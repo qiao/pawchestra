@@ -14,7 +14,7 @@ import { addRimLight } from './rim-light.ts';
 import type { RimUniforms } from './rim-light.ts';
 import { noBakeTexture } from './stage-bake.ts';
 
-/** The finish of the stage wood of a venue (design 4.1, 4.5): the values of {@link STAGE_FINISH}. */
+/** The finish of the stage wood of a venue (design 4.1): the values of {@link STAGE_FINISH}. */
 export interface StageFinish {
   /** The roughness of the wood below the lacquer, before the grain. */
   readonly roughness: number;
