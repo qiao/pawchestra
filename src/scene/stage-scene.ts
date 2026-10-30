@@ -31,6 +31,7 @@ import type { ScenePose } from '../pose/types.ts';
 import { freeBeamOpacity } from '../shots/beam-opacity.ts';
 import type { FrameCover, ScreenBox, ViewFrame } from '../shots/frame.ts';
 import type { CameraPose } from '../shots/types.ts';
+import { SCENE_COLORS } from '../models/colors.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import { buildSceneProps } from '../models/props.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
@@ -81,7 +82,7 @@ import { freeShotLight, shotRig } from '../shots/shot-light.ts';
 import { gradeLutSteps } from './grade.ts';
 import { createRenderer } from './renderer.ts';
 import { aimGap, easeAim, easeShare, soloAim } from './solo-light.ts';
-import { STAGE_SHADOW, createStage, noBakeUniforms } from './stage.ts';
+import { HALL_STAGE, STAGE_SHADOW, createStage, noBakeUniforms } from './stage.ts';
 import { VariantMaterials } from './variants.ts';
 import type { StageBakeUniforms } from './stage.ts';
 import { bakeStageSteps } from './stage-bake.ts';
@@ -472,7 +473,15 @@ export class StageScene {
     // new layout. A shown layout is under the cover of the stage while a new one builds (PF1).
     setPoolAim(this.#pool, aim);
     const bakeUniforms = noBakeUniforms();
-    const stageGroup = createStage(layout.stageSide, podium, this.#pool, bakeUniforms, this.#rim);
+    const stageGroup = createStage(
+      layout.stageSide,
+      podium,
+      HALL_STAGE,
+      SCENE_COLORS,
+      this.#pool,
+      bakeUniforms,
+      this.#rim,
+    );
     scene.add(stageGroup);
     yield;
     const lights = createLights(layout.stageSide, this.#tier, layout.conductor);

@@ -1,7 +1,9 @@
 import { Group, Mesh, MeshPhysicalMaterial, ShaderChunk, Vector3 } from 'three';
 import type { Texture } from 'three';
 
+import type { PropColors } from '../models/colors.ts';
 import { STAGE_COLORS } from '../models/props.ts';
+import type { StageColors } from '../models/props.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { STAGE_CORNER_CUT, STAGE_LIP, buildStage } from '../models/stage.ts';
 import { createGeometry } from './geometry.ts';
@@ -12,9 +14,54 @@ import { addRimLight } from './rim-light.ts';
 import type { RimUniforms } from './rim-light.ts';
 import { noBakeTexture } from './stage-bake.ts';
 
+/** The finish of the stage wood of a venue (design 4.1, 4.5): the values of {@link STAGE_FINISH}. */
+export interface StageFinish {
+  /** The roughness of the wood below the lacquer, before the grain. */
+  readonly roughness: number;
+  /** The largest change of the wood color by the grain, as a factor. */
+  readonly grain: number;
+  /** The largest change of the roughness by the grain. */
+  readonly grainRoughness: number;
+  /** The factor of the direct gloss of the lights on the wood below the lacquer. */
+  readonly specular: number;
+  /** The largest change of the roughness from one plank to the next. */
+  readonly plankRoughness: number;
+  /** The largest change of the direct gloss from one plank to the next, as a factor. */
+  readonly plankGloss: number;
+  /** The part of the gloss that the dark line between two planks keeps. */
+  readonly seamGloss: number;
+  /** The strength of the lacquer layer above the wood, from 0 to 1. */
+  readonly clearcoat: number;
+  /** The roughness of the lacquer layer. */
+  readonly clearcoatRoughness: number;
+}
+
 /**
- * The finish of the stage wood (design 4.5, materials): walnut with a soft sheen under a thin
- * lacquer. The diffuse light of the wood gives most of the light of the planks, so the lit floor
+ * The baked light of the sides of the stage of a venue (design 4.1, 4.5): the values of
+ * {@link SIDE_GLOW}.
+ */
+export interface SideGlow {
+  /** The light of the skirt, as a part of its base color. */
+  readonly skirt: number;
+  /** The light of the lip of the edge, as a part of its base color. */
+  readonly edge: number;
+  /** The part of the light that the corners lose. */
+  readonly fade: number;
+}
+
+/** The stage of a venue (design 4.1): its colors, the finish of its wood, and its side light. */
+export interface VenueStage {
+  /** The colors of the planks, the seams, the lip, the skirt, the podium, and the risers. */
+  readonly colors: StageColors;
+  /** The finish of the wood. */
+  readonly finish: StageFinish;
+  /** The baked light of the skirt and the lip. */
+  readonly sideGlow: SideGlow;
+}
+
+/**
+ * The finish of the stage wood of the concert hall (design 4.5, materials): walnut with a soft
+ * sheen under a thin lacquer. The diffuse light of the wood gives most of the light of the planks, so the lit floor
  * keeps the warm color of the wood, as in `orchestra-latest.png`. The pool of the stage lights
  * (`addLightPool()`) sets the width of the lit area.
  */
@@ -53,7 +100,7 @@ export const STAGE_FINISH = {
   clearcoat: 0.18,
   /** The roughness of the lacquer layer: a soft glare of the key light. */
   clearcoatRoughness: 0.35,
-} as const;
+} as const satisfies StageFinish;
 
 /**
  * The baked light of the sides of the stage (design 4.5, scene colors): the light of the lit floor
@@ -70,7 +117,14 @@ export const SIDE_GLOW = {
   edge: 0.25,
   /** The part of the light that the corners lose. */
   fade: 0.6,
-} as const;
+} as const satisfies SideGlow;
+
+/** The stage of the concert hall (design 4.5): walnut planks under a thin lacquer. */
+export const HALL_STAGE: VenueStage = {
+  colors: STAGE_COLORS,
+  finish: STAGE_FINISH,
+  sideGlow: SIDE_GLOW,
+};
 
 /**
  * The GLSL of the grain: a value noise, stretched along x, the direction of the planks. It needs
@@ -118,7 +172,7 @@ float plankNumber(vec3 color) {
   return fract(sin(dot(color, vec3(1271.1, 3117.7, 7451.3))) * 43758.5453);
 }
 
-// 1 on the dark line between two planks, which has the color STAGE_COLORS.seam, else 0.
+// 1 on the dark line between two planks, which has the seam color of the venue, else 0.
 float seamOf(vec3 color) {
   vec3 d = abs(color - uSeamColor);
   return 1.0 - step(1e-4, max(d.r, max(d.g, d.b)));
@@ -317,6 +371,8 @@ function liftedShadowVertex(): string {
  * edge, and the pool of the stage lights (design 4.5, materials).
  *
  * @param stageSide The stage side `S`, in meters, for the fade of the baked light.
+ * @param stage The stage of the venue (design 4.1): the seam color, the finish, and the side
+ *   light.
  * @param pool The uniforms of the pool of the stage lights (design 4.5).
  * @param bake The uniforms of the bake of the static props. With no bake, all light reaches each
  *   point.
@@ -325,41 +381,39 @@ function liftedShadowVertex(): string {
  */
 export function createStageMaterial(
   stageSide: number,
+  stage: VenueStage,
   pool: PoolUniforms,
   bake: StageBakeUniforms = noBakeUniforms(),
   rim: RimUniforms | null = null,
 ): MeshPhysicalMaterial {
+  const { finish, sideGlow } = stage;
   const material = new MeshPhysicalMaterial({
     vertexColors: true,
     flatShading: true,
-    roughness: STAGE_FINISH.roughness,
+    roughness: finish.roughness,
     metalness: 0,
-    clearcoat: STAGE_FINISH.clearcoat,
-    clearcoatRoughness: STAGE_FINISH.clearcoatRoughness,
+    clearcoat: finish.clearcoat,
+    clearcoatRoughness: finish.clearcoatRoughness,
   });
   material.onBeforeCompile = (shader) => {
     addLightPool(shader, pool, 'stage');
     if (rim) {
       addRimLight(shader, rim, 'stage');
     }
-    shader.uniforms['uGrain'] = { value: STAGE_FINISH.grain };
-    shader.uniforms['uGrainRoughness'] = { value: STAGE_FINISH.grainRoughness };
+    shader.uniforms['uGrain'] = { value: finish.grain };
+    shader.uniforms['uGrainRoughness'] = { value: finish.grainRoughness };
     shader.uniforms['uHalfSide'] = { value: stageSide / 2 };
     shader.uniforms['uCornerCut'] = { value: STAGE_CORNER_CUT * stageSide };
-    shader.uniforms['uSpecular'] = { value: STAGE_FINISH.specular };
-    shader.uniforms['uSeamColor'] = { value: new Vector3(...STAGE_COLORS.seam) };
+    shader.uniforms['uSpecular'] = { value: finish.specular };
+    shader.uniforms['uSeamColor'] = { value: new Vector3(...stage.colors.seam) };
     shader.uniforms['uPlank'] = {
-      value: new Vector3(
-        STAGE_FINISH.plankRoughness,
-        STAGE_FINISH.plankGloss,
-        STAGE_FINISH.seamGloss,
-      ),
+      value: new Vector3(finish.plankRoughness, finish.plankGloss, finish.seamGloss),
     };
     shader.uniforms['uStageBake'] = bake.uStageBake;
     shader.uniforms['uShadowLift'] = bake.uShadowLift;
     shader.uniforms['uStageBlur'] = bake.uStageBlur;
     shader.uniforms['uSideGlow'] = {
-      value: new Vector3(SIDE_GLOW.skirt, SIDE_GLOW.edge, SIDE_GLOW.fade),
+      value: new Vector3(sideGlow.skirt, sideGlow.edge, sideGlow.fade),
     };
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -398,6 +452,8 @@ export function createStageMaterial(
  *
  * @param stageSide The stage side `S`, in meters.
  * @param podium The podium center of the layout, or `null` for a layout with no podium.
+ * @param stage The stage of the venue (design 4.1).
+ * @param props The prop colors of the venue, for the conductor stand.
  * @param pool The uniforms of the pool of the stage lights (design 4.5).
  * @param bake The uniforms of the bake of the static props.
  * @param rim The uniforms of the rim lights (design 4.5), or `null` for no rim lights.
@@ -406,15 +462,17 @@ export function createStageMaterial(
 export function createStage(
   stageSide: number,
   podium: Vec3 | null,
+  stage: VenueStage,
+  props: PropColors,
   pool: PoolUniforms,
   bake: StageBakeUniforms = noBakeUniforms(),
   rim: RimUniforms | null = null,
 ): Group {
-  const stage = new Mesh(
-    createGeometry(buildStage(stageSide, podium)),
-    createStageMaterial(stageSide, pool, bake, rim),
+  const mesh = new Mesh(
+    createGeometry(buildStage(stageSide, podium, stage.colors, props)),
+    createStageMaterial(stageSide, stage, pool, bake, rim),
   );
-  stage.castShadow = true;
-  stage.receiveShadow = true;
-  return new Group().add(stage);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return new Group().add(mesh);
 }

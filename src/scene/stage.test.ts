@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { Mesh, MeshStandardMaterial } from 'three';
 
+import { SCENE_COLORS } from '../models/colors.ts';
 import { createPoolUniforms } from './light-pool.ts';
-import { STAGE_FINISH, createStage, createStageMaterial } from './stage.ts';
+import { HALL_STAGE, STAGE_FINISH, createStage, createStageMaterial } from './stage.ts';
 
 describe('createStage', () => {
   it('makes one stage mesh that casts and takes the shadows of the spotlight', () => {
-    const meshes = createStage(8, [0, 0, 3], createPoolUniforms()).children;
+    const meshes = createStage(
+      8,
+      [0, 0, 3],
+      HALL_STAGE,
+      SCENE_COLORS,
+      createPoolUniforms(),
+    ).children;
     expect(meshes).toHaveLength(1);
     const [stage] = meshes;
     expect(stage).toBeInstanceOf(Mesh);
@@ -17,7 +24,7 @@ describe('createStage', () => {
 
 describe('createStageMaterial (design 4.5, materials)', () => {
   it('gives the wood a polished finish, glossier than the matte group of the players', () => {
-    const material = createStageMaterial(8, createPoolUniforms());
+    const material = createStageMaterial(8, HALL_STAGE, createPoolUniforms());
     expect(material).toBeInstanceOf(MeshStandardMaterial);
     expect(material.roughness).toBe(STAGE_FINISH.roughness);
     expect(material.roughness).toBeLessThan(0.85);
@@ -27,7 +34,7 @@ describe('createStageMaterial (design 4.5, materials)', () => {
   });
 
   it('adds the grain, the baked light of the sides, and the pool to the standard shader', () => {
-    const material = createStageMaterial(8, createPoolUniforms());
+    const material = createStageMaterial(8, HALL_STAGE, createPoolUniforms());
     const shader = {
       uniforms: {},
       vertexShader: '#include <common>\n#include <project_vertex>',
