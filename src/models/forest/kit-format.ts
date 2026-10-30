@@ -1,13 +1,6 @@
-import { srgb } from '../mesh.ts';
-import {
-  byteReader,
-  readByte,
-  readVarint,
-  toBase64,
-  unzigzag,
-  writeVarint,
-  zigzag,
-} from '../packed-bytes.ts';
+import type { srgb } from '../mesh.ts';
+import { toBase64, writeVarint, zigzag } from '../packed-bytes.ts';
+import type { byteReader, readByte, readVarint, unzigzag } from '../packed-bytes.ts';
 import type { Vec3 } from '../tuples.ts';
 
 /** The kinds of the faces of a forest part, in the order of their packed index. */
@@ -30,6 +23,23 @@ export interface ForestTriangle {
   readonly rgb: Vec3;
   /** The kind of the face. */
   readonly kind: ForestFaceKind;
+}
+
+/**
+ * The functions of the first download that read a packed part (design 7.2). The chunk of the
+ * forest imports no module of the first download at run time, so the caller gives them.
+ */
+export interface KitReaders {
+  /** `byteReader()` of `models/packed-bytes.ts`. */
+  readonly byteReader: typeof byteReader;
+  /** `readByte()` of `models/packed-bytes.ts`. */
+  readonly readByte: typeof readByte;
+  /** `readVarint()` of `models/packed-bytes.ts`. */
+  readonly readVarint: typeof readVarint;
+  /** `unzigzag()` of `models/packed-bytes.ts`. */
+  readonly unzigzag: typeof unzigzag;
+  /** `srgb()` of `models/mesh.ts`. */
+  readonly srgb: typeof srgb;
 }
 
 /** A forest part read back by {@link unpackForestPart}, as flat triangles. */
@@ -182,11 +192,13 @@ export function packForestPart(triangles: readonly ForestTriangle[]): string {
  * Reads a forest part of {@link packForestPart} back as flat triangles.
  *
  * @param packed The packed part as base64.
+ * @param readers The functions of the first download that read the bytes.
  * @returns The corners, their linear colors, and the kind of each triangle.
  * @throws Error if the bytes end early, or if a corner or a triangle names a vertex or a color
  *   that does not exist.
  */
-export function unpackForestPart(packed: string): ForestMesh {
+export function unpackForestPart(packed: string, readers: KitReaders): ForestMesh {
+  const { byteReader, readByte, readVarint, unzigzag, srgb } = readers;
   const reader = byteReader(packed);
   const vertexCount = readVarint(reader);
   const triangleCount = readVarint(reader);

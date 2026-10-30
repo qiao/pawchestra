@@ -1,12 +1,10 @@
-import { srgb } from '../mesh.ts';
-import { STAGE_CORNER_CUT } from '../stage.ts';
 import type { Vec3 } from '../tuples.ts';
 import { FOREST_KIT } from './kit-data.ts';
 import { unpackForestPart } from './kit-format.ts';
-import type { ForestKitData, ForestRopeEnd } from './kit-format.ts';
+import type { ForestKitData, ForestRopeEnd, KitReaders } from './kit-format.ts';
 
 export { FOREST_FACE_KINDS } from './kit-format.ts';
-export type { ForestFaceKind } from './kit-format.ts';
+export type { ForestFaceKind, KitReaders } from './kit-format.ts';
 
 /** One part of the forest kit, as flat triangles in meters. */
 export interface ForestPart {
@@ -47,14 +45,14 @@ export interface ForestLayout {
 }
 
 /**
- * The ropes of the light string: their radius in meters and their linear color, the same as
- * `ROPE` of `tools/forest-kit/build-kit.py`.
+ * The ropes of the light string: their radius in meters and their color, the same as `ROPE` of
+ * `tools/forest-kit/build-kit.py`.
  */
 export const FOREST_ROPE = {
   /** The radius of the rope, in meters. */
   radius: 0.014,
-  /** The linear color of the rope. */
-  color: srgb('#6b5236'),
+  /** The color of the rope, in sRGB. */
+  color: '#6b5236',
 } as const;
 
 /**
@@ -69,12 +67,13 @@ const ROPE_SEGMENTS = 24;
 /**
  * Decodes the parts of the kit.
  *
+ * @param readers The functions of the first download that read the bytes (design 7.2).
  * @param kit The packed kit. The kit of `pnpm forest-kit` by default.
  * @returns Each part, in the order of the kit.
  * @throws Error if the packed data of a part is broken.
  */
-export function forestParts(kit: ForestKitData = FOREST_KIT): ForestPart[] {
-  return kit.parts.map(({ name, packed }) => ({ name, ...unpackForestPart(packed) }));
+export function forestParts(readers: KitReaders, kit: ForestKitData = FOREST_KIT): ForestPart[] {
+  return kit.parts.map(({ name, packed }) => ({ name, ...unpackForestPart(packed, readers) }));
 }
 
 /**
@@ -106,15 +105,21 @@ const CORNER_BLEND = 1;
  *
  * @param x The x of the place, in meters.
  * @param z The z of the place, in meters.
- * @param side The stage side of the kit.
- * @param newSide The new stage side.
+ * @param sides The stage side of the kit and the new stage side.
+ * @param cornerCut The corner cut of the stage, as a part of its side: `STAGE_CORNER_CUT`.
  * @returns The new x and z.
  */
-function movePlace(x: number, z: number, side: number, newSide: number): [number, number] {
+function movePlace(
+  x: number,
+  z: number,
+  sides: readonly [side: number, newSide: number],
+  cornerCut: number,
+): [number, number] {
+  const [side, newSide] = sides;
   const half = side / 2;
   const newHalf = newSide / 2;
   const beyond = Math.min(Math.abs(x) - half, Math.abs(z) - half);
-  const cut = Math.max(0, (STAGE_CORNER_CUT * (side - newSide)) / 2);
+  const cut = Math.max(0, (cornerCut * (side - newSide)) / 2);
   const corner = cut * Math.min(1, Math.max(0, beyond / CORNER_BLEND));
 
   return [
@@ -227,12 +232,18 @@ function thinTrees(placements: readonly ForestPlacement[], kit: ForestKitData): 
  * after the move, and the lanterns of each rope hang at equal steps between its ends.
  *
  * @param stageSide The stage side `S`, in meters.
+ * @param cornerCut The corner cut of the stage, as a part of its side: `STAGE_CORNER_CUT` of
+ *   `models/stage.ts`, as an argument (design 7.2).
  * @param kit The packed kit. The kit of `pnpm forest-kit` by default.
  * @returns The placed parts, the rope lanterns at the end, and the ropes.
  */
-export function placeForest(stageSide: number, kit: ForestKitData = FOREST_KIT): ForestLayout {
+export function placeForest(
+  stageSide: number,
+  cornerCut: number,
+  kit: ForestKitData = FOREST_KIT,
+): ForestLayout {
   const moved = kit.placements.map(([part, x, y, z, yaw, scale]): ForestPlacement => {
-    const [nx, nz] = movePlace(x, z, kit.stageSide, stageSide);
+    const [nx, nz] = movePlace(x, z, [kit.stageSide, stageSide], cornerCut);
     return { part, position: [nx, y, nz], yaw, scale };
   });
 
