@@ -105,6 +105,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | `blender -b --factory-startup --python tools/blender/dump_mesh.py -- <mesh.glb> <out.npz>` | Writes the welded vertices (studio units and axes) and the triangles of a mesh into an npz file. |
 | `pnpm mesh-options <animal> <dir> --size <label>=<head top>... [--legs <f>,...] [--arms <f>,...] [--instrument <id>]` | Makes the mid-report of a mesh: it rigs each size, leg factor, and arm factor as `rig-mesh --check` does, and writes the measures and the warnings into `<dir>/options.md`. About 7 s for each variant. |
 | `pnpm studio-body <animal> [--inspect [--glb <file>]]` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender, scaled by the landmark of the animal. A seated role drops onto its seat. `--inspect` prints the joints, the clips, and the arm lengths, and writes no file. |
+| `blender -b --factory-startup -P tools/forest-kit/build-kit.py -- assets/forest/forest-kit.glb [--render <dir>]`, then `pnpm forest-kit [--glb <file>] [--check]` | Builds the low-poly forest kit from one seed into a GLB file: the parts, one empty for each place around the stage of the default demo, and the rope ends of the light string (`assets/forest/README.md`). `--render` also renders the reference view, the five views, and the sheet of the parts. `pnpm forest-kit` writes `src/models/forest/kit-data.ts` from the GLB file, and prints the triangles of each part and the gzip size. A run gives the same bytes. About 1 s, and 80 s with `--render`. |
 
 ## Tests and scripts
 
