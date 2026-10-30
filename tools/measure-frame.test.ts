@@ -170,6 +170,7 @@ describe('frameOptions', () => {
   it('gives the defaults of the frame target', () => {
     expect(frameOptions([], true)).toEqual({
       demo: 'perf-60',
+      scene: 'hall',
       scale: 2,
       headed: false,
       free: false,
@@ -183,8 +184,9 @@ describe('frameOptions', () => {
 
   it('reads each flag', () => {
     const flags = ['--demo=bach', '--scale=1', '--free', '--max-cpu=25', '--wait=5', '--no-metal'];
-    expect(frameOptions([...flags, '--keep=out', '--headed'], true)).toEqual({
+    expect(frameOptions([...flags, '--keep=out', '--headed', '--scene=forest'], true)).toEqual({
       demo: 'bach',
+      scene: 'forest',
       scale: 1,
       headed: true,
       free: true,

@@ -10,7 +10,10 @@ import { chromium } from '@playwright/test';
 import type { Browser, Page } from '@playwright/test';
 import { createServer } from 'vite';
 
+import { venueHash } from '../src/app/demos.ts';
 import { FIRST_PLAY, SAMPLES_READY } from '../src/app/dev-hook.ts';
+import { DEFAULT_VENUE, VENUE_IDS, isVenueId } from '../src/scene/venue-id.ts';
+import type { VenueId } from '../src/scene/venue-id.ts';
 import { chromiumArgs } from './chromium-args.ts';
 import { startCinematic } from './cinematic-mode.ts';
 import {
@@ -405,7 +408,7 @@ const CPU_WINDOW_SEC = 5;
 const CPU_WAIT_SEC = 300;
 
 /** The flags of `pnpm frame` that take a value, such as `--demo=<id>`. */
-const VALUE_FLAGS = new Set(['demo', 'scale', 'max-cpu', 'wait', 'keep']);
+const VALUE_FLAGS = new Set(['demo', 'scene', 'scale', 'max-cpu', 'wait', 'keep']);
 
 /** The flags of `pnpm frame` that take no value, such as `--headed`. */
 const SWITCH_FLAGS = new Set(['headed', 'free', 'no-metal', 'gpu-only']);
@@ -414,6 +417,8 @@ const SWITCH_FLAGS = new Set(['headed', 'free', 'no-metal', 'gpu-only']);
 export interface FrameOptions {
   /** The demo id, or `perf-60`, the file of the frame target. */
   readonly demo: string;
+  /** The venue around the stage (design 4.1): the hall by default. */
+  readonly scene: VenueId;
   /** The device pixels for each CSS pixel. */
   readonly scale: number;
   /** True to show the browser windows. */
@@ -440,7 +445,8 @@ export interface FrameOptions {
  *   records no Metal trace.
  * @returns The options.
  * @throws Error for an unknown flag, a value flag with no value, a switch with a value, a value
- *   that is not a positive number, or `--gpu-only` with `--no-metal` or with no `xctrace`.
+ *   that is not a positive number, an unknown venue, or `--gpu-only` with `--no-metal` or with no
+ *   `xctrace`.
  */
 export function frameOptions(flags: readonly string[], xctraceFound: boolean): FrameOptions {
   const values = new Map<string, string>();
@@ -472,6 +478,10 @@ export function frameOptions(flags: readonly string[], xctraceFound: boolean): F
   if (switches.has('gpu-only') && !xctraceFound) {
     throw new Error('The flag --gpu-only needs the Metal trace, and xcrun finds no xctrace.');
   }
+  const scene = values.get('scene') ?? DEFAULT_VENUE;
+  if (!isVenueId(scene)) {
+    throw new Error(`The flag --scene takes one of ${VENUE_IDS.join(', ')}, not "${scene}".`);
+  }
   const positive = (name: string, fallback: number): number => {
     const text = values.get(name);
     const value = text === undefined ? fallback : Number(text);
@@ -482,6 +492,7 @@ export function frameOptions(flags: readonly string[], xctraceFound: boolean): F
   };
   return {
     demo: values.get('demo') ?? 'perf-60',
+    scene,
     scale: positive('scale', 2),
     headed: switches.has('headed'),
     free: switches.has('free'),
@@ -685,8 +696,9 @@ async function playDemo(browser: Browser, base: string, options: FrameOptions): 
     }
   });
   page.on('pageerror', (error) => count(`page error: ${error.message}`));
-  await page.goto(`${base}#demo=${options.demo}`);
+  await page.goto(`${base}${venueHash(options.scene, `#demo=${options.demo}`)}`);
   await page.waitForSelector(`canvas[data-demo="${options.demo}"]`, { timeout: 60_000 });
+  await page.waitForSelector(`canvas[data-scene="${options.scene}"]`, { timeout: 60_000 });
   await page.waitForSelector(SAMPLES_READY, { timeout: 120_000 });
   if (!options.free) {
     // The frame target also holds in Cinematic mode (design 9.7).
@@ -1251,6 +1263,8 @@ export interface RunRecord {
   readonly dirty: boolean;
   /** The demo of the run. */
   readonly demo: string;
+  /** The venue of the run. */
+  readonly scene: VenueId;
   /** The device pixels for each CSS pixel. */
   readonly scale: number;
   /** The width and the height of the drawing buffer of the stage, in pixels. */
@@ -1419,7 +1433,8 @@ async function main(): Promise<void> {
     const { info } = capped ?? uncapped;
     const view = options.free ? 'Free' : info.camera;
     const size = `1440 × 900 at the device scale ${options.scale}`;
-    console.log(`Frame measure of ${options.demo} (${info.players} players), ${view}, ${size}`);
+    const piece = `${options.demo} in the venue ${options.scene} (${info.players} players)`;
+    console.log(`Frame measure of ${piece}, ${view}, ${size}`);
     console.log(`${info.browser}, ${uncapped.probe.renderer}`);
     console.log(`Drawing buffer of the stage: ${uncapped.canvas.join(' × ')} pixels.`);
     if (cpu === null) {
@@ -1482,6 +1497,7 @@ async function main(): Promise<void> {
       const record: RunRecord = {
         ...treeState(root),
         demo: options.demo,
+        scene: options.scene,
         scale: options.scale,
         canvas: uncapped.canvas,
         songs: {
