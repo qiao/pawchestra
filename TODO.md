@@ -45,6 +45,8 @@ render, and the memory.
 
 - [ ] Measure the clock target of 9.7 with the bow.
 - [ ] Measure the steps of `currentTime` in Firefox, and smooth `now()` if the bow needs it (6.7).
+- [ ] Forest scene: build the surroundings from the forest kit (round C). Replace the stub of
+      `scene/forest.ts` with the meshes of `assets/forest/` (4.1).
 - [ ] Hide or fade each forest part between the camera and the stage (`src/models/forest/kit.ts`).
       The trees at the sides stand inside the default distance of about 16 m, so an orbit, a side
       shot, or a high shot can look through a trunk or a crown.
@@ -62,6 +64,24 @@ render, and the memory.
 - [ ] Share the corner code of `models/forest/kit-format.ts` with `models/studio-format.ts`. Both
       hold the same recent-vertex code, because the forest round could not change
       `studio-format.ts`.
+- [ ] Forest: the stub frame is darker at the top corners than `reference/forest.webp` (median
+      luma 20 to 25 against 35) and redder (mean RGB 99, 57, 27 against 106, 69, 31). The default
+      view shows more earth than canopy. Tune the roots `FOREST*` with `pnpm look-variants` and
+      the key `scene` (4.1).
+- [ ] Forest: `pnpm look-lab` measures a forest frame against `orchestra-latest.png`. Add the
+      regions and the reference `forest.webp` for the venue `forest`.
+- [ ] Remove the top-level await of `src/gallery/views-main.ts`, so that the chunk merge of
+      Rolldown works again (7.2). Then the forest chunk can import the modules of the first
+      download, and `ForestKit` can go. Measure `pnpm size` and `pnpm load-probe` after it.
+- [ ] A lamp glow of `createGlows()` (`scene/surroundings.ts`) wider than about 130 px did not
+      draw on the development Mac, but the GPU gives points up to 511 px. Check the hall lamps in
+      the close shots, and draw a large glow as a quad.
+- [ ] The conductor shot of `pnpm frozen` does not repeat: two runs of `e0ccc347` differ in 22,445
+      pixels, by at most 2, at the lamp glows at the top left. Find the cause, so that a check of
+      a refactor can trust the shot.
+- [ ] A change of the scene sends the camera of Free mode back to the default view, as a change
+      of "Section size" does (2.8). Keep the orbit of the camera, so that a switch does not move
+      the view.
 
 Done when: the screenshot has the composition of the reference (9.5), and the clock target
 passes.
