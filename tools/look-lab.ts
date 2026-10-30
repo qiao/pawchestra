@@ -7,9 +7,11 @@
  * the layout of {@link LOOK_DEMO} (`tools/look-regions.ts`). `<dir>/regions-default.png` shows
  * these regions on the frame of the tree.
  *
- * Usage: `pnpm look-lab <dir> [--base <ref>] [--url <url>] [--measure]`
+ * Usage: `pnpm look-lab <dir> [--base <ref>] [--url <url>] [--scene <id>] [--measure]`
  *
  * - `--base <ref>` also renders a commit (the frames `play-base-*.png`), as `pnpm close-views`.
+ * - `--scene <id>` renders the stage in a venue (design 4.1), such as `forest`. The measures
+ *   still compare each frame with the reference of the hall.
  * - `--url <url>` renders a running site, such as the dev server of `pnpm look-variants` with a
  *   look override (`src/app/look-override.ts`). It builds no site.
  * - `--measure` renders nothing, and measures the frames that `<dir>` holds.
@@ -896,7 +898,7 @@ export async function readLookFrames(
   return frames;
 }
 
-const USAGE = 'Usage: pnpm look-lab <dir> [--base <ref>] [--url <url>] [--measure]';
+const USAGE = 'Usage: pnpm look-lab <dir> [--base <ref>] [--url <url>] [--scene <id>] [--measure]';
 
 /**
  * Renders the frames of the look lab with `pnpm close-views play`, unless `--measure` is given,

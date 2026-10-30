@@ -6,8 +6,9 @@
  *
  * `<variants.json>` holds one object: the name of each variant, a folder name, and its changes.
  * The changes are look paths and values, as the query `look` of the dev server
- * (`src/app/look-override.ts`, `LOOK_ROOTS` of `src/scene/look-values.ts`), and the optional key
- * `solo`, as the query `solo` (`soloSeats()`). An empty object renders the working tree:
+ * (`src/app/look-override.ts`, `LOOK_ROOTS` of `src/scene/look-values.ts`), the optional key
+ * `solo`, as the query `solo` (`soloSeats()`), and the optional key `scene`, the venue of the
+ * frames (design 4.1), such as `"scene": "forest"`. An empty object renders the working tree:
  *
  * ```json
  * { "main": { "BACK_ROW_LIGHT.illuminance": 0, "LIGHT_POOL.reachBack": 0.42 }, "tree": {} }
@@ -46,6 +47,8 @@ import { layoutScene } from '../src/models/layout-scene.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
 import { checkLook, parseLook, soloSeats } from '../src/scene/look-values.ts';
 import type { LookChanges } from '../src/scene/look-values.ts';
+import { DEFAULT_VENUE, VENUE_IDS, isVenueId } from '../src/scene/venue-id.ts';
+import type { VenueId } from '../src/scene/venue-id.ts';
 import { scoreOf } from '../src/score/test-score.ts';
 import { defaultSummary, lookRegions, lookSummary, readLookFrames } from './look-lab.ts';
 import type { LookFrame, SummaryRow } from './look-lab.ts';
@@ -67,6 +70,8 @@ interface Variant {
   readonly look: LookChanges;
   /** The seats and species of the solo, or `null` with no solo. */
   readonly solo: string | null;
+  /** The venue of the frames: the key `scene` (design 4.1). */
+  readonly scene: VenueId;
 }
 
 /** The command line. */
@@ -107,7 +112,8 @@ function readArgs(args: readonly string[]): VariantsArgs {
  *
  * @param text The JSON text of the file.
  * @returns The variants, in the order of the file.
- * @throws Error that names the variant, for a wrong name, a wrong solo, or a wrong change.
+ * @throws Error that names the variant, for a wrong name, a wrong solo, an unknown venue, or a
+ *   wrong change.
  */
 export function parseVariants(text: string): Variant[] {
   let parsed: unknown;
@@ -139,8 +145,14 @@ export function parseVariants(text: string): Variant[] {
         `The solo of the variant ${name} is no list of seats and species: ${JSON.stringify(solo)}.`,
       );
     }
-    const changes = new Map([...look].filter(([path]) => path !== 'solo'));
-    return { name, look: changes, solo: solo === undefined ? null : String(solo) };
+    const scene = String(look.get('scene') ?? DEFAULT_VENUE);
+    if (!isVenueId(scene)) {
+      throw new Error(
+        `The scene of the variant ${name} is not one of ${VENUE_IDS.join(', ')}: ${scene}.`,
+      );
+    }
+    const changes = new Map([...look].filter(([path]) => path !== 'solo' && path !== 'scene'));
+    return { name, look: changes, solo: solo === undefined ? null : String(solo), scene };
   });
 }
 
@@ -297,6 +309,8 @@ function runVariant(out: string, site: string, variant: Variant): Promise<number
         join(out, variant.name),
         '--url',
         variantUrl(site, variant),
+        '--scene',
+        variant.scene,
       ],
       { cwd: ROOT, stdio: ['ignore', fd, fd], detached: true },
     ),
