@@ -201,7 +201,7 @@ def material(kind):
     }[kind]
     if kind == 'glow':
         tree.links.new(attr.outputs['Color'], bsdf.inputs['Emission Color'])
-        bsdf.inputs['Emission Strength'].default_value = 6.0
+        bsdf.inputs['Emission Strength'].default_value = 3.5
     return mat
 
 
@@ -1755,7 +1755,7 @@ def build_preview(objects, empties):
     preview.objects.link(cam)
     bpy.context.scene.camera = cam
     sun = bpy.data.objects.new('sun', bpy.data.lights.new('sun', 'SUN'))
-    sun.data.energy = 4.5
+    sun.data.energy = 7.0
     sun.data.color = (1.0, 0.62, 0.32)
     sun.data.angle = math.radians(2.0)
     # The sun stands at the back right, 22 degrees high, and shines to the front left.
@@ -1765,8 +1765,8 @@ def build_preview(objects, empties):
     world = bpy.context.scene.world or bpy.data.worlds.new('world')
     bpy.context.scene.world = world
     background = next(n for n in world.node_tree.nodes if n.type == 'BACKGROUND')
-    background.inputs['Color'].default_value = (0.42, 0.3, 0.16, 1.0)
-    background.inputs['Strength'].default_value = 0.6
+    background.inputs['Color'].default_value = (0.62, 0.43, 0.24, 1.0)
+    background.inputs['Strength'].default_value = 1.8
     render = bpy.context.scene.render
     render.resolution_x, render.resolution_y = 1600, 1000
     return preview
