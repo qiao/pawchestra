@@ -10,7 +10,7 @@ import type { Browser, Page } from '@playwright/test';
 import { build as viteBuild, preview } from 'vite';
 import type { Plugin } from 'vite';
 
-import { DEFAULT_DEMO, DEMOS, DEMO_IDS } from '../src/app/demos.ts';
+import { DEFAULT_DEMO, DEMOS, DEMO_IDS, venueHash } from '../src/app/demos.ts';
 import type { DemoId } from '../src/app/demos.ts';
 import { BAR_HIDE_SEC } from '../src/app/bar-rules.ts';
 import { FIRST_PLAY, SAMPLES_READY } from '../src/app/dev-hook.ts';
@@ -28,6 +28,8 @@ import { ModelCache } from '../src/models/model-cache.ts';
 import { SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
+import { DEFAULT_VENUE, VENUE_IDS, isVenueId } from '../src/scene/venue-id.ts';
+import type { VenueId } from '../src/scene/venue-id.ts';
 import { buildScore } from '../src/score/score.ts';
 import { INSTRUMENT_IDS } from '../src/models/instruments/catalog.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
@@ -3076,6 +3078,8 @@ interface PlayArgs {
    * opens the file with its file input, as a user does, so the file stays outside the repository.
    */
   readonly midi: string | null;
+  /** The venue around the stage of `--scene` (design 4.1): the hall by default. */
+  readonly scene: VenueId;
   /** The time of the frames. */
   readonly time: PlayTime;
   /**
@@ -3432,9 +3436,9 @@ function playParts(args: PlayArgs): PlayArgs[] {
 
 /**
  * Reads the command line of the mode `play`:
- * `play <dir> [--demo <id> | --midi <path>] [--time <s>... | --strip <from>:<step>:<count>] [--camera <name>|<dx>,<dy>,<wheel>|<JSON>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--pause]`.
+ * `play <dir> [--demo <id> | --midi <path>] [--scene <id>] [--time <s>... | --strip <from>:<step>:<count>] [--camera <name>|<dx>,<dy>,<wheel>|<JSON>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--pause]`.
  * `--pause` pauses the play at the time of the frame, so that the frame shows the rest pose
- * ({@link pauseFrame}).
+ * ({@link pauseFrame}). `--scene` renders the stage in a venue (design 4.1), such as `forest`.
  * With no `--camera`, the camera is `default`. `--camera-file` gives labelled cameras in place of
  * `--camera` ({@link cameraFile}). `--midi` renders a MIDI file of the user in place
  * of a demo ({@link openMidi}). `--strip` renders frames at exact song times from one page each
@@ -3451,7 +3455,7 @@ function playParts(args: PlayArgs): PlayArgs[] {
  * @returns The command line, or `null` when the first argument is not `play`.
  * @throws Error that lists the correct names, for an unknown demo, camera, or species, and an
  *   error for a wrong time, a time below {@link SEEK_LEAD_SEC}, a time at or after the end of the
- *   demo, a file of `--midi` that does not exist or comes with `--demo`, two times with one
+ *   demo, an unknown venue, a file of `--midi` that does not exist or comes with `--demo`, two times with one
  *   folder, `--camera` or `--camera-file` with `--cinematic` or `--shot`, `--camera-file` with
  *   `--camera`, a wrong camera file, `--time` with `--shot`, `--at` with `--camera`,
  *   `--camera-file`, `--cinematic`, `--shot`, or `--url`, `--set` with `--url` or `--base`, an
@@ -3467,6 +3471,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
     [
       '--demo',
       '--midi',
+      '--scene',
       '--time',
       '--camera',
       '--camera-file',
@@ -3496,6 +3501,10 @@ function playArgs(args: readonly string[]): PlayArgs | null {
     throw new Error('The option --midi gives the piece, so it takes no --demo.');
   }
   const midi = midiText === null ? null : midiPath(midiText);
+  const scene = line.options.get('--scene')?.[0] ?? DEFAULT_VENUE;
+  if (!isVenueId(scene)) {
+    throw new Error(`The option --scene takes one of ${VENUE_IDS.join(', ')}, not "${scene}".`);
+  }
   const shotText = line.options.get('--shot')?.[0] ?? null;
   const cinematic = line.flags.has('--cinematic') || shotText !== null;
   const cameraTexts = line.options.get('--camera');
@@ -3559,6 +3568,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
     return {
       demo,
       midi,
+      scene,
       time,
       otherTimes: [],
       cameras: [camera],
@@ -3598,6 +3608,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
   return {
     demo,
     midi,
+    scene,
     time,
     otherTimes: others,
     cameras,
@@ -4176,7 +4187,8 @@ async function openPlay(
   ];
   const query = params.length > 0 ? `?${params.join('&')}` : '';
   // The page of a file of --midi opens the default demo, and then the file replaces it.
-  const path = args.midi === null ? `/${query}#demo=${args.demo}` : `/${query}`;
+  const hash = venueHash(args.scene, args.midi === null ? `#demo=${args.demo}` : '');
+  const path = `/${query}${hash}`;
   const page = await openShot(browser, new URL(path.slice(1), site).href, {
     file: '',
     path,
@@ -4523,6 +4535,7 @@ function stripCacheDir(
     file(join(ROOT, 'tools', 'screenshots.ts')),
     file(join(ROOT, 'node_modules', '.pnpm', 'lock.yaml')),
     args.midi === null ? `demo ${args.demo}` : `midi ${file(args.midi)}`,
+    args.scene,
     camera,
     aim,
     args.frame,
@@ -5161,7 +5174,7 @@ const USAGE = [
   `Usage: pnpm close-views <${CLOSE_ROLES.join('|')}> <output directory> [--target head] [--views <view|deg,...>] [--moments <moment,...>] [--zoom <n>] [--elevation <deg>] [--aim <x>,<z>,<height>] [--scale <n>] [--probe <${GALLERY_PROBES.join('|')},...>] [--url <url>] [--glb <file>] [--set <changes>] [--lineup [--with <role,...>] [--crop <n>] [--box <x>,<y>,<w>,<h>]] [--base <ref> [--pairs <view|cell,...> [--crop <x>,<y>,<w>,<h>]] [--sheet [--box <x>,<y>,<w>,<h>]]]`,
   '       pnpm close-views lineup <species,...> <output directory> [--url <url>] [--base <ref>]',
   `       pnpm close-views species <species,...> <output directory> [--views <${SPECIES_VIEWS.map((view) => view.name).join('|')},...>] [--moment <play|rest|lift<p>|lower<p>>] [--zoom <n>] [--elevation <deg>] [--url <url>] [--base <ref>]`,
-  `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>]`,
+  `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--scene <${VENUE_IDS.join('|')}>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>]`,
   '       pnpm close-views batch <output directory> [--species <species,...> [--moments <play|rest|lift<p>|lower<p>,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--lineup]] [--role <role>]... [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]',
   '       pnpm close-views audit <output directory> [--roles <role,...>] [--url <url>] [--base <ref>]',
 ].join('\n');
