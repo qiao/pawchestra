@@ -31,7 +31,6 @@ import type { ScenePose } from '../pose/types.ts';
 import { freeBeamOpacity } from '../shots/beam-opacity.ts';
 import type { FrameCover, ScreenBox, ViewFrame } from '../shots/frame.ts';
 import type { CameraPose } from '../shots/types.ts';
-import { SCENE_COLORS } from '../models/colors.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import { buildSceneProps } from '../models/props.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
@@ -49,12 +48,10 @@ import type { CaptureOptions } from './environment.ts';
 import { FREE_LENS, focusOf, freeFocusDistance, freeFocusOf } from './focus.ts';
 import type { Focus, FocusSpot } from './focus.ts';
 import { createMaterials } from './geometry.ts';
-import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
-  HALL_LIGHTS,
   aimKeyLight,
   aimRimLights,
   createLights,
@@ -76,7 +73,6 @@ import {
 import type { PlayerSpot } from './player.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
 import type { HazeFrame, TargetFormat } from './post.ts';
-import { HALL_POST } from './post.ts';
 import type { VenuePost } from './post.ts';
 import { createRimUniforms, setRimLights } from './rim-light.ts';
 import { SHOT_LOOK, createShotUniforms, setShotLight } from './shot-light.ts';
@@ -84,12 +80,13 @@ import { freeShotLight, shotRig } from '../shots/shot-light.ts';
 import { gradeLut, gradeLutSteps } from './grade.ts';
 import { createRenderer } from './renderer.ts';
 import { aimGap, easeAim, easeShare, soloAim } from './solo-light.ts';
-import { HALL_STAGE, STAGE_SHADOW, createStage, noBakeUniforms } from './stage.ts';
+import { STAGE_SHADOW, createStage, noBakeUniforms } from './stage.ts';
 import { VariantMaterials } from './variants.ts';
 import type { StageBakeUniforms } from './stage.ts';
 import { bakeStageSteps } from './stage-bake.ts';
 import { compileInto, gpuDoneSteps, programsReadySteps } from './programs.ts';
 import { depthGeometryOf } from './shared-corners.ts';
+import type { Venue, VenueId } from './venue.ts';
 
 /** The inputs of {@link StageScene}. */
 interface StageSceneOptions {
@@ -205,10 +202,12 @@ const WARM_LAYER = 31;
 /** The difference of two aims below which the ease of the stage lights stops, in meters. */
 const AIM_SETTLED = 1e-3;
 
-/** The scene and the camera of one layout. */
+/** The scene and the camera of one layout in one venue. */
 interface LayoutView {
   /** The layout of the scene. The solo light reads its players (design 2.4). */
   readonly layout: SceneLayout;
+  /** The venue of the scene (design 4.1). */
+  readonly venue: Venue;
   /** The stage side `S`, in meters. */
   readonly stageSide: number;
   /** The heads of the players and the conductor, for the focus of Free mode (design 4.5). */
@@ -221,8 +220,8 @@ interface LayoutView {
   readonly players: readonly SkinnedMesh[];
   /** The bone spheres of each player mesh that a fitted sphere can cull, by mesh. */
   readonly culled: ReadonlyMap<SkinnedMesh, BoneSpheres>;
-  /** The hall around the stage. Its cutaway follows the camera. */
-  readonly hall: Group;
+  /** The surroundings of the venue around the stage. Their cutaway follows the camera. */
+  readonly surroundings: Group;
   /** The light effects that write no depth, such as the visible beam (scene/post.ts). */
   readonly effects: readonly Object3D[];
   /** The bake of the static props, or `null` for a GPU with no target of floats (design 4.5). */
@@ -252,8 +251,10 @@ interface PendingBuild {
 interface LayoutCapture {
   /** The target that holds the environment texture. */
   target: WebGLRenderTarget;
-  /** The hall of the layout. */
-  readonly hall: Group;
+  /** The venue of the layout. */
+  readonly venue: Venue;
+  /** The surroundings of the layout. */
+  readonly surroundings: Group;
   /** The stage side `S`, in meters. */
   readonly stageSide: number;
   /** The point of the capture and the hidden objects. */
@@ -341,10 +342,10 @@ export class StageScene {
   readonly #canvas: HTMLCanvasElement;
   readonly #renderer: WebGLRenderer;
   /**
-   * The environment of the reflections (design 4.5), or `null` before the first build. A restored
-   * WebGL context makes it again.
+   * The environment of the reflections of each venue (design 4.1, 4.5), from the first build in the
+   * venue. A restored WebGL context makes the environment of the shown venue again.
    */
-  #environment: WebGLRenderTarget | null = null;
+  readonly #environments = new Map<VenueId, WebGLRenderTarget>();
   /**
    * The PMREM generator of the environment and of the captures. It keeps its materials, so each
    * capture compiles no program again (design 7.2).
@@ -460,26 +461,21 @@ export class StageScene {
    *
    * @param layout The positions of the stage, the players, and the stands.
    * @param models The player models of the score, which the layout and the pose plan share.
+   * @param venue The place around the stage (design 4.1).
    * @returns The steps, which return the scene of the layout.
    */
-  *prepareSteps(layout: SceneLayout, models: ModelCache): Steps<PreparedLayout> {
+  *prepareSteps(layout: SceneLayout, models: ModelCache, venue: Venue): Steps<PreparedLayout> {
     this.#discardPending();
-    yield* this.#postSteps(HALL_POST);
-    this.#environment ??= yield* createEnvironmentSteps(
-      this.#renderer,
-      this.#pmrem,
-      this.#compileTarget,
-    );
-    const environment = this.#environment;
+    yield* this.#postSteps(venue.post);
+    const environment = yield* this.#environmentSteps(venue);
     const scene = new Scene();
     const pending: PendingBuild = { scene, camera: null, targets: [] };
     this.#pending = pending;
     scene.environment = environment.texture;
     scene.environmentIntensity = ENVIRONMENT.intensity;
     const materials = this.#materials;
-    const hall = createHall(layout.stageSide);
-    scene.add(hall);
-    yield;
+    const surroundings = yield* venue.surroundingsSteps(layout.stageSide);
+    scene.add(surroundings);
     const podium = layout.conductor ? layout.podium : null;
     const aim = defaultAim(layout.stageSide, podium);
     // The capture of the environment renders the stage with the aim and the rim lights of the
@@ -489,19 +485,22 @@ export class StageScene {
     const stageGroup = createStage(
       layout.stageSide,
       podium,
-      HALL_STAGE,
-      SCENE_COLORS,
+      venue.stage,
+      venue.props,
       this.#pool,
       bakeUniforms,
       this.#rim,
     );
     scene.add(stageGroup);
     yield;
-    const lights = createLights(layout.stageSide, this.#tier, layout.conductor, HALL_LIGHTS);
+    const lights = createLights(layout.stageSide, this.#tier, layout.conductor, venue.light);
     scene.add(lights);
     setRimLights(this.#rim, lights);
     yield;
-    const props = createStaticMesh(buildSceneProps(layout), materials);
+    const props = createStaticMesh(
+      buildSceneProps(layout, venue.props, venue.stage.colors),
+      materials,
+    );
     scene.add(props);
     const players = yield* createPlayersSteps(playerSpots(layout), materials, models);
     this.#variants.assign(players);
@@ -528,7 +527,8 @@ export class StageScene {
     const capture = this.#post
       ? yield* this.#captureSteps(
           scene,
-          hall,
+          venue,
+          surroundings,
           layout.stageSide,
           {
             position: [aim.center[0], CAPTURE.height, aim.center[1]],
@@ -544,6 +544,7 @@ export class StageScene {
       aim,
       view: {
         layout,
+        venue,
         stageSide: layout.stageSide,
         spots: focusSpots(layout, models),
         scene,
@@ -551,7 +552,7 @@ export class StageScene {
         lights,
         players,
         culled,
-        hall,
+        surroundings,
         effects: lightEffects(scene),
         bake,
         capture,
@@ -569,7 +570,7 @@ export class StageScene {
   show(prepared: PreparedLayout): void {
     const { view, aim } = prepared;
     this.#pending = null;
-    const post = HALL_POST;
+    const post = view.venue.post;
     this.#post?.setValues(post, gradeLut(post.grade));
     this.#renderer.setClearColor(post.clearColor);
     setPoolAim(this.#pool, aim);
@@ -722,13 +723,37 @@ export class StageScene {
   }
 
   /**
+   * Makes the environment of the reflections of a venue in steps (`createEnvironmentSteps()`,
+   * design 4.5, 7.2), one time for each venue.
+   *
+   * @param venue The venue.
+   * @returns The steps, which return the target of the environment. A made environment takes no
+   *   step.
+   */
+  *#environmentSteps(venue: Venue): Steps<WebGLRenderTarget> {
+    let environment = this.#environments.get(venue.id);
+    if (!environment) {
+      const scene = venue.environmentScene();
+      environment = yield* createEnvironmentSteps(
+        this.#renderer,
+        this.#pmrem,
+        this.#compileTarget,
+        scene,
+      );
+      this.#environments.set(venue.id, environment);
+    }
+    return environment;
+  }
+
+  /**
    * Captures the environment of a layout (`captureEnvironmentSteps()`, design 4.5) in steps: the
-   * hall and the lit stage, with no players, no props, and no beam, from above the middle of the
-   * pool of light. During the capture, the reflections use the environment of the renderer, and
-   * the hall shows in full from the point of the capture.
+   * surroundings and the lit stage, with no players, no props, and no beam, from above the middle
+   * of the pool of light. During the capture, the reflections use the environment of the venue,
+   * and the surroundings show in full from the point of the capture.
    *
    * @param scene The scene of the layout.
-   * @param hall The hall of the layout.
+   * @param venue The venue of the layout.
+   * @param surroundings The surroundings of the layout.
    * @param stageSide The stage side `S`, in meters.
    * @param options The point of the capture and the hidden objects.
    * @param pending The build that frees the target if it does not show, or `null`.
@@ -737,19 +762,21 @@ export class StageScene {
    */
   *#captureSteps(
     scene: Scene,
-    hall: Group,
+    venue: Venue,
+    surroundings: Group,
     stageSide: number,
     options: CaptureOptions,
     pending: PendingBuild | null,
   ): Steps<LayoutCapture> {
-    scene.environment = this.#environment?.texture ?? null;
+    scene.environment = this.#environments.get(venue.id)?.texture ?? null;
     scene.environmentIntensity = ENVIRONMENT.intensity;
-    setHallCamera(hall, stageSide, new Vector3(...options.position), CAPTURE.size);
+    const point = new Vector3(...options.position);
+    venue.frameSurroundings(surroundings, stageSide, point, CAPTURE.size);
     const target = yield* captureEnvironmentSteps(this.#renderer, this.#pmrem, scene, options);
     pending?.targets.push(target);
     scene.environment = target.texture;
     scene.environmentIntensity = CAPTURE.intensity;
-    return { target, hall, stageSide, options };
+    return { target, venue, surroundings, stageSide, options };
   }
 
   /**
@@ -934,7 +961,7 @@ export class StageScene {
     const depthPass = beamGroup instanceof Group;
     if (depthPass) {
       this.#holdPose(view);
-      const hidden = [...view.effects, view.hall];
+      const hidden = [...view.effects, view.surroundings];
       this.#beamDepth.render(this.#renderer, view.scene, camera, hidden, this.#variants);
       setBeamFrame(beamGroup, {
         stageSide: view.stageSide,
@@ -943,10 +970,11 @@ export class StageScene {
         timeSec,
         depth: this.#beamDepth,
         foot,
-        look: HALL_LIGHTS.beam,
+        look: view.venue.light.beam,
       });
     }
-    setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);
+    const pixels = this.#beamDepth.size[1];
+    view.venue.frameSurroundings(view.surroundings, view.stageSide, camera.position, pixels);
     const focus = this.#focusOf(view, shot !== null, performance.now());
     if (!depthPass) {
       this.#holdPose(view);
@@ -954,7 +982,7 @@ export class StageScene {
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
-        const wide = HALL_POST.look.vignette;
+        const wide = view.venue.post.look.vignette;
         const vignette = wide + (SHOT_LOOK.vignette - wide) * light;
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, { haze, vignette });
       } else {
@@ -1094,7 +1122,10 @@ export class StageScene {
     this.#variants.dispose();
     this.#post?.dispose();
     this.#beamDepth.dispose();
-    this.#environment?.dispose();
+    for (const environment of this.#environments.values()) {
+      environment.dispose();
+    }
+    this.#environments.clear();
     this.#pmrem.dispose();
     this.#compileTarget.dispose();
     this.#renderer.dispose();
@@ -1108,15 +1139,14 @@ export class StageScene {
     // The generator of the lost context holds no valid target, so a new one makes the maps.
     this.#pmrem.dispose();
     this.#pmrem = new PMREMGenerator(this.#renderer);
-    this.#environment?.dispose();
-    this.#environment = null;
+    for (const environment of this.#environments.values()) {
+      environment.dispose();
+    }
+    this.#environments.clear();
     if (!this.#view) {
       return;
     }
-    const environment = runAll(
-      createEnvironmentSteps(this.#renderer, this.#pmrem, this.#compileTarget),
-    );
-    this.#environment = environment;
+    const environment = runAll(this.#environmentSteps(this.#view.venue));
     this.#view.scene.environment = environment.texture;
     const bake = this.#view?.bake;
     if (this.#view && bake) {
@@ -1139,7 +1169,8 @@ export class StageScene {
       const { target } = runAll(
         this.#captureSteps(
           this.#view.scene,
-          capture.hall,
+          capture.venue,
+          capture.surroundings,
           capture.stageSide,
           capture.options,
           null,

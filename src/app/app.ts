@@ -7,6 +7,7 @@ import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
 import type { SeatAudibility } from '../pose/types.ts';
 import type { PreparedLayout, StageScene } from '../scene/stage-scene.ts';
+import { HALL_VENUE } from '../scene/venue.ts';
 import type { Steps } from '../score/steps.ts';
 import { stageMix } from '../score/stage-mix.ts';
 import type { ChannelMix } from '../score/stage-mix.ts';
@@ -667,7 +668,7 @@ export class App {
       // The first call of the pose code is slower, so it runs in a step before the first frame.
       poseAt(plans.plan, 0, 0, STOPPED.transport, [], createScenePose(plans.plan));
       yield;
-      const prepared = yield* scene.prepareSteps(plans.layout, plans.models);
+      const prepared = yield* scene.prepareSteps(plans.layout, plans.models, HALL_VENUE);
       return { score, scene: plans, prepared };
     })();
     const run = before.then(async () => runSliced(steps, live));
