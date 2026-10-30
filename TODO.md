@@ -77,8 +77,10 @@ render, and the memory.
       draw on the development Mac, but the GPU gives points up to 511 px. Check the hall lamps in
       the close shots, and draw a large glow as a quad.
 - [ ] The conductor shot of `pnpm frozen` does not repeat: two runs of `e0ccc347` differ in 22,445
-      pixels, by at most 2, at the lamp glows at the top left. Find the cause, so that a check of
-      a refactor can trust the shot.
+      pixels, by at most 2, at the lamp glows at the top left. A run at the load average 20 gave
+      a perf-section shot with 2.2 million changed pixels and a softer blur, and the next run
+      matched the base. The automatic tier can drop under load. Find the causes, so that a check
+      of a refactor can trust each shot.
 - [ ] A change of the scene sends the camera of Free mode back to the default view, as a change
       of "Section size" does (2.8). Keep the orbit of the camera, so that a switch does not move
       the view.
