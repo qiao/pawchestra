@@ -1,4 +1,5 @@
 import type { QualityTier } from '../scene/quality.ts';
+import type { VenueId } from '../scene/venue-id.ts';
 import type { SectionSize } from '../score/types.ts';
 
 /** The value of the setting "Quality": the automatic tier, or a tier of the user (design 2.6). */
@@ -9,6 +10,12 @@ export interface SettingOption<T extends string> {
   readonly value: T;
   readonly label: string;
 }
+
+/** The buttons of the setting "Scene", in order (design 2.8, 4.1). */
+export const VENUE_OPTIONS = [
+  { value: 'hall', label: 'Concert hall' },
+  { value: 'forest', label: 'Forest' },
+] as const satisfies readonly SettingOption<VenueId>[];
 
 /** The buttons of the setting "Section size", in order (design 2.8, 3.8). */
 export const SECTION_SIZE_OPTIONS = [
@@ -40,6 +47,7 @@ export const FRAME_RATE_OPTIONS = [
 
 /** The dim line below each setting, which explains its values (design 2.8). */
 export const SETTING_HELP = {
+  venue: 'The place around the stage.',
   sectionSize:
     'The number of animals in the strings and the choir. Auto gives full sections to an orchestral file.',
   quality:

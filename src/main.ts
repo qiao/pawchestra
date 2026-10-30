@@ -3,7 +3,7 @@
 import { soloFromQuery } from './app/look-override.ts';
 import { inject } from '@vercel/analytics';
 import { App } from './app/app.ts';
-import { fileFromHash } from './app/demos.ts';
+import { fileFromHash, venueFromHash } from './app/demos.ts';
 import type { DevHook } from './app/dev-hook.ts';
 import { NO_WEBGL2_TEXT } from './app/messages.ts';
 import { yieldToMain } from './app/slices.ts';
@@ -113,11 +113,15 @@ function start(canvas: HTMLCanvasElement, scene: StageScene): void {
     installDevHook(app, scene);
     soloFromQuery(app, scene);
   }
-  // The URL hash `#demo=<id>` opens a demo (design 2.2). A change of the hash in the address bar
-  // shows its demo. It is no user gesture, so the first screen waits for a click.
+  // The URL hash `#demo=<id>` opens a demo (design 2.2), and `scene=<id>` selects the venue (2.8).
+  // A change of the hash in the address bar shows its demo in its venue. It is no user gesture,
+  // so the first screen waits for a click.
   window.addEventListener('hashchange', () => {
+    app.setVenue(venueFromHash(location.hash));
     app.select(fileFromHash(location.hash, import.meta.env.DEV), false).catch(reportError);
   });
+  // The venue of the hash starts the load of its chunk before the build of the first piece.
+  app.setVenue(venueFromHash(location.hash));
   const first = fileFromHash(location.hash, import.meta.env.DEV);
   // The first screen waits for a click, because the browser needs a user gesture (design 2.2).
   app.select(first, false).catch(reportError);

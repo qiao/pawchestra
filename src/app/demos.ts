@@ -1,3 +1,5 @@
+import { DEFAULT_VENUE, isVenueId } from '../scene/venue-id.ts';
+import type { VenueId } from '../scene/venue-id.ts';
 import { spokenTime } from './time-text.ts';
 
 /**
@@ -243,11 +245,55 @@ export function fileFromHash(hash: string, devServer: boolean): StageFile {
 }
 
 /**
- * Gives the URL hash of a demo (design 2.2).
+ * Gives a URL hash with a new value of one key, and keeps the other keys in their order.
+ *
+ * @param hash The hash of the URL, for example `#demo=beethoven-9`, or '' for none.
+ * @param key The key.
+ * @param value The new value, or `null` to remove the key.
+ * @returns The new hash, or '' with no key.
+ */
+function hashWith(hash: string, key: string, value: string | null): string {
+  const params = new URLSearchParams(hash.replace(/^#/u, ''));
+  if (value === null) {
+    params.delete(key);
+  } else {
+    params.set(key, value);
+  }
+  const text = params.toString();
+  return text ? `#${text}` : '';
+}
+
+/**
+ * Gives the URL hash of a demo (design 2.2). The hash keeps its other keys, such as `scene`.
  *
  * @param id The demo.
- * @returns The hash, for example `#demo=beethoven-9`.
+ * @param hash The current hash of the URL, or '' for none.
+ * @returns The hash, for example `#demo=beethoven-9` or `#demo=beethoven-9&scene=forest`.
  */
-export function demoHash(id: DemoId): string {
-  return `#demo=${id}`;
+export function demoHash(id: DemoId, hash = ''): string {
+  return hashWith(hash, 'demo', id);
+}
+
+/**
+ * Selects the venue of the URL hash `#scene=<id>` (design 2.8). No key or an unknown value gives
+ * the hall.
+ *
+ * @param hash The hash of the URL, for example `#demo=beethoven-9&scene=forest`, or '' for none.
+ * @returns The venue.
+ */
+export function venueFromHash(hash: string): VenueId {
+  const value = new URLSearchParams(hash.replace(/^#/u, '')).get('scene') ?? '';
+  return isVenueId(value) ? value : DEFAULT_VENUE;
+}
+
+/**
+ * Gives the URL hash of a venue (design 2.8). The hall, the default venue, has no key `scene`.
+ * The hash keeps its other keys, such as `demo`.
+ *
+ * @param id The venue.
+ * @param hash The current hash of the URL, or '' for none.
+ * @returns The hash, for example `#demo=beethoven-9&scene=forest`, or '' with no key.
+ */
+export function venueHash(id: VenueId, hash: string): string {
+  return hashWith(hash, 'scene', id === DEFAULT_VENUE ? null : id);
 }
