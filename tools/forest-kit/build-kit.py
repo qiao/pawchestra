@@ -1861,7 +1861,7 @@ def render_sheet(folder, objects):
     for i, name in enumerate(names):
         obj = objects[name]
         size = max(obj.dimensions)
-        scale = min(1.0, cell * 0.62 / size) if size > 0 else 1.0
+        scale = cell * 0.62 / size if size > 0 else 1.0
         col, row = i % columns, i // columns
         x, z = (col - (columns - 1) / 2) * cell, (row - 1.5) * cell
         copy = bpy.data.objects.new(f'sheet-{name}', obj.data)
