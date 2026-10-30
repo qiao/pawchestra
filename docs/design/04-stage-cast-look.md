@@ -33,6 +33,66 @@ These product choices apply to each area:
   over the middle of its soles, where a real stance is most stable (4.4, seat).
 - **No fur shading.** The material has no fur shader, no tufts, and no shells (4.5, materials).
 
+**Venues**
+
+A venue is the place around the stage: the surroundings, the environment of the reflections, the
+light, the stage finish, the prop colors, and the post effects. The setting "Scene" selects it
+(2.8). Two venues exist:
+
+- `hall`: the concert hall above, and the default (`HALL_VENUE` of `scene/venue.ts`). Its values
+  are the constants of 4.5.
+- `forest`: a forest clearing, as `reference/forest.webp` (`scene/forest.ts`). The current forest
+  is a stub: a disc of earth, a ring of faceted trees with a gap in front of the default camera,
+  lanterns, a far forest that glows toward a low sun at the back right, a lighter and matte stage
+  wood, dark wood chairs, a golden rim light and beam, and a warm grade. A later round builds it
+  from the kit of `assets/forest/`.
+
+```text
+ setting "Scene" ──┐          hash "#demo=...&scene=forest"
+                   v                        │
+             App.setVenue(id) <─────────────┘
+                   │ (path of a change of "Section size": cover, build, show)
+                   v
+     loadVenue(id) ── forest: import('./forest.ts'), a lazy chunk (7.2)
+                   │
+                   v
+  StageScene.prepareSteps(layout, models, venue) ──> show()
+```
+
+```typescript
+/** The values and the builders of one venue (`scene/venue.ts`). */
+export interface Venue {
+  readonly id: VenueId; // 'hall' | 'forest' (`scene/venue-id.ts`)
+  /** The surroundings: no light, no shadow, hidden in the depth passes of the beam. */
+  surroundingsSteps(stageSide: number): Steps<Group>;
+  /** The cutaway of the surroundings and the glow size for a camera. */
+  frameSurroundings(surroundings: Group, stageSide: number, camera: Vector3, pixels: number): void;
+  /** The scene that the PMREM environment captures, one time for each venue. */
+  environmentScene(): Scene;
+  /** The key, side, back-row, rim, fill, and conductor lights, and the beam (`VenueLight`). */
+  readonly light: VenueLight;
+  /** The stage colors, the finish of the wood, and the side light (`VenueStage`). */
+  readonly stage: VenueStage;
+  /** The colors of the chairs, the stools, and the music stands, as linear RGB. */
+  readonly props: PropColors;
+  /** The bloom, the vignette, the grain, the room haze, the grade, and the clear color. */
+  readonly post: VenuePost;
+}
+```
+
+- **Shared stage.** Each venue keeps the cast, the instruments, the layout, the stage outline,
+  the camera, and the shot plan, because a change of the venue must keep the song time, the
+  transport, and the poses (5.1). The places of the key light and of the rim lights
+  (`models/beam.ts`) stay the same, because the shots read them (5.6). A venue changes the
+  colors and the strength of these lights.
+- **Pure core.** `models/props.ts` and `models/stage.ts` take the prop and stage colors as plain
+  arguments, with the hall colors as the default.
+- **Caches.** `StageScene` keeps one environment for each venue, and `scene/grade.ts` one lookup
+  table for each grade.
+- **Look override.** The roots `FOREST`, `FOREST_LIGHT`, `FOREST_STAGE`, `FOREST_PROPS`, and
+  `FOREST_POST` of `LOOK_ROOTS` hold the values of the forest, so that `pnpm look-variants` (key
+  `scene`) tunes them. The hall keeps its roots.
+
 ## 4.2 Layout
 
 The sections go into arcs in the standard order, with no gaps between the used sections. The
