@@ -319,6 +319,15 @@ Read the group of your work before you plan it.
 - A face rule can paint a dark block on the side. Check it from the front, at 60°, and each side.
 - Measure the packed parts before you cut a palette entry.
 
+### Blender scripts
+
+- The face order of `bmesh.ops.create_uvsphere()` changes from run to run. For the same GLB on
+  each run, make the sphere points in the script (`tools/forest-kit/build-kit.py`).
+- The glTF exporter writes the vertex colors only with `export_vertex_color='NAME'` and the name
+  of the color attribute.
+- The `location` of a new child object is in the frame of its parent. Undo the place, the turn,
+  and the scale of the parent to get the local point.
+
 ### Probes
 
 - Give a kept GLB file of `pnpm rig-mesh --check --keep` to `--glb` of the probes. Never copy it
