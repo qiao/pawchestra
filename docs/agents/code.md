@@ -31,7 +31,9 @@ This module of `AGENTS.md` gives the rules of the TypeScript code and its style.
 ## Code style
 
 - **Format.** oxfmt formats TypeScript with `.oxfmtrc.json`: a print width of 100, 2 spaces,
-  semicolons, and single quotes. CI checks the format.
+  semicolons, and single quotes. CI checks the format. It checks `tools/` with its subfolders,
+  except the plugin code of `tools/oxlint/`. Format a Python script of `tools/` with
+  `uvx ruff format --line-length 100 --config "format.quote-style='single'" <file>`.
 - **Blank lines.** Put one empty line between top-level declarations. Use blank lines or
   separate files for structure, with no banner comments and no divider comments.
 - **Code blocks.** Inside a function body, put one empty line between the logical steps. For
