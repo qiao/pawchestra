@@ -1527,15 +1527,20 @@ def scatter(rng, objects, footprints):
     fill([('rock-2', 1), ('rock-3', 2)], 14, 0.6, 8.0, (0.7, 1.3), 0.0)
     fill('grass', 46, 0.2, 9.0, (0.8, 1.4), 0.0)
     fill('moss', 16, 0.4, 10.0, (0.8, 1.4), 0.0)
+    # The low parts at the bottom of the default view, near the camera.
     for name, x, z in (
         ('bush-2', -6.4, 6.6),
         ('bush-1', 6.9, 6.4),
         ('fern-1', -3.6, 5.6),
         ('fern-2', 1.2, 5.5),
-        ('fern-1', 4.5, 4.7),
-        ('fern-2', -4.6, 3.9),
+        ('fern-1', 4.0, 5.3),
+        ('fern-2', -5.2, 3.6),
     ):
-        place(name, x, z, 1.0, rng.uniform(0, 360))
+        yaw = rng.uniform(0, 360)
+        space = clearance(objects[name], x, z, yaw, 1.0, 3.0)
+        if space < LOW_CLEARANCE:
+            raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
+        place(name, x, z, 1.0, yaw)
     return places
 
 
