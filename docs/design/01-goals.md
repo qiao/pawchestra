@@ -31,6 +31,7 @@ they set.
 | `mockup.png`, `scene.png` | The app during play, and nine views of the scene | The look, over `orchestra.webp` and the prototype of 2.8 |
 | `animals.webp` | Three views of the first animals | The proportions and the colors, over `orchestra.webp` |
 | `orchestra.webp` | The first target scene | Only what no newer image shows |
+| `forest.webp` | The forest scene: a wood deck in a clearing, trees, lanterns, a stream, and a low sun | The place, the light, and the stage finish of the forest scene. The cast follows the other images |
 | `*-views.png`, `*-turnaround.png` | One species from each side | The form, the face, and the colors of the species |
 
 The navigation menu at the top of `mockup.png` is out of scope.
