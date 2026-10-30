@@ -1780,14 +1780,25 @@ def build_preview(objects, empties):
 def use_cycles(samples):
     """Selects Cycles with few samples and the denoiser, or keeps EEVEE when Cycles is absent."""
     scene = bpy.context.scene
+    scene.view_settings.view_transform = 'AgX'
+    scene.render.image_settings.file_format = 'PNG'
     try:
         scene.render.engine = 'CYCLES'
         scene.cycles.samples = samples
         scene.cycles.use_denoising = True
     except (TypeError, AttributeError):
         scene.render.engine = 'BLENDER_EEVEE'
-    scene.view_settings.view_transform = 'AgX'
-    scene.render.image_settings.file_format = 'PNG'
+        return
+    # The GPU renders the views in a few seconds. Cycles keeps the CPU when no GPU answers.
+    try:
+        prefs = bpy.context.preferences.addons['cycles'].preferences
+        prefs.compute_device_type = 'METAL'
+        prefs.get_devices()
+        for device in prefs.devices:
+            device.use = True
+        scene.cycles.device = 'GPU'
+    except (KeyError, TypeError, AttributeError):
+        scene.cycles.device = 'CPU'
 
 
 def view_camera(name, azimuth, elevation, distance, target, fov=40.0, ortho=0.0):
