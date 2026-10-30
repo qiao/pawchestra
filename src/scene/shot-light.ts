@@ -21,7 +21,7 @@ export const SHOT_LOOK = {
   kicker: 2.5,
   /** The extra exposure of a close shot, in stops. */
   exposure: 0.15,
-  /** The vignette of a close shot. The wide shots keep `POST_LOOK.vignette`. */
+  /** The vignette of a close shot. The wide shots keep the vignette of the venue (`PostValues`). */
   vignette: 0.6,
 } as const;
 

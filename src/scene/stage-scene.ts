@@ -76,11 +76,12 @@ import {
 import type { PlayerSpot } from './player.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
 import type { HazeFrame, TargetFormat } from './post.ts';
-import { POST_LOOK } from './post.ts';
+import { HALL_POST } from './post.ts';
+import type { VenuePost } from './post.ts';
 import { createRimUniforms, setRimLights } from './rim-light.ts';
 import { SHOT_LOOK, createShotUniforms, setShotLight } from './shot-light.ts';
 import { freeShotLight, shotRig } from '../shots/shot-light.ts';
-import { gradeLutSteps } from './grade.ts';
+import { gradeLut, gradeLutSteps } from './grade.ts';
 import { createRenderer } from './renderer.ts';
 import { aimGap, easeAim, easeShare, soloAim } from './solo-light.ts';
 import { HALL_STAGE, STAGE_SHADOW, createStage, noBakeUniforms } from './stage.ts';
@@ -423,17 +424,28 @@ export class StageScene {
   }
 
   /**
-   * Makes the post effects in steps on the first build (design 7.2): the lookup table of the
-   * grade, then the passes. A GPU that cannot render to a target of floats gets none.
+   * Makes the lookup table of the grade of a venue in steps (design 7.2), and the post effects on
+   * the first build. A GPU that cannot render to a target of floats gets none.
    *
+   * @param values The post effects of the venue (design 4.1).
    * @returns The steps.
    */
-  *#postSteps(): Steps<undefined> {
-    if (this.#post || this.#postFormat === 'none') {
+  *#postSteps(values: VenuePost): Steps<undefined> {
+    if (this.#postFormat === 'none') {
       return undefined;
     }
-    yield* gradeLutSteps();
-    const post = new PostPipeline(this.#renderer, this.#postFormat, this.#tier, this.#variants);
+    const lut = yield* gradeLutSteps(values.grade);
+    if (this.#post) {
+      return undefined;
+    }
+    const post = new PostPipeline(
+      this.#renderer,
+      this.#postFormat,
+      this.#tier,
+      this.#variants,
+      values,
+      lut,
+    );
     const buffer = this.#renderer.getDrawingBufferSize(new Vector2());
     post.setSize(buffer.x, buffer.y);
     this.#post = post;
@@ -452,7 +464,7 @@ export class StageScene {
    */
   *prepareSteps(layout: SceneLayout, models: ModelCache): Steps<PreparedLayout> {
     this.#discardPending();
-    yield* this.#postSteps();
+    yield* this.#postSteps(HALL_POST);
     this.#environment ??= yield* createEnvironmentSteps(
       this.#renderer,
       this.#pmrem,
@@ -557,6 +569,9 @@ export class StageScene {
   show(prepared: PreparedLayout): void {
     const { view, aim } = prepared;
     this.#pending = null;
+    const post = HALL_POST;
+    this.#post?.setValues(post, gradeLut(post.grade));
+    this.#renderer.setClearColor(post.clearColor);
     setPoolAim(this.#pool, aim);
     setRimLights(this.#rim, view.lights);
     this.#variants.useScene(view.scene);
@@ -939,7 +954,8 @@ export class StageScene {
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
-        const vignette = POST_LOOK.vignette + (SHOT_LOOK.vignette - POST_LOOK.vignette) * light;
+        const wide = HALL_POST.look.vignette;
+        const vignette = wide + (SHOT_LOOK.vignette - wide) * light;
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, { haze, vignette });
       } else {
         this.#renderer.render(view.scene, camera);

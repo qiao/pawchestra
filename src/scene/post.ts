@@ -26,7 +26,8 @@ import type { Steps } from '../score/steps.ts';
 
 import type { DepthDraw } from './beam.ts';
 import { LENS } from './focus.ts';
-import { gradeLut } from './grade.ts';
+import { GRADE, gradeLut } from './grade.ts';
+import type { GradeValues } from './grade.ts';
 import { compileInto } from './programs.ts';
 import type { Focus } from './focus.ts';
 import {
@@ -40,7 +41,35 @@ import {
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 
-/** The values of the post effects (design 4.5, post effects). */
+/** The values of the post effects of a venue (design 4.1): the fields of {@link POST_LOOK}. */
+export interface PostValues {
+  /** The bloom starts at this linear brightness, with a soft knee below it. */
+  readonly bloomThreshold: number;
+  /** The soft knee of the bloom below its threshold. */
+  readonly bloomKnee: number;
+  /** The part of the bloom that the final pass adds to the scene. */
+  readonly bloomStrength: number;
+  /** The part of all the light that the bloom keeps below its threshold. */
+  readonly diffusion: number;
+  /** The factor of the bloom for each channel. */
+  readonly halation: readonly [number, number, number];
+  /** The part of the light that the vignette takes from the corners in a wide shot. */
+  readonly vignette: number;
+  /** The size of the film grain, in display values. */
+  readonly grain: number;
+}
+
+/** The values of the room haze of a venue (design 4.1): the fields of {@link ROOM_HAZE}. */
+export interface HazeValues {
+  /** The density of the haze, for each stage side of distance. */
+  readonly density: number;
+  /** The light of the haze in all directions, in linear values, before the phase. */
+  readonly color: readonly [number, number, number];
+  /** The g of the Henyey-Greenstein phase. */
+  readonly forward: number;
+}
+
+/** The post effects of the concert hall (design 4.5, post effects). */
 export const POST_LOOK = {
   /** The bloom starts at this linear brightness, with a soft knee below it. */
   bloomThreshold: 1.8,
@@ -59,7 +88,7 @@ export const POST_LOOK = {
   vignette: 0.45,
   /** The size of the film grain, in display values. */
   grain: 0.035,
-} as const;
+} as const satisfies PostValues;
 
 /**
  * The room haze of the final pass (design 4.5, light and render): thin warm air that grows with
@@ -82,7 +111,7 @@ export const ROOM_HAZE = {
    * forward.
    */
   forward: 0.6,
-} as const;
+} as const satisfies HazeValues;
 
 /** The room haze of one frame. */
 export interface HazeFrame {
@@ -108,7 +137,7 @@ interface PostFrame {
 
 /**
  * Makes the uniforms of the color grade, `GRADE_FUNCTION` of `post-shaders.ts`: the shared lookup
- * table of `scene/grade.ts`.
+ * table of the grade of the hall (`scene/grade.ts`).
  *
  * @returns The uniforms, new for each call.
  */
@@ -135,6 +164,26 @@ export function grainSeed(timeSec: number): number {
 
 /** The clear color behind the hall, in sRGB: the dark of the hall far from the light. */
 export const CLEAR_COLOR = '#0b0807';
+
+/** The post effects of a venue (design 4.1): the bloom, the vignette, the grain, and the grade. */
+export interface VenuePost {
+  /** The bloom, the vignette, and the grain. */
+  readonly look: PostValues;
+  /** The room haze. */
+  readonly haze: HazeValues;
+  /** The color grade. */
+  readonly grade: GradeValues;
+  /** The clear color behind the surroundings, in sRGB. */
+  readonly clearColor: string;
+}
+
+/** The post effects of the concert hall (design 4.5). */
+export const HALL_POST: VenuePost = {
+  look: POST_LOOK,
+  haze: ROOM_HAZE,
+  grade: GRADE,
+  clearColor: CLEAR_COLOR,
+};
 
 /**
  * The color format of the targets of the scene and of the bloom (design 2.6). `packed` holds three
@@ -331,6 +380,10 @@ export class PostPipeline {
    * separate pass at half size costs less.
    */
   readonly #depth: DepthDraw;
+  /** The post effects of the venue of the shown scene (design 4.1). */
+  #values: VenuePost;
+  /** The lookup table of the grade of {@link PostPipeline.#values}. */
+  #lut: Texture;
   #width = 0;
   #height = 0;
 
@@ -342,12 +395,23 @@ export class PostPipeline {
    * @param tier The quality tier. It sets the bloom levels and the samples of the blur.
    * @param depth Draws the depth pass of the depth of field with a depth material that writes no
    *   color in place of the material of each mesh (`VariantMaterials.renderDepth()`).
+   * @param values The post effects of the venue (design 4.1).
+   * @param lut The lookup table of the grade of the venue (`gradeLutSteps()`).
    */
-  constructor(renderer: WebGLRenderer, format: TargetFormat, tier: QualityTier, depth: DepthDraw) {
+  constructor(
+    renderer: WebGLRenderer,
+    format: TargetFormat,
+    tier: QualityTier,
+    depth: DepthDraw,
+    values: VenuePost,
+    lut: Texture,
+  ) {
     this.#renderer = renderer;
     this.#format = format;
     this.#tier = tier;
     this.#depth = depth;
+    this.#values = values;
+    this.#lut = lut;
     const geometry = new BufferGeometry();
     // One triangle that covers the view.
     geometry.setAttribute(
@@ -358,12 +422,13 @@ export class PostPipeline {
     this.#quad = new Mesh(geometry);
     this.#quad.frustumCulled = false;
 
+    const look = values.look;
     const down = () => ({
       uSource: { value: null },
       uTexel: { value: new Vector2() },
-      uThreshold: { value: POST_LOOK.bloomThreshold },
-      uKnee: { value: POST_LOOK.bloomKnee },
-      uDiffusion: { value: POST_LOOK.diffusion },
+      uThreshold: { value: look.bloomThreshold },
+      uKnee: { value: look.bloomKnee },
+      uDiffusion: { value: look.diffusion },
     });
     this.#bloomPrefilter = passMaterial(BLOOM_DOWN_FRAGMENT, down(), { PREFILTER: 1 });
     this.#bloomDown = passMaterial(BLOOM_DOWN_FRAGMENT, down());
@@ -394,6 +459,28 @@ export class PostPipeline {
     this.#height = height;
     this.#disposeTargets();
     this.#targets = this.#createTargets();
+  }
+
+  /**
+   * Sets the post effects of a venue (design 4.1): the bloom, the halation, the haze, the grade,
+   * and the grain. The next frame uses them.
+   *
+   * @param values The post effects of the venue.
+   * @param lut The lookup table of its grade (`gradeLutSteps()`).
+   */
+  setValues(values: VenuePost, lut: Texture): void {
+    if (values === this.#values && lut === this.#lut) {
+      return;
+    }
+    this.#values = values;
+    this.#lut = lut;
+    const look = values.look;
+    for (const material of [this.#bloomPrefilter, this.#bloomDown]) {
+      setUniform(material, 'uThreshold', look.bloomThreshold);
+      setUniform(material, 'uKnee', look.bloomKnee);
+      setUniform(material, 'uDiffusion', look.diffusion);
+    }
+    this.#setFinalValues(this.#final);
   }
 
   /**
@@ -634,7 +721,8 @@ export class PostPipeline {
     }
     const values = uniforms['uHaze']?.value;
     if (values instanceof Vector4) {
-      values.set(haze.start, ROOM_HAZE.density / haze.stageSide, ROOM_HAZE.forward, haze.floorY);
+      const room = this.#values.haze;
+      values.set(haze.start, room.density / haze.stageSide, room.forward, haze.floorY);
     }
   }
 
@@ -684,7 +772,7 @@ export class PostPipeline {
     if (settings.blurSamples > 0) {
       defines['DEPTH_OF_FIELD'] = 1;
     }
-    const look = POST_LOOK;
+    const look = this.#values.look;
     const material = passMaterial(
       FINAL_FRAGMENT,
       {
@@ -699,9 +787,9 @@ export class PostPipeline {
         uHazeInverse: { value: new Matrix4() },
         uHazeCamera: { value: new Vector3() },
         uHazeLight: { value: new Vector3(0, 1, 0) },
-        uHazeColor: { value: new Vector3(...ROOM_HAZE.color) },
+        uHazeColor: { value: new Vector3(...this.#values.haze.color) },
         uHaze: { value: new Vector4() },
-        ...gradeUniforms(),
+        uGradeLut: { value: this.#lut },
         uVignette: { value: look.vignette },
         uAspect: { value: 1 },
         uGrain: { value: look.grain },
@@ -713,6 +801,27 @@ export class PostPipeline {
     // The final pass draws to the canvas, so it takes the tone mapping of the renderer.
     material.toneMapped = true;
     return material;
+  }
+
+  /**
+   * Sets the uniforms of the final pass from the post effects of the venue.
+   *
+   * @param material The final pass.
+   */
+  #setFinalValues(material: ShaderMaterial): void {
+    const look = this.#values.look;
+    setUniform(material, 'uBloomStrength', look.bloomStrength);
+    const halation = material.uniforms['uHalation']?.value;
+    if (halation instanceof Vector3) {
+      halation.set(...look.halation);
+    }
+    const hazeColor = material.uniforms['uHazeColor']?.value;
+    if (hazeColor instanceof Vector3) {
+      hazeColor.set(...this.#values.haze.color);
+    }
+    setUniform(material, 'uGradeLut', this.#lut);
+    setUniform(material, 'uVignette', look.vignette);
+    setUniform(material, 'uGrain', look.grain);
   }
 
   #disposeTargets(): void {
