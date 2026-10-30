@@ -4,8 +4,24 @@ import type { ConductorPlace } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { keyLightPlace, rimLightPlace, rimLightXs } from '../models/beam.ts';
 import { createBeam, setBeamTier } from './beam.ts';
+import { BEAM_LOOK } from './beam.ts';
+import type { BeamValues } from './beam.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
+
+/** The values of the key light of a venue (design 4.1): the fields of {@link KEY_LIGHT}. */
+export interface KeyLightValues {
+  /** The color, in sRGB. The light on the face of the conductor takes it too. */
+  readonly color: string;
+  /** The aim, as a part of the way from the stage center to the podium center. */
+  readonly aimToPodium: number;
+  /** The half angle of the cone, in radians. */
+  readonly angle: number;
+  /** The penumbra of the cone, from 0 to 1. */
+  readonly penumbra: number;
+  /** The illuminance at the aim point, on a face that looks at the light, in lux. */
+  readonly illuminance: number;
+}
 
 /**
  * The key light (design 4.5): the stage spotlight, and the only light that casts shadows on the
@@ -42,7 +58,7 @@ export const KEY_LIGHT = {
    * environment.
    */
   illuminance: 5.8,
-} as const;
+} as const satisfies KeyLightValues;
 
 /**
  * The side lights (design 4.5): two warm spotlights from the front corners of the hall, high at
@@ -83,7 +99,7 @@ export const SIDE_LIGHT = {
   angle: 14 * MathUtils.DEG2RAD,
   /** The penumbra of the cone. */
   penumbra: 0.5,
-} as const;
+} as const satisfies SideLightValues;
 
 /**
  * The back-row lights (design 4.5): two warm spotlights high at the front corners of the hall, the
@@ -119,7 +135,19 @@ export const BACK_ROW_LIGHT = {
   angle: 10 * MathUtils.DEG2RAD,
   /** The penumbra of the cone. */
   penumbra: 0.5,
-} as const;
+} as const satisfies CrossPair;
+
+/** The values of the rim lights of a venue (design 4.1): the fields of {@link RIM_LIGHT}. */
+export interface RimLightValues {
+  /** The color, in sRGB. */
+  readonly color: string;
+  /** The illuminance at the aim point, on a face that looks at the light, in lux. */
+  readonly illuminance: number;
+  /** The half angle of the cone, in radians. */
+  readonly angle: number;
+  /** The penumbra of the cone, from 0 to 1. */
+  readonly penumbra: number;
+}
 
 /**
  * The rim lights (design 4.5): warm spotlights far behind the orchestra and high (`RIM_PLACE` of
@@ -141,7 +169,20 @@ export const RIM_LIGHT = {
   angle: 16 * MathUtils.DEG2RAD,
   /** The full penumbra, for a soft pool of light. */
   penumbra: 1,
-} as const;
+} as const satisfies RimLightValues;
+
+/**
+ * The values of the fill light of a venue (design 4.1): the fields of {@link FILL} but `players`,
+ * which the shared material of the players reads for each venue.
+ */
+export interface FillValues {
+  /** The color of the light from above, in sRGB. */
+  readonly sky: string;
+  /** The color of the light from below, in sRGB. */
+  readonly ground: string;
+  /** The intensity of the hemisphere light. */
+  readonly intensity: number;
+}
 
 /**
  * The fill light (design 4.5): low, so that the shadows stay deep. The sky is a neutral gray, so
@@ -151,9 +192,15 @@ export const RIM_LIGHT = {
  * The stage takes all of it, so its shadows keep their tone.
  *
  * The intensity of 3.5 gives the floor outside the pool little fill. The part 0.857 gives the
- * players a fill of 3.0 and a little more of the diffuse light of the environment.
+ * players a fill of 3.0 and a little more of the diffuse light of the environment. The part
+ * `players` holds for each venue, because the players share one material.
  */
-export const FILL = { sky: '#2c2c2e', ground: '#2c241e', intensity: 3.5, players: 0.857 } as const;
+export const FILL = {
+  sky: '#2c2c2e',
+  ground: '#2c241e',
+  intensity: 3.5,
+  players: 0.857,
+} as const;
 
 /**
  * The normal bias of the shadow, in texels of the shadow map at the stage, beyond the blur radius
@@ -246,6 +293,25 @@ function shadowNormalBias(
 }
 
 /**
+ * The values of the light on the face of the conductor of a venue (design 4.1): the fields of
+ * {@link CONDUCTOR_LIGHT}. The light takes the color of the key light.
+ */
+export interface ConductorLightValues {
+  /** The aim point is this high above the podium top, in meters. */
+  readonly aimHeight: number;
+  /** The light stands this far in front of the aim point, toward the orchestra, in meters. */
+  readonly forward: number;
+  /** The light stands this far above the aim point, in meters. */
+  readonly up: number;
+  /** The illuminance at the aim point, in lux. */
+  readonly illuminance: number;
+  /** The half angle of the cone, in radians. */
+  readonly angle: number;
+  /** The penumbra of the cone, from 0 to 1. */
+  readonly penumbra: number;
+}
+
+/**
  * The light on the face of the conductor (design 4.5): a weak spotlight from the orchestra side.
  * With no such light, the face is dark brown on dark gray in the conductor shot. This light casts
  * no shadow.
@@ -266,17 +332,18 @@ export const CONDUCTOR_LIGHT = {
   angle: 16 * MathUtils.DEG2RAD,
   /** The penumbra of the cone. */
   penumbra: 0.6,
-} as const;
+} as const satisfies ConductorLightValues;
 
 /**
  * Creates the light on the face of the conductor (design 4.5). The bear faces the orchestra, so
  * the light stands in front of it and above it, and aims at its face.
  *
  * @param conductor The place of the conductor.
+ * @param light The light values of the venue.
  * @returns The light. Its target is a child of the light group with it.
  */
-function createConductorLight(conductor: ConductorPlace): SpotLight {
-  const c = CONDUCTOR_LIGHT;
+function createConductorLight(conductor: ConductorPlace, light: VenueLight): SpotLight {
+  const c = light.conductor;
   const [x, y, z] = conductor.position;
   const aimY = y + c.aimHeight;
   // The front of the bear is (-sin f, 0, -cos f).
@@ -284,14 +351,14 @@ function createConductorLight(conductor: ConductorPlace): SpotLight {
   const frontZ = -Math.cos(conductor.facing);
   const distanceSquared = c.forward * c.forward + c.up * c.up;
 
-  const light = new SpotLight(KEY_LIGHT.color, c.illuminance * distanceSquared);
-  light.position.set(x + frontX * c.forward, aimY + c.up, z + frontZ * c.forward);
-  light.target.position.set(x, aimY, z);
-  light.angle = c.angle;
-  light.penumbra = c.penumbra;
-  light.decay = 2;
-  light.castShadow = false;
-  return light;
+  const spot = new SpotLight(light.key.color, c.illuminance * distanceSquared);
+  spot.position.set(x + frontX * c.forward, aimY + c.up, z + frontZ * c.forward);
+  spot.target.position.set(x, aimY, z);
+  spot.angle = c.angle;
+  spot.penumbra = c.penumbra;
+  spot.decay = 2;
+  spot.castShadow = false;
+  return spot;
 }
 
 /** The name of the key light in the group of {@link createLights}. */
@@ -503,7 +570,7 @@ export function spotIlluminance(spot: SpotLight, point: Vec3, normal: Vec3): num
 }
 
 /** The place, the aim, the light, and the cone of a pair of cross lights, in stage sides. */
-interface CrossPair {
+export interface CrossPair {
   /** The position of the light at the right. */
   readonly position: Vec3;
   /** The aim of the light at the right. */
@@ -516,21 +583,60 @@ interface CrossPair {
   readonly penumbra: number;
 }
 
+/** The values of the side lights of a venue (design 4.1): a pair of cross lights with a color. */
+export interface SideLightValues extends CrossPair {
+  /** The color of the side lights and of the back-row lights, in sRGB. */
+  readonly color: string;
+}
+
 /**
- * Creates a pair of cross lights in the color of the side lights: the light at the right, and its
- * mirror at the left.
+ * The light values of a venue (design 4.1): the key light, the cross lights, the rim lights with
+ * their beams, the fill light, and the light on the conductor. The places of the key light and of
+ * the rim lights (`models/beam.ts`) hold for each venue, because the shots read them (design 5.6).
+ */
+export interface VenueLight {
+  /** The key light. */
+  readonly key: KeyLightValues;
+  /** The side lights. */
+  readonly side: SideLightValues;
+  /** The back-row lights, in the color of the side lights. */
+  readonly backRow: CrossPair;
+  /** The rim lights. */
+  readonly rim: RimLightValues;
+  /** The visible beam of each rim light. */
+  readonly beam: BeamValues;
+  /** The fill light. */
+  readonly fill: FillValues;
+  /** The light on the face of the conductor. */
+  readonly conductor: ConductorLightValues;
+}
+
+/** The light values of the concert hall (design 4.5). */
+export const HALL_LIGHTS: VenueLight = {
+  key: KEY_LIGHT,
+  side: SIDE_LIGHT,
+  backRow: BACK_ROW_LIGHT,
+  rim: RIM_LIGHT,
+  beam: BEAM_LOOK,
+  fill: FILL,
+  conductor: CONDUCTOR_LIGHT,
+};
+
+/**
+ * Creates a pair of cross lights: the light at the right, and its mirror at the left.
  *
  * @param stageSide The stage side `S`, in meters.
  * @param pair The place, the aim, the light, and the cone of the light at the right.
  * @param name The name of each light.
+ * @param color The color of the lights, in sRGB.
  * @returns The light at the right and the light at the left, with no shadow.
  */
-function crossPair(stageSide: number, pair: CrossPair, name: string): SpotLight[] {
+function crossPair(stageSide: number, pair: CrossPair, name: string, color: string): SpotLight[] {
   const [px, py, pz] = pair.position;
   const [tx, ty, tz] = pair.target;
   return [1, -1].map((sign) => {
     const light = spotlight(
-      SIDE_LIGHT.color,
+      color,
       [sign * px * stageSide, py * stageSide, pz * stageSide],
       [sign * tx * stageSide, ty * stageSide, tz * stageSide],
       pair.illuminance,
@@ -559,14 +665,15 @@ export function keyLightPosition(stageSide: number): Vec3 {
  * @param tier The quality tier.
  * @param conductor The place of the conductor, or `null` with no conductor. With no conductor,
  *   the light aims at the stage center.
+ * @param key The values of the key light of the venue.
  * @returns The light. Its target is at the aim point.
  */
 function createKeyLight(
   stageSide: number,
   tier: QualityTier,
   conductor: ConductorPlace | null,
+  key: KeyLightValues,
 ): SpotLight {
-  const key = KEY_LIGHT;
   const position = keyLightPosition(stageSide);
   const target: Vec3 = conductor
     ? [conductor.position[0] * key.aimToPodium, 0, conductor.position[2] * key.aimToPodium]
@@ -607,6 +714,7 @@ interface LightOptions {
  * @param tier The quality tier. It sets the shadow map sizes and the shadow blur.
  * @param conductor The place of the conductor, or `null` for a view with no conductor, such as
  *   the gallery.
+ * @param light The light values of the venue (design 4.1), such as {@link HALL_LIGHTS}.
  * @param options The options.
  * @returns A group with the lights, the targets of the spotlights, and the beam group of
  *   {@link createBeam}.
@@ -615,44 +723,47 @@ export function createLights(
   stageSide: number,
   tier: QualityTier,
   conductor: ConductorPlace | null,
+  light: VenueLight,
   options: LightOptions = {},
 ): Group {
   const group = new Group();
 
-  const key = createKeyLight(stageSide, tier, conductor);
+  const key = createKeyLight(stageSide, tier, conductor, light.key);
   group.add(key, key.target);
 
-  group.add(new HemisphereLight(FILL.sky, FILL.ground, FILL.intensity));
+  const fill = light.fill;
+  group.add(new HemisphereLight(fill.sky, fill.ground, fill.intensity));
 
-  for (const light of crossPair(stageSide, SIDE_LIGHT, SIDE_NAME)) {
-    light.shadow.bias = -0.0005;
-    setSideTier(light, tier);
-    fitShadow(light, stageSide);
-    group.add(light, light.target);
+  const crossColor = light.side.color;
+  for (const spot of crossPair(stageSide, light.side, SIDE_NAME, crossColor)) {
+    spot.shadow.bias = -0.0005;
+    setSideTier(spot, tier);
+    fitShadow(spot, stageSide);
+    group.add(spot, spot.target);
   }
   if (options.backRows ?? true) {
-    for (const light of crossPair(stageSide, BACK_ROW_LIGHT, BACK_ROW_NAME)) {
-      group.add(light, light.target);
+    for (const spot of crossPair(stageSide, light.backRow, BACK_ROW_NAME, crossColor)) {
+      group.add(spot, spot.target);
     }
   }
   for (const x of rimLightXs(stageSide)) {
-    const rim = RIM_LIGHT;
-    const light = spotlight(rim.color, rimLightPlace(stageSide, x), [x, 0, 0], rim.illuminance);
-    light.name = RIM_NAME;
-    light.angle = rim.angle;
-    light.penumbra = rim.penumbra;
+    const rim = light.rim;
+    const spot = spotlight(rim.color, rimLightPlace(stageSide, x), [x, 0, 0], rim.illuminance);
+    spot.name = RIM_NAME;
+    spot.angle = rim.angle;
+    spot.penumbra = rim.penumbra;
     // three.js does not render an invisible light. The materials add its diffuse light
     // (`scene/rim-light.ts`), because a spotlight of three.js cost 0.3 ms of GPU time.
-    light.visible = false;
-    group.add(light, light.target);
+    spot.visible = false;
+    group.add(spot, spot.target);
   }
 
   if (options.beam ?? true) {
-    group.add(createBeam(stageSide, tier));
+    group.add(createBeam(stageSide, tier, light.beam));
   }
   if (conductor) {
-    const light = createConductorLight(conductor);
-    group.add(light, light.target);
+    const spot = createConductorLight(conductor, light);
+    group.add(spot, spot.target);
   }
   return group;
 }

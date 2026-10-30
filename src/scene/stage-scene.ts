@@ -54,6 +54,7 @@ import { BeamDepth, setBeamFrame } from './beam.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
+  HALL_LIGHTS,
   aimKeyLight,
   aimRimLights,
   createLights,
@@ -484,7 +485,7 @@ export class StageScene {
     );
     scene.add(stageGroup);
     yield;
-    const lights = createLights(layout.stageSide, this.#tier, layout.conductor);
+    const lights = createLights(layout.stageSide, this.#tier, layout.conductor, HALL_LIGHTS);
     scene.add(lights);
     setRimLights(this.#rim, lights);
     yield;
@@ -927,6 +928,7 @@ export class StageScene {
         timeSec,
         depth: this.#beamDepth,
         foot,
+        look: HALL_LIGHTS.beam,
       });
     }
     setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);

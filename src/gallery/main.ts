@@ -28,7 +28,7 @@ import type { ScenePoseBuffer } from '../pose/pose-at.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { createMaterials } from '../scene/geometry.ts';
-import { createLights } from '../scene/lights.ts';
+import { HALL_LIGHTS, createLights } from '../scene/lights.ts';
 import {
   applyScenePose,
   createPlayerGeometry,
@@ -247,7 +247,7 @@ scene.add(floor);
 
 // The gallery shows the models, so it has no visible beam and no back-row lights. The shadows
 // keep the blur radius of the high tier, so the role views show the shadows of the stage.
-const lights = createLights(floorSide, 'high', null, { beam: false, backRows: false });
+const lights = createLights(floorSide, 'high', null, HALL_LIGHTS, { beam: false, backRows: false });
 scene.add(lights);
 
 const camera = new PerspectiveCamera(GALLERY_FOV_DEG, 1, 0.1, 10 * floorSide);

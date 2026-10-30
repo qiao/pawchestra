@@ -32,6 +32,19 @@ import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 
 /**
+ * The values of the visible beam that a venue sets (design 4.1): the fields of {@link BEAM_LOOK}
+ * with the same names. The other fields of {@link BEAM_LOOK} hold for each venue.
+ */
+export interface BeamValues {
+  /** The color of the scattered light, in sRGB. */
+  readonly color: string;
+  /** The scattered light of a view ray of one stage side through the axis, in linear values. */
+  readonly strength: number;
+  /** The light of a dust mote at the axis, in linear values. */
+  readonly moteStrength: number;
+}
+
+/**
  * The look of the visible beam (design 4.5, light and render). The beam is the cone of
  * `models/beam.ts`. Its shader adds the light that the haze in the cone scatters to the camera:
  * the length of the view ray in the cone, times a density that is highest on the axis and fades to
@@ -499,11 +512,17 @@ export function insideHaze(
   return Math.hypot(x, z) < hazeRadius(stageSide, y);
 }
 
-/** The uniforms of the cone, the fades, and the depth that the beam and the motes share. */
-function coneUniforms(stageSide: number) {
+/**
+ * Gives the uniforms of the cone, the fades, and the depth that the beam and the motes share.
+ *
+ * @param stageSide The stage side `S`, in meters.
+ * @param look The beam values of the venue.
+ * @returns New uniforms.
+ */
+function coneUniforms(stageSide: number, look: BeamValues) {
   const { low, high, top, topFade, margin } = BEAM_LOOK.items;
   return {
-    uColor: { value: new Color(BEAM_LOOK.color) },
+    uColor: { value: new Color(look.color) },
     uHeight: { value: BEAM_LOOK.tip * stageSide },
     uTopRadius: { value: BEAM_LOOK.tipRadius * stageSide },
     uCore: { value: BEAM_LOOK.core },
@@ -546,9 +565,10 @@ function noiseTexture(): Data3DTexture {
  *
  * @param stageSide The stage side `S`, in meters.
  * @param count The number of motes.
+ * @param look The beam values of the venue.
  * @returns The points.
  */
-function createMotes(stageSide: number, count: number): Points {
+function createMotes(stageSide: number, count: number, look: BeamValues): Points {
   const seeds = new Float32Array(count * 4);
   for (let i = 0; i < seeds.length; i++) {
     seeds[i] = plankHash(i, 9173);
@@ -561,11 +581,11 @@ function createMotes(stageSide: number, count: number): Points {
     vertexShader: MOTE_VERTEX,
     fragmentShader: MOTE_FRAGMENT,
     uniforms: {
-      ...coneUniforms(stageSide),
+      ...coneUniforms(stageSide, look),
       uTime: { value: 0 },
       uSize: { value: BEAM_LOOK.moteSize },
       uPixels: { value: 900 },
-      uStrength: { value: BEAM_LOOK.moteStrength },
+      uStrength: { value: look.moteStrength },
     },
     transparent: true,
     blending: AdditiveBlending,
@@ -584,13 +604,14 @@ function createMotes(stageSide: number, count: number): Points {
  * @param stageSide The stage side `S`, in meters.
  * @param tier The quality tier. It sets the noise samples and the number of motes
  *   ({@link setBeamTier}).
+ * @param look The beam values of the venue (design 4.1), such as {@link BEAM_LOOK}.
  * @returns A group with a group of the cone and the motes for each rim light. With no rim light,
  *   the group is empty, and the depth pass of the frame still gives the room haze its depth.
  */
-export function createBeam(stageSide: number, tier: QualityTier): Group {
+export function createBeam(stageSide: number, tier: QualityTier, look: BeamValues): Group {
   const group = new Group();
   for (const _ of rimLightXs(stageSide)) {
-    group.add(createHaze(stageSide, tier));
+    group.add(createHaze(stageSide, tier, look));
   }
   return group;
 }
@@ -601,16 +622,17 @@ export function createBeam(stageSide: number, tier: QualityTier): Group {
  *
  * @param stageSide The stage side `S`, in meters.
  * @param tier The quality tier.
+ * @param look The beam values of the venue.
  * @returns A group with the cone and the motes.
  */
-function createHaze(stageSide: number, tier: QualityTier): Group {
+function createHaze(stageSide: number, tier: QualityTier, look: BeamValues): Group {
   const geometry = new LatheGeometry(
     hazeProfile(stageSide).map(([radius, y]) => new Vector2(radius, y)),
     48,
   );
   const uniforms = {
-    ...coneUniforms(stageSide),
-    uStrength: { value: BEAM_LOOK.strength / stageSide },
+    ...coneUniforms(stageSide, look),
+    uStrength: { value: look.strength / stageSide },
     uInside: { value: 0 },
     uBottom: { value: BEAM_LOOK.bottom },
     uNoise: { value: BEAM_LOOK.noise },
@@ -645,7 +667,7 @@ function createHaze(stageSide: number, tier: QualityTier): Group {
   cone.renderOrder = 1;
   // The motes of the highest tier. A lower tier draws only a part of them.
   const most = Math.max(...Object.values(TIER_SETTINGS).map((settings) => settings.motes));
-  const group = new Group().add(cone, createMotes(stageSide, most));
+  const group = new Group().add(cone, createMotes(stageSide, most, look));
   setHazeTier(group, tier);
   return group;
 }
@@ -811,6 +833,8 @@ interface BeamFrame {
    * a rim light on the stage axis. Each beam adds the x of its rim light.
    */
   readonly foot: StagePair;
+  /** The beam values of the venue (design 4.1): the values of {@link createBeam}. */
+  readonly look: BeamValues;
 }
 
 /**
@@ -870,7 +894,7 @@ function setHazeFrame(haze: Object3D, frame: BeamFrame, foot: StagePair, lightX:
     }
     if (child instanceof Mesh) {
       leanCone(child, stageSide, foot, lightX);
-      setValue(u, 'uStrength', (BEAM_LOOK.strength / stageSide) * factor);
+      setValue(u, 'uStrength', (frame.look.strength / stageSide) * factor);
       setValue(u, 'uInside', inside ? 1 : 0);
       // A camera in the haze cone sees the back faces. The depth of the scene ends each view ray,
       // so a player in front of a back face does not hide the haze before the player.
@@ -883,7 +907,7 @@ function setHazeFrame(haze: Object3D, frame: BeamFrame, foot: StagePair, lightX:
         drift.set(d * 0.3, d, d * 0.2);
       }
     } else {
-      setValue(u, 'uStrength', BEAM_LOOK.moteStrength * factor);
+      setValue(u, 'uStrength', frame.look.moteStrength * factor);
       setValue(u, 'uTime', timeSec);
       setValue(u, 'uPixels', height);
     }
