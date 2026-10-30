@@ -1,5 +1,6 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { SCENE_COLORS } from './colors.ts';
+import type { PropColors } from './colors.ts';
 import { PIANO_BENCH, buildPianoBench } from './instruments/piano.ts';
 import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
@@ -365,16 +366,18 @@ function addBox(builder: MeshBuilder, part: Bounds, color: Rgb): void {
  * @param seatHeight The height of the seat, in meters.
  * @param seatDepth The depth of the seat, in meters.
  * @param seatWidth The width of the seat, in meters.
+ * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
 export function buildChair(
   seatHeight: number,
   seatDepth: number = CHAIR.seatDepth,
   seatWidth: number = CHAIR.seatWidth,
+  colors: PropColors = SCENE_COLORS,
 ): MeshData {
   const c = { ...CHAIR, seatHeight, seatWidth };
   const builder = new MeshBuilder();
-  const color = SCENE_COLORS.chair;
+  const color = colors.chair;
   const x = c.seatWidth / 2 - CHAIR_LEG / 2;
   const center = (c.seatDepth - seatDepth) / 2;
   const z = seatDepth / 2 - CHAIR_LEG / 2 - center;
@@ -400,12 +403,16 @@ export function buildChair(
  *
  * @param deskHeight The height of the middle of the desk above the floor, in meters
  *   ({@link standDeskHeight}).
+ * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
-export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): MeshData {
+export function buildMusicStand(
+  deskHeight: number = MUSIC_STAND.deskHeight,
+  colors: PropColors = SCENE_COLORS,
+): MeshData {
   const s = { ...MUSIC_STAND, deskHeight };
   const builder = new MeshBuilder();
-  const color = SCENE_COLORS.stand;
+  const color = colors.stand;
   for (let i = 0; i < 3; i++) {
     const turn = new Quaternion().setFromAxisAngle(
       new Vector3(0, 1, 0),
@@ -430,6 +437,7 @@ export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): Me
     builder,
     box(s.deskWidth, s.deskDepth, 0.012),
     transform(toVec3(deskCenter), toQuat(tilt)),
+    colors,
   );
   // The sheet is one quad a little in front of the desk.
   const w = s.deskWidth / 2 - 0.04;
@@ -438,7 +446,7 @@ export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): Me
   const corner = (cx: number, cy: number): Vec3 =>
     toVec3(new Vector3(cx, cy, front).applyQuaternion(tilt).add(deskCenter));
   builder.add(quad(corner(-w, -d), corner(w, -d), corner(w, d), corner(-w, d)), {
-    color: SCENE_COLORS.sheet,
+    color: colors.sheet,
   });
   return builder.build();
 }
@@ -450,12 +458,18 @@ export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): Me
  * @param builder The builder.
  * @param plate The corner list of the desk plate, with its large faces along z.
  * @param at The place of the desk.
+ * @param colors The prop colors of the venue (design 4.1).
  */
-export function addDesk(builder: MeshBuilder, plate: readonly number[], at: Transform): void {
+export function addDesk(
+  builder: MeshBuilder,
+  plate: readonly number[],
+  at: Transform,
+  colors: PropColors,
+): void {
   const [front, rest] = splitByFacing(plate, [0, 0, 1], 0.99);
   const [back, edges] = splitByFacing(rest, [0, 0, -1], 0.99);
-  builder.add([...front, ...back], { color: SCENE_COLORS.standDesk, at });
-  builder.add(edges, { color: SCENE_COLORS.standEdge, at });
+  builder.add([...front, ...back], { color: colors.standDesk, at });
+  builder.add(edges, { color: colors.standEdge, at });
 }
 
 /**
@@ -467,9 +481,14 @@ export function addDesk(builder: MeshBuilder, plate: readonly number[], at: Tran
  *
  * @param high True for the high stool.
  * @param seat The heights of the seat and of the foot ring. The stool of the harp has no ring.
+ * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
-export function buildStool(high: boolean, seat: SeatHeights): MeshData {
+export function buildStool(
+  high: boolean,
+  seat: SeatHeights,
+  colors: PropColors = SCENE_COLORS,
+): MeshData {
   const { seatHeight } = seat;
   const { seatSize } = high ? HIGH_STOOL : STOOL;
   const width = high ? seatSize : (seat.seatWidth ?? seatSize);
@@ -478,7 +497,7 @@ export function buildStool(high: boolean, seat: SeatHeights): MeshData {
   // (`chairSeat()`): its front edge ends where the thighs leave it, behind the knees and the shins.
   const center = high || seat.seatDepth === undefined ? 0 : (CHAIR.seatDepth - depth) / 2;
   const builder = new MeshBuilder();
-  const color = SCENE_COLORS.chair;
+  const color = colors.chair;
   addBox(builder, centeredBox([0, seatHeight - 0.02, center], [width, 0.04, depth]), color);
   const legHeight = seatHeight - 0.04;
   const at = seatSize / 2 - CHAIR_LEG / 2;
@@ -508,20 +527,28 @@ export function buildStool(high: boolean, seat: SeatHeights): MeshData {
  *
  * @param support The support of the player.
  * @param seat The heights of the seat ({@link seatHeights}), or `null` for a standing player.
+ * @param colors The prop colors of the venue (design 4.1): the hall colors by default. The piano
+ *   bench keeps its own colors.
  * @returns The mesh data, or `null` for a standing player or a body with no chair.
  */
-export function buildSupport(support: Support, seat: SeatHeights | null): MeshData | null {
+export function buildSupport(
+  support: Support,
+  seat: SeatHeights | null,
+  colors: PropColors = SCENE_COLORS,
+): MeshData | null {
   if (!seat) {
     return null;
   }
 
   switch (support) {
     case 'chair':
-      return seat.noChair ? null : buildChair(seat.seatHeight, seat.seatDepth, seat.seatWidth);
+      return seat.noChair
+        ? null
+        : buildChair(seat.seatHeight, seat.seatDepth, seat.seatWidth, colors);
     case 'stool':
-      return buildStool(false, seat);
+      return buildStool(false, seat, colors);
     case 'high-stool':
-      return buildStool(true, seat);
+      return buildStool(true, seat, colors);
     case 'bench':
       return buildPianoBench(seat.seatHeight, seat.seatDepth);
     case 'stand':
@@ -678,9 +705,10 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
  * at each desk height is built one time.
  *
  * @param layout The layout of a score.
+ * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
  */
-export function buildSceneProps(layout: SceneLayout): MeshData {
+export function buildSceneProps(layout: SceneLayout, colors: PropColors = SCENE_COLORS): MeshData {
   const builder = new MeshBuilder();
   const seats = new Map<string, MeshData | null>();
   const place = (position: Vec3, facing: number): Transform =>
@@ -697,7 +725,7 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
       heights?.noChair,
     ].join(' ');
     if (!seats.has(key)) {
-      seats.set(key, buildSupport(support, heights));
+      seats.set(key, buildSupport(support, heights, colors));
     }
     const seat = seats.get(key);
     if (seat) {
@@ -706,7 +734,7 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
   }
   const stands = new Map<number, MeshData>();
   for (const at of layout.stands) {
-    const stand = stands.get(at.deskHeight) ?? buildMusicStand(at.deskHeight);
+    const stand = stands.get(at.deskHeight) ?? buildMusicStand(at.deskHeight, colors);
     stands.set(at.deskHeight, stand);
     builder.addMesh(stand, place(at.position, at.facing));
   }

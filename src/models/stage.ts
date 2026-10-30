@@ -571,6 +571,7 @@ function addPodium(builder: MeshBuilder, podium: Vec3, stand = true): void {
     builder,
     box(desk.deskWidth, desk.deskDepth, 0.015),
     transform(toVec3(deskCenter), toQuat(tilt)),
+    SCENE_COLORS,
   );
   // The open score: two pages with a small gap, on the front face of the desk.
   const lift = new Vector3(0, 0, 0.0095).applyQuaternion(tilt);
