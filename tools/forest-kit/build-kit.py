@@ -1254,7 +1254,7 @@ def build_parts(collection):
         build_canopy('canopy-2', {'length': 2.4, 'drop': 0.5, 'blobs': 4, 'size': 0.9}),
         build_bush('bush-1', {'blobs': 4, 'size': 0.6}),
         build_bush('bush-2', {'blobs': 3, 'size': 0.45}),
-        build_bush('bush-3', {'blobs': 4, 'size': 0.8, 'fine': True}),
+        build_bush('bush-3', {'blobs': 3, 'size': 0.8, 'fine': True}),
         build_fern(
             'fern-1',
             {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 9, 'width': 0.17},
@@ -1283,6 +1283,10 @@ def build_parts(collection):
 #: The half side of the stage of the default demo, and its corner cut, in meters.
 HALF = STAGE_SIDE / 2
 CUT = STAGE_CORNER_CUT * STAGE_SIDE
+
+#: The most triangles of all placed parts around the stage of the default demo, with the lanterns
+#: of the light string.
+TRIANGLE_BUDGET = 40000
 
 #: The least space between the deck edge and the trunk with its roots, in meters.
 TREE_CLEARANCE = 1.5
@@ -1932,8 +1936,11 @@ def build(collection):
     bpy.context.view_layer.update()
     empties = place_empties(collection, places, objects)
     bpy.context.view_layer.update()
-    empties = list(collection.objects)
-    empties = [o for o in empties if o.type == 'EMPTY']
+    empties = [o for o in collection.objects if o.type == 'EMPTY']
+    placed = sum(len(objects[p[0]].data.polygons) for p in places)
+    placed += sum(rope[5] for rope in ROPES) * len(objects['lantern-hanging'].data.polygons)
+    if placed > TRIANGLE_BUDGET:
+        raise ValueError(f'The kit places {placed} triangles, above {TRIANGLE_BUDGET}.')
     return objects, empties, places, footprints
 
 
