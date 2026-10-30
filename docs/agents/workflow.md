@@ -134,6 +134,9 @@ These rules hold for each test:
   two agents do not measure at the same time. `--gate <load>` also waits for a quiet CPU.
 - Run a long `pnpm loudness` fit through `tools/measure-lock.sh run --owner <name> -- <cmd>` when
   another agent measures. Two runs at the same time make each run about 3 times slower.
+- Run a headless Blender build or render through the same lock when another agent measures. A
+  Blender job at about 500% CPU made the gates of `pnpm frame` refuse runs, and it changed a
+  shot of `pnpm frozen`.
 - A load round measures the times of the app with `pnpm load-probe`, and the scores and the metrics
   of Lighthouse with `pnpm lighthouse`. Use the saved tool, because the Lighthouse of the
   chrome-devtools MCP server has no performance category. `--url https://www.zoophony.com/` audits
