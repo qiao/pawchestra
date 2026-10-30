@@ -156,6 +156,9 @@ These traps make a load measure wrong:
   The build puts the CSS inline, and the manifest still names the removed file.
 - Commit or set aside each later edit before a build for a measure. The build reads the working
   tree, so the edit goes into the measure.
+- Check the chunks of the build after a new dynamic import. The top-level await of
+  `src/gallery/views-main.ts` turns off the chunk merge of Rolldown, so a lazy chunk that imports
+  a module of the first download makes a common chunk (design 7.2).
 
 These traps make a task of the main thread long:
 
