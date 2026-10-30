@@ -1861,7 +1861,11 @@ def render_sheet(folder, objects):
         col, row = i % columns, i // columns
         x, z = (col - (columns - 1) / 2) * cell, (row - 1.5) * cell
         copy = bpy.data.objects.new(f'sheet-{name}', obj.data)
-        copy.location = blender_point((x, 0.0, z))
+        # The middle of the box of the part goes to the middle of its cell.
+        points = [app_point(v.co) for v in obj.data.vertices]
+        mid_x = (min(p.x for p in points) + max(p.x for p in points)) / 2
+        mid_z = (min(p.z for p in points) + max(p.z for p in points)) / 2
+        copy.location = blender_point((x - mid_x * scale, 0.0, z - mid_z * scale))
         copy.scale = (scale, scale, scale)
         sheet.objects.link(copy)
         dims = [obj.dimensions[0], obj.dimensions[2], obj.dimensions[1]]
