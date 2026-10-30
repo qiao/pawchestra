@@ -1,9 +1,24 @@
-import type { Group, Scene, Vector3 } from 'three';
+import {
+  BackSide,
+  BoxGeometry,
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  Scene,
+  SphereGeometry,
+} from 'three';
+import type { Vector3 } from 'three';
 
 import { SCENE_COLORS } from '../models/colors.ts';
 import type { PropColors } from '../models/colors.ts';
+import { srgb } from '../models/mesh.ts';
+import { STAGE_THICKNESS, plankHash } from '../models/stage.ts';
 import type { Steps } from '../score/steps.ts';
 import { buildEnvironmentScene } from './environment.ts';
+import type { ForestKit } from './forest.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { HALL_LIGHTS } from './lights.ts';
 import type { VenueLight } from './lights.ts';
@@ -11,9 +26,16 @@ import { HALL_POST } from './post.ts';
 import type { VenuePost } from './post.ts';
 import { HALL_STAGE } from './stage.ts';
 import type { VenueStage } from './stage.ts';
-
-/** The place around the stage (design 4.1). The hash key `scene` names it (design 2.8). */
-export type VenueId = 'hall' | 'forest';
+import {
+  TriangleList,
+  addLamp,
+  bakedGeometry,
+  createGlows,
+  cutawayMaterial,
+  ringCutaway,
+  setCutaway,
+} from './surroundings.ts';
+import type { VenueId } from './venue-id.ts';
 
 /**
  * The values and the builders of one venue (design 4.1): the surroundings, the environment of the
@@ -71,4 +93,46 @@ export const HALL_VENUE: Venue = {
   stage: HALL_STAGE,
   props: SCENE_COLORS,
   post: HALL_POST,
+};
+
+/**
+ * Gives the venue of an id (design 4.1, 7.2). The hall is in the first download, and the forest
+ * loads as a chunk of its own at its first use.
+ *
+ * @param id The venue.
+ * @returns A promise of the venue.
+ * @throws Error if the chunk of the forest does not load. The app then stays in the hall.
+ */
+export async function loadVenue(id: VenueId): Promise<Venue> {
+  if (id === 'hall') {
+    return HALL_VENUE;
+  }
+  const { forestVenue } = await import('./forest.ts');
+  return forestVenue(FOREST_KIT);
+}
+
+/** The runtime parts of the first download that the chunk of the forest uses (design 7.2). */
+const FOREST_KIT: ForestKit = {
+  three: {
+    BackSide,
+    BoxGeometry,
+    BufferAttribute,
+    BufferGeometry,
+    Color,
+    Group,
+    Mesh,
+    MeshBasicMaterial,
+    Scene,
+    SphereGeometry,
+  },
+  srgb,
+  plankHash,
+  floorY: -STAGE_THICKNESS,
+  TriangleList,
+  addLamp,
+  bakedGeometry,
+  createGlows,
+  cutawayMaterial,
+  ringCutaway,
+  setCutaway,
 };

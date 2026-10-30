@@ -86,7 +86,8 @@ import type { StageBakeUniforms } from './stage.ts';
 import { bakeStageSteps } from './stage-bake.ts';
 import { compileInto, gpuDoneSteps, programsReadySteps } from './programs.ts';
 import { depthGeometryOf } from './shared-corners.ts';
-import type { Venue, VenueId } from './venue.ts';
+import type { Venue } from './venue.ts';
+import type { VenueId } from './venue-id.ts';
 
 /** The inputs of {@link StageScene}. */
 interface StageSceneOptions {
