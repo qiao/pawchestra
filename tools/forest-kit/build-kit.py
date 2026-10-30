@@ -515,9 +515,10 @@ def build_tree(name, spec):
         return Vector((top.x, 0.0, top.z)) * (y / height) ** 1.5 + Vector((0.0, y, 0.0))
 
     ends = []
-    a = rng.uniform(0, 2 * math.pi)
-    for _ in range(spec['branches']):
-        a += 2 * math.pi / spec['branches'] + rng.uniform(-0.4, 0.4)
+    for i in range(spec['branches']):
+        # The branches leave out the side of the root gap, which faces the deck, so that the
+        # crown hangs little over the stage, where a high camera looks down.
+        a = math.radians(55 + 250 * (i + 0.5) / spec['branches']) + rng.uniform(-0.25, 0.25)
         start = axis_at(height * rng.uniform(0.82, 0.97))
         reach = spec['reach'] * rng.uniform(0.8, 1.1)
         end = start + Vector(
