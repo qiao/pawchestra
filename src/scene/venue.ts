@@ -1,13 +1,18 @@
 import {
+  AdditiveBlending,
   BackSide,
   BoxGeometry,
   BufferAttribute,
   BufferGeometry,
   Color,
+  DataTexture,
+  DoubleSide,
   Group,
   Mesh,
   MeshBasicMaterial,
+  RedFormat,
   Scene,
+  ShaderMaterial,
   SphereGeometry,
 } from 'three';
 import type { Vector3 } from 'three';
@@ -15,7 +20,8 @@ import type { Vector3 } from 'three';
 import { SCENE_COLORS } from '../models/colors.ts';
 import type { PropColors } from '../models/colors.ts';
 import { srgb } from '../models/mesh.ts';
-import { STAGE_THICKNESS, plankHash } from '../models/stage.ts';
+import { byteReader, readByte, readVarint, unzigzag } from '../models/packed-bytes.ts';
+import { STAGE_CORNER_CUT, STAGE_THICKNESS, plankHash } from '../models/stage.ts';
 import type { Steps } from '../score/steps.ts';
 import { buildEnvironmentScene } from './environment.ts';
 import type { ForestKit } from './forest.ts';
@@ -26,15 +32,6 @@ import { HALL_POST } from './post.ts';
 import type { VenuePost } from './post.ts';
 import { HALL_STAGE } from './stage.ts';
 import type { VenueStage } from './stage.ts';
-import {
-  TriangleList,
-  addLamp,
-  bakedGeometry,
-  createGlows,
-  cutawayMaterial,
-  ringCutaway,
-  setCutaway,
-} from './surroundings.ts';
 import type { VenueId } from './venue-id.ts';
 
 /**
@@ -114,25 +111,24 @@ export async function loadVenue(id: VenueId): Promise<Venue> {
 /** The runtime parts of the first download that the chunk of the forest uses (design 7.2). */
 const FOREST_KIT: ForestKit = {
   three: {
+    AdditiveBlending,
     BackSide,
     BoxGeometry,
     BufferAttribute,
     BufferGeometry,
     Color,
+    DataTexture,
+    DoubleSide,
     Group,
     Mesh,
     MeshBasicMaterial,
+    RedFormat,
     Scene,
+    ShaderMaterial,
     SphereGeometry,
   },
-  srgb,
+  readers: { byteReader, readByte, readVarint, unzigzag, srgb },
   plankHash,
   floorY: -STAGE_THICKNESS,
-  TriangleList,
-  addLamp,
-  bakedGeometry,
-  createGlows,
-  cutawayMaterial,
-  ringCutaway,
-  setCutaway,
+  cornerCut: STAGE_CORNER_CUT,
 };
