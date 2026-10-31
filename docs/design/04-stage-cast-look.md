@@ -118,6 +118,11 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   their low boughs fill the top corners. The other trees keep `TREE_CLEARANCE`. The default view
   sees nothing above about 2 m behind the deck, so one rope of the light string hangs between the
   framing trees across the top of the view. Bushes and ferns fill the ground behind the deck.
+- **Water.** A small fall of two steps drops in strands between dark, wet rocks behind the back
+  right corner of the deck, so that the default view shows it at the height of the heads of the
+  back row, as `forest.webp`. Its stream runs toward the deck corner with glints of the sun, and
+  turns to the right under the bushes (`STREAM_PLACE` and `STREAM_COURSE` of
+  `tools/forest-kit/build-kit.py`). A trunk stands at the right of the fall, as in the reference.
 - **Far forest.** Rings of far trees and a backdrop ring hide the edge of the ground from each
   camera of the orbit, also at the largest distance (`FOREST.far`).
 - **Cut.** A part drops when the line from the camera to a point of the stage passes through it,
