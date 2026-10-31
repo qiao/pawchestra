@@ -1273,35 +1273,40 @@ def build_ground():
 def build_path():
     """Builds the path in front of the stage: a strip of lighter earth from the deck to the front.
 
-    Its origin is at the middle of the front edge of the deck, on the ground.
+    Its origin is at the middle of the front edge of the deck, on the ground. Its edges fade into
+    the earth around it, so that it shows no hard outline.
     """
     part = Part('path')
     rng = part.rng
     length = 9.0
-    left, right = [], []
-    for i in range(10):
-        t = i / 9
+    rows = 19
+    left, right, inner = [], [], []
+    for i in range(rows):
+        t = i / (rows - 1)
         z = 0.2 + length * t
-        half = 1.5 + 0.6 * t + rng.uniform(-0.15, 0.15)
+        half = 1.5 + 0.6 * t + rng.uniform(-0.12, 0.12)
         bend = 0.6 * math.sin(t * 2.4)
         left.append((bend - half, z))
         right.append((bend + half, z))
+        if 0 < i < rows - 1:
+            inner += [(bend + u * half, z + rng.uniform(-0.1, 0.1)) for u in (-0.55, 0.0, 0.55)]
     outline = left + list(reversed(right))
-    inner = [
-        (rng.uniform(-1.0, 1.0) + 0.6 * math.sin(t * 2.4), 0.6 + length * t)
-        for t in [i / 12 for i in range(1, 12)]
-    ]
     edges = [(i, (i + 1) % len(outline)) for i in range(len(outline))]
     verts2d, _, faces, _, _, _ = delaunay_2d_cdt(
         [Vector(p) for p in outline + inner], edges, [], 2, 1e-4
     )
-    points = [Vector((v.x, 0.012 + rng.uniform(0, 0.006), v.y)) for v in verts2d]
-    part.add(
-        points,
-        [tuple(f) for f in faces],
-        solid_paint([('path', 3), ('path-light', 2), ('earth-light', 1)], 'matte', part.tint, 1.5),
-        'up',
+    points = [Vector((v.x, 0.014, v.y)) for v in verts2d]
+    field = solid_paint(
+        [('path', 3), ('path-light', 2), ('earth-light', 1)], 'matte', part.tint, 1.5
     )
+
+    def paint(normal, point):
+        t = min(1.0, max(0.0, (point.z - 0.2) / length))
+        u = abs(point.x - 0.6 * math.sin(t * 2.4)) / (1.5 + 0.6 * t)
+        color, kind = field(normal, point)
+        return mix(color, linear('earth'), 0.75 * smoothstep(0.5, 1.0, u)), kind
+
+    part.add(points, [tuple(f) for f in faces], paint, 'up')
     return part
 
 
