@@ -92,11 +92,13 @@ PALETTE = {
     'path-light': '#ab8660',
     'rock-wet': '#4a4640',
     'rock-wet-dark': '#34302c',
-    'water': '#3e4a44',
-    'water-deep': '#2a3330',
-    'water-light': '#9aa59c',
-    'water-glint': '#f2e2bf',
-    'foam': '#f0f2ec',
+    'water': '#3d4a52',
+    'water-deep': '#2b343b',
+    'water-cream': '#95856e',
+    'water-cream-light': '#afa386',
+    'water-streak': '#5c5040',
+    'water-glint': '#f0b85a',
+    'foam': '#c9c1b2',
     'iron': '#2e2925',
     'iron-light': '#4a423a',
     'glass': '#ffb85c',
@@ -1178,8 +1180,8 @@ STREAM_HALF = (0.55, 0.36)
 #: the foot, the z of the lip, the reach of the water past the lip, and the half width of the
 #: water.
 FALL_STEPS = (
-    (0.62, 0.34, -0.55, 0.1, 0.26),
-    (0.34, 0.045, -0.18, 0.14, 0.38),
+    (0.62, 0.34, -0.55, 0.1, 0.2),
+    (0.34, 0.045, -0.18, 0.14, 0.3),
 )
 
 
@@ -1271,51 +1273,63 @@ def build_stream():
     for top, foot, z, _, half in FALL_STEPS:
         slab((-half - 0.06, foot - 0.04, z - 0.16), (half + 0.06, top - 0.02, z - 0.04))
 
-    # The water: the pool above the fall, the strands of each step, and the foam at each foot.
-    # The strands are white with warm glints of the low sun near their lips.
-    disc((0.0, FALL_STEPS[0][0] + 0.01, -0.85), (0.3, 0.22), 7, [('water', 2), ('water-light', 1)])
+    # The water: the pool above the fall, a sheet over each step, and the foam at each foot. Each
+    # sheet curves over its lip in columns of uneven widths with no gap, in tones of cream with
+    # streaks. Strands of uneven widths and lengths lie over the sheet, so that the streaks
+    # overlap, as the warm, soft water of `forest.webp`.
+    disc((0.0, FALL_STEPS[0][0] + 0.01, -0.85), (0.3, 0.22), 7, [('water', 2), ('water-cream', 1)])
+    tones = [('water-cream', 3), ('water-streak', 2), ('water-cream-light', 2)]
     for top, foot, z, reach, half in FALL_STEPS:
-        lip = [
-            Vector((-half, top + 0.005, z - 0.12)),
-            Vector((half, top + 0.005, z - 0.12)),
-            Vector((half, top + 0.005, z + 0.01)),
-            Vector((-half, top + 0.005, z + 0.01)),
-        ]
-        part.add(lip, [(0, 1, 2, 3)], lambda n, c: (linear('water-light'), 'water'), 'up')
-        # Strands of random widths with dark gaps of rock between them.
-        spans = []
-        x = -half + rng.uniform(0.0, 0.03)
-        while x < half - 0.03:
-            width = min(rng.uniform(0.03, 0.08), half - x)
-            spans.append((x, x + width))
-            x += width + rng.uniform(0.025, 0.05)
         drop = top - foot
-        for x0, x1 in spans:
-            all_foam = rng.random() < 0.2
-            glint = rng.random() < 0.5
-            sway = rng.uniform(-0.02, 0.02)
-            rows = []
-            for sv in (0.0, 0.3, 0.65, 1.0):
-                y = top - drop * sv
-                zz = z + reach * math.sqrt(sv) + rng.uniform(-0.01, 0.01)
-                rows += [Vector((x0 + sway * sv, y, zz)), Vector((x1 + sway * sv, y, zz))]
-            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(3)]
 
-            def strand_paint(normal, center, all_foam=all_foam, glint=glint, top=top, drop=drop):
+        def sheet_point(x, sv, front=0.0, top=top, z=z, reach=reach, drop=drop):
+            """Gives a point of the sheet: over the round lip first, then down and out."""
+            if sv < 0:
+                return Vector((x, top + 0.008, z - 0.07 + front))
+            return Vector((x, top - drop * sv, z + reach * math.sqrt(sv) + 0.015 + front))
+
+        lip = [Vector((-half, top + 0.008, z - 0.14)), Vector((half, top + 0.008, z - 0.14))]
+        lip += [sheet_point(half, -1), sheet_point(-half, -1)]
+        part.add(lip, [(0, 1, 2, 3)], lambda n, c: (linear('water-cream'), 'water'), 'up')
+        rows_at = (-1, 0.0, 0.12, 0.4, 0.7, 1.0)
+        cuts = sorted(rng.uniform(-half * 0.9, half * 0.9) for _ in range(6))
+        columns = list(zip([-half] + cuts, cuts + [half]))
+        for x0, x1 in columns:
+            tone = pick(rng, tones)
+            end = rng.uniform(0.86, 1.0)
+            pts = []
+            for sv in rows_at:
+                sv = sv if sv < 0 else sv * end
+                pts += [sheet_point(x0, sv), sheet_point(x1, sv)]
+            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(len(rows_at) - 1)]
+
+            def sheet_paint(normal, center, tone=tone, top=top, drop=drop):
                 share = (top - center.y) / drop
-                if share > 0.7 and (all_foam or glint):
-                    return linear('foam'), 'water'
-                if share < 0.35 and glint:
-                    return linear('water-glint'), 'water'
-                return linear('water-light'), 'water'
+                return linear('foam' if share > 0.8 else tone), 'water'
 
-            part.add(rows, faces, strand_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
+            part.add(pts, faces, sheet_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
+        for _ in range(6):
+            width = rng.uniform(0.03, 0.09)
+            x0 = rng.uniform(-half, half - width)
+            length = rng.uniform(0.55, 1.0)
+            tone = pick(rng, [('water-cream-light', 2), ('water-streak', 1)])
+            pts = []
+            for sv in (-1, 0.0, 0.12, length * 0.5, length):
+                pts += [sheet_point(x0, sv, 0.012), sheet_point(x0 + width, sv, 0.012)]
+            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(4)]
+            part.add(
+                pts,
+                faces,
+                lambda n, c, tone=tone: (linear(tone), 'water'),
+                lambda c, z=z: Vector((c.x, c.y, z - 1.0)),
+            )
+        # The foam pool at the foot: a wide, uneven fan of foam and cream.
         disc(
-            (0.0, foot, z + reach + 0.08),
-            (half + 0.08, 0.12),
-            7,
-            [('foam', 1), ('water-light', 2)],
-            0.012,
+            (0.0, foot, z + reach + 0.1),
+            (half + 0.12, 0.16),
+            9,
+            [('foam', 3), ('water-cream', 2)],
+            0.015,
         )
 
     # The stream: a strip of dark water from the pool along the course, with small glints of the
@@ -1344,17 +1358,17 @@ def build_stream():
         lambda n, c: (linear(pick(rng, [('water', 3), ('water-deep', 2)])), 'water'),
         'up',
     )
-    # The glints: small flat triangles just above the water, more of them near the fall.
+    # The glints: many tiny gold triangles just above the water, more of them near the fall.
     for i in range(len(course) - 1):
         (ax, az), (bx, bz) = course[i], course[i + 1]
-        for _ in range(7 if i < 3 else 3):
+        d = Vector((bx - ax, bz - az)).normalized()
+        n = Vector((-d.y, d.x))
+        for _ in range(14 if i < 3 else 5):
             t = rng.uniform(0.0, 1.0)
             cx, cz = ax + (bx - ax) * t, az + (bz - az) * t
-            d = Vector((bx - ax, bz - az)).normalized()
-            n = Vector((-d.y, d.x))
             off = rng.uniform(-0.7, 0.7) * (STREAM_HALF[1] if i > 0 else STREAM_HALF[0])
-            c = Vector((cx + n.x * off, 0.052, cz + n.y * off))
-            size = rng.uniform(0.025, 0.05)
+            c = Vector((cx + n.x * off, 0.05, cz + n.y * off))
+            size = rng.uniform(0.01, 0.022)
             a0 = rng.uniform(0, 2 * math.pi)
             tri = [
                 c + Vector((size * math.cos(a0 + k * 2.1), 0.0, size * math.sin(a0 + k * 2.1)))
