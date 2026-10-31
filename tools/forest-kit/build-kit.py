@@ -828,20 +828,37 @@ def build_moss(name, spec):
     return part
 
 
+def soft_rock(rng, size, planes, roundness=0.14, detail=(14, 9)):
+    """Gives the points and the faces of a rock with flat sides and soft edges.
+
+    The rock is the meet of half spaces with random normals, as a hull of random points, and six
+    half spaces on the axes, which keep it near the unit size. Each point of a sphere goes out to
+    a soft minimum of its distances to the planes, so that each edge rounds over about
+    `roundness` (a share of the unit size). The axes then scale by `size`.
+    """
+    sides = [(Vector((1.0, 0.0, 0.0)) * s, 1.0) for s in (1, -1)]
+    sides += [(Vector((0.0, 1.0, 0.0)) * s, 1.0) for s in (1, -1)]
+    sides += [(Vector((0.0, 0.0, 1.0)) * s, 1.0) for s in (1, -1)]
+    for _ in range(planes):
+        n = Vector((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, 1))).normalized()
+        sides.append((n, rng.uniform(0.72, 0.95)))
+    unit, faces = unit_sphere(detail)
+    points = []
+    for d in unit:
+        reach = [offset / d.dot(n) for n, offset in sides if d.dot(n) > 1e-3]
+        least = min(reach)
+        r = least - roundness * math.log(sum(math.exp(-(t - least) / roundness) for t in reach))
+        points.append(Vector((d.x * r * size[0], d.y * r * size[1], d.z * r * size[2])))
+    return points, faces
+
+
 def build_rock(name, spec):
-    """Builds a faceted rock: the hull of random points in a flat ellipsoid, set into the ground."""
+    """Builds a rock with flat sides and soft edges, set into the ground."""
     part = Part(name)
     rng = part.rng
     size = spec['size']
-    points = []
-    for _ in range(spec['points']):
-        d = Vector(
-            (rng.gauss(0, 1), abs(rng.gauss(0, 1)) * 0.9 + 0.1, rng.gauss(0, 1))
-        ).normalized()
-        points.append(
-            Vector((d.x * size[0], max(-0.08, d.y * size[1] - size[1] * 0.25), d.z * size[2]))
-        )
-    points, faces = hull(points)
+    points, faces = soft_rock(rng, size, spec['points'])
+    points = [Vector((p.x, max(-0.08, p.y - size[1] * 0.1), p.z)) for p in points]
     centroid = sum(points, Vector()) / len(points)
 
     lit, mid, shade = spec.get('tones', ('rock-light', 'rock', None))
@@ -1290,12 +1307,10 @@ def build_stream():
     water = solid_paint([('water', 3), ('water-deep', 2)], 'water', part.tint, 1.2)
 
     def rock(center, size, count=12, moss=0.0):
-        """Adds a boulder: wet, dark sides, and a dry top with some moss."""
-        pts = []
-        for _ in range(count):
-            d = Vector((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, 1))).normalized()
-            pts.append(Vector(center) + Vector((d.x * size[0], d.y * size[1], d.z * size[2])))
-        pts, faces = hull(pts)
+        """Adds a boulder with soft edges: wet, dark sides, and a dry top with some moss."""
+        detail = (14, 9) if max(size) > 0.3 else (10, 6)
+        pts, faces = soft_rock(rng, size, count, 0.16, detail)
+        pts = [Vector(center) + p for p in pts]
         c = sum(pts, Vector()) / len(pts)
 
         def rock_paint(normal, point):
