@@ -104,6 +104,14 @@ page starts in Free mode (`app/camera-mode.ts`).
 - **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6. The first shot starts from
   the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
   at once.
+- **Letterbox.** Cinematic mode shows the scene in the largest box of the aspect 21:9
+  (`CINEMA_ASPECT`) at the middle of the viewport, as a film. Pure black bars fill the rest: at
+  the top and the bottom of a view narrower than 21:9, and at the sides of a wider view. The
+  frame is the same in each view, also on a phone in portrait, as a film player shows a film. The
+  drawer and the bar do not move it. Free mode has no bars.
+- A change of the mode moves the bars in or out in `LETTERBOX_MOVE_MS` with a smoothstep, and at
+  once with reduced motion. The image of the camera moves with the bars, so the change has no
+  jump (`StageCamera.frameTo()`).
 - On the first screen, the frame shrinks until the stage is clear of the play button (2.8). The
   frame uses the view of the stage at the default distance in the current direction, so a drag
   changes it and a zoom does not. Thus a wheel or a pinch zooms the camera there as during play,
@@ -235,10 +243,10 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   in the build, 7.2), so the first paint shows no unstyled page.
 - **Drawer**: a floating panel in `--panel-glass`, nearly opaque, so that its dim text keeps
   4.5:1 over white fur. Only the panel of the current tab scrolls. The arrow keys, Home, and End
-  move between the tabs, as the tabs pattern of WAI-ARIA says. While the drawer is open, the
-  camera moves its frame with `setViewOffset()` (`stageCover()`), and the canvas fills the window,
-  so the opaque canvas shows no edge. A wide window opens the drawer at start (`isWideLayout()`),
-  so that the stage does not move at the click on play.
+  move between the tabs, as the tabs pattern of WAI-ARIA says. While the drawer is open in Free
+  mode, the camera moves its frame with `setViewOffset()` (`stageCover()`), and the canvas fills
+  the window, so the opaque canvas shows no edge. A wide window opens the drawer at start
+  (`isWideLayout()`), so that the stage does not move at the click on play.
   - **Demos**: a row with the title, the composer, and the length, and no cover. A long title
     wraps, because an ellipsis would hide a part of it. The current row has a level meter from the
     notes of the score (`meterLevels()`), so the UI owns no audio code. The meter has a column of

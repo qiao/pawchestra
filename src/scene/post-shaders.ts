@@ -13,6 +13,19 @@ void main() {
 `;
 
 /**
+ * The GLSL clamp of a sample to the part of its source that the frame wrote: `uClamp` holds the
+ * lowest and the highest texture coordinates (design 2.5, 4.5). In Cinematic mode, each pass
+ * writes only the letterbox, so a sample outside it would read an old frame.
+ */
+const SOURCE_CLAMP = /* glsl */ `
+uniform vec4 uClamp;
+
+vec2 inSource(vec2 uv) {
+  return clamp(uv, uClamp.xy, uClamp.zw);
+}
+`;
+
+/**
  * The downsample of the bloom: 13 samples in five boxes, as in the bloom of "Next generation post
  * processing in Call of Duty: Advanced Warfare" (Jimenez, 2014). With `PREFILTER`, the first pass
  * also keeps the bright parts, with a soft knee, and weights each box by its brightness, so that
@@ -25,10 +38,11 @@ uniform vec2 uTexel;
 uniform float uThreshold;
 uniform float uKnee;
 uniform float uDiffusion;
+${SOURCE_CLAMP}
 varying vec2 vUv;
 
 vec3 tap(float x, float y) {
-  return texture(uSource, vUv + uTexel * vec2(x, y)).rgb;
+  return texture(uSource, inSource(vUv + uTexel * vec2(x, y))).rgb;
 }
 
 float brightness(vec3 c) {
@@ -84,10 +98,11 @@ export const BLOOM_UP_FRAGMENT = /* glsl */ `
 uniform sampler2D uSource;
 uniform sampler2D uBase;
 uniform vec2 uTexel;
+${SOURCE_CLAMP}
 varying vec2 vUv;
 
 vec3 tap(float x, float y) {
-  return texture(uSource, vUv + uTexel * vec2(x, y)).rgb;
+  return texture(uSource, inSource(vUv + uTexel * vec2(x, y))).rgb;
 }
 
 void main() {
@@ -126,12 +141,13 @@ float blurAt(vec2 uv) {
 export const BLUR_PREPARE_FRAGMENT = /* glsl */ `
 uniform sampler2D uColor;
 ${VIEW_DEPTH}
+${SOURCE_CLAMP}
 varying vec2 vUv;
 
 void main() {
   // The half-size pixel center lies between four pixels of the scene, so the linear filter
   // gives their mean. A limit keeps a single bright pixel from a large bright disc.
-  vec3 color = min(texture(uColor, vUv).rgb, vec3(32.0));
+  vec3 color = min(texture(uColor, inSource(vUv)).rgb, vec3(32.0));
   gl_FragColor = vec4(color, blurAt(vUv));
 }
 `;
@@ -148,6 +164,7 @@ uniform sampler2D uSource;
 uniform vec2 uTexel;
 // The pixels of this pass for a blur of 1 (the full image height), times one half (a radius).
 uniform float uPixelsPerBlur;
+${SOURCE_CLAMP}
 varying vec2 vUv;
 
 const float GOLDEN_ANGLE = 2.39996323;
@@ -160,7 +177,7 @@ void main() {
   for (int i = 0; i < SAMPLES; i++) {
     float r = sqrt((float(i) + 0.5) / float(SAMPLES)) * radius;
     float angle = float(i) * GOLDEN_ANGLE;
-    vec4 tap = texture(uSource, vUv + vec2(cos(angle), sin(angle)) * r * uTexel);
+    vec4 tap = texture(uSource, inSource(vUv + vec2(cos(angle), sin(angle)) * r * uTexel));
     float reach = abs(tap.a) * uPixelsPerBlur;
     if (tap.a > center.a) {
       reach = min(reach, radius);
@@ -191,9 +208,14 @@ vec3 grade(vec3 color) {
 /**
  * The final pass to the canvas (design 4.5, post effects): the depth of field, the room haze, the
  * bloom, the tone mapping of the renderer, the color grade, the vignette, and the film grain. One
- * pass does all of them, so each pixel of the canvas reads the scene one time.
+ * pass does all of them, so each pixel of the canvas reads the scene one time. Outside the frame
+ * `uFrame` (left, bottom, right, top), the pass writes the black of the letterbox bars of
+ * Cinematic mode (design 2.5), and reads no texture.
  */
 export const FINAL_FRAGMENT = /* glsl */ `
+uniform vec4 uFrame;
+// The part of the half-size bloom and blur that the frame wrote.
+uniform vec4 uHalfClamp;
 uniform sampler2D uScene;
 uniform sampler2D uBloom;
 uniform sampler2D uBlur;
@@ -246,19 +268,24 @@ float hash(vec2 p) {
 }
 
 void main() {
+  if (vUv.x < uFrame.x || vUv.y < uFrame.y || vUv.x > uFrame.z || vUv.y > uFrame.w) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    return;
+  }
+  vec2 halfUv = clamp(vUv, uHalfClamp.xy, uHalfClamp.zw);
   vec3 color = texture(uScene, vUv).rgb;
 #ifdef DEPTH_OF_FIELD
   // The blur of this pixel at full size decides how much of the soft image it takes, so the
   // outline of a sharp subject stays sharp.
   if (uBlurOn > 0.5) {
     float radius = abs(blurAt(vUv)) * uPixelsPerBlur;
-    color = mix(color, texture(uBlur, vUv).rgb, smoothstep(0.5, 2.0, radius));
+    color = mix(color, texture(uBlur, halfUv).rgb, smoothstep(0.5, 2.0, radius));
   }
 #endif
   color = hazed(color);
 #ifdef BLOOM
   // The halation: the glow is warmer than the light, as the red glow around a light on film.
-  color += texture(uBloom, vUv).rgb * uBloomStrength * uHalation;
+  color += texture(uBloom, halfUv).rgb * uBloomStrength * uHalation;
 #endif
 #ifdef TONE_MAPPING
   color = toneMapping(color);

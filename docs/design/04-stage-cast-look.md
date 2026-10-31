@@ -429,6 +429,13 @@ scene ──> [depth 1/2] ──────────────────
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
   vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.
+- **Letterbox** (2.5). Each target keeps the size of the canvas, and a scissor limits each pass to
+  the letterbox (`cropTarget()` of `scene/letterbox.ts`): the scene pass, its MSAA resolve, the
+  depth passes, the bloom, and the blur. Each sample stays in the written part of its source
+  (`SOURCE_CLAMP` of `scene/post-shaders.ts`), and the final pass writes the black bars with no
+  sample. Thus no pass renders the scene under the bars, and the move of the bars allocates no
+  target. A canvas of the size of the letterbox would allocate each target again in each frame of
+  the move. The blur of the depth of field is a part of the height of the letterbox.
 
 **Camera**
 
@@ -443,6 +450,8 @@ limits. `shots/frame.ts` holds the frame.
   planner, and the beam fade. A portrait viewport gets a lower and more frontal view
   (`PORTRAIT_RULE`). Each player stays whole in each wide shot (`wideView()`), and the frame
   centers on the free area of 2.8 (`viewFrame()`).
+- In Cinematic mode, `setViewOffset()` puts the image of the camera into the letterbox of 2.5,
+  with the aspect `CINEMA_ASPECT`. The canvas keeps the size of the window.
 
 **Supports.** The players of the timpani, the percussion, the contrabass, the tuba, the choir,
 and the conductor stand. The soloist of 3.8 also stands when it plays the violin, the viola, the

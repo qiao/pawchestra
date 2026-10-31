@@ -50,6 +50,8 @@ import type { Focus, FocusSpot } from './focus.ts';
 import { createMaterials } from './geometry.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
+import { letterbox, letterboxShare, mixBox, stepLetterbox, uvRectOf } from './letterbox.ts';
+import type { FrameBox } from './letterbox.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
@@ -73,7 +75,7 @@ import {
 } from './player.ts';
 import type { PlayerSpot } from './player.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
-import type { HazeFrame, TargetFormat } from './post.ts';
+import type { HazeFrame, PostView, TargetFormat } from './post.ts';
 import { POST_LOOK } from './post.ts';
 import { createRimUniforms, setRimLights } from './rim-light.ts';
 import { SHOT_LOOK, createShotUniforms, setShotLight } from './shot-light.ts';
@@ -87,6 +89,14 @@ import type { StageBakeUniforms } from './stage.ts';
 import { bakeStageSteps } from './stage-bake.ts';
 import { compileInto, gpuDoneSteps, programsReadySteps } from './programs.ts';
 import { depthGeometryOf } from './shared-corners.ts';
+
+/** The letterbox of one frame (design 2.5). */
+interface LetterboxFrame {
+  /** The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode). */
+  readonly share: number;
+  /** The part of the canvas that shows the scene, for the post effects. */
+  readonly view: PostView;
+}
 
 /** The inputs of {@link StageScene}. */
 interface StageSceneOptions {
@@ -393,6 +403,15 @@ export class StageScene {
   #aimTarget: LightAim | null = null;
   /** The time of the last frame, in milliseconds, for the ease of the stage lights. */
   #aimMs = 0;
+  /**
+   * The progress of the move of the letterbox bars (design 2.5), from 0 (Free mode) to 1
+   * (Cinematic mode).
+   */
+  #letterbox = 0;
+  /** The time of the last move of the letterbox bars, in milliseconds, or `null` before it. */
+  #letterboxMs: number | null = null;
+  /** The part of the canvas that showed the scene in the last frame, in CSS pixels. */
+  #visible: FrameBox = { x: 0.5, y: 0.5, width: 1, height: 1 };
 
   /**
    * Creates the renderer on a canvas. The scene shows nothing until {@link StageScene.show}.
@@ -872,8 +891,46 @@ export class StageScene {
   }
 
   /**
+   * The part of the canvas that showed the scene in the last frame, in CSS pixels: the full
+   * canvas in Free mode, and the letterbox in Cinematic mode (design 2.5).
+   */
+  get visible(): FrameBox {
+    return this.#visible;
+  }
+
+  /**
+   * Moves the letterbox bars toward the mode of the frame, and gives the view of the frame (design
+   * 2.5). The bars move in `LETTERBOX_MOVE_MS` of `letterbox.ts`, at once with reduced motion.
+   *
+   * @param cinematic True in Cinematic mode.
+   * @param nowMs The time of the frame, in milliseconds.
+   * @returns The share of the letterbox, from 0 to 1, and the view of the post effects.
+   */
+  #followLetterbox(cinematic: boolean, nowMs: number): LetterboxFrame {
+    const last = this.#letterboxMs;
+    const dtMs = last === null || this.#reducedMotion ? Infinity : nowMs - last;
+    this.#letterboxMs = nowMs;
+    this.#letterbox = stepLetterbox(this.#letterbox, cinematic, dtMs);
+    const share = letterboxShare(this.#letterbox);
+
+    const width = this.#width;
+    const height = this.#height;
+    const full = { x: width / 2, y: height / 2, width, height };
+    if (share <= 0) {
+      this.#visible = full;
+      return { share, view: { rect: null, imageHeight: 1 } };
+    }
+    const frame = letterbox(width, height);
+    this.#visible = mixBox(full, frame, share);
+    const imageHeight = 1 + (frame.height / height - 1) * share;
+    return { share, view: { rect: uvRectOf(this.#visible, width, height), imageHeight } };
+  }
+
+  /**
    * Renders one frame of the current layout. With no layout, it does nothing. The beam takes the
-   * factor of the shot, or in Free mode the factor of the camera distance (design 4.5, 5.6).
+   * factor of the shot, or in Free mode the factor of the camera distance (design 4.5, 5.6). In
+   * Cinematic mode, the scene shows in the letterbox, and the canvas is black around it (design
+   * 2.5). No pass renders the scene under the bars.
    *
    * @param shot The camera of the shot of the frame in Cinematic mode, or `null` in Free mode.
    *   Then the orbit controls move the camera (design 2.5).
@@ -901,7 +958,8 @@ export class StageScene {
       light = freeShotLight(view.stageSide, this.aspect, [x, y, z]);
     }
     this.#lightShot(view, light, spot);
-    view.camera.frameTo(cover, ring, performance.now());
+    const { share, view: postView } = this.#followLetterbox(shot !== null, performance.now());
+    view.camera.frameTo(cover, ring, performance.now(), share);
     const foot = this.#followAim(view, performance.now());
     const camera = view.camera.camera;
     const timeSec = effectTime(performance.now(), this.#reducedMotion);
@@ -910,6 +968,7 @@ export class StageScene {
     if (depthPass) {
       this.#holdPose(view);
       const hidden = [...view.effects, view.hall];
+      this.#beamDepth.crop(postView.rect);
       this.#beamDepth.render(this.#renderer, view.scene, camera, hidden, this.#variants);
       setBeamFrame(beamGroup, {
         stageSide: view.stageSide,
@@ -929,13 +988,35 @@ export class StageScene {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
         const vignette = POST_LOOK.vignette + (SHOT_LOOK.vignette - POST_LOOK.vignette) * light;
-        this.#post.render(view.scene, camera, focus, view.effects, timeSec, { haze, vignette });
+        this.#post.render(view.scene, camera, focus, view.effects, timeSec, {
+          haze,
+          vignette,
+          view: postView,
+        });
       } else {
+        this.#scissorCanvas(postView.rect !== null);
         this.#renderer.render(view.scene, camera);
       }
     });
     view.scene.matrixWorldAutoUpdate = true;
     releaseSkeletons(view.players);
+  }
+
+  /**
+   * Limits the render to the canvas to the letterbox, with no post effects (design 2.5). The
+   * browser clears the canvas before each frame, so the bars stay black.
+   *
+   * @param cropped True to limit the render to the visible part of the last frame.
+   */
+  #scissorCanvas(cropped: boolean): void {
+    const renderer = this.#renderer;
+    renderer.setScissorTest(cropped);
+    if (cropped) {
+      const box = this.#visible;
+      const left = box.x - box.width / 2;
+      const bottom = this.#height - (box.y + box.height / 2);
+      renderer.setScissor(left, bottom, box.width, box.height);
+    }
   }
 
   /**

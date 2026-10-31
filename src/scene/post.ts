@@ -26,6 +26,8 @@ import type { Steps } from '../score/steps.ts';
 
 import type { DepthDraw } from './beam.ts';
 import { LENS } from './focus.ts';
+import { cropTarget } from './letterbox.ts';
+import type { UvRect } from './letterbox.ts';
 import { gradeLut } from './grade.ts';
 import { compileInto } from './programs.ts';
 import type { Focus } from './focus.ts';
@@ -98,12 +100,28 @@ export interface HazeFrame {
   readonly floorY: number;
 }
 
+/**
+ * The part of the canvas that shows the scene in one frame (design 2.5, 4.5). In Cinematic mode,
+ * each pass writes only the letterbox, and the final pass writes black bars around it.
+ */
+export interface PostView {
+  /** The part of the canvas that shows the scene, or `null` for the full canvas. */
+  readonly rect: UvRect | null;
+  /**
+   * The height of the image of the camera divided by the height of the canvas: 1 in Free mode,
+   * and the height of the letterbox in Cinematic mode. The blur of the depth of field is a part of
+   * the image height.
+   */
+  readonly imageHeight: number;
+}
+
 /** The values of the final pass that change with each frame. */
 interface PostFrame {
   /** The room haze, or `null` for no haze. */
   readonly haze: HazeFrame | null;
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
+  readonly view: PostView;
 }
 
 /**
@@ -273,6 +291,33 @@ function setUniform(material: ShaderMaterial, name: string, value: UniformValue)
 }
 
 /**
+ * Sets the clamp of the samples of a pass to the part of its source that the frame wrote: the
+ * middles of the first and the last written pixels (`SOURCE_CLAMP` of `post-shaders.ts`). A full
+ * source gets the clamp from 0 to 1, which changes no sample.
+ *
+ * @param material The material of the pass.
+ * @param name The name of the uniform of the clamp.
+ * @param source The source of the pass.
+ */
+function setClamp(material: ShaderMaterial, name: string, source: WebGLRenderTarget): void {
+  const clamp = material.uniforms[name]?.value;
+  if (!(clamp instanceof Vector4)) {
+    return;
+  }
+  if (!source.scissorTest) {
+    clamp.set(0, 0, 1, 1);
+    return;
+  }
+  const { x, y, z, w } = source.scissor;
+  clamp.set(
+    (x + 0.5) / source.width,
+    (y + 0.5) / source.height,
+    (x + z - 0.5) / source.width,
+    (y + w - 0.5) / source.height,
+  );
+}
+
+/**
  * Sets the size of one texel of the source of a pass.
  *
  * @param material The material of the pass. It has the uniform `uTexel`.
@@ -364,6 +409,7 @@ export class PostPipeline {
       uThreshold: { value: POST_LOOK.bloomThreshold },
       uKnee: { value: POST_LOOK.bloomKnee },
       uDiffusion: { value: POST_LOOK.diffusion },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
     });
     this.#bloomPrefilter = passMaterial(BLOOM_DOWN_FRAGMENT, down(), { PREFILTER: 1 });
     this.#bloomDown = passMaterial(BLOOM_DOWN_FRAGMENT, down());
@@ -371,9 +417,11 @@ export class PostPipeline {
       uSource: { value: null },
       uBase: { value: null },
       uTexel: { value: new Vector2() },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
     });
     this.#blurPrepare = passMaterial(BLUR_PREPARE_FRAGMENT, {
       uColor: { value: null },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
       ...focusUniforms(),
     });
     this.#blurGather = this.#createBlurGather();
@@ -423,7 +471,7 @@ export class PostPipeline {
    * @param effects The light effects that write no depth, such as the visible beam. The depth pass
    *   hides them.
    * @param timeSec The time of the effects, in seconds, for the film grain ({@link grainSeed}).
-   * @param frame The room haze and the vignette of the frame.
+   * @param frame The room haze, the vignette, and the view of the frame.
    */
   render(
     scene: Scene,
@@ -437,24 +485,60 @@ export class PostPipeline {
     if (!targets) {
       return;
     }
+    const { view } = frame;
+    this.#crop(targets, view.rect);
     const renderer = this.#renderer;
     renderer.setRenderTarget(targets.scene);
     renderer.render(scene, camera);
 
     const bloom = this.#renderBloom(targets);
-    const blur = focus.active ? this.#renderBlur(targets, scene, camera, focus, effects) : null;
+    const blur = focus.active
+      ? this.#renderBlur(targets, scene, camera, focus, effects, view.imageHeight)
+      : null;
 
     const final = this.#final;
     setUniform(final, 'uScene', targets.scene.texture);
-    setUniform(final, 'uBloom', bloom);
-    setUniform(final, 'uBlur', blur);
+    setUniform(final, 'uBloom', bloom?.texture ?? null);
+    setUniform(final, 'uBlur', blur?.texture ?? null);
     setUniform(final, 'uBlurOn', blur ? 1 : 0);
-    this.#setFocus(final, camera, focus, this.#height / 2);
+    // The bloom and the blur have the same half size, so one clamp serves both.
+    const half = bloom ?? blur;
+    if (half) {
+      setClamp(final, 'uHalfClamp', half);
+    }
+    const rect = view.rect;
+    const frameRect = final.uniforms['uFrame']?.value;
+    if (frameRect instanceof Vector4) {
+      frameRect.set(rect?.left ?? 0, rect?.bottom ?? 0, rect?.right ?? 1, rect?.top ?? 1);
+    }
+    this.#setFocus(final, camera, focus, (this.#height / 2) * view.imageHeight);
     setUniform(final, 'uAspect', this.#width / this.#height);
     this.#setHaze(final, camera, frame.haze);
     setUniform(final, 'uVignette', frame.vignette);
     setUniform(final, 'uSeed', grainSeed(timeSec));
     this.#pass(final, null);
+  }
+
+  /**
+   * Limits each target of the frame to the part of the view (design 2.5): the passes write only the
+   * pixels of the part, and no pass renders the scene under the bars.
+   *
+   * @param targets The targets.
+   * @param rect The part of the canvas that shows the scene, or `null` for the full canvas.
+   */
+  #crop(targets: Targets, rect: UvRect | null): void {
+    for (const target of [
+      targets.scene,
+      ...targets.bloomDown,
+      ...targets.bloomUp,
+      targets.depth,
+      targets.blurPrepare,
+      targets.blurGather,
+    ]) {
+      if (target) {
+        cropTarget(target, rect);
+      }
+    }
   }
 
   /**
@@ -529,13 +613,14 @@ export class PostPipeline {
     };
   }
 
-  #renderBloom(targets: Targets): Texture | null {
+  #renderBloom(targets: Targets): WebGLRenderTarget | null {
     const levels = targets.bloomDown;
     let source = targets.scene;
     for (const [i, level] of levels.entries()) {
       const material = i === 0 ? this.#bloomPrefilter : this.#bloomDown;
       setUniform(material, 'uSource', source.texture);
       setTexel(material, source);
+      setClamp(material, 'uClamp', source);
       this.#pass(material, level);
       source = level;
     }
@@ -549,35 +634,52 @@ export class PostPipeline {
         setUniform(this.#bloomUp, 'uSource', source.texture);
         setUniform(this.#bloomUp, 'uBase', base.texture);
         setTexel(this.#bloomUp, source);
+        setClamp(this.#bloomUp, 'uClamp', source);
         this.#pass(this.#bloomUp, to);
         source = to;
       }
     }
-    return levels.length > 0 ? source.texture : null;
+    return levels.length > 0 ? source : null;
   }
 
+  /**
+   * Renders the depth of field at half size: the depth, the color and the blur of each pixel, and
+   * the soft image.
+   *
+   * @param targets The targets.
+   * @param scene The scene.
+   * @param camera The camera.
+   * @param focus The focus of the frame.
+   * @param effects The light effects that write no depth.
+   * @param imageHeight The height of the image of the camera divided by the height of the canvas.
+   * @returns The target of the soft image, or `null` when the tier has no depth of field.
+   */
   #renderBlur(
     targets: Targets,
     scene: Scene,
     camera: PerspectiveCamera,
     focus: Focus,
     effects: readonly Object3D[],
-  ): Texture | null {
+    imageHeight: number,
+  ): WebGLRenderTarget | null {
     const { depth, blurPrepare, blurGather } = targets;
     if (!depth || !blurPrepare || !blurGather) {
       return null;
     }
     this.#renderDepth(depth, scene, camera, effects);
+    const pixelsPerBlur = (blurPrepare.height / 2) * imageHeight;
     const prepare = this.#blurPrepare;
     setUniform(prepare, 'uColor', targets.scene.texture);
-    this.#setFocus(prepare, camera, focus, blurPrepare.height / 2);
+    setClamp(prepare, 'uClamp', targets.scene);
+    this.#setFocus(prepare, camera, focus, pixelsPerBlur);
     this.#pass(prepare, blurPrepare);
     const gather = this.#blurGather;
     setUniform(gather, 'uSource', blurPrepare.texture);
     setTexel(gather, blurPrepare);
-    setUniform(gather, 'uPixelsPerBlur', blurPrepare.height / 2);
+    setClamp(gather, 'uClamp', blurPrepare);
+    setUniform(gather, 'uPixelsPerBlur', pixelsPerBlur);
     this.#pass(gather, blurGather);
-    return blurGather.texture;
+    return blurGather;
   }
 
   #renderDepth(
@@ -670,6 +772,7 @@ export class PostPipeline {
         uSource: { value: null },
         uTexel: { value: new Vector2() },
         uPixelsPerBlur: { value: 1 },
+        uClamp: { value: new Vector4(0, 0, 1, 1) },
       },
       { SAMPLES: Math.max(1, TIER_SETTINGS[this.#tier].blurSamples) },
     );
@@ -688,6 +791,8 @@ export class PostPipeline {
     const material = passMaterial(
       FINAL_FRAGMENT,
       {
+        uFrame: { value: new Vector4(0, 0, 1, 1) },
+        uHalfClamp: { value: new Vector4(0, 0, 1, 1) },
         uScene: { value: null },
         uBloom: { value: null },
         uBlur: { value: null },

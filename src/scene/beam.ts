@@ -27,6 +27,8 @@ import type { Camera, Material, Object3D, PerspectiveCamera, Scene } from 'three
 import { rimLightPlace, rimLightXs } from '../models/beam.ts';
 import { plankHash } from '../models/stage.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { cropTarget } from './letterbox.ts';
+import type { UvRect } from './letterbox.ts';
 import type { StagePair } from './light-pool.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
@@ -745,6 +747,16 @@ export class BeamDepth {
     this.#width = width;
     this.#height = height;
     this.#target.setSize(width, height);
+  }
+
+  /**
+   * Limits the depth pass to the part of the canvas that shows the scene: the letterbox of
+   * Cinematic mode (design 2.5).
+   *
+   * @param rect The part, or `null` for the full canvas.
+   */
+  crop(rect: UvRect | null): void {
+    cropTarget(this.#target, rect);
   }
 
   /**
