@@ -67,6 +67,14 @@ export const MIN_MAXIMUM_COVER = 0.6;
 export const CHROME_SEEK_SEC = 32;
 
 /**
+ * The song times of the seeks before the Chrome traces of `--long`, in seconds: five traces of
+ * {@link MEASURE_SEC} cover each shot of `perf-60.mid` from 2 s to 58 s, about 3,000 frames.
+ * `pnpm frame-compare` records them, so that a change of about 0.2 ms of the main-thread p95
+ * stands out of the spread of the runs.
+ */
+export const CHROME_LONG_SEEKS_SEC = [2, 14, 26, 38, 48] as const;
+
+/**
  * The song time of the seek before the Metal trace, in seconds. The start of `xctrace` took
  * 2.2 s after the settle, and the record 4.4 s of song time, so the trace covers about 19 s to
  * 24 s, in the section shot from 16 s to 26 s of `perf-60.mid`, with the depth of field.
@@ -408,10 +416,10 @@ const CPU_WINDOW_SEC = 5;
 const CPU_WAIT_SEC = 300;
 
 /** The flags of `pnpm frame` that take a value, such as `--demo=<id>`. */
-const VALUE_FLAGS = new Set(['demo', 'scene', 'scale', 'max-cpu', 'wait', 'keep']);
+const VALUE_FLAGS = new Set(['demo', 'scene', 'scale', 'max-cpu', 'wait', 'keep', 'frames']);
 
 /** The flags of `pnpm frame` that take no value, such as `--headed`. */
-const SWITCH_FLAGS = new Set(['headed', 'free', 'no-metal', 'gpu-only']);
+const SWITCH_FLAGS = new Set(['headed', 'free', 'no-metal', 'gpu-only', 'long']);
 
 /** The options of the frame measure (the flags of `pnpm frame`). */
 export interface FrameOptions {
@@ -435,6 +443,20 @@ export interface FrameOptions {
   readonly gpuOnly: boolean;
   /** The folder for the raw traces of the run, or `undefined` to keep none. */
   readonly keep: string | undefined;
+  /** True to record the Chrome traces at each seek of {@link CHROME_LONG_SEEKS_SEC}. */
+  readonly long: boolean;
+  /** The JSON file for the time of each frame ({@link FrameTimes}), or `undefined`. */
+  readonly frames: string | undefined;
+}
+
+/** The time of each frame of a run, in milliseconds: the file of `--frames`. */
+export interface FrameTimes {
+  /** The tasks of the main thread of each frame of the Chrome traces. */
+  readonly main: readonly number[];
+  /** The callback of `requestAnimationFrame` of each frame of the Chrome traces. */
+  readonly callback: readonly number[];
+  /** The WebGL frames of the Metal trace, or an empty list with no Metal trace. */
+  readonly gpu: readonly number[];
 }
 
 /**
@@ -501,6 +523,8 @@ export function frameOptions(flags: readonly string[], xctraceFound: boolean): F
     metal: xctraceFound && !switches.has('no-metal'),
     gpuOnly: switches.has('gpu-only'),
     keep: values.get('keep'),
+    long: switches.has('long'),
+    frames: values.get('frames'),
   };
 }
 
@@ -832,16 +856,17 @@ interface CappedMeasure {
   /** The frames of the Chrome trace. */
   readonly frames: TraceFrames;
   /** The song time at the start and at the end of the Chrome trace, in seconds. */
-  readonly songs: readonly [number, number];
+  readonly songs: readonly (readonly [number, number])[];
 }
 
 /**
  * Measures at the frame rate of the display: the callback and the GPU timer query of each frame
- * for {@link MEASURE_SEC}, then a Chrome trace of the main thread for the same time (design 9.7).
+ * for {@link MEASURE_SEC}, then a Chrome trace of the main thread for the same time after each
+ * seek (design 9.7): {@link CHROME_SEEK_SEC}, or {@link CHROME_LONG_SEEKS_SEC} with `--long`.
  *
  * @param base The URL of the dev server.
  * @param options The options.
- * @returns The values.
+ * @returns The values, with the frames of all traces in the order of the seeks.
  */
 async function measureCapped(base: string, options: FrameOptions): Promise<CappedMeasure> {
   const browser = await launchChrome(options, false);
@@ -849,20 +874,33 @@ async function measureCapped(base: string, options: FrameOptions): Promise<Cappe
     const page = await playDemo(browser, base, options);
     const info = await pageInfo(browser, page, options);
     const probe = await probeFor(page, MEASURE_SEC);
-    const from = await seekTo(page, CHROME_SEEK_SEC);
-    await browser.startTracing(page, { categories: TRACE_CATEGORIES });
-    await page.waitForTimeout(MEASURE_SEC * 1000);
-    // The stop of the trace takes about 1.5 s, so the end comes before it.
-    const songs: readonly [number, number] = [from, await songTimeOf(page)];
-    const trace = await browser.stopTracing();
-    if (options.keep) {
-      await writeFile(join(options.keep, 'main-trace.json'), trace);
+    const seeks = options.long ? CHROME_LONG_SEEKS_SEC : [CHROME_SEEK_SEC];
+    const parts: TraceFrames[] = [];
+    const songs: (readonly [number, number])[] = [];
+    for (const [k, seek] of seeks.entries()) {
+      const from = await seekTo(page, seek);
+      await browser.startTracing(page, { categories: TRACE_CATEGORIES });
+      await page.waitForTimeout(MEASURE_SEC * 1000);
+      // The stop of the trace takes about 1.5 s, so the end comes before it.
+      songs.push([from, await songTimeOf(page)]);
+      const trace = await browser.stopTracing();
+      if (options.keep) {
+        const name = k === 0 ? 'main-trace.json' : `main-trace-${k + 1}.json`;
+        await writeFile(join(options.keep, name), trace);
+      }
+      // SAFETY: Chrome writes the trace in the JSON trace event format, with this field.
+      const { traceEvents } = JSON.parse(trace.toString('utf8')) as {
+        traceEvents: TraceEvent[];
+      };
+      parts.push(traceFrames(traceEvents));
     }
-    // SAFETY: Chrome writes the trace in the JSON trace event format, with this field.
-    const { traceEvents } = JSON.parse(trace.toString('utf8')) as {
-      traceEvents: TraceEvent[];
+    const frames: TraceFrames = {
+      callback: parts.flatMap((part) => part.callback),
+      main: parts.flatMap((part) => part.main),
+      gpuTask: parts.flatMap((part) => part.gpuTask),
+      spanSec: parts.reduce((sum, part) => sum + part.spanSec, 0),
     };
-    return { info, probe, frames: traceFrames(traceEvents), songs };
+    return { info, probe, frames, songs };
   } finally {
     await browser.close();
   }
@@ -1271,8 +1309,10 @@ export interface RunRecord {
   readonly canvas: readonly [number, number];
   /** The song times of the seeks and of each trace, in seconds. */
   readonly songs: {
-    /** The seek before the Chrome trace, and the start and the end of the trace. */
-    readonly chrome: { readonly seek: number; readonly trace: readonly [number, number] } | null;
+    /** The seek before each Chrome trace, and the start and the end of the trace. */
+    readonly chrome:
+      | readonly { readonly seek: number; readonly trace: readonly [number, number] }[]
+      | null;
     /** The seek before the Metal trace, and the start and the end of the record. */
     readonly metal: { readonly seek: number; readonly trace: readonly [number, number] } | null;
   };
@@ -1447,10 +1487,11 @@ async function main(): Promise<void> {
     }
     console.log(`Load average (1 min, for information): ${loadsText(loads)}.`);
     if (capped) {
-      const [from, to] = capped.songs;
+      const windows = capped.songs.map(([from, to]) => `${from.toFixed(1)} to ${to.toFixed(1)} s`);
       console.log(
-        `The Chrome trace started at the song time ${from.toFixed(1)} s and ended at ` +
-          `${to.toFixed(1)} s, after a seek to ${CHROME_SEEK_SEC} s.`,
+        `The Chrome traces (${capped.songs.length}) covered the song times ` +
+          `${windows.join(', ')}, after the seeks to ` +
+          `${(options.long ? CHROME_LONG_SEEKS_SEC : [CHROME_SEEK_SEC]).join(', ')} s.`,
       );
     }
     const uncappedFps = `${framesPerSecond(uncapped.probe.stamps).toFixed(1)} fps with no cap`;
@@ -1501,7 +1542,12 @@ async function main(): Promise<void> {
         scale: options.scale,
         canvas: uncapped.canvas,
         songs: {
-          chrome: capped ? { seek: CHROME_SEEK_SEC, trace: capped.songs } : null,
+          chrome: capped
+            ? capped.songs.map((trace, k) => ({
+                seek: options.long ? (CHROME_LONG_SEEKS_SEC[k] ?? NaN) : CHROME_SEEK_SEC,
+                trace,
+              }))
+            : null,
           metal: uncapped.songs ? { seek: METAL_SEEK_SEC, trace: uncapped.songs } : null,
         },
         loads,
@@ -1513,6 +1559,14 @@ async function main(): Promise<void> {
       };
       await writeFile(join(options.keep, 'run.json'), `${JSON.stringify(record, null, 2)}\n`);
       console.log(`Wrote ${join(options.keep, 'run.json')}.`);
+    }
+    if (options.frames) {
+      const times: FrameTimes = {
+        main: capped?.frames.main ?? [],
+        callback: capped?.frames.callback ?? [],
+        gpu: uncapped.metal ?? [],
+      };
+      await writeFile(options.frames, `${JSON.stringify(times)}\n`);
     }
     for (const line of messageLines(RUNNING.messages)) {
       console.log(line);
