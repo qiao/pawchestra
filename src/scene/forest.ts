@@ -72,31 +72,32 @@ export const FOREST = {
    * The sun, seen from the stage center: the turn from the front (+z) toward the right (+x) and
    * the angle above the floor of its light, in radians. Its glow stands among the trees at the
    * back right, at a distance and a height in meters, with a radius in meters, so that the
-   * default view shows it below the canopy.
+   * default view shows it at its top right, as `forest.webp`. The glow shines through the trees.
    */
   sun: {
     azimuth: 145 * DEGREES,
     elevation: 25 * DEGREES,
-    glowDistance: 15,
-    glowHeight: 4,
-    glow: 5,
+    glowDistance: 12.5,
+    glowHeight: 2.2,
+    glow: 6.5,
   },
   /** The radius of the glow of a lantern, in meters. */
   lanternGlow: 0.5,
   /** The light of the middle of a glow, in linear values: a lantern and the sun. */
-  glowLight: { lantern: [0.5, 0.24, 0.08], sun: [0.55, 0.36, 0.12] },
+  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [0.7, 0.45, 0.13] },
   /** The baked light of the faces (`ForestBake` of `forest-build.ts`). */
   bake: {
     sky: [0.32, 0.3, 0.14],
     ground: [0.14, 0.09, 0.04],
     sun: [2.2, 1.45, 0.55],
     sunShade: [0.25, 9],
+    canopy: { distance: [1.5, 7], height: [2, 8], shade: 0.65 },
     leafGlow: [0.7, 0.75, 0.2],
     key: { light: [0.45, 0.32, 0.18], direction: [-0.3, 0.7, 1] },
     deck: { light: [0.7, 0.42, 0.18], reach: 2.5 },
     lantern: { light: [1.6, 0.8, 0.25], reach: 0.9 },
-    glass: 8,
-    water: [0.12, 0.1, 0.06],
+    glass: [3, 1.6, 0.8],
+    water: [0.55, 0.55, 0.5],
     haze: {
       start: 10,
       reach: 22,
@@ -491,11 +492,16 @@ export function forestVenue(kit: ForestKit): Venue {
       });
       const cut = createCut(kit, build, stageSide);
       const lamps = build.lamps.map((lamp: ForestLamp) => ({ ...lamp, glow: FOREST.lanternGlow }));
+      const sun = glowMesh(kit, [sunGlow(kit)], FOREST.glowLight.sun, { cut, lift: 0 });
+      // The glow of the sun shines through the canopy, so no tree hides it.
+      if (!Array.isArray(sun.material)) {
+        sun.material.depthTest = false;
+      }
       const group = new kit.three.Group().add(
         forestMesh(kit, build.solid, cut, false),
         forestMesh(kit, build.foliage, cut, true),
         glowMesh(kit, lamps, FOREST.glowLight.lantern, { cut, lift: 1 }),
-        glowMesh(kit, [sunGlow(kit)], FOREST.glowLight.sun, { cut, lift: 0 }),
+        sun,
       );
       cuts.set(group, cut);
       return group;

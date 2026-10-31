@@ -30,6 +30,17 @@ export interface ForestBake {
    * face gets the full sun.
    */
   readonly sunShade: readonly [floor: number, height: number];
+  /**
+   * The shade of the canopy on a low face far from the clearing: the distances beyond the deck
+   * edge at which the shade starts and becomes full, in meters, the heights above the ground at
+   * which it starts to fall off and ends, in meters, and the share of the sky and the sun that it
+   * takes away.
+   */
+  readonly canopy: {
+    readonly distance: readonly [number, number];
+    readonly height: readonly [number, number];
+    readonly shade: number;
+  };
   /** The light of the sun through a leaf that looks away from it. */
   readonly leafGlow: Rgb;
   /** The soft warm key from the front: its light, and its direction to the light. */
@@ -38,9 +49,13 @@ export interface ForestBake {
   readonly deck: { readonly light: Rgb; readonly reach: number };
   /** The light of a lantern at its glass, and the distance at which it halves. */
   readonly lantern: { readonly light: Rgb; readonly reach: number };
-  /** The factor of the albedo of the lantern glass, above 1 so that the bloom takes it. */
-  readonly glass: number;
-  /** The light of the water toward the sun, added to the lit albedo. */
+  /**
+   * The factor of the albedo of the lantern glass for each channel, above 1 so that the bloom
+   * takes it. A lower green and blue keep the amber hue, which the tone curve turns toward white
+   * at a high light.
+   */
+  readonly glass: Rgb;
+  /** The light of the sky that the water and the foam reflect, as a factor of their albedo. */
   readonly water: Rgb;
   /**
    * The haze of the far forest: the distance beyond the deck edge at which it starts and the
@@ -273,6 +288,18 @@ function outsideDeck(x: number, z: number, half: number): number {
 }
 
 /**
+ * Gives the smooth step of a value between two edges: 0 below the first, 1 above the second.
+ *
+ * @param edges The two edges.
+ * @param value The value.
+ * @returns The step, from 0 to 1.
+ */
+function smoothstep(edges: readonly [number, number], value: number): number {
+  const t = Math.min(1, Math.max(0, (value - edges[0]) / (edges[1] - edges[0])));
+  return t * t * (3 - 2 * t);
+}
+
+/**
  * Calculates the baked color of a face from its albedo (design 4.1).
  *
  * @param input The inputs of the build.
@@ -290,7 +317,7 @@ function bakeFace(
   const b = input.bake;
   const { center, normal, kind } = face;
   if (kind === GLOW) {
-    return [albedo[0] * b.glass, albedo[1] * b.glass, albedo[2] * b.glass];
+    return [albedo[0] * b.glass[0], albedo[1] * b.glass[1], albedo[2] * b.glass[2]];
   }
 
   const sun = sunDirection(input.sun);
@@ -301,12 +328,16 @@ function bakeFace(
     light[1] += color[1] * share;
     light[2] += color[2] * share;
   };
-  add(b.sky, up);
+  const height = center[1] - input.floorY;
+  const half = input.stageSide / 2;
+  const c = b.canopy;
+  const far = smoothstep(c.distance, outsideDeck(center[0], center[2], half));
+  const cover = 1 - c.shade * far * (1 - smoothstep(c.height, height));
+  add(b.sky, up * cover);
   add(b.ground, 1 - up);
 
-  const height = center[1] - input.floorY;
   const [floor, full] = b.sunShade;
-  const open = floor + (1 - floor) * Math.min(1, Math.max(0, height / full));
+  const open = (floor + (1 - floor) * Math.min(1, Math.max(0, height / full))) * cover;
   const facing = normal[0] * sun[0] + normal[1] * sun[1] + normal[2] * sun[2];
   add(b.sun, open * Math.max(0, facing));
   if (kind === FOLIAGE) {
@@ -320,7 +351,6 @@ function bakeFace(
     Math.max(0, (normal[0] * k[0] + normal[1] * k[1] + normal[2] * k[2]) / keyLength),
   );
 
-  const half = input.stageSide / 2;
   const edge = outsideDeck(center[0], center[2], half) / b.deck.reach;
   const toStage = Math.hypot(center[0], center[2]) || 1;
   const deckFacing = 0.5 + 0.5 * (-(normal[0] * center[0] + normal[2] * center[2]) / toStage);
@@ -338,7 +368,11 @@ function bakeFace(
 
   const color: Rgb = [albedo[0] * light[0], albedo[1] * light[1], albedo[2] * light[2]];
   if (kind === WATER) {
-    return [color[0] + b.water[0], color[1] + b.water[1], color[2] + b.water[2]];
+    return [
+      color[0] + albedo[0] * b.water[0],
+      color[1] + albedo[1] * b.water[1],
+      color[2] + albedo[2] * b.water[2],
+    ];
   }
   return color;
 }
