@@ -29,7 +29,9 @@
  *    row for each variant, with the row of the reference first, and writes them to
  *    `<dir>/variants.md`. The white fur of each variant takes the pixels of the mask of the first
  *    variant, so the light color does not change the pixel set. The column `n` gives the count
- *    of the own mask of the variant, so a change of the pixel set shows.
+ *    of the own mask of the variant, so a change of the pixel set shows. The table "Whole
+ *    frame" gives `frameSummary()` of the camera `default` of each variant, with the row of the
+ *    reference of each venue of the variants first (`VENUE_REFERENCES`).
  *
  * It exits with 1 when a variant fails.
  */
@@ -50,7 +52,15 @@ import type { LookChanges } from '../src/scene/look-values.ts';
 import { DEFAULT_VENUE, VENUE_IDS, isVenueId } from '../src/scene/venue-id.ts';
 import type { VenueId } from '../src/scene/venue-id.ts';
 import { scoreOf } from '../src/score/test-score.ts';
-import { defaultSummary, lookRegions, lookSummary, readLookFrames } from './look-lab.ts';
+import {
+  VENUE_REFERENCES,
+  defaultSummary,
+  frameSummary,
+  lookRegions,
+  lookSummary,
+  readFrame,
+  readLookFrames,
+} from './look-lab.ts';
 import type { LookFrame, SummaryRow } from './look-lab.ts';
 import { patchedDemo } from './patch-demos.ts';
 import { ROOT, optionValue } from './ref-tree.ts';
@@ -397,8 +407,14 @@ async function main(): Promise<void> {
   const regions = await lookRegions();
   const orchestraRows: [string, SummaryRow][] = [];
   const defaultRows: [string, SummaryRow][] = [];
+  const wholeRows: [string, SummaryRow][] = [];
   let pixelsOf: { readonly name: string; readonly frame: LookFrame } | null = null;
   try {
+    for (const venue of new Set(variants.map((v) => v.scene))) {
+      const path = join(ROOT, VENUE_REFERENCES[venue]);
+      const reference = await readFrame(browser, path, venue, null, null);
+      wholeRows.push([`reference ${venue}`, frameSummary(reference)]);
+    }
     for (const variant of variants.filter((v) => !failed.includes(v.name))) {
       const frames = await readLookFrames(browser, join(args.out, variant.name));
       const find = (label: string): LookFrame | undefined =>
@@ -417,6 +433,7 @@ async function main(): Promise<void> {
         // The white fur of each variant takes the pixel set of the first variant.
         pixelsOf ??= { name: variant.name, frame: view };
         defaultRows.push([variant.name, defaultSummary(view, regions, pixelsOf.frame)]);
+        wholeRows.push([variant.name, frameSummary(view)]);
       }
     }
   } finally {
@@ -428,6 +445,7 @@ async function main(): Promise<void> {
   const tables = [
     `## Camera orchestra\n\n${summaryTable(orchestraRows)}`,
     `## Camera default\n\n${note}\n${summaryTable(defaultRows)}`,
+    `## Whole frame, camera default\n\n${summaryTable(wholeRows)}`,
   ].join('\n');
   await writeFile(join(args.out, 'variants.md'), `# Look variants\n\n${tables}`);
   console.log(`\n${tables}`);
