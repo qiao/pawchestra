@@ -80,6 +80,9 @@ export function motionOf(from: ShotKey, to: ShotKey): Motion {
   ];
 }
 
+/** The tolerance of the neutral look, in the sine of the angle. */
+const NEUTRAL_TIE = 1e-9;
+
 /**
  * Gives the screen direction of a look: the side of the frame to which a subject that faces an
  * azimuth looks, for a camera at an azimuth seen from the subject (design 5.6).
@@ -90,7 +93,8 @@ export function motionOf(from: ShotKey, to: ShotKey): Motion {
  */
 export function lookSide(facing: number, azimuth: number): -1 | 0 | 1 {
   const x = Math.sin(facing - azimuth);
-  if (Math.abs(x) < Math.sin(FILM_GRAMMAR.neutral)) {
+  // A look on the limit is neutral: the azimuth grid of the search reaches the limit exactly.
+  if (Math.abs(x) < Math.sin(FILM_GRAMMAR.neutral) + NEUTRAL_TIE) {
     return 0;
   }
   return x > 0 ? 1 : -1;

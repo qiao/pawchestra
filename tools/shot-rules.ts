@@ -257,7 +257,8 @@ function project(frame: Frame, point: Vec3): [number, number] {
  */
 export function lookSide(facing: number, azimuth: number): -1 | 0 | 1 {
   const x = Math.sin(facing - azimuth);
-  if (Math.abs(x) < Math.sin(GRAMMAR.neutral)) {
+  // A look on the limit is neutral, as in the planner.
+  if (Math.abs(x) < Math.sin(GRAMMAR.neutral) + 1e-9) {
     return 0;
   }
   return x > 0 ? 1 : -1;
