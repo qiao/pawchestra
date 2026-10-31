@@ -322,7 +322,7 @@ Read the group of your work before you plan it.
 ### Blender scripts
 
 - The face order of `bmesh.ops.create_uvsphere()` changes from run to run. For the same GLB on
-  each run, make the sphere points in the script (`tools/forest-kit/build-kit.py`).
+  each run, make the sphere points in the script.
 - The glTF exporter writes the vertex colors only with `export_vertex_color='NAME'` and the name
   of the color attribute.
 - The `location` of a new child object is in the frame of its parent. Undo the place, the turn,

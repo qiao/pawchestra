@@ -45,23 +45,6 @@ render, and the memory.
 
 - [ ] Measure the clock target of 9.7 with the bow.
 - [ ] Measure the steps of `currentTime` in Firefox, and smooth `now()` if the bow needs it (6.7).
-- [ ] Hide or fade each forest part between the camera and the stage (`src/models/forest/kit.ts`).
-      The trees at the sides stand inside the default distance of about 16 m, so an orbit, a side
-      shot, or a high shot can look through a trunk or a crown.
-- [ ] Decide the space between the deck edge and the near trees of the forest. With 1.5 m to the
-      roots, the near trunks show only at the left and right edges of the default view. In
-      `forest.webp`, the left trunk stands nearer to the deck.
-- [ ] Check a far zoom-out of Free mode in the forest. The ground of the kit ends at 42 m with a
-      rim that rises 2.2 m, so a low far camera can see past it.
-- [ ] Tune the albedos of the forest kit with the light and the grade of the app. They match the
-      medians of `forest.webp` only under the warm sun of the Blender preview.
-- [ ] Give the forest kit the leaf clusters of `forest.webp`. The crowns are round faceted blobs,
-      the waterfall is a stack of gray rocks, and no lantern hangs from a branch.
-- [ ] Draw the `foliage` faces of the forest kit from both sides. The fronds of the ferns and the
-      blades of the grass are single sheets.
-- [ ] Share the corner code of `models/forest/kit-format.ts` with `models/studio-format.ts`. Both
-      hold the same recent-vertex code, because the forest round could not change
-      `studio-format.ts`.
 - [ ] Remove the top-level await of `src/gallery/views-main.ts`, so that the chunk merge of
       Rolldown works again (7.2). Measure `pnpm size` and `pnpm load-probe` after it.
 - [ ] A lamp glow of `createGlows()` (`scene/hall.ts`) wider than about 130 px did not draw on
