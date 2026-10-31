@@ -2006,7 +2006,31 @@ def scatter(rng, objects, footprints):
     # The grass tufts of the clearing in front of the deck, beside and behind the log.
     for x, z in FRONT_GRASS:
         place('grass', x, z, rng.uniform(0.8, 1.1), rng.uniform(0, 360))
+    # Grass and moss over the open clearing in front of the deck, beside the path, and ferns at
+    # its sides, so that the high view of a phone sees no bare earth there.
+    for name, count, wide in (('grass', 36, 0.0), ('moss', 6, 0.0), ('fern-2', 8, 3.6)):
+        tries = 0
+        while count > 0 and tries < 600:
+            tries += 1
+            x, z = rng.uniform(-7.5, 7.5), rng.uniform(HALF + 1.2, HALF + 15.0)
+            scale = rng.uniform(0.8, 1.25)
+            radius = footprints[name] * scale
+            if abs(x) < wide or on_path(x, z, 0.3 + radius):
+                continue
+            if any(math.hypot(x - tx, z - tz) < radius + tr for tx, tz, tr in taken):
+                continue
+            place(name, x, z, scale, rng.uniform(0, 360))
+            count -= 1
     return places
+
+
+def on_path(x, z, margin):
+    """Finds if a point of the ground lies on the path in front of the deck, or within a margin of
+    it (`build_path()`)."""
+    t = (z - HALF - 0.2) / 9.0
+    if t < 0.0 or t > 1.0:
+        return False
+    return abs(x - 0.6 * math.sin(t * 2.4)) < 1.5 + 0.6 * t + margin
 
 
 def footprint(obj):
