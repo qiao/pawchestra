@@ -108,7 +108,8 @@ page starts in Free mode (`app/camera-mode.ts`).
   (`CINEMA_ASPECT`) at the middle of the viewport, as a film. Pure black bars fill the rest: at
   the top and the bottom of a view narrower than 21:9, and at the sides of a wider view. The
   frame is the same in each view, also on a phone in portrait, as a film player shows a film. The
-  drawer and the bar do not move it. Free mode has no bars.
+  shots of 5.6 take this aspect in each view, so a piece gives the same film on each screen. The
+  drawer and the bar do not move the frame. Free mode has no bars.
 - A change of the mode moves the bars in or out in `LETTERBOX_MOVE_MS` with a smoothstep, and at
   once with reduced motion. The image of the camera moves with the bars, so the change has no
   jump (`StageCamera.frameTo()`).

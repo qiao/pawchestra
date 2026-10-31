@@ -12,6 +12,7 @@ import { stageMix } from '../score/stage-mix.ts';
 import type { ChannelMix } from '../score/stage-mix.ts';
 import { cameraAt, createCameraPose } from '../shots/camera-at.ts';
 import type { CameraPose, ShotPlan } from '../shots/types.ts';
+import { CINEMA_ASPECT } from '../shots/view.ts';
 import type { Score, SectionSize } from '../score/types.ts';
 import { focusKindOf } from '../ui/dom.ts';
 import { nextShadeLevel } from '../ui/title-shade.ts';
@@ -937,8 +938,9 @@ export class App {
       // The key light moves to the soloed seats (design 2.4, 4.5).
       this.#scene.solo(piece.flags);
       if (this.#cameraMode === 'cinematic') {
-        // With reduced motion, each shot holds its first camera, and each cut is hard (2.5).
-        const view = { aspect: this.#scene.aspect, still: this.#scene.reducedMotion };
+        // The shots fill the letterbox of the aspect 21:9 in each viewport. With reduced motion,
+        // each shot holds its first camera, and each cut is hard (2.5).
+        const view = { aspect: CINEMA_ASPECT, still: this.#scene.reducedMotion };
         shot = cameraAt(piece.shots, this.#songTime, transport, view, this.#shotCamera);
       }
     }
