@@ -11,12 +11,17 @@
  * process (`probeBeside()`), and the tool prints the shots and the trace of both. A commit with no
  * `traceShots()` gives only its shots.
  *
+ * With `--rules`, the tool checks the shots of each demo against the rules of film grammar
+ * (`tools/shot-rules.ts`) in place of a trace.
+ *
  * Usage: pnpm shot-trace <demo> [--from <s>] [--to <s>] [--cameras] [--base <ref>] [--json <file>]
+ *        pnpm shot-trace --rules [--demo <id>]... [--base <ref>] [--list] [--json <file>]
  */
 import { writeFileSync } from 'node:fs';
 
 import { patchedDemos } from './patch-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
+import { rulesMain } from './shot-rules.ts';
 import { writeSmf } from '../src/midi/test-smf.ts';
 import type { TestFile } from '../src/midi/test-smf.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
@@ -486,9 +491,14 @@ async function compareTrace(options: TraceOptions, ref: string): Promise<void> {
   );
 }
 
-/** Runs the tool: `node tools/shot-trace.ts <demo> [options]`. */
+/** Runs the tool: `node tools/shot-trace.ts <demo> [options]`, or the rules check with `--rules`. */
 async function main(): Promise<void> {
-  const options = parseTraceOptions(process.argv.slice(2));
+  const args = process.argv.slice(2);
+  if (args.includes('--rules')) {
+    await rulesMain(args);
+    return;
+  }
+  const options = parseTraceOptions(args);
   if (options.base !== null) {
     await compareTrace(options, options.base);
     return;
