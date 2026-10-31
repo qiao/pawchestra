@@ -300,6 +300,7 @@ function forestMesh(
   geometry.setAttribute('position', new three.BufferAttribute(arrays.positions, 3));
   geometry.setAttribute('color', new three.BufferAttribute(arrays.colors, 3));
   geometry.setAttribute('cut', new three.BufferAttribute(arrays.cut, 1));
+  geometry.setIndex(new three.BufferAttribute(arrays.index, 1));
   const material = new three.ShaderMaterial({
     vertexShader: FOREST_VERTEX,
     fragmentShader: FOREST_FRAGMENT,

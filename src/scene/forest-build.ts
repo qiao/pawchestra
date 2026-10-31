@@ -15,23 +15,24 @@ const WATER = FOREST_FACE_KINDS.indexOf('water');
 
 /**
  * The baked light of the forest (design 4.1): the surroundings take no light in the app, so each
- * face gets the light of the low sun, the sky, the key, the lit deck, and the lanterns in its
- * color. The lights are linear factors of the albedo. The colors of the haze are linear values.
+ * vertex gets the light of the low sun, the sky, the key, the lit deck, and the lanterns in its
+ * color, from its smooth normal. The lights are linear factors of the albedo. The colors of the
+ * haze are linear values.
  */
 export interface ForestBake {
-  /** The light from above, on a face that looks up. */
+  /** The light from above, on a surface that looks up. */
   readonly sky: Rgb;
-  /** The light from below, on a face that looks down. */
+  /** The light from below, on a surface that looks down. */
   readonly ground: Rgb;
-  /** The direct light of the sun on a face that looks at it, in the open. */
+  /** The direct light of the sun on a surface that looks at it, in the open. */
   readonly sun: Rgb;
   /**
    * The share of the sun under the canopy: at the floor, and the height in meters from which a
-   * face gets the full sun.
+   * surface gets the full sun.
    */
   readonly sunShade: readonly [floor: number, height: number];
   /**
-   * The shade of the canopy on a low face of wood, earth, or rock far from the clearing: the
+   * The shade of the canopy on low wood, earth, or rock far from the clearing: the
    * distances beyond the deck
    * edge at which the shade starts and becomes full, in meters, the heights above the ground at
    * which it starts to fall off and ends, in meters, and the share of the sky and the sun that it
@@ -151,7 +152,7 @@ export interface ForestInputs {
   readonly srgb: (hex: string) => Rgb;
 }
 
-/** The triangles of one mesh of the forest, with no index. */
+/** The vertices and the triangles of one mesh of the forest. */
 export interface ForestArrays {
   /** x, y, z of each vertex, in meters. */
   readonly positions: Float32Array;
@@ -159,6 +160,8 @@ export interface ForestArrays {
   readonly colors: Float32Array;
   /** The cut group of each vertex ({@link CutGroup}). */
   readonly cut: Float32Array;
+  /** Three vertices for each triangle, counterclockwise from the front. */
+  readonly index: Uint32Array;
 }
 
 /** One lantern glow: the center of its glass, its cut group, and its kind. */
@@ -217,7 +220,7 @@ interface Copy {
   group: number;
 }
 
-/** Collects triangles with a color and a cut group for each vertex. */
+/** Collects vertices with a color and a cut group, and the triangles between them. */
 class ArrayBuilder {
   /** x, y, z of each vertex. */
   readonly positions: number[] = [];
@@ -225,36 +228,65 @@ class ArrayBuilder {
   readonly colors: number[] = [];
   /** The cut group of each vertex. */
   readonly cut: number[] = [];
+  /** Three vertices for each triangle. */
+  readonly index: number[] = [];
 
   /**
-   * Adds a triangle with one color.
+   * Adds a vertex.
+   *
+   * @param point The place, in meters.
+   * @param color The color.
+   * @param group The cut group.
+   * @returns The index of the vertex.
+   */
+  vertex(point: Vec3, color: Rgb, group: number): number {
+    this.positions.push(point[0], point[1], point[2]);
+    this.colors.push(color[0], color[1], color[2]);
+    this.cut.push(group);
+    return this.cut.length - 1;
+  }
+
+  /**
+   * Adds a triangle between three vertices.
+   *
+   * @param a The first vertex.
+   * @param b The second vertex.
+   * @param c The third vertex.
+   */
+  triangle(a: number, b: number, c: number): void {
+    this.index.push(a, b, c);
+  }
+
+  /**
+   * Adds a triangle with one color and its own three vertices.
    *
    * @param corners Nine numbers: the three corners.
    * @param color The color.
    * @param group The cut group.
    */
   add(corners: readonly number[], color: Rgb, group: number): void {
-    for (let k = 0; k < 3; k++) {
-      this.positions.push(corners[k * 3] ?? 0, corners[k * 3 + 1] ?? 0, corners[k * 3 + 2] ?? 0);
-      this.colors.push(color[0], color[1], color[2]);
-      this.cut.push(group);
-    }
+    const [ax = 0, ay = 0, az = 0, bx = 0, by = 0, bz = 0, cx = 0, cy = 0, cz = 0] = corners;
+    this.triangle(
+      this.vertex([ax, ay, az], color, group),
+      this.vertex([bx, by, bz], color, group),
+      this.vertex([cx, cy, cz], color, group),
+    );
   }
 
   /**
-   * Adds a triangle with a color for each corner.
+   * Adds a triangle with a color for each corner and its own three vertices.
    *
    * @param corners The three corners.
    * @param colors The color of each corner.
    * @param group The cut group.
    */
   addShaded(corners: readonly [Vec3, Vec3, Vec3], colors: readonly [Rgb, Rgb, Rgb], group: number) {
-    for (const [k, corner] of corners.entries()) {
-      const color = colors[k] ?? colors[0];
-      this.positions.push(...corner);
-      this.colors.push(...color);
-      this.cut.push(group);
-    }
+    const [a, b, c] = corners;
+    this.triangle(
+      this.vertex(a, colors[0], group),
+      this.vertex(b, colors[1], group),
+      this.vertex(c, colors[2], group),
+    );
   }
 
   /**
@@ -267,6 +299,7 @@ class ArrayBuilder {
       positions: new Float32Array(this.positions),
       colors: new Float32Array(this.colors),
       cut: new Float32Array(this.cut),
+      index: new Uint32Array(this.index),
     };
   }
 }
@@ -307,22 +340,22 @@ function smoothstep(edges: readonly [number, number], value: number): number {
 }
 
 /**
- * Calculates the baked color of a face from its albedo (design 4.1).
+ * Calculates the baked color of a point of a surface from its albedo (design 4.1).
  *
  * @param input The inputs of the build.
  * @param albedo The linear albedo.
- * @param face The center and the unit normal of the face, and its kind.
+ * @param point The place and the unit normal of the point, and the kind of its surface.
  * @param lamps The centers of the lantern glass.
  * @returns The baked linear color.
  */
-function bakeFace(
+function bakePoint(
   input: ForestInputs,
   albedo: Rgb,
-  face: { readonly center: Vec3; readonly normal: Vec3; readonly kind: number },
+  point: { readonly center: Vec3; readonly normal: Vec3; readonly kind: number },
   lamps: readonly Vec3[],
 ): Rgb {
   const b = input.bake;
-  const { center, normal, kind } = face;
+  const { center, normal, kind } = point;
   if (kind === GLOW) {
     return [albedo[0] * b.glass[0], albedo[1] * b.glass[1], albedo[2] * b.glass[2]];
   }
@@ -431,25 +464,46 @@ function addHaze(input: ForestInputs, color: Rgb, center: Vec3): Rgb {
 }
 
 /**
- * Turns the corners of one triangle of a part to its place.
+ * Turns the vertices and the normals of a part to the place of a copy.
  *
  * @param copy The placed copy.
- * @param t The triangle.
- * @param out Nine numbers: the three corners in meters.
+ * @param positions x, y, z of each vertex in meters. The call writes it.
+ * @param normals The unit normal of each vertex. The call writes it.
  */
-function placeTriangle(copy: Copy, t: number, out: number[]): void {
+function placeVertices(copy: Copy, positions: Float64Array, normals: Float64Array): void {
   const cos = Math.cos(copy.yaw);
   const sin = Math.sin(copy.yaw);
   const p = copy.part.positions;
+  const n = copy.part.normals;
   const [x, y, z] = copy.position;
-  for (let k = 0; k < 3; k++) {
-    const i = t * 9 + k * 3;
+  for (let i = 0; i < p.length; i += 3) {
     const px = (p[i] ?? 0) * copy.scale;
-    const py = (p[i + 1] ?? 0) * copy.scale;
     const pz = (p[i + 2] ?? 0) * copy.scale;
-    out[k * 3] = x + px * cos + pz * sin;
-    out[k * 3 + 1] = y + py;
-    out[k * 3 + 2] = z + pz * cos - px * sin;
+    positions[i] = x + px * cos + pz * sin;
+    positions[i + 1] = y + (p[i + 1] ?? 0) * copy.scale;
+    positions[i + 2] = z + pz * cos - px * sin;
+    const nx = n[i] ?? 0;
+    const nz = n[i + 2] ?? 0;
+    normals[i] = nx * cos + nz * sin;
+    normals[i + 1] = n[i + 1] ?? 0;
+    normals[i + 2] = nz * cos - nx * sin;
+  }
+}
+
+/**
+ * Copies the three corners of a triangle of a placed part.
+ *
+ * @param positions The placed vertices ({@link placeVertices}).
+ * @param indices The triangles of the part.
+ * @param t The index of the first corner of the triangle in `indices`.
+ * @param out Nine numbers: the three corners. The call writes it.
+ */
+function cornersOf(positions: Float64Array, indices: Uint32Array, t: number, out: number[]): void {
+  for (let k = 0; k < 3; k++) {
+    const v = (indices[t + k] ?? 0) * 3;
+    out[k * 3] = positions[v] ?? 0;
+    out[k * 3 + 1] = positions[v + 1] ?? 0;
+    out[k * 3 + 2] = positions[v + 2] ?? 0;
   }
 }
 
@@ -814,11 +868,17 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
   const lamps: ForestLamp[] = [];
   const corners: number[] = Array.from({ length: 9 }, () => 0);
   for (const copy of [...copies, ...ropeCopies]) {
+    const { kinds, indices } = copy.part;
+    if (!kinds.includes(GLOW)) {
+      continue;
+    }
+    const world = new Float64Array(copy.part.positions.length);
+    placeVertices(copy, world, new Float64Array(world.length));
     const sum: [number, number, number] = [0, 0, 0];
     let count = 0;
-    for (let t = 0; t < copy.part.kinds.length; t++) {
-      if (copy.part.kinds[t] === GLOW) {
-        placeTriangle(copy, t, corners);
+    for (let t = 0; t < indices.length; t += 3) {
+      if (kinds[indices[t] ?? 0] === GLOW) {
+        cornersOf(world, indices, t, corners);
         const { center } = faceOf(corners);
         sum[0] += center[0];
         sum[1] += center[1];
@@ -826,9 +886,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
         count++;
       }
     }
-    if (count > 0) {
-      lamps.push({ center: [sum[0] / count, sum[1] / count, sum[2] / count], cut: copy.group });
-    }
+    lamps.push({ center: [sum[0] / count, sum[1] / count, sum[2] / count], cut: copy.group });
   }
   const lampCenters = lamps.map((lamp) => lamp.center);
 
@@ -842,25 +900,40 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
   let work = 0;
   for (const [c, copy] of [...copies, ...ropeCopies].entries()) {
     const { part } = copy;
-    const groupBands = copy.group > 0 && c < copies.length ? bands[c] : undefined;
-    for (let t = 0; t < part.kinds.length; t++) {
-      placeTriangle(copy, t, corners);
-      const kind = part.kinds[t] ?? 0;
-      const face = faceOf(corners);
-      const i = t * 9;
+    const world = new Float64Array(part.positions.length);
+    const normals = new Float64Array(part.normals.length);
+    placeVertices(copy, world, normals);
+    const remap = new Uint32Array(part.kinds.length);
+    for (let v = 0; v < part.kinds.length; v++) {
+      const kind = part.kinds[v] ?? 0;
+      const i = v * 3;
+      const center: Vec3 = [world[i] ?? 0, world[i + 1] ?? 0, world[i + 2] ?? 0];
+      const normal: Vec3 = [normals[i] ?? 0, normals[i + 1] ?? 1, normals[i + 2] ?? 0];
       const albedo: Rgb = [part.colors[i] ?? 0, part.colors[i + 1] ?? 0, part.colors[i + 2] ?? 0];
       const color = addHaze(
         input,
-        bakeFace(input, albedo, { ...face, kind }, lampCenters),
-        face.center,
+        bakePoint(input, albedo, { center, normal, kind }, lampCenters),
+        center,
       );
-      (kind === FOLIAGE ? foliage : solid).add(corners, color, copy.group);
+      remap[v] = (kind === FOLIAGE ? foliage : solid).vertex(center, color, copy.group);
+    }
+
+    const groupBands = copy.group > 0 && c < copies.length ? bands[c] : undefined;
+    const { indices } = part;
+    for (let t = 0; t < indices.length; t += 3) {
+      const a = indices[t] ?? 0;
+      (part.kinds[a] === FOLIAGE ? foliage : solid).triangle(
+        remap[a] ?? 0,
+        remap[indices[t + 1] ?? 0] ?? 0,
+        remap[indices[t + 2] ?? 0] ?? 0,
+      );
       if (groupBands) {
+        cornersOf(world, indices, t, corners);
         addToBands(groupBands, corners, rule, false);
       }
     }
-    triangles += part.kinds.length;
-    work += part.kinds.length;
+    triangles += indices.length / 3;
+    work += part.kinds.length + indices.length / 6;
     if (work > 3000) {
       work = 0;
       yield;
@@ -874,12 +947,15 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
     if (copy.group === 0 || !boxes) {
       continue;
     }
-    for (let t = 0; t < copy.part.kinds.length; t++) {
-      placeTriangle(copy, t, corners);
+    const { indices } = copy.part;
+    const world = new Float64Array(copy.part.positions.length);
+    placeVertices(copy, world, new Float64Array(world.length));
+    for (let t = 0; t < indices.length; t += 3) {
+      cornersOf(world, indices, t, corners);
       addToBands(boxes, corners, rule, true);
     }
     groupBands[copy.group]?.push(...bandsOf(boxes));
-    work += copy.part.kinds.length;
+    work += indices.length / 3;
     if (work > 6000) {
       work = 0;
       yield;
@@ -892,7 +968,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
     bounds: boundsOf(list),
     ends: null,
   }));
-  const ropeColor = bakeFace(
+  const ropeColor = bakePoint(
     input,
     input.srgb(FOREST_ROPE.color),
     { center: [0, 4, 0], normal: [0, 1, 0], kind: 0 },

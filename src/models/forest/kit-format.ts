@@ -19,8 +19,14 @@ export const FOREST_STEP = 1e-3;
 export interface ForestTriangle {
   /** The three corners, in meters, counterclockwise from the front. */
   readonly corners: readonly [Vec3, Vec3, Vec3];
-  /** The color of the face as sRGB bytes, each from 0 to 255. */
-  readonly rgb: Vec3;
+  /** The color of each corner as sRGB bytes, each from 0 to 255. */
+  readonly colors: readonly [Vec3, Vec3, Vec3];
+  /**
+   * The unit normal of each corner. Two corners share a vertex only with the same normal, so
+   * that a hard edge of the GLB file stays hard. The pack keeps no normal: the read rebuilds the
+   * normals from the shared vertices ({@link unpackForestPart}).
+   */
+  readonly normals: readonly [Vec3, Vec3, Vec3];
   /** The kind of the face. */
   readonly kind: ForestFaceKind;
 }
@@ -42,14 +48,24 @@ export interface KitReaders {
   readonly srgb: typeof srgb;
 }
 
-/** A forest part read back by {@link unpackForestPart}, as flat triangles. */
+/** A forest part read back by {@link unpackForestPart}: shared vertices and triangles. */
 export interface ForestMesh {
-  /** Three numbers for each corner, three corners for each triangle, in meters. */
+  /** x, y, z of each vertex, in meters. */
   readonly positions: Float32Array;
-  /** The linear RGB of each corner. The three corners of a triangle have the same color. */
+  /**
+   * The unit normal of each vertex: the sum of the normals of its triangles, each weighted by its
+   * area. A vertex on a hard edge belongs to the triangles of one side only.
+   */
+  readonly normals: Float32Array;
+  /** The linear RGB of each vertex. */
   readonly colors: Float32Array;
-  /** The kind of each triangle, as an index in {@link FOREST_FACE_KINDS}. */
+  /**
+   * The kind of each vertex, as an index in {@link FOREST_FACE_KINDS}. The three vertices of a
+   * triangle have the kind of the triangle.
+   */
   readonly kinds: Uint8Array;
+  /** Three vertices for each triangle, counterclockwise from the front. */
+  readonly indices: Uint32Array;
 }
 
 /**
@@ -113,109 +129,209 @@ function cornerCodes(corners: readonly number[]): number[] {
 }
 
 /**
+ * The steps of a unit normal in the key of a vertex of {@link packForestPart}. Two corners with
+ * normals within half a step share a vertex.
+ */
+const NORMAL_STEPS = 64;
+
+/**
  * Packs the triangles of a forest part as base64 text. The corners with the same place in whole
- * steps of {@link FOREST_STEP} share one vertex, and the vertices take the order of their first
- * corner, so that most corner codes are small.
+ * steps of {@link FOREST_STEP}, the same color, the same normal, and the same kind share one
+ * vertex. The vertices take the order of their first corner, so that most corner codes are small,
+ * and the colors of neighbor vertices are near.
  *
  * The packed bytes, each count and each number of the LEB128 kind unless the list says else:
  *
- * 1. The vertex count, the triangle count, and the color count.
+ * 1. The vertex count, the triangle count, and the count of the runs of kinds.
  * 2. The place of each vertex, one axis after the other: the difference from the vertex before,
  *    in steps of {@link FOREST_STEP}, as a zigzag number.
- * 3. The code of each corner of the triangles ({@link cornerCodes}).
- * 4. The colors: r, g, b as sRGB bytes and the kind index, each as one byte.
- * 5. The color of each triangle, as an index in the colors.
+ * 3. The color of each vertex, one channel after the other: the difference of the sRGB byte from
+ *    the vertex before, as a zigzag number.
+ * 4. The runs of the kinds of the vertices: the kind index as one byte, and the vertex count.
+ * 5. The code of each corner of the triangles ({@link cornerCodes}).
  *
  * @param triangles The triangles.
  * @returns The packed part as base64.
  */
 export function packForestPart(triangles: readonly ForestTriangle[]): string {
   const keys = new Map<string, number>();
-  const vertices: Vec3[] = [];
+  const vertices: { readonly steps: Vec3; readonly rgb: Vec3; readonly kind: number }[] = [];
   const corners = triangles.flatMap((t) =>
-    t.corners.map((corner) => {
+    t.corners.map((corner, k) => {
       const steps: Vec3 = [
         Math.round(corner[0] / FOREST_STEP),
         Math.round(corner[1] / FOREST_STEP),
         Math.round(corner[2] / FOREST_STEP),
       ];
-      const key = steps.join(' ');
+      const color = t.colors[k] ?? t.colors[0];
+      const rgb: Vec3 = [byteOf(color[0]), byteOf(color[1]), byteOf(color[2])];
+      const normal = (t.normals[k] ?? t.normals[0]).map((n) => Math.round(n * NORMAL_STEPS));
+      const kind = FOREST_FACE_KINDS.indexOf(t.kind);
+      const key = `${steps.join(' ')} ${rgb.join(' ')} ${normal.join(' ')} ${kind}`;
       let index = keys.get(key);
       if (index === undefined) {
         index = vertices.length;
         keys.set(key, index);
-        vertices.push(steps);
+        vertices.push({ steps, rgb, kind });
       }
       return index;
     }),
   );
 
-  const colorKeys = new Map<string, number>();
-  const colors: (readonly [Vec3, ForestFaceKind])[] = [];
-  const triangleColors = triangles.map((t) => {
-    const key = `${t.rgb.join(' ')} ${t.kind}`;
-    let index = colorKeys.get(key);
-    if (index === undefined) {
-      index = colors.length;
-      colorKeys.set(key, index);
-      colors.push([t.rgb, t.kind]);
+  const runs: [kind: number, count: number][] = [];
+  for (const { kind } of vertices) {
+    const last = runs.at(-1);
+    if (last && last[0] === kind) {
+      last[1] += 1;
+    } else {
+      runs.push([kind, 1]);
     }
-    return index;
-  });
+  }
 
   const out: number[] = [];
   writeVarint(out, vertices.length);
   writeVarint(out, triangles.length);
-  writeVarint(out, colors.length);
-  for (let axis = 0; axis < 3; axis++) {
-    let last = 0;
-    for (const vertex of vertices) {
-      const steps = vertex[axis] ?? 0;
-      writeVarint(out, zigzag(steps - last));
-      last = steps;
+  writeVarint(out, runs.length);
+  for (const field of ['steps', 'rgb'] as const) {
+    for (let axis = 0; axis < 3; axis++) {
+      let last = 0;
+      for (const vertex of vertices) {
+        const value = vertex[field][axis] ?? 0;
+        writeVarint(out, zigzag(value - last));
+        last = value;
+      }
     }
+  }
+  for (const [kind, count] of runs) {
+    out.push(kind);
+    writeVarint(out, count);
   }
   for (const code of cornerCodes(corners)) {
     writeVarint(out, code);
-  }
-  for (const [rgb, kind] of colors) {
-    out.push(...rgb.map((c) => Math.min(255, Math.max(0, Math.round(c)))));
-    out.push(FOREST_FACE_KINDS.indexOf(kind));
-  }
-  for (const index of triangleColors) {
-    writeVarint(out, index);
   }
   return toBase64(out);
 }
 
 /**
- * Reads a forest part of {@link packForestPart} back as flat triangles.
+ * Rounds a color channel to a byte.
+ *
+ * @param value The channel, from 0 to 255.
+ * @returns The byte.
+ */
+function byteOf(value: number): number {
+  return Math.min(255, Math.max(0, Math.round(value)));
+}
+
+/**
+ * Gives the linear value of each sRGB byte.
+ *
+ * @param srgb `srgb()` of `models/mesh.ts`.
+ * @returns 256 linear values.
+ */
+function linearBytes(srgb: KitReaders['srgb']): Float32Array {
+  const out = new Float32Array(256);
+  for (let b = 0; b < 256; b++) {
+    out[b] = srgb(`#${b.toString(16).padStart(2, '0')}0000`)[0];
+  }
+  return out;
+}
+
+/**
+ * Rebuilds the normal of each vertex: the sum of the normals of its triangles, each as long as
+ * two times the area of its triangle, made unit. A vertex with no area gets the normal +y.
+ *
+ * @param positions x, y, z of each vertex.
+ * @param indices Three vertices for each triangle.
+ * @returns The unit normal of each vertex.
+ */
+function vertexNormals(positions: Float32Array, indices: Uint32Array): Float32Array {
+  const normals = new Float32Array(positions.length);
+  for (let t = 0; t < indices.length; t += 3) {
+    const a = (indices[t] ?? 0) * 3;
+    const b = (indices[t + 1] ?? 0) * 3;
+    const c = (indices[t + 2] ?? 0) * 3;
+    const ux = (positions[b] ?? 0) - (positions[a] ?? 0);
+    const uy = (positions[b + 1] ?? 0) - (positions[a + 1] ?? 0);
+    const uz = (positions[b + 2] ?? 0) - (positions[a + 2] ?? 0);
+    const vx = (positions[c] ?? 0) - (positions[a] ?? 0);
+    const vy = (positions[c + 1] ?? 0) - (positions[a + 1] ?? 0);
+    const vz = (positions[c + 2] ?? 0) - (positions[a + 2] ?? 0);
+    const nx = uy * vz - uz * vy;
+    const ny = uz * vx - ux * vz;
+    const nz = ux * vy - uy * vx;
+    for (const v of [a, b, c]) {
+      normals[v] = (normals[v] ?? 0) + nx;
+      normals[v + 1] = (normals[v + 1] ?? 0) + ny;
+      normals[v + 2] = (normals[v + 2] ?? 0) + nz;
+    }
+  }
+
+  for (let v = 0; v < normals.length; v += 3) {
+    const x = normals[v] ?? 0;
+    const y = normals[v + 1] ?? 0;
+    const z = normals[v + 2] ?? 0;
+    const length = Math.hypot(x, y, z);
+    if (length > 1e-12) {
+      normals[v] = x / length;
+      normals[v + 1] = y / length;
+      normals[v + 2] = z / length;
+    } else {
+      normals[v + 1] = 1;
+    }
+  }
+  return normals;
+}
+
+/**
+ * Reads a forest part of {@link packForestPart} back as shared vertices and triangles, and
+ * rebuilds the normals of the vertices.
  *
  * @param packed The packed part as base64.
  * @param readers The functions of the first download that read the bytes.
- * @returns The corners, their linear colors, and the kind of each triangle.
- * @throws Error if the bytes end early, or if a corner or a triangle names a vertex or a color
- *   that does not exist.
+ * @returns The vertices with their normals, linear colors, and kinds, and the triangles.
+ * @throws Error if the bytes end early, if a corner names a vertex that does not exist, or if
+ *   the runs of the kinds do not cover the vertices.
  */
 export function unpackForestPart(packed: string, readers: KitReaders): ForestMesh {
   const { byteReader, readByte, readVarint, unzigzag, srgb } = readers;
   const reader = byteReader(packed);
   const vertexCount = readVarint(reader);
   const triangleCount = readVarint(reader);
-  const colorCount = readVarint(reader);
+  const runCount = readVarint(reader);
 
-  const places = new Float32Array(vertexCount * 3);
+  const positions = new Float32Array(vertexCount * 3);
   for (let axis = 0; axis < 3; axis++) {
     let last = 0;
     for (let v = 0; v < vertexCount; v++) {
       last += unzigzag(readVarint(reader));
-      places[v * 3 + axis] = last * FOREST_STEP;
+      positions[v * 3 + axis] = last * FOREST_STEP;
+    }
+  }
+  const linear = linearBytes(srgb);
+  const colors = new Float32Array(vertexCount * 3);
+  for (let channel = 0; channel < 3; channel++) {
+    let last = 0;
+    for (let v = 0; v < vertexCount; v++) {
+      last += unzigzag(readVarint(reader));
+      colors[v * 3 + channel] = linear[last & 0xff] ?? 0;
     }
   }
 
-  const corners = new Uint32Array(triangleCount * 3);
+  const kinds = new Uint8Array(vertexCount);
+  let filled = 0;
+  for (let r = 0; r < runCount; r++) {
+    const kind = readByte(reader);
+    const count = readVarint(reader);
+    kinds.fill(kind, filled, filled + count);
+    filled += count;
+  }
+  if (filled !== vertexCount) {
+    throw new Error(`The runs of the kinds cover ${filled} of ${vertexCount} vertices.`);
+  }
+
+  const indices = new Uint32Array(triangleCount * 3);
   const state: CornerState = { recent: [], high: -1, previous: 0 };
-  for (let c = 0; c < corners.length; c++) {
+  for (let c = 0; c < indices.length; c++) {
     const code = readVarint(reader);
     const place = code < RECENT_CORNERS ? code : -1;
     let corner: number;
@@ -229,32 +345,10 @@ export function unpackForestPart(packed: string, readers: KitReaders): ForestMes
     if (corner < 0 || corner >= vertexCount) {
       throw new Error(`The corner ${c} names the vertex ${corner}, which does not exist.`);
     }
-    corners[c] = corner;
+    indices[c] = corner;
     noteCorner(state, corner, place);
   }
-
-  const entries = Array.from({ length: colorCount }, () => {
-    const bytes = [readByte(reader), readByte(reader), readByte(reader)];
-    const hex = bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return { rgb: srgb(`#${hex}`), kind: readByte(reader) };
-  });
-
-  const positions = new Float32Array(triangleCount * 9);
-  const colors = new Float32Array(triangleCount * 9);
-  const kinds = new Uint8Array(triangleCount);
-  for (let t = 0; t < triangleCount; t++) {
-    const entry = entries[readVarint(reader)];
-    if (!entry) {
-      throw new Error(`The triangle ${t} names a color that does not exist.`);
-    }
-    kinds[t] = entry.kind;
-    for (let k = 0; k < 3; k++) {
-      const v = corners[t * 3 + k] ?? 0;
-      positions.set(places.subarray(v * 3, v * 3 + 3), t * 9 + k * 3);
-      colors.set(entry.rgb, t * 9 + k * 3);
-    }
-  }
-  return { positions, colors, kinds };
+  return { positions, normals: vertexNormals(positions, indices), colors, kinds, indices };
 }
 
 /** One end of a rope of the light string: a point on a tree. */
