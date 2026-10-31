@@ -1051,16 +1051,18 @@ export class App {
     );
     const songSec = shownSongTime(this.#seekSec, this.#songTime);
     const ended = piece !== null && atSongEnd(status, songSec, piece.score.durationSec);
-    // In Cinematic mode during play, all controls and panels hide together (design 2.3).
+    // In Cinematic mode during play, all controls and panels hide together (design 2.3). Only
+    // that rule reads the panels, so Free mode skips their query of the focus in each frame.
+    const cinematic = this.#cameraMode === 'cinematic';
     const shown = uiShown({
-      cinematic: this.#cameraMode === 'cinematic',
+      cinematic,
       playing: status.playing,
       idleSec: wallTime - this.#activeAt,
       focused: ui.bar.focused,
       hovered: ui.bar.hovered,
       drawerOpen: ui.drawer.open,
-      panelFocused: ui.panelFocused,
-      panelHovered: ui.panelHovered,
+      panelFocused: cinematic && ui.panelFocused,
+      panelHovered: cinematic && ui.panelHovered,
       held: this.#message !== null || ui.creditsDialog.open,
     });
     ui.showPanels(shown.panels);
