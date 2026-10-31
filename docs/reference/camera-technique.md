@@ -106,6 +106,11 @@ The app follows these facts:
 - **The 30° rule (section 2).** Each shot turns the camera by at least `FILM_GRAMMAR.jumpAngle`
   (30°) around its target from the previous shot, or it changes the size of the frame by
   `FILM_GRAMMAR.jumpSize` (1.5 times, about one step from a medium shot to a close-up).
+- **The camera height (sections 2 and 5).** The cameras stand low, near the eye height of the
+  players, as the cameras on the railings around the platform. The wanted camera of each kind
+  stands at `CAMERA_LOWER` (0.7) of the height of its nominal elevation above the stage top. A
+  close camera with heads in the foreground first tries each azimuth at that height, and only
+  then rises.
 - **Moves across a cut (section 4).** The arc of a shot goes in the direction of the arc of the
   previous shot, and the last shot cranes up in place of a pull-out after a push-in. A push-in
   with no arc is neutral on the axis of the arc.

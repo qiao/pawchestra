@@ -214,6 +214,44 @@ const BLEND_RULES = {
 } as const;
 
 /**
+ * The height of the cameras of the shots (design 5.6): the wanted camera of each kind stands at
+ * this part of the height above the stage top that its nominal elevation gives, at the same
+ * distance and azimuth. The elevations of `SHOT_KEYS` and `WIDE_VARIANTS` are nominal. A low
+ * camera films the players near the height of their eyes, as the cameras on the railings of a
+ * concert hall do. A lower camera sees more heads in the foreground, so more close shots rise.
+ */
+export const CAMERA_LOWER = 0.7;
+
+/**
+ * Gives the elevation of a camera at {@link CAMERA_LOWER} of the height of a nominal elevation
+ * above the stage top (design 5.6).
+ *
+ * @param target The target of the key.
+ * @param distance The distance from the camera to the target, in meters.
+ * @param nominal The nominal elevation, in radians.
+ * @returns The elevation of the lower camera, in radians.
+ */
+function lowered(target: Vec3, distance: number, nominal: number): number {
+  const height = target[1] + distance * Math.sin(nominal);
+  const sine = (CAMERA_LOWER * height - target[1]) / distance;
+  return Math.asin(Math.min(1, Math.max(-1, sine)));
+}
+
+/**
+ * Gives the distance of the camera of a wide or a high shot from its target, at the aspect of
+ * Cinematic mode.
+ *
+ * @param stageSide The stage side `S`.
+ * @param wide True for a wide shot, which takes the landscape rule of `cameraAt()`.
+ * @param zoom The zoom of the key.
+ * @returns The distance, in meters.
+ */
+function farDistance(stageSide: number, wide: boolean, zoom: number): number {
+  const landscape = wide ? landscapeZoom(CINEMA_ASPECT) : 1;
+  return defaultDistance(stageSide, CINEMA_ASPECT) * landscape * zoom;
+}
+
+/**
  * The search of a clear camera (design 5.6): the wanted azimuth, then these steps to each side,
  * then the same azimuths higher.
  */
@@ -232,6 +270,7 @@ const KEY_SEARCH = {
    * planner keeps the result of the tests of each camera for the later cuts.
    */
   azimuthGrid: 6,
+  /** The rises of the search above the wanted elevation. */
   elevationSteps: [0, 8, 16, 24, 32, 40].map((d) => d * DEG),
   /** The camera stays within this angle of the front of the subject. */
   maxFromFront: 75 * DEG,
@@ -247,12 +286,14 @@ const KEY_SEARCH = {
    */
   repeatAngle: 20 * DEG,
   /**
-   * The tops of the elevation bands of the search, plus the lift of a piano shot. At a cut, each
-   * candidate first gets a search in the lowest band, and only then in the higher bands. Close
-   * shots of the back rows from 40° to 60° show the tops of the heads, and the dark area beside
-   * the stage fills 30% to 45% of the frame.
+   * The tops of the elevation bands of the search above the low band, plus the lift of a piano
+   * shot. At a cut, each candidate first gets a search in the low band, at the wanted elevation
+   * with each azimuth of the grid, then in the first band, and only then in the higher bands.
+   * Most close cameras that rise stop at the first top, so it sets the height of the close shots.
+   * Close shots of the back rows from 40° to 60° show the tops of the heads, and the dark area
+   * beside the stage fills 30% to 45% of the frame.
    */
-  bands: [30 * DEG, 40 * DEG, 50 * DEG],
+  bands: [24, 34, 44].map((d) => d * DEG),
   /**
    * A candidate with a score this near to the best score of the cut gets the second band before
    * the candidates with lower scores get it. Thus an entry or the lead keeps its shot.
@@ -321,8 +362,9 @@ interface WideVariant {
 }
 
 /**
- * The wide shots (design 5.6). The first one is the default view of design 4.5. The zoom is a
- * factor of the default view, and it keeps each player in the frame of a landscape view.
+ * The wide shots (design 5.6). The first one is the default view of design 4.5. The elevations are
+ * nominal ({@link CAMERA_LOWER}). The zoom is a factor of the default view, and it keeps each
+ * player in the frame of a landscape view.
  */
 export const WIDE_VARIANTS: readonly WideVariant[] = [
   { azimuth: DEFAULT_AZIMUTH / DEG, elevation: DEFAULT_ELEVATION / DEG, zoom: 1 },
@@ -349,8 +391,8 @@ function defaultKey(zoom: number): ShotKey {
 }
 
 /**
- * The camera values of each kind of shot, in degrees and factors (design 5.6). The cameras are a
- * little low. The conductor camera stays above the head of the conductor.
+ * The camera values of each kind of shot, in degrees and factors (design 5.6). The elevations are
+ * nominal: the camera stands lower ({@link CAMERA_LOWER}).
  */
 const SHOT_KEYS = {
   /**
@@ -363,7 +405,7 @@ const SHOT_KEYS = {
    * default view.
    */
   high: { fov: 30, zoom: 0.75, azimuth: [0, 12], elevation: [37, 41], arc: 8, rise: 4 },
-  /** View 05 of `scene.png`: the conductor from behind, close, and a little above its head. */
+  /** View 05 of `scene.png`: the conductor from behind, close. */
   conductor: { fov: 26, offset: [6, 18], elevation: 8, pushIn: 0.92 },
   /** View 02 of `scene.png`: the orchestra over the shoulder of the bear, from the audience side. */
   conductorBack: { fov: 30, offset: [0, 8], elevation: 19, pushIn: 0.95 },
@@ -371,11 +413,6 @@ const SHOT_KEYS = {
   side: { fov: 30, offset: [0, 12], elevation: 11, pushIn: 0.95, arc: 6 },
   section: { fov: 30, offset: [8, 22], elevation: 11, backRise: 8, pushIn: 0.92, arc: 6 },
   solo: { fov: 24, offset: [20, 40], elevation: 9, backRise: 10, pushIn: 0.9, arc: 4 },
-  /**
-   * The last shot cranes up by this angle, in degrees, into the default view. A pull-out after a
-   * push-in reverses the move across the cut (design 5.6).
-   */
-  lastRise: 12,
 } as const;
 
 /**
@@ -485,6 +522,11 @@ interface Planner {
    * starts, and its top, in radians.
    */
   band: [number, number];
+  /**
+   * True in the low band: the search tries only the wanted elevation of the shot, with a full
+   * search of the azimuths.
+   */
+  lowBand: boolean;
   /**
    * True when the search of a close camera is full: for the best candidate at its entry. A full
    * search also tries the places between the steps, the places beyond them, and the arc to the
@@ -963,9 +1005,12 @@ function searchClose(
   planner.moveCache.set(moveKey, known);
   const previous = planner.planned.at(-1);
   const s = KEY_SEARCH;
-  // The band moves up with the lift of a piano shot.
+  // The band moves up with the lift of a piano shot. The wanted elevation is low (CAMERA_LOWER).
   const bottom = planner.band[0] + subject.lift;
   const top = planner.band[1] + subject.lift;
+  const fit: ShotKey = { azimuth: 0, elevation: 0, zoom: 1, fov: move.fov };
+  const distance = keyDistance(planner.stageSide, subject.radius, fit, CINEMA_ASPECT);
+  const wanted = lowered(subject.target, distance, move.elevation);
   const sink = planner.trace;
   const kept = sink ? (sink.kept.get(moveKey) ?? new Map<number, KeptResult>()) : null;
   if (sink && kept) {
@@ -976,8 +1021,8 @@ function searchClose(
         subject: name,
         front: subject.front,
         wantedAzimuth: move.wantedAzimuth,
-        band: [bottom, top],
-        full: planner.fullSearch,
+        band: planner.lowBand ? [wanted, wanted] : [bottom, top],
+        full: planner.fullSearch || planner.lowBand,
         outsideFront: 0,
         cameras: [],
       }
@@ -1069,20 +1114,23 @@ function searchClose(
       held,
     };
   };
+  // The low band tries only the wanted elevation, with a full search.
+  const full = planner.fullSearch || planner.lowBand;
+  const rises = planner.lowBand ? s.elevationSteps.slice(0, 1) : s.elevationSteps;
   let last = -Infinity;
-  for (const rise of s.elevationSteps) {
-    const elevation = Math.min(move.elevation + rise, top);
+  for (const rise of rises) {
+    const elevation = planner.lowBand ? wanted : Math.min(wanted + rise, top);
     if (elevation <= last + 1e-9) {
       break;
     }
     last = elevation;
-    if (elevation <= bottom + 1e-9) {
+    if (!planner.lowBand && elevation <= bottom + 1e-9) {
       continue;
     }
     // The steps of the search, then for a full search the places between and beyond them, and
     // then the arc to the other side. The planner keeps the result of each place, so a place
     // that comes again costs little.
-    const passes = !planner.fullSearch ? 1 : move.arc === 0 || move.lateral !== 0 ? 2 : 3;
+    const passes = !full ? 1 : move.arc === 0 || move.lateral !== 0 ? 2 : 3;
     for (let pass = 0; pass < passes; pass++) {
       for (const step of pass === 0 ? s.azimuthSteps : s.fullSteps) {
         for (const side of step === 0 ? [1] : [1, -1]) {
@@ -1132,7 +1180,11 @@ function wideFraming(planner: Planner): Framing {
   const k = SHOT_KEYS.wide;
   const keyOf = (variant: WideVariant): ShotKey => ({
     azimuth: variant.azimuth * DEG,
-    elevation: variant.elevation * DEG,
+    elevation: lowered(
+      DEFAULT_TARGET,
+      farDistance(planner.stageSide, true, variant.zoom),
+      variant.elevation * DEG,
+    ),
     zoom: variant.zoom,
     fov: k.fov,
   });
@@ -1156,20 +1208,26 @@ function wideFraming(planner: Planner): Framing {
 }
 
 /**
- * Makes the framing of the opening shot (design 5.6): the default view of design 4.5, which is
- * also the view of the first screen, with a push-in to 0.92.
+ * Makes the framing of the opening shot (design 5.6): from the default view of design 4.5, which
+ * is also the view of the first screen, a crane down to the low wide view with a push-in.
  *
  * @returns The framing.
  */
-function openingFraming(): Framing {
+function openingFraming(planner: Planner): Framing {
   const from = defaultKey(1);
-  const to = defaultKey(SHOT_KEYS.wide.pushIn);
+  const zoom = SHOT_KEYS.wide.pushIn;
+  const distance = farDistance(planner.stageSide, true, zoom);
+  const to = {
+    ...defaultKey(zoom),
+    elevation: lowered(DEFAULT_TARGET, distance, DEFAULT_ELEVATION),
+  };
   return { target: DEFAULT_TARGET, radius: 0, from, to, seats: [], part: null, held: new Set() };
 }
 
 /**
  * Makes the framing of a high shot, as view 09 of `scene.png`: a seeded azimuth of up to 12° to
- * one side and an elevation of 40° to 44°, with an arc of 8° over the middle and a rise of 4°.
+ * one side and a nominal elevation of 37° to 41°, with an arc of 8° over the middle and a rise of
+ * 4°.
  *
  * @param planner The planner.
  * @returns The framing.
@@ -1179,19 +1237,22 @@ function highFraming(planner: Planner): Framing {
   const k = SHOT_KEYS.high;
   // The arc goes to the middle, to the other side than the azimuth.
   const azimuth = -arcSign(planner, -signOf(random)) * between(random, k.azimuth) * DEG;
+  const target: Vec3 = [0, 0, -0.05 * planner.stageSide];
+  const distance = farDistance(planner.stageSide, false, k.zoom);
+  const nominal = between(random, k.elevation) * DEG;
   const from: ShotKey = {
     azimuth,
-    elevation: between(random, k.elevation) * DEG,
+    elevation: lowered(target, distance, nominal),
     zoom: k.zoom,
     fov: k.fov,
   };
   const to: ShotKey = {
     ...from,
     azimuth: azimuth - Math.sign(azimuth) * k.arc * DEG,
-    elevation: from.elevation + k.rise * DEG,
+    elevation: lowered(target, distance, nominal + k.rise * DEG),
   };
   return {
-    target: [0, 0, -0.05 * planner.stageSide],
+    target,
     radius: 0,
     from,
     to,
@@ -2095,15 +2156,16 @@ function* planShotsSteps(
     conductorShots: 0,
     sinceSide: 0,
     lastAzimuth: new Map(),
-    band: [-Infinity, KEY_SEARCH.bands[0]],
+    band: [-Infinity, KEY_SEARCH.bands[0] ?? 0],
+    lowBand: false,
     fullSearch: false,
     trace,
   };
 
-  // The opening: the default view of the first screen holds for the count-in, then it pushes in
-  // slowly over the first phrase. The click on play thus makes no cut.
+  // The opening: the default view of the first screen holds for the count-in, then it cranes down
+  // and pushes in slowly over the first phrase. The click on play thus makes no cut.
   let cut = chooseEnd(planner, 0, 'wide');
-  addShot(planner, { kind: 'wide', id: 'wide', group: null }, openingFraming(), {
+  addShot(planner, { kind: 'wide', id: 'wide', group: null }, openingFraming(planner), {
     startSec: -Infinity,
     endSec: cut,
     moveEndSec: cut,
@@ -2142,22 +2204,24 @@ function* planShotsSteps(
       attempts: [],
     }));
     traced?.candidates.push(...traces);
-    // The lowest elevation band first. A candidate near the best score gets the second band too.
-    // The other candidates get the higher bands only after all candidates failed (N4).
+    // The low band first, then the lowest elevation band. A candidate near the best score gets
+    // the second elevation band too. The other candidates get the higher bands only after all
+    // candidates failed (N4).
     const lead = (scored[0]?.score ?? 0) - KEY_SEARCH.bandMargin;
-    const bands = KEY_SEARCH.bands.length;
+    const bands = KEY_SEARCH.bands.length + 1;
     for (const higher of [false, true]) {
       for (const [index, candidate] of candidates.entries()) {
-        // The first pass: the first band, the second band for a candidate near the best, and all
-        // bands for the best candidate at its entry. Each candidate that shows an entering seat
-        // gets the second band and a full search. The second pass: the bands that the candidate
-        // did not get.
+        // The first pass: the low band and the first elevation band, the second elevation band
+        // for a candidate near the best, and all bands for the best candidate at its entry. Each
+        // candidate that shows an entering seat gets the second elevation band and a full search.
+        // The second pass: the bands that the candidate did not get.
         const entering = candidate.entering.length > 0;
         const best = entering && candidate === scored[0];
-        const first = best ? bands : entering || candidate.score >= lead ? 2 : 1;
+        const first = best ? bands : entering || candidate.score >= lead ? 3 : 2;
         planner.fullSearch = entering;
         for (let band = higher ? first : 0; band < (higher ? bands : first); band++) {
-          planner.band = [KEY_SEARCH.bands[band - 1] ?? -Infinity, KEY_SEARCH.bands[band] ?? 0];
+          planner.lowBand = band === 0;
+          planner.band = [KEY_SEARCH.bands[band - 2] ?? -Infinity, KEY_SEARCH.bands[band - 1] ?? 0];
           yield;
           const attempt =
             trace && traced ? startAttempt(trace, traces[index]?.attempts ?? [], band) : null;
@@ -2182,7 +2246,8 @@ function* planShotsSteps(
       }
     }
     // A conductor shot that fills the time searches all bands.
-    planner.band = [-Infinity, KEY_SEARCH.bands[bands - 1] ?? 0];
+    planner.band = [-Infinity, KEY_SEARCH.bands.at(-1) ?? 0];
+    planner.lowBand = false;
     planner.fullSearch = false;
     if (trace) {
       trace.attempt = null;
@@ -2254,16 +2319,17 @@ function* planShotsSteps(
     cut = end;
   }
 
-  // The closing: the camera cranes up into the default view and holds after the song end. A
-  // pull-out reverses the push-in of the shot before it.
+  // The closing: the camera cranes up from the low wide view into the default view, and it holds
+  // after the song end. A pull-out reverses the push-in of the shot before it.
   const to = defaultKey(1);
+  const low = lowered(DEFAULT_TARGET, farDistance(planner.stageSide, true, 1), DEFAULT_ELEVATION);
   addShot(
     planner,
     { kind: 'wide', id: 'wide', group: null },
     {
       target: DEFAULT_TARGET,
       radius: 0,
-      from: { ...to, elevation: to.elevation - SHOT_KEYS.lastRise * DEG },
+      from: { ...to, elevation: low },
       to,
       seats: [],
       part: null,
@@ -2292,8 +2358,8 @@ function* planShotsSteps(
  * Calculates the shots of a score (design 5.6): the cut points, the subjects, and the clear
  * cameras. Pure: the same score, layout, and seed give the same plan.
  *
- * - The first shot is the default view from `-Infinity`. It holds for the count-in, and it pushes
- *   in over the first phrase.
+ * - The first shot is the default view from `-Infinity`. It holds for the count-in, and it cranes
+ *   down and pushes in over the first phrase.
  * - Each cut falls on a downbeat. A shot lasts 4 to 14 s, and a wide or high shot up to 18 s.
  * - The music after each cut selects its subject.
  * - The last shot is a wide shot that cranes up into the default view, and it holds after the song

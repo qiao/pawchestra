@@ -444,14 +444,24 @@ each shot at that aspect.
 | side, section, solo | low, from the front of one side, one group, or one player |
 
 - The shots follow the views of `scene.png`. The conductor shows only from behind, as in the
-  reference images (1). All shots keep the camera a little low, as the default view does.
+  reference images (1).
+- All shots stand low, near the eye height of the players, as the cameras on the railings of a
+  concert hall. The wanted camera of each kind stands at `CAMERA_LOWER` of the height above the
+  stage top that its nominal elevation gives (`SHOT_KEYS`, `WIDE_VARIANTS`). Free mode and its
+  default view keep `DEFAULT_ELEVATION`.
+- A close camera first tries the wanted elevation with each azimuth of the grid (the low band).
+  Only then it rises in steps up to the tops of `KEY_SEARCH.bands`, because a low camera sees
+  more heads in the foreground. Each candidate gets the low band and the first band before a
+  candidate gets a higher band, except the best candidate at its entry.
 - Each move blends its keys with a smoothstep over the full shot and turns around the target, so
   it starts and ends at rest and never cuts through the subject.
 
 **Cuts and choice.** A cut falls on a downbeat or on the middle beat of a bar, with a bonus for a
 phrase line (`CUT_BONUS`). The camera films the player who just started to play: a cut at an
-entry gets the largest bonus. The first shot is the default view, as the establishing shot of a
-concert film, and the last shot cranes up into it. The planner reads the music after the cut
+entry gets the largest bonus. The first shot starts at the default view, as the establishing shot
+of a concert film, and it cranes down to the low wide view while it pushes in. The last shot cranes
+up from the low wide view into the default view, so a play from the start after the end makes no
+cut. The planner reads the music after the cut
 (`MUSIC_RULES`): the share of each group, the entries, a tutti, and the lead, because a concert
 film follows the melody. Then these rules apply, in this order (`CHOICE_WEIGHTS`, `SHOT_TIMES`):
 

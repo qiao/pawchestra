@@ -17,10 +17,7 @@ export function isCloseShot(kind: ShotKind): boolean {
 export interface ShotKey {
   /** Radians around y, from +z (the audience) to +x, as in `defaultView()`. */
   readonly azimuth: number;
-  /**
-   * Radians above the stage plane. A close shot keeps it from 0.1 to 1.05 (6° to 60°), and a
-   * high shot rises to 0.84 (48°).
-   */
+  /** Radians above the stage plane, seen from the target. */
   readonly elevation: number;
   /**
    * A factor of the fit distance of the shot, or of the wide distance for a radius of 0. Less
