@@ -4,6 +4,12 @@ import type { Vec3 } from '../models/tuples.ts';
 /** The vertical field of view of the camera, in degrees (design 4.5, camera). */
 export const FIELD_OF_VIEW = 30;
 
+/**
+ * The aspect of the frame of Cinematic mode (design 2.5, 5.6): 21:9, as a film. The app shows this
+ * frame with black bars, and the shot planner tests its cameras at this aspect.
+ */
+export const CINEMA_ASPECT = 21 / 9;
+
 /** The near plane of the camera, in meters. */
 export const NEAR = 0.1;
 
