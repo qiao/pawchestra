@@ -24,18 +24,20 @@ import { buildScore } from '../src/score/score.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import type { CameraView } from '../src/shots/types.ts';
+import { CINEMA_ASPECT } from '../src/shots/view.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
 
 /** The step of the song time between two samples, in seconds. */
 export const CAMERA_STEP = 0.25;
 
-/** The views of the probe: a landscape and a portrait aspect, each with and without motion. */
+/**
+ * The views of the probe: the aspect of the frame of Cinematic mode (design 2.5), with and
+ * without motion. Each window shows that frame.
+ */
 export const CAMERA_VIEWS: readonly CameraView[] = [
-  { aspect: 1.6, still: false },
-  { aspect: 1.6, still: true },
-  { aspect: 0.46, still: false },
-  { aspect: 0.46, still: true },
+  { aspect: CINEMA_ASPECT, still: false },
+  { aspect: CINEMA_ASPECT, still: true },
 ];
 
 /** The transport of a play from the song start, with no limit of the lift time. */
@@ -54,7 +56,7 @@ export interface DemoCamera {
   readonly samples: number;
   /** The hash of the cameras of all samples of all views, as 16 hex digits. */
   readonly hash: string;
-  /** The hash of the cameras of each view, by its aspect and its motion, such as `1.6 still`. */
+  /** The hash of the cameras of each view, by its aspect and its motion, such as `2.33 still`. */
   readonly views: Readonly<Record<string, string>>;
 }
 
@@ -78,10 +80,10 @@ export interface CameraComparison {
  * Gives the name of a view in the probe.
  *
  * @param view The view.
- * @returns The name, such as `1.6 moving` or `0.46 still`.
+ * @returns The name, such as `2.33 moving` or `2.33 still`.
  */
 function viewName(view: CameraView): string {
-  return `${view.aspect} ${view.still ? 'still' : 'moving'}`;
+  return `${view.aspect.toFixed(2)} ${view.still ? 'still' : 'moving'}`;
 }
 
 /**
