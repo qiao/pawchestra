@@ -467,8 +467,9 @@ function addHaze(input: ForestInputs, color: Rgb, center: Vec3): Rgb {
  * Turns the vertices and the normals of a part to the place of a copy.
  *
  * @param copy The placed copy.
- * @param positions x, y, z of each vertex in meters. The call writes it.
- * @param normals The unit normal of each vertex. The call writes it.
+ * @param positions x, y, z of each vertex in meters. The call writes the first three numbers for
+ *   each vertex of the part, so the array can be longer.
+ * @param normals The unit normal of each vertex, in the same order. The call writes it.
  */
 function placeVertices(copy: Copy, positions: Float64Array, normals: Float64Array): void {
   const cos = Math.cos(copy.yaw);
@@ -864,6 +865,13 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
   }
   yield;
 
+  // One set of scratch arrays for the placed vertices of each copy, so that the build leaves
+  // little garbage for a later frame to collect.
+  const most = Math.max(0, ...input.parts.map((part) => part.kinds.length));
+  const world = new Float64Array(most * 3);
+  const normals = new Float64Array(most * 3);
+  const remap = new Uint32Array(most);
+
   // The glass of each lantern is the light of the bake and the place of a glow.
   const lamps: ForestLamp[] = [];
   const corners: number[] = Array.from({ length: 9 }, () => 0);
@@ -872,8 +880,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
     if (!kinds.includes(GLOW)) {
       continue;
     }
-    const world = new Float64Array(copy.part.positions.length);
-    placeVertices(copy, world, new Float64Array(world.length));
+    placeVertices(copy, world, normals);
     const sum: [number, number, number] = [0, 0, 0];
     let count = 0;
     for (let t = 0; t < indices.length; t += 3) {
@@ -900,10 +907,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
   let work = 0;
   for (const [c, copy] of [...copies, ...ropeCopies].entries()) {
     const { part } = copy;
-    const world = new Float64Array(part.positions.length);
-    const normals = new Float64Array(part.normals.length);
     placeVertices(copy, world, normals);
-    const remap = new Uint32Array(part.kinds.length);
     for (let v = 0; v < part.kinds.length; v++) {
       const kind = part.kinds[v] ?? 0;
       const i = v * 3;
@@ -948,8 +952,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
       continue;
     }
     const { indices } = copy.part;
-    const world = new Float64Array(copy.part.positions.length);
-    placeVertices(copy, world, new Float64Array(world.length));
+    placeVertices(copy, world, normals);
     for (let t = 0; t < indices.length; t += 3) {
       cornersOf(world, indices, t, corners);
       addToBands(boxes, corners, rule, true);
