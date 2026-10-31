@@ -1233,6 +1233,13 @@ def build_ground():
     ]
     tone = Waves(part.tint, 3.0)
     edge = Waves(part.tint, 1.2)
+    spots = [
+        (
+            Vector((part.tint.uniform(-6.0, 6.0), part.tint.uniform(HALF + 0.8, HALF + 12.0))),
+            part.tint.uniform(0.5, 1.3),
+        )
+        for _ in range(16)
+    ]
     mounds = Waves(rng, 2.5)
     points = []
     for v in verts2d:
@@ -1251,6 +1258,12 @@ def build_ground():
             d = (p - at).length / (radius * wobble)
             if d < 1.15:
                 color = mix(color, linear(name), smoothstep(1.15, 0.85, d))
+        # Soft spots of sun on the clearing in front of the deck, as the lit earth of the
+        # reference.
+        for at, radius in spots:
+            d = (p - at).length / (radius * wobble)
+            if d < 1.0:
+                color = mix(color, linear('path-light'), 0.55 * smoothstep(1.0, 0.6, d))
         return color, 'matte'
 
     part.add(points, [tuple(f) for f in faces], paint, 'up')
