@@ -11,7 +11,11 @@ their traps. The head comment of each tool file gives its options.
    variant holds look paths and values, and the key `solo`. The tool prints one row of the measures
    for each variant.
 3. Change the code to the chosen variant, and compare it with `pnpm look-lab <dir> --base <start>`.
-4. Put the chosen values and their reason into design 4.1 or 4.5.
+4. After each look change of a venue, render the close shots of `beethoven-9` at 28 s and 146 s
+   (`pnpm close-views play <dir> --demo beethoven-9 --scene <id> --cinematic --time 28 --time
+   146`), and compare them with the base. The default view alone does not show a glare of the
+   light toward the camera.
+5. Put the chosen values and their reason into design 4.1 or 4.5.
 
 ## The look override
 
