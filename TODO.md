@@ -528,6 +528,22 @@ each control.
 
 - [ ] Take frames of each kind of shot of each demo at both sizes, and the GIF, and check them
       against 5.6 (9.8).
+- [ ] Put the title in the top bar of the letterbox where it fits, as the control bar is in the
+      bottom bar. At 844 × 390 and 2560 × 1080 the shown title covers the top of the film (2.3).
+- [ ] Let the smoke test check Cinematic mode: the letterbox, and the rule that hides the whole UI.
+      No end-to-end test uses Cinematic mode now (2.3, 2.5).
+- [ ] Check the letterbox on a GPU with no float target. That path has no post effects, and it uses
+      the canvas scissor of three.js in CSS pixels (4.5).
+- [ ] Update the paused frame tests of `src/shots/test-shot-frames.ts` to `CINEMA_ASPECT` and to the
+      composition of the close shots. They still sample the aspects 1.6 and 0.46 (5.6).
+- [ ] Tool: cache the base rows of `pnpm frame-compare` by tree, and let `close-views`,
+      `screenshots`, and the Playwright probes take `tools/measure-lock.sh` as GPU users. A UI
+      round spent about 45 minutes on frame measures, with refused runs under the load of renders.
+- [ ] Tool: add `pnpm close-views play --look <JSON>...` with `--sheet`, which renders each look
+      variant from one build in a labelled grid with a base row. It saves about 8 minutes for each
+      look lineup.
+- [ ] Tool: add `pnpm screenshots --cinematic --sizes <list>` (the UI shown and hidden) and a mode
+      that records a UI move as a screencast. A UI round wrote three probes for this.
 
 Done when: the tests of 5.6 pass for each demo, the shot targets and the frame target of 9.7
 pass, and the smoke test checks the camera.
