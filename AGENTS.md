@@ -18,8 +18,7 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 - **Reference images.** `docs/reference/orchestra-latest.png` and `orchestra-side.png` are the
   newest target, from two angles. `mockup.png` and `scene.png` are the target of the look,
   `lowpoly-animals.png` of the forms and the facets, and `animals.webp` of the front, side, and
-  back views. The sheets `*-views.png` and `*-turnaround.png` show single species. `forest.webp`
-  is the target of the forest scene. The images win
+  back views. The sheets `*-views.png` and `*-turnaround.png` show single species. The images win
   over the values that design 4.5 to 4.7 names. Design 1 says which image wins where they differ.
 - **Technique references.** The motion of each player follows a real musician. The target of
   each family is its reference in `docs/reference/`: `string-technique.md`, `wind-technique.md`,
