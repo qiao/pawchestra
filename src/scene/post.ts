@@ -64,6 +64,26 @@ export const POST_LOOK = {
 } as const;
 
 /**
+ * The vignette of the letterbox of Cinematic mode (design 2.5, 4.5): an oval with the shape of the
+ * frame, so that the top and the bottom edges darken as much as the sides. The round vignette of
+ * `POST_LOOK` comes from the middle of the canvas, and it darkened the middle of the top edge by
+ * only about 12%, where the hall is dark already.
+ */
+export const FRAME_VIGNETTE = {
+  /**
+   * The part of the light that the vignette takes from the corners of the frame. The middle of
+   * each edge loses about 0.69 of it. A close shot multiplies it by the ratio of
+   * `SHOT_LOOK.vignette` to `POST_LOOK.vignette`.
+   */
+  strength: 0.55,
+  /**
+   * The start and the end of the fall, in the distance from the middle of the frame: 1 at the
+   * middle of each edge, and the square root of 2 at the corners.
+   */
+  fall: [0.3, Math.SQRT2],
+} as const;
+
+/**
  * The room haze of the final pass (design 4.5, light and render): thin warm air that grows with
  * the distance behind the subject of the camera, so the back rows and the hall get an aerial
  * depth, and the beam stands in air, as in `orchestra-latest.png`. The stage in front of the
@@ -113,6 +133,11 @@ export interface PostView {
    * the image height.
    */
   readonly imageHeight: number;
+  /**
+   * The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode). It mixes the round
+   * vignette of the canvas with the vignette of the frame ({@link FRAME_VIGNETTE}).
+   */
+  readonly cinema: number;
 }
 
 /** The values of the final pass that change with each frame. */
@@ -515,6 +540,11 @@ export class PostPipeline {
     setUniform(final, 'uAspect', this.#width / this.#height);
     this.#setHaze(final, camera, frame.haze);
     setUniform(final, 'uVignette', frame.vignette);
+    setUniform(final, 'uCinema', view.cinema);
+    const fall = final.uniforms['uFrameVignette']?.value;
+    if (fall instanceof Vector2) {
+      fall.set(...FRAME_VIGNETTE.fall);
+    }
     setUniform(final, 'uSeed', grainSeed(timeSec));
     this.#pass(final, null);
   }
@@ -809,6 +839,8 @@ export class PostPipeline {
         ...gradeUniforms(),
         uVignette: { value: look.vignette },
         uAspect: { value: 1 },
+        uCinema: { value: 0 },
+        uFrameVignette: { value: new Vector2(...FRAME_VIGNETTE.fall) },
         uGrain: { value: look.grain },
         uSeed: { value: 0 },
         ...focusUniforms(),

@@ -436,6 +436,13 @@ scene ──> [depth 1/2] ──────────────────
   sample. Thus no pass renders the scene under the bars, and the move of the bars allocates no
   target. A canvas of the size of the letterbox would allocate each target again in each frame of
   the move. The blur of the depth of field is a part of the height of the letterbox.
+- **Vignette.** Free mode has a round vignette from the middle of the canvas (`POST_LOOK`). It
+  darkens the middle of the top edge by only about 12%, where the hall is dark already. The
+  letterbox has an oval vignette with the shape of the frame (`FRAME_VIGNETTE`), so that the top
+  and the bottom edges darken as much as the sides, and the vignette shows on the lit stage. A
+  close shot gets the stronger vignette of `SHOT_LOOK`, and the letterbox takes the same ratio as
+  a boost (`vignetteOf()` of `scene/stage-scene.ts`). The strength is the middle of a lineup of
+  three strengths.
 
 **Camera**
 

@@ -233,6 +233,11 @@ uniform float uPixelsPerBlur;
 ${GRADE_FUNCTION}
 uniform float uVignette;
 uniform float uAspect;
+// The share of the vignette of the letterbox, from 0 (Free mode) to 1 (Cinematic mode).
+uniform float uCinema;
+// The vignette of the letterbox: the start and the end of its fall, in the distance from the
+// middle of the frame, with 1 at the middle of each edge.
+uniform vec2 uFrameVignette;
 uniform float uGrain;
 uniform float uSeed;
 #ifdef DEPTH_OF_FIELD
@@ -295,10 +300,18 @@ void main() {
   // The grade works on the display values (sRGB).
   vec3 c = grade(gl_FragColor.rgb);
   float luma = dot(c, vec3(0.2126, 0.7152, 0.0722));
-  // The vignette darkens the corners. The distance keeps the aspect, so the shape is round.
+  // The vignette of Free mode darkens the corners. The distance keeps the aspect, so the shape is
+  // round.
   vec2 fromCenter = (vUv - 0.5) * vec2(uAspect, 1.0);
   float edge = length(fromCenter) / length(vec2(uAspect, 1.0) * 0.5);
-  c *= 1.0 - uVignette * smoothstep(0.3, 1.0, edge);
+  float shade = smoothstep(0.3, 1.0, edge);
+  // The vignette of the letterbox is an oval with the shape of the frame, so the top and the
+  // bottom edges darken as much as the sides.
+  if (uCinema > 0.0) {
+    vec2 inFrame = (vUv - uFrame.xy) / (uFrame.zw - uFrame.xy) * 2.0 - 1.0;
+    shade = mix(shade, smoothstep(uFrameVignette.x, uFrameVignette.y, length(inFrame)), uCinema);
+  }
+  c *= 1.0 - uVignette * shade;
   // The grain changes in each frame. It is strongest in the middle tones, as on film, and it also
   // breaks the bands of the dark gradients.
   float grain = hash(gl_FragCoord.xy + uSeed) - 0.5;

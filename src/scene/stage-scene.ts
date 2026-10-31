@@ -76,7 +76,7 @@ import {
 import type { PlayerSpot } from './player.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
 import type { HazeFrame, PostView, TargetFormat } from './post.ts';
-import { POST_LOOK } from './post.ts';
+import { FRAME_VIGNETTE, POST_LOOK } from './post.ts';
 import { createRimUniforms, setRimLights } from './rim-light.ts';
 import { SHOT_LOOK, createShotUniforms, setShotLight } from './shot-light.ts';
 import { freeShotLight, shotRig } from '../shots/shot-light.ts';
@@ -89,6 +89,22 @@ import type { StageBakeUniforms } from './stage.ts';
 import { bakeStageSteps } from './stage-bake.ts';
 import { compileInto, gpuDoneSteps, programsReadySteps } from './programs.ts';
 import { depthGeometryOf } from './shared-corners.ts';
+
+/**
+ * Gives the strength of the vignette of a frame (design 4.5, post effects). A close shot gets the
+ * stronger vignette of `SHOT_LOOK`. In the letterbox, the vignette of the frame takes the same
+ * ratio as a boost.
+ *
+ * @param light The weight of the light of a close shot, from 0 to 1.
+ * @param cinema The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode).
+ * @returns The part of the light that the vignette takes from the corners.
+ */
+function vignetteOf(light: number, cinema: number): number {
+  const free = POST_LOOK.vignette + (SHOT_LOOK.vignette - POST_LOOK.vignette) * light;
+  const boost = SHOT_LOOK.vignette / POST_LOOK.vignette;
+  const frame = FRAME_VIGNETTE.strength * (1 + (boost - 1) * light);
+  return free + (frame - free) * cinema;
+}
 
 /** The letterbox of one frame (design 2.5). */
 interface LetterboxFrame {
@@ -919,12 +935,13 @@ export class StageScene {
     const full = { x: width / 2, y: height / 2, width, height };
     if (share <= 0) {
       this.#visible = full;
-      return { share, view: { rect: null, imageHeight: 1 } };
+      return { share, view: { rect: null, imageHeight: 1, cinema: 0 } };
     }
     const frame = letterbox(width, height);
     this.#visible = mixBox(full, frame, share);
     const imageHeight = 1 + (frame.height / height - 1) * share;
-    return { share, view: { rect: uvRectOf(this.#visible, width, height), imageHeight } };
+    const rect = uvRectOf(this.#visible, width, height);
+    return { share, view: { rect, imageHeight, cinema: share } };
   }
 
   /**
@@ -988,7 +1005,7 @@ export class StageScene {
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
-        const vignette = POST_LOOK.vignette + (SHOT_LOOK.vignette - POST_LOOK.vignette) * light;
+        const vignette = vignetteOf(light, share);
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, {
           haze,
           vignette,
