@@ -41,8 +41,9 @@ import { CINEMA_ASPECT, defaultView } from '../src/shots/view.ts';
 const DEG = Math.PI / 180;
 
 /**
- * The limits of the rules (design 5.6). They are the values of `FILM_GRAMMAR` of
- * `src/shots/grammar.ts`, copied here so that the tool also checks a commit from before it.
+ * The limits of the rules (design 5.6). The limits of the line, the look, the jump cut, and the
+ * moves are the values of `FILM_GRAMMAR` of `src/shots/grammar.ts`, copied here so that the tool
+ * also checks a commit from before it. The room and the eye limits are the tolerances of the check.
  */
 export const GRAMMAR = {
   /** The largest angle of a camera from the audience axis, in radians. */
