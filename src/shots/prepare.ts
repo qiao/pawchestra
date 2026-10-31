@@ -291,6 +291,12 @@ const KEY_SEARCH = {
    */
   sideFromFront: 30 * DEG,
   /**
+   * The camera of a side view stays at or below this elevation: the top of the first band of
+   * {@link KEY_SEARCH}.bands. Views 03 and 04 of `scene.png` film the side low. Side views from
+   * 34° to 44° looked down on the side, with the heads of the front rows over it.
+   */
+  sideCeiling: 24 * DEG,
+  /**
    * The camera of a section or solo shot stays at least this far in azimuth from the camera of the
    * last shot of the same subject. With no limit, K. 315 shows the solo flute six times from
    * almost the same angle.
@@ -870,6 +876,8 @@ interface CloseMove {
   readonly maxFromFront: number;
   /** The shot size, which sets the frame of each camera. */
   readonly size: ShotSize;
+  /** The highest elevation of the camera, in radians: `Infinity` for no limit but the bands. */
+  readonly ceiling: number;
 }
 
 /** The body boxes and the sight lines of a subject. */
@@ -1118,7 +1126,7 @@ function searchClose(
   const s = KEY_SEARCH;
   // The band moves up with the lift of a piano shot. The wanted elevation is low (CAMERA_LOWER).
   const bottom = planner.band[0] + subject.lift;
-  const top = planner.band[1] + subject.lift;
+  const top = Math.min(planner.band[1], move.ceiling) + subject.lift;
   // The frame of a camera of the move: the subject fills the share of the width of its shot size,
   // with its look room, and the frame holds its height (design 5.6).
   const frameAt = (azimuth: number, elevation: number, arc: number): number => {
@@ -1486,6 +1494,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
         size: SHOT_SIZES.conductorBack,
+        ceiling: Infinity,
         lateral: lateralOf(planner),
       },
       'conductor back',
@@ -1506,6 +1515,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
         size: SHOT_SIZES.conductor,
+        ceiling: Infinity,
         lateral: lateralOf(planner),
       },
       'conductor close',
@@ -1568,6 +1578,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.sideFromFront,
+          ceiling: KEY_SEARCH.sideCeiling,
           size: SHOT_SIZES.side,
           lateral: lateralOf(planner),
         },
@@ -1600,6 +1611,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
           size: SHOT_SIZES.section,
+          ceiling: Infinity,
           lateral: lateralOf(planner),
         },
         candidate.id,
@@ -1626,6 +1638,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
           size: SHOT_SIZES.solo,
+          ceiling: Infinity,
           lateral: lateralOf(planner),
         },
         candidate.id,

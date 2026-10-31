@@ -145,7 +145,8 @@ The app follows these facts:
   the solo shows the player and its instrument in place of about seven players.
 - **The group-shot of a side (section 3).** A side view shows the players of its sphere as one
   group (a group-shot of five or six players or more). A head of another player in front of the
-  group counts in the foreground rule.
+  group counts in the foreground rule, and the side camera stays low
+  (`KEY_SEARCH.sideCeiling`).
 - **The dirty frame (section 3).** A near head or a near box of another object that the depth of
   field blurs can stand at one side edge of a close shot (`FOREGROUND.dirtyBlur`). Its inner edge
   stays in the outer third of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
