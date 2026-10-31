@@ -17,6 +17,10 @@ their traps. The head comment of each tool file gives its options.
    light toward the camera.
 5. Put the chosen values and their reason into design 4.1 or 4.5.
 
+A kit or mesh change that adds more than 1.5 times the triangles runs
+`pnpm frame-compare <base> HEAD --runs 3` directly after its lineup, because the main-thread tail
+of the forest grew with the size of its kit.
+
 ## The look override
 
 - The dev server reads the query `look`: JSON of look paths, such as `BACK_ROW_LIGHT.position.1`,
