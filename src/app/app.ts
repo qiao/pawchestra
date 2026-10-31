@@ -955,6 +955,7 @@ export class App {
     // The sheet of a phone covers the first screen, so the stage does not need to clear it.
     const ring = this.#phone.matches && drawer.open ? null : this.#ui.firstScreen.ringBox;
     this.#scene.render(shot, cover, ring);
+    this.#ui.showLetterbox(this.#scene.letterboxBar);
     this.#followShade(wallTime, shade);
     this.#showFrame();
     if (piece && !this.#audioStarted) {

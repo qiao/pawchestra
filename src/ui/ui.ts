@@ -73,6 +73,10 @@ export class Ui {
   readonly #phone: MediaQueryList;
   /** The number of builds that cover the stage now. */
   #covers = 0;
+  /** The root element of the page, which holds the CSS variable `--letterbox`. */
+  readonly #root: HTMLElement;
+  /** The height of the bottom bar of the letterbox that the page shows, in CSS pixels. */
+  #letterbox = 0;
 
   /**
    * Creates the UI and adds it to a parent element.
@@ -91,6 +95,7 @@ export class Ui {
     canFullScreen: boolean,
     target: Window,
   ) {
+    this.#root = parent.ownerDocument.documentElement;
     // The static title of index.html stays in its place (design 2.8, 7.2).
     this.title = new Title(parent.querySelector<HTMLElement>(':scope > header.title'));
     this.tooltips = new Tooltips(target);
@@ -218,6 +223,23 @@ export class Ui {
     this.drawer.setOpen(true);
     this.demoList.element.scrollTop = 0;
     this.demoList.focusCurrent();
+  }
+
+  /**
+   * Gives the CSS the height of the bottom bar of the letterbox of Cinematic mode (design 2.3,
+   * 2.5). Where that bar has room for the bar of the controls, the bar of the controls stands in
+   * its middle, so that the controls do not cover the film. It writes the DOM only when the height
+   * changes by half a pixel or more.
+   *
+   * @param height The height of the bottom bar of the letterbox, in CSS pixels: 0 for none.
+   */
+  showLetterbox(height: number): void {
+    const rounded = Math.round(height * 2) / 2;
+    if (rounded === this.#letterbox) {
+      return;
+    }
+    this.#letterbox = rounded;
+    this.#root.style.setProperty('--letterbox', `${rounded}px`);
   }
 
   /**

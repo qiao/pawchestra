@@ -891,11 +891,12 @@ export class StageScene {
   }
 
   /**
-   * The part of the canvas that showed the scene in the last frame, in CSS pixels: the full
-   * canvas in Free mode, and the letterbox in Cinematic mode (design 2.5).
+   * The height of the bottom bar of the letterbox in the last frame, in CSS pixels (design 2.5): 0
+   * in Free mode and on a canvas wider than 21:9.
    */
-  get visible(): FrameBox {
-    return this.#visible;
+  get letterboxBar(): number {
+    const visible = this.#visible;
+    return Math.max(0, this.#height - (visible.y + visible.height / 2));
   }
 
   /**
