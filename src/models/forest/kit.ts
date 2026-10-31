@@ -205,7 +205,8 @@ const TREE_HEIGHT = 3;
 
 /**
  * Finds each tree whose footprint overlaps the footprint of a tree before it in the list. A
- * small stage moves the trees behind its edges closer together, so it keeps fewer trees.
+ * small stage moves the trees behind its edges closer together, so it keeps fewer trees. A part
+ * with no footprint, such as a lantern on a branch of a tree, overlaps nothing.
  *
  * @param placements The placed parts, the most important first.
  * @param kit The kit, with the footprint and the height of each part.
@@ -218,7 +219,7 @@ function thinTrees(placements: readonly ForestPlacement[], kit: ForestKitData): 
   let kept = 0;
   return placements.map((placement) => {
     const part = parts.get(placement.part);
-    if (!part || part.height <= TREE_HEIGHT) {
+    if (!part || part.height <= TREE_HEIGHT || part.footprint === 0) {
       return kept++;
     }
 
