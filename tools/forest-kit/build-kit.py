@@ -256,7 +256,7 @@ def pick(rng, choices):
 
 #: The sides and the bands of the spheres of the leaves: `'round'` for the parts near the stage,
 #: and `'low'` for the far trees.
-SPHERES = {'round': (12, 7), 'low': (9, 5)}
+SPHERES = {'round': (10, 6), 'low': (7, 4)}
 
 
 def unit_sphere(detail):
@@ -1174,7 +1174,7 @@ def ground_spacing(x, z):
         return 2.0
     if min(math.hypot(x - lx, z - lz) for lx, lz in LANTERN_POOLS) < 1.8:
         return 0.3
-    return 0.5 + 4.0 * smoothstep(9.0, 36.0, edge)
+    return 0.65 + 4.0 * smoothstep(9.0, 36.0, edge)
 
 
 def ground_points(rng, outer):
@@ -1638,7 +1638,7 @@ def build_parts(collection):
         build_bush('bush-3', {'blobs': 3, 'size': 0.8}),
         build_fern(
             'fern-1',
-            {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 13, 'width': 0.15},
+            {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 11, 'width': 0.16},
         ),
         build_fern(
             'fern-2',
@@ -1647,8 +1647,8 @@ def build_parts(collection):
                 'length': 0.8,
                 'rise': 0.55,
                 'droop': 0.2,
-                'leaflets': 11,
-                'width': 0.115,
+                'leaflets': 9,
+                'width': 0.125,
             },
         ),
         build_grass('grass', {'blades': 11, 'spread': 0.08, 'height': 0.32, 'width': 0.022}),
