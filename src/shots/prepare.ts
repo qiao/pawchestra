@@ -1110,7 +1110,7 @@ function searchClose(
   const frameAt = (azimuth: number, elevation: number, arc: number): number => {
     const third = subject.eyes ? thirdOf(subject.facing, azimuth + arc / 2) : 0;
     const at = (a: number): number =>
-      frameHalfHeight(subject, move.size, a, elevation, third, move.fov);
+      frameHalfHeight(subject, move.size, a, elevation, third, move.fov, move.pushIn);
     return Math.max(at(azimuth), at(azimuth + arc));
   };
   const fit: ShotKey = { azimuth: 0, elevation: 0, zoom: 1, fov: move.fov };

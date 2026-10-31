@@ -1,3 +1,4 @@
+import type { Vec3 } from '../models/tuples.ts';
 import { FILM_GRAMMAR } from './grammar.ts';
 import type { Subject } from './subjects.ts';
 import { CINEMA_ASPECT } from './view.ts';
@@ -73,12 +74,77 @@ export const FRAME_MARGINS = {
 const FIT_PASSES = 3;
 
 /**
+ * The place of a point in the view of a camera, relative to the target: the offset to the right
+ * and up, and the offset of the depth, in meters.
+ */
+interface ViewOffset {
+  /** The offset to the right. */
+  readonly right: number;
+  /** The offset up, in the frame of a camera that looks at the target. */
+  readonly up: number;
+  /** The depth less the depth of the target: below 0 nearer to the camera. */
+  readonly depth: number;
+}
+
+/**
+ * Gives the view offsets of points for a camera at an azimuth and an elevation around a target.
+ *
+ * @param points The points.
+ * @param target The target.
+ * @param azimuth The azimuth of the camera, in radians.
+ * @param elevation The elevation of the camera, in radians.
+ * @returns The offset of each point.
+ */
+function viewOffsets(
+  points: readonly Vec3[],
+  target: Vec3,
+  azimuth: number,
+  elevation: number,
+): ViewOffset[] {
+  const cos = Math.cos(azimuth);
+  const sin = Math.sin(azimuth);
+  const ce = Math.cos(elevation);
+  const se = Math.sin(elevation);
+  return points.map((p) => {
+    const dx = p[0] - target[0];
+    const dy = p[1] - target[1];
+    const dz = p[2] - target[2];
+    const toward = dx * sin + dz * cos;
+    return {
+      right: dx * cos - dz * sin,
+      up: dy * ce - toward * se,
+      depth: -(toward * ce + dy * se),
+    };
+  });
+}
+
+/**
+ * Gives the scale of an offset at a depth to its size at the depth of the target.
+ *
+ * @param depth The depth offset of the point.
+ * @param distance The distance of the camera from the target, or `Infinity` for no perspective.
+ * @returns The scale: more than 1 for a point nearer to the camera.
+ */
+function depthScale(depth: number, distance: number): number {
+  if (!Number.isFinite(distance)) {
+    return 1;
+  }
+  return distance / Math.max((1 - FRAME_MARGINS.near) * distance, distance + depth);
+}
+
+/**
  * Calculates the frame of a close camera (design 5.6): half its height at the target, at the
- * aspect of Cinematic mode. The outline of the subject fills the share of the width of its shot
- * size. With `inside`, the outline also stays inside the side edges, with the target on its third
- * line. The frame also holds the subject from its top to its bottom, with its eyes on the upper
- * third line. A near point of the outline looks larger: after a first pass with no perspective,
- * each pass scales the points by their depth at the distance of the last pass.
+ * aspect of Cinematic mode, at the zoom 1.
+ *
+ * - The outline of the subject fills the share of the width of its shot size at the zoom 1.
+ * - With `inside`, the outline stays inside the side edges at the closest zoom of the move, with
+ *   the target on its third line.
+ * - At the closest zoom, with the eyes on the upper third line, the frame holds the top of each
+ *   head below its top edge and each low point above its bottom edge.
+ *
+ * A point near the camera looks larger, and a camera above the subject sees a far point higher in
+ * the frame. After a first pass with no perspective, each pass scales the offsets of the points
+ * by their depth at the distance of the last pass.
  *
  * @param subject The subject.
  * @param size The shot size.
@@ -86,6 +152,7 @@ const FIT_PASSES = 3;
  * @param elevation The elevation of the camera above the target, in radians.
  * @param third The third line of the target: -1, 0, or 1.
  * @param fov The vertical field of view, in degrees.
+ * @param zoom The closest zoom of the move: the push-in at its end.
  * @returns Half the height of the frame at the target, in meters.
  */
 export function frameHalfHeight(
@@ -95,46 +162,50 @@ export function frameHalfHeight(
   elevation: number,
   third: number,
   fov: number,
+  zoom: number,
 ): number {
   const margins = FRAME_MARGINS;
   const line = FILM_GRAMMAR.thirdLine;
   const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
-  let tall = 0;
-  if (subject.eyes) {
-    const eyes = subject.eyes[1];
-    tall = Math.max(
-      (subject.top - eyes) / (1 - line - margins.top),
-      (eyes - subject.bottom) / (1 + line - margins.bottom),
-    );
-  }
-
-  // The right axis of the camera and the axis toward it, in the stage plane.
-  const cos = Math.cos(azimuth);
-  const sin = Math.sin(azimuth);
-  const [tx, , tz] = subject.target;
+  const { target, reach, eyes } = subject;
+  const outline = viewOffsets(subject.outline, target, azimuth, elevation);
+  const [eye] = eyes ? viewOffsets([eyes], target, azimuth, elevation) : [];
+  const tops = eye ? viewOffsets(subject.tops, target, azimuth, elevation) : [];
+  const lows = eye ? viewOffsets(subject.lows, target, azimuth, elevation) : [];
   const x0 = third * line;
-  const { reach } = subject;
-  let half = tall;
-  let flat = Infinity;
+  const room = 1 - margins.side;
+  let half = 0;
+  let distance = Infinity;
   for (let pass = 0; pass < FIT_PASSES; pass++) {
-    let low = Infinity;
-    let high = -Infinity;
-    for (const p of subject.outline) {
-      const dx = p[0] - tx;
-      const dz = p[2] - tz;
-      const toward = Math.min(dx * sin + dz * cos, margins.near * flat);
-      const scale = Number.isFinite(flat) ? flat / (flat - toward) : 1;
-      const right = dx * cos - dz * sin;
-      low = Math.min(low, (right - reach) * scale);
-      high = Math.max(high, (right + reach) * scale);
+    const near = distance * zoom;
+    let [low, high, nearLow, nearHigh] = [Infinity, -Infinity, Infinity, -Infinity];
+    for (const p of outline) {
+      const far = depthScale(p.depth, distance);
+      const close = depthScale(p.depth, near);
+      low = Math.min(low, (p.right - reach) * far);
+      high = Math.max(high, (p.right + reach) * far);
+      nearLow = Math.min(nearLow, (p.right - reach) * close);
+      nearHigh = Math.max(nearHigh, (p.right + reach) * close);
     }
     let width = (high - low) / (2 * size.share);
     if (size.inside) {
-      const room = 1 - margins.side;
-      width = Math.max(width, high / (room - x0), -low / (room + x0));
+      width = Math.max(width, nearHigh / ((room - x0) * zoom), -nearLow / ((room + x0) * zoom));
+    }
+
+    let tall = 0;
+    if (eye) {
+      const eyeUp = eye.up * depthScale(eye.depth, near);
+      for (const p of tops) {
+        const above = p.up * depthScale(p.depth, near) - eyeUp;
+        tall = Math.max(tall, above / ((1 - line - margins.top) * zoom));
+      }
+      for (const p of lows) {
+        const below = eyeUp - p.up * depthScale(p.depth, near);
+        tall = Math.max(tall, below / ((1 + line - margins.bottom) * zoom));
+      }
     }
     half = Math.max(tall, width / CINEMA_ASPECT);
-    flat = (half / tanV) * Math.cos(elevation);
+    distance = half / tanV;
   }
   return half;
 }

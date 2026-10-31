@@ -242,13 +242,16 @@ export interface Subject {
    * players, or the sphere of a side view or of the view over the shoulder.
    */
   readonly reach: number;
-  /** The height of the highest top of the subject players, which the frame holds, in meters. */
-  readonly top: number;
   /**
-   * The height of the lowest point that the frame holds, in meters: the hands and the instrument
-   * of the subject players, the target, or the middle of the body of the conductor.
+   * The tops of the heads of the subject players with their ears, over the middle of each head.
+   * The frame holds them below its top edge.
    */
-  readonly bottom: number;
+  readonly tops: readonly Vec3[];
+  /**
+   * The low points that the frame holds above its bottom edge: the hands and the instruments of
+   * the subject players and the target, or the middle of the body of the conductor.
+   */
+  readonly lows: readonly Vec3[];
 }
 
 /** The radius of the sphere around a head, in head heights `H`. It holds the snout. */
@@ -654,25 +657,22 @@ function headsOf(players: readonly SubjectPlayer[]): Vec3 {
 
 /**
  * Gives the extent of players that the frame of a close shot holds (design 5.6): the hull of
- * their outlines, the highest top, and the lowest of their hands, their instruments, and a target.
+ * their outlines, the top of each head, and their hands, their instruments, and a target.
  *
  * @param players The players. There is at least one.
  * @param target The target of the shot.
- * @returns The outline, the top, and the bottom of the subject.
+ * @returns The outline, the tops, and the low points of the subject.
  */
 function extentOf(
   players: readonly SubjectPlayer[],
   target: Vec3,
-): Pick<Subject, 'outline' | 'reach' | 'top' | 'bottom'> {
-  let top = -Infinity;
-  let bottom = target[1];
-  for (const p of players) {
-    top = Math.max(top, p.top);
-    for (const part of p.sights.parts) {
-      bottom = Math.min(bottom, part[1]);
-    }
-  }
-  return { outline: hullOf(players.flatMap((p) => p.outline)), reach: 0, top, bottom };
+): Pick<Subject, 'outline' | 'reach' | 'tops' | 'lows'> {
+  return {
+    outline: hullOf(players.flatMap((p) => p.outline)),
+    reach: 0,
+    tops: players.map((p): Vec3 => [p.sights.head[0], p.top, p.sights.head[2]]),
+    lows: [target, ...players.flatMap((p) => p.sights.parts)],
+  };
 }
 
 /**
@@ -822,8 +822,8 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     floor: [],
     outline: conductor.outline,
     reach: 0,
-    top: conductor.top,
-    bottom: conductor.body[1],
+    tops: [[head[0], conductor.top, head[2]]],
+    lows: [conductor.body],
   };
 }
 
@@ -875,8 +875,8 @@ export function conductorBackSubject(
     floor: [],
     outline: [target],
     reach: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
-    top: target[1],
-    bottom: target[1],
+    tops: [],
+    lows: [],
   };
 }
 
@@ -962,7 +962,14 @@ export function sideSubject(
     focus: target,
     outside: null,
     floor: [],
-    ...extentOf(players, target),
+    // The frame holds the heads and the hands of the players in the sphere, and it cuts the rest.
+    ...extentOf(
+      players.filter(
+        (p) =>
+          Math.hypot(p.position[0] - target[0], p.position[2] - target[2]) <= sizes.sideRadius * S,
+      ),
+      target,
+    ),
     outline: [target],
     reach: sizes.sideRadius * S,
   };
