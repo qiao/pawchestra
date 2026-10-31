@@ -179,8 +179,6 @@ describe('frameOptions', () => {
       metal: true,
       gpuOnly: false,
       keep: undefined,
-      long: false,
-      frames: undefined,
     });
   });
 
@@ -197,8 +195,6 @@ describe('frameOptions', () => {
       metal: false,
       gpuOnly: false,
       keep: 'out',
-      long: false,
-      frames: undefined,
     });
   });
 

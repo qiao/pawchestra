@@ -140,8 +140,6 @@ These rules hold for each test:
 - Run a headless Blender build or render through the same lock when another agent measures. A
   Blender job at about 500% CPU made the gates of `pnpm frame` refuse runs, and it changed a
   shot of `pnpm frozen`.
-- Queue all renders before a `pnpm frame-compare`, and none between its runs. A render in the
-  lock waits behind each run of about 5 minutes.
 - A load round measures the times of the app with `pnpm load-probe`, and the scores and the metrics
   of Lighthouse with `pnpm lighthouse`. Use the saved tool, because the Lighthouse of the
   chrome-devtools MCP server has no performance category. `--url https://www.zoophony.com/` audits
