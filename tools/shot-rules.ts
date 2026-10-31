@@ -126,6 +126,8 @@ export interface RulesOutput {
   readonly shots: Readonly<Record<string, number>>;
   /** The median and the largest elevation and height of each kind, over all demos. */
   readonly kinds: Readonly<Record<string, KindSummary>>;
+  /** True if the commit has the list of the bones of the head, so the tool counts cut heads. */
+  readonly headChecked: boolean;
 }
 
 /** The median and the largest elevation and height of the cameras of one kind of shot. */
@@ -684,7 +686,7 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
       medianWidth: median(values.widths),
     };
   }
-  return { breaks, shots, kinds: summary };
+  return { breaks, shots, kinds: summary, headChecked: headBones !== null };
 }
 
 /** The options of `pnpm shot-trace --rules`. */
@@ -757,7 +759,9 @@ export function rulesLines(
   const names = outputs.map(([name]) => name);
   const lines = [`| Rule | ${names.join(' | ')} |`, `|---|${names.map(() => '---:').join('|')}|`];
   for (const rule of GRAMMAR_RULES) {
-    const counts = outputs.map(([, o]) => o.breaks.filter((b) => b.rule === rule).length);
+    const counts = outputs.map(([, o]) =>
+      rule === 'head' && !o.headChecked ? '-' : o.breaks.filter((b) => b.rule === rule).length,
+    );
     lines.push(`| ${rule} | ${counts.join(' | ')} |`);
   }
   const shots = outputs.map(([, o]) => Object.values(o.shots).reduce((sum, n) => sum + n, 0));
