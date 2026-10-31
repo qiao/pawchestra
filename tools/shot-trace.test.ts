@@ -66,7 +66,7 @@ function shot(startSec: number, endSec: number): Shot {
     seats: [2],
     part: null,
     target: [0, 1, 0],
-    radius: 1,
+    halfHeight: 1,
     composition: null,
     from: key,
     to: key,

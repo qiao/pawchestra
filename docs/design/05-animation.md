@@ -413,7 +413,7 @@ type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo';
 interface ShotKey {
   azimuth: number;   // radians around y, from +z (the audience) to +x
   elevation: number; // radians above the stage plane
-  zoom: number;      // a factor of the fit distance, or of the wide distance
+  zoom: number;      // a factor of the frame distance, or of the wide distance
   fov: number;       // the vertical field of view, in degrees
 }
 
@@ -425,7 +425,7 @@ interface Shot {
   seats: readonly number[];
   part: readonly number[] | null; // the players of a choir part, such as the sopranos
   target: Vec3;        // the camera turns around it
-  radius: number;      // the subject sphere, or 0 for a wide or a high shot
+  halfHeight: number;  // half the frame height at the target, or 0 for a wide or a high shot
   composition: { eyes: Vec3; third: -1 | 0 | 1 } | null; // look room and headroom
   from: ShotKey;
   to: ShotKey;

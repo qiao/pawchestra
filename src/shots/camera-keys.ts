@@ -23,23 +23,27 @@ export function fitDistance(radius: number, aspect: number, fov: number): number
 }
 
 /**
- * Calculates the distance of a camera key from its target.
+ * Calculates the distance of a camera key from its target (design 5.6). A close shot stands at
+ * the distance at which its field of view shows half its frame height at the target. Thus the
+ * frame does not depend on the aspect of the view.
  *
  * @param stageSide The stage side `S`, in meters.
- * @param radius The radius of the subject, or 0 for a wide or a high shot. These use the
- *   distance of the default view.
+ * @param halfHeight Half the height of the frame of a close shot at its target, or 0 for a wide
+ *   or a high shot. These use the distance of the default view.
  * @param key The key.
  * @param aspect The width of the view divided by its height.
  * @returns The distance in meters.
  */
 export function keyDistance(
   stageSide: number,
-  radius: number,
+  halfHeight: number,
   key: ShotKey,
   aspect: number,
 ): number {
   const base =
-    radius > 0 ? fitDistance(radius, aspect, key.fov) : defaultDistance(stageSide, aspect);
+    halfHeight > 0
+      ? halfHeight / Math.tan((key.fov / 2) * MathUtils.DEG2RAD)
+      : defaultDistance(stageSide, aspect);
   return base * key.zoom;
 }
 

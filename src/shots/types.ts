@@ -4,7 +4,7 @@ import type { Vec3 } from '../models/tuples.ts';
 export type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo';
 
 /**
- * Tells if a kind of shot is a close shot, which fits its subject sphere into the frame.
+ * Tells if a kind of shot is a close shot, which fits the frame to its subject.
  *
  * @param kind The kind.
  * @returns True for a conductor, side, section, or solo shot.
@@ -20,8 +20,8 @@ export interface ShotKey {
   /** Radians above the stage plane, seen from the target. */
   readonly elevation: number;
   /**
-   * A factor of the fit distance of the shot, or of the wide distance for a radius of 0. Less
-   * than 1 is closer.
+   * A factor of the distance of the frame of the shot, or of the wide distance for a frame of 0.
+   * Less than 1 is closer.
    */
   readonly zoom: number;
   /** The vertical field of view, in degrees. */
@@ -61,10 +61,11 @@ export interface Shot {
   /** The middle of the subject. The camera turns around it at its distance. */
   readonly target: Vec3;
   /**
-   * The radius of the subject sphere, in meters. 0 for a wide or a high shot: these use the
-   * default distance of design 4.5.
+   * Half the height of the frame of a close shot at the distance of its target, at the zoom 1, in
+   * meters. The camera stands at the distance that gives this frame with its field of view. 0 for
+   * a wide or a high shot: these use the default distance of design 4.5.
    */
-  readonly radius: number;
+  readonly halfHeight: number;
   /**
    * The place of the subject in the frame, or `null` for the target in the middle: a wide, a
    * high, or an over-the-shoulder conductor shot.

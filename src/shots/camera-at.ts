@@ -77,7 +77,7 @@ function writeShotCamera(
     key.elevation = wide.elevation;
     key.zoom = wide.zoom;
   }
-  const distance = keyDistance(plan.stageSide, shot.radius, key, aspect);
+  const distance = keyDistance(plan.stageSide, shot.halfHeight, key, aspect);
   writeKeyPosition(shot.target, key.azimuth, key.elevation, distance, out);
   writeLookPoint(out, shot.target, shot.composition, key.fov, aspect, look);
   return key.fov;

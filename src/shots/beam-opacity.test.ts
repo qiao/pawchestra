@@ -162,7 +162,7 @@ describe('cameraAt and the beam (design 5.6)', () => {
   it('changes the beam at once at a hard cut from a wide shot to a close shot', () => {
     const { plan } = scene;
     const cut = plan.shots.findIndex(
-      (shot, i) => shot.blendSec === 0 && plan.shots[i - 1]?.kind === 'wide' && shot.radius > 0,
+      (shot, i) => shot.blendSec === 0 && plan.shots[i - 1]?.kind === 'wide' && shot.halfHeight > 0,
     );
     const shot = plan.shots[cut];
     if (!shot) {
@@ -176,7 +176,7 @@ describe('cameraAt and the beam (design 5.6)', () => {
     // The planner blends only between close shots, so the test gives a cut a blend of 1 s.
     const { plan } = scene;
     const cut = plan.shots.findIndex(
-      (shot, i) => plan.shots[i - 1]?.kind === 'wide' && shot.radius > 0,
+      (shot, i) => plan.shots[i - 1]?.kind === 'wide' && shot.halfHeight > 0,
     );
     const shot = plan.shots[cut];
     if (!shot) {

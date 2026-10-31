@@ -292,10 +292,10 @@ describe('the choice of the shots of prepareShots() (design 5.6)', () => {
       }
       // The first one looks over the shoulder of the bear at the orchestra (view 02), and the next
       // one shows the bear close (view 05).
-      const radius = (i: number): number => plan.shots[i]?.radius ?? 0;
-      expect(radius(first)).toBeGreaterThan(0.25 * plan.stageSide);
+      const half = (i: number): number => plan.shots[i]?.halfHeight ?? 0;
+      expect(half(first)).toBeGreaterThan(0.25 * plan.stageSide);
       if (conductor.length > 1) {
-        expect(radius(conductor[1] ?? -1)).toBeLessThan(1.5);
+        expect(half(conductor[1] ?? -1)).toBeLessThan(1.5);
       }
     },
   );
@@ -433,7 +433,7 @@ describe('the choice of the shots of prepareShots() (design 5.6)', () => {
 
   it.each(SCENES)('makes no jump cut in $file', (scene) => {
     const { plan } = scene;
-    const size = (shot: Shot): number => (isWide(shot) ? 0.7 * plan.stageSide : shot.radius);
+    const size = (shot: Shot): number => (isWide(shot) ? 0.7 * plan.stageSide : shot.halfHeight);
     for (let i = 1; i < plan.shots.length; i++) {
       const a = plan.shots[i - 1];
       const b = plan.shots[i];

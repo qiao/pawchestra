@@ -436,7 +436,7 @@ export function describeShotFrames(scenes: readonly ShotScene[]): void {
                   head[0] - shot.target[0],
                   head[1] - shot.target[1],
                   head[2] - shot.target[2],
-                ) <= shot.radius,
+                ) <= shot.halfHeight,
             );
           return shot.kind === 'solo' && principal ? [principal] : inSphere;
         };
@@ -550,7 +550,7 @@ export function describeShotFrames(scenes: readonly ShotScene[]): void {
           // The rule reads the start and the end of the move, in a desktop view.
           for (const key of [shot.from, shot.to]) {
             const position = new Vector3(
-              ...keyPosition(plan.stageSide, shot.target, shot.radius, key, 1.6),
+              ...keyPosition(plan.stageSide, shot.target, shot.halfHeight, key, 1.6),
             );
             camera.fov = key.fov;
             camera.aspect = 1.6;
@@ -620,7 +620,13 @@ export function describeShotFrames(scenes: readonly ShotScene[]): void {
           }
           for (const aspect of FRAME_RULES.aspects) {
             for (const key of [shot.from, shot.to]) {
-              const position = keyPosition(plan.stageSide, shot.target, shot.radius, key, aspect);
+              const position = keyPosition(
+                plan.stageSide,
+                shot.target,
+                shot.halfHeight,
+                key,
+                aspect,
+              );
               camera.fov = key.fov;
               camera.aspect = aspect;
               camera.position.set(...position);

@@ -25,15 +25,16 @@ describe('fitDistance (design 5.6)', () => {
 });
 
 describe('keyDistance', () => {
-  it('uses the default distance for a radius of 0, times the zoom', () => {
+  it('uses the default distance for a frame of 0, times the zoom', () => {
     const key = { azimuth: 0, elevation: 0, zoom: 0.6, fov: 30 };
     expect(keyDistance(10, 0, key, 1440 / 900)).toBeCloseTo(0.6 * 33, 9);
     expect(keyDistance(10, 0, key, 390 / 844)).toBeCloseTo(0.6 * defaultDistance(10, 390 / 844), 9);
   });
 
-  it('uses the fit distance of the radius, times the zoom', () => {
+  it('shows half the frame height at the target with the field of view, times the zoom', () => {
     const key = { azimuth: 0, elevation: 0, zoom: 0.85, fov: 26 };
-    expect(keyDistance(10, 0.95, key, 1.6)).toBeCloseTo(0.85 * fitDistance(0.95, 1.6, 26), 9);
+    expect(keyDistance(10, 0.6, key, 1.6)).toBeCloseTo((0.85 * 0.6) / Math.tan(13 * DEG), 9);
+    expect(keyDistance(10, 0.6, key, 0.46)).toBeCloseTo(keyDistance(10, 0.6, key, 2.4), 9);
   });
 });
 

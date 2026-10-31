@@ -8,7 +8,13 @@ import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';
 import { FREE_BEAM_FADE } from './beam-opacity.ts';
-import { angleDifference, keyDistance, viewAngle, writeKeyPosition } from './camera-keys.ts';
+import {
+  angleDifference,
+  fitDistance,
+  keyDistance,
+  viewAngle,
+  writeKeyPosition,
+} from './camera-keys.ts';
 import {
   CLEARANCE,
   bodyBoxes,
@@ -591,8 +597,8 @@ interface TraceSink {
 interface Framing {
   /** The point that the camera looks at. */
   readonly target: Vec3;
-  /** The radius of the subject sphere, or 0 for a wide or a high shot. */
-  readonly radius: number;
+  /** Half the height of the frame at the target, or 0 for a wide or a high shot. */
+  readonly halfHeight: number;
   /** The camera at the start of the move. */
   readonly from: ShotKey;
   /** The camera at the end of the move. */
@@ -681,7 +687,7 @@ function mixKeys(a: ShotKey, b: ShotKey, u: number): ShotKey {
  *
  * @param stageSide The stage side `S`.
  * @param target The target.
- * @param radius The radius of the subject, or 0 for a wide or a high shot.
+ * @param halfHeight Half the height of the frame at the target, or 0 for a wide or a high shot.
  * @param key The key.
  * @param aspect The aspect of the view.
  * @returns The position.
@@ -689,12 +695,12 @@ function mixKeys(a: ShotKey, b: ShotKey, u: number): ShotKey {
 export function keyPosition(
   stageSide: number,
   target: Vec3,
-  radius: number,
+  halfHeight: number,
   key: ShotKey,
   aspect: number,
 ): Vec3 {
   const out: [number, number, number] = [0, 0, 0];
-  const distance = keyDistance(stageSide, radius, key, aspect);
+  const distance = keyDistance(stageSide, halfHeight, key, aspect);
   writeKeyPosition(target, key.azimuth, key.elevation, distance, out);
   return out;
 }
@@ -713,7 +719,7 @@ type MoveRefusal = Extract<
  *
  * @param planner The planner.
  * @param target The target.
- * @param radius The radius of the subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param from The key at the start.
  * @param to The key at the end.
  * @param held The boxes of the body of the subject.
@@ -725,7 +731,7 @@ type MoveRefusal = Extract<
 function moveRefusal(
   planner: Planner,
   target: Vec3,
-  radius: number,
+  halfHeight: number,
   from: ShotKey,
   to: ShotKey,
   held: ReadonlySet<ClearBox>,
@@ -735,13 +741,13 @@ function moveRefusal(
   const aspect = CINEMA_ASPECT;
   // A camera that crosses the cone of the beam in a shot sees the beam come or go at once. The
   // camera stays on one side for the full move, with a margin.
-  const side = beamSide(S, keyPosition(S, target, radius, from, aspect));
+  const side = beamSide(S, keyPosition(S, target, halfHeight, from, aspect));
   if (side === 'edge') {
     return 'beamEdge';
   }
   // The cheap tests of all samples come first, so that a camera that fails them costs little.
   const cameras = MOVE_SAMPLES.map((u) =>
-    keyPosition(S, target, radius, mixKeys(from, to, u), aspect),
+    keyPosition(S, target, halfHeight, mixKeys(from, to, u), aspect),
   );
   for (const camera of cameras) {
     const share = Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(S, aspect);
@@ -766,7 +772,7 @@ function moveRefusal(
     }
   }
   for (const u of LINE_SAMPLES) {
-    const camera = keyPosition(S, target, radius, mixKeys(from, to, u), aspect);
+    const camera = keyPosition(S, target, halfHeight, mixKeys(from, to, u), aspect);
     if (!targetLineClear(planner.clearance, target, camera, held)) {
       return 'line';
     }
@@ -780,7 +786,7 @@ function moveRefusal(
  *
  * @param stageSide The stage side `S`.
  * @param target The target.
- * @param radius The radius of the subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param from The key at the start.
  * @param to The key at the end.
  * @returns The largest share.
@@ -788,13 +794,13 @@ function moveRefusal(
 function moveShare(
   stageSide: number,
   target: Vec3,
-  radius: number,
+  halfHeight: number,
   from: ShotKey,
   to: ShotKey,
 ): number {
   let largest = 0;
   for (const u of MOVE_SAMPLES) {
-    const camera = keyPosition(stageSide, target, radius, mixKeys(from, to, u), CINEMA_ASPECT);
+    const camera = keyPosition(stageSide, target, halfHeight, mixKeys(from, to, u), CINEMA_ASPECT);
     const share =
       Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(stageSide, CINEMA_ASPECT);
     largest = Math.max(largest, share);
@@ -808,13 +814,13 @@ function moveShare(
  *
  * @param stageSide The stage side `S`.
  * @param wide True for a wide shot, which takes the landscape rule of `cameraAt()`.
- * @param radius The radius of the subject, or 0 for a wide or a high shot.
+ * @param halfHeight Half the height of the frame at the target, or 0 for a wide or a high shot.
  * @param key The key.
  * @returns The size, in meters.
  */
-function frameSize(stageSide: number, wide: boolean, radius: number, key: ShotKey): number {
+function frameSize(stageSide: number, wide: boolean, halfHeight: number, key: ShotKey): number {
   const landscape = wide ? landscapeZoom(CINEMA_ASPECT) : 1;
-  const distance = keyDistance(stageSide, radius, key, CINEMA_ASPECT) * landscape;
+  const distance = keyDistance(stageSide, halfHeight, key, CINEMA_ASPECT) * landscape;
   return distance * Math.tan((key.fov / 2) * DEG);
 }
 
@@ -907,6 +913,7 @@ interface ComposedCamera {
  *
  * @param planner The planner.
  * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param composition The place of the subject in the frame, or `null`.
  * @param key The key.
  * @returns The camera.
@@ -914,11 +921,12 @@ interface ComposedCamera {
 function composedCamera(
   planner: Planner,
   subject: Subject,
+  halfHeight: number,
   composition: Composition | null,
   key: ShotKey,
 ): ComposedCamera {
-  const { target, radius } = subject;
-  const camera = keyPosition(planner.stageSide, target, radius, key, CINEMA_ASPECT);
+  const { target } = subject;
+  const camera = keyPosition(planner.stageSide, target, halfHeight, key, CINEMA_ASPECT);
   const look: [number, number, number] = [0, 0, 0];
   const y = writeLookPoint(camera, target, composition, key.fov, CINEMA_ASPECT, look);
   const third = composition?.third ?? 0;
@@ -931,6 +939,7 @@ function composedCamera(
  *
  * @param planner The planner.
  * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param from The key at the start.
  * @param to The key at the end.
  * @returns The composition, or `null` for a subject in the middle of the frame.
@@ -938,6 +947,7 @@ function composedCamera(
 function compositionOf(
   planner: Planner,
   subject: Subject,
+  halfHeight: number,
   from: ShotKey,
   to: ShotKey,
 ): Composition | null {
@@ -945,13 +955,7 @@ function compositionOf(
     return null;
   }
   const middle = mixKeys(from, to, 0.5);
-  const camera = keyPosition(
-    planner.stageSide,
-    subject.target,
-    subject.radius,
-    middle,
-    CINEMA_ASPECT,
-  );
+  const camera = keyPosition(planner.stageSide, subject.target, halfHeight, middle, CINEMA_ASPECT);
   const third = thirdOf(subject.facing, azimuthFrom(camera, subject.center));
   return { eyes: subject.eyes, third };
 }
@@ -962,6 +966,7 @@ function compositionOf(
  *
  * @param planner The planner.
  * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param from The key at the start.
  * @param to The key at the end.
  * @param composition The place of the subject in the frame, or `null`.
@@ -971,6 +976,7 @@ function compositionOf(
 function moveForeground(
   planner: Planner,
   subject: Subject,
+  halfHeight: number,
   from: ShotKey,
   to: ShotKey,
   composition: Composition | null,
@@ -982,14 +988,14 @@ function moveForeground(
     // The point stays out of the frame for the full move.
     for (const u of MOVE_SAMPLES) {
       const key = mixKeys(from, to, u);
-      const { camera, look } = composedCamera(planner, subject, composition, key);
+      const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
       if (inFrame(outside, camera, look, key.fov, aspect)) {
         return true;
       }
     }
   }
   for (const key of [from, to]) {
-    const { camera, look, middle } = composedCamera(planner, subject, composition, key);
+    const { camera, look, middle } = composedCamera(planner, subject, halfHeight, composition, key);
     const found =
       test === 'heads'
         ? foregroundHead(
@@ -1018,6 +1024,7 @@ function moveForeground(
  *
  * @param planner The planner.
  * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
  * @param from The key at the start.
  * @param to The key at the end.
  * @param composition The place of the subject in the frame, or `null`.
@@ -1026,13 +1033,14 @@ function moveForeground(
 function lineRefusal(
   planner: Planner,
   subject: Subject,
+  halfHeight: number,
   from: ShotKey,
   to: ShotKey,
   composition: Composition | null,
 ): 'axis' | 'look' | null {
   const master = lookSide(subject.facing, azimuthFrom(planner.master, subject.center));
   for (const key of [from, to]) {
-    const { camera, look } = composedCamera(planner, subject, composition, key);
+    const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
     if (!keepsLine(camera, look)) {
       return 'axis';
     }
@@ -1096,8 +1104,11 @@ function searchClose(
   // The band moves up with the lift of a piano shot. The wanted elevation is low (CAMERA_LOWER).
   const bottom = planner.band[0] + subject.lift;
   const top = planner.band[1] + subject.lift;
+  // The frame that holds the subject sphere, at the aspect of Cinematic mode.
+  const halfHeight =
+    fitDistance(subject.radius, CINEMA_ASPECT, move.fov) * Math.tan((move.fov / 2) * DEG);
   const fit: ShotKey = { azimuth: 0, elevation: 0, zoom: 1, fov: move.fov };
-  const distance = keyDistance(planner.stageSide, subject.radius, fit, CINEMA_ASPECT);
+  const distance = keyDistance(planner.stageSide, halfHeight, fit, CINEMA_ASPECT);
   const wanted = lowered(subject.target, distance, move.elevation);
   const sink = planner.trace;
   const kept = sink ? (sink.kept.get(moveKey) ?? new Map<number, KeptResult>()) : null;
@@ -1160,12 +1171,12 @@ function searchClose(
     }
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
-    const composition = compositionOf(planner, subject, from, to);
-    const line = lineRefusal(planner, subject, from, to, composition);
+    const composition = compositionOf(planner, subject, halfHeight, from, to);
+    const line = lineRefusal(planner, subject, halfHeight, from, to, composition);
     if (line) {
       return refuse(azimuth, elevation, arc, line);
     }
-    if (jumpCut(previous, from, frameSize(planner.stageSide, false, subject.radius, from))) {
+    if (jumpCut(previous, from, frameSize(planner.stageSide, false, halfHeight, from))) {
       return refuse(azimuth, elevation, arc, 'jump');
     }
     // N7: no repeat of the framing of the last shot of the subject.
@@ -1177,20 +1188,23 @@ function searchClose(
       const refusal: KeptRefusal | null = moveForeground(
         planner,
         subject,
+        halfHeight,
         from,
         to,
         composition,
         'heads',
       )
         ? 'head'
-        : (moveRefusal(planner, subject.target, subject.radius, from, to, held, sights) ??
-          (moveForeground(planner, subject, from, to, composition, 'objects') ? 'object' : null));
+        : (moveRefusal(planner, subject.target, halfHeight, from, to, held, sights) ??
+          (moveForeground(planner, subject, halfHeight, from, to, composition, 'objects')
+            ? 'object'
+            : null));
       clear = refusal === null;
       known.set(key, clear);
       if (kept && refusal) {
         const share =
           refusal === 'distance'
-            ? moveShare(planner.stageSide, subject.target, subject.radius, from, to)
+            ? moveShare(planner.stageSide, subject.target, halfHeight, from, to)
             : null;
         kept.set(key, { refusal, share });
         refuse(azimuth, elevation, arc, refusal, false, share);
@@ -1202,7 +1216,7 @@ function searchClose(
     search?.cameras.push({ azimuth, elevation, arc, refusal: null, kept: false, share: null });
     return {
       target: subject.target,
-      radius: subject.radius,
+      halfHeight,
       from,
       to,
       seats: subject.seats,
@@ -1304,7 +1318,7 @@ function wideFraming(planner: Planner): Framing {
     : { ...from, azimuth: from.azimuth + arcSign(planner, signOf(random)) * k.arc * DEG };
   return {
     target: DEFAULT_TARGET,
-    radius: 0,
+    halfHeight: 0,
     from,
     to,
     seats: [],
@@ -1332,7 +1346,7 @@ function openingFraming(planner: Planner): Framing {
   };
   return {
     target: DEFAULT_TARGET,
-    radius: 0,
+    halfHeight: 0,
     from,
     to,
     seats: [],
@@ -1379,7 +1393,7 @@ function highFraming(planner: Planner): Framing | null {
     };
     return {
       target,
-      radius: 0,
+      halfHeight: 0,
       from,
       to,
       seats: [],
@@ -2070,8 +2084,8 @@ function blendOf(
   const S = planner.stageSide;
   const held = new Set([...previous.held, ...next.held]);
   const shot = previous.shot;
-  const a = keyPosition(S, shot.target, shot.radius, shot.to, CINEMA_ASPECT);
-  const b = keyPosition(S, next.target, next.radius, next.from, CINEMA_ASPECT);
+  const a = keyPosition(S, shot.target, shot.halfHeight, shot.to, CINEMA_ASPECT);
+  const b = keyPosition(S, next.target, next.halfHeight, next.from, CINEMA_ASPECT);
   if (Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) >= r.nearInSides * S) {
     return 0;
   }
@@ -2148,14 +2162,14 @@ function addShot(
       seats: framing.seats,
       part: framing.part,
       target: framing.target,
-      radius: framing.radius,
+      halfHeight: framing.halfHeight,
       composition: framing.composition,
       from: framing.from,
       to: framing.to,
     },
     id: candidate.id,
     group: candidate.group,
-    size: frameSize(planner.stageSide, kind === 'wide', framing.radius, framing.to),
+    size: frameSize(planner.stageSide, kind === 'wide', framing.halfHeight, framing.to),
     motion: motionOf(framing.from, framing.to),
     held: framing.held,
   });
@@ -2462,7 +2476,7 @@ function* planShotsSteps(
     { kind: 'wide', id: 'wide', group: null },
     {
       target: DEFAULT_TARGET,
-      radius: 0,
+      halfHeight: 0,
       from: { ...to, elevation: low },
       to,
       seats: [],
