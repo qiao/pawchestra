@@ -33,6 +33,8 @@ import {
   BEAM_HEIGHT_IN_SIDES,
   BEAM_RADIUS_IN_SIDES,
   BEAM_TOP_RADIUS_IN_SIDES,
+  RIM_PLACE,
+  rimLightPlace,
 } from '../models/beam.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { TIER_SETTINGS } from './quality.ts';
@@ -69,6 +71,16 @@ describe('tilingNoise', () => {
 });
 
 /**
+ * Gives the position of the rim light of the hall on the stage axis.
+ *
+ * @param side The stage side `S`, in meters.
+ * @returns The position, in meters.
+ */
+function hallLight(side: number): Vec3 {
+  return rimLightPlace(side, RIM_PLACE);
+}
+
+/**
  * Rounds the values of a point to 1 nm, so that a test can compare it.
  *
  * @param point The values.
@@ -84,43 +96,48 @@ function rounded(point: readonly number[]): number[] {
  * stage center to the tip of the haze.
  */
 function onAxis(side: number, y: number, dx = 0, dz = 0): [number, number, number] {
-  const [tipX, height, tipZ] = hazeTip(side, [0, 0]);
+  const [tipX, height, tipZ] = hazeTip(side, [0, 0], hallLight(side));
   return [(tipX * y) / height + dx, y, (tipZ * y) / height + dz];
 }
 
 describe('beamAxes (design 2.4, 4.5)', () => {
   const side = 11.19;
   const foot = [3.9, 3.2] as const;
-  const height = hazeTip(side, foot)[1];
+  const height = hazeTip(side, foot, hallLight(side))[1];
 
   it('leans the beam from the light to its foot on the stage top', () => {
     // The foot is the axis at the stage top, and the tip stays on the line to the key light.
-    const [lightX, , lightZ] = hazeTip(side, foot);
-    expect(rounded(beamAxes(side, [3.9, 0, 3.2], foot))).toEqual([0, 0, 0]);
-    expect(rounded(beamAxes(side, [lightX, height, lightZ], foot))).toEqual(
+    const [lightX, , lightZ] = hazeTip(side, foot, hallLight(side));
+    expect(rounded(beamAxes(side, [3.9, 0, 3.2], foot, hallLight(side)))).toEqual([0, 0, 0]);
+    expect(rounded(beamAxes(side, [lightX, height, lightZ], foot, hallLight(side)))).toEqual(
       rounded([0, height, 0]),
     );
-    expect(rounded(beamAxes(side, [4.9, 0, 3.2], foot))).toEqual([1, 0, 0]);
+    expect(rounded(beamAxes(side, [4.9, 0, 3.2], foot, hallLight(side)))).toEqual([1, 0, 0]);
     // Halfway up, the axis is halfway between the foot and the light.
-    const middle = beamAxes(side, [(3.9 + lightX) / 2, height / 2, (3.2 + lightZ) / 2], foot);
+    const middle = beamAxes(
+      side,
+      [(3.9 + lightX) / 2, height / 2, (3.2 + lightZ) / 2],
+      foot,
+      hallLight(side),
+    );
     expect(rounded(middle)).toEqual(rounded([0, height / 2, 0]));
     // At the stage top, a foot at the stage center keeps the stage axes.
-    expect(beamAxes(side, [2, 0, -1], [0, 0])).toEqual([2, 0, -1]);
+    expect(beamAxes(side, [2, 0, -1], [0, 0], hallLight(side))).toEqual([2, 0, -1]);
   });
 
   it('tells a point in the leaning haze cone from a point outside it', () => {
-    expect(insideHaze(side, [3.9, 0.5, 3.2], foot)).toBe(true);
-    expect(insideHaze(side, [0, 0.5, 0])).toBe(true);
+    expect(insideHaze(side, [3.9, 0.5, 3.2], foot, hallLight(side))).toBe(true);
+    expect(insideHaze(side, [0, 0.5, 0], [0, 0], hallLight(side))).toBe(true);
     // A point 0.6 S from the axis is outside the foot of the haze (BEAM_LOOK.column).
-    expect(insideHaze(side, [3.9 + 0.6 * side, 0.5, 3.2], foot)).toBe(false);
-    expect(insideHaze(side, [0.6 * side, 0.5, 0])).toBe(false);
+    expect(insideHaze(side, [3.9 + 0.6 * side, 0.5, 3.2], foot, hallLight(side))).toBe(false);
+    expect(insideHaze(side, [0.6 * side, 0.5, 0], [0, 0], hallLight(side))).toBe(false);
   });
 });
 
 describe('hazeProfile (design 4.5)', () => {
   it('keeps the haze cone inside the light cone, from below the stage top up to the light', () => {
     const side = 11.19;
-    const height = hazeTip(side, [0, 0])[1];
+    const height = hazeTip(side, [0, 0], hallLight(side))[1];
     const [axis, bottom, top] = hazeProfile(side);
     expect(axis?.[0]).toBe(0);
     expect(axis?.[1]).toBeLessThan(0);
@@ -139,12 +156,14 @@ describe('hazeProfile (design 4.5)', () => {
 
   it('tells a point in the haze cone from a point in the light cone outside it', () => {
     const side = 11.19;
-    const top = hazeTip(side, [0, 0])[1];
-    expect(insideHaze(side, onAxis(side, 0.8 * top))).toBe(true);
-    expect(insideHaze(side, onAxis(side, 0.3 * top))).toBe(true);
-    expect(insideHaze(side, onAxis(side, 0.8 * top, 2))).toBe(false);
-    expect(insideHaze(side, onAxis(side, 0.8 * top, 0.5 * side))).toBe(false);
-    expect(insideHaze(side, [0, -0.5, 0])).toBe(false);
+    const top = hazeTip(side, [0, 0], hallLight(side))[1];
+    expect(insideHaze(side, onAxis(side, 0.8 * top), [0, 0], hallLight(side))).toBe(true);
+    expect(insideHaze(side, onAxis(side, 0.3 * top), [0, 0], hallLight(side))).toBe(true);
+    expect(insideHaze(side, onAxis(side, 0.8 * top, 2), [0, 0], hallLight(side))).toBe(false);
+    expect(insideHaze(side, onAxis(side, 0.8 * top, 0.5 * side), [0, 0], hallLight(side))).toBe(
+      false,
+    );
+    expect(insideHaze(side, [0, -0.5, 0], [0, 0], hallLight(side))).toBe(false);
   });
 });
 
@@ -175,7 +194,7 @@ function coneSides(beam: Object3D): ShaderMaterial[] {
 
 describe('createBeam (design 2.6, 4.5)', () => {
   it('gives the high tier dust motes and the most noise samples', () => {
-    const beam = createBeam(11.19, 'high', BEAM_LOOK);
+    const beam = createBeam(11.19, 'high', BEAM_LOOK, RIM_PLACE);
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     const sides = coneSides(beam);
     expect(sides.map((side) => side.side)).toEqual([BackSide, FrontSide]);
@@ -192,7 +211,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
     // 350 bright motes read as a field of stars in the column.
     expect(TIER_SETTINGS.high.motes).toBeLessThanOrEqual(150);
     expect(BEAM_LOOK.moteStrength).toBeLessThanOrEqual(1);
-    const motes = hazeParts(createBeam(11.19, 'high', BEAM_LOOK)).find(
+    const motes = hazeParts(createBeam(11.19, 'high', BEAM_LOOK, RIM_PLACE)).find(
       (child) => child instanceof Points,
     );
     if (!(motes?.material instanceof ShaderMaterial)) {
@@ -202,7 +221,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
   });
 
   it('hides the dust motes on the low tier', () => {
-    const beam = createBeam(11.19, 'low', BEAM_LOOK);
+    const beam = createBeam(11.19, 'low', BEAM_LOOK, RIM_PLACE);
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     expect(motes?.visible).toBe(false);
   });
@@ -210,7 +229,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
 
 describe('setBeamTier (design 2.6)', () => {
   it('changes the haze samples and the dust motes after the layout', () => {
-    const beam = createBeam(11.19, 'high', BEAM_LOOK);
+    const beam = createBeam(11.19, 'high', BEAM_LOOK, RIM_PLACE);
     const sides = coneSides(beam);
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     if (!motes) {
@@ -310,7 +329,7 @@ describe('BeamDepth (design 4.5)', () => {
 
 describe('setBeamFrame (design 4.5, 5.6)', () => {
   const side = 11.19;
-  const beam = createBeam(side, 'high', BEAM_LOOK);
+  const beam = createBeam(side, 'high', BEAM_LOOK, RIM_PLACE);
   const depth = new BeamDepth();
   depth.setSize(1440, 900);
   const material = (kind: typeof Mesh | typeof Points): ShaderMaterial => {
@@ -338,6 +357,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
       depth,
       foot: [0, 0],
       look: BEAM_LOOK,
+      place: RIM_PLACE,
     });
     return camera;
   };
@@ -375,6 +395,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
       depth,
       foot,
       look: BEAM_LOOK,
+      place: RIM_PLACE,
     });
 
     for (const kind of [Mesh, Points]) {
@@ -385,11 +406,11 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
     if (!cone) {
       throw new Error('The beam has no cone.');
     }
-    const height = hazeTip(side, foot)[1];
+    const height = hazeTip(side, foot, hallLight(side))[1];
     const bottom = new Vector3(0, 0, 0).applyMatrix4(cone.matrixWorld);
     const top = new Vector3(0, height, 0).applyMatrix4(cone.matrixWorld);
     expect(rounded(bottom.toArray())).toEqual([3.9, 0, 3.2]);
-    expect(rounded(top.toArray())).toEqual(rounded(hazeTip(side, foot)));
+    expect(rounded(top.toArray())).toEqual(rounded(hazeTip(side, foot, hallLight(side))));
 
     // A camera just above the foot is inside the haze cone.
     camera.position.set(3.9, 1, 3.2);
@@ -401,6 +422,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
       depth,
       foot,
       look: BEAM_LOOK,
+      place: RIM_PLACE,
     });
     expect(uniforms(Mesh)['uInside']?.value).toBe(1);
     frame(1, [0, 20, 40]);
@@ -411,7 +433,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
     frame(1, [0, 20, 40]);
     expect(uniforms(Mesh)['uInside']?.value).toBe(0);
     expect(material(Mesh).depthTest).toBe(true);
-    frame(1, onAxis(side, 0.8 * hazeTip(side, [0, 0])[1], 0.5, 0.5));
+    frame(1, onAxis(side, 0.8 * hazeTip(side, [0, 0], hallLight(side))[1], 0.5, 0.5));
     expect(uniforms(Mesh)['uInside']?.value).toBe(1);
     expect(material(Mesh).depthTest).toBe(false);
     frame(1, onAxis(side, 2, 1, 1));

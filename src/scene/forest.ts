@@ -156,6 +156,7 @@ export const FOREST_LIGHT = {
     penumbra: 0.5,
   },
   rim: { color: '#ffb866', illuminance: 6.5, angle: 16 * DEGREES, penumbra: 1 },
+  rimPlace: { distance: 2.45, elevation: 66 * DEGREES, turn: 0, count: 1, spread: 0.3 },
   beam: { color: '#ffc47a', strength: 4.5, moteStrength: 1 },
   fill: { sky: '#3a3a1c', ground: '#3a2814', intensity: 4.2 },
   conductor: {
