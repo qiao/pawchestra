@@ -2,8 +2,8 @@ import type * as Three from 'three';
 import type { Group, Scene, Vector3 } from 'three';
 
 import type { PropColors } from '../models/colors.ts';
-import type { KitReaders } from '../models/forest/kit.ts';
-import { forestParts, placeForest } from '../models/forest/kit.ts';
+import type { ForestPart, KitReaders } from '../models/forest/kit.ts';
+import { forestPartSteps, placeForest } from '../models/forest/kit.ts';
 import type { Rgb } from '../models/mesh.ts';
 import type { StageColors } from '../models/props.ts';
 import type { plankHash } from '../models/stage.ts';
@@ -554,11 +554,11 @@ function linearColors<K extends string>(
 export function forestVenue(kit: ForestKit): Venue {
   const cuts = new WeakMap<Group, ForestCut>();
   const suns = new WeakMap<Group, SunDepthUniforms>();
-  let parts: ReturnType<typeof forestParts> | null = null;
+  let parts: ForestPart[] | null = null;
   return {
     id: 'forest',
     *surroundingsSteps(stageSide) {
-      parts ??= forestParts(kit.readers);
+      parts ??= yield* forestPartSteps(kit.readers);
       yield;
       const build = yield* buildForestSteps({
         parts,
