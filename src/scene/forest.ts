@@ -78,13 +78,13 @@ export const FOREST = {
   sun: {
     elevation: 25 * DEGREES,
     glowDistance: 12.5,
-    glowHeight: 2.2,
-    glow: 6.5,
+    glowHeight: 0.6,
+    glow: 4,
   },
   /** The radius of the glow of a lantern, in meters. */
   lanternGlow: 0.5,
   /** The light of the middle of a glow, in linear values: a lantern and the sun. */
-  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [0.7, 0.45, 0.13] },
+  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [1.4, 0.95, 0.3] },
   /** The baked light of the faces (`ForestBake` of `forest-build.ts`). */
   bake: {
     sky: [0.32, 0.3, 0.14],
@@ -93,6 +93,7 @@ export const FOREST = {
     sunShade: [0.5, 9],
     canopy: { distance: [1.5, 7], height: [2, 8], shade: 0.65 },
     leafGlow: [3, 3.2, 0.8],
+    sunLeaves: { light: [3, 3.6, 0.6], power: 2 },
     key: { light: [0.45, 0.32, 0.18], direction: [-0.3, 0.7, 1] },
     deck: { light: [0.7, 0.42, 0.18], reach: 2.5 },
     lantern: { light: [1.6, 0.8, 0.25], reach: 0.9 },

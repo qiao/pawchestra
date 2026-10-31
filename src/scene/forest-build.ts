@@ -44,6 +44,12 @@ export interface ForestBake {
   };
   /** The light of the sun through a leaf that looks away from it. */
   readonly leafGlow: Rgb;
+  /**
+   * The light of the low sun on the leaves in its direction from the stage center, whichever
+   * way they look, and the power of the turn toward the sun. The leaves near the sun glow
+   * yellow-green, as in `forest.webp`.
+   */
+  readonly sunLeaves: { readonly light: Rgb; readonly power: number };
   /** The soft warm key from the front: its light, and its direction to the light. */
   readonly key: { readonly light: Rgb; readonly direction: Vec3 };
   /** The warm light of the lit deck on the parts near it, and the distance at which it halves. */
@@ -345,6 +351,7 @@ function bakeFace(
   add(b.sun, open * Math.max(0, facing));
   if (kind === FOLIAGE) {
     add(b.leafGlow, open * Math.max(0, -facing));
+    add(b.sunLeaves.light, open * sunward(input.sun, center, b.sunLeaves.power));
   }
 
   const k = b.key.direction;
@@ -381,6 +388,20 @@ function bakeFace(
 }
 
 /**
+ * Gives how far a point lies toward the sun, seen from above the stage center: the cosine of the
+ * turn between the point and the sun, at least 0, to a power.
+ *
+ * @param sun The sun.
+ * @param point The point, in meters.
+ * @param power The power.
+ * @returns The share, from 0 to 1: 1 in the direction of the sun.
+ */
+function sunward(sun: ForestSun, point: Vec3, power: number): number {
+  const angle = Math.atan2(point[0], point[2]);
+  return Math.max(0, Math.cos(angle - sun.azimuth)) ** power;
+}
+
+/**
  * Mixes a baked color toward the haze of the far forest, which glows toward the sun.
  *
  * @param input The inputs of the build.
@@ -396,8 +417,7 @@ function addHaze(input: ForestInputs, color: Rgb, center: Vec3): Rgb {
   }
 
   const amount = 1 - Math.exp(-beyond / h.reach);
-  const angle = Math.atan2(center[0], center[2]);
-  const toward = Math.max(0, Math.cos(angle - input.sun.azimuth)) ** h.power;
+  const toward = sunward(input.sun, center, h.power);
   const haze: Rgb = [
     h.away[0] + (h.toward[0] - h.away[0]) * toward,
     h.away[1] + (h.toward[1] - h.away[1]) * toward,

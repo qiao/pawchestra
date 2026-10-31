@@ -108,8 +108,10 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
 - **Baked light.** The surroundings take no light, as the hall, because a light costs GPU time
   on large surfaces. Each face gets the light of the low sun, the sky, the key, the lit deck, and
   the lanterns in its color (`FOREST.bake`). A low face far from the clearing gets less sky and
-  sun, as under a canopy. The far parts get a haze that glows toward the sun at the back right.
-  One color for each face keeps the low-poly facets.
+  sun, as under a canopy. The leaves and the far trees in the direction of the sun glow
+  yellow-green (`FOREST.bake.sunLeaves`), as the lit leaves of `forest.webp`. The far parts get a
+  haze that glows toward the sun at the back right. One color for each face keeps the low-poly
+  facets.
 - **Two meshes.** The placed copies merge into one mesh of the faces that show from the front,
   and one mesh of the leaves, which show from both sides, because the fronds and the grass
   blades are single sheets.
@@ -137,8 +139,9 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   each group holds the result, and the vertex shader drops the triangles of a dropped group.
 - **Glows.** Each lantern has a soft glow square, as the lamp glows of the hall, with no size
   limit, so that a lantern becomes a soft disc in a close shot. The lanterns give no real light,
-  because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands among the
-  trees at the back right and shines through them.
+  because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands low among
+  the trees in the direction of the rim light, at the top right of the default view, and shines
+  through them.
 - **Chunk.** The kit and the forest code load in the lazy chunk (7.2). The kit takes the byte
   readers, `srgb()`, and the corner cut of the stage as arguments, which `venue.ts` gives through
   `ForestKit`.
