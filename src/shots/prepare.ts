@@ -399,6 +399,22 @@ function defaultKey(zoom: number): ShotKey {
 }
 
 /**
+ * The aspect from which the landscape rule of design 4.5 holds its zoom: a desktop of 1440 × 900.
+ * The wide views fit the stage into the free area of such a view.
+ */
+const DESKTOP_ASPECT = 1.6;
+
+/**
+ * The vertical field of view of the wide and high shots, in degrees (design 5.6): at
+ * `CINEMA_ASPECT`, it shows the horizontal angle that {@link FIELD_OF_VIEW} shows at
+ * {@link DESKTOP_ASPECT}. Thus the stage fills a 21:9 frame as it fills the free area of a desktop
+ * view. At 30°, the low wide shots showed the stage in less than half of the width, over a band of
+ * the dark floor.
+ */
+export const WIDE_FOV =
+  (2 * Math.atan((Math.tan((FIELD_OF_VIEW / 2) * DEG) * DESKTOP_ASPECT) / CINEMA_ASPECT)) / DEG;
+
+/**
  * The camera values of each kind of shot, in degrees and factors (design 5.6). The elevations are
  * nominal: the camera stands lower ({@link CAMERA_LOWER}).
  */
@@ -407,12 +423,12 @@ const SHOT_KEYS = {
    * The push-in keeps the wide camera farther than 0.5 of the default distance, the end of the
    * beam fade of Free mode (design 4.5).
    */
-  wide: { fov: 30, pushIn: 0.92, arc: 6 },
+  wide: { fov: WIDE_FOV, pushIn: 0.92, arc: 6 },
   /**
    * View 09 of `scene.png`: the stage from the front and high in the hall, farther than the
    * default view.
    */
-  high: { fov: 30, zoom: 0.75, azimuth: [0, 12], elevation: [37, 41], arc: 8, rise: 4 },
+  high: { fov: WIDE_FOV, zoom: 0.75, azimuth: [0, 12], elevation: [37, 41], arc: 8, rise: 4 },
   /** View 05 of `scene.png`: the conductor from behind, close. */
   conductor: { fov: 26, offset: [6, 18], elevation: 8, pushIn: 0.92 },
   /** View 02 of `scene.png`: the orchestra over the shoulder of the bear, from the audience side. */
@@ -1251,7 +1267,8 @@ function arcSign(planner: Planner, seeded: number): number {
 }
 
 /**
- * Makes the framing of a wide shot: one of the four variants, with a push-in or an arc.
+ * Makes the framing of a wide shot: one of the four variants, with a push-in or an arc. The seeded
+ * variant, or the next one that makes no jump cut, or else the seeded variant.
  *
  * @param planner The planner.
  * @returns The framing.
@@ -1299,7 +1316,8 @@ function wideFraming(planner: Planner): Framing {
 
 /**
  * Makes the framing of the opening shot (design 5.6): from the default view of design 4.5, which
- * is also the view of the first screen, a crane down to the low wide view with a push-in.
+ * is also the view of the first screen, a crane down to the low wide view, with a push-in and a
+ * zoom in to {@link WIDE_FOV}.
  *
  * @returns The framing.
  */
@@ -1310,6 +1328,7 @@ function openingFraming(planner: Planner): Framing {
   const to = {
     ...defaultKey(zoom),
     elevation: lowered(DEFAULT_TARGET, distance, DEFAULT_ELEVATION),
+    fov: WIDE_FOV,
   };
   return {
     target: DEFAULT_TARGET,
@@ -1326,40 +1345,50 @@ function openingFraming(planner: Planner): Framing {
 /**
  * Makes the framing of a high shot, as view 09 of `scene.png`: a seeded azimuth of up to 12° to
  * one side and a nominal elevation of 37° to 41°, with an arc of 8° over the middle and a rise of
- * 4°.
+ * 4°. When the seeded azimuth makes a jump cut, the largest azimuth on the same side takes its
+ * place, so the arc keeps its direction.
  *
  * @param planner The planner.
- * @returns The framing.
+ * @returns The framing, or `null` when both azimuths make a jump cut.
  */
-function highFraming(planner: Planner): Framing {
+function highFraming(planner: Planner): Framing | null {
   const random = decisionRandom(planner.seed, planner.cut, 'high');
   const k = SHOT_KEYS.high;
   // The arc goes to the middle, to the other side than the azimuth.
-  const azimuth = -arcSign(planner, -signOf(random)) * between(random, k.azimuth) * DEG;
+  const side = -arcSign(planner, -signOf(random));
+  const seeded = between(random, k.azimuth);
   const target: Vec3 = [0, 0, -0.05 * planner.stageSide];
   const distance = farDistance(planner.stageSide, false, k.zoom);
   const nominal = between(random, k.elevation) * DEG;
-  const from: ShotKey = {
-    azimuth,
-    elevation: lowered(target, distance, nominal),
-    zoom: k.zoom,
-    fov: k.fov,
-  };
-  const to: ShotKey = {
-    ...from,
-    azimuth: azimuth - Math.sign(azimuth) * k.arc * DEG,
-    elevation: lowered(target, distance, nominal + k.rise * DEG),
-  };
-  return {
-    target,
-    radius: 0,
-    from,
-    to,
-    seats: [],
-    part: null,
-    held: new Set(),
-    composition: null,
-  };
+  const previous = planner.planned.at(-1);
+  for (const degrees of [seeded, k.azimuth[1]]) {
+    const azimuth = side * degrees * DEG;
+    const from: ShotKey = {
+      azimuth,
+      elevation: lowered(target, distance, nominal),
+      zoom: k.zoom,
+      fov: k.fov,
+    };
+    if (jumpCut(previous, from, frameSize(planner.stageSide, false, 0, from))) {
+      continue;
+    }
+    const to: ShotKey = {
+      ...from,
+      azimuth: azimuth - side * k.arc * DEG,
+      elevation: lowered(target, distance, nominal + k.rise * DEG),
+    };
+    return {
+      target,
+      radius: 0,
+      from,
+      to,
+      seats: [],
+      part: null,
+      held: new Set(),
+      composition: null,
+    };
+  }
+  return null;
 }
 
 /**
@@ -1449,8 +1478,12 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
   const { subjects } = planner;
   const random = decisionRandom(planner.seed, planner.cut, candidate.id);
   switch (candidate.kind) {
-    case 'wide':
-      return wideFraming(planner);
+    case 'wide': {
+      // A wide candidate whose variants all make a jump cut has no camera.
+      const framing = wideFraming(planner);
+      const size = frameSize(planner.stageSide, true, 0, framing.from);
+      return jumpCut(planner.planned.at(-1), framing.from, size) ? null : framing;
+    }
     case 'high':
       return highFraming(planner);
     case 'conductor':
