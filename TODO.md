@@ -45,31 +45,28 @@ render, and the memory.
 
 - [ ] Measure the clock target of 9.7 with the bow.
 - [ ] Measure the steps of `currentTime` in Firefox, and smooth `now()` if the bow needs it (6.7).
-- [ ] Forest scene: build the surroundings from the forest kit (round C). Replace the stub of
-      `scene/forest.ts` with the meshes of `assets/forest/` (4.1).
-- [ ] Hide or fade each forest part between the camera and the stage (`src/models/forest/kit.ts`).
-      The trees at the sides stand inside the default distance of about 16 m, so an orbit, a side
-      shot, or a high shot can look through a trunk or a crown.
-- [ ] Decide the space between the deck edge and the near trees of the forest. With 1.5 m to the
-      roots, the near trunks show only at the left and right edges of the default view. In
-      `forest.webp`, the left trunk stands nearer to the deck.
-- [ ] Check a far zoom-out of Free mode in the forest. The ground of the kit ends at 42 m with a
-      rim that rises 2.2 m, so a low far camera can see past it.
-- [ ] Tune the albedos of the forest kit with the light and the grade of the app. They match the
-      medians of `forest.webp` only under the warm sun of the Blender preview.
-- [ ] Give the forest kit the leaf clusters of `forest.webp`. The crowns are round faceted blobs,
-      the waterfall is a stack of gray rocks, and no lantern hangs from a branch.
-- [ ] Draw the `foliage` faces of the forest kit from both sides. The fronds of the ferns and the
-      blades of the grass are single sheets.
 - [ ] Share the corner code of `models/forest/kit-format.ts` with `models/studio-format.ts`. Both
       hold the same recent-vertex code, because the forest round could not change
       `studio-format.ts`.
-- [ ] Forest: the stub frame is darker at the top corners than `reference/forest.webp` (median
-      luma 20 to 25 against 35) and redder (mean RGB 99, 57, 27 against 106, 69, 31). The default
-      view shows more earth than canopy. Tune the roots `FOREST*` with `pnpm look-variants` and
-      the key `scene` (4.1).
-- [ ] Forest: `pnpm look-lab` measures a forest frame against `orchestra-latest.png`. Add the
-      regions and the reference `forest.webp` for the venue `forest`.
+- [ ] Forest: the surroundings read darker and browner than `reference/forest.webp`, which shows
+      lit yellow-green leaves and light shafts behind the deck. The default view sees bare earth
+      between the bushes behind the deck. The planks in the shade at the left measure luma about
+      64 against 81 (4.1).
+- [ ] Forest: the beam stands behind the stage center, because the forest keeps the rim places
+      of the hall (`models/beam.ts`), which the shot plan reads. In `forest.webp`, the light
+      shafts come from the back right. Give the rim place to the shot plan as an argument of the
+      venue (4.1, 5.6).
+- [ ] Forest: `pnpm look-lab` measures the regions of the forest frames against
+      `orchestra-latest.png`. Only the table "Whole frame" uses `forest.webp`. Add the forest
+      regions: the lit planks, the planks in the shade, the chairs, and the podium.
+- [ ] Forest: the room haze of the post pass gives each forest pixel the haze of the floor or the
+      far plane behind it, because the depth pass hides the surroundings (4.5). Check the near
+      trunks and the lanterns against a depth pass with the forest.
+- [ ] Forest: the cut drops the left framing tree in the default view of a phone, because its
+      bough comes near the line to a point of the stage from the high camera. Check the cut
+      cylinders of the boughs against the true leaves (4.1).
+- [ ] Forest: the water has no shimmer, and the leaves have no sway (4.1). Add them only within
+      the frame target.
 - [ ] Remove the top-level await of `src/gallery/views-main.ts`, so that the chunk merge of
       Rolldown works again (7.2). Then the forest chunk can import the modules of the first
       download, and `ForestKit` can go. Measure `pnpm size` and `pnpm load-probe` after it.
