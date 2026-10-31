@@ -1424,8 +1424,8 @@ PLACES = [
     ('tree-4', 12.2, 6.2, -60, 1.0, 0.0),
     # The low boughs from the framing trees over the top corners of the default view, and the
     # lantern on a branch of the left framing tree.
-    ('canopy-1', -6.0, -0.4, -60, 1.0, 3.6),
-    ('canopy-2', 6.1, -1.0, -120, 1.0, 3.8),
+    ('canopy-1', -6.0, -0.4, -60, 1.0, 4.1),
+    ('canopy-2', 6.1, -1.0, -120, 1.0, 4.3),
     ('lantern-branch', -6.0, -0.4, -10, 1.0, 0.0),
     # The stumps with their lanterns at the front corners, the log and the rocks in front.
     ('stump-1', -4.6, 4.3, 0, 1.0, 0.0),
