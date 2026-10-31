@@ -120,11 +120,14 @@ export const FOREST = {
   },
   /**
    * The cut of the parts between the camera and the stage (`CutRules` of `forest-build.ts`), and
-   * the points of the stage that no part may hide (`CutSamples` of `forest-cut.ts`).
+   * the points of the stage that no part may hide (`CutSamples` of `forest-cut.ts`). A cell of
+   * 2 m gave the bough of the left framing tree a cylinder 0.6 m wider than its leaves, which
+   * dropped the tree in the default view of a phone. A cell of 1.5 m keeps it, and a test of all
+   * groups takes at most 0.3 ms (`pnpm forest-cut`).
    */
   cut: {
     band: 1.5,
-    cell: 2,
+    cell: 1.5,
     low: 0.35,
     join: 0.6,
     wide: 8,

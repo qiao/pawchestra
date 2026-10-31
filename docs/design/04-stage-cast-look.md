@@ -139,7 +139,8 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   not fit, because the trees at the stage sides stand inside the default distance. The points
   are a grid over the deck at the heights of the players (`FOREST.cut`). Each placed part has one
   upright cylinder for each plan cell of each height band, so that a bough beside the deck does
-  not count as a part in front of the players. A part drops with its group, such as a tree with
+  not count as a part in front of the players. A cell holds the leaves of a bough closely, so
+  that the high camera of a phone keeps the framing trees. A part drops with its group, such as a tree with
   its bough and its lantern, and a rope drops with either of its trees. A texture of one byte for
   each group holds the result, and the vertex shader drops the triangles of a dropped group.
 - **Glows.** Each lantern has a soft glow square, as the lamp glows of the hall, with no size
