@@ -853,6 +853,11 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
       addToBands(boxes, corners, rule, true);
     }
     groupBands[copy.group]?.push(...bandsOf(boxes));
+    work += copy.part.kinds.length;
+    if (work > 6000) {
+      work = 0;
+      yield;
+    }
   }
   yield;
 
