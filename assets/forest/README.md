@@ -21,15 +21,14 @@ update the size and the SHA-256 below.
 
 | Item | Value |
 |---|---|
-| Size | 416,700 bytes |
-| SHA-256 | `e4fe1021ada9373fdb3ced056a3b48e88dd8255409a8a46dd16c816504f7ff42` |
+| Size | 402,996 bytes |
+| SHA-256 | `64a567c0a0a6af14a254f5e54e9808d73cc8d788e511e2d9710b765cadcd2676` |
 | Origin | Own work of the project. The script makes each point itself from one seed. It imports, downloads, and generates no model |
 | License | Apache License 2.0, as the project (`../../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
 | Writer | Blender 5.2.2 LTS, Khronos glTF Blender I/O v5.2.40 |
-| Contents | 27 mesh nodes, one for each part, at the origin. One empty for each place, with the part name in the property `part`. One empty for each rope end, as a child of the empty of its tree. The empty `stage` with the stage side of the places in the property `side` |
+| Contents | 26 mesh nodes, one for each part, at the origin. One empty for each place, with the part name in the property `part`. One empty for each rope end, as a child of the empty of its tree. The empty `stage` with the stage side of the places in the property `side` |
 | Faces | One color for each face in the color attribute `COLOR_0`, and one material for each kind of face: `matte`, `glow`, `water`, and `foliage`. No normal, no texture coordinate, and no texture |
 
 The axes are those of the app: one unit is one meter, y is up, and the audience is at +z. The
 origin of a part is on the ground, except for the hanging lantern, whose origin is the top of its
-ring. The origin of the lantern on a branch is on the axis of its tree, so that the app cuts it
-with its tree.
+ring.

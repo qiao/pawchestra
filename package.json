@@ -45,7 +45,6 @@
     "mesh-options": "node tools/mesh-options.ts",
     "studio-body": "node tools/studio-body.ts",
     "forest-kit": "node tools/forest-kit/forest-kit.ts",
-    "forest-cut": "node tools/forest-cut.ts",
     "view-point": "node tools/view-point.ts",
     "close-views": "sh -c 'node tools/close-views.ts --check \"$@\" && pnpm build && node tools/close-views.ts \"$@\"' close-views",
     "fold-probe": "node tools/fold-probe.ts",

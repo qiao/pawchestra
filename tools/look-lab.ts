@@ -10,10 +10,8 @@
  * Usage: `pnpm look-lab <dir> [--base <ref>] [--url <url>] [--scene <id>] [--measure]`
  *
  * - `--base <ref>` also renders a commit (the frames `play-base-*.png`), as `pnpm close-views`.
- * - `--scene <id>` renders the stage in a venue (design 4.1), such as `forest`. The region
- *   measures still compare each frame with the reference of the hall. The table "Whole frame"
- *   compares each frame with the reference of the venue ({@link VENUE_REFERENCES}): the mean
- *   color and the median luma of each cell of a 3 by 3 grid.
+ * - `--scene <id>` renders the stage in a venue (design 4.1), such as `forest`. The measures
+ *   still compare each frame with the reference of the hall.
  * - `--url <url>` renders a running site, such as the dev server of `pnpm look-variants` with a
  *   look override (`src/app/look-override.ts`). It builds no site.
  * - `--measure` renders nothing, and measures the frames that `<dir>` holds.
@@ -29,7 +27,6 @@ import { DEFAULT_DEMO } from '../src/app/demos.ts';
 import type { DemoId } from '../src/app/demos.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
-import type { VenueId } from '../src/scene/venue-id.ts';
 import { scoreOf } from '../src/score/test-score.ts';
 import { defaultRegions } from './look-regions.ts';
 import type { DefaultRegion } from './look-regions.ts';
@@ -175,56 +172,6 @@ export const LOOK_TIME_SEC = 33.5;
 
 /** The reference image of the look. */
 const REFERENCE = 'docs/reference/orchestra-latest.png';
-
-/** The reference image of the whole frame of the default view in each venue (design 4.1). */
-export const VENUE_REFERENCES: Readonly<Record<VenueId, string>> = {
-  hall: REFERENCE,
-  forest: 'docs/reference/forest.webp',
-};
-
-/**
- * Gives the measures of a whole frame in one row: the mean sRGB color, and the median luma of
- * each cell of a 3 by 3 grid, row by row from the top. A frame and a reference of other sizes
- * compare, because the cells are shares of the frame.
- *
- * @param frame The frame or the reference.
- * @returns The columns.
- */
-export function frameSummary(frame: LookFrame): SummaryRow {
-  const { width, rgba } = frame.image;
-  const height = frame.height;
-  const sum = [0, 0, 0];
-  const cells: number[][] = Array.from({ length: 9 }, () => []);
-  for (let y = 0; y < height; y++) {
-    const row = Math.min(2, Math.floor((3 * y) / height));
-    for (let x = 0; x < width; x++) {
-      const i = (y * width + x) * 4;
-      const r = rgba[i] ?? 0;
-      const g = rgba[i + 1] ?? 0;
-      const b = rgba[i + 2] ?? 0;
-      sum[0] = (sum[0] ?? 0) + r;
-      sum[1] = (sum[1] ?? 0) + g;
-      sum[2] = (sum[2] ?? 0) + b;
-      cells[row * 3 + Math.min(2, Math.floor((3 * x) / width))]?.push(luma(r, g, b));
-    }
-  }
-  const count = width * height;
-  const median = (values: readonly number[]): string => {
-    const sorted = values.toSorted((a, b) => a - b);
-    return (sorted[Math.floor(sorted.length / 2)] ?? 0).toFixed(0);
-  };
-  const row = (k: number): string =>
-    cells
-      .slice(k * 3, k * 3 + 3)
-      .map(median)
-      .join(' ');
-  return [
-    ['mean RGB', sum.map((v) => (v / count).toFixed(0)).join('/')],
-    ['luma top', row(0)],
-    ['luma middle', row(1)],
-    ['luma bottom', row(2)],
-  ];
-}
 
 /** The luma of an sRGB color, from 0 to 255. */
 function luma(r: number, g: number, b: number): number {
@@ -951,22 +898,6 @@ export async function readLookFrames(
   return frames;
 }
 
-/**
- * Makes a Markdown table of summary rows, one row for each label.
- *
- * @param rows The label and the columns of each row.
- * @returns The table.
- */
-export function rowsTable(rows: readonly (readonly [label: string, row: SummaryRow])[]): string {
-  const names = rows[0]?.[1].map(([name]) => name) ?? [];
-  const lines = [
-    `| frame | ${names.join(' | ')} |`,
-    `|${' --- |'.repeat(names.length + 1)}`,
-    ...rows.map(([label, row]) => `| ${label} | ${row.map(([, text]) => text).join(' | ')} |`),
-  ];
-  return `${lines.join('\n')}\n`;
-}
-
 const USAGE = 'Usage: pnpm look-lab <dir> [--base <ref>] [--url <url>] [--scene <id>] [--measure]';
 
 /**
@@ -1000,20 +931,7 @@ async function main(): Promise<void> {
     if (tree) {
       await writeRegionsImage(browser, tree, regions, join(dir, 'regions-default.png'));
     }
-    const scene = passed[passed.indexOf('--scene') + 1];
-    const venue: VenueId = passed.includes('--scene') && scene === 'forest' ? 'forest' : 'hall';
-    const whole = VENUE_REFERENCES[venue];
-    const wholeRows: [string, SummaryRow][] = [
-      [
-        'reference',
-        frameSummary(await readFrame(browser, join(ROOT, whole), 'reference', null, null)),
-      ],
-      ...frames
-        .filter((frame) => frame.camera === 'default')
-        .map((frame): [string, SummaryRow] => [frame.label, frameSummary(frame)]),
-    ];
-    const wholeTable = `## Whole frame against \`${whole}\`\n\n${rowsTable(wholeRows)}`;
-    const text = `# Look lab\n\nThe frames of \`${dir}\` against \`${REFERENCE}\`.\n\n${lookTables(frames, regions)}\n${wholeTable}`;
+    const text = `# Look lab\n\nThe frames of \`${dir}\` against \`${REFERENCE}\`.\n\n${lookTables(frames, regions)}`;
     await writeFile(join(dir, 'look.md'), text);
     console.log(text);
   } finally {

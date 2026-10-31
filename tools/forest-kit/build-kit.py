@@ -68,8 +68,6 @@ PALETTE = {
     'bark-dark': '#47321f',
     'bark-light': '#77573b',
     'bark-moss': '#4f5528',
-    'log-bark': '#6e4428',
-    'log-bark-dark': '#563420',
     'wood-cut': '#c98f55',
     'wood-ring': '#9a6436',
     'leaf-light': '#909c33',
@@ -90,9 +88,9 @@ PALETTE = {
     'litter': '#6f4a2a',
     'path': '#9c7650',
     'path-light': '#ab8660',
-    'water': '#3e4a44',
-    'water-light': '#a9b8b2',
-    'foam': '#f0f2ec',
+    'water': '#5a5444',
+    'water-light': '#9a9a8a',
+    'foam': '#e0e2da',
     'iron': '#2e2925',
     'iron-light': '#4a423a',
     'glass': '#ffb85c',
@@ -441,42 +439,20 @@ def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
 
 
 def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
-    """Adds leaf clusters around the centers of a crown.
-
-    With `detail='ico'`, each cluster is two flat pads of few faces: a wide upper pad and a
-    smaller, darker pad below it and to one side, so that the crown shows layers of leaves, as in
-    the reference. Two pads of the `'low'` sphere have about the triangles of one icosphere. With
-    `detail='low'`, each cluster is one blob, for the far trees.
-    """
+    """Adds leaf blobs around the centers of a crown."""
     rng = part.rng
     for i in range(count):
         c = Vector(centers[i % len(centers)])
         offset = Vector((rng.uniform(-1, 1), rng.uniform(-0.5, 0.6), rng.uniform(-1, 1)))
         c = c + offset * size * 0.8
         r = size * rng.uniform(0.7, 1.1)
-        if detail == 'low':
-            radii = (
-                r * rng.uniform(0.9, 1.15),
-                r * flat * rng.uniform(0.85, 1.1),
-                r * rng.uniform(0.9, 1.15),
-            )
-            points, faces = blob(rng, c, radii, detail, 0.14)
-            part.add(points, faces, leaf_paint(rng, light), lambda _, c=c: c)
-            continue
-        a = rng.uniform(0, 2 * math.pi)
-        side = Vector((math.cos(a), 0.0, math.sin(a)))
-        pads = (
-            (c + Vector((0.0, r * 0.2, 0.0)), (1.1, 0.5 * flat / 0.75, 1.1), light),
-            (c + side * (r * 0.55) - Vector((0.0, r * 0.3, 0.0)), (0.8, 0.4, 0.8), light - 0.2),
+        radii = (
+            r * rng.uniform(0.9, 1.15),
+            r * flat * rng.uniform(0.85, 1.1),
+            r * rng.uniform(0.9, 1.15),
         )
-        for center, (sx, sy, sz), shade in pads:
-            radii = (
-                r * sx * rng.uniform(0.85, 1.15),
-                r * sy * rng.uniform(0.8, 1.15),
-                r * sz * rng.uniform(0.85, 1.15),
-            )
-            points, faces = blob(rng, center, radii, 'low', 0.22)
-            part.add(points, faces, leaf_paint(rng, shade), lambda _, c=center: c)
+        points, faces = blob(rng, c, radii, detail, 0.14)
+        part.add(points, faces, leaf_paint(rng, light), lambda _, c=c: c)
 
 
 def trunk(part, spec):
@@ -816,17 +792,11 @@ def build_log(name, spec):
         points += [p + Vector((0.0, rng.uniform(-0.02, 0.02), 0.0)) * (0 < i < 4) for p in pts]
         centers.append(c)
     faces = rings_faces(len(xs), sides)
-    # Each side of the log keeps one warm bark color along its length, as the ridges of bark. A
-    # random color for each face made large blocks, like a checker. The top side holds moss.
-    strips = [
-        pick(rng, [('log-bark', 3), ('log-bark-dark', 2), ('bark-light', 1)]) for _ in range(sides)
-    ]
 
     def paint(normal, center):
-        if normal.y > 0.95 and center.x > length * 0.2:
-            return linear('bark-moss'), 'matte'
-        side = round(math.atan2(normal.y, normal.z) / (2 * math.pi) * sides) % sides
-        return linear(strips[side]), 'matte'
+        if normal.y > 0.6 and rng.random() < 0.4:
+            return linear('moss'), 'matte'
+        return linear(pick(rng, [('bark', 3), ('bark-dark', 2), ('bark-light', 1)])), 'matte'
 
     part.add(points, faces, paint, lambda c: min(centers, key=lambda k: abs(k.x - c.x)))
     first, last = points[:sides], points[-sides:]
@@ -994,44 +964,6 @@ def build_lantern_hanging():
     return part
 
 
-def build_lantern_branch():
-    """Builds a lantern that hangs from a short branch of a tree.
-
-    Its origin is on the axis of the trunk, on the ground, so that the cut of the app keeps it
-    with its tree. The branch leaves the trunk toward +x and holds a hook and a hanging lantern.
-    """
-    part = Part('lantern-branch')
-    spec = LANTERN
-    height, reach = 3.25, 1.15
-    branch(
-        part, (0.25, height - 0.35, 0.0), (reach + 0.15, height + 0.1, 0.0), 0.09, 0.035, bend=0.12
-    )
-    hook = Vector((reach, height + 0.02, 0.0))
-    box(part, hook - Vector((0.008, 0.16, 0.008)), hook + Vector((0.008, 0.0, 0.008)), 'iron')
-    lantern = Part('lantern-branch-body')
-    top = lantern_body(lantern, 0.0, spec)
-    torus(lantern, (0.0, top + spec['ring'], 0.0), spec['ring'], 0.008, 8, 4, 'iron')
-    lift = top + spec['ring'] * 2 + 0.008
-    lantern.bm.verts.ensure_lookup_table()
-    drop = hook.y - 0.16 - lift
-    moved = [app_point(v.co) + Vector((hook.x, drop, hook.z)) for v in lantern.bm.verts]
-    for v, p in zip(lantern.bm.verts, moved):
-        v.co = blender_point(p)
-    copy_faces(lantern, part)
-    lantern.bm.free()
-    return part
-
-
-def copy_faces(source, target):
-    """Copies the faces of one part into another, with their colors and their kinds."""
-    verts = {v: target.bm.verts.new(v.co) for v in source.bm.verts}
-    for f in source.bm.faces:
-        g = target.bm.faces.new([verts[v] for v in f.verts])
-        g.material_index = f.material_index
-        for a, b in zip(f.loops, g.loops):
-            b[target.color] = a[source.color]
-
-
 def build_lantern_standing():
     """Builds the standing lantern, with a wider foot and a ring handle on its roof."""
     part = Part('lantern-standing')
@@ -1183,7 +1115,7 @@ def build_stream():
 
     steps = [(1.7, -1.6), (0.85, -0.8)]
     for height, z in steps:
-        for x in (-1.25, -0.65, 0.65, 1.25):
+        for x in (-1.15, -0.55, 0.55, 1.15):
             rock(
                 (x * rng.uniform(0.9, 1.1), height * 0.5, z + rng.uniform(-0.15, 0.15)),
                 (0.55, height * 0.55, 0.6),
@@ -1197,52 +1129,23 @@ def build_stream():
             Vector((-0.45, height, z - 0.6)),
         ]
         part.add(lip, [(0, 1, 2, 3)], water('water'), 'up')
-        # The falling water: a sheet of columns with a small wave, water at the top and white
-        # foam in streaks and at the foot.
-        drop = height - (0.85 if height > 1 else 0.02)
-        columns, rows = 4, 4
         sheet = []
-        for i in range(rows + 1):
-            t = i / rows
+        drop = height - (0.85 if height > 1 else 0.02)
+        for i in range(4):
+            t = i / 3
             y = height - drop * t
-            half = 0.4 + 0.1 * t
-            for k in range(columns + 1):
-                u = k / columns
-                wave = 0.06 * math.sin(u * 7.0 + t * 3.0)
-                zz = z + 0.32 + 0.28 * math.sin(t * 1.4) + wave
-                sheet.append(Vector((-half + 2 * half * u, y, zz)))
-        faces = [
-            (
-                i * (columns + 1) + k,
-                i * (columns + 1) + k + 1,
-                (i + 1) * (columns + 1) + k + 1,
-                (i + 1) * (columns + 1) + k,
-            )
-            for i in range(rows)
-            for k in range(columns)
-        ]
-        streaks = [rng.random() < 0.45 for _ in range(columns)]
-
-        def fall_paint(normal, center, streaks=streaks, height=height, drop=drop, z=z):
-            t = (height - center.y) / max(drop, 1e-3)
-            column = min(columns - 1, max(0, int((center.x + 0.5) / 1.0 * columns)))
-            foam = t > 0.55 or (streaks[column] and t > 0.15)
-            return linear('foam' if foam else 'water-light'), 'water'
-
-        part.add(sheet, faces, fall_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
-        # The foam pool at the foot of the fall.
-        foot = height - drop
-        pool_center = Vector((0.0, foot + 0.035, z + 0.75))
-        pool = [pool_center]
-        for k in range(9):
-            a = 2 * math.pi * k / 9
-            rr = rng.uniform(0.45, 0.65)
-            pool.append(pool_center + Vector((rr * 1.3 * math.cos(a), 0.0, rr * math.sin(a))))
+            zz = z + 0.3 + 0.25 * math.sin(t * 1.4)
+            half = 0.38 + 0.08 * t
+            sheet += [Vector((-half, y, zz)), Vector((half, y, zz))]
+        faces = [(2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2) for i in range(3)]
         part.add(
-            pool,
-            [(0, 1 + (k + 1) % 9, 1 + k) for k in range(9)],
-            lambda n, c: (linear(pick(rng, [('foam', 3), ('water-light', 1)])), 'water'),
-            'up',
+            sheet,
+            faces,
+            lambda n, c: (
+                linear('foam' if c.y < 0.25 or rng.random() < 0.35 else 'water-light'),
+                'water',
+            ),
+            lambda c: c + Vector((0.0, 0.0, -1.0)),
         )
     course = STREAM_COURSE
     left, right = [], []
@@ -1370,7 +1273,6 @@ def build_parts(collection):
         build_stump('stump-2', {'height': 0.45, 'radius': 0.34}),
         build_lantern_hanging(),
         build_lantern_standing(),
-        build_lantern_branch(),
         build_ground(),
         build_path(),
         build_stream(),
@@ -1384,19 +1286,10 @@ CUT = STAGE_CORNER_CUT * STAGE_SIDE
 
 #: The most triangles of all placed parts around the stage of the default demo, with the lanterns
 #: of the light string.
-TRIANGLE_BUDGET = 50000
+TRIANGLE_BUDGET = 40000
 
 #: The least space between the deck edge and the trunk with its roots, in meters.
 TREE_CLEARANCE = 1.5
-
-#: The least space between the deck edge and the roots of the two framing trees, in meters. The
-#: default view stands close to the deck, so a trunk with 1.5 m of space showed only at the frame
-#: edges. With this space, the trunks frame the left and the right of the view, as in the
-#: reference, and the players at the deck edge keep a free side.
-FRAME_CLEARANCE = 0.4
-
-#: The indices in `PLACES` of the two framing trees.
-FRAME_TREES = (0, 1)
 
 #: The least space between the deck edge and a low part of the scatter, in meters, so that no
 #: frond or leaf comes over the deck.
@@ -1409,8 +1302,8 @@ LOW_CLEARANCE = 0.05
 PLACES = [
     # The large trees. The near trees beside the front half of the deck frame the default view,
     # the trees behind the deck hold the light string, and the others stand around the stage.
-    ('tree-1', -6.0, -0.4, 0, 1.0, 0.0),
-    ('tree-2', 6.1, -1.0, 0, 1.0, 0.0),
+    ('tree-1', -6.7, -1.0, 0, 1.0, 0.0),
+    ('tree-2', 6.65, -0.5, 0, 1.0, 0.0),
     ('tree-3', -6.3, -6.5, 0, 0.95, 0.0),
     ('tree-2', -1.3, -6.9, 0, 0.9, 0.0),
     ('tree-4', 4.2, -7.0, 0, 1.0, 0.0),
@@ -1422,11 +1315,9 @@ PLACES = [
     ('tree-3', -12.0, -8.6, -20, 1.0, 0.0),
     ('tree-1', -11.4, 5.4, 60, 0.95, 0.0),
     ('tree-4', 12.2, 6.2, -60, 1.0, 0.0),
-    # The low boughs from the framing trees over the top corners of the default view, and the
-    # lantern on a branch of the left framing tree.
-    ('canopy-1', -6.0, -0.4, -70, 1.0, 4.4),
-    ('canopy-2', 6.1, -1.0, -120, 1.0, 4.3),
-    ('lantern-branch', -6.0, -0.4, -10, 1.0, 0.0),
+    # The low boughs from the near trees over the top corners of the default view.
+    ('canopy-1', -6.4, -0.8, -60, 1.0, 4.4),
+    ('canopy-2', 6.35, -0.3, -120, 1.0, 4.6),
     # The stumps with their lanterns at the front corners, the log and the rocks in front.
     ('stump-1', -4.6, 4.3, 0, 1.0, 0.0),
     ('lantern-standing', -4.6, 4.3, 15, 1.0, 0.55),
@@ -1447,15 +1338,13 @@ PLACES = [
 ]
 
 #: The ropes of the light string: the two trees (indices in `PLACES`), the height of each end
-#: above the ground, the slack, and the lantern count. The ropes from the framing trees to the
-#: trees behind the deck hold the sides of the string. The default view sees nothing above about
-#: 2 m behind the deck, so the rope between the framing trees crosses the top of the view.
+#: above the ground, the slack, and the lantern count. The ropes behind the deck hang low, so that
+#: they cross the top of the default view.
 ROPES = [
-    (0, 2, 3.8, 3.2, 0.02, 3),
-    (2, 3, 3.2, 3.0, 0.02, 2),
-    (3, 4, 3.0, 3.1, 0.02, 2),
-    (4, 1, 3.1, 3.8, 0.02, 3),
-    (0, 1, 3.7, 3.7, 0.012, 4),
+    (0, 2, 4.2, 3.4, 0.02, 3),
+    (2, 3, 3.4, 3.1, 0.02, 2),
+    (3, 4, 3.1, 3.3, 0.02, 2),
+    (4, 1, 3.3, 4.2, 0.02, 3),
 ]
 
 
@@ -1548,11 +1437,11 @@ def scatter(rng, objects, footprints):
     bush stands in the opening in front of the stage.
     """
     places = []
-    for i, (part, x, z, yaw, scale, lift) in enumerate(PLACES):
+    for part, x, z, yaw, scale, lift in PLACES:
         if part in TALL_PARTS:
             yaw = facing_yaw(x, z) + yaw
             space = clearance(objects[part], x, z, yaw, scale)
-            if space < (FRAME_CLEARANCE if i in FRAME_TREES else TREE_CLEARANCE):
+            if space < TREE_CLEARANCE:
                 raise ValueError(f'{part} at ({x}, {z}) stands {space:.2f} m from the deck edge.')
         places.append((part, x, z, round(yaw, 1), scale, lift))
     water = stream_course(places)
@@ -1609,12 +1498,10 @@ def scatter(rng, objects, footprints):
             place(name, x, z, scale, yaw)
             count -= 1
 
-    def clusters(choices, count, size, near, far, scales, back=False):
+    def clusters(choices, count, size, near, far, scales):
         for _ in range(count):
             point = ring_point(near, far)
             if not point or in_front_opening(*point) or in_front_view(point[0], point[1], 1.2):
-                continue
-            if back and point[1] > -HALF:
                 continue
             for k in range(size):
                 a = rng.uniform(0, 2 * math.pi)
@@ -1639,17 +1526,6 @@ def scatter(rng, objects, footprints):
         0.6,
         4.5,
         (0.7, 1.15),
-    )
-    # The undergrowth behind the deck: the default view sees the ground there up to about 12 m
-    # behind the deck, below the crowns.
-    clusters(
-        [('bush-2', 3), ('bush-1', 1), ('fern-1', 2), ('fern-2', 3)],
-        40,
-        4,
-        4.5,
-        12.0,
-        (0.8, 1.3),
-        back=True,
     )
     fill([('fern-1', 1), ('fern-2', 1)], 24, 0.2, 5.0, (0.8, 1.25), 0.0)
     fill([('rock-2', 1), ('rock-3', 2)], 14, 0.6, 8.0, (0.7, 1.3), 0.0)

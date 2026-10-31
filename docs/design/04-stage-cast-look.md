@@ -41,9 +41,11 @@ light, the stage finish, the prop colors, and the post effects. The setting "Sce
 
 - `hall`: the concert hall above, and the default (`HALL_VENUE` of `scene/venue.ts`). Its values
   are the constants of 4.5.
-- `forest`: a forest clearing, as `reference/forest.webp` (`scene/forest.ts`), from the kit of
-  `assets/forest/` (below). It has a lighter and matte stage wood, dark wood chairs, a golden rim
-  light and beam, and a warm grade.
+- `forest`: a forest clearing, as `reference/forest.webp` (`scene/forest.ts`). The current forest
+  is a stub: a disc of earth, a ring of faceted trees with a gap in front of the default camera,
+  lanterns, a far forest that glows toward a low sun at the back right, a lighter and matte stage
+  wood, dark wood chairs, a golden rim light and beam, and a warm grade. A later round builds it
+  from the kit of `assets/forest/`.
 
 ```text
  setting "Scene" ──┐          hash "#demo=...&scene=forest"
@@ -90,65 +92,6 @@ export interface Venue {
 - **Look override.** The roots `FOREST`, `FOREST_LIGHT`, `FOREST_STAGE`, `FOREST_PROPS`, and
   `FOREST_POST` of `LOOK_ROOTS` hold the values of the forest, so that `pnpm look-variants` (key
   `scene`) tunes them. The hall keeps its roots.
-
-**Forest**
-
-The forest draws each part of the kit (`models/forest/kit.ts`) at its place around the stage,
-with rings of far trees, a backdrop of tree tops, and a far ground (`scene/forest-build.ts`,
-`FOREST`).
-
-- **Baked light.** The surroundings take no light, as the hall, because a light costs GPU time
-  on large surfaces. Each face gets the light of the low sun, the sky, the key, the lit deck, and
-  the lanterns in its color (`FOREST.bake`). A low face far from the clearing gets less sky and
-  sun, as under a canopy. The far parts get a haze that glows toward the sun at the back right.
-  One color for each face keeps the low-poly facets.
-- **Two meshes.** The placed copies merge into one mesh of the faces that show from the front,
-  and one mesh of the leaves, which show from both sides, because the fronds and the grass
-  blades are single sheets.
-- **Framing.** The default view stands close to the deck. Thus the two framing trees stand
-  `FRAME_CLEARANCE` from the deck edge with their roots (`tools/forest-kit/build-kit.py`), and
-  their low boughs fill the top corners. The other trees keep `TREE_CLEARANCE`. The default view
-  sees nothing above about 2 m behind the deck, so one rope of the light string hangs between the
-  framing trees across the top of the view. Bushes and ferns fill the ground behind the deck.
-- **Far forest.** Rings of far trees and a backdrop ring hide the edge of the ground from each
-  camera of the orbit, also at the largest distance (`FOREST.far`).
-- **Cut.** A part drops when the line from the camera to a point of the stage passes through it,
-  or when the camera stands inside it (`scene/forest-cut.ts`). The ring cutaway of the hall did
-  not fit, because the trees at the stage sides stand inside the default distance. The points
-  are a grid over the deck at the heights of the players (`FOREST.cut`). Each placed part has one
-  upright cylinder for each plan cell of each height band, so that a bough beside the deck does
-  not count as a part in front of the players. A part drops with its group, such as a tree with
-  its bough and its lantern, and a rope drops with either of its trees. A texture of one byte for
-  each group holds the result, and the vertex shader drops the triangles of a dropped group.
-- **Glows.** Each lantern has a soft glow square, as the lamp glows of the hall, with no size
-  limit, so that a lantern becomes a soft disc in a close shot. The lanterns give no real light,
-  because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands among the
-  trees at the back right and shines through them.
-- **Chunk.** The kit and the forest code load in the lazy chunk (7.2). The kit takes the byte
-  readers, `srgb()`, and the corner cut of the stage as arguments, which `venue.ts` gives through
-  `ForestKit`.
-
-```text
- camera ●
-         \      line from the camera to a point of the stage
-      ┌───\───┐
-      │    \  │  cylinder of one cell of a part: the line passes through it,
-      └─────\─┘  so the group of the part drops for this camera
-             \
- deck ────────●────────  point of the grid, at the height of a player
-```
-
-```typescript
-/** One cut group of the forest (`scene/forest-build.ts`). */
-interface CutGroup {
-  /** The cylinders of the parts: bottom, top, x, z, and radius, in meters. */
-  readonly bands: readonly CutBand[];
-  /** One cylinder around all bands, for a fast first test. */
-  readonly bounds: CutBand | null;
-  /** For a rope: the groups of its two trees. */
-  readonly ends: readonly [number, number] | null;
-}
-```
 
 ## 4.2 Layout
 

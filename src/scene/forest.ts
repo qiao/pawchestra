@@ -1,26 +1,24 @@
 import type * as Three from 'three';
-import type { Group, Scene, Vector3 } from 'three';
+import type { Group, Mesh, Scene, Vector3 } from 'three';
 
 import type { PropColors } from '../models/colors.ts';
-import type { KitReaders } from '../models/forest/kit.ts';
-import { forestParts, placeForest } from '../models/forest/kit.ts';
-import type { Rgb } from '../models/mesh.ts';
+import type { Rgb, srgb } from '../models/mesh.ts';
 import type { StageColors } from '../models/props.ts';
 import type { plankHash } from '../models/stage.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { buildForestSteps, sunDirection } from './forest-build.ts';
-import type { CutGroup, ForestArrays, ForestBuild, ForestLamp } from './forest-build.ts';
-import {
-  FOREST_FRAGMENT,
-  FOREST_VERTEX,
-  GLOW_FRAGMENT,
-  GLOW_VERTEX,
-  cutPoints,
-  keepGroups,
-} from './forest-cut.ts';
 import type { VenueLight } from './lights.ts';
 import type { VenuePost } from './post.ts';
 import type { StageFinish, SideGlow } from './stage.ts';
+import type {
+  Lamp,
+  TriangleList,
+  addLamp,
+  bakedGeometry,
+  createGlows,
+  cutawayMaterial,
+  ringCutaway,
+  setCutaway,
+} from './surroundings.ts';
 import type { Venue } from './venue.ts';
 
 /**
@@ -30,104 +28,119 @@ import type { Venue } from './venue.ts';
  * level await of `gallery/views-main.ts` turns off the chunk merge of Rolldown.
  */
 export interface ForestKit {
-  /** The classes and the constants of three.js. */
+  /** The classes of three.js. */
   readonly three: Pick<
     typeof Three,
-    | 'AdditiveBlending'
     | 'BackSide'
     | 'BoxGeometry'
     | 'BufferAttribute'
     | 'BufferGeometry'
     | 'Color'
-    | 'DataTexture'
-    | 'DoubleSide'
     | 'Group'
     | 'Mesh'
     | 'MeshBasicMaterial'
-    | 'RedFormat'
     | 'Scene'
-    | 'ShaderMaterial'
     | 'SphereGeometry'
   >;
-  /** The byte readers of `models/packed-bytes.ts` and `srgb()` of `models/mesh.ts`. */
-  readonly readers: KitReaders;
-  /** `plankHash()` of `models/stage.ts`: the seeded numbers of the far trees. */
+  /** `srgb()` of `models/mesh.ts`. */
+  readonly srgb: typeof srgb;
+  /** `plankHash()` of `models/stage.ts`: the seeded numbers of the trees. */
   readonly plankHash: typeof plankHash;
   /** The height of the floor around the stage, in meters: `-STAGE_THICKNESS`. */
   readonly floorY: number;
-  /** The corner cut of the stage, as a part of its side: `STAGE_CORNER_CUT`. */
-  readonly cornerCut: number;
+  /** `TriangleList` of `surroundings.ts`. */
+  readonly TriangleList: typeof TriangleList;
+  /** `addLamp()` of `surroundings.ts`. */
+  readonly addLamp: typeof addLamp;
+  /** `bakedGeometry()` of `surroundings.ts`. */
+  readonly bakedGeometry: typeof bakedGeometry;
+  /** `createGlows()` of `surroundings.ts`. */
+  readonly createGlows: typeof createGlows;
+  /** `cutawayMaterial()` of `surroundings.ts`. */
+  readonly cutawayMaterial: typeof cutawayMaterial;
+  /** `ringCutaway()` of `surroundings.ts`. */
+  readonly ringCutaway: typeof ringCutaway;
+  /** `setCutaway()` of `surroundings.ts`. */
+  readonly setCutaway: typeof setCutaway;
 }
 
 /** The factor from degrees to radians. */
 const DEGREES = Math.PI / 180;
 
 /**
- * The surroundings of the forest (design 4.1): the kit of `assets/forest/` with baked light, the
- * far forest, the glows, and the cut. The lights and the colors are linear values. They give the
- * hue and the lightness of `docs/reference/forest.webp`, because the surroundings take no light.
+ * The surroundings of the forest (design 4.1): a stub that a later round replaces with the kit of
+ * `assets/forest/`. The sizes are parts of the forest unit `u`, the stage side with a minimum, as
+ * the hall unit. The colors are in sRGB, but the lights in linear values. They give the hue and
+ * the lightness of the frame of `docs/reference/forest.webp`, because the surroundings take no
+ * light.
  */
 export const FOREST = {
+  /** The smallest forest unit, in meters, so that a small stage still stands in a wide clearing. */
+  minUnit: 9,
+  /** The radius of the disc of forest earth around the stage. */
+  groundRadius: 1.6,
+  /**
+   * The distance from the stage edge at which the light of the stage on the earth halves, in
+   * stage sides.
+   */
+  groundReach: 0.25,
+  /** The number of trees in the ring. */
+  trees: 16,
+  /** The smallest and the largest distance of a tree from the stage center. */
+  ring: [0.95, 1.4],
+  /** The smallest and the largest height of a tree. */
+  height: [0.6, 0.95],
+  /** The radius of a trunk at the ground, as a part of the height of its tree. */
+  trunk: 0.045,
+  /**
+   * The canopy shapes of a tree: the height of the middle and the radius of each, as parts of the
+   * height of the tree.
+   */
+  canopy: [
+    [0.55, 0.3],
+    [0.72, 0.24],
+    [0.86, 0.17],
+  ],
+  /**
+   * The gap in front of the default camera: no tree stands within this angle of the front (+z),
+   * seen from the stage center, in radians.
+   */
+  frontGap: 55 * DEGREES,
+  /** The cutaway angle: a camera outside the ring sees no tree within it of its own direction. */
+  cutawayAngle: 55 * DEGREES,
+  /** The ring of the far forest behind the trees: its radius and its height. */
+  wall: { radius: 1.6, height: 1.1 },
   /**
    * The sun, seen from the stage center: the turn from the front (+z) toward the right (+x) and
-   * the angle above the floor of its light, in radians. Its glow stands among the trees at the
-   * back right, at a distance and a height in meters, with a radius in meters, so that the
-   * default view shows it at its top right, as `forest.webp`. The glow shines through the trees.
+   * the angle above the floor of its light, in radians. Its glow stands at the back right, low,
+   * so that the default view shows it between the trees: its angle above the floor, and its
+   * distance and its radius, in units. A glow wider than about 130 px did not draw on the
+   * development Mac, so the radius stays small.
    */
   sun: {
     azimuth: 145 * DEGREES,
     elevation: 25 * DEGREES,
-    glowDistance: 12.5,
-    glowHeight: 2.2,
-    glow: 6.5,
+    glowElevation: 2 * DEGREES,
+    distance: 1.5,
+    glow: 0.1,
   },
-  /** The radius of the glow of a lantern, in meters. */
-  lanternGlow: 0.5,
-  /** The light of the middle of a glow, in linear values: a lantern and the sun. */
-  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [0.7, 0.45, 0.13] },
-  /** The baked light of the faces (`ForestBake` of `forest-build.ts`). */
-  bake: {
-    sky: [0.32, 0.3, 0.14],
-    ground: [0.14, 0.09, 0.04],
-    sun: [2.2, 1.45, 0.55],
-    sunShade: [0.5, 9],
-    canopy: { distance: [1.5, 7], height: [2, 8], shade: 0.65 },
-    leafGlow: [3, 3.2, 0.8],
-    key: { light: [0.45, 0.32, 0.18], direction: [-0.3, 0.7, 1] },
-    deck: { light: [0.7, 0.42, 0.18], reach: 2.5 },
-    lantern: { light: [1.6, 0.8, 0.25], reach: 0.9 },
-    glass: [3, 1.6, 0.8],
-    water: [0.55, 0.55, 0.5],
-    haze: {
-      start: 10,
-      reach: 22,
-      away: [0.05, 0.05, 0.025],
-      toward: [0.9, 0.62, 0.25],
-      power: 3,
-    },
-  },
-  /** The far forest around the kit (`FarForest` of `forest-build.ts`). */
-  far: {
-    rings: [
-      { distance: [14, 20], count: 30, scale: [1, 1.35] },
-      { distance: [21, 30], count: 40, scale: [1.2, 1.7] },
-    ],
-    parts: ['tree-far', 'conifer', 'tree-far'],
-    backdrop: { distance: 36, height: [10, 24], segments: 64, color: [0.03, 0.035, 0.012] },
-    groundRadius: 140,
-    groundColor: [0.05, 0.035, 0.02],
-  },
-  /**
-   * The cut of the parts between the camera and the stage (`CutRules` of `forest-build.ts`), and
-   * the points of the stage that no part may hide (`CutSamples` of `forest-cut.ts`).
-   */
-  cut: {
-    band: 1.5,
-    cell: 2,
-    low: 0.35,
-    join: 0.6,
-    wide: 8,
-    samples: { share: 0.6, grid: 3, heights: [0.6, 1.6] },
+  /** The lanterns on every second tree: the height above the floor and the size, in meters. */
+  lantern: { height: 2.6, size: 0.14, glow: 0.55 },
+  /** The colors, in sRGB, but the light of the sun and of a lantern in linear values. */
+  colors: {
+    groundNear: '#8a5428',
+    groundFar: '#2a1e10',
+    trunkShade: '#3e2010',
+    trunkLit: '#7a4a24',
+    canopyShade: '#363412',
+    canopyLit: '#666022',
+    canopyTop: '#a0a438',
+    wallLow: '#1e1c0c',
+    wallHigh: '#4a4a20',
+    sun: [2.5, 1.7, 0.6],
+    sunGlow: [2.4, 1.5, 0.5],
+    lantern: [9, 5.2, 2.4],
+    glow: [0.45, 0.2, 0.075],
   },
   /** The environment of the reflections: the sky, the horizon, and the earth in sRGB, and the sun. */
   environment: { sky: '#4a4220', horizon: '#2a2412', earth: '#1a1208', sun: [8, 5, 1.8] },
@@ -139,7 +152,7 @@ export const FOREST = {
  * light on the conductor start at the values of the hall.
  */
 export const FOREST_LIGHT = {
-  key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.8 },
+  key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.2 },
   side: {
     color: '#ffe0b4',
     position: [1.1, 1.4, 0.7],
@@ -156,7 +169,7 @@ export const FOREST_LIGHT = {
     penumbra: 0.5,
   },
   rim: { color: '#ffb866', illuminance: 6.5, angle: 16 * DEGREES, penumbra: 1 },
-  beam: { color: '#ffc47a', strength: 4.5, moteStrength: 1 },
+  beam: { color: '#ffc47a', strength: 6.2, moteStrength: 1 },
   fill: { sky: '#3a3a1c', ground: '#3a2814', intensity: 4.2 },
   conductor: {
     aimHeight: 1.2,
@@ -177,16 +190,16 @@ type PropHex = Readonly<Record<keyof PropColors, string>>;
 /** The stage of the forest (design 4.1): a lighter, warmer, and matte wood, in sRGB. */
 export const FOREST_STAGE = {
   colors: {
-    plank: '#9c5a16',
+    plank: '#84461a',
     seam: '#6a3610',
     nosing: '#925424',
     skirt: '#4e2c14',
     groove: '#30190b',
-    podium: '#8a5028',
+    podium: '#7a4626',
     riserTread: '#94592a',
     riserNosing: '#b8783a',
     podiumPanel: '#663a1e',
-    podiumTop: '#9a6034',
+    podiumTop: '#8e5630',
     podiumTopPanel: '#804c2a',
   },
   finish: {
@@ -205,7 +218,7 @@ export const FOREST_STAGE = {
 
 /** The props of the forest (design 4.1): chairs of a dark wood and black music stands, in sRGB. */
 export const FOREST_PROPS = {
-  chair: '#7a3e16',
+  chair: '#5a2a0e',
   stand: '#1e1a16',
   standDesk: '#544840',
   standEdge: '#a08b7a',
@@ -220,7 +233,7 @@ export const FOREST_POST = {
     bloomStrength: 0.18,
     diffusion: 0.025,
     halation: [1.2, 1.0, 0.7],
-    vignette: 0.75,
+    vignette: 0.6,
     grain: 0.035,
   },
   haze: { density: 0.18, color: [0.06, 0.04, 0.015], forward: 0.65 },
@@ -235,7 +248,7 @@ export const FOREST_POST = {
       [210, 232],
       [255, 252],
     ],
-    saturation: 1.2,
+    saturation: 1.08,
     vibrance: 0.4,
     shadowSaturation: 0.9,
     shadowTint: [0.008, 0.004, -0.01],
@@ -244,165 +257,343 @@ export const FOREST_POST = {
   clearColor: '#14100a',
 } satisfies VenuePost;
 
-/** The cut of the forest of one stage: the groups, the points of the stage, and the texture. */
-interface ForestCut {
-  /** The camera of the last test, so that a camera at rest costs no test. */
-  readonly camera: Vec3;
-  /** The cut groups of the build. */
-  readonly groups: readonly CutGroup[];
-  /** The points of the stage that no part may hide. */
-  readonly points: readonly Vec3[];
-  /** One byte for each group: 255 to keep, 0 to drop. */
-  readonly bytes: Uint8Array;
-  /** The texture of the bytes, which the shaders read. */
-  readonly texture: Three.DataTexture;
+/** The golden ratio, for the corners of an icosahedron. */
+const PHI = (1 + Math.sqrt(5)) / 2;
+
+/** The 12 corners of an icosahedron, before the scale to the unit sphere. */
+const ICOSAHEDRON_CORNERS: readonly Vec3[] = [
+  [-1, PHI, 0],
+  [1, PHI, 0],
+  [-1, -PHI, 0],
+  [1, -PHI, 0],
+  [0, -1, PHI],
+  [0, 1, PHI],
+  [0, -1, -PHI],
+  [0, 1, -PHI],
+  [PHI, 0, -1],
+  [PHI, 0, 1],
+  [-PHI, 0, -1],
+  [-PHI, 0, 1],
+];
+
+/** The 20 faces of an icosahedron, counterclockwise from outside, as the corners of three.js. */
+const ICOSAHEDRON_FACES: readonly Vec3[] = [
+  [0, 11, 5],
+  [0, 5, 1],
+  [0, 1, 7],
+  [0, 7, 10],
+  [0, 10, 11],
+  [1, 5, 9],
+  [5, 11, 4],
+  [11, 10, 2],
+  [10, 7, 6],
+  [7, 1, 8],
+  [3, 9, 4],
+  [3, 4, 2],
+  [3, 2, 6],
+  [3, 6, 8],
+  [3, 8, 9],
+  [4, 9, 5],
+  [2, 4, 11],
+  [6, 2, 10],
+  [8, 6, 7],
+  [9, 8, 1],
+];
+
+/**
+ * Gives the forest unit: the stage side, but at least {@link FOREST}.minUnit.
+ *
+ * @param stageSide The stage side `S`, in meters.
+ * @returns The unit `u`, in meters.
+ */
+function forestUnit(stageSide: number): number {
+  return Math.max(stageSide, FOREST.minUnit);
 }
 
 /**
- * Creates a mesh of the forest: the baked colors of its vertices, with the cut.
+ * Gives the direction of the sun ({@link FOREST}.sun): a unit vector from the stage center.
  *
- * @param kit The runtime parts of the first download.
- * @param arrays The triangles.
- * @param cut The cut of the forest.
- * @param twoSided True for the leaves, which show from both sides.
- * @returns The mesh. It takes no light.
+ * @returns The direction.
  */
-function forestMesh(
-  kit: ForestKit,
-  arrays: ForestArrays,
-  cut: ForestCut,
-  twoSided: boolean,
-): Three.Mesh {
-  const { three } = kit;
-  const geometry = new three.BufferGeometry();
-  geometry.setAttribute('position', new three.BufferAttribute(arrays.positions, 3));
-  geometry.setAttribute('color', new three.BufferAttribute(arrays.colors, 3));
-  geometry.setAttribute('cut', new three.BufferAttribute(arrays.cut, 1));
-  const material = new three.ShaderMaterial({
-    vertexShader: FOREST_VERTEX,
-    fragmentShader: FOREST_FRAGMENT,
-    vertexColors: true,
-    uniforms: { uKeep: { value: cut.texture } },
-  });
-  if (twoSided) {
-    material.side = three.DoubleSide;
-  }
-  // The depth pass of the post effects keeps this material, so that it also drops the cut parts,
-  // as `cutawayMaterial()` of `surroundings.ts` does.
-  material.allowOverride = false;
-  return new three.Mesh(geometry, material);
-}
-
-/**
- * Creates the glows of the forest: a square that faces the camera at each lamp, with additive
- * light and the cut. They write no depth, so the depth passes hide them as light effects.
- *
- * @param kit The runtime parts of the first download.
- * @param lamps The centers, the radii in meters, and the cut groups.
- * @param light The light of the middle of a glow, in linear values.
- * @param options The texture of the cut, and the share of the radius by which a square moves
- *   toward the camera.
- * @returns The mesh.
- */
-function glowMesh(
-  kit: ForestKit,
-  lamps: readonly Glow[],
-  light: Rgb,
-  options: { readonly cut: ForestCut; readonly lift: number },
-): Three.Mesh {
-  const { three } = kit;
-  const corners: readonly (readonly [number, number])[] = [
-    [-1, -1],
-    [1, -1],
-    [1, 1],
-    [-1, -1],
-    [1, 1],
-    [-1, 1],
+function sunDirection(): Vec3 {
+  const { azimuth, elevation } = FOREST.sun;
+  return [
+    Math.sin(azimuth) * Math.cos(elevation),
+    Math.sin(elevation),
+    Math.cos(azimuth) * Math.cos(elevation),
   ];
-  const count = lamps.length * corners.length;
-  const positions = new Float32Array(count * 3);
-  const offsets = new Float32Array(count * 2);
-  const glows = new Float32Array(count);
-  const cuts = new Float32Array(count);
-  let v = 0;
-  for (const lamp of lamps) {
-    for (const corner of corners) {
-      positions.set(lamp.center, v * 3);
-      offsets.set(corner, v * 2);
-      glows[v] = lamp.glow;
-      cuts[v] = lamp.cut;
-      v++;
+}
+
+/**
+ * Gives the glow of the sun behind the trees: a large lamp glow in the direction of the sun.
+ *
+ * @param stageSide The stage side `S`, in meters.
+ * @returns The lamp of the glow.
+ */
+function sunGlow(stageSide: number): Lamp {
+  const { azimuth, glowElevation, distance, glow } = FOREST.sun;
+  const unit = forestUnit(stageSide);
+  const flat = distance * unit * Math.cos(glowElevation);
+  const center: Vec3 = [
+    flat * Math.sin(azimuth),
+    distance * unit * Math.sin(glowElevation),
+    flat * Math.cos(azimuth),
+  ];
+  return { center, glow: glow * unit };
+}
+
+/**
+ * Mixes two linear colors.
+ *
+ * @param a The color at 0.
+ * @param b The color at 1.
+ * @param t The share of `b`, from 0 to 1.
+ * @returns The mix.
+ */
+function mix(a: Rgb, b: Rgb, t: number): Rgb {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+}
+
+/**
+ * Gives the unit normal of a triangle with its corners counterclockwise from its front.
+ *
+ * @param a The first corner.
+ * @param b The second corner.
+ * @param c The third corner.
+ * @returns The normal.
+ */
+function normalOf(a: Vec3, b: Vec3, c: Vec3): Vec3 {
+  const u: Vec3 = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const v: Vec3 = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+  const n: Vec3 = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+  const length = Math.hypot(...n) || 1;
+  return [n[0] / length, n[1] / length, n[2] / length];
+}
+
+/**
+ * Gives the share of the sun on a face: 0 in the shade, 1 on a face that looks at the sun.
+ *
+ * @param normal The unit normal of the face.
+ * @returns The share.
+ */
+function sunShare(normal: Vec3): number {
+  const [x, y, z] = sunDirection();
+  return Math.max(0, normal[0] * x + normal[1] * y + normal[2] * z);
+}
+
+/**
+ * Adds the trunk of a tree: a prism with six sides that narrows to its top. The sides that look
+ * at the sun get the lit color.
+ *
+ * @param kit The runtime parts of the first download.
+ * @param list The triangles.
+ * @param foot The foot of the trunk on the floor.
+ * @param size The radius at the foot and the height, in meters.
+ */
+function addTrunk(
+  kit: ForestKit,
+  list: TriangleList,
+  foot: Vec3,
+  size: readonly [radius: number, height: number],
+): void {
+  const shade = kit.srgb(FOREST.colors.trunkShade);
+  const lit = kit.srgb(FOREST.colors.trunkLit);
+  const [radius, height] = size;
+  const [x, y, z] = foot;
+  const corner = (i: number, top: boolean): Vec3 => {
+    const angle = (i / 6) * Math.PI * 2;
+    const r = top ? radius * 0.6 : radius;
+    return [x + r * Math.sin(angle), y + (top ? height : 0), z + r * Math.cos(angle)];
+  };
+  for (let i = 0; i < 6; i++) {
+    const a = corner(i, false);
+    const b = corner(i + 1, false);
+    const d = corner(i, true);
+    const e = corner(i + 1, true);
+    const color = mix(shade, lit, sunShare(normalOf(a, b, e)));
+    list.add([a, b, e], [color, color, color], [x, z]);
+    list.add([a, e, d], [color, color, color], [x, z]);
+  }
+}
+
+/**
+ * Adds one canopy shape of a tree: a faceted icosahedron, a little flat. The faces that look at
+ * the sun get the lit color, and the lit faces that look up get the yellow-green of the lit tops.
+ *
+ * @param kit The runtime parts of the first download.
+ * @param list The triangles.
+ * @param center The middle of the shape.
+ * @param radius The radius, in meters.
+ * @param anchor The anchor of the tree on the floor.
+ */
+function addCanopy(
+  kit: ForestKit,
+  list: TriangleList,
+  center: Vec3,
+  radius: number,
+  anchor: readonly [number, number],
+): void {
+  const c = FOREST.colors;
+  const shade = kit.srgb(c.canopyShade);
+  const lit = kit.srgb(c.canopyLit);
+  const top = kit.srgb(c.canopyTop);
+  const scale = radius / Math.hypot(1, PHI);
+  const corner = (i: number): Vec3 => {
+    const [x, y, z] = ICOSAHEDRON_CORNERS[i] ?? [0, 0, 0];
+    return [center[0] + x * scale, center[1] + y * scale * 0.85, center[2] + z * scale];
+  };
+  for (const [i, j, k] of ICOSAHEDRON_FACES) {
+    const a = corner(i);
+    const b = corner(j);
+    const d = corner(k);
+    const normal = normalOf(a, b, d);
+    const sun = sunShare(normal);
+    const color = mix(mix(shade, lit, sun), top, sun * Math.max(0, normal[1]));
+    list.add([a, b, d], [color, color, color], anchor);
+  }
+}
+
+/** The trees, the lanterns, and the far forest of a stage. */
+interface ForestData {
+  /** The trunks and the canopies. */
+  readonly trees: TriangleList;
+  /** The ring of the far forest. */
+  readonly wall: TriangleList;
+  /** The small bright bodies of the lanterns. */
+  readonly lanterns: TriangleList;
+  /** Each lantern, for its glow. */
+  readonly lamps: readonly Lamp[];
+}
+
+/**
+ * Builds the trees and the lanterns around a stage (design 4.1): a ring of trees with a gap in
+ * front of the default camera, and a lantern on every second tree, on the side of the stage.
+ *
+ * @param kit The runtime parts of the first download.
+ * @param stageSide The stage side `S`, in meters.
+ * @returns The triangles and the lamps.
+ */
+function buildForest(kit: ForestKit, stageSide: number): ForestData {
+  const unit = forestUnit(stageSide);
+  const trees = new kit.TriangleList();
+  const lanterns = new kit.TriangleList();
+  const lamps: Lamp[] = [];
+  const f = FOREST;
+  const span = 2 * Math.PI - 2 * f.frontGap;
+  for (let i = 0; i < f.trees; i++) {
+    const angle = f.frontGap + ((i + 0.2 + 0.6 * kit.plankHash(i, 401)) / f.trees) * span;
+    const radius = (f.ring[0] + (f.ring[1] - f.ring[0]) * kit.plankHash(i, 402)) * unit;
+    const height = (f.height[0] + (f.height[1] - f.height[0]) * kit.plankHash(i, 403)) * unit;
+    const foot: Vec3 = [radius * Math.sin(angle), kit.floorY, radius * Math.cos(angle)];
+    const anchor: [number, number] = [foot[0], foot[2]];
+    addTrunk(kit, trees, foot, [f.trunk * height, f.canopy[0][0] * height]);
+    for (const [k, [middle, size]] of f.canopy.entries()) {
+      const shift = (kit.plankHash(i, 410 + k) - 0.5) * size * height * 0.5;
+      const center: Vec3 = [foot[0] + shift, kit.floorY + middle * height, foot[2] - shift];
+      addCanopy(kit, trees, center, size * height, anchor);
+    }
+    if (i % 2 === 0) {
+      const inward = 1 - (f.trunk * height + f.lantern.size * 2) / radius;
+      const center: Vec3 = [foot[0] * inward, kit.floorY + f.lantern.height, foot[2] * inward];
+      lamps.push({ center, glow: f.lantern.glow });
+      kit.addLamp(lanterns, center, f.lantern.size / 2, f.colors.lantern);
     }
   }
-  const geometry = new three.BufferGeometry();
-  geometry.setAttribute('position', new three.BufferAttribute(positions, 3));
-  geometry.setAttribute('corner', new three.BufferAttribute(offsets, 2));
-  geometry.setAttribute('glow', new three.BufferAttribute(glows, 1));
-  geometry.setAttribute('cut', new three.BufferAttribute(cuts, 1));
-  const material = new three.ShaderMaterial({
-    vertexShader: GLOW_VERTEX,
-    fragmentShader: GLOW_FRAGMENT,
-    uniforms: {
-      uKeep: { value: options.cut.texture },
-      uLift: { value: options.lift },
-      uColor: { value: new three.Color().setRGB(...light) },
-    },
-    transparent: true,
-    blending: three.AdditiveBlending,
-    depthWrite: false,
-  });
-  material.allowOverride = false;
-  const mesh = new three.Mesh(geometry, material);
-  // A glow has no fixed bounds, because it faces the camera.
-  mesh.frustumCulled = false;
-  return mesh;
-}
-
-/** One glow of the forest: its center and its radius in meters, and its cut group. */
-interface Glow {
-  /** The center, in meters. */
-  readonly center: Vec3;
-  /** The radius, in meters. */
-  readonly glow: number;
-  /** The cut group. */
-  readonly cut: number;
+  return { trees, wall: buildWall(kit, unit), lanterns, lamps };
 }
 
 /**
- * Gives the glow of the sun among the trees at the back right ({@link FOREST}.sun).
+ * Builds the ring of the far forest: faces that point to the stage, dark at the floor and lighter
+ * at the top, with the glow of the sun at the back right.
  *
  * @param kit The runtime parts of the first download.
- * @returns The center, the radius, and the cut group 0.
+ * @param unit The forest unit `u`, in meters.
+ * @returns The triangles.
  */
-function sunGlow(kit: ForestKit): Glow {
-  const { azimuth, glowDistance, glowHeight, glow } = FOREST.sun;
-  const center: Vec3 = [
-    glowDistance * Math.sin(azimuth),
-    kit.floorY + glowHeight,
-    glowDistance * Math.cos(azimuth),
-  ];
-  return { center, glow, cut: 0 };
-}
-
-/**
- * Creates the cut of a build: the texture of the groups, with each group kept.
- *
- * @param kit The runtime parts of the first download.
- * @param build The forest of the stage.
- * @param stageSide The stage side `S`, in meters.
- * @returns The cut.
- */
-function createCut(kit: ForestKit, build: ForestBuild, stageSide: number): ForestCut {
-  const bytes = new Uint8Array(build.groups.length).fill(255);
-  const texture = new kit.three.DataTexture(bytes, bytes.length, 1, kit.three.RedFormat);
-  texture.needsUpdate = true;
-  return {
-    camera: [Number.NaN, Number.NaN, Number.NaN],
-    groups: build.groups,
-    points: cutPoints(stageSide, FOREST.cut.samples),
-    bytes,
-    texture,
+function buildWall(kit: ForestKit, unit: number): TriangleList {
+  const f = FOREST;
+  const wall = new kit.TriangleList();
+  const radius = f.wall.radius * unit;
+  const top = f.wall.height * unit;
+  const low = kit.srgb(f.colors.wallLow);
+  const high = kit.srgb(f.colors.wallHigh);
+  const segments = 36;
+  const point = (i: number, share: number): Vec3 => {
+    const angle = (i / segments) * Math.PI * 2;
+    return [radius * Math.sin(angle), kit.floorY + share * top, radius * Math.cos(angle)];
   };
+  const color = (i: number, share: number): Rgb => {
+    const angle = (i / segments) * Math.PI * 2;
+    const sun = Math.max(0, Math.cos(angle - f.sun.azimuth)) ** 4 * share;
+    const base = mix(low, high, share);
+    return [
+      base[0] + f.colors.sun[0] * sun,
+      base[1] + f.colors.sun[1] * sun,
+      base[2] + f.colors.sun[2] * sun,
+    ];
+  };
+  const bands = [0, 0.35, 0.7, 1];
+  for (let i = 0; i < segments; i++) {
+    for (let k = 0; k + 1 < bands.length; k++) {
+      const s0 = bands[k] ?? 0;
+      const s1 = bands[k + 1] ?? 1;
+      // The face points to the ring center: counterclockwise seen from inside.
+      const a = point(i + 1, s0);
+      const b = point(i, s0);
+      const c = point(i, s1);
+      const d = point(i + 1, s1);
+      const anchor: [number, number] = [(a[0] + b[0]) / 2, (a[2] + b[2]) / 2];
+      const [ca, cb, cc, cd] = [color(i + 1, s0), color(i, s0), color(i, s1), color(i + 1, s1)];
+      wall.add([a, b, c], [ca, cb, cc], anchor);
+      wall.add([a, c, d], [ca, cc, cd], anchor);
+    }
+  }
+  return wall;
+}
+
+/**
+ * Creates the disc of forest earth around a stage: the light of the stage on the earth near its
+ * edge, and the dark earth far from it, baked into the colors of the vertices.
+ *
+ * @param kit The runtime parts of the first download.
+ * @param stageSide The stage side `S`, in meters.
+ * @returns The mesh. It takes no light, and no cutaway.
+ */
+function createGround(kit: ForestKit, stageSide: number): Mesh {
+  const f = FOREST;
+  const { BufferAttribute: Attribute, BufferGeometry: Geometry } = kit.three;
+  const radius = f.groundRadius * forestUnit(stageSide);
+  const near = kit.srgb(f.colors.groundNear);
+  const far = kit.srgb(f.colors.groundFar);
+  const rings = 24;
+  const segments = 48;
+  const positions: number[] = [];
+  const colors: number[] = [];
+  const vertex = (ring: number, i: number): void => {
+    const r = (ring / rings) * radius;
+    const angle = (i / segments) * Math.PI * 2;
+    const x = r * Math.sin(angle);
+    const z = r * Math.cos(angle);
+    const outside = Math.max(0, Math.max(Math.abs(x), Math.abs(z)) - stageSide / 2);
+    const d = outside / (f.groundReach * stageSide);
+    positions.push(x, kit.floorY, z);
+    colors.push(...mix(far, near, 1 / (1 + d * d)));
+  };
+  for (let ring = 0; ring < rings; ring++) {
+    for (let i = 0; i < segments; i++) {
+      // Two triangles that face up: counterclockwise seen from above.
+      vertex(ring, i);
+      vertex(ring + 1, i);
+      vertex(ring + 1, i + 1);
+      vertex(ring, i);
+      vertex(ring + 1, i + 1);
+      vertex(ring, i + 1);
+    }
+  }
+  const geometry = new Geometry();
+  geometry.setAttribute('position', new Attribute(new Float32Array(positions), 3));
+  geometry.setAttribute('color', new Attribute(new Float32Array(colors), 3));
+  return new kit.three.Mesh(geometry, new kit.three.MeshBasicMaterial({ vertexColors: true }));
 }
 
 /**
@@ -415,16 +606,10 @@ function createCut(kit: ForestKit, build: ForestBuild, stageSide: number): Fores
 function forestEnvironment(kit: ForestKit): Scene {
   const e = FOREST.environment;
   const { three } = kit;
-  const srgb = kit.readers.srgb;
   const sphere = new three.SphereGeometry(20, 16, 8);
-  const sky = srgb(e.sky);
-  const horizon = srgb(e.horizon);
-  const earth = srgb(e.earth);
-  const mix = (a: Rgb, b: Rgb, t: number): Rgb => [
-    a[0] + (b[0] - a[0]) * t,
-    a[1] + (b[1] - a[1]) * t,
-    a[2] + (b[2] - a[2]) * t,
-  ];
+  const sky = kit.srgb(e.sky);
+  const horizon = kit.srgb(e.horizon);
+  const earth = kit.srgb(e.earth);
   const position = sphere.getAttribute('position');
   const colors = new Float32Array(position.count * 3);
   for (let i = 0; i < position.count; i++) {
@@ -439,7 +624,7 @@ function forestEnvironment(kit: ForestKit): Scene {
     new three.BoxGeometry(4, 4, 4),
     new three.MeshBasicMaterial({ color: new three.Color().setRGB(...e.sun) }),
   );
-  const [x, y, z] = sunDirection(FOREST.sun);
+  const [x, y, z] = sunDirection();
   sun.position.set(16 * x, 16 * y, 16 * z);
   scene.add(sun);
   return scene;
@@ -456,68 +641,44 @@ function linearColors<K extends string>(
   kit: ForestKit,
   colors: Readonly<Record<K, string>>,
 ): Record<K, Rgb> {
-  const entries = Object.entries<string>(colors).map(([key, hex]) => [key, kit.readers.srgb(hex)]);
+  const entries = Object.entries<string>(colors).map(([key, hex]) => [key, kit.srgb(hex)]);
   // SAFETY: the entries have the keys of `colors`.
   return Object.fromEntries(entries) as Record<K, Rgb>;
 }
 
 /**
- * Makes the forest clearing (design 4.1): the surroundings from the kit, the light, the stage
- * finish, the prop colors, and the grade. It reads the values of {@link FOREST},
- * {@link FOREST_STAGE}, and {@link FOREST_PROPS} at the call, after the look override of the dev
- * server.
+ * Makes the forest clearing (design 4.1): a stub of the surroundings, the light, the stage finish,
+ * the prop colors, and the grade. It reads the values of {@link FOREST_STAGE} and
+ * {@link FOREST_PROPS} at the call, after the look override of the dev server.
  *
  * @param kit The runtime parts of the first download.
  * @returns The venue.
  */
 export function forestVenue(kit: ForestKit): Venue {
-  const cuts = new WeakMap<Group, ForestCut>();
-  let parts: ReturnType<typeof forestParts> | null = null;
   return {
     id: 'forest',
     *surroundingsSteps(stageSide) {
-      parts ??= forestParts(kit.readers);
+      const ground = createGround(kit, stageSide);
       yield;
-      const build = yield* buildForestSteps({
-        parts,
-        layout: placeForest(stageSide, kit.cornerCut),
-        stageSide,
-        floorY: kit.floorY,
-        sun: FOREST.sun,
-        bake: FOREST.bake,
-        far: FOREST.far,
-        cut: FOREST.cut,
-        hash: kit.plankHash,
-        srgb: kit.readers.srgb,
-      });
-      const cut = createCut(kit, build, stageSide);
-      const lamps = build.lamps.map((lamp: ForestLamp) => ({ ...lamp, glow: FOREST.lanternGlow }));
-      const sun = glowMesh(kit, [sunGlow(kit)], FOREST.glowLight.sun, { cut, lift: 0 });
+      const data = buildForest(kit, stageSide);
+      yield;
+      const group = new kit.three.Group().add(ground);
+      for (const list of [data.wall, data.trees, data.lanterns]) {
+        group.add(new kit.three.Mesh(kit.bakedGeometry(list.build()), kit.cutawayMaterial(0)));
+      }
+      group.add(kit.createGlows(data.lamps, 0, FOREST.colors.glow));
+      const sun = kit.createGlows([sunGlow(stageSide)], 0, FOREST.colors.sunGlow);
       // The glow of the sun shines through the canopy, so no tree hides it.
       if (!Array.isArray(sun.material)) {
         sun.material.depthTest = false;
       }
-      const group = new kit.three.Group().add(
-        forestMesh(kit, build.solid, cut, false),
-        forestMesh(kit, build.foliage, cut, true),
-        glowMesh(kit, lamps, FOREST.glowLight.lantern, { cut, lift: 1 }),
-        sun,
-      );
-      cuts.set(group, cut);
+      group.add(sun);
       return group;
     },
-    frameSurroundings(surroundings: Group, _stageSide: number, camera: Vector3) {
-      const cut = cuts.get(surroundings);
-      if (
-        !cut ||
-        camera.distanceToSquared({ x: cut.camera[0], y: cut.camera[1], z: cut.camera[2] }) < 1e-8
-      ) {
-        return;
-      }
-      camera.toArray(cut.camera);
-      if (keepGroups(cut.groups, cut.camera, cut.points, cut.bytes)) {
-        cut.texture.needsUpdate = true;
-      }
+    frameSurroundings(surroundings: Group, stageSide: number, camera: Vector3, pixels: number) {
+      const radius = FOREST.ring[1] * forestUnit(stageSide);
+      const cutaway = kit.ringCutaway(camera.toArray(), 0, radius, FOREST.cutawayAngle);
+      kit.setCutaway(surroundings, cutaway, pixels);
     },
     environmentScene: () => forestEnvironment(kit),
     light: FOREST_LIGHT,

@@ -1,10 +1,12 @@
+import { srgb } from '../mesh.ts';
+import { STAGE_CORNER_CUT } from '../stage.ts';
 import type { Vec3 } from '../tuples.ts';
 import { FOREST_KIT } from './kit-data.ts';
 import { unpackForestPart } from './kit-format.ts';
-import type { ForestKitData, ForestRopeEnd, KitReaders } from './kit-format.ts';
+import type { ForestKitData, ForestRopeEnd } from './kit-format.ts';
 
 export { FOREST_FACE_KINDS } from './kit-format.ts';
-export type { ForestFaceKind, KitReaders } from './kit-format.ts';
+export type { ForestFaceKind } from './kit-format.ts';
 
 /** One part of the forest kit, as flat triangles in meters. */
 export interface ForestPart {
@@ -30,36 +32,29 @@ export interface ForestPlacement {
   readonly scale: number;
 }
 
-/** One rope of the light string, with its lanterns. */
+/** One rope of the light string. */
 export interface ForestRope {
   /** The points of the rope from one end to the other, in meters, on a catenary. */
   readonly points: readonly Vec3[];
-  /**
-   * The trees of the two ends, as indices in {@link ForestLayout}.placements, or -1 for a tree
-   * that the layout dropped.
-   */
-  readonly trees: readonly [number, number];
-  /** The lanterns that hang from the rope, at equal steps between its ends. */
-  readonly lanterns: readonly ForestPlacement[];
 }
 
 /** The forest around one stage: the placed parts and the ropes of the light string. */
 export interface ForestLayout {
-  /** Each placed copy of a part. */
+  /** Each placed copy of a part, with the lanterns that hang from the ropes at the end. */
   readonly placements: readonly ForestPlacement[];
   /** The ropes of the light string. */
   readonly ropes: readonly ForestRope[];
 }
 
 /**
- * The ropes of the light string: their radius in meters and their color, the same as `ROPE` of
- * `tools/forest-kit/build-kit.py`.
+ * The ropes of the light string: their radius in meters and their linear color, the same as
+ * `ROPE` of `tools/forest-kit/build-kit.py`.
  */
 export const FOREST_ROPE = {
   /** The radius of the rope, in meters. */
   radius: 0.014,
-  /** The color of the rope, in sRGB. */
-  color: '#6b5236',
+  /** The linear color of the rope. */
+  color: srgb('#6b5236'),
 } as const;
 
 /**
@@ -74,13 +69,12 @@ const ROPE_SEGMENTS = 24;
 /**
  * Decodes the parts of the kit.
  *
- * @param readers The functions of the first download that read the bytes (design 7.2).
  * @param kit The packed kit. The kit of `pnpm forest-kit` by default.
  * @returns Each part, in the order of the kit.
  * @throws Error if the packed data of a part is broken.
  */
-export function forestParts(readers: KitReaders, kit: ForestKitData = FOREST_KIT): ForestPart[] {
-  return kit.parts.map(({ name, packed }) => ({ name, ...unpackForestPart(packed, readers) }));
+export function forestParts(kit: ForestKitData = FOREST_KIT): ForestPart[] {
+  return kit.parts.map(({ name, packed }) => ({ name, ...unpackForestPart(packed) }));
 }
 
 /**
@@ -112,21 +106,15 @@ const CORNER_BLEND = 1;
  *
  * @param x The x of the place, in meters.
  * @param z The z of the place, in meters.
- * @param sides The stage side of the kit and the new stage side.
- * @param cornerCut The corner cut of the stage, as a part of its side: `STAGE_CORNER_CUT`.
+ * @param side The stage side of the kit.
+ * @param newSide The new stage side.
  * @returns The new x and z.
  */
-function movePlace(
-  x: number,
-  z: number,
-  sides: readonly [side: number, newSide: number],
-  cornerCut: number,
-): [number, number] {
-  const [side, newSide] = sides;
+function movePlace(x: number, z: number, side: number, newSide: number): [number, number] {
   const half = side / 2;
   const newHalf = newSide / 2;
   const beyond = Math.min(Math.abs(x) - half, Math.abs(z) - half);
-  const cut = Math.max(0, (cornerCut * (side - newSide)) / 2);
+  const cut = Math.max(0, (STAGE_CORNER_CUT * (side - newSide)) / 2);
   const corner = cut * Math.min(1, Math.max(0, beyond / CORNER_BLEND));
 
   return [
@@ -204,33 +192,32 @@ export function catenary(a: Vec3, b: Vec3, slack: number, count: number): Vec3[]
 const TREE_HEIGHT = 3;
 
 /**
- * Finds each tree whose footprint overlaps the footprint of a tree before it in the list. A
- * small stage moves the trees behind its edges closer together, so it keeps fewer trees. A part
- * with no footprint, such as a lantern on a branch of a tree, overlaps nothing.
+ * Removes each tree whose footprint overlaps the footprint of a tree before it in the list. A
+ * small stage moves the trees behind its edges closer together, so it keeps fewer trees.
  *
  * @param placements The placed parts, the most important first.
  * @param kit The kit, with the footprint and the height of each part.
- * @returns For each placed part, its index in the list of the kept parts, or -1 for a dropped
- *   tree.
+ * @returns The placed parts with no overlapped tree.
  */
-function thinTrees(placements: readonly ForestPlacement[], kit: ForestKitData): number[] {
+function thinTrees(placements: readonly ForestPlacement[], kit: ForestKitData): ForestPlacement[] {
   const parts = new Map(kit.parts.map((part) => [part.name, part]));
+  const kept: ForestPlacement[] = [];
   const trees: { readonly x: number; readonly z: number; readonly radius: number }[] = [];
-  let kept = 0;
-  return placements.map((placement) => {
+  for (const placement of placements) {
     const part = parts.get(placement.part);
-    if (!part || part.height <= TREE_HEIGHT || part.footprint === 0) {
-      return kept++;
+    if (!part || part.height <= TREE_HEIGHT) {
+      kept.push(placement);
+      continue;
     }
 
     const [x, , z] = placement.position;
     const radius = part.footprint * placement.scale;
     if (trees.every((t) => Math.hypot(t.x - x, t.z - z) >= t.radius + radius)) {
       trees.push({ x, z, radius });
-      return kept++;
+      kept.push(placement);
     }
-    return -1;
-  });
+  }
+  return kept;
 }
 
 /**
@@ -240,31 +227,24 @@ function thinTrees(placements: readonly ForestPlacement[], kit: ForestKitData): 
  * after the move, and the lanterns of each rope hang at equal steps between its ends.
  *
  * @param stageSide The stage side `S`, in meters.
- * @param cornerCut The corner cut of the stage, as a part of its side: `STAGE_CORNER_CUT` of
- *   `models/stage.ts`, as an argument (design 7.2).
  * @param kit The packed kit. The kit of `pnpm forest-kit` by default.
- * @returns The placed parts, and the ropes with their lanterns.
+ * @returns The placed parts, the rope lanterns at the end, and the ropes.
  */
-export function placeForest(
-  stageSide: number,
-  cornerCut: number,
-  kit: ForestKitData = FOREST_KIT,
-): ForestLayout {
+export function placeForest(stageSide: number, kit: ForestKitData = FOREST_KIT): ForestLayout {
   const moved = kit.placements.map(([part, x, y, z, yaw, scale]): ForestPlacement => {
-    const [nx, nz] = movePlace(x, z, [kit.stageSide, stageSide], cornerCut);
+    const [nx, nz] = movePlace(x, z, kit.stageSide, stageSide);
     return { part, position: [nx, y, nz], yaw, scale };
   });
 
-  const kept = thinTrees(moved, kit);
+  const lanterns: ForestPlacement[] = [];
   const ropes = kit.ropes.map((rope): ForestRope => {
     const a = ropeEnd(rope.ends[0], moved);
     const b = ropeEnd(rope.ends[1], moved);
-    const lanterns = catenary(a, b, rope.slack, rope.lanterns + 1)
-      .slice(1, -1)
-      .map((position): ForestPlacement => ({ part: ROPE_LANTERN, position, yaw: 0, scale: 1 }));
-    const trees: [number, number] = [kept[rope.ends[0].tree] ?? -1, kept[rope.ends[1].tree] ?? -1];
-    return { points: catenary(a, b, rope.slack, ROPE_SEGMENTS), trees, lanterns };
+    for (const position of catenary(a, b, rope.slack, rope.lanterns + 1).slice(1, -1)) {
+      lanterns.push({ part: ROPE_LANTERN, position, yaw: 0, scale: 1 });
+    }
+    return { points: catenary(a, b, rope.slack, ROPE_SEGMENTS) };
   });
 
-  return { placements: moved.filter((_, i) => (kept[i] ?? -1) >= 0), ropes };
+  return { placements: [...thinTrees(moved, kit), ...lanterns], ropes };
 }
