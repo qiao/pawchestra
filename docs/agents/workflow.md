@@ -39,6 +39,9 @@ Make one logical change in each commit, and keep every commit green: each commit
   `app`), or `demos`, `tools`, `ci`, `design`, or `agents`. Reuse the spelling of the log.
 - Split a refactor of several steps into separate commits. For example, add the new path first,
   then remove the old code.
+- Commit each change before the next edit. Never stage zero-context hunks
+  (`git apply --unidiff-zero`), because a hunk can land at the wrong line. Join a check and its
+  commit with `&&`, because a `;` commits after a failed check.
 
 ### The check script
 
