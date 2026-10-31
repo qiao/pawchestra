@@ -245,6 +245,8 @@ export const FOREST_POST = {
 
 /** The cut of the forest of one stage: the groups, the points of the stage, and the texture. */
 interface ForestCut {
+  /** The camera of the last test, so that a camera at rest costs no test. */
+  readonly camera: Vec3;
   /** The cut groups of the build. */
   readonly groups: readonly CutGroup[];
   /** The points of the stage that no part may hide. */
@@ -394,6 +396,7 @@ function createCut(kit: ForestKit, build: ForestBuild, stageSide: number): Fores
   const texture = new kit.three.DataTexture(bytes, bytes.length, 1, kit.three.RedFormat);
   texture.needsUpdate = true;
   return {
+    camera: [Number.NaN, Number.NaN, Number.NaN],
     groups: build.groups,
     points: cutPoints(stageSide, FOREST.cut.samples),
     bytes,
@@ -499,7 +502,14 @@ export function forestVenue(kit: ForestKit): Venue {
     },
     frameSurroundings(surroundings: Group, _stageSide: number, camera: Vector3) {
       const cut = cuts.get(surroundings);
-      if (cut && keepGroups(cut.groups, camera.toArray(), cut.points, cut.bytes)) {
+      if (
+        !cut ||
+        camera.distanceToSquared({ x: cut.camera[0], y: cut.camera[1], z: cut.camera[2] }) < 1e-8
+      ) {
+        return;
+      }
+      camera.toArray(cut.camera);
+      if (keepGroups(cut.groups, cut.camera, cut.points, cut.bytes)) {
         cut.texture.needsUpdate = true;
       }
     },
