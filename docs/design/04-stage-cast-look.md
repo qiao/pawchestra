@@ -43,7 +43,7 @@ light, the stage finish, the prop colors, and the post effects. The setting "Sce
   are the constants of 4.5.
 - `forest`: a forest clearing, as `reference/forest.webp` (`scene/forest.ts`), from the kit of
   `assets/forest/` (below). It has a lighter and matte stage wood, dark wood chairs, a golden rim
-  light and beam, and a warm grade.
+  light from the low sun at the back right with a slanted beam, and a warm grade.
 
 ```text
  setting "Scene" ──┐          hash "#demo=...&scene=forest"
@@ -80,9 +80,10 @@ export interface Venue {
 
 - **Shared stage.** Each venue keeps the cast, the instruments, the layout, the stage outline,
   the camera, and the shot plan, because a change of the venue must keep the song time, the
-  transport, and the poses (5.1). The places of the key light and of the rim lights
-  (`models/beam.ts`) stay the same, because the shots read them (5.6). A venue changes the
-  colors and the strength of these lights.
+  transport, and the poses (5.1). The place of the key light (`KEY_PLACE` of `models/beam.ts`)
+  stays the same, because the shots read it (5.6). Each venue places its rim lights
+  (`VenueLight.rimPlace`), because the shot plan reads only the cone of `insideBeam()`. A venue
+  also changes the colors and the strength of the lights.
 - **Pure core.** `models/props.ts` and `models/stage.ts` take the prop and stage colors as plain
   arguments, with the hall colors as the default.
 - **Caches.** `StageScene` keeps one environment for each venue, and `scene/grade.ts` one lookup
@@ -97,6 +98,13 @@ The forest draws each part of the kit (`models/forest/kit.ts`) at its place arou
 with rings of far trees, a backdrop of tree tops, and a far ground (`scene/forest-build.ts`,
 `FOREST`).
 
+- **Sun.** The rim light is the low sun at the back right (`FOREST_LIGHT.rimPlace`), so the beam
+  slants from the top right toward the stage, as the light shafts of `forest.webp`. The glow of
+  the sun and the sun of the bake stand in the same direction (`forestSun()`). The shot plan
+  reads no rim place, so the place keeps the cameras out of the haze: over the shot plans of all
+  demos, fewer camera samples stand in the haze than in the hall, each in a close shot with a dim
+  beam, and no camera crosses the haze surface in a shot. A lower or a more turned sun breaks
+  this rule.
 - **Baked light.** The surroundings take no light, as the hall, because a light costs GPU time
   on large surfaces. Each face gets the light of the low sun, the sky, the key, the lit deck, and
   the lanterns in its color (`FOREST.bake`). A low face far from the clearing gets less sky and
@@ -507,7 +515,8 @@ under the hard key light.
   conductor and the middle of the orchestra, because a separate light costs GPU time. A hot spot
   holds only the podium on the players, so the white fur of the front rows does not clip.
 - **Beam** (`BEAM_LOOK`). The haze cone leans toward its rim light, which stands at the x of the
-  beam, so the beam has a visible source and stands upright. The camera dims it in a close shot.
+  beam in the hall, so the beam has a visible source and stands upright. The forest turns its rim
+  light to the back right (4.1). The camera dims the beam in a close shot.
 - **Other terms.** Each layout bakes the soft key shadow on the stage one time
   (`scene/stage-bake.ts`), because the props and the stage do not move. A close shot adds a soft
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives

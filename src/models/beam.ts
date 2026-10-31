@@ -120,8 +120,9 @@ export function rimLightPlace(stageSide: number, place: RimPlace, x = 0): Vec3 {
 
 /**
  * The height of the cone that the shot planner keeps clear of cameras, in stage sides (design
- * 5.6). The cone stands upright on the stage center and holds the haze of the visible beam near
- * the stage, also when the beam leans to the key light.
+ * 5.6). The cone stands upright on the stage center and holds the haze of the visible beam of the
+ * hall, which leans back toward its rim light. The beam of the forest leans to the back right and
+ * out of the cone near its top, so its place keeps the cameras out of its haze (design 4.1).
  */
 export const BEAM_HEIGHT_IN_SIDES = 1.2;
 

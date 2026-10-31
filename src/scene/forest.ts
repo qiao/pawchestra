@@ -9,7 +9,7 @@ import type { StageColors } from '../models/props.ts';
 import type { plankHash } from '../models/stage.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { buildForestSteps, sunDirection } from './forest-build.ts';
-import type { CutGroup, ForestArrays, ForestBuild, ForestLamp } from './forest-build.ts';
+import type { CutGroup, ForestArrays, ForestBuild, ForestLamp, ForestSun } from './forest-build.ts';
 import {
   FOREST_FRAGMENT,
   FOREST_VERTEX,
@@ -69,13 +69,13 @@ const DEGREES = Math.PI / 180;
  */
 export const FOREST = {
   /**
-   * The sun, seen from the stage center: the turn from the front (+z) toward the right (+x) and
-   * the angle above the floor of its light, in radians. Its glow stands among the trees at the
-   * back right, at a distance and a height in meters, with a radius in meters, so that the
-   * default view shows it at its top right, as `forest.webp`. The glow shines through the trees.
+   * The sun, seen from the stage center: the angle above the floor of the light of the bake, in
+   * radians. The sun stands in the direction of the rim light ({@link forestSun}). Its glow
+   * stands among the trees there, at a distance and a height in meters, with a radius in meters,
+   * so that the default view shows it at its top right, as `forest.webp`. The glow shines
+   * through the trees.
    */
   sun: {
-    azimuth: 145 * DEGREES,
     elevation: 25 * DEGREES,
     glowDistance: 12.5,
     glowHeight: 2.2,
@@ -134,9 +134,14 @@ export const FOREST = {
 } as const;
 
 /**
- * The light of the forest (design 4.1): a soft warm key from the front, a low golden sun behind
- * the stage as the rim light and the beam, and a green-gold fill. The back-row lights and the
+ * The light of the forest (design 4.1): a soft warm key from the front, a low golden sun at the
+ * back right as the rim light and the beam, and a green-gold fill. The back-row lights and the
  * light on the conductor start at the values of the hall.
+ *
+ * The rim light stands lower than in the hall and turns to the right, so that the beam slants
+ * from the top right toward the stage, as the light shafts of `forest.webp`. A lower or a more
+ * turned place puts more cameras of the shot plans in the haze of the beam, because the shot plan
+ * reads no rim place (design 5.6).
  */
 export const FOREST_LIGHT = {
   key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.8 },
@@ -156,7 +161,7 @@ export const FOREST_LIGHT = {
     penumbra: 0.5,
   },
   rim: { color: '#ffb866', illuminance: 6.5, angle: 16 * DEGREES, penumbra: 1 },
-  rimPlace: { distance: 2.45, elevation: 66 * DEGREES, turn: 0, count: 1, spread: 0.3 },
+  rimPlace: { distance: 2.45, elevation: 45 * DEGREES, turn: 35 * DEGREES, count: 1, spread: 0.3 },
   beam: { color: '#ffc47a', strength: 4.5, moteStrength: 1 },
   fill: { sky: '#3a3a1c', ground: '#3a2814', intensity: 4.2 },
   conductor: {
@@ -168,6 +173,17 @@ export const FOREST_LIGHT = {
     penumbra: 0.6,
   },
 } satisfies VenueLight;
+
+/**
+ * Gives the sun of the forest (design 4.1): the direction of the rim light ({@link FOREST_LIGHT}),
+ * and the angle of the light of the bake ({@link FOREST}.sun). Thus the glow, the bake, and the
+ * beam come from one side. It reads the values at the call, after the look override.
+ *
+ * @returns The sun.
+ */
+export function forestSun(): ForestSun {
+  return { azimuth: Math.PI - FOREST_LIGHT.rimPlace.turn, elevation: FOREST.sun.elevation };
+}
 
 /** The stage colors of a venue in sRGB, as the look override takes them. */
 type StageHex = Readonly<Record<keyof StageColors, string>>;
@@ -376,7 +392,8 @@ interface Glow {
  * @returns The center, the radius, and the cut group 0.
  */
 function sunGlow(kit: ForestKit): Glow {
-  const { azimuth, glowDistance, glowHeight, glow } = FOREST.sun;
+  const { glowDistance, glowHeight, glow } = FOREST.sun;
+  const { azimuth } = forestSun();
   const center: Vec3 = [
     glowDistance * Math.sin(azimuth),
     kit.floorY + glowHeight,
@@ -440,7 +457,7 @@ function forestEnvironment(kit: ForestKit): Scene {
     new three.BoxGeometry(4, 4, 4),
     new three.MeshBasicMaterial({ color: new three.Color().setRGB(...e.sun) }),
   );
-  const [x, y, z] = sunDirection(FOREST.sun);
+  const [x, y, z] = sunDirection(forestSun());
   sun.position.set(16 * x, 16 * y, 16 * z);
   scene.add(sun);
   return scene;
@@ -484,7 +501,7 @@ export function forestVenue(kit: ForestKit): Venue {
         layout: placeForest(stageSide, kit.cornerCut),
         stageSide,
         floorY: kit.floorY,
-        sun: FOREST.sun,
+        sun: forestSun(),
         bake: FOREST.bake,
         far: FOREST.far,
         cut: FOREST.cut,
