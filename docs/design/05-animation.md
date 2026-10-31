@@ -531,12 +531,21 @@ copy these numbers of the design:
 
 - The line of sight from 0.3 m outside the target crosses no box, except the boxes within 0.4 m of
   the target.
-- No head in the foreground of a close shot has a radius above 0.24 of half the frame height.
-- No other object nearer than 0.9 of the focus depth covers more than 15% of a 20 × 20 grid.
+- No head in the foreground of a close shot has a radius above 0.24 of half the frame height,
+  except the blurred head of a dirty frame.
+- No other object nearer than 0.9 of the focus depth covers more than 15% of a 20 × 20 grid,
+  except the blurred boxes of a dirty frame.
 - Each camera keeps 0.6 m from each box, 1.0 m from the podium and the conductor, and 0.6 m above
   the stage top.
 - A camera stays on one side of the beam cone for a full shot, because a crossing darkens the
   image at once.
+
+**The dirty frame.** A low close camera sees the heads of the rows in front of its subject. As
+the shoulder of an over-the-shoulder shot (`camera-technique.md`), a near head or a near box of
+another object can stand at one side edge of the frame, when the depth of field of 4.5 blurs it
+(`FOREGROUND.dirtyBlur`). Its inner edge stays in the outer part of the frame width
+(`FOREGROUND.dirtyShare`), and all dirty heads of a frame stay at one side. A head over the
+subject always counts. Thus a solo camera can stay low behind the front rows.
 
 **Transitions, beam, and light.** A hard cut is the default. A blend is a short camera move in a
 slow or quiet window (`BLEND_RULES`), because a true dissolve needs two renders for each frame.

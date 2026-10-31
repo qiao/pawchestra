@@ -20,7 +20,7 @@ import {
   targetLineClear,
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
-import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
+import { foregroundHead, foregroundObject, inFrame, lensScale } from './foreground.ts';
 import {
   FILM_GRAMMAR,
   azimuthFrom,
@@ -994,6 +994,8 @@ function moveForeground(
   }
   for (const key of [from, to]) {
     const { camera, look, middle } = composedCamera(planner, subject, halfHeight, composition, key);
+    // The depth of field of the frame blurs a near head or box at a side edge: a dirty frame.
+    const lens = lensScale(camera, look, key.fov, planner.stageSide);
     const found =
       test === 'heads'
         ? foregroundHead(
@@ -1006,8 +1008,9 @@ function moveForeground(
             aspect,
             floor,
             middle,
+            lens,
           )
-        : foregroundObject(planner.clearance, members, focus, camera, look, key.fov, aspect);
+        : foregroundObject(planner.clearance, members, focus, camera, look, key.fov, aspect, lens);
     if (found) {
       return true;
     }

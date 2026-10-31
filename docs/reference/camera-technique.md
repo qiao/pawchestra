@@ -68,6 +68,14 @@ source.
   one third down from the top and its waist at the bottom. A seated player with its instrument is
   about as wide as it is high from the waist up, so it fills about 0.4 of the frame width
   (derived from [1, 6]).
+- An over-the-shoulder shot puts the camera behind the shoulder and the head of a person in the
+  foreground. The back of the head in the foreground adds depth to the frame [10].
+- A usual over-the-shoulder shot has a shallow depth of field: the shoulder in the foreground is
+  soft, and the subject stays sharp [10].
+- A shot of one person with the back of the head and the shoulder of another person is also
+  called a "dirty" shot, and a shot with no other person a "clean" shot [11].
+- The back of the nearer person takes up no more than one third of the frame, so that the face
+  of the farther person shows clearly [12].
 
 ## 4. Moves across a cut
 
@@ -133,6 +141,11 @@ The app follows these facts:
   two-shot, a side view a group-shot of the front half of one side, and a conductor shot a waist
   shot of the bear from behind. The frame also holds the head with the ears, so a waist shot of
   a player with long ears, such as a rabbit, is wider.
+- **The dirty frame (section 3).** A near head or a near box of another object that the depth of
+  field blurs can stand at one side edge of a close shot (`FOREGROUND.dirtyBlur`). Its inner edge
+  stays in the outer third of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
+  frame stay at one side. A head over the subject always counts. Thus a solo camera can stay low
+  behind the heads of the front rows.
 
 The app does not follow these facts:
 
@@ -140,6 +153,9 @@ The app does not follow these facts:
   `SHOT_TIMES.maxSec` (14 s). A live broadcast uses more and shorter takes, but the planner makes
   each shot one time from the score, and each shot needs a clear camera.
 - **The zoom out (section 5).** A long close shot pushes in slowly, and it does not zoom out.
+- **The soft shoulder (section 3).** The lens of the app blurs a point in front of the focus to
+  at most `LENS.maxNearBlur` of the image height (design 4.5), so the head at the edge of a dirty
+  frame is only a little soft.
 
 ## 7. Sources
 
@@ -168,3 +184,13 @@ All sources opened on 2026-10-31.
    https://www.elbphilharmonie.de/en/mediatheque/the-stream-team/381
 9. B. Zaza, "Lessons learned: Live Multi-Camera Directing in Classical Music, Part II",
    Orchestras Canada, 2022-10-31. https://oc.ca/en/?p=11091
+10. Wikipedia, "Over-the-shoulder shot", which cites B. Brown, "Cinematography: Theory and
+    Practice", Focal Press, 2012, p. 23, G. Mercado, "The Filmmaker's Eye", Focal Press, 2013,
+    and M. Svanera, S. Benini, N. Adami, R. Leonardi, and A. B. Kovács, "Over-the-shoulder shot
+    detection in art films", CBMI 2015, IEEE. https://en.wikipedia.org/wiki/Over-the-shoulder_shot
+11. University of Utah, CS 3660, "Cinematography: Composition & the Camera in Machinima", lecture
+    slides, slide 12 "Over the Shoulder (OTS)".
+    https://my.eng.utah.edu/~cs3660/LecturesPDF/CS3660Machinima_Cinematography_03%20Jana.pdf
+12. N. LaJeunesse, "Over the shoulder shot: Its uses in cinema", Videomaker, section "Camera
+    placement".
+    https://www.videomaker.com/how-to/shooting/camera-movement/over-the-shoulder-shot-its-uses-in-cinema/

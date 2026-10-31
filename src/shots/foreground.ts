@@ -1,4 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
+import { LENS, apertureAt, blurScale } from '../scene/focus.ts';
 import type { StageClearance } from './clearance.ts';
 
 /** The head of a player or of the conductor on the stage, for the foreground test. */
@@ -57,7 +58,46 @@ export const FOREGROUND = {
   objectShare: 0.15,
   /** The cells on each side of the grid of the frame that measures the cover. */
   cells: 20,
+  /**
+   * The dirty frame (`docs/reference/camera-technique.md`): a near head, or a near box of another
+   * object, that the depth of field blurs can stand at one side edge of the frame, as the shoulder
+   * of an over-the-shoulder shot. Its inner edge stays this far from its side edge, as a part of
+   * the frame width: one third.
+   */
+  dirtyShare: 1 / 3,
+  /**
+   * A point counts as blurred when the lens of design 4.5 gives it a blur disc in front of the
+   * focus of at least this part of the image height: the near limit of the lens.
+   */
+  dirtyBlur: LENS.maxNearBlur,
 } as const;
+
+/**
+ * Calculates the blur scale of the lens of a close frame (design 4.5): the blur disc at a depth
+ * `d` in front of the focus is `scale × (focus / d - 1)`, as a part of the image height.
+ *
+ * @param camera The camera.
+ * @param look The point that the camera looks at, which is in focus.
+ * @param fov The vertical field of view, in degrees.
+ * @param stageSide The stage side `S`, in meters.
+ * @returns The scale.
+ */
+export function lensScale(camera: Vec3, look: Vec3, fov: number, stageSide: number): number {
+  const focus = Math.hypot(look[0] - camera[0], look[1] - camera[1], look[2] - camera[2]);
+  return blurScale(focus, fov, apertureAt(focus, stageSide));
+}
+
+/**
+ * Tells if the depth of field blurs a point in front of the focus enough for a dirty frame.
+ *
+ * @param depth The view depth of the point, in meters.
+ * @param focus The view depth of the focus, in meters.
+ * @param lens The blur scale of {@link lensScale}, or 0 for no blur.
+ * @returns True if the blur disc reaches {@link FOREGROUND}.dirtyBlur.
+ */
+function blurred(depth: number, focus: number, lens: number): boolean {
+  return depth > 0 && lens * (focus / depth - 1) >= FOREGROUND.dirtyBlur;
+}
 
 /** The axes of a camera, and the half sizes of its frame at a depth of 1 m. */
 interface FrameAxes {
@@ -140,6 +180,11 @@ function frameAxes(camera: Vec3, target: Vec3, fov: number, aspect: number): Fra
  * and no music folder: only the third rule applies to it. Its top on the screen is lower than
  * the chest of each singer of the subject (design 5.6).
  *
+ * A near or a large head that the depth of field blurs makes a dirty frame, as the shoulder of an
+ * over-the-shoulder shot, and it does not count. It stays at one side edge, with its inner edge
+ * in the outer third of the width, and all such heads stay at the same side. A head over the
+ * subject always counts.
+ *
  * @param heads The heads of the players and of the conductor.
  * @param members The owners of the heads of the subject. Their heads do not count.
  * @param focus The point of the subject that sets the distance: the middle of the head of a
@@ -151,6 +196,7 @@ function frameAxes(camera: Vec3, target: Vec3, fov: number, aspect: number): Fra
  * @param chests The chests of the singers of a choir shot, or none for the other subjects.
  * @param middle The place of the target of the subject in the frame, in the units of the view:
  *   the middle of the frame, or a third line of a composition (design 5.6).
+ * @param lens The blur scale of the frame ({@link lensScale}), or 0 for a frame with no blur.
  * @returns True if a head stands in the foreground.
  */
 export function foregroundHead(
@@ -163,6 +209,7 @@ export function foregroundHead(
   aspect: number,
   chests: readonly Vec3[] = [],
   middle: readonly [number, number] = [0, 0],
+  lens = 0,
 ): boolean {
   const a = frameAxes(camera, target, fov, aspect);
   const floor = chests.length > 0 ? lowestOnScreen(chests, camera, a) : -Infinity;
@@ -178,6 +225,13 @@ export function foregroundHead(
   const near2 = FOREGROUND.nearShare * FOREGROUND.nearShare * subjectDistance2;
   const [middleX, middleY] = FOREGROUND.middle;
   const outside = FOREGROUND.edgeOutside;
+  const focusDepth = Math.hypot(
+    target[0] - camera[0],
+    target[1] - camera[1],
+    target[2] - camera[2],
+  );
+  const edge = 1 - 2 * FOREGROUND.dirtyShare;
+  let dirtySide = 0;
   for (const head of heads) {
     const dx = head.center[0] - camera[0];
     const dy = head.center[1] - camera[1];
@@ -198,17 +252,22 @@ export function foregroundHead(
     const radiusX = head.radius / (depth * a.tanH);
     const radiusY = head.radius / (depth * a.tanV);
     const under = up + radiusY < floor;
-    if (!under && distance2 < near2 && x - outside * radiusX < 1 && y - outside * radiusY < 1) {
-      return true;
-    }
     const overX = Math.abs(right - middle[0]) - radiusX < middleX;
     if (!under && overX && Math.abs(up - middle[1]) - radiusY < middleY) {
       return true;
     }
+    const near = !under && distance2 < near2;
     const large = head.radius / (depth * sizeTan) > FOREGROUND.edgeRadius;
-    if (large && x - outside * radiusX < 1 && y - outside * radiusY < 1) {
-      return true;
+    if ((!near && !large) || x - outside * radiusX >= 1 || y - outside * radiusY >= 1) {
+      continue;
     }
+    // A blurred head in the outer third of one side edge makes a dirty frame.
+    const side = Math.sign(right);
+    if (blurred(depth, focusDepth, lens) && x - radiusX >= edge && dirtySide !== -side) {
+      dirtySide = side;
+      continue;
+    }
+    return true;
   }
   return false;
 }
@@ -252,7 +311,9 @@ const NEAR_DEPTH = 0.1;
  * with their instruments, the conductor with the podium, and the stands. The subject players and
  * the risers do not count. A box counts when its middle is nearer to the camera than 0.9 of the
  * depth of the focus. The test marks the cells of a grid of 20 × 20 over the frame that the
- * screen rectangle of each box covers, and counts the cells of each object.
+ * screen rectangle of each box covers, and counts the cells of each object. A box that the depth
+ * of field blurs, with its screen rectangle in the outer third of one side edge, makes a dirty
+ * frame and does not count, as a head of {@link foregroundHead}.
  *
  * @param clearance The obstacles of the stage.
  * @param members The owners of the subject players. Their boxes do not count.
@@ -261,6 +322,7 @@ const NEAR_DEPTH = 0.1;
  * @param target The point that the camera looks at.
  * @param fov The vertical field of view, in degrees.
  * @param aspect The width of the frame divided by its height.
+ * @param lens The blur scale of the frame ({@link lensScale}), or 0 for a frame with no blur.
  * @returns True if an object covers too much of the frame.
  */
 export function foregroundObject(
@@ -271,6 +333,7 @@ export function foregroundObject(
   target: Vec3,
   fov: number,
   aspect: number,
+  lens = 0,
 ): boolean {
   const a = frameAxes(camera, target, fov, aspect);
   const [cx, cy, cz] = camera;
@@ -279,6 +342,8 @@ export function foregroundObject(
     ((focus[0] - cx) * a.fx + (focus[1] - cy) * a.fy + (focus[2] - cz) * a.fz);
   const n = FOREGROUND.cells;
   const most = FOREGROUND.objectShare * n * n;
+  const focusDepth = Math.hypot(target[0] - cx, target[1] - cy, target[2] - cz);
+  const edge = 1 - 2 * FOREGROUND.dirtyShare;
   for (const obstacle of clearance.obstacles) {
     if (obstacle.kind === 'risers' || members.includes(obstacle.owner)) {
       continue;
@@ -306,7 +371,8 @@ export function foregroundObject(
       const bx = box.x - cx;
       const by = (box.minY + box.maxY) / 2 - cy;
       const bz = box.z - cz;
-      if (bx * a.fx + by * a.fy + bz * a.fz > limit) {
+      const boxDepth = bx * a.fx + by * a.fy + bz * a.fz;
+      if (boxDepth > limit) {
         continue;
       }
       let ahead = false;
@@ -337,6 +403,9 @@ export function foregroundObject(
         x1 = Math.max(x1, x);
         y0 = Math.min(y0, y);
         y1 = Math.max(y1, y);
+      }
+      if ((x1 <= -edge || x0 >= edge) && blurred(boxDepth, focusDepth, lens)) {
+        continue;
       }
       // The cells with the middle in the rectangle: the middle of cell i is -1 + (2i + 1) / n.
       const i0 = Math.max(0, Math.ceil(((x0 + 1) * n) / 2 - 0.5));
