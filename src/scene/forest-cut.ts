@@ -204,6 +204,7 @@ attribute float cut;
 uniform sampler2D uKeep;
 uniform float uLift;
 varying vec2 vCorner;
+varying float vViewZ;
 void main() {
   vCorner = corner;
   if (texelFetch(uKeep, ivec2(int(cut + 0.5), 0), 0).r < 0.5) {
@@ -215,6 +216,7 @@ void main() {
   float near = 1.0 - min(glow * uLift, distance - 0.2) / distance;
   view.xyz *= near;
   view.xy += corner * glow * near;
+  vViewZ = view.z;
   gl_Position = projectionMatrix * view;
 }
 `;
@@ -226,6 +228,36 @@ varying vec2 vCorner;
 void main() {
   float d = length(vCorner);
   float light = exp(-6.0 * d * d) * (1.0 - smoothstep(0.8, 1.0, d));
+  gl_FragColor = vec4(uColor * light, 1.0);
+  #include <colorspace_fragment>
+}
+`;
+
+/**
+ * The fragment shader of the glow of the sun: the soft disc of {@link GLOW_FRAGMENT}, which the
+ * stage, the props, and the players hide. The glow shines through the trees, so it takes no depth
+ * test. It reads the depth of the frame with no surroundings (`BeamDepth` of `beam.ts`), so a
+ * close shot toward the sun keeps the players clear. With `uUseDepth` at 0, nothing hides it.
+ */
+export const SUN_GLOW_FRAGMENT = /* glsl */ `
+#include <packing>
+uniform vec3 uColor;
+uniform sampler2D uDepth;
+uniform vec2 uResolution;
+uniform float uNear;
+uniform float uFar;
+uniform float uUseDepth;
+varying vec2 vCorner;
+varying float vViewZ;
+void main() {
+  float d = length(vCorner);
+  float light = exp(-6.0 * d * d) * (1.0 - smoothstep(0.8, 1.0, d));
+  if (uUseDepth > 0.5) {
+    float depth = texture(uDepth, gl_FragCoord.xy / uResolution).x;
+    float sceneZ = perspectiveDepthToViewZ(depth, uNear, uFar);
+    // A surface of the stage nearer than the glow hides it, with a soft edge of 1 m.
+    light *= 1.0 - smoothstep(vViewZ - 0.5, vViewZ + 0.5, sceneZ);
+  }
   gl_FragColor = vec4(uColor * light, 1.0);
   #include <colorspace_fragment>
 }

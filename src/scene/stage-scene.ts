@@ -772,7 +772,7 @@ export class StageScene {
     scene.environment = this.#environments.get(venue.id)?.texture ?? null;
     scene.environmentIntensity = ENVIRONMENT.intensity;
     const point = new Vector3(...options.position);
-    venue.frameSurroundings(surroundings, stageSide, point, CAPTURE.size);
+    venue.frameSurroundings(surroundings, stageSide, point, CAPTURE.size, null);
     const target = yield* captureEnvironmentSteps(this.#renderer, this.#pmrem, scene, options);
     pending?.targets.push(target);
     scene.environment = target.texture;
@@ -976,7 +976,15 @@ export class StageScene {
       });
     }
     const pixels = this.#beamDepth.size[1];
-    view.venue.frameSurroundings(view.surroundings, view.stageSide, camera.position, pixels);
+    const depth = depthPass
+      ? {
+          texture: this.#beamDepth.texture,
+          size: this.#beamDepth.size,
+          near: camera.near,
+          far: camera.far,
+        }
+      : null;
+    view.venue.frameSurroundings(view.surroundings, view.stageSide, camera.position, pixels, depth);
     const focus = this.#focusOf(view, shot !== null, performance.now());
     if (!depthPass) {
       this.#holdPose(view);

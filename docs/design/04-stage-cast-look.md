@@ -63,8 +63,14 @@ export interface Venue {
   readonly id: VenueId; // 'hall' | 'forest' (`scene/venue-id.ts`)
   /** The surroundings: no light, no shadow, hidden in the depth passes of the beam. */
   surroundingsSteps(stageSide: number): Steps<Group>;
-  /** The cutaway of the surroundings and the glow size for a camera. */
-  frameSurroundings(surroundings: Group, stageSide: number, camera: Vector3, pixels: number): void;
+  /** The cutaway, the glow size, and the depth of the stage items for a camera. */
+  frameSurroundings(
+    surroundings: Group,
+    stageSide: number,
+    camera: Vector3,
+    pixels: number,
+    depth: FrameDepth | null, // the depth pass of the beam, with no surroundings
+  ): void;
   /** The scene that the PMREM environment captures, one time for each venue. */
   environmentScene(): Scene;
   /** The key, side, back-row, rim, fill, and conductor lights, and the beam (`VenueLight`). */
@@ -147,7 +153,9 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   limit, so that a lantern becomes a soft disc in a close shot. The lanterns give no real light,
   because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands low among
   the trees in the direction of the rim light, at the top right of the default view, and shines
-  through them.
+  through them. The stage, the props, and the players hide it: its shader reads the depth pass of
+  the beam, which holds no surroundings (`SUN_GLOW_FRAGMENT`). With no depth test, a close shot
+  toward the sun shows the glow as a glare over the back row.
 - **Chunk.** The kit and the forest code load in the lazy chunk (7.2). The kit takes the byte
   readers, `srgb()`, and the corner cut of the stage as arguments, which `venue.ts` gives through
   `ForestKit`.

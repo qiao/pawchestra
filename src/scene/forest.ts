@@ -15,13 +15,14 @@ import {
   FOREST_VERTEX,
   GLOW_FRAGMENT,
   GLOW_VERTEX,
+  SUN_GLOW_FRAGMENT,
   cutPoints,
   keepGroups,
 } from './forest-cut.ts';
 import type { VenueLight } from './lights.ts';
 import type { VenuePost } from './post.ts';
 import type { StageFinish, SideGlow } from './stage.ts';
-import type { Venue } from './venue.ts';
+import type { FrameDepth, Venue } from './venue.ts';
 
 /**
  * The runtime parts of the first download that the forest uses (design 7.2). This chunk imports
@@ -406,6 +407,63 @@ function sunGlow(kit: ForestKit): Glow {
   return { center, glow, cut: 0 };
 }
 
+/** The uniforms of the depth of the stage in the glow of the sun ({@link SUN_GLOW_FRAGMENT}). */
+interface SunDepthUniforms {
+  /** The depth texture of the frame with no surroundings. */
+  readonly uDepth: { value: Three.Texture | null };
+  /** The width and the height of the drawing buffer, in pixels. */
+  readonly uResolution: { value: Float32Array };
+  /** The near plane of the camera, in meters. */
+  readonly uNear: { value: number };
+  /** The far plane of the camera, in meters. */
+  readonly uFar: { value: number };
+  /** 1 to hide the glow behind the stage items, 0 with no depth. */
+  readonly uUseDepth: { value: number };
+}
+
+/**
+ * Turns the glow of the sun into a glow that the stage items hide (design 4.1): a close shot
+ * toward the sun saw the glow over the back row, because the glow takes no depth test.
+ *
+ * @param kit The runtime parts of the first download.
+ * @param sun The mesh of the glow of the sun, from `glowMesh()`.
+ * @returns The uniforms of the depth, or null if the mesh has no shader material.
+ */
+function hideSunBehindStage(kit: ForestKit, sun: Three.Mesh): SunDepthUniforms | null {
+  const material = sun.material;
+  if (!(material instanceof kit.three.ShaderMaterial)) {
+    return null;
+  }
+  const uniforms: SunDepthUniforms = {
+    uDepth: { value: null },
+    uResolution: { value: new Float32Array([1, 1]) },
+    uNear: { value: 0.1 },
+    uFar: { value: 100 },
+    uUseDepth: { value: 0 },
+  };
+  // The glow of the sun shines through the canopy, so no tree hides it.
+  material.depthTest = false;
+  material.fragmentShader = SUN_GLOW_FRAGMENT;
+  Object.assign(material.uniforms, uniforms);
+  return uniforms;
+}
+
+/**
+ * Sets the depth of the stage items of a frame in the glow of the sun.
+ *
+ * @param uniforms The uniforms of {@link hideSunBehindStage}.
+ * @param depth The depth of the frame, or null with no depth pass.
+ */
+function setSunDepth(uniforms: SunDepthUniforms, depth: FrameDepth | null): void {
+  uniforms.uUseDepth.value = depth ? 1 : 0;
+  if (depth) {
+    uniforms.uDepth.value = depth.texture;
+    uniforms.uResolution.value.set(depth.size);
+    uniforms.uNear.value = depth.near;
+    uniforms.uFar.value = depth.far;
+  }
+}
+
 /**
  * Creates the cut of a build: the texture of the groups, with each group kept.
  *
@@ -494,6 +552,7 @@ function linearColors<K extends string>(
  */
 export function forestVenue(kit: ForestKit): Venue {
   const cuts = new WeakMap<Group, ForestCut>();
+  const suns = new WeakMap<Group, SunDepthUniforms>();
   let parts: ReturnType<typeof forestParts> | null = null;
   return {
     id: 'forest',
@@ -515,10 +574,7 @@ export function forestVenue(kit: ForestKit): Venue {
       const cut = createCut(kit, build, stageSide);
       const lamps = build.lamps.map((lamp: ForestLamp) => ({ ...lamp, glow: FOREST.lanternGlow }));
       const sun = glowMesh(kit, [sunGlow(kit)], FOREST.glowLight.sun, { cut, lift: 0 });
-      // The glow of the sun shines through the canopy, so no tree hides it.
-      if (!Array.isArray(sun.material)) {
-        sun.material.depthTest = false;
-      }
+      const sunDepth = hideSunBehindStage(kit, sun);
       const group = new kit.three.Group().add(
         forestMesh(kit, build.solid, cut, false),
         forestMesh(kit, build.foliage, cut, true),
@@ -526,9 +582,22 @@ export function forestVenue(kit: ForestKit): Venue {
         sun,
       );
       cuts.set(group, cut);
+      if (sunDepth) {
+        suns.set(group, sunDepth);
+      }
       return group;
     },
-    frameSurroundings(surroundings: Group, _stageSide: number, camera: Vector3) {
+    frameSurroundings(
+      surroundings: Group,
+      _stageSide: number,
+      camera: Vector3,
+      _pixels: number,
+      depth: FrameDepth | null,
+    ) {
+      const sun = suns.get(surroundings);
+      if (sun) {
+        setSunDepth(sun, depth);
+      }
       const cut = cuts.get(surroundings);
       if (
         !cut ||

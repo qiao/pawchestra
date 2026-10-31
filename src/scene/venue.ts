@@ -15,7 +15,7 @@ import {
   ShaderMaterial,
   SphereGeometry,
 } from 'three';
-import type { Vector3 } from 'three';
+import type { Texture, Vector3 } from 'three';
 
 import { SCENE_COLORS } from '../models/colors.ts';
 import type { PropColors } from '../models/colors.ts';
@@ -33,6 +33,18 @@ import type { VenuePost } from './post.ts';
 import { HALL_STAGE } from './stage.ts';
 import type { VenueStage } from './stage.ts';
 import type { VenueId } from './venue-id.ts';
+
+/** The depth of the stage items of a frame, which the surroundings can read (design 4.1). */
+export interface FrameDepth {
+  /** The depth texture of the frame with no surroundings and no light effects. */
+  readonly texture: Texture;
+  /** The width and the height of the drawing buffer, in pixels. */
+  readonly size: readonly [number, number];
+  /** The near plane of the camera, in meters. */
+  readonly near: number;
+  /** The far plane of the camera, in meters. */
+  readonly far: number;
+}
 
 /**
  * The values and the builders of one venue (design 4.1): the surroundings, the environment of the
@@ -57,8 +69,16 @@ export interface Venue {
    * @param stageSide The stage side `S`, in meters.
    * @param camera The camera position.
    * @param pixels The height of the drawing buffer, in pixels.
+   * @param depth The depth of the stage items of the frame, or null with no depth pass, such as
+   *   for the capture of the environment.
    */
-  frameSurroundings(surroundings: Group, stageSide: number, camera: Vector3, pixels: number): void;
+  frameSurroundings(
+    surroundings: Group,
+    stageSide: number,
+    camera: Vector3,
+    pixels: number,
+    depth: FrameDepth | null,
+  ): void;
   /**
    * Builds the scene that the PMREM environment of the reflections captures one time for the
    * venue. The caller frees its geometries and materials.
