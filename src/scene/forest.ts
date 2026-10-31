@@ -90,9 +90,9 @@ export const FOREST = {
     sky: [0.32, 0.3, 0.14],
     ground: [0.14, 0.09, 0.04],
     sun: [2.2, 1.45, 0.55],
-    sunShade: [0.25, 9],
+    sunShade: [0.5, 9],
     canopy: { distance: [1.5, 7], height: [2, 8], shade: 0.65 },
-    leafGlow: [0.7, 0.75, 0.2],
+    leafGlow: [3, 3.2, 0.8],
     key: { light: [0.45, 0.32, 0.18], direction: [-0.3, 0.7, 1] },
     deck: { light: [0.7, 0.42, 0.18], reach: 2.5 },
     lantern: { light: [1.6, 0.8, 0.25], reach: 0.9 },
@@ -139,7 +139,7 @@ export const FOREST = {
  * light on the conductor start at the values of the hall.
  */
 export const FOREST_LIGHT = {
-  key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.2 },
+  key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.8 },
   side: {
     color: '#ffe0b4',
     position: [1.1, 1.4, 0.7],
@@ -156,7 +156,7 @@ export const FOREST_LIGHT = {
     penumbra: 0.5,
   },
   rim: { color: '#ffb866', illuminance: 6.5, angle: 16 * DEGREES, penumbra: 1 },
-  beam: { color: '#ffc47a', strength: 6.2, moteStrength: 1 },
+  beam: { color: '#ffc47a', strength: 4.5, moteStrength: 1 },
   fill: { sky: '#3a3a1c', ground: '#3a2814', intensity: 4.2 },
   conductor: {
     aimHeight: 1.2,
@@ -177,16 +177,16 @@ type PropHex = Readonly<Record<keyof PropColors, string>>;
 /** The stage of the forest (design 4.1): a lighter, warmer, and matte wood, in sRGB. */
 export const FOREST_STAGE = {
   colors: {
-    plank: '#84461a',
+    plank: '#9c5a16',
     seam: '#6a3610',
     nosing: '#925424',
     skirt: '#4e2c14',
     groove: '#30190b',
-    podium: '#7a4626',
+    podium: '#8a5028',
     riserTread: '#94592a',
     riserNosing: '#b8783a',
     podiumPanel: '#663a1e',
-    podiumTop: '#8e5630',
+    podiumTop: '#9a6034',
     podiumTopPanel: '#804c2a',
   },
   finish: {
@@ -205,7 +205,7 @@ export const FOREST_STAGE = {
 
 /** The props of the forest (design 4.1): chairs of a dark wood and black music stands, in sRGB. */
 export const FOREST_PROPS = {
-  chair: '#5a2a0e',
+  chair: '#7a3e16',
   stand: '#1e1a16',
   standDesk: '#544840',
   standEdge: '#a08b7a',
@@ -220,7 +220,7 @@ export const FOREST_POST = {
     bloomStrength: 0.18,
     diffusion: 0.025,
     halation: [1.2, 1.0, 0.7],
-    vignette: 0.6,
+    vignette: 0.75,
     grain: 0.035,
   },
   haze: { density: 0.18, color: [0.06, 0.04, 0.015], forward: 0.65 },
@@ -235,7 +235,7 @@ export const FOREST_POST = {
       [210, 232],
       [255, 252],
     ],
-    saturation: 1.08,
+    saturation: 1.2,
     vibrance: 0.4,
     shadowSaturation: 0.9,
     shadowTint: [0.008, 0.004, -0.01],
