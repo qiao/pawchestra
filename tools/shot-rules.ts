@@ -14,9 +14,12 @@
  * - `room`: a close shot of a player or a section that looks to one side puts it in the middle of
  *   the frame, or on the side of its look (look room).
  * - `headroom`: the eyes of a close shot of a player or a section are far from the upper third line.
+ * - `head`: the top of a head of a player of a solo or a section shot, with the ears, is above the
+ *   top edge of the frame (a cut head).
  *
  * The tool also gives the median and the largest elevation and height of the camera of each kind
- * of shot, from a sample each {@link SAMPLE_STEP}.
+ * of shot, from a sample each {@link SAMPLE_STEP}, and the median share of the frame width that
+ * the footprints of the players of a solo or a section shot fill.
  *
  * Usage: pnpm shot-trace --rules [--demo <id>]... [--base <ref>] [--list] [--json <file>]
  */
@@ -25,9 +28,10 @@ import { writeFileSync } from 'node:fs';
 import { patchedDemos } from './patch-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
+import { layoutObstacles, layoutScene } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
+import { boneIndex } from '../src/models/rig.ts';
 import type { Transport } from '../src/pose/types.ts';
 import { buildScore } from '../src/score/score.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
@@ -74,7 +78,7 @@ export const GRAMMAR = {
 export const SAMPLE_STEP = 0.25;
 
 /** A rule of film grammar that the tool checks. */
-export type GrammarRule = 'line' | 'look' | 'jump' | 'motion' | 'room' | 'headroom';
+export type GrammarRule = 'line' | 'look' | 'jump' | 'motion' | 'room' | 'headroom' | 'head';
 
 /** The rules, in the order of the output. */
 export const GRAMMAR_RULES: readonly GrammarRule[] = [
@@ -84,6 +88,7 @@ export const GRAMMAR_RULES: readonly GrammarRule[] = [
   'motion',
   'room',
   'headroom',
+  'head',
 ];
 
 /** One break of a rule. */
@@ -106,6 +111,11 @@ export interface KindHeights {
   readonly elevations: number[];
   /** The height of each sample above the stage top, in meters. */
   readonly heights: number[];
+  /**
+   * The share of the frame width that the footprints of the players of each solo or section shot
+   * fill, in the middle of its move.
+   */
+  readonly widths: number[];
 }
 
 /** The result of the check of the demos. */
@@ -128,6 +138,8 @@ export interface KindSummary {
   /** In meters above the stage top. */
   readonly medianHeight: number;
   readonly maxHeight: number;
+  /** The median share of the frame width that the players fill, or 0 for no solo or section. */
+  readonly medianWidth: number;
 }
 
 /** The transport of a play from the song start, as the camera probe uses it. */
@@ -162,6 +174,74 @@ interface ShotSubject {
   readonly facing: number;
   /** The mean point of the middles of their heads. */
   readonly eyes: Vec3;
+  /** The index of each player in `SceneLayout.players`. */
+  readonly owners: readonly number[];
+}
+
+/** The top of the head and the footprint of one player, for the head rule and the width share. */
+export interface PlayerExtent {
+  /** The top of the head with the ears, over the middle of the head. */
+  readonly top: Vec3;
+  /** The corners of the footprint boxes in the stage plane. */
+  readonly corners: readonly Vec3[];
+}
+
+/** The bones of the head with the ears. */
+const HEAD_BONES: ReadonlySet<number> = new Set(
+  (['head', 'jaw', 'earL', 'earR'] as const).map((name) => boneIndex(name)),
+);
+
+/**
+ * Gives the top of the head and the footprint of each player of a layout. The tool reads them
+ * from the models and the obstacles, so it also runs on a commit from before the extent of the
+ * subjects (design 5.6).
+ *
+ * @param layout The layout.
+ * @param models The models of the score.
+ * @param subjects The places of the subjects.
+ * @returns The extent of each player, by its index in `SceneLayout.players`.
+ */
+export function playerExtents(
+  layout: SceneLayout,
+  models: ModelCache,
+  subjects: StageSubjects,
+): Map<number, PlayerExtent> {
+  const heads = new Map<number, Vec3>();
+  for (const seat of subjects.seats) {
+    for (const p of seat?.players ?? []) {
+      heads.set(p.sights.owner, p.sights.head);
+    }
+  }
+  const obstacles = layoutObstacles(layout, models);
+  const first = layout.conductor ? 1 : 0;
+  const extents = new Map<number, PlayerExtent>();
+  for (const [index, place] of layout.players.entries()) {
+    const { species, instrument, kettles, support } = place.cast;
+    const { positions, bones } = models.get(species, instrument, kettles, support).mesh;
+    let top = -Infinity;
+    for (let corner = 0; corner < bones.length; corner++) {
+      if (HEAD_BONES.has(bones[corner] ?? -1)) {
+        top = Math.max(top, positions[corner * 3 + 1] ?? top);
+      }
+    }
+    const head = heads.get(index) ?? place.position;
+    const corners: Vec3[] = [];
+    for (const box of obstacles[first + index]?.boxes ?? []) {
+      for (const [lx, lz] of [
+        [-box.halfX, -box.halfZ],
+        [box.halfX, -box.halfZ],
+        [-box.halfX, box.halfZ],
+        [box.halfX, box.halfZ],
+      ] as const) {
+        corners.push([box.x + lx * box.cos + lz * box.sin, 0, box.z - lx * box.sin + lz * box.cos]);
+      }
+    }
+    extents.set(index, {
+      top: [head[0], Math.max(head[1], place.position[1] + top), head[2]],
+      corners,
+    });
+  }
+  return extents;
 }
 
 /**
@@ -313,6 +393,7 @@ function shotSubject(subjects: StageSubjects, shot: Shot): ShotSubject | null {
     center: [x / n, shot.target[1], z / n],
     facing: Math.atan2(fx, fz),
     eyes: [ex / n, ey / n, ez / n],
+    owners: players.map((p) => p.sights.owner),
   };
 }
 
@@ -421,6 +502,7 @@ function degrees(radians: number): string {
  * @param subjects The places of the subjects.
  * @param durationSec The song length.
  * @param kinds The elevations and the heights of each kind, which the function adds to.
+ * @param extents The top of the head and the footprint of each player ({@link playerExtents}).
  * @returns The breaks.
  */
 export function checkPlan(
@@ -430,6 +512,7 @@ export function checkPlan(
   subjects: StageSubjects,
   durationSec: number,
   kinds: Map<ShotKind, KindHeights>,
+  extents: ReadonlyMap<number, PlayerExtent>,
 ): RuleBreak[] {
   const breaks: RuleBreak[] = [];
   const master = defaultView(layout.stageSide, CINEMA_ASPECT, 1).position;
@@ -442,7 +525,7 @@ export function checkPlan(
     const start = Math.max(0, shot.startSec);
     const end = Number.isFinite(shot.endSec) ? Math.min(shot.endSec, durationSec) : shot.moveEndSec;
     const subject = shotSubject(subjects, shot);
-    const heights = kinds.get(shot.kind) ?? { elevations: [], heights: [] };
+    const heights = kinds.get(shot.kind) ?? { elevations: [], heights: [], widths: [] };
     kinds.set(shot.kind, heights);
     let worstLine = 0;
     let lookBreak: string | null = null;
@@ -484,6 +567,23 @@ export function checkPlan(
       }
       if (Math.abs(y - GRAMMAR.eyeLine) > GRAMMAR.eyeTolerance) {
         add('headroom', start, shot.kind, `eyes at y ${y.toFixed(2)}`);
+      }
+      if (shot.kind !== 'side') {
+        const players = subject.owners.flatMap((owner) => extents.get(owner) ?? []);
+        const xs = players.flatMap((p) => p.corners.map((c) => project(frame, c)[0]));
+        heights.widths.push((Math.max(...xs) - Math.min(...xs)) / 2);
+        // The top of each head in the frame stays below the top edge for the full move.
+        let top = -Infinity;
+        for (const t of [moveStart, (moveStart + moveEnd) / 2, moveEnd]) {
+          const sample = frameAt(plan, Math.min(t, end - 1e-6));
+          for (const p of players) {
+            const [hx, hy] = project(sample, p.top);
+            top = Math.abs(hx) <= 1 ? Math.max(top, hy) : top;
+          }
+        }
+        if (top > 1) {
+          add('head', start, shot.kind, `top of a head at y ${top.toFixed(2)}`);
+        }
       }
     }
   }
@@ -561,7 +661,8 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
     const plan = prepareShots(score, layout, SHOT_SEED, models);
     const subjects = prepareSubjects(score, layout, models);
     shots[name] = plan.shots.length;
-    breaks.push(...checkPlan(name, plan, layout, subjects, score.durationSec, kinds));
+    const extents = playerExtents(layout, models, subjects);
+    breaks.push(...checkPlan(name, plan, layout, subjects, score.durationSec, kinds, extents));
   }
 
   const summary: Record<string, KindSummary> = {};
@@ -572,6 +673,7 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
       maxElevation: Math.max(...values.elevations),
       medianHeight: median(values.heights),
       maxHeight: Math.max(...values.heights),
+      medianWidth: median(values.widths),
     };
   }
   return { breaks, shots, kinds: summary };
@@ -655,8 +757,8 @@ export function rulesLines(
 
   const kinds: ShotKind[] = ['wide', 'high', 'conductor', 'side', 'section', 'solo'];
   lines.push(
-    '| Kind | Tree | Median elevation | Max elevation | Median height m | Max height m |',
-    '|---|---|---:|---:|---:|---:|',
+    '| Kind | Tree | Median elevation | Max elevation | Median height m | Max height m | Median width |',
+    '|---|---|---:|---:|---:|---:|---:|',
   );
   for (const kind of kinds) {
     for (const [name, output] of outputs) {
@@ -665,7 +767,7 @@ export function rulesLines(
         continue;
       }
       lines.push(
-        `| ${kind} | ${name} | ${k.medianElevation.toFixed(1)}° | ${k.maxElevation.toFixed(1)}° | ${k.medianHeight.toFixed(2)} | ${k.maxHeight.toFixed(2)} |`,
+        `| ${kind} | ${name} | ${k.medianElevation.toFixed(1)}° | ${k.maxElevation.toFixed(1)}° | ${k.medianHeight.toFixed(2)} | ${k.maxHeight.toFixed(2)} | ${k.medianWidth > 0 ? k.medianWidth.toFixed(2) : '-'} |`,
       );
     }
   }
