@@ -1158,41 +1158,70 @@ def build_lantern_standing():
     return part
 
 
-def scatter_points(rng, center_radius, outer, spacing_near, spacing_far, near):
-    """Gives random points in a disc, closer together near the center."""
-    points = []
-    r = center_radius
-    while r < outer:
-        spacing = (
-            spacing_near
-            if r < near
-            else spacing_near + (spacing_far - spacing_near) * min(1.0, (r - near) / (outer - near))
-        )
-        count = max(6, int(2 * math.pi * r / spacing))
+#: The places of the standing lanterns on the stumps, x and z in meters: the ground around them
+#: gets a finer grid, so that the baked pool of their light stays round.
+LANTERN_POOLS = ((-4.6, 4.3), (4.75, 4.45))
+
+
+def ground_spacing(x, z):
+    """Gives the space between the points of the ground at a place, in meters.
+
+    The grid is fine near the deck, where the cameras look, finer around the standing lanterns,
+    and coarse under the deck and far away.
+    """
+    edge = deck_distance(x, z)
+    if edge < -0.8:
+        return 2.0
+    if min(math.hypot(x - lx, z - lz) for lx, lz in LANTERN_POOLS) < 1.8:
+        return 0.3
+    return 0.5 + 4.0 * smoothstep(9.0, 36.0, edge)
+
+
+def ground_points(rng, outer):
+    """Gives the points of the ground: rings of points with the space of `ground_spacing()`."""
+    points = [(0.0, 0.0)]
+    r = 0.6
+    while r < outer - 1.5:
         start = rng.uniform(0, 2 * math.pi)
-        for k in range(count):
-            a = start + 2 * math.pi * (k + rng.uniform(-0.3, 0.3)) / count
-            rr = r + rng.uniform(-0.3, 0.3) * spacing
+        a = start
+        while a < start + 2 * math.pi - 1e-6:
+            x, z = r * math.cos(a), r * math.sin(a)
+            step = ground_spacing(x, z)
+            rr = r + rng.uniform(-0.25, 0.25) * step
             points.append((rr * math.cos(a), rr * math.sin(a)))
-        r += spacing * 0.87
+            a += step / r * rng.uniform(0.85, 1.15)
+        r += min(ground_spacing(r, 0.0), ground_spacing(0.0, r)) * 0.87
     return points
 
 
-def build_ground():
-    """Builds the forest ground: a faceted disc of earth with patches of moss and litter.
+def ground_rise(waves, x, z):
+    """Gives the soft rise of the ground at a place, in meters.
 
-    The disc rises at its rim, so that a far view sees no edge under the trees.
+    The clearing in front of the deck and the stream stay flat, because the path and the water
+    lie just above the ground there. Elsewhere, low mounds grow with the distance from the deck.
+    """
+    edge = deck_distance(x, z)
+    calm = smoothstep(0.0, 1.5, min(math.hypot(x - wx, z - wz) for wx, wz in STREAM_COURSE))
+    if -3.2 < x < 3.4 and z > HALF - 0.5:
+        calm *= smoothstep(0.0, 1.2, min(x + 3.2, 3.4 - x))
+    amplitude = (0.03 + 0.09 * smoothstep(2.0, 12.0, edge)) * calm
+    return amplitude * waves(Vector((x, 0.0, z)))
+
+
+def build_ground():
+    """Builds the forest ground: a disc of earth with soft rises and soft patches of litter.
+
+    The disc rises at its rim, so that a far view sees no edge under the trees. Its origin is on
+    the ground, as the other parts.
     """
     part = Part('ground')
     rng = part.rng
     outer = 42.0
-    flat = scatter_points(rng, 0.8, outer, 1.1, 4.5, 12.0)
-    flat = [(0.0, 0.0)] + flat
     rim = [
         (outer * math.cos(2 * math.pi * k / 48), outer * math.sin(2 * math.pi * k / 48))
         for k in range(48)
     ]
-    flat = [p for p in flat if math.hypot(*p) < outer - 1.5] + rim
+    flat = ground_points(rng, outer) + rim
     verts2d, _, faces, _, _, _ = delaunay_2d_cdt([Vector(p) for p in flat], [], [], 0, 1e-4)
     patches = [
         (
@@ -1204,11 +1233,12 @@ def build_ground():
     ]
     tone = Waves(part.tint, 3.0)
     edge = Waves(part.tint, 1.2)
+    mounds = Waves(rng, 2.5)
     points = []
     for v in verts2d:
         r = v.length
         rise = 0.0 if r < 16 else 2.2 * ((r - 16) / (outer - 16)) ** 1.6
-        points.append(Vector((v.x, GROUND_Y + rng.uniform(-0.03, 0.03) + rise, v.y)))
+        points.append(Vector((v.x, rise + ground_rise(mounds, v.x, v.y), v.y)))
 
     def paint(normal, point):
         p = Vector((point.x, point.z))
@@ -1629,7 +1659,7 @@ CUT = STAGE_CORNER_CUT * STAGE_SIDE
 
 #: The most triangles of all placed parts around the stage of the default demo, with the lanterns
 #: of the light string.
-TRIANGLE_BUDGET = 50000
+TRIANGLE_BUDGET = 200000
 
 #: The least space between the deck edge and the trunk with its roots, in meters.
 TREE_CLEARANCE = 1.5
