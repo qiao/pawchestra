@@ -327,8 +327,6 @@ Read the group of your work before you plan it.
   of the color attribute.
 - The `location` of a new child object is in the frame of its parent. Undo the place, the turn,
   and the scale of the parent to get the local point.
-- A color function that draws from the random generator of the forms moves the forms. Give the
-  colors a generator of their own, as `Part.tint` of `tools/forest-kit/build-kit.py`.
 
 ### Probes
 

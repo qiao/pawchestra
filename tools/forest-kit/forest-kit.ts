@@ -76,12 +76,8 @@ interface KitNode {
 
 /** A primitive of a mesh of the GLB file: the faces of one material. */
 interface KitPrimitive {
-  /** The accessors of the places, the normals, and the colors of the vertices. */
-  readonly attributes: {
-    readonly POSITION: number;
-    readonly NORMAL?: number;
-    readonly COLOR_0?: number;
-  };
+  /** The accessors of the places and of the colors of the vertices. */
+  readonly attributes: { readonly POSITION: number; readonly COLOR_0?: number };
   /** The accessor of the vertices of the triangles. */
   readonly indices: number;
   /** The material, whose name is the kind of the faces. */
@@ -243,29 +239,13 @@ function isKind(name: string): name is ForestFaceKind {
 }
 
 /**
- * Gives the unit normal of a triangle, counterclockwise from its front.
- *
- * @param corners The three corners.
- * @returns The normal, or +y for a triangle with no area.
- */
-function faceNormal(corners: readonly [Vec3, Vec3, Vec3]): Vec3 {
-  const [a, b, c] = corners;
-  const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]] as const;
-  const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]] as const;
-  const n: Vec3 = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
-  const length = Math.hypot(...n);
-  return length > 1e-12 ? [n[0] / length, n[1] / length, n[2] / length] : [0, 1, 0];
-}
-
-/**
- * Reads the triangles of the mesh of a part node. A primitive with no normals gets the normal of
- * each face at its corners, so that each face stays flat.
+ * Reads the triangles of the mesh of a part node.
  *
  * @param glb The file.
  * @param node The node of the part.
- * @returns The triangles, with the color and the normal of each corner.
- * @throws Error if the node moves its mesh, a material is not a kind, or a primitive has no
- *   color.
+ * @returns The triangles, each with the color of its first corner.
+ * @throws Error if the node moves its mesh, a material is not a kind, a primitive has no color,
+ *   or the corners of a triangle have different colors.
  */
 function partTriangles(glb: KitGlb, node: KitNode): ForestTriangle[] {
   const moved =
@@ -284,34 +264,26 @@ function partTriangles(glb: KitGlb, node: KitNode): ForestTriangle[] {
       throw new Error(`The part ${node.name ?? '?'} has a primitive with no kind or no color.`);
     }
     const positions = readAccessor(glb, primitive.attributes.POSITION);
-    const normals =
-      primitive.attributes.NORMAL === undefined
-        ? null
-        : readAccessor(glb, primitive.attributes.NORMAL);
     const colors = readAccessor(glb, primitive.attributes.COLOR_0);
     const colorSize = colors.length / (positions.length / 3);
     const indices = readAccessor(glb, primitive.indices);
-    const triple = (values: Float64Array, at: number): Vec3 => [
-      values[at] ?? 0,
-      values[at + 1] ?? 0,
-      values[at + 2] ?? 0,
-    ];
     for (let t = 0; t < indices.length; t += 3) {
-      const vertices = [indices[t] ?? 0, indices[t + 1] ?? 0, indices[t + 2] ?? 0] as const;
-      const corners = vertices.map((v) => triple(positions, v * 3));
-      const rgb = vertices.map((v): Vec3 => {
-        const [r, g, b] = triple(colors, v * colorSize);
-        return [srgbByte(r), srgbByte(g), srgbByte(b)];
+      const corner = (k: number): Vec3 => {
+        const v = indices[t + k] ?? 0;
+        return [positions[v * 3] ?? 0, positions[v * 3 + 1] ?? 0, positions[v * 3 + 2] ?? 0];
+      };
+      const [rgb, ...others] = [0, 1, 2].map((k): Vec3 => {
+        const at = (indices[t + k] ?? 0) * colorSize;
+        return [
+          srgbByte(colors[at] ?? 0),
+          srgbByte(colors[at + 1] ?? 0),
+          srgbByte(colors[at + 2] ?? 0),
+        ];
       });
-      const [a = [0, 0, 0], b = a, c = a] = corners;
-      const flat = faceNormal([a, b, c]);
-      const n = vertices.map((v) => (normals ? triple(normals, v * 3) : flat));
-      triangles.push({
-        corners: [a, b, c],
-        colors: [rgb[0] ?? [0, 0, 0], rgb[1] ?? [0, 0, 0], rgb[2] ?? [0, 0, 0]],
-        normals: [n[0] ?? flat, n[1] ?? flat, n[2] ?? flat],
-        kind,
-      });
+      if (!rgb || others.some((other) => other.join() !== rgb.join())) {
+        throw new Error(`A triangle of the part ${node.name ?? '?'} has corners of two colors.`);
+      }
+      triangles.push({ corners: [corner(0), corner(1), corner(2)], rgb, kind });
     }
   }
   return triangles;

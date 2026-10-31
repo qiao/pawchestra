@@ -1,16 +1,21 @@
-import type { Steps } from '../../score/steps.ts';
 import type { Vec3 } from '../tuples.ts';
 import { FOREST_KIT } from './kit-data.ts';
 import { unpackForestPart } from './kit-format.ts';
-import type { ForestKitData, ForestMesh, ForestRopeEnd, KitReaders } from './kit-format.ts';
+import type { ForestKitData, ForestRopeEnd, KitReaders } from './kit-format.ts';
 
 export { FOREST_FACE_KINDS } from './kit-format.ts';
 export type { ForestFaceKind, KitReaders } from './kit-format.ts';
 
-/** One part of the forest kit: shared vertices and triangles, in meters. */
-export interface ForestPart extends ForestMesh {
+/** One part of the forest kit, as flat triangles in meters. */
+export interface ForestPart {
   /** The name of the part, such as 'tree-1' or 'lantern-hanging'. */
   readonly name: string;
+  /** Three numbers for each corner, three corners for each triangle. */
+  readonly positions: Float32Array;
+  /** The linear RGB of each corner. */
+  readonly colors: Float32Array;
+  /** The kind of each triangle, as an index into FOREST_FACE_KINDS. */
+  readonly kinds: Uint8Array;
 }
 
 /** One placed copy of a part around a stage. */
@@ -76,27 +81,6 @@ const ROPE_SEGMENTS = 24;
  */
 export function forestParts(readers: KitReaders, kit: ForestKitData = FOREST_KIT): ForestPart[] {
   return kit.parts.map(({ name, packed }) => ({ name, ...unpackForestPart(packed, readers) }));
-}
-
-/**
- * Decodes the parts of the kit in steps, one part in each step, so that the decode of the app
- * makes no long task (design 7.2).
- *
- * @param readers The functions of the first download that read the bytes (design 7.2).
- * @param kit The packed kit. The kit of `pnpm forest-kit` by default.
- * @returns The steps, which return each part, in the order of the kit.
- * @throws Error if the packed data of a part is broken.
- */
-export function* forestPartSteps(
-  readers: KitReaders,
-  kit: ForestKitData = FOREST_KIT,
-): Steps<ForestPart[]> {
-  const parts: ForestPart[] = [];
-  for (const { name, packed } of kit.parts) {
-    parts.push({ name, ...unpackForestPart(packed, readers) });
-    yield;
-  }
-  return parts;
 }
 
 /**

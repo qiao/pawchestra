@@ -2,8 +2,8 @@ import type * as Three from 'three';
 import type { Group, Scene, Vector3 } from 'three';
 
 import type { PropColors } from '../models/colors.ts';
-import type { ForestPart, KitReaders } from '../models/forest/kit.ts';
-import { forestPartSteps, placeForest } from '../models/forest/kit.ts';
+import type { KitReaders } from '../models/forest/kit.ts';
+import { forestParts, placeForest } from '../models/forest/kit.ts';
 import type { Rgb } from '../models/mesh.ts';
 import type { StageColors } from '../models/props.ts';
 import type { plankHash } from '../models/stage.ts';
@@ -300,7 +300,6 @@ function forestMesh(
   geometry.setAttribute('position', new three.BufferAttribute(arrays.positions, 3));
   geometry.setAttribute('color', new three.BufferAttribute(arrays.colors, 3));
   geometry.setAttribute('cut', new three.BufferAttribute(arrays.cut, 1));
-  geometry.setIndex(new three.BufferAttribute(arrays.index, 1));
   const material = new three.ShaderMaterial({
     vertexShader: FOREST_VERTEX,
     fragmentShader: FOREST_FRAGMENT,
@@ -554,11 +553,11 @@ function linearColors<K extends string>(
 export function forestVenue(kit: ForestKit): Venue {
   const cuts = new WeakMap<Group, ForestCut>();
   const suns = new WeakMap<Group, SunDepthUniforms>();
-  let parts: ForestPart[] | null = null;
+  let parts: ReturnType<typeof forestParts> | null = null;
   return {
     id: 'forest',
     *surroundingsSteps(stageSide) {
-      parts ??= yield* forestPartSteps(kit.readers);
+      parts ??= forestParts(kit.readers);
       yield;
       const build = yield* buildForestSteps({
         parts,

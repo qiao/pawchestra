@@ -104,20 +104,6 @@ The forest draws each part of the kit (`models/forest/kit.ts`) at its place arou
 with rings of far trees, a backdrop of tree tops, and a far ground (`scene/forest-build.ts`,
 `FOREST`).
 
-- **Style.** The forest has the style of the musicians: smooth, round forms with soft light.
-  Faceted bushes beside the smooth players read as a second style. These forms make the style
-  (`tools/forest-kit/build-kit.py`):
-  - The leaves are clusters of smooth lumps.
-  - The trunks and the branches have many sides and a soft root flare.
-  - The rocks have flat sides and soft edges.
-  - The log and the stumps have round rims and cut ends with rings.
-  - The ground is a fine grid with soft rises away from the clearing.
-
-  Each vertex of the kit has a color from smooth functions of its place and its normal. A seeded
-  field of waves blends the colors of a part, so each color keeps about its share, and no face
-  stands out. The organic parts shade smooth across their shared vertices. The lanterns keep
-  flat faces.
-
 - **Sun.** The rim light is the low sun at the back right (`FOREST_LIGHT.rimPlace`), so the beam
   slants from the top right toward the stage, as the light shafts of `forest.webp`. The glow of
   the sun and the sun of the bake stand in the same direction (`forestSun()`). The shot plan
@@ -126,36 +112,29 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   beam, and no camera crosses the haze surface in a shot. A lower or a more turned sun breaks
   this rule.
 - **Baked light.** The surroundings take no light, as the hall, because a light costs GPU time
-  on large surfaces. Each vertex gets the light of the low sun, the sky, the key, the lit deck,
-  and the lanterns in its color, from its smooth normal (`FOREST.bake`). A low vertex far from
-  the clearing gets less sky and sun, as under a canopy. The leaves and the far trees in the
-  direction of the sun glow yellow-green (`FOREST.bake.sunLeaves`), as the lit leaves of
-  `forest.webp`. The far parts get a haze that glows toward the sun at the back right. A lit
-  material, as the props have, does not fit: it costs GPU time on the many pixels of the forest
-  (9.7), and the spot cones of the stage light only the deck, so the forest gets only the fill
-  and goes dark.
+  on large surfaces. Each face gets the light of the low sun, the sky, the key, the lit deck, and
+  the lanterns in its color (`FOREST.bake`). A low face far from the clearing gets less sky and
+  sun, as under a canopy. The leaves and the far trees in the direction of the sun glow
+  yellow-green (`FOREST.bake.sunLeaves`), as the lit leaves of `forest.webp`. The far parts get a
+  haze that glows toward the sun at the back right. One color for each face keeps the low-poly
+  facets.
 - **Two meshes.** The placed copies merge into one mesh of the faces that show from the front,
   and one mesh of the leaves, which show from both sides, because the fronds and the grass
-  blades are single sheets. Each mesh shares the vertices of each copy through an index, so the
-  bake runs one time for each vertex.
+  blades are single sheets.
 - **Framing.** The default view stands close to the deck. Thus the two framing trees stand
   `FRAME_CLEARANCE` from the deck edge with their roots (`tools/forest-kit/build-kit.py`), and
   their low boughs fill the top corners. The other trees keep `TREE_CLEARANCE`. The default view
   sees nothing above about 2 m behind the deck, so one rope of the light string hangs between the
   framing trees across the top of the view. A row of bushes stands along the back edge of the
   deck, with ferns and bushes behind it (`BACK_UNDERGROWTH`), because the default view saw bare
-  earth between the scattered bushes there. In front of the deck, a clearing of dark earth with
-  grass tufts holds a log at an angle at the lower left and a group of dark blue-gray rocks with
-  bushes at the right, as `forest.webp`. The log keeps a gap of earth to the deck front, its far
-  end lies in the bushes, and its cut end with rings points to the front right. Soft streaks run
-  along its bark. Grass, moss, and soft spots of sun cover the open clearing beside the path,
-  because the high view of a phone saw bare earth there. The path fades into the earth at its
-  edges.
+  earth between the scattered bushes there. In front of the deck, a clearing of dark earth with grass tufts holds a log at an angle at the
+  lower left and a group of dark blue-gray rocks with bushes at the right, as `forest.webp`. The
+  log keeps a gap of earth to the deck front, its far end lies in the bushes, and its cut end
+  with rings points to the front right. Its bark has one color.
 - **Water.** A small fall of two steps drops between dark, wet rocks behind the back right corner
   of the deck, so that the default view shows it at the height of the heads of the back row, as
-  `forest.webp`. Each step is one soft sheet of cream water that curves over its lip and narrows
-  toward its foot, with uneven edges, streaks of cream, and lumps of foam in a pool at its foot.
-  Columns of one color with straight edges read as a stack of boxes. Its blue-gray stream runs
+  `forest.webp`. Each step is one soft sheet of cream water that curves over its lip, with
+  streaks of uneven width and length, and a foam pool at its foot. Its blue-gray stream runs
   toward the deck corner with small gold glints of the sun, and turns to the right under the
   bushes (`STREAM_PLACE` and `STREAM_COURSE` of
   `tools/forest-kit/build-kit.py`). A trunk stands at the right of the fall, as in the reference.
@@ -179,9 +158,7 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   toward the sun shows the glow as a glare over the back row.
 - **Chunk.** The kit and the forest code load in the lazy chunk (7.2). The kit takes the byte
   readers, `srgb()`, and the corner cut of the stage as arguments, which `venue.ts` gives through
-  `ForestKit`. The kit packs the shared vertices with a color for each vertex and no normal
-  (`models/forest/kit-format.ts`). Corners share a vertex only with the same normal in the GLB
-  file, so a hard edge stays hard, and the read rebuilds the normals from the triangles.
+  `ForestKit`.
 
 ```text
  camera ●
