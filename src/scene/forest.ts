@@ -125,7 +125,7 @@ export const FOREST = {
     low: 0.35,
     join: 0.6,
     wide: 8,
-    samples: { share: 0.75, grid: 3, heights: [0.6, 1.6] },
+    samples: { share: 0.6, grid: 3, heights: [0.6, 1.6] },
   },
   /** The environment of the reflections: the sky, the horizon, and the earth in sRGB, and the sun. */
   environment: { sky: '#4a4220', horizon: '#2a2412', earth: '#1a1208', sun: [8, 5, 1.8] },

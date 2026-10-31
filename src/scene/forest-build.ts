@@ -146,17 +146,21 @@ export interface ForestLamp {
 }
 
 /**
+ * One band of a cut group: an upright cylinder around the points of the group in one height band,
+ * in meters. Its axis stands at the middle of the points, so that a bough that reaches to one side
+ * gets a cylinder on that side.
+ */
+export type CutBand = readonly [bottom: number, top: number, x: number, z: number, radius: number];
+
+/**
  * One cut group: the parts that the cut keeps or drops together, such as a stump and its
  * lantern. Group 0 holds the parts that the cut keeps in each view.
  */
 export interface CutGroup {
-  /** x and z of the anchor on the ground, in meters. */
-  readonly anchor: readonly [number, number];
-  /**
-   * The bands of the group from the ground up: the bottom, the top, and the radius around the
-   * anchor of each band, in meters.
-   */
-  readonly bands: readonly (readonly [bottom: number, top: number, radius: number])[];
+  /** The bands of the group from the ground up. */
+  readonly bands: readonly CutBand[];
+  /** One upright cylinder around all bands, for a fast first test. */
+  readonly bounds: CutBand | null;
   /** For a rope: the groups of its two trees, so that it drops with either tree. */
   readonly ends: readonly [number, number] | null;
 }
@@ -497,29 +501,100 @@ function groupCopies(copies: readonly Copy[], input: ForestInputs): [number, num
   return anchors;
 }
 
+/** The plan box of the points of one band of a group, and then the radius around its middle. */
+interface BandBox {
+  /** The least x. */
+  minX: number;
+  /** The largest x. */
+  maxX: number;
+  /** The least z. */
+  minZ: number;
+  /** The largest z. */
+  maxZ: number;
+  /** The least height. */
+  minY: number;
+  /** The largest height. */
+  maxY: number;
+  /** The largest distance of a point from the middle of the box, after the second pass. */
+  radius: number;
+}
+
 /**
- * Collects the bands of the cut groups from the placed corners.
+ * Adds the corners of a triangle to the bands of its group: the first pass grows the plan box of
+ * each band, and the second pass grows the radius around the middle of the box.
  *
- * @param bands The bands of each group, as a map from the band index to its radius. The call
- *   adds to it.
- * @param anchor The anchor of the group.
+ * @param bands The boxes of the bands of the group, by the band index. The call adds to them.
  * @param corners Nine numbers: the three corners.
- * @param rule The inputs of the cut and the floor.
+ * @param rule The height of a band and the floor.
+ * @param second False for the first pass, true for the second.
  */
 function addToBands(
-  bands: Map<number, number>,
-  anchor: readonly [number, number],
+  bands: Map<number, BandBox>,
   corners: readonly number[],
   rule: { readonly band: number; readonly floorY: number },
+  second: boolean,
 ): void {
   for (let k = 0; k < 3; k++) {
     const x = corners[k * 3] ?? 0;
     const y = corners[k * 3 + 1] ?? 0;
     const z = corners[k * 3 + 2] ?? 0;
-    const band = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
-    const radius = Math.hypot(x - anchor[0], z - anchor[1]);
-    bands.set(band, Math.max(bands.get(band) ?? 0, radius));
+    const index = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
+    let box = bands.get(index);
+    if (!box) {
+      box = { minX: x, maxX: x, minZ: z, maxZ: z, minY: y, maxY: y, radius: 0 };
+      bands.set(index, box);
+    }
+    if (second) {
+      const mx = (box.minX + box.maxX) / 2;
+      const mz = (box.minZ + box.maxZ) / 2;
+      box.radius = Math.max(box.radius, Math.hypot(x - mx, z - mz));
+    } else {
+      box.minX = Math.min(box.minX, x);
+      box.maxX = Math.max(box.maxX, x);
+      box.minZ = Math.min(box.minZ, z);
+      box.maxZ = Math.max(box.maxZ, z);
+      box.minY = Math.min(box.minY, y);
+      box.maxY = Math.max(box.maxY, y);
+    }
   }
+}
+
+/**
+ * Makes the bands of the band boxes of a placed part.
+ *
+ * @param boxes The boxes of the bands, by the band index.
+ * @returns The bands, from the ground up, each from its lowest to its highest point.
+ */
+function bandsOf(boxes: ReadonlyMap<number, BandBox>): CutBand[] {
+  return [...boxes.entries()]
+    .toSorted((a, b) => a[0] - b[0])
+    .map(([, box]): CutBand => {
+      const x = (box.minX + box.maxX) / 2;
+      const z = (box.minZ + box.maxZ) / 2;
+      return [box.minY, box.maxY, x, z, box.radius];
+    });
+}
+
+/**
+ * Gives one upright cylinder around bands.
+ *
+ * @param bands The bands.
+ * @returns The cylinder, or null for no band.
+ */
+function boundsOf(bands: readonly CutBand[]): CutBand | null {
+  if (bands.length === 0) {
+    return null;
+  }
+  const minX = Math.min(...bands.map((b) => b[2] - b[4]));
+  const maxX = Math.max(...bands.map((b) => b[2] + b[4]));
+  const minZ = Math.min(...bands.map((b) => b[3] - b[4]));
+  const maxZ = Math.max(...bands.map((b) => b[3] + b[4]));
+  const x = (minX + maxX) / 2;
+  const z = (minZ + maxZ) / 2;
+  const radius = Math.max(...bands.map((b) => Math.hypot(b[2] - x, b[3] - z) + b[4]));
+  const bottom = Math.min(...bands.map((b) => b[0]));
+  const top = Math.max(...bands.map((b) => b[1]));
+  return [bottom, top, x, z, radius];
 }
 
 /**
@@ -583,7 +658,8 @@ function addBackdrop(out: ArrayBuilder, input: ForestInputs, groups: CutGroup[])
     const group = groups.length;
     const width = radius * (a1 - a0);
     const [ax, , az] = point(mid, 0);
-    groups.push({ anchor: [ax, az], bands: [[y0, y0 + tip, width]], ends: null });
+    const band: CutBand = [y0, y0 + tip, ax, az, width];
+    groups.push({ bands: [band], bounds: band, ends: null });
     // The faces point to the ring center: counterclockwise seen from inside.
     const c0 = point(a1, y0);
     const c1 = point(a0, y0);
@@ -689,14 +765,15 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
 
   const solid = new ArrayBuilder();
   const foliage = new ArrayBuilder();
-  const bands = anchors.map(() => new Map<number, number>());
+  // Each placed part has its own bands, so that the bands of a bough or a lantern on a branch
+  // stand at the bough and not around the trunk.
+  const bands = copies.map(() => new Map<number, BandBox>());
   const rule = { band: input.cut.band, floorY: input.floorY };
   let triangles = 0;
   let work = 0;
-  for (const copy of [...copies, ...ropeCopies]) {
+  for (const [c, copy] of [...copies, ...ropeCopies].entries()) {
     const { part } = copy;
-    const anchor = anchors[copy.group] ?? [0, 0];
-    const groupBands = copy.group > 0 ? bands[copy.group] : undefined;
+    const groupBands = copy.group > 0 && c < copies.length ? bands[c] : undefined;
     for (let t = 0; t < part.kinds.length; t++) {
       placeTriangle(copy, t, corners);
       const kind = part.kinds[t] ?? 0;
@@ -710,29 +787,35 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
       );
       (kind === FOLIAGE ? foliage : solid).add(corners, color, copy.group);
       if (groupBands) {
-        addToBands(groupBands, anchor, corners, rule);
+        addToBands(groupBands, corners, rule, false);
       }
     }
     triangles += part.kinds.length;
     work += part.kinds.length;
-    if (work > 6000) {
+    if (work > 3000) {
       work = 0;
       yield;
     }
   }
 
-  const groups: CutGroup[] = anchors.map((anchor, g) => ({
-    anchor,
-    bands:
-      g === 0
-        ? []
-        : [...(bands[g] ?? new Map<number, number>()).entries()]
-            .toSorted((a, b) => a[0] - b[0])
-            .map(([band, radius]) => [
-              input.floorY + band * input.cut.band,
-              input.floorY + (band + 1) * input.cut.band,
-              radius,
-            ]),
+  // The second pass of the bands: the radius around the middle of each box.
+  const groupBands = anchors.map((): CutBand[] => []);
+  for (const [c, copy] of copies.entries()) {
+    const boxes = bands[c];
+    if (copy.group === 0 || !boxes) {
+      continue;
+    }
+    for (let t = 0; t < copy.part.kinds.length; t++) {
+      placeTriangle(copy, t, corners);
+      addToBands(boxes, corners, rule, true);
+    }
+    groupBands[copy.group]?.push(...bandsOf(boxes));
+  }
+  yield;
+
+  const groups: CutGroup[] = groupBands.map((list) => ({
+    bands: list,
+    bounds: boundsOf(list),
     ends: null,
   }));
   const ropeColor = bakeFace(
@@ -742,7 +825,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
     [],
   );
   for (const [r, rope] of input.layout.ropes.entries()) {
-    groups.push({ anchor: [0, 0], bands: [], ends: ropeEnds[r] ?? [0, 0] });
+    groups.push({ bands: [], bounds: null, ends: ropeEnds[r] ?? [0, 0] });
     addRope(solid, rope.points, ropeColor, groups.length - 1);
   }
   yield;

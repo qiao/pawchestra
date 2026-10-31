@@ -1,5 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
-import type { CutGroup } from './forest-build.ts';
+import type { CutBand, CutGroup } from './forest-build.ts';
 
 /**
  * The points of the stage that no part of the forest may hide (design 4.1): a grid over the deck
@@ -38,25 +38,19 @@ export function cutPoints(stageSide: number, samples: CutSamples): Vec3[] {
 
 /**
  * Tells if the line from the camera to a point of the stage passes through a band of a group: an
- * upright cylinder around the anchor. A camera inside the cylinder counts as a hit.
+ * upright cylinder. A camera inside the cylinder counts as a hit.
  *
  * @param camera The camera.
  * @param point The point of the stage.
- * @param anchor The anchor of the group.
- * @param band The bottom, the top, and the radius of the band.
+ * @param band The band.
  * @returns True if the line passes through the band.
  */
-function hitsBand(
-  camera: Vec3,
-  point: Vec3,
-  anchor: readonly [number, number],
-  band: readonly [number, number, number],
-): boolean {
+function hitsBand(camera: Vec3, point: Vec3, band: CutBand): boolean {
+  const [bottom, top, x, z, radius] = band;
   const dx = point[0] - camera[0];
   const dz = point[2] - camera[2];
-  const fx = camera[0] - anchor[0];
-  const fz = camera[2] - anchor[1];
-  const [bottom, top, radius] = band;
+  const fx = camera[0] - x;
+  const fz = camera[2] - z;
   const a = dx * dx + dz * dz;
   const b = 2 * (fx * dx + fz * dz);
   const c = fx * fx + fz * fz - radius * radius;
@@ -77,6 +71,38 @@ function hitsBand(
   const y0 = camera[1] + (point[1] - camera[1]) * t0;
   const y1 = camera[1] + (point[1] - camera[1]) * t1;
   return Math.max(y0, y1) >= bottom && Math.min(y0, y1) <= top;
+}
+
+/** The region of the lines from the camera to the points of the stage, for the first test. */
+interface SightRegion {
+  /** The camera. */
+  readonly camera: Vec3;
+  /** The plan distance from the stage center within which the points lie. */
+  readonly reach: number;
+  /** The least and the largest height of the lines. */
+  readonly heights: readonly [number, number];
+}
+
+/**
+ * Tells if a cylinder can meet a line from the camera to a point of the stage: its plan circle
+ * comes near the segment from the camera to the stage center, and its heights meet the heights
+ * of the lines.
+ *
+ * @param region The region of the lines.
+ * @param bounds The cylinder.
+ * @returns False if no line can pass through the cylinder.
+ */
+function nearSight(region: SightRegion, bounds: CutBand): boolean {
+  const [bottom, top, x, z, radius] = bounds;
+  if (bottom > region.heights[1] || top < region.heights[0]) {
+    return false;
+  }
+  const [cx, , cz] = region.camera;
+  const length2 = cx * cx + cz * cz;
+  const t = length2 > 0 ? Math.min(1, Math.max(0, ((x - cx) * -cx + (z - cz) * -cz) / length2)) : 0;
+  const px = cx - cx * t;
+  const pz = cz - cz * t;
+  return Math.hypot(x - px, z - pz) <= radius + region.reach;
 }
 
 /**
@@ -104,13 +130,23 @@ export function keepGroups(
       changed = true;
     }
   };
+  let reach = 0;
+  let low = camera[1];
+  let high = camera[1];
+  for (const point of points) {
+    reach = Math.max(reach, Math.hypot(point[0], point[2]));
+    low = Math.min(low, point[1]);
+    high = Math.max(high, point[1]);
+  }
+  const region: SightRegion = { camera, reach, heights: [low, high] };
   for (const [g, group] of groups.entries()) {
     if (group.ends) {
       continue;
     }
-    const hit = group.bands.some((band) =>
-      points.some((point) => hitsBand(camera, point, group.anchor, band)),
-    );
+    const hit =
+      group.bounds !== null &&
+      nearSight(region, group.bounds) &&
+      group.bands.some((band) => points.some((point) => hitsBand(camera, point, band)));
     set(g, g === 0 || !hit);
   }
   for (const [g, group] of groups.entries()) {
