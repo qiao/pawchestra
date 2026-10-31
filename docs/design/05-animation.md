@@ -472,6 +472,8 @@ times its width. Thus a close shot fits the width of its subject with the shot s
   line and the look room on the other side. A side view and the view over the shoulder fit a
   sphere, and the frame cuts its deep part. A side view holds the heads and the hands of the
   players in its sphere.
+- A side view is a group-shot, so it shows one clear group. Only the players in its sphere are
+  subject players: a head of another player in front of them counts in the foreground rule.
 - At the push-in of the end of the move, the frame then grows until it holds the top of each
   head and the hands and the instruments, with the eyes on the upper third line
   (`FRAME_MARGINS`). The head has no ears (`HEAD_BONES`): a closer shot needs less headroom, and
