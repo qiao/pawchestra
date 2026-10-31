@@ -60,11 +60,12 @@ render, and the memory.
 - [ ] Forest: measure the switch to the forest on a phone. The build has about 90 steps of at
       most 5 ms in Node and about 130,000 triangles. Check the longest step with the 4x CPU
       throttle and the GPU time at the low tier (4.1, 9.7).
-- [ ] Forest: the main-thread p95 of `pnpm frame --scene=forest` grows with the size of the kit,
-      with the same p50 and the same GPU time: 3.57 ms at 2c9dd23d (57,728 triangles), 3.65 ms
-      at 129,514, and 3.98 ms at 168,488 (frame-compare, 3 runs each). The forest code of each
-      frame (the cut) takes 0.03 ms. Profile the slow frames, and find the cause before the kit
-      grows again (4.1, 9.7).
+- [ ] Forest: the main-thread p95 of `pnpm frame --scene=forest` fails at the round kit, with
+      the same p50 (2.74 ms) and the same GPU p95 (3.60 ms). Medians of all runs: 3.61 ms at
+      2c9dd23d (57,728 triangles, 9 runs), 3.80 ms at 129,514 triangles (6 runs), 4.05 ms at
+      168,488 (9 runs), and 3.97 ms at 89cb063b (6 runs). The last frame-compare gave 4.07 ms at
+      09cb695b. The forest code of each frame (the cut) takes 0.03 ms. Profile the slow frames
+      of 2c9dd23d and the tip in the forest, and remove the cause (4.1, 9.7).
 - [ ] Forest: `pnpm look-lab` measures the regions of the forest frames against
       `orchestra-latest.png`. Only the table "Whole frame" uses `forest.webp`. Add the forest
       regions: the lit planks, the planks in the shade, the chairs, and the podium.
