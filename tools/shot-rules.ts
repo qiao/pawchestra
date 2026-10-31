@@ -348,13 +348,14 @@ function sameSubject(a: Shot, b: Shot): boolean {
 }
 
 /**
- * Gives the times of the move of a shot: from the start of the move to its end.
+ * Gives the times of the move of a shot on the screen: from the end of the blend into it, or from
+ * the start of its move, to its end. During a blend, the camera comes from the previous shot.
  *
  * @param shot The shot.
  * @returns The start and the end, in song seconds.
  */
 function moveTimes(shot: Shot): [number, number] {
-  const start = Math.max(0, shot.startSec);
+  const start = Math.max(0, shot.startSec + shot.blendSec);
   return [start, Math.max(start, shot.moveEndSec)];
 }
 
