@@ -185,6 +185,11 @@ export interface Subject {
   readonly facing: number;
   /** The middle of the subject players on the stage, for the screen direction of their look. */
   readonly center: Vec3;
+  /**
+   * The middle of the heads of the subject players, which the frame puts on the upper third line
+   * (design 5.6), or `null` for a subject in the middle of the frame.
+   */
+  readonly eyes: Vec3 | null;
   /** 0 at the podium, 1 at the back edge of the stage (design 5.6). */
   readonly back: number;
   /** The seats of the subject. */
@@ -488,6 +493,16 @@ function middleOf(players: readonly SubjectPlayer[]): Vec3 {
 }
 
 /**
+ * Gives the middle of the heads of players.
+ *
+ * @param players The players. There is at least one.
+ * @returns The middle.
+ */
+function headsOf(players: readonly SubjectPlayer[]): Vec3 {
+  return middleOf(players.map((p) => ({ ...p, position: p.sights.head })));
+}
+
+/**
  * Gives the subject of a solo shot (design 5.6): the principal player of a seat, 0.9 m above the
  * stage, with a sphere of 0.95 m, or more to hold its head.
  *
@@ -512,6 +527,7 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
     front: piano ? principal.front + KEYBOARD_VIEW.turn : principal.front,
     facing: principal.front,
     center: principal.position,
+    eyes: principal.sights.head,
     back: backOf(subjects, z),
     seats: [seatIndex],
     part: null,
@@ -593,6 +609,7 @@ export function sectionSubject(
     front: piano ? meanFront(players) + KEYBOARD_VIEW.turn : meanFront(players),
     facing: meanFront(players),
     center: middleOf(players),
+    eyes: headsOf(players),
     back: backOf(subjects, sphere.target[2]),
     seats: kept,
     part,
@@ -623,6 +640,7 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     front: 0,
     facing: Math.PI,
     center: head,
+    eyes: head,
     back: 0,
     seats: [],
     part: null,
@@ -671,6 +689,7 @@ export function conductorBackSubject(
     front: azimuth - Math.PI,
     facing: Math.PI,
     center: head,
+    eyes: null,
     back: 0,
     seats: [],
     part: null,
@@ -757,6 +776,7 @@ export function sideSubject(
     front: side * sizes.sideFront,
     facing: meanFront(players),
     center: middleOf(players),
+    eyes: headsOf(players),
     back: backOf(subjects, target[2]),
     seats,
     part: null,

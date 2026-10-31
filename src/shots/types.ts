@@ -28,6 +28,17 @@ export interface ShotKey {
   readonly fov: number;
 }
 
+/** The place of the subject in the frame of a close shot (design 5.6): look room and headroom. */
+export interface Composition {
+  /** The middle of the heads of the subject players. The frame puts it on the upper third line. */
+  readonly eyes: Vec3;
+  /**
+   * The third line of the target: -1 on the left, 1 on the right, or 0 in the middle. A subject
+   * that looks to one side stands on the third line on the other side, so it looks into the frame.
+   */
+  readonly third: -1 | 0 | 1;
+}
+
 /** One shot of the film of a score (design 5.6). */
 export interface Shot {
   readonly kind: ShotKind;
@@ -47,13 +58,18 @@ export interface Shot {
    * for all players of the seats.
    */
   readonly part: readonly number[] | null;
-  /** The point that the camera looks at. */
+  /** The middle of the subject. The camera turns around it at its distance. */
   readonly target: Vec3;
   /**
    * The radius of the subject sphere, in meters. 0 for a wide or a high shot: these use the
    * default distance of design 4.5.
    */
   readonly radius: number;
+  /**
+   * The place of the subject in the frame, or `null` for the target in the middle: a wide, a
+   * high, or an over-the-shoulder conductor shot.
+   */
+  readonly composition: Composition | null;
   /** The camera at the start of the move. */
   readonly from: ShotKey;
   /** The camera at `moveEndSec`. */

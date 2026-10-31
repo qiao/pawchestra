@@ -27,8 +27,8 @@ export const FOREGROUND = {
    */
   coverShare: 0.95,
   /**
-   * The middle of the frame, in the units of the view: half its width and half its height. The
-   * camera looks at the target of the subject, so the body and the instrument fill this part.
+   * The middle of the subject in the frame, in the units of the view: half its width and half its
+   * height around the target. The body and the instrument fill this part.
    */
   middle: [0.4, 0.6],
   /**
@@ -130,8 +130,8 @@ function frameAxes(camera: Vec3, target: Vec3, fov: number, aspect: number): Fra
  *
  * - a head nearer to the camera than 0.75 times the distance of the focus of the subject, with
  *   more than a thin cap of it in the frame,
- * - a head nearer than 0.95 times that distance, with a part of it in the middle of the frame,
- *   over the subject,
+ * - a head nearer than 0.95 times that distance, with a part of it over the subject, around the
+ *   place of the target in the frame,
  * - a head nearer than 0.95 times that distance, with a radius on the screen larger than 0.24 of
  *   half the height of the frame (of the geometric mean of the half sides of a portrait frame),
  *   with more than a thin cap of it in the frame.
@@ -149,6 +149,8 @@ function frameAxes(camera: Vec3, target: Vec3, fov: number, aspect: number): Fra
  * @param fov The vertical field of view, in degrees.
  * @param aspect The width of the frame divided by its height.
  * @param chests The chests of the singers of a choir shot, or none for the other subjects.
+ * @param middle The place of the target of the subject in the frame, in the units of the view:
+ *   the middle of the frame, or a third line of a composition (design 5.6).
  * @returns True if a head stands in the foreground.
  */
 export function foregroundHead(
@@ -160,6 +162,7 @@ export function foregroundHead(
   fov: number,
   aspect: number,
   chests: readonly Vec3[] = [],
+  middle: readonly [number, number] = [0, 0],
 ): boolean {
   const a = frameAxes(camera, target, fov, aspect);
   const floor = chests.length > 0 ? lowestOnScreen(chests, camera, a) : -Infinity;
@@ -188,7 +191,8 @@ export function foregroundHead(
       continue;
     }
     // The middle of the head in the units of the view, and the radius of the head.
-    const x = Math.abs(dx * a.rx + dz * a.rz) / (depth * a.tanH);
+    const right = (dx * a.rx + dz * a.rz) / (depth * a.tanH);
+    const x = Math.abs(right);
     const up = (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * a.tanV);
     const y = Math.abs(up);
     const radiusX = head.radius / (depth * a.tanH);
@@ -197,7 +201,8 @@ export function foregroundHead(
     if (!under && distance2 < near2 && x - outside * radiusX < 1 && y - outside * radiusY < 1) {
       return true;
     }
-    if (!under && x - radiusX < middleX && y - radiusY < middleY) {
+    const overX = Math.abs(right - middle[0]) - radiusX < middleX;
+    if (!under && overX && Math.abs(up - middle[1]) - radiusY < middleY) {
       return true;
     }
     const large = head.radius / (depth * sizeTan) > FOREGROUND.edgeRadius;

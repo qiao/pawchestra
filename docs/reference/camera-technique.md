@@ -114,11 +114,16 @@ The app follows these facts:
 - **Moves across a cut (section 4).** The arc of a shot goes in the direction of the arc of the
   previous shot, and the last shot cranes up in place of a pull-out after a push-in. A push-in
   with no arc is neutral on the axis of the arc.
+- **Look room and headroom (section 3).** A close shot turns its camera, so that the eyes of the
+  subject stand on the upper third line, and the subject on the third line away from its look. A
+  subject with a neutral look stands in the middle.
 
-The app does not follow these facts yet:
+The app does not follow these facts:
 
-- **Look room and headroom (section 3).** A close shot puts the target of its subject in the
-  middle of the frame.
+- **Short takes (section 5).** A shot lasts from `SHOT_TIMES.minSec` (4 s) to
+  `SHOT_TIMES.maxSec` (14 s). A live broadcast uses more and shorter takes, but the planner makes
+  each shot one time from the score, and each shot needs a clear camera.
+- **The zoom out (section 5).** A long close shot pushes in slowly, and it does not zoom out.
 
 ## 7. Sources
 

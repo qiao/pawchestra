@@ -4,6 +4,7 @@ import { smoothstep } from '../pose/rest.ts';
 import type { Transport } from '../pose/types.ts';
 import { SHOT_BEAM_OPACITY } from './beam-opacity.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';
+import { writeLookPoint } from './grammar.ts';
 import { SHOT_LIGHT, SHOT_SPOT } from './shot-light.ts';
 import { isCloseShot } from './types.ts';
 import type { CameraPose, CameraPoseBuffer, CameraView, Shot, ShotKey, ShotPlan } from './types.ts';
@@ -38,15 +39,19 @@ const scratchKey: ScratchKey = { azimuth: 0, elevation: 0, zoom: 1, fov: FIELD_O
 
 const blendStart: [number, number, number] = [0, 0, 0];
 
+const blendLook: [number, number, number] = [0, 0, 0];
+
 /**
- * Writes the camera of a shot at a part of its move. A wide shot follows the landscape rule and
- * the portrait rule of design 4.5.
+ * Writes the camera of a shot at a part of its move, and the point that it looks at for the
+ * composition of the shot (design 5.6). A wide shot follows the landscape rule and the portrait
+ * rule of design 4.5.
  *
  * @param plan The plan.
  * @param shot The shot.
  * @param u The eased part of the move, from 0 to 1.
  * @param aspect The aspect of the view.
  * @param out The position to write.
+ * @param look The point to write that the camera looks at.
  * @returns The vertical field of view, in degrees.
  */
 function writeShotCamera(
@@ -55,6 +60,7 @@ function writeShotCamera(
   u: number,
   aspect: number,
   out: [number, number, number],
+  look: [number, number, number],
 ): number {
   const a: ShotKey = shot.from;
   const b: ShotKey = shot.to;
@@ -73,6 +79,7 @@ function writeShotCamera(
   }
   const distance = keyDistance(plan.stageSide, shot.radius, key, aspect);
   writeKeyPosition(shot.target, key.azimuth, key.elevation, distance, out);
+  writeLookPoint(out, shot.target, shot.composition, key.fov, aspect, look);
   return key.fov;
 }
 
@@ -103,7 +110,9 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    shot. With `still`, each cut is hard.
  * 5. The factor of the beam opacity comes from the kind of the shot, so it is constant in a
  *    shot. A blend blends it with the camera. The default view has the full beam.
- * 6. A close shot sets `close`, so that its full frame stands in the free area of the page.
+ * 6. A close shot sets `close`, so that its full frame stands in the free area of the page. Its
+ *    camera looks at the point of its composition, so that the subject stands on a third line.
+ *    The camera turns around the target of the shot.
  * 7. The weights of the light of a close shot and of the follow-spot come from the kind of the
  *    shot, as the factor of the beam. The default view has the light of the stage.
  *
@@ -140,8 +149,7 @@ export function cameraAt(
   const moveStart = Math.max(current.startSec, 0);
   const span = current.moveEndSec - moveStart;
   const u = still || span <= 0 ? 0 : smoothstep((time - moveStart) / span);
-  out.fov = writeShotCamera(plan, current, u, aspect, out.position);
-  copyPoint(current.target, out.target);
+  out.fov = writeShotCamera(plan, current, u, aspect, out.position, out.target);
   out.beam = SHOT_BEAM_OPACITY[current.kind];
   out.light = SHOT_LIGHT[current.kind];
   out.spot = SHOT_SPOT[current.kind];
@@ -153,10 +161,10 @@ export function cameraAt(
     return out;
   }
   const w = smoothstep(sinceCut / current.blendSec);
-  const fov = writeShotCamera(plan, previous, 1, aspect, blendStart);
+  const fov = writeShotCamera(plan, previous, 1, aspect, blendStart, blendLook);
   for (let k = 0; k < 3; k++) {
     const p = blendStart[k] ?? 0;
-    const t = previous.target[k] ?? 0;
+    const t = blendLook[k] ?? 0;
     out.position[k] = p + ((out.position[k] ?? 0) - p) * w;
     out.target[k] = t + ((out.target[k] ?? 0) - t) * w;
   }

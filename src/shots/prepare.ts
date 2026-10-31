@@ -21,7 +21,15 @@ import {
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
 import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
-import { FILM_GRAMMAR, azimuthFrom, keepsLine, lookSide, motionOf } from './grammar.ts';
+import {
+  FILM_GRAMMAR,
+  azimuthFrom,
+  keepsLine,
+  lookSide,
+  motionOf,
+  thirdOf,
+  writeLookPoint,
+} from './grammar.ts';
 import type { Motion } from './grammar.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
@@ -49,7 +57,7 @@ import type {
   TierName,
   TraceRange,
 } from './trace.ts';
-import type { Shot, ShotKey, ShotKind, ShotPlan } from './types.ts';
+import type { Composition, Shot, ShotKey, ShotKind, ShotPlan } from './types.ts';
 import {
   CINEMA_ASPECT,
   DEFAULT_AZIMUTH,
@@ -579,6 +587,8 @@ interface Framing {
   readonly part: readonly number[] | null;
   /** The boxes of the body of the subject. */
   readonly held: ReadonlySet<ClearBox>;
+  /** The place of the subject in the frame, or `null` for the target in the middle. */
+  readonly composition: Composition | null;
 }
 
 /**
@@ -868,14 +878,77 @@ function subjectLines(planner: Planner, subject: Subject): SubjectLines {
   return lines;
 }
 
+/** A camera of a close key, with the point that it looks at for the composition of the shot. */
+interface ComposedCamera {
+  readonly camera: Vec3;
+  readonly look: Vec3;
+  /** The place of the target in the frame, in the units of the view. */
+  readonly middle: readonly [number, number];
+}
+
 /**
- * Tells if a head or another object stands in the foreground of a close move, at its start or at
- * its end, at the aspect of Cinematic mode (design 5.6).
+ * Gives the camera of a close key and the point that it looks at (design 5.6).
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param composition The place of the subject in the frame, or `null`.
+ * @param key The key.
+ * @returns The camera.
+ */
+function composedCamera(
+  planner: Planner,
+  subject: Subject,
+  composition: Composition | null,
+  key: ShotKey,
+): ComposedCamera {
+  const { target, radius } = subject;
+  const camera = keyPosition(planner.stageSide, target, radius, key, CINEMA_ASPECT);
+  const look: [number, number, number] = [0, 0, 0];
+  const y = writeLookPoint(camera, target, composition, key.fov, CINEMA_ASPECT, look);
+  const third = composition?.third ?? 0;
+  return { camera, look, middle: [third * FILM_GRAMMAR.thirdLine, y] };
+}
+
+/**
+ * Gives the place of a subject in the frame of a close move (design 5.6): its eyes on the upper
+ * third line, and the target on the third line away from its look in the middle of the move.
  *
  * @param planner The planner.
  * @param subject The subject.
  * @param from The key at the start.
  * @param to The key at the end.
+ * @returns The composition, or `null` for a subject in the middle of the frame.
+ */
+function compositionOf(
+  planner: Planner,
+  subject: Subject,
+  from: ShotKey,
+  to: ShotKey,
+): Composition | null {
+  if (!subject.eyes) {
+    return null;
+  }
+  const middle = mixKeys(from, to, 0.5);
+  const camera = keyPosition(
+    planner.stageSide,
+    subject.target,
+    subject.radius,
+    middle,
+    CINEMA_ASPECT,
+  );
+  const third = thirdOf(subject.facing, azimuthFrom(camera, subject.center));
+  return { eyes: subject.eyes, third };
+}
+
+/**
+ * Tells if a head or another object stands in the foreground of a close move, at its start or at
+ * its end, in the frame of its composition at the aspect of Cinematic mode (design 5.6).
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @param composition The place of the subject in the frame, or `null`.
  * @param test The test of one camera: the heads, or the cover of the other objects.
  * @returns True if a head or an object stands in the foreground.
  */
@@ -884,23 +957,23 @@ function moveForeground(
   subject: Subject,
   from: ShotKey,
   to: ShotKey,
+  composition: Composition | null,
   test: 'heads' | 'objects',
 ): boolean {
-  const S = planner.stageSide;
-  const { target, members, focus, outside, floor } = subject;
+  const { members, focus, outside, floor } = subject;
   const aspect = CINEMA_ASPECT;
   if (test === 'heads' && outside) {
     // The point stays out of the frame for the full move.
     for (const u of MOVE_SAMPLES) {
       const key = mixKeys(from, to, u);
-      const camera = keyPosition(S, target, subject.radius, key, aspect);
-      if (inFrame(outside, camera, target, key.fov, aspect)) {
+      const { camera, look } = composedCamera(planner, subject, composition, key);
+      if (inFrame(outside, camera, look, key.fov, aspect)) {
         return true;
       }
     }
   }
   for (const key of [from, to]) {
-    const camera = keyPosition(S, target, subject.radius, key, aspect);
+    const { camera, look, middle } = composedCamera(planner, subject, composition, key);
     const found =
       test === 'heads'
         ? foregroundHead(
@@ -908,12 +981,13 @@ function moveForeground(
             members,
             focus,
             camera,
-            target,
+            look,
             key.fov,
             aspect,
             floor,
+            middle,
           )
-        : foregroundObject(planner.clearance, members, focus, camera, target, key.fov, aspect);
+        : foregroundObject(planner.clearance, members, focus, camera, look, key.fov, aspect);
     if (found) {
       return true;
     }
@@ -930,6 +1004,7 @@ function moveForeground(
  * @param subject The subject.
  * @param from The key at the start.
  * @param to The key at the end.
+ * @param composition The place of the subject in the frame, or `null`.
  * @returns `axis` for a camera over the line, `look` for a look to the other side, else `null`.
  */
 function lineRefusal(
@@ -937,17 +1012,12 @@ function lineRefusal(
   subject: Subject,
   from: ShotKey,
   to: ShotKey,
+  composition: Composition | null,
 ): 'axis' | 'look' | null {
   const master = lookSide(subject.facing, azimuthFrom(planner.master, subject.center));
   for (const key of [from, to]) {
-    const camera = keyPosition(
-      planner.stageSide,
-      subject.target,
-      subject.radius,
-      key,
-      CINEMA_ASPECT,
-    );
-    if (!keepsLine(camera, subject.target)) {
+    const { camera, look } = composedCamera(planner, subject, composition, key);
+    if (!keepsLine(camera, look)) {
       return 'axis';
     }
     const side = lookSide(subject.facing, azimuthFrom(camera, subject.center));
@@ -1072,7 +1142,8 @@ function searchClose(
     }
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
-    const line = lineRefusal(planner, subject, from, to);
+    const composition = compositionOf(planner, subject, from, to);
+    const line = lineRefusal(planner, subject, from, to, composition);
     if (line) {
       return refuse(azimuth, elevation, arc, line);
     }
@@ -1085,10 +1156,17 @@ function searchClose(
     }
     if (clear === undefined) {
       // The cheap test of the heads comes first, and the cover of the objects last.
-      const refusal: KeptRefusal | null = moveForeground(planner, subject, from, to, 'heads')
+      const refusal: KeptRefusal | null = moveForeground(
+        planner,
+        subject,
+        from,
+        to,
+        composition,
+        'heads',
+      )
         ? 'head'
         : (moveRefusal(planner, subject.target, subject.radius, from, to, held, sights) ??
-          (moveForeground(planner, subject, from, to, 'objects') ? 'object' : null));
+          (moveForeground(planner, subject, from, to, composition, 'objects') ? 'object' : null));
       clear = refusal === null;
       known.set(key, clear);
       if (kept && refusal) {
@@ -1112,6 +1190,7 @@ function searchClose(
       seats: subject.seats,
       part: subject.part,
       held,
+      composition,
     };
   };
   // The low band tries only the wanted elevation, with a full search.
@@ -1204,7 +1283,16 @@ function wideFraming(planner: Planner): Framing {
   const to: ShotKey = push
     ? { ...from, zoom: from.zoom * k.pushIn }
     : { ...from, azimuth: from.azimuth + arcSign(planner, signOf(random)) * k.arc * DEG };
-  return { target: DEFAULT_TARGET, radius: 0, from, to, seats: [], part: null, held: new Set() };
+  return {
+    target: DEFAULT_TARGET,
+    radius: 0,
+    from,
+    to,
+    seats: [],
+    part: null,
+    held: new Set(),
+    composition: null,
+  };
 }
 
 /**
@@ -1221,7 +1309,16 @@ function openingFraming(planner: Planner): Framing {
     ...defaultKey(zoom),
     elevation: lowered(DEFAULT_TARGET, distance, DEFAULT_ELEVATION),
   };
-  return { target: DEFAULT_TARGET, radius: 0, from, to, seats: [], part: null, held: new Set() };
+  return {
+    target: DEFAULT_TARGET,
+    radius: 0,
+    from,
+    to,
+    seats: [],
+    part: null,
+    held: new Set(),
+    composition: null,
+  };
 }
 
 /**
@@ -1259,6 +1356,7 @@ function highFraming(planner: Planner): Framing {
     seats: [],
     part: null,
     held: new Set(),
+    composition: null,
   };
 }
 
@@ -2016,6 +2114,7 @@ function addShot(
       part: framing.part,
       target: framing.target,
       radius: framing.radius,
+      composition: framing.composition,
       from: framing.from,
       to: framing.to,
     },
@@ -2334,6 +2433,7 @@ function* planShotsSteps(
       seats: [],
       part: null,
       held: new Set(),
+      composition: null,
     },
     {
       startSec: cut,

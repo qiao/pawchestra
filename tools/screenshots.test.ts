@@ -173,6 +173,7 @@ function planOf(list: readonly [ShotKind, number][]): ShotPlan {
       part: null,
       target: [0, 0, 0],
       radius: 0,
+      composition: null,
       from: key,
       to: key,
       blendSec: 0,

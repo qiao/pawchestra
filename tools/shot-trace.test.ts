@@ -67,6 +67,7 @@ function shot(startSec: number, endSec: number): Shot {
     part: null,
     target: [0, 1, 0],
     radius: 1,
+    composition: null,
     from: key,
     to: key,
     blendSec: 0,

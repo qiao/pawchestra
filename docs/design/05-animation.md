@@ -424,8 +424,9 @@ interface Shot {
   moveEndSec: number;
   seats: readonly number[];
   part: readonly number[] | null; // the players of a choir part, such as the sopranos
-  target: Vec3;
+  target: Vec3;        // the camera turns around it
   radius: number;      // the subject sphere, or 0 for a wide or a high shot
+  composition: { eyes: Vec3; third: -1 | 0 | 1 } | null; // look room and headroom
   from: ShotKey;
   to: ShotKey;
   blendSec: number;    // 0 is a hard cut
@@ -492,8 +493,15 @@ bear gives weak frames of a solo. Mute and solo do not change the plan.
   fall, and a push-in or a pull-out. A part of at least `moveShare` of the distance counts. The
   arc of a shot goes in the direction of the arc of the previous shot, so no move reverses at the
   cut. When that arc would leave the front range, the shot only pushes in. After a still axis,
-  the seeded direction holds. The last shot cranes up into the default view
-  (`SHOT_KEYS.lastRise`), because a pull-out reverses the push-in of the shot before it.
+  the seeded direction holds. The last shot cranes up into the default view, because a pull-out
+  reverses the push-in of the shot before it.
+- **Look room and headroom.** A close shot of a player, a section, a side, or the conductor has a
+  `composition`. Its camera turns with no roll, so that the eyes of the subject stand on the upper
+  third line (`thirdLine`) and the target on the third line away from the look. A neutral look
+  keeps the target in the middle. The tilt stays within `maxTilt`, so the target stays in the
+  frame. The camera still turns around the target, so the moves and the clearance do not change.
+  The foreground tests read the frame of the composition, with the middle of the subject at the
+  place of the target.
 
 **Clearance.** The camera never stands inside a player, and the subject does not hide. The
 planner tests each move and sight line against the boxes of `layoutObstacles()`, at
