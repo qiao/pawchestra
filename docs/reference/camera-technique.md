@@ -88,8 +88,8 @@ and `cameraAt()` of `src/shots/camera-at.ts` gives the camera of each frame (des
 
 The app follows these facts:
 
-- **The master shot (section 2).** The first shot is the default view, a long shot of the full
-  stage, and a wide shot comes back at least each `SHOT_TIMES.maxWideGapSec`. The wide shots take
+- **The master shot (section 2).** The first shot starts at the default view, a long shot of the
+  full stage, and a wide shot comes back at least each `SHOT_TIMES.maxWideGapSec`. The wide shots take
   `WIDE_FOV`, so the stage fills the width of the 21:9 frame.
 - **The score (section 5).** The planner reads the music after each cut, and a cut at an entry
   shows the player who enters (`CUT_BONUS.entry`, `TIERS`).
