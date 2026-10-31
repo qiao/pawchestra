@@ -462,9 +462,9 @@ phrase line (`CUT_BONUS`). The camera films the player who just started to play:
 entry gets the largest bonus. The first shot starts at the default view, as the establishing shot
 of a concert film, and it cranes down to the low wide view while it pushes in. The last shot cranes
 up from the low wide view into the default view, so a play from the start after the end makes no
-cut. The planner reads the music after the cut
-(`MUSIC_RULES`): the share of each group, the entries, a tutti, and the lead, because a concert
-film follows the melody. Then these rules apply, in this order (`CHOICE_WEIGHTS`, `SHOT_TIMES`):
+cut. The planner reads the music after the cut (`MUSIC_RULES`): the share of each group, the
+entries, a tutti, and the lead, because a concert film follows the melody. Then these rules apply,
+in this order (`CHOICE_WEIGHTS`, `SHOT_TIMES`):
 
 1. No repeat of the kind and the subject of the previous shot.
 2. No section or solo shot of the group of the previous shot.
