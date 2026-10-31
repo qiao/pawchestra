@@ -14,6 +14,7 @@ import {
 import type { FrameClear, FrameCover, ScreenBox, ViewFrame } from '../shots/frame.ts';
 import type { CameraPose } from '../shots/types.ts';
 import {
+  CINEMA_ASPECT,
   ELEVATION_LIMITS,
   FIELD_OF_VIEW,
   MAX_DISTANCE_FACTOR,
@@ -23,6 +24,9 @@ import {
   farPlane,
   orbitMinDistance,
 } from '../shots/view.ts';
+
+import { letterbox, mixBox } from './letterbox.ts';
+import type { FrameBox } from './letterbox.ts';
 
 /**
  * The move of the orbit target to the stage center after a change from a close shot to Free mode
@@ -88,6 +92,55 @@ const scratchView = new Matrix4();
 /** The scale of the view matrix of `#stageBox()`. */
 const UNIT_SCALE = new Vector3(1, 1, 1);
 
+/**
+ * Gives the box of a frame of the aspect of the canvas.
+ *
+ * @param frame The frame.
+ * @param width The width of the canvas, in CSS pixels.
+ * @param height The height of the canvas, in CSS pixels.
+ * @returns The box of the image of the camera.
+ */
+function boxOfFrame(frame: ViewFrame, width: number, height: number): FrameBox {
+  return { x: frame.x, y: frame.y, width: width * frame.scale, height: height * frame.scale };
+}
+
+/**
+ * Gives the box of the stage on the canvas from its box in the units of the view (from -1 to 1, y
+ * up), for an image box of any aspect.
+ *
+ * @param box The box of the stage in the units of the view: left, bottom, right, and top.
+ * @param image The box of the image of the camera, in CSS pixels.
+ * @returns The box of the stage on the canvas.
+ */
+function stageOnCanvas(box: ScreenBox, image: FrameBox): ScreenBox {
+  const halfWidth = image.width / 2;
+  const halfHeight = image.height / 2;
+  return {
+    left: image.x + box.left * halfWidth,
+    right: image.x + box.right * halfWidth,
+    top: image.y - box.top * halfHeight,
+    bottom: image.y - box.bottom * halfHeight,
+  };
+}
+
+/**
+ * Applies a clear of the first screen to an image box: it scales the box by the factor around the
+ * fixed point, as `clearedFrame()` does for a frame.
+ *
+ * @param box The box.
+ * @param clear The clear.
+ * @returns The box with the clear.
+ */
+function clearedBox(box: FrameBox, clear: FrameClear): FrameBox {
+  const { factor, x, y } = clear;
+  return {
+    x: x + (box.x - x) * factor,
+    y: y + (box.y - y) * factor,
+    width: box.width * factor,
+    height: box.height * factor,
+  };
+}
+
 /** The move of the orbit target that runs: its start point and its start time. */
 interface TargetGlide {
   readonly from: Vector3;
@@ -129,6 +182,11 @@ export class StageCamera {
   #fitGlide: { readonly from: number; readonly startMs: number } | null = null;
   /** The scale of the frame that keeps the stage clear of the play button of the first screen. */
   #clear: FrameClear = NO_CLEAR;
+  /**
+   * The share of the letterbox of Cinematic mode (design 2.5): 0 in Free mode, 1 in the frame of
+   * the aspect `CINEMA_ASPECT`, and between them while the bars move.
+   */
+  #cinema = 0;
   /** The highest point of the players above the stage top, in meters. */
   readonly #stageTop: number;
 
@@ -190,23 +248,33 @@ export class StageCamera {
    * button of the first screen shows, the frame shrinks until the stage is clear of it (design
    * 2.2, 2.8). After the first play, it grows back to the default view in about 0.4 s.
    *
+   * In Cinematic mode, the frame is the letterbox of the aspect `CINEMA_ASPECT` (design 2.5). The
+   * parts of the page over the canvas do not move it. While the bars move, the frame moves from the
+   * frame of Free mode to the letterbox by the share.
+   *
    * @param cover The parts of the page over the canvas.
    * @param ring The box of the load ring of the play button of the first screen, in CSS pixels,
    *   or `null` while it does not show.
    * @param nowMs The time of the frame, in milliseconds.
+   * @param cinema The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode).
    */
-  frameTo(cover: FrameCover, ring: ScreenBox | null, nowMs: number): void {
+  frameTo(cover: FrameCover, ring: ScreenBox | null, nowMs: number, cinema = 0): void {
     const dtMs = this.#frameMs === null || this.#reducedMotion ? Infinity : nowMs - this.#frameMs;
     this.#frameMs = nowMs;
     this.#cover = {
       right: glideTo(this.#cover.right, cover.right, dtMs, FRAME_GLIDE_MS, 0.01),
       lift: glideTo(this.#cover.lift, cover.lift, dtMs, FRAME_GLIDE_MS, 0.01),
     };
+    this.#cinema = cinema;
     let factor = 1;
     const stage = ring ? this.#stageBox() : null;
     if (ring && stage) {
       const base = viewFrame(this.#width, this.#height, this.#cover, this.#fit);
-      const clear = clearFirstScreen(boxOnCanvas(stage, this.#width, this.#height, base), ring);
+      const onCanvas =
+        cinema > 0
+          ? stageOnCanvas(stage, this.#imageBox(base))
+          : boxOnCanvas(stage, this.#width, this.#height, base);
+      const clear = clearFirstScreen(onCanvas, ring);
       factor = clear.factor;
       this.#clear = clear;
     }
@@ -230,7 +298,8 @@ export class StageCamera {
   #stageBox(): ScreenBox | null {
     const camera = this.camera;
     const target = this.#controls.target;
-    const { distance } = defaultView(this.#stageSide, this.#width, this.#height);
+    // The default distance follows the aspect of the image: the letterbox in Cinematic mode.
+    const { distance } = defaultView(this.#stageSide, camera.aspect, 1);
     scratchEye.subVectors(camera.position, target).setLength(distance).add(target);
     scratchView.compose(scratchEye, camera.quaternion, UNIT_SCALE).invert();
     const tanV = Math.tan(((camera.fov / 2) * Math.PI) / 180);
@@ -258,7 +327,10 @@ export class StageCamera {
     return { left, right, bottom, top };
   }
 
-  /** The frame of the camera on the canvas, in CSS pixels. */
+  /**
+   * The frame of the camera on the canvas, in CSS pixels. In Cinematic mode, its scale is the
+   * height of the image of the camera divided by the height of the canvas.
+   */
   get frame(): ViewFrame {
     return this.#frame;
   }
@@ -415,11 +487,43 @@ export class StageCamera {
     }
   }
 
-  /** Sets the view offset of the frame. The caller updates the projection matrix. */
+  /**
+   * Gives the box of the image of the camera before the clear of the first screen: the frame of
+   * Free mode mixed with the letterbox by the share of Cinematic mode.
+   *
+   * @param frame The frame of Free mode.
+   * @returns The box, in CSS pixels.
+   */
+  #imageBox(frame: ViewFrame): FrameBox {
+    const free = boxOfFrame(frame, this.#width, this.#height);
+    return mixBox(free, letterbox(this.#width, this.#height), this.#cinema);
+  }
+
+  /**
+   * Sets the aspect and the view offset of the frame. The caller updates the projection matrix.
+   * In Free mode, the image has the aspect of the canvas. In Cinematic mode, it has the aspect
+   * `CINEMA_ASPECT`, and the canvas shows the image and the scene around it (design 2.5).
+   */
   #applyFrame(): void {
     const frame = viewFrame(this.#width, this.#height, this.#cover, this.#fit);
-    this.#frame = clearedFrame(frame, this.#clear);
-    this.camera.setViewOffset(...viewOffset(this.#width, this.#height, this.#frame));
+    if (this.#cinema <= 0) {
+      this.#frame = clearedFrame(frame, this.#clear);
+      this.camera.aspect = this.#width / this.#height;
+      this.camera.setViewOffset(...viewOffset(this.#width, this.#height, this.#frame));
+      return;
+    }
+
+    const box = clearedBox(this.#imageBox(frame), this.#clear);
+    this.#frame = { x: box.x, y: box.y, scale: box.height / this.#height };
+    this.camera.aspect = this.#cinema >= 1 ? CINEMA_ASPECT : box.width / box.height;
+    this.camera.setViewOffset(
+      box.width,
+      box.height,
+      box.width / 2 - box.x,
+      box.height / 2 - box.y,
+      this.#width,
+      this.#height,
+    );
   }
 
   #updateFar(): void {
