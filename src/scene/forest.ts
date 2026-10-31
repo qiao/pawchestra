@@ -9,20 +9,19 @@ import type { StageColors } from '../models/props.ts';
 import type { plankHash } from '../models/stage.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { buildForestSteps, sunDirection } from './forest-build.ts';
-import type { CutGroup, ForestArrays, ForestBuild, ForestLamp, ForestSun } from './forest-build.ts';
+import type { CutGroup, ForestArrays, ForestBuild, ForestLamp } from './forest-build.ts';
 import {
   FOREST_FRAGMENT,
   FOREST_VERTEX,
   GLOW_FRAGMENT,
   GLOW_VERTEX,
-  SUN_GLOW_FRAGMENT,
   cutPoints,
   keepGroups,
 } from './forest-cut.ts';
 import type { VenueLight } from './lights.ts';
 import type { VenuePost } from './post.ts';
 import type { StageFinish, SideGlow } from './stage.ts';
-import type { FrameDepth, Venue } from './venue.ts';
+import type { Venue } from './venue.ts';
 
 /**
  * The runtime parts of the first download that the forest uses (design 7.2). This chunk imports
@@ -70,22 +69,22 @@ const DEGREES = Math.PI / 180;
  */
 export const FOREST = {
   /**
-   * The sun, seen from the stage center: the angle above the floor of the light of the bake, in
-   * radians. The sun stands in the direction of the rim light ({@link forestSun}). Its glow
-   * stands among the trees there, at a distance and a height in meters, with a radius in meters,
-   * so that the default view shows it at its top right, as `forest.webp`. The glow shines
-   * through the trees.
+   * The sun, seen from the stage center: the turn from the front (+z) toward the right (+x) and
+   * the angle above the floor of its light, in radians. Its glow stands among the trees at the
+   * back right, at a distance and a height in meters, with a radius in meters, so that the
+   * default view shows it at its top right, as `forest.webp`. The glow shines through the trees.
    */
   sun: {
+    azimuth: 145 * DEGREES,
     elevation: 25 * DEGREES,
     glowDistance: 12.5,
-    glowHeight: 0.6,
-    glow: 4,
+    glowHeight: 2.2,
+    glow: 6.5,
   },
   /** The radius of the glow of a lantern, in meters. */
   lanternGlow: 0.5,
   /** The light of the middle of a glow, in linear values: a lantern and the sun. */
-  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [1.4, 0.95, 0.3] },
+  glowLight: { lantern: [0.6, 0.24, 0.05], sun: [0.7, 0.45, 0.13] },
   /** The baked light of the faces (`ForestBake` of `forest-build.ts`). */
   bake: {
     sky: [0.32, 0.3, 0.14],
@@ -94,7 +93,6 @@ export const FOREST = {
     sunShade: [0.5, 9],
     canopy: { distance: [1.5, 7], height: [2, 8], shade: 0.65 },
     leafGlow: [3, 3.2, 0.8],
-    sunLeaves: { light: [3, 3.6, 0.6], power: 2 },
     key: { light: [0.45, 0.32, 0.18], direction: [-0.3, 0.7, 1] },
     deck: { light: [0.7, 0.42, 0.18], reach: 2.5 },
     lantern: { light: [1.6, 0.8, 0.25], reach: 0.9 },
@@ -121,14 +119,11 @@ export const FOREST = {
   },
   /**
    * The cut of the parts between the camera and the stage (`CutRules` of `forest-build.ts`), and
-   * the points of the stage that no part may hide (`CutSamples` of `forest-cut.ts`). A cell of
-   * 2 m gave the bough of the left framing tree a cylinder 0.6 m wider than its leaves, which
-   * dropped the tree in the default view of a phone. A cell of 1.5 m keeps it, and a test of all
-   * groups takes at most 0.3 ms (`pnpm forest-cut`).
+   * the points of the stage that no part may hide (`CutSamples` of `forest-cut.ts`).
    */
   cut: {
     band: 1.5,
-    cell: 1.5,
+    cell: 2,
     low: 0.35,
     join: 0.6,
     wide: 8,
@@ -139,14 +134,9 @@ export const FOREST = {
 } as const;
 
 /**
- * The light of the forest (design 4.1): a soft warm key from the front, a low golden sun at the
- * back right as the rim light and the beam, and a green-gold fill. The back-row lights and the
+ * The light of the forest (design 4.1): a soft warm key from the front, a low golden sun behind
+ * the stage as the rim light and the beam, and a green-gold fill. The back-row lights and the
  * light on the conductor start at the values of the hall.
- *
- * The rim light stands lower than in the hall and turns to the right, so that the beam slants
- * from the top right toward the stage, as the light shafts of `forest.webp`. A lower or a more
- * turned place puts more cameras of the shot plans in the haze of the beam, because the shot plan
- * reads no rim place (design 5.6).
  */
 export const FOREST_LIGHT = {
   key: { color: '#ffcf98', aimToPodium: 0, angle: 19 * DEGREES, penumbra: 1, illuminance: 4.8 },
@@ -166,8 +156,7 @@ export const FOREST_LIGHT = {
     penumbra: 0.5,
   },
   rim: { color: '#ffb866', illuminance: 6.5, angle: 16 * DEGREES, penumbra: 1 },
-  rimPlace: { distance: 2.45, elevation: 45 * DEGREES, turn: 35 * DEGREES, count: 1, spread: 0.3 },
-  beam: { color: '#ffc47a', strength: 6, moteStrength: 1 },
+  beam: { color: '#ffc47a', strength: 4.5, moteStrength: 1 },
   fill: { sky: '#3a3a1c', ground: '#3a2814', intensity: 4.2 },
   conductor: {
     aimHeight: 1.2,
@@ -178,17 +167,6 @@ export const FOREST_LIGHT = {
     penumbra: 0.6,
   },
 } satisfies VenueLight;
-
-/**
- * Gives the sun of the forest (design 4.1): the direction of the rim light ({@link FOREST_LIGHT}),
- * and the angle of the light of the bake ({@link FOREST}.sun). Thus the glow, the bake, and the
- * beam come from one side. It reads the values at the call, after the look override.
- *
- * @returns The sun.
- */
-export function forestSun(): ForestSun {
-  return { azimuth: Math.PI - FOREST_LIGHT.rimPlace.turn, elevation: FOREST.sun.elevation };
-}
 
 /** The stage colors of a venue in sRGB, as the look override takes them. */
 type StageHex = Readonly<Record<keyof StageColors, string>>;
@@ -397,71 +375,13 @@ interface Glow {
  * @returns The center, the radius, and the cut group 0.
  */
 function sunGlow(kit: ForestKit): Glow {
-  const { glowDistance, glowHeight, glow } = FOREST.sun;
-  const { azimuth } = forestSun();
+  const { azimuth, glowDistance, glowHeight, glow } = FOREST.sun;
   const center: Vec3 = [
     glowDistance * Math.sin(azimuth),
     kit.floorY + glowHeight,
     glowDistance * Math.cos(azimuth),
   ];
   return { center, glow, cut: 0 };
-}
-
-/** The uniforms of the depth of the stage in the glow of the sun ({@link SUN_GLOW_FRAGMENT}). */
-interface SunDepthUniforms {
-  /** The depth texture of the frame with no surroundings. */
-  readonly uDepth: { value: Three.Texture | null };
-  /** The width and the height of the drawing buffer, in pixels. */
-  readonly uResolution: { value: Float32Array };
-  /** The near plane of the camera, in meters. */
-  readonly uNear: { value: number };
-  /** The far plane of the camera, in meters. */
-  readonly uFar: { value: number };
-  /** 1 to hide the glow behind the stage items, 0 with no depth. */
-  readonly uUseDepth: { value: number };
-}
-
-/**
- * Turns the glow of the sun into a glow that the stage items hide (design 4.1): a close shot
- * toward the sun saw the glow over the back row, because the glow takes no depth test.
- *
- * @param kit The runtime parts of the first download.
- * @param sun The mesh of the glow of the sun, from `glowMesh()`.
- * @returns The uniforms of the depth, or null if the mesh has no shader material.
- */
-function hideSunBehindStage(kit: ForestKit, sun: Three.Mesh): SunDepthUniforms | null {
-  const material = sun.material;
-  if (!(material instanceof kit.three.ShaderMaterial)) {
-    return null;
-  }
-  const uniforms: SunDepthUniforms = {
-    uDepth: { value: null },
-    uResolution: { value: new Float32Array([1, 1]) },
-    uNear: { value: 0.1 },
-    uFar: { value: 100 },
-    uUseDepth: { value: 0 },
-  };
-  // The glow of the sun shines through the canopy, so no tree hides it.
-  material.depthTest = false;
-  material.fragmentShader = SUN_GLOW_FRAGMENT;
-  Object.assign(material.uniforms, uniforms);
-  return uniforms;
-}
-
-/**
- * Sets the depth of the stage items of a frame in the glow of the sun.
- *
- * @param uniforms The uniforms of {@link hideSunBehindStage}.
- * @param depth The depth of the frame, or null with no depth pass.
- */
-function setSunDepth(uniforms: SunDepthUniforms, depth: FrameDepth | null): void {
-  uniforms.uUseDepth.value = depth ? 1 : 0;
-  if (depth) {
-    uniforms.uDepth.value = depth.texture;
-    uniforms.uResolution.value.set(depth.size);
-    uniforms.uNear.value = depth.near;
-    uniforms.uFar.value = depth.far;
-  }
 }
 
 /**
@@ -519,7 +439,7 @@ function forestEnvironment(kit: ForestKit): Scene {
     new three.BoxGeometry(4, 4, 4),
     new three.MeshBasicMaterial({ color: new three.Color().setRGB(...e.sun) }),
   );
-  const [x, y, z] = sunDirection(forestSun());
+  const [x, y, z] = sunDirection(FOREST.sun);
   sun.position.set(16 * x, 16 * y, 16 * z);
   scene.add(sun);
   return scene;
@@ -552,7 +472,6 @@ function linearColors<K extends string>(
  */
 export function forestVenue(kit: ForestKit): Venue {
   const cuts = new WeakMap<Group, ForestCut>();
-  const suns = new WeakMap<Group, SunDepthUniforms>();
   let parts: ReturnType<typeof forestParts> | null = null;
   return {
     id: 'forest',
@@ -564,7 +483,7 @@ export function forestVenue(kit: ForestKit): Venue {
         layout: placeForest(stageSide, kit.cornerCut),
         stageSide,
         floorY: kit.floorY,
-        sun: forestSun(),
+        sun: FOREST.sun,
         bake: FOREST.bake,
         far: FOREST.far,
         cut: FOREST.cut,
@@ -574,7 +493,10 @@ export function forestVenue(kit: ForestKit): Venue {
       const cut = createCut(kit, build, stageSide);
       const lamps = build.lamps.map((lamp: ForestLamp) => ({ ...lamp, glow: FOREST.lanternGlow }));
       const sun = glowMesh(kit, [sunGlow(kit)], FOREST.glowLight.sun, { cut, lift: 0 });
-      const sunDepth = hideSunBehindStage(kit, sun);
+      // The glow of the sun shines through the canopy, so no tree hides it.
+      if (!Array.isArray(sun.material)) {
+        sun.material.depthTest = false;
+      }
       const group = new kit.three.Group().add(
         forestMesh(kit, build.solid, cut, false),
         forestMesh(kit, build.foliage, cut, true),
@@ -582,22 +504,9 @@ export function forestVenue(kit: ForestKit): Venue {
         sun,
       );
       cuts.set(group, cut);
-      if (sunDepth) {
-        suns.set(group, sunDepth);
-      }
       return group;
     },
-    frameSurroundings(
-      surroundings: Group,
-      _stageSide: number,
-      camera: Vector3,
-      _pixels: number,
-      depth: FrameDepth | null,
-    ) {
-      const sun = suns.get(surroundings);
-      if (sun) {
-        setSunDepth(sun, depth);
-      }
+    frameSurroundings(surroundings: Group, _stageSide: number, camera: Vector3) {
       const cut = cuts.get(surroundings);
       if (
         !cut ||

@@ -70,7 +70,7 @@ PALETTE = {
     'bark-moss': '#4f5528',
     'log-bark': '#6e4428',
     'log-bark-dark': '#563420',
-    'wood-cut': '#dba76c',
+    'wood-cut': '#c98f55',
     'wood-ring': '#9a6436',
     'leaf-light': '#909c33',
     'leaf': '#6a7c2b',
@@ -88,20 +88,11 @@ PALETTE = {
     'earth-dark': '#5f412b',
     'earth-light': '#8f6845',
     'litter': '#6f4a2a',
-    'path': '#80603f',
-    'path-light': '#906e4a',
-    'rock-blue-light': '#626872',
-    'rock-blue': '#4a5059',
-    'rock-blue-dark': '#363a42',
-    'rock-wet': '#4a4640',
-    'rock-wet-dark': '#34302c',
-    'water': '#3d4a52',
-    'water-deep': '#2b343b',
-    'water-cream': '#95856e',
-    'water-cream-light': '#afa386',
-    'water-streak': '#5c5040',
-    'water-glint': '#f0b85a',
-    'foam': '#c9c1b2',
+    'path': '#9c7650',
+    'path-light': '#ab8660',
+    'water': '#3e4a44',
+    'water-light': '#a9b8b2',
+    'foam': '#f0f2ec',
     'iron': '#2e2925',
     'iron-light': '#4a423a',
     'glass': '#ffb85c',
@@ -331,21 +322,15 @@ def blob(rng, center, radii, detail='ico', jitter=0.12):
 
 
 def hull(points):
-    """Gives the points and the faces of the convex hull of points.
-
-    A point inside the hull can be in both lists of the unused points, so each point goes into
-    the delete one time.
-    """
+    """Gives the points and the faces of the convex hull of points."""
     tmp = bmesh.new()
     verts = [tmp.verts.new(p) for p in points]
     result = bmesh.ops.convex_hull(tmp, input=verts)
-    unused = list(
-        dict.fromkeys(
-            g
-            for g in result['geom_unused'] + result['geom_interior']
-            if isinstance(g, bmesh.types.BMVert)
-        )
-    )
+    unused = [
+        g
+        for g in result['geom_unused'] + result['geom_interior']
+        if isinstance(g, bmesh.types.BMVert)
+    ]
     bmesh.ops.delete(tmp, geom=unused, context='VERTS')
     tmp.verts.index_update()
     out = [Vector(v.co) for v in tmp.verts]
@@ -776,17 +761,17 @@ def build_rock(name, spec):
     points, faces = hull(points)
     centroid = sum(points, Vector()) / len(points)
 
-    lit, mid, shade = spec.get('tones', ('rock-light', 'rock', None))
-
     def paint(normal, center):
         if normal.y > 0.75 and rng.random() < spec.get('moss', 0.0):
             return linear('moss'), 'matte'
         light = normal.y + rng.uniform(-0.35, 0.35)
-        if light > 0.6:
-            return linear(lit), 'matte'
-        if light > 0.0:
-            return linear(mid), 'matte'
-        return linear(shade or pick(rng, [('rock-dark', 2), ('rock-warm', 1)])), 'matte'
+        return linear(
+            'rock-light'
+            if light > 0.6
+            else 'rock'
+            if light > 0.0
+            else pick(rng, [('rock-dark', 2), ('rock-warm', 1)])
+        ), 'matte'
 
     part.add(points, faces, paint, lambda _: centroid)
     return part
@@ -815,7 +800,7 @@ def wood_end(part, center, radius, sides, axis, start, rings_count=3):
 
 
 def build_log(name, spec):
-    """Builds a fallen log along x, with bark facets of one color and light cut ends with rings."""
+    """Builds a fallen log along x, with bark facets, moss on top, and cut ends with rings."""
     part = Part(name)
     rng = part.rng
     sides = 9
@@ -831,14 +816,19 @@ def build_log(name, spec):
         points += [p + Vector((0.0, rng.uniform(-0.02, 0.02), 0.0)) * (0 < i < 4) for p in pts]
         centers.append(c)
     faces = rings_faces(len(xs), sides)
-    # The bark has one color, so that the baked light alone shades the facets. Colors of bark
-    # for each side and a moss top made blocks of other colors, as a green block at one end.
-    part.add(
-        points,
-        faces,
-        lambda n, c: (linear('log-bark'), 'matte'),
-        lambda c: min(centers, key=lambda k: abs(k.x - c.x)),
-    )
+    # Each side of the log keeps one warm bark color along its length, as the ridges of bark. A
+    # random color for each face made large blocks, like a checker. The top side holds moss.
+    strips = [
+        pick(rng, [('log-bark', 3), ('log-bark-dark', 2), ('bark-light', 1)]) for _ in range(sides)
+    ]
+
+    def paint(normal, center):
+        if normal.y > 0.95 and center.x > length * 0.2:
+            return linear('bark-moss'), 'matte'
+        side = round(math.atan2(normal.y, normal.z) / (2 * math.pi) * sides) % sides
+        return linear(strips[side]), 'matte'
+
+    part.add(points, faces, paint, lambda c: min(centers, key=lambda k: abs(k.x - c.x)))
     first, last = points[:sides], points[-sides:]
     for ring_points, center, axis in (
         (first, centers[0], Vector((-1.0, 0.0, 0.0))),
@@ -846,6 +836,16 @@ def build_log(name, spec):
     ):
         r = sum((p - center).length for p in ring_points) / sides
         wood_end(part, center + axis * 0.005, r * 0.96, sides, axis, 0.3)
+    stub_at = Vector((xs[1] + 0.3, radius * 1.5, 0.12))
+    branch(
+        part,
+        stub_at - Vector((0.0, radius * 0.4, 0.0)),
+        stub_at + Vector((0.25, 0.35, 0.15)),
+        0.07,
+        0.04,
+        sides=5,
+        segments=2,
+    )
     return part
 
 
@@ -1141,240 +1141,139 @@ def build_path():
     return part
 
 
-#: The place of the stream part: the x and the z of the foot of the waterfall, and the yaw in
-#: degrees, which turns the fall to the default camera. The fall stands behind the back right
-#: corner of the deck, so that the default view shows it at the height of the heads of the back
-#: row, as `forest.webp`.
-STREAM_PLACE = (5.0, -5.6, -15.0)
-
-#: The middle line of the stream in the axes of the app, from the pool at the foot of the
-#: waterfall: the water runs toward the back right corner of the deck, then turns to the right
-#: (+x) and goes under the bushes at the right side of the stage.
+#: The middle line of the water of the stream below the waterfall, in the axes of the part: the
+#: water runs to the front, and then turns to +x.
 STREAM_COURSE = (
-    (4.98, -5.15),
-    (4.86, -4.7),
-    (4.98, -4.25),
-    (5.45, -3.92),
-    (6.3, -3.72),
-    (7.3, -3.5),
-    (8.4, -3.1),
-    (9.6, -2.6),
+    (0.0, 0.2),
+    (0.4, 1.2),
+    (1.3, 2.1),
+    (2.3, 2.9),
+    (3.4, 3.6),
+    (4.6, 4.3),
+    (5.8, 5.2),
+    (7.0, 6.0),
+    (8.4, 6.6),
 )
-
-#: The half width of the water of the stream, in meters, at the pool and further down.
-STREAM_HALF = (0.55, 0.36)
-
-#: The two steps of the waterfall in the axes of the part: the height of the lip, the height of
-#: the foot, the z of the lip, the reach of the water past the lip, and the half width of the
-#: water.
-FALL_STEPS = (
-    (0.62, 0.34, -0.55, 0.1, 0.2),
-    (0.34, 0.045, -0.18, 0.14, 0.3),
-)
-
-
-def stream_local(x, z):
-    """Turns a point of the ground in the axes of the app into the axes of the stream part."""
-    sx, sz, yaw = STREAM_PLACE
-    a = math.radians(yaw)
-    dx, dz = x - sx, z - sz
-    # The place turns a local point by the yaw: x = lx cos + lz sin, z = lz cos - lx sin.
-    return dx * math.cos(a) - dz * math.sin(a), dx * math.sin(a) + dz * math.cos(a)
-
-
-def stream_world(lx, lz):
-    """Turns a point of the ground in the axes of the stream part into the axes of the app."""
-    sx, sz, yaw = STREAM_PLACE
-    a = math.radians(yaw)
-    return sx + lx * math.cos(a) + lz * math.sin(a), sz + lz * math.cos(a) - lx * math.sin(a)
 
 
 def build_stream():
-    """Builds the small waterfall of two steps between dark, wet rocks, and its stream.
+    """Builds the stream with a small waterfall in two steps, rock ledges, and bank stones.
 
-    Its origin is at the foot of the waterfall, on the ground. The water falls toward +z in
-    strands with foam, onto a ledge and into a pool, and the stream runs from the pool along
-    `STREAM_COURSE`, with glints and bank stones.
+    Its origin is at the foot of the waterfall, on the ground. The water falls toward +z and then
+    runs to +x and +z.
     """
     part = Part('stream')
     rng = part.rng
-    wet = solid_paint([('rock-wet', 3), ('rock-wet-dark', 2), ('rock-dark', 1)], 'matte', rng)
-    dry = solid_paint([('rock', 3), ('rock-warm', 2), ('rock-light', 1)], 'matte', rng)
 
-    def rock(center, size, count=12, moss=0.0):
-        """Adds a boulder: wet, dark sides, and a dry top with some moss."""
+    def water(name):
+        return lambda n, c: (linear(name), 'water')
+
+    rock_paint = solid_paint(
+        [('rock', 3), ('rock-dark', 2), ('rock-warm', 1), ('moss', 1)], 'matte', rng
+    )
+
+    def rock(center, size, count=12):
         pts = []
         for _ in range(count):
             d = Vector((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, 1))).normalized()
             pts.append(Vector(center) + Vector((d.x * size[0], d.y * size[1], d.z * size[2])))
         pts, faces = hull(pts)
         c = sum(pts, Vector()) / len(pts)
-
-        def rock_paint(normal, center):
-            if normal.y > 0.55:
-                if rng.random() < moss:
-                    return linear(pick(rng, [('moss', 2), ('leaf-dark', 1)])), 'matte'
-                return dry(normal, center)
-            return wet(normal, center)
-
         part.add(pts, faces, rock_paint, lambda _: c)
 
-    def slab(lo, hi, count=10):
-        """Adds a rock of random points in a box: the dark face behind a step of the fall.
-
-        A point near each front corner keeps the face as wide and as high as the water.
-        """
-        pts = [Vector(tuple(rng.uniform(lo[i], hi[i]) for i in range(3))) for _ in range(count)]
-        for x, y in ((lo[0], lo[1]), (hi[0], lo[1]), (lo[0], hi[1]), (hi[0], hi[1])):
-            pts.append(Vector((x, y, hi[2] - rng.uniform(0.0, 0.03))))
-        pts, faces = hull(pts)
-        c = sum(pts, Vector()) / len(pts)
-        part.add(pts, faces, wet, lambda _: c)
-
-    def disc(center, radii, sides, names, lift=0.0):
-        """Adds a flat fan of water faces that look up."""
-        pts = [Vector(center) + Vector((0.0, lift, 0.0))]
-        start = rng.uniform(0, 1)
-        for k in range(sides):
-            a = start + 2 * math.pi * k / sides
-            r = rng.uniform(0.82, 1.08)
-            pts.append(
-                Vector(center)
-                + Vector((radii[0] * r * math.cos(a), 0.0, radii[1] * r * math.sin(a)))
-            )
-        faces = [(0, 1 + (k + 1) % sides, 1 + k) for k in range(sides)]
-        part.add(pts, faces, lambda n, c: (linear(pick(rng, names)), 'water'), 'up')
-
-    # The rocks: flat boulders behind the top of the fall and at each side of each step, and the
-    # dark faces behind the strands, so that the rock shows between them.
-    rock((0.0, 0.45, -1.3), (1.0, 0.45, 0.5), 16, moss=0.4)
-    rock((-0.85, 0.3, -0.85), (0.45, 0.36, 0.42), 12, moss=0.3)
-    rock((0.9, 0.32, -0.8), (0.48, 0.38, 0.4), 12, moss=0.3)
-    for top, _, z, _, half in FALL_STEPS:
-        for side in (-1, 1):
+    steps = [(1.7, -1.6), (0.85, -0.8)]
+    for height, z in steps:
+        for x in (-1.25, -0.65, 0.65, 1.25):
             rock(
-                (side * (half + 0.22 + rng.uniform(0.0, 0.06)), top * 0.55, z - 0.02),
-                (0.3, top * 0.55, 0.3),
-                11,
-                moss=0.2,
+                (x * rng.uniform(0.9, 1.1), height * 0.5, z + rng.uniform(-0.15, 0.15)),
+                (0.55, height * 0.55, 0.6),
             )
-    for top, foot, z, _, half in FALL_STEPS:
-        slab((-half - 0.06, foot - 0.04, z - 0.16), (half + 0.06, top - 0.02, z - 0.04))
-
-    # The water: the pool above the fall, a sheet over each step, and the foam at each foot. Each
-    # sheet curves over its lip in columns of uneven widths with no gap, in tones of cream with
-    # streaks. Strands of uneven widths and lengths lie over the sheet, so that the streaks
-    # overlap, as the warm, soft water of `forest.webp`.
-    disc((0.0, FALL_STEPS[0][0] + 0.01, -0.85), (0.3, 0.22), 7, [('water', 2), ('water-cream', 1)])
-    tones = [('water-cream', 3), ('water-streak', 2), ('water-cream-light', 2)]
-    for top, foot, z, reach, half in FALL_STEPS:
-        drop = top - foot
-
-        def sheet_point(x, sv, front=0.0, top=top, z=z, reach=reach, drop=drop):
-            """Gives a point of the sheet: over the round lip first, then down and out."""
-            if sv < 0:
-                return Vector((x, top + 0.008, z - 0.07 + front))
-            return Vector((x, top - drop * sv, z + reach * math.sqrt(sv) + 0.015 + front))
-
-        lip = [Vector((-half, top + 0.008, z - 0.14)), Vector((half, top + 0.008, z - 0.14))]
-        lip += [sheet_point(half, -1), sheet_point(-half, -1)]
-        part.add(lip, [(0, 1, 2, 3)], lambda n, c: (linear('water-cream'), 'water'), 'up')
-        rows_at = (-1, 0.0, 0.12, 0.4, 0.7, 1.0)
-        cuts = sorted(rng.uniform(-half * 0.9, half * 0.9) for _ in range(6))
-        columns = list(zip([-half] + cuts, cuts + [half]))
-        for x0, x1 in columns:
-            tone = pick(rng, tones)
-            end = rng.uniform(0.86, 1.0)
-            pts = []
-            for sv in rows_at:
-                sv = sv if sv < 0 else sv * end
-                pts += [sheet_point(x0, sv), sheet_point(x1, sv)]
-            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(len(rows_at) - 1)]
-
-            def sheet_paint(normal, center, tone=tone, top=top, drop=drop):
-                share = (top - center.y) / drop
-                return linear('foam' if share > 0.8 else tone), 'water'
-
-            part.add(pts, faces, sheet_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
-        for _ in range(6):
-            width = rng.uniform(0.03, 0.09)
-            x0 = rng.uniform(-half, half - width)
-            length = rng.uniform(0.55, 1.0)
-            tone = pick(rng, [('water-cream-light', 2), ('water-streak', 1)])
-            pts = []
-            for sv in (-1, 0.0, 0.12, length * 0.5, length):
-                pts += [sheet_point(x0, sv, 0.012), sheet_point(x0 + width, sv, 0.012)]
-            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(4)]
-            part.add(
-                pts,
-                faces,
-                lambda n, c, tone=tone: (linear(tone), 'water'),
-                lambda c, z=z: Vector((c.x, c.y, z - 1.0)),
+    rock((0.0, 0.9, -2.4), (1.5, 0.95, 0.9))
+    for height, z in steps:
+        lip = [
+            Vector((-0.38, height, z + 0.3)),
+            Vector((0.38, height, z + 0.3)),
+            Vector((0.45, height - 0.82 * 0.0, z - 0.6)),
+            Vector((-0.45, height, z - 0.6)),
+        ]
+        part.add(lip, [(0, 1, 2, 3)], water('water'), 'up')
+        # The falling water: a sheet of columns with a small wave, water at the top and white
+        # foam in streaks and at the foot.
+        drop = height - (0.85 if height > 1 else 0.02)
+        columns, rows = 4, 4
+        sheet = []
+        for i in range(rows + 1):
+            t = i / rows
+            y = height - drop * t
+            half = 0.4 + 0.1 * t
+            for k in range(columns + 1):
+                u = k / columns
+                wave = 0.06 * math.sin(u * 7.0 + t * 3.0)
+                zz = z + 0.32 + 0.28 * math.sin(t * 1.4) + wave
+                sheet.append(Vector((-half + 2 * half * u, y, zz)))
+        faces = [
+            (
+                i * (columns + 1) + k,
+                i * (columns + 1) + k + 1,
+                (i + 1) * (columns + 1) + k + 1,
+                (i + 1) * (columns + 1) + k,
             )
-        # The foam pool at the foot: a wide, uneven fan of foam and cream.
-        disc(
-            (0.0, foot, z + reach + 0.1),
-            (half + 0.12, 0.16),
-            9,
-            [('foam', 3), ('water-cream', 2)],
-            0.015,
+            for i in range(rows)
+            for k in range(columns)
+        ]
+        streaks = [rng.random() < 0.45 for _ in range(columns)]
+
+        def fall_paint(normal, center, streaks=streaks, height=height, drop=drop, z=z):
+            t = (height - center.y) / max(drop, 1e-3)
+            column = min(columns - 1, max(0, int((center.x + 0.5) / 1.0 * columns)))
+            foam = t > 0.55 or (streaks[column] and t > 0.15)
+            return linear('foam' if foam else 'water-light'), 'water'
+
+        part.add(sheet, faces, fall_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
+        # The foam pool at the foot of the fall.
+        foot = height - drop
+        pool_center = Vector((0.0, foot + 0.035, z + 0.75))
+        pool = [pool_center]
+        for k in range(9):
+            a = 2 * math.pi * k / 9
+            rr = rng.uniform(0.45, 0.65)
+            pool.append(pool_center + Vector((rr * 1.3 * math.cos(a), 0.0, rr * math.sin(a))))
+        part.add(
+            pool,
+            [(0, 1 + (k + 1) % 9, 1 + k) for k in range(9)],
+            lambda n, c: (linear(pick(rng, [('foam', 3), ('water-light', 1)])), 'water'),
+            'up',
         )
-
-    # The stream: a strip of dark water from the pool along the course, with small glints of the
-    # low sun, and stones on its banks.
-    course = [stream_local(x, z) for x, z in STREAM_COURSE]
-    course.insert(0, (0.0, 0.18))
+    course = STREAM_COURSE
     left, right = [], []
     for i, (x, z) in enumerate(course):
         a = course[min(i + 1, len(course) - 1)]
         b = course[max(i - 1, 0)]
         d = Vector((a[0] - b[0], a[1] - b[1])).normalized()
         n = Vector((-d.y, d.x))
-        half = (STREAM_HALF[0] if i < 2 else STREAM_HALF[1]) + rng.uniform(-0.04, 0.05)
+        half = (1.0 if i == 0 else 0.55) + rng.uniform(-0.08, 0.12)
         left.append((x + n.x * half, z + n.y * half))
         right.append((x - n.x * half, z - n.y * half))
-    middle = [(x + rng.uniform(-0.08, 0.08), z) for x, z in course[1:-1]]
     outline = left + list(reversed(right))
     edges = [(i, (i + 1) % len(outline)) for i in range(len(outline))]
-    verts2d, _, faces, _, _, _ = delaunay_2d_cdt(
-        [Vector(p) for p in outline + middle], edges, [], 2, 1e-4
-    )
-    pts = [Vector((v.x, 0.045, v.y)) for v in verts2d]
+    verts2d, _, faces, _, _, _ = delaunay_2d_cdt([Vector(p) for p in outline], edges, [], 2, 1e-4)
+    pts = [Vector((v.x, 0.03, v.y)) for v in verts2d]
     part.add(
         pts,
         [tuple(f) for f in faces],
-        lambda n, c: (linear(pick(rng, [('water', 3), ('water-deep', 2)])), 'water'),
+        lambda n, c: (linear(pick(rng, [('water', 4), ('water-light', 1)])), 'water'),
         'up',
     )
-    # The glints: many tiny gold triangles just above the water, more of them near the fall.
-    for i in range(len(course) - 1):
-        (ax, az), (bx, bz) = course[i], course[i + 1]
-        d = Vector((bx - ax, bz - az)).normalized()
-        n = Vector((-d.y, d.x))
-        for _ in range(14 if i < 3 else 5):
-            t = rng.uniform(0.0, 1.0)
-            cx, cz = ax + (bx - ax) * t, az + (bz - az) * t
-            off = rng.uniform(-0.7, 0.7) * (STREAM_HALF[1] if i > 0 else STREAM_HALF[0])
-            c = Vector((cx + n.x * off, 0.05, cz + n.y * off))
-            size = rng.uniform(0.01, 0.022)
-            a0 = rng.uniform(0, 2 * math.pi)
-            tri = [
-                c + Vector((size * math.cos(a0 + k * 2.1), 0.0, size * math.sin(a0 + k * 2.1)))
-                for k in range(3)
-            ]
-            part.add(tri, [(0, 1, 2)], lambda n, c: (linear('water-glint'), 'water'), 'up')
-    for i in range(len(course)):
-        for edge in (left, right):
-            if i > 0 and rng.random() < 0.3:
-                continue
-            p = edge[i]
-            size = rng.uniform(0.12, 0.26) * (1.3 if i < 2 else 1.0)
-            rock(
-                (p[0] + rng.uniform(-0.06, 0.06), size * 0.25, p[1] + rng.uniform(-0.12, 0.12)),
-                (size, size * 0.6, size * 0.85),
-                9,
-                0.3,
-            )
+    for i in range(1, len(course)):
+        for s in (-1, 1):
+            if rng.random() < 0.75:
+                p = left[i] if s > 0 else right[i]
+                size = rng.uniform(0.18, 0.32)
+                rock(
+                    (p[0] + rng.uniform(-0.1, 0.1), size * 0.3, p[1] + rng.uniform(-0.2, 0.2)),
+                    (size, size * 0.7, size * 0.9),
+                    9,
+                )
     return part
 
 
@@ -1466,16 +1365,7 @@ def build_parts(collection):
         build_rock('rock-1', {'size': (0.75, 0.75, 0.6), 'points': 18, 'moss': 0.5}),
         build_rock('rock-2', {'size': (0.55, 0.35, 0.45), 'points': 14, 'moss': 0.3}),
         build_rock('rock-3', {'size': (0.3, 0.26, 0.26), 'points': 11}),
-        build_log('log', {'length': 2.3, 'radius': 0.27}),
-        build_rock(
-            'rock-4',
-            {
-                'size': (0.6, 0.5, 0.5),
-                'points': 16,
-                'moss': 0.2,
-                'tones': ('rock-blue-light', 'rock-blue', 'rock-blue-dark'),
-            },
-        ),
+        build_log('log', {'length': 3.0, 'radius': 0.3}),
         build_stump('stump-1', {'height': 0.55, 'radius': 0.4}),
         build_stump('stump-2', {'height': 0.45, 'radius': 0.34}),
         build_lantern_hanging(),
@@ -1523,7 +1413,7 @@ PLACES = [
     ('tree-2', 6.1, -1.0, 0, 1.0, 0.0),
     ('tree-3', -6.3, -6.5, 0, 0.95, 0.0),
     ('tree-2', -1.3, -6.9, 0, 0.9, 0.0),
-    ('tree-4', 7.2, -6.6, 0, 1.0, 0.0),
+    ('tree-4', 4.2, -7.0, 0, 1.0, 0.0),
     ('tree-4', -9.8, -3.2, 40, 1.05, 0.0),
     ('tree-3', 11.2, 2.4, -40, 0.95, 0.0),
     ('tree-1', 3.4, -10.6, 30, 0.95, 0.0),
@@ -1542,56 +1432,19 @@ PLACES = [
     ('lantern-standing', -4.6, 4.3, 15, 1.0, 0.55),
     ('stump-2', 4.75, 4.45, 40, 1.0, 0.0),
     ('lantern-standing', 4.75, 4.45, -20, 1.0, 0.45),
-    # The log lies at an angle at the lower left, with its thick cut end to the front right and
-    # its far end in the bushes at the left, and keeps a gap of earth to the deck front. The dark
-    # rocks stand in a group at the right.
-    ('log', -2.15, 5.0, 165, 1.0, 0.0),
-    ('rock-4', 2.45, 5.05, 20, 1.0, 0.0),
-    ('rock-4', 3.25, 4.85, 140, 0.7, 0.0),
-    ('rock-4', 2.95, 5.55, 260, 0.55, 0.0),
-    ('rock-3', 1.85, 5.3, 0, 1.0, 0.0),
+    ('log', -1.6, 4.95, -6, 1.0, 0.0),
+    ('rock-1', 3.0, 5.2, 30, 0.7, 0.0),
+    ('rock-2', 3.9, 5.5, 110, 0.9, 0.0),
+    ('rock-3', 2.2, 5.1, 0, 1.0, 0.0),
+    ('rock-2', -4.0, 5.6, 200, 0.8, 0.0),
     ('rock-1', -8.0, -4.8, 70, 1.3, 0.0),
     ('rock-2', -4.6, -6.0, 10, 1.3, 0.0),
     ('rock-1', 2.2, -6.3, 160, 1.0, 0.0),
     # The ground, the path, and the stream with its waterfall at the back right.
     ('ground', 0.0, 0.0, 0, 1.0, 0.0),
     ('path', 0.0, HALF, 0, 1.0, 0.0),
-    ('stream', *STREAM_PLACE, 1.0, 0.0),
+    ('stream', 6.6, -8.9, -15, 1.0, 0.0),
 ]
-
-#: The undergrowth along the back edge of the deck: a row of bushes near the edge and a row of
-#: ferns and bushes behind it, from the left corner to the waterfall. The part, x, and z in
-#: meters.
-BACK_UNDERGROWTH = (
-    ('bush-2', -4.3, -5.05),
-    ('bush-1', -3.2, -5.3),
-    ('bush-2', -2.1, -5.0),
-    ('bush-1', -0.95, -5.3),
-    ('bush-2', 0.2, -5.0),
-    ('bush-1', 1.35, -5.3),
-    ('bush-2', 2.45, -5.0),
-    ('bush-2', 3.45, -5.05),
-    ('fern-2', -3.75, -6.2),
-    ('bush-2', -1.6, -6.3),
-    ('fern-2', 0.75, -6.25),
-    ('bush-2', 2.95, -6.2),
-)
-
-#: The grass tufts of the clearing in front of the deck: x and z in meters.
-FRONT_GRASS = (
-    (-2.3, 4.55),
-    (-1.0, 4.62),
-    (-0.2, 4.95),
-    (0.35, 4.6),
-    (0.9, 5.15),
-    (1.45, 4.7),
-    (0.2, 5.45),
-    (-0.4, 5.75),
-    (2.05, 4.55),
-    (1.6, 5.7),
-    (-2.9, 5.6),
-    (3.7, 4.55),
-)
 
 #: The ropes of the light string: the two trees (indices in `PLACES`), the height of each end
 #: above the ground, the slack, and the lantern count. The ropes from the framing trees to the
@@ -1668,14 +1521,22 @@ def in_front_opening(x, z):
     return z > HALF - 1.0 and abs(x) < HALF + 1.0 + (z - HALF) * 0.7
 
 
-#: The least space between the water of the stream and the foot of a part of the scatter, in
-#: meters.
-STREAM_KEEP = 0.9
+#: The course of the stream in the axes of the app, for the scatter: points that keep the parts off
+#: the water.
+STREAM_KEEP = 1.6
 
 
 def stream_course(places):
-    """Gives points along the water of the placed stream and its fall, in the axes of the app."""
-    return [stream_world(0.0, z) for z in (-1.2, -0.6, 0.0)] + list(STREAM_COURSE)
+    """Gives points along the water of the placed stream."""
+    _, sx, sz, yaw, _, _ = next(p for p in places if p[0] == 'stream')
+    a = math.radians(yaw)
+    out = []
+    for lx, lz in [(0.0, -2.4), (0.0, -1.6), (0.0, -0.8)] + list(STREAM_COURSE):
+        # A turn of the yaw about +y moves x to x cos + z sin, and z to -x sin + z cos.
+        out.append(
+            (sx + lx * math.cos(a) + lz * math.sin(a), sz - lx * math.sin(a) + lz * math.cos(a))
+        )
+    return out
 
 
 def scatter(rng, objects, footprints):
@@ -1802,25 +1663,12 @@ def scatter(rng, objects, footprints):
         ('fern-2', 1.2, 5.5),
         ('fern-1', 4.0, 5.3),
         ('fern-2', -5.2, 3.6),
-        ('bush-1', -4.15, 5.2),
-        ('bush-2', 3.85, 5.5),
     ):
         yaw = rng.uniform(0, 360)
         space = clearance(objects[name], x, z, yaw, 1.0, 3.0)
         if space < LOW_CLEARANCE:
             raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
         place(name, x, z, 1.0, yaw)
-    # The undergrowth along the back edge of the deck, where the default view saw bare earth.
-    for name, x, z in BACK_UNDERGROWTH:
-        yaw = rng.uniform(0, 360)
-        scale = rng.uniform(0.9, 1.15)
-        space = clearance(objects[name], x, z, yaw, scale, 3.0)
-        if space < LOW_CLEARANCE:
-            raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
-        place(name, x, z, scale, yaw)
-    # The grass tufts of the clearing in front of the deck, beside and behind the log.
-    for x, z in FRONT_GRASS:
-        place('grass', x, z, rng.uniform(0.8, 1.1), rng.uniform(0, 360))
     return places
 
 

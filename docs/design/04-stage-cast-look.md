@@ -43,7 +43,7 @@ light, the stage finish, the prop colors, and the post effects. The setting "Sce
   are the constants of 4.5.
 - `forest`: a forest clearing, as `reference/forest.webp` (`scene/forest.ts`), from the kit of
   `assets/forest/` (below). It has a lighter and matte stage wood, dark wood chairs, a golden rim
-  light from the low sun at the back right with a slanted beam, and a warm grade.
+  light and beam, and a warm grade.
 
 ```text
  setting "Scene" ──┐          hash "#demo=...&scene=forest"
@@ -63,14 +63,8 @@ export interface Venue {
   readonly id: VenueId; // 'hall' | 'forest' (`scene/venue-id.ts`)
   /** The surroundings: no light, no shadow, hidden in the depth passes of the beam. */
   surroundingsSteps(stageSide: number): Steps<Group>;
-  /** The cutaway, the glow size, and the depth of the stage items for a camera. */
-  frameSurroundings(
-    surroundings: Group,
-    stageSide: number,
-    camera: Vector3,
-    pixels: number,
-    depth: FrameDepth | null, // the depth pass of the beam, with no surroundings
-  ): void;
+  /** The cutaway of the surroundings and the glow size for a camera. */
+  frameSurroundings(surroundings: Group, stageSide: number, camera: Vector3, pixels: number): void;
   /** The scene that the PMREM environment captures, one time for each venue. */
   environmentScene(): Scene;
   /** The key, side, back-row, rim, fill, and conductor lights, and the beam (`VenueLight`). */
@@ -86,10 +80,9 @@ export interface Venue {
 
 - **Shared stage.** Each venue keeps the cast, the instruments, the layout, the stage outline,
   the camera, and the shot plan, because a change of the venue must keep the song time, the
-  transport, and the poses (5.1). The place of the key light (`KEY_PLACE` of `models/beam.ts`)
-  stays the same, because the shots read it (5.6). Each venue places its rim lights
-  (`VenueLight.rimPlace`), because the shot plan reads only the cone of `insideBeam()`. A venue
-  also changes the colors and the strength of the lights.
+  transport, and the poses (5.1). The places of the key light and of the rim lights
+  (`models/beam.ts`) stay the same, because the shots read them (5.6). A venue changes the
+  colors and the strength of these lights.
 - **Pure core.** `models/props.ts` and `models/stage.ts` take the prop and stage colors as plain
   arguments, with the hall colors as the default.
 - **Caches.** `StageScene` keeps one environment for each venue, and `scene/grade.ts` one lookup
@@ -104,20 +97,11 @@ The forest draws each part of the kit (`models/forest/kit.ts`) at its place arou
 with rings of far trees, a backdrop of tree tops, and a far ground (`scene/forest-build.ts`,
 `FOREST`).
 
-- **Sun.** The rim light is the low sun at the back right (`FOREST_LIGHT.rimPlace`), so the beam
-  slants from the top right toward the stage, as the light shafts of `forest.webp`. The glow of
-  the sun and the sun of the bake stand in the same direction (`forestSun()`). The shot plan
-  reads no rim place, so the place keeps the cameras out of the haze: over the shot plans of all
-  demos, fewer camera samples stand in the haze than in the hall, each in a close shot with a dim
-  beam, and no camera crosses the haze surface in a shot. A lower or a more turned sun breaks
-  this rule.
 - **Baked light.** The surroundings take no light, as the hall, because a light costs GPU time
   on large surfaces. Each face gets the light of the low sun, the sky, the key, the lit deck, and
   the lanterns in its color (`FOREST.bake`). A low face far from the clearing gets less sky and
-  sun, as under a canopy. The leaves and the far trees in the direction of the sun glow
-  yellow-green (`FOREST.bake.sunLeaves`), as the lit leaves of `forest.webp`. The far parts get a
-  haze that glows toward the sun at the back right. One color for each face keeps the low-poly
-  facets.
+  sun, as under a canopy. The far parts get a haze that glows toward the sun at the back right.
+  One color for each face keeps the low-poly facets.
 - **Two meshes.** The placed copies merge into one mesh of the faces that show from the front,
   and one mesh of the leaves, which show from both sides, because the fronds and the grass
   blades are single sheets.
@@ -125,19 +109,7 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   `FRAME_CLEARANCE` from the deck edge with their roots (`tools/forest-kit/build-kit.py`), and
   their low boughs fill the top corners. The other trees keep `TREE_CLEARANCE`. The default view
   sees nothing above about 2 m behind the deck, so one rope of the light string hangs between the
-  framing trees across the top of the view. A row of bushes stands along the back edge of the
-  deck, with ferns and bushes behind it (`BACK_UNDERGROWTH`), because the default view saw bare
-  earth between the scattered bushes there. In front of the deck, a clearing of dark earth with grass tufts holds a log at an angle at the
-  lower left and a group of dark blue-gray rocks with bushes at the right, as `forest.webp`. The
-  log keeps a gap of earth to the deck front, its far end lies in the bushes, and its cut end
-  with rings points to the front right. Its bark has one color.
-- **Water.** A small fall of two steps drops between dark, wet rocks behind the back right corner
-  of the deck, so that the default view shows it at the height of the heads of the back row, as
-  `forest.webp`. Each step is one soft sheet of cream water that curves over its lip, with
-  streaks of uneven width and length, and a foam pool at its foot. Its blue-gray stream runs
-  toward the deck corner with small gold glints of the sun, and turns to the right under the
-  bushes (`STREAM_PLACE` and `STREAM_COURSE` of
-  `tools/forest-kit/build-kit.py`). A trunk stands at the right of the fall, as in the reference.
+  framing trees across the top of the view. Bushes and ferns fill the ground behind the deck.
 - **Far forest.** Rings of far trees and a backdrop ring hide the edge of the ground from each
   camera of the orbit, also at the largest distance (`FOREST.far`).
 - **Cut.** A part drops when the line from the camera to a point of the stage passes through it,
@@ -145,17 +117,13 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   not fit, because the trees at the stage sides stand inside the default distance. The points
   are a grid over the deck at the heights of the players (`FOREST.cut`). Each placed part has one
   upright cylinder for each plan cell of each height band, so that a bough beside the deck does
-  not count as a part in front of the players. A cell holds the leaves of a bough closely, so
-  that the high camera of a phone keeps the framing trees. A part drops with its group, such as a tree with
+  not count as a part in front of the players. A part drops with its group, such as a tree with
   its bough and its lantern, and a rope drops with either of its trees. A texture of one byte for
   each group holds the result, and the vertex shader drops the triangles of a dropped group.
 - **Glows.** Each lantern has a soft glow square, as the lamp glows of the hall, with no size
   limit, so that a lantern becomes a soft disc in a close shot. The lanterns give no real light,
-  because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands low among
-  the trees in the direction of the rim light, at the top right of the default view, and shines
-  through them. The stage, the props, and the players hide it: its shader reads the depth pass of
-  the beam, which holds no surroundings (`SUN_GLOW_FRAGMENT`). With no depth test, a close shot
-  toward the sun shows the glow as a glare over the back row.
+  because a light costs GPU time on each lit pixel (9.7). The glow of the sun stands among the
+  trees at the back right and shines through them.
 - **Chunk.** The kit and the forest code load in the lazy chunk (7.2). The kit takes the byte
   readers, `srgb()`, and the corner cut of the stage as arguments, which `venue.ts` gives through
   `ForestKit`.
@@ -539,8 +507,7 @@ under the hard key light.
   conductor and the middle of the orchestra, because a separate light costs GPU time. A hot spot
   holds only the podium on the players, so the white fur of the front rows does not clip.
 - **Beam** (`BEAM_LOOK`). The haze cone leans toward its rim light, which stands at the x of the
-  beam in the hall, so the beam has a visible source and stands upright. The forest turns its rim
-  light to the back right (4.1). The camera dims the beam in a close shot.
+  beam, so the beam has a visible source and stands upright. The camera dims it in a close shot.
 - **Other terms.** Each layout bakes the soft key shadow on the stage one time
   (`scene/stage-bake.ts`), because the props and the stage do not move. A close shot adds a soft
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives

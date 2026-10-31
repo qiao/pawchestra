@@ -772,7 +772,7 @@ export class StageScene {
     scene.environment = this.#environments.get(venue.id)?.texture ?? null;
     scene.environmentIntensity = ENVIRONMENT.intensity;
     const point = new Vector3(...options.position);
-    venue.frameSurroundings(surroundings, stageSide, point, CAPTURE.size, null);
+    venue.frameSurroundings(surroundings, stageSide, point, CAPTURE.size);
     const target = yield* captureEnvironmentSteps(this.#renderer, this.#pmrem, scene, options);
     pending?.targets.push(target);
     scene.environment = target.texture;
@@ -972,19 +972,10 @@ export class StageScene {
         depth: this.#beamDepth,
         foot,
         look: view.venue.light.beam,
-        place: view.venue.light.rimPlace,
       });
     }
     const pixels = this.#beamDepth.size[1];
-    const depth = depthPass
-      ? {
-          texture: this.#beamDepth.texture,
-          size: this.#beamDepth.size,
-          near: camera.near,
-          far: camera.far,
-        }
-      : null;
-    view.venue.frameSurroundings(view.surroundings, view.stageSide, camera.position, pixels, depth);
+    view.venue.frameSurroundings(view.surroundings, view.stageSide, camera.position, pixels);
     const focus = this.#focusOf(view, shot !== null, performance.now());
     if (!depthPass) {
       this.#holdPose(view);
@@ -1050,7 +1041,7 @@ export class StageScene {
       depth: this.#beamDepth.texture,
       start: camera.position.distanceTo(new Vector3(...view.camera.target)),
       stageSide: view.stageSide,
-      light: rimLightPlace(view.stageSide, view.venue.light.rimPlace),
+      light: rimLightPlace(view.stageSide),
       floorY: -STAGE_THICKNESS,
     };
   }
@@ -1081,8 +1072,7 @@ export class StageScene {
     this.#aim = aim;
     setPoolAim(this.#pool, aim);
     aimKeyLight(view.lights, view.stageSide, aim.center[0], aim.center[1]);
-    const rimPlace = view.venue.light.rimPlace;
-    aimRimLights(view.lights, view.stageSide, rimPlace, aim.beam[0], aim.beam[1]);
+    aimRimLights(view.lights, view.stageSide, aim.beam[0], aim.beam[1]);
     setRimLights(this.#rim, view.lights);
     return aim.beam;
   }

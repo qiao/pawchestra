@@ -2,8 +2,7 @@ import { Group, HemisphereLight, MathUtils, SpotLight, Vector3 } from 'three';
 
 import type { ConductorPlace } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { RIM_PLACE, keyLightPlace, rimLightPlace, rimLightXs } from '../models/beam.ts';
-import type { RimPlace } from '../models/beam.ts';
+import { keyLightPlace, rimLightPlace, rimLightXs } from '../models/beam.ts';
 import { createBeam, setBeamTier } from './beam.ts';
 import { BEAM_LOOK } from './beam.ts';
 import type { BeamValues } from './beam.ts';
@@ -494,18 +493,11 @@ export function aimKeyLight(lights: Group, stageSide: number, x: number, z: numb
  *
  * @param lights The group of {@link createLights}.
  * @param stageSide The stage side `S`, in meters.
- * @param place The place of the rim lights of the venue.
  * @param x The x of the foot of the beam of a rim light on the stage axis, in meters.
  * @param z The z of the foot, in meters.
  */
-export function aimRimLights(
-  lights: Group,
-  stageSide: number,
-  place: RimPlace,
-  x: number,
-  z: number,
-): void {
-  const xs = rimLightXs(stageSide, place);
+export function aimRimLights(lights: Group, stageSide: number, x: number, z: number): void {
+  const xs = rimLightXs(stageSide);
   const rims = lights.children.filter(
     (child): child is SpotLight => child instanceof SpotLight && child.name === RIM_NAME,
   );
@@ -599,9 +591,8 @@ export interface SideLightValues extends CrossPair {
 
 /**
  * The light values of a venue (design 4.1): the key light, the cross lights, the rim lights with
- * their place and their beams, the fill light, and the light on the conductor. The place of the
- * key light (`KEY_PLACE` of `models/beam.ts`) holds for each venue, because the shot plan reads
- * it (design 5.6). The shot plan reads no rim place, so each venue places its rim lights.
+ * their beams, the fill light, and the light on the conductor. The places of the key light and of
+ * the rim lights (`models/beam.ts`) hold for each venue, because the shots read them (design 5.6).
  */
 export interface VenueLight {
   /** The key light. */
@@ -612,8 +603,6 @@ export interface VenueLight {
   readonly backRow: CrossPair;
   /** The rim lights. */
   readonly rim: RimLightValues;
-  /** The place of the rim lights, with their beams (`models/beam.ts`). */
-  readonly rimPlace: RimPlace;
   /** The visible beam of each rim light. */
   readonly beam: BeamValues;
   /** The fill light. */
@@ -628,7 +617,6 @@ export const HALL_LIGHTS: VenueLight = {
   side: SIDE_LIGHT,
   backRow: BACK_ROW_LIGHT,
   rim: RIM_LIGHT,
-  rimPlace: RIM_PLACE,
   beam: BEAM_LOOK,
   fill: FILL,
   conductor: CONDUCTOR_LIGHT,
@@ -758,10 +746,9 @@ export function createLights(
       group.add(spot, spot.target);
     }
   }
-  for (const x of rimLightXs(stageSide, light.rimPlace)) {
+  for (const x of rimLightXs(stageSide)) {
     const rim = light.rim;
-    const place = rimLightPlace(stageSide, light.rimPlace, x);
-    const spot = spotlight(rim.color, place, [x, 0, 0], rim.illuminance);
+    const spot = spotlight(rim.color, rimLightPlace(stageSide, x), [x, 0, 0], rim.illuminance);
     spot.name = RIM_NAME;
     spot.angle = rim.angle;
     spot.penumbra = rim.penumbra;
@@ -772,7 +759,7 @@ export function createLights(
   }
 
   if (options.beam ?? true) {
-    group.add(createBeam(stageSide, tier, light.beam, light.rimPlace));
+    group.add(createBeam(stageSide, tier, light.beam));
   }
   if (conductor) {
     const spot = createConductorLight(conductor, light);

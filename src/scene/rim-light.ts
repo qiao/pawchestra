@@ -3,7 +3,7 @@ import type { Group, WebGLProgramParametersWithUniforms } from 'three';
 
 import { LIGHT_NAMES } from './lights.ts';
 
-/** The most rim lights that the shaders take (`RimPlace.count` of `models/beam.ts`). */
+/** The most rim lights that the shaders take (`RIM_PLACE.count` of `models/beam.ts`). */
 const MAX_RIM_LIGHTS = 3;
 
 /**

@@ -48,26 +48,23 @@ render, and the memory.
 - [ ] Share the corner code of `models/forest/kit-format.ts` with `models/studio-format.ts`. Both
       hold the same recent-vertex code, because the forest round could not change
       `studio-format.ts`.
-- [ ] Forest: the top right of the default view reads as a soft veil of the sun glow, with the
-      luma p50/p90 95/112 against 64/139 in `reference/forest.webp`. The reference shows dark
-      leaves with bright spots of sun and thin shafts among the trees there (4.1).
-- [ ] Forest: the beam is one haze cone over the stage. The light shafts of `forest.webp` are
-      several thin shafts that fall through the trees behind the deck (4.1, 4.5).
-- [ ] Forest: the waterfall reads as a stack of pale cream boxes with straight edges, not as
-      falling water (`2-crop-back-right.png` of the forest-sun round). Give each sheet an uneven
-      outline that narrows and curves, and more foam at the foot (4.1).
-- [ ] Forest: the default view of a phone shows a wide clearing of bare, faceted earth below the
-      deck. Add grass, ferns, and spots of sun there, within the triangle budget of the kit
-      (`TRIANGLE_BUDGET` of `tools/forest-kit/build-kit.py`).
-- [ ] Forest: the points of the kit ground are 0.4 m below the floor, because the ground adds the
-      floor height to its points and to its place (`build-kit.py`). Start its points at its
-      origin, as the other parts do. The reverted commit db6e7e87 holds this fix (4.1).
+- [ ] Forest: the surroundings read darker and browner than `reference/forest.webp`, which shows
+      lit yellow-green leaves and light shafts behind the deck. The default view sees bare earth
+      between the bushes behind the deck. The planks in the shade at the left measure luma about
+      64 against 81 (4.1).
+- [ ] Forest: the beam stands behind the stage center, because the forest keeps the rim places
+      of the hall (`models/beam.ts`), which the shot plan reads. In `forest.webp`, the light
+      shafts come from the back right. Give the rim place to the shot plan as an argument of the
+      venue (4.1, 5.6).
 - [ ] Forest: `pnpm look-lab` measures the regions of the forest frames against
       `orchestra-latest.png`. Only the table "Whole frame" uses `forest.webp`. Add the forest
       regions: the lit planks, the planks in the shade, the chairs, and the podium.
 - [ ] Forest: the room haze of the post pass gives each forest pixel the haze of the floor or the
       far plane behind it, because the depth pass hides the surroundings (4.5). Check the near
       trunks and the lanterns against a depth pass with the forest.
+- [ ] Forest: the cut drops the left framing tree in the default view of a phone, because its
+      bough comes near the line to a point of the stage from the high camera. Check the cut
+      cylinders of the boughs against the true leaves (4.1).
 - [ ] Forest: the water has no shimmer, and the leaves have no sway (4.1). Add them only within
       the frame target.
 - [ ] Remove the top-level await of `src/gallery/views-main.ts`, so that the chunk merge of

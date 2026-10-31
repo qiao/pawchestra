@@ -14,7 +14,7 @@ import {
   setHallCamera,
 } from './hall.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
-import { RIM_PLACE, rimLightPlace } from '../models/beam.ts';
+import { rimLightPlace } from '../models/beam.ts';
 
 /** Gives the corners and the normal of each triangle of a hall mesh. */
 function triangles(positions: Float32Array): { center: Vec3; normal: Vec3 }[] {
@@ -124,7 +124,7 @@ describe('buildHall (design 4.5, hall)', () => {
       throw new Error('The hall has no floor.');
     }
     const uniforms = floor.material.uniforms;
-    expect(uniforms['uGlossLight']?.value.toArray()).toEqual(rimLightPlace(side, RIM_PLACE));
+    expect(uniforms['uGlossLight']?.value.toArray()).toEqual(rimLightPlace(side));
     expect(uniforms['uShine']?.value).toBe(HALL_FLOOR.shine);
     expect(uniforms['uFloorY']?.value).toBe(-STAGE_THICKNESS);
     expect(floor.material.fragmentShader).toContain('pow(max(h.y, 0.0), uShine)');

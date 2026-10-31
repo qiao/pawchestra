@@ -47,82 +47,56 @@ export function keyLightPlace(stageSide: number): Vec3 {
 }
 
 /**
- * The place of the rim lights of a venue (design 4.1, 4.5), seen from the stage center on the
- * stage top. Each rim light has a visible beam, which leans from its foot on the stage toward the
- * light.
- */
-export interface RimPlace {
-  /** The distance from the stage center, in stage sides. */
-  readonly distance: number;
-  /** The angle above the stage top, in radians. */
-  readonly elevation: number;
-  /**
-   * The turn from the back of the stage axis (-z) toward the right side (+x), in radians. With 0,
-   * a rim light stands at the x of its beam, so the beam stands upright in the frontal default
-   * view. A turn to the right makes the top of the beam lean to the right in that view.
-   */
-  readonly turn: number;
-  /** The number of rim lights, each with its beam. 0 gives no rim light and no beam. */
-  readonly count: number;
-  /** The distance between two neighbor rim lights, in stage sides. */
-  readonly spread: number;
-}
-
-/**
- * The place of the rim lights of the concert hall (design 4.5): far behind the orchestra, and
- * high, as the back lights on a truss of a concert film. A rim light stands at the x of its beam,
- * so the beam stands upright in the frontal default view, as the fan of `orchestra-latest.png`.
+ * The place of the rim lights (design 4.5), seen from the stage center on the stage top: far
+ * behind the orchestra, and high, as the back lights on a truss of a concert film. Each rim light
+ * has a visible beam, which leans from its foot on the stage toward the light. A rim light stands
+ * at the x of its beam, so the beam stands upright in the frontal default view, as the fan of
+ * `orchestra-latest.png`.
  */
 export const RIM_PLACE = {
   /** The distance from the stage center, in stage sides. */
   distance: 2.45,
   /** The angle above the stage top, in radians. */
   elevation: 66 * MathUtils.DEG2RAD,
-  /** The turn from the back toward the right side, in radians: none. */
-  turn: 0,
   /** The number of rim lights, each with its beam. 0 gives no rim light and no beam. */
   count: 1,
   /** The distance between two neighbor rim lights, in stage sides. */
   spread: 0.3,
-} as const satisfies RimPlace;
+} as const;
 
 /**
- * Gives the x of each rim light of a stage before the turn of its place: the lights stand in a
- * row across the stage, centered on the stage axis.
+ * Gives the x of each rim light of a stage ({@link RIM_PLACE}): the lights stand in a row across
+ * the stage, centered on the stage axis.
  *
  * @param stageSide The stage side `S`, in meters.
- * @param place The place of the rim lights of the venue, such as {@link RIM_PLACE}.
  * @returns The x of each light, in meters, from the left.
  */
-export function rimLightXs(stageSide: number, place: RimPlace): number[] {
-  const { count, spread } = place;
+export function rimLightXs(stageSide: number): number[] {
+  const { count, spread } = RIM_PLACE;
   return Array.from({ length: count }, (_, i) => (i - (count - 1) / 2) * spread * stageSide);
 }
 
 /**
- * Gives the position of a rim light of a stage. The stage axes have +x to the right, +y up, and
- * +z to the audience, so the back of the stage is at -z.
+ * Gives the position of a rim light of a stage ({@link RIM_PLACE}). The stage axes have +x to
+ * the right, +y up, and +z to the audience, so the back of the stage is at -z.
  *
  * @param stageSide The stage side `S`, in meters.
- * @param place The place of the rim lights of the venue, such as {@link RIM_PLACE}.
- * @param x The x of the light in its row ({@link rimLightXs}), in meters: 0 on the stage axis.
+ * @param x The x of the light, in meters: 0 on the stage axis.
  * @returns The position, in meters.
  */
-export function rimLightPlace(stageSide: number, place: RimPlace, x = 0): Vec3 {
-  const { distance, elevation, turn } = place;
-  const flat = distance * stageSide * Math.cos(elevation);
+export function rimLightPlace(stageSide: number, x = 0): Vec3 {
+  const { distance, elevation } = RIM_PLACE;
   return [
-    x + flat * Math.sin(turn),
+    x,
     distance * stageSide * Math.sin(elevation),
-    -flat * Math.cos(turn),
+    -distance * stageSide * Math.cos(elevation),
   ];
 }
 
 /**
  * The height of the cone that the shot planner keeps clear of cameras, in stage sides (design
- * 5.6). The cone stands upright on the stage center and holds the haze of the visible beam of the
- * hall, which leans back toward its rim light. The beam of the forest leans to the back right and
- * out of the cone near its top, so its place keeps the cameras out of its haze (design 4.1).
+ * 5.6). The cone stands upright on the stage center and holds the haze of the visible beam near
+ * the stage, also when the beam leans to the key light.
  */
 export const BEAM_HEIGHT_IN_SIDES = 1.2;
 

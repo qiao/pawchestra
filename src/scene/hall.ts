@@ -3,7 +3,7 @@ import { CircleGeometry, Color, Group, Mesh, ShaderMaterial, Vector3 } from 'thr
 import type { Vec3 } from '../models/tuples.ts';
 import { srgb } from '../models/mesh.ts';
 import type { Rgb } from '../models/mesh.ts';
-import { RIM_PLACE, rimLightPlace } from '../models/beam.ts';
+import { rimLightPlace } from '../models/beam.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
 import { RIM_LIGHT } from './lights.ts';
 import {
@@ -442,7 +442,7 @@ export function createHall(stageSide: number): Group {
         uEdge: { value: new Color(HALL_FLOOR.edge) },
         uHalfSide: { value: stageSide / 2 },
         uReach: { value: HALL_FLOOR.reach * stageSide },
-        uGlossLight: { value: new Vector3(...rimLightPlace(stageSide, RIM_PLACE)) },
+        uGlossLight: { value: new Vector3(...rimLightPlace(stageSide)) },
         uGlossColor: {
           value: new Color(RIM_LIGHT.color).multiplyScalar(HALL_FLOOR.gloss),
         },

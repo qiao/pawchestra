@@ -23,7 +23,7 @@ import type { Vec3 } from '../src/models/tuples.ts';
 import { buildForestSteps } from '../src/scene/forest-build.ts';
 import type { CutBand, CutGroup } from '../src/scene/forest-build.ts';
 import { cutPoints, keepGroups } from '../src/scene/forest-cut.ts';
-import { FOREST, forestSun } from '../src/scene/forest.ts';
+import { FOREST } from '../src/scene/forest.ts';
 import { runAll } from '../src/score/steps.ts';
 import {
   DEFAULT_ELEVATION,
@@ -161,7 +161,7 @@ function main(): void {
       layout: placeForest(stageSide, STAGE_CORNER_CUT),
       stageSide,
       floorY: -STAGE_THICKNESS,
-      sun: forestSun(),
+      sun: FOREST.sun,
       bake: FOREST.bake,
       far: FOREST.far,
       cut: FOREST.cut,
