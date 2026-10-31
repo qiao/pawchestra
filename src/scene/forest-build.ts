@@ -87,6 +87,8 @@ export interface FarForest {
 export interface CutRules {
   /** The height of one band of the cut test, in meters. */
   readonly band: number;
+  /** The side of one plan cell of a band, in meters: a band has one cylinder for each cell. */
+  readonly cell: number;
   /** The highest top of a part, in meters above the ground, that the cut keeps in each view. */
   readonly low: number;
   /** The distance in meters within which a part joins the cut group of a tall part before it. */
@@ -520,25 +522,29 @@ interface BandBox {
 }
 
 /**
- * Adds the corners of a triangle to the bands of its group: the first pass grows the plan box of
- * each band, and the second pass grows the radius around the middle of the box.
+ * Adds the corners of a triangle to the bands of its part: the first pass grows the box of each
+ * cell of a band, and the second pass grows the radius around the middle of the box.
  *
- * @param bands The boxes of the bands of the group, by the band index. The call adds to them.
+ * @param bands The boxes of the cells of the bands of the part, by a key of the band and the
+ *   cell. The call adds to them.
  * @param corners Nine numbers: the three corners.
- * @param rule The height of a band and the floor.
+ * @param rule The height of a band, the side of a cell, and the floor.
  * @param second False for the first pass, true for the second.
  */
 function addToBands(
   bands: Map<number, BandBox>,
   corners: readonly number[],
-  rule: { readonly band: number; readonly floorY: number },
+  rule: { readonly band: number; readonly cell: number; readonly floorY: number },
   second: boolean,
 ): void {
   for (let k = 0; k < 3; k++) {
     const x = corners[k * 3] ?? 0;
     const y = corners[k * 3 + 1] ?? 0;
     const z = corners[k * 3 + 2] ?? 0;
-    const index = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
+    const band = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
+    const cx = Math.floor(x / rule.cell) + 500;
+    const cz = Math.floor(z / rule.cell) + 500;
+    const index = (band * 1000 + cx) * 1000 + cz;
     let box = bands.get(index);
     if (!box) {
       box = { minX: x, maxX: x, minZ: z, maxZ: z, minY: y, maxY: y, radius: 0 };
@@ -768,7 +774,7 @@ export function* buildForestSteps(input: ForestInputs): Steps<ForestBuild> {
   // Each placed part has its own bands, so that the bands of a bough or a lantern on a branch
   // stand at the bough and not around the trunk.
   const bands = copies.map(() => new Map<number, BandBox>());
-  const rule = { band: input.cut.band, floorY: input.floorY };
+  const rule = { band: input.cut.band, cell: input.cut.cell, floorY: input.floorY };
   let triangles = 0;
   let work = 0;
   for (const [c, copy] of [...copies, ...ropeCopies].entries()) {

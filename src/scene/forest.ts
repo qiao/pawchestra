@@ -122,6 +122,7 @@ export const FOREST = {
    */
   cut: {
     band: 1.5,
+    cell: 2,
     low: 0.35,
     join: 0.6,
     wide: 8,

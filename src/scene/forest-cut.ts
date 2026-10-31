@@ -146,7 +146,12 @@ export function keepGroups(
     const hit =
       group.bounds !== null &&
       nearSight(region, group.bounds) &&
-      group.bands.some((band) => points.some((point) => hitsBand(camera, point, band)));
+      group.bands.some(
+        (band) =>
+          band[0] <= high &&
+          band[1] >= low &&
+          points.some((point) => hitsBand(camera, point, band)),
+      );
     set(g, g === 0 || !hit);
   }
   for (const [g, group] of groups.entries()) {
