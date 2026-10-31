@@ -31,7 +31,7 @@ first download                                lazy, after the first frame
 | `pose/` | `poseAt()` (5.1). | yes | first download |
 | `models/` | The species, the studio bodies, the instruments, and `layoutScene()`. | yes | first download |
 | `shots/` | The camera shots of 5.6: `prepareShots()` and `cameraAt()`. | yes | first download |
-| `scene/` | Three.js: stage, lights, camera, quality tiers, poses applied to bones, and the venues (4.1). | no | first download, but the forest venue (`scene/forest.ts`) is lazy |
+| `scene/` | Three.js: stage, lights, camera, quality tiers, poses applied to bones. | no | first download |
 | `audio/` | The `Player`, the Worker, and the worklet processor. | no (the block scheduler is pure) | lazy |
 | `app/`, `ui/` | Load flow, transport, seat list, URL hash, settings. | no | first download |
 | `gallery/` | The development pages `gallery.html` and `views.html`. | no | own entry |
@@ -120,15 +120,8 @@ owner. A change that moves the size by more than 5 KB states the reason in its c
 
 `pnpm size` (`tools/size.ts`) sums the gzip sizes of `index.html`, the CSS, the entry chunk with
 its static imports and their assets, and the MIDI file of the default demo (`DEFAULT_DEMO`, 8.2).
-It does not count the audio code, the SF3 files, the development pages, the other demos, and the
-forest venue. The app loads the audio code after the first frame, another demo when the user
-selects it, and the chunk of the forest when the user selects the venue or the hash names it
-(`loadVenue()` of `scene/venue.ts`, 4.1).
-
-The chunk of the forest imports no module of the first download at run time. `venue.ts` gives it
-those modules as a kit (`ForestKit`). The top-level await of `gallery/views-main.ts` turns off the
-chunk merge of Rolldown (`chunkOptimization`), so a module that both chunks import goes into a new
-common chunk of the first download. Such a chunk grew the first download by 4.2 kB after gzip. A
+It does not count the audio code, the SF3 files, the development pages, and the other demos. The
+app loads the audio code after the first frame, and another demo when the user selects it. A
 file that is gzip data already counts with its own size, because the host sends it with no
 second gzip. `--base <ref>` also builds a commit, and prints both totals.
 

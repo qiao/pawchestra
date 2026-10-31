@@ -34,7 +34,7 @@ import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { defaultAim, hotSpotFactor, poolFactor } from '../src/scene/light-pool.ts';
-import { HALL_LIGHTS, LIGHT_NAMES, createLights, spotIlluminance } from '../src/scene/lights.ts';
+import { LIGHT_NAMES, createLights, spotIlluminance } from '../src/scene/lights.ts';
 import { applyLook, lookValueAt, parseLook } from '../src/scene/look-values.ts';
 import type { LookChanges, LookValue } from '../src/scene/look-values.ts';
 import type { QualityTier } from '../src/scene/quality.ts';
@@ -126,9 +126,7 @@ function kindLight(
  * @returns The spotlights, the aim, and a function that gives the hot spot factor of a place.
  */
 function stageLights(layout: SceneLayout, options: ProbeLight) {
-  const group = createLights(layout.stageSide, options.tier, layout.conductor, HALL_LIGHTS, {
-    beam: false,
-  });
+  const group = createLights(layout.stageSide, options.tier, layout.conductor, { beam: false });
   const spots = group.children.filter((child): child is SpotLight => child instanceof SpotLight);
   const aim = defaultAim(layout.stageSide, layout.conductor ? layout.podium : null);
   const hot = (x: number, z: number, surface: 'stage' | 'players' = 'stage'): number =>

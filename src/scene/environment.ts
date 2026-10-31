@@ -17,8 +17,8 @@ import type { Steps } from '../score/steps.ts';
 import { fromCubemapSteps, fromSceneSteps } from './pmrem-steps.ts';
 
 /**
- * The environment of the reflections of the concert hall (design 4.5, light and render): a dark
- * room with warm lamps around the horizon and a warm light above, as the hall of `scene.png`. The brass, the copper,
+ * The environment of the reflections (design 4.5, light and render): a dark room with warm lamps
+ * around the horizon and a warm light above, as the hall of `scene.png`. The brass, the copper,
  * and the polished wood reflect it. With no environment, metal looked dim.
  */
 export const ENVIRONMENT = {
@@ -30,14 +30,13 @@ export const ENVIRONMENT = {
   lamps: 10,
   /** The light above, in linear values: the spotlight and its beam. */
   top: [3, 2, 1.2],
-  /** The factor of the environment light on each material of the scene, in each venue. */
+  /** The factor of the environment light on each material of the scene. */
   intensity: 0.6,
 } as const;
 
 /**
- * Builds the scene of the environment of the concert hall: a sphere of the room color seen from
- * inside, warm boxes at the horizon, and a warm box above. It holds no light, so the boxes show
- * only their colors.
+ * Builds the scene of the environment: a sphere of the room color seen from inside, warm boxes at
+ * the horizon, and a warm box above. It holds no light, so the boxes show only their colors.
  *
  * @returns The scene, with its center at the origin.
  */
@@ -74,27 +73,25 @@ const ENVIRONMENT_SIZE = 256;
 const ENVIRONMENT_BLUR = 0.04;
 
 /**
- * Creates the environment texture of the reflections in steps (design 4.5, 7.2): a PMREM of the
- * environment scene of a venue, such as {@link buildEnvironmentScene}, as `fromScene()` of
- * three.js makes it with a blur of {@link ENVIRONMENT_BLUR}. The renderer makes it one time for
- * each venue, and each layout of the venue uses it. The steps compile the programs first, and
- * then render the faces, the blur, and the mip levels in separate tasks.
+ * Creates the environment texture of the reflections in steps (design 4.5, 7.2): a PMREM of
+ * {@link buildEnvironmentScene}, as `fromScene()` of three.js makes it with a blur of
+ * {@link ENVIRONMENT_BLUR}. The renderer makes it one time, and each layout uses it. The steps
+ * compile the programs first, and then render the faces, the blur, and the mip levels in separate
+ * tasks.
  *
  * @param renderer The renderer.
  * @param generator The PMREM generator of the renderer. It keeps its materials, so the captures
  *   of the layouts compile no program again.
  * @param compileTarget A render target for the compile. A program of a target differs from a
  *   program of the canvas.
- * @param scene The environment scene of the venue. The steps free its geometries and its basic
- *   materials.
  * @returns The steps, which return the target that holds the texture. The caller frees it.
  */
 export function* createEnvironmentSteps(
   renderer: WebGLRenderer,
   generator: PMREMGenerator,
   compileTarget: WebGLRenderTarget,
-  scene: Scene,
 ): Steps<WebGLRenderTarget> {
+  const scene = buildEnvironmentScene();
   const target = yield* fromSceneSteps(renderer, generator, compileTarget, {
     scene,
     size: ENVIRONMENT_SIZE,

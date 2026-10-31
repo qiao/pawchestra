@@ -13,7 +13,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   FILL,
-  HALL_LIGHTS,
   KEY_LIGHT,
   SHADOW_MARGIN,
   SHADOW_TOP,
@@ -51,12 +50,12 @@ function keyOf(group: Group): SpotLight {
 
 describe('createLights', () => {
   const side = 6.6;
-  const lights = createLights(side, 'high', null, HALL_LIGHTS);
+  const lights = createLights(side, 'high', null);
 
   it('makes a pool of light on the orchestra that is darker at the stage edges (design 4.5)', () => {
     // A layout with the podium 1.0 m behind the front edge.
     const conductor = conductorOn([0, 0, side / 2 - 1]);
-    const spot = keyOf(createLights(side, 'high', conductor, HALL_LIGHTS));
+    const spot = keyOf(createLights(side, 'high', conductor));
     const axis = spot.target.position.clone().sub(spot.position);
     // The light that a point of the stage top gets: the cone, the distance, and the angle of the
     // light on the floor.
@@ -88,7 +87,7 @@ describe('createLights', () => {
   });
 
   it('keeps each point that the key light lights inside its shadow map (design 4.5)', () => {
-    const spot = keyOf(createLights(11.19, 'high', conductorOn([0, 0, 4.6]), HALL_LIGHTS));
+    const spot = keyOf(createLights(11.19, 'high', conductorOn([0, 0, 4.6])));
     const camera = spot.shadow.camera;
     const axis = spot.target.position.clone().sub(spot.position).normalize();
     const half = 11.19 / 2;
@@ -153,7 +152,7 @@ describe('createLights', () => {
   });
 
   it('leaves out the beam and its motes for the gallery (review of step 8, H3)', () => {
-    const gallery = createLights(side, 'high', null, HALL_LIGHTS, { beam: false });
+    const gallery = createLights(side, 'high', null, { beam: false });
     const names: string[] = [];
     gallery.traverse((object) => names.push(object.name));
     expect(names).not.toContain('beam');
@@ -165,7 +164,7 @@ describe('createLights', () => {
 describe('aimKeyLight (design 2.4, 4.5)', () => {
   it('turns the key light to a soloed seat, and fits its shadow camera to the new aim', () => {
     const side = 11.19;
-    const lights = createLights(side, 'high', conductorOn([0, 0, 4.6]), HALL_LIGHTS);
+    const lights = createLights(side, 'high', conductorOn([0, 0, 4.6]));
     const spot = keyOf(lights);
     const place = spot.position.clone();
     const intensity = spot.intensity;
@@ -211,7 +210,7 @@ describe('keyShadowFrustum (design 4.5)', () => {
 describe('the light on the face of the conductor (design 4.5, UX audit FI1)', () => {
   const podium = [0, 0, 3.79] as const;
   const conductor = conductorOn([...podium]);
-  const spots = createLights(11.19, 'high', conductor, HALL_LIGHTS).children.filter(
+  const spots = createLights(11.19, 'high', conductor).children.filter(
     (child) => child instanceof SpotLight,
   );
   const face = conductor.position[1] + 1.2;
@@ -242,14 +241,14 @@ describe('the light on the face of the conductor (design 4.5, UX audit FI1)', ()
   });
 
   it('has no light for the conductor in a view with no conductor', () => {
-    const lights = createLights(11.19, 'high', null, HALL_LIGHTS);
+    const lights = createLights(11.19, 'high', null);
     expect(lights.children.filter((child) => child instanceof SpotLight)).toHaveLength(6);
   });
 });
 
 describe('setLightsTier (design 2.6)', () => {
   it('gives the spotlight the shadow map and the blur of the new tier', () => {
-    const lights = createLights(6.6, 'high', null, HALL_LIGHTS);
+    const lights = createLights(6.6, 'high', null);
     const spot = lights.children.find((child) => child instanceof SpotLight);
     expect(spot?.shadow.mapSize.toArray()).toEqual([2048, 2048]);
     expect(spot?.shadow.radius).toBe(TIER_SETTINGS.high.shadowRadius);
@@ -261,7 +260,7 @@ describe('setLightsTier (design 2.6)', () => {
   });
 
   it('gives the beam the haze samples and the dust motes of the new tier', () => {
-    const changed = createLights(6.6, 'high', null, HALL_LIGHTS);
+    const changed = createLights(6.6, 'high', null);
     setLightsTier(changed, 'low');
     const beam = changed.children.find((child) => child instanceof Group);
     const parts = beam?.children.flatMap((haze) => haze.children) ?? [];
@@ -277,7 +276,7 @@ describe('setLightsTier (design 2.6)', () => {
 
 describe('the shadow bias (design 2.6, 4.5, UX audit 2026-10-05, SC5)', () => {
   it('moves each receiver past the blur disc of its tier, so a lit face does not shadow itself', () => {
-    const lights = createLights(11.19, 'high', null, HALL_LIGHTS);
+    const lights = createLights(11.19, 'high', null);
     const spot = keyOf(lights);
     // A texel of the map at the aim point, on the high tier.
     const distance = spot.position.distanceTo(spot.target.position);

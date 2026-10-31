@@ -1,7 +1,6 @@
 import type { DemoId } from '../app/demos.ts';
 import type { SeatFlag } from '../app/seat-flags.ts';
 import type { FrameRateSetting, QualitySetting } from '../app/settings.ts';
-import type { VenueId } from '../scene/venue-id.ts';
 import type { SectionSize } from '../score/types.ts';
 import { CLOSE_CREDITS_LABEL, CREDITS_TEXT, licensesUrl } from '../app/credits.ts';
 import { REPOSITORY_LABEL } from '../app/page-title.ts';
@@ -36,8 +35,6 @@ interface UiActions extends BarActions {
   readonly onFile: (file: File) => void;
   /** A click on the mute or the solo button of a seat. */
   readonly onSeatFlag: (seatIndex: number, flag: SeatFlag) => void;
-  /** A click on a button of the setting "Scene". */
-  readonly onVenue: (venue: VenueId) => void;
   /** A click on a button of the setting "Section size". */
   readonly onSectionSize: (size: SectionSize) => void;
   /** A click on a button of the setting "Quality". */
@@ -132,12 +129,7 @@ export class Ui {
       this.drawer.focusTab('seats');
     });
     this.drawer.addTab('seats', 'Seats', this.seatList.element);
-    this.settings = new Settings(
-      actions.onVenue,
-      actions.onSectionSize,
-      actions.onQuality,
-      actions.onFrameRate,
-    );
+    this.settings = new Settings(actions.onSectionSize, actions.onQuality, actions.onFrameRate);
     // The link "Credits" is a button, because it opens a dialog and goes to no page (design 2.8).
     this.creditsDialog = new ModalDialog(
       'credits-dialog',

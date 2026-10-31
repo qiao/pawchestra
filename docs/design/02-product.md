@@ -16,7 +16,6 @@
   starts the music, and the samples load right after the first frame.
 - The URL hash `#demo=<id>` opens a demo (`fileFromHash()` in `app/demos.ts`). A selection in the
   demo list writes the hash with `history.replaceState()`. A dropped file does not change the URL.
-  The key `scene` of the hash selects the venue (2.8, 4.1).
 - Only the first screen waits for a click, because the browser needs a user gesture before it
   plays audio. A piece that the user selects later starts when its samples are ready.
 - A click on play while the samples load starts the piece when they are ready, and a second click
@@ -251,20 +250,10 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
     buttons "M" and "S" ("Mute {name}", "Solo {name}"). Only a screen reader reads the source line.
     The dot is small and faint while its seat is silent, and full with a soft glow while it plays
     (`seatLevels()`). A dark fur gets a lighter glow that keeps 3:1 (`ringColor()`).
-  - **Settings**: "Scene" (Concert hall, Forest), "Section size" (Auto, One per part, Full),
-    "Quality" (Auto, High, Medium, Low), and "Frame rate" (Auto, 60 fps, 30 fps). "Auto" names
-    its current value, such as "Auto (Full)". `SETTING_HELP` gives the help lines, and "Scene"
-    has "The place around the stage." A counter beside "Frame rate" shows the drawn rate
-    (`measuredFrameRate()`). "Scene" is the first row, after the group "Playback" of a phone,
-    because it changes the most of the image (4.1).
-  - **Scene**: the hash key `scene` keeps the venue beside `demo`, such as
-    `#demo=beethoven-9&scene=forest` (`venueHash()`, `venueFromHash()` of `app/demos.ts`). The
-    hall has no key, and no key or an unknown value gives the hall. A change of the demo keeps
-    the key. A change of the venue builds the scene again behind the build cover, as a change of
-    "Section size" does, and the song time, the transport, and the sound go on. The camera mode
-    stays, and the camera of Free mode goes back to the default view. If the chunk of the forest
-    does not load, the setting and the hash go back to the hall, and the console gets the
-    error.
+  - **Settings**: "Section size" (Auto, One per part, Full), "Quality" (Auto, High, Medium, Low),
+    and "Frame rate" (Auto, 60 fps, 30 fps). "Auto" names its current value, such as "Auto
+    (Full)". `SETTING_HELP` gives the help lines. A counter beside "Frame rate" shows the drawn
+    rate (`measuredFrameRate()`).
   - **Credits**: the link "Credits" is a `button` with `aria-haspopup="dialog"`, because it opens a
     native `<dialog>` and goes to no page. The dialog has the layout of the end credits of a film:
     a title card with the author, then "Now playing" (8.2), "Sounds" (6.2, 6.8), and "Other

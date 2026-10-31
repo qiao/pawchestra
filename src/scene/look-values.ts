@@ -11,7 +11,6 @@ import { FREE_BEAM_FADE, SHOT_BEAM_OPACITY } from '../shots/beam-opacity.ts';
 import { FREE_LIGHT_FADE, SHOT_LIGHT, SHOT_RIG, SHOT_SPOT } from '../shots/shot-light.ts';
 import { BEAM_LOOK } from './beam.ts';
 import { CAPTURE, ENVIRONMENT } from './environment.ts';
-import { FOREST, FOREST_LIGHT, FOREST_POST, FOREST_PROPS, FOREST_STAGE } from './forest.ts';
 import { FREE_LENS, LENS } from './focus.ts';
 import { GRADE } from './grade.ts';
 import { GLOW_LIGHT, HALL_COLORS, HALL_FLOOR, HALL_LIGHT } from './hall.ts';
@@ -34,9 +33,8 @@ import { SIDE_GLOW, STAGE_FINISH, STAGE_SHADOW } from './stage.ts';
 
 /**
  * The roots of the look paths: each exported light, pool, color, grade, tone, finish, haze, lens, and
- * beam constant of the scene (design 4.5), and the roots `FOREST*` of the forest (design 4.1). A
- * look path starts with a root and names a value in it, such as `BACK_ROW_LIGHT.illuminance`,
- * `BACK_ROW_LIGHT.position.1`, or `FOREST_LIGHT.rim.illuminance`. The look override of the
+ * beam constant of the scene (design 4.5). A look path starts with a root and names a value in it,
+ * such as `BACK_ROW_LIGHT.illuminance` or `BACK_ROW_LIGHT.position.1`. The look override of the
  * dev server (`src/app/look-override.ts`), `pnpm look-variants`, and `pnpm light-probe` read this
  * list. A new constant of the look goes into it.
  */
@@ -48,11 +46,6 @@ const LOOK_ROOTS = {
   ENVIRONMENT,
   FILL,
   FINISHES,
-  FOREST,
-  FOREST_LIGHT,
-  FOREST_POST,
-  FOREST_PROPS,
-  FOREST_STAGE,
   FREE_BEAM_FADE,
   FREE_LENS,
   FREE_LIGHT_FADE,

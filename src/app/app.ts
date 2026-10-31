@@ -7,10 +7,6 @@ import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
 import type { SeatAudibility } from '../pose/types.ts';
 import type { PreparedLayout, StageScene } from '../scene/stage-scene.ts';
-import { DEFAULT_VENUE } from '../scene/venue-id.ts';
-import type { VenueId } from '../scene/venue-id.ts';
-import { HALL_VENUE, loadVenue } from '../scene/venue.ts';
-import type { Venue } from '../scene/venue.ts';
 import type { Steps } from '../score/steps.ts';
 import { stageMix } from '../score/stage-mix.ts';
 import type { ChannelMix } from '../score/stage-mix.ts';
@@ -26,7 +22,7 @@ import { DEFAULT_SPEED, DEFAULT_VOLUME, barShows, volumeGain } from './bar-rules
 import { motionEvent, nextMode } from './camera-mode.ts';
 import type { CameraEvent, CameraMode } from './camera-mode.ts';
 import type { Speed } from './bar-rules.ts';
-import { DEMOS, PERF_60, demoHash, demoUrl, isDemoId, venueHash } from './demos.ts';
+import { DEMOS, PERF_60, demoHash, demoUrl, isDemoId } from './demos.ts';
 import type { StageFile } from './demos.ts';
 import { FILE_ERROR_TEXTS, fileTitle, readScoreFile } from './file-rules.ts';
 import { keyAction, keySeekPoint, keyVolume } from './keys.ts';
@@ -254,15 +250,6 @@ export class App {
   #muted = false;
   /** The mix preset of the session, from the query `mix` (design 6.8). */
   readonly #mix: MixName = mixOfQuery(window.location.search);
-  /** The value of the setting "Scene" (design 2.8, 4.1). */
-  #venueId: VenueId = DEFAULT_VENUE;
-  /**
-   * The venue of the setting "Scene" for the next build, or the load of its chunk (design 7.2). A
-   * chunk that does not load gives the hall.
-   */
-  #venue: Promise<Venue> = Promise.resolve(HALL_VENUE);
-  /** The venue of the shown scene. */
-  #shownVenue: VenueId = DEFAULT_VENUE;
   /** The value of the setting "Section size" (design 2.8, 3.8). */
   #sectionSize: SectionSize = 'auto';
   /** The value of the setting "Quality" (design 2.6). */
@@ -355,9 +342,6 @@ export class App {
         },
         onSeatFlag: (seatIndex, flag) => {
           this.#toggleSeat(seatIndex, flag);
-        },
-        onVenue: (venue) => {
-          this.setVenue(venue);
         },
         onSectionSize: (size) => {
           this.#setSectionSize(size);
@@ -455,8 +439,7 @@ export class App {
   /** Shows the settings, and gives the renderer the tier of the quality setting (design 2.6). */
   #applySettings(): void {
     const auto = autoLabels(this.#piece?.score.orchestral ?? null, this.#tierWatch.tier);
-    const settings = this.#ui.settings;
-    settings.show(this.#venueId, this.#sectionSize, this.#quality, this.#frameRate, auto);
+    this.#ui.settings.show(this.#sectionSize, this.#quality, this.#frameRate, auto);
     this.#scene.setTier(renderTier(this.#quality, this.#tierWatch));
   }
 
@@ -474,66 +457,8 @@ export class App {
     }
     this.#sectionSize = size;
     this.#applySettings();
-    if (this.#piece?.file !== PERF_60) {
-      this.#rebuildCurrent();
-    }
-  }
-
-  /**
-   * Changes the setting "Scene" (design 2.8, 4.1): the venue of the next builds and the hash key
-   * `scene`. A shown piece builds its scene again in the new venue, on the path of a change of the
-   * section size. The song time, the transport, and the sound go on, because the poses are
-   * stateless (design 5.1). The forest loads its chunk first (design 7.2).
-   *
-   * @param id The new venue.
-   */
-  setVenue(id: VenueId): void {
-    if (id !== this.#venueId) {
-      this.#venueId = id;
-      this.#venue = this.#loadVenue(id);
-      this.#applySettings();
-      this.#rebuildCurrent();
-    }
-    this.#writeVenueHash();
-  }
-
-  /**
-   * Loads a venue (`loadVenue()`). If its chunk does not load, the console gets the error, and the
-   * setting and the hash go back to the hall.
-   *
-   * @param id The venue.
-   * @returns A promise of the venue, or of the hall after a failure.
-   */
-  async #loadVenue(id: VenueId): Promise<Venue> {
-    try {
-      return await loadVenue(id);
-    } catch (error) {
-      console.error(error);
-      if (this.#venueId === id) {
-        this.#venueId = DEFAULT_VENUE;
-        this.#applySettings();
-        this.#writeVenueHash();
-      }
-      return HALL_VENUE;
-    }
-  }
-
-  /** Writes the setting "Scene" into the URL hash, with no entry in the history (design 2.8). */
-  #writeVenueHash(): void {
-    const hash = venueHash(this.#venueId, location.hash);
-    if (hash !== location.hash) {
-      history.replaceState(history.state, '', `${location.pathname}${location.search}${hash}`);
-    }
-  }
-
-  /**
-   * Builds the scene of the current piece again behind the cover of the stage (design 3.8, 4.1):
-   * after a change of the section size or of the scene. A new piece or a later change replaces
-   * the build. With no piece, it does nothing.
-   */
-  #rebuildCurrent(): void {
     const piece = this.#piece;
-    if (!piece) {
+    if (!piece || piece.file === PERF_60) {
       return;
     }
     // The stage fades out during the build of the new scene (PF1).
@@ -541,7 +466,7 @@ export class App {
     this.#ui
       .coverStage()
       .then(async () => {
-        const size = sectionSizeOf(piece.file, this.#sectionSize);
+        // A new piece or a later change of the setting replaces this build.
         await this.#rebuildScene(piece, size, () => ticket === this.#rebuilds);
         this.#ui.uncoverStage();
       })
@@ -549,8 +474,8 @@ export class App {
   }
 
   /**
-   * Builds the score, the plans, and the scene of the current piece again with a section size, in
-   * the venue of the setting "Scene" (design 3.8, 4.1).
+   * Builds the score, the plans, and the scene of the current piece again with a section size
+   * (design 3.8).
    *
    * @param piece The current piece.
    * @param size The section size.
@@ -572,7 +497,7 @@ export class App {
     piece.meter = meterTrack(score.notes, score.durationSec);
     piece.glow = seatSpans(score.notes, score.seats.length);
     piece.poses = createScenePose(plan);
-    this.#showScene(prepared);
+    this.#scene.show(prepared);
     // The player counts of the seat rows change with the section size (design 2.8).
     this.#showSeats(piece);
     this.#ui.seatList.update(piece.flags, piece.audible);
@@ -699,7 +624,7 @@ export class App {
       }
     }
     const sectionSize = sectionSizeOf(file, this.#sectionSize);
-    // The new piece replaces a build of a setting of the current piece.
+    // The new piece replaces a build of the section size of the current piece.
     this.#rebuilds++;
     const built = await this.#build(planFileSteps(bytes, sectionSize, file), () => {
       return ticket === this.#request;
@@ -722,13 +647,13 @@ export class App {
     if (current) {
       this.#ui.uncoverStage();
     }
-    this.#followSettings(piece, sectionSize);
+    this.#followSectionSize(piece, sectionSize);
     return true;
   }
 
   /**
    * Builds the score, the plans, and the 3D scene of a file in slices of the main thread (design
-   * 7.2), after the build before it, in the venue of the setting "Scene" at the call.
+   * 7.2), after the build before it.
    *
    * @param planned The steps of the score and its plans.
    * @param live Tells if the result is still needed.
@@ -737,16 +662,15 @@ export class App {
   async #build(planned: Steps<PlannedScore>, live: () => boolean): Promise<BuiltScore | null> {
     const before = this.#lastBuild;
     const scene = this.#scene;
-    const place = this.#venue;
-    const steps = function* (venue: Venue): Steps<BuiltScore> {
+    const steps = (function* (): Steps<BuiltScore> {
       const { score, scene: plans } = yield* planned;
       // The first call of the pose code is slower, so it runs in a step before the first frame.
       poseAt(plans.plan, 0, 0, STOPPED.transport, [], createScenePose(plans.plan));
       yield;
-      const prepared = yield* scene.prepareSteps(plans.layout, plans.models, venue);
+      const prepared = yield* scene.prepareSteps(plans.layout, plans.models);
       return { score, scene: plans, prepared };
-    };
-    const run = before.then(async () => runSliced(steps(await place), live));
+    })();
+    const run = before.then(async () => runSliced(steps, live));
     this.#lastBuild = run.catch(() => null);
     return run;
   }
@@ -765,7 +689,7 @@ export class App {
       .then((shown) => {
         // The hash opens the demo again after a reload. It adds no entry to the history.
         if (shown && isDemoId(file)) {
-          history.replaceState(history.state, '', demoHash(file, location.hash));
+          history.replaceState(history.state, '', demoHash(file));
         }
       })
       .catch(reportError);
@@ -820,7 +744,7 @@ export class App {
     const { bytes } = result;
     // The section size can change while the page reads the file.
     const size = this.#sectionSize;
-    // The new piece replaces a build of a setting of the current piece.
+    // The new piece replaces a build of the section size of the current piece.
     this.#rebuilds++;
     const built = await this.#build(
       sectionSize === size ? planScoreSteps(result.score) : planFileSteps(bytes, size, file.name),
@@ -840,34 +764,23 @@ export class App {
     if (covered) {
       this.#ui.uncoverStage();
     }
-    this.#followSettings(piece, size);
+    this.#followSectionSize(piece, size);
   }
 
   /**
-   * Builds the scene of a new piece again when the setting "Section size" or "Scene" changed
-   * during its build (design 3.8, 4.1). The build used the values of its start.
+   * Builds the scene of a new piece again when the setting "Section size" changed during its
+   * build (design 3.8). The build used the size of its start.
    *
    * @param piece The new piece.
    * @param built The section size of its build.
    */
-  #followSettings(piece: Piece, built: SectionSize): void {
-    const size = sectionSizeOf(piece.file, this.#sectionSize);
-    if (size !== built || this.#shownVenue !== this.#venueId) {
-      this.#rebuildCurrent();
+  #followSectionSize(piece: Piece, built: SectionSize): void {
+    if (piece.file === PERF_60 || built === this.#sectionSize) {
+      return;
     }
-  }
-
-  /**
-   * Shows the 3D scene of a build, and records its venue (design 4.1). The screenshot tools and
-   * the end-to-end tests wait for the attribute `data-scene` of the canvas.
-   *
-   * @param prepared The 3D scene.
-   */
-  #showScene(prepared: PreparedLayout): void {
-    this.#scene.show(prepared);
-    const venue = prepared.view.venue.id;
-    this.#shownVenue = venue;
-    this.#canvas.dataset['scene'] = venue;
+    const size = this.#sectionSize;
+    this.#sectionSize = built;
+    this.#setSectionSize(size);
   }
 
   /**
@@ -888,7 +801,7 @@ export class App {
     this.#failedFile = null;
     this.#playWhenShown = false;
     this.#piece = piece;
-    this.#showScene(prepared);
+    this.#scene.show(prepared);
     // The mode stays. Cinematic mode takes the shots of the new score (design 2.5).
     this.#changeCamera('new-piece');
     const demo = piece.file !== null && isDemoId(piece.file) ? piece.file : null;

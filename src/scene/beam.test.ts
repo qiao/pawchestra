@@ -175,7 +175,7 @@ function coneSides(beam: Object3D): ShaderMaterial[] {
 
 describe('createBeam (design 2.6, 4.5)', () => {
   it('gives the high tier dust motes and the most noise samples', () => {
-    const beam = createBeam(11.19, 'high', BEAM_LOOK);
+    const beam = createBeam(11.19, 'high');
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     const sides = coneSides(beam);
     expect(sides.map((side) => side.side)).toEqual([BackSide, FrontSide]);
@@ -192,9 +192,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
     // 350 bright motes read as a field of stars in the column.
     expect(TIER_SETTINGS.high.motes).toBeLessThanOrEqual(150);
     expect(BEAM_LOOK.moteStrength).toBeLessThanOrEqual(1);
-    const motes = hazeParts(createBeam(11.19, 'high', BEAM_LOOK)).find(
-      (child) => child instanceof Points,
-    );
+    const motes = hazeParts(createBeam(11.19, 'high')).find((child) => child instanceof Points);
     if (!(motes?.material instanceof ShaderMaterial)) {
       throw new Error('The beam has no motes.');
     }
@@ -202,7 +200,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
   });
 
   it('hides the dust motes on the low tier', () => {
-    const beam = createBeam(11.19, 'low', BEAM_LOOK);
+    const beam = createBeam(11.19, 'low');
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     expect(motes?.visible).toBe(false);
   });
@@ -210,7 +208,7 @@ describe('createBeam (design 2.6, 4.5)', () => {
 
 describe('setBeamTier (design 2.6)', () => {
   it('changes the haze samples and the dust motes after the layout', () => {
-    const beam = createBeam(11.19, 'high', BEAM_LOOK);
+    const beam = createBeam(11.19, 'high');
     const sides = coneSides(beam);
     const motes = hazeParts(beam).find((child) => child instanceof Points);
     if (!motes) {
@@ -310,7 +308,7 @@ describe('BeamDepth (design 4.5)', () => {
 
 describe('setBeamFrame (design 4.5, 5.6)', () => {
   const side = 11.19;
-  const beam = createBeam(side, 'high', BEAM_LOOK);
+  const beam = createBeam(side, 'high');
   const depth = new BeamDepth();
   depth.setSize(1440, 900);
   const material = (kind: typeof Mesh | typeof Points): ShaderMaterial => {
@@ -330,15 +328,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
   const frame = (factor: number, position: Vec3): PerspectiveCamera => {
     const camera = new PerspectiveCamera(30, 1.6, 0.5, 80);
     camera.position.set(...position);
-    setBeamFrame(beam, {
-      stageSide: side,
-      factor,
-      camera,
-      timeSec: 12,
-      depth,
-      foot: [0, 0],
-      look: BEAM_LOOK,
-    });
+    setBeamFrame(beam, { stageSide: side, factor, camera, timeSec: 12, depth, foot: [0, 0] });
     return camera;
   };
 
@@ -367,15 +357,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
     const camera = new PerspectiveCamera(30, 1.6, 0.5, 80);
     camera.position.set(0, 20, 40);
     const foot = [3.9, 3.2] as const;
-    setBeamFrame(beam, {
-      stageSide: side,
-      factor: 1,
-      camera,
-      timeSec: 12,
-      depth,
-      foot,
-      look: BEAM_LOOK,
-    });
+    setBeamFrame(beam, { stageSide: side, factor: 1, camera, timeSec: 12, depth, foot });
 
     for (const kind of [Mesh, Points]) {
       expect(uniforms(kind)['uFoot']?.value).toEqual(new Vector2(3.9, 3.2));
@@ -393,15 +375,7 @@ describe('setBeamFrame (design 4.5, 5.6)', () => {
 
     // A camera just above the foot is inside the haze cone.
     camera.position.set(3.9, 1, 3.2);
-    setBeamFrame(beam, {
-      stageSide: side,
-      factor: 1,
-      camera,
-      timeSec: 12,
-      depth,
-      foot,
-      look: BEAM_LOOK,
-    });
+    setBeamFrame(beam, { stageSide: side, factor: 1, camera, timeSec: 12, depth, foot });
     expect(uniforms(Mesh)['uInside']?.value).toBe(1);
     frame(1, [0, 20, 40]);
     expect(uniforms(Mesh)['uFoot']?.value).toEqual(new Vector2(0, 0));

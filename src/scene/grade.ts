@@ -9,25 +9,8 @@ type GradeColor = readonly [r: number, g: number, b: number];
 /** A point of the tone curve: the input and the output luma, as display values from 0 to 255. */
 type CurvePoint = readonly [input: number, output: number];
 
-/** The values of the color grade of a venue (design 4.1): the fields of {@link GRADE}. */
-export interface GradeValues {
-  /** The tone curve on the luma, as display values from 0 to 255, by increasing input. */
-  readonly curve: readonly CurvePoint[];
-  /** The saturation of all colors, as a factor. */
-  readonly saturation: number;
-  /** The extra saturation of the pale colors. */
-  readonly vibrance: number;
-  /** The part of the saturation that the shadows keep. */
-  readonly shadowSaturation: number;
-  /** The tint of the shadows, added to each channel. */
-  readonly shadowTint: GradeColor;
-  /** The tint of the highlights, added to each channel. */
-  readonly highlightTint: GradeColor;
-}
-
 /**
- * The values of the color grade of the concert hall on the display values, after AgX (design 4.5,
- * post effects).
+ * The values of the color grade on the display values, after AgX (design 4.5, post effects).
  * {@link gradeColor} applies them, and the lookup table of {@link gradeLut} holds the result. The
  * look lab (`pnpm look-lab`) fitted them to `orchestra-latest.png` at the exposure of
  * `STAGE_TONE` of `scene/renderer.ts`.
@@ -71,7 +54,7 @@ export const GRADE = {
    * white fur yellow.
    */
   highlightTint: [0.01, 0.002, -0.015],
-} as const satisfies GradeValues;
+} as const;
 
 /**
  * Makes a monotone cubic curve through points (Fritsch and Carlson, 1980). The curve does not
@@ -161,18 +144,14 @@ function lumaOf(color: GradeColor): number {
 
 /**
  * Grades one display color (design 4.5, post effects): the tone curve on the luma, the saturation
- * with the vibrance, and the tints of the shadows and of the highlights.
+ * with the vibrance, and the tints of the shadows and of the highlights ({@link GRADE}).
  *
  * @param color The display color after AgX, from 0 to 1 for each channel.
- * @param curve The tone curve of `grade.curve`, on values from 0 to 1 ({@link monotoneCurve}).
- * @param g The grade values of the venue, such as {@link GRADE}.
+ * @param curve The tone curve of `GRADE.curve`, on values from 0 to 1 ({@link monotoneCurve}).
  * @returns The graded color.
  */
-function gradeColor(
-  color: GradeColor,
-  curve: (x: number) => number,
-  g: GradeValues,
-): [number, number, number] {
+function gradeColor(color: GradeColor, curve: (x: number) => number): [number, number, number] {
+  const g = GRADE;
   const clamped = color.map((value) => Math.min(1, Math.max(0, value)));
   const [r0 = 0, g0 = 0, b0 = 0] = clamped;
   const before = lumaOf([r0, g0, b0]);
@@ -208,19 +187,18 @@ export const GRADE_LUT_SIZE = 33;
  * `Data3DTexture` reads them.
  *
  * @param size The number of entries on each axis.
- * @param grade The grade values of the venue.
  * @returns The steps, which return four bytes for each entry.
  */
-function* gradeLutDataSteps(size: number, grade: GradeValues): Steps<Uint8Array> {
+function* gradeLutDataSteps(size: number): Steps<Uint8Array> {
   const data = new Uint8Array(size * size * size * 4);
-  // The curve reads `grade.curve` at the call, so that the look override of the dev server
+  // The curve reads `GRADE.curve` at the call, so that the look override of the dev server
   // (`src/app/look-override.ts`) reaches it.
-  const curve = monotoneCurve(grade.curve.map(([x, y]) => [x / 255, y / 255]));
+  const curve = monotoneCurve(GRADE.curve.map(([x, y]) => [x / 255, y / 255]));
   for (let b = 0; b < size; b++) {
     yield;
     for (let g = 0; g < size; g++) {
       for (let r = 0; r < size; r++) {
-        const graded = gradeColor([r / (size - 1), g / (size - 1), b / (size - 1)], curve, grade);
+        const graded = gradeColor([r / (size - 1), g / (size - 1), b / (size - 1)], curve);
         const i = ((b * size + g) * size + r) * 4;
         for (const [channel, value] of graded.entries()) {
           data[i + channel] = Math.round(Math.min(1, Math.max(0, value)) * 255);
@@ -232,39 +210,34 @@ function* gradeLutDataSteps(size: number, grade: GradeValues): Steps<Uint8Array>
   return data;
 }
 
-/** The lookup table of each grade, which all materials and passes of a venue share. */
-const luts = new Map<GradeValues, Data3DTexture>();
+/** The lookup table of the grade, which all materials and passes share. */
+let lut: Data3DTexture | null = null;
 
 /**
- * Gives the lookup table of a grade (design 4.5, post effects), as a 3D texture with a linear
+ * Gives the lookup table of the grade (design 4.5, post effects), as a 3D texture with a linear
  * filter. The final pass and the views page read it with `GRADE_FUNCTION` of `post-shaders.ts`.
  *
- * @param grade The grade values of the venue: the grade of the hall by default.
  * @returns The texture. Its pixels stay in memory, so a restored WebGL context loads it again.
  */
-export function gradeLut(grade: GradeValues = GRADE): Data3DTexture {
-  return luts.get(grade) ?? runAll(gradeLutSteps(grade));
+export function gradeLut(): Data3DTexture {
+  return lut ?? runAll(gradeLutSteps());
 }
 
 /**
- * Makes the lookup table of a grade as {@link gradeLut} does, in steps (design 7.2). Each grade
- * gets its own table, one time.
+ * Makes the lookup table of the grade as {@link gradeLut} does, in steps (design 7.2).
  *
- * @param grade The grade values of the venue.
  * @returns The steps, which return the texture. A made table takes no step.
  */
-export function* gradeLutSteps(grade: GradeValues): Steps<Data3DTexture> {
-  let lut = luts.get(grade);
+export function* gradeLutSteps(): Steps<Data3DTexture> {
   if (!lut) {
     const size = GRADE_LUT_SIZE;
-    lut = new Data3DTexture(yield* gradeLutDataSteps(size, grade), size, size, size);
+    lut = new Data3DTexture(yield* gradeLutDataSteps(size), size, size, size);
     lut.format = RGBAFormat;
     lut.type = UnsignedByteType;
     lut.minFilter = LinearFilter;
     lut.magFilter = LinearFilter;
     lut.colorSpace = NoColorSpace;
     lut.needsUpdate = true;
-    luts.set(grade, lut);
   }
   return lut;
 }

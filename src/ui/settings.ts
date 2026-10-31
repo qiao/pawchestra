@@ -3,7 +3,6 @@ import {
   QUALITY_OPTIONS,
   SECTION_SIZE_OPTIONS,
   SETTING_HELP,
-  VENUE_OPTIONS,
 } from '../app/settings.ts';
 import type {
   AutoLabels,
@@ -11,7 +10,6 @@ import type {
   QualitySetting,
   SettingOption,
 } from '../app/settings.ts';
-import type { VenueId } from '../scene/venue-id.ts';
 import type { SectionSize } from '../score/types.ts';
 import { createButton, createElement, setAttribute, setText } from './dom.ts';
 
@@ -112,17 +110,15 @@ function createGroup(
 }
 
 /**
- * The settings of the drawer (design 2.3, 2.8): "Scene", "Section size", "Quality", and "Frame
- * rate", each with a dim line that explains its values. "Frame rate" shows the rate of the drawn
- * frames at the right of its label. On a phone, the "Playback" group at the top holds the speed
- * menu, the volume slider, "Reset view", and full screen of the bar, each with a visible label.
+ * The settings of the drawer (design 2.3, 2.8): "Section size", "Quality", and "Frame rate", each
+ * with a dim line that explains its values. "Frame rate" shows the rate of the drawn frames at the
+ * right of its label. On a phone, the "Playback" group at the top holds the speed menu, the volume
+ * slider, "Reset view", and full screen of the bar, each with a visible label.
  */
 export class Settings {
   readonly element: HTMLElement;
   /** The places of the "Playback" group, for `Bar.placePlayback()`. */
   readonly playback: PlaybackSlots;
-  /** The place around the stage (design 4.1). */
-  readonly #venue: Segmented<VenueId>;
   readonly #sectionSize: Segmented<SectionSize>;
   readonly #quality: Segmented<QualitySetting>;
   readonly #frameRate: Segmented<FrameRateSetting>;
@@ -130,15 +126,13 @@ export class Settings {
   readonly #fps = createElement('span', 'setting-value');
 
   /**
-   * Creates the four segmented controls.
+   * Creates the three segmented controls.
    *
-   * @param onVenue The action of a new scene.
    * @param onSectionSize The action of a new section size.
    * @param onQuality The action of a new quality setting.
    * @param onFrameRate The action of a new frame rate setting.
    */
   constructor(
-    onVenue: (venue: VenueId) => void,
     onSectionSize: (size: SectionSize) => void,
     onQuality: (quality: QualitySetting) => void,
     onFrameRate: (frameRate: FrameRateSetting) => void,
@@ -155,13 +149,11 @@ export class Settings {
     playback.setAttribute('role', 'group');
     playback.setAttribute('aria-label', 'Playback');
     playback.append(createElement('span', 'setting-label', 'Playback'), row);
-    this.#venue = new Segmented('Scene', VENUE_OPTIONS, onVenue);
     this.#sectionSize = new Segmented('Section size', SECTION_SIZE_OPTIONS, onSectionSize);
     this.#quality = new Segmented('Quality', QUALITY_OPTIONS, onQuality);
     this.#frameRate = new Segmented('Frame rate', FRAME_RATE_OPTIONS, onFrameRate);
     this.element.append(
       playback,
-      createGroup('Scene', this.#venue.element, SETTING_HELP.venue),
       createGroup('Section size', this.#sectionSize.element, SETTING_HELP.sectionSize),
       createGroup('Quality', this.#quality.element, SETTING_HELP.quality),
       createGroup('Frame rate', this.#frameRate.element, SETTING_HELP.frameRate, this.#fps),
@@ -171,20 +163,17 @@ export class Settings {
   /**
    * Marks the current values, and shows the value that each button "Auto" selects now.
    *
-   * @param venue The setting "Scene".
    * @param sectionSize The setting "Section size".
    * @param quality The setting "Quality".
    * @param frameRate The setting "Frame rate".
    * @param auto The labels of the buttons "Auto", from `autoLabels()`.
    */
   show(
-    venue: VenueId,
     sectionSize: SectionSize,
     quality: QualitySetting,
     frameRate: FrameRateSetting,
     auto: AutoLabels,
   ): void {
-    this.#venue.show(venue, '');
     this.#sectionSize.show(sectionSize, auto.sectionSize);
     this.#quality.show(quality, auto.quality);
     this.#frameRate.show(frameRate, 'Auto');

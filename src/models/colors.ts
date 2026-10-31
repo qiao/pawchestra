@@ -39,27 +39,7 @@ export const SPECIES_COLORS = {
   'polar-bear': { fur: '#efeae0', belly: '#f6f2ea', accent: '#1a1715' },
 } as const satisfies Readonly<Record<SpeciesId, SpeciesColors>>;
 
-/**
- * The colors of the chairs, the stools, and the music stands of a venue (design 4.1), in linear
- * values. The prop builders of `props.ts` and `stage.ts` take them as an argument.
- */
-export interface PropColors {
-  /** The wood of the chairs and the stools. */
-  readonly chair: Rgb;
-  /** The frame of a music stand and of the conductor stand. */
-  readonly stand: Rgb;
-  /** The two large faces of the desk of a stand. */
-  readonly standDesk: Rgb;
-  /** The four narrow faces of the desk of a stand. */
-  readonly standEdge: Rgb;
-  /** The sheet music on a stand. */
-  readonly sheet: Rgb;
-}
-
-/**
- * The colors of the stage and the props of the concert hall (design 4.5, scene colors), in linear
- * values. They are the {@link PropColors} of the hall.
- */
+/** The colors of the stage and the props (design 4.5, scene colors), in linear values. */
 export const SCENE_COLORS = {
   stageTop: srgb('#7a6359'),
   /**
@@ -77,7 +57,7 @@ export const SCENE_COLORS = {
   /** The four narrow faces of the desk of a stand: a lighter edge around the desk. */
   standEdge: srgb('#a08b7a'),
   sheet: srgb('#ece6d6'),
-} as const satisfies PropColors & Readonly<Record<string, Rgb>>;
+} as const satisfies Readonly<Record<string, Rgb>>;
 
 /** The colors of the instruments (design 4.5, instrument colors), in linear values. */
 export const INSTRUMENT_COLORS = {

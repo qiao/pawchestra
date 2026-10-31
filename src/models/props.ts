@@ -1,6 +1,5 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { SCENE_COLORS } from './colors.ts';
-import type { PropColors } from './colors.ts';
 import { PIANO_BENCH, buildPianoBench } from './instruments/piano.ts';
 import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
@@ -16,38 +15,8 @@ import { STUDIO_BODIES } from './studio-body.ts';
 import type { StudioBody } from './studio-format.ts';
 
 /**
- * The colors of the stage, the podium, and the choir risers of a venue (design 4.1), in linear
- * values. The stage builders of `stage.ts` and {@link buildRisers} take them as an argument.
- */
-export interface StageColors {
-  /** The mean color of a plank. Each plank has its own tone around it. */
-  readonly plank: Rgb;
-  /** The dark line between two planks. The stage shader finds a seam by this color. */
-  readonly seam: Rgb;
-  /** The raised lip around the stage top. */
-  readonly nosing: Rgb;
-  /** The skirt: the front and the sides of the stage, and the sides of the risers. */
-  readonly skirt: Rgb;
-  /** The grooves of the skirt panels. */
-  readonly groove: Rgb;
-  /** The body of the podium, and the frames around the panels of its sides. */
-  readonly podium: Rgb;
-  /** The boards of the treads of the choir risers. */
-  readonly riserTread: Rgb;
-  /** The front edge of each tread of the choir risers. */
-  readonly riserNosing: Rgb;
-  /** The panels of the sides of the podium. */
-  readonly podiumPanel: Rgb;
-  /** The top plate of the podium and the frame of its top. */
-  readonly podiumTop: Rgb;
-  /** The panel of the top of the podium. */
-  readonly podiumTopPanel: Rgb;
-}
-
-/**
- * The colors of the stage, the steps, the podium, and the choir risers of the concert hall (design
- * 4.5, scene colors), in linear values: the {@link StageColors} of the hall. The stage is glossy
- * walnut, as in `mockup.png` and `scene.png`.
+ * The colors of the stage, the steps, the podium, and the choir risers (design 4.5, scene
+ * colors), in linear values. The stage is glossy walnut, as in `mockup.png` and `scene.png`.
  */
 export const STAGE_COLORS = {
   /**
@@ -86,7 +55,7 @@ export const STAGE_COLORS = {
   podiumTop: srgb('#80532f'),
   /** The panel of the top of the podium, inside its frame and a dark groove. */
   podiumTopPanel: srgb('#73492a'),
-} as const satisfies StageColors;
+} as const satisfies Readonly<Record<string, Rgb>>;
 
 /**
  * The item that a player sits or stands on (design 5.1). `stand` is the floor or the podium, and
@@ -396,18 +365,16 @@ function addBox(builder: MeshBuilder, part: Bounds, color: Rgb): void {
  * @param seatHeight The height of the seat, in meters.
  * @param seatDepth The depth of the seat, in meters.
  * @param seatWidth The width of the seat, in meters.
- * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
 export function buildChair(
   seatHeight: number,
   seatDepth: number = CHAIR.seatDepth,
   seatWidth: number = CHAIR.seatWidth,
-  colors: PropColors = SCENE_COLORS,
 ): MeshData {
   const c = { ...CHAIR, seatHeight, seatWidth };
   const builder = new MeshBuilder();
-  const color = colors.chair;
+  const color = SCENE_COLORS.chair;
   const x = c.seatWidth / 2 - CHAIR_LEG / 2;
   const center = (c.seatDepth - seatDepth) / 2;
   const z = seatDepth / 2 - CHAIR_LEG / 2 - center;
@@ -433,16 +400,12 @@ export function buildChair(
  *
  * @param deskHeight The height of the middle of the desk above the floor, in meters
  *   ({@link standDeskHeight}).
- * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
-export function buildMusicStand(
-  deskHeight: number = MUSIC_STAND.deskHeight,
-  colors: PropColors = SCENE_COLORS,
-): MeshData {
+export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): MeshData {
   const s = { ...MUSIC_STAND, deskHeight };
   const builder = new MeshBuilder();
-  const color = colors.stand;
+  const color = SCENE_COLORS.stand;
   for (let i = 0; i < 3; i++) {
     const turn = new Quaternion().setFromAxisAngle(
       new Vector3(0, 1, 0),
@@ -467,7 +430,6 @@ export function buildMusicStand(
     builder,
     box(s.deskWidth, s.deskDepth, 0.012),
     transform(toVec3(deskCenter), toQuat(tilt)),
-    colors,
   );
   // The sheet is one quad a little in front of the desk.
   const w = s.deskWidth / 2 - 0.04;
@@ -476,7 +438,7 @@ export function buildMusicStand(
   const corner = (cx: number, cy: number): Vec3 =>
     toVec3(new Vector3(cx, cy, front).applyQuaternion(tilt).add(deskCenter));
   builder.add(quad(corner(-w, -d), corner(w, -d), corner(w, d), corner(-w, d)), {
-    color: colors.sheet,
+    color: SCENE_COLORS.sheet,
   });
   return builder.build();
 }
@@ -488,18 +450,12 @@ export function buildMusicStand(
  * @param builder The builder.
  * @param plate The corner list of the desk plate, with its large faces along z.
  * @param at The place of the desk.
- * @param colors The prop colors of the venue (design 4.1).
  */
-export function addDesk(
-  builder: MeshBuilder,
-  plate: readonly number[],
-  at: Transform,
-  colors: PropColors,
-): void {
+export function addDesk(builder: MeshBuilder, plate: readonly number[], at: Transform): void {
   const [front, rest] = splitByFacing(plate, [0, 0, 1], 0.99);
   const [back, edges] = splitByFacing(rest, [0, 0, -1], 0.99);
-  builder.add([...front, ...back], { color: colors.standDesk, at });
-  builder.add(edges, { color: colors.standEdge, at });
+  builder.add([...front, ...back], { color: SCENE_COLORS.standDesk, at });
+  builder.add(edges, { color: SCENE_COLORS.standEdge, at });
 }
 
 /**
@@ -511,14 +467,9 @@ export function addDesk(
  *
  * @param high True for the high stool.
  * @param seat The heights of the seat and of the foot ring. The stool of the harp has no ring.
- * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data, with all vertices on bone 0.
  */
-export function buildStool(
-  high: boolean,
-  seat: SeatHeights,
-  colors: PropColors = SCENE_COLORS,
-): MeshData {
+export function buildStool(high: boolean, seat: SeatHeights): MeshData {
   const { seatHeight } = seat;
   const { seatSize } = high ? HIGH_STOOL : STOOL;
   const width = high ? seatSize : (seat.seatWidth ?? seatSize);
@@ -527,7 +478,7 @@ export function buildStool(
   // (`chairSeat()`): its front edge ends where the thighs leave it, behind the knees and the shins.
   const center = high || seat.seatDepth === undefined ? 0 : (CHAIR.seatDepth - depth) / 2;
   const builder = new MeshBuilder();
-  const color = colors.chair;
+  const color = SCENE_COLORS.chair;
   addBox(builder, centeredBox([0, seatHeight - 0.02, center], [width, 0.04, depth]), color);
   const legHeight = seatHeight - 0.04;
   const at = seatSize / 2 - CHAIR_LEG / 2;
@@ -557,28 +508,20 @@ export function buildStool(
  *
  * @param support The support of the player.
  * @param seat The heights of the seat ({@link seatHeights}), or `null` for a standing player.
- * @param colors The prop colors of the venue (design 4.1): the hall colors by default. The piano
- *   bench keeps its own colors.
  * @returns The mesh data, or `null` for a standing player or a body with no chair.
  */
-export function buildSupport(
-  support: Support,
-  seat: SeatHeights | null,
-  colors: PropColors = SCENE_COLORS,
-): MeshData | null {
+export function buildSupport(support: Support, seat: SeatHeights | null): MeshData | null {
   if (!seat) {
     return null;
   }
 
   switch (support) {
     case 'chair':
-      return seat.noChair
-        ? null
-        : buildChair(seat.seatHeight, seat.seatDepth, seat.seatWidth, colors);
+      return seat.noChair ? null : buildChair(seat.seatHeight, seat.seatDepth, seat.seatWidth);
     case 'stool':
-      return buildStool(false, seat, colors);
+      return buildStool(false, seat);
     case 'high-stool':
-      return buildStool(true, seat, colors);
+      return buildStool(true, seat);
     case 'bench':
       return buildPianoBench(seat.seatHeight, seat.seatDepth);
     case 'stand':
@@ -615,21 +558,20 @@ interface RiserBlock {
  *
  * @param inner The distance of the front of the tread from the podium center.
  * @param outer The distance of the back of the tread from the podium center.
- * @param colors The stage colors of the venue.
  * @returns The bands: the start, the end, and the color.
  */
-function treadBands(inner: number, outer: number, colors: StageColors): [number, number, Rgb][] {
+function treadBands(inner: number, outer: number): [number, number, Rgb][] {
   const line = PLANK_LINE / 2;
-  const bands: [number, number, Rgb][] = [[inner, inner + RISER.nosing, colors.riserNosing]];
+  const bands: [number, number, Rgb][] = [[inner, inner + RISER.nosing, STAGE_COLORS.riserNosing]];
   const start = inner + RISER.nosing;
   const boards = Math.ceil((outer - start) / RISER.board - 1e-9);
   const width = (outer - start) / boards;
   for (let i = 0; i < boards; i++) {
     const from = start + i * width + (i > 0 ? line : 0);
     const to = start + (i + 1) * width - (i < boards - 1 ? line : 0);
-    bands.push([from, to, colors.riserTread]);
+    bands.push([from, to, STAGE_COLORS.riserTread]);
     if (i < boards - 1) {
-      bands.push([to, to + 2 * line, colors.seam]);
+      bands.push([to, to + 2 * line, STAGE_COLORS.seam]);
     }
   }
   return bands;
@@ -642,14 +584,8 @@ function treadBands(inner: number, outer: number, colors: StageColors): [number,
  * @param builder The builder.
  * @param block The block.
  * @param podium The podium center, the center of the arc.
- * @param colors The stage colors of the venue.
  */
-function addRiserBlock(
-  builder: MeshBuilder,
-  block: RiserBlock,
-  podium: Vec3,
-  colors: StageColors,
-): void {
+function addRiserBlock(builder: MeshBuilder, block: RiserBlock, podium: Vec3): void {
   const { inner, outer, height, halfAngle } = block;
   const point = (r: number, angle: number, y: number): Vec3 => [
     podium[0] + r * Math.sin(angle),
@@ -661,7 +597,7 @@ function addRiserBlock(
   for (let i = 0; i < segments; i++) {
     const a0 = -halfAngle + (2 * halfAngle * i) / segments;
     const a1 = -halfAngle + (2 * halfAngle * (i + 1)) / segments;
-    for (const [from, to, color] of treadBands(inner, outer, colors)) {
+    for (const [from, to, color] of treadBands(inner, outer)) {
       builder.add(
         quad(
           point(from, a0, height),
@@ -701,7 +637,7 @@ function addRiserBlock(
       point(inner, halfAngle, height),
     ),
   );
-  builder.add(sides, { color: colors.skirt });
+  builder.add(sides, { color: STAGE_COLORS.skirt });
 }
 
 /**
@@ -712,19 +648,13 @@ function addRiserBlock(
  *
  * @param levels The levels of the layout.
  * @param podium The podium center, the center of the arcs.
- * @param colors The stage colors of the venue (design 4.1): the hall colors by default.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
  */
-export function buildRisers(
-  levels: readonly RiserLevel[],
-  podium: Vec3,
-  colors: StageColors = STAGE_COLORS,
-): MeshData {
+export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshData {
   const builder = new MeshBuilder();
   for (const { level, radius, height, halfAngle } of levels) {
     const inner = radius - RISER.depth / 2;
-    const block = { inner, outer: radius + RISER.depth / 2, height, halfAngle };
-    addRiserBlock(builder, block, podium, colors);
+    addRiserBlock(builder, { inner, outer: radius + RISER.depth / 2, height, halfAngle }, podium);
     if (level !== 0) {
       continue;
     }
@@ -736,7 +666,7 @@ export function buildRisers(
         height: (height * (count + 1 - j)) / (count + 1),
         halfAngle,
       };
-      addRiserBlock(builder, step, podium, colors);
+      addRiserBlock(builder, step, podium);
     }
   }
   return builder.build();
@@ -748,15 +678,9 @@ export function buildRisers(
  * at each desk height is built one time.
  *
  * @param layout The layout of a score.
- * @param colors The prop colors of the venue (design 4.1): the hall colors by default.
- * @param stage The stage colors of the venue, for the choir risers: the hall colors by default.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
  */
-export function buildSceneProps(
-  layout: SceneLayout,
-  colors: PropColors = SCENE_COLORS,
-  stage: StageColors = STAGE_COLORS,
-): MeshData {
+export function buildSceneProps(layout: SceneLayout): MeshData {
   const builder = new MeshBuilder();
   const seats = new Map<string, MeshData | null>();
   const place = (position: Vec3, facing: number): Transform =>
@@ -773,7 +697,7 @@ export function buildSceneProps(
       heights?.noChair,
     ].join(' ');
     if (!seats.has(key)) {
-      seats.set(key, buildSupport(support, heights, colors));
+      seats.set(key, buildSupport(support, heights));
     }
     const seat = seats.get(key);
     if (seat) {
@@ -782,12 +706,12 @@ export function buildSceneProps(
   }
   const stands = new Map<number, MeshData>();
   for (const at of layout.stands) {
-    const stand = stands.get(at.deskHeight) ?? buildMusicStand(at.deskHeight, colors);
+    const stand = stands.get(at.deskHeight) ?? buildMusicStand(at.deskHeight);
     stands.set(at.deskHeight, stand);
     builder.addMesh(stand, place(at.position, at.facing));
   }
   if (layout.risers.length > 0) {
-    builder.addMesh(buildRisers(layout.risers, layout.podium, stage), transform());
+    builder.addMesh(buildRisers(layout.risers, layout.podium), transform());
   }
   return builder.build();
 }
