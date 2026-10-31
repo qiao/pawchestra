@@ -7,7 +7,7 @@
  *
  * - `<x>,<y>,<z>`: a point in meters. The tool prints its pixel and its depth from the camera.
  * - `--pixel <u>,<v>,<y>`: a pixel and a height in meters. The tool prints the point at that
- *   height under the pixel, such as `--pixel 1250,250,-0.4` for the ground of the forest.
+ *   height under the pixel, such as `--pixel 1250,250,0`.
  * - `--side <m>`: the stage side in meters. By default, the stage side of the default demo.
  * - `--size <w>x<h>`: the canvas in CSS pixels, 1600x1000 by default, as `close-views play`.
  *
