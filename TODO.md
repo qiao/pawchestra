@@ -53,10 +53,9 @@ render, and the memory.
       leaves with bright spots of sun and thin shafts among the trees there (4.1).
 - [ ] Forest: the beam is one haze cone over the stage. The light shafts of `forest.webp` are
       several thin shafts that fall through the trees behind the deck (4.1, 4.5).
-- [ ] Forest: a close shot from the front left looks along the slanted beam, so the haze adds up
-      to a bright glare that veils the back row, also with the dim beam of a close shot
-      (`beethoven-9` at 28 s and 146 s). Fade the beam by the angle between the view and the
-      beam axis, or lean the beam less in these shots (4.5, 5.6).
+- [ ] Forest: the waterfall reads as a stack of pale cream boxes with straight edges, not as
+      falling water (`2-crop-back-right.png` of the forest-sun round). Give each sheet an uneven
+      outline that narrows and curves, and more foam at the foot (4.1).
 - [ ] Forest: the default view of a phone shows a wide clearing of bare, faceted earth below the
       deck. Add grass, ferns, and spots of sun there, within the triangle budget of the kit
       (`TRIANGLE_BUDGET` of `tools/forest-kit/build-kit.py`).
