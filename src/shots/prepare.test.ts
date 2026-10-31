@@ -21,7 +21,8 @@ import { mulberry32 } from '../pose/random.ts';
 import { firstVoiceFile } from '../score/test-first-voice.ts';
 import { musicIn, prepareMusic } from './music.ts';
 import { scoreOf } from '../score/test-score.ts';
-import { JUMP_CUT, SHOT_TIMES, SMALL_GROUP_SEATS, WIDE_VARIANTS, prepareShots } from './prepare.ts';
+import { FILM_GRAMMAR } from './grammar.ts';
+import { SHOT_TIMES, SMALL_GROUP_SEATS, WIDE_VARIANTS, prepareShots } from './prepare.ts';
 import { SECTION_GROUPS, prepareSubjects, sectionSubject, soloSubject } from './subjects.ts';
 import type { SectionGroup } from './subjects.ts';
 import { TEST_SEED, chamberShotScenes, shotDemos, shotSceneOf } from './test-shots.ts';
@@ -441,9 +442,8 @@ describe('the choice of the shots of prepareShots() (design 5.6)', () => {
       }
       const ratio = Math.max(size(a), size(b)) / Math.min(size(a), size(b));
       const angle = viewAngle(a.to, b.from);
-      expect(angle >= JUMP_CUT.angle || ratio >= JUMP_CUT.sizeRatio, `shots ${i - 1}, ${i}`).toBe(
-        true,
-      );
+      const { jumpAngle, jumpSize } = FILM_GRAMMAR;
+      expect(angle >= jumpAngle || ratio >= jumpSize, `shots ${i - 1}, ${i}`).toBe(true);
     }
   });
 

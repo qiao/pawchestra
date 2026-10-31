@@ -22,6 +22,16 @@ export const FILM_GRAMMAR = {
    * player turns less than 0.35 of its length to the side, so the look reads as frontal.
    */
   neutral: 20 * DEG,
+  /**
+   * Two shots in a row turn the camera by at least this angle around their targets (the 30°
+   * rule), or they change the size of the frame by {@link FILM_GRAMMAR.jumpSize}.
+   */
+  jumpAngle: 30 * DEG,
+  /**
+   * The smallest ratio of the frame sizes of two shots in a row with a smaller turn: about one step
+   * of the shot sizes, such as from a medium shot to a close-up.
+   */
+  jumpSize: 1.5,
 } as const;
 
 /**

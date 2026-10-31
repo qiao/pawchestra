@@ -474,6 +474,10 @@ bear gives weak frames of a solo. Mute and solo do not change the plan.
   camera also keeps the screen direction of the look of its subject in the master shot: its
   seeded offset goes to the side of the front where the master camera stands. A look within
   `neutral` of the camera axis has no direction, so it fits both sides.
+- **The 30° rule.** Each shot turns the camera by at least `jumpAngle` around its target from the
+  end of the previous shot, or it changes the size of the frame at the target by `jumpSize`. The
+  planner tests each shot against the previous shot, also of another subject, so the rule holds
+  for two shots of one subject. A wide shot takes the next variant that passes.
 
 **Clearance.** The camera never stands inside a player, and the subject does not hide. The
 planner tests each move and sight line against the boxes of `layoutObstacles()`, at

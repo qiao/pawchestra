@@ -21,7 +21,7 @@ import {
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
 import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
-import { azimuthFrom, keepsLine, lookSide } from './grammar.ts';
+import { FILM_GRAMMAR, azimuthFrom, keepsLine, lookSide } from './grammar.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import {
@@ -57,6 +57,7 @@ import {
   FIELD_OF_VIEW,
   defaultDistance,
   defaultView,
+  landscapeZoom,
 } from './view.ts';
 
 /** Degrees to radians. */
@@ -211,9 +212,6 @@ const BLEND_RULES = {
   nearInSides: 0.35,
 } as const;
 
-/** The jump cut rule: neighbor shots differ by this view angle or this ratio of size. */
-export const JUMP_CUT = { angle: 30 * DEG, sizeRatio: 1.5 } as const;
-
 /**
  * The search of a clear camera (design 5.6): the wanted azimuth, then these steps to each side,
  * then the same azimuths higher.
@@ -332,6 +330,13 @@ export const WIDE_VARIANTS: readonly WideVariant[] = [
   { azimuth: 0, elevation: 17, zoom: 1 },
 ];
 
+/** The default view as a wide variant. */
+const DEFAULT_WIDE: WideVariant = {
+  azimuth: DEFAULT_AZIMUTH / DEG,
+  elevation: DEFAULT_ELEVATION / DEG,
+  zoom: 1,
+};
+
 /**
  * Gives the key of the default view of design 4.5 at a zoom.
  *
@@ -368,9 +373,6 @@ const SHOT_KEYS = {
   /** The last shot pulls out from this zoom to 1 in the default view. */
   lastPullOut: 0.92,
 } as const;
-
-/** The size of a wide or high shot for the jump cut rule, in stage sides. */
-const WIDE_SIZE_IN_SIDES = 0.7;
 
 /**
  * The shots of a small group (design 5.6): a score with fewer than this many seats with players
@@ -426,7 +428,7 @@ interface PlannedShot {
   readonly shot: Shot;
   readonly id: string;
   readonly group: SectionGroup | null;
-  /** The size of the subject for the jump cut rule, in meters. */
+  /** The size of the frame of its last key ({@link frameSize}), for the jump cut rule. */
   readonly size: number;
   /** The boxes that hold the target. */
   readonly held: ReadonlySet<ClearBox>;
@@ -727,12 +729,29 @@ function moveShare(
 }
 
 /**
+ * Gives the size of the frame of a key for the jump cut rule (design 5.6): half the height of the
+ * frame at the distance of the target, at the aspect of Cinematic mode.
+ *
+ * @param stageSide The stage side `S`.
+ * @param wide True for a wide shot, which takes the landscape rule of `cameraAt()`.
+ * @param radius The radius of the subject, or 0 for a wide or a high shot.
+ * @param key The key.
+ * @returns The size, in meters.
+ */
+function frameSize(stageSide: number, wide: boolean, radius: number, key: ShotKey): number {
+  const landscape = wide ? landscapeZoom(CINEMA_ASPECT) : 1;
+  const distance = keyDistance(stageSide, radius, key, CINEMA_ASPECT) * landscape;
+  return distance * Math.tan((key.fov / 2) * DEG);
+}
+
+/**
  * Tells if a new shot is a jump cut after the previous shot (design 5.6): the view turns less
- * than 30°, and the size of the subject changes less than 1.5 times.
+ * than 30°, and the size of the frame changes less than 1.5 times. The planner tests it after
+ * each shot, also of another subject, so the 30° rule holds for each shot of the same subject.
  *
  * @param previous The previous shot.
  * @param from The first key of the new shot.
- * @param size The size of the new subject.
+ * @param size The size of the frame of the new shot ({@link frameSize}).
  * @returns True for a jump cut.
  */
 function jumpCut(previous: PlannedShot | undefined, from: ShotKey, size: number): boolean {
@@ -740,7 +759,8 @@ function jumpCut(previous: PlannedShot | undefined, from: ShotKey, size: number)
     return false;
   }
   const ratio = Math.max(size, previous.size) / Math.max(1e-6, Math.min(size, previous.size));
-  return viewAngle(previous.shot.to, from) < JUMP_CUT.angle && ratio < JUMP_CUT.sizeRatio;
+  const rules = FILM_GRAMMAR;
+  return viewAngle(previous.shot.to, from) < rules.jumpAngle && ratio < rules.jumpSize;
 }
 
 /** The move of a close shot. */
@@ -999,7 +1019,7 @@ function searchClose(
     if (line) {
       return refuse(azimuth, elevation, arc, line);
     }
-    if (jumpCut(previous, from, subject.radius)) {
+    if (jumpCut(previous, from, frameSize(planner.stageSide, false, subject.radius, from))) {
       return refuse(azimuth, elevation, arc, 'jump');
     }
     // N7: no repeat of the framing of the last shot of the subject.
@@ -1073,16 +1093,23 @@ function searchClose(
  */
 function wideFraming(planner: Planner): Framing {
   const random = decisionRandom(planner.seed, planner.cut, 'wide');
-  const variant = WIDE_VARIANTS[Math.floor(random() * WIDE_VARIANTS.length)] ?? WIDE_VARIANTS[0];
   const k = SHOT_KEYS.wide;
-  const from: ShotKey = variant
-    ? {
-        azimuth: variant.azimuth * DEG,
-        elevation: variant.elevation * DEG,
-        zoom: variant.zoom,
-        fov: k.fov,
-      }
-    : defaultKey(1);
+  const keyOf = (variant: WideVariant): ShotKey => ({
+    azimuth: variant.azimuth * DEG,
+    elevation: variant.elevation * DEG,
+    zoom: variant.zoom,
+    fov: k.fov,
+  });
+  // The seeded variant, or the next one that makes no jump cut after the previous shot.
+  const first = Math.floor(random() * WIDE_VARIANTS.length);
+  const previous = planner.planned.at(-1);
+  const keys = WIDE_VARIANTS.map((...[, i]) =>
+    keyOf(WIDE_VARIANTS[(first + i) % WIDE_VARIANTS.length] ?? WIDE_VARIANTS[0] ?? DEFAULT_WIDE),
+  );
+  const from =
+    keys.find((key) => !jumpCut(previous, key, frameSize(planner.stageSide, true, 0, key))) ??
+    keys[0] ??
+    defaultKey(1);
   // A variant from the side has the nearest zoom that keeps each player in the frame, so it arcs
   // in place of a push-in. Its push-in to 1.01 put a stage corner of K. 525 out of a 1.6 view.
   const push = random() < 0.5 && from.zoom <= 1;
@@ -1891,7 +1918,7 @@ function addShot(
     },
     id: candidate.id,
     group: candidate.group,
-    size: wideKind ? WIDE_SIZE_IN_SIDES * planner.stageSide : framing.radius,
+    size: frameSize(planner.stageSide, kind === 'wide', framing.radius, framing.to),
     held: framing.held,
   });
   if (kind === 'section' || kind === 'solo' || kind === 'side') {

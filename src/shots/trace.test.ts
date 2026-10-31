@@ -13,7 +13,8 @@ import {
 import type { TestEvent } from '../midi/test-smf.ts';
 import { violinPianoDuoFile } from '../models/test-chamber.ts';
 import { viewAngle } from './camera-keys.ts';
-import { CLOSE_DISTANCE_SHARE, JUMP_CUT, traceShots } from './prepare.ts';
+import { FILM_GRAMMAR } from './grammar.ts';
+import { CLOSE_DISTANCE_SHARE, traceShots } from './prepare.ts';
 import { TEST_SEED, shotSceneOf } from './test-shots.ts';
 import type { ShotScene } from './test-shots.ts';
 import type { CutTrace, ShotTrace, TraceRange } from './trace.ts';
@@ -194,7 +195,7 @@ describe('traceShots() (design 5.6)', () => {
         for (const camera of cameras.filter((c) => c.refusal === 'jump')) {
           jumps++;
           const key = { azimuth: camera.azimuth, elevation: camera.elevation, zoom: 1, fov: 30 };
-          expect(previous && viewAngle(previous.to, key)).toBeLessThan(JUMP_CUT.angle);
+          expect(previous && viewAngle(previous.to, key)).toBeLessThan(FILM_GRAMMAR.jumpAngle);
         }
       }
     }

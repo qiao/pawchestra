@@ -103,10 +103,11 @@ The app follows these facts:
   look to the same side of the screen as in the master shot. A look within
   `FILM_GRAMMAR.neutral` (20°) of the camera axis is neutral, as a head-on or a tail-away shot.
   The conductor shows only from behind, so its look is always neutral.
+- **The 30° rule (section 2).** Each shot turns the camera by at least `FILM_GRAMMAR.jumpAngle`
+  (30°) around its target from the previous shot, or it changes the size of the frame by
+  `FILM_GRAMMAR.jumpSize` (1.5 times, about one step from a medium shot to a close-up).
 
 The app does not follow these facts yet:
-- **The 30° rule (section 2).** The planner compares the radius of the subjects, and a wide shot
-  and a conductor shot can be too near in angle and in size.
 - **Moves across a cut (section 4).** The seeded arcs of two shots in a row can go in opposite
   directions.
 - **Look room and headroom (section 3).** A close shot puts the target of its subject in the
