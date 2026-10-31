@@ -465,6 +465,16 @@ film follows the melody. Then these rules apply, in this order (`CHOICE_WEIGHTS`
 A score with fewer than `SMALL_GROUP_SEATS` seats gets no conductor shot, because the back of the
 bear gives weak frames of a solo. Mute and solo do not change the plan.
 
+**Film grammar.** The shots obey the rules of a concert film of
+`docs/reference/camera-technique.md`, with the limits of `FILM_GRAMMAR` (`shots/grammar.ts`).
+`pnpm shot-trace --rules` counts the breaks of each rule over all demos.
+
+- **The line.** The default view is the master shot. Each camera looks at most `lineAzimuth` away
+  from the audience axis, so the stage keeps its left and right sides on the screen. A close
+  camera also keeps the screen direction of the look of its subject in the master shot: its
+  seeded offset goes to the side of the front where the master camera stands. A look within
+  `neutral` of the camera axis has no direction, so it fits both sides.
+
 **Clearance.** The camera never stands inside a player, and the subject does not hide. The
 planner tests each move and sight line against the boxes of `layoutObstacles()`, at
 `CINEMA_ASPECT`, because each view shows that frame. The frame tests (`shots/test-shot-frames.ts`)

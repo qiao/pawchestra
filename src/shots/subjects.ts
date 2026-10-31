@@ -178,6 +178,13 @@ export interface Subject {
   readonly radius: number;
   /** The azimuth of the front of the subject. A camera stays within 75° of it. */
   readonly front: number;
+  /**
+   * The azimuth to which the subject players face, for the screen direction of their look (design
+   * 5.6). It differs from {@link Subject.front} for the piano, whose camera stands at the side.
+   */
+  readonly facing: number;
+  /** The middle of the subject players on the stage, for the screen direction of their look. */
+  readonly center: Vec3;
   /** 0 at the podium, 1 at the back edge of the stage (design 5.6). */
   readonly back: number;
   /** The seats of the subject. */
@@ -462,6 +469,25 @@ function meanFront(players: readonly SubjectPlayer[]): number {
 }
 
 /**
+ * Gives the middle of the places of players.
+ *
+ * @param players The players. There is at least one.
+ * @returns The middle.
+ */
+function middleOf(players: readonly SubjectPlayer[]): Vec3 {
+  let x = 0;
+  let y = 0;
+  let z = 0;
+  for (const p of players) {
+    x += p.position[0];
+    y += p.position[1];
+    z += p.position[2];
+  }
+  const n = players.length;
+  return [x / n, y / n, z / n];
+}
+
+/**
  * Gives the subject of a solo shot (design 5.6): the principal player of a seat, 0.9 m above the
  * stage, with a sphere of 0.95 m, or more to hold its head.
  *
@@ -484,6 +510,8 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
       distance(principal.head, target) + SUBJECT_SIZES.headMargin,
     ),
     front: piano ? principal.front + KEYBOARD_VIEW.turn : principal.front,
+    facing: principal.front,
+    center: principal.position,
     back: backOf(subjects, z),
     seats: [seatIndex],
     part: null,
@@ -563,6 +591,8 @@ export function sectionSubject(
     target: sphere.target,
     radius: sphere.radius,
     front: piano ? meanFront(players) + KEYBOARD_VIEW.turn : meanFront(players),
+    facing: meanFront(players),
+    center: middleOf(players),
     back: backOf(subjects, sphere.target[2]),
     seats: kept,
     part,
@@ -591,6 +621,8 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     target: conductor.target,
     radius: SUBJECT_SIZES.conductorRadius,
     front: 0,
+    facing: Math.PI,
+    center: head,
     back: 0,
     seats: [],
     part: null,
@@ -637,6 +669,8 @@ export function conductorBackSubject(
     target,
     radius: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
     front: azimuth - Math.PI,
+    facing: Math.PI,
+    center: head,
     back: 0,
     seats: [],
     part: null,
@@ -721,6 +755,8 @@ export function sideSubject(
     target,
     radius: sizes.sideRadius * S,
     front: side * sizes.sideFront,
+    facing: meanFront(players),
+    center: middleOf(players),
     back: backOf(subjects, target[2]),
     seats,
     part: null,

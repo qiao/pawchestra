@@ -145,6 +145,8 @@ function timeValue(flag: string, text: string): number {
 
 /** The text of each refusal of a camera, as the tool prints it. */
 export const REFUSAL_TEXTS: Readonly<Record<CameraRefusal, string>> = {
+  axis: 'over the line of the stage',
+  look: 'look to the other side',
   jump: 'jump cut',
   repeat: 'repeat of the last framing',
   head: 'head in the foreground',

@@ -96,13 +96,15 @@ The app follows these facts:
   shots between them (`SHOT_TIMES.conductorSpacing`).
 - **The moves (section 4).** Each move starts and ends at rest (a smoothstep), and the close
   shots push in slowly.
+- **The line (section 1).** The default view is the master shot. Each camera looks at most
+  `FILM_GRAMMAR.lineAzimuth` (75°) away from the audience axis, so it stays in the hall, as the
+  cameras of a concert hall do.
+- **The screen direction of a look (section 1).** A close camera shows each player or section
+  look to the same side of the screen as in the master shot. A look within
+  `FILM_GRAMMAR.neutral` (20°) of the camera axis is neutral, as a head-on or a tail-away shot.
+  The conductor shows only from behind, so its look is always neutral.
 
 The app does not follow these facts yet:
-
-- **The line (section 1).** A close camera can stand up to `KEY_SEARCH.maxFromFront` from the
-  front of its subject, also behind the orchestra.
-- **The screen direction of a look (section 1).** A close camera can show a player look to the
-  other side of the screen than in the master shot.
 - **The 30° rule (section 2).** The planner compares the radius of the subjects, and a wide shot
   and a conductor shot can be too near in angle and in size.
 - **Moves across a cut (section 4).** The seeded arcs of two shots in a row can go in opposite

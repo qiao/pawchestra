@@ -21,6 +21,7 @@ import {
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
 import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
+import { azimuthFrom, keepsLine, lookSide } from './grammar.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import {
@@ -55,6 +56,7 @@ import {
   DEFAULT_TARGET,
   FIELD_OF_VIEW,
   defaultDistance,
+  defaultView,
 } from './view.ts';
 
 /** Degrees to radians. */
@@ -436,6 +438,8 @@ interface Planner {
   readonly subjects: StageSubjects;
   readonly clearance: StageClearance;
   readonly stageSide: number;
+  /** The camera of the master shot: the default view at the aspect of Cinematic mode. */
+  readonly master: Vec3;
   /** The seed of the plan. */
   readonly seed: number;
   /** The cut of the shot that the planner chooses now, in song seconds. */
@@ -845,13 +849,70 @@ function moveForeground(
 }
 
 /**
+ * Tests the 180° rule of a close move (design 5.6): each camera of the move keeps the line of the
+ * stage, and the subject looks to the same side of the screen as in the master shot, or the look
+ * is neutral in one of the two.
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @returns `axis` for a camera over the line, `look` for a look to the other side, else `null`.
+ */
+function lineRefusal(
+  planner: Planner,
+  subject: Subject,
+  from: ShotKey,
+  to: ShotKey,
+): 'axis' | 'look' | null {
+  const master = lookSide(subject.facing, azimuthFrom(planner.master, subject.center));
+  for (const key of [from, to]) {
+    const camera = keyPosition(
+      planner.stageSide,
+      subject.target,
+      subject.radius,
+      key,
+      CINEMA_ASPECT,
+    );
+    if (!keepsLine(camera, subject.target)) {
+      return 'axis';
+    }
+    const side = lookSide(subject.facing, azimuthFrom(camera, subject.center));
+    if (side !== 0 && master !== 0 && side !== master) {
+      return 'look';
+    }
+  }
+  return null;
+}
+
+/**
+ * Gives the sign of the seeded offset of a close camera from the front of its subject (design
+ * 5.6): toward the side of the front where the master camera stands, so that the look of the
+ * subject keeps its screen direction. A subject with a neutral look in the master shot keeps the
+ * seeded sign.
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param seeded The seeded sign, 1 or -1.
+ * @returns 1 or -1.
+ */
+function offsetSign(planner: Planner, subject: Subject, seeded: number): number {
+  const master = azimuthFrom(planner.master, subject.center);
+  if (lookSide(subject.facing, master) === 0) {
+    return seeded;
+  }
+  return Math.sign(angleDifference(master, subject.facing)) || seeded;
+}
+
+/**
  * Searches a clear camera for a close shot (design 5.6) in the elevation band of the cut: the
  * wanted azimuth, then ±12° to ±72°, then the same azimuths 8° to 40° higher, up to the top of
  * the band. At each elevation, a full search then tries each place of the grid with the seeded
  * arc, and then with the arc to the other side. The camera stays within 75° of the front of the
- * subject. A camera that makes a jump cut does not count, and a camera with a head or another
- * large object in the foreground does not count. In a traced try, each tested camera goes into the
- * trace with its refusal.
+ * subject. A camera over the line of the stage or across the look of the subject does not count
+ * (the 180° rule). A camera that makes a jump cut does not count, and a camera with a head or
+ * another large object in the foreground does not count. In a traced try, each tested camera goes
+ * into the trace with its refusal.
  *
  * @param planner The planner.
  * @param subject The subject.
@@ -934,6 +995,10 @@ function searchClose(
     }
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
+    const line = lineRefusal(planner, subject, from, to);
+    if (line) {
+      return refuse(azimuth, elevation, arc, line);
+    }
     if (jumpCut(previous, from, subject.radius)) {
       return refuse(azimuth, elevation, arc, 'jump');
     }
@@ -1173,7 +1238,9 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
         planner,
         subject,
         {
-          wantedAzimuth: subject.front + signOf(random) * onGrid(between(random, k.offset)),
+          wantedAzimuth:
+            subject.front +
+            offsetSign(planner, subject, signOf(random)) * onGrid(between(random, k.offset)),
           elevation: k.elevation * DEG,
           arc: signOf(random) * k.arc * DEG,
           pushIn: k.pushIn,
@@ -1200,7 +1267,9 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
         subject,
         {
           wantedAzimuth:
-            subject.front + signOf(random) * onGrid(between(random, k.offset) * subject.spread),
+            subject.front +
+            offsetSign(planner, subject, signOf(random)) *
+              onGrid(between(random, k.offset) * subject.spread),
           elevation: (k.elevation + k.backRise * subject.back) * DEG + subject.lift,
           arc: signOf(random) * k.arc * DEG,
           pushIn: k.pushIn,
@@ -1222,7 +1291,9 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
         subject,
         {
           wantedAzimuth:
-            subject.front + signOf(random) * onGrid(between(random, k.offset) * subject.spread),
+            subject.front +
+            offsetSign(planner, subject, signOf(random)) *
+              onGrid(between(random, k.offset) * subject.spread),
           elevation: (k.elevation + k.backRise * subject.back) * DEG + subject.lift,
           arc: signOf(random) * k.arc * DEG,
           pushIn: k.pushIn,
@@ -1940,6 +2011,7 @@ function* planShotsSteps(
     subjects,
     clearance: prepareClearance(layout, models),
     stageSide: layout.stageSide,
+    master: defaultView(layout.stageSide, CINEMA_ASPECT, 1).position,
     seed,
     cut: 0,
     lastStart: lastStartOf(music, score.durationSec),

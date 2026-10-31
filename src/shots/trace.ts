@@ -4,6 +4,8 @@ import type { ShotKind, ShotPlan } from './types.ts';
  * A reason why the search of a close shot refuses a camera (design 5.6), in the order of the
  * tests:
  *
+ * - `axis`: a camera that turns more than `FILM_GRAMMAR.lineAzimuth` from the audience axis.
+ * - `look`: a camera that shows the subject look to the other side than in the master shot.
  * - `jump`: a jump cut after the previous shot.
  * - `repeat`: less than 20° from the camera of the last shot of the same subject.
  * - `head`: a head in the foreground, or the outside point of the subject in the frame.
@@ -17,6 +19,8 @@ import type { ShotKind, ShotPlan } from './types.ts';
  * - `object`: another large object in the foreground.
  */
 export type CameraRefusal =
+  | 'axis'
+  | 'look'
   | 'jump'
   | 'repeat'
   | 'head'
@@ -30,9 +34,10 @@ export type CameraRefusal =
 
 /**
  * A refusal that the planner keeps for each camera of a subject, because it does not depend on
- * the cut: the tests of the foreground, the beam, the distance, and the clearance.
+ * the cut and its test costs much: the tests of the foreground, the beam, the distance, and the
+ * clearance.
  */
-export type KeptRefusal = Exclude<CameraRefusal, 'jump' | 'repeat'>;
+export type KeptRefusal = Exclude<CameraRefusal, 'axis' | 'look' | 'jump' | 'repeat'>;
 
 /** A camera that the search of a close shot tested. */
 export interface CameraTrace {
