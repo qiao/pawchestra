@@ -536,9 +536,9 @@ interface Planner {
    */
   lowBand: boolean;
   /**
-   * True when the search of a close camera is full: for the best candidate at its entry. A full
-   * search also tries the places between the steps, the places beyond them, and the arc to the
-   * other side.
+   * True when the search of a close camera is full: for a candidate that shows a seat that enters
+   * at the cut. A full search also tries the places between the steps, the places beyond them, and
+   * the arc to the other side. The low band always searches in full.
    */
   fullSearch: boolean;
   /** The trace of the choice, or `null` for a plan with no trace. */
@@ -1048,11 +1048,13 @@ function offsetSign(planner: Planner, subject: Subject, seeded: number): number 
 }
 
 /**
- * Searches a clear camera for a close shot (design 5.6) in the elevation band of the cut: the
- * wanted azimuth, then ±12° to ±72°, then the same azimuths 8° to 40° higher, up to the top of
- * the band. At each elevation, a full search then tries each place of the grid with the seeded
- * arc, and then with the arc to the other side. The camera stays within 75° of the front of the
- * subject. A camera over the line of the stage or across the look of the subject does not count
+ * Searches a clear camera for a close shot (design 5.6) in the elevation band of the cut. The low
+ * band tries only the wanted elevation, at {@link CAMERA_LOWER} of the height of its nominal
+ * elevation, with a full search. A higher band tries the wanted azimuth, then ±12° to ±72°, then
+ * the same azimuths 8° to 40° higher, up to the top of the band. At each elevation, a full search
+ * then tries each place of the grid with the arc of the move, and then with the arc to the other
+ * side when the move of the previous shot does not fix its direction. The camera stays within 75°
+ * of the front of the subject. A camera over the line of the stage or across the look of the subject does not count
  * (the 180° rule). A camera that makes a jump cut does not count, and a camera with a head or
  * another large object in the foreground does not count. In a traced try, each tested camera goes
  * into the trace with its refusal.
