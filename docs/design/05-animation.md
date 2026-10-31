@@ -451,7 +451,7 @@ each shot at that aspect.
 **Cuts and choice.** A cut falls on a downbeat or on the middle beat of a bar, with a bonus for a
 phrase line (`CUT_BONUS`). The camera films the player who just started to play: a cut at an
 entry gets the largest bonus. The first shot is the default view, as the establishing shot of a
-concert film, and the last shot pulls out. The planner reads the music after the cut
+concert film, and the last shot cranes up into it. The planner reads the music after the cut
 (`MUSIC_RULES`): the share of each group, the entries, a tutti, and the lead, because a concert
 film follows the melody. Then these rules apply, in this order (`CHOICE_WEIGHTS`, `SHOT_TIMES`):
 
@@ -478,6 +478,12 @@ bear gives weak frames of a solo. Mute and solo do not change the plan.
   end of the previous shot, or it changes the size of the frame at the target by `jumpSize`. The
   planner tests each shot against the previous shot, also of another subject, so the rule holds
   for two shots of one subject. A wide shot takes the next variant that passes.
+- **Moves across a cut.** A move goes on three axes: an arc to the right or the left, a rise or a
+  fall, and a push-in or a pull-out. A part of at least `moveShare` of the distance counts. The
+  arc of a shot goes in the direction of the arc of the previous shot, so no move reverses at the
+  cut. When that arc would leave the front range, the shot only pushes in. After a still axis,
+  the seeded direction holds. The last shot cranes up into the default view
+  (`SHOT_KEYS.lastRise`), because a pull-out reverses the push-in of the shot before it.
 
 **Clearance.** The camera never stands inside a player, and the subject does not hide. The
 planner tests each move and sight line against the boxes of `layoutObstacles()`, at

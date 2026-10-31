@@ -106,10 +106,12 @@ The app follows these facts:
 - **The 30° rule (section 2).** Each shot turns the camera by at least `FILM_GRAMMAR.jumpAngle`
   (30°) around its target from the previous shot, or it changes the size of the frame by
   `FILM_GRAMMAR.jumpSize` (1.5 times, about one step from a medium shot to a close-up).
+- **Moves across a cut (section 4).** The arc of a shot goes in the direction of the arc of the
+  previous shot, and the last shot cranes up in place of a pull-out after a push-in. A push-in
+  with no arc is neutral on the axis of the arc.
 
 The app does not follow these facts yet:
-- **Moves across a cut (section 4).** The seeded arcs of two shots in a row can go in opposite
-  directions.
+
 - **Look room and headroom (section 3).** A close shot puts the target of its subject in the
   middle of the frame.
 

@@ -21,7 +21,8 @@ import {
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
 import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
-import { FILM_GRAMMAR, azimuthFrom, keepsLine, lookSide } from './grammar.ts';
+import { FILM_GRAMMAR, azimuthFrom, keepsLine, lookSide, motionOf } from './grammar.ts';
+import type { Motion } from './grammar.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import {
@@ -370,8 +371,11 @@ const SHOT_KEYS = {
   side: { fov: 30, offset: [0, 12], elevation: 11, pushIn: 0.95, arc: 6 },
   section: { fov: 30, offset: [8, 22], elevation: 11, backRise: 8, pushIn: 0.92, arc: 6 },
   solo: { fov: 24, offset: [20, 40], elevation: 9, backRise: 10, pushIn: 0.9, arc: 4 },
-  /** The last shot pulls out from this zoom to 1 in the default view. */
-  lastPullOut: 0.92,
+  /**
+   * The last shot cranes up by this angle, in degrees, into the default view. A pull-out after a
+   * push-in reverses the move across the cut (design 5.6).
+   */
+  lastRise: 12,
 } as const;
 
 /**
@@ -430,6 +434,8 @@ interface PlannedShot {
   readonly group: SectionGroup | null;
   /** The size of the frame of its last key ({@link frameSize}), for the jump cut rule. */
   readonly size: number;
+  /** The move of the shot, which the move of the next shot does not reverse. */
+  readonly motion: Motion;
   /** The boxes that hold the target. */
   readonly held: ReadonlySet<ClearBox>;
 }
@@ -767,8 +773,13 @@ function jumpCut(previous: PlannedShot | undefined, from: ShotKey, size: number)
 interface CloseMove {
   readonly wantedAzimuth: number;
   readonly elevation: number;
-  /** The arc of the move, in radians. Its sign turns when the end leaves the front range. */
+  /**
+   * The arc of the move, in radians. When the end leaves the front range, its sign turns, or the
+   * arc is 0 when the move of the previous shot fixes its direction.
+   */
   readonly arc: number;
+  /** The move of the previous shot to the right: -1, 0 for none, or 1. */
+  readonly lateral: number;
   readonly pushIn: number;
   readonly fov: number;
   /** The azimuth of the last shot of the same subject, or `null`. */
@@ -1001,13 +1012,14 @@ function searchClose(
         }
         return null;
       }
-      arc = -arc;
+      // The move does not reverse the move of the previous shot (design 5.6).
+      arc = move.lateral === 0 ? -arc : 0;
     }
     // The camera on the grid around the front, the elevation in 0.1°, and the direction of the
     // arc. A camera that failed its tests before fails again, so it needs no other test.
     const onFront = Math.round(angleDifference(azimuth, subject.front) / (s.azimuthGrid * DEG));
     const key =
-      ((onFront + 32) * 1000 + Math.round((elevation / DEG) * 10)) * 2 + (arc > 0 ? 1 : 0);
+      ((onFront + 32) * 1000 + Math.round((elevation / DEG) * 10)) * 3 + Math.sign(arc) + 1;
     let clear = known.get(key);
     if (clear === false) {
       const old = kept?.get(key);
@@ -1070,7 +1082,7 @@ function searchClose(
     // The steps of the search, then for a full search the places between and beyond them, and
     // then the arc to the other side. The planner keeps the result of each place, so a place
     // that comes again costs little.
-    const passes = !planner.fullSearch ? 1 : move.arc === 0 ? 2 : 3;
+    const passes = !planner.fullSearch ? 1 : move.arc === 0 || move.lateral !== 0 ? 2 : 3;
     for (let pass = 0; pass < passes; pass++) {
       for (const step of pass === 0 ? s.azimuthSteps : s.fullSteps) {
         for (const side of step === 0 ? [1] : [1, -1]) {
@@ -1083,6 +1095,30 @@ function searchClose(
     }
   }
   return null;
+}
+
+/**
+ * Gives the move to the right of the previous shot.
+ *
+ * @param planner The planner.
+ * @returns -1, 0 for none or for no previous shot, or 1.
+ */
+function lateralOf(planner: Planner): number {
+  return planner.planned.at(-1)?.motion[0] ?? 0;
+}
+
+/**
+ * Gives the direction of the arc of a new shot (design 5.6): the direction of the move of the
+ * previous shot to the right, so that the move does not reverse at the cut. After a shot with no
+ * such move, the seeded direction.
+ *
+ * @param planner The planner.
+ * @param seeded The seeded direction, 1 or -1.
+ * @returns 1 or -1.
+ */
+function arcSign(planner: Planner, seeded: number): number {
+  const lateral = lateralOf(planner);
+  return lateral === 0 ? seeded : lateral;
 }
 
 /**
@@ -1115,7 +1151,7 @@ function wideFraming(planner: Planner): Framing {
   const push = random() < 0.5 && from.zoom <= 1;
   const to: ShotKey = push
     ? { ...from, zoom: from.zoom * k.pushIn }
-    : { ...from, azimuth: from.azimuth + signOf(random) * k.arc * DEG };
+    : { ...from, azimuth: from.azimuth + arcSign(planner, signOf(random)) * k.arc * DEG };
   return { target: DEFAULT_TARGET, radius: 0, from, to, seats: [], part: null, held: new Set() };
 }
 
@@ -1141,7 +1177,8 @@ function openingFraming(): Framing {
 function highFraming(planner: Planner): Framing {
   const random = decisionRandom(planner.seed, planner.cut, 'high');
   const k = SHOT_KEYS.high;
-  const azimuth = signOf(random) * between(random, k.azimuth) * DEG;
+  // The arc goes to the middle, to the other side than the azimuth.
+  const azimuth = -arcSign(planner, -signOf(random)) * between(random, k.azimuth) * DEG;
   const from: ShotKey = {
     azimuth,
     elevation: between(random, k.elevation) * DEG,
@@ -1199,6 +1236,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         fov: k.fov,
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
+        lateral: lateralOf(planner),
       },
       'conductor back',
     );
@@ -1217,6 +1255,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         fov: k.fov,
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
+        lateral: lateralOf(planner),
       },
       'conductor close',
     );
@@ -1269,11 +1308,12 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
             subject.front +
             offsetSign(planner, subject, signOf(random)) * onGrid(between(random, k.offset)),
           elevation: k.elevation * DEG,
-          arc: signOf(random) * k.arc * DEG,
+          arc: arcSign(planner, signOf(random)) * k.arc * DEG,
           pushIn: k.pushIn,
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.sideFromFront,
+          lateral: lateralOf(planner),
         },
         candidate.id,
       );
@@ -1298,11 +1338,12 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
             offsetSign(planner, subject, signOf(random)) *
               onGrid(between(random, k.offset) * subject.spread),
           elevation: (k.elevation + k.backRise * subject.back) * DEG + subject.lift,
-          arc: signOf(random) * k.arc * DEG,
+          arc: arcSign(planner, signOf(random)) * k.arc * DEG,
           pushIn: k.pushIn,
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
+          lateral: lateralOf(planner),
         },
         candidate.id,
       );
@@ -1322,11 +1363,12 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
             offsetSign(planner, subject, signOf(random)) *
               onGrid(between(random, k.offset) * subject.spread),
           elevation: (k.elevation + k.backRise * subject.back) * DEG + subject.lift,
-          arc: signOf(random) * k.arc * DEG,
+          arc: arcSign(planner, signOf(random)) * k.arc * DEG,
           pushIn: k.pushIn,
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
+          lateral: lateralOf(planner),
         },
         candidate.id,
       );
@@ -1919,6 +1961,7 @@ function addShot(
     id: candidate.id,
     group: candidate.group,
     size: frameSize(planner.stageSide, kind === 'wide', framing.radius, framing.to),
+    motion: motionOf(framing.from, framing.to),
     held: framing.held,
   });
   if (kind === 'section' || kind === 'solo' || kind === 'side') {
@@ -2211,7 +2254,8 @@ function* planShotsSteps(
     cut = end;
   }
 
-  // The closing: the default view pulls out and holds after the song end.
+  // The closing: the camera cranes up into the default view and holds after the song end. A
+  // pull-out reverses the push-in of the shot before it.
   const to = defaultKey(1);
   addShot(
     planner,
@@ -2219,7 +2263,7 @@ function* planShotsSteps(
     {
       target: DEFAULT_TARGET,
       radius: 0,
-      from: defaultKey(SHOT_KEYS.lastPullOut),
+      from: { ...to, elevation: to.elevation - SHOT_KEYS.lastRise * DEG },
       to,
       seats: [],
       part: null,
@@ -2252,7 +2296,8 @@ function* planShotsSteps(
  *   in over the first phrase.
  * - Each cut falls on a downbeat. A shot lasts 4 to 14 s, and a wide or high shot up to 18 s.
  * - The music after each cut selects its subject.
- * - The last shot is a wide shot that pulls out, and it holds after the song end.
+ * - The last shot is a wide shot that cranes up into the default view, and it holds after the song
+ *   end.
  *
  * @param score The score.
  * @param layout The layout of the score, from `layoutScene()`.

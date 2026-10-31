@@ -1,5 +1,6 @@
 import type { Vec3 } from '../models/tuples.ts';
 import { angleDifference } from './camera-keys.ts';
+import type { ShotKey } from './types.ts';
 
 /** Degrees to radians. */
 const DEG = Math.PI / 180;
@@ -32,7 +33,45 @@ export const FILM_GRAMMAR = {
    * of the shot sizes, such as from a medium shot to a close-up.
    */
   jumpSize: 1.5,
+  /**
+   * A move counts on an axis when it moves the camera at least this part of its distance to the
+   * target. A shot with no move that counts is still.
+   */
+  moveShare: 0.02,
 } as const;
+
+/**
+ * The move of a shot on the axes of its camera (design 5.6): to the right, up, and forward. Each
+ * part is -1, 0 for no move that counts, or 1.
+ */
+export type Motion = readonly [number, number, number];
+
+/**
+ * Gives the sign of a part of a move that counts.
+ *
+ * @param share The part of the move, as a part of the distance to the target.
+ * @returns -1, 0, or 1.
+ */
+function moveSign(share: number): number {
+  return Math.abs(share) < FILM_GRAMMAR.moveShare ? 0 : Math.sign(share);
+}
+
+/**
+ * Gives the move of a shot from its keys (design 5.6). An arc around the target moves the camera
+ * to the right when the azimuth grows, a rise moves it up, and a push-in moves it forward.
+ *
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @returns The move.
+ */
+export function motionOf(from: ShotKey, to: ShotKey): Motion {
+  const elevation = (from.elevation + to.elevation) / 2;
+  return [
+    moveSign((to.azimuth - from.azimuth) * Math.cos(elevation)),
+    moveSign(to.elevation - from.elevation),
+    moveSign((from.zoom - to.zoom) / from.zoom),
+  ];
+}
 
 /**
  * Gives the screen direction of a look: the side of the frame to which a subject that faces an
