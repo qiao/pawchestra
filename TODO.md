@@ -59,6 +59,9 @@ render, and the memory.
 - [ ] Forest: the default view of a phone shows a wide clearing of bare, faceted earth below the
       deck. Add grass, ferns, and spots of sun there, within the triangle budget of the kit
       (`TRIANGLE_BUDGET` of `tools/forest-kit/build-kit.py`).
+- [ ] Forest: the points of the kit ground are 0.4 m below the floor, because the ground adds the
+      floor height to its points and to its place (`build-kit.py`). Start its points at its
+      origin, as the other parts do. The reverted commit db6e7e87 holds this fix (4.1).
 - [ ] Forest: `pnpm look-lab` measures the regions of the forest frames against
       `orchestra-latest.png`. Only the table "Whole frame" uses `forest.webp`. Add the forest
       regions: the lit planks, the planks in the shade, the chairs, and the podium.
