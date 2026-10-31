@@ -5,16 +5,19 @@
  *
  * Each item gets a temporary tree: a commit, a branch, or a tag gives its tree, and a file that
  * ends in `.patch` gives the tree of `HEAD` with the patch. Each tree links the `node_modules` of
- * the repository. The tool runs `pnpm frame` in each tree `--runs` times (default 3), the items in
- * turns, so that a slow change of the machine reaches each item. Each run goes through
- * `tools/measure-lock.sh run --owner frame-compare --gate <load>` (default 12). A refusal of
- * `pnpm frame` (exit code 2: the CPU gate or the guard of the GPU phase) waits 60 s outside the
- * lock and runs again, at most 3 times. Then `pnpm frozen --tree` renders the frozen shots of each
- * tree through the lock, and the tool compares each item with the first item.
+ * the repository, and the tool prepares the site and `perf-60.mid` of each tree one time. Then it
+ * runs `tools/measure-frame.ts --long` in each tree `--runs` times (default 3), the items in
+ * turns (A B A B), so that a slow change of the machine reaches each item. `--long` records the
+ * main thread in five traces over the shots of `perf-60.mid`, about 3,000 frames. Each run goes
+ * through `tools/measure-lock.sh run --owner frame-compare --gate <load>` (default 12). A refusal
+ * (exit code 2: the CPU gate or the guard of the GPU phase) waits 60 s outside the lock and runs
+ * again, at most 3 times. Then `pnpm frozen --tree` renders the frozen shots of each tree through
+ * the lock, and the tool compares each item with the first item.
  *
- * It prints one table: the median of the runs for each item, with the main thread, the GPU row
- * of the Metal trace, and the frame rate with no frame cap, and then the pixel difference of each
- * shot. The output of each run is in `<out>` (default `scratch/frame-compare/`).
+ * It prints the median of the runs for each item, the p95 of each run with the spread, and the
+ * p95 of all frames of all runs together with a block bootstrap 90% interval and the frames
+ * above 4 ms in each 1,000 frames ({@link pooledStats}). Then it prints the pixel difference of
+ * each shot. The output of each run is in `<out>` (default `scratch/frame-compare/`).
  */
 import { spawn } from 'node:child_process';
 import { existsSync, symlinkSync } from 'node:fs';
@@ -26,6 +29,8 @@ import { chromium } from '@playwright/test';
 
 import { chromiumArgs } from './chromium-args.ts';
 import { SHOT_NAMES, comparePngs, diffLine } from './frozen.ts';
+import { FRAME_LIMIT_MS } from './measure-frame.ts';
+import type { FrameTimes } from './measure-frame.ts';
 import { ROOT, run, shortHash, withRefTree } from './ref-tree.ts';
 
 /** The owner name of the measure lock. */
@@ -138,6 +143,8 @@ export interface FrameRun {
   readonly gpu: readonly [number, number] | null;
   /** The frame rate with no frame cap, in frames each second. */
   readonly uncapped: number | null;
+  /** The time of each frame of the run (`--frames` of `measure-frame.ts`), or `null`. */
+  readonly times: FrameTimes | null;
 }
 
 /**
@@ -161,13 +168,143 @@ function rowValues(output: string, start: string): readonly [number, number] | n
  * @param output The output.
  * @returns The values.
  */
-export function frameRun(output: string): FrameRun {
+export function frameRun(output: string, times: FrameTimes | null = null): FrameRun {
   const rate = /([\d.]+) fps with no cap/.exec(output)?.[1];
   return {
     main: rowValues(output, '| Main thread'),
     gpu: rowValues(output, '| GPU: WebGL frames in the Metal trace'),
     uncapped: rate === undefined ? null : Number(rate),
+    times,
   };
+}
+
+/** The frames of all runs of one item together ({@link pooledStats}). */
+export interface PooledStats {
+  /** The count of the frames. */
+  readonly count: number;
+  /** The p95 of all frames, at the nearest rank, in milliseconds. */
+  readonly p95: number;
+  /** The 5th and the 95th percentile of the p95 of the bootstrap draws, in milliseconds. */
+  readonly interval: readonly [number, number];
+  /** The frames above the limit of design 9.7 in each 1,000 frames. */
+  readonly overPerThousand: number;
+}
+
+/** The count of the bootstrap draws of {@link pooledStats}. */
+const DRAWS = 1000;
+
+/**
+ * The frames of one block of the bootstrap: one second at 60 fps. Slow frames come in groups,
+ * such as the frames of one shot, so the draws take whole blocks of frames in their order.
+ */
+const BLOCK = 60;
+
+/**
+ * Gives the value at the nearest rank of a sorted list, as `frameStats()` of `measure-frame.ts`.
+ *
+ * @param sorted The values, in increasing order.
+ * @param q The share, such as 0.95.
+ * @returns The value, or 0 for an empty list.
+ */
+function rank(sorted: ArrayLike<number>, q: number): number {
+  return sorted[Math.max(0, Math.ceil(q * sorted.length) - 1)] ?? 0;
+}
+
+/**
+ * Gives a seeded generator of numbers from 0 to 1 (mulberry32), so that each table repeats.
+ *
+ * @param seed The seed.
+ * @returns The generator.
+ */
+function seeded(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Calculates the statistics of the frames of all runs of one item together: the p95, a block
+ * bootstrap 90% interval of the p95, and the frames above {@link FRAME_LIMIT_MS} in each 1,000
+ * frames. Each draw takes as many blocks of {@link BLOCK} frames as the runs have, with
+ * replacement, from all runs.
+ *
+ * @param runs The time of each frame of each run, in milliseconds.
+ * @returns The statistics, or `null` with no frame.
+ */
+export function pooledStats(runs: readonly (readonly number[])[]): PooledStats | null {
+  const all = Float64Array.from(runs.flat()).toSorted();
+  if (all.length === 0) {
+    return null;
+  }
+
+  const blocks = runs.flatMap((frames) =>
+    Array.from({ length: Math.ceil(frames.length / BLOCK) }, (_, b) =>
+      frames.slice(b * BLOCK, (b + 1) * BLOCK),
+    ),
+  );
+  const random = seeded(9.7e6);
+  const draws = new Float64Array(DRAWS);
+  for (let d = 0; d < DRAWS; d++) {
+    const sample: number[] = [];
+    for (let b = 0; b < blocks.length; b++) {
+      sample.push(...(blocks[Math.floor(random() * blocks.length)] ?? []));
+    }
+    draws[d] = rank(Float64Array.from(sample).toSorted(), 0.95);
+  }
+  const sortedDraws = draws.toSorted();
+  const over = all.length - all.findIndex((time) => time > FRAME_LIMIT_MS);
+  return {
+    count: all.length,
+    p95: rank(all, 0.95),
+    interval: [rank(sortedDraws, 0.05), rank(sortedDraws, 0.95)],
+    overPerThousand: all.some((time) => time > FRAME_LIMIT_MS) ? (over / all.length) * 1000 : 0,
+  };
+}
+
+/**
+ * Gives the lines of the table of the runs: the p95 of each run and their spread, and the
+ * statistics of all frames together ({@link pooledStats}), for the main thread and the GPU.
+ *
+ * @param labels The label of each item.
+ * @param runs The runs of each item.
+ * @returns The lines of the table.
+ */
+export function spreadTable(
+  labels: readonly string[],
+  runs: readonly (readonly FrameRun[])[],
+): string[] {
+  const lines = [
+    '| Item | Row | p95 of each run | Spread | p95 of all frames (90% interval) | Above 4 ms per 1,000 | Frames |',
+    '|---|---|---|---|---|---|---|',
+  ];
+  for (const [i, label] of labels.entries()) {
+    const done = (runs[i] ?? []).filter((one) => one.times !== null);
+    for (const [row, pick] of [
+      ['Main thread', (times: FrameTimes) => times.main],
+      ['GPU', (times: FrameTimes) => times.gpu],
+    ] as const) {
+      const frames = done.map((one) => (one.times ? pick(one.times) : []));
+      const each = frames.map((list) => rank(Float64Array.from(list).toSorted(), 0.95));
+      const stats = pooledStats(frames);
+      const spread = each.length > 0 ? Math.max(...each) - Math.min(...each) : NaN;
+      const cells = stats
+        ? [
+            each.map((value) => value.toFixed(2)).join(', '),
+            spread.toFixed(2),
+            `${stats.p95.toFixed(2)} (${stats.interval[0].toFixed(2)} to ${stats.interval[1].toFixed(2)})`,
+            stats.overPerThousand.toFixed(1),
+            String(stats.count),
+          ]
+        : ['-', '-', '-', '-', '0'];
+      lines.push(`| ${label} | ${row} | ${cells.join(' | ')} |`);
+    }
+  }
+  return lines;
 }
 
 /**
@@ -243,11 +380,12 @@ async function runLogged(
 }
 
 /**
- * Runs `pnpm frame` in a tree through the measure lock, and runs it again after a refusal.
+ * Runs `tools/measure-frame.ts --long` of a prepared tree through the measure lock, and runs it
+ * again after a refusal.
  *
- * @param tree The root of the tree.
+ * @param tree The root of the tree, with its site and `perf-60.mid` ({@link prepareTree}).
  * @param args The command line.
- * @param log The file of the output of the last try.
+ * @param log The file of the output of the last try. The times of the frames go beside it.
  * @param prefix The prefix of the lines on the console.
  * @returns The values of the run, or `null` after the last refusal or a failure.
  */
@@ -257,9 +395,11 @@ async function frameIn(
   log: string,
   prefix: string,
 ): Promise<FrameRun | null> {
+  const timesFile = log.replace(/\.txt$/, '.frames.json');
   for (let attempt = 1; attempt <= TRIES; attempt++) {
     const lock = ['run', '--owner', OWNER, '--gate', String(args.gate), '--max'];
-    const frame = ['pnpm', '-C', tree, 'frame', ...args.frameFlags];
+    const script = join(tree, 'tools', 'measure-frame.ts');
+    const frame = ['node', script, '--long', `--frames=${timesFile}`, ...args.frameFlags];
     const code = await runLogged(
       join(ROOT, 'tools', 'measure-lock.sh'),
       [...lock, String(RUN_MAX_SEC), '--', ...frame],
@@ -268,7 +408,9 @@ async function frameIn(
     );
     // Exit code 0 passes the target, and 1 fails it. Both give a table.
     if (code === 0 || code === 1) {
-      return frameRun(await readFile(log, 'utf8'));
+      // SAFETY: measure-frame.ts writes this file as JSON of FrameTimes.
+      const times = JSON.parse(await readFile(timesFile, 'utf8')) as FrameTimes;
+      return frameRun(await readFile(log, 'utf8'), times);
     }
     if (code !== REFUSED || attempt === TRIES) {
       console.log(`${prefix} pnpm frame ended with ${code}. See ${log}.`);
@@ -278,6 +420,18 @@ async function frameIn(
     await delay(RETRY_WAIT_MS);
   }
   return null;
+}
+
+/**
+ * Prepares a tree one time for all its runs, as the script `pnpm frame` does before each run:
+ * the files of the site (`pnpm prepare-site`) and `perf-60.mid`.
+ *
+ * @param tree The root of the tree.
+ * @throws Error if a step fails.
+ */
+function prepareTree(tree: string): void {
+  run('pnpm', ['prepare-site'], tree);
+  run('node', ['tools/write-perf-60.ts'], tree);
 }
 
 /**
@@ -305,6 +459,7 @@ async function withTrees<T>(
         run('git', ['apply', item.patch], dir);
       }
       symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'dir');
+      prepareTree(dir);
       return withTrees(rest, use, [...roots, dir]);
     },
     { prefix: 'frame-compare-' },
@@ -346,10 +501,16 @@ async function main(): Promise<void> {
         `| ${item.label} | ${done.length} of ${args.runs} | ${thread} | ${gpu} | ${fps} |`,
       );
     }
-    const command = ['pnpm frame', ...args.frameFlags].join(' ');
+    const command = ['pnpm frame --long', ...args.frameFlags].join(' ');
     console.log(`\nMedian of the runs (ms), ${command}:\n`);
     console.log(lines.join('\n'));
-    await writeFile(join(args.out, 'table.md'), `${lines.join('\n')}\n`);
+    const spread = spreadTable(
+      items.map((item) => item.label),
+      runs,
+    );
+    console.log('\nEach run and all frames together (ms):\n');
+    console.log(spread.join('\n'));
+    await writeFile(join(args.out, 'table.md'), `${[...lines, '', ...spread].join('\n')}\n`);
     if (!args.frozen || items.length < 2) {
       return;
     }
