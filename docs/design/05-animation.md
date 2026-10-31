@@ -448,6 +448,19 @@ the beam fade of Free mode starts there (4.5).
 | section | low, from the front of one group | a group shot |
 | solo | low, from the front of one player | a waist shot |
 
+- The shots follow the views of `scene.png`. The conductor shows only from behind, as in the
+  reference images (1).
+- All shots stand low, near the eye height of the players, as the cameras on the railings of a
+  concert hall. The wanted camera of each kind stands at `CAMERA_LOWER` of the height above the
+  stage top that its nominal elevation gives (`SHOT_KEYS`, `WIDE_VARIANTS`). Free mode and its
+  default view keep `DEFAULT_ELEVATION`.
+- A close camera first tries the wanted elevation with each azimuth of the grid (the low band).
+  Only then it rises in steps up to the tops of `KEY_SEARCH.bands`, because a low camera sees
+  more heads in the foreground. Each candidate gets the low band and the first band before a
+  candidate gets a higher band, except the best candidate at its entry.
+- Each move blends its keys with a smoothstep over the full shot and turns around the target, so
+  it starts and ends at rest and never cuts through the subject.
+
 **The frame of a close shot.** A 21:9 frame that fits the height of one player shows about 2.3
 times its width. Thus a close shot fits the width of its subject with the shot size of its kind
 (`SHOT_SIZES`, `shots/shot-size.ts`), from `camera-technique.md`:
@@ -466,19 +479,6 @@ times its width. Thus a close shot fits the width of its subject with the shot s
 - The shot keeps half the height of its frame (`halfHeight`). The camera stands at the distance
   at which its field of view shows that frame, so the camera does not depend on the aspect of
   the view.
-
-- The shots follow the views of `scene.png`. The conductor shows only from behind, as in the
-  reference images (1).
-- All shots stand low, near the eye height of the players, as the cameras on the railings of a
-  concert hall. The wanted camera of each kind stands at `CAMERA_LOWER` of the height above the
-  stage top that its nominal elevation gives (`SHOT_KEYS`, `WIDE_VARIANTS`). Free mode and its
-  default view keep `DEFAULT_ELEVATION`.
-- A close camera first tries the wanted elevation with each azimuth of the grid (the low band).
-  Only then it rises in steps up to the tops of `KEY_SEARCH.bands`, because a low camera sees
-  more heads in the foreground. Each candidate gets the low band and the first band before a
-  candidate gets a higher band, except the best candidate at its entry.
-- Each move blends its keys with a smoothstep over the full shot and turns around the target, so
-  it starts and ends at rest and never cuts through the subject.
 
 **Cuts and choice.** A cut falls on a downbeat or on the middle beat of a bar, with a bonus for a
 phrase line (`CUT_BONUS`). The camera films the player who just started to play: a cut at an
