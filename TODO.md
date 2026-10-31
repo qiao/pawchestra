@@ -539,6 +539,10 @@ each control.
       `FOREGROUND` and `CLEARANCE` in place of copies. They still sample the aspects 1.6 and 0.46
       (5.6). Also `prepare.test.ts` expects the half height of the shot over the shoulder above
       0.25 S (now about 0.21 S), and the 33° test of `camera-keys.test.ts` fails on the base too.
+- [ ] Make the side views read as one clear side. A near player of the group can fill a frame edge
+      (`beethoven-5-4` at 28.57 s, the ears at the bottom of `mozart-k191` at 125 s), and a view of
+      the right side shows the backs of the cellists. Also check the section elevation of 69° in
+      `pnpm shot-trace --rules`: no section key is above 45°, so it can be a sample of a blend (5.6).
 - [ ] Tool: add `pnpm close-views play --shots <n> [--base <ref>]`, which renders the middle of the
       first n shots into a labelled contact sheet, and `--set` for the constants of the planner. A
       shot round wrote 4 scratch scripts for this, about 35 minutes.
