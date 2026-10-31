@@ -139,8 +139,10 @@ The app follows these facts:
 - **Shot sizes (section 3).** A close shot fits the width of its subject in the 21:9 frame
   (`SHOT_SIZES`). A solo is a waist one-shot of one player, a section shot a group-shot or a
   two-shot, a side view a group-shot of the front half of one side, and a conductor shot a waist
-  shot of the bear from behind. The frame also holds the head with the ears, so a waist shot of
-  a player with long ears, such as a rabbit, is wider.
+  shot of the bear from behind. The frame holds the head with no ears (`HEAD_BONES`), because
+  the closer the subject, the less headroom it needs, and a close shot can cut the top of the
+  head (section 3). Thus the long ears of a rabbit or a fox can leave the frame of a solo, and
+  the solo shows the player and its instrument in place of about seven players.
 - **The dirty frame (section 3).** A near head or a near box of another object that the depth of
   field blurs can stand at one side edge of a close shot (`FOREGROUND.dirtyBlur`). Its inner edge
   stays in the outer third of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a

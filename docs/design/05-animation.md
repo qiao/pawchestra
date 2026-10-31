@@ -473,8 +473,10 @@ times its width. Thus a close shot fits the width of its subject with the shot s
   sphere, and the frame cuts its deep part. A side view holds the heads and the hands of the
   players in its sphere.
 - At the push-in of the end of the move, the frame then grows until it holds the top of each
-  head with the ears and the hands and the instruments, with the eyes on the upper third line
-  (`FRAME_MARGINS`). The fit reads each point with the perspective of the camera: a near head
+  head and the hands and the instruments, with the eyes on the upper third line
+  (`FRAME_MARGINS`). The head has no ears (`HEAD_BONES`): a closer shot needs less headroom, and
+  a close shot can cut the top of the head (`camera-technique.md`). With the ears, a waist shot
+  of a rabbit or a fox showed about seven players. The fit reads each point with the perspective of the camera: a near head
   looks larger, and a high camera sees a back row higher in the frame. A last test reads the
   tops of the heads with the composed camera at the push-in, because the fit does not tilt the
   camera (`HEAD_TEST_PASSES`).

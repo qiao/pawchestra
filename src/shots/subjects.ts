@@ -141,7 +141,7 @@ interface SubjectPlayer {
    * close shot holds their spread across the view.
    */
   readonly outline: readonly Vec3[];
-  /** The height of the top of the head of the player with its ears, in meters. */
+  /** The height of the top of the head of the player with no ears, in meters. */
   readonly top: number;
 }
 
@@ -163,7 +163,7 @@ interface ConductorSubjects {
   readonly body: Vec3;
   /** The corners of the outline of the bear and its two hands in the stage plane. */
   readonly outline: readonly Vec3[];
-  /** The height of the top of the head of the bear with its ears, in meters. */
+  /** The height of the top of the head of the bear with no ears, in meters. */
   readonly top: number;
 }
 
@@ -243,7 +243,7 @@ export interface Subject {
    */
   readonly reach: number;
   /**
-   * The tops of the heads of the subject players with their ears, over the middle of each head.
+   * The tops of the heads of the subject players with no ears, over the middle of each head.
    * The frame holds them below its top edge.
    */
   readonly tops: readonly Vec3[];
@@ -348,17 +348,22 @@ function hullOf(points: readonly Vec3[]): Vec3[] {
   return [...chain(sorted), ...chain(sorted.toReversed())];
 }
 
-/** The bones of the head with the ears, whose top the frame of a close shot holds. */
-const HEAD_BONES: ReadonlySet<number> = new Set(
-  (['head', 'jaw', 'earL', 'earR'] as const).map((name) => boneIndex(name)),
+/**
+ * The bones of the head whose top the frame of a close shot holds below its top edge (design 5.6):
+ * the skull and the face. The ears do not count, because a closer shot needs less headroom and a
+ * close shot can cut the top of the head (`docs/reference/camera-technique.md`). With the ears, a
+ * waist shot of a rabbit was about 4 m wide and showed about seven players.
+ */
+export const HEAD_BONES: ReadonlySet<number> = new Set(
+  (['head', 'jaw'] as const).map((name) => boneIndex(name)),
 );
 
 /** The height of the top of the head of each model, in the model axes. */
 const headTops = new WeakMap<PlayerModel, number>();
 
 /**
- * Gives the height of the top of the head of a model with its ears, in the model axes: the
- * highest corner of the mesh on a bone of the head. An instrument, such as the lid of the piano,
+ * Gives the height of the top of the head of a model with no ears, in the model axes: the highest
+ * corner of the mesh on a bone of {@link HEAD_BONES}. An instrument, such as the lid of the piano,
  * does not count.
  *
  * @param model The model.
@@ -385,7 +390,7 @@ function headTopOf(model: PlayerModel): number {
 interface PlayerOutline {
   /** The corners of the outline. */
   readonly outline: Vec3[];
-  /** The height of the top of the head with the ears, in meters. */
+  /** The height of the top of the head with no ears, in meters. */
   readonly top: number;
 }
 

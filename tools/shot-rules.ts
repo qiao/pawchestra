@@ -14,8 +14,9 @@
  * - `room`: a close shot of a player or a section that looks to one side puts it in the middle of
  *   the frame, or on the side of its look (look room).
  * - `headroom`: the eyes of a close shot of a player or a section are far from the upper third line.
- * - `head`: the top of a head of a player of a solo or a section shot, with the ears, is above the
- *   top edge of the frame (a cut head).
+ * - `head`: the top of a head of a player of a solo or a section shot is above the top edge of the
+ *   frame (a cut head). The head has the bones of `HEAD_BONES` of `src/shots/subjects.ts`, with no
+ *   ears. A commit from before that list gets no count.
  *
  * The tool also gives the median and the largest elevation and height of the camera of each kind
  * of shot, from a sample each {@link SAMPLE_STEP}, and the median share of the frame width that
@@ -31,12 +32,11 @@ import type { Vec3 } from '../src/models/tuples.ts';
 import { layoutObstacles, layoutScene } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
-import { boneIndex } from '../src/models/rig.ts';
 import type { Transport } from '../src/pose/types.ts';
 import { buildScore } from '../src/score/score.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
-import { prepareSubjects } from '../src/shots/subjects.ts';
+import * as shotSubjects from '../src/shots/subjects.ts';
 import type { StageSubjects } from '../src/shots/subjects.ts';
 import type { Shot, ShotKind, ShotPlan } from '../src/shots/types.ts';
 import { CINEMA_ASPECT, defaultView } from '../src/shots/view.ts';
@@ -180,16 +180,21 @@ interface ShotSubject {
 
 /** The top of the head and the footprint of one player, for the head rule and the width share. */
 export interface PlayerExtent {
-  /** The top of the head with the ears, over the middle of the head. */
-  readonly top: Vec3;
+  /**
+   * The top of the head over the middle of the head, or `null` for a commit with no list of the
+   * bones of the head.
+   */
+  readonly top: Vec3 | null;
   /** The corners of the footprint boxes in the stage plane. */
   readonly corners: readonly Vec3[];
 }
 
-/** The bones of the head with the ears. */
-const HEAD_BONES: ReadonlySet<number> = new Set(
-  (['head', 'jaw', 'earL', 'earR'] as const).map((name) => boneIndex(name)),
-);
+/**
+ * The bones of the head that the frame holds: `HEAD_BONES` of `src/shots/subjects.ts`, or `null`
+ * for a commit from before that list. The tool then counts no cut heads.
+ */
+const headBones: ReadonlySet<number> | null =
+  'HEAD_BONES' in shotSubjects ? shotSubjects.HEAD_BONES : null;
 
 /**
  * Gives the top of the head and the footprint of each player of a layout. The tool reads them
@@ -220,7 +225,7 @@ export function playerExtents(
     const { positions, bones } = models.get(species, instrument, kettles, support).mesh;
     let top = -Infinity;
     for (let corner = 0; corner < bones.length; corner++) {
-      if (HEAD_BONES.has(bones[corner] ?? -1)) {
+      if (headBones?.has(bones[corner] ?? -1)) {
         top = Math.max(top, positions[corner * 3 + 1] ?? top);
       }
     }
@@ -237,7 +242,7 @@ export function playerExtents(
       }
     }
     extents.set(index, {
-      top: [head[0], Math.max(head[1], place.position[1] + top), head[2]],
+      top: headBones ? [head[0], Math.max(head[1], place.position[1] + top), head[2]] : null,
       corners,
     });
   }
@@ -577,6 +582,9 @@ export function checkPlan(
         for (const t of [moveStart, (moveStart + moveEnd) / 2, moveEnd]) {
           const sample = frameAt(plan, Math.min(t, end - 1e-6));
           for (const p of players) {
+            if (!p.top) {
+              continue;
+            }
             const [hx, hy] = project(sample, p.top);
             top = Math.abs(hx) <= 1 ? Math.max(top, hy) : top;
           }
@@ -659,7 +667,7 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
     const models = new ModelCache();
     const layout = layoutScene(score, models);
     const plan = prepareShots(score, layout, SHOT_SEED, models);
-    const subjects = prepareSubjects(score, layout, models);
+    const subjects = shotSubjects.prepareSubjects(score, layout, models);
     shots[name] = plan.shots.length;
     const extents = playerExtents(layout, models, subjects);
     breaks.push(...checkPlan(name, plan, layout, subjects, score.durationSec, kinds, extents));
