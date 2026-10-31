@@ -254,97 +254,53 @@ def pick(rng, choices):
     return choices[-1][0]
 
 
+#: The sides and the bands of the spheres of the leaves: `'round'` for the parts near the stage,
+#: and `'low'` for the far trees.
+SPHERES = {'round': (12, 7), 'low': (9, 5)}
+
+
 def unit_sphere(detail):
-    """Gives the unit points and the faces of a sphere of few faces.
+    """Gives the unit points and the faces of a sphere of bands, from pole to pole.
 
-    `detail` is `'ico'` for an icosphere of 80 triangles, or `'low'` for a sphere of 7 sides and 4
-    bands (42 triangles), which looks less even. The script makes the points itself, because the
-    order of the faces of `bmesh.ops.create_uvsphere()` changes from run to run.
+    `detail` names a pair of `SPHERES` or is a pair (sides, bands). Each band turns by half a side
+    against the band above it, so that the quads do not line up in columns. The script makes the
+    points itself, because the order of the faces of `bmesh.ops.create_uvsphere()` changes from
+    run to run.
     """
-    if detail == 'low':
-        points = [Vector((0.0, 1.0, 0.0))]
-        for band in (1, 2, 3):
-            y = math.cos(math.pi * band / 4)
-            r = math.sin(math.pi * band / 4)
-            points += [
-                Vector(
-                    (
-                        r * math.cos(2 * math.pi * k / 7 + band * 0.45),
-                        y,
-                        r * math.sin(2 * math.pi * k / 7 + band * 0.45),
-                    )
+    sides, bands = SPHERES[detail] if isinstance(detail, str) else detail
+    points = [Vector((0.0, 1.0, 0.0))]
+    for band in range(1, bands):
+        y = math.cos(math.pi * band / bands)
+        r = math.sin(math.pi * band / bands)
+        turn = math.pi * band / sides
+        points += [
+            Vector(
+                (
+                    r * math.cos(2 * math.pi * k / sides + turn),
+                    y,
+                    r * math.sin(2 * math.pi * k / sides + turn),
                 )
-                for k in range(7)
-            ]
-        points.append(Vector((0.0, -1.0, 0.0)))
-        faces = [(0, 1 + (k + 1) % 7, 1 + k) for k in range(7)]
-        for band in range(2):
-            a, b = 1 + band * 7, 8 + band * 7
-            faces += [(a + k, a + (k + 1) % 7, b + (k + 1) % 7, b + k) for k in range(7)]
-        faces += [(22, 15 + k, 15 + (k + 1) % 7) for k in range(7)]
-        return points, faces
-    t = (1 + math.sqrt(5)) / 2
-    points = [
-        Vector(p).normalized()
-        for p in (
-            (-1, t, 0),
-            (1, t, 0),
-            (-1, -t, 0),
-            (1, -t, 0),
-            (0, -1, t),
-            (0, 1, t),
-            (0, -1, -t),
-            (0, 1, -t),
-            (t, 0, -1),
-            (t, 0, 1),
-            (-t, 0, -1),
-            (-t, 0, 1),
-        )
-    ]
-    base = [
-        (0, 11, 5),
-        (0, 5, 1),
-        (0, 1, 7),
-        (0, 7, 10),
-        (0, 10, 11),
-        (1, 5, 9),
-        (5, 11, 4),
-        (11, 10, 2),
-        (10, 7, 6),
-        (7, 1, 8),
-        (3, 9, 4),
-        (3, 4, 2),
-        (3, 2, 6),
-        (3, 6, 8),
-        (3, 8, 9),
-        (4, 9, 5),
-        (2, 4, 11),
-        (6, 2, 10),
-        (8, 6, 7),
-        (9, 8, 1),
-    ]
-    middles = {}
-
-    def middle(a, b):
-        key = (min(a, b), max(a, b))
-        if key not in middles:
-            middles[key] = len(points)
-            points.append((points[a] + points[b]).normalized())
-        return middles[key]
-
-    faces = []
-    for a, b, c in base:
-        ab, bc, ca = middle(a, b), middle(b, c), middle(c, a)
-        faces += [(a, ab, ca), (b, bc, ab), (c, ca, bc), (ab, bc, ca)]
+            )
+            for k in range(sides)
+        ]
+    points.append(Vector((0.0, -1.0, 0.0)))
+    last = len(points) - 1
+    faces = [(0, 1 + (k + 1) % sides, 1 + k) for k in range(sides)]
+    for band in range(bands - 2):
+        a, b = 1 + band * sides, 1 + (band + 1) * sides
+        faces += [(a + k, a + (k + 1) % sides, b + (k + 1) % sides, b + k) for k in range(sides)]
+    start = 1 + (bands - 2) * sides
+    faces += [(last, start + k, start + (k + 1) % sides) for k in range(sides)]
     return points, faces
 
 
-def blob(rng, center, radii, detail='ico', jitter=0.12):
-    """Gives a faceted blob: a sphere of few faces with a random radius at each point."""
+def blob(rng, center, radii, detail='round', jitter=0.12):
+    """Gives a smooth lump: a sphere with soft bumps of a seeded field on its radius."""
     unit, faces = unit_sphere(detail)
+    bumps = Waves(rng, 1.6, count=2)
     points = []
     for d in unit:
-        k = 1 + rng.uniform(-jitter, jitter)
+        k = 1 + jitter * bumps(d)
         points.append(
             Vector(
                 (
@@ -546,13 +502,13 @@ def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
     part.add(points, faces, bark_paint(part.tint), inside)
 
 
-def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
+def crown(part, centers, count, size, flat=0.75, light=0.0, detail='round'):
     """Adds leaf clusters around the centers of a crown.
 
-    With `detail='ico'`, each cluster is two flat pads of few faces: a wide upper pad and a
-    smaller, darker pad below it and to one side, so that the crown shows layers of leaves, as in
-    the reference. Two pads of the `'low'` sphere have about the triangles of one icosphere. With
-    `detail='low'`, each cluster is one blob, for the far trees.
+    With `detail='round'`, each cluster is two smooth, flat lumps: a wide upper lump and a
+    smaller, darker lump below it and to one side, so that the crown shows layers of leaves, as
+    in the reference. With `detail='low'`, each cluster is one lump of fewer faces, for the far
+    trees.
     """
     rng = part.rng
     for i in range(count):
@@ -581,7 +537,7 @@ def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
                 r * sy * rng.uniform(0.8, 1.15),
                 r * sz * rng.uniform(0.85, 1.15),
             )
-            points, faces = blob(rng, center, radii, 'low', 0.22)
+            points, faces = blob(rng, center, radii, 'round', 0.16)
             part.add(points, faces, leaf_paint(part.tint, shade), lambda _, c=center: c)
 
 
@@ -669,38 +625,37 @@ def build_tree(name, spec):
 
 
 def build_far_tree(name, spec):
-    """Builds a smaller tree of the back rows: a plain trunk and a few leaf blobs."""
+    """Builds a smaller tree of the back rows: a plain trunk and a few leaf lumps."""
     part = Part(name)
-    rng = part.rng
     height = spec['trunk']
     points, centers = [], []
     for y in (-0.2, height * 0.4, height):
         r = spec['radius'] * (1 - 0.35 * max(y, 0) / height)
         c = Vector((0.0, y, 0.0))
-        points += ring(c, r, 6, rng.uniform(0, 1))
+        points += ring(c, r, 9)
         centers.append(c)
     part.add(
         points,
-        rings_faces(3, 6, cap_top=True),
+        rings_faces(3, 9, cap_top=True),
         bark_paint(part.tint),
         lambda center: min(centers, key=lambda c: abs(c.y - center.y)),
     )
     top = Vector((0.0, height + spec['crown'] * 0.4, 0.0))
-    crown(part, [top], spec['blobs'], spec['crown'], flat=0.9, detail=spec.get('detail', 'ico'))
+    crown(part, [top], spec['blobs'], spec['crown'], flat=0.9, detail=spec.get('detail', 'round'))
     return part
 
 
 def build_conifer(name, spec):
-    """Builds a conifer of the back rows: a trunk and stacked faceted cones."""
+    """Builds a conifer of the back rows: a trunk and stacked soft cones with a drooping rim."""
     part = Part(name)
     rng = part.rng
     waves = Waves(part.tint, 1.5)
-    points = ring((0, -0.2, 0), spec['radius'], 5) + ring(
-        (0, spec['height'] * 0.5, 0), spec['radius'] * 0.6, 5
+    points = ring((0, -0.2, 0), spec['radius'], 8) + ring(
+        (0, spec['height'] * 0.5, 0), spec['radius'] * 0.6, 8
     )
     part.add(
         points,
-        rings_faces(2, 5, cap_top=True),
+        rings_faces(2, 8, cap_top=True),
         bark_paint(part.tint),
         lambda c: Vector((0.0, c.y, 0.0)),
     )
@@ -710,11 +665,24 @@ def build_conifer(name, spec):
         y0 = spec['height'] * (0.25 + 0.62 * t)
         r = spec['spread'] * (1 - 0.7 * t)
         h = spec['height'] * 0.32
-        base = ring((0, y0, 0), r, 7, rng.uniform(0, 1))
-        base = [p + Vector((0.0, rng.uniform(-0.15, 0.1), 0.0)) for p in base]
+        sides = 12
+        waves_rim = Waves(rng, 2.0, count=2)
+        rim = [
+            p + Vector((0.0, -0.12 + 0.12 * waves_rim(p), 0.0))
+            for p in ring((0, y0, 0), r, sides, rng.uniform(0, 1))
+        ]
         tip = Vector((rng.uniform(-0.1, 0.1), y0 + h, rng.uniform(-0.1, 0.1)))
-        pts = base + [tip]
-        faces = [(k, (k + 1) % 7, 7) for k in range(7)] + [tuple(range(7))]
+        pts = list(rim)
+        for share, spread in ((0.35, 0.6), (0.7, 0.27)):
+            pts += [
+                Vector((p.x * spread + tip.x * share, y0 + h * share, p.z * spread + tip.z * share))
+                for p in rim
+            ]
+        pts += [tip, Vector((0.0, y0 + h * 0.12, 0.0))]
+        top, under = len(pts) - 2, len(pts) - 1
+        faces = rings_faces(3, sides)
+        faces += [(2 * sides + k, 2 * sides + (k + 1) % sides, top) for k in range(sides)]
+        faces += [((k + 1) % sides, k, under) for k in range(sides)]
         c = Vector((0.0, y0 + h * 0.3, 0.0))
 
         def paint(normal, point, waves=waves):
@@ -752,7 +720,7 @@ def build_bush(name, spec):
             (math.cos(a) * d, r * 0.7 + (spec['size'] * 0.3 if i == 0 else 0.0), math.sin(a) * d)
         )
         radii = (r * rng.uniform(0.85, 1.2), r * rng.uniform(0.7, 0.95), r * rng.uniform(0.85, 1.2))
-        points, faces = blob(rng, c, radii, 'ico' if spec.get('fine') else 'low', 0.24)
+        points, faces = blob(rng, c, radii, 'round', 0.18)
         part.add(points, faces, leaf_paint(part.tint, -0.2), lambda _, c=c: c)
     return part
 
@@ -1570,7 +1538,7 @@ def build_parts(collection):
         build_canopy('canopy-2', {'length': 2.4, 'drop': 0.5, 'blobs': 4, 'size': 0.9}),
         build_bush('bush-1', {'blobs': 4, 'size': 0.6}),
         build_bush('bush-2', {'blobs': 3, 'size': 0.45}),
-        build_bush('bush-3', {'blobs': 3, 'size': 0.8, 'fine': True}),
+        build_bush('bush-3', {'blobs': 3, 'size': 0.8}),
         build_fern(
             'fern-1',
             {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 9, 'width': 0.17},
