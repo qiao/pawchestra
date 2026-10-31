@@ -138,8 +138,9 @@ export class Tooltips {
    * @param control The control.
    */
   #show(control: HTMLElement): void {
-    // A control that hides, for example in the hidden bar, gets no tooltip.
-    if (!control.isConnected || control.closest('.is-hidden, [hidden]')) {
+    // A control that hides, for example in the hidden bar or in the hidden UI of Cinematic mode,
+    // gets no tooltip.
+    if (!control.isConnected || control.closest('.is-hidden, [hidden], .is-ui-hidden')) {
       return;
     }
     setText(this.element, this.#text());

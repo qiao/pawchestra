@@ -473,6 +473,25 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
   pointer-events: none;
 }
 
+/* In Cinematic mode during play, the title and the drawer hide with the bar, so that the film
+   fills the screen (design 2.3). They keep their place, so the drawer comes back open, and they
+   keep their place in the focus order. They ignore the pointer, so the first tap goes to the stage
+   and only shows them. The drawer fades in 0.2 s with its own transition. */
+.title {
+  transition: opacity 0.2s;
+}
+
+body.is-ui-hidden .title,
+body.is-ui-hidden .drawer {
+  opacity: 0;
+}
+
+body.is-ui-hidden .title *,
+body.is-ui-hidden .drawer,
+body.is-ui-hidden .drawer * {
+  pointer-events: none;
+}
+
 /* Before the file of the first piece arrives, the length is not known, so the bar shows no times
    and no seek bar. They keep their places, so that the bar does not move. */
 .bar.is-empty .time,
@@ -1649,6 +1668,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
 
 @media (prefers-reduced-motion: reduce) {
   .bar,
+  .title,
   .drawer,
   .drawer[hidden],
   #stage,

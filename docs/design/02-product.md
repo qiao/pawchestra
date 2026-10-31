@@ -53,6 +53,13 @@ The UI has the style of a video player. The theme is dark only, because the scen
   that bar has room for it and two gaps, so that the controls do not cover the film
   (`--bar-lift` of `ui/ui.css`). The drawer and the messages move up with it. Else the bar covers
   the bottom of the frame.
+- In Cinematic mode during play, all controls and panels hide after the same time: the bar, the
+  logo, the title and the composer, the drawer (also when it is open), each tooltip, and the
+  pointer (`uiShown()` of `app/bar-rules.ts`). A pointer motion, a tap, or Tab shows them all.
+  They stay while the pointer is over one of them, while a control in them has the keyboard
+  focus, and while a dialog or a message is open. A pause shows them, and an open drawer comes
+  back open. They fade in 0.2 s, at once with reduced motion. Free mode hides only the bar,
+  because there the user works with the view and the drawer.
 - The drawer has the tabs "Music" (the demos and the file button), "Seats", and "Settings" (with
   the link "Credits"). The UI says "Music", because each user knows the word, and it covers a demo
   and a MIDI file of the user. "Track" names a track of a MIDI file, and "song" does not fit the
@@ -363,5 +370,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   of the bar gets the focus.
 - A row of the music list that a click focused shows no focus ring, also after Space or an arrow
   key. A Tab into the list shows the ring.
-- The bar stays visible while a control of the bar has the keyboard focus (`:focus-visible`),
-  while the pointer is over it, and while the drawer is open.
+- In Free mode, the bar stays visible while a control of the bar has the keyboard focus
+  (`:focus-visible`), while the pointer is over it, and while the drawer is open. In Cinematic
+  mode, the focus or the pointer on the bar, the title, or the drawer keeps all of them, and an
+  open drawer does not (2.3). The hidden controls stay in the focus order.

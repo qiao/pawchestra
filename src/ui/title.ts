@@ -56,6 +56,8 @@ export class Title {
   readonly #composer: HTMLElement;
   /** The range that measures the text of a line. */
   readonly #range = document.createRange();
+  /** True while the pointer is over the link to the repository, the only control of the title. */
+  #hovered = false;
   /** Each line with the lightest backdrop at which its text keeps 4.5:1 with no shade. */
   readonly #lines: readonly (readonly [HTMLElement, number])[];
   /** The level of the shade of each line, from 0 to 1, or NaN before the first level. */
@@ -90,6 +92,22 @@ export class Title {
       [this.#title, TEXT_BACKDROP_LIMIT],
       [this.#composer, TEXT_BACKDROP_LIMIT],
     ];
+    this.repositoryLink.addEventListener('pointerenter', () => {
+      this.#hovered = true;
+    });
+    this.repositoryLink.addEventListener('pointerleave', () => {
+      this.#hovered = false;
+    });
+  }
+
+  /** True while the pointer is over the link to the repository. */
+  get hovered(): boolean {
+    return this.#hovered;
+  }
+
+  /** True while the link to the repository shows the focus of the keyboard (`:focus-visible`). */
+  get focusShown(): boolean {
+    return this.repositoryLink.matches(':focus-visible');
   }
 
   /**

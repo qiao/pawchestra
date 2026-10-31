@@ -19,7 +19,7 @@ import { nextShadeLevel } from '../ui/title-shade.ts';
 import { Ui } from '../ui/ui.ts';
 import { playWithSilentSwitch, warmAudioOutput } from './audio-session.ts';
 import { BackdropProbe } from './backdrop-probe.ts';
-import { DEFAULT_SPEED, DEFAULT_VOLUME, barShows, volumeGain } from './bar-rules.ts';
+import { DEFAULT_SPEED, DEFAULT_VOLUME, uiShown, volumeGain } from './bar-rules.ts';
 import { motionEvent, nextMode } from './camera-mode.ts';
 import type { CameraEvent, CameraMode } from './camera-mode.ts';
 import type { Speed } from './bar-rules.ts';
@@ -396,13 +396,17 @@ export class App {
    * right arrows seek 5 s, Home goes to the start, the up and the down arrows change the volume, C
    * toggles the automatic camera, M the mute button, and F the full screen. Escape closes the
    * drawer, and the drawer button gets the focus that the drawer held. A key action shows the bar,
-   * as a pointer motion does. While the credits dialog is open, no key of the page acts, and
-   * Escape closes only the dialog (design 2.8).
+   * as a pointer motion does, and Tab shows the hidden UI of Cinematic mode (design 2.3). While the
+   * credits dialog is open, no key of the page acts, and Escape closes only the dialog (design
+   * 2.8).
    *
    * @param event The key event.
    */
   #pressKey(event: KeyboardEvent): void {
     const modified = event.ctrlKey || event.altKey || event.metaKey;
+    if (event.key === 'Tab') {
+      this.#activeAt = performance.now() / 1000;
+    }
     const dialog = this.#ui.creditsDialog.open;
     if (event.key === 'Escape' && !modified && this.#ui.drawer.open && !dialog) {
       const refocus = this.#ui.drawer.focused;
@@ -1047,6 +1051,19 @@ export class App {
     );
     const songSec = shownSongTime(this.#seekSec, this.#songTime);
     const ended = piece !== null && atSongEnd(status, songSec, piece.score.durationSec);
+    // In Cinematic mode during play, all controls and panels hide together (design 2.3).
+    const shown = uiShown({
+      cinematic: this.#cameraMode === 'cinematic',
+      playing: status.playing,
+      idleSec: wallTime - this.#activeAt,
+      focused: ui.bar.focused,
+      hovered: ui.bar.hovered,
+      drawerOpen: ui.drawer.open,
+      panelFocused: ui.panelFocused,
+      panelHovered: ui.panelHovered,
+      held: this.#message !== null || ui.creditsDialog.open,
+    });
+    ui.showPanels(shown.panels);
     ui.bar.update({
       playLabel: ended ? 'Play again' : playLabel(status),
       pieceShown: piece !== null,
@@ -1058,13 +1075,7 @@ export class App {
       automaticCamera: this.#cameraMode === 'cinematic',
       fullScreen: document.fullscreenElement !== null,
       drawerOpen: ui.drawer.open,
-      shown: barShows({
-        playing: status.playing,
-        idleSec: wallTime - this.#activeAt,
-        focused: ui.bar.focused,
-        hovered: ui.bar.hovered,
-        drawerOpen: ui.drawer.open,
-      }),
+      shown: shown.bar,
     });
     // The counter of the settings changes two times each second, so that it stays readable.
     if (ui.drawer.open && wallTime - this.#fpsShownAt >= FPS_COUNTER_SEC) {

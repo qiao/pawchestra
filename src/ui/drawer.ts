@@ -25,6 +25,8 @@ export class Drawer {
   readonly #tabList: HTMLElement;
   readonly #tabs = new Map<DrawerTab, TabParts>();
   #current: DrawerTab | null = null;
+  /** True while the pointer is over the drawer. */
+  #hovered = false;
 
   /**
    * Creates the closed drawer with the drag handle, the close button, and no tabs.
@@ -47,6 +49,12 @@ export class Drawer {
     const top = createElement('div', 'drawer-top');
     top.append(this.#tabList, this.closeButton);
     this.element.append(this.#createHandle(), top);
+    this.element.addEventListener('pointerenter', () => {
+      this.#hovered = true;
+    });
+    this.element.addEventListener('pointerleave', () => {
+      this.#hovered = false;
+    });
   }
 
   /**
@@ -108,6 +116,19 @@ export class Drawer {
   /** True while an element of the drawer has the keyboard focus. */
   get focused(): boolean {
     return this.element.contains(document.activeElement);
+  }
+
+  /**
+   * True while a control of the drawer shows the focus of the keyboard (`:focus-visible`). A focus
+   * from a click or a tap does not count, so that the drawer still hides during play (design 2.3).
+   */
+  get focusShown(): boolean {
+    return this.element.querySelector(':focus-visible') !== null;
+  }
+
+  /** True while the pointer is over the open drawer. */
+  get hovered(): boolean {
+    return this.#hovered && this.open;
   }
 
   /** The current tab, or `null` before the first tab. */

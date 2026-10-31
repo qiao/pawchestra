@@ -75,6 +75,8 @@ export class Ui {
   #covers = 0;
   /** The root element of the page, which holds the CSS variable `--letterbox`. */
   readonly #root: HTMLElement;
+  /** The element that holds the UI, which gets the class `is-ui-hidden`. */
+  readonly #parent: HTMLElement;
   /** The height of the bottom bar of the letterbox that the page shows, in CSS pixels. */
   #letterbox = 0;
 
@@ -96,6 +98,7 @@ export class Ui {
     target: Window,
   ) {
     this.#root = parent.ownerDocument.documentElement;
+    this.#parent = parent;
     // The static title of index.html stays in its place (design 2.8, 7.2).
     this.title = new Title(parent.querySelector<HTMLElement>(':scope > header.title'));
     this.tooltips = new Tooltips(target);
@@ -223,6 +226,35 @@ export class Ui {
     this.drawer.setOpen(true);
     this.demoList.element.scrollTop = 0;
     this.demoList.focusCurrent();
+  }
+
+  /** True while the pointer is over a control of the title or over the open drawer. */
+  get panelHovered(): boolean {
+    return this.title.hovered || this.drawer.hovered;
+  }
+
+  /** True while a control of the title or the drawer shows the focus of the keyboard. */
+  get panelFocused(): boolean {
+    return this.title.focusShown || this.drawer.focusShown;
+  }
+
+  /**
+   * Shows or hides the panels: the logo, the title, the composer, the open drawer, and the
+   * tooltips (design 2.3). The hidden panels keep their place, their state, and their place in the
+   * focus order, so that the drawer comes back open, and a Tab shows them again. They ignore the
+   * pointer, so that the first tap only shows them. They fade in 0.2 s, at once with reduced
+   * motion.
+   *
+   * @param shown True to show them.
+   */
+  showPanels(shown: boolean): void {
+    if (this.#parent.classList.contains('is-ui-hidden') !== shown) {
+      return;
+    }
+    this.#parent.classList.toggle('is-ui-hidden', !shown);
+    if (!shown) {
+      this.tooltips.hide();
+    }
   }
 
   /**
