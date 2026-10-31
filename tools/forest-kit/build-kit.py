@@ -911,66 +911,76 @@ def wood_end(part, center, radius, sides, axis, start, rings_count=3):
 
 
 def build_log(name, spec):
-    """Builds a fallen log along x, with bark facets of one color and light cut ends with rings."""
+    """Builds a fallen log along x, with soft streaks along its bark, a rounded rim at each end,
+    and light cut ends with rings."""
     part = Part(name)
     rng = part.rng
-    sides = 9
+    sides = 18
     length, radius = spec['length'], spec['radius']
-    xs = [-length / 2 + length * t for t in (0.0, 0.22, 0.5, 0.78, 1.0)]
+    half = length / 2
+    xs = [-half, -half + 0.035]
+    xs += [-half + length * t for t in (0.12, 0.26, 0.4, 0.55, 0.7, 0.85)]
+    xs += [half - 0.035, half]
+    lumps = Waves(rng, 0.8, count=2)
     points, centers = [], []
     for i, x in enumerate(xs):
-        c = Vector(
-            (x, radius * 0.92 + rng.uniform(-0.02, 0.02) * (0 < i < 4), rng.uniform(-0.03, 0.03))
-        )
-        r = radius * (1 + rng.uniform(-0.05, 0.06)) * (1 - 0.08 * (x + length / 2) / length)
-        pts = ring(c, r, sides, 0.3, Vector((0.0, 0.0, 1.0)), Vector((0.0, 1.0, 0.0)))
-        points += [p + Vector((0.0, rng.uniform(-0.02, 0.02), 0.0)) * (0 < i < 4) for p in pts]
+        c = Vector((x, radius * 0.92 + 0.015 * lumps(Vector((x, 0.0, 0.0))), 0.0))
+        rim = 0.92 if i in (0, len(xs) - 1) else 1.0
+        r = radius * rim * (1 - 0.08 * (x + half) / length)
+        for p in ring(c, r, sides, 0.3, Vector((0.0, 0.0, 1.0)), Vector((0.0, 1.0, 0.0))):
+            points.append(c + (p - c) * (1 + 0.04 * lumps(p / radius)))
         centers.append(c)
     faces = rings_faces(len(xs), sides)
-    # The bark has one color, so that the baked light alone shades the facets. Colors of bark
-    # for each side and a moss top made blocks of other colors, as a green block at one end.
-    part.add(
-        points,
-        faces,
-        lambda n, c: (linear('log-bark'), 'matte'),
-        lambda c: min(centers, key=lambda k: abs(k.x - c.x)),
-    )
+    # Soft streaks run along the log, as the grooves of the bark. A random color for each face
+    # made blocks of other colors, as a green block at one end.
+    streaks = Waves(part.tint, 0.3, stretch=(0.08, 1.0, 1.0))
+
+    def paint(normal, point):
+        dark = 0.6 * smoothstep(0.55, 0.85, streaks.share(point))
+        return mix(linear('log-bark'), linear('log-bark-dark'), dark), 'matte'
+
+    part.add(points, faces, paint, lambda c: min(centers, key=lambda k: abs(k.x - c.x)))
     first, last = points[:sides], points[-sides:]
     for ring_points, center, axis in (
         (first, centers[0], Vector((-1.0, 0.0, 0.0))),
         (last, centers[-1], Vector((1.0, 0.0, 0.0))),
     ):
         r = sum((p - center).length for p in ring_points) / sides
-        wood_end(part, center + axis * 0.005, r * 0.96, sides, axis, 0.3)
+        wood_end(part, center + axis * 0.004, r * 0.98, sides, axis, 0.3, 5)
     return part
 
 
 def build_stump(name, spec):
-    """Builds a stump with roots and a flat top with rings, on which a lantern stands."""
+    """Builds a stump with roots, a rounded rim, and a flat top with rings, on which a lantern
+    stands."""
     part = Part(name)
     rng = part.rng
-    sides = 9
+    sides = 18
     height, radius = spec['height'], spec['radius']
     roots = [rng.uniform(0, 2 * math.pi) + 2 * math.pi * i / 4 for i in range(4)]
+    lumps = Waves(rng, 0.9, count=2)
+    levels = (-0.15, 0.0, 0.06, 0.14, 0.25, 0.4, height * 0.75, height - 0.03, height)
     points, centers = [], []
-    for y in (-0.15, 0.0, 0.18, height * 0.6, height):
+    for y in levels:
         flare = 0.45 * math.exp(-max(y, 0) / 0.16)
         c = Vector((0.0, y, 0.0))
+        rim = 0.95 if y == height else 1.0
         for k in range(sides):
             a = 2 * math.pi * k / sides
             lobe = max(max(0.0, math.cos(a - r)) ** 6 for r in roots)
-            r = radius * (1 + flare * (0.2 + 1.0 * lobe) + rng.uniform(-0.04, 0.04))
+            d = Vector((math.cos(a), y / radius, math.sin(a)))
+            r = radius * rim * (1 + flare * (0.2 + 1.0 * lobe) + 0.04 * lumps(d))
             points.append(c + Vector((r * math.cos(a), 0.0, r * math.sin(a))))
         centers.append(c)
     part.add(
         points,
-        rings_faces(5, sides),
+        rings_faces(len(levels), sides),
         bark_paint(part.tint, 0.25),
         lambda c: min(centers, key=lambda k: abs(k.y - c.y)),
     )
     top = points[-sides:]
     r = sum((p - centers[-1]).length for p in top) / sides
-    wood_end(part, centers[-1], r, sides, Vector((0.0, 1.0, 0.0)), 0.0, 4)
+    wood_end(part, centers[-1], r, sides, Vector((0.0, 1.0, 0.0)), 0.0, 5)
     return part
 
 
