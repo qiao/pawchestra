@@ -90,9 +90,9 @@ PALETTE = {
     'litter': '#6f4a2a',
     'path': '#9c7650',
     'path-light': '#ab8660',
-    'water': '#5a5444',
-    'water-light': '#9a9a8a',
-    'foam': '#e0e2da',
+    'water': '#3e4a44',
+    'water-light': '#a9b8b2',
+    'foam': '#f0f2ec',
     'iron': '#2e2925',
     'iron-light': '#4a423a',
     'glass': '#ffb85c',
@@ -441,20 +441,42 @@ def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
 
 
 def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
-    """Adds leaf blobs around the centers of a crown."""
+    """Adds leaf clusters around the centers of a crown.
+
+    With `detail='ico'`, each cluster is two flat pads of few faces: a wide upper pad and a
+    smaller, darker pad below it and to one side, so that the crown shows layers of leaves, as in
+    the reference. Two pads of the `'low'` sphere have about the triangles of one icosphere. With
+    `detail='low'`, each cluster is one blob, for the far trees.
+    """
     rng = part.rng
     for i in range(count):
         c = Vector(centers[i % len(centers)])
         offset = Vector((rng.uniform(-1, 1), rng.uniform(-0.5, 0.6), rng.uniform(-1, 1)))
         c = c + offset * size * 0.8
         r = size * rng.uniform(0.7, 1.1)
-        radii = (
-            r * rng.uniform(0.9, 1.15),
-            r * flat * rng.uniform(0.85, 1.1),
-            r * rng.uniform(0.9, 1.15),
+        if detail == 'low':
+            radii = (
+                r * rng.uniform(0.9, 1.15),
+                r * flat * rng.uniform(0.85, 1.1),
+                r * rng.uniform(0.9, 1.15),
+            )
+            points, faces = blob(rng, c, radii, detail, 0.14)
+            part.add(points, faces, leaf_paint(rng, light), lambda _, c=c: c)
+            continue
+        a = rng.uniform(0, 2 * math.pi)
+        side = Vector((math.cos(a), 0.0, math.sin(a)))
+        pads = (
+            (c + Vector((0.0, r * 0.2, 0.0)), (1.1, 0.5 * flat / 0.75, 1.1), light),
+            (c + side * (r * 0.55) - Vector((0.0, r * 0.3, 0.0)), (0.8, 0.4, 0.8), light - 0.2),
         )
-        points, faces = blob(rng, c, radii, detail, 0.14)
-        part.add(points, faces, leaf_paint(rng, light), lambda _, c=c: c)
+        for center, (sx, sy, sz), shade in pads:
+            radii = (
+                r * sx * rng.uniform(0.85, 1.15),
+                r * sy * rng.uniform(0.8, 1.15),
+                r * sz * rng.uniform(0.85, 1.15),
+            )
+            points, faces = blob(rng, center, radii, 'low', 0.22)
+            part.add(points, faces, leaf_paint(rng, shade), lambda _, c=center: c)
 
 
 def trunk(part, spec):
@@ -1161,7 +1183,7 @@ def build_stream():
 
     steps = [(1.7, -1.6), (0.85, -0.8)]
     for height, z in steps:
-        for x in (-1.15, -0.55, 0.55, 1.15):
+        for x in (-1.25, -0.65, 0.65, 1.25):
             rock(
                 (x * rng.uniform(0.9, 1.1), height * 0.5, z + rng.uniform(-0.15, 0.15)),
                 (0.55, height * 0.55, 0.6),
@@ -1175,23 +1197,52 @@ def build_stream():
             Vector((-0.45, height, z - 0.6)),
         ]
         part.add(lip, [(0, 1, 2, 3)], water('water'), 'up')
-        sheet = []
+        # The falling water: a sheet of columns with a small wave, water at the top and white
+        # foam in streaks and at the foot.
         drop = height - (0.85 if height > 1 else 0.02)
-        for i in range(4):
-            t = i / 3
+        columns, rows = 4, 4
+        sheet = []
+        for i in range(rows + 1):
+            t = i / rows
             y = height - drop * t
-            zz = z + 0.3 + 0.25 * math.sin(t * 1.4)
-            half = 0.38 + 0.08 * t
-            sheet += [Vector((-half, y, zz)), Vector((half, y, zz))]
-        faces = [(2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2) for i in range(3)]
+            half = 0.4 + 0.1 * t
+            for k in range(columns + 1):
+                u = k / columns
+                wave = 0.06 * math.sin(u * 7.0 + t * 3.0)
+                zz = z + 0.32 + 0.28 * math.sin(t * 1.4) + wave
+                sheet.append(Vector((-half + 2 * half * u, y, zz)))
+        faces = [
+            (
+                i * (columns + 1) + k,
+                i * (columns + 1) + k + 1,
+                (i + 1) * (columns + 1) + k + 1,
+                (i + 1) * (columns + 1) + k,
+            )
+            for i in range(rows)
+            for k in range(columns)
+        ]
+        streaks = [rng.random() < 0.45 for _ in range(columns)]
+
+        def fall_paint(normal, center, streaks=streaks, height=height, drop=drop, z=z):
+            t = (height - center.y) / max(drop, 1e-3)
+            column = min(columns - 1, max(0, int((center.x + 0.5) / 1.0 * columns)))
+            foam = t > 0.55 or (streaks[column] and t > 0.15)
+            return linear('foam' if foam else 'water-light'), 'water'
+
+        part.add(sheet, faces, fall_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
+        # The foam pool at the foot of the fall.
+        foot = height - drop
+        pool_center = Vector((0.0, foot + 0.035, z + 0.75))
+        pool = [pool_center]
+        for k in range(9):
+            a = 2 * math.pi * k / 9
+            rr = rng.uniform(0.45, 0.65)
+            pool.append(pool_center + Vector((rr * 1.3 * math.cos(a), 0.0, rr * math.sin(a))))
         part.add(
-            sheet,
-            faces,
-            lambda n, c: (
-                linear('foam' if c.y < 0.25 or rng.random() < 0.35 else 'water-light'),
-                'water',
-            ),
-            lambda c: c + Vector((0.0, 0.0, -1.0)),
+            pool,
+            [(0, 1 + (k + 1) % 9, 1 + k) for k in range(9)],
+            lambda n, c: (linear(pick(rng, [('foam', 3), ('water-light', 1)])), 'water'),
+            'up',
         )
     course = STREAM_COURSE
     left, right = [], []

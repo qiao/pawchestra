@@ -21,8 +21,8 @@ update the size and the SHA-256 below.
 
 | Item | Value |
 |---|---|
-| Size | 416,844 bytes |
-| SHA-256 | `99014e4c45371edd9be5a3c9db85fbcc8232ab40c9038b6e65897ed670f00c87` |
+| Size | 416,700 bytes |
+| SHA-256 | `65b11a57db3c05097e2df1dfa3483bb70cc9ec667eeb60494bcdc3446b56a7a2` |
 | Origin | Own work of the project. The script makes each point itself from one seed. It imports, downloads, and generates no model |
 | License | Apache License 2.0, as the project (`../../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
 | Writer | Blender 5.2.2 LTS, Khronos glTF Blender I/O v5.2.40 |
