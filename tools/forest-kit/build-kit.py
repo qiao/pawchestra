@@ -1420,63 +1420,70 @@ def build_stream():
         slab((-half - 0.06, foot - 0.04, z - 0.16), (half + 0.06, top - 0.02, z - 0.04))
 
     # The water: the pool above the fall, a sheet over each step, and the foam at each foot. Each
-    # sheet curves over its lip in columns of uneven widths with no gap, in tones of cream with
-    # streaks. Strands of uneven widths and lengths lie over the sheet, so that the streaks
-    # overlap, as the warm, soft water of `forest.webp`.
-    disc((0.0, FALL_STEPS[0][0] + 0.01, -0.85), (0.3, 0.22), 7, [('water', 2), ('water-cream', 1)])
-    tones = [('water-cream', 3), ('water-streak', 2), ('water-cream-light', 2)]
+    # sheet curves over its lip and narrows toward its foot, with uneven edges and a soft bulge in
+    # its middle. Streaks of cream run down it, and it turns to foam at its foot, as the warm, soft
+    # water of `forest.webp`.
+    disc((0.0, FALL_STEPS[0][0] + 0.01, -0.85), (0.3, 0.22), 12, [('water', 2), ('water-cream', 1)])
+    tones = [('water-streak', 2), ('water-cream', 3), ('water-cream-light', 2)]
+    rows_at = (-1, 0.0, 0.05, 0.13, 0.25, 0.4, 0.56, 0.72, 0.87, 1.0)
+    columns = 10
     for top, foot, z, reach, half in FALL_STEPS:
         drop = top - foot
+        left, right = Waves(rng, 0.6, count=2), Waves(rng, 0.6, count=2)
+        streaks = Waves(part.tint, 0.14, stretch=(1.0, 0.03, 0.03))
 
-        def sheet_point(x, sv, front=0.0, top=top, z=z, reach=reach, drop=drop):
-            """Gives a point of the sheet: over the round lip first, then down and out."""
+        def sheet_point(u, sv, top=top, z=z, reach=reach, drop=drop, left=left, right=right):
+            """Gives a point of the sheet across its width (u from -1 to 1): over the round lip
+            first, then down and out."""
+            t = max(sv, 0.0)
+            narrow = 1 - 0.25 * t
+            x0 = -half * narrow + 0.035 * left(Vector((t, 0.0, 0.0)))
+            x1 = half * narrow + 0.035 * right(Vector((t, 0.0, 0.0)))
+            x = x0 + (u + 1) / 2 * (x1 - x0)
+            bulge = 0.02 * math.cos(u * math.pi / 2) * math.sqrt(t)
             if sv < 0:
-                return Vector((x, top + 0.008, z - 0.07 + front))
-            return Vector((x, top - drop * sv, z + reach * math.sqrt(sv) + 0.015 + front))
+                return Vector((x, top + 0.008, z - 0.07))
+            return Vector((x, top - drop * t, z + reach * math.sqrt(t) + 0.015 + bulge))
 
         lip = [Vector((-half, top + 0.008, z - 0.14)), Vector((half, top + 0.008, z - 0.14))]
-        lip += [sheet_point(half, -1), sheet_point(-half, -1)]
+        lip += [sheet_point(1, -1), sheet_point(-1, -1)]
         part.add(lip, [(0, 1, 2, 3)], lambda n, c: (linear('water-cream'), 'water'), 'up')
-        rows_at = (-1, 0.0, 0.12, 0.4, 0.7, 1.0)
-        cuts = sorted(rng.uniform(-half * 0.9, half * 0.9) for _ in range(6))
-        columns = list(zip([-half] + cuts, cuts + [half]))
-        for x0, x1 in columns:
-            tone = pick(rng, tones)
-            end = rng.uniform(0.86, 1.0)
-            pts = []
-            for sv in rows_at:
-                sv = sv if sv < 0 else sv * end
-                pts += [sheet_point(x0, sv), sheet_point(x1, sv)]
-            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(len(rows_at) - 1)]
+        pts = [sheet_point(-1 + 2 * k / columns, sv) for sv in rows_at for k in range(columns + 1)]
+        w = columns + 1
+        faces = [
+            (r * w + k, r * w + k + 1, (r + 1) * w + k + 1, (r + 1) * w + k)
+            for r in range(len(rows_at) - 1)
+            for k in range(columns)
+        ]
 
-            def sheet_paint(normal, point, tone=tone, top=top, drop=drop):
-                share = (top - point.y) / drop
-                return mix(linear(tone), linear('foam'), smoothstep(0.7, 0.9, share)), 'water'
+        def sheet_paint(normal, point, top=top, drop=drop, streaks=streaks):
+            share = (top - point.y) / drop
+            color = weighted_color(tones, streaks.share(point))
+            color = mix(color, linear('water-cream-light'), 0.5 * smoothstep(0.12, 0.0, share))
+            return mix(color, linear('foam'), smoothstep(0.6, 0.95, share)), 'water'
 
-            part.add(pts, faces, sheet_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
-        for _ in range(6):
-            width = rng.uniform(0.03, 0.09)
-            x0 = rng.uniform(-half, half - width)
-            length = rng.uniform(0.55, 1.0)
-            tone = pick(rng, [('water-cream-light', 2), ('water-streak', 1)])
-            pts = []
-            for sv in (-1, 0.0, 0.12, length * 0.5, length):
-                pts += [sheet_point(x0, sv, 0.012), sheet_point(x0 + width, sv, 0.012)]
-            faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(4)]
-            part.add(
-                pts,
-                faces,
-                lambda n, c, tone=tone: (linear(tone), 'water'),
-                lambda c, z=z: Vector((c.x, c.y, z - 1.0)),
-            )
-        # The foam pool at the foot: a wide, uneven fan of foam and cream.
+        part.add(pts, faces, sheet_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
+        # The foam pool at the foot: a wide, uneven fan of foam and cream, with low lumps of foam
+        # where the water lands.
         disc(
             (0.0, foot, z + reach + 0.1),
-            (half + 0.12, 0.16),
-            9,
+            (half + 0.16, 0.2),
+            14,
             [('foam', 3), ('water-cream', 2)],
             0.015,
         )
+        for k in range(4):
+            x = (k - 1.5) / 1.5 * half * 0.6 + rng.uniform(-0.03, 0.03)
+            size = rng.uniform(0.06, 0.1)
+            radii = (size * 1.3, size * 0.35, size)
+            center = (x, foot + 0.012, z + reach + rng.uniform(0.02, 0.1))
+            foam_pts, foam_faces = blob(rng, center, radii, 'low', 0.15)
+            part.add(
+                foam_pts,
+                foam_faces,
+                lambda n, c: (linear('foam'), 'water'),
+                lambda _, c=center: Vector(c),
+            )
 
     # The stream: a strip of dark water from the pool along the course, with small glints of the
     # low sun, and stones on its banks.
