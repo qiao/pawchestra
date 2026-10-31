@@ -534,8 +534,14 @@ each control.
       No end-to-end test uses Cinematic mode now (2.3, 2.5).
 - [ ] Check the letterbox on a GPU with no float target. That path has no post effects, and it uses
       the canvas scissor of three.js in CSS pixels (4.5).
-- [ ] Update the paused frame tests of `src/shots/test-shot-frames.ts` to `CINEMA_ASPECT` and to the
-      composition of the close shots. They still sample the aspects 1.6 and 0.46 (5.6).
+- [ ] Update the paused frame tests of `src/shots/test-shot-frames.ts` to `CINEMA_ASPECT`, to the
+      composition of the close shots, and to the blurred head at a side edge. Let them read
+      `FOREGROUND` and `CLEARANCE` in place of copies. They still sample the aspects 1.6 and 0.46
+      (5.6). Also `prepare.test.ts` expects the half height of the shot over the shoulder above
+      0.25 S (now about 0.21 S), and the 33° test of `camera-keys.test.ts` fails on the base too.
+- [ ] Tool: add `pnpm close-views play --shots <n> [--base <ref>]`, which renders the middle of the
+      first n shots into a labelled contact sheet, and `--set` for the constants of the planner. A
+      shot round wrote 4 scratch scripts for this, about 35 minutes.
 - [ ] Tool: cache the base rows of `pnpm frame-compare` by tree, and let `close-views`,
       `screenshots`, and the Playwright probes take `tools/measure-lock.sh` as GPU users. A UI
       round spent about 45 minutes on frame measures, with refused runs under the load of renders.
