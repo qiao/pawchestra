@@ -1024,7 +1024,7 @@ export class StageScene {
    * Limits the render to the canvas to the letterbox, with no post effects (design 2.5). The
    * browser clears the canvas before each frame, so the bars stay black.
    *
-   * @param cropped True to limit the render to the visible part of the last frame.
+   * @param cropped True to limit the render to the visible part of the frame (`#visible`).
    */
   #scissorCanvas(cropped: boolean): void {
     const renderer = this.#renderer;
