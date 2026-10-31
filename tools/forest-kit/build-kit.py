@@ -9,9 +9,10 @@ so the same script gives the same GLB file. It imports, downloads, and generates
 
 The GLB file holds:
 
-- one mesh object for each part, at the origin, in meters. Each face has one color (the color
-  attribute `Col`) and one material, whose name is the kind of the face: `matte`, `glow`,
-  `water`, or `foliage`;
+- one mesh object for each part, at the origin, in meters. Each vertex has a color (the color
+  attribute `Col`) from smooth functions of its place and its normal, and each face has one
+  material, whose name is the kind of the face: `matte`, `glow`, `water`, or `foliage`. The
+  faces of the organic parts shade smooth, and the faces of the lanterns stay flat;
 - one empty for each placed copy of a part, with the part name in the custom property `part`;
 - one empty for each end of a rope of the light string, as a child of the empty of its tree, with
   the custom properties `rope` (the rope index), `end` (0 or 1), `slack` (the extra length of the
@@ -131,6 +132,15 @@ def app_point(v):
     return Vector((v[0], v[2], -v[1]))
 
 
+def polygon_area(points, face):
+    """Gives the area of a planar polygon of points."""
+    n = Vector((0.0, 0.0, 0.0))
+    a = Vector(points[face[0]])
+    for i in range(1, len(face) - 1):
+        n += (Vector(points[face[i]]) - a).cross(Vector(points[face[i + 1]]) - a)
+    return n.length / 2
+
+
 def face_normal(points, face):
     """Gives the unit normal of a face by the method of Newell, and its center."""
     n = Vector((0.0, 0.0, 0.0))
@@ -144,21 +154,28 @@ def face_normal(points, face):
 
 
 class Part:
-    """A mesh of one part in the axes of the app, with one color and one kind on each face."""
+    """A mesh of one part in the axes of the app, with a color on each vertex and a kind on each
+    face."""
 
     def __init__(self, name):
         self.name = name
         self.rng = random.Random(f'{SEED}-{name}')
+        # The colors take their own generator, so that a change of a color keeps the forms.
+        self.tint = random.Random(f'{SEED}-{name}-tint')
         self.bm = bmesh.new()
         self.color = self.bm.loops.layers.float_color.new('Col')
 
-    def add(self, points, faces, paint, outward=None):
-        """Adds faces with the color and the kind of `paint(normal, center)` for each face.
+    def add(self, points, faces, paint, outward=None, smooth=True):
+        """Adds faces with the color and the kind of `paint(normal, point)` at each point.
 
-        `outward(center)` gives a point inside the solid. A face whose normal points to that point
-        turns over. With `'up'`, each face turns to +y.
+        `paint` gets the smooth normal of each point: the sum of the normals of its faces in this
+        call, each weighted by the area of its face. The kind of a face is the kind of its first
+        point. `outward(center)` gives a point inside the solid. A face whose normal points to
+        that point turns over. With `'up'`, each face turns to +y. With `smooth`, the faces shade
+        smooth across their shared points.
         """
-        verts = [self.bm.verts.new(blender_point(p)) for p in points]
+        oriented = []
+        sums = [Vector((0.0, 0.0, 0.0)) for _ in points]
         for face in faces:
             normal, center = face_normal(points, face)
             if outward == 'up':
@@ -170,11 +187,21 @@ class Part:
             if flip:
                 face = tuple(reversed(face))
                 normal = -normal
-            color, kind = paint(normal, center)
+            area = polygon_area(points, face)
+            for i in face:
+                sums[i] += normal * area
+            oriented.append(face)
+        paints = []
+        for p, n in zip(points, sums):
+            normal = n.normalized() if n.length > 1e-12 else Vector((0.0, 1.0, 0.0))
+            paints.append(paint(normal, Vector(p)))
+        verts = [self.bm.verts.new(blender_point(p)) for p in points]
+        for face in oriented:
             f = self.bm.faces.new([verts[i] for i in face])
-            f.material_index = KINDS.index(kind)
-            for loop in f.loops:
-                loop[self.color] = (*color, 1.0)
+            f.material_index = KINDS.index(paints[face[0]][1])
+            f.smooth = smooth
+            for i, loop in zip(face, f.loops):
+                loop[self.color] = (*paints[i][0], 1.0)
 
     def finish(self, collection):
         """Turns the part into a triangulated mesh object in the collection."""
@@ -390,41 +417,105 @@ def frame_of(direction):
     return x, d.cross(x).normalized()
 
 
-def leaf_paint(rng, light=0.0):
-    """Gives a paint of leaves: lighter faces turn up, darker faces turn down."""
+def smoothstep(edge0, edge1, x):
+    """Gives 0 below the first edge, 1 above the second edge, and a smooth step between."""
+    t = min(1.0, max(0.0, (x - edge0) / (edge1 - edge0)))
+    return t * t * (3 - 2 * t)
 
-    def paint(normal, center):
-        t = 0.5 + 0.5 * normal.y + light + rng.uniform(-0.3, 0.3)
-        name = (
-            'leaf-light'
-            if t > 0.85
-            else 'leaf'
-            if t > 0.5
-            else 'leaf-dark'
-            if t > 0.2
-            else 'leaf-deep'
-        )
-        return linear(name), 'foliage'
+
+def mix(a, b, t):
+    """Mixes two linear colors: `a` at 0 and `b` at 1."""
+    t = min(1.0, max(0.0, t))
+    return tuple(x + (y - x) * t for x, y in zip(a, b))
+
+
+def weighted_color(choices, t, soft=0.08):
+    """Gives the color of a list of (name, weight) pairs at a share `t` from 0 to 1.
+
+    Each color takes a part of the range from 0 to 1 by its weight, and two neighbor colors blend
+    across `soft` on each side of their edge. A share that is even from 0 to 1 thus gives each
+    color about its weight.
+    """
+    total = sum(w for _, w in choices)
+    color = linear(choices[0][0])
+    edge = 0.0
+    for (_, w), (name, _) in zip(choices, choices[1:]):
+        edge += w / total
+        color = mix(color, linear(name), smoothstep(edge - soft, edge + soft, t))
+    return color
+
+
+class Waves:
+    """A smooth field of one seed: a sum of a few waves in random directions.
+
+    `share(p)` turns the field into a share from 0 to 1 that is about even over a large region,
+    so that `weighted_color()` gives each color about its weight.
+    """
+
+    def __init__(self, rng, size, count=3, stretch=(1.0, 1.0, 1.0)):
+        self.waves = []
+        variance = 0.0
+        for i in range(count):
+            d = Vector(
+                (
+                    rng.gauss(0, 1) * stretch[0],
+                    rng.gauss(0, 1) * stretch[1],
+                    rng.gauss(0, 1) * stretch[2],
+                )
+            ).normalized()
+            k = 2 * math.pi / (size * rng.uniform(0.75, 1.25)) * 1.7**i
+            amp = 0.6**i
+            self.waves.append((d * k, rng.uniform(0, 2 * math.pi), amp))
+            variance += amp * amp / 2
+        self.sigma = math.sqrt(variance)
+
+    def __call__(self, p):
+        """Gives the field at a point: about -1 to 1, with a mean of 0."""
+        return sum(a * math.sin(d.dot(p) + phase) for d, phase, a in self.waves) / (self.sigma * 2)
+
+    def share(self, p):
+        """Gives the field at a point as a share from 0 to 1."""
+        return 0.5 + 0.5 * math.erf(self(p) * 2 / math.sqrt(2))
+
+
+def leaf_paint(rng, light=0.0):
+    """Gives a paint of leaves: lighter where the leaves turn up, darker where they turn down,
+    with a soft change across the part."""
+    waves = Waves(rng, 1.6)
+    choices = [('leaf-deep', 0.2), ('leaf-dark', 0.3), ('leaf', 0.35), ('leaf-light', 0.15)]
+
+    def paint(normal, point):
+        t = 0.5 + 0.5 * normal.y + light + 0.3 * (2 * waves.share(point) - 1)
+        return weighted_color(choices, t), 'foliage'
 
     return paint
 
 
 def bark_paint(rng, moss_below=0.0):
-    """Gives a paint of bark, with moss on some faces below a height."""
+    """Gives a paint of bark, with soft patches of moss below a height."""
+    waves = Waves(rng, 1.2)
+    moss = Waves(rng, 0.8)
 
-    def paint(normal, center):
-        if center.y < moss_below and rng.random() < 0.35:
-            return linear('bark-moss'), 'matte'
-        return linear(pick(rng, [('bark', 3), ('bark-dark', 2), ('bark-light', 1)])), 'matte'
+    def paint(normal, point):
+        color = weighted_color(
+            [('bark', 3), ('bark-dark', 2), ('bark-light', 1)], waves.share(point)
+        )
+        if point.y < moss_below:
+            fade = smoothstep(moss_below, moss_below - 0.4, point.y)
+            color = mix(
+                color, linear('bark-moss'), fade * smoothstep(0.55, 0.75, moss.share(point))
+            )
+        return color, 'matte'
 
     return paint
 
 
-def solid_paint(names, kind='matte', rng=None):
-    """Gives a paint that picks one color of a list of (name, weight) pairs for each face."""
+def solid_paint(names, kind='matte', rng=None, size=1.0):
+    """Gives a paint that blends the colors of a list of (name, weight) pairs in a soft field."""
+    waves = Waves(rng, size)
 
-    def paint(normal, center):
-        return linear(pick(rng, names)), kind
+    def paint(normal, point):
+        return weighted_color(names, waves.share(point)), kind
 
     return paint
 
@@ -452,7 +543,7 @@ def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
     def inside(center):
         return min(centers, key=lambda c: (c - center).length)
 
-    part.add(points, faces, bark_paint(rng), inside)
+    part.add(points, faces, bark_paint(part.tint), inside)
 
 
 def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
@@ -476,7 +567,7 @@ def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
                 r * rng.uniform(0.9, 1.15),
             )
             points, faces = blob(rng, c, radii, detail, 0.14)
-            part.add(points, faces, leaf_paint(rng, light), lambda _, c=c: c)
+            part.add(points, faces, leaf_paint(part.tint, light), lambda _, c=c: c)
             continue
         a = rng.uniform(0, 2 * math.pi)
         side = Vector((math.cos(a), 0.0, math.sin(a)))
@@ -491,7 +582,7 @@ def crown(part, centers, count, size, flat=0.75, light=0.0, detail='ico'):
                 r * sz * rng.uniform(0.85, 1.15),
             )
             points, faces = blob(rng, center, radii, 'low', 0.22)
-            part.add(points, faces, leaf_paint(rng, shade), lambda _, c=center: c)
+            part.add(points, faces, leaf_paint(part.tint, shade), lambda _, c=center: c)
 
 
 def trunk(part, spec):
@@ -533,7 +624,7 @@ def trunk(part, spec):
     def inside(center):
         return min(centers, key=lambda c: abs(c.y - center.y))
 
-    part.add(points, faces, bark_paint(rng, 1.4), inside)
+    part.add(points, faces, bark_paint(part.tint, 1.4), inside)
     return centers
 
 
@@ -591,7 +682,7 @@ def build_far_tree(name, spec):
     part.add(
         points,
         rings_faces(3, 6, cap_top=True),
-        bark_paint(rng),
+        bark_paint(part.tint),
         lambda center: min(centers, key=lambda c: abs(c.y - center.y)),
     )
     top = Vector((0.0, height + spec['crown'] * 0.4, 0.0))
@@ -603,11 +694,15 @@ def build_conifer(name, spec):
     """Builds a conifer of the back rows: a trunk and stacked faceted cones."""
     part = Part(name)
     rng = part.rng
+    waves = Waves(part.tint, 1.5)
     points = ring((0, -0.2, 0), spec['radius'], 5) + ring(
         (0, spec['height'] * 0.5, 0), spec['radius'] * 0.6, 5
     )
     part.add(
-        points, rings_faces(2, 5, cap_top=True), bark_paint(rng), lambda c: Vector((0.0, c.y, 0.0))
+        points,
+        rings_faces(2, 5, cap_top=True),
+        bark_paint(part.tint),
+        lambda c: Vector((0.0, c.y, 0.0)),
     )
     tiers = spec['tiers']
     for i in range(tiers):
@@ -622,11 +717,9 @@ def build_conifer(name, spec):
         faces = [(k, (k + 1) % 7, 7) for k in range(7)] + [tuple(range(7))]
         c = Vector((0.0, y0 + h * 0.3, 0.0))
 
-        def paint(normal, center, rng=rng):
-            name = 'leaf-dark' if normal.y > -0.2 else 'leaf-deep'
-            if rng.random() < 0.3:
-                name = 'leaf'
-            return linear(name), 'foliage'
+        def paint(normal, point, waves=waves):
+            color = mix(linear('leaf-deep'), linear('leaf-dark'), smoothstep(-0.4, 0.0, normal.y))
+            return mix(color, linear('leaf'), smoothstep(0.62, 0.78, waves.share(point))), 'foliage'
 
         part.add(pts, faces, paint, lambda _, c=c: c)
     return part
@@ -660,7 +753,7 @@ def build_bush(name, spec):
         )
         radii = (r * rng.uniform(0.85, 1.2), r * rng.uniform(0.7, 0.95), r * rng.uniform(0.85, 1.2))
         points, faces = blob(rng, c, radii, 'ico' if spec.get('fine') else 'low', 0.24)
-        part.add(points, faces, leaf_paint(rng, -0.2), lambda _, c=c: c)
+        part.add(points, faces, leaf_paint(part.tint, -0.2), lambda _, c=c: c)
     return part
 
 
@@ -754,7 +847,7 @@ def build_moss(name, spec):
     part.add(
         points,
         faces,
-        solid_paint([('moss', 3), ('leaf-dark', 2), ('leaf-deep', 1)], 'foliage', rng),
+        solid_paint([('moss', 3), ('leaf-dark', 2), ('leaf-deep', 1)], 'foliage', part.tint, 0.6),
         'up',
     )
     return part
@@ -777,16 +870,25 @@ def build_rock(name, spec):
     centroid = sum(points, Vector()) / len(points)
 
     lit, mid, shade = spec.get('tones', ('rock-light', 'rock', None))
+    tone = Waves(part.tint, 0.7)
+    patches = Waves(part.tint, 0.5)
+    warm = Waves(part.tint, 0.9)
 
-    def paint(normal, center):
-        if normal.y > 0.75 and rng.random() < spec.get('moss', 0.0):
-            return linear('moss'), 'matte'
-        light = normal.y + rng.uniform(-0.35, 0.35)
-        if light > 0.6:
-            return linear(lit), 'matte'
-        if light > 0.0:
-            return linear(mid), 'matte'
-        return linear(shade or pick(rng, [('rock-dark', 2), ('rock-warm', 1)])), 'matte'
+    def paint(normal, point):
+        dark = (
+            linear(shade)
+            if shade
+            else mix(
+                linear('rock-dark'), linear('rock-warm'), smoothstep(0.6, 0.75, warm.share(point))
+            )
+        )
+        light = normal.y + 0.35 * (2 * tone.share(point) - 1)
+        color = mix(dark, linear(mid), smoothstep(-0.08, 0.08, light))
+        color = mix(color, linear(lit), smoothstep(0.52, 0.68, light))
+        moss = smoothstep(0.65, 0.85, normal.y) * smoothstep(
+            1 - spec.get('moss', 0.0) - 0.08, 1 - spec.get('moss', 0.0) + 0.08, patches.share(point)
+        )
+        return mix(color, linear('moss'), moss), 'matte'
 
     part.add(points, faces, paint, lambda _: centroid)
     return part
@@ -805,13 +907,15 @@ def wood_end(part, center, radius, sides, axis, start, rings_count=3):
             (base + k, base + sides + k, base + sides + (k + 1) % sides, base + (k + 1) % sides)
             for k in range(sides)
         ]
-    bands = ['wood-cut'] + [
-        ('wood-ring' if i % 2 == 0 else 'wood-cut') for i in range(rings_count - 1)
-    ]
-    colors = [bands[0]] * sides + [bands[1 + i // sides] for i in range((rings_count - 1) * sides)]
-    order = iter(colors)
     out = Vector(axis).normalized()
-    part.add(points, faces, lambda n, c: (linear(next(order)), 'matte'), lambda c: c - out)
+
+    def paint(normal, point):
+        # Rings of light and dark wood alternate from the center to the bark.
+        share = (point - Vector(center)).length / radius
+        ring_shade = 0.5 - 0.5 * math.cos(math.pi * share * rings_count)
+        return mix(linear('wood-cut'), linear('wood-ring'), ring_shade), 'matte'
+
+    part.add(points, faces, paint, lambda c: c - out)
 
 
 def build_log(name, spec):
@@ -869,7 +973,7 @@ def build_stump(name, spec):
     part.add(
         points,
         rings_faces(5, sides),
-        bark_paint(rng, 0.25),
+        bark_paint(part.tint, 0.25),
         lambda c: min(centers, key=lambda k: abs(k.y - c.y)),
     )
     top = points[-sides:]
@@ -897,7 +1001,7 @@ def box(part, lo, hi, color, kind='matte'):
     ]
     faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
     c = (Vector(lo) + Vector(hi)) / 2
-    part.add(points, faces, lambda n, cc: (linear(color), kind), lambda _: c)
+    part.add(points, faces, lambda n, cc: (linear(color), kind), lambda _: c, smooth=False)
 
 
 def pyramid(part, base_y, half, height, color):
@@ -909,7 +1013,7 @@ def pyramid(part, base_y, half, height, color):
     points.append(Vector((0.0, base_y + height, 0.0)))
     faces = [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4), (0, 1, 2, 3)]
     c = Vector((0.0, base_y + height * 0.3, 0.0))
-    part.add(points, faces, lambda n, cc: (linear(color), 'matte'), lambda _: c)
+    part.add(points, faces, lambda n, cc: (linear(color), 'matte'), lambda _: c, smooth=False)
 
 
 def torus(part, center, radius, tube, segments, sides, color):
@@ -969,7 +1073,7 @@ def lantern_body(part, bottom, spec):
     glass += [p + Vector((0.0, h, 0.0)) for p in glass]
     faces = [(0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
     c = Vector((0.0, y + h / 2, 0.0))
-    part.add(glass, faces, lambda n, cc: (linear('glass'), 'glow'), lambda _: c)
+    part.add(glass, faces, lambda n, cc: (linear('glass'), 'glow'), lambda _: c, smooth=False)
     y += h
     box(part, (-w - 0.012, y, -w - 0.012), (w + 0.012, y + 0.025, w + 0.012), 'iron')
     y += 0.025
@@ -1086,21 +1190,26 @@ def build_ground():
         )
         for _ in range(60)
     ]
+    tone = Waves(part.tint, 3.0)
+    edge = Waves(part.tint, 1.2)
     points = []
     for v in verts2d:
         r = v.length
         rise = 0.0 if r < 16 else 2.2 * ((r - 16) / (outer - 16)) ** 1.6
         points.append(Vector((v.x, GROUND_Y + rng.uniform(-0.03, 0.03) + rise, v.y)))
 
-    def paint(normal, center):
-        p = Vector((center.x, center.z))
+    def paint(normal, point):
+        p = Vector((point.x, point.z))
+        share = tone.share(point)
+        near = weighted_color([('earth-light', 2), ('earth', 3), ('path', 1)], share)
+        far = weighted_color([('earth', 3), ('earth-dark', 3), ('litter', 2)], share)
+        color = mix(near, far, smoothstep(6.5, 8.5, p.length))
+        wobble = 1 + 0.15 * edge(point)
         for at, radius, name in patches:
-            if (p - at).length < radius * rng.uniform(0.8, 1.1):
-                return linear(name), 'foliage' if name in ('moss', 'grass') else 'matte'
-        r = p.length
-        if r < 7.5:
-            return linear(pick(rng, [('earth-light', 2), ('earth', 3), ('path', 1)])), 'matte'
-        return linear(pick(rng, [('earth', 3), ('earth-dark', 3), ('litter', 2)])), 'matte'
+            d = (p - at).length / (radius * wobble)
+            if d < 1.15:
+                color = mix(color, linear(name), smoothstep(1.15, 0.85, d))
+        return color, 'matte'
 
     part.add(points, [tuple(f) for f in faces], paint, 'up')
     return part
@@ -1135,7 +1244,7 @@ def build_path():
     part.add(
         points,
         [tuple(f) for f in faces],
-        solid_paint([('path', 3), ('path-light', 2), ('earth-light', 1)], 'matte', rng),
+        solid_paint([('path', 3), ('path-light', 2), ('earth-light', 1)], 'matte', part.tint, 1.5),
         'up',
     )
     return part
@@ -1198,8 +1307,12 @@ def build_stream():
     """
     part = Part('stream')
     rng = part.rng
-    wet = solid_paint([('rock-wet', 3), ('rock-wet-dark', 2), ('rock-dark', 1)], 'matte', rng)
-    dry = solid_paint([('rock', 3), ('rock-warm', 2), ('rock-light', 1)], 'matte', rng)
+    wet = solid_paint(
+        [('rock-wet', 3), ('rock-wet-dark', 2), ('rock-dark', 1)], 'matte', part.tint, 0.6
+    )
+    dry = solid_paint([('rock', 3), ('rock-warm', 2), ('rock-light', 1)], 'matte', part.tint, 0.6)
+    patches = Waves(part.tint, 0.4)
+    water = solid_paint([('water', 3), ('water-deep', 2)], 'water', part.tint, 1.2)
 
     def rock(center, size, count=12, moss=0.0):
         """Adds a boulder: wet, dark sides, and a dry top with some moss."""
@@ -1210,12 +1323,16 @@ def build_stream():
         pts, faces = hull(pts)
         c = sum(pts, Vector()) / len(pts)
 
-        def rock_paint(normal, center):
-            if normal.y > 0.55:
-                if rng.random() < moss:
-                    return linear(pick(rng, [('moss', 2), ('leaf-dark', 1)])), 'matte'
-                return dry(normal, center)
-            return wet(normal, center)
+        def rock_paint(normal, point):
+            color = mix(
+                wet(normal, point)[0], dry(normal, point)[0], smoothstep(0.45, 0.65, normal.y)
+            )
+            share = patches.share(point)
+            green = mix(linear('moss'), linear('leaf-dark'), smoothstep(0.4, 0.6, share))
+            cover = smoothstep(0.5, 0.7, normal.y) * smoothstep(
+                1 - moss - 0.08, 1 - moss + 0.08, share
+            )
+            return mix(color, green, cover), 'matte'
 
         part.add(pts, faces, rock_paint, lambda _: c)
 
@@ -1233,6 +1350,7 @@ def build_stream():
 
     def disc(center, radii, sides, names, lift=0.0):
         """Adds a flat fan of water faces that look up."""
+        paint = solid_paint(names, 'water', part.tint, 0.3)
         pts = [Vector(center) + Vector((0.0, lift, 0.0))]
         start = rng.uniform(0, 1)
         for k in range(sides):
@@ -1243,7 +1361,7 @@ def build_stream():
                 + Vector((radii[0] * r * math.cos(a), 0.0, radii[1] * r * math.sin(a)))
             )
         faces = [(0, 1 + (k + 1) % sides, 1 + k) for k in range(sides)]
-        part.add(pts, faces, lambda n, c: (linear(pick(rng, names)), 'water'), 'up')
+        part.add(pts, faces, paint, 'up')
 
     # The rocks: flat boulders behind the top of the fall and at each side of each step, and the
     # dark faces behind the strands, so that the rock shows between them.
@@ -1291,9 +1409,9 @@ def build_stream():
                 pts += [sheet_point(x0, sv), sheet_point(x1, sv)]
             faces = [(2 * r, 2 * r + 1, 2 * r + 3, 2 * r + 2) for r in range(len(rows_at) - 1)]
 
-            def sheet_paint(normal, center, tone=tone, top=top, drop=drop):
-                share = (top - center.y) / drop
-                return linear('foam' if share > 0.8 else tone), 'water'
+            def sheet_paint(normal, point, tone=tone, top=top, drop=drop):
+                share = (top - point.y) / drop
+                return mix(linear(tone), linear('foam'), smoothstep(0.7, 0.9, share)), 'water'
 
             part.add(pts, faces, sheet_paint, lambda c, z=z: Vector((c.x, c.y, z - 1.0)))
         for _ in range(6):
@@ -1343,7 +1461,7 @@ def build_stream():
     part.add(
         pts,
         [tuple(f) for f in faces],
-        lambda n, c: (linear(pick(rng, [('water', 3), ('water-deep', 2)])), 'water'),
+        water,
         'up',
     )
     # The glints: many tiny gold triangles just above the water, more of them near the fall.
@@ -2196,7 +2314,7 @@ def export(path, objects, empties):
         export_extras=True,
         export_yup=True,
         export_apply=False,
-        export_normals=False,
+        export_normals=True,
         export_texcoords=False,
         export_vertex_color='NAME',
         export_vertex_color_name='Col',
