@@ -1,10 +1,12 @@
 import { CONDUCTOR } from '../models/cast.ts';
 import type { PlayingSection } from '../models/cast.ts';
+import { playerFootprint } from '../models/footprint.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import type { ConductorPlace, PlayerPlace, SceneLayout } from '../models/layout.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { boneIndex } from '../models/rig.ts';
 import { conductorBeatPoint } from '../pose/conductor.ts';
 import { headOf } from '../pose/plan.ts';
 import type { Score } from '../score/types.ts';
@@ -114,6 +116,12 @@ export const SUBJECT_SIZES = {
   sideRadius: 0.27,
   /** The front of the left side view, in radians: 50° to the left of the audience axis. */
   sideFront: (50 * Math.PI) / 180,
+  /**
+   * The outline of a player holds its footprint up to this distance from its place, in meters:
+   * the body, a held instrument, and the near part of a piano, a harp, or the kettles. The
+   * kettles of the timpani reach 1.5 m to the side.
+   */
+  outlineReach: 0.9,
 } as const;
 
 /** One player of a seat: its place, the point of its head, its front, and its sight points. */
@@ -136,6 +144,14 @@ interface SubjectPlayer {
    * instrument (design 5.6).
    */
   readonly sights: SightPoints;
+  /**
+   * The corners of the outline of the player in the stage plane: its body, its instrument, and
+   * its seat, up to {@link SUBJECT_SIZES}.outlineReach from its place (design 5.6). The frame of a
+   * close shot holds their spread across the view.
+   */
+  readonly outline: readonly Vec3[];
+  /** The height of the top of the head of the player with its ears, in meters. */
+  readonly top: number;
 }
 
 /** The players of one seat. */
@@ -154,6 +170,10 @@ interface ConductorSubjects {
   readonly sights: SightPoints;
   /** The middle of the body of the bear, 0.8 m above the podium top. */
   readonly body: Vec3;
+  /** The corners of the outline of the bear and its two hands in the stage plane. */
+  readonly outline: readonly Vec3[];
+  /** The height of the top of the head of the bear with its ears, in meters. */
+  readonly top: number;
 }
 
 /** The places of the subjects of a layout. */
@@ -222,6 +242,24 @@ export interface Subject {
    * another player under them on the screen does not cover a singer (design 5.6).
    */
   readonly floor: readonly Vec3[];
+  /**
+   * The points in the stage plane whose spread across the view sets the width of the frame
+   * (design 5.6): the outline of the subject players, or the middle of the sphere of a side view
+   * or of the view over the shoulder.
+   */
+  readonly outline: readonly Vec3[];
+  /**
+   * The radius of a circle around each point of the outline, in meters: 0 for the outline of the
+   * players, or the sphere of a side view or of the view over the shoulder.
+   */
+  readonly reach: number;
+  /** The height of the highest top of the subject players, which the frame holds, in meters. */
+  readonly top: number;
+  /**
+   * The height of the lowest point that the frame holds, in meters: the hands and the instrument
+   * of the subject players, the target, or the middle of the body of the conductor.
+   */
+  readonly bottom: number;
 }
 
 /** The radius of the sphere around a head, in head heights `H`. It holds the snout. */
@@ -272,6 +310,125 @@ function onStage(point: Vec3, place: Pick<PlayerPlace, 'position' | 'facing'>): 
     place.position[1] + point[1],
     place.position[2] - point[0] * sin + point[2] * cos,
   ];
+}
+
+/**
+ * Gives the z component of the cross product of two edges in the stage plane: from `o` to `a`
+ * and from `o` to `b`.
+ *
+ * @param o The common start.
+ * @param a The end of the first edge.
+ * @param b The end of the second edge.
+ * @returns More than 0 for a turn from +x to +z.
+ */
+function turnOf(o: Vec3, a: Vec3, b: Vec3): number {
+  return (a[0] - o[0]) * (b[2] - o[2]) - (a[2] - o[2]) * (b[0] - o[0]);
+}
+
+/**
+ * Gives the convex hull of points in the stage plane (the monotone chain). The spread of the
+ * points across a view is the spread of their hull, which has fewer points.
+ *
+ * @param points The points. Their y does not count.
+ * @returns The corners of the hull, with the y 0.
+ */
+function hullOf(points: readonly Vec3[]): Vec3[] {
+  const sorted = points
+    .map((p): Vec3 => [p[0], 0, p[2]])
+    .toSorted((a, b) => a[0] - b[0] || a[2] - b[2]);
+  if (sorted.length < 3) {
+    return sorted;
+  }
+
+  const chain = (list: readonly Vec3[]): Vec3[] => {
+    const out: Vec3[] = [];
+    for (const p of list) {
+      while (
+        out.length >= 2 &&
+        turnOf(out[out.length - 2] ?? p, out[out.length - 1] ?? p, p) <= 0
+      ) {
+        out.pop();
+      }
+      out.push(p);
+    }
+    return out.slice(0, -1);
+  };
+  return [...chain(sorted), ...chain(sorted.toReversed())];
+}
+
+/** The bones of the head with the ears, whose top the frame of a close shot holds. */
+const HEAD_BONES: ReadonlySet<number> = new Set(
+  (['head', 'jaw', 'earL', 'earR'] as const).map((name) => boneIndex(name)),
+);
+
+/** The height of the top of the head of each model, in the model axes. */
+const headTops = new WeakMap<PlayerModel, number>();
+
+/**
+ * Gives the height of the top of the head of a model with its ears, in the model axes: the
+ * highest corner of the mesh on a bone of the head. An instrument, such as the lid of the piano,
+ * does not count.
+ *
+ * @param model The model.
+ * @returns The height, in meters.
+ */
+function headTopOf(model: PlayerModel): number {
+  const known = headTops.get(model);
+  if (known !== undefined) {
+    return known;
+  }
+
+  const { positions, bones } = model.mesh;
+  let top = model.body.headCenter[1];
+  for (let corner = 0; corner < bones.length; corner++) {
+    if (HEAD_BONES.has(bones[corner] ?? -1)) {
+      top = Math.max(top, positions[corner * 3 + 1] ?? top);
+    }
+  }
+  headTops.set(model, top);
+  return top;
+}
+
+/** The outline of a model in the stage plane, and the height of its top. */
+interface PlayerOutline {
+  /** The corners of the outline. */
+  readonly outline: Vec3[];
+  /** The height of the top of the head with the ears, in meters. */
+  readonly top: number;
+}
+
+/**
+ * Gives the outline of a model at its place (design 5.6): the hull of the corners of its
+ * footprint boxes and of some other points, each moved toward the place to at most
+ * {@link SUBJECT_SIZES}.outlineReach from it.
+ *
+ * @param model The model.
+ * @param place The place of the model.
+ * @param others Other points on the stage, such as the hands of the conductor.
+ * @returns The corners of the outline, and the height of the top of the head.
+ */
+function outlineOf(
+  model: PlayerModel,
+  place: Pick<PlayerPlace, 'position' | 'facing'>,
+  others: readonly Vec3[] = [],
+): PlayerOutline {
+  const footprint = playerFootprint(model);
+  const points: Vec3[] = [...others];
+  for (const box of footprint.boxes) {
+    for (const x of [box.min[0], box.max[0]]) {
+      for (const z of [box.min[2], box.max[2]]) {
+        points.push(onStage([x, 0, z], place));
+      }
+    }
+  }
+  const [px, , pz] = place.position;
+  const reach = SUBJECT_SIZES.outlineReach;
+  const near = points.map((p): Vec3 => {
+    const flat = Math.hypot(p[0] - px, p[2] - pz);
+    const scale = flat > reach ? reach / flat : 1;
+    return [px + (p[0] - px) * scale, 0, pz + (p[2] - pz) * scale];
+  });
+  return { outline: hullOf(near), top: place.position[1] + headTopOf(model) };
 }
 
 /**
@@ -352,6 +509,7 @@ export function prepareSubjects(
         const sights = modelSights(model);
         const center = onStage(sights.head, place);
         heads.push({ owner: index, center, radius: HEAD_RADIUS_IN_H * model.body.headHeight });
+        const { outline, top } = outlineOf(model, place);
 
         return {
           player: place.cast.player,
@@ -364,6 +522,8 @@ export function prepareSubjects(
             head: center,
             parts: sights.parts.map((p) => onStage(p, place)),
           },
+          outline,
+          top,
         };
       }),
     };
@@ -386,6 +546,7 @@ export function prepareSubjects(
         place.position[1] + SUBJECT_SIZES.conductorBodyHeight,
         place.position[2],
       ],
+      ...outlineOf(bear, place, sights.parts),
     };
   }
   return {
@@ -503,6 +664,29 @@ function headsOf(players: readonly SubjectPlayer[]): Vec3 {
 }
 
 /**
+ * Gives the extent of players that the frame of a close shot holds (design 5.6): the hull of
+ * their outlines, the highest top, and the lowest of their hands, their instruments, and a target.
+ *
+ * @param players The players. There is at least one.
+ * @param target The target of the shot.
+ * @returns The outline, the top, and the bottom of the subject.
+ */
+function extentOf(
+  players: readonly SubjectPlayer[],
+  target: Vec3,
+): Pick<Subject, 'outline' | 'reach' | 'top' | 'bottom'> {
+  let top = -Infinity;
+  let bottom = target[1];
+  for (const p of players) {
+    top = Math.max(top, p.top);
+    for (const part of p.sights.parts) {
+      bottom = Math.min(bottom, part[1]);
+    }
+  }
+  return { outline: hullOf(players.flatMap((p) => p.outline)), reach: 0, top, bottom };
+}
+
+/**
  * Gives the subject of a solo shot (design 5.6): the principal player of a seat, 0.9 m above the
  * stage, with a sphere of 0.95 m, or more to hold its head.
  *
@@ -537,8 +721,8 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
     members: [principal.sights.owner],
     focus: principal.sights.head,
     outside: seatIndex === subjects.soloist ? (subjects.conductor?.body ?? null) : null,
-
     floor: [],
+    ...extentOf([principal], target),
   };
 }
 
@@ -620,6 +804,7 @@ export function sectionSubject(
     focus: sphere.target,
     outside: null,
     floor: choir ? players.map((p) => p.chest) : [],
+    ...extentOf(players, sphere.target),
   };
 }
 
@@ -651,6 +836,10 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     focus: head,
     outside: null,
     floor: [],
+    outline: conductor.outline,
+    reach: 0,
+    top: conductor.top,
+    bottom: conductor.body[1],
   };
 }
 
@@ -701,6 +890,10 @@ export function conductorBackSubject(
     focus: target,
     outside: null,
     floor: [],
+    outline: [target],
+    reach: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
+    top: target[1],
+    bottom: target[1],
   };
 }
 
@@ -787,6 +980,9 @@ export function sideSubject(
     focus: target,
     outside: null,
     floor: [],
+    ...extentOf(players, target),
+    outline: [target],
+    reach: sizes.sideRadius * S,
   };
 }
 
