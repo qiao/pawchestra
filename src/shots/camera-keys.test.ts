@@ -1,28 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  angleDifference,
-  fitDistance,
-  keyDistance,
-  viewAngle,
-  writeKeyPosition,
-} from './camera-keys.ts';
+import { angleDifference, keyDistance, viewAngle, writeKeyPosition } from './camera-keys.ts';
 import { DEFAULT_TARGET, defaultDistance, defaultView } from './view.ts';
 
 const DEG = Math.PI / 180;
-
-describe('fitDistance (design 5.6)', () => {
-  it('fits a sphere by the vertical field of view when the view is as wide as it is tall', () => {
-    expect(fitDistance(0.95, 1.6, 26)).toBeCloseTo((0.95 / Math.sin(13 * DEG)) * 1.05, 9);
-    expect(fitDistance(0.95, 1, 26)).toBeCloseTo(fitDistance(0.95, 2.4, 26), 9);
-  });
-
-  it('fits a sphere by the width on a phone in portrait: about 2.1 times farther', () => {
-    const ratio = fitDistance(1, 0.46, 30) / fitDistance(1, 1.6, 30);
-    expect(ratio).toBeGreaterThan(2);
-    expect(ratio).toBeLessThan(2.2);
-  });
-});
 
 describe('keyDistance', () => {
   it('uses the default distance for a frame of 0, times the zoom', () => {

@@ -58,6 +58,16 @@ source.
   top [6].
 - A subject that looks to one side has more space on that side, so it stands on the third line on
   the other side (derived from [5, 6]).
+- A shot takes its name from the lowest part of the body at the bottom of the frame: a full
+  figure, knee, thigh, waist, bust, head, or tight head shot [1, p. 13-15].
+- A shot also takes its name from the number of people in it: a one-shot, a two-shot, a
+  three-shot, a group-shot of five or six people, and a crowd-shot of 20 or more [1, p. 13-15].
+- The closer the subject, the less headroom it needs. In an extreme close-up, the top of the head
+  is out of the frame [6].
+- A 21:9 frame is 2.33 times as wide as it is high. A waist shot of a seated player puts its eyes
+  one third down from the top and its waist at the bottom. A seated player with its instrument is
+  about as wide as it is high from the waist up, so it fills about 0.4 of the frame width
+  (derived from [1, 6]).
 
 ## 4. Moves across a cut
 
@@ -118,6 +128,11 @@ The app follows these facts:
 - **Look room and headroom (section 3).** A close shot turns its camera, so that the eyes of the
   subject stand on the upper third line, and the subject on the third line away from its look. A
   subject with a neutral look stands in the middle.
+- **Shot sizes (section 3).** A close shot fits the width of its subject in the 21:9 frame
+  (`SHOT_SIZES`). A solo is a waist one-shot of one player, a section shot a group-shot or a
+  two-shot, a side view a group-shot of the front half of one side, and a conductor shot a waist
+  shot of the bear from behind. The frame also holds the head with the ears, so a waist shot of
+  a player with long ears, such as a rabbit, is wider.
 
 The app does not follow these facts:
 
@@ -143,8 +158,9 @@ All sources opened on 2026-10-31.
    ed., 2005, pages 5 to 7. https://en.wikipedia.org/wiki/180-degree_rule
 5. Wikipedia, "Lead room". https://en.wikipedia.org/wiki/Lead_room
 6. Wikipedia, "Headroom (photographic framing)", which cites I. Barbash and L. Taylor,
-   "Cross-cultural Filmmaking", University of California Press, 1997, p. 97.
-   https://en.wikipedia.org/wiki/Headroom_(photographic_framing)
+   "Cross-cultural Filmmaking", University of California Press, 1997, p. 97, G. Millerson,
+   "Video Camera Techniques", Focal Press, 1994, p. 80, and R. Thompson, "Grammar of the Shot",
+   Focal Press, 1998, p. 64. https://en.wikipedia.org/wiki/Headroom_(photographic_framing)
 7. R. Thompson and C. J. Bowen, "Grammar of the Edit", 3rd ed., Focal Press, 2013, and 4th ed.,
    Routledge, 2018: the heading "Avoid cutting pans and tilts that reverse direction at the cut
    point" of the table of contents (PIP #11 of the 3rd edition, item 31 of the 4th edition).

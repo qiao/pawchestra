@@ -4,24 +4,6 @@ import type { Vec3 } from '../models/tuples.ts';
 import type { ShotKey } from './types.ts';
 import { defaultDistance } from './view.ts';
 
-/** The fit distance keeps 5% of space around the subject sphere (design 5.6). */
-const FIT_MARGIN = 1.05;
-
-/**
- * Calculates the distance at which a sphere fills the view (design 5.6): `radius / sin(min(v, h))
- * × 1.05`, where `v` is half the vertical field of view and `h` is half the horizontal one.
- *
- * @param radius The radius of the sphere, in meters.
- * @param aspect The width of the view divided by its height.
- * @param fov The vertical field of view, in degrees.
- * @returns The distance from the camera to the center of the sphere.
- */
-export function fitDistance(radius: number, aspect: number, fov: number): number {
-  const v = (fov / 2) * MathUtils.DEG2RAD;
-  const h = Math.atan(Math.tan(v) * aspect);
-  return (radius / Math.sin(Math.min(v, h))) * FIT_MARGIN;
-}
-
 /**
  * Calculates the distance of a camera key from its target (design 5.6). A close shot stands at
  * the distance at which its field of view shows half its frame height at the target. Thus the

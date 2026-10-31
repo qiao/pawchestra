@@ -8,13 +8,7 @@ import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';
 import { FREE_BEAM_FADE } from './beam-opacity.ts';
-import {
-  angleDifference,
-  fitDistance,
-  keyDistance,
-  viewAngle,
-  writeKeyPosition,
-} from './camera-keys.ts';
+import { angleDifference, keyDistance, viewAngle, writeKeyPosition } from './camera-keys.ts';
 import {
   CLEARANCE,
   bodyBoxes,
@@ -37,6 +31,8 @@ import {
   writeLookPoint,
 } from './grammar.ts';
 import type { Motion } from './grammar.ts';
+import { SHOT_SIZES, frameHalfHeight } from './shot-size.ts';
+import type { ShotSize } from './shot-size.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import {
@@ -860,6 +856,8 @@ interface CloseMove {
   readonly avoid: number | null;
   /** The camera stays within this angle of the front of the subject, in radians. */
   readonly maxFromFront: number;
+  /** The shot size, which sets the frame of each camera. */
+  readonly size: ShotSize;
 }
 
 /** The body boxes and the sight lines of a subject. */
@@ -1096,7 +1094,7 @@ function searchClose(
   name: string,
 ): Framing | null {
   const { held, sights } = subjectLines(planner, subject);
-  const moveKey = `${subjectKey(subject)} ${subject.radius} ${move.pushIn} ${move.fov}`;
+  const moveKey = `${subjectKey(subject)} ${move.size.share} ${subject.reach} ${move.pushIn} ${move.fov}`;
   const known = planner.moveCache.get(moveKey) ?? new Map<number, boolean>();
   planner.moveCache.set(moveKey, known);
   const previous = planner.planned.at(-1);
@@ -1104,11 +1102,17 @@ function searchClose(
   // The band moves up with the lift of a piano shot. The wanted elevation is low (CAMERA_LOWER).
   const bottom = planner.band[0] + subject.lift;
   const top = planner.band[1] + subject.lift;
-  // The frame that holds the subject sphere, at the aspect of Cinematic mode.
-  const halfHeight =
-    fitDistance(subject.radius, CINEMA_ASPECT, move.fov) * Math.tan((move.fov / 2) * DEG);
+  // The frame of a camera of the move: the subject fills the share of the width of its shot size,
+  // with its look room, and the frame holds its height (design 5.6).
+  const frameAt = (azimuth: number, elevation: number, arc: number): number => {
+    const third = subject.eyes ? thirdOf(subject.facing, azimuth + arc / 2) : 0;
+    const at = (a: number): number =>
+      frameHalfHeight(subject, move.size, a, elevation, third, move.fov);
+    return Math.max(at(azimuth), at(azimuth + arc));
+  };
   const fit: ShotKey = { azimuth: 0, elevation: 0, zoom: 1, fov: move.fov };
-  const distance = keyDistance(planner.stageSide, halfHeight, fit, CINEMA_ASPECT);
+  const nominal = frameAt(move.wantedAzimuth, move.elevation, 0);
+  const distance = keyDistance(planner.stageSide, nominal, fit, CINEMA_ASPECT);
   const wanted = lowered(subject.target, distance, move.elevation);
   const sink = planner.trace;
   const kept = sink ? (sink.kept.get(moveKey) ?? new Map<number, KeptResult>()) : null;
@@ -1169,6 +1173,7 @@ function searchClose(
       const old = kept?.get(key);
       return old ? refuse(azimuth, elevation, arc, old.refusal, true, old.share) : null;
     }
+    const halfHeight = frameAt(azimuth, elevation, arc);
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
     const composition = compositionOf(planner, subject, halfHeight, from, to);
@@ -1440,6 +1445,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         fov: k.fov,
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
+        size: SHOT_SIZES.conductorBack,
         lateral: lateralOf(planner),
       },
       'conductor back',
@@ -1459,6 +1465,7 @@ function conductorFraming(planner: Planner, window: WindowMusic): Framing | null
         fov: k.fov,
         avoid: null,
         maxFromFront: KEY_SEARCH.maxFromFront,
+        size: SHOT_SIZES.conductor,
         lateral: lateralOf(planner),
       },
       'conductor close',
@@ -1521,6 +1528,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.sideFromFront,
+          size: SHOT_SIZES.side,
           lateral: lateralOf(planner),
         },
         candidate.id,
@@ -1551,6 +1559,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
+          size: SHOT_SIZES.section,
           lateral: lateralOf(planner),
         },
         candidate.id,
@@ -1576,6 +1585,7 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
           fov: k.fov,
           avoid: planner.lastAzimuth.get(framingSubject(candidate)) ?? null,
           maxFromFront: KEY_SEARCH.maxFromFront,
+          size: SHOT_SIZES.solo,
           lateral: lateralOf(planner),
         },
         candidate.id,

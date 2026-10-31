@@ -55,23 +55,18 @@ export const SECTION_GROUPS = {
 export const SUBJECT_SIZES = {
   /** The target of a section shot is this high above the players. */
   sectionHeight: 0.8,
-  /** The sphere of a section holds each player plus this margin in the stage plane. */
-  sectionMargin: 0.75,
   /**
-   * The sphere of the two-shot of a small group holds each player plus this margin in the stage
-   * plane. A two-shot frames its players closer than a section shot. With 0.75 m, the violin and
-   * the piano of a duo need a camera 0.45 of the default distance away, beyond the limit of the
-   * close shots (design 5.6). With 0.5 m or 0.48 m, the only clear camera stands just beyond the
-   * limit of 0.44 of the default distance.
+   * The sphere of a section holds each player plus this margin in the stage plane. The sphere
+   * chooses the players of the shot, and the outline of the players sets the frame.
    */
+  sectionMargin: 0.75,
+  /** The sphere of the two-shot of a small group holds each player plus this margin. */
   twoShotMargin: 0.46,
   /** The largest sphere of a section shot. */
   sectionMaxRadius: 2.6,
   /**
    * The sphere of a choir part also holds this margin beyond the section margin: the place of
-   * one more singer on each side (design 4.5). The sopranos of the Ode to Joy demo stand behind
-   * the contrabasses, and with the section margin, their large heads refused each camera below
-   * 50° within 60° of the front of the sopranos.
+   * one more singer on each side (design 4.5).
    */
   partMargin: 0.6,
   /** The target of a solo shot is this high above the principal player. */
@@ -82,10 +77,6 @@ export const SUBJECT_SIZES = {
    * raised arms, and the back.
    */
   conductorDrop: 0.3,
-  /** The sphere of a solo shot. */
-  closeRadius: 0.95,
-  /** The sphere of the close view of the conductor: the head, the back, and the raised arms. */
-  conductorRadius: 1.1,
   /**
    * The target of the view over the shoulder of the conductor (view 02 of `scene.png`) is this
    * many stage sides in front of the head of the bear, toward the players who play, and this
@@ -102,7 +93,7 @@ export const SUBJECT_SIZES = {
   conductorBackTurn: (20 * Math.PI) / 180,
   /** The sphere of the view over the shoulder, in stage sides: the orchestra behind the bear. */
   conductorBackRadius: 0.3,
-  /** The sphere also holds each head point plus this margin. */
+  /** The sphere of a section also holds each head point plus this margin. */
   headMargin: 0.3,
   /** The middle of the body of the bear is this high above the podium top. */
   conductorBodyHeight: 0.8,
@@ -190,12 +181,10 @@ export interface StageSubjects {
   readonly soloist: number | null;
 }
 
-/** The subject of a shot: the target, the sphere, and the front. */
+/** The subject of a shot: the target, the extent that the frame holds, and the front. */
 export interface Subject {
   /** The point that the camera looks at. */
   readonly target: Vec3;
-  /** The radius of the subject sphere, in meters. */
-  readonly radius: number;
   /** The azimuth of the front of the subject. A camera stays within 75° of it. */
   readonly front: number;
   /**
@@ -687,8 +676,8 @@ function extentOf(
 }
 
 /**
- * Gives the subject of a solo shot (design 5.6): the principal player of a seat, 0.9 m above the
- * stage, with a sphere of 0.95 m, or more to hold its head.
+ * Gives the subject of a solo shot (design 5.6): the principal player of a seat, with the target
+ * 0.9 m above the stage. The frame holds the outline of the player, its head, and its hands.
  *
  * @param subjects The subjects.
  * @param seatIndex The seat.
@@ -704,10 +693,6 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
   const piano = subjects.seats[seatIndex]?.group === 'piano';
   return {
     target,
-    radius: Math.max(
-      SUBJECT_SIZES.closeRadius,
-      distance(principal.head, target) + SUBJECT_SIZES.headMargin,
-    ),
     front: piano ? principal.front + KEYBOARD_VIEW.turn : principal.front,
     facing: principal.front,
     center: principal.position,
@@ -789,7 +774,6 @@ export function sectionSubject(
   const members = choir ? playersOf(kept) : players;
   return {
     target: sphere.target,
-    radius: sphere.radius,
     front: piano ? meanFront(players) + KEYBOARD_VIEW.turn : meanFront(players),
     facing: meanFront(players),
     center: middleOf(players),
@@ -810,7 +794,8 @@ export function sectionSubject(
 
 /**
  * Gives the subject of the close view of the conductor from behind (design 5.6, view 05 of
- * `scene.png`): the shoulders of the bear, with a sphere of 1.1 m. The camera stands on the
+ * `scene.png`): the shoulders of the bear. The frame holds the bear and its hands from the middle
+ * of its body to the top of its head. The camera stands on the
  * audience side, so the front of the subject points to +z. The baton and the hands are in front
  * of the bear, so the camera needs a clear line to the head only.
  *
@@ -821,7 +806,6 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
   const { head } = conductor.sights;
   return {
     target: conductor.target,
-    radius: SUBJECT_SIZES.conductorRadius,
     front: 0,
     facing: Math.PI,
     center: head,
@@ -874,7 +858,6 @@ export function conductorBackSubject(
   ];
   return {
     target,
-    radius: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
     front: azimuth - Math.PI,
     facing: Math.PI,
     center: head,
@@ -965,7 +948,6 @@ export function sideSubject(
   }
   return {
     target,
-    radius: sizes.sideRadius * S,
     front: side * sizes.sideFront,
     facing: meanFront(players),
     center: middleOf(players),

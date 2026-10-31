@@ -433,18 +433,36 @@ interface Shot {
 }
 ```
 
-Each camera stands on a sphere around its target at the fit distance of the subject. Cinematic
-mode always shows a frame of `CINEMA_ASPECT` (21:9, design 2.5), so the planner fits and tests
-each shot at that aspect. A wide or a high shot takes `WIDE_FOV`: at 21:9 it shows the horizontal
-angle of the stage view of a desktop, so the stage fills the width of the frame. The wide camera
-cannot come nearer, because the beam fade of Free mode starts there (4.5).
+Each camera stands on a sphere around its target. Cinematic mode always shows a frame of
+`CINEMA_ASPECT` (21:9, design 2.5), so the planner fits and tests each shot at that aspect. A wide
+or a high shot takes `WIDE_FOV`: at 21:9 it shows the horizontal angle of the stage view of a
+desktop, so the stage fills the width of the frame. The wide camera cannot come nearer, because
+the beam fade of Free mode starts there (4.5).
 
-| Kind | Camera |
-|---|---|
-| wide | the default view of 4.5, or a variant (`WIDE_VARIANTS`) |
-| high | high, near the front |
-| conductor | behind the bear: close, or over the shoulder at the players |
-| side, section, solo | low, from the front of one side, one group, or one player |
+| Kind | Camera | Shot size |
+|---|---|---|
+| wide | the default view of 4.5, or a variant (`WIDE_VARIANTS`) | the full stage |
+| high | high, near the front | the full stage |
+| conductor | behind the bear: close, or over the shoulder at the players | a waist shot, or a long shot of the players |
+| side | low, from the front of one side | a group shot of its front half |
+| section | low, from the front of one group | a group shot |
+| solo | low, from the front of one player | a waist shot |
+
+**The frame of a close shot.** A 21:9 frame that fits the height of one player shows about 2.3
+times its width. Thus a close shot fits the width of its subject with the shot size of its kind
+(`SHOT_SIZES`, `shots/shot-size.ts`), from `camera-technique.md`:
+
+- The outline of the subject fills a share of the frame width, seen from each camera, with the
+  perspective of its distance. The outline is the hull of the footprints of the subject players,
+  with their instruments and seats, up to `SUBJECT_SIZES.outlineReach` from each player.
+- A solo, a section, or the conductor stays inside the side edges, with the target on its third
+  line and the look room on the other side. A side view and the view over the shoulder fit a
+  sphere, and the frame cuts its deep part.
+- The frame then grows until it holds the head with the ears and the hands and the instrument,
+  with the eyes on the upper third line (`FRAME_MARGINS`).
+- The shot keeps half the height of its frame (`halfHeight`). The camera stands at the distance
+  at which its field of view shows that frame, so the camera does not depend on the aspect of
+  the view.
 
 - The shots follow the views of `scene.png`. The conductor shows only from behind, as in the
   reference images (1).
