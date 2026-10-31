@@ -432,8 +432,9 @@ interface Shot {
 }
 ```
 
-Each camera stands on a sphere around its target at the fit distance of the subject for the
-current aspect, so a phone in portrait gets a camera farther away.
+Each camera stands on a sphere around its target at the fit distance of the subject. Cinematic
+mode always shows a frame of `CINEMA_ASPECT` (21:9, design 2.5), so the planner fits and tests
+each shot at that aspect.
 
 | Kind | Camera |
 |---|---|
@@ -465,8 +466,8 @@ A score with fewer than `SMALL_GROUP_SEATS` seats gets no conductor shot, becaus
 bear gives weak frames of a solo. Mute and solo do not change the plan.
 
 **Clearance.** The camera never stands inside a player, and the subject does not hide. The
-planner tests each move and sight line against the boxes of `layoutObstacles()`, at the aspects
-1.6 and 0.46, because one plan serves all views. The frame tests (`shots/test-shot-frames.ts`)
+planner tests each move and sight line against the boxes of `layoutObstacles()`, at
+`CINEMA_ASPECT`, because each view shows that frame. The frame tests (`shots/test-shot-frames.ts`)
 copy these numbers of the design:
 
 - The line of sight from 0.3 m outside the target crosses no box, except the boxes within 0.4 m of

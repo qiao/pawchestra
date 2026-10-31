@@ -57,11 +57,6 @@ export const FOREGROUND = {
   objectShare: 0.15,
   /** The cells on each side of the grid of the frame that measures the cover. */
   cells: 20,
-  /**
-   * The aspects of the test: a desktop, and a phone in portrait (390 × 844). The tall frame of a
-   * phone shows more of the area in front of the subject.
-   */
-  aspects: [1.6, 0.46],
 } as const;
 
 /** The axes of a camera, and the half sizes of its frame at a depth of 1 m. */

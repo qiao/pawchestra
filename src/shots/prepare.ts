@@ -20,7 +20,7 @@ import {
   targetLineClear,
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
-import { FOREGROUND, foregroundHead, foregroundObject, inFrame } from './foreground.ts';
+import { foregroundHead, foregroundObject, inFrame } from './foreground.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import {
@@ -49,6 +49,7 @@ import type {
 } from './trace.ts';
 import type { Shot, ShotKey, ShotKind, ShotPlan } from './types.ts';
 import {
+  CINEMA_ASPECT,
   DEFAULT_AZIMUTH,
   DEFAULT_ELEVATION,
   DEFAULT_TARGET,
@@ -258,12 +259,6 @@ const KEY_SEARCH = {
   bandMargin: 1,
 } as const;
 
-/**
- * The aspects that the planner tests: the nearest camera (each view as wide as it is tall, or
- * wider) and the farthest camera (a phone in portrait, 390 × 844).
- */
-const TEST_ASPECTS = { near: 1, far: 0.46 } as const;
-
 /** The samples of a move that the planner tests, as parts of the move. */
 const MOVE_SAMPLES = [0, 0.25, 0.5, 0.75, 1] as const;
 
@@ -281,12 +276,6 @@ const SIGHT_MOVE_SAMPLES = new Set<number>([0, 0.5, 1]);
 
 /** The samples of the line of sight along a blend: 1/64 of the move apart. */
 const SIGHT_SAMPLES = Array.from({ length: 65 }, (...[, i]) => i / 64);
-
-/**
- * The aspects of the beam test: a desktop, a tablet in portrait, and a phone in portrait. Each
- * view has its own camera on the ray of the key, so each one gets its own test.
- */
-const BEAM_ASPECTS = [TEST_ASPECTS.near, 0.7, TEST_ASPECTS.far] as const;
 
 /** The smallest distance of a camera from the surface of the cone of the beam, in meters. */
 const BEAM_MARGIN = 0.3;
@@ -637,10 +626,10 @@ type MoveRefusal = Extract<
 >;
 
 /**
- * Tests if a move keeps its camera clear (design 5.6) at the samples of the move, from the nearest
- * to the farthest camera. The camera also stays inside or outside the cone of the visible beam for
- * the full move, because the beam draws only its outer faces, and it stays nearer to the stage
- * center than 0.44 of the default distance.
+ * Tests if a move keeps its camera clear (design 5.6) at the samples of the move, at the aspect of
+ * Cinematic mode. The camera also stays inside or outside the cone of the visible beam for the
+ * full move, because the beam draws only its outer faces, and it stays nearer to the stage center
+ * than 0.44 of the default distance.
  *
  * @param planner The planner.
  * @param target The target.
@@ -663,48 +652,42 @@ function moveRefusal(
   sights: SubjectSightLines | null,
 ): MoveRefusal | null {
   const S = planner.stageSide;
-  // A camera that crosses the cone of the beam in a shot sees the beam come or go at once. For
-  // each tested aspect, the camera stays on one side for the full move, with a margin.
-  const sides = BEAM_ASPECTS.map((aspect) =>
-    beamSide(S, keyPosition(S, target, radius, from, aspect)),
-  );
-  if (sides.includes('edge')) {
+  const aspect = CINEMA_ASPECT;
+  // A camera that crosses the cone of the beam in a shot sees the beam come or go at once. The
+  // camera stays on one side for the full move, with a margin.
+  const side = beamSide(S, keyPosition(S, target, radius, from, aspect));
+  if (side === 'edge') {
     return 'beamEdge';
   }
   // The cheap tests of all samples come first, so that a camera that fails them costs little.
-  const keys = MOVE_SAMPLES.map((u) => mixKeys(from, to, u));
-  for (const key of keys) {
-    for (let i = 0; i < BEAM_ASPECTS.length; i++) {
-      const aspect = BEAM_ASPECTS[i] ?? TEST_ASPECTS.near;
-      const camera = keyPosition(S, target, radius, key, aspect);
-      const share = Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(S, aspect);
-      if (share > CLOSE_DISTANCE_SHARE) {
-        return 'distance';
-      }
-      if (beamSide(S, camera) !== sides[i]) {
-        return 'beamSide';
-      }
+  const cameras = MOVE_SAMPLES.map((u) =>
+    keyPosition(S, target, radius, mixKeys(from, to, u), aspect),
+  );
+  for (const camera of cameras) {
+    const share = Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(S, aspect);
+    if (share > CLOSE_DISTANCE_SHARE) {
+      return 'distance';
+    }
+    if (beamSide(S, camera) !== side) {
+      return 'beamSide';
     }
   }
-  for (let k = 0; k < keys.length; k++) {
-    const key = keys[k] ?? from;
-    const near = keyPosition(S, target, radius, key, TEST_ASPECTS.near);
-    const far = keyPosition(S, target, radius, key, TEST_ASPECTS.far);
-    if (!cameraClear(planner.clearance, target, near, far, held)) {
+  for (let k = 0; k < cameras.length; k++) {
+    const camera = cameras[k] ?? target;
+    if (!cameraClear(planner.clearance, target, camera, camera, held)) {
       return 'camera';
     }
     if (
       sights &&
       SIGHT_MOVE_SAMPLES.has(MOVE_SAMPLES[k] ?? -1) &&
-      !(sightsClear(planner.clearance, sights, near) && sightsClear(planner.clearance, sights, far))
+      !sightsClear(planner.clearance, sights, camera)
     ) {
       return 'sight';
     }
   }
-  // The farthest camera has the longest line of sight on the ray.
   for (const u of LINE_SAMPLES) {
-    const far = keyPosition(S, target, radius, mixKeys(from, to, u), TEST_ASPECTS.far);
-    if (!targetLineClear(planner.clearance, target, far, held)) {
+    const camera = keyPosition(S, target, radius, mixKeys(from, to, u), aspect);
+    if (!targetLineClear(planner.clearance, target, camera, held)) {
       return 'line';
     }
   }
@@ -713,8 +696,7 @@ function moveRefusal(
 
 /**
  * Gives the largest share of the default distance of the cameras of a move, over the samples of
- * the move and the aspects of the beam test. A close camera stays at or below
- * {@link CLOSE_DISTANCE_SHARE}. Only a trace reads it.
+ * the move. A close camera stays at or below {@link CLOSE_DISTANCE_SHARE}. Only a trace reads it.
  *
  * @param stageSide The stage side `S`.
  * @param target The target.
@@ -732,12 +714,10 @@ function moveShare(
 ): number {
   let largest = 0;
   for (const u of MOVE_SAMPLES) {
-    for (const aspect of BEAM_ASPECTS) {
-      const camera = keyPosition(stageSide, target, radius, mixKeys(from, to, u), aspect);
-      const share =
-        Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(stageSide, aspect);
-      largest = Math.max(largest, share);
-    }
+    const camera = keyPosition(stageSide, target, radius, mixKeys(from, to, u), CINEMA_ASPECT);
+    const share =
+      Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(stageSide, CINEMA_ASPECT);
+    largest = Math.max(largest, share);
   }
   return largest;
 }
@@ -813,7 +793,7 @@ function subjectLines(planner: Planner, subject: Subject): SubjectLines {
 
 /**
  * Tells if a head or another object stands in the foreground of a close move, at its start or at
- * its end, in each view of the foreground rule (design 5.6).
+ * its end, at the aspect of Cinematic mode (design 5.6).
  *
  * @param planner The planner.
  * @param subject The subject.
@@ -831,36 +811,34 @@ function moveForeground(
 ): boolean {
   const S = planner.stageSide;
   const { target, members, focus, outside, floor } = subject;
+  const aspect = CINEMA_ASPECT;
   if (test === 'heads' && outside) {
-    // The point stays out of the frame of a desktop view for the full move.
-    const desktop = FOREGROUND.aspects[0];
+    // The point stays out of the frame for the full move.
     for (const u of MOVE_SAMPLES) {
       const key = mixKeys(from, to, u);
-      const camera = keyPosition(S, target, subject.radius, key, desktop);
-      if (inFrame(outside, camera, target, key.fov, desktop)) {
+      const camera = keyPosition(S, target, subject.radius, key, aspect);
+      if (inFrame(outside, camera, target, key.fov, aspect)) {
         return true;
       }
     }
   }
-  for (const aspect of FOREGROUND.aspects) {
-    for (const key of [from, to]) {
-      const camera = keyPosition(S, target, subject.radius, key, aspect);
-      const found =
-        test === 'heads'
-          ? foregroundHead(
-              planner.subjects.heads,
-              members,
-              focus,
-              camera,
-              target,
-              key.fov,
-              aspect,
-              floor,
-            )
-          : foregroundObject(planner.clearance, members, focus, camera, target, key.fov, aspect);
-      if (found) {
-        return true;
-      }
+  for (const key of [from, to]) {
+    const camera = keyPosition(S, target, subject.radius, key, aspect);
+    const found =
+      test === 'heads'
+        ? foregroundHead(
+            planner.subjects.heads,
+            members,
+            focus,
+            camera,
+            target,
+            key.fov,
+            aspect,
+            floor,
+          )
+        : foregroundObject(planner.clearance, members, focus, camera, target, key.fov, aspect);
+    if (found) {
+      return true;
     }
   }
   return false;
@@ -1757,26 +1735,20 @@ function blendOf(
   }
   const S = planner.stageSide;
   const held = new Set([...previous.held, ...next.held]);
-  for (const aspect of [TEST_ASPECTS.near, TEST_ASPECTS.far]) {
-    const a = keyPosition(S, previous.shot.target, previous.shot.radius, previous.shot.to, aspect);
-    const b = keyPosition(S, next.target, next.radius, next.from, aspect);
-    // The distance rule reads the cameras of a desktop view. A phone in portrait moves both
-    // cameras out on their rays.
-    if (
-      aspect === TEST_ASPECTS.near &&
-      Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) >= r.nearInSides * S
-    ) {
-      return 0;
-    }
-    if (!pathClear(planner.clearance, a, b, previous.shot.target, next.target, held)) {
-      return 0;
-    }
-    const side = beamSide(S, a);
-    const crosses =
-      side === 'edge' || MOVE_SAMPLES.some((u) => beamSide(S, mixPoints(a, b, u)) !== side);
-    if (crosses) {
-      return 0;
-    }
+  const shot = previous.shot;
+  const a = keyPosition(S, shot.target, shot.radius, shot.to, CINEMA_ASPECT);
+  const b = keyPosition(S, next.target, next.radius, next.from, CINEMA_ASPECT);
+  if (Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) >= r.nearInSides * S) {
+    return 0;
+  }
+  if (!pathClear(planner.clearance, a, b, shot.target, next.target, held)) {
+    return 0;
+  }
+  const side = beamSide(S, a);
+  const crosses =
+    side === 'edge' || MOVE_SAMPLES.some((u) => beamSide(S, mixPoints(a, b, u)) !== side);
+  if (crosses) {
+    return 0;
   }
   return Math.min(r.maxSec, Math.max(r.minSec, beat));
 }
