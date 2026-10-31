@@ -31,7 +31,8 @@ export interface ForestBake {
    */
   readonly sunShade: readonly [floor: number, height: number];
   /**
-   * The shade of the canopy on a low face far from the clearing: the distances beyond the deck
+   * The shade of the canopy on a low face of wood, earth, or rock far from the clearing: the
+   * distances beyond the deck
    * edge at which the shade starts and becomes full, in meters, the heights above the ground at
    * which it starts to fall off and ends, in meters, and the share of the sky and the sun that it
    * takes away.
@@ -331,7 +332,9 @@ function bakeFace(
   const height = center[1] - input.floorY;
   const half = input.stageSide / 2;
   const c = b.canopy;
-  const far = smoothstep(c.distance, outsideDeck(center[0], center[2], half));
+  // The leaves keep their light under the canopy, because the low sun shines through them.
+  const far =
+    kind === FOLIAGE ? 0 : smoothstep(c.distance, outsideDeck(center[0], center[2], half));
   const cover = 1 - c.shade * far * (1 - smoothstep(c.height, height));
   add(b.sky, up * cover);
   add(b.ground, 1 - up);
