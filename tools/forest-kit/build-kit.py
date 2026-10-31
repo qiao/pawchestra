@@ -1,5 +1,5 @@
 # Output: `assets/forest/forest-kit.glb`.
-"""Builds the low-poly forest kit of the forest scene, in Blender (batch).
+"""Builds the forest kit of the forest scene, in Blender (batch).
 
 The kit is the art of the forest clearing of `docs/reference/forest.webp`: the parts and their
 places around the stage of the default demo. The script makes all geometry itself from one seed,

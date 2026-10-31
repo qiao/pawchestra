@@ -1,6 +1,6 @@
 # Forest kit
 
-This folder holds the GLB file of the forest kit: the low-poly parts of the forest scene of
+This folder holds the GLB file of the forest kit: the smooth, round parts of the forest scene of
 `docs/reference/forest.webp`, and their places around the stage of the default demo. The app does
 not serve this file. It loads the module `src/models/forest/kit-data.ts`, which this chain writes:
 
