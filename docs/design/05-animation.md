@@ -475,7 +475,9 @@ times its width. Thus a close shot fits the width of its subject with the shot s
 - At the push-in of the end of the move, the frame then grows until it holds the top of each
   head with the ears and the hands and the instruments, with the eyes on the upper third line
   (`FRAME_MARGINS`). The fit reads each point with the perspective of the camera: a near head
-  looks larger, and a high camera sees a back row higher in the frame.
+  looks larger, and a high camera sees a back row higher in the frame. A last test reads the
+  tops of the heads with the composed camera at the push-in, because the fit does not tilt the
+  camera (`HEAD_TEST_PASSES`).
 - The shot keeps half the height of its frame (`halfHeight`). The camera stands at the distance
   at which its field of view shows that frame, so the camera does not depend on the aspect of
   the view.

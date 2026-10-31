@@ -237,6 +237,35 @@ export function writeLookPoint(
 }
 
 /**
+ * Gives the highest place of points in the frame of a camera with no roll.
+ *
+ * @param camera The camera.
+ * @param look The point that the camera looks at.
+ * @param points The points, in front of the camera.
+ * @param fov The vertical field of view, in degrees.
+ * @returns The highest y, as a part of half the frame height above the middle, or `-Infinity`
+ *   with no points.
+ */
+export function highestInFrame(
+  camera: Vec3,
+  look: Vec3,
+  points: readonly Vec3[],
+  fov: number,
+): number {
+  const a = writeAxes(camera, look);
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  let highest = -Infinity;
+  for (const p of points) {
+    const dx = p[0] - camera[0];
+    const dy = p[1] - camera[1];
+    const dz = p[2] - camera[2];
+    const depth = Math.max(1e-6, dx * a.fx + dy * a.fy + dz * a.fz);
+    highest = Math.max(highest, (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * tanV));
+  }
+  return highest;
+}
+
+/**
  * Gives the third line of a subject that faces an azimuth, for a camera at an azimuth seen from
  * the subject (design 5.6): the side of the frame away from its look.
  *

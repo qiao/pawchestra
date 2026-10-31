@@ -24,6 +24,7 @@ import { foregroundHead, foregroundObject, inFrame, lensScale } from './foregrou
 import {
   FILM_GRAMMAR,
   azimuthFrom,
+  highestInFrame,
   keepsLine,
   lookSide,
   motionOf,
@@ -31,7 +32,7 @@ import {
   writeLookPoint,
 } from './grammar.ts';
 import type { Motion } from './grammar.ts';
-import { SHOT_SIZES, frameHalfHeight } from './shot-size.ts';
+import { FRAME_MARGINS, SHOT_SIZES, frameHalfHeight } from './shot-size.ts';
 import type { ShotSize } from './shot-size.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
@@ -313,6 +314,12 @@ const KEY_SEARCH = {
 
 /** The samples of a move that the planner tests, as parts of the move. */
 const MOVE_SAMPLES = [0, 0.25, 0.5, 0.75, 1] as const;
+
+/**
+ * The tests of the tops of the heads with the composed camera of a close frame (design 5.6). Each
+ * test that finds a head above the top margin grows the frame, so that the head comes down to it.
+ */
+const HEAD_TEST_PASSES = 2;
 
 /**
  * The samples between the samples of a move at which the planner also tests the line of sight
@@ -1120,6 +1127,28 @@ function searchClose(
       frameHalfHeight(subject, move.size, a, elevation, third, move.fov, move.pushIn);
     return Math.max(at(azimuth), at(azimuth + arc));
   };
+  // The frame of a camera of the move, tested with the composed camera at the push-in, where the
+  // frame is closest: the fit tilts no camera, and a steep camera sees a far head higher.
+  const heldFrame = (azimuth: number, elevation: number, arc: number): number => {
+    let half = frameAt(azimuth, elevation, arc);
+    if (!subject.eyes || subject.tops.length === 0) {
+      return half;
+    }
+    const line = FILM_GRAMMAR.thirdLine;
+    const limit = 1 - FRAME_MARGINS.top;
+    const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
+    const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
+    for (let pass = 0; pass < HEAD_TEST_PASSES; pass++) {
+      const composition = compositionOf(planner, subject, half, from, to);
+      const { camera, look } = composedCamera(planner, subject, half, composition, to);
+      const highest = highestInFrame(camera, look, subject.tops, move.fov);
+      if (highest <= limit) {
+        break;
+      }
+      half *= (highest - line) / (limit - line);
+    }
+    return half;
+  };
   const fit: ShotKey = { azimuth: 0, elevation: 0, zoom: 1, fov: move.fov };
   const nominal = frameAt(move.wantedAzimuth, move.elevation, 0);
   const distance = keyDistance(planner.stageSide, nominal, fit, CINEMA_ASPECT);
@@ -1183,7 +1212,7 @@ function searchClose(
       const old = kept?.get(key);
       return old ? refuse(azimuth, elevation, arc, old.refusal, true, old.share) : null;
     }
-    const halfHeight = frames.get(key) ?? frameAt(azimuth, elevation, arc);
+    const halfHeight = frames.get(key) ?? heldFrame(azimuth, elevation, arc);
     frames.set(key, halfHeight);
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
