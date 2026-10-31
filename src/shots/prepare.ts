@@ -526,6 +526,11 @@ interface Planner {
    * many cuts, with the same cameras.
    */
   readonly moveCache: Map<string, Map<number, boolean>>;
+  /**
+   * The half height of the frame of each close move so far, by the keys of
+   * {@link Planner.moveCache}. The fit of a frame reads each point of the subject in three passes.
+   */
+  readonly frameCache: Map<string, Map<number, number>>;
   /** The number of shots since the last wide or high shot, or since the start. */
   sinceWide: number;
   /** The end of the last wide or high shot, in song seconds. */
@@ -1100,6 +1105,8 @@ function searchClose(
   const moveKey = `${subjectKey(subject)} ${move.size.share} ${subject.reach} ${move.pushIn} ${move.fov}`;
   const known = planner.moveCache.get(moveKey) ?? new Map<number, boolean>();
   planner.moveCache.set(moveKey, known);
+  const frames = planner.frameCache.get(moveKey) ?? new Map<number, number>();
+  planner.frameCache.set(moveKey, frames);
   const previous = planner.planned.at(-1);
   const s = KEY_SEARCH;
   // The band moves up with the lift of a piano shot. The wanted elevation is low (CAMERA_LOWER).
@@ -1176,7 +1183,8 @@ function searchClose(
       const old = kept?.get(key);
       return old ? refuse(azimuth, elevation, arc, old.refusal, true, old.share) : null;
     }
-    const halfHeight = frameAt(azimuth, elevation, arc);
+    const halfHeight = frames.get(key) ?? frameAt(azimuth, elevation, arc);
+    frames.set(key, halfHeight);
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
     const composition = compositionOf(planner, subject, halfHeight, from, to);
@@ -2310,6 +2318,7 @@ function* planShotsSteps(
     planned: [],
     sightCache: new Map(),
     moveCache: new Map(),
+    frameCache: new Map(),
     sinceWide: 0,
     lastWideEnd: 0,
     staged: subjects.seats.flatMap((players, seat) => (players ? [seat] : [])),
