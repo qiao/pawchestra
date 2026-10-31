@@ -448,8 +448,12 @@ def leaf_paint(rng, light=0.0):
 
 
 def bark_paint(rng, moss_below=0.0):
-    """Gives a paint of bark, with soft patches of moss below a height."""
-    waves = Waves(rng, 1.2)
+    """Gives a paint of bark, with soft patches of moss below a height.
+
+    The field of the bark colors changes fast around a trunk and slowly along it, so that the
+    bark shows long streaks, as grooves.
+    """
+    waves = Waves(rng, 0.7, stretch=(1.0, 0.12, 1.0))
     moss = Waves(rng, 0.8)
 
     def paint(normal, point):
@@ -476,8 +480,8 @@ def solid_paint(names, kind='matte', rng=None, size=1.0):
     return paint
 
 
-def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
-    """Adds a tapered branch from a start to an end, with a small upward bend."""
+def branch(part, start, end, r0, r1, sides=8, segments=5, bend=0.0):
+    """Adds a smooth, tapered branch from a start to an end, with a small upward bend."""
     rng = part.rng
     start, end = Vector(start), Vector(end)
     axis = end - start
@@ -488,11 +492,11 @@ def branch(part, start, end, r0, r1, sides=5, segments=3, bend=0.0):
         c = start + axis * t + Vector((0.0, bend * math.sin(math.pi * t), 0.0))
         c += (
             Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1)))
-            * 0.04
+            * 0.03
             * (0 < i < segments)
         )
         r = r0 + (r1 - r0) * t
-        points += ring(c, r, sides, rng.uniform(0, 1), x, y)
+        points += ring(c, r, sides, 0.0, x, y)
         centers.append(c)
     faces = rings_faces(segments + 1, sides, cap_top=True)
 
@@ -542,13 +546,14 @@ def crown(part, centers, count, size, flat=0.75, light=0.0, detail='round'):
 
 
 def trunk(part, spec):
-    """Adds a trunk with buttress roots, and gives the ring centers of its axis.
+    """Adds a smooth trunk with buttress roots, and gives the ring centers of its axis.
 
     `spec` gives the height of the trunk, the radius above the roots, the taper, the flare of the
-    roots, the root count, the lean (x, z) of the top, and the twist.
+    roots, the root count, the lean (x, z) of the top, and the twist. The rings stand close near
+    the ground, so that the roots flare in a soft curve.
     """
     rng = part.rng
-    sides = 8
+    sides = 16
     height = spec['trunk']
     radius = spec['radius']
     # The roots leave a gap at the angle 0 (+x). The yaw of each tree turns the gap to the deck,
@@ -557,8 +562,10 @@ def trunk(part, spec):
         2 * math.pi * (i + 0.5) / spec['roots'] + rng.uniform(-0.15, 0.15)
         for i in range(spec['roots'])
     ]
-    levels = [-0.2, 0.0, 0.35, 0.8, 1.5] + [1.5 + (height - 1.5) * t for t in (0.2, 0.42, 0.7, 1.0)]
+    levels = [-0.2, 0.0, 0.12, 0.28, 0.5, 0.8, 1.15, 1.6]
+    levels += [1.6 + (height - 1.6) * t for t in (0.15, 0.32, 0.5, 0.7, 0.86, 1.0)]
     lean = Vector((spec['lean'][0], 0.0, spec['lean'][1]))
+    lumps = Waves(rng, 1.4, count=2)
     points, centers = [], []
     for y in levels:
         h = max(y, 0.0)
@@ -569,11 +576,11 @@ def trunk(part, spec):
         for k in range(sides):
             a = 2 * math.pi * k / sides + twist
             lobe = max(max(0.0, math.cos(a - r)) ** 6 for r in roots)
-            r = base * (1 + flare * (0.3 + 2.0 * lobe) + rng.uniform(-0.07, 0.07))
+            ring_point = Vector((math.cos(a), y / radius / 3, math.sin(a)))
+            r = base * (1 + flare * (0.3 + 2.0 * lobe) + 0.05 * lumps(ring_point))
             if y < 0:
                 r *= 1.12
-            lift = rng.uniform(-0.06, 0.06) if y > 0 else 0.0
-            points.append(center + Vector((r * math.cos(a), lift, r * math.sin(a))))
+            points.append(center + Vector((r * math.cos(a), 0.0, r * math.sin(a))))
         centers.append(center)
     faces = rings_faces(len(levels), sides, cap_top=True)
 
