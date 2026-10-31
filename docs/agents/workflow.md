@@ -114,6 +114,9 @@ These rules hold for each test:
 
 ## Probes and the shell
 
+- In an isolated worktree, the guard of the shell refuses a heredoc, a `$VAR` operand, and several
+  git calls in one line. Write a command of many steps as a script in `scratch/` and run it, and
+  keep each git call plain.
 - Put a probe script in `scratch/` of your worktree. Git ignores the folder, and the checks skip
   it. Run it with `node scratch/<name>.ts`, with relative imports such as
   `../src/models/species.ts`.
