@@ -6,7 +6,7 @@ import type { ForestKitData } from './kit-format.ts';
  */
 export const FOREST_KIT = {
   source: 'assets/forest/forest-kit.glb',
-  sha256: '0c22f362b1d77c22895eadd54c311cc45fd820864b5c508a36b25c4a0635a21b',
+  sha256: 'e4fe1021ada9373fdb3ced056a3b48e88dd8255409a8a46dd16c816504f7ff42',
   stageSide: 8.488,
   parts: [
     {
@@ -213,7 +213,7 @@ export const FOREST_KIT = {
     ['tree-3', -12, -0.4, -8.6, -0.9704, 1],
     ['tree-1', -11.4, -0.4, 5.4, 1.4888, 0.95],
     ['tree-4', 12.2, -0.4, 6.2, 1.6249, 1],
-    ['canopy-1', -6, 3.7, -0.4, -1.0472, 1],
+    ['canopy-1', -6, 4, -0.4, -1.2217, 1],
     ['canopy-2', 6.1, 3.9, -1, -2.0944, 1],
     ['lantern-branch', -6, -0.4, -0.4, -0.1745, 1],
     ['stump-1', -4.6, -0.4, 4.3, 0, 1],
