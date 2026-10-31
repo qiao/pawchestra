@@ -56,16 +56,15 @@ export const FRAME_MARGINS = {
   /** The outline stays this far inside each side edge. */
   side: 0.1,
   /**
-   * The top of the subject stays this far below the top edge: the head with the ears is not cut.
-   * A playing pose can lift the head above its bind pose, and with 0.05 the ears of a rabbit
-   * touched the top edge.
+   * The top of each head stays this far below the top edge, so the head with the ears is not cut.
+   * The fit reads the head of the bind pose, and a playing pose can lift the head above it.
    */
   top: 0.1,
   /** The hands and the instrument stay this far above the bottom edge. */
   bottom: 0.1,
   /**
-   * The depth of a point of the outline toward the camera counts up to this part of the flat
-   * distance of the camera, so that a point near the camera does not make the frame infinite.
+   * The depth of a point toward the camera counts up to this part of the distance of the camera,
+   * so that a point near the camera does not make the frame infinite.
    */
   near: 0.7,
 } as const;
