@@ -733,7 +733,11 @@ def build_bush(name, spec):
 
 
 def frond(rng, angle, length, rise, droop, leaflets, width):
-    """Gives the points and the triangles of one fern frond: leaflets on each side of a rib."""
+    """Gives the points and the triangles of one fern frond: leaflets on each side of a rib.
+
+    Each leaflet has two triangles: its outline bulges toward the base of the frond, so that the
+    leaflets look round and overlap a little.
+    """
     direction = Vector((math.cos(angle), 0.0, math.sin(angle)))
     side = Vector((-direction.z, 0.0, direction.x))
     rib = []
@@ -751,8 +755,9 @@ def frond(rng, angle, length, rise, droop, leaflets, width):
             tip = (
                 (a + b) / 2 + side * (s * w) + direction * (w * 0.5) + Vector((0.0, -w * 0.35, 0.0))
             )
-            points.append(tip)
-            faces.append((i, i + 1, len(points) - 1))
+            back = (a + tip) / 2 - direction * (w * 0.3) + Vector((0.0, w * 0.08, 0.0))
+            points += [tip, back]
+            faces += [(i, len(points) - 1, len(points) - 2), (i, len(points) - 2, i + 1)]
     return points, faces
 
 
@@ -778,7 +783,7 @@ def build_fern(name, spec):
 
 
 def build_grass(name, spec):
-    """Builds a tuft of grass: thin folded blades that lean out."""
+    """Builds a tuft of grass: thin blades that curve out, darker at their base."""
     part = Part(name)
     rng = part.rng
     for i in range(spec['blades']):
@@ -787,38 +792,43 @@ def build_grass(name, spec):
         side = Vector((-out.z, 0.0, out.x))
         base = out * rng.uniform(0.0, spec['spread'])
         h = spec['height'] * rng.uniform(0.6, 1.1)
-        tip = base + out * (h * 0.45) + Vector((0.0, h, 0.0))
+        middle = base + out * (h * 0.12) + Vector((0.0, h * 0.55, 0.0))
+        tip = base + out * (h * 0.5) + Vector((0.0, h, 0.0))
         w = spec['width']
-        points = [base - side * w, base + side * w, base + out * w * 0.6, tip]
-        faces = [(0, 2, 3), (2, 1, 3)]
+        points = [
+            base - side * w,
+            base + side * w,
+            middle - side * w * 0.7,
+            middle + side * w * 0.7,
+        ]
+        points.append(tip)
+        faces = [(0, 1, 3), (0, 3, 2), (2, 3, 4)]
         name = 'grass' if rng.random() < 0.6 else 'fern'
-        part.add(points, faces, lambda n, c, name=name: (linear(name), 'foliage'), 'up')
+
+        def paint(normal, point, name=name, h=h):
+            shade = 0.35 * (1 - smoothstep(0.0, h * 0.6, point.y))
+            return mix(linear(name), linear('leaf-dark'), shade), 'foliage'
+
+        part.add(points, faces, paint, 'up')
     return part
 
 
 def build_moss(name, spec):
-    """Builds a low patch of moss: a flat faceted mound."""
+    """Builds a low patch of moss: a soft, flat mound with an uneven rim."""
     part = Part(name)
     rng = part.rng
-    sides = 9
+    sides = 16
+    rim = Waves(rng, 2.5, count=2)
     points = [Vector((0.0, spec['height'], 0.0))]
-    for k in range(sides):
-        a = 2 * math.pi * k / sides
-        r = spec['radius'] * rng.uniform(0.7, 1.15)
-        points.append(
-            Vector(
-                (r * 0.55 * math.cos(a + 0.2), spec['height'] * 0.6, r * 0.55 * math.sin(a + 0.2))
-            )
-        )
-    for k in range(sides):
-        a = 2 * math.pi * k / sides
-        r = spec['radius'] * rng.uniform(0.85, 1.2)
-        points.append(Vector((r * math.cos(a), -0.02, r * math.sin(a))))
-    faces = [(0, 1 + k, 1 + (k + 1) % sides) for k in range(sides)]
-    faces += [
-        (1 + k, 1 + sides + k, 1 + sides + (k + 1) % sides, 1 + (k + 1) % sides)
-        for k in range(sides)
-    ]
+    for share, y in ((0.35, 0.9), (0.7, 0.55), (1.0, -0.02)):
+        for k in range(sides):
+            a = 2 * math.pi * k / sides
+            d = Vector((math.cos(a), 0.0, math.sin(a)))
+            r = spec['radius'] * share * (1 + 0.25 * rim(d))
+            points.append(Vector((r * d.x, spec['height'] * y if y > 0 else y, r * d.z)))
+    faces = [(0, 1 + (k + 1) % sides, 1 + k) for k in range(sides)]
+    faces += rings_faces(3, sides)
+    faces = faces[:sides] + [tuple(i + 1 for i in f) for f in faces[sides:]]
     part.add(
         points,
         faces,
@@ -1573,13 +1583,20 @@ def build_parts(collection):
         build_bush('bush-3', {'blobs': 3, 'size': 0.8}),
         build_fern(
             'fern-1',
-            {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 9, 'width': 0.17},
+            {'fronds': 8, 'length': 1.1, 'rise': 0.5, 'droop': 0.4, 'leaflets': 13, 'width': 0.15},
         ),
         build_fern(
             'fern-2',
-            {'fronds': 6, 'length': 0.8, 'rise': 0.55, 'droop': 0.2, 'leaflets': 8, 'width': 0.13},
+            {
+                'fronds': 6,
+                'length': 0.8,
+                'rise': 0.55,
+                'droop': 0.2,
+                'leaflets': 11,
+                'width': 0.115,
+            },
         ),
-        build_grass('grass', {'blades': 8, 'spread': 0.08, 'height': 0.32, 'width': 0.025}),
+        build_grass('grass', {'blades': 11, 'spread': 0.08, 'height': 0.32, 'width': 0.022}),
         build_moss('moss', {'radius': 0.55, 'height': 0.06}),
         build_rock('rock-1', {'size': (0.75, 0.75, 0.6), 'points': 18, 'moss': 0.5}),
         build_rock('rock-2', {'size': (0.55, 0.35, 0.45), 'points': 14, 'moss': 0.3}),
