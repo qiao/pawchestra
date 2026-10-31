@@ -120,6 +120,10 @@ with rings of far trees, a backdrop of tree tops, and a far ground (`scene/fores
   their low boughs fill the top corners. The other trees keep `TREE_CLEARANCE`. The default view
   sees nothing above about 2 m behind the deck, so one rope of the light string hangs between the
   framing trees across the top of the view. Bushes and ferns fill the ground behind the deck.
+  In front of the deck, a clearing of dark earth with grass tufts holds a log at an angle at the
+  lower left and a group of dark blue-gray rocks with bushes at the right, as `forest.webp`. The
+  log keeps a gap of earth to the deck front, its far end lies in the bushes, and its cut end
+  with rings points to the front right. Its bark has one color.
 - **Water.** A small fall of two steps drops between dark, wet rocks behind the back right corner
   of the deck, so that the default view shows it at the height of the heads of the back row, as
   `forest.webp`. Each step is one soft sheet of cream water that curves over its lip, with

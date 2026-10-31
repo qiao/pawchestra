@@ -21,12 +21,12 @@ update the size and the SHA-256 below.
 
 | Item | Value |
 |---|---|
-| Size | 432,984 bytes |
-| SHA-256 | `2ff8e0c4e2844f6d02498a7dfeb4ad58e98c52e92fff5b7994a098b312364edc` |
+| Size | 436,488 bytes |
+| SHA-256 | `afbc042acce6de2727bd3a1048e91c1ceb88c34e4cc0640c7f3a85e6fb379e7c` |
 | Origin | Own work of the project. The script makes each point itself from one seed. It imports, downloads, and generates no model |
 | License | Apache License 2.0, as the project (`../../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
 | Writer | Blender 5.2.2 LTS, Khronos glTF Blender I/O v5.2.40 |
-| Contents | 27 mesh nodes, one for each part, at the origin. One empty for each place, with the part name in the property `part`. One empty for each rope end, as a child of the empty of its tree. The empty `stage` with the stage side of the places in the property `side` |
+| Contents | 28 mesh nodes, one for each part, at the origin. One empty for each place, with the part name in the property `part`. One empty for each rope end, as a child of the empty of its tree. The empty `stage` with the stage side of the places in the property `side` |
 | Faces | One color for each face in the color attribute `COLOR_0`, and one material for each kind of face: `matte`, `glow`, `water`, and `foliage`. No normal, no texture coordinate, and no texture |
 
 The axes are those of the app: one unit is one meter, y is up, and the audience is at +z. The

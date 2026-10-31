@@ -70,7 +70,7 @@ PALETTE = {
     'bark-moss': '#4f5528',
     'log-bark': '#6e4428',
     'log-bark-dark': '#563420',
-    'wood-cut': '#c98f55',
+    'wood-cut': '#dba76c',
     'wood-ring': '#9a6436',
     'leaf-light': '#909c33',
     'leaf': '#6a7c2b',
@@ -88,8 +88,11 @@ PALETTE = {
     'earth-dark': '#5f412b',
     'earth-light': '#8f6845',
     'litter': '#6f4a2a',
-    'path': '#9c7650',
-    'path-light': '#ab8660',
+    'path': '#80603f',
+    'path-light': '#906e4a',
+    'rock-blue-light': '#626872',
+    'rock-blue': '#4a5059',
+    'rock-blue-dark': '#363a42',
     'rock-wet': '#4a4640',
     'rock-wet-dark': '#34302c',
     'water': '#3d4a52',
@@ -773,17 +776,17 @@ def build_rock(name, spec):
     points, faces = hull(points)
     centroid = sum(points, Vector()) / len(points)
 
+    lit, mid, shade = spec.get('tones', ('rock-light', 'rock', None))
+
     def paint(normal, center):
         if normal.y > 0.75 and rng.random() < spec.get('moss', 0.0):
             return linear('moss'), 'matte'
         light = normal.y + rng.uniform(-0.35, 0.35)
-        return linear(
-            'rock-light'
-            if light > 0.6
-            else 'rock'
-            if light > 0.0
-            else pick(rng, [('rock-dark', 2), ('rock-warm', 1)])
-        ), 'matte'
+        if light > 0.6:
+            return linear(lit), 'matte'
+        if light > 0.0:
+            return linear(mid), 'matte'
+        return linear(shade or pick(rng, [('rock-dark', 2), ('rock-warm', 1)])), 'matte'
 
     part.add(points, faces, paint, lambda _: centroid)
     return part
@@ -812,7 +815,7 @@ def wood_end(part, center, radius, sides, axis, start, rings_count=3):
 
 
 def build_log(name, spec):
-    """Builds a fallen log along x, with bark facets, moss on top, and cut ends with rings."""
+    """Builds a fallen log along x, with bark facets of one color and light cut ends with rings."""
     part = Part(name)
     rng = part.rng
     sides = 9
@@ -828,19 +831,14 @@ def build_log(name, spec):
         points += [p + Vector((0.0, rng.uniform(-0.02, 0.02), 0.0)) * (0 < i < 4) for p in pts]
         centers.append(c)
     faces = rings_faces(len(xs), sides)
-    # Each side of the log keeps one warm bark color along its length, as the ridges of bark. A
-    # random color for each face made large blocks, like a checker. The top side holds moss.
-    strips = [
-        pick(rng, [('log-bark', 3), ('log-bark-dark', 2), ('bark-light', 1)]) for _ in range(sides)
-    ]
-
-    def paint(normal, center):
-        if normal.y > 0.95 and center.x > length * 0.2:
-            return linear('bark-moss'), 'matte'
-        side = round(math.atan2(normal.y, normal.z) / (2 * math.pi) * sides) % sides
-        return linear(strips[side]), 'matte'
-
-    part.add(points, faces, paint, lambda c: min(centers, key=lambda k: abs(k.x - c.x)))
+    # The bark has one color, so that the baked light alone shades the facets. Colors of bark
+    # for each side and a moss top made blocks of other colors, as a green block at one end.
+    part.add(
+        points,
+        faces,
+        lambda n, c: (linear('log-bark'), 'matte'),
+        lambda c: min(centers, key=lambda k: abs(k.x - c.x)),
+    )
     first, last = points[:sides], points[-sides:]
     for ring_points, center, axis in (
         (first, centers[0], Vector((-1.0, 0.0, 0.0))),
@@ -848,16 +846,6 @@ def build_log(name, spec):
     ):
         r = sum((p - center).length for p in ring_points) / sides
         wood_end(part, center + axis * 0.005, r * 0.96, sides, axis, 0.3)
-    stub_at = Vector((xs[1] + 0.3, radius * 1.5, 0.12))
-    branch(
-        part,
-        stub_at - Vector((0.0, radius * 0.4, 0.0)),
-        stub_at + Vector((0.25, 0.35, 0.15)),
-        0.07,
-        0.04,
-        sides=5,
-        segments=2,
-    )
     return part
 
 
@@ -1478,7 +1466,16 @@ def build_parts(collection):
         build_rock('rock-1', {'size': (0.75, 0.75, 0.6), 'points': 18, 'moss': 0.5}),
         build_rock('rock-2', {'size': (0.55, 0.35, 0.45), 'points': 14, 'moss': 0.3}),
         build_rock('rock-3', {'size': (0.3, 0.26, 0.26), 'points': 11}),
-        build_log('log', {'length': 3.0, 'radius': 0.3}),
+        build_log('log', {'length': 2.3, 'radius': 0.27}),
+        build_rock(
+            'rock-4',
+            {
+                'size': (0.6, 0.5, 0.5),
+                'points': 16,
+                'moss': 0.2,
+                'tones': ('rock-blue-light', 'rock-blue', 'rock-blue-dark'),
+            },
+        ),
         build_stump('stump-1', {'height': 0.55, 'radius': 0.4}),
         build_stump('stump-2', {'height': 0.45, 'radius': 0.34}),
         build_lantern_hanging(),
@@ -1545,11 +1542,14 @@ PLACES = [
     ('lantern-standing', -4.6, 4.3, 15, 1.0, 0.55),
     ('stump-2', 4.75, 4.45, 40, 1.0, 0.0),
     ('lantern-standing', 4.75, 4.45, -20, 1.0, 0.45),
-    ('log', -1.6, 4.95, -6, 1.0, 0.0),
-    ('rock-1', 3.0, 5.2, 30, 0.7, 0.0),
-    ('rock-2', 3.9, 5.5, 110, 0.9, 0.0),
-    ('rock-3', 2.2, 5.1, 0, 1.0, 0.0),
-    ('rock-2', -4.0, 5.6, 200, 0.8, 0.0),
+    # The log lies at an angle at the lower left, with its thick cut end to the front right and
+    # its far end in the bushes at the left, and keeps a gap of earth to the deck front. The dark
+    # rocks stand in a group at the right.
+    ('log', -2.15, 5.0, 165, 1.0, 0.0),
+    ('rock-4', 2.45, 5.05, 20, 1.0, 0.0),
+    ('rock-4', 3.25, 4.85, 140, 0.7, 0.0),
+    ('rock-4', 2.95, 5.55, 260, 0.55, 0.0),
+    ('rock-3', 1.85, 5.3, 0, 1.0, 0.0),
     ('rock-1', -8.0, -4.8, 70, 1.3, 0.0),
     ('rock-2', -4.6, -6.0, 10, 1.3, 0.0),
     ('rock-1', 2.2, -6.3, 160, 1.0, 0.0),
@@ -1558,6 +1558,22 @@ PLACES = [
     ('path', 0.0, HALF, 0, 1.0, 0.0),
     ('stream', *STREAM_PLACE, 1.0, 0.0),
 ]
+
+#: The grass tufts of the clearing in front of the deck: x and z in meters.
+FRONT_GRASS = (
+    (-2.3, 4.55),
+    (-1.0, 4.62),
+    (-0.2, 4.95),
+    (0.35, 4.6),
+    (0.9, 5.15),
+    (1.45, 4.7),
+    (0.2, 5.45),
+    (-0.4, 5.75),
+    (2.05, 4.55),
+    (1.6, 5.7),
+    (-2.9, 5.6),
+    (3.7, 4.55),
+)
 
 #: The ropes of the light string: the two trees (indices in `PLACES`), the height of each end
 #: above the ground, the slack, and the lantern count. The ropes from the framing trees to the
@@ -1768,12 +1784,17 @@ def scatter(rng, objects, footprints):
         ('fern-2', 1.2, 5.5),
         ('fern-1', 4.0, 5.3),
         ('fern-2', -5.2, 3.6),
+        ('bush-1', -4.15, 5.2),
+        ('bush-2', 3.85, 5.5),
     ):
         yaw = rng.uniform(0, 360)
         space = clearance(objects[name], x, z, yaw, 1.0, 3.0)
         if space < LOW_CLEARANCE:
             raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
         place(name, x, z, 1.0, yaw)
+    # The grass tufts of the clearing in front of the deck, beside and behind the log.
+    for x, z in FRONT_GRASS:
+        place('grass', x, z, rng.uniform(0.8, 1.1), rng.uniform(0, 360))
     return places
 
 
