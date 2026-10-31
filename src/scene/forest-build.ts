@@ -559,8 +559,9 @@ interface BandBox {
 }
 
 /**
- * Adds the corners of a triangle to the bands of its part: the first pass grows the box of each
- * cell of a band, and the second pass grows the radius around the middle of the box.
+ * Adds a triangle to the bands of its part: the first pass grows the box of the cell of the
+ * center of the triangle by its corners, and the second pass grows the radius around the middle
+ * of the box.
  *
  * @param bands The boxes of the cells of the bands of the part, by a key of the band and the
  *   cell. The call adds to them.
@@ -574,30 +575,35 @@ function addToBands(
   rule: { readonly band: number; readonly cell: number; readonly floorY: number },
   second: boolean,
 ): void {
+  // The whole triangle goes into the cell of its center, so that a large face between cells is
+  // in the cylinder of its cell.
+  const x = ((corners[0] ?? 0) + (corners[3] ?? 0) + (corners[6] ?? 0)) / 3;
+  const y = ((corners[1] ?? 0) + (corners[4] ?? 0) + (corners[7] ?? 0)) / 3;
+  const z = ((corners[2] ?? 0) + (corners[5] ?? 0) + (corners[8] ?? 0)) / 3;
+  const band = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
+  const cx = Math.floor(x / rule.cell) + 500;
+  const cz = Math.floor(z / rule.cell) + 500;
+  const index = (band * 1000 + cx) * 1000 + cz;
+  let box = bands.get(index);
+  if (!box) {
+    box = { minX: x, maxX: x, minZ: z, maxZ: z, minY: y, maxY: y, radius: 0 };
+    bands.set(index, box);
+  }
   for (let k = 0; k < 3; k++) {
-    const x = corners[k * 3] ?? 0;
-    const y = corners[k * 3 + 1] ?? 0;
-    const z = corners[k * 3 + 2] ?? 0;
-    const band = Math.max(0, Math.floor((y - rule.floorY) / rule.band));
-    const cx = Math.floor(x / rule.cell) + 500;
-    const cz = Math.floor(z / rule.cell) + 500;
-    const index = (band * 1000 + cx) * 1000 + cz;
-    let box = bands.get(index);
-    if (!box) {
-      box = { minX: x, maxX: x, minZ: z, maxZ: z, minY: y, maxY: y, radius: 0 };
-      bands.set(index, box);
-    }
+    const px = corners[k * 3] ?? 0;
+    const py = corners[k * 3 + 1] ?? 0;
+    const pz = corners[k * 3 + 2] ?? 0;
     if (second) {
       const mx = (box.minX + box.maxX) / 2;
       const mz = (box.minZ + box.maxZ) / 2;
-      box.radius = Math.max(box.radius, Math.hypot(x - mx, z - mz));
+      box.radius = Math.max(box.radius, Math.hypot(px - mx, pz - mz));
     } else {
-      box.minX = Math.min(box.minX, x);
-      box.maxX = Math.max(box.maxX, x);
-      box.minZ = Math.min(box.minZ, z);
-      box.maxZ = Math.max(box.maxZ, z);
-      box.minY = Math.min(box.minY, y);
-      box.maxY = Math.max(box.maxY, y);
+      box.minX = Math.min(box.minX, px);
+      box.maxX = Math.max(box.maxX, px);
+      box.minZ = Math.min(box.minZ, pz);
+      box.maxZ = Math.max(box.maxZ, pz);
+      box.minY = Math.min(box.minY, py);
+      box.maxY = Math.max(box.maxY, py);
     }
   }
 }
