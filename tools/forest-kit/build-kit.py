@@ -1559,6 +1559,24 @@ PLACES = [
     ('stream', *STREAM_PLACE, 1.0, 0.0),
 ]
 
+#: The undergrowth along the back edge of the deck: a row of bushes near the edge and a row of
+#: ferns and bushes behind it, from the left corner to the waterfall. The part, x, and z in
+#: meters.
+BACK_UNDERGROWTH = (
+    ('bush-2', -4.3, -5.05),
+    ('bush-1', -3.2, -5.3),
+    ('bush-2', -2.1, -5.0),
+    ('bush-1', -0.95, -5.3),
+    ('bush-2', 0.2, -5.0),
+    ('bush-1', 1.35, -5.3),
+    ('bush-2', 2.45, -5.0),
+    ('bush-2', 3.45, -5.05),
+    ('fern-2', -3.75, -6.2),
+    ('bush-2', -1.6, -6.3),
+    ('fern-2', 0.75, -6.25),
+    ('bush-2', 2.95, -6.2),
+)
+
 #: The grass tufts of the clearing in front of the deck: x and z in meters.
 FRONT_GRASS = (
     (-2.3, 4.55),
@@ -1792,6 +1810,14 @@ def scatter(rng, objects, footprints):
         if space < LOW_CLEARANCE:
             raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
         place(name, x, z, 1.0, yaw)
+    # The undergrowth along the back edge of the deck, where the default view saw bare earth.
+    for name, x, z in BACK_UNDERGROWTH:
+        yaw = rng.uniform(0, 360)
+        scale = rng.uniform(0.9, 1.15)
+        space = clearance(objects[name], x, z, yaw, scale, 3.0)
+        if space < LOW_CLEARANCE:
+            raise ValueError(f'{name} at ({x}, {z}) comes {-space:.2f} m over the deck edge.')
+        place(name, x, z, scale, yaw)
     # The grass tufts of the clearing in front of the deck, beside and behind the log.
     for x, z in FRONT_GRASS:
         place('grass', x, z, rng.uniform(0.8, 1.1), rng.uniform(0, 360))
