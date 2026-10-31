@@ -53,12 +53,13 @@ render, and the memory.
       leaves with bright spots of sun and thin shafts among the trees there (4.1).
 - [ ] Forest: the beam is one haze cone over the stage. The light shafts of `forest.webp` are
       several thin shafts that fall through the trees behind the deck (4.1, 4.5).
-- [ ] Forest: the waterfall reads as a stack of pale cream boxes with straight edges, not as
-      falling water (`2-crop-back-right.png` of the forest-sun round). Give each sheet an uneven
-      outline that narrows and curves, and more foam at the foot (4.1).
-- [ ] Forest: the default view of a phone shows a wide clearing of bare, faceted earth below the
-      deck. Add grass, ferns, and spots of sun there, within the triangle budget of the kit
-      (`TRIANGLE_BUDGET` of `tools/forest-kit/build-kit.py`).
+- [ ] Forest: each leaf cluster is one or two smooth lumps with a round outline. The crowns and
+      the bushes of `forest.webp` show many small clusters of leaves with a soft, uneven outline.
+      Add small lumps on the outline of each cluster within the frame target and the size of the
+      forest chunk (4.1, 7.2).
+- [ ] Forest: measure the switch to the forest on a phone. The build has about 80 steps of at
+      most 5 ms in Node and about 168,000 triangles. Check the longest step with the 4x CPU
+      throttle and the GPU time at the low tier (4.1, 9.7).
 - [ ] Forest: `pnpm look-lab` measures the regions of the forest frames against
       `orchestra-latest.png`. Only the table "Whole frame" uses `forest.webp`. Add the forest
       regions: the lit planks, the planks in the shade, the chairs, and the podium.
