@@ -326,8 +326,11 @@ function parseConfigValue(text: string, old: ConfigValue, path: string): ConfigV
  * (`colors.tone`), the light border of a black fur region (`colors.border`), the round eye
  * patches (`colors.patch`), the smile line (`colors.smile`), the move of a colored fur in Oklch
  * (`colors.shift`), the cut of the mesh where a hanging forearm touches the belly (`cut`), and
- * the smoothing of the arm tubes (`armSmooth`), and the smoothing of the bent elbows of the bind
- * mesh (`bindSmooth`). `tools/blender/rig_mesh.py` describes each rule.
+ * the smoothing of the arm tubes (`armSmooth`), the smoothing of the bent elbows of the bind
+ * mesh (`bindSmooth`), the straight bind arms (`studio.straightArms`), and the bind supination of
+ * each paw (`studio.bindSupination`, 0 for a side with no value). A path through an optional rule
+ * that the config does not have, such as `studio.bindSupination.L`, adds the rule first.
+ * `tools/blender/rig_mesh.py` describes each rule.
  */
 const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, ConfigValue>([
   ['headFactor', 1],
@@ -370,6 +373,8 @@ const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, Config
   ['colors.smile', { bands: [] }],
   ['colors.shift', { chroma: [0, 1], light: [0, 1], scale: [1, 1], turn: 0 }],
   ['cut', { top: 0 }],
+  ['studio.straightArms', false],
+  ['studio.bindSupination', { L: 0, R: 0 }],
 ]);
 
 /**
@@ -397,7 +402,7 @@ function setConfigValue(config: ConfigObject, change: ConfigChange): void {
   let node: ConfigValue = config;
   for (const [i, key] of keys.entries()) {
     const last = i === keys.length - 1;
-    const optional = last ? OPTIONAL_VALUES.get(path) : undefined;
+    const optional = OPTIONAL_VALUES.get(keys.slice(0, i + 1).join('.'));
     const old: ConfigValue | undefined = childOf(node, key) ?? optional;
     if (old === undefined && last && canAdd(node, key)) {
       setChild(node, key, newConfigValue(text, key, path));
@@ -407,7 +412,11 @@ function setConfigValue(config: ConfigObject, change: ConfigChange): void {
       throw new Error(`The key "${key}" of ${path} is not known.`);
     }
     if (!last) {
-      node = old;
+      // An optional rule that the config does not have gets a copy of its value first.
+      if (childOf(node, key) === undefined) {
+        setChild(node, key, structuredClone(old));
+      }
+      node = childOf(node, key) ?? old;
     } else {
       setChild(node, key, parseConfigValue(text, old, path));
     }
@@ -522,12 +531,28 @@ export function newKeys(text: string, list: string): string[] {
   const config = JSON.parse(text) as ConfigObject;
   const added: string[] = [];
   for (const change of configChanges(list)) {
-    if (!hasPath(config, change.path) && !OPTIONAL_VALUES.has(change.path)) {
+    if (!hasPath(config, change.path) && !isOptional(change.path)) {
       added.push(change.path);
     }
     setConfigValue(config, change);
   }
   return added;
+}
+
+/**
+ * Tells if a path names an optional rule ({@link OPTIONAL_VALUES}) or a key of the value of an
+ * optional rule, such as `studio.bindSupination.L`.
+ *
+ * @param path The path.
+ * @returns True for such a path.
+ */
+function isOptional(path: string): boolean {
+  if (OPTIONAL_VALUES.has(path)) {
+    return true;
+  }
+  const cut = path.lastIndexOf('.');
+  const parent = cut < 0 ? undefined : OPTIONAL_VALUES.get(path.slice(0, cut));
+  return parent !== undefined && childOf(parent, path.slice(cut + 1)) !== undefined;
 }
 
 /**
