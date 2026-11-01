@@ -217,7 +217,9 @@ def step_paint(s):
 def arm_stations(s, line):
     """Gives the center line point and the axis of each ring, as `arm_stations()` of
     `violin_arms.py` does, with the gap `wristGap` of the animal at the wrist: the rings of the
-    elbow stand `gap` from the joint, and the last forearm ring `wristGap` from the wrist."""
+    elbow stand `gap` from the joint, and the last forearm ring `wristGap` from the wrist. `fore`
+    is the number of the inner forearm rings at equal steps, or a tuple of their shares of the
+    forearm from the elbow joint."""
     a, e, w, t = line
     gap = s.units(s.spec['gap'])
     wrist = s.units(s.spec.get('wristGap', s.spec['gap']))
@@ -226,7 +228,11 @@ def arm_stations(s, line):
     out.append((e, (u + f).normalized()))
     lo, hi = gap / (w - e).length, 1 - wrist / (w - e).length
     count = s.spec['fore']
-    out += [(e.lerp(w, lo + (hi - lo) * k / (count + 1)), f) for k in range(count + 2)]
+    if isinstance(count, (tuple, list)):
+        shares = (lo,) + tuple(count) + (hi,)
+    else:
+        shares = tuple(lo + (hi - lo) * k / (count + 1) for k in range(count + 2))
+    out += [(e.lerp(w, k), f) for k in shares]
     out.append((w, (f + h).normalized()))
     return out
 
