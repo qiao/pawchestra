@@ -55,6 +55,7 @@
     "arm-shape": "node tools/arm-shape.ts",
     "arm-check": "node tools/arm-check.ts",
     "cast-matrix": "node tools/cast-matrix.ts",
+    "bind-supination": "node tools/bind-supination.ts",
     "carry-check": "node tools/carry-check.ts",
     "shot-trace": "node tools/shot-trace.ts",
     "look-lab": "node tools/look-lab.ts",
