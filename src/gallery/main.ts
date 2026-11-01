@@ -240,6 +240,14 @@ const floorSide = 2 * Math.max(extentX, extentZ) + 2;
 canvas.dataset['row'] = [extentX, extentZ, Math.max(...sizes.map((size) => size.height))]
   .map((value) => value.toFixed(3))
   .join(' ');
+// The place and the turn of the first model, for a camera that `pnpm clip-views --aim` aims at a
+// posed paw: x and z in meters, and the turn around y in radians.
+const first = models[0]?.object;
+if (first) {
+  canvas.dataset['first'] = [first.position.x, first.position.z, first.rotation.y]
+    .map((value) => value.toFixed(5))
+    .join(' ');
+}
 const floor = new Mesh(
   new PlaneGeometry(floorSide, floorSide),
   new MeshStandardMaterial({
