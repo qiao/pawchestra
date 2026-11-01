@@ -88,6 +88,9 @@
  * prints each value whose verdict or written value changed ({@link compareLines}), so that a try
  * of a weight or a hold shows its changes against the last try with no scratch reader.
  *
+ * `--rings` prints the narrow axes of the elbow ring and the wrist ring of each arm of each run
+ * ({@link ringLines}), also with no rebind, in place of the lines of a rebind.
+ *
  * `--world --base <ref>` gives the largest move of the posed joints and palms of each arm between
  * the commit and the working tree at the samples of the gate ({@link probeWorld}), with no gate. A
  * rebind round thus proves in one run that the new bind poses the same bones. It takes `--set` and
@@ -2082,6 +2085,43 @@ async function readGateFile(path: string): Promise<GateFile> {
 }
 
 /**
+ * Writes the narrow axis of the elbow ring and the wrist ring of each arm of each role in cm, with
+ * the base in parentheses (`--rings`): the 5th percentile of the worst sample set, as
+ * {@link rebindLines} writes it for a rebind. A try of a weight then reads the widths of each run.
+ *
+ * @param reports The reports of each role.
+ * @param base True when the run has a base.
+ * @returns The lines.
+ */
+export function ringLines(
+  reports: readonly {
+    readonly role: string;
+    readonly tree: RoleReport | null;
+    readonly base: RoleReport | null;
+  }[],
+  base: boolean,
+): string[] {
+  const rows = reports.flatMap(({ role, tree, base: before }) =>
+    tree
+      ? SIDES.map((side) => {
+          const cells = REBIND_RINGS.map((ring) => {
+            const was = base ? ` (${cm(before?.rings?.[side][ring] ?? undefined)})` : '';
+            return `${cm(tree.rings?.[side][ring] ?? undefined)}${was}`;
+          });
+          return `| ${role} | ${side} | ${cells.join(' | ')} |`;
+        })
+      : [],
+  );
+  return [
+    `The narrow axis p5 of the elbow ring and the wrist ring of each arm, in cm${base ? ', with the base in parentheses' : ''}:`,
+    '',
+    `| Role | Arm | ${REBIND_RINGS.map((ring) => `${ring} cm`).join(' | ')} |`,
+    `|---|---|${REBIND_RINGS.map(() => '---:').join('|')}|`,
+    ...rows,
+  ];
+}
+
+/**
  * Writes the table of the gate of several variants ({@link summaryLines}), with a column of the
  * name of the variant: one block of rows for each variant, in the order of the variants.
  *
@@ -2163,13 +2203,15 @@ export interface CheckArgs {
   readonly json: string | null;
   /** True for `--world`: the posed joints and palms against the base ({@link checkWorld}). */
   readonly world: boolean;
+  /** True for `--rings`: the ring widths of each arm of each run ({@link ringLines}). */
+  readonly rings: boolean;
   /** The file of `--compare`: the lines of an earlier run ({@link GateFile}), or `null`. */
   readonly compare: string | null;
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>], or pnpm arm-check <role>... | --all --world --base <ref> [--set <changes>]... [--glb <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
+  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>] [--rings], or pnpm arm-check <role>... | --all --world --base <ref> [--set <changes>]... [--glb <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
 
 /** One variant of `--variant`: a name and the changes of the holds of its `--set` options. */
 export interface ArmVariant {
@@ -2245,7 +2287,7 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     '--json',
     '--compare',
   ]);
-  const flags = new Set(['--all', '--views-all', '--long', '--world']);
+  const flags = new Set(['--all', '--views-all', '--long', '--world', '--rings']);
   const roles: string[] = [];
   const values = new Map<string, string[]>();
   const seen = new Set<string>();
@@ -2378,6 +2420,7 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     explain,
     json: values.has('--json') ? resolve(values.get('--json')?.[0] ?? '') : null,
     world: seen.has('--world'),
+    rings: seen.has('--rings'),
     compare: values.has('--compare') ? resolve(values.get('--compare')?.[0] ?? '') : null,
   };
 }
@@ -3649,7 +3692,9 @@ async function checkVariants(options: CheckArgs): Promise<number> {
   );
   for (const { variant, reports, rows } of blocks) {
     const grips = gripLines(reports);
-    const rebinds = rebindLines(reports);
+    const rebinds = options.rings
+      ? ringLines(reports, options.base !== null)
+      : rebindLines(reports);
     const shown = options.long ? rows : rows.filter((row) => row.verdict !== 'PASS');
     if (grips.length > 0 || shown.length > 0 || rebinds.length > 0) {
       console.log(`\nVariant ${variant.name}:`);
@@ -3757,9 +3802,12 @@ async function main(): Promise<number> {
     await writeFile(options.json, `${JSON.stringify(lines, null, 1)}\n`);
     console.log(`\nLines of the gate: ${options.json}`);
   }
-  const rebinds = rebindLines(reports);
+  const rebinds = options.rings ? [] : rebindLines(reports);
   if (rebinds.length > 0) {
     console.log(['', ...rebinds].join('\n'));
+  }
+  if (options.rings) {
+    console.log(['', ...ringLines(reports, options.base !== null)].join('\n'));
   }
   const grips = gripLines(reports);
   if (grips.length > 0) {
