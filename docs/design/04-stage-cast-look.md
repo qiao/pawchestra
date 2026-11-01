@@ -271,15 +271,21 @@ blends one time, from the source. A straight arm has no elbow plane, so the body
 axis of each arm (`StudioBody.hinges`). The axis is the axis of the bent bind of
 `studio.bindArms`, so that the upper arms and the paws keep their world turns in each pose. The
 inner elbow then bends further from its bind, so a `raise` shape of a bent elbow relaxes its faces.
+The linear blend of the larger bend also narrows the bent elbow, and a shape cannot widen it.
 
 **Role-neutral bind.** The target of each body is a bind that fits no single role: straight bind
-arms, and one bind supination of each paw near the middle of the play twists of all roles of the
-body. A bind bent for one hold gives a rest shape that fits only that hold, and each other hold
-blends its own bend on top. A bind supination for one role can put the paw twist of another role
-near 180°, where the skin folds and the twist measure flips. So a body with the role-neutral bind
-takes a new role with no new rig, which is the way to one skeleton for each species and each
-instrument (Cast matrix). The wolf has this bind. A body with `raise` shapes also fits each shape
-against all its roles, because a shape fits only the poses near its hold.
+arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
+shape that fits only that hold, and each other hold blends its own bend on top. So a body with
+the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
+species and each instrument (Cast matrix). The wolf has this bind. A body with `raise` shapes also
+fits each shape against all its roles, because a shape fits only the poses near its hold.
+
+The bind supination of each paw is the value that makes the largest paw twist p95 of any role
+smallest. The roles are the roles of the cast matrix (`CAST_ROLES`) and the own roles of the body,
+each on the sample of the matrix (`CAST_SAMPLE`). A value from two roles only can put the paw twist
+of a third role near 180°, where the skin folds and the twist measure flips. A change of the
+supination moves each signed paw twist of its side by the same angle, so the signed twists of one
+rig give the value of each side.
 
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
