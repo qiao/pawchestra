@@ -291,6 +291,14 @@ axis of the retarget. The palm comes from the hand of the player, and the zero i
 with the palm inward. A new bind of the same pose then keeps each grip, and one entry of a role
 holds for each body.
 
+A new bind of the same bone pose moves the zero of the lines that count from the bind
+(`BIND_MEASURES`), so their margin against the base would fail a body for its bind alone. So the
+gate keys the bind of each body (the bind heads of the arm bones, the palms, and the elbow axes).
+When the key differs from the base, these lines take only their limits, and `REBIND` marks a line
+that the margin alone fails. The gate then compares the elbow and wrist ring widths in meters,
+because the flat share counts from the bind ring. A body with the same bind keeps the margin, so a
+round that keeps the binds stays as strict as before.
+
 ```typescript
 /** The bind frames of the grip of one arm (`tools/arm-check.ts`). */
 interface GripFrames {
