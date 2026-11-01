@@ -36,7 +36,7 @@ import { promisify } from 'node:util';
 import { Matrix4, Vector3 } from 'three';
 
 import { armBinds } from './arm-shape.ts';
-import { FOLD_ROLES, probeFolds, roleAnimal } from './fold-probe.ts';
+import { FOLD_ROLES, findRole, isRole, probeFolds, roleAnimal } from './fold-probe.ts';
 import { rigConfigPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { keptCorners } from './rig-mesh.ts';
 import { setHolds } from './hold-sets.ts';
@@ -414,7 +414,7 @@ export async function sourceCorners(animal: string): Promise<(SourceFace | null)
 /**
  * Measures both arms of a role over the play samples of its demos.
  *
- * @param role The name of a role of `FOLD_ROLES`.
+ * @param role The name of a role of `FOLD_ROLES`, or a recast role (`findRole()`).
  * @param sources The source face of each face of the module, or null.
  * @param demos The demos.
  * @param step The step of the song time of the play, in seconds.
@@ -427,7 +427,7 @@ export function probeArmLook(
   demos: readonly DemoFile[],
   step: number,
 ): Readonly<Record<Side, ArmLookValues>> {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   if (!source) {
     throw new Error(`No role has the name ${role}.`);
   }
@@ -503,15 +503,15 @@ async function main(): Promise<void> {
         : undefined;
   const roles = args.includes('--all')
     ? meshRoles()
-    : args.filter((arg, i) => FOLD_ROLES.has(arg) && !(args[i - 1] ?? '').startsWith('--'));
+    : args.filter((arg, i) => isRole(arg) && !(args[i - 1] ?? '').startsWith('--'));
   if (roles.length === 0) {
     throw new Error(
-      `Usage: pnpm arm-look <role>... | --all [--demo <id>]... [--step <seconds>] [--set <changes>]... [--glb <file> --corners <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}.`,
+      `Usage: pnpm arm-look <role>... | --all [--demo <id>]... [--step <seconds>] [--set <changes>]... [--glb <file> --corners <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>.`,
     );
   }
   if (glb) {
     const [role] = roles;
-    const source = role ? FOLD_ROLES.get(role) : undefined;
+    const source = role ? findRole(role) : undefined;
     if (roles.length !== 1 || !source || !cornersFile) {
       throw new Error(
         'The option --glb takes one role and the corners of its rig: --corners <file>, or <name>.corners.json beside <name>.glb of pnpm rig-mesh --check --keep.',
@@ -541,7 +541,7 @@ async function main(): Promise<void> {
   let failed = false;
   try {
     for (const role of roles) {
-      const source = FOLD_ROLES.get(role);
+      const source = findRole(role);
       if (!source) {
         continue;
       }
