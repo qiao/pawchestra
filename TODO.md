@@ -281,22 +281,25 @@ passes.
       play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
       goes 5.9 cm into the body in 2% of the samples.
-- [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and one bind
-      supination at the middle of the play twists of their roles, one body at a time. The wolf
-      has it. The bodies with only a bent `bindArms` cost least: start with the mouse, whose arms
-      come from `wind_arms.py` as the arms of the wolf.
-- [ ] Wolf role-neutral bind: the bent elbows are narrower in meters than with the bent bind. The
-      left elbow ring of the clarinetist at rest is 3.1 cm in place of 3.8 cm (flat p5 0.78 in
-      place of 0.94), and the forearms go 0.6 cm into the body at rest in place of 0.5 cm. The 2x
-      crops show no slit or flap. Two `raise` shapes of each bent elbow (`pnpm raise-fit`, fade 20°
-      to 40°) did not bring the ring to 3.6 cm: a valley fill gave 3.05 cm left and 3.45 cm right
-      (p5, against 3.04 and 3.38), and a follow of the first upper arm segment gave 3.15 and 3.54.
-      Both added a left fold (folds p95 5, base 2). A shape that only relaxes or fills cannot give
-      back the lost width: try weights or a helper bone at the inner elbow.
-- [ ] Wolf bind supination: the left value 100° is the middle of the clarinet and the violin only.
-      The snare drum recast (`snare-drummer@wolf`) then twists the left paw 171° (limit 170°) and
-      the left forearm 80° (limit 80°), in place of 142° and 65° with 66°. Choose the value from
-      the twists of all roles of the cast matrix.
+- [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
+      supination of the rule, one body at a time. The wolf and the mouse have it. The bear has
+      straight bind arms and needs only the supination. Then the bodies with arm segments and a
+      bent `bindArms`: the elephant, the hippo, the rhino, and the deer.
+- [ ] Bind supination rule (design 4.4): save the probe of the signed paw twists of the cast roles
+      as a tool, so that each body move gets its value in one run. The round used scratch probes
+      (`reports/2026-11-01-elbow-mouse/probes/`). It needs the recast setup of `measurePair()` of
+      `tools/cast-matrix.ts` as an export.
+- [ ] Neutral bind elbows: the bent elbows are narrower in meters than with the bent bind. The
+      elbow ring p5 is 3.04 cm in place of 3.71 cm (left) and 3.39 in place of 3.97 (right) on the
+      wolf clarinetist, and 1.74 in place of 1.98 (left) and 1.79 in place of 2.01 (right) on the
+      mouse oboist. The 2x crops show no slit, flap, or pinch. Four tries on the wolf did not
+      reach 3.6 cm with no new fold: two `raise` shapes (3.05 and 3.15 cm left), an elbow helper of
+      3 and 4 ring gaps in Blender (3.08 cm and no gain), and a Remove From Group of the arm bones
+      across the joint (3.30 cm, and 3.39 cm with Levels gain 2 on the helper), which folds 2 to 4
+      faces of the left inner elbow in each sample. Next: more Smooth rounds after the Remove From
+      Group, or a loop edge ring at the elbow (`wind_arms.py` faces, ask first).
+- [ ] Mouse oboist with the neutral bind: the right arm folds 8 faces at p95 at rest (limit 8,
+      base 7), and the left arm 6 (base 4).
 - [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
       folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
       `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
