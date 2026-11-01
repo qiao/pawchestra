@@ -78,7 +78,9 @@
  * no cache ({@link explainLines}): the value of each arm in each sample set against the rest
  * sample and against the bind, with the mark `MOVES` at a stretch that is larger from the rest
  * than from the bind, the part of the rest sample of each demo that shrinks most from the bind,
- * and the worst edges or rings of the worst sample of each arm, with the bone of each.
+ * and the worst edges or rings of the worst sample of each arm, with the bone of each. With
+ * `--glb <file>`, it explains the studio body of the file, in a copy of `src/`
+ * (`tools/glb-swap.ts`), so that each try body of a rig gives its rings at the same samples.
  *
  * `--variant <name>` starts a variant of the holds, and each `--set` after it adds its changes to
  * the variant. Several `--variant` groups give several variants in one run ({@link checkVariants}).
@@ -93,7 +95,7 @@
  * [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long], or
  * pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>]
  * [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]...
- * [--midi <path>]... [--step <seconds>] [--set <changes>]...
+ * [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]
  *
  * Each `--midi <path>` adds a MIDI file outside the repository to the demos as one more `--demo`
  * ({@link userFiles}), also on the commit of `--base` and `--states`.
@@ -1993,7 +1995,7 @@ export interface CheckArgs {
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]...';
+  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
 
 /** One variant of `--variant`: a name and the changes of the holds of its `--set` options. */
 export interface ArmVariant {
@@ -2149,12 +2151,12 @@ export function checkArgs(args: readonly string[]): CheckArgs {
   if (explainText !== null && explain === null) {
     throw new Error(`The option --explain takes ${EXPLAINED.join(' or ')}.\n${USAGE}`);
   }
-  const unexplained = ['--base', '--glb', '--views', '--jobs', '--trace', '--states'].filter((o) =>
+  const unexplained = ['--base', '--views', '--jobs', '--trace', '--states'].filter((o) =>
     values.has(o),
   );
   if (explain && (chosen.length !== 1 || all || unexplained.length > 0 || seen.has('--long'))) {
     throw new Error(
-      `The option --explain takes one role, --demo, --step, and --set, and no --all, --long, or ${unexplained.join(', ') || 'option of the gate'}.\n${USAGE}`,
+      `The option --explain takes one role, --demo, --step, --set, and --glb, and no --all, --long, or ${unexplained.join(', ') || 'option of the gate'}.\n${USAGE}`,
     );
   }
   const variants = variantGroups(args);
@@ -3207,6 +3209,15 @@ async function main(): Promise<number> {
     return childMain(args);
   }
   const options = checkArgs(args);
+  const { glb, rest } = takeGlb(args);
+  if (options.explain && glb) {
+    // The explain runs again in a copy of `src/` with the studio body of the file.
+    const source = findRole(options.roles[0] ?? '');
+    if (!source) {
+      throw new Error(`No role has the name ${options.roles.join(', ')}.`);
+    }
+    return withGlbBody(roleAnimal(source), glb, (dir) => runTool(dir, 'arm-check.ts', rest));
+  }
   if (options.trace || options.explain) {
     const holds = options.own.filter((...[, i]) => options.own[i - 1] === '--set').join(';');
     const changes = holds ? setHolds(holds) : null;
