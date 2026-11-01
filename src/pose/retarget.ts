@@ -95,6 +95,7 @@ export interface ClipTarget {
  * no state (`clipPoseAt()` of `pose/clip-pose.ts`).
  */
 export interface PlayerClip {
+  /** The name of the source clip. */
   readonly name: string;
   /** The frames for each second. */
   readonly rate: number;

@@ -49,15 +49,19 @@ export interface SourceTrack {
 
 /** One animation of a clip file. */
 export interface SourceClip {
+  /** The name of the animation, such as `Wave`. */
   readonly name: string;
   /** The time of the last key, in seconds. The first key is at 0. */
   readonly duration: number;
+  /** The keys of each animated property of each bone. */
   readonly tracks: readonly SourceTrack[];
 }
 
 /** The skeleton and the clips of one GLB file. */
 export interface SourceFile {
+  /** The skeleton in its rest pose. */
   readonly skeleton: SourceSkeleton;
+  /** The animations of the file, in their order. */
   readonly clips: readonly SourceClip[];
 }
 
