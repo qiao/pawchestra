@@ -2875,8 +2875,7 @@ async function childMain(args: readonly string[]): Promise<number> {
     throw new Error('The step must be a number of seconds above 0.');
   }
   const demos = await gateDemos(option('--demo'), option('--midi'), false);
-  const holds = option('--set').join(';');
-  const changes = holds ? setHolds(holds) : null;
+  const changes = await setRunHolds(roles, option('--set').join(';'));
   const reports: Record<string, RoleReport> = {};
   try {
     for (const role of roles) {
@@ -2896,6 +2895,26 @@ async function childMain(args: readonly string[]): Promise<number> {
   };
   await writeFile(option('--json')[0] ?? '', `${JSON.stringify(json)}\n`);
   return 0;
+}
+
+/**
+ * Sets the hold changes of a run in memory, with the scale of the size rule of each recast role,
+ * as the cast matrix gives it (`setRecastHolds()` of `tools/recast-scale.ts`). The module of the
+ * rule loads only for a recast role, because the probe tree of an older commit can lack it.
+ *
+ * @param roles The roles of the run.
+ * @param holds The hold changes of `--set`, or `''`.
+ * @returns The changes with a function that puts the old values back, or `null` for no change.
+ */
+async function setRunHolds(
+  roles: readonly string[],
+  holds: string,
+): Promise<ReturnType<typeof setHolds> | null> {
+  if (!roles.some((role) => role.includes('@'))) {
+    return holds ? setHolds(holds) : null;
+  }
+  const { setRecastHolds } = await import('./recast-scale.ts');
+  return setRecastHolds(roles, holds);
 }
 
 /**
@@ -3006,8 +3025,12 @@ async function eachLimited<T, R>(
   return results;
 }
 
-/** The scripts of the gate that `--base` and `--states` copy into the tree of each commit. */
-const GATE_SCRIPTS: readonly string[] = ['arm-check.ts'];
+/**
+ * The scripts of the gate that `--base` and `--states` copy into the tree of each commit. The size
+ * rule of a recast role ({@link setRunHolds}) goes with the gate, so that both trees measure the
+ * recast pair at the size of their own rule.
+ */
+const GATE_SCRIPTS: readonly string[] = ['arm-check.ts', 'recast-scale.ts'];
 
 /**
  * Opens the probe tree of each commit (`withProbeTree()` of `tools/ref-tree.ts`), with the gate of
@@ -3220,9 +3243,9 @@ async function main(): Promise<number> {
   }
   if (options.trace || options.explain) {
     const holds = options.own.filter((...[, i]) => options.own[i - 1] === '--set').join(';');
-    const changes = holds ? setHolds(holds) : null;
+    const changes = await setRunHolds(options.roles, holds);
     try {
-      if (changes) {
+      if (changes?.text) {
         console.log(`The working tree takes the hold changes ${changes.text}.`);
       }
       const role = options.roles[0] ?? '';
