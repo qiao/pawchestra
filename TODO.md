@@ -285,11 +285,21 @@ passes.
       176° to 180° on its forearm and flips in the lift and the lowering (17,992°/s). A bind
       supination in the middle of the twists of all roles of a body (left 100°, right 65°) passes
       the gate of both roles. Decide the migration with the report of the spike.
-- [ ] Test mannequin: `pnpm arm-check violinist@mannequin clarinetist@mannequin` fails. Each arm
-      has folds p95 9 to 20 (also at rest), and the right arms have twist p95 97 (violin) and 66
-      (clarinet). The rig has the rule weights with no arm segments. The bind supination of the
-      spike (left 100°, right 65°) lowers only the paw twist. Try the arm segments with Blender
-      weights.
+- [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
+      folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
+      `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
+      folds (left 8 to 13), and a wider smooth of the shoulder line gave no change.
+- [ ] Test mannequin: the forearm twist p95 of the left violin arm is 54 against 38 of the base
+      (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
+      Decide if the margin holds against a base with no segments.
+- [ ] Test mannequin: the baked bands of the rebuilt arms have saw-tooth edges in the face colors,
+      because the tube faces do not follow the band edges of the source.
+- [ ] Arm rebuild: on the wolf clarinetist, `arm_rebuild.py` gives fewer folds than `wind_arms.py`,
+      but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
+      ring, then replace the species scripts one at a time after a review of the crops.
+- [ ] Arm rebuild: `arm_rebuild.py` has no cut along the seam with a side wall (`cat_arms.py`),
+      so an arm joined to the trunk down to the elbow (the fox, the cat, the hippo, and the deer)
+      keeps its species script.
 - [ ] Recast grips: `pnpm arm-check` gives a recast role with no entry of `ACCEPTED_GRIPS` no
       grip turn, such as `violinist@mannequin`. The grip frame does not move with the bind, so the
       gate can take the entry of the role, as `pnpm cast-matrix` does. Decide it.
