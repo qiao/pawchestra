@@ -47,6 +47,9 @@ def import_file(path):
             filepath=path, automatic_bone_orientation=False, ignore_leaf_bones=False
         )
     elif ext in ('.glb', '.gltf'):
+        # The glTF importer puts the keys on the frames of the scene. Mixamo gives 30 frames a
+        # second, so the keys stay on frames, and the export keeps their times.
+        bpy.context.scene.render.fps = 30
         bpy.ops.import_scene.gltf(filepath=path)
     else:
         fail(f'the file type {ext} is not read: give an FBX, GLB, or glTF file')
@@ -106,13 +109,23 @@ def bake_object_transform(rig):
 
 
 def clip_name(action, stem, count, rig):
-    """Names a clip by its take, or by the file name for a file of one take."""
-    if count == 1:
-        return stem
+    """Names a clip by its take, or by the file name for a file of one Mixamo take."""
+    parts = action.name.split('|')
+    if len(parts) == 1:
+        # The glTF importer keeps the name of each animation.
+        return action.name
     # The FBX importer names a take `<object>|<take>`, and a Mixamo take is `mixamo.com|Layer0`.
     skip = {'', 'mixamo.com', rig.name}
-    parts = [p for p in action.name.split('|')[1:] if p not in skip and not p.startswith('Layer')]
-    return parts[-1] if parts else stem
+    kept = [p for p in parts[1:] if p not in skip and not p.startswith('Layer')]
+    return kept[-1] if kept and count > 1 else stem
+
+
+def drop_bone_shapes(rig):
+    """Removes the meshes that only draw the bones, such as the sphere of the glTF importer."""
+    shapes = {pb.custom_shape for pb in rig.pose.bones if pb.custom_shape}
+    for obj in shapes:
+        bpy.data.objects.remove(obj)
+    return len(shapes)
 
 
 def main():
@@ -127,6 +140,7 @@ def main():
         bpy.data.objects.remove(obj)
     import_file(source)
     rig = the_armature()
+    log('bone shapes removed', drop_bone_shapes(rig))
     renamed = strip_prefix(rig)
     log('bones renamed', renamed)
     factor = bake_object_transform(rig)
