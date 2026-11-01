@@ -2850,12 +2850,18 @@ async function explainRole(
 }
 
 /**
- * Runs the tool as a child: it measures the roles of the command line in this tree, and writes
- * {@link ArmJson} into the file of `--json`. A role that the tree does not have goes into
+ * The mark of a child of the tool on its command line: a child writes {@link ArmJson} into the
+ * file of `--json`. A child of `--base` and `--states` runs the gate of the working tree, so each child has the mark.
+ */
+const CHILD = '--child';
+
+/**
+ * Runs the tool as a child ({@link CHILD}): it measures the roles of the command line in this
+ * tree, and writes {@link ArmJson} into the file of `--json`. A role that the tree does not have goes into
  * `missing`. With `--glb <file>`, the tool runs again in a copy of `src/` with the studio body of
  * the file (`tools/glb-swap.ts`).
  *
- * @param args The arguments, with `--json <file>`.
+ * @param args The arguments, with {@link CHILD} and `--json <file>` at the end.
  * @returns The exit code.
  */
 async function childMain(args: readonly string[]): Promise<number> {
@@ -2966,7 +2972,7 @@ async function measureRole(
     const texts = await probeBeside(
       options.base,
       'arm-check.ts',
-      { base: [role, ...options.shared], tree },
+      { base: [role, ...options.shared, CHILD], tree: [...tree, CHILD] },
       { prefix: 'arm-check-', cache: true, treeCache, scripts: GATE_SCRIPTS },
     );
     return {
@@ -2983,7 +2989,7 @@ async function measureRole(
       const file = join(dir, 'tree.json');
       await runChild(
         process.execPath,
-        [join('tools', 'arm-check.ts'), ...tree, '--json', file],
+        [join('tools', 'arm-check.ts'), ...tree, CHILD, '--json', file],
         ROOT,
       );
       return readFile(file, 'utf8');
@@ -3086,7 +3092,7 @@ async function measureStates(options: CheckArgs): Promise<StateRun[]> {
       const file = join(dir, `${role}.json`);
       await runChild(
         process.execPath,
-        [join('tools', 'arm-check.ts'), role, ...options.shared, '--json', file],
+        [join('tools', 'arm-check.ts'), role, ...options.shared, CHILD, '--json', file],
         dir,
       );
       return readArmJson(await readFile(file, 'utf8')).roles[role] ?? null;
@@ -3228,7 +3234,7 @@ async function checkVariants(options: CheckArgs): Promise<number> {
  */
 async function main(): Promise<number> {
   const args = process.argv.slice(2);
-  if (args.includes('--json')) {
+  if (args.includes(CHILD)) {
     return childMain(args);
   }
   const options = checkArgs(args);
