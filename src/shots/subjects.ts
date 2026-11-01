@@ -503,8 +503,9 @@ function sphereAround(points: ArrayLike<number>): Pick<BodyPart, 'center' | 'rad
 }
 
 /**
- * Gives the body of a model at its place on the stage (design 5.6): its points and its parts
- * after a turn of `facing` around y and the position, and a sphere that holds them.
+ * Gives the body of a model at its place on the stage (design 5.6): its parts after a turn of
+ * `facing` around y and the position, and a sphere that holds them. The points of a part move to
+ * the place at the first test of the part (`placePart()` of `foreground.ts`).
  *
  * @param model The model.
  * @param place The place of the model.
@@ -520,17 +521,19 @@ function bodyAt(model: PlayerModel, place: Pick<PlayerPlace, 'position' | 'facin
     py + y,
     pz - x * sin + z * cos,
   ];
-  const points = new Float64Array(local.points.length);
-  for (let i = 0; i < points.length; i += 3) {
-    const x = local.points[i] ?? 0;
-    const z = local.points[i + 2] ?? 0;
-    points[i] = px + x * cos + z * sin;
-    points[i + 1] = py + (local.points[i + 1] ?? 0);
-    points[i + 2] = pz - x * sin + z * cos;
-  }
   // A turn and a move keep each sphere: only its middle moves.
   const parts = local.parts.map((part) => ({ ...part, center: move(...part.center) }));
-  return { points, center: move(...local.center), radius: local.radius, parts };
+  return {
+    local: local.points,
+    points: new Float64Array(local.points.length),
+    placed: new Uint8Array(local.points.length / 3),
+    position: place.position,
+    cos,
+    sin,
+    center: move(...local.center),
+    radius: local.radius,
+    parts,
+  };
 }
 
 /** The outline of a model in the stage plane, and the height of its top. */

@@ -19,7 +19,7 @@ export interface BodyPart {
   readonly center: Vec3;
   /** The radius of the sphere, in meters. */
   readonly radius: number;
-  /** The index of the first point of the part in {@link StageBody}.points, a third of its offset. */
+  /** The index of the first point of the part in {@link StageBody}.local, a third of its offset. */
   readonly start: number;
   /** The index of the point after the last point of the part. */
   readonly end: number;
@@ -28,10 +28,23 @@ export interface BodyPart {
 /** The body of an animal on the stage in the bind pose, for the distance floor of a close shot. */
 export interface StageBody {
   /**
-   * The points of the body with no instrument and no repeats, as x, y, z in the stage axes, in
-   * the order of the parts.
+   * The points of the body with no instrument and no repeats, as x, y, z in the axes of the model,
+   * in the order of the parts.
+   */
+  readonly local: Float64Array;
+  /**
+   * The points of {@link StageBody.local} in the stage axes. A part gets its points at its first
+   * test ({@link placePart}), because each camera is far from most parts.
    */
   readonly points: Float64Array;
+  /** 1 at the index of the first point of each part whose points are in `points`, else 0. */
+  readonly placed: Uint8Array;
+  /** The position of the model on the stage. */
+  readonly position: Vec3;
+  /** The cosine of the turn of the model around y (`facing`). */
+  readonly cos: number;
+  /** The sine of the turn of the model around y. */
+  readonly sin: number;
   /** The middle of a sphere that holds the points. */
   readonly center: Vec3;
   /** The radius of the sphere, in meters. */
@@ -424,6 +437,29 @@ export function foregroundObject(
 }
 
 /**
+ * Writes the points of a part of a body in the stage axes, at the first test of the part: a turn
+ * around y, then the position of the model.
+ *
+ * @param body The body.
+ * @param part The part.
+ */
+function placePart(body: StageBody, part: BodyPart): void {
+  if (body.placed[part.start] === 1) {
+    return;
+  }
+  const { local, points, cos, sin } = body;
+  const [px, py, pz] = body.position;
+  for (let i = part.start * 3; i < part.end * 3; i += 3) {
+    const x = local[i] ?? 0;
+    const z = local[i + 2] ?? 0;
+    points[i] = px + x * cos + z * sin;
+    points[i + 1] = py + (local[i + 1] ?? 0);
+    points[i + 2] = pz - x * sin + z * cos;
+  }
+  body.placed[part.start] = 1;
+}
+
+/**
  * Tells if a point of an animal body in the frame of a camera is nearer to the camera than
  * {@link ANIMAL_FLOOR} (design 5.6). A body or a part whose sphere is farther than the floor needs
  * no test of its points.
@@ -477,6 +513,7 @@ export function animalTooNear(
       ) {
         continue;
       }
+      placePart(body, part);
       for (let i = part.start * 3; i < part.end * 3; i += 3) {
         const dx = (p[i] ?? 0) - cx;
         const dy = (p[i + 1] ?? 0) - cy;
