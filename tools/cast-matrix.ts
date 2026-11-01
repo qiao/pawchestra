@@ -2,8 +2,8 @@
  * Measures each pair of a species and a role: the cast matrix (design 4.4, "Cast matrix"). It
  * recasts each species into each role (`findRole()` of `tools/fold-probe.ts`), and measures the
  * pair with the arm gate (`probeRole()` of `tools/arm-check.ts`) and the clearance sweep
- * (`sweepDemos()` of `tools/pose-depth.ts`) on a short sample ({@link CAST_SAMPLE}). Thus the
- * table shows how far the bodies are from "any animal with any instrument".
+ * (`sweepDemos()` of `tools/pose-depth.ts`), with its note targets, on a short sample
+ * ({@link CAST_SAMPLE}). Thus the table shows which species can play which instrument.
  *
  * - **Hold.** A recast pair plays the shared hold of the instrument: the tool removes the own hold
  *   of the species from `SPECIES_HOLDS` and `SPECIES_WIND_HOLDS` in memory. The own role of a
@@ -11,11 +11,12 @@
  * - **Scale.** A recast pair with a violin or a viola takes the scale of the rule of a violin shop
  *   (`ruleSize()` of `tools/hold-reach.ts`), clamped to the real sizes ({@link REAL_LENGTHS}). Each
  *   other instrument keeps the scale 1, and the cell says so ({@link ScaleSource}).
- * - **Verdict.** A value of the gate over its limit fails, and a clip over the limit of its pair
- *   fails. A value is open when the own pair of the role is over the same limit and the value is not
- *   worse by more than the margin of the limit ({@link CLIP_MARGIN} for a clip): a known item of the
- *   role. The grip of each pair counts from the accepted grip of the role (`ACCEPTED_GRIPS`),
- *   because the grip frame does not move with the bind.
+ * - **Verdict.** A value of the gate over its limit fails, a clip over the limit of its pair fails,
+ *   and a note target missed by more than the limit of the role fails. A value is open when the own
+ *   pair of the role is over the same limit and the value is not worse by more than the margin of
+ *   the limit ({@link CLIP_MARGIN} for a clip and a note target): a known item of the role. The
+ *   grip of each pair counts from the accepted grip of the role (`ACCEPTED_GRIPS`), because the
+ *   grip frame does not move with the bind.
  *
  * Each pair runs in a child process, with at most `--jobs` children at the same time, and its JSON
  * goes into a cache by tree (`treeCacheFile()` of `tools/ref-tree.ts`), so a second run on the same
@@ -86,11 +87,14 @@ export const REAL_LENGTHS = {
   viola: { smallest: 0.42, largest: 0.7 },
 } as const;
 
-/** The deeper depth of a clip than the own pair of the role above which the clip fails, in meters. */
+/**
+ * The depth of a clip, or the error of a note target, past the own pair of the role above which
+ * the value fails, in meters.
+ */
 export const CLIP_MARGIN = 0.01;
 
 /** The format version of {@link PairJson}. A new version gives new cache keys. */
-export const CAST_FORMAT = 1;
+export const CAST_FORMAT = 2;
 
 /**
  * The source of the instrument scale of a pair. `own`: the own role of the species, with the scale
@@ -146,13 +150,15 @@ export interface PairJson {
   readonly clips: readonly PairClip[];
   /** The note targets of the sweep. */
   readonly targets: TargetReach;
+  /** The largest error of a note target of the role (`RoleSweep.targetError`), in meters. */
+  readonly targetLimit: number;
   /** The message of an error of the pair, or `null`. */
   readonly error: string | null;
   /** The run time of the pair, in seconds. */
   readonly seconds: number;
 }
 
-/** One value of a cell that does not pass, or the value nearest to its limit in a cell that does. */
+/** One value of a cell: a value that does not pass, or the value nearest to its limit. */
 export interface CellItem {
   /** The verdict of the value. */
   readonly verdict: 'PASS' | 'OPEN' | 'FAIL';
@@ -170,6 +176,8 @@ export interface MatrixCell {
   readonly worst: CellItem | null;
   /** The deepest clip with the largest ratio, or `null` with no clip. */
   readonly clip: CellItem | null;
+  /** The largest error of a note target, or `null` with no note target. */
+  readonly targets: CellItem | null;
   /** The values that do not pass. */
   readonly items: readonly CellItem[];
 }
@@ -429,7 +437,9 @@ async function measurePair(species: SpeciesId, role: string, demo: string): Prom
       };
     }
     const seconds = (performance.now() - started) / 1000;
-    return { ...base, scale, arms, clips: [...clips.values()], targets, error: null, seconds };
+    const targetLimit = sweep.targetError;
+    const found = { arms, clips: [...clips.values()], targets, targetLimit };
+    return { ...base, scale, ...found, error: null, seconds };
   } catch (error) {
     return {
       ...base,
@@ -437,6 +447,7 @@ async function measurePair(species: SpeciesId, role: string, demo: string): Prom
       arms: null,
       clips: [],
       targets: { samples: 0, within: 0, worst: 0 },
+      targetLimit: 0,
       error: error instanceof Error ? error.message : String(error),
       seconds: (performance.now() - started) / 1000,
     };
@@ -520,6 +531,35 @@ function clipItem(clip: PairClip, home: PairClip | undefined): CellItem {
 }
 
 /**
+ * Gives the item of the note targets of a pair: the largest error of a hand, or of the part that
+ * it holds, from its note target. It goes over its limit when a paw misses its strings, keys, or
+ * valves.
+ *
+ * @param pair The pair.
+ * @param home The own pair of the role, or `null`.
+ * @returns The item, or `null` for a pair with no note target.
+ */
+function targetItem(pair: PairJson, home: PairJson | null): CellItem | null {
+  if (pair.targets.samples === 0) {
+    return null;
+  }
+  const { worst } = pair.targets;
+  const limit = pair.targetLimit;
+  const homeWorst = home && home.targets.samples > 0 ? home.targets.worst : null;
+  const mm = (m: number): string => (m * 1000).toFixed(m < 0.01 ? 1 : 0);
+  return {
+    verdict: cellVerdict(
+      worst > limit,
+      homeWorst !== null && homeWorst > limit,
+      homeWorst === null ? Infinity : worst - homeWorst,
+      CLIP_MARGIN,
+    ),
+    text: `targets ${mm(worst)}/${mm(limit)} mm`,
+    ratio: worst / Math.max(1e-4, limit),
+  };
+}
+
+/**
  * Gives the cell of a pair against the own pair of its role.
  *
  * @param pair The pair.
@@ -530,7 +570,7 @@ export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
   if (pair.error !== null || !pair.arms) {
     const text = `error: ${(pair.error ?? 'no report').split('\n')[0] ?? ''}`;
     const item: CellItem = { verdict: 'FAIL', text, ratio: Infinity };
-    return { verdict: 'FAIL', worst: item, clip: null, items: [item] };
+    return { verdict: 'FAIL', worst: item, clip: null, targets: null, items: [item] };
   }
 
   const homeRows = home?.arms ? gateRows(home.name, home.arms, null) : [];
@@ -551,18 +591,21 @@ export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
       (best, item) => (!best || item.ratio > best.ratio ? item : best),
       null,
     );
-  const items = [...gate, ...clips].filter((item) => item.verdict !== 'PASS');
+  const targets = targetItem(pair, home);
+  const items = [...gate, ...clips, ...(targets ? [targets] : [])].filter(
+    (item) => item.verdict !== 'PASS',
+  );
   const verdict = items.some((item) => item.verdict === 'FAIL')
     ? 'FAIL'
     : items.length > 0
       ? 'OPEN'
       : 'PASS';
-  return { verdict, worst: largest(gate), clip: largest(clips), items };
+  return { verdict, worst: largest(gate), clip: largest(clips), targets, items };
 }
 
 /**
- * Writes the text of a cell: the verdict, the worst value of the gate, the deepest clip, and the
- * scale.
+ * Writes the text of a cell: the verdict, the worst value of the gate, the deepest clip, the note
+ * targets when they do not pass, and the scale.
  *
  * @param pair The pair.
  * @param cell The cell.
@@ -577,7 +620,8 @@ export function cellText(pair: PairJson, cell: MatrixCell): string {
         : pair.scale.source === 'none'
           ? ' · x1 no rule'
           : ` · x${pair.scale.value.toFixed(2)}${pair.scale.source === 'rule' ? '' : ` ${pair.scale.source}`}`;
-  const parts = [cell.verdict, cell.worst?.text, cell.clip?.text].filter(
+  const missed = cell.targets?.verdict === 'PASS' ? undefined : cell.targets?.text;
+  const parts = [cell.verdict, cell.worst?.text, cell.clip?.text, missed].filter(
     (part) => part !== undefined,
   );
   return `${parts.join(' · ')}${scale}`;
@@ -593,7 +637,7 @@ export function matrixLines(json: MatrixJson): string[] {
   const find = (species: SpeciesId, role: string): MatrixPair | undefined =>
     json.pairs.find(({ pair }) => pair.species === species && pair.role === role);
   const lines = [
-    `Cast matrix of ${json.species.length} species and ${json.roles.length} roles in ${Math.round(json.seconds)} s. Sample: the shortest demo with the role, a gate step of ${json.sample.step} s, and each ${json.sample.every}th sweep sample. A cell gives the verdict, the worst value of the gate, the deepest clip (value/limit), and the scale of a scaled instrument.`,
+    `Cast matrix of ${json.species.length} species and ${json.roles.length} roles in ${Math.round(json.seconds)} s. Sample: the shortest demo with the role, a gate step of ${json.sample.step} s, and each ${json.sample.every}th sweep sample. A cell gives the verdict, the worst value of the gate, the deepest clip (value/limit), the note targets that do not pass, and the scale of a scaled instrument.`,
     '',
     `| Species | ${json.roles.map((role) => `${role} (${json.demos[role] ?? '-'})`).join(' | ')} |`,
     `|---|${json.roles.map(() => '---').join('|')}|`,
