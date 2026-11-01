@@ -204,7 +204,8 @@ These traps make a task of the main thread long:
 ## Report images
 
 Write the images of a report into `reports/<date>-<topic>/` of your checkout. Git ignores this
-folder, and the manager reads the images there before the merge. Commit no report image. The hook
+folder, and the manager reads the images there before the merge. `tools/merge-branch.sh` copies
+the folder into the main checkout before it removes the worktree. Commit no report image. The hook
 `tools/git-hooks/pre-commit` stops a commit that adds an image or a video outside the folders of
 the product images, such as `src/`, `public/`, and `docs/reference/`. Report images made most of
 the size of the git history.

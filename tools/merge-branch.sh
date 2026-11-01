@@ -275,6 +275,13 @@ if ! git merge-base --is-ancestor main "$BRANCH"; then
 fi
 git merge --ff-only "$BRANCH"
 git log --oneline -1
+# Git ignores reports/, so a forced remove of the worktree deletes the report images of the
+# round. Copy them into the main checkout first (docs/agents/workflow.md, "Report images").
+if [ -d "$WORKTREE/reports" ] && [ "$(cd "$WORKTREE" && pwd -P)" != "$(pwd -P)" ]; then
+  mkdir -p reports
+  cp -R "$WORKTREE/reports/." reports/
+  echo "Copied the report folders of $WORKTREE into reports/."
+fi
 git worktree remove --force "$WORKTREE"
 git branch -D "$BRANCH"
 rm -rf "$MERGE_TMP"
