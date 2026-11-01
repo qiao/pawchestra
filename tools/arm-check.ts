@@ -373,6 +373,10 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   // bind elbow and the bind paws of the wolf turn the left paw 109.5° and the right paw 100.5°
   // toward supination, so the grips are -89° and -71° plus these angles.
   ['clarinetist', { L: 20, R: 29 }],
+  // The recast role of the wolf with the shoulder hold of the rabbit (WOLF_VIOLIN_HOLD), on the
+  // bind of the clarinetist. The left grip is 141° from a pronated bind, inside the 133° to 156°
+  // of the good left paws of the violins.
+  ['violinist@wolf', { L: -109, R: -23 }],
   // The mouse holds the 40° oboe from the side of each paw, with the left paw on the upper joint
   // and the thumbs up the tube, from accepted crops. A palm that faces out with the thumb down is
   // the fault. The left elbow points down, so that the left arm does not read as a raised wing.
