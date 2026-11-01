@@ -1004,11 +1004,13 @@ function composeAt(
 }
 
 /**
- * The cameras of a close move, which its tests share (design 5.6). The tests read the cameras of
- * the samples of {@link NEAR_SAMPLES} and of the two end keys, and each composed camera took the
- * correction of its look point again in each test. Each camera now comes at its first use.
+ * The cameras of a close move, which its tests share (design 5.6). The tests read the same cameras
+ * of the samples of {@link NEAR_SAMPLES} and of the two end keys, and a composed camera needs the
+ * correction of its look point. So each camera comes at its first use, and the other tests read
+ * it.
  */
 interface MoveCameras {
+  /** The subject of the move. */
   readonly subject: Subject;
   /** Half the height of the frame at the target. */
   readonly halfHeight: number;
@@ -1029,7 +1031,15 @@ interface ComposedMove extends MoveCameras {
   /** The composed camera of each sample, after its first use. */
   readonly composed: (ComposedCamera | undefined)[];
   /** The composed cameras of `from` and `to`, after their first use. */
-  readonly ends: { from?: ComposedCamera; to?: ComposedCamera };
+  readonly ends: MoveEnds;
+}
+
+/** The composed cameras of the end keys of a close move, after their first use. */
+interface MoveEnds {
+  /** The composed camera of `from`. */
+  from?: ComposedCamera;
+  /** The composed camera of `to`. */
+  to?: ComposedCamera;
 }
 
 /**
