@@ -1498,19 +1498,25 @@ const APP_ENTRY = join(ROOT, 'src', 'main.ts');
 
 /**
  * Checks the variant of `--glb` and `--set` of the close views of a role, and makes it: the
- * module of the studio body of the GLB file, as `pnpm fold-probe --glb` makes it.
+ * module of the studio body of the GLB file, as `pnpm fold-probe --glb` makes it. A recast role
+ * also takes the scale of the size rule of its instrument, as the cast matrix gives it
+ * (`recastChanges()` of `tools/recast-scale.ts`). The build of `--base` keeps the scale of its
+ * commit.
  *
  * @param args The command line.
  * @param check True to only check the variant, with no export of the GLB file.
- * @returns The variant, or `null` with neither option or with `check`.
+ * @returns The variant, or `null` with no change or with `check`.
  * @throws Error if a hold change does not fit, if the species of the role has no studio body, or
  *   if the GLB file does not exist.
  */
 async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVariant | null> {
-  if (!args.glb && args.holds === null) {
+  const holds = args.recast
+    ? (await import('./recast-scale.ts')).recastChanges([roleName(args)], args.holds ?? '') || null
+    : args.holds;
+  if (!args.glb && holds === null) {
     return null;
   }
-  const changes = args.holds === null ? null : setHolds(args.holds);
+  const changes = holds === null ? null : setHolds(holds);
   changes?.undo();
   const { species } = viewsOf(args);
   const animal = speciesAnimal(species);
@@ -1528,13 +1534,13 @@ async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVa
     console.log(`The working tree takes the hold changes ${changes.text}.`);
   }
   if (!args.glb || !animal) {
-    return { body: null, holds: args.holds === null ? null : [args.holds], entry: GALLERY_ENTRY };
+    return { body: null, holds: holds === null ? null : [holds], entry: GALLERY_ENTRY };
   }
   const { text } = glbModule(animal, args.glb, new Uint8Array(await readFile(args.glb)));
   console.log(`The ${species} of the working tree takes the studio body of ${args.glb}.`);
   return {
     body: { path: join(ROOT, 'src', 'models', 'studio', `${animal}.ts`), text },
-    holds: args.holds === null ? null : [args.holds],
+    holds: holds === null ? null : [holds],
     entry: GALLERY_ENTRY,
   };
 }
