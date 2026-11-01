@@ -285,6 +285,12 @@ passes.
       supination of the rule, one body at a time. The wolf and the mouse have it. The bear has
       straight bind arms and needs only the supination. Then the bodies with arm segments and a
       bent `bindArms`: the elephant, the hippo, the rhino, and the deer.
+- [ ] Bind supination after the shared violin hold (design 4.4): `pnpm bind-supination` now gives
+      the wolf L 62, R 18 (rig L 57, R 15) and the mouse L 127, R 86 (rig R 119). The violin recast
+      moved: the right paw of the mouse is near 0° now. Rig both bodies with the new values after
+      the next hold change of a cast role, and check the matrix.
+- [ ] Clip places (9.3): `pnpm pose-depth` names the part of a bowed string at a clip, but no part
+      of a wind or a brass instrument, such as a bell or a key.
 - [ ] Neutral bind elbows: the bent elbows are narrower in meters than with the bent bind. The
       elbow ring p5 is 3.04 cm in place of 3.71 cm (left) and 3.39 in place of 3.97 (right) on the
       wolf clarinetist, and 1.74 in place of 1.98 (left) and 1.79 in place of 2.01 (right) on the
