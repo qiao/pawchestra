@@ -27,8 +27,9 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 - **Recast role `<role>@<species>`.** The role tools (`fold-probe`, `arm-check`, `pose-depth`,
   `hold-fit`, `close-views`, `arm-look`, `carry-check`) take a role with another species, such as
   `violinist@wolf`. The species gets the seats and the instrument of the role in each demo scene
-  (`findRole()` of `tools/fold-probe.ts`), and keeps the body sweep of its own role. The gallery
-  shows it with `?only=violin@wolf`. `--base` needs a commit with the same recast, and
+  (`findRole()` of `tools/fold-probe.ts`), and keeps the body sweep of its own role. A test
+  species, such as `mannequin`, takes its obstacle of `TEST_BODY_OBSTACLES` (`homeBody()`). The
+  gallery shows it with `?only=violin@wolf`. `--base` needs a commit with the same recast, and
   `arm-check --views` and `close-views batch` take no recast role.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
