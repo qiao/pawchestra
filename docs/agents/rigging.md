@@ -329,11 +329,17 @@ Read the group of your work before you plan it.
   of the color attribute.
 - The `location` of a new child object is in the frame of its parent. Undo the place, the turn,
   and the scale of the parent to get the local point.
+- The glTF importer adds a sphere mesh for the bone shapes, and keys at the 24 fps of the scene.
+  An FBX take can key the scale of the armature object. Check the meshes, the rate, and the scale.
+- An FBX armature with no mesh takes its current pose as its rest pose. Keep each quaternion key
+  on the side of the key before it (a dot product of 0 or more), else the blend goes the long way.
 
 ### Probes
 
 - Give a kept GLB file of `pnpm rig-mesh --check --keep` to `--glb` of the probes. Never copy it
   over the rig in `assets/`.
+- `armGaps()` of `pose/test-arm-clearance.ts` gives false depths for an arm in front of the
+  chest. Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
   wrist, or a camera in JSON at the podium.
 - A fix of a turn rate can move a prop to a wrong place with all measures passed. Render a crop of
