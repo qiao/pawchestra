@@ -2,7 +2,7 @@ import type { BowGrip } from './instruments/strings.ts';
 import { isScaledInstrument } from './instruments/types.ts';
 import type { CymbalForm, InstrumentId, ScaledInstrument } from './instruments/types.ts';
 import type { StudioBodyName } from './studio-body.ts';
-import type { StudioPalette } from './studio-format.ts';
+import type { StudioBody, StudioPalette } from './studio-format.ts';
 import { STUDIO_BADGER } from './studio/badger.ts';
 import { STUDIO_BEAR } from './studio/bear.ts';
 import { STUDIO_BEAVER } from './studio/beaver.ts';
@@ -179,6 +179,18 @@ export const SPECIES_IDS = [
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
 /**
+ * Gives the seat height of a studio body that binds standing, in H (design 4.4): the seat of its
+ * seated pose (`StudioBody.sitting`), or a fixed height for a body with no seated pose.
+ *
+ * @param body The studio body.
+ * @param fixed The seat height in H of a body with no seated pose.
+ * @returns The seat height, in H.
+ */
+function standingSeat(body: StudioBody, fixed: number): number {
+  return body.sitting ? body.sitting.seatHeight / body.headHeight : fixed;
+}
+
+/**
  * Finds if a text is the id of a species.
  *
  * @param value The text.
@@ -316,13 +328,14 @@ export const SPECIES = {
   /**
    * Bear, the conductor (reference image). It has the studio body of the T-pose mesh
    * `assets/models/bear/bear-tpose.glb`, which `pnpm rig-mesh bear` rigs with its own faces (design
-   * 4.4). Its head height is the head of the studio body.
+   * 4.4). Its head height is the head of the studio body. It binds standing, so its seat comes from
+   * the seated pose of its body ({@link standingSeat}).
    */
   bear: {
     body: 'studio-bear',
     colors: SPECIES_COLORS.bear,
     headHeight: STUDIO_BEAR.headHeight,
-    seatHeight: 0.75,
+    seatHeight: standingSeat(STUDIO_BEAR, 0.75),
   },
   /**
    * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the mesh
