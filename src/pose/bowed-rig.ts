@@ -284,6 +284,13 @@ export interface BowedHold {
   readonly restBow: {
     /** The place of the grip on the right thigh. */
     readonly lap: LapPlace;
+    /**
+     * The direction of the right forearm at rest, from the elbow of the bind pose, in the model
+     * axes. When it is given, the grip lies at the end of the forearm and the paw in this
+     * direction, in place of {@link BowedHold.restBow.lap}, so that the upper arm hangs as in the
+     * bind pose on each body (`forearmGrip()`).
+     */
+    readonly forearm?: Vec3;
     /** The direction from the frog to the tip. */
     readonly tip: Vec3;
     /** The side of the hair, from the stick. */
@@ -773,6 +780,20 @@ const WOLF_VIOLIN_HOLD = {
 } as const satisfies BowedHold;
 
 /**
+ * The bow of the dog cellist at rest (design 5.2): the right paw holds the bow over the right knee,
+ * 0.25 H out and 0.5 H above the top of the thigh at 0.9 of the way to the knee, with the tip up
+ * and leaned out and forward, away from the cello. The short arm of the dog then bends softly at
+ * the elbow, and the wrist bends 22° with the palm toward the body. In the lift and the lowering,
+ * the bow turns through the front, and the grip moves 0.3 H out, away from the cello.
+ */
+const LAP_CELLO_BOW = {
+  lap: { along: 0.9, offset: [0.25, 0.5, 0] },
+  tip: [0.6, 1, -0.6],
+  hair: UPRIGHT_BOW.hair,
+  via: { ...UPRIGHT_BOW.via, reach: [0.3, 0, -0.4] },
+} as const satisfies BowedHold['restBow'];
+
+/**
  * The hold of the cello between the knees for each seated body (design 4.6, 5.3), as a real
  * cellist holds it (`docs/reference/string-technique.md`, section 2.7). The place comes from the
  * body (`fit`, `fitCelloPlace()` of `pose/cello-place.ts`): the end pin on the floor right of the
@@ -805,13 +826,13 @@ const WOLF_VIOLIN_HOLD = {
  * of the right shoulder folds in 87% of the pizzicato samples. With this pluck, the upper arm turns
  * 79° and goes 2.2 cm in, and 20% of the samples fold.
  *
- * In the rest pose, the right paw holds the bow over the right knee, 0.25 H out and 0.5 H above
- * the top of the thigh at 0.9 of the way to the knee, with the tip up and leaned out and forward,
- * away from the cello, and the right elbow points out, down, and back. The short arm then bends
- * softly at the elbow, and the wrist bends 22° with the palm toward the body. The left paw holds
- * the cello at 0.6 of the fingerboard with the elbow down and out, near the side. In the lift and
- * the lowering, the bow turns through the front, and the grip moves 0.3 H out, away from the
- * cello.
+ * In the rest pose, the right upper arm hangs as in the bind pose, and the forearm points forward,
+ * a little out, and up, (0.3, 0.3, -1), from the bind elbow (`restBow.forearm`). The paw holds the
+ * bow with the tip up and leaned out and forward, away from the cello ({@link LAP_CELLO_BOW}). With
+ * the grip of the dog, 0.5 H above the thigh, the bow paw of the recast rabbit, panda, monkey, and
+ * mouse twisted 136° to 179° at rest, folded 10 to 11 faces at the right arm, and flipped in the
+ * lift. The left paw holds the cello at 0.6 of the fingerboard with the elbow down and out, near
+ * the side.
  */
 const CELLO_HOLD = {
   ...FLOOR_HOLD,
@@ -831,12 +852,7 @@ const CELLO_HOLD = {
   restPlace: 0.6,
   restPoleL: [-0.5, -1, 0],
   restPoleR: [0.6, -1, 0.75],
-  restBow: {
-    lap: { along: 0.9, offset: [0.25, 0.5, 0] },
-    tip: [0.6, 1, -0.6],
-    hair: UPRIGHT_BOW.hair,
-    via: { ...UPRIGHT_BOW.via, reach: [0.3, 0, -0.4] },
-  },
+  restBow: { ...LAP_CELLO_BOW, forearm: [0.3, 0.3, -1] },
   fit: { gap: 0.28 },
 } as const satisfies BowedHold;
 
@@ -1057,6 +1073,7 @@ const DOG_HOLD = {
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
   highTilt: 0,
+  restBow: LAP_CELLO_BOW,
   fit: null,
 } as const satisfies BowedHold;
 
@@ -1645,7 +1662,9 @@ export function bowedRig(
     restPoleR: hold.restPoleR,
     restPoleL: hold.restPoleL,
     restBow: {
-      grip: lapPoint(model, 'R', restBow.lap),
+      grip: restBow.forearm
+        ? forearmGrip(model, restBow.forearm)
+        : lapPoint(model, 'R', restBow.lap),
       rotation: bowRotation(restBow.tip, restBow.hair),
       via: via
         ? {
@@ -1671,6 +1690,25 @@ export function bowedRig(
       )
     : rig;
   return { ...rest, bowRange: bowRangeOf(rest), stopRange: stopRangeOf(rest) };
+}
+
+/**
+ * Gives the grip of a bow at rest at the end of the right forearm: from the elbow of the bind
+ * pose, along a direction, by the length of the forearm and of the paw to the middle of the palm.
+ * The upper arm then hangs as in the bind pose, so its twist and its folds stay near the bind on
+ * each body, and the rest elbow stays near the play elbow (design 5.2, 5.3).
+ *
+ * @param model The player model.
+ * @param direction The direction of the forearm, in the model axes.
+ * @returns The grip, in the model axes.
+ */
+function forearmGrip(model: PlayerModel, direction: Vec3): Vec3 {
+  const at = (bone: 'forearmR' | 'handR'): Vector3 =>
+    new Vector3(...(model.skeleton.positions[boneIndex(bone)] ?? [0, 0, 0]));
+  const elbow = at('forearmR');
+  const wrist = at('handR');
+  const length = elbow.distanceTo(wrist) + wrist.distanceTo(new Vector3(...model.body.palmR));
+  return toVec3(elbow.addScaledVector(new Vector3(...direction).normalize(), length));
 }
 
 /**
