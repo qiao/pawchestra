@@ -338,6 +338,12 @@ Read the group of your work before you plan it.
   An FBX take can key the scale of the armature object. Check the meshes, the rate, and the scale.
 - An FBX armature with no mesh takes its current pose as its rest pose. Keep each quaternion key
   on the side of the key before it (a dot product of 0 or more), else the blend goes the long way.
+- The FBX exporter takes its ids from the Python string hash. For the same bytes on each run, run
+  Blender with `PYTHONHASHSEED=0` and `--python-use-system-env`, as `mannequin.py` does.
+- A pose turn of a bone uses the axes of that bone, with Y along the bone. Convert a turn in the
+  axes of the armature first.
+- A value such as 0.707107 in a module fails the lint as an approximate `Math.SQRT1_2`. Move a
+  joint a little off 45°.
 
 ### Probes
 
