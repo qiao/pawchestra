@@ -16,7 +16,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 import { SPECIES, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
-import { STUDIO_BODIES } from '../src/models/studio-body.ts';
+import { isStudioBodyName } from '../src/models/studio-body.ts';
 import type { StudioBodyName } from '../src/models/studio-body.ts';
 import type { StudioBody } from '../src/models/studio-format.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
@@ -92,13 +92,13 @@ export function takeGlb(args: readonly string[], cwd: string = process.cwd()): G
 }
 
 /**
- * Tells if a value of `SpeciesParams.body` names a studio body.
+ * Tells if a value of `SpeciesParams.body` names a studio body: a body of the app or a test body.
  *
  * @param body The value.
- * @returns True for a key of `STUDIO_BODIES`.
+ * @returns True for a studio body (`isStudioBodyName()`).
  */
 function isStudioBody(body: string | undefined): body is StudioBodyName {
-  return body !== undefined && Object.hasOwn(STUDIO_BODIES, body);
+  return body !== undefined && isStudioBodyName(body);
 }
 
 /**
@@ -356,10 +356,10 @@ function withAnimalEntry(text: string, animal: string, settings: AnimalSettings)
 
 /**
  * Adds the scratch entries of an animal with no studio body to a copy ({@link withGlbBody}). An
- * animal with no module in `STUDIO_BODIES` gets its entry there, and the species of the same id
- * gets the body ({@link withSpeciesBody}). An animal with no entry in `ANIMALS` gets the settings
- * of the export as its entry in `ANIMALS` of the copy. An animal with a studio body and an entry
- * changes nothing.
+ * animal with no studio body (`isStudioBodyName()`) gets its entry in `STUDIO_BODIES`, and the
+ * species of the same id gets the body ({@link withSpeciesBody}). An animal with no entry in
+ * `ANIMALS` gets the settings of the export as its entry in `ANIMALS` of the copy. An animal with
+ * a studio body, also a test body, and an entry changes nothing.
  *
  * @param dir The folder of the copy.
  * @param animal The animal.
@@ -371,7 +371,7 @@ async function addScratchBody(
   animal: string,
   settings: AnimalSettings,
 ): Promise<void> {
-  if (!Object.hasOwn(STUDIO_BODIES, `studio-${animal}`)) {
+  if (!isStudioBodyName(`studio-${animal}`)) {
     if (!isSpeciesId(animal)) {
       throw new Error(
         `The animal ${animal} has no studio body and is not a species, so no species can take its body.`,

@@ -110,6 +110,16 @@ function isTestBody(name: string): name is TestBodyName {
 }
 
 /**
+ * Tells if a text names a studio body: a body of the app or a test body.
+ *
+ * @param name The text.
+ * @returns True for a key of {@link STUDIO_BODIES} or of the test bodies.
+ */
+export function isStudioBodyName(name: string): name is StudioBodyName {
+  return Object.hasOwn(STUDIO_BODIES, name) || isTestBody(name);
+}
+
+/**
  * Tells if a body name is the name of a body of the app.
  *
  * @param name The name of a studio body.
