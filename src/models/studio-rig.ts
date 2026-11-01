@@ -715,49 +715,76 @@ export function standingBody(body: StudioBody, mesh: StudioMesh): PosedStudioBod
   }
   const lift = new Vector3(...standing.lift);
   lift.y = -low;
-  const lifted = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(lift));
-  for (let v = 0; v < positions.length; v += 3) {
-    positions[v] = (positions[v] ?? 0) + lift.x;
-    positions[v + 1] = (positions[v + 1] ?? 0) + lift.y;
-    positions[v + 2] = (positions[v + 2] ?? 0) + lift.z;
-  }
-
-  // The points of the holds move with their bones: the head center and the nose with the head,
-  // and each finger tip and palm with its fingers.
-  const moved = (bone: StudioBone, p: Vec3): Vec3 =>
-    lifted(toVec3(new Vector3(...p).applyMatrix4(boneMatrix(stand, bone))));
-  const turned = (bone: StudioBone, d: Vec3): Vec3 =>
-    toVec3(new Vector3(...d).applyQuaternion(stand.turns.get(bone) ?? new Quaternion()));
+  moveAll(positions, lift);
   return {
     body: {
       ...body,
-      // SAFETY: the entries hold each bone of the body one time: each bone of STUDIO_BONES with a
-      // head.
-      heads: Object.fromEntries(
-        STUDIO_BONES.flatMap((bone) => {
-          const place = stand.heads[bone];
-          return place ? [[bone, lifted(place)]] : [];
-        }),
-      ) as StudioHeads,
-      palms: { L: turned('fingers_L', body.palms.L), R: turned('fingers_R', body.palms.R) },
-      fingerTips: {
-        L: moved('fingers_L', body.fingerTips.L),
-        R: moved('fingers_R', body.fingerTips.R),
-      },
-      headCenter: moved('head', body.headCenter),
-      nose: moved('head', body.nose),
-      eyes: {
-        ...body.eyes,
-        directions: {
-          L: turned('eye_L', body.eyes.directions.L),
-          R: turned('eye_R', body.eyes.directions.R),
-        },
-      },
+      ...stancePlaces(body, stand, lift),
       floor: [0, 0, 0],
       seatHeight: null,
       standing: null,
     },
     mesh: { ...mesh, positions, correctives },
+  };
+}
+
+/**
+ * Moves each point of a list of x, y, z by one move, in place.
+ *
+ * @param positions The points.
+ * @param move The move.
+ */
+function moveAll(positions: Float32Array, move: Vector3): void {
+  for (let v = 0; v < positions.length; v += 3) {
+    positions[v] = (positions[v] ?? 0) + move.x;
+    positions[v + 1] = (positions[v + 1] ?? 0) + move.y;
+    positions[v + 2] = (positions[v + 2] ?? 0) + move.z;
+  }
+}
+
+/**
+ * Gives the places of a studio body in a new stance: the head of each bone in a chain pose, and the
+ * points of the holds, which move with their bones: the head center and the nose with the head,
+ * and each finger tip and palm with its fingers. Each place then takes one more move.
+ *
+ * @param body The studio body in its bind pose.
+ * @param pose The chain pose of the stance.
+ * @param lift The move of the body after the pose.
+ * @returns The places of the stance.
+ */
+function stancePlaces(
+  body: StudioBody,
+  pose: ChainPose,
+  lift: Vector3,
+): Pick<StudioBody, 'heads' | 'palms' | 'fingerTips' | 'headCenter' | 'nose' | 'eyes'> {
+  const lifted = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(lift));
+  const moved = (bone: StudioBone, p: Vec3): Vec3 =>
+    lifted(toVec3(new Vector3(...p).applyMatrix4(boneMatrix(pose, bone))));
+  const turned = (bone: StudioBone, d: Vec3): Vec3 =>
+    toVec3(new Vector3(...d).applyQuaternion(pose.turns.get(bone) ?? new Quaternion()));
+  return {
+    // SAFETY: the entries hold each bone of the body one time: each bone of STUDIO_BONES with a
+    // head.
+    heads: Object.fromEntries(
+      STUDIO_BONES.flatMap((bone) => {
+        const place = pose.heads[bone];
+        return place ? [[bone, lifted(place)]] : [];
+      }),
+    ) as StudioHeads,
+    palms: { L: turned('fingers_L', body.palms.L), R: turned('fingers_R', body.palms.R) },
+    fingerTips: {
+      L: moved('fingers_L', body.fingerTips.L),
+      R: moved('fingers_R', body.fingerTips.R),
+    },
+    headCenter: moved('head', body.headCenter),
+    nose: moved('head', body.nose),
+    eyes: {
+      ...body.eyes,
+      directions: {
+        L: turned('eye_L', body.eyes.directions.L),
+        R: turned('eye_R', body.eyes.directions.R),
+      },
+    },
   };
 }
 
