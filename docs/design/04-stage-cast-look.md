@@ -317,6 +317,68 @@ a hold, or a body runs it.
   `<role>@<species>` (`recastScene()` of `pose/test-scene.ts`). The species takes the seats and
   the instrument of the role in the test scenes only, and the cast of the app does not change.
 
+### Clips
+
+A clip of a person, such as a Mixamo animation, can move a player in a moment with no play: a
+walk on, a bow, applause, or an idle. A clip cannot follow the notes, so the concert keeps
+`poseAt()` (5.1). Only the gallery plays a clip now (`clip`, 7.1). Design 8.1 gives the license
+rule of the Mixamo files.
+
+```text
+ Mixamo FBX or GLB file (outside git, 8.1)
+   | pnpm mixamo-import (headless Blender: no prefix, meters, one animation for each take)
+   v
+ <dir>/<name>.glb --> readSourceFile() (models/source-clips.ts): the rest pose and the keys
+   | retargetClip() (pose/retarget.ts), one time for each body
+   v
+ PlayerClip: the rotations of BONE_NAMES and the root offset at CLIP_RATE frames a second
+   | clipPoseAt() (pose/clip-pose.ts), in each frame, with no state
+   v
+ AnimalPose --> poseStudioBones()
+```
+
+```typescript
+/** A clip on the skeleton of a player: plain data that the clip layer reads with no state. */
+interface PlayerClip {
+  readonly name: string;
+  /** The frames for each second (`CLIP_RATE`). */
+  readonly rate: number;
+  readonly frames: number;
+  /** One quaternion for each bone of `BONE_NAMES` in each frame, relative to the parent. */
+  readonly rotations: Float32Array;
+  /** The offset of the root bone in each frame, in meters, in the model axes. */
+  readonly rootOffsets: Float32Array;
+  /** The depth of the lowest sole under the floor before the floor rule, in `H`. */
+  readonly floorDepths: Float32Array;
+}
+```
+
+- **Bone map.** `MIXAMO_BONES` gives the bone of the player of each Mixamo bone, or none. Of
+  several bones that drive one bone, the last bone of the chain gives the turn: `spine` takes
+  `Spine1`, and `chest` takes `Spine2`, which carries the arms and the neck. The roll of a Mixamo
+  forearm turns its hand, and the turn of the hand reaches the twist bone (`TWIST_SHARE`). The
+  four long fingers give one curl of the `fingers` block (`FINGER_CURL_SHARE`).
+- **World turns.** A clip stores each turn relative to the T-pose of the source, so a rename of
+  the bones alone does not work. The retarget reads the world turn of each source bone from its
+  rest pose. Thus the rolls of the source bones do not matter.
+- **Rest compensation.** Each limb bone of the player first turns from its bind pose to the
+  direction of its source bone in the rest pose of the source: the hanging arm goes to the T-pose
+  with the palm down, and a seated thigh goes down. The trunk, the head, and the feet keep their
+  bind form, because both rest poses stand upright with the head forward and the feet flat. Thus
+  each animal keeps its own lean.
+- **Axes and size.** The left side of the source goes to -x, and its up to +y. The hips move
+  across the floor in head heights `H`. The source has no chin, so its `H` is its height over
+  `HUMAN_HEADS`, the canon of figure drawing.
+- **Floor rule.** The legs of an animal are shorter in `H` than human legs, so a move of the hips
+  in `H` puts the soles under the floor or in the air. Thus the lowest sole of the player keeps
+  the height of the lowest sole of the source, in `H` (`solePoints()`). A foot on the floor of the
+  source stays on the floor, and a jump stays a jump.
+- **Gallery.** The animals of a clip stand, and the bones of the instrument hide, because a clip
+  cannot hold an instrument. The dev and preview servers serve the clip files from a local folder
+  (`ZOOPHONY_CLIPS`, `scratch/clips/` by default), so `dist/` gets no Mixamo file (8.1).
+  `pnpm clip-views` shows a clip from the four sides, and measures the floor depth and the depth
+  of each arm part in the body.
+
 ## 4.5 Visual values
 
 One world unit is one meter. The code files that each block names hold the values. The colors
