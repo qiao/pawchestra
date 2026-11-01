@@ -175,7 +175,9 @@ user mesh (Meshy GLB)  ->  tools/blender/arm_rebuild.py  ->  <a>-arms.glb + <a>-
 
 The first step applies only to a body whose arms or legs get new quad faces. The rig of another
 body reads the source mesh. The first step takes its settings from the joints of the config and
-from the mesh, so that a new mesh gets clean arms with no work by hand. A species script
+from the mesh, so that a new mesh gets clean arms with no work by hand. Each face takes one
+color, so a face across a color edge of the old arm gives a saw-tooth edge. The first step thus
+puts a ring at each color edge across the arm. A species script
 `tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. The `README.md` of `assets/models/<a>/` gives the source and the
 steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
