@@ -1,5 +1,7 @@
 import type { Vec3 } from '../models/tuples.ts';
 import { LENS, apertureAt, blurScale } from '../scene/focus.ts';
+import { cameraAxes } from './camera-keys.ts';
+import type { CameraAxes } from './camera-keys.ts';
 import type { StageClearance } from './clearance.ts';
 
 /** The head of a player or of the conductor on the stage, for the foreground test. */
@@ -139,72 +141,6 @@ function blurred(depth: number, focus: number, lens: number): boolean {
   return depth > 0 && lens * (focus / depth - 1) >= FOREGROUND.dirtyBlur;
 }
 
-/** The axes of a camera, and the half sizes of its frame at a depth of 1 m. */
-interface FrameAxes {
-  fx: number;
-  fy: number;
-  fz: number;
-  rx: number;
-  rz: number;
-  ux: number;
-  uy: number;
-  uz: number;
-  /** Half the height of the frame at a depth of 1 m. */
-  tanV: number;
-  /** Half the width of the frame at a depth of 1 m. */
-  tanH: number;
-}
-
-const axes: FrameAxes = {
-  fx: 0,
-  fy: 0,
-  fz: 1,
-  rx: 1,
-  rz: 0,
-  ux: 0,
-  uy: 1,
-  uz: 0,
-  tanV: 1,
-  tanH: 1,
-};
-
-/**
- * Writes the axes of a camera that looks at a target, with no roll.
- *
- * @param camera The camera.
- * @param target The point that the camera looks at.
- * @param fov The vertical field of view, in degrees.
- * @param aspect The width of the frame divided by its height.
- * @returns The axes. The function writes them into one shared object.
- */
-function frameAxes(camera: Vec3, target: Vec3, fov: number, aspect: number): FrameAxes {
-  let fx = target[0] - camera[0];
-  let fy = target[1] - camera[1];
-  let fz = target[2] - camera[2];
-  const fl = Math.hypot(fx, fy, fz);
-  fx /= fl;
-  fy /= fl;
-  fz /= fl;
-  // right = forward × (0, 1, 0)
-  let rx = -fz;
-  let rz = fx;
-  const rl = Math.hypot(rx, rz);
-  rx /= rl;
-  rz /= rl;
-  // up = right × forward
-  axes.ux = -rz * fy;
-  axes.uy = rz * fx - rx * fz;
-  axes.uz = rx * fy;
-  axes.fx = fx;
-  axes.fy = fy;
-  axes.fz = fz;
-  axes.rx = rx;
-  axes.rz = rz;
-  axes.tanV = Math.tan(((fov / 2) * Math.PI) / 180);
-  axes.tanH = axes.tanV * aspect;
-  return axes;
-}
-
 /**
  * Tells if a head of another player stands in the foreground of a close camera (design 5.6):
  *
@@ -251,11 +187,13 @@ export function foregroundHead(
   middle: readonly [number, number] = [0, 0],
   lens = 0,
 ): boolean {
-  const a = frameAxes(camera, target, fov, aspect);
-  const floor = chests.length > 0 ? lowestOnScreen(chests, camera, a) : -Infinity;
+  const a = cameraAxes(camera, target);
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  const tanH = tanV * aspect;
+  const floor = chests.length > 0 ? lowestOnScreen(chests, camera, a, tanV) : -Infinity;
 
   // The unit of the size of a head on the screen, at a depth of 1 m.
-  const sizeTan = a.tanV * Math.min(1, Math.sqrt(aspect));
+  const sizeTan = tanV * Math.min(1, Math.sqrt(aspect));
   const fx = focus[0] - camera[0];
   const fy = focus[1] - camera[1];
   const fz = focus[2] - camera[2];
@@ -285,12 +223,12 @@ export function foregroundHead(
       continue;
     }
     // The middle of the head in the units of the view, and the radius of the head.
-    const right = (dx * a.rx + dz * a.rz) / (depth * a.tanH);
+    const right = (dx * a.rx + dz * a.rz) / (depth * tanH);
     const x = Math.abs(right);
-    const up = (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * a.tanV);
+    const up = (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * tanV);
     const y = Math.abs(up);
-    const radiusX = head.radius / (depth * a.tanH);
-    const radiusY = head.radius / (depth * a.tanV);
+    const radiusX = head.radius / (depth * tanH);
+    const radiusY = head.radius / (depth * tanV);
     const under = up + radiusY < floor;
     const overX = Math.abs(right - middle[0]) - radiusX < middleX;
     if (!under && overX && Math.abs(up - middle[1]) - radiusY < middleY) {
@@ -318,16 +256,22 @@ export function foregroundHead(
  * @param points The points, in front of the camera.
  * @param camera The camera.
  * @param a The axes of the camera.
+ * @param tanV Half the height of the frame at a depth of 1 m.
  * @returns The lowest y of the points, in the units of the view.
  */
-function lowestOnScreen(points: readonly Vec3[], camera: Vec3, a: FrameAxes): number {
+function lowestOnScreen(
+  points: readonly Vec3[],
+  camera: Vec3,
+  a: CameraAxes,
+  tanV: number,
+): number {
   let lowest = Infinity;
   for (const [px, py, pz] of points) {
     const dx = px - camera[0];
     const dy = py - camera[1];
     const dz = pz - camera[2];
     const depth = Math.max(dx * a.fx + dy * a.fy + dz * a.fz, 1e-6);
-    lowest = Math.min(lowest, (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * a.tanV));
+    lowest = Math.min(lowest, (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * tanV));
   }
 
   return lowest;
@@ -375,7 +319,9 @@ export function foregroundObject(
   aspect: number,
   lens = 0,
 ): boolean {
-  const a = frameAxes(camera, target, fov, aspect);
+  const a = cameraAxes(camera, target);
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  const tanH = tanV * aspect;
   const [cx, cy, cz] = camera;
   const limit =
     FOREGROUND.objectNear *
@@ -402,7 +348,7 @@ export function foregroundObject(
     const side = Math.abs(ox * a.rx + oz * a.rz);
     const up = Math.abs(ox * a.ux + oy * a.uy + oz * a.uz);
     const far = Math.max(depth, 0) + reach;
-    if (side - reach > far * a.tanH || up - reach > far * a.tanV) {
+    if (side - reach > far * tanH || up - reach > far * tanV) {
       continue;
     }
     stamp++;
@@ -426,8 +372,8 @@ export function foregroundObject(
         ahead ||= d > 0;
         // A corner behind the camera counts at the near plane, so the box covers more.
         const dd = Math.max(d, NEAR_DEPTH);
-        corners[2 * c] = (px * a.rx + pz * a.rz) / (dd * a.tanH);
-        corners[2 * c + 1] = (px * a.ux + py * a.uy + pz * a.uz) / (dd * a.tanV);
+        corners[2 * c] = (px * a.rx + pz * a.rz) / (dd * tanH);
+        corners[2 * c + 1] = (px * a.ux + py * a.uy + pz * a.uz) / (dd * tanV);
       }
       if (!ahead) {
         continue;
@@ -490,7 +436,9 @@ export function animalTooNear(
 ): boolean {
   const [cx, cy, cz] = camera;
   const floor2 = ANIMAL_FLOOR * ANIMAL_FLOOR;
-  let a: FrameAxes | null = null;
+  let a: CameraAxes | null = null;
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  const tanH = tanV * aspect;
   for (const body of bodies) {
     const reach = ANIMAL_FLOOR + body.radius;
     const bx = body.center[0] - cx;
@@ -508,16 +456,16 @@ export function animalTooNear(
       if (px * px + py * py + pz * pz >= (ANIMAL_FLOOR + r) ** 2) {
         continue;
       }
-      a ??= frameAxes(camera, target, fov, aspect);
+      a ??= cameraAxes(camera, target);
       // The sphere of the part is behind the camera, or outside a side plane of the frame: the
       // distance to the plane through the camera is (offset - depth × tan) / √(1 + tan²).
       const partDepth = px * a.fx + py * a.fy + pz * a.fz;
-      const side = Math.abs(px * a.rx + pz * a.rz) - partDepth * a.tanH;
-      const up = Math.abs(px * a.ux + py * a.uy + pz * a.uz) - partDepth * a.tanV;
+      const side = Math.abs(px * a.rx + pz * a.rz) - partDepth * tanH;
+      const up = Math.abs(px * a.ux + py * a.uy + pz * a.uz) - partDepth * tanV;
       if (
         partDepth <= -r ||
-        side > r * Math.sqrt(1 + a.tanH * a.tanH) ||
-        up > r * Math.sqrt(1 + a.tanV * a.tanV)
+        side > r * Math.sqrt(1 + tanH * tanH) ||
+        up > r * Math.sqrt(1 + tanV * tanV)
       ) {
         continue;
       }
@@ -531,8 +479,8 @@ export function animalTooNear(
         const depth = dx * a.fx + dy * a.fy + dz * a.fz;
         if (
           depth > 0 &&
-          Math.abs(dx * a.rx + dz * a.rz) <= depth * a.tanH &&
-          Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) <= depth * a.tanV
+          Math.abs(dx * a.rx + dz * a.rz) <= depth * tanH &&
+          Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) <= depth * tanV
         ) {
           return true;
         }
@@ -559,7 +507,9 @@ export function inFrame(
   fov: number,
   aspect: number,
 ): boolean {
-  const a = frameAxes(camera, target, fov, aspect);
+  const a = cameraAxes(camera, target);
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  const tanH = tanV * aspect;
   const dx = point[0] - camera[0];
   const dy = point[1] - camera[1];
   const dz = point[2] - camera[2];
@@ -567,7 +517,7 @@ export function inFrame(
   if (depth <= 0) {
     return false;
   }
-  const x = Math.abs(dx * a.rx + dz * a.rz) / (depth * a.tanH);
-  const y = Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) / (depth * a.tanV);
+  const x = Math.abs(dx * a.rx + dz * a.rz) / (depth * tanH);
+  const y = Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) / (depth * tanV);
   return x <= 1 && y <= 1;
 }

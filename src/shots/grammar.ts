@@ -1,5 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
-import { angleDifference } from './camera-keys.ts';
+import { angleDifference, cameraAxes } from './camera-keys.ts';
 import type { Composition, ShotKey } from './types.ts';
 
 /** Degrees to radians. */
@@ -124,51 +124,6 @@ export function keepsLine(camera: Vec3, look: Vec3): boolean {
   return Math.abs(angleDifference(turn, 0)) <= FILM_GRAMMAR.lineAzimuth;
 }
 
-/** The axes of a camera with no roll, which {@link writeAxes} writes before each read. */
-interface CameraAxes {
-  /** The forward axis. */
-  fx: number;
-  fy: number;
-  fz: number;
-  /** The right axis, in the stage plane. */
-  rx: number;
-  rz: number;
-  /** The up axis. */
-  ux: number;
-  uy: number;
-  uz: number;
-}
-
-const axes: CameraAxes = { fx: 0, fy: 0, fz: 1, rx: 1, rz: 0, ux: 0, uy: 1, uz: 0 };
-
-/**
- * Writes the axes of a camera that looks at a point with no roll, as `lookAt()` of three.js.
- *
- * @param camera The camera.
- * @param look The point that the camera looks at.
- * @returns The axes. The function writes them into one shared object.
- */
-function writeAxes(camera: Vec3, look: Vec3): CameraAxes {
-  let fx = look[0] - camera[0];
-  let fy = look[1] - camera[1];
-  let fz = look[2] - camera[2];
-  const length = Math.hypot(fx, fy, fz) || 1;
-  fx /= length;
-  fy /= length;
-  fz /= length;
-  // right = forward × (0, 1, 0), and up = right × forward
-  const flat = Math.hypot(fx, fz) || 1;
-  axes.fx = fx;
-  axes.fy = fy;
-  axes.fz = fz;
-  axes.rx = -fz / flat;
-  axes.rz = fx / flat;
-  axes.ux = -axes.rz * fy;
-  axes.uy = axes.rz * fx - axes.rx * fz;
-  axes.uz = axes.rx * fy;
-  return axes;
-}
-
 /** The steps of the correction of the point that a camera looks at for a composition. */
 const LOOK_STEPS = 3;
 
@@ -216,7 +171,7 @@ export function writeLookPoint(
   const dz = ez - camera[2];
   let targetY = 0;
   for (let step = 0; step < LOOK_STEPS; step++) {
-    const a = writeAxes(camera, out);
+    const a = cameraAxes(camera, out);
     const depth = Math.max(1e-6, tx * a.fx + ty * a.fy + tz * a.fz);
     const x = (tx * a.rx + tz * a.rz) / (depth * tanH);
     targetY = (tx * a.ux + ty * a.uy + tz * a.uz) / (depth * tanV);
@@ -252,7 +207,7 @@ export function highestInFrame(
   points: readonly Vec3[],
   fov: number,
 ): number {
-  const a = writeAxes(camera, look);
+  const a = cameraAxes(camera, look);
   const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
   let highest = -Infinity;
   for (const p of points) {
