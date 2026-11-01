@@ -7,12 +7,15 @@
  * of its own, the trees in turns (`--turns`, default 5), so that a slow change of the machine
  * reaches each tree. A child plans each demo one time to warm up, then `--runs` times (default 5),
  * and gives the median. The table gives, for each demo, the median of the turns of each tree, and
- * the ratio of the working tree to the first tree. The total is the sum of the demos. The load
- * average shows at the start and at the end, because a load above about 10 makes one run invalid.
+ * the ratio of the last tree (the working tree) to the first tree. The total is the sum of the
+ * demos. The load average shows at the start and at the end, because a load above about 10 makes
+ * one run invalid.
  *
- * A commit gets the script of the working tree, so each tree runs the same measure.
+ * A commit gets the script of the working tree, so each tree runs the same measure. Each turn reads
+ * the working tree again, so an edit during a run goes into the measure. `--no-tree` times only
+ * the commits of `--base`, with the ratio of the last commit to the first commit.
  *
- * Usage: pnpm plan-time [--base <ref>]... [--demo <id>]... [--runs <n>] [--turns <n>]
+ * Usage: pnpm plan-time [--base <ref>]... [--no-tree] [--demo <id>]... [--runs <n>] [--turns <n>]
  *        [--gate <load>]
  */
 import { spawnSync } from 'node:child_process';
@@ -38,7 +41,7 @@ const LOCK_MAX_SEC = 1800;
 
 /** The usage text of the tool. */
 const USAGE =
-  'Usage: pnpm plan-time [--base <ref>]... [--demo <id>]... [--runs <n>] [--turns <n>] [--gate <load>]';
+  'Usage: pnpm plan-time [--base <ref>]... [--no-tree] [--demo <id>]... [--runs <n>] [--turns <n>] [--gate <load>]';
 
 /** The command line of the tool. */
 export interface PlanTimeArgs {
@@ -54,6 +57,8 @@ export interface PlanTimeArgs {
   readonly gate: number;
   /** The file for the times of one child, or `null` for the parent. */
   readonly child: string | null;
+  /** True to time only the commits of `--base`, with no working tree. */
+  readonly noTree: boolean;
 }
 
 /**
@@ -71,8 +76,13 @@ export function parsePlanTimeArgs(args: readonly string[]): PlanTimeArgs {
   let turns = 5;
   let gate = 12;
   let child: string | null = null;
+  let noTree = false;
   for (let i = 0; i < args.length; i++) {
     const flag = args[i] ?? '';
+    if (flag === '--no-tree') {
+      noTree = true;
+      continue;
+    }
     const value = args[i + 1];
     if (value === undefined || value.startsWith('--')) {
       throw new Error(`The option "${flag}" has no value.\n${USAGE}`);
@@ -101,7 +111,10 @@ export function parsePlanTimeArgs(args: readonly string[]): PlanTimeArgs {
       throw new Error(`The option "${flag}" is not known.\n${USAGE}`);
     }
   }
-  return { bases, demos, runs, turns, gate, child };
+  if (noTree && bases.length === 0) {
+    throw new Error(`The option --no-tree needs at least one --base.\n${USAGE}`);
+  }
+  return { bases, demos, runs, turns, gate, child, noTree };
 }
 
 /**
@@ -202,7 +215,7 @@ async function timeTrees(args: PlanTimeArgs): Promise<string[]> {
     return await withTrees(args.bases, async (dirs) => {
       const trees: TimedTree[] = [
         ...args.bases.map((ref, i) => ({ label: shortHash(ref), dir: dirs[i] ?? ROOT, turns: [] })),
-        { label: 'tree', dir: ROOT, turns: [] },
+        ...(args.noTree ? [] : [{ label: 'tree', dir: ROOT, turns: [] }]),
       ];
       const childArgs = [
         '--runs',
