@@ -40,6 +40,7 @@
     "plan-time": "node tools/plan-time.ts",
     "beat-rates": "node tools/beat-rates.ts",
     "clip-probe": "node tools/clip-probe.ts",
+    "clip-views": "node tools/clip-views.ts",
     "keyboard": "pnpm build && node tools/keyboard-check.ts",
     "smoke": "pnpm prepare-site && node tools/smoke.ts",
     "rig-mesh": "node tools/rig-mesh.ts",

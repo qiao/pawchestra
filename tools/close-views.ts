@@ -961,7 +961,7 @@ async function render(
  * @param cellSize The size of one cell, in CSS pixels.
  * @returns The PNG image.
  */
-async function grid(
+export async function grid(
   browser: Browser,
   cells: readonly Buffer[],
   labels: readonly string[],
