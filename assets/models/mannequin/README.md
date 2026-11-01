@@ -62,7 +62,9 @@ Each face has one color of a palette texture.
 
 ## Clips
 
-The clips are on the Mixamo skeleton, at 30 frames per second. Each frame has a key of each bone.
+The clips are on the Mixamo skeleton, at 30 frames per second. The GLB files have a key of each
+bone on each frame. The FBX exporter drops each key that the line between its neighbors gives
+(the simplify factor 1).
 
 | Clip | Frames | Motion |
 |---|---|---|
