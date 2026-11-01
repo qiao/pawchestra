@@ -32,6 +32,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), a bind elbow bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a bind upper arm near the hanging arm (`bindArms`), antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
+| mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with quad rings at each joint and the rule weights. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 The penguin has no sheet, so `pnpm choir-check <dir>` compares it with the choir of the two newest
 reference images.
