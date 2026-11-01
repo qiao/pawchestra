@@ -14,8 +14,9 @@ export const SHADE_ALPHA = 0.8;
 export const TEXT_BACKDROP_LIMIT = 0.125;
 
 /**
- * The lightest backdrop of the logo at which its gold (`--accent-strong`) keeps more than 4.5:1
- * with no shade. The limit of 4.5:1 is 0.095.
+ * The lightest backdrop of the logo line at which its gold (`--accent-strong`) and the gray text
+ * of the link to GitHub (`--github-mark`) keep more than 4.5:1 with no shade. The limit of 4.5:1
+ * is 0.095 for the gold and 0.089 for the gray.
  */
 export const LOGO_BACKDROP_LIMIT = 0.085;
 
