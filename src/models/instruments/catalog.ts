@@ -62,6 +62,9 @@ export const INSTRUMENT_IDS = [
  *   (`SpeciesParams.cymbalForm`). The other instruments ignore it.
  * @param tubaPipe The lengths by which the lead pipe of the tuba reaches back and to the left from
  *   the mouthpiece (`SpeciesParams.tubaPipe`), in meters. The other instruments ignore it.
+ * @param endPin The end pin of a cello for the body of the player (`celloPinOf()` of
+ *   `cello-fit.ts`), in meters, or `undefined` for the end pin of the size. The other instruments
+ *   ignore it.
  * @returns The model.
  */
 export function buildInstrument(
@@ -71,9 +74,10 @@ export function buildInstrument(
   bowGrip?: BowGrip,
   cymbalForm: CymbalForm = 'hand',
   tubaPipe: readonly [back: number, left: number] = [0, 0],
+  endPin?: number,
 ): InstrumentModel {
   if (isScaledInstrument(id)) {
-    return buildScaled(id, scale, bowGrip, cymbalForm);
+    return buildScaled(id, scale, bowGrip, cymbalForm, endPin);
   }
   switch (id) {
     case 'piano':
@@ -117,6 +121,7 @@ export function buildInstrument(
  * @param bowGrip The grip of the bow in the right paw, or `undefined` for the grip of the bind
  *   pose of the bow.
  * @param cymbalForm The form of the cymbals.
+ * @param endPin The end pin of a cello, in meters, or `undefined` for the end pin of the size.
  * @returns The model.
  */
 function buildScaled(
@@ -124,13 +129,14 @@ function buildScaled(
   scale: number,
   bowGrip: BowGrip | undefined,
   cymbalForm: CymbalForm,
+  endPin: number | undefined,
 ): InstrumentModel {
   switch (id) {
     case 'violin':
     case 'viola':
     case 'cello':
     case 'contrabass':
-      return buildBowedString(id, scale, bowGrip);
+      return buildBowedString(id, scale, bowGrip, endPin);
     case 'oboe':
     case 'bassoon':
       return buildWoodwind(id, scale);

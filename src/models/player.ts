@@ -13,6 +13,7 @@ import type { SeatHeights, Support } from './props.ts';
 import { boneIndex, makeSkeleton } from './rig.ts';
 import type { BoneName, Skeleton } from './rig.ts';
 import { SPECIES, instrumentScale } from './species.ts';
+import { celloPinOf } from './instruments/cello-fit.ts';
 import { studioRigOf } from './studio-body.ts';
 import type { StudioRig } from './studio-rig.ts';
 import type { SpeciesId, SpeciesParams } from './species.ts';
@@ -240,13 +241,15 @@ export function* buildPlayerSteps(
   yield;
   const body = yield* buildBipedSteps(builder, params, stance);
   yield;
+  const scale = instrumentScale(params, instrument);
   const model = buildInstrument(
     instrument,
     kettles,
-    instrumentScale(params, instrument),
+    scale,
     params.bowGrip,
     params.cymbalForm,
     params.tubaPipe,
+    instrument === 'cello' ? celloPinOf(body, scale) : undefined,
   );
   yield;
   const placed = attachInstrument(builder, model, body);

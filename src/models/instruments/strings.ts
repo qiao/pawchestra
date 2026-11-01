@@ -80,9 +80,10 @@ const BASS_END_PIN = 0.2;
 
 /**
  * Gives the length of the end pin of an upright bowed string below the tail end, in meters
- * (design 4.6). A smaller cello has a longer end pin, so that the top of its body stays at the
- * place of the top of the full size: a player of a fractional cello sets the end pin so that the
- * upper bout rests against the chest. The contrabass keeps {@link BASS_END_PIN} at each size.
+ * (design 4.6), when the player gives no end pin. A smaller cello has a longer end pin, so that the
+ * top of its body stays at the place of the top of the full size. A player builds its cello with
+ * the end pin of its body (`celloPinOf()` of `cello-fit.ts`). The contrabass keeps
+ * {@link BASS_END_PIN} at each size.
  *
  * @param id The upright bowed string.
  * @param scale The scale of the instrument, as a factor of its full size.
@@ -1536,17 +1537,21 @@ function buildBow(size: number, grip: BowGrip): BowPiece {
  * @param id The instrument.
  * @param scale The scale of the instrument and its bow, as a factor of {@link STRING_SCALES}.
  * @param grip The grip of the bow in the right paw of the species.
+ * @param endPin The length of the end pin of a cello below the tail end, in meters, for the body of
+ *   the player (`celloPinOf()` of `cello-fit.ts`), or `undefined` for {@link endPinLength}. The
+ *   other instruments ignore it.
  * @returns The model.
  */
 export function buildBowedString(
   id: BowedStringId,
   scale = 1,
   grip: BowGrip = SQUARE_GRIP,
+  endPin?: number,
 ): InstrumentModel {
   const v = VIOLIN;
   const s = STRING_SCALES[id] * scale;
   const upright = id === 'cello' || id === 'contrabass';
-  const pin = upright ? endPinLength(id, scale) : 0;
+  const pin = upright ? ((id === 'cello' ? endPin : undefined) ?? endPinLength(id, scale)) : 0;
   // The violin axes in the piece axes, before the scale: upright, the length is +y, the top is
   // -z, and the middle of the body depth is on the axis of the end pin.
   const lengthAxis = new Vector3(0, 1, 0);
