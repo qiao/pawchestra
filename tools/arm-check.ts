@@ -46,6 +46,12 @@
  * over its limit fails. A role that the commit does not have has no base. The
  * exit code is 1 when a value fails.
  *
+ * A body whose bind differs from the bind of the base ({@link bindKey}) is a rebind. Each value of
+ * {@link BIND_MEASURES} of a rebind counts from another zero than its base, so it takes only its
+ * limit: `FAIL` over the limit, and `REBIND` in place of a `FAIL` of the margin. The other values
+ * keep the margin. The run then prints the narrow axes of the elbow ring and the wrist ring in
+ * centimeters against the base ({@link rebindLines}), because the flat share no longer compares.
+ *
  * The JSON of each role of the working tree goes into a cache by tree ({@link armCacheFile}), so a
  * second run on the same tree, such as the merge gate after the gate of the branch, reads it and
  * prints `tree: cached`. A change of a file of `src/`, `tools/`, or the demos gives a new key.
@@ -92,6 +98,7 @@
  * Each `--midi <path>` adds a MIDI file outside the repository to the demos as one more `--demo`
  * ({@link userFiles}), also on the commit of `--base` and `--states`.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { basename, join, resolve } from 'node:path';
@@ -185,6 +192,36 @@ export type Measure = (typeof MEASURES)[number];
 
 /** The measures of the moves: the lifts and the lowerings of {@link probeMoves}. */
 export const MOVE_MEASURES = ['moveTwist', 'moveTurn'] as const satisfies readonly Measure[];
+
+/**
+ * The measures that count from the bind pose of the body: the twists and the swing of the paw on
+ * its forearm from the bind paw, and the flat share against the bind ring. A new bind moves their
+ * zero with the same pose of the bones, so a rebind judges them only by their limits (design 4.4,
+ * "Arm gate").
+ */
+export const BIND_MEASURES = [
+  'foreTwist',
+  'flat',
+  'pawTwist',
+  'pawSwing',
+  'moveTwist',
+] as const satisfies readonly Measure[];
+
+/** The arm bones whose bind heads, with the palm and the elbow axis, give the bind of an arm. */
+const BIND_BONES = [
+  'clavicle',
+  'upper_arm',
+  'forearm',
+  'forearm_twist',
+  'hand',
+  'fingers',
+] as const;
+
+/** The rings whose narrow axes a rebind prints in place of the flat share ({@link ARM_RINGS}). */
+export const REBIND_RINGS = ['elbow', 'wrist'] as const;
+
+/** A ring of {@link REBIND_RINGS}. */
+export type RebindRing = (typeof REBIND_RINGS)[number];
 
 /**
  * The sample sets of the gate: the sets of `probeFolds()`, and `move`, the lifts and the
@@ -1225,6 +1262,17 @@ export interface RoleReport {
    * A role with no play sample and a JSON text before format 3 have none.
    */
   readonly grips?: Readonly<Record<Side, number>>;
+  /**
+   * The key of the bind of the bodies of the role ({@link bindKey}). A JSON text before format 5
+   * has none.
+   */
+  readonly bind?: string;
+  /**
+   * The narrow axis of each ring of {@link REBIND_RINGS} of each arm, in meters: the 5th
+   * percentile of the worst sample set of the rest, the play, and the lift. A JSON text before
+   * format 5 has none.
+   */
+  readonly rings?: Readonly<Record<Side, Readonly<Record<RebindRing, number>>>>;
 }
 
 /** The JSON text of a run of the tool for one tree (`--json`). */
@@ -1241,9 +1289,13 @@ export interface ArmJson {
 
 /**
  * The format version of {@link ArmJson}. Version 4 gives the grips in the frame of the posed
- * forearm ({@link GripFrames}), so it changes the grips of the older versions.
+ * forearm ({@link GripFrames}), so it changes the grips of the older versions. Version 5 adds the
+ * key of the bind and the ring widths of each role ({@link RoleReport.bind}).
  */
-export const ARM_FORMAT = 4;
+export const ARM_FORMAT = 5;
+
+/** The oldest format version that {@link ARM_FORMAT} only adds fields to. */
+const ARM_SINCE = 4;
 
 /** The values and the labels of the samples of one role, by sample set. */
 interface Samples {
@@ -1445,6 +1497,53 @@ function turnDegrees(a: Quaternion, b: Quaternion): number {
   return (2 * Math.acos(Math.min(1, Math.abs(a.dot(b)))) * 180) / Math.PI;
 }
 
+/** The key of the bind of each studio rig that {@link bindKey} gave. */
+const bindKeys = new WeakMap<StudioRig, string>();
+
+/**
+ * Gives the key of the bind of the arms of a studio body: a hash of the bind heads of the arm
+ * bones ({@link BIND_BONES}) from the clavicle, the palms, and the elbow axes
+ * (`StudioBody.hinges`), each rounded to 1e-5. Two bodies with one key bind their arms in one
+ * pose, so the values of {@link BIND_MEASURES} count from one zero. A move of the whole body, such
+ * as a new seat, keeps the key.
+ *
+ * @param rig The studio rig.
+ * @returns The first 12 hex digits of the SHA-256 of the bind data.
+ */
+export function bindKey(rig: StudioRig): string {
+  const found = bindKeys.get(rig);
+  if (found !== undefined) {
+    return found;
+  }
+  const body = rig.body;
+  const round = (value: number): number => Math.round(value * 1e5) / 1e5;
+  const arms = SIDES.map((side) => {
+    const root = body.heads[`clavicle_${side}`];
+    const heads = BIND_BONES.map((bone) =>
+      body.heads[`${bone}_${side}`].map((value, i) => round(value - (root[i] ?? 0))),
+    );
+    const hinge = body.hinges?.[side].map(round) ?? null;
+    return { heads, palm: body.palms[side].map(round), hinge };
+  });
+  const key = createHash('sha256').update(JSON.stringify(arms)).digest('hex').slice(0, 12);
+  bindKeys.set(rig, key);
+  return key;
+}
+
+/**
+ * Tells if the bodies of a role bind their arms in another pose than the bodies of the base: both
+ * reports have a key of the bind ({@link bindKey}), and the keys differ.
+ *
+ * @param tree The report of the working tree.
+ * @param base The report of the base, or `null` with no base.
+ * @returns True for a rebind.
+ */
+export function isRebind(tree: RoleReport, base: RoleReport | null): boolean {
+  return (
+    base !== null && tree.bind !== undefined && base.bind !== undefined && tree.bind !== base.bind
+  );
+}
+
 /**
  * Measures the arms of the studio body of a role over demos.
  *
@@ -1467,6 +1566,17 @@ export function probeRole(
   };
   const found: string[] = [];
   const rolls: Record<Side, number[]> = { L: [], R: [] };
+  const keys = new Set<string>();
+  const ringAt = REBIND_RINGS.map((name) => ARM_RINGS.findIndex((ring) => ring.name === name));
+  const widths = (): Record<Side, number[][]> => ({
+    L: REBIND_RINGS.map(() => []),
+    R: REBIND_RINGS.map(() => []),
+  });
+  const narrows: Record<SampleSet, Record<Side, number[][]>> = {
+    rest: widths(),
+    play: widths(),
+    lift: widths(),
+  };
   for (const demo of demos) {
     const counts: Record<SampleSet, number> = { rest: 0, play: 0, lift: 0 };
     const none = (): Record<Side, number | null> => ({ L: null, R: null });
@@ -1485,12 +1595,20 @@ export function probeRole(
       const label = given ?? plan?.(set, counts[set]) ?? '';
       counts[set] += 1;
       const arms = armBinds(rig);
+      keys.add(bindKey(rig));
       const store = sets[set];
       store.labels.push(label);
       for (const side of SIDES) {
         // The rest sample of a demo comes first, and the stretch counts from it.
         if (set === 'rest') {
           rests[side] = lowerLengths(arms[side], posed);
+        }
+        const ringWidths = ringNarrows(arms[side], studio.matrices, posed);
+        for (const [k, at] of ringAt.entries()) {
+          const width = ringWidths[at] ?? Number.NaN;
+          if (Number.isFinite(width)) {
+            narrows[set][side][k]?.push(width);
+          }
         }
         const sample = measureArm(arms[side], studio.matrices, posed, folded, rests[side]);
         const values = store.values[side];
@@ -1538,7 +1656,24 @@ export function probeRole(
       moveTurn: of('moveTurn'),
     };
   };
-  const report: RoleReport = { demos: found, arms: { L: armStats('L'), R: armStats('R') } };
+  // The narrowest ring of each arm: the 5th percentile of the worst sample set.
+  const ringWidth = (side: Side, k: number): number =>
+    Math.min(
+      ...SAMPLE_SETS.map((set) => {
+        const sorted = (narrows[set][side][k] ?? []).toSorted((a, b) => a - b);
+        return sorted.length > 0 ? quantile(sorted, 0.05) : Infinity;
+      }),
+    );
+  const ringsOf = (side: Side): Readonly<Record<RebindRing, number>> => ({
+    elbow: ringWidth(side, REBIND_RINGS.indexOf('elbow')),
+    wrist: ringWidth(side, REBIND_RINGS.indexOf('wrist')),
+  });
+  const report: RoleReport = {
+    demos: found,
+    arms: { L: armStats('L'), R: armStats('R') },
+    bind: [...keys].toSorted().join(' '),
+    rings: { L: ringsOf('L'), R: ringsOf('R') },
+  };
   const medians = { L: angleMedian(rolls.L), R: angleMedian(rolls.R) };
   if (medians.L === null || medians.R === null) {
     return report;
@@ -1598,23 +1733,37 @@ export function gateValue(
 }
 
 /** The verdict of one value of the gate. */
-export type Verdict = 'PASS' | 'OPEN' | 'FAIL';
+export type Verdict = 'PASS' | 'OPEN' | 'REBIND' | 'FAIL';
 
 /**
  * Gives the verdict of one value against its limit and the base. A value that is worse than the
  * base by more than the margin fails, also within its limit, because a goal on one measure can
  * move a twist to a joint that no goal measures. A value over its limit fails when the base has no
  * value or is within the limit, and else it is open: a known item that the change does not make
- * worse. Each other value passes.
+ * worse. Each other value passes. A value that counts from another bind than its base
+ * (`rebind`) takes only its limit: it fails over the limit, and is `REBIND` when the margin alone
+ * would fail it.
  *
  * @param value The value of the working tree.
  * @param base The value of the base, or `null` with no base.
  * @param limit The limit.
+ * @param rebind True for a value of {@link BIND_MEASURES} of a rebind ({@link isRebind}).
  * @returns The verdict.
  */
-export function verdictOf(value: number, base: number | null, limit: ArmLimit): Verdict {
+export function verdictOf(
+  value: number,
+  base: number | null,
+  limit: ArmLimit,
+  rebind = false,
+): Verdict {
   const over = (v: number): boolean => (limit.up ? v > limit.limit : v < limit.limit);
   const worse = base !== null && (limit.up ? value - base : base - value) > limit.margin;
+  if (rebind) {
+    if (over(value)) {
+      return 'FAIL';
+    }
+    return worse ? 'REBIND' : 'PASS';
+  }
   if (worse || (over(value) && (base === null || !over(base)))) {
     return 'FAIL';
   }
@@ -1650,6 +1799,8 @@ export interface GateRow {
  * @returns The values, by arm and measure.
  */
 export function gateRows(role: string, tree: RoleReport, base: RoleReport | null): GateRow[] {
+  const rebind = isRebind(tree, base);
+  const fromBind = (measure: Measure): boolean => BIND_MEASURES.some((m) => m === measure);
   return SIDES.flatMap((side) =>
     MEASURES.flatMap((measure): GateRow[] => {
       const limit = ARM_LIMITS[measure];
@@ -1664,7 +1815,7 @@ export function gateRows(role: string, tree: RoleReport, base: RoleReport | null
       const before = baseStats ? gateValue(baseStats, limit) : null;
       const value = found.value;
       const baseValue = before?.value ?? null;
-      const verdict = verdictOf(value, baseValue, limit);
+      const verdict = verdictOf(value, baseValue, limit, rebind && fromBind(measure));
       return [{ role, side, measure, set: found.set, stats: of, value, base: baseValue, verdict }];
     }),
   );
@@ -1711,15 +1862,53 @@ export function summaryLines(rows: readonly GateRow[], base: boolean): string[] 
       const mark = row.verdict === 'PASS' ? '' : ` ${row.verdict}`;
       return `${show(row.value, measure)}${was}${mark}`;
     });
-    const worst = own.some((r) => r.verdict === 'FAIL')
-      ? 'FAIL'
-      : own.some((r) => r.verdict === 'OPEN')
-        ? 'OPEN'
-        : 'PASS';
+    const worst =
+      (['FAIL', 'OPEN', 'REBIND'] as const).find((v) => own.some((r) => r.verdict === v)) ?? 'PASS';
     const [role = '', side = ''] = key.split(' ');
     lines.push(`| ${role} | ${side} | ${cells.join(' | ')} | ${worst} |`);
   }
   return lines;
+}
+
+/**
+ * Writes the lines of the roles whose bodies bind their arms in another pose than the base
+ * ({@link isRebind}): the keys of the binds, and the narrow axis of the elbow ring and the wrist
+ * ring of each arm in centimeters, with the base in parentheses. The flat share of a rebind
+ * counts from another bind ring, so these widths compare the skin in place of it.
+ *
+ * @param reports The reports of each role.
+ * @returns The lines, empty with no rebind.
+ */
+export function rebindLines(
+  reports: readonly {
+    readonly role: string;
+    readonly tree: RoleReport | null;
+    readonly base: RoleReport | null;
+  }[],
+): string[] {
+  // A width with no sample is Infinity, which the JSON text of a child holds as null.
+  const inCm = (value: number | undefined): string =>
+    Number.isFinite(value) ? (100 * (value ?? 0)).toFixed(2) : '-';
+  const rows = reports.flatMap(({ role, tree, base }) =>
+    tree && isRebind(tree, base)
+      ? SIDES.map((side) => {
+          const cells = REBIND_RINGS.map(
+            (ring) => `${inCm(tree.rings?.[side][ring])} (${inCm(base?.rings?.[side][ring])})`,
+          );
+          return `| ${role} | ${side} | ${tree.bind ?? '-'} (${base?.bind ?? '-'}) | ${cells.join(' | ')} |`;
+        })
+      : [],
+  );
+  if (rows.length === 0) {
+    return [];
+  }
+  return [
+    `The bodies of the roles below bind their arms in another pose than the base. Each value of ${BIND_MEASURES.map((m) => ARM_LIMITS[m].name).join(', ')} takes only its limit, and REBIND marks a value that the margin alone fails. The narrow axis p5 of the elbow ring and the wrist ring, in cm with the base in parentheses, compares the skin in place of the flat share:`,
+    '',
+    `| Role | Arm | Bind (base) | ${REBIND_RINGS.map((ring) => `${ring} cm`).join(' | ')} |`,
+    `|---|---|---|${REBIND_RINGS.map(() => '---:').join('|')}|`,
+    ...rows,
+  ];
 }
 
 /**
@@ -2699,7 +2888,7 @@ async function childMain(args: readonly string[]): Promise<number> {
   }
   const json: ArmJson = {
     version: ARM_FORMAT,
-    since: ARM_FORMAT,
+    since: ARM_SINCE,
     roles: reports,
     missing: roles.filter((role) => !isRole(role)),
   };
@@ -2989,9 +3178,13 @@ async function checkVariants(options: CheckArgs): Promise<number> {
   );
   for (const { variant, reports, rows } of blocks) {
     const grips = gripLines(reports);
+    const rebinds = rebindLines(reports);
     const shown = options.long ? rows : rows.filter((row) => row.verdict !== 'PASS');
-    if (grips.length > 0 || shown.length > 0) {
+    if (grips.length > 0 || shown.length > 0 || rebinds.length > 0) {
       console.log(`\nVariant ${variant.name}:`);
+    }
+    if (rebinds.length > 0) {
+      console.log(['', ...rebinds].join('\n'));
     }
     if (grips.length > 0) {
       console.log(['', ...grips].join('\n'));
@@ -3072,6 +3265,10 @@ async function main(): Promise<number> {
     );
   }
   console.log(['', ...summaryLines(rows, options.base !== null)].join('\n'));
+  const rebinds = rebindLines(reports);
+  if (rebinds.length > 0) {
+    console.log(['', ...rebinds].join('\n'));
+  }
   const grips = gripLines(reports);
   if (grips.length > 0) {
     console.log(['', ...grips].join('\n'));
