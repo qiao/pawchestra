@@ -1341,10 +1341,11 @@ interface StoredRows {
 /**
  * The format version of the JSON text of `--json` (`ProbeFormat` of `tools/ref-tree.ts`). A
  * change of the format takes the next version. Version 2 added the reach of the note targets,
- * version 3 the samples over the goal of each pair, and version 4 the phase of the sample of each
- * deepest point ({@link PairPhase}).
+ * version 3 the samples over the goal of each pair, version 4 the phase of the sample of each
+ * deepest point ({@link PairPhase}), and version 5 the places of each deepest point
+ * (`PairDepth.partPlace`, `PairDepth.intoPlace`).
  */
-export const ROWS_FORMAT = 4;
+export const ROWS_FORMAT = 5;
 
 /**
  * The oldest format version that {@link ROWS_FORMAT} only adds fields to (`ProbeFormat.since` of
@@ -1391,7 +1392,7 @@ export function readRows(text: string): SweepRow[] {
  * @returns The depth.
  */
 export function restoreDepth(stored: StoredDepth): PhasedDepth {
-  const base: PairDepth = {
+  let base: PairDepth = {
     part: stored.part,
     into: stored.into,
     depth: stored.depth,
@@ -1400,6 +1401,13 @@ export function restoreDepth(stored: StoredDepth): PhasedDepth {
     bone: stored.bone,
     along: stored.along ?? Number.NaN,
   };
+  // A text before the format version 5 has no places.
+  if (stored.partPlace !== undefined) {
+    base = { ...base, partPlace: stored.partPlace };
+  }
+  if (stored.intoPlace !== undefined) {
+    base = { ...base, intoPlace: stored.intoPlace };
+  }
   const depth: PhasedDepth = stored.phase ? { ...base, phase: stored.phase } : base;
   if (stored.samples === undefined || stored.over === undefined) {
     return depth;
