@@ -127,6 +127,9 @@ These rules hold for each test:
   machine has no `pdftotext`.
 - Start each long job in the background: a render, a measure, a sweep, or a check script. Wait for
   its exit notice, and write the docs during the wait.
+- Never wait in a loop such as `until ! pgrep -f '<name>'`. The shell of the loop has `<name>` in
+  its own command line, so `pgrep` always finds it, and the loop never ends. A round left six such
+  loops of `frame-compare.ts` running after its end.
 - A sweep, such as `pnpm pose-depth` or `pnpm fold-probe`, reads the modules at its start. Do not
   edit or commit a module that it reads while it runs.
 - In the shell of an agent, `grep` is a shell function that runs ugrep with `--ignore-files`, so it
