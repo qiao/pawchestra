@@ -803,6 +803,34 @@ const WOLF_VIOLIN_HOLD = {
 } as const satisfies BowedHold;
 
 /**
+ * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
+ * values of the accepted rabbit violinist ({@link SHOULDER_HOLD}), as directions and in head
+ * heights, with a place and a rest from the body. With the chin hold, the left upper arms and the
+ * forearms of the recast bodies went 2.2 cm to 28 cm into the body in the rest and the moves.
+ *
+ * The tail end lies on the left collarbone (`chinFit`, `fitViolinPlace()`): 0.45 of the way from
+ * the middle line to the left shoulder joint, 0.05 H above the base of the neck, and 0.18 H behind
+ * the front of the upper chest, between the 0.19 H of the rabbit and the 0.22 H of the red fox.
+ * The head turns until the jaw touches the chin rest and the strings at the bow: a press of
+ * 0.02 H put the jaw of the deer and the cat up to 1.0 cm deeper into the violin. With 0.22 H, the
+ * violin of the beaver went 5.8 cm into the body in the play.
+ *
+ * At rest, the arms hang out to the sides until they clear the body (`restArms`): the left upper
+ * arm swings 20° forward and the elbow bends 100°, so that the left paw holds the upright violin
+ * in front of the thigh. The right upper arm swings 45° forward and the elbow bends 80°: with
+ * 20°, the right upper arm of the recast red fox went 2.0 cm into the body at rest and in the
+ * moves (1.5 cm with 35°).
+ */
+const VIOLIN_HOLD = {
+  ...SHOULDER_HOLD,
+  chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
+  restArms: {
+    L: { forward: 20 * MathUtils.DEG2RAD, bend: 100 * MathUtils.DEG2RAD },
+    R: { forward: 45 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
+  },
+} as const satisfies BowedHold;
+
+/**
  * The bow of the dog cellist at rest (design 5.2): the right paw holds the bow over the right knee,
  * 0.25 H out and 0.5 H above the top of the thigh at 0.9 of the way to the knee, with the tip up
  * and leaned out and forward, away from the cello. The short arm of the dog then bends softly at
@@ -881,7 +909,7 @@ const CELLO_HOLD = {
 
 /** The holds of the bowed strings. */
 export const BOWED_HOLDS = {
-  violin: CHIN_HOLD,
+  violin: VIOLIN_HOLD,
   // The left arm reaches the nut of the viola only with a smaller forward move.
   viola: { ...CHIN_HOLD, reach: 30 * MathUtils.DEG2RAD, playShift: [0, -0.05, -0.04] },
   cello: CELLO_HOLD,

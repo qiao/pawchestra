@@ -64,6 +64,7 @@ export const SHEET_MOMENTS = {
     hold: {
       ...BOWED_HOLDS.violin,
       playShift: [-0.25, 0.05, 0],
+      chinFit: null,
       playTurn: violinTurn(-25, 15),
       poleTipR: BOWED_HOLDS.violin.poleR,
     },
