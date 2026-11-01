@@ -8,7 +8,7 @@ import { HEAD_BONES, closedDepth, surfaceGap } from './test-clearance.ts';
 import type { ClosedSurface } from './test-clearance.ts';
 import { poseSkeleton } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
-import type { TestScene } from './test-scene.ts';
+import type { Recast, TestScene } from './test-scene.ts';
 import { posedCorner } from './test-skin.ts';
 import type { AnimalPose, Transport } from './types.ts';
 
@@ -118,6 +118,12 @@ export interface RoleSweep {
   readonly players: (scene: TestScene) => readonly SweepPlayer[];
   /** Gives the sets of samples of a scene. */
   readonly sampleSets: (scene: TestScene) => readonly SampleSet[];
+  /**
+   * The recast of the seats of a recast role (`recastSweep()` of `pose/test-sweep-roles.ts`): the
+   * scene of each demo takes it (`recastScene()` of `pose/test-scene.ts`). None for a role of the
+   * cast of the app.
+   */
+  readonly recast?: Recast;
 }
 
 /** The deepest point of a moving part in an obstacle over a set of samples. */

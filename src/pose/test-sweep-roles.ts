@@ -25,7 +25,7 @@ import type { ClosedSurface, PosedPart } from './test-clearance.ts';
 import { posedPiecePoint, posedPoint } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 import { NOT_STARTED, PLAYING, allAudible, ofConductor, seatSpecies } from './test-scene.ts';
-import type { TestScene } from './test-scene.ts';
+import type { Recast, TestScene } from './test-scene.ts';
 import { BODY_OBSTACLE } from './test-sweep.ts';
 import type { AcceptedDepth, NoteTarget, RoleSweep, SweepPart, SweepSample } from './test-sweep.ts';
 import type { Transport } from './types.ts';
@@ -1598,12 +1598,13 @@ export function soloistScene(role: SoloistRole, species: SpeciesId, seed = 1): T
  * loops of each mesh differ.
  *
  * @param sweep The sweep of the role, such as the violinist.
- * @param species The species of the recast, such as the wolf.
+ * @param recast The recast of the seats of the role, such as the wolf in the seats of the rabbit.
  * @param home The sweep of the own role of the species, such as the clarinetist.
- * @returns The sweep, with the name `<role>@<species>`.
+ * @returns The sweep, with the name `<role>@<species>` and the recast.
  * @throws Error if the sweep of the own role has no body.
  */
-export function recastSweep(sweep: RoleSweep, species: SpeciesId, home: RoleSweep): RoleSweep {
+export function recastSweep(sweep: RoleSweep, recast: Recast, home: RoleSweep): RoleSweep {
+  const { species } = recast;
   const body = home.obstacles.find((obstacle) => obstacle.name === BODY_OBSTACLE);
   if (!body) {
     throw new Error(`The sweep of the ${home.role} has no obstacle ${BODY_OBSTACLE}.`);
@@ -1611,6 +1612,7 @@ export function recastSweep(sweep: RoleSweep, species: SpeciesId, home: RoleSwee
   return {
     ...sweep,
     role: `${sweep.role}@${species}`,
+    recast,
     obstacles: sweep.obstacles.map((obstacle) =>
       obstacle.name === BODY_OBSTACLE ? body : obstacle,
     ),

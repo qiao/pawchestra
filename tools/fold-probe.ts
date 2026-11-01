@@ -65,7 +65,7 @@ import { toVec3 } from '../src/models/tuples.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
-import { NOT_STARTED, PLAYING, allAudible, recastScene, sceneOf } from '../src/pose/test-scene.ts';
+import { NOT_STARTED, PLAYING, allAudible, recastSceneOf } from '../src/pose/test-scene.ts';
 import type { Recast, TestScene } from '../src/pose/test-scene.ts';
 import { SWEEP_ROLES, recastSweep } from '../src/pose/test-sweep-roles.ts';
 import type { RoleSweep } from '../src/pose/test-sweep.ts';
@@ -194,8 +194,7 @@ export function isRole(name: string): boolean {
  * @returns The scene.
  */
 export function roleScene(role: RoleSource, bytes: Uint8Array): TestScene {
-  const scene = sceneOf(bytes);
-  return role.kind === 'player' && role.recast ? recastScene(scene, role.recast) : scene;
+  return recastSceneOf(bytes, role.kind === 'player' ? role.recast : undefined);
 }
 
 /**
@@ -217,9 +216,7 @@ export function findSweep(name: string): RoleSweep | undefined {
   const sweep = Object.entries(SWEEP_ROLES).find(
     ([key]) => key === name.slice(0, name.indexOf(RECAST_MARK)),
   )?.[1];
-  return sweep
-    ? recastSweep(sweep, role.recast.species, homeSweep(role.recast.species))
-    : undefined;
+  return sweep ? recastSweep(sweep, role.recast, homeSweep(role.recast.species)) : undefined;
 }
 
 /**
