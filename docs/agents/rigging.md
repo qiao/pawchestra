@@ -26,7 +26,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
 | pig | A copy with round upper arms free of the trunk (`pig-arms.glb`), a twist bone of each upper arm (`upperTwist`), a horn turned back toward the body. | `hornist` |
-| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), a bind elbow bent forward and supinated bind paws (`bindArms`), the clarinet bell against the right knee at rest. | `clarinetist` |
+| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind (design 4.4): straight bind arms with the elbow axes of a forward bend (`straightArms`, `bindArms`), and bind paws supinated to the middle of the clarinet and violin twists (`bindSupination`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Longer arms, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), a bind elbow bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
