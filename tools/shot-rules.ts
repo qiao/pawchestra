@@ -22,8 +22,8 @@
  * seats in its sphere, because its frame holds only them.
  *
  * The tool also gives the median and the largest elevation and height of the camera of each kind
- * of shot, from a sample each {@link SAMPLE_STEP}, and the median share of the frame width that
- * the footprints of the players of a solo or a section shot fill.
+ * of shot, from a sample each {@link SAMPLE_STEP} after the blend into the shot, and the median
+ * share of the frame width that the footprints of the players of a solo or a section shot fill.
  *
  * For each shot, the tool also measures the nearest animal: the distance from the camera to the
  * nearest point of an animal body in the frame, and the largest part of the frame height that
@@ -915,9 +915,13 @@ export function checkPlan(
     for (let t = start; t < end - 1e-9; t += SAMPLE_STEP) {
       const frame = frameAt(plan, t);
       measure(t, frame);
-      const toCamera = minus(frame.position, shot.target);
-      heights.elevations.push(Math.asin(toCamera[1] / Math.hypot(...toCamera)) / DEG);
-      heights.heights.push(frame.position[1]);
+      // During a blend, the camera comes from the previous shot, so it is not a camera of this
+      // shot and its kind.
+      if (t >= shot.startSec + shot.blendSec) {
+        const toCamera = minus(frame.position, shot.target);
+        heights.elevations.push(Math.asin(toCamera[1] / Math.hypot(...toCamera)) / DEG);
+        heights.heights.push(frame.position[1]);
+      }
       const forward = axesOf(frame).forward;
       const turn = Math.abs(Math.atan2(-forward[0], -forward[2]));
       worstLine = Math.max(worstLine, turn);
