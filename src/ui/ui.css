@@ -134,15 +134,27 @@ svg {
   display: none !important;
 }
 
+/* In Cinematic mode, the title stands at the top-left corner of the frame, at the insets of Free
+   mode (design 2.3). The app sets --letterbox, the height of the top and the bottom bars, and
+   --letterbox-side, the width of each side bar, so the title moves with the bars. */
 .title {
   --logo-lift: -2px;
   position: fixed;
-  top: var(--title-top);
-  left: var(--title-left);
-  max-width: min(720px, calc(100vw - 2 * var(--title-left)));
+  top: calc(var(--letterbox, 0px) + var(--title-top));
+  left: calc(var(--letterbox-side, 0px) + var(--title-left));
+  max-width: min(720px, calc(100vw - 2 * var(--letterbox-side, 0px) - 2 * var(--title-left)));
   margin: 0;
   text-shadow: 0 1px 2px #000;
   pointer-events: none;
+}
+
+/* A window in portrait has a low frame and a high top bar: at 390 × 844, the frame is 167 px high
+   and the top bar 338 px. There the title stays at the top of the window, as in Free mode, so that
+   it covers no part of the low frame (design 2.3). */
+@media (orientation: portrait) {
+  .title {
+    top: var(--title-top);
+  }
 }
 
 /* Each line of the title has its own soft shade, which keeps 4.5:1 for its text over a white animal
@@ -473,20 +485,14 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
   pointer-events: none;
 }
 
-/* In Cinematic mode during play, the title and the drawer hide with the bar, so that the film
-   fills the screen (design 2.3). They keep their place, so the drawer comes back open, and they
-   keep their place in the focus order. They ignore the pointer, so the first tap goes to the stage
-   and only shows them. The drawer fades in 0.2 s with its own transition. */
-.title {
-  transition: opacity 0.2s;
-}
-
-body.is-ui-hidden .title,
+/* In Cinematic mode during play, the drawer hides with the bar, so that the film fills the screen
+   (design 2.3). It keeps its place, so it comes back open, and it keeps its place in the focus
+   order. It ignores the pointer, so the first tap goes to the stage and only shows it. It fades in
+   0.2 s with its own transition. */
 body.is-ui-hidden .drawer {
   opacity: 0;
 }
 
-body.is-ui-hidden .title *,
 body.is-ui-hidden .drawer,
 body.is-ui-hidden .drawer * {
   pointer-events: none;
@@ -1668,7 +1674,6 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
 
 @media (prefers-reduced-motion: reduce) {
   .bar,
-  .title,
   .drawer,
   .drawer[hidden],
   #stage,

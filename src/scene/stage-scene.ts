@@ -907,19 +907,38 @@ export class StageScene {
   }
 
   /**
-   * The height of the bottom bar of the letterbox, in CSS pixels (design 2.5): 0 in Free mode and
-   * on a canvas wider than 21:9. It comes from the current canvas size and the move of the bars,
-   * not from the visible box of the last frame. A frame with no layout, such as a frame during the
-   * load, does not update that box, so the box of a 1 × 1 canvas lifted the bar of the controls to
-   * the middle of the window.
+   * The height of each of the top and the bottom bars of the letterbox, in CSS pixels (design
+   * 2.5): 0 in Free mode and on a canvas wider than 21:9. It comes from the current canvas size
+   * and the move of the bars, not from the visible box of the last frame. A frame with no layout,
+   * such as a frame during the load, does not update that box, so the box of a 1 × 1 canvas lifted
+   * the bar of the controls to the middle of the window.
    */
   get letterboxBar(): number {
+    return this.#barSize(this.#height, letterbox(this.#width, this.#height).height);
+  }
+
+  /**
+   * The width of each of the side bars of the letterbox, in CSS pixels (design 2.5): 0 in Free
+   * mode and on a canvas narrower than 21:9. It has the source of {@link StageScene.letterboxBar}.
+   */
+  get letterboxSide(): number {
+    return this.#barSize(this.#width, letterbox(this.#width, this.#height).width);
+  }
+
+  /**
+   * Gives the size of one bar of the letterbox at the current move of the bars: the half of the
+   * space that the frame leaves on one axis.
+   *
+   * @param canvas The size of the canvas on the axis, in CSS pixels.
+   * @param frame The size of the frame of Cinematic mode on the axis, in CSS pixels.
+   * @returns The size of the bar, in CSS pixels.
+   */
+  #barSize(canvas: number, frame: number): number {
     const share = letterboxShare(this.#letterbox);
     if (share <= 0) {
       return 0;
     }
-    const height = this.#height;
-    return Math.max(0, ((height - letterbox(this.#width, height).height) / 2) * share);
+    return Math.max(0, ((canvas - frame) / 2) * share);
   }
 
   /**

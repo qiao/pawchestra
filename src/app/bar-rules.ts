@@ -60,16 +60,17 @@ export interface UiActivity extends BarActivity {
 export interface UiShown {
   /** True if the bar and the pointer over the stage show. */
   readonly bar: boolean;
-  /** True if the logo, the title, the composer, the open drawer, and the tooltips show. */
+  /** True if the open drawer and the tooltips show. The title always shows. */
   readonly panels: boolean;
 }
 
 /**
  * Tells which parts of the UI show (design 2.3). Free mode hides only the bar, with the rule of
- * {@link barShows}. In Cinematic mode during play, the bar, the title, and the drawer hide together
- * after {@link BAR_HIDE_SEC} with no pointer motion, also an open drawer, so that the film fills the
- * screen. They stay while the pointer is over one of them, while a control in them has the
- * keyboard focus, and while a dialog or a message is open.
+ * {@link barShows}. In Cinematic mode during play, the bar and the drawer hide together after
+ * {@link BAR_HIDE_SEC} with no pointer motion, also an open drawer, so that the film fills the
+ * screen. The title always shows. They stay while the pointer is over the bar, the drawer, or the
+ * link of the title, while one of these has the keyboard focus, and while a dialog or a message is
+ * open.
  *
  * @param activity The mode, the play state, and the activity of the user.
  * @returns The parts that show.

@@ -73,12 +73,14 @@ export class Ui {
   readonly #phone: MediaQueryList;
   /** The number of builds that cover the stage now. */
   #covers = 0;
-  /** The root element of the page, which holds the CSS variable `--letterbox`. */
+  /** The root element of the page, which holds the sizes of the letterbox bars. */
   readonly #root: HTMLElement;
   /** The element that holds the UI, which gets the class `is-ui-hidden`. */
   readonly #parent: HTMLElement;
-  /** The height of the bottom bar of the letterbox that the page shows, in CSS pixels. */
-  #letterbox = 0;
+  /** The height of the top and the bottom bars of the letterbox that the page shows, in CSS px. */
+  #letterboxHeight = 0;
+  /** The width of each side bar of the letterbox that the page shows, in CSS pixels. */
+  #letterboxWidth = 0;
 
   /**
    * Creates the UI and adds it to a parent element.
@@ -239,11 +241,10 @@ export class Ui {
   }
 
   /**
-   * Shows or hides the panels: the logo, the title, the composer, the open drawer, and the
-   * tooltips (design 2.3). The hidden panels keep their place, their state, and their place in the
-   * focus order, so that the drawer comes back open, and a Tab shows them again. They ignore the
-   * pointer, so that the first tap only shows them. They fade in 0.2 s, at once with reduced
-   * motion.
+   * Shows or hides the panels: the open drawer and the tooltips (design 2.3). The title always
+   * shows. The hidden panels keep their place, their state, and their place in the focus order, so
+   * that the drawer comes back open, and a Tab shows them again. They ignore the pointer, so that
+   * the first tap only shows them. They fade in 0.2 s, at once with reduced motion.
    *
    * @param shown True to show them.
    */
@@ -258,20 +259,36 @@ export class Ui {
   }
 
   /**
-   * Gives the CSS the height of the bottom bar of the letterbox of Cinematic mode (design 2.3,
-   * 2.5). Where that bar has room for the bar of the controls, the bar of the controls stands in
-   * its middle, so that the controls do not cover the film. It writes the DOM only when the height
-   * changes by half a pixel or more.
+   * Gives the CSS the sizes of the bars of the letterbox of Cinematic mode (design 2.3, 2.5):
+   * `--letterbox`, the height of the top and the bottom bars, and `--letterbox-side`, the width of
+   * each side bar. Where the bottom bar has room for the bar of the controls, the bar of the
+   * controls stands in its middle, so that the controls do not cover the film. The title stands at
+   * the top-left corner of the frame. It writes the DOM only when a size changes by half a pixel or
+   * more.
    *
-   * @param height The height of the bottom bar of the letterbox, in CSS pixels: 0 for none.
+   * @param height The height of the top and the bottom bars, in CSS pixels: 0 for none.
+   * @param width The width of each side bar, in CSS pixels: 0 for none.
    */
-  showLetterbox(height: number): void {
-    const rounded = Math.round(height * 2) / 2;
-    if (rounded === this.#letterbox) {
-      return;
+  showLetterbox(height: number, width: number): void {
+    this.#letterboxHeight = this.#showPixels('--letterbox', this.#letterboxHeight, height);
+    this.#letterboxWidth = this.#showPixels('--letterbox-side', this.#letterboxWidth, width);
+  }
+
+  /**
+   * Writes a size into a CSS variable of the root, rounded to half a pixel, when the rounded size
+   * differs from the shown size.
+   *
+   * @param name The name of the CSS variable.
+   * @param shown The size that the page shows, in CSS pixels.
+   * @param size The new size, in CSS pixels.
+   * @returns The rounded size, which the page now shows.
+   */
+  #showPixels(name: string, shown: number, size: number): number {
+    const rounded = Math.round(size * 2) / 2;
+    if (rounded !== shown) {
+      this.#root.style.setProperty(name, `${rounded}px`);
     }
-    this.#letterbox = rounded;
-    this.#root.style.setProperty('--letterbox', `${rounded}px`);
+    return rounded;
   }
 
   /**

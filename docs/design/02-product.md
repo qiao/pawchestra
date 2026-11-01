@@ -53,13 +53,18 @@ The UI has the style of a video player. The theme is dark only, because the scen
   that bar has room for it and two gaps, so that the controls do not cover the film
   (`--bar-lift` of `ui/ui.css`). The drawer and the messages move up with it. Else the bar covers
   the bottom of the frame.
-- In Cinematic mode during play, all controls and panels hide after the same time: the bar, the
-  logo, the title and the composer, the drawer (also when it is open), each tooltip, and the
-  pointer (`uiShown()` of `app/bar-rules.ts`). A pointer motion, a tap, or Tab shows them all.
-  They stay while the pointer is over one of them, while a control in them has the keyboard
-  focus, and while a dialog or a message is open. A pause shows them, and an open drawer comes
-  back open. They fade in 0.2 s, at once with reduced motion. Free mode hides only the bar,
-  because there the user works with the view and the drawer.
+- In Cinematic mode, the title (the logo, the piece title, the composer, and the link to GitHub)
+  stands at the top-left corner of the frame, at the insets of Free mode, so that it stays with
+  the film. It moves with the bars (`--letterbox` and `--letterbox-side` of `ui/ui.css`). A window in portrait has a low frame and a high top bar, so
+  there the title stays at the top of the window and covers no part of the frame.
+- In Cinematic mode during play, all controls and panels but the title hide after the same time:
+  the bar, the drawer (also when it is open), each tooltip, and the pointer (`uiShown()` of
+  `app/bar-rules.ts`). The title always shows, because it names the piece of the film. A pointer
+  motion, a tap, or Tab shows them all. They stay while the pointer is over the bar, the drawer,
+  or the link of the title, while one of these has the keyboard focus, and while a dialog or a
+  message is open. A pause shows them, and an open drawer comes back open. They fade in 0.2 s, at
+  once with reduced motion. Free mode hides only the bar, because there the user works with the
+  view and the drawer.
 - Each change from Free mode to Cinematic mode closes the drawer, so that the film starts with no
   panel. A pointer motion, a tap, or Tab then shows the bar, and the drawer stays closed. The
   drawer button opens it. A change back to Free mode does not open the drawer again, so that a
@@ -124,7 +129,8 @@ page starts in Free mode (`app/camera-mode.ts`).
   the top and the bottom of a view narrower than 21:9, and at the sides of a wider view. The
   frame is the same in each view, also on a phone in portrait, as a film player shows a film. The
   shots of 5.6 take this aspect in each view, so a piece gives the same film on each screen. The
-  drawer and the bar do not move the frame. Free mode has no bars.
+  drawer and the bar do not move the frame. The title stands at its top-left corner (2.3). Free
+  mode has no bars.
 - A change of the mode moves the bars in or out in `LETTERBOX_MOVE_MS` with a smoothstep, and at
   once with reduced motion. The image of the camera moves with the bars, so the change has no
   jump (`StageCamera.frameTo()`).
@@ -238,7 +244,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   the logo rules of GitHub permit only white, black, or gray. `index.html` holds the title lines
   of the default demo, and the app keeps that header, so the piece title paints with the first
   paint (7.2). A hash that names a demo clears the lines before the first paint, and the app
-  writes the title of its demo. The full-page message of 2.6 removes the header.
+  writes the title of its demo. The full-page message of 2.6 removes the header. In Cinematic
+  mode, the header stands at the top-left corner of the frame and does not hide (2.3).
 - **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
   line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
   free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
@@ -378,5 +385,6 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   key. A Tab into the list shows the ring.
 - In Free mode, the bar stays visible while a control of the bar has the keyboard focus
   (`:focus-visible`), while the pointer is over it, and while the drawer is open. In Cinematic
-  mode, the focus or the pointer on the bar, the title, or the drawer keeps all of them, and an
-  open drawer does not (2.3). The hidden controls stay in the focus order.
+  mode, the focus or the pointer on the bar, the drawer, or the link of the title keeps the bar
+  and the drawer, and an open drawer does not (2.3). The title does not hide. The hidden controls
+  stay in the focus order.
