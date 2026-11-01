@@ -25,6 +25,12 @@
  *
  * `--quick` takes the coarse {@link QUICK_SAMPLE} in place of {@link CAST_SAMPLE}.
  *
+ * `--base <ref>` runs the matrix on the code of a commit and on the working tree, each in a child
+ * process (`probeBeside()` of `tools/ref-tree.ts`), with the matrix, the gate, and the size rule of
+ * the working tree on both ({@link MATRIX_SCRIPTS}). The JSON of the commit goes into the cache by
+ * tree. The table gives the cell of each pair on both trees with the change ({@link compareLines}).
+ * A child writes its {@link MatrixJson} into the file of `--json`.
+ *
  * `--set <changes>` changes the holds of each pair in memory (`setHolds()` of
  * `tools/hold-sets.ts`), before the tool takes the shared hold and the size rule, so that a try
  * needs no edit of the source. Each `--variant <name>=<changes>` adds a column of each role with
@@ -32,7 +38,7 @@
  * the scale of the recast species, such as `wolf.violinScale=0.7`, takes the place of the rule.
  *
  * Usage: pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>]
- * [--quick] [--set <changes>]... [--variant <name>=<changes>]...
+ * [--quick] [--set <changes>]... [--variant <name>=<changes>]... [--base <ref>]
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -51,10 +57,12 @@ import type { PairScale } from './recast-scale.ts';
 import {
   PROBE_NO_CACHE,
   ROOT,
+  probeBeside,
   runChild,
   storeBase,
   treeCacheFile,
   withTempFolder,
+  withoutOptions,
 } from './ref-tree.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { isScaledInstrument } from '../src/models/instruments/types.ts';
@@ -234,11 +242,15 @@ interface MatrixArgs {
   readonly sample: CastSample;
   /** The variants: `base`, then each `--variant`. */
   readonly variants: readonly MatrixVariant[];
+  /** The commit of `--base`, or `null`. */
+  readonly base: string | null;
+  /** The JSON file of a child of `--base` (`--json`), or `null`. */
+  readonly json: string | null;
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>] [--quick] [--set <changes>]... [--variant <name>=<changes>]...';
+  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>] [--quick] [--set <changes>]... [--variant <name>=<changes>]... [--base <ref>]';
 
 /**
  * Reads the command line.
@@ -257,7 +269,16 @@ export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
   for (let i = 0; i < rest.length; i += 2) {
     const name = rest[i] ?? '';
     const value = rest[i + 1];
-    const known = ['--roles', '--species', '--out', '--jobs', '--set', '--variant'];
+    const known = [
+      '--roles',
+      '--species',
+      '--out',
+      '--jobs',
+      '--set',
+      '--variant',
+      '--base',
+      '--json',
+    ];
     if (!known.includes(name) || value === undefined) {
       throw new Error(`The option ${name} is unknown or has no value.\n${USAGE}`);
     }
@@ -314,11 +335,17 @@ export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
     species: species.filter(isSpeciesId),
     out: resolve(
       values.get('--out') ??
-        join(ROOT, 'scratch', quick ? 'cast-matrix-quick.md' : 'cast-matrix.md'),
+        join(
+          ROOT,
+          'scratch',
+          `cast-matrix${quick ? '-quick' : ''}${values.has('--base') ? '-compare' : ''}.md`,
+        ),
     ),
     jobs,
     sample: quick ? QUICK_SAMPLE : CAST_SAMPLE,
     variants,
+    base: values.get('--base') ?? null,
+    json: values.has('--json') ? resolve(values.get('--json') ?? '') : null,
   };
 }
 
@@ -913,34 +940,49 @@ async function childMain(args: readonly string[]): Promise<void> {
 }
 
 /**
- * Runs the tool.
+ * Gives the cache file of the pairs of one variant of a run (`treeCacheFile()`), or `null` with
+ * `PROBE_NO_CACHE=1` or with no index of git. The probe tree of a commit of `--base` is an empty git
+ * repository with no index, so its pairs have no cache, and `probeBeside()` caches the whole JSON
+ * of the commit in place of them.
  *
- * @returns The exit code.
+ * @param sample The sample of the run.
+ * @param changes The hold changes of the variant, or `''` for none.
+ * @returns The key file of the tree, or `null`.
  */
-async function main(): Promise<number> {
-  const args = process.argv.slice(2);
-  if (args[0] === '--pair') {
-    await childMain(args);
-    return 0;
+function variantCache(sample: CastSample, changes: string): string | null {
+  if (process.env[PROBE_NO_CACHE] === '1') {
+    return null;
   }
+  try {
+    // A variant with no change keeps the key of a run with no --set.
+    return treeCacheFile('cast-matrix.ts', [
+      `format ${CAST_FORMAT}`,
+      JSON.stringify(sample),
+      ...(changes === '' ? [] : [`set ${changes}`]),
+    ]);
+  } catch {
+    return null;
+  }
+}
 
-  const options = parseMatrixArgs(args);
+/**
+ * Measures each pair of a run in its child process, or reads it from the cache, and gives the
+ * JSON of the run with the cell of each pair.
+ *
+ * @param options The command line.
+ * @param progress True to print a line at the end of each pair.
+ * @returns The JSON of the run.
+ */
+async function runMatrix(options: MatrixArgs, progress: boolean): Promise<MatrixJson> {
   const started = performance.now();
   const demos: Record<string, string> = {};
   for (const role of options.roles) {
     demos[role] = await roleDemo(role);
   }
-  // A variant with no change keeps the key of a run with no --set.
   const trees = new Map(
     options.variants.map((variant) => [
       variant.name,
-      process.env[PROBE_NO_CACHE] === '1'
-        ? null
-        : treeCacheFile('cast-matrix.ts', [
-            `format ${CAST_FORMAT}`,
-            JSON.stringify(options.sample),
-            ...(variant.changes === '' ? [] : [`set ${variant.changes}`]),
-          ]),
+      variantCache(options.sample, variant.changes),
     ]),
   );
   const wanted = options.variants.flatMap((variant) =>
@@ -961,12 +1003,14 @@ async function main(): Promise<number> {
     done += 1;
     const state = pair.error === null ? '' : ` error: ${pair.error.split('\n')[0] ?? ''}`;
     const label = options.variants.length > 1 ? ` [${variant.name}]` : '';
-    console.log(
-      `${done}/${wanted.length} ${pairName(species, role)}${label} ${pair.seconds.toFixed(0)} s${state}`,
-    );
+    if (progress) {
+      console.log(
+        `${done}/${wanted.length} ${pairName(species, role)}${label} ${pair.seconds.toFixed(0)} s${state}`,
+      );
+    }
     return { variant: variant.name, pair };
   });
-  const json: MatrixJson = {
+  return {
     version: CAST_FORMAT,
     roles: options.roles,
     species: options.species,
@@ -981,6 +1025,107 @@ async function main(): Promise<number> {
       return { variant, pair, cell: matrixCell(pair, home?.pair ?? null) };
     }),
   };
+}
+
+/**
+ * Writes the table of a run of `--base`: one row for each pair of each variant, with the cell of
+ * the commit, the cell of the working tree, and the change: `same`, the change of the verdict, or
+ * `value` for a cell with the same verdict and another text.
+ *
+ * @param base The JSON of the run of the commit.
+ * @param tree The JSON of the run of the working tree.
+ * @param ref The commit, as the command line gives it.
+ * @returns The lines.
+ */
+export function compareLines(base: MatrixJson, tree: MatrixJson, ref: string): string[] {
+  const named = tree.variants.length > 1;
+  const rows = tree.pairs
+    .filter((p) => tree.species.includes(p.pair.species))
+    .map(({ variant, pair, cell }) => {
+      const before = base.pairs.find(
+        (p) =>
+          p.variant === variant && p.pair.species === pair.species && p.pair.role === pair.role,
+      );
+      const was = before ? cellText(before.pair, before.cell) : '-';
+      const now = cellText(pair, cell);
+      const change = !before
+        ? 'new'
+        : before.cell.verdict !== cell.verdict
+          ? `${before.cell.verdict} -> ${cell.verdict}`
+          : was === now
+            ? 'same'
+            : 'value';
+      const label = named ? ` [${variant}]` : '';
+      return {
+        change,
+        line: `| ${pair.species} | ${pair.role}${label} | ${was} | ${now} | ${change} |`,
+      };
+    });
+  const count = (json: MatrixJson, verdict: MatrixCell['verdict']): number =>
+    json.pairs.filter((p) => json.species.includes(p.pair.species) && p.cell.verdict === verdict)
+      .length;
+  const counts = (json: MatrixJson): string =>
+    `PASS ${count(json, 'PASS')}, OPEN ${count(json, 'OPEN')}, FAIL ${count(json, 'FAIL')}`;
+  const changed = rows.filter((row) => row.change !== 'same').length;
+  return [
+    `Cast matrix of ${tree.species.length} species and ${tree.roles.length} roles against ${ref}: ${changed} of ${rows.length} cells change. Base: ${counts(base)}. Tree: ${counts(tree)}. A cell gives the verdict, the worst value of the gate, the deepest clip, and the scale.`,
+    '',
+    `| Species | Role | ${ref} | Tree | Change |`,
+    '|---|---|---|---|---|',
+    ...rows.map((row) => row.line),
+  ];
+}
+
+/**
+ * Reads the JSON text of a run.
+ *
+ * @param text The text.
+ * @returns The JSON.
+ */
+function readMatrix(text: string): MatrixJson {
+  // SAFETY: the text comes from main() of this tool with --json, and probeFormat() checked it.
+  return JSON.parse(text) as MatrixJson;
+}
+
+/**
+ * The scripts of the working tree that the probe tree of `--base` takes in place of its own, so
+ * that both trees run the same matrix, gate, and size rule.
+ */
+const MATRIX_SCRIPTS: readonly string[] = ['cast-matrix.ts', 'arm-check.ts', 'recast-scale.ts'];
+
+/**
+ * Runs the tool.
+ *
+ * @returns The exit code.
+ */
+async function main(): Promise<number> {
+  const args = process.argv.slice(2);
+  if (args[0] === '--pair') {
+    await childMain(args);
+    return 0;
+  }
+
+  const options = parseMatrixArgs(args);
+  if (options.json !== null) {
+    writeFileSync(options.json, `${JSON.stringify(await runMatrix(options, false))}\n`);
+    return 0;
+  }
+  if (options.base !== null) {
+    console.log(`The matrix runs on ${options.base} and on the working tree, each in a child.`);
+    const child = withoutOptions(args, ['--base', '--out', '--json']);
+    const texts = await probeBeside(
+      options.base,
+      'cast-matrix.ts',
+      { base: child, tree: child },
+      { prefix: 'cast-matrix-', cache: true, scripts: MATRIX_SCRIPTS },
+    );
+    const lines = compareLines(readMatrix(texts.base), readMatrix(texts.tree), options.base);
+    mkdirSync(dirname(options.out), { recursive: true });
+    writeFileSync(options.out, `${lines.join('\n')}\n`);
+    console.log(['', ...lines, '', `Table: ${options.out}`].join('\n'));
+    return 0;
+  }
+  const json = await runMatrix(options, true);
   const lines = matrixLines(json);
   mkdirSync(dirname(options.out), { recursive: true });
   writeFileSync(options.out, `${lines.join('\n')}\n`);
