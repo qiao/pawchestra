@@ -256,8 +256,11 @@ The rest of each family:
   its back stands at the height of the chest, and the middle line of its back stands a gap in
   front of the trunk and the thighs, the room of the arms. The arms take the values of the
   accepted dog cellist, as directions and in `H`. The right elbow points out and down, near the
-  body, so the bow paw stays near the direction of no paw twist. Reason: a hold with fixed values
-  fits one body only. With the old shared hold, the elbow pointed out and up, and the bow paw of
+  body, so the bow paw stays near the direction of no paw twist. At rest, the right upper arm
+  hangs as in the bind pose, and the grip lies at the end of the forearm (`forearmGrip()`), so
+  the rest elbow stays near the play elbow on each body. In the high positions, the left paw tilts
+  further over the neck (`highTilt`), so the wrist comes up beside the upper bout. Reason: a hold
+  with fixed values fits one body only. With the old shared hold, the elbow pointed out and up, and the bow paw of
   12 recast bodies flipped through 180° (cast matrix, 4.4). The dog keeps its own place
   (`DOG_HOLD`). The other instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
