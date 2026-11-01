@@ -32,7 +32,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), a bind elbow bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a bind upper arm near the hanging arm (`bindArms`), antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
-| mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with quad rings at each joint and the rule weights. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
+| mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with the rebuilt arms of `arm_rebuild.py`. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 The penguin has no sheet, so `pnpm choir-check <dir>` compares it with the choir of the two newest
 reference images.
@@ -44,7 +44,7 @@ studio, then pack it into a module that the app reads.
 
 ```text
  assets/models/<s>/<s>.glb (source mesh, unchanged)
-   | tools/blender/<a>_arms.py (only a body with rebuilt arms or legs)
+   | tools/blender/arm_rebuild.py, or <a>_arms.py (rebuilt arms or legs)
    v
  <s>-arms.glb + <s>-weights.json (a copy with quad tubes and Blender weights)
    | pnpm rig-mesh <a>   (tools/mesh-rigs/<a>.json, Blender)
@@ -56,8 +56,7 @@ studio, then pack it into a module that the app reads.
 ```
 
 The app keeps its own motion: `poseStudioBones()` of `src/models/studio-rig.ts` drives the studio
-bones from the pose of the player on each frame. `lowpoly-studio/` can also build a rigged GLB file
-from a reference sheet. It is a separate project outside the rules of `AGENTS.md`.
+bones from the pose of the player on each frame.
 
 Test a change of the chain on the test mannequin first (`assets/models/mannequin/`, design 4.4):
 `pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
@@ -75,10 +74,10 @@ Its mesh has clean quad rings and twist markers, so a fault there comes from the
 3. **Options.** Run `pnpm mesh-options <a> <dir> --size <label>=<head top>... --arms <f>,...
    --legs <f>,... --instrument <id>`. Fix each warning of the rigs, then ask the user about the
    size, the arms, and the legs with `options.md` and `options.png`.
-4. **Rig.** Look at the seated bind, the standing body, the knees, and the bones with
-   `pnpm rig-mesh <a> --check --preview <dir>`. Try each variant with `--check --set`. The
-   triangles and the gzip size stay in their budgets, and the standing body stays within 1 mm of
-   the source.
+4. **Rig.** Rebuild the arms with `arm_rebuild.py` first. Look at the seated bind, the
+   standing body, the knees, and the bones with `pnpm rig-mesh <a> --check --preview <dir>`. Try
+   each variant with `--check --set`. The triangles and the gzip size stay in their budgets, and
+   the standing body stays within 1 mm of the source.
 5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale (the shoulder joints, or
    the keys of a pianist), a crease angle that matches the facet contrast of its reference crops,
    and the seat settings. Run `pnpm studio-body <a>`, add the module to `STUDIO_BODIES`, and give
@@ -124,6 +123,11 @@ when the seated legs show a wedge. Three causes add up, so fix all three:
 - **Hold.** The hold sets the total twist. A real forearm turns about 90°. When a hold asks for
   160° or more, change the hold or the instrument first.
 
+Run `tools/blender/arm_rebuild.py` first. It does the steps below from the joints of the config
+and rays through the mesh, with the functions of the species scripts. Write a species script
+`tools/blender/<a>_arms.py` only for a fault that it does not fix, such as an arm joined to the
+trunk down to the elbow (`cat_arms.py`).
+
 ### Rules
 
 - Work in the live Blender through Blender MCP with the plain Blender tools. Look at an image after
@@ -138,8 +142,8 @@ when the seated legs show a wedge. Three causes add up, so fix all three:
 
 1. Import the source, and run Merge by Distance, because automatic weights fail on split seams.
 2. Bisect each arm at the shoulder line and at the wrist, and delete the faces between the cuts.
-3. Build a quad tube of 15 rings of 16 vertices: 5 on the upper arm, 3 at the elbow, 8 on the
-   forearm, and 2 at the wrist. Each ring stands at a right angle to its bone.
+3. Build a quad tube of rings of 16 vertices, about 0.45 arm radii apart, with a ring on each side
+   of the elbow and the wrist. Each ring stands at a right angle to its bone.
 4. Shrinkwrap the tube onto a hidden copy of the old arm, and join it to the trunk and the paw with
    Bridge Edge Loops.
 5. Bake the fur color of the old arm onto a UV strip of the atlas, and transfer the custom normals
@@ -149,8 +153,7 @@ when the seated legs show a wedge. Three causes add up, so fix all three:
 7. Fix the weights with Weight Paint: remove the arm bones from the trunk below the armpits, and
    smooth the shoulder line. Look at the arm down, forward, an elbow at 100°, and a forearm turn
    of 90°.
-8. Write the weights file and the replay script `tools/blender/<a>_arms.py`. A headless run gives
-   the same bytes.
+8. Write the weights file. A headless run gives the same bytes.
 
 For the legs (`polar_bear_legs.py`), cut below the crotch and above the foot, build the tube before
 the leg factor, keep the rule weights with a knee ramp (`paintedLower`, `weights.knee`), and give
@@ -348,8 +351,6 @@ Read the group of your work before you plan it.
 
 ### Probes
 
-- Give a kept GLB file of `pnpm rig-mesh --check --keep` to `--glb` of the probes. Never copy it
-  over the rig in `assets/`.
 - `armGaps()` of `pose/test-arm-clearance.ts` gives false depths for an arm in front of the
   chest. Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
