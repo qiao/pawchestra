@@ -1133,13 +1133,13 @@ function keptRefusal(
   if (moveForeground(planner, subject, halfHeight, from, to, composition, 'heads')) {
     return 'head';
   }
-  if (moveNear(planner, subject, halfHeight, from, to, composition)) {
-    return 'near';
-  }
   const { held, sights } = subjectLines(planner, subject);
   const move = moveRefusal(planner, subject.target, halfHeight, from, to, held, sights);
   if (move) {
     return move;
+  }
+  if (moveNear(planner, subject, halfHeight, from, to, composition)) {
+    return 'near';
   }
   return moveForeground(planner, subject, halfHeight, from, to, composition, 'objects')
     ? 'object'
