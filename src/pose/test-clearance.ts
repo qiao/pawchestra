@@ -429,6 +429,12 @@ export interface ClosedSurface {
   readonly clusters: readonly SurfaceCluster[];
   /** The box around the triangles. */
   readonly box: Box3;
+  /**
+   * The main bone of each triangle of the part, before the caps, as an index of `BONE_NAMES`, for
+   * the region of a point on the surface ({@link surfaceNearest}). A surface of
+   * {@link closeSurface} has none.
+   */
+  readonly bones?: Int32Array;
 }
 
 /** The caps and the clusters of a surface, found from its corners in the bind pose. */
@@ -743,11 +749,20 @@ export function closedPart(
     plans.set(key, plan);
   }
   checkLoops(plan, loops, `The bones ${key}`);
-  return surfaceOf(plan, (corner) => {
+  let mains = MAIN_BONES.get(plan);
+  if (!mains) {
+    mains = Int32Array.from(firsts, (v) => mesh.bones[v] ?? -1);
+    MAIN_BONES.set(plan, mains);
+  }
+  const surface = surfaceOf(plan, (corner) => {
     const v = (firsts[Math.floor(corner / 3)] ?? 0) + (corner % 3);
     return new Vector3(...posedCorner(posed, v));
   });
+  return { ...surface, bones: mains };
 }
+
+/** The main bone of each triangle of each plan of {@link closedPart}, before the caps. */
+const MAIN_BONES = new WeakMap<SurfacePlan, Int32Array>();
 
 /**
  * Gives the first corner of each triangle whose main bone is one of some bones.
@@ -843,6 +858,42 @@ function surfaceDistance(surface: ClosedSurface, p: Vector3): number {
     }
   }
   return best;
+}
+
+/** The nearest point of a closed surface to a point ({@link surfaceNearest}). */
+export interface SurfacePoint {
+  /** The index of the triangle in the surface: a cap when it is past the triangles of the part. */
+  readonly triangle: number;
+  /** The nearest point on the triangle. */
+  readonly point: Vector3;
+}
+
+/**
+ * Finds the nearest point of a closed surface to a point, as {@link closedDepth} measures the
+ * depth, with its triangle, such as for the region of the body at the deepest point of a part.
+ * Only tests use it.
+ *
+ * @param surface The surface.
+ * @param p The point.
+ * @returns The nearest point and its triangle, or the triangle -1 for a surface with no triangle.
+ */
+export function surfaceNearest(surface: ClosedSurface, p: Vector3): SurfacePoint {
+  let best = Infinity;
+  let found: SurfacePoint = { triangle: -1, point: p.clone() };
+  const near = new Vector3();
+  for (const cluster of surface.clusters) {
+    if (cluster.middle.distanceTo(p) - cluster.radius >= best) {
+      continue;
+    }
+    for (const m of cluster.members) {
+      const distance = surface.triangles[m]?.closestPointToPoint(p, near).distanceTo(p);
+      if (distance !== undefined && distance < best) {
+        best = distance;
+        found = { triangle: m, point: near.clone() };
+      }
+    }
+  }
+  return found;
 }
 
 /** The deepest point of a set of points in a closed surface. */
