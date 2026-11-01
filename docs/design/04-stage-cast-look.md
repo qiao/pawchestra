@@ -272,6 +272,15 @@ axis of each arm (`StudioBody.hinges`). The axis is the axis of the bent bind of
 `studio.bindArms`, so that the upper arms and the paws keep their world turns in each pose. The
 inner elbow then bends further from its bind, so a `raise` shape of a bent elbow relaxes its faces.
 
+**Role-neutral bind.** The target of each body is a bind that fits no single role: straight bind
+arms, and one bind supination of each paw near the middle of the play twists of all roles of the
+body. A bind bent for one hold gives a rest shape that fits only that hold, and each other hold
+blends its own bend on top. A bind supination for one role can put the paw twist of another role
+near 180°, where the skin folds and the twist measure flips. So a body with the role-neutral bind
+takes a new role with no new rig, which is the way to one skeleton for each species and each
+instrument (Cast matrix). The wolf has this bind. A body with `raise` shapes also fits each shape
+against all its roles, because a shape fits only the poses near its hold.
+
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
 a hold, or a body runs it. The paw twist, the paw swing, and the flat share measure the skin, so
