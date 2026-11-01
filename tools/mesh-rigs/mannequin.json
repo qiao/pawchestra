@@ -1,0 +1,102 @@
+{
+  "source": "assets/models/mannequin/mannequin-animal.glb",
+  "sourceNote": "The A-pose mesh of the animal preset of the test mannequin (tools/blender/mannequin.py, assets/models/mannequin/README.md). It is a test body of the rig chain: no section of the app casts the species mannequin. The mesh has quad rings of 16 vertices at each joint, so the config has no rebuilt arms and no painted weights.",
+  "output": "assets/models/mannequin/mannequin.rig.glb",
+  "name": "Mannequin",
+  "weld": 1e-5,
+  "app": {
+    "shoulders": 1.025662,
+    "reach": 0.4597,
+    "note": "1.5955 m for each unit, so that the body keeps the 1.6 m of the preset (the standing skull top of the wolf in the app). The standing shoulder joints are at 0.642835 u (1.025662 m). The reach from the shoulder joint to the middle of the palm is 0.4597 m (pnpm rig-mesh mannequin --check)."
+  },
+  "armFactor": 1,
+  "armFactorNote": "The factor 1 keeps the arms of the preset, whose lengths are the mean of the wolf and the rabbit.",
+  "legFactor": 1,
+  "legFactorNote": "The factor 1 keeps the legs of the preset. The chair fits the legs.",
+  "joints": {
+    "root": {"head": [0, 0, 0], "tail": [0, 0, 0.1], "roll": [0, 1, 0]},
+    "hips": {"head": [0, 0.313916, 0], "tail": "spine"},
+    "spine": {"head": [0, 0.39414, 0.003008], "tail": "spine1"},
+    "spine1": {"head": [0, 0.464336, 0.006017], "tail": "chest"},
+    "chest": {"head": [0, 0.534533, 0.010028], "tail": "neck"},
+    "neck": {"head": [0, 0.684953, 0.015042], "tail": "head"},
+    "head": {"head": [0, 0.735093, 0.020056], "tail": [0, 0.995, 0.020056]},
+    "ear_L": {"head": [0.05014, 0.95571, 0.020056], "tail": [0.070196, 0.995822, 0.020056]},
+    "clavicle_L": {"head": [0.030084, 0.634813, 0], "tail": "upper_arm_L"},
+    "upper_arm_L": {"head": [0.109305, 0.642835, 0], "tail": "forearm_L", "roll": "palm"},
+    "forearm_L": {"head": [0.205741, 0.546399, 0], "tail": "forearm_twist_L", "roll": "palm"},
+    "forearm_twist_L": {"head": [0.25325, 0.49889, 0], "tail": "hand_L", "roll": "palm"},
+    "hand_L": {"head": [0.300759, 0.451381, 0], "tail": "fingers_L", "roll": "palm"},
+    "fingers_L": {"head": [0.325329, 0.426811, 0], "tail": [0.355359, 0.396782, 0], "roll": "palm"},
+    "thigh_L": {"head": [0.085238, 0.30088, 0], "tail": "shin_L"},
+    "shin_L": {"head": [0.085238, 0.174527, 0], "tail": "foot_L"},
+    "foot_L": {"head": [0.085238, 0.056697, -0.005014], "tail": "toes_L", "roll": [0, 1, 0]},
+    "toes_L": {"head": [0.085238, 0.028117, 0.060168], "tail": [0.085238, 0.028117, 0.095266], "roll": [0, 1, 0]},
+    "tail": {"head": [0, 0.303888, -0.080224], "tail": [0, 0.303888, -0.120336], "roll": [0, 1, 0]}
+  },
+  "palm": [-0.7071, -0.7071, 0],
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the top of the head, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. Each joint is a joint of the preset (landmarks() and mixamo_joints() of tools/blender/mannequin.py), with the arms turned 45 degrees down about the shoulder joint, as the A-pose of the mesh. The mesh has no ears and no tail, so the ear bones lie inside the head top and the tail bone behind the hips holds no vertex. The palm is the palm of the A-pose: in and down.",
+  "studio": {
+    "legTurns": {
+      "thigh": [0.532071, 0.0, -0.074778, 0.843391],
+      "shin": [0.021262, 0.0, 0.0, 0.999774],
+      "foot": [0, 0, 0, 1],
+      "toes": [0, 0, 0, 1]
+    },
+    "trunk": {
+      "open": 1,
+      "shares": {"hips": 1, "spine": 1, "spine1": 0.75, "chest": 0.5, "neck": 0.25, "head": 0}
+    },
+    "trunkNote": "The values of the wolf.",
+    "bindArms": {
+      "upper_arm": [0.813873, -0.143043, 0.563161],
+      "forearm": [0.316246, 0.757051, 0.571719],
+      "hand": [-0.078782, 0.677317, 0.731461]
+    },
+    "bindSupination": {"L": 83, "R": 28},
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py). The body has two test roles, so each paw takes the middle of the turns of the violin bind of the rabbit (L 100, R 0) and the clarinet bind of the wolf (L 66, R 57).",
+    "note": "The bind arms of the rabbit and the panda (the studio bind arms of tools/rig/studio-targets.ts). legTurns comes from tools/rig/leg_turns.py <config> 25 8 0, as on the rabbit."
+  },
+  "weights": {
+    "armSplit": 0.115,
+    "headFrom": 0.74,
+    "earBase": [1.1, 1.2],
+    "tailBall": {"center": [0, 0.3, -0.4], "radius": 0.001, "behind": -0.39},
+    "sliver": {"angle": 10, "longest": 0.03, "note": "The values of the rabbit."},
+    "line": {"angle": 170, "note": "The values of the rabbit."},
+    "shoulderHead": [0.06, 0.1],
+    "fingers": 0.5,
+    "haunch": {
+      "height": [0.25, 0.32],
+      "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, from below the hip joints to the hips joint."
+    },
+    "note": "Beyond the plane |x| = armSplit (5 mm out of the shoulder joint), only the free arm follows the arm bones. Above headFrom (the chin), each vertex follows the head only. earBase and the tail ball lie outside the body, so no vertex follows the ears or the tail."
+  },
+  "refine": {
+    "rings": [],
+    "flip": {"angle": 150, "normals": 60, "move": 0.0016, "rounds": 4, "note": "The values of the rabbit."},
+    "ringsNote": "No ring: the mesh has quad rings at each joint."
+  },
+  "check": {
+    "thin": {"angle": 10, "length": 0.08, "near": 0.1},
+    "note": "The values of the rabbit."
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.025,
+    "eyeShare": 0.34,
+    "eyeBox": [[0.03, 0.84, 0.1], [0.1, 0.925, 0.17]],
+    "note": "Each face takes the color of its palette cell. The dark limit 0.025 keeps the dark backs of the bands out of the dark faces, and the black eyes (0.02 sRGB) in them. The eye box holds the left eye of the preset (2 by 2 faces). The orange nose keeps the fur, as the mesh has no gloss nose."
+  },
+  "eyeShell": {"lift": 0.002, "points": 12, "reach": 1, "darkReach": 2, "note": "The values of the rabbit."},
+  "chair": {
+    "halfWidth": 0.2,
+    "front": 0.0,
+    "back": -0.14,
+    "backHeight": 0.15,
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat. The front edge lies under the hip joints."
+  },
+  "crease": {"rings": 2, "rounds": 8, "share": 0.5, "back": 0.1, "below": 0.03, "note": "The values of the rabbit."},
+  "sit": {"gap": 0.004, "band": 0.2, "ramp": 0.03, "step": 0.005, "smooth": 6, "end": 0.02, "most": 0.045, "note": "The values of the rabbit."}
+}
