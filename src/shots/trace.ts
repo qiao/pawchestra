@@ -55,7 +55,7 @@ export interface CameraTrace {
   readonly kept: boolean;
   /**
    * For a refusal by the distance: the largest share of the default distance over the samples of
-   * the move and the aspects of the beam test. Else `null`.
+   * the move. Else `null`.
    */
   readonly share: number | null;
 }

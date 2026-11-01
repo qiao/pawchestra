@@ -1210,10 +1210,11 @@ function offsetSign(planner: Planner, subject: Subject, seeded: number): number 
  * the same azimuths 8° to 40° higher, up to the top of the band. At each elevation, a full search
  * then tries each place of the grid with the arc of the move, and then with the arc to the other
  * side when the move of the previous shot does not fix its direction. The camera stays within 75°
- * of the front of the subject. A camera over the line of the stage or across the look of the subject does not count
- * (the 180° rule). A camera that makes a jump cut does not count, and a camera with a head or
- * another large object in the foreground does not count. In a traced try, each tested camera goes
- * into the trace with its refusal.
+ * of the front of the subject. A camera over the line of the stage or across the look of the
+ * subject does not count (the 180° rule). These cameras do not count either: a camera that makes a
+ * jump cut, a camera with a head or another large object in the foreground, and a camera nearer
+ * than `ANIMAL_FLOOR` to an animal in its frame. In a traced try, each tested camera goes into the
+ * trace with its refusal.
  *
  * @param planner The planner.
  * @param subject The subject.

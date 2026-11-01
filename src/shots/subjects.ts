@@ -758,8 +758,8 @@ interface PlayerSphere {
  * their middle, and the radius that holds each player plus 0.75 m and each head.
  *
  * @param players The players. There is at least one.
- * @param margin The margin around each player in the stage plane: 0.75 m, or 0.5 m for a
- *   two-shot.
+ * @param margin The margin around each player in the stage plane: `SUBJECT_SIZES.sectionMargin`,
+ *   or `SUBJECT_SIZES.twoShotMargin` for a two-shot.
  * @returns The sphere.
  */
 function sphereOf(players: readonly SubjectPlayer[], margin: number): PlayerSphere {
@@ -895,8 +895,8 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
  *
  * @param subjects The subjects.
  * @param seats The active seats of the group, with the most activity first.
- * @param margin The margin around each player in the stage plane: 0.75 m, or 0.5 m for the
- *   two-shot of a small group.
+ * @param margin The margin around each player in the stage plane: `SUBJECT_SIZES.sectionMargin`,
+ *   or `SUBJECT_SIZES.twoShotMargin` for the two-shot of a small group.
  * @param part The players of a part of the first seat by their number in the seat, or `null`
  *   for all players.
  * @returns The subject, or `null` with no players.
