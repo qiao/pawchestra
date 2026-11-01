@@ -60,6 +60,10 @@ The UI has the style of a video player. The theme is dark only, because the scen
   focus, and while a dialog or a message is open. A pause shows them, and an open drawer comes
   back open. They fade in 0.2 s, at once with reduced motion. Free mode hides only the bar,
   because there the user works with the view and the drawer.
+- Each change from Free mode to Cinematic mode closes the drawer, so that the film starts with no
+  panel. A pointer motion, a tap, or Tab then shows the bar, and the drawer stays closed. The
+  drawer button opens it. A change back to Free mode does not open the drawer again, so that a
+  drag does not make a panel jump into view.
 - The drawer has the tabs "Music" (the demos and the file button), "Seats", and "Settings" (with
   the link "Credits"). The UI says "Music", because each user knows the word, and it covers a demo
   and a MIDI file of the user. "Track" names a track of a MIDI file, and "song" does not fit the
@@ -114,7 +118,7 @@ page starts in Free mode (`app/camera-mode.ts`).
   cannot go below the stage, and a zoom stops outside the box of the stage and the players.
 - **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6. The first shot starts from
   the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
-  at once.
+  at once. The change to Cinematic mode closes the drawer (2.3).
 - **Letterbox.** Cinematic mode shows the scene in the largest box of the aspect 21:9
   (`CINEMA_ASPECT`) at the middle of the viewport, as a film. Pure black bars fill the rest: at
   the top and the bottom of a view narrower than 21:9, and at the sides of a wider view. The
@@ -258,7 +262,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   move between the tabs, as the tabs pattern of WAI-ARIA says. While the drawer is open in Free
   mode, the camera moves its frame with `setViewOffset()` (`stageCover()`), and the canvas fills
   the window, so the opaque canvas shows no edge. A wide window opens the drawer at start
-  (`isWideLayout()`), so that the stage does not move at the click on play.
+  (`isWideLayout()`), so that the stage does not move at the click on play. The change to
+  Cinematic mode closes it (2.3).
   - **Demos**: a row with the title, the composer, and the length, and no cover. A long title
     wraps, because an ellipsis would hide a part of it. The current row has a level meter from the
     notes of the score (`meterLevels()`), so the UI owns no audio code. The meter has a column of
@@ -367,7 +372,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   piece.
 - The focus order is the title, the bar, then the drawer.
 - When a focused play button of the first screen or a focused message goes away, the play button
-  of the bar gets the focus.
+  of the bar gets the focus. When the drawer closes with the focus in it (Escape, a selection in
+  the sheet of a phone, or the change to Cinematic mode), the drawer button gets the focus.
 - A row of the music list that a click focused shows no focus ring, also after Space or an arrow
   key. A Tab into the list shows the ring.
 - In Free mode, the bar stays visible while a control of the bar has the keyboard focus

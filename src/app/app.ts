@@ -545,12 +545,18 @@ export class App {
   }
 
   /**
-   * Changes the camera mode after an event (design 2.5).
+   * Changes the camera mode after an event (design 2.5). Each change to Cinematic mode closes the
+   * drawer, so that the film starts with no panel (design 2.3). A change back to Free mode does
+   * not open it again, so that a drag does not make a panel jump into view.
    *
    * @param event The event.
    */
   #changeCamera(event: CameraEvent): void {
-    this.#cameraMode = nextMode(this.#cameraMode, event);
+    const mode = nextMode(this.#cameraMode, event);
+    if (mode === 'cinematic' && this.#cameraMode === 'free') {
+      this.#ui.closeDrawer();
+    }
+    this.#cameraMode = mode;
   }
 
   /** Cinematic or Free (design 2.5). */
