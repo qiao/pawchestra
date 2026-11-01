@@ -392,6 +392,10 @@ The app follows these facts:
   the keys (`aimSide`, `gripCurl`). At rest, the flute stands on the right thigh in the right paw
   (`rest`, `restShift`, `gripAround`). A standing fox lets the free left arm hang down along the
   side with a small bend of the elbow (`FOX_HANG`).
+- **The shared flute and clarinet (2.4, 3, `WIND_HOLDS`).** Each recast body plays the arm values
+  of the tan fox or the wolf, with the lip plate or the mouthpiece at its mouth. At rest, the
+  right paw holds the instrument nearly upright at the right side, as a flutist rests the flute
+  vertically on the right leg (2.4), and the left paw hangs (`restArms`, `restFreeL`).
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
@@ -437,6 +441,9 @@ The app does not follow these facts:
 - **The clarinet angle (3).** The clarinet hangs nearer to the vertical than 45° (`hanging()`,
   `play`), as the wolf of `orchestra-latest.png` and `orchestra-side.png` holds it. The long muzzle
   puts the mouthpiece far in front of the chest, so at 45° the bell is far in front of the knees.
+- **The shared clarinet rest (3).** The clarinet stands at the right side in the right paw, with
+  the bell on nothing, and the left paw leaves its grip. A seated player keeps the right thumb on
+  the thumb rest with the bell on the chair or the knee.
 - **The clarinet rest (3).** The bell rests on nothing. The round belly reaches the seat front, so
   an upright clarinet has no room on the seat, and on the right knee the left forearm goes into
   the belly.
