@@ -293,7 +293,9 @@ passes.
       (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
       Decide if the margin holds against a base with no segments.
 - [ ] Test mannequin: the baked bands of the rebuilt arms have saw-tooth edges in the face colors,
-      because the tube faces do not follow the band edges of the source.
+      because the tube faces do not follow the band edges of the source. Each face keeps one
+      color, so a face that crosses an edge takes one side. Put a tube ring at each color edge
+      along the old arm in `arm_rebuild.py`. A real arm with dark paws gets the same fault.
 - [ ] Arm rebuild: on the wolf clarinetist, `arm_rebuild.py` gives fewer folds than `wind_arms.py`,
       but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
       ring, then replace the species scripts one at a time after a review of the crops.
