@@ -23,6 +23,9 @@ This module of `AGENTS.md` gives the rules of the TypeScript code and its style.
   refuse a double cast (`as unknown as T`), also in a test. At one boundary conversion, a single
   cast with a `SAFETY:` comment is permitted.
 - **Pure ESM.** Use `import type` for an import of types only.
+- **Import cycles.** A dynamic import from a main module with a top-level `await` can make an
+  import cycle that stops the tool, as `pnpm pose-depth` stopped through `tools/hold-reach.ts`.
+  Run such a tool in a child process.
 - **Naming.** Follow the [Google TypeScript Style Guide](https://ts.dev/style/). Use no
   underscore prefixes.
 - **Initialisms.** Write a standalone initialism in upper case (`MIDI`, `GM`, `SF3`). Use
