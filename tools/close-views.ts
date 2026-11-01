@@ -3438,7 +3438,8 @@ function playParts(args: PlayArgs): PlayArgs[] {
  * With no `--camera`, the camera is `default`. `--camera-file` gives labelled cameras in place of
  * `--camera` ({@link cameraFile}). `--midi` renders a MIDI file of the user in place
  * of a demo ({@link openMidi}). `--strip` renders frames at exact song times from one page each
- * ({@link stripTimes}, {@link stripViews}). `--size` sets the size of the frames
+ * ({@link stripTimes}, {@link stripViews}). A frame of `--time` or `--shot` also shows the exact
+ * song time, except with `--pause` or `--url` ({@link freezesTime}). `--size` sets the size of the frames
  * ({@link playSize}). `--cinematic` renders the camera of the shot plan
  * of the app ({@link CINEMATIC_CAMERA}). `--shot` also gives the time: the frame of the first solo
  * or section shot of its subject ({@link chooseShot}). `--at` aims the stage camera at one player
@@ -3850,6 +3851,34 @@ function chosenShotText(demo: string, chosen: ChosenShot): string {
   return `The shot of ${demo}: ${shot.kind} of ${noun} ${seats}, ${Math.max(0, shot.startSec).toFixed(2)} s to ${end}. The frame is at ${chosen.frameSec} s.`;
 }
 
+/**
+ * Writes the shot of the working tree at a song time of a Cinematic frame, as the app plans it,
+ * for the output of the tool: its kind, its seats, its times, and the blend into it when the time
+ * falls in the blend.
+ *
+ * @param args The command line.
+ * @param time The song time, in seconds.
+ * @returns The text, such as `The shot of beethoven-9 at 39.75 s: solo of the seat 4 (hippo),
+ *   36.00 s to 44.00 s.`
+ */
+async function shotAtText(args: PlayArgs, time: number): Promise<string> {
+  const { score, layout, models } = await demoLayout(args.demo, args.midi);
+  const { shots } = prepareShots(score, layout, SHOT_SEED, models);
+  const shot = shots.findLast((s) => s.startSec <= time) ?? shots[0];
+  if (!shot) {
+    return `The ${pieceText(args.demo, args.midi)} has no shot.`;
+  }
+  const seats = shot.seats.map((seat) => `${seat} (${speciesOfSeat(layout.players, seat)})`);
+  const subject =
+    seats.length === 0 ? '' : ` of the seat${seats.length > 1 ? 's' : ''} ${seats.join(', ')}`;
+  const end = Number.isFinite(shot.endSec) ? `${shot.endSec.toFixed(2)} s` : 'the end';
+  const blend =
+    time < shot.startSec + shot.blendSec
+      ? `, in the blend of ${shot.blendSec.toFixed(2)} s from the previous shot`
+      : '';
+  return `The shot of ${pieceName(args)} at ${time.toFixed(2)} s: ${shot.kind}${subject}, ${Math.max(0, shot.startSec).toFixed(2)} s to ${end}${blend}.`;
+}
+
 /** The player of `--at` on the stage of a demo. */
 interface AimTarget {
   /** The place of the player. */
@@ -3903,19 +3932,33 @@ function aimTargetText(demo: string, target: AimTarget): string {
 
 /**
  * A plugin of a build of the mode `play`: `aim` for the camera of `--at` ({@link aimPlugin}), and
- * `freeze` for the frozen song time of `--strip` ({@link freezePlugin}).
+ * `freeze` for a frozen song time ({@link freezePlugin}, {@link freezesTime}).
  */
 type PlayPlugin = 'aim' | 'freeze';
+
+/**
+ * Tells if the frames of a command line of the mode `play` freeze the song time of the page
+ * ({@link freezePlugin}): a strip, and each frame of `--time` or `--shot` on a built site. A frame
+ * of `--pause` needs the real play, and a site of `--url` has no plugin. Their frames come about
+ * 1 to 2 s after the time, when the bar hides.
+ *
+ * @param args The command line.
+ * @returns True for frames at the exact song time.
+ */
+function freezesTime(args: PlayArgs): boolean {
+  return args.strip !== null || (!args.pause && args.url === null);
+}
 
 /**
  * Gives the plugins of the builds of a command line of the mode `play`.
  *
  * @param args The command line.
- * @returns The plugins: `aim` with `--at` or a camera in JSON, and `freeze` with `--strip`.
+ * @returns The plugins: `aim` with `--at` or a camera in JSON, and `freeze` for frames at the
+ *   exact song time ({@link freezesTime}).
  */
 function playPluginKinds(args: PlayArgs): PlayPlugin[] {
   const aim = args.at !== null || args.cameras.some((camera) => camera.pose);
-  return [...(aim ? ['aim' as const] : []), ...(args.strip ? ['freeze' as const] : [])];
+  return [...(aim ? ['aim' as const] : []), ...(freezesTime(args) ? ['freeze' as const] : [])];
 }
 
 /**
@@ -3977,7 +4020,7 @@ function freezePlugin(root: string): Plugin {
       const missing = Object.values(FREEZE_ANCHORS).filter((anchor) => !code.includes(anchor));
       if (missing.length > 0) {
         throw new Error(
-          `The app ${app} has no code "${missing.join('" and no "')}", so --strip cannot freeze its song time.`,
+          `The app ${app} has no code "${missing.join('" and no "')}", so the frames of the mode play cannot freeze its song time.`,
         );
       }
       const pose = FREEZE_ANCHORS.pose.replace('wallTime', `(${freeze}?.wall ?? wallTime)`);
@@ -4224,11 +4267,14 @@ async function openPlay(
 }
 
 /**
- * Renders one play frame of a site: it opens the page and sets the camera ({@link openPlay}). A
- * seek keeps the free camera of "Reset view" (design 2.5). Then it seeks to
+ * Renders one play frame of a site. A frame that freezes the song time ({@link freezesTime}) is a
+ * strip of one frame ({@link stripFrames}): it shows the exact song time, and the poses at the
+ * wall time {@link FREEZE_WALL} after it. Else it opens the page and sets the camera
+ * ({@link openPlay}). A seek keeps the free camera of "Reset view" (design 2.5). Then it seeks to
  * {@link SEEK_LEAD_SEC} before the time, waits until the seek bar reaches the time, and waits
  * until the bar hides. The bar hides {@link BAR_HIDE_SEC} after the last motion of the pointer,
- * so the motion before the seek makes it hide before the frame.
+ * so the motion before the seek makes it hide before the frame. That frame comes about 1 to 2 s
+ * after the time.
  *
  * @param browser The browser.
  * @param site The URL of the site.
@@ -4238,7 +4284,8 @@ async function openPlay(
  * @param tree The name of the tree of the site, such as `the working tree` or `main (cc83899c)`.
  * @param target The player of `--at`, or `null`. A camera with an {@link AimView} then puts its
  *   camera ({@link aimPose}) into the query `aim` of the page, for a build of {@link aimPlugin}.
- * @returns The PNG image, and the song time of the bar at the frame, such as `0:06`.
+ * @returns The PNG image, and the song time of the frame: the exact time, such as `39.75 s`, or
+ *   the time of the bar, such as `0:41 on the bar`.
  * @throws Error that names the tree, the camera, the demo, and the time, when the seek bar does
  *   not reach the time in {@link SEEK_WAIT_MS}, when the bar does not hide in {@link BAR_WAIT_MS},
  *   or when the camera of a Cinematic frame is not in Cinematic mode.
@@ -4252,6 +4299,20 @@ async function playFrame(
   tree: string,
   target: AimTarget | null,
 ): Promise<{ readonly image: Buffer; readonly clock: string }> {
+  if (freezesTime(args)) {
+    const [image] = await stripFrames(
+      browser,
+      site,
+      { ...args, strip: [time] },
+      camera,
+      tree,
+      target,
+    );
+    if (!image) {
+      throw new Error(`The frame of ${tree} at ${time} s has no image.`);
+    }
+    return { image, clock: `${time.toFixed(2)} s` };
+  }
   const frame = `${tree}, camera ${camera.name}, ${pieceText(args.demo, args.midi)}, time ${time} s`;
   const page = await openPlay(browser, site, args, camera, target, frame);
   try {
@@ -4290,7 +4351,7 @@ async function playFrame(
     if (args.cinematic && automatic !== 'true') {
       throw new Error(`The camera of the frame of ${frame} is not in Cinematic mode.`);
     }
-    return { image, clock };
+    return { image, clock: `${clock} on the bar` };
   } finally {
     await page.close();
   }
@@ -4671,6 +4732,9 @@ async function playViews(args: PlayArgs, site: TreeSite): Promise<CommitRender> 
   const columns = args.cameras.length;
   const time = await playTimeSec(args);
   const target = await partTarget(args);
+  if (args.cinematic) {
+    console.log(await shotAtText(args, time));
+  }
   const after = await renderPlay(
     browser,
     site.base,
