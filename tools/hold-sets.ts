@@ -133,6 +133,13 @@ const NULL_FIELDS: ReadonlyMap<string, HoldValue> = new Map<string, HoldValue>([
   ['fit', { gap: 0 } satisfies NonNullable<BowedHold['fit']>],
   ['chinFit', { side: 0, up: 0, back: 0, press: 0 } satisfies NonNullable<BowedHold['chinFit']>],
   [
+    'restArms',
+    {
+      L: { forward: 0, bend: 0 },
+      R: { forward: 0, bend: 0 },
+    } satisfies NonNullable<BowedHold['restArms']>,
+  ],
+  [
     'restFreeL',
     {
       lap: { along: 0, offset: [0, 0, 0] },

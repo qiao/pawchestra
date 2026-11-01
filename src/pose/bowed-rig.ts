@@ -24,6 +24,7 @@ import {
   stringsAt,
 } from './bowed.ts';
 import { hangingArm } from './hang.ts';
+import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
 import { setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
@@ -334,6 +335,15 @@ export interface BowedHold {
    * the left collarbone beside the neck. `null` keeps the fixed place of the hold.
    */
   readonly chinFit: ChinFit | null;
+  /**
+   * The arms in the rest pose of a violin or a viola on the lap, from the hanging arms of the body
+   * (`hangingArm()` of `pose/hang.ts`, design 5.2): each upper arm swings forward by its angle and
+   * out until it clears the side of the body, and each elbow bends forward by its angle. The left
+   * paw holds the upright instrument in its rest grip, and the right paw holds the bow in its rest
+   * turn (`restBow`). Thus the rest elbows stay near the sides on each body. `null` keeps the rest
+   * places of `rest.lap` and `restBow.lap`.
+   */
+  readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
 }
 
 /**
@@ -431,6 +441,7 @@ const CHIN_HOLD = {
   standBow: null,
   fit: null,
   chinFit: null,
+  restArms: null,
 } as const satisfies BowedHold;
 
 /**
@@ -501,6 +512,7 @@ const FLOOR_HOLD = {
   standBow: null,
   fit: null,
   chinFit: null,
+  restArms: null,
 } as const satisfies BowedHold;
 
 /**
@@ -1709,7 +1721,9 @@ export function bowedRig(
             }
           : null,
       )
-    : rig;
+    : hold.restArms && hold.restPawTurnL !== null
+      ? armRest(model, rig, hold.restArms)
+      : rig;
   return { ...rest, bowRange: bowRangeOf(rest), stopRange: stopRangeOf(rest) };
 }
 
@@ -1740,6 +1754,47 @@ function forearmGrip(model: PlayerModel, direction: Vec3): Vec3 {
   const wrist = at('handR');
   const length = elbow.distanceTo(wrist) + wrist.distanceTo(new Vector3(...model.body.palmR));
   return toVec3(elbow.addScaledVector(new Vector3(...direction).normalize(), length));
+}
+
+/**
+ * Gives the rest pose of a violin or a viola on the lap from the hanging arms of the body (design
+ * 5.2, `BowedHold.restArms`): each arm hangs out to the side until it clears the body, with its own
+ * forward swing and elbow bend (`hangingArm()`). The instrument moves from its place on the thigh
+ * so that the left paw holds its neck in the rest grip at the hanging wrist, and the right paw
+ * holds the bow in its rest turn at the hanging wrist.
+ *
+ * @param model The player model.
+ * @param rig The points of the player, with the rest place on the thigh.
+ * @param arms The angles of each arm.
+ * @returns The points, with the rest places of the instrument and the bow and the rest elbows.
+ */
+function armRest(
+  model: PlayerModel,
+  rig: RigPoints,
+  arms: NonNullable<BowedHold['restArms']>,
+): RigPoints {
+  const hangL = hangingArm(model, rig.armL, arms.L);
+  const hangR = hangingArm(model, rig.armR, arms.R);
+  const { place, strings } = createBowPlaces();
+  instrumentAt(rig, bindFrames(rig), 0, place);
+  stringsAt(rig, place, strings);
+  const hand = restHandAt(rig, place, strings, {
+    wrist: new Vector3(),
+    rotation: new Quaternion(),
+  });
+  const wristL = new Vector3(...rig.armL.bind.shoulder).add(new Vector3(...hangL.wrist));
+  const wristR = new Vector3(...rig.armR.bind.shoulder).add(new Vector3(...hangR.wrist));
+  const bowHand = new Quaternion(...rig.restBow.rotation);
+  return {
+    ...rig,
+    restPivot: toVec3(new Vector3(...rig.restPivot).add(wristL.sub(hand.wrist))),
+    restPoleL: hangL.pole,
+    restPoleR: hangR.pole,
+    restBow: {
+      ...rig.restBow,
+      grip: toVec3(new Vector3(...rig.grip).applyQuaternion(bowHand).add(wristR)),
+    },
+  };
 }
 
 /**
