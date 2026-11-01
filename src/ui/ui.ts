@@ -280,9 +280,16 @@ export class Ui {
    * drawer button gets the focus that the sheet held, as after the Escape key.
    */
   closeSheetAfterSelection(): void {
-    if (!this.#phone.matches || !this.drawer.open) {
-      return;
+    if (this.#phone.matches) {
+      this.closeDrawer();
     }
+  }
+
+  /**
+   * Closes the drawer (design 2.4, 2.8). The drawer button gets the focus that the drawer held, so
+   * that the focus does not fall back to the page.
+   */
+  closeDrawer(): void {
     const refocus = this.drawer.focused;
     this.drawer.setOpen(false);
     if (refocus) {

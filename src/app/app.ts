@@ -409,11 +409,7 @@ export class App {
     }
     const dialog = this.#ui.creditsDialog.open;
     if (event.key === 'Escape' && !modified && this.#ui.drawer.open && !dialog) {
-      const refocus = this.#ui.drawer.focused;
-      this.#ui.drawer.setOpen(false);
-      if (refocus) {
-        this.#ui.bar.focusDrawerButton();
-      }
+      this.#ui.closeDrawer();
       return;
     }
     const press = { key: event.key, repeat: event.repeat, modified };
