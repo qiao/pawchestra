@@ -286,13 +286,17 @@ export const SPECIES = {
    * which `pnpm rig-mesh wolf` rigs (design 4.4), with the size of the reference images, then 0.9
    * of the height and 1.2 of the width. It sits on a chair that fits its legs, with the tail back
    * over the seat and down behind it, and stands as a soloist. Its head height is the head of the
-   * studio body, and the seat height is the seat of the studio body, in H.
+   * studio body, and the seat height is the seat of the studio body, in H. The violin size is for
+   * the recast role `violinist@wolf` of the role tools only: no wolf plays the violin in the app.
+   * It is the rule of a violin shop for the arm of the wolf with the violin on the shoulder (0.732),
+   * rounded up to 0.75 (`pnpm hold-reach wolf --instrument violin`).
    */
   wolf: {
     body: 'studio-wolf',
     colors: SPECIES_COLORS.wolf,
     headHeight: STUDIO_WOLF.headHeight,
     seatHeight: STUDIO_WOLF.seatHeight / STUDIO_WOLF.headHeight,
+    violinScale: 0.75,
   },
   /**
    * Elephant, the timpani: a gray elephant with large ears, a long trunk, and cream tusks. It has
