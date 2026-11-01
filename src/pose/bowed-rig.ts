@@ -785,7 +785,12 @@ const WOLF_VIOLIN_HOLD = {
  *
  * The left paw tilts 55° over the neck (`tiltL`), and the left elbow points out to the left and
  * nearly level, because the leaned neck comes near the left shoulder, and turns up 2° for each
- * lower string. The right shoulder turns 30°.
+ * lower string. From the second position to the fifth position, the left paw tilts 20° further
+ * over the neck (`highTilt`), so that the wrist comes up beside the upper bout, as the hand of a
+ * real player goes over the shoulder of the instrument (`docs/reference/string-technique.md`,
+ * section 1.5): with no further tilt, the left forearm of the recast deer goes 1.9 cm into the
+ * upper bout in a high position of `mendelssohn-op61` (0.5 cm with this tilt). The right shoulder
+ * turns 30°.
  *
  * The short arms reach the strings only nearly straight. The trunk leans 3° forward, so that the
  * shoulders come nearer to the strings, and the right elbow points out and down, near the body.
@@ -815,6 +820,7 @@ const CELLO_HOLD = {
   stringTurn: 6 * MathUtils.DEG2RAD,
   frogHair: 0.12,
   tiltL: 55 * MathUtils.DEG2RAD,
+  highTilt: 20 * MathUtils.DEG2RAD,
   poleL: [-1, -0.15, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   poleR: [1, -1.2, -0.3],
@@ -1044,12 +1050,13 @@ const CAT_HOLD = {
  * 0.06 m right of the middle and 0.66 m in front of the floor point of the seat. It leans 14° to
  * the left, and its top plate turns 6° to the right. It keeps this place in the rest pose
  * (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the knees do not
- * touch the cello.
+ * touch the cello. The left paw keeps the tilt of the low positions in the high positions.
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
+  highTilt: 0,
   fit: null,
 } as const satisfies BowedHold;
 
