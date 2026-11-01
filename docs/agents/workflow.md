@@ -132,6 +132,8 @@ These rules hold for each test:
   loops of `frame-compare.ts` running after its end.
 - A sweep, such as `pnpm pose-depth` or `pnpm fold-probe`, reads the modules at its start. Do not
   edit or commit a module that it reads while it runs.
+- The probe cache keys each result by the tree. A commit during a run that you will read again
+  from the cache changes the key, and the next run starts cold.
 - In the shell of an agent, `grep` is a shell function that runs ugrep with `--ignore-files`, so it
   skips `scratch/` and `node_modules/`. `command grep` runs the grep of the system.
 - Make a temporary edit with `perl -0pi -e`, because the `sed -i` of macOS needs a suffix. Make a
