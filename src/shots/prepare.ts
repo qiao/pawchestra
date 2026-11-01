@@ -20,7 +20,14 @@ import {
   targetLineClear,
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
-import { foregroundHead, foregroundObject, inFrame, lensScale } from './foreground.ts';
+import {
+  ANIMAL_FLOOR,
+  animalTooNear,
+  foregroundHead,
+  foregroundObject,
+  inFrame,
+  lensScale,
+} from './foreground.ts';
 import {
   FILM_GRAMMAR,
   azimuthFrom,
@@ -335,6 +342,12 @@ const HEAD_TEST_PASSES = 2;
 const LINE_SAMPLES = Array.from({ length: 17 }, (...[, i]) => i / 16).filter(
   (...[, i]) => i % 4 !== 0,
 );
+
+/**
+ * The samples of a move at which the planner tests the distance floor of the animals, 1/16 of the
+ * move apart. A body at a corner of the frame came into it between two of the five samples.
+ */
+const NEAR_SAMPLES = Array.from({ length: 17 }, (...[, i]) => i / 16);
 
 /** The samples of a move at which the planner tests the sight lines of the subject. */
 const SIGHT_MOVE_SAMPLES = new Set<number>([0, 0.5, 1]);
@@ -1039,6 +1052,93 @@ function moveForeground(
 }
 
 /**
+ * Tells if an animal in the frame of a close move comes nearer to the camera than
+ * `ANIMAL_FLOOR`, at each of {@link NEAR_SAMPLES}, in the frame of its composition (design 5.6).
+ * Only the bodies near the path of the camera need the test of each sample.
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @param composition The place of the subject in the frame, or `null`.
+ * @returns True if an animal is too near.
+ */
+function moveNear(
+  planner: Planner,
+  subject: Subject,
+  halfHeight: number,
+  from: ShotKey,
+  to: ShotKey,
+  composition: Composition | null,
+): boolean {
+  const keys = NEAR_SAMPLES.map((u) => mixKeys(from, to, u));
+  const cameras = keys.map((key) =>
+    keyPosition(planner.stageSide, subject.target, halfHeight, key, CINEMA_ASPECT),
+  );
+  // A sphere around the cameras of the move: its middle and its radius.
+  const middle = mixPoints(cameras[0] ?? subject.target, cameras.at(-1) ?? subject.target, 0.5);
+  const path = Math.max(
+    ...cameras.map((c) => Math.hypot(c[0] - middle[0], c[1] - middle[1], c[2] - middle[2])),
+  );
+  const near = planner.subjects.bodies.filter(
+    (body) =>
+      Math.hypot(
+        body.center[0] - middle[0],
+        body.center[1] - middle[1],
+        body.center[2] - middle[2],
+      ) <
+      ANIMAL_FLOOR + body.radius + path,
+  );
+  if (near.length === 0) {
+    return false;
+  }
+  for (const key of keys) {
+    const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
+    if (animalTooNear(near, camera, look, key.fov, CINEMA_ASPECT)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Runs the tests of a close move that the planner keeps for each camera, because they do not
+ * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects last.
+ *
+ * @param planner The planner.
+ * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @param composition The place of the subject in the frame, or `null`.
+ * @returns The first test that fails, or `null` for a clear move.
+ */
+function keptRefusal(
+  planner: Planner,
+  subject: Subject,
+  halfHeight: number,
+  from: ShotKey,
+  to: ShotKey,
+  composition: Composition | null,
+): KeptRefusal | null {
+  if (moveForeground(planner, subject, halfHeight, from, to, composition, 'heads')) {
+    return 'head';
+  }
+  if (moveNear(planner, subject, halfHeight, from, to, composition)) {
+    return 'near';
+  }
+  const { held, sights } = subjectLines(planner, subject);
+  const move = moveRefusal(planner, subject.target, halfHeight, from, to, held, sights);
+  if (move) {
+    return move;
+  }
+  return moveForeground(planner, subject, halfHeight, from, to, composition, 'objects')
+    ? 'object'
+    : null;
+}
+
+/**
  * Tests the 180° rule of a close move (design 5.6): each camera of the move keeps the line of the
  * stage, and the subject looks to the same side of the screen as in the master shot, or the look
  * is neutral in one of the two.
@@ -1116,7 +1216,7 @@ function searchClose(
   move: CloseMove,
   name: string,
 ): Framing | null {
-  const { held, sights } = subjectLines(planner, subject);
+  const { held } = subjectLines(planner, subject);
   const moveKey = `${subjectKey(subject)} ${move.size.share} ${subject.reach} ${move.pushIn} ${move.fov}`;
   const known = planner.moveCache.get(moveKey) ?? new Map<number, boolean>();
   planner.moveCache.set(moveKey, known);
@@ -1237,21 +1337,7 @@ function searchClose(
       return refuse(azimuth, elevation, arc, 'repeat');
     }
     if (clear === undefined) {
-      // The cheap test of the heads comes first, and the cover of the objects last.
-      const refusal: KeptRefusal | null = moveForeground(
-        planner,
-        subject,
-        halfHeight,
-        from,
-        to,
-        composition,
-        'heads',
-      )
-        ? 'head'
-        : (moveRefusal(planner, subject.target, halfHeight, from, to, held, sights) ??
-          (moveForeground(planner, subject, halfHeight, from, to, composition, 'objects')
-            ? 'object'
-            : null));
+      const refusal = keptRefusal(planner, subject, halfHeight, from, to, composition);
       clear = refusal === null;
       known.set(key, clear);
       if (kept && refusal) {

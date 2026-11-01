@@ -11,6 +11,46 @@ export interface StageHead {
   readonly radius: number;
 }
 
+/** A part of a body: a group of near points, with a sphere that holds them. */
+export interface BodyPart {
+  /** The middle of the sphere. */
+  readonly center: Vec3;
+  /** The radius of the sphere, in meters. */
+  readonly radius: number;
+  /** The index of the first point of the part in {@link StageBody}.points, a third of its offset. */
+  readonly start: number;
+  /** The index of the point after the last point of the part. */
+  readonly end: number;
+}
+
+/** The body of an animal on the stage in the bind pose, for the distance floor of a close shot. */
+export interface StageBody {
+  /**
+   * The points of the body with no instrument and no repeats, as x, y, z in the stage axes, in
+   * the order of the parts.
+   */
+  readonly points: Float64Array;
+  /** The middle of a sphere that holds the points. */
+  readonly center: Vec3;
+  /** The radius of the sphere, in meters. */
+  readonly radius: number;
+  /**
+   * The parts of the body. A camera near a body is far from most of its parts, so most points
+   * need no test.
+   */
+  readonly parts: readonly BodyPart[];
+}
+
+/**
+ * The smallest distance from a close camera to each point of an animal body in its frame, in
+ * meters (design 5.6). The low-poly animals show their facets and the seams of their meshes from
+ * near. The floor holds for each animal in the frame: the subject, a neighbor, and a blurred head
+ * or body of a dirty frame. It is 1.25 times the distance of the nearest animal of the side views
+ * of the demos at their 5th percentile (0.95 m), the closest kind of shot in
+ * `pnpm shot-trace --rules`.
+ */
+export const ANIMAL_FLOOR = 1.2;
+
 /**
  * The foreground rule of a close shot (design 5.6). Close shots showed large heads of other players
  * at the bottom edge and over the subject, and the piano case or a head of another player over a
@@ -423,6 +463,79 @@ export function foregroundObject(
       }
       if (covered > most) {
         return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Tells if a point of an animal body in the frame of a camera is nearer to the camera than
+ * {@link ANIMAL_FLOOR} (design 5.6). A body or a part whose sphere is farther than the floor needs
+ * no test of its points.
+ *
+ * @param bodies The bodies of the players and of the conductor.
+ * @param camera The camera.
+ * @param target The point that the camera looks at.
+ * @param fov The vertical field of view, in degrees.
+ * @param aspect The width of the frame divided by its height.
+ * @returns True if an animal in the frame is too near.
+ */
+export function animalTooNear(
+  bodies: readonly StageBody[],
+  camera: Vec3,
+  target: Vec3,
+  fov: number,
+  aspect: number,
+): boolean {
+  const [cx, cy, cz] = camera;
+  const floor2 = ANIMAL_FLOOR * ANIMAL_FLOOR;
+  let a: FrameAxes | null = null;
+  for (const body of bodies) {
+    const reach = ANIMAL_FLOOR + body.radius;
+    const bx = body.center[0] - cx;
+    const by = body.center[1] - cy;
+    const bz = body.center[2] - cz;
+    if (bx * bx + by * by + bz * bz >= reach * reach) {
+      continue;
+    }
+    const p = body.points;
+    for (const part of body.parts) {
+      const r = part.radius;
+      const px = part.center[0] - cx;
+      const py = part.center[1] - cy;
+      const pz = part.center[2] - cz;
+      if (px * px + py * py + pz * pz >= (ANIMAL_FLOOR + r) ** 2) {
+        continue;
+      }
+      a ??= frameAxes(camera, target, fov, aspect);
+      // The sphere of the part is behind the camera, or outside a side plane of the frame: the
+      // distance to the plane through the camera is (offset - depth × tan) / √(1 + tan²).
+      const partDepth = px * a.fx + py * a.fy + pz * a.fz;
+      const side = Math.abs(px * a.rx + pz * a.rz) - partDepth * a.tanH;
+      const up = Math.abs(px * a.ux + py * a.uy + pz * a.uz) - partDepth * a.tanV;
+      if (
+        partDepth <= -r ||
+        side > r * Math.sqrt(1 + a.tanH * a.tanH) ||
+        up > r * Math.sqrt(1 + a.tanV * a.tanV)
+      ) {
+        continue;
+      }
+      for (let i = part.start * 3; i < part.end * 3; i += 3) {
+        const dx = (p[i] ?? 0) - cx;
+        const dy = (p[i + 1] ?? 0) - cy;
+        const dz = (p[i + 2] ?? 0) - cz;
+        if (dx * dx + dy * dy + dz * dz >= floor2) {
+          continue;
+        }
+        const depth = dx * a.fx + dy * a.fy + dz * a.fz;
+        if (
+          depth > 0 &&
+          Math.abs(dx * a.rx + dz * a.rz) <= depth * a.tanH &&
+          Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) <= depth * a.tanV
+        ) {
+          return true;
+        }
       }
     }
   }

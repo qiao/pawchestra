@@ -562,6 +562,14 @@ another object can stand at one side edge of the frame, when the depth of field 
 (`FOREGROUND.dirtyShare`), and all dirty heads of a frame stay at one side. A head over the
 subject always counts. Thus a solo camera can stay low behind the front rows.
 
+**The distance to the animals.** No point of an animal body in the frame of a close camera comes
+nearer than `ANIMAL_FLOOR` at a sample of the move (`NEAR_SAMPLES`). The rule holds for each
+animal in the frame: the subject, a neighbor, and a blurred head or body of a dirty frame. The
+low-poly animals show their facets and the seams of their meshes from near. The floor is 1.25
+times the 5th percentile of the distance of the nearest animal of the side views, the closest
+kind of shot of `pnpm shot-trace --rules`. The body is the mesh of the animal in the bind pose,
+with no instrument.
+
 **Transitions, beam, and light.** A hard cut is the default. A blend is a short camera move in a
 slow or quiet window (`BLEND_RULES`), because a true dissolve needs two renders for each frame.
 The beam fades in the close shots, because a close camera sees the additive beam over the full

@@ -154,6 +154,9 @@ The app follows these facts:
   stays in the outer third of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
   frame stay at one side. A head over the subject always counts. Thus a solo camera can stay low
   behind the heads of the front rows.
+- **The distance to the animals (section 3).** Each animal in the frame of a close shot, also a
+  head of a dirty frame, stays at least `ANIMAL_FLOOR` from the camera, because the low-poly
+  animals show their facets and the seams of their meshes from near.
 
 The app does not follow these facts:
 

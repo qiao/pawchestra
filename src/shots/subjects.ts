@@ -13,7 +13,7 @@ import type { Score } from '../score/types.ts';
 import { angleDifference, azimuthOf } from './camera-keys.ts';
 import { CONDUCTOR_OWNER } from './clearance.ts';
 import type { SightPoints } from './clearance.ts';
-import type { StageHead } from './foreground.ts';
+import type { BodyPart, StageBody, StageHead } from './foreground.ts';
 
 /**
  * The groups of the section shots (design 5.6). `ensemble` is the two-shot of all players of a
@@ -177,6 +177,8 @@ export interface StageSubjects {
   readonly conductor: ConductorSubjects | null;
   /** The heads of all players and of the conductor, for the foreground rule. */
   readonly heads: readonly StageHead[];
+  /** The bodies of all players and of the conductor, for the distance floor of a close shot. */
+  readonly bodies: readonly StageBody[];
   /** The seat of the soloist of the score (3.8), or `null`. */
   readonly soloist: number | null;
 }
@@ -386,6 +388,141 @@ function headTopOf(model: PlayerModel): number {
   return top;
 }
 
+/** The size of the cells of the grid that groups the points of a body into parts, in meters. */
+const BODY_PART_CELL = 0.25;
+
+/** The points of the body of a model in the model axes, grouped into parts. */
+interface ModelBody {
+  /** The points, as x, y, z, in the order of the parts. */
+  readonly points: Float64Array;
+  /** The middle of a sphere that holds the points. */
+  readonly center: Vec3;
+  /** The radius of the sphere, in meters. */
+  readonly radius: number;
+  /** The parts, in the model axes. */
+  readonly parts: readonly BodyPart[];
+}
+
+/** The body of each model, in the model axes. */
+const modelBodies = new WeakMap<PlayerModel, ModelBody>();
+
+/**
+ * Gives the body of a model in the model axes (design 5.6): the corners of the mesh on a bone of
+ * the body, with no repeats, grouped into the parts of a grid of {@link BODY_PART_CELL}. A bone of
+ * the instrument, such as `instrument` or `bow`, does not count.
+ *
+ * @param model The model.
+ * @returns The body.
+ */
+function modelBodyOf(model: PlayerModel): ModelBody {
+  const known = modelBodies.get(model);
+  if (known) {
+    return known;
+  }
+
+  const { positions, bones } = model.mesh;
+  const instrument = boneIndex('instrument');
+  const seen = new Set<number>();
+  const cells = new Map<number, number[]>();
+  // The key of a point or of a cell holds each axis in 17 bits.
+  const keyOf = (x: number, y: number, z: number): number =>
+    ((x + 2 ** 16) * 2 ** 17 + y + 2 ** 16) * 2 ** 17 + z + 2 ** 16;
+  for (let corner = 0; corner < bones.length; corner++) {
+    if ((bones[corner] ?? 0) >= instrument) {
+      continue;
+    }
+    const x = positions[corner * 3] ?? 0;
+    const y = positions[corner * 3 + 1] ?? 0;
+    const z = positions[corner * 3 + 2] ?? 0;
+    // A point in steps of 0.1 mm, up to ±6.5 m.
+    const key = keyOf(Math.round(x * 1e4), Math.round(y * 1e4), Math.round(z * 1e4));
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    const c = BODY_PART_CELL;
+    const cell = keyOf(Math.floor(x / c), Math.floor(y / c), Math.floor(z / c));
+    const list = cells.get(cell) ?? [];
+    list.push(x, y, z);
+    cells.set(cell, list);
+  }
+
+  const points: number[] = [];
+  const parts: BodyPart[] = [];
+  for (const list of cells.values()) {
+    const start = points.length / 3;
+    points.push(...list);
+    const sphere = sphereAround(list);
+    parts.push({ ...sphere, start, end: points.length / 3 });
+  }
+  const body = { points: Float64Array.from(points), ...sphereAround(points), parts };
+  modelBodies.set(model, body);
+  return body;
+}
+
+/**
+ * Gives a sphere that holds points: the middle of their box, and the distance to the farthest
+ * point.
+ *
+ * @param points The points, as x, y, z.
+ * @returns The middle and the radius.
+ */
+function sphereAround(points: ArrayLike<number>): Pick<BodyPart, 'center' | 'radius'> {
+  const low = [Infinity, Infinity, Infinity];
+  const high = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < points.length; i++) {
+    const k = i % 3;
+    const v = points[i] ?? 0;
+    low[k] = Math.min(low[k] ?? v, v);
+    high[k] = Math.max(high[k] ?? v, v);
+  }
+  const middle = (k: number): number => ((low[k] ?? 0) + (high[k] ?? 0)) / 2;
+  const center: Vec3 = [middle(0), middle(1), middle(2)];
+  let radius = 0;
+  for (let i = 0; i < points.length; i += 3) {
+    radius = Math.max(
+      radius,
+      Math.hypot(
+        (points[i] ?? 0) - center[0],
+        (points[i + 1] ?? 0) - center[1],
+        (points[i + 2] ?? 0) - center[2],
+      ),
+    );
+  }
+  return { center, radius };
+}
+
+/**
+ * Gives the body of a model at its place on the stage (design 5.6): its points and its parts
+ * after a turn of `facing` around y and the position, and a sphere that holds them.
+ *
+ * @param model The model.
+ * @param place The place of the model.
+ * @returns The body.
+ */
+function bodyAt(model: PlayerModel, place: Pick<PlayerPlace, 'position' | 'facing'>): StageBody {
+  const local = modelBodyOf(model);
+  const cos = Math.cos(place.facing);
+  const sin = Math.sin(place.facing);
+  const [px, py, pz] = place.position;
+  const move = (x: number, y: number, z: number): Vec3 => [
+    px + x * cos + z * sin,
+    py + y,
+    pz - x * sin + z * cos,
+  ];
+  const points = new Float64Array(local.points.length);
+  for (let i = 0; i < points.length; i += 3) {
+    const x = local.points[i] ?? 0;
+    const z = local.points[i + 2] ?? 0;
+    points[i] = px + x * cos + z * sin;
+    points[i + 1] = py + (local.points[i + 1] ?? 0);
+    points[i + 2] = pz - x * sin + z * cos;
+  }
+  // A turn and a move keep each sphere: only its middle moves.
+  const parts = local.parts.map((part) => ({ ...part, center: move(...part.center) }));
+  return { points, center: move(...local.center), radius: local.radius, parts };
+}
+
 /** The outline of a model in the stage plane, and the height of its top. */
 interface PlayerOutline {
   /** The corners of the outline. */
@@ -493,6 +630,7 @@ export function prepareSubjects(
     bySeat[place.cast.seatIndex]?.push({ place, index });
   }
   const heads: StageHead[] = [];
+  const bodies: StageBody[] = [];
   const seats = score.seats.map((seat, i): SeatPlayers | null => {
     const places = bySeat[i] ?? [];
     if (seat.section === 'sound-only' || places.length === 0) {
@@ -506,6 +644,7 @@ export function prepareSubjects(
         const sights = modelSights(model);
         const center = onStage(sights.head, place);
         heads.push({ owner: index, center, radius: HEAD_RADIUS_IN_H * model.body.headHeight });
+        bodies.push(bodyAt(model, place));
         const { outline, top } = outlineOf(model, place);
 
         return {
@@ -535,6 +674,7 @@ export function prepareSubjects(
       center: sights.head,
       radius: HEAD_RADIUS_IN_H * bear.body.headHeight,
     });
+    bodies.push(bodyAt(bear, place));
     conductor = {
       target: [sights.head[0], sights.head[1] - SUBJECT_SIZES.conductorDrop, sights.head[2]],
       sights,
@@ -552,6 +692,7 @@ export function prepareSubjects(
     seats,
     conductor,
     heads,
+    bodies,
     soloist: score.soloist,
   };
 }

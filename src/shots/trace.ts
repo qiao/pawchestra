@@ -9,6 +9,7 @@ import type { ShotKind, ShotPlan } from './types.ts';
  * - `jump`: a jump cut after the previous shot.
  * - `repeat`: less than 20° from the camera of the last shot of the same subject.
  * - `head`: a head in the foreground, or the outside point of the subject in the frame.
+ * - `near`: a point of an animal body in the frame nearer to the camera than `ANIMAL_FLOOR`.
  * - `beamEdge`: a camera at the start of the move near the surface of the cone of the beam.
  * - `distance`: a camera farther from the stage center than `CLOSE_DISTANCE_SHARE` of the default
  *   distance.
@@ -24,6 +25,7 @@ export type CameraRefusal =
   | 'jump'
   | 'repeat'
   | 'head'
+  | 'near'
   | 'beamEdge'
   | 'distance'
   | 'beamSide'
