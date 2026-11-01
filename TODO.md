@@ -323,11 +323,14 @@ passes.
       Fit the shared holds of the bowed strings and the winds on more than one body.
 - [ ] Shared violin hold (`BOWED_HOLDS.violin`): the arms go 2.4 cm to 28 cm into the body in the
       rest, the lift, or the lowering of each recast species.
-- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): with the place from the body and the cello
-      rule, the wolf passes, and the dog stays `OPEN`. The bow paw of the rabbit, the panda, the
-      monkey, and the mouse flips in the lift and twists 134° to 179° at rest, with folds R 10 to
-      11 at rest: fit the rest bow and its via to the body. The forearms go 1.8 cm to 2.7 cm into
-      the cello in the play of the deer, the foxes, the polar bear, and the mannequin.
+- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
+      the dog stays `OPEN`. The right paw of the panda (1.9 cm) and the left claws of the monkey
+      (1.8 cm) go into the cello in a few play samples. The cello of the foxes goes 5.0 cm into the
+      body in the play, the forearms of the polar bear and the mannequin go up to 2.4 cm into the
+      cello at rest and in the moves, and the upper arms of the cat and the pig go up to 4.0 cm into
+      the body.
+- [ ] Dog cellist: the fitted place (`cello@dog.fit`) with a cello of 0.87 gives the arm gate of
+      `DOG_HOLD` on two demos. Sweep the dog with it, then remove `DOG_HOLD` if it is not worse.
 - [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
       (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
       14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
