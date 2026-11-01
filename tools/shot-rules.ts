@@ -22,6 +22,13 @@
  * of shot, from a sample each {@link SAMPLE_STEP}, and the median share of the frame width that
  * the footprints of the players of a solo or a section shot fill.
  *
+ * For each shot, the tool also measures the nearest animal: the distance from the camera to the
+ * nearest point of an animal body in the frame, and the largest part of the frame height that
+ * one head fills. A head or a body of the dirty frame counts. The samples of a shot include the
+ * end of its move, the closest moment of a push-in. The table gives the minimum, the 5th
+ * percentile, and the median distance of each kind of shot, and the largest, the 95th
+ * percentile, and the median head part.
+ *
  * Usage: pnpm shot-trace --rules [--demo <id>]... [--base <ref>] [--list] [--json <file>]
  */
 import { writeFileSync } from 'node:fs';
@@ -29,9 +36,12 @@ import { writeFileSync } from 'node:fs';
 import { patchedDemos } from './patch-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
+import { CONDUCTOR } from '../src/models/cast.ts';
 import { layoutObstacles, layoutScene } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
+import type { PlayerModel } from '../src/models/player.ts';
+import { boneIndex } from '../src/models/rig.ts';
 import type { Transport } from '../src/pose/types.ts';
 import { buildScore } from '../src/score/score.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
@@ -116,6 +126,24 @@ export interface KindHeights {
    * fill, in the middle of its move.
    */
   readonly widths: number[];
+  /** The nearest animal of each shot. */
+  readonly near: ShotNear[];
+}
+
+/** The nearest animal of one shot. */
+export interface ShotNear {
+  /** The demo. */
+  readonly demo: string;
+  /** The kind of the shot. */
+  readonly kind: ShotKind;
+  /** The start of the shot, in song seconds. */
+  readonly startSec: number;
+  /** The time of the sample with the nearest animal, in song seconds. */
+  readonly timeSec: number;
+  /** The distance from the camera to the nearest point of an animal body in the frame. */
+  readonly distance: number;
+  /** The largest part of the frame height that one head fills in the shot. */
+  readonly head: number;
 }
 
 /** The result of the check of the demos. */
@@ -128,7 +156,12 @@ export interface RulesOutput {
   readonly kinds: Readonly<Record<string, KindSummary>>;
   /** True if the commit has the list of the bones of the head, so the tool counts cut heads. */
   readonly headChecked: boolean;
+  /** The {@link CLOSEST_SHOTS} shots of each kind with the nearest animals, nearest first. */
+  readonly closest: readonly ShotNear[];
 }
+
+/** The number of shots of each kind with the nearest animals that `--list` gives. */
+const CLOSEST_SHOTS = 3;
 
 /** The median and the largest elevation and height of the cameras of one kind of shot. */
 export interface KindSummary {
@@ -142,6 +175,20 @@ export interface KindSummary {
   readonly maxHeight: number;
   /** The median share of the frame width that the players fill, or 0 for no solo or section. */
   readonly medianWidth: number;
+  /** The number of shots. */
+  readonly shots: number;
+  /** The distance from the camera to the nearest animal of a shot, in meters: the minimum. */
+  readonly minDistance: number;
+  /** The 5th percentile of that distance over the shots. */
+  readonly lowDistance: number;
+  /** The median of that distance over the shots. */
+  readonly medianDistance: number;
+  /** The largest part of the frame height that one head fills in a shot: the largest value. */
+  readonly maxHead: number;
+  /** The 95th percentile of that part over the shots. */
+  readonly highHead: number;
+  /** The median of that part over the shots. */
+  readonly medianHead: number;
 }
 
 /** The transport of a play from the song start, as the camera probe uses it. */
@@ -249,6 +296,263 @@ export function playerExtents(
     });
   }
   return extents;
+}
+
+/** The points of a model in its axes, for {@link animalBodies}. */
+interface ModelPoints {
+  /** The corners of the body with no instrument, with no repeats, as x, y, z. */
+  readonly body: Float64Array;
+  /** The corners of the head with no ears ({@link headBones}), with no repeats, as x, y, z. */
+  readonly head: Float64Array;
+}
+
+/** The body of one animal on the stage in the bind pose, for the measure of the nearest animal. */
+export interface AnimalBody {
+  /** The corners of the body with no instrument, as x, y, z in the stage axes. */
+  readonly points: Float64Array;
+  /** The corners of the head with no ears, as x, y, z. Empty for a commit with no head list. */
+  readonly head: Float64Array;
+  /** The middle of a sphere that holds the points of the body. */
+  readonly center: Vec3;
+  /** The radius of that sphere, in meters. */
+  readonly radius: number;
+  /** The middle of a sphere that holds the points of the head. */
+  readonly headCenter: Vec3;
+  /** The radius of that sphere, in meters. */
+  readonly headRadius: number;
+}
+
+/**
+ * Gives the points of the body and of the head of a model, with no repeats. The corners of a bone
+ * of the instrument, such as `instrument` or `bow`, are not a part of the body.
+ *
+ * @param model The model.
+ * @returns The points in the axes of the model.
+ */
+function modelPoints(model: PlayerModel): ModelPoints {
+  const { positions, bones } = model.mesh;
+  const instrument = boneIndex('instrument');
+  const body: number[] = [];
+  const head: number[] = [];
+  const seenBody = new Set<number>();
+  const seenHead = new Set<number>();
+  // Adds a point once: its key holds each axis in steps of 0.1 mm in 17 bits, up to ±6.5 m.
+  const add = (out: number[], seen: Set<number>, x: number, y: number, z: number): void => {
+    const key = [x, y, z].reduce((sum, v) => sum * 2 ** 17 + Math.round(v * 1e4) + 2 ** 16, 0);
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(x, y, z);
+    }
+  };
+  for (let corner = 0; corner < bones.length; corner++) {
+    const bone = bones[corner] ?? 0;
+    if (bone >= instrument) {
+      continue;
+    }
+    const x = positions[corner * 3] ?? 0;
+    const y = positions[corner * 3 + 1] ?? 0;
+    const z = positions[corner * 3 + 2] ?? 0;
+    add(body, seenBody, x, y, z);
+    if (headBones?.has(bone)) {
+      add(head, seenHead, x, y, z);
+    }
+  }
+  return { body: Float64Array.from(body), head: Float64Array.from(head) };
+}
+
+/** The place of a player or of the conductor: a point on the stage and a turn around y. */
+interface PlayerPlaceLike {
+  /** The point under the middle of the model. */
+  readonly position: Vec3;
+  /** Radians around y. 0 faces -z. */
+  readonly facing: number;
+}
+
+/** The points of a model at its place, with a sphere that holds them. */
+interface PlacedPoints {
+  /** The points in the stage axes, as x, y, z. */
+  readonly points: Float64Array;
+  /** The middle of the sphere. */
+  readonly center: Vec3;
+  /** The radius of the sphere, in meters. */
+  readonly radius: number;
+}
+
+/**
+ * Moves the points of a model to its place on the stage: a turn of `facing` around y, then the
+ * position. Gives the sphere that holds them.
+ *
+ * @param points The points in the axes of the model, as x, y, z.
+ * @param place The place of the model.
+ * @returns The points on the stage, the middle of their sphere, and its radius.
+ */
+function placePoints(points: Float64Array, place: PlayerPlaceLike): PlacedPoints {
+  const cos = Math.cos(place.facing);
+  const sin = Math.sin(place.facing);
+  const [px, py, pz] = place.position;
+  const out = new Float64Array(points.length);
+  const low = [Infinity, Infinity, Infinity];
+  const high = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < points.length; i += 3) {
+    const x = points[i] ?? 0;
+    const y = points[i + 1] ?? 0;
+    const z = points[i + 2] ?? 0;
+    const p = [px + x * cos + z * sin, py + y, pz - x * sin + z * cos];
+    for (let k = 0; k < 3; k++) {
+      const v = p[k] ?? 0;
+      out[i + k] = v;
+      low[k] = Math.min(low[k] ?? v, v);
+      high[k] = Math.max(high[k] ?? v, v);
+    }
+  }
+  const middle = (k: number): number => ((low[k] ?? 0) + (high[k] ?? 0)) / 2;
+  const center: Vec3 = [middle(0), middle(1), middle(2)];
+  let radius = 0;
+  for (let i = 0; i < out.length; i += 3) {
+    radius = Math.max(
+      radius,
+      Math.hypot(
+        (out[i] ?? 0) - center[0],
+        (out[i + 1] ?? 0) - center[1],
+        (out[i + 2] ?? 0) - center[2],
+      ),
+    );
+  }
+  return { points: out, center, radius };
+}
+
+/**
+ * Gives the body of each animal of a layout: each player and the conductor, in the bind pose.
+ *
+ * @param layout The layout.
+ * @param models The models of the score.
+ * @returns The bodies.
+ */
+export function animalBodies(layout: SceneLayout, models: ModelCache): AnimalBody[] {
+  const known = new Map<PlayerModel, ModelPoints>();
+  const bodyOf = (model: PlayerModel, place: PlayerPlaceLike): AnimalBody => {
+    const local = known.get(model) ?? modelPoints(model);
+    known.set(model, local);
+    const body = placePoints(local.body, place);
+    const head = placePoints(local.head, place);
+    return {
+      points: body.points,
+      head: head.points,
+      center: body.center,
+      radius: body.radius,
+      headCenter: head.center,
+      headRadius: head.radius,
+    };
+  };
+  const bodies = layout.players.map((place) => {
+    const { species, instrument, kettles, support } = place.cast;
+    return bodyOf(models.get(species, instrument, kettles, support), place);
+  });
+  if (layout.conductor) {
+    bodies.push(bodyOf(models.get(CONDUCTOR.species, CONDUCTOR.instrument), layout.conductor));
+  }
+  return bodies;
+}
+
+/**
+ * Gives the distance from a camera to the nearest point of an animal body in its frame, at the
+ * aspect of Cinematic mode.
+ *
+ * @param frame The camera.
+ * @param bodies The bodies of the animals.
+ * @returns The distance in meters, or `Infinity` with no body in the frame.
+ */
+function nearestAnimal(frame: Frame, bodies: readonly AnimalBody[]): number {
+  const a = axesOf(frame);
+  const tanV = Math.tan((frame.fov / 2) * DEG);
+  const tanH = tanV * CINEMA_ASPECT;
+  const [cx, cy, cz] = frame.position;
+  const order = bodies
+    .map((body) => ({
+      body,
+      bound:
+        Math.hypot(body.center[0] - cx, body.center[1] - cy, body.center[2] - cz) - body.radius,
+    }))
+    .toSorted((x, y) => x.bound - y.bound);
+  // The squares of the distances, because a square root in the loop of the points costs more.
+  let best2 = Infinity;
+  for (const { body, bound } of order) {
+    if (bound > 0 && bound * bound >= best2) {
+      break;
+    }
+    const p = body.points;
+    for (let i = 0; i < p.length; i += 3) {
+      const dx = (p[i] ?? 0) - cx;
+      const dy = (p[i + 1] ?? 0) - cy;
+      const dz = (p[i + 2] ?? 0) - cz;
+      const distance2 = dx * dx + dy * dy + dz * dz;
+      const depth = dx * a.forward[0] + dy * a.forward[1] + dz * a.forward[2];
+      if (distance2 >= best2 || depth <= 0) {
+        continue;
+      }
+      const x = (dx * a.right[0] + dz * a.right[2]) / (depth * tanH);
+      const y = (dx * a.up[0] + dy * a.up[1] + dz * a.up[2]) / (depth * tanV);
+      if (Math.abs(x) <= 1 && Math.abs(y) <= 1) {
+        best2 = distance2;
+      }
+    }
+  }
+  return Math.sqrt(best2);
+}
+
+/**
+ * Gives the largest part of the frame height that one head fills, at the aspect of Cinematic
+ * mode. The part of a head at an edge counts only inside the frame.
+ *
+ * @param frame The camera.
+ * @param bodies The bodies of the animals.
+ * @returns The part, from 0 to 1.
+ */
+function largestHead(frame: Frame, bodies: readonly AnimalBody[]): number {
+  const a = axesOf(frame);
+  const tanV = Math.tan((frame.fov / 2) * DEG);
+  const tanH = tanV * CINEMA_ASPECT;
+  const [cx, cy, cz] = frame.position;
+  // The sphere of each head in front of the camera fills at most its bound of the height, so the
+  // largest bounds come first.
+  const order = bodies
+    .map((body) => {
+      const [hx, hy, hz] = body.headCenter;
+      const depth = (hx - cx) * a.forward[0] + (hy - cy) * a.forward[1] + (hz - cz) * a.forward[2];
+      const bound = body.headRadius / (Math.max(depth - body.headRadius, 1e-3) * tanV);
+      return { body, bound: depth + body.headRadius > 0 ? bound : 0 };
+    })
+    .toSorted((x, y) => y.bound - x.bound);
+  let best = 0;
+  for (const { body, bound } of order) {
+    if (bound <= best) {
+      break;
+    }
+    let x0 = Infinity;
+    let x1 = -Infinity;
+    let y0 = Infinity;
+    let y1 = -Infinity;
+    const p = body.head;
+    for (let i = 0; i < p.length; i += 3) {
+      const dx = (p[i] ?? 0) - cx;
+      const dy = (p[i + 1] ?? 0) - cy;
+      const dz = (p[i + 2] ?? 0) - cz;
+      const d = dx * a.forward[0] + dy * a.forward[1] + dz * a.forward[2];
+      if (d <= 1e-3) {
+        continue;
+      }
+      const x = (dx * a.right[0] + dz * a.right[2]) / (d * tanH);
+      const y = (dx * a.up[0] + dy * a.up[1] + dz * a.up[2]) / (d * tanV);
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y);
+      y1 = Math.max(y1, y);
+    }
+    if (x1 >= -1 && x0 <= 1 && y1 >= -1 && y0 <= 1) {
+      best = Math.max(best, (Math.min(y1, 1) - Math.max(y0, -1)) / 2);
+    }
+  }
+  return best;
 }
 
 /**
@@ -510,6 +814,7 @@ function degrees(radians: number): string {
  * @param durationSec The song length.
  * @param kinds The elevations and the heights of each kind, which the function adds to.
  * @param extents The top of the head and the footprint of each player ({@link playerExtents}).
+ * @param bodies The body of each animal ({@link animalBodies}).
  * @returns The breaks.
  */
 export function checkPlan(
@@ -520,6 +825,7 @@ export function checkPlan(
   durationSec: number,
   kinds: Map<ShotKind, KindHeights>,
   extents: ReadonlyMap<number, PlayerExtent>,
+  bodies: readonly AnimalBody[],
 ): RuleBreak[] {
   const breaks: RuleBreak[] = [];
   const master = defaultView(layout.stageSide, CINEMA_ASPECT, 1).position;
@@ -532,12 +838,30 @@ export function checkPlan(
     const start = Math.max(0, shot.startSec);
     const end = Number.isFinite(shot.endSec) ? Math.min(shot.endSec, durationSec) : shot.moveEndSec;
     const subject = shotSubject(subjects, shot);
-    const heights = kinds.get(shot.kind) ?? { elevations: [], heights: [], widths: [] };
+    const heights = kinds.get(shot.kind) ?? { elevations: [], heights: [], widths: [], near: [] };
     kinds.set(shot.kind, heights);
     let worstLine = 0;
     let lookBreak: string | null = null;
+    let near: ShotNear = {
+      demo,
+      kind: shot.kind,
+      startSec: start,
+      timeSec: start,
+      distance: Infinity,
+      head: 0,
+    };
+    const measure = (time: number, frame: Frame): void => {
+      const distance = nearestAnimal(frame, bodies);
+      const head = Math.max(near.head, largestHead(frame, bodies));
+      near =
+        distance < near.distance ? { ...near, timeSec: time, distance, head } : { ...near, head };
+    };
+    // The end of the move is the closest moment of a push-in.
+    const closestAt = Math.min(moveTimes(shot)[1], end) - 1e-6;
+    measure(closestAt, frameAt(plan, closestAt));
     for (let t = start; t < end - 1e-9; t += SAMPLE_STEP) {
       const frame = frameAt(plan, t);
+      measure(t, frame);
       const toCamera = minus(frame.position, shot.target);
       heights.elevations.push(Math.asin(toCamera[1] / Math.hypot(...toCamera)) / DEG);
       heights.heights.push(frame.position[1]);
@@ -552,6 +876,7 @@ export function checkPlan(
         }
       }
     }
+    heights.near.push(near);
     if (worstLine > GRAMMAR.lineAzimuth) {
       add('line', start, shot.kind, `turn ${degrees(worstLine)}`);
     }
@@ -630,20 +955,31 @@ export function checkPlan(
 }
 
 /**
+ * Gives a percentile of numbers, with a linear blend between the two nearest ranks.
+ *
+ * @param values The numbers.
+ * @param share The percentile, from 0 to 1: 0.5 for the median.
+ * @returns The percentile, or 0 with no numbers.
+ */
+function percentile(values: readonly number[], share: number): number {
+  const sorted = values.toSorted((a, b) => a - b);
+  if (sorted.length === 0) {
+    return 0;
+  }
+  const at = share * (sorted.length - 1);
+  const low = sorted[Math.floor(at)] ?? 0;
+  const high = sorted[Math.ceil(at)] ?? 0;
+  return low + (high - low) * (at - Math.floor(at));
+}
+
+/**
  * Gives the median of numbers.
  *
  * @param values The numbers.
  * @returns The median, or 0 with no numbers.
  */
 function median(values: readonly number[]): number {
-  const sorted = values.toSorted((a, b) => a - b);
-  const n = sorted.length;
-  if (n === 0) {
-    return 0;
-  }
-  return n % 2 === 1
-    ? (sorted[(n - 1) / 2] ?? 0)
-    : ((sorted[n / 2 - 1] ?? 0) + (sorted[n / 2] ?? 0)) / 2;
+  return percentile(values, 0.5);
 }
 
 /**
@@ -672,11 +1008,17 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
     const subjects = shotSubjects.prepareSubjects(score, layout, models);
     shots[name] = plan.shots.length;
     const extents = playerExtents(layout, models, subjects);
-    breaks.push(...checkPlan(name, plan, layout, subjects, score.durationSec, kinds, extents));
+    const bodies = animalBodies(layout, models);
+    breaks.push(
+      ...checkPlan(name, plan, layout, subjects, score.durationSec, kinds, extents, bodies),
+    );
   }
 
   const summary: Record<string, KindSummary> = {};
+  const closest: ShotNear[] = [];
   for (const [kind, values] of kinds) {
+    const distances = values.near.map((n) => n.distance);
+    const heads = values.near.map((n) => n.head);
     summary[kind] = {
       samples: values.heights.length,
       medianElevation: median(values.elevations),
@@ -684,9 +1026,19 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
       medianHeight: median(values.heights),
       maxHeight: Math.max(...values.heights),
       medianWidth: median(values.widths),
+      shots: values.near.length,
+      minDistance: Math.min(...distances),
+      lowDistance: percentile(distances, 0.05),
+      medianDistance: median(distances),
+      maxHead: Math.max(...heads),
+      highHead: percentile(heads, 0.95),
+      medianHead: median(heads),
     };
+    closest.push(
+      ...values.near.toSorted((a, b) => a.distance - b.distance).slice(0, CLOSEST_SHOTS),
+    );
   }
-  return { breaks, shots, kinds: summary, headChecked: headBones !== null };
+  return { breaks, shots, kinds: summary, headChecked: headBones !== null, closest };
 }
 
 /** The options of `pnpm shot-trace --rules`. */
@@ -784,11 +1136,34 @@ export function rulesLines(
     }
   }
 
+  lines.push(
+    '',
+    '| Kind | Tree | Shots | Min distance m | 5% distance m | Median distance m | Max head | 95% head | Median head |',
+    '|---|---|---:|---:|---:|---:|---:|---:|---:|',
+  );
+  for (const kind of kinds) {
+    for (const [name, output] of outputs) {
+      const k = output.kinds[kind];
+      if (!k) {
+        continue;
+      }
+      lines.push(
+        `| ${kind} | ${name} | ${k.shots} | ${k.minDistance.toFixed(2)} | ${k.lowDistance.toFixed(2)} | ${k.medianDistance.toFixed(2)} | ${k.maxHead.toFixed(2)} | ${k.highHead.toFixed(2)} | ${k.medianHead.toFixed(2)} |`,
+      );
+    }
+  }
+
   if (list) {
     for (const [name, output] of outputs) {
       lines.push('', `Breaks of ${name}:`);
       for (const b of output.breaks) {
         lines.push(`  ${b.rule} ${b.demo} ${b.timeSec.toFixed(2)} s ${b.kinds}: ${b.detail}`);
+      }
+      lines.push('', `Shots of ${name} with the nearest animals, ${CLOSEST_SHOTS} of each kind:`);
+      for (const n of output.closest) {
+        lines.push(
+          `  ${n.kind} ${n.demo} ${n.startSec.toFixed(2)} s: ${n.distance.toFixed(2)} m at ${n.timeSec.toFixed(2)} s, head ${n.head.toFixed(2)}`,
+        );
       }
     }
   }
