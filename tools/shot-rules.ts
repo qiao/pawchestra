@@ -25,9 +25,10 @@
  * For each shot, the tool also measures the nearest animal: the distance from the camera to the
  * nearest point of an animal body in the frame, and the largest part of the frame height that
  * one head fills. A head or a body of the dirty frame counts. The samples of a shot include the
- * end of its move, the closest moment of a push-in. The table gives the minimum, the 5th
- * percentile, and the median distance of each kind of shot, and the largest, the 95th
- * percentile, and the median head part.
+ * end of its move, the closest moment of a push-in, and {@link BLEND_SAMPLES} samples of the
+ * blend into it. The table gives the minimum, the 5th percentile, and the median distance of each
+ * kind of shot, and the largest, the 95th percentile, and the median head part. Its row `blend`
+ * gives the nearest animal of the blend samples alone, one value for each blend.
  *
  * Usage: pnpm shot-trace --rules [--demo <id>]... [--base <ref>] [--list] [--json <file>]
  */
@@ -87,6 +88,12 @@ export const GRAMMAR = {
 /** The step of the song time between two samples of the camera, in seconds. */
 export const SAMPLE_STEP = 0.25;
 
+/**
+ * The number of parts of a blend between two samples of the nearest animal: 32, twice as many as
+ * the samples of the floor test of the planner (`NEAR_SAMPLES` of `src/shots/prepare.ts`).
+ */
+const BLEND_SAMPLES = 32;
+
 /** A rule of film grammar that the tool checks. */
 export type GrammarRule = 'line' | 'look' | 'jump' | 'motion' | 'room' | 'headroom' | 'head';
 
@@ -128,6 +135,8 @@ export interface KindHeights {
   readonly widths: number[];
   /** The nearest animal of each shot. */
   readonly near: ShotNear[];
+  /** The nearest animal of the blend into each shot with a blend ({@link RulesOutput.blends}). */
+  readonly blends: ShotNear[];
 }
 
 /** The nearest animal of one shot. */
@@ -158,6 +167,11 @@ export interface RulesOutput {
   readonly headChecked: boolean;
   /** The {@link CLOSEST_SHOTS} shots of each kind with the nearest animals, nearest first. */
   readonly closest: readonly ShotNear[];
+  /**
+   * The nearest animal of the blend into each shot with a blend, from its samples alone. The kind
+   * is the kind of the shot after the blend.
+   */
+  readonly blends: readonly ShotNear[];
 }
 
 /** The number of shots of each kind with the nearest animals that `--list` gives. */
@@ -838,7 +852,13 @@ export function checkPlan(
     const start = Math.max(0, shot.startSec);
     const end = Number.isFinite(shot.endSec) ? Math.min(shot.endSec, durationSec) : shot.moveEndSec;
     const subject = shotSubject(subjects, shot);
-    const heights = kinds.get(shot.kind) ?? { elevations: [], heights: [], widths: [], near: [] };
+    const heights = kinds.get(shot.kind) ?? {
+      elevations: [],
+      heights: [],
+      widths: [],
+      near: [],
+      blends: [],
+    };
     kinds.set(shot.kind, heights);
     let worstLine = 0;
     let lookBreak: string | null = null;
@@ -850,15 +870,34 @@ export function checkPlan(
       distance: Infinity,
       head: 0,
     };
-    const measure = (time: number, frame: Frame): void => {
+    // Adds the nearest animal of one sample to a measure.
+    const nearer = (into: ShotNear, time: number, frame: Frame): ShotNear => {
       const distance = nearestAnimal(frame, bodies);
-      const head = Math.max(near.head, largestHead(frame, bodies));
-      near =
-        distance < near.distance ? { ...near, timeSec: time, distance, head } : { ...near, head };
+      const head = Math.max(into.head, largestHead(frame, bodies));
+      return distance < into.distance
+        ? { ...into, timeSec: time, distance, head }
+        : { ...into, head };
+    };
+    const measure = (time: number, frame: Frame): void => {
+      near = nearer(near, time, frame);
     };
     // The end of the move is the closest moment of a push-in.
     const closestAt = Math.min(moveTimes(shot)[1], end) - 1e-6;
     measure(closestAt, frameAt(plan, closestAt));
+    if (shot.blendSec > 0) {
+      // The camera of the blend moves from the end of the previous shot, so it can pass nearer
+      // to an animal than both shots.
+      let blend: ShotNear = { ...near, timeSec: start, distance: Infinity, head: 0 };
+      for (let k = 0; k <= BLEND_SAMPLES; k++) {
+        const t = shot.startSec + (shot.blendSec * k) / BLEND_SAMPLES;
+        blend = nearer(blend, t, frameAt(plan, Math.min(t, end - 1e-6)));
+      }
+      heights.blends.push(blend);
+      near =
+        blend.distance < near.distance
+          ? { ...blend, head: Math.max(near.head, blend.head) }
+          : { ...near, head: Math.max(near.head, blend.head) };
+    }
     for (let t = start; t < end - 1e-9; t += SAMPLE_STEP) {
       const frame = frameAt(plan, t);
       measure(t, frame);
@@ -1016,6 +1055,9 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
 
   const summary: Record<string, KindSummary> = {};
   const closest: ShotNear[] = [];
+  const blends = [...kinds.values()]
+    .flatMap((values) => values.blends)
+    .toSorted((a, b) => a.distance - b.distance);
   for (const [kind, values] of kinds) {
     const distances = values.near.map((n) => n.distance);
     const heads = values.near.map((n) => n.head);
@@ -1038,7 +1080,7 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
       ...values.near.toSorted((a, b) => a.distance - b.distance).slice(0, CLOSEST_SHOTS),
     );
   }
-  return { breaks, shots, kinds: summary, headChecked: headBones !== null, closest };
+  return { breaks, shots, kinds: summary, headChecked: headBones !== null, closest, blends };
 }
 
 /** The options of `pnpm shot-trace --rules`. */
@@ -1152,6 +1194,16 @@ export function rulesLines(
       );
     }
   }
+  for (const [name, output] of outputs) {
+    const distances = output.blends.map((n) => n.distance);
+    const heads = output.blends.map((n) => n.head);
+    if (distances.length === 0) {
+      continue;
+    }
+    lines.push(
+      `| blend | ${name} | ${distances.length} | ${Math.min(...distances).toFixed(2)} | ${percentile(distances, 0.05).toFixed(2)} | ${median(distances).toFixed(2)} | ${Math.max(...heads).toFixed(2)} | ${percentile(heads, 0.95).toFixed(2)} | ${median(heads).toFixed(2)} |`,
+    );
+  }
 
   if (list) {
     for (const [name, output] of outputs) {
@@ -1160,11 +1212,11 @@ export function rulesLines(
         lines.push(`  ${b.rule} ${b.demo} ${b.timeSec.toFixed(2)} s ${b.kinds}: ${b.detail}`);
       }
       lines.push('', `Shots of ${name} with the nearest animals, ${CLOSEST_SHOTS} of each kind:`);
-      for (const n of output.closest) {
-        lines.push(
-          `  ${n.kind} ${n.demo} ${n.startSec.toFixed(2)} s: ${n.distance.toFixed(2)} m at ${n.timeSec.toFixed(2)} s, head ${n.head.toFixed(2)}`,
-        );
-      }
+      const nearLine = (n: ShotNear): string =>
+        `  ${n.kind} ${n.demo} ${n.startSec.toFixed(2)} s: ${n.distance.toFixed(2)} m at ${n.timeSec.toFixed(2)} s, head ${n.head.toFixed(2)}`;
+      lines.push(...output.closest.map(nearLine));
+      lines.push('', `Blends of ${name} with the nearest animals:`);
+      lines.push(...output.blends.slice(0, CLOSEST_SHOTS).map(nearLine));
     }
   }
   return lines;
