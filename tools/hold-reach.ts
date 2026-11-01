@@ -76,7 +76,7 @@ export type ReachSupport = 'chair' | 'stand';
  * The total lengths of the smallest and the largest violin of the size chart of a violin teacher,
  * in meters.
  */
-const REAL_VIOLINS = { smallest: 0.33, largest: 0.59 } as const;
+export const REAL_VIOLINS = { smallest: 0.33, largest: 0.59 } as const;
 
 /** The reach of the arms of a player against its instrument under the chin, in meters. */
 export interface HoldReach {
