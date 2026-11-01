@@ -22,11 +22,11 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
 | panda | The mesh with the rule weights. | `trombonist` |
 | hippo | Longer rebuilt arms with a seam cut and a side wall (`hippo_arms.py`), smoothed arm tubes (`armSmooth`), smaller pea eyes. Stands at the contrabass. | `bassist` |
-| mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
+| mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind (design 4.4), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
 | pig | A copy with round upper arms free of the trunk (`pig-arms.glb`), a twist bone of each upper arm (`upperTwist`), a horn turned back toward the body. | `hornist` |
-| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind (design 4.4): straight bind arms with the elbow axes of a forward bend (`straightArms`, `bindArms`), and bind paws supinated to the middle of the clarinet and violin twists (`bindSupination`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
+| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind (design 4.4). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Longer arms, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), a bind elbow bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
@@ -201,8 +201,8 @@ Read the group of your work before you plan it.
   A pose can give a paw its own turn (`pawTurnL`, `pawKeepR`).
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist. Supinate
   the bind paw by about half of the play twist (`studio.bindSupination`), also with straight bind
-  arms: with no supination, the left violin paw flips at 180°. A body with two roles takes the
-  middle of their play twists.
+  arms: with no supination, the left violin paw flips at 180°. A role-neutral body takes the value
+  of design 4.4 from the signed twists of all cast roles.
 - `twistAngle()` flips when the paw turn passes 180°. Lower the twist of the hold, or move its zero
   with the bind paw. Carry no value from the last frame.
 - A turn of the bind forearm about the upper arm (`studio.bindArms`) moves the zero of the paw twist
