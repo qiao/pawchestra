@@ -80,48 +80,38 @@ export const FRAME_MARGINS = {
 const FIT_PASSES = 3;
 
 /**
- * The place of a point in the view of a camera, relative to the target: the offset to the right
- * and up, and the offset of the depth, in meters.
+ * The view offsets of the points of one fit ({@link writeOffsets}): for each point, the offset to
+ * the right, the offset up, and the depth less the depth of the target. Each call of
+ * {@link frameHalfHeight} writes the offsets that it reads, so the buffer holds no state. A plan
+ * fits the frame of each new camera of a close subject, so new objects for the offsets cost time.
  */
-interface ViewOffset {
-  /** The offset to the right. */
-  readonly right: number;
-  /** The offset up, in the frame of a camera that looks at the target. */
-  readonly up: number;
-  /** The depth less the depth of the target: below 0 nearer to the camera. */
-  readonly depth: number;
-}
+let offsets = new Float64Array(3 * 64);
+
+/** The cosine and the sine of the azimuth, and the cosine and the sine of the elevation. */
+type CameraTurn = readonly [cos: number, sin: number, ce: number, se: number];
 
 /**
- * Gives the view offsets of points for a camera at an azimuth and an elevation around a target.
+ * Writes the view offsets of points for a camera at an azimuth and an elevation around a target
+ * into {@link offsets}: the offset to the right and up, in the frame of a camera that looks at the
+ * target, and the depth less the depth of the target, below 0 nearer to the camera.
  *
  * @param points The points.
  * @param target The target.
- * @param azimuth The azimuth of the camera, in radians.
- * @param elevation The elevation of the camera, in radians.
- * @returns The offset of each point.
+ * @param turn The turn of the camera.
+ * @param at The index of the first point in {@link offsets}.
  */
-function viewOffsets(
-  points: readonly Vec3[],
-  target: Vec3,
-  azimuth: number,
-  elevation: number,
-): ViewOffset[] {
-  const cos = Math.cos(azimuth);
-  const sin = Math.sin(azimuth);
-  const ce = Math.cos(elevation);
-  const se = Math.sin(elevation);
-  return points.map((p) => {
+function writeOffsets(points: readonly Vec3[], target: Vec3, turn: CameraTurn, at: number): void {
+  const [cos, sin, ce, se] = turn;
+  for (const [i, p] of points.entries()) {
     const dx = p[0] - target[0];
     const dy = p[1] - target[1];
     const dz = p[2] - target[2];
     const toward = dx * sin + dz * cos;
-    return {
-      right: dx * cos - dz * sin,
-      up: dy * ce - toward * se,
-      depth: -(toward * ce + dy * se),
-    };
-  });
+    const k = 3 * (at + i);
+    offsets[k] = dx * cos - dz * sin;
+    offsets[k + 1] = dy * ce - toward * se;
+    offsets[k + 2] = -(toward * ce + dy * se);
+  }
 }
 
 /**
@@ -173,11 +163,28 @@ export function frameHalfHeight(
   const margins = FRAME_MARGINS;
   const line = FILM_GRAMMAR.thirdLine;
   const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
-  const { target, reach, eyes } = subject;
-  const outline = viewOffsets(subject.outline, target, azimuth, elevation);
-  const [eye] = eyes ? viewOffsets([eyes], target, azimuth, elevation) : [];
-  const tops = eye ? viewOffsets(subject.tops, target, azimuth, elevation) : [];
-  const lows = eye ? viewOffsets(subject.lows, target, azimuth, elevation) : [];
+  const { target, reach, eyes, outline, tops, lows } = subject;
+  const turn: CameraTurn = [
+    Math.cos(azimuth),
+    Math.sin(azimuth),
+    Math.cos(elevation),
+    Math.sin(elevation),
+  ];
+  // The offsets of the outline, then of the eyes, the tops of the heads, and the low points.
+  const eyeAt = outline.length;
+  const topsEnd = eyeAt + 1 + (eyes ? tops.length : 0);
+  const lowsEnd = topsEnd + (eyes ? lows.length : 0);
+  if (offsets.length < 3 * lowsEnd) {
+    offsets = new Float64Array(6 * lowsEnd);
+  }
+  writeOffsets(outline, target, turn, 0);
+  if (eyes) {
+    writeOffsets([eyes], target, turn, eyeAt);
+    writeOffsets(tops, target, turn, eyeAt + 1);
+    writeOffsets(lows, target, turn, topsEnd);
+  }
+  const up = (i: number): number => offsets[3 * i + 1] ?? 0;
+  const depth = (i: number): number => offsets[3 * i + 2] ?? 0;
   const x0 = third * line;
   const room = 1 - margins.side;
   let half = 0;
@@ -185,10 +192,11 @@ export function frameHalfHeight(
   for (let pass = 0; pass < FIT_PASSES; pass++) {
     const near = distance * zoom;
     let [low, high] = [Infinity, -Infinity];
-    for (const p of outline) {
-      const close = depthScale(p.depth, near);
-      low = Math.min(low, (p.right - reach) * close);
-      high = Math.max(high, (p.right + reach) * close);
+    for (let i = 0; i < eyeAt; i++) {
+      const right = offsets[3 * i] ?? 0;
+      const close = depthScale(depth(i), near);
+      low = Math.min(low, (right - reach) * close);
+      high = Math.max(high, (right + reach) * close);
     }
     // At the closest zoom, half the width of the frame at the target is `width × zoom`.
     let width = (high - low) / (2 * size.share * zoom);
@@ -197,14 +205,14 @@ export function frameHalfHeight(
     }
 
     let tall = 0;
-    if (eye) {
-      const eyeUp = eye.up * depthScale(eye.depth, near);
-      for (const p of tops) {
-        const above = p.up * depthScale(p.depth, near) - eyeUp;
+    if (eyes) {
+      const eyeUp = up(eyeAt) * depthScale(depth(eyeAt), near);
+      for (let i = eyeAt + 1; i < topsEnd; i++) {
+        const above = up(i) * depthScale(depth(i), near) - eyeUp;
         tall = Math.max(tall, above / ((1 - line - margins.top) * zoom));
       }
-      for (const p of lows) {
-        const below = eyeUp - p.up * depthScale(p.depth, near);
+      for (let i = topsEnd; i < lowsEnd; i++) {
+        const below = eyeUp - up(i) * depthScale(depth(i), near);
         tall = Math.max(tall, below / ((1 + line - margins.bottom) * zoom));
       }
     }
