@@ -173,6 +173,10 @@ module task ─> probe of WebGL2 ─> renderer ─> app and fetch ─> slices of
   capture render in steps, with a fence wait at the end of each, because an upload waits on the
   main thread while the GPU is busy. One draw of each player geometry on a warm layer uploads its
   buffers and builds its morph texture. The first frame thus compiles and uploads nothing new.
+- **Restore.** A restored WebGL context makes the environment, the bake, and the capture again
+  (`StageScene.restoreSteps()`), in slices after the build before it. WebGL changes the status of
+  a fence or of a parallel compile only between two tasks. Thus `runAll()` cannot run a step that
+  waits for the GPU, because its wait never ends in one task.
 - **Start.** One probe context gives WebGL2 and the target format (`probeWebgl2()`). The probe
   and the renderer start in later tasks, and the first canvas size comes from a
   `ResizeObserver`, so no read forces the layout of the page.

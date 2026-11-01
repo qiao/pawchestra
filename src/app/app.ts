@@ -388,7 +388,24 @@ export class App {
       document.addEventListener(name, keepPageScale, { passive: false });
     }
     this.#listenForMotion(canvas);
+    // The renderer made its listener first, so it makes its own state again before the steps.
+    canvas.addEventListener('webglcontextrestored', () => {
+      this.#restoreScene();
+    });
     this.#applySettings();
+  }
+
+  /**
+   * Makes the maps of the 3D scene again after a restored WebGL context
+   * (`StageScene.restoreSteps()`), in slices of the main thread after the build before it (design
+   * 7.2). The steps wait for the GPU, and WebGL gives the end of a wait only in a later task, so
+   * one task cannot run them.
+   */
+  #restoreScene(): void {
+    const steps = this.#scene.restoreSteps();
+    const run = this.#lastBuild.then(async () => runSliced(steps, () => true));
+    this.#lastBuild = run.catch(() => null);
+    run.catch(reportError);
   }
 
   /**

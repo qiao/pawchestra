@@ -15,7 +15,9 @@ export type StepYield = undefined | 'wait';
 export type Steps<T> = Generator<StepYield, T, undefined>;
 
 /**
- * Runs all steps of a calculation at once.
+ * Runs all steps of a calculation at once. It cannot run a step that yields `wait`: WebGL changes
+ * the status of a fence or of a parallel compile only between two tasks, so that wait never ends
+ * in one task (design 7.2).
  *
  * @param steps The steps.
  * @returns The result of the last step.

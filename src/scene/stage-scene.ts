@@ -34,7 +34,6 @@ import type { CameraPose } from '../shots/types.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import { buildSceneProps } from '../models/props.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
-import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import { StageCamera } from './camera.ts';
 import { disposeTree } from './dispose.ts';
@@ -437,11 +436,6 @@ export class StageScene {
     this.#renderer.setOpaqueSort(this.#variants.opaqueSort);
     this.#exposure = this.#renderer.toneMappingExposure;
     this.#pmrem = new PMREMGenerator(this.#renderer);
-    // The renderer listens first, and makes its state again. The PMREM of the environment is
-    // rendered one time, so a lost context loses its content.
-    canvas.addEventListener('webglcontextrestored', () => {
-      this.#restoreEnvironment();
-    });
     this.#postFormat = targetFormatOf(this.#renderer);
   }
 
@@ -1196,51 +1190,58 @@ export class StageScene {
 
   /**
    * Makes the environment of the reflections, the bake of the static props, and the captured
-   * environment again after a restored WebGL context.
+   * environment of the shown layout again after a restored WebGL context, in steps (design 7.2).
+   * The PMREM of the environment, the bake, and the capture render one time, so a lost context
+   * loses their content. The renderer makes its own state again in its listener of the restore.
+   * The steps wait for the GPU, and WebGL changes the status of a fence or of a parallel compile
+   * only between two tasks, so `runAll()` cannot run them: the app runs them in slices.
+   *
+   * @returns The steps.
    */
-  #restoreEnvironment(): void {
+  *restoreSteps(): Steps<undefined> {
     // The generator of the lost context holds no valid target, so a new one makes the maps.
     this.#pmrem.dispose();
     this.#pmrem = new PMREMGenerator(this.#renderer);
     this.#environment?.dispose();
     this.#environment = null;
-    if (!this.#view) {
-      return;
+    const view = this.#view;
+    if (!view) {
+      return undefined;
     }
-    const environment = runAll(
-      createEnvironmentSteps(this.#renderer, this.#pmrem, this.#compileTarget),
+
+    const environment = yield* createEnvironmentSteps(
+      this.#renderer,
+      this.#pmrem,
+      this.#compileTarget,
     );
     this.#environment = environment;
-    this.#view.scene.environment = environment.texture;
-    const bake = this.#view?.bake;
-    if (this.#view && bake) {
+    view.scene.environment = environment.texture;
+    const bake = view.bake;
+    if (bake) {
       bake.target.dispose();
-      const { target } = runAll(
-        this.#bakeSteps(
-          this.#view.scene,
-          bake.stageSide,
-          bake.stage,
-          bake.props,
-          bake.uniforms,
-          null,
-        ),
+      const { target } = yield* this.#bakeSteps(
+        view.scene,
+        bake.stageSide,
+        bake.stage,
+        bake.props,
+        bake.uniforms,
+        null,
       );
       bake.target = target;
     }
-    const capture = this.#view?.capture;
-    if (this.#view && capture) {
+    const capture = view.capture;
+    if (capture) {
       capture.target.dispose();
-      const { target } = runAll(
-        this.#captureSteps(
-          this.#view.scene,
-          capture.hall,
-          capture.stageSide,
-          capture.options,
-          null,
-        ),
+      const { target } = yield* this.#captureSteps(
+        view.scene,
+        capture.hall,
+        capture.stageSide,
+        capture.options,
+        null,
       );
       capture.target = target;
     }
+    return undefined;
   }
 
   #disposeView(): void {
