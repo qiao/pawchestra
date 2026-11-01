@@ -1,9 +1,12 @@
 /**
  * Renders the frozen shots of the stage and compares the pixels of two trees (design 9.7):
- * `pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--tree <dir>]`. A frozen shot holds
- * the song time and the wall time, so that two runs of one tree give the same pixels. A cut of the
- * frame time that must keep the look runs `pnpm frozen --base main` (`docs/agents/commands.md`).
- * `--tree` renders another folder in place of the working tree.
+ * `pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--tree <dir>] [--canvas-only]`. A
+ * frozen shot holds the song time and the wall time, so that two runs of one tree give the same
+ * pixels. A cut of the frame time that must keep the look runs `pnpm frozen --base main`
+ * (`docs/agents/commands.md`). `--tree` renders another folder in place of the working tree.
+ * `--canvas-only` hides the parts of the page over the canvas before each shot, so that a shot
+ * holds only the pixels of the canvas. A refactor check against the base of a round with a
+ * planned change of the UI then shows only the changes of the scene.
  *
  * The tool serves the working tree with the Vite dev server, opens each shot in Google Chrome at
  * 1440 × 900 and the device scale 2, and writes `<out>/tree/<shot>.png`. With `--base`, it
@@ -74,6 +77,14 @@ const FREEZE = `(() => {
   window.requestAnimationFrame = (cb) => request((t) => cb(frozen ?? t));
 })();`;
 
+/**
+ * The style of `--canvas-only`: it hides each part of the page over the canvas, such as the
+ * title, the bar, and the drawer. The opacity hides each part with all its children, and it keeps
+ * the layout. Thus the app keeps the frame of the camera that the first screen and the drawer
+ * give. The letterbox is a part of the canvas, so it stays.
+ */
+const CANVAS_ONLY = 'body > :not(#stage) { opacity: 0 !important; transition: none !important; }';
+
 /** The command line of the tool. */
 export interface FrozenArgs {
   /** The commit, the branch, or the tag to compare with the working tree, or `null`. */
@@ -87,6 +98,8 @@ export interface FrozenArgs {
    * `null`. `pnpm frame-compare` renders its temporary trees with it.
    */
   readonly tree: string | null;
+  /** True with `--canvas-only`: each shot hides the parts of the page over the canvas. */
+  readonly canvasOnly: boolean;
 }
 
 /**
@@ -113,7 +126,8 @@ export function frozenArgs(args: readonly string[]): FrozenArgs {
   const tree = optionValue(args, '--tree');
   if (base === undefined || shots === undefined || out === undefined || tree === undefined) {
     throw new Error(
-      'Usage: pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--tree <dir>]',
+      'Usage: pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--tree <dir>] ' +
+        '[--canvas-only]',
     );
   }
   const names = shots === null ? [...SHOT_NAMES] : shots.split(',');
@@ -126,7 +140,20 @@ export function frozenArgs(args: readonly string[]): FrozenArgs {
     shots: names.filter((name) => isShot(name)),
     out: resolve(out ?? join(ROOT, 'scratch', 'frozen')),
     tree: tree === null ? null : resolve(tree),
+    canvasOnly: args.includes('--canvas-only'),
   };
+}
+
+/** The options of {@link renderShots}. */
+interface RenderOptions {
+  /** True to hide the parts of the page over the canvas before each shot. */
+  readonly canvasOnly: boolean;
+  /**
+   * The cache folder of Vite, or `undefined` for the cache of the tree. A temporary tree gets its
+   * own, so that it does not write the cache of the repository through its link to
+   * `node_modules`.
+   */
+  readonly cacheDir?: string;
 }
 
 /**
@@ -137,15 +164,14 @@ export function frozenArgs(args: readonly string[]): FrozenArgs {
  * @param root The root of the tree, with a `node_modules` folder.
  * @param out The folder of the PNG files.
  * @param shots The shots.
- * @param cacheDir The cache folder of Vite. A temporary tree gets its own, so that it does not
- *   write the cache of the repository through its link to `node_modules`.
+ * @param options The canvas-only flag and the cache folder of Vite.
  */
 async function renderShots(
   browser: Browser,
   root: string,
   out: string,
   shots: readonly FrozenShot[],
-  cacheDir?: string,
+  options: RenderOptions,
 ): Promise<void> {
   await mkdir(out, { recursive: true });
   const config: InlineConfig = {
@@ -154,8 +180,8 @@ async function renderShots(
     logLevel: 'error',
     server: { port: PORT, strictPort: false },
   };
-  if (cacheDir) {
-    config.cacheDir = cacheDir;
+  if (options.cacheDir) {
+    config.cacheDir = options.cacheDir;
   }
   const server = await createServer(config);
   await server.listen();
@@ -205,6 +231,10 @@ async function renderShots(
         await page.evaluate('window.freezeTime()');
         await page.mouse.move(0, 0);
         await page.waitForTimeout(4000);
+        if (options.canvasOnly) {
+          await page.addStyleTag({ content: CANVAS_ONLY });
+          await page.waitForTimeout(300);
+        }
         await writeFile(join(out, `${name}.png`), await page.screenshot({ type: 'png' }));
         const song = await page.evaluate(() => window.zoophony?.songTime ?? Number.NaN);
         console.log(`${relative(ROOT, join(out, `${name}.png`))}: song time ${song.toFixed(2)} s`);
@@ -328,10 +358,14 @@ async function main(): Promise<void> {
   const browser = await chromium.launch({ channel: 'chrome', args: chromiumArgs('darwin') });
   try {
     const tree = join(args.out, 'tree');
+    const { canvasOnly } = args;
     if (args.tree === null) {
-      await renderShots(browser, ROOT, tree, args.shots);
+      await renderShots(browser, ROOT, tree, args.shots, { canvasOnly });
     } else {
-      await renderShots(browser, args.tree, tree, args.shots, join(args.tree, '.vite-cache'));
+      await renderShots(browser, args.tree, tree, args.shots, {
+        canvasOnly,
+        cacheDir: join(args.tree, '.vite-cache'),
+      });
     }
     if (args.base === null) {
       return;
@@ -344,7 +378,10 @@ async function main(): Promise<void> {
       async (dir) => {
         symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'dir');
         await writeAssets(dir);
-        await renderShots(browser, dir, baseDir, args.shots, join(dir, '.vite-cache'));
+        await renderShots(browser, dir, baseDir, args.shots, {
+          canvasOnly,
+          cacheDir: join(dir, '.vite-cache'),
+        });
       },
       { prefix: 'frozen-' },
     );
