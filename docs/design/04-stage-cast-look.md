@@ -308,7 +308,9 @@ gate keys the bind of each body (the bind heads of the arm bones, the palms, and
 When the key differs from the base, these lines take only their limits, and `REBIND` marks a line
 that the margin alone fails. The gate then compares the elbow and wrist ring widths in meters,
 because the flat share counts from the bind ring. A body with the same bind keeps the margin, so a
-round that keeps the binds stays as strict as before.
+round that keeps the binds stays as strict as before. A rebind must keep the pose of the bones, so
+`pnpm arm-check --world --base` compares the posed arm joints and palms of the two trees at the
+samples of the gate.
 
 ```typescript
 /** The bind frames of the grip of one arm (`tools/arm-check.ts`). */
