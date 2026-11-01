@@ -31,7 +31,7 @@ import type { SideMove } from '../src/pose/side-move.ts';
 import type { Fingering } from '../src/pose/wind-notes.ts';
 import { IDENTITY } from '../src/models/tuples.ts';
 import type { Quat } from '../src/models/tuples.ts';
-import { SPECIES_WIND_HOLDS, holdTurn } from '../src/pose/winds.ts';
+import { SPECIES_WIND_HOLDS, WIND_HOLDS, holdTurn } from '../src/pose/winds.ts';
 import type { FreePaw } from '../src/pose/winds.ts';
 
 /**
@@ -60,9 +60,11 @@ const OWN_HOLDS = Object.fromEntries(
  * (`SpeciesParams.cymbalForm`), and `cymbals` the hold of the hand cymbals. `choir` changes the
  * hold of the flippers of a singer (`CHOIR_HOLD`), `choirMotion` the opening of the beak and the
  * lift of the head of a singer (`CHOIR_MOTION`), and `folder` the place of the choir folder
- * (`CHOIR_FOLDER`).
+ * (`CHOIR_FOLDER`). The name of a wind instrument, such as `flute`, changes its shared hold
+ * (`WIND_HOLDS`), which each recast species plays.
  */
 const HOLDS = {
+  ...WIND_HOLDS,
   piano: HANDS_HOLDS.piano,
   harp: HANDS_HOLDS.harp,
   violin: BOWED_HOLDS.violin,
