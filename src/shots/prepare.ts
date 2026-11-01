@@ -1057,6 +1057,39 @@ function moveForeground(
 }
 
 /**
+ * Gives the bodies near the cameras of a path, each with only its near parts. A body or a part
+ * whose sphere stays farther than `ANIMAL_FLOOR` from a sphere around the cameras is far from
+ * each camera of the path, so its points need no test.
+ *
+ * @param planner The planner.
+ * @param cameras The cameras of the path. There is at least one.
+ * @returns The near bodies.
+ */
+function nearBodies(planner: Planner, cameras: readonly Vec3[]): StageBody[] {
+  const first = cameras[0] ?? [0, 0, 0];
+  const middle = mixPoints(first, cameras.at(-1) ?? first, 0.5);
+  const path = Math.max(
+    ...cameras.map((c) => Math.hypot(c[0] - middle[0], c[1] - middle[1], c[2] - middle[2])),
+  );
+  const nearMiddle = (center: Vec3, radius: number): boolean => {
+    const dx = center[0] - middle[0];
+    const dy = center[1] - middle[1];
+    const dz = center[2] - middle[2];
+    return dx * dx + dy * dy + dz * dz < (ANIMAL_FLOOR + radius + path) ** 2;
+  };
+  const near: StageBody[] = [];
+  for (const body of planner.bodies) {
+    const parts = nearMiddle(body.center, body.radius)
+      ? body.parts.filter((part) => nearMiddle(part.center, part.radius))
+      : [];
+    if (parts.length > 0) {
+      near.push({ ...body, parts });
+    }
+  }
+  return near;
+}
+
+/**
  * Tells if an animal in the frame of a close move comes nearer to the camera than
  * `ANIMAL_FLOOR`, at each of {@link NEAR_SAMPLES}, in the frame of its composition (design 5.6).
  * Only the bodies near the path of the camera need the test of each sample.
@@ -1081,27 +1114,7 @@ function moveNear(
   const cameras = keys.map((key) =>
     keyPosition(planner.stageSide, subject.target, halfHeight, key, CINEMA_ASPECT),
   );
-  // A sphere around the cameras of the move: its middle and its radius. A body or a part whose
-  // sphere stays farther than the floor from this sphere is far from each camera of the move.
-  const middle = mixPoints(cameras[0] ?? subject.target, cameras.at(-1) ?? subject.target, 0.5);
-  const path = Math.max(
-    ...cameras.map((c) => Math.hypot(c[0] - middle[0], c[1] - middle[1], c[2] - middle[2])),
-  );
-  const nearMiddle = (center: Vec3, radius: number): boolean => {
-    const dx = center[0] - middle[0];
-    const dy = center[1] - middle[1];
-    const dz = center[2] - middle[2];
-    return dx * dx + dy * dy + dz * dz < (ANIMAL_FLOOR + radius + path) ** 2;
-  };
-  const near: StageBody[] = [];
-  for (const body of planner.bodies) {
-    const parts = nearMiddle(body.center, body.radius)
-      ? body.parts.filter((part) => nearMiddle(part.center, part.radius))
-      : [];
-    if (parts.length > 0) {
-      near.push({ ...body, parts });
-    }
-  }
+  const near = nearBodies(planner, cameras);
   if (near.length === 0) {
     return false;
   }
