@@ -285,6 +285,19 @@ passes.
       supination at the middle of the play twists of their roles, one body at a time. The wolf
       has it. The bodies with only a bent `bindArms` cost least: start with the mouse, whose arms
       come from `wind_arms.py` as the arms of the wolf.
+- [ ] Wolf role-neutral bind: the bent elbows are narrower in meters than with the bent bind. The
+      left elbow ring of the clarinetist at rest is 3.1 cm in place of 3.8 cm (flat p5 0.78 in
+      place of 0.94), and the forearms go 0.6 cm into the body at rest in place of 0.5 cm. The 2x
+      crops show no slit or flap. Fit a `raise` shape of each bent elbow against both roles, as
+      the bear has, if a later crop shows a pinched elbow.
+- [ ] Wolf bind supination: the left value 100° is the middle of the clarinet and the violin only.
+      The snare drum recast (`snare-drummer@wolf`) then twists the left paw 171° (limit 170°) and
+      the left forearm 80° (limit 80°), in place of 142° and 65° with 66°. Choose the value from
+      the twists of all roles of the cast matrix.
+- [ ] Arm gate: `--base` across a change of the bind fails the lines that count from the bind
+      (paw twist, paw swing, forearm twist, move twist, flat) with the same world pose. Measure
+      them in a frame that no bind moves, as the grip turn does, or mark them `OPEN` when the bind
+      of the body changes.
 - [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
       folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
       `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
