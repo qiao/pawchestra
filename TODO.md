@@ -288,8 +288,11 @@ passes.
 - [ ] Wolf role-neutral bind: the bent elbows are narrower in meters than with the bent bind. The
       left elbow ring of the clarinetist at rest is 3.1 cm in place of 3.8 cm (flat p5 0.78 in
       place of 0.94), and the forearms go 0.6 cm into the body at rest in place of 0.5 cm. The 2x
-      crops show no slit or flap. Fit a `raise` shape of each bent elbow against both roles, as
-      the bear has, if a later crop shows a pinched elbow.
+      crops show no slit or flap. Two `raise` shapes of each bent elbow (`pnpm raise-fit`, fade 20°
+      to 40°) did not bring the ring to 3.6 cm: a valley fill gave 3.05 cm left and 3.45 cm right
+      (p5, against 3.04 and 3.38), and a follow of the first upper arm segment gave 3.15 and 3.54.
+      Both added a left fold (folds p95 5, base 2). A shape that only relaxes or fills cannot give
+      back the lost width: try weights or a helper bone at the inner elbow.
 - [ ] Wolf bind supination: the left value 100° is the middle of the clarinet and the violin only.
       The snare drum recast (`snare-drummer@wolf`) then twists the left paw 171° (limit 170°) and
       the left forearm 80° (limit 80°), in place of 142° and 65° with 66°. Choose the value from
