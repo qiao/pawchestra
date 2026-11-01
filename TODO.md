@@ -285,10 +285,6 @@ passes.
       supination of the rule, one body at a time. The wolf and the mouse have it. The bear has
       straight bind arms and needs only the supination. Then the bodies with arm segments and a
       bent `bindArms`: the elephant, the hippo, the rhino, and the deer.
-- [ ] Bind supination rule (design 4.4): save the probe of the signed paw twists of the cast roles
-      as a tool, so that each body move gets its value in one run. The round used scratch probes
-      (`reports/2026-11-01-elbow-mouse/probes/`). It needs the recast setup of `measurePair()` of
-      `tools/cast-matrix.ts` as an export.
 - [ ] Neutral bind elbows: the bent elbows are narrower in meters than with the bent bind. The
       elbow ring p5 is 3.04 cm in place of 3.71 cm (left) and 3.39 in place of 3.97 (right) on the
       wolf clarinetist, and 1.74 in place of 1.98 (left) and 1.79 in place of 2.01 (right) on the
