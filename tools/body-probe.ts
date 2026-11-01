@@ -27,7 +27,7 @@ import { INSTRUMENT_SUPPORTS, buildPlayer, stanceOn } from '../src/models/player
 import type { Support } from '../src/models/props.ts';
 import { BONE_NAMES } from '../src/models/rig.ts';
 import { SPECIES } from '../src/models/species.ts';
-import { studioRenderMesh, studioRigOf } from '../src/models/studio-body.ts';
+import { loadTestBodies, studioRenderMesh, studioRigOf } from '../src/models/studio-body.ts';
 import type { SmoothNormals, StudioRenderMesh } from '../src/models/studio-body.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
@@ -39,6 +39,10 @@ import type { TestScene } from '../src/pose/test-scene.ts';
 import type { AnimalPose, Transport } from '../src/pose/types.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
+
+// The probe takes each species of SPECIES, also a test species whose body the app does not load
+// (design 4.4, "Test mannequin").
+await loadTestBodies();
 
 /** The supports of each species in the probe: each seat, and standing. */
 export const PROBE_SUPPORTS = [
