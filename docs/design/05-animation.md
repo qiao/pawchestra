@@ -156,6 +156,8 @@ demo shows the same motion on each visit.
   (`beatSway()`). A real player sways with a slow level of the meter, so the pulse is the
   conducted beat (5.4) up to `PULSE_TEMPO`, the preferred tempo of a listener, and 2 or 4
   conducted beats above it (`markPulses()`).
+- **Clips.** A clip of a person (4.4) gives a pose from the clip and the clip time alone
+  (`clipPoseAt()`), so it keeps the rule of stateless poses. Only the gallery plays a clip now.
 - **Idle layer.** The idle layer uses the wall clock, so the animals stay alive while the music
   stops. Its motions come at seeded times in windows of the wall clock, so they need no state
   (`IDLE_MOTION`). Hanging ears do not twitch, as a real hanging ear does not
