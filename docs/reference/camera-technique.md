@@ -141,10 +141,11 @@ The app follows these facts:
   player, a section shot a group-shot or a two-shot, a side view a group-shot of the front half
   of one side, and a conductor shot a thigh shot of the bear from behind. The solo and the
   conductor shots are 1.25 times larger than a waist shot, because the low-poly animals show
-  their facets and the seams of their meshes from near. The frame holds the head with no ears (`HEAD_BONES`), because
-  the closer the subject, the less headroom it needs, and a close shot can cut the top of the
-  head (section 3). Thus the long ears of a rabbit or a fox can leave the frame of a solo, and
-  the solo shows the player and its instrument in place of about seven players.
+  their facets and the seams of their meshes from near. The frame holds the head with no ears
+  (`HEAD_BONES`), because the closer the subject, the less headroom it needs, and a close shot
+  can cut the top of the head (section 3). Thus the long ears of a rabbit or a fox can leave the
+  frame of a solo, and the solo shows the player and its instrument in place of about seven
+  players.
 - **The group-shot of a side (section 3).** A side view shows the players of its sphere as one
   group (a group-shot of five or six players or more). A head of another player in front of the
   group counts in the foreground rule, and the side camera stays low
