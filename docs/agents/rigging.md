@@ -104,7 +104,8 @@ with a worse look is also not done.
   rest.
 - The paw twist, the paw swing, the forearm twist, the move twist, and the flat share count from
   the bind. When the bind differs from the base, they take only their limits (`REBIND`), and the
-  gate prints the elbow and wrist ring widths. The grip turn ignores the bind.
+  gate prints the elbow and wrist ring widths. The grip turn ignores the bind. A rebind round
+  proves the same bones with `pnpm arm-check <roles> --world --base <start>`.
 - `pnpm arm-look <role>` measures a crumpled or a flat upper arm. Read the 2x crops from the front,
   the back, and each side, because a defect can show from one side only.
 
