@@ -20,6 +20,7 @@ import {
   targetLineClear,
 } from './clearance.ts';
 import type { ClearBox, Segment, StageClearance, SubjectSightLines } from './clearance.ts';
+import type { StageBody } from './foreground.ts';
 import {
   ANIMAL_FLOOR,
   animalTooNear,
@@ -1076,20 +1077,27 @@ function moveNear(
   const cameras = keys.map((key) =>
     keyPosition(planner.stageSide, subject.target, halfHeight, key, CINEMA_ASPECT),
   );
-  // A sphere around the cameras of the move: its middle and its radius.
+  // A sphere around the cameras of the move: its middle and its radius. A body or a part whose
+  // sphere stays farther than the floor from this sphere is far from each camera of the move.
   const middle = mixPoints(cameras[0] ?? subject.target, cameras.at(-1) ?? subject.target, 0.5);
   const path = Math.max(
     ...cameras.map((c) => Math.hypot(c[0] - middle[0], c[1] - middle[1], c[2] - middle[2])),
   );
-  const near = planner.subjects.bodies.filter(
-    (body) =>
-      Math.hypot(
-        body.center[0] - middle[0],
-        body.center[1] - middle[1],
-        body.center[2] - middle[2],
-      ) <
-      ANIMAL_FLOOR + body.radius + path,
-  );
+  const nearMiddle = (center: Vec3, radius: number): boolean => {
+    const dx = center[0] - middle[0];
+    const dy = center[1] - middle[1];
+    const dz = center[2] - middle[2];
+    return dx * dx + dy * dy + dz * dz < (ANIMAL_FLOOR + radius + path) ** 2;
+  };
+  const near: StageBody[] = [];
+  for (const body of planner.subjects.bodies) {
+    const parts = nearMiddle(body.center, body.radius)
+      ? body.parts.filter((part) => nearMiddle(part.center, part.radius))
+      : [];
+    if (parts.length > 0) {
+      near.push({ ...body, parts });
+    }
+  }
   if (near.length === 0) {
     return false;
   }
