@@ -236,6 +236,7 @@ const SPECIES_NAMES = {
   badger: ['badger', 'badgers'],
   penguin: ['penguin', 'penguins'],
   'polar-bear': ['polar bear', 'polar bears'],
+  mannequin: ['mannequin', 'mannequins'],
 } as const satisfies Readonly<Record<SpeciesId, readonly [string, string]>>;
 
 /** The animal line of the sound-only seat, which has no animal (design 2.8). */

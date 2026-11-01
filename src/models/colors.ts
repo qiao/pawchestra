@@ -37,6 +37,7 @@ export const SPECIES_COLORS = {
   badger: { fur: '#7d7a76', belly: '#e6e1d8', accent: '#24211e' },
   penguin: { fur: '#1f1d1c', belly: '#ece8e0', accent: '#d98a3a' },
   'polar-bear': { fur: '#efeae0', belly: '#f6f2ea', accent: '#1a1715' },
+  mannequin: { fur: '#dbccb3', belly: '#bdccdb', accent: '#d9261f' },
 } as const satisfies Readonly<Record<SpeciesId, SpeciesColors>>;
 
 /** The colors of the stage and the props (design 4.5, scene colors), in linear values. */

@@ -172,6 +172,7 @@ export const SPECIES_IDS = [
   'badger',
   'penguin',
   'polar-bear',
+  'mannequin',
 ] as const;
 
 /** A species that the generator builds: one of {@link SPECIES_IDS}. */
@@ -548,6 +549,20 @@ export const SPECIES = {
     colors: SPECIES_COLORS['polar-bear'],
     headHeight: STUDIO_POLAR_BEAR.headHeight,
     seatHeight: STUDIO_POLAR_BEAR.seatHeight / STUDIO_POLAR_BEAR.headHeight,
+  },
+  /**
+   * Mannequin, a test body (design 4.4, "Test mannequin"): the animal preset of
+   * `tools/blender/mannequin.py`, with the markers of the twist and of the side, which `pnpm
+   * rig-mesh mannequin` rigs. No section casts it. The role tools test the rig chain with the
+   * recast roles `violinist@mannequin` and `clarinetist@mannequin`. The app does not load its
+   * body (`loadTestBodies()` of `studio-body.ts`), so the head height and the seat height are the
+   * values of `src/models/studio/mannequin.ts`, which `pnpm studio-body mannequin` writes.
+   */
+  mannequin: {
+    body: 'studio-mannequin',
+    colors: SPECIES_COLORS.mannequin,
+    headHeight: 0.453483,
+    seatHeight: 0.239596 / 0.453483,
   },
 } as const satisfies Readonly<Record<SpeciesId, SpeciesParams>>;
 
