@@ -22,18 +22,24 @@ import { MeshBuilder } from '../models/mesh.ts';
 import { buildPlayer } from '../models/player.ts';
 import type { PlayerModel } from '../models/player.ts';
 import { buildSupport } from '../models/props.ts';
+import { readSourceFile } from '../models/source-clips.ts';
+import { clipDuration, clipPoseAt, createClipPose } from '../pose/clip-pose.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
-import type { ScenePoseBuffer } from '../pose/pose-at.ts';
+import type { ScenePoseBuffer, WritablePose } from '../pose/pose-at.ts';
+import { retargetClip, solePoints } from '../pose/retarget.ts';
+import type { PlayerClip } from '../pose/retarget.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { createMaterials } from '../scene/geometry.ts';
 import { createLights } from '../scene/lights.ts';
 import {
+  applyPose,
   applyScenePose,
   createPlayerGeometry,
   createPlayerMesh,
   createStaticMesh,
+  hideBone,
 } from '../scene/player.ts';
 import { createRenderer } from '../scene/renderer.ts';
 import {
@@ -43,6 +49,7 @@ import {
   bodyBoundsOf,
   boundsOf,
   closeView,
+  galleryClip,
   galleryMove,
   galleryProbe,
   gallerySupport,
@@ -514,10 +521,64 @@ const cast = galleryCast();
 /** The pose plan of the test notes, and the poses that each frame writes. */
 let poses: GalleryPoses | null = null;
 
-/** Shows the time and the notes that sound at it. */
+/** The bones of the instrument, which a clip hides, because a clip cannot hold an instrument. */
+const INSTRUMENT_BONES = ['instrument', 'slide', 'bow', 'malletL', 'malletR', 'baton'] as const;
+
+/** A clip on each animal of the gallery, and the poses that each frame writes (design 4.4). */
+interface GalleryClip {
+  /** The clip on each animal, in the order of the meshes of the cast. */
+  readonly clips: readonly PlayerClip[];
+  /** The pose of each animal that each frame writes. */
+  readonly poses: readonly WritablePose[];
+}
+
+/** The clip of the query `clip` after it loads, or `null`. */
+let clip: GalleryClip | null = null;
+
+/**
+ * Loads the clip of the query `clip` from the local clip files (`clips/<file>.glb`, design 4.4,
+ * 8.1), and retargets it onto each animal of the cast. The time slider then gives the clip time,
+ * and the canvas gets the attribute `data-clip` (`ready` or `failed`) for the image tools.
+ */
+async function loadClip(): Promise<void> {
+  const wanted = galleryClip(search);
+  if (!wanted || !cast) {
+    return;
+  }
+  const response = await fetch(`clips/${wanted.file}.glb`);
+  if (!response.ok) {
+    throw new Error(`The clip file clips/${wanted.file}.glb gave the status ${response.status}.`);
+  }
+  const file = readSourceFile(new Uint8Array(await response.arrayBuffer()));
+  const source = wanted.animation
+    ? file.clips.find((c) => c.name === wanted.animation)
+    : file.clips[0];
+  if (!source) {
+    throw new Error(`The clip file has no animation "${wanted.animation ?? ''}".`);
+  }
+  const animals = [...cast.players, ...(cast.conductor ? [cast.conductor] : [])];
+  const clips = animals.map(({ model }) =>
+    retargetClip(file, source, {
+      skeleton: model.skeleton,
+      headHeight: model.body.headHeight,
+      soles: solePoints(model.mesh),
+    }),
+  );
+  clip = { clips, poses: clips.map(() => createClipPose()) };
+  const duration = clips[0] ? clipDuration(clips[0]) : 0;
+  time.max = String(duration);
+  status.textContent = `Clip ${source.name}: ${duration.toFixed(2)} s.`;
+  canvas.dataset['clip'] = 'ready';
+}
+
+/** Shows the time and the notes that sound at it, or only the time for a clip. */
 function updateTime(notes: readonly TestNote[]): void {
   const at = Number(time.value);
   timeValue.textContent = `${at.toFixed(2)} s`;
+  // A clip keeps its own status line (`loadClip()`): the notes do not play.
+  if (galleryClip(search)) {
+    return;
+  }
   const sounding = notesAt(notes, at);
   status.textContent =
     sounding.length > 0
@@ -563,7 +624,18 @@ const projected = new Vector3();
  * gallery.
  */
 function frame(): void {
-  if (poses) {
+  if (clip && cast) {
+    for (const [i, mesh] of cast.meshes.entries()) {
+      const one = clip.clips[i];
+      const pose = clip.poses[i];
+      if (one && pose) {
+        applyPose(mesh, clipPoseAt(one, Number(time.value), pose));
+        for (const bone of INSTRUMENT_BONES) {
+          hideBone(mesh, bone);
+        }
+      }
+    }
+  } else if (poses) {
     applyScenePose(
       cast?.meshes ?? [],
       galleryPose(poses, Number(time.value), performance.now() / 1000),
@@ -588,4 +660,8 @@ function frame(): void {
   requestAnimationFrame(frame);
 }
 
+loadClip().catch((error: Error) => {
+  status.textContent = error.message;
+  canvas.dataset['clip'] = 'failed';
+});
 requestAnimationFrame(frame);

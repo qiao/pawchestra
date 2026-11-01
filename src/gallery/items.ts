@@ -295,15 +295,39 @@ const REST: Transport = {
 
 /**
  * Reads the support of a species item from the query of the gallery (design 7.1). The query
- * `stand` shows each player standing, as a soloist who stands (design 4.5). With no `stand`, each
- * player has the support of its instrument.
+ * `stand` shows each player standing, as a soloist who stands (design 4.5). A clip (the query
+ * `clip`) also stands each player, because the clips of a standing person start on their feet
+ * (design 4.4). With neither query, each player has the support of its instrument.
  *
  * @param search The query of the page.
  * @param instrument The instrument of the item.
  * @returns The support.
  */
 export function gallerySupport(search: URLSearchParams, instrument: InstrumentId): Support {
-  return search.has('stand') ? 'stand' : INSTRUMENT_SUPPORTS[instrument];
+  return search.has('stand') || search.has('clip') ? 'stand' : INSTRUMENT_SUPPORTS[instrument];
+}
+
+/** A clip of the gallery query `clip=<file>[:<animation>]` (design 4.4, 7.1). */
+export interface GalleryClipQuery {
+  /** The name of the file `clips/<file>.glb`, which the dev and preview servers serve. */
+  readonly file: string;
+  /** The name of the animation in the file, or `null` for its first animation. */
+  readonly animation: string | null;
+}
+
+/**
+ * Reads the clip of the gallery query `clip`: `clip=wave` names the first animation of
+ * `clips/wave.glb`, and `clip=mannequin:Bow` names the animation `Bow` of `clips/mannequin.glb`.
+ *
+ * @param search The query of the page.
+ * @returns The clip, or `null` with no query `clip` or with a name that is not a file name.
+ */
+export function galleryClip(search: URLSearchParams): GalleryClipQuery | null {
+  const [file = '', ...rest] = (search.get('clip') ?? '').split(':');
+  if (!/^[\w.-]+$/u.test(file)) {
+    return null;
+  }
+  return { file, animation: rest.length > 0 ? rest.join(':') : null };
 }
 
 /**
