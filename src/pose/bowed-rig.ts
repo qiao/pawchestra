@@ -749,6 +749,19 @@ const FOX_HOLD = {
   },
 } as const satisfies BowedHold;
 
+/**
+ * The hold of the violin on the left shoulder for the wolf, as the recast role `violinist@wolf` of
+ * the role tools (design 4.4): a test of the wolf body in a role that is not its own. No wolf
+ * plays the violin in the app. The hold is the hold of the rabbit ({@link SHOULDER_HOLD}), whose
+ * values are in H, with the violin of the rule of a violin shop for the arm of the wolf
+ * (`violinScale`). The bow plays no hair within 0.18 m of the frog (`frogHair`): with the 0.11 m
+ * of the rabbit, the bow paw goes 3.8 cm into the body at the frog, and with 0.14 m, 2.3 cm.
+ */
+const WOLF_VIOLIN_HOLD = {
+  ...SHOULDER_HOLD,
+  frogHair: 0.18,
+} as const satisfies BowedHold;
+
 /** The holds of the bowed strings. */
 export const BOWED_HOLDS = {
   violin: CHIN_HOLD,
@@ -1158,6 +1171,7 @@ export const SPECIES_HOLDS: Partial<
   cat: { viola: CAT_HOLD },
   dog: { cello: DOG_HOLD },
   hippo: { contrabass: HIPPO_HOLD },
+  wolf: { violin: WOLF_VIOLIN_HOLD },
 };
 
 /**
