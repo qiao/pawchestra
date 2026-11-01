@@ -1,6 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
+import type { PawBind } from '../models/studio-rig.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { placePoint } from '../models/instruments/hold.ts';
@@ -1307,6 +1308,12 @@ export interface BowedRig {
   readonly bowAlign: Quat;
   readonly armL: ArmRig;
   readonly armR: ArmRig;
+  /**
+   * The bind of the left paw of the studio body, from which its twist on the forearm counts
+   * (`studioPawTwist()` of `models/studio-rig.ts`): the lift of a violin or a viola keeps the twist
+   * between -π and π on its way.
+   */
+  readonly pawBindL: PawBind;
   /** The rotation of the `instrument` bone in the rest pose, relative to its parent. */
   readonly restRotation: Quat;
   /** The move of the instrument while the player plays, in meters (`BowedHold.playShift`). */
@@ -1655,6 +1662,7 @@ export function bowedRig(
     bowAlign: toQuat(setFromBasis(new Quaternion(), hairAxis, hairNormal).invert()),
     armL: armRig(model, 'L'),
     armR: armRig(model, 'R'),
+    pawBindL: pawBindOf(model.studio.arms.L),
     restRotation: toQuat(restRotation),
     playShift: toVec3(playShift),
     restPivot: restPivotOf(model, hold, atSide, pivot, playShift),
@@ -1690,6 +1698,16 @@ export function bowedRig(
       )
     : rig;
   return { ...rest, bowRange: bowRangeOf(rest), stopRange: stopRangeOf(rest) };
+}
+
+/**
+ * Copies the bind of a paw of a studio arm, so that the rig holds plain values only.
+ *
+ * @param arm The studio arm.
+ * @returns The bind of its paw.
+ */
+function pawBindOf(arm: PawBind): PawBind {
+  return { fore: arm.fore, hinge: arm.hinge, paw: arm.paw };
 }
 
 /**

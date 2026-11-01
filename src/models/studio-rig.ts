@@ -1258,6 +1258,61 @@ export function palmTurnAngle(side: Side, hand: Quaternion, forearm: Vector3): n
   return side === 'R' ? Math.max(0, limited) : limited;
 }
 
+/** The bind of the paw of one studio arm that the twist of the paw counts from. */
+export type PawBind = Pick<StudioArm, 'fore' | 'hinge' | 'paw'>;
+
+const twistUpper = new Vector3();
+const twistFore = new Vector3();
+const twistHinge = new Vector3();
+const twistForeBind = new Vector3();
+const twistHingeBind = new Vector3();
+const twistFrame = new Quaternion();
+const twistHand = new Quaternion();
+const twistPaw = new Quaternion();
+
+/**
+ * Gives the twist of a paw of a studio arm on its forearm from the bind of the studio, as the
+ * twist bone of the arm takes it (design 4.4, 5.2). A pose that moves a paw through a large turn
+ * reads it, so that the twist stays between -π and π on the way and the twist bone does not turn
+ * over.
+ *
+ * @param pawBind The bind of the paw of the arm ({@link StudioRig.arms}).
+ * @param shoulderAt The posed shoulder joint.
+ * @param elbowAt The posed elbow joint.
+ * @param wristAt The posed wrist joint.
+ * @param hand The world rotation of the hand of the player.
+ * @param turn The turn of the paw in the plane of its palm, in radians ({@link palmTurnAngle}).
+ * @returns The twist, from -π to π.
+ */
+export function studioPawTwist(
+  pawBind: PawBind,
+  shoulderAt: Vector3,
+  elbowAt: Vector3,
+  wristAt: Vector3,
+  hand: Quaternion,
+  turn: number,
+): number {
+  twistUpper.subVectors(elbowAt, shoulderAt).normalize();
+  twistFore.subVectors(wristAt, elbowAt).normalize();
+  twistHinge.crossVectors(twistUpper, twistFore);
+  if (twistHinge.lengthSq() < 1e-8) {
+    twistHinge.set(1, 0, 0);
+  }
+  twistForeBind.fromArray(pawBind.fore);
+  alignFrames(
+    twistForeBind,
+    twistHingeBind.fromArray(pawBind.hinge),
+    twistFore,
+    twistHinge,
+    twistFrame,
+  );
+  twistHand
+    .copy(hand)
+    .multiply(twistPaw.setFromAxisAngle(X_AXIS, turn))
+    .multiply(twistPaw.fromArray(pawBind.paw));
+  return twistAngle(twistFrame.invert().multiply(twistHand), twistForeBind);
+}
+
 /**
  * Writes the bones of one arm of a studio body: the upper arm, the forearm, the twist bone, the
  * paw, and the fingers. It leaves the module vector `upper` at the posed direction of the upper

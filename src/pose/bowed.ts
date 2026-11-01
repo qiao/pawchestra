@@ -1,7 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { boneIndex } from '../models/rig.ts';
-import { palmTurnAngle } from '../models/studio-rig.ts';
+import { palmTurnAngle, studioPawTwist } from '../models/studio-rig.ts';
 import { mixDirection, mixRotation } from './blend.ts';
 import type { BowedHold, BowedRig, RigPoints } from './bowed-rig.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
@@ -1238,10 +1238,12 @@ function carryLift(
   // The rest turn of the paw differs from the turn of the retarget at rest by this angle.
   const restOffset = restTurn - retargetTurn(restHand.rotation);
   turnedPaw(restHand.rotation, restTurn, seenRest);
+  const restTwist = studioTwist(rig, restHand.rotation, restTurn);
   handInArm(rig, frames, 1, leftElbow(hold, state, playPoleL), playHand, handInPlay);
   const playAngle = retargetTurn(playHand.rotation);
   turnedPaw(playHand.rotation, playAngle, seenPlay);
-  mixTwist(rig, handInRest, handInPlay, weight, handInMix);
+  const playTwist = studioTwist(rig, playHand.rotation, playAngle);
+  mixTwist(rig, handInRest, handInPlay, playTwist - restTwist, weight, handInMix);
   out.wrist
     .lerpVectors(restHand.wrist, playHand.wrist, weight)
     .addScaledVector(
@@ -1306,16 +1308,35 @@ function twistOf(q: Quaternion, axis: Vector3): number {
 }
 
 /**
+ * Gives the twist of the left paw on its forearm from the bind of the studio body, for the arm in
+ * the module values `carryShoulder` and `carryArm` (`studioPawTwist()` of `models/studio-rig.ts`).
+ *
+ * @param rig The points of the player.
+ * @param hand The world rotation of the hand of the player.
+ * @param palmTurn The turn of the paw in the plane of its palm, in radians.
+ * @returns The twist, from -π to π.
+ */
+function studioTwist(rig: RigPoints, hand: Quaternion, palmTurn: number): number {
+  const { position } = carryShoulder;
+  return studioPawTwist(rig.pawBindL, position, carryArm.elbow, carryArm.wrist, hand, palmTurn);
+}
+
+/**
  * Mixes two turns of the left paw in the frame of its arm ({@link armFrame}, design 5.2): the
- * twist around the forearm goes on a straight line from its first angle to its second angle with
- * a supination, as a real forearm turns from the rest grip to the playing grip of a violin, and
- * the rest of the turn, the bend of the wrist, mixes on its own. With a pronation, the paw turns
- * against the instrument, which takes the short turn from the rest to the play. A mix of the
- * whole turns can bend the wrist far past both ends in the middle.
+ * twist around the forearm goes on a straight line from its first angle to its second angle, and
+ * the rest of the turn, the bend of the wrist, mixes on its own. The twist takes the way on which
+ * the twist of the studio paw from its bind stays between -π and π (`studio`), so that the twist
+ * bone of the forearm does not turn over in the move. On a supinated bind paw, this way is a
+ * supination, as a real forearm turns from the rest grip to the playing grip of a violin. On a
+ * pronated bind paw, the playing grip lies past π in the supination, so the paw turns the other way,
+ * through the direction of no paw twist. A mix of the whole turns can bend the wrist far past both
+ * ends in the middle.
  *
  * @param rig The points of the player.
  * @param from The turn at the weight 0.
  * @param to The turn at the weight 1.
+ * @param studio The change of the twist of the studio paw from the rest to the play, from -2π to
+ *   2π, with both ends between -π and π.
  * @param weight The weight.
  * @param out The quaternion to write. It must not be `from` or `to`.
  * @returns `out`.
@@ -1324,6 +1345,7 @@ function mixTwist(
   rig: RigPoints,
   from: Quaternion,
   to: Quaternion,
+  studio: number,
   weight: number,
   out: Quaternion,
 ): Quaternion {
@@ -1331,7 +1353,7 @@ function mixTwist(
   twistAxis.fromArray(bind.wrist).sub(carryPoint.fromArray(bind.elbow)).normalize();
   const a = twistOf(from, twistAxis);
   const b = twistOf(to, twistAxis);
-  const change = b <= a ? b - a : b - a - 2 * Math.PI;
+  const change = b - a + 2 * Math.PI * Math.round((studio - (b - a)) / (2 * Math.PI));
   swingRest.copy(from).multiply(twistRest.setFromAxisAngle(twistAxis, -a));
   swingPlay.copy(to).multiply(twistPlay.setFromAxisAngle(twistAxis, -b));
   mixRotation(swingRest, swingPlay, weight, out);
