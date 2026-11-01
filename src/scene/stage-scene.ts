@@ -907,12 +907,19 @@ export class StageScene {
   }
 
   /**
-   * The height of the bottom bar of the letterbox in the last frame, in CSS pixels (design 2.5): 0
-   * in Free mode and on a canvas wider than 21:9.
+   * The height of the bottom bar of the letterbox, in CSS pixels (design 2.5): 0 in Free mode and
+   * on a canvas wider than 21:9. It comes from the current canvas size and the move of the bars,
+   * not from the visible box of the last frame. A frame with no layout, such as a frame during the
+   * load, does not update that box, so the box of a 1 × 1 canvas lifted the bar of the controls to
+   * the middle of the window.
    */
   get letterboxBar(): number {
-    const visible = this.#visible;
-    return Math.max(0, this.#height - (visible.y + visible.height / 2));
+    const share = letterboxShare(this.#letterbox);
+    if (share <= 0) {
+      return 0;
+    }
+    const height = this.#height;
+    return Math.max(0, ((height - letterbox(this.#width, height).height) / 2) * share);
   }
 
   /**
