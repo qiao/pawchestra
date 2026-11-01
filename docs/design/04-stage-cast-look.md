@@ -271,7 +271,23 @@ inner elbow then bends further from its bind, so a `raise` shape of a bent elbow
 
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
-a hold, or a body runs it.
+a hold, or a body runs it. The paw twist, the paw swing, and the flat share measure the skin, so
+they count from the bind. The grip turn asks if the paw holds its prop in the accepted way of the
+role (`ACCEPTED_GRIPS`), which is a question of the pose. So it reads the twist of the paw in the
+frame of the posed forearm (`GripFrames`): the axis from the elbow to the wrist, and the elbow
+axis of the retarget. The palm comes from the hand of the player, and the zero is its hanging arm
+with the palm inward. A new bind of the same pose then keeps each grip, and one entry of a role
+holds for each body.
+
+```typescript
+/** The bind frames of the grip of one arm (`tools/arm-check.ts`). */
+interface GripFrames {
+  /** The turn from the frame of the player (down, +x) to the bind forearm and its elbow axis. */
+  readonly fore: Quaternion;
+  /** The turn from the frame of the player (down, inward palm) to the bind paw and its palm. */
+  readonly paw: Quaternion;
+}
+```
 
 ### Seat
 

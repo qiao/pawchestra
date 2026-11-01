@@ -285,9 +285,6 @@ passes.
       176° to 180° on its forearm and flips in the lift and the lowering (17,992°/s). A bind
       supination in the middle of the twists of all roles of a body (left 100°, right 65°) passes
       the gate of both roles. Decide the migration with the report of the spike.
-- [ ] Neutral arm bind (spike): `ACCEPTED_GRIPS` counts from the bind, so each new bind moves each
-      grip of the body (the wolf clarinetist: 49° to 70°). Store the grips in a frame of the
-      forearm that no bind moves before a migration.
 - [ ] Test mannequin: `pnpm arm-check violinist@mannequin clarinetist@mannequin` fails. Each arm
       has folds p95 9 to 20 (also at rest), and the right arms have twist p95 97 (violin) and 66
       (clarinet). The rig has the rule weights with no arm segments. The bind supination of the

@@ -21,10 +21,11 @@
  * - `stretch`: the largest growth of an edge of the faces of the forearm and the paw from the rest
  *   sample of the same body and demo, as a share of the length of the upper arm, such as a spike
  *   from the paw to the upper arm. A face that is long in the rest too does not count.
- * - `grip turn`: the turn of the paw twist in the play from the accepted grip of its arm
- *   ({@link ACCEPTED_GRIPS}). The value is the median, so a paw that holds its prop in another
- *   grip fails with no base. For a role with no entry, the tool prints a ready entry under the
- *   table ({@link gripLines}), and the role has no value `grip`.
+ * - `grip turn`: the turn of the paw in the play from the accepted grip of its arm
+ *   ({@link ACCEPTED_GRIPS}). The grip is the twist of the paw in the frame of the posed forearm
+ *   ({@link GripFrames}), which no bind moves. The value is the median, so a paw that holds its
+ *   prop in another grip fails with no base. For a role with no entry, the tool prints a ready
+ *   entry under the table ({@link gripLines}), and the role has no value `grip`.
  *
  * - `move twist` and `move turn`: the largest paw twist on the forearm, and the largest turn rate of
  *   the wrist in degrees per second, over the lifts and the lowerings of {@link probeMoves} at
@@ -123,6 +124,7 @@ import {
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
 import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
+import type { Vec3 } from '../src/models/tuples.ts';
 import {
   createStudioPose,
   poseStudioBones,
@@ -327,80 +329,75 @@ export const ARM_LIMITS: Readonly<Record<Measure, ArmLimit>> = {
 export const JUMP_ANGLE = 90;
 
 /**
- * The accepted grip of each arm of each role: the median paw twist on the forearm in the play of
- * `eefece23`, whose arms are accepted, in degrees, with the sign of the right arm turned so
- * that one sign is one turn of the forearm on both sides. The bind paw of a mesh body is no
- * neutral wrist, so no anatomy limit from the bind separates a wrung paw from a good one: the good
- * left paws of the violins turned 133° to 156° from the pronated bind of their meshes. The value
- * `grip` is the turn of the paw from its accepted grip. A hold change that changes a grip on
- * purpose gives its new median here, with the accepted crops. A new bind of a paw moves its
- * entry by the turn of the bind. A role with no entry has no value `grip`.
+ * The accepted grip of each arm of each role: the median grip of the arm in the play of accepted
+ * arms ({@link GripFrames}), in degrees, with the sign of the right arm turned, so that a positive
+ * grip turns each palm toward pronation. The grip counts from the posed forearm, so a new bind
+ * keeps each entry, and the entry of a role holds for each body in the role.
+ * The entries of the older frame of the bind moved into this frame by the shift of the median of
+ * each arm on `27b9fc24`. The value `grip` is the turn of the paw from its accepted grip. A hold
+ * change that changes a grip on purpose gives its new median here, with the accepted crops. A role
+ * with no entry has no value `grip`.
  */
 export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>> = new Map<
   string,
   Readonly<Record<Side, number>>
 >([
   // The smooth studio bear with the baton along the index finger.
-  ['conductor', { L: -54, R: -5 }],
+  ['conductor', { L: -46, R: 2 }],
   // The T-pose polar bear mesh.
-  ['pianist', { L: -23, R: -30 }],
-  ['harpist', { L: -55, R: -101 }],
-  // The bind left paw of the rabbit, the red fox, and the cat turns 100°, 110°, and 120° toward
-  // supination, so the left grips of the same holds are 133°, 140°, and 147° plus these angles,
-  // wrapped into ±180°.
-  ['violinist', { L: -127, R: -86 }],
-  ['fox-violinist', { L: -110, R: -102 }],
+  ['pianist', { L: 39, R: 30 }],
+  ['harpist', { L: 22, R: -35 }],
+  // The good left paws of the violins and the viola turn 148° to 175° toward supination.
+  ['violinist', { L: -171, R: -29 }],
+  ['fox-violinist', { L: -152, R: -33 }],
   // The cat violist with the right elbow down at the tip, which rolls the right forearm, from
   // accepted 2x paw crops.
-  ['violist', { L: -93, R: -62 }],
-  ['cellist', { L: -146, R: 12 }],
+  ['violist', { L: -175, R: -17 }],
+  ['cellist', { L: -90, R: 72 }],
   // The hippo bow arm with the elbow out and a little up, so that the forearm slopes down to the
   // bow with a nearly straight wrist.
-  ['bassist', { L: -164, R: -10 }],
+  ['bassist', { L: -98, R: 57 }],
   // The panda holds the low part of the slide brace from its right side, with the right palm to
   // the left and the thumb up the brace, from accepted 3x crops. A palm that faces out with the
   // thumb down is the fault.
-  ['trombonist', { L: -104, R: -85 }],
+  ['trombonist', { L: -50, R: -32 }],
   // The paws of the timpanist and of the badger close on their mallets, sticks, and beaters, so
   // that each paw holds its stick, from accepted 3x crops. Each timpani paw turns around the shaft
   // at the strike (strikeRoll), so that the shaft stays in the closed paw. This turns the left paw
   // 12° and the right paw 13° further.
-  ['timpanist', { L: -9, R: -20 }],
-  ['bassoonist', { L: -118, R: -70 }],
-  ['hornist', { L: -153, R: -54 }],
+  ['timpanist', { L: 75, R: 61 }],
+  ['bassoonist', { L: -41, R: -2 }],
+  ['hornist', { L: -92, R: -3 }],
   // The wolf and the mouse close their paws around the tube, with the palms toward its axis and
-  // the grips moved around it, so that each paw holds the instrument, from accepted 2x crops. The
-  // bind elbow and the bind paws of the wolf turn the left paw 109.5° and the right paw 100.5°
-  // toward supination, so the grips are -89° and -71° plus these angles.
-  ['clarinetist', { L: 20, R: 29 }],
-  // The recast role of the wolf with the shoulder hold of the rabbit (WOLF_VIOLIN_HOLD), on the
-  // bind of the clarinetist. The left grip is 141° from a pronated bind, inside the 133° to 156°
-  // of the good left paws of the violins.
-  ['violinist@wolf', { L: -109, R: -23 }],
+  // the grips moved around it, so that each paw holds the instrument, from accepted 2x crops.
+  ['clarinetist', { L: -14, R: 4 }],
+  // The recast role of the wolf with the shoulder hold of the rabbit (WOLF_VIOLIN_HOLD). The left
+  // grip lies inside the grips of the good left paws of the violins.
+  ['violinist@wolf', { L: -148, R: -55 }],
   // The mouse holds the 40° oboe from the side of each paw, with the left paw on the upper joint
   // and the thumbs up the tube, from accepted crops. A palm that faces out with the thumb down is
   // the fault. The left elbow points down, so that the left arm does not read as a raised wing.
-  ['oboist', { L: -85, R: -90 }],
+  ['oboist', { L: -11, R: -18 }],
   // The paws of the woodwinds of the tan fox face its tube (faceTube of pose/winds.ts). The left
   // paw holds the flute from its front, with its fingers over the top, and faces it in the play,
   // from accepted 2x paw crops. It turns -10° on its forearm below the flute.
-  ['flutist', { L: -87, R: -30 }],
-  ['trumpeter', { L: -99, R: -98 }],
+  ['flutist', { L: -122, R: 46 }],
+  ['trumpeter', { L: -23, R: -40 }],
   // The rhino with the rebuilt arms, the bind elbow bent forward, and the tuba elbows down and out
-  // (from accepted 2x paw crops). The bind sets the zero of the paw twist.
-  ['tubist', { L: -87, R: -32 }],
-  ['singer', { L: -79, R: -79 }],
+  // (from accepted 2x paw crops).
+  ['tubist', { L: -80, R: -29 }],
+  ['singer', { L: -34, R: -34 }],
   // The hanging left arm of the badger, from accepted 2x crops: the arm hangs nearer to the body
   // since the side test of `pose/hang.ts` counts only the inner side of each part.
-  ['bass-drummer', { L: -81, R: 21 }],
+  ['bass-drummer', { L: -22, R: 74 }],
   // The wrist lifts the tip of the stick or the mallet over its spot between strikes, and the paws
   // close on their sticks and mallets, from accepted paw crops.
-  ['snare-drummer', { L: -4, R: -4 }],
-  ['cymbalist', { L: 0, R: 0 }],
-  ['percussionist', { L: -80, R: -28 }],
+  ['snare-drummer', { L: 65, R: 66 }],
+  ['cymbalist', { L: 67, R: 67 }],
+  ['percussionist', { L: -7, R: 35 }],
   // The spine leans over the bars, and the wrist lifts the head of each mallet over its bar
   // between strikes, from accepted 2x paw crops.
-  ['xylophonist', { L: -28, R: -22 }],
+  ['xylophonist', { L: 29, R: 46 }],
 ]);
 
 /**
@@ -475,12 +472,40 @@ interface ArmBind {
   readonly lengths: Float32Array;
   /** The bind length of the upper arm. */
   readonly upper: number;
+  /** The frames of the grip ({@link GripFrames}). */
+  readonly grip: GripFrames;
+}
+
+/**
+ * The bind frames of the grip of one arm. The grip is the twist of the paw in the frame of the
+ * posed forearm: the axis from the elbow to the wrist, and the elbow axis of the retarget
+ * (`poseStudioBones()`). Both come from the posed skeleton of the player, and the palm of the paw
+ * comes from the hand of the player, so a new bind of the same pose gives the same grip. The zero
+ * is the hanging arm of the player in its bind pose: the palm inward, along the elbow axis. A
+ * positive grip turns the palm of each arm toward pronation.
+ */
+export interface GripFrames {
+  /**
+   * The turn from the frame of the player to the bind forearm: the down axis to the axis from the
+   * elbow to the wrist, and +x to the elbow axis (`StudioRig.arms`).
+   */
+  readonly fore: Quaternion;
+  /**
+   * The turn from the frame of the player to the bind paw: the down axis to the axis from the
+   * wrist to the fingers, and the inward palm of the player to the palm of the studio
+   * (`StudioBody.palms`).
+   */
+  readonly paw: Quaternion;
 }
 
 /** The values of one arm in one sample, by measure. */
 export type ArmSample = Readonly<Record<Measure, number>> & {
-  /** The signed twist of the paw on its forearm, in degrees, for the jumps. */
+  /** The signed twist of the paw on its forearm from the bind, in degrees, for the jumps. */
   readonly pawRoll: number;
+  /**
+   * The signed twist of the paw in the frame of the posed forearm, in degrees ({@link GripFrames}).
+   */
+  readonly gripRoll: number;
 };
 
 /**
@@ -749,7 +774,73 @@ function armBind(rig: StudioRig, side: Side): ArmBind {
     lowerFaces: [...lowerSet],
     lengths: edgeLengths(mesh.positions, lower),
     upper: joints.elbow.distanceTo(joints.shoulder),
+    grip: gripFrames(rig, side, joints),
   };
+}
+
+/** The down axis: each bone of each arm of the player points down in its bind pose. */
+const DOWN = new Vector3(0, -1, 0);
+
+/** The elbow axis of each arm of the player in its bind pose (`poseStudioBones()`). */
+const PLAYER_HINGE = new Vector3(1, 0, 0);
+
+/**
+ * The palm of each hand of the player in its bind pose: inward, as `PALMS` of
+ * `models/studio-rig.ts` gives it.
+ */
+const PLAYER_PALMS: Readonly<Record<Side, Vector3>> = {
+  L: new Vector3(1, 0, 0),
+  R: new Vector3(-1, 0, 0),
+};
+
+/** The arm constants of a rig that an older tree of a probe can give with no elbow axis. */
+interface ArmHinge {
+  /** The unit elbow axis of the bind pose of the studio. */
+  readonly hinge?: Vec3;
+}
+
+/**
+ * Gives the bind frames of the grip of one arm ({@link GripFrames}). A rig with no elbow axis
+ * takes the axis of its bind arm: the upper arm × the forearm.
+ *
+ * @param rig The studio rig.
+ * @param side The side.
+ * @param joints The bind heads of the shoulder, the elbow, and the wrist.
+ * @returns The frames.
+ */
+function gripFrames(
+  rig: StudioRig,
+  side: Side,
+  joints: Readonly<Record<'shoulder' | 'elbow' | 'wrist', Vector3>>,
+): GripFrames {
+  const fore = joints.wrist.clone().sub(joints.elbow);
+  const given: ArmHinge = rig.arms[side];
+  const hinge = given.hinge
+    ? new Vector3(...given.hinge)
+    : new Vector3().crossVectors(joints.elbow.clone().sub(joints.shoulder), fore);
+  const h = rig.body.heads;
+  const fingers = new Vector3(...h[`fingers_${side}`]).sub(new Vector3(...h[`hand_${side}`]));
+  return {
+    fore: frameTurn([DOWN, PLAYER_HINGE], [fore, hinge]),
+    paw: frameTurn([DOWN, PLAYER_PALMS[side]], [fingers, new Vector3(...rig.body.palms[side])]),
+  };
+}
+
+/**
+ * Gives the turn from one frame of two axes to another: the first axis onto the first axis, and
+ * the second axis, made normal to the first, onto the second.
+ *
+ * @param from The two axes of the first frame.
+ * @param to The two axes of the second frame.
+ * @returns The turn.
+ */
+function frameTurn(from: readonly [Vector3, Vector3], to: readonly [Vector3, Vector3]): Quaternion {
+  const basis = ([a, b]: readonly [Vector3, Vector3]): Matrix4 => {
+    const x = a.clone().normalize();
+    const y = b.clone().addScaledVector(x, -b.dot(x)).normalize();
+    return new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y));
+  };
+  return new Quaternion().setFromRotationMatrix(basis(to).multiply(basis(from).transpose()));
 }
 
 /**
@@ -985,6 +1076,8 @@ export function measureArm(
   const pawTwist = twistAngle(paw, foreBind);
   const swing = paw.clone().multiply(new Quaternion().setFromAxisAngle(foreBind, -pawTwist));
   const pawSwing = (2 * Math.acos(Math.min(1, Math.abs(swing.w))) * 180) / Math.PI;
+  // The paw in the frame of the posed forearm: the frame of the player on both sides.
+  const grip = arm.grip.fore.clone().invert().multiply(paw).multiply(arm.grip.paw);
 
   const posedLengths = lowerLengths(arm, posed);
   const reference = rest ?? arm.lengths;
@@ -1005,6 +1098,7 @@ export function measureArm(
     moveTwist: 0,
     moveTurn: 0,
     pawRoll: (pawTwist * 180) / Math.PI,
+    gripRoll: (twistAngle(grip, DOWN) * 180) / Math.PI,
   };
 }
 
@@ -1126,9 +1220,9 @@ export interface RoleReport {
   /** The summaries of each arm. */
   readonly arms: Readonly<Record<Side, ArmStats>>;
   /**
-   * The median paw twist of each arm in the play ({@link angleMedian}), in whole degrees, with the
-   * sign of the right arm turned, as an entry of {@link ACCEPTED_GRIPS} gives it. A role with no
-   * play sample and a JSON text before format 3 have none.
+   * The median grip of each arm in the play ({@link angleMedian}, {@link GripFrames}), in whole
+   * degrees, with the sign of the right arm turned, as an entry of {@link ACCEPTED_GRIPS} gives it.
+   * A role with no play sample and a JSON text before format 3 have none.
    */
   readonly grips?: Readonly<Record<Side, number>>;
 }
@@ -1145,8 +1239,11 @@ export interface ArmJson {
   readonly missing: readonly string[];
 }
 
-/** The format version of {@link ArmJson}. */
-export const ARM_FORMAT = 3;
+/**
+ * The format version of {@link ArmJson}. Version 4 gives the grips in the frame of the posed
+ * forearm ({@link GripFrames}), so it changes the grips of the older versions.
+ */
+export const ARM_FORMAT = 4;
 
 /** The values and the labels of the samples of one role, by sample set. */
 interface Samples {
@@ -1406,7 +1503,7 @@ export function probeRole(
         const jump = before === null ? 0 : Math.abs(wrap(sample.pawRoll - before));
         values.pawJump.push(jump > JUMP_ANGLE ? jump : 0);
         last[set][side] = sample.pawRoll;
-        const signed = side === 'R' ? -sample.pawRoll : sample.pawRoll;
+        const signed = side === 'R' ? -sample.gripRoll : sample.gripRoll;
         if (set === 'play') {
           rolls[side].push(signed);
         }
@@ -1450,8 +1547,8 @@ export function probeRole(
 }
 
 /**
- * Gives a ready entry of {@link ACCEPTED_GRIPS} for each role that has none: the median paw twist
- * of each arm in the play, as the line of the map.
+ * Gives a ready entry of {@link ACCEPTED_GRIPS} for each role that has none: the median grip of
+ * each arm in the play ({@link GripFrames}), as the line of the map.
  *
  * @param reports The report of each role.
  * @returns The lines, empty when each role has an entry or no play sample.
@@ -1468,7 +1565,7 @@ export function gripLines(
     return [];
   }
   return [
-    'The roles below have no entry in ACCEPTED_GRIPS. A ready entry from the median paw twist of each arm in the play:',
+    'The roles below have no entry in ACCEPTED_GRIPS. A ready entry from the median grip of each arm in the play, in the frame of the posed forearm:',
     '',
     ...lines,
   ];
@@ -2006,8 +2103,8 @@ async function gateDemos(
 /**
  * Traces the paws of the first body of a role at each step of a range, with no sweep: for each
  * arm, the signed paw twist on the forearm from the bind, its change from the line before, the paw
- * swing, the signed turn from the accepted grip ({@link ACCEPTED_GRIPS}, with the sign of the
- * right arm turned), and the forearm twist ({@link measureArm}). A play sample poses the song time
+ * swing, the signed turn of the grip ({@link GripFrames}) from the accepted grip
+ * ({@link ACCEPTED_GRIPS}, with the sign of the right arm turned), and the forearm twist ({@link measureArm}). A play sample poses the song time
  * as `probeFolds()` does, and a lift sample the wall time from the press of play. The modules of
  * the pose load only here, so the gate imports no more exports of an old tree.
  *
@@ -2056,7 +2153,7 @@ export async function traceLines(
   const player = body.index === null ? 'the conductor' : `the player ${body.index}`;
   const kind = range.lift ? 'wall times of the lift' : 'song times';
   const lines = [
-    `Paw trace of the ${role} (${player}) in ${range.demo}, ${kind} ${range.from} s to ${range.to} s at steps of ${step} s. In degrees: the signed paw twist on the forearm from the bind, its change from the line before (JUMP above ${JUMP_ANGLE}°), the paw swing, the signed turn from the accepted grip (the right arm with its sign turned), and the forearm twist.`,
+    `Paw trace of the ${role} (${player}) in ${range.demo}, ${kind} ${range.from} s to ${range.to} s at steps of ${step} s. In degrees: the signed paw twist on the forearm from the bind, its change from the line before (JUMP above ${JUMP_ANGLE}°), the paw swing, the signed turn of the grip in the frame of the posed forearm from the accepted grip (the right arm with its sign turned), and the forearm twist.`,
     '',
     `| ${range.lift ? 'Wall' : 'Song'} s | ${SIDES.map((s) => `${s} twist | ${s} change | ${s} swing | ${s} grip | ${s} forearm`).join(' | ')} |`,
     `|---|${SIDES.map(() => '---|---|---|---|---').join('|')}|`,
@@ -2085,7 +2182,7 @@ export async function traceLines(
       const before = last[side];
       const change = before === null ? 0 : wrap(sample.pawRoll - before);
       last[side] = sample.pawRoll;
-      const signed = side === 'R' ? -sample.pawRoll : sample.pawRoll;
+      const signed = side === 'R' ? -sample.gripRoll : sample.gripRoll;
       const grip = grips ? wholeDegrees(wrap(signed - grips[side])) : '-';
       const jump = Math.abs(change) > JUMP_ANGLE ? ' JUMP' : '';
       return `${wholeDegrees(sample.pawRoll)} | ${wholeDegrees(change)}${jump} | ${wholeDegrees(sample.pawSwing)} | ${grip} | ${wholeDegrees(sample.foreTwist)}`;
@@ -2602,7 +2699,7 @@ async function childMain(args: readonly string[]): Promise<number> {
   }
   const json: ArmJson = {
     version: ARM_FORMAT,
-    since: 2,
+    since: ARM_FORMAT,
     roles: reports,
     missing: roles.filter((role) => !isRole(role)),
   };
