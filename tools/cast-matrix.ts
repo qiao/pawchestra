@@ -8,10 +8,9 @@
  * - **Hold.** A recast pair plays the shared hold of the instrument: the tool removes the own hold
  *   of the species from `SPECIES_HOLDS` and `SPECIES_WIND_HOLDS` in memory. The own role of a
  *   species keeps its own hold and its own instrument scale.
- * - **Scale.** A recast pair with a violin or a viola takes the scale of the rule of a violin shop
- *   (`ruleSize()` of `tools/hold-reach.ts`), clamped to the real sizes ({@link REAL_LENGTHS}), and a
- *   cello the scale of the cello rule (`celloRule()` of `tools/cello-size.ts`). Each other
- *   instrument keeps the scale 1, and the cell says so ({@link ScaleSource}).
+ * - **Scale.** A recast pair takes the size rule of its instrument (`setRecastScale()` of
+ *   `tools/recast-scale.ts`): the rule of a violin shop for a violin or a viola, and the cello rule
+ *   for a cello. Each other instrument keeps the scale 1, and the cell says so (`ScaleSource`).
  * - **Verdict.** A value of the gate over its limit fails, a clip over the limit of its pair fails,
  *   and a note target missed by more than the limit of the role fails. A value is open when the own
  *   pair of the role is over the same limit and the value is not worse by more than the margin of
@@ -42,12 +41,12 @@ import { dirname, join, resolve } from 'node:path';
 import { ACCEPTED_GRIPS, ARM_LIMITS, gateRows, probeRole } from './arm-check.ts';
 import type { GateRow, Measure, RoleReport } from './arm-check.ts';
 import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
-import { celloRule } from './cello-size.ts';
-import { REAL_VIOLINS, holdReach, ruleSize } from './hold-reach.ts';
 import { setHolds } from './hold-sets.ts';
 import { sampleAt, sweepDemos } from './pose-depth.ts';
 import type { TargetReach } from './pose-depth.ts';
 import { probeDemos } from './probe-demos.ts';
+import { setRecastScale } from './recast-scale.ts';
+import type { PairScale } from './recast-scale.ts';
 import {
   PROBE_NO_CACHE,
   ROOT,
@@ -103,18 +102,6 @@ export interface CastSample {
 }
 
 /**
- * The real total lengths of each instrument under the chin, from the tail end to the scroll, in
- * meters. The violin: the smallest and the largest violin of the size chart of a violin teacher
- * (`REAL_VIOLINS` of `tools/hold-reach.ts`). The viola: the body lengths of 10 to 16.5 inches of a
- * viola chart (`docs/reference/string-technique.md`, 1.10), times the 1.66 of the total length of
- * a full violin (0.59 m) to its body (0.356 m).
- */
-export const REAL_LENGTHS = {
-  violin: REAL_VIOLINS,
-  viola: { smallest: 0.42, largest: 0.7 },
-} as const;
-
-/**
  * The depth of a clip, or the error of a note target, past the own pair of the role above which
  * the value fails, in meters.
  */
@@ -123,28 +110,12 @@ export const CLIP_MARGIN = 0.01;
 /** The format version of {@link PairJson}. A new version gives new cache keys. */
 export const CAST_FORMAT = 2;
 
-/**
- * The source of the instrument scale of a pair. `own`: the own role of the species, with the scale
- * of the app. `rule`: the rule of a violin shop. `smallest`, `largest`: the rule, clamped to a
- * real size. `none`: no rule fits the instrument or the arm, so the scale is 1. `fixed`: the app
- * has no scale of the instrument. `set`: a change of `--set` or `--variant`.
- */
-export type ScaleSource = 'own' | 'rule' | 'smallest' | 'largest' | 'none' | 'fixed' | 'set';
-
 /** One variant of a run: a column of each role, with the hold changes of the variant. */
 export interface MatrixVariant {
   /** The name: `base` for the changes of `--set` alone, else the name of `--variant`. */
   readonly name: string;
   /** The hold changes (`setHolds()` of `tools/hold-sets.ts`), or `''` for no change. */
   readonly changes: string;
-}
-
-/** The instrument scale of a pair. */
-export interface PairScale {
-  /** The scale, as a factor of the instrument of the app. */
-  readonly value: number;
-  /** The source of the scale. */
-  readonly source: ScaleSource;
 }
 
 /** The deepest point of one pair of parts in one sample set of the sweep. */
@@ -416,52 +387,6 @@ function useSharedHold(species: SpeciesId, instrument: InstrumentId): void {
       Reflect.deleteProperty(entry, instrument);
     }
   }
-}
-
-/**
- * Sets the instrument scale of a recast species in memory, and gives it: the rule of a violin shop
- * for a violin or a viola, clamped to {@link REAL_LENGTHS}, the cello rule for a cello
- * (`celloRule()` of `tools/cello-size.ts`), else 1. Run it after {@link useSharedHold}, because
- * the rules pose the hold.
- *
- * @param species The species.
- * @param instrument The instrument.
- * @returns The scale.
- */
-function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale {
-  if (!isScaledInstrument(instrument)) {
-    return { value: 1, source: 'fixed' };
-  }
-
-  const params: SpeciesParams = SPECIES[species];
-  const param = SCALE_PARAMS[instrument];
-  Reflect.deleteProperty(params, param);
-  if (instrument === 'cello') {
-    const cello = celloRule(species);
-    const source =
-      cello.source === 'smallest' || cello.source === 'largest' ? cello.source : 'rule';
-    Reflect.set(params, param, cello.scale);
-    return { value: cello.scale, source };
-  }
-  if (instrument !== 'violin' && instrument !== 'viola') {
-    return { value: 1, source: 'none' };
-  }
-
-  const reach = holdReach(species, instrument, 'chair');
-  const rule = ruleSize(reach);
-  if (!rule) {
-    return { value: 1, source: 'none' };
-  }
-  const real = REAL_LENGTHS[instrument];
-  const perMeter = reach.scale / reach.length;
-  const scale: PairScale =
-    rule.length < real.smallest
-      ? { value: real.smallest * perMeter, source: 'smallest' }
-      : rule.length > real.largest
-        ? { value: real.largest * perMeter, source: 'largest' }
-        : { value: rule.scale, source: 'rule' };
-  Reflect.set(params, param, scale.value);
-  return scale;
 }
 
 /**
