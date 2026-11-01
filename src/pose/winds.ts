@@ -58,9 +58,21 @@ export interface WindHold {
   readonly rest: Quat;
   /**
    * The move of the `instrument` bone in the rest pose, in head heights, in the axes of the chest.
-   * The instrument comes down from the mouth to the lap.
+   * The instrument comes down from the mouth to the lap. With {@link WindHold.restArms}, the move
+   * starts at the place from the hanging arms.
    */
   readonly restShift: Vec3;
+  /**
+   * The arms in the rest pose from the hanging arms of the body (`hangingArm()` of `pose/hang.ts`,
+   * design 5.2): each upper arm swings forward by its angle and out until it clears the side of
+   * the body, and each elbow bends forward by its angle. The instrument takes its rest turn, and
+   * moves so that the paws that hold it at rest hold their rest grips at the hanging palms: the
+   * right paw alone when the left paw leaves its grip ({@link WindHold.restFreeL}), else the middle
+   * of both paws. A free left paw hangs with its own angles, also on a seat. The rest elbows point
+   * as the hanging elbows. Thus the rest elbows stay near the sides on each body. `null` keeps the
+   * rest place of {@link WindHold.restShift} from the mouth and the rest elbows of the hold.
+   */
+  readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
   readonly fingering: Fingering;
   /** The fundamental of a brass tube, as a MIDI key. 0 for a woodwind. */
   readonly fundamental: number;
@@ -211,6 +223,7 @@ const WOODWIND = {
   play: IDENTITY,
   rest: IDENTITY,
   restShift: [0, 0, 0],
+  restArms: null,
   fingering: 'holes',
   fundamental: 0,
   headTurn: 0,
@@ -1122,6 +1135,12 @@ export interface WindRig {
   readonly pivot: Vec3;
   /** The move of the `instrument` bone in the rest pose, in meters, in the axes of the chest. */
   readonly restOffset: Vec3;
+  /**
+   * The directions to which the elbows point in the rest pose: the rest elbows of the hold, or the
+   * elbows of the hanging arms ({@link WindHold.restArms}).
+   */
+  readonly restPoleL: Vec3;
+  readonly restPoleR: Vec3;
   readonly chestBind: Vec3;
   /** The bind positions of the `neck` and the `head` bones, around which the head turns. */
   readonly neckBind: Vec3;
@@ -1163,12 +1182,22 @@ function gripPoint(model: PlayerModel, grip: PiecePoint | null): Vec3 {
  * @param model The player model.
  * @param arm The left arm.
  * @param rest The free paw of the hold.
+ * @param angles The angles of the hanging left arm of {@link WindHold.restArms}, which hangs also
+ *   on a seat, or `null`.
  * @returns The paw.
  */
-function freeRestOf(model: PlayerModel, arm: ArmRig, rest: FreePaw): FreeRest {
+function freeRestOf(
+  model: PlayerModel,
+  arm: ArmRig,
+  rest: FreePaw,
+  angles: HangAngles | null,
+): FreeRest {
   const h = model.body.headHeight;
   const [out, up, forward] = rest.arc;
   const arc: Vec3 = [-out * h, up * h, -forward * h];
+  if (angles) {
+    return { kind: 'hang', hang: hangingArm(model, arm, angles), arc };
+  }
   if (model.support === 'stand') {
     return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), arc };
   }
@@ -1355,25 +1384,87 @@ export function windRig(
     new Vector3(...placePoint(model.pieces, { bone: 'slide', at: point }));
   const travelVector = slide ? slideAt(slide.to).sub(slideAt(slide.from)) : new Vector3();
   const left = side('L');
-  const rig = {
+  const placed = {
     hold,
     pivot: at(BONES.instrument),
     restOffset: toVec3(new Vector3(...hold.restShift).multiplyScalar(model.body.headHeight)),
+    restPoleL: hold.restPoleL,
+    restPoleR: hold.restPoleR,
     chestBind: at(BONES.chest),
     neckBind: at(BONES.neck),
     headBind: at(BONES.head),
     lip: toVec3(new Vector3(...hold.lipShift).multiplyScalar(model.body.headHeight)),
     left,
     right: side('R'),
-    freeL: hold.restFreeL ? freeRestOf(model, left.arm, hold.restFreeL) : null,
+    freeL: hold.restFreeL
+      ? freeRestOf(model, left.arm, hold.restFreeL, hold.restArms?.L ?? null)
+      : null,
     slideAxis: toVec3(travelVector.clone().normalize()),
   };
+  const rig = hold.restArms ? armRest(model, placed, hold.restArms) : placed;
   const signed = {
     ...rig,
     left: { ...rig.left, aimSign: aimSignOf(rig, rig.left) },
     right: { ...rig.right, aimSign: aimSignOf(rig, rig.right) },
   };
   return { ...signed, slideReach: slideReachOf(signed, travelVector.length()) };
+}
+
+/**
+ * Gives the rest place of a wind instrument from the hanging arms of the body (design 5.2,
+ * {@link WindHold.restArms}), with the chest in its bind pose: each arm hangs out to the side
+ * until it clears the body, with its own forward swing and elbow bend (`hangingArm()`), and with
+ * the turn of its shoulder bone in the hold. The instrument takes its rest turn, and moves so that
+ * the rest grip of the right palm lies at the hanging right palm when the left paw leaves its grip,
+ * else so that the middle of both rest grips lies at the middle of both hanging palms. The move of
+ * the hold ({@link WindHold.restShift}) then adds to that place. The rest elbows point as the
+ * hanging elbows.
+ *
+ * @param model The player model.
+ * @param rig The points of the player, with the rest move of the hold alone.
+ * @param arms The angles of each arm.
+ * @returns The points, with the rest move and the rest elbows from the hanging arms.
+ */
+function armRest(
+  model: PlayerModel,
+  rig: Omit<WindRig, 'slideReach'>,
+  arms: NonNullable<WindHold['restArms']>,
+): Omit<WindRig, 'slideReach'> {
+  const chest = { rotation: new Quaternion(), position: new Vector3(...rig.chestBind) };
+  const restTurn = new Quaternion(...rig.hold.rest);
+  const pivotAt = new Vector3(...rig.pivot);
+  // The place of the rest pivot at which the rest grip of one side lies at its hanging palm.
+  const pivotFor = (side: WindSide, angles: HangAngles) => {
+    const hang = hangingArm(model, side.arm, angles);
+    const turn =
+      side.arm.side === 'L'
+        ? leftShoulderTurn(rig.hold, new Quaternion())
+        : rightShoulderTurn(rig.hold, new Quaternion());
+    const shoulderAt = poseShoulder(side.arm, chest, rig.chestBind, turn);
+    const palmAt = hangingWrist(hang, shoulderAt, new Vector3()).add(
+      new Vector3(...side.arm.palm).applyQuaternion(
+        hangingHand(hang, shoulderAt, new Quaternion()),
+      ),
+    );
+    const grip = new Vector3(...side.restGrip).sub(pivotAt).applyQuaternion(restTurn);
+    return { pivot: palmAt.sub(grip), pole: hang.pole };
+  };
+  const right = pivotFor(rig.right, arms.R);
+  const left = pivotFor(rig.left, arms.L);
+  const restPivot = rig.freeL
+    ? right.pivot
+    : left.pivot.clone().add(right.pivot).multiplyScalar(0.5);
+  // The rest pivot is the mouth with the move of the hold (`placeWind()`).
+  const move = restPivot
+    .sub(pivotAt)
+    .sub(new Vector3(...rig.lip))
+    .add(new Vector3(...rig.restOffset));
+  return {
+    ...rig,
+    restOffset: toVec3(move),
+    restPoleL: left.pole,
+    restPoleR: right.pole,
+  };
 }
 
 /** The pose of a wind player that is not in the rotations of its bones. */
@@ -1832,13 +1923,13 @@ export function poseWind(
   const { hold } = rig;
   const { freeL } = rig;
   const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
-  const restPoleL = freeL?.kind === 'hang' ? freeL.hang.pole : hold.restPoleL;
+  const restPoleL = freeL?.kind === 'hang' ? freeL.hang.pole : rig.restPoleL;
   const poleL = mixPole(restPoleL, hold.poleL, weight);
   leftShoulderTurn(hold, leftTurn);
   poseSide(rig, rig.left, frames, leftTurn, poleL, left, freeL, weight, out.rotations);
   const right = curlOf(state.fingersR, weight, hold.gripCurl?.[1] ?? null);
   rightShoulderTurn(hold, rightTurn);
-  const poleR = mixPole(hold.restPoleR, hold.poleR, weight);
+  const poleR = mixPole(rig.restPoleR, hold.poleR, weight);
   poseSide(rig, rig.right, frames, rightTurn, poleR, right, null, weight, out.rotations);
   setBoneRotation(out.rotations, BONES.instrument, local);
   slide.toArray(out.slideOffset);
