@@ -88,10 +88,9 @@ PALETTE = {
 COLOR_ORDER = tuple(PALETTE)
 
 
-# ##### The presets. #####
-#
 # Each preset gives its places in H, the height from the soles to the top of the head, in the axes
 # of the studio: y up, +z forward, and +x the left side. The right side mirrors the left side.
+
 
 def human_preset():
     """Gives the human preset: an adult of 1.8 m, as the Mixamo characters.
@@ -132,8 +131,12 @@ def human_preset():
         ),
         'limb': {
             # Radii at the shoulder, the elbow, the wrist, the hip, the knee, and the ankle.
-            'shoulder': 0.032, 'elbow': 0.024, 'wrist': 0.019,
-            'hip': 0.05, 'knee': 0.032, 'ankle': 0.022,
+            'shoulder': 0.032,
+            'elbow': 0.024,
+            'wrist': 0.019,
+            'hip': 0.05,
+            'knee': 0.032,
+            'ankle': 0.022,
         },
         'hand': {'width': 0.03, 'thick': 0.012},
         'foot': {'width': 0.024, 'thick': 0.018},
@@ -184,8 +187,12 @@ def animal_preset():
             (1.005, 0.07, 0.075, 0.02),
         ),
         'limb': {
-            'shoulder': 0.042, 'elbow': 0.034, 'wrist': 0.03,
-            'hip': 0.07, 'knee': 0.05, 'ankle': 0.04,
+            'shoulder': 0.042,
+            'elbow': 0.034,
+            'wrist': 0.03,
+            'hip': 0.07,
+            'knee': 0.05,
+            'ankle': 0.04,
         },
         'hand': {'width': 0.05, 'thick': 0.024},
         'foot': {'width': 0.04, 'thick': 0.028},
@@ -245,8 +252,6 @@ def landmarks(p):
         'top': Vector((0, h, head[-1][3] * h)),
     }
 
-
-# ##### Step 1: the body. #####
 
 def skin_graph(p):
     """Gives the graph of the Skin modifier: the points in meters (studio axes), the radius of each
@@ -362,8 +367,6 @@ def body_object(p, name='Mannequin'):
     return out
 
 
-# ##### Step 2: the colors. #####
-
 def limb_segments(at):
     """Gives the segments of the left limbs for the colors: the name, the start, the end, and the
     radius within which a face belongs to the segment, as a part of the length."""
@@ -460,8 +463,12 @@ def palette_png():
         return struct.pack('>I', len(data)) + body + struct.pack('>I', zlib.crc32(body))
 
     header = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
-    return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', header)
-            + chunk(b'IDAT', zlib.compress(bytes(raw), 9)) + chunk(b'IEND', b''))
+    return (
+        b'\x89PNG\r\n\x1a\n'
+        + chunk(b'IHDR', header)
+        + chunk(b'IDAT', zlib.compress(bytes(raw), 9))
+        + chunk(b'IEND', b'')
+    )
 
 
 def cell_uv(name):
@@ -505,25 +512,38 @@ def paint(p, ob, work):
     return counts
 
 
-# ##### Step 3: the Mixamo skeleton. #####
-
 #: The bones of the Mixamo skeleton with all fingers (65 bones), in parent order, with the prefix
 #: `mixamorig:`. Each name is a bone of `Xbot.glb` and of `Samba Dancing.fbx` of the three.js
 #: examples, which Mixamo exported. `Left` stands for each side. The bones that end a chain
 #: (`HeadTop_End`, `Toe_End`, and the fourth bone of each finger) hold no weight.
 MIXAMO_CENTER = (
-    ('Hips', None), ('Spine', 'Hips'), ('Spine1', 'Spine'), ('Spine2', 'Spine1'),
-    ('Neck', 'Spine2'), ('Head', 'Neck'), ('HeadTop_End', 'Head'),
+    ('Hips', None),
+    ('Spine', 'Hips'),
+    ('Spine1', 'Spine'),
+    ('Spine2', 'Spine1'),
+    ('Neck', 'Spine2'),
+    ('Head', 'Neck'),
+    ('HeadTop_End', 'Head'),
 )
 MIXAMO_SIDE = (
-    ('LeftShoulder', 'Spine2'), ('LeftArm', 'LeftShoulder'), ('LeftForeArm', 'LeftArm'),
-    ('LeftHand', 'LeftForeArm'),
-) + tuple(
-    (f'LeftHand{finger}{k}', 'LeftHand' if k == 1 else f'LeftHand{finger}{k - 1}')
-    for finger in ('Thumb', 'Index', 'Middle', 'Ring', 'Pinky') for k in (1, 2, 3, 4)
-) + (
-    ('LeftUpLeg', 'Hips'), ('LeftLeg', 'LeftUpLeg'), ('LeftFoot', 'LeftLeg'),
-    ('LeftToeBase', 'LeftFoot'), ('LeftToe_End', 'LeftToeBase'),
+    (
+        ('LeftShoulder', 'Spine2'),
+        ('LeftArm', 'LeftShoulder'),
+        ('LeftForeArm', 'LeftArm'),
+        ('LeftHand', 'LeftForeArm'),
+    )
+    + tuple(
+        (f'LeftHand{finger}{k}', 'LeftHand' if k == 1 else f'LeftHand{finger}{k - 1}')
+        for finger in ('Thumb', 'Index', 'Middle', 'Ring', 'Pinky')
+        for k in (1, 2, 3, 4)
+    )
+    + (
+        ('LeftUpLeg', 'Hips'),
+        ('LeftLeg', 'LeftUpLeg'),
+        ('LeftFoot', 'LeftLeg'),
+        ('LeftToeBase', 'LeftFoot'),
+        ('LeftToe_End', 'LeftToeBase'),
+    )
 )
 
 #: The prefix of each bone name of a Mixamo skeleton.
@@ -533,8 +553,10 @@ PREFIX = 'mixamorig:'
 def mixamo_bones():
     """Gives the 65 bones (name with no prefix, parent) in parent order: the middle, the left side,
     then the right side."""
-    right = tuple((n.replace('Left', 'Right'), None if q is None else q.replace('Left', 'Right'))
-                  for n, q in MIXAMO_SIDE)
+    right = tuple(
+        (n.replace('Left', 'Right'), None if q is None else q.replace('Left', 'Right'))
+        for n, q in MIXAMO_SIDE
+    )
     return MIXAMO_CENTER + MIXAMO_SIDE + right
 
 
@@ -584,8 +606,12 @@ def mixamo_joints(p):
 def bone_tail(name, joints, bones):
     """Gives the end of a bone for the automatic weights: the head of its main child, or a short
     step past the head along the parent bone for a bone that ends a chain."""
-    main = {'Hips': 'Spine', 'Spine2': 'Neck', 'LeftHand': 'LeftHandMiddle1',
-            'RightHand': 'RightHandMiddle1'}
+    main = {
+        'Hips': 'Spine',
+        'Spine2': 'Neck',
+        'LeftHand': 'LeftHandMiddle1',
+        'RightHand': 'RightHandMiddle1',
+    }
     children = [n for n, q in bones if q == name]
     child = main.get(name, children[0] if children else None)
     if child:
@@ -642,8 +668,6 @@ def mixamo_rig(p, body):
         pb.rotation_mode = 'QUATERNION'
     return rig
 
-
-# ##### Step 4: the clips. #####
 
 def quat(axis, degrees):
     """Gives the turn about an axis of Blender by an angle in degrees."""
@@ -728,8 +752,7 @@ def clap_pose(p, j, gap):
         e, w, t = (to_blender(j[side + k]) for k in ('ForeArm', 'Hand', 'HandMiddle4'))
         upper, fore = (e - s).length, (w - e).length
         hand = (t - w).length
-        target = Vector((sign * gap, s.y - 0.8 * (upper + fore) + 0.2 * hand,
-                         s.z - 0.25 * upper))
+        target = Vector((sign * gap, s.y - 0.8 * (upper + fore) + 0.2 * hand, s.z - 0.25 * upper))
         target.x = sign * (gap + 0.1 * hand)
         pole = Vector((sign * 1.0, 0.3, -1.0))
         d1, d2 = two_bone(s, target, upper, fore, pole)
@@ -746,8 +769,17 @@ def clap_pose(p, j, gap):
 def clip_clap(p, j, f):
     """The arms come forward, and the paws meet in front of the chest 4 times."""
     reach = ramp(f, ((0, 0.0), (15, 1.0), (63, 1.0), (78, 0.0)))
-    beat = ((15, 1.0), (21, 0.0), (27, 1.0), (33, 0.0), (39, 1.0), (45, 0.0), (51, 1.0),
-            (57, 0.0), (63, 1.0))
+    beat = (
+        (15, 1.0),
+        (21, 0.0),
+        (27, 1.0),
+        (33, 0.0),
+        (39, 1.0),
+        (45, 0.0),
+        (51, 1.0),
+        (57, 0.0),
+        (63, 1.0),
+    )
     open_ = ramp(f, beat)
     hand = (j['LeftHandMiddle4'] - j['LeftHand']).length
     thick = p['hand']['thick'] * p['height']
@@ -796,7 +828,7 @@ def add_clips(p, rig):
             turns, _ = fn(p, j, f)
             for name in names:
                 pb = rig.pose.bones[name]
-                pb.rotation_quaternion = local(turns.get(name[len(PREFIX):], Quaternion()))
+                pb.rotation_quaternion = local(turns.get(name[len(PREFIX) :], Quaternion()))
                 pb.keyframe_insert('rotation_quaternion', frame=f)
             hips = rig.pose.bones[PREFIX + 'Hips']
             hips.location = (0, 0, 0)
@@ -810,8 +842,6 @@ def add_clips(p, rig):
         pb.location = (0, 0, 0)
     return actions
 
-
-# ##### Step 5: the A-pose. #####
 
 #: The angle of each arm below the level in the A-pose, in degrees, near the 43 degrees of the
 #: upper arm of the wolf mesh (`tools/mesh-rigs/wolf.json`). An angle of 45 degrees gives the
@@ -837,8 +867,6 @@ def a_pose_mesh(rig, body, name):
     ob.vertex_groups.clear()
     return ob
 
-
-# ##### Step 6: the files. #####
 
 #: The centimeters for each meter: a Mixamo FBX file is in centimeters (`UnitScaleFactor` 1 in
 #: `Samba Dancing.fbx`), and the joints of `Xbot.glb` are in centimeters under an armature node
@@ -878,12 +906,24 @@ def write_glb(path, objects, rigged):
     """Writes the selected objects as a GLB file, with the palette texture as PNG."""
     select(objects)
     bpy.ops.export_scene.gltf(
-        filepath=path, export_format='GLB', use_selection=True, export_apply=False,
-        export_image_format='AUTO', export_extras=False, export_attributes=False,
-        export_tangents=False, export_morph=False, export_skins=rigged,
-        export_animations=rigged, export_animation_mode='ACTIONS', export_force_sampling=True,
-        export_def_bones=False, export_rest_position_armature=True,
-        export_reset_pose_bones=True, export_optimize_animation_size=False)
+        filepath=path,
+        export_format='GLB',
+        use_selection=True,
+        export_apply=False,
+        export_image_format='AUTO',
+        export_extras=False,
+        export_attributes=False,
+        export_tangents=False,
+        export_morph=False,
+        export_skins=rigged,
+        export_animations=rigged,
+        export_animation_mode='ACTIONS',
+        export_force_sampling=True,
+        export_def_bones=False,
+        export_rest_position_armature=True,
+        export_reset_pose_bones=True,
+        export_optimize_animation_size=False,
+    )
 
 
 def steady_fbx():
@@ -917,24 +957,46 @@ def write_fbx(path, objects, rigged):
     steady_fbx()
     select(objects)
     bpy.ops.export_scene.fbx(
-        filepath=path, use_selection=True,
+        filepath=path,
+        use_selection=True,
         object_types={'ARMATURE', 'MESH'} if rigged else {'MESH'},
-        global_scale=1.0, apply_unit_scale=True, apply_scale_options='FBX_SCALE_NONE',
-        axis_forward='-Z', axis_up='Y', use_mesh_modifiers=False, mesh_smooth_type='FACE',
-        add_leaf_bones=False, primary_bone_axis='Y', secondary_bone_axis='X',
-        armature_nodetype='NULL', use_armature_deform_only=False,
-        bake_anim=rigged, bake_anim_use_all_bones=True, bake_anim_use_nla_strips=False,
-        bake_anim_use_all_actions=True, bake_anim_force_startend_keying=True,
-        bake_anim_step=1.0, bake_anim_simplify_factor=1.0,
-        path_mode='COPY', embed_textures=True)
+        global_scale=1.0,
+        apply_unit_scale=True,
+        apply_scale_options='FBX_SCALE_NONE',
+        axis_forward='-Z',
+        axis_up='Y',
+        use_mesh_modifiers=False,
+        mesh_smooth_type='FACE',
+        add_leaf_bones=False,
+        primary_bone_axis='Y',
+        secondary_bone_axis='X',
+        armature_nodetype='NULL',
+        use_armature_deform_only=False,
+        bake_anim=rigged,
+        bake_anim_use_all_bones=True,
+        bake_anim_use_nla_strips=False,
+        bake_anim_use_all_actions=True,
+        bake_anim_force_startend_keying=True,
+        bake_anim_step=1.0,
+        bake_anim_simplify_factor=1.0,
+        path_mode='COPY',
+        embed_textures=True,
+    )
 
 
 def clear_scene():
     """Removes each object and each data block of the start file."""
     for ob in list(bpy.data.objects):
         bpy.data.objects.remove(ob)
-    for coll in (bpy.data.meshes, bpy.data.armatures, bpy.data.actions, bpy.data.materials,
-                 bpy.data.images, bpy.data.cameras, bpy.data.lights):
+    for coll in (
+        bpy.data.meshes,
+        bpy.data.armatures,
+        bpy.data.actions,
+        bpy.data.materials,
+        bpy.data.images,
+        bpy.data.cameras,
+        bpy.data.lights,
+    ):
         for block in list(coll):
             coll.remove(block)
     scene = bpy.context.scene
@@ -959,8 +1021,7 @@ def build(preset, work):
     add_clips(p, rig)
     flat = bpy.data.objects.new('MannequinTPose', body.data.copy())
     bpy.context.scene.collection.objects.link(flat)
-    return {'preset': p, 'body': body, 'rig': rig, 'apose': pose, 'tpose': flat,
-            'counts': counts}
+    return {'preset': p, 'body': body, 'rig': rig, 'apose': pose, 'tpose': flat, 'counts': counts}
 
 
 def write_files(scene, out):
@@ -982,26 +1043,41 @@ def write_files(scene, out):
 
 
 def main():
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+    argv = sys.argv[sys.argv.index('--') + 1 :] if '--' in sys.argv else []
     if len(argv) != 3 or argv[0] not in PRESETS or argv[1] != '--out':
-        raise SystemExit('Usage: blender -b --factory-startup --python '
-                         'tools/blender/mannequin.py -- <human|animal> --out <dir>')
+        raise SystemExit(
+            'Usage: blender -b --factory-startup --python '
+            'tools/blender/mannequin.py -- <human|animal> --out <dir>'
+        )
     if sys.flags.hash_randomization:
         # The FBX exporter makes its ids from the string hash, so the run needs a fixed seed.
         env = dict(os.environ, PYTHONHASHSEED='0')
         code = subprocess.call(
-            [bpy.app.binary_path, '-b', '--factory-startup', '--python-use-system-env',
-             '--python', os.path.abspath(__file__), '--', *argv], env=env)
+            [
+                bpy.app.binary_path,
+                '-b',
+                '--factory-startup',
+                '--python-use-system-env',
+                '--python',
+                os.path.abspath(__file__),
+                '--',
+                *argv,
+            ],
+            env=env,
+        )
         raise SystemExit(code)
     preset, out = argv[0], os.path.abspath(argv[2])
     os.makedirs(out, exist_ok=True)
     import tempfile
+
     with tempfile.TemporaryDirectory() as work:
         scene = build(preset, work)
         paths = write_files(scene, out)
     me = scene['body'].data
-    print(f'mannequin {preset}: {len(me.vertices)} vertices, {len(me.polygons)} quads, '
-          f'{2 * len(me.polygons)} triangles')
+    print(
+        f'mannequin {preset}: {len(me.vertices)} vertices, {len(me.polygons)} quads, '
+        f'{2 * len(me.polygons)} triangles'
+    )
     print('colors: ' + ', '.join(f'{k} {v}' for k, v in sorted(scene['counts'].items())))
     for key, path in paths.items():
         with open(path, 'rb') as f:
