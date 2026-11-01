@@ -24,7 +24,7 @@ import { closeSurface, closedPart, openLoops, posedPart } from './test-clearance
 import type { ClosedSurface, PosedPart } from './test-clearance.ts';
 import { posedPiecePoint, posedPoint } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
-import { NOT_STARTED, PLAYING, allAudible, ofConductor } from './test-scene.ts';
+import { NOT_STARTED, PLAYING, allAudible, ofConductor, seatSpecies } from './test-scene.ts';
 import type { TestScene } from './test-scene.ts';
 import { BODY_OBSTACLE } from './test-sweep.ts';
 import type { AcceptedDepth, NoteTarget, RoleSweep, SweepPart, SweepSample } from './test-sweep.ts';
@@ -951,7 +951,8 @@ function sweptBowed(
   species: ReadonlySet<SpeciesId>,
 ): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (!cast || !species.has(cast.species) || cast.instrument !== instrument) {
+  const seat = seatSpecies(scene, index);
+  if (!cast || !seat || !species.has(seat) || cast.instrument !== instrument) {
     return false;
   }
   // A soloist stands where the section sits. The contrabass player stands in each seat.
@@ -1107,15 +1108,17 @@ function flutistTargets(scene: TestScene, index: number, model: PlayerModel): No
  */
 function sweptFlutist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'fox-tan' || cast.instrument !== 'flute') {
+  if (seatSpecies(scene, index) !== 'fox-tan' || cast?.instrument !== 'flute') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) =>
-      p.cast.species === 'fox-tan' && p.cast.instrument === 'flute' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'fox-tan' &&
+      p.cast.instrument === 'flute' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1211,15 +1214,17 @@ function trombonistTargets(scene: TestScene, index: number, model: PlayerModel):
  */
 function sweptTrombonist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'panda' || cast.instrument !== 'trombone') {
+  if (seatSpecies(scene, index) !== 'panda' || cast?.instrument !== 'trombone') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) =>
-      p.cast.species === 'panda' && p.cast.instrument === 'trombone' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'panda' &&
+      p.cast.instrument === 'trombone' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1390,7 +1395,8 @@ const TIMPANIST_SWEEP: RoleSweep = {
   players: (scene) =>
     scene.layout.players.flatMap((place, index) => {
       const { species, instrument, kettles, support } = place.cast;
-      if (!TIMPANISTS.has(species) || instrument !== 'timpani') {
+      const seat = seatSpecies(scene, index);
+      if (!seat || !TIMPANISTS.has(seat) || instrument !== 'timpani') {
         return [];
       }
       const buffer = createScenePose(scene.plan);
@@ -1455,7 +1461,8 @@ function percussionSweep(
     players: (scene) =>
       scene.layout.players.flatMap((place, index) => {
         const { species, kettles, support } = place.cast;
-        if (!PERCUSSIONISTS.has(species) || place.cast.instrument !== instrument) {
+        const seat = seatSpecies(scene, index);
+        if (!seat || !PERCUSSIONISTS.has(seat) || place.cast.instrument !== instrument) {
           return [];
         }
         const buffer = createScenePose(scene.plan);
@@ -1594,14 +1601,17 @@ export function soloistScene(role: SoloistRole, species: SpeciesId, seed = 1): T
  */
 function sweptOboist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'mouse' || cast.instrument !== 'oboe') {
+  if (seatSpecies(scene, index) !== 'mouse' || cast?.instrument !== 'oboe') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) => p.cast.species === 'mouse' && p.cast.instrument === 'oboe' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'mouse' &&
+      p.cast.instrument === 'oboe' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1655,15 +1665,17 @@ const OBOIST_SWEEP: RoleSweep = {
  */
 function sweptBassoonist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'beaver' || cast.instrument !== 'bassoon') {
+  if (seatSpecies(scene, index) !== 'beaver' || cast?.instrument !== 'bassoon') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) =>
-      p.cast.species === 'beaver' && p.cast.instrument === 'bassoon' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'beaver' &&
+      p.cast.instrument === 'bassoon' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1725,14 +1737,15 @@ const BASSOONIST_SWEEP: RoleSweep = {
  */
 function sweptHornist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'pig' || cast.instrument !== 'horn') {
+  if (seatSpecies(scene, index) !== 'pig' || cast?.instrument !== 'horn') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) => p.cast.species === 'pig' && p.cast.instrument === 'horn' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'pig' && p.cast.instrument === 'horn' && p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1788,15 +1801,17 @@ const HORNIST_SWEEP: RoleSweep = {
  */
 function sweptClarinetist(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'wolf' || cast.instrument !== 'clarinet') {
+  if (seatSpecies(scene, index) !== 'wolf' || cast?.instrument !== 'clarinet') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) =>
-      p.cast.species === 'wolf' && p.cast.instrument === 'clarinet' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'wolf' &&
+      p.cast.instrument === 'clarinet' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1850,15 +1865,17 @@ const CLARINETIST_SWEEP: RoleSweep = {
  */
 function sweptTrumpeter(scene: TestScene, index: number): boolean {
   const { cast } = scene.layout.players[index] ?? {};
-  if (cast?.species !== 'monkey' || cast.instrument !== 'trumpet') {
+  if (seatSpecies(scene, index) !== 'monkey' || cast?.instrument !== 'trumpet') {
     return false;
   }
   if (cast.support === 'stand') {
     return true;
   }
   const first = scene.layout.players.findIndex(
-    (p) =>
-      p.cast.species === 'monkey' && p.cast.instrument === 'trumpet' && p.cast.support !== 'stand',
+    (p, i) =>
+      seatSpecies(scene, i) === 'monkey' &&
+      p.cast.instrument === 'trumpet' &&
+      p.cast.support !== 'stand',
   );
   return first === index;
 }
@@ -1913,7 +1930,7 @@ const TRUMPETER_SWEEP: RoleSweep = {
  */
 function sweptTubist(scene: TestScene, index: number): boolean {
   const first = scene.layout.players.findIndex(
-    (p) => p.cast.species === 'rhino' && p.cast.instrument === 'tuba',
+    (p, i) => seatSpecies(scene, i) === 'rhino' && p.cast.instrument === 'tuba',
   );
   return first === index;
 }
@@ -2008,7 +2025,7 @@ function singerTargets(scene: TestScene, index: number, model: PlayerModel): Not
  */
 function sweptSinger(scene: TestScene, index: number): boolean {
   const first = scene.layout.players.findIndex(
-    (p) => p.cast.species === 'penguin' && p.cast.instrument === 'choir-folder',
+    (p, i) => seatSpecies(scene, i) === 'penguin' && p.cast.instrument === 'choir-folder',
   );
   return first === index;
 }
