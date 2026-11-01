@@ -46,7 +46,7 @@ const USAGE = 'Usage: pnpm mixamo-import <file.fbx|file.glb> --out <dir>';
  * @param path The absolute path.
  * @returns True when git ignores the path.
  */
-function outsideGit(path: string): boolean {
+export function outsideGit(path: string): boolean {
   const inside = relative(ROOT, path);
   if (inside.startsWith('..') || resolve(ROOT, inside) !== path) {
     return true;
@@ -56,24 +56,26 @@ function outsideGit(path: string): boolean {
 }
 
 /**
- * Runs the Blender script, and prints its log lines.
+ * Runs a Blender script of `tools/blender/` with headless Blender, and prints its log lines: the
+ * lines that start with the name of the script and a colon.
  *
- * @param source The input file.
- * @param out The output GLB file.
+ * @param script The path of the script.
+ * @param args The arguments of the script.
  * @returns A promise that ends when Blender ends.
  */
-function runBlender(source: string, out: string): Promise<void> {
+export function runBlenderScript(script: string, args: readonly string[]): Promise<void> {
   const blender = process.env['BLENDER'] ?? 'blender';
-  const args = ['-b', '--factory-startup', '--python-exit-code', '1', '--python', SCRIPT, '--'];
+  const head = ['-b', '--factory-startup', '--python-exit-code', '1', '--python', script, '--'];
+  const prefix = `${basename(script, '.py')}:`;
   return new Promise((done, fail) => {
     const child = trackChild(
-      spawn(blender, [...args, source, out], { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] }),
+      spawn(blender, [...head, ...args], { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] }),
     );
     let errors = '';
     child.stdout?.setEncoding('utf8');
     child.stdout?.on('data', (text: string) => {
       for (const line of text.split('\n')) {
-        if (line.startsWith('mixamo_import:')) {
+        if (line.startsWith(prefix)) {
           console.log(line);
         }
       }
@@ -187,10 +189,23 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
-  mkdirSync(dir, { recursive: true });
-  const out = join(dir, `${basename(source, extname(source))}.glb`);
-  await runBlender(source, out);
-  printFacts(readSourceFile(new Uint8Array(readFileSync(out))));
+  printFacts(readSourceFile(new Uint8Array(readFileSync(await importMixamo(source, dir)))));
 }
 
-await main();
+/**
+ * Converts a Mixamo file into a GLB file in meters (`tools/blender/mixamo_import.py`).
+ *
+ * @param source The FBX, GLB, or glTF file.
+ * @param dir The output folder, which git must ignore.
+ * @returns The path of `<dir>/<name>.glb`.
+ */
+export async function importMixamo(source: string, dir: string): Promise<string> {
+  mkdirSync(dir, { recursive: true });
+  const out = join(dir, `${basename(source, extname(source))}.glb`);
+  await runBlenderScript(SCRIPT, [source, out]);
+  return out;
+}
+
+if (import.meta.main) {
+  await main();
+}
