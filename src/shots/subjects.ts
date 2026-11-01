@@ -420,26 +420,38 @@ function modelBodyOf(model: PlayerModel): ModelBody {
 
   const { positions, bones } = model.mesh;
   const instrument = boneIndex('instrument');
-  const seen = new Set<number>();
+  const c = BODY_PART_CELL;
+  // The corners of a triangle mesh repeat each point as an exact copy, so a hash table of the bits
+  // of the three floats finds each repeat with no rounding.
+  const bits = new Int32Array(positions.buffer, positions.byteOffset, positions.length);
+  const size = 2 ** Math.ceil(Math.log2(2 * bones.length + 2));
+  const table = new Int32Array(size).fill(-1);
   const cells = new Map<number, number[]>();
-  // The key of a point or of a cell holds each axis in 17 bits.
-  const keyOf = (x: number, y: number, z: number): number =>
-    ((x + 2 ** 16) * 2 ** 17 + y + 2 ** 16) * 2 ** 17 + z + 2 ** 16;
   for (let corner = 0; corner < bones.length; corner++) {
     if ((bones[corner] ?? 0) >= instrument) {
       continue;
     }
+    const [a, b, d] = [bits[corner * 3] ?? 0, bits[corner * 3 + 1] ?? 0, bits[corner * 3 + 2] ?? 0];
+    let slot =
+      (Math.imul(a, 0x9e3779b1) ^ Math.imul(b, 0x85ebca77) ^ Math.imul(d, 0xc2b2ae3d)) & (size - 1);
+    let repeat = false;
+    for (let other = table[slot] ?? -1; other >= 0; other = table[slot] ?? -1) {
+      if (bits[other * 3] === a && bits[other * 3 + 1] === b && bits[other * 3 + 2] === d) {
+        repeat = true;
+        break;
+      }
+      slot = (slot + 1) & (size - 1);
+    }
+    if (repeat) {
+      continue;
+    }
+    table[slot] = corner;
     const x = positions[corner * 3] ?? 0;
     const y = positions[corner * 3 + 1] ?? 0;
     const z = positions[corner * 3 + 2] ?? 0;
-    // A point in steps of 0.1 mm, up to ±6.5 m.
-    const key = keyOf(Math.round(x * 1e4), Math.round(y * 1e4), Math.round(z * 1e4));
-    if (seen.has(key)) {
-      continue;
-    }
-    seen.add(key);
-    const c = BODY_PART_CELL;
-    const cell = keyOf(Math.floor(x / c), Math.floor(y / c), Math.floor(z / c));
+    // 8 bits for each axis of the cell: a model within ±32 m.
+    const cell =
+      ((Math.floor(x / c) + 128) * 256 + Math.floor(y / c) + 128) * 256 + Math.floor(z / c) + 128;
     const list = cells.get(cell) ?? [];
     list.push(x, y, z);
     cells.set(cell, list);
