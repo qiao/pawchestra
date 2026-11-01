@@ -371,7 +371,9 @@ function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale
 }
 
 /**
- * Measures one pair in this process: the arm gate and the sweep on the sample of the role.
+ * Measures one pair in this process: the arm gate and the sweep on the sample of the role. A fault
+ * of the pair, such as a species with no body sweep, gives the JSON with its message, so that the
+ * matrix shows it as a cell.
  *
  * @param species The species.
  * @param role The role.
@@ -383,14 +385,13 @@ async function measurePair(species: SpeciesId, role: string, demo: string): Prom
   const name = pairName(species, role);
   const own = name === role;
   const base = { version: CAST_FORMAT, species, role, name, own, demo };
-  const source = findRole(name);
-  const sweep = findSweep(name);
-  if (source?.kind !== 'player' || !sweep) {
-    throw new Error(`The pair ${name} has no role or no sweep.`);
-  }
-
   let scale: PairScale = { value: 1, source: 'own' };
   try {
+    const source = findRole(name);
+    const sweep = findSweep(name);
+    if (source?.kind !== 'player' || !sweep) {
+      throw new Error(`The pair ${name} has no role or no sweep.`);
+    }
     if (!own) {
       useSharedHold(species, source.instrument);
       scale = setRecastScale(species, source.instrument);
