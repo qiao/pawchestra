@@ -321,9 +321,12 @@ see "Retarget and render"), and runs the arm gate and the clearance sweep with i
 on the shortest demo of the role. A recast pair plays the shared hold of the instrument, because an
 own hold would hide a fault of the body. A violin or a viola takes the size of the rule of a violin
 shop, and a cello the cello rule, each clamped to the real sizes (4.6). Each other instrument keeps
-the size of the app. `--quick` takes a coarse sample, so that a round finds the faults of a pair
-early. A value over its limit
-fails, unless the own pair of the role has the same open item. The grip of each pair counts from
+the size of the app. The recast roles of `pnpm arm-check`, `pnpm pose-depth`, and `pnpm
+close-views` take the same size (`tools/recast-scale.ts`), so that a run of one pair measures
+its cell. `--quick` takes a coarse sample, so that a round finds the faults of a pair early.
+`--set` and `--variant` change the holds in memory, as the other hold tools do, so that a try
+needs no edit of the source. A value over its limit fails, unless the own pair of the role has the
+same open item. The grip of each pair counts from
 the accepted grip of the role, because the frame of the grip does not move with the bind. Run the
 matrix after a change of a shared hold, a bind rule, or the skeleton, and compare the counts of
 each verdict.
