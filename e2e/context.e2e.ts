@@ -68,8 +68,10 @@ test('keeps the reflections after a loss of the WebGL context (review of step 8,
     lose.restoreContext();
     await restored;
   });
-  await page.waitForTimeout(1000);
   // The environment of the reflections lights the stage and the players. Without it, the box
-  // was 2.6% darker. The grain and the dust change it by about 0.1%.
-  expect(await meanLight(page)).toBeGreaterThan(0.99 * before);
+  // was 2.6% darker. The grain and the dust change it by about 0.1%. The app makes the maps again
+  // in slices after the restore (design 7.2), so the test waits until the light comes back.
+  await expect
+    .poll(async () => meanLight(page), { timeout: 30_000 })
+    .toBeGreaterThan(0.99 * before);
 });
