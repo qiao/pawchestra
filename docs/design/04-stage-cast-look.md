@@ -168,13 +168,15 @@ has a studio body: a source mesh, rigged into the studio format. The app reads o
 of `src/models/studio/`, and the tools make them from the meshes:
 
 ```text
-user mesh (Meshy GLB)  ->  tools/blender/<a>_arms.py  ->  <a>-arms.glb + <a>-weights.json
+user mesh (Meshy GLB)  ->  tools/blender/arm_rebuild.py  ->  <a>-arms.glb + <a>-weights.json
   ->  pnpm rig-mesh <a> (tools/mesh-rigs/<a>.json, Blender)  ->  <a>.rig.glb
   ->  pnpm studio-body <a> (no Blender)  ->  src/models/studio/<a>.ts (the app reads only this)
 ```
 
 The first step applies only to a body whose arms or legs get new quad faces. The rig of another
-body reads the source mesh. The `README.md` of `assets/models/<a>/` gives the source and the
+body reads the source mesh. The first step takes its settings from the joints of the config and
+from the mesh, so that a new mesh gets clean arms with no work by hand. A species script
+`tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. The `README.md` of `assets/models/<a>/` gives the source and the
 steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
@@ -201,7 +203,8 @@ steps of each file.
   proportions of an adult of 1.8 m, and the preset `animal` the mean proportions of the wolf and
   the rabbit. A band and a front stripe on each limb show a twist. The palm and the back of the
   hand have two colors, and the two sides have two tints. Each joint has quad rings of 16
-  vertices. The species `mannequin` has the animal preset as its body, and no section casts it.
+  vertices. The species `mannequin` has the animal preset with the rebuilt arms of
+  `arm_rebuild.py` as its body, and no section casts it.
   The role tools test it with a recast role, such as `violinist@mannequin`. A test body loads
   apart from the bodies of the app (`loadTestBodies()` of `models/studio-body.ts`), so the first
   download does not grow by it.
