@@ -352,24 +352,50 @@ const FOX_HANG = [20, 20] as const;
  * a little forward, and tilts, so that the arms that hold it stay out of the body (design 5.3).
  */
 export const WIND_HOLDS = {
-  // While it plays, the flute turns its right end 30° back and 15° down, nearer to level, the left
-  // elbow points out, forward, and a little up, and the right elbow points down. The left hand
-  // holds the flute in front of the face, to the right of the middle, so the left arm crosses the
-  // chest: at 10° down, the left upper arm goes 0.03 H into the chest of the tan fox, and level and
-  // square to the front 0.067 H. The flute turns its right end down in the rest pose.
+  // The flute hold of each seated body (design 4.6, 5.3): the arm values of the accepted tan fox
+  // flutist (FOX_FLUTE), as directions and in H, with the lip plate at the mouth and the rest from
+  // the hanging arms (restArms). The head turns 30° to the left, the flute lies 9° back from square
+  // to the face and slopes 8° down to the right, and the left paw holds it near the lip plate from
+  // its front, with the right paw behind it and a little below (docs/reference/wind-technique.md
+  // 2.4). Each paw keeps the side sign of the fox (aimSigns): with the sign from the geometry, the
+  // right paw of 7 recast bodies turned 151° to 179° from the accepted grip. The shoulders turn 20°
+  // forward in the play, as the shoulder blade of a real player slides forward: with square
+  // shoulders, the upper arms of the recast wolf, beaver, and pig went 2.8 cm to 5.1 cm into the
+  // body, and their paws missed their grips by 1.2 cm to 2.8 cm. The left grip moves 0.02 H across
+  // the tube toward the left shoulder, 0.06 H nearer than the fox: with the grip of the fox, the
+  // left paw of the recast beaver, dog, and pig turned 172° to 179° on its forearm. At rest, the
+  // left paw hangs from the shoulder with a soft bend and the roll of its grip, and the right paw
+  // holds the flute nearly upright at its side, at the hanging palm with the forearm 40° forward
+  // from the upper arm, as a real flutist rests the flute vertically on the right leg.
   flute: {
     ...WOODWIND,
-    play: holdTurn(
-      0,
-      -15,
-      toQuat(new Quaternion().setFromAxisAngle(Y_AXIS, -30 * MathUtils.DEG2RAD)),
-    ),
-    poleL: [-1, 0.5, -1],
-    poleR: [1, -1, -0.5],
-    restPoleL: [-1, 0, -0.3],
-    restPoleR: [1, -1, -1],
-    rest: holdTurn(0, -45),
-    restShift: [-0.15, 0, -0.1],
+    reach: 20 * MathUtils.DEG2RAD,
+    reachL: 20 * MathUtils.DEG2RAD,
+    headTurn: FOX_HEAD_TURN * MathUtils.DEG2RAD,
+    lipShift: [0, -0.05, 0],
+    play: fluteTurn(FOX_HEAD_TURN - FOX_FLUTE_BACK, 8),
+    poleL: [-1, -0.5, -0.3],
+    poleR: [1, -1.4, -0.3],
+    rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
+    restArms: {
+      L: { forward: FOX_HANG[0] * MathUtils.DEG2RAD, bend: FOX_HANG[1] * MathUtils.DEG2RAD },
+      R: { forward: 20 * MathUtils.DEG2RAD, bend: 40 * MathUtils.DEG2RAD },
+    },
+    restFreeL: {
+      lap: { along: 0.45, offset: [-0.5, -0.55, -0.12] },
+      palm: [0.85, -0.37, 0.38],
+      fingers: [0, -1, -0.3],
+      arc: [0.57, 0.04, 0.31],
+    },
+    faceTube: ['palm', 'palm'],
+    aimAcross: 1,
+    aimSide: [0.5, -0.5],
+    aimSigns: [-1, -1],
+    gripShiftL: [-0.04, 0, -0.02],
+    gripShiftR: [0, 0, -0.14],
+    restGripShiftR: [-0.45, -0.13, -0.08],
+    gripCurl: curls(115, 106),
+    gripAround: true,
   },
   // The oboe turns the arms by `reach`: with no turn, the right palm is at 1.04 of 97% of the
   // reach. The left elbow points down. At rest, it points a little further out: with (-1, -1, -1),
