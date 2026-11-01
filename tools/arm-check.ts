@@ -82,6 +82,11 @@
  * `--glb <file>`, it explains the studio body of the file, in a copy of `src/`
  * (`tools/glb-swap.ts`), so that each try body of a rig gives its rings at the same samples.
  *
+ * `--json <file>` writes each line of the table of the gate with its values, its verdicts, and
+ * its ring widths ({@link GateFile}). `--compare <file>` reads such a file of an earlier run, and
+ * prints each value whose verdict or written value changed ({@link compareLines}), so that a try
+ * of a weight or a hold shows its changes against the last try with no scratch reader.
+ *
  * `--variant <name>` starts a variant of the holds, and each `--set` after it adds its changes to
  * the variant. Several `--variant` groups give several variants in one run ({@link checkVariants}).
  * Each variant of each role runs as one child, as a run with its `--set` options alone, with its
@@ -92,7 +97,8 @@
  *
  * Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]...
  * [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]]
- * [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long], or
+ * [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--json <file>]
+ * [--compare <file>], or
  * pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>]
  * [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]...
  * [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]
@@ -1913,6 +1919,162 @@ export function rebindLines(
   ];
 }
 
+/** One value of a line of {@link GateFile}: one measure of one arm. */
+export interface GateValue {
+  /** The measure. */
+  readonly measure: Measure;
+  /** The worst sample set. */
+  readonly set: GateSet;
+  /** The value of the gate. */
+  readonly value: number;
+  /** The value of the base, or `null` with no base. */
+  readonly base: number | null;
+  /** The verdict. */
+  readonly verdict: Verdict;
+}
+
+/** One line of {@link GateFile}: one arm of one role, as a row of the table of the gate. */
+export interface GateLine {
+  /** The role. */
+  readonly role: string;
+  /** The arm. */
+  readonly side: Side;
+  /** The verdict of the line: the worst verdict of its values. */
+  readonly verdict: Verdict;
+  /** The values. */
+  readonly values: readonly GateValue[];
+  /** The narrow axis p5 of each ring of {@link REBIND_RINGS}, in meters, or `null` for none. */
+  readonly rings: Readonly<Record<RebindRing, number | null>> | null;
+}
+
+/** The file of `--json`: the lines of one run of the gate, which `--compare` reads. */
+export interface GateFile {
+  /** The format version ({@link GATE_FILE_FORMAT}). */
+  readonly version: number;
+  /** The commit of `--base`, or `null`. */
+  readonly base: string | null;
+  /** The lines. */
+  readonly lines: readonly GateLine[];
+}
+
+/** The format version of {@link GateFile}. */
+export const GATE_FILE_FORMAT = 1;
+
+/** The verdicts from the worst to the best, for the verdict of a line. */
+const VERDICT_ORDER: readonly Verdict[] = ['FAIL', 'OPEN', 'REBIND', 'PASS'];
+
+/**
+ * Gives the lines of the gate of a run for the file of `--json`.
+ *
+ * @param rows The values of the gate.
+ * @param reports The report of each role, for the ring widths.
+ * @param base The commit of `--base`, or `null`.
+ * @returns The file.
+ */
+export function gateFile(
+  rows: readonly GateRow[],
+  reports: readonly { readonly role: string; readonly tree: RoleReport | null }[],
+  base: string | null,
+): GateFile {
+  const keys = [...new Set(rows.map((row) => `${row.role} ${row.side}`))];
+  const lines = keys.map((key): GateLine => {
+    const own = rows.filter((row) => `${row.role} ${row.side}` === key);
+    const first = own[0];
+    const role = first?.role ?? '';
+    const side = first?.side ?? 'L';
+    const rings = reports.find((report) => report.role === role)?.tree?.rings?.[side];
+    // A width with no sample is Infinity, which JSON holds as null.
+    const width = (value: number | undefined): number | null =>
+      value !== undefined && Number.isFinite(value) ? value : null;
+    return {
+      role,
+      side,
+      verdict: VERDICT_ORDER.find((v) => own.some((row) => row.verdict === v)) ?? 'PASS',
+      values: own.map(({ measure, set, value, base: was, verdict }) => ({
+        measure,
+        set,
+        value,
+        base: was,
+        verdict,
+      })),
+      rings: rings ? { elbow: width(rings.elbow), wrist: width(rings.wrist) } : null,
+    };
+  });
+  return { version: GATE_FILE_FORMAT, base, lines };
+}
+
+/**
+ * Writes the changes of a run against the file of an earlier run (`--compare`): one row for each
+ * value whose verdict or written value changed, and for each ring width that changed by 0.01 cm
+ * or more. A line that only one run has gives one row.
+ *
+ * @param before The file of the earlier run.
+ * @param now The lines of this run.
+ * @param name The name of the file, for the head of the table.
+ * @returns The lines.
+ */
+export function compareLines(before: GateFile, now: GateFile, name: string): string[] {
+  const rows: string[] = [];
+  const key = (line: GateLine): string => `${line.role} ${line.side}`;
+  const lines = [...before.lines, ...now.lines];
+  const keys = [...new Set(lines.map(key))];
+  for (const k of keys) {
+    const was = before.lines.find((line) => key(line) === k);
+    const is = now.lines.find((line) => key(line) === k);
+    const [role = '', side = ''] = k.split(' ');
+    if (!was || !is) {
+      rows.push(
+        `| ${role} | ${side} | line | ${was ? was.verdict : '-'} | ${is ? is.verdict : '-'} |`,
+      );
+      continue;
+    }
+    for (const measure of MEASURES) {
+      const old = was.values.find((v) => v.measure === measure);
+      const value = is.values.find((v) => v.measure === measure);
+      const text = (v: GateValue | undefined): string =>
+        v ? `${show(v.value, measure)} ${v.verdict}` : '-';
+      if (text(old) !== text(value)) {
+        rows.push(
+          `| ${role} | ${side} | ${ARM_LIMITS[measure].name} | ${text(old)} | ${text(value)} |`,
+        );
+      }
+    }
+    for (const ring of REBIND_RINGS) {
+      const old = cm(was.rings?.[ring] ?? undefined);
+      const width = cm(is.rings?.[ring] ?? undefined);
+      if (old !== width) {
+        rows.push(`| ${role} | ${side} | ${ring} ring cm | ${old} | ${width} |`);
+      }
+    }
+  }
+  if (rows.length === 0) {
+    return [`No value of the gate changed against ${name}.`];
+  }
+  return [
+    `The values of the gate that changed against ${name} (base ${before.base ?? 'none'}), with the value and the verdict:`,
+    '',
+    `| Role | Arm | Measure | ${name} | This run |`,
+    '|---|---|---|---|---|',
+    ...rows,
+  ];
+}
+
+/**
+ * Reads the file of `--compare`.
+ *
+ * @param path The path.
+ * @returns The file.
+ * @throws Error if the file has no lines of the gate of {@link GATE_FILE_FORMAT}.
+ */
+async function readGateFile(path: string): Promise<GateFile> {
+  // SAFETY: the file comes from --json of this tool, and the check below reads its version.
+  const file = JSON.parse(await readFile(path, 'utf8')) as Partial<GateFile>;
+  if (file.version !== GATE_FILE_FORMAT || !Array.isArray(file.lines)) {
+    throw new Error(`The file ${path} has no lines of the gate of format ${GATE_FILE_FORMAT}.`);
+  }
+  return { version: file.version, base: file.base ?? null, lines: file.lines };
+}
+
 /**
  * Writes the table of the gate of several variants ({@link summaryLines}), with a column of the
  * name of the variant: one block of rows for each variant, in the order of the variants.
@@ -1991,11 +2153,15 @@ export interface CheckArgs {
   readonly states: readonly string[];
   /** The measure of `--explain`, or `null` for the gate. */
   readonly explain: Explained | null;
+  /** The file of `--json` for the lines of the gate ({@link GateFile}), or `null`. */
+  readonly json: string | null;
+  /** The file of `--compare`: the lines of an earlier run ({@link GateFile}), or `null`. */
+  readonly compare: string | null;
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
+  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
 
 /** One variant of `--variant`: a name and the changes of the holds of its `--set` options. */
 export interface ArmVariant {
@@ -2068,6 +2234,8 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     '--trace',
     '--states',
     '--explain',
+    '--json',
+    '--compare',
   ]);
   const flags = new Set(['--all', '--views-all', '--long']);
   const roles: string[] = [];
@@ -2159,6 +2327,12 @@ export function checkArgs(args: readonly string[]): CheckArgs {
       `The option --explain takes one role, --demo, --step, --set, and --glb, and no --all, --long, or ${unexplained.join(', ') || 'option of the gate'}.\n${USAGE}`,
     );
   }
+  const lineless = ['--trace', '--explain', '--states', '--variant'].filter((o) => values.has(o));
+  if ((values.has('--json') || values.has('--compare')) && lineless.length > 0) {
+    throw new Error(
+      `The options --json and --compare take the lines of the gate, and no ${lineless.join(', ')}.\n${USAGE}`,
+    );
+  }
   const variants = variantGroups(args);
   const single = ['--trace', '--explain', '--states', '--views'].filter((o) => values.has(o));
   if (variants.length > 0 && single.length > 0) {
@@ -2187,6 +2361,8 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     step,
     states,
     explain,
+    json: values.has('--json') ? resolve(values.get('--json')?.[0] ?? '') : null,
+    compare: values.has('--compare') ? resolve(values.get('--compare')?.[0] ?? '') : null,
   };
 }
 
@@ -2851,7 +3027,8 @@ async function explainRole(
 
 /**
  * The mark of a child of the tool on its command line: a child writes {@link ArmJson} into the
- * file of `--json`. A child of `--base` and `--states` runs the gate of the working tree, so each child has the mark.
+ * file of `--json`, and a run with no mark writes the lines of the gate there ({@link GateFile}).
+ * A child of `--base` and `--states` runs the gate of the working tree, so each child has the mark.
  */
 const CHILD = '--child';
 
@@ -3305,6 +3482,15 @@ async function main(): Promise<number> {
     );
   }
   console.log(['', ...summaryLines(rows, options.base !== null)].join('\n'));
+  const lines = gateFile(rows, reports, options.base);
+  if (options.compare !== null) {
+    const before = await readGateFile(options.compare);
+    console.log(['', ...compareLines(before, lines, basename(options.compare))].join('\n'));
+  }
+  if (options.json !== null) {
+    await writeFile(options.json, `${JSON.stringify(lines, null, 1)}\n`);
+    console.log(`\nLines of the gate: ${options.json}`);
+  }
   const rebinds = rebindLines(reports);
   if (rebinds.length > 0) {
     console.log(['', ...rebinds].join('\n'));
