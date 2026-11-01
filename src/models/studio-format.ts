@@ -279,6 +279,25 @@ export interface StudioStanding {
 }
 
 /**
+ * The seated pose of a standing studio body that also sits, such as the conductor bear in a
+ * seated role (design 4.4): the legs of a seated bind, with the sit corrective shapes of the rig
+ * at their full weight. It is the mirror of {@link StudioStanding}.
+ */
+export interface StudioSitting {
+  /**
+   * The move of the body from its standing place to its place over the seat: the soles on the
+   * floor, and the front edge of the seat of the rig at the front edge of the seat of the app.
+   */
+  readonly drop: Vec3;
+  /** The world turn of each leg bone from the bind pose to the seated pose. */
+  readonly turns: Readonly<Record<StudioLegBone, Quat>>;
+  /** The height of the seat top: {@link StudioBody.seatHeight} of the seated body. */
+  readonly seatHeight: number;
+  /** The depth of the chair: {@link StudioBody.chairDepth} of the seated body. */
+  readonly chairDepth: number;
+}
+
+/**
  * The names of the other palettes of a studio body (design 4.4, 4.5): the tan palette of the fox
  * mesh, which the tan foxes of the flutes take. The red foxes keep the palette of the mesh.
  */
@@ -437,6 +456,11 @@ export interface StudioBody {
    * stance of its role.
    */
   readonly standing: StudioStanding | null;
+  /**
+   * The seated pose of a standing body that also sits. The packed mesh then holds the sit
+   * corrective shapes after the arm corrective shapes. A body with no seated pose has none.
+   */
+  readonly sitting?: StudioSitting;
   /**
    * The poses of the corrective shapes of a raised arm or of a bent wrist, at most
    * {@link STUDIO_RAISES}. The packed mesh holds these shapes in this order after the two arm-down
