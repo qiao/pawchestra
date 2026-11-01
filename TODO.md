@@ -298,8 +298,12 @@ passes.
       across the joint (3.30 cm, and 3.39 cm with Levels gain 2 on the helper), which folds 2 to 4
       faces of the left inner elbow in each sample. Next: more Smooth rounds after the Remove From
       Group, or a loop edge ring at the elbow (`wind_arms.py` faces, ask first).
-- [ ] Mouse oboist with the neutral bind: the right arm folds 8 faces at p95 at rest (limit 8,
-      base 7), and the left arm 6 (base 4).
+- [ ] Mouse with the neutral bind: the folds grow. The oboist folds 8 faces of the right arm at
+      p95 at rest (limit 8, base 7) and 6 of the left arm (base 4). In the cast matrix, the snare
+      drum recast folds 9 faces of the left arm in the play (limit 8, base 3) and 8 of the right
+      (base 2). Its paws are pronated, so the large bind supination (127° and 119°) is far from
+      them. The violin recast takes the left paw 1.6 cm into the violin in the lift (limit 1.5 cm,
+      base 1.5 cm).
 - [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
       folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
       `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
