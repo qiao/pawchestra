@@ -103,7 +103,7 @@ with a worse look is also not done.
   rest.
 - The paw swing, the paw twist, and the flat share count from the bind. A new bind moves their
   zero, so `--base` can fail with the same world pose. Compare the world bone turns and the ring
-  widths in meters.
+  widths in meters. The depths of `pnpm pose-depth` stay, so sweep one bind only.
 - `pnpm arm-look <role>` measures a crumpled or a flat upper arm. Read the 2x crops from the front,
   the back, and each side, because a defect can show from one side only.
 
