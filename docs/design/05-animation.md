@@ -229,7 +229,13 @@ The rest of each family:
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the round bellies of the mouse, the wolf, the beaver, and the pig cover their thighs. So
-  these instruments stay in front of the belly.
+  these instruments stay in front of the belly. A shared hold with rest arms
+  (`WindHold.restArms`, `armRest()` of `pose/winds.ts`) rests from the hanging arms of the body:
+  the right paw holds the flute or the clarinet nearly upright at its side, at the hanging palm,
+  as a flutist rests the flute vertically on the right leg (winds 2.4), and the free left paw
+  hangs with the roll of its grip (`freeRoll()`). Reason: a rest place in `H` from the mouth fits
+  one body only, and with both paws on the clarinet at the middle of the hanging palms, the arms
+  went into the body.
 - **Piano and harp.** The polar bear sits tall with a small lean to the piano and the head up, as
   a pianist before a performance, with the paws in front of the lower belly (`restLean`). The
   deer sits up with each hand near a string.
@@ -293,6 +299,15 @@ The rest of each family:
   mouth, so the look at the conductor does not turn the head.
 - Each paw closes around its tube (`WindHold.faceTube`, `gripShiftL`). `pnpm wind-grip` measures
   the grasp in each phase.
+- **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)
+  take the arm values of the accepted tan fox and wolf, as directions and in `H`, with the lip
+  plate or the mouthpiece at the mouth landmark of the body. Each paw keeps the side sign of its
+  accepted player (`WindHold.aimSigns`). The shoulders turn forward only in the play
+  (`turnShare()`). The rest comes from the hanging arms (5.2). Reason: the sign from the geometry
+  turned the right flute paw of 7 recast bodies about 180°, and the lip shift of the wolf under
+  its long muzzle put the forearms of short snouts into the body. The tan fox and the wolf keep
+  their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). The trumpet keeps its fixed shared hold: at the
+  size 1, the paws of each recast body miss the valves.
 - A brass player presses the valves of the pitch (`BRASS_FUNDAMENTALS`), and the partials skip
   the flat seventh partial, as real players do (`PARTIALS`).
 - The trombone slide takes the position of the pitch, mapped into the travel that the arm
