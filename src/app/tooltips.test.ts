@@ -16,6 +16,7 @@ describe('tooltipText (design 2.8, audit 2026-10-05-ux-design, CT1)', () => {
       play: [' '],
       seek: ['ArrowLeft', 'ArrowRight', 'Home'],
       mute: ['m'],
+      volume: ['ArrowUp', 'ArrowDown'],
       camera: ['c'],
       fullScreen: ['f'],
     } as const;
