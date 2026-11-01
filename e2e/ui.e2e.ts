@@ -68,8 +68,9 @@ test.describe('the load state on a slow network (audit 2026-10-05-ux-design, LD2
     });
     // A module script runs before the event DOMContentLoaded, so the test waits only for the HTML.
     await page.goto('./', { waitUntil: 'commit' });
-    // The logo stands where the logo of the app stands, so the first paint does not jump.
-    await expect(page.locator('.title .logo')).toHaveText('Zoophony');
+    // The logo stands where the logo of the app stands, so the first paint does not jump. The
+    // wordmark is an SVG path, and the name is the accessible name of the heading (design 2.8).
+    await expect(page.getByRole('heading', { level: 1, name: 'Zoophony' })).toBeVisible();
     await expect(page.locator('.first-screen .status')).toHaveText(LOADING_TEXT);
     release();
     await expect(page.locator('.boot')).toHaveCount(0);
