@@ -515,6 +515,9 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Clips: the waving paw of `Wave` goes 0.11 H (wolf) to 0.13 H (rabbit) into the head,
       because the large head of an animal fills the place of a raised human hand. Add a clearance
       rule for the arms of a clip.
+- [ ] Clips: a human arm that hangs at the side goes into the round trunk of an animal: the paw
+      0.25 H (wolf) and the forearm 0.32 H (rabbit) in the scratch clips. Map the hanging arm of
+      the source to the rest arm of the body (5.2) in place of straight down.
 - [ ] Clips: test a walk. The floor rule keeps the sole heights, but a hips move in `H` can slide
       the short feet. Scale the move by the leg length if the feet slide.
 - [ ] Clips: a clip in the concert needs a place for the instrument (a stand or the floor) and a
