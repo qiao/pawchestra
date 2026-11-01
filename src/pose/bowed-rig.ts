@@ -29,6 +29,8 @@ import { setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
 import { armRig, poseShoulder, solveArm } from './ik.ts';
 import { fitCelloPlace } from './cello-place.ts';
+import { fitViolinPlace } from './violin-place.ts';
+import type { ChinFit } from './violin-place.ts';
 import { lapPoint } from './lap.ts';
 import type { LapPlace } from './lap.ts';
 import type { ArmRig } from './ik.ts';
@@ -326,6 +328,12 @@ export interface BowedHold {
    * the fixed place of the hold.
    */
   readonly fit: { readonly gap: number } | null;
+  /**
+   * The place of a violin or a viola under the jaw from the body (`fitViolinPlace()` of
+   * `pose/violin-place.ts`, design 5.3), in place of {@link BowedHold.playShift}: the tail end on
+   * the left collarbone beside the neck. `null` keeps the fixed place of the hold.
+   */
+  readonly chinFit: ChinFit | null;
 }
 
 /**
@@ -422,6 +430,7 @@ const CHIN_HOLD = {
   },
   standBow: null,
   fit: null,
+  chinFit: null,
 } as const satisfies BowedHold;
 
 /**
@@ -491,6 +500,7 @@ const FLOOR_HOLD = {
   },
   standBow: null,
   fit: null,
+  chinFit: null,
 } as const satisfies BowedHold;
 
 /**
@@ -1570,7 +1580,10 @@ export function bowedRig(
   instrument: BowedInstrument,
   given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
-  const hold = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
+  const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
+  const hold = floor.chinFit
+    ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) }
+    : floor;
   const { positions, parents } = model.skeleton;
   const at = (bone: number): Vec3 => positions[bone] ?? [0, 0, 0];
   const pieceRotation = (bone: 'instrument' | 'bow'): Quaternion => {
