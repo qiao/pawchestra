@@ -1076,7 +1076,8 @@ export function sideOf(subjects: StageSubjects, seat: number): StageSide | null 
  * middle of the players, 1.0 m high, and at least `0.15 × S` from the middle line on its side.
  * The sphere of `SUBJECT_SIZES.sideRadius` holds about the front half of the side, and the frame
  * cuts the rest. Only the players in the sphere are subject players, so a head of another player
- * or of the conductor in front of them counts in the foreground rule.
+ * or of the conductor in front of them counts in the foreground rule. The players of the seats in
+ * the sphere give the eyes, the look, and the extent of the frame.
  *
  * @param subjects The subjects.
  * @param seats The seats of the side view. There is at least one with players.
@@ -1119,12 +1120,16 @@ export function sideSubject(
       }
     }
   }
+  // The look and the eyes come from the players that the frame holds, so that their eyes stand
+  // on the upper third line. With no player of the seats in the sphere, all players count.
+  const framed = players.filter(inSphere);
+  const group = framed.length > 0 ? framed : players;
   return {
     target,
     front: side * sizes.sideFront,
-    facing: meanFront(players),
-    center: middleOf(players),
-    eyes: headsOf(players),
+    facing: meanFront(group),
+    center: middleOf(group),
+    eyes: headsOf(group),
     back: backOf(subjects, target[2]),
     seats,
     part: null,
@@ -1136,7 +1141,7 @@ export function sideSubject(
     outside: null,
     floor: [],
     // The frame holds the heads and the hands of the players in the sphere, and it cuts the rest.
-    ...extentOf(players.filter(inSphere), target),
+    ...extentOf(framed, target),
     outline: [target],
     reach,
   };

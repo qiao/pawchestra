@@ -18,6 +18,9 @@
  *   frame (a cut head). The head has the bones of `HEAD_BONES` of `src/shots/subjects.ts`, with no
  *   ears. A commit from before that list gets no count.
  *
+ * The rules of the look, the room, and the headroom of a side view read only the players of its
+ * seats in its sphere, because its frame holds only them.
+ *
  * The tool also gives the median and the largest elevation and height of the camera of each kind
  * of shot, from a sample each {@link SAMPLE_STEP}, and the median share of the frame width that
  * the footprints of the players of a solo or a section shot fill.
@@ -691,7 +694,7 @@ function shotSubject(subjects: StageSubjects, shot: Shot): ShotSubject | null {
   if (shot.kind !== 'solo' && shot.kind !== 'section' && shot.kind !== 'side') {
     return null;
   }
-  const players = shot.seats.flatMap((seat) => {
+  const seated = shot.seats.flatMap((seat) => {
     const all = subjects.seats[seat]?.players ?? [];
     if (shot.kind === 'solo') {
       return all.slice(0, 1);
@@ -699,6 +702,17 @@ function shotSubject(subjects: StageSubjects, shot: Shot): ShotSubject | null {
     const part = shot.part;
     return part ? all.filter((p) => part.includes(p.player)) : all;
   });
+  // The frame of a side view holds only the players in its sphere, so the rules of the look read
+  // only them, as the planner does (design 5.6).
+  const reach = shotSubjects.SUBJECT_SIZES.sideRadius * subjects.stageSide;
+  const framed =
+    shot.kind === 'side'
+      ? seated.filter(
+          (p) =>
+            Math.hypot(p.position[0] - shot.target[0], p.position[2] - shot.target[2]) <= reach,
+        )
+      : seated;
+  const players = framed.length > 0 ? framed : seated;
   if (players.length === 0) {
     return null;
   }
