@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
@@ -11,6 +12,7 @@ import { setHolds } from './hold-sets.ts';
 import { whereLines } from './part-where.ts';
 import {
   PROBE_NO_CACHE,
+  ROOT,
   probeBeside,
   probeCacheDir,
   shortHash,
@@ -1566,6 +1568,24 @@ function baseRowCache(options: Options): string | null {
 }
 
 /**
+ * Sets the hold changes of a variant in memory, with the scale of the size rule of a recast role,
+ * as the cast matrix gives it (`recastChanges()` of `tools/recast-scale.ts`). The rule runs in a
+ * child process, because the imports of its module come back to this module.
+ *
+ * @param role The role.
+ * @param variant The hold changes of the variant, or `''`.
+ * @returns The changes, with a function that puts the old values back.
+ */
+function setRoleHolds(role: RoleSweep, variant: string): ReturnType<typeof setHolds> {
+  if (!role.recast) {
+    return setHolds(variant);
+  }
+  const script = join(ROOT, 'tools', 'recast-scale.ts');
+  const args = [script, role.role, variant];
+  return setHolds(execFileSync(process.execPath, args, { cwd: ROOT, encoding: 'utf8' }).trim());
+}
+
+/**
  * Sweeps each variant of the options with the holds of now, and writes the details of each
  * variant after its sweep. A run with `--set` takes the base row from its cache when the working
  * tree and the other arguments did not change ({@link baseRowCache}), and prints
@@ -1590,7 +1610,7 @@ async function sweepRows(options: Options, role: RoleSweep): Promise<SweepRow[]>
       printDetails(role, cached.results, options.goal);
       continue;
     }
-    const { undo, text } = setHolds(variant);
+    const { undo, text } = setRoleHolds(role, variant);
     const started = performance.now();
     let timed: TimedRow;
     try {
@@ -1711,7 +1731,7 @@ async function main(): Promise<void> {
     return;
   }
   if (options.where) {
-    const undo = setHolds(options.variants[1] ?? '').undo;
+    const undo = setRoleHolds(options.role, options.variants[1] ?? '').undo;
     try {
       console.log(
         whereLines(

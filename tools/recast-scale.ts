@@ -154,3 +154,20 @@ export function setRecastHolds(
 ): ReturnType<typeof setHolds> {
   return setHolds(recastChanges(roles, changes));
 }
+
+/**
+ * Prints the hold changes of a run of recast roles ({@link recastChanges}):
+ * `node tools/recast-scale.ts <role>,... [<changes>]`. A tool whose imports come back to
+ * `tools/hold-reach.ts`, such as `pnpm pose-depth`, reads the changes from this child.
+ */
+function main(): void {
+  const roles = (process.argv[2] ?? '').split(',').filter((role) => role !== '');
+  if (roles.length === 0) {
+    throw new Error('Usage: node tools/recast-scale.ts <role>,... [<changes>]');
+  }
+  console.log(recastChanges(roles, process.argv[3] ?? ''));
+}
+
+if (import.meta.main) {
+  main();
+}
