@@ -231,6 +231,9 @@ Read the group of your work before you plan it.
   move the mouthpiece under the muzzle (`lipShift`).
 - Rest elbows far from the play elbows twist the paws in the lift. Keep them near.
 - A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
+- A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head
+  (the panda, the mouse), and the fit then jumps. Measure the front of a band of the upper chest
+  (`chestFront()`).
 - `weights.fingers` 0.5 keeps the curl small. A paw that closes around a tube takes the weight 1.
 
 ### Bow
