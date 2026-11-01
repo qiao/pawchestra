@@ -227,7 +227,7 @@ export function findSweep(name: string): RoleSweep | undefined {
 /**
  * Gives the obstacle of the body of a species for a recast role: the obstacle of a test species
  * (`TEST_BODY_OBSTACLES`), or the obstacle `body` of the sweep of the first role of
- * {@link FOLD_ROLES} with the species.
+ * {@link FOLD_ROLES} with the species, such as the conductor for the bear.
  *
  * @param species The species.
  * @returns The obstacle.
@@ -239,8 +239,8 @@ export function homeBody(species: SpeciesId): SweepObstacle {
     return test;
   }
 
-  const home = [...FOLD_ROLES].find(
-    ([, role]) => role.kind === 'player' && role.species.includes(species),
+  const home = [...FOLD_ROLES].find(([, role]) =>
+    role.kind === 'player' ? role.species.includes(species) : CONDUCTOR.species === species,
   )?.[0];
   const sweep = Object.entries(SWEEP_ROLES).find(([key]) => key === home)?.[1];
   if (!sweep) {
