@@ -216,6 +216,17 @@ export function standDeskHeight(eyes: readonly number[]): number {
 export const CHAIR_LEG = 0.035;
 
 /**
+ * Gives the depth of the chair under a studio body (design 4.4): the chair of its seated bind, or
+ * the chair of its seated pose for a standing body that also sits (`StudioBody.sitting`).
+ *
+ * @param studio The studio body.
+ * @returns The depth, in meters, or `null` for a body with no chair.
+ */
+function studioChairDepth(studio: StudioBody): number | null {
+  return studio.chairDepth ?? studio.sitting?.chairDepth ?? null;
+}
+
+/**
  * Gives the heights of the chair of a body (design 4.5, props): the seat at the legs of the
  * species. A studio body sits on a chair as deep as the chair of the studio (design 4.4), and a
  * wide studio body on a wider chair.
@@ -226,10 +237,11 @@ export const CHAIR_LEG = 0.035;
  */
 function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
   const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
-  if (!studio || studio.chairDepth === null) {
+  const depth = studio ? studioChairDepth(studio) : null;
+  if (!studio || depth === null) {
     return { seatHeight: legs, footHeight: 0 };
   }
-  const seat = { seatHeight: legs, footHeight: 0, seatDepth: studio.chairDepth };
+  const seat = { seatHeight: legs, footHeight: 0, seatDepth: depth };
   return studio.chairWidth === undefined ? seat : { ...seat, seatWidth: studio.chairWidth };
 }
 
@@ -244,10 +256,11 @@ function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
  */
 function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
   const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
-  if (!studio || studio.chairDepth === null) {
+  const depth = studio ? studioChairDepth(studio) : null;
+  if (!studio || depth === null) {
     return { seatHeight, footHeight: 0 };
   }
-  const seat = { seatHeight, footHeight: 0, seatDepth: studio.chairDepth };
+  const seat = { seatHeight, footHeight: 0, seatDepth: depth };
   return studio.chairWidth === undefined ? seat : { ...seat, seatWidth: studio.chairWidth };
 }
 
