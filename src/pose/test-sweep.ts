@@ -1,12 +1,13 @@
 import { Triangle, Vector3 } from 'three';
 
+import { VIOLIN } from '../models/instruments/strings.ts';
 import type { PlayerModel } from '../models/player.ts';
 import { BONE_NAMES, boneIndex } from '../models/rig.ts';
 import type { BoneName } from '../models/rig.ts';
 import type { Score } from '../score/types.ts';
-import { HEAD_BONES, closedDepth, surfaceGap } from './test-clearance.ts';
+import { HEAD_BONES, closedDepth, surfaceGap, surfaceNearest } from './test-clearance.ts';
 import type { ClosedSurface } from './test-clearance.ts';
-import { poseSkeleton } from './test-kinematics.ts';
+import { poseSkeleton, posedPiecePoint } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 import type { Recast, TestScene } from './test-scene.ts';
 import { posedCorner } from './test-skin.ts';
@@ -145,6 +146,16 @@ export interface PairDepth {
    * its first child. `NaN` for a bone with no child.
    */
   readonly along: number;
+  /**
+   * The part of a bowed string at the deepest point of the instrument ({@link bowedPlace}), such
+   * as `neck`, or none for another point.
+   */
+  readonly partPlace?: string;
+  /**
+   * The region of the obstacle at its nearest point to the deepest point: a region of the body
+   * ({@link BODY_REGIONS}), or a part of a bowed string ({@link bowedPlace}), or none.
+   */
+  readonly intoPlace?: string;
   /** The number of samples of the sweep, when the sweep has a goal ({@link PairGoal}). */
   readonly samples?: number;
   /** The number of samples with a depth over the goal, when the sweep has a goal. */
@@ -209,6 +220,119 @@ function partPoints(mesh: PlayerModel['mesh'], bones: readonly BoneName[]): Part
   const found = { corners: [...places.values()] };
   parts.set(key, found);
   return found;
+}
+
+/**
+ * The region of the body of each bone of a body obstacle, for the place of a clip. A cap of an
+ * open loop of the body, such as the cut to an upper arm, is the `arm root`.
+ */
+export const BODY_REGIONS: Readonly<Partial<Record<BoneName, string>>> = {
+  hips: 'belly',
+  spine: 'belly',
+  chest: 'chest',
+  neck: 'neck',
+  head: 'head',
+  jaw: 'jaw',
+  eyeL: 'head',
+  eyeR: 'head',
+  earL: 'head',
+  earR: 'head',
+  tail1: 'tail',
+  tail2: 'tail',
+  trunk1: 'trunk',
+  trunk2: 'trunk',
+  trunk3: 'trunk',
+  shoulderL: 'shoulder L',
+  shoulderR: 'shoulder R',
+  thighL: 'thigh L',
+  thighR: 'thigh R',
+  shinL: 'shin L',
+  shinR: 'shin R',
+  footL: 'foot L',
+  footR: 'foot R',
+};
+
+/** The distance below the tail end of a bowed string from which a point is on the end pin. */
+const END_PIN_FROM = 0.005;
+
+/**
+ * Gives the part of a bowed string at a posed point, from its place along the instrument in the
+ * violin axes (`VIOLIN`): the end pin below the tail end, the body, the neck up to the nut, and the
+ * scroll after the nut. The fingerboard target of the model gives the axes in the pose.
+ *
+ * @param posed The posed skeleton.
+ * @param point The posed point.
+ * @returns The part, or `null` for an instrument with no fingerboard.
+ */
+export function bowedPlace(posed: PosedSkeleton, point: Vector3): string | null {
+  const board = posed.model.instrument.targets.find((target) => target.kind === 'fingerboard');
+  if (!board) {
+    return null;
+  }
+  const nut = new Vector3(...posedPiecePoint(posed, { bone: board.bone, at: board.from }));
+  const end = new Vector3(...posedPiecePoint(posed, { bone: board.bone, at: board.to }));
+  const span = nut.distanceTo(end);
+  if (!(span > 0)) {
+    return null;
+  }
+  const axis = nut.clone().sub(end).divideScalar(span);
+  const x =
+    VIOLIN.nut + (point.clone().sub(nut).dot(axis) * (VIOLIN.nut - VIOLIN.fingerboardEnd)) / span;
+  if (x < -END_PIN_FROM) {
+    return 'end pin';
+  }
+  if (x <= VIOLIN.bodyLength) {
+    return 'body';
+  }
+  return x <= VIOLIN.nut ? 'neck' : 'scroll';
+}
+
+/** The places of the deepest point of a pair ({@link PairDepth}), as {@link clipPlaces} fills them. */
+interface ClipPlaces {
+  /** The part of a bowed string at the deepest point of the instrument. */
+  partPlace?: string;
+  /** The region of the obstacle at its nearest point to the deepest point. */
+  intoPlace?: string;
+}
+
+/**
+ * Gives the places of the deepest point of a moving part in an obstacle: the part of a bowed
+ * string for a point of the instrument, and the region of the obstacle at its nearest point, a
+ * region of a body obstacle or a part of the bowed string of the player.
+ *
+ * @param posed The posed skeleton.
+ * @param obstacle The name of the obstacle.
+ * @param surface The surface of the obstacle.
+ * @param point The deepest point.
+ * @param bone The main bone of the deepest point.
+ * @returns The places.
+ */
+function clipPlaces(
+  posed: PosedSkeleton,
+  obstacle: string,
+  surface: ClosedSurface,
+  point: Vector3,
+  bone: number,
+): ClipPlaces {
+  const places: ClipPlaces = {};
+  const part = BONE_NAMES[bone] === 'instrument' ? bowedPlace(posed, point) : null;
+  if (part !== null) {
+    places.partPlace = part;
+  }
+  const near = surfaceNearest(surface, point);
+  const bones = surface.bones;
+  let into: string | null = null;
+  if (bones && near.triangle >= 0) {
+    const main = bones[near.triangle];
+    const name = main === undefined ? undefined : BONE_NAMES[main];
+    into = main === undefined ? 'arm root' : name ? (BODY_REGIONS[name] ?? name) : null;
+  } else if (obstacle === posed.model.instrument.id) {
+    into = bowedPlace(posed, near.point);
+  }
+  if (into !== null) {
+    places.intoPlace = into;
+  }
+  return places;
 }
 
 /**
@@ -308,12 +432,14 @@ export function sweepDepths(
         }
         const bone = mesh.bones[corner] ?? 0;
         deepest.set(key, {
-          ...best,
+          part: best.part,
+          into: best.into,
           depth,
           song: sample[0],
           wall: sample[1],
           bone: BONE_NAMES[bone] ?? null,
           along: alongBone(posed, bone, point),
+          ...clipPlaces(posed, name, surface, point, bone),
         });
       }
     }
@@ -388,7 +514,9 @@ export function depthLimit(
 export function pairText(pair: PairDepth): string {
   const along = Number.isNaN(pair.along) ? '' : ` ${pair.along.toFixed(2)}`;
   const place = pair.bone ? ` (${pair.bone}${along})` : '';
-  return `${pair.part} in ${pair.into}: ${(pair.depth * 100).toFixed(1)} cm at song ${pair.song.toFixed(2)} s, wall ${pair.wall.toFixed(2)} s${place}`;
+  const from = pair.partPlace ? `, the ${pair.partPlace}` : '';
+  const into = pair.intoPlace ? `${from ? '' : ','} into the ${pair.intoPlace}` : '';
+  return `${pair.part} in ${pair.into}: ${(pair.depth * 100).toFixed(1)} cm at song ${pair.song.toFixed(2)} s, wall ${pair.wall.toFixed(2)} s${place}${from}${into}`;
 }
 
 /** The name of the obstacle of the body of the player in each role. */
