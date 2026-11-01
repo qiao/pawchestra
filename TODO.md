@@ -542,8 +542,17 @@ each control.
       0.25 S (now about 0.21 S), and the 33° test of `camera-keys.test.ts` fails on the base too.
 - [ ] Make the side views read as one clear side. A near player of the group can fill a frame edge
       (`beethoven-5-4` at 28.57 s, the ears at the bottom of `mozart-k191` at 125 s), and a view of
-      the right side shows the backs of the cellists. Also check the section elevation of 69° in
-      `pnpm shot-trace --rules`: no section key is above 45°, so it can be a sample of a blend (5.6).
+      the right side shows the backs of the cellists (5.6).
+- [ ] Show the user the effect of the animal floor of 1.2 m before a second step. The median
+      elevation of a solo went from 13.5° to 17.2°, and of a section from 20.4° to 22.4°. A blurred
+      body at 1.2 m still fills a side edge (`beethoven-5-4` at 349.5 s) (5.6).
+- [ ] Bring the plan time back to at most 1.05 times `ade6e026` (now 1.10, `pnpm plan-time`).
+      `bach-bwv1047` became about 2 times slower in the round of the animal floor: find why. The
+      outlines of `prepareSubjects()` take about 9% and the music reads about 13%. Design 9.7 gives
+      at most 20 ms for the largest demo, and `beethoven-8-4` and `brahms-2` take about 40 ms.
+- [ ] Test the closing shot and the fill wide shot against the 30° rule. At the last cut, refuse a
+      wide or high candidate that makes a jump cut with the fixed closing key, and try
+      `highFraming()` before the seeded fallback of the fill. No such jump cut occurs now (5.6).
 - [ ] Tool: add `pnpm close-views play --shots <n> [--base <ref>]`, which renders the middle of the
       first n shots into a labelled contact sheet, and `--set` for the constants of the planner. A
       shot round wrote 4 scratch scripts for this, about 35 minutes.
@@ -555,6 +564,10 @@ each control.
       look lineup.
 - [ ] Tool: add `pnpm screenshots --cinematic --sizes <list>` (the UI shown and hidden) and a mode
       that records a UI move as a screencast. A UI round wrote three probes for this.
+- [ ] Tool: let `pnpm shot-trace --base` tell if the two traces are equal, and add `--profile` to
+      `pnpm plan-time`. A shot round wrote a scratch script for each.
+- [ ] Tool: `pnpm close-views play` with `--pause` or `--url` still renders 1 to 2 s after `--time`.
+      The label then says "on the bar".
 
 Done when: the tests of 5.6 pass for each demo, the shot targets and the frame target of 9.7
 pass, and the smoke test checks the camera.
