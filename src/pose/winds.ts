@@ -409,16 +409,45 @@ export const WIND_HOLDS = {
     rest: holdTurn(9, 27),
     restShift: [-0.13, 0, -0.02],
   },
-  // The long snout of the wolf puts the clarinet far forward, so the right arm needs the turn
-  // of the oboe. The left elbow points down, as in animals.webp.
+  // The clarinet hold of each seated body (design 4.6, 5.3): the arm values of the accepted wolf
+  // clarinetist (WOLF_CLARINET), as directions and in H, with the mouthpiece at the mouth and the
+  // rest from the hanging arms (restArms). The clarinet hangs 30° from the vertical, in the middle
+  // of the body, and each paw holds it from the side of its own shoulder, with the palm on the tube
+  // and the side signs of the wolf (docs/reference/wind-technique.md 3). The shoulders turn
+  // forward in the play, the right 35° and the left 20°. The mouthpiece stays at the mouth: with
+  // the 0.4 H of the wolf back under its long muzzle, the forearms of the recast cat, panda, pig,
+  // and polar bear went 7.6 cm to 12.5 cm into the body in the play. At rest, the left paw
+  // hangs from the shoulder with the roll of its grip, and the right paw holds the clarinet upright
+  // at its side, at the hanging palm with the forearm 80° forward from the upper arm, as a seated
+  // clarinetist rests it with the right thumb on the thumb rest. With both paws on their grips at
+  // the middle of the hanging palms, the arms of each recast body went 3 cm to 16 cm into the body
+  // at rest.
   clarinet: {
     ...WOODWIND,
-    reach: 20 * MathUtils.DEG2RAD,
-    poleL: [-1, -1, -1],
-    restPoleL: [-1, -1, -1],
-    restPoleR: [1, -1, -1],
-    rest: holdTurn(-10, 30),
-    restShift: [-0.17, 0.05, -0.02],
+    reach: 35 * MathUtils.DEG2RAD,
+    reachL: 20 * MathUtils.DEG2RAD,
+    play: holdTurn(5, 0),
+    rest: holdTurn(-25, 0),
+    poleL: [-0.3, -1, 0],
+    poleR: [0.3, -1, 0],
+    restArms: {
+      L: { forward: 20 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
+      R: { forward: 20 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
+    },
+    restFreeL: {
+      lap: { along: 0.45, offset: [-0.5, -0.55, -0.12] },
+      palm: [0.85, -0.37, 0.38],
+      fingers: [0, -1, -0.3],
+      arc: [0.3, 0.04, 0.31],
+    },
+    faceTube: ['palm', 'palm'],
+    aimAcross: 1,
+    aimSide: [0.25, 0.25],
+    aimSigns: [-1, 1],
+    gripShiftL: [0.15, 0.14, -0.11],
+    gripShiftR: [0.05, 0.19, -0.11],
+    restAim: 1,
+    gripCurl: curls(115, 115),
   },
   // While it plays, the bassoon turns its lower end 20° forward and 20° to the right, and the
   // right elbow points down. With no turn, the right forearm goes 0.21 H into the right thigh.
@@ -926,6 +955,9 @@ const WOLF_CLARINET_FORWARD = 5;
  */
 const WOLF_CLARINET = {
   ...WIND_HOLDS.clarinet,
+  restArms: null,
+  restFreeL: null,
+  aimSigns: null,
   reach: 35 * MathUtils.DEG2RAD,
   reachL: 20 * MathUtils.DEG2RAD,
   lipShift: [0, -0.18, 0.4],
