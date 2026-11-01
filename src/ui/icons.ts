@@ -40,10 +40,10 @@ const ICONS = {
   'volume-off': '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
   'reset-view':
     '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
-  // A movie camera with two film reels for "Cinematic camera". A still camera looks like a button
-  // that takes a photo (design 2.8).
-  'movie-camera':
-    '<circle cx="6.75" cy="6.75" r="2.75"/><circle cx="12.75" cy="6.75" r="2.75"/><rect x="3" y="10.75" width="12.5" height="8.75" rx="1.5"/><path d="M15.5 13.75l5.5-2.75v8l-5.5-2.75"/>',
+  // An open clapperboard for "Cinematic camera": a slate and its stick, open by 15°, with two
+  // stripes. It reads as film at 20 px (design 2.8).
+  clapperboard:
+    '<rect x="3.5" y="10.5" width="17" height="9" rx="1.5"/><path d="M3.5 10.5l16.42-4.4-.91-3.38L2.59 7.12z"/><path d="M8.43 9.18l.73-3.82M13.68 7.77l.73-3.82"/>',
   'full-screen':
     '<path d="M4 8.5V4h4.5M4 4l5.5 5.5M20 8.5V4h-4.5M20 4l-5.5 5.5M4 15.5V20h4.5M4 20l5.5-5.5M20 15.5V20h-4.5M20 20l-5.5-5.5"/>',
   'exit-full-screen':

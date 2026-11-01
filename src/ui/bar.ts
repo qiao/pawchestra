@@ -228,7 +228,7 @@ export class Bar {
 
     this.#camera = createButton('camera', 'Cinematic camera');
     this.#camera.setAttribute('aria-pressed', 'false');
-    this.#camera.append(createIcon('movie-camera'));
+    this.#camera.append(createIcon('clapperboard'));
     this.#camera.addEventListener('click', actions.onCamera);
 
     this.#reset = createButton('reset', 'Reset view');
