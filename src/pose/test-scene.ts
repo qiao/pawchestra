@@ -96,6 +96,19 @@ export function recastScene(scene: TestScene, recast: Recast, seed = 1): TestSce
 }
 
 /**
+ * Builds the scene of a test file as {@link sceneOf} does, with a recast ({@link recastScene}).
+ * The role tools build the scene of each demo with it.
+ *
+ * @param file The bytes of the file.
+ * @param recast The recast, or `undefined` for the cast of the score.
+ * @returns The scene.
+ */
+export function recastSceneOf(file: Uint8Array, recast: Recast | undefined): TestScene {
+  const scene = sceneOf(file);
+  return recast ? recastScene(scene, recast) : scene;
+}
+
+/**
  * Gives the species of the seat of a player: the species of its cast, or the species of the seat
  * before a recast ({@link recastScene}).
  *
