@@ -1,0 +1,783 @@
+/**
+ * Measures each pair of a species and a role: the cast matrix (design 4.4, "Cast matrix"). It
+ * recasts each species into each role (`findRole()` of `tools/fold-probe.ts`), and measures the
+ * pair with the arm gate (`probeRole()` of `tools/arm-check.ts`) and the clearance sweep
+ * (`sweepDemos()` of `tools/pose-depth.ts`) on a short sample ({@link CAST_SAMPLE}). Thus the
+ * table shows how far the bodies are from "any animal with any instrument".
+ *
+ * - **Hold.** A recast pair plays the shared hold of the instrument: the tool removes the own hold
+ *   of the species from `SPECIES_HOLDS` and `SPECIES_WIND_HOLDS` in memory. The own role of a
+ *   species keeps its own hold and its own instrument scale.
+ * - **Scale.** A recast pair with a violin or a viola takes the scale of the rule of a violin shop
+ *   (`ruleSize()` of `tools/hold-reach.ts`), clamped to the real sizes ({@link REAL_LENGTHS}). Each
+ *   other instrument keeps the scale 1, and the cell says so ({@link ScaleSource}).
+ * - **Verdict.** A value of the gate over its limit fails, and a clip over the limit of its pair
+ *   fails. A value is open when the own pair of the role is over the same limit and the value is not
+ *   worse by more than the margin of the limit ({@link CLIP_MARGIN} for a clip): a known item of the
+ *   role. The grip of each pair counts from the accepted grip of the role (`ACCEPTED_GRIPS`),
+ *   because the grip frame does not move with the bind.
+ *
+ * Each pair runs in a child process, with at most `--jobs` children at the same time, and its JSON
+ * goes into a cache by tree (`treeCacheFile()` of `tools/ref-tree.ts`), so a second run on the same
+ * tree reads it. The tool writes one table (a row for each species, a column for each role) into
+ * the file of `--out`, and the JSON of all pairs beside it ({@link MatrixJson}).
+ *
+ * Usage: pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>]
+ */
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+
+import { ACCEPTED_GRIPS, ARM_LIMITS, gateRows, probeRole } from './arm-check.ts';
+import type { GateRow, Measure, RoleReport } from './arm-check.ts';
+import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
+import { REAL_VIOLINS, holdReach, ruleSize } from './hold-reach.ts';
+import { sampleAt, sweepDemos } from './pose-depth.ts';
+import type { TargetReach } from './pose-depth.ts';
+import { probeDemos } from './probe-demos.ts';
+import {
+  PROBE_NO_CACHE,
+  ROOT,
+  runChild,
+  storeBase,
+  treeCacheFile,
+  withTempFolder,
+} from './ref-tree.ts';
+import type { InstrumentId } from '../src/models/instruments/types.ts';
+import { isScaledInstrument } from '../src/models/instruments/types.ts';
+import { SCALE_PARAMS, SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/species.ts';
+import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
+import { SPECIES_HOLDS } from '../src/pose/bowed-rig.ts';
+import { depthLimit } from '../src/pose/test-sweep.ts';
+import { SPECIES_WIND_HOLDS } from '../src/pose/winds.ts';
+import { scoreOf } from '../src/score/test-score.ts';
+
+/**
+ * The roles of a run with no `--roles`: one role of each family. A bowed string under the chin, a
+ * bowed string on the floor, a side-blown wind, a front wind, a brass instrument, and a drum.
+ */
+export const CAST_ROLES = [
+  'violinist',
+  'cellist',
+  'flutist',
+  'clarinetist',
+  'trumpeter',
+  'snare-drummer',
+] as const;
+
+/**
+ * The short sample of each pair. Each pair plays the shortest demo with the role, because one demo
+ * holds the rest, the lift, the play, and the lowering of the role. The arm gate takes a play
+ * sample at each `step` of song time, twice the step of the gate (`GATE_STEP`), and the sweep each
+ * `every`-th play sample of its role. A pair then takes less than 1 minute. The matrix finds the
+ * pairs to work on, and the full gate of one pair checks a change.
+ */
+export const CAST_SAMPLE = { step: 0.5, every: 4 } as const;
+
+/**
+ * The real total lengths of each instrument under the chin, from the tail end to the scroll, in
+ * meters. The violin: the smallest and the largest violin of the size chart of a violin teacher
+ * (`REAL_VIOLINS` of `tools/hold-reach.ts`). The viola: the body lengths of 10 to 16.5 inches of a
+ * viola chart (`docs/reference/string-technique.md`, 1.10), times the 1.66 of the total length of
+ * a full violin (0.59 m) to its body (0.356 m).
+ */
+export const REAL_LENGTHS = {
+  violin: REAL_VIOLINS,
+  viola: { smallest: 0.42, largest: 0.7 },
+} as const;
+
+/** The deeper depth of a clip than the own pair of the role above which the clip fails, in meters. */
+export const CLIP_MARGIN = 0.01;
+
+/** The format version of {@link PairJson}. A new version gives new cache keys. */
+export const CAST_FORMAT = 1;
+
+/**
+ * The source of the instrument scale of a pair. `own`: the own role of the species, with the scale
+ * of the app. `rule`: the rule of a violin shop. `smallest`, `largest`: the rule, clamped to a
+ * real size. `none`: no rule fits the instrument or the arm, so the scale is 1. `fixed`: the app
+ * has no scale of the instrument.
+ */
+export type ScaleSource = 'own' | 'rule' | 'smallest' | 'largest' | 'none' | 'fixed';
+
+/** The instrument scale of a pair. */
+export interface PairScale {
+  /** The scale, as a factor of the instrument of the app. */
+  readonly value: number;
+  /** The source of the scale. */
+  readonly source: ScaleSource;
+}
+
+/** The deepest point of one pair of parts in one sample set of the sweep. */
+export interface PairClip {
+  /** The sample set, such as `play`. */
+  readonly set: string;
+  /** The moving part, such as `paws`. */
+  readonly part: string;
+  /** The obstacle, such as `body`. */
+  readonly into: string;
+  /** The depth, in meters. */
+  readonly depth: number;
+  /** The limit of the pair in the set (`depthLimit()`), in meters. */
+  readonly limit: number;
+  /** The demo and the time of the sample. */
+  readonly at: string;
+}
+
+/** The JSON of one pair, as a child writes it. */
+export interface PairJson {
+  /** The format version ({@link CAST_FORMAT}). */
+  readonly version: number;
+  /** The species. */
+  readonly species: SpeciesId;
+  /** The role of `FOLD_ROLES`. */
+  readonly role: string;
+  /** The name of the pair for the role tools: the role, or `<role>@<species>`. */
+  readonly name: string;
+  /** True for the own role of the species. */
+  readonly own: boolean;
+  /** The demo of the sample. */
+  readonly demo: string;
+  /** The instrument scale. */
+  readonly scale: PairScale;
+  /** The report of the arm gate, or `null` after an error. */
+  readonly arms: RoleReport | null;
+  /** The deepest point of each pair of parts of the sweep in each set. */
+  readonly clips: readonly PairClip[];
+  /** The note targets of the sweep. */
+  readonly targets: TargetReach;
+  /** The message of an error of the pair, or `null`. */
+  readonly error: string | null;
+  /** The run time of the pair, in seconds. */
+  readonly seconds: number;
+}
+
+/** One value of a cell that does not pass, or the value nearest to its limit in a cell that does. */
+export interface CellItem {
+  /** The verdict of the value. */
+  readonly verdict: 'PASS' | 'OPEN' | 'FAIL';
+  /** The text, such as `grip L 62/45` or `paws>body 4.1/1.5 cm`. */
+  readonly text: string;
+  /** The value as a share of its limit: above 1 is over the limit. */
+  readonly ratio: number;
+}
+
+/** One cell of the matrix. */
+export interface MatrixCell {
+  /** The verdict of the cell: the worst verdict of its values. */
+  readonly verdict: 'PASS' | 'OPEN' | 'FAIL';
+  /** The value of the gate with the largest ratio, or `null` with no value. */
+  readonly worst: CellItem | null;
+  /** The deepest clip with the largest ratio, or `null` with no clip. */
+  readonly clip: CellItem | null;
+  /** The values that do not pass. */
+  readonly items: readonly CellItem[];
+}
+
+/** The JSON file of a run. */
+export interface MatrixJson {
+  /** The format version ({@link CAST_FORMAT}). */
+  readonly version: number;
+  /** The roles, in the order of the columns. */
+  readonly roles: readonly string[];
+  /** The species, in the order of the rows. */
+  readonly species: readonly SpeciesId[];
+  /** The sample of each pair. */
+  readonly sample: typeof CAST_SAMPLE;
+  /** The demo of each role. */
+  readonly demos: Readonly<Record<string, string>>;
+  /** The run time of the matrix, in seconds. */
+  readonly seconds: number;
+  /** Each pair, with its cell. */
+  readonly pairs: readonly MatrixPair[];
+}
+
+/** One pair of the matrix with its cell. */
+export interface MatrixPair {
+  /** The JSON of the pair. */
+  readonly pair: PairJson;
+  /** The cell. */
+  readonly cell: MatrixCell;
+}
+
+/** The command line of the tool. */
+interface MatrixArgs {
+  /** The roles of the columns. */
+  readonly roles: readonly string[];
+  /** The species of the rows. */
+  readonly species: readonly SpeciesId[];
+  /** The file of the table. The JSON goes beside it, with the extension `.json`. */
+  readonly out: string;
+  /** The largest number of children at the same time. */
+  readonly jobs: number;
+}
+
+/** The usage text. */
+const USAGE =
+  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>]';
+
+/**
+ * Reads the command line.
+ *
+ * @param args The arguments.
+ * @returns The options.
+ * @throws Error for an unknown option, role, or species.
+ */
+export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
+  const values = new Map<string, string>();
+  for (let i = 0; i < args.length; i += 2) {
+    const name = args[i] ?? '';
+    const value = args[i + 1];
+    if (!['--roles', '--species', '--out', '--jobs'].includes(name) || value === undefined) {
+      throw new Error(`The option ${name} is unknown or has no value.\n${USAGE}`);
+    }
+    values.set(name, value);
+  }
+  const list = (name: string): string[] | null =>
+    values
+      .get(name)
+      ?.split(',')
+      .filter((item) => item !== '') ?? null;
+  const roles = list('--roles') ?? [...CAST_ROLES];
+  const players = [...FOLD_ROLES].filter(([, role]) => role.kind === 'player').map(([n]) => n);
+  const unknownRoles = roles.filter((role) => !players.includes(role));
+  if (unknownRoles.length > 0) {
+    throw new Error(
+      `No player role has the name ${unknownRoles.join(', ')}. The roles are: ${players.join(', ')}.`,
+    );
+  }
+  const species = list('--species') ?? [...SPECIES_IDS];
+  const unknownSpecies = species.filter((id) => !isSpeciesId(id));
+  if (unknownSpecies.length > 0) {
+    throw new Error(`No species has the id ${unknownSpecies.join(', ')}.`);
+  }
+  const jobs = Number(values.get('--jobs') ?? 4);
+  if (!Number.isInteger(jobs) || jobs < 1) {
+    throw new Error('The option --jobs takes a whole number above 0.');
+  }
+  return {
+    roles,
+    species: species.filter(isSpeciesId),
+    out: resolve(values.get('--out') ?? join(ROOT, 'scratch', 'cast-matrix.md')),
+    jobs,
+  };
+}
+
+/**
+ * Gives the species of the own role of a role of `FOLD_ROLES`.
+ *
+ * @param role The role.
+ * @returns The species.
+ * @throws Error if the role is no player role.
+ */
+function homeSpecies(role: string): readonly SpeciesId[] {
+  const source = FOLD_ROLES.get(role);
+  if (source?.kind !== 'player') {
+    throw new Error(`The ${role} is no player role.`);
+  }
+  return source.species;
+}
+
+/**
+ * Gives the name of a pair for the role tools: the role for its own species, else the recast role
+ * `<role>@<species>`.
+ *
+ * @param species The species.
+ * @param role The role.
+ * @returns The name.
+ */
+export function pairName(species: SpeciesId, role: string): string {
+  return homeSpecies(role).includes(species) ? role : `${role}@${species}`;
+}
+
+/**
+ * Gives the demo of the sample of a role: the shortest demo with a player of the role
+ * ({@link CAST_SAMPLE}).
+ *
+ * @param role The role.
+ * @returns The file of the demo.
+ * @throws Error if no demo has the role.
+ */
+async function roleDemo(role: string): Promise<string> {
+  const sweep = findSweep(role);
+  if (!sweep) {
+    throw new Error(`The ${role} has no sweep.`);
+  }
+  let best: { readonly file: string; readonly length: number } | null = null;
+  for (const demo of await probeDemos()) {
+    const score = scoreOf(demo.bytes);
+    if (sweep.hasRole(score) && (!best || score.durationSec < best.length)) {
+      best = { file: demo.file, length: score.durationSec };
+    }
+  }
+  if (!best) {
+    throw new Error(`No demo has the ${role}.`);
+  }
+  return best.file;
+}
+
+/**
+ * Gives a recast species the shared hold of an instrument: it removes the own hold of the species
+ * from `SPECIES_HOLDS` and `SPECIES_WIND_HOLDS`, in memory. A child measures one pair and ends, so
+ * the change stays.
+ *
+ * @param species The species.
+ * @param instrument The instrument.
+ */
+function useSharedHold(species: SpeciesId, instrument: InstrumentId): void {
+  for (const entry of [SPECIES_HOLDS[species], SPECIES_WIND_HOLDS[species]]) {
+    if (entry && Object.hasOwn(entry, instrument)) {
+      Reflect.deleteProperty(entry, instrument);
+    }
+  }
+}
+
+/**
+ * Sets the instrument scale of a recast species in memory, and gives it: the rule of a violin shop
+ * for a violin or a viola, clamped to {@link REAL_LENGTHS}, else 1. Run it after
+ * {@link useSharedHold}, because the rule poses the hold.
+ *
+ * @param species The species.
+ * @param instrument The instrument.
+ * @returns The scale.
+ */
+function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale {
+  if (!isScaledInstrument(instrument)) {
+    return { value: 1, source: 'fixed' };
+  }
+
+  const params: SpeciesParams = SPECIES[species];
+  const param = SCALE_PARAMS[instrument];
+  Reflect.deleteProperty(params, param);
+  if (instrument !== 'violin' && instrument !== 'viola') {
+    return { value: 1, source: 'none' };
+  }
+
+  const reach = holdReach(species, instrument, 'chair');
+  const rule = ruleSize(reach);
+  if (!rule) {
+    return { value: 1, source: 'none' };
+  }
+  const real = REAL_LENGTHS[instrument];
+  const perMeter = reach.scale / reach.length;
+  const scale: PairScale =
+    rule.length < real.smallest
+      ? { value: real.smallest * perMeter, source: 'smallest' }
+      : rule.length > real.largest
+        ? { value: real.largest * perMeter, source: 'largest' }
+        : { value: rule.scale, source: 'rule' };
+  Reflect.set(params, param, scale.value);
+  return scale;
+}
+
+/**
+ * Measures one pair in this process: the arm gate and the sweep on the sample of the role.
+ *
+ * @param species The species.
+ * @param role The role.
+ * @param demo The demo of the sample.
+ * @returns The JSON of the pair.
+ */
+async function measurePair(species: SpeciesId, role: string, demo: string): Promise<PairJson> {
+  const started = performance.now();
+  const name = pairName(species, role);
+  const own = name === role;
+  const base = { version: CAST_FORMAT, species, role, name, own, demo };
+  const source = findRole(name);
+  const sweep = findSweep(name);
+  if (source?.kind !== 'player' || !sweep) {
+    throw new Error(`The pair ${name} has no role or no sweep.`);
+  }
+
+  let scale: PairScale = { value: 1, source: 'own' };
+  try {
+    if (!own) {
+      useSharedHold(species, source.instrument);
+      scale = setRecastScale(species, source.instrument);
+    }
+    const demos = (await probeDemos()).filter((file) => file.file === demo);
+    const grips = ACCEPTED_GRIPS.get(role) ?? null;
+    const arms = probeRole(source, demos, CAST_SAMPLE.step, grips);
+    const results = await sweepDemos(
+      { demos: [demo.replace(/\.mid$/, '')], times: null, gaps: false, every: CAST_SAMPLE.every },
+      sweep,
+    );
+    const clips = new Map<string, PairClip>();
+    let targets: TargetReach = { samples: 0, within: 0, worst: 0 };
+    for (const result of results) {
+      for (const set of result.sets) {
+        for (const pair of set.pairs) {
+          const key = `${set.name} ${pair.part} ${pair.into}`;
+          const found = clips.get(key);
+          if (!found || pair.depth > found.depth) {
+            clips.set(key, {
+              set: set.name,
+              part: pair.part,
+              into: pair.into,
+              depth: pair.depth,
+              limit: depthLimit(sweep, pair, set.name).depth,
+              at: sampleAt(result.demo, set.name, pair),
+            });
+          }
+        }
+      }
+      targets = {
+        samples: targets.samples + result.reached.samples,
+        within: targets.within + result.reached.within,
+        worst: Math.max(targets.worst, result.reached.worst),
+      };
+    }
+    const seconds = (performance.now() - started) / 1000;
+    return { ...base, scale, arms, clips: [...clips.values()], targets, error: null, seconds };
+  } catch (error) {
+    return {
+      ...base,
+      scale,
+      arms: null,
+      clips: [],
+      targets: { samples: 0, within: 0, worst: 0 },
+      error: error instanceof Error ? error.message : String(error),
+      seconds: (performance.now() - started) / 1000,
+    };
+  }
+}
+
+/**
+ * Gives the verdict of a value against its limit and the value of the own pair of the role: over
+ * the limit fails, unless the own pair is over the limit too and the value is not worse by more
+ * than the margin (a known item of the role, `OPEN`).
+ *
+ * @param over True when the value is over its limit.
+ * @param homeOver True when the value of the own pair is over the limit.
+ * @param worse The amount by which the value is worse than the value of the own pair.
+ * @param margin The margin.
+ * @returns The verdict.
+ */
+export function cellVerdict(
+  over: boolean,
+  homeOver: boolean,
+  worse: number,
+  margin: number,
+): CellItem['verdict'] {
+  if (!over) {
+    return 'PASS';
+  }
+  return homeOver && worse <= margin ? 'OPEN' : 'FAIL';
+}
+
+/** The short names of the measures of the gate in a cell. */
+const SHORT: Readonly<Record<Measure, string>> = {
+  folds: 'folds',
+  twist: 'twist',
+  foreTwist: 'forearm twist',
+  flat: 'flat',
+  pawTwist: 'paw twist',
+  pawSwing: 'paw swing',
+  pawJump: 'paw jumps',
+  stretch: 'stretch',
+  grip: 'grip',
+  moveTwist: 'move twist',
+  moveTurn: 'move turn',
+};
+
+/**
+ * Gives the item of one value of the gate.
+ *
+ * @param row The value.
+ * @param home The value of the own pair of the role with the same arm and measure, or none.
+ * @returns The item.
+ */
+function gateItem(row: GateRow, home: GateRow | undefined): CellItem {
+  const limit = ARM_LIMITS[row.measure];
+  const over = (value: number): boolean => (limit.up ? value > limit.limit : value < limit.limit);
+  const worse = home ? (limit.up ? row.value - home.value : home.value - row.value) : Infinity;
+  const ratio = limit.up ? row.value / limit.limit : limit.limit / Math.max(1e-6, row.value);
+  const digits = limit.stat === 'share' ? 3 : limit.digits;
+  return {
+    verdict: cellVerdict(over(row.value), home ? over(home.value) : false, worse, limit.margin),
+    text: `${SHORT[row.measure]} ${row.side} ${row.value.toFixed(digits)}/${limit.limit}`,
+    ratio,
+  };
+}
+
+/**
+ * Gives the item of one clip of the sweep.
+ *
+ * @param clip The clip.
+ * @param home The clip of the own pair of the role with the same set and parts, or none.
+ * @returns The item.
+ */
+function clipItem(clip: PairClip, home: PairClip | undefined): CellItem {
+  const over = (c: PairClip): boolean => c.depth > c.limit;
+  const worse = home ? clip.depth - home.depth : Infinity;
+  const cm = (m: number): string => (m * 100).toFixed(1);
+  return {
+    verdict: cellVerdict(over(clip), home ? over(home) : false, worse, CLIP_MARGIN),
+    text: `${clip.set} ${clip.part}>${clip.into} ${cm(clip.depth)}/${cm(clip.limit)} cm`,
+    ratio: clip.depth / Math.max(1e-6, clip.limit),
+  };
+}
+
+/**
+ * Gives the cell of a pair against the own pair of its role.
+ *
+ * @param pair The pair.
+ * @param home The own pair of the role, or `null` when it failed.
+ * @returns The cell.
+ */
+export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
+  if (pair.error !== null || !pair.arms) {
+    const text = `error: ${(pair.error ?? 'no report').split('\n')[0] ?? ''}`;
+    const item: CellItem = { verdict: 'FAIL', text, ratio: Infinity };
+    return { verdict: 'FAIL', worst: item, clip: null, items: [item] };
+  }
+
+  const homeRows = home?.arms ? gateRows(home.name, home.arms, null) : [];
+  const gate = gateRows(pair.name, pair.arms, null).map((row) =>
+    gateItem(
+      row,
+      homeRows.find((h) => h.side === row.side && h.measure === row.measure),
+    ),
+  );
+  const clips = pair.clips.map((clip) =>
+    clipItem(
+      clip,
+      home?.clips.find((h) => h.set === clip.set && h.part === clip.part && h.into === clip.into),
+    ),
+  );
+  const largest = (items: readonly CellItem[]): CellItem | null =>
+    items.reduce<CellItem | null>(
+      (best, item) => (!best || item.ratio > best.ratio ? item : best),
+      null,
+    );
+  const items = [...gate, ...clips].filter((item) => item.verdict !== 'PASS');
+  const verdict = items.some((item) => item.verdict === 'FAIL')
+    ? 'FAIL'
+    : items.length > 0
+      ? 'OPEN'
+      : 'PASS';
+  return { verdict, worst: largest(gate), clip: largest(clips), items };
+}
+
+/**
+ * Writes the text of a cell: the verdict, the worst value of the gate, the deepest clip, and the
+ * scale.
+ *
+ * @param pair The pair.
+ * @param cell The cell.
+ * @returns The text.
+ */
+export function cellText(pair: PairJson, cell: MatrixCell): string {
+  const scale =
+    pair.scale.source === 'fixed'
+      ? ''
+      : pair.scale.source === 'own'
+        ? ' · own'
+        : pair.scale.source === 'none'
+          ? ' · x1 no rule'
+          : ` · x${pair.scale.value.toFixed(2)}${pair.scale.source === 'rule' ? '' : ` ${pair.scale.source}`}`;
+  const parts = [cell.verdict, cell.worst?.text, cell.clip?.text].filter(
+    (part) => part !== undefined,
+  );
+  return `${parts.join(' · ')}${scale}`;
+}
+
+/**
+ * Writes the table of the matrix: a row for each species, a column for each role.
+ *
+ * @param json The matrix.
+ * @returns The lines.
+ */
+export function matrixLines(json: MatrixJson): string[] {
+  const find = (species: SpeciesId, role: string): MatrixPair | undefined =>
+    json.pairs.find(({ pair }) => pair.species === species && pair.role === role);
+  const lines = [
+    `Cast matrix of ${json.species.length} species and ${json.roles.length} roles in ${Math.round(json.seconds)} s. Sample: the shortest demo with the role, a gate step of ${json.sample.step} s, and each ${json.sample.every}th sweep sample. A cell gives the verdict, the worst value of the gate, the deepest clip (value/limit), and the scale of a scaled instrument.`,
+    '',
+    `| Species | ${json.roles.map((role) => `${role} (${json.demos[role] ?? '-'})`).join(' | ')} |`,
+    `|---|${json.roles.map(() => '---').join('|')}|`,
+  ];
+  for (const species of json.species) {
+    const cells = json.roles.map((role) => {
+      const found = find(species, role);
+      return found ? cellText(found.pair, found.cell) : '-';
+    });
+    lines.push(`| ${species} | ${cells.join(' | ')} |`);
+  }
+  const count = (verdict: MatrixCell['verdict']): number =>
+    json.pairs.filter(
+      ({ pair, cell }) => json.species.includes(pair.species) && cell.verdict === verdict,
+    ).length;
+  lines.push('', `PASS ${count('PASS')}, OPEN ${count('OPEN')}, FAIL ${count('FAIL')}.`);
+  return lines;
+}
+
+/**
+ * Gives the cache file of a pair: the key of the tree (`treeCacheFile()`), with the pair and the
+ * sample in its arguments, or `null` with `PROBE_NO_CACHE=1`.
+ *
+ * @param tree The key file of the tree for the run.
+ * @param species The species.
+ * @param role The role.
+ * @returns The file, or `null`.
+ */
+function pairCacheFile(tree: string | null, species: SpeciesId, role: string): string | null {
+  return tree ? tree.replace(/\.json$/, `-${species}.${role}.json`) : null;
+}
+
+/**
+ * Measures one pair in a child process, or reads it from the cache.
+ *
+ * @param tree The key file of the tree, or `null` for no cache.
+ * @param species The species.
+ * @param role The role.
+ * @param demo The demo of the sample.
+ * @returns The JSON of the pair.
+ */
+async function runPair(
+  tree: string | null,
+  species: SpeciesId,
+  role: string,
+  demo: string,
+): Promise<PairJson> {
+  const cache = pairCacheFile(tree, species, role);
+  if (cache && existsSync(cache)) {
+    return readPair(await readFile(cache, 'utf8'));
+  }
+  const text = await withTempFolder(
+    async (dir) => {
+      const file = join(dir, 'pair.json');
+      await runChild(
+        process.execPath,
+        [join('tools', 'cast-matrix.ts'), '--pair', `${species},${role},${demo}`, '--json', file],
+        ROOT,
+      );
+      return readFile(file, 'utf8');
+    },
+    { prefix: 'cast-matrix-' },
+  );
+  if (cache) {
+    storeBase(cache, text);
+  }
+  return readPair(text);
+}
+
+/**
+ * Reads the JSON text of a pair.
+ *
+ * @param text The text.
+ * @returns The JSON.
+ */
+function readPair(text: string): PairJson {
+  // SAFETY: the text comes from childMain() of this tool, with the format of the cache key.
+  return JSON.parse(text) as PairJson;
+}
+
+/**
+ * Runs a function on each item, with at most a number of calls at the same time.
+ *
+ * @param items The items.
+ * @param jobs The largest number of calls at the same time.
+ * @param work The function.
+ * @returns The results, in the order of the items.
+ */
+async function eachLimited<T, R>(
+  items: readonly T[],
+  jobs: number,
+  work: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = [];
+  let next = 0;
+  const lane = async (): Promise<void> => {
+    while (next < items.length) {
+      const k = next;
+      next += 1;
+      const item = items[k];
+      if (item !== undefined) {
+        results[k] = await work(item);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(jobs, items.length) }, lane));
+  return results;
+}
+
+/**
+ * Runs the tool as a child: it measures one pair, and writes {@link PairJson} into the file of
+ * `--json`.
+ *
+ * @param args The arguments: `--pair <species>,<role>,<demo> --json <file>`.
+ */
+async function childMain(args: readonly string[]): Promise<void> {
+  const [species = '', role = '', demo = ''] = (args[1] ?? '').split(',');
+  const file = args[3];
+  if (!isSpeciesId(species) || !FOLD_ROLES.has(role) || args[2] !== '--json' || !file) {
+    throw new Error('The child takes --pair <species>,<role>,<demo> --json <file>.');
+  }
+  writeFileSync(file, `${JSON.stringify(await measurePair(species, role, demo))}\n`);
+}
+
+/**
+ * Runs the tool.
+ *
+ * @returns The exit code.
+ */
+async function main(): Promise<number> {
+  const args = process.argv.slice(2);
+  if (args[0] === '--pair') {
+    await childMain(args);
+    return 0;
+  }
+
+  const options = parseMatrixArgs(args);
+  const started = performance.now();
+  const demos: Record<string, string> = {};
+  for (const role of options.roles) {
+    demos[role] = await roleDemo(role);
+  }
+  const tree =
+    process.env[PROBE_NO_CACHE] === '1'
+      ? null
+      : treeCacheFile('cast-matrix.ts', [`format ${CAST_FORMAT}`, JSON.stringify(CAST_SAMPLE)]);
+  const wanted = options.roles.flatMap((role) => {
+    const homes = homeSpecies(role).filter((s) => !options.species.includes(s));
+    return [...options.species, ...homes].map((species) => ({ species, role }));
+  });
+  let done = 0;
+  const pairs = await eachLimited(wanted, options.jobs, async ({ species, role }) => {
+    const pair = await runPair(tree, species, role, demos[role] ?? '');
+    done += 1;
+    const state = pair.error === null ? '' : ` error: ${pair.error.split('\n')[0] ?? ''}`;
+    console.log(
+      `${done}/${wanted.length} ${pairName(species, role)} ${pair.seconds.toFixed(0)} s${state}`,
+    );
+    return pair;
+  });
+  const json: MatrixJson = {
+    version: CAST_FORMAT,
+    roles: options.roles,
+    species: options.species,
+    sample: CAST_SAMPLE,
+    demos,
+    seconds: (performance.now() - started) / 1000,
+    pairs: pairs.map((pair) => ({
+      pair,
+      cell: matrixCell(pair, pairs.find((p) => p.role === pair.role && p.own) ?? null),
+    })),
+  };
+  const lines = matrixLines(json);
+  mkdirSync(dirname(options.out), { recursive: true });
+  writeFileSync(options.out, `${lines.join('\n')}\n`);
+  writeFileSync(options.out.replace(/\.md$/, '') + '.json', `${JSON.stringify(json, null, 1)}\n`);
+  console.log(['', ...lines, '', `Table: ${options.out}`].join('\n'));
+  return 0;
+}
+
+if (import.meta.main) {
+  try {
+    process.exitCode = await main();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(2);
+  }
+}
