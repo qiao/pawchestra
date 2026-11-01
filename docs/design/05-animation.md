@@ -274,6 +274,18 @@ The rest of each family:
   12 recast bodies flipped through 180° (cast matrix, 4.4). The dog keeps its own place
   (`DOG_HOLD`). The other instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
+- **Violin hold from the body.** The shared violin hold (`BOWED_HOLDS.violin`) takes the arm
+  values of the accepted rabbit violinist, as directions and in `H`, and its place from the
+  landmarks of the body (`BowedHold.chinFit`, `fitViolinPlace()`). The tail end lies on the left
+  collarbone: a share of the way from the middle line to the left shoulder joint, above the base of
+  the neck, and behind the front of the upper chest (`chestFront()`), the depth of the chest. The
+  violin keeps the turn of the hold. Then the head turns down or up in a small range until the jaw
+  touches the chin rest and the strings at the bow (`jawGap()`), and the violin moves up or down
+  for the rest of the gap, as a violinist rests the jaw on the chin rest with a straight head
+  (strings 1.10). Reason: a place in `H` from the head fits one body only. With the chin hold, the
+  arms of each recast body went into the body, and with the head turn of the rabbit, the jaw went
+  into the violin of six bodies. The rabbit and the red fox keep their own holds (`SHOULDER_HOLD`,
+  `FOX_HOLD`).
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
