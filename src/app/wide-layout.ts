@@ -15,8 +15,8 @@ export const WIDE_LAYOUT_QUERY = `(min-width: ${WIDE_MIN_WIDTH_PX}px) and (min-a
 
 /**
  * Tells if a window has the wide layout (design 2.3, 2.8): at least 1200 px wide, with an aspect
- * of at least 3:2. The drawer then opens at start with the seat list expanded, as in the mockup
- * `reference/mockup.png`.
+ * of at least 3:2. The drawer then opens at start at the tab "Music", so that the stage does not
+ * move at the click on play.
  *
  * @param width The width of the window, in CSS pixels.
  * @param height The height of the window, in CSS pixels.
