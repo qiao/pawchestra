@@ -70,10 +70,13 @@ import {
   FOLD_ROLE_TABLE,
   SAMPLE_SETS,
   faceLines,
+  findRole,
+  homeSweep,
   meanTurn,
   probeFolds,
   roleAnimal,
   roleBodies,
+  roleScene,
   splitText,
   turnAngle,
 } from './fold-probe.ts';
@@ -119,10 +122,9 @@ import { twistAngle } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
 import type { Quat } from '../src/models/tuples.ts';
 import type { SpeciesId } from '../src/models/species.ts';
-import { sceneOf } from '../src/pose/test-scene.ts';
 import type { TestScene } from '../src/pose/test-scene.ts';
 import type { Technique } from '../src/score/types.ts';
-import { INSTRUMENT_PART, SWEEP_ROLES } from '../src/pose/test-sweep-roles.ts';
+import { INSTRUMENT_PART, SWEEP_ROLES, recastSweep } from '../src/pose/test-sweep-roles.ts';
 import { BODY_OBSTACLE, PAW_PARTS, depthLimit, pairText } from '../src/pose/test-sweep.ts';
 import type { PairDepth, RoleSweep } from '../src/pose/test-sweep.ts';
 import { isInFamily } from '../src/pose/family.ts';
@@ -237,7 +239,7 @@ export const UPPER_ARM_GOAL = 35;
 export const LEG_RESTS: ReadonlySet<string> = new Set(['flute@fox-tan']);
 
 /** The usage text of `pnpm hold-fit`. */
-const USAGE = `Usage: pnpm hold-fit <${[...FOLD_ROLES.keys()].join(' | ')}> [--set <path>=<value>[;<path>=<value>]...]... [--grid <path>=<a>:<b>:<step>]... [--sets <${FIT_SETS.join(' | ')}>[,<set>]...] [--demo <id>|all]... [--midi <path>]... [--step <seconds>] [--faces <n>] [--faces-of <face>[,<face>]...] [--technique <normal | pizzicato | tremolo>] [--base <ref>] [--json <file>] [--glb <file>]
+const USAGE = `Usage: pnpm hold-fit <${[...FOLD_ROLES.keys()].join(' | ')} | <role>@<species>> [--set <path>=<value>[;<path>=<value>]...]... [--grid <path>=<a>:<b>:<step>]... [--sets <${FIT_SETS.join(' | ')}>[,<set>]...] [--demo <id>|all]... [--midi <path>]... [--step <seconds>] [--faces <n>] [--faces-of <face>[,<face>]...] [--technique <normal | pizzicato | tremolo>] [--base <ref>] [--json <file>] [--glb <file>]
        pnpm hold-fit <role> --scan [--walls <seconds>[,<seconds>]...] [--set <changes>]... [--grid <path>=<a>:<b>:<step>]... [--demo <id>|all]... [--midi <path>]... [--glb <file>]`;
 
 /**
@@ -421,7 +423,7 @@ export function techniqueFilter(technique: Technique): PlayFilter {
 
 /** The options of `pnpm hold-fit`. */
 export interface FitOptions {
-  /** The name of the role, a key of `FOLD_ROLES`. */
+  /** The name of the role, a key of `FOLD_ROLES` or a recast role (`findRole()`). */
   readonly name: string;
   /** The role. */
   readonly role: RoleSource;
@@ -504,7 +506,7 @@ export function parseWalls(value: string): number[] {
  */
 export function parseFitOptions(args: readonly string[]): FitOptions {
   const [name = '', ...rest] = args;
-  const role = FOLD_ROLES.get(name);
+  const role = findRole(name);
   if (!role) {
     throw new Error(USAGE);
   }
@@ -627,7 +629,7 @@ export function parseFitOptions(args: readonly string[]): FitOptions {
  * Gives the sweep of a fold role: the role of `SWEEP_ROLES` whose players in a scene are bodies of
  * the fold role, with only these players. The violinist sweep holds the rabbits and the red foxes,
  * so the fold role `fox-violinist` sweeps only the red foxes. A new role of both tables thus needs
- * no entry here. The sweep of a role that holds its instrument against its body measures the
+ * no entry here. A recast role (`findRole()`) takes the body of its species (`recastSweep()`). The sweep of a role that holds its instrument against its body measures the
  * instrument in the body (`INSTRUMENT_PART` of `src/pose/test-sweep-roles.ts`, {@link splitHeld}).
  *
  * @param role The fold role.
@@ -647,13 +649,17 @@ export function fitSweep(
   if (!sweep) {
     return null;
   }
+  const cast =
+    role.kind === 'player' && role.recast
+      ? recastSweep(sweep, role.recast, homeSweep(role.recast.species))
+      : sweep;
   return {
-    ...sweep,
+    ...cast,
     sampleSets: (other) =>
       sweep.sampleSets(other).filter((set) => sets.some((name) => name === set.name)),
     players: (other) => {
       const own = new Set(roleBodies(role, other).map((body) => body.model));
-      return sweep.players(other).filter((player) => own.has(player.model));
+      return cast.players(other).filter((player) => own.has(player.model));
     },
   };
 }
@@ -1914,7 +1920,7 @@ async function fitDemos(
   const scenes = new Map<string, TestScene>();
   const notes = new Map<string, number>();
   for (const demo of all) {
-    const scene = sceneOf(demo.bytes);
+    const scene = roleScene(options.role, demo.bytes);
     if (roleBodies(options.role, scene).length > 0) {
       scenes.set(id(demo), scene);
       notes.set(id(demo), roleNotes(options.role, scene));
