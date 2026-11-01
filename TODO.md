@@ -334,6 +334,10 @@ passes.
       the right upper arm of the monkey goes flat (0.53 to 0.55) in the play, and the left forearm
       of the mannequin goes 1.7 cm into the violin. The polar bear folds 22 and 12 faces (body
       weights).
+- [ ] Violin lift on a pronated bind paw (5.2): the left paw turns through the direction of no
+      paw twist, so the carried violin turns about 240° with it in the middle of the move (the
+      deer at `lift50`, `reports/2026-11-01-violin-hold/`). The role-neutral bind supination of
+      each body (4.4) shortens this turn.
 - [ ] Violin place (5.3): the head turn of the jaw rule (-15° to 15°) and the place of the violin
       on the collarbone need a look from the reference sheets on each body, because the matrix
       measures no contact of the jaw.
