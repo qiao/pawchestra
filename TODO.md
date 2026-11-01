@@ -294,10 +294,6 @@ passes.
       The snare drum recast (`snare-drummer@wolf`) then twists the left paw 171° (limit 170°) and
       the left forearm 80° (limit 80°), in place of 142° and 65° with 66°. Choose the value from
       the twists of all roles of the cast matrix.
-- [ ] Arm gate: `--base` across a change of the bind fails the lines that count from the bind
-      (paw twist, paw swing, forearm twist, move twist, flat) with the same world pose. Measure
-      them in a frame that no bind moves, as the grip turn does, or mark them `OPEN` when the bind
-      of the body changes.
 - [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
       folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
       `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
