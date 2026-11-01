@@ -322,6 +322,8 @@ Read the group of your work before you plan it.
   bones.
 - A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
   leaned forward.
+- A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
+  heels, because short thighs leave the feet under the haunch.
 
 ### Head and colors
 

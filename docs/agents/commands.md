@@ -103,7 +103,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 
 | Command | Action |
 |---|---|
-| `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. `--set` can add an optional rule, such as `studio.bindSupination.L=57`. 20 s to 75 s. |
+| `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. `--set` can add an optional rule, such as `studio.bindSupination.L=57` or `sitPose=@<file>`. 20 s to 75 s. |
 | `blender -b --factory-startup --python tools/blender/arm_rebuild.py -- <animal> [--source <glb>] [--factor <f>] [--spec <JSON>] [--out <dir>]` | Rebuilds the arms from the joints of `tools/mesh-rigs/<animal>.json` ([`rigging.md`](rigging.md)) into `<animal>-arms.glb` and `<animal>-weights.json`. Test them with `rig-mesh --check --set 'source=<glb>;paintedWeights=<json>'`. 10 s. |
 | `blender -b --factory-startup --python tools/blender/wind_arms_try.py -- <animal> <out dir> '<JSON>'` | Runs the session of `wind_arms.py` with changes of the weights or of the elbow rings, for a weight try. |
 | `blender -b --factory-startup --python tools/blender/arm_root.py -- tools/arm-roots/<species>.json [--out <file.glb>]` | Writes a copy of a source mesh with local edits at the arm root. Rig the copy with `pnpm rig-mesh <animal> --check --set source=<path> --keep <dir>`. 5 s. |
