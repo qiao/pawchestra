@@ -61,15 +61,21 @@ import {
   studioOffsets,
 } from '../src/models/studio-rig.ts';
 import type { StudioPose, StudioRig } from '../src/models/studio-rig.ts';
+import { loadTestBodies } from '../src/models/studio-body.ts';
 import { toVec3 } from '../src/models/tuples.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { NOT_STARTED, PLAYING, allAudible, recastSceneOf } from '../src/pose/test-scene.ts';
 import type { Recast, TestScene } from '../src/pose/test-scene.ts';
-import { SWEEP_ROLES, recastSweep } from '../src/pose/test-sweep-roles.ts';
-import type { RoleSweep } from '../src/pose/test-sweep.ts';
+import { SWEEP_ROLES, TEST_BODY_OBSTACLES, recastSweep } from '../src/pose/test-sweep-roles.ts';
+import { BODY_OBSTACLE } from '../src/pose/test-sweep.ts';
+import type { RoleSweep, SweepObstacle } from '../src/pose/test-sweep.ts';
 import type { AnimalPose, Transport } from '../src/pose/types.ts';
+
+// A recast role can name a test species, such as violinist@mannequin, whose body the app does not
+// load (design 4.4, "Test mannequin"). Each role tool imports this module, so the load is here.
+await loadTestBodies();
 
 /** The source of the body of a role: the conductor, or each player of an instrument. */
 export type RoleSource =
@@ -200,12 +206,11 @@ export function roleScene(role: RoleSource, bytes: Uint8Array): TestScene {
 /**
  * Gives the sweep of a role of `pnpm pose-depth` by its name: a role of `SWEEP_ROLES` of
  * `src/pose/test-sweep-roles.ts`, or a recast role ({@link findRole}) with the body of its species
- * (`recastSweep()`). The body comes from the sweep of the first role of {@link FOLD_ROLES} with
- * the species.
+ * (`recastSweep()`, {@link homeBody}).
  *
  * @param name The name of the role.
  * @returns The sweep, or `undefined` when no sweep has the name.
- * @throws Error if the species of a recast role has no sweep of its own.
+ * @throws Error if the species of a recast role has no body obstacle ({@link homeBody}).
  */
 export function findSweep(name: string): RoleSweep | undefined {
   const own = Object.entries(SWEEP_ROLES).find(([key]) => key === name)?.[1];
@@ -216,18 +221,24 @@ export function findSweep(name: string): RoleSweep | undefined {
   const sweep = Object.entries(SWEEP_ROLES).find(
     ([key]) => key === name.slice(0, name.indexOf(RECAST_MARK)),
   )?.[1];
-  return sweep ? recastSweep(sweep, role.recast, homeSweep(role.recast.species)) : undefined;
+  return sweep ? recastSweep(sweep, role.recast, homeBody(role.recast.species)) : undefined;
 }
 
 /**
- * Gives the sweep of the own role of a species: the sweep of the first role of
+ * Gives the obstacle of the body of a species for a recast role: the obstacle of a test species
+ * (`TEST_BODY_OBSTACLES`), or the obstacle `body` of the sweep of the first role of
  * {@link FOLD_ROLES} with the species.
  *
  * @param species The species.
- * @returns The sweep.
- * @throws Error if no role of `SWEEP_ROLES` has the species.
+ * @returns The obstacle.
+ * @throws Error if no role of `SWEEP_ROLES` has the species, or if its sweep has no body.
  */
-export function homeSweep(species: SpeciesId): RoleSweep {
+export function homeBody(species: SpeciesId): SweepObstacle {
+  const test = TEST_BODY_OBSTACLES[species];
+  if (test) {
+    return test;
+  }
+
   const home = [...FOLD_ROLES].find(
     ([, role]) => role.kind === 'player' && role.species.includes(species),
   )?.[0];
@@ -235,7 +246,11 @@ export function homeSweep(species: SpeciesId): RoleSweep {
   if (!sweep) {
     throw new Error(`The ${species} has no role of its own in SWEEP_ROLES.`);
   }
-  return sweep;
+  const body = sweep.obstacles.find((obstacle) => obstacle.name === BODY_OBSTACLE);
+  if (!body) {
+    throw new Error(`The sweep of the ${sweep.role} has no obstacle ${BODY_OBSTACLE}.`);
+  }
+  return body;
 }
 
 /**

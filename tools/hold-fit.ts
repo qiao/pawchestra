@@ -71,7 +71,7 @@ import {
   SAMPLE_SETS,
   faceLines,
   findRole,
-  homeSweep,
+  homeBody,
   meanTurn,
   probeFolds,
   roleAnimal,
@@ -651,7 +651,7 @@ export function fitSweep(
   }
   const cast =
     role.kind === 'player' && role.recast
-      ? recastSweep(sweep, role.recast, homeSweep(role.recast.species))
+      ? recastSweep(sweep, role.recast, homeBody(role.recast.species))
       : sweep;
   return {
     ...cast,

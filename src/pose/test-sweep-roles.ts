@@ -27,7 +27,14 @@ import type { PosedSkeleton } from './test-kinematics.ts';
 import { NOT_STARTED, PLAYING, allAudible, ofConductor, seatSpecies } from './test-scene.ts';
 import type { Recast, TestScene } from './test-scene.ts';
 import { BODY_OBSTACLE } from './test-sweep.ts';
-import type { AcceptedDepth, NoteTarget, RoleSweep, SweepPart, SweepSample } from './test-sweep.ts';
+import type {
+  AcceptedDepth,
+  NoteTarget,
+  RoleSweep,
+  SweepObstacle,
+  SweepPart,
+  SweepSample,
+} from './test-sweep.ts';
 import type { Transport } from './types.ts';
 
 /**
@@ -1592,23 +1599,27 @@ export function soloistScene(role: SoloistRole, species: SpeciesId, seed = 1): T
 }
 
 /**
+ * The obstacle of the body of each test species (design 4.4, "Test mannequin"), which has no role
+ * of its own. A recast role with the species takes it (`homeBody()` of `tools/fold-probe.ts`). The
+ * mannequin is a mesh of the rig chain, with the open loops of {@link MESH_BODY_LOOPS}.
+ */
+export const TEST_BODY_OBSTACLES: Readonly<Partial<Record<SpeciesId, SweepObstacle>>> = {
+  mannequin: { name: BODY_OBSTACLE, surface: meshBodySurface },
+};
+
+/**
  * Gives the sweep of a recast role (`recastScene()` of `pose/test-scene.ts`): the sweep of the
  * role, with the body of the new species as the obstacle `body`, and with only the players of
- * that species. The body comes from the sweep of the own role of the species, because the open
- * loops of each mesh differ.
+ * that species. The body comes from the sweep of the own role of the species, or from
+ * {@link TEST_BODY_OBSTACLES}, because the open loops of each mesh differ.
  *
  * @param sweep The sweep of the role, such as the violinist.
  * @param recast The recast of the seats of the role, such as the wolf in the seats of the rabbit.
- * @param home The sweep of the own role of the species, such as the clarinetist.
+ * @param body The obstacle of the body of the new species (`homeBody()` of `tools/fold-probe.ts`).
  * @returns The sweep, with the name `<role>@<species>` and the recast.
- * @throws Error if the sweep of the own role has no body.
  */
-export function recastSweep(sweep: RoleSweep, recast: Recast, home: RoleSweep): RoleSweep {
+export function recastSweep(sweep: RoleSweep, recast: Recast, body: SweepObstacle): RoleSweep {
   const { species } = recast;
-  const body = home.obstacles.find((obstacle) => obstacle.name === BODY_OBSTACLE);
-  if (!body) {
-    throw new Error(`The sweep of the ${home.role} has no obstacle ${BODY_OBSTACLE}.`);
-  }
   return {
     ...sweep,
     role: `${sweep.role}@${species}`,
