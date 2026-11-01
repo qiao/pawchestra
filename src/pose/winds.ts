@@ -68,10 +68,11 @@ export interface WindHold {
    * the body, and each elbow bends forward by its angle. The instrument takes its rest turn, and
    * moves so that the paws that hold it at rest hold their rest grips at the hanging palms: the
    * right paw alone when the left paw leaves its grip ({@link WindHold.restFreeL}), else the middle
-   * of both paws. A free left paw hangs with its own angles, also on a seat. The rest elbows point
-   * as the hanging elbows. Thus the rest elbows stay near the sides on each body. The shoulder
-   * turns of the hold grow with the weight of the playing pose ({@link turnShare}). `null` keeps
-   * the rest place of {@link WindHold.restShift} from the mouth and the rest elbows of the hold.
+   * of both paws. A free left paw hangs with its own angles, also on a seat, with the roll of its
+   * grip ({@link freeRoll}). The rest elbows point as the hanging elbows. Thus the rest elbows stay
+   * near the sides on each body. The shoulder turns of the hold grow with the weight of the playing
+   * pose ({@link turnShare}). `null` keeps the rest place of {@link WindHold.restShift} from the
+   * mouth and the rest elbows of the hold.
    */
   readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
   readonly fingering: Fingering;
@@ -1092,6 +1093,11 @@ type FreeRest = (
       readonly kind: 'hang';
       /** The wrist, the hand, and the elbow of the hanging arm. */
       readonly hang: HangingArm;
+      /**
+       * The turn of the hanging paw around its long axis, in the axes of the paw, so that it takes
+       * the roll of its grip in the play ({@link freeRoll}), or `null` for the hanging paw alone.
+       */
+      readonly roll: Quat | null;
     }
 ) & {
   /**
@@ -1207,10 +1213,10 @@ function freeRestOf(
   const [out, up, forward] = rest.arc;
   const arc: Vec3 = [-out * h, up * h, -forward * h];
   if (angles) {
-    return { kind: 'hang', hang: hangingArm(model, arm, angles), arc };
+    return { kind: 'hang', hang: hangingArm(model, arm, angles), roll: null, arc };
   }
   if (model.support === 'stand') {
-    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), arc };
+    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), roll: null, arc };
   }
   return { kind: 'lap', ...lapHand(model, arm, rest), arc };
 }
@@ -1434,7 +1440,45 @@ export function windRig(
     left: { ...rig.left, aimSign: hold.aimSigns?.[0] ?? aimSignOf(rig, rig.left) },
     right: { ...rig.right, aimSign: hold.aimSigns?.[1] ?? aimSignOf(rig, rig.right) },
   };
-  return { ...signed, slideReach: slideReachOf(signed, travelVector.length()) };
+  // A free paw that hangs from the rest arms takes the roll of its grip.
+  const freeL =
+    hold.restArms && signed.freeL?.kind === 'hang'
+      ? { ...signed.freeL, roll: freeRoll(signed, signed.freeL.hang) }
+      : signed.freeL;
+  const rolled = { ...signed, freeL };
+  return { ...rolled, slideReach: slideReachOf(rolled, travelVector.length()) };
+}
+
+/**
+ * Gives the turn of the hanging left paw around its long axis that gives it the roll of its grip
+ * in the play, with the chest in its bind pose ({@link WindHold.restArms}): the twist around the
+ * long axis of the paw of the turn from the hanging paw to the paw on its grip. The lift and the
+ * lowering then turn the paw mostly across its long axis. A paw that keeps the roll of the
+ * hanging arm turns up to 220° around its forearm in the lift, as the bind paws of the bodies
+ * differ by about 100°, and the twist bone of the forearm flips.
+ *
+ * @param rig The points of the player.
+ * @param hang The hanging left arm.
+ * @returns The turn, in the axes of the hanging paw.
+ */
+function freeRoll(rig: Omit<WindRig, 'slideReach'>, hang: HangingArm): Quat {
+  const chest = { rotation: new Quaternion(), position: new Vector3(...rig.chestBind) };
+  placeWind(rig, chest, 1);
+  const side = rig.left;
+  const at = new Vector3(...side.grip).sub(new Vector3(...rig.pivot)).applyQuaternion(rotation);
+  at.add(pivot);
+  const turn = leftShoulderTurn(rig.hold, new Quaternion());
+  const play = handOnGrip(
+    rig,
+    side,
+    poseShoulder(side.arm, chest, rig.chestBind, turn),
+    at,
+    1,
+    new Quaternion(),
+  );
+  const square = poseShoulder(side.arm, chest, rig.chestBind, new Quaternion());
+  const relative = hangingHand(hang, square, new Quaternion()).invert().multiply(play);
+  return toQuat(new Quaternion(0, relative.y, 0, relative.w).normalize());
 }
 
 /**
@@ -1537,6 +1581,7 @@ const hand = new Quaternion();
 const palm = new Vector3();
 const restWrist = new Vector3();
 const restHand = new Quaternion();
+const rollTurn = new Quaternion();
 const arcMove = new Vector3();
 const ORIGIN = [0, 0, 0] as const;
 
@@ -1820,6 +1865,9 @@ function poseSide(
     } else {
       hangingWrist(free.hang, shoulder, restWrist);
       hangingHand(free.hang, shoulder, restHand);
+      if (free.roll) {
+        restHand.multiply(rollTurn.fromArray(free.roll));
+      }
     }
     wrist.lerpVectors(restWrist, wrist, weight);
     wrist.add(
