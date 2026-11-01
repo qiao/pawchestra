@@ -254,7 +254,9 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
   ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button
   says "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit
-  full screen".
+  full screen". Each control stays inside the bar at each width. From 900 px, the controls stand
+  in the groups of the mockup. From 700 px to 899 px, the groups do not fit, so the controls stand
+  closer. The volume slider shrinks to half its width before a control leaves the bar.
 - **First screen**: a round play button below the front edge of the stage, so that it does not
   cover the orchestra. The camera frame shrinks until the stage is clear of it
   (`clearFirstScreen()`). A ring shows the load progress of the bytes, and the load text counts

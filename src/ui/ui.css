@@ -547,12 +547,25 @@ body.is-ui-hidden .drawer * {
   min-width: 60px;
 }
 
+/* The volume slider gives up its width before a control leaves the bar. The seek bar keeps its
+   least width, and it takes the free width of the bar. */
 .volume {
   width: 128px;
+  min-width: 64px;
+}
+
+/* From 700 px, the bar holds each control and the duration. Below 900 px, the groups of the
+   mockup do not fit: at 700 px with touch, they put three buttons up to 174 px outside the bar.
+   There the controls stand closer. */
+@media (min-width: 700px) and (max-width: 899px) {
+  .bar {
+    gap: 8px;
+    padding: 0 12px;
+  }
 }
 
 /* On a wider screen, the controls of the bar stand apart in groups, as in the mockup. */
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .bar {
     gap: 12px;
     padding: 0 16px 0 20px;
