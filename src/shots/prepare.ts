@@ -4,6 +4,7 @@ import type { SceneLayout } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
 import { mixHash, mulberry32 } from '../pose/random.ts';
+import { smoothstep } from '../pose/rest.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';
@@ -1127,6 +1128,57 @@ function moveNear(
   return false;
 }
 
+/** The keys and the frame of the shot after a blend, for the floor test of the blend. */
+type BlendShot = Pick<Shot, 'target' | 'halfHeight' | 'composition' | 'from' | 'to'>;
+
+/**
+ * Tells if an animal in the frame of a blend comes nearer to the camera than `ANIMAL_FLOOR`, at
+ * each of {@link NEAR_SAMPLES} of the blend (design 5.6). The samples follow `cameraAt()`: the
+ * camera, the point that it looks at, and the field of view go from the end of the previous shot
+ * to the camera of the next shot, which moves too. Thus the path is not a move of one shot, and
+ * the tests of the two moves do not cover it.
+ *
+ * @param planner The planner.
+ * @param previous The previous shot.
+ * @param next The shot after the blend.
+ * @param blendSec The time of the blend, in seconds.
+ * @param spanSec The time of the move of the next shot, in seconds.
+ * @returns True if an animal is too near.
+ */
+function blendNear(
+  planner: Planner,
+  previous: Shot,
+  next: BlendShot,
+  blendSec: number,
+  spanSec: number,
+): boolean {
+  const S = planner.stageSide;
+  const aspect = CINEMA_ASPECT;
+  const end = mixKeys(previous.from, previous.to, 1);
+  const start = keyPosition(S, previous.target, previous.halfHeight, end, aspect);
+  const startLook: [number, number, number] = [0, 0, 0];
+  writeLookPoint(start, previous.target, previous.composition, end.fov, aspect, startLook);
+  const frames = NEAR_SAMPLES.map((s) => {
+    const key = mixKeys(next.from, next.to, spanSec > 0 ? smoothstep((s * blendSec) / spanSec) : 0);
+    const camera = keyPosition(S, next.target, next.halfHeight, key, aspect);
+    const look: [number, number, number] = [0, 0, 0];
+    writeLookPoint(camera, next.target, next.composition, key.fov, aspect, look);
+    const w = smoothstep(s);
+    return {
+      camera: mixPoints(start, camera, w),
+      look: mixPoints(startLook, look, w),
+      fov: end.fov + (key.fov - end.fov) * w,
+    };
+  });
+  const near = nearBodies(
+    planner,
+    frames.map((f) => f.camera),
+  );
+  return (
+    near.length > 0 && frames.some((f) => animalTooNear(near, f.camera, f.look, f.fov, aspect))
+  );
+}
+
 /**
  * Runs the tests of a close move that the planner keeps for each camera, because they do not
  * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects last.
@@ -2229,7 +2281,8 @@ function chooseEnd(planner: Planner, start: number, kind: ShotKind, latest = Inf
 /**
  * Tells if two neighbor shots blend (design 5.6): slow or soft music, two close shots, cameras
  * less than `0.35 × S` apart, and a clear straight path between them that stays on one side of
- * the cone of the beam.
+ * the cone of the beam. Each animal in the frame of the blend keeps `ANIMAL_FLOOR`, else the
+ * shots meet in a hard cut.
  *
  * @param planner The planner.
  * @param previous The previous shot.
@@ -2237,6 +2290,7 @@ function chooseEnd(planner: Planner, start: number, kind: ShotKind, latest = Inf
  * @param kind The kind of the next shot.
  * @param window The music after the cut.
  * @param cut The cut, in song seconds.
+ * @param end The end of the move of the next shot, in song seconds.
  * @returns The blend time in seconds, or 0 for a hard cut.
  */
 function blendOf(
@@ -2246,6 +2300,7 @@ function blendOf(
   kind: ShotKind,
   window: WindowMusic,
   cut: number,
+  end: number,
 ): number {
   const r = BLEND_RULES;
   const beat = beatLengthAt(planner.music, cut);
@@ -2272,7 +2327,8 @@ function blendOf(
   if (crosses) {
     return 0;
   }
-  return Math.min(r.maxSec, Math.max(r.minSec, beat));
+  const blend = Math.min(r.maxSec, Math.max(r.minSec, beat));
+  return blendNear(planner, shot, next, blend, end - cut) ? 0 : blend;
 }
 
 /**
@@ -2366,7 +2422,8 @@ function addShot(
 /**
  * Makes the previous shot longer when no subject fits at a cut (design 5.6). Its new end is the
  * end that a shot of its kind from the cut would get within the longest length of the previous
- * shot, and its move takes the longer time.
+ * shot, and its move takes the longer time. The slower move changes the path of a blend into the
+ * shot, so the blend becomes a hard cut when its path no longer keeps `ANIMAL_FLOOR`.
  *
  * @param planner The planner.
  * @param cut The cut, in song seconds.
@@ -2384,9 +2441,15 @@ function holdPrevious(planner: Planner, cut: number): number | null {
   if (end > longest + 1e-9) {
     return null;
   }
+  const before = planner.planned.at(-2)?.shot;
+  const { blendSec } = last.shot;
+  const blend =
+    before && blendSec > 0 && blendNear(planner, before, last.shot, blendSec, end - startSec)
+      ? 0
+      : blendSec;
   planner.planned[planner.planned.length - 1] = {
     ...last,
-    shot: { ...last.shot, endSec: end, moveEndSec: end },
+    shot: { ...last.shot, endSec: end, moveEndSec: end, blendSec: blend },
   };
   if (wideKind) {
     planner.lastWideEnd = end;
@@ -2640,7 +2703,9 @@ function* planShotsSteps(
       startSec: cut,
       endSec: end,
       moveEndSec: end,
-      blendSec: previous ? blendOf(planner, previous, framing, candidate.kind, window, cut) : 0,
+      blendSec: previous
+        ? blendOf(planner, previous, framing, candidate.kind, window, cut, end)
+        : 0,
     });
     cut = end;
   }

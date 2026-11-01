@@ -157,7 +157,8 @@ The app follows these facts:
   behind the heads of the front rows.
 - **The distance to the animals (section 3).** Each animal in the frame of a close shot, also a
   head of a dirty frame, stays at least `ANIMAL_FLOOR` from the camera, because the low-poly
-  animals show their facets and the seams of their meshes from near.
+  animals show their facets and the seams of their meshes from near. A blend between two close
+  shots keeps the floor too, or it becomes a hard cut.
 
 The app does not follow these facts:
 

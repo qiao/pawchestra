@@ -564,7 +564,9 @@ subject always counts. Thus a solo camera can stay low behind the front rows.
 
 **The distance to the animals.** No point of an animal body in the frame of a close camera comes
 nearer than `ANIMAL_FLOOR` at a sample of the move (`NEAR_SAMPLES`). The rule holds for each
-animal in the frame: the subject, a neighbor, and a blurred head or body of a dirty frame. The
+animal in the frame: the subject, a neighbor, and a blurred head or body of a dirty frame. A
+blend keeps the floor at the same samples of its own path, because its camera moves between the
+moves of two shots. A blend that cannot keep it becomes a hard cut. The
 low-poly animals show their facets and the seams of their meshes from near. The floor is 1.25
 times the 5th percentile of the distance of the nearest animal of the side views, the closest
 kind of shot of `pnpm shot-trace --rules`. The body is the mesh of the animal in the bind pose,
