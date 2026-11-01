@@ -250,6 +250,17 @@ The rest of each family:
   makes short fast strokes (`BOW_MOTION`).
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
+- **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of
+  the body in place of fixed values (`BowedHold.fit`, `fitCelloPlace()`). The end pin stands on
+  the floor right of the middle, the cello leans back and to the left (`CELLO_PLACE`), the top of
+  its back stands at the height of the chest, and the middle line of its back stands a gap in
+  front of the trunk and the thighs, the room of the arms. The arms take the values of the
+  accepted dog cellist, as directions and in `H`. The right elbow points out and down, near the
+  body, so the bow paw stays near the direction of no paw twist. Reason: a hold with fixed values
+  fits one body only. With the old shared hold, the elbow pointed out and up, and the bow paw of
+  12 recast bodies flipped through 180° (cast matrix, 4.4). The dog keeps its own place
+  (`DOG_HOLD`). The other instruments can take this pattern: a place from the landmarks, and the
+  arm values of an accepted player.
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 

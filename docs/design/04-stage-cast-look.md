@@ -314,7 +314,9 @@ interface GripFrames {
 see "Retarget and render"), and runs the arm gate and the clearance sweep with its note targets
 on the shortest demo of the role. A recast pair plays the shared hold of the instrument, because an
 own hold would hide a fault of the body. A violin or a viola takes the size of the rule of a violin
-shop, clamped to the real sizes (4.6), and each other instrument keeps the size of the app. A value over its limit
+shop, and a cello the cello rule, each clamped to the real sizes (4.6). Each other instrument keeps
+the size of the app. `--quick` takes a coarse sample, so that a round finds the faults of a pair
+early. A value over its limit
 fails, unless the own pair of the role has the same open item. The grip of each pair counts from
 the accepted grip of the role, because the frame of the grip does not move with the bind. Run the
 matrix after a change of a shared hold, a bind rule, or the skeleton, and compare the counts of
@@ -733,7 +735,13 @@ length, and a species with short arms plays a smaller instrument (`SCALED_INSTRU
 fields of `SpeciesParams`), as a child plays a fractional violin or a small lever harp. A smaller
 instrument shrinks toward the mouth or the base, so the mouth keeps its place. A violin shop
 sizes a violin so that, with the left arm extended, the scroll lies in the middle of the palm
-(`pnpm hold-reach`).
+(`pnpm hold-reach`). The cello rule (`celloRule()` of `tools/cello-size.ts`) sizes a cello as a
+cellist does: the largest cello at which the left paw reaches the first position with the elbow
+bent to at most `CELLO_ELBOW`, the end pin fits the chest, and the lower bout is not below the
+knees, clamped to the real sizes (`REAL_CELLOS`, from a 1/10 to a 4/4). The cast matrix gives
+this size to a recast cellist, and a new cellist species takes it as its `celloScale`. Each cello
+gets the end pin of its body (`celloPinOf()`), so that the top of its back rests on the chest at
+the lean of `CELLO_PLACE`, as a cellist sets the end pin.
 
 The hold gives the place of each piece in the bind pose of 4.7, in the axes of the model: the
 player faces -z, and its left is -x. An offset in `H` uses the head height of the player. Where
@@ -742,7 +750,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Instrument | Model and hold |
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The cat plays a small viola near the neck. |
-| Cello, contrabass | The violin form with an end pin (`endPinLength()`). The cello leans back between the knees. The contrabass has sloped shoulders and machine heads, and stands at the left side. |
+| Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands at the left side. |
 | Harp | Leaned back onto the right shoulder. The deer plays a smaller harp on a box (`HARP_PLACE`, `HARP_STAND`). |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), so the keys stand a little below the elbows of the polar bear. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. |
