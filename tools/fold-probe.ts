@@ -50,6 +50,7 @@ import { CONDUCTOR, SECTION_INSTRUMENTS, SECTION_SPECIES } from '../src/models/c
 import type { PlayingSection } from '../src/models/cast.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import type { PlayerModel } from '../src/models/player.ts';
+import { isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import { STUDIO_BONES, STUDIO_PARENTS } from '../src/models/studio-format.ts';
 import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
@@ -64,8 +65,10 @@ import { toVec3 } from '../src/models/tuples.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
-import { NOT_STARTED, PLAYING, allAudible, sceneOf } from '../src/pose/test-scene.ts';
-import type { TestScene } from '../src/pose/test-scene.ts';
+import { NOT_STARTED, PLAYING, allAudible, recastScene, sceneOf } from '../src/pose/test-scene.ts';
+import type { Recast, TestScene } from '../src/pose/test-scene.ts';
+import { SWEEP_ROLES, recastSweep } from '../src/pose/test-sweep-roles.ts';
+import type { RoleSweep } from '../src/pose/test-sweep.ts';
 import type { AnimalPose, Transport } from '../src/pose/types.ts';
 
 /** The source of the body of a role: the conductor, or each player of an instrument. */
@@ -84,6 +87,11 @@ export type RoleSource =
        * violins play one instrument with two studio bodies, so each body has a role of its own.
        */
       readonly species: readonly SpeciesId[];
+      /**
+       * The recast of a role `<role>@<species>` ({@link findRole}): the species of the role
+       * leave their seats to the new species, or none for a role of {@link FOLD_ROLES}.
+       */
+      readonly recast?: Recast;
     };
 
 /** The roles with a studio body. A new role of route 3 adds one entry. */
@@ -122,9 +130,120 @@ export const FOLD_ROLE_TABLE: Omit<RefRole, 'name'> = {
   table: 'FOLD_ROLES',
 };
 
+/** The mark between a role and a species in the name of a recast role, such as `violinist@wolf`. */
+const RECAST_MARK = '@';
+
 /**
- * Gives the species of a role: the conductor, or the species of the role in each section with the
- * instrument of the role.
+ * Finds a role by its name: a role of {@link FOLD_ROLES}, or a recast role `<role>@<species>`,
+ * such as `violinist@wolf`. A recast role puts the species into the seats of the role, with the
+ * instrument of the role (`recastScene()` of `src/pose/test-scene.ts`). Each role tool reads its
+ * role with this function.
+ *
+ * @param name The name of the role.
+ * @returns The role, or `undefined` when no role has the name.
+ * @throws Error if a recast role names an unknown species, the conductor, or the own species of
+ *   the role.
+ */
+export function findRole(name: string): RoleSource | undefined {
+  const at = name.indexOf(RECAST_MARK);
+  if (at < 0) {
+    return FOLD_ROLES.get(name);
+  }
+  const base = FOLD_ROLES.get(name.slice(0, at));
+  const species = name.slice(at + 1);
+  if (!base) {
+    return undefined;
+  }
+  if (!isSpeciesId(species)) {
+    throw new Error(`The recast role ${name} names no species: ${species}.`);
+  }
+  if (base.kind === 'conductor') {
+    throw new Error(`The recast role ${name} takes a player role, and not the conductor.`);
+  }
+  if (base.species.includes(species)) {
+    throw new Error(`The ${species} already plays the role of ${name}.`);
+  }
+  return {
+    kind: 'player',
+    instrument: base.instrument,
+    species: [species],
+    recast: { instrument: base.instrument, from: base.species, species },
+  };
+}
+
+/**
+ * Tells if a role has a name: a role of {@link FOLD_ROLES}, or a recast role ({@link findRole}).
+ *
+ * @param name The name.
+ * @returns True for a role.
+ */
+export function isRole(name: string): boolean {
+  try {
+    return findRole(name) !== undefined;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Builds the scene of a demo for a role: the scene of the cast of the score, with the recast of a
+ * recast role ({@link findRole}).
+ *
+ * @param role The role.
+ * @param bytes The bytes of the MIDI file.
+ * @returns The scene.
+ */
+export function roleScene(role: RoleSource, bytes: Uint8Array): TestScene {
+  const scene = sceneOf(bytes);
+  return role.kind === 'player' && role.recast ? recastScene(scene, role.recast) : scene;
+}
+
+/**
+ * Gives the sweep of a role of `pnpm pose-depth` by its name: a role of `SWEEP_ROLES` of
+ * `src/pose/test-sweep-roles.ts`, or a recast role ({@link findRole}) with the body of its species
+ * (`recastSweep()`). The body comes from the sweep of the first role of {@link FOLD_ROLES} with
+ * the species.
+ *
+ * @param name The name of the role.
+ * @returns The sweep, or `undefined` when no sweep has the name.
+ * @throws Error if the species of a recast role has no sweep of its own.
+ */
+export function findSweep(name: string): RoleSweep | undefined {
+  const own = Object.entries(SWEEP_ROLES).find(([key]) => key === name)?.[1];
+  const role = own ? undefined : findRole(name);
+  if (own || role?.kind !== 'player' || !role.recast) {
+    return own;
+  }
+  const sweep = Object.entries(SWEEP_ROLES).find(
+    ([key]) => key === name.slice(0, name.indexOf(RECAST_MARK)),
+  )?.[1];
+  return sweep
+    ? recastSweep(sweep, role.recast.species, homeSweep(role.recast.species))
+    : undefined;
+}
+
+/**
+ * Gives the sweep of the own role of a species: the sweep of the first role of
+ * {@link FOLD_ROLES} with the species.
+ *
+ * @param species The species.
+ * @returns The sweep.
+ * @throws Error if no role of `SWEEP_ROLES` has the species.
+ */
+export function homeSweep(species: SpeciesId): RoleSweep {
+  const home = [...FOLD_ROLES].find(
+    ([, role]) => role.kind === 'player' && role.species.includes(species),
+  )?.[0];
+  const sweep = Object.entries(SWEEP_ROLES).find(([key]) => key === home)?.[1];
+  if (!sweep) {
+    throw new Error(`The ${species} has no role of its own in SWEEP_ROLES.`);
+  }
+  return sweep;
+}
+
+/**
+ * Gives the species of a role: the conductor, the species of a recast, or the species of the role
+ * in each section with the instrument of the role.
  *
  * @param role The role.
  * @returns The species.
@@ -132,6 +251,9 @@ export const FOLD_ROLE_TABLE: Omit<RefRole, 'name'> = {
 export function roleSpecies(role: RoleSource): SpeciesId[] {
   if (role.kind === 'conductor') {
     return [CONDUCTOR.species];
+  }
+  if (role.recast) {
+    return [role.recast.species];
   }
   return Object.keys(SECTION_INSTRUMENTS)
     .filter((section): section is PlayingSection => section in SECTION_SPECIES)
@@ -773,7 +895,7 @@ export function probeFolds(
     sets: { rest: emptyCount(), play: emptyCount(), lift: emptyCount() },
   };
   for (const demo of demos) {
-    const scene = sceneOf(demo.bytes);
+    const scene = roleScene(role, demo.bytes);
     const bodies = roleBodies(role, scene);
     if (bodies.length === 0) {
       continue;
@@ -2015,10 +2137,10 @@ async function compareFolds(
 async function main(): Promise<void> {
   const { glb, rest: args } = takeGlb(process.argv.slice(2));
   const name = args[0] ?? '';
-  const role = FOLD_ROLES.get(name);
+  const role = findRole(name);
   if (!role) {
     throw new Error(
-      `Usage: pnpm fold-probe <role> [--demo <id>]... [--step <seconds>] [--faces <n>] [--turns <face>] [--bins <face>] [--set <changes>]... [--json <file>] [--glb <file>] [--base <ref> [--faces-of <faces>]], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}.`,
+      `Usage: pnpm fold-probe <role> [--demo <id>]... [--step <seconds>] [--faces <n>] [--turns <face>] [--bins <face>] [--set <changes>]... [--json <file>] [--glb <file>] [--base <ref> [--faces-of <faces>]], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>, such as violinist@wolf.`,
     );
   }
   const baseAt = args.indexOf('--base');
