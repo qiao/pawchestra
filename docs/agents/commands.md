@@ -3,9 +3,8 @@
 This module of `AGENTS.md` lists the commands and the steps of CI. Use Node 24 or later, and the
 pnpm of the `packageManager` field of `package.json`.
 
-A row gives the main options. The tool file gives the details and each option, in its head comment
-or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names another file.
-`--help` prints only the usage line.
+A row gives the main options. The head comment of `tools/<name>.ts` gives each option of
+`pnpm <name>`, unless the row names another file.
 
 ## Shared options
 
@@ -21,12 +20,10 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 - **`--glb <file>`.** Gives the animal the studio body of another GLB file, in a copy of `src/`
   (`tools/glb-swap.ts`). `assets/` and `src/` do not change, so a file of `rig-mesh --check --keep`
   needs no `pnpm studio-body`.
-- **Recast role `<role>@<species>`.** The role tools (`fold-probe`, `arm-check`, `pose-depth`,
-  `hold-fit`, `close-views`, `arm-look`, `carry-check`) take a role with another species, such as
-  `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`). The species
-  keeps the body sweep of its own role, and a test species takes `TEST_BODY_OBSTACLES`. It takes
-  the size rule of the matrix (`tools/recast-scale.ts`). `--base` needs a commit with the same
-  recast, and `arm-check --views` and `close-views batch` take none.
+- **Recast role `<role>@<species>`.** The role tools take a role with another species, such as
+  `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`), with the size
+  rule of the matrix (`tools/recast-scale.ts`). A test species takes `TEST_BODY_OBSTACLES`.
+  `arm-check --views` and `close-views batch` take no recast role.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
 - **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
@@ -39,12 +36,12 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 |---|---|
 | `pnpm install` | Installs the dependencies. |
 | `pnpm prepare-site` | Writes the SF3 presets into `public/sf/` and the changed demos into `public/demos/` (design 8.3). `pnpm dev`, `build`, `smoke`, `frame`, and `frozen` run it first. |
-| `pnpm dev` | Writes `perf/perf-60.mid`, and starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html` (design 7.1), and a demo at `/#demo=<id>`. |
-| `pnpm build` | Builds the site into `dist/` with the third-party license file (design 7.3), and gzips the preset and demo files (design 7.2). `ZOOPHONY_BASE` sets the base path, and `ZOOPHONY_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
+| `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html` (design 7.1), and a demo at `/#demo=<id>`. |
+| `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). `ZOOPHONY_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
 | `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). `--base` also builds the commit, and prints the difference. |
-| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `zoophony` (design 9.2) with a logged-in Vercel CLI. Code: `tools/deploy-vercel.sh`. About 2 minutes. |
-| `pnpm load-probe [--phone] [--repeat] [--base <ref>]` | Measures the load of the default demo after `pnpm build`, through `tools/measure-lock.sh`: FCP, LCP, the first frame, the time until play is ready, and the bytes. About 10 s. |
-| `pnpm lighthouse [--quick] [--desktop] [--url <url>]` | Audits the page with the pinned Lighthouse after `pnpm build`, through `tools/measure-lock.sh`. About 15 s for each run. |
+| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `zoophony` (design 9.2). Code: `tools/deploy-vercel.sh`. About 2 minutes. |
+| `pnpm load-probe [--phone] [--repeat] [--base <ref>]` | Measures the load of the default demo after `pnpm build`: FCP, LCP, the first frame, the time until play is ready, and the bytes. About 10 s. |
+| `pnpm lighthouse [--quick] [--desktop] [--url <url>]` | Audits the page with the pinned Lighthouse after `pnpm build`. About 15 s for each run. |
 | `pnpm typecheck` | Runs `tsc` with no output files. |
 | `pnpm lint` | Runs `oxlint --type-aware .` with the anti-slop plugin. |
 | `pnpm format`, `pnpm format:check` | Formats the source paths with oxfmt, or checks their format. |
@@ -53,15 +50,15 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 
 | Command | Action |
 |---|---|
-| `pnpm screenshots <dir> [--sheet] [--play] [--ui] [--drawer] [--load] [--shots]` | Writes the review screenshots of design 9.8 as WebP files: each demo at 1440 × 900 and 390 × 844, the gallery, the animal views, and the sheets. The flags add close views, play frames, UI states, and camera shots. |
+| `pnpm screenshots <dir> [--sheet] [--play] [--ui] [--drawer] [--load] [--shots]` | Writes the review screenshots of design 9.8: each demo at 1440 × 900 and 390 × 844, the gallery, and the animal views. The flags add other views. |
 | `pnpm share-image [--out <file>]` | Writes `public/share.jpg` (design 7.4) from `SHARE_CAMERA`. Run it after a change of the look. About 15 s. |
 | `pnpm snapshot` | Saves the play frame of the default demo and a close view of each gallery model into `scratch/snapshots/<date>-<hash>/`. |
 | `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). A matte of `tools/sheet-mattes/` adds the silhouette IoU of each view. |
 | `pnpm choir-check <dir>` | Puts the gallery penguin beside a penguin of each of the two newest reference images. |
-| `pnpm close-views <role> <dir> [--moments <list>] [--views <list>] [--lineup] [--base <ref>] [--set <changes>]...` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. `--moments` takes a share of a move, such as `lift30`. `--lineup` gives a row of the base, the tree, and each `--with` role for each view. 25 s to 45 s. |
+| `pnpm close-views <role> <dir> [--moments <list>] [--views <list>] [--lineup] [--base <ref>] [--set <changes>]...` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. `--moments` takes a share of a move, such as `lift30`. `--lineup` puts the base, the tree, and each `--with` role in a row. 25 s to 45 s. |
 | `pnpm close-views <mode> <dir> ...` | The other modes: `lineup <species,...>`, `species <species,...>`, `batch` (the image set of a round, 90 s to 260 s), and `play`. `play` renders `--demo` or `--midi` at each `--time` or `--strip <from>:<step>:<count>`, from `--camera`, `--cinematic`, `--shot <seat>`, or `--at <seat>`. |
 | `pnpm close-views audit <dir> [--roles <role,...>] [--base <ref>]` | The audit sheet of the seams: 2x crops of the arms and the upper trunk in each moment of each role, the commit above the tree. All roles: about 27 minutes. |
-| `pnpm clip-views <dir> --clip <file>[:<animation>] [--species <list>] [--aim pawL\|pawR]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), and prints the floor depth and the depth of each arm part in the body, in `H`. `--no-images` prints only the depths. About 40 s. |
+| `pnpm clip-views <dir> --clip <file>[:<animation>] [--species <list>] [--aim pawL\|pawR]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), with the depth of each arm part in the body. `--no-images` prints only the depths. About 40 s. |
 | `pnpm look-lab <dir> [--url <url>]`, `pnpm look-variants <file> --out <dir>` | Measure frames of `close-views play` against `orchestra-latest.png`: one tree, or each variant. 40 s each. |
 | `pnpm keyboard` | Checks each control with the keyboard alone at 1440 × 900 and 390 × 844. |
 
@@ -90,7 +87,7 @@ score of `tools/probe-demos.ts`. [`rigging.md`](rigging.md) gives the roles.
 | `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. About 50 s for each role. |
 | `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. 25 s to 55 s. |
 | `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>] [--states <ref>,...]`, or `<role> --trace` or `--explain` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND` (a new bind), or `PASS`. All roles: 5 to 7 minutes cold, 2 s from the cache. |
-| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>] [--quick] [--set <changes>]... [--variant <name>=<changes>]...` | Recasts each species into each role with the shared hold and the size rule of its instrument, and writes one table of `PASS`, `OPEN`, or `FAIL` with the worst value of the arm gate and the deepest clip, and its JSON (design 4.4). It caches each pair by tree. Six roles: about 3 minutes cold. `--quick` takes a coarse sample: one role in about 25 s. Each `--variant` adds a column. `node tools/cello-size.ts [<species>,...]` prints the cello rule. |
+| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--quick] [--set <changes>]... [--variant <name>=<changes>]...` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst value of the arm gate and the deepest clip. It caches each pair by tree. Six roles: about 3 minutes cold. `--quick` takes a coarse sample: one role in about 25 s. Each `--variant` adds a column. |
 | `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. Three roles: 45 s. |
 | `pnpm raise-fit <role> --faces <list> --side L\|R [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. 15 s. |
 | `pnpm body-probe [--out <file>]`, `--compare <base.json> <new.json>`, or `--base <ref>` | Probes the rest joints and a mesh hash of each species, and a hash of the poses of each player of each demo. `--compare` and `--base` fail on a difference. About 6 s. |
@@ -108,12 +105,12 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | Command | Action |
 |---|---|
 | `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. 20 s to 75 s. |
-| `blender -b --factory-startup --python tools/blender/arm_rebuild.py -- <animal> [--source <glb>] [--factor <f>] [--spec <JSON>] [--out <dir>]` | Rebuilds the arms of `armSource` from the joints of `tools/mesh-rigs/<animal>.json` ([`rigging.md`](rigging.md)) into `<animal>-arms.glb` and `<animal>-weights.json`. Test them with one variant: `rig-mesh --check --set 'source=<glb>;paintedWeights=<json>'`. Two runs give the same bytes. 10 s. |
+| `blender -b --factory-startup --python tools/blender/arm_rebuild.py -- <animal> [--source <glb>] [--factor <f>] [--spec <JSON>] [--out <dir>]` | Rebuilds the arms from the joints of `tools/mesh-rigs/<animal>.json` ([`rigging.md`](rigging.md)) into `<animal>-arms.glb` and `<animal>-weights.json`. Test them with `rig-mesh --check --set 'source=<glb>;paintedWeights=<json>'`. 10 s. |
 | `blender -b --factory-startup --python tools/blender/arm_root.py -- tools/arm-roots/<species>.json [--out <file.glb>]` | Writes a copy of a source mesh with local edits at the arm root. Rig the copy with `pnpm rig-mesh <animal> --check --set source=<path> --keep <dir>`. 5 s. |
 | `blender -b --factory-startup --python tools/blender/mannequin.py -- <human\|animal> --out <dir>` | Writes the test mannequin of a preset (design 4.4): an A-pose GLB, a T-pose FBX for mixamo.com, and a GLB and an FBX with the test clips (`assets/models/mannequin/README.md`). 3 s. |
 | `blender -b --factory-startup --python tools/blender/dump_mesh.py -- <mesh.glb> <out.npz>` | Writes the welded vertices and the triangles of a mesh into an npz file. |
 | `pnpm mesh-options <animal> <dir> --size <label>=<head top>...` | Makes the mid-report of a mesh: it rigs each size, leg factor, and arm factor, and writes `<dir>/options.md`. About 7 s for each variant. |
-| `pnpm mixamo-import <file.fbx\|file.glb> --out <dir>` | Converts a Mixamo file into `<dir>/<name>.glb` in meters, with one animation for each take (design 4.4), and prints the bones that the map misses. The folder must be one that git ignores (design 8.1). About 3 s. |
+| `pnpm mixamo-import <file.fbx\|file.glb> --out <dir>` | Converts a Mixamo file into `<dir>/<name>.glb` in meters, with one animation for each take (design 4.4). The folder must be one that git ignores (design 8.1). About 3 s. |
 | `pnpm mixamo-model <file.fbx\|file.glb> --out <dir>` | Writes the inputs of `rig-mesh` from a Mixamo-rigged mesh (design 4.4): the mesh alone, the joints and the palm, and a `paintedWeights` file. The folder must be one that git ignores. About 6 s. |
 | `pnpm studio-body <animal> [--inspect [--glb <file>]]` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender. `--inspect` prints the joints, the clips, and the arm lengths. |
 | `pnpm view-point [<x>,<y>,<z>]... [--pixel <u>,<v>,<y>]...` | Projects each point into the default view with no render, and prints its pixel and its depth. About 1 s. |
@@ -128,12 +125,12 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | `pnpm test:paused [--base <ref>] [<path>]...` | Runs the paused tests, or only the file of each path. `--base <ref>` prints only the failures of the working tree. |
 | `pnpm test:perf` | Runs the speed tests (`*-speed.test.ts`) one file at a time. |
 | `pnpm test:e2e [--project=chromium]` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site. Set `ZOOPHONY_E2E_PORT` to a free port (4182 by default). |
-| `pnpm e2e-base <ref> [--no-cache] [-- <args of playwright test>]` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. About 1.5 minutes, 4 minutes with no cache. |
+| `pnpm e2e-base <ref> [--no-cache] [-- <args of playwright test>]` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. About 1.5 minutes. |
 | `pnpm smoke` | Runs the smoke test on the Vite dev server: the bow arm of a violin and the camera modes. |
-| `pnpm frame [--demo=<id>] [--free] [--max-cpu=<percent>] [--gpu-only] [--keep=<dir>]` | Measures the frame target of design 9.7: `perf-60.mid` in Google Chrome with a Metal System Trace. About 3 minutes. Code: `tools/measure-frame.ts`. |
+| `pnpm frame [--demo=<id>] [--free] [--gpu-only] [--keep=<dir>]` | Measures the frame target of design 9.7 in Google Chrome with a Metal System Trace. About 3 minutes. Code: `tools/measure-frame.ts`. |
 | `pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--canvas-only]` | Renders the four frozen shots. `--base` also renders the commit, and exits with 1 when a pixel changed. `--canvas-only` compares only the scene. About 2 minutes. |
 | `pnpm cpu-profile [--demo <id>] [--seek <s>] [--callers <function>[:<line>]]` | Profiles the main thread during play, and prints the top functions for each frame. About 20 s. |
-| `pnpm frame-compare <ref\|patch>... [--runs <n>] [--gate <load>] [-- <flags of pnpm frame>]` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. It takes the measure lock itself. About 5 minutes for each run of an item. |
+| `pnpm frame-compare <ref\|patch>... [--runs <n>] [-- <flags of pnpm frame>]` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. About 5 minutes for each run of an item. |
 | `tools/check-commits.sh [--tip] [--no-cache] <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
 | `tools/measure-lock.sh run --owner <name> [--gate <load>] [--max <s>] -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
 | `tools/merge-branch.sh [--check-only] [--no-arm-check] <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs the full `pnpm test`, the arm gate, `pnpm build`, and `pnpm size`. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
