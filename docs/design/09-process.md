@@ -60,7 +60,8 @@ check runs goes out of date. A change that needs a check runs one file with
 - The clearance sweep of each role (`SWEEP_ROLES`) measures the depth of the paws, the arms, and a
   held part in the body and the instrument. A real player touches the instrument with the body,
   and the instrument does not go into the body (`INSTRUMENT_CONTACT`). `pnpm pose-depth <role>`
-  prints the same depths.
+  prints the same depths, with the region of the body and the part of a bowed string at each
+  deepest point (`BODY_REGIONS`, `bowedPlace()`), so that a hold fit sees the cause of a clip.
 - The Playwright smoke test (`e2e/smoke.e2e.ts`) plays the default demo on the built site, so that
   it tests the files that deploy. The built site has no dev hook, so `App` writes the song time
   into the attribute `data-song-time` of the stage canvas.
