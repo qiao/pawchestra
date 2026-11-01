@@ -36,8 +36,10 @@ import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import type { CameraPose, Shot } from '../src/shots/types.ts';
 import { FIELD_OF_VIEW } from '../src/shots/view.ts';
 import { LOWER_MAX_SEC, REST_TIMES } from '../src/pose/rest.ts';
+import type { Recast } from '../src/pose/test-scene.ts';
 import { chromiumArgs } from './chromium-args.ts';
 import { startCinematic } from './cinematic-mode.ts';
+import { findRole } from './fold-probe.ts';
 import { glbModule, speciesAnimal } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { patchedDemo } from './patch-demos.ts';
@@ -164,6 +166,12 @@ interface RoleViews {
   readonly camera: BodyCamera | LineCamera;
   /** The test notes of the gallery for the moments, or none for the default test notes. */
   readonly notes: string | null;
+  /**
+   * The recast of a recast role `<role>@<species>` (`findRole()` of `tools/fold-probe.ts`): the
+   * query `only` selects the recast name `<instrument>@<species>` of the gallery. None for a
+   * role of the cast.
+   */
+  readonly recast?: Recast;
 }
 
 /**
@@ -855,7 +863,9 @@ export function closeViewPath(
   const camera = role.camera;
   const query = new URLSearchParams({
     page: 'species',
-    only: role.instrument ?? role.species,
+    only: role.recast
+      ? `${role.recast.instrument}@${role.recast.species}`
+      : (role.instrument ?? role.species),
     zoom: String(camera.zoom),
     azimuth: String(view.azimuth),
     elevation: String(view.elevation ?? camera.elevation),
@@ -1014,10 +1024,54 @@ export function roleOf(name: string | undefined): CloseRole | null {
   return CLOSE_ROLES.find((role) => role === name) ?? null;
 }
 
+/**
+ * Reads a role of the command line that can be a recast role `<role>@<species>`, such as
+ * `violinist@wolf` (`findRole()` of `tools/fold-probe.ts`).
+ *
+ * @param name The name.
+ * @returns The role and its recast, or `null` for a name that is not a role.
+ * @throws Error if the recast names an unknown species or the own species of the role.
+ */
+function castRoleOf(
+  name: string | undefined,
+): { readonly role: CloseRole; readonly recast: Recast | null } | null {
+  const at = name?.indexOf('@') ?? -1;
+  const role = roleOf(at < 0 ? name : name?.slice(0, at));
+  if (!role || at < 0 || name === undefined) {
+    return role ? { role, recast: null } : null;
+  }
+  const found = findRole(name);
+  return found?.kind === 'player' && found.recast ? { role, recast: found.recast } : null;
+}
+
+/**
+ * Gives the close view of the role of a command line: the view of {@link ROLE_VIEWS}, with the
+ * species and the recast of a recast role.
+ *
+ * @param args The role and its recast.
+ * @returns The view.
+ */
+function viewsOf(args: Pick<CloseViewsArgs, 'role' | 'recast'>): RoleViews {
+  const own = ROLE_VIEWS[args.role];
+  return args.recast ? { ...own, species: args.recast.species, recast: args.recast } : own;
+}
+
+/**
+ * Gives the name of the role of a command line in the file names: the role, or the recast role.
+ *
+ * @param args The role and its recast.
+ * @returns The name, such as `violinist@wolf`.
+ */
+function roleName(args: Pick<CloseViewsArgs, 'role' | 'recast'>): string {
+  return args.recast ? `${args.role}@${args.recast.species}` : args.role;
+}
+
 /** The command line of the close views. */
 interface CloseViewsArgs {
   /** The role. */
   readonly role: CloseRole;
+  /** The recast of a recast role `<role>@<species>` ({@link castRoleOf}), or `null`. */
+  readonly recast: Recast | null;
   /** The output directory. */
   readonly out: string;
   /** The URL of a running site of the working tree, or `null` for the built site. */
@@ -1306,7 +1360,8 @@ function scaleOf(value: string | null): number {
  *   `--set` comes with `--url`.
  */
 export function closeViewsArgs(args: readonly string[]): CloseViewsArgs | null {
-  const role = roleOf(args[0]);
+  const cast = castRoleOf(args[0]);
+  const role = cast?.role;
   const out = args[1];
   const url = optionValue(args, '--url');
   const base = optionValue(args, '--base');
@@ -1356,7 +1411,7 @@ export function closeViewsArgs(args: readonly string[]): CloseViewsArgs | null {
   if (lineup && crop !== null && factor === null) {
     throw new Error(`The option --crop of --lineup takes a factor, such as 2, and not "${crop}".`);
   }
-  const ownViews = ROLE_VIEWS[role];
+  const ownViews = viewsOf({ role, recast: cast.recast });
   const momentNames = moments
     ? moments.split(',').map((name) => roleMoment(ownViews, name).name)
     : null;
@@ -1386,6 +1441,7 @@ export function closeViewsArgs(args: readonly string[]): CloseViewsArgs | null {
   }
   return {
     role,
+    recast: cast.recast,
     out,
     url: url ?? null,
     base: base ?? null,
@@ -1393,9 +1449,7 @@ export function closeViewsArgs(args: readonly string[]): CloseViewsArgs | null {
     elevation: elevationOf(elevation ?? undefined),
     aim: aimOf(aim ?? undefined),
     scale: scaleOf(scale ?? null),
-    pairs: pairs
-      ? pairCells(target ? headViews(ROLE_VIEWS[role]) : ROLE_VIEWS[role], pairs.split(','))
-      : null,
+    pairs: pairs ? pairCells(target ? headViews(ownViews) : ownViews, pairs.split(',')) : null,
     crop: crop && !lineup ? cropOf(crop) : null,
     glb: glb ? resolve(glb) : null,
     holds: holds ?? null,
@@ -1458,10 +1512,10 @@ async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVa
   }
   const changes = args.holds === null ? null : setHolds(args.holds);
   changes?.undo();
-  const { species } = ROLE_VIEWS[args.role];
+  const { species } = viewsOf(args);
   const animal = speciesAnimal(species);
   if (args.glb && !animal) {
-    throw new Error(`The ${species} of the role ${args.role} has no studio body for --glb.`);
+    throw new Error(`The ${species} of the role ${roleName(args)} has no studio body for --glb.`);
   }
   if (args.glb && !existsSync(args.glb)) {
     throw new Error(`The GLB file ${args.glb} does not exist.`);
@@ -2044,9 +2098,9 @@ async function probeViews(
 ): Promise<CommitRender> {
   const { browser } = site;
   const { out } = args;
-  const target = args.target ? `${args.role}-${args.target}` : args.role;
+  const target = args.target ? `${roleName(args)}-${args.target}` : roleName(args);
   const name = probe ? `${target}-${probe}` : target;
-  const role = roleCamera(ROLE_VIEWS[args.role], args);
+  const role = roleCamera(viewsOf(args), args);
   const scale = args.lineup ? Math.max(args.scale, args.lineup.crop) : args.scale;
   const size = roleCell(scale);
   if (args.zoom !== null || args.elevation !== null || scale !== 1) {
