@@ -307,8 +307,9 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   "Exit full screen (F)", and "Speed", "Reset view", and "Open the drawer" with no key. The link
   to GitHub shows "Zoophony on GitHub". The tooltips keep their keys, although the mockup shows
   only the names, because they are the only visible hint of the keys. A tooltip follows WCAG
-  1.4.13, and never shows for a touch. A screen reader skips it, because `aria-label` and
-  `aria-keyshortcuts` give the name and the key.
+  1.4.13, and never shows for a touch. A bar that hides hides only the tooltips of its own
+  controls, so the tooltip of the link to GitHub stays while the link has the focus. A screen
+  reader skips it, because `aria-label` and `aria-keyshortcuts` give the name and the key.
 - **Icons**: inline SVG, 20 × 20, stroke width 1.75, round caps and joins, `currentColor`
   (`ui/icons.ts`). "Cinematic camera" shows an open clapperboard. In a lineup of the bar at 1x
   and 2x, it read as film at 20 px, with the stroke weight of the other icons. A movie camera

@@ -450,7 +450,7 @@ export class Bar {
     if (view.shown) {
       this.#tooltips.refresh();
     } else {
-      this.#tooltips.hide();
+      this.#tooltips.hideIn(this.element);
     }
   }
 }

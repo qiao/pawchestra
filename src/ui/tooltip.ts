@@ -88,6 +88,19 @@ export class Tooltips {
     });
   }
 
+  /**
+   * Hides the tooltip at once when its control is in an element, for example in the bar that
+   * hides. The tooltip of a control outside the element stays while its control has the pointer
+   * or the focus (WCAG 1.4.13).
+   *
+   * @param container The element.
+   */
+  hideIn(container: Element): void {
+    if (this.#control && container.contains(this.#control)) {
+      this.hide();
+    }
+  }
+
   /** Hides the tooltip at once. */
   hide(): void {
     clearTimeout(this.#showTimer);
