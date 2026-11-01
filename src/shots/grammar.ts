@@ -1,5 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
-import { angleDifference, cameraAxes } from './camera-keys.ts';
+import { cameraAxes } from './camera-keys.ts';
 import type { Composition, ShotKey } from './types.ts';
 
 /** Degrees to radians. */
@@ -120,8 +120,7 @@ export function azimuthFrom(camera: Vec3, point: Vec3): number {
  * @returns True if the camera keeps the line.
  */
 export function keepsLine(camera: Vec3, look: Vec3): boolean {
-  const turn = Math.atan2(camera[0] - look[0], camera[2] - look[2]);
-  return Math.abs(angleDifference(turn, 0)) <= FILM_GRAMMAR.lineAzimuth;
+  return Math.abs(azimuthFrom(camera, look)) <= FILM_GRAMMAR.lineAzimuth;
 }
 
 /** The steps of the correction of the point that a camera looks at for a composition. */
