@@ -288,6 +288,19 @@ passes.
 - [ ] Neutral arm bind (spike): `ACCEPTED_GRIPS` counts from the bind, so each new bind moves each
       grip of the body (the wolf clarinetist: 49° to 70°). Store the grips in a frame of the
       forearm that no bind moves before a migration.
+- [ ] Test mannequin: `pnpm arm-check violinist@mannequin clarinetist@mannequin` fails. Each arm
+      has folds p95 9 to 20 (also at rest), and the right arms have twist p95 97 (violin) and 66
+      (clarinet). The rig has the rule weights with no arm segments. The bind supination of the
+      spike (left 100°, right 65°) lowers only the paw twist. Try the arm segments with Blender
+      weights.
+- [ ] Test mannequin: `ACCEPTED_GRIPS` has no entry for `violinist@mannequin` and
+      `clarinetist@mannequin`. Add them after the gate passes and the manager accepts the crops.
+- [ ] Test mannequin: upload `mannequin-human-tpose.fbx` to mixamo.com, and compare the auto-rig
+      with `mannequin-human-mixamo.glb`. It needs the Adobe account of the user.
+- [ ] Test mannequin: the Mixamo help pages of Adobe refused the download (HTTP 403), so the
+      skeleton options of the auto-rigger (65 or 25 bones) have no Adobe source yet.
+- [ ] Test bodies: the paused tests that build each species (`species.test.ts`, `player.test.ts`)
+      need `loadTestBodies()` before the pause ends, because the mannequin body loads apart.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
