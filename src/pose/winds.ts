@@ -138,6 +138,14 @@ export interface WindHold {
    */
   readonly aimSide: readonly [left: number, right: number];
   /**
+   * The sign of the side direction across the tube in the aim of each paw ({@link aimSide}), 1 or
+   * -1, for the left paw and the right paw, or `null` for the sign that continues the way of the
+   * paw from its shoulder across the body in the playing pose ({@link aimSignOf}). A shared hold
+   * takes the signs of its accepted player: a paw that lies nearly in the plane of its shoulder
+   * and its tube gets the other sign on another body, and its paw turns about 180°.
+   */
+  readonly aimSigns: readonly [left: number, right: number] | null;
+  /**
    * The move of the grip of the left palm from the grip of the instrument, in head heights, in the
    * axes of the tube ({@link shiftGrip}): along the tube from the mouthpiece, toward the axis of
    * the tube and past it, and across the tube away from the shoulder of the paw. The grip of a
@@ -232,6 +240,7 @@ const WOODWIND = {
   faceTube: ['none', 'none'],
   aimAcross: 0,
   aimSide: [0, 0],
+  aimSigns: null,
   gripShiftL: [0, 0, 0],
   gripShiftR: [0, 0, 0],
   restGripShiftL: null,
@@ -1119,8 +1128,9 @@ interface WindSide {
   /**
    * The sign of the side direction across the tube in the aim of the paw ({@link aimSide}): 1 or
    * -1 times the cross product of the axis of the tube and the direction from the grip to the
-   * tube. The playing pose sets it once, so that a lift or a lowering that turns the tube does not
-   * flip the side direction, and the paw with it.
+   * tube: the sign of the hold ({@link WindHold.aimSigns}), or the sign of the playing pose. It is
+   * set once, so that a lift or a lowering that turns the tube does not flip the side direction,
+   * and the paw with it.
    */
   readonly aimSign: number;
 }
@@ -1404,8 +1414,8 @@ export function windRig(
   const rig = hold.restArms ? armRest(model, placed, hold.restArms) : placed;
   const signed = {
     ...rig,
-    left: { ...rig.left, aimSign: aimSignOf(rig, rig.left) },
-    right: { ...rig.right, aimSign: aimSignOf(rig, rig.right) },
+    left: { ...rig.left, aimSign: hold.aimSigns?.[0] ?? aimSignOf(rig, rig.left) },
+    right: { ...rig.right, aimSign: hold.aimSigns?.[1] ?? aimSignOf(rig, rig.right) },
   };
   return { ...signed, slideReach: slideReachOf(signed, travelVector.length()) };
 }
