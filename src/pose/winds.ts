@@ -69,8 +69,9 @@ export interface WindHold {
    * moves so that the paws that hold it at rest hold their rest grips at the hanging palms: the
    * right paw alone when the left paw leaves its grip ({@link WindHold.restFreeL}), else the middle
    * of both paws. A free left paw hangs with its own angles, also on a seat. The rest elbows point
-   * as the hanging elbows. Thus the rest elbows stay near the sides on each body. `null` keeps the
-   * rest place of {@link WindHold.restShift} from the mouth and the rest elbows of the hold.
+   * as the hanging elbows. Thus the rest elbows stay near the sides on each body. The shoulder
+   * turns of the hold grow with the weight of the playing pose ({@link turnShare}). `null` keeps
+   * the rest place of {@link WindHold.restShift} from the mouth and the rest elbows of the hold.
    */
   readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
   readonly fingering: Fingering;
@@ -1215,15 +1216,30 @@ function freeRestOf(
 }
 
 /**
+ * Gives the share of the shoulder turns of a hold at a weight of the playing pose: the weight for a
+ * hold with rest arms ({@link WindHold.restArms}), so that the arms hang from square shoulders at
+ * rest, as the shoulder blade of a real player slides forward only when the arm reaches forward.
+ * Else 1, so that the shoulders keep their turn at rest.
+ *
+ * @param hold The hold.
+ * @param weight The weight of the playing pose: 0 is the rest pose.
+ * @returns The share, from 0 to 1.
+ */
+function turnShare(hold: WindHold, weight: number): number {
+  return hold.restArms ? weight : 1;
+}
+
+/**
  * Gives the forward turn of the right shoulder bone of a hold.
  *
  * @param hold The hold.
  * @param out The quaternion to write.
+ * @param share The share of the turn ({@link turnShare}). The whole turn by default.
  * @returns `out`, with the local rotation of `shoulderR`.
  */
-function rightShoulderTurn(hold: WindHold, out: Quaternion): Quaternion {
+function rightShoulderTurn(hold: WindHold, out: Quaternion, share = 1): Quaternion {
   // A positive turn around y moves the right shoulder forward.
-  return out.setFromAxisAngle(Y_AXIS, hold.reach);
+  return out.setFromAxisAngle(Y_AXIS, hold.reach * share);
 }
 
 /**
@@ -1231,12 +1247,13 @@ function rightShoulderTurn(hold: WindHold, out: Quaternion): Quaternion {
  *
  * @param hold The hold.
  * @param out The quaternion to write.
+ * @param share The share of the turn ({@link turnShare}). The whole turn by default.
  * @returns `out`, with the local rotation of `shoulderL`.
  */
-function leftShoulderTurn(hold: WindHold, out: Quaternion): Quaternion {
+function leftShoulderTurn(hold: WindHold, out: Quaternion, share = 1): Quaternion {
   // A negative turn around y moves the left shoulder forward. The subtraction from 0 keeps a turn
   // of 0 at +0, so that a hold with no turn writes the same rotation as no turn.
-  return out.setFromAxisAngle(Y_AXIS, 0 - hold.reachL);
+  return out.setFromAxisAngle(Y_AXIS, 0 - hold.reachL * share);
 }
 
 /**
@@ -1423,8 +1440,8 @@ export function windRig(
 /**
  * Gives the rest place of a wind instrument from the hanging arms of the body (design 5.2,
  * {@link WindHold.restArms}), with the chest in its bind pose: each arm hangs out to the side
- * until it clears the body, with its own forward swing and elbow bend (`hangingArm()`), and with
- * the turn of its shoulder bone in the hold. The instrument takes its rest turn, and moves so that
+ * until it clears the body, with its own forward swing and elbow bend (`hangingArm()`), from a
+ * square shoulder ({@link turnShare}). The instrument takes its rest turn, and moves so that
  * the rest grip of the right palm lies at the hanging right palm when the left paw leaves its grip,
  * else so that the middle of both rest grips lies at the middle of both hanging palms. The move of
  * the hold ({@link WindHold.restShift}) then adds to that place. The rest elbows point as the
@@ -1446,11 +1463,8 @@ function armRest(
   // The place of the rest pivot at which the rest grip of one side lies at its hanging palm.
   const pivotFor = (side: WindSide, angles: HangAngles) => {
     const hang = hangingArm(model, side.arm, angles);
-    const turn =
-      side.arm.side === 'L'
-        ? leftShoulderTurn(rig.hold, new Quaternion())
-        : rightShoulderTurn(rig.hold, new Quaternion());
-    const shoulderAt = poseShoulder(side.arm, chest, rig.chestBind, turn);
+    // The shoulders are square at rest (`turnShare()`).
+    const shoulderAt = poseShoulder(side.arm, chest, rig.chestBind, new Quaternion());
     const palmAt = hangingWrist(hang, shoulderAt, new Vector3()).add(
       new Vector3(...side.arm.palm).applyQuaternion(
         hangingHand(hang, shoulderAt, new Quaternion()),
@@ -1899,8 +1913,8 @@ export function windGrips(rig: WindRig, weight: number): Readonly<Record<'L' | '
     return { joint: toVec3(joint), grip: toVec3(at) };
   };
   return {
-    L: side(rig.left, leftShoulderTurn(rig.hold, new Quaternion())),
-    R: side(rig.right, rightShoulderTurn(rig.hold, new Quaternion())),
+    L: side(rig.left, leftShoulderTurn(rig.hold, new Quaternion(), turnShare(rig.hold, weight))),
+    R: side(rig.right, rightShoulderTurn(rig.hold, new Quaternion(), turnShare(rig.hold, weight))),
   };
 }
 
@@ -1935,10 +1949,10 @@ export function poseWind(
   const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
   const restPoleL = freeL?.kind === 'hang' ? freeL.hang.pole : rig.restPoleL;
   const poleL = mixPole(restPoleL, hold.poleL, weight);
-  leftShoulderTurn(hold, leftTurn);
+  leftShoulderTurn(hold, leftTurn, turnShare(hold, weight));
   poseSide(rig, rig.left, frames, leftTurn, poleL, left, freeL, weight, out.rotations);
   const right = curlOf(state.fingersR, weight, hold.gripCurl?.[1] ?? null);
-  rightShoulderTurn(hold, rightTurn);
+  rightShoulderTurn(hold, rightTurn, turnShare(hold, weight));
   const poleR = mixPole(rig.restPoleR, hold.poleR, weight);
   poseSide(rig, rig.right, frames, rightTurn, poleR, right, null, weight, out.rotations);
   setBoneRotation(out.rotations, BONES.instrument, local);
