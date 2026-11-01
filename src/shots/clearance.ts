@@ -395,6 +395,48 @@ export function segmentClear(
 }
 
 /**
+ * Gives the obstacles that can come near a segment between two of some points, such as the
+ * cameras, the target, and the sight points of one camera move (design 5.6). An obstacle whose top
+ * with its clearance is below each point, or whose square with its clearance misses the box around
+ * the points, also passes the broad phase of {@link segmentClear} for each such segment. Thus the
+ * tests of these segments give the same results with the near obstacles alone, and each test
+ * reads fewer obstacles.
+ *
+ * @param clearance The obstacles.
+ * @param points The points. There is at least one.
+ * @returns The near obstacles, in their order.
+ */
+export function nearClearance(clearance: StageClearance, points: readonly Vec3[]): StageClearance {
+  let lowY = Infinity;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (const [x, y, z] of points) {
+    lowY = Math.min(lowY, y);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minZ = Math.min(minZ, z);
+    maxZ = Math.max(maxZ, z);
+  }
+  const obstacles = clearance.obstacles.filter((obstacle) => {
+    // The largest margin of the two kinds of test: the clearance, or 0 for a line of sight.
+    const gap = Math.max(obstacle.clearance, 0);
+    if (lowY >= obstacle.maxY + gap) {
+      return false;
+    }
+    const reach = obstacle.radius + gap;
+    return !(
+      obstacle.x + reach < minX ||
+      obstacle.x - reach > maxX ||
+      obstacle.z + reach < minZ ||
+      obstacle.z - reach > maxZ
+    );
+  });
+  return { obstacles };
+}
+
+/**
  * Writes a segment.
  *
  * @param out The segment to write.

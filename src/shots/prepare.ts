@@ -14,6 +14,7 @@ import {
   CLEARANCE,
   bodyBoxes,
   cameraClear,
+  nearClearance,
   prepareClearance,
   prepareSightLines,
   segmentClear,
@@ -799,22 +800,29 @@ function moveRefusal(
       return 'beamSide';
     }
   }
+  // Each segment of the tests below lies in the box of the target, the sight points, and the
+  // cameras of the move, so the tests read only the obstacles near that box.
+  const clearance = nearClearance(planner.clearance, [
+    target,
+    ...(sights ? [sights.head.point, ...sights.parts.map((line) => line.point)] : []),
+    ...NEAR_SAMPLES.map((...[, i]) => sampleCamera(planner, move, i)),
+  ]);
   for (let k = 0; k < cameras.length; k++) {
     const camera = cameras[k] ?? target;
-    if (!cameraClear(planner.clearance, target, camera, camera, held)) {
+    if (!cameraClear(clearance, target, camera, camera, held)) {
       return 'camera';
     }
     if (
       sights &&
       SIGHT_MOVE_SAMPLES.has(MOVE_SAMPLES[k] ?? -1) &&
-      !sightsClear(planner.clearance, sights, camera)
+      !sightsClear(clearance, sights, camera)
     ) {
       return 'sight';
     }
   }
   for (const i of LINE_INDICES) {
     const camera = sampleCamera(planner, move, i);
-    if (!targetLineClear(planner.clearance, target, camera, held)) {
+    if (!targetLineClear(clearance, target, camera, held)) {
       return 'line';
     }
   }
