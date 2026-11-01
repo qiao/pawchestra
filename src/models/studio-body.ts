@@ -156,8 +156,8 @@ const rigs = new Map<string, StudioRig>();
 
 /**
  * Gives the rig of a studio body. The rig of each body and stance is made one time. A seated body
- * that also stands has a standing rig (`standingBody()` of `studio-rig.ts`). Each other body
- * keeps the stance of its role.
+ * that also stands has a standing rig (`standingBody()` of `studio-rig.ts`), and a standing body
+ * that also sits has a seated rig (`seatedBody()`). Each other body keeps the stance of its role.
  *
  * @param name The studio body.
  * @param stands True for a player that stands.
@@ -165,7 +165,9 @@ const rigs = new Map<string, StudioRig>();
  */
 export function studioRigOf(name: StudioBodyName, stands: boolean): StudioRig {
   const body = studioBodyOf(name);
-  const key = `${name} ${stands && body.standing ? 'standing' : 'bind'}`;
+  const stance =
+    stands && body.standing ? 'standing' : !stands && body.sitting ? 'sitting' : 'bind';
+  const key = `${name} ${stance}`;
   let rig = rigs.get(key);
   if (!rig) {
     rig = studioRig(body, stands);
@@ -249,7 +251,8 @@ function playerSkins(rig: StudioRig): CornerSkin[] {
  * the body with the skin of the studio (`StudioRig`). A studio body keeps the stance of its role
  * on each support: the bear conductor stands, and the polar bear pianist sits on its bench
  * (`StudioBody.seatHeight`). A seated body that also stands, such as the violinist rabbit, sits on
- * a seat and stands as a soloist ({@link studioRigOf}). A species can take another palette of the
+ * a seat and stands as a soloist, and a standing body that also sits (`StudioBody.sitting`) sits
+ * on a seat ({@link studioRigOf}). A species can take another palette of the
  * faces, as the tan foxes take the tan palette of the fox mesh.
  *
  * @param builder The mesh that gets the triangles.
