@@ -60,6 +60,7 @@
     "frame": "pnpm prepare-site && node tools/write-perf-60.ts && node tools/measure-frame.ts",
     "frozen": "pnpm prepare-site && node tools/write-perf-60.ts && node tools/frozen.ts",
     "cpu-profile": "pnpm prepare-site && node tools/write-perf-60.ts && node tools/cpu-profile.ts",
+    "e2e-base": "node tools/e2e-base.ts",
     "frame-compare": "node tools/frame-compare.ts"
   },
   "dependencies": {
