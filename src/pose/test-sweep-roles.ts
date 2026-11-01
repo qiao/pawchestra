@@ -1601,10 +1601,11 @@ export function soloistScene(role: SoloistRole, species: SpeciesId, seed = 1): T
 /**
  * The obstacle of the body of each test species (design 4.4, "Test mannequin"), which has no role
  * of its own. A recast role with the species takes it (`homeBody()` of `tools/fold-probe.ts`). The
- * mannequin is a mesh of the rig chain, with the open loops of {@link MESH_BODY_LOOPS}.
+ * body of the mannequin has only the two cuts to the upper arms ({@link BODY_LOOPS}), because its
+ * mesh has no other open edge.
  */
 export const TEST_BODY_OBSTACLES: Readonly<Partial<Record<SpeciesId, SweepObstacle>>> = {
-  mannequin: { name: BODY_OBSTACLE, surface: meshBodySurface },
+  mannequin: { name: BODY_OBSTACLE, surface: bodySurface },
 };
 
 /**
