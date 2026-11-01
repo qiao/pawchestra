@@ -196,6 +196,15 @@ steps of each file.
 - **Licenses.** The project author made the meshes with Meshy on a paid plan, and holds their
   rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
   `README.md` of the repository), with no entry in the third-party license file (7.3).
+- **Test mannequin.** `tools/blender/mannequin.py` makes an original test body for the rig chain
+  and for the Mixamo route (`assets/models/mannequin/README.md`). The preset `human` has the
+  proportions of an adult of 1.8 m, and the preset `animal` the mean proportions of the wolf and
+  the rabbit. A band and a front stripe on each limb show a twist. The palm and the back of the
+  hand have two colors, and the two sides have two tints. Each joint has quad rings of 16
+  vertices. The species `mannequin` has the animal preset as its body, and no section casts it.
+  The role tools test it with a recast role, such as `violinist@mannequin`. A test body loads
+  apart from the bodies of the app (`loadTestBodies()` of `models/studio-body.ts`), so the first
+  download does not grow by it.
 
 ### Rules of each body
 
