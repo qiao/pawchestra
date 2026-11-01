@@ -121,9 +121,10 @@ test.describe('the tooltips of the speed and the volume (audit 2026-10-06-ux-des
   test('a hover names the control', async ({ page }) => {
     await page.goto('./');
     await page.waitForSelector('#stage[data-demo]');
+    // The tooltip of the volume names its keys too, and the speed has no key (design 2.8).
     for (const [selector, text] of [
       ['.bar .speed', 'Speed'],
-      ['.bar .volume', 'Volume'],
+      ['.bar .volume', 'Volume (↑ ↓)'],
     ] as const) {
       await page.hover(selector);
       await expect(page.locator('.tooltip')).toHaveText(text);
