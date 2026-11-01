@@ -23,15 +23,23 @@ const AA_TEXT = 4.5;
 /** The selectors of the lines of the title, in the order of `Title.lines`. */
 const LINES = ['.title .logo', '.title h2', '.title p'] as const;
 
-/** The style that shows the shades alone over a white page, as over a light floor. */
+/**
+ * The style that shows the shades alone over a white page, as over a light floor. It hides each
+ * part of the title in front of the shade: the text, the icons, and the outline of the pill of the
+ * link to GitHub. The outline is a part of the link, and no text stands on it.
+ */
 const WHITE_PAGE = `
   body { background: #fff !important; }
   #stage, .drawer, .first-screen, .bar { visibility: hidden !important; }
   .title, .title * { color: transparent !important; text-shadow: none !important; }
-  .title svg { visibility: hidden !important; }`;
+  .title svg { visibility: hidden !important; }
+  .title .github { border-color: transparent !important; }`;
 
 /** One pixel: red, green, and blue from 0 to 255. */
 type Pixel = readonly [number, number, number];
+
+/** The color of a line with no color, which fails each contrast check. */
+const BLACK: Pixel = [0, 0, 0];
 
 /** One line of the title on the page. */
 interface LineOnPage {
@@ -43,7 +51,10 @@ interface LineOnPage {
   readonly right: number;
   /** The bottom edge of the box. */
   readonly bottom: number;
-  /** The color of its text: red, green, and blue. */
+  /**
+   * The darkest color of its text: red, green, and blue. The logo line holds the gold name and
+   * the gray text of the link to GitHub, and the darker gray needs the darker backdrop.
+   */
   readonly color: Pixel;
 }
 
@@ -88,7 +99,8 @@ async function cornerPixels(page: Page, width: number, height: number): Promise<
 }
 
 /**
- * Reads the box and the text color of each line of the title, before a style hides the text.
+ * Reads the box and the darkest text color of each line of the title, before a style hides the
+ * text. The colors are the color of the line and of each element in it that holds text.
  *
  * @param page The page.
  * @returns The lines, in the order of `Title.lines`.
@@ -104,26 +116,36 @@ async function linesOnPage(page: Page): Promise<LineOnPage[]> {
         const range = document.createRange();
         range.selectNodeContents(element);
         const box = range.getBoundingClientRect();
-        const color = getComputedStyle(element).color.match(/\d+/gu)?.map(Number) ?? [];
+        const texts = [...element.querySelectorAll('*')].filter((child) =>
+          [...child.childNodes].some(
+            (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+          ),
+        );
+        const colors = [element, ...texts].map(
+          (part) => getComputedStyle(part).color.match(/\d+/gu)?.map(Number) ?? [],
+        );
         return {
           left: Math.floor(box.left - margin),
           top: Math.floor(box.top - margin),
           right: Math.ceil(box.right + margin),
           bottom: Math.ceil(box.bottom + margin),
-          color,
+          colors,
         };
       }),
     { selectors: [...LINES], margin: LINE_MARGIN },
   );
 
   return lines.map((line) => {
-    const [r = 0, g = 0, b = 0] = line.color;
+    const pixels = line.colors.map(([r = 0, g = 0, b = 0]): Pixel => [r, g, b]);
+    const [color = BLACK] = pixels.toSorted(
+      (a, b) => relativeLuminance(...a) - relativeLuminance(...b),
+    );
     return {
       left: line.left,
       top: line.top,
       right: line.right,
       bottom: line.bottom,
-      color: [r, g, b],
+      color,
     };
   });
 }
