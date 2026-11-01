@@ -58,6 +58,10 @@ The app keeps its own motion: `poseStudioBones()` of `src/models/studio-rig.ts` 
 bones from the pose of the player on each frame. `lowpoly-studio/` can also build a rigged GLB file
 from a reference sheet. It is a separate project outside the rules of `AGENTS.md`.
 
+Test a change of the chain on the test mannequin first (`assets/models/mannequin/`, design 4.4):
+`pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
+Its mesh has clean quad rings and twist markers, so a fault there comes from the chain.
+
 ### Steps of a new body
 
 1. **Joints.** Measure the joints on cuts of the mesh, and write them in
