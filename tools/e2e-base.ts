@@ -52,7 +52,7 @@ The whole output of each run (the build and the tests) goes into a log file in
 scratch/e2e-base/ of the working tree, beside the JSON report of Playwright. The tool prints
 the path of the log before each run. The result of the base goes into probe-cache/ of the
 common git folder, with a copy of its log. The key is the tree hash of <ref>, the arguments of
-the tests, Node, and the lockfile, so a cache hit runs the base no more.
+the tests, Node, and the lockfile. With a cache hit, the base does not run again.
 
 Exit codes: 0 when no failure of the tree passes on the base, 1 when one does, and 2 for a
 usage error or a run that did not finish.`;
