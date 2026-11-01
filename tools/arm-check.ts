@@ -77,8 +77,9 @@
  * `--explain <measure>` explains `stretch` or `flat` of one role in this tree, with no child and
  * no cache ({@link explainLines}): the value of each arm in each sample set against the rest
  * sample and against the bind, with the mark `MOVES` at a stretch that is larger from the rest
- * than from the bind, the part of the rest sample of each demo that shrinks most from the bind,
- * and the worst edges or rings of the worst sample of each arm, with the bone of each. With
+ * than from the bind, the narrow axis p5 of each ring in each sample set for `flat`, the part of
+ * the rest sample of each demo that shrinks most from the bind, and the worst edges or rings of
+ * the worst sample of each arm, with the bone of each. With
  * `--glb <file>`, it explains the studio body of the file, in a copy of `src/`
  * (`tools/glb-swap.ts`), so that each try body of a rig gives its rings at the same samples.
  *
@@ -2891,6 +2892,9 @@ export function explainLines(
   const gate = (sample: ExplainSample): number => (fromRest ? sample.rest : sample.bind);
   const samples: Record<Side, ExplainSample[]> = { L: [], R: [] };
   const rests: Record<Side, PartSample[]> = { L: [], R: [] };
+  const narrows = (): Record<SampleSet, number[][]> => ({ rest: [], play: [], lift: [] });
+  const widths: Record<Side, Record<SampleSet, number[][]>> = { L: narrows(), R: narrows() };
+  const bindWidths: Record<Side, number[]> = { L: [], R: [] };
   const worst: Record<Side, PartSample | null> = { L: null, R: null };
   const found: string[] = [];
   for (const demo of demos) {
@@ -2907,6 +2911,12 @@ export function explainLines(
         if (set === 'rest') {
           restOf[side] = parts;
         }
+        for (const [k, width] of parts.narrows.entries()) {
+          if (Number.isFinite(width)) {
+            (widths[side][set][k] ??= []).push(width);
+          }
+        }
+        bindWidths[side] = arm.rings.map((ring) => ring.narrow);
         const rest = restOf[side];
         const sample: ExplainSample = {
           label,
@@ -2982,9 +2992,35 @@ export function explainLines(
         : 'No set has the mark MOVES: in each set, the stretch from the rest is not larger than from the bind.',
     );
   }
+  lines.push('', ...table);
+  if (!fromRest) {
+    const p5 = (values: readonly number[] | undefined): string =>
+      cm(
+        quantile(
+          (values ?? []).toSorted((a, b) => a - b),
+          0.05,
+        ),
+      );
+    lines.push(
+      '',
+      'The narrow axis p5 of each ring in each sample set, and the narrow axis of the bind ring, in cm:',
+      '',
+      `| Arm | Set | ${ARM_RINGS.map((ring) => ring.name).join(' | ')} |`,
+      `|---|---|${ARM_RINGS.map(() => '---:').join('|')}|`,
+    );
+    for (const side of SIDES) {
+      lines.push(
+        `| ${side} | bind | ${ARM_RINGS.map((...[, k]) => cm(bindWidths[side][k])).join(' | ')} |`,
+      );
+      for (const set of SAMPLE_SETS) {
+        if (samples[side].some((sample) => sample.set === set)) {
+          const cells = ARM_RINGS.map((...[, k]) => p5(widths[side][set][k]));
+          lines.push(`| ${side} | ${set} | ${cells.join(' | ')} |`);
+        }
+      }
+    }
+  }
   lines.push(
-    '',
-    ...table,
     '',
     `The part of the rest sample of each demo that shrinks most from the bind. ${fromRest ? 'A short edge in the rest makes each stretch from the rest larger.' : 'The gate reads the bind, so a rest that moves changes only the values "from the rest".'}`,
     '',
