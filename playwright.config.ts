@@ -29,6 +29,8 @@ export default defineConfig({
   use: {
     baseURL: SITE,
     viewport: { width: 960, height: 600 },
+    // A click on a hidden control fails after 15 s, not after the timeout of the whole test.
+    actionTimeout: 15_000,
   },
   webServer: {
     command: `pnpm exec vite preview --port ${PORT} --strictPort`,
