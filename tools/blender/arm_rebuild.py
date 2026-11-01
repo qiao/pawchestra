@@ -28,12 +28,14 @@ joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
 Run it in a terminal from the root of the tree:
 
     Blender -b --factory-startup -P tools/blender/arm_rebuild.py -- <animal> [--source <glb>]
-        [--factor <f> | <upper>,<fore>] [--out <dir>] [--views <dir>]
+        [--factor <f> | <upper>,<fore>] [--spec <JSON>] [--out <dir>] [--views <dir>]
 
 `--source` is the mesh before the rebuild: `armSource` of the config by default, else `source`.
 `--factor` makes the arms longer, 1 by default. The joints of the config are the joints of the
-longer arms, as in the species scripts. `--out` is the folder of the output files, the folder of
-`output` of the config by default. `--views` writes the check images of `cat_arms.look()`.
+longer arms, as in the species scripts. `--spec` replaces settings of `step_measure()` with the
+keys of a species script, such as `{"cut": {"shoulder": 0.3, "tilt": 20, "wrist": 0.1}}`. `--out` is
+the folder of the output files, the folder of `output` of the config by default. `--views` writes
+the check images of `cat_arms.look()`.
 
 Two runs give the same bytes: the script runs Blender again with `PYTHONHASHSEED=0`, as
 `mannequin.py` does. In the live Blender of MCP, `run_steps()` runs one step at a time.
@@ -115,7 +117,7 @@ class Session(va.Session):
     """The state of one rebuild, with the settings of `step_measure()` in place of the settings of
     a species script."""
 
-    def __init__(self, animal, source=None, factor=1.0, out_dir=None):
+    def __init__(self, animal, source=None, factor=1.0, out_dir=None, overrides=None):
         self.animal = animal
         path = os.path.join('tools', 'mesh-rigs', animal + '.json')
         with open(os.path.join(va.ROOT, path)) as f:
@@ -141,6 +143,7 @@ class Session(va.Session):
         self.rig = None
         self.fr = None
         self.loops = {}
+        self.overrides = overrides or {}
 
 
 def ray_hits(s, bvh, point, axis):
@@ -234,7 +237,8 @@ def step_measure(s):
     - `zone`: |x| `ZONE_X` of the shoulder joint, and `ZONE_RADIUS` of the largest hit of the
       free arm. `faces`: the faces of the zone, the most faces that a cut arm can have.
 
-    Gives the settings as a dict for the log.
+    The settings of `--spec` (`s.overrides`) then replace these. Gives the settings as a dict for
+    the log.
     """
     bm = bmesh.new()
     bm.from_mesh(s.mesh.data)
@@ -311,6 +315,7 @@ def step_measure(s):
     spec['fore'] = max(3, round(span / (RING_SPACING * fore_r)) - 1)
     spec['faces'] = max(zone_faces(s, bm, side) for side in (1, -1))
     bm.free()
+    spec.update(s.overrides)
     return {k: spec[k] for k in ('cut', 'zone', 'gap', 'wristGap', 'upper', 'fore', 'faces')}
 
 
@@ -594,19 +599,22 @@ def parse(argv):
     """Reads the arguments after `--`: the animal and the options of the docstring."""
     usage = (
         'Usage: Blender -b --factory-startup -P tools/blender/arm_rebuild.py -- <animal> '
-        '[--source <glb>] [--factor <f> | <upper>,<fore>] [--out <dir>] [--views <dir>]'
+        '[--source <glb>] [--factor <f> | <upper>,<fore>] [--spec <JSON>] [--out <dir>] '
+        '[--views <dir>]'
     )
     if not argv or argv[0].startswith('--'):
         raise SystemExit(usage)
-    out = {'animal': argv[0], 'source': None, 'factor': 1.0, 'out': None, 'views': None}
+    out = {'animal': argv[0], 'source': None, 'factor': 1.0, 'spec': {}, 'out': None, 'views': None}
     rest = argv[1:]
     while rest:
-        if len(rest) < 2 or rest[0] not in ('--source', '--factor', '--out', '--views'):
+        if len(rest) < 2 or rest[0] not in ('--source', '--factor', '--spec', '--out', '--views'):
             raise SystemExit(usage)
         key, value = rest[0][2:], rest[1]
         if key == 'factor':
             parts = [float(v) for v in value.split(',')]
             value = parts[0] if len(parts) == 1 else tuple(parts)
+        elif key == 'spec':
+            value = json.loads(value)
         elif key != 'source':
             value = os.path.abspath(value)
         out[key] = value
@@ -640,7 +648,7 @@ def main():
         ca.VIEWS = args['views']
         os.makedirs(ca.VIEWS, exist_ok=True)
     va.clear_scene()
-    s = Session(args['animal'], args['source'], args['factor'], args['out'])
+    s = Session(args['animal'], args['source'], args['factor'], args['out'], args['spec'])
     os.makedirs(s.out_dir, exist_ok=True)
     run_steps(s)
     print(
