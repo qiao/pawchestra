@@ -80,7 +80,7 @@ shasum -a 256 assets/models/wolf/*.glb assets/models/wolf/wolf-weights.json
 
 | Item | Value |
 |---|---|
-| Size | 732,200 bytes |
-| SHA-256 | `81c1ae6c9d64531f46b2582951a98d249ee7d868a8855555c13c04c931009c3f` |
-| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of a forward bend (`studio.bindArms`), and the bind paws supinated to the middle of the clarinet and violin twists (`studio.bindSupination`) |
+| Size | 731,924 bytes |
+| SHA-256 | `4f53364716ec556df6c171a71ab22c4724de7d95b0af4da880872de0f89931ac` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of a forward bend (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, and the straight legs of each side |
