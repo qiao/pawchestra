@@ -4,6 +4,7 @@ import type { MeshData } from '../models/mesh.ts';
 import { INSTRUMENT_SUPPORTS } from '../models/player.ts';
 import type { Support } from '../models/props.ts';
 import type { PlayingSection } from '../models/cast.ts';
+import { isSpeciesId } from '../models/species.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { INSTRUMENT_IDS } from '../models/instruments/catalog.ts';
 import type { InstrumentId } from '../models/instruments/types.ts';
@@ -70,21 +71,42 @@ export function instrumentItems(): GalleryItem[] {
 }
 
 /**
+ * Gives the item of a recast name `<instrument>@<species>`: the species with an instrument that
+ * no section of the cast gives it, such as `violin@wolf` (design 7.1).
+ *
+ * @param name The name.
+ * @returns The item, or `null` when the name is not a recast name.
+ */
+function recastItem(name: string): GalleryItem | null {
+  const [instrument = '', species = '', ...extra] = name.split('@');
+  const known = INSTRUMENT_IDS.find((id) => id === instrument);
+  if (extra.length > 0 || !known || !isSpeciesId(species)) {
+    return null;
+  }
+  return { label: `${species}\n${known}`, species, instrument: known };
+}
+
+/**
  * Selects the items of a list of names, so that a close view of the gallery shows only some
  * models (design 7.1). For example, `?only=dog,piano` shows the dog with the cello and the
- * polar bear with the piano.
+ * polar bear with the piano. A recast name `<instrument>@<species>` adds the species with the
+ * instrument, such as `?only=violin@wolf` for the recast role `violinist@wolf` of the role tools.
  *
  * @param items The items of a page.
- * @param only The names, separated by commas: a species or an instrument. `null` selects all
- *   items.
- * @returns The items whose species or instrument has one of the names, in their order.
+ * @param only The names, separated by commas: a species, an instrument, or a recast name. `null`
+ *   selects all items.
+ * @returns The items whose species or instrument has one of the names, in their order, then the
+ *   item of each recast name.
  */
 export function selectItems(items: readonly GalleryItem[], only: string | null): GalleryItem[] {
   if (only === null) {
     return [...items];
   }
   const names = new Set(only.split(',').map((name) => name.trim()));
-  return items.filter((item) => names.has(item.species) || names.has(item.instrument));
+  return [
+    ...items.filter((item) => names.has(item.species) || names.has(item.instrument)),
+    ...[...names].flatMap((name) => recastItem(name) ?? []),
+  ];
 }
 
 /** The angle of the camera of the gallery above the floor, in degrees, with no query. */
