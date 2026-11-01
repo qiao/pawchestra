@@ -97,7 +97,16 @@ import { basename, join, resolve } from 'node:path';
 
 import { Matrix4, Quaternion, Vector3 } from 'three';
 
-import { FOLD_ROLES, SAMPLE_SETS, probeFolds, roleAnimal, roleBodies } from './fold-probe.ts';
+import {
+  FOLD_ROLES,
+  SAMPLE_SETS,
+  findRole,
+  isRole,
+  probeFolds,
+  roleAnimal,
+  roleBodies,
+  roleScene,
+} from './fold-probe.ts';
 import type { RoleSource, SampleSet } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
@@ -126,7 +135,7 @@ import type { StudioRig } from '../src/models/studio-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { LIFT_FIT_SEC, LOWER_MAX_SEC } from '../src/pose/rest.ts';
-import { PLAYING, allAudible, sceneOf } from '../src/pose/test-scene.ts';
+import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 import type { Transport } from '../src/pose/types.ts';
 
 /** The sides of the arms. */
@@ -1179,7 +1188,7 @@ function planLabels(
   demo: DemoFile,
   step: number,
 ): (set: SampleSet, index: number) => string {
-  const scene = sceneOf(demo.bytes);
+  const scene = roleScene(role, demo.bytes);
   const bodies = Math.max(1, roleBodies(role, scene).length);
   const start = -countInAt(scene.plan.beats, 0).lengthSec;
   return (set, index) => {
@@ -1258,7 +1267,7 @@ export function probeMoves(role: RoleSource, demos: readonly DemoFile[]): Sample
   const store = emptySamples();
   const studio = createStudioPose();
   for (const demo of demos) {
-    const scene = sceneOf(demo.bytes);
+    const scene = roleScene(role, demo.bytes);
     const bodies = roleBodies(role, scene);
     if (bodies.length === 0) {
       continue;
@@ -1793,10 +1802,10 @@ export function checkArgs(args: readonly string[]): CheckArgs {
   if (all === roles.length > 0) {
     throw new Error(`Give roles or --all, not both and not none.\n${USAGE}`);
   }
-  const unknown = roles.filter((role) => !FOLD_ROLES.has(role));
+  const unknown = roles.filter((role) => !isRole(role));
   if (unknown.length > 0) {
     throw new Error(
-      `No role has the name ${unknown.join(', ')}. The roles are: ${[...FOLD_ROLES.keys()].join(', ')}.`,
+      `No role has the name ${unknown.join(', ')}. The roles are: ${[...FOLD_ROLES.keys()].join(', ')}, and the recast roles <role>@<species>.`,
     );
   }
   const glb = values.get('--glb')?.[0] ?? null;
@@ -1814,6 +1823,11 @@ export function checkArgs(args: readonly string[]): CheckArgs {
   }
   if (views !== null && values.has('--midi')) {
     throw new Error('The option --views renders the demos of the app, so --midi does not go.');
+  }
+  if (views !== null && chosen.some((role) => findRole(role) !== FOLD_ROLES.get(role))) {
+    throw new Error(
+      'The option --views renders the cast of the app, so it takes no recast role. Render a recast role with pnpm close-views <role>@<species>.',
+    );
   }
   const midi = (values.get('--midi') ?? []).map((path) => resolve(path));
   const lost = midi.filter((path) => !existsSync(path));
@@ -2007,14 +2021,16 @@ export async function traceLines(
   step: number,
   midi: readonly string[] = [],
 ): Promise<string[]> {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   const all = [...(await probeDemos()), ...userFiles(midi)];
   const demo = all.find((d) => d.file === range.demo);
-  const scene = demo ? sceneOf(demo.bytes) : null;
+  const scene = demo && source ? roleScene(source, demo.bytes) : null;
   const [body] = source && scene ? roleBodies(source, scene) : [];
   if (!source || !scene || !body) {
     const withRole = source
-      ? all.filter((d) => roleBodies(source, sceneOf(d.bytes)).length > 0).map((d) => d.file)
+      ? all
+          .filter((d) => roleBodies(source, roleScene(source, d.bytes)).length > 0)
+          .map((d) => d.file)
       : [];
     throw new Error(
       `The demo ${range.demo} has no studio body of the ${role}. The demos with the role are: ${withRole.join(', ') || 'none'}.`,
@@ -2532,7 +2548,7 @@ async function explainRole(
   measure: Explained,
   options: CheckArgs,
 ): Promise<string[]> {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   if (!source) {
     throw new Error(`No role has the name ${role}.`);
   }
@@ -2554,7 +2570,7 @@ async function childMain(args: readonly string[]): Promise<number> {
   const { glb, rest } = takeGlb(args);
   const roles = rest.filter((arg, i) => !arg.startsWith('--') && !rest[i - 1]?.startsWith('--'));
   if (glb) {
-    const source = FOLD_ROLES.get(roles[0] ?? '');
+    const source = findRole(roles[0] ?? '');
     if (!source) {
       throw new Error(`The option --glb needs a role of this tree, and not ${roles.join(', ')}.`);
     }
@@ -2572,7 +2588,7 @@ async function childMain(args: readonly string[]): Promise<number> {
   const reports: Record<string, RoleReport> = {};
   try {
     for (const role of roles) {
-      const source = FOLD_ROLES.get(role);
+      const source = isRole(role) ? findRole(role) : undefined;
       if (source) {
         reports[role] = probeRole(source, demos, step, ACCEPTED_GRIPS.get(role) ?? null);
       }
@@ -2584,7 +2600,7 @@ async function childMain(args: readonly string[]): Promise<number> {
     version: ARM_FORMAT,
     since: 2,
     roles: reports,
-    missing: roles.filter((role) => !FOLD_ROLES.has(role)),
+    missing: roles.filter((role) => !isRole(role)),
   };
   await writeFile(option('--json')[0] ?? '', `${JSON.stringify(json)}\n`);
   return 0;
