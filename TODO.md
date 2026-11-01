@@ -292,12 +292,14 @@ passes.
 - [ ] Neutral bind elbows: the bent elbows are narrower in meters than with the bent bind. The
       elbow ring p5 is 3.04 cm in place of 3.71 cm (left) and 3.39 in place of 3.97 (right) on the
       wolf clarinetist, and 1.74 in place of 1.98 (left) and 1.79 in place of 2.01 (right) on the
-      mouse oboist. The 2x crops show no slit, flap, or pinch. Four tries on the wolf did not
-      reach 3.6 cm with no new fold: two `raise` shapes (3.05 and 3.15 cm left), an elbow helper of
-      3 and 4 ring gaps in Blender (3.08 cm and no gain), and a Remove From Group of the arm bones
-      across the joint (3.30 cm, and 3.39 cm with Levels gain 2 on the helper), which folds 2 to 4
-      faces of the left inner elbow in each sample. Next: more Smooth rounds after the Remove From
-      Group, or a loop edge ring at the elbow (`wind_arms.py` faces, ask first).
+      mouse oboist. The 2x crops show no slit, flap, or pinch. Weights that keep the forearm and
+      the elbow helper off the upper arm, with one more elbow ring, reach 3.83 cm (left) and
+      3.86 cm (right) on the wolf, but fold 13 faces of each inner elbow (base 2 and 3). More
+      Smooth rounds after a Remove From Group give 2.81 to 3.31 cm and 5 to 6 folds. The mouse got
+      no try (`reports/2026-11-01-elbow-ring/`). The inner skin needs a turn ramp of about the
+      elbow radius times the bend (design 4.4), and the gate ring at 0.85 of the upper arm lies
+      inside that span. Decide: accept the narrower elbows, move the ramp onto the forearm over
+      more rings, or blend the arm skin with dual quaternions in the app.
 - [ ] Mouse with the neutral bind: the folds grow. The oboist folds 8 faces of the right arm at
       p95 at rest (limit 8, base 7) and 6 of the left arm (base 4). In the cast matrix, the snare
       drum recast folds 9 faces of the left arm in the play (limit 8, base 3) and 8 of the right
