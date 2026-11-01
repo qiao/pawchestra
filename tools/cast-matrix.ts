@@ -23,7 +23,10 @@
  * tree reads it. The tool writes one table (a row for each species, a column for each role) into
  * the file of `--out`, and the JSON of all pairs beside it ({@link MatrixJson}).
  *
+ * `--quick` takes the coarse {@link QUICK_SAMPLE} in place of {@link CAST_SAMPLE}.
+ *
  * Usage: pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>]
+ * [--quick]
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -74,6 +77,21 @@ export const CAST_ROLES = [
  * pairs to work on, and the full gate of one pair checks a change.
  */
 export const CAST_SAMPLE = { step: 0.5, every: 4 } as const;
+
+/**
+ * The coarse sample of `--quick`: a gate step of 2 s and each 16th sweep sample. It finds the
+ * faults of a pair early: a pair alone takes about half of the time of {@link CAST_SAMPLE}. A change
+ * still gets its full sample before its report.
+ */
+export const QUICK_SAMPLE = { step: 2, every: 16 } as const;
+
+/** The sample of each pair: {@link CAST_SAMPLE} or {@link QUICK_SAMPLE}. */
+export interface CastSample {
+  /** The step of song time between two play samples of the arm gate, in seconds. */
+  readonly step: number;
+  /** The sweep takes each `every`-th play sample of its role. */
+  readonly every: number;
+}
 
 /**
  * The real total lengths of each instrument under the chin, from the tail end to the scroll, in
@@ -191,7 +209,7 @@ export interface MatrixJson {
   /** The species, in the order of the rows. */
   readonly species: readonly SpeciesId[];
   /** The sample of each pair. */
-  readonly sample: typeof CAST_SAMPLE;
+  readonly sample: CastSample;
   /** The demo of each role. */
   readonly demos: Readonly<Record<string, string>>;
   /** The run time of the matrix, in seconds. */
@@ -218,11 +236,13 @@ interface MatrixArgs {
   readonly out: string;
   /** The largest number of children at the same time. */
   readonly jobs: number;
+  /** The sample of each pair: {@link QUICK_SAMPLE} with `--quick`, else {@link CAST_SAMPLE}. */
+  readonly sample: CastSample;
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>]';
+  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>] [--quick]';
 
 /**
  * Reads the command line.
@@ -233,9 +253,11 @@ const USAGE =
  */
 export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
   const values = new Map<string, string>();
-  for (let i = 0; i < args.length; i += 2) {
-    const name = args[i] ?? '';
-    const value = args[i + 1];
+  const quick = args.includes('--quick');
+  const named = args.filter((arg) => arg !== '--quick');
+  for (let i = 0; i < named.length; i += 2) {
+    const name = named[i] ?? '';
+    const value = named[i + 1];
     if (!['--roles', '--species', '--out', '--jobs'].includes(name) || value === undefined) {
       throw new Error(`The option ${name} is unknown or has no value.\n${USAGE}`);
     }
@@ -266,8 +288,12 @@ export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
   return {
     roles,
     species: species.filter(isSpeciesId),
-    out: resolve(values.get('--out') ?? join(ROOT, 'scratch', 'cast-matrix.md')),
+    out: resolve(
+      values.get('--out') ??
+        join(ROOT, 'scratch', quick ? 'cast-matrix-quick.md' : 'cast-matrix.md'),
+    ),
     jobs,
+    sample: quick ? QUICK_SAMPLE : CAST_SAMPLE,
   };
 }
 
@@ -386,9 +412,15 @@ function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale
  * @param species The species.
  * @param role The role.
  * @param demo The demo of the sample.
+ * @param sample The sample of the pair.
  * @returns The JSON of the pair.
  */
-async function measurePair(species: SpeciesId, role: string, demo: string): Promise<PairJson> {
+async function measurePair(
+  species: SpeciesId,
+  role: string,
+  demo: string,
+  sample: CastSample,
+): Promise<PairJson> {
   const started = performance.now();
   const name = pairName(species, role);
   const own = name === role;
@@ -406,9 +438,9 @@ async function measurePair(species: SpeciesId, role: string, demo: string): Prom
     }
     const demos = (await probeDemos()).filter((file) => file.file === demo);
     const grips = ACCEPTED_GRIPS.get(role) ?? null;
-    const arms = probeRole(source, demos, CAST_SAMPLE.step, grips);
+    const arms = probeRole(source, demos, sample.step, grips);
     const results = await sweepDemos(
-      { demos: [demo.replace(/\.mid$/, '')], times: null, gaps: false, every: CAST_SAMPLE.every },
+      { demos: [demo.replace(/\.mid$/, '')], times: null, gaps: false, every: sample.every },
       sweep,
     );
     const clips = new Map<string, PairClip>();
@@ -677,6 +709,7 @@ function pairCacheFile(tree: string | null, species: SpeciesId, role: string): s
  * @param species The species.
  * @param role The role.
  * @param demo The demo of the sample.
+ * @param sample The sample of the pair.
  * @returns The JSON of the pair.
  */
 async function runPair(
@@ -684,6 +717,7 @@ async function runPair(
   species: SpeciesId,
   role: string,
   demo: string,
+  sample: CastSample,
 ): Promise<PairJson> {
   const cache = pairCacheFile(tree, species, role);
   if (cache && existsSync(cache)) {
@@ -694,7 +728,15 @@ async function runPair(
       const file = join(dir, 'pair.json');
       await runChild(
         process.execPath,
-        [join('tools', 'cast-matrix.ts'), '--pair', `${species},${role},${demo}`, '--json', file],
+        [
+          join('tools', 'cast-matrix.ts'),
+          '--pair',
+          `${species},${role},${demo}`,
+          '--json',
+          file,
+          '--sample',
+          `${sample.step},${sample.every}`,
+        ],
         ROOT,
       );
       return readFile(file, 'utf8');
@@ -751,15 +793,27 @@ async function eachLimited<T, R>(
  * Runs the tool as a child: it measures one pair, and writes {@link PairJson} into the file of
  * `--json`.
  *
- * @param args The arguments: `--pair <species>,<role>,<demo> --json <file>`.
+ * @param args The arguments: `--pair <species>,<role>,<demo> --json <file> --sample <step>,<every>`.
  */
 async function childMain(args: readonly string[]): Promise<void> {
   const [species = '', role = '', demo = ''] = (args[1] ?? '').split(',');
   const file = args[3];
-  if (!isSpeciesId(species) || !FOLD_ROLES.has(role) || args[2] !== '--json' || !file) {
-    throw new Error('The child takes --pair <species>,<role>,<demo> --json <file>.');
+  const [step = NaN, every = NaN] = (args[5] ?? '').split(',').map(Number);
+  if (
+    !isSpeciesId(species) ||
+    !FOLD_ROLES.has(role) ||
+    args[2] !== '--json' ||
+    !file ||
+    args[4] !== '--sample' ||
+    !(step > 0) ||
+    !Number.isInteger(every)
+  ) {
+    throw new Error(
+      'The child takes --pair <species>,<role>,<demo> --json <file> --sample <step>,<every>.',
+    );
   }
-  writeFileSync(file, `${JSON.stringify(await measurePair(species, role, demo))}\n`);
+  const pair = await measurePair(species, role, demo, { step, every });
+  writeFileSync(file, `${JSON.stringify(pair)}\n`);
 }
 
 /**
@@ -783,14 +837,14 @@ async function main(): Promise<number> {
   const tree =
     process.env[PROBE_NO_CACHE] === '1'
       ? null
-      : treeCacheFile('cast-matrix.ts', [`format ${CAST_FORMAT}`, JSON.stringify(CAST_SAMPLE)]);
+      : treeCacheFile('cast-matrix.ts', [`format ${CAST_FORMAT}`, JSON.stringify(options.sample)]);
   const wanted = options.roles.flatMap((role) => {
     const homes = homeSpecies(role).filter((s) => !options.species.includes(s));
     return [...options.species, ...homes].map((species) => ({ species, role }));
   });
   let done = 0;
   const pairs = await eachLimited(wanted, options.jobs, async ({ species, role }) => {
-    const pair = await runPair(tree, species, role, demos[role] ?? '');
+    const pair = await runPair(tree, species, role, demos[role] ?? '', options.sample);
     done += 1;
     const state = pair.error === null ? '' : ` error: ${pair.error.split('\n')[0] ?? ''}`;
     console.log(
@@ -802,7 +856,7 @@ async function main(): Promise<number> {
     version: CAST_FORMAT,
     roles: options.roles,
     species: options.species,
-    sample: CAST_SAMPLE,
+    sample: options.sample,
     demos,
     seconds: (performance.now() - started) / 1000,
     pairs: pairs.map((pair) => ({
