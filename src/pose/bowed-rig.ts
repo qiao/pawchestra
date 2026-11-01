@@ -27,6 +27,7 @@ import type { InstrumentOf } from './family.ts';
 import { setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
 import { armRig, poseShoulder, solveArm } from './ik.ts';
+import { fitCelloPlace } from './cello-place.ts';
 import { lapPoint } from './lap.ts';
 import type { LapPlace } from './lap.ts';
 import type { ArmRig } from './ik.ts';
@@ -310,6 +311,13 @@ export interface BowedHold {
      */
     readonly via: BowVia | null;
   } | null;
+  /**
+   * The place of a cello from the body (`fitCelloPlace()` of `pose/cello-place.ts`, design 5.3),
+   * in place of {@link BowedHold.playShift} and {@link BowedHold.playTurn}: the cello leans back
+   * until the middle line of its back stands `gap` head heights in front of the body. `null` keeps
+   * the fixed place of the hold.
+   */
+  readonly fit: { readonly gap: number } | null;
 }
 
 /**
@@ -405,6 +413,7 @@ const CHIN_HOLD = {
     via: null,
   },
   standBow: null,
+  fit: null,
 } as const satisfies BowedHold;
 
 /**
@@ -473,6 +482,7 @@ const FLOOR_HOLD = {
     via: null,
   },
   standBow: null,
+  fit: null,
 } as const satisfies BowedHold;
 
 /**
@@ -762,16 +772,74 @@ const WOLF_VIOLIN_HOLD = {
   frogHair: 0.18,
 } as const satisfies BowedHold;
 
+/**
+ * The hold of the cello between the knees for each seated body (design 4.6, 5.3), as a real
+ * cellist holds it (`docs/reference/string-technique.md`, section 2.7). The place comes from the
+ * body (`fit`, `fitCelloPlace()` of `pose/cello-place.ts`): the end pin on the floor right of the
+ * middle, the cello leaned back 25.7° and 14° to the left (`CELLO_PLACE`), and moved back until
+ * its back presses the front of the trunk by 1 cm, with the top of the back at the chest. The arm
+ * values are the values of the accepted dog cellist, in head heights and as directions, so they
+ * fit each body. With the bow arm of the floor hold (the elbow out and up), the bow paw of 12
+ * recast bodies turned 134° to 172° from the accepted grip or flipped through 180°. With the
+ * right elbow out and down, near the body, the paw keeps near the direction of no paw twist.
+ *
+ * The left paw tilts 55° over the neck (`tiltL`), and the left elbow points out to the left and
+ * nearly level, because the leaned neck comes near the left shoulder, and turns up 2° for each
+ * lower string. The right shoulder turns 30°.
+ *
+ * The short arms reach the strings only nearly straight. The trunk leans 3° forward, so that the
+ * shoulders come nearer to the strings, and the right elbow points out and down, near the body.
+ * The bow plays no hair within 0.12 m of the frog (`frogHair`), and the string planes are 6°
+ * apart, so that the paw at the frog and on the C string stays out of the right rim of the
+ * cello. In pizzicato, the right paw comes up from the side, as a real player plucks with the hand
+ * hanging from the wrist and the thumb near the edge of the fingerboard
+ * (`docs/reference/string-technique.md`, section 2.8): it plucks 0.2 of the way from the end of the
+ * fingerboard to the bow contact, 0.15 m right of the strings (`pluckSide`), with the elbow out and
+ * down (`polePizzicato`). Over the fingerboard (`pluckPlace` -0.3), the paw of the dog lies flat
+ * across the strings, the right upper arm turns 101° and goes 5.2 cm into the body, and the front
+ * of the right shoulder folds in 87% of the pizzicato samples. With this pluck, the upper arm turns
+ * 79° and goes 2.2 cm in, and 20% of the samples fold.
+ *
+ * In the rest pose, the right paw holds the bow over the right knee, 0.25 H out and 0.5 H above
+ * the top of the thigh at 0.9 of the way to the knee, with the tip up and leaned out and forward,
+ * away from the cello, and the right elbow points out, down, and back. The short arm then bends
+ * softly at the elbow, and the wrist bends 22° with the palm toward the body. The left paw holds
+ * the cello at 0.6 of the fingerboard with the elbow down and out, near the side. In the lift and
+ * the lowering, the bow turns through the front, and the grip moves 0.3 H out, away from the
+ * cello.
+ */
+const CELLO_HOLD = {
+  ...FLOOR_HOLD,
+  lean: 3 * MathUtils.DEG2RAD,
+  reach: 30 * MathUtils.DEG2RAD,
+  stringTurn: 6 * MathUtils.DEG2RAD,
+  frogHair: 0.12,
+  tiltL: 55 * MathUtils.DEG2RAD,
+  poleL: [-1, -0.15, 0],
+  elbowPerString: 2 * MathUtils.DEG2RAD,
+  poleR: [1, -1.2, -0.3],
+  poleTipR: [1, -0.5, -0.5],
+  pluckPlace: 0.2,
+  pluckSide: 0.15,
+  polePizzicato: [1, -1, -0.3],
+  restPlace: 0.6,
+  restPoleL: [-0.5, -1, 0],
+  restPoleR: [0.6, -1, 0.75],
+  restBow: {
+    lap: { along: 0.9, offset: [0.25, 0.5, 0] },
+    tip: [0.6, 1, -0.6],
+    hair: UPRIGHT_BOW.hair,
+    via: { ...UPRIGHT_BOW.via, reach: [0.3, 0, -0.4] },
+  },
+  fit: { gap: 0.28 },
+} as const satisfies BowedHold;
+
 /** The holds of the bowed strings. */
 export const BOWED_HOLDS = {
   violin: CHIN_HOLD,
   // The left arm reaches the nut of the viola only with a smaller forward move.
   viola: { ...CHIN_HOLD, reach: 30 * MathUtils.DEG2RAD, playShift: [0, -0.05, -0.04] },
-  // The chair of the dog fits the low seats, so the cello stands higher at its body. The cellist
-  // leans 8°, and its right shoulder turns 45°: with a lean of 10° and a turn of 40°, its head
-  // comes 0.026 m to the neck (limit 0.03 m), and the bow stick goes 6.0 mm into the right forearm
-  // (limit 1 mm).
-  cello: { ...FLOOR_HOLD, reach: 45 * MathUtils.DEG2RAD, lean: 8 * MathUtils.DEG2RAD },
+  cello: CELLO_HOLD,
   // The base of the hold of the hippo (HIPPO_HOLD), which moves and turns the contrabass to its
   // body. The real string planes are 25° apart, and the stick leans 10°.
   contrabass: {
@@ -970,64 +1038,19 @@ const CAT_HOLD = {
 } as const satisfies BowedHold;
 
 /**
- * The hold of the cello between the knees, for the dog mesh (design 4.6, 5.3), as a real cellist
- * holds it (`docs/reference/string-technique.md`, section 2.7): the cello leans back 25° from the
- * vertical, with the back of the upper bout at the chest, the neck at the left of the head, and
- * the endpin on the floor 0.06 m right of the middle and 0.66 m in front of the floor point of the
- * seat. It leans 14° to the left, and its top plate turns 6° to the right. It keeps this place in
- * the rest pose (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the
- * knees do not touch the cello.
- *
- * The left paw tilts 55° over the neck (`tiltL`), and the left elbow points out to the left and
- * nearly level, because the leaned neck comes near the left shoulder, and turns up 2° for each
- * lower string. The right shoulder turns 30°.
- *
- * The short arms reach the strings only nearly straight. The trunk leans 3° forward, so that the
- * shoulders come nearer to the strings, and the right elbow points out and down, near the body.
- * The bow plays no hair within 0.12 m of the frog (`frogHair`), and the string planes are 6°
- * apart, so that the paw at the frog and on the C string stays out of the right rim of the
- * cello. In pizzicato, the right paw comes up from the side, as a real player plucks with the hand
- * hanging from the wrist and the thumb near the edge of the fingerboard
- * (`docs/reference/string-technique.md`, section 2.8): it plucks 0.2 of the way from the end of the
- * fingerboard to the bow contact, 0.15 m right of the strings (`pluckSide`), with the elbow out and
- * down (`polePizzicato`). Over the fingerboard (`pluckPlace` -0.3), the paw lies flat across the
- * strings, the right upper arm turns 101° and goes 5.2 cm into the body, and the front of the
- * right shoulder folds in 87% of the pizzicato samples. With this pluck, the upper arm turns 79°
- * and goes 2.2 cm in, and 20% of the samples fold.
- *
- * In the rest pose, the right paw holds the bow over the right knee, 0.25 H out and 0.5 H above
- * the top of the thigh at 0.9 of the way to the knee, with the tip up and leaned out and forward,
- * away from the cello, and the right elbow points out, down, and back. The short arm then bends
- * softly at the elbow, and the wrist bends 22° with the palm toward the body. The left paw holds
- * the cello at 0.6 of the fingerboard with the elbow down and out, near the side. In the lift and
- * the lowering, the bow turns through the front, and the grip moves 0.3 H out, away from the
- * cello.
+ * The hold of the cello between the knees, for the dog mesh (design 4.6, 5.3): the arm values of
+ * {@link CELLO_HOLD} with a fixed place. The cello leans back 25° from the vertical, with the back
+ * of the upper bout at the chest, the neck at the left of the head, and the endpin on the floor
+ * 0.06 m right of the middle and 0.66 m in front of the floor point of the seat. It leans 14° to
+ * the left, and its top plate turns 6° to the right. It keeps this place in the rest pose
+ * (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the knees do not
+ * touch the cello.
  */
 const DOG_HOLD = {
-  ...BOWED_HOLDS.cello,
-  lean: 3 * MathUtils.DEG2RAD,
-  reach: 30 * MathUtils.DEG2RAD,
-  stringTurn: 6 * MathUtils.DEG2RAD,
-  frogHair: 0.12,
+  ...CELLO_HOLD,
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
-  tiltL: 55 * MathUtils.DEG2RAD,
-  poleL: [-1, -0.15, 0],
-  elbowPerString: 2 * MathUtils.DEG2RAD,
-  poleR: [1, -1.2, -0.3],
-  poleTipR: [1, -0.5, -0.5],
-  pluckPlace: 0.2,
-  pluckSide: 0.15,
-  polePizzicato: [1, -1, -0.3],
-  restPlace: 0.6,
-  restPoleL: [-0.5, -1, 0],
-  restPoleR: [0.6, -1, 0.75],
-  restBow: {
-    lap: { along: 0.9, offset: [0.25, 0.5, 0] },
-    tip: [0.6, 1, -0.6],
-    hair: UPRIGHT_BOW.hair,
-    via: { ...UPRIGHT_BOW.via, reach: [0.3, 0, -0.4] },
-  },
+  fit: null,
 } as const satisfies BowedHold;
 
 /**
@@ -1506,15 +1529,17 @@ function restPivotOf(
  *
  * @param model A player with a violin, a viola, a cello, or a contrabass.
  * @param instrument The instrument of the model.
- * @param hold The hold of the instrument. The stage uses the hold of {@link BOWED_HOLDS}.
+ * @param given The hold of the instrument. The stage uses the hold of {@link BOWED_HOLDS}. A hold
+ *   with a fit takes the place of the cello from the body (`BowedHold.fit`).
  * @returns The rig.
  * @throws Error if the instrument has no bow or no target of a bowed string.
  */
 export function bowedRig(
   model: PlayerModel,
   instrument: BowedInstrument,
-  hold: BowedHold = BOWED_HOLDS[instrument],
+  given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
+  const hold = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
   const { positions, parents } = model.skeleton;
   const at = (bone: number): Vec3 => positions[bone] ?? [0, 0, 0];
   const pieceRotation = (bone: 'instrument' | 'bow'): Quaternion => {
