@@ -9,7 +9,7 @@ export type CameraMode = 'cinematic' | 'free';
 
 /**
  * An event that can change the camera mode (design 2.5): a drag of more than 4 px, a wheel, or a
- * pinch on the stage; a click of 4 px or less; the "Automatic camera" button or the key C;
+ * pinch on the stage; a click of 4 px or less; the "Cinematic camera" button or the key C;
  * "Reset view"; and a new piece or a new section size.
  */
 export type CameraEvent = 'drag' | 'wheel' | 'pinch' | 'click' | 'toggle' | 'reset' | 'new-piece';

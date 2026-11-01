@@ -15,7 +15,7 @@ const HIDE_DELAY_MS = 150;
 
 /**
  * The tooltips of the controls (design 2.8): one box above the control, with the name of the action
- * and its key, for example "Automatic camera (C)". It shows 400 ms after a mouse or a pen comes
+ * and its key, for example "Cinematic camera (C)". It shows 400 ms after a mouse or a pen comes
  * over a control, or after a keyboard focus on it. A touch gives no tooltip. Escape hides it, and
  * the pointer can move onto it. A screen reader skips the box, because the control has the same
  * name in its `aria-label` and the key in its `aria-keyshortcuts`.

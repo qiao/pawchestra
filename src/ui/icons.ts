@@ -40,7 +40,7 @@ const ICONS = {
   'volume-off': '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
   'reset-view':
     '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
-  // A movie camera with two film reels for "Automatic camera". A still camera looks like a button
+  // A movie camera with two film reels for "Cinematic camera". A still camera looks like a button
   // that takes a photo (design 2.8).
   'movie-camera':
     '<circle cx="6.75" cy="6.75" r="2.75"/><circle cx="12.75" cy="6.75" r="2.75"/><rect x="3" y="10.75" width="12.5" height="8.75" rx="1.5"/><path d="M15.5 13.75l5.5-2.75v8l-5.5-2.75"/>',

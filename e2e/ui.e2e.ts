@@ -192,7 +192,7 @@ test.describe('the tooltips of the bar (audit 2026-10-05-ux-design, CT1)', () =>
     await page.goto('./');
     await page.waitForSelector('#stage[data-demo]');
     await page.hover('.bar .camera');
-    await expect(page.locator('.tooltip')).toHaveText('Automatic camera (C)');
+    await expect(page.locator('.tooltip')).toHaveText('Cinematic camera (C)');
     await expect(page.locator('.bar .camera')).toHaveAttribute('aria-keyshortcuts', 'C');
     await page.keyboard.press('Escape');
     await expect(page.locator('.tooltip')).toBeHidden();

@@ -394,7 +394,7 @@ export class App {
   /**
    * Does the action of a key of the page (design 2.4). Space plays and pauses, the left and the
    * right arrows seek 5 s, Home goes to the start, the up and the down arrows change the volume, C
-   * toggles the automatic camera, M the mute button, and F the full screen. Escape closes the
+   * toggles the cinematic camera, M the mute button, and F the full screen. Escape closes the
    * drawer, and the drawer button gets the focus that the drawer held. A key action shows the bar,
    * as a pointer motion does, and Tab shows the hidden UI of Cinematic mode (design 2.3). While the
    * credits dialog is open, no key of the page acts, and Escape closes only the dialog (design
@@ -1076,7 +1076,7 @@ export class App {
       seekable: status.samples === 'ready',
       muted: this.#muted || this.#volume === 0,
       volume: this.#volume,
-      automaticCamera: this.#cameraMode === 'cinematic',
+      cinematicCamera: this.#cameraMode === 'cinematic',
       fullScreen: document.fullscreenElement !== null,
       drawerOpen: ui.drawer.open,
       shown: shown.bar,

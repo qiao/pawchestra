@@ -5,7 +5,7 @@ import { CONTROL_KEYS, tooltipText } from './tooltips.ts';
 
 describe('tooltipText (design 2.8, audit 2026-10-05-ux-design, CT1)', () => {
   it('names the action and its key', () => {
-    expect(tooltipText('Automatic camera', CONTROL_KEYS.camera)).toBe('Automatic camera (C)');
+    expect(tooltipText('Cinematic camera', CONTROL_KEYS.camera)).toBe('Cinematic camera (C)');
     expect(tooltipText('Play', CONTROL_KEYS.play)).toBe('Play (Space)');
     expect(tooltipText('Exit full screen', CONTROL_KEYS.fullScreen)).toBe('Exit full screen (F)');
     expect(tooltipText('Reset view', null)).toBe('Reset view');

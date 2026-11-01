@@ -1,10 +1,10 @@
 import type { Page } from '@playwright/test';
 
-/** The "Automatic camera" toggle when it is on: the page is in Cinematic mode (design 2.5). */
+/** The "Cinematic camera" toggle when it is on: the page is in Cinematic mode (design 2.5). */
 const CINEMATIC_TOGGLE = '.bar .camera[aria-pressed="true"]';
 
 /**
- * Turns on the automatic camera of a page with the key C, before the click on play (design 2.5).
+ * Turns on the cinematic camera of a page with the key C, before the click on play (design 2.5).
  * The site of an older commit can start in Cinematic mode, so the key comes only when the
  * toggle is off. Thus a compare of two commits renders the same mode.
  *

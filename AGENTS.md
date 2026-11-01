@@ -23,7 +23,7 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 - **Technique references.** The motion of each player follows a real musician. The target of
   each family is its reference in `docs/reference/`: `string-technique.md`, `wind-technique.md`,
   `percussion-technique.md`, `harp-technique.md`, and `piano-technique.md`, with a source for each
-  fact. The automatic camera follows a concert film: `camera-technique.md`. A change of the motion
+  fact. The cinematic camera follows a concert film: `camera-technique.md`. A change of the motion
   or of the shots updates the section "Use in the app" of its reference in the same commit.
 - **UI.** `docs/prototype/ui.html` and its screenshots in `docs/prototype/`. Design 2.8 gives the
   tokens and the exact message texts.

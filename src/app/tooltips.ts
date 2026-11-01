@@ -23,9 +23,9 @@ export const CONTROL_KEYS = {
  * Gives the text of the tooltip of a control (design 2.8): the name of the action, and its key in
  * parentheses.
  *
- * @param label The accessible name of the control, for example "Automatic camera".
+ * @param label The accessible name of the control, for example "Cinematic camera".
  * @param key The key of the control, or `null` for a control with no key.
- * @returns The text, for example "Automatic camera (C)".
+ * @returns The text, for example "Cinematic camera (C)".
  */
 export function tooltipText(label: string, key: ControlKey | null): string {
   return key ? `${label} (${key.text})` : label;

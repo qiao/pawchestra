@@ -69,7 +69,7 @@ export interface CameraChecks {
   readonly dragMove: number;
   /** The mode after the drag. */
   readonly modeAfterDrag: string;
-  /** The mode after a click on the "Automatic camera" button. */
+  /** The mode after a click on the "Cinematic camera" button. */
   readonly modeAfterButton: string;
   /** The mode after the key C. */
   readonly modeAfterKey: string;
@@ -267,7 +267,7 @@ async function modeOf(page: Page): Promise<string> {
 }
 
 /**
- * Pauses the play, drags the stage a little, then uses the "Automatic camera" button and the key
+ * Pauses the play, drags the stage a little, then uses the "Cinematic camera" button and the key
  * C (design 2.5).
  *
  * @param page The page, during play.
@@ -289,7 +289,7 @@ async function checkCameraControls(
   await page.waitForTimeout(300);
   const after = await page.evaluate(() => [...(window.zoophony?.cameraPosition ?? [])]);
   const modeAfterDrag = await modeOf(page);
-  await page.getByRole('button', { name: 'Automatic camera' }).click();
+  await page.getByRole('button', { name: 'Cinematic camera' }).click();
   const modeAfterButton = await modeOf(page);
   await page.locator('#stage').focus();
   await page.keyboard.press('c');

@@ -696,7 +696,7 @@ input[type='range']:disabled::-moz-range-thumb {
   background: var(--panel);
 }
 
-/* The icon of the automatic camera is in the accent color while the toggle is on (design 2.8). */
+/* The icon of the cinematic camera is in the accent color while the toggle is on (design 2.8). */
 .camera[aria-pressed='true'] {
   color: var(--accent);
 }

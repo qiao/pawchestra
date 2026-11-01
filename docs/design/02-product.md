@@ -46,7 +46,7 @@ The UI has the style of a video player. The theme is dark only, because the scen
 ```
 
 - The bar holds play and pause, the seek bar, the times, the speed, the volume, and the buttons
-  "Automatic camera", "Reset view" (2.5), full screen, and the drawer. During play, the bar and
+  "Cinematic camera", "Reset view" (2.5), full screen, and the drawer. During play, the bar and
   the pointer hide after a short time with no pointer motion. A hidden bar ignores the pointer, so
   the first tap only shows it.
 - In Cinematic mode, the bar stands in the middle of the bottom bar of the letterbox (2.5) where
@@ -83,7 +83,7 @@ The UI has the style of a video player. The theme is dark only, because the scen
   1.5×.
 - Space plays and pauses. The left and the right arrows seek 5 s, and Home goes to the start. The
   up and the down arrows move the volume slider by 5 of 100, and turn the mute off, as the slider
-  does. C toggles the automatic camera, M the mute, and F the full screen. Escape closes the
+  does. C toggles the cinematic camera, M the mute, and F the full screen. Escape closes the
   drawer, a message, or the dialog. The keys do nothing in a text field, with Ctrl, Alt, or Meta,
   while the dialog is open, and when the focused control uses the key (`keyAction()` in
   `app/keys.ts`). C also acts on a focused button or slider, because no control uses it. A row of
@@ -108,8 +108,8 @@ page starts in Free mode (`app/camera-mode.ts`).
              |    FREE     |  orbit from the current camera
              +-------------+
                 │       ^
-   "Automatic   │       │  drag, wheel, pinch,
-    camera", C  │       │  "Automatic camera", C, or
+   "Cinematic   │       │  drag, wheel, pinch,
+    camera", C  │       │  "Cinematic camera", C, or
                 │       │  "Reset view" (Free, default view)
                 v       │
              +-------------+
@@ -249,7 +249,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 - **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
   line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
   free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
-- **Bar**: "Automatic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
+- **Bar**: "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
   again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
   ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button
   says "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit
@@ -303,14 +303,14 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 - **Page title**: "{title}, {composer} · Zoophony" for a demo, and "{title} · Zoophony" for a
   file (`pageTitle()`). The default demo keeps the title of the start page (7.4).
 - **Tooltips** name the action and its key: "Play (Space)", "Pause (Space)", "Play again (Space)",
-  "Seek (← →, Home)", "Mute (M)", "Volume (↑ ↓)", "Automatic camera (C)", "Full screen (F)",
+  "Seek (← →, Home)", "Mute (M)", "Volume (↑ ↓)", "Cinematic camera (C)", "Full screen (F)",
   "Exit full screen (F)", and "Speed", "Reset view", and "Open the drawer" with no key. The link
   to GitHub shows "Zoophony on GitHub". The tooltips keep their keys, although the mockup shows
   only the names, because they are the only visible hint of the keys. A tooltip follows WCAG
   1.4.13, and never shows for a touch. A screen reader skips it, because `aria-label` and
   `aria-keyshortcuts` give the name and the key.
 - **Icons**: inline SVG, 20 × 20, stroke width 1.75, round caps and joins, `currentColor`
-  (`ui/icons.ts`). "Automatic camera" shows a movie camera with two film reels. A still camera
+  (`ui/icons.ts`). "Cinematic camera" shows a movie camera with two film reels. A still camera
   looks like a button that takes a photo.
 
 **Seat texts**

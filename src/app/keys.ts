@@ -5,7 +5,7 @@ const KEY_SEEK_SEC = 5;
 const KEY_VOLUME_STEP = 5;
 
 /**
- * The action of a key of the page (design 2.4). `camera` toggles the automatic camera (2.5),
+ * The action of a key of the page (design 2.4). `camera` toggles the cinematic camera (2.5),
  * `mute` the mute button, and `full-screen` the full screen.
  */
 type KeyAction =
@@ -55,7 +55,7 @@ export interface KeyPress {
 /**
  * Gives the action of a key of the page (design 2.4): Space plays and pauses, the left and the
  * right arrows seek 5 s, Home goes to the start, the up and the down arrows change the volume, C
- * toggles the automatic camera, M the mute button, and F the full screen. The keys do nothing
+ * toggles the cinematic camera, M the mute button, and F the full screen. The keys do nothing
  * while the focus is in a text field, while a modal dialog is open, with Ctrl, Alt, or Meta, and
  * when the control with the focus uses the key itself. Space and the letters do not repeat, so
  * that a held key does not toggle many times.

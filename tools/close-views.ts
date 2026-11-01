@@ -4146,7 +4146,7 @@ async function openMidi(page: Page, midi: string, frame: string): Promise<void> 
  * Opens the page of a play frame of a site, and sets its camera: it plays the demo, and closes the
  * drawer. With `--midi`, it then opens the file ({@link openMidi}). Out of Cinematic mode, it
  * moves the camera to the default view with "Reset view", and drags and turns the wheel of the
- * camera. In Cinematic mode, it turns on the automatic camera before the play
+ * camera. In Cinematic mode, it turns on the cinematic camera before the play
  * ({@link startCinematic}), and then it does not touch the camera, so the shot plan of the app
  * moves it.
  * Then it moves the pointer onto the stage, so that the bar hides {@link BAR_HIDE_SEC} later.
@@ -4283,7 +4283,7 @@ async function playFrame(
     }
     const image = await page.screenshot({ type: 'png' });
     const clock = await page.$eval('.bar .time', (element) => element.textContent ?? '');
-    // The toggle "Automatic camera" is on in Cinematic mode (design 2.5).
+    // The toggle "Cinematic camera" is on in Cinematic mode (design 2.5).
     const automatic = await page.$eval('button.camera', (element) =>
       element.getAttribute('aria-pressed'),
     );

@@ -424,7 +424,7 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
   }
 
   // "Reset view" of the desktop check gave Free mode, so the start state can be either one.
-  await c.tabTo(named('Automatic camera'));
+  await c.tabTo(named('Cinematic camera'));
   const camera = (): Promise<string> => c.attribute('.bar .camera', 'aria-pressed');
   const cameraBefore = await camera();
   await c.press(['Space']);
@@ -432,7 +432,7 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
   await c.press(['Enter']);
   const cameraEnter = await camera();
   c.record(
-    'Automatic camera',
+    'Cinematic camera',
     'Tab, Space, Enter',
     `aria-pressed ${cameraBefore}, then ${cameraSpace}, then ${cameraEnter}`,
     cameraSpace !== cameraBefore && cameraEnter === cameraBefore,
@@ -467,7 +467,7 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
   c.record(
     'Key C (focus on the page)',
     'c, C',
-    `automatic camera ${cameraKeyBefore}, then ${cameraKey}, then ${cameraKeyAgain}`,
+    `cinematic camera ${cameraKeyBefore}, then ${cameraKey}, then ${cameraKeyAgain}`,
     cameraKey !== cameraKeyBefore && cameraKeyAgain === cameraKeyBefore,
   );
   const mute = (): Promise<string> => c.attribute('.bar button[aria-pressed]', 'aria-pressed');
@@ -502,7 +502,7 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
 /**
  * Checks the speed menu, the volume slider, "Reset view", and full screen: in the bar on a
  * desktop, and in the "Playback" group of the settings on a phone. "Reset view" also turns off
- * the automatic camera (design 2.5).
+ * the cinematic camera (design 2.5).
  *
  * @param c The checker.
  * @param page The page.
@@ -544,12 +544,12 @@ async function checkPlayback(c: Checker, page: Page, place: string): Promise<voi
   await c.tabTo(named('Reset view'));
   await c.press(['Enter']);
   const resetFocused = (await c.focused()) === 'Reset view';
-  const automatic = await c.attribute('.bar .camera', 'aria-pressed');
+  const cinematic = await c.attribute('.bar .camera', 'aria-pressed');
   c.record(
     `Reset view${where}`,
     'Tab, Enter',
-    `the view resets, the automatic camera is ${automatic === 'true' ? 'on' : 'off'}`,
-    resetFocused && automatic === 'false',
+    `the view resets, the cinematic camera is ${cinematic === 'true' ? 'on' : 'off'}`,
+    resetFocused && cinematic === 'false',
   );
 
   const canFullScreen = await page.evaluate(() => document.fullscreenEnabled);

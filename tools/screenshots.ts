@@ -226,7 +226,7 @@ function demoShotPlan(bytes: Uint8Array): ShotPlan {
 }
 
 /**
- * Takes the screenshot of a camera shot: it turns on the automatic camera, plays the demo, seeks
+ * Takes the screenshot of a camera shot: it turns on the cinematic camera, plays the demo, seeks
  * to the shot during play, and waits 1.5 s. The bar hides 3 s after the click on play, so the screenshot shows the scene only.
  *
  * @param browser The browser.

@@ -19,7 +19,7 @@ export interface BarActions {
   /** A move of the volume slider, from 0 to 100. */
   readonly onVolume: (volume: number) => void;
   readonly onMute: () => void;
-  /** A click on the "Automatic camera" toggle (design 2.5). */
+  /** A click on the "Cinematic camera" toggle (design 2.5). */
   readonly onCamera: () => void;
   readonly onResetView: () => void;
   readonly onFullScreen: () => void;
@@ -47,8 +47,8 @@ interface BarView {
   readonly muted: boolean;
   /** The position of the volume slider, from 0 to 100. A volume key also moves it (design 2.4). */
   readonly volume: number;
-  /** True in Cinematic mode: the "Automatic camera" toggle is on (design 2.5). */
-  readonly automaticCamera: boolean;
+  /** True in Cinematic mode: the "Cinematic camera" toggle is on (design 2.5). */
+  readonly cinematicCamera: boolean;
   readonly fullScreen: boolean;
   readonly drawerOpen: boolean;
   /** False while the bar hides during play (design 2.3). */
@@ -141,7 +141,7 @@ function createButtonText(text: string): HTMLElement {
 
 /**
  * The bar at the bottom (design 2.3, 2.8). From left to right: play or pause, the current time,
- * the seek bar, the duration, the speed menu, mute, the volume slider, "Automatic camera", "Reset
+ * the seek bar, the duration, the speed menu, mute, the volume slider, "Cinematic camera", "Reset
  * view", full screen, and the drawer button.
  */
 export class Bar {
@@ -226,7 +226,7 @@ export class Bar {
     });
     this.#volume = volumeSlider;
 
-    this.#camera = createButton('camera', 'Automatic camera');
+    this.#camera = createButton('camera', 'Cinematic camera');
     this.#camera.setAttribute('aria-pressed', 'false');
     this.#camera.append(createIcon('movie-camera'));
     this.#camera.addEventListener('click', actions.onCamera);
@@ -346,7 +346,7 @@ export class Bar {
 
   /**
    * Moves the speed menu, the volume slider, "Reset view", and full screen into the "Playback"
-   * group of the settings on a phone, or back into the bar (design 2.8). "Automatic camera" stays
+   * group of the settings on a phone, or back into the bar (design 2.8). "Cinematic camera" stays
    * in the bar. The page has one control of each kind, so the two places never differ. In the
    * group, each control has a visible label.
    *
@@ -427,7 +427,7 @@ export class Bar {
       setIcon(this.#muteIcon, view.muted ? 'volume-off' : 'volume');
     }
 
-    setAttribute(this.#camera, 'aria-pressed', String(view.automaticCamera));
+    setAttribute(this.#camera, 'aria-pressed', String(view.cinematicCamera));
 
     setAttribute(
       this.#fullScreen,
