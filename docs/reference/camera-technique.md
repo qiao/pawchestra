@@ -137,9 +137,11 @@ The app follows these facts:
   subject stand on the upper third line, and the subject on the third line away from its look. A
   subject with a neutral look stands in the middle.
 - **Shot sizes (section 3).** A close shot fits the width of its subject in the 21:9 frame
-  (`SHOT_SIZES`). A solo is a waist one-shot of one player, a section shot a group-shot or a
-  two-shot, a side view a group-shot of the front half of one side, and a conductor shot a waist
-  shot of the bear from behind. The frame holds the head with no ears (`HEAD_BONES`), because
+  (`SHOT_SIZES`) at the end of its push-in, its closest moment. A solo is a knee one-shot of one
+  player, a section shot a group-shot or a two-shot, a side view a group-shot of the front half
+  of one side, and a conductor shot a thigh shot of the bear from behind. The solo and the
+  conductor shots are 1.25 times larger than a waist shot, because the low-poly animals show
+  their facets and the seams of their meshes from near. The frame holds the head with no ears (`HEAD_BONES`), because
   the closer the subject, the less headroom it needs, and a close shot can cut the top of the
   head (section 3). Thus the long ears of a rabbit or a fox can leave the frame of a solo, and
   the solo shows the player and its instrument in place of about seven players.

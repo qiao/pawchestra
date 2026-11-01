@@ -443,10 +443,10 @@ the beam fade of Free mode starts there (4.5).
 |---|---|---|
 | wide | the default view of 4.5, or a variant (`WIDE_VARIANTS`) | the full stage |
 | high | high, near the front | the full stage |
-| conductor | behind the bear: close, or over the shoulder at the players | a waist shot, or a long shot of the players |
+| conductor | behind the bear: close, or over the shoulder at the players | a thigh shot, or a long shot of the players |
 | side | low, from the front of one side | a group shot of its front half |
 | section | low, from the front of one group | a group shot |
-| solo | low, from the front of one player | a waist shot |
+| solo | low, from the front of one player | a knee shot |
 
 - The shots follow the views of `scene.png`. The conductor shows only from behind, as in the
   reference images (1).
@@ -468,6 +468,10 @@ times its width. Thus a close shot fits the width of its subject with the shot s
 - The outline of the subject fills a share of the frame width, seen from each camera, with the
   perspective of its distance. The outline is the hull of the footprints of the subject players,
   with their instruments and seats, up to `SUBJECT_SIZES.outlineReach` from each player.
+- Each rule of the frame holds at the end of the push-in, the closest moment of the move, so a
+  move never ends closer than its shot size. The low-poly animals show their facets and the seams
+  of their meshes from near. Thus a solo is a knee shot and a conductor shot a thigh shot, 1.25
+  times larger than a waist shot at the end of its push-in.
 - A solo, a section, or the conductor stays inside the side edges, with the target on its third
   line and the look room on the other side. A side view and the view over the shoulder fit a
   sphere, and the frame cuts its deep part. A side view holds the heads and the hands of the

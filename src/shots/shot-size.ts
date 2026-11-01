@@ -5,7 +5,10 @@ import { CINEMA_ASPECT } from './view.ts';
 
 /** The size of the frame of one kind of close shot (design 5.6). */
 export interface ShotSize {
-  /** The part of the width of the frame that the outline of the subject fills, at the zoom 1. */
+  /**
+   * The part of the width of the frame that the outline of the subject fills at the end of the
+   * push-in, the closest moment of the move.
+   */
   readonly share: number;
   /**
    * True if the outline stays inside the side edges of the frame, with its look room. False for a
@@ -18,16 +21,18 @@ export interface ShotSize {
  * The shot sizes of the close shots (design 5.6, `docs/reference/camera-technique.md`). The frame
  * of a close shot has the aspect 21:9, so it fits the width of its subject. A frame that fits the
  * height of the subject shows about 2.3 times its width, and a solo shot then showed about eight
- * players.
+ * players. The low-poly animals show their facets and the seams of their meshes from near, so the
+ * closest frames stay 1.25 times larger than a waist shot.
  */
 export const SHOT_SIZES = {
   /**
-   * A waist shot of one player (a medium shot): the frame shows the player from the waist up, with
-   * its instrument and its hands. A seated player is about as wide as it is high from the waist to
-   * the top of the head, and the eyes stand one third down from the top, so the player fills about
-   * 0.4 of the width of a 21:9 frame.
+   * A knee shot of one player (a medium long shot): the frame shows the player from about the
+   * knees up, with its instrument and its hands. A seated player is about as wide as it is high
+   * from the waist to the top of the head, and the eyes stand one third down from the top, so the
+   * player fills about 0.4 of the width of a 21:9 waist shot. A push-in to 0.9 from that frame
+   * ends at 0.44. The knee shot at the end of the push-in is 1.25 times larger.
    */
-  solo: { share: 0.4, inside: true },
+  solo: { share: 0.36, inside: true },
   /**
    * A group shot of the players of a section, or a two-shot of a small group. The section stands
    * on its third line, and the look room on the other side holds the rest of the width.
@@ -39,11 +44,12 @@ export const SHOT_SIZES = {
    */
   side: { share: 1, inside: false },
   /**
-   * A waist shot of the conductor from behind, with its raised arms (view 05 of `scene.png`). In
-   * view 05, the bear fills about 0.45 of a 16:9 frame, and thus about 0.35 of a 21:9 frame of
-   * the same height.
+   * A shot of the conductor from behind, with its raised arms (view 05 of `scene.png`). In view
+   * 05, the bear fills about 0.45 of a 16:9 frame, and thus about 0.35 of a 21:9 frame of the
+   * same height. A push-in to 0.92 from that frame ends at 0.38. The frame at the end of the
+   * push-in is 1.25 times larger.
    */
-  conductor: { share: 0.35, inside: true },
+  conductor: { share: 0.3, inside: true },
   /**
    * The view over the shoulder of the conductor at the orchestra (view 02 of `scene.png`): a long
    * shot of the players behind the bear. The frame is about as wide as the stage.
@@ -134,17 +140,17 @@ function depthScale(depth: number, distance: number): number {
 
 /**
  * Calculates the frame of a close camera (design 5.6): half its height at the target, at the
- * aspect of Cinematic mode, at the zoom 1.
+ * aspect of Cinematic mode, at the zoom 1. Each rule holds at the closest zoom of the move, the
+ * end of its push-in, so the move ends at the shot size.
  *
- * - The outline of the subject fills the share of the width of its shot size at the zoom 1.
- * - With `inside`, the outline stays inside the side edges at the closest zoom of the move, with
- *   the target on its third line.
- * - At the closest zoom, with the eyes on the upper third line, the frame holds the top of each
- *   head below its top edge and each low point above its bottom edge.
+ * - The outline of the subject fills the share of the width of its shot size.
+ * - With `inside`, the outline stays inside the side edges, with the target on its third line.
+ * - With the eyes on the upper third line, the frame holds the top of each head below its top
+ *   edge and each low point above its bottom edge.
  *
  * A point near the camera looks larger, and a camera above the subject sees a far point higher in
  * the frame. After a first pass with no perspective, each pass scales the offsets of the points
- * by their depth at the distance of the last pass.
+ * by their depth at the closest distance of the last pass.
  *
  * @param subject The subject.
  * @param size The shot size.
@@ -178,18 +184,16 @@ export function frameHalfHeight(
   let distance = Infinity;
   for (let pass = 0; pass < FIT_PASSES; pass++) {
     const near = distance * zoom;
-    let [low, high, nearLow, nearHigh] = [Infinity, -Infinity, Infinity, -Infinity];
+    let [low, high] = [Infinity, -Infinity];
     for (const p of outline) {
-      const far = depthScale(p.depth, distance);
       const close = depthScale(p.depth, near);
-      low = Math.min(low, (p.right - reach) * far);
-      high = Math.max(high, (p.right + reach) * far);
-      nearLow = Math.min(nearLow, (p.right - reach) * close);
-      nearHigh = Math.max(nearHigh, (p.right + reach) * close);
+      low = Math.min(low, (p.right - reach) * close);
+      high = Math.max(high, (p.right + reach) * close);
     }
-    let width = (high - low) / (2 * size.share);
+    // At the closest zoom, half the width of the frame at the target is `width × zoom`.
+    let width = (high - low) / (2 * size.share * zoom);
     if (size.inside) {
-      width = Math.max(width, nearHigh / ((room - x0) * zoom), -nearLow / ((room + x0) * zoom));
+      width = Math.max(width, high / ((room - x0) * zoom), -low / ((room + x0) * zoom));
     }
 
     let tall = 0;
