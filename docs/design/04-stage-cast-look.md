@@ -292,9 +292,9 @@ interface GripFrames {
 **Cast matrix.** The goal is one skeleton with which each species can play each instrument.
 `pnpm cast-matrix` measures the way to it: it recasts each species into each role (a recast role,
 see "Retarget and render"), and runs the arm gate and the clearance sweep with its note targets
-on the shortest demo of the role. A recast pair plays the shared hold of the instrument, because an own hold would hide a
-fault of the body. A violin or a viola takes the size of the rule of a violin shop, clamped to the
-real sizes (4.6), and each other instrument keeps the size of the app. A value over its limit
+on the shortest demo of the role. A recast pair plays the shared hold of the instrument, because an
+own hold would hide a fault of the body. A violin or a viola takes the size of the rule of a violin
+shop, clamped to the real sizes (4.6), and each other instrument keeps the size of the app. A value over its limit
 fails, unless the own pair of the role has the same open item. The grip of each pair counts from
 the accepted grip of the role, because the frame of the grip does not move with the bind. Run the
 matrix after a change of a shared hold, a bind rule, or the skeleton, and compare the counts of
