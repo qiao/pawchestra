@@ -1,6 +1,6 @@
 # Camera technique: how a concert film cuts and frames its shots
 
-This file is the target of the automatic camera of the app (Cinematic mode, design 2.5 and 5.6).
+This file is the target of the cinematic camera of the app (Cinematic mode, design 2.5 and 5.6).
 It gives the rules of continuity editing, of the frame, and of the film of an orchestra concert,
 with a source for each fact.
 

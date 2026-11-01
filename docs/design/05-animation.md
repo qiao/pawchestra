@@ -392,7 +392,7 @@ the height of each player at the change, from `SeatAudibility.before`
 
 ## 5.6 Camera shots
 
-The automatic camera of 2.5 films the piece as a concert film does. `cameraAt()` calculates the
+The cinematic camera of 2.5 films the piece as a concert film does. `cameraAt()` calculates the
 camera only from the shot plan, the song time, the transport, and the view. `prepareShots()` makes
 the plan one time for each score. Thus a seek, a pause, and a speed change are always correct, and
 the same piece gives the same film. `pnpm shot-trace` prints the choice at each cut.

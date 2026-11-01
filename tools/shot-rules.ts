@@ -1,5 +1,5 @@
 /**
- * Checks the shots of the automatic camera against the rules of film grammar (design 5.6,
+ * Checks the shots of the cinematic camera against the rules of film grammar (design 5.6,
  * `docs/reference/camera-technique.md`), over each demo, at the aspect of Cinematic mode. The
  * check reads only the camera of `cameraAt()` and the places of the players, so it also runs on a
  * commit from before the rules.
