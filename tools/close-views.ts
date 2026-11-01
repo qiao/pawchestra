@@ -3137,9 +3137,10 @@ interface CameraJson {
 /**
  * Reads a camera in JSON: `{"position":[x,y,z],"target":[x,y,z],"fov":<deg>}` in the axes of the
  * stage, in meters, with no `fov` for the field of view of the stage (`FIELD_OF_VIEW`). The stage
- * camera of the build follows it in each frame, as the camera of `--at` ({@link aimPlugin}). The
- * name of the camera is `pose-` and the first 6 hex digits of the SHA-256 of the text. A camera of
- * `--camera-file` takes its label in place of that name ({@link cameraFile}).
+ * camera of the build follows it in each frame, as the camera of `--at` ({@link aimPlugin}). A
+ * site of `--url` has no such build, so it shows the default view: there, use a drag camera, such
+ * as `250,0,0`. The name of the camera is `pose-` and the first 6 hex digits of the SHA-256 of the
+ * text. A camera of `--camera-file` takes its label in place of that name ({@link cameraFile}).
  *
  * @param text The JSON text.
  * @returns The camera.
