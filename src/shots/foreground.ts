@@ -280,7 +280,11 @@ function lowestOnScreen(
 /** The cells of the grid of the frame: the number of the last object that covers each one. */
 const cellStamps = new Int32Array(FOREGROUND.cells * FOREGROUND.cells);
 
-/** The number of the object of the last cover test. Each test of an object takes a new number. */
+/**
+ * The number of the object of the last cover test. Each test of an object takes a new number, so a
+ * cell with an older number is free. The grid starts again before the number passes the range of
+ * the grid, so a result never depends on the earlier tests.
+ */
 let stamp = 0;
 
 /** The x and the y of the 8 corners of a box on the screen. */
@@ -350,6 +354,10 @@ export function foregroundObject(
     const far = Math.max(depth, 0) + reach;
     if (side - reach > far * tanH || up - reach > far * tanV) {
       continue;
+    }
+    if (stamp === 2 ** 31 - 1) {
+      cellStamps.fill(0);
+      stamp = 0;
     }
     stamp++;
     let covered = 0;
