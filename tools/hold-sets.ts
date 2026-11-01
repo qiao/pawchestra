@@ -159,6 +159,7 @@ const NULL_FIELDS: ReadonlyMap<string, HoldValue> = new Map<string, HoldValue>([
   ['restGripShiftL', [0, 0, 0]],
   ['restGripShiftR', [0, 0, 0]],
   ['gripCurl', [0, 0]],
+  ['aimSigns', [0, 0]],
 ]);
 
 /**
