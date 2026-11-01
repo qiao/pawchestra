@@ -79,3 +79,11 @@ loops and in front of and under the armpits collapse. A run gives the same bytes
 blender -b --factory-startup -P tools/blender/wind_arms.py -- mouse
 shasum -a 256 assets/models/mouse/*.glb assets/models/mouse/mouse-weights.json
 ```
+
+## mouse.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 580,468 bytes |
+| SHA-256 | `f57c202ff203bef2a1269f50379dbb9f743d15d007f25e8a1c652bb0e977344a` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the oboe hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the oboe is smallest (`studio.bindSupination`) |
