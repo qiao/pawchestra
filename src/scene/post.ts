@@ -541,10 +541,6 @@ export class PostPipeline {
     this.#setHaze(final, camera, frame.haze);
     setUniform(final, 'uVignette', frame.vignette);
     setUniform(final, 'uCinema', view.cinema);
-    const fall = final.uniforms['uFrameVignette']?.value;
-    if (fall instanceof Vector2) {
-      fall.set(...FRAME_VIGNETTE.fall);
-    }
     setUniform(final, 'uSeed', grainSeed(timeSec));
     this.#pass(final, null);
   }
@@ -840,6 +836,7 @@ export class PostPipeline {
         uVignette: { value: look.vignette },
         uAspect: { value: 1 },
         uCinema: { value: 0 },
+        // The fall does not change, so no frame sets it.
         uFrameVignette: { value: new Vector2(...FRAME_VIGNETTE.fall) },
         uGrain: { value: look.grain },
         uSeed: { value: 0 },
