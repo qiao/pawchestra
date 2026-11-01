@@ -305,16 +305,16 @@ passes.
       them. The violin recast takes the left paw 1.6 cm into the violin in the lift (limit 1.5 cm,
       base 1.5 cm).
 - [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
-      folds p95 17 in the lift (limit 8): trunk faces at the front of the right armpit on
+      folds p95 11 in the lift (limit 8): trunk faces at the front of the right armpit on
       `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
       folds (left 8 to 13), and a wider smooth of the shoulder line gave no change.
-- [ ] Test mannequin: the forearm twist p95 of the left violin arm is 54 against 38 of the base
+- [ ] Test mannequin: the forearm twist p95 of the left violin arm is 48 against 38 of the base
       (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
       Decide if the margin holds against a base with no segments.
-- [ ] Test mannequin: the baked bands of the rebuilt arms have saw-tooth edges in the face colors,
-      because the tube faces do not follow the band edges of the source. Each face keeps one
-      color, so a face that crosses an edge takes one side. Put a tube ring at each color edge
-      along the old arm in `arm_rebuild.py`. A real arm with dark paws gets the same fault.
+- [ ] Test mannequin: the front stripes of the rebuilt arms keep small zigzags. Their sides run
+      along the bone between two spokes of the tube, and their ends are edges of 2 or 3 rays, so
+      `arm_rebuild.py` gives them no ring (`color_edges()`). A spoke at each side would need
+      tube rings with free spokes.
 - [ ] Arm rebuild: on the wolf clarinetist, `arm_rebuild.py` gives fewer folds than `wind_arms.py`,
       but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
       ring, then replace the species scripts one at a time after a review of the crops.
