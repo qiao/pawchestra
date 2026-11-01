@@ -328,8 +328,21 @@ passes.
       111 FAIL (`reports/2026-11-01-cast-matrix/`). In 97 FAIL cells, a value fails in most
       recast cells of its column, so the shared hold of the instrument fits only its own species.
       Fit the shared holds of the bowed strings and the winds on more than one body.
-- [ ] Shared violin hold (`BOWED_HOLDS.violin`): the arms go 2.4 cm to 28 cm into the body in the
-      rest, the lift, or the lowering of each recast species.
+- [ ] Shared violin hold (`BOWED_HOLDS.violin`, 5.3): 8 of the 14 seated bodies pass. The upper
+      arms of the cat go 2.0 cm to 4.0 cm into its deep chest in the play and the lowering, and the
+      upper arms of the pig 2.5 cm to 3.3 cm. The left paw of the dog stretches 0.56 in the lift,
+      the right upper arm of the monkey goes flat (0.53 to 0.55) in the play, and the left forearm
+      of the mannequin goes 1.7 cm into the violin. The polar bear folds 22 and 12 faces (body
+      weights).
+- [ ] Violin place (5.3): the head turn of the jaw rule (-15° to 15°) and the place of the violin
+      on the collarbone need a look from the reference sheets on each body, because the matrix
+      measures no contact of the jaw.
+- [ ] Recast holds in the role tools: a recast role keeps the own hold of its species, such as
+      `WOLF_VIOLIN_HOLD` for `violinist@wolf`, and the cast matrix takes the shared hold. The wolf
+      passes with the shared violin hold, so its own hold can go. The `--base` build of
+      `close-views` and the `--base` sweep of `pose-depth` keep the scale of their commit.
+- [ ] Standing-bind violinists: the bear, the hippo, the elephant, the badger, the rhino, and the
+      penguin bind standing and cannot sit with the violin yet.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
       the dog stays `OPEN`. The right paw of the panda (1.9 cm) and the left claws of the monkey
       (1.8 cm) go into the cello in a few play samples. The cello of the foxes goes 5.0 cm into the
