@@ -1592,6 +1592,42 @@ export function soloistScene(role: SoloistRole, species: SpeciesId, seed = 1): T
 }
 
 /**
+ * Gives the sweep of a recast role (`recastScene()` of `pose/test-scene.ts`): the sweep of the
+ * role, with the body of the new species as the obstacle `body`, and with only the players of
+ * that species. The body comes from the sweep of the own role of the species, because the open
+ * loops of each mesh differ.
+ *
+ * @param sweep The sweep of the role, such as the violinist.
+ * @param species The species of the recast, such as the wolf.
+ * @param home The sweep of the own role of the species, such as the clarinetist.
+ * @returns The sweep, with the name `<role>@<species>`.
+ * @throws Error if the sweep of the own role has no body.
+ */
+export function recastSweep(sweep: RoleSweep, species: SpeciesId, home: RoleSweep): RoleSweep {
+  const body = home.obstacles.find((obstacle) => obstacle.name === BODY_OBSTACLE);
+  if (!body) {
+    throw new Error(`The sweep of the ${home.role} has no obstacle ${BODY_OBSTACLE}.`);
+  }
+  return {
+    ...sweep,
+    role: `${sweep.role}@${species}`,
+    obstacles: sweep.obstacles.map((obstacle) =>
+      obstacle.name === BODY_OBSTACLE ? body : obstacle,
+    ),
+    players: (scene) => {
+      const models = new Set(
+        scene.layout.players
+          .filter((place) => place.cast.species === species)
+          .map(({ cast }) =>
+            scene.models.get(cast.species, cast.instrument, cast.kettles, cast.support),
+          ),
+      );
+      return sweep.players(scene).filter((player) => models.has(player.model));
+    },
+  };
+}
+
+/**
  * Tells if a player of a scene is in the sweep of the oboist: the first seated mouse with an oboe,
  * and each mouse soloist, which stands (design 4.2).
  *
