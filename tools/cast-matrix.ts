@@ -26,8 +26,14 @@
  *
  * `--quick` takes the coarse {@link QUICK_SAMPLE} in place of {@link CAST_SAMPLE}.
  *
+ * `--set <changes>` changes the holds of each pair in memory (`setHolds()` of
+ * `tools/hold-sets.ts`), before the tool takes the shared hold and the size rule, so that a try
+ * needs no edit of the source. Each `--variant <name>=<changes>` adds a column of each role with
+ * its changes after those of `--set`, as `pnpm pair-scan` does ({@link MatrixVariant}). A change of
+ * the scale of the recast species, such as `wolf.violinScale=0.7`, takes the place of the rule.
+ *
  * Usage: pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>]
- * [--quick]
+ * [--quick] [--set <changes>]... [--variant <name>=<changes>]...
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -38,6 +44,7 @@ import type { GateRow, Measure, RoleReport } from './arm-check.ts';
 import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
 import { celloRule } from './cello-size.ts';
 import { REAL_VIOLINS, holdReach, ruleSize } from './hold-reach.ts';
+import { setHolds } from './hold-sets.ts';
 import { sampleAt, sweepDemos } from './pose-depth.ts';
 import type { TargetReach } from './pose-depth.ts';
 import { probeDemos } from './probe-demos.ts';
@@ -120,9 +127,17 @@ export const CAST_FORMAT = 2;
  * The source of the instrument scale of a pair. `own`: the own role of the species, with the scale
  * of the app. `rule`: the rule of a violin shop. `smallest`, `largest`: the rule, clamped to a
  * real size. `none`: no rule fits the instrument or the arm, so the scale is 1. `fixed`: the app
- * has no scale of the instrument.
+ * has no scale of the instrument. `set`: a change of `--set` or `--variant`.
  */
-export type ScaleSource = 'own' | 'rule' | 'smallest' | 'largest' | 'none' | 'fixed';
+export type ScaleSource = 'own' | 'rule' | 'smallest' | 'largest' | 'none' | 'fixed' | 'set';
+
+/** One variant of a run: a column of each role, with the hold changes of the variant. */
+export interface MatrixVariant {
+  /** The name: `base` for the changes of `--set` alone, else the name of `--variant`. */
+  readonly name: string;
+  /** The hold changes (`setHolds()` of `tools/hold-sets.ts`), or `''` for no change. */
+  readonly changes: string;
+}
 
 /** The instrument scale of a pair. */
 export interface PairScale {
@@ -214,6 +229,8 @@ export interface MatrixJson {
   readonly sample: CastSample;
   /** The demo of each role. */
   readonly demos: Readonly<Record<string, string>>;
+  /** The variants, in the order of their columns. */
+  readonly variants: readonly MatrixVariant[];
   /** The run time of the matrix, in seconds. */
   readonly seconds: number;
   /** Each pair, with its cell. */
@@ -222,6 +239,8 @@ export interface MatrixJson {
 
 /** One pair of the matrix with its cell. */
 export interface MatrixPair {
+  /** The name of the variant of the pair ({@link MatrixVariant}). */
+  readonly variant: string;
   /** The JSON of the pair. */
   readonly pair: PairJson;
   /** The cell. */
@@ -240,30 +259,60 @@ interface MatrixArgs {
   readonly jobs: number;
   /** The sample of each pair: {@link QUICK_SAMPLE} with `--quick`, else {@link CAST_SAMPLE}. */
   readonly sample: CastSample;
+  /** The variants: `base`, then each `--variant`. */
+  readonly variants: readonly MatrixVariant[];
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>] [--quick]';
+  'Usage: pnpm cast-matrix [--roles <role>,...] [--species <species>,...] [--out <file>] [--jobs <n>] [--quick] [--set <changes>]... [--variant <name>=<changes>]...';
 
 /**
  * Reads the command line.
  *
  * @param args The arguments.
  * @returns The options.
- * @throws Error for an unknown option, role, or species.
+ * @throws Error for an unknown option, role, or species, for a variant with no name or a name
+ *   that comes two times, and for a hold change that does not fit.
  */
 export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
   const values = new Map<string, string>();
+  const sets: string[] = [];
+  const named: (readonly [string, string])[] = [];
   const quick = args.includes('--quick');
-  const named = args.filter((arg) => arg !== '--quick');
-  for (let i = 0; i < named.length; i += 2) {
-    const name = named[i] ?? '';
-    const value = named[i + 1];
-    if (!['--roles', '--species', '--out', '--jobs'].includes(name) || value === undefined) {
+  const rest = args.filter((arg) => arg !== '--quick');
+  for (let i = 0; i < rest.length; i += 2) {
+    const name = rest[i] ?? '';
+    const value = rest[i + 1];
+    const known = ['--roles', '--species', '--out', '--jobs', '--set', '--variant'];
+    if (!known.includes(name) || value === undefined) {
       throw new Error(`The option ${name} is unknown or has no value.\n${USAGE}`);
     }
-    values.set(name, value);
+    if (name === '--set') {
+      sets.push(value);
+    } else if (name === '--variant') {
+      const cut = value.indexOf('=');
+      const label = value.slice(0, cut);
+      if (cut < 1 || label === 'base' || named.some(([n]) => n === label)) {
+        throw new Error(
+          `The option --variant takes <name>=<changes> with a new name other than base, and not "${value}".`,
+        );
+      }
+      named.push([label, value.slice(cut + 1)]);
+    } else {
+      values.set(name, value);
+    }
+  }
+  const joined = (...parts: readonly string[]): string => parts.filter((p) => p !== '').join(';');
+  const variants: MatrixVariant[] = [
+    { name: 'base', changes: joined(...sets) },
+    ...named.map(([name, changes]) => ({
+      name,
+      changes: joined(...sets, changes),
+    })),
+  ];
+  for (const variant of variants) {
+    setHolds(variant.changes).undo();
   }
   const list = (name: string): string[] | null =>
     values
@@ -296,6 +345,7 @@ export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
     ),
     jobs,
     sample: quick ? QUICK_SAMPLE : CAST_SAMPLE,
+    variants,
   };
 }
 
@@ -415,6 +465,29 @@ function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale
 }
 
 /**
+ * Gives the scale of the instrument of a recast species that a hold change sets, such as
+ * `wolf.violinScale=0.7`, or `null` when the changes set no such scale.
+ *
+ * @param species The species.
+ * @param instrument The instrument.
+ * @param changes The hold changes.
+ * @returns The scale, or `null`.
+ */
+function scaleOfChanges(
+  species: SpeciesId,
+  instrument: InstrumentId,
+  changes: string,
+): PairScale | null {
+  if (!isScaledInstrument(instrument)) {
+    return null;
+  }
+  const path = `${species}.${SCALE_PARAMS[instrument]}=`;
+  const named = changes.split(';').some((change) => change.trim().startsWith(path));
+  const params: SpeciesParams = SPECIES[species];
+  return named ? { value: params[SCALE_PARAMS[instrument]] ?? 1, source: 'set' } : null;
+}
+
+/**
  * Measures one pair in this process: the arm gate and the sweep on the sample of the role. A fault
  * of the pair, such as a species with no body sweep, gives the JSON with its message, so that the
  * matrix shows it as a cell.
@@ -423,6 +496,8 @@ function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale
  * @param role The role.
  * @param demo The demo of the sample.
  * @param sample The sample of the pair.
+ * @param changes The hold changes of the variant ({@link MatrixVariant}), before the shared hold
+ *   and the size rule.
  * @returns The JSON of the pair.
  */
 async function measurePair(
@@ -430,6 +505,7 @@ async function measurePair(
   role: string,
   demo: string,
   sample: CastSample,
+  changes: string,
 ): Promise<PairJson> {
   const started = performance.now();
   const name = pairName(species, role);
@@ -442,15 +518,23 @@ async function measurePair(
     if (source?.kind !== 'player' || !sweep) {
       throw new Error(`The pair ${name} has no role or no sweep.`);
     }
+    setHolds(changes);
     if (!own) {
       useSharedHold(species, source.instrument);
-      scale = setRecastScale(species, source.instrument);
+      scale =
+        scaleOfChanges(species, source.instrument, changes) ??
+        setRecastScale(species, source.instrument);
     }
     const demos = (await probeDemos()).filter((file) => file.file === demo);
     const grips = ACCEPTED_GRIPS.get(role) ?? null;
     const arms = probeRole(source, demos, sample.step, grips);
     const results = await sweepDemos(
-      { demos: [demo.replace(/\.mid$/, '')], times: null, gaps: false, every: sample.every },
+      {
+        demos: [demo.replace(/\.mid$/, '')],
+        times: null,
+        gaps: false,
+        every: sample.every,
+      },
       sweep,
     );
     const clips = new Map<string, PairClip>();
@@ -612,7 +696,13 @@ export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
   if (pair.error !== null || !pair.arms) {
     const text = `error: ${(pair.error ?? 'no report').split('\n')[0] ?? ''}`;
     const item: CellItem = { verdict: 'FAIL', text, ratio: Infinity };
-    return { verdict: 'FAIL', worst: item, clip: null, targets: null, items: [item] };
+    return {
+      verdict: 'FAIL',
+      worst: item,
+      clip: null,
+      targets: null,
+      items: [item],
+    };
   }
 
   const homeRows = home?.arms ? gateRows(home.name, home.arms, null) : [];
@@ -642,7 +732,13 @@ export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
     : items.length > 0
       ? 'OPEN'
       : 'PASS';
-  return { verdict, worst: largest(gate), clip: largest(clips), targets, items };
+  return {
+    verdict,
+    worst: largest(gate),
+    clip: largest(clips),
+    targets,
+    items,
+  };
 }
 
 /**
@@ -670,32 +766,53 @@ export function cellText(pair: PairJson, cell: MatrixCell): string {
 }
 
 /**
- * Writes the table of the matrix: a row for each species, a column for each role.
+ * Writes the table of the matrix: a row for each species, and a column for each role of each
+ * variant, with the counts of the verdicts of each variant and the changes of each variant.
  *
  * @param json The matrix.
  * @returns The lines.
  */
 export function matrixLines(json: MatrixJson): string[] {
-  const find = (species: SpeciesId, role: string): MatrixPair | undefined =>
-    json.pairs.find(({ pair }) => pair.species === species && pair.role === role);
+  const named = json.variants.length > 1;
+  const columns = json.variants.flatMap((variant) =>
+    json.roles.map((role) => ({ variant: variant.name, role })),
+  );
+  const find = (species: SpeciesId, role: string, variant: string): MatrixPair | undefined =>
+    json.pairs.find(
+      (p) => p.variant === variant && p.pair.species === species && p.pair.role === role,
+    );
+  const header = columns.map(
+    ({ variant, role }) => `${role} (${json.demos[role] ?? '-'})${named ? ` [${variant}]` : ''}`,
+  );
   const lines = [
     `Cast matrix of ${json.species.length} species and ${json.roles.length} roles in ${Math.round(json.seconds)} s. Sample: the shortest demo with the role, a gate step of ${json.sample.step} s, and each ${json.sample.every}th sweep sample. A cell gives the verdict, the worst value of the gate, the deepest clip (value/limit), the note targets that do not pass, and the scale of a scaled instrument.`,
     '',
-    `| Species | ${json.roles.map((role) => `${role} (${json.demos[role] ?? '-'})`).join(' | ')} |`,
-    `|---|${json.roles.map(() => '---').join('|')}|`,
+    ...json.variants
+      .filter((variant) => variant.changes !== '')
+      .map((variant) => `Changes of ${variant.name}: \`${variant.changes}\`.`),
+    ...(json.variants.some((variant) => variant.changes !== '') ? [''] : []),
+    `| Species | ${header.join(' | ')} |`,
+    `|---|${columns.map(() => '---').join('|')}|`,
   ];
   for (const species of json.species) {
-    const cells = json.roles.map((role) => {
-      const found = find(species, role);
+    const cells = columns.map(({ variant, role }) => {
+      const found = find(species, role, variant);
       return found ? cellText(found.pair, found.cell) : '-';
     });
     lines.push(`| ${species} | ${cells.join(' | ')} |`);
   }
-  const count = (verdict: MatrixCell['verdict']): number =>
-    json.pairs.filter(
-      ({ pair, cell }) => json.species.includes(pair.species) && cell.verdict === verdict,
-    ).length;
-  lines.push('', `PASS ${count('PASS')}, OPEN ${count('OPEN')}, FAIL ${count('FAIL')}.`);
+  lines.push('');
+  for (const variant of json.variants) {
+    const count = (verdict: MatrixCell['verdict']): number =>
+      json.pairs.filter(
+        (p) =>
+          p.variant === variant.name &&
+          json.species.includes(p.pair.species) &&
+          p.cell.verdict === verdict,
+      ).length;
+    const counts = `PASS ${count('PASS')}, OPEN ${count('OPEN')}, FAIL ${count('FAIL')}.`;
+    lines.push(named ? `${variant.name}: ${counts}` : counts);
+  }
   return lines;
 }
 
@@ -720,6 +837,7 @@ function pairCacheFile(tree: string | null, species: SpeciesId, role: string): s
  * @param role The role.
  * @param demo The demo of the sample.
  * @param sample The sample of the pair.
+ * @param changes The hold changes of the variant, or `''` for none.
  * @returns The JSON of the pair.
  */
 async function runPair(
@@ -728,6 +846,7 @@ async function runPair(
   role: string,
   demo: string,
   sample: CastSample,
+  changes: string,
 ): Promise<PairJson> {
   const cache = pairCacheFile(tree, species, role);
   if (cache && existsSync(cache)) {
@@ -746,6 +865,7 @@ async function runPair(
           file,
           '--sample',
           `${sample.step},${sample.every}`,
+          ...(changes === '' ? [] : ['--set', changes]),
         ],
         ROOT,
       );
@@ -803,12 +923,14 @@ async function eachLimited<T, R>(
  * Runs the tool as a child: it measures one pair, and writes {@link PairJson} into the file of
  * `--json`.
  *
- * @param args The arguments: `--pair <species>,<role>,<demo> --json <file> --sample <step>,<every>`.
+ * @param args The arguments: `--pair <species>,<role>,<demo> --json <file> --sample <step>,<every>`,
+ *   and `--set <changes>` for a variant with changes.
  */
 async function childMain(args: readonly string[]): Promise<void> {
   const [species = '', role = '', demo = ''] = (args[1] ?? '').split(',');
   const file = args[3];
   const [step = NaN, every = NaN] = (args[5] ?? '').split(',').map(Number);
+  const changes = args[6] === '--set' ? (args[7] ?? '') : '';
   if (
     !isSpeciesId(species) ||
     !FOLD_ROLES.has(role) ||
@@ -816,13 +938,14 @@ async function childMain(args: readonly string[]): Promise<void> {
     !file ||
     args[4] !== '--sample' ||
     !(step > 0) ||
-    !Number.isInteger(every)
+    !Number.isInteger(every) ||
+    args.length !== (args[6] === '--set' ? 8 : 6)
   ) {
     throw new Error(
-      'The child takes --pair <species>,<role>,<demo> --json <file> --sample <step>,<every>.',
+      'The child takes --pair <species>,<role>,<demo> --json <file> --sample <step>,<every> [--set <changes>].',
     );
   }
-  const pair = await measurePair(species, role, demo, { step, every });
+  const pair = await measurePair(species, role, demo, { step, every }, changes);
   writeFileSync(file, `${JSON.stringify(pair)}\n`);
 }
 
@@ -844,23 +967,41 @@ async function main(): Promise<number> {
   for (const role of options.roles) {
     demos[role] = await roleDemo(role);
   }
-  const tree =
-    process.env[PROBE_NO_CACHE] === '1'
-      ? null
-      : treeCacheFile('cast-matrix.ts', [`format ${CAST_FORMAT}`, JSON.stringify(options.sample)]);
-  const wanted = options.roles.flatMap((role) => {
-    const homes = homeSpecies(role).filter((s) => !options.species.includes(s));
-    return [...options.species, ...homes].map((species) => ({ species, role }));
-  });
+  // A variant with no change keeps the key of a run with no --set.
+  const trees = new Map(
+    options.variants.map((variant) => [
+      variant.name,
+      process.env[PROBE_NO_CACHE] === '1'
+        ? null
+        : treeCacheFile('cast-matrix.ts', [
+            `format ${CAST_FORMAT}`,
+            JSON.stringify(options.sample),
+            ...(variant.changes === '' ? [] : [`set ${variant.changes}`]),
+          ]),
+    ]),
+  );
+  const wanted = options.variants.flatMap((variant) =>
+    options.roles.flatMap((role) => {
+      const homes = homeSpecies(role).filter((s) => !options.species.includes(s));
+      return [...options.species, ...homes].map((species) => ({
+        species,
+        role,
+        variant,
+      }));
+    }),
+  );
   let done = 0;
-  const pairs = await eachLimited(wanted, options.jobs, async ({ species, role }) => {
-    const pair = await runPair(tree, species, role, demos[role] ?? '', options.sample);
+  const pairs = await eachLimited(wanted, options.jobs, async ({ species, role, variant }) => {
+    const tree = trees.get(variant.name) ?? null;
+    const demo = demos[role] ?? '';
+    const pair = await runPair(tree, species, role, demo, options.sample, variant.changes);
     done += 1;
     const state = pair.error === null ? '' : ` error: ${pair.error.split('\n')[0] ?? ''}`;
+    const label = options.variants.length > 1 ? ` [${variant.name}]` : '';
     console.log(
-      `${done}/${wanted.length} ${pairName(species, role)} ${pair.seconds.toFixed(0)} s${state}`,
+      `${done}/${wanted.length} ${pairName(species, role)}${label} ${pair.seconds.toFixed(0)} s${state}`,
     );
-    return pair;
+    return { variant: variant.name, pair };
   });
   const json: MatrixJson = {
     version: CAST_FORMAT,
@@ -868,11 +1009,14 @@ async function main(): Promise<number> {
     species: options.species,
     sample: options.sample,
     demos,
+    variants: options.variants,
     seconds: (performance.now() - started) / 1000,
-    pairs: pairs.map((pair) => ({
-      pair,
-      cell: matrixCell(pair, pairs.find((p) => p.role === pair.role && p.own) ?? null),
-    })),
+    pairs: pairs.map(({ variant, pair }) => {
+      const home = pairs.find(
+        (p) => p.variant === variant && p.pair.role === pair.role && p.pair.own,
+      );
+      return { variant, pair, cell: matrixCell(pair, home?.pair ?? null) };
+    }),
   };
   const lines = matrixLines(json);
   mkdirSync(dirname(options.out), { recursive: true });
