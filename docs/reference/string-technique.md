@@ -424,7 +424,11 @@ The app follows these facts:
   the front of the chest, and the jaw lies on the chin rest. The chin rest is at the left of the
   tailpiece, on the side of the G string (`CHIN_REST`). The left shoulder bone turns forward
   in the play (`BowedHold.reachL`, `shoulderTurnL()`), as the left shoulder of a violinist moves
-  forward, so that the short left arm reaches the nut.
+  forward, so that the short left arm reaches the nut. The shared violin hold places the tail end
+  on the left collarbone from the body (`fitViolinPlace()`): beside the neck, above the base of the
+  neck, and behind the front of the upper chest. Then the head turns until the jaw touches the chin
+  rest, and the violin moves up or down for the rest of the gap, so that the head stays near
+  straight.
 - **The shoulder rest (1.10).** A shoulder rest lies under the back of the lower bout
   (`SHOULDER_REST`). Its high end is on the side of the E string, over the left shoulder and the
   upper arm of the animal.
@@ -490,7 +494,9 @@ The app follows these facts:
   holds the neck in a rest grip near the grip of the play (`restHandAt()`,
   `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). The
   cat rests the viola nearer to the hip, so that its shorter arm bends, and closes its paw around
-  the neck.
+  the neck. In the shared violin hold, both arms hang out to the sides until they clear the body,
+  and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left
+  paw in front of the thigh, and the upright bow at the right paw.
 
 The app does not follow these facts:
 
@@ -521,7 +527,10 @@ The app does not follow these facts:
   180°, and the forearm skin follows the paw with no jump. In the middle of the move, the wrist
   moves off its line (`BowedHold.liftReach`), so that the instrument keeps out of the body near
   the jaw. A banjo roll with the scroll to the side avoids the twist, but no source gives it as a
-  rest.
+  rest. On a body with a pronated bind paw, the playing grip lies more than 180° from the bind in
+  the supination. There the paw turns the other way, through the direction of no paw twist
+  (`studioPawTwist()`), so that the skin of the forearm does not turn over. No source gives this
+  turn.
 - **The top plate at rest (2.9).** No source gives its side in the seated rest. The top plate of
   the violin faces the front. The top plate of the viola faces the front and a little to the left,
   because with the top to the front the bow paw of the cat turns too fast in a lowering. The bow
