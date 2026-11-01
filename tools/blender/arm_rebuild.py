@@ -8,7 +8,8 @@ joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
 1. Import the source mesh and Merge by Distance (`violin_arms.import_mesh()`).
 2. Measure the arms: the shoulder line is the first section of the upper arm, from the shoulder
    joint, where each ray from the bone hits the arm near the median radius. The ring gaps and
-   the ring count come from the radii and the lengths of the arm.
+   the ring count come from the radii and the lengths of the arm. Each color edge across the old
+   arm gets a ring (`color_edges()`), so that each tube face lies on one side of the edge.
 3. Cut each arm at the shoulder line and at the wrist, and model a quad tube of rings of 16
    vertices, each ring at a right angle to its bone (`wind_arms.step_cut_and_tube()`). Collapse
    the thin faces at the cut loops (`wind_arms.step_clean_cut()`).
@@ -111,6 +112,27 @@ ROOT_BAND = 1.5
 #: The share of the upper arm from the shoulder joint beyond which an arm vertex follows only the
 #: bones of its own arm (`step_paint()`).
 FREE_ARM = 0.5
+
+#: The steps of the color samples of each ray along each bone (`color_edges()`).
+EDGE_STEPS = 200
+
+#: The samples on each side of a step whose mean colors `color_edges()` compares.
+EDGE_WINDOW = 3
+
+#: The smallest distance of the two mean colors at a color edge, in sRGB from 0 to 1.
+EDGE_COLOR = 0.2
+
+#: Two changes on neighbor rays are one edge when their places along the bone differ by less than
+#: this share of the ring spacing.
+EDGE_LINK = 0.25
+
+#: The fewest rays of one edge. A shorter edge, such as the end of a stripe, gets no ring.
+EDGE_RAYS = 4
+
+#: An edge gets a ring when its places along the bone lie within this share of the ring spacing,
+#: and when it is at least this share of the ring spacing from the end rings and from the ring of
+#: another edge. A wider edge is slanted, and no ring at a right angle to the bone follows it.
+EDGE_SLANT = 0.5
 
 
 class Session(va.Session):
@@ -224,6 +246,164 @@ def zone_faces(s, bm, side):
     )
 
 
+def color_sampler(s):
+    """Gives a function of a ray from a point in a direction that gives the base color of the
+    source mesh where the ray hits it, as an sRGB array, or None for no hit within `RAY_REACH`.
+    The color comes from the image of the base color at the UV of the hit point."""
+    import numpy as np
+
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    bmesh.ops.triangulate(bm, faces=bm.faces[:])
+    bm.faces.ensure_lookup_table()
+    uv = bm.loops.layers.uv.active
+    bvh = BVHTree.FromBMesh(bm)
+    bsdf = next(n for n in s.mesh.data.materials[0].node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    image = bsdf.inputs['Base Color'].links[0].from_node.image
+    width, height = image.size
+    pixels = np.empty(width * height * 4, np.float32)
+    image.pixels.foreach_get(pixels)
+    pixels = pixels.reshape(height, width, 4)[:, :, :3]
+
+    def sample(point, direction):
+        hit = bvh.ray_cast(point, direction, s.units(RAY_REACH))
+        if hit[0] is None:
+            return None
+        loops = bm.faces[hit[2]].loops
+        a, b, c = (lp.vert.co for lp in loops)
+        v0, v1, v2 = b - a, c - a, hit[0] - a
+        d00, d01, d11, d20, d21 = v0.dot(v0), v0.dot(v1), v1.dot(v1), v2.dot(v0), v2.dot(v1)
+        den = d00 * d11 - d01 * d01
+        k1 = (d11 * d20 - d01 * d21) / den
+        k2 = (d00 * d21 - d01 * d20) / den
+        u, v = loops[0][uv].uv * (1 - k1 - k2) + loops[1][uv].uv * k1 + loops[2][uv].uv * k2
+        x = min(width - 1, max(0, int(u % 1.0 * width)))
+        y = min(height - 1, max(0, int(v % 1.0 * height)))
+        return pixels[y, x]
+
+    return sample
+
+
+def ray_changes(colors):
+    """Gives the steps of one ray where the color changes: the step between the samples i and
+    i + 1 when the mean colors of `EDGE_WINDOW` samples on each side differ by at least
+    `EDGE_COLOR`, the largest step of each run of such steps. A sample with no hit stops a window.
+    Gives each change as the share i + 0.5 of the steps."""
+    import numpy as np
+
+    near = []
+    for i in range(EDGE_WINDOW - 1, len(colors) - EDGE_WINDOW):
+        before = colors[i - EDGE_WINDOW + 1 : i + 1]
+        after = colors[i + 1 : i + 1 + EDGE_WINDOW]
+        if any(c is None for c in before + after):
+            near.append(0.0)
+            continue
+        near.append(float(np.linalg.norm(np.mean(before, axis=0) - np.mean(after, axis=0))))
+    out, run = [], []
+    for k, d in enumerate(near + [0.0]):
+        if d >= EDGE_COLOR:
+            run.append((d, k))
+        elif run:
+            out.append(max(run)[1] + EDGE_WINDOW - 1 + 0.5)
+            run = []
+    steps = len(colors) - 1
+    return [i / steps for i in out]
+
+
+def color_edges(s, sample, part, spacing, ends):
+    """Finds the color edges along one bone of both arms (`part` 0 the upper arm, 1 the forearm):
+    the shares of the bone where the face color of the source changes.
+
+    `RAYS` rays at a right angle to the bone sample the color (`sample` of `color_sampler()`) at
+    `EDGE_STEPS` steps along it, and each ray gives its changes (`ray_changes()`). Changes on
+    neighbor rays within `EDGE_LINK` of the ring spacing `spacing` (a share of the bone) join into
+    one edge. An edge of at least `EDGE_RAYS` rays whose shares lie within `EDGE_SLANT` of the
+    spacing gets a ring at its median share, and a wider edge is slanted. A ring must stand at least
+    `EDGE_SLANT` of the spacing inside `ends` and from the ring before it. The rings of the two arms
+    pair up: two rings within that distance give their mean, and a ring of one arm only goes.
+
+    Gives the shares of the rings, and the log of each edge: its share, its rays, its spread, and
+    the verdict `ring`, `slanted`, `near`, `short`, or `one side`.
+    """
+    rings, log = {}, []
+    for side in (1, -1):
+        line = va.arm_line(s, side)
+        a, b = line[part], line[part + 1]
+        axis = (b - a).normalized()
+        up = Vector((0, 0, 1))
+        ref = (up - axis * axis.dot(up)).normalized()
+        across = axis.cross(ref)
+        changes = []
+        for k in range(RAYS):
+            angle = 2 * math.pi * k / RAYS
+            direction = ref * math.cos(angle) + across * math.sin(angle)
+            colors = [sample(a.lerp(b, i / EDGE_STEPS), direction) for i in range(EDGE_STEPS + 1)]
+            changes += [(k, at) for at in ray_changes(colors)]
+        # Join the changes of neighbor rays into edges (one union of the changes).
+        root = list(range(len(changes)))
+
+        def find(i):
+            while root[i] != i:
+                root[i] = root[root[i]]
+                i = root[i]
+            return i
+
+        for i, (k, at) in enumerate(changes):
+            for j, (k2, at2) in enumerate(changes):
+                if (k2 - k) % RAYS == 1 and abs(at2 - at) < EDGE_LINK * spacing:
+                    root[find(i)] = find(j)
+        edges = {}
+        for i, change in enumerate(changes):
+            edges.setdefault(find(i), []).append(change)
+        kept = []
+        for edge in sorted(edges.values(), key=lambda e: median([at for _, at in e])):
+            shares = [at for _, at in edge]
+            at = median(shares)
+            spread = max(shares) - min(shares)
+            rays = len({k for k, _ in edge})
+            if rays < EDGE_RAYS:
+                verdict = 'short'
+            elif spread > EDGE_SLANT * spacing:
+                verdict = 'slanted'
+            elif not ends[0] + EDGE_SLANT * spacing <= at <= ends[1] - EDGE_SLANT * spacing:
+                verdict = 'near'
+            elif kept and at - kept[-1] < EDGE_SLANT * spacing:
+                verdict = 'near'
+            else:
+                verdict = 'ring'
+                kept.append(at)
+            log.append({'side': side, 'at': round(at, 4), 'rays': rays,
+                        'spread': round(spread, 4), 'verdict': verdict})
+        rings[side] = kept
+    out, alone = [], []
+    left = list(rings[1])
+    for at in rings[-1]:
+        mate = min(left, key=lambda x: abs(x - at), default=None)
+        if mate is not None and abs(mate - at) < EDGE_SLANT * spacing:
+            left.remove(mate)
+            out.append((mate + at) / 2)
+        else:
+            alone.append((-1, at))
+    alone += [(1, at) for at in left]
+    # An edge of one arm only gets no ring: the mesh is symmetric, so it is a spot of the paint.
+    for entry in log:
+        if (entry['side'], entry['at']) in {(side, round(at, 4)) for side, at in alone}:
+            entry['verdict'] = 'one side'
+    return [round(at, 4) for at in sorted(out)], log
+
+
+def ring_shares(ends, edges, spacing, least):
+    """Gives the shares of the rings of one bone between the shares `ends`, with no ring at the
+    ends: a ring at each color edge of `edges`, and rings at equal steps of about `spacing`
+    between them. With no edge, the span from end to end has at least `least` steps."""
+    points = [ends[0]] + list(edges) + [ends[1]]
+    out = []
+    for x0, x1 in zip(points, points[1:]):
+        count = max(least if len(points) == 2 else 1, round((x1 - x0) / spacing))
+        out += [x0 + (x1 - x0) * k / count for k in range(1, count)] + [x1]
+    return [round(at, 4) for at in out[:-1]]
+
+
 def step_measure(s):
     """Finds the settings of the rebuild from the joints and from rays through the source mesh,
     and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`:
@@ -233,12 +413,14 @@ def step_measure(s):
       `cut.wrist`: the first share of `WRIST_CUTS` with a closed loop around the paw.
     - `gap` and `wristGap`: `GAP_SHARE` of the median radius at the elbow and at the wrist.
     - `upper` and `fore`: the rings `RING_SPACING` radii apart, from the shoulder line to the
-      elbow ring, and from the elbow ring to the wrist ring.
+      elbow ring, and from the elbow ring to the wrist ring, with a ring at each color edge of
+      `color_edges()` (`ring_shares()`). With an edge on the forearm, `fore` is the tuple of the
+      shares of its rings.
     - `zone`: |x| `ZONE_X` of the shoulder joint, and `ZONE_RADIUS` of the largest hit of the
       free arm. `faces`: the faces of the zone, the most faces that a cut arm can have.
 
-    The settings of `--spec` (`s.overrides`) then replace these. Gives the settings as a dict for
-    the log.
+    The settings of `--spec` (`s.overrides`) then replace these. Gives the settings and the log of
+    the color edges as a dict.
     """
     bm = bmesh.new()
     bm.from_mesh(s.mesh.data)
@@ -307,16 +489,24 @@ def step_measure(s):
     fore_len = (w - e).length / s.fr.height
 
     end = 1 - spec['gap'] / upper_len
-    count = max(2, round((end - shoulder) * upper_len / (RING_SPACING * upper_r)))
-    spec['upper'] = tuple(
-        round(shoulder + (end - shoulder) * k / count, 4) for k in range(1, count)
-    )
-    span = fore_len - spec['gap'] - spec['wristGap']
-    spec['fore'] = max(3, round(span / (RING_SPACING * fore_r)) - 1)
+    spacing = RING_SPACING * upper_r / upper_len
+    sample = color_sampler(s)
+    edges, log = color_edges(s, sample, 0, spacing, (shoulder, end))
+    spec['upper'] = tuple(ring_shares((shoulder, end), edges, spacing, 2))
+    lo, hi = spec['gap'] / fore_len, 1 - spec['wristGap'] / fore_len
+    spacing = RING_SPACING * fore_r / fore_len
+    fore, more = color_edges(s, sample, 1, spacing, (lo, hi))
+    if fore:
+        spec['fore'] = tuple(ring_shares((lo, hi), fore, spacing, 4))
+    else:
+        span = fore_len - spec['gap'] - spec['wristGap']
+        spec['fore'] = max(3, round(span / (RING_SPACING * fore_r)) - 1)
     spec['faces'] = max(zone_faces(s, bm, side) for side in (1, -1))
     bm.free()
     spec.update(s.overrides)
-    return {k: spec[k] for k in ('cut', 'zone', 'gap', 'wristGap', 'upper', 'fore', 'faces')}
+    out = {k: spec[k] for k in ('cut', 'zone', 'gap', 'wristGap', 'upper', 'fore', 'faces')}
+    out['edges'] = {'upper': log, 'fore': more}
+    return out
 
 
 def cut_loop(s, side):
