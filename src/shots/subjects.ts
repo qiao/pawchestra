@@ -177,8 +177,6 @@ export interface StageSubjects {
   readonly conductor: ConductorSubjects | null;
   /** The heads of all players and of the conductor, for the foreground rule. */
   readonly heads: readonly StageHead[];
-  /** The bodies of all players and of the conductor, for the distance floor of a close shot. */
-  readonly bodies: readonly StageBody[];
   /** The seat of the soloist of the score (3.8), or `null`. */
   readonly soloist: number | null;
 }
@@ -630,7 +628,6 @@ export function prepareSubjects(
     bySeat[place.cast.seatIndex]?.push({ place, index });
   }
   const heads: StageHead[] = [];
-  const bodies: StageBody[] = [];
   const seats = score.seats.map((seat, i): SeatPlayers | null => {
     const places = bySeat[i] ?? [];
     if (seat.section === 'sound-only' || places.length === 0) {
@@ -644,7 +641,6 @@ export function prepareSubjects(
         const sights = modelSights(model);
         const center = onStage(sights.head, place);
         heads.push({ owner: index, center, radius: HEAD_RADIUS_IN_H * model.body.headHeight });
-        bodies.push(bodyAt(model, place));
         const { outline, top } = outlineOf(model, place);
 
         return {
@@ -674,7 +670,6 @@ export function prepareSubjects(
       center: sights.head,
       radius: HEAD_RADIUS_IN_H * bear.body.headHeight,
     });
-    bodies.push(bodyAt(bear, place));
     conductor = {
       target: [sights.head[0], sights.head[1] - SUBJECT_SIZES.conductorDrop, sights.head[2]],
       sights,
@@ -692,9 +687,27 @@ export function prepareSubjects(
     seats,
     conductor,
     heads,
-    bodies,
     soloist: score.soloist,
   };
+}
+
+/**
+ * Prepares the body of each animal of a layout (design 5.6): each player and the conductor in the
+ * bind pose, for the distance floor of a close shot.
+ *
+ * @param layout The layout of the score.
+ * @param models The player models of the score.
+ * @returns The bodies.
+ */
+export function prepareBodies(layout: SceneLayout, models: ModelCache): StageBody[] {
+  const bodies = layout.players.map((place) => {
+    const { species, instrument, kettles, support } = place.cast;
+    return bodyAt(models.get(species, instrument, kettles, support), place);
+  });
+  if (layout.conductor) {
+    bodies.push(bodyAt(models.get(CONDUCTOR.species, CONDUCTOR.instrument), layout.conductor));
+  }
+  return bodies;
 }
 
 /**

@@ -49,6 +49,7 @@ import {
   activeMiddle,
   conductorBackSubject,
   conductorCloseSubject,
+  prepareBodies,
   prepareSubjects,
   sectionSubject,
   sideOf,
@@ -534,6 +535,8 @@ interface PlannedShot {
 interface Planner {
   readonly music: ScoreMusic;
   readonly subjects: StageSubjects;
+  /** The body of each animal, for the distance floor of a close shot. */
+  readonly bodies: readonly StageBody[];
   readonly clearance: StageClearance;
   readonly stageSide: number;
   /** The camera of the master shot: the default view at the aspect of Cinematic mode. */
@@ -1090,7 +1093,7 @@ function moveNear(
     return dx * dx + dy * dy + dz * dz < (ANIMAL_FLOOR + radius + path) ** 2;
   };
   const near: StageBody[] = [];
-  for (const body of planner.subjects.bodies) {
+  for (const body of planner.bodies) {
     const parts = nearMiddle(body.center, body.radius)
       ? body.parts.filter((part) => nearMiddle(part.center, part.radius))
       : [];
@@ -2442,9 +2445,12 @@ function* planShotsSteps(
   yield;
   const subjects = prepareSubjects(score, layout, models);
   yield;
+  const bodies = prepareBodies(layout, models);
+  yield;
   const planner: Planner = {
     music,
     subjects,
+    bodies,
     clearance: prepareClearance(layout, models),
     stageSide: layout.stageSide,
     master: defaultView(layout.stageSide, CINEMA_ASPECT, 1).position,
