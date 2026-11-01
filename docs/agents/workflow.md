@@ -133,7 +133,8 @@ These rules hold for each test:
 - A sweep, such as `pnpm pose-depth` or `pnpm fold-probe`, reads the modules at its start. Do not
   edit or commit a module that it reads while it runs.
 - The probe cache keys each result by the tree. A commit during a run that you will read again
-  from the cache changes the key, and the next run starts cold.
+  from the cache changes the key, and the next run starts cold. The key has no environment
+  variable, so run a variant that only the environment sets with `PROBE_NO_CACHE=1`.
 - In the shell of an agent, `grep` is a shell function that runs ugrep with `--ignore-files`, so it
   skips `scratch/` and `node_modules/`. `command grep` runs the grep of the system.
 - Make a temporary edit with `perl -0pi -e`, because the `sed -i` of macOS needs a suffix. Make a
