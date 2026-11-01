@@ -93,6 +93,11 @@ def bake_object_transform(rig):
         fail(f'the armature has a scale that is not uniform: {tuple(scale)}')
     factor = scale[0]
     for action in bpy.data.actions:
+        for bag in channelbags(action):
+            # The keys of the object itself would bring the baked turn and scale back: an FBX
+            # file can key the scale of the armature object in each take.
+            for fc in [fc for fc in bag.fcurves if not fc.data_path.startswith('pose.bones[')]:
+                bag.fcurves.remove(fc)
         for fc in fcurves_of(action):
             if fc.data_path.startswith('pose.bones[') and fc.data_path.endswith('.location'):
                 for key in fc.keyframe_points:
