@@ -248,7 +248,7 @@ joints and the rules, each with a note.
 | Group | Config keys | Purpose |
 | --- | --- | --- |
 | Form | `armFactor`, `legFactor`, `headFactor`, `neckFactor`, `trunkFactor`, `girthFactor`, `proportions` | Change a part to a product choice or to the sheet. The head can keep its form. |
-| Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front`, `crease` | Bind a seated role in its pose of 5.2, with the haunch on the seat. |
+| Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front`, `crease`, `sitPose` | Bind a seated role in its pose of 5.2, with the haunch on the seat, or give a standing bind a sit pose. |
 | Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. |
 | Shapes | `raise` | Give the source back in the standing pose, and relax the faces of a bent arm. |
 | Arms | `upperTwist`, `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms`, `armSmooth` | Spread the roll of an arm along the arm, so the skin does not twist. |
@@ -355,6 +355,27 @@ each verdict.
   pose of their meshes. The rhino stands as a real tubist on a strap does.
 - A seated body that also stands as a soloist (`soloist` of `ANIMALS`) keeps the leg shapes of
   its sheet pose (`standingBody()` of `models/studio-rig.ts`).
+- A standing body that also sits takes the mirror (`StudioBody.sitting`, `seatedBody()`), so that
+  one bind serves the standing and the seated roles. The rig makes a sit pose with the steps of
+  a seated bind (`sitPose` of the config): the leg turns, the sit, and the creases. The shapes
+  `sit_L` and `sit_R` give that skin back from the standing bind. A seated player of the body
+  takes the leg turns and the shapes at their full weight, and sits on a chair that fits the sit
+  pose. The weight comes from the stance alone, so the pose stays stateless. The trunk and the
+  tail keep the bind, because a recline would also need the arm shapes again
+  (`StudioStanding.armTurns`). No body of the app has a sit pose yet.
+
+```typescript
+/** The seated pose of a standing studio body that also sits (`models/studio-format.ts`). */
+interface StudioSitting {
+  /** The move from the standing place to the seat: soles on the floor, chair fronts aligned. */
+  readonly drop: Vec3;
+  /** The world turn of each leg bone from the bind pose to the seated pose. */
+  readonly turns: Readonly<Record<StudioLegBone, Quat>>;
+  /** The seat height and the chair depth of the seated body. */
+  readonly seatHeight: number;
+  readonly chairDepth: number;
+}
+```
 
 ### Retarget and render
 
