@@ -192,7 +192,9 @@ Read the group of your work before you plan it.
 - The retarget turns each paw toward its forearm in the plane of the palm (`PAW_TURN`), up to 70°.
   A pose can give a paw its own turn (`pawTurnL`, `pawKeepR`).
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist. Supinate
-  the bind paw by about half of the play twist (`studio.bindSupination`).
+  the bind paw by about half of the play twist (`studio.bindSupination`), also with straight bind
+  arms: with no supination, the left violin paw flips at 180°. A body with two roles takes the
+  middle of their play twists.
 - `twistAngle()` flips when the paw turn passes 180°. Lower the twist of the hold, or move its zero
   with the bind paw. Carry no value from the last frame.
 - A turn of the bind forearm about the upper arm (`studio.bindArms`) moves the zero of the paw twist
