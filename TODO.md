@@ -279,7 +279,8 @@ passes.
       bodies needs them.
 - [ ] Wolf violinist (`violinist@wolf`, spike): the left paw goes 1.8 cm into the violin in the
       play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
-      The paw of the wolf is large for its smaller violin.
+      The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
+      goes 5.9 cm into the body in 2% of the samples.
 - [ ] Neutral arm bind (spike): with no bind supination, the left violin paw of the wolf twists
       176° to 180° on its forearm and flips in the lift and the lowering (17,992°/s). A bind
       supination in the middle of the twists of all roles of a body (left 100°, right 65°) passes
