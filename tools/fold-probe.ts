@@ -227,7 +227,8 @@ export function findSweep(name: string): RoleSweep | undefined {
 /**
  * Gives the obstacle of the body of a species for a recast role: the obstacle of a test species
  * (`TEST_BODY_OBSTACLES`), or the obstacle `body` of the sweep of the first role of
- * {@link FOLD_ROLES} with the species, such as the conductor for the bear.
+ * {@link FOLD_ROLES} with the species, such as the conductor for the bear. A role with no sweep of
+ * its own takes the sweep of its instrument, such as the violinist for the red fox.
  *
  * @param species The species.
  * @returns The obstacle.
@@ -241,8 +242,16 @@ export function homeBody(species: SpeciesId): SweepObstacle {
 
   const home = [...FOLD_ROLES].find(([, role]) =>
     role.kind === 'player' ? role.species.includes(species) : CONDUCTOR.species === species,
-  )?.[0];
-  const sweep = Object.entries(SWEEP_ROLES).find(([key]) => key === home)?.[1];
+  );
+  const sweepOf = (name: string): RoleSweep | undefined =>
+    Object.entries(SWEEP_ROLES).find(([key]) => key === name)?.[1];
+  const [name, role] = home ?? [];
+  const same = [...FOLD_ROLES].filter(
+    ([, other]) =>
+      role?.kind === 'player' && other.kind === 'player' && other.instrument === role.instrument,
+  );
+  const sweep =
+    (name === undefined ? undefined : sweepOf(name)) ?? same.map(([n]) => sweepOf(n)).find(Boolean);
   if (!sweep) {
     throw new Error(`The ${species} has no role of its own in SWEEP_ROLES.`);
   }
