@@ -521,9 +521,12 @@ scene of each demo has its seats and stage size with no overlap.
       blend from the rest pose of 5.2 into the clip and back. The gallery hides the instrument.
 - [ ] Clips: decide where a retargeted clip for the build lives outside git (design 8.1), such as a
       private folder that `pnpm deploy:vercel` reads.
-- [ ] Models: build `pnpm mixamo-model`, which writes the joints and the painted weights of a
-      Mixamo-rigged mesh (plan in `docs/design/04-stage-cast-look.md`, "Clips"). Blocked: the
-      project author decides the rule of the auto-rig output (design 8.1).
+- [ ] Models: rig a real Mixamo-rigged animal with `pnpm mixamo-model` and `pnpm rig-mesh`, and
+      give its arm segments their own weights. The spike rigged the animal mannequin with the
+      seat of the rhino config. Blocked: the project author decides the rule of the auto-rig output
+      (design 8.1).
+- [ ] Tool: `pnpm rig-mesh` stops on a mesh with no eye or nose faces (no gloss faces), because
+      `primitive_arrays()` of `rig_mesh.py` gets an empty material.
 
 Done when: the pose tests pass, and the pose and frame targets pass.
 
