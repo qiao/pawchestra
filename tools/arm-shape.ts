@@ -39,7 +39,7 @@ import { setHolds } from './hold-sets.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { SPECIES } from '../src/models/species.ts';
 import type { SpeciesParams } from '../src/models/species.ts';
-import { STUDIO_BODIES } from '../src/models/studio-body.ts';
+import { studioBodyOf } from '../src/models/studio-body.ts';
 import type { StudioBodyName } from '../src/models/studio-body.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
@@ -778,7 +778,7 @@ export function setBodyRules(
     }
     const value = parse(text);
     for (const name of bodies) {
-      const body = STUDIO_BODIES[name];
+      const body = studioBodyOf(name);
       const had = Object.hasOwn(body, key);
       const old: unknown = Object.entries(body).find(([k]) => k === key)?.[1];
       Reflect.set(body, key, value);

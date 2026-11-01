@@ -11,7 +11,7 @@ import type { MeshData, Rgb, Transform } from './mesh.ts';
 import { box, quad } from './primitives.ts';
 import { SPECIES } from './species.ts';
 import type { SpeciesParams } from './species.ts';
-import { STUDIO_BODIES } from './studio-body.ts';
+import { studioBodyOf } from './studio-body.ts';
 import type { StudioBody } from './studio-format.ts';
 
 /**
@@ -225,7 +225,7 @@ export const CHAIR_LEG = 0.035;
  * @returns The heights.
  */
 function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? STUDIO_BODIES[species.body] : null;
+  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
   if (!studio || studio.chairDepth === null) {
     return { seatHeight: legs, footHeight: 0 };
   }
@@ -243,7 +243,7 @@ function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
  * @returns The heights.
  */
 function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? STUDIO_BODIES[species.body] : null;
+  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
   if (!studio || studio.chairDepth === null) {
     return { seatHeight, footHeight: 0 };
   }
@@ -261,7 +261,7 @@ function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
  * @returns The heights.
  */
 function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? STUDIO_BODIES[species.body] : null;
+  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
   const seat = { seatHeight, footHeight: 0 };
   return studio?.benchDepth === undefined ? seat : { ...seat, seatDepth: studio.benchDepth };
 }

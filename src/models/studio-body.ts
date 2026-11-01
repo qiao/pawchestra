@@ -63,8 +63,83 @@ export const STUDIO_BODIES = {
   'studio-wolf': STUDIO_WOLF,
 } as const satisfies Readonly<Record<string, StudioBody>>;
 
-/** The name of a studio body of a species. */
-export type StudioBodyName = keyof typeof STUDIO_BODIES;
+/**
+ * The test bodies (design 4.4, "Test mannequin"), by the value of `SpeciesParams.body`, each with
+ * the load of its module: bodies of the rig chain that no section casts. The app loads no test
+ * body, so the first download has none. A role tool or the gallery loads them with
+ * {@link loadTestBodies} before it builds a player.
+ */
+const TEST_BODIES = {
+  'studio-mannequin': async (): Promise<StudioBody> =>
+    (await import('./studio/mannequin.ts')).STUDIO_MANNEQUIN,
+} as const;
+
+/** The name of a studio body of the app. */
+type AppBodyName = keyof typeof STUDIO_BODIES;
+
+/** The name of a test body. */
+type TestBodyName = keyof typeof TEST_BODIES;
+
+/** The name of a studio body of a species: a body of the app or a test body. */
+export type StudioBodyName = AppBodyName | TestBodyName;
+
+/** The test bodies that {@link loadTestBodies} loaded. */
+const testBodies = new Map<TestBodyName, StudioBody>();
+
+/**
+ * Loads the module of each test body (design 4.4, "Test mannequin"), so that a player can have it.
+ * Each module loads one time.
+ */
+export async function loadTestBodies(): Promise<void> {
+  const loads = Object.entries(TEST_BODIES).map(async ([name, load]) => {
+    if (isTestBody(name) && !testBodies.has(name)) {
+      testBodies.set(name, await load());
+    }
+  });
+  await Promise.all(loads);
+}
+
+/**
+ * Tells if a name is the name of a test body.
+ *
+ * @param name The name.
+ * @returns True for a key of {@link TEST_BODIES}.
+ */
+function isTestBody(name: string): name is TestBodyName {
+  return Object.hasOwn(TEST_BODIES, name);
+}
+
+/**
+ * Tells if a body name is the name of a body of the app.
+ *
+ * @param name The name of a studio body.
+ * @returns True for a key of {@link STUDIO_BODIES}.
+ */
+function isAppBody(name: StudioBodyName): name is AppBodyName {
+  return Object.hasOwn(STUDIO_BODIES, name);
+}
+
+/**
+ * Gives a studio body by its name: a body of the app, or a test body that
+ * {@link loadTestBodies} loaded.
+ *
+ * @param name The studio body.
+ * @returns The body.
+ * @throws Error if the name is a test body that is not loaded.
+ */
+export function studioBodyOf(name: StudioBodyName): StudioBody {
+  if (isAppBody(name)) {
+    return STUDIO_BODIES[name];
+  }
+
+  const body = testBodies.get(name);
+  if (!body) {
+    throw new Error(
+      `The test body ${name} is not loaded. Call loadTestBodies() before a player of a test species (design 4.4).`,
+    );
+  }
+  return body;
+}
 
 /** The rig of each studio body and stance, made on its first use. */
 const rigs = new Map<string, StudioRig>();
@@ -79,7 +154,7 @@ const rigs = new Map<string, StudioRig>();
  * @returns The rig.
  */
 export function studioRigOf(name: StudioBodyName, stands: boolean): StudioRig {
-  const body = STUDIO_BODIES[name];
+  const body = studioBodyOf(name);
   const key = `${name} ${stands && body.standing ? 'standing' : 'bind'}`;
   let rig = rigs.get(key);
   if (!rig) {
@@ -104,7 +179,7 @@ function colorsWith(name: StudioBodyName, palette: StudioPalette): Float32Array 
   const key = `${name} ${palette}`;
   let colors = paletteColors.get(key);
   if (!colors) {
-    const body: StudioBody = STUDIO_BODIES[name];
+    const body = studioBodyOf(name);
     const packed = body.palettes?.[palette];
     if (packed === undefined) {
       throw new Error(`The studio body ${name} has no ${palette} palette.`);
