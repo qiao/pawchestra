@@ -24,6 +24,12 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 - **`--glb <file>`.** Gives the animal the studio body of another GLB file, in a copy of `src/`
   (`tools/glb-swap.ts`). `ANIMALS`, `assets/`, and `src/` do not change, also after Ctrl-C, so a
   file of `rig-mesh --check --keep` needs no copy and no `pnpm studio-body`.
+- **Recast role `<role>@<species>`.** The role tools (`fold-probe`, `arm-check`, `pose-depth`,
+  `hold-fit`, `close-views`, `arm-look`, `carry-check`) take a role with another species, such as
+  `violinist@wolf`. The species gets the seats and the instrument of the role in each demo scene
+  (`findRole()` of `tools/fold-probe.ts`), and keeps the body sweep of its own role. The gallery
+  shows it with `?only=violin@wolf`. `--base` needs a commit with the same recast, and
+  `arm-check --views` and `close-views batch` take no recast role.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
 - **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
