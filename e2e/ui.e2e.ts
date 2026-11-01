@@ -283,6 +283,8 @@ test.describe('the labels of the "Playback" group (audit 2026-10-05-ux-design, P
     await page.goto('./');
     await page.waitForSelector('#stage[data-demo]');
     await page.locator('.bar button[aria-expanded]').click();
+    // The group is in the tab "Settings", and the drawer opens at the tab "Music" (design 2.3).
+    await page.getByRole('tab', { name: 'Settings' }).click();
     const group = page.getByRole('group', { name: 'Playback' });
     await group.scrollIntoViewIfNeeded();
     for (const label of ['Speed', 'Volume', 'Reset view']) {
