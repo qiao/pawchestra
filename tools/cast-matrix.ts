@@ -9,8 +9,9 @@
  *   of the species from `SPECIES_HOLDS` and `SPECIES_WIND_HOLDS` in memory. The own role of a
  *   species keeps its own hold and its own instrument scale.
  * - **Scale.** A recast pair with a violin or a viola takes the scale of the rule of a violin shop
- *   (`ruleSize()` of `tools/hold-reach.ts`), clamped to the real sizes ({@link REAL_LENGTHS}). Each
- *   other instrument keeps the scale 1, and the cell says so ({@link ScaleSource}).
+ *   (`ruleSize()` of `tools/hold-reach.ts`), clamped to the real sizes ({@link REAL_LENGTHS}), and a
+ *   cello the scale of the cello rule (`celloRule()` of `tools/cello-size.ts`). Each other
+ *   instrument keeps the scale 1, and the cell says so ({@link ScaleSource}).
  * - **Verdict.** A value of the gate over its limit fails, a clip over the limit of its pair fails,
  *   and a note target missed by more than the limit of the role fails. A value is open when the own
  *   pair of the role is over the same limit and the value is not worse by more than the margin of
@@ -35,6 +36,7 @@ import { dirname, join, resolve } from 'node:path';
 import { ACCEPTED_GRIPS, ARM_LIMITS, gateRows, probeRole } from './arm-check.ts';
 import type { GateRow, Measure, RoleReport } from './arm-check.ts';
 import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
+import { celloRule } from './cello-size.ts';
 import { REAL_VIOLINS, holdReach, ruleSize } from './hold-reach.ts';
 import { sampleAt, sweepDemos } from './pose-depth.ts';
 import type { TargetReach } from './pose-depth.ts';
@@ -368,8 +370,9 @@ function useSharedHold(species: SpeciesId, instrument: InstrumentId): void {
 
 /**
  * Sets the instrument scale of a recast species in memory, and gives it: the rule of a violin shop
- * for a violin or a viola, clamped to {@link REAL_LENGTHS}, else 1. Run it after
- * {@link useSharedHold}, because the rule poses the hold.
+ * for a violin or a viola, clamped to {@link REAL_LENGTHS}, the cello rule for a cello
+ * (`celloRule()` of `tools/cello-size.ts`), else 1. Run it after {@link useSharedHold}, because
+ * the rules pose the hold.
  *
  * @param species The species.
  * @param instrument The instrument.
@@ -383,6 +386,13 @@ function setRecastScale(species: SpeciesId, instrument: InstrumentId): PairScale
   const params: SpeciesParams = SPECIES[species];
   const param = SCALE_PARAMS[instrument];
   Reflect.deleteProperty(params, param);
+  if (instrument === 'cello') {
+    const cello = celloRule(species);
+    const source =
+      cello.source === 'smallest' || cello.source === 'largest' ? cello.source : 'rule';
+    Reflect.set(params, param, cello.scale);
+    return { value: cello.scale, source };
+  }
   if (instrument !== 'violin' && instrument !== 'viola') {
     return { value: 1, source: 'none' };
   }
