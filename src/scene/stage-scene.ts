@@ -51,7 +51,7 @@ import { createMaterials } from './geometry.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
 import { letterbox, letterboxShare, mixBox, stepLetterbox, uvRectOf } from './letterbox.ts';
-import type { FrameBox } from './letterbox.ts';
+import type { UvRect } from './letterbox.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
@@ -104,14 +104,6 @@ function vignetteOf(light: number, cinema: number): number {
   const boost = SHOT_LOOK.vignette / POST_LOOK.vignette;
   const frame = FRAME_VIGNETTE.strength * (1 + (boost - 1) * light);
   return free + (frame - free) * cinema;
-}
-
-/** The letterbox of one frame (design 2.5). */
-interface LetterboxFrame {
-  /** The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode). */
-  readonly share: number;
-  /** The part of the canvas that shows the scene, for the post effects. */
-  readonly view: PostView;
 }
 
 /** The inputs of {@link StageScene}. */
@@ -426,8 +418,6 @@ export class StageScene {
   #letterbox = 0;
   /** The time of the last move of the letterbox bars, in milliseconds, or `null` before it. */
   #letterboxMs: number | null = null;
-  /** The part of the canvas that showed the scene in the last frame, in CSS pixels. */
-  #visible: FrameBox = { x: 0.5, y: 0.5, width: 1, height: 1 };
 
   /**
    * Creates the renderer on a canvas. The scene shows nothing until {@link StageScene.show}.
@@ -949,27 +939,27 @@ export class StageScene {
    *
    * @param cinematic True in Cinematic mode.
    * @param nowMs The time of the frame, in milliseconds.
-   * @returns The share of the letterbox, from 0 to 1, and the view of the post effects.
+   * @returns The view of the post effects, with the share of the letterbox, from 0 to 1.
    */
-  #followLetterbox(cinematic: boolean, nowMs: number): LetterboxFrame {
+  #followLetterbox(cinematic: boolean, nowMs: number): PostView {
     const last = this.#letterboxMs;
     const dtMs = last === null || this.#reducedMotion ? Infinity : nowMs - last;
     this.#letterboxMs = nowMs;
     this.#letterbox = stepLetterbox(this.#letterbox, cinematic, dtMs);
     const share = letterboxShare(this.#letterbox);
+    if (share <= 0) {
+      return { rect: null, imageHeight: 1, cinema: 0 };
+    }
 
     const width = this.#width;
     const height = this.#height;
-    const full = { x: width / 2, y: height / 2, width, height };
-    if (share <= 0) {
-      this.#visible = full;
-      return { share, view: { rect: null, imageHeight: 1, cinema: 0 } };
-    }
     const frame = letterbox(width, height);
-    this.#visible = mixBox(full, frame, share);
-    const imageHeight = 1 + (frame.height / height - 1) * share;
-    const rect = uvRectOf(this.#visible, width, height);
-    return { share, view: { rect, imageHeight, cinema: share } };
+    const visible = mixBox({ x: width / 2, y: height / 2, width, height }, frame, share);
+    return {
+      rect: uvRectOf(visible, width, height),
+      imageHeight: 1 + (frame.height / height - 1) * share,
+      cinema: share,
+    };
   }
 
   /**
@@ -1004,8 +994,8 @@ export class StageScene {
       light = freeShotLight(view.stageSide, this.aspect, [x, y, z]);
     }
     this.#lightShot(view, light, spot);
-    const { share, view: postView } = this.#followLetterbox(shot !== null, performance.now());
-    view.camera.frameTo(cover, ring, performance.now(), share);
+    const postView = this.#followLetterbox(shot !== null, performance.now());
+    view.camera.frameTo(cover, ring, performance.now(), postView.cinema);
     const foot = this.#followAim(view, performance.now());
     const camera = view.camera.camera;
     const timeSec = effectTime(performance.now(), this.#reducedMotion);
@@ -1033,14 +1023,14 @@ export class StageScene {
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
-        const vignette = vignetteOf(light, share);
+        const vignette = vignetteOf(light, postView.cinema);
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, {
           haze,
           vignette,
           view: postView,
         });
       } else {
-        this.#scissorCanvas(postView.rect !== null);
+        this.#scissorCanvas(postView.rect);
         this.#renderer.render(view.scene, camera);
       }
     });
@@ -1052,16 +1042,20 @@ export class StageScene {
    * Limits the render to the canvas to the letterbox, with no post effects (design 2.5). The
    * browser clears the canvas before each frame, so the bars stay black.
    *
-   * @param cropped True to limit the render to the visible part of the frame (`#visible`).
+   * @param rect The part of the canvas that shows the scene, or `null` for the full canvas.
    */
-  #scissorCanvas(cropped: boolean): void {
+  #scissorCanvas(rect: UvRect | null): void {
     const renderer = this.#renderer;
-    renderer.setScissorTest(cropped);
-    if (cropped) {
-      const box = this.#visible;
-      const left = box.x - box.width / 2;
-      const bottom = this.#height - (box.y + box.height / 2);
-      renderer.setScissor(left, bottom, box.width, box.height);
+    renderer.setScissorTest(rect !== null);
+    if (rect) {
+      const width = this.#width;
+      const height = this.#height;
+      renderer.setScissor(
+        rect.left * width,
+        rect.bottom * height,
+        (rect.right - rect.left) * width,
+        (rect.top - rect.bottom) * height,
+      );
     }
   }
 
