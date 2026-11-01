@@ -352,10 +352,10 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the elbow and the wrist of the rest shape keep the angles of the source (8 and 22 degrees between the joints). Thus the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape. The clarinet and the violin (violinist@wolf) both pass the arm gate with this bind. A bind bent for one hold (the elbow 62 degrees, the paw 25 degrees) gives a rest shape with the inner elbow and wrist skin pressed for that hold, and each other hold blends its own bend on top.",
     "bindSupination": {
-      "L": 100,
-      "R": 65
+      "L": 57,
+      "R": 15
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 100 degrees and the right 65 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The bind paw sets the zero of the paw twist. Each value is near the middle of the play twists of the clarinet hold and the violin hold, so that the paw twist of each hold stays far below 180 degrees: the left paw twists about 69 degrees in the clarinet hold and about -83 degrees in the violin hold. With no supination, the left violin paw twists about 177 degrees, and the twist measure flips at 180 degrees.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 57 degrees and the right 15 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The bind paw sets the zero of the paw twist. Each value makes the largest paw twist p95 of the six roles of the cast matrix smallest (design 4.4): about 128 degrees on the left (the flute and the snare drum) and 90 degrees on the right (the cello and the snare drum). The middle of the clarinet and the violin twists alone (the left 100 degrees) put the left snare drum paw at about 171 degrees.",
     "tailBind": {
       "tail": [
         0,
