@@ -86,6 +86,7 @@ front of a row grows with the height of the next row (`GAP`, `LABEL_DEPTH`). The
 | `lift=<share>`, `lower=<share>` | Show each animal at a share (0 to 1) of its lift or of its lowering, after its seeded delay (`moveTransport()`). |
 | `probe=colors`, `normals`, `noshadow` | Show the face colors, the normals, or no shadow on the bodies (`applyProbe()`). |
 | `fill=<lux>` | Add a light from the camera, so that a close view shows the side that the key light leaves dark. |
+| `clip=<file>[:<animation>]` | Play a clip of `clips/<file>.glb` on each animal at the time of the slider (4.4). The animals stand, and the instrument hides. |
 
 `pnpm close-views` uses these queries to show the moments and the views of each role of
 `ROLE_VIEWS` in one grid, and `pnpm choir-check` to compare the penguin with the reference images.
