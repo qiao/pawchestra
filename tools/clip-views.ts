@@ -373,6 +373,8 @@ async function speciesCells(
         if ((await page.getAttribute('canvas', 'data-clip')) !== 'ready') {
           throw new Error(`The clip did not load: ${(await page.textContent('#status')) ?? ''}`);
         }
+        // The dev server can show the page before its style sheet and its first frame.
+        await page.waitForSelector('canvas[data-ready]', { timeout: 120_000 });
         await page.addStyleTag({ content: '#controls, #labels { display: none; }' });
         await page.evaluate((value) => {
           const slider = document.querySelector('#time');
