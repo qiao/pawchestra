@@ -397,6 +397,8 @@ test('the settings explain their values (audit 2026-10-05-ux-design, DR4)', asyn
   await page.goto('./');
   await page.waitForSelector('#stage[data-demo]');
   await page.locator('.bar button[aria-expanded]').click();
+  // The settings are in the tab "Settings", and the drawer opens at the tab "Music" (design 2.3).
+  await page.getByRole('tab', { name: 'Settings' }).click();
   await expect(page.getByRole('group', { name: 'Section size' })).toContainText('Auto (Full)');
   await expect(page.getByRole('group', { name: 'Quality' })).toContainText(
     /Auto \((High|Medium|Low)\)/u,
