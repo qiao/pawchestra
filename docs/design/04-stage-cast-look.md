@@ -378,6 +378,11 @@ interface PlayerClip {
   (`ZOOPHONY_CLIPS`, `scratch/clips/` by default), so `dist/` gets no Mixamo file (8.1).
   `pnpm clip-views` shows a clip from the four sides, and measures the floor depth and the depth
   of each arm part in the body.
+- **Models.** `pnpm mixamo-model` reads a Mixamo-rigged mesh, and writes the inputs of
+  `pnpm rig-mesh`: the mesh alone as the source, the joints and the palm of the config, and a
+  `paintedWeights` file from the skin. Mixamo has no twist bone, so the forearm weight moves to
+  the twist bone along the forearm (`TWIST_RAMP`). Mixamo has no ears and no tail, so the rigger
+  adds their joints. The rig then adds the eyes, the palms, and the seat.
 
 ## 4.5 Visual values
 
