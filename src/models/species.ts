@@ -556,13 +556,16 @@ export const SPECIES = {
    * rig-mesh mannequin` rigs. No section casts it. The role tools test the rig chain with the
    * recast roles `violinist@mannequin` and `clarinetist@mannequin`. The app does not load its
    * body (`loadTestBodies()` of `studio-body.ts`), so the head height and the seat height are the
-   * values of `src/models/studio/mannequin.ts`, which `pnpm studio-body mannequin` writes.
+   * values of `src/models/studio/mannequin.ts`, which `pnpm studio-body mannequin` writes. The
+   * violin size is the rule of a violin shop for the arm of the mannequin with the violin on the
+   * shoulder (0.704), rounded to 0.7 (`pnpm hold-reach mannequin --instrument violin`).
    */
   mannequin: {
     body: 'studio-mannequin',
     colors: SPECIES_COLORS.mannequin,
     headHeight: 0.453483,
     seatHeight: 0.239596 / 0.453483,
+    violinScale: 0.7,
   },
 } as const satisfies Readonly<Record<SpeciesId, SpeciesParams>>;
 
