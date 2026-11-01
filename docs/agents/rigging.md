@@ -55,9 +55,6 @@ studio, then pack it into a module that the app reads.
  src/models/studio/<a>.ts --> STUDIO_BODIES --> SPECIES[<s>].body
 ```
 
-The app keeps its own motion: `poseStudioBones()` of `src/models/studio-rig.ts` drives the studio
-bones from the pose of the player on each frame.
-
 Test a change of the chain on the test mannequin first (`assets/models/mannequin/`, design 4.4):
 `pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
 Its mesh has clean quad rings and twist markers, so a fault there comes from the chain.
@@ -142,7 +139,8 @@ trunk down to the elbow (`cat_arms.py`).
 1. Import the source, and run Merge by Distance, because automatic weights fail on split seams.
 2. Bisect each arm at the shoulder line and at the wrist, and delete the faces between the cuts.
 3. Build a quad tube of rings of 16 vertices, about 0.45 arm radii apart, with a ring on each side
-   of the elbow and the wrist. Each ring stands at a right angle to its bone.
+   of the elbow and the wrist, and at each color edge of the old arm. Each ring stands at a right
+   angle to its bone. A slanted color edge keeps its zigzag (`colorBlend` softens it).
 4. Shrinkwrap the tube onto a hidden copy of the old arm, and join it to the trunk and the paw with
    Bridge Edge Loops.
 5. Bake the fur color of the old arm onto a UV strip of the atlas, and transfer the custom normals
