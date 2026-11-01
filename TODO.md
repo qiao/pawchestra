@@ -528,8 +528,9 @@ each control.
 
 - [ ] Take frames of each kind of shot of each demo at both sizes, and the GIF, and check them
       against 5.6 (9.8).
-- [ ] Put the title in the top bar of the letterbox where it fits, as the control bar is in the
-      bottom bar. At 844 × 390 and 2560 × 1080 the shown title covers the top of the film (2.3).
+- [ ] Check the title in the frame at 844 × 390: it covers about 30% of the frame height at the
+      left. A smaller title in Cinematic mode, or a fade some seconds after a piece starts, can
+      help (2.3).
 - [ ] Let the smoke test check Cinematic mode: the letterbox, and the rule that hides the whole UI.
       No end-to-end test uses Cinematic mode now (2.3, 2.5).
 - [ ] Check the letterbox on a GPU with no float target. That path has no post effects, and it uses
