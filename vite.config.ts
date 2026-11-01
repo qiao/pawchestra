@@ -1,5 +1,6 @@
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { Plugin } from 'vite';
+import type { Connect, Plugin } from 'vite';
 import { LICENSES_FILE } from './src/app/credits.ts';
 import { DEFAULT_DEMO, DEMOS, demoUrl } from './src/app/demos.ts';
 import {
@@ -249,11 +250,66 @@ const DEV_LICENSES: Plugin = {
   },
 };
 
+/**
+ * Makes the handler that serves the local clip files at `clips/<name>.glb` (design 4.4, 8.1). The
+ * folder is `ZOOPHONY_CLIPS`, or `scratch/clips/` of the root. Git ignores `scratch/`, so a Mixamo
+ * file there stays out of git. A name holds only letters, digits, `.`, `_`, and `-`.
+ *
+ * @param base The base path of the site.
+ * @param root The root of the project.
+ * @returns The handler of the server.
+ */
+function clipFiles(base: string, root: string): Connect.NextHandleFunction {
+  const dir = process.env['ZOOPHONY_CLIPS'] ?? resolve(root, 'scratch', 'clips');
+  return (request, response, next) => {
+    const match = /^clips\/([\w.-]+\.glb)$/u.exec(
+      (request.url ?? '').split('?')[0]?.slice(base.length) ?? '',
+    );
+    if (!match?.[1]) {
+      next();
+      return;
+    }
+    readFile(resolve(dir, match[1])).then(
+      (bytes) => {
+        response.setHeader('Content-Type', 'model/gltf-binary');
+        response.end(bytes);
+      },
+      () => {
+        response.statusCode = 404;
+        response.end();
+      },
+    );
+  };
+}
+
+/**
+ * The plugin that serves the local clip files of the gallery query `clip` in the dev server and
+ * in the preview server (design 4.4). The build gets no clip file, because the license of a
+ * Mixamo file permits no stand-alone copy (design 8.1).
+ */
+const LOCAL_CLIPS: Plugin = {
+  name: 'zoophony:local-clips',
+  configureServer(server) {
+    server.middlewares.use(clipFiles(server.config.base, server.config.root));
+  },
+  configurePreviewServer(server) {
+    server.middlewares.use(clipFiles(server.config.base, server.config.root));
+  },
+};
+
 export default defineConfig({
   base: BASE,
   // `src/main.ts` reads the constant. A build with no analytics drops the code of the package.
   define: { ZOOPHONY_ANALYTICS: JSON.stringify(ANALYTICS) },
-  plugins: [DEV_LOOK_OVERRIDE, INDEX_VALUES, SITE_PAGES, INLINE_CSS, GZIP_AUDIO, DEV_LICENSES],
+  plugins: [
+    DEV_LOOK_OVERRIDE,
+    INDEX_VALUES,
+    SITE_PAGES,
+    INLINE_CSS,
+    GZIP_AUDIO,
+    DEV_LICENSES,
+    LOCAL_CLIPS,
+  ],
   build: {
     // tools/size.ts reads the manifest to find the static imports of the entry chunk.
     manifest: true,
