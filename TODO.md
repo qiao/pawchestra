@@ -274,6 +274,19 @@ passes.
       (percussion-technique 5).
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
+- [ ] Recast roles: `pnpm close-views batch` and `pnpm arm-check --views` take no recast role
+      `<role>@<species>`, and `--base` needs a commit with the recast. A migration to role-neutral
+      bodies needs them.
+- [ ] Wolf violinist (`violinist@wolf`, spike): the left paw goes 1.8 cm into the violin in the
+      play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
+      The paw of the wolf is large for its smaller violin.
+- [ ] Neutral arm bind (spike): with no bind supination, the left violin paw of the wolf twists
+      176° to 180° on its forearm and flips in the lift and the lowering (17,992°/s). A bind
+      supination in the middle of the twists of all roles of a body (left 100°, right 65°) passes
+      the gate of both roles. Decide the migration with the report of the spike.
+- [ ] Neutral arm bind (spike): `ACCEPTED_GRIPS` counts from the bind, so each new bind moves each
+      grip of the body (the wolf clarinetist: 49° to 70°). Store the grips in a frame of the
+      forearm that no bind moves before a migration.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
