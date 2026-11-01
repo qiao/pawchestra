@@ -55,8 +55,9 @@ The UI has the style of a video player. The theme is dark only, because the scen
   the bottom of the frame.
 - In Cinematic mode, the title (the logo, the piece title, the composer, and the link to GitHub)
   stands at the top-left corner of the frame, at the insets of Free mode, so that it stays with
-  the film. It moves with the bars (`--letterbox` and `--letterbox-side` of `ui/ui.css`). A window in portrait has a low frame and a high top bar, so
-  there the title stays at the top of the window and covers no part of the frame.
+  the film. It moves with the bars (`--letterbox` and `--letterbox-side` of `ui/ui.css`). A
+  window in portrait has a low frame and a high top bar, so there the title stays at the top of
+  the window and covers no part of the frame.
 - In Cinematic mode during play, all controls and panels but the title hide after the same time:
   the bar, the drawer (also when it is open), each tooltip, and the pointer (`uiShown()` of
   `app/bar-rules.ts`). The title always shows, because it names the piece of the film. A pointer
