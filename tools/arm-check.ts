@@ -87,6 +87,11 @@
  * prints each value whose verdict or written value changed ({@link compareLines}), so that a try
  * of a weight or a hold shows its changes against the last try with no scratch reader.
  *
+ * `--world --base <ref>` gives the largest move of the posed joints and palms of each arm between
+ * the commit and the working tree at the samples of the gate ({@link probeWorld}), with no gate. A
+ * rebind round thus proves in one run that the new bind poses the same bones. It takes `--set` and
+ * `--glb` for the working tree, and exits with 1 when a joint or a palm moves.
+ *
  * `--variant <name>` starts a variant of the holds, and each `--set` after it adds its changes to
  * the variant. Several `--variant` groups give several variants in one run ({@link checkVariants}).
  * Each variant of each role runs as one child, as a run with its `--set` options alone, with its
@@ -2155,13 +2160,15 @@ export interface CheckArgs {
   readonly explain: Explained | null;
   /** The file of `--json` for the lines of the gate ({@link GateFile}), or `null`. */
   readonly json: string | null;
+  /** True for `--world`: the posed joints and palms against the base ({@link checkWorld}). */
+  readonly world: boolean;
   /** The file of `--compare`: the lines of an earlier run ({@link GateFile}), or `null`. */
   readonly compare: string | null;
 }
 
 /** The usage text. */
 const USAGE =
-  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
+  'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>], or pnpm arm-check <role>... | --all --world --base <ref> [--set <changes>]... [--glb <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
 
 /** One variant of `--variant`: a name and the changes of the holds of its `--set` options. */
 export interface ArmVariant {
@@ -2237,7 +2244,7 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     '--json',
     '--compare',
   ]);
-  const flags = new Set(['--all', '--views-all', '--long']);
+  const flags = new Set(['--all', '--views-all', '--long', '--world']);
   const roles: string[] = [];
   const values = new Map<string, string[]>();
   const seen = new Set<string>();
@@ -2333,6 +2340,13 @@ export function checkArgs(args: readonly string[]): CheckArgs {
       `The options --json and --compare take the lines of the gate, and no ${lineless.join(', ')}.\n${USAGE}`,
     );
   }
+  const worldless = ['--trace', '--explain', '--states', '--variant', '--views', '--json'];
+  const notWorld = worldless.filter((o) => values.has(o));
+  if (seen.has('--world') && (!values.has('--base') || notWorld.length > 0)) {
+    throw new Error(
+      `The option --world takes --base, and no ${notWorld.join(', ') || 'option of another mode'}.\n${USAGE}`,
+    );
+  }
   const variants = variantGroups(args);
   const single = ['--trace', '--explain', '--states', '--views'].filter((o) => values.has(o));
   if (variants.length > 0 && single.length > 0) {
@@ -2362,6 +2376,7 @@ export function checkArgs(args: readonly string[]): CheckArgs {
     states,
     explain,
     json: values.has('--json') ? resolve(values.get('--json')?.[0] ?? '') : null,
+    world: seen.has('--world'),
     compare: values.has('--compare') ? resolve(values.get('--compare')?.[0] ?? '') : null,
   };
 }
@@ -3025,6 +3040,202 @@ async function explainRole(
   return explainLines(role, source, demos, options.step ?? GATE_STEP, measure);
 }
 
+/** The format version of {@link WorldJson}. */
+const WORLD_FORMAT = 1;
+
+/** The numbers of each sample of one arm in {@link WorldSamples}: a place for each bone, a palm. */
+const WORLD_STRIDE = BIND_BONES.length * 3 + 3;
+
+/** The posed joints and palms of one role at each sample of the gate (`--world`). */
+export interface WorldSamples {
+  /** The label of each sample: the demo and the time. */
+  readonly labels: readonly string[];
+  /**
+   * For each sample of each arm: the posed head of each bone of {@link BIND_BONES} in meters, then
+   * the unit palm, as {@link WORLD_STRIDE} numbers.
+   */
+  readonly arms: Readonly<Record<Side, readonly number[]>>;
+}
+
+/** The JSON text of a child of `--world` for one tree. */
+export interface WorldJson {
+  /** The format version ({@link WORLD_FORMAT}). */
+  readonly version: number;
+  /** The samples of each role. */
+  readonly roles: Readonly<Partial<Record<string, WorldSamples>>>;
+}
+
+/** A move of a joint above this distance, in meters, is no longer the same bone. */
+export const WORLD_MOVE = 1e-4;
+
+/** A turn of a palm above this angle, in degrees, is no longer the same palm. */
+export const WORLD_TURN = 0.1;
+
+/**
+ * Gives the posed head of each bone of {@link BIND_BONES} and the posed palm of each arm at each
+ * sample of the rest, the play, and the lift of `probeFolds()`: the bind head and the bind palm
+ * through the skin matrix of the bone. A body with another bind in the same pose of the bones
+ * gives the same places and palms.
+ *
+ * @param role The role.
+ * @param demos The demos.
+ * @param step The step of the play, in seconds.
+ * @returns The samples.
+ */
+export function probeWorld(
+  role: RoleSource,
+  demos: readonly DemoFile[],
+  step: number,
+): WorldSamples {
+  const labels: string[] = [];
+  const arms: Record<Side, number[]> = { L: [], R: [] };
+  const round = (value: number): number => Math.round(value * 1e6) / 1e6;
+  const point = new Vector3();
+  for (const demo of demos) {
+    probeFolds(role, [demo], step, (...[rig, studio, , , , label]) => {
+      labels.push(label);
+      for (const side of SIDES) {
+        for (const bone of BIND_BONES) {
+          const name: StudioBone = `${bone}_${side}`;
+          const matrix = matrixOf(studio.matrices, STUDIO_BONES.indexOf(name));
+          point.fromArray(rig.body.heads[name]).applyMatrix4(matrix);
+          arms[side].push(round(point.x), round(point.y), round(point.z));
+        }
+        const hand = matrixOf(studio.matrices, STUDIO_BONES.indexOf(`hand_${side}`));
+        point.fromArray(rig.body.palms[side]).transformDirection(hand);
+        arms[side].push(round(point.x), round(point.y), round(point.z));
+      }
+    });
+  }
+  return { labels, arms };
+}
+
+/** The largest move of one arm of one role between two trees (`--world`). */
+export interface WorldMove {
+  /** The role. */
+  readonly role: string;
+  /** The arm. */
+  readonly side: Side;
+  /** The number of samples that both trees have. */
+  readonly samples: number;
+  /** The largest move of a posed joint, in meters. */
+  readonly move: number;
+  /** The bone and the sample of the largest move. */
+  readonly moveAt: string;
+  /** The largest turn of the posed palm, in degrees. */
+  readonly turn: number;
+  /** The sample of the largest turn. */
+  readonly turnAt: string;
+}
+
+/**
+ * Gives the largest move of the posed joints and the largest turn of the posed palm of each arm
+ * between the samples of the base and of the working tree with the same label.
+ *
+ * @param role The role.
+ * @param base The samples of the base.
+ * @param tree The samples of the working tree.
+ * @returns The move of each arm.
+ */
+export function worldMoves(role: string, base: WorldSamples, tree: WorldSamples): WorldMove[] {
+  const index = new Map(base.labels.map((label, k) => [label, k]));
+  return SIDES.map((side) => {
+    let found: WorldMove = { role, side, samples: 0, move: 0, moveAt: '-', turn: 0, turnAt: '-' };
+    for (const [k, label] of tree.labels.entries()) {
+      const b = index.get(label);
+      if (b === undefined) {
+        continue;
+      }
+      const at = (list: readonly number[], sample: number, i: number): number =>
+        list[sample * WORLD_STRIDE + i] ?? Number.NaN;
+      let { move, moveAt, turn, turnAt } = found;
+      for (const [j, bone] of BIND_BONES.entries()) {
+        const d = Math.hypot(
+          ...[0, 1, 2].map(
+            (c) => at(tree.arms[side], k, j * 3 + c) - at(base.arms[side], b, j * 3 + c),
+          ),
+        );
+        if (d > move) {
+          move = d;
+          moveAt = `${bone}_${side}, ${label}`;
+        }
+      }
+      const palm = BIND_BONES.length * 3;
+      const [tx = 0, ty = 0, tz = 0] = [0, 1, 2].map((c) => at(tree.arms[side], k, palm + c));
+      const [bx = 0, by = 0, bz = 0] = [0, 1, 2].map((c) => at(base.arms[side], b, palm + c));
+      // The angle from the cross product and the dot product stays exact near 0°, where an arc
+      // cosine of the rounded palms gives about 0.1°.
+      const cross = Math.hypot(ty * bz - tz * by, tz * bx - tx * bz, tx * by - ty * bx);
+      const angle = (Math.atan2(cross, tx * bx + ty * by + tz * bz) * 180) / Math.PI;
+      if (angle > turn) {
+        turn = angle;
+        turnAt = label;
+      }
+      found = { role, side, samples: found.samples + 1, move, moveAt, turn, turnAt };
+    }
+    return found;
+  });
+}
+
+/**
+ * Writes the table of `--world`: the largest move of a posed joint and the largest turn of the
+ * posed palm of each arm, with `SAME` when both stay within {@link WORLD_MOVE} and
+ * {@link WORLD_TURN}, and `MOVED` else.
+ *
+ * @param moves The moves of each arm of each role.
+ * @param ref The commit of the base.
+ * @returns The lines.
+ */
+export function worldLines(moves: readonly WorldMove[], ref: string): string[] {
+  return [
+    `The posed joints (${BIND_BONES.join(', ')}) and palms of the working tree against ${ref}, at each sample of the rest, the play, and the lift that both trees have. SAME: no joint moves more than ${(WORLD_MOVE * 100).toFixed(2)} cm, and no palm turns more than ${WORLD_TURN}°.`,
+    '',
+    '| Role | Arm | Samples | Joint move cm | Bone, sample | Palm turn ° | Sample | Verdict |',
+    '|---|---|---:|---:|---|---:|---|---|',
+    ...moves.map(
+      (m) =>
+        `| ${m.role} | ${m.side} | ${m.samples} | ${(100 * m.move).toFixed(3)} | ${m.moveAt} | ${m.turn.toFixed(2)} | ${m.turnAt} | ${m.samples > 0 && m.move <= WORLD_MOVE && m.turn <= WORLD_TURN ? 'SAME' : 'MOVED'} |`,
+    ),
+  ];
+}
+
+/**
+ * Runs `--world` on each role: the base and the working tree, each in a child process
+ * (`probeBeside()`), with the gate of the working tree on both.
+ *
+ * @param options The command line, with a base.
+ * @returns The exit code: 1 when a joint or a palm of an arm moves.
+ */
+async function checkWorld(options: CheckArgs): Promise<number> {
+  const base = options.base ?? '';
+  const started = performance.now();
+  const moves = await eachLimited(options.roles, options.jobs, async (role) => {
+    const texts = await probeBeside(
+      base,
+      'arm-check.ts',
+      {
+        base: [role, '--world', ...options.shared, CHILD],
+        tree: [role, '--world', ...options.shared, ...options.own, CHILD],
+      },
+      { prefix: 'arm-world-', cache: true, scripts: GATE_SCRIPTS },
+    );
+    // SAFETY: the texts come from childMain() of this tool with --world.
+    const read = (text: string): WorldSamples | undefined =>
+      (JSON.parse(text) as WorldJson).roles[role];
+    const before = read(texts.base);
+    const after = read(texts.tree);
+    return before && after ? worldMoves(role, before, after) : [];
+  });
+  const seconds = ((performance.now() - started) / 1000).toFixed(0);
+  const lines = worldLines(moves.flat(), base);
+  console.log(
+    [`World pose of ${options.roles.length} roles in ${seconds} s.`, ...lines].join('\n'),
+  );
+  return moves.flat().some((m) => !(m.samples > 0 && m.move <= WORLD_MOVE && m.turn <= WORLD_TURN))
+    ? 1
+    : 0;
+}
+
 /**
  * The mark of a child of the tool on its command line: a child writes {@link ArmJson} into the
  * file of `--json`, and a run with no mark writes the lines of the gate there ({@link GateFile}).
@@ -3059,6 +3270,22 @@ async function childMain(args: readonly string[]): Promise<number> {
   }
   const demos = await gateDemos(option('--demo'), option('--midi'), false);
   const changes = await setRunHolds(roles, option('--set').join(';'));
+  if (rest.includes('--world')) {
+    const worlds: Record<string, WorldSamples> = {};
+    try {
+      for (const role of roles) {
+        const source = isRole(role) ? findRole(role) : undefined;
+        if (source) {
+          worlds[role] = probeWorld(source, demos, step);
+        }
+      }
+    } finally {
+      changes?.undo();
+    }
+    const json: WorldJson = { version: WORLD_FORMAT, roles: worlds };
+    await writeFile(option('--json')[0] ?? '', `${JSON.stringify(json)}\n`);
+    return 0;
+  }
   const reports: Record<string, RoleReport> = {};
   try {
     for (const role of roles) {
@@ -3460,6 +3687,9 @@ async function main(): Promise<number> {
   }
   if (options.variants.length > 0) {
     return checkVariants(options);
+  }
+  if (options.world) {
+    return checkWorld(options);
   }
   const started = performance.now();
   const reports = await eachLimited(options.roles, options.jobs, async (role) => ({
