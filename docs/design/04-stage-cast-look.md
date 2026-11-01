@@ -277,7 +277,7 @@ The linear blend of the larger bend also narrows the bent elbow, and a shape can
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
 shape that fits only that hold, and each other hold blends its own bend on top. So a body with
 the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
-species and each instrument (Cast matrix). The wolf has this bind. A body with `raise` shapes also
+species and each instrument (Cast matrix). The wolf and the mouse have this bind. A body with `raise` shapes also
 fits each shape against all its roles, because a shape fits only the poses near its hold.
 
 The bind supination of each paw is the value that makes the largest paw twist p95 of any role
