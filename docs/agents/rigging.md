@@ -299,8 +299,9 @@ Read the group of your work before you plan it.
   key of its joint. A body has at most `RAISE_LIMIT` shapes.
 - A shape fixes only the poses near its rule, so fit the hold first. Keep the rig log count of
   `raise R` at 0.
-- A shape only relaxes or fills the skin. It cannot widen an elbow ring that a straight bind
-  narrows: change the weights or the elbow helper.
+- A shape only relaxes or fills the skin, so it cannot widen an elbow ring that a straight bind
+  narrows, and a longer elbow helper did not widen it. A Remove From Group across the joint
+  widened it, but folded the inner elbow.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 
