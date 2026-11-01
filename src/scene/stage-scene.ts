@@ -575,12 +575,14 @@ export class StageScene {
   /**
    * Shows the scene of a layout from {@link StageScene.prepareSteps}. The scene of the previous
    * layout frees its geometries, its own materials, and its lights. The shared material stays for
-   * the next layout. The camera returns to the default view of the new stage.
+   * the next layout. The camera returns to the default view of the new stage, at the current size
+   * of the canvas: {@link StageScene.resize} during the build resized only the shown camera.
    *
    * @param prepared The scene of the layout.
    */
   show(prepared: PreparedLayout): void {
     const { view, aim } = prepared;
+    view.camera.resize(this.#width, this.#height);
     this.#pending = null;
     setPoolAim(this.#pool, aim);
     setRimLights(this.#rim, view.lights);
