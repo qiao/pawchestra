@@ -1733,8 +1733,10 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
 }
 
 @media (max-width: 699px) {
+  /* The title of a phone stands 16 px from the top, as from the left. The tap area of 44 px
+     around the link to GitHub then stays inside the window (design 2.8). */
   :root {
-    --title-top: 12px;
+    --title-top: 16px;
   }
 
   /* A phone has no room for two columns, so each row of the group "Sounds" stands on the axis:

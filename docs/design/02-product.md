@@ -297,7 +297,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 - **Phone**, narrower than 700 px: the drawer is a sheet above the bar with a drag handle, and a
   selection closes it. The speed, the volume, "Reset view", and full screen move into the group
   "Playback" of the settings, so that the page has one control of each kind. The bar shows no
-  duration, so that the seek bar is longer.
+  duration, so that the seek bar is longer. The top inset of the title (`--title-top`) keeps the
+  touch area of the link to GitHub inside the window.
 - **Messages**: at the bottom center above the bar, with a bar in `--danger`. A message closes
   after a few seconds, with "Close the message", or with Escape. It stays while it has the pointer
   or the focus (`followMessage()`). A new message or a new piece replaces it. The failure texts
