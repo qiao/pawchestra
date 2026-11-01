@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
 import { BOW_PART, bowSweep } from './bow-sweep.ts';
-import { FOLD_ROLES, roleAnimal } from './fold-probe.ts';
+import { findRole, findSweep, roleAnimal } from './fold-probe.ts';
 import type { PlayFilter } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import type { DemoFile } from './patch-demos.ts';
@@ -29,7 +29,7 @@ import type { SpeciesId } from '../src/models/species.ts';
 import type { NoteLayer, PlayerPlan } from '../src/pose/plan.ts';
 import { createStrikeState, strikeStateAt } from '../src/pose/strikes.ts';
 import type { StrikeTrack } from '../src/pose/strikes.ts';
-import { sceneOf } from '../src/pose/test-scene.ts';
+import { recastSceneOf } from '../src/pose/test-scene.ts';
 import type { TestScene } from '../src/pose/test-scene.ts';
 import {
   depthLimit,
@@ -129,7 +129,7 @@ export interface WhereRequest {
 export const ROW_LIMIT = 5;
 
 /** The text of the usage. */
-const USAGE = `Usage: pnpm pose-depth <${Object.keys(SWEEP_ROLES).join(' | ')}> [--demo <id>]... [--midi <path>]... [--soloist <species>] [--set <path>=<value>[;<path>=<value>]...]... [--bones <list>] [--into <list>] [--times <list>] [--gaps] [--targets] [--goal <cm>] [--per-bone] [--every <n>] [--base <ref>] [--json <file>] [--long] [--glb <file>], or pnpm pose-depth <role> --where <bone> <demo>:<time> [--set <changes>]`;
+const USAGE = `Usage: pnpm pose-depth <${Object.keys(SWEEP_ROLES).join(' | ')} | <role>@<species>> [--demo <id>]... [--midi <path>]... [--soloist <species>] [--set <path>=<value>[;<path>=<value>]...]... [--bones <list>] [--into <list>] [--times <list>] [--gaps] [--targets] [--goal <cm>] [--per-bone] [--every <n>] [--base <ref>] [--json <file>] [--long] [--glb <file>], or pnpm pose-depth <role> --where <bone> <demo>:<time> [--set <changes>]`;
 
 /** The options of the command with no value. */
 const FLAGS: ReadonlySet<string> = new Set(['--gaps', '--targets', '--long', '--per-bone']);
@@ -222,7 +222,7 @@ function takeWhere(args: readonly string[]): WhereArgs {
  */
 export function parseOptions(args: readonly string[]): Options {
   const [name, ...given] = args;
-  const role = Object.entries(SWEEP_ROLES).find(([key]) => key === name)?.[1];
+  const role = findSweep(name ?? '');
   if (!role) {
     throw new Error(USAGE);
   }
@@ -793,7 +793,8 @@ export async function sweepDemos(options: SweepOptions, role: RoleSweep): Promis
   }
   const results: DemoResult[] = [];
   for (const demo of await roleDemos(options.demos, options.midi ?? [], role)) {
-    results.push(...sweepScene(demoId(demo), sceneOf(demo.bytes), options, role, false));
+    const scene = recastSceneOf(demo.bytes, role.recast);
+    results.push(...sweepScene(demoId(demo), scene, options, role, false));
   }
   return results;
 }
@@ -1689,7 +1690,7 @@ async function sweepGlb(options: Options, glb: string, args: readonly string[]):
   if (options.base !== null) {
     throw new Error(`The options --glb and --base do not go together.\n${USAGE}`);
   }
-  const source = FOLD_ROLES.get(options.role.role);
+  const source = findRole(options.role.role);
   if (!source) {
     throw new Error(`The ${options.role.role} has no studio body, so --glb does not apply.`);
   }

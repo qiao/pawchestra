@@ -8,7 +8,7 @@ import type { Vec3 } from '../src/models/tuples.ts';
 import { closedDepth } from '../src/pose/test-clearance.ts';
 import { poseSkeleton, posedPoint } from '../src/pose/test-kinematics.ts';
 import type { PosedSkeleton } from '../src/pose/test-kinematics.ts';
-import { sceneOf } from '../src/pose/test-scene.ts';
+import { recastSceneOf } from '../src/pose/test-scene.ts';
 import { posedCorner } from '../src/pose/test-skin.ts';
 import type { RoleSweep } from '../src/pose/test-sweep.ts';
 import { playSample } from '../src/pose/test-sweep-roles.ts';
@@ -99,7 +99,7 @@ export function whereLines(
   demos: readonly DemoFile[],
 ): string[] {
   const [demo] = demos;
-  const scene = demo ? sceneOf(demo.bytes) : null;
+  const scene = demo ? recastSceneOf(demo.bytes, role.recast) : null;
   const [player] = scene ? role.players(scene) : [];
   if (!scene || !player) {
     throw new Error(`The demo "${where.demo}" has no player of the ${role.role}.`);
