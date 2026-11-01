@@ -35,6 +35,7 @@ FBX files.
 | `mannequin-<preset>-tpose.fbx` | The mesh in a T-pose, with no skeleton | An upload to mixamo.com |
 | `mannequin-<preset>-mixamo.glb` | The T-pose mesh with the Mixamo skeleton (65 bones), weights of at most 4 bones, and the test clips | The input of the Mixamo adapter |
 | `mannequin-<preset>-mixamo.fbx` | The same as an FBX file in centimeters, with one take for each clip (`Armature\|<clip>`) | The input of the Mixamo adapter |
+| `mannequin.rig.glb` | The studio rig of `mannequin-animal.glb` (`tools/mesh-rigs/mannequin.json`) | The input of `pnpm studio-body mannequin` |
 
 The presets:
 

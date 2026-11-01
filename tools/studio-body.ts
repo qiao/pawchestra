@@ -388,6 +388,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       glb: 'assets/models/wolf/wolf.rig.glb',
     },
   ],
+  // The test mannequin (design 4.4, "Test mannequin"): the animal preset of
+  // tools/blender/mannequin.py, a test body of the rig chain that no section casts. It keeps the
+  // 1.6 m of the preset.
+  [
+    'mannequin',
+    {
+      landmark: 'shoulders',
+      height: 1.025662,
+      seated: true,
+      soloist: true,
+      constant: 'STUDIO_MANNEQUIN',
+      crease: 35,
+      glb: 'assets/models/mannequin/mannequin.rig.glb',
+    },
+  ],
   // The percussion badger (design 4.4). It stands at each percussion
   // instrument, so the export keeps the standing pose of the rig.
   [
