@@ -758,7 +758,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 
 | Instrument | Model and hold |
 | --- | --- |
-| Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The cat plays a small viola near the neck. |
+| Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands at the left side. |
 | Harp | Leaned back onto the right shoulder. The deer plays a smaller harp on a box (`HARP_PLACE`, `HARP_STAND`). |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), so the keys stand a little below the elbows of the polar bear. The keys stand in front of its belly (`PIANO_FRONT_H`). |
