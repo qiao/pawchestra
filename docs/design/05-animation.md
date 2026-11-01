@@ -196,7 +196,12 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   one factor (`liftScale()`). A pause in the count-in lowers the instruments at once.
 - **No wrist flip.** A paw does not turn past 180° on its forearm in a move, because the twist
   bone (`TWIST_SHARE` of `models/studio-rig.ts`) then turns over in one frame. The arm gate checks
-  each move (`probeMoves()` of `tools/arm-check.ts`).
+  each move (`probeMoves()` of `tools/arm-check.ts`). The carried left paw of a violin or a viola
+  turns on the way on which its twist from the bind of the studio stays between -180° and 180°
+  (`studioPawTwist()`). On a supinated bind paw, this way is a supination, as a real forearm turns.
+  On a pronated bind paw, the playing grip lies past 180° in the supination, so the paw turns the
+  other way, through the direction of no paw twist. Reason: the change of the hold cannot change
+  the bind of the body, and the other way flips the paw on six recast bodies.
 - **Seated posture.** Each seated player sits tall off the chair back, with the hips above the
   knees, vertical shins, and the soles flat, as real seated string players sit: "The main point
   is that your hips are higher than your knees" (violinist.com, discussion 9372). The seat stays
