@@ -24,8 +24,9 @@ or its usage text: `tools/<name>.ts` for `pnpm <name>`, unless the row names ano
 - **Recast role `<role>@<species>`.** The role tools (`fold-probe`, `arm-check`, `pose-depth`,
   `hold-fit`, `close-views`, `arm-look`, `carry-check`) take a role with another species, such as
   `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`). The species
-  keeps the body sweep of its own role, and a test species takes `TEST_BODY_OBSTACLES`. `--base`
-  needs a commit with the same recast, and `arm-check --views` and `close-views batch` take none.
+  keeps the body sweep of its own role, and a test species takes `TEST_BODY_OBSTACLES`. It takes
+  the size rule of the matrix (`tools/recast-scale.ts`). `--base` needs a commit with the same
+  recast, and `arm-check --views` and `close-views batch` take none.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
 - **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
@@ -89,7 +90,7 @@ score of `tools/probe-demos.ts`. [`rigging.md`](rigging.md) gives the roles.
 | `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. About 50 s for each role. |
 | `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. 25 s to 55 s. |
 | `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>] [--states <ref>,...]`, or `<role> --trace` or `--explain` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND` (a new bind), or `PASS`. All roles: 5 to 7 minutes cold, 2 s from the cache. |
-| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>] [--quick]` | Recasts each species into each role with the shared hold and the size rule of its instrument, and writes one table of `PASS`, `OPEN`, or `FAIL` with the worst value of the arm gate and the deepest clip, and its JSON (design 4.4). It caches each pair by tree. Six roles and 20 species with `--jobs 5`: about 3 minutes cold, 2 s from the cache. `--quick` takes a coarse sample: one role in about 25 s with `--jobs 8`. `node tools/cello-size.ts [<species>,...]` prints the cello rule (design 4.6). |
+| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--jobs <n>] [--quick] [--set <changes>]... [--variant <name>=<changes>]...` | Recasts each species into each role with the shared hold and the size rule of its instrument, and writes one table of `PASS`, `OPEN`, or `FAIL` with the worst value of the arm gate and the deepest clip, and its JSON (design 4.4). It caches each pair by tree. Six roles: about 3 minutes cold. `--quick` takes a coarse sample: one role in about 25 s. Each `--variant` adds a column. `node tools/cello-size.ts [<species>,...]` prints the cello rule. |
 | `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. Three roles: 45 s. |
 | `pnpm raise-fit <role> --faces <list> --side L\|R [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. 15 s. |
 | `pnpm body-probe [--out <file>]`, `--compare <base.json> <new.json>`, or `--base <ref>` | Probes the rest joints and a mesh hash of each species, and a hash of the poses of each player of each demo. `--compare` and `--base` fail on a difference. About 6 s. |
