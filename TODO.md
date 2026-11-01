@@ -510,6 +510,20 @@ scene of each demo has its seats and stage size with no overlap.
       cache of the base frames.
 - [ ] Tool: let `pnpm pose-depth` print only the pairs that differ between its `--set` rows, and
       take `--sets lift,lower`.
+- [ ] Clips (4.4): test the retarget on real Mixamo files in `scratch/mixamo/`. The spike used the
+      Mixamo-style clips of the mannequin round and a scratch armature only.
+- [ ] Clips: the waving paw of `Wave` goes 0.11 H (wolf) to 0.13 H (rabbit) into the head,
+      because the large head of an animal fills the place of a raised human hand. Add a clearance
+      rule for the arms of a clip.
+- [ ] Clips: test a walk. The floor rule keeps the sole heights, but a hips move in `H` can slide
+      the short feet. Scale the move by the leg length if the feet slide.
+- [ ] Clips: a clip in the concert needs a place for the instrument (a stand or the floor) and a
+      blend from the rest pose of 5.2 into the clip and back. The gallery hides the instrument.
+- [ ] Clips: decide where a retargeted clip for the build lives outside git (design 8.1), such as a
+      private folder that `pnpm deploy:vercel` reads.
+- [ ] Models: build `pnpm mixamo-model`, which writes the joints and the painted weights of a
+      Mixamo-rigged mesh (plan in `docs/design/04-stage-cast-look.md`, "Clips"). Blocked: the
+      project author decides the rule of the auto-rig output (design 8.1).
 
 Done when: the pose tests pass, and the pose and frame targets pass.
 
