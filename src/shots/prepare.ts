@@ -353,6 +353,15 @@ const LINE_SAMPLES = Array.from({ length: 17 }, (...[, i]) => i / 16).filter(
  */
 const NEAR_SAMPLES = Array.from({ length: 17 }, (...[, i]) => i / 16);
 
+/**
+ * The index in {@link NEAR_SAMPLES} of each sample of {@link MOVE_SAMPLES}. The tests of a move
+ * share the camera of each sample ({@link MoveCameras}).
+ */
+const MOVE_INDICES = MOVE_SAMPLES.map((u) => NEAR_SAMPLES.indexOf(u));
+
+/** The index in {@link NEAR_SAMPLES} of each sample of {@link LINE_SAMPLES}. */
+const LINE_INDICES = LINE_SAMPLES.map((u) => NEAR_SAMPLES.indexOf(u));
+
 /** The samples of a move at which the planner tests the sight lines of the subject. */
 const SIGHT_MOVE_SAMPLES = new Set<number>([0, 0.5, 1]);
 
@@ -751,10 +760,7 @@ type MoveRefusal = Extract<
  * than 0.44 of the default distance.
  *
  * @param planner The planner.
- * @param target The target.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
+ * @param move The cameras of the move.
  * @param held The boxes of the body of the subject.
  * @param sights The lines of sight to the head, the hands, and the instrument of a solo or a
  *   conductor shot, or `null`. Each camera of the move sees them (design 5.6).
@@ -763,25 +769,21 @@ type MoveRefusal = Extract<
  */
 function moveRefusal(
   planner: Planner,
-  target: Vec3,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
+  move: MoveCameras,
   held: ReadonlySet<ClearBox>,
   sights: SubjectSightLines | null,
 ): MoveRefusal | null {
   const S = planner.stageSide;
   const aspect = CINEMA_ASPECT;
+  const { target } = move.subject;
   // A camera that crosses the cone of the beam in a shot sees the beam come or go at once. The
   // camera stays on one side for the full move, with a margin.
-  const side = beamSide(S, keyPosition(S, target, halfHeight, from, aspect));
+  const side = beamSide(S, sampleCamera(planner, move, 0));
   if (side === 'edge') {
     return 'beamEdge';
   }
   // The cheap tests of all samples come first, so that a camera that fails them costs little.
-  const cameras = MOVE_SAMPLES.map((u) =>
-    keyPosition(S, target, halfHeight, mixKeys(from, to, u), aspect),
-  );
+  const cameras = MOVE_INDICES.map((i) => sampleCamera(planner, move, i));
   for (const camera of cameras) {
     const share = Math.hypot(camera[0], camera[1], camera[2]) / defaultDistance(S, aspect);
     if (share > CLOSE_DISTANCE_SHARE) {
@@ -804,8 +806,8 @@ function moveRefusal(
       return 'sight';
     }
   }
-  for (const u of LINE_SAMPLES) {
-    const camera = keyPosition(S, target, halfHeight, mixKeys(from, to, u), aspect);
+  for (const i of LINE_INDICES) {
+    const camera = sampleCamera(planner, move, i);
     if (!targetLineClear(planner.clearance, target, camera, held)) {
       return 'line';
     }
@@ -962,39 +964,173 @@ function composedCamera(
   composition: Composition | null,
   key: ShotKey,
 ): ComposedCamera {
-  const { target } = subject;
-  const camera = keyPosition(planner.stageSide, target, halfHeight, key, CINEMA_ASPECT);
+  const camera = keyPosition(planner.stageSide, subject.target, halfHeight, key, CINEMA_ASPECT);
+  return composeAt(subject, camera, composition, key.fov);
+}
+
+/**
+ * Gives the point that a close camera looks at for the composition of its shot (design 5.6).
+ *
+ * @param subject The subject.
+ * @param camera The camera.
+ * @param composition The place of the subject in the frame, or `null`.
+ * @param fov The vertical field of view, in degrees.
+ * @returns The camera.
+ */
+function composeAt(
+  subject: Subject,
+  camera: Vec3,
+  composition: Composition | null,
+  fov: number,
+): ComposedCamera {
   const look: [number, number, number] = [0, 0, 0];
-  const y = writeLookPoint(camera, target, composition, key.fov, CINEMA_ASPECT, look);
+  const y = writeLookPoint(camera, subject.target, composition, fov, CINEMA_ASPECT, look);
   const third = composition?.third ?? 0;
   return { camera, look, middle: [third * FILM_GRAMMAR.thirdLine, y] };
+}
+
+/**
+ * The cameras of a close move, which its tests share (design 5.6). The tests read the cameras of
+ * the samples of {@link NEAR_SAMPLES} and of the two end keys, and each composed camera took the
+ * correction of its look point again in each test. Each camera now comes at its first use.
+ */
+interface MoveCameras {
+  readonly subject: Subject;
+  /** Half the height of the frame at the target. */
+  readonly halfHeight: number;
+  /** The key at the start, which is also the key of the first sample. */
+  readonly from: ShotKey;
+  /** The key at the end. The last sample mixes the keys, so it can differ by a rounding. */
+  readonly to: ShotKey;
+  /** The key of each sample of {@link NEAR_SAMPLES}: `from`, then the mixed keys. */
+  readonly keys: readonly ShotKey[];
+  /** The camera of each sample, after its first use. */
+  readonly cameras: (Vec3 | undefined)[];
+}
+
+/** The cameras of a close move with the composition of its shot. */
+interface ComposedMove extends MoveCameras {
+  /** The place of the subject in the frame, or `null`. */
+  readonly composition: Composition | null;
+  /** The composed camera of each sample, after its first use. */
+  readonly composed: (ComposedCamera | undefined)[];
+  /** The composed cameras of `from` and `to`, after their first use. */
+  readonly ends: { from?: ComposedCamera; to?: ComposedCamera };
+}
+
+/**
+ * Starts the cameras of a close move ({@link MoveCameras}).
+ *
+ * @param subject The subject.
+ * @param halfHeight Half the height of the frame at the target.
+ * @param from The key at the start.
+ * @param to The key at the end.
+ * @returns The cameras, with none calculated.
+ */
+function moveCameras(
+  subject: Subject,
+  halfHeight: number,
+  from: ShotKey,
+  to: ShotKey,
+): MoveCameras {
+  const keys = NEAR_SAMPLES.map((u, i) => (i === 0 ? from : mixKeys(from, to, u)));
+  return { subject, halfHeight, from, to, keys, cameras: [] };
+}
+
+/**
+ * Gives the camera of a sample of a close move.
+ *
+ * @param planner The planner.
+ * @param move The cameras of the move.
+ * @param i The index of the sample in {@link NEAR_SAMPLES}.
+ * @returns The camera.
+ */
+function sampleCamera(planner: Planner, move: MoveCameras, i: number): Vec3 {
+  const known = move.cameras[i];
+  if (known) {
+    return known;
+  }
+  const key = move.keys[i] ?? move.from;
+  const camera = keyPosition(
+    planner.stageSide,
+    move.subject.target,
+    move.halfHeight,
+    key,
+    CINEMA_ASPECT,
+  );
+  move.cameras[i] = camera;
+  return camera;
+}
+
+/**
+ * Gives the composed camera of a sample of a close move.
+ *
+ * @param planner The planner.
+ * @param move The cameras of the move.
+ * @param i The index of the sample in {@link NEAR_SAMPLES}.
+ * @returns The camera and its look point.
+ */
+function sampleComposed(planner: Planner, move: ComposedMove, i: number): ComposedCamera {
+  const known = move.composed[i];
+  if (known) {
+    return known;
+  }
+  const fov = (move.keys[i] ?? move.from).fov;
+  const composed = composeAt(move.subject, sampleCamera(planner, move, i), move.composition, fov);
+  move.composed[i] = composed;
+  return composed;
+}
+
+/**
+ * Gives the composed camera of an end key of a close move.
+ *
+ * @param planner The planner.
+ * @param move The cameras of the move.
+ * @param end The end.
+ * @returns The camera and its look point.
+ */
+function endComposed(planner: Planner, move: ComposedMove, end: 'from' | 'to'): ComposedCamera {
+  if (end === 'from') {
+    move.ends.from ??= sampleComposed(planner, move, 0);
+    return move.ends.from;
+  }
+  move.ends.to ??= composedCamera(
+    planner,
+    move.subject,
+    move.halfHeight,
+    move.composition,
+    move.to,
+  );
+  return move.ends.to;
 }
 
 /**
  * Gives the place of a subject in the frame of a close move (design 5.6): its eyes on the upper
  * third line, and the target on the third line away from its look in the middle of the move.
  *
- * @param planner The planner.
  * @param subject The subject.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
+ * @param middle The camera in the middle of the move.
  * @returns The composition, or `null` for a subject in the middle of the frame.
  */
-function compositionOf(
-  planner: Planner,
-  subject: Subject,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
-): Composition | null {
+function compositionAt(subject: Subject, middle: () => Vec3): Composition | null {
   if (!subject.eyes) {
     return null;
   }
-  const middle = mixKeys(from, to, 0.5);
-  const camera = keyPosition(planner.stageSide, subject.target, halfHeight, middle, CINEMA_ASPECT);
-  const third = thirdOf(subject.facing, azimuthFrom(camera, subject.center));
+  const third = thirdOf(subject.facing, azimuthFrom(middle(), subject.center));
   return { eyes: subject.eyes, third };
+}
+
+/**
+ * Adds the composition to the cameras of a close move ({@link compositionAt}).
+ *
+ * @param planner The planner.
+ * @param move The cameras of the move.
+ * @returns The cameras with the composition.
+ */
+function composeMove(planner: Planner, move: MoveCameras): ComposedMove {
+  const middle = NEAR_SAMPLES.indexOf(0.5);
+  const composition = compositionAt(move.subject, () => sampleCamera(planner, move, middle));
+  return { ...move, composition, composed: [], ends: {} };
 }
 
 /**
@@ -1002,37 +1138,26 @@ function compositionOf(
  * its end, in the frame of its composition at the aspect of Cinematic mode (design 5.6).
  *
  * @param planner The planner.
- * @param subject The subject.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
- * @param composition The place of the subject in the frame, or `null`.
+ * @param move The cameras of the move.
  * @param test The test of one camera: the heads, or the cover of the other objects.
  * @returns True if a head or an object stands in the foreground.
  */
-function moveForeground(
-  planner: Planner,
-  subject: Subject,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
-  composition: Composition | null,
-  test: 'heads' | 'objects',
-): boolean {
-  const { members, focus, outside, floor } = subject;
+function moveForeground(planner: Planner, move: ComposedMove, test: 'heads' | 'objects'): boolean {
+  const { members, focus, outside, floor } = move.subject;
   const aspect = CINEMA_ASPECT;
   if (test === 'heads' && outside) {
     // The point stays out of the frame for the full move.
-    for (const u of MOVE_SAMPLES) {
-      const key = mixKeys(from, to, u);
-      const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
-      if (inFrame(outside, camera, look, key.fov, aspect)) {
+    for (const i of MOVE_INDICES) {
+      const fov = (move.keys[i] ?? move.from).fov;
+      const { camera, look } = sampleComposed(planner, move, i);
+      if (inFrame(outside, camera, look, fov, aspect)) {
         return true;
       }
     }
   }
-  for (const key of [from, to]) {
-    const { camera, look, middle } = composedCamera(planner, subject, halfHeight, composition, key);
+  for (const end of ['from', 'to'] as const) {
+    const key = move[end];
+    const { camera, look, middle } = endComposed(planner, move, end);
     // The depth of field of the frame blurs a near head or box at a side edge: a dirty frame.
     const lens = lensScale(camera, look, key.fov, planner.stageSide);
     const found =
@@ -1096,31 +1221,17 @@ function nearBodies(planner: Planner, cameras: readonly Vec3[]): StageBody[] {
  * Only the bodies near the path of the camera need the test of each sample.
  *
  * @param planner The planner.
- * @param subject The subject.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
- * @param composition The place of the subject in the frame, or `null`.
+ * @param move The cameras of the move.
  * @returns True if an animal is too near.
  */
-function moveNear(
-  planner: Planner,
-  subject: Subject,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
-  composition: Composition | null,
-): boolean {
-  const keys = NEAR_SAMPLES.map((u) => mixKeys(from, to, u));
-  const cameras = keys.map((key) =>
-    keyPosition(planner.stageSide, subject.target, halfHeight, key, CINEMA_ASPECT),
-  );
+function moveNear(planner: Planner, move: ComposedMove): boolean {
+  const cameras = NEAR_SAMPLES.map((...[, i]) => sampleCamera(planner, move, i));
   const near = nearBodies(planner, cameras);
   if (near.length === 0) {
     return false;
   }
-  for (const key of keys) {
-    const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
+  for (const [i, key] of move.keys.entries()) {
+    const { camera, look } = sampleComposed(planner, move, i);
     if (animalTooNear(near, camera, look, key.fov, CINEMA_ASPECT)) {
       return true;
     }
@@ -1184,35 +1295,22 @@ function blendNear(
  * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects last.
  *
  * @param planner The planner.
- * @param subject The subject.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
- * @param composition The place of the subject in the frame, or `null`.
+ * @param move The cameras of the move.
  * @returns The first test that fails, or `null` for a clear move.
  */
-function keptRefusal(
-  planner: Planner,
-  subject: Subject,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
-  composition: Composition | null,
-): KeptRefusal | null {
-  if (moveForeground(planner, subject, halfHeight, from, to, composition, 'heads')) {
+function keptRefusal(planner: Planner, move: ComposedMove): KeptRefusal | null {
+  if (moveForeground(planner, move, 'heads')) {
     return 'head';
   }
-  const { held, sights } = subjectLines(planner, subject);
-  const move = moveRefusal(planner, subject.target, halfHeight, from, to, held, sights);
-  if (move) {
-    return move;
+  const { held, sights } = subjectLines(planner, move.subject);
+  const refusal = moveRefusal(planner, move, held, sights);
+  if (refusal) {
+    return refusal;
   }
-  if (moveNear(planner, subject, halfHeight, from, to, composition)) {
+  if (moveNear(planner, move)) {
     return 'near';
   }
-  return moveForeground(planner, subject, halfHeight, from, to, composition, 'objects')
-    ? 'object'
-    : null;
+  return moveForeground(planner, move, 'objects') ? 'object' : null;
 }
 
 /**
@@ -1221,24 +1319,14 @@ function keptRefusal(
  * is neutral in one of the two.
  *
  * @param planner The planner.
- * @param subject The subject.
- * @param halfHeight Half the height of the frame at the target.
- * @param from The key at the start.
- * @param to The key at the end.
- * @param composition The place of the subject in the frame, or `null`.
+ * @param move The cameras of the move.
  * @returns `axis` for a camera over the line, `look` for a look to the other side, else `null`.
  */
-function lineRefusal(
-  planner: Planner,
-  subject: Subject,
-  halfHeight: number,
-  from: ShotKey,
-  to: ShotKey,
-  composition: Composition | null,
-): 'axis' | 'look' | null {
+function lineRefusal(planner: Planner, move: ComposedMove): 'axis' | 'look' | null {
+  const { subject } = move;
   const master = lookSide(subject.facing, azimuthFrom(planner.master, subject.center));
-  for (const key of [from, to]) {
-    const { camera, look } = composedCamera(planner, subject, halfHeight, composition, key);
+  for (const end of ['from', 'to'] as const) {
+    const { camera, look } = endComposed(planner, move, end);
     if (!keepsLine(camera, look)) {
       return 'axis';
     }
@@ -1324,8 +1412,11 @@ function searchClose(
     const limit = 1 - FRAME_MARGINS.top;
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
+    const middle = mixKeys(from, to, 0.5);
     for (let pass = 0; pass < HEAD_TEST_PASSES; pass++) {
-      const composition = compositionOf(planner, subject, half, from, to);
+      const composition = compositionAt(subject, () =>
+        keyPosition(planner.stageSide, subject.target, half, middle, CINEMA_ASPECT),
+      );
       const { camera, look } = composedCamera(planner, subject, half, composition, to);
       const highest = highestInFrame(camera, look, subject.tops, move.fov);
       if (highest <= limit) {
@@ -1402,8 +1493,9 @@ function searchClose(
     frames.set(key, halfHeight);
     const from: ShotKey = { azimuth, elevation, zoom: 1, fov: move.fov };
     const to: ShotKey = { azimuth: azimuth + arc, elevation, zoom: move.pushIn, fov: move.fov };
-    const composition = compositionOf(planner, subject, halfHeight, from, to);
-    const line = lineRefusal(planner, subject, halfHeight, from, to, composition);
+    const cameras = composeMove(planner, moveCameras(subject, halfHeight, from, to));
+    const { composition } = cameras;
+    const line = lineRefusal(planner, cameras);
     if (line) {
       return refuse(azimuth, elevation, arc, line);
     }
@@ -1415,7 +1507,7 @@ function searchClose(
       return refuse(azimuth, elevation, arc, 'repeat');
     }
     if (clear === undefined) {
-      const refusal = keptRefusal(planner, subject, halfHeight, from, to, composition);
+      const refusal = keptRefusal(planner, cameras);
       clear = refusal === null;
       known.set(key, clear);
       if (kept && refusal) {
