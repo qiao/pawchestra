@@ -816,16 +816,24 @@ const WOLF_VIOLIN_HOLD = {
  * violin of the beaver went 5.8 cm into the body in the play.
  *
  * At rest, the arms hang out to the sides until they clear the body (`restArms`): the left upper
- * arm swings 20° forward and the elbow bends 100°, so that the left paw holds the upright violin
- * in front of the thigh. The right upper arm swings 45° forward and the elbow bends 80°: with
- * 20°, the right upper arm of the recast red fox went 2.0 cm into the body at rest and in the
- * moves (1.5 cm with 35°).
+ * arm swings 20° forward and the elbow bends 80°, so that the left paw holds the upright violin in
+ * front of the thigh. With 100°, the violin of the beaver went 4.0 cm into the belly at rest. The
+ * right upper arm swings 45° forward and the elbow bends 80°: with 20°, the right upper arm of the
+ * recast red fox went 2.0 cm into the body at rest and in the moves (1.5 cm with 35°).
+ *
+ * In the middle of the lift and the lowering, the left wrist moves 0.3 H to the front
+ * (`liftReach`): with the 0.15 H of the rabbit, the violin of the mouse and the panda went 2.2 cm
+ * and 3.3 cm into the body in a lowering. The bow plays no hair within 0.15 m of the frog
+ * (`frogHair`): with the 0.11 m of the rabbit, the bow paw of the deer and the dog went 1.9 cm and
+ * 2.2 cm into the body at the frog.
  */
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
+  frogHair: 0.15,
+  liftReach: [0.15, 0.15, -0.3],
   restArms: {
-    L: { forward: 20 * MathUtils.DEG2RAD, bend: 100 * MathUtils.DEG2RAD },
+    L: { forward: 20 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
     R: { forward: 45 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
   },
 } as const satisfies BowedHold;
