@@ -1,21 +1,32 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { SAMPLES_READY } from '../src/app/dev-hook.ts';
 
 /**
- * Opens the credits dialog with a click on the link "Credits" at the end of the tab "Settings". A
- * narrow window opens the drawer first.
+ * Shows the link "Credits" at the end of the tab "Settings". A narrow window opens the drawer
+ * first, and a wide window opens it at the tab "Music" (design 2.8).
  *
  * @param page The page, with the first piece on the stage.
+ * @returns The link.
  */
-async function openCredits(page: Page): Promise<void> {
+async function showCreditsLink(page: Page): Promise<Locator> {
   const link = page.getByRole('button', { name: 'Credits', exact: true });
   if ((await page.locator('.drawer[hidden]').count()) > 0) {
     await page.locator('.bar button[aria-expanded]').click();
   }
   await page.getByRole('tab', { name: 'Settings' }).click();
   await link.scrollIntoViewIfNeeded();
+  return link;
+}
+
+/**
+ * Opens the credits dialog with a click on the link "Credits".
+ *
+ * @param page The page, with the first piece on the stage.
+ */
+async function openCredits(page: Page): Promise<void> {
+  const link = await showCreditsLink(page);
   await link.click();
 }
 
@@ -25,12 +36,12 @@ test.describe('the credits dialog (design 2.8)', () => {
   test('opens from the link, holds the focus, and stops the keys of the page', async ({ page }) => {
     await page.goto('./');
     await page.waitForSelector(SAMPLES_READY, { timeout: 60_000 });
-    const link = page.getByRole('button', { name: 'Credits', exact: true });
+    const link = await showCreditsLink(page);
     await expect(link).toHaveAttribute('aria-haspopup', 'dialog');
     // The drawer holds no credits section, only the link.
     await expect(page.locator('.drawer h2', { hasText: 'Credits' })).toHaveCount(0);
 
-    await openCredits(page);
+    await link.click();
     const dialog = page.getByRole('dialog', { name: 'Credits' });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole('link', { name: 'Third-party licenses' })).toBeVisible();
