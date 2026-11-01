@@ -348,6 +348,8 @@ Read the group of your work before you plan it.
   axes of the armature first.
 - A value such as 0.707107 in a module fails the lint as an approximate `Math.SQRT1_2`. Move a
   joint a little off 45°.
+- An import of `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py`. Put the
+  plain functions back after the import, as `arm_rebuild.py` does.
 
 ### Probes
 
