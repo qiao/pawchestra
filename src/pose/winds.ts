@@ -314,6 +314,28 @@ function fluteTurn(forward: number, down: number, keys: Vec3 = [0, 1, 0]): Quat 
   );
 }
 
+/** The turn of the head of the flutist fox to the left while it plays, in degrees. */
+const FOX_HEAD_TURN = 30;
+
+/**
+ * The turn of the right end of the flute of the flutist fox back from square to the face, in
+ * degrees. Square to the face, the arms reach the right grip with 0.8 cm to spare, and two faces
+ * of the front of the right shoulder fold in each play sample. The turns from 7° to 11° back, with
+ * the flute 8° to 10° down, fold 0.7% of the play samples, and 5° or 12° back, or 12° down, fold
+ * each sample, so the hold takes the middle.
+ */
+export const FOX_FLUTE_BACK = 9;
+
+/**
+ * The forward swing of the upper arm and the forward bend of the elbow of the free left arm of the
+ * standing tan fox, in degrees (`FreePaw.hang`). The `HANG` angles of 20° and 60° point the
+ * forearm 80° forward, almost level, with the paw in the air in front of the slim body. With
+ * 20° and 20°, the arm hangs down along the side with a soft bend, as a flutist keeps the arms
+ * loose and the elbows down (`docs/reference/wind-technique.md` 2.4). The upper arm swings 19° out
+ * to clear the side of the body, and the forearm 16°.
+ */
+const FOX_HANG = [20, 20] as const;
+
 /**
  * The holds of the winds. In the rest pose, each instrument moves off the mouth, to the side and
  * a little forward, and tilts, so that the arms that hold it stay out of the body (design 5.3).
@@ -424,18 +446,6 @@ export const WIND_HOLDS = {
   },
 } as const satisfies Readonly<Record<WindInstrument, WindHold>>;
 
-/** The turn of the head of the flutist fox to the left while it plays, in degrees. */
-const FOX_HEAD_TURN = 30;
-
-/**
- * The turn of the right end of the flute of the flutist fox back from square to the face, in
- * degrees. Square to the face, the arms reach the right grip with 0.8 cm to spare, and two faces
- * of the front of the right shoulder fold in each play sample. The turns from 7° to 11° back, with
- * the flute 8° to 10° down, fold 0.7% of the play samples, and 5° or 12° back, or 12° down, fold
- * each sample, so the hold takes the middle.
- */
-export const FOX_FLUTE_BACK = 9;
-
 /**
  * The flute hold of the tan fox (design 5.3), the hold of a real flutist. The head turns 30° to
  * the left while the fox plays, as Debost writes, and the flute lies 9° back from square to the
@@ -480,16 +490,6 @@ export const FOX_FLUTE_BACK = 9;
  * 1.5 cm). With the paw nearer to the haunch or the elbow more bent, the inner elbow goes further
  * into the side of the trunk.
  */
-/**
- * The forward swing of the upper arm and the forward bend of the elbow of the free left arm of the
- * standing tan fox, in degrees (`FreePaw.hang`). The `HANG` angles of 20° and 60° point the
- * forearm 80° forward, almost level, with the paw in the air in front of the slim body. With
- * 20° and 20°, the arm hangs down along the side with a soft bend, as a flutist keeps the arms
- * loose and the elbows down (`docs/reference/wind-technique.md` 2.4). The upper arm swings 19° out
- * to clear the side of the body, and the forearm 16°.
- */
-const FOX_HANG = [20, 20] as const;
-
 const FOX_FLUTE = {
   ...WOODWIND,
   headTurn: FOX_HEAD_TURN * MathUtils.DEG2RAD,
