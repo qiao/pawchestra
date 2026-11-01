@@ -265,9 +265,11 @@ test.describe('the drop hint on a touch screen (audit 2026-10-05-ux-design, PH2)
 });
 
 test('a desktop shows the drop hint (audit 2026-10-05-ux-design, PH2)', async ({ page }) => {
+  // A wide window opens the drawer at start at the tab "Music" (design 2.8). The default window
+  // of the tests (960 × 600) is not wide, so its drawer stays closed.
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('./');
   await page.waitForSelector('#stage[data-demo]');
-  // A wide window opens the drawer at start at the tab "Music" (design 2.8).
   const button = page.getByRole('button', { name: 'Open a MIDI file' });
   // The second line of the button says where the file comes from, and it describes the button.
   await expect(button).toHaveAccessibleDescription('From this device, or drop it on the page');
