@@ -544,7 +544,12 @@ The app follows these facts:
   the chest, and the lower bout is not below the knees. It clamps the size from a 1/10 [84] to a
   4/4 [63].
 - **The rest (2.7).** The cello stays between the knees, and the left paw holds it. The right paw
-  holds the bow over the right knee with the tip up, as in the first lesson of [61].
+  holds the bow with the tip up, as in the first lesson of [61]. The right upper arm hangs as in
+  the bind pose, and the forearm points forward (`forearmGrip()`). The dog holds the bow over the
+  right knee.
+- **The high positions (1.5).** The left paw tilts further over the neck from the second position
+  to the fifth position (`BowedHold.highTilt`), as the hand goes over the shoulder of the
+  instrument.
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings,
   near the end of the fingerboard (`BowedHold.pluckSide`, `pluckPlace`), with the elbow out and
   down, as a bassist. No source of this file gives the cello pizzicato.
@@ -561,7 +566,8 @@ The app does not follow these facts:
 - **The left hand (1.9).** The left paw tilts further over the neck from the bass side
   (`BowedHold.tiltL`), so that the thick paw keeps off the fingerboard.
 - **The bow at rest (2.7).** The short arm does not reach the knee, so the grip is above the
-  thigh, and the tip leans out and forward. No source gives the rest of an orchestral cellist.
+  thigh, in front of the body, and the tip leans out and forward. No source gives the rest of an
+  orchestral cellist.
 
 ### 3.4 The standing contrabass player and the rest
 
