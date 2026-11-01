@@ -69,6 +69,7 @@ import type {
   TierName,
   TraceRange,
 } from './trace.ts';
+import { isCloseShot } from './types.ts';
 import type { Composition, Shot, ShotKey, ShotKind, ShotPlan } from './types.ts';
 import {
   CINEMA_ASPECT,
@@ -2238,8 +2239,7 @@ function blendOf(
   if (beat < r.slowBeatSec && window.meanLoudness > r.softLoudness) {
     return 0;
   }
-  const close = (k: ShotKind): boolean => k === 'conductor' || k === 'section' || k === 'solo';
-  if (!close(previous.shot.kind) || !close(kind)) {
+  if (!isCloseShot(previous.shot.kind) || !isCloseShot(kind)) {
     return 0;
   }
   const S = planner.stageSide;

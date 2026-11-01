@@ -571,7 +571,8 @@ kind of shot of `pnpm shot-trace --rules`. The body is the mesh of the animal in
 with no instrument.
 
 **Transitions, beam, and light.** A hard cut is the default. A blend is a short camera move in a
-slow or quiet window (`BLEND_RULES`), because a true dissolve needs two renders for each frame.
+slow or quiet window between two close shots (`BLEND_RULES`, `isCloseShot`), because a true
+dissolve needs two renders for each frame.
 The beam fades in the close shots, because a close camera sees the additive beam over the full
 image. A close shot gets its own soft key, a kicker, and a stronger vignette, as a film crew
 lights each setup again (`SHOT_LIGHT`). The weights come from the kind of the shot, so they do not
