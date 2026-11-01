@@ -11,6 +11,10 @@
  * proposed fade is full up to the angle that holds 90% of the folded samples (at least 10°), and
  * ends 10° later.
  *
+ * A recast role `<role>@<species>` (`findRole()`) takes the size rule of the cast matrix
+ * (`setRecastHolds()` of `tools/recast-scale.ts`), as `pnpm arm-check` does, so that a rule fits
+ * the folds of a cell of the matrix.
+ *
  * `--json <file>` writes the entry into a file, and
  * `pnpm rig-mesh <animal> --check --set 'raise+=@<file>'` adds it to the list of `raise`.
  *
@@ -26,6 +30,8 @@ import { Matrix4, Quaternion } from 'three';
 import {
   FOLD_ROLES,
   SAMPLE_SETS,
+  findRole,
+  isRole,
   meanTurn,
   probeFolds,
   roleAnimal,
@@ -35,6 +41,7 @@ import type { SampleSet } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { patchedDemos } from './patch-demos.ts';
+import { setRecastHolds } from './recast-scale.ts';
 import { STUDIO_BONES, STUDIO_RAISES } from '../src/models/studio-format.ts';
 import type { Side } from '../src/models/studio-format.ts';
 import type { Quat } from '../src/models/tuples.ts';
@@ -95,7 +102,7 @@ export interface ArmSample {
 
 /** The options of the command. */
 export interface RaiseOptions {
-  /** The name of the role, a key of `FOLD_ROLES`. */
+  /** The name of the role: a key of `FOLD_ROLES`, or a recast role `<role>@<species>`. */
   readonly role: string;
   /** The faces of the module whose folds the rule must remove. */
   readonly faces: readonly number[];
@@ -345,8 +352,8 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
  */
 export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
   const role = args[0] ?? '';
-  const usage = `Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>] [--glb <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}.`;
-  if (!FOLD_ROLES.has(role)) {
+  const usage = `Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>] [--glb <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>.`;
+  if (!isRole(role)) {
     throw new Error(usage);
   }
   const values = (name: string): string[] =>
@@ -393,7 +400,7 @@ export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
  * @throws Error if a demo has an unknown name.
  */
 export async function armSamples(options: RaiseOptions): Promise<ArmSample[]> {
-  const role = FOLD_ROLES.get(options.role);
+  const role = findRole(options.role);
   if (!role) {
     throw new Error(`No role has the name ${options.role}.`);
   }
@@ -406,7 +413,12 @@ export async function armSamples(options: RaiseOptions): Promise<ArmSample[]> {
     options.demos.length > 0 ? all.filter((demo) => options.demos.includes(demo.file)) : all;
   const faces = new Set(options.faces);
   const samples: ArmSample[] = [];
-  const changes = options.changes ? setHolds(options.changes) : null;
+  const recast = role.kind === 'player' && role.recast !== undefined;
+  const changes = recast
+    ? setRecastHolds([options.role], options.changes)
+    : options.changes
+      ? setHolds(options.changes)
+      : null;
   try {
     probeFolds(role, demos, options.step, (...[, studio, , folded, set]) => {
       samples.push({
@@ -429,7 +441,7 @@ async function main(): Promise<void> {
   const { glb, rest } = takeGlb(process.argv.slice(2));
   const options = parseRaiseArgs(rest);
   if (glb) {
-    const role = FOLD_ROLES.get(options.role);
+    const role = findRole(options.role);
     if (role) {
       process.exitCode = await withGlbBody(roleAnimal(role), glb, (dir) =>
         runTool(dir, 'raise-fit.ts', rest),
@@ -441,6 +453,9 @@ async function main(): Promise<void> {
   const samples = await armSamples(options);
   if (options.changes) {
     console.log(`Hold changes: ${options.changes}`);
+  }
+  if (findRole(options.role)?.kind === 'player' && options.role.includes('@')) {
+    console.log('The recast role takes the size rule of the cast matrix (tools/recast-scale.ts).');
   }
   const fit = fitRaise(samples, options);
   console.log(fit.lines.join('\n'));
@@ -479,7 +494,7 @@ export function raiseCount(text: string): number {
  *   in the copy of `--glb`.
  */
 function freeRaises(role: string): string | null {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   const animal = source ? roleAnimal(source) : '';
   const path = join(import.meta.dirname, 'mesh-rigs', `${animal}.json`);
   if (!animal || !existsSync(path)) {
@@ -506,7 +521,7 @@ function writeEntry(file: string, fit: RaiseFit, role: string): string {
     return `No entry, so the tool writes no file ${file}.`;
   }
   writeFileSync(file, `${JSON.stringify(entry, null, 2)}\n`);
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   const animal = source ? roleAnimal(source) : '<animal>';
   return `Wrote the entry to ${file}. Check it with: pnpm rig-mesh ${animal} --check --set 'raise+=@${file}'`;
 }
