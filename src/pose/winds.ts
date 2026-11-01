@@ -1716,6 +1716,53 @@ function aimSide(
 }
 
 /**
+ * Gives the world rotation of a paw on its grip: the paw aims from its shoulder at its grip, and a
+ * paw that faces its tube ({@link WindHold.faceTube}) aims across the tube ({@link aimAcross},
+ * {@link aimSide}) and rolls to face it, by a share of the playing pose. It reads the module
+ * scratch objects `rotation`, `pivot`, and `slide` of the placed instrument
+ * ({@link placeWind}).
+ *
+ * @param rig The points of the player.
+ * @param side The side of the body.
+ * @param from The posed `shoulder` bone.
+ * @param at The posed grip of the palm.
+ * @param aim The share of the aim and the roll of the play.
+ * @param out The quaternion to write.
+ * @returns `out`.
+ */
+function handOnGrip(
+  rig: Omit<WindRig, 'slideReach'>,
+  side: WindSide,
+  from: Frame,
+  at: Vector3,
+  aim: number,
+  out: Quaternion,
+): Quaternion {
+  const face = rig.hold.faceTube[side.arm.side === 'L' ? 0 : 1];
+  if (face === 'none') {
+    return handToward(from, at, out);
+  }
+  tubeAxis.fromArray(side.tube.axis).applyQuaternion(rotation);
+  // The palm faces from its grip to the axis of its tube. The axis of a woodwind passes through
+  // the mouthpiece. The up axis of the bone is no such direction: the oboe and the clarinet hang
+  // with their keys toward the body, so with it, the palms faced up.
+  tubePoint.fromArray(side.tube.point);
+  if (side.tube.onSlide) {
+    tubePoint.add(slide);
+  }
+  tubePoint.sub(pivotBind.fromArray(rig.pivot)).applyQuaternion(rotation).add(pivot);
+  tubeSide.subVectors(tubePoint, at).projectOnPlane(tubeAxis).normalize();
+  aimAcross(from, at, tubeAxis, rig.hold.aimAcross * aim, aimPoint);
+  const sideShare = rig.hold.aimSide[side.arm.side === 'L' ? 0 : 1];
+  if (sideShare !== 0) {
+    aimSide(from, tubeAxis, tubeSide, side.aimSign, sideShare * aim, aimPoint);
+  }
+  handToward(from, aimPoint, out);
+  faceTube(out, tubeSide, side.arm.side, face, aim);
+  return out;
+}
+
+/**
  * Writes one arm and its fingers on the grip of the instrument. A paw that is free in the rest pose
  * moves from its rest place to its grip by the weight of the playing pose.
  *
@@ -1758,30 +1805,9 @@ function poseSide(
   // of its shoulder at rest: with the roll of the grip at rest, the mix from its rest paw flips to
   // the other side of its forearm in the middle of the move. With no roll in the play, the left
   // flute paw of the tan fox points at the flute from below and misses it.
-  const face = rig.hold.faceTube[side.arm.side === 'L' ? 0 : 1];
-  if (face !== 'none') {
-    tubeAxis.fromArray(side.tube.axis).applyQuaternion(rotation);
-    // The palm faces from its grip to the axis of its tube. The axis of a woodwind passes through
-    // the mouthpiece. The up axis of the bone is no such direction: the oboe and the clarinet hang
-    // with their keys toward the body, so with it, the palms faced up.
-    tubePoint.fromArray(side.tube.point);
-    if (side.tube.onSlide) {
-      tubePoint.add(slide);
-    }
-    tubePoint.sub(pivotBind).applyQuaternion(rotation).add(pivot);
-    tubeSide.subVectors(tubePoint, grip).projectOnPlane(tubeAxis).normalize();
-    // The share of the aim and the roll of the play: a hold can keep them in the rest pose.
-    const aim = free ? weight : rig.hold.restAim + (1 - rig.hold.restAim) * weight;
-    aimAcross(shoulder, grip, tubeAxis, rig.hold.aimAcross * aim, aimPoint);
-    const sideShare = rig.hold.aimSide[side.arm.side === 'L' ? 0 : 1];
-    if (sideShare !== 0) {
-      aimSide(shoulder, tubeAxis, tubeSide, side.aimSign, sideShare * aim, aimPoint);
-    }
-    handToward(shoulder, aimPoint, hand);
-    faceTube(hand, tubeSide, side.arm.side, face, aim);
-  } else {
-    handToward(shoulder, grip, hand);
-  }
+  // The share of the aim and the roll of the play: a hold can keep them in the rest pose.
+  const aim = free ? weight : rig.hold.restAim + (1 - rig.hold.restAim) * weight;
+  handOnGrip(rig, side, shoulder, grip, aim, hand);
   const wrist = grip.sub(palm.fromArray(side.arm.palm).applyQuaternion(hand));
 
   // In the playing pose, the paw is on its grip with no mix, so that the pose is the pose of the
