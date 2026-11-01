@@ -290,8 +290,31 @@ passes.
       (clarinet). The rig has the rule weights with no arm segments. The bind supination of the
       spike (left 100°, right 65°) lowers only the paw twist. Try the arm segments with Blender
       weights.
-- [ ] Test mannequin: `ACCEPTED_GRIPS` has no entry for `violinist@mannequin` and
-      `clarinetist@mannequin`. Add them after the gate passes and the manager accepts the crops.
+- [ ] Recast grips: `pnpm arm-check` gives a recast role with no entry of `ACCEPTED_GRIPS` no
+      grip turn, such as `violinist@mannequin`. The grip frame does not move with the bind, so the
+      gate can take the entry of the role, as `pnpm cast-matrix` does. Decide it.
+- [ ] Cast matrix (design 4.4): the baseline of six roles and 20 species gives 7 PASS, 2 OPEN, and
+      111 FAIL (`reports/2026-11-01-cast-matrix/`). In 97 FAIL cells, a value fails in most
+      recast cells of its column, so the shared hold of the instrument fits only its own species.
+      Fit the shared holds of the bowed strings and the winds on more than one body.
+- [ ] Shared violin hold (`BOWED_HOLDS.violin`): the arms go 2.4 cm to 28 cm into the body in the
+      rest, the lift, or the lowering of each recast species.
+- [ ] Shared cello hold (`BOWED_HOLDS.cello`): the right paw flips in the lift or the lowering of
+      15 of 19 species (move turn about 18,000°/s), its grip turns 68° to 172° from the accepted
+      grip, and the forearms go 2 cm to 6 cm into the cello.
+- [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`): the grips turn 46° to 69° (left) and 88° to
+      103° (right) from the accepted grips of the wolf, and the paws of 15 of 19 species miss the
+      keys by up to 38 cm.
+- [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`): the paws of each recast species miss the valves
+      by 9 cm to 45 cm, and the upper arms of 16 of 19 species go into the body.
+- [ ] Shared flute hold (`WIND_HOLDS.flute`): the upper arms of 18 of 19 recast species go up to
+      14 cm into the body.
+- [ ] Recast bodies: the bear, the rhino, the polar bear, the elephant, and the mannequin fold the
+      arms in each role of the matrix (folds p95 13 to 29 in the five roles of the strings and the
+      winds): a fault of the weights or the shapes of each body.
+- [ ] Cast matrix sizes: only the violin and the viola have a size rule (`hold-reach`). The other
+      scaled instruments keep the scale 1 in a recast. The real viola sizes come from a chart of
+      body lengths, times the ratio of a full violin.
 - [ ] Test mannequin: upload `mannequin-human-tpose.fbx` to mixamo.com, and compare the auto-rig
       with `mannequin-human-mixamo.glb`. It needs the Adobe account of the user.
 - [ ] Test mannequin: the Mixamo help pages of Adobe refused the download (HTTP 403), so the
