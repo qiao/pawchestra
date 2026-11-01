@@ -105,10 +105,9 @@ with a worse look is also not done.
 - The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`. A new role adds
   its entry. Change an entry only after the manager accepts the 2x paw crops at a strike and at
   rest.
-- The paw swing, the paw twist, and the flat share count from the bind. A new bind moves their
-  zero, so `--base` can fail with the same world pose. Compare the world bone turns and the ring
-  widths in meters. The depths of `pnpm pose-depth` stay, so sweep one bind only. The grip turn
-  reads the paw in the frame of the posed forearm, so a new bind keeps it.
+- The paw twist, the paw swing, the forearm twist, the move twist, and the flat share count from
+  the bind. When the bind differs from the base, they take only their limits (`REBIND`), and the
+  gate prints the elbow and wrist ring widths. The grip turn ignores the bind.
 - `pnpm arm-look <role>` measures a crumpled or a flat upper arm. Read the 2x crops from the front,
   the back, and each side, because a defect can show from one side only.
 
