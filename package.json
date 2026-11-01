@@ -43,6 +43,7 @@
     "keyboard": "pnpm build && node tools/keyboard-check.ts",
     "smoke": "pnpm prepare-site && node tools/smoke.ts",
     "rig-mesh": "node tools/rig-mesh.ts",
+    "mixamo-import": "node tools/mixamo-import.ts",
     "mesh-options": "node tools/mesh-options.ts",
     "studio-body": "node tools/studio-body.ts",
     "view-point": "node tools/view-point.ts",
