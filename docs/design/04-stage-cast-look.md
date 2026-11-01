@@ -290,7 +290,7 @@ smallest. The roles are the roles of the cast matrix (`CAST_ROLES`) and the own 
 each on the sample of the matrix (`CAST_SAMPLE`). A value from two roles only can put the paw twist
 of a third role near 180°, where the skin folds and the twist measure flips. A change of the
 supination moves each signed paw twist of its side by the same angle, so the signed twists of one
-rig give the value of each side.
+rig give the value of each side (`pnpm bind-supination <species>`).
 
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
