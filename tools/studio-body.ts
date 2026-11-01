@@ -35,6 +35,7 @@ import type {
   StudioHeads,
   StudioPalette,
   StudioRaise,
+  StudioSitting,
   StudioStanding,
   StudioTriangle,
   StudioVertex,
@@ -575,6 +576,16 @@ export const CORRECTIVE_NAMES = ['arm_down_L', 'arm_down_R'] as const;
 export const LEG_CORRECTIVE_NAMES = ['legs_straight_L', 'legs_straight_R'] as const;
 
 /**
+ * The sit corrective shapes of a standing body that also sits (`sitPose` of the config of
+ * `pnpm rig-mesh`), after the other kept shapes: the left side, then the right side. They have
+ * their full weight in the clip `sit` (`StudioBody.sitting`).
+ */
+export const SIT_CORRECTIVE_NAMES = ['sit_L', 'sit_R'] as const;
+
+/** The name of the clip of the seated pose of a standing body that also sits. */
+const SIT_CLIP = 'sit';
+
+/**
  * The corrective shape of a raised arm or of a bent wrist of a rig of `pnpm rig-mesh` (`raise` of
  * its config) whose pose names no morph target, by the side of the arm: the one shape of a file
  * with one pose. A file with a list of poses names the target of each pose, such as `arm_raise_R2`
@@ -588,19 +599,38 @@ const RAISE_TARGET = /^arm_raise_[LR]\d*$/;
 
 /**
  * Gives the corrective shapes that the export keeps for an animal: the arm-down shapes, the shapes
- * of a raised arm or of a bent wrist of the file, and the leg shapes of a seated body that also
- * stands.
+ * of a raised arm or of a bent wrist of the file, the leg shapes of a seated body that also
+ * stands, and the sit shapes of a standing body that also sits.
  *
  * @param settings The settings of the animal.
  * @param raised The morph targets of the shapes of a raised arm or of a bent wrist, in the order of
  *   their poses ({@link raisesOf}).
+ * @param sits True for a standing body that also sits ({@link sitsIn}).
  * @returns The names, in their order in the packed mesh.
  */
 export function keptCorrectives(
   settings: AnimalSettings,
   raised: readonly string[],
+  sits = false,
 ): readonly string[] {
-  return [...CORRECTIVE_NAMES, ...raised, ...(settings.soloist ? LEG_CORRECTIVE_NAMES : [])];
+  return [
+    ...CORRECTIVE_NAMES,
+    ...raised,
+    ...(settings.soloist ? LEG_CORRECTIVE_NAMES : []),
+    ...(sits ? SIT_CORRECTIVE_NAMES : []),
+  ];
+}
+
+/**
+ * Finds if the export gives an animal a seated pose (`StudioBody.sitting`): a standing body whose
+ * rig has the clip of a sit pose (`sitPose` of the config of `pnpm rig-mesh`).
+ *
+ * @param glb The file.
+ * @param settings The settings of the animal.
+ * @returns True for a standing body with the clip.
+ */
+export function sitsIn(glb: Glb, settings: AnimalSettings): boolean {
+  return !settings.seated && (glb.json.animations ?? []).some((a) => a.name === SIT_CLIP);
 }
 
 /**
@@ -2336,6 +2366,80 @@ function standingOf(glb: Glb, skeleton: SourceSkeleton, frame: SceneFrame): Stud
   return { ...upright, tailTurns: turns(STUDIO_TAIL_BONES) };
 }
 
+/**
+ * Finds the seated pose of a standing body that also sits (design 4.4, `StudioBody.sitting`): the
+ * turns of the leg bones in the clip `sit`, in which the sit corrective shapes have their full
+ * weight. The export skins the mesh in that clip, and fits the seat to the seated skin as it fits
+ * the seat of a seated body ({@link sceneFrame}): the soles go onto the floor, the front edge of
+ * the chair of the rig goes to the front edge of the chair of the app, and the seat top is the
+ * lowest point of the body over the seat. The scale stays the scale of the standing body.
+ *
+ * @param glb The file.
+ * @param skeleton The bind pose.
+ * @param mesh The welded mesh, with the moves of the kept shapes.
+ * @param settings The settings of the animal.
+ * @param kept The kept shapes, in the order of the moves of each vertex.
+ * @returns The seated pose, in the model axes.
+ * @throws Error if the hips move or turn in the clip, or if the rig has no chair.
+ */
+function sittingOf(
+  glb: Glb,
+  skeleton: SourceSkeleton,
+  mesh: SourceMesh,
+  settings: AnimalSettings,
+  kept: readonly string[],
+): StudioSitting {
+  const posed = worldMatrices(glb.json, firstKeys(glb, SIT_CLIP).nodes);
+  const skins = new Map(
+    [...skeleton.binds].map(([bone, bind]) => {
+      const world = posed[skeleton.nodes.get(bone) ?? -1];
+      return [bone, world ? world.clone().multiply(bind.clone().invert()) : new Matrix4()] as const;
+    }),
+  );
+  const turn = (bone: string): Quaternion =>
+    new Quaternion().setFromRotationMatrix(skins.get(bone) ?? new Matrix4());
+  if (
+    new Vector3()
+      .setFromMatrixPosition(posed[skeleton.nodes.get('hips') ?? -1] ?? new Matrix4())
+      .distanceTo(headOf(skeleton, 'hips')) > 1e-4 ||
+    turn('hips').angleTo(new Quaternion()) > 1e-3
+  ) {
+    throw new Error('The hips move in the clip sit, so the legs alone do not make it.');
+  }
+  const sitMoves = kept.flatMap((name, s) =>
+    SIT_CORRECTIVE_NAMES.some((sit) => sit === name) ? [s] : [],
+  );
+  const seated: SourceMesh = {
+    vertices: mesh.vertices.map((vertex) => {
+      const rest = vertex.position.clone();
+      for (const s of sitMoves) {
+        rest.add(vertex.moves[s] ?? new Vector3());
+      }
+      const position = new Vector3();
+      for (const [bone, w] of vertex.skin) {
+        position.addScaledVector(rest.clone().applyMatrix4(skins.get(bone) ?? new Matrix4()), w);
+      }
+      return { ...vertex, position };
+    }),
+    faces: mesh.faces,
+  };
+  const frame = sceneFrame(glb, skeleton, seated, { ...settings, seated: true });
+  if (frame.chairDepth === null) {
+    throw new Error('The rig of a sit pose has no chair.');
+  }
+  // The turn of a half circle around y moves a rotation into the model axes: x and z change sign.
+  const model = (q: Quaternion): Quat => [round(-q.x), round(q.y), round(-q.z), round(q.w)];
+  const turns = <T extends string>(bones: readonly T[]): Record<T, Quat> =>
+    // SAFETY: the entries hold each bone of the list one time.
+    Object.fromEntries(bones.map((bone) => [bone, model(turn(bone))])) as Record<T, Quat>;
+  return {
+    drop: toModelAxes(frame.offset, frame.scale),
+    turns: turns(STUDIO_LEG_BONES),
+    seatHeight: seatHeightOf(glb, seated, frame),
+    chairDepth: frame.chairDepth,
+  };
+}
+
 /** The head of a mesh in the clip `reference`, for the measures of the head. */
 interface ClipHead {
   /** The place of each vertex in the clip, in the units and the axes of the studio. */
@@ -2420,9 +2524,11 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
   const glb = readGlb(bytes);
   const skeleton = readSkeleton(glb);
   const raises = raisesOf(glb);
+  const sits = sitsIn(glb, settings);
   const kept = keptCorrectives(
     settings,
     raises.map((raise) => raise.target),
+    sits,
   );
   const mesh = weldMesh(glb, kept);
   const frame = sceneFrame(glb, skeleton, mesh, settings);
@@ -2656,6 +2762,9 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
     crease: settings.crease,
     mesh: packStudioMesh(vertices, ordered.faces, correctives),
   };
+  if (sits) {
+    body = { ...body, sitting: sittingOf(glb, skeleton, mesh, settings, kept) };
+  }
   if (raises.length > 0) {
     body = { ...body, raises: raises.map((raise) => raise.pose) };
   }
@@ -3050,6 +3159,7 @@ export function inspectStudioGlb(
     kept: keptCorrectives(
       used,
       raisesOf(glb).map((raise) => raise.target),
+      sitsIn(glb, used),
     ).includes(name),
   }));
   const lowest = new Vector3(0, Infinity, 0);
