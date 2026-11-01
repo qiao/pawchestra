@@ -20,6 +20,31 @@
 [`demos/README.md`](../../demos/README.md) gives the source link, the license, the typesetter,
 and the SHA-256 of each file.
 
+### Mixamo files
+
+A character or an animation of mixamo.com is a "Content File" of Adobe. The license is royalty
+free for personal, commercial, and non-profit projects, such as films and video games (the
+[Mixamo FAQ](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) of Adobe). It is
+personal and gives no right to sublicense. It permits a modified copy and a distribution only
+inside the end use, and never "on a stand-alone basis, outside of the End Use" (the
+[Adobe General Terms of Use](https://www.adobe.com/legal/terms.html), effective 3 October 2025,
+section 3.6). The
+[Mixamo Additional Terms](https://wwwimages2.adobe.com/content/dam/cc/en/legal/servicetou/Mixamo-Addl-Terms-en_US-20210623.pdf)
+of 23 June 2021 add one rule: no training or test of a machine learning model.
+
+- **Repository.** No Mixamo file goes into git, and no file that a tool makes from one: no FBX
+  file, no GLB file of `pnpm mixamo-import`, and no clip data. The repository is public, so each
+  file in it is a stand-alone copy. Its licenses (CC BY-NC 4.0 and Apache 2.0) would also
+  sublicense the file.
+- **Local files.** Keep the files in `scratch/` or in a folder outside the repository, and give
+  their paths to the tools, as a MIDI file of the user (`--midi`). Only the person who downloaded
+  a file uses it, because the license is personal.
+- **Build.** The build can embed a retargeted clip in the code of the app, as a game embeds its
+  animations, and never a source file. The build has no Mixamo clip now. The dev server and the
+  probes serve the clips of the gallery from the local folder (4.4), and `dist/` gets none.
+- **Auto-rig.** The terms do not name the skeleton and the weights that the auto-rigger of
+  Mixamo gives an own mesh. Keep them outside git until the project author decides.
+
 ## 8.2 List
 
 | # | Hash id | Piece | Source | License | What it shows |
