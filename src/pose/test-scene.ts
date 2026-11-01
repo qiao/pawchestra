@@ -5,6 +5,7 @@ import type { SceneLayout } from '../models/layout.ts';
 import { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { InstrumentId } from '../models/instruments/types.ts';
+import type { SpeciesId } from '../models/species.ts';
 import { scoreOf } from '../score/test-score.ts';
 import type { Score, SectionSize } from '../score/types.ts';
 import { preparePoses } from './plan.ts';
@@ -18,6 +19,24 @@ export interface TestScene {
   readonly plan: PosePlan;
   /** The player models that the layout and the plan share. */
   readonly models: ModelCache;
+  /**
+   * The species of the seat of each player before a recast ({@link recastScene}), or none when
+   * each player has the species of its seat.
+   */
+  readonly seats?: readonly SpeciesId[];
+}
+
+/**
+ * A recast of the seats of a role: another species plays the instrument of the role in its seats,
+ * such as the wolf in the seats of the rabbit violinists (`violinist@wolf`).
+ */
+export interface Recast {
+  /** The instrument of the role, which the new species plays. */
+  readonly instrument: InstrumentId;
+  /** The species of the role. The recast takes them out of the seats with the instrument. */
+  readonly from: readonly SpeciesId[];
+  /** The species that plays in the seats. */
+  readonly species: SpeciesId;
 }
 
 /**
@@ -38,6 +57,54 @@ export function sceneOf(
   const models = new ModelCache();
   const layout = layoutScene(score, models);
   return { score, layout, plan: preparePoses(score, layout, seed, models), models };
+}
+
+/**
+ * Puts another species into the seats of a role, as a test of a body in a role that is not its
+ * own: each player with the instrument of the recast and a species of the role gets the new
+ * species. The places of the layout stay, and the plan is made again for the new cast. The
+ * sweeps find the seats of a role by the species of the seat ({@link seatSpecies}).
+ *
+ * @param scene The scene with the cast of the score.
+ * @param recast The recast.
+ * @param seed The seed of the pose.
+ * @returns The scene, or the same scene when no seat changes.
+ */
+export function recastScene(scene: TestScene, recast: Recast, seed = 1): TestScene {
+  const changed = (index: number): boolean => {
+    const cast = scene.layout.players[index]?.cast;
+    return (
+      cast !== undefined &&
+      cast.instrument === recast.instrument &&
+      recast.from.includes(cast.species)
+    );
+  };
+  if (!scene.layout.players.some((_, index) => changed(index))) {
+    return scene;
+  }
+  const players = scene.layout.players.map((place, index) =>
+    changed(index) ? { ...place, cast: { ...place.cast, species: recast.species } } : place,
+  );
+  const layout = { ...scene.layout, players };
+  return {
+    score: scene.score,
+    layout,
+    plan: preparePoses(scene.score, layout, seed, scene.models),
+    models: scene.models,
+    seats: scene.layout.players.map((place) => place.cast.species),
+  };
+}
+
+/**
+ * Gives the species of the seat of a player: the species of its cast, or the species of the seat
+ * before a recast ({@link recastScene}).
+ *
+ * @param scene The scene.
+ * @param index The index of the player.
+ * @returns The species, or `undefined` when the scene has no such player.
+ */
+export function seatSpecies(scene: TestScene, index: number): SpeciesId | undefined {
+  return scene.seats?.[index] ?? scene.layout.players[index]?.cast.species;
 }
 
 /**
