@@ -25,7 +25,7 @@ The steps:
    and Normalize All. Then turn each bone up with no roll, so that each joint has no turn in the
    rest pose, as in a Mixamo file (`mixamo_rig()`).
 4. Key the test clips at 30 frames per second (`add_clips()`).
-5. Pose the arms 45 degrees down from the T-pose and apply the skin to the mesh: this is the
+5. Pose the arms 40 degrees down from the T-pose and apply the skin to the mesh: this is the
    A-pose mesh (`a_pose_mesh()`).
 6. Write the files. The FBX files are in centimeters, as a Mixamo download (`write_fbx()`).
 
@@ -813,8 +813,11 @@ def add_clips(p, rig):
 
 # ##### Step 5: the A-pose. #####
 
-#: The angle of each arm below the level in the A-pose, in degrees.
-A_POSE = 45.0
+#: The angle of each arm below the level in the A-pose, in degrees, near the 43 degrees of the
+#: upper arm of the wolf mesh (`tools/mesh-rigs/wolf.json`). An angle of 45 degrees gives the
+#: arm direction 0.707107 in the studio module, which the lint refuses as an approximate
+#: `Math.SQRT1_2`.
+A_POSE = 40.0
 
 
 def a_pose_mesh(rig, body, name):

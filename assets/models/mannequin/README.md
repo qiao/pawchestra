@@ -31,7 +31,7 @@ FBX files.
 
 | File | Contents | Use |
 |---|---|---|
-| `mannequin-<preset>.glb` | The mesh in an A-pose (each arm 45 degrees down), with no skeleton | The input of `pnpm rig-mesh` |
+| `mannequin-<preset>.glb` | The mesh in an A-pose (each arm 40 degrees down), with no skeleton | The input of `pnpm rig-mesh` |
 | `mannequin-<preset>-tpose.fbx` | The mesh in a T-pose, with no skeleton | An upload to mixamo.com |
 | `mannequin-<preset>-mixamo.glb` | The T-pose mesh with the Mixamo skeleton (65 bones), weights of at most 4 bones, and the test clips | The input of the Mixamo adapter |
 | `mannequin-<preset>-mixamo.fbx` | The same as an FBX file in centimeters, with one take for each clip (`Armature\|<clip>`) | The input of the Mixamo adapter |
@@ -104,11 +104,11 @@ by side in it.
 
 | File | Size (bytes) | SHA-256 |
 |---|---|---|
-| `mannequin-human.glb` | 192,300 | `f8ad4b9a14e2114f977900679e6c06f7ee708ea4b6e15c1d676856df857533fe` |
+| `mannequin-human.glb` | 192,300 | `52d0cdefbe82107d572069e7a2a562231571400240aef68521b0499251d58a0c` |
 | `mannequin-human-tpose.fbx` | 161,196 | `fc573bbd6cad5711ca848bc60423250bce728baabff78e33f8471c03d963d58b` |
 | `mannequin-human-mixamo.glb` | 675,804 | `1c1fa2d7541dc696b469ec622374f4951e9de33b1fecaaf34fba32711f753905` |
 | `mannequin-human-mixamo.fbx` | 1,937,068 | `baf117ad7f52f7584b8ca968435c0f35df26b039c696b14a70db32fee730a21c` |
-| `mannequin-animal.glb` | 116,076 | `77da476e3205953f20a42f82ef494ec03f254efbe0892f169beffa435b731d32` |
+| `mannequin-animal.glb` | 116,076 | `c4b94597490424d88e8c8ede9c98b2748f39e6552896e93b1e02c4137cd4438f` |
 | `mannequin-animal-tpose.fbx` | 103,980 | `3b9ac703f7e7ad66a98cb453476d6aa5b5b5a762e86d12f9a99147de7452996f` |
 | `mannequin-animal-mixamo.glb` | 564,632 | `973682ee26bff0c1f405d50436bf744ab5b75bd3facff9f855694acb185562d6` |
 | `mannequin-animal-mixamo.fbx` | 1,870,156 | `d65c2d482fd1d1d28d280b513a2571611993c537de08c8b0394b04e6bde2cbc7` |
