@@ -323,9 +323,17 @@ passes.
       Fit the shared holds of the bowed strings and the winds on more than one body.
 - [ ] Shared violin hold (`BOWED_HOLDS.violin`): the arms go 2.4 cm to 28 cm into the body in the
       rest, the lift, or the lowering of each recast species.
-- [ ] Shared cello hold (`BOWED_HOLDS.cello`): the right paw flips in the lift or the lowering of
-      15 of 19 species (move turn about 18,000°/s), its grip turns 68° to 172° from the accepted
-      grip, and the forearms go 2 cm to 6 cm into the cello.
+- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): with the place from the body and the cello
+      rule, the wolf passes, and the dog stays `OPEN`. The bow paw of the rabbit, the panda, the
+      monkey, and the mouse flips in the lift and twists 134° to 179° at rest, with folds R 10 to
+      11 at rest: fit the rest bow and its via to the body. The forearms go 1.8 cm to 2.7 cm into
+      the cello in the play of the deer, the foxes, the polar bear, and the mannequin.
+- [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
+      (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
+      14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
+      takes the rule as `celloScale` by hand, because the rule poses the hold in a tool.
+- [ ] Standing-bind cellists: the bear, the hippo, the elephant, the badger, the rhino, and the
+      penguin bind standing and cannot sit at the cello yet (14 to 24 `FAIL` values each).
 - [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`): the grips turn 46° to 69° (left) and 88° to
       103° (right) from the accepted grips of the wolf, and the paws of 15 of 19 species miss the
       keys by up to 38 cm.
@@ -336,9 +344,10 @@ passes.
 - [ ] Recast bodies: the bear, the rhino, the polar bear, the elephant, and the mannequin fold the
       arms in each role of the matrix (folds p95 13 to 29 in the five roles of the strings and the
       winds): a fault of the weights or the shapes of each body.
-- [ ] Cast matrix sizes: only the violin and the viola have a size rule (`hold-reach`). The other
-      scaled instruments keep the scale 1 in a recast. The real viola sizes come from a chart of
-      body lengths, times the ratio of a full violin.
+- [ ] Cast matrix sizes: only the violin, the viola (`hold-reach`), and the cello
+      (`cello-size.ts`) have a size rule. The other scaled instruments keep the scale 1 in a
+      recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
+      violin.
 - [ ] Test mannequin: upload `mannequin-human-tpose.fbx` to mixamo.com, and compare the auto-rig
       with `mannequin-human-mixamo.glb`. It needs the Adobe account of the user.
 - [ ] Test mannequin: the Mixamo help pages of Adobe refused the download (HTTP 403), so the
