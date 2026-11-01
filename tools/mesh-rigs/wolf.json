@@ -346,19 +346,16 @@
         -0.023386,
         0.312493,
         0.949632
-      ],
-      "hand": [
-        -0.443922,
-        0.296269,
-        0.84567
       ]
     },
-    "bindArmsNote": "The bind forearm and the bind hand turn 45 degrees forward about the bind upper arm from the bind arms of the cat and the dog, and the hand keeps its wrist bend of 25 degrees in the frame of the palm, as on the rhino. The bind elbow sets the zero of the roll of the upper arm, so the rolls of the clarinet stay near 0.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The forearm direction turns 45 degrees forward about the bind upper arm from the bind arms of the cat and the dog. The elbow axis sets the zero of the roll of the upper arm, so the rolls of the clarinet stay near 0. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the elbow and the wrist of the rest shape keep the angles of the source (8 and 22 degrees between the joints). Thus the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape. The clarinet and the violin (violinist@wolf) both pass the arm gate with this bind. A bind bent for one hold (the elbow 62 degrees, the paw 25 degrees) gives a rest shape with the inner elbow and wrist skin pressed for that hold, and each other hold blends its own bend on top.",
     "bindSupination": {
-      "L": 66,
-      "R": 57
+      "L": 100,
+      "R": 65
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 66 degrees and the right 57 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The bind paw sets the zero of the paw twist, so the paw twists stay small in the clarinet hold.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 100 degrees and the right 65 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The bind paw sets the zero of the paw twist. Each value is near the middle of the play twists of the clarinet hold and the violin hold, so that the paw twist of each hold stays far below 180 degrees: the left paw twists about 69 degrees in the clarinet hold and about -83 degrees in the violin hold. With no supination, the left violin paw twists about 177 degrees, and the twist measure flips at 180 degrees.",
     "tailBind": {
       "tail": [
         0,
