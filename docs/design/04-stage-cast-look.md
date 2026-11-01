@@ -274,6 +274,9 @@ axis of each arm (`StudioBody.hinges`). The axis is the axis of the bent bind of
 `studio.bindArms`, so that the upper arms and the paws keep their world turns in each pose. The
 inner elbow then bends further from its bind, so a `raise` shape of a bent elbow relaxes its faces.
 The linear blend of the larger bend also narrows the bent elbow, and a shape cannot widen it.
+Weights that keep the forearm and the elbow helper off the upper arm keep the elbow wide, but the
+whole bend then falls on the rings at the joint, and the inner skin folds. A fold-free inner
+elbow needs a turn ramp about as long as the elbow radius times the bend angle.
 
 **Role-neutral bind.** The target of each body is a bind that fits no single role: straight bind
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
