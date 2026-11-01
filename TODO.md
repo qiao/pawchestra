@@ -55,6 +55,9 @@ render, and the memory.
       a perf-section shot with 2.2 million changed pixels and a softer blur, and the next run
       matched the base. The automatic tier can drop under load. Find the causes, so that a check
       of a refactor can trust each shot.
+- [ ] After a restored WebGL context, run the compile and warm-up steps of a build too
+      (`#compileSteps`, `#warmSteps` of `StageScene`). Now the first frame compiles the programs on
+      the main thread, and the frames draw with empty maps for about 0.3 s (7.2).
 
 Done when: the screenshot has the composition of the reference (9.5), and the clock target
 passes.
@@ -680,6 +683,10 @@ passes, and the quality tiers of 2.6 keep 60 fps on a laptop.
 - [ ] Add `pnpm knip` for the unused exports, with the HTML entries, `tools/**/*.ts`, and
       `--include-entry-exports`.
 - [ ] Format `tools/mesh-rigs/*.json` with oxfmt, so that a script can rewrite them.
+- [ ] Let `pnpm frame-compare` pass `--canvas-only` to its frozen step, for a round that changes
+      the UI and the scene.
+- [ ] Let the contrast checks of `e2e/title-shade.e2e.ts` print the place of the worst pixel, not
+      only the ratio. An outline of the GitHub pill needed a probe to find.
 - [ ] Remove the audit and review labels from the `it()` and `describe()` names of the paused
       tests, and the dated notes that the `_arms.py` scripts write into the weights files of
       `assets/models/`.
