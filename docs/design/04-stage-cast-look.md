@@ -313,6 +313,9 @@ a hold, or a body runs it.
   stay sharp. The other bodies share one angle. The colors hold the baked occlusion of the rig.
 - **Bind mesh.** `buildStudioBody()` gives the mesh in the bind pose of the player, with two
   bones for each corner, for the footprints, the budgets, and the tests.
+- **Recast role.** A role tool tests a body in a role that is not its own with a recast role
+  `<role>@<species>` (`recastScene()` of `pose/test-scene.ts`). The species takes the seats and
+  the instrument of the role in the test scenes only, and the cast of the app does not change.
 
 ## 4.5 Visual values
 
