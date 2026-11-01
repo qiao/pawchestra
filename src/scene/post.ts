@@ -369,6 +369,8 @@ interface Targets {
   readonly blurPrepare: WebGLRenderTarget | null;
   /** The soft image at half size. */
   readonly blurGather: WebGLRenderTarget | null;
+  /** Each target above, for the crop of each frame and the disposal. */
+  readonly all: readonly WebGLRenderTarget[];
 }
 
 /**
@@ -553,17 +555,8 @@ export class PostPipeline {
    * @param rect The part of the canvas that shows the scene, or `null` for the full canvas.
    */
   #crop(targets: Targets, rect: UvRect | null): void {
-    for (const target of [
-      targets.scene,
-      ...targets.bloomDown,
-      ...targets.bloomUp,
-      targets.depth,
-      targets.blurPrepare,
-      targets.blurGather,
-    ]) {
-      if (target) {
-        cropTarget(target, rect);
-      }
+    for (const target of targets.all) {
+      cropTarget(target, rect);
     }
   }
 
@@ -628,15 +621,15 @@ export class PostPipeline {
     // No pass reads the depth of the scene target, so the resolve of its samples copies only the
     // color. The depth of field and the haze render their own depth.
     scene.resolveDepthBuffer = false;
-    return {
-      scene,
-      bloomDown: sizes.map(([w, h]) => floatTarget(w, h, format)),
-      bloomUp: sizes.slice(0, -1).map(([w, h]) => floatTarget(w, h, format)),
-      depth,
-      // The blur of each pixel needs the alpha channel.
-      blurPrepare: blur ? floatTarget(halfWidth, halfHeight, 'half') : null,
-      blurGather: blur ? floatTarget(halfWidth, halfHeight, format) : null,
-    };
+    const bloomDown = sizes.map(([w, h]) => floatTarget(w, h, format));
+    const bloomUp = sizes.slice(0, -1).map(([w, h]) => floatTarget(w, h, format));
+    // The blur of each pixel needs the alpha channel.
+    const blurPrepare = blur ? floatTarget(halfWidth, halfHeight, 'half') : null;
+    const blurGather = blur ? floatTarget(halfWidth, halfHeight, format) : null;
+    const all = [scene, ...bloomDown, ...bloomUp, depth, blurPrepare, blurGather].filter(
+      (target) => target !== null,
+    );
+    return { scene, bloomDown, bloomUp, depth, blurPrepare, blurGather, all };
   }
 
   #renderBloom(targets: Targets): WebGLRenderTarget | null {
@@ -855,15 +848,8 @@ export class PostPipeline {
       return;
     }
     targets.depth?.depthTexture?.dispose();
-    for (const target of [
-      targets.scene,
-      ...targets.bloomDown,
-      ...targets.bloomUp,
-      targets.depth,
-      targets.blurPrepare,
-      targets.blurGather,
-    ]) {
-      target?.dispose();
+    for (const target of targets.all) {
+      target.dispose();
     }
     this.#targets = null;
   }
