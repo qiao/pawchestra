@@ -349,8 +349,11 @@ passes.
       `WOLF_VIOLIN_HOLD` for `violinist@wolf`, and the cast matrix takes the shared hold. The wolf
       passes with the shared violin hold, so its own hold can go. The `--base` build of
       `close-views` and the `--base` sweep of `pose-depth` keep the scale of their commit.
-- [ ] Standing-bind violinists: the bear, the hippo, the elephant, the badger, the rhino, and the
-      penguin bind standing and cannot sit with the violin yet.
+- [ ] Seated bear (4.4): the rig gives a standing bind a sit pose (`sitPose`, `seatedBody()`).
+      Give the bear its sit pose (the values of `reports/2026-11-01-bear-sit/`), write its GLB
+      and its module, and check that only the seated bear changes and the conductor stays
+      (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
+      go 5 cm to 10 cm into the body, as on the standing bear.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
       the dog stays `OPEN`. The right paw of the panda (1.9 cm) and the left claws of the monkey
       (1.8 cm) go into the cello in a few play samples. The cello of the foxes goes 5.0 cm into the
@@ -363,8 +366,10 @@ passes.
       (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
       14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
       takes the rule as `celloScale` by hand, because the rule poses the hold in a tool.
-- [ ] Standing-bind cellists: the bear, the hippo, the elephant, the badger, the rhino, and the
-      penguin bind standing and cannot sit at the cello yet (14 to 24 `FAIL` values each).
+- [ ] Penguin seat (4.4): the penguin binds standing. A sit pose works, but it shows no change,
+      because the egg hides the legs and the seat stays at about 6 cm. Decide if the penguin
+      takes seated roles. The hippo, the elephant, the badger, and the rhino bind seated already,
+      and their seated cells fail on the arms.
 - [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`): the grips turn 46° to 69° (left) and 88° to
       103° (right) from the accepted grips of the wolf, and the paws of 15 of 19 species miss the
       keys by up to 38 cm.
