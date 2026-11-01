@@ -217,7 +217,12 @@ The rest of each family:
   upright on the left thigh, the neck through the closed left paw, and the bow upright at the
   right side (`restHandAt()`, `UPRIGHT_BOW`). In a move, the instrument turns with the left paw as
   one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). A
-  standing player hangs the bow with the tip down (`HANGING_BOW`).
+  standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold, the
+  arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
+  bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
+  its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
+  upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
+  arm root.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. The hippo hangs the bow beside the belly,
   because its short knee is under the belly.
