@@ -344,7 +344,8 @@ and at the highest rates the wrist and the elbow move in phase [56 (abstract)].
   least 30 in long, of a 3/4 26 in to 27.25 in, and of a 1/2 23 in to 26 in [63] (abstract). A
   size guide takes a 1/2 for a player of 4 ft 0 in to 4 ft 6 in with an arm of 20 in to 22 in,
   and a 4/4 for a player of at least 5 ft 0 in with an arm of at least 24 in. Two of the height,
-  the arm length, and the finger span must match [64].
+  the arm length, and the finger span must match [64]. A 1/10 cello of one maker has a back of
+  19.5 in [84] (search summary): 0.65 of the back of a 4/4 (derived).
 - **The bow at rest.** In a first lesson, the screw of the frog stands on top of the right knee,
   so that the bow points up at the ceiling, and the left hand rests on the left knee [61]. No
   source of this file gives the rest of an orchestral cellist between pieces.
@@ -531,11 +532,17 @@ The app does not follow these facts:
 
 The app follows these facts:
 
-- **The contacts (2.7).** The dog holds the cello with `DOG_HOLD`: the endpin on the floor in
-  front of the chair, the back of the cello against the belly and the chest, and the neck at the
-  left of the head, above the left shoulder.
-- **The angle (2.7).** The cello leans back in the range of the handout [65], and a little to the
-  left. The dog sits upright, with a small lean forward [66].
+- **The contacts (2.7).** Each seated body holds the cello at a place from its body
+  (`CELLO_PLACE`, `fitCelloPlace()`): the endpin on the floor right of the middle, the top of the
+  back at the height of the chest, and the neck at the left of the head, above the left shoulder.
+  The end pin of each body fits its chest (`celloPinOf()`), as a cellist sets the end pin. The
+  dog keeps a fixed place of its own (`DOG_HOLD`).
+- **The angle (2.7).** The cello leans back 25.7° and 14° to the left, 28° from the vertical, in
+  the range of the handout [65]. The trunk leans 3° forward [66].
+- **The size (2.7).** The cello rule (`celloRule()` of `tools/cello-size.ts`) takes the largest
+  cello at which the left paw reaches the first position with the elbow bent, the end pin fits
+  the chest, and the lower bout is not below the knees. It clamps the size from a 1/10 [84] to a
+  4/4 [63].
 - **The rest (2.7).** The cello stays between the knees, and the left paw holds it. The right paw
   holds the bow over the right knee with the tip up, as in the first lesson of [61].
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings,
@@ -544,8 +551,13 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The knees (2.7).** The short thighs of the dog end far behind the lower bout of the leaned
+- **The chest (2.7).** The middle line of the back stands 0.28 H in front of the trunk, the room
+  of the arms in the accepted dog hold. Pressed onto the chest, the cello went 5 cm to 12 cm into
+  the bodies of the cast matrix.
+- **The knees (2.7).** The short thighs of most bodies end far behind the lower bout of the leaned
   cello, so the knees do not touch it.
+- **The elbow (1.9).** No source gives the bend of the left elbow at the first position. The rule
+  takes the bend of the dog at its accepted cello, 65° between the upper arm and the forearm.
 - **The left hand (1.9).** The left paw tilts further over the neck from the bass side
   (`BowedHold.tiltL`), so that the thick paw keeps off the fingerboard.
 - **The bow at rest (2.7).** The short arm does not reach the knee, so the grip is above the
@@ -787,3 +799,6 @@ Each source opened on 2026-10-17, except where its entry gives another date.
     https://www.corilon.com/gb/library/practical-advice/finding-a-student-violin-in-the-proper-size
 83. Wikipedia, "Pizzicato", the "banjo" position of the violin and the viola. Opened on
     2026-10-27. https://en.wikipedia.org/wiki/Pizzicato
+84. PMT Online, "Stentor Student I Cello (Back Length 19.5in) 1/10", a product page. The page did
+    not open on 2026-11-01, and the fact comes from a search summary.
+    https://pmtonline.co.uk/stentor-student-i-cello-back-length-19-5in-1-10
