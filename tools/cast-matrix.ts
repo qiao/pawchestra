@@ -41,6 +41,7 @@ import { dirname, join, resolve } from 'node:path';
 import { ACCEPTED_GRIPS, ARM_LIMITS, gateRows, probeRole } from './arm-check.ts';
 import type { GateRow, Measure, RoleReport } from './arm-check.ts';
 import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
+import type { RoleSource } from './fold-probe.ts';
 import { setHolds } from './hold-sets.ts';
 import { sampleAt, sweepDemos } from './pose-depth.ts';
 import type { TargetReach } from './pose-depth.ts';
@@ -61,6 +62,7 @@ import { SCALE_PARAMS, SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/s
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import { SPECIES_HOLDS } from '../src/pose/bowed-rig.ts';
 import { depthLimit } from '../src/pose/test-sweep.ts';
+import type { RoleSweep } from '../src/pose/test-sweep.ts';
 import { SPECIES_WIND_HOLDS } from '../src/pose/winds.ts';
 import { scoreOf } from '../src/score/test-score.ts';
 
@@ -355,7 +357,7 @@ export function pairName(species: SpeciesId, role: string): string {
  * @returns The file of the demo.
  * @throws Error if no demo has the role.
  */
-async function roleDemo(role: string): Promise<string> {
+export async function roleDemo(role: string): Promise<string> {
   const sweep = findSweep(role);
   if (!sweep) {
     throw new Error(`The ${role} has no sweep.`);
@@ -412,6 +414,51 @@ function scaleOfChanges(
   return named ? { value: params[SCALE_PARAMS[instrument]] ?? 1, source: 'set' } : null;
 }
 
+/** One pair of the matrix, set up in memory by {@link setPair}. */
+export interface CastPair {
+  /** The name of the pair for the role tools: the role, or `<role>@<species>`. */
+  readonly name: string;
+  /** True for the own role of the species. */
+  readonly own: boolean;
+  /** The role of the pair (`findRole()`). */
+  readonly source: Extract<RoleSource, { readonly kind: 'player' }>;
+  /** The sweep of the pair (`findSweep()`). */
+  readonly sweep: RoleSweep;
+  /** The instrument scale. */
+  readonly scale: PairScale;
+}
+
+/**
+ * Sets up one pair of the matrix in memory, as the matrix measures it: the hold changes, then, for
+ * a recast pair, the shared hold of the instrument and the size rule. The change stays, so a
+ * caller measures one pair in its own process.
+ *
+ * @param species The species.
+ * @param role The role.
+ * @param changes The hold changes ({@link MatrixVariant}), before the shared hold and the size
+ *   rule, or `''` for none.
+ * @returns The pair.
+ * @throws Error if the pair has no role or no sweep.
+ */
+export function setPair(species: SpeciesId, role: string, changes: string): CastPair {
+  const name = pairName(species, role);
+  const own = name === role;
+  const source = findRole(name);
+  const sweep = findSweep(name);
+  if (source?.kind !== 'player' || !sweep) {
+    throw new Error(`The pair ${name} has no role or no sweep.`);
+  }
+  setHolds(changes);
+  let scale: PairScale = { value: 1, source: 'own' };
+  if (!own) {
+    useSharedHold(species, source.instrument);
+    scale =
+      scaleOfChanges(species, source.instrument, changes) ??
+      setRecastScale(species, source.instrument);
+  }
+  return { name, own, source, sweep, scale };
+}
+
 /**
  * Measures one pair in this process: the arm gate and the sweep on the sample of the role. A fault
  * of the pair, such as a species with no body sweep, gives the JSON with its message, so that the
@@ -438,18 +485,9 @@ async function measurePair(
   const base = { version: CAST_FORMAT, species, role, name, own, demo };
   let scale: PairScale = { value: 1, source: 'own' };
   try {
-    const source = findRole(name);
-    const sweep = findSweep(name);
-    if (source?.kind !== 'player' || !sweep) {
-      throw new Error(`The pair ${name} has no role or no sweep.`);
-    }
-    setHolds(changes);
-    if (!own) {
-      useSharedHold(species, source.instrument);
-      scale =
-        scaleOfChanges(species, source.instrument, changes) ??
-        setRecastScale(species, source.instrument);
-    }
+    const cast = setPair(species, role, changes);
+    const { source, sweep } = cast;
+    scale = cast.scale;
     const demos = (await probeDemos()).filter((file) => file.file === demo);
     const grips = ACCEPTED_GRIPS.get(role) ?? null;
     const arms = probeRole(source, demos, sample.step, grips);
