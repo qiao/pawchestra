@@ -370,13 +370,30 @@ passes.
       because the egg hides the legs and the seat stays at about 6 cm. Decide if the penguin
       takes seated roles. The hippo, the elephant, the badger, and the rhino bind seated already,
       and their seated cells fail on the arms.
-- [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`): the grips turn 46° to 69° (left) and 88° to
-      103° (right) from the accepted grips of the wolf, and the paws of 15 of 19 species miss the
-      keys by up to 38 cm.
+- [ ] Shared flute hold (`WIND_HOLDS.flute`, 5.3): 3 of the 14 seated bodies pass (the tan fox,
+      the rabbit, the wolf). The free left paw of the deer, the beaver, the monkey, and the pig
+      turns near or through 180° on its forearm in the lift, because their bind paws lie about 100°
+      from the bind paws of the foxes. Port the twist mix of the violin carry (`mixTwist()` of
+      `pose/bowed.ts`) to the free wind paw. The arms of the red fox, the cat, the panda, the polar
+      bear, and the mannequin go 2.1 cm to 4.1 cm into the body at rest and in the moves, the left
+      upper arm of the dog twists 58° (limit 55°), and the paws of the mouse miss the flute by
+      1.5 cm. At rest, the right paw can stand off the upright flute (rabbit images).
+- [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`, 5.3): 3 of the 14 seated bodies pass (the wolf,
+      the deer, the monkey). The upper arms of the cat, the pig, the polar bear, and the mannequin
+      go 4.1 cm to 5.3 cm into the deep chest in the play, and the paws of the foxes, the cat, the
+      mouse, and the beaver miss the keys by 3.5 cm to 13 cm.
 - [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`): the paws of each recast species miss the valves
-      by 9 cm to 45 cm, and the upper arms of 16 of 19 species go into the body.
-- [ ] Shared flute hold (`WIND_HOLDS.flute`): the upper arms of 18 of 19 recast species go up to
-      14 cm into the body.
+      by 9 cm to 45 cm at the size 1. With the arm values of the monkey and the rest from the
+      hanging arms, the paws still missed by 2.8 cm to 15 cm, and the arms went 3 cm to 15 cm into
+      the body at rest. A pocket trumpet is 24 cm long (Wikipedia, "Pocket trumpet"), about half of
+      a standard trumpet: a size rule needs the length of a standard trumpet from a source.
+- [ ] Wind size rules (4.6): a flute with a curved head joint is 51 cm against 67 cm straight
+      (Classic Cantabile FL-200U, kirstein.de), and an E♭ clarinet is about 49 cm (Wikipedia,
+      "E-flat clarinet"), against the 0.67 m of the clarinet of the app at 0.85. Add the flute and
+      the clarinet to `SCALED_INSTRUMENTS` with a rule of the cast matrix, for the mouse.
+- [ ] Standing winds: a soloist plays the flute and the trumpet standing. Check if a standing hold
+      (`stand`) helps the bodies whose seated flute and clarinet cells fail on the arms (the bear,
+      the hippo, the elephant, the badger, the rhino, and the penguin).
 - [ ] Recast bodies: the bear, the rhino, the polar bear, the elephant, and the mannequin fold the
       arms in each role of the matrix (folds p95 13 to 29 in the five roles of the strings and the
       winds): a fault of the weights or the shapes of each body.
