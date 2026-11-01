@@ -24,7 +24,7 @@ import { writeFileSync } from 'node:fs';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 
 import { MOVE_STEP, demoMoves } from './arm-check.ts';
-import { FOLD_ROLES, roleBodies } from './fold-probe.ts';
+import { FOLD_ROLES, findRole, isRole, roleBodies, roleScene } from './fold-probe.ts';
 import { setHolds } from './hold-sets.ts';
 import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
@@ -36,7 +36,7 @@ import { createStudioPose, poseStudioBones, studioOffsets } from '../src/models/
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { LIFT_FIT_SEC, LOWER_MAX_SEC } from '../src/pose/rest.ts';
-import { PLAYING, allAudible, sceneOf } from '../src/pose/test-scene.ts';
+import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 import type { Transport } from '../src/pose/types.ts';
 
 /** The usage text of `pnpm carry-check`. */
@@ -131,6 +131,18 @@ export function carryRoles(): string[] {
 }
 
 /**
+ * Tells if a role carries its instrument: a role of {@link carryRoles}, or a recast role
+ * (`findRole()` of `tools/fold-probe.ts`) with an instrument of {@link CARRIED}.
+ *
+ * @param role The name of the role.
+ * @returns True for a role with a carried instrument.
+ */
+function carries(role: string): boolean {
+  const source = isRole(role) ? findRole(role) : undefined;
+  return source?.kind === 'player' && CARRIED.includes(source.instrument);
+}
+
+/**
  * Reads the command line of `pnpm carry-check`.
  *
  * @param args The arguments after the script.
@@ -146,10 +158,10 @@ export function carryArgs(args: readonly string[]): CarryArgs {
   }
   const roles = list.split(',').map((role) => role.trim());
   const known = carryRoles();
-  const wrong = roles.filter((role, i) => !known.includes(role) || roles.indexOf(role) !== i);
+  const wrong = roles.filter((role, i) => !carries(role) || roles.indexOf(role) !== i);
   if (wrong.length > 0) {
     throw new Error(
-      `The roles ${wrong.join(', ')} are not roles with a carried instrument, or come two times. The roles are: ${known.join(', ')}.`,
+      `The roles ${wrong.join(', ')} are not roles with a carried instrument, or come two times. The roles are: ${known.join(', ')}, and their recast roles <role>@<species>.`,
     );
   }
 
@@ -291,7 +303,7 @@ export function stepsCarry(steps: readonly CarryStep[]): StepValues {
  * @throws Error if the role has no carried instrument.
  */
 export function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   if (source?.kind !== 'player' || !CARRIED.includes(source.instrument)) {
     throw new Error(`The role ${role} has no carried instrument.`);
   }
@@ -301,7 +313,7 @@ export function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarr
 
   const moves: MoveCarry[] = [];
   for (const demo of demos) {
-    const scene = sceneOf(demo.bytes);
+    const scene = roleScene(source, demo.bytes);
     const audible = allAudible(scene.score);
     const buffer = createScenePose(scene.plan);
     for (const { index, model } of roleBodies(source, scene)) {
