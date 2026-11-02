@@ -293,7 +293,11 @@ inner elbow then bends further from its bind, so a `raise` shape of a bent elbow
 The linear blend of the larger bend also narrows the bent elbow, and a shape cannot widen it.
 Weights that keep the forearm and the elbow helper off the upper arm keep the elbow wide, but the
 whole bend then falls on the rings at the joint, and the inner skin folds. A fold-free inner
-elbow needs a turn ramp about as long as the elbow radius times the bend angle.
+elbow needs a turn ramp about as long as the elbow radius times the bend angle. The relax of a
+shape moves only the faces that turn over in the pose of its rule, so the fold can move to the
+next faces of the elbow ring. Thus a rule of a bent elbow can turn further than the mean turn of
+its folded samples (`--further` of `pnpm raise-fit`), so that its pose also turns over the next
+faces.
 
 **Role-neutral bind.** The target of each body is a bind that fits no single role: straight bind
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
