@@ -7,7 +7,11 @@
  * prints the mean of each key with its spread, a table of fades with the weight of the shape in
  * each sample set, and a `raise` entry with the turns in the axes of the studio, ready for the
  * config. A rule of a bent wrist (`--bone hand`) turns 10° further than the mean on the same axis,
- * because the pose of a rule in Blender turns over fewer faces than the app at the same turn. The
+ * because the pose of a rule in Blender turns over fewer faces than the app at the same turn.
+ * `--further <degrees>` sets this angle for a rule of a bent wrist or a bent elbow
+ * (`--bone forearm`, 0° by default). On a straight bind elbow, the pose of the rule at the mean
+ * turn turns over only some faces of the fold, and the relax then moves the fold to the next faces
+ * of the elbow ring. A further turn also turns over those faces, so the relax smooths them too. The
  * proposed fade is full up to the angle that holds 90% of the folded samples (at least 10°), and
  * ends 10° later.
  *
@@ -19,8 +23,8 @@
  * `pnpm rig-mesh <animal> --check --set 'raise+=@<file>'` adds it to the list of `raise`.
  *
  * Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand]
- * [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>]
- * [--glb <file>]
+ * [--further <degrees>] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>]
+ * [--set <changes>]... [--json <file>] [--glb <file>]
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -64,6 +68,19 @@ export const RULE_KEYS: Readonly<Record<RuleBone, ArmKey>> = {
 
 /** The angle by which a rule of a bent wrist turns further than the mean turn, in degrees. */
 export const WRIST_FURTHER = 10;
+
+/**
+ * The angle by which a rule of a bent elbow turns further than the mean turn by default, in
+ * degrees. `--further` sets another angle.
+ */
+export const ELBOW_FURTHER = 0;
+
+/** The angle by which each kind of rule turns further than the mean turn by default, in degrees. */
+export const RULE_FURTHER: Readonly<Record<RuleBone, number>> = {
+  upper: 0,
+  forearm: ELBOW_FURTHER,
+  hand: WRIST_FURTHER,
+};
 
 /** The share of the folded samples that the full weight of a proposed fade holds. */
 export const FADE_SHARE = 0.9;
@@ -110,6 +127,11 @@ export interface RaiseOptions {
   readonly side: Side;
   /** The bone of the rule. */
   readonly bone: RuleBone;
+  /**
+   * The angle by which the turn of the rule goes further than the mean turn of its key on the same
+   * axis, in degrees. A rule of a raised arm takes 0.
+   */
+  readonly further: number;
   /** The sample sets whose folds give the mean turns. */
   readonly sets: readonly SampleSet[];
   /** The demos, by the name of the file with `.mid`, or none for all demos. */
@@ -283,7 +305,7 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
   );
 
   const key = RULE_KEYS[options.bone];
-  const turn = options.bone === 'hand' ? turnFurther(means.wrist, WRIST_FURTHER) : means[key];
+  const turn = options.further === 0 ? means[key] : turnFurther(means[key], options.further);
   const angles = folded.map((s) => turnAngle(s.keys[key], turn));
   const fade = proposeFade(angles);
   const fades = [fade, ...FADES.filter(([a, b]) => a !== fade[0] || b !== fade[1])];
@@ -313,7 +335,7 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
       : {
           clavicle: studio(means.clavicle),
           upper_arm: studio(means.upper),
-          forearm: studio(means.elbow),
+          forearm: studio(options.bone === 'forearm' ? turn : means.elbow),
         };
   const kind =
     options.bone === 'hand'
@@ -321,7 +343,7 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
       : options.bone === 'forearm'
         ? 'bent elbow'
         : 'raised arm';
-  const note = `The shape of the ${kind} ${options.side} of the ${options.role} (pnpm raise-fit). Faces ${options.faces.join(', ')} fold in ${folded.length} of ${chosen.length} samples of the sets ${options.sets.join(', ')}, and the key ${key} turns ${fromBind(means[key]).toFixed(1)} degrees from the bind in their mean.${options.bone === 'hand' ? ` The rule turns ${WRIST_FURTHER} degrees further on the same axis.` : ''}`;
+  const note = `The shape of the ${kind} ${options.side} of the ${options.role} (pnpm raise-fit). Faces ${options.faces.join(', ')} fold in ${folded.length} of ${chosen.length} samples of the sets ${options.sets.join(', ')}, and the key ${key} turns ${fromBind(means[key]).toFixed(1)} degrees from the bind in their mean.${options.further === 0 ? '' : ` The rule turns ${options.further} degrees further on the same axis.`}`;
   // The config writes the bone after the side, and a rule of the upper arm has no bone.
   const head =
     options.bone === 'upper' ? { side: options.side } : { side: options.side, bone: options.bone };
@@ -352,7 +374,7 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
  */
 export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
   const role = args[0] ?? '';
-  const usage = `Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>] [--glb <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>.`;
+  const usage = `Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand] [--further <degrees>] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>] [--glb <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>.`;
   if (!isRole(role)) {
     throw new Error(usage);
   }
@@ -375,6 +397,13 @@ export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
   if (bone !== 'upper' && bone !== 'forearm' && bone !== 'hand') {
     throw new Error('The option --bone takes upper, forearm, or hand.');
   }
+  const further = Number(value('--further') ?? RULE_FURTHER[bone]);
+  if (!Number.isFinite(further) || further < 0) {
+    throw new Error('The option --further takes an angle of 0 degrees or more.');
+  }
+  if (bone === 'upper' && further !== 0) {
+    throw new Error('The option --further takes a rule of a bent elbow or a bent wrist.');
+  }
   const sets = (value('--sets') ?? 'play').split(',');
   const known = (set: string): set is SampleSet => SAMPLE_SETS.some((s) => s === set);
   if (!sets.every(known)) {
@@ -388,7 +417,8 @@ export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
     throw new Error('The step must be a number of seconds above 0.');
   }
   const json = value('--json') ?? null;
-  return { role, faces, side, bone, sets, demos, step, changes: values('--set').join(';'), json };
+  const changes = values('--set').join(';');
+  return { role, faces, side, bone, further, sets, demos, step, changes, json };
 }
 
 /**
