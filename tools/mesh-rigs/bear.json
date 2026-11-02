@@ -4,10 +4,10 @@
   "rootNormals": {
     "radius": 0,
     "wrist": [
-      0.03,
+      0.1,
       0.025
     ],
-    "note": "The arm faces from 0.03 units before each wrist joint to 0.025 units past it take the normals of the skin with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py), so that the wrist shows no crease. With radius 0, the shoulders keep the crease angle."
+    "note": "The arm faces from 0.1 units before each wrist joint (about the whole forearm) to 0.025 units past it take the normals of the skin with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py), so that the wrist shows no crease. The supinated bind paw (studio.bindSupination) twists the bind forearm, and with 0.03 units a dark saw-tooth line showed under the right forearm at the beat. With radius 0, the shoulders keep the crease angle."
   },
   "paintedWeights": "assets/models/bear/bear-weights.json",
   "paintedLower": [
@@ -307,7 +307,12 @@
       ]
     },
     "note": "The bear stands on its podium in the app, so the seated bind keeps the legs of the source: each turn is the identity. The trunk does not recline (open 0). The bind keeps the arms of the source straight (straightArms): the forearm and the paw keep the turn of the upper arm, so that the elbow and the wrist of the rest shape keep the angles of the source (7 and 5 degrees between the joints). A bind with the elbow bent 62 degrees and the paw bent 23 degrees to the palm gave a rest shape with the inner wrist skin pressed, and a dark slit showed at each wrist in the play. bindArms.upper_arm sets the bind upper arm, and bindArms.forearm the elbow axis of the bent bind of the other meshes, which the app keeps (StudioBody.hinges).",
-    "straightArms": true
+    "straightArms": true,
+    "bindSupination": {
+      "L": 25,
+      "R": 32
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 25 degrees and the right 32 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The right value makes the largest right paw twist p95 of the six roles of the cast matrix smallest (design 4.4, pnpm bind-supination): about 93 degrees (the violin and the cello), against 123 degrees with no supination. The rule gives the left 51 degrees (largest left p95 110 degrees, the violin and the snare drum), but the conductor then shows a dark dent on the side of the left forearm near the wrist at the beat, which no normal rule and no dual quaternion bind removed. With 35 degrees a soft shade stayed. The own role wins (design 4.4), so the left takes 25 degrees: the forearm looks as on the old bind, and the largest left paw twist p95 of the cast roles is 136 degrees (the violin and the flute), against 161 degrees with no supination. The probe takes only the roles of players, so pnpm arm-check conductor checks the paw twists of the conductor."
   },
   "weights": {
     "armSplit": 0.18,
