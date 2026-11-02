@@ -457,7 +457,7 @@ rule of the Mixamo files.
    | pnpm mixamo-import (headless Blender: no prefix, meters, one animation for each take)
    v
  <dir>/<name>.glb --> readSourceFile() (models/source-clips.ts): the rest pose and the keys
-   | retargetClip() (pose/retarget.ts), one time for each body
+   | retargetClip() (pose/retarget.ts), one time for each body, on clipTarget()
    v
  PlayerClip: the rotations of BONE_NAMES and the root offset at CLIP_RATE frames a second
    | clipPoseAt() (pose/clip-pose.ts), in each frame, with no state
@@ -494,12 +494,30 @@ interface PlayerClip {
   with the palm down, and a seated thigh goes down. The trunk, the head, and the feet keep their
   bind form, because both rest poses stand upright with the head forward and the feet flat. Thus
   each animal keeps its own lean.
-- **Axes and size.** The left side of the source goes to -x, and its up to +y. The hips move
-  across the floor in head heights `H`. The source has no chin, so its `H` is its height over
-  `HUMAN_HEADS`, the canon of figure drawing.
+- **Axes and size.** The left side of the source goes to -x, and its up to +y. The up of the
+  source is the axis of the file nearest to the line from the hips to the head, because that line
+  leans forward a little, and the floor rule then reads a forward walk as a rise. The source has
+  no chin, so its `H` is its height over `HUMAN_HEADS`, the canon of figure drawing.
+- **Hanging arm rule.** A human arm that hangs at the side goes straight down into the round
+  trunk of an animal. Thus each arm bone blends its rest compensation toward the turn to the rest
+  arm of the body (`hangingArm()`, 5.2), by the share of the source arm that hangs (`HANG_FADE`,
+  the angle of the line from the shoulder to the wrist). The hanging arm of the source points
+  straight down, so a sway of the source arm moves the rest arm. A raised arm, a clap, and a
+  T-pose keep the plain retarget.
+- **Clearance rule.** The large head of an animal fills the place of a raised human hand, and its
+  round trunk the place of a clap. Thus each upper arm turns about the shoulder joint by the
+  smallest turn that moves the deepest arm point out of the body (`clearArms()`), until the arm is
+  clear. The forearm and the paw keep their turns, so a wave still waves beside the head. The body
+  of the rule is a stack of horizontal slices of each body bone, with a radius for each angle bin
+  (`clipBody()`), one time for each body. The root of the upper arm lies in the shoulder in each
+  pose, so the rule does not test it.
+- **Walk rule.** A standing foot moves back under the hips by the turns of the leg, and these
+  scale with the leg length. Thus the hips move across the floor by the ratio of the leg lengths,
+  from the hip joint over the knee to the ankle, and a standing foot keeps its place. A move in
+  `H` slid the short feet of the animals.
 - **Floor rule.** The legs of an animal are shorter in `H` than human legs, so a move of the hips
-  in `H` puts the soles under the floor or in the air. Thus the lowest sole of the player keeps
-  the height of the lowest sole of the source, in `H` (`solePoints()`). A foot on the floor of the
+  puts the soles under the floor or in the air. Thus the lowest sole of the player keeps the
+  height of the lowest sole of the source, in `H` (`solePoints()`). A foot on the floor of the
   source stays on the floor, and a jump stays a jump.
 - **Gallery.** The animals of a clip stand, and the bones of the instrument hide, because a clip
   cannot hold an instrument. The dev and preview servers serve the clip files from a local folder
