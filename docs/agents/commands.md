@@ -83,9 +83,9 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the studio skin folds. 10 s to 40 s. |
 | `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. About 50 s for each role. |
 | `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. 25 s to 55 s. |
-| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>] [--states <ref>,...] [--json <file>] [--compare <file>]`, or `<role> --trace` or `--explain` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND` (a new bind), or `PASS`. `--json` writes each line with its values and verdicts, and `--compare` prints the changes against such a file. `--rings` and `--explain flat` print the ring widths. All roles: 5 to 7 minutes cold, 2 s from the cache. |
+| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>] [--states <ref>,...] [--json <file>] [--compare <file>]`, or `<role> --trace` or `--explain` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND` (a new bind), or `PASS`. `--json` writes the lines, and `--compare` prints the changes against such a file. `--rings` and `--explain flat` print the ring widths. All roles: 5 to 7 minutes cold, 2 s from the cache. |
 | `pnpm arm-check <role>... --world --base <ref> [--set <changes>]... [--glb <file>]` | Prints the largest move of the posed arm joints and the largest turn of the palms against the commit at the samples of the gate, with `SAME` or `MOVED` (exit code 1). One role: about 1 minute. |
-| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--quick] [--set <changes>]... [--variant <name>=<changes>]... [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst value of the arm gate and the deepest clip. It caches each pair by tree. Six roles: about 3 minutes cold. `--quick` takes a coarse sample: one role in about 25 s. Each `--variant` adds a column. `--base` gives the cell of the commit beside each cell, with the change. |
+| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--quick] [--set <changes>]... [--variant <name>=<changes>]... [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst arm gate value and the deepest clip. `--quick` takes a coarse sample, each `--variant` adds a column, and `--base` adds the cell of the commit with the change. A cache keeps each pair by tree. Six roles: about 3 minutes cold, or 25 s for one role with `--quick`. |
 | `pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>]` | Gives the bind supination of each paw by the rule of design 4.4, with the signed paw twists of each cast role and own role. About 12 s. |
 | `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. Three roles: 45 s. |
 | `pnpm raise-fit <role> --faces <list> --side L\|R [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces, also of a recast role. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. 15 s. |
@@ -104,7 +104,9 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | Command | Action |
 |---|---|
 | `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. `--set` can add an optional rule, such as `studio.bindSupination.L=57` or `sitPose=@<file>`. 20 s to 75 s. |
+| `pnpm mesh-intake <mesh.glb> --config <config> [--factor <f>]` | Checks a mesh against the intake spec (design 4.4), and gives `keep faces` or `needs rebuild` (exit code 1). 2 s. |
 | `blender -b --factory-startup --python tools/blender/arm_rebuild.py -- <animal> [--source <glb>] [--factor <f>] [--spec <JSON>] [--out <dir>]` | Rebuilds the arms from the joints of `tools/mesh-rigs/<animal>.json` ([`rigging.md`](rigging.md)) into `<animal>-arms.glb` and `<animal>-weights.json`. Test them with `rig-mesh --check --set 'source=<glb>;paintedWeights=<json>'`. 10 s. |
+| `blender ... arm_rebuild.py -- <animal> --keep-faces [--out <dir>]` | Adds only the arm segments and the weights to a mesh with `keep faces`. The GLB file is a copy of the source. 5 s. |
 | `blender -b --factory-startup --python tools/blender/wind_arms_try.py -- <animal> <out dir> '<JSON>'` | Runs the session of `wind_arms.py` with changes of the weights or of the elbow rings, for a weight try. |
 | `blender -b --factory-startup --python tools/blender/arm_root.py -- tools/arm-roots/<species>.json [--out <file.glb>]` | Writes a copy of a source mesh with local edits at the arm root. Rig the copy with `pnpm rig-mesh <animal> --check --set source=<path> --keep <dir>`. 5 s. |
 | `blender -b --factory-startup --python tools/blender/mannequin.py -- <human\|animal> --out <dir>` | Writes the test mannequin of a preset (design 4.4) as GLB and FBX files, with the test clips (`assets/models/mannequin/README.md`). 3 s. |
@@ -144,8 +146,8 @@ lint, the format, `pnpm test`, the build, and the size, with no deploy.
 
 ## Checks for each kind of change
 
-These checks compare the working tree with `main`. Each one prints the differences, so an equal
-result proves that the change kept the behavior.
+Each check compares the working tree with `main`. An equal result proves that the change kept the
+behavior.
 
 ```text
 comments or docs only        ->  body-probe --base main equal, dist/ of both builds equal
