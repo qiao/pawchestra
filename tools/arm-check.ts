@@ -52,6 +52,12 @@
  * keep the margin. The run then prints the narrow axes of the elbow ring and the wrist ring in
  * centimeters against the base ({@link rebindLines}), because the flat share no longer compares.
  *
+ * `--glb <file>` gives the working tree the studio body of another GLB file, such as a file of
+ * `pnpm rig-mesh --check --keep`, in a copy of `src/` (`tools/glb-swap.ts`). Each role runs in a
+ * child of its own, so each role must have the animal of the file: a role of its species, or a
+ * recast role `<role>@<species>` of that species ({@link checkGlbRoles}). Thus one run gates the
+ * own role of a new body and its recast roles.
+ *
  * The JSON of each role of the working tree goes into a cache by tree ({@link armCacheFile}), so a
  * second run on the same tree, such as the merge gate after the gate of the branch, reads it and
  * prints `tree: cached`. A change of a file of `src/`, `tools/`, or the demos gives a new key.
@@ -2264,11 +2270,39 @@ export function variantGroups(args: readonly string[]): ArmVariant[] {
 }
 
 /**
+ * Checks the roles of `--glb <file>`. Each role takes the studio body of the file in a child of its
+ * own ({@link childMain}), so each role must have the animal of the file: a role of the species of
+ * the file, such as `clarinetist` for a file of the wolf, or a recast role of that species, such as
+ * `violinist@wolf`.
+ *
+ * @param roles The roles of the command line.
+ * @throws Error if the roles have more than one animal, or if a role has no studio body.
+ */
+export function checkGlbRoles(roles: readonly string[]): void {
+  const animals = roles.map((role) => {
+    const source = findRole(role);
+    try {
+      return { role, animal: source ? roleAnimal(source) : null };
+    } catch {
+      return { role, animal: null };
+    }
+  });
+  const kinds = new Set(animals.map(({ animal }) => animal));
+  if (kinds.size !== 1 || kinds.has(null)) {
+    const list = animals.map(({ role, animal }) => `${role} (${animal ?? 'no studio body'})`);
+    throw new Error(
+      `The option --glb takes the roles of one animal, the animal of the file, and the recast roles <role>@<species> of its species. The roles and their animals are: ${list.join(', ')}.`,
+    );
+  }
+}
+
+/**
  * Reads the command line of the tool.
  *
  * @param args The arguments.
  * @returns The command line.
- * @throws Error for an unknown role or option, or a missing value.
+ * @throws Error for an unknown role or option, a missing value, or roles of `--glb` with more than
+ *   one animal ({@link checkGlbRoles}).
  */
 export function checkArgs(args: readonly string[]): CheckArgs {
   const valued = new Set([
@@ -2320,8 +2354,8 @@ export function checkArgs(args: readonly string[]): CheckArgs {
   }
   const glb = values.get('--glb')?.[0] ?? null;
   const chosen = all ? [...FOLD_ROLES.keys()] : roles;
-  if (glb !== null && chosen.length !== 1) {
-    throw new Error('The option --glb takes one role, the role of the animal of the file.');
+  if (glb !== null) {
+    checkGlbRoles(chosen);
   }
   const jobs = Number(values.get('--jobs')?.[0] ?? 4);
   if (!Number.isInteger(jobs) || jobs < 1) {
