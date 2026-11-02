@@ -26,8 +26,8 @@ import { join } from 'node:path';
 
 import { armBinds, measureArm } from './arm-check.ts';
 import { CAST_ROLES, CAST_SAMPLE, pairName, roleDemo, setPair } from './cast-matrix.ts';
-import { FOLD_ROLES, SAMPLE_SETS, probeFolds } from './fold-probe.ts';
-import type { SampleSet } from './fold-probe.ts';
+import { FOLD_ROLES, SAMPLE_SETS, findRole, findSweep, probeFolds } from './fold-probe.ts';
+import type { RoleSource, SampleSet } from './fold-probe.ts';
 import { glbAnimal, rigConfigPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { probeDemos } from './probe-demos.ts';
 import {
@@ -178,6 +178,56 @@ export function supinationRoles(species: SpeciesId): string[] {
 }
 
 /**
+ * Gives the role whose demo a role takes: the role, or, for an own role with no sweep of its own,
+ * the first role of its instrument with a sweep. The sweep of the violinist holds the red fox, so
+ * the fox-violinist takes the demo of the violinist.
+ *
+ * @param role The role.
+ * @returns The role of the demo.
+ */
+function demoRole(role: string): string {
+  const source = FOLD_ROLES.get(role);
+  if (findSweep(role) || source?.kind !== 'player') {
+    return role;
+  }
+  const same = [...FOLD_ROLES].find(
+    ([name, other]) =>
+      other.kind === 'player' && other.instrument === source.instrument && findSweep(name),
+  );
+  return same?.[0] ?? role;
+}
+
+/** One pair of this tool, set up in memory by {@link pairSource}. */
+interface SupinationPair {
+  /** The name of the pair: the role, or `<role>@<species>`. */
+  readonly name: string;
+  /** The role of the pair (`findRole()`). */
+  readonly source: RoleSource;
+}
+
+/**
+ * Sets up one pair in memory. A recast pair takes the shared hold and the size rule of the matrix
+ * (`setPair()`). An own role keeps its hold and its scale. It needs no sweep, because the tool reads
+ * only the paw twists of the bodies of the role.
+ *
+ * @param species The species.
+ * @param role The role.
+ * @returns The pair.
+ * @throws Error if the pair has no role.
+ */
+function pairSource(species: SpeciesId, role: string): SupinationPair {
+  const name = pairName(species, role);
+  if (name !== role) {
+    return setPair(species, role, '');
+  }
+  const source = findRole(name);
+  if (!source) {
+    throw new Error(`The pair ${name} has no role.`);
+  }
+  return { name, source };
+}
+
+/**
  * Measures the signed paw twists of one pair in this process, on the demo of the matrix.
  *
  * @param species The species.
@@ -185,8 +235,8 @@ export function supinationRoles(species: SpeciesId): string[] {
  * @returns The JSON of the pair.
  */
 async function measureRolls(species: SpeciesId, role: string): Promise<RollJson> {
-  const { name, source } = setPair(species, role, '');
-  const demo = await roleDemo(role);
+  const { name, source } = pairSource(species, role);
+  const demo = await roleDemo(demoRole(role));
   const demos = (await probeDemos()).filter((file) => file.file === demo);
   const lists = (): Record<SampleSet, number[]> => ({ rest: [], play: [], lift: [] });
   const rolls: Record<Side, Record<SampleSet, number[]>> = { L: lists(), R: lists() };
