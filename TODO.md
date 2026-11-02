@@ -302,7 +302,7 @@ passes.
       (`STUDIO_RAISES`). The third left shape (the lift) can go: the left gate lines stay at the
       base, and the 2x crops do not change. Only faces 1560 and 1561 in front of the left arm root
       then fold in 3% to 7% of the lift. A shape of the bent right elbow in that slot failed in
-      four tries. With `below` 0.3, it turns over 4 faces of the right arm root (R 6). With
+      six tries. With `below` 0.3, it turns over 4 faces of the right arm root (R 6). With
       `below` 0, the fold moves to the next faces of the elbow ring (R 8). A rule that turns 10°
       further (`raise-fit --further`) gives R 5, and 6 faces stay turned over in its pose. A
       further turn of 20° with a smooth of the posed tube from `upper_arm_seg1` (`smooth`,
@@ -312,9 +312,10 @@ passes.
       `forearm_seg1`, 5 or 10 rounds, a turn of 15° or 20°) gives the same result (R 2, spine1
       folds +56%, face 726 in 100% of the play). The relax of 60 rounds moves corners 355 and
       356 of face 726 (weights on `upper_arm_seg1_R` and `upper_arm_seg2_R`) by up to 9.8 mm.
-      Next: the smooth with no relax (`below` -1, as on the fox and the hippo), or allow a fifth
-      shape. The cat keeps its bent bind (`reports/2026-11-02-cat-neutral/`,
-      `reports/2026-11-02-cat-bend/`).
+      With no relax (`below` -1, 5 or 10 rounds), the smooth turns over faces 689, 690, and 691
+      of the trunk in the pose of the rule, and the fold moves to faces 518 to 521 of the upper
+      arm (91% of the play, R 8). The cat keeps its bent bind (`reports/2026-11-02-cat-neutral/`,
+      `reports/2026-11-02-cat-bend/`). The open choice: a fifth shape (`STUDIO_RAISES`).
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
