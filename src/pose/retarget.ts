@@ -1,10 +1,13 @@
 import { MathUtils, Matrix4, Quaternion, Vector3 } from 'three';
 
 import type { MeshData } from '../models/mesh.ts';
+import type { PlayerModel } from '../models/player.ts';
 import { BONE_NAMES, boneIndex } from '../models/rig.ts';
 import type { BoneName, Skeleton } from '../models/rig.ts';
 import type { SourceClip, SourceFile, SourceTrack } from '../models/source-clips.ts';
-import type { Vec3 } from '../models/tuples.ts';
+import type { Quat, Vec3 } from '../models/tuples.ts';
+import { hangShare, restArm } from './clip-fit.ts';
+import type { RestArm } from './clip-fit.ts';
 import { chainFrames, createFrame, posePoint } from './frames.ts';
 import { MIXAMO_BONES, isMixamoBone, mixamoDrivers } from './mixamo-bones.ts';
 
@@ -80,7 +83,10 @@ export interface SolePoint {
   readonly point: Vec3;
 }
 
-/** The body that a clip plays on: the skeleton of the player, its size, and its soles. */
+/**
+ * The body that a clip plays on: the skeleton of the player, its size, its soles, and its rest
+ * arms ({@link clipTarget}).
+ */
 export interface ClipTarget {
   /** The skeleton of the player in its bind pose (design 4.7). */
   readonly skeleton: Skeleton;
@@ -88,6 +94,8 @@ export interface ClipTarget {
   readonly headHeight: number;
   /** The lowest points of the soles in the bind pose ({@link solePoints}). */
   readonly soles: readonly SolePoint[];
+  /** The rest arm of each side of a standing body (design 5.2), for the hanging arm rule. */
+  readonly restArms: { readonly L: RestArm; readonly R: RestArm };
 }
 
 /**
@@ -148,6 +156,22 @@ export function solePoints(mesh: MeshData): SolePoint[] {
     }
   }
   return points;
+}
+
+/**
+ * Makes the target of a clip from a player model, one time for each body: the skeleton, the size,
+ * the soles, and the rest arms (design 4.4).
+ *
+ * @param model The standing player model.
+ * @returns The target.
+ */
+export function clipTarget(model: PlayerModel): ClipTarget {
+  return {
+    skeleton: model.skeleton,
+    headHeight: model.body.headHeight,
+    soles: solePoints(model.mesh),
+    restArms: { L: restArm(model, 'L'), R: restArm(model, 'R') },
+  };
 }
 
 /** The two keys of a rotation blend. Each call writes them before it reads them. */
@@ -343,6 +367,36 @@ function restTurn(bone: BoneName, target: ClipTarget, sourceDir: Vector3 | null)
   return new Quaternion().setFromUnitVectors(ownDir, sourceDir);
 }
 
+/** The arm bones of each side whose rest turn the hanging arm rule changes, with their rest arm. */
+const HANG_BONES = [
+  { bone: 'upperArmL', side: 'L', part: 'upper' },
+  { bone: 'forearmL', side: 'L', part: 'forearm' },
+  { bone: 'handL', side: 'L', part: 'hand' },
+  { bone: 'upperArmR', side: 'R', part: 'upper' },
+  { bone: 'forearmR', side: 'R', part: 'forearm' },
+  { bone: 'handR', side: 'R', part: 'hand' },
+] as const satisfies readonly {
+  readonly bone: BoneName;
+  readonly side: 'L' | 'R';
+  readonly part: keyof RestArm;
+}[];
+
+/**
+ * Gives the turn of an arm bone of the player for the hanging arm rule: the turn from its bind
+ * pose to the rest arm of the body, after the turn back from the hanging arm of the source to its
+ * rest pose. The hanging arm of the source points straight down, with the shortest turn from its
+ * rest pose, so in a T-pose source the palm faces the thigh. A source arm that hangs thus gives
+ * the rest arm of the body, and a small move of the source arm moves the rest arm.
+ *
+ * @param rest The world turn of the bone in the rest arm of the body.
+ * @param sourceDir The direction of the source bone in its rest pose.
+ * @returns The turn.
+ */
+function hangTurn(rest: Quat, sourceDir: Vector3): Quaternion {
+  const toHang = new Quaternion().setFromUnitVectors(sourceDir, new Vector3(0, -1, 0));
+  return toHang.invert().multiply(new Quaternion(...rest));
+}
+
 /**
  * Gives the unit normal of the palm of one hand of the source in its rest pose, from the knuckles:
  * the index finger lies on the side of the thumb, so the line from the index to the little finger
@@ -426,8 +480,12 @@ function fingerCurl(
  * 2. Rest compensation: each source bone gives its world turn from its rest pose, D(t). A limb
  *    bone of the player first takes the turn from its bind pose to the rest pose of the source,
  *    A, so its world turn is D(t) A. The trunk, the head, and the feet keep their bind form.
- * 3. Each bone with no source bone follows its parent. The fingers take one curl.
- * 4. The hips move in head heights `H` across the floor. The floor rule then sets the height of
+ * 3. Hanging arm rule: an arm bone of the player blends A toward the turn from its bind pose
+ *    to the rest arm of the body ({@link hangTurn}) by the share of the source arm that hangs
+ *    (`hangShare()` of `pose/clip-fit.ts`). A human arm that hangs at the side thus takes the
+ *    rest arm of the body (design 5.2), out of the round trunk.
+ * 4. Each bone with no source bone follows its parent. The fingers take one curl.
+ * 5. The hips move in head heights `H` across the floor. The floor rule then sets the height of
  *    the body: the lowest sole of the player keeps the height of the lowest sole of the source,
  *    in `H`, so a foot on the floor of the source stays on the floor.
  *
@@ -454,10 +512,29 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
 
   const drivers = mixamoDrivers(names);
   const turns = new Map<number, Quaternion>();
+  const sourceDirs = new Map<BoneName, Vector3>();
   for (const [bone, source] of drivers) {
     const sourceDir = restDirection(bone, source, names, parents, rest, axes);
     turns.set(boneIndex(bone), restTurn(bone, target, sourceDir));
+    if (sourceDir) {
+      sourceDirs.set(bone, sourceDir);
+    }
   }
+  const hangTurns = new Map<number, { readonly side: 'L' | 'R'; readonly turn: Quaternion }>();
+  for (const { bone, side, part } of HANG_BONES) {
+    const sourceDir = sourceDirs.get(bone);
+    if (sourceDir) {
+      hangTurns.set(boneIndex(bone), {
+        side,
+        turn: hangTurn(target.restArms[side][part], sourceDir),
+      });
+    }
+  }
+  const sourceArms = {
+    L: [drivers.get('upperArmL'), drivers.get('handL')],
+    R: [drivers.get('upperArmR'), drivers.get('handR')],
+  } as const;
+  const shares = { L: 0, R: 0 };
   const fingers = { L: boneIndex('fingersL'), R: boneIndex('fingersR') } as const;
 
   const count = BONE_NAMES.length;
@@ -469,25 +546,40 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
   const chain = BONE_NAMES.map(() => createFrame());
   const local = new Quaternion();
   const posed = new Vector3();
+  const compensation = new Quaternion();
   const bindLow = target.soles.length > 0 ? Math.min(...target.soles.map((s) => s.point[1])) : 0;
 
   for (let f = 0; f < frames; f++) {
     const time = Math.min(f / CLIP_RATE, clip.duration);
     const pose = sourcePose(file, clip, time);
     const out = rotations.subarray(f * count * 4, (f + 1) * count * 4);
+    for (const side of ['L', 'R'] as const) {
+      const [shoulder, wrist] = sourceArms[side];
+      const from = pose.positions[shoulder ?? -1];
+      const to = pose.positions[wrist ?? -1];
+      shares[side] =
+        from && to
+          ? hangShare(from.clone().applyQuaternion(axes), to.clone().applyQuaternion(axes))
+          : 0;
+    }
     for (let i = 0; i < count; i++) {
       const parent = target.skeleton.parents[i] ?? -1;
       const parentWorld = worlds[parent];
       const world = worlds[i] ?? local;
       const source = drivers.get(BONE_NAMES[i] ?? 'root');
       if (source !== undefined) {
+        compensation.copy(turns.get(i) ?? local.identity());
+        const hang = hangTurns.get(i);
+        if (hang && shares[hang.side] > 0) {
+          compensation.slerp(hang.turn, shares[hang.side]);
+        }
         // D(t) in the model axes: C D C^-1, then the rest compensation A.
         world
           .copy(axes)
           .multiply(pose.rotations[source] ?? local)
           .multiply((rest.rotations[source] ?? local).clone().invert())
           .multiply(axesInverse)
-          .multiply(turns.get(i) ?? local);
+          .multiply(compensation);
       } else if (i === fingers.L || i === fingers.R) {
         const side = i === fingers.L ? 'Left' : 'Right';
         const curl = fingerCurl(side, names, parents, rest, pose);

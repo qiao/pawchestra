@@ -28,7 +28,7 @@ import { clipDuration, clipPoseAt, createClipPose } from '../pose/clip-pose.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer, WritablePose } from '../pose/pose-at.ts';
-import { retargetClip, solePoints } from '../pose/retarget.ts';
+import { clipTarget, retargetClip } from '../pose/retarget.ts';
 import type { PlayerClip } from '../pose/retarget.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
@@ -569,13 +569,7 @@ async function loadClip(): Promise<void> {
     throw new Error(`The clip file has no animation "${wanted.animation ?? ''}".`);
   }
   const animals = [...cast.players, ...(cast.conductor ? [cast.conductor] : [])];
-  const clips = animals.map(({ model }) =>
-    retargetClip(file, source, {
-      skeleton: model.skeleton,
-      headHeight: model.body.headHeight,
-      soles: solePoints(model.mesh),
-    }),
-  );
+  const clips = animals.map(({ model }) => retargetClip(file, source, clipTarget(model)));
   clip = { clips, poses: clips.map(() => createClipPose()) };
   const duration = clips[0] ? clipDuration(clips[0]) : 0;
   time.max = String(duration);

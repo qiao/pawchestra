@@ -38,7 +38,7 @@ import { readSourceFile } from '../src/models/source-clips.ts';
 import { isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import { clipDuration, clipPoseAt, createClipPose } from '../src/pose/clip-pose.ts';
-import { retargetClip, solePoints } from '../src/pose/retarget.ts';
+import { clipTarget, retargetClip } from '../src/pose/retarget.ts';
 import type { PlayerClip } from '../src/pose/retarget.ts';
 import { closedDepth } from '../src/pose/test-clearance.ts';
 import { poseSkeleton } from '../src/pose/test-kinematics.ts';
@@ -164,11 +164,7 @@ function modelClip(args: ClipViewsArgs, model: PlayerModel): PlayerClip {
   if (!clip) {
     throw new Error(`The file ${file}.glb has no animation "${name}".`);
   }
-  return retargetClip(source, clip, {
-    skeleton: model.skeleton,
-    headHeight: model.body.headHeight,
-    soles: solePoints(model.mesh),
-  });
+  return retargetClip(source, clip, clipTarget(model));
 }
 
 /** The arm parts whose depth in the body the tool measures, with their bones. */
