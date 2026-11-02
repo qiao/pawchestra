@@ -278,32 +278,28 @@ function sourceAxes(names: readonly string[], rest: SourcePose): SourceAxes {
 }
 
 /**
- * Gives the turn of a limb bone of the player from its bind pose to the rest pose of the source:
- * the shortest turn from the direction of the bone to its child to the direction of the source
- * bone to its children that drive that child, in the model axes. The hanging arm of the player
- * goes to the T-pose of the source, with the palm down, as in the T-pose.
+ * Gives the direction of a limb bone of the source in its rest pose, in the model axes: from the
+ * source bone to the mean of its children that drive the child of the player bone.
  *
  * @param bone The bone of the player.
- * @param target The body.
  * @param source The index of the source bone that drives it.
  * @param names The names of the source bones.
  * @param parents The parents of the source bones.
  * @param rest The rest pose of the source.
  * @param axes The turn from the source axes to the model axes.
- * @returns The turn, or the identity for a bone that keeps its bind form.
+ * @returns The unit direction, or `null` for a bone that keeps its bind form or has no child.
  */
-function restTurn(
+function restDirection(
   bone: BoneName,
-  target: ClipTarget,
   source: number,
   names: readonly string[],
   parents: readonly number[],
   rest: SourcePose,
   axes: Quaternion,
-): Quaternion {
+): Vector3 | null {
   const child = LIMB_CHILD.get(bone);
   if (OWN_FORM.has(bone) || !child) {
-    return new Quaternion();
+    return null;
   }
 
   const mean = new Vector3();
@@ -315,13 +311,31 @@ function restTurn(
     }
   }
   if (count === 0) {
-    return new Quaternion();
+    return null;
   }
-  const sourceDir = mean
+  return mean
     .divideScalar(count)
     .sub(rest.positions[source] ?? new Vector3())
     .normalize()
     .applyQuaternion(axes);
+}
+
+/**
+ * Gives the turn of a limb bone of the player from its bind pose to the rest pose of the source:
+ * the shortest turn from the direction of the bone to its child to the direction of the source
+ * bone ({@link restDirection}). The hanging arm of the player goes to the T-pose of the source,
+ * with the palm down, as in the T-pose.
+ *
+ * @param bone The bone of the player.
+ * @param target The body.
+ * @param sourceDir The direction of the source bone in its rest pose, or `null`.
+ * @returns The turn, or the identity for a bone that keeps its bind form.
+ */
+function restTurn(bone: BoneName, target: ClipTarget, sourceDir: Vector3 | null): Quaternion {
+  const child = LIMB_CHILD.get(bone);
+  if (!sourceDir || !child) {
+    return new Quaternion();
+  }
   const positions = target.skeleton.positions;
   const ownDir = new Vector3(...(positions[boneIndex(child)] ?? [0, 0, 0]))
     .sub(new Vector3(...(positions[boneIndex(bone)] ?? [0, 0, 0])))
@@ -441,7 +455,8 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
   const drivers = mixamoDrivers(names);
   const turns = new Map<number, Quaternion>();
   for (const [bone, source] of drivers) {
-    turns.set(boneIndex(bone), restTurn(bone, target, source, names, parents, rest, axes));
+    const sourceDir = restDirection(bone, source, names, parents, rest, axes);
+    turns.set(boneIndex(bone), restTurn(bone, target, sourceDir));
   }
   const fingers = { L: boneIndex('fingersL'), R: boneIndex('fingersR') } as const;
 
