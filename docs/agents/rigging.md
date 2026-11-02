@@ -13,7 +13,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 
 | Species | Body | Role |
 |---|---|---|
-| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), straight bind arms (`straightArms`) with a `raise` shape of each bent elbow, wrist skin normals (`rootNormals.wrist`), a larger crease angle and a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
+| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), straight bind arms (`straightArms`) with `raise` shapes of the bent elbows, wrist skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), and the leg length of the mesh. Sits on a bench that fits its haunch (`benchFitOf()`) at a piano of `PIANO_SCALE`, with the right foot on the damper pedal. | `pianist` |
 | rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a supinated bind left paw (`bindSupination`), root and elbow skin normals, a smaller violin. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a supinated bind left paw, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
@@ -23,13 +23,13 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | panda | The mesh with the rule weights. | `trombonist` |
 | hippo | Longer rebuilt arms with a seam cut and a side wall (`hippo_arms.py`), smoothed arm tubes (`armSmooth`), smaller pea eyes. Stands at the contrabass. | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind (design 4.4), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
-| elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
+| elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`), the role-neutral bind. Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
 | pig | A copy with round upper arms free of the trunk (`pig-arms.glb`), a twist bone of each upper arm (`upperTwist`), a horn turned back toward the body. | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind (design 4.4). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Longer arms, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
-| rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), a bind elbow bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
+| rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), bind elbows bent forward, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a bind upper arm near the hanging arm (`bindArms`), antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
 | mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with the rebuilt arms of `arm_rebuild.py`. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
