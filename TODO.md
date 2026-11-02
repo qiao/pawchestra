@@ -362,28 +362,15 @@ passes.
       (base 2). Its paws are pronated, so the large bind supination (127° and 119°) is far from
       them. The violin recast takes the left paw 1.6 cm into the violin in the lift (limit 1.5 cm,
       base 1.5 cm).
-- [ ] Test mannequin: with the rebuilt arms of `arm_rebuild.py`, the right violin arm still has
-      folds p95 11 in the lift (limit 8): trunk faces at the front of the right armpit on
-      `clavicle_R`. No clavicle weight on the trunk from the armpit to the shoulder joint gave more
-      folds (left 8 to 13), and a wider smooth of the shoulder line gave no change.
 - [ ] Test mannequin: the forearm twist p95 of the left violin arm is 48 against 38 of the base
       (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
       Decide if the margin holds against a base with no segments.
-- [ ] Test mannequin: the front stripes of the rebuilt arms keep small zigzags. Their sides run
-      along the bone between two spokes of the tube, and their ends are edges of 2 or 3 rays, so
-      `arm_rebuild.py` gives them no ring (`color_edges()`). A spoke at each side would need
-      tube rings with free spokes.
 - [ ] Arm rebuild: on the wolf clarinetist, `arm_rebuild.py` gives fewer folds than `wind_arms.py`,
       but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
       ring, then replace the species scripts one at a time after a review of the crops.
 - [ ] Arm rebuild: `arm_rebuild.py` has no cut along the seam with a side wall (`cat_arms.py`),
       so an arm joined to the trunk down to the elbow (the fox, the cat, the hippo, and the deer)
       keeps its species script.
-- [ ] Test mannequin: its source with kept faces (`arm_rebuild.py --keep-faces`) passes the arm
-      gate of both test roles against the rebuilt arms, with 4,304 in place of 4,512 triangles
-      and no saw-tooth band edges. The wrist rings are about 0.2 cm narrower, and the 2x crops
-      show no change of the form (`reports/2026-11-02-mesh-intake/`). Decide if the mannequin
-      body takes the kept faces. That also ends the zigzag item of the front stripes above.
 - [ ] Mesh intake: `pnpm mesh-intake` puts the shoulder line of the dog at 0.50 of the upper arm,
       at its limit, but the arm of `dog.glb` joins the trunk down to 0.80 (the `README.md` of the
       dog). The rays from the bone do not see the seam faces outside the arm. Count the faces
