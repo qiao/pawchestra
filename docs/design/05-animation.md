@@ -347,7 +347,14 @@ The rest of each family:
 - The right foot presses the damper pedal with the sustain pedal of the score (CC 64,
   `pedalLevelAt()`), and the synth reads the same events.
 
-**Harp** (harp 6): the palm faces the string of its note and pulls away to pluck.
+**Harp** (harp 6): the palm faces the string of its note and pulls away to pluck. The left palm
+also faces a little down (`HANDS_HOLDS.harp.faceL`), so that the left wrist stays near straight,
+as the wrists of a harpist go only a little down (harp 4). Reason: the short upper arm of the deer
+cannot bring the left elbow near the plane of the strings, so the left forearm points into the
+strings. With the palm square to the strings, the left wrist bent back past the paw swing limit of
+the arm gate in the rest, in the lift, and in the play. The turned paw comes nearer to the
+strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
+knuckles stay out of the neck of the harp.
 
 **Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it to half
 between two notes, so that each note shows (`CHOIR_MOTION`). Neighbor voices sway to opposite

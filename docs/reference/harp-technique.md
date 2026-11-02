@@ -104,6 +104,10 @@ The app follows these facts:
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
   right hand the treble strings from the right side (`faceL`, `faceR`).
 - **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`).
+- **The wrists (section 4).** The left palm faces the strings and a little down (`faceL`), so
+  that the left wrist bends only a little, as the wrists of a harpist go a little down. A palm
+  square to the strings bends the left wrist of the short arm far back, because the left forearm
+  points into the strings.
 - **The pluck (section 5).** The fingers curl after each pluck (`curl`, `curlClosed`), and the palm
   pulls away from the strings (`HAND_MOTION` of `src/pose/hand-notes.ts`).
 

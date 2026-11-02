@@ -220,19 +220,28 @@ export const HANDS_HOLDS = {
   // trunk sits erect, and the elbows rise out to the sides. The short arms of the deer set the
   // values. The spine leans 3° forward: at 8°, the muzzle comes to 1.0 cm of the neck of the
   // leaned harp. The left palm lies 0.14 m above the middle of each string, nearer to the
-  // shoulder: at 0.08 m, the left paw bends 68° on its forearm (paw swing of `pnpm arm-check`,
-  // limit 70°), and at 0.06 m, it misses the far bass strings by up to 7 mm. The left fingers
-  // point up and back along the strings (`aimL`): with the fingers on the line from the shoulder,
-  // the left paw bends 86° to 91° on its forearm. The elbows point out and down, in the play and
+  // shoulder: at 0.10 m, the left paw bends 67° from the straight paw of the source (paw swing of
+  // `pnpm arm-check`, limit 70°), and at 0.06 m, it misses the far bass strings by up to 7 mm.
+  // The left palm faces the strings and a little down (`faceL`), as the wrists of a harpist go a
+  // little down. The left shoulder lies 0.27 m from the plane of the strings, and the left upper
+  // arm is 0.2 m long, so the left forearm points into the strings. With the palm square to the
+  // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
+  // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
+  // paw. The knuckles of the turned paw come nearer to the strings, so the left palm lies 6 cm
+  // from the strings and 2 cm toward the column: with 3 cm and no move, the knuckles go 1.5 cm
+  // into the neck of the harp, and the forearm goes deeper into the chest with no move toward the
+  // column. The left fingers point up and back along the strings (`aimL`): with the fingers on
+  // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
+  // on its bent bind forearm. The elbows point out and down, in the play and
   // at rest: with the elbows down, the left upper arm goes 6.3 cm into the chest when it reaches
   // across to the strings. With the left elbow at [-1, -1, 0] in the play, the left upper arm goes
   // flat (flat p5 of `pnpm arm-check` 0.77, against 0.83 with this elbow).
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.03, 0.14, 0],
+    palmL: [-0.06, 0.14, -0.02],
     palmR: [0.03, 0, 0],
-    faceL: [1, 0, 0],
+    faceL: [1, -0.6, 0],
     faceR: [-1, 0, 0],
     aimL: [0, 1, 0.5],
     aimR: null,
