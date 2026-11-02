@@ -996,11 +996,16 @@ export interface RigMeshArgs {
    * or `null` for none.
    */
   readonly keep: string | null;
+  /**
+   * True for `--no-base`: `--check` rigs and probes only the variants of `--set`, and the tables
+   * have no row of the base config ({@link checkVariants}).
+   */
+  readonly noBase: boolean;
 }
 
 /** The usage text of `pnpm rig-mesh`. */
 const USAGE =
-  'Usage: node tools/rig-mesh.ts <animal> [--preview <dir>] [--check [--set <path>=<value>[;<path>=<value>]...]... [--roles <role>[,<role>]...] [--step <seconds>] [--demo <id>]... [--faces <n>] [--watch <face>[,<face>]...] [--hold <changes>]... [--keep <dir>]]';
+  'Usage: node tools/rig-mesh.ts <animal> [--preview <dir>] [--check [--set <path>=<value>[;<path>=<value>]...]... [--no-base] [--roles <role>[,<role>]...] [--step <seconds>] [--demo <id>]... [--faces <n>] [--watch <face>[,<face>]...] [--hold <changes>]... [--keep <dir>]]';
 
 /** The options of `pnpm rig-mesh` that take a value. */
 const VALUED = [
@@ -1028,15 +1033,16 @@ function isValued(arg: string): arg is (typeof VALUED)[number] {
 /**
  * Reads the arguments of `pnpm rig-mesh <animal> [--preview <dir>] [--check] [--set <changes>]...`
  * and the options of the app checks of `--check`: `--roles`, `--step`, `--demo`, `--faces`,
- * `--watch`, and `--hold`, whose changes of the holds the fold probes take in memory, and the
- * folder of `--keep`.
+ * `--watch`, and `--hold`, whose changes of the holds the fold probes take in memory, the
+ * folder of `--keep`, and `--no-base`.
  *
  * @param args The arguments after the script.
  * @returns The animal, the preview folder, the check flag, the variants, and the options of the
  *   app checks.
  * @throws Error with the usage for other arguments, for `--set` or an option of the app checks
- *   with no `--check`, for a step that is not above 0, for a count of faces that is not a whole
- *   number above 0, or for a watched face that is not a whole number of 0 or more.
+ *   with no `--check`, for `--no-base` with no `--set`, for a step that is not above 0, for a count
+ *   of faces that is not a whole number above 0, or for a watched face that is not a whole number
+ *   of 0 or more.
  */
 export function parseArgs(args: readonly string[]): RigMeshArgs {
   let preview: string | null = null;
@@ -1050,11 +1056,17 @@ export function parseArgs(args: readonly string[]): RigMeshArgs {
   const watch: number[] = [];
   const holds: string[] = [];
   let keep: string | null = null;
+  let noBase = false;
   let checkOnly = false;
   for (let i = 0; i < args.length; i++) {
     const arg = args[i] ?? '';
     if (arg === '--check') {
       check = true;
+      continue;
+    }
+    if (arg === '--no-base') {
+      noBase = true;
+      checkOnly = true;
       continue;
     }
     if (!isValued(arg)) {
@@ -1107,12 +1119,23 @@ export function parseArgs(args: readonly string[]): RigMeshArgs {
   if (!animal || rest.length !== 1 || animal.startsWith('--') || (checkOnly && !check)) {
     throw new Error(USAGE);
   }
+  if (noBase && sets.length === 0) {
+    throw new Error(`The option --no-base needs at least one --set.\n${USAGE}`);
+  }
   // Each change must fit before the first rig, so that a typing fault stops the run at once.
   const hold = holds.join(';');
   if (hold) {
     setHolds(hold).undo();
   }
-  return { animal, preview, check, sets, probe: { roles, step, demos, faces, hold, watch }, keep };
+  return {
+    animal,
+    preview,
+    check,
+    sets,
+    probe: { roles, step, demos, faces, hold, watch },
+    keep,
+    noBase,
+  };
 }
 
 /**
@@ -2202,7 +2225,10 @@ async function checkRig(
  * variant ({@link newKeys}) before the first rig. Before the first rig, the form of the players
  * on the commit {@link FORM_BASE} comes from a probe tree, and the tables of the form and of the
  * stage sides follow the table of the variants ({@link formLines}). A variant whose rig or probe
- * fails prints its message, and the next variant runs.
+ * fails prints its message, and the next variant runs. With `noBase`, the base config gets no rig
+ * and no probe, which saves about half of the time of a check of one variant. The variants still
+ * keep the meters for each unit of the base, and the first variant takes the place of the base in
+ * the table of the watched faces ({@link watchLines}).
  *
  * @param animal The animal.
  * @param text The JSON text of the config, read one time at the start.
@@ -2213,6 +2239,7 @@ async function checkRig(
  *   the form tables.
  * @param keep The folder of `--keep`, into which each rig goes as `base.glb`, `variant-1.glb`,
  *   and so on, each with its corners file, or `null`.
+ * @param noBase True for `--no-base`: only the variants get a rig and the probes.
  * @returns True when each variant passed.
  * @throws Error if a variant does not fit or names no source file that exists, or if a role of
  *   `--roles` is not a role of the animal, before the first rig.
@@ -2224,6 +2251,7 @@ async function checkVariants(
   preview: string | null,
   probe: CheckProbe,
   keep: string | null = null,
+  noBase = false,
 ): Promise<boolean> {
   const texts = checkTexts(text, sets, ANIMALS.has(animal));
   for (const [k, set] of sets.entries()) {
@@ -2243,6 +2271,10 @@ async function checkVariants(
   const form = players.length > 0 ? await baseForm(players) : null;
   const rows: CheckRow[] = [];
   for (const [k, variant] of ['', ...sets].entries()) {
+    if (k === 0 && noBase) {
+      console.log('The base config gets no rig and no probe (--no-base).');
+      continue;
+    }
     if (sets.length > 0) {
       console.log(`\n${variant || 'base'}:`);
     }
@@ -2287,17 +2319,18 @@ async function checkVariants(
  * `tools/blender/rig_mesh.py`, which writes the GLB file of the config. With `--preview`, the
  * script also writes the images of the rig into the folder. With `--check`, the rig goes into a
  * temporary folder, and the tool measures it with no write into the repository. Each `--set` of
- * `--check` is a variant of the config in memory, and the tool checks the base and each variant.
+ * `--check` is a variant of the config in memory, and the tool checks the base and each variant,
+ * or only the variants with `--no-base`.
  * Blender comes from the environment variable `BLENDER`, or `blender` on the path.
  */
 async function main(): Promise<void> {
-  const { animal, preview, check, sets, probe, keep } = parseArgs(process.argv.slice(2));
+  const { animal, preview, check, sets, probe, keep, noBase } = parseArgs(process.argv.slice(2));
   const configPath = join(CONFIG_DIR, `${animal}.json`);
   const text = await readFile(configPath, 'utf8');
   const config = parseConfig(text);
   checkSource(config, relative(ROOT, configPath));
   if (check) {
-    if (!(await checkVariants(animal, text, sets, preview, probe, keep))) {
+    if (!(await checkVariants(animal, text, sets, preview, probe, keep, noBase))) {
       process.exitCode = 1;
     }
     return;
