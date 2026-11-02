@@ -379,6 +379,22 @@ passes.
 - [ ] Arm rebuild: `arm_rebuild.py` has no cut along the seam with a side wall (`cat_arms.py`),
       so an arm joined to the trunk down to the elbow (the fox, the cat, the hippo, and the deer)
       keeps its species script.
+- [ ] Test mannequin: its source with kept faces (`arm_rebuild.py --keep-faces`) passes the arm
+      gate of both test roles against the rebuilt arms, with 4,304 in place of 4,512 triangles
+      and no saw-tooth band edges. The wrist rings are about 0.2 cm narrower, and the 2x crops
+      show no change of the form (`reports/2026-11-02-mesh-intake/`). Decide if the mannequin
+      body takes the kept faces. That also ends the zigzag item of the front stripes above.
+- [ ] Mesh intake: `pnpm mesh-intake` puts the shoulder line of the dog at 0.50 of the upper arm,
+      at its limit, but the arm of `dog.glb` joins the trunk down to 0.80 (the `README.md` of the
+      dog). The rays from the bone do not see the seam faces outside the arm. Count the faces
+      that join the arm and the trunk.
+- [ ] Mesh intake: the limits `GAP`, `SPACING`, `TILT`, and `COLOR_FACES` of
+      `tools/blender/mesh_intake.py` come only from the mannequin and the rebuilt arms. Check them
+      on the first clean quad mesh, with `arm_rebuild.py --keep-faces` and the arm gate.
+- [ ] Mesh intake: the quad share reads the order of the triangles of the glTF exporter of
+      Blender, which writes the two triangles of a quad one after the other. A file of another
+      exporter can give a low share for a quad mesh. Convert such a file in Blender first, or
+      join the triangles by their shape.
 - [ ] Recast grips: `pnpm arm-check` gives a recast role with no entry of `ACCEPTED_GRIPS` no
       grip turn, such as `violinist@mannequin`. The grip frame does not move with the bind, so the
       gate can take the entry of the role, as `pnpm cast-matrix` does. Decide it.
