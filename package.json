@@ -47,6 +47,7 @@
     "mixamo-import": "node tools/mixamo-import.ts",
     "mixamo-model": "node tools/mixamo-model.ts",
     "mesh-options": "node tools/mesh-options.ts",
+    "mesh-intake": "node tools/mesh-intake.ts",
     "studio-body": "node tools/studio-body.ts",
     "view-point": "node tools/view-point.ts",
     "close-views": "sh -c 'node tools/close-views.ts --check \"$@\" && pnpm build && node tools/close-views.ts \"$@\"' close-views",
