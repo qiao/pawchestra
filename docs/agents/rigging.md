@@ -305,6 +305,8 @@ Read the group of your work before you plan it.
   elbow, also with more Smooth rounds or one more elbow ring.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
+- On an arm joined to the trunk, start an elbow shape with `below` 0, and read its rig log first:
+  `below` 0.3 also relaxes the faces of the arm root and turns them over.
 
 ### Legs, seat, and tail
 
