@@ -98,3 +98,14 @@ blender -b --factory-startup -P tools/blender/polar_bear_arms.py
 blender -b --factory-startup -P tools/blender/polar_bear_legs.py
 shasum -a 256 assets/models/polar-bear/*.glb assets/models/polar-bear/*.json
 ```
+
+## polar-bear-tpose.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 960,016 bytes |
+| SHA-256 | `240cba75844173d29f201342e7e84ff2e582315750640a038e86836b9f214962` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the piano is smallest (`studio.bindSupination`) |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow of the piano hold |
+
+A run of `pnpm rig-mesh polar-bear` gives the same bytes.
