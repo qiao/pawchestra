@@ -311,7 +311,7 @@
       "L": 105,
       "R": 58
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 105 degrees and the right 58 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the harp on the straight bind smallest (design 4.4): about 138 degrees on the left (the flute and the snare drum) and 93 degrees on the right (the violin and the snare drum). A probe of the rig with these values gives a change of 0.5 degrees or less.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 105 degrees and the right 58 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the harp on the straight bind smallest (design 4.4): about 138 degrees on the left (the flute and the snare drum) and 93 degrees on the right (the violin and the snare drum). A probe of the rig with these values gives a change of 0.5 degrees or less. A right value of 0 or 30 degrees puts the right forearm as deep into the soundbox of the harp in the lowering as 58 degrees (about 2.2 cm), so the right side keeps the rule value.",
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source, and the right side mirrors it. The tail has one bone, so it needs no bind direction."
   },
   "weights": {
