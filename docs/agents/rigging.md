@@ -437,7 +437,11 @@ Result. Numbers (| Measure | main | round |, and the gate table). Choices. Commi
   median for `ACCEPTED_GRIPS` with the 2x paw crops.
 - When two goals conflict, keep this order: the clearance, the arm gate, the range of the
   instrument, and the look of the hold.
-- Run `pnpm pose-depth <role> --glb <file> --every 4` on the first variant of a mesh edit.
+- Run `pnpm pose-depth <role> --glb <file> --every 4` on the first variant of a mesh edit, and
+  the full sweep only on the final rig.
+- Before a bind move edits a config, gate the straight variant with supination 0
+  (`pnpm arm-check <role> --glb <file> --base <start>`). Two parallel rounds run each sweep
+  through `tools/measure-lock.sh`.
 - Make the images with one batch (`pnpm close-views batch`), from the front, the back, and each
   side, at a note and at rest. Run `pnpm close-views audit` before the report.
 - After the commit of the body, run `pnpm test:paused src/shots/` and
