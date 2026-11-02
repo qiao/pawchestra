@@ -813,25 +813,27 @@ CLIPS = (
 
 def add_clips(p, rig):
     """Keys each test clip as an action on each frame: the turn of each bone, and the place of the
-    hips, which carry the root motion in a Mixamo file. Each action has a fake user, so that the
-    exporters see it."""
+    hips, which carry the root motion in a Mixamo file. A clip function gives the turns and its
+    last frame, and the move of the hips in meters in the axes of Blender when the hips move. Each
+    action has a fake user, so that the exporters see it."""
     j = mixamo_joints(p)
     names = [PREFIX + n for n, _ in mixamo_bones()]
     rig.animation_data_create()
     actions = []
     for clip, fn in CLIPS:
-        _, last = fn(p, j, 0)
+        last = fn(p, j, 0)[1]
         action = bpy.data.actions.new(clip)
         action.use_fake_user = True
         rig.animation_data.action = action
         for f in range(last + 1):
-            turns, _ = fn(p, j, f)
+            turns, _, *move = fn(p, j, f)
             for name in names:
                 pb = rig.pose.bones[name]
                 pb.rotation_quaternion = local(turns.get(name[len(PREFIX) :], Quaternion()))
                 pb.keyframe_insert('rotation_quaternion', frame=f)
             hips = rig.pose.bones[PREFIX + 'Hips']
-            hips.location = (0, 0, 0)
+            # The place of a pose bone is in the axes of the bone (`BONE_REST`).
+            hips.location = BONE_REST.inverted() @ move[0] if move else Vector((0, 0, 0))
             hips.keyframe_insert('location', frame=f)
         action.frame_range = (0, max(last, 0))
         action.use_frame_range = True
@@ -891,7 +893,25 @@ def to_centimeters(objects, rig=None):
             eb.roll = 0.0
         bpy.ops.object.mode_set(mode='OBJECT')
         rig.scale = (1 / CM,) * 3
+        # The keyed places of the bones (the move of the hips) are in the units of the skeleton.
+        for curve in action_curves():
+            if curve.data_path.endswith('.location'):
+                for key in curve.keyframe_points:
+                    key.co.y *= CM
+                    key.handle_left.y *= CM
+                    key.handle_right.y *= CM
     bpy.context.view_layer.update()
+
+
+def action_curves():
+    """Gives the F-curves of each action, through the slots of the layered actions of Blender."""
+    from bpy_extras import anim_utils
+
+    for action in bpy.data.actions:
+        for slot in action.slots:
+            bag = anim_utils.action_get_channelbag_for_slot(action, slot)
+            if bag:
+                yield from bag.fcurves
 
 
 def select(objects):
