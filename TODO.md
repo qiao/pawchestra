@@ -282,14 +282,21 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, and the hippo have it. Then the bodies with arm
-      segments and a bent `bindArms`: the fox and the cat.
+      the elephant, the rhino, the bear, the deer, the hippo, and the fox have it. Then the body
+      with arm segments and a bent `bindArms`: the cat.
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
       right arm and `bindSmooth` keep their rules from the bent bind: the forearm turn of a rule
       counts from the bind forearm, so the rest shape now relaxes a nearly straight elbow. The
       bow paw bends 46° off its bind skin to keep its place (paw swing p95 48°, limit 70°).
+- [ ] Fox with the neutral bind: the bent right elbow ring is 3.21 cm in place of 4.01 cm on the
+      red fox violinist (20%), and 3.88 cm in place of 4.33 cm on the tan fox flutist. The 2x crops
+      show no pinch. The left forearm goes 0.2 cm deeper into the violin at rest, and the left paw
+      0.2 cm deeper into the flute (0.1 cm with no supination). In the cast matrix, the cello
+      recast folds 10 faces of the left arm (limit 8), and the snare drum recast twists the left
+      forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
+      bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
