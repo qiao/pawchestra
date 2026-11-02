@@ -426,9 +426,15 @@ def step_check(s, budget):
     s.line(share >= QUAD_SHARE, 'quad share', '%.2f of the triangles in quads (limit at least '
            '%.2f)' % (share, QUAD_SHARE))
     bm.free()
-    fails = [name for ok, name, _ in s.lines if not ok]
+    # The reasons: each failed point once, with the sides that fail it.
+    fails = {}
+    for ok, name, _ in s.lines:
+        point, _, side = name.rpartition(' ') if name[-2:] in (' L', ' R') else (name, '', '')
+        if not ok:
+            fails.setdefault(point, []).append(side)
     if fails:
-        print('mesh_intake: verdict: needs rebuild (%s)' % ', '.join(fails))
+        reasons = ', '.join(' '.join([point] + sides).strip() for point, sides in fails.items())
+        print('mesh_intake: verdict: needs rebuild (%s)' % reasons)
     else:
         print('mesh_intake: verdict: keep faces')
 
