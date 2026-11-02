@@ -74,3 +74,13 @@ bytes:
 blender -b --factory-startup -P tools/blender/elephant_arms.py
 shasum -a 256 assets/models/elephant/*.glb assets/models/elephant/elephant-weights.json
 ```
+
+## elephant.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 754,252 bytes |
+| SHA-256 | `be29ce8bbe689b9481ca2f204fc26220816898f2d6be8f511e8310686be25aae` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the timpani is smallest (`studio.bindSupination`). The skin of each forearm and wrist takes the skin normals (`rootNormals.wrist`) |
+
+A run of `pnpm rig-mesh elephant` gives the same bytes.
