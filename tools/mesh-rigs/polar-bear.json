@@ -303,13 +303,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the other meshes, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 117,
+      "R": 53
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 117 degrees and the right 53 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the piano on the straight bind smallest (design 4.4): about 115 degrees on the left (the flute and the snare drum) and 82 degrees on the right (the cello). With no supination, the left paw twists of the violin and the flute are near 180 degrees.",
     "note": "The thighs slope 25 degrees down and 15 degrees out, and the shins are vertical, as in the seat of design 5.2, and the feet stand flat (tools/rig/leg_turns.py <config> 25 15 0). The trunk keeps the seat of the source, and the play lean of the hold leans the spine, because a forward lean of the bind folds both arms."
   },
   "weights": {
@@ -536,5 +539,67 @@
   "bind": {
     "knee": "dq",
     "note": "Each vertex with a weight on both the thigh and the shin of one side takes the dual quaternion blend in the seated bind (bind_skin() of tools/blender/rig_mesh.py), so that each ring of the knee keeps its radius: the knee front rounds over the kneecap. The other vertices keep the linear blend, and the app moves the bind mesh with the linear blend."
-  }
+  },
+  "raise": [
+    {
+      "side": "L",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          -0.0339,
+          0.9994
+        ],
+        "upper_arm": [
+          0.4567,
+          -0.2806,
+          0.0973,
+          0.8386
+        ],
+        "forearm": [
+          -0.4076,
+          -0.1353,
+          0.4619,
+          0.776
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent left elbow of the pianist (pnpm raise-fit). With the straight bind arms, the inner elbow bends further from its bind, and faces 2753 and 2754 fold in 926 of 1332 samples of the rest, the play, and the lift. The key elbow turns 78 degrees from the bind in their mean. The relax of the shape also smooths the folded faces of the left shoulder in its pose."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0.0341,
+          0.9994
+        ],
+        "upper_arm": [
+          0.4492,
+          0.2271,
+          -0.0967,
+          0.8586
+        ],
+        "forearm": [
+          -0.403,
+          0.1326,
+          -0.457,
+          0.7818
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent right elbow of the pianist (pnpm raise-fit). With the straight bind arms, the inner elbow bends further from its bind, and faces 550, 551, 552, 553, and 588 fold in 1048 of 1332 samples of the rest, the play, and the lift. The key elbow turns 77 degrees from the bind in their mean."
+    }
+  ]
 }
