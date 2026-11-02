@@ -297,6 +297,14 @@ passes.
       recast folds 10 faces of the left arm (limit 8), and the snare drum recast twists the left
       forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
       bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
+- [ ] Cat with the neutral bind: the straight bind folds the inner right elbow of the violist
+      (folds p95 R 8, base 2, margin 2): faces 523 and 484 of the forearm, and 550 and 552 of the
+      upper arm. The cat has 4 `raise` shapes, the most of a body (`STUDIO_RAISES`), so no shape
+      of the bent elbow fits. A `bindSmooth` of the right elbow, and the bow arm shape keyed to
+      the play elbow of the straight bind, gave 6 to 12 folds in the play and the lift. The cat
+      keeps its bent bind (`reports/2026-11-01-neutral-n/cat-straight/`). The two probes give
+      L 106, R 47 (largest p95 130 and 77). Free a shape, or allow a fifth shape, then fit a shape
+      of the bent right elbow.
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
