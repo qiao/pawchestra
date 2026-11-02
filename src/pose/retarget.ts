@@ -177,6 +177,17 @@ export function clipTarget(model: PlayerModel): ClipTarget {
   };
 }
 
+/**
+ * Gives the length of a leg: from the hip joint over the knee to the ankle.
+ *
+ * @param joints The hip joint, the knee, and the ankle.
+ * @returns The length, or 0 when a joint is missing.
+ */
+function legLength(joints: readonly (Vector3 | undefined)[]): number {
+  const [hip, knee, ankle] = joints;
+  return hip && knee && ankle ? hip.distanceTo(knee) + knee.distanceTo(ankle) : 0;
+}
+
 /** The two keys of a rotation blend. Each call writes them before it reads them. */
 const keyA = new Quaternion();
 const keyB = new Quaternion();
@@ -497,9 +508,12 @@ function fingerCurl(
  * 4. Each bone with no source bone follows its parent. The fingers take one curl.
  * 5. Clearance rule: each upper arm turns about the shoulder joint until the arm is out of the
  *    head and the trunk (`clearArms()` of `pose/clip-fit.ts`).
- * 6. The hips move in head heights `H` across the floor. The floor rule then sets the height of
- *    the body: the lowest sole of the player keeps the height of the lowest sole of the source,
- *    in `H`, so a foot on the floor of the source stays on the floor.
+ * 6. Walk rule: the hips move across the floor in leg lengths, the length from the hip joint
+ *    over the knee to the ankle. A standing foot moves back under the hips by the turns of the
+ *    leg, which scale with the leg length, so it keeps its place. A move in `H` slid the short
+ *    feet of the animals. The floor rule then sets the height of the body: the lowest sole of the
+ *    player keeps the height of the lowest sole of the source, in `H`, so a foot on the floor of
+ *    the source stays on the floor.
  *
  * The rolls of the source bones do not matter, because each step reads world turns.
  *
@@ -521,6 +535,16 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
   const top = Math.max(...rest.positions.map((p) => p.dot(up)));
   const scale = target.headHeight / ((top - soleRest) / HUMAN_HEADS);
   const hips = names.indexOf('Hips');
+  const sourceLeg = legLength(
+    ['LeftUpLeg', 'LeftLeg', 'LeftFoot'].map((n) => rest.positions[names.indexOf(n)]),
+  );
+  const ownLeg = legLength(
+    (['thighL', 'shinL', 'footL'] as const).map((bone) => {
+      const at = target.skeleton.positions[boneIndex(bone)];
+      return at ? new Vector3(...at) : undefined;
+    }),
+  );
+  const stride = sourceLeg > 0 && ownLeg > 0 ? ownLeg / sourceLeg : scale;
 
   const drivers = mixamoDrivers(names);
   const turns = new Map<number, Quaternion>();
@@ -610,12 +634,12 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
     }
     clearArms(target.body, target.skeleton, out, clearChain);
 
-    // The hips move across the floor in H. The floor rule sets the height.
+    // Walk rule: the hips move across the floor in leg lengths. The floor rule sets the height.
     const move = (pose.positions[hips] ?? new Vector3())
       .clone()
       .sub(rest.positions[hips] ?? new Vector3())
-      .applyQuaternion(axes)
-      .multiplyScalar(scale);
+      .applyQuaternion(axes);
+    move.set(move.x * stride, move.y * scale, move.z * stride);
     chainFrames(target.skeleton, out, chain, [move.x, 0, move.z]);
     let low = Infinity;
     for (const sole of target.soles) {
