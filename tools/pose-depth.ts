@@ -1653,20 +1653,31 @@ export const SWEEP_ROLE_TABLE: Omit<RefRole, 'name'> = {
  * (`probeBeside()`). The commit runs the base with no change. A role that the commit does not have
  * stops the run before the probes (`checkRefRole()`). Then the tool writes the details and the
  * table of the working tree, and one compare of each variant with the commit
- * ({@link compareDepths}).
+ * ({@link compareDepths}). With `--glb <file>`, only the child of the working tree takes the
+ * option, so it sweeps the studio body of the file ({@link sweepGlb}), and the commit keeps its own
+ * body and its cache.
  *
  * @param role The role of the options.
  * @param ref The commit, the branch, or the tag.
  * @param goal The goal of `--goal`, in meters, or `null` for the limit of each pair.
+ * @param glb The absolute path of the GLB file of `--glb`, or `null`.
  */
-async function compareRef(role: RoleSweep, ref: string, goal: number | null): Promise<void> {
+async function compareRef(
+  role: RoleSweep,
+  ref: string,
+  goal: number | null,
+  glb: string | null,
+): Promise<void> {
   const label = `${ref} (${shortHash(ref)})`;
-  const args = withoutOptions(absoluteMidi(process.argv.slice(2)), ['--base']);
+  const args = withoutOptions(absoluteMidi(process.argv.slice(2)), ['--base', '--glb']);
   const started = performance.now();
   const texts = await probeBeside(
     ref,
     'pose-depth.ts',
-    { base: withoutOptions(args, ['--set', '--goal'], ['--gaps', '--long']), tree: args },
+    {
+      base: withoutOptions(args, ['--set', '--goal'], ['--gaps', '--long']),
+      tree: glb === null ? args : [...args, '--glb', glb],
+    },
     { prefix: 'pose-depth-', role: { ...SWEEP_ROLE_TABLE, name: role.role }, cache: true },
   );
   const [base] = readRows(texts.base);
@@ -1706,18 +1717,16 @@ async function printPlan(options: Options, role: RoleSweep): Promise<void> {
  * such as a GLB file of `pnpm rig-mesh --check --keep`. The tool runs again in a child process, in
  * a copy of `src/` with the module of the file (`withGlbBody()` of `tools/glb-swap.ts`). The files
  * of `assets/` and `src/` do not change, also after a stop or a failure. The child sweeps the base
- * row each time, because a cache by tree does not know the file ({@link PROBE_NO_CACHE}).
+ * row each time, because a cache by tree does not know the file ({@link PROBE_NO_CACHE}). With
+ * `--base`, the child of the working tree of {@link compareRef} runs this sweep.
  *
- * @param options The options of the other arguments.
+ * @param options The options of the other arguments, with no `--base`.
  * @param glb The absolute path of the GLB file.
  * @param args The other arguments, with no `--glb`.
  * @returns The exit code of the child.
- * @throws Error with `--base`, or for a role with no studio body.
+ * @throws Error for a role with no studio body.
  */
 async function sweepGlb(options: Options, glb: string, args: readonly string[]): Promise<number> {
-  if (options.base !== null) {
-    throw new Error(`The options --glb and --base do not go together.\n${USAGE}`);
-  }
   const source = findRole(options.role.role);
   if (!source) {
     throw new Error(`The ${options.role.role} has no studio body, so --glb does not apply.`);
@@ -1729,12 +1738,13 @@ async function sweepGlb(options: Options, glb: string, args: readonly string[]):
 
 /**
  * Runs the tool: `node tools/pose-depth.ts <role> [options]`. With `--glb <file>`, the sweep runs
- * on the studio body of the file ({@link sweepGlb}).
+ * on the studio body of the file ({@link sweepGlb}), and with `--base` too, against the commit
+ * ({@link compareRef}).
  */
 async function main(): Promise<void> {
   const { glb, rest } = takeGlb(process.argv.slice(2));
   const options = parseOptions(rest);
-  if (glb) {
+  if (glb && options.base === null) {
     process.exitCode = await sweepGlb(options, glb, rest);
     return;
   }
@@ -1756,7 +1766,7 @@ async function main(): Promise<void> {
   const role = roleOf(options);
   await printPlan(options, role);
   if (options.base !== null) {
-    await compareRef(role, options.base, options.goal);
+    await compareRef(role, options.base, options.goal, glb);
     return;
   }
   const rows = await sweepRows(options, role);
