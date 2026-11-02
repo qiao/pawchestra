@@ -91,7 +91,8 @@ passes.
 - [ ] Deer harpist: the right move twist max fails the arm gate on its margin. Turn the right paw
       toward the treble strings, or accept the value in the gate.
 - [ ] Deer harpist: the left palm is 0.14 m above the middle of the strings, but a harpist holds
-      both hands at almost one level. A lower palm needs room in the paw swing (66°, limit 70°).
+      both hands at almost one level. A lower palm needs room in the paw swing from the straight
+      bind paw (59°, and 67° at 0.10 m, limit 70°).
 - [ ] Deer harpist: the forearms rise about 30° from the elbow to the wrist, but a harpist holds
       them level. The elbows of the short arms hang below the strings (harp-technique).
 - [ ] Deer harpist: the knees lie under the round belly, so the base of the harp stands in front of
@@ -283,8 +284,8 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, and the bear have it. Then the bodies with arm segments and a bent
-      `bindArms`: the hippo and the deer.
+      the elephant, the rhino, the bear, and the deer have it. Then the body with arm segments and
+      a bent `bindArms`: the hippo.
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
@@ -304,12 +305,14 @@ passes.
       drum folds move to the left arm (L 13, base R 10). The rhino flute forearms go deeper into
       the body in the lift (5.3 cm, base 4.5 cm), and the rhino cello left arm is flatter (flat
       p5 0.65, limit 0.55). Most other fold counts fall.
-- [ ] Deer with the neutral bind: the harp lift bends the left wrist 88° from the straight bind
-      paw (paw swing p95, limit 70), and the right arm folds 4 faces in the play (base 0): the
-      inner elbow and a thin face of the right paw (133). The 2x crops show no visible change. The
-      deer keeps its bent bind (`reports/2026-11-01-neutral-k/deer-neutral/`). Bend the left wrist
-      less in the harp lift, then rig the straight bind with the supination L 105, R 58 and a
-      `raise` shape of the right elbow.
+- [ ] Deer with the neutral bind: the right forearm goes 0.24 cm deeper into the soundbox in the
+      lowering (2.22 cm, base 1.98, accepted 4 cm). A right supination of 0 or 30 gives the same
+      depth, so the straight bind causes it. With its `raise` shape, the right inner elbow still
+      folds 2 faces at p95 in the play (494 and 495, base 0). The bent elbow rings of the harp hold
+      are narrower (p5 L 2.32 cm against 2.86, R 2.15 against 2.94). The 2x crops show no pinch.
+- [ ] Deer cast matrix with the neutral bind: the snare drum recast fails on the left forearm
+      twist (80°, limit 80°), and the flute recast on the left paw swing (73°, limit 70°) in place
+      of a flip of the left paw (move turn 17,993°/s on `14ef3d67`).
 - [ ] Rabbit with the neutral bind: in the cast matrix, the flute recast folds 9 faces of the right
       arm in the play (limit 8), and the cello recast 8. The snare drum recast passes now.
 - [ ] Polar bear with the neutral bind: in `pnpm arm-check pianist --world`, the fingers joints move
