@@ -273,7 +273,8 @@ interface SourceAxes {
 
 /**
  * Gives the turn from the axes of a source file to the model axes of the player: the left side of
- * the source goes to -x, its up to +y, and its front to -z (design 4.4).
+ * the source goes to -x, its up to +y, and its front to -z (design 4.4). The up of the source is
+ * the axis of the file nearest to the line from the hips to the head.
  *
  * @param names The names of the source bones.
  * @param rest The rest pose of the source.
@@ -290,7 +291,13 @@ function sourceAxes(names: readonly string[], rest: SourcePose): SourceAxes {
     throw new Error('The source skeleton has no hips, head, or left and right legs.');
   }
 
-  const up = top.clone().sub(hips).normalize();
+  // The line from the hips to the head leans forward a little (0.9° in the test mannequin), and
+  // the floor rule read the forward move of a walk along it as a rise. The axis of the file
+  // nearest to the line is the true vertical.
+  const lean = top.clone().sub(hips);
+  const axis = [Math.abs(lean.x), Math.abs(lean.y), Math.abs(lean.z)];
+  const k = axis.indexOf(Math.max(...axis));
+  const up = new Vector3().setComponent(k, Math.sign(lean.getComponent(k)));
   const side = left.clone().sub(right);
   side.sub(up.clone().multiplyScalar(side.dot(up))).normalize();
   const front = side.clone().cross(up);
