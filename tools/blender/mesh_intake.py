@@ -17,8 +17,8 @@ The steps:
 2. Find the shoulder line of each arm as `arm_rebuild.step_measure()` does: the first section of
    the upper arm that is free of the trunk, plus `CUT_MARGIN`. It must lie before `FREE_ARM`, where
    the free-arm rule of `arm_rebuild.step_paint()` starts. The arm is the part of the mesh beyond
-   that line (`arm_island()`). The gap is the smallest distance from the free arm to the rest of
-   the mesh.
+   that line (`arm_rebuild.free_arm()`). The gap is the smallest distance from the free arm to the
+   rest of the mesh.
 3. Find the edge loops of the quads that go around each arm bone and each leg (`edge_rings()`):
    the rings. Each ring gives its place along the limb, its radius, its tilt from a right angle
    to the bone, and its vertices.
@@ -79,10 +79,6 @@ QUAD_SHARE = 0.9
 #: The samples of a face for its color: the middle and each corner, pulled this share of the way
 #: to the middle.
 CORNER_PULL = 0.3
-
-#: An island vertex farther than this factor of the zone radius from the arm line, or nearer to
-#: the middle plane than the zone, shows an arm that joins the trunk or a leg.
-LEAK = 2.0
 
 #: The longest edge loop, in edges.
 LOOP_MOST = 200
@@ -147,30 +143,6 @@ def joint_stations(line):
         at += (b - a).length
         out.append(at)
     return out
-
-
-def arm_island(s, bm, side, plane):
-    """Gives the vertices of one arm: a flood from the middle of the forearm over the edges, with no
-    step behind the plane of the shoulder line. Gives None when the flood leaks into the trunk or
-    a leg."""
-    point, normal = plane
-    line = va.arm_line(s, side)
-    _, e, w, _ = line
-    mid = e.lerp(w, 0.5)
-    seed = min(bm.verts, key=lambda p: (p.co - mid).length)
-    near_x = s.units(s.spec['zone']['x'])
-    reach = LEAK * s.units(s.spec['zone']['radius'])
-    island, stack = set(), [seed]
-    while stack:
-        p = stack.pop()
-        if p in island:
-            continue
-        if p.co.x * side < near_x or va.arm_distance(line, p.co) > reach:
-            return None
-        island.add(p)
-        stack += [q for q in (edge.other_vert(p) for edge in p.link_edges)
-                  if (q.co - point).dot(normal) > 0]
-    return island
 
 
 def edge_loop(edge):
@@ -354,8 +326,7 @@ def check_arm(s, bm, bvh, side, sections, pixels):
         shoulder = min(start + ar.CUT_MARGIN, ar.CUT_MOST)
         s.line(shoulder < ar.FREE_ARM, 'arm free ' + name, 'the shoulder line at %.2f of the '
                'upper arm (limit below %.2f)' % (shoulder, ar.FREE_ARM))
-        plane = (a.lerp(e, shoulder), u)
-        island = arm_island(s, bm, side, plane)
+        island = ar.free_arm(s, bm, side, shoulder)
         if island is None:
             s.line(False, 'gap ' + name, 'the arm joins the trunk or a leg beyond the shoulder '
                    'line (%.2f of the upper arm)' % shoulder)
@@ -368,10 +339,9 @@ def check_arm(s, bm, bvh, side, sections, pixels):
             s.line(gap >= GAP, 'gap ' + name, '%.2f upper arm radii from the free arm to the '
                    'trunk and the legs (limit at least %.2f)' % (gap, GAP))
     if island is None:
-        plane = (a, u)
 
         def keep(p):
-            return (p.co - plane[0]).dot(plane[1]) > 0
+            return (p.co - a).dot(u) > 0
     else:
         def keep(p):
             return p in island

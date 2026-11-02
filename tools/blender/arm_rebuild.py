@@ -134,6 +134,10 @@ EDGE_RAYS = 4
 #: another edge. A wider edge is slanted, and no ring at a right angle to the bone follows it.
 EDGE_SLANT = 0.5
 
+#: An arm vertex farther than this factor of the zone radius from the arm line, or nearer to the
+#: middle plane than the zone, shows an arm that joins the trunk or a leg (`free_arm()`).
+LEAK = 2.0
+
 
 class Session(va.Session):
     """The state of one rebuild, with the settings of `step_measure()` in place of the settings of
@@ -231,6 +235,32 @@ def closed_loop(s, bm, side, point, normal):
         return va.ring_faces(s, bm, va.arm_line(s, side), side, point, normal)[1]
     except RuntimeError:
         return None
+
+
+def free_arm(s, bm, side, shoulder):
+    """Gives the vertices of one arm beyond the shoulder line at the share `shoulder` of the upper
+    arm, with no cut: a flood from the vertex nearest to the middle of the forearm over the edges,
+    with no step behind the plane of the line, which stands at a right angle to the upper arm.
+    Gives None when the flood leaks into the trunk or a leg: a vertex nearer to the middle plane
+    than the zone, or farther than `LEAK` zone radii from the arm line."""
+    line = va.arm_line(s, side)
+    a, e, w, _ = line
+    point, normal = a.lerp(e, shoulder), (e - a).normalized()
+    mid = e.lerp(w, 0.5)
+    seed = min(bm.verts, key=lambda p: (p.co - mid).length)
+    near_x = s.units(s.spec['zone']['x'])
+    reach = LEAK * s.units(s.spec['zone']['radius'])
+    arm, stack = set(), [seed]
+    while stack:
+        p = stack.pop()
+        if p in arm:
+            continue
+        if p.co.x * side < near_x or va.arm_distance(line, p.co) > reach:
+            return None
+        arm.add(p)
+        stack += [q for q in (edge.other_vert(p) for edge in p.link_edges)
+                  if (q.co - point).dot(normal) > 0]
+    return arm
 
 
 def zone_faces(s, bm, side):
