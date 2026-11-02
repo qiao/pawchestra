@@ -302,14 +302,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
-    "bindArmsNote": "The bind upper arm points out, forward, and 27 degrees down, nearer to the hanging source arm than the bind of the other meshes. This bind keeps the shoulder ring of the left arm wide and the left socket free of folds in the play.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind: the upper arm points out, forward, and 27 degrees down, near the hanging source arm, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 105,
+      "R": 58
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 105 degrees and the right 58 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the harp on the straight bind smallest (design 4.4): about 138 degrees on the left (the flute and the snare drum) and 93 degrees on the right (the violin and the snare drum). A probe of the rig with these values gives a change of 0.5 degrees or less.",
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source, and the right side mirrors it. The tail has one bone, so it needs no bind direction."
   },
   "weights": {
@@ -387,9 +389,14 @@
         -0.0831,
         0.4846,
         0.019
+      ],
+      [
+        -0.19092,
+        0.27097,
+        0.08432
       ]
     ],
-    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners, one face after the other. Six faces lie in the crease at the front of the left socket, which folds when the deer plays the harp. The last face lies under the right armpit.",
+    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners, one face after the other. Six faces lie in the crease at the front of the left socket, which folds when the deer plays the harp. The seventh face lies under the right armpit. The last face is a thin face of the right paw with a corner of 170 degrees, which turned over in each pose of the straight bind.",
     "haunch": {
       "height": [
         0.185,
@@ -418,17 +425,6 @@
   },
   "refine": {
     "rings": [],
-    "pointFlip": {
-      "points": [
-        [
-          -0.1303,
-          0.4169,
-          0.04085
-        ]
-      ],
-      "near": 0.003,
-      "note": "The edge at this point is the diagonal of one quad of the tube at the front of the right inner elbow (point_flips() of tools/blender/rig_mesh.py). The bent elbow of the seated bind makes this diagonal the long one, and its thin face then folds. The other diagonal does not fold."
-    },
     "flip": {
       "angle": 150,
       "normals": 60,
@@ -515,5 +511,37 @@
     "top": 0.1945,
     "carryTail": true,
     "note": "The values of the dog, with top and carryTail. top 0.1945 puts the flat underside of the haunch on the seat top. With carryTail, the tail ball moves down with the root of the tail, so that the faces under the tail do not stretch into a dark column."
-  }
+  },
+  "raise": [
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.3971,
+          0.2966,
+          -0.0594,
+          0.8665
+        ],
+        "forearm": [
+          -0.5866,
+          0.1236,
+          -0.5176,
+          0.6105
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent right elbow of the harpist (pnpm raise-fit). With the straight bind arms, the inner elbow bends further from its bind, and faces 461, 462, 463, and 465 fold in 151 of 283 samples of the play. The key elbow turns 105 degrees from the bind in their mean. With the shape, faces 494 and 495 fold in 16% and 8% of the play samples (folds p95 2, base 0)."
+    }
+  ]
 }
