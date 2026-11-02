@@ -61,9 +61,16 @@ export function outsideGit(path: string): boolean {
  *
  * @param script The path of the script.
  * @param args The arguments of the script.
+ * @param onLine The reader of each log line, which prints the line by default.
  * @returns A promise that ends when Blender ends.
  */
-export function runBlenderScript(script: string, args: readonly string[]): Promise<void> {
+export function runBlenderScript(
+  script: string,
+  args: readonly string[],
+  onLine: (line: string) => void = (line) => {
+    console.log(line);
+  },
+): Promise<void> {
   const blender = process.env['BLENDER'] ?? 'blender';
   const head = ['-b', '--factory-startup', '--python-exit-code', '1', '--python', script, '--'];
   const prefix = `${basename(script, '.py')}:`;
@@ -80,7 +87,7 @@ export function runBlenderScript(script: string, args: readonly string[]): Promi
       tail = lines.pop() ?? '';
       for (const line of lines) {
         if (line.startsWith(prefix)) {
-          console.log(line);
+          onLine(line);
         }
       }
     });
