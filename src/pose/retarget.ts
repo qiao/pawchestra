@@ -6,8 +6,8 @@ import { BONE_NAMES, boneIndex } from '../models/rig.ts';
 import type { BoneName, Skeleton } from '../models/rig.ts';
 import type { SourceClip, SourceFile, SourceTrack } from '../models/source-clips.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
-import { hangShare, restArm } from './clip-fit.ts';
-import type { RestArm } from './clip-fit.ts';
+import { clearArms, clearFrames, clipBody, hangShare, restArm } from './clip-fit.ts';
+import type { ClipBody, RestArm } from './clip-fit.ts';
 import { chainFrames, createFrame, posePoint } from './frames.ts';
 import { MIXAMO_BONES, isMixamoBone, mixamoDrivers } from './mixamo-bones.ts';
 
@@ -84,8 +84,8 @@ export interface SolePoint {
 }
 
 /**
- * The body that a clip plays on: the skeleton of the player, its size, its soles, and its rest
- * arms ({@link clipTarget}).
+ * The body that a clip plays on: the skeleton of the player, its size, its soles, its rest arms,
+ * and the parts that its arms keep clear of ({@link clipTarget}).
  */
 export interface ClipTarget {
   /** The skeleton of the player in its bind pose (design 4.7). */
@@ -96,6 +96,8 @@ export interface ClipTarget {
   readonly soles: readonly SolePoint[];
   /** The rest arm of each side of a standing body (design 5.2), for the hanging arm rule. */
   readonly restArms: { readonly L: RestArm; readonly R: RestArm };
+  /** The body parts and the arm points of the clearance rule. */
+  readonly body: ClipBody;
 }
 
 /**
@@ -160,7 +162,7 @@ export function solePoints(mesh: MeshData): SolePoint[] {
 
 /**
  * Makes the target of a clip from a player model, one time for each body: the skeleton, the size,
- * the soles, and the rest arms (design 4.4).
+ * the soles, the rest arms, and the body of the clearance rule (design 4.4).
  *
  * @param model The standing player model.
  * @returns The target.
@@ -171,6 +173,7 @@ export function clipTarget(model: PlayerModel): ClipTarget {
     headHeight: model.body.headHeight,
     soles: solePoints(model.mesh),
     restArms: { L: restArm(model, 'L'), R: restArm(model, 'R') },
+    body: clipBody(model),
   };
 }
 
@@ -485,7 +488,9 @@ function fingerCurl(
  *    (`hangShare()` of `pose/clip-fit.ts`). A human arm that hangs at the side thus takes the
  *    rest arm of the body (design 5.2), out of the round trunk.
  * 4. Each bone with no source bone follows its parent. The fingers take one curl.
- * 5. The hips move in head heights `H` across the floor. The floor rule then sets the height of
+ * 5. Clearance rule: each upper arm turns about the shoulder joint until the arm is out of the
+ *    head and the trunk (`clearArms()` of `pose/clip-fit.ts`).
+ * 6. The hips move in head heights `H` across the floor. The floor rule then sets the height of
  *    the body: the lowest sole of the player keeps the height of the lowest sole of the source,
  *    in `H`, so a foot on the floor of the source stays on the floor.
  *
@@ -547,6 +552,7 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
   const local = new Quaternion();
   const posed = new Vector3();
   const compensation = new Quaternion();
+  const clearChain = clearFrames(target.skeleton);
   const bindLow = target.soles.length > 0 ? Math.min(...target.soles.map((s) => s.point[1])) : 0;
 
   for (let f = 0; f < frames; f++) {
@@ -595,6 +601,7 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
         .multiply(world);
       local.toArray(out, i * 4);
     }
+    clearArms(target.body, target.skeleton, out, clearChain);
 
     // The hips move across the floor in H. The floor rule sets the height.
     const move = (pose.positions[hips] ?? new Vector3())
