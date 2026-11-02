@@ -298,15 +298,18 @@ passes.
       forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
       bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
 - [ ] Cat with the neutral bind: the straight bind (L 106, R 47) folds the inner right elbow of
-      the violist (folds p95 R 8, base 2, margin 2): faces 523 and 484 of the forearm, and 519,
-      550, and 552 of the upper arm. The cat has 4 `raise` shapes (`STUDIO_RAISES`). The third
-      left shape (the lift) can go: the left gate lines stay at the base, and the 2x crops do
-      not change. Only faces 1560 and 1561 in front of the left arm root then fold in 3% to 7% of
-      the lift. A shape of the bent right elbow in that slot failed in two tries. With `below`
-      0.3, it turns over 4 faces of the right arm root, and the trunk folds double (R 6). With
-      `below` 0, the fold moves from the forearm to the upper arm side of the elbow ring (R 8).
-      The cat keeps its bent bind (`reports/2026-11-02-cat-neutral/`). Two elbow shapes, as on
-      the hippo, need a fifth shape.
+      the violist (folds p95 R 8, base 2, margin 2). The cat has 4 `raise` shapes
+      (`STUDIO_RAISES`). The third left shape (the lift) can go: the left gate lines stay at the
+      base, and the 2x crops do not change. Only faces 1560 and 1561 in front of the left arm root
+      then fold in 3% to 7% of the lift. A shape of the bent right elbow in that slot failed in
+      four tries. With `below` 0.3, it turns over 4 faces of the right arm root (R 6). With
+      `below` 0, the fold moves to the next faces of the elbow ring (R 8). A rule that turns 10°
+      further (`raise-fit --further`) gives R 5, and 6 faces stay turned over in its pose. A
+      further turn of 20° with a smooth of the posed tube from `upper_arm_seg1` (`smooth`,
+      `smoothBones`) clears the elbow (R 2), but faces 725 and 726 of the trunk in front of the
+      right arm root then fold in 84% and 100% of the play, and 11 faces stay turned over in the
+      pose of the rule. Next: smooth only the elbow segments, or allow a fifth shape. The cat
+      keeps its bent bind (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`).
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
