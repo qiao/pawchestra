@@ -168,18 +168,20 @@ has a studio body: a source mesh, rigged into the studio format. The app reads o
 of `src/models/studio/`, and the tools make them from the meshes:
 
 ```text
-user mesh (Meshy GLB)  ->  tools/blender/arm_rebuild.py  ->  <a>-arms.glb + <a>-weights.json
+user mesh (GLB)  ->  pnpm mesh-intake (keep faces | needs rebuild)
+  ->  tools/blender/arm_rebuild.py [--keep-faces]  ->  <a>-arms.glb + <a>-weights.json
   ->  pnpm rig-mesh <a> (tools/mesh-rigs/<a>.json, Blender)  ->  <a>.rig.glb
   ->  pnpm studio-body <a> (no Blender)  ->  src/models/studio/<a>.ts (the app reads only this)
 ```
 
-The first step applies only to a body whose arms or legs get new quad faces. The rig of another
-body reads the source mesh. The first step takes its settings from the joints of the config and
-from the mesh, so that a new mesh gets clean arms with no work by hand. Each face takes one
-color, so a face across a color edge of the old arm gives a saw-tooth edge. The first step thus
-puts a ring at each color edge across the arm. A species script
-`tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. The `README.md` of `assets/models/<a>/` gives the source and the
-steps of each file.
+The rebuild applies only to a body whose arms or legs get new quad faces. A clean quad mesh
+(`keep faces`, "Source meshes") keeps its faces, and the step adds only the arm segments and the
+weights. The rig of another body reads the source mesh. The rebuild takes its settings from the
+joints of the config and from the mesh, so that a new mesh gets clean arms with no work by hand.
+Each face takes one color, so a face across a color edge of the old arm gives a saw-tooth edge.
+The rebuild thus puts a ring at each color edge across the arm. A species script
+`tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. The `README.md` of
+`assets/models/<a>/` gives the source and the steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
 ### Source meshes
@@ -191,9 +193,11 @@ steps of each file.
   source file stays unchanged and a run gives the same bytes again.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
-- **Intake pose.** A new mesh comes in an A-pose, with a gap between each arm and the trunk. An
-  arm that touches the trunk needs a cut with a flat cap, and bone heat then spreads the arm
-  weights into the trunk. Both give flaps at the armpit. The rig fixes the meshes that exist.
+- **Intake spec.** A new mesh comes with clean quad faces, so that its arms keep their faces: the
+  rig adds only the arm segments and the weights (`arm_rebuild.py --keep-faces`). `pnpm
+  mesh-intake` checks each point of the intake table below with the limits of
+  `tools/blender/mesh_intake.py`, and gives the verdict `keep faces` or `needs rebuild`. The rig
+  fixes the meshes that exist.
 - **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
   each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`).
   The first download of 1 MB and the frame time of 9.7 stay the limits.
@@ -210,6 +214,19 @@ steps of each file.
   The role tools test it with a recast role, such as `violinist@mannequin`. A test body loads
   apart from the bodies of the app (`loadTestBodies()` of `models/studio-body.ts`), so the first
   download does not grow by it.
+
+| Intake point | Target | Reason |
+| --- | --- | --- |
+| Pose | An A-pose: each upper arm 30° to 45° below the horizontal (`POSE`). | A hanging arm and a raised arm then bend the shoulder about the same angle from the bind. |
+| Arm gap | A gap between each arm and the trunk: the arm is free of the trunk from a shoulder line before `FREE_ARM` of the upper arm, and the free arm stays `GAP` arm radii from the trunk and the legs. | An arm that touches the trunk needs a cut with a flat cap, and bone heat then spreads the arm weights into the trunk. Both give flaps at the armpit. |
+| Limb rings | Each arm and leg is a quad tube. Its rings have 16 vertices (at least `RING_VERTS`), stand at a right angle to the bone (`TILT`), and lie about 0.45 to 0.5 radii apart (at most `SPACING`). | Short arm segments keep each turn step small, and close rings keep the faces between them from a spiral fold. A ring of fewer vertices shows a flat side when the arm twists. |
+| Joint rings | At least 3 rings within one radius of each elbow and knee, and 2 of each wrist (`JOINT_RINGS`). | The helper bone of a joint spans these rings, so that the bend spreads over several faces. |
+| Color edges | Each color edge of the texture lies on a ring or another edge, and no arm face crosses one (`COLOR_FACES`). | Each face takes one color, so a face across a color edge gives a saw-tooth edge. |
+| Faces | At least `QUAD_SHARE` of the triangles in quads, and at most `STUDIO_TRIANGLE_BUDGET` triangles. | A triangle stops an edge ring. The budget keeps the download and the frame time. |
+
+The check reads the rings along each arm, and the rings across each knee. A GLB file holds only
+triangles. The glTF exporter writes the two triangles of a quad one after the other, so the check
+joins each such pair into a quad again.
 
 ### Rules of each body
 
