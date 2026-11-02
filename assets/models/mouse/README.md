@@ -84,6 +84,6 @@ shasum -a 256 assets/models/mouse/*.glb assets/models/mouse/mouse-weights.json
 
 | Item | Value |
 |---|---|
-| Size | 580,468 bytes |
-| SHA-256 | `f57c202ff203bef2a1269f50379dbb9f743d15d007f25e8a1c652bb0e977344a` |
+| Size | 580,464 bytes |
+| SHA-256 | `fff1850989e267d4df80bee0834177febb34b5c8bdcccbd96427e6a72f47524a` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the oboe hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the oboe is smallest (`studio.bindSupination`) |
