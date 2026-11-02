@@ -499,18 +499,27 @@ interface PlayerClip {
   leans forward a little, and the floor rule then reads a forward walk as a rise. The source has
   no chin, so its `H` is its height over `HUMAN_HEADS`, the canon of figure drawing.
 - **Hanging arm rule.** A human arm that hangs at the side goes straight down into the round
-  trunk of an animal. Thus each arm bone blends its rest compensation toward the turn to the rest
-  arm of the body (`hangingArm()`, 5.2), by the share of the source arm that hangs (`HANG_FADE`,
-  the angle of the line from the shoulder to the wrist). The hanging arm of the source points
-  straight down, so a sway of the source arm moves the rest arm. A raised arm, a clap, and a
-  T-pose keep the plain retarget.
+  trunk of an animal. Thus each arm bone blends its rest compensation toward the turn to the side
+  arm of the body, by the share of the source arm that hangs (`HANG_FADE`, the angle of the line
+  from the shoulder to the wrist). The side arm is the arm of `hangingArm()` (5.2) with no forward
+  swing and no elbow bend: the smallest angle out to the side at which it clears the torso and
+  the legs. The hanging arm of the source points straight down, so the source gives the swing and
+  the elbow bend, and the arms hang along the sides. The full rest arm of 5.2 with the bend of the
+  source held the forearms straight forward. A raised arm, a clap, and a T-pose keep the plain
+  retarget.
+- **Meeting paw rule.** The shoulders of an animal are wider in `H`, so the paws of a human clap
+  stay apart. Thus a wrist near the middle plane of the source chest (`MEET_FADE`) keeps its
+  distance from the plane in `H`, by a two-bone swing of the arm (`meetPaws()`).
 - **Clearance rule.** The large head of an animal fills the place of a raised human hand, and its
-  round trunk the place of a clap. Thus each upper arm turns about the shoulder joint by the
-  smallest turn that moves the deepest arm point out of the body (`clearArms()`), until the arm is
-  clear. The forearm and the paw keep their turns, so a wave still waves beside the head. The body
-  of the rule is a stack of horizontal slices of each body bone, with a radius for each angle bin
-  (`clipBody()`), one time for each body. The root of the upper arm lies in the shoulder in each
-  pose, so the rule does not test it.
+  round trunk the place of a clap. Arms that reach in front of the chest (`FRONT_FADE`) first
+  lift together about the side axis of the chest, up to `LIFT_LIMIT` (`liftArms()`). This turn
+  keeps the distance of each wrist from the middle plane, so the paws of a clap meet above a round
+  belly. Then each upper arm that is still in the body turns about the shoulder joint by the
+  smallest turn that moves the deepest arm point out (`clearArms()`). The forearm and the paw keep
+  their turns, so a wave still waves beside the head. The body of the rule is a stack of
+  horizontal slices of each body bone, with a radius for each angle bin (`clipBody()`), one time
+  for each body. The root of the upper arm lies in the shoulder in each pose, so the rule does not
+  test it.
 - **Walk rule.** A standing foot moves back under the hips by the turns of the leg, and these
   scale with the leg length. Thus the hips move across the floor by the ratio of the leg lengths,
   from the hip joint over the knee to the ankle, and a standing foot keeps its place. A move in
