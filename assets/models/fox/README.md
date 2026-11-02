@@ -77,5 +77,6 @@ shasum -a 256 assets/models/fox/*.glb assets/models/fox/fox-weights.json
 ```
 
 The rig gives the faces near each shoulder joint and each elbow joint the normals of the skin with
-no crease angle (`rootNormals` of the config). The seated bind bends the elbows, and a crease
-angle splits the normals of each inner elbow into a visible notch.
+no crease angle (`rootNormals` of the config). Each hold bends the elbows, and a crease angle
+splits the normals of each inner elbow into a visible notch. The rig binds the arms straight, with
+a supinated bind paw on each side (the role-neutral bind of design 4.4).
