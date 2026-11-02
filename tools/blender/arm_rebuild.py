@@ -30,6 +30,7 @@ Run it in a terminal from the root of the tree:
 
     Blender -b --factory-startup -P tools/blender/arm_rebuild.py -- <animal> [--source <glb>]
         [--factor <f> | <upper>,<fore>] [--spec <JSON>] [--out <dir>] [--views <dir>]
+        [--keep-faces]
 
 `--source` is the mesh before the rebuild: `armSource` of the config by default, else `source`.
 `--factor` makes the arms longer, 1 by default. The joints of the config are the joints of the
@@ -38,6 +39,13 @@ keys of a species script, such as `{"cut": {"shoulder": 0.3, "tilt": 20, "wrist"
 the folder of the output files, the folder of `output` of the config by default. `--views` writes
 the check images of `cat_arms.look()`.
 
+`--keep-faces` keeps the faces of a clean quad mesh that passes `pnpm mesh-intake` (design 4.4,
+"Source meshes"). It does steps 1, 6, 7, and 8, and of step 2 only the shoulder line, the zone,
+and the gaps of the joints (`KEEP_STEPS`, `measure_joints()`). The arm beyond the shoulder line
+takes the code of the tube, and the vertices behind the line the code of the cut loop
+(`step_mark()`), so that the weight rules find the arms with no cut. `<animal>-arms.glb` is then
+a copy of the bytes of the source (`step_copy()`). It takes no `--factor`.
+
 Two runs give the same bytes: the script runs Blender again with `PYTHONHASHSEED=0`, as
 `mannequin.py` does. In the live Blender of MCP, `run_steps()` runs one step at a time.
 """
@@ -45,6 +53,7 @@ Two runs give the same bytes: the script runs Blender again with `PYTHONHASHSEED
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 
@@ -143,8 +152,10 @@ class Session(va.Session):
     """The state of one rebuild, with the settings of `step_measure()` in place of the settings of
     a species script."""
 
-    def __init__(self, animal, source=None, factor=1.0, out_dir=None, overrides=None):
+    def __init__(self, animal, source=None, factor=1.0, out_dir=None, overrides=None,
+                 keep_faces=False):
         self.animal = animal
+        self.keep_faces = keep_faces
         path = os.path.join('tools', 'mesh-rigs', animal + '.json')
         with open(os.path.join(va.ROOT, path)) as f:
             self.config = json.load(f)
@@ -556,6 +567,61 @@ def step_measure(s):
     return out
 
 
+def step_measure_kept(s):
+    """Finds the shoulder line, the arm zone, and the gaps of the joints of a mesh that keeps its
+    faces (`measure_joints()`), and puts the shoulder line into `cut.shoulder` of `s.spec`. The
+    settings of `--spec` then replace these. Gives the settings."""
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    bvh = BVHTree.FromBMesh(bm)
+    shoulder, _, _ = measure_joints(s, bm, bvh)
+    bm.free()
+    s.spec['cut'] = {'shoulder': shoulder, 'tilt': 0.0}
+    s.spec.update(s.overrides)
+    return {k: s.spec[k] for k in ('cut', 'zone', 'gap', 'wristGap')}
+
+
+def step_mark(s):
+    """Marks the arms of a mesh that keeps its faces in the vertex attribute `arm_part`, as the cut
+    and the tube mark a rebuilt arm: each vertex of the arm beyond the shoulder line (`free_arm()`)
+    takes the code of the tube, and each vertex behind the line with an edge to the arm takes the
+    code of the shoulder loop. `step_loops()`, `arm_island()`, and `step_paint()` then work as on a
+    rebuilt arm. Gives the vertices of the arm and of the loop of each side."""
+    mesh = s.mesh
+    bm = bmesh.new()
+    bm.from_mesh(mesh.data)
+    codes = [0] * len(bm.verts)
+    out = {}
+    for side, off in ((1, 0), (-1, 10)):
+        arm = free_arm(s, bm, side, s.spec['cut']['shoulder'])
+        if arm is None:
+            raise RuntimeError('The arm of the side %d joins the trunk or a leg beyond the '
+                               'shoulder line, so its faces cannot stay (pnpm mesh-intake).'
+                               % side)
+        loop = {q for p in arm for q in (e.other_vert(p) for e in p.link_edges) if q not in arm}
+        for p in arm:
+            codes[p.index] = va.PART['tube'] + off
+        for p in loop:
+            codes[p.index] = va.PART['shoulder'] + off
+        out[side] = (len(arm), len(loop))
+    bm.free()
+    attr = mesh.data.attributes.get('arm_part') or mesh.data.attributes.new(
+        'arm_part', 'INT', 'POINT')
+    attr.data.foreach_set('value', codes)
+    return out
+
+
+def step_copy(s):
+    """Writes `<animal>-arms.glb` as a copy of the bytes of the source, for a mesh that keeps its
+    faces, so that the rig reads the faces, the colors, and the normals of the source. Gives the
+    size of the file."""
+    source = os.path.join(va.ROOT, s.spec['source'])
+    path = os.path.join(s.out_dir, s.animal + '-arms.glb')
+    if os.path.abspath(source) != os.path.abspath(path):
+        shutil.copyfile(source, path)
+    return os.path.getsize(path)
+
+
 def cut_loop(s, side):
     """Gives the center and the mean radius of the shoulder cut loop of one side of the mesh, in
     Blender, and its lowest height in units of the studio (the armpit)."""
@@ -750,11 +816,18 @@ def step_weights(s):
     path = os.path.join(s.out_dir, s.animal + '-weights.json')
     with open(path) as f:
         data = json.load(f)
-    data['note'] = (
-        'Weights of the %s with the rebuilt arms of tools/blender/arm_rebuild.py: automatic '
-        'weights and the weight rules of step_paint(). Points in the units of the rig config.'
-        % s.animal
-    )
+    if s.keep_faces:
+        data['note'] = (
+            'Weights of the %s with the faces of the source (tools/blender/arm_rebuild.py '
+            '--keep-faces): automatic weights and the weight rules of step_paint(). Points in the '
+            'units of the rig config.' % s.animal
+        )
+    else:
+        data['note'] = (
+            'Weights of the %s with the rebuilt arms of tools/blender/arm_rebuild.py: automatic '
+            'weights and the weight rules of step_paint(). Points in the units of the rig config.'
+            % s.animal
+        )
     with open(path, 'w') as f:
         json.dump(data, f, separators=(',', ':'))
     return count
@@ -825,10 +898,27 @@ STEPS = (
     step_weights,
 )
 
+#: The steps of `--keep-faces`, in order: no cut, tube, wrap, bridge, or bake. The arms keep the
+#: faces of the source, and get only the bones, the weights, and the weight rules.
+KEEP_STEPS = (
+    va.import_mesh,
+    step_measure_kept,
+    step_mark,
+    step_loops,
+    step_look,
+    step_copy,
+    step_skeleton,
+    va.step_bind,
+    step_paint,
+    fa.step_fingers,
+    step_weights,
+)
 
-def run_steps(s, first=0, last=len(STEPS)):
-    """Runs the steps from `first` up to `last` (not included), and prints the result of each."""
-    for step in STEPS[first:last]:
+
+def run_steps(s, first=0, last=None, steps=STEPS):
+    """Runs the steps from `first` up to `last` (not included, all by default), and prints the
+    result of each."""
+    for step in steps[first:last]:
         print('%s: %s' % (step.__name__, step(s)))
 
 
@@ -837,13 +927,18 @@ def parse(argv):
     usage = (
         'Usage: Blender -b --factory-startup -P tools/blender/arm_rebuild.py -- <animal> '
         '[--source <glb>] [--factor <f> | <upper>,<fore>] [--spec <JSON>] [--out <dir>] '
-        '[--views <dir>]'
+        '[--views <dir>] [--keep-faces]'
     )
     if not argv or argv[0].startswith('--'):
         raise SystemExit(usage)
-    out = {'animal': argv[0], 'source': None, 'factor': 1.0, 'spec': {}, 'out': None, 'views': None}
+    out = {'animal': argv[0], 'source': None, 'factor': 1.0, 'spec': {}, 'out': None, 'views': None,
+           'keep': False}
     rest = argv[1:]
     while rest:
+        if rest[0] == '--keep-faces':
+            out['keep'] = True
+            rest = rest[1:]
+            continue
         if len(rest) < 2 or rest[0] not in ('--source', '--factor', '--spec', '--out', '--views'):
             raise SystemExit(usage)
         key, value = rest[0][2:], rest[1]
@@ -856,6 +951,8 @@ def parse(argv):
             value = os.path.abspath(value)
         out[key] = value
         rest = rest[2:]
+    if out['keep'] and out['factor'] != 1.0:
+        raise SystemExit('--keep-faces keeps the arms of the source, so it takes no --factor.')
     return out
 
 
@@ -885,9 +982,10 @@ def main():
         ca.VIEWS = args['views']
         os.makedirs(ca.VIEWS, exist_ok=True)
     va.clear_scene()
-    s = Session(args['animal'], args['source'], args['factor'], args['out'], args['spec'])
+    s = Session(args['animal'], args['source'], args['factor'], args['out'], args['spec'],
+                args['keep'])
     os.makedirs(s.out_dir, exist_ok=True)
-    run_steps(s)
+    run_steps(s, steps=KEEP_STEPS if s.keep_faces else STEPS)
     print(
         'arm_rebuild: wrote %s-arms.glb and %s-weights.json into %s'
         % (s.animal, s.animal, s.out_dir)
