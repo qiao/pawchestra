@@ -88,8 +88,6 @@ passes.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
 - [ ] Deer harpist: ask the user to confirm the length of the arms, the size of the harp, its lean
       back onto the right shoulder, the box under it, and the rebuilt arms.
-- [ ] Deer harpist: the right move twist max fails the arm gate on its margin. Turn the right paw
-      toward the treble strings, or accept the value in the gate.
 - [ ] Deer harpist: the left palm is 0.14 m above the middle of the strings, but a harpist holds
       both hands at almost one level. A lower palm needs room in the paw swing from the straight
       bind paw (59°, and 67° at 0.10 m, limit 70°).
