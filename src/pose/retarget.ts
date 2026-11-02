@@ -6,8 +6,17 @@ import { BONE_NAMES, boneIndex } from '../models/rig.ts';
 import type { BoneName, Skeleton } from '../models/rig.ts';
 import type { SourceClip, SourceFile, SourceTrack } from '../models/source-clips.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
-import { clearArms, clearFrames, clipBody, hangShare, restArm } from './clip-fit.ts';
-import type { ClipBody, RestArm } from './clip-fit.ts';
+import {
+  clearArms,
+  clearFrames,
+  clipBody,
+  frontShare,
+  hangShare,
+  meetPaws,
+  meetShare,
+  restArm,
+} from './clip-fit.ts';
+import type { ClipBody, PawMeets, RestArm } from './clip-fit.ts';
 import { chainFrames, createFrame, posePoint } from './frames.ts';
 import { MIXAMO_BONES, isMixamoBone, mixamoDrivers } from './mixamo-bones.ts';
 
@@ -506,9 +515,12 @@ function fingerCurl(
  *    (`hangShare()` of `pose/clip-fit.ts`). A human arm that hangs at the side thus takes the
  *    rest arm of the body (design 5.2), out of the round trunk.
  * 4. Each bone with no source bone follows its parent. The fingers take one curl.
- * 5. Clearance rule: each upper arm turns about the shoulder joint until the arm is out of the
- *    head and the trunk (`clearArms()` of `pose/clip-fit.ts`).
- * 6. Walk rule: the hips move across the floor in leg lengths, the length from the hip joint
+ * 5. Meeting paw rule: a wrist near the middle plane of the chest keeps its distance from the
+ *    plane in `H` (`meetPaws()` of `pose/clip-fit.ts`), so the paws of a clap meet.
+ * 6. Clearance rule: each upper arm turns about the shoulder joint until the arm is out of the
+ *    head and the trunk (`clearArms()` of `pose/clip-fit.ts`). An arm in front of the chest
+ *    only lifts, so the paws of a clap meet above a round belly.
+ * 7. Walk rule: the hips move across the floor in leg lengths, the length from the hip joint
  *    over the knee to the ankle. A standing foot moves back under the hips by the turns of the
  *    leg, which scale with the leg length, so it keeps its place. A move in `H` slid the short
  *    feet of the animals. The floor rule then sets the height of the body: the lowest sole of the
@@ -571,6 +583,16 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
     R: [drivers.get('upperArmR'), drivers.get('handR')],
   } as const;
   const shares = { L: 0, R: 0 };
+  const sourceChest = drivers.get('chest');
+  const headSource = (top - soleRest) / HUMAN_HEADS;
+  const meet: PawMeets = {
+    L: { share: 0, distance: 0 },
+    R: { share: 0, distance: 0 },
+  };
+  const front = { L: 0, R: 0 };
+  const chestTurn = new Quaternion();
+  const chestSide = new Vector3();
+  const chestFront = new Vector3();
   const fingers = { L: boneIndex('fingersL'), R: boneIndex('fingersR') } as const;
 
   const count = BONE_NAMES.length;
@@ -598,6 +620,23 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
         from && to
           ? hangShare(from.clone().applyQuaternion(axes), to.clone().applyQuaternion(axes))
           : 0;
+    }
+    // The side and the front axes of the source chest, in the model axes, for the meeting paw
+    // rule and the lift of the clearance rule.
+    const chestAt = pose.positions[sourceChest ?? -1];
+    chestTurn
+      .copy(axes)
+      .multiply(pose.rotations[sourceChest ?? -1] ?? local.identity())
+      .multiply((rest.rotations[sourceChest ?? -1] ?? local.identity()).clone().invert())
+      .multiply(axesInverse);
+    chestSide.set(1, 0, 0).applyQuaternion(chestTurn);
+    chestFront.set(0, 0, -1).applyQuaternion(chestTurn);
+    for (const side of ['L', 'R'] as const) {
+      const wrist = pose.positions[sourceArms[side][1] ?? -1];
+      const offset = wrist && chestAt ? wrist.clone().sub(chestAt).applyQuaternion(axes) : null;
+      meet[side].share = offset ? meetShare(offset.dot(chestSide) / headSource) : 0;
+      meet[side].distance = offset ? offset.dot(chestSide) * scale : 0;
+      front[side] = offset ? frontShare(offset.dot(chestFront) / headSource) : 0;
     }
     for (let i = 0; i < count; i++) {
       const parent = target.skeleton.parents[i] ?? -1;
@@ -632,7 +671,8 @@ export function retargetClip(file: SourceFile, clip: SourceClip, target: ClipTar
         .multiply(world);
       local.toArray(out, i * 4);
     }
-    clearArms(target.body, target.skeleton, out, clearChain);
+    meetPaws(target.skeleton, out, clearChain, meet);
+    clearArms(target.body, target.skeleton, out, clearChain, front);
 
     // Walk rule: the hips move across the floor in leg lengths. The floor rule sets the height.
     const move = (pose.positions[hips] ?? new Vector3())

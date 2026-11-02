@@ -8,7 +8,7 @@ import type { Quat, Vec3 } from '../models/tuples.ts';
 import { chainFrames, createFrame, posePoint } from './frames.ts';
 import type { Frame } from './frames.ts';
 import { hangingArm } from './hang.ts';
-import { armRig } from './ik.ts';
+import { armRig, solveTwoBone } from './ik.ts';
 
 /**
  * The angles of the line from the shoulder to the wrist of a source arm from straight down, in
@@ -83,6 +83,47 @@ export function hangShare(shoulder: Vector3, wrist: Vector3): number {
   return 1 - MathUtils.smoothstep(angle, HANG_FADE.full, HANG_FADE.none);
 }
 
+/**
+ * The distances of a source wrist from the middle plane of the chest, in head heights of the
+ * source, over which the meeting paw rule of a clip fades out (design 4.4). Up to `full`, the
+ * wrist of the player keeps the distance of the source wrist in `H`, so the paws of a clap meet.
+ * From `none` on, the arm keeps its plain turns. Reason: the wrists of the closed clap of the test
+ * clip lie 0.17 H from the middle, its open clap 1.2 H, and a hanging arm 0.9 H or more.
+ */
+export const MEET_FADE = { full: 0.4, none: 0.8 } as const;
+
+/**
+ * Gives the share of the meeting paw rule for a source wrist: 1 near the middle plane of the
+ * chest, 0 past {@link MEET_FADE}, with a smooth step between.
+ *
+ * @param distance The distance of the source wrist from the middle plane, in head heights.
+ * @returns The share, from 0 to 1.
+ */
+export function meetShare(distance: number): number {
+  return 1 - MathUtils.smoothstep(Math.abs(distance), MEET_FADE.full, MEET_FADE.none);
+}
+
+/**
+ * The distances of a source wrist in front of the chest, in head heights of the source, over which
+ * the clearance rule starts to lift an arm in place of a free turn (design 4.4). Reason: the
+ * wrists of the clap of the test clip lie about 2 H in front of the chest, open or closed, and a
+ * hanging or walking arm 0.7 H or less. A lift about the side axis of the chest keeps the
+ * distance of the wrist from the middle plane, so the paws of a clap meet in front of the body,
+ * above a round belly.
+ */
+export const FRONT_FADE = { none: 1, full: 1.5 } as const;
+
+/**
+ * Gives the share of the lift of the clearance rule for a source wrist: 0 near the chest, 1 past
+ * {@link FRONT_FADE}, with a smooth step between.
+ *
+ * @param distance The distance of the source wrist in front of the chest, in head heights.
+ * @returns The share, from 0 to 1.
+ */
+export function frontShare(distance: number): number {
+  return MathUtils.smoothstep(distance, FRONT_FADE.none, FRONT_FADE.full);
+}
+
 /** The number of angle bins of a slice of a body part. */
 const SLICE_BINS = 24;
 
@@ -109,6 +150,13 @@ const CLEAR_STEPS = 12;
 
 /** The largest turn of one step, in radians. */
 const CLEAR_TURN = 20 * MathUtils.DEG2RAD;
+
+/**
+ * The largest lift of the arms of a clap above a round belly, in radians ({@link liftArms}). A
+ * clap of the test clip reaches forward at 79° from straight down, so the paws stay below the top
+ * of the head. Past it, the arms turn out to the side, and the paws part.
+ */
+const LIFT_LIMIT = 60 * MathUtils.DEG2RAD;
 
 /** The bones of the body that the arms of a clip keep clear of. */
 const BODY_BONES: readonly BoneName[] = [
@@ -450,25 +498,222 @@ function deepest(
   return out;
 }
 
+/** The rule of the meeting paws of each side. */
+export interface PawMeets {
+  readonly L: PawMeet;
+  readonly R: PawMeet;
+}
+
+/** The share and the wanted distance of a paw from the middle plane of the chest, for one side. */
+export interface PawMeet {
+  /** The share of the rule, from {@link meetShare}. */
+  share: number;
+  /** The wanted signed distance of the wrist from the middle plane, in meters, along +x of the chest. */
+  distance: number;
+}
+
+const lateral = new Vector3();
+const wrist = new Vector3();
+const elbow = new Vector3();
+const swing = new Quaternion();
+const upperTurn = new Quaternion();
+const lowerTurn = new Quaternion();
+const handTurn = new Quaternion();
+const joints = { elbow: new Vector3(), wrist: new Vector3() };
+const pole = new Vector3();
+const from = new Vector3();
+const to = new Vector3();
+
+/**
+ * Moves each wrist of a pose to its wanted distance from the middle plane of the chest, by the
+ * share of the meeting paw rule (design 4.4): the two-bone solution with the elbow on the side of
+ * its pose, blended with the pose by the share. Each arm bone turns by the smallest swing, so the
+ * roll of the arm stays, and the hand keeps its world turn. Thus two paws that touch in the source
+ * touch on a body with wider shoulders or shorter arms.
+ *
+ * @param skeleton The skeleton.
+ * @param rotations The rotations of the pose, relative to the parents. The tool writes the arms.
+ * @param frames The frames to write, one for each bone.
+ * @param meet The rule of each side.
+ */
+export function meetPaws(
+  skeleton: Skeleton,
+  rotations: Float32Array,
+  frames: readonly Frame[],
+  meet: PawMeets,
+): void {
+  const chest = boneIndex('chest');
+  for (const side of ['L', 'R'] as const) {
+    const { share, distance } = meet[side];
+    if (share <= 0) {
+      continue;
+    }
+    chainFrames(skeleton, rotations, frames);
+    const ids = {
+      shoulder: boneIndex(`shoulder${side}`),
+      upper: boneIndex(`upperArm${side}`),
+      forearm: boneIndex(`forearm${side}`),
+      hand: boneIndex(`hand${side}`),
+    };
+    const [shoulderFrame, upperFrame, forearmFrame, handFrame, chestFrame] = [
+      frames[ids.shoulder],
+      frames[ids.upper],
+      frames[ids.forearm],
+      frames[ids.hand],
+      frames[chest],
+    ];
+    if (!shoulderFrame || !upperFrame || !forearmFrame || !handFrame || !chestFrame) {
+      continue;
+    }
+    const bind = (bone: number): Vector3 => new Vector3(...(skeleton.positions[bone] ?? [0, 0, 0]));
+    const upperLength = bind(ids.forearm).distanceTo(bind(ids.upper));
+    const lowerLength = bind(ids.hand).distanceTo(bind(ids.forearm));
+
+    lateral.set(1, 0, 0).applyQuaternion(chestFrame.rotation);
+    const shoulder = upperFrame.position;
+    elbow.copy(forearmFrame.position);
+    wrist.copy(handFrame.position);
+    const own = to.subVectors(wrist, chestFrame.position).dot(lateral);
+    const target = from.copy(wrist).addScaledVector(lateral, distance - own);
+    const line = to.subVectors(wrist, shoulder).normalize();
+    pole.subVectors(elbow, shoulder).addScaledVector(line, -pole.dot(line));
+    if (pole.lengthSq() < 1e-10) {
+      pole.copy(lateral).multiplyScalar(side === 'L' ? -1 : 1);
+    }
+    solveTwoBone(shoulder, target, upperLength, lowerLength, pole, joints);
+
+    handTurn.copy(handFrame.rotation);
+    swing.setFromUnitVectors(
+      from.subVectors(elbow, shoulder).normalize(),
+      to.subVectors(joints.elbow, shoulder).normalize(),
+    );
+    upperTurn.copy(swing).multiply(upperFrame.rotation);
+    from.subVectors(wrist, elbow).applyQuaternion(swing).normalize();
+    to.subVectors(joints.wrist, joints.elbow).normalize();
+    lowerTurn.setFromUnitVectors(from, to).multiply(swing).multiply(forearmFrame.rotation);
+    upperTurn.copy(world.copy(upperFrame.rotation).slerp(upperTurn, share));
+    lowerTurn.copy(world.copy(forearmFrame.rotation).slerp(lowerTurn, share));
+
+    parentInverse.copy(shoulderFrame.rotation).invert();
+    world
+      .copy(parentInverse)
+      .multiply(upperTurn)
+      .toArray(rotations, ids.upper * 4);
+    world
+      .copy(upperTurn)
+      .invert()
+      .multiply(lowerTurn)
+      .toArray(rotations, ids.forearm * 4);
+    world
+      .copy(lowerTurn)
+      .invert()
+      .multiply(handTurn)
+      .toArray(rotations, ids.hand * 4);
+  }
+}
+
 const contact: Contact = { depth: 0, point: new Vector3(), normal: new Vector3() };
 const parentInverse = new Quaternion();
 const axis = new Vector3();
 const arm = new Vector3();
 const turn = new Quaternion();
 const world = new Quaternion();
+const gradient = new Vector3();
 
 /**
- * Turns each arm of a pose out of the body (design 4.4): while a point of the arm lies in a part
- * of the body, the upper arm turns about the shoulder joint by the smallest turn that moves that
- * point out by its depth and {@link CLEAR_GAP}, at most {@link CLEAR_STEPS} times. The forearm
- * and the paw keep their turns from the upper arm, so the motion of a clip keeps its form: a wave
- * still waves beside the head.
+ * Turns the upper arm of one side about the shoulder joint, in the model axes.
+ *
+ * @param skeleton The skeleton.
+ * @param rotations The rotations of the pose, relative to the parents.
+ * @param frames The posed frames of the pose.
+ * @param upper The index of the upper arm.
+ * @param by The turn.
+ */
+function turnUpper(
+  skeleton: Skeleton,
+  rotations: Float32Array,
+  frames: readonly Frame[],
+  upper: number,
+  by: Quaternion,
+): void {
+  const parent = skeleton.parents[upper] ?? -1;
+  parentInverse.identity();
+  if (frames[parent]) {
+    parentInverse.copy(frames[parent].rotation).invert();
+  }
+  world
+    .copy(frames[upper]?.rotation ?? world)
+    .premultiply(by)
+    .premultiply(parentInverse);
+  world.toArray(rotations, upper * 4);
+}
+
+/**
+ * Lifts the arms of a pose that reach in front of the chest ({@link frontShare}) out of the body
+ * (design 4.4): both arms turn by the same angle about the side axis of the chest, at most
+ * {@link LIFT_LIMIT}, until both are clear. A turn about the side axis keeps the distance of each
+ * wrist from the middle plane, and the same angle keeps the paws at one height, so the paws of a
+ * clap meet above a round belly.
  *
  * @param body The body.
  * @param skeleton The skeleton.
  * @param rotations The rotations of the pose, relative to the parents. The tool writes the upper
  *   arms.
  * @param frames The frames to write, one for each bone.
+ * @param sides The sides that reach in front of the chest.
+ */
+function liftArms(
+  body: ClipBody,
+  skeleton: Skeleton,
+  rotations: Float32Array,
+  frames: readonly Frame[],
+  sides: readonly ('L' | 'R')[],
+): void {
+  let lifted = 0;
+  for (let step = 0; step < CLEAR_STEPS && sides.length > 0; step++) {
+    chainFrames(skeleton, rotations, frames);
+    axis.set(1, 0, 0).applyQuaternion(frames[boneIndex('chest')]?.rotation ?? turn.identity());
+    let angle = 0;
+    for (const side of sides) {
+      const upper = boneIndex(`upperArm${side}`);
+      deepest(body, side === 'L' ? body.armL : body.armR, skeleton, frames, contact);
+      arm.subVectors(contact.point, frames[upper]?.position ?? contact.point);
+      const lever = gradient.crossVectors(arm, contact.normal).dot(axis);
+      if (contact.depth > 0 && Math.abs(lever) > 1e-6) {
+        const need = Math.min(
+          (contact.depth + CLEAR_GAP * body.headHeight) / Math.abs(lever),
+          CLEAR_TURN,
+        );
+        if (need > Math.abs(angle)) {
+          angle = Math.sign(lever) * need;
+        }
+      }
+    }
+    if (angle === 0 || lifted + Math.abs(angle) > LIFT_LIMIT) {
+      return;
+    }
+    lifted += Math.abs(angle);
+    turn.setFromAxisAngle(axis, angle);
+    for (const side of sides) {
+      turnUpper(skeleton, rotations, frames, boneIndex(`upperArm${side}`), turn);
+    }
+  }
+}
+
+/**
+ * Turns each arm of a pose out of the body (design 4.4). First the arms that reach in front of
+ * the chest lift ({@link liftArms}). Then, while a point of an arm still lies in a part of the
+ * body, its upper arm turns about the shoulder joint by the smallest turn that moves that point
+ * out by its depth and {@link CLEAR_GAP}, at most {@link CLEAR_STEPS} times. The forearm and the
+ * paw keep their turns from the upper arm, so the motion of a clip keeps its form: a wave still
+ * waves beside the head.
+ *
+ * @param body The body.
+ * @param skeleton The skeleton.
+ * @param rotations The rotations of the pose, relative to the parents. The tool writes the upper
+ *   arms.
+ * @param frames The frames to write, one for each bone.
+ * @param front The share of the lift of each side ({@link frontShare}).
  * @returns The largest depth of an arm that remains, in meters.
  */
 export function clearArms(
@@ -476,12 +721,19 @@ export function clearArms(
   skeleton: Skeleton,
   rotations: Float32Array,
   frames: readonly Frame[],
+  front: { readonly L: number; readonly R: number },
 ): number {
+  liftArms(
+    body,
+    skeleton,
+    rotations,
+    frames,
+    (['L', 'R'] as const).filter((side) => front[side] > 0.5),
+  );
   let remains = 0;
   for (const side of ['L', 'R'] as const) {
     const points = side === 'L' ? body.armL : body.armR;
     const upper = boneIndex(`upperArm${side}`);
-    const parent = skeleton.parents[upper] ?? -1;
     for (let step = 0; step <= CLEAR_STEPS; step++) {
       chainFrames(skeleton, rotations, frames);
       deepest(body, points, skeleton, frames, contact);
@@ -489,8 +741,7 @@ export function clearArms(
         remains = Math.max(remains, contact.depth);
         break;
       }
-      const shoulder = frames[upper]?.position ?? new Vector3();
-      arm.subVectors(contact.point, shoulder);
+      arm.subVectors(contact.point, frames[upper]?.position ?? contact.point);
       axis.crossVectors(arm, contact.normal);
       const lever = axis.length();
       if (lever < 1e-6) {
@@ -499,15 +750,7 @@ export function clearArms(
       }
       const angle = Math.min((contact.depth + CLEAR_GAP * body.headHeight) / lever, CLEAR_TURN);
       turn.setFromAxisAngle(axis.divideScalar(lever), angle);
-      parentInverse.identity();
-      if (frames[parent]) {
-        parentInverse.copy(frames[parent].rotation).invert();
-      }
-      world
-        .copy(frames[upper]?.rotation ?? world)
-        .premultiply(turn)
-        .premultiply(parentInverse);
-      world.toArray(rotations, upper * 4);
+      turnUpper(skeleton, rotations, frames, upper, turn);
     }
   }
   return remains;
