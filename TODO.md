@@ -688,14 +688,23 @@ scene of each demo has its seats and stage size with no overlap.
       take `--sets lift,lower`.
 - [ ] Clips (4.4): test the retarget on real Mixamo files in `scratch/mixamo/`. The spike used the
       Mixamo-style clips of the mannequin round and a scratch armature only.
-- [ ] Clips: the waving paw of `Wave` goes 0.11 H (wolf) to 0.13 H (rabbit) into the head,
-      because the large head of an animal fills the place of a raised human hand. Add a clearance
-      rule for the arms of a clip.
-- [ ] Clips: a human arm that hangs at the side goes into the round trunk of an animal: the paw
-      0.25 H (wolf) and the forearm 0.32 H (rabbit) in the scratch clips. Map the hanging arm of
-      the source to the rest arm of the body (5.2) in place of straight down.
-- [ ] Clips: test a walk. The floor rule keeps the sole heights, but a hips move in `H` can slide
-      the short feet. Scale the move by the leg length if the feet slide.
+- [ ] Clips: the clearance rule opens the paws of `Clap`, because it turns an upper arm out to
+      the side of the chest. The gap of the paws at the clap frame goes from 0.004 H to 0.83 H
+      (cat), from 0.003 H to 0.24 H (mannequin), and from 0.36 H to 1.29 H (bear). The plain
+      retarget already opens it on a round body with wide shoulders: 0.41 H (elephant) and 0.57 H
+      (penguin). A rule that kept the distance of each wrist from the middle plane met the paws,
+      but put the arms 0.37 H (bear) and 0.45 H (penguin) into the belly. Put the meeting point in
+      front of the body, as a round person claps above the belly.
+- [ ] Clips: the root of the upper arm lies in the shoulder in the T-pose of the source and in
+      each clip, up to 0.07 H (badger), because of the skin at the arm cut. The clearance rule does
+      not test the root. Check it with the arm gate.
+- [ ] Clips: a standing foot of `Walk` still slides 0.06 H (beaver) and 0.04 H (penguin) in one
+      step, because the thigh and the shin of these bodies have other ratios than the human leg.
+- [ ] Tool: let `pnpm clip-views` print the gap of the paws and the slide of a standing foot. The
+      clip fit round measured them with a scratch probe.
+- [ ] Models: the files `mannequin-human-mixamo.*` and `mannequin-animal-mixamo.*` of
+      `assets/models/mannequin/` have no `Idle` and no `Walk`. Write them again with
+      `tools/blender/mannequin.py` in a round that may change the asset files.
 - [ ] Clips: a clip in the concert needs a place for the instrument (a stand or the floor) and a
       blend from the rest pose of 5.2 into the clip and back. The gallery hides the instrument.
 - [ ] Clips: decide where a retargeted clip for the build lives outside git (design 8.1), such as a
