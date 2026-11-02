@@ -33,7 +33,7 @@
     "armShare": 0.3,
     "armShareNote": "A face of the radius stays in the rim only when the mean weight of its corners on the clavicle and the arm bones of its side is 0.3 or more (root_rim()), as on the hippo. Thus the faces of the upper chest and the back keep their facets.",
     "elbow": 0.06,
-    "elbowNote": "The faces within 0.06 units of each elbow joint take the skin normals too, as on the fox. The bind bends each elbow, and the crease angle splits the normals of the inner elbows into hard lines."
+    "elbowNote": "The faces within 0.06 units of each elbow joint take the skin normals too, as on the fox. Each hold bends the elbows, and the crease angle splits the normals of the inner elbows into hard lines."
   },
   "output": "assets/models/rabbit/rabbit-apose.rig.glb",
   "name": "Rabbit",
@@ -305,17 +305,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 100
+      "L": 88,
+      "R": 42
     },
-    "bindSupinationNote": "The bind paw of the left arm turns 100 degrees about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The bind paw sets the zero of the paw twist, so the violin paw does not twist through 180 degrees. The right paw keeps the bind arms.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 88 degrees and the right 42 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 134 degrees on the left (the violin and the snare drum) and 90 degrees on the right (the cello and the snare drum). With no supination, the left paw twists of the violin and the flute are near 180 degrees.",
     "note": "The thigh slopes 25 degrees down and 8 degrees out, so that the hips are above the knees, and the shin is vertical, as the legs of the red fox (tools/rig/leg_turns.py <config> 25 8 0, tools/mesh-rigs/fox.json). The bind arms are the bind arms of the studio rabbit, from tools/rig/studio-targets.ts."
   },
   "weights": {
@@ -445,5 +444,37 @@
     "end": 0.02,
     "most": 0.045,
     "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox (sit of tools/mesh-rigs/fox.json). The drop fades over the last 0.02 units of the haunch, where the haunch meets the tail ball, so that no face between them turns over."
-  }
+  },
+  "raise": [
+    {
+      "side": "L",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          -0.1223,
+          0,
+          0.9925
+        ],
+        "upper_arm": [
+          0.1913,
+          -0.2093,
+          -0.1561,
+          0.9462
+        ],
+        "forearm": [
+          -0.3981,
+          -0.209,
+          0.5044,
+          0.7372
+        ]
+      },
+      "fade": [
+        20,
+        30
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent left elbow of the violinist (pnpm raise-fit). With the straight bind arms, the inner elbow bends further from its bind, and faces 1394, 1349, 2147, 1393, 1348, and 2206 fold in 1087 of 6718 samples of the play and the lift. The key elbow turns 85 degrees from the bind in their mean."
+    }
+  ]
 }
