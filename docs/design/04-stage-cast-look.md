@@ -290,7 +290,9 @@ smallest. The roles are the roles of the cast matrix (`CAST_ROLES`) and the own 
 each on the sample of the matrix (`CAST_SAMPLE`). A value from two roles only can put the paw twist
 of a third role near 180°, where the skin folds and the twist measure flips. A change of the
 supination moves each signed paw twist of its side by the same angle, so the signed twists of one
-rig give the value of each side (`pnpm bind-supination <species>`).
+rig give the value of each side (`pnpm bind-supination <species>`). When the value of a side makes
+a clearance of the own role of the body grow in the concert, the own role wins, and the value of
+that side stays smaller: the concert plays the own role, and a recast role is only a test.
 
 The forearm segments share the bind supination, so the rest shape holds a twisted forearm. On a
 thick forearm, the edges of its thin faces then turn more than the crease angle, and a hold near
