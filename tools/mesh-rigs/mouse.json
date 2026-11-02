@@ -297,9 +297,9 @@
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
       "L": 127,
-      "R": 119
+      "R": 72
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 127 degrees and the right 119 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the oboe smallest (design 4.4): about 111 degrees on the left (the flute and the snare drum) and 121 degrees on the right (the cello and the violin). With no supination, the paw twists of five roles are near 180 degrees.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 127 degrees and the right 72 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the oboe smallest (design 4.4): about 111 degrees on the left (the violin and the snare drum) and 74 degrees on the right (the cello). With no supination, the paw twists of five roles are near 180 degrees.",
     "note": "The seated posture of design 5.2: the thigh slopes 25 degrees down and 15 degrees out, so that the oboe has room between the knees, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). tailBind turns the tail root 24 degrees below the level, so that the loop of the tail lies flat on the floor behind the chair.",
     "tailBind": {
       "tail": [
