@@ -63,6 +63,17 @@ shasum -a 256 assets/models/rabbit/*.glb assets/models/rabbit/rabbit-weights.jso
 ```
 
 The rig gives the faces near each shoulder joint and each elbow joint the normals of the skin with
-no crease angle (`rootNormals` of the config). The seated bind raises the hanging arms and bends
-the elbows. A crease angle there splits the normals, and the split shows as a slit at the front of
-each arm root.
+no crease angle (`rootNormals` of the config). The seated bind raises the hanging arms, and each
+hold bends the elbows. A crease angle there splits the normals, and the split shows as a slit at the
+front of each arm root.
+
+## rabbit-apose.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 806,716 bytes |
+| SHA-256 | `800fa2b41324ec82c5e933d664441e58c54537a1facfb24290cef8824c8a5ac3` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent left elbow |
+
+A run of `pnpm rig-mesh rabbit` gives the same bytes.
