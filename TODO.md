@@ -282,30 +282,28 @@ passes.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
-      supination of the rule, one body at a time. The wolf, the mouse, and the elephant have it.
-      The bear has straight bind arms and needs only the supination. Then the bodies with arm
-      segments and a bent `bindArms`: the hippo, the rhino, and the deer.
-- [ ] Bear neutral bind: the supination of the rule (L 51, R 32) passes the conductor gate (no
-      FAIL) and `arm-check --world` (SAME), but at the beat the 2x crops show a dark dent on the
-      side of the left forearm near the wrist, and a saw-tooth line under the right forearm. The
-      skin normals over the forearm (`rootNormals.wrist` 0.1, 0.025) remove the line, but not
-      the dent. A dual quaternion bind of the left arm (`bind.arm`) does not remove it. The left
-      paw twist p95 of the conductor goes from 52 to 84. Decide: a smaller left supination, or a
-      fix of the forearm form (`reports/2026-11-01-neutral-l/bear-candidate/`).
+      supination of the rule, one body at a time. The wolf, the mouse, the elephant, the rhino,
+      and the bear have it. Then the bodies with arm segments and a bent `bindArms`: the hippo
+      and the deer.
+- [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
+      side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
+      skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
+      p95 of the cast roles is thus 136° in place of 110° (the violin and the flute). A fix of the
+      forearm form would let the left take the rule value.
 - [ ] Bear `raise` shapes: the rig log keeps 3 faces of the right shape turned over after the
-      relax (736, 737, 738), as on `37d5d5c7`. With the left supination 51, the left shape keeps
-      1 (1444).
-- [ ] Rhino neutral bind: straight bind arms fold the bent elbows of the tuba hold (folds p95 L
-      11, R 15, limit 8). Two `raise` shapes of the bent elbows bring them to L 4 and R 2 (base 4
-      and 6). The right supination of the rule (22°) then takes the right forearm near the elbow
-      0.6 cm deeper into the tuba at rest, in the lift, and in the lowering (1.3 cm to 1.5 cm,
-      limit 1.5 cm). With 0° on the right, the depths stay within 0.1 cm of the base, and the
-      largest right paw twist p95 of the cast roles is 115° in place of 94°. Decide: the rule
-      value with the deeper forearm, or 0° on the right (config and shapes in
-      `reports/2026-11-01-neutral-l/rhino-candidate/`).
-- [ ] Elephant neutral bind, cast matrix: each of the 6 recast cells fails on `37d5d5c7` and on
-      the tree. The clarinet folds grow (L 19, base 15), and the snare drum folds move to the
-      left arm (L 13, base R 10). The cello, flute, and trumpet folds fall.
+      relax (736, 737, 738), as on `37d5d5c7`.
+- [ ] Rhino right bind paw: it keeps no supination in place of the rule value 22°, because 22°
+      takes the right forearm near the elbow 0.6 cm deeper into the tuba at rest, in the lift, and
+      in the lowering (1.3 cm to 1.5 cm, limit 1.5 cm). The largest right paw twist p95 of the
+      cast roles is thus 115° in place of 94° (the violin). The rig log keeps 1 face (444) of the
+      right elbow shape turned over.
+- [ ] Rhino neutral bind elbows: the bent elbow rings of the tuba hold are about 24% narrower
+      (p5 L 4.26 cm against 5.58 cm, R 4.04 against 5.16). The 2x crops show no pinch.
+- [ ] Neutral bind, cast matrix of the elephant, the rhino, and the bear: each recast cell fails on
+      `37d5d5c7` and on the tree. The elephant clarinet folds grow (L 19, base 15), and its snare
+      drum folds move to the left arm (L 13, base R 10). The rhino flute forearms go deeper into
+      the body in the lift (5.3 cm, base 4.5 cm), and the rhino cello left arm is flatter (flat
+      p5 0.65, limit 0.55). Most other fold counts fall.
 - [ ] Bind supination after the shared violin hold (design 4.4): `pnpm bind-supination` now gives
       the wolf L 62, R 18 (rig L 57, R 15) and the mouse L 127, R 86 (rig R 119). The violin recast
       moved: the right paw of the mouse is near 0° now. Rig both bodies with the new values after
