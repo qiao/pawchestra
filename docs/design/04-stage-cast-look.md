@@ -284,7 +284,9 @@ shape that fits only that hold, and each other hold blends its own bend on top. 
 the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
 species and each instrument (Cast matrix). The rabbit, the polar bear, the wolf, the mouse, the
 elephant, the rhino, the bear, and the deer have this bind. A body with `raise` shapes also fits
-each shape against all its roles, because a shape fits only the poses near its hold.
+each shape against all its roles, because a shape fits only the poses near its hold. A pose gives
+the bend of a paw off its forearm as an angle (`pawBendR`), so that a new bind keeps the paw in
+the world.
 
 The bind supination of each paw is the value that makes the largest paw twist p95 of any role
 smallest. The roles are the roles of the cast matrix (`CAST_ROLES`) and the own roles of the body,
