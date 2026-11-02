@@ -34,9 +34,6 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
 | mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with the rebuilt arms of `arm_rebuild.py`. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
-The penguin has no sheet, so `pnpm choir-check <dir>` compares it with the choir of the two newest
-reference images.
-
 ## The asset chain
 
 Each body comes from a textured mesh with no skeleton. The tools rig it into the GLB format of the
@@ -71,10 +68,11 @@ Its mesh has clean quad rings and twist markers, so a fault there comes from the
 3. **Options.** Run `pnpm mesh-options <a> <dir> --size <label>=<head top>... --arms <f>,...
    --legs <f>,... --instrument <id>`. Fix each warning of the rigs, then ask the user about the
    size, the arms, and the legs with `options.md` and `options.png`.
-4. **Rig.** Rebuild the arms with `arm_rebuild.py` first. Look at the seated bind, the
-   standing body, the knees, and the bones with `pnpm rig-mesh <a> --check --preview <dir>`. Try
-   each variant with `--check --set`. The triangles and the gzip size stay in their budgets, and
-   the standing body stays within 1 mm of the source.
+4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4). Run `arm_rebuild.py`, with
+   `--keep-faces` on `keep faces`. Look at the seated bind, the standing body, the knees, and the
+   bones with `pnpm rig-mesh <a> --check --preview <dir>`. Try each variant with `--check --set`.
+   The triangles and the gzip size stay in their budgets, and the standing body stays within 1 mm
+   of the source.
 5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale (the shoulder joints, or
    the keys of a pianist), a crease angle that matches the facet contrast of its reference crops,
    and the seat settings. Run `pnpm studio-body <a>`, add the module to `STUDIO_BODIES`, and give
@@ -120,7 +118,8 @@ when the seated legs show a wedge. Three causes add up, so fix all three:
   160° or more, change the hold or the instrument first.
 
 Run `tools/blender/arm_rebuild.py` first. It does the steps below from the joints of the config
-and rays through the mesh, with the functions of the species scripts. Write a species script
+and rays through the mesh, with the functions of the species scripts. A clean quad mesh skips
+steps 2 to 5 (`--keep-faces`). Write a species script
 `tools/blender/<a>_arms.py` only for a fault that it does not fix, such as an arm joined to the
 trunk down to the elbow (`cat_arms.py`).
 
