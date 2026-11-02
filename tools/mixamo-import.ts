@@ -72,9 +72,13 @@ export function runBlenderScript(script: string, args: readonly string[]): Promi
       spawn(blender, [...head, ...args], { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] }),
     );
     let errors = '';
+    // A chunk of the output can end in the middle of a line, so the end waits for the next chunk.
+    let tail = '';
     child.stdout?.setEncoding('utf8');
     child.stdout?.on('data', (text: string) => {
-      for (const line of text.split('\n')) {
+      const lines = (tail + text).split('\n');
+      tail = lines.pop() ?? '';
+      for (const line of lines) {
         if (line.startsWith(prefix)) {
           console.log(line);
         }
