@@ -8,7 +8,7 @@ import type { Quat, Vec3 } from '../models/tuples.ts';
 import { chainFrames, createFrame, posePoint } from './frames.ts';
 import type { Frame } from './frames.ts';
 import { hangingArm } from './hang.ts';
-import { armRig, solveArm } from './ik.ts';
+import { armRig } from './ik.ts';
 
 /**
  * The angles of the line from the shoulder to the wrist of a source arm from straight down, in
@@ -28,8 +28,17 @@ export interface RestArm {
 }
 
 /**
- * Gives the rest arm of a standing body (design 5.2): the arm of `hangingArm()`, solved as the
- * concert solves it, from the bind pose of the shoulder.
+ * The angles of the arm of {@link restArm}: a straight arm with no forward swing. Thus the rule
+ * takes only the side angle of the rest arm (5.2), and the source gives the swing and the elbow
+ * bend. Reason: the forward swing and the elbow bend of the concert rest arm, added to the bend of
+ * the source, held the forearms straight forward.
+ */
+const SIDE_HANG = { forward: 0, bend: 0 } as const;
+
+/**
+ * Gives the side arm of a standing body: the arm of `hangingArm()` with no forward swing and no
+ * elbow bend (`SIDE_HANG`), out to the side by the smallest angle at which it clears the torso and
+ * the legs (design 5.2).
  *
  * @param model The player model.
  * @param side The side of the body.
@@ -37,11 +46,23 @@ export interface RestArm {
  */
 export function restArm(model: PlayerModel, side: 'L' | 'R'): RestArm {
   const arm = armRig(model, side);
-  const hang = hangingArm(model, arm);
+  const hang = hangingArm(model, arm, SIDE_HANG);
   const shoulder = new Vector3(...arm.bind.shoulder);
-  const wrist = new Vector3(...hang.wrist).add(shoulder);
-  const pose = solveArm(arm.bind, shoulder, new Quaternion(), wrist, new Vector3(...hang.pole));
-  return { upper: toQuat(pose.upper), forearm: toQuat(pose.lower), hand: hang.hand };
+  const elbow = new Vector3(...arm.bind.elbow);
+  const bindWrist = new Vector3(...arm.bind.wrist);
+  const hand = new Quaternion(...hang.hand);
+  const lower = new Vector3(0, -1, 0).applyQuaternion(hand);
+  const upper = new Vector3(...hang.wrist)
+    .addScaledVector(lower, -bindWrist.distanceTo(elbow))
+    .normalize();
+  const upperTurn = new Quaternion().setFromUnitVectors(
+    elbow.clone().sub(shoulder).normalize(),
+    upper,
+  );
+  const lowerTurn = new Quaternion()
+    .setFromUnitVectors(bindWrist.sub(elbow).applyQuaternion(upperTurn).normalize(), lower)
+    .multiply(upperTurn);
+  return { upper: toQuat(upperTurn), forearm: toQuat(lowerTurn), hand: hang.hand };
 }
 
 /** The unit down direction. */
