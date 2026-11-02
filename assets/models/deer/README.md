@@ -75,3 +75,14 @@ has 4,152 triangles. A run gives the same bytes:
 blender -b --factory-startup -P tools/blender/deer_arms.py
 shasum -a 256 assets/models/deer/*.glb assets/models/deer/deer-weights.json
 ```
+
+## deer.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 596,992 bytes |
+| SHA-256 | `f614c227eab44495a0cabc3cc3c9a1ac9a7e0c3d50729af3a0786960cdf7d228` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the harp is smallest (`studio.bindSupination`) |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent right elbow of the harp hold |
+
+A run of `pnpm rig-mesh deer` gives the same bytes.
