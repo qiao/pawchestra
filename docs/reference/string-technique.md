@@ -613,10 +613,10 @@ The app does not follow these facts:
   (`BowedHold.frogHair`).
 - **The bow hand (2.1).** `rollToward()` rolls the paw around the stick, so that the back of the
   paw points to the elbow, and `BowedHold.farSideR` keeps the roll at one end of its range on the
-  low strings. The paw keeps the bend of its bind pose on the forearm (`BowedHold.pawKeepR`), as
-  the French bow is held "as if the hand is resting by the side". The hand turns in the plane of
-  its palm around the grip (`BowedHold.stickTurnR`), so that the paw keeps one place on the stick
-  and a straight wrist. The bow then turns a little in the paw over a stroke, as the fingers of a
+  low strings. The paw bends about 25° off the forearm in the plane of its palm
+  (`BowedHold.pawBendR`), as the French bow is held "as if the hand is resting by the side". The
+  hand turns in the plane of its palm around the grip (`BowedHold.stickTurnR`), so that the paw
+  keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over a stroke, as the fingers of a
   player let the bow turn.
 - **The rest.** No source gives the rest of an orchestral bassist. The contrabass stays at its
   playing place, and the left paw holds the neck. The right paw hangs beside the belly with the

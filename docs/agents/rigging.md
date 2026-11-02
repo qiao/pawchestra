@@ -197,7 +197,7 @@ Read the group of your work before you plan it.
 ### Paws and twist
 
 - The retarget turns each paw toward its forearm in the plane of the palm (`PAW_TURN`), up to 70°.
-  A pose can give a paw its own turn (`pawTurnL`, `pawKeepR`).
+  A pose can give a paw its own turn (`pawTurnL`, `pawBendR`).
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist. Supinate
   the bind paw (`studio.bindSupination`), also with straight bind arms: with no supination, the left
   violin paw flips at 180°. Take the value of design 4.4 (`pnpm bind-supination <species>`), then

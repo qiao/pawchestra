@@ -29,11 +29,11 @@ export interface AnimalPose {
    */
   readonly pawTurnL?: number | null;
   /**
-   * The share of the bend of its bind pose that the right paw keeps on its forearm, from 0 to 1,
-   * after the turn of the retarget toward the forearm (4.4): the bow paw of a hold with
-   * `BowedHold.pawKeepR` (5.3). A pose with no value takes 0.
+   * The bend of the right paw off the line of its forearm, in radians, after the turn of the
+   * retarget toward the forearm (4.4): the bow paw of a hold with `BowedHold.pawBendR` (5.3). A
+   * pose with no value takes 0.
    */
-  readonly pawKeepR?: number;
+  readonly pawBendR?: number;
   /** 0 is open eyes, 1 is closed eyes. The eye bones scale on y by `max(0.05, 1 - blink)`. */
   readonly blink: number;
   /**

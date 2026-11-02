@@ -104,13 +104,13 @@ export interface BowedHold {
    */
   readonly farSideR: number;
   /**
-   * The share of the bend of the bind paw that the right paw keeps on its forearm while it holds
-   * the bow, from 0 to 1 (`pawKeepR` of `AnimalPose`, `poseStudioBones()` of
+   * The bend of the right paw off the line of its forearm while it holds the bow, in the plane of
+   * its palm, in radians (`pawBendR` of `AnimalPose`, `poseStudioBones()` of
    * `models/studio-rig.ts`): 0 turns the paw onto the line of the forearm, as the retarget does
-   * for each paw, and 1 keeps the paw on the forearm as in the bind pose, so that the skin of the
-   * wrist keeps the form of the bind (design 4.4).
+   * for each paw. The bend counts from the forearm, so the paw keeps its place in the world with
+   * each bind of the body (design 4.4).
    */
-  readonly pawKeepR: number;
+  readonly pawBendR: number;
   /**
    * The turn of the right hand around the grip on the stick, or `null` for no turn
    * (`turnOnStick()` of `pose/bowed.ts`). The hand turns in the plane of its palm around the
@@ -399,7 +399,7 @@ const CHIN_HOLD = {
   polePizzicato: [1, -0.5, -1],
   followChange: 0,
   farSideR: Math.PI,
-  pawKeepR: 0,
+  pawBendR: 0,
   stickTurnR: null,
   playShift: [0, -0.05, -0.15],
   playTurn: IDENTITY,
@@ -474,7 +474,7 @@ const FLOOR_HOLD = {
   polePizzicato: [1, 0, 0],
   followChange: 0.3,
   farSideR: Math.PI,
-  pawKeepR: 0,
+  pawBendR: 0,
   stickTurnR: null,
   playShift: [0, 0, -0.05],
   playTurn: IDENTITY,
@@ -1215,12 +1215,12 @@ const DOG_HOLD = {
  * violinists, with the grip 0.3 H out, 0.3 H up, and 0.6 H to the front: with no move up, the bow
  * paw turns 2,959°/s at the most in the lowering.
  *
- * The bow paw keeps the bend of its bind pose on the forearm (`pawKeepR` 1), as a bassist holds
- * the French bow "as if the hand is resting by the side" (`docs/reference/string-technique.md`,
- * section 2.1). The bind bends the short paw 25° off the thick forearm, and the turn of the
- * retarget onto the line of the forearm bends the skin of the wrist 25° off that form: the edges
- * of the wrist stretch up to 1.9 times, and the heel of the paw shows as a lump under the bow paw
- * from the right. With the bend, they stretch up to 1.3 times.
+ * The bow paw bends 24.94° off the forearm (`pawBendR`), as a bassist holds the French bow "as
+ * if the hand is resting by the side" (`docs/reference/string-technique.md`, section 2.1). The
+ * bind bends the short paw by this angle off the thick forearm, and the turn of the retarget onto
+ * the line of the forearm bends the skin of the wrist 25° off that form: the edges of the wrist
+ * stretch up to 1.9 times, and the heel of the paw shows as a lump under the bow paw from the
+ * right. With the bend, they stretch up to 1.3 times.
  *
  * The bow hand turns in the plane of its palm around the grip on the stick, so that the forearm
  * keeps 45° in that plane (`stickTurnR`), and the paw keeps one turn on the hand. The grip lies in
@@ -1249,7 +1249,7 @@ const HIPPO_HOLD = {
   pluckSide: 0.18,
   stopEnd: 0.7,
   farSideR: 30 * MathUtils.DEG2RAD,
-  pawKeepR: 1,
+  pawBendR: 24.94 * MathUtils.DEG2RAD,
   stickTurnR: { forearm: 45 * MathUtils.DEG2RAD, most: 90 * MathUtils.DEG2RAD },
   restPoleR: [0.6, -1, 0],
   restPoleL: [-1, -0.3, 0],
