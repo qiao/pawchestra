@@ -209,8 +209,8 @@ The rebuild thus puts a ring at each color edge across the arm. A species script
   proportions of an adult of 1.8 m, and the preset `animal` the mean proportions of the wolf and
   the rabbit. A band and a front stripe on each limb show a twist. The palm and the back of the
   hand have two colors, and the two sides have two tints. Each joint has quad rings of 16
-  vertices. The species `mannequin` has the animal preset with the rebuilt arms of
-  `arm_rebuild.py` as its body, and no section casts it.
+  vertices. The species `mannequin` has the animal preset with its own faces as its body
+  (`arm_rebuild.py --keep-faces`), and no section casts it.
   The role tools test it with a recast role, such as `violinist@mannequin`. A test body loads
   apart from the bodies of the app (`loadTestBodies()` of `models/studio-body.ts`), so the first
   download does not grow by it.
