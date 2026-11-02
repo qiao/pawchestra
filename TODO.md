@@ -308,8 +308,13 @@ passes.
       further turn of 20° with a smooth of the posed tube from `upper_arm_seg1` (`smooth`,
       `smoothBones`) clears the elbow (R 2), but faces 725 and 726 of the trunk in front of the
       right arm root then fold in 84% and 100% of the play, and 11 faces stay turned over in the
-      pose of the rule. Next: smooth only the elbow segments, or allow a fifth shape. The cat
-      keeps its bent bind (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`).
+      pose of the rule. A smooth of the elbow segments alone (`upper_arm_seg2` to
+      `forearm_seg1`, 5 or 10 rounds, a turn of 15° or 20°) gives the same result (R 2, spine1
+      folds +56%, face 726 in 100% of the play). The relax of 60 rounds moves corners 355 and
+      356 of face 726 (weights on `upper_arm_seg1_R` and `upper_arm_seg2_R`) by up to 9.8 mm.
+      Next: the smooth with no relax (`below` -1, as on the fox and the hippo), or allow a fifth
+      shape. The cat keeps its bent bind (`reports/2026-11-02-cat-neutral/`,
+      `reports/2026-11-02-cat-bend/`).
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
