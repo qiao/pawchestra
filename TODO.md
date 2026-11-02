@@ -688,16 +688,15 @@ scene of each demo has its seats and stage size with no overlap.
       take `--sets lift,lower`.
 - [ ] Clips (4.4): test the retarget on real Mixamo files in `scratch/mixamo/`. The spike used the
       Mixamo-style clips of the mannequin round and a scratch armature only.
-- [ ] Clips: the clearance rule opens the paws of `Clap`, because it turns an upper arm out to
-      the side of the chest. The gap of the paws at the clap frame goes from 0.004 H to 0.83 H
-      (cat), from 0.003 H to 0.24 H (mannequin), and from 0.36 H to 1.29 H (bear). The plain
-      retarget already opens it on a round body with wide shoulders: 0.41 H (elephant) and 0.57 H
-      (penguin). A rule that kept the distance of each wrist from the middle plane met the paws,
-      but put the arms 0.37 H (bear) and 0.45 H (penguin) into the belly. Put the meeting point in
-      front of the body, as a round person claps above the belly.
+- [ ] Clips: the paws of `Clap` do not meet on the cat (0.80 H, 0.004 H with the plain
+      retarget), and on round bodies with wide shoulders: elephant 1.7 H, bear 1.05 H, penguin
+      2.3 H. The lift of `liftArms()` up to `LIFT_LIMIT` does not clear these arms, and the free
+      turn then parts the paws. A larger lift puts the paws of the cat into its head. The upper arm
+      of the clap goes deeper than with the plain retarget on the rhino (0.029 H to 0.049 H) and at
+      the root on the bear (0.157 H to 0.190 H).
 - [ ] Clips: the root of the upper arm lies in the shoulder in the T-pose of the source and in
-      each clip, up to 0.07 H (badger), because of the skin at the arm cut. The clearance rule does
-      not test the root. Check it with the arm gate.
+      each clip, up to 0.19 H (bear, `Clap`), because of the skin at the arm cut. The clearance
+      rule does not test the root. Check it with the arm gate.
 - [ ] Clips: a standing foot of `Walk` still slides 0.06 H (beaver) and 0.04 H (penguin) in one
       step, because the thigh and the shin of these bodies have other ratios than the human leg.
 - [ ] Tool: let `pnpm clip-views` print the gap of the paws and the slide of a standing foot. The
