@@ -29,7 +29,11 @@
   },
   "rootNormals": {
     "elbow": 0.07,
-    "note": "The skin faces whose middle lies within elbow (units) of the head of a forearm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). This removes the light and dark creases at each bent elbow."
+    "wrist": [
+      0.09,
+      0.025
+    ],
+    "note": "The skin faces whose middle lies within elbow (units) of the head of a forearm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). This removes the light and dark creases at each bent elbow. The arm faces from 0.09 units before each wrist joint (about the whole forearm) to 0.025 units past it take the skin normals too. The supinated bind paw (studio.bindSupination) twists the bind forearm, so the edges of its thin faces turn more than the crease angle, and the timpani hold then showed a dark saw-tooth line under the right wrist. With 0.03 units, one dark notch stayed."
   },
   "output": "assets/models/elephant/elephant.rig.glb",
   "name": "Elephant",
@@ -300,13 +304,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 118,
+      "R": 95
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 118 degrees and the right 95 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the timpani smallest (design 4.4, pnpm bind-supination on the straight bind with no supination): about 135 degrees on the left (the violin and the timpani) and 101 degrees on the right (the violin and the snare drum). With no supination, the paw twists of the violin, the cello, and the trumpet are near 160 degrees.",
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source (the values of the hippo). The elephant stands in the app (soloist of ANIMALS), so no player sits in this bind. Bind arms nearer to the A-pose fold more faces."
   },
   "weights": {
