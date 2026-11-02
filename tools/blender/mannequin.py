@@ -801,6 +801,38 @@ def clip_tpose(p, j, f):
     return {}, 0
 
 
+def hanging_arms(swing_left, swing_right, bend_left, bend_right, out=8.0):
+    """Gives the turns of two arms that hang at the sides: each arm turns down from the T-pose to
+    `out` degrees from the vertical, swings forward by its swing, and bends its elbow forward by
+    its bend (degrees). The wrists stay straight, so the palms face the thighs."""
+    turns = {}
+    for side, sign, swing, bend in (
+        ('Left', 1, swing_left, bend_left),
+        ('Right', -1, swing_right, bend_right),
+    ):
+        down = quat((0, 1, 0), sign * (90.0 - out))
+        # A turn about +x moves a hanging arm back, so a forward swing turns about -x.
+        upper = quat((1, 0, 0), -swing) @ down
+        fore = quat((1, 0, 0), -(swing + bend)) @ down
+        turns[side + 'Arm'] = upper
+        turns[side + 'ForeArm'] = upper.inverted() @ fore
+    return turns
+
+
+def clip_idle(p, j, f):
+    """The arms hang at the sides, and the body sways a little from side to side: the trunk leans
+    1.5 degrees to each side, the head leans back against it, and the arms swing 2 degrees, once in
+    3 seconds."""
+    last = 90
+    phase = 2 * math.pi * f / last
+    lean = 1.5 * math.sin(phase)
+    swing = 2.0 * math.sin(phase + math.pi / 2)
+    turns = hanging_arms(swing, -swing, 12.0, 12.0)
+    turns['Spine1'] = quat((0, 1, 0), lean)
+    turns['Head'] = quat((0, 1, 0), -lean)
+    return turns, last
+
+
 #: The test clips, in their order in the files.
 CLIPS = (
     ('TPose', clip_tpose),
@@ -808,6 +840,7 @@ CLIPS = (
     ('Bow', clip_bow),
     ('Clap', clip_clap),
     ('ForearmTwist', clip_forearm_twist),
+    ('Idle', clip_idle),
 )
 
 
