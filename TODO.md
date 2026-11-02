@@ -131,7 +131,7 @@ passes.
       trunk (piano-technique).
 - [ ] Polar bear pianist: at rest, the paws lie 8 cm to 10 cm below the key top, on the lower belly,
       because the arms do not reach the thighs. Lower paws fold the right shoulder.
-- [ ] Polar bear rig: the left shoulder folds about 20 faces at rest and in the play (limit 8). Add
+- [ ] Polar bear rig: the left shoulder folds about 16 faces at rest and in the play (limit 8). Add
       loop edges or a corrective shape at the armpit (`pnpm fold-probe pianist`).
 - [ ] Polar bear rig: each forearm folds into a hard dark V at the inner elbow in the chord (faces
       574 to 576 on the right). Add loop edges or a corrective shape at the elbow.
@@ -282,9 +282,9 @@ passes.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
-      supination of the rule, one body at a time. The wolf, the mouse, the elephant, the rhino,
-      and the bear have it. Then the bodies with arm segments and a bent `bindArms`: the hippo
-      and the deer.
+      supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
+      the elephant, the rhino, and the bear have it. Then the bodies with arm segments and a bent
+      `bindArms`: the hippo and the deer.
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
@@ -304,16 +304,27 @@ passes.
       drum folds move to the left arm (L 13, base R 10). The rhino flute forearms go deeper into
       the body in the lift (5.3 cm, base 4.5 cm), and the rhino cello left arm is flatter (flat
       p5 0.65, limit 0.55). Most other fold counts fall.
-- [ ] Bind supination after the shared violin hold (design 4.4): `pnpm bind-supination` now gives
-      the wolf L 62, R 18 (rig L 57, R 15) and the mouse L 127, R 86 (rig R 119). The violin recast
-      moved: the right paw of the mouse is near 0° now. Rig both bodies with the new values after
-      the next hold change of a cast role, and check the matrix.
+- [ ] Deer with the neutral bind: the harp lift bends the left wrist 88° from the straight bind
+      paw (paw swing p95, limit 70), and the right arm folds 4 faces in the play (base 0): the
+      inner elbow and a thin face of the right paw (133). The 2x crops show no visible change. The
+      deer keeps its bent bind (`reports/2026-11-01-neutral-k/deer-neutral/`). Bend the left wrist
+      less in the harp lift, then rig the straight bind with the supination L 105, R 58 and a
+      `raise` shape of the right elbow.
+- [ ] Rabbit with the neutral bind: in the cast matrix, the flute recast folds 9 faces of the right
+      arm in the play (limit 8), and the cello recast 8. The snare drum recast passes now.
+- [ ] Polar bear with the neutral bind: in `pnpm arm-check pianist --world`, the fingers joints move
+      0.013 cm (left) and 0.016 cm (right) against the bent bind (SAME up to 0.01 cm), with no turn
+      of the palms. The straight bind puts the forearms 0.1 cm to 0.2 cm deeper into the case, and
+      the `raise` shape of the right elbow puts the right upper arm 0.2 cm deeper into the
+      shoulder.
 - [ ] Clip places (9.3): `pnpm pose-depth` names the part of a bowed string at a clip, but no part
       of a wind or a brass instrument, such as a bell or a key.
 - [ ] Neutral bind elbows: the bent elbows are narrower in meters than with the bent bind. The
       elbow ring p5 is 3.04 cm in place of 3.71 cm (left) and 3.39 in place of 3.97 (right) on the
       wolf clarinetist, and 1.74 in place of 1.98 (left) and 1.79 in place of 2.01 (right) on the
-      mouse oboist. The 2x crops show no slit, flap, or pinch. Weights that keep the forearm and
+      mouse oboist. The rabbit violinist has 2.95 in place of 3.07 (left) and 2.88 in place of 3.04
+      (right), and the polar bear pianist 4.96 in place of 5.32 (left) and 5.12 in place of 5.34
+      (right). The 2x crops show no slit, flap, or pinch. Weights that keep the forearm and
       the elbow helper off the upper arm, with one more elbow ring, reach 3.83 cm (left) and
       3.86 cm (right) on the wolf, but fold 13 faces of each inner elbow (base 2 and 3). More
       Smooth rounds after a Remove From Group give 2.81 to 3.31 cm and 5 to 6 folds. The mouse got
