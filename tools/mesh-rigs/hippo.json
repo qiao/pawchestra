@@ -43,7 +43,7 @@
       "upper_arm_seg3",
       "forearm_seg0"
     ],
-    "note": "12 rounds of taubin() smooth the bind mesh of the left elbow after its relax (arm_smooth() on the bind, main() of tools/blender/rig_mesh.py). The seated bind bends the left elbow far, and without this rule the inner elbow folds into a lip."
+    "note": "12 rounds of taubin() smooth the bind mesh of the left elbow after its relax (arm_smooth() on the bind, main() of tools/blender/rig_mesh.py). The old bent bind folded the inner left elbow into a lip without this rule. The straight bind keeps the rule."
   },
   "raise": [
     {
@@ -84,7 +84,67 @@
         "forearm_seg2",
         "forearm_seg3"
       ],
-      "note": "The rest shape of the right arm: the mean turns of the rest samples of the bassist. It smooths the posed tube from the second upper arm segment to the wrist (raise_shape() of tools/blender/rig_mesh.py), with no relax (below -1). The fade keeps it off the play."
+      "note": "The rest shape of the right arm: the upper arm takes the mean turn of the rest samples of the bassist. It smooths the posed tube from the second upper arm segment to the wrist (raise_shape() of tools/blender/rig_mesh.py), with no relax (below -1). The fade keeps it off the play. The forearm turn counts from the bind forearm, so with the straight bind the elbow of the rule pose is almost straight."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0.4226,
+          0,
+          0.9063
+        ],
+        "upper_arm": [
+          0.3325,
+          0.1122,
+          -0.4704,
+          0.8097
+        ],
+        "forearm": [
+          -0.3622,
+          0.167,
+          -0.4462,
+          0.8012
+        ]
+      },
+      "fade": [
+        20,
+        30
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent right elbow of the bassist (pnpm raise-fit on the straight bind). With the straight bind arms, the inner elbow bends further from its bind, and faces 442, 444, 472, 471, 501, 470, 536, 440, and 474 fold in 3365 of 4690 samples of the play. The key elbow turns 73.5 degrees from the bind in their mean. With the clavicle at its bind turn, the shape relaxed fewer faces."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0.4226,
+          0,
+          0.9063
+        ],
+        "upper_arm": [
+          0.3548,
+          0.0442,
+          -0.4164,
+          0.8359
+        ],
+        "forearm": [
+          -0.4135,
+          0.1966,
+          -0.5078,
+          0.7297
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the right elbow bent further (pnpm raise-fit on the straight bind with the shape before it). Faces 472, 471, 476, 440, 501, and 470 still fold in 791 of 4690 samples of the play, and the key elbow turns 86.3 degrees from the bind in their mean."
     }
   ],
   "output": "assets/models/hippo/hippo.rig.glb",
@@ -366,14 +426,17 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source (tools/rig/leg_turns.py <config> 25 15 0). The bind hand bends 25 degrees off the forearm in the palm plane, as the source paw, and the bow paw keeps this bend (HIPPO_HOLD.pawKeepR of src/pose/bowed-rig.ts)."
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 100,
+      "R": 31
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 100 degrees and the right 31 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the contrabass smallest (design 4.4): about 127 degrees on the left (the violin and the snare drum) and 111 degrees on the right (the trumpet and the contrabass). The straight bind with no supination gave L 111, R 31, and a second probe on the rig at 111 gave the change -11. With no supination, the left paw of the bassist twists about 180 degrees.",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source (tools/rig/leg_turns.py <config> 25 15 0)."
   },
   "weights": {
     "armSplit": 0.26,
@@ -453,7 +516,7 @@
       "note": "The rule of the fox, the rabbit, the cat, the dog, and the panda, with a lower angle, a larger move, and wider normals (refine.flipNote)."
     },
     "ringsNote": "The rig has no rings. A ring at each elbow or at a wrist puts the rig above 3,200 triangles.",
-    "flipNote": "The long edge of each thin face of the arms in the seated bind flips (flip_edges() of tools/blender/rig_mesh.py). The bind bends the thick elbows 62 degrees, so the inner elbow faces are thin. The angle 130, the move 0.004, and the normals 90 flip more of them."
+    "flipNote": "The long edge of each thin face of the arms in the seated bind flips (flip_edges() of tools/blender/rig_mesh.py). The angle 130, the move 0.004, and the normals 90 flip more of them. The straight bind keeps the elbows of the source, so fewer inner elbow faces are thin than with the old bind, which bent the thick elbows 62 degrees."
   },
   "check": {
     "thin": {

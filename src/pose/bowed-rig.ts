@@ -1217,10 +1217,8 @@ const DOG_HOLD = {
  *
  * The bow paw bends 24.94° off the forearm (`pawBendR`), as a bassist holds the French bow "as
  * if the hand is resting by the side" (`docs/reference/string-technique.md`, section 2.1). The
- * bind bends the short paw by this angle off the thick forearm, and the turn of the retarget onto
- * the line of the forearm bends the skin of the wrist 25° off that form: the edges of the wrist
- * stretch up to 1.9 times, and the heel of the paw shows as a lump under the bow paw from the
- * right. With the bend, they stretch up to 1.3 times.
+ * straight bind paw of the hippo bends 20.9° the other way in the plane of its palm, so the bow
+ * paw bends about 46° from the form of its bind skin (paw swing p95 48°, limit 70°).
  *
  * The bow hand turns in the plane of its palm around the grip on the stick, so that the forearm
  * keeps 45° in that plane (`stickTurnR`), and the paw keeps one turn on the hand. The grip lies in
