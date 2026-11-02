@@ -680,6 +680,9 @@ scene of each demo has its seats and stage size with no overlap.
       (design 8.1).
 - [ ] Tool: `pnpm rig-mesh` stops on a mesh with no eye or nose faces (no gloss faces), because
       `primitive_arrays()` of `rig_mesh.py` gets an empty material.
+- [ ] Tool: `pnpm fold-probe` prints a wrong "Source middle (u)" for some faces. For face 133 of the
+      deer it gives (-0.1721, 0.3031, 0.0644), but entry 133 of the corners file of the rig gives
+      (-0.1909, 0.2710, 0.0843), the point that fixed the face in `weights.rigidPainted`.
 
 Done when: the pose tests pass, and the pose and frame targets pass.
 
