@@ -292,6 +292,14 @@ of a third role near 180°, where the skin folds and the twist measure flips. A 
 supination moves each signed paw twist of its side by the same angle, so the signed twists of one
 rig give the value of each side (`pnpm bind-supination <species>`).
 
+The forearm segments share the bind supination, so the rest shape holds a twisted forearm. On a
+thick forearm, the edges of its thin faces then turn more than the crease angle, and a hold near
+the twist of the source shows a dark saw-tooth line under the wrist. So the forearm faces of such
+a body take the skin normals with no crease angle (`rootNormals.wrist`, from the elbow side of
+the forearm to the paw). A normal rule cannot change the form: on a thick forearm, the
+supination can dent the side of the forearm near the wrist, or push the forearm near the elbow
+deeper into an instrument.
+
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
 a hold, or a body runs it. The paw twist, the paw swing, and the flat share measure the skin, so
