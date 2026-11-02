@@ -404,27 +404,30 @@ def ring_shares(ends, edges, spacing, least):
     return [round(at, 4) for at in out[:-1]]
 
 
-def step_measure(s):
-    """Finds the settings of the rebuild from the joints and from rays through the source mesh,
-    and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`:
+def closed_section(s, bm, part, share):
+    """Tells whether a plane at a right angle to the upper arm (`part` 0) or to the paw (2), at a
+    share of it, finds a closed loop around the arm on each side (`closed_loop()`)."""
+    for side in (1, -1):
+        line = va.arm_line(s, side)
+        a, b = line[part], line[part + 1]
+        if closed_loop(s, bm, side, a.lerp(b, share), (b - a).normalized()) is None:
+            return False
+    return True
 
-    - `cut.shoulder`: the first free share of the upper arm (`first_free()`) plus `CUT_MARGIN`,
-      the larger of the two sides, as long as the plane finds a closed loop around the arm.
-      `cut.wrist`: the first share of `WRIST_CUTS` with a closed loop around the paw.
-    - `gap` and `wristGap`: `GAP_SHARE` of the median radius at the elbow and at the wrist.
-    - `upper` and `fore`: the rings `RING_SPACING` radii apart, from the shoulder line to the
-      elbow ring, and from the elbow ring to the wrist ring, with a ring at each color edge of
-      `color_edges()` (`ring_shares()`). With an edge on the forearm, `fore` is the tuple of the
-      shares of its rings.
+
+def measure_joints(s, bm, bvh):
+    """Finds the shoulder line, the arm zone, and the gaps of the joints from the joints and from
+    rays through the source mesh, and puts `zone`, `gap`, and `wristGap` into `s.spec`:
+
     - `zone`: |x| `ZONE_X` of the shoulder joint, and `ZONE_RADIUS` of the largest hit of the
-      free arm. `faces`: the faces of the zone, the most faces that a cut arm can have.
+      free arm.
+    - `gap` and `wristGap`: `GAP_SHARE` of the median radius at the elbow and at the wrist.
 
-    The settings of `--spec` (`s.overrides`) then replace these. Gives the settings and the log of
-    the color edges as a dict.
+    The shoulder line is the first free share of the upper arm (`first_free()`) plus
+    `CUT_MARGIN`, the larger of the two sides, as long as the plane finds a closed loop around the
+    arm. Gives the share of the shoulder line, and the median radii of the free upper arm and of
+    the forearm in units of the studio.
     """
-    bm = bmesh.new()
-    bm.from_mesh(s.mesh.data)
-    bvh = BVHTree.FromBMesh(bm)
     sections = {side: arm_sections(s, bvh, side) for side in (1, -1)}
     start = max(first_free(sections[side]['upper']) for side in (1, -1))
     free_hits = [
@@ -464,22 +467,36 @@ def step_measure(s):
     }
     spec['gap'] = round(GAP_SHARE * radius('elbow'), 4)
     spec['wristGap'] = round(GAP_SHARE * radius('wrist'), 4)
-
-    def closed(part, share):
-        # A plane at the share of the upper arm (0) or of the paw (2) finds a loop on each side.
-        for side in (1, -1):
-            line = va.arm_line(s, side)
-            a, b = line[part], line[part + 1]
-            if closed_loop(s, bm, side, a.lerp(b, share), (b - a).normalized()) is None:
-                return False
-        return True
-
     shoulder = round(min(start + CUT_MARGIN, CUT_MOST), 4)
-    while not closed(0, shoulder):
+    while not closed_section(s, bm, 0, shoulder):
         shoulder = round(shoulder + CUT_STEP, 4)
         if shoulder > CUT_MOST:
             raise RuntimeError('No closed loop around the upper arm up to the share %s.' % CUT_MOST)
-    wrist = next((share for share in WRIST_CUTS if closed(2, share)), None)
+    return shoulder, upper_r, fore_r
+
+
+def step_measure(s):
+    """Finds the settings of the rebuild from the joints and from rays through the source mesh,
+    and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`:
+
+    - `zone`, `gap`, and `wristGap`: the settings of `measure_joints()`.
+    - `cut.shoulder`: the shoulder line of `measure_joints()`. `cut.wrist`: the first share of
+      `WRIST_CUTS` with a closed loop around the paw.
+    - `upper` and `fore`: the rings `RING_SPACING` radii apart, from the shoulder line to the
+      elbow ring, and from the elbow ring to the wrist ring, with a ring at each color edge of
+      `color_edges()` (`ring_shares()`). With an edge on the forearm, `fore` is the tuple of the
+      shares of its rings.
+    - `faces`: the faces of the zone, the most faces that a cut arm can have.
+
+    The settings of `--spec` (`s.overrides`) then replace these. Gives the settings and the log of
+    the color edges as a dict.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    bvh = BVHTree.FromBMesh(bm)
+    shoulder, upper_r, fore_r = measure_joints(s, bm, bvh)
+    spec = s.spec
+    wrist = next((share for share in WRIST_CUTS if closed_section(s, bm, 2, share)), None)
     if wrist is None:
         raise RuntimeError('No closed loop around the paw at the shares %s.' % (WRIST_CUTS,))
     spec['cut'] = {'shoulder': shoulder, 'tilt': 0.0, 'wrist': wrist}
