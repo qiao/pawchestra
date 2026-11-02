@@ -156,10 +156,17 @@
     },
     "bindArms": {
       "upper_arm": [0.813873, -0.143043, 0.563161],
-      "forearm": [-0.112888, -0.02484, 0.993297],
-      "hand": [-0.514147, 0.0639, 0.855318]
+      "forearm": [-0.112888, -0.02484, 0.993297]
     },
-    "note": "The seated posture of design 5.2: the thigh slopes 25 degrees down and 15 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). The rhino stands to play the tuba, so no player sits in this pose. The bind forearm turns about the bind upper arm, so that the elbow bends forward and not up."
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind, in which the forearm turns about the upper arm so that the elbow bends forward and not up. Thus the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 42,
+      "R": 0
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 42 degrees and the right 0 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The left value makes the largest left paw twist p95 of the six roles of the cast matrix and the tuba smallest (design 4.4, pnpm bind-supination on the straight bind with no supination): about 112 degrees (the violin and the snare drum), against 154 degrees with no supination. The rule gives the right 22 degrees (largest right p95 115 to 94 degrees, the violin), but the supinated bind forearm then takes the right forearm near the elbow 0.6 cm deeper into the tuba at rest, in the lift, and in the lowering (1.3 cm to 1.5 cm, base 0.7 cm to 0.9 cm, limit 1.5 cm). The own role wins (design 4.4), so the right paw keeps no supination: the depths stay within 0.1 cm of the base, and the largest right paw twist p95 of the cast roles stays 115 degrees (the violin).",
+    "note": "The seated posture of design 5.2: the thigh slopes 25 degrees down and 15 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). The rhino stands to play the tuba, so no player sits in this pose."
   },
   "weights": {
     "armSplit": 0.17,
@@ -257,5 +264,67 @@
     "rounds": 6,
     "sides": "LR",
     "note": "6 rounds of taubin() smooth the arm tubes of rhino-tpose-arms.glb after the weights (arm_smooth() of tools/blender/rig_mesh.py), at most 0.025 units, so that the tubes lose the ridges of the big faces of the T-pose mesh."
-  }
+  },
+  "raise": [
+    {
+      "side": "L",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.2439,
+          -0.0425,
+          -0.3431,
+          0.9061
+        ],
+        "forearm": [
+          -0.0926,
+          -0.5817,
+          -0.0249,
+          0.8077
+        ]
+      },
+      "fade": [
+        10,
+        35
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent elbow L of the tubist (pnpm raise-fit with the straight bind). Faces 1899, 1900, 1998, 1997, 2000, 1947, 1901, 1902 fold in each sample of the play, and the key elbow turns 72.2 degrees from the bind in their mean. The rule keeps the clavicle at its bind turn: with the mean clavicle turn of the samples, six shoulder and neck faces stayed turned over in the key pose. The fade of 10 to 35 degrees also covers the rest and the lift."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.0558,
+          0.2192,
+          0.3996,
+          0.8883
+        ],
+        "forearm": [
+          -0.1109,
+          0.7008,
+          0.0309,
+          0.704
+        ]
+      },
+      "fade": [
+        10,
+        35
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent elbow R of the tubist (pnpm raise-fit with the straight bind). Faces 418, 419, 421, 454, 455, 456, 457, 422, 453, 420, 393, 424, 423, 394 fold in each sample of the play, and the key elbow turns 90.5 degrees from the bind in their mean. The rule keeps the clavicle at its bind turn: with the mean clavicle turn of the samples, six shoulder and neck faces stayed turned over in the key pose. The fade of 10 to 35 degrees also covers the rest and the lift."
+    }
+  ]
 }
