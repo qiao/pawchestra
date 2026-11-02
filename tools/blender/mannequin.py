@@ -833,6 +833,83 @@ def clip_idle(p, j, f):
     return turns, last
 
 
+#: The walk of the `Walk` clip: a slow walk with the feet flat on the floor. A stride (two steps)
+#: takes 32 frames (112 steps a minute), the step is 0.35 m, each foot stands for 60% of the
+#: stride (Winter, "Biomechanics and Motor Control of Human Movement", 4th ed., 2009, 4.0), the
+#: swing lifts the ankle 0.08 m, and the arms swing 12 degrees to each side, against the legs.
+WALK = {'stride': 32, 'step': 0.35, 'stance': 0.6, 'lift': 0.08, 'arms': 12.0, 'strides': 2}
+
+#: The longest reach of a leg in the walk, as a share of its length: the knee of the standing leg
+#: then bends about 16 degrees, as a real knee in the loading response.
+WALK_REACH = 0.99
+
+
+def walk_foot(phase, start, stride):
+    """Gives the forward place and the lift share of a foot at a phase of its stride: the foot
+    stands at `start` in the stance, and moves one stride forward in an arc in the swing."""
+    stance = WALK['stance']
+    if phase < stance:
+        return start, 0.0
+    s = (phase - stance) / (1 - stance)
+    return start + stride * s * s * (3 - 2 * s), math.sin(math.pi * s)
+
+
+def clip_walk(p, j, f):
+    """The body walks forward: the hips move forward at a steady speed and bob up and down, each
+    foot stands flat on the floor and swings forward in an arc, the knees point forward (a turn
+    of each leg from the hip and the knee, `two_bone()`), and the arms swing against the legs. A
+    foot that stands does not slide on the floor."""
+    period = WALK['stride']
+    stride = 2 * WALK['step']
+    speed = stride / period
+    last = period * WALK['strides']
+    hips = {side: to_blender(j[side + 'UpLeg']) for side in ('Left', 'Right')}
+    knees = {side: to_blender(j[side + 'Leg']) for side in ('Left', 'Right')}
+    ankles = {side: to_blender(j[side + 'Foot']) for side in ('Left', 'Right')}
+    thigh = (knees['Left'] - hips['Left']).length
+    shin = (ankles['Left'] - knees['Left']).length
+    reach = WALK_REACH * (thigh + shin)
+
+    # The left foot lands at the start of each stride, and the right foot half a stride later.
+    # A foot lands 0.3 strides in front of its hip, so that it stands under the hip in the middle
+    # of its stance.
+    feet = {}
+    for side, offset in (('Left', 0.0), ('Right', 0.5)):
+        phase = (f / period + offset) % 1.0
+        land = f - phase * period
+        forward, lift = walk_foot(phase, speed * land + 0.3 * stride, stride)
+        feet[side] = (forward, lift, phase < WALK['stance'])
+    move = speed * f
+    rise = min(
+        math.sqrt(max(0.0, reach * reach - (forward - move) ** 2))
+        - (hips['Left'].z - ankles['Left'].z)
+        for forward, _, stands in feet.values()
+        if stands
+    )
+    rise = min(0.0, rise)
+    # Blender: the front is -y.
+    offset = Vector((0, -move, rise))
+
+    turns = {}
+    for side, (forward, lift, _) in feet.items():
+        hip = hips[side] + offset
+        ankle = Vector((ankles[side].x, ankles[side].y - forward, ankles[side].z))
+        ankle.z += WALK['lift'] * lift
+        d1, d2 = two_bone(hip, ankle, thigh, shin, Vector((0, -1, 0)))
+        q1 = aim(knees[side] - hips[side], d1)
+        q2 = aim(ankles[side] - knees[side], d2)
+        turns[side + 'UpLeg'] = q1
+        turns[side + 'Leg'] = q1.inverted() @ q2
+        # The foot keeps its rest turn in the world, so the sole stays flat.
+        turns[side + 'Foot'] = q2.inverted()
+
+    swing = WALK['arms'] * math.cos(2 * math.pi * f / period)
+    turns.update(
+        hanging_arms(-swing, swing, 15.0 + max(0.0, -swing) / 2, 15.0 + max(0.0, swing) / 2)
+    )
+    return turns, last, offset
+
+
 #: The test clips, in their order in the files.
 CLIPS = (
     ('TPose', clip_tpose),
@@ -841,6 +918,7 @@ CLIPS = (
     ('Clap', clip_clap),
     ('ForearmTwist', clip_forearm_twist),
     ('Idle', clip_idle),
+    ('Walk', clip_walk),
 )
 
 
