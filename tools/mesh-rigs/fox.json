@@ -8,7 +8,7 @@
     "radius": 0.12,
     "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). This removes a thin dark slit and a dark wedge at the back of the armpit.",
     "elbow": 0.07,
-    "elbowNote": "The faces within 0.07 units of each elbow joint take the skin normals too. The seated bind bends each elbow, and without this rule the split normals show a crease in the lit forearm. The tan fox shares the rig."
+    "elbowNote": "The faces within 0.07 units of each elbow joint take the skin normals too. Each hold bends the elbows, and without this rule the split normals show a crease in the lit forearm. The tan fox shares the rig."
   },
   "raise": [
     {
@@ -49,7 +49,7 @@
         "forearm_seg2",
         "forearm_seg3"
       ],
-      "note": "The rest shape of the right arm: the mean turns of the rest samples of the fox violinist. It smooths the posed tube from the second upper arm segment to the wrist (raise_shape() of tools/blender/rig_mesh.py), so that the inner elbow shows no bright streak. The fade keeps it off the play."
+      "note": "The rest shape of the right arm: the upper arm takes the mean turn of the rest samples of the fox violinist. It smooths the posed tube from the second upper arm segment to the wrist (raise_shape() of tools/blender/rig_mesh.py), so that the inner elbow shows no bright streak. The fade keeps it off the play. The forearm turn counts from the bind forearm, so with the straight bind the elbow of the rule pose is almost straight."
     }
   ],
   "armSegments": {
@@ -113,11 +113,13 @@
     "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py), as seated string players sit tall. The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The head share is 0, so that the flute hold does not fold the neck.",
     "bindArms": {
       "upper_arm": [0.813873, -0.143043, 0.563161],
-      "forearm": [0.316246, 0.757051, 0.571719],
-      "hand": [-0.078782, 0.677317, 0.731461]
+      "forearm": [0.316246, 0.757051, 0.571719]
     },
-    "bindSupination": { "L": 110 },
-    "bindSupinationNote": "The bind paw of the left arm turns 110 degrees about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py). The bind paw sets the zero of the paw twist, so the left paw does not twist through 180 degrees on the violin or the flute. The right paw keeps the bind arms.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": { "L": 109, "R": 59 },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 109 degrees and the right 59 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the own roles of the red fox and the tan fox (the violin and the flute) smallest (design 4.4): about 132 degrees on the left (the flute and the snare drum) and 85 degrees on the right (the cello and the snare drum). The straight bind with no supination gave L 115 to 119 and R 59, and a second probe on the rig at 117 gave the change -8.5. With no supination, the left paw of the flutist twists past 160 degrees.",
     "tailBind": {
       "tail": [0, -0.12, -1],
       "tail_tip": [0, -1.4, -1]
