@@ -8,7 +8,7 @@ writes:
 pig.glb                           source mesh
    │  tools/blender/pig_arms.py   new upper arms
    v
-pig-arms.glb                      source of the rig (`source` of tools/mesh-rigs/pig.json)
+pig-upper.glb                     source of the rig (`source` of tools/mesh-rigs/pig.json)
    │  pnpm rig-mesh pig
    v
 pig.rig.glb                       rigged mesh
@@ -24,7 +24,7 @@ src/models/studio/pig.ts          studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `pig.glb` | Source mesh (below) | None |
-| `pig-arms.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
+| `pig-upper.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
 | `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
 
 ## pig.glb
@@ -56,7 +56,7 @@ at 1e-5.
 - The ears go from y 0.87 to 1.0 at x ±0.08 to ±0.23, with the tips folded forward. The small
   curled tail is at y 0.26 to 0.33 and z -0.19 to -0.26.
 
-## pig-arms.glb
+## pig-upper.glb
 
 | Item | Value |
 |---|---|
@@ -83,6 +83,6 @@ forearm have no face that joins them to the trunk. The tube takes the fur color 
 The script runs in the live Blender or in a batch run:
 
 ```bash
-blender -b --python tools/blender/pig_arms.py -- assets/models/pig/pig.glb assets/models/pig/pig-arms.glb
+blender -b --python tools/blender/pig_arms.py -- assets/models/pig/pig.glb assets/models/pig/pig-upper.glb
 shasum -a 256 assets/models/pig/*.glb
 ```

@@ -1,5 +1,5 @@
 {
-  "source": "assets/models/pig/pig-arms.glb",
+  "source": "assets/models/pig/pig-upper.glb",
   "sourceNote": "A copy of assets/models/pig/pig.glb with new upper arms (assets/models/pig/README.md). The mesh has no upper arm of its own, so tools/blender/pig_arms.py removes the bulge of the trunk wall above each elbow, fills the wall again, and builds a round tube up to a closed dome around the shoulder joint.",
   "output": "assets/models/pig/pig.rig.glb",
   "name": "Pig",
