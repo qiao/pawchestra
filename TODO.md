@@ -252,11 +252,15 @@ passes.
       dark line under the forearm near the elbow from the front at the frog.
 - [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
       frog.
-- [ ] Rabbit T-pose body: the side gap of `pnpm trunk-form violinist --to 0.9` in the play is 1.61
-      cm (left) and 2.40 cm (right) after `weights.paintedBelow` (3.38 and 6.57 cm before, A-pose
-      rabbit 2.04 and 0.72 cm). In the lowering, the upper arms then go 2.1 cm into the body (1.5
-      cm before, bach-bwv1050 wall 13.5 s). Fit the lowering, or a higher lower height of the
-      rule. Then run the rule on the panda and the cat, which show the same fault.
+- [ ] Rabbit T-pose body: with `weights.paintedBelow` (0.40 to 0.52 u), the side gap of `pnpm
+      trunk-form violinist --to 0.9` in the play is 1.61 cm (left) and 2.40 cm (right), against
+      3.38 and 6.57 cm before and 2.04 and 0.72 cm on the A-pose rabbit. The accepted cost: at
+      the end of the lowering, the right upper arm goes 2.1 cm into the chest (1.5 cm before,
+      bach-bwv1050 wall 13.5 s). A lower height of 0.42 to 0.46 u made the gaps larger, and the
+      shoulder fade (`reachFade`) and the right rest arm angles did not bring it below 2.0 cm.
+      Next: a lowering path that keeps the right elbow out of the chest until late in the move,
+      or a smaller share of the rule where the arm passes. Then run the rule on the panda and the
+      cat, which show the same fault.
 - [ ] Rabbit T-pose body: the seated thigh is 0.70 of its length across and 0.67 up after
       `legGirth` 1.6 (A-pose rabbit 0.78 to 0.89 and 0.97). The back of the thigh keeps its place
       on the seat, so the thigh grows up only on its top. Check a larger factor with the depths.
