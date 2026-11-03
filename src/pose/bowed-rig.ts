@@ -168,6 +168,13 @@ export interface BowedHold {
   /** The forward turn of the right shoulder bone around y, so that the arm reaches further. */
   readonly reach: number;
   /**
+   * The weight of the playing pose below which the forward turn of the right shoulder fades in the
+   * lift and the lowering (`shoulderTurn()` of `pose/bowed.ts`): 1 fades it over the whole move.
+   * A smaller value keeps the whole turn until the bow arm leaves the chest, because a round bow
+   * arm that still crosses the chest goes into the trunk when the shoulder turns back.
+   */
+  readonly reachFade: number;
+  /**
    * The forward turn of the left shoulder bone around y, so that the left arm reaches the
    * fingerboard: of a floor instrument far in front of a round body, in the play and in the rest,
    * and of a violin or a viola turned toward the front, in the play only (`shoulderTurnL()` of
@@ -411,6 +418,7 @@ const CHIN_HOLD = {
   soundingPoint: [1 / 8, 1 / 18],
   slant: -20 * MathUtils.DEG2RAD,
   reach: 30 * MathUtils.DEG2RAD,
+  reachFade: 1,
   reachL: 0,
   freeHair: FREE_HAIR,
   frogHair: 0,
@@ -486,6 +494,7 @@ const FLOOR_HOLD = {
   soundingPoint: [1 / 9, 1 / 15],
   slant: -20 * MathUtils.DEG2RAD,
   reach: 30 * MathUtils.DEG2RAD,
+  reachFade: 1,
   reachL: 0,
   freeHair: FREE_HAIR,
   frogHair: 0,
