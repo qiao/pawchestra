@@ -100,3 +100,10 @@ arm root.
 | Shapes | The arm-down shape of each arm, and the straight legs of each side |
 
 A run of `pnpm rig-mesh rabbit` gives the same bytes.
+
+## The module
+
+`pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The old eye
+of the mesh is a black ball in a groove, and the rig colors the ball as fur. So the export moves
+the head vertices of each old eye onto a smooth surface (`eyeFill` of `ANIMALS`), and the pea
+eyes lie flush on it, with the size of the eyes of the A-pose rabbit (`eyeSize`).
