@@ -55,7 +55,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm snapshot` | Saves the play frame of the default demo and a close view of each gallery model into `scratch/snapshots/<date>-<hash>/`. |
 | `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). A matte of `tools/sheet-mattes/` adds the silhouette IoU of each view. |
 | `pnpm choir-check <dir>` | Puts the gallery penguin beside a penguin of each of the two newest reference images. |
-| `pnpm close-views <role> <dir> [--moments <list>] [--views <list>] [--lineup] [--base <ref>] [--set <changes>]...` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. `--moments` takes a share of a move, such as `lift30`. `--lineup` puts the base, the tree, and each `--with` role in a row. 25 s to 45 s. |
+| `pnpm close-views <role> <dir> [--moments <list>] [--views <list>] [--lineup] [--base <ref>] [--set <changes>]...` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. `--lineup` puts the base, the tree, and each `--with` role in a row. 25 s to 45 s. |
 | `pnpm close-views <mode> <dir> ...` | The other modes: `lineup <species,...>`, `species <species,...>`, `batch` (the image set of a round, 90 s to 260 s), and `play`. `play` renders a demo at chosen times from a chosen camera or seat. |
 | `pnpm close-views audit <dir> [--roles <role,...>] [--base <ref>]` | The audit sheet of the seams: 2x crops of the arms and the upper trunk in each moment of each role, the commit above the tree. All roles: about 27 minutes. |
 | `pnpm clip-views <dir> --clip <file>[:<animation>] [--species <list>] [--aim pawL\|pawR]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), with the depth of each arm part in the body. About 40 s. |
@@ -95,7 +95,7 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | `pnpm camera-probe [--out <file>]`, `--compare <base.json> <new.json>`, or `--base <ref>` | Prints a hash of the camera of `cameraAt()` for each demo (design 5.6). `--compare` and `--base` print the changed samples. About 8 s. |
 | `pnpm beat-rates [--demo <id>]... [--limit <bpm>]`, or `--trace <from>-<to>` | Prints the rate of each beat or note motion over a song (design 5.1, 5.4), and fails above the limit. 3 s for each demo. |
 | `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. 6 s for one file. |
-| `pnpm shot-trace <demo> [--from <s>] [--to <s>] [--base <ref>]`, or `--rules [--list] [--base <ref>]` | Prints the choice of the shot planner at each cut (design 5.6). `--rules` counts the breaks of the rules of film grammar over all demos. 5 s. |
+| `pnpm shot-trace <demo> [--from <s>] [--to <s>] [--base <ref>]`, or `--rules [--list] [--base <ref>]` | Prints the choice of the shot planner at each cut (design 5.6). 5 s. |
 | `pnpm plan-time [--base <ref>]... [--demo <id>]... [--no-tree]` | Times `prepareShots()` on each demo (design 5.6) on each tree, in turns. About 1 minute for 3 trees. |
 | `pnpm light-probe [--look <JSON>] [--grid <spec>] [--goal <r>]` | Light on the players by row, and the lux for a goal. 1 s. |
 
@@ -138,7 +138,7 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | `tools/check-commits.sh [--tip] [--no-cache] <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
 | `tools/measure-lock.sh run --owner <name> [--gate <load>] [--max <s>] -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
 | `tools/merge-branch.sh [--check-only] [--no-arm-check] <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs the arm gate, `pnpm build`, and `pnpm size`. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
-| `tools/base-tree.sh <ref> [<path>...]` | Extracts a commit into a temporary folder with a link to `node_modules`, and prints the folder, for a base run of a tool with no `--base`. Run a tool with a cache there with `PROBE_NO_CACHE=1`. |
+| `tools/base-tree.sh <ref> [<path>...]` | Extracts a commit into a temporary folder with a link to `node_modules`, and prints the folder, for a base run of a tool with no `--base`. |
 | `tools/break-test.sh '<perl expr>' <file> <test files>...` | Applies one temporary break to a tracked file, and prints each test that fails. |
 
 ## CI
