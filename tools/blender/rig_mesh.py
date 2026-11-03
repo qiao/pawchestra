@@ -127,16 +127,17 @@ reads it ("The asset chain" of `docs/agents/rigging.md`). The steps:
    (`upper_twist()`), and the file names the share for `pnpm studio-body`. With `sitPose`, the
    shapes `sit_L` and `sit_R` follow: the move of each vertex in the bind pose that the skin of
    the clip `sit` takes to its place in the sit pose (`sit_shapes()`).
-9. Write the GLB file with the code of this script: the materials `fur`, `gloss`, and `chair`,
-   the skinned mesh with its morph targets, the skeleton, the clip `reference` with one key, the
-   clip `sit` of a sit pose, a chair under the seated body or under the sit pose, and the facts that `pnpm studio-body` reads in the extras of the
-   asset. When `colors.shift` moves a face, `COLOR_1` holds the colors before the shift, from
-   which `pnpm studio-body` maps the other palettes. The bytes depend only on the config and the
-   source file.
+9. Write the GLB file with the code of this script: the materials `fur` and `gloss`, the skinned
+   mesh with its morph targets, the skeleton, the clip `reference` with one key, the clip `sit` of
+   a sit pose, and the facts that `pnpm studio-body` reads in the extras of the asset. The file
+   holds only the animal. The seat under the seated body or under the sit pose is numbers in the
+   extras (`seat_extras()`). When `colors.shift` moves a face, `COLOR_1` holds the colors before
+   the shift, from which `pnpm studio-body` maps the other palettes. The bytes depend only on the
+   config and the source file.
 
-With `--preview`, the script also renders the seated bind and the standing body from four sides, the
-knees of the seated body from the side, the neck from four sides, and the main bone of each face,
-and with `sitPose` the sit pose from four sides and its knees,
+With `--preview`, the script also renders the seated bind on its chair and the standing body from
+four sides, the knees of the seated body from the side, the neck from four sides, and the main bone
+of each face, and with `sitPose` the sit pose on its chair from four sides and its knees,
 and it writes the long-armed source as `source-long-arms.obj` for the probes. With `--obj`, it
 writes only the long-armed source, into the file, for `pnpm rig-mesh --check`. With `--check`, it
 also lists the faces that the stretch turns or squeezes (`stretch_faces()`) and the long thin faces
@@ -238,9 +239,9 @@ SHAPES = ('arm_down_L', 'arm_down_R', 'legs_straight_L', 'legs_straight_R')
 RAISE_LIMIT = 4
 
 #: The roughness of each material, as the materials of the studio rabbit.
-MATERIALS = (('chair', 0.6), ('fur', 0.7), ('gloss', 0.42))
+MATERIALS = (('fur', 0.7), ('gloss', 0.42))
 
-#: The color of the chair, in sRGB.
+#: The color of the chair of the preview images, in sRGB.
 CHAIR_COLOR = (0.55, 0.42, 0.3)
 
 #: The size of one view of a preview, in pixels.
@@ -4632,10 +4633,10 @@ def spread_shape(shape, points, tris, rule):
 
 
 def chair_mesh(rule, bind, weights):
-    """Makes the chair under the seated body: a seat whose top is the lowest point of the body
-    over the seat, four legs, and a back. The shins and the feet hang in front of the seat, and
-    the tail goes back over it, so they do not count. Gives the vertices, the triangles, and the
-    seat top."""
+    """Makes the chair under the seated body for the preview images: a seat whose top is the
+    lowest point of the body over the seat, four legs, and a back. The shins and the feet hang in
+    front of the seat, and the tail goes back over it, so they do not count. Gives the vertices,
+    the triangles, and the seat top."""
     hw, front, back = rule['halfWidth'], rule['front'], rule['back']
     lower = [BONES.index(f'{b}_{s}') for b in ('shin', 'foot', 'toes') for s in 'LR']
     hanging = weights[:, lower].sum(axis=1) > 0.5
@@ -4672,6 +4673,19 @@ def chair_mesh(rule, bind, weights):
         for a, b, c, d in quads:
             faces += [[base + a, base + b, base + c], [base + a, base + c, base + d]]
     return np.array(verts, float), np.array(faces), top
+
+
+def seat_extras(rule, prop, top):
+    """Gives the seat of the rule `chair` for the extras of the asset: the seat of the app that
+    takes its place (`prop`), the seat top, the front and the back edges on z, and the half width
+    on x, in the units of the studio. `pnpm studio-body` fits the seat of the app to it. Each
+    number is a 32-bit float, as a vertex of the file, so that the export gives the same values as
+    from the box of a chair mesh."""
+    def single(value):
+        """Gives the value as a 32-bit float."""
+        return float(np.float32(value))
+    return {'prop': prop, 'top': single(top), 'front': single(rule['front']),
+            'back': single(rule['back']), 'halfWidth': single(rule['halfWidth'])}
 
 
 class GlbWriter:
@@ -4743,30 +4757,21 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
 
 
 def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
-              bind_heads, src_frames, src_heads, chair, extras, base=None, sit=None):
+              bind_heads, src_frames, src_heads, extras, base=None, sit=None):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
-    for `pnpm studio-body`. The morph targets are the shapes, in their order. With `base`, the
-    colors before `colors.shift`, the attribute `COLOR_1` holds them. With `sit`, the world frame
-    and the head of each bone in the sit pose (`sitPose` of the config), the file also has the
-    clip `sit`."""
+    for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
+    (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
+    before `colors.shift`, the attribute `COLOR_1` holds them. With `sit`, the world frame and the
+    head of each bone in the sit pose (`sitPose` of the config), the file also has the clip
+    `sit`."""
     w = GlbWriter()
     shape_names = list(shapes)
     mats = [{'name': name, 'doubleSided': True,
              'pbrMetallicRoughness': {'metallicFactor': 0.0, 'roughnessFactor': rough}}
             for name, rough in MATERIALS]
 
-    chair_verts, chair_tris, _ = chair
-    chair_prim = {
-        'attributes': {
-            'POSITION': w.floats(chair_verts, 'VEC3', minmax=True),
-            'COLOR_0': w.floats(np.tile(linear(CHAIR_COLOR), (len(chair_verts), 1)), 'VEC3'),
-        },
-        'indices': w.add(chair_tris.astype(np.uint32).ravel(), 5125, 'SCALAR'),
-        'material': 0,
-    }
-
     primitives = []
-    for k, name in ((1, 'fur'), (2, 'gloss')):
+    for k, (name, _) in enumerate(MATERIALS):
         arrays = primitive_arrays(bind, tris, colors, materials, weights, shapes, name, base)
         attributes = {
             'POSITION': w.floats(arrays['position'], 'VEC3', minmax=True),
@@ -4791,12 +4796,8 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         back = frames[parent].T
         return back @ (heads[name] - heads[parent]), back @ frames[name]
 
-    first = 2
-    # The seat prop is a chair, or the piano bench of a pianist (`chair.prop`). `pnpm studio-body`
-    # puts the front edge of the prop at the front edge of the seat of the app with that name.
-    prop = config['chair'].get('prop', 'chair')
-    nodes = [{'name': prop, 'mesh': 0}]
-    nodes.append({'name': config['name'], 'mesh': 1, 'skin': 0})
+    first = 1
+    nodes = [{'name': config['name'], 'mesh': 0, 'skin': 0}]
     joint_index = {name: first + k for k, name in enumerate(BONES)}
     inverse = []
     for name in BONES:
@@ -4811,7 +4812,7 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         world[:3, :3] = bind_frames[name]
         world[:3, 3] = bind_heads[name]
         inverse.append(np.linalg.inv(world).T.ravel())
-    nodes.append({'name': f"{config['name']}Rig", 'children': [1, joint_index['root']]})
+    nodes.append({'name': f"{config['name']}Rig", 'children': [0, joint_index['root']]})
 
     times = w.floats(np.zeros(1), 'SCALAR', minmax=True)
 
@@ -4829,7 +4830,7 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
                                  'target': {'node': joint_index[bone], 'path': target}})
         samplers.append({'input': times, 'output': w.floats(np.array(weights), 'SCALAR'),
                          'interpolation': 'LINEAR'})
-        channels.append({'sampler': len(samplers) - 1, 'target': {'node': 1, 'path': 'weights'}})
+        channels.append({'sampler': len(samplers) - 1, 'target': {'node': 0, 'path': 'weights'}})
         return {'name': name, 'channels': channels, 'samplers': samplers}
 
     # The clip `reference` gives the source back: each shape has its full weight, but the shapes
@@ -4845,12 +4846,11 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
     gltf = {
         'asset': {'generator': 'zoophony tools/blender/rig_mesh.py', 'version': '2.0'},
         'scene': 0,
-        'scenes': [{'name': 'Scene', 'nodes': [0, len(nodes) - 1]}],
+        'scenes': [{'name': 'Scene', 'nodes': [len(nodes) - 1]}],
         'nodes': nodes,
         'animations': animations,
         'materials': mats,
         'meshes': [
-            {'name': prop, 'primitives': [chair_prim]},
             {'name': config['name'], 'primitives': primitives,
              'weights': [0.0] * len(shape_names), 'extras': {'targetNames': shape_names}},
         ],
@@ -4861,8 +4861,7 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         'bufferViews': w.views,
         'buffers': [{'byteLength': len(w.bin)}],
     }
-    if extras:
-        gltf['asset']['extras'] = extras
+    gltf['asset']['extras'] = extras
     text = json.dumps(gltf, separators=(',', ':')).encode()
     text += b' ' * (-len(text) % 4)
     data = bytes(w.bin) + b'\0' * (-len(w.bin) % 4)
@@ -5475,10 +5474,10 @@ def main():
         log(f'shape {name}: {int((np.abs(shape).max(axis=1) > 1e-6).sum())} vertices, '
             f'largest move {np.abs(shape).max():.4f} u')
 
-    # The chair of a body with a sit pose stands under the sit mesh, so that `pnpm studio-body`
-    # fits the seat of the app to the seated body (`StudioBody.sitting`).
-    chair = (chair_mesh(config['sitPose']['chair'], sit_all, weights_all) if sit_clip else
-             chair_mesh(config['chair'], bind_all, weights_all))
+    # The seat of a body with a sit pose is under the sit mesh, so that `pnpm studio-body` fits the
+    # seat of the app to the seated body (`StudioBody.sitting`).
+    seat_rule = config['sitPose']['chair'] if sit_clip else config['chair']
+    chair = chair_mesh(seat_rule, sit_all if sit_clip else bind_all, weights_all)
     log(f'chair: seat top {chair[2]:.4f} u, lowest point of the body {bind_all[:, 1].min():.4f} u')
     if TAIL_TIP in BONES:
         tail = weights_all[:, [BONES.index('tail'), BONES.index(TAIL_TIP)]].sum(axis=1) > 0.5
@@ -5491,6 +5490,9 @@ def main():
     # the move of the head center by the smoothing.
     extras = {key: config[key] for key in ('headFactor', 'neckFactor')
               if config.get(key, 1) != 1}
+    # The seat is a chair, or the piano bench of a pianist (`chair.prop`). `pnpm studio-body` puts
+    # the front edge of the seat at the front edge of the seat of the app of that name.
+    extras['seat'] = seat_extras(seat_rule, config['chair'].get('prop', 'chair'), chair[2])
     if skin_caps.any():
         # The app gives each corner of these faces the normal of the skin at its vertex
         # (`studioNormals()`), because the normals of the caps of the arm point into the gap
@@ -5535,7 +5537,7 @@ def main():
         log(f'smooth: the head center of the holds moves back by {np.linalg.norm(shift):.4f} u '
             f'({np.linalg.norm(shift) * meters * 100:.2f} cm), to the head before the smoothing')
     write_glb(out_path, config, bind_all, tris_all, colors_all, materials, weights_all, shapes,
-              bind_frames, bind_heads, src_frames, long_heads, chair, extras,
+              bind_frames, bind_heads, src_frames, long_heads, extras,
               base_all if (base_all != colors_all).any() else None, sit_clip)
 
     if obj_path:
