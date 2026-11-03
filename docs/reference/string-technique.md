@@ -562,7 +562,8 @@ The app follows these facts:
   right knee, low and out from the side.
 - **The bow arm (2.2).** The rebuilt round arms of the dog keep the elbows out (`DOG_HOLD`): the
   bow elbow points out in the play, as a stroke starts open at the shoulder [85], and both elbows
-  point out at rest, so that the upper arms stay off the chest.
+  point out at rest, so that the upper arms stay off the chest. In pizzicato, the paw plucks
+  further right of the strings than in `CELLO_HOLD`, with the elbow out.
 - **The high positions (1.5).** The left paw tilts further over the neck from the second position
   to the fifth position (`BowedHold.highTilt`), as the hand goes over the shoulder of the
   instrument.
