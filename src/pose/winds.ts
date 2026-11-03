@@ -635,18 +635,19 @@ const PANDA_PLAY_TURN = toQuat(
  * upright slide brace (`faceTube`, `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as
  * the left hand of a real trombonist wraps the slide tubes and the tips of the right thumb and the
  * first two fingers hold the brace (`docs/reference/wind-technique.md` 1.1). The left grip moves
- * 0.1 H toward its tubes, because the middle of the big paw is 7 cm from them on the grip of the
- * instrument, and 0.08 H along the tubes toward the mouthpiece, so that the left elbow bends more.
- * Its fingers curl 90°. The right paw holds the low part of the brace from the right side of the
- * panda, with its palm to the left and its thumb up the brace, as a real trombonist puts the thumb
- * on the top of the brace and the fingers below it, with the wrist "sideways in relation to the
- * face" (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.1 H down the brace and 0.08 H
- * along the slide away from the mouthpiece (`gripShiftR`): the slide points 45° to the right, so
- * the right side of the panda is the far right side of the brace. The paw points 0.8 of the way
- * along the slide (`aimSide`), and the fingers curl 110° around the brace. With the grip 0.08 H
- * back toward the mouthpiece, the right palm faces the audience and the right thumb points down
- * the brace. Both paws keep the aim and the roll of the play at rest (`restAim`): with the roll of
- * the shoulder, the right wrist turns 5,500° to 9,800° each second in the lowering.
+ * 0.09 H toward its tubes, because the middle of the big paw is 7 cm from them on the grip of the
+ * instrument, and 0.07 H along the tubes toward the mouthpiece, so that the left elbow bends more.
+ * Its fingers curl 90°. With 0.08 H along the tubes and 0.1 H toward them, the left wrist goes
+ * 0.3 cm into the slide tubes. The right paw holds the low part of the brace from the right side of
+ * the panda, with its palm to the left and its thumb up the brace, as a real trombonist puts the
+ * thumb on the top of the brace and the fingers below it, with the wrist "sideways in relation to
+ * the face" (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.1 H down the brace and
+ * 0.08 H along the slide away from the mouthpiece (`gripShiftR`): the slide points 45° to the
+ * right, so the right side of the panda is the far right side of the brace. The paw points 0.8 of
+ * the way along the slide (`aimSide`), and the fingers curl 110° around the brace. With the grip
+ * 0.08 H back toward the mouthpiece, the right palm faces the audience and the right thumb points
+ * down the brace. Both paws keep the aim and the roll of the play at rest (`restAim`): with the
+ * roll of the shoulder, the right wrist turns 5,500° to 9,800° each second in the lowering.
  *
  * The elbows stay away from the sides of the body, as a brass player keeps space between the
  * elbows and the sides (`docs/reference/wind-technique.md` 1.8). The arms of the body are round
@@ -695,7 +696,7 @@ const PANDA_TROMBONE = {
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.8, 0.8],
-  gripShiftL: [-0.08, 0.1, 0],
+  gripShiftL: [-0.07, 0.09, 0],
   gripShiftR: [0.1, 0, 0.08],
   restAim: 1,
   gripCurl: curls(90, 110),
