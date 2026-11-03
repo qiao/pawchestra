@@ -313,9 +313,9 @@
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role (the role-neutral bind of design 4.4).",
     "bindSupination": {
       "L": 102,
-      "R": 51
+      "R": 64
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The values make the largest paw twist p95 of the six roles of the cast matrix and the horn smallest (design 4.4, pnpm bind-supination pig): L 118 degrees (the flute and the snare drum) against 165 with no supination (the horn), R 74 degrees (the cello) against 123. A third probe of the supinated rig moves no side by more than 0.5 degrees.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The values make the largest paw twist p95 of the six roles of the cast matrix and the horn smallest (design 4.4, pnpm bind-supination pig): L 118 degrees (the flute and the snare drum) against 165 with no supination (the horn), R 86 degrees (the cello and the horn) against 123. The rest right elbow of the horn hold points forward (restPoleR), so the hornist right paw twists 98 degrees at rest on R 51, and the right value is 64. A probe of the rig of L 102 and R 64 moves no side by more than 0.5 degrees.",
     "note": "The seated posture of design 5.2: the thigh slopes 25 degrees down and 15 degrees out, so that the horn has room at the right knee, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). The foot and the toes keep the turn of the source, so that the soles stand flat on the floor."
   },
   "weights": {
