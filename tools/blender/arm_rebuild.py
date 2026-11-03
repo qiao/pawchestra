@@ -1,7 +1,8 @@
 """Rebuilds the arms of any animal from the joints of its rig config, with no settings of a species.
 
-The script does the steps of "The rebuild of the arms in Blender" of `docs/agents/rigging.md`
-with the functions of the species scripts. It finds each setting of a species script from the
+The script does the steps below with the functions of the species scripts, and with the rules of
+"The rebuild of the arms in Blender" of `docs/agents/rigging.md`. It finds each setting of a
+species script from the
 joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
 (`step_measure()`):
 
@@ -699,7 +700,8 @@ def side_bones(side):
 
 def step_paint(s):
     """Fixes the weights with the Weight Paint tools, with rules from the joints and the cut
-    loops (step 7 of `docs/agents/rigging.md`), in this order:
+    loops (step 7 of the module doc, and the Weight Paint rule of `docs/agents/rigging.md`), in
+    this order:
 
     1. The trunk below the armpits: Remove From Group of the bones of both arms on each vertex
        outside the arm islands and below the armpit of its side. A vertex with no weight left
