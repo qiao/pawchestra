@@ -24,7 +24,7 @@ arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has th
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
-| beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
+| beaver | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), rigid crease faces (`rigidPainted`), root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
 | pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). The horn hold keeps the round left elbow off the belly. | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
@@ -32,7 +32,7 @@ arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has th
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a right elbow `raise`, antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
-| mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with the kept faces of `arm_rebuild.py --keep-faces`. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
+| mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 ## The asset chain
 
@@ -107,9 +107,9 @@ round not done.
 
 ## The rebuild of the arms in Blender
 
-Rebuild the arms when they show a spiral crease, a sharp elbow, slivers, or slits. Rebuild the legs
-when the seated legs show a wedge. Three causes add up, so fix all three. A second subdivision, a
-Smooth of the upper arm weights, or a move of the elbow alone does not fix a twisted arm.
+Rebuild the arms for a spiral crease, a sharp elbow, slivers, or slits, and the legs for a wedge
+in the seated legs. Three causes add up, so fix all three. A second subdivision, a Smooth of the
+upper arm weights, or a move of the elbow alone does not fix a twisted arm.
 
 - **Faces.** Long thin triangles across a joint fold into a spiral. New quad faces fix it.
 - **Bones.** The linear blend collapses the skin under a large twist on one bone. Short segments
@@ -121,15 +121,15 @@ Smooth of the upper arm weights, or a move of the elbow alone does not fix a twi
 Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps. A clean quad
 mesh skips steps 2 to 5 (`--keep-faces`). Write a species script `tools/blender/<a>_arms.py` only
 for a fault that it does not fix, such as an arm joined to the trunk down to the elbow (the side
-wall of `cat_arms.py`).
+wall of `cat_arms.py`, or the split crease of `beaver_edit.py`).
 
 ### Rules
 
-- Work in the live Blender through Blender MCP with the plain Blender tools, one step at a time
-  (`run_steps()`). Look at an image after each step. Write no weight algorithm of your own.
+- Work in Blender with the plain tools, one step at a time (`run_steps()`), and look at an image
+  after each step. Write no weight algorithm of your own.
 - Change only the limb faces from the shoulder line to the wrist, or from the haunch line to the
   ankle. The new surface lies on the old limb. Ask the user before the first rebuild of a species.
-- Keep the source file. Write the copy next to it, with a note in the `README.md` of the folder.
+- Keep the source file, and write the copy next to it with a note in its `README.md`.
 - Never call `read_factory_settings`: it stops the MCP server.
 - Merge by Distance first, because automatic weights fail on split seams.
 - Put the rings of 16 vertices about 0.45 arm radii apart, with a ring on each side of the elbow
@@ -227,9 +227,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
   it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
-- A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
-  (`rigidPainted`). A raised arm pulls out a side with no trunk weight: give it a trunk share
-  (`paintedBelow`).
+- A hanging T-pose arm folds the faces under its root, as a split crease does. Make them and the
+  first tube ring rigid (`rigidPainted`). A raised arm pulls out a side with no trunk weight: give
+  it a trunk share (`paintedBelow`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
@@ -335,7 +335,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 ### Probes
 
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
-  wrist, or a camera in JSON at the podium.
+  wrist.
 - A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the
   move.
 - Record the commit or the `--set` of each row of a variant table.
