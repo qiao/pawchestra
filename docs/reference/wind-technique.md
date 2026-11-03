@@ -228,6 +228,9 @@ from the first position (derived).
   [1] [29]. Farkas holds the hand vertical, with the backs of the fingers on the far side of the
   bell and the thumb against the top of the throat [26 (secondary)]. The weight of the bell rests
   on the knuckles of the thumb and the index finger [1] [25].
+- **The arms.** The sources disagree. Weidner keeps "both arms comfortably away from the rib cage
+  to allow for relaxed breathing", with the upper part of the right arm "roughly even vertically
+  with the torso of the body" [1]. Tuckwell keeps the elbows near the body [28 (secondary)].
 - **The angles.** The horn lies at about 45° across the body, with the bell at the right of the
   torso and in front of it [25]. The mouthpiece slopes down [29]. The bell points past the right
   side of the body, so that the stomach does not mute it [1]. Tuckwell turns the head to the left
