@@ -365,19 +365,17 @@ export const SPECIES = {
   },
   /**
    * Hippo, the contrabasses: a round mauve-gray hippo with a pale belly and muzzle. It has the
-   * studio body of the mesh `assets/models/hippo/hippo.glb`, which `pnpm rig-mesh hippo` rigs
-   * (design 4.4), with the head height of the red fox and longer arms. It stands at its contrabass,
-   * as the hippos of `orchestra-latest.png`. Its legs are so short that it stands about as high as
-   * it sits on a chair that fits them. Its head height is the head of the studio body, and the seat
-   * height is the seat of the studio body, in H.
+   * studio body of the T-pose mesh `assets/models/hippo/hippo-tpose.glb`, which `pnpm rig-mesh
+   * hippo` rigs (design 4.4), with the head height of the red fox and the arms of the mesh. It
+   * stands at its contrabass, as the hippos of `orchestra-latest.png`. Its legs are so short that
+   * it stands about as high as it sits on a chair that fits them. Its head height is the head of
+   * the studio body, and the seat height is the seat of the studio body, in H.
    *
-   * The stick of the bow passes through the middle of the closed right paw, 23° from square toward
-   * the wrist. With the grip of `BOW_GRIP`, the stick passes under the paw, and the claws point
-   * down past it. The bow hand turns around the grip on the stick (`stickTurnR` of the hold), so
-   * the paw keeps one turn on the hand, and the stick stays within 0.4 cm of the middle of the paw
-   * in the play, the lift, the rest, and the lowering. With the grip on the stick 2.5 cm from the
-   * middle of the paw toward the frog, on the line nearest to the middles of the paw that the
-   * retarget turns, the stick runs up to 2.4 cm from the middle.
+   * The stick of the bow passes through the closed right paw, 23° from square toward the wrist,
+   * and the frog lies in the paw at the frog, at the tip, and at rest (2x crops). With the grip of
+   * `BOW_GRIP`, the stick passes under the paw, and the claws point down past it. The bow hand
+   * turns around the grip on the stick (`stickTurnR` of the hold), so the paw keeps one turn on
+   * the hand. A move of the grip by 0.04 H in any direction changes the look of the paw little.
    */
   hippo: {
     body: 'studio-hippo',
