@@ -916,7 +916,10 @@ function pigTurn(turns: HornTurns): Quat {
  * forearm, and the two turns move it in opposite directions: the shoulder alone at 40° turns the
  * left grip 19°, the elbow alone 21°, and both 5°. On the rig with the raise shapes of the old
  * hold, a forward turn of the shoulder of 40° or more folds 7 to 9 faces of the left arm, so the
- * shoulder turns 36°.
+ * shoulder turns 36°. The left grip moves 0.03 H toward the mouthpiece and 0.03 H across the valves
+ * away from the left shoulder (`gripShiftL`). The left forearm then goes 0.2 cm into the belly in
+ * place of 1.3 cm, and the left wrist 0.6 cm into the horn in place of 0.9 cm. A move of 0.03 H
+ * toward the shoulder puts the forearm 2.1 cm into the belly.
  *
  * At rest, the horn comes down 0.2 H and 0.2 H forward onto the round belly, which covers the short
  * thighs, with the bell at the right of the belly beside the right haunch. A lower rest puts the
@@ -932,6 +935,7 @@ const PIG_HORN = {
   restShift: [0.05, -0.2, -0.2],
   restPoleL: [-1, 0.2, -0.7],
   restPoleR: [1, -0.3, 0.3],
+  gripShiftL: [-0.03, 0, 0.03],
 } as const satisfies WindHold;
 
 /**
