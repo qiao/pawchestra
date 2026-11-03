@@ -344,13 +344,25 @@ passes.
       0.4 cm into the horn at rest (0.6 cm on the old hold): of 16 rest variants of the left elbow
       and the left rest grip, none kept the left paw at 0.1 cm and the left wrist at 0.3 cm or
       less. Try a rest grip on the far side of the valves, or accept the depths.
-- [ ] Badger with rebuilt arms: `arm_rebuild.py badger` gives clean tubes, but the folds grow on
-      the old bind and on the straight bind (L 114, R 89). Nine of 10 arms fail, the most on the
-      xylophonist (L 17, base 8). The grip turn of the bass drummer R grows to 22° (base 7°). A
-      painted clavicle weight lifts a throat vertex to the head weight 0.5, so the head height
-      grows 15.5 mm (`headFloor` 0.76 of `ANIMALS` keeps it). The own roles want a small bind
-      supination, and the violin recast sets the left value. Fit the painted weights of the
-      shoulder line and the paws first (`reports/2026-11-02-rebuild-b/badger/`).
+- [ ] Badger with rebuilt arms: `arm_rebuild.py badger` gives clean tubes. A straight bind that
+      turns the hanging source arm 39° up to the old `bindArms.upper_arm` crumples the arm root.
+      A bind upper arm along the source arm ([0.615, -0.726, 0.308], forearm [0.447, 0.642,
+      0.622], so the elbow axis stays within 6.5° of the old axis) removes it: the bass drummer,
+      the snare drummer, and the cymbalist then pass the gate (`REBIND`). The percussionist still
+      folds L 19 and R 10 (base 5 and 1), and the xylophonist L 15 and R 12 (base 8 and 4), at the
+      arm root and the inner elbow. Wider elbow rings (gap 0.04 and 0.047) fold more. The
+      clavicles on the rule weights, `paintedBelow`, and `rigidPainted` change little. Raise
+      shapes fix the percussionist R (3), but the relax of the triangle shape turns more faces
+      over (L 24), and the xylophone shapes move the folds to the next faces of the arm root. An
+      elbow of the triangle arm nearer the body (`poleL` [-0.2, -1, 0.3]) gives L 13. The upper
+      arms go 3.0 cm into the capped arm root in each pose (base 2.4), and the left xylophone paw
+      2.3 cm into the shoulder (base 1.1). The rule supination is L 116 and R 91. With it, the
+      wrist ring of the cymbalist L narrows from 2.73 cm to 2.36 cm. Next: free the thin arm root
+      faces at the shoulder line (a species option of the rebuild), then fit the shapes again
+      (`reports/2026-11-03-badger-arms/`, try files in `scratch/merged/badger-arms/`).
+- [ ] Mesh rig: `paintedBelow` can give a vertex with four arm bones the trunk bone as a fifth
+      bone, and the rig then stops in `primitive_arrays()` (the badger). Keep the four largest
+      weights of such a vertex.
 - [ ] Arm rebuild: a cut plane less than about 0.4 mm from a source vertex leaves a cluster of
       very small faces at its loop. `step_clean_flaps()` deletes the flaps, but the small faces
       of the dog right shoulder line still turn over at rest (`rigidPainted` fixes them). A snap
