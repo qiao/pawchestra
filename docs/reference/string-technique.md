@@ -602,9 +602,10 @@ The app does not follow these facts:
 - **The hip and the knee (2.8).** The knee of the hippo lies under its belly, so the contrabass
   stands in front of the belly. Both shoulders turn forward (`BowedHold.reach`,
   `BowedHold.reachL`), so that the short arms reach the strings.
-- **The left hand (2.8).** The thick left paw tilts over the neck, as the paw of the dog, so that
-  the left arm keeps off the body. The thick wrist then touches the neck while the fingers stop
-  the strings, where a real bassist touches the neck with the thumb alone.
+- **The left hand (2.8).** The thick left paw tilts far over the neck, so that the left arm keeps
+  off the body. The paw lies a little off the strings along the normal of its palm
+  (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a
+  real bassist does. The paw has no single fingers, so no finger presses a string.
 - **The high positions (2.8).** The left shoulder lies behind the upper bout, and the short arm
   does not reach over it. Thus the left paw stops the strings only up to `BowedHold.stopEnd`, and
   the high notes take places lower on the neck.
@@ -621,9 +622,11 @@ The app does not follow these facts:
   keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over a stroke, as the fingers of a
   player let the bow turn.
 - **The rest.** No source gives the rest of an orchestral bassist. The contrabass stays at its
-  playing place, and the left paw holds the neck. The right paw hangs beside the belly with the
-  bow tip down, because the knee is under the belly. The right elbow points down and a little out
-  (`BowedHold.restPoleR`), so that the skin of the hanging upper arm twists less.
+  playing place, and the left paw holds the neck nearer to the nut than in the floor hold
+  (`BowedHold.restPlace`), so that the idle sway does not take the left forearm into the neck.
+  The right paw hangs out from the side of the belly with the bow tip down, because the knee is
+  under the belly, and the round upper arm stays off the trunk. The right elbow points down and a
+  little out (`BowedHold.restPoleR`), so that the skin of the hanging upper arm twists less.
 
 ## 4. Sources
 
