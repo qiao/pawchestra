@@ -27,7 +27,7 @@ src/models/studio/hippo.ts           studio body of the app
 | `hippo-arms.glb` | Copy of `hippo.glb` with rebuilt arms. License as `hippo.glb` | `hippo_arms.py` |
 | `hippo-weights.json` | Weights of the same Blender run. License as `hippo.glb` | `hippo_arms.py` |
 | `hippo.rig.glb` | Output of the rig. License as `hippo.glb` | `pnpm rig-mesh hippo` |
-| `hippo-tpose.glb` | New source mesh in a T-pose (below). No tool reads it yet | None |
+| `hippo-tpose.glb` | New source mesh in a T-pose (below). No tool reads it | None |
 
 ## hippo.glb
 
@@ -87,7 +87,9 @@ shasum -a 256 assets/models/hippo/*.glb assets/models/hippo/hippo-weights.json
 ## hippo-tpose.glb
 
 The new source mesh of the hippo, in a T-pose: the arms are level and out to the sides, free of
-the trunk. The mesh has no skeleton.
+the trunk. The mesh has no skeleton. No tool reads it: a rig with rebuilt arms
+(`arm_rebuild.py`, factor 1) and the role-neutral bind did not pass the proof of the bassist, so
+the body of the app stays the rig of `hippo.glb`. `TODO.md` gives the open items.
 
 | Item | Value |
 |---|---|
