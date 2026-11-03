@@ -1,7 +1,7 @@
 # Rigging
 
 This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the arm rebuild, and
-the traps. Design 4.4 gives the body rules. [`rig-rounds.md`](rig-rounds.md) gives the brief of a
+the traps. Design 4.4 gives the body rules, and [`rig-rounds.md`](rig-rounds.md) the brief of a
 rigging round.
 
 ## Bodies and roles
@@ -20,7 +20,7 @@ arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has th
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
-| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), a right elbow `raise` shape. | `trombonist` |
+| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), a right elbow `raise` shape, longer legs on the old chair (`shinFactor`, `chair.front`). | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
@@ -53,7 +53,7 @@ The tools rig each textured mesh with no skeleton, then pack it into a module of
 
 Test a change of the chain on the test mannequin first (`assets/models/mannequin/`, design 4.4):
 `pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
-Its mesh has clean quad rings and twist markers, so a fault there comes from the chain.
+Its clean rings and twist markers show a fault of the chain.
 
 ### Steps of a new body
 
@@ -157,8 +157,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 
 `poseSegments()` and `StudioArmSegments` of `src/models/studio-rig.ts` and `driven_turns()` of
 `tools/blender/rig_mesh.py` turn the new bones with the same rule. `paintedWeights` names the
-weights file, and `paintedLower` lists the bones that keep the rule weights. Each body with
-`armSegments` has 20 more bone matrices, so run `pnpm frame` after a new one.
+weights file, and `paintedLower` lists the bones that keep the rule weights. Run
+`pnpm frame` after a new body with `armSegments` (20 more bone matrices).
 
 ## Traps
 
@@ -180,7 +180,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - Short arms do not reach the instruments. Size the instrument by the rule of real players, and
   keep the limbs until the user asks for longer arms.
 - The arm factor follows the hold. Fit the hold with a first factor, measure the reach, and rig the
-  final factor one time.
+  final factor.
 - A new scale of `SpeciesParams` adds its instrument to `SCALED_INSTRUMENTS`, so the typecheck
   names each reader.
 - A hold trades folds against clearance. Check each hold change with `pnpm hold-fit --set`,
@@ -281,7 +281,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   and fit the bench to the legs.
 - The linear blend flattens a bent knee. Give the knees `bind.knee`, and smooth the back of the knee
   in few rounds.
-- Short or sloped thighs set the seat top before the haunch. End the seat where the thighs leave
+- Short or sloped thighs set the seat top far under the hips. End the seat where the thighs leave
   it (`chair.front`).
 - A tail root moves the seat top. Give the sit a fixed top from the final `--check` (`sit.top`).
 - A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
@@ -336,9 +336,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
   wrist, or a camera in JSON at the podium.
-- A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the move
-  first.
-- Record each row of a variant table with the commit or the `--set` of its run.
+- A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the
+  move.
+- Record the commit or the `--set` of each row of a variant table.
 - These pose values stay in meters at each body size: the bow values of `src/pose/bowed-rig.ts` and
   `src/pose/strokes.ts`, `HAND_MOTION`, the percussion `sizes`, `CONDUCTOR_MOTION.scale`, and the
   sweep limits. Compare a new body size in `H` first.
