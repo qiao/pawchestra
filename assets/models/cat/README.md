@@ -1,12 +1,12 @@
 # Cat model
 
-This folder holds the source mesh of the cat, a copy with rebuilt arms and its weights, and the
-rigged copy. The app does not serve these files. It loads the module `src/models/studio/cat.ts`,
-which this chain writes:
+This folder holds the T-pose source mesh of the cat, a copy with rebuilt arms and its weights,
+and the rigged copy. The app does not serve these files. It loads the module
+`src/models/studio/cat.ts`, which this chain writes:
 
 ```text
-cat.glb                            source mesh
-   │  tools/blender/cat_arms.py    rebuilt arms, belly, and painted weights
+cat-tpose.glb                      source mesh (`armSource` of tools/mesh-rigs/cat.json)
+   │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
    v
 cat-arms.glb + cat-weights.json    `source` and `paintedWeights` of tools/mesh-rigs/cat.json
    │  pnpm rig-mesh cat
@@ -24,90 +24,11 @@ src/models/studio/cat.ts           studio body of the app
 
 | File | Origin | Rebuild |
 |---|---|---|
-| `cat.glb` | Source mesh (below) | None |
-| `cat-arms.glb` | Copy of `cat.glb` with rebuilt arms and belly. License as `cat.glb` | `cat_arms.py` |
-| `cat-weights.json` | Weights of the same Blender run. License as `cat.glb` | `cat_arms.py` |
-| `cat.rig.glb` | Output of the rig. License as `cat.glb` | `pnpm rig-mesh cat` |
-| `cat-tpose.glb` | New source mesh in a T-pose (below). No tool reads it yet | None |
-
-## cat.glb
-
-| Item | Value |
-|---|---|
-| Size | 14,466,300 bytes |
-| SHA-256 | `0ca57eaa7f831ce5f17ff889d46b935e6c21400e69a597347c1381f0305cda9e` |
-| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
-| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Writer | Khronos glTF Blender I/O v4.3.47 |
-| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,121 triangles and 4,148 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
-| Material | One material `BakedMaterial`, double-sided, with a base color texture and a metallic-roughness texture, each a PNG of 4096 × 4096 pixels. The texture is an atlas of an automatic unwrap |
-
-Facts of the mesh:
-
-- A weld at 1e-5 gives 1,563 vertices in one connected part. The mesh has 2 open edges and 6
-  edges with more than two faces. 318 faces have a corner angle below 10°.
-- The box is x -0.491 to 0.490, y -0.952 to 0.952, and z -0.419 to 0.426. Thus the cat is 1.903
-  units high from the soles to the tips of the ears.
-- The cat faces +z, with its left side at +x. These are the axes of the studio.
-- The cat stands in an A-pose: the arms go down and out at about 58° below the horizontal.
-- The eyes are dark faces of the head surface with a few green faces, with no shells. Thin
-  whiskers stand out from the muzzle.
-- The tail hangs down behind the legs, and its end goes back along the floor. The sheet shows a
-  tail that curls up at its end.
-
-## cat-arms.glb and cat-weights.json
-
-| Item | Value |
-|---|---|
-| `cat-arms.glb` | 1,180,540 bytes, SHA-256 `ecfe907e75fac79a56df2e5aa98e82b95217ff78f0d17cddb95e880552d90d76` |
-| Mesh | 2,146 vertices after a weld at 1e-5, 4,287 triangles: on each arm a tube of 16 rings of 16 vertices, joined to the shoulder socket and to the paw with Bridge Edge Loops, and a side wall of 54 (left) and 50 (right) faces under each arm. Near the left armpit line, 8 vertices of the first two shoulder rings merged into the next ring or into the line |
-| Material | One material with one base color JPEG of 4096 × 4608 pixels: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. The side walls and the flat inner sides of the arms take one gray fur texel of the trunk beside the seam. No metallic-roughness texture |
-| `cat-weights.json` | 480,430 bytes, SHA-256 `588d9b38b0dff053118adf037f9c87521a1504fc48df949043622062a486155e` |
-| Weights | The automatic weights of Blender with the Weight Paint fixes of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config. The arms take the automatic weights of the copy before the round side walls (`step_tube_heat()`) |
-
-The upper arm of `cat.glb` joins the side of the trunk down to the elbow. Thus the script makes an
-armpit: a cut along the seam where the arm meets the trunk, a side wall of the trunk under the
-arm, and a quad tube from the shoulder to the wrist. The flat inner side of the tube lies on the
-side wall and meets it only at the armpit line. The faces of the paws, the trunk, the legs, and
-the head are the faces of the source.
-
-A rig with arm segments does not stretch the arms, so the arms get their length in the copy. The
-upper arm is 0.92 and the forearm 0.78 as long as on the source. The arm is 1.10 head heights from
-the shoulder joint to the wrist (1.30 on the source). The cross-section is 0.85 of the source.
-
-The other steps of the script:
-
-- **`step_belly()`.** It moves the belly front onto an ellipse arc and each side onto an even
-  curve, at most 0.016 units. Thus the trunk is an even oval from the front and from the side. The
-  front of the upper belly, where the bow upper arm lies in the play, is a little flatter, most at
-  the middle line (`flat`). The faces and the colors of the trunk stay.
-- **`step_round_wall()`.** It deletes the small trunk faces that turn back under the side wall,
-  fills the hole again with even faces, and smooths the wall and the trunk near it along the
-  normal of the plane of the seam. Thus the side wall rounds into the trunk.
-- **`step_clean_pit()`.** It merges the shoulder ring vertices near the left armpit line into the
-  next ring, and the socket vertices near the line ends. Then it fills the band again with a strip
-  of triangles. Thus the band has no thin face. The right arm keeps its band, because the clean
-  made the root ring of the bow arm flatter in the play.
-
-A run gives the same bytes:
-
-```bash
-blender -b --factory-startup -P tools/blender/cat_arms.py
-shasum -a 256 assets/models/cat/*.glb assets/models/cat/cat-weights.json
-```
-
-## Rig facts of cat.rig.glb
-
-- The seated bind bends each elbow 79° and turns the left paw 120°. Thus the rig binds the left
-  lower arm with the dual quaternion blend (`bind.arm` of the config), and the elbow and the
-  forearm keep the round of the tube. The bow arm keeps the linear blend, because it bends
-  further than the bind in the play.
-- The front of each arm root keeps the trunk weights, so it stays with the chest. With no trunk
-  weights, the root folded.
-- Three `raise` shapes of the left arm (the turns of the play, of the rest, and between them) move
-  the front of the arm root half of the way with the first segment of the upper arm (`follow`).
-  In the shape of the play, the skin near the root front fills its valleys and moves no vertex in
-  (`follow.fill`). A fourth shape does the same for the bow arm in the play.
+| `cat-tpose.glb` | Source mesh (below) | None |
+| `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
+| `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
+| `cat.rig.glb` | Output of the rig. License as `cat-tpose.glb` | `pnpm rig-mesh cat` |
+| `cat.glb` | Old source mesh in an A-pose (below). Only the old replay of `tools/blender/cat_arms.py` reads it | None |
 
 ## cat-tpose.glb
 
@@ -141,3 +62,61 @@ at 1e-5.
   is at y 0.75 and z 0.25. Thin whiskers stand out from the muzzle.
 - The long tail hangs from the back of the haunch (y 0.26, z -0.06) down to y 0.09 behind the
   legs, and curls up behind to y 0.25 at z -0.27.
+
+## cat-arms.glb and cat-weights.json
+
+`tools/blender/arm_rebuild.py` rebuilds the free T-pose arms of `cat-tpose.glb` with quad tubes
+at the length of the mesh (no `--factor`), and writes the Blender weights of the arms. The
+shoulder line lies at 0.25 of the upper arm, and the wrist cut at 0.1 of the paw. Each arm has 14
+rings of 16 vertices. The rings of each elbow lie 0.035 units from the elbow joint (`--spec`), and
+the elbow helper is 0.07 units, twice that gap: with the gap of 0.0216 units that the script
+chooses, the inner faces of each elbow turned over in each pose of the play and the rest. The
+faces of the paws, the trunk, the legs, the tail, and the head are the faces of the source. A run
+gives the same bytes:
+
+```bash
+blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"gap": 0.035}'
+```
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `cat-arms.glb` | 1,117,708 bytes | `534753ea563f0e71e438485a3b481535c26406b04571733aaf316f062f1cb6e2` |
+| `cat-weights.json` | 443,443 bytes | `43c269c0e67de717f3637d84dfd22533fb7790118eb6596d7ca6cd889797a963` |
+
+## cat.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 819,716 bytes |
+| SHA-256 | `296e30eb44552bbad732943b149b75a811759399f0ba3684d2536fa435e70524` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
+| Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes: the bent left elbow at rest (two), the bow arm in the play, and the bent right elbow at rest |
+| Tail | The long tail hangs behind the chair in the seated bind (`studio.tailBind`), and keeps its curl in the standing body |
+
+A run of `pnpm rig-mesh cat` gives the same bytes.
+
+## cat.glb
+
+| Item | Value |
+|---|---|
+| Size | 14,466,300 bytes |
+| SHA-256 | `0ca57eaa7f831ce5f17ff889d46b935e6c21400e69a597347c1381f0305cda9e` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Khronos glTF Blender I/O v4.3.47 |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,121 triangles and 4,148 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+| Material | One material `BakedMaterial`, double-sided, with a base color texture and a metallic-roughness texture, each a PNG of 4096 × 4096 pixels. The texture is an atlas of an automatic unwrap |
+
+Facts of the mesh:
+
+- A weld at 1e-5 gives 1,563 vertices in one connected part. The mesh has 2 open edges and 6
+  edges with more than two faces. 318 faces have a corner angle below 10°.
+- The box is x -0.491 to 0.490, y -0.952 to 0.952, and z -0.419 to 0.426. Thus the cat is 1.903
+  units high from the soles to the tips of the ears.
+- The cat faces +z, with its left side at +x. These are the axes of the studio.
+- The cat stands in an A-pose: the arms go down and out at about 58° below the horizontal.
+- The eyes are dark faces of the head surface with a few green faces, with no shells. Thin
+  whiskers stand out from the muzzle.
+- The tail hangs down behind the legs, and its end goes back along the floor. The sheet shows a
+  tail that curls up at its end.
