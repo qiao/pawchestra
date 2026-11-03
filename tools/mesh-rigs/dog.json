@@ -6,6 +6,10 @@
   "paintedWeights": "assets/models/dog/dog-weights.json",
   "paintedLower": ["root", "hips", "spine", "spine1", "chest", "neck", "head", "ear_L", "ear_R", "thigh_L", "shin_L", "foot_L", "toes_L", "thigh_R", "shin_R", "foot_R", "toes_R", "tail", "tail_tip"],
   "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, as on the monkey.",
+  "rootNormals": {
+    "radius": 0.08,
+    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). This removes a dark slit at the front of the right arm root, where the round inner arm of dog-patch.glb meets the cap of the trunk hole, in the lift and the play."
+  },
   "armSegments": {
     "helper": 0.043,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it)."
@@ -198,8 +202,8 @@
     "fingers": 0.5,
     "rigid": [[-0.1045, 0.5536, 0.0752]],
     "rigidNote": "The corners of face 331 of the right armpit take the mean of their weights (rigid_faces() of tools/blender/rig_mesh.py). The point is the middle of the face in the units of the source, at the plane of armSplit. With the mean, the face does not turn over.",
-    "rigidPainted": [[[-0.1031, 0.5513, 0.0659], [-0.1101, 0.5513, 0.0625]], [-0.1185, 0.5878, 0.1346], [-0.1061, 0.5845, 0.0496]],
-    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights): first two small faces that share two corners, then one thin face with a corner of 5 degrees. They lie at the right shoulder line of dog-arms.glb, where the cut plane of arm_rebuild.py passes 0.4 mm from a vertex of dog-patch.glb, and they turned over at rest on the bent bind (pnpm fold-probe cellist --faces). The last point is a face of the same line that turned over in the play on the straight bind.",
+    "rigidPainted": [[[-0.1031, 0.5513, 0.0659], [-0.1101, 0.5513, 0.0625]], [-0.1185, 0.5878, 0.1346], [-0.1061, 0.5845, 0.0496], [-0.1033, 0.6258, 0.0656]],
+    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights): first two small faces that share two corners, then one thin face with a corner of 5 degrees. They lie at the right shoulder line of dog-arms.glb, where the cut plane of arm_rebuild.py passes 0.4 mm from a vertex of dog-patch.glb, and they turned over at rest on the bent bind (pnpm fold-probe cellist --faces). The last two points are faces of the same line that turned over in the play on the straight bind: the second of them is a thin face with a corner of 7 degrees (face 615 of the module, in 1.1% of the play samples of mozart-k525).",
     "haunch": {
       "height": [0.18, 0.275],
       "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the buttocks stay on the hips. It starts 0.03 units above the knee and ends 0.03 units above the thigh joint."
