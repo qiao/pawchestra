@@ -926,8 +926,8 @@ function pigTurn(turns: HornTurns): Quat {
  * right forearm 2.3 cm to 5.4 cm into the belly. At rest, the left grip moves 0.015 H toward the
  * mouthpiece and 0.015 H away from the left shoulder (`restGripShiftL`), so that the left wrist
  * goes at most 0.3 cm in place of 0.9 cm into the horn. The right elbow points out, down, and
- * forward (`restPoleR`), so that the round right forearm lies 0.3 cm in place of 0.6 cm in the
- * rim of the bell.
+ * forward (`restPoleR`), so that the round right forearm lies 0.4 cm in place of 0.6 cm in the
+ * rim of the bell, with the bind supination of the right paw that this elbow gives.
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
