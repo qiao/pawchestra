@@ -1,4 +1,5 @@
-"""Replays the Blender session that rebuilds the arms of the rabbit violinist and the cat violist.
+"""Replays the Blender session that rebuilds the arms of the cat violist, with the steps that
+`arm_rebuild.py` and the species scripts reuse.
 
 The rebuild uses loop edges, retopology, and extra bones to fix the twist of the arms and the
 wrists. The session makes these steps in the live Blender through MCP, with an image after each
@@ -58,22 +59,6 @@ WELD = 1e-5
 #: gives the mesh. The joints of the config are the joints of the shaped arm, and its `armFactor` is 1, because the rig with arm segments
 #: does not stretch the arms (`armSegments` of `tools/blender/rig_mesh.py`).
 ANIMALS = {
-    'rabbit': {
-        'config': 'tools/mesh-rigs/rabbit.json',
-        'source': 'assets/models/rabbit/rabbit-apose.glb',
-        'folder': 'assets/models/rabbit',
-        'factor': 1.15,
-        'slim': (1.0, 1.0),
-        'cut': {'shoulder': 0.15, 'tilt': 20.0, 'wrist': 0.1},
-        'zone': {'x': 0.0626, 'radius': 0.0797},
-        'gap': 0.0085,
-        'upper': (0.3, 0.45, 0.6, 0.75),
-        'fore': 6,
-        'texture': 512,
-        'faces': 600,
-        'paint': {'trunk': {'x': 0.07, 'y': (0.25, 0.45)}, 'root': {'x': (0.05, 0.11),
-                                                                    'y': (0.4, 0.55)}},
-    },
     'cat': {
         'config': 'tools/mesh-rigs/cat.json',
         'source': 'assets/models/cat/cat.glb',
@@ -1044,7 +1029,7 @@ def main():
     """Runs the steps of the session and writes the source mesh and the weights into the out dir
     (the folder of the animal in `assets/models/` by default)."""
     argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    animal = argv[0] if argv else 'rabbit'
+    animal = argv[0] if argv else 'cat'
     out_dir = os.path.abspath(argv[1]) if len(argv) > 1 else None
     clear_scene()
     s = Session(animal, out_dir)

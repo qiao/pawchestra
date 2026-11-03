@@ -23,10 +23,8 @@ src/models/studio/rabbit.ts               studio body of the app
 
 | File | Origin | Rebuild |
 |---|---|---|
-| `rabbit-apose.glb` | Source mesh of the old A-pose body (below) | None |
 | `rabbit-arms.glb` | Copy of `rabbit-tpose.glb` with rebuilt arms. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
 | `rabbit-weights.json` | Weights of the same Blender run. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
-| `rabbit-apose.rig.glb` | Rig of the old A-pose body. License as the source | None |
 | `rabbit-tpose.glb` | Source mesh (below) | None |
 | `rabbit.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
 
@@ -63,19 +61,6 @@ than two faces, and 484 faces have a corner angle below 10°.
 shasum -a 256 assets/models/rabbit/rabbit-tpose.glb
 ```
 
-## rabbit-apose.glb
-
-The mesh has no skeleton. The arms are in an A-pose: out, down, and a little forward, apart from
-the trunk below the shoulders.
-
-| Item | Value |
-|---|---|
-| Size | 16,662,596 bytes |
-| SHA-256 | `ed1c4778be4ee6ceba54aaf8e92117684551c18c06448e3b4904d2415e56634a` |
-| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
-| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,118 triangles and 4,327 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
-
 ## rabbit-arms.glb and rabbit-weights.json
 
 | Item | Value |
@@ -103,17 +88,6 @@ The rig gives the faces near each shoulder joint and each elbow joint the normal
 no crease angle (`rootNormals` of the config). The bind raises the arms, and each hold bends the
 elbows. A crease angle there splits the normals, and the split shows as a slit at the front of each
 arm root.
-
-## rabbit-apose.rig.glb
-
-| Item | Value |
-|---|---|
-| Size | 804,132 bytes |
-| SHA-256 | `cfc3fe4485e0917e049bad6024de04d73d5bf6e2e8a76d48c7b1047d17fe6785` |
-| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
-| Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent left elbow |
-
-A run of `pnpm rig-mesh rabbit` gives the same bytes.
 
 ## rabbit.rig.glb
 

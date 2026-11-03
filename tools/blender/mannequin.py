@@ -149,9 +149,10 @@ def animal_preset():
 
     Each place is the mean of the wolf and the rabbit, in parts of the height from the soles to the
     skull top. The wolf joints are those of `tools/mesh-rigs/wolf.json`, with the skull top at
-    0.8684 u (`app.note`). The rabbit joints are those of `tools/mesh-rigs/rabbit.json` after the
-    leg factor 1.75, which lifts the body 0.09 u (the shoulders at 0.574 u, `app.note`), with the
-    skull top at the tail of the head bone, 0.85 u. The parts (wolf, rabbit, mean):
+    0.8684 u (`app.note`). The rabbit joints are those of the A-pose rabbit
+    (`tools/mesh-rigs/rabbit.json` at 6af3369d) after the leg factor 1.75, which lifts the body
+    0.09 u (the shoulders at 0.574 u, `app.note`), with the skull top at the tail of the head bone,
+    0.85 u. The parts (wolf, rabbit, mean):
 
     - shoulder joint height 0.6005, 0.675, 0.638; out 0.1107, 0.107, 0.109
     - hip joint height 0.293, 0.300, 0.297; out 0.0872, 0.082, 0.085
