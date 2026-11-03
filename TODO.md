@@ -124,14 +124,16 @@ passes.
       patch. A change of the eye box or of the eye rules checks both patches.
 - [ ] Panda: the side under each arm root (the shoulder band, 0.8 to 0.9 of the trunk line) has
       more clavicle and arm weight than trunk weight, so `pnpm trunk-form trombonist --to 0.9`
-      gives a gap of 8.9 and 10.4 cm in the play (old panda 3.0 and 1.6 cm). `weights.paintedBelow`
-      [0.58, 0.68] / 0.12 gives 4.7 and 5.3 cm in the play and 4.6 and 4.3 cm at rest, near half,
-      but the left arm folds 8 faces at rest (main 4, limit 8): the arm gate fails. A lower band
-      (0.5 to 0.62) made the gap deeper. Try the rule with a `raise` shape of the left arm at rest,
-      or a narrower band on the left side only.
-- [ ] Panda: the head is 1.212 H wide (old panda 1.128 H). `headFactor` 0.93 gives 1.128 H, but
-      the nose and the trombone move 3 cm back, and the right arm folds 4 faces at rest (main 1):
-      the arm gate fails (also with 0.96). Fit the trombone hold again with the smaller head.
+      gives a gap of 8.9 and 10.4 cm in the play and 8.2 and 6.7 cm at rest (old panda 3.0 and 1.6
+      cm). The best try, `weights.paintedBelow` [0.6, 0.68] / 0.12 with a left `raise` shape of
+      the rest (`pnpm raise-fit trombonist --faces 1598,1602,1603 --side L --sets rest,lift`),
+      gives 4.8 and 5.5 cm in the play and 4.6 and 4.1 cm at rest, near half. It passes the arm
+      gate (left folds 3, base 5), but the right arm folds 3 faces (base 2): face 689 at the front
+      of the right arm root. A rigid face there gave 6 folds. With the rule, the bind itself has
+      a gap of 4.7 and 5.0 cm, so no weight rule makes the gap smaller than that: a form change
+      of the bind at the shoulder band is next. A rule above 0.62 u leaves faces of the right
+      elbow `raise` shape turned over, and an inner limit of 0.10 or 0.14 makes the left side
+      worse (`reports/2026-11-03-panda-head/`, try files in `scratch/merged/panda-head/`).
 - [ ] Panda: the trunk from the hips to the neck is 1.41 H long (old panda 1.52 H), and the sit
       lifts the lowest haunch up to 11 cm onto the seat top of the old chair. Check the haunch from
       behind in the app view.
@@ -358,9 +360,6 @@ passes.
       wrist ring of the cymbalist L narrows from 2.73 cm to 2.36 cm. Next: free the thin arm root
       faces at the shoulder line (a species option of the rebuild), then fit the shapes again
       (`reports/2026-11-03-badger-arms/`, try files in `scratch/merged/badger-arms/`).
-- [ ] Mesh rig: `paintedBelow` can give a vertex with four arm bones the trunk bone as a fifth
-      bone, and the rig then stops in `primitive_arrays()` (the badger). Keep the four largest
-      weights of such a vertex.
 - [ ] Arm rebuild: a cut plane less than about 0.4 mm from a source vertex leaves a cluster of
       very small faces at its loop. `step_clean_flaps()` deletes the flaps, but the small faces
       of the dog right shoulder line still turn over at rest (`rigidPainted` fixes them). A snap
@@ -594,7 +593,7 @@ scene of each demo has its seats and stage size with no overlap.
       horn. The B♭ side needs a thumb valve and a second fundamental, B♭1 (wind-technique 2.2).
 - [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view. Show the
       user the front view.
-- [ ] Panda trombonist: the arm reaches 0.120 m of the slide, 21% of a real seventh position. A
+- [ ] Panda trombonist: the arm reaches 0.155 m of the slide, 27% of a real seventh position. A
       larger right shoulder turn puts the right upper arm into the belly, and the grip 0.05 H up the
       brace keeps it off the belly. Show the user slide angles of 45° and 60°.
 - [ ] Panda trombonist: the left elbow out uses most of the margin of the grip turn (left 16,
