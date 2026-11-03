@@ -27,6 +27,41 @@ src/models/studio/rabbit.ts               studio body of the app
 | `rabbit-arms.glb` | Copy of the source with rebuilt arms. License as the source | `violin_arms.py rabbit` |
 | `rabbit-weights.json` | Weights of the same Blender run. License as the source | `violin_arms.py rabbit` |
 | `rabbit-apose.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
+| `rabbit-tpose.glb` | The T-pose source mesh of the next body (below) | None |
+
+## rabbit-tpose.glb
+
+The T-pose mesh replaces `rabbit-apose.glb` as the source when its rig passes the arm gate. The
+mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
+
+| Item | Value |
+|---|---|
+| Size | 13,759,212 bytes |
+| SHA-256 | `a6dbee19e81407e6a88acb302f20a734c0021a27986ba48b999c3832caca7fea` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Khronos glTF Blender I/O v4.3.47 |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,123 triangles and 4,709 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+| Material | One material `BakedMaterial`, double-sided, with a base color texture (8.0 MB) and a metallic-roughness texture (5.5 MB), each a PNG of 4096 × 4096 pixels |
+
+The values below are in the units of the studio: 1 unit from the soles to the ear tips, the soles
+at y = 0, +z forward, and +x the left side of the animal. The mesh is 1.902 units of the file
+high, and the weld at 1e-5 gives 1,566 vertices in one part. 6 edges are open, 14 edges have more
+than two faces, and 484 faces have a corner angle below 10°.
+
+- The box is x -0.358 to 0.358, y 0 to 1, and z -0.162 to 0.158.
+- The arms stand out level at y 0.47 to 0.53, free of the trunk from |x| 0.087, with the paw
+  tips at |x| 0.357. The pads of each paw face down (the palm hint of the config).
+- The legs part below the crotch at y 0.18. The feet reach forward to z 0.086.
+- The fur is light grey, with pink inner ears, a pink nose, and pink paw pads. The black eyes
+  are at y 0.646 to 0.683 and z 0.067 to 0.095. Thin whiskers leave the muzzle at y 0.57 to 0.62,
+  out to |x| 0.17.
+- The ears stand from y 0.76 to the top. A round tail ball sits at the back, at y 0.25 to 0.34,
+  out to z -0.162.
+
+```bash
+shasum -a 256 assets/models/rabbit/rabbit-tpose.glb
+```
 
 ## rabbit-apose.glb
 
