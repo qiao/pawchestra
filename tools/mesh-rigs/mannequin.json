@@ -61,7 +61,7 @@
     },
     "bindSupination": {"L": 83, "R": 28},
     "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py). The body has two test roles, so each paw takes the middle of the turns of the violin bind of the rabbit (L 100, R 0) and the clarinet bind of the wolf (L 66, R 57).",
-    "note": "The bind arms of the rabbit and the panda (the studio bind arms of tools/rig/studio-targets.ts). legTurns comes from tools/rig/leg_turns.py <config> 25 8 0, as on the rabbit."
+    "note": "The bind arms of the rabbit and the panda. legTurns comes from tools/rig/leg_turns.py <config> 25 8 0, as on the rabbit."
   },
   "weights": {
     "armSplit": 0.115,

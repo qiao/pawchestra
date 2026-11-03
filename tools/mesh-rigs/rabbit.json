@@ -315,7 +315,7 @@
       "R": 42
     },
     "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 88 degrees and the right 42 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 134 degrees on the left (the violin and the snare drum) and 90 degrees on the right (the cello and the snare drum). With no supination, the left paw twists of the violin and the flute are near 180 degrees.",
-    "note": "The thigh slopes 25 degrees down and 8 degrees out, so that the hips are above the knees, and the shin is vertical, as the legs of the red fox (tools/rig/leg_turns.py <config> 25 8 0, tools/mesh-rigs/fox.json). The bind arms are the bind arms of the studio rabbit, from tools/rig/studio-targets.ts."
+    "note": "The thigh slopes 25 degrees down and 8 degrees out, so that the hips are above the knees, and the shin is vertical, as the legs of the red fox (tools/rig/leg_turns.py <config> 25 8 0, tools/mesh-rigs/fox.json)."
   },
   "weights": {
     "armSplit": 0.095,
