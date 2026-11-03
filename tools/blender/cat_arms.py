@@ -1,9 +1,8 @@
-"""Replays the Blender session that rebuilds the arms of the cat violist.
+"""Gives the steps that rebuild an arm that the mesh joins to the trunk down to the elbow.
 
-The rebuild uses loop edges, a retopology, and extra bones to fix the arm and the wrist twist.
-The cat needs more than the route of `violin_arms.py`: the upper arm of the source mesh joins the
-side of the trunk down to the elbow, so a cut at a right angle to the bone finds no closed loop
-around the arm. This script gives the cat a real armpit:
+The upper arm of such a mesh joins the side of the trunk, so a cut at a right angle to the
+bone finds no closed loop around the arm. These steps give the arm a real armpit, and
+`fox_arms.py` and `deer_arms.py` run them with the settings of their animal (`STEPS`):
 
 1. Import the mesh and Merge by Distance (`violin_arms.import_mesh()`).
 2. Cut each arm along the seam where it meets the trunk, not at a right angle to the bone: Bisect
@@ -28,14 +27,10 @@ around the arm. This script gives the cat a real armpit:
    no thin face (`step_clean_pit()`).
 7. The studio skeleton with the arm segments and the helpers, automatic weights, and the Weight
    Paint fixes of `step_paint()`.
-8. Write the weights for `paintedWeights` of the config (`cat-weights.json`).
+8. Write the weights for `paintedWeights` of the config (`<animal>-weights.json`).
 
-Run it in a terminal from the root of the tree:
-
-    Blender -b --factory-startup -P tools/blender/cat_arms.py -- [<out dir>] [--views <dir>]
-
-A run gives the same `cat-arms.glb` and `cat-weights.json`, byte for byte. `--views <dir>` writes
-check images of the arms after each step of the mesh, and the part codes of each vertex.
+The script has no run of its own. `look()` also writes the check images of
+`arm_rebuild.py`.
 """
 
 import math
@@ -49,8 +44,9 @@ from mathutils import Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import violin_arms as va  # noqa: E402
 
-#: The settings of the cat, in the units of the studio (1 unit from the soles to the ear tips).
-#: `seam`: the cut along the seam and the armpit:
+#: The keys of the settings of an animal of these steps, in the units of the studio (1 unit
+#: from the soles to the top), as `fox_arms.py` and `deer_arms.py` give them. `seam`: the cut
+#: along the seam and the armpit:
 #:
 #: - `x`, `lean`: the plane of the seam, |x| from the middle plane at the height `armpit`, and its
 #:   lean out for each unit of height down, as the side of the trunk widens below the armpit.
@@ -95,68 +91,6 @@ import violin_arms as va  # noqa: E402
 #: socket. `sides`: the sides of the clean, `L` and `R` (the left and the right arm of the animal).
 #:
 #: The other keys are the keys of `violin_arms.ANIMALS`.
-CAT = {
-    'config': 'tools/mesh-rigs/cat.json',
-    'source': 'assets/models/cat/cat.glb',
-    'folder': 'assets/models/cat',
-    # The upper arm is 0.92 and the forearm 0.78 as long as on the mesh, 1.10 head heights from the
-    # shoulder joint to the wrist, and the forearm is 0.86 of the upper arm, as on a real arm.
-    # With 0.85 for both, the shorter upper arm moves the round part of the tube into the plane of
-    # the seam, and the middle of the upper arm goes 22% narrower at rest. With 1 (1.30 H) and with
-    # 1.1496, the reach of the red fox, the arms are too long for the short trunk of the cat.
-    'factor': (0.92, 0.78),
-    'slim': (0.85, 0.85),
-    'cut': {'shoulder': 0.0, 'tilt': 0.0, 'wrist': 0.1},
-    'zone': {'x': 0.07, 'radius': 0.08},
-    'gap': 0.02,
-    'upper': (0.45, 0.6, 0.75),
-    'fore': 6,
-    'texture': 512,
-    'faces': 1200,
-    'seam': {'x': 0.08, 'lean': 0.1, 'low': 0.45, 'reach': 0.06, 'edge': 0.6, 'armpit': 0.6,
-             'lift': -0.004, 'rings': (0.15, 0.45), 'ruled': 1, 'ramp': 10, 'round': 3,
-             'wrap': 0.012},
-    # With the shorter arms of factor 1 and the share 0.2, the upper ring of each upper arm narrows
-    # to 0.66 of its bind width at rest (0.73 with no anchor), and with 0.35 the right arm twists
-    # more.
-    'anchor': {'share': 0.1, 'reach': 0.05, 'crease': True},
-    # The even oval of the trunk (`step_belly()`). The front ends at the lap and at the neck, and
-    # the sides at the hips and at the lower end of the side walls.
-    # The bow upper arm lies on the front corners of the upper belly at the tip on the lowest
-    # string, 30 to 50 degrees from the front at 0.7 to 0.82 of the line: the oval moved them
-    # 0.5 to 1.3 cm forward, and the arm went 2.3 cm in. The flat zone peaks at the middle line
-    # and falls off over the whole front, so the front of the upper belly gets flatter with no
-    # crease: the arm goes 2.1 cm in, and no edge of the patch turns more than 34.5 degrees. A
-    # zone of the corners only (10 to 75 degrees, 0.006 units) put the arm 1.5 cm in, but the
-    # edges beside the middle strip turned 42 degrees, and a light strip showed at rest. A move
-    # over 0.004 units left a gap of the side view to its hull.
-    'belly': {'front': (0.06, 0.92), 'sides': (0.12, 0.7), 'bend': 1e5, 'step': 0.002,
-             'round': {'share': 0.6, 'fade': (0.5, 0.8)},
-             'flat': {'f': (0.62, 0.9), 'angle': (-75, 75), 'move': 0.004}},
-    # The round side wall under each arm (`step_round_wall()`). In the play, a flat wall shows as
-    # a light patch with a crease at its lower tip. With `deep` 0.002, the left upper arm goes
-    # 1.7 cm into the new wall in the play, the lift, and the lowering (1.0 to 1.2 cm with a flat
-    # wall), because the fill takes the room of the lips. With 0.01, the right wall folds at 175
-    # degrees. With 0.006, 7 and 6 vertices of the flat inner side of the arms lie out of the trunk
-    # in the copy (2 and 1 with a flat wall), and no slit shows at rest. With no `reach`, the trunk
-    # rings take long faces down to the hips, move them up to 3 cm, and draw a V of hard edges
-    # under the wall.
-    'wall': {'lip': 0.2, 'depth': 0.01, 'over': 0.02, 'grid': 0.016, 'rings': 2, 'reach': 0.03,
-             'rounds': 6, 'deep': 0.006},
-    # The band between each armpit line and the flat inner side of the arm (`step_clean_pit()`).
-    # With no clean, 27 faces near the ends of the lines have a corner under 12 degrees, and three
-    # corners of a face at the front end of the left line lie on one line. A merge on both sides
-    # of the whole line folds two new faces of the right arm root at rest, so `close` acts only at
-    # the back half of the line. A merge of such a vertex into the next ring leaves a small dark
-    # point at the back end of the left line from az -110 in the play, and with no merge, a dark
-    # slit shows there. With no merge of the socket vertices, the back of the left socket folds in
-    # 28.6% of the play (the thin faces there share one set of weights in `rigid_slivers()` of
-    # `rig_mesh.py`). The right side keeps its band: with the clean, the root ring of the bow arm
-    # goes flatter in the play (flat p5 of `pnpm arm-check` 0.75, and 0.84 with no clean, a fail),
-    # and with the strip only, the valleys in front of the right root are deeper in the play.
-    'pit': {'near': (0.0055, 0.003), 'close': 0.003, 'weld': 0.0025, 'sides': 'L'},
-}
-va.ANIMALS['cat'] = CAT
 
 RING_VERTS = va.RING_VERTS
 PART = dict(va.PART, wall=4, armpit=5)
@@ -710,7 +644,7 @@ va.arm_faces = new_faces
 
 def arm_verts(s, bm, part, off):
     """Gives the vertices of one arm: the tube, the wrist loop, and the paw, which the tube reaches
-    with no step over the socket (`violin_arms.arm_verts()` for the cat)."""
+    with no step over the socket (`violin_arms.arm_verts()` for an arm with a side wall)."""
     stop = {PART[k] + off for k in ('shoulder', 'armpit', 'wall')}
     arm, stack = set(), [p for p in bm.verts if p[part] == PART['tube'] + off]
     while stack:
@@ -1649,23 +1583,3 @@ STEPS = (va.import_mesh, step_cut, step_wall, step_tube, step_wrap, step_bridge,
          step_clean_pit, va.step_atlas, step_inner_color, va.step_export, va.step_skeleton,
          va.step_bind, step_tube_heat, step_paint, step_weights)
 
-
-def main():
-    """Runs the steps and writes the source mesh and the weights into the out dir (the folder of
-    the cat in `assets/models/` by default)."""
-    global VIEWS
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    if '--views' in argv:
-        k = argv.index('--views')
-        VIEWS = os.path.abspath(argv[k + 1])
-        os.makedirs(VIEWS, exist_ok=True)
-        del argv[k:k + 2]
-    out_dir = os.path.abspath(argv[0]) if argv else None
-    va.clear_scene()
-    s = va.Session('cat', out_dir)
-    for step in STEPS:
-        print('%s: %s' % (step.__name__, step(s)))
-
-
-if __name__ == '__main__':
-    main()

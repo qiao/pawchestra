@@ -1,5 +1,5 @@
-"""Replays the Blender session that rebuilds the arms of the cat violist, with the steps that
-`arm_rebuild.py` and the species scripts reuse.
+"""Gives the steps that rebuild the arms of an animal with a quad tube, which `arm_rebuild.py`
+and the species scripts reuse. Each species script puts its settings into `ANIMALS`.
 
 The rebuild uses loop edges, retopology, and extra bones to fix the twist of the arms and the
 wrists. The session makes these steps in the live Blender through MCP, with an image after each
@@ -58,24 +58,7 @@ WELD = 1e-5
 #: (upper arm, forearm), and `slim`: the factors of their cross-sections, which `step_shape()`
 #: gives the mesh. The joints of the config are the joints of the shaped arm, and its `armFactor` is 1, because the rig with arm segments
 #: does not stretch the arms (`armSegments` of `tools/blender/rig_mesh.py`).
-ANIMALS = {
-    'cat': {
-        'config': 'tools/mesh-rigs/cat.json',
-        'source': 'assets/models/cat/cat.glb',
-        'folder': 'assets/models/cat',
-        'factor': 1.1496,
-        'slim': (0.85, 0.85),
-        'cut': {'shoulder': 0.8, 'tilt': 20.0, 'wrist': 0.1},
-        'zone': {'x': 0.07, 'radius': 0.08},
-        'gap': 0.0085,
-        'upper': (0.9,),
-        'fore': 6,
-        'texture': 512,
-        'faces': 900,
-        'paint': {'trunk': {'x': 0.085, 'y': (0.35, 0.66)}, 'root': {'x': (0.07, 0.11),
-                                                                     'y': (0.48, 0.68)}},
-    },
-}
+ANIMALS = {}
 
 #: The vertices of each ring of a tube.
 RING_VERTS = 16
@@ -419,8 +402,8 @@ TWISTS = range(-12, 13)
 
 def bridge_twist(bm, edges):
     """Gives the twist offset of Bridge Edge Loops (the Twist field of the operator) that joins two
-    loops with the shortest new edges. On the wrists of the cat, the offsets 1 and 2 give shorter
-    edges than the default 0. The offset 0 wins a tie."""
+    loops with the shortest new edges. On the wrists of the cat of the A-pose mesh, the offsets 1 and
+    2 gave shorter edges than the default 0. The offset 0 wins a tie."""
     bm.edges.ensure_lookup_table()
     indices = [e.index for e in edges]
     best, best_length = 0, None
@@ -1029,7 +1012,7 @@ def main():
     """Runs the steps of the session and writes the source mesh and the weights into the out dir
     (the folder of the animal in `assets/models/` by default)."""
     argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    animal = argv[0] if argv else 'cat'
+    animal = argv[0]
     out_dir = os.path.abspath(argv[1]) if len(argv) > 1 else None
     clear_scene()
     s = Session(animal, out_dir)

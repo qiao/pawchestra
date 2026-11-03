@@ -42,10 +42,10 @@ import fox_arms as fa  # noqa: E402
 
 va = ca.va
 
-#: The settings of the deer, with the keys of `CAT` of `cat_arms.py`, in the units of the studio
-#: (1 unit from the soles to the tips of the antlers). The upper arm is about 0.06 units thick.
-#: Below the free root at y 0.47, the side of the trunk stands at |x| 0.081 and the inner side of
-#: the arm at |x| 0.084.
+#: The settings of the deer, with the keys of the settings of `cat_arms.py`, in the units of the
+#: studio (1 unit from the soles to the tips of the antlers). The upper arm is about 0.06 units
+#: thick. Below the free root at y 0.47, the side of the trunk stands at |x| 0.081 and the inner
+#: side of the arm at |x| 0.084.
 DEER = {
     'config': 'tools/mesh-rigs/deer.json',
     'source': 'assets/models/deer/deer.glb',

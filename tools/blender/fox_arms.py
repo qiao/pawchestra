@@ -44,15 +44,15 @@ import wind_arms as wa  # noqa: E402
 
 va = ca.va
 
-#: The settings of the fox, with the keys of `CAT` of `cat_arms.py`, in the units of the studio (1
-#: unit from the soles to the ear tips). Below the armpit at y 0.515, the side of the trunk stands
-#: at |x| 0.093, and the free arm starts at |x| 0.113, so the seam plane stands at |x| 0.1. The
-#: shoulder has no ring (`seam.rings`): two rings packed at the short socket fold into a dark slit
-#: at the back of the arm root. The first ring of the tube takes Blender weights (`seam.ruled` 0).
-#: The tube near the side walls takes a chest share of 0.4 (`anchor`): with 0.2, the right arm of
-#: the red fox folds 9 to 11 faces at rest. `fingers`: the share of the weight of each finger bone
-#: that the fingers keep (`step_fingers()`). `notches`: the sphere at the back of the neck, below
-#: the ruff, whose vertices `step_smooth_notches()` smooths.
+#: The settings of the fox, with the keys of the settings of `cat_arms.py`, in the units of the
+#: studio (1 unit from the soles to the ear tips). Below the armpit at y 0.515, the side of the
+#: trunk stands at |x| 0.093, and the free arm starts at |x| 0.113, so the seam plane stands at |x|
+#: 0.1. The shoulder has no ring (`seam.rings`): two rings packed at the short socket fold into a
+#: dark slit at the back of the arm root. The first ring of the tube takes Blender weights
+#: (`seam.ruled` 0). The tube near the side walls takes a chest share of 0.4 (`anchor`): with 0.2,
+#: the right arm of the red fox folds 9 to 11 faces at rest. `fingers`: the share of the weight of
+#: each finger bone that the fingers keep (`step_fingers()`). `notches`: the sphere at the back of
+#: the neck, below the ruff, whose vertices `step_smooth_notches()` smooths.
 FOX = {
     'config': 'tools/mesh-rigs/fox.json',
     'source': 'assets/models/fox/fox.glb',
