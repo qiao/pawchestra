@@ -314,6 +314,13 @@ passes.
       arm. The arm sections match the source, so the painted weights are the cause. Find the
       vertices of the bow arm root in the chest, then rebuild (`reports/2026-11-02-rebuild-b/dog/`,
       patches in `scratch/merged/rebuild-b/dog-kept/`).
+- [ ] Badger with rebuilt arms: `arm_rebuild.py badger` gives clean tubes, but the folds grow on
+      the old bind and on the straight bind (L 114, R 89). Nine of 10 arms fail, the most on the
+      xylophonist (L 17, base 8). The grip turn of the bass drummer R grows to 22° (base 7°). A
+      painted clavicle weight lifts a throat vertex to the head weight 0.5, so the head height
+      grows 15.5 mm (`headFloor` 0.76 of `ANIMALS` keeps it). The own roles want a small bind
+      supination, and the violin recast sets the left value. Fit the painted weights of the
+      shoulder line and the paws first (`reports/2026-11-02-rebuild-b/badger/`).
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
