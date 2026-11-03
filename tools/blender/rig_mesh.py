@@ -63,7 +63,8 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    `armGirth` of the config, the upper arm and the forearm take its factors across their axes
    (`arm_slim()`, `fore_slim()`): the factor of the upper arm fades in from the shoulder joint,
    and the factor of the forearm fades out to the wrist, so that the shoulders and the paws keep
-   their form.
+   their form. With `legGirth`, the thigh and the shin take its factors across their axes in the
+   same way (`leg_girth()`), so that a thigh that the leg factor makes long does not look thin.
 5. Change the faces of the arms and the legs so that they bend at the joints: with `pointFlip`
    the edge at each of its points flips first (`point_flips()`), then a ring of new
    vertices at each joint of the config splits the faces that it crosses, and the long edge of a
@@ -221,6 +222,15 @@ TRUNK = ('hips', 'spine', 'spine1', 'chest')
 #: of the upper arm (`armGirth` of the config) grows from 0 to all (`arm_slim()`), so that the
 #: shoulder and the side of the trunk next to the shoulder joint keep their form.
 ARM_GIRTH_FADE = 0.4
+
+#: The share of the thigh above the hip joint over which the factor of the cross-section of the
+#: thigh (`legGirth` of the config) grows from 0 to all (`leg_girth()`), so that the haunch on
+#: the seat keeps its form, and the share of the shin over which it falls to 0 below the knee.
+LEG_GIRTH_FADE = 0.4
+
+#: The least distance of the inner side of a widened thigh from the middle plane, in units
+#: (`leg_girth()`), so that the two thighs do not cross.
+LEG_GIRTH_GAP = 0.01
 
 #: The bones whose vertices the girth factors widen around the trunk axis (`girth_moves()`): the
 #: trunk bones and the clavicles, which hold the tops of the shoulders.
@@ -3023,10 +3033,12 @@ def move(rotation, src, dst):
 def stretch(verts, weights, heads, ends, children, factors, rules):
     """Makes the limbs longer, the head larger, the neck and the trunk shorter, and the trunk wider
     by the factors of the config: `arm`, `leg`, `head`, `neck`, `trunk`, and `girth` (the width
-    and the depth), and `armGirth` (the upper arm and the forearm). The upper
+    and the depth), `armGirth` (the upper arm and the forearm), and `legGirth` (the thigh and the
+    shin). The upper
     arm and the forearm of each side grow by `arm` along their axes from the shoulder joint out,
     and the paw moves with the wrist and keeps its size. With `armGirth`, the upper arm and the
-    forearm take its two factors across their axes (`arm_slim()`, `fore_slim()`). A point on the inner side of the shoulder
+    forearm take its two factors across their axes (`arm_slim()`, `fore_slim()`), and with
+    `legGirth`, the thigh and the shin (`leg_girth()`). A point on the inner side of the shoulder
     joint does not move with the upper arm. With a ramp (`weights.stretchRamp` of the config, in units), only the free arm
     beyond the plane |x| = `armSplit` stretches with the upper arm: the share of the stretch fades
     from 0 to 1 over the ramp on each side of the plane, so that the trunk beside and below the
@@ -3045,6 +3057,8 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     neck, and the move of the neck joint by the trunk factor."""
     new_heads = {k: v.copy() for k, v in heads.items()}
     new_ends = {k: v.copy() for k, v in ends.items()}
+    if tuple(factors.get('legGirth', (1, 1))) != (1, 1):
+        verts = leg_girth(verts, heads, *factors['legGirth'])
     matrices = [move(np.eye(3), np.zeros(3), np.zeros(3)) for _ in BONES]
     halves = {}
     fores = {}
@@ -3276,6 +3290,45 @@ def arm_slim(points, head, axis, factor, share, length):
     across = rel - along[:, None] * axis
     fade = smoothstep(along, 0.0, ARM_GIRTH_FADE * length) * share
     return points - ((1 - factor) * fade)[:, None] * across
+
+
+def leg_girth(points, heads, thigh, shin):
+    """Widens the thighs and the shins of the source across their axes by the factors `thigh` and
+    `shin` (`legGirth` of the config), before the skin: each point moves by its place, whatever
+    its weights, because the bone heat of a short thick thigh splits its middle between the thigh,
+    the shin, and the hips. On the thigh, the share of the factor grows from 0 at `LEG_GIRTH_FADE`
+    of the thigh above the hip joint to all at the hip joint, so that the ring at the crotch grows
+    and the haunch above it keeps its form, and it falls to 0 over the first `LEG_GIRTH_FADE` of
+    the shin. The back of the thigh (-z of the source) keeps its place, so that the seated thigh
+    widens up and to the sides and keeps its underside on the seat, and the inner side stops
+    `LEG_GIRTH_GAP` from the middle plane. On the shin, the share falls from all at the knee joint to 0 at the ankle joint, so that
+    the ankle keeps the width of the foot. Only the points on the side of each leg move."""
+    out = points.copy()
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        hip, knee, ankle = (np.asarray(heads[f'{b}_{side}'], float)
+                            for b in ('thigh', 'shin', 'foot'))
+        own = points[:, 0] * sign > 0
+        for head, end, factor, is_thigh in ((hip, knee, thigh, True), (knee, ankle, shin, False)):
+            if factor == 1:
+                continue
+            length = float(np.linalg.norm(end - head))
+            axis = (end - head) / length
+            rel = points - head
+            along = rel @ axis
+            across = rel - along[:, None] * axis
+            if is_thigh:
+                shin_length = float(np.linalg.norm(ankle - knee))
+                fade = (smoothstep(along, -LEG_GIRTH_FADE * length, 0.0)
+                        * (1 - smoothstep(along, length, length + LEG_GIRTH_FADE * shin_length)))
+                across[:, 2] = np.maximum(across[:, 2], 0.0)
+            else:
+                fade = (smoothstep(along, -LEG_GIRTH_FADE * length, 0.0)
+                        * (1 - smoothstep(along, 0.0, length)))
+            out += ((factor - 1) * fade * own)[:, None] * across
+        # The inner side stops short of the middle plane, so that the thighs do not cross it.
+        out[own, 0] = sign * np.maximum(sign * out[own, 0], np.minimum(sign * points[own, 0],
+                                                                        LEG_GIRTH_GAP))
+    return out
 
 
 def fore_slim(points, head, axis, factor, length):
@@ -5100,7 +5153,8 @@ def main():
                'head': config.get('headFactor', 1), 'neck': config.get('neckFactor', 1),
                'trunk': config.get('trunkFactor', 1),
                'girth': config.get('girthFactor', [1, 1]),
-               'armGirth': config.get('armGirth', [1, 1])}
+               'armGirth': config.get('armGirth', [1, 1]),
+               'legGirth': config.get('legGirth', [1, 1])}
     long_verts, long_heads, long_ends, rise, drop, lower = stretch(verts, weights, heads, ends,
                                                                     children, factors, rules)
     stretched = stretch_faces(verts, long_verts, source_tris) if check else []
@@ -5109,6 +5163,9 @@ def main():
         before, after = reach(heads, side) * meters, reach(long_heads, side) * meters
         log(f'arm {side}: reach {before:.4f} m before, {after:.4f} m after the factor '
             f"{config['armFactor']} (target {config['app']['reach']} m)")
+    if tuple(factors['legGirth']) != (1, 1):
+        log(f"legGirth: the thighs and the shins take the factors {factors['legGirth']} across "
+            f"their axes")
     if factors['shin'] != factors['leg']:
         log(f"shins: the shin factor {factors['shin']} makes the shins longer than the thighs "
             f"(leg factor {factors['leg']})")
