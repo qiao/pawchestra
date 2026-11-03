@@ -112,14 +112,16 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda arm rebuild (4.4): `tools/blender/panda_edit.py` frees each arm in a copy. It splits
-      the crease of the arm, turns the arm out 10° and shifts it 0.012 units, and fills both lips
-      with quads. `pnpm mesh-intake` then passes the pose (34°), the arm free (0.25 and 0.20 of
-      the upper arm), and the gap (0.27 and 0.33 radii). But the four-side images show slivers at
-      the armpits and a notch at the inner elbow. The rebuilt arm shows shards on the side wall
-      where the forearm touched the belly (`reports/2026-11-02-panda-edit/`). Next: remove one
-      ring of old trunk faces beside each lip before the fill, and fit the side wall to the trunk
-      below the armpit, or cut along a seam plane with a side wall, as `cat_arms.py` does.
+- [ ] Panda arm rebuild (4.4): `tools/blender/panda_edit.py` frees each arm in a copy, with a
+      side wall as `cat_arms.py` makes. `pnpm mesh-intake` passes the pose (31.2°), the arm free
+      (0.25 and 0.15), and the gap (0.28 and 0.38 radii), and `arm_rebuild.py --factor 1.497`
+      rebuilds the copy. With the role-neutral bind (L 103, R 54), the trombonist gate passes
+      (folds p95 L 2, R 2), but `pnpm pose-depth trombonist` puts the upper arms 6.3 cm to 7.9 cm
+      into the body at 0.33 to 0.39 of the upper arm (0.0 on `main`), in each sample. The old
+      bind, the rule weights of the clavicles, and a shoulder cut at 0.4 give the same depth. The
+      body stays (`reports/2026-11-02-panda-edit/rig/`). Next: find the corners of the depth with
+      `pose-depth --where` at the rest, and check if the poses or the clavicle region of the
+      short, thick arm cause it.
 - [ ] Panda: try `weights.armCrease` on each arm that is one solid with the trunk.
 - [ ] Panda: a small gray dent shows below each arm from the left side. Move the body run of the cut
       (vertices 787, 793, and 800, `tools/arm-roots/panda.json`).
