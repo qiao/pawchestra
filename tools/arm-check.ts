@@ -69,7 +69,8 @@
  * `--views <dir>` renders the worst play sample of each arm that fails, or of each arm with
  * `--views-all`, a strike, and a rest of the player, with `pnpm close-views play --at <species>`,
  * and writes one image of each frame: a 2x crop of each arm in each view, the commit on the left
- * and the working tree on the right (`tools/arm-views.ts`).
+ * and the working tree on the right (`tools/arm-views.ts`). A recast role renders with `--recast`
+ * of `close-views play`, in the seats of the role.
  *
  * `--trace <demo>:<from>-<to>` prints the paws of one role at each step of a range of song times,
  * or of wall times of the lift with `lift<from>-<to>`, with no sweep ({@link traceLines}). The
@@ -2367,11 +2368,6 @@ export function checkArgs(args: readonly string[]): CheckArgs {
   }
   if (views !== null && values.has('--midi')) {
     throw new Error('The option --views renders the demos of the app, so --midi does not go.');
-  }
-  if (views !== null && chosen.some((role) => findRole(role) !== FOLD_ROLES.get(role))) {
-    throw new Error(
-      'The option --views renders the cast of the app, so it takes no recast role. Render a recast role with pnpm close-views <role>@<species>.',
-    );
   }
   const midi = (values.get('--midi') ?? []).map((path) => resolve(path));
   const lost = midi.filter((path) => !existsSync(path));

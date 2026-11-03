@@ -17,7 +17,10 @@
  * fingers, with a margin. A box of {@link CROP_SIDE} or less shows at 2x. The frames of one demo
  * render in one run of `close-views` with one `--time` for each frame, so each tree builds one time
  * for them ({@link renderFrames}), into `<dir>/<role>-<demo>/time-<time>/`. A folder that holds the
- * frames of an earlier run keeps them, and the tool renders no frame again.
+ * frames of an earlier run keeps them, and the tool renders no frame again. A recast role
+ * `<role>@<species>` renders with `--recast` of `close-views play`, so the app of each tree puts
+ * the species into the seats of the role, as the gate does. The commit keeps the instrument scale
+ * of its own app.
  */
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -43,7 +46,7 @@ import {
   shotSubject,
   subjectName,
 } from './close-views.ts';
-import { FOLD_ROLES, roleBodies, roleSpecies } from './fold-probe.ts';
+import { findRole, roleBodies, roleScene, roleSpecies } from './fold-probe.ts';
 import type { RoleSource } from './fold-probe.ts';
 import { patchedDemo } from './patch-demos.ts';
 import { ROOT, runChild } from './ref-tree.ts';
@@ -61,7 +64,7 @@ import {
 } from '../src/models/studio-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
-import { PLAYING, allAudible, sceneOf } from '../src/pose/test-scene.ts';
+import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 
 /** The azimuths of the views, in degrees: the front, two fronts at 35°, and the side. */
 const VIEW_AZIMUTHS: readonly number[] = [0, 35, -35, 90];
@@ -195,11 +198,11 @@ function worstFrame(tree: RoleReport, rows: readonly GateRow[], parts: GateParts
  * @returns The frames.
  */
 async function noteFrames(role: string, demo: DemoId): Promise<Frame[]> {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   if (!source) {
     return [];
   }
-  const scene = sceneOf((await patchedDemo(`${demo}.mid`)).bytes);
+  const scene = roleScene(source, (await patchedDemo(`${demo}.mid`)).bytes);
   const [body] = roleBodies(source, scene);
   const seat =
     body?.index === null || body === undefined
@@ -311,13 +314,13 @@ async function frameViews(
   sides: readonly Side[],
   parts: GateParts,
 ): Promise<FrameViews> {
-  const source = FOLD_ROLES.get(role);
+  const source = findRole(role);
   const species = source ? roleSpecies(source)[0] : undefined;
   const none: FrameViews = { azimuths: VIEW_AZIMUTHS, boxes: new Map(), hidden: [] };
   if (!source || species === undefined) {
     return none;
   }
-  const scene = sceneOf((await patchedDemo(`${frame.demo}.mid`)).bytes);
+  const scene = roleScene(source, (await patchedDemo(`${frame.demo}.mid`)).bytes);
   const [body] = roleBodies(source, scene);
   if (!body) {
     return none;
@@ -345,7 +348,12 @@ async function frameViews(
     createStudioPose(),
   );
   const posed = skinStudioMesh(rig.mesh, studio);
-  const target = await aimTarget(frame.demo, shotSubject(atText(source, species)));
+  const target = await aimTarget(
+    frame.demo,
+    shotSubject(atText(source, species)),
+    null,
+    source.kind === 'player' ? (source.recast ?? null) : null,
+  );
   const onStage = (
     place: { readonly position: Vec3; readonly facing: number },
     x: number,
@@ -554,7 +562,7 @@ interface PlannedFrame {
 /**
  * Gives the subject of `--at` of `pnpm close-views play` for the player of a role: its species,
  * or its species and its instrument, such as `badger:cymbals`, for a species that plays several
- * instruments.
+ * instruments, or for a recast role, whose species also plays its own instrument.
  *
  * @param source The role.
  * @param species The species of the player of the role.
@@ -562,7 +570,9 @@ interface PlannedFrame {
  */
 function atText(source: RoleSource | undefined, species: string): string {
   const many = speciesItems().filter((item) => item.species === species).length > 1;
-  return source?.kind === 'player' && many ? `${species}:${source.instrument}` : species;
+  return source?.kind === 'player' && (many || source.recast)
+    ? `${species}:${source.instrument}`
+    : species;
 }
 
 /**
@@ -576,12 +586,15 @@ function atText(source: RoleSource | undefined, species: string): string {
  * @param folder Gives the folder of the frames of a demo.
  * @param species The subject of `--at` of the player of the role ({@link atText}).
  * @param base The commit of `--base`, or `null`.
+ * @param recast The name of a recast role `<role>@<species>`, which each tree of the run puts
+ *   into the app (`--recast` of `pnpm close-views play`), or `null` for a role of the cast.
  */
 async function renderFrames(
   plans: readonly PlannedFrame[],
   folder: (demo: DemoId) => string,
   species: string,
   base: string | null,
+  recast: string | null,
 ): Promise<void> {
   const demos = [...new Set(plans.map((plan) => plan.frame.demo))];
   for (const demo of demos) {
@@ -604,6 +617,7 @@ async function renderFrames(
         species,
         ...azimuths.flatMap((a) => ['--azimuth', String(a)]),
         ...(base === null ? [] : ['--base', base]),
+        ...(recast === null ? [] : ['--recast', recast]),
       ],
       ROOT,
     );
@@ -627,7 +641,7 @@ export async function renderViews(
   const dir = options.views ?? '';
   await mkdir(dir, { recursive: true });
   for (const { role, tree } of reports) {
-    const source = FOLD_ROLES.get(role);
+    const source = findRole(role);
     const species = source ? roleSpecies(source)[0] : undefined;
     if (!tree || species === undefined) {
       continue;
@@ -682,6 +696,7 @@ export async function renderViews(
       (demo) => join(dir, `${role}-${demo}`),
       atText(source, species),
       options.base,
+      source?.kind === 'player' && source.recast ? role : null,
     );
     for (const { frame, views, out } of planned) {
       const cells: PairCell[] = [];
