@@ -192,27 +192,29 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat violist: the round belly keeps both elbows 35° to 48° from the vertical at rest, and the
-      right upper arm meets the belly 1.7 cm deep near the elbow (limit 1.5 cm).
-- [ ] Cat violist: the bow upper arm goes 2.1 cm into the body at the tip on the lowest string
-      (limit 1.5 cm). Try a flatter inner upper arm. A larger shoulder turn folds face 785.
-- [ ] Cat violist: the right claws go 2.2 cm into the viola at the frog, and the left upper arm 2.2
-      cm into the body in the moves (limit 1.5 cm).
-- [ ] Cat violist: `pnpm arm-look violist` finds too many thin dark folds across the right shoulder
-      at the tip. Try a bind of the right upper arm nearer to the play.
-- [ ] Cat: face 832 at the front of the right armpit folds in most of the play. Arm segments allow
-      no `raise` shape there.
-- [ ] Cat: the armpit line at the lower back of each arm root folds a little in the play (faces 729,
-      688, and 728 on the right), and 11 to 12 hidden faces of the lines turn over.
-- [ ] Cat: a soft fold stays at the front of the left arm root, and a notch at rest. Put the socket
-      front and the first ring front of the copy onto the trunk surface before the weights.
-- [ ] Cat: at the ends of each armpit line, the wall meets the trunk at up to 108°, and a small
-      point shows from az ±150. Clean the 14 thin faces of the right line.
-- [ ] Cat: near the elbow, the left forearm is 0.89 of the tube in the play, because the linear
-      blend turns the paw about 100° from the bind over three forearm segments.
+- [ ] Cat T-pose body: the legs keep the length of the mesh (brief of the round), so the seat is
+      0.136 m (0.298 m on the A-pose body) and the cat reads as standing in front of a low chair
+      (`reports/2026-11-03-cat-new/lineup/`). The A-pose body had the leg factor 1.94. Ask the
+      user: keep the legs, or a leg factor for a seated read.
+- [ ] Cat violist: the left paw goes 2.1 cm into the viola in the play and the lift, near the
+      upper bout, as the separate claws of the A-pose body did (2.2 cm and 2.1 cm). At rest it
+      goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
+      separate claws, so `pnpm pose-depth` marks the pair `paws in viola` as GROWS. Check the paw
+      crops of the fifth position.
+- [ ] Cat violist: at rest and in the lift, the right upper arm goes 1.0 cm into its arm root
+      (0.8 cm on the A-pose body), and 1.4 cm in a lowering of `beethoven-5-4` (1.3 cm).
+- [ ] Cat T-pose body: the long tail hangs behind the chair, so the footprint of the cat is 0.31 m
+      deeper, and the layout moves the seats around it: `pnpm body-probe` shows pose changes of
+      other players in most demos, and no change of another body. A tail curled on the seat
+      (`studio.tailCurl`) folded 161 tail faces of the new mesh.
+- [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
+      shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
+      smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.
+- [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
+      A-pose body there: the dark V band on the lower back above the seat, and the folds of the
+      right shoulder at the tip. Remove each item that the new body does not show.
 - [ ] Cat: from the back, a dark band in a V lies on the lower back above the seat. Find the faces
       and the light that make it.
-- [ ] Cat tail: 4 faces stay turned over against the bone turn after the bind. No image shows them.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
@@ -250,7 +252,8 @@ passes.
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
-- [ ] Cat violist: ask the user to confirm the 1/2 viola. A 3/4 viola reaches the nut at about 55°.
+- [ ] Cat violist: ask the user to confirm the 1/2 viola. The longer arms of the T-pose body
+      reach the nut with 9.5 cm to spare, and the rule of a violin shop gives the scale 0.919.
 - [ ] When the tests come back, run `pnpm test:paused src/shots/` and
       `src/models/layout-scene.test.ts`. The harp, the viola, and the piano gap moved seats.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
@@ -298,8 +301,8 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, and
-      the pig have it. Then the body with arm segments and a bent `bindArms`: the cat.
+      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, the
+      pig, and the cat have it.
 - [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.4 cm into the rim of
       the bell near the wrist (0.1 cm on the old arm, target 0.3 cm), with the rest
       right elbow (1, -0.5, -0.6) and the bind supination R 64 (0.3 cm on R 51). The left paw goes
@@ -339,25 +342,6 @@ passes.
       recast folds 10 faces of the left arm (limit 8), and the snare drum recast twists the left
       forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
       bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
-- [ ] Cat with the neutral bind: the straight bind (L 106, R 47) folds the inner right elbow of
-      the violist (folds p95 R 8, base 2, margin 2). The cat has 4 `raise` shapes
-      (`STUDIO_RAISES`). The third left shape (the lift) can go: the left gate lines stay at the
-      base, and the 2x crops do not change. Only faces 1560 and 1561 in front of the left arm root
-      then fold in 3% to 7% of the lift. A shape of the bent right elbow in that slot failed in
-      six tries. With `below` 0.3, it turns over 4 faces of the right arm root (R 6). With
-      `below` 0, the fold moves to the next faces of the elbow ring (R 8). A rule that turns 10°
-      further (`raise-fit --further`) gives R 5, and 6 faces stay turned over in its pose. A
-      further turn of 20° with a smooth of the posed tube from `upper_arm_seg1` (`smooth`,
-      `smoothBones`) clears the elbow (R 2), but faces 725 and 726 of the trunk in front of the
-      right arm root then fold in 84% and 100% of the play, and 11 faces stay turned over in the
-      pose of the rule. A smooth of the elbow segments alone (`upper_arm_seg2` to
-      `forearm_seg1`, 5 or 10 rounds, a turn of 15° or 20°) gives the same result (R 2, spine1
-      folds +56%, face 726 in 100% of the play). The relax of 60 rounds moves corners 355 and
-      356 of face 726 (weights on `upper_arm_seg1_R` and `upper_arm_seg2_R`) by up to 9.8 mm.
-      With no relax (`below` -1, 5 or 10 rounds), the smooth turns over faces 689, 690, and 691
-      of the trunk in the pose of the rule, and the fold moves to faces 518 to 521 of the upper
-      arm (91% of the play, R 8). The cat keeps its bent bind (`reports/2026-11-02-cat-neutral/`,
-      `reports/2026-11-02-cat-bend/`). The open choice: a fifth shape (`STUDIO_RAISES`).
 - [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
       side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
       skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
@@ -420,8 +404,8 @@ passes.
       but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
       ring, then replace the species scripts one at a time after a review of the crops.
 - [ ] Arm rebuild: `arm_rebuild.py` has no cut along the seam with a side wall (`cat_arms.py`),
-      so an arm joined to the trunk down to the elbow (the fox, the cat, the hippo, and the deer)
-      keeps its species script.
+      so an arm joined to the trunk down to the elbow (the fox and the deer) keeps
+      its species script.
 - [ ] Mesh intake: `pnpm mesh-intake` puts the shoulder line of the dog at 0.50 of the upper arm,
       at its limit, but the arm of `dog.glb` joins the trunk down to 0.80 (the `README.md` of the
       dog). The rays from the bone do not see the seam faces outside the arm. Count the faces
