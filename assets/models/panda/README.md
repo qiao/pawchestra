@@ -1,16 +1,23 @@
 # Panda model
 
-This folder holds the source mesh of the panda and its rigged copy. The app does not serve these
-files. It loads the module `src/models/studio/panda.ts`, which this chain writes:
+This folder holds the source mesh of the panda, a copy with rebuilt arms and its weights, and the
+rigged copy. The app does not serve these files. It loads the module `src/models/studio/panda.ts`,
+which this chain writes:
 
 ```text
-panda.glb                      source mesh
-   │  pnpm rig-mesh panda      config tools/mesh-rigs/panda.json
+panda.glb                            source mesh
+   │  tools/blender/panda_edit.py    arms free of the trunk
    v
-panda.rig.glb                  rigged mesh
+panda-edit.glb                       not in git (below)
+   │  tools/blender/arm_rebuild.py   rebuilt arms and painted weights
+   v
+panda-arms.glb + panda-weights.json  `source` and `paintedWeights` of tools/mesh-rigs/panda.json
+   │  pnpm rig-mesh panda
+   v
+panda.rig.glb                        rigged mesh
    │  pnpm studio-body panda
    v
-src/models/studio/panda.ts     studio body of the app
+src/models/studio/panda.ts           studio body of the app
 ```
 
 `docs/agents/rigging.md` gives the steps of the chain.
@@ -20,6 +27,9 @@ src/models/studio/panda.ts     studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `panda.glb` | Source mesh (below) | None |
+| `panda-edit.glb` | Copy with the arms free of the trunk, not in git. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/panda_edit.py -- assets/models/panda/panda-edit.glb` |
+| `panda-arms.glb` | `panda-edit.glb` with rebuilt arms 1.497 times as long. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.497` |
+| `panda-weights.json` | Weights of the same Blender run. License as `panda.glb` | The same run |
 | `panda.rig.glb` | Output of the rig. License as `panda.glb` | `pnpm rig-mesh panda` |
 
 ## panda.glb
@@ -56,3 +66,36 @@ at y = 0, +z forward, and +x the left side of the animal. The mesh faces +z, wit
 - The small round ears stand on the top of the head, from y 0.90 to 1.0, beside the top of the
   skull.
 - The short round tail is a ball at the back, from z -0.19 to -0.238 and from y 0.22 to 0.33.
+
+## panda-edit.glb
+
+The upper arm of `panda.glb` joins the side of the trunk down to the elbow, so `arm_rebuild.py`
+finds no free section of it. `tools/blender/panda_edit.py` frees each arm in this copy:
+
+- It splits the crease of each arm (`SEAMS`), turns the arm out 10° about the forward axis
+  through the shoulder joint, and shifts it 0.018 units out and up, with a ramp along the upper
+  arm. The arm now hangs 31.2° below the horizontal.
+- It closes the inner side of each arm with a grid of quads, and the trunk with a side wall, as
+  `cat_arms.py` does for the cat. It smooths the pockets of the trunk that the arm hid.
+- The new faces take the fur colors beside them. The rest of the mesh stays.
+
+`pnpm mesh-intake` on the copy passes the pose, the arm free, and the gap lines. Only
+`arm_rebuild.py` reads the copy, and a run gives the same bytes, so git keeps no copy of it
+(`.gitignore`). Write it before a rebuild of the arms.
+
+| Item | Value |
+|---|---|
+| Size | 12,113,876 bytes |
+| SHA-256 | `d51c42d3385947dd1f9927a2aa4d90b4eca067dab3f19e96ccf38fba444eb94b` |
+
+## panda-arms.glb and panda-weights.json
+
+`tools/blender/arm_rebuild.py` rebuilds the arms of `panda-edit.glb` with quad tubes, 1.497 times
+as long as the mesh (`--factor 1.497`), and writes the Blender weights of the arms. The shoulder
+line lies at 0.25 of the upper arm. A run gives the same bytes. The round arm is 9.3 cm from the
+bone to its inner side, so the holds keep the elbows away from the trunk (design 5.3).
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `panda-arms.glb` | 821,148 bytes | `91f7246c55d2863ec414ddb825844f328320d87f1d056fa5b64ce4285b2e5a1a` |
+| `panda-weights.json` | 439,232 bytes | `4cd2116637468398f7d697046f0822f3f987fe70c3f4cfbece5f04515e84740b` |
