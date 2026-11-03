@@ -124,14 +124,6 @@ passes.
       the play, below the limit 0.44 of `pnpm arm-look`.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
-- [ ] Hippo: the T-pose mesh `hippo-tpose.glb` rigs with clean rebuilt arms (`arm_rebuild.py`,
-      factor 1, reach 0.495 m against 0.539 m) and the role-neutral bind, but two tries of the
-      bassist failed, so the current mesh stays. The thicker left forearm goes 1.9 cm into the
-      neck in the play and 2.0 cm in the lowering (current 1.4 cm and 1.1 cm). Three to four
-      faces of the right shoulder fold in the bow reach (current 1). The bow frog shows on the
-      back of the right paw (`bowGrip`). The rest upper arms improve (2.2 cm, current 5.1 cm).
-      The try config and images are in `reports/2026-11-03-hippo-new/`. Ask the user: accept
-      the trade, or fit a new contrabass hold for this body.
 - [ ] Polar bear pianist: the arms go up to about 8 cm into the belly in the play (accepted 4 cm).
       Try the elbow poles (`HANDS_HOLDS.piano`) further out, with the arm gate.
 - [ ] Polar bear pianist: from the front, the open lid hides the bear and its paws.
@@ -274,8 +266,7 @@ passes.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
-- [ ] Hippo: the nose tip lies on a nostril 2.8 cm from the middle plane, and the rig checks warn. A
-      tip on the plane moves the jaw of the rig 3.0 cm up.
+- [ ] Hippo: the nose tip lies on a nostril 2.7 cm from the middle plane, and the rig checks warn.
 - [ ] Mouse: in the front view, the pea eyes lean in at the top, because the surface under them
       faces more up. Try a direction between the two.
 - [ ] Hippo bassist: at rest, the stick goes through the middle of the round paw, and the frog end
@@ -335,12 +326,10 @@ passes.
       of the dog right shoulder line still turn over at rest (`rigidPainted` fixes them). A snap
       of such a vertex onto the plane changes the bytes of the monkey, whose wrist planes pass
       0.11 mm and 0.19 mm from a vertex.
-- [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
-      only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
-      the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
-      right arm and `bindSmooth` keep their rules from the bent bind: the forearm turn of a rule
-      counts from the bind forearm, so the rest shape now relaxes a nearly straight elbow. The
-      bow paw bends 46° off its bind skin to keep its place (paw swing p95 48°, limit 70°).
+- [ ] Hippo with the T-pose body: each recast cell of the cast matrix fails, as on `831beea4`. The
+      left arm folds 10 to 13 faces (limit 8) in the violin, the clarinet, the trumpet, and the
+      snare drum, and the right arm 18 in the cello. The flute recast turns the left paw
+      17,953°/s in a move. The own role passes.
 - [ ] Fox with the neutral bind: the bent right elbow ring is 3.21 cm in place of 4.01 cm on the
       red fox violinist (20%), and 3.88 cm in place of 4.33 cm on the tan fox flutist. The 2x crops
       show no pinch. The left forearm goes 0.2 cm deeper into the violin at rest, and the left paw
@@ -617,8 +606,6 @@ scene of each demo has its seats and stage size with no overlap.
       right forearm goes 4.2 cm into the rim of the upper bout. Try a path around the rim.
 - [ ] Hippo bassist: the top edge of the upper bout touches the chest under the chin, and a few
       teeth of the skin show over it in a close view from the front.
-- [ ] Hippo face: the brow ridge of the mesh shades a crease above each pea eye, which can read
-      stern in a close front view. Show the user the face, and offer a face rule.
 - [ ] Held instruments over 2 cm in the body: the pig hornist, the rhino tubist, the red fox, the
       rabbit, and the cat. Fit each hold, or accept the depth with its reason.
 - [ ] Merge gate: it runs no clearance sweep. Add the pair "instrument in body" of each held role to
