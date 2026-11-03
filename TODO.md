@@ -252,6 +252,18 @@ passes.
       dark line under the forearm near the elbow from the front at the frog.
 - [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
       frog.
+- [ ] Rabbit T-pose body: the side of the trunk under each arm looks cut in. The side gap of `pnpm
+      trunk-form violinist --to 0.9` in the play is 3.38 cm (left) and 6.57 cm (right), against
+      2.04 and 0.72 cm on the A-pose rabbit. The painted weights give that side no trunk weight,
+      so the raised arm pulls it out. Fix it in the shared chain, then on the panda and the cat.
+- [ ] Rabbit T-pose body: the seated thigh is 0.70 of its length across and 0.67 up after
+      `legGirth` 1.6 (A-pose rabbit 0.78 to 0.89 and 0.97). The back of the thigh keeps its place
+      on the seat, so the thigh grows up only on its top. Check a larger factor with the depths.
+- [ ] Rabbit T-pose body: after `eyeFill`, a thin light lip stays at the front of each eye from the
+      side, and the right eye bone lies 1.2 cm nearer the middle than the left one.
+- [ ] `pnpm rig-mesh --check`: the standing body against the source counts the form rules that
+      move the source on purpose (`eyeFill`, `legGirth`), so the rabbit is 19 mm above the limit.
+      Leave out the moved vertices.
 - [ ] Bowed strings: the left elbow points to the side under the instrument, and the upper arm turns
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
