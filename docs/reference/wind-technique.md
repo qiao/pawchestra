@@ -435,7 +435,8 @@ The app follows these facts:
 - **The bassoon (3, `BEAVER_BASSOON`).** The bassoon lies diagonal from the right hip up past the
   left shoulder, with the bell above the head (`BEAVER_PLAY`, `bassoonParts()`). The left paw is
   high on the wing joint, and the right paw low on the boot joint. The bocal is near the level at
-  the reed, and the reed is under the front teeth (`lipShift`).
+  the reed, and the reed is under the front teeth (`lipShift`). The elbows stay a little away from
+  the body (`poleL`, `poleR`), so that the round free arms stay out of the belly (design 5.3).
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body
   (`fingering`). The horn lies across the body, with the bell at the right of the torso and in
   front of it, off the leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The valves
@@ -480,9 +481,9 @@ The app does not follow these facts:
   an upright clarinet has no room on the seat, and on the right knee the left forearm goes into
   the belly.
 - **The bassoon (3).** The app has no strap. The beaver plays a smaller bassoon
-  (`SpeciesParams.bassoonScale`), so that it keeps its arms. No source gives the elbows: the
-  elbows of `poleL` and `poleR` give the smallest twist of the left forearm. No source gives the
-  rest: the bassoon moves off the mouth, with both paws on their grips (`BEAVER_REST`).
+  (`SpeciesParams.bassoonScale`), so that it keeps its arms. No source gives the angle of the
+  elbows: each elbow points as far out as the paw keeps its grip. No source gives the rest: the
+  bassoon moves off the mouth, with both paws on their grips (`BEAVER_REST`).
 - **The right hand in the horn (2.2).** The right paw stays on the axis of the bell, inside its
   opening (`HORN_PALM_DEPTH`), in place of against the bell wall at 2 o'clock. A deeper paw puts
   the wrist through the bell wall.
