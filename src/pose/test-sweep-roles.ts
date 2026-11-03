@@ -160,6 +160,12 @@ const DEER_BODY_LOOPS = 3;
  */
 const PIG_BODY_LOOPS = 0;
 
+/**
+ * The open loops of {@link BODY_BONES} of the T-pose panda mesh: the roots of the two upper arms,
+ * and one open edge pair of 0.8 cm at the left side of the nose, which the source mesh has.
+ */
+const PANDA_BODY_LOOPS = 3;
+
 /** The parts of the two arms that move in the sweep of a role. */
 const ARM_PARTS: readonly SweepPart[] = [
   { name: 'paws', bones: ['handL', 'handR'] },
@@ -381,6 +387,17 @@ function deerBodySurface(posed: PosedSkeleton): ClosedSurface {
  */
 function pigBodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, PIG_BODY_LOOPS);
+}
+
+/**
+ * The closed surface of the body of the T-pose panda mesh: {@link BODY_BONES} with a cap on each
+ * open loop ({@link PANDA_BODY_LOOPS}).
+ *
+ * @param posed The posed skeleton.
+ * @returns The surface.
+ */
+function pandaBodySurface(posed: PosedSkeleton): ClosedSurface {
+  return closedPart(posed, BODY_BONES, PANDA_BODY_LOOPS);
 }
 
 /** The seat of each player model, found one time for each model. */
@@ -1259,13 +1276,14 @@ function sweptTrombonist(scene: TestScene, index: number): boolean {
  * play start, in the rest pose before the first play, and in the lowering after the song end, with
  * the left palm on its grip and the right palm on the slide. The first
  * seated panda of each demo with trombones, and each standing panda soloist, play it. The body of
- * the panda mesh has no open edge, so its closed surface has the two cuts to the upper arms.
+ * the panda mesh has one small open edge pair, so its closed surface has a cap on it and on the
+ * roots of the two upper arms ({@link pandaBodySurface}).
  */
 const TROMBONIST_SWEEP: RoleSweep = {
   role: 'trombonist',
   parts: [...ARM_PARTS, INSTRUMENT_PART],
   obstacles: [
-    { name: 'body', surface: bodySurface },
+    { name: 'body', surface: pandaBodySurface },
     { name: 'trombone', surface: instrumentSurface },
   ],
   contact: CONTACT,
