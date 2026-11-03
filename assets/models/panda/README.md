@@ -93,22 +93,26 @@ shasum -a 256 assets/models/panda/panda-arms.glb assets/models/panda/panda-weigh
 
 | Item | Value |
 |---|---|
-| Size | 816,332 bytes |
-| SHA-256 | `0afdef67d919dcbb201dae71a724c67f6edea09665434bd2a319f06ddaa358c3` |
-| Mesh | 4,071 triangles (3,707 in `panda-arms.glb`), with the same 2 open edges and 1 edge with more than two faces |
+| Size | 815,864 bytes |
+| SHA-256 | `8cbcaf9969d7bebeb25cf10b8f67eab9ae5b90b001d827c1d8ee7cfdbc89fa0a` |
+| Mesh | 4,057 triangles (3,707 in `panda-arms.glb`), with the same 2 open edges and 1 edge with more than two faces |
 
 The faces of the head and the trunk are 2 cm to 5 cm across, and the rig gives each face one
-color. With no cut, each eye patch is a set of angular shards, and the lower edge of the band on
-the back is a saw line. `tools/blender/panda_edge.py` cuts the faces along the edge between the
-black and the white of the texture, in two regions: the eye patches, and the lower edge of the
-band on the back. It splits each face that the edge crosses at the middles of its edges one time,
-then splits each edge between a light and a dark vertex where the texture changes. The faces of
-the eye boxes keep their edges. Each new vertex lies on an old face: the largest distance of a
-vertex from the surface of `panda-arms.glb` is below 1e-7 units, and the area is the same. The rig
-takes the weights of `panda-arms.glb` (`weightSource` of the config), so the cut moves no weight.
+color. With no cut, each eye patch is a set of angular shards, and the lower edge of the band is a
+saw line. `tools/blender/panda_edge.py` cuts the faces along the edge between the black and the
+white of the texture, in two regions with their own settings (`REGIONS`). In the eye patches, it
+first splits each face that the edge crosses at the middles of its edges, so that each small patch
+keeps its oval. Along the lower edge of the band, on the front, the sides, and the back, it makes
+no such split, and a change near a corner goes through that corner, so that the new faces are few
+and large. Then it splits each edge between a light and a dark vertex where the texture changes.
+The faces of the eye boxes keep their edges. Each new vertex lies on an old face: the largest
+distance of a vertex from the surface of `panda-arms.glb` is below 1e-7 units, and the area is the
+same. The rig takes the weights of `panda-arms.glb` (`weightSource` of the config), so the cut
+moves no weight.
 
-The front and the sides of the band keep their faces. There the weights of the clavicles change
-much from corner to corner, and the small new faces turned over in the play of the trombonist.
+At the band, the weights of the clavicles change much from corner to corner. Small new faces of a
+middle split turned over in the play of the trombonist. The large new faces do not: the fold probe
+of the trombonist gives the same faces as with no cut on the front and the sides.
 
 A headless run gives the same bytes:
 
