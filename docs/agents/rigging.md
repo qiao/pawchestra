@@ -18,7 +18,7 @@ arm tubes, Blender weights, and arm segments.
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, a tail on the seat, a viola of `violaScale`. | `violist` |
-| dog | A copy with round inner arms (`dog-patch.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
+| dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, the role-neutral bind with elbow `raise` shapes, a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut on the head and the back (`panda_edge.py`), the role-neutral bind with a right elbow `raise` shape. | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind, a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
@@ -35,8 +35,8 @@ arm tubes, Blender weights, and arm segments.
 
 ## The asset chain
 
-Each body comes from a textured mesh with no skeleton. The tools rig it into the GLB format of a
-studio body, then pack it into a module that the app reads.
+The tools rig each textured mesh with no skeleton into a studio body GLB file, then pack it into
+a module of the app.
 
 ```text
  assets/models/<s>/<s>.glb (source mesh, unchanged)
@@ -164,8 +164,6 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 
 ## Traps
 
-Read the group of your work first.
-
 ### Paws and twist
 
 - The retarget turns each paw toward its forearm in the plane of the palm (`PAW_TURN`), up to 70°.
@@ -257,8 +255,8 @@ Read the group of your work first.
   the seam fixes them (`cut`). Give the caps the skin normals.
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. No measure
   sees it, so look at the sheets of `pnpm close-views audit`.
-- After a cut, the inner root of a bow arm swings into the chest. Give it a chest share
-  (`weights.armRoot`).
+- After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
+  share (`weights.armRoot`). For painted weights, turn the elbow out (design 5.3).
 - End a cut above the shoulder joint, else a black triangle shows on the back.
 - Flatten the inner side of a thick upper arm after the bake, never before it.
 - Cut a wrist parallel to the last ring, and give the band `rootNormals.wrist`.
