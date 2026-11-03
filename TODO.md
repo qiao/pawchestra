@@ -122,9 +122,19 @@ passes.
 - [ ] Panda: the eye margin of `panda_edge.py` (0.004) is near a limit. With 0, the cut faces in
       the left eye box grow the old eye of the rig, and its ring color makes a white hole in the
       patch. A change of the eye box or of the eye rules checks both patches.
-- [ ] Panda: the legs keep the length of the mesh (`legFactor` 1), so the seat is 0.181 m (0.278 m
-      with the leg factor 1.5 of the older body), and the panda sits low. Show the user the side
-      view, and ask for the leg factor.
+- [ ] Panda: the side under each arm root (the shoulder band, 0.8 to 0.9 of the trunk line) has
+      more clavicle and arm weight than trunk weight, so `pnpm trunk-form trombonist --to 0.9`
+      gives a gap of 8.9 and 10.4 cm in the play (old panda 3.0 and 1.6 cm). `weights.paintedBelow`
+      [0.58, 0.68] / 0.12 gives 4.7 and 5.3 cm in the play and 4.6 and 4.3 cm at rest, near half,
+      but the left arm folds 8 faces at rest (main 4, limit 8): the arm gate fails. A lower band
+      (0.5 to 0.62) made the gap deeper. Try the rule with a `raise` shape of the left arm at rest,
+      or a narrower band on the left side only.
+- [ ] Panda: the head is 1.212 H wide (old panda 1.128 H). `headFactor` 0.93 gives 1.128 H, but
+      the nose and the trombone move 3 cm back, and the right arm folds 4 faces at rest (main 1):
+      the arm gate fails (also with 0.96). Fit the trombone hold again with the smaller head.
+- [ ] Panda: the trunk from the hips to the neck is 1.41 H long (old panda 1.52 H), and the sit
+      lifts the lowest haunch up to 11 cm onto the seat top of the old chair. Check the haunch from
+      behind in the app view.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
       the user in a close play frame of the stage.
 - [ ] Beaver: the narrow axis of the middle of each upper arm is 0.35 to 0.40 of the wide axis in
