@@ -43,7 +43,11 @@
   "legFactorNote": "The legs keep the length of the mesh. Do not stretch the legs: change the chair.",
   "rootNormals": {
     "radius": 0.16,
-    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the normals of the skin with no crease angle (root_rim() of tools/blender/rig_mesh.py, studioNormals() of src/models/studio-normals.ts), as on the rhino. Thus the arm root shows no hard seam and no dark wedge."
+    "wrist": [
+      0.1,
+      0.025
+    ],
+    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the normals of the skin with no crease angle (root_rim() of tools/blender/rig_mesh.py, studioNormals() of src/models/studio-normals.ts), as on the rhino. Thus the arm root shows no hard seam and no dark wedge. The arm faces from 0.1 units before each wrist joint to 0.025 units past it take the same normals, as on the bear: the supinated bind paw (studio.bindSupination) twists the bind forearm of the rebuilt round arm, and with no such rule a dark saw-tooth line showed under the right wrist and a dark slit on the back of the right paw, at rest and at a note."
   },
   "joints": {
     "root": {
