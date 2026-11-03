@@ -466,9 +466,14 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
+- [ ] Panda with the free arms in the cast matrix: each recast cell fails on the upper arms in
+      the body (violin 6.0 cm, cello 5.5 cm, flute 3.6 cm, clarinet 8.4 cm, trumpet 8.0 cm) or the
+      forearms (snare drum 7.8 cm). The violin cell goes from `PASS` to `FAIL`. The shared holds
+      keep the elbows of joined arms near the trunk. Give the shared holds the rule of the free
+      round arms (5.3), and run the matrix for each body.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
-      the dog stays `OPEN`. The right paw of the panda (1.9 cm) and the left claws of the monkey
-      (1.8 cm) go into the cello in a few play samples. The cello of the foxes goes 5.0 cm into the
+      the dog stays `OPEN`. The left claws of the monkey (1.8 cm) go into the cello in a few play
+      samples. The cello of the foxes goes 5.0 cm into the
       body in the play, the forearms of the polar bear and the mannequin go up to 2.4 cm into the
       cello at rest and in the moves, and the upper arms of the cat and the pig go up to 4.0 cm into
       the body.
