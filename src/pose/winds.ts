@@ -903,7 +903,8 @@ function pigTurn(turns: HornTurns): Quat {
  * is 0.507 m from the left shoulder joint, beyond the arm of 0.385 m. The horn turns its lower end
  * 40° back toward the body and its right side 20° forward ({@link PIG_TURNS}). The left shoulder
  * turns 36° forward, as the shoulder blade of a real player slides forward. The left paw then has
- * 10.6 cm to spare, and the right paw 7.4 cm (`pnpm hold-reach pig --instrument horn`).
+ * 10.3 cm to spare with the moved grip (`gripShiftL`), and the right paw 7.4 cm
+ * (`pnpm hold-reach pig --instrument horn`).
  *
  * The left elbow points out and a little forward, and the right elbow out and down. The arms of
  * the body are round tubes free of the trunk, so the left elbow stays away from the side, as a horn
