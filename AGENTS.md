@@ -90,5 +90,6 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 | [`writing.md`](docs/agents/writing.md) | Simplified Technical English, the tells to avoid, the prose checks, the length limits, and TSDoc | before you write a doc, a comment, or a commit message |
 | [`code.md`](docs/agents/code.md) | the compiler options, the lint rules, and the code style | before you write TypeScript |
 | [`commands.md`](docs/agents/commands.md) | each command with its usage, its main options, its output, and its run time, and the steps of CI | before you run a tool that you do not know |
-| [`rigging.md`](docs/agents/rigging.md) | the bodies and their roles, the asset chain, the arm gate, the rebuild of the arms in Blender, the traps, and the brief of a rigging round | before work on a body, a rig, a role, a hold, or a seat |
+| [`rigging.md`](docs/agents/rigging.md) | the bodies and their roles, the asset chain, the arm gate, the rebuild of the arms in Blender, and the traps | before work on a body, a rig, a role, a hold, or a seat |
+| [`rig-rounds.md`](docs/agents/rig-rounds.md) | the brief of a rigging round, its rules, the common rules of the agents, and the docs checklist | before you brief or start a rigging round |
 | [`look-work.md`](docs/agents/look-work.md) | the loop of a round of the light, the colors, or the grade, the look override, and the traps of the look measures | before a round of the light, the colors, or the grade |
