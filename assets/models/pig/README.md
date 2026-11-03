@@ -1,14 +1,17 @@
 # Pig model
 
-This folder holds the source mesh of the pig, a copy with new upper arms, and the rigged copy. The
-app does not serve these files. It loads the module `src/models/studio/pig.ts`, which this chain
-writes:
+This folder holds the source mesh of the pig, a copy with new upper arms, a copy with rebuilt arms
+and its weights, and the rigged copy. The app does not serve these files. It loads the module
+`src/models/studio/pig.ts`, which this chain writes:
 
 ```text
 pig.glb                           source mesh
    │  tools/blender/pig_arms.py   new upper arms
    v
-pig-upper.glb                     source of the rig (`source` of tools/mesh-rigs/pig.json)
+pig-upper.glb                     `armSource` of tools/mesh-rigs/pig.json
+   │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
+   v
+pig-arms.glb + pig-weights.json   `source` and `paintedWeights` of tools/mesh-rigs/pig.json
    │  pnpm rig-mesh pig
    v
 pig.rig.glb                       rigged mesh
@@ -25,6 +28,8 @@ src/models/studio/pig.ts          studio body of the app
 |---|---|---|
 | `pig.glb` | Source mesh (below) | None |
 | `pig-upper.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
+| `pig-arms.glb` | `pig-upper.glb` with rebuilt arms 1.5 times as long. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- pig --factor 1.5` |
+| `pig-weights.json` | Weights of the same Blender run. License as `pig.glb` | The same run |
 | `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
 
 ## pig.glb
@@ -86,3 +91,15 @@ The script runs in the live Blender or in a batch run:
 blender -b --python tools/blender/pig_arms.py -- assets/models/pig/pig.glb assets/models/pig/pig-upper.glb
 shasum -a 256 assets/models/pig/*.glb
 ```
+
+## pig-arms.glb and pig-weights.json
+
+`tools/blender/arm_rebuild.py` rebuilds the arms of `pig-upper.glb` with quad tubes, 1.5 times as
+long as the mesh (`--factor 1.5`), and writes the Blender weights of the arms. The shoulder line
+lies at 0.55 of the upper arm. Each arm has 9 rings of 16 vertices, with 1 ring on the upper arm
+and 3 on the forearm between the joint rings. A run gives the same bytes.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `pig-arms.glb` | 965,548 bytes | `13450e613415d8bbcf3e2c4eaa9c9584019b7b2967f0a147fd44808758ebf4f6` |
+| `pig-weights.json` | 410,080 bytes | `9bea1248d22906b422644507a73a0426fd3742b7afe4d372b803ab19173f7f75` |
