@@ -252,10 +252,11 @@ passes.
       dark line under the forearm near the elbow from the front at the frog.
 - [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
       frog.
-- [ ] Rabbit T-pose body: the side of the trunk under each arm looks cut in. The side gap of `pnpm
-      trunk-form violinist --to 0.9` in the play is 3.38 cm (left) and 6.57 cm (right), against
-      2.04 and 0.72 cm on the A-pose rabbit. The painted weights give that side no trunk weight,
-      so the raised arm pulls it out. Fix it in the shared chain, then on the panda and the cat.
+- [ ] Rabbit T-pose body: the side gap of `pnpm trunk-form violinist --to 0.9` in the play is 1.61
+      cm (left) and 2.40 cm (right) after `weights.paintedBelow` (3.38 and 6.57 cm before, A-pose
+      rabbit 2.04 and 0.72 cm). In the lowering, the upper arms then go 2.1 cm into the body (1.5
+      cm before, bach-bwv1050 wall 13.5 s). Fit the lowering, or a higher lower height of the
+      rule. Then run the rule on the panda and the cat, which show the same fault.
 - [ ] Rabbit T-pose body: the seated thigh is 0.70 of its length across and 0.67 up after
       `legGirth` 1.6 (A-pose rabbit 0.78 to 0.89 and 0.97). The back of the thigh keeps its place
       on the seat, so the thigh grows up only on its top. Check a larger factor with the depths.
