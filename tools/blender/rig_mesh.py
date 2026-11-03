@@ -3,9 +3,8 @@
     blender -b --factory-startup --python tools/blender/rig_mesh.py -- <config.json> <out.glb> \
         [--preview <dir>] [--obj <file>] [--faces <file>] [--corners <file>] [--check]
 
-`pnpm rig-mesh <animal>` runs this script with `tools/mesh-rigs/<animal>.json`. The output has
-the format of `lowpoly-studio/animals/<animal>/out/<animal>.glb`, so that `pnpm studio-body`
-reads it ("The asset chain" of `docs/agents/rigging.md`). The steps:
+`pnpm rig-mesh <animal>` runs this script with `tools/mesh-rigs/<animal>.json`. `pnpm studio-body`
+reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
 
 1. Import the source GLB file, weld the corners, and scale the mesh to 1 unit from the soles to
    the top, with the soles at y = 0. The math uses the axes of the studio: y up, +z forward, and
