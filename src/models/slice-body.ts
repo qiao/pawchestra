@@ -117,14 +117,46 @@ function fillBins(radii: Float32Array): void {
 }
 
 /**
+ * Gives the radius of each angle bin of a slice as the support of its corners: the largest
+ * distance of a corner from the middle along the middle direction of the bin, at least 0. A slice
+ * with corners on one side only thus gets no radius on the other side. The fill of the empty bins
+ * ({@link fillBins}) gives a slice with one corner the radius of that corner all around: the top
+ * slices of the spine of the badger got 0.72 H in each bin.
+ *
+ * @param bins The bins of one slice to write.
+ * @param band The corners of the slice.
+ * @param mx The x of the middle.
+ * @param mz The z of the middle.
+ */
+function supportBins(bins: Float32Array, band: readonly Vec3[], mx: number, mz: number): void {
+  for (let b = 0; b < SLICE_BINS; b++) {
+    const angle = (2 * Math.PI * b) / SLICE_BINS;
+    const ux = Math.cos(angle);
+    const uz = Math.sin(angle);
+    let most = 0;
+    for (const [x, , z] of band) {
+      most = Math.max(most, (x - mx) * ux + (z - mz) * uz);
+    }
+    bins[b] = most;
+  }
+}
+
+/**
  * Makes the slices of one bone.
  *
  * @param bone The bone.
  * @param corners The corners of the bone in the bind pose.
  * @param h The head height.
+ * @param support True for the radii of {@link supportBins}, false for the largest distance of a
+ *   corner in each bin with the empty bins filled ({@link fillBins}).
  * @returns The part, or `null` for a bone with too few corners.
  */
-function bodyPart(bone: number, corners: readonly Vec3[], h: number): BodyPart | null {
+function bodyPart(
+  bone: number,
+  corners: readonly Vec3[],
+  h: number,
+  support: boolean,
+): BodyPart | null {
   if (corners.length < 4) {
     return null;
   }
@@ -145,6 +177,10 @@ function bodyPart(bone: number, corners: readonly Vec3[], h: number): BodyPart |
     const mz = band.length > 0 ? (Math.min(...zs) + Math.max(...zs)) / 2 : 0;
     middles.set([mx, mz], s * 2);
     const bins = radii.subarray(s * SLICE_BINS, (s + 1) * SLICE_BINS);
+    if (support) {
+      supportBins(bins, band, mx, mz);
+      continue;
+    }
     bins.fill(-1);
     for (const [x, , z] of band) {
       const turn = Math.atan2(z - mz, x - mx) / (2 * Math.PI);
@@ -177,13 +213,15 @@ function bodyPart(bone: number, corners: readonly Vec3[], h: number): BodyPart |
  *
  * @param mesh The mesh in the bind pose.
  * @param h The head height `H`, in meters.
+ * @param support True for the support slices of {@link supportBins}, which have no false radius
+ *   at the end of a part. The clip rule takes the filled slices of {@link fillBins}.
  * @returns The body.
  */
-export function sliceBody(mesh: MeshData, h: number): SliceBody {
+export function sliceBody(mesh: MeshData, h: number, support = false): SliceBody {
   const parts: BodyPart[] = [];
   for (const name of SLICE_BONES) {
     const bone = boneIndex(name);
-    const part = bodyPart(bone, boneCorners(mesh, bone), h);
+    const part = bodyPart(bone, boneCorners(mesh, bone), h, support);
     if (part) {
       parts.push(part);
     }
