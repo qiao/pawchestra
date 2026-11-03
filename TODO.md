@@ -234,12 +234,21 @@ passes.
 - [ ] Rabbit T-pose body (`rabbit-tpose.glb`): the first rig passed the arm gate, and failed the
       clearance sweep. Its arms are rebuilt 1.18 times longer (`arm_rebuild.py --factor 1.18`, the
       smallest factor at which the left paw reaches the nut of the violin of 0.83), with the bind
-      supination L 90 and R 43 and rigid armpit faces (`rigidPainted`). Against the A-pose body,
-      the right upper arm goes into the belly: 3.0 cm (0.7) at rest, 3.9 cm (1.6) in the lowering,
-      and 2.3 cm (1.5) in the play, and the violin 3.4 cm (1.9) into the body in the lift. The rest
-      arms of the shared violin hold (`restArms`) take the rest to 1.2 cm and the lowering to
-      2.7 cm. Next: keep the elbows out in the play and the moves (design 5.3, "Free round arms"),
-      or slimmer upper arms in the copy. The try files are in `scratch/tpose-body/` of the round.
+      supination L 90 and R 43 and rigid armpit faces (`rigidPainted`). A hold by the rule of
+      free round arms (design 5.3) clears the play, the lift, and the rest: `restArms` L 30° and
+      80°, R 20° and 60°, the left elbow out (`poleL` -1, -1, -0.5), the lift wrist 0.3 H to the
+      front (`liftReach`), and the right shoulder 40° forward (`reach`). On two demos, the upper
+      arms then go 1.3 cm (play), 1.1 cm (lift), and 0.8 cm (rest) into the body, and the
+      instrument at most 1.9 cm. The arm gate has no `FAIL`. In the lowering, the right upper arm
+      still goes 2.7 cm into the arm root and the belly (the A-pose body: 1.6 cm), and no rest
+      arm, rest grip, bow via, elbow pole, or shoulder turn changes it. The right shoulder turn
+      falls with the move weight while the bow arm still crosses the chest, so the next try is a
+      pose rule that keeps the shoulder turn until the arm leaves the chest. The try files are in
+      `scratch/hold-try/` of the round.
+- [ ] Rabbit T-pose body: a `colors.tone` step toward the cream of the fur swatch of
+      `rabbit-views.png` (Oklab -0.028, +0.003, +0.009) moves 3,744 fur faces, and the change is
+      small in the close views. A smooth box under the head made a hard shelf under the chin and
+      left the dark band, which is the shadow of the large head on the neck.
 - [ ] Rabbit violinist: the bow goes up to 2.5 cm into the arms in the lowering and 1.0 cm at rest,
       near the grip.
 - [ ] Rabbit violinist: the violin points 50° to the left, 5° more than a real player. A bow arm
