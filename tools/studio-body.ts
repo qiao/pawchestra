@@ -312,12 +312,15 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       glb: 'assets/models/dog/dog.rig.glb',
     },
   ],
-  // The trombone panda (design 4.4). It stands as a soloist.
+  // The trombone panda (design 4.4). It stands as a soloist. The standing shoulder joints are
+  // 1.026202 m high (0.9792 m with the legs of the mesh, and the rise of the longer legs), so that
+  // the body keeps 1.6052 m for each unit (`app` of the rig config). The panda sits on the chair of
+  // the panda of the A-pose mesh: the seat top is 0.277 m high, and the chair is 0.210 m deep.
   [
     'panda',
     {
       landmark: 'shoulders',
-      height: 0.9792,
+      height: 1.026202,
       seated: true,
       soloist: true,
       constant: 'STUDIO_PANDA',
