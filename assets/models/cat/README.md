@@ -28,6 +28,7 @@ src/models/studio/cat.ts           studio body of the app
 | `cat-arms.glb` | Copy of `cat.glb` with rebuilt arms and belly. License as `cat.glb` | `cat_arms.py` |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat.glb` | `cat_arms.py` |
 | `cat.rig.glb` | Output of the rig. License as `cat.glb` | `pnpm rig-mesh cat` |
+| `cat-tpose.glb` | New source mesh in a T-pose (below). No tool reads it yet | None |
 
 ## cat.glb
 
@@ -107,3 +108,36 @@ shasum -a 256 assets/models/cat/*.glb assets/models/cat/cat-weights.json
   the front of the arm root half of the way with the first segment of the upper arm (`follow`).
   In the shape of the play, the skin near the root front fills its valleys and moves no vertex in
   (`follow.fill`). A fourth shape does the same for the bow arm in the play.
+
+## cat-tpose.glb
+
+The new source mesh of the cat, in a T-pose: the arms are level and out to the sides, free of the
+trunk. The mesh has no skeleton.
+
+| Item | Value |
+|---|---|
+| Size | 16,839,588 bytes |
+| SHA-256 | `0880377af85b14e01dd5985e3a53a35f88b2fa2c5e8901505488b510e66f4210` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Khronos glTF Blender I/O v4.3.47 |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,110 triangles and 4,386 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+| Material | One material `BakedMaterial`, double-sided, with a base color PNG (11,083,837 bytes) and a metallic-roughness PNG (5,595,156 bytes), each of 4096 × 4096 pixels |
+
+The values below are in the units of the studio: 1 unit from the soles to the tips of the ears,
+the soles at y = 0, +z forward, and +x the left side of the animal. The mesh faces +z. The weld is
+at 1e-5.
+
+- The weld gives 1,565 vertices in one connected part. 23 open edges and 21 edges with more than
+  two faces remain. 213 faces have a corner angle below 10°.
+- The box is x -0.475 to 0.474, y 0 to 1, and z -0.267 to 0.252. The cat is 1.9017 units of the
+  file high from the soles to the tips of the ears. The top of the skull is at y 0.914.
+- The cat stands upright on short legs, with the crotch at y 0.145. The trunk is narrow: 0.21 units
+  wide at the waist (y 0.5). The cream belly goes from the chin to the crotch.
+- The arms are level at y 0.598 and free of the trunk from x 0.13 out. The white paw starts at
+  x 0.35, and each paw ends at x 0.474, with the pink pads and claws under it, so the palm faces
+  down.
+- The eyes are dark faces of the head surface at y 0.80 and z 0.20, with no shells. The pink nose
+  is at y 0.75 and z 0.25. Thin whiskers stand out from the muzzle.
+- The long tail hangs from the back of the haunch (y 0.26, z -0.06) down to y 0.09 behind the
+  legs, and curls up behind to y 0.25 at z -0.27.
