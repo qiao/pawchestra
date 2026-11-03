@@ -93,10 +93,11 @@ arm root.
 
 | Item | Value |
 |---|---|
-| Size | 512,000 bytes |
-| SHA-256 | `fe9f7f42c97c6c677ac7beeb08d4a311a2c67e59d271adcd4612936104d6bb63` |
+| Size | 511,920 bytes |
+| SHA-256 | `bc875f2e89e12f8126be4bff292915716e6d3781bd1e96d0d18d5c4583ee65b3` |
 | Bind | The role-neutral bind (design 4.4): the rebuilt arms straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Colors | The plain fur moves toward the cream of the fur swatch of `docs/reference/rabbit-views.png` (`colors.tone`) |
+| Armpits | The trunk under each arm root takes a part of the painted arm weights (`weights.paintedBelow`), so that a raised arm does not pull the side out |
 | Thighs | 1.6 times wider across their axes before the skin, up and to the sides (`legGirth`), because the leg factor makes the thin thighs of the mesh long |
 | Shapes | The arm-down shape of each arm, and the straight legs of each side |
 

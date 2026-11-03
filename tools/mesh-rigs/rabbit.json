@@ -322,6 +322,7 @@
   },
   "weights": {
     "armSplit": 0.09,
+    "paintedBelow": { "height": [0.4, 0.52], "inner": 0.105, "note": "The weights of Blender gave the side of the trunk under each arm root only the clavicle and the arm, so the raised bow arm pulled the side up and out: the side gap of pnpm trunk-form violinist --to 0.9 was 3.4 and 6.6 cm in the play. Below y 0.52, a part of the clavicle and arm weight within 0.105 u of the middle plane goes to the trunk, all of it at y 0.4 (painted_below() of tools/blender/rig_mesh.py)." },
     "headFrom": 0.56,
     "earBase": [
       0.75,
