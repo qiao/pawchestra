@@ -184,7 +184,10 @@ from the first position (derived).
   erect and the thighs down [16].
 - The abdominal muscles work less on a flat or a downward sloping seat than in standing [16]. In
   [17], they worked at about 2/3 of the level of standing, and the players preferred to stand.
-- The arms stay away from the rib cage, so that the rib cage can expand [1].
+- The arms stay away from the rib cage, so that the rib cage can expand [1]. In a neutral
+  position, "the upper arm should be comfortably away from the torso of the body", and "there
+  should be space between the elbows and the musician's sides" [1]. Arms "close to parallel to the
+  ground" and arms that "collapse against their rib cages" are faults of beginners [1].
 
 ## 2. Trumpet, horn, oboe, and flute
 
@@ -356,7 +359,12 @@ The app follows these facts:
   the mouthpiece brace (`faceTube`, `gripShiftL`). The right paw holds the low part of the upright
   slide brace from the right, with the palm to the left and a little toward the player, and the
   thumb up the brace (`gripShiftR`, `aimSide`). Both paws keep this hold at rest (`restAim`).
-- **The left arm (1.1).** The left elbow points down and forward (`reachL`, `poleL`).
+- **The left arm (1.1).** The left elbow points down, forward, and a little out (`reachL`,
+  `poleL`).
+- **The elbows (1.8).** The elbows stay away from the sides. Each elbow turns out about the line
+  from the shoulder joint to the grip (`poleL`, `poleR`), and the left shoulder turns forward
+  (`reachL`), so that the free round arms stay out of the trunk (design 5.3). At rest, the
+  elbows point out and stay below the shoulders (`restPoleL`, `restPoleR`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with
@@ -375,11 +383,13 @@ The app does not follow these facts:
   travel.
 - **The slide reach (1.2).** The slide travel is a small part of the real travel, with the right
   arm straight at the seventh position (`slideReachOf()`). The paw at the far side of the brace
-  keeps the palm off the audience, and costs a part of the reach.
+  keeps the palm off the audience, and costs a part of the reach. The right grip lies high on the
+  brace, so that the right upper arm stays off the belly, and costs another part (`gripShiftR`).
 - **The alternate positions (1.3).** The app has none.
 - **The arm (1.4).** The two-bone IK moves the elbow most, with no lead of the wrist (`armRig()`).
-- **The rest place (1.7).** No source gives it. The slide hangs down in front, with both paws on
-  their grips (`rest`, `restShift` of `WIND_HOLDS.trombone`, design 5.2).
+- **The rest place (1.7).** No source gives it. The trombone stays at the grips of the play, off
+  the mouth, with the slide turned down in front (`rest`, `restShift` of `PANDA_TROMBONE`, design
+  5.2).
 
 ### 4.2 The other winds
 
