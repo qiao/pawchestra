@@ -1110,7 +1110,9 @@ const CAT_HOLD = {
  * 0.06 m right of the middle and 0.66 m in front of the floor point of the seat. It leans 14° to
  * the left, and its top plate turns 6° to the right. It keeps this place in the rest pose
  * (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the knees do not
- * touch the cello. The left paw keeps the tilt of the low positions in the high positions.
+ * touch the cello. In the high positions, the left paw tilts further over the neck, as in
+ * {@link CELLO_HOLD}: with the tilt of the low positions, the round left forearm goes 3.3 cm into
+ * the body of the cello.
  *
  * The rebuilt arms of the dog are round tubes with their full inner half width (design 5.3, "Free
  * round arms"), so the elbows keep away from the sides, as a cellist starts a stroke open at the
@@ -1119,7 +1121,11 @@ const CAT_HOLD = {
  * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
  *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
  *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
- *   its accepted grip (4° on the old body).
+ *   its accepted grip (4° on the old body). The right shoulder turns 25° forward (`reach`): with
+ *   30°, the right upper arm goes 1.8 cm into the chest in a stroke of `bach-bwv1050`.
+ * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
+ *   out and a little down, (2.5, -0.5, -0.3): with the pluck of {@link CELLO_HOLD}, the right upper
+ *   arm goes 3.0 cm into the chest.
  * - At rest, the bow grip lies 0.5 H out, 0.35 H up, and 0.2 H forward from the thigh at 0.9 of the
  *   way to the knee, lower and further out than {@link LAP_CELLO_BOW}, with the elbow out, back,
  *   and down, (1.2, -1, 0.75): with the grip and the elbow of {@link LAP_CELLO_BOW}, the right
@@ -1133,9 +1139,11 @@ const DOG_HOLD = {
   ...CELLO_HOLD,
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
-  highTilt: 0,
+  reach: 25 * MathUtils.DEG2RAD,
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
+  polePizzicato: [2.5, -0.5, -0.3],
+  pluckSide: 0.25,
   restPoleR: [1.2, -1, 0.75],
   restPoleL: [-2, -1, 0],
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
