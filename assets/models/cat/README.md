@@ -70,8 +70,9 @@ shoulder line lies at 0.25 of the upper arm, and the wrist cut at 0.1 of the paw
 rings of 16 vertices. The rings of each elbow lie 0.035 units from the elbow joint (`--spec`), and
 the elbow helper is 0.07 units, twice that gap: with the gap of 0.0216 units that the script
 chooses, the inner faces of each elbow turned over in each pose of the play and the rest. The
-faces of the paws, the trunk, the legs, the tail, and the head are the faces of the source. A run
-gives the same bytes:
+faces of the paws, the trunk, the legs, the tail, and the head are the faces of the source. The
+points of `cat-weights.json` are the places after the `soften` of the brow in the config, so that
+the painted weights find each softened vertex. A run gives the same bytes:
 
 ```bash
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"gap": 0.035}'
@@ -80,15 +81,15 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 | File | Size | SHA-256 |
 |---|---|---|
 | `cat-arms.glb` | 1,117,708 bytes | `534753ea563f0e71e438485a3b481535c26406b04571733aaf316f062f1cb6e2` |
-| `cat-weights.json` | 443,443 bytes | `43c269c0e67de717f3637d84dfd22533fb7790118eb6596d7ca6cd889797a963` |
+| `cat-weights.json` | 443,441 bytes | `02b0339c3aec91562a2f2f116c9926b79bade46a9b595ce3fc5d1de12edfb948` |
 
 ## cat.rig.glb
 
 | Item | Value |
 |---|---|
-| Size | 819,884 bytes |
-| SHA-256 | `62500536155de8e0318c332ca1c98dc1bddc7d147d345fa19c0058554d7c0c7d` |
-| Form | The thigh 1.6 and the shin 2.4 times as long as on the source, and the thigh 1.25 times as thick (`legFactor`, `shinFactor`, `legGirth`), so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.298 m high, 0.46 m wide, and 0.343 m deep. The head and the ears are 0.85 times as large, around the neck joint (`headFactor`), so that the head is as wide for its height as the head of that cat |
+| Size | 824,784 bytes |
+| SHA-256 | `5edbdec6e4dc09144baaf6af78cb8906e5612890e1f1dc4b6fdc8a3bd95e202c` |
+| Form | The thigh 1.6 and the shin 2.4 times as long as on the source, and the thigh 1.25 times as thick (`legFactor`, `shinFactor`, `legGirth`), so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.298 m high, 0.46 m wide, and 0.343 m deep. The trunk from the hips joint to the chest joint is 0.6 times as long (`trunkFactor`, `trunkTop`), so that the trunk from the hips joint to the neck joint is 1.61 H (that cat 1.49 H). The head and the ears are 0.85 times as large, around the neck joint (`headFactor`), so that the head is as wide for its height as the head of that cat. The sharp edges of the brow are softened (`soften`), so that the brow does not read as worried |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
 | Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes: the bent left elbow at rest (two), the bow arm in the play, and the bent right elbow at rest |
