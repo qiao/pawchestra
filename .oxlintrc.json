@@ -61,7 +61,6 @@
     "**/dist",
     "**/node_modules",
     "docs/**",
-    "lowpoly-studio/**",
     "tools/oxlint/anti-slop/**",
     ".agent/**",
     ".agents/**",
