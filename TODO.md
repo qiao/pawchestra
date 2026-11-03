@@ -557,14 +557,18 @@ scene of each demo has its seats and stage size with no overlap.
       5 and F4 in 4 or 6 (wind-technique 1.3).
 - [ ] Double horn: advanced players use the B♭ side above the written G4. The app has a single F
       horn. The B♭ side needs a thumb valve and a second fundamental, B♭1 (wind-technique 2.2).
-- [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view, and face 467
-      at the front of the right shoulder folds in 2% of the lift. Show the user the front view.
-- [ ] Panda trombonist: the arm reaches about 0.1 m of the slide, 18% of a real seventh position,
-      and a larger right shoulder turn folds the shoulder. Show the user slide angles of 45° and 60°.
+- [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view. Show the
+      user the front view.
+- [ ] Panda trombonist: the arm reaches 0.095 m of the slide, 17% of a real seventh position. A
+      larger right shoulder turn puts the right upper arm into the belly, and the grip 0.05 H up the
+      brace keeps it off the belly. Show the user slide angles of 45° and 60°.
+- [ ] Panda trombonist: the elbows out use most of the margin of the grip turn (left 16, right 14,
+      margin 15 over 2 and 1). Show the user the 2x paw crops of the play and the rest, and ask to
+      accept the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
+- [ ] Panda trombonist: at rest, the left paw bends 65° to the side (paw swing, limit 70) with the
+      elbow out. Check the left wrist in the 2x crops of the rest.
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
-- [ ] Panda trombonist: at rest, the left finger tips stand 0.7 cm from the slide tubes (limit 0.6
-      cm). Give each paw a rest aim.
 - [ ] Hippo bassist: the upper arms go up to 6 cm into the body and 4.7 cm into the contrabass. The
       hidden inner side of the arm tube counts. Measure the visible surface only.
 - [ ] Hippo bassist: the left forearm goes 2.1 cm into the neck in 0.1% of the play, and a light
