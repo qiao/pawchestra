@@ -1,8 +1,0 @@
-{
-  "source": "assets/models/panda/panda.glb",
-  "output": "assets/models/panda/panda-roots.glb",
-  "weld": 1e-05,
-  "metersPerUnit": 1.5154,
-  "note": "The edit of the panda arm roots. A hull fill of the 7 front lips of the left notch (454, 450, 452, 787, 460, 451, 458) does not give a clean root, so the list has no edit and the rig reads panda.glb.",
-  "edits": []
-}
