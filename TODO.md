@@ -653,8 +653,11 @@ scene of each demo has its seats and stage size with no overlap.
       `bach-bwv1050`.
 - [ ] Rhino: the shoulders widen the footprint, and the conductor pose of `boulanger-matin` changes
       from 257.38 s. Check that the cue of the conductor still aims at the tuba.
-- [ ] Body probe: a change of the panda rig changes 18 pose sets of other players at the start of
-      `brahms-2` and `beethoven-9`. Find the shared input that the panda rig moves.
+- [ ] Body probe: a change of the panda rig changes the pose sets of other players (38 sets of the
+      hippo, the elephant, the badger, and the conductor with the free arms). The layout packs the
+      seats of a row by the footprints (`playerFootprint()`), so the 0.7 cm narrower panda moves 9
+      seats up to 0.32 cm, and their looks and cues change. Give the probe a seat mark, so that a
+      body change shows the moved seats apart from a pose change.
 - [ ] Tan fox flutist: the grips of the play and the rest lie on two sides of the flute, so the
       right paw turns around the tube in the lift (`gripAround`). Show the user the 2x crops.
 - [ ] Pig hornist: two faces of the right hoof fold at rest and in 27% of the lift, because a body
