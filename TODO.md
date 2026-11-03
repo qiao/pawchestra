@@ -290,8 +290,11 @@ passes.
       The middle of the left forearm then goes 2.7 cm into the belly in the play (base 1.2 cm,
       limit 1.5 cm), and 2.1 cm on the old bind. An elbow ring gap of 0.0125 gave 2.5 cm, and a
       gap of 0.04 folded 28 faces of the left arm. Move the left forearm of the horn hold off the
-      belly, then rebuild (`reports/2026-11-02-rebuild-a/pig/`). The trunk of the rebuilt body
-      has no open loop, so the hornist sweep then needs a body surface with no cap.
+      belly with the rule of the free panda arms (design 5.3, "Free round arms"): turn the left
+      elbow out about the line from the shoulder to the grip, bend it with a nearer grip, and keep
+      the grip turn within its margin. Then rebuild (`reports/2026-11-02-rebuild-a/pig/`). The
+      trunk of the rebuilt body has no open loop, so the hornist sweep then needs a body surface
+      with no cap.
 - [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
       tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
       cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
