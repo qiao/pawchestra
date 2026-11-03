@@ -252,6 +252,9 @@ passes.
       the pair an accepted depth, and fix the dark facets on the shoulders.
 - [ ] Remove the unused high stool (`HIGH_STOOL` and the support `high-stool` of `props.ts`). No
       player sits on it.
+- [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
+      `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
+      body uses it, because the pig now has arm segments.
 - [ ] Hippo: the nose tip lies on a nostril 2.8 cm from the middle plane, and the rig checks warn. A
       tip on the plane moves the jaw of the rig 3.0 cm up.
 - [ ] Mouse: in the front view, the pea eyes lean in at the top, because the surface under them
