@@ -248,8 +248,10 @@ passes.
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
       shafts down. A real timpanist holds them one inch above the head with a level shaft.
-- [ ] Pig hornist: the dome of each upper arm lies inside the shoulder (4.2 cm in the sweep). Give
-      the pair an accepted depth, and fix the dark facets on the shoulders.
+- [ ] Pig hornist: the dome of each upper arm lies inside the shoulder (3.9 cm in the sweep, at the
+      shoulder joint), and the free upper arm from 0.25 of the bone stays at most 1.3 cm in the
+      body. The same pair fails each recast role of the pig in the cast matrix (4.5 cm to 6.4 cm).
+      Give the pair an accepted depth, and fix the dark facets on the shoulders.
 - [ ] Remove the unused high stool (`HIGH_STOOL` and the support `high-stool` of `props.ts`). No
       player sits on it.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
