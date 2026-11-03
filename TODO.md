@@ -213,8 +213,8 @@ passes.
 - [ ] Cat tail: 4 faces stay turned over against the bone turn after the bind. No image shows them.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
-- [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, the
-      hornist, and the oboist twist the left paw near 170°. Try `studio.bindSupination`.
+- [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
+      oboist twist the left paw near 170°. Try `studio.bindSupination`.
 - [ ] Red fox and tan fox: at rest, the crook of the right elbow keeps a soft fold, because the
       linear blend pinches the bent inner elbow. A dual quaternion bind folds the bow arm.
 - [ ] Red fox and tan fox: thin dark V lines on the white chest are splits of the normals of the fur
@@ -283,8 +283,8 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, and the panda
-      have it. Then the body with arm segments and a bent `bindArms`: the cat.
+      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, and
+      the pig have it. Then the body with arm segments and a bent `bindArms`: the cat.
 - [ ] Pig with rebuilt arms: `arm_rebuild.py pig --factor 1.5` on the copy with new upper arms
       gives round arm tubes, and the hornist gate passes with the role-neutral bind (L 102, R 51).
       The middle of the left forearm then goes 2.7 cm into the belly in the play (base 1.2 cm,
