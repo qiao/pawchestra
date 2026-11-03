@@ -235,7 +235,10 @@ The rest of each family:
   as a flutist rests the flute vertically on the right leg (winds 2.4), and the free left paw
   hangs with the roll of its grip (`freeRoll()`). Reason: a rest place in `H` from the mouth fits
   one body only, and with both paws on the clarinet at the middle of the hanging palms, the arms
-  went into the body.
+  went into the body. The panda keeps the trombone at the grips of the play, off the mouth, with
+  the slide turned down in front and the elbows out (`PANDA_TROMBONE`). Reason: with the trombone
+  upright in front of the face, its free right arm cleared the trunk only with the elbow at the
+  level of the shoulder, a fault of a brass player (winds 1.8).
 - **Piano and harp.** The polar bear sits tall with a small lean to the piano and the head up, as
   a pianist before a performance, with the paws in front of the lower belly (`restLean`). The
   deer sits up with each hand near a string.
