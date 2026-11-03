@@ -197,10 +197,6 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat T-pose body: the legs keep the length of the mesh (brief of the round), so the seat is
-      0.136 m (0.298 m on the A-pose body) and the cat reads as standing in front of a low chair
-      (`reports/2026-11-03-cat-new/lineup/`). The A-pose body had the leg factor 1.94. Ask the
-      user: keep the legs, or a leg factor for a seated read.
 - [ ] Cat violist: the left paw goes 2.1 cm into the viola in the play and the lift, near the
       upper bout, as the separate claws of the A-pose body did (2.2 cm and 2.1 cm). At rest it
       goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
@@ -209,8 +205,14 @@ passes.
 - [ ] Cat violist: at rest and in the lift, the right upper arm goes 1.0 cm into its arm root
       (0.8 cm on the A-pose body), and 1.4 cm in a lowering of `beethoven-5-4` (1.3 cm).
 - [ ] Cat T-pose body: the tail lies on the seat behind the haunch and touches the left back post
-      of the chair (0.3 cm, `node tools/tail-gap.ts violist`). The footprint is 0.04 m deeper
-      than on the A-pose body, so most seats move by a little (median 0.4 cm, at most 12.5 cm).
+      of the chair (0.0 cm, `node tools/tail-gap.ts violist`). The footprint is 1.2 cm deeper
+      than on the A-pose body.
+- [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
+      reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
+- [ ] Cat T-pose body: the brow above each eye shows dark facets that read a little worried
+      (`reports/2026-11-03-cat-look/final/face.png`). The `soften` rule of the wolf moves source
+      points, and the painted weights then find no vertex. Soften the brow in `cat-arms.glb`
+      before the weights, or add a soften step after the painted weights.
 - [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
       shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
       smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.
