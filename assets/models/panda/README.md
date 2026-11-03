@@ -27,7 +27,7 @@ src/models/studio/panda.ts           studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `panda.glb` | Source mesh (below) | None |
-| `panda-edit.glb` | Copy with the arms free of the trunk, not in git. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/panda_edit.py -- assets/models/panda/panda-edit.glb` |
+| `panda-edit.glb` | Copy with the arms free of the trunk. Git keeps no copy. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/panda_edit.py -- assets/models/panda/panda-edit.glb` |
 | `panda-arms.glb` | `panda-edit.glb` with rebuilt arms 1.497 times as long. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.497` |
 | `panda-weights.json` | Weights of the same Blender run. License as `panda.glb` | The same run |
 | `panda.rig.glb` | Output of the rig. License as `panda.glb` | `pnpm rig-mesh panda` |
