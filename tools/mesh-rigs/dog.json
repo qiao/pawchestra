@@ -139,6 +139,14 @@
       "forearm": [0.316246, 0.757051, 0.571719],
       "hand": [-0.078782, 0.677317, 0.731461]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the cello, so the elbow axes and the zero of the roll of the upper arm stay.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 91,
+      "R": 50
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 91 degrees and the right 50 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the cello smallest (design 4.4): about 144 degrees on the left (the violin and the snare drum) and 105 degrees on the right (the cello and the snare drum). The first probe of pnpm bind-supination on the straight rig with no supination gave 91 and 50, and the second probe on the rig with 91 and 46 gave a change of 0 and 4.",
     "tailCurl": {
       "points": [
         [0, -0.067, -0.056],
@@ -190,8 +198,8 @@
     "fingers": 0.5,
     "rigid": [[-0.1045, 0.5536, 0.0752]],
     "rigidNote": "The corners of face 331 of the right armpit take the mean of their weights (rigid_faces() of tools/blender/rig_mesh.py). The point is the middle of the face in the units of the source, at the plane of armSplit. With the mean, the face does not turn over.",
-    "rigidPainted": [[[-0.1031, 0.5513, 0.0659], [-0.1101, 0.5513, 0.0625]], [-0.1185, 0.5878, 0.1346]],
-    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights): first two small faces that share two corners, then one thin face with a corner of 5 degrees. They lie at the right shoulder line of dog-arms.glb, where the cut plane of arm_rebuild.py passes 0.4 mm from a vertex of dog-patch.glb, and they turned over at rest on the bent bind (pnpm fold-probe cellist --faces).",
+    "rigidPainted": [[[-0.1031, 0.5513, 0.0659], [-0.1101, 0.5513, 0.0625]], [-0.1185, 0.5878, 0.1346], [-0.1061, 0.5845, 0.0496]],
+    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights): first two small faces that share two corners, then one thin face with a corner of 5 degrees. They lie at the right shoulder line of dog-arms.glb, where the cut plane of arm_rebuild.py passes 0.4 mm from a vertex of dog-patch.glb, and they turned over at rest on the bent bind (pnpm fold-probe cellist --faces). The last point is a face of the same line that turned over in the play on the straight bind.",
     "haunch": {
       "height": [0.18, 0.275],
       "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the buttocks stay on the hips. It starts 0.03 units above the knee and ends 0.03 units above the thigh joint."
@@ -212,6 +220,11 @@
     "bodyNormals": "LR",
     "note": "The cut removes the seam faces between the arm and the trunk, which stretch into flat shards when the cello arms rise. It ends above the shoulder joint (y 0.603). Each arm has a round patch in the mesh, so the cut closes only the trunk hole (open_loop() of tools/blender/rig_mesh.py)."
   },
+  "raise": [
+    {"side": "R", "bone": "forearm", "turns": {"clavicle": [0, 0.2588, 0, 0.9659], "upper_arm": [0.5693, 0.1208, -0.0822, 0.8091], "forearm": [-0.5264, 0.167, -0.5441, 0.6317]}, "fade": [20, 30], "below": 0.3, "note": "The shape of the bent elbow R of the cellist (pnpm raise-fit). Faces 472, 474, 476, 475, 470, 473, 471 fold in 1849 of 6160 samples of the sets play, and the key elbow turns 91.6 degrees from the bind in their mean. The rule turns 10 degrees further on the same axis."},
+    {"side": "L", "bone": "forearm", "turns": {"clavicle": [0, 0, 0, 1], "upper_arm": [0.3718, 0.2284, 0.1353, 0.8896], "forearm": [-0.586, -0.2137, 0.6037, 0.4965]}, "fade": [15, 25], "below": 0.3, "note": "The shape of the bent elbow L of the cellist (pnpm raise-fit). Faces 1714, 1713, 1681, 2063, 1682, 2622, 2623, 2064 fold in 6113 of 6160 samples of the sets play, and the key elbow turns 110.5 degrees from the bind in their mean. The rule turns 10 degrees further on the same axis.", "grow": 1},
+    {"side": "L", "bone": "forearm", "turns": {"clavicle": [0, 0, 0, 1], "upper_arm": [0.3862, 0.1762, 0.0902, 0.9009], "forearm": [-0.5786, -0.2076, 0.5963, 0.5164]}, "fade": [25, 35], "below": 0.3, "note": "The shape of the bent elbow L of the cellist (pnpm raise-fit). Faces 2065, 1712, 1683, 1716, 1714 fold in 492 of 558 samples of the sets lift, and the key elbow turns 107.8 degrees from the bind in their mean. The rule turns 10 degrees further on the same axis.", "grow": 1}
+  ],
   "refine": {
     "rings": [],
     "flip": {
