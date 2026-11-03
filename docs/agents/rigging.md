@@ -20,7 +20,7 @@ arm tubes, Blender weights, and arm segments.
 | cat | Rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`, which takes its weights from the copy before the wall), a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
 | panda | Arms freed from the trunk in a copy (`panda_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.497`), the role-neutral bind, the elbows out in the trombone hold. | `trombonist` |
-| hippo | Longer rebuilt arms with a seam cut and a side wall (`hippo_arms.py`), smoothed arm tubes (`armSmooth`), the role-neutral bind with elbow `raise` shapes, smaller pea eyes. Stands at the contrabass. | `bassist` |
+| hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind, a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`), the role-neutral bind. Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
