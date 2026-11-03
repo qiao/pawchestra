@@ -6,22 +6,23 @@ angular shards and the lower edge of the band is a saw line. The texture has a s
 each eye and a smooth curve at the band.
 
     /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup \
-        --python tools/blender/panda_edge.py -- <in.glb> <out.glb> [levels] [limit]
+        --python tools/blender/panda_edge.py -- <in.glb> <out.glb>
 
 The steps:
 
 1. Import the file, and weld the vertices at 1e-5 units of the file, as `pnpm rig-mesh` does.
 2. Give each vertex a side: light when the Oklab lightness of the base color texture at the UV of
    its first face corner is at least `LIGHTNESS`.
-3. Split the faces of the regions (`REGIONS`) that the edge crosses, `levels` times (1 by
-   default): each face with light and dark texture samples, or with corners of two sides, splits
-   each edge at its middle, and each face then splits along the lines between its new vertices.
+3. Split the faces of each region (`REGIONS`) that the edge crosses, as many times as the levels
+   of the region: each face with light and dark texture samples, or with corners of two sides,
+   splits each edge at its middle, and each face then splits along the lines between its new
+   vertices.
 4. On each edge of the regions whose two vertices have different sides, find the place of the
    change, as `penguin_edge.py` does: the texture is sampled at 64 steps along the edge, and the
-   place is the change nearest to the middle, from `limit` to 1 - `limit` of the edge (0.15 by
-   default). A vertex nearer to the change than `limit` of the edge lies on the line: its edges
-   are not cut, so that no new face is a thin sliver. Split each other edge there, and split each
-   face along the line between its new vertices, or from its one new vertex to the opposite corner.
+   place is the change nearest to the middle. A vertex nearer to the change than the limit of the
+   region (a share of the edge) lies on the line: its edges are not cut, so that no new face is a
+   thin sliver. Split each other edge there, and split each face along the line between its new
+   vertices, or from its one new vertex to the opposite corner.
 5. Triangulate the faces with more than three corners, and export the GLB file.
 
 Each new vertex lies on an old edge or on a line across an old face, so the surface does not move.
@@ -39,8 +40,6 @@ import numpy as np
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 SOURCE, OUT = argv[:2]
-LEVELS = int(argv[2]) if len(argv) > 2 else 1
-LIMIT = float(argv[3]) if len(argv) > 3 else 0.15
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CONFIG = os.path.join(ROOT, 'tools', 'mesh-rigs', 'panda.json')
@@ -54,18 +53,22 @@ STEPS = 64
 #: The texture samples of a face in step 3: the points of a grid of this many steps on each edge.
 GRID = 6
 
-#: The regions of the cut, in the units of the studio with x as |x|: the eye patches, in front of
-#: the eyes and behind the nose, and the lower edge of the band on the back. The front and the
-#: sides of the band and the shoulders keep their faces: there the weights of the clavicles change
-#: much from corner to corner, so the skin moves a new vertex off the line of its old edge, and
-#: the small new faces turn over in the play (`pnpm fold-probe trombonist`).
+#: The regions of the cut: the lowest and the highest corner of a box in the units of the studio
+#: with x as |x|, the levels of step 3, and the limit of step 4. The eye patches, in front of the
+#: eyes and behind the nose, take one level, so that each small patch keeps its round oval. The
+#: lower edge of the band, on the front, the sides, and the back, takes no level and the limit
+#: 0.25: few and large new faces. There the weights of the clavicles change much from corner to
+#: corner, so the skin moves a new vertex off the line of its old edge, and a small new face
+#: turned over in the play with one level (`pnpm fold-probe trombonist`).
 REGIONS = [
-    [[0.03, 0.76, 0.09], [0.15, 0.905, 0.175]],
-    [[0.0, 0.44, -1.0], [0.12, 0.62, -0.04]],
+    [[0.03, 0.76, 0.09], [0.15, 0.905, 0.175], 1, 0.15],
+    [[0.0, 0.40, -1.0], [0.30, 0.70, 1.0], 0, 0.25],
 ]
 
-#: The margin around each eye box, in units.
-EYE_MARGIN = 0.008
+#: The margin around each eye box, in units. With 0.008, the frozen faces at the inner and the
+#: outer end of each eye box made black spikes out of the patch. With 0, the cut faces in the
+#: left eye box grew the old eye of the rig, and its ring color made a white hole in the patch.
+EYE_MARGIN = 0.004
 
 
 def linear(srgb):
@@ -137,10 +140,10 @@ def studio(vert):
     return (np.array([p[0], p[2], -p[1]]) - [0.0, floor, 0.0]) / (top - floor)
 
 
-def in_regions(p):
-    """Tells if a point in the units of the studio is in a region of the cut."""
+def region_of(p):
+    """Gives the first region of the cut that holds a point in the units of the studio, or None."""
     q = np.array([abs(p[0]), p[1], p[2]])
-    return any(np.all(q >= lo) and np.all(q <= hi) for lo, hi in np.asarray(REGIONS, float))
+    return next((r for r in REGIONS if np.all(q >= r[0]) and np.all(q <= r[1])), None)
 
 
 # The faces in an eye box keep their edges.
@@ -197,11 +200,12 @@ def split_edges(edges_and_places):
 
 
 grid = np.array([(i / GRID, j / GRID) for i in range(GRID + 1) for j in range(GRID + 1 - i)])
-for level in range(LEVELS):
+for level in range(max(r[2] for r in REGIONS)):
     light = {v: vert_light(v) for v in bm.verts if v.link_loops}
     chosen = []
     for face in bm.faces:
-        if not in_regions(np.mean([studio(v) for v in face.verts], axis=0)):
+        region = region_of(np.mean([studio(v) for v in face.verts], axis=0))
+        if region is None or region[2] <= level:
             continue
         uv = np.array([loop[uv_layer].uv[:] for loop in face.loops])
         samples = uv[0] + grid[:, :1] * (uv[1] - uv[0]) + grid[:, 1:] * (uv[2] - uv[0])
@@ -219,7 +223,10 @@ places = []
 for edge in bm.edges:
     a, b = edge.verts
     if (a not in light or b not in light or light[a] == light[b] or not edge.link_loops
-            or is_frozen(edge) or not in_regions((studio(a) + studio(b)) / 2)):
+            or is_frozen(edge)):
+        continue
+    region = region_of((studio(a) + studio(b)) / 2)
+    if region is None:
         continue
     loop = edge.link_loops[0]
     uv0, uv1 = np.array(loop[uv_layer].uv), np.array(loop.link_loop_next[uv_layer].uv)
@@ -228,20 +235,20 @@ for edge in bm.edges:
     changes = np.nonzero(sides[1:] != sides[:-1])[0]
     place = 0.5 if len(changes) == 0 else float(
         (t[changes] + 0.5 / STEPS)[np.argmin(np.abs(t[changes] + 0.5 / STEPS - 0.5))])
-    places.append((edge, loop.vert, place))
-# A vertex less than `limit` of an edge from the change lies on the line: its edges are not cut,
-# and the line goes through it, so that no new face is a thin sliver.
+    places.append((edge, loop.vert, place, region[3]))
+# A vertex less than the limit of an edge from the change lies on the line: its edges are not
+# cut, and the line goes through it, so that no new face is a thin sliver.
 on_line = set()
-for edge, start, place in places:
-    if place < LIMIT:
+for edge, start, place, limit in places:
+    if place < limit:
         on_line.add(id(start))
-    elif place > 1.0 - LIMIT:
+    elif place > 1.0 - limit:
         on_line.add(id(edge.other_vert(start)))
-cuts = [(edge, start, place) for edge, start, place in places
+cuts = [(edge, start, place) for edge, start, place, _ in places
         if id(edge.verts[0]) not in on_line and id(edge.verts[1]) not in on_line]
 print(f'edge_cut: {len(on_line)} vertices lie on the line')
 split_edges(cuts)
-print(f'edge_cut: levels {LEVELS}, limit {LIMIT}: {len(cuts)} edges cut, {faces_before} faces '
+print(f'edge_cut: {len(cuts)} edges cut, {faces_before} faces '
       f'before and {len(bm.faces)} after, {thin_before} faces below 10 degrees before and '
       f'{thin_faces()} after')
 
