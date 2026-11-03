@@ -48,6 +48,8 @@
   "armFactorNote": "The factor 1 keeps the arm length, because the rig with arm segments does not stretch the arms. The arms of rabbit-arms.glb are 1.18 times longer than the source arms (arm_rebuild.py --factor 1.18), and the arm joints are the joints of the longer arms. 1.18 is the smallest factor of the sweep 1, 1.1, 1.13, 1.16, 1.18, and 1.2 at which the left paw reaches the nut of the violin of 0.83 (stopRange from 0.01, as the A-pose rabbit). The reach is then 1.21 H, as the 1.22 H of the A-pose rabbit. With 1, the paw reaches the fingerboard only from 0.34.",
   "legFactor": 1.75,
   "legFactorNote": "The factor of the thigh and the shin, as for the A-pose rabbit. Each one stretches only between its joints, the foot keeps its size, and the body rises 0.0975 units, so that the soles stay at y 0. The chair of the app fits the legs, so the soles stand on the floor.",
+  "legGirth": [1.6, 1],
+  "legGirthNote": "The thigh of the T-pose mesh is thinner than the thigh of the A-pose rabbit, and the leg factor makes it long, so the seated thigh looked thin. The thigh takes the factor 1.6 across its axis before the skin (leg_girth() of tools/blender/rig_mesh.py), up and to the sides, so that its width comes near the width of the A-pose rabbit. The back of the thigh keeps its place, so the underside stays on the seat. The shin keeps its form.",
   "joints": {
     "root": {
       "head": [
