@@ -3209,6 +3209,20 @@ interface PlayArgs {
    * 5.2) ({@link pauseFrame}).
    */
   readonly pause: boolean;
+  /**
+   * The recast role of `--recast <role>@<species>` with its recast, or `null` for the cast of the
+   * app. The app of each tree then puts the species into the seats of the role
+   * ({@link recastPlugin}), and the working tree takes the scale of the size rule.
+   */
+  readonly recast: PlayRecast | null;
+}
+
+/** A recast role of the mode `play` (`--recast`). */
+interface PlayRecast {
+  /** The name of the recast role, such as `violinist@wolf`. */
+  readonly name: string;
+  /** The recast of the role (`findRole()` of `tools/fold-probe.ts`). */
+  readonly recast: Recast;
 }
 
 /** The fields of a camera in JSON of the command line ({@link jsonCamera}), before the checks. */
@@ -3535,6 +3549,10 @@ function playParts(args: PlayArgs): PlayArgs[] {
  * tree from a build of its own ({@link startVariantSite}). More than one `--set` renders each
  * variant into its own folder ({@link playSetDir}) from that one build. More than one `--time` renders each
  * time into its own folder ({@link playTimeDir}) from one build of each tree ({@link playParts}).
+ * `--recast <role>@<species>` puts the species into the seats of the role in the app of each tree
+ * ({@link recastPlugin}), so that `pnpm arm-check --views` shows a recast role. The working tree
+ * takes the scale of the size rule of the instrument (`recastChanges()` of
+ * `tools/recast-scale.ts`), and the build of `--base` keeps the scale of its commit.
  *
  * @param args The arguments after the script.
  * @returns The command line, or `null` when the first argument is not `play`.
@@ -3544,8 +3562,8 @@ function playParts(args: PlayArgs): PlayArgs[] {
  *   folder, `--camera` or `--camera-file` with `--cinematic` or `--shot`, `--camera-file` with
  *   `--camera`, a wrong camera file, `--time` with `--shot`, `--at` with `--camera`,
  *   `--camera-file`, `--cinematic`, `--shot`, or `--url`, `--set` with `--url` or `--base`, an
- *   option of `--at` with no `--at`, `--pause` with `--strip` or `--shot`, a wrong option, or a
- *   missing word.
+ *   option of `--at` with no `--at`, `--pause` with `--strip` or `--shot`, `--recast` with no
+ *   recast role, `--url`, or `--set`, a wrong option, or a missing word.
  */
 function playArgs(args: readonly string[]): PlayArgs | null {
   if (args[0] !== 'play') {
@@ -3569,6 +3587,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
       '--set',
       '--size',
       '--strip',
+      '--recast',
     ],
     ['--camera', '--azimuth', '--time', '--set'],
     ['--cinematic', '--pause'],
@@ -3640,6 +3659,10 @@ function playArgs(args: readonly string[]): PlayArgs | null {
       'The option --set builds a site of its own and moves the player of --at, so --url and --base do not go.',
     );
   }
+  const recast = playRecast(line.options.get('--recast')?.[0] ?? null);
+  if (recast && (url !== null || holds.length > 0)) {
+    throw new Error('The option --recast builds a site of its own, so --url and --set do not go.');
+  }
 
   if (shotText !== null) {
     const subject = shotSubject(shotText);
@@ -3661,6 +3684,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
       holdsIndex: null,
       strip: null,
       pause,
+      recast,
     };
   }
   const [first = PLAY_TIME_SEC, ...others] = (
@@ -3700,7 +3724,50 @@ function playArgs(args: readonly string[]): PlayArgs | null {
     holdsIndex: null,
     strip,
     pause,
+    recast,
   };
+}
+
+/**
+ * Reads the recast role of `--recast <role>@<species>` of the mode `play`.
+ *
+ * @param text The value of the option, or `null` with no option.
+ * @returns The recast role, or `null` with no option.
+ * @throws Error if the text is not a recast role ({@link castRoleOf}).
+ */
+function playRecast(text: string | null): PlayRecast | null {
+  if (text === null) {
+    return null;
+  }
+  const recast = castRoleOf(text)?.recast;
+  if (!recast) {
+    throw new Error(
+      `The option --recast takes a recast role <role>@<species>, such as violinist@wolf, and not "${text}".`,
+    );
+  }
+  return { name: text, recast };
+}
+
+/**
+ * Puts the species of a recast into the seats of its role in a layout, as `recastScene()` of
+ * `src/pose/test-scene.ts` does: each player with the instrument of the recast and a species of
+ * the role gets the new species, and keeps its place. {@link recastPlugin} does the same in the
+ * app.
+ *
+ * @param layout The layout of the cast of the score.
+ * @param recast The recast, or `null`.
+ * @returns The layout with the recast, or the same layout with no recast.
+ */
+function recastLayout(layout: SceneLayout, recast: Recast | null): SceneLayout {
+  if (!recast) {
+    return layout;
+  }
+  const players = layout.players.map((place) =>
+    place.cast.instrument === recast.instrument && recast.from.includes(place.cast.species)
+      ? { ...place, cast: { ...place.cast, species: recast.species } }
+      : place,
+  );
+  return { ...layout, players };
 }
 
 /** The most frames of `--strip`. */
@@ -3877,10 +3944,15 @@ interface DemoLayout {
  *
  * @param demo The demo.
  * @param midi The path of the file of `--midi`, which replaces the demo, or `null`.
+ * @param recast The recast of `--recast` ({@link recastLayout}), or `null`.
  * @returns The score, its layout, and its player models.
  * @throws Error when the demo is not valid.
  */
-async function demoLayout(demo: DemoId, midi: string | null): Promise<DemoLayout> {
+async function demoLayout(
+  demo: DemoId,
+  midi: string | null,
+  recast: Recast | null = null,
+): Promise<DemoLayout> {
   const bytes =
     midi === null ? (await patchedDemo(`${demo}.mid`)).bytes : new Uint8Array(await readFile(midi));
   const result = buildScore(bytes, 'auto');
@@ -3888,7 +3960,8 @@ async function demoLayout(demo: DemoId, midi: string | null): Promise<DemoLayout
     throw new Error(`The ${pieceText(demo, midi)} is not valid: ${result.error}.`);
   }
   const models = new ModelCache();
-  return { score: result.score, layout: layoutScene(result.score, models), models };
+  const layout = recastLayout(layoutScene(result.score, models), recast);
+  return { score: result.score, layout, models };
 }
 
 /**
@@ -3898,6 +3971,7 @@ async function demoLayout(demo: DemoId, midi: string | null): Promise<DemoLayout
  * @param demo The demo.
  * @param subject The subject.
  * @param midi The path of the file of `--midi`, which replaces the demo, or `null`.
+ * @param recast The recast of `--recast`, or `null`.
  * @returns The shot, its species, and the time of its frame.
  * @throws Error when the demo is not valid, when no solo or section shot has the subject, or when
  *   the time of the frame is not a time of a play frame ({@link frameTime}).
@@ -3906,8 +3980,9 @@ async function chooseShot(
   demo: DemoId,
   subject: ShotSubject,
   midi: string | null = null,
+  recast: Recast | null = null,
 ): Promise<ChosenShot> {
-  const { score, layout, models } = await demoLayout(demo, midi);
+  const { score, layout, models } = await demoLayout(demo, midi, recast);
   const { shots } = prepareShots(score, layout, SHOT_SEED, models);
 
   const shot = firstShotOf(shots, layout.players, subject);
@@ -3950,7 +4025,7 @@ function chosenShotText(demo: string, chosen: ChosenShot): string {
  *   36.00 s to 44.00 s.`
  */
 async function shotAtText(args: PlayArgs, time: number): Promise<string> {
-  const { score, layout, models } = await demoLayout(args.demo, args.midi);
+  const { score, layout, models } = await demoLayout(args.demo, args.midi, args.recast?.recast);
   const { shots } = prepareShots(score, layout, SHOT_SEED, models);
   const shot = shots.findLast((s) => s.startSec <= time) ?? shots[0];
   if (!shot) {
@@ -3982,6 +4057,7 @@ interface AimTarget {
  * @param demo The demo.
  * @param subject The seat or the species.
  * @param midi The path of the file of `--midi`, which replaces the demo, or `null`.
+ * @param recast The recast of `--recast` ({@link recastLayout}), or `null`.
  * @returns The player and the box of its body.
  * @throws Error that lists the players of the demo, when no player matches.
  */
@@ -3989,8 +4065,9 @@ export async function aimTarget(
   demo: DemoId,
   subject: ShotSubject,
   midi: string | null = null,
+  recast: Recast | null = null,
 ): Promise<AimTarget> {
-  const { layout, models } = await demoLayout(demo, midi);
+  const { layout, models } = await demoLayout(demo, midi, recast);
   const place = layout.players.find((player) => isSubjectPlayer(subject, player.cast));
   if (!place) {
     const name = subject.kind === 'seat' ? `the seat ${subject.seat}` : subjectName(subject);
@@ -4019,10 +4096,11 @@ function aimTargetText(demo: string, target: AimTarget): string {
 }
 
 /**
- * A plugin of a build of the mode `play`: `aim` for the camera of `--at` ({@link aimPlugin}), and
- * `freeze` for a frozen song time ({@link freezePlugin}, {@link freezesTime}).
+ * A plugin of a build of the mode `play`: `aim` for the camera of `--at` ({@link aimPlugin}),
+ * `freeze` for a frozen song time ({@link freezePlugin}, {@link freezesTime}), and `recast` for
+ * the recast of `--recast` ({@link recastPlugin}).
  */
-type PlayPlugin = 'aim' | 'freeze';
+type PlayPlugin = 'aim' | 'freeze' | 'recast';
 
 /**
  * Tells if the frames of a command line of the mode `play` freeze the song time of the page
@@ -4041,12 +4119,16 @@ function freezesTime(args: PlayArgs): boolean {
  * Gives the plugins of the builds of a command line of the mode `play`.
  *
  * @param args The command line.
- * @returns The plugins: `aim` with `--at` or a camera in JSON, and `freeze` for frames at the
- *   exact song time ({@link freezesTime}).
+ * @returns The plugins: `aim` with `--at` or a camera in JSON, `freeze` for frames at the exact
+ *   song time ({@link freezesTime}), and `recast` with `--recast`.
  */
 function playPluginKinds(args: PlayArgs): PlayPlugin[] {
   const aim = args.at !== null || args.cameras.some((camera) => camera.pose);
-  return [...(aim ? ['aim' as const] : []), ...(freezesTime(args) ? ['freeze' as const] : [])];
+  return [
+    ...(aim ? ['aim' as const] : []),
+    ...(freezesTime(args) ? ['freeze' as const] : []),
+    ...(args.recast ? ['recast' as const] : []),
+  ];
 }
 
 /**
@@ -4060,7 +4142,66 @@ function playPlugins(root: string, kinds: readonly PlayPlugin[]): Plugin[] {
   return [
     ...(kinds.includes('aim') ? [aimPlugin(root)] : []),
     ...(kinds.includes('freeze') ? [freezePlugin(root)] : []),
+    ...(kinds.includes('recast') ? [recastPlugin(root)] : []),
   ];
+}
+
+/** The query of the page that gives the recast of `--recast` as JSON ({@link recastPlugin}). */
+const RECAST_QUERY = 'recast';
+
+/** The code of `planSceneSteps()` of `src/app/scene-plan.ts` that {@link recastPlugin} changes. */
+const RECAST_ANCHOR = 'const layout = yield* layoutSceneSteps(score, models);';
+
+/**
+ * Gives the plugin of a build of the app whose layout takes the recast of the query
+ * {@link RECAST_QUERY}: JSON of a `Recast`. The plugin changes the source of
+ * `src/app/scene-plan.ts` before the compile, so that each player with the instrument of the
+ * recast and a species of the role gets the new species and keeps its place, as
+ * {@link recastLayout} does in the tool. The pose plan and the shot plan then take the new cast. A
+ * page with no query is the page of the app.
+ *
+ * @param root The root of the tree to build.
+ * @returns The plugin.
+ * @throws Error in the build, when the app of the tree has no {@link RECAST_ANCHOR}. Then the
+ *   commit of `--base` is too old for `--recast`.
+ */
+function recastPlugin(root: string): Plugin {
+  const plan = join(realpathSync(root), 'src', 'app', 'scene-plan.ts');
+  const recast = [
+    'function closeViewsRecast(layout) {',
+    `  const text = new URLSearchParams(globalThis.location?.search ?? '').get(${JSON.stringify(RECAST_QUERY)});`,
+    '  if (!text) {',
+    '    return layout;',
+    '  }',
+    '  const { instrument, from, species } = JSON.parse(text);',
+    '  const players = layout.players.map((place) =>',
+    '    place.cast.instrument === instrument && from.includes(place.cast.species)',
+    '      ? { ...place, cast: { ...place.cast, species } }',
+    '      : place,',
+    '  );',
+    '  return { ...layout, players };',
+    '}',
+  ].join('\n');
+  return {
+    name: 'zoophony:close-views-recast',
+    apply: 'build',
+    enforce: 'pre',
+    transform(code, id) {
+      if (id !== plan) {
+        return null;
+      }
+      if (!code.includes(RECAST_ANCHOR)) {
+        throw new Error(
+          `The app ${plan} has no code "${RECAST_ANCHOR}", so the frames of the mode play cannot take --recast.`,
+        );
+      }
+      const layout = RECAST_ANCHOR.replace('yield*', 'closeViewsRecast(yield*').replace(
+        ');',
+        '));',
+      );
+      return `${code.replace(RECAST_ANCHOR, layout)}\n${recast}\n`;
+    },
+  };
 }
 
 /** The property of `window` that freezes the song time of a build of {@link freezePlugin}. */
@@ -4177,7 +4318,7 @@ async function playTimeSec(args: PlayArgs): Promise<number> {
   if (args.time.kind === 'song') {
     return args.time.sec;
   }
-  const chosen = await chooseShot(args.demo, args.time.subject, args.midi);
+  const chosen = await chooseShot(args.demo, args.time.subject, args.midi, args.recast?.recast);
   console.log(chosenShotText(pieceName(args), chosen));
   return chosen.frameSec;
 }
@@ -4304,6 +4445,9 @@ async function openPlay(
   const params = [
     ...(aim ? [`aim=${encodeURIComponent(JSON.stringify(aim))}`] : []),
     ...(args.holdsIndex === null ? [] : [`${HOLDS_QUERY}=${args.holdsIndex}`]),
+    ...(args.recast
+      ? [`${RECAST_QUERY}=${encodeURIComponent(JSON.stringify(args.recast.recast))}`]
+      : []),
   ];
   const query = params.length > 0 ? `?${params.join('&')}` : '';
   // The page of a file of --midi opens the default demo, and then the file replaces it.
@@ -4510,7 +4654,7 @@ async function partTarget(args: PlayArgs): Promise<AimTarget | null> {
   const changes = args.holdsIndex === null ? null : setHolds(args.holds[args.holdsIndex] ?? '');
   let target: AimTarget | null = null;
   try {
-    target = args.at ? await aimTarget(args.demo, args.at, args.midi) : null;
+    target = args.at ? await aimTarget(args.demo, args.at, args.midi, args.recast?.recast) : null;
   } finally {
     changes?.undo();
   }
@@ -5312,7 +5456,7 @@ const USAGE = [
   `Usage: pnpm close-views <${CLOSE_ROLES.join('|')}> <output directory> [--target head] [--views <view|deg,...>] [--moments <moment,...>] [--zoom <n>] [--elevation <deg>] [--aim <x>,<z>,<height>] [--scale <n>] [--probe <${GALLERY_PROBES.join('|')},...>] [--url <url>] [--glb <file>] [--set <changes>] [--lineup [--with <role,...>] [--crop <n>] [--box <x>,<y>,<w>,<h>]] [--base <ref> [--pairs <view|cell,...> [--crop <x>,<y>,<w>,<h>]] [--sheet [--box <x>,<y>,<w>,<h>]]]`,
   '       pnpm close-views lineup <species,...> <output directory> [--url <url>] [--base <ref>]',
   `       pnpm close-views species <species,...> <output directory> [--views <${SPECIES_VIEWS.map((view) => view.name).join('|')},...>] [--moment <play|rest|lift<p>|lower<p>>] [--zoom <n>] [--elevation <deg>] [--url <url>] [--base <ref>]`,
-  `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>]`,
+  `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--recast <role>@<species>]`,
   '       pnpm close-views batch <output directory> [--species <species,...> [--moments <play|rest|lift<p>|lower<p>,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--lineup]] [--role <role | <role>@<species>>]... [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]',
   '       pnpm close-views audit <output directory> [--roles <role,...>] [--url <url>] [--base <ref>]',
 ].join('\n');
@@ -5373,7 +5517,7 @@ async function main(): Promise<void> {
     // A subject with no shot or no player, or a wrong hold change, stops the tool before the
     // build. The hold changes stay in memory, so that the player of --at is the player of the
     // variant.
-    const { demo, midi, time, at, holds } = mode.args;
+    const { demo, midi, time, at, holds, recast } = mode.args;
     try {
       const [only] = holds;
       if (holds.length === 1 && only !== undefined) {
@@ -5389,11 +5533,19 @@ async function main(): Promise<void> {
       if (holds.length > 0) {
         variant = { body: null, holds, entry: APP_ENTRY };
       }
+      // The recast player of the working tree takes the scale of the size rule, as in the gate.
+      const scale = recast
+        ? (await import('./recast-scale.ts')).recastChanges([recast.name], '')
+        : '';
+      if (scale) {
+        console.log(`The working tree takes the hold changes ${setHolds(scale).text}.`);
+        variant = { body: null, holds: [scale], entry: APP_ENTRY };
+      }
       if (time.kind === 'shot') {
-        await chooseShot(demo, time.subject, midi);
+        await chooseShot(demo, time.subject, midi, recast?.recast);
       }
       if (at) {
-        await aimTarget(demo, at, midi);
+        await aimTarget(demo, at, midi, recast?.recast);
       }
     } catch (error) {
       console.error(error instanceof Error ? error.message : String(error));
