@@ -183,9 +183,8 @@ export const INSTRUMENT_PART: SweepPart = {
 };
 
 /**
- * The contact depth of a paw in a body, in meters: 0.01 of the height of the bear of the studio
- * conductor (`lowpoly-studio/roles/conductor/role.toml`), with a margin. A paw that rests on the
- * belly or a knee presses the fur a little.
+ * The contact depth of a paw in a body, in meters: 0.01 of the height of the conductor bear, with
+ * a margin. A paw that rests on the belly or a knee presses the fur a little.
  */
 const CONTACT = 0.015;
 
