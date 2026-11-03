@@ -1,16 +1,15 @@
 # Rigging
 
-This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the arm rebuild in
-Blender, and the traps of the rig. Design 4.4 gives the rules of the bodies, and the reference
-images are the target of each body. [`rig-rounds.md`](rig-rounds.md) gives the brief of a rigging
-round.
+This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the arm rebuild, and
+the traps. Design 4.4 gives the body rules. [`rig-rounds.md`](rig-rounds.md) gives the brief of a
+rigging round.
 
 ## Bodies and roles
 
 Each species has a studio body (`body: 'studio-<a>'`). `pnpm fold-probe`, `pnpm hold-fit`,
 `pnpm arm-check`, and `pnpm close-views` take the role names.
 `pnpm pose-depth violinist` sweeps the rabbit and the red fox together. "Rebuilt arms" means quad
-arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Blender").
+arm tubes, Blender weights, and arm segments.
 
 | Species | Body | Role |
 |---|---|---|
@@ -234,8 +233,9 @@ Read the group of your work first.
 - Bone heat gives the trunk side a part of a hanging arm. Keep the arm weights on the free arm
   (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
-  it the mean. The `sliver` rule can then move a weight 4 cm away: compare the weights with `main`
-  by place.
+  it the mean. The `sliver` rule can move a weight 4 cm away: compare the weights with `main`.
+- A hanging T-pose arm folds the faces under its root. Make the bridge faces and the first tube
+  ring one rigid group (`rigidPainted`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
