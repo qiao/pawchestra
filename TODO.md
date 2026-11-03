@@ -294,10 +294,6 @@ passes.
       (0.1 cm on the old arm). A rest right elbow of (1, -0.5, -0.6) (`restPoleR`) gives 0.3 cm,
       but the hornist right paw then twists 98° at rest, and the bind supination rule asks R 64 in
       place of R 51. Rig the pig with the new value, or accept the depth.
-- [ ] Pig with rebuilt arms: in the 2x crops of the right view, a dark saw-tooth line shows under
-      the right wrist, and a small dark slit on the back of the right paw, at rest and at a note.
-      A rig with the forearm normals of the bear (`rootNormals.wrist` [0.1, 0.025], design 4.4)
-      removes both and keeps the bind. Add it to `tools/mesh-rigs/pig.json`, and rig the pig.
 - [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
       tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
       cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
