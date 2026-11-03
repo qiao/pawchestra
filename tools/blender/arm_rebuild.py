@@ -13,7 +13,8 @@ joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
    arm gets a ring (`color_edges()`), so that each tube face lies on one side of the edge.
 3. Cut each arm at the shoulder line and at the wrist, and model a quad tube of rings of 16
    vertices, each ring at a right angle to its bone (`wind_arms.step_cut_and_tube()`). Collapse
-   the thin faces at the cut loops (`wind_arms.step_clean_cut()`).
+   the thin faces at the cut loops, and keep the open edges of the source out of the loops
+   (`step_clean_cut()`).
 4. Shrinkwrap the tube onto a hidden copy of the old arm, bridge it to the trunk and the paw,
    beautify the bridge, and collapse the thin bridge faces (`violin_arms.step_wrap()`,
    `step_bridge()`, `step_beautify()`, `wind_arms.step_clean_bridge()`).
@@ -147,6 +148,10 @@ EDGE_SLANT = 0.5
 #: An arm vertex farther than this factor of the zone radius from the arm line, or nearer to the
 #: middle plane than the zone, shows an arm that joins the trunk or a leg (`free_arm()`).
 LEAK = 2.0
+
+#: The code of `arm_part` that an open vertex of the source holds during `step_clean_cut()`. It is
+#: no code of `violin_arms.PART`, so no step reads it as a part of the arm.
+HOLD = -1
 
 
 class Session(va.Session):
@@ -636,6 +641,32 @@ def cut_loop(s, side):
     return center, radius, armpit
 
 
+def step_clean_cut(s):
+    """Collapses the thin faces at the cut loops (`wind_arms.step_clean_cut()`), and keeps the
+    open edges of the source out of the loops.
+
+    After each collapse, `wind_arms.step_clean_cut()` gives the code of a loop to each open vertex
+    beside the loop, so that a merged vertex stays a vertex of the loop. An open edge of the source,
+    such as the trunk hole of the dog copy at its shoulder line, then takes the code vertex by
+    vertex, and Bridge Edge Loops joins the tube to the hole too. So the open vertices of the
+    source (the open vertices with no code after the cut) take the code `HOLD` during the step, and
+    no code after it. Gives the number of collapsed edges."""
+    mesh = s.mesh
+    part = mesh.data.attributes['arm_part'].data
+    bm = bmesh.new()
+    bm.from_mesh(mesh.data)
+    held = [p.index for p in bm.verts if p.is_boundary and part[p.index].value == 0]
+    bm.free()
+    for i in held:
+        part[i].value = HOLD
+    count = wa.step_clean_cut(s)
+    part = mesh.data.attributes['arm_part'].data
+    for p in part:
+        if p.value == HOLD:
+            p.value = 0
+    return count
+
+
 def step_loops(s):
     """Keeps the shoulder cut loop of each side for `step_paint()`, after the clean of the cut
     loops. Gives the armpit height of each side in units of the studio."""
@@ -878,7 +909,7 @@ STEPS = (
     va.import_mesh,
     step_measure,
     wa.step_cut_and_tube,
-    wa.step_clean_cut,
+    step_clean_cut,
     step_loops,
     va.step_wrap,
     va.step_bridge,
