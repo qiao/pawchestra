@@ -334,14 +334,14 @@
     "straightArms": true,
     "tailBind": {
       "tail": [
-        0.75,
+        0.65,
         -0.38,
-        -0.3
+        -0.15
       ],
-      "tail_tip": [0.7, -0.41, 0.6]
+      "tail_tip": [0.6, -0.41, 0.75]
     },
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
-    "tailBindNote": "Each tail bone of the seated bind turns onto its direction: the root bone goes to the left and a little back and down, so that the tail lies on the seat behind the haunch, and the tip bone goes to the left, forward, and down, so that the curled end hangs over the left side of the seat in front of the back post. The tail keeps the curl of the mesh, and the footprint of the seated cat stays 4 cm deeper than the footprint of the cat of the A-pose mesh. With the tail back over the back edge of the seat, the footprint was 31 cm deeper, and the layout moved the seats of most demos. A curl of the tail along a curve (tailCurl) crumpled the U-shaped tail of the mesh. The tail keeps its curl in the standing body."
+    "tailBindNote": "Each tail bone of the seated bind turns onto its direction: the root bone goes to the left and a little down and back, so that the tail lies on the seat behind the haunch, and the tip bone goes to the left, forward, and down, so that the curled end hangs over the left side of the seat in front of the back post. The tail keeps the curl of the mesh, and the footprint of the seated cat is 1.2 cm deeper than the footprint of the cat of the A-pose mesh. With the root bone further back [0.75, -0.38, -0.3] and the tip bone [0.7, -0.41, 0.6], the tail went 1.2 cm into the left back post of the chair of 0.46 m, and the footprint was 4.5 cm deeper. With the tail back over the back edge of the seat, the footprint was 31 cm deeper, and the layout moved the seats of most demos. A curl of the tail along a curve (tailCurl) crumpled the U-shaped tail of the mesh. The tail keeps its curl in the standing body."
   },
   "weights": {
     "armSplit": 0.12,
