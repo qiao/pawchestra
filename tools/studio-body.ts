@@ -240,7 +240,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       backRoom: 0.04,
       constant: 'STUDIO_RABBIT',
       crease: 35,
-      glb: 'assets/models/rabbit/rabbit-apose.rig.glb',
+      glb: 'assets/models/rabbit/rabbit.rig.glb',
     },
   ],
   // The red and the tan foxes (design 4.4). The wide haunch of the fox sits on a wider chair.

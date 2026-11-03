@@ -36,7 +36,7 @@
     "elbow": 0.06,
     "elbowNote": "The faces within 0.06 units of each elbow joint take the skin normals too, as on the fox. Each hold bends the elbows, and the crease angle splits the normals of the inner elbows into hard lines."
   },
-  "output": "assets/models/rabbit/rabbit-apose.rig.glb",
+  "output": "assets/models/rabbit/rabbit.rig.glb",
   "name": "Rabbit",
   "weld": 1e-05,
   "app": {
@@ -529,6 +529,29 @@
       0.55,
       0.55
     ],
+    "tone": {
+      "chroma": 0.03,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          -0.02,
+          0.003,
+          0.009
+        ],
+        [
+          0.97,
+          -0.028,
+          0.003,
+          0.009
+        ]
+      ],
+      "note": "The light grey fur takes the cream of the fur swatch of rabbit-views.png (Oklab 0.938, 0.009, 0.018): each plain face moves by a row [L, dL, da, db] in Oklab, blended by its lightness. The pink nose, inner ears, and paw pads have more chroma, and the white whiskers are lighter than light, so they keep their colors."
+    },
     "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few."
   },
   "eyeShell": {

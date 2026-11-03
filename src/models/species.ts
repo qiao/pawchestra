@@ -231,13 +231,13 @@ export function instrumentScale(params: SpeciesParams, instrument: InstrumentId)
 /** The parameters of each species (design 4.3, 4.5). */
 export const SPECIES = {
   /**
-   * Rabbit, the first violins (reference image). It has the studio body of the A-pose mesh
-   * `assets/models/rabbit/rabbit-apose.glb`, which `pnpm rig-mesh rabbit` rigs with no split
-   * (design 4.4), seated with the bind pose of the studio rabbit, and standing as a soloist. Its
-   * head height is the head of the studio body, and its chair fits its legs: the seat height is the
-   * seat of the studio body, in H. The rabbit has short arms that bend less to play, so the arms
-   * reach 0.36 m, and the violin is 0.83 of the violin of the app. With the full violin of 0.958,
-   * the arms must stretch 1.62 times, and their long faces fold.
+   * Rabbit, the first violins (reference image). It has the studio body of the T-pose mesh
+   * `assets/models/rabbit/rabbit-tpose.glb`, with arms rebuilt 1.18 times longer
+   * (`tools/blender/arm_rebuild.py`), which `pnpm rig-mesh rabbit` rigs (design 4.4), seated with
+   * the bind pose of the studio rabbit, and standing as a soloist. Its head height is the head of
+   * the studio body, and its chair fits its legs: the seat height is the seat of the studio body,
+   * in H. The violin is 0.83 of the violin of the app, and the arms reach 0.39 m: with arms 1.18
+   * times longer, the left paw reaches the nut, and with shorter arms, it does not.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
    * stick lies 40° from square toward the wrist, near the line of the middles of the turned paw, so

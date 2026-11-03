@@ -1,17 +1,17 @@
 # Rabbit model
 
-This folder holds the A-pose source mesh of the rabbit, a copy with rebuilt arms and its weights,
+This folder holds the T-pose source mesh of the rabbit, a copy with rebuilt arms and its weights,
 and the rigged copy. The app does not serve these files. It loads the module
 `src/models/studio/rabbit.ts`, which this chain writes:
 
 ```text
-rabbit-apose.glb                          source mesh
-   │  tools/blender/violin_arms.py rabbit  rebuilt arms and painted weights
+rabbit-tpose.glb                          source mesh
+   │  tools/blender/arm_rebuild.py rabbit --factor 1.18
    v
 rabbit-arms.glb + rabbit-weights.json     `source` and `paintedWeights` of the config
    │  pnpm rig-mesh rabbit                config tools/mesh-rigs/rabbit.json
    v
-rabbit-apose.rig.glb                      rigged mesh
+rabbit.rig.glb                            rigged mesh
    │  pnpm studio-body rabbit
    v
 src/models/studio/rabbit.ts               studio body of the app
@@ -23,18 +23,16 @@ src/models/studio/rabbit.ts               studio body of the app
 
 | File | Origin | Rebuild |
 |---|---|---|
-| `rabbit-apose.glb` | Source mesh (below) | None |
+| `rabbit-apose.glb` | Source mesh of the old A-pose body (below) | None |
 | `rabbit-arms.glb` | Copy of `rabbit-tpose.glb` with rebuilt arms. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
 | `rabbit-weights.json` | Weights of the same Blender run. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
-| `rabbit-apose.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
-| `rabbit-tpose.glb` | The T-pose source mesh of the next body (below) | None |
+| `rabbit-apose.rig.glb` | Rig of the old A-pose body. License as the source | None |
+| `rabbit-tpose.glb` | Source mesh (below) | None |
+| `rabbit.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
 
 ## rabbit-tpose.glb
 
-The T-pose mesh replaces `rabbit-apose.glb` as the source when its rig passes the arm gate and
-the clearance sweep. A first rig with arms 1.18 times longer passed the arm gate, and its upper arms
-went up to 3.9 cm into the body in the lowering (`TODO.md`). The mesh has no skeleton. The arms
-stand out level to the sides, free of the trunk.
+The mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
 
 | Item | Value |
 |---|---|
@@ -114,5 +112,17 @@ arm root.
 | SHA-256 | `cfc3fe4485e0917e049bad6024de04d73d5bf6e2e8a76d48c7b1047d17fe6785` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent left elbow |
+
+A run of `pnpm rig-mesh rabbit` gives the same bytes.
+
+## rabbit.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 512,004 bytes |
+| SHA-256 | `9189d064412bd2867599356fe928cec3c29bb21cd5f5907cfd562d07541df43b` |
+| Bind | The role-neutral bind (design 4.4): the rebuilt arms straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
+| Colors | The plain fur moves toward the cream of the fur swatch of `docs/reference/rabbit-views.png` (`colors.tone`) |
+| Shapes | The arm-down shape of each arm, and the straight legs of each side |
 
 A run of `pnpm rig-mesh rabbit` gives the same bytes.
