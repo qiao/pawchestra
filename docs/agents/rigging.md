@@ -17,7 +17,7 @@ arm tubes, Blender weights, and arm segments.
 | rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, a tail on the seat, a viola of `violaScale`. | `violist` |
+| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), a smaller head (`headFactor`), a tail on the seat, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, the role-neutral bind with elbow `raise` shapes, a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), the role-neutral bind with a right elbow `raise` shape. | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
@@ -168,9 +168,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   A pose can give a paw its own turn (`pawTurnL`, `pawBendR`).
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist, where
   `twistAngle()` flips. Supinate the bind paw (`studio.bindSupination`), also with straight bind
-  arms: with no supination, the left violin paw flips. Take the value of design 4.4
-  (`pnpm bind-supination <species>`), and probe the new rig again, because a twist past 180° gives
-  a wrong value. Else lower the twist of the hold. Carry no value from the last frame.
+  arms. Take the value of design 4.4 (`pnpm bind-supination <species>`), and probe the new rig
+  again. Else lower the twist of the hold. Carry no value from the last frame.
 - A turn of the bind forearm about the upper arm (`studio.bindArms`) moves the zero of the paw twist
   and of the upper arm roll. Straight bind arms keep the roll zero with the elbow axes of the bent
   bind (`StudioBody.hinges`).
@@ -185,9 +184,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - A new scale of `SpeciesParams` adds its instrument to `SCALED_INSTRUMENTS`, so the typecheck
   names each reader.
 - A hold trades folds against clearance. Check each hold change with `pnpm hold-fit --set`,
-  `pnpm pose-depth --set`, and `pnpm arm-check --variant` first.
+  `pnpm pose-depth --set`, and `pnpm arm-check --variant`.
 - The arm gate and the depths pass while a paw misses its instrument. Measure each grip with
-  `pnpm wind-grip`, and look at the thumb, which the tool does not see.
+  `pnpm wind-grip`, and look at the thumb.
 - A paw that points at its tube cannot face it with the palm. Put the grip beside the tube.
 - A big head puts the grips at shoulder height: point the elbows down. A deep trunk takes the room
   of the elbows: point them out.
@@ -198,10 +197,10 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - Rest elbows far from the play elbows twist the paws in the lift. Keep them near.
 - A freed round arm has its full inner half width, so the hold of the joined arm puts it into the
   trunk. Turn each elbow out about the line from the shoulder to the grip, bend it with a nearer
-  grip, and check the grip turn, which counts from the posed forearm.
+  grip, and check the grip turn.
 - A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
-- A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head
-  (the panda, the mouse), and the fit then jumps. Measure the front of a band of the upper chest
+- A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head,
+  and the fit then jumps. Measure the front of a band of the upper chest
   (`chestFront()`).
 
 ### Bow
@@ -289,7 +288,10 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   bones.
 - A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
   leaned forward.
-- A long leg factor thins a thigh. Widen it before the skin (`legGirth`).
+- A long leg factor thins a thigh. Widen it before the skin (`legGirth`): bone heat splits a short
+  thigh.
+- A long thigh puts the feet forward and moves the seats. Lengthen the shin (`shinFactor`). Move
+  `headFloor` and each lap share (`lap.along`) with the legs.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
