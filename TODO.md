@@ -304,6 +304,16 @@ passes.
       gap of 0.04 folded 28 faces of the left arm. Move the left forearm of the horn hold off the
       belly, then rebuild (`reports/2026-11-02-rebuild-a/pig/`). The trunk of the rebuilt body
       has no open loop, so the hornist sweep then needs a body surface with no cap.
+- [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
+      tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
+      cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
+      and `rigidPainted` at the right shoulder line. The depth grows, also on the old bind. The
+      bow upper arm goes 2.1 cm into the chest in the play (base 0.2 cm). The left forearm goes
+      1.2 cm to 1.5 cm into the cello at rest (base 0.0 cm). `armRoot` acts only on the rule
+      weights, and a chest share of the painted root weights (0.25 to 0.5) does not move the bow
+      arm. The arm sections match the source, so the painted weights are the cause. Find the
+      vertices of the bow arm root in the chest, then rebuild (`reports/2026-11-02-rebuild-b/dog/`,
+      patches in `scratch/merged/rebuild-b/dog-kept/`).
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
