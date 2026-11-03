@@ -224,8 +224,10 @@ The rest of each family:
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
   arm root.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
-  the right knee with the tip up, as a cellist does. The hippo hangs the bow beside the belly,
-  because its short knee is under the belly.
+  the right knee with the tip up, as a cellist does. The hippo hangs the bow out from the side of
+  the belly, because its short knee is under the belly, and the round upper arm then stays off the
+  trunk. Its left paw holds the neck nearer to the nut (`restPlace`), because the idle sway of the
+  rest takes the thick left forearm into the neck lower down.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the round bellies of the mouse, the wolf, the beaver, and the pig cover their thighs. So
@@ -316,6 +318,11 @@ The rest of each family:
   arms of each recast body went into the body, and with the head turn of the rabbit, the jaw went
   into the violin of six bodies. The rabbit and the red fox keep their own holds (`SHOULDER_HOLD`,
   `FOX_HOLD`).
+- **Thick wrist on a floor neck.** The left paw of a floor instrument puts the middle of its finger
+  block on the strings. The rebuilt round wrist of the hippo then goes into the back of the neck,
+  so its paw lies a little off the strings along the normal of its palm (`BowedHold.gapL`), as a
+  real bassist keeps the wrist off the neck (strings 2.8). Reason: a larger tilt of the paw over
+  the neck alone turns the paw past the accepted grip of the role.
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
