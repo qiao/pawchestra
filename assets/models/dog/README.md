@@ -106,3 +106,9 @@ of the trunk. A run gives the same bytes:
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- dog --factor 1.35
 shasum -a 256 assets/models/dog/dog-arms.glb assets/models/dog/dog-weights.json
 ```
+
+## dog.rig.glb
+
+`pnpm rig-mesh dog` rigs `dog-arms.glb` with the role-neutral bind of design 4.4: straight bind
+arms, the bind supination of `studio.bindSupination`, and three `raise` shapes of the inner elbows
+(`tools/mesh-rigs/dog.json`). `pnpm studio-body dog` then writes `src/models/studio/dog.ts`.
