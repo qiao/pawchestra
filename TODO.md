@@ -298,6 +298,10 @@ passes.
       shoulder (`gripShiftL`), so that the left forearm stays off the belly. The left palm then
       lies 1.7 cm from the grip of the horn, and the left paw goes 0.6 cm into the horn in the
       play (0.4 cm on the old hold). Check the left paw on the valves in the 2x crops.
+- [ ] Pig with rebuilt arms: in the 2x crops of the right view, a dark saw-tooth line shows under
+      the right wrist, and a small dark slit on the back of the right paw, at rest and at a note.
+      A rig with the forearm normals of the bear (`rootNormals.wrist` [0.1, 0.025], design 4.4)
+      removes both and keeps the bind. Add it to `tools/mesh-rigs/pig.json`, and rig the pig.
 - [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
       tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
       cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
