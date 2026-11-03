@@ -676,8 +676,6 @@ scene of each demo has its seats and stage size with no overlap.
       body change shows the moved seats apart from a pose change.
 - [ ] Tan fox flutist: the grips of the play and the rest lie on two sides of the flute, so the
       right paw turns around the tube in the lift (`gripAround`). Show the user the 2x crops.
-- [ ] Pig hornist: two faces of the right hoof fold at rest and in 27% of the lift, because a body
-      has at most four corrective shapes (`RAISE_LIMIT`). Try a weight rule of the right paw.
 - [ ] Pig hornist: the round belly covers the short thighs, so the horn rests on the belly. Show the
       user the close views.
 - [ ] Pig: in the front view, the skin of the armpits stretches into bands to the raised upper arms.
