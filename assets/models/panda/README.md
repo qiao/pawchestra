@@ -5,11 +5,8 @@ rigged copy. The app does not serve these files. It loads the module `src/models
 which this chain writes:
 
 ```text
-panda.glb                            source mesh
-   │  tools/blender/panda_edit.py    arms free of the trunk
-   v
-panda-edit.glb                       not in git (below)
-   │  tools/blender/arm_rebuild.py   rebuilt arms and painted weights
+panda-tpose.glb                      source mesh
+   │  tools/blender/arm_rebuild.py panda --factor 1.05
    v
 panda-arms.glb + panda-weights.json  `source` and `paintedWeights` of tools/mesh-rigs/panda.json
    │  pnpm rig-mesh panda
@@ -26,17 +23,15 @@ src/models/studio/panda.ts           studio body of the app
 
 | File | Origin | Rebuild |
 |---|---|---|
-| `panda.glb` | Source mesh (below) | None |
-| `panda-edit.glb` | Copy with the arms free of the trunk. Git keeps no copy. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/panda_edit.py -- assets/models/panda/panda-edit.glb` |
-| `panda-arms.glb` | `panda-edit.glb` with rebuilt arms 1.497 times as long. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.497` |
-| `panda-weights.json` | Weights of the same Blender run. License as `panda.glb` | The same run |
-| `panda.rig.glb` | Output of the rig. License as `panda.glb` | `pnpm rig-mesh panda` |
-| `panda-tpose.glb` | The T-pose source mesh of the next body (below) | None |
+| `panda-tpose.glb` | Source mesh (below) | None |
+| `panda-arms.glb` | Copy of `panda-tpose.glb` with rebuilt arms. License as the source | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.05` |
+| `panda-weights.json` | Weights of the same Blender run. License as the source | The same run |
+| `panda.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh panda` |
+| `panda.glb` | The source mesh of the older body (below). No rig reads it | None |
 
 ## panda-tpose.glb
 
-The T-pose mesh replaces `panda.glb` as the source when its rig passes the arm gate. The mesh has
-no skeleton. The arms stand out level to the sides, free of the trunk.
+The mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
 
 | Item | Value |
 |---|---|
@@ -126,12 +121,23 @@ finds no free section of it. `tools/blender/panda_edit.py` frees each arm in thi
 
 ## panda-arms.glb and panda-weights.json
 
-`tools/blender/arm_rebuild.py` rebuilds the arms of `panda-edit.glb` with quad tubes, 1.497 times
-as long as the mesh (`--factor 1.497`), and writes the Blender weights of the arms. The shoulder
-line lies at 0.25 of the upper arm. A run gives the same bytes. The round arm is 9.3 cm from the
-bone to its inner side, so the holds keep the elbows away from the trunk (design 5.3).
+| Item | Value |
+|---|---|
+| `panda-arms.glb` | 806,948 bytes, SHA-256 `92fa61ba7f8708b6e2b91916c2983eed483bacf34faafe66e01defd037d2fbe2` |
+| Mesh | 1,856 vertices after a weld at 1e-5, 3,707 triangles: on each arm a tube of 10 quad rings of 16 vertices from 0.25 of the upper arm to 0.1 of the paw, joined to the trunk and the paw with Bridge Edge Loops, with Beautify Faces and Collapse Edges on the bridge triangles |
+| Material | One material with one base color JPEG of 4096 × 4608 pixels: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. No metallic-roughness texture |
+| `panda-weights.json` | 415,692 bytes, SHA-256 `7d7b33862d664b86ff8ea0cc4af7d5b1e661f3e44a3c6c09eb09c02cb1edc71d` |
+| Weights | The automatic weights of Blender with the weight rules of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config. The fingers keep half of their weight (`weights.fingers`) |
 
-| File | Size | SHA-256 |
-|---|---|---|
-| `panda-arms.glb` | 821,148 bytes | `91f7246c55d2863ec414ddb825844f328320d87f1d056fa5b64ce4285b2e5a1a` |
-| `panda-weights.json` | 439,232 bytes | `4cd2116637468398f7d697046f0822f3f987fe70c3f4cfbece5f04515e84740b` |
+`tools/blender/arm_rebuild.py` puts new quad faces on each arm of `panda-tpose.glb` from the
+shoulder line to the wrist, with the settings that it finds from the joints of the config and from
+rays through the mesh. The new arm surface lies on the old one. The faces of the paws, the trunk,
+the legs, the tail, and the head are the faces of the source. The arms are 1.05 times longer from
+the shoulder line (`--factor 1.05`), because a rig with arm segments does not stretch the arms.
+With this factor, the right arm reaches the slide travel of the panda of the older mesh
+(`armFactorNote` of the config). A run gives the same bytes:
+
+```bash
+blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.05
+shasum -a 256 assets/models/panda/panda-arms.glb assets/models/panda/panda-weights.json
+```
