@@ -1,5 +1,35 @@
 {
-  "source": "assets/models/monkey/monkey.glb",
+  "source": "assets/models/monkey/monkey-arms.glb",
+  "sourceNote": "A copy of the mesh assets/models/monkey/monkey.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.2 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.2 makes these faces. The other faces and monkey.glb stay unchanged.",
+  "armSource": "assets/models/monkey/monkey.glb",
+  "armSourceNote": "The source mesh (assets/models/monkey/README.md). tools/blender/arm_rebuild.py reads it.",
+  "paintedWeights": "assets/models/monkey/monkey-weights.json",
+  "paintedLower": [
+    "root",
+    "hips",
+    "spine",
+    "spine1",
+    "chest",
+    "neck",
+    "head",
+    "ear_L",
+    "ear_R",
+    "thigh_L",
+    "shin_L",
+    "foot_L",
+    "toes_L",
+    "thigh_R",
+    "shin_R",
+    "foot_R",
+    "toes_R",
+    "tail",
+    "tail_tip"
+  ],
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, as on the wolf.",
+  "armSegments": {
+    "helper": 0.037,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it)."
+  },
   "output": "assets/models/monkey/monkey.rig.glb",
   "name": "Monkey",
   "weld": 1e-05,
@@ -8,8 +38,8 @@
     "reach": 0.384,
     "note": "No reference image shows a monkey. The scale is 1.1726 m for each unit, so the skull top is at 1.132 m, the standing shoulder joints at 0.59 u (0.692 m), and H is 0.334 m."
   },
-  "armFactor": 1.2,
-  "armFactorNote": "The factor of the upper arm and the forearm. The arms of the mesh are short for the trumpet, so the factor 1.2 gives a reach of 0.384 m. The monkey plays a smaller trumpet at the scale 0.65 (SpeciesParams.trumpetScale, SPECIES_WIND_HOLDS.monkey of src/pose/winds.ts).",
+  "armFactor": 1,
+  "armFactorNote": "The factor 1 keeps the arm length, because the rig with arm segments does not stretch the arms. The arms of monkey-arms.glb are 1.2 times longer than the arms of the source (arm_rebuild.py --factor 1.2), and the arm joints are the joints of the longer arms, so the reach stays app.reach. The monkey plays a smaller trumpet at the scale 0.65 (SpeciesParams.trumpetScale, SPECIES_WIND_HOLDS.monkey of src/pose/winds.ts).",
   "legFactor": 1,
   "legFactorNote": "The legs keep the length of the mesh. Do not stretch the legs: change the chair.",
   "joints": {
@@ -113,41 +143,41 @@
     },
     "forearm_L": {
       "head": [
-        0.178,
-        0.495,
-        0.003
+        0.1926,
+        0.476,
+        0.0066
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.211,
-        0.449,
-        0.025
+        0.2322,
+        0.4208,
+        0.033
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.244,
-        0.403,
-        0.047
+        0.2718,
+        0.3656,
+        0.0594
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.262,
-        0.335,
-        0.065
+        0.2898,
+        0.2976,
+        0.0774
       ],
       "tail": [
-        0.2592,
-        0.2778,
-        0.0882
+        0.287,
+        0.2404,
+        0.1006
       ],
       "roll": "palm"
     },
@@ -233,7 +263,7 @@
     -0.164,
     -0.594
   ],
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the top of the tuft of hair, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The tail is a chain of two bones from the haunch over a bend behind the right foot to the tip of the curl.",
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the top of the tuft of hair, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The tail is a chain of two bones from the haunch over a bend behind the right foot to the tip of the curl. The joints of the elbow, the wrist, and the paw are the joints of the longer arms of arm_rebuild.py --factor 1.2.",
   "studio": {
     "legTurns": {
       "thigh": [

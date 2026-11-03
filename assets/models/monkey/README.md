@@ -1,16 +1,20 @@
 # Monkey model
 
-This folder holds the source mesh of the monkey and its rigged copy. The app does not serve these
-files. It loads the module `src/models/studio/monkey.ts`, which this chain writes:
+This folder holds the source mesh of the monkey, a copy with rebuilt arms and its weights, and the
+rigged copy. The app does not serve these files. It loads the module `src/models/studio/monkey.ts`,
+which this chain writes:
 
 ```text
-monkey.glb                     source mesh
-   │  pnpm rig-mesh monkey     config tools/mesh-rigs/monkey.json
+monkey.glb                               source mesh
+   │  tools/blender/arm_rebuild.py       rebuilt arms and painted weights
    v
-monkey.rig.glb                 rigged mesh
+monkey-arms.glb + monkey-weights.json    `source` and `paintedWeights` of tools/mesh-rigs/monkey.json
+   │  pnpm rig-mesh monkey
+   v
+monkey.rig.glb                           rigged mesh
    │  pnpm studio-body monkey
    v
-src/models/studio/monkey.ts    studio body of the app
+src/models/studio/monkey.ts              studio body of the app
 ```
 
 `docs/agents/rigging.md` gives the steps of the chain.
@@ -20,6 +24,8 @@ src/models/studio/monkey.ts    studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `monkey.glb` | Source mesh (below) | None |
+| `monkey-arms.glb` | Copy of `monkey.glb` with rebuilt arms. License as `monkey.glb` | `arm_rebuild.py monkey --factor 1.2` |
+| `monkey-weights.json` | Weights of the same Blender run. License as `monkey.glb` | `arm_rebuild.py monkey --factor 1.2` |
 | `monkey.rig.glb` | Output of the rig. License as `monkey.glb` | `pnpm rig-mesh monkey` |
 
 ## monkey.glb
@@ -59,3 +65,25 @@ at y = 0, +z forward, and +x the left side of the animal. The mesh faces +z, wit
 - The round pink ears stand at the sides of the head, from x 0.12 to 0.17.
 - The long thin tail leaves the back of the haunch at y 0.27 and goes down to the floor behind
   the right foot. It ends in a curl that stands up on the floor at x -0.25 to -0.13.
+
+## monkey-arms.glb and monkey-weights.json
+
+| Item | Value |
+|---|---|
+| `monkey-arms.glb` | 948,484 bytes, SHA-256 `d21a8eca1fa86ad5bf5387a9c3203c272b75b1aa3c232b77516ce906e588d3c1` |
+| Mesh | 1,982 vertices after a weld at 1e-5, 3,957 triangles: on each arm a tube of 15 quad rings of 16 vertices from 0.2 of the upper arm to 0.1 of the paw, joined to the trunk and the paw with Bridge Edge Loops, with Beautify Faces and Collapse Edges on the bridge triangles |
+| Material | One material with one base color JPEG: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. No metallic-roughness texture |
+| `monkey-weights.json` | 446,328 bytes, SHA-256 `7bfdeaac77e181bedbb3d96281ee02de8b7c41f0aa83b1c63d62da76059ce1d7` |
+| Weights | The automatic weights of Blender with the weight rules of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config |
+
+`tools/blender/arm_rebuild.py` puts new quad faces on each arm from the shoulder line to the wrist,
+with the settings that it finds from the joints of the config and from rays through the mesh. The
+new arm surface lies on the old one. The arms are 1.2 times longer from the shoulder line
+(`--factor 1.2`), because a rig with arm segments does not stretch the arms. The faces of the
+paws, the trunk, the legs, the tail, and the head are the faces of the source. A run gives the
+same bytes:
+
+```bash
+blender -b --factory-startup -P tools/blender/arm_rebuild.py -- monkey --factor 1.2
+shasum -a 256 assets/models/monkey/*.glb assets/models/monkey/monkey-weights.json
+```
