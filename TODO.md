@@ -284,6 +284,13 @@ passes.
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
       the elephant, the rhino, the bear, the deer, the hippo, the fox, and the monkey have it.
       Then the body with arm segments and a bent `bindArms`: the cat.
+- [ ] Pig with rebuilt arms: `arm_rebuild.py pig --factor 1.5` on the copy with new upper arms
+      gives round arm tubes, and the hornist gate passes with the role-neutral bind (L 102, R 51).
+      The middle of the left forearm then goes 2.7 cm into the belly in the play (base 1.2 cm,
+      limit 1.5 cm), and 2.1 cm on the old bind. An elbow ring gap of 0.0125 gave 2.5 cm, and a
+      gap of 0.04 folded 28 faces of the left arm. Move the left forearm of the horn hold off the
+      belly, then rebuild (`reports/2026-11-02-rebuild-a/pig/`). The trunk of the rebuilt body
+      has no open loop, so the hornist sweep then needs a body surface with no cap.
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
