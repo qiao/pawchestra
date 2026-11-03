@@ -37,8 +37,8 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 
 ## The asset chain
 
-Each body comes from a textured mesh with no skeleton. The tools rig it into the GLB format of the
-studio, then pack it into a module that the app reads.
+Each body comes from a textured mesh with no skeleton. The tools rig it into the GLB format of a
+studio body, then pack it into a module that the app reads.
 
 ```text
  assets/models/<s>/<s>.glb (source mesh, unchanged)
