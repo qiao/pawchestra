@@ -18,7 +18,7 @@ arm tubes, Blender weights, and arm segments.
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, a tail on the seat, a viola of `violaScale`. | `violist` |
-| dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
+| dog | A copy with round inner arms (`dog-patch.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut on the head and the back (`panda_edge.py`), the role-neutral bind with a right elbow `raise` shape. | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind, a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |

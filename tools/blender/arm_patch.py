@@ -1,4 +1,4 @@
-# Output: `assets/models/dog/dog-arms.glb`.
+# Output: `assets/models/dog/dog-patch.glb`.
 """Remodels the inner side of each arm of a copy of a mesh, in Blender (batch).
 
 It reads the bones of a tail of two bones and of a jaw from the config, as `main()` of

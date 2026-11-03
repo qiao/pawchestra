@@ -8,7 +8,7 @@ writes:
 dog.glb                           source mesh
    │  tools/blender/arm_patch.py  round patch on the inner side of each arm
    v
-dog-arms.glb                      source of the rig (`source` of tools/mesh-rigs/dog.json)
+dog-patch.glb                     source of the rig (`source` of tools/mesh-rigs/dog.json)
    │  pnpm rig-mesh dog
    v
 dog.rig.glb                       rigged mesh
@@ -24,7 +24,7 @@ src/models/studio/dog.ts          studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `dog.glb` | Source mesh (below) | None |
-| `dog-arms.glb` | Copy of `dog.glb` with patched arms. License as `dog.glb` | `arm_patch.py` (below) |
+| `dog-patch.glb` | Copy of `dog.glb` with patched arms. License as `dog.glb` | `arm_patch.py` (below) |
 | `dog.rig.glb` | Output of the rig. License as `dog.glb` | `pnpm rig-mesh dog` |
 
 ## dog.glb
@@ -52,7 +52,7 @@ at 1e-5.
 - The eyes and the nose are dark faces of the head surface, with no shells. The long ears hang
   down beside the head to y 0.74. The tail tip is at z -0.31, 0.16 units above the floor.
 
-## dog-arms.glb
+## dog-patch.glb
 
 | Item | Value |
 |---|---|
@@ -68,10 +68,10 @@ it. No vertex of the source moves. The copy has 3,160 triangles. A run gives the
 
 ```bash
 blender -b --factory-startup --python tools/blender/arm_patch.py -- \
-  tools/mesh-rigs/dog.json assets/models/dog/dog.glb assets/models/dog/dog-arms.glb \
+  tools/mesh-rigs/dog.json assets/models/dog/dog.glb assets/models/dog/dog-patch.glb \
   '{"step":0.02,"freeR":false,"fade":[0.05,0.35],"scale":1.0}'
 ```
 
 ```bash
-shasum -a 256 assets/models/dog/dog.glb assets/models/dog/dog-arms.glb
+shasum -a 256 assets/models/dog/dog.glb assets/models/dog/dog-patch.glb
 ```

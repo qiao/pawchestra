@@ -1,5 +1,5 @@
 {
-  "source": "assets/models/dog/dog-arms.glb",
+  "source": "assets/models/dog/dog-patch.glb",
   "sourceNote": "The dog mesh with one local edit (assets/models/dog/README.md). The faces that join each arm to the trunk below the cut top go, and a round patch of new vertices closes the inner side of each arm (tools/blender/arm_patch.py), so that the raised cello arms do not stretch the shoulder seam into flat shards.",
   "output": "assets/models/dog/dog.rig.glb",
   "name": "Dog",
@@ -147,7 +147,7 @@
   "weights": {
     "armSplit": 0.11,
     "armIslands": true,
-    "armIslandsNote": "The round inner side of each arm of dog-arms.glb lies in part inside the plane armSplit, and only free arm vertices surround it. It follows the arm as the free arm beyond the plane (arm_islands() of tools/blender/rig_mesh.py).",
+    "armIslandsNote": "The round inner side of each arm of dog-patch.glb lies in part inside the plane armSplit, and only free arm vertices surround it. It follows the arm as the free arm beyond the plane (arm_islands() of tools/blender/rig_mesh.py).",
     "armRoot": {
       "share": 0.25,
       "along": [0.3, 0.7],
