@@ -290,10 +290,12 @@ passes.
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
       the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, and
       the pig have it. Then the body with arm segments and a bent `bindArms`: the cat.
-- [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.6 cm into the bell rim
-      (0.1 cm on the old arm). A rest right elbow of (1, -0.5, -0.6) (`restPoleR`) gives 0.3 cm,
-      but the hornist right paw then twists 98° at rest, and the bind supination rule asks R 64 in
-      place of R 51. Rig the pig with the new value, or accept the depth.
+- [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.4 cm into the rim of
+      the bell near the wrist (0.1 cm on the old arm, target 0.3 cm), with the rest
+      right elbow (1, -0.5, -0.6) and the bind supination R 64 (0.3 cm on R 51). The left paw goes
+      0.4 cm into the horn at rest (0.6 cm on the old hold): of 16 rest variants of the left elbow
+      and the left rest grip, none kept the left paw at 0.1 cm and the left wrist at 0.3 cm or
+      less. Try a rest grip on the far side of the valves, or accept the depths.
 - [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
       tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
       cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
