@@ -406,6 +406,11 @@ each verdict.
   of the old cat, and the head has the width of the old head for its height. The shin grows
   more than the thigh (`shinFactor`): a long thigh puts the feet forward, and the deeper footprint
   moves the seats of each demo (4.2).
+- The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
+  the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
+  thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
+  old panda. The vertical shin lifts the seat by its full length and the sloped thigh by less
+  than half, so the shin grows more than the thigh (`shinFactor`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
