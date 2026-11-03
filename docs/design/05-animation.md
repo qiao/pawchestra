@@ -264,6 +264,15 @@ The rest of each family:
   points lie on the line of the swivel, so it does not move them. The next approach is a turn of
   the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
   lowering that keeps the elbow bent (`TODO.md`).
+- **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig) is a
+  round tube with its full inner half width. With the bone pose of the joined arm, the inner side
+  of the upper arm goes into the trunk. So the hold of such a body keeps the elbows away from the
+  sides, as a brass player does (winds 1.8). Each elbow turns out about the line from the shoulder
+  joint to the grip, and the shoulder turns forward when the arm reaches forward. A grip nearer to
+  the shoulder bends the elbow, so each degree of the turn moves the upper arm further from the
+  trunk. The grip turn of the arm gate counts from the posed forearm, so the turn of the elbow
+  adds to it (`ACCEPTED_GRIPS`), and a large forward turn of the shoulder folds it. Reason: on a
+  bent arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
