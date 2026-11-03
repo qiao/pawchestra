@@ -294,10 +294,6 @@ passes.
       (0.1 cm on the old arm). A rest right elbow of (1, -0.5, -0.6) (`restPoleR`) gives 0.3 cm,
       but the hornist right paw then twists 98° at rest, and the bind supination rule asks R 64 in
       place of R 51. Rig the pig with the new value, or accept the depth.
-- [ ] Pig hornist: the left grip moves 0.03 H toward the mouthpiece and 0.03 H away from the left
-      shoulder (`gripShiftL`), so that the left forearm stays off the belly. The left palm then
-      lies 1.7 cm from the grip of the horn, and the left paw goes 0.6 cm into the horn in the
-      play (0.4 cm on the old hold). Check the left paw on the valves in the 2x crops.
 - [ ] Pig with rebuilt arms: in the 2x crops of the right view, a dark saw-tooth line shows under
       the right wrist, and a small dark slit on the back of the right paw, at rest and at a note.
       A rig with the forearm normals of the bear (`rootNormals.wrist` [0.1, 0.025], design 4.4)
