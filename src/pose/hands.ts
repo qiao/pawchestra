@@ -188,18 +188,16 @@ export const HANDS_HOLDS = {
     restArc: [0, 0.2, 0.15],
     // The rest pose is the rest position of a pianist before a performance: the trunk sits tall
     // with a slight lean toward the piano, the head is up, and the hands rest in the lap
-    // (`docs/reference/piano-technique.md`, section 8). The rest lean is the lean of the `ready`
-    // clip of the studio (`clip_ready()` of `lowpoly-studio/roles/pianist/clips.py`). The head
-    // lifts against it (`restHeadLift`), so the gaze is level and the face shows over the lid. The
-    // round belly of the T-pose polar bear covers its short thighs, so the paws lie in the lap in
-    // front of the lower belly, over the thighs, with the palms down and the fingers forward and
-    // in. On the low bench, paws on the belly go 3 cm into it, and the left shoulder folds more
-    // faces than on a high bench. Paws 0.8 H in front of the lap point keep off the belly on the
-    // short thighs of the mesh: at 0.6 H, the shoulders fold 4 and 3 more faces. Rest elbows that
-    // point out and down, near the elbows of the play, keep the paws from a twist in the lift. The
-    // right paw lies higher than the left paw: a lower right paw folds up to 6 more faces at the
-    // right shoulder (`pnpm arm-check`, limit 8). With the trunk of the studio rest clip, the bear
-    // slumps forward over its knees, and the paws hang beside them.
+    // (`docs/reference/piano-technique.md`, section 8). The head lifts against the rest lean
+    // (`restHeadLift`), so the gaze is level and the face shows over the lid. The round belly of
+    // the T-pose polar bear covers its short thighs, so the paws lie in the lap in front of the
+    // lower belly, over the thighs, with the palms down and the fingers forward and in. On the low
+    // bench, paws on the belly go 3 cm into it, and the left shoulder folds more faces than on a
+    // high bench. Paws 0.8 H in front of the lap point keep off the belly on the short thighs of
+    // the mesh: at 0.6 H, the shoulders fold 4 and 3 more faces. Rest elbows that point out and
+    // down, near the elbows of the play, keep the paws from a twist in the lift. The right paw lies
+    // higher than the left paw: a lower right paw folds up to 6 more faces at the right shoulder
+    // (`pnpm arm-check`, limit 8).
     restL: {
       kind: 'lap',
       lap: { along: 0.45, offset: [0.03, 0.08, -0.8] },
