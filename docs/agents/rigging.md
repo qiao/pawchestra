@@ -8,28 +8,29 @@ rigging round.
 
 Each species has a studio body (`'studio-<a>'`). The role tools take the role names, and
 `pnpm pose-depth violinist` sweeps the rabbit and the red fox together. "Rebuilt arms" means quad
-arm tubes, Blender weights, and arm segments.
+arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has the role-neutral bind
+(design 4.4).
 
 | Species | Body | Role |
 |---|---|---|
-| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), the role-neutral bind with elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
-| polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), the role-neutral bind, dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), and the leg length of the mesh. Sits on a bench that fits its haunch (`benchFitOf()`) at a piano of `PIANO_SCALE`, with the right foot on the damper pedal. | `pianist` |
-| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
-| fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
+| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
+| polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), and the leg length of the mesh. Sits on a bench that fits its haunch (`benchFitOf()`). | `pianist` |
+| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
+| fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), a smaller head (`headFactor`), a tail on the seat, a viola of `violaScale`. | `violist` |
-| dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, the role-neutral bind with elbow `raise` shapes, a round hanging tail. | `cellist` |
-| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), the role-neutral bind with a right elbow `raise` shape. | `trombonist` |
-| hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
-| mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind, a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
-| elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`), the role-neutral bind. Stands at the timpani, with the trunk on the head. | `timpanist` |
+| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
+| dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
+| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), a right elbow `raise` shape. | `trombonist` |
+| hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
+| mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
+| elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
-| pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), the role-neutral bind with two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). The horn turns back toward the body, and the horn hold keeps the round left elbow away from the belly. | `hornist` |
-| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind. The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
+| pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). The horn hold keeps the round left elbow off the belly. | `hornist` |
+| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
-| monkey | Longer rebuilt arms (`arm_rebuild.py --factor 1.2`), the role-neutral bind, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
-| rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), the role-neutral bind with elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
-| deer | Longer rebuilt arms with a side wall (`deer_arms.py`), the role-neutral bind with a right elbow `raise`, antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
+| monkey | Longer rebuilt arms (`arm_rebuild.py --factor 1.2`), a long tail curled on the floor, a smaller trumpet, no chair. | `trumpeter` |
+| rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
+| deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a right elbow `raise`, antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
 | mannequin | The test body (design 4.4): the animal preset of `mannequin.py`, with the kept faces of `arm_rebuild.py --keep-faces`. No section casts it. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
@@ -129,8 +130,7 @@ wall of `cat_arms.py`).
 - Change only the limb faces from the shoulder line to the wrist, or from the haunch line to the
   ankle. The new surface lies on the old limb. Ask the user before the first rebuild of a species.
 - Keep the source file. Write the copy next to it, with a note in the `README.md` of the folder.
-- Never call `read_factory_settings`, because it stops the MCP server. Stop only your own Blender
-  process.
+- Never call `read_factory_settings`: it stops the MCP server.
 - Merge by Distance first, because automatic weights fail on split seams.
 - Put the rings of 16 vertices about 0.45 arm radii apart, with a ring on each side of the elbow
   and the wrist. A slanted color edge keeps its zigzag (`colorBlend` softens it).
@@ -290,6 +290,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   leaned forward.
 - A long leg factor thins a thigh. Widen it before the skin (`legGirth`): bone heat splits a short
   thigh.
+- A trunk factor up to the neck shortens the chest under the arm roots and folds the shoulders.
+  Shorten only the trunk below the chest joint (`trunkTop`).
 - A long thigh puts the feet forward and moves the seats. Lengthen the shin (`shinFactor`). Move
   `headFloor` and each lap share (`lap.along`) with the legs.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
@@ -304,6 +306,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim around the pea eye. Fill it (`eyeFill`).
+- A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
+  the config, and run `arm_rebuild.py`: it writes the softened places into the weights file.
 - A face rule can paint a dark block on the side. Check it from the front, at 60°, and the sides.
 - Measure packed parts before a palette cut.
 
