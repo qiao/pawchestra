@@ -222,7 +222,9 @@ The rest of each family:
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
-  arm root.
+  arm root. The cat keeps a rest place on the thigh, far to the front of its short lap, and rests
+  the bow grip far to the front too. Reason: a grip near the shoulder bends a straight bind elbow
+  past 130°, and the inner elbow folds.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. The hippo hangs the bow out from the side of
   the belly, because its short knee is under the belly, and the round upper arm then stays off the
@@ -269,12 +271,13 @@ The rest of each family:
   the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
   lowering that keeps the elbow bent (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig), or a
-  long rebuilt arm of a T-pose mesh (the rabbit), is a round tube with its full inner half width.
-  With the bone pose of a thinner arm, the inner side of the upper arm goes into the trunk. So the
-  hold of such a body keeps the elbows away from the sides, as a brass player does (winds 1.8).
-  A violinist keeps the left elbow under the instrument and the bow arm free of the body (strings
-  1.8, 2.3). At rest, the arms of such a body hang out until they clear the body (`restArms`). Each elbow turns out about the line from the shoulder
-  joint to the grip, and the shoulder turns forward when the arm reaches forward. A grip nearer to
+  rebuilt arm of a T-pose mesh (the rabbit, the cat), is a round tube with its full inner half
+  width. With the bone pose of a thinner arm, the inner side of the upper arm goes into the trunk.
+  So the hold of such a body keeps the elbows away from the sides, as a brass player does
+  (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of the
+  body (strings 1.8, 2.3). At rest, the arms of such a body hang out until they clear the body
+  (`restArms`). Each elbow turns out about the line from the shoulder joint to the grip, and the
+  shoulder turns forward when the arm reaches forward. A grip nearer to
   the shoulder bends the elbow, so each degree of the turn moves the upper arm further from the
   trunk. When the forearm and not the upper arm lies on the trunk, a nearer grip pushes the
   forearm in. A grip away from the shoulder frees the forearm, but moves the paw off its keys, so
