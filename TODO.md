@@ -137,8 +137,6 @@ passes.
       behind in the app view.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
       the user in a close play frame of the stage.
-- [ ] Beaver: the narrow axis of the middle of each upper arm is 0.35 to 0.40 of the wide axis in
-      the play, below the limit 0.44 of `pnpm arm-look`.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
 - [ ] Polar bear pianist: the arms go up to about 8 cm into the belly in the play (accepted 4 cm).
@@ -665,16 +663,13 @@ scene of each demo has its seats and stage size with no overlap.
       the trombonist, the oboist, the clarinetist, the wolf, the tubist, and the xylophone.
 - [ ] Horn: the right palm lies across the bell opening, 2.5 cm inside it (`HORN_PALM_DEPTH`). A
       real hand goes deeper, against the far wall at 2 o'clock. Turn the paw along the bell.
-- [ ] Beaver bassoonist: the right claws go 1.5 cm into the bassoon in one lowering sample.
-- [ ] Beaver bassoonist: three faces of the left wrist, forearm, and shoulder top fold at rest and
-      in 13% of the lift, and a dark slot shows at the cap of the cut under the left arm.
-- [ ] Beaver: a soft dark crease stays at the front of the right arm root from the right side.
-- [ ] Beaver: rebuild the arms with segments. The method of the cat folded 15 faces of each arm, so
-      a new try needs a smaller socket.
+- [ ] Beaver bassoonist: three faces of the inner left elbow fold in each play sample, and the
+      left paw swings 70° on its forearm in the play (limit 70). Try wider elbow rings
+      (`arm_rebuild.py --spec`) with new rigid crease points, or a left elbow `raise` shape.
 - [ ] Beaver: the fur keeps the orange-brown of its texture. Ask the user if the plain fur takes the
       chroma of `SPECIES_COLORS.beaver`.
 - [ ] Twist steps above 25° between two arm bones: the left forearm of the rabbit, the cat, and the
-      foxes, the beaver, the panda, and the wolf right forearm. Add forearm segments.
+      foxes, the panda, and the wolf right forearm. Add forearm segments.
 - [ ] Twist steps: measure the steps of the snare drum and the xylophone on the percussion test
       score.
 - [ ] Arm gate: accept or fix the values near their margins: the cat, the elephant, the panda
