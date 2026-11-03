@@ -56,9 +56,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    to 0 at the shoulder and at the hip. The paws and the feet keep their size, and the body rises
    so that the soles stay at y = 0. The head and the ears grow by the head factor around the neck
    joint, and the weights blend the growth over the neck. The trunk takes the trunk factor
-   between the hips joint and the neck joint (`trunk_moves()`), and the head and the arms move
-   with it and keep their sizes. The legs and the tail keep their places. The trunk and the
-   clavicles take the girth
+   between the hips joint and the neck joint, or the joint of `trunkTop` (`trunk_moves()`), and
+   the head and the arms move with it and keep their sizes. The legs and the tail keep their
+   places. The trunk and the clavicles take the girth
    factors across the trunk axis, one for the width and one for the depth (`girth_moves()`), and
    the arms, the legs, and the tail move out with their joints and keep their sizes. With
    `armGirth` of the config, the upper arm and the forearm take its factors across their axes
@@ -3077,7 +3077,8 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     joint. The neck takes `neck` between its joints,
     and the head and the ears move along the neck by the move of the head joint, so that the neck
     of the rig is `neck` times the neck of the grown head. The trunk takes `trunk` between the hips
-    joint and the neck joint, and each other bone moves with it as a whole (`trunk_moves()`). The
+    joint and the joint `trunkTop` (the neck joint by default), and each other bone moves with it as
+    a whole (`trunk_moves()`). The
     vertices of the trunk and of the clavicles take `girth` across the trunk axis, and each other
     bone moves as a whole with its joint (`girth_moves()`). Then the body rises by the growth of
     the legs, so that the soles stay at y = 0. The root stays on the floor. Each vertex blends the
@@ -3170,12 +3171,12 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
         if factors['neck'] != 1:
             segments[BONES.index('neck')] = (pivot, pivot, heads['head'], factors['neck'])
 
-    # The trunk shortens between the hips joint and the neck joint. The other bones move with the
-    # trunk as a whole, after their own stretch.
+    # The trunk shortens between the hips joint and the joint `trunkTop`. The other bones move
+    # with the trunk as a whole, after their own stretch.
     lower = np.zeros(3)
     shifts = {}
     if factors['trunk'] != 1:
-        segment, moves = trunk_moves(heads, factors['trunk'])
+        segment, moves = trunk_moves(heads, factors['trunk'], factors['trunkTop'])
         lower = moves['neck']
         for name, shift in moves.items():
             k = BONES.index(name)
@@ -3243,21 +3244,23 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     return out, new_heads, new_ends, rise, drop, lower
 
 
-def trunk_moves(heads, factor):
+def trunk_moves(heads, factor, top='neck'):
     """Gives the moves of the trunk factor. The trunk bones shorten by `factor` along the line from
-    the hips joint to the neck joint (`segment_stretch()`): a point before the hips joint keeps its
-    place, a point between the joints moves by its place along the line, and a point beyond the
-    neck joint moves by the whole drop of the neck joint. So the trunk keeps its width and its
-    depth, and the faces of the belly keep their colors and become shorter along the trunk. Each
-    other bone moves as a whole with the point of the line at the head of the first bone of its
-    chain after the trunk: the neck, the head, and the ears with the neck joint, and each arm with
-    its clavicle joint. The chains of the hips bone keep their places: each leg, and the tail,
-    which grows from the pelvis, so that the tail and the haunch under it stay on the seat. So the
-    head, the arms, the legs, and the tail keep their sizes, and a vertex with weights on the trunk
-    and on another bone blends two moves of nearly the same size. Gives the segment of the trunk bones (the head,
-    the moved head, the end, and the factor) and the move of each other bone by its name, with no
-    move of the root."""
-    segment = (heads['hips'], heads['hips'], heads['neck'], factor)
+    the hips joint to the joint `top` (`trunkTop` of the config, the neck joint by default) with
+    `segment_stretch()`: a point before the hips joint keeps its place, a point between the joints
+    moves by its place along the line, and a point beyond `top` moves by the whole drop of `top`.
+    So the trunk keeps its width and its depth, and the faces of the belly keep their colors and
+    become shorter along the trunk. With the chest joint as `top`, the upper chest, the shoulders,
+    and the arm roots keep their form and move as a whole. Each other bone moves as a whole with
+    the point of the line at the head of the first bone of its chain after the trunk: the neck,
+    the head, and the ears with the neck joint, and each arm with its clavicle joint. The chains of
+    the hips bone keep their places: each leg, and the tail, which grows from the pelvis, so that
+    the tail and the haunch under it stay on the seat. So the head, the arms, the legs, and the
+    tail keep their sizes, and a vertex with weights on the trunk and on another bone blends two
+    moves of nearly the same size. Gives the segment of the trunk bones (the head, the moved head,
+    the end, and the factor) and the move of each other bone by its name, with no move of the
+    root."""
+    segment = (heads['hips'], heads['hips'], heads[top], factor)
     moves = {}
     for name in BONES:
         if name in TRUNK or PARENTS[name] is None:
@@ -5187,6 +5190,7 @@ def main():
                'shin': config.get('shinFactor', config.get('legFactor', 1)),
                'head': config.get('headFactor', 1), 'neck': config.get('neckFactor', 1),
                'trunk': config.get('trunkFactor', 1),
+               'trunkTop': config.get('trunkTop', 'neck'),
                'girth': config.get('girthFactor', [1, 1]),
                'armGirth': config.get('armGirth', [1, 1]),
                'legGirth': config.get('legGirth', [1, 1])}

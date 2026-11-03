@@ -91,10 +91,17 @@ export interface MeshRigConfig {
    */
   readonly neckFactor?: number;
   /**
-   * The factor of the length of the trunk between the hips joint and the neck joint, 1 when it is
-   * not given. The head, the arms, the legs, and the tail keep their sizes and move with the trunk.
+   * The factor of the length of the trunk between the hips joint and the neck joint, or the joint
+   * of {@link trunkTop}, 1 when it is not given. The head and the arms keep their sizes and move
+   * with the trunk, and the legs and the tail keep their places.
    */
   readonly trunkFactor?: number;
+  /**
+   * The joint at the top of the part of the trunk that the trunk factor shortens, from the hips
+   * joint: `neck` when it is not given. With `chest`, the upper chest and the arm roots keep
+   * their form.
+   */
+  readonly trunkTop?: 'chest' | 'neck';
   /**
    * The factors of the width (along x) and of the depth (in the middle plane) of the trunk and of
    * the clavicles across the trunk axis, 1 and 1 when they are not given. The arms, the legs, and
@@ -324,7 +331,7 @@ function parseConfigValue(text: string, old: ConfigValue, path: string): ConfigV
 /**
  * The optional rules of a config that a variant of `--set` can add, by their path, each with a
  * value of the kind of its value: the head factor (`headFactor`), the neck factor (`neckFactor`),
- * the trunk factor (`trunkFactor`), the girth factor (`girthFactor`), the factors of the
+ * the trunk factor (`trunkFactor`) and the top joint of its part of the trunk (`trunkTop`), the girth factor (`girthFactor`), the factors of the
  * cross-section of the arms (`armGirth`) and of the legs (`legGirth`), the trunk share of the painted weights under the armpits (`weights.paintedBelow`), the factors of the source on each axis
  * (`proportions`), the depth factor of the source and the factor of the kept head
  * (`proportions.depth`, `proportions.head`), the root share of the tail in
@@ -343,6 +350,7 @@ const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, Config
   ['headFactor', 1],
   ['neckFactor', 1],
   ['trunkFactor', 1],
+  ['trunkTop', 'neck'],
   ['girthFactor', [1, 1]],
   ['armGirth', [1, 1]],
   ['legGirth', [1, 1]],
@@ -801,15 +809,15 @@ export function legRise(config: MeshRigConfig): number {
 /**
  * Gives the drop of the left arm by the trunk factor, as `trunk_moves()` of
  * `tools/blender/rig_mesh.py` gives it: the trunk shortens by the factor along the line from the
- * hips joint to the neck joint, and the arm moves with the point of the line at its clavicle
- * joint.
+ * hips joint to the joint of `trunkTop`, and the arm moves with the point of the line at its
+ * clavicle joint.
  *
  * @param config The config.
  * @returns The drop, in the units of the studio: negative for a factor below 1.
  */
 export function trunkDrop(config: MeshRigConfig): number {
   const hips = jointHead(config, 'hips');
-  const neck = jointHead(config, 'neck');
+  const neck = jointHead(config, config.trunkTop ?? 'neck');
   const clavicle = jointHead(config, 'clavicle_L');
   const length = distance(hips, neck);
   const axis: Vec3 = [
