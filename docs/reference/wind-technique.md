@@ -361,10 +361,10 @@ The app follows these facts:
   thumb up the brace (`gripShiftR`, `aimSide`). Both paws keep this hold at rest (`restAim`).
 - **The left arm (1.1).** The left elbow points down, forward, and a little out (`reachL`,
   `poleL`).
-- **The elbows (1.8).** The elbows stay away from the sides. Each elbow turns out about the line
-  from the shoulder joint to the grip (`poleL`, `poleR`), and the left shoulder turns forward
-  (`reachL`), so that the free round arms stay out of the trunk (design 5.3). At rest, the
-  elbows point out and stay below the shoulders (`restPoleL`, `restPoleR`).
+- **The elbows (1.8).** The elbows stay away from the sides, so that the free round arms stay out
+  of the trunk (design 5.3). Each elbow turns out about the line from the shoulder joint to the
+  grip (`poleL`, `poleR`), and the left shoulder turns forward (`reachL`). At rest, the elbows
+  point out and stay below the shoulders (`restPoleL`, `restPoleR`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with
