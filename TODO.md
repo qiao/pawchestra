@@ -288,16 +288,14 @@ passes.
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
       the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, and
       the pig have it. Then the body with arm segments and a bent `bindArms`: the cat.
-- [ ] Pig with rebuilt arms: `arm_rebuild.py pig --factor 1.5` on the copy with new upper arms
-      gives round arm tubes, and the hornist gate passes with the role-neutral bind (L 102, R 51).
-      The middle of the left forearm then goes 2.7 cm into the belly in the play (base 1.2 cm,
-      limit 1.5 cm), and 2.1 cm on the old bind. An elbow ring gap of 0.0125 gave 2.5 cm, and a
-      gap of 0.04 folded 28 faces of the left arm. Move the left forearm of the horn hold off the
-      belly with the rule of the free panda arms (design 5.3, "Free round arms"): turn the left
-      elbow out about the line from the shoulder to the grip, bend it with a nearer grip, and keep
-      the grip turn within its margin. Then rebuild (`reports/2026-11-02-rebuild-a/pig/`). The
-      trunk of the rebuilt body has no open loop, so the hornist sweep then needs a body surface
-      with no cap.
+- [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.6 cm into the bell rim
+      (0.1 cm on the old arm). A rest right elbow of (1, -0.5, -0.6) (`restPoleR`) gives 0.3 cm,
+      but the hornist right paw then twists 98° at rest, and the bind supination rule asks R 64 in
+      place of R 51. Rig the pig with the new value, or accept the depth.
+- [ ] Pig hornist: the left grip moves 0.03 H toward the mouthpiece and 0.03 H away from the left
+      shoulder (`gripShiftL`), so that the left forearm stays off the belly. The left palm then
+      lies 1.7 cm from the grip of the horn, and the left paw goes 0.6 cm into the horn in the
+      play (0.4 cm on the old hold). Check the left paw on the valves in the 2x crops.
 - [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
       tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
       cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
