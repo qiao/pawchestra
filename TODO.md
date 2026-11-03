@@ -117,11 +117,14 @@ passes.
       (0.25 and 0.15), and the gap (0.28 and 0.38 radii), and `arm_rebuild.py --factor 1.497`
       rebuilds the copy. With the role-neutral bind (L 103, R 54), the trombonist gate passes
       (folds p95 L 2, R 2), but `pnpm pose-depth trombonist` puts the upper arms 6.3 cm to 7.9 cm
-      into the body at 0.33 to 0.39 of the upper arm (0.0 on `main`), in each sample. The old
-      bind, the rule weights of the clavicles, and a shoulder cut at 0.4 give the same depth. The
-      body stays (`reports/2026-11-02-panda-edit/rig/`). Next: find the corners of the depth with
-      `pose-depth --where` at the rest, and check if the poses or the clavicle region of the
-      short, thick arm cause it.
+      into the body (0.0 on `main`), in each sample. The deep corners lie on the inner side of
+      the upper arm at 0.33 to 0.41 and at 0.67 to 0.74 of its length, 8 cm to 12 cm from the
+      bone, so the free round arm is inside the trunk in the poses of the trombone. The fused arm
+      of `panda.glb` hid this overlap. The 2x crops from 40° show white wall faces through the
+      arm. The mouse oboist (0.6 cm) and the monkey trumpeter (no depth) have the same body
+      surface with caps at the arm cuts, so the depth is no fault of the sweep. The body stays
+      (`reports/2026-11-02-panda-edit/`). Next: elbows further out in the trombone hold, or a
+      thinner inner upper arm in the copy.
 - [ ] Panda: try `weights.armCrease` on each arm that is one solid with the trunk.
 - [ ] Panda: a small gray dent shows below each arm from the left side. Move the body run of the cut
       (vertices 787, 793, and 800, `tools/arm-roots/panda.json`).
