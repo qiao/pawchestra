@@ -197,7 +197,7 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
 - **No wrist flip.** A paw does not turn past 180° on its forearm in a move, because the twist
   bone (`TWIST_SHARE` of `models/studio-rig.ts`) then turns over in one frame. The arm gate checks
   each move (`probeMoves()` of `tools/arm-check.ts`). The carried left paw of a violin or a viola
-  turns on the way on which its twist from the bind of the studio stays between -180° and 180°
+  turns on the way on which its twist from the bind of the studio body stays between -180° and 180°
   (`studioPawTwist()`). On a supinated bind paw, this way is a supination, as a real forearm turns.
   On a pronated bind paw, the playing grip lies past 180° in the supination, so the paw turns the
   other way, through the direction of no paw twist. Reason: the change of the hold cannot change
