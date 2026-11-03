@@ -398,6 +398,19 @@ passes.
       111 FAIL (`reports/2026-11-01-cast-matrix/`). In 97 FAIL cells, a value fails in most
       recast cells of its column, so the shared hold of the instrument fits only its own species.
       Fit the shared holds of the bowed strings and the winds on more than one body.
+- [ ] Arms in the body of the cast matrix (5.3): 9 cells fail on an arm clip only
+      (`reports/2026-11-02-arm-clear/`). At the deepest moment of `cb550973`, the arm of the cat
+      violinist (4.0 cm), the cat cellist (4.1 cm), the pig violinist (3.3 cm), and the mannequin
+      cellist (2.4 cm) is straight (174° to 180°), because the paw target is out of reach. The pig
+      violinist and the pig flutist (3.3 cm) clip at the root of the upper arm (0.02 to 0.10 of
+      its length), and the dog cellist (2.7 cm) at 0.37. The mannequin violinist clips with the
+      forearm near the wrist (0.88) in the violin (2.0 cm). A swivel of the elbow cannot move
+      these points, and two tries cleared no cell. They also turned the paws on their forearms:
+      11 arms of 9 own roles failed the arm gate, most on the move twist and the move turn. Next:
+      a turn of the shoulder bone for the clips at the root, and a path of the paw in the lift and
+      the lowering that keeps the elbow bent. The red fox flutist (2.8 cm, elbow at 141°) and the
+      mannequin clarinetist (5.0 cm, 100°) bend the elbow, and a swivel brought the clarinetist to
+      1.6 cm.
 - [ ] Shared violin hold (`BOWED_HOLDS.violin`, 5.3): 8 of the 14 seated bodies pass. The upper
       arms of the cat go 2.0 cm to 4.0 cm into its deep chest in the play and the lowering, and the
       upper arms of the pig 2.5 cm to 3.3 cm. The left paw of the dog stretches 0.56 in the lift,
