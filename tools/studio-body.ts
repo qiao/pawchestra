@@ -501,9 +501,9 @@ const FINISHES: ReadonlyMap<string, Finish> = new Map([
 const DROPPED_BONES: ReadonlySet<string> = new Set(['baton', 'violin', 'bow']);
 
 /**
- * The name of a digit bone of a paw with four digits, such as `finger3_L` of the pianist role
- * (`lowpoly-studio/roles/pianist/role.toml`). The app has one finger bone on each hand, so the
- * digits of a paw become the one `fingers` bone of its side, and they curl together.
+ * The name of a digit bone of a paw with four digits, such as `finger3_L`. The app has one finger
+ * bone on each hand, so the digits of a paw become the one `fingers` bone of its side, and they
+ * curl together.
  */
 const DIGIT = /^finger\d_([LR])$/;
 
@@ -792,7 +792,7 @@ interface Gltf {
       readonly hinges?: Readonly<Record<Side, readonly number[]>>;
       /**
        * The seat under the seated bind pose, or under the sit pose of a standing bind. A file of
-       * another tool, such as the low-poly studio, has none.
+       * another tool has none.
        */
       readonly seat?: SeatExtras;
     };
@@ -1926,7 +1926,7 @@ interface SheetPose {
 
 /**
  * Finds the corrective weights of the pose of the sheet, and the direction of each upper arm in
- * the axes of the chest in that pose (`lowpoly-studio/templates/biped/corrective.py`).
+ * the axes of the chest in that pose (`correctives()` of `tools/blender/rig_mesh.py`).
  *
  * @param glb The file.
  * @param skeleton The bind pose.
