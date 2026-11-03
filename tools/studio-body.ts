@@ -79,7 +79,7 @@ export interface AnimalSettings {
   /**
    * The move of a seated body on a chair back toward the chair back, in meters (design 4.4, 4.5).
    * The front edge of the chair of the app then lies this far in front of the front edge of the
-   * chair of the studio under the body. The chair grows forward when the move would put the trunk
+   * chair of the rig under the body. The chair grows forward when the move would put the trunk
    * nearer than {@link CHAIR_BACK_CLEARANCE} to the back posts, so the body moves back only to
    * that clearance. 0 when it is not given.
    */
@@ -645,18 +645,16 @@ function targetNamesOf(glb: Glb): readonly string[] {
   return mesh?.extras?.targetNames ?? [];
 }
 
-/** A seat prop of the studio, and the size of the seat of the app that takes its place. */
-interface SeatProp {
-  /** The name of the prop node: `bench` or `chair`. */
-  readonly name: string;
+/** The seat of a rig, and the size of the seat of the app that takes its place. */
+interface RigSeat extends SeatExtras {
   /** The width of the seat of the app, in meters. */
   readonly width: number;
   /** The depth of the seat of the app, in meters. */
   readonly depth: number;
 }
 
-/** The seat props of the studio, and the width and the depth of the seat of the app for each. */
-const SEATS: ReadonlyMap<string, Omit<SeatProp, 'name'>> = new Map([
+/** The seats of the app by the `prop` of the seat of a rig: the width and the depth of each. */
+const SEATS: ReadonlyMap<string, Pick<RigSeat, 'width' | 'depth'>> = new Map([
   ['bench', { width: PIANO_BENCH.width, depth: PIANO_BENCH.depth }],
   ['chair', { width: CHAIR.seatWidth, depth: CHAIR.seatDepth }],
 ]);
@@ -793,6 +791,11 @@ interface Gltf {
        * of the file. The file has none with no such rule.
        */
       readonly hinges?: Readonly<Record<Side, readonly number[]>>;
+      /**
+       * The seat under the seated bind pose, or under the sit pose of a standing bind. A file of
+       * another tool, such as the low-poly studio, has none.
+       */
+      readonly seat?: SeatExtras;
     };
   };
 }
@@ -825,6 +828,24 @@ export interface RaiseExtras {
    * the name of its side in {@link RAISE_NAMES}.
    */
   readonly target?: string;
+}
+
+/**
+ * The seat of a rig in the extras of a GLB file of `pnpm rig-mesh` (`chair` of its config, or
+ * `sitPose.chair` of a sit pose), in the axes and the units of the studio. The file holds no prop,
+ * so that it holds only the animal (design 4.4).
+ */
+export interface SeatExtras {
+  /** The seat of the app that takes its place: `chair`, or `bench` for the piano bench. */
+  readonly prop: string;
+  /** The height of the seat top: the lowest point of the body over the seat. */
+  readonly top: number;
+  /** The z of the front edge of the seat. */
+  readonly front: number;
+  /** The z of the back edge of the seat. */
+  readonly back: number;
+  /** The half width of the seat on x, around the middle plane. */
+  readonly halfWidth: number;
 }
 
 /** A GLB file: its JSON part and its binary part. */
@@ -2007,7 +2028,7 @@ interface SceneFrame {
 
 /**
  * Gives the box around the meshes of the scene nodes of the GLB file whose names pass a test, such
- * as the bench or the keys of the piano of the studio.
+ * as the keys of the piano of the studio.
  *
  * @param glb The file.
  * @param test The test of a node name.
@@ -2038,19 +2059,25 @@ function propBox(glb: Glb, test: (name: string) => boolean): Box3 {
 }
 
 /**
- * Finds the seat prop of the studio (a bench or a chair) and the size of the seat of the app.
+ * Reads the seat of a rig (a bench or a chair) from the extras of its asset, and gives the size of
+ * the seat of the app that takes its place.
  *
  * @param glb The file.
- * @returns The name of the prop, and the width and the depth of the seat of the app, in meters.
- * @throws Error if the file has no seat prop.
+ * @returns The seat of the rig, and the width and the depth of the seat of the app, in meters.
+ * @throws Error if the file has no seat, or a seat of no seat of the app.
  */
-function seatOf(glb: Glb): SeatProp {
-  for (const [name, size] of SEATS) {
-    if (glb.json.nodes.some((node) => node.name === name && node.mesh !== undefined)) {
-      return { name, ...size };
-    }
+function seatOf(glb: Glb): RigSeat {
+  const seat = glb.json.asset?.extras?.seat;
+  if (!seat) {
+    throw new Error('The file has no seat in the extras of its asset. Rig it with pnpm rig-mesh.');
   }
-  throw new Error(`The file has no seat prop: ${[...SEATS.keys()].join(' or ')}.`);
+  const size = SEATS.get(seat.prop);
+  if (!size) {
+    throw new Error(
+      `The seat ${seat.prop} of the file is no seat of the app: ${[...SEATS.keys()].join(' or ')}.`,
+    );
+  }
+  return { ...seat, ...size };
 }
 
 /**
@@ -2088,11 +2115,11 @@ function reclines(glb: Glb): boolean {
  * Finds the scale and the move of the studio animal in the app (design 4.4). A standing body keeps
  * its place: the soles of the studio are on the floor. A seated body drops until the lowest point
  * of its mesh, a sole, is on the floor, and moves forward so that the front edge of the seat of
- * the studio (a bench or a chair) is at the front edge of the seat of the app. A seated role with
- * a seat height in its settings then rises until its seat is at that height, and its feet hang
- * above the floor. The scene of the
- * studio puts the field of the soles on its floor, and the skin is a little outside the field, so
- * the seated body of the app is up to 0.011 units higher above its keys than in the studio.
+ * the rig (a bench or a chair, {@link SeatExtras}) is at the front edge of the seat of the app.
+ * A seated role with a seat height in its settings then rises until its seat is at that height,
+ * and its feet hang above the floor. The scene of the studio puts the field of the soles on its
+ * floor, and the skin is a little outside the field, so the seated body of the app is up to 0.011
+ * units higher above its keys than in the studio.
  *
  * @param glb The file.
  * @param skeleton The bind pose.
@@ -2117,28 +2144,25 @@ function sceneFrame(
 
   const drop = Math.min(...mesh.vertices.map((v) => v.position.y));
   const seat = seatOf(glb);
-  const box = propBox(glb, (name) => name === seat.name);
-  const front = box.max.z;
-  const back = seat.name === 'chair' ? (settings.seatBack ?? 0) : 0;
-  const bench = seat.name === 'bench' ? benchFitOf(mesh, box, scale) : null;
+  const back = seat.prop === 'chair' ? (settings.seatBack ?? 0) : 0;
+  const bench = seat.prop === 'bench' ? benchFitOf(mesh, seat, scale) : null;
   const depth =
-    seat.name === 'chair'
-      ? chairDepthOf(mesh, box, scale, back, settings.backRoom ?? 0)
+    seat.prop === 'chair'
+      ? chairDepthOf(mesh, seat, scale, back, settings.backRoom ?? 0)
       : bench
         ? round(bench.ahead + bench.behind)
         : seat.depth;
-  // The front edge of the seat of the studio in the app, in the axes of the studio: a chair keeps
+  // The front edge of the seat of the rig in the app, in the axes of the studio: a chair keeps
   // its back at the back of the chair of design 4.5, and a shorter seat ends further back. The
   // body lies the move back behind it. The bench stands around the floor point, and the body sits
-  // with the front edge of the seat of the studio the reach under the thighs behind its front
-  // edge.
+  // with the front edge of the seat of the rig the reach under the thighs behind its front edge.
   const appFront =
-    seat.name === 'chair' ? depth - CHAIR.seatDepth / 2 : depth / 2 - (bench?.ahead ?? 0);
+    seat.prop === 'chair' ? depth - CHAIR.seatDepth / 2 : depth / 2 - (bench?.ahead ?? 0);
   const frame = {
     scale,
-    offset: new Vector3(0, -drop, (appFront - back) / scale - front),
-    chairDepth: seat.name === 'chair' ? round(depth) : null,
-    chairWidth: seat.name === 'chair' ? (settings.seatWidth ?? null) : null,
+    offset: new Vector3(0, -drop, (appFront - back) / scale - seat.front),
+    chairDepth: seat.prop === 'chair' ? round(depth) : null,
+    chairWidth: seat.prop === 'chair' ? (settings.seatWidth ?? null) : null,
     bench,
   };
   if (settings.seat === undefined) {
@@ -2167,34 +2191,34 @@ const BENCH_SINK = 0.01;
 
 /** The reach of a piano bench under a seated studio body ({@link benchFitOf}), in meters. */
 interface BenchFit {
-  /** The reach of the front edge in front of the front edge of the seat of the studio. */
+  /** The reach of the front edge in front of the front edge of the seat of the rig. */
   readonly ahead: number;
-  /** The reach of the back edge behind the front edge of the seat of the studio. */
+  /** The reach of the back edge behind the front edge of the seat of the rig. */
   readonly behind: number;
 }
 
 /**
  * Finds the reach of the piano bench of the app under a body on a bench (design 4.4, 4.5), as the
  * bench of `polar-bear-views.png` holds the whole haunch and a part of the level thighs. The seat
- * top is the lowest point of the body over the seat of the studio. The back edge is
+ * top is the lowest point of the body over the seat of the rig. The back edge is
  * {@link BENCH_BACK_ROOM} behind the last point of the haunch, from the seat top up to
  * {@link BENCH_HAUNCH} above it. The front edge goes forward from the front edge of the seat of the
- * studio, in steps of {@link BENCH_STEP}, while the underside of the thighs stays above
+ * rig, in steps of {@link BENCH_STEP}, while the underside of the thighs stays above
  * {@link BENCH_SINK} below the seat top: further forward, a level thigh is thicker, and it would
  * go deep into the seat. The haunch sets the seat top ({@link seatHeightOf}), so the thighs press
  * a little into the pad. The tail does not count.
  *
  * @param mesh The welded mesh.
- * @param seat The box of the seat of the studio, in the axes and the units of the studio.
+ * @param seat The seat of the rig, in the axes and the units of the studio.
  * @param scale The meters for each unit.
  * @returns The reach, in meters.
  */
-function benchFitOf(mesh: SourceMesh, seat: Box3, scale: number): BenchFit {
-  const half = seat.max.x;
+function benchFitOf(mesh: SourceMesh, seat: SeatExtras, scale: number): BenchFit {
+  const half = seat.halfWidth;
   const body = mesh.vertices.filter((v) => !onTail(v) && Math.abs(v.position.x) <= half);
   let top = Infinity;
   for (const { position: p } of body) {
-    if (p.z >= seat.min.z && p.z <= seat.max.z) {
+    if (p.z >= seat.back && p.z <= seat.front) {
       top = Math.min(top, p.y);
     }
   }
@@ -2208,7 +2232,7 @@ function benchFitOf(mesh: SourceMesh, seat: Box3, scale: number): BenchFit {
   }
   const step = BENCH_STEP / scale;
   let ahead = 0;
-  for (let z = seat.max.z; z < first; z += step) {
+  for (let z = seat.front; z < first; z += step) {
     const low = body.reduce(
       (least, { position: p }) => (p.z >= z && p.z < z + step ? Math.min(least, p.y) : least),
       Infinity,
@@ -2216,23 +2240,23 @@ function benchFitOf(mesh: SourceMesh, seat: Box3, scale: number): BenchFit {
     if (low < top - BENCH_SINK / scale) {
       break;
     }
-    ahead = (z + step - seat.max.z) * scale;
+    ahead = (z + step - seat.front) * scale;
   }
-  return { ahead, behind: (seat.max.z - last) * scale + BENCH_BACK_ROOM };
+  return { ahead, behind: (seat.front - last) * scale + BENCH_BACK_ROOM };
 }
 
 /**
  * Finds the depth of the chair of the app under a body on a chair (design 4.4, 4.5): the depth of
- * the chair of the studio, so that the body sits on the whole seat, as in the studio. The chair
+ * the chair of the rig, so that the body sits on the whole seat, as in the rig. The chair
  * grows back until its back posts keep {@link CHAIR_BACK_CLEARANCE} behind the trunk, as the
  * chair of the parametric biped does (`chairForward()` of `models/player.ts`), and then by the
  * room behind the back and the move of the body back on it. The body lies the move behind the
- * front edge of the chair of the studio, so it moves back up to that clearance, and the chair
+ * front edge of the chair of the rig, so it moves back up to that clearance, and the chair
  * grows forward under it by the rest of the move. The tail goes back through the open back under
  * the top rail, so it does not count.
  *
  * @param mesh The welded mesh.
- * @param chair The box of the chair of the studio, in the axes and the units of the studio.
+ * @param chair The seat of the rig, in the axes and the units of the studio.
  * @param scale The meters for each unit.
  * @param move The move of the body back on the chair, in meters (`AnimalSettings.seatBack`).
  * @param room The room behind the back beyond the clearance, in meters
@@ -2241,21 +2265,21 @@ function benchFitOf(mesh: SourceMesh, seat: Box3, scale: number): BenchFit {
  */
 function chairDepthOf(
   mesh: SourceMesh,
-  chair: Box3,
+  chair: SeatExtras,
   scale: number,
   move: number,
   room: number,
 ): number {
   // The back of the chair of the app reaches its height above the seat: the lowest point of the
-  // body over the chair of the studio. The tail goes back over the seat, so it does not count.
+  // body over the chair of the rig. The tail goes back over the seat, so it does not count.
   let seat = Infinity;
   for (const vertex of mesh.vertices) {
     const p = vertex.position;
     if (
       !onTail(vertex) &&
-      Math.abs(p.x) <= chair.max.x &&
-      p.z >= chair.min.z &&
-      p.z <= chair.max.z
+      Math.abs(p.x) <= chair.halfWidth &&
+      p.z >= chair.back &&
+      p.z <= chair.front
     ) {
       seat = Math.min(seat, p.y);
     }
@@ -2264,14 +2288,14 @@ function chairDepthOf(
   let back = Infinity;
   for (const vertex of mesh.vertices) {
     const p = vertex.position;
-    if (!onTail(vertex) && p.y <= top && Math.abs(p.x) <= chair.max.x) {
+    if (!onTail(vertex) && p.y <= top && Math.abs(p.x) <= chair.halfWidth) {
       back = Math.min(back, p.z);
     }
   }
-  const studio = (chair.max.z - chair.min.z) * scale;
+  const studio = (chair.front - chair.back) * scale;
   return Math.max(
     studio,
-    (chair.max.z - back) * scale + CHAIR_LEG + CHAIR_BACK_CLEARANCE + room + move,
+    (chair.front - back) * scale + CHAIR_LEG + CHAIR_BACK_CLEARANCE + room + move,
   );
 }
 
@@ -2291,7 +2315,7 @@ function seatHeightOf(glb: Glb, mesh: SourceMesh, frame: SceneFrame): number {
   const halfX = (frame.chairWidth ?? seat.width) / 2 / frame.scale;
   // The seat in the axes of the studio: a chair from its back at the back of the chair of design
   // 4.5 to its front edge, and the bench around the origin. Under a body that fits it, the haunch
-  // sets the bench top: the part of the bench behind the front edge of the seat of the studio.
+  // sets the bench top: the part of the bench behind the front edge of the seat of the rig.
   const fit = frame.bench;
   const bench = fit ? fit.ahead + fit.behind : seat.depth;
   const back = frame.chairDepth === null ? -bench / 2 : -CHAIR.seatDepth / 2;
@@ -2946,8 +2970,8 @@ export interface StudioInspection {
   /** The height of the hips joint in the bind pose. */
   readonly bindHips: number;
   /**
-   * True for a seated role: the setting of `ANIMALS`, or a prop `bench` for an animal that is not
-   * in `ANIMALS`.
+   * True for a seated role: the setting of `ANIMALS`, or a bench (a prop `bench`, or a seat of the
+   * rig on the bench) for an animal that is not in `ANIMALS`.
    */
   readonly seated: boolean;
   /**
@@ -2957,6 +2981,8 @@ export interface StudioInspection {
   readonly lowest: Vec3;
   /** The props: the scene nodes with a mesh and no skin. */
   readonly props: readonly InspectedProp[];
+  /** The seat of a rig of `pnpm rig-mesh` in the extras of the asset, or `null` with none. */
+  readonly seat: SeatExtras | null;
   /** The height of the top of the prop `bench`, or `null` with no bench. */
   readonly benchTop: number | null;
   /** The keys of the piano of the studio, or `null` with no keys. */
@@ -3001,9 +3027,9 @@ function meshBox(glb: Glb, worlds: readonly Matrix4[], nodes: readonly number[])
 /**
  * Reads the facts of a GLB file of the studio that a new studio body needs (design 4.4). These
  * are the nodes, the joints, the morph targets, and the clips. They also hold the heights of the
- * hips, the length of each arm to the middle of the palm, the lowest point of the skin, and the
- * boxes of the props. The function reads the file as it is. It does not stop on a part that the
- * export refuses: it lists that part.
+ * hips, the length of each arm to the middle of the palm, the lowest point of the skin, the boxes
+ * of the props, and the seat of a rig. The function reads the file as it is. It does not stop on a
+ * part that the export refuses: it lists that part.
  *
  * @param bytes The GLB file.
  * @param settings The settings of the animal, or `null` for an animal that is not in `ANIMALS`.
@@ -3044,6 +3070,7 @@ export function inspectStudioGlb(
   }));
   const bench = props.find((prop) => prop.name === 'bench');
   const keys = props.find((prop) => prop.name === 'piano_key_*');
+  const seat = gltf.asset?.extras?.seat ?? null;
 
   // The scale of the settings, as the export finds it.
   const used = settings ?? {
@@ -3201,9 +3228,10 @@ export function inspectStudioGlb(
     clips,
     arms,
     bindHips: heightOf(hips, worlds),
-    seated: settings ? settings.seated : bench !== undefined,
+    seated: settings ? settings.seated : bench !== undefined || seat?.prop === 'bench',
     lowest: lowest.toArray(),
     props: props.map((prop) => ({ name: prop.name, nodes: prop.nodes, box: unitBox(prop.box) })),
+    seat,
     benchTop: bench ? bench.box.max.y : null,
     keys: keys ? { top: keys.box.max.y, front: keys.box.min.z } : null,
   };
@@ -3273,6 +3301,12 @@ export function inspectionLines(facts: StudioInspection): string[] {
   );
   if (facts.props.length === 0) {
     lines.push('  none');
+  }
+  if (facts.seat) {
+    const { prop, top, front, back, halfWidth } = facts.seat;
+    lines.push(
+      `Seat of the rig (${prop}): top ${units(top)}, front edge z ${units(front)}, back edge z ${units(back)}, half width ${units(halfWidth)}`,
+    );
   }
   if (facts.benchTop !== null) {
     lines.push(`Bench top: ${units(facts.benchTop)}`);
