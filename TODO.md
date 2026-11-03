@@ -301,23 +301,13 @@ passes.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
       the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, the
-      pig, and the cat have it.
+      pig, the cat, and the dog have it.
 - [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.4 cm into the rim of
       the bell near the wrist (0.1 cm on the old arm, target 0.3 cm), with the rest
       right elbow (1, -0.5, -0.6) and the bind supination R 64 (0.3 cm on R 51). The left paw goes
       0.4 cm into the horn at rest (0.6 cm on the old hold): of 16 rest variants of the left elbow
       and the left rest grip, none kept the left paw at 0.1 cm and the left wrist at 0.3 cm or
       less. Try a rest grip on the far side of the valves, or accept the depths.
-- [ ] Dog with rebuilt arms: `arm_rebuild.py dog --factor 1.35` on the patched copy gives clean
-      tubes. The rebuild writes `dog-arms.glb`, so the patched copy needs another name first. The
-      cellist gate passes with the role-neutral bind (L 91, R 46), elbow and lift `raise` shapes,
-      and `rigidPainted` at the right shoulder line. The depth grows, also on the old bind. The
-      bow upper arm goes 2.1 cm into the chest in the play (base 0.2 cm). The left forearm goes
-      1.2 cm to 1.5 cm into the cello at rest (base 0.0 cm). `armRoot` acts only on the rule
-      weights, and a chest share of the painted root weights (0.25 to 0.5) does not move the bow
-      arm. The arm sections match the source, so the painted weights are the cause. Find the
-      vertices of the bow arm root in the chest, then rebuild (`reports/2026-11-02-rebuild-b/dog/`,
-      patches in `scratch/merged/rebuild-b/dog-kept/`).
 - [ ] Badger with rebuilt arms: `arm_rebuild.py badger` gives clean tubes, but the folds grow on
       the old bind and on the straight bind (L 114, R 89). Nine of 10 arms fail, the most on the
       xylophonist (L 17, base 8). The grip turn of the bass drummer R grows to 22° (base 7°). A
@@ -463,8 +453,13 @@ passes.
       trumpet 10.0 cm) or the forearms (snare drum 7.6 cm), and the folds go over the limit 8 in
       four cells (10 to 13 faces). The shared holds keep the elbows of joined arms near the trunk.
       Give the shared holds the rule of the free round arms (5.3), and run the matrix for each body.
-- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
-      the dog stays `OPEN`. The left claws of the monkey (1.8 cm) go into the cello in a few play
+- [ ] Dog with the free arms in the cast matrix: the rebuilt round arms of the dog go further into
+      the body in the recast cells than the old arms (lower or play, base in parentheses): violin
+      2.1 cm (1.9), flute 2.3 cm (1.3), clarinet 2.7 cm (1.8), trumpet 4.5 cm (2.6), snare drum
+      3.7 cm (2.6) (`reports/2026-11-03-dog-hold/proof/matrix.log`). Give the shared holds the rule
+      of the free round arms (5.3), as for the panda.
+- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, the deer, and the dog
+      (own hold) pass. The left claws of the monkey (1.8 cm) go into the cello in a few play
       samples. The cello of the foxes goes 5.0 cm into the
       body in the play, the forearms of the polar bear and the mannequin go up to 2.4 cm into the
       cello at rest and in the moves, and the upper arms of the cat and the pig go up to 4.0 cm into
@@ -522,15 +517,17 @@ scene of each demo has its seats and stage size with no overlap.
 
 ## Step 5. Motion (5, 4.7, 9.7)
 
-- [ ] Dog cellist: the left ear touches the cello, the left forearm and paw go up to 2.1 cm into it,
-      and the bow reach is 69% (goal 70%). Move the cello, and rebuild the left arm shapes.
+- [ ] Dog cellist: the left ear touches the cello, and the bow reach is 69% (goal 70%). Move the
+      cello.
 - [ ] Dog cellist: the knees stay about 21 cm from the leaned cello.
 - [ ] Dog cellist: in `boulanger-matin` (121 s to 127 s), the third cellist puts one paw 2.4 cm into
       the other, where pizzicato on the low strings meets a held arco note (`pnpm clip-probe`).
-- [ ] Dog: the upper arms go 5.2 cm into the body in the play and the lowering (goal 3.5 cm). Try a
-      larger `weights.armRoot.along`, or a bow hold that keeps the upper arm off the chest.
-- [ ] Dog: faces 342 and 172 at the right shoulder top fold in 17% of the lift. Try a `raise` shape
-      fitted on the lift alone, with a fade of 5° to 10°.
+- [ ] Dog: faces 1713 and 1714 of the left inner elbow fold at rest and in 13% of the lift samples
+      of `mozart-k525`, and the left elbow shape `arm_raise_L` leaves 6 faces turned over in its own
+      pose. Fit the left elbow shapes again with the rest elbow of `DOG_HOLD` (`pnpm raise-fit`).
+- [ ] Dog: the white band of each rebuilt forearm ends in a saw-tooth color edge near the wrist
+      (`reports/2026-11-03-dog-hold/crops-el20/`). Try a color blend (`colorBlend`) or a ring on the
+      edge.
 - [ ] Dog: a soft star dent shows on the chest below the right arm root from the right side, and a
       thin dark line at the right root from az150 at rest. Try a fair of the body caps.
 - [ ] Cat violist: in the 5th position, the left wrist under the neck keeps a twisted band.
