@@ -321,6 +321,11 @@ passes.
       grows 15.5 mm (`headFloor` 0.76 of `ANIMALS` keeps it). The own roles want a small bind
       supination, and the violin recast sets the left value. Fit the painted weights of the
       shoulder line and the paws first (`reports/2026-11-02-rebuild-b/badger/`).
+- [ ] Arm rebuild: a cut plane less than about 0.4 mm from a source vertex leaves a cluster of
+      very small faces at its loop. `step_clean_flaps()` deletes the flaps, but the small faces
+      of the dog right shoulder line still turn over at rest (`rigidPainted` fixes them). A snap
+      of such a vertex onto the plane changes the bytes of the monkey, whose wrist planes pass
+      0.11 mm and 0.19 mm from a vertex.
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
