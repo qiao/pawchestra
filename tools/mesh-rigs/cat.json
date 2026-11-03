@@ -1,141 +1,498 @@
 {
   "source": "assets/models/cat/cat-arms.glb",
-  "sourceNote": "The cat mesh (assets/models/cat/README.md), with new arm faces: a cut along the arm seam, a side wall of the trunk under each arm, and a quad tube for each arm. The trunk is an even oval. tools/blender/cat_arms.py replays the Blender session that made it. cat.glb stays unchanged.",
+  "sourceNote": "A copy of the T-pose mesh assets/models/cat/cat-tpose.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, at the length of the mesh. tools/blender/arm_rebuild.py makes these faces, with the elbow rings 0.035 u from the elbow (--spec, assets/models/cat/README.md). The other faces and cat-tpose.glb stay unchanged.",
+  "armSource": "assets/models/cat/cat-tpose.glb",
+  "armSourceNote": "The T-pose mesh of the cat (assets/models/cat/README.md). Its arms are level and free of the trunk, so tools/blender/arm_rebuild.py rebuilds them with no species script.",
   "paintedWeights": "assets/models/cat/cat-weights.json",
-  "paintedLower": ["root", "hips", "spine", "spine1", "chest", "neck", "head", "ear_L", "ear_R", "thigh_L", "shin_L", "foot_L", "toes_L", "thigh_R", "shin_R", "foot_R", "toes_R", "tail"],
-  "paintedNote": "The weights of the arm tubes are the automatic weights of Blender with the Weight Paint fixes of tools/blender/cat_arms.py. The trunk, the side walls, the socket, and the first ring of each shoulder keep the rule weights, so that the chest in front of each shoulder does not fold.",
+  "paintedLower": [
+    "root",
+    "hips",
+    "spine",
+    "spine1",
+    "chest",
+    "neck",
+    "head",
+    "ear_L",
+    "ear_R",
+    "thigh_L",
+    "shin_L",
+    "foot_L",
+    "toes_L",
+    "thigh_R",
+    "shin_R",
+    "foot_R",
+    "toes_R",
+    "tail"
+  ],
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, because the seated bind of the app depends on them.",
   "armSegments": {
-    "helper": 0.017,
-    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the rabbit. The app turns them from the joints of the pose (poseArm() of src/models/studio-rig.ts). They replace the rings of refine."
+    "helper": 0.07,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it). With the gap 0.0216 u that the script chooses (the helper 0.0432 u), the inner faces of each elbow turned over in each sample of the play and the rest (arm gate folds p95 L 13, R 20). With the gap 0.035 u, the bend spreads over more rings."
   },
   "rootNormals": {
     "radius": 0.1,
-    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). The bind turns the arm root, and without this rule hard dark lines show at the back of each arm root."
-  },
-  "armSmooth": {
-    "rounds": 4,
-    "sides": "R",
-    "note": "4 rounds of taubin() smooth the tube of the bow arm of cat-arms.glb after the weights (arm_smooth() of tools/blender/rig_mesh.py), so that the arm shows no lumps. More rounds fold the bow paw."
+    "armShare": 0.3,
+    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). A face stays in the rim only when the mean weight of its corners on the clavicle and the arm bones of its side is 0.3 or more, as on the hippo and the rabbit, so that the faces of the upper chest keep their facets."
   },
   "output": "assets/models/cat/cat.rig.glb",
   "name": "Cat",
-  "weld": 1e-5,
+  "weld": 1e-05,
   "app": {
-    "shoulders": 1.042897,
-    "reach": 0.4128,
-    "note": "The scale is 1.639161 m for each unit, so that the standing ear tips with the leg factor 1.5 are 1.758 m high, as the red fox. The trunk factor makes the cat shorter: the standing shoulder joints are at 1.042897 m (keptHeight() of tools/rig-mesh.ts). The reach is the reach of cat-arms.glb."
+    "shoulders": 0.950065,
+    "reach": 0.5305,
+    "note": "The scale keeps the head height H of the cat body of the A-pose mesh, 0.339375 m (from the chin to the top of the skull, with no whisker tips, headFloor of ANIMALS): 1.588737 m for each unit, with the standing shoulder joints at 0.950065 m (ANIMALS). The holds in H then keep their size in meters. The reach is the reach of the arms of the mesh, from the shoulder joint to the middle of the palm."
   },
   "armFactor": 1,
-  "armFactorNote": "The factor 1 does not stretch the arms in the rig. The upper arm of cat-arms.glb is 0.92 and the forearm 0.78 as long as on the source (step_shape() of tools/blender/cat_arms.py). The cat plays a smaller viola nearer to the neck, so that the left paw reaches the nut.",
-  "legFactor": 1.94168,
-  "trunkFactor": 0.686144,
-  "girthFactor": [1.08, 1.15],
-  "neckFactor": 0.65,
-  "legFactorNote": "The factor of the thigh and the shin. Each one stretches only between its joints, and the foot keeps its size. The factor is 1.5 + (1 - 0.85768) × 0.45 / 0.145 = 1.94168, so that the standing ear tips stay at 1.758 m with the shorter trunk.",
-  "neckFactorNote": "The factor of the neck between its joints, the factor of the fox. The head keeps its size and moves down the neck with the head joint: the neck joint is 4.9 cm from the head joint.",
-  "girthFactorNote": "The factors of the width and the depth of the trunk and the clavicles across the trunk axis (girth_moves() of tools/blender/rig_mesh.py), so that the trunk matches docs/reference/cat-views.png. The arms, the legs, and the tail keep their sizes and move out with their joints.",
-  "trunkFactorNote": "The factor of the trunk between the hips joint and the neck joint (trunk_moves() of tools/blender/rig_mesh.py). From the narrowest neck row to the crotch, the trunk is 1.76 head heights, as on the red fox. The head, the arms, the legs, and the tail keep their sizes and move with the trunk.",
+  "armFactorNote": "The arms keep the length of the mesh (arm_rebuild.py with no --factor). The left paw reaches the nut of the viola of violaScale with 9.5 cm to spare (pnpm hold-reach cat --instrument viola), so the arms need no stretch.",
+  "legFactor": 1,
+  "legFactorNote": "The legs keep the length of the mesh, as the user mesh is. The short legs give a seat of 0.136 m, and the chair of the app fits them.",
   "joints": {
-    "root": { "head": [0, 0, 0], "tail": [0, 0, 0.1], "roll": [0, 1, 0] },
-    "hips": { "head": [0, 0.21, 0.045], "tail": "spine" },
-    "spine": { "head": [0, 0.32, 0.05], "tail": "spine1" },
-    "spine1": { "head": [0, 0.435, 0.06], "tail": "chest" },
-    "chest": { "head": [0, 0.55, 0.065], "tail": "neck" },
-    "neck": { "head": [0, 0.66, 0.065], "tail": "head" },
-    "head": { "head": [0, 0.705, 0.075], "tail": [0, 0.9, 0.09] },
-    "ear_L": { "head": [0.068, 0.89, 0.079], "tail": [0.12, 1.0, 0.115] },
-    "clavicle_L": { "head": [0.02, 0.645, 0.055], "tail": "upper_arm_L" },
-    "upper_arm_L": { "head": [0.06, 0.636, 0.05], "tail": "forearm_L", "roll": "palm" },
-    "forearm_L": { "head": [0.12992, 0.5348, 0.0546], "tail": "forearm_twist_L", "roll": "palm" },
-    "forearm_twist_L": { "head": [0.15956, 0.4919, 0.06396], "tail": "hand_L", "roll": "palm" },
-    "hand_L": { "head": [0.1892, 0.449, 0.07332], "tail": "fingers_L", "roll": "palm" },
-    "fingers_L": { "head": [0.2152, 0.412, 0.07532], "tail": [0.2212, 0.382, 0.08132], "roll": "palm" },
-    "thigh_L": { "head": [0.07, 0.19, 0.065], "tail": "shin_L" },
-    "shin_L": { "head": [0.07, 0.115, 0.058], "tail": "foot_L" },
-    "foot_L": { "head": [0.073, 0.045, 0.055], "tail": "toes_L", "roll": [0, 1, 0] },
-    "toes_L": { "head": [0.088, 0.02, 0.1], "tail": [0.088, 0.01, 0.133], "roll": [0, 1, 0] },
-    "tail": { "head": [0, 0.3, -0.045], "tail": "tail_tip", "roll": [0, 1, 0] },
-    "tail_tip": { "head": [0, 0.08, -0.08], "tail": [0, 0.03, -0.215], "roll": [0, 1, 0] }
+    "root": {
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.1
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "hips": {
+      "head": [
+        0,
+        0.19,
+        0.06
+      ],
+      "tail": "spine"
+    },
+    "spine": {
+      "head": [
+        0,
+        0.3,
+        0.075
+      ],
+      "tail": "spine1"
+    },
+    "spine1": {
+      "head": [
+        0,
+        0.41,
+        0.09
+      ],
+      "tail": "chest"
+    },
+    "chest": {
+      "head": [
+        0,
+        0.52,
+        0.09
+      ],
+      "tail": "neck"
+    },
+    "neck": {
+      "head": [
+        0,
+        0.665,
+        0.085
+      ],
+      "tail": "head"
+    },
+    "head": {
+      "head": [
+        0,
+        0.7,
+        0.09
+      ],
+      "tail": [
+        0,
+        0.9135,
+        0.08
+      ]
+    },
+    "ear_L": {
+      "head": [
+        0.105,
+        0.89,
+        0.11
+      ],
+      "tail": [
+        0.155,
+        1.0,
+        0.154
+      ]
+    },
+    "clavicle_L": {
+      "head": [
+        0.02,
+        0.605,
+        0.08
+      ],
+      "tail": "upper_arm_L"
+    },
+    "upper_arm_L": {
+      "head": [
+        0.085,
+        0.598,
+        0.075
+      ],
+      "tail": "forearm_L",
+      "roll": "palm"
+    },
+    "forearm_L": {
+      "head": [
+        0.235,
+        0.598,
+        0.092
+      ],
+      "tail": "forearm_twist_L",
+      "roll": "palm"
+    },
+    "forearm_twist_L": {
+      "head": [
+        0.31,
+        0.598,
+        0.105
+      ],
+      "tail": "hand_L",
+      "roll": "palm"
+    },
+    "hand_L": {
+      "head": [
+        0.385,
+        0.598,
+        0.118
+      ],
+      "tail": "fingers_L",
+      "roll": "palm"
+    },
+    "fingers_L": {
+      "head": [
+        0.445,
+        0.592,
+        0.128
+      ],
+      "tail": [
+        0.474,
+        0.586,
+        0.13
+      ],
+      "roll": "palm"
+    },
+    "thigh_L": {
+      "head": [
+        0.093,
+        0.185,
+        0.08
+      ],
+      "tail": "shin_L"
+    },
+    "shin_L": {
+      "head": [
+        0.093,
+        0.105,
+        0.07
+      ],
+      "tail": "foot_L"
+    },
+    "foot_L": {
+      "head": [
+        0.095,
+        0.045,
+        0.065
+      ],
+      "tail": "toes_L",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "toes_L": {
+      "head": [
+        0.11,
+        0.015,
+        0.125
+      ],
+      "tail": [
+        0.11,
+        0.005,
+        0.16
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail": {
+      "head": [
+        0,
+        0.255,
+        -0.06
+      ],
+      "tail": "tail_tip",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail_tip": {
+      "head": [
+        0,
+        0.105,
+        -0.15
+      ],
+      "tail": [
+        0,
+        0.24,
+        -0.255
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    }
   },
-  "palm": [-0.88, -0.47, -0.07],
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, +z forward, +x the left side. The tail is a chain of two bones. The elbow, the wrist, and the paw joints move with the shorter arm bones of cat-arms.glb.",
+  "palm": [
+    0,
+    -1,
+    0
+  ],
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, +z forward, +x the left side. The right side mirrors the left side. The arms are in a T-pose, level at y 0.598. The shoulder joint lies 0.035 u inside the line where the arm leaves the trunk, the wrist joint at the start of the white paw, and the elbow halfway between them. The pink pads lie under each paw, so the palm faces down. The neck joint lies at the narrowest row under the chin. The tail is a chain of two bones: the root bone goes down behind the legs, and the tip bone curls up behind.",
   "studio": {
     "legTurns": {
-      "thigh": [0.570402, 0.007167, -0.07679, 0.817737],
-      "shin": [0.021399, 0, 0.021399, 0.999542],
-      "foot": [0, 0, 0, 1],
-      "toes": [0, 0, 0, 1]
+      "thigh": [
+        0.58301,
+        0.009673,
+        -0.077382,
+        0.808714
+      ],
+      "shin": [
+        0.041541,
+        0.0,
+        0.016617,
+        0.998999
+      ],
+      "foot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "toes": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
     },
     "trunk": {
       "open": 1,
-      "shares": { "hips": 1, "spine": 1, "spine1": 0.75, "chest": 0.5, "neck": 0.25, "head": 0 }
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
     },
-    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. With open 1, the trunk axis leans 0.4 degrees back, and no crease face turns over.",
+    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share.",
     "bindArms": {
-      "upper_arm": [0.702, -0.451, 0.551],
-      "forearm": [0.316246, 0.757051, 0.571719],
-      "hand": [-0.078782, 0.677317, 0.731461]
-    },
-    "bindArmsNote": "The bind upper arm points 38 degrees from the hanging upper arm of the mesh, as on the deer. A bind farther from the mesh folds the socket at the back of the upper arm, and a bind nearer to it twists the arm more.",
-    "bindSupination": { "L": 120 },
-    "bindSupinationNote": "The bind paw of the left arm turns 120 degrees about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py). The bind paw sets the zero of the paw twist, so the left paw does not twist through 180 degrees on the viola. The right paw keeps the bind arms.",
-    "tailCurl": {
-      "points": [
-        [0.05, -0.079, -0.02],
-        [0.1506, -0.112, 0.036],
-        [0.1793, -0.1216, 0.0995],
-        [0.1468, -0.1101, 0.1573],
-        [0.0987, -0.0654, 0.1948]
+      "upper_arm": [
+        0.702,
+        -0.451,
+        0.551
       ],
-      "blend": [0.5, 0.95],
-      "smooth": 4,
-      "note": "The seated tail curls on the seat around the left side of the haunch, as a sitting cat curls its tail. The points are the curve after the tail root in the seated bind (curl_line() of tools/blender/rig_mesh.py). The blend keeps the tail root with the haunch, and smooth rounds the curl."
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
     },
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 8 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 8 0). The bind arms are the arms of the fox and the rabbit."
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the cat of the A-pose mesh, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindSupination": {
+      "L": 150,
+      "R": 90
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 150 degrees and the right 90 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The rule of design 4.4 gives L 84 and R 53 (pnpm bind-supination cat on the rigs of L 0, L 90, and L 150), but the own role wins on both sides. With L 84, the left paw twist p95 of the violist is 149 degrees and its move twist 151 degrees, near the pinch of the wrist skin under the neck; with 150, 83 and 85 degrees. With R 53, the bow paw twists past 180 degrees in the lift (move twist 180, limit 176); with 90, its paw twist p95 is 61 degrees. With L 150, the largest left paw twist p95 of the cast roles is 168 degrees (the flutist and the snare drummer, limit 170).",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 8 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 8 0).",
+    "straightArms": true,
+    "tailBind": {
+      "tail": [
+        0,
+        -0.15,
+        -1
+      ],
+      "tail_tip": [
+        0,
+        -1.2,
+        -1
+      ]
+    },
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "tailBindNote": "Each tail bone of the seated bind turns onto its direction: the root bone goes back over the back edge of the seat and a little down, and the tip bone goes down and back, so that the long tail hangs behind the chair between the back posts. The tail keeps its curl in the standing body."
   },
   "weights": {
-    "armSplit": 0.1,
-    "armBelow": [0.6, 0.64],
-    "armSplitNote": "The side wall under each arm and the socket lie inside the plane |x| = 0.1, and below the armpit line at the height 0.6 they keep no arm weight (armBelow). A smaller value gives the side wall the weights of the free arm.",
+    "armSplit": 0.12,
     "stretchRamp": 0,
     "stretchRampNote": "With a ramp, the upper arm stretches by the arm factor only on the free arm: the share of the stretch fades from 0 to 1 over this many units on each side of the plane |x| = armSplit. 0 gives no ramp, as for the fox and the rabbit.",
-    "headFrom": 0.71,
-    "noseFront": { "front": 0.19, "note": "The tips of the lower whiskers hang below headFrom, in front of the plane z = front, and only they lie there. The rule gives them to the head, so that the head lift does not bend each whisker. The head measures leave the tips out (headFloor of tools/studio-body.ts)." },
-    "earBase": [0.875, 0.91],
-    "tail": { "radius": 0.06, "behind": -0.028, "root": [-0.02, 0.05], "bend": 0.04, "smooth": 3 },
-    "sliver": { "angle": 10, "longest": 0.04, "note": "The corners of each thin face share one set of weights, so that the face moves rigidly and does not turn over at a bent joint. A thin face has a corner angle below angle (degrees) and a longest edge below longest (units), which takes face 1248 of the left armpit." },
-    "line": { "angle": 150, "head": true, "note": "The middle corner of each long thin face (a corner angle above angle, in degrees) takes the mix of the weights of its two other corners by its place along their line, so that it does not lag when a joint bends. With head, the head takes the rule too." },
-    "clavicleFrom": [0.595, 0.64],
-    "clavicleFromNote": "The share of the clavicle weight that a vertex keeps grows from 0 at the lower height to 1 at the upper height (units), and the chest takes the rest. This is the rule of the fox, moved with the clavicle joint of the cat (y 0.645).",
-    "armTop": [0.645, 0.69],
-    "armTopNote": "The share of the weight of the clavicles and the upper arms that a vertex keeps falls from 1 at the lower height to 0 at the upper height (units), and the neck takes the rest. Thus the bow arm does not fold the clavicle faces under the chin.",
-    "shoulderRamp": { "x": [0.06, 0.13], "y": [0.56, 0.62] },
-    "shoulderRampNote": "Above the heights of y (units), the share of the upper arm weight that a vertex keeps grows from 0 at the distance x[0] from the middle plane to 1 at x[1], and the clavicle takes the rest. Thus the top of the narrow shoulder next to the neck does not fold.",
-    "shoulderHead": [0.03, 0.054],
-    "shoulderHeadNote": "Below headFrom, the share of the head weight that goes to the neck grows from 0 at the smaller distance from the middle plane to all at the larger distance (units). The values of the fox, scaled by the neck of the cat.",
+    "headFrom": 0.7,
+    "noseFront": {
+      "front": 0.21,
+      "note": "The tips of the lower whiskers hang below headFrom, in front of the plane z = front, and only they lie there: the front of the belly ends at z 0.206. The rule gives them to the head, so that the head lift does not bend each whisker. The head measures leave the tips out (headFloor of tools/studio-body.ts)."
+    },
+    "earBase": [
+      0.875,
+      0.91
+    ],
+    "tail": {
+      "radius": 0.06,
+      "behind": -0.045,
+      "root": [
+        0.0,
+        0.04
+      ],
+      "bend": 0.04,
+      "smooth": 3
+    },
+    "sliver": {
+      "angle": 10,
+      "longest": 0.04,
+      "note": "The corners of each thin face share one set of weights, so that the face moves rigidly and does not turn over at a bent joint. A thin face has a corner angle below angle (degrees) and a longest edge below longest (units)."
+    },
+    "line": {
+      "angle": 150,
+      "head": true,
+      "note": "The middle corner of each long thin face (a corner angle above angle, in degrees) takes the mix of the weights of its two other corners by its place along their line, so that it does not lag when a joint bends. With head, the head takes the rule too."
+    },
+    "clavicleFrom": [
+      0.56,
+      0.6
+    ],
+    "armTop": [
+      0.605,
+      0.66
+    ],
+    "armTopNote": "The share of the weight of the clavicles and the upper arms that a vertex keeps falls from 1 at the lower height to 0 at the upper height (units), and the neck takes the rest: from the middle of the T-pose arm root to its top under the chin.",
+    "shoulderHead": [
+      0.03,
+      0.054
+    ],
+    "shoulderHeadNote": "Below headFrom, the share of the head weight that goes to the neck grows from 0 at the smaller distance from the middle plane to all at the larger distance (units).",
     "fingers": 0.5,
     "fingersNote": "The fingers keep this share of their bone heat weight, and the hand takes the rest, as in the fox and the rabbit.",
-    "haunch": { "height": [0.14, 0.22], "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the buttocks stay on the hips and the thigh turns onto the seat. The ramp of the fox, scaled by the thigh of the cat." },
-    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. Above headFrom, each vertex except the ears follows the head only, with the whiskers. The vertices within radius of the tail line and behind the plane z = behind follow the two tail bones with soft shares."
+    "haunch": {
+      "height": [
+        0.12,
+        0.18
+      ],
+      "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the buttocks stay on the hips and the thigh turns onto the seat. It starts below the crotch (y 0.145) and ends near the thigh joint."
+    },
+    "note": "Above headFrom (the chin), each vertex except the ears follows the head only, with the whiskers. Each ear vertex goes to its ear bone with a ramp over the heights of earBase.",
+    "armFree": {
+      "turn": 0,
+      "radius": 0.075,
+      "floor": 0.52,
+      "note": "A vertex of the free arm lies beyond |x| = armSplit, within 0.075 u of the chain of the arm joints, and above y 0.52, so that the side of the trunk under the arm follows the trunk."
+    },
+    "rigidPainted": [
+      [
+        [
+          0.1157,
+          0.5584,
+          0.1193
+        ],
+        [
+          0.1164,
+          0.5528,
+          0.1114
+        ],
+        [
+          0.1164,
+          0.5483,
+          0.1034
+        ],
+        [
+          0.1146,
+          0.5674,
+          0.1287
+        ],
+        [
+          0.1224,
+          0.5611,
+          0.0531
+        ],
+        [
+          0.1215,
+          0.5523,
+          0.0609
+        ]
+      ],
+      [
+        [
+          -0.1158,
+          0.5575,
+          0.1181
+        ],
+        [
+          -0.1094,
+          0.5707,
+          0.1326
+        ],
+        [
+          -0.1165,
+          0.5525,
+          0.1108
+        ],
+        [
+          -0.1164,
+          0.5483,
+          0.1033
+        ],
+        [
+          -0.1224,
+          0.5611,
+          0.0531
+        ],
+        [
+          -0.1215,
+          0.5523,
+          0.0609
+        ]
+      ]
+    ],
+    "armSplitNote": "The arm leaves the trunk at |x| 0.13. Beyond the plane |x| = armSplit, only the free arm follows the arm bones (armFree).",
+    "tailNote": "The vertices within radius of the tail line and behind the plane z = behind follow the two tail bones with soft shares (tail_weights() of tools/blender/rig_mesh.py).",
+    "clavicleFromNote": "The share of the clavicle weight that a vertex keeps grows from 0 at the lower height to 1 at the upper height (units), and the chest takes the rest: the band under the clavicle joint (y 0.605).",
+    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the faces under the front and the back of each arm root. The T-pose arm turns about 80 degrees down to hang, and these faces folded in each sample of the rest (pnpm fold-probe violist --faces)."
   },
   "refine": {
     "rings": [],
-    "ringsNote": "No ring: the quad tube of each arm has rings at the elbow and the wrist (tools/blender/cat_arms.py).",
+    "ringsNote": "No ring: the rebuilt tubes have rings at each elbow and each wrist.",
     "flip": {
       "angle": 150,
       "normals": 60,
       "move": 0.0016,
       "rounds": 4,
       "note": "The long edge of an arm face with a corner angle above angle (degrees) in the seated bind flips to the corner of the face on its other side, when the two faces lie almost on one plane (normals, degrees) and the surface moves at most move (units)."
-    },
-    "pointFlip": {
-      "points": [[-0.1227, 0.5149, 0.0942]],
-      "near": 0.003,
-      "note": "The edge at this point is the diagonal of one quad of the tube at the inner right elbow (point_flips() of tools/blender/rig_mesh.py). The bow elbow bends far, and with this diagonal its thin face folds. With the other diagonal, it does not fold."
     }
   },
   "check": {
-    "thin": { "angle": 10, "length": 0.08, "near": 0.1 },
+    "thin": {
+      "angle": 10,
+      "length": 0.08,
+      "near": 0.1
+    },
     "note": "pnpm rig-mesh --check lists the faces of the seated bind with a corner angle below angle (degrees) and a longest edge of at least length (units), when that edge passes within near (units) of an arm or leg joint. These faces are candidates for a ring (refine.rings)."
   },
   "colors": {
@@ -144,32 +501,63 @@
     "dark": 0.05,
     "eyeShare": 0.34,
     "eyeBox": [
-      [0.015, 0.78, 0.12],
-      [0.095, 0.85, 0.21]
+      [
+        0.035,
+        0.77,
+        0.16
+      ],
+      [
+        0.11,
+        0.835,
+        0.23
+      ]
     ],
     "noseBox": [
-      [-0.02, 0.762, 0.205],
-      [0.02, 0.79, 0.23]
+      [
+        -0.02,
+        0.74,
+        0.235
+      ],
+      [
+        0.02,
+        0.765,
+        0.26
+      ]
     ],
-    "nose": [0.74, 0.54, 0.49],
+    "nose": [
+      0.89,
+      0.58,
+      0.53
+    ],
     "tone": {
       "chroma": 0.034,
-      "light": [0.9, 0.93],
-      "keep": ["hand", "fingers", "foot", "toes"],
-      "points": [
-        [0.49, 0.06, -0.01, -0.0375],
-        [0.87, -0.019, -0.007, -0.041]
+      "light": [
+        0.93,
+        0.96
       ],
-      "note": "The warm stage light adds chroma to the gray fur and the cream belly. Each plain fur face moves half of the full step to the sheet colors: a row is [L, dL, da, db] in Oklab. The paws, the whiskers, the pink nose, and the inner ears keep their colors."
+      "keep": [
+        "hand",
+        "fingers",
+        "foot",
+        "toes"
+      ],
+      "points": [
+        [
+          0.5,
+          0.053,
+          -0.0134,
+          -0.0407
+        ],
+        [
+          0.9075,
+          -0.047,
+          -0.008,
+          -0.0423
+        ]
+      ],
+      "note": "The warm stage light adds chroma to the gray fur and the cream belly. Each plain fur face moves by a row [L, dL, da, db] in Oklab, blended by its lightness, so that the fur and the belly take the colors of the cat of the A-pose mesh: half of the step from the texture to the sheet colors. The texture of the T-pose mesh has the same fur (Oklab L 0.500) and a lighter belly (0.908). The paws, the whiskers, the pink nose, and the inner ears keep their colors."
     },
-    "belly": {
-      "range": [0.22, 0.86],
-      "center": 0.5,
-      "radii": [0.0793, 0.5, 0.7],
-      "light": 0.72,
-      "note": "The light belly patch is an even oval in the front plane of the stretched trunk (belly_patch() of tools/blender/rig_mesh.py). Each face of the trunk front in the range takes the cream, the gray, or a mix by the share of its area in the oval."
-    },
-    "note": "Each face takes the mean color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. The eye box and the nose box find the eye faces and the pink nose faces. Then palette and tone set the color."
+    "note": "Each face takes the mean color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. The eye box holds the dark eye faces (y 0.78 to 0.82), and the nose box the pink nose (y 0.75). Then palette and tone set the color. The texture has the cream belly, so the config has no belly patch."
   },
   "eyeShell": {
     "lift": 0.002,
@@ -178,21 +566,12 @@
     "darkReach": 2,
     "note": "Each eye shell is a fan from the middle of the dark eye faces to at most points points of their edge, lifted lift units. pnpm studio-body finds each eye by its fan, and the app puts its pea eye there (design 4.5). The values of the fox."
   },
-  "smooth": {
-    "box": [
-      [-0.12, 0.65, -0.2],
-      [0.12, 0.74, 0.12]
-    ],
-    "rounds": 12,
-    "share": 0.5,
-    "note": "The rig smooths the neck and the bottom of the head inside the box before the weights, so that the underside of the big head shows no black band in its own shadow. The chin, the jaw, the muzzle, and the eyes stay outside the box."
-  },
   "chair": {
     "halfWidth": 0.184,
     "front": 0.1,
     "back": -0.087,
     "backHeight": 0.15,
-    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail. The half width holds the haunch (x ±0.151). The front edge ends where the sloped thighs leave the seat top."
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail. The half width holds the haunch (x ±0.167). The chair of the app fits the short legs."
   },
   "crease": {
     "rings": 2,
@@ -208,29 +587,138 @@
       "fade": 0.04
     },
     "note": "The seated bind is smoothed across the crease where the belly meets the top of each thigh (crease_relax() of tools/blender/rig_mesh.py), with the values of the fox and the rabbit. The corrective shapes give the source back, so the standing body keeps its form.",
-    "lapNote": "A second smoothing (lap) of the seam between the oval belly and the thighs. It reaches 4 rings up the belly front and fades out over fade units behind the hip joints and beyond side units from the middle plane, so that the seat top and the outer hips stay."
+    "lapNote": "A second smoothing (lap) of the seam between the belly and the thighs. It reaches 4 rings up the belly front and fades out over fade units behind the hip joints and beyond side units from the middle plane, so that the seat top and the outer hips stay."
   },
   "sit": {
-    "gap": 0,
+    "gap": 0.004,
     "band": 0.2,
-    "ramp": 0.015,
+    "ramp": 0.03,
     "step": 0.005,
-    "smooth": 8,
-    "end": 0.0065,
-    "most": 0.2,
-    "root": [0.7, 0.95],
-    "top": 0.2673,
-    "note": "The underside of the haunch behind the hip joints goes down onto the seat in the seated bind (sit() of tools/blender/rig_mesh.py). With root, the tail root moves with the haunch. top keeps the seat top fixed, because the curled tail does not pull the root down."
-  },
-  "bind": {
-    "arm": "dq",
-    "armSides": ["L"],
-    "note": "Each vertex with a weight on a lower bone of the left arm takes the dual quaternion blend in the seated bind (bind_skin() of tools/blender/rig_mesh.py), so that the elbow and the forearm keep the round tube. The bow arm bends further in the play, so it keeps the linear blend."
+    "smooth": 6,
+    "end": 0.02,
+    "most": 0.045,
+    "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox and the rabbit (sit() of tools/blender/rig_mesh.py), at most 0.045 u."
   },
   "raise": [
-    {"side": "L", "turns": {"clavicle": [0, -0.1736, 0, 0.9848], "upper_arm": [0.1825, -0.2037, 0.0973, 0.9569], "forearm": [0.083, 0.0279, -0.0829, 0.9927]}, "fade": [15, 30], "below": 0.0, "follow": {"points": [[0.0876, 0.6098, 0.1007], [0.0911, 0.6188, 0.1029], [0.0854, 0.6236, 0.1067], [0.0958, 0.6265, 0.0978], [0.1004, 0.6015, 0.0963], [0.0855, 0.616, 0.1065], [0.0869, 0.6366, 0.1045], [0.0833, 0.6313, 0.1133]], "reach": [0.02, 0.05], "share": 0.5, "fill": {"rounds": 4, "step": 0.25}}, "note": "The shape of the raised left arm of the play (pnpm raise-fit violist --faces 1594 --side L). In the pose of the rule, the skin near the points at the front of the arm root moves with the first upper arm segment (follow) and fills its valleys (fill)."},
-    {"side": "L", "turns": {"clavicle": [0, 0, 0, 1], "upper_arm": [0.455, -0.3102, 0.2693, 0.7901], "forearm": [0.0517, 0.0174, -0.0516, 0.9972]}, "fade": [10, 20], "below": 0.0, "follow": {"points": [[0.0876, 0.6098, 0.1007], [0.0911, 0.6188, 0.1029], [0.0854, 0.6236, 0.1067], [0.0958, 0.6265, 0.0978], [0.1004, 0.6015, 0.0963], [0.0855, 0.616, 0.1065], [0.0869, 0.6366, 0.1045], [0.0833, 0.6313, 0.1133]], "reach": [0.02, 0.05], "share": 0.5}, "note": "The shape of the left arm at rest (pnpm raise-fit violist --faces 2255,2241,2242,2243 --side L --sets rest). In the pose of the rule, the same points as in the play shape move half of the way with the first upper arm segment."},
-    {"side": "L", "turns": {"clavicle": [0, -0.0651, 0, 0.9979], "upper_arm": [0.2106, -0.247, 0.3318, 0.8858], "forearm": [0.2084, 0.0701, -0.2082, 0.9531]}, "fade": [10, 25], "below": 0, "follow": {"points": [[0.0876, 0.6098, 0.1007], [0.0911, 0.6188, 0.1029], [0.0854, 0.6236, 0.1067], [0.0958, 0.6265, 0.0978], [0.1004, 0.6015, 0.0963], [0.0855, 0.616, 0.1065], [0.0869, 0.6366, 0.1045], [0.0833, 0.6313, 0.1133]], "reach": [0.02, 0.05], "share": 0.5}, "note": "The shape of the left arm between the rest and the play (pnpm raise-fit violist --faces 2488,2487,3118 --side L --sets lift). The upper arm passes between the turns of the other two shapes there, so this shape keeps the front of the root free of a crease in the lift."},
-    {"side": "R", "turns": {"clavicle": [0, 0.309, 0, 0.9511], "upper_arm": [0.1815, 0.3958, -0.4867, 0.7573], "forearm": [-0.0866, 0.0291, -0.0865, 0.9921]}, "fade": [15, 30], "below": 0, "follow": {"points": [[-0.0876, 0.6098, 0.1007], [-0.0911, 0.6188, 0.1029], [-0.0854, 0.6236, 0.1067], [-0.0958, 0.6265, 0.0978], [-0.1004, 0.6015, 0.0963], [-0.0855, 0.616, 0.1065]], "reach": [0.02, 0.05], "share": 0.5}, "note": "The shape of the bow arm in the play (pnpm raise-fit violist --faces 772,775,689,690,729,688,691 --side R). In the pose of the rule, the vertices near 6 points at the front of the right root move half of the way with the first upper arm segment."}
+    {
+      "side": "L",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.3597,
+          -0.1083,
+          0.2096,
+          0.9027
+        ],
+        "forearm": [
+          -0.6065,
+          -0.1773,
+          0.5848,
+          0.5086
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent left elbow at rest (pnpm raise-fit violist --faces 3117,3118,3385,3386,2367,2368,2424,3387,2369 --side L --bone forearm --sets rest). The rest grip on the neck of the upright viola bends the straight bind elbow 119 degrees, and the inner elbow faces turned over in each rest sample."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0.309,
+          0,
+          0.9511
+        ],
+        "upper_arm": [
+          0.1136,
+          0.3223,
+          -0.4339,
+          0.8336
+        ],
+        "forearm": [
+          -0.5449,
+          0.1555,
+          -0.5284,
+          0.6322
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bow arm in the play (pnpm raise-fit violist --faces 502,504,501,816,811,881,817,786,1031 --side R --bone forearm --sets play). The inner faces of the elbow and the faces at the front of the shoulder turn over when the bow arm reaches forward with the elbow bent 102 degrees."
+    },
+    {
+      "side": "R",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.3807,
+          -0.1184,
+          0.07,
+          0.9144
+        ],
+        "forearm": [
+          -0.6082,
+          0.1779,
+          -0.5864,
+          0.5046
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0.3,
+      "note": "The shape of the bent right elbow at rest (pnpm raise-fit violist --faces 504,502,501,506,730 --side R --bone forearm --sets rest). The bow paw at the front of the lap bends the elbow, and the inner elbow faces turned over in each rest sample."
+    },
+    {
+      "side": "L",
+      "bone": "forearm",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          0.3597,
+          -0.1083,
+          0.2096,
+          0.9027
+        ],
+        "forearm": [
+          -0.6354,
+          -0.1858,
+          0.6127,
+          0.4316
+        ]
+      },
+      "fade": [
+        15,
+        25
+      ],
+      "below": 0.3,
+      "note": "The second shape of the bent left elbow at rest (pnpm raise-fit violist --faces 2367,3117,3118 --side L --bone forearm --sets rest --further 10). The first shape leaves four inner elbow faces turned over in its pose. This rule turns 10 degrees further, so that its relax takes them too."
+    }
   ]
 }
