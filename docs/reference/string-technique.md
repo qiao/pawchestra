@@ -559,7 +559,10 @@ The app follows these facts:
 - **The rest (2.7).** The cello stays between the knees, and the left paw holds it. The right paw
   holds the bow with the tip up, as in the first lesson of [61]. The right upper arm hangs as in
   the bind pose, and the forearm points forward (`forearmGrip()`). The dog holds the bow over the
-  right knee.
+  right knee, low and out from the side.
+- **The bow arm (2.2).** The rebuilt round arms of the dog keep the elbows out (`DOG_HOLD`): the
+  bow elbow points out in the play, as a stroke starts open at the shoulder [85], and both elbows
+  point out at rest, so that the upper arms stay off the chest.
 - **The high positions (1.5).** The left paw tilts further over the neck from the second position
   to the fifth position (`BowedHold.highTilt`), as the hand goes over the shoulder of the
   instrument.
