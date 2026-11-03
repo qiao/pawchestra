@@ -270,14 +270,15 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat: the T-pose mesh (design 4.4). The standing shoulder joints are 1.159778 m high
-  // (0.950065 m with the legs of the mesh and the rise of the longer legs), so that the head
-  // height H stays the H of the cat of the A-pose mesh, 0.339 m (`app` of the rig config). The cat
+  // The viola cat: the T-pose mesh (design 4.4). The standing shoulder joints are 0.950065 m high
+  // (the joints of the mesh, raised by the longer legs and lowered by the shorter trunk by the same
+  // 0.132 u), so that the head height H stays the H of the cat of the A-pose mesh, 0.339 m (`app`
+  // of the rig config). The cat
   // sits on the chair of the cat of the A-pose mesh: 0.46 m wide, and 0.343 m deep with the back
   // room. The haunch is 0.53 m wide, so it reaches a little past the sides of the seat. The tips of
   // the lower whiskers hang below the chin and follow the head (`noseFront` of the rig config), so
-  // the head measures start at the chin, 0.827 u high after the rise of the legs and the smaller
-  // head (`headFactor`). The pea eyes are 1.35 times the share of the smaller head (5.1 cm wide on
+  // the head measures start at the chin, 0.695 u high after the rise of the legs, the drop of the
+  // trunk, and the smaller head (`headFactor`). The pea eyes are 1.35 times the share of the smaller head (5.1 cm wide on
   // a head 0.44 m wide, old cat 4.4 cm on 0.43 m), because the eyes of the old cat sat in a light
   // face and looked larger. They lie 0.05 H of the eyes above the old eyes of the mesh, where the
   // face is flatter, so that the ovals stay round.
@@ -285,7 +286,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
     'cat',
     {
       landmark: 'shoulders',
-      height: 1.159778,
+      height: 0.950065,
       seated: true,
       soloist: true,
       seatWidth: 0.46,
@@ -293,7 +294,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       constant: 'STUDIO_CAT',
       crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
-      headFloor: 0.827,
+      headFloor: 0.695,
       eyeSize: 1.35,
       eyeShift: [0, 0.05],
     },
