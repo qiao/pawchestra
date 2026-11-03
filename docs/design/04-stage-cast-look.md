@@ -195,6 +195,12 @@ side wall on the trunk (`tools/blender/cat_arms.py`). The `README.md` of
   source file stays unchanged and a run gives the same bytes again.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
+- **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
+  eye patch. A script cuts such faces along the edge in a copy (`tools/blender/penguin_edge.py`,
+  `panda_edge.py`), and each new vertex lies on an old face. The rig takes the weights of the mesh
+  before the cut (`weightSource`). A cut stays where the weights change little, such as the head:
+  where the clavicle weights change fast, the skin bends the inside of a large face, and the small
+  new faces turn over in the play.
 - **Intake spec.** A new mesh comes with clean quad faces, so that its arms keep their faces: the
   rig adds only the arm segments and the weights (`arm_rebuild.py --keep-faces`). `pnpm
   mesh-intake` checks each point of the intake table below with the limits of
