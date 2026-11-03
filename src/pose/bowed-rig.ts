@@ -1201,8 +1201,7 @@ const DOG_HOLD = {
  * and its top plate faces forward. The strings run up to the nut beside the head. The trunk leans
  * forward, and both shoulders turn forward (`reach`, `reachL`), also in the rest, so that the
  * short arms reach the strings. With a right turn of 40°, the skin of the upper bow arm twists
- * 37° (the arm gate), and with 48°, the right elbow goes 0.6 cm into the back of the contrabass
- * in the play.
+ * 37° (the arm gate), and with 50°, the right elbow goes 0.9 cm into the back of the contrabass.
  * With a left turn of 30°, the left forearm goes 2.2 cm into the neck at the end of the lowering.
  *
  * The string planes are 6° apart, below the 25° of a real contrabass, as on the cello of the dog.
@@ -1236,8 +1235,7 @@ const DOG_HOLD = {
  * mesh hang. The rest grip lies out from the side of the belly, so that the round right upper arm
  * stays off the trunk: 0.2 H further in, it goes 2.2 cm into the body at rest. In the lift and
  * the lowering, the tip turns through the front, as the upright bow of the violinists, with the
- * grip moved up and far to the front: with less move up, the bow paw turns up to 2,008°/s in a
- * lift (the arm gate).
+ * grip moved up and far to the front, so that the bow paw does not turn fast.
  *
  * The bow paw bends 24.94° off the forearm (`pawBendR`), as a bassist holds the French bow "as
  * if the hand is resting by the side" (`docs/reference/string-technique.md`, section 2.1). The
@@ -1249,7 +1247,7 @@ const DOG_HOLD = {
 const HIPPO_HOLD = {
   ...BOWED_HOLDS.contrabass,
   lean: 12 * MathUtils.DEG2RAD,
-  reach: 46 * MathUtils.DEG2RAD,
+  reach: 48 * MathUtils.DEG2RAD,
   reachL: 34 * MathUtils.DEG2RAD,
   playShift: [0.9989, 0, -0.1588],
   playTurn: [-0.1075, 0.2477, 0.2044, 0.9409],
@@ -1275,7 +1273,7 @@ const HIPPO_HOLD = {
     lap: { along: 1, offset: [1, 1, -0.4] },
     tip: HANGING_BOW.tip,
     hair: HANGING_BOW.hair,
-    via: { ...UPRIGHT_BOW.via, reach: [0, 0.8, -1.1] },
+    via: { ...UPRIGHT_BOW.via, reach: [0.1, 0.5, -0.9] },
   },
 } as const satisfies BowedHold;
 
