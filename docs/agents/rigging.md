@@ -74,10 +74,9 @@ Its mesh has clean quad rings and twist markers, so a fault there comes from the
    bones with `pnpm rig-mesh <a> --check --preview <dir>`. Try each variant with `--check --set`,
    and add `--no-base` after the first run. The triangles and the gzip size stay in their
    budgets, and the standing body stays within 1 mm of the source.
-5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale (the shoulder joints, or
-   the keys of a pianist), a crease angle that matches the facet contrast of its reference crops,
-   and the seat settings. Run `pnpm studio-body <a>`, add the module to `STUDIO_BODIES`, and give
-   the species the body.
+5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale (the shoulder joints), a
+   crease angle that matches the facet contrast of its reference crops, and the seat settings. Run
+   `pnpm studio-body <a>`, add the module to `STUDIO_BODIES`, and give the species the body.
 6. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
    `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit <role> --set`,
    `pnpm hold-reach <species>`, and `pnpm pose-depth <role>`. After a change of shared code,

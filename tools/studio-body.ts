@@ -53,11 +53,10 @@ export const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');
 /** The settings of one animal of the studio that the app shows. */
 export interface AnimalSettings {
   /**
-   * The landmark of the scale (design 4.4): the shoulder joints of the bind pose, or the top of
-   * the white keys of the piano of the studio (`piano_key_*`), which the pianist role puts a set
-   * distance below the elbows of the seated bind pose.
+   * The landmark of the scale (design 4.4): the shoulder joints of the standing body
+   * ({@link standingShoulder}).
    */
-  readonly landmark: 'shoulders' | 'keys';
+  readonly landmark: 'shoulders';
   /** The height of the landmark above the floor in the app, in meters. It sets the scale. */
   readonly height: number;
   /**
@@ -2027,38 +2026,6 @@ interface SceneFrame {
 }
 
 /**
- * Gives the box around the meshes of the scene nodes of the GLB file whose names pass a test, such
- * as the keys of the piano of the studio.
- *
- * @param glb The file.
- * @param test The test of a node name.
- * @returns The box, in the axes and the units of the studio.
- * @throws Error if no node with a mesh passes the test.
- */
-function propBox(glb: Glb, test: (name: string) => boolean): Box3 {
-  const worlds = worldMatrices(glb.json, new Map());
-  const box = new Box3();
-  for (const [i, node] of glb.json.nodes.entries()) {
-    const mesh = node.mesh === undefined ? undefined : glb.json.meshes[node.mesh];
-    if (!mesh || node.skin !== undefined || !test(node.name ?? '')) {
-      continue;
-    }
-    for (const primitive of mesh.primitives) {
-      const positions = readAccessor(glb, primitive.attributes['POSITION'] ?? -1);
-      for (let v = 0; v < positions.length; v += 3) {
-        box.expandByPoint(
-          new Vector3().fromArray(positions, v).applyMatrix4(worlds[i] ?? new Matrix4()),
-        );
-      }
-    }
-  }
-  if (box.isEmpty()) {
-    throw new Error('The file has no prop with a matching name.');
-  }
-  return box;
-}
-
-/**
  * Reads the seat of a rig (a bench or a chair) from the extras of its asset, and gives the size of
  * the seat of the app that takes its place.
  *
@@ -2117,9 +2084,7 @@ function reclines(glb: Glb): boolean {
  * of its mesh, a sole, is on the floor, and moves forward so that the front edge of the seat of
  * the rig (a bench or a chair, {@link SeatExtras}) is at the front edge of the seat of the app.
  * A seated role with a seat height in its settings then rises until its seat is at that height,
- * and its feet hang above the floor. The scene of the studio puts the field of the soles on its
- * floor, and the skin is a little outside the field, so the seated body of the app is up to 0.011
- * units higher above its keys than in the studio.
+ * and its feet hang above the floor.
  *
  * @param glb The file.
  * @param skeleton The bind pose.
@@ -2133,11 +2098,7 @@ function sceneFrame(
   mesh: SourceMesh,
   settings: AnimalSettings,
 ): SceneFrame {
-  const landmark =
-    settings.landmark === 'shoulders'
-      ? standingShoulder(glb, skeleton)
-      : propBox(glb, (name) => name.startsWith('piano_key_')).max.y;
-  const scale = settings.height / landmark;
+  const scale = settings.height / standingShoulder(glb, skeleton);
   if (!settings.seated) {
     return { scale, offset: new Vector3(), chairDepth: null, chairWidth: null, bench: null };
   }
@@ -2916,13 +2877,11 @@ export interface InspectedClip {
   readonly hips: number;
 }
 
-/** One group of props: one node, or all keys `piano_key_*` of the piano of the studio. */
+/** One prop: a scene node with a mesh and no skin. */
 export interface InspectedProp {
-  /** The name of the node, or `piano_key_*` for the keys. */
+  /** The name of the node. */
   readonly name: string;
-  /** The number of nodes in the group. */
-  readonly nodes: number;
-  /** The box of the meshes of the group. */
+  /** The box of the mesh of the node. */
   readonly box: UnitBox;
 }
 
@@ -2932,14 +2891,6 @@ export interface InspectedTarget {
   readonly name: string;
   /** True when the export keeps the target as a corrective shape. */
   readonly kept: boolean;
-}
-
-/** The keys `piano_key_*` of the piano of the studio. */
-export interface InspectedKeys {
-  /** The height of the top of the keys. */
-  readonly top: number;
-  /** The z of the front edge of the keys: the edge near the player. */
-  readonly front: number;
 }
 
 /**
@@ -2985,8 +2936,6 @@ export interface StudioInspection {
   readonly seat: SeatExtras | null;
   /** The height of the top of the prop `bench`, or `null` with no bench. */
   readonly benchTop: number | null;
-  /** The keys of the piano of the studio, or `null` with no keys. */
-  readonly keys: InspectedKeys | null;
 }
 
 /**
@@ -3035,7 +2984,7 @@ function meshBox(glb: Glb, worlds: readonly Matrix4[], nodes: readonly number[])
  * @param settings The settings of the animal, or `null` for an animal that is not in `ANIMALS`.
  *   Then the scale puts the shoulder joints 1.0 m above the floor.
  * @returns The facts, in the axes and the units of the studio.
- * @throws Error if the file has no skin, or no prop of the landmark of the settings.
+ * @throws Error if the file has no skin.
  */
 export function inspectStudioGlb(
   bytes: Uint8Array,
@@ -3052,24 +3001,11 @@ export function inspectStudioGlb(
   const heightOf = (node: number, matrices: readonly Matrix4[]): number =>
     new Vector3().setFromMatrixPosition(matrices[node] ?? new Matrix4()).y;
 
-  // The props: each node with a mesh and no skin. The keys of the piano are one group.
-  const propNodes = [...gltf.nodes.keys()].filter(
-    (i) => gltf.nodes[i]?.mesh !== undefined && gltf.nodes[i]?.skin === undefined,
-  );
-  const keyNodes = propNodes.filter((i) => (gltf.nodes[i]?.name ?? '').startsWith('piano_key_'));
-  const groups = [
-    ...propNodes
-      .filter((i) => !keyNodes.includes(i))
-      .map((i) => ({ name: gltf.nodes[i]?.name ?? '', nodes: [i] })),
-    ...(keyNodes.length > 0 ? [{ name: 'piano_key_*', nodes: keyNodes }] : []),
-  ];
-  const props = groups.map((group) => ({
-    name: group.name,
-    nodes: group.nodes.length,
-    box: meshBox(glb, worlds, group.nodes),
-  }));
+  // The props: each node with a mesh and no skin.
+  const props = [...gltf.nodes.keys()]
+    .filter((i) => gltf.nodes[i]?.mesh !== undefined && gltf.nodes[i]?.skin === undefined)
+    .map((i) => ({ name: gltf.nodes[i]?.name ?? '', box: meshBox(glb, worlds, [i]) }));
   const bench = props.find((prop) => prop.name === 'bench');
-  const keys = props.find((prop) => prop.name === 'piano_key_*');
   const seat = gltf.asset?.extras?.seat ?? null;
 
   // The scale of the settings, as the export finds it.
@@ -3083,11 +3019,7 @@ export function inspectStudioGlb(
   };
   // The export takes the shoulders of the standing body, as the clip `reference` gives them for a
   // rig with a reclined trunk (`standingShoulder()`).
-  const landmark =
-    used.landmark === 'shoulders' ? standingShoulder(glb, readSkeleton(glb)) : keys?.box.max.y;
-  if (landmark === undefined) {
-    throw new Error('The file has no keys `piano_key_*` for the landmark of the settings.');
-  }
+  const landmark = standingShoulder(glb, readSkeleton(glb));
   const scaleFrom = settings
     ? `ANIMALS: the ${used.landmark} at ${used.height} m`
     : 'assumed: the shoulders at 1 m, because the animal is not in ANIMALS';
@@ -3230,10 +3162,9 @@ export function inspectStudioGlb(
     bindHips: heightOf(hips, worlds),
     seated: settings ? settings.seated : bench !== undefined || seat?.prop === 'bench',
     lowest: lowest.toArray(),
-    props: props.map((prop) => ({ name: prop.name, nodes: prop.nodes, box: unitBox(prop.box) })),
+    props: props.map((prop) => ({ name: prop.name, box: unitBox(prop.box) })),
     seat,
     benchTop: bench ? bench.box.max.y : null,
-    keys: keys ? { top: keys.box.max.y, front: keys.box.min.z } : null,
   };
 }
 
@@ -3294,10 +3225,7 @@ export function inspectionLines(facts: StudioInspection): string[] {
       : '  Standing: no drop.',
     '',
     'Props (the box in units: min, max):',
-    ...facts.props.map(
-      (prop) =>
-        `  ${prop.name} (${prop.nodes} node${prop.nodes === 1 ? '' : 's'}): ${point(prop.box.min)}, ${point(prop.box.max)}`,
-    ),
+    ...facts.props.map((prop) => `  ${prop.name}: ${point(prop.box.min)}, ${point(prop.box.max)}`),
   );
   if (facts.props.length === 0) {
     lines.push('  none');
@@ -3310,12 +3238,6 @@ export function inspectionLines(facts: StudioInspection): string[] {
   }
   if (facts.benchTop !== null) {
     lines.push(`Bench top: ${units(facts.benchTop)}`);
-  }
-  if (facts.keys) {
-    lines.push(
-      `Key top: ${units(facts.keys.top)}`,
-      `Key front (the edge near the player), z: ${units(facts.keys.front)}`,
-    );
   }
   return lines;
 }
