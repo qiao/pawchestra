@@ -282,8 +282,8 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, the hippo, and the fox have it. Then the body
-      with arm segments and a bent `bindArms`: the cat.
+      the elephant, the rhino, the bear, the deer, the hippo, the fox, and the monkey have it.
+      Then the body with arm segments and a bent `bindArms`: the cat.
 - [ ] Hippo with the neutral bind: two new `raise` shapes of the bent right elbow fit the bassist
       only. In the cast matrix, the cello recast folds 13 faces of the right arm (limit 8), and
       the right elbow ring of the bassist is 5.85 cm in place of 6.50 cm. The rest shape of the
