@@ -24,7 +24,7 @@ src/models/studio/hippo.ts           studio body of the app
 | File | Origin | Rebuild |
 |---|---|---|
 | `hippo-tpose.glb` | Source mesh (below) | None |
-| `hippo-arms.glb` | Copy of `hippo-tpose.glb` with rebuilt arms. License as `hippo-tpose.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- hippo` |
+| `hippo-arms.glb` | Copy of `hippo-tpose.glb` with rebuilt arms. License as `hippo-tpose.glb` | `arm_rebuild.py` (below) |
 | `hippo-weights.json` | Weights of the same Blender run. License as `hippo-tpose.glb` | The same run |
 | `hippo.rig.glb` | Output of the rig. License as `hippo-tpose.glb` | `pnpm rig-mesh hippo` |
 
@@ -64,22 +64,26 @@ at 1e-5.
 `tools/blender/arm_rebuild.py` rebuilds the free T-pose arms of `hippo-tpose.glb` with quad tubes
 at the length of the mesh (no `--factor`), and writes the Blender weights of the arms. The
 shoulder line lies at 0.3 of the upper arm. Each arm has 9 rings of 16 vertices, and the elbow
-helper is 0.0722 units, twice the gap of the elbow rings. The faces of the paws, the trunk, the
-legs, and the head are the faces of the source. The rebuilt right wrist has a small dark recess
-above the claws, so the rig gives its dark faces the fur color (`colors.border`). A run gives the
-same bytes.
+helper is 0.0722 units, twice the gap of the elbow rings. The wrist cut lies at 0.2 of the paw
+(`--spec`): with the cut at 0.1 that the script chooses, the bridge of the right wrist takes dark
+baked faces in a lip around the wrist. The faces of the paws, the trunk, the legs, and the head
+are the faces of the source. A run gives the same bytes:
+
+```bash
+blender -b --factory-startup -P tools/blender/arm_rebuild.py -- hippo --spec '{"cut": {"shoulder": 0.3, "tilt": 0.0, "wrist": 0.2}}'
+```
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `hippo-arms.glb` | 991,692 bytes | `cfb294e6abbb0f7b29afd2509f6c24c311d98de24b24ffcd4d39f942334f5784` |
-| `hippo-weights.json` | 396,331 bytes | `7ae83f8ddd32fe6776a099c3a84fa4d385371753aad3c8a69d2d1c322970fe22` |
+| `hippo-arms.glb` | 992,116 bytes | `b8ecb0d191f7beeca0d2f22283308bde126db3476c68c111028fafbf6b10b525` |
+| `hippo-weights.json` | 399,966 bytes | `180a8953709c4b75cfa6809179bfc958787612e27dc9d197114de91eef3288be` |
 
 ## hippo.rig.glb
 
 | Item | Value |
 |---|---|
-| Size | 594,724 bytes |
-| SHA-256 | `906c55b95319e0bdf62b6de1687563f2bea8a5288ad47f8a9b196b17a46e9e6e` |
+| Size | 590,984 bytes |
+| SHA-256 | `f0d68c1a6bc5e58190b6404c1e95525924876711af432116f3e0f4a74f7e1ab8` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 20 and R 0 (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side. No `raise` shape |
 
