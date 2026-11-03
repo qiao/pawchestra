@@ -607,7 +607,7 @@ const PANDA_PLAY = {
    */
   down: -5,
   /** The forward turn of the left shoulder. */
-  shoulderL: 42,
+  shoulderL: 35,
   /** The turn of the slide down from the play in the rest pose, around the chest x axis. */
   restDown: 30,
 } as const;
@@ -636,20 +636,22 @@ const PANDA_PLAY_TURN = toQuat(
  * the left hand of a real trombonist wraps the slide tubes and the tips of the right thumb and the
  * first two fingers hold the brace (`docs/reference/wind-technique.md` 1.1). The left grip moves
  * 0.07 H toward its tubes, because the middle of the big paw is a few cm from them on the grip of
- * the instrument, and 0.07 H along the tubes toward the mouthpiece, so that the left elbow bends
- * more. Its fingers curl 90°. With 0.09 H toward the tubes, the left palm turns 55° from the tubes,
- * and the left paw does not grasp them at rest (`pnpm wind-grip trombonist`). The right paw holds
- * the low part of the brace from the right side of the panda, with its palm to the left and its
- * thumb up the brace, as a real trombonist puts the thumb on the top of the brace and the fingers
- * below it, with the wrist "sideways in relation to the face" (`docs/reference/wind-technique.md`
- * 1.1). Its grip moves 0.1 H down the brace and 0.03 H along the slide away from the mouthpiece
- * (`gripShiftR`): the slide points 45° to the right, so the right side of the panda is the far
- * right side of the brace. The paw points 0.8 of the way along the slide (`aimSide`), and the
- * fingers curl 110° around the brace. With the grip 0.08 H along the slide, the middle of the paw
- * lies 5 cm from the brace, and the paw does not grasp it. On the body of the older mesh, with the
- * grip 0.08 H back toward the mouthpiece, the right palm faced the audience and the right thumb
- * pointed down the brace. Both paws keep the aim and the roll of the play at rest (`restAim`): with
- * the roll of the shoulder, the right wrist turns 5,500° to 9,800° each second in the lowering.
+ * the instrument, and 0.04 H along the tubes toward the mouthpiece, so that the left elbow bends
+ * more. Its fingers curl 90°. With 0.07 H toward the mouthpiece, the left forearm of the T-pose
+ * body goes 1.1 cm into the chin in the play, the lift, and the lowering (`pnpm pose-depth
+ * trombonist`). With 0.09 H toward the tubes, the left palm turns 55° from the tubes, and the left
+ * paw does not grasp them at rest (`pnpm wind-grip trombonist`). The right paw holds the low part
+ * of the brace from the right side of the panda, with its palm to the left and its thumb up the
+ * brace, as a real trombonist puts the thumb on the top of the brace and the fingers below it, with
+ * the wrist "sideways in relation to the face" (`docs/reference/wind-technique.md` 1.1). Its grip
+ * moves 0.1 H down the brace and 0.03 H along the slide away from the mouthpiece (`gripShiftR`):
+ * the slide points 45° to the right, so the right side of the panda is the far right side of the
+ * brace. The paw points 0.8 of the way along the slide (`aimSide`), and the fingers curl 110°
+ * around the brace. With the grip 0.08 H along the slide, the middle of the paw lies 5 cm from the
+ * brace, and the paw does not grasp it. On the body of the older mesh, with the grip 0.08 H back
+ * toward the mouthpiece, the right palm faced the audience and the right thumb pointed down the
+ * brace. Both paws keep the aim and the roll of the play at rest (`restAim`): with the roll of the
+ * shoulder, the right wrist turns 5,500° to 9,800° each second in the lowering.
  *
  * The elbows stay away from the sides of the body, as a brass player keeps space between the elbows
  * and the sides (`docs/reference/wind-technique.md` 1.8). The arms of the body are round tubes free
@@ -672,11 +674,12 @@ const PANDA_PLAY_TURN = toQuat(
  * the shoulder there, reached 0.195 m on the grip at the mouthpiece side of the brace, but bent the
  * right wrist 74° to 76° to the side.
  *
- * The left shoulder turns 42° forward, as the shoulder blade of a real player slides forward when
- * the arm reaches forward, so that the left arm root moves off the front of the chest. With a
- * square left shoulder, the left upper arm turns 68° from its bind direction to the grip, and faces
- * at the front of the left shoulder fold in each sample. A turn of 45° or more folds 5 faces of the
- * left shoulder in the play.
+ * The left shoulder turns 35° forward, as the shoulder blade of a real player slides forward when
+ * the arm reaches forward, so that the left arm root moves off the front of the chest. With 42°,
+ * the left forearm goes 0.4 cm into the slide tubes in the lift and the lowering (0.2 cm with 35°).
+ * On the body of the older mesh, with a square left shoulder, the left upper arm turned 68° from
+ * its bind direction to the grip, and faces at the front of the left shoulder folded in each
+ * sample. A turn of 45° or more folded 5 faces of the left shoulder in the play.
  *
  * In the rest pose, both paws stay on their grips, and the trombone stays as in the play, off the
  * mouth, with the slide turned 30° down in front (`rest`, `restShift`). No source gives the rest
@@ -700,7 +703,7 @@ const PANDA_TROMBONE = {
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.8, 0.8],
-  gripShiftL: [-0.07, 0.07, 0],
+  gripShiftL: [-0.04, 0.07, 0],
   gripShiftR: [0.1, 0, 0.03],
   restAim: 1,
   gripCurl: curls(90, 110),
