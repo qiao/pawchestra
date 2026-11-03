@@ -273,9 +273,9 @@ passes.
       (percussion-technique 5).
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
-- [ ] Recast roles: `pnpm close-views batch` and `pnpm arm-check --views` take no recast role
-      `<role>@<species>`, and `--base` needs a commit with the recast. A migration to role-neutral
-      bodies needs them.
+- [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
+      commit with the instrument scale of its app, but the gate measures the commit with its size
+      rule (`tools/recast-scale.ts`). Give the build of the commit the scale of its own rule.
 - [ ] Wolf violinist (`violinist@wolf`, spike): the left paw goes 1.8 cm into the violin in the
       play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
