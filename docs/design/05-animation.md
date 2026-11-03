@@ -271,8 +271,9 @@ The rest of each family:
   joint to the grip, and the shoulder turns forward when the arm reaches forward. A grip nearer to
   the shoulder bends the elbow, so each degree of the turn moves the upper arm further from the
   trunk. When the forearm and not the upper arm lies on the trunk, a nearer grip pushes the
-  forearm in, so the grip moves away from the shoulder (the pig, `gripShiftL`). The grip turn of
-  the arm gate counts from the posed forearm, so the turn of the elbow adds to it
+  forearm in. A grip away from the shoulder frees the forearm, but moves the paw off its keys, so
+  the pig keeps the grip of the play and moves only the grip of the rest (`restGripShiftL`). The
+  grip turn of the arm gate counts from the posed forearm, so the turn of the elbow adds to it
   (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the shoulder. Reason: on a bent
   arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
 - Version 1 has no extra effects, for example no music-note particles.
