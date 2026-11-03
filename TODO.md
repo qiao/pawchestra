@@ -203,10 +203,9 @@ passes.
       crops of the fifth position.
 - [ ] Cat violist: at rest and in the lift, the right upper arm goes 1.0 cm into its arm root
       (0.8 cm on the A-pose body), and 1.4 cm in a lowering of `beethoven-5-4` (1.3 cm).
-- [ ] Cat T-pose body: the long tail hangs behind the chair, so the footprint of the cat is 0.31 m
-      deeper, and the layout moves the seats around it: `pnpm body-probe` shows pose changes of
-      other players in most demos, and no change of another body. A tail curled on the seat
-      (`studio.tailCurl`) folded 161 tail faces of the new mesh.
+- [ ] Cat T-pose body: the tail lies on the seat behind the haunch and touches the left back post
+      of the chair (0.3 cm, `node tools/tail-gap.ts violist`). The footprint is 0.04 m deeper
+      than on the A-pose body, so most seats move by a little (median 0.4 cm, at most 12.5 cm).
 - [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
       shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
       smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.

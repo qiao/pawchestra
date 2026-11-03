@@ -149,7 +149,7 @@ interface SpeciesParams {
   noChair?: true;
   /** The place and the turn of the bow stick in the right paw (4.6). */
   bowGrip?: BowGrip;
-  /** A seated tail that lies curled on the seat, and does not sway (5.1). No species has it. */
+  /** A seated tail that lies on the seat, and does not sway (5.1): the cat. */
   seatedTail?: 'curl';
   /** Ears that hang beside the head, and do not twitch (5.1): the dog. */
   hangingEars?: true;

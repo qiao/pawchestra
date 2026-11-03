@@ -91,6 +91,6 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
 | Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes: the bent left elbow at rest (two), the bow arm in the play, and the bent right elbow at rest |
-| Tail | The long tail hangs behind the chair in the seated bind (`studio.tailBind`), and keeps its curl in the standing body |
+| Tail | In the seated bind, the long tail lies on the seat behind the haunch and hangs over the left side of the seat (`studio.tailBind`). It keeps its curl, also in the standing body |
 
 A run of `pnpm rig-mesh cat` gives the same bytes.
