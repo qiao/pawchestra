@@ -34,7 +34,6 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 - **Tasks.** Take the next task from `TODO.md`, and follow the rules at its top. A step is done
   when its "done" criterion is true and the manager accepts the report and the images (design
   9.8).
-- **Low-poly studio.** `lowpoly-studio/` is a separate project, outside the rules of this file.
 
 ## Hard rules
 
