@@ -172,6 +172,12 @@ from the first position (derived).
   a lesson starts with the slide lock engaged [5].
 - **On the floor.** A trombone on the floor rests on the bell, the mouthpiece or the leadpipe, and
   the tuning slide, and never on the slide [6].
+- **Three points.** On the ground, the trombone rests on "THREE POINTS": the mouthpiece receiver,
+  the main tuning slide, and the bell. "The slide should NOT rest on the ground", and the bell
+  never rests on the chair [70].
+- **The left knee.** In the assembly, a seated player holds the slide vertical in front of the right
+  knee and lifts the bell "on the left knee", with the left hand on the brace where the bell starts
+  to flare [70].
 - No source of this file gives where an orchestral trombonist holds the trombone between two
   entrances, or how long before an entrance the player lifts it.
 
@@ -637,3 +643,6 @@ Each source opened on 2026-10-18, except where its entry gives another date.
     https://www.yamaha.com/en/musical_instrument_guide/bassoon/trivia/trivia002.html
 69. "Stand and Deliver", Flute Talk, The Instrumentalist (December 2011, opened 2026-10-30).
     https://theinstrumentalist.com/december-2011-flute-talk/stand-and-deliver/
+70. R. Patterson, J. Harvey, K. Wiechmann, "Trombone Toolbox: Essential Strategies", Texas
+    Bandmasters Association Convention/Clinic (2024, opened 2026-11-02).
+    https://texasbandmasters.org/wp-content/uploads/2024/08/Trombone-Toolbox-Essential-Strategies.pdf
