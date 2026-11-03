@@ -574,11 +574,17 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Panda trombonist: the left elbow out uses most of the margin of the grip turn (left 16,
       margin 15 over 2). Show the user the 2x paw crops of the play and the rest, and ask to accept
       the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
-- [ ] Panda trombonist rest: in the lift and the lowering, the left paw slides down its tubes to the
-      rest grip, and its finger tips leave the tubes for 0.1 s to 0.5 s (`pnpm wind-grip`: lift 94%,
-      lowering 80%, 100% on `89341b2d`). The top of the upright trombone crosses the left eye in
-      the front view. Show the user the front view and the rows of
-      `reports/2026-11-03-panda-new/`.
+- [ ] Panda trombonist rest: the top of the upright trombone crosses the left eye in the front
+      view. A place beside the head (rest turn 20° to the left, `restShift` [-0.4, -0.16, -0.3])
+      turned the right arm across the belly: the arm gate failed (right folds 5, flat 0.73), and
+      the upper arms went 5.9 cm into the body. A lower place with the slide 25° forward
+      (`restDown` 50, `restShift` [0, -0.28, -0.38]) cleared the face and passed the gate, but the
+      upper arms went 0.5 cm deeper and the left paw left its rest grip
+      (`reports/2026-11-03-panda-look/rest-tries.png`). Ask the user for the rest place.
+- [ ] Panda trombonist rest: in the lift and the lowering, the left finger tips leave the tubes
+      (`pnpm wind-grip`: lift 94%, lowering 80%). A left rest grip 0.02 H toward the left
+      shoulder gave 94% and 87%, and with the left rest elbow less far out ([-1, -1, -0.3]) 97%
+      and 90%, but both flattened the left upper arm at rest (flat 0.77 and 0.79, base 0.86).
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the right elbow goes 0.6 cm into the back of the contrabass at 197.40 s of
