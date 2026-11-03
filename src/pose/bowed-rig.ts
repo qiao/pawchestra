@@ -1028,9 +1028,12 @@ export const BOWED_HOLDS = {
  * the side.
  *
  * The rest pose is the upright rest of the rabbit and the red fox, as a seated violist rests: the
- * viola stands upright on the top of the left thigh, 0.6 of the way from the hip to the knee, and
+ * viola stands upright on the top of the left thigh, 0.28 of the way from the hip to the knee, and
  * 0.12 H in from it, 0.1 H down, and 0.4 H to the front, and the bow rests in the right paw at the
- * front of the lap. The short legs of the T-pose body put the lap low under the round belly: with
+ * front of the lap. The thigh of the cat is 2.15 times as long as the thigh of its mesh (`legFactor`
+ * of the rig config), so 0.28 of it is the place of 0.6 of the thigh of the mesh: with 0.6, the
+ * rest paws reach 8 cm further forward, and the left arm twists 28° at rest (14° with 0.28). The
+ * lap lies low under the round belly: with
  * the viola 0.05 H up and 0.06 H to the front, the place of the A-pose body, the viola goes 3.8 cm
  * into the belly at rest, and the left elbow bends 134° to the grip on the neck, so that its inner
  * faces fold. The left paw holds the viola at 0.55 of the fingerboard from the nut (`restPlace`),
@@ -1039,7 +1042,7 @@ export const BOWED_HOLDS = {
  * (`docs/reference/string-technique.md`, section 2.9): the playing grip at the rest place, curled
  * 115°, with the palm 8 mm off the neck (`restGapL`), turned 10° around the normal of the top plate,
  * and with a turn of 42° in the plane of its palm (`restPawTurnL`). The grip of the bow rests
- * 0.4 H out, 0.5 H up, and 0.35 H to the front at 0.6 of the way to the knee, with the tip a
+ * 0.4 H out, 0.5 H up, and 0.35 H to the front at 0.28 of the way to the knee, with the tip a
  * little forward, (0.15, 1, -0.45), and the right elbow hangs down, out, and a little back,
  * (0.9, -1, 0.2). With the grip 0.6 H up and 0.05 H to the front, the right elbow bends 140° at
  * rest, and its inner faces fold. In the rest pose, the top plate of the viola faces the front and
@@ -1086,7 +1089,7 @@ const CAT_HOLD = {
   rest: {
     axis: LAP_VIOLIN.axis,
     top: [-0.5, 0, -0.87],
-    lap: { along: 0.6, offset: [0.12, -0.1, -0.4] },
+    lap: { along: 0.28, offset: [0.12, -0.1, -0.4] },
   },
   liftReach: [-0.3, 0.29, -0.19],
   restCurlL: 115 * MathUtils.DEG2RAD,
@@ -1095,7 +1098,7 @@ const CAT_HOLD = {
   restGapL: 0.008,
   liftPoleL: [-1.2, -0.6, 0],
   restBow: {
-    lap: { along: 0.6, offset: [0.4, 0.5, -0.35] },
+    lap: { along: 0.28, offset: [0.4, 0.5, -0.35] },
     tip: [0.15, 1, -0.45],
     hair: [0, 0, -1],
     via: { ...UPRIGHT_BOW.via, reach: [0.6, 0, -0.4] },
