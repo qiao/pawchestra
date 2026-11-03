@@ -198,9 +198,11 @@ side wall on the trunk (`tools/blender/cat_arms.py`). The `README.md` of
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
   eye patch. A script cuts such faces along the edge in a copy (`tools/blender/penguin_edge.py`,
   `panda_edge.py`), and each new vertex lies on an old face. The rig takes the weights of the mesh
-  before the cut (`weightSource`). A cut stays where the weights change little, such as the head:
-  where the clavicle weights change fast, the skin bends the inside of a large face, and the small
-  new faces turn over in the play.
+  before the cut (`weightSource`). Where the weights change fast, such as at the clavicles, the
+  skin moves a new vertex off the line of its old edge, and a small new face turns over in the
+  play. There the cut adds few and large faces: it splits no face at the middles of its edges, and
+  a change near a corner goes through that corner. The texture has a soft gray step at each edge,
+  so a face of the edge takes the larger half of its samples (`colors.split`).
 - **Intake spec.** A new mesh comes with clean quad faces, so that its arms keep their faces: the
   rig adds only the arm segments and the weights (`arm_rebuild.py --keep-faces`). `pnpm
   mesh-intake` checks each point of the intake table below with the limits of
