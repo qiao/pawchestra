@@ -1,14 +1,14 @@
 # Rigging
 
-This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the rebuild of the arms
-in Blender, and the traps of the rig. Design 4.4 gives the rules of the bodies, and the reference
+This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the arm rebuild in
+Blender, and the traps of the rig. Design 4.4 gives the rules of the bodies, and the reference
 images are the target of each body. [`rig-rounds.md`](rig-rounds.md) gives the brief of a rigging
 round.
 
 ## Bodies and roles
 
-Each species has a studio body (`body: 'studio-<a>'`). The roles are the names that
-`pnpm fold-probe`, `pnpm hold-fit`, `pnpm arm-check`, and `pnpm close-views` take.
+Each species has a studio body (`body: 'studio-<a>'`). `pnpm fold-probe`, `pnpm hold-fit`,
+`pnpm arm-check`, and `pnpm close-views` take the role names.
 `pnpm pose-depth violinist` sweeps the rabbit and the red fox together. "Rebuilt arms" means quad
 arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Blender").
 
@@ -21,7 +21,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | Rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
-| panda | A copy with the arms freed from the trunk (`panda_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.497`), the role-neutral bind. The trombone hold keeps the round elbows away from the trunk. | `trombonist` |
+| panda | Arms freed from the trunk in a copy (`panda_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.497`), the role-neutral bind, the elbows out in the trombone hold. | `trombonist` |
 | hippo | Longer rebuilt arms with a seam cut and a side wall (`hippo_arms.py`), smoothed arm tubes (`armSmooth`), the role-neutral bind with elbow `raise` shapes, smaller pea eyes. Stands at the contrabass. | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), the role-neutral bind, a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`), the role-neutral bind. Stands at the timpani, with the trunk on the head. | `timpanist` |
@@ -60,17 +60,16 @@ Its mesh has clean quad rings and twist markers, so a fault there comes from the
 ### Steps of a new body
 
 1. **Joints.** Measure the joints on cuts of the mesh, and write them in
-   `tools/mesh-rigs/<a>.json` with a note on each measure. Start with the arm factor 1 and the leg
-   factor 1. The first line of `pnpm rig-mesh <a> --check` gives the arm factor of the target
-   reach.
+   `tools/mesh-rigs/<a>.json` with a note on each measure. Start with the arm and leg factors 1. The
+   first line of `pnpm rig-mesh <a> --check` gives the arm factor of the target reach.
 2. **Form.** A body that is shorter or wider than the mesh takes `proportions`. A head that keeps
    its form takes `"keep": "head"` with a blend zone on the neck above the shoulder tops. A larger
    head grows `H`, so fit the holds again.
 3. **Options.** Run `pnpm mesh-options <a> <dir> --size <label>=<head top>... --arms <f>,...
    --legs <f>,... --instrument <id>`. Fix each warning of the rigs, then ask the user about the
-   size, the arms, and the legs with `options.md` and `options.png`.
+   size, arms, and legs with `options.md` and `options.png`.
 4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4). Run `arm_rebuild.py`, with
-   `--keep-faces` on `keep faces`. Look at the seated bind, the standing body, the knees, and the
+   `--keep-faces` on `keep faces`. Look at the seated bind, standing body, knees, and
    bones with `pnpm rig-mesh <a> --check --preview <dir>`. Try each variant with `--check --set`,
    and add `--no-base` after the first run. The triangles and the gzip size stay in their
    budgets, and the standing body stays within 1 mm of the source.
@@ -84,15 +83,15 @@ Its mesh has clean quad rings and twist markers, so a fault there comes from the
 
 A new role adds in the same commit its entries in `SWEEP_ROLES` of `src/pose/test-sweep-roles.ts`,
 `FOLD_ROLES` of `tools/fold-probe.ts`, and `ROLE_VIEWS` of `tools/close-views.ts`, and its rows in
-the table above and in the pose index of design 5. Only the last commit of a series of rig commits
-writes the GLB file, together with its module.
+the table above and in the pose index of design 5. Only the last commit of a rig series writes the
+GLB file and its module.
 
 ## The arm gate
 
 A fold count does not see a twisted or a flat arm, and a goal on one measure moves the twist to a
 joint that no goal measures. Each round that changes a hold, a rig, a pose, an instrument size, or
-a seat runs the whole gate, `pnpm arm-check <roles> --base <start> --views <dir>`, and puts the
-table and the crop pairs into its report. A `FAIL`, or a better number with a worse look, makes the
+a seat runs the whole gate (`pnpm arm-check <roles> --base <start> --views <dir>`) and reports its
+table and crop pairs. A `FAIL`, or a better number with a worse look, makes the
 round not done.
 
 - `--trace <demo>:<from>-<to>` finds a fast turn of a paw. `--states <ref>,...` compares old
@@ -103,11 +102,11 @@ round not done.
   its entry. A round that changes a grip on purpose expects a `FAIL` of the grip turn, and gives
   the new median with the 2x paw crops at a strike and at rest. The entry changes only after the
   manager accepts them.
-- The paw twist, the paw swing, the forearm twist, the move twist, and the flat share count from
-  the bind. When the bind differs from the base, they take only their limits (`REBIND`), and the
-  gate prints the elbow and wrist ring widths. The grip turn ignores the bind. A rebind round
-  proves the same bones with `pnpm arm-check <roles> --world --base <start>`.
-- `pnpm arm-look <role>` measures a crumpled or a flat upper arm.
+- The paw twist, paw swing, forearm twist, move twist, and flat share count from the bind. When the
+  bind differs from the base, they take only their limits (`REBIND`), and the gate prints the elbow
+  and wrist ring widths. The grip turn ignores the bind. A rebind round proves the same bones with
+  `pnpm arm-check <roles> --world --base <start>`.
+- `pnpm arm-look <role>` measures a crumpled or flat upper arm.
 
 ## The rebuild of the arms in Blender
 
@@ -122,9 +121,9 @@ Smooth of the upper arm weights, or a move of the elbow alone does not fix a twi
   about 160° on its forearm folds the wrist. Then change the hold or the instrument first, and
   hold the part near the direction of no paw twist.
 
-Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps, which it does from
-the joints of the config and rays through the mesh, with the functions of the species scripts. A
-clean quad mesh skips steps 2 to 5 (`--keep-faces`). Write a species script
+Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps, from the joints of
+the config and rays through the mesh, with the functions of the species scripts. A clean quad mesh
+skips steps 2 to 5 (`--keep-faces`). Write a species script
 `tools/blender/<a>_arms.py` only for a fault that it does not fix, such as an arm joined to the
 trunk down to the elbow (`cat_arms.py`, which takes its weights from the copy before the wall).
 
@@ -135,8 +134,8 @@ trunk down to the elbow (`cat_arms.py`, which takes its weights from the copy be
 - Change only the limb faces from the shoulder line to the wrist, or from the haunch line to the
   ankle. The new surface lies on the old limb. Ask the user before the first rebuild of a species.
 - Keep the source file. Write the copy next to it, with a note in the `README.md` of the folder.
-- Never call `read_factory_settings`, because it stops the MCP server. Stop only the Blender
-  process that you start.
+- Never call `read_factory_settings`, because it stops the MCP server. Stop only your own Blender
+  process.
 - Merge by Distance first, because automatic weights fail on split seams.
 - Put the rings of 16 vertices about 0.45 arm radii apart, with a ring on each side of the elbow
   and the wrist. A slanted color edge keeps its zigzag (`colorBlend` softens it).
@@ -150,9 +149,8 @@ faces move the bone heat of the whole mesh, so give the kept vertices the old bo
 
 ### Bones
 
-Each upper arm and each forearm has 4 deform segments, and each elbow and each wrist has a helper
-bone. The old arm bones hold no skin and only drive the new bones. `armSegments` of the config
-turns this on.
+Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The
+old arm bones hold no skin and only drive the new bones. `armSegments` of the config turns this on.
 
 ```text
  clavicle --> upper_arm (drives) --+-- upper_arm_seg0..3 (roll 1/8 .. 7/8)
@@ -169,7 +167,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 
 ## Traps
 
-Read the group of your work before you plan it.
+Read the group of your work first.
 
 ### Paws and twist
 
@@ -194,7 +192,7 @@ Read the group of your work before you plan it.
 - A new scale of `SpeciesParams` adds its instrument to `SCALED_INSTRUMENTS`, so the typecheck
   names each reader.
 - A hold trades folds against clearance. Check each hold change with `pnpm hold-fit --set`,
-  `pnpm pose-depth --set`, and `pnpm arm-check --variant` before you write it.
+  `pnpm pose-depth --set`, and `pnpm arm-check --variant` first.
 - The arm gate and the depths pass while a paw misses its instrument. Measure each grip with
   `pnpm wind-grip`, and look at the thumb, which the tool does not see.
 - A paw that points at its tube cannot face it with the palm. Put the grip beside the tube.
@@ -206,8 +204,8 @@ Read the group of your work before you plan it.
   move the mouthpiece under the muzzle (`lipShift`).
 - Rest elbows far from the play elbows twist the paws in the lift. Keep them near.
 - A freed round arm has its full inner half width, so the hold of the joined arm puts it into the
-  trunk with the same bones. Turn the elbows out about the line from the shoulder to the grip, and
-  bend the elbow with a nearer grip. The grip turn counts from the posed forearm, so check it.
+  trunk. Turn each elbow out about the line from the shoulder to the grip, bend it with a nearer
+  grip, and check the grip turn, which counts from the posed forearm.
 - A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
 - A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head
   (the panda, the mouse), and the fit then jumps. Measure the front of a band of the upper chest
@@ -236,8 +234,8 @@ Read the group of your work before you plan it.
 - Bone heat gives the trunk side a part of a hanging arm. Keep the arm weights on the free arm
   (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
-  it the mean. The `sliver` rule can then move a weight 4 cm away, so compare the weights with
-  `main` by place.
+  it the mean. The `sliver` rule can then move a weight 4 cm away: compare the weights with `main`
+  by place.
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
@@ -246,9 +244,8 @@ Read the group of your work before you plan it.
   short paw. Check both.
 - `weights.fingers` 0.5 keeps the curl small. A paw that closes around a tube takes the weight 1.
 - A bind that bends a thick paw (`studio.bindArms`) presses the inner wrist skin in the rest shape,
-  and each pose blends its bend on top. No weight rule, ring, taper, or `raise` then removes the
-  dark slit at the wrist. Bind the arms straight (`studio.straightArms`), and judge a wrist by its
-  2x crops.
+  and each pose blends its bend on top, so no weight rule, ring, taper, or `raise` removes the dark
+  wrist slit. Bind the arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
   (`paintedLower`).
 - The glTF skin has no B-Bones and 4 weights for each vertex. In the Blender preview, set
@@ -270,17 +267,17 @@ Read the group of your work before you plan it.
 
 ### Shapes
 
-- When no weight rule or ring removes a fold, fit a shape of `raise` with `pnpm raise-fit` on the
+- When no weight rule or ring removes a fold, fit a `raise` shape with `pnpm raise-fit` on the
   key of its joint. A body has at most `RAISE_LIMIT` shapes.
 - A shape fixes only the poses near its rule, so fit the hold first. Keep the rig log count of
   `raise R` at 0.
 - A shape or a longer elbow helper cannot widen an elbow ring that a straight bind narrows.
   Weights that keep the forearm and the helper off the upper arm widen it, but fold the inner
-  elbow, also with more Smooth rounds or one more elbow ring.
+  elbow, also with more Smooth rounds or one more ring.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 - On an arm joined to the trunk, start an elbow shape with `below` 0, and read its rig log first:
-  `below` 0.3 also relaxes the faces of the arm root and turns them over.
+  `below` 0.3 also turns over the relaxed faces of the arm root.
 
 ### Legs, seat, and tail
 
@@ -316,9 +313,9 @@ Read the group of your work before you plan it.
 - The glTF exporter writes the vertex colors only with `export_vertex_color='NAME'` and the name
   of the color attribute.
 - The `location` of a new child object is in the frame of its parent. Undo the place, the turn,
-  and the scale of the parent to get the local point.
-- The glTF importer adds a sphere mesh for the bone shapes, and keys at the 24 fps of the scene.
-  An FBX take can key the scale of the armature object. Check the meshes, the rate, and the scale.
+  and the scale of the parent for the local point.
+- The glTF importer adds a sphere mesh for the bone shapes and keys at the 24 fps of the scene,
+  and an FBX take can key the scale of the armature. Check the meshes, the rate, and the scale.
 - An FBX armature with no mesh takes its current pose as its rest pose. Keep each quaternion key
   on the side of the key before it (a dot product of 0 or more), else the blend goes the long way.
 - The FBX exporter takes its ids from the Python string hash. Run Blender with `PYTHONHASHSEED=0`
