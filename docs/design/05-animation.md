@@ -238,7 +238,7 @@ The rest of each family:
   went into the body. The panda keeps the trombone at the grips of the play, off the mouth, with
   the slide turned down in front and the elbows out (`PANDA_TROMBONE`). Reason: with the trombone
   upright in front of the face, its free right arm cleared the trunk only with the elbow at the
-  level of the shoulder, a fault of a brass player (winds 1.8).
+  level of the shoulder. Arms near the level are a fault of a brass player (winds 1.8).
 - **Piano and harp.** The polar bear sits tall with a small lean to the piano and the head up, as
   a pianist before a performance, with the paws in front of the lower belly (`restLean`). The
   deer sits up with each hand near a string.
@@ -271,8 +271,8 @@ The rest of each family:
   joint to the grip, and the shoulder turns forward when the arm reaches forward. A grip nearer to
   the shoulder bends the elbow, so each degree of the turn moves the upper arm further from the
   trunk. The grip turn of the arm gate counts from the posed forearm, so the turn of the elbow
-  adds to it (`ACCEPTED_GRIPS`), and a large forward turn of the shoulder folds it. Reason: on a
-  bent arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
+  adds to it (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the shoulder. Reason:
+  on a bent arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):

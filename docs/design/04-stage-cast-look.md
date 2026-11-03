@@ -181,8 +181,8 @@ joints of the config and from the mesh, so that a new mesh gets clean arms with 
 Each face takes one color, so a face across a color edge of the old arm gives a saw-tooth edge.
 The rebuild thus puts a ring at each color edge across the arm. A species script
 `tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. An arm that the
-mesh joins to the trunk down to the elbow has no free section, so a script first frees it in a
-copy with a side wall on the trunk (`tools/blender/panda_edit.py`). The `README.md` of
+mesh joins to the trunk down to the elbow has no free section. A script first frees it in a copy
+with a side wall on the trunk (`tools/blender/panda_edit.py`). The `README.md` of
 `assets/models/<a>/` gives the source and the steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
