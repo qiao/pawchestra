@@ -1121,8 +1121,9 @@ const CAT_HOLD = {
  * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
  *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
  *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
- *   its accepted grip (4° on the old body). The right shoulder turns 25° forward (`reach`): with
- *   30°, the right upper arm goes 1.8 cm into the chest in a stroke of `bach-bwv1050`.
+ *   its accepted grip (4° on the old body). The right shoulder turns 20° forward (`reach`): with
+ *   30°, the right upper arm goes 1.8 cm into the chest in a stroke of `bach-bwv1050`, and with
+ *   25°, 1.7 cm in a stroke of `beethoven-8-4`.
  * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
  *   out and a little down, (2.5, -0.5, -0.3): with the pluck of {@link CELLO_HOLD}, the right upper
  *   arm goes 3.0 cm into the chest.
@@ -1139,7 +1140,7 @@ const DOG_HOLD = {
   ...CELLO_HOLD,
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
-  reach: 25 * MathUtils.DEG2RAD,
+  reach: 20 * MathUtils.DEG2RAD,
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
   polePizzicato: [2.5, -0.5, -0.3],
