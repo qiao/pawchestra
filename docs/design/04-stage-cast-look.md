@@ -411,7 +411,10 @@ each verdict.
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
   old panda. The vertical shin lifts the seat by its full length and the sloped thigh by less
-  than half, so the shin grows more than the thigh (`shinFactor`).
+  than half, so the shin grows more than the thigh (`shinFactor`). Its head is smaller than the
+  head of the mesh (`headFactor`), so that the head has the width of the old head for its height,
+  as on the cat. The smaller head moves the mouth back, so the trombone hold of the panda puts the
+  right elbow further out and the rest place further forward (5.2, 5.3).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
