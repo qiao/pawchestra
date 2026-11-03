@@ -592,18 +592,17 @@ scene of each demo has its seats and stage size with no overlap.
       `studioPawTwist()` does for the carried violin paw (`reports/2026-11-02-panda-rest/round2/`).
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
-- [ ] Hippo bassist: the upper arms go up to 6 cm into the body and 4.7 cm into the contrabass. The
-      hidden inner side of the arm tube counts. Measure the visible surface only.
-- [ ] Hippo bassist: the left forearm goes 2.1 cm into the neck in 0.1% of the play, and a light
-      face of the texture shows under the right arm from az150.
-- [ ] Hippo bassist: on the E and A strings, the bow paw goes more than 1.5 cm into the belly in 5%
-      of the play. Try a hold that moves the right elbow off the line of the stick (slant -10°).
+- [ ] Hippo bassist: the right elbow goes 0.6 cm into the back of the contrabass at 197.40 s of
+      `beethoven-1` (0 cm with the old body). The touch is accepted for now, because the T-pose
+      body takes the upper arms from 5.1 cm to 1.3 cm out of the body. Try an elbow path for the
+      frog-side low-string bow place: a right shoulder turn of 46° or a lean of 10° moves the
+      touch to `bach-bwv1050` and `beethoven-9` (3.0 cm and 3.4 cm).
+- [ ] Hippo bassist: check the texture under the right arm from az150 on the T-pose body. The old
+      mesh showed a light face there.
 - [ ] Hippo bassist: the left paw stops only up to 0.7 of the fingerboard, so the high notes take
       lower places on the neck. Show the user a high passage of `bach-bwv1050`.
 - [ ] Hippo bassist: the bow plays only a part of the hair, so the strokes are short. Offer the user
       longer arms or a smaller contrabass.
-- [ ] Hippo bassist: in the change from the bow to pizzicato at 248.13 s of `boulanger-matin`, the
-      right forearm goes 4.2 cm into the rim of the upper bout. Try a path around the rim.
 - [ ] Hippo bassist: the top edge of the upper bout touches the chest under the chin, and a few
       teeth of the skin show over it in a close view from the front.
 - [ ] Held instruments over 2 cm in the body: the pig hornist, the rhino tubist, the red fox, the
