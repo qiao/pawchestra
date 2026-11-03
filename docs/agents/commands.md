@@ -17,11 +17,13 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
   and compares it with the working tree. A cache by tree keeps the JSON of the commit
   (`base: cached`). `PROBE_NO_CACHE=1` runs the commit again.
 - **`--glb <file>`.** Gives the animal the studio body of another GLB file, in a copy of `src/`
-  (`tools/glb-swap.ts`), so a file of `rig-mesh --check --keep` needs no `pnpm studio-body`.
+  (`tools/glb-swap.ts`), so a file of `rig-mesh --check --keep` needs no `pnpm studio-body`. With
+  `--base`, only the working tree takes it. `arm-check` takes each role of its animal, also a
+  recast role.
 - **Recast role `<role>@<species>`.** The role tools take a role with another species, such as
   `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`), with the size
   rule of the matrix (`tools/recast-scale.ts`). A test species takes `TEST_BODY_OBSTACLES`.
-  `arm-check --views` and `close-views batch` take no recast role.
+  `arm-check --views` takes no recast role.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
 - **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
@@ -103,7 +105,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 
 | Command | Action |
 |---|---|
-| `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. `--set` can add an optional rule, such as `studio.bindSupination.L=57` or `sitPose=@<file>`. 20 s to 75 s. |
+| `pnpm rig-mesh <animal> [--preview <dir>] [--check [--set <changes>]... [--no-base] [--keep <dir>]]` | Rigs a textured mesh into a studio body GLB file from `tools/mesh-rigs/<animal>.json` (design 4.4). `--check` rigs into a temporary folder, and prints the measures and the faults of each role. `--set` can add an optional rule, such as `studio.bindSupination.L=57` or `sitPose=@<file>`, and `--no-base` checks only the variants, in about half of the time. 20 s to 75 s. |
 | `pnpm mesh-intake <mesh.glb> --config <config> [--factor <f>]` | Checks a mesh against the intake spec (design 4.4), and gives `keep faces` or `needs rebuild` (exit code 1). 2 s. |
 | `blender -b --factory-startup --python tools/blender/arm_rebuild.py -- <animal> [--source <glb>] [--factor <f>] [--spec <JSON>] [--out <dir>]` | Rebuilds the arms from the joints of `tools/mesh-rigs/<animal>.json` ([`rigging.md`](rigging.md)) into `<animal>-arms.glb` and `<animal>-weights.json`. Test them with `rig-mesh --check --set 'source=<glb>;paintedWeights=<json>'`. 10 s. |
 | `blender ... arm_rebuild.py -- <animal> --keep-faces [--out <dir>]` | Adds only the arm segments and the weights to a mesh with `keep faces`. The GLB file is a copy of the source. 5 s. |
