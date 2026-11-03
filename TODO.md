@@ -567,6 +567,15 @@ scene of each demo has its seats and stage size with no overlap.
       accept the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
 - [ ] Panda trombonist: at rest, the left paw bends 65° to the side (paw swing, limit 70) with the
       elbow out. Check the left wrist in the 2x crops of the rest.
+- [ ] Panda trombonist rest: an upright rest needs both paws on the trombone. Upright in front, as
+      on `59ddbdc8`, the free right arm clears the trunk only with the elbow at the level of the
+      shoulder, and the right paw then twists 163° at rest (arm gate `FAIL`, base 90°). With the
+      lower end of the slide 35° to the right (36° from the vertical), the elbows out, and the left
+      rest grip 0.06 H across its tubes, the arms stay within 1.4 cm and the gate passes, but the
+      left paw does not grasp at rest (`pnpm wind-grip` 0%, as on `59ddbdc8`), and the forearms go
+      0.5 cm into the trombone (0.1 cm on `dc300792`). A left rest grip that grasps bends the left
+      wrist past 100° (limit 70°). Next: a rest grip of the left paw on the bell brace at the flare
+      (wind-technique 1.7), and a rest aim of each paw (`reports/2026-11-02-panda-rest/`).
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the upper arms go up to 6 cm into the body and 4.7 cm into the contrabass. The
