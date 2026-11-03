@@ -31,3 +31,8 @@ scratch/
 # The images of a round report. The manager reads them in the checkout of the agent. Git keeps no
 # report image (design 9.8).
 reports/
+
+# The panda copy with the arms free of the trunk (tools/blender/panda_edit.py). Only
+# tools/blender/arm_rebuild.py reads it, and a run writes the same bytes, so git keeps no copy of
+# its 12 MB (assets/models/panda/README.md).
+assets/models/panda/panda-edit.glb
