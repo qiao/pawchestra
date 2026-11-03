@@ -1546,6 +1546,33 @@ async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVa
 }
 
 /**
+ * Gives the variant of the recast roles `<role>@<species>` of a batch: the scale of the size rule
+ * of each recast role (`recastChanges()` of `tools/recast-scale.ts`), as the close view of one
+ * recast role takes it ({@link siteVariant}). The parts of these roles render on a site of their
+ * own, because a scale such as `fox-red.violinScale` also changes a player of the cast. The build
+ * of `--base` keeps the scale of its commit, as for one recast role.
+ *
+ * @param parts The parts of the batch.
+ * @returns The variant, or `null` when no recast role of the batch has a scaled instrument.
+ */
+async function batchVariant(parts: readonly SingleMode[]): Promise<SiteVariant | null> {
+  const names = parts.flatMap((part) =>
+    part.kind === 'role' && part.args.recast ? [roleName(part.args)] : [],
+  );
+  if (names.length === 0) {
+    return null;
+  }
+  const holds = (await import('./recast-scale.ts')).recastChanges(names, '');
+  if (!holds) {
+    return null;
+  }
+  const applied = setHolds(holds);
+  applied.undo();
+  console.log(`The recast roles of the batch take the hold changes ${applied.text}.`);
+  return { body: null, holds: [holds], entry: GALLERY_ENTRY };
+}
+
+/**
  * Gives the plugin of the build of a variant: the module of the studio body of the GLB file in
  * place of the module of the tree, and a first import of the entry of the page that applies the
  * hold changes with `setHolds()` before the other modules of the page run, as the hold tools
@@ -4918,7 +4945,7 @@ function partMode(args: readonly string[]): SingleMode {
 
 /**
  * Reads the command line of the mode `batch`:
- * `batch <dir> [--species <species,...>] [--moments <moment,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--role <role>]... [--lineup] [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]`.
+ * `batch <dir> [--species <species,...>] [--moments <moment,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--role <role | <role>@<species>>]... [--lineup] [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]`.
  * Each part is the command line of a single mode with the folder of the part in `<dir>`, and
  * the reader of that mode reads it:
  *
@@ -4926,7 +4953,8 @@ function partMode(args: readonly string[]): SingleMode {
  *   `--moments` ({@link DEFAULT_BATCH_MOMENTS} by default), at the views of `--views`, and with
  *   `--elevation`, into `species-<moment>/` at the zoom 1 and `species-<moment>-zoom<n>/` at
  *   another zoom.
- * - `--role`: the close view of each role, into `<role>/`.
+ * - `--role`: the close view of each role, into `<role>/`. A recast role `<role>@<species>`
+ *   renders on a site of its own with the scale of its size rule ({@link batchVariant}).
  * - `--lineup`: the lineup of the species of `--species`, into `lineup/`.
  * - `--camera`: the mode `play` at each camera, with `--demo` and `--time`, into `play/`.
  *
@@ -5007,7 +5035,7 @@ function batchArgs(args: readonly string[]): BatchArgs | null {
 
   const roles = CLOSE_ROLES.map((name) => ({ name }));
   for (const name of onceEach(line.options.get('--role') ?? [], 'role')) {
-    const role = namedItem(name, roles, 'role').name;
+    const role = castRoleOf(name)?.recast ? name : namedItem(name, roles, 'role').name;
     parts.push(partMode([role, join(out, role), ...shared]));
   }
 
@@ -5238,17 +5266,15 @@ function sameInCommit(ref: string, path: string): boolean {
  * working tree stays open, because the lineup renders the working tree again at its common
  * camera.
  *
- * @param modes The renders of each mode.
- * @param site The site of the working tree.
+ * @param modes The renders of each mode, each with its site of the working tree.
  * @param ref The commit, the branch, or the tag of `--base`, or `null`.
  */
 async function renderModes(
-  modes: readonly ModeRender[],
-  site: TreeSite,
+  modes: readonly { readonly mode: ModeRender; readonly site: TreeSite }[],
   ref: string | null,
 ): Promise<void> {
   const commits: { readonly overlay: readonly string[]; readonly render: CommitRender }[] = [];
-  for (const mode of modes) {
+  for (const { mode, site } of modes) {
     const commitRender = await mode.tree(site);
     if (commitRender) {
       commits.push({ overlay: mode.overlay, render: commitRender });
@@ -5259,7 +5285,7 @@ async function renderModes(
   }
 
   const label = `${ref} (${shortHash(ref)})`;
-  const plugins = [...new Set(modes.flatMap((mode) => mode.plugins))];
+  const plugins = [...new Set(modes.flatMap(({ mode }) => mode.plugins))];
   const builds = commitBuilds(commits, (path) => sameInCommit(ref, path));
   for (const build of builds) {
     if (build.overlay.length > 0) {
@@ -5287,7 +5313,7 @@ const USAGE = [
   '       pnpm close-views lineup <species,...> <output directory> [--url <url>] [--base <ref>]',
   `       pnpm close-views species <species,...> <output directory> [--views <${SPECIES_VIEWS.map((view) => view.name).join('|')},...>] [--moment <play|rest|lift<p>|lower<p>>] [--zoom <n>] [--elevation <deg>] [--url <url>] [--base <ref>]`,
   `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>]`,
-  '       pnpm close-views batch <output directory> [--species <species,...> [--moments <play|rest|lift<p>|lower<p>,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--lineup]] [--role <role>]... [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]',
+  '       pnpm close-views batch <output directory> [--species <species,...> [--moments <play|rest|lift<p>|lower<p>,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--lineup]] [--role <role | <role>@<species>>]... [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]',
   '       pnpm close-views audit <output directory> [--roles <role,...>] [--url <url>] [--base <ref>]',
 ].join('\n');
 
@@ -5403,13 +5429,23 @@ async function main(): Promise<void> {
           ...playPlugins(ROOT, plugins),
         ])
       : await startSite(ROOT, SERVER_PORT);
+  const recast = mode.kind === 'batch' && !url ? await batchVariant(mode.args.parts) : null;
+  let recastSite: Site | null = null;
   try {
-    await renderModes(modes.map(modeRender), site, mode.args.base);
+    const ownSite = recast ? await startVariantSite([variantPlugin(recast)]) : null;
+    recastSite = ownSite;
+    const siteOf = (part: SingleMode): TreeSite =>
+      ownSite && part.kind === 'role' && part.args.recast ? ownSite : site;
+    await renderModes(
+      modes.map((part) => ({ mode: modeRender(part), site: siteOf(part) })),
+      mode.args.base,
+    );
   } finally {
     if (url) {
       await site.browser.close();
     }
     await site.close();
+    await recastSite?.close();
   }
 }
 
