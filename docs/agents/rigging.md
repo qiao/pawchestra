@@ -205,6 +205,9 @@ Read the group of your work before you plan it.
 - A long snout puts the mouthpiece far forward. Turn the instrument back around the mouthpiece, or
   move the mouthpiece under the muzzle (`lipShift`).
 - Rest elbows far from the play elbows twist the paws in the lift. Keep them near.
+- A freed round arm has its full inner half width, so the hold of the joined arm puts it into the
+  trunk with the same bones. Turn the elbows out about the line from the shoulder to the grip, and
+  bend the elbow with a nearer grip. The grip turn counts from the posed forearm, so check it.
 - A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
 - A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head
   (the panda, the mouse), and the fit then jumps. Measure the front of a band of the upper chest
