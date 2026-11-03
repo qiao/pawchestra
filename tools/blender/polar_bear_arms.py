@@ -437,8 +437,8 @@ def retopo_bridge(mesh):
     return made, collapsed, smoothed
 
 
-#: The rounds and the factor of Smooth Vertices of `smooth_wrists()`, as on the hippo
-#: (`WRIST_SMOOTH` of `hippo_arms.py`).
+#: The rounds and the factor of Smooth Vertices of `smooth_wrists()`, as on the bear
+#: (`WRIST_SMOOTH` of `bear_arms.py`).
 WRIST_SMOOTH = (4, 0.5)
 
 

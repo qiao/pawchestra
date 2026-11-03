@@ -98,14 +98,13 @@ SHOULDER_ANGLE = 20.0
 CUT_PLANES = va.cut_planes
 
 #: The rounds and the factor of Smooth Vertices on the band of each wrist (`step_smooth_wrist()`),
-#: as on the polar bear and the hippo.
+#: as on the polar bear.
 WRIST_SMOOTH = (4, 0.5)
 
 
 def cut_planes(s, line, side):
     """Gives the cut planes of `violin_arms.cut_planes()`, with the wrist plane at a right angle to
-    the axis of the last ring of the tube, as `cut_planes()` of `hippo_arms.py` and of
-    `polar_bear_arms.py` do.
+    the axis of the last ring of the tube, as `cut_planes()` of `polar_bear_arms.py` does.
 
     The last ring stands at the wrist joint at a right angle to the line halfway between the
     forearm and the paw (`violin_arms.arm_stations()`). The wrist plane of `violin_arms.py` stands
