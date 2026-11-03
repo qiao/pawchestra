@@ -23,7 +23,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 - **Recast role `<role>@<species>`.** The role tools take a role with another species, such as
   `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`), with the size
   rule of the matrix (`tools/recast-scale.ts`). A test species takes `TEST_BODY_OBSTACLES`.
-  `arm-check --views` takes no recast role.
+  `close-views play --recast` puts it into the app.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
 - **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
