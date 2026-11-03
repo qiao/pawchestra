@@ -1,6 +1,8 @@
 {
-  "source": "assets/models/panda/panda-arms.glb",
-  "sourceNote": "The T-pose panda mesh panda-tpose.glb (armSource, assets/models/panda/README.md), with new quad faces on each arm from the shoulder line to the wrist, so that the arms and the wrists do not twist. tools/blender/arm_rebuild.py makes these faces with the arms 1.05 times longer (--factor 1.05). The other faces and panda-tpose.glb stay unchanged.",
+  "source": "assets/models/panda/panda-edge.glb",
+  "sourceNote": "The T-pose panda mesh panda-tpose.glb (armSource, assets/models/panda/README.md), with new quad faces on each arm from the shoulder line to the wrist (panda-arms.glb), so that the arms and the wrists do not twist. tools/blender/arm_rebuild.py makes these faces with the arms 1.05 times longer (--factor 1.05). tools/blender/panda_edge.py then cuts the faces along the edges of the eye patches and of the band on the back, with no change of the form. The other faces and panda-tpose.glb stay unchanged.",
+  "weightSource": "assets/models/panda/panda-arms.glb",
+  "weightSourceNote": "The weights come from the mesh before the cut of panda_edge.py, and each vertex takes the weights of its place on it (placed_weights() of tools/blender/rig_mesh.py). With the weight rules on the cut mesh, the bone heat and the sliver rules changed the weights near the new faces.",
   "paintedWeights": "assets/models/panda/panda-weights.json",
   "paintedLower": [
     "root",
@@ -498,31 +500,7 @@
       ],
       "note": "The white fur takes the full step to the white of SPECIES_COLORS.panda. A row is [L, dL, da, db] in Oklab: a face below the lightness 0.5 does not move, and a face above 0.8 takes the move of the second row. Thus the black parts keep their colors."
     },
-    "note": "The eyes and the eye patches have almost the same dark color, so the eye box holds only the brown iris and the black pupil in the patch. A face in the nose box whose color is nearer to the nose color than to white takes the gloss. The rig has no border rule: with it, the black band of the back showed white teeth.",
-    "patch": {
-      "center": [
-        0.08,
-        0.824
-      ],
-      "radii": [
-        0.055,
-        0.055
-      ],
-      "box": [
-        [
-          0.02,
-          0.75,
-          0.08
-        ],
-        [
-          0.15,
-          0.92,
-          1.0
-        ]
-      ],
-      "dark": 0.5,
-      "note": "Each dark fur face in the box, or in its mirror, with a corner outside the circle around the middle of the patch takes the color of the nearest light fur face. The faces of the head are large, so the patches of the texture give faces with sharp points out of the patch, and an angry look. The circle keeps a round patch around the eye."
-    }
+    "note": "The eyes and the eye patches have almost the same dark color, so the eye box holds only the brown iris and the black pupil in the patch. A face in the nose box whose color is nearer to the nose color than to white takes the gloss. The rig has no border rule: with it, the black band of the back showed white teeth. The faces of the source are cut along the edge of each eye patch (panda-edge.glb), so each patch keeps the round oval of the texture with no patch rule."
   },
   "eyeShell": {
     "lift": 0.002,
