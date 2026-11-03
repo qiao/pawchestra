@@ -255,8 +255,9 @@ entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings.
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
 - It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
-  `eyeShift`, `eyeNormal`). Each eye bends to the head surface (`eyeBend()`), so its rim lies at
-  the fur. Both eye lights show on the upper left, as the reflection of one lamp does.
+  `eyeShift`, `eyeNormal`). An old eye that stands out as a ball in a groove shows a light rim
+  around the pea eye, so the head fills it first (`eyeFill`). Each eye bends to the head surface
+  (`eyeBend()`), so its rim lies at the fur. Both eye lights show on the upper left, as the reflection of one lamp does.
 - The tip of the nose comes from the vertices near the middle plane (`NOSE_PLANE`), or below a
   horn (`noseTop`). The head measures leave out a long nose, the whiskers, and the antlers
   (`headFloor`, `headCeiling`), because the holds in `H` start at the head.
