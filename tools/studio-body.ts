@@ -289,7 +289,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       seated: true,
       soloist: true,
       seatWidth: 0.46,
-      backRoom: 0.011,
+      backRoom: 0.014,
       constant: 'STUDIO_CAT',
       crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
