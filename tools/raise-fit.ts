@@ -44,7 +44,7 @@ import {
 import type { SampleSet } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
-import { patchedDemos } from './patch-demos.ts';
+import { probeDemos } from './probe-demos.ts';
 import { setRecastHolds } from './recast-scale.ts';
 import { STUDIO_BONES, STUDIO_RAISES } from '../src/models/studio-format.ts';
 import type { Side } from '../src/models/studio-format.ts';
@@ -434,7 +434,7 @@ export async function armSamples(options: RaiseOptions): Promise<ArmSample[]> {
   if (!role) {
     throw new Error(`No role has the name ${options.role}.`);
   }
-  const all = await patchedDemos();
+  const all = await probeDemos();
   const unknown = options.demos.filter((file) => !all.some((demo) => demo.file === file));
   if (unknown.length > 0) {
     throw new Error(`No demo has the name ${unknown.join(', ')}.`);
