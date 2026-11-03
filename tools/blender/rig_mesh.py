@@ -48,7 +48,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    first move toward the middle of their neighbors (`smooth_box()`), before the weights. The file
    then gives the move of the head center back to the head before the smoothing (`head_shift()`),
    so that the holds keep their places. With `paintedWeights`, the weights come from a file of
-   Blender.
+   Blender. With `weightSource`, a mesh before a planar split of some faces, the steps give the
+   weights of that mesh, and each vertex takes the weights of its place on it
+   (`placed_weights()`), so that the split moves no weight.
 4. Make the upper arm and the forearm longer by the arm factor of the config, and the thigh and
    the shin by the leg factor. Each bone scales along its axis, and the weights blend the stretch
    to 0 at the shoulder and at the hip. The paws and the feet keep their size, and the body rises
@@ -2857,6 +2859,47 @@ def weight_steps(row):
     return steps
 
 
+def placed_weights(verts, old_verts, old_tris, old_weights):
+    """Gives each vertex the weights of its place on an old mesh (`weightSource` of the config): a
+    vertex at the place of an old vertex takes its weights, and each other vertex the mix of the
+    weights of the corners of the old face on which it lies, by its place on the face. A planar
+    split of the faces, such as `tools/blender/panda_edge.py`, puts each new vertex on an old face,
+    so the old vertices keep their weights and the skin of the old surface stays. Gives the
+    weights and the count of the vertices at old places."""
+    weights = np.zeros((len(verts), old_weights.shape[1]))
+    kept = 0
+    for v, point in enumerate(verts):
+        gaps = np.linalg.norm(old_verts - point, axis=1)
+        k = int(np.argmin(gaps))
+        if gaps[k] < 1e-6:
+            weights[v] = old_weights[k]
+            kept += 1
+            continue
+        face, share = face_place(old_verts, old_tris, point)
+        weights[v] = share @ old_weights[old_tris[face]]
+    return limit(weights), kept
+
+
+def face_place(verts, tris, point):
+    """Gives the face of a mesh on which a point lies, and the shares of its three corners at the
+    point. Raises an error when the point is more than 1e-5 units from each face."""
+    a, b, c = verts[tris[:, 0]], verts[tris[:, 1]], verts[tris[:, 2]]
+    u, w, p = b - a, c - a, point - a
+    uu, uw, ww = (u * u).sum(axis=1), (u * w).sum(axis=1), (w * w).sum(axis=1)
+    pu, pw = (p * u).sum(axis=1), (p * w).sum(axis=1)
+    det = np.maximum(uu * ww - uw * uw, 1e-18)
+    s = np.clip((ww * pu - uw * pw) / det, 0.0, 1.0)
+    t = np.clip((uu * pw - uw * pu) / det, 0.0, 1.0)
+    over = s + t > 1.0
+    s, t = np.where(over, s / (s + t), s), np.where(over, t / (s + t), t)
+    gaps = np.linalg.norm(a + s[:, None] * u + t[:, None] * w - point, axis=1)
+    face = int(np.argmin(gaps))
+    if gaps[face] > 1e-5:
+        raise SystemExit(f'weightSource: the vertex at {point} lies {gaps[face]:.6f} u from the '
+                         'nearest face of the old mesh.')
+    return face, np.array([1.0 - s[face] - t[face], s[face], t[face]])
+
+
 def limit(weights):
     """Keeps the four largest weights of each vertex, in steps of 1/255 that add up to 1."""
     out = np.zeros_like(weights)
@@ -4970,6 +5013,14 @@ def main():
                 f'(smallest angle {angles.min():.1f} degrees, median {np.median(angles):.1f}), '
                 f'the arm run {arm_run}, the body run {body_run}')
         log(f'cut: {before} triangles before, {len(source_tris)} after')
+    # With `weightSource`, the weights come from that mesh, the mesh before a planar split of its
+    # faces, and each vertex of the source takes the weights of its place on it (`placed_weights()`).
+    mesh_verts, mesh_tris = verts, source_tris
+    if 'weightSource' in config:
+        if 'smooth' in config or 'cut' in config:
+            raise SystemExit('weightSource takes no smooth and no cut.')
+        verts, source_tris, _, _ = load_mesh({**config, 'source': config['weightSource']})
+        unsmoothed = verts
     if 'paintedWeights' in config:
         rule_weights = None
         if config.get('paintedLower'):
@@ -5031,6 +5082,12 @@ def main():
         weights = straight_slivers(verts, source_tris,
                                    rigid_slivers(verts, source_tris, weights, rules), rules)
         weights = limit(rigid_faces(verts, source_tris, weights, rules))
+    if 'weightSource' in config:
+        weights, kept = placed_weights(mesh_verts, verts, source_tris, weights)
+        log(f"weights: {kept} of {len(mesh_verts)} vertices take the weights of the vertex at "
+            f"their place in {config['weightSource']}, and the others the mix on their face")
+        verts, source_tris = mesh_verts, mesh_tris
+        unsmoothed = verts
 
     if 'armSmooth' in config:
         verts, count, largest = arm_smooth(verts, source_tris, weights, config['armSmooth'])
