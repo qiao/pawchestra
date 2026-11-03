@@ -83,10 +83,11 @@ const MESH_BODY_LOOPS = 4;
 const RABBIT_BODY_LOOPS = 6;
 
 /**
- * The open loops of {@link BODY_BONES} of the cat mesh: the cuts to the two upper arms, and one
- * open edge pair of 1.4 cm at a whisker.
+ * The open loops of {@link BODY_BONES} of the T-pose cat mesh: the roots of the two upper arms,
+ * and nine open edge loops of 2.5 cm to 16 cm at the whiskers and the muzzle, which the source
+ * mesh has.
  */
-const CAT_BODY_LOOPS = 3;
+const CAT_BODY_LOOPS = 11;
 
 /**
  * The open loops of {@link BODY_BONES} of the dog mesh: the cuts to the two upper arms, two open
