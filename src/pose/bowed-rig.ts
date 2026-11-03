@@ -280,6 +280,13 @@ export interface BowedHold {
    */
   readonly restGapL: number;
   /**
+   * The move of the left paw of a floor instrument from the neck, along the normal of its palm, in
+   * meters, in the play, the rest, and the moves between them (`poseBowed()` of `pose/bowed.ts`).
+   * The grip puts the middle of the finger block on the strings, so the thick wrist of a short
+   * paw goes into the back of the neck. 0 keeps the grip on the strings.
+   */
+  readonly gapL: number;
+  /**
    * The direction to which the left elbow points in the middle of the lift and of the lowering, in
    * the axes of the chest (design 5.2). The elbow turns from the rest pole to this pole, then to
    * the playing pole. `null` mixes the rest pole and the playing pole directly.
@@ -438,6 +445,7 @@ const CHIN_HOLD = {
   restPawTurnL: null,
   restYawL: 0,
   restGapL: 0,
+  gapL: 0,
   liftPoleL: null,
   restAtSide: false,
   restBow: {
@@ -510,6 +518,7 @@ const FLOOR_HOLD = {
   restPawTurnL: null,
   restYawL: 0,
   restGapL: 0,
+  gapL: 0,
   liftPoleL: null,
   restAtSide: false,
   restBow: {

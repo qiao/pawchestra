@@ -1597,6 +1597,11 @@ export function poseBowed(
   const handTilt = leftTilt(rig.hold, state.fingerboard) * weight;
   if (!carried) {
     stopHandAt(rig, place, strings, stop, h.curlL * weight, handTilt, finger, handL);
+    if (rig.hold.gapL !== 0) {
+      // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
+      palmNormal.set(1, 0, 0).applyQuaternion(handL.rotation);
+      handL.wrist.addScaledVector(palmNormal, -rig.hold.gapL);
+    }
   }
   shoulderTurnL(rig, weight, turnL);
   const shoulderFrameL = poseShoulder(rig.armL, chest, rig.chestBind, turnL, shoulderL);
