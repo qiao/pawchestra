@@ -248,7 +248,7 @@ violin, by 0.32 mm on the cello, and by 0.52 mm on the double bass (derived from
 | Value | Violin | Viola | Cello | Double bass |
 |---|---|---|---|---|
 | Angle between neighbor string planes | 17° to 18° between the middles of the zones of one player in motion capture, with the double stops at −22°, −5°, and +13° and the outer edges at −44° and +36° [39]. 14° to 23° in a patent, smaller on the higher strings [42 (secondary)]. 15° to 16.4° (derived) from a bridge arc of 42 mm radius and 11 mm to 12 mm between the strings [43 (abstract)] | No source | No source | About 25° [42 (secondary)] |
-| Arm level | The arm is higher for the G string and lower for the E string. The range of the shoulder in a full bow falls from 24° on the lowest string to 16° on the highest string [44 (abstract)] | As the violin | The bow is "close to your body and lower than the others" on the C string, and it reaches "far away from your body" on the A string [45]. The range of the shoulder rises from 16° on the C string to 30° on the A string [44 (abstract)] | No source |
+| Arm level | The arm is higher for the G string and lower for the E string. The range of the shoulder in a full bow falls from 24° on the lowest string to 16° on the highest string [44 (abstract)] | As the violin | The bow is "close to your body and lower than the others" on the C string, and it reaches "far away from your body" on the A string [45]. A bow stroke starts "open at the shoulder", where "the arm gently extends outward" [85]. The range of the shoulder rises from 16° on the C string to 30° on the A string [44 (abstract)] | No source |
 | Elbow range in a full bow | 71°, the same on all strings [44 (abstract)] [46] | No source | 33° [44 (abstract)] | No source |
 
 ### 2.3 String crossings
@@ -824,3 +824,5 @@ Each source opened on 2026-10-17, except where its entry gives another date.
 84. PMT Online, "Stentor Student I Cello (Back Length 19.5in) 1/10", a product page. The page did
     not open on 2026-11-01, and the fact comes from a search summary.
     https://pmtonline.co.uk/stentor-student-i-cello-back-length-19-5in-1-10
+85. A. McDonagh, "Cello Basics 14: Bow Arm". Opened on 2026-11-03.
+    https://www.ailbhemcdonagh.com/cello-basics-14-bow-arm.html
