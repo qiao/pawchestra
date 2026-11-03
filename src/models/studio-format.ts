@@ -55,13 +55,12 @@ export const ARM_SEGMENT_BONES = [
 export type ArmSegmentBone = (typeof ARM_SEGMENT_BONES)[number];
 
 /**
- * The bones of a studio body (design 4.4, 4.7): the 30 body bones of the biped template of
- * `lowpoly-studio/`, in parent order, the two eye bones that `pnpm studio-body` adds, so that the
- * eyes blink (design 5.1), and the optional bones ({@link OPTIONAL_STUDIO_BONES}): the tip of a
- * tail of two bones, the jaw of a beak, and the arm segments and helpers
- * ({@link ARM_SEGMENT_BONES}). The optional bones come last, so that the index of each other bone
- * stays. The names keep the spelling of the studio. The packed skin names each bone by its index
- * in this list.
+ * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig of `pnpm rig-mesh`, in
+ * parent order, the two eye bones that `pnpm studio-body` adds, so that the eyes blink (design
+ * 5.1), and the optional bones ({@link OPTIONAL_STUDIO_BONES}): the tip of a tail of two bones,
+ * the jaw of a beak, and the arm segments and helpers ({@link ARM_SEGMENT_BONES}). The optional
+ * bones come last, so that the index of each other bone stays. The names keep the spelling of the
+ * rig. The packed skin names each bone by its index in this list.
  */
 export const STUDIO_BONES = [
   'root',
@@ -124,7 +123,7 @@ export type RequiredStudioBone = Exclude<StudioBone, OptionalStudioBone>;
 export type StudioHeads = Readonly<Record<RequiredStudioBone, Vec3>> &
   Readonly<Partial<Record<OptionalStudioBone, Vec3>>>;
 
-/** The parent of each bone of a studio body: the hierarchy of the biped template of the studio. */
+/** The parent of each bone of a studio body: the hierarchy of a rig of `pnpm rig-mesh`. */
 export const STUDIO_PARENTS = {
   root: null,
   hips: 'root',
@@ -379,12 +378,12 @@ export interface StudioEyes {
 }
 
 /**
- * A body from the studio (design 4.4): the mesh of a GLB file of `lowpoly-studio/` in its bind
- * pose, with its own skeleton, its skin of up to four bones for each vertex, and its corrective
- * shapes. `pnpm studio-body <animal>` writes the module of an animal. The axes are the axes of
- * the model: the animal faces -z, its left side is -x, the soles are on y = 0, and the middle
- * plane is x = 0. The units are meters. A seated body has the bind pose of its seated role, with
- * the legs bent for the seat and the soles on the floor.
+ * A studio body (design 4.4): the mesh of a rig of `pnpm rig-mesh` in its bind pose, with its own
+ * skeleton, its skin of up to four bones for each vertex, and its corrective shapes.
+ * `pnpm studio-body <animal>` writes the module of an animal. The axes are the axes of the model:
+ * the animal faces -z, its left side is -x, the soles are on y = 0, and the middle plane is
+ * x = 0. The units are meters. A seated body has the bind pose of its seated role, with the legs
+ * bent for the seat and the soles on the floor.
  */
 export interface StudioBody {
   /** The GLB file, relative to the repository. */
@@ -405,7 +404,7 @@ export interface StudioBody {
   /**
    * The direction of each upper arm in the pose of the sheet, in the axes of the chest. The
    * corrective shape of each arm has its full weight in this pose, and the weight 0 in the bind
-   * pose (`lowpoly-studio/templates/biped/corrective.py`).
+   * pose (`correctives()` of `tools/blender/rig_mesh.py`).
    */
   readonly sheetArms: Readonly<Record<Side, Vec3>>;
   /**
