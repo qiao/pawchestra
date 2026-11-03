@@ -312,13 +312,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm. bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the trumpet hold. Thus the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm. Thus the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 118,
+      "R": 70
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 118 degrees and the right 70 degrees (paw_supination() of tools/blender/rig_mesh.py). The forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the trumpet smallest (design 4.4). This largest twist is about 133 degrees on the left (the flute and the snare drum) and 86 degrees on the right (the cello and the snare drum). With no supination, it is about 170 degrees on the left and 156 degrees on the right.",
     "tailBind": {
       "tail": [
         -0.1179,

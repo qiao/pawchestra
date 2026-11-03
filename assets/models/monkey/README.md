@@ -87,3 +87,12 @@ same bytes:
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- monkey --factor 1.2
 shasum -a 256 assets/models/monkey/*.glb assets/models/monkey/monkey-weights.json
 ```
+
+## monkey.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 482,476 bytes |
+| SHA-256 | `330c307b9c84f58ac51759c6e765c6b8e364bafe6faf70dad6adf19152e0c89d` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the bent trumpet bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
+| Shapes | The arm-down shape of each arm, and the straight legs of each side |
