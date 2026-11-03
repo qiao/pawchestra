@@ -254,6 +254,13 @@ The rest of each family:
   events.
 - **Chords.** Notes of a player that start within `CHORD_SEC` form one stroke, strike, or chord
   (3.8).
+- **Arms in the body.** A turn of the elbow about the line from the shoulder joint to the wrist
+  (a swivel) keeps the paw on its target, but it cannot clear an arm that the cast matrix puts
+  into the body. Reason: at the deepest moment, the arm is straight because the paw target of
+  the lift or the lowering is out of reach, or the clip is at the root of the upper arm. Both
+  points lie on the line of the swivel, so it does not move them. The next approach is a turn of
+  the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
+  lowering that keeps the elbow bent (`TODO.md`).
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
