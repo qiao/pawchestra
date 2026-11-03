@@ -16,8 +16,9 @@ joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
    the thin faces at the cut loops, and keep the open edges of the source out of the loops
    (`step_clean_cut()`).
 4. Shrinkwrap the tube onto a hidden copy of the old arm, bridge it to the trunk and the paw,
-   beautify the bridge, and collapse the thin bridge faces (`violin_arms.step_wrap()`,
-   `step_bridge()`, `step_beautify()`, `wind_arms.step_clean_bridge()`).
+   beautify the bridge, collapse the thin bridge faces, and delete the flap faces at the loops
+   (`violin_arms.step_wrap()`, `step_bridge()`, `step_beautify()`,
+   `wind_arms.step_clean_bridge()`, `step_clean_loops()`, `step_clean_flaps()`).
 5. Bake the fur color onto a UV strip of the atlas, transfer the custom normals, make the arms
    `--factor` times longer, and write `<animal>-arms.glb` (`violin_arms.step_uv()` to
    `step_export()`).
@@ -709,6 +710,43 @@ def step_clean_loops(s):
     return count
 
 
+def step_clean_flaps(s):
+    """Deletes the flap faces at the cut loops (Delete Faces), after `step_clean_loops()`.
+
+    When a cut plane passes very near a vertex of the source (0.07 mm at the right wrist of the
+    badger, 0.4 mm at the right shoulder line of the dog), the Bisect makes a cluster of very short
+    edges around that vertex. A collapse of `wind_arms.step_clean_bridge()` in the cluster can
+    leave a flap: a face with a corner on a cut loop, two open edges, and one edge of three faces.
+    On the badger, such a flap stopped the bone heat of Blender for all bones. Each flap goes,
+    until none is left. A flap of the source, with no corner on a loop, stays. Gives the number of
+    deleted faces."""
+    mesh = s.mesh
+    bpy.context.view_layer.objects.active = mesh
+    bpy.ops.object.mode_set(mode='EDIT')
+    bm = bmesh.from_edit_mesh(mesh.data)
+    part = bm.verts.layers.int['arm_part']
+    loops = {va.PART[c] + off for c in ('shoulder', 'wrist') for off in (0, 10)}
+    count = 0
+    for _ in range(200):
+        flap = next(
+            (
+                f
+                for f in bm.faces
+                if any(p[part] in loops for p in f.verts)
+                and sum(len(e.link_faces) == 1 for e in f.edges) == 2
+                and any(len(e.link_faces) > 2 for e in f.edges)
+            ),
+            None,
+        )
+        if flap is None:
+            break
+        bmesh.ops.delete(bm, geom=[flap], context='FACES')
+        count += 1
+    bmesh.update_edit_mesh(mesh.data)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return count
+
+
 def arm_island(s):
     """Gives the indices of the vertices of each arm: the tube, the wrist loop, and the paw
     (`violin_arms.arm_verts()`), by side."""
@@ -916,6 +954,7 @@ STEPS = (
     va.step_beautify,
     wa.step_clean_bridge,
     step_clean_loops,
+    step_clean_flaps,
     va.step_uv,
     va.step_bake,
     va.step_normals,
