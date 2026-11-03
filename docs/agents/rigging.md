@@ -14,7 +14,7 @@ arm tubes, Blender weights, and arm segments.
 |---|---|---|
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), the role-neutral bind with elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), the role-neutral bind, dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), and the leg length of the mesh. Sits on a bench that fits its haunch (`benchFitOf()`) at a piano of `PIANO_SCALE`, with the right foot on the damper pedal. | `pianist` |
-| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
+| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, a tail on the seat, a viola of `violaScale`. | `violist` |
@@ -96,14 +96,13 @@ round not done.
 - `tools/merge-branch.sh` runs the gate of all roles for a change of `src/pose/`, `src/models/`,
   or `tools/blender/`.
 - The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`. A new role adds
-  its entry. A round that changes a grip on purpose expects a `FAIL` of the grip turn, and gives
-  the new median with the 2x paw crops at a strike and at rest. The entry changes only after the
-  manager accepts them.
+  its entry. A planned grip change expects a grip turn `FAIL`, and gives the new median with 2x
+  paw crops at a strike and at rest. The manager accepts the new entry.
 - The paw twist, paw swing, forearm twist, move twist, and flat share count from the bind. When the
   bind differs from the base, they take only their limits (`REBIND`), and the gate prints the elbow
   and wrist ring widths. The grip turn ignores the bind. A rebind round proves the same bones with
   `pnpm arm-check <roles> --world --base <start>`.
-- `pnpm arm-look <role>` measures a crumpled or flat upper arm.
+- `pnpm arm-look <role>` measures a crumpled upper arm.
 
 ## The rebuild of the arms in Blender
 
@@ -230,7 +229,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
   it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
 - A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
-  (`rigidPainted`).
+  (`rigidPainted`). A raised arm pulls out a side with no trunk weight: give it a trunk share
+  (`paintedBelow`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
@@ -289,8 +289,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   bones.
 - A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
   leaned forward.
-- A long leg factor thins a thigh. Widen it before the skin (`legGirth`): bone heat splits a short
-  thigh.
+- A long leg factor thins a thigh. Widen it before the skin (`legGirth`).
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
@@ -304,7 +303,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim around the pea eye. Fill it (`eyeFill`).
 - A face rule can paint a dark block on the side. Check it from the front, at 60°, and the sides.
-- Measure the packed parts before a palette cut.
+- Measure packed parts before a palette cut.
 
 ### Blender scripts
 
@@ -324,8 +323,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   axes of the armature first.
 - A value such as 0.707107 in a module fails the lint as an approximate `Math.SQRT1_2`. Move a
   joint a little off 45°.
-- An import of `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py`. Put them
-  back after the import (`arm_rebuild.py`).
+- An import of `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py`. Restore
+  them (`arm_rebuild.py`).
 
 ### Probes
 
