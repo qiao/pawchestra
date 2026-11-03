@@ -1070,6 +1070,34 @@ LOWER_BONES = ('root', 'hips', 'thigh_L', 'shin_L', 'foot_L', 'toes_L', 'thigh_R
                'foot_R', 'toes_R', 'tail', 'tail_tip')
 
 
+def painted_below(verts, weights, heads, rule):
+    """Gives the trunk under each armpit a part of the painted weights of the arm (`paintedBelow`
+    of the weights of the config). The weights of Blender give the side of the trunk under the
+    root of a T-pose arm only the clavicle and the arm, so a raised arm pulls the side up and out,
+    and the trunk under it looks cut in. Within `inner` units of the middle plane, the share of the
+    clavicle and arm weights that a vertex keeps grows from 0 at the lower height of `height` to 1
+    at the upper height, and the trunk bone at the height of the vertex (the spine1 below the head
+    of the chest, else the chest) takes the rest. Gives the new weights."""
+    w = weights.copy()
+    low, high = rule['height']
+    keep = smoothstep(verts[:, 1], low, high)
+    chest = np.where(verts[:, 1] >= heads['chest'][1], BONES.index('chest'),
+                     BONES.index('spine1'))
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        arm = [k for k, b in enumerate(BONES)
+               if b.endswith(f'_{side}') and b.split('_')[0] in ('clavicle', 'upper', 'forearm',
+                                                                   'elbow')]
+        inside = (verts[:, 0] * sign > 0) & (verts[:, 0] * sign <= rule['inner'])
+        rows = np.nonzero(inside & (keep < 1.0) & (w[:, arm].sum(axis=1) > 0))[0]
+        taken = w[rows][:, arm] * (1.0 - keep[rows])[:, None]
+        w[rows[:, None], arm] -= taken
+        w[rows, chest[rows]] += taken.sum(axis=1)
+        log(f'painted below {side}: {len(rows)} vertices of the trunk under the armpit give '
+            f'{taken.sum():.1f} of arm weight to the trunk, at most '
+            f'{taken.sum(axis=1).max() if len(rows) else 0:.2f}')
+    return w
+
+
 def painted_weights(verts, path):
     """Reads the weights that a rigger painted in Blender (`paintedWeights` of the config), for
     each welded vertex of the source. The file holds the bone names, the place of each painted
@@ -5123,6 +5151,8 @@ def main():
         else:
             log(f"weights: painted in Blender ({config['paintedWeights']}), no rules")
         weights = limit(weights)
+        if 'paintedBelow' in rules:
+            weights = painted_below(verts, weights, heads, rules['paintedBelow'])
         if rules.get('rigidPainted'):
             # The thin faces at these points take the mean of the painted weights of their corners,
             # as `rigid` does for the rule weights.

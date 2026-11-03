@@ -325,7 +325,7 @@ function parseConfigValue(text: string, old: ConfigValue, path: string): ConfigV
  * The optional rules of a config that a variant of `--set` can add, by their path, each with a
  * value of the kind of its value: the head factor (`headFactor`), the neck factor (`neckFactor`),
  * the trunk factor (`trunkFactor`), the girth factor (`girthFactor`), the factors of the
- * cross-section of the arms (`armGirth`) and of the legs (`legGirth`), the factors of the source on each axis
+ * cross-section of the arms (`armGirth`) and of the legs (`legGirth`), the trunk share of the painted weights under the armpits (`weights.paintedBelow`), the factors of the source on each axis
  * (`proportions`), the depth factor of the source and the factor of the kept head
  * (`proportions.depth`, `proportions.head`), the root share of the tail in
  * the sit of the haunch (`sit.root`), the fixed seat top of the sit (`sit.top`), the curve of the
@@ -346,6 +346,7 @@ const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, Config
   ['girthFactor', [1, 1]],
   ['armGirth', [1, 1]],
   ['legGirth', [1, 1]],
+  ['weights.paintedBelow', { height: [0, 0], inner: 0 }],
   ['proportions', { width: 1, height: 1, depth: 1 }],
   ['proportions.depth', 1],
   ['proportions.head', 1],
