@@ -38,14 +38,15 @@
   "name": "Cat",
   "weld": 1e-05,
   "app": {
-    "shoulders": 1.205852,
+    "shoulders": 1.159778,
     "reach": 0.5305,
-    "note": "The scale keeps the head height H of the cat body of the A-pose mesh, 0.339375 m (from the chin to the top of the skull, with no whisker tips, headFloor of ANIMALS): 1.588737 m for each unit, with the standing shoulder joints at 1.205852 m (ANIMALS): 0.950065 m of the mesh, and the rise of the longer legs. The holds in H then keep their size in meters. The reach is the reach of the arms of the mesh, from the shoulder joint to the middle of the palm."
+    "note": "The scale keeps the head height H of the cat body of the A-pose mesh, 0.339375 m (from the chin to the top of the skull, with no whisker tips, headFloor of ANIMALS): 1.588737 m for each unit, with the standing shoulder joints at 1.159778 m (ANIMALS): 0.598 u of the mesh, and the rise of the longer legs (0.132 u). The holds in H then keep their size in meters. The reach is the reach of the arms of the mesh, from the shoulder joint to the middle of the palm."
   },
   "armFactor": 1,
   "armFactorNote": "The arms keep the length of the mesh (arm_rebuild.py with no --factor). The left paw reaches the nut of the viola of violaScale with 9.5 cm to spare (pnpm hold-reach cat --instrument viola), so the arms need no stretch.",
-  "legFactor": 2.15,
-  "legFactorNote": "The thigh and the shin are 2.15 times as long as on the mesh, and the feet keep their size, as on the cat of the A-pose mesh (1.94). The cat then sits on the chair of that cat: the seat top is 0.2995 m high (0.298 m on the old cat, 0.136 m with the legs of the mesh). The body rises 0.161 u, so the standing shoulder joints of ANIMALS rise with it and the trunk, the head, and the arms keep their meters.",
+  "legFactor": 1.6,
+  "shinFactor": 2.4,
+  "legFactorNote": "The thigh is 1.6 times and the shin 2.4 times as long as on the mesh, and the feet keep their size, so that the cat sits on the chair of the cat of the A-pose mesh (seat top 0.298 m; 0.136 m with the legs of the mesh), with legs about as long as the legs of that cat (thigh 0.205 m and shin 0.230 m, old 0.240 m and 0.223 m). With 2.15 for both, the thigh was 0.275 m long, the knees and the feet reached 7.5 cm further forward than on the old cat, and the stage of each demo grew 0.27 m wider. The body rises 0.132 u, so the standing shoulder joints of ANIMALS rise with it and the trunk, the head, and the arms keep their meters.",
   "headFactor": 0.85,
   "headFactorNote": "The head and the ears are 0.85 times as large as on the mesh, around the neck joint, so that the head is as wide for its height H as the head of the cat of the A-pose mesh (1.29 H, old 1.27 H, 1.52 H with the factor 1) and the pea eyes are as far apart (0.57 H). The export keeps the head before the factor for the holds (ungrown() of tools/studio-body.ts).",
   "joints": {
