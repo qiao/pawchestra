@@ -56,8 +56,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    to 0 at the shoulder and at the hip. The paws and the feet keep their size, and the body rises
    so that the soles stay at y = 0. The head and the ears grow by the head factor around the neck
    joint, and the weights blend the growth over the neck. The trunk takes the trunk factor
-   between the hips joint and the neck joint (`trunk_moves()`), and the head, the arms, the legs,
-   and the tail move with it and keep their sizes. The trunk and the clavicles take the girth
+   between the hips joint and the neck joint (`trunk_moves()`), and the head and the arms move
+   with it and keep their sizes. The legs and the tail keep their places. The trunk and the
+   clavicles take the girth
    factors across the trunk axis, one for the width and one for the depth (`girth_moves()`), and
    the arms, the legs, and the tail move out with their joints and keep their sizes. With
    `armGirth` of the config, the upper arm and the forearm take its factors across their axes
@@ -3249,10 +3250,11 @@ def trunk_moves(heads, factor):
     neck joint moves by the whole drop of the neck joint. So the trunk keeps its width and its
     depth, and the faces of the belly keep their colors and become shorter along the trunk. Each
     other bone moves as a whole with the point of the line at the head of the first bone of its
-    chain after the trunk: the neck, the head, and the ears with the neck joint, each arm with its
-    clavicle joint, each leg with its hip joint, and the tail with its root. So the head, the arms,
-    the legs, and the tail keep their sizes, and a vertex with weights on the trunk and on another
-    bone blends two moves of nearly the same size. Gives the segment of the trunk bones (the head,
+    chain after the trunk: the neck, the head, and the ears with the neck joint, and each arm with
+    its clavicle joint. The chains of the hips bone keep their places: each leg, and the tail,
+    which grows from the pelvis, so that the tail and the haunch under it stay on the seat. So the
+    head, the arms, the legs, and the tail keep their sizes, and a vertex with weights on the trunk
+    and on another bone blends two moves of nearly the same size. Gives the segment of the trunk bones (the head,
     the moved head, the end, and the factor) and the move of each other bone by its name, with no
     move of the root."""
     segment = (heads['hips'], heads['hips'], heads['neck'], factor)
@@ -3263,6 +3265,9 @@ def trunk_moves(heads, factor):
         first = name
         while PARENTS[first] not in TRUNK:
             first = PARENTS[first]
+        if PARENTS[first] == 'hips':
+            moves[name] = np.zeros(3)
+            continue
         moves[name] = segment_stretch(heads[first][None, :], *segment)[0] - heads[first]
     return segment, moves
 
