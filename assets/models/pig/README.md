@@ -97,7 +97,9 @@ shasum -a 256 assets/models/pig/*.glb
 `tools/blender/arm_rebuild.py` rebuilds the arms of `pig-upper.glb` with quad tubes, 1.5 times as
 long as the mesh (`--factor 1.5`), and writes the Blender weights of the arms. The shoulder line
 lies at 0.55 of the upper arm. Each arm has 9 rings of 16 vertices, with 1 ring on the upper arm
-and 3 on the forearm between the joint rings. A run gives the same bytes.
+and 3 on the forearm between the joint rings. A run gives the same bytes. With the bone pose of the
+old horn hold, the round left forearm goes 2.7 cm into the belly (1.2 cm on the old arm), so the
+horn hold keeps the left elbow away from the belly (design 5.3).
 
 | File | Size | SHA-256 |
 |---|---|---|
