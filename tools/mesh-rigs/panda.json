@@ -395,9 +395,26 @@
         -0.0168,
         0.6349,
         0.1159
+      ],
+      [
+        [
+          -0.1962,
+          0.5383,
+          0.0248
+        ],
+        [
+          -0.1929,
+          0.5269,
+          0.0068
+        ],
+        [
+          -0.1965,
+          0.5316,
+          0.0113
+        ]
       ]
     ],
-    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the thin bridge faces at the front of the left arm root, in three groups, and of one face of the upper chest under the chin. The left shoulder turns forward in the trombone hold, and these faces folded in each sample (pnpm fold-probe trombonist --faces).",
+    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the thin bridge faces at the front of each arm root, in three groups on the left and one on the right, and of one face of the upper chest under the chin. The left shoulder turns forward in the play, and the right arm hangs down to the upright trombone at rest, and these faces folded in each sample of those poses (pnpm fold-probe trombonist --faces).",
     "fingersNote": "The fingers keep this share of their bone heat weight, and the hand takes the rest, so that the curl of the fingers does not turn over the faces of the palm side of the paw. With the share 1, three faces of each paw folded in each sample, and the arm gate failed on the folds."
   },
   "refine": {
