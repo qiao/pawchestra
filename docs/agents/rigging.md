@@ -17,7 +17,7 @@ arm tubes, Blender weights, and arm segments.
 | rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | Rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`, which takes its weights from the copy before the wall), a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a viola of `violaScale`. | `violist` |
+| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, the legs of the mesh, a hanging tail, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut on the head and the back (`panda_edge.py`), the role-neutral bind with a right elbow `raise` shape. | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), the role-neutral bind, a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
@@ -121,8 +121,8 @@ Smooth of the upper arm weights, or a move of the elbow alone does not fix a twi
 
 Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps. A clean quad
 mesh skips steps 2 to 5 (`--keep-faces`). Write a species script `tools/blender/<a>_arms.py` only
-for a fault that it does not fix, such as an arm joined to the trunk down to the elbow
-(`cat_arms.py`, which takes its weights from the copy before the wall).
+for a fault that it does not fix, such as an arm joined to the trunk down to the elbow (the side
+wall of `cat_arms.py`).
 
 ### Rules
 
@@ -238,6 +238,8 @@ Read the group of your work first.
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
   `pnpm pose-depth`.
+- A straight bind folds a thick inner elbow. Put its rings one arm radius from the joint
+  (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both.
 - `weights.fingers` 0.5 keeps the curl small. A paw that closes around a tube takes the weight 1.
