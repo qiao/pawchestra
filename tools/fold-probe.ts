@@ -24,6 +24,10 @@
  * `--bins <face>` gives the turn of each bone of the arm of the face from its bind pose with a fold
  * and with no fold, and the share of the samples with a fold by that turn ({@link binProbe}).
  *
+ * `--glb <file>` gives the role the studio body of another GLB file, such as a file of
+ * `pnpm rig-mesh --check --keep`, in a copy of `src/` (`tools/glb-swap.ts`). With `--base`, the
+ * working tree takes the body of the file, and the commit keeps its own ({@link compareFolds}).
+ *
  * Usage: pnpm fold-probe <role> [--demo <id>]... [--step <seconds>] [--faces <n>] [--turns <face>]
  * [--bins <face>] [--set <changes>]... [--json <file> [--middles <faces>]] [--glb <file>]
  * [--base <ref> [--faces-of <faces>]]
@@ -2104,13 +2108,16 @@ export function readFoldJson(text: string): FoldCounts {
  * A role that the commit does not have stops the run before the probes (`checkRefRole()`). With
  * `faces` above 0, the table of the faces of {@link faceCompareLines} follows. With faces of
  * `--faces-of`, the commit also gives their middles (`--middles`), and the table of
- * {@link baseFaceLines} follows.
+ * {@link baseFaceLines} follows. With `--glb <file>`, only the child of the working tree takes the
+ * option, so it probes the studio body of the file in a copy of `src/` (`tools/glb-swap.ts`), and
+ * the commit keeps its own body and its cache.
  *
  * @param name The name of the role.
  * @param ref The commit, the branch, or the tag.
- * @param args The arguments of the children, with no `--base` and no `--faces-of`.
+ * @param args The arguments of the children, with no `--base`, no `--faces-of`, and no `--glb`.
  * @param faces The number of faces of each tree in the table of the faces, or 0 for no table.
  * @param facesOf The faces of `--faces-of`, as the commit numbers them, or none.
+ * @param glb The absolute path of the GLB file of `--glb`, or `null`.
  */
 async function compareFolds(
   name: string,
@@ -2118,6 +2125,7 @@ async function compareFolds(
   args: readonly string[],
   faces: number,
   facesOf: readonly number[],
+  glb: string | null,
 ): Promise<void> {
   const label = `${ref} (${shortHash(ref)})`;
   const started = performance.now();
@@ -2125,7 +2133,7 @@ async function compareFolds(
   const texts = await probeBeside(
     ref,
     'fold-probe.ts',
-    { base: [...args, ...middles], tree: args },
+    { base: [...args, ...middles], tree: glb === null ? args : [...args, '--glb', glb] },
     { prefix: 'fold-probe-', role: { ...FOLD_ROLE_TABLE, name }, cache: true },
   );
   const base = readFaceJson(texts.base);
@@ -2153,7 +2161,7 @@ async function compareFolds(
  * Runs the probe: `node tools/fold-probe.ts <role> [--demo <id>]... [--step <seconds>]`. With
  * `--glb <file>`, the role gets the studio body that the export makes from the file, in a copy of
  * `src/` (`tools/glb-swap.ts`). With `--base <ref>`, the probe of the commit and of the working
- * tree run at the same time ({@link compareFolds}).
+ * tree run at the same time ({@link compareFolds}), also with `--glb`.
  */
 async function main(): Promise<void> {
   const { glb, rest: args } = takeGlb(process.argv.slice(2));
@@ -2170,12 +2178,12 @@ async function main(): Promise<void> {
     throw new Error('The option --base takes a commit, a branch, or a tag.');
   }
   const options = ['--json', '--middles', '--turns', '--bins', '--set'];
-  if (ref && (glb || options.some((option) => args.includes(option)))) {
+  if (ref && options.some((option) => args.includes(option))) {
     throw new Error(
-      'The option --base goes with none of --glb, --json, --middles, --turns, --bins, and --set.',
+      'The option --base goes with none of --json, --middles, --turns, --bins, and --set.',
     );
   }
-  if (glb) {
+  if (glb && !ref) {
     process.exitCode = await withGlbBody(roleAnimal(role), glb, (dir) =>
       runTool(dir, 'fold-probe.ts', args),
     );
@@ -2213,7 +2221,8 @@ async function main(): Promise<void> {
   }
 
   if (ref) {
-    await compareFolds(name, ref, withoutOptions(args, ['--base', '--faces-of']), faces, facesOf);
+    const own = withoutOptions(args, ['--base', '--faces-of']);
+    await compareFolds(name, ref, own, faces, facesOf, glb);
     return;
   }
 
