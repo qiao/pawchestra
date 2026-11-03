@@ -283,8 +283,8 @@ passes.
       goes 5.9 cm into the body in 2% of the samples.
 - [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
       supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, the hippo, the fox, and the monkey have it.
-      Then the body with arm segments and a bent `bindArms`: the cat.
+      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, and the panda
+      have it. Then the body with arm segments and a bent `bindArms`: the cat.
 - [ ] Pig with rebuilt arms: `arm_rebuild.py pig --factor 1.5` on the copy with new upper arms
       gives round arm tubes, and the hornist gate passes with the role-neutral bind (L 102, R 51).
       The middle of the left forearm then goes 2.7 cm into the belly in the play (base 1.2 cm,
