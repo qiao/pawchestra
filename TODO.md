@@ -112,6 +112,14 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
+- [ ] Panda arm rebuild (4.4): `tools/blender/panda_edit.py` frees each arm in a copy. It splits
+      the crease of the arm, turns the arm out 10° and shifts it 0.012 units, and fills both lips
+      with quads. `pnpm mesh-intake` then passes the pose (34°), the arm free (0.25 and 0.20 of
+      the upper arm), and the gap (0.27 and 0.33 radii). But the four-side images show slivers at
+      the armpits and a notch at the inner elbow. The rebuilt arm shows shards on the side wall
+      where the forearm touched the belly (`reports/2026-11-02-panda-edit/`). Next: remove one
+      ring of old trunk faces beside each lip before the fill, and fit the side wall to the trunk
+      below the armpit, or cut along a seam plane with a side wall, as `cat_arms.py` does.
 - [ ] Panda: try `weights.armCrease` on each arm that is one solid with the trunk.
 - [ ] Panda: a small gray dent shows below each arm from the left side. Move the body run of the cut
       (vertices 787, 793, and 800, `tools/arm-roots/panda.json`).
