@@ -608,8 +608,11 @@ const PANDA_PLAY = {
   down: -5,
   /** The forward turn of the left shoulder. */
   shoulderL: 35,
-  /** The turn of the slide down from the play in the rest pose, around the chest x axis. */
-  restDown: 30,
+  /**
+   * The turn of the slide down from the bind turn in the rest pose, around the chest x axis, so
+   * that the trombone stands upright in front of the body, with the slide 16° from the vertical.
+   */
+  restDown: 59,
 } as const;
 
 /** The turn of the trombone of the panda while it plays ({@link PANDA_PLAY}). */
@@ -681,30 +684,38 @@ const PANDA_PLAY_TURN = toQuat(
  * its bind direction to the grip, and faces at the front of the left shoulder folded in each
  * sample. A turn of 45° or more folded 5 faces of the left shoulder in the play.
  *
- * In the rest pose, both paws stay on their grips, and the trombone stays as in the play, off the
- * mouth, with the slide turned 30° down in front (`rest`, `restShift`). No source gives the rest
- * place (`docs/reference/wind-technique.md` 1.7). The rest elbows point out, near the play elbows
- * (`restPoleL`, `restPoleR`). The left rest elbow points a little down, because with the elbow
- * level, the skin of the left upper arm twists 20° from the chest at rest. With the trombone
- * upright in front of the face, the right upper arm cleared the trunk only with the elbow out at
- * the level of the shoulder, and arms near the level are a fault of a brass player
- * (`docs/reference/wind-technique.md` 1.8).
+ * In the rest pose, the trombone stands upright in front of the body, below the mouth, with the
+ * slide down and 16° forward of the vertical (`rest`, {@link PANDA_PLAY}), as a seated player holds
+ * the slide vertical in front of the knee (`docs/reference/wind-technique.md` 1.7). It moves 0.3 H
+ * forward and 0.12 H down from the mouthpiece of the bind (`restShift`). Both paws keep the aim and
+ * the roll of the play on the instrument (`restAim`), so that the lift and the lowering turn each
+ * hand with the trombone, and the right paw does not turn past 180° on its forearm (move twist at
+ * most 93°). With a rest grip of its own on the top of the brace, the right hand turned about 180°
+ * from the rest to the play, and each mix of the move flipped the right paw. The left paw slides
+ * 0.11 H down its tubes at rest (`restGripShiftL`), because at the grip of the play its finger tips
+ * do not reach the tubes. In the middle of the lift and the lowering, the left finger tips leave
+ * the tubes for 0.1 s to 0.5 s. The elbows point out and down at rest (`restPoleL`, `restPoleR`).
+ * With the trombone 0.28 H lower and the elbows further down, the right upper arm went 5.7 cm into
+ * the belly, and with the left elbow less far out, the left forearm went 0.4 cm into the slide
+ * tubes in the lowering. A real player never rests the trombone on the slide, and the slide end and
+ * the bell stay off the floor (`docs/reference/wind-technique.md` 1.7).
  */
 const PANDA_TROMBONE = {
   ...WIND_HOLDS.trombone,
   reachL: PANDA_PLAY.shoulderL * MathUtils.DEG2RAD,
   play: PANDA_PLAY_TURN,
-  rest: holdTurn(-PANDA_PLAY.restDown, 0, PANDA_PLAY_TURN),
-  restShift: [0, -0.1, -0.05],
+  rest: holdTurn(-PANDA_PLAY.restDown, 0),
+  restShift: [0, -0.12, -0.3],
   poleL: [-0.6, -0.4, -0.7],
   poleR: [0.6, -1, -0.25],
-  restPoleL: [-1, -0.6, -0.3],
-  restPoleR: [1, -0.5, 0],
+  restPoleL: [-1.4, -1, -0.3],
+  restPoleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.8, 0.8],
   gripShiftL: [-0.04, 0.07, 0],
   gripShiftR: [0.1, 0, 0.03],
+  restGripShiftL: [0.07, 0.06, 0],
   restAim: 1,
   gripCurl: curls(90, 110),
 } as const satisfies WindHold;

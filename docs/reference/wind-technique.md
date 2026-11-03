@@ -373,7 +373,13 @@ The app follows these facts:
 - **The elbows (1.8).** The elbows stay away from the sides, so that the free round arms stay out
   of the trunk (design 5.3). Each elbow turns out about the line from the shoulder joint to the
   grip (`poleL`, `poleR`), and the left shoulder turns forward (`reachL`). At rest, the elbows
-  point out and stay below the shoulders (`restPoleL`, `restPoleR`).
+  point out and down, below the shoulders (`restPoleL`, `restPoleR`).
+- **The rest place (1.7).** The trombone stands upright in front of the body, with the slide down,
+  16° forward of the vertical, as a seated player holds the slide vertical in front of the knee
+  [70]. The top of the instrument stays below the mouth, and the slide end and the bell stay off
+  the floor [6] [70] (`rest`, `restShift`). Both paws keep the grip of the play on the instrument
+  (`restAim`), and the left paw slides down the inner slide tubes, away from the
+  mouthpiece (`restGripShiftL`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with
@@ -396,9 +402,9 @@ The app does not follow these facts:
   brace, so that the right upper arm stays off the belly, and costs another part (`gripShiftR`).
 - **The alternate positions (1.3).** The app has none.
 - **The arm (1.4).** The two-bone IK moves the elbow most, with no lead of the wrist (`armRig()`).
-- **The rest place (1.7).** No source gives it. The trombone stays at the grips of the play, off
-  the mouth, with the slide turned down in front (`rest`, `restShift` of `PANDA_TROMBONE`, design
-  5.2).
+- **The rest place (1.7).** No source gives where an orchestral trombonist holds the trombone in a
+  long rest. The upright rest is a product choice, and its nearest source is the assembly of
+  [70], which is not a rest between two entrances (design 5.2).
 
 ### 4.2 The other winds
 
