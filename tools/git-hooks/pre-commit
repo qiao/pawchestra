@@ -6,9 +6,8 @@
 set -euo pipefail
 
 media='\.(webp|png|jpe?g|gif|webm|mp4|mov)$'
-kept='^(src|public|docs/reference|docs/prototype|tools/sheet-mattes|lowpoly-studio/reference)/'
+kept='^(src|public|docs/reference|docs/prototype|tools/sheet-mattes)/'
 kept+='|^docs/[^/]+$'
-kept+='|^lowpoly-studio/animals/[^/]+/(reference/|out/report/review\.webp$)'
 
 blocked="$(git diff --cached --name-only --diff-filter=AM -z | tr '\0' '\n' |
   grep -iE "$media" | grep -vE "$kept" || true)"
