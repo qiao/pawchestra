@@ -1006,8 +1006,11 @@ export const BOWED_HOLDS = {
  * The string planes of the cat are 7° apart, below the 17° of the chin hold, so that the bow arm
  * reaches the end of the hair. The left elbow turns toward the body by 2° for each lower string of
  * the finger (`elbowPerString`). From the second position to the fifth position, the left paw
- * tilts 20° further over the neck, so that the wrist comes up toward the upper bout (`highTilt`,
- * `leftTilt()` of `pose/bowed.ts`). The left paw tilts 45° over the neck (`tiltL`, 30° in the chin
+ * tilts 30° further over the neck, so that the wrist comes up toward the upper bout (`highTilt`,
+ * `leftTilt()` of `pose/bowed.ts`): with 20°, the left paw goes 2.1 cm into the upper bout in the
+ * lowering after the fifth position of `mozart-k191` (1.5 cm with 30°). The left paw lies 8 mm off
+ * the neck along the normal of its palm in the play and at rest (`gapL`, `restGapL`), so that the
+ * round left forearm keeps out of the neck: on the neck, it goes 0.3 cm in. The left paw tilts 45° over the neck (`tiltL`, 30° in the chin
  * hold), so that it curls around the neck and the fingers come down on the strings from above, as
  * a real violist holds the neck (`docs/reference/string-technique.md`, section 1.9).
  *
@@ -1033,7 +1036,7 @@ export const BOWED_HOLDS = {
  * with the elbow down, out, and a little forward, (-1.6, -1, -0.2). It closes around the neck in
  * the rest grip, as a seated violist holds the neck with the left hand
  * (`docs/reference/string-technique.md`, section 2.9): the playing grip at the rest place, curled
- * 115°, with the palm on the neck (`restGapL` 0), turned 10° around the normal of the top plate,
+ * 115°, with the palm 8 mm off the neck (`restGapL`), turned 10° around the normal of the top plate,
  * and with a turn of 42° in the plane of its palm (`restPawTurnL`). The grip of the bow rests
  * 0.4 H out, 0.5 H up, and 0.35 H to the front at 0.6 of the way to the knee, with the tip a
  * little forward, (0.15, 1, -0.45), and the right elbow hangs down, out, and a little back,
@@ -1069,7 +1072,8 @@ const CAT_HOLD = {
   tiltL: 45 * MathUtils.DEG2RAD,
   poleL: [-1, -1, -0.75],
   elbowPerString: 2 * MathUtils.DEG2RAD,
-  highTilt: 20 * MathUtils.DEG2RAD,
+  highTilt: 30 * MathUtils.DEG2RAD,
+  gapL: 0.008,
   poleR: [2, -0.6, -0.7],
   poleTipR: [1.5, -1, -1],
   polePizzicato: [1.2, -0.5, -1],
@@ -1087,7 +1091,7 @@ const CAT_HOLD = {
   restCurlL: 115 * MathUtils.DEG2RAD,
   restPawTurnL: 42 * MathUtils.DEG2RAD,
   restYawL: 10 * MathUtils.DEG2RAD,
-  restGapL: 0,
+  restGapL: 0.008,
   liftPoleL: [-1.2, -0.6, 0],
   restBow: {
     lap: { along: 0.6, offset: [0.4, 0.5, -0.35] },

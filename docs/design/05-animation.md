@@ -327,7 +327,8 @@ The rest of each family:
   block on the strings. The rebuilt round wrist of the hippo then goes into the back of the neck,
   so its paw lies a little off the strings along the normal of its palm (`BowedHold.gapL`), as a
   real bassist keeps the wrist off the neck (strings 2.8). Reason: a larger tilt of the paw over
-  the neck alone turns the paw past the accepted grip of the role.
+  the neck alone turns the paw past the accepted grip of the role. The cat keeps its left paw a
+  little off the neck of the viola too, so that its round forearm keeps out of the neck.
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
