@@ -1,14 +1,17 @@
 # Panda model
 
-This folder holds the source mesh of the panda, a copy with rebuilt arms and its weights, and the
-rigged copy. The app does not serve these files. It loads the module `src/models/studio/panda.ts`,
+This folder holds the source mesh of the panda, a copy with rebuilt arms and its weights, a copy
+with the color edges cut, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/panda.ts`,
 which this chain writes:
 
 ```text
 panda-tpose.glb                      source mesh
    │  tools/blender/arm_rebuild.py panda --factor 1.05
    v
-panda-arms.glb + panda-weights.json  `source` and `paintedWeights` of tools/mesh-rigs/panda.json
+panda-arms.glb + panda-weights.json  `weightSource` and `paintedWeights` of tools/mesh-rigs/panda.json
+   │  tools/blender/panda_edge.py
+   v
+panda-edge.glb                       `source` of tools/mesh-rigs/panda.json
    │  pnpm rig-mesh panda
    v
 panda.rig.glb                        rigged mesh
@@ -26,6 +29,7 @@ src/models/studio/panda.ts           studio body of the app
 | `panda-tpose.glb` | Source mesh (below) | None |
 | `panda-arms.glb` | Copy of `panda-tpose.glb` with rebuilt arms. License as the source | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.05` |
 | `panda-weights.json` | Weights of the same Blender run. License as the source | The same run |
+| `panda-edge.glb` | Copy of `panda-arms.glb` with the color edges cut. License as the source | `panda_edge.py` (below) |
 | `panda.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh panda` |
 
 ## panda-tpose.glb
@@ -83,4 +87,33 @@ With this factor, the right arm reaches the slide travel of the panda of the old
 ```bash
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.05
 shasum -a 256 assets/models/panda/panda-arms.glb assets/models/panda/panda-weights.json
+```
+
+## panda-edge.glb
+
+| Item | Value |
+|---|---|
+| Size | 816,332 bytes |
+| SHA-256 | `0afdef67d919dcbb201dae71a724c67f6edea09665434bd2a319f06ddaa358c3` |
+| Mesh | 4,071 triangles (3,707 in `panda-arms.glb`), with the same 2 open edges and 1 edge with more than two faces |
+
+The faces of the head and the trunk are 2 cm to 5 cm across, and the rig gives each face one
+color. With no cut, each eye patch is a set of angular shards, and the lower edge of the band on
+the back is a saw line. `tools/blender/panda_edge.py` cuts the faces along the edge between the
+black and the white of the texture, in two regions: the eye patches, and the lower edge of the
+band on the back. It splits each face that the edge crosses at the middles of its edges one time,
+then splits each edge between a light and a dark vertex where the texture changes. The faces of
+the eye boxes keep their edges. Each new vertex lies on an old face: the largest distance of a
+vertex from the surface of `panda-arms.glb` is below 1e-7 units, and the area is the same. The rig
+takes the weights of `panda-arms.glb` (`weightSource` of the config), so the cut moves no weight.
+
+The front and the sides of the band keep their faces. There the weights of the clavicles change
+much from corner to corner, and the small new faces turned over in the play of the trombonist.
+
+A headless run gives the same bytes:
+
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python \
+  tools/blender/panda_edge.py -- assets/models/panda/panda-arms.glb assets/models/panda/panda-edge.glb
+shasum -a 256 assets/models/panda/panda-edge.glb
 ```
