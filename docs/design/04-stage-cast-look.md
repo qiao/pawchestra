@@ -260,7 +260,9 @@ entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings.
 `pnpm rig-mesh <animal>` rigs a source mesh with Blender: one mesh of faces with one color each,
 the skeleton of the biped template of the studio, a skin of up to four bones for each vertex,
 and up to `RAISE_LIMIT` corrective shapes. The config `tools/mesh-rigs/<animal>.json` gives the
-joints and the rules, each with a note.
+joints and the rules, each with a note. The rig file holds only the animal, so that other tools
+can read it, and a role-neutral body holds no prop of a role. The seat of the config goes into the
+extras of the asset as numbers ("Seat"), and only the preview images show a chair.
 
 | Group | Config keys | Purpose |
 | --- | --- | --- |
@@ -381,6 +383,8 @@ each verdict.
   the seat. The chair fits the body (`StudioBody.seatHeight`, `chairDepth`, `chairWidth`,
   `backRoom`), so the feet touch the floor. The seat is level, and it ends where the thighs leave
   it at the haunch (`chair.front`).
+- The rig writes the seat of its config into the extras of the asset (`seat`, `SeatExtras` below),
+  and the export fits the seat of the app to it.
 - The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
@@ -411,6 +415,19 @@ interface StudioSitting {
   /** The seat height and the chair depth of the seated body. */
   readonly seatHeight: number;
   readonly chairDepth: number;
+}
+
+/** The seat of a rig in the extras of its GLB file, in the units of the studio (`studio-body.ts`). */
+interface SeatExtras {
+  /** The seat of the app that takes its place: `chair`, or `bench` for the piano bench. */
+  readonly prop: string;
+  /** The height of the seat top: the lowest point of the body over the seat. */
+  readonly top: number;
+  /** The z of the front edge and of the back edge of the seat. */
+  readonly front: number;
+  readonly back: number;
+  /** The half width of the seat on x, around the middle plane. */
+  readonly halfWidth: number;
 }
 ```
 
