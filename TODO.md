@@ -112,11 +112,16 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda: the black band keeps a jagged lower edge on the front and the sides, because each
-      large face takes one color. `panda_edge.py` cuts the faces along the edge only on the back:
-      on the front and the sides, the clavicle weights change fast, and the small new faces turned
-      over in each sample of the trombonist (`pnpm fold-probe trombonist`). A border rule on the
-      front removed the band under the chin. Try a smoother field of the clavicle weights there.
+- [ ] Panda: at rest, the app view (front left, 30° up) shows a white wedge of the chest between
+      the raised left arm and the band. It is the top of the white belly of the texture, and its
+      edge is now a clean curve. The reference images show a white chest up to a thin collar, so the
+      rig keeps it. Ask the user if the band must cover the upper chest
+      (`reports/2026-11-03-panda-edges/crops.png`).
+- [ ] Panda: the lower edge of the band keeps a small step on each side under the arm root, and
+      the outer top corner of the right eye patch keeps a short point (also in the texture).
+- [ ] Panda: the eye margin of `panda_edge.py` (0.004) is near a limit. With 0, the cut faces in
+      the left eye box grow the old eye of the rig, and its ring color makes a white hole in the
+      patch. A change of the eye box or of the eye rules checks both patches.
 - [ ] Panda: the legs keep the length of the mesh (`legFactor` 1), so the seat is 0.181 m (0.278 m
       with the leg factor 1.5 of the older body), and the panda sits low. Show the user the side
       view, and ask for the leg factor.
