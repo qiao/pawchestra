@@ -112,12 +112,17 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda: with the elbows out, thin dark slits show at the top of the side wall under each arm,
-      and the black fur edge at each armpit is jagged, in the 2x crops at rest and in the lift
-      (`reports/2026-11-02-panda-hold/crops-rest-el20.png`). The side wall of `panda_edit.py`
-      meets the trunk there. Fix the form in the copy, then rebuild the arms.
-- [ ] Panda face: the round patches have angular edges, and they are smaller than in the reference.
-      Ask the user if a smoother oval is worth a vertex move.
+- [ ] Panda: the black band of the T-pose mesh has a jagged lower edge on the back and the sides,
+      because each large face takes one color. Without the border rule it has fewer white teeth
+      (`reports/2026-11-03-panda-new/border.png`). A cut of the faces along the color edge would
+      give the smooth edge of the source.
+- [ ] Panda face: the head faces of the T-pose mesh are large, so the tilted oval eye patches of
+      the texture give sharp points and two different patches. The patch rule (`colors.patch`)
+      keeps a circle around each eye, and the patches stay angular. Ask the user if a cut of the
+      head faces along the patch edge is worth the work.
+- [ ] Panda: the legs keep the length of the mesh (`legFactor` 1), so the seat is 0.181 m (0.278 m
+      with the leg factor 1.5 of the older body), and the panda sits low. Show the user the side
+      view, and ask for the leg factor.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
       the user in a close play frame of the stage.
 - [ ] Beaver: the narrow axis of the middle of each upper arm is 0.35 to 0.40 of the wide axis in
@@ -473,11 +478,11 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Panda with the free arms in the cast matrix: each recast cell fails on the upper arms in
-      the body (violin 6.0 cm, cello 5.5 cm, flute 3.6 cm, clarinet 8.4 cm, trumpet 8.0 cm) or the
-      forearms (snare drum 7.8 cm). The violin cell goes from `PASS` to `FAIL`. The shared holds
-      keep the elbows of joined arms near the trunk. Give the shared holds the rule of the free
-      round arms (5.3), and run the matrix for each body.
+- [ ] Panda with the free arms in the cast matrix: each recast cell of the T-pose panda fails on
+      the upper arms in the body (violin 2.9 cm, cello 6.6 cm, flute 5.0 cm, clarinet 7.6 cm,
+      trumpet 10.0 cm) or the forearms (snare drum 7.6 cm), and the folds go over the limit 8 in
+      four cells (10 to 13 faces). The shared holds keep the elbows of joined arms near the trunk.
+      Give the shared holds the rule of the free round arms (5.3), and run the matrix for each body.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, and the deer pass, and
       the dog stays `OPEN`. The left claws of the monkey (1.8 cm) go into the cello in a few play
       samples. The cello of the foxes goes 5.0 cm into the
@@ -566,30 +571,17 @@ scene of each demo has its seats and stage size with no overlap.
       horn. The B♭ side needs a thumb valve and a second fundamental, B♭1 (wind-technique 2.2).
 - [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view. Show the
       user the front view.
-- [ ] Panda trombonist: the arm reaches 0.095 m of the slide, 17% of a real seventh position. A
+- [ ] Panda trombonist: the arm reaches 0.120 m of the slide, 21% of a real seventh position. A
       larger right shoulder turn puts the right upper arm into the belly, and the grip 0.05 H up the
       brace keeps it off the belly. Show the user slide angles of 45° and 60°.
-- [ ] Panda trombonist: the elbows out use most of the margin of the grip turn (left 16, right 14,
-      margin 15 over 2 and 1). Show the user the 2x paw crops of the play and the rest, and ask to
-      accept the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
-- [ ] Panda trombonist: at rest, the left paw bends 65° to the side (paw swing, limit 70) with the
-      elbow out. Check the left wrist in the 2x crops of the rest.
-- [ ] Panda trombonist rest: an upright rest needs both paws on the trombone. Upright in front, as
-      on `59ddbdc8`, the free right arm clears the trunk only with the elbow at the level of the
-      shoulder, and the right paw then twists 163° at rest (arm gate `FAIL`, base 90°). With the
-      lower end of the slide 35° to the right (36° from the vertical), the elbows out, and the left
-      rest grip 0.06 H across its tubes, the arms stay within 1.4 cm and the gate passes, but the
-      left paw does not grasp at rest (`pnpm wind-grip` 0%, as on `59ddbdc8`), and the forearms go
-      0.5 cm into the trombone (0.1 cm on `dc300792`). A left rest grip that grasps bends the left
-      wrist past 100° (limit 70°). A second round tried the slide 16° from the vertical (0° in the
-      front view), the left paw on the bell tube where the bell starts to flare (wind-technique
-      1.7), the right paw on the top of the brace, and an own rest aim for each paw. At rest, the
-      left paw grasps (100%), and the right paw twists 7°. But the right elbow comes up to the
-      level of the shoulder, the right paw does not grasp (0%), and the left upper arm twists 25°
-      (base 10°). The right hand turns about 180° from the rest to the play. So each mix of the
-      move turns the right paw past 180° on its forearm (move turn up to 18,000°/s). Next: a turn
-      of the right paw on the way that keeps its twist between -180° and 180°, as
-      `studioPawTwist()` does for the carried violin paw (`reports/2026-11-02-panda-rest/round2/`).
+- [ ] Panda trombonist: the left elbow out uses most of the margin of the grip turn (left 16,
+      margin 15 over 2). Show the user the 2x paw crops of the play and the rest, and ask to accept
+      the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
+- [ ] Panda trombonist rest: in the lift and the lowering, the left paw slides down its tubes to the
+      rest grip, and its finger tips leave the tubes for 0.1 s to 0.5 s (`pnpm wind-grip`: lift 94%,
+      lowering 80%, 100% on `89341b2d`). The top of the upright trombone crosses the left eye in
+      the front view. Show the user the front view and the rows of
+      `reports/2026-11-03-panda-new/`.
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the right elbow goes 0.6 cm into the back of the contrabass at 197.40 s of
