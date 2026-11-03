@@ -31,6 +31,42 @@ src/models/studio/panda.ts           studio body of the app
 | `panda-arms.glb` | `panda-edit.glb` with rebuilt arms 1.497 times as long. License as `panda.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.497` |
 | `panda-weights.json` | Weights of the same Blender run. License as `panda.glb` | The same run |
 | `panda.rig.glb` | Output of the rig. License as `panda.glb` | `pnpm rig-mesh panda` |
+| `panda-tpose.glb` | The T-pose source mesh of the next body (below) | None |
+
+## panda-tpose.glb
+
+The T-pose mesh replaces `panda.glb` as the source when its rig passes the arm gate. The mesh has
+no skeleton. The arms stand out level to the sides, free of the trunk.
+
+| Item | Value |
+|---|---|
+| Size | 13,086,256 bytes |
+| SHA-256 | `883565d62054921455a119395318b83019d225e629ec58ada6f535fb967e895e` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Khronos glTF Blender I/O v4.3.47 |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,141 triangles and 3,912 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+| Material | One material `BakedMaterial`, double-sided, with a base color texture (7.6 MB) and a metallic-roughness texture (5.3 MB), each a PNG of 4096 × 4096 pixels |
+
+The values below are in the units of the studio: 1 unit from the soles to the ear tips, the soles
+at y = 0, +z forward, and +x the left side of the animal. The mesh is 1.699 units of the file
+high, and the weld at 1e-5 gives 1,573 vertices in one part. 2 edges are open, 1 edge has more
+than two faces, and 49 faces have a corner angle below 10°.
+
+- The box is x -0.560 to 0.559, y 0 to 1, and z -0.230 to 0.230.
+- The arms stand out level at y 0.53 to 0.68, free of the trunk from |x| 0.21, with the paw tips
+  at |x| 0.56. The claws of each paw curl down, so the palm faces down (the palm hint of the
+  config).
+- The legs part below the crotch at y 0.19. The feet reach forward to z 0.107.
+- The fur is white, with black ears, eye patches, shoulders, arms, and legs. Each eye has a brown
+  iris and a black pupil at y 0.815 to 0.845, inside the black patch. The nose is a black patch at
+  the front of the muzzle, at y 0.75 to 0.79, and a thin mouth line smiles under it.
+- The round belly reaches z 0.207 at y 0.37. The small round ears stand from y 0.91 to the top.
+  A round tail ball sits at the back, at y 0.22 to 0.35, out to z -0.230.
+
+```bash
+shasum -a 256 assets/models/panda/panda-tpose.glb
+```
 
 ## panda.glb
 
