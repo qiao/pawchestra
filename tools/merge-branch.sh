@@ -282,6 +282,13 @@ if [ -d "$WORKTREE/reports" ] && [ "$(cd "$WORKTREE" && pwd -P)" != "$(pwd -P)" 
   cp -R "$WORKTREE/reports/." reports/
   echo "Copied the report folders of $WORKTREE into reports/."
 fi
+# Git also ignores scratch/, which holds the try files of a round (kept rigs, patches, configs).
+# Keep them in scratch/merged/<branch>/ of the main checkout, with no package folder.
+if [ -d "$WORKTREE/scratch" ] && [ "$(cd "$WORKTREE" && pwd -P)" != "$(pwd -P)" ]; then
+  mkdir -p "scratch/merged/$BRANCH"
+  rsync -a --exclude node_modules --exclude .git "$WORKTREE/scratch/" "scratch/merged/$BRANCH/"
+  echo "Copied the scratch files of $WORKTREE into scratch/merged/$BRANCH/."
+fi
 git worktree remove --force "$WORKTREE"
 git branch -D "$BRANCH"
 rm -rf "$MERGE_TMP"
