@@ -1219,7 +1219,8 @@ const DOG_HOLD = {
  *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), as a
  * real bassist rests the thumb on the edge of the fingerboard
- * (`docs/reference/string-technique.md`, section 2.8). The bow tip points up, square to the
+ * (`docs/reference/string-technique.md`, section 2.8). With the paw 0.06 m nearer to the strings,
+ * the right elbow goes 2.8 cm into the back of the contrabass. The bow tip points up, square to the
  * strings, so that the forearm comes to the hand at about 45° in the plane of the palm, as in the
  * play. The left paw stops the strings only up to 0.7 of the fingerboard from the nut (`stopEnd`):
  * the left shoulder lies behind the upper bout, and the short arm does not reach over it. The far
@@ -1261,7 +1262,7 @@ const HIPPO_HOLD = {
   poleTipR: [2, 0.15, -1],
   polePizzicato: [3, 0.9, -1],
   pizzicatoTip: [0, 1, 0],
-  pluckSide: 0.18,
+  pluckSide: 0.24,
   stopEnd: 0.7,
   farSideR: 30 * MathUtils.DEG2RAD,
   pawBendR: 24.94 * MathUtils.DEG2RAD,
