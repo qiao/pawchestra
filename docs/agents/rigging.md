@@ -6,8 +6,7 @@ rigging round.
 
 ## Bodies and roles
 
-Each species has a studio body (`body: 'studio-<a>'`). `pnpm fold-probe`, `pnpm hold-fit`,
-`pnpm arm-check`, and `pnpm close-views` take the role names.
+Each species has a studio body (`'studio-<a>'`). The role tools take the role names, and
 `pnpm pose-depth violinist` sweeps the rabbit and the red fox together. "Rebuilt arms" means quad
 arm tubes, Blender weights, and arm segments.
 
@@ -18,7 +17,7 @@ arm tubes, Blender weights, and arm segments.
 | rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), the role-neutral bind, a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | Rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a viola of `violaScale`. | `violist` |
+| cat | Rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`, which takes its weights from the copy before the wall), a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-arms.glb`), a cut at each arm seam, a chest share of the inner arm root (`weights.armRoot`), a round hanging tail. | `cellist` |
 | panda | Arms freed from the trunk in a copy (`panda_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.497`), the role-neutral bind, the elbows out in the trombone hold. | `trombonist` |
 | hippo | Longer rebuilt arms with a seam cut and a side wall (`hippo_arms.py`), smoothed arm tubes (`armSmooth`), the role-neutral bind with elbow `raise` shapes, smaller pea eyes. Stands at the contrabass. | `bassist` |
@@ -120,11 +119,10 @@ Smooth of the upper arm weights, or a move of the elbow alone does not fix a twi
   about 160° on its forearm folds the wrist. Then change the hold or the instrument first, and
   hold the part near the direction of no paw twist.
 
-Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps, from the joints of
-the config and rays through the mesh, with the functions of the species scripts. A clean quad mesh
-skips steps 2 to 5 (`--keep-faces`). Write a species script
-`tools/blender/<a>_arms.py` only for a fault that it does not fix, such as an arm joined to the
-trunk down to the elbow (`cat_arms.py`, which takes its weights from the copy before the wall).
+Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps. A clean quad
+mesh skips steps 2 to 5 (`--keep-faces`). Write a species script `tools/blender/<a>_arms.py` only
+for a fault that it does not fix, such as an arm joined to the trunk down to the elbow
+(`cat_arms.py`, which takes its weights from the copy before the wall).
 
 ### Rules
 
@@ -233,9 +231,9 @@ Read the group of your work first.
 - Bone heat gives the trunk side a part of a hanging arm. Keep the arm weights on the free arm
   (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
-  it the mean. The `sliver` rule can move a weight 4 cm away: compare the weights with `main`.
-- A hanging T-pose arm folds the faces under its root. Make the bridge faces and the first tube
-  ring one rigid group (`rigidPainted`).
+  it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
+- A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
+  (`rigidPainted`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
