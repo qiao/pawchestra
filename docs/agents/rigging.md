@@ -46,7 +46,7 @@ studio, then pack it into a module that the app reads.
  <s>-arms.glb + <s>-weights.json (a copy with quad tubes and Blender weights)
    | pnpm rig-mesh <a>   (tools/mesh-rigs/<a>.json, Blender)
    v
- <s>.rig.glb (face colors, gloss, chair, joints, shapes, clip `reference`)
+ <s>.rig.glb (face colors, gloss, joints, shapes, clip `reference`, seat in the extras)
    | pnpm studio-body <a> (ANIMALS of tools/studio-body.ts, no Blender)
    v
  src/models/studio/<a>.ts --> STUDIO_BODIES --> SPECIES[<s>].body
