@@ -124,6 +124,14 @@ passes.
       the play, below the limit 0.44 of `pnpm arm-look`.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
+- [ ] Hippo: the T-pose mesh `hippo-tpose.glb` rigs with clean rebuilt arms (`arm_rebuild.py`,
+      factor 1, reach 0.495 m against 0.539 m) and the role-neutral bind, but two tries of the
+      bassist failed, so the current mesh stays. The thicker left forearm goes 1.9 cm into the
+      neck in the play and 2.0 cm in the lowering (current 1.4 cm and 1.1 cm). Three to four
+      faces of the right shoulder fold in the bow reach (current 1). The bow frog shows on the
+      back of the right paw (`bowGrip`). The rest upper arms improve (2.2 cm, current 5.1 cm).
+      The try config and images are in `reports/2026-11-03-hippo-new/`. Ask the user: accept
+      the trade, or fit a new contrabass hold for this body.
 - [ ] Polar bear pianist: the arms go up to about 8 cm into the belly in the play (accepted 4 cm).
       Try the elbow poles (`HANDS_HOLDS.piano`) further out, with the arm gate.
 - [ ] Polar bear pianist: from the front, the open lid hides the bear and its paws.
