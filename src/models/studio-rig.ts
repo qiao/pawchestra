@@ -94,9 +94,8 @@ export const STUDIO_FOLLOWS = {
 } as const satisfies Readonly<Record<StudioBone, BodyBoneName>>;
 
 /**
- * The share of the twist of the paw that the forearm twist bone takes, as in the clips of the
- * studio (`lowpoly-studio/roles/conductor/clips.py`). Thus the skin of the forearm does not twist
- * as a candy wrapper.
+ * The share of the twist of the paw that the forearm twist bone takes. Thus the skin of the
+ * forearm does not twist as a candy wrapper.
  */
 export const TWIST_SHARE = 0.5;
 
@@ -104,11 +103,10 @@ export const TWIST_SHARE = 0.5;
  * The turn of a paw in the plane of its palm toward the forearm (design 4.4). The hand of the
  * player holds the baton across the palm and points the fingers along the places of the left
  * hand, so its fingers stand at 45° to 150° from the forearm in the conductor poses. The skin of
- * the studio bends well up to about 50° at the wrist (`lowpoly-studio/roles/conductor/`). The
- * turn in the plane of the palm keeps the palm, the baton across it, and the curl of the fingers,
- * and it brings the paw toward the line of the forearm. The right paw turns only by positive
- * angles: toward the baton, which runs forward from the fist. A turn away from the baton takes the
- * baton out of the paw.
+ * a studio body bends well up to about 50° at the wrist. The turn in the plane of the palm keeps
+ * the palm, the baton across it, and the curl of the fingers, and it brings the paw toward the
+ * line of the forearm. The right paw turns only by positive angles: toward the baton, which runs
+ * forward from the fist. A turn away from the baton takes the baton out of the paw.
  */
 export const PAW_TURN = {
   /** The largest turn, in radians. The baton stays in the paw up to about 70°. */
