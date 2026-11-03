@@ -153,6 +153,13 @@ const RHINO_BODY_LOOPS = 3;
  */
 const DEER_BODY_LOOPS = 3;
 
+/**
+ * The open loops of {@link BODY_BONES} of the pig mesh: none. Each arm of the pig is a closed part
+ * of its own with no face that joins it to the trunk (`pig-upper.glb`, `pig-arms.glb`), and the
+ * trunk wall under each arm is closed.
+ */
+const PIG_BODY_LOOPS = 0;
+
 /** The parts of the two arms that move in the sweep of a role. */
 const ARM_PARTS: readonly SweepPart[] = [
   { name: 'paws', bones: ['handL', 'handR'] },
@@ -363,6 +370,17 @@ function rhinoBodySurface(posed: PosedSkeleton): ClosedSurface {
  */
 function deerBodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, DEER_BODY_LOOPS);
+}
+
+/**
+ * The closed surface of the body of the pig mesh: {@link BODY_BONES}, which need no cap
+ * ({@link PIG_BODY_LOOPS}).
+ *
+ * @param posed The posed skeleton.
+ * @returns The surface.
+ */
+function pigBodySurface(posed: PosedSkeleton): ClosedSurface {
+  return closedPart(posed, BODY_BONES, PIG_BODY_LOOPS);
 }
 
 /** The seat of each player model, found one time for each model. */
@@ -1803,14 +1821,15 @@ function sweptHornist(scene: TestScene, index: number): boolean {
  * The sweep of the hornist (design 5.3): the sweep of the trombonist with the horn and the pig.
  * The first seated pig of each demo with horns, and each standing pig soloist, play it. The left
  * palm is on its grip at the valves at the start of each phrase, and the right palm on its grip in
- * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide). The body
- * of the pig mesh has no open edge, so its closed surface has the two cuts to the upper arms.
+ * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide). Each arm
+ * of the pig mesh is a closed part of its own, so the body is closed with no cap
+ * ({@link pigBodySurface}).
  */
 const HORNIST_SWEEP: RoleSweep = {
   ...TROMBONIST_SWEEP,
   role: 'hornist',
   obstacles: [
-    { name: 'body', surface: bodySurface },
+    { name: 'body', surface: pigBodySurface },
     { name: 'horn', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'horn'),
