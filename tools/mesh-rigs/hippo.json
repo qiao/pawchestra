@@ -1,6 +1,6 @@
 {
   "source": "assets/models/hippo/hippo-arms.glb",
-  "sourceNote": "The hippo mesh (assets/models/hippo/hippo.glb, assets/models/hippo/README.md), with new quad faces on each arm from the arm seam to the wrist, a side wall of the trunk under each arm, and arms 1.5 times longer. tools/blender/hippo_arms.py replays the Blender session that made it. hippo.glb stays unchanged.",
+  "sourceNote": "A copy of the T-pose mesh assets/models/hippo/hippo-tpose.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, at the length of the mesh. tools/blender/arm_rebuild.py makes these faces. The other faces and hippo-tpose.glb stay unchanged.",
   "paintedWeights": "assets/models/hippo/hippo-weights.json",
   "paintedLower": [
     "root",
@@ -22,152 +22,39 @@
     "toes_R",
     "tail"
   ],
-  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the Weight Paint fixes of tools/blender/hippo_arms.py. The vertices on the bones of paintedLower keep the rule weights, because the seated bind of the app depends on them.",
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, because the seated bind of the app depends on them.",
   "armSegments": {
-    "helper": 0.044,
+    "helper": 0.0722,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it).",
     "rootSegment": true,
-    "rootSegmentNote": "The rule weight of each upper arm goes to its first segment (segment_joints() and main() of tools/blender/rig_mesh.py), so that the trunk around the socket takes the roll of the first ring of the tube, as on the fox.",
-    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units. The app turns them from the pose joints (poseArm() of src/models/studio-rig.ts), so the length changes only the automatic weights of Blender. A longer helper folds more play samples."
+    "rootSegmentNote": "The rule weight of each upper arm goes to its first segment (segment_joints() and main() of tools/blender/rig_mesh.py), so that the trunk around the socket takes the roll of the first ring of the tube. Without it, three to four faces of the right shoulder fold in the reach of the bow arm (arm gate folds p95 4)."
   },
   "armSmooth": {
     "rounds": 6,
     "sides": "LR",
-    "bones": ["upper_arm_seg1", "upper_arm_seg2", "forearm_seg1", "forearm_seg2", "forearm_seg3"],
-    "note": "6 rounds of taubin() smooth the middle of each arm tube after the weights (arm_smooth() of tools/blender/rig_mesh.py), so that the arms show no lumps or dents. The elbow rings and the root stay out, because the elbow rings keep a gap for the helper bone and the root joins the side wall."
+    "note": "6 rounds of taubin() smooth the arm tubes after the weights (arm_smooth() of tools/blender/rig_mesh.py), so that the tubes lose the ridges of the big faces of the T-pose mesh, as on the rhino."
   },
-  "bindSmooth": {
-    "rounds": 12,
-    "sides": "L",
-    "bones": [
-      "elbow",
-      "upper_arm_seg3",
-      "forearm_seg0"
-    ],
-    "note": "12 rounds of taubin() smooth the bind mesh of the left elbow after its relax (arm_smooth() on the bind, main() of tools/blender/rig_mesh.py). The old bent bind folded the inner left elbow into a lip without this rule. The straight bind keeps the rule."
-  },
-  "raise": [
-    {
-      "side": "R",
-      "turns": {
-        "clavicle": [
-          0,
-          0,
-          0,
-          1
-        ],
-        "upper_arm": [
-          0.4003,
-          -0.098,
-          0.3335,
-          0.8479
-        ],
-        "forearm": [
-          -0.0677,
-          0.0392,
-          -0.0877,
-          0.9931
-        ]
-      },
-      "fade": [
-        10,
-        25
-      ],
-      "below": -1,
-      "smooth": 10,
-      "smoothBones": [
-        "upper_arm_seg1",
-        "upper_arm_seg2",
-        "upper_arm_seg3",
-        "elbow",
-        "forearm_seg0",
-        "forearm_seg1",
-        "forearm_seg2",
-        "forearm_seg3"
-      ],
-      "note": "The rest shape of the right arm: the upper arm takes the mean turn of the rest samples of the bassist. It smooths the posed tube from the second upper arm segment to the wrist (raise_shape() of tools/blender/rig_mesh.py), with no relax (below -1). The fade keeps it off the play. The forearm turn counts from the bind forearm, so with the straight bind the elbow of the rule pose is almost straight."
-    },
-    {
-      "side": "R",
-      "bone": "forearm",
-      "turns": {
-        "clavicle": [
-          0,
-          0.4226,
-          0,
-          0.9063
-        ],
-        "upper_arm": [
-          0.3325,
-          0.1122,
-          -0.4704,
-          0.8097
-        ],
-        "forearm": [
-          -0.3622,
-          0.167,
-          -0.4462,
-          0.8012
-        ]
-      },
-      "fade": [
-        20,
-        30
-      ],
-      "below": 0.3,
-      "note": "The shape of the bent right elbow of the bassist (pnpm raise-fit on the straight bind). With the straight bind arms, the inner elbow bends further from its bind, and faces 442, 444, 472, 471, 501, 470, 536, 440, and 474 fold in 3365 of 4690 samples of the play. The key elbow turns 73.5 degrees from the bind in their mean. With the clavicle at its bind turn, the shape relaxed fewer faces."
-    },
-    {
-      "side": "R",
-      "bone": "forearm",
-      "turns": {
-        "clavicle": [
-          0,
-          0.4226,
-          0,
-          0.9063
-        ],
-        "upper_arm": [
-          0.3548,
-          0.0442,
-          -0.4164,
-          0.8359
-        ],
-        "forearm": [
-          -0.4135,
-          0.1966,
-          -0.5078,
-          0.7297
-        ]
-      },
-      "fade": [
-        10,
-        20
-      ],
-      "below": 0.3,
-      "note": "The shape of the right elbow bent further (pnpm raise-fit on the straight bind with the shape before it). Faces 472, 471, 476, 440, 501, and 470 still fold in 791 of 4690 samples of the play, and the key elbow turns 86.3 degrees from the bind in their mean."
-    }
-  ],
   "output": "assets/models/hippo/hippo.rig.glb",
   "name": "Hippo",
   "weld": 1e-05,
   "app": {
-    "shoulders": 0.888504,
-    "reach": 0.5391,
-    "note": "The scale puts the standing skull top (the highest vertex within 0.03 u of the middle plane) at 1.570 m, the head height of the red fox: 1.600907 m for each unit, with the standing shoulder joints at 0.888504 m (ANIMALS)."
+    "shoulders": 1.008489,
+    "reach": 0.4954,
+    "note": "The scale puts the standing skull top (the highest vertex within 0.03 u of the middle plane, 0.9839 u) at 1.570 m, the head height of the red fox: 1.595711 m for each unit, with the standing shoulder joints at 1.008489 m (ANIMALS). The reach is the reach of the arms of the mesh, from the shoulder joint to the middle of the palm."
   },
   "armFactor": 1,
-  "armFactorNote": "The factor 1 does not stretch the arms in the rig. The arms of hippo-arms.glb are already 1.5 times longer than the source arms (step_shape() of tools/blender/violin_arms.py, called by tools/blender/hippo_arms.py). The contrabass of the hippo is smaller (bassScale 0.8 of src/models/species.ts).",
+  "armFactorNote": "The arms keep the length of the mesh (arm_rebuild.py with no --factor). The new grip of the contrabass (HIPPO_HOLD of src/pose/bowed-rig.ts) reaches each note target, so the arms need no stretch. The contrabass of the hippo is smaller (bassScale 0.8 of src/models/species.ts).",
   "legFactor": 1,
   "legFactorNote": "The legs keep the length of the mesh. The hippo stands at its contrabass in the app, as the hippos of the reference images, so no seat asks for longer legs.",
   "rootNormals": {
     "radius": 0.1,
     "armShare": 0.3,
     "turn": 60,
-    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py). The seated bind turns the arm up, and without this rule a hard dark crease shows under the left arm.",
+    "note": "The skin faces whose middle lies within radius (units) of the head of an upper arm take the skin normals with no crease angle in the app (root_rim() of tools/blender/rig_mesh.py), so that a raised arm root shows no dark crease.",
     "armShareNote": "A face of the radius stays in the rim only when the mean weight of its corners on the clavicle and the arm bones of its side is 0.3 or more (root_rim()). Thus the big trunk faces under the left armpit keep their own normals and show no dark patch.",
     "turnNote": "A face of the rim keeps the crease normals when a corner takes a skin normal more than 60 degrees from its own face in the final bind (rim_turns()). Thus the big trunk face under the right armpit shows no black wedge under the bow arm.",
     "elbow": 0.09,
-    "elbowNote": "The faces within 0.09 units of each elbow joint take the skin normals (root_rim() of tools/blender/rig_mesh.py). The left paw on the neck bends the left elbow far, and without this rule the split normals show a thin dark line across the elbow."
+    "elbowNote": "The faces within 0.09 units of each elbow joint take the skin normals (root_rim() of tools/blender/rig_mesh.py). The left paw on the neck bends the left elbow far, and split normals would show a thin dark line across the elbow."
   },
   "joints": {
     "root": {
@@ -190,145 +77,145 @@
     "hips": {
       "head": [
         0,
-        0.155,
-        -0.05
+        0.17,
+        -0.04
       ],
       "tail": "spine"
     },
     "spine": {
       "head": [
         0,
-        0.27,
-        -0.05
+        0.29,
+        -0.04
       ],
       "tail": "spine1"
     },
     "spine1": {
       "head": [
         0,
-        0.385,
-        -0.04
+        0.41,
+        -0.035
       ],
       "tail": "chest"
     },
     "chest": {
       "head": [
         0,
-        0.49,
-        -0.04
+        0.52,
+        -0.035
       ],
       "tail": "neck"
     },
     "neck": {
       "head": [
         0,
-        0.64,
-        -0.065
+        0.665,
+        -0.04
       ],
       "tail": "head"
     },
     "head": {
       "head": [
         0,
-        0.695,
-        -0.06
+        0.71,
+        -0.03
       ],
       "tail": [
         0,
-        0.975,
-        -0.03
+        0.984,
+        0.008
       ]
     },
     "ear_L": {
       "head": [
-        0.095,
-        0.962,
-        0.005
+        0.1,
+        0.96,
+        0.008
       ],
       "tail": [
-        0.1,
+        0.104,
         1.0,
-        0.008
+        0.009
       ]
     },
     "clavicle_L": {
       "head": [
         0.03,
-        0.585,
-        -0.05
+        0.62,
+        -0.04
       ],
       "tail": "upper_arm_L"
     },
     "upper_arm_L": {
       "head": [
-        0.19,
-        0.555,
-        -0.07
+        0.165,
+        0.632,
+        -0.04
       ],
       "tail": "forearm_L",
       "roll": "palm"
     },
     "forearm_L": {
       "head": [
-        0.283,
-        0.453,
-        0.005
+        0.31,
+        0.634,
+        -0.035
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.3265,
-        0.399,
-        0.04625
+        0.3825,
+        0.635,
+        -0.0325
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.37,
-        0.345,
-        0.0875
+        0.455,
+        0.636,
+        -0.03
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.392,
-        0.316,
-        0.0915
+        0.495,
+        0.632,
+        -0.025
       ],
       "tail": [
-        0.41,
-        0.293,
-        0.0825
+        0.535,
+        0.62,
+        -0.025
       ],
       "roll": "palm"
     },
     "thigh_L": {
       "head": [
-        0.123,
-        0.125,
-        -0.055
+        0.135,
+        0.165,
+        -0.045
       ],
       "tail": "shin_L"
     },
     "shin_L": {
       "head": [
-        0.123,
-        0.085,
-        -0.051
+        0.135,
+        0.1,
+        -0.045
       ],
       "tail": "foot_L"
     },
     "foot_L": {
       "head": [
-        0.127,
+        0.137,
         0.045,
-        -0.045
+        -0.04
       ],
       "tail": "toes_L",
       "roll": [
@@ -339,14 +226,14 @@
     },
     "toes_L": {
       "head": [
-        0.118,
-        0.016,
-        0.03
+        0.14,
+        0.015,
+        0.025
       ],
       "tail": [
-        0.105,
-        0.008,
-        0.075
+        0.14,
+        0.005,
+        0.06
       ],
       "roll": [
         0,
@@ -357,13 +244,13 @@
     "tail": {
       "head": [
         0,
-        0.215,
-        -0.235
+        0.32,
+        -0.25
       ],
       "tail": [
         0,
-        0.157,
-        -0.205
+        0.235,
+        -0.255
       ],
       "roll": [
         0,
@@ -373,36 +260,36 @@
     }
   },
   "palm": [
-    -0.822,
-    -0.269,
-    -0.502
+    0,
+    -1,
+    0
   ],
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tops, +z forward, +x the left side. The neck joint lies below the chin. The elbow, forearm twist, wrist, and paw joints are the joints of the longer arms.",
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tops, +z forward, +x the left side. The right side mirrors the left side. The arms are in a T-pose, and the claws make a row under the end of each paw, so the palm faces down. The shoulder joint lies 0.035 u inside the line where the arm leaves the trunk, and the elbow lies halfway from the shoulder joint to the wrist. The neck joint lies below the chin.",
   "studio": {
     "legTurns": {
       "thigh": [
-        0.477428,
-        -0.013442,
-        -0.134415,
-        0.868225
+        0.518992,
+        0.0,
+        -0.139063,
+        0.843391
       ],
       "shin": [
-        -0.074105,
+        -0.045292,
         0.0,
-        0.049403,
-        0.996026
+        0.018117,
+        0.998809
       ],
       "foot": [
-        0,
-        0,
-        0,
-        1
+        0.0,
+        0.0,
+        0.0,
+        1.0
       ],
       "toes": [
-        0,
-        0,
-        0,
-        1
+        0.0,
+        0.0,
+        0.0,
+        1.0
       ]
     },
     "trunk": {
@@ -432,21 +319,16 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 100,
-      "R": 31
+      "L": 20,
+      "R": 0
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 100 degrees and the right 31 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the contrabass smallest (design 4.4): about 127 degrees on the left (the violin and the snare drum) and 111 degrees on the right (the trumpet and the contrabass). The straight bind with no supination gave L 111, R 31, and a second probe on the rig at 111 gave the change -11. With no supination, the left paw of the bassist twists about 180 degrees.",
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source (tools/rig/leg_turns.py <config> 25 15 0)."
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 20 degrees and the right 0 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The rule of design 4.4 gives L 111 and R 38 (two probes of pnpm bind-supination hippo), but the own role wins: each 20 degrees more on the left takes the left forearm deeper into the neck of the contrabass at rest (0 gives 1.1 cm, 40 gives 1.6 cm, 111 gives 1.7 cm), and R 38 turns the right paw 177 degrees in a move (limit 176). With 20, the left paw twist p95 of the bassist is 161 degrees (limit 170).",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source (tools/rig/leg_turns.py <config> 25 15 0). The hippo stands in the app, so no player sits in this pose."
   },
   "weights": {
-    "armSplit": 0.26,
-    "armBelow": [
-      0.42,
-      0.52
-    ],
-    "armBelowNote": "Inside the plane of armSplit, the share of the arm weight that a vertex keeps grows from 0 at the lower height to 1 at the upper height (units), and the trunk takes the rest. This ramp folds the root of the arm tube the least.",
+    "armSplit": 0.2,
     "stretchRamp": 0,
-    "headFrom": 0.7,
+    "headFrom": 0.72,
     "earBase": [
       1.1,
       1.2
@@ -454,11 +336,11 @@
     "tailBall": {
       "center": [
         0,
-        0.19,
-        -0.22
+        0.28,
+        -0.255
       ],
-      "radius": 0.04,
-      "behind": -0.195
+      "radius": 0.05,
+      "behind": -0.235
     },
     "sliver": {
       "angle": 10,
@@ -471,8 +353,8 @@
       "note": "The values of the fox, the cat, the dog, and the panda."
     },
     "clavicleFrom": [
-      0.52,
-      0.565
+      0.555,
+      0.6
     ],
     "clavicleMiddle": [
       0.05,
@@ -480,31 +362,29 @@
     ],
     "clavicleMiddleNote": "The share of the clavicle weight that a vertex below headFrom keeps grows from 0 at the smaller distance from the middle plane to 1 at the larger distance (units), and the chest takes the rest. Thus the bow arm does not fold the chest under the chin.",
     "armTop": [
-      0.625,
+      0.64,
       0.7
     ],
-    "armTopNote": "The share of the clavicle and upper arm weights that a vertex gives to the neck grows from 0 at the lower height to 1 at the upper height (units). The wide fade keeps the back of the right shoulder from a fold. The fade is sensitive to small changes.",
+    "armTopNote": "The share of the clavicle and upper arm weights that a vertex gives to the neck grows from 0 at the lower height to 1 at the upper height (units): from the middle of the T-pose arm root to its top under the chin.",
     "shoulderHead": [
       0.12,
       0.17
     ],
-    "rigid": [
-      [
-        -0.1678,
-        0.682,
-        -0.1188
-      ]
-    ],
-    "rigidNote": "The face nearest to each point (source units) takes the mean of the weights of its corners. Face 323 at the back of the right side of the neck joins the head, the neck, and the clavicle, and without this rule the bow arm folds it (pnpm fold-probe bassist --faces).",
     "fingers": 0.5,
     "haunch": {
       "height": [
-        0.1,
-        0.15
+        0.12,
+        0.17
       ],
-      "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the round haunch stays on the hips. It starts at the knee and ends at the crotch."
+      "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the round haunch stays on the hips. It starts below the crotch and ends at the thigh joint."
     },
-    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. The plane lies out of the whole trunk, so that no trunk vertex takes a lower arm bone. The arm vertices take the weights of Blender (paintedWeights). Above headFrom (the chin), each vertex follows the head only."
+    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones (armFree). Above headFrom (the chin), each vertex follows the head only. The tail is a ball on one bone (tailBall).",
+    "armFree": {
+      "turn": 0,
+      "radius": 0.11,
+      "floor": 0.53,
+      "note": "The T-pose arm is free of the trunk beyond x 0.2 (the cuts of assets/models/hippo/README.md). A vertex of the free arm lies beyond |x| = armSplit, within 0.11 u of the chain of the arm joints, and above y 0.53, so that the round belly under the arm follows the trunk."
+    }
   },
   "refine": {
     "rings": [],
@@ -515,8 +395,8 @@
       "rounds": 4,
       "note": "The rule of the fox, the rabbit, the cat, the dog, and the panda, with a lower angle, a larger move, and wider normals (refine.flipNote)."
     },
-    "ringsNote": "The rig has no rings. A ring at each elbow or at a wrist puts the rig above 3,200 triangles.",
-    "flipNote": "The long edge of each thin face of the arms in the seated bind flips (flip_edges() of tools/blender/rig_mesh.py). The angle 130, the move 0.004, and the normals 90 flip more of them. The straight bind keeps the elbows of the source, so fewer inner elbow faces are thin than with the old bind, which bent the thick elbows 62 degrees."
+    "ringsNote": "The rig has no rings. The rebuilt tubes have rings at each elbow and each wrist.",
+    "flipNote": "The long edge of each thin face of the arms in the seated bind flips (flip_edges() of tools/blender/rig_mesh.py). The angle 130, the move 0.004, and the normals 90 flip more of them."
   },
   "check": {
     "thin": {
@@ -533,14 +413,14 @@
     "eyeShare": 0.34,
     "eyeBox": [
       [
-        0.05,
-        0.895,
-        0.07
+        0.045,
+        0.89,
+        0.085
       ],
       [
         0.09,
-        0.93,
-        0.115
+        0.935,
+        0.125
       ]
     ],
     "tone": {
@@ -557,37 +437,54 @@
         [
           0.5,
           0,
-          -0.004,
-          -0.01
+          -0.0079,
+          -0.0076
         ],
         [
-          0.58,
+          0.59,
           0,
-          -0.0067,
-          -0.0082
+          -0.0161,
+          -0.0046
         ],
         [
           0.65,
           0,
-          -0.007,
-          -0.022
+          -0.0156,
+          -0.018
         ],
         [
           0.75,
           0,
-          -0.007,
-          -0.03
+          -0.0113,
+          -0.0231
         ],
         [
-          0.87,
+          0.86,
           0,
-          -0.006,
-          -0.033
+          -0.0102,
+          -0.0288
         ]
       ],
-      "note": "The mesh has warmer colors than SPECIES_COLORS.hippo. Each plain face takes the hue and the chroma of the species color of its band and keeps its lightness: a row is [L, dL, da, db] in Oklab. The claws keep their colors."
+      "note": "The texture has a pinker fur than SPECIES_COLORS.hippo. Each plain face takes the hue and the chroma of the species color of its band (the accent, the fur, and the belly) and keeps its lightness: a row is [L, dL, da, db] in Oklab, from the mean Oklab color of the faces of the mesh in each band. The claws keep their colors."
     },
-    "note": "The values of samples, palette, dark, and eyeShare are the values of the other meshes. A dark face in the eye box is an eye face. The config has no nose box, because the hippo has no nose pad: the export takes the front of the muzzle as the nose tip."
+    "note": "The values of samples, palette, dark, and eyeShare are the values of the other meshes. A dark face in the eye box is an eye face. The config has no nose box, because the hippo has no nose pad: the export takes the front of the muzzle as the nose tip.",
+    "border": {
+      "box": [
+        [
+          -0.56,
+          0.55,
+          -0.15
+        ],
+        [
+          0.56,
+          0.7,
+          0.12
+        ]
+      ],
+      "share": 1.01,
+      "dark": 0.3,
+      "note": "In the box of the arm roots and the wrists, each fur face darker than the Oklab lightness 0.3 takes the color of the nearest light fur face. The rebuilt right wrist has a dark recess above the claws that the bend of the bow paw shows as a black wedge. No other dark face lies in the box."
+    }
   },
   "eyeShell": {
     "lift": 0.002,
@@ -620,5 +517,7 @@
     "end": 0.0065,
     "most": 0.03,
     "note": "The values of the panda: the haunch moves down at most 0.03 u."
-  }
+  },
+  "armSource": "assets/models/hippo/hippo-tpose.glb",
+  "armSourceNote": "The T-pose mesh of the hippo (assets/models/hippo/README.md). Its arms are level and free of the trunk, so tools/blender/arm_rebuild.py rebuilds them with no species script."
 }
