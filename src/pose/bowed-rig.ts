@@ -1048,11 +1048,12 @@ export const BOWED_HOLDS = {
  * most 1.3 cm into the body: with 0.14 H out, 1.9 cm. In the middle of the moves, the left elbow
  * points out and a little down, as at rest (`liftPoleL`). The bow takes the via of the upright bow
  * (`UPRIGHT_BOW`): the tip forward, a little up and in, with the hair down, and the grip moves
- * 0.45 H out and 0.4 H to the front in the middle, so that the bow arm passes outside the round
+ * 0.6 H out and 0.4 H to the front in the middle, so that the bow arm passes outside the round
  * belly. With the via of the cat of the A-pose mesh (the tip forward and out, the grip 0.5 H out,
  * 0.45 H up, and 0.15 H to the front), the bow paw bends 158° off its forearm and twists past
- * 180° in the moves of the T-pose body. With the grip 0.3 H out, the right upper arm goes 1.8 cm
- * into its arm root in a lowering (1.3 cm with 0.45 H).
+ * 180° in the moves of the T-pose body. With the grip 0.45 H out, the right upper arm goes 1.8 cm
+ * into its arm root in a lowering of `beethoven-5-4`, and the right forearm 1.1 cm into the viola
+ * in a lowering of `beethoven-6-1` (1.4 cm and 0.4 cm with 0.6 H).
  *
  * A cat soloist who stands hangs the bow from the right paw with the tip down, a little forward and
  * out, and turns it through the front in the lift and the lowering (`HANGING_BOW`).
@@ -1092,7 +1093,7 @@ const CAT_HOLD = {
     lap: { along: 0.6, offset: [0.4, 0.5, -0.35] },
     tip: [0.15, 1, -0.45],
     hair: [0, 0, -1],
-    via: { ...UPRIGHT_BOW.via, reach: [0.45, 0, -0.4] },
+    via: { ...UPRIGHT_BOW.via, reach: [0.6, 0, -0.4] },
   },
   standBow: HANGING_BOW,
 } as const satisfies BowedHold;
