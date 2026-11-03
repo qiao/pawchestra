@@ -1,26 +1,27 @@
-"""Frees the arms of a copy of the panda mesh from the trunk (a trial, design 4.4).
+"""Frees the arms of a copy of the panda mesh from the trunk (design 4.4, "Source meshes").
 
 The upper arm of `panda.glb` joins the side of the trunk from the shoulder down to the elbow, so
-`arm_rebuild.py` finds no free section of the upper arm. This script frees each arm in a copy, so
-that `arm_rebuild.py` can rebuild it as the arm of any body:
+`arm_rebuild.py` finds no free section of the upper arm. This script frees each arm in a copy,
+`panda-edit.glb`, so that `arm_rebuild.py` rebuilds it as the arm of any body. The side wall of
+the trunk under the arm follows `step_round_wall()` of `cat_arms.py`:
 
 1. Import the source and Merge by Distance (`violin_arms.import_mesh()`).
 2. Split the edges of the crease where the arm meets the trunk (`SEAMS`, `step_rip()`).
 3. Turn the arm out about the forward axis through the shoulder joint, and shift it out and up,
-   with a ramp along the upper arm (`step_turn()`). The two copies of a seam vertex that part by
+   with a ramp along the upper arm (`step_turn()`). A turn alone does not open the front crease,
+   because its top lies on the axis of the turn. The two copies of a seam vertex that part by
    less than `JOIN` join again, so that the hole starts where it opens.
-4. Close the hole of each side: an armpit line from the front to the back end of the hole, and a
-   grid of quads on the lip of the arm and on the lip of the trunk (`step_fill()`).
-5. Smooth the old crease on both lips (`step_fair()`).
-6. Give each new face the fur color of the nearest old face of its part (`step_color()`).
-7. Write the copy (`step_export()`).
+4. Close the arm with an armpit line and a grid of quads on the arm lip (`step_fill()`).
+5. Close the trunk with a side wall on the plane of the seam: a Delaunay fill of the hole, a
+   smooth along the normal of the plane, and a relax of the wall (`step_wall()`).
+6. Smooth the pockets of the trunk that the arm hid (`step_pocket()`).
+7. Smooth the old crease on the arm, and round the inner side of the arm, so that the Shrinkwrap
+   of `arm_rebuild.py` puts the tube on the arm and not on the wall (`step_fair()`,
+   `step_round()`).
+8. Give the new faces the fur colors beside them (`step_color()`), and write the copy.
 
-`turned_joints()` gives the joints of the left arm for the rig config after the turn.
-
-The trial does not give a clean copy yet. `pnpm mesh-intake` passes the pose, the arm free, and the
-gap lines, but the four-side images show slivers at the armpits and a notch at the inner elbow,
-and the rebuilt arm shows shards on the side wall where the forearm touched the belly
-(`TODO.md`). No body reads the copy.
+The script prints the joints of the left arm of the rig config after the turn, for the longer
+arms of `armFactor` (`turned_joints()`).
 
 Run it in a terminal from the root of the tree:
 
@@ -58,7 +59,7 @@ SEAMS = {
 TURN = 10.0
 
 #: The shift of each arm out and up, at a right angle to the turned upper arm, in units.
-SHIFT = 0.012
+SHIFT = 0.018
 
 #: The shares of the upper arm over which the turn grows from 0 to its full angle.
 RAMP = (0.05, 0.45)
@@ -70,16 +71,28 @@ FLOOD = 0.0
 #: The two copies of a seam vertex that part by less than this distance in units join again.
 JOIN = 0.005
 
-#: The smooth of the old crease (`step_fair()`): the rings of old trunk faces beside the lip, and
-#: the rounds and the factor of Smooth Vertices.
-FAIR_BAND = 1
+#: The smooth of the old crease on the arm (`step_fair()`): the rounds and the factors of Smooth
+#: Vertices.
 FAIR_SMOOTH = 4
 FAIR_FACTOR = (0.5,)
 
+#: The share of the way from the flat inner side of each arm to a round arm (`step_round()`).
+ROUND = 0.6
+
+#: The side wall of the trunk (`step_wall()`), with the keys of `wall` of `cat_arms.py`: the side
+#: of the triangles of the wall in units, the rings of trunk vertices around the wall that move,
+#: within `reach` units of a vertex of the wall, the rounds of the smooth, and the largest depth
+#: of a vertex of the wall in the trunk.
+WALL = {'inset': 0.015, 'lip': 0.7, 'depth': 0.03, 'grid': 0.016, 'rings': 4, 'reach': 0.05,
+        'rounds': 6, 'deep': 0.006, 'relax': 8}
+
+#: The smooth of the pockets of the trunk that the arm hid (`step_pocket()`).
+POCKET = {'angle': 40.0, 'reach': 0.08, 'ball': 0.05, 'rounds': 10}
+
 #: The codes of the vertex attribute `panda_part`: the trunk, the turned arm, the armpit line,
-#: the new faces of the arm, the new faces of the trunk, the lip of the arm, and the lip of the
-#: trunk.
-TRUNK, ARM, PIT, ARM_FILL, TRUNK_FILL, ARM_LIP, TRUNK_LIP = 0, 1, 2, 3, 4, 5, 6
+#: the new faces of the arm, the new faces of the trunk, the lip of the arm, the lip of the
+#: trunk, and the two ends of the armpit line.
+TRUNK, ARM, PIT, ARM_FILL, TRUNK_FILL, ARM_LIP, TRUNK_LIP, APEX = 0, 1, 2, 3, 4, 5, 6, 7
 
 
 def session():
@@ -141,6 +154,23 @@ def smoothstep(x, lo, hi):
     return t * t * (3 - 2 * t)
 
 
+def turn_of(s, side):
+    """Gives the full turn of one arm (a matrix) and its shift (a vector in Blender)."""
+    a, e, _, _ = va.arm_line(s, side)
+    full = Matrix.Rotation(math.radians(-side * TURN), 3, Vector((0, 1, 0)))
+    u = full @ (e - a).normalized()
+    # The shift goes out and up, at a right angle to the turned upper arm in the front view.
+    lift = Vector((-u.z, 0.0, u.x)).normalized() * side * SHIFT * s.fr.height
+    return full, lift
+
+
+def turned_line(s, side):
+    """Gives the shoulder, the elbow, the wrist, and the finger tip of one arm after the turn."""
+    a, e, w, t = va.arm_line(s, side)
+    full, lift = turn_of(s, side)
+    return [a] + [a + full @ (p - a) + lift for p in (e, w, t)]
+
+
 def step_turn(s):
     """Turns each arm out about the forward axis through its shoulder joint by `TURN`, and shifts
     it by `SHIFT`, each times the ramp of `RAMP` along the upper arm. Joins the copies of the seam
@@ -157,11 +187,8 @@ def step_turn(s):
             if q is not p and (q.co - p.co).length < 1e-9:
                 twins[p] = q
     for side in (1, -1):
-        a, e, _, _ = va.arm_line(s, side)
-        full = Matrix.Rotation(math.radians(-side * TURN), 3, Vector((0, 1, 0)))
-        u = full @ (e - a).normalized()
-        # The shift goes out and up, at a right angle to the turned upper arm in the front view.
-        lift = Vector((-u.z, 0.0, u.x)).normalized() * side * SHIFT * s.fr.height
+        a = va.arm_line(s, side)[0]
+        _, lift = turn_of(s, side)
         arm = arm_region(s, bm, side)
         for p in arm:
             k = smoothstep(share(s, side, p.co), *RAMP)
@@ -270,32 +297,33 @@ def pit_count(arm, trunk, front, back):
 
 
 def step_fill(s):
-    """Closes the arm and the trunk of each side: an armpit line from the front apex to the back
-    apex, and a grid patch of quads on each lip (`grid_patch()`)."""
+    """Closes the arm of each side: an armpit line from the front apex to the back apex, and a grid
+    patch of quads on the arm lip (`grid_patch()`). The trunk lip stays open for `step_wall()`."""
     bm = bmesh.new()
     bm.from_mesh(s.mesh.data)
     part = bm.verts.layers.int['panda_part']
     out = {}
     for side in (1, -1):
         front, back, arm, trunk = lips(bm, side)
-        trunk = trunk[::-1]
-        p = pit_count(arm, trunk, front, back)
+        p = pit_count(arm, arm, front, back)
         pit = [front]
         for i in range(1, p):
             v = bm.verts.new(front.co.lerp(back.co, i / p))
             v[part] = PIT
             pit.append(v)
         pit.append(back)
-        made = {}
-        for lip, code in ((arm, ARM_FILL), (trunk, TRUNK_FILL)):
-            for v in lip[1:-1]:
-                v[part] = ARM_LIP if code == ARM_FILL else TRUNK_LIP
-            n = len(lip) - 1
-            k = (n - p) // 2
-            made[code] = grid_patch(bm, pit, lip[:k + 1], lip[::-1][:k + 1], lip[k:k + p + 1],
-                                    code)
-            orient(bm, made[code][1])
-        out[side] = {'pit': p, 'arm': len(made[ARM_FILL][1]), 'trunk': len(made[TRUNK_FILL][1])}
+        front[part] = back[part] = APEX
+        for v in arm[1:-1]:
+            v[part] = ARM_LIP
+        for v in trunk[1:-1]:
+            v[part] = TRUNK_LIP
+        for i in range(p):
+            bm.edges.new((pit[i], pit[i + 1]))
+        n = len(arm) - 1
+        k = (n - p) // 2
+        made = grid_patch(bm, pit, arm[:k + 1], arm[::-1][:k + 1], arm[k:k + p + 1], ARM_FILL)
+        orient(bm, made[1])
+        out[side] = {'pit': p, 'arm': len(made[1])}
     bm.normal_update()
     bm.to_mesh(s.mesh.data)
     bm.free()
@@ -366,38 +394,71 @@ def step_export(s, path):
 
 
 def step_color(s):
-    """Gives each new face one fur color: each corner takes the UV middle of the nearest old face
-    of its part (the arm for the faces of the arm, the trunk for the faces of the trunk). Each
-    face of the rig takes one color, so the new faces continue the fur beside them."""
+    """Gives the new faces their fur colors. The new faces of each arm take one color, as
+    `step_inner_color()` of `cat_arms.py` does: each corner takes the UV middle of the old face
+    beside them whose texture color is nearest to the median color of these old faces. Each face
+    of the wall and each old face at the trunk lip below the armpit line takes the UV middle of
+    the nearest trunk face with no vertex within one edge of the lip. Gives the count of the faces
+    of the wall and the lip, and the median colors of the arms."""
+    import numpy as np
+
     bm = bmesh.new()
     bm.from_mesh(s.mesh.data)
     part = bm.verts.layers.int['panda_part']
     fill = bm.faces.layers.int['panda_fill']
     uv = bm.loops.layers.uv.active
-    fills = {ARM_FILL: ARM, TRUNK_FILL: TRUNK}
-    old = {ARM: [], TRUNK: []}
-    new = []
-    for f in bm.faces:
-        if f[fill]:
-            new.append((f, f[fill]))
-        elif all(p[part] in (ARM, ARM_LIP) for p in f.verts):
-            old[ARM].append(f)
-        else:
-            old[TRUNK].append(f)
-    middles = {
-        key: [(f.calc_center_median(),
-               sum((lp[uv].uv for lp in f.loops), Vector((0, 0))) / len(f.loops))
-              for f in faces]
-        for key, faces in old.items()
-    }
-    for f, c in new:
+    mat = s.mesh.data.materials[0]
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    image = bsdf.inputs['Base Color'].links[0].from_node.image
+    width, height = image.size
+    pixels = np.empty(width * height * 4, np.float32)
+    image.pixels.foreach_get(pixels)
+    pixels = pixels.reshape(height, width, 4)[:, :, :3]
+
+    def middle(f):
+        return sum((lp[uv].uv for lp in f.loops), Vector((0, 0))) / len(f.loops)
+
+    def color(at):
+        return pixels[min(int(at.y % 1.0 * height), height - 1),
+                      min(int(at.x % 1.0 * width), width - 1)]
+
+    lips = {ARM_FILL: (ARM_LIP, ARM)}
+    out = {}
+    # The wall and the old faces at the trunk lip below the armpit line take the color of the
+    # nearest trunk face away from the lip: the old crease faces carry the black fur of the arm.
+    pit = min(p.co.z for p in bm.verts if p[part] in (PIT, APEX))
+    rim = [f for f in bm.faces if f[fill] == TRUNK_FILL
+           or (not f[fill] and any(p[part] == TRUNK_LIP for p in f.verts)
+               and f.calc_center_median().z < pit)]
+    far = [f for f in bm.faces if not f[fill]
+           and all(p[part] == TRUNK for p in f.verts)
+           and not any(q[part] == TRUNK_LIP for p in f.verts for x in p.link_edges
+                       for q in [x.other_vert(p)])]
+    centers = [(f.calc_center_median(), middle(f)) for f in far]
+    for f in rim:
         center = f.calc_center_median()
-        _, at = min(middles[fills[c]], key=lambda m: (m[0] - center).length)
+        _, at = min(centers, key=lambda m: (m[0] - center).length)
         for lp in f.loops:
             lp[uv].uv = at
+    out['rim'] = len(rim)
+    for side in (1, -1):
+        for code, codes in lips.items():
+            new = [f for f in bm.faces if f[fill] == code and f.calc_center_median().x * side > 0]
+            region = {p for f in new for p in f.verts}
+            beside = [g for p in region for g in p.link_faces
+                      if not g[fill] and all(q[part] in codes + (APEX,) for q in g.verts)]
+            beside = list(dict.fromkeys(beside))
+            colors = np.array([color(middle(g)) for g in beside])
+            median = np.median(colors, axis=0)
+            pick = beside[int(np.argmin(np.linalg.norm(colors - median, axis=1)))]
+            at = middle(pick)
+            for f in new:
+                for lp in f.loops:
+                    lp[uv].uv = at
+            out[(side, code)] = [round(float(c), 3) for c in median]
     bm.to_mesh(s.mesh.data)
     bm.free()
-    return len(new)
+    return out
 
 
 def rings_of(verts, count):
@@ -410,32 +471,268 @@ def rings_of(verts, count):
 
 
 def step_fair(s):
-    """Smooths the old crease on each side with Smooth Vertices (`FAIR_SMOOTH` rounds of each
-    factor of `FAIR_FACTOR`). On the trunk, the new faces, the lip, and `FAIR_BAND` rings of old
-    faces beside the lip move. On the arm, the new faces and the lip move. The armpit line stays.
-    Gives the largest move of each side in units."""
+    """Smooths the old crease on the arm of each side with Smooth Vertices (`FAIR_SMOOTH` rounds of
+    each factor of `FAIR_FACTOR`): the new faces of the arm and the arm lip move, and the armpit
+    line stays. Gives the largest move of each side in units."""
     bm = bmesh.new()
     bm.from_mesh(s.mesh.data)
     part = bm.verts.layers.int['panda_part']
     start = {p: p.co.copy() for p in bm.verts}
     out = {}
     for side in (1, -1):
+        verts = [p for p in bm.verts if p[part] in (ARM_FILL, ARM_LIP) and p.co.x * side > 0]
+        for _ in range(FAIR_SMOOTH):
+            for factor in FAIR_FACTOR:
+                bmesh.ops.smooth_vert(bm, verts=verts, factor=factor, use_axis_x=True,
+                                      use_axis_y=True, use_axis_z=True)
+        out[side] = round(max((p.co - start[p]).length for p in verts) / s.fr.height, 4)
+    bm.normal_update()
+    bm.to_mesh(s.mesh.data)
+    bm.free()
+    return out
 
-        def mine(code):
-            return {p for p in bm.verts if p[part] == code and p.co.x * side > 0}
 
-        lip = mine(TRUNK_LIP)
-        trunk = lip | mine(TRUNK_FILL)
-        trunk |= {p for p in rings_of(lip, FAIR_BAND) if p[part] == TRUNK}
-        for verts in (trunk, mine(ARM_FILL) | mine(ARM_LIP)):
-            for _ in range(FAIR_SMOOTH):
-                # A Taubin step: a smooth, then a smaller step back out, so that the form does not
-                # shrink.
-                for factor in FAIR_FACTOR:
-                    bmesh.ops.smooth_vert(bm, verts=list(verts), factor=factor, use_axis_x=True,
-                                          use_axis_y=True, use_axis_z=True)
-        moved = [(p.co - start[p]).length for p in bm.verts if p.co.x * side > 0]
-        out[side] = round(max(moved) / s.fr.height, 4)
+def step_round(s):
+    """Rounds the new faces of each arm: each inner vertex moves out from the arm line by the share
+    `ROUND` of the way to the mean distance of the arm lip from the arm line. The flat inner side
+    of the arm then lies near the rings of the tube of `arm_rebuild.py`, so that its Shrinkwrap
+    puts the tube on the arm and not on the side wall. Gives the largest move of each side in
+    units."""
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    part = bm.verts.layers.int['panda_part']
+    out = {}
+    for side in (1, -1):
+        line = turned_line(s, side)
+
+        def foot(co):
+            best = None
+            for a, b in zip(line, line[1:]):
+                ab = b - a
+                t = max(0.0, min(1.0, (co - a).dot(ab) / ab.length_squared))
+                q = a + ab * t
+                if best is None or (co - q).length < (co - best).length:
+                    best = q
+            return best
+
+        lip = [p for p in bm.verts if p[part] == ARM_LIP and p.co.x * side > 0]
+        radius = sum((p.co - foot(p.co)).length for p in lip) / len(lip)
+        most = 0.0
+        for p in [q for q in bm.verts if q[part] == ARM_FILL and q.co.x * side > 0]:
+            q = foot(p.co)
+            d = (p.co - q).length
+            target = q + (p.co - q).normalized() * (d + (radius - d) * ROUND)
+            if d < radius:
+                most = max(most, (target - p.co).length)
+                p.co = target
+        out[side] = round(most / s.fr.height, 4)
+    bm.normal_update()
+    bm.to_mesh(s.mesh.data)
+    bm.free()
+    return out
+
+
+def step_pocket(s):
+    """Smooths the pockets of the trunk that the arm hid: each sharp edge of the trunk (a turn of at
+    least `POCKET['angle']` degrees) within `POCKET['reach']` units of the trunk lip, with its
+    vertices and one ring around them, and the trunk within `POCKET['ball']` units of the lowest
+    point of the lip, take `POCKET['rounds']` Taubin rounds of Smooth Vertices.
+    The armpit line stays. Gives the count of the sharp edges and the largest move of each side in
+    units."""
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    bm.normal_update()
+    part = bm.verts.layers.int['panda_part']
+    trunk = (TRUNK, TRUNK_LIP, TRUNK_FILL)
+    out = {}
+    for side in (1, -1):
+        lip = [p.co.copy() for p in bm.verts if p[part] == TRUNK_LIP and p.co.x * side > 0]
+        reach = s.units(POCKET['reach'])
+        sharp = []
+        for x in bm.edges:
+            if len(x.link_faces) != 2 or x.verts[0].co.x * side <= 0:
+                continue
+            if any(q[part] not in trunk for f in x.link_faces for q in f.verts):
+                continue
+            a, b = x.link_faces
+            if math.degrees(a.normal.angle(b.normal, 0.0)) < POCKET['angle']:
+                continue
+            mid = (x.verts[0].co + x.verts[1].co) / 2
+            if min((mid - q).length for q in lip) < reach:
+                sharp.append(x)
+        verts = {p for x in sharp for p in x.verts}
+        verts |= {q for p in verts for x in p.link_edges for q in [x.other_vert(p)]}
+        # The pocket where the forearm touched the belly: the vertices near the lowest point of the
+        # trunk lip.
+        low = min((p for p in bm.verts if p[part] == TRUNK_LIP and p.co.x * side > 0),
+                  key=lambda p: p.co.z)
+        verts |= {p for p in bm.verts if (p.co - low.co).length < s.units(POCKET['ball'])}
+        verts = [p for p in verts if p[part] in trunk]
+        start = {p: p.co.copy() for p in verts}
+        for _ in range(POCKET['rounds']):
+            for factor in (0.5, -0.53):
+                bmesh.ops.smooth_vert(bm, verts=verts, factor=factor, use_axis_x=True,
+                                      use_axis_y=True, use_axis_z=True)
+        most = max(((p.co - start[p]).length for p in verts), default=0.0)
+        out[side] = (len(sharp), round(most / s.fr.height, 4))
+    bm.normal_update()
+    bm.to_mesh(s.mesh.data)
+    bm.free()
+    return out
+
+
+def seam_plane(bm, side):
+    """Gives the plane of the side wall of one side (a point and the unit normal toward the arm):
+    the plane through the armpit line and the lowest vertex of the trunk lip."""
+    part = bm.verts.layers.int['panda_part']
+    ends = [p for p in bm.verts if p[part] == APEX and p.co.x * side > 0]
+    lip = [p for p in bm.verts if p[part] == TRUNK_LIP and p.co.x * side > 0]
+    mid = (ends[0].co + ends[1].co) / 2
+    low = min(lip, key=lambda p: p.co.z)
+    normal = (ends[0].co - ends[1].co).cross(low.co - mid).normalized()
+    if normal.x * side < 0:
+        normal = -normal
+    return mid, normal
+
+
+def wall_loop(bm, side):
+    """Gives the boundary loop of the trunk hole of one side in order: the trunk lip and the armpit
+    line."""
+    part = bm.verts.layers.int['panda_part']
+    edges = [x for x in bm.edges if x.is_boundary and x.verts[0].co.x * side > 0]
+    links = {}
+    for x in edges:
+        a, b = x.verts
+        links.setdefault(a, []).append(b)
+        links.setdefault(b, []).append(a)
+    if any(len(q) != 2 for q in links.values()):
+        raise RuntimeError('The hole of the side %d touches itself.' % side)
+    start = next(p for p in links if p[part] == APEX)
+    loop, prev = [start], None
+    for _ in range(len(links)):
+        nxt = next(q for q in links[loop[-1]] if q is not prev)
+        if nxt is start:
+            if len(loop) != len(links):
+                raise RuntimeError('The side %d has more than one hole.' % side)
+            return loop
+        prev = loop[-1]
+        loop.append(nxt)
+    raise RuntimeError('The hole of the side %d does not close.' % side)
+
+
+def step_wall(s):
+    """Closes the trunk of each side with a side wall, as `step_round_wall()` of `cat_arms.py`
+    does for the cat:
+
+    1. Fill: a 2D Delaunay triangulation (`delaunay_2d_cdt()` of Blender) of the hole outline (the
+       trunk lip and the armpit line), projected on the plane of the seam (`seam_plane()`), and of
+       the points of a grid of the side `WALL['grid']` units inside it (`cat_arms.wall_grid()`).
+       The new vertices lie on the plane.
+    2. Smooth along the normal of the plane only, `WALL['rounds']` times with the factor 0.5: the
+       wall, its outline, and `WALL['rings']` rings of trunk vertices within `WALL['reach']` units
+       of the wall move, and the armpit line stays. No vertex goes beyond the plane toward the arm,
+       and a vertex of the wall goes at most `WALL['deep']` units into the trunk.
+    3. Relax the inner vertices of the wall in all axes, `WALL['relax']` Taubin rounds of Smooth
+       Vertices, with the outline fixed, so that the wall meets the trunk with no step.
+
+    Gives for each side the counts of the new faces and of the moving vertices, and the largest
+    move in units."""
+    from mathutils.geometry import delaunay_2d_cdt
+    from mathutils.kdtree import KDTree
+    import numpy as np
+
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    bm.normal_update()
+    part = bm.verts.layers.int['panda_part']
+    fill = bm.faces.layers.int['panda_fill']
+    out = {}
+    for side in (1, -1):
+        plane_co, plane_no = seam_plane(bm, side)
+        plane_co = plane_co - plane_no * s.units(WALL['inset'])
+        # The lips: trunk faces beside the hole that turn away from the arm, near the plane.
+        lips = set()
+        stack = [f for p in bm.verts if p[part] == TRUNK_LIP and p.co.x * side > 0
+                 for f in p.link_faces]
+        while stack:
+            f = stack.pop()
+            if (f in lips or f.normal.dot(plane_no) > WALL['lip']
+                    or min((p.co - plane_co).dot(plane_no) for p in f.verts)
+                    < -s.units(WALL['depth'])
+                    or any(p[part] not in (TRUNK, TRUNK_LIP) for p in f.verts)):
+                continue
+            lips.add(f)
+            stack += [g for x in f.edges for g in x.link_faces if g not in lips]
+        for f in lips:
+            for p in f.verts:
+                p[part] = TRUNK_LIP
+        bmesh.ops.delete(bm, geom=list(lips), context='FACES')
+        loose = [p for p in bm.verts if not p.link_faces and p[part] == TRUNK_LIP]
+        bmesh.ops.delete(bm, geom=loose, context='VERTS')
+        loop = wall_loop(bm, side)
+        up = plane_no.cross(Vector((0.0, -1.0, 0.0))).normalized()
+        if up.z < 0:
+            up = -up
+        across = up.cross(plane_no).normalized()
+        outline = [((p.co - plane_co).dot(across), (p.co - plane_co).dot(up)) for p in loop]
+        points = ar.ca.wall_grid(outline, s.units(WALL['grid']))
+        n = len(outline)
+        coords, _, tris, origins, _, _ = delaunay_2d_cdt(
+            [Vector(c) for c in outline + points], [(k, (k + 1) % n) for k in range(n)],
+            [list(range(n))], 1, 1e-9)
+        if any(len(origin) > 1 for origin in origins) or len(coords) != n + len(points):
+            raise RuntimeError('The outline of the wall crosses itself in the plane of the seam.')
+        verts = {}
+        for k, origin in enumerate(origins):
+            if origin and origin[0] < n:
+                verts[k] = loop[origin[0]]
+            else:
+                p = bm.verts.new(plane_co + across * coords[k][0] + up * coords[k][1])
+                p[part] = TRUNK_FILL
+                verts[k] = p
+        faces = []
+        for tri in tris:
+            f = bm.faces.new([verts[k] for k in tri])
+            f[fill] = TRUNK_FILL
+            f.smooth = True
+            faces.append(f)
+        orient(bm, faces)
+        moving = {p for f in faces for p in f.verts if p[part] in (TRUNK_FILL, TRUNK_LIP)}
+        tree = KDTree(len(moving))
+        for k, p in enumerate(moving):
+            tree.insert(p.co, k)
+        tree.balance()
+        ring = set(moving)
+        for _ in range(WALL['rings']):
+            ring = {q for p in ring for x in p.link_edges for q in [x.other_vert(p)]
+                    if q[part] == TRUNK and q not in moving
+                    and tree.find(q.co)[2] < s.units(WALL['reach'])}
+            moving |= ring
+        moving = sorted(moving, key=lambda p: p.index)
+        normal = np.array(plane_no[:])
+        start = np.array([p.co[:] for p in moving])
+        depth = (start - np.array(plane_co[:])) @ normal
+        wall = np.array([p[part] == TRUNK_FILL for p in moving])
+        lift = np.zeros(len(moving))
+        for _ in range(WALL['rounds']):
+            for p, co in zip(moving, start + np.outer(lift, normal)):
+                p.co = Vector(co)
+            mean = np.array([sum((x.other_vert(p).co for x in p.link_edges), Vector())
+                             / len(p.link_edges) for p in moving])
+            lift += 0.5 * ((mean - start) @ normal - lift)
+            lift = np.where(wall, np.maximum(lift, -s.units(WALL['deep']) - depth), lift)
+            lift = np.where(wall, np.minimum(lift, -depth), lift)
+        for p, co in zip(moving, start + np.outer(lift, normal)):
+            p.co = Vector(co)
+        # 3. Relax the wall in all axes with Taubin rounds, with its outline fixed, so that the
+        # wall meets the trunk at its outline with no step.
+        inner = [p for p in moving if p[part] == TRUNK_FILL]
+        for _ in range(WALL['relax']):
+            for factor in (0.5, -0.53):
+                bmesh.ops.smooth_vert(bm, verts=inner, factor=factor, use_axis_x=True,
+                                      use_axis_y=True, use_axis_z=True)
+        out[side] = (len(lips), len(faces), len(moving),
+                     round(float(np.abs(lift).max() / s.fr.height), 4))
     bm.normal_update()
     bm.to_mesh(s.mesh.data)
     bm.free()
@@ -443,7 +740,8 @@ def step_fair(s):
 
 
 #: The steps of the edit, in order.
-STEPS = (step_rip, step_turn, step_fill, step_fair, step_color)
+STEPS = (step_rip, step_turn, step_fill, step_wall, step_pocket, step_fair, step_round,
+         step_color)
 
 
 def main():
