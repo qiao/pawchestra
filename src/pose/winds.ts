@@ -801,8 +801,11 @@ const BEAVER_SHOULDER_TURN = {
    * faces at the front of the left shoulder fold in each play sample.
    */
   left: 20,
-  /** The right shoulder. */
-  right: 15,
+  /**
+   * The right shoulder. With 15°, the round free right upper arm goes 1.1 cm into the belly in
+   * the play, against 0.5 cm with 20°.
+   */
+  right: 20,
 } as const;
 
 /**
@@ -851,14 +854,17 @@ const BEAVER_REST = holdTurn(0, 0);
  * (`SpeciesParams.bassoonScale`), and each shoulder bone turns forward
  * ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a real player slides forward when the
  * arm reaches forward: with square shoulders, the right paw reaches its grip with 3 cm to spare
- * only on a bassoon of 0.75. The right elbow points down, out, and forward, which gives the
- * smallest arm turns of 3 elbow directions. The left elbow points down, out, and a little back,
- * in the play and at rest. The beaver has no arm segments, so the twist of the left paw on the
- * side grips goes into two links of the forearm: 55.4° for each link, against 64.6° with the
- * elbow down, out, and forward. With the elbow of the shared bassoon rest straight out to the
- * side, the left paw turns 178° on its forearm at rest, so the lift and the lowering turn it
- * through 180° and the twist bone of the forearm jumps. With one left elbow in the play and at
- * rest, the lift does not turn the paw through 180°.
+ * only on a bassoon of 0.75. The arms are round tubes free of the trunk, as a real bassoonist
+ * keeps the elbows a little away from the body. So each elbow points further out than the elbow
+ * of the old arm that the mesh joined to the trunk: the left elbow out, down, and a little back,
+ * and the right elbow out, down, and forward. At rest, the right elbow points higher, and the left
+ * elbow does not point back. With the old elbows, the left upper arm went 2.8 cm and the right
+ * upper arm 2.5 cm into the belly. With the left elbow further out, the left paw swings more than
+ * 70° on its forearm in the play. With the right elbow higher in the play, the right paw turns
+ * more than 25° from its accepted grip.
+ *
+ * The right fingers curl 120° around the boot joint, against 100° on the left: with 100°, the
+ * right claws go 1.8 cm into the bassoon, against 1.0 cm with 120°.
  */
 const BEAVER_BASSOON = {
   ...WIND_HOLDS.bassoon,
@@ -868,16 +874,17 @@ const BEAVER_BASSOON = {
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
   restShift: [0, -0.05, -0.15],
-  poleL: [-0.5, -1, 0.2],
-  poleR: [0.5, -1, -0.5],
-  restPoleL: [-0.5, -1, 0.2],
+  poleL: [-0.75, -1, 0.1],
+  poleR: [1, -1, -0.5],
+  restPoleL: [-0.75, -1, 0],
+  restPoleR: [1, -0.5, -0.5],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.25, 0.25],
   gripShiftL: [0, 0.1, -0.1],
   gripShiftR: [0.15, 0.2, -0.14],
   restAim: 1,
-  gripCurl: curls(100, 100),
+  gripCurl: curls(100, 120),
 } as const satisfies WindHold;
 
 /** The turns of the horn of the pig around the mouthpiece, relative to the chest (design 5.3). */
