@@ -690,10 +690,11 @@ const PANDA_PLAY_TURN = toQuat(
  * In the rest pose, the trombone stands upright in front of the body, below the mouth, with the
  * slide down and 16° forward of the vertical (`rest`, {@link PANDA_PLAY}), as a seated player holds
  * the slide vertical in front of the knee (`docs/reference/wind-technique.md` 1.7). It moves 0.36 H
- * forward and 0.09 H down from the mouthpiece of the bind (`restShift`), so that the arms rest as
+ * forward and 0.105 H down from the mouthpiece of the bind (`restShift`), so that the arms rest as
  * before the smaller head moved the mouthpiece back. With 0.3 H forward, two faces of the inner
- * right elbow fold at rest, and with 0.12 H down, the right upper arm goes 0.4 cm into the belly
- * (0.1 cm with 0.09 H). Both paws keep the aim and the roll of the play on the instrument
+ * right elbow fold at rest. With 0.12 H down, the paws go 0.4 cm into the trombone at rest (0.2 cm
+ * with 0.105 H), and with 0.09 H down, the left paw leaves its tubes in one more sample of the lift
+ * (`pnpm wind-grip trombonist`). Both paws keep the aim and the roll of the play on the instrument
  * (`restAim`), so that the lift and the lowering turn each hand with the trombone, and the right
  * paw does not turn past 180° on its forearm (move twist at most 93°). With a rest grip of its own
  * on the top of the brace, the right hand turned about 180° from the rest to the play, and each mix
@@ -711,7 +712,7 @@ const PANDA_TROMBONE = {
   reachL: PANDA_PLAY.shoulderL * MathUtils.DEG2RAD,
   play: PANDA_PLAY_TURN,
   rest: holdTurn(-PANDA_PLAY.restDown, 0),
-  restShift: [0, -0.09, -0.36],
+  restShift: [0, -0.105, -0.36],
   poleL: [-0.6, -0.4, -0.7],
   poleR: [0.8, -1, -0.25],
   restPoleL: [-1.4, -1, -0.3],
