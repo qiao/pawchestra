@@ -1096,6 +1096,12 @@ def painted_below(verts, weights, heads, rule):
         log(f'painted below {side}: {len(rows)} vertices of the trunk under the armpit give '
             f'{taken.sum():.1f} of arm weight to the trunk, at most '
             f'{taken.sum(axis=1).max() if len(rows) else 0:.2f}')
+    # A vertex with four arm bones gets the trunk bone as a fifth bone. The glTF skin holds four,
+    # so such a vertex keeps its four largest weights. The other vertices stay as they are.
+    over = np.nonzero((w > 1e-4).sum(axis=1) > INFLUENCES)[0]
+    if len(over):
+        w[over] = limit(w[over])
+        log(f'painted below: {len(over)} vertices with a fifth bone keep the four largest weights')
     return w
 
 
