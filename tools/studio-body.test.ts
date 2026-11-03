@@ -9,7 +9,7 @@ import type { RequiredStudioBone, StudioBody } from '../src/models/studio-format
 import type { Vec3 } from '../src/models/tuples.ts';
 import { PIANO_BENCH } from '../src/models/instruments/piano.ts';
 import { CHAIR, CHAIR_LEG } from '../src/models/props.ts';
-import type { AnimalSettings, Glb } from './studio-body.ts';
+import type { AnimalSettings, Glb, SeatExtras } from './studio-body.ts';
 import {
   ANIMALS,
   eyeOnHead,
@@ -211,7 +211,7 @@ describe('pnpm studio-body (design 4.4)', async () => {
 
 describe('pnpm studio-body with four digits on each paw (design 4.4)', async () => {
   const source = 'lowpoly-studio/animals/polar-bear/out/polar-bear.glb';
-  const bytes = await readFile(join(import.meta.dirname, '..', source));
+  const bytes = withSeat(await readFile(join(import.meta.dirname, '..', source)));
   const settings = ANIMALS.get('polar-bear');
   if (!settings) {
     throw new Error('The polar bear has no settings.');
@@ -253,7 +253,7 @@ describe('pnpm studio-body with four digits on each paw (design 4.4)', async () 
 
 describe('pnpm studio-body with a seated body (design 4.4)', async () => {
   const source = 'lowpoly-studio/animals/polar-bear/out/polar-bear.glb';
-  const bytes = await readFile(join(import.meta.dirname, '..', source));
+  const bytes = withSeat(await readFile(join(import.meta.dirname, '..', source)));
   const settings = ANIMALS.get('polar-bear');
   if (!settings) {
     throw new Error('The polar bear has no settings.');
@@ -307,8 +307,12 @@ describe('pnpm studio-body with a seated body (design 4.4)', async () => {
 });
 
 describe('pnpm studio-body --inspect (design 4.4)', async () => {
-  const read = async (animal: string): Promise<Buffer> =>
-    readFile(join(import.meta.dirname, '..', `lowpoly-studio/animals/${animal}/out/${animal}.glb`));
+  const read = async (animal: string): Promise<Uint8Array> =>
+    withSeat(
+      await readFile(
+        join(import.meta.dirname, '..', `lowpoly-studio/animals/${animal}/out/${animal}.glb`),
+      ),
+    );
   const bear = inspectStudioGlb(await read('bear'), ANIMALS.get('bear') ?? null);
   const polar = inspectStudioGlb(await read('polar-bear'), ANIMALS.get('polar-bear') ?? null);
   const bearText = inspectionLines(bear).join('\n');
@@ -472,7 +476,7 @@ function onFloor(settings: AnimalSettings): AnimalSettings {
 
 describe('pnpm studio-body with a seated body that also stands (design 4.4)', async () => {
   const source = 'lowpoly-studio/animals/rabbit/out/rabbit.glb';
-  const bytes = await readFile(join(import.meta.dirname, '..', source));
+  const bytes = withSeat(await readFile(join(import.meta.dirname, '..', source)));
   const rabbit = ANIMALS.get('rabbit');
   if (!rabbit) {
     throw new Error('The rabbit has no settings.');
@@ -540,8 +544,10 @@ describe('pnpm studio-body with a seated body that also stands (design 4.4)', as
   });
 
   it('gives no standing pose to a body that keeps the stance of its role', async () => {
-    const polar = await readFile(
-      join(import.meta.dirname, '..', 'lowpoly-studio/animals/polar-bear/out/polar-bear.glb'),
+    const polar = withSeat(
+      await readFile(
+        join(import.meta.dirname, '..', 'lowpoly-studio/animals/polar-bear/out/polar-bear.glb'),
+      ),
     );
     const polarSettings = ANIMALS.get('polar-bear');
     if (!polarSettings) {
@@ -776,6 +782,8 @@ interface RigExtras {
     readonly turn: readonly number[];
     readonly fade: readonly number[];
   };
+  /** The seat of the rig. */
+  readonly seat?: SeatExtras;
 }
 
 /** The parts of the JSON chunk of a GLB file that the tests change. */
@@ -828,6 +836,28 @@ function withJson(bytes: Uint8Array, edit: (json: GlbJson) => void): Uint8Array 
 function withExtras(bytes: Uint8Array, extras: RigExtras): Uint8Array {
   return withJson(bytes, (json) => {
     json.asset.extras = extras;
+  });
+}
+
+/**
+ * Writes a GLB file of the low-poly studio again with the seat of a rig of `pnpm rig-mesh` in the
+ * extras of its asset: the box of its prop `bench` or `chair`, because the export reads the seat
+ * only from the extras. A file with no such prop, such as the file of a standing body, stays.
+ *
+ * @param bytes The GLB file of the low-poly studio.
+ * @returns The new file.
+ */
+function withSeat(bytes: Uint8Array): Uint8Array {
+  const prop = inspectStudioGlb(bytes, null).props.find(
+    (p) => p.name === 'bench' || p.name === 'chair',
+  );
+  if (!prop) {
+    return bytes;
+  }
+  const { min, max } = prop.box;
+  const seat = { prop: prop.name, top: max[1], front: max[2], back: min[2], halfWidth: max[0] };
+  return withJson(bytes, (json) => {
+    json.asset.extras = { ...json.asset.extras, seat };
   });
 }
 
