@@ -112,22 +112,10 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda arm rebuild (4.4): `tools/blender/panda_edit.py` frees each arm in a copy, with a
-      side wall as `cat_arms.py` makes. `pnpm mesh-intake` passes the pose (31.2°), the arm free
-      (0.25 and 0.15), and the gap (0.28 and 0.38 radii), and `arm_rebuild.py --factor 1.497`
-      rebuilds the copy. With the role-neutral bind (L 103, R 54), the trombonist gate passes
-      (folds p95 L 2, R 2), but `pnpm pose-depth trombonist` puts the upper arms 6.3 cm to 7.9 cm
-      into the body (0.0 on `main`), in each sample. The deep corners lie on the inner side of
-      the upper arm at 0.33 to 0.41 and at 0.67 to 0.74 of its length, 8 cm to 12 cm from the
-      bone, so the free round arm is inside the trunk in the poses of the trombone. The fused arm
-      of `panda.glb` hid this overlap. The 2x crops from 40° show white wall faces through the
-      arm. The mouse oboist (0.6 cm) and the monkey trumpeter (no depth) have the same body
-      surface with caps at the arm cuts, so the depth is no fault of the sweep. The body stays
-      (`reports/2026-11-02-panda-edit/`). Next: elbows further out in the trombone hold, or a
-      thinner inner upper arm in the copy.
-- [ ] Panda: try `weights.armCrease` on each arm that is one solid with the trunk.
-- [ ] Panda: a small gray dent shows below each arm from the left side. Move the body run of the cut
-      (vertices 787, 793, and 800, `tools/arm-roots/panda.json`).
+- [ ] Panda: with the elbows out, thin dark slits show at the top of the side wall under each arm,
+      and the black fur edge at each armpit is jagged, in the 2x crops at rest and in the lift
+      (`reports/2026-11-02-panda-hold/crops-rest-el20.png`). The side wall of `panda_edit.py`
+      meets the trunk there. Fix the form in the copy, then rebuild the arms.
 - [ ] Panda face: the round patches have angular edges, and they are smaller than in the reference.
       Ask the user if a smoother oval is worth a vertex move.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
