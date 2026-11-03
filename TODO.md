@@ -209,10 +209,12 @@ passes.
       than on the A-pose body.
 - [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
       reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
-- [ ] Cat T-pose body: the brow above each eye shows dark facets that read a little worried
-      (`reports/2026-11-03-cat-look/final/face.png`). The `soften` rule of the wolf moves source
-      points, and the painted weights then find no vertex. Soften the brow in `cat-arms.glb`
-      before the weights, or add a soften step after the painted weights.
+- [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
+      play, 5.8 cm with the trunk of the mesh. The cuts are shares of the line from the hips joint
+      to the neck joint, so with the shorter trunk the cut 0.9 lies higher on the body, at the arm
+      root. On the same part of the body (`--from 0.083 --to 0.86`), the gap is 5.85 cm. Let
+      `trunk-form` place its cuts by the place on the source body, so that a trunk factor does not
+      move them.
 - [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
       shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
       smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.
