@@ -46,6 +46,8 @@
   "armFactorNote": "The arms keep the length of the mesh (arm_rebuild.py with no --factor). The left paw reaches the nut of the viola of violaScale with 9.5 cm to spare (pnpm hold-reach cat --instrument viola), so the arms need no stretch.",
   "legFactor": 2.15,
   "legFactorNote": "The thigh and the shin are 2.15 times as long as on the mesh, and the feet keep their size, as on the cat of the A-pose mesh (1.94). The cat then sits on the chair of that cat: the seat top is 0.2995 m high (0.298 m on the old cat, 0.136 m with the legs of the mesh). The body rises 0.161 u, so the standing shoulder joints of ANIMALS rise with it and the trunk, the head, and the arms keep their meters.",
+  "headFactor": 0.85,
+  "headFactorNote": "The head and the ears are 0.85 times as large as on the mesh, around the neck joint, so that the head is as wide for its height H as the head of the cat of the A-pose mesh (1.29 H, old 1.27 H, 1.52 H with the factor 1) and the pea eyes are as far apart (0.57 H). The export keeps the head before the factor for the holds (ungrown() of tools/studio-body.ts).",
   "joints": {
     "root": {
       "head": [
