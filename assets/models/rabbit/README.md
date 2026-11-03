@@ -31,8 +31,10 @@ src/models/studio/rabbit.ts               studio body of the app
 
 ## rabbit-tpose.glb
 
-The T-pose mesh replaces `rabbit-apose.glb` as the source when its rig passes the arm gate. The
-mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
+The T-pose mesh replaces `rabbit-apose.glb` as the source when its rig passes the arm gate and
+the clearance sweep. A first rig with arms 1.18 times longer passed the arm gate, and its upper arms
+went up to 3.9 cm into the body in the lowering (`TODO.md`). The mesh has no skeleton. The arms
+stand out level to the sides, free of the trunk.
 
 | Item | Value |
 |---|---|
