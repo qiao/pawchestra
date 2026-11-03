@@ -29,7 +29,7 @@ arm tubes, Blender weights, and arm segments (see "The rebuild of the arms in Bl
 | pig | A copy with round upper arms free of the trunk (`pig-arms.glb`), a twist bone of each upper arm (`upperTwist`), a horn turned back toward the body. | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`), the role-neutral bind. The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
-| monkey | Longer arms, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
+| monkey | Longer rebuilt arms (`arm_rebuild.py --factor 1.2`), the role-neutral bind, a long tail curled on the floor, a smaller trumpet, no chair. Stands with its feet under its hips and its trunk leaned forward. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), the role-neutral bind with elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), the role-neutral bind with a right elbow `raise`, antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
 | penguin | The flippers as arms, a split beak with a jaw bone (`penguin-beak.glb`), faces cut along the black and white edge (`penguin-edge.glb`), a larger crease angle and a color blend. Stands on its riser with the folder. | `singer` |
