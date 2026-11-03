@@ -1,6 +1,6 @@
 {
   "source": "assets/models/hippo/hippo-arms.glb",
-  "sourceNote": "A copy of the T-pose mesh assets/models/hippo/hippo-tpose.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, at the length of the mesh. tools/blender/arm_rebuild.py makes these faces. The other faces and hippo-tpose.glb stay unchanged.",
+  "sourceNote": "A copy of the T-pose mesh assets/models/hippo/hippo-tpose.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, at the length of the mesh. tools/blender/arm_rebuild.py makes these faces, with the wrist cut at 0.2 of the paw (--spec, assets/models/hippo/README.md). The other faces and hippo-tpose.glb stay unchanged.",
   "paintedWeights": "assets/models/hippo/hippo-weights.json",
   "paintedLower": [
     "root",
@@ -467,24 +467,7 @@
       ],
       "note": "The texture has a pinker fur than SPECIES_COLORS.hippo. Each plain face takes the hue and the chroma of the species color of its band (the accent, the fur, and the belly) and keeps its lightness: a row is [L, dL, da, db] in Oklab, from the mean Oklab color of the faces of the mesh in each band. The claws keep their colors."
     },
-    "note": "The values of samples, palette, dark, and eyeShare are the values of the other meshes. A dark face in the eye box is an eye face. The config has no nose box, because the hippo has no nose pad: the export takes the front of the muzzle as the nose tip.",
-    "border": {
-      "box": [
-        [
-          -0.56,
-          0.55,
-          -0.15
-        ],
-        [
-          0.56,
-          0.7,
-          0.12
-        ]
-      ],
-      "share": 1.01,
-      "dark": 0.3,
-      "note": "In the box of the arm roots and the wrists, each fur face darker than the Oklab lightness 0.3 takes the color of the nearest light fur face. The rebuilt right wrist has a dark recess above the claws that the bend of the bow paw shows as a black wedge. No other dark face lies in the box."
-    }
+    "note": "The values of samples, palette, dark, and eyeShare are the values of the other meshes. A dark face in the eye box is an eye face. The config has no nose box, because the hippo has no nose pad: the export takes the front of the muzzle as the nose tip."
   },
   "eyeShell": {
     "lift": 0.002,
