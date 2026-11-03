@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_MANNEQUIN = {
   source: 'assets/models/mannequin/mannequin.rig.glb',
-  sha256: '6a4ee201951f4a56b903ec919f400a744ad9f0629b90c292b9ec5205c9fb657c',
+  sha256: 'f47a3b993f55f2155853b86fd0b765243331e8e3f3cd0d480aed64d8a00eaa7f',
   scale: 1.595529,
   heads: {
     root: [0, -0.116236, -0.023374],

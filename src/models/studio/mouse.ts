@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_MOUSE = {
   source: 'assets/models/mouse/mouse.rig.glb',
-  sha256: 'fff1850989e267d4df80bee0834177febb34b5c8bdcccbd96427e6a72f47524a',
+  sha256: '2de3ca18ed1ef9c9a1cfec45463d7c03c61f6969808f41baa7483e1a82bff61f',
   scale: 0.856046,
   heads: {
     root: [0, -0.025942, 0.062986],

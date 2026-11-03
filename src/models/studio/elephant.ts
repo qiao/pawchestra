@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_ELEPHANT = {
   source: 'assets/models/elephant/elephant.rig.glb',
-  sha256: 'be29ce8bbe689b9481ca2f204fc26220816898f2d6be8f511e8310686be25aae',
+  sha256: 'd248d687b1ba860d14f45f5f94a8edd310683d79daee77d48d35bf111a15c995',
   scale: 1.92,
   heads: {
     root: [0, -0.059192, -0.4336],

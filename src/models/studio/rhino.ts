@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_RHINO = {
   source: 'assets/models/rhino/rhino.rig.glb',
-  sha256: '61ef94f04de9c3b9ad305603ff7f8dc876b80255bb3c143e180ad590d52dfc59',
+  sha256: '55890747c98b59e5f9d913df608e049fd4e5d83e60cab8306453950797d58a2b',
   scale: 1.533119,
   heads: {
     root: [0, -0.067686, -0.202506],

@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_DOG = {
   source: 'assets/models/dog/dog.rig.glb',
-  sha256: '0d0cfad6f39825bb0e7834df15d322caa4d0700b0647465ead5536e6329d38cb',
+  sha256: 'e043508fbc89e608fbeb369e518e51676f4a84a7f1a76b8276836f6d738b4e19',
   scale: 1.433782,
   heads: {
     root: [0, -0.116159, 0.010007],

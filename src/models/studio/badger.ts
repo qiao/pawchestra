@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_BADGER = {
   source: 'assets/models/badger/badger.rig.glb',
-  sha256: '47607bddaf4c559308d99494d23c437e2043aa2ee4f86298d0737be85100b00d',
+  sha256: 'dc1251e3e71f84e4e39cc5e928e18813823701a5cdcb19b1a0f94525277a5f21',
   scale: 1.038,
   heads: {
     root: [0, -0.03927, -0.139086],

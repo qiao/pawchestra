@@ -67,8 +67,8 @@ shasum -a 256 assets/models/rhino/*.glb assets/models/rhino/rhino-tpose-weights.
 
 | Item | Value |
 |---|---|
-| Size | 744,780 bytes |
-| SHA-256 | `61ef94f04de9c3b9ad305603ff7f8dc876b80255bb3c143e180ad590d52dfc59` |
+| Size | 742,196 bytes |
+| SHA-256 | `55890747c98b59e5f9d913df608e049fd4e5d83e60cab8306453950797d58a2b` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bind with the elbows bent forward (`studio.bindArms`). The left bind paw is supinated by the rule of the cast matrix and the tuba. The right bind paw keeps no supination, because the value of the rule takes the right forearm deeper into the tuba (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow of the tuba hold |
 

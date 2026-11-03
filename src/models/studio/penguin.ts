@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_PENGUIN = {
   source: 'assets/models/penguin/penguin.rig.glb',
-  sha256: '34fa8f6cf8e48be59520b3ddd5226b242495b11dc3d99124043493359e33e312',
+  sha256: '42adc1cd41fc2749e6a0cc095cc9b719d53f9ac4a6df711756e5ac669d016a7c',
   scale: 1.043,
   heads: {
     root: [0, 0, -0.081883],

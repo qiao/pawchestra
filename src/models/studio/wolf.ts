@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_WOLF = {
   source: 'assets/models/wolf/wolf.rig.glb',
-  sha256: 'd42c5793cd52c91b8ac800df8f2ffef2b1739879473c1437ed49aba54ac28f96',
+  sha256: 'a9cd380d98bd0134c74066c54e8f00bb5b02210aa095e39c490182d4d56facb0',
   scale: 1.865895,
   heads: {
     root: [0, -0.104188, -0.011085],

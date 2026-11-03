@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_DEER = {
   source: 'assets/models/deer/deer.rig.glb',
-  sha256: 'f614c227eab44495a0cabc3cc3c9a1ac9a7e0c3d50729af3a0786960cdf7d228',
+  sha256: '3e80455fa7353c66ed9f7fcf79e2b72637f73a4b69290325ff80437b054f0120',
   scale: 1.676873,
   heads: {
     root: [0, -0.080517, -0.008768],

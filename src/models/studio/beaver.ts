@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_BEAVER = {
   source: 'assets/models/beaver/beaver.rig.glb',
-  sha256: 'c3d495bb8046cf7c4f6f460dcf6512f81297b1b7d7bcc6407eab14335e969c26',
+  sha256: 'e5e6d686a88c628cfa0e28fe5c744d1c066c6f031117cd8ccef8082798f0de67',
   scale: 1.029,
   heads: {
     root: [0, -0.0161, 0.020232],

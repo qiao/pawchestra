@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_PANDA = {
   source: 'assets/models/panda/panda.rig.glb',
-  sha256: '3c47fa70b62b22497c3fe2d12e978f51b435203b1058a34b32b100b8f63736d2',
+  sha256: 'bc234b23bde15a85a10a944987fe7f6939fb2db56cf53256590d111001967609',
   scale: 1.515445,
   heads: {
     root: [0, -0.055342, -0.16401],

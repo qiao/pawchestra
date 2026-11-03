@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_BEAR = {
   source: 'assets/models/bear/bear-tpose.rig.glb',
-  sha256: '4ae7462bd5d8be4234e0c2e03864506d1ff0c37ce25c54c3778d48dd2e3e416c',
+  sha256: '73af414fe49f7760d25843c10bb5db62037d40843a9a8ee2fff7c017d4fd5b56',
   scale: 1.52207,
   heads: {
     root: [0, 0, 0],

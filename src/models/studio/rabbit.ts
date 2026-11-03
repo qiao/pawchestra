@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_RABBIT = {
   source: 'assets/models/rabbit/rabbit-apose.rig.glb',
-  sha256: '800fa2b41324ec82c5e933d664441e58c54537a1facfb24290cef8824c8a5ac3',
+  sha256: 'cfc3fe4485e0917e049bad6024de04d73d5bf6e2e8a76d48c7b1047d17fe6785',
   scale: 1.483132,
   heads: {
     root: [0, -0.060221, -0.094446],

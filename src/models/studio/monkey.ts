@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_MONKEY = {
   source: 'assets/models/monkey/monkey.rig.glb',
-  sha256: '7aa225765c8968d89ab658c15ed17857d3833f613b9b7de3af52445f14ea00d6',
+  sha256: '3db5856f87492d2d339e6aa7b554ce29c3220ec517e49ea138c63268e203afc3',
   scale: 1.1726,
   heads: {
     root: [0, -0.004906, 0.044696],

@@ -82,8 +82,8 @@ shasum -a 256 assets/models/bear/*.glb assets/models/bear/bear-weights.json
 
 | Item | Value |
 |---|---|
-| Size | 620,984 bytes |
-| SHA-256 | `4ae7462bd5d8be4234e0c2e03864506d1ff0c37ce25c54c3778d48dd2e3e416c` |
+| Size | 618,400 bytes |
+| SHA-256 | `73af414fe49f7760d25843c10bb5db62037d40843a9a8ee2fff7c017d4fd5b56` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config): the elbow and the wrist keep the angles of the source. The right bind paw is supinated by the rule of the cast matrix. The left bind paw takes a smaller supination, because the value of the rule dents the left forearm of the conductor (`studio.bindSupination`). The skin of each forearm and wrist takes the skin normals (`rootNormals.wrist`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow |
 

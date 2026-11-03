@@ -71,8 +71,8 @@ front of each arm root.
 
 | Item | Value |
 |---|---|
-| Size | 806,716 bytes |
-| SHA-256 | `800fa2b41324ec82c5e933d664441e58c54537a1facfb24290cef8824c8a5ac3` |
+| Size | 804,132 bytes |
+| SHA-256 | `cfc3fe4485e0917e049bad6024de04d73d5bf6e2e8a76d48c7b1047d17fe6785` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent left elbow |
 

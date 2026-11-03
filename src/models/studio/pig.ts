@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_PIG = {
   source: 'assets/models/pig/pig.rig.glb',
-  sha256: '6f818a89221e12b8b264b33816f16a8127e8ffe8ccc2b48f407570f2b108dcac',
+  sha256: '5a8d8879755b7a757ab1cf02e1d6a9a5f8c4719e3a851bef39462fa284b76bb2',
   scale: 1.199913,
   heads: {
     root: [0, -0.034394, -0.083009],

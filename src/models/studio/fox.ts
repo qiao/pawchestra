@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_FOX = {
   source: 'assets/models/fox/fox.rig.glb',
-  sha256: '348f3889cf184a4491c155b188f6bc594910bc92b10dc15870c4bd2aeac17f1f',
+  sha256: 'b5fb5f5f0db0b29fdeb6ded164edb46d22a10a26e5abe0030d85e153facc0329',
   scale: 1.5504,
   heads: {
     root: [0, -0.139874, -0.009614],

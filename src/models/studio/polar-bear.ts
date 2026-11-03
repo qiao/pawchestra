@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_POLAR_BEAR = {
   source: 'assets/models/polar-bear/polar-bear-tpose.rig.glb',
-  sha256: '240cba75844173d29f201342e7e84ff2e582315750640a038e86836b9f214962',
+  sha256: '15744c7b9be62b5b9564d7dde67a99a79fab126d75b0b753d9fa7845346db7ac',
   scale: 1.582772,
   heads: {
     root: [0, -0.110338, -0.164804],
