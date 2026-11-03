@@ -28,7 +28,6 @@ src/models/studio/cat.ts           studio body of the app
 | `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
 | `cat.rig.glb` | Output of the rig. License as `cat-tpose.glb` | `pnpm rig-mesh cat` |
-| `cat.glb` | Old source mesh in an A-pose (below). Only the old replay of `tools/blender/cat_arms.py` reads it | None |
 
 ## cat-tpose.glb
 
@@ -95,28 +94,3 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 | Tail | The long tail hangs behind the chair in the seated bind (`studio.tailBind`), and keeps its curl in the standing body |
 
 A run of `pnpm rig-mesh cat` gives the same bytes.
-
-## cat.glb
-
-| Item | Value |
-|---|---|
-| Size | 14,466,300 bytes |
-| SHA-256 | `0ca57eaa7f831ce5f17ff889d46b935e6c21400e69a597347c1381f0305cda9e` |
-| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
-| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Writer | Khronos glTF Blender I/O v4.3.47 |
-| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,121 triangles and 4,148 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
-| Material | One material `BakedMaterial`, double-sided, with a base color texture and a metallic-roughness texture, each a PNG of 4096 × 4096 pixels. The texture is an atlas of an automatic unwrap |
-
-Facts of the mesh:
-
-- A weld at 1e-5 gives 1,563 vertices in one connected part. The mesh has 2 open edges and 6
-  edges with more than two faces. 318 faces have a corner angle below 10°.
-- The box is x -0.491 to 0.490, y -0.952 to 0.952, and z -0.419 to 0.426. Thus the cat is 1.903
-  units high from the soles to the tips of the ears.
-- The cat faces +z, with its left side at +x. These are the axes of the studio.
-- The cat stands in an A-pose: the arms go down and out at about 58° below the horizontal.
-- The eyes are dark faces of the head surface with a few green faces, with no shells. Thin
-  whiskers stand out from the muzzle.
-- The tail hangs down behind the legs, and its end goes back along the floor. The sheet shows a
-  tail that curls up at its end.
