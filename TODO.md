@@ -223,6 +223,15 @@ passes.
       (87°) to 70°.
 - [ ] Rabbit: at rest, a narrow groove runs between the front of each upper arm and the trunk. It is
       the gap of the arm copy. Fill the gap in the copy.
+- [ ] Rabbit T-pose body (`rabbit-tpose.glb`): the first rig passed the arm gate, and failed the
+      clearance sweep. Its arms are rebuilt 1.18 times longer (`arm_rebuild.py --factor 1.18`, the
+      smallest factor at which the left paw reaches the nut of the violin of 0.83), with the bind
+      supination L 90 and R 43 and rigid armpit faces (`rigidPainted`). Against the A-pose body,
+      the right upper arm goes into the belly: 3.0 cm (0.7) at rest, 3.9 cm (1.6) in the lowering,
+      and 2.3 cm (1.5) in the play, and the violin 3.4 cm (1.9) into the body in the lift. The rest
+      arms of the shared violin hold (`restArms`) take the rest to 1.2 cm and the lowering to
+      2.7 cm. Next: keep the elbows out in the play and the moves (design 5.3, "Free round arms"),
+      or slimmer upper arms in the copy. The try files are in `scratch/tpose-body/` of the round.
 - [ ] Rabbit violinist: the bow goes up to 2.5 cm into the arms in the lowering and 1.0 cm at rest,
       near the grip.
 - [ ] Rabbit violinist: the violin points 50° to the left, 5° more than a real player. A bow arm
