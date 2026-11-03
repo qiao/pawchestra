@@ -86,11 +86,12 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 
 | Item | Value |
 |---|---|
-| Size | 819,716 bytes |
-| SHA-256 | `296e30eb44552bbad732943b149b75a811759399f0ba3684d2536fa435e70524` |
+| Size | 819,884 bytes |
+| SHA-256 | `62500536155de8e0318c332ca1c98dc1bddc7d147d345fa19c0058554d7c0c7d` |
+| Form | The thigh 1.6 and the shin 2.4 times as long as on the source, and the thigh 1.25 times as thick (`legFactor`, `shinFactor`, `legGirth`), so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.298 m high, 0.46 m wide, and 0.343 m deep. The head and the ears are 0.85 times as large, around the neck joint (`headFactor`), so that the head is as wide for its height as the head of that cat |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
 | Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes: the bent left elbow at rest (two), the bow arm in the play, and the bent right elbow at rest |
-| Tail | In the seated bind, the long tail lies on the seat behind the haunch and hangs over the left side of the seat (`studio.tailBind`). It keeps its curl, also in the standing body |
+| Tail | In the seated bind, the long tail lies on the seat behind the haunch and hangs over the left side of the seat (`studio.tailBind`). It keeps its curl, also in the standing body. The footprint of the seated cat is 0.650 m deep, 1.2 cm deeper than on the cat of the A-pose mesh |
 
 A run of `pnpm rig-mesh cat` gives the same bytes.
