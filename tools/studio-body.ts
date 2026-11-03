@@ -270,23 +270,27 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat: the T-pose mesh (design 4.4). The standing shoulder joints are at 0.598 u, so
-  // that the head height H stays the H of the cat of the A-pose mesh, 0.339 m (`app` of the rig
-  // config). The haunch of the cat is 0.53 m wide, so it sits on a chair of that width. The tips
-  // of the lower whiskers hang below the chin and follow the head (`noseFront` of the rig config),
-  // so the head measures start at the chin.
+  // The viola cat: the T-pose mesh (design 4.4). The standing shoulder joints are 1.205852 m high
+  // (0.950065 m with the legs of the mesh and the rise of the longer legs), so that the head
+  // height H stays the H of the cat of the A-pose mesh, 0.339 m (`app` of the rig config). The cat
+  // sits on the chair of the cat of the A-pose mesh: 0.46 m wide, and 0.343 m deep with the back
+  // room. The haunch is 0.53 m wide, so it reaches a little past the sides of the seat. The tips of
+  // the lower whiskers hang below the chin and follow the head (`noseFront` of the rig config), so
+  // the head measures start at the chin, 0.856 u high after the rise of the legs and the smaller
+  // head (`headFactor`).
   [
     'cat',
     {
       landmark: 'shoulders',
-      height: 0.950065,
+      height: 1.205852,
       seated: true,
       soloist: true,
-      seatWidth: 0.53,
+      seatWidth: 0.46,
+      backRoom: 0.011,
       constant: 'STUDIO_CAT',
       crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
-      headFloor: 0.7,
+      headFloor: 0.856,
     },
   ],
   // The cello dog (design 4.4).
