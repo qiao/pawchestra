@@ -277,7 +277,7 @@ extras of the asset as numbers ("Seat"), and only the preview images show a chai
 
 | Group | Config keys | Purpose |
 | --- | --- | --- |
-| Form | `armFactor`, `legFactor`, `shinFactor`, `headFactor`, `neckFactor`, `trunkFactor`, `girthFactor`, `legGirth`, `proportions` | Change a part to a product choice or to the sheet. The head can keep its form. A long thigh can keep its width. |
+| Form | `armFactor`, `legFactor`, `shinFactor`, `headFactor`, `neckFactor`, `trunkFactor`, `trunkTop`, `girthFactor`, `legGirth`, `proportions` | Change a part to a product choice or to the sheet. The head can keep its form. A long thigh can keep its width. A trunk can shorten only below the chest joint (`trunkTop`), so that the arm roots keep their form: the shoulders fold when the chest under them shortens. The legs and the tail keep their places. |
 | Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front`, `crease`, `sitPose` | Bind a seated role in its pose of 5.2, with the haunch on the seat, or give a standing bind a sit pose. |
 | Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource`, `weightSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. A planar split of the faces takes the weights of the mesh before it. The trunk under a T-pose arm root keeps a trunk share of the painted weights (`weights.paintedBelow`), so that a raised arm does not pull the side out. |
 | Shapes | `raise` | Give the source back in the standing pose, and relax the faces of a bent arm. |
@@ -400,9 +400,10 @@ each verdict.
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
 - The cat sits on the chair of the cat of its old mesh, as a product choice: the T-pose mesh has
-  short legs and a wide head, which read as a large head on a short body in front of a low chair.
-  So its legs are longer than the legs of the mesh, and its head is smaller
-  (`headFactor`), so that the head has the width of the old head for its height. The shin grows
+  short legs, a long trunk, and a wide head, which read as a large head on a lean body in front of
+  a low chair. So its legs are longer than the legs of the mesh, its trunk is shorter
+  (`trunkFactor`), and its head is smaller (`headFactor`), so that the body has the part ratios
+  of the old cat, and the head has the width of the old head for its height. The shin grows
   more than the thigh (`shinFactor`): a long thigh puts the feet forward, and the deeper footprint
   moves the seats of each demo (4.2).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
