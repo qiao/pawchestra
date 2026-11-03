@@ -270,9 +270,11 @@ The rest of each family:
   sides, as a brass player does (winds 1.8). Each elbow turns out about the line from the shoulder
   joint to the grip, and the shoulder turns forward when the arm reaches forward. A grip nearer to
   the shoulder bends the elbow, so each degree of the turn moves the upper arm further from the
-  trunk. The grip turn of the arm gate counts from the posed forearm, so the turn of the elbow
-  adds to it (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the shoulder. Reason:
-  on a bent arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
+  trunk. When the forearm and not the upper arm lies on the trunk, a nearer grip pushes the
+  forearm in, so the grip moves away from the shoulder (the pig, `gripShiftL`). The grip turn of
+  the arm gate counts from the posed forearm, so the turn of the elbow adds to it
+  (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the shoulder. Reason: on a bent
+  arm, the swivel moves the arm root off the trunk, and each paw keeps its grip.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
