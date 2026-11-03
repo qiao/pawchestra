@@ -574,8 +574,15 @@ scene of each demo has its seats and stage size with no overlap.
       rest grip 0.06 H across its tubes, the arms stay within 1.4 cm and the gate passes, but the
       left paw does not grasp at rest (`pnpm wind-grip` 0%, as on `59ddbdc8`), and the forearms go
       0.5 cm into the trombone (0.1 cm on `dc300792`). A left rest grip that grasps bends the left
-      wrist past 100° (limit 70°). Next: a rest grip of the left paw on the bell brace at the flare
-      (wind-technique 1.7), and a rest aim of each paw (`reports/2026-11-02-panda-rest/`).
+      wrist past 100° (limit 70°). A second round tried the slide 16° from the vertical (0° in the
+      front view), the left paw on the bell tube where the bell starts to flare (wind-technique
+      1.7), the right paw on the top of the brace, and an own rest aim for each paw. At rest, the
+      left paw grasps (100%), and the right paw twists 7°. But the right elbow comes up to the
+      level of the shoulder, the right paw does not grasp (0%), and the left upper arm twists 25°
+      (base 10°). The right hand turns about 180° from the rest to the play. So each mix of the
+      move turns the right paw past 180° on its forearm (move turn up to 18,000°/s). Next: a turn
+      of the right paw on the way that keeps its twist between -180° and 180°, as
+      `studioPawTwist()` does for the carried violin paw (`reports/2026-11-02-panda-rest/round2/`).
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the upper arms go up to 6 cm into the body and 4.7 cm into the contrabass. The
