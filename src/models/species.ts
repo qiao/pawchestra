@@ -134,9 +134,10 @@ export interface SpeciesParams {
    */
   readonly palette?: StudioPalette;
   /**
-   * The seated tail of a studio body: `curl` when it lies curled on the seat
-   * (`studio.tailCurl` of the rig config), so that it does not sway in the idle motion on a seat
-   * (design 5.1). A tail that hangs behind the chair sways when it is not given.
+   * The seated tail of a studio body: `curl` when it lies on the seat (`studio.tailCurl` or
+   * `studio.tailBind` of the rig config), so that it does not sway in the idle motion on a seat
+   * into the haunch or the back posts of the chair (design 5.1). A tail that hangs behind the
+   * chair sways when it is not given.
    */
   readonly seatedTail?: 'curl';
   /**
@@ -341,7 +342,8 @@ export const SPECIES = {
    * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the
    * T-pose mesh `assets/models/cat/cat-tpose.glb`, which `pnpm rig-mesh cat` rigs (design 4.4),
    * with the head height of the cat of the A-pose mesh and the arms and the legs of the mesh. Its
-   * long tail hangs behind the chair, and it stands as a soloist. Its head height is the head of
+   * long tail lies on the seat behind the haunch and hangs over the left side of the seat, and it
+   * stands as a soloist. Its head height is the head of
    * the studio body, and its chair fits its short legs: the seat height is the seat of the studio
    * body, in H. It plays a viola of about 10 inches, with a body of 259 mm, 0.74 of the viola of
    * the app (`violaScale`), so that the long arms keep the bend of a real violist.
@@ -355,6 +357,7 @@ export const SPECIES = {
   cat: {
     body: 'studio-cat',
     colors: SPECIES_COLORS.cat,
+    seatedTail: 'curl',
     violaScale: 0.74,
     bowGrip: { at: [-0.002, 0.007, -0.079], turn: 50 * (Math.PI / 180) },
     headHeight: STUDIO_CAT.headHeight,
