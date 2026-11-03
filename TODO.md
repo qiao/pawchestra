@@ -112,14 +112,11 @@ passes.
       cut. Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda: the black band of the T-pose mesh has a jagged lower edge on the back and the sides,
-      because each large face takes one color. Without the border rule it has fewer white teeth
-      (`reports/2026-11-03-panda-new/border.png`). A cut of the faces along the color edge would
-      give the smooth edge of the source.
-- [ ] Panda face: the head faces of the T-pose mesh are large, so the tilted oval eye patches of
-      the texture give sharp points and two different patches. The patch rule (`colors.patch`)
-      keeps a circle around each eye, and the patches stay angular. Ask the user if a cut of the
-      head faces along the patch edge is worth the work.
+- [ ] Panda: the black band keeps a jagged lower edge on the front and the sides, because each
+      large face takes one color. `panda_edge.py` cuts the faces along the edge only on the back:
+      on the front and the sides, the clavicle weights change fast, and the small new faces turned
+      over in each sample of the trombonist (`pnpm fold-probe trombonist`). A border rule on the
+      front removed the band under the chin. Try a smoother field of the clavicle weights there.
 - [ ] Panda: the legs keep the length of the mesh (`legFactor` 1), so the seat is 0.181 m (0.278 m
       with the leg factor 1.5 of the older body), and the panda sits low. Show the user the side
       view, and ask for the leg factor.
