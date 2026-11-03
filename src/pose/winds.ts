@@ -902,24 +902,35 @@ function pigTurn(turns: HornTurns): Quat {
  * 0.29 m in front of the shoulder joints, so with the hold of {@link WIND_HOLDS} the left grip
  * is 0.507 m from the left shoulder joint, beyond the arm of 0.385 m. The horn turns its lower end
  * 40° back toward the body and its right side 20° forward ({@link PIG_TURNS}). The left shoulder
- * turns 26° forward, as the shoulder blade of a real player slides forward. The left paw then has
- * 8.0 cm to spare, and the right paw 7.4 cm (`pnpm hold-reach pig --instrument horn`).
+ * turns 36° forward, as the shoulder blade of a real player slides forward. The left paw then has
+ * 10.6 cm to spare, and the right paw 7.4 cm (`pnpm hold-reach pig --instrument horn`).
  *
- * The left elbow points out, forward, and a little down, and the right elbow out and down. Of the
- * left elbow directions, (-0.5, -1, -0.5) turns the arm least, but puts the left forearm 6 cm into
- * the chest. At rest, the horn comes down 0.2 H and 0.2 H forward onto the round belly, which
- * covers the short thighs, with the bell at the right of the belly beside the right haunch. A lower
- * rest puts the right forearm 2.3 cm to 5.4 cm into the belly.
+ * The left elbow points out and a little forward, and the right elbow out and down. The arms of
+ * the body are round tubes free of the trunk, so the left elbow stays away from the side, as a horn
+ * player keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The left
+ * elbow turns out about the line from the shoulder joint to the valves, from (-1, -0.5, -1) to
+ * (-1, 0.05, -0.5), and the left shoulder turns 36° forward in place of 26°: with the old elbow,
+ * the left forearm went 2.7 cm and the left upper arm 2.7 cm into the belly. The rest elbow points
+ * a little higher, (-1, 0.2, -0.7), because the left upper arm then lies on the side of the chest
+ * (1.9 cm into it with the elbow of the play). The grip turn of the arm gate counts from the posed
+ * forearm, and the two turns move it in opposite directions: the shoulder alone at 40° turns the
+ * left grip 19°, the elbow alone 21°, and both 5°. On the rig with the raise shapes of the old
+ * hold, a forward turn of the shoulder of 40° or more folds 7 to 9 faces of the left arm, so the
+ * shoulder turns 36°.
+ *
+ * At rest, the horn comes down 0.2 H and 0.2 H forward onto the round belly, which covers the short
+ * thighs, with the bell at the right of the belly beside the right haunch. A lower rest puts the
+ * right forearm 2.3 cm to 5.4 cm into the belly.
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
-  reachL: 26 * MathUtils.DEG2RAD,
+  reachL: 36 * MathUtils.DEG2RAD,
   play: pigTurn(PIG_TURNS.play),
-  poleL: [-1, -0.5, -1],
+  poleL: [-1, 0.05, -0.5],
   poleR: [1, -1, 0],
   rest: pigTurn(PIG_TURNS.rest),
   restShift: [0.05, -0.2, -0.2],
-  restPoleL: [-1, -0.5, -1],
+  restPoleL: [-1, 0.2, -0.7],
   restPoleR: [1, -0.3, 0.3],
 } as const satisfies WindHold;
 

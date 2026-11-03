@@ -434,6 +434,10 @@ The app follows these facts:
   (`fingering`). The horn lies across the body, with the bell at the right of the torso and in
   front of it, off the leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The valves
   follow the single F horn chart (`BRASS_FUNDAMENTALS.horn`, `HORN_PARTIALS`).
+- **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
+  them. The left elbow points out to the side, and the left shoulder turns forward (`poleL`,
+  `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
+  5.3).
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
   holds the trumpet around the upright casings (`fingering`, `faceTube`). The right palm lies
   above the valves and faces down. The trumpet points a little down, straight ahead (`trumpet()`
@@ -473,9 +477,9 @@ The app does not follow these facts:
 - **The right hand in the horn (2.2).** The right paw stays on the axis of the bell, inside its
   opening (`HORN_PALM_DEPTH`), in place of against the bell wall at 2 o'clock. A deeper paw puts
   the wrist through the bell wall.
-- **The horn elbows (2.2).** The left elbow points out and forward (`reachL`, `poleL`). The long
-  snout puts the valves far in front of the chest, and with the elbow down and in, the left
-  forearm goes into the chest.
+- **The horn elbows (2.2).** Tuckwell keeps the elbows near the body. The long snout puts the
+  valves far in front of the chest, and with the left elbow down and in, the round left arm goes
+  into the belly.
 - **The horn rest (2.2).** The round belly covers the short thighs, so the horn rests on the belly
   over the lap, with the bell at the right and the leadpipe up (`rest`, `restShift`).
 - **The double horn (2.2).** The app has no B♭ side.
