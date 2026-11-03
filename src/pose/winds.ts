@@ -924,7 +924,9 @@ function pigTurn(turns: HornTurns): Quat {
  *
  * At rest, the horn comes down 0.2 H and 0.2 H forward onto the round belly, which covers the short
  * thighs, with the bell at the right of the belly beside the right haunch. A lower rest puts the
- * right forearm 2.3 cm to 5.4 cm into the belly.
+ * right forearm 2.3 cm to 5.4 cm into the belly. The right elbow points out, down, and forward
+ * (`restPoleR`), so that the round right forearm lies 0.3 cm in place of 0.6 cm in the rim of the
+ * bell.
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
@@ -935,7 +937,7 @@ const PIG_HORN = {
   rest: pigTurn(PIG_TURNS.rest),
   restShift: [0.05, -0.2, -0.2],
   restPoleL: [-1, 0.2, -0.7],
-  restPoleR: [1, -0.3, 0.3],
+  restPoleR: [1, -0.5, -0.6],
   gripShiftL: [-0.03, 0, 0.03],
 } as const satisfies WindHold;
 
