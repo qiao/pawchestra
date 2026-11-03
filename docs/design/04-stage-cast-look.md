@@ -279,7 +279,7 @@ extras of the asset as numbers ("Seat"), and only the preview images show a chai
 | --- | --- | --- |
 | Form | `armFactor`, `legFactor`, `headFactor`, `neckFactor`, `trunkFactor`, `girthFactor`, `legGirth`, `proportions` | Change a part to a product choice or to the sheet. The head can keep its form. A long thigh can keep its width. |
 | Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front`, `crease`, `sitPose` | Bind a seated role in its pose of 5.2, with the haunch on the seat, or give a standing bind a sit pose. |
-| Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource`, `weightSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. A planar split of the faces takes the weights of the mesh before it. |
+| Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource`, `weightSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. A planar split of the faces takes the weights of the mesh before it. The trunk under a T-pose arm root keeps a trunk share of the painted weights (`weights.paintedBelow`), so that a raised arm does not pull the side out. |
 | Shapes | `raise` | Give the source back in the standing pose, and relax the faces of a bent arm. |
 | Arms | `upperTwist`, `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms`, `armSmooth` | Spread the roll of an arm along the arm, so the skin does not twist. |
 | Splits | `weights.armSplit`, `weights.armFree`, `weights.armCrease`, `cut` | Free an arm that the mesh joins to the trunk, so a raised arm pulls no flap out. |
