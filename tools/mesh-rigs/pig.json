@@ -302,13 +302,16 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the horn, so the elbow axes and the zero of the roll of the upper arm stay.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 102,
+      "R": 51
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The values make the largest paw twist p95 of the six roles of the cast matrix and the horn smallest (design 4.4, pnpm bind-supination pig): L 118 degrees (the flute and the snare drum) against 165 with no supination (the horn), R 74 degrees (the cello) against 123. A third probe of the supinated rig moves no side by more than 0.5 degrees.",
     "note": "The seated posture of design 5.2: the thigh slopes 25 degrees down and 15 degrees out, so that the horn has room at the right knee, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). The foot and the toes keep the turn of the source, so that the soles stand flat on the floor."
   },
   "weights": {
@@ -479,55 +482,25 @@
   },
   "raise": [
     {
-      "side": "R",
-      "turns": {
-        "clavicle": [
-          0,
-          0,
-          0,
-          1
-        ],
-        "upper_arm": [
-          0.4104,
-          -0.0269,
-          0.1114,
-          0.9047
-        ],
-        "forearm": [
-          -0.0984,
-          0.0556,
-          -0.128,
-          0.9853
-        ]
-      },
-      "fade": [
-        10,
-        20
-      ],
-      "below": 0.3,
-      "grow": 1,
-      "note": "The shape of the right arm on the horn, with the mean turns of the play samples of the hold (pnpm raise-fit hornist --faces 81,213,216,438 --side R). Each face of the right armpit below the cosine 0.3 relaxes, with one ring of trunk corners (grow)."
-    },
-    {
       "side": "L",
       "turns": {
         "clavicle": [
           0,
-          -0.225,
+          -0.309,
           0,
-          0.9744
+          0.9511
         ],
         "upper_arm": [
-          0.2634,
-          -0.5582,
-          0.4197,
-          0.6654
+          0.2604,
+          -0.4607,
+          0.5559,
+          0.6411
         ],
         "forearm": [
-          -0.078,
-          -0.0441,
-          0.1015,
-          0.9908
+          0.4188,
+          0.1999,
+          -0.5122,
+          -0.7227
         ]
       },
       "fade": [
@@ -535,17 +508,17 @@
         20
       ],
       "below": 0,
-      "note": "The shape of the left arm on the valves, with the mean turns of the play samples (pnpm raise-fit hornist --faces 1169,1888,1936 --side L)."
+      "note": "The shape of the left arm on the valves, with the mean turns of the play samples of the hold with the elbow out (pnpm raise-fit hornist --faces 743,745 --side L). The faces of the inner left elbow fold in each play sample with no shape."
     },
     {
       "side": "L",
       "bone": "hand",
       "turns": {
         "hand": [
-          -0.3118,
-          -0.4177,
-          -0.8441,
-          0.126
+          -0.0888,
+          0.2839,
+          -0.6483,
+          0.7008
         ]
       },
       "fade": [
@@ -553,36 +526,7 @@
         25
       ],
       "below": 0.3,
-      "note": "The shape of the bent left wrist on the valves (pnpm raise-fit hornist --faces 1896,2638 --side L --bone hand). The rule turns 10 degrees past the mean of the play samples."
-    },
-    {
-      "side": "R",
-      "turns": {
-        "clavicle": [
-          0,
-          0,
-          0,
-          1
-        ],
-        "upper_arm": [
-          0.6748,
-          0.1901,
-          -0.1591,
-          0.6951
-        ],
-        "forearm": [
-          -0.0065,
-          0.0037,
-          -0.0085,
-          0.9999
-        ]
-      },
-      "fade": [
-        10,
-        20
-      ],
-      "below": 0,
-      "note": "The shape of the right arm in the rest pose of the horn, with the mean turns of the rest samples (pnpm raise-fit hornist --faces 81,213,216,438,437 --side R --sets rest). Four rules is the limit of a body (RAISE_LIMIT), so the right paw of the rest has no shape."
+      "note": "The shape of the bent left wrist on the valves (pnpm raise-fit hornist --faces 504,708 --side L --bone hand). The rule turns 10 degrees past the mean of the play samples. The right arm has no shape, because no face of it folds with the straight bind."
     }
   ]
 }
