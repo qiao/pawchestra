@@ -491,8 +491,8 @@ passes.
       the rabbit, the wolf). The free left paw of the deer, the beaver, the monkey, and the pig
       turns near or through 180° on its forearm in the lift, because their bind paws lie about 100°
       from the bind paws of the foxes. Port the twist mix of the violin carry (`mixTwist()` of
-      `pose/bowed.ts`) to the free wind paw. The arms of the red fox, the cat, the panda, the polar
-      bear, and the mannequin go 2.1 cm to 4.1 cm into the body at rest and in the moves, the left
+      `pose/bowed.ts`) to the free wind paw. The arms of the red fox, the cat, the polar bear, and
+      the mannequin go 2.1 cm to 4.1 cm into the body at rest and in the moves, the left
       upper arm of the dog twists 58° (limit 55°), and the paws of the mouse miss the flute by
       1.5 cm. At rest, the right paw can stand off the upright flute (rabbit images).
 - [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`, 5.3): 3 of the 14 seated bodies pass (the wolf,
