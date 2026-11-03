@@ -236,7 +236,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
     },
   ],
   // The violinist rabbit (design 4.4). The rabbit sits 4 cm further forward on a seat 4 cm deeper,
-  // so that its back keeps off the chair back.
+  // so that its back keeps off the chair back. The old eye of the T-pose mesh is a ball in a
+  // groove, so the head fills it (`eyeFill`), and the pea eyes take the size of the eyes of the
+  // A-pose rabbit (0.93) and face halfway toward the filled face (`eyeNormal`).
   [
     'rabbit',
     {
@@ -247,6 +249,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       backRoom: 0.04,
       constant: 'STUDIO_RABBIT',
       crease: 35,
+      eyeFill: [0.1, 0.16],
+      eyeNormal: 0.5,
+      eyeSize: 0.93,
       glb: 'assets/models/rabbit/rabbit.rig.glb',
     },
   ],
