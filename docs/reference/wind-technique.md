@@ -437,9 +437,10 @@ The app follows these facts:
 - **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
   them. The left elbow points out to the side, and the left shoulder turns forward (`poleL`,
   `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
-  5.3). The left paw holds the valves a little nearer to the mouthpiece and further from the left
-  shoulder (`gripShiftL`), so that the left forearm and the left wrist stay off the belly and the
-  horn.
+  5.3). The left paw holds the valves at the grip of the horn. At rest, the left grip moves a
+  little toward the mouthpiece and away from the left shoulder (`restGripShiftL`), and the right
+  elbow points out, down, and forward (`restPoleR`), so that the left wrist and the round right
+  forearm stay off the horn.
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
   holds the trumpet around the upright casings (`fingering`, `faceTube`). The right palm lies
   above the valves and faces down. The trumpet points a little down, straight ahead (`trumpet()`
