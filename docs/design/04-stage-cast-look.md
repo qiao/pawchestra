@@ -241,7 +241,7 @@ joins each such pair into a quad again.
 `pnpm studio-body <animal>` reads the rigged GLB file with no Blender and writes the module. The
 entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings.
 
-- It turns the animal to face -z and scales it. It drops the props and the clips of the studio,
+- It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
 - It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
@@ -258,7 +258,7 @@ entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings.
 ### Mesh rig
 
 `pnpm rig-mesh <animal>` rigs a source mesh with Blender: one mesh of faces with one color each,
-the skeleton of the biped template of the studio, a skin of up to four bones for each vertex,
+the skeleton of a studio body (`STUDIO_BONES`), a skin of up to four bones for each vertex,
 and up to `RAISE_LIMIT` corrective shapes. The config `tools/mesh-rigs/<animal>.json` gives the
 joints and the rules, each with a note. The rig file holds only the animal, so that other tools
 can read it, and a role-neutral body holds no prop of a role. The seat of the config goes into the
@@ -969,13 +969,13 @@ type BoneName =
   | 'slide';
 ```
 
-- **Studio bones.** A studio body has a skeleton of its own: the body bones of the biped template
-  of the studio, two eye bones for the pea eyes, and the optional bones
-  (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`), and the arm
-  segments and helpers (`ARM_SEGMENT_BONES`). The optional bones come after the other bones, so
-  that a new one keeps each other index. The scene gives the mesh the studio bones and the bones
-  of the player, and `poseStudioBones()` writes their matrices from the pose of the player. A
-  pose also holds the twist bones of the upper arms (`UPPER_TWIST_BONES`).
+- **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
+  eye bones for the pea eyes, and the optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip
+  (`tail_tip`), the jaw of a beak (`jaw`), and the arm segments and helpers
+  (`ARM_SEGMENT_BONES`). The optional bones come after the other bones, so that a new one keeps
+  each other index. The scene gives the mesh the studio bones and the bones of the player, and
+  `poseStudioBones()` writes their matrices from the pose of the player. A pose also holds the
+  twist bones of the upper arms (`UPPER_TWIST_BONES`).
 - **Arm segments.** `poseArm()` writes each segment from the turns of its arm, around the joint at
   the start of its part. The readers of the bind mesh read the upper arm or the forearm of the
   player for them (`STUDIO_FOLLOWS`).
