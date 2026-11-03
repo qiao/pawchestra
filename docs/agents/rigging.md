@@ -14,7 +14,7 @@ arm tubes, Blender weights, and arm segments.
 |---|---|---|
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), the role-neutral bind with elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium, with the baton along the index finger. | `conductor` |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), the role-neutral bind, dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), and the leg length of the mesh. Sits on a bench that fits its haunch (`benchFitOf()`) at a piano of `PIANO_SCALE`, with the right foot on the damper pedal. | `pianist` |
-| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, a smaller violin, elbows out. | `violinist` |
+| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), the role-neutral bind, rigid armpit faces, root and elbow skin normals, wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), the role-neutral bind, a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), the role-neutral bind, four elbow `raise` shapes, rigid armpit faces, a tail on the seat, a viola of `violaScale`. | `violist` |
@@ -35,8 +35,7 @@ arm tubes, Blender weights, and arm segments.
 
 ## The asset chain
 
-The tools rig each textured mesh with no skeleton into a studio body GLB file, then pack it into
-a module of the app.
+The tools rig each textured mesh with no skeleton, then pack it into a module of the app.
 
 ```text
  assets/models/<s>/<s>.glb (source mesh, unchanged)
@@ -180,8 +179,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 
 ### Holds and reach
 
-- Short arms do not reach the instruments of the app. Size the instrument by the rule of real
-  players, and keep the limbs until the user asks for longer arms.
+- Short arms do not reach the instruments. Size the instrument by the rule of real players, and
+  keep the limbs until the user asks for longer arms.
 - The arm factor follows the hold. Fit the hold with a first factor, measure the reach, and rig the
   final factor one time.
 - A new scale of `SpeciesParams` adds its instrument to `SCALED_INSTRUMENTS`, so the typecheck
@@ -215,8 +214,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
 
 ### Clearance
 
-- The sweep measures triangle corners, so the middle of a long box can go into the body unseen.
-  `bowPoints()` takes a point at each 1 cm of the bow.
+- The sweep measures triangle corners, so the middle of a long box can go into the body unseen
+  (`bowPoints()`).
 - A depth that stays the same over all variants is half the thickness of the obstacle.
 - The depth of an open part is false near its edge, so the sweep measures closed parts
   (`closedPart()`).
@@ -290,6 +289,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   bones.
 - A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
   leaned forward.
+- A long leg factor thins a thigh. Widen it before the skin (`legGirth`): bone heat splits a short
+  thigh.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
@@ -301,19 +302,20 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   `headFloor`, and `headCeiling`.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
-- A face rule can paint a dark block on the side. Check it from the front, at 60°, and each side.
-- Measure the packed parts before you cut a palette entry.
+- An old eye that is a ball in a groove shows a light rim around the pea eye. Fill it (`eyeFill`).
+- A face rule can paint a dark block on the side. Check it from the front, at 60°, and the sides.
+- Measure the packed parts before a palette cut.
 
 ### Blender scripts
 
 - The face order of `bmesh.ops.create_uvsphere()` changes from run to run. Make the sphere points
   in the script.
-- The glTF exporter writes the vertex colors only with `export_vertex_color='NAME'` and the name
-  of the color attribute.
+- The glTF exporter writes vertex colors only with `export_vertex_color='NAME'` and the attribute
+  name.
 - The `location` of a new child object is in the frame of its parent. Undo the place, the turn,
   and the scale of the parent for the local point.
-- The glTF importer adds a sphere mesh for the bone shapes and keys at the 24 fps of the scene,
-  and an FBX take can key the scale of the armature. Check the meshes, the rate, and the scale.
+- The glTF importer adds a sphere mesh for the bone shapes and keys at 24 fps, and an FBX take can
+  key the armature scale. Check them.
 - An FBX armature with no mesh takes its current pose as its rest pose. Keep each quaternion key
   on the side of the key before it (a dot product of 0 or more), else the blend goes the long way.
 - The FBX exporter takes its ids from the Python string hash. Run Blender with `PYTHONHASHSEED=0`
@@ -322,16 +324,16 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Eac
   axes of the armature first.
 - A value such as 0.707107 in a module fails the lint as an approximate `Math.SQRT1_2`. Move a
   joint a little off 45°.
-- An import of `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py`. Put the
-  plain functions back after the import, as `arm_rebuild.py` does.
+- An import of `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py`. Put them
+  back after the import (`arm_rebuild.py`).
 
 ### Probes
 
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
   wrist, or a camera in JSON at the podium.
-- A fix of a turn rate can move a prop to a wrong place with all measures passed. Render a crop of
-  the move before you commit.
+- A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the move
+  first.
 - Record each row of a variant table with the commit or the `--set` of its run.
 - These pose values stay in meters at each body size: the bow values of `src/pose/bowed-rig.ts` and
   `src/pose/strokes.ts`, `HAND_MOTION`, the percussion `sizes`, `CONDUCTOR_MOTION.scale`, and the
-  sweep limits. After a change of the body size, compare in `H` first.
+  sweep limits. Compare a new body size in `H` first.
