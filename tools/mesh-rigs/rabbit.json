@@ -1,6 +1,7 @@
 {
   "source": "assets/models/rabbit/rabbit-arms.glb",
-  "sourceNote": "The A-pose rabbit mesh (assets/models/rabbit/README.md), with new quad faces on each arm from the shoulder line to the wrist, so that the arms and the wrists do not twist. tools/blender/violin_arms.py makes these faces. The other faces and rabbit-apose.glb stay unchanged.",
+  "sourceNote": "The T-pose rabbit mesh rabbit-tpose.glb (armSource, assets/models/rabbit/README.md), with new quad faces on each arm from the shoulder line to the wrist, so that the arms and the wrists do not twist. tools/blender/arm_rebuild.py makes these faces with the arms 1.18 times longer (--factor 1.18). The other faces and rabbit-tpose.glb stay unchanged.",
+  "armSource": "assets/models/rabbit/rabbit-tpose.glb",
   "paintedWeights": "assets/models/rabbit/rabbit-weights.json",
   "paintedLower": [
     "root",
@@ -22,10 +23,10 @@
     "toes_R",
     "tail"
   ],
-  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the Weight Paint fixes of tools/blender/violin_arms.py. The vertices on the bones of paintedLower keep the rule weights, as on the polar bear, because the seated bind of the app depends on them.",
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the Weight Paint fixes of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, as on the polar bear, because the seated bind of the app depends on them.",
   "armSegments": {
-    "helper": 0.017,
-    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, which spans the three rings of its joint in the bind. The app turns them from the joints of the pose (poseArm() of src/models/studio-rig.ts)."
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units: twice the gap of the joint rings of arm_rebuild.py, which spans the three rings of its joint in the bind. The app turns them from the joints of the pose (poseArm() of src/models/studio-rig.ts)."
   },
   "rootNormals": {
     "radius": 0.12,
@@ -40,13 +41,13 @@
   "weld": 1e-05,
   "app": {
     "shoulders": 0.8513179,
-    "reach": 0.3647,
-    "note": "The app puts the standing shoulder joints 0.8513179 m above the floor (ANIMALS of tools/studio-body.ts). The shoulder joints of the mesh are at 0.574 u after the leg factor, so the scale is 1.4831 m for each unit. The reach is 0.3647 m, and the violin is 0.83 of the violin of the app."
+    "reach": 0.3886,
+    "note": "The app puts the standing shoulder joints 0.8513179 m above the floor (ANIMALS of tools/studio-body.ts), as for the A-pose rabbit. The shoulder joints of the mesh are at 0.5945 u after the leg factor, so the scale is 1.4320 m for each unit. The reach is 0.3886 m, and the violin is 0.83 of the violin of the app."
   },
   "armFactor": 1,
-  "armFactorNote": "The factor 1 keeps the arm length, because the rig with arm segments does not stretch the arms. The arms of rabbit-arms.glb are 1.15 times longer than the source arms (step_shape() of tools/blender/violin_arms.py), and the arm joints are the joints of the longer arms, so the reach stays app.reach.",
+  "armFactorNote": "The factor 1 keeps the arm length, because the rig with arm segments does not stretch the arms. The arms of rabbit-arms.glb are 1.18 times longer than the source arms (arm_rebuild.py --factor 1.18), and the arm joints are the joints of the longer arms. 1.18 is the smallest factor of the sweep 1, 1.1, 1.13, 1.16, 1.18, and 1.2 at which the left paw reaches the nut of the violin of 0.83 (stopRange from 0.01, as the A-pose rabbit). The reach is then 1.21 H, as the 1.22 H of the A-pose rabbit. With 1, the paw reaches the fingerboard only from 0.34.",
   "legFactor": 1.75,
-  "legFactorNote": "The factor of the thigh and the shin. Each one stretches only between its joints, the foot keeps its size, and the body rises 0.105 units, so that the soles stay at y 0. The chair of the app fits the legs, so the soles stand on the floor.",
+  "legFactorNote": "The factor of the thigh and the shin, as for the A-pose rabbit. Each one stretches only between its joints, the foot keeps its size, and the body rises 0.0975 units, so that the soles stay at y 0. The chair of the app fits the legs, so the soles stand on the floor.",
   "joints": {
     "root": {
       "head": [
@@ -68,7 +69,7 @@
     "hips": {
       "head": [
         0,
-        0.19,
+        0.205,
         0.0
       ],
       "tail": "spine"
@@ -76,15 +77,15 @@
     "spine": {
       "head": [
         0,
-        0.26,
-        0.005
+        0.275,
+        0.006
       ],
       "tail": "spine1"
     },
     "spine1": {
       "head": [
         0,
-        0.33,
+        0.345,
         0.012
       ],
       "tail": "chest"
@@ -92,121 +93,121 @@
     "chest": {
       "head": [
         0,
-        0.4,
-        0.02
+        0.415,
+        0.018
       ],
       "tail": "neck"
     },
     "neck": {
       "head": [
         0,
-        0.52,
-        0.025
+        0.525,
+        0.02
       ],
       "tail": "head"
     },
     "head": {
       "head": [
         0,
-        0.57,
-        0.03
+        0.555,
+        0.022
       ],
       "tail": [
         0,
-        0.76,
-        0.03
+        0.755,
+        0.022
       ]
     },
     "ear_L": {
       "head": [
-        0.045,
-        0.77,
-        -0.015
+        0.06,
+        0.765,
+        -0.009
       ],
       "tail": [
-        0.11,
-        0.99,
-        -0.09
+        0.135,
+        0.995,
+        -0.065
       ]
     },
     "clavicle_L": {
       "head": [
         0.02,
-        0.45,
-        0.03
+        0.47,
+        0.012
       ],
       "tail": "upper_arm_L"
     },
     "upper_arm_L": {
       "head": [
-        0.091,
-        0.484,
-        0.024
+        0.075,
+        0.497,
+        0.008
       ],
       "tail": "forearm_L",
       "roll": "palm"
     },
     "forearm_L": {
       "head": [
-        0.1738,
-        0.4173,
-        0.0654
+        0.2048,
+        0.497,
+        0.008
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.21635,
-        0.38395,
-        0.0884
+        0.26675,
+        0.49995,
+        0.008
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.25775,
-        0.3506,
-        0.11255
+        0.3287,
+        0.5029,
+        0.008
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.27375,
-        0.3286,
-        0.12355
+        0.3637,
+        0.5009,
+        0.007
       ],
       "tail": [
-        0.28975,
-        0.3086,
-        0.13155
+        0.3947,
+        0.4949,
+        0.008
       ],
       "roll": "palm"
     },
     "thigh_L": {
       "head": [
-        0.07,
-        0.165,
+        0.072,
+        0.185,
         0.0
       ],
       "tail": "shin_L"
     },
     "shin_L": {
       "head": [
-        0.072,
-        0.1,
-        -0.005
+        0.07,
+        0.115,
+        -0.008
       ],
       "tail": "foot_L"
     },
     "foot_L": {
       "head": [
         0.072,
-        0.045,
-        -0.02
+        0.055,
+        -0.025
       ],
       "tail": "toes_L",
       "roll": [
@@ -217,14 +218,14 @@
     },
     "toes_L": {
       "head": [
-        0.09,
+        0.085,
         0.018,
-        0.06
+        0.045
       ],
       "tail": [
-        0.095,
+        0.09,
         0.008,
-        0.105
+        0.08
       ],
       "roll": [
         0,
@@ -235,13 +236,13 @@
     "tail": {
       "head": [
         0,
-        0.235,
-        -0.11
+        0.29,
+        -0.09
       ],
       "tail": [
         0,
-        0.235,
-        -0.175
+        0.29,
+        -0.16
       ],
       "roll": [
         0,
@@ -251,11 +252,11 @@
     }
   },
   "palm": [
-    -0.602,
-    -0.764,
-    -0.23
+    0,
+    -1,
+    0.015
   ],
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The palm is the true palm of the source, in, down, and a little back, as the palm of the fox.",
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The arms are level in the T-pose, and the arm joints lie on the middle line of the arm at the joints of the 1.18 times longer arms. The palm is the true palm of the source: the mean normal of the pink pads of the palm faces down.",
   "studio": {
     "legTurns": {
       "thigh": [
@@ -311,27 +312,27 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 88,
-      "R": 42
+      "L": 90,
+      "R": 43
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 88 degrees and the right 42 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 134 degrees on the left (the violin and the snare drum) and 90 degrees on the right (the cello and the snare drum). With no supination, the left paw twists of the violin and the flute are near 180 degrees.",
-    "note": "The thigh slopes 25 degrees down and 8 degrees out, so that the hips are above the knees, and the shin is vertical, as the legs of the red fox (tools/rig/leg_turns.py <config> 25 8 0, tools/mesh-rigs/fox.json)."
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 90 degrees and the right 43 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 137 degrees on the left (the violin and the snare drum) and 93 degrees on the right (the cello and the snare drum). Three probes of pnpm bind-supination gave 97 and 43, then 90 and 43, then no change.",
+    "note": "The leg turns of the A-pose rabbit: the thighs of the T-pose mesh have the same direction, so the seat keeps its form. The shin is vertical, as the legs of the red fox."
   },
   "weights": {
-    "armSplit": 0.095,
-    "headFrom": 0.575,
+    "armSplit": 0.09,
+    "headFrom": 0.56,
     "earBase": [
-      0.755,
-      0.785
+      0.75,
+      0.78
     ],
     "tailBall": {
       "center": [
         0,
-        0.235,
-        -0.155
+        0.29,
+        -0.13
       ],
-      "radius": 0.055,
-      "behind": -0.125
+      "radius": 0.05,
+      "behind": -0.1
     },
     "sliver": {
       "angle": 10,
@@ -351,12 +352,129 @@
     "fingersNote": "The fingers keep this share of their bone heat weight, and the hand takes the rest, so that the curl of the fingers does not turn over a face between the hand and the fingers.",
     "haunch": {
       "height": [
-        0.12,
-        0.19
+        0.14,
+        0.205
       ],
       "note": "The part of the thigh weight that goes to the hips grows from 0 at the lower height to 1 at the upper height, so that the haunch stays on the seat and the thigh turns onto it. This is the ramp of the fox, scaled by the thigh of the rabbit."
     },
-    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. Above headFrom, each vertex except the ears follows the head only. Each ear vertex goes to its ear bone with a ramp over the heights of earBase. The tail ball follows the tail only."
+    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. Above headFrom, each vertex except the ears follows the head only. Each ear vertex goes to its ear bone with a ramp over the heights of earBase. The tail ball follows the tail only.",
+    "rigidPainted": [
+      [
+        [
+          0.0934,
+          0.4634,
+          0.0454
+        ],
+        [
+          0.0934,
+          0.4578,
+          0.0392
+        ],
+        [
+          0.0898,
+          0.4563,
+          0.0233
+        ],
+        [
+          0.0894,
+          0.4567,
+          -0.0086
+        ],
+        [
+          0.0933,
+          0.457,
+          0.0092
+        ],
+        [
+          0.0853,
+          0.4702,
+          0.0513
+        ],
+        [
+          0.1019,
+          0.4605,
+          0.0367
+        ],
+        [
+          0.1073,
+          0.4661,
+          0.0413
+        ],
+        [
+          0.1063,
+          0.4603,
+          0.0294
+        ],
+        [
+          0.1013,
+          0.4582,
+          0.0178
+        ],
+        [
+          0.093,
+          0.4575,
+          -0.0106
+        ]
+      ],
+      [
+        [
+          -0.0932,
+          0.4562,
+          0.0321
+        ],
+        [
+          -0.0935,
+          0.4563,
+          0.0156
+        ],
+        [
+          -0.0932,
+          0.4573,
+          0.0365
+        ],
+        [
+          -0.0897,
+          0.4551,
+          0.0331
+        ],
+        [
+          -0.0722,
+          0.4486,
+          -0.033
+        ],
+        [
+          -0.0899,
+          0.4576,
+          -0.0185
+        ],
+        [
+          -0.1019,
+          0.4605,
+          0.0367
+        ],
+        [
+          -0.1073,
+          0.4661,
+          0.0413
+        ],
+        [
+          -0.1063,
+          0.4603,
+          0.0294
+        ],
+        [
+          -0.1013,
+          0.4582,
+          0.0178
+        ],
+        [
+          -0.093,
+          0.4575,
+          -0.0106
+        ]
+      ]
+    ],
+    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the bridge faces under each arm root and of the first ring of the tube under it. The T-pose arm turns about 80 degrees down to hang, and these faces folded in each sample of the rest and the play (pnpm fold-probe violinist --faces)."
   },
   "refine": {
     "rings": [],
@@ -385,25 +503,25 @@
     "eyeBox": [
       [
         0.03,
-        0.6,
-        0.08
+        0.62,
+        0.05
       ],
       [
         0.12,
-        0.7,
-        0.2
+        0.71,
+        0.15
       ]
     ],
     "noseBox": [
       [
         -0.03,
-        0.58,
-        0.15
+        0.605,
+        0.13
       ],
       [
         0.03,
-        0.66,
-        0.2
+        0.64,
+        0.18
       ]
     ],
     "nose": [
@@ -422,7 +540,7 @@
   },
   "chair": {
     "halfWidth": 0.16,
-    "front": -0.02,
+    "front": -0.03,
     "back": -0.1396,
     "backHeight": 0.15,
     "note": "The seat is level, and its top is the lowest point of the seated body over the seat. Its front edge ends where the sloped thighs leave the seat top at the haunch. The chair of the app grows back until its back posts keep 1 cm behind the trunk (backRoom of ANIMALS of tools/studio-body.ts)."
@@ -444,37 +562,5 @@
     "end": 0.02,
     "most": 0.045,
     "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox (sit of tools/mesh-rigs/fox.json). The drop fades over the last 0.02 units of the haunch, where the haunch meets the tail ball, so that no face between them turns over."
-  },
-  "raise": [
-    {
-      "side": "L",
-      "bone": "forearm",
-      "turns": {
-        "clavicle": [
-          0,
-          -0.1223,
-          0,
-          0.9925
-        ],
-        "upper_arm": [
-          0.1913,
-          -0.2093,
-          -0.1561,
-          0.9462
-        ],
-        "forearm": [
-          -0.3981,
-          -0.209,
-          0.5044,
-          0.7372
-        ]
-      },
-      "fade": [
-        20,
-        30
-      ],
-      "below": 0.3,
-      "note": "The shape of the bent left elbow of the violinist (pnpm raise-fit). With the straight bind arms, the inner elbow bends further from its bind, and faces 1394, 1349, 2147, 1393, 1348, and 2206 fold in 1087 of 6718 samples of the play and the lift. The key elbow turns 85 degrees from the bind in their mean."
-    }
-  ]
+  }
 }
