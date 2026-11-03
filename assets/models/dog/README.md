@@ -110,5 +110,5 @@ shasum -a 256 assets/models/dog/dog-arms.glb assets/models/dog/dog-weights.json
 ## dog.rig.glb
 
 `pnpm rig-mesh dog` rigs `dog-arms.glb` with the role-neutral bind of design 4.4: straight bind
-arms, the bind supination of `studio.bindSupination`, and three `raise` shapes of the inner elbows
-(`tools/mesh-rigs/dog.json`). `pnpm studio-body dog` then writes `src/models/studio/dog.ts`.
+arms, the bind supination of `studio.bindSupination`, three `raise` shapes of the inner elbows,
+and the skin normals at the arm roots (`rootNormals` of `tools/mesh-rigs/dog.json`). `pnpm studio-body dog` then writes `src/models/studio/dog.ts`.
