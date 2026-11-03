@@ -891,11 +891,12 @@ const VIOLIN_HOLD = {
 } as const satisfies BowedHold;
 
 /**
- * The bow of the dog cellist at rest (design 5.2): the right paw holds the bow over the right knee,
+ * The bow of the cellist at rest (design 5.2): the right paw holds the bow over the right knee,
  * 0.25 H out and 0.5 H above the top of the thigh at 0.9 of the way to the knee, with the tip up
- * and leaned out and forward, away from the cello. The short arm of the dog then bends softly at
- * the elbow, and the wrist bends 22° with the palm toward the body. In the lift and the lowering,
- * the bow turns through the front, and the grip moves 0.3 H out, away from the cello.
+ * and leaned out and forward, away from the cello. The short arm of the old dog body then bent
+ * softly at the elbow, and the wrist bent 22° with the palm toward the body. In the lift and the
+ * lowering, the bow turns through the front, and the grip moves 0.3 H out, away from the cello.
+ * The dog keeps the bow and moves the grip lower and further out ({@link DOG_HOLD}).
  */
 const LAP_CELLO_BOW = {
   lap: { along: 0.9, offset: [0.25, 0.5, 0] },
@@ -1110,13 +1111,34 @@ const CAT_HOLD = {
  * the left, and its top plate turns 6° to the right. It keeps this place in the rest pose
  * (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the knees do not
  * touch the cello. The left paw keeps the tilt of the low positions in the high positions.
+ *
+ * The rebuilt arms of the dog are round tubes with their full inner half width (design 5.3, "Free
+ * round arms"), so the elbows keep away from the sides, as a cellist starts a stroke open at the
+ * shoulder with the arm out from the body (`docs/reference/string-technique.md`, section 2.2):
+ *
+ * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
+ *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
+ *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
+ *   its accepted grip (4° on the old body).
+ * - At rest, the bow grip lies 0.5 H out, 0.35 H up, and 0.2 H forward from the thigh at 0.9 of the
+ *   way to the knee, lower and further out than {@link LAP_CELLO_BOW}, with the elbow out, back,
+ *   and down, (1.2, -1, 0.75): with the grip and the elbow of {@link LAP_CELLO_BOW}, the right
+ *   upper arm goes 3.1 cm into the chest at rest. An elbow further out, (2, -1, 0.3), also clears
+ *   the arm, but twists the bow paw 147° on its forearm at rest (105° with this hold).
+ * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
+ *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
+ *   into the cello.
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
   playShift: [-0.076, 0, -0.34],
   playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
   highTilt: 0,
-  restBow: LAP_CELLO_BOW,
+  poleR: [1.5, -1, -0.3],
+  poleTipR: [1.5, -0.5, -0.5],
+  restPoleR: [1.2, -1, 0.75],
+  restPoleL: [-2, -1, 0],
+  restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
   fit: null,
 } as const satisfies BowedHold;
 
