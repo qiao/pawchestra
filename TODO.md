@@ -629,6 +629,9 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Wind players: the mitten paws close as one block, so no finger lies on a key.
 - [ ] Wind thumbs: the thumbs of the meshes have no bone, and the rhino and pig paws have no digit.
       Add a thumb measure to `pnpm wind-grip`, and check the horn hold in the images.
+- [ ] Horn grip: `pnpm wind-grip` has no hornist role, because the horn names no grip tube
+      (`tubes: {}` of the horn in `models/instruments/brass.ts`). Give the horn a tube at the
+      valves and at the bell throat, and add the role.
 - [ ] Wind grips: `pnpm wind-grip` takes the finger tips from the bind pose, and the right oboe paw
       grasps in 54% of the play. Check the right oboe grip.
 - [ ] Accepted grips: after a check of the 2x paw crops, update `ACCEPTED_GRIPS` for the bassoonist,
