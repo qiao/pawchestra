@@ -17,6 +17,7 @@ import { armRig, handToward, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
+import { elbowOutTurn, turnPoleOut } from './round-arms.ts';
 import { BRASS_FUNDAMENTALS } from './wind-notes.ts';
 import type { Fingering, WindState } from './wind-notes.ts';
 
@@ -45,6 +46,13 @@ export interface WindHold {
   readonly restPoleL: Vec3;
   /** The direction to which the right elbow points in the rest pose. */
   readonly restPoleR: Vec3;
+  /**
+   * The rule of the round free arms (design 5.3): the out swing that the arms of the body that the
+   * hold fits need (`armOut()`), in radians. A rounder body turns each elbow out, at rest and in
+   * the play (`elbowOutTurn()`). `null` keeps the elbows of the hold on each body, as an own hold
+   * does.
+   */
+  readonly roundArms: number | null;
   /**
    * The rotation of the `instrument` bone while the player plays, relative to the chest. The
    * instrument turns around the mouthpiece, so that the mouthpiece stays at the mouth.
@@ -230,6 +238,7 @@ const WOODWIND = {
   poleR: POLE_R,
   restPoleL: POLE_L,
   restPoleR: POLE_R,
+  roundArms: null,
   play: IDENTITY,
   rest: IDENTITY,
   restShift: [0, 0, 0],
@@ -348,6 +357,14 @@ export const FOX_FLUTE_BACK = 9;
 const FOX_HANG = [20, 20] as const;
 
 /**
+ * The out swing of the arms of the body that each shared hold fits, in degrees
+ * (`WindHold.roundArms`, design 5.3): the larger `armOut()` of the two arms of its accepted player. The flute fits the
+ * tan fox (20° and 23°), the clarinet the wolf (12° and 11°), and the trumpet the monkey (15° and
+ * 16°), so a rounder body turns its elbows out, and these bodies keep the elbows of the hold.
+ */
+const ROUND_ARMS_FIT = { flute: 23, clarinet: 12, trumpet: 16 } as const;
+
+/**
  * The holds of the winds. In the rest pose, each instrument moves off the mouth, to the side and
  * a little forward, and tilts, so that the arms that hold it stay out of the body (design 5.3).
  */
@@ -369,6 +386,7 @@ export const WIND_HOLDS = {
   // from the upper arm, as a real flutist rests the flute vertically on the right leg.
   flute: {
     ...WOODWIND,
+    roundArms: ROUND_ARMS_FIT.flute * MathUtils.DEG2RAD,
     reach: 20 * MathUtils.DEG2RAD,
     reachL: 20 * MathUtils.DEG2RAD,
     headTurn: FOX_HEAD_TURN * MathUtils.DEG2RAD,
@@ -424,6 +442,7 @@ export const WIND_HOLDS = {
   // at rest.
   clarinet: {
     ...WOODWIND,
+    roundArms: ROUND_ARMS_FIT.clarinet * MathUtils.DEG2RAD,
     reach: 35 * MathUtils.DEG2RAD,
     reachL: 20 * MathUtils.DEG2RAD,
     play: holdTurn(5, 0),
@@ -481,6 +500,7 @@ export const WIND_HOLDS = {
     ...WOODWIND,
     reach: 34 * MathUtils.DEG2RAD,
     reachL: 34 * MathUtils.DEG2RAD,
+    roundArms: ROUND_ARMS_FIT.trumpet * MathUtils.DEG2RAD,
     poleL: [-0.5, -1, -1],
     poleR: [1, -1, -1],
     restPoleL: [-1, -1, -1],
@@ -1043,6 +1063,7 @@ const WOLF_CLARINET_FORWARD = 5;
  */
 const WOLF_CLARINET = {
   ...WIND_HOLDS.clarinet,
+  roundArms: null,
   restArms: null,
   restFreeL: null,
   aimSigns: null,
@@ -1101,6 +1122,7 @@ const WOLF_CLARINET = {
  */
 const MONKEY_TRUMPET = {
   ...WIND_HOLDS.trumpet,
+  roundArms: null,
   reach: 34 * MathUtils.DEG2RAD,
   reachL: 0,
   play: holdTurn(-10, 0),
@@ -1592,8 +1614,47 @@ export function windRig(
     hold.restArms && signed.freeL?.kind === 'hang'
       ? { ...signed.freeL, roll: freeRoll(signed, signed.freeL.hang) }
       : signed.freeL;
-  const rolled = { ...signed, freeL };
+  const rolled = roundElbows(model, { ...signed, freeL });
   return { ...rolled, slideReach: slideReachOf(rolled, travelVector.length()) };
+}
+
+/**
+ * Turns the elbows of a round body out by the rule of the round free arms
+ * ({@link WindHold.roundArms}, design 5.3): the elbows of the play, of the rest, and of a free
+ * hanging left arm. The paws keep their grips, so only the elbows move.
+ *
+ * @param model The player model.
+ * @param rig The points of the player.
+ * @returns The points, with the turned elbows, or `rig` for a hold with no rule.
+ */
+function roundElbows(
+  model: PlayerModel,
+  rig: Omit<WindRig, 'slideReach'>,
+): Omit<WindRig, 'slideReach'> {
+  const { hold } = rig;
+  if (hold.roundArms === null) {
+    return rig;
+  }
+  const turnL = elbowOutTurn(model, rig.left.arm, hold.roundArms);
+  const turnR = elbowOutTurn(model, rig.right.arm, hold.roundArms);
+  const freeL =
+    rig.freeL?.kind === 'hang'
+      ? {
+          ...rig.freeL,
+          hang: { ...rig.freeL.hang, pole: turnPoleOut(rig.freeL.hang.pole, turnL, 'L') },
+        }
+      : rig.freeL;
+  return {
+    ...rig,
+    hold: {
+      ...hold,
+      poleL: turnPoleOut(hold.poleL, turnL, 'L'),
+      poleR: turnPoleOut(hold.poleR, turnR, 'R'),
+    },
+    restPoleL: turnPoleOut(rig.restPoleL, turnL, 'L'),
+    restPoleR: turnPoleOut(rig.restPoleR, turnR, 'R'),
+    freeL,
+  };
 }
 
 /**
