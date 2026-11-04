@@ -101,15 +101,21 @@ passes.
 - [ ] Add the chair as an obstacle to the sweeps of the seated roles, with the legs and the haunch
       as parts (`SEATED_PARTS`, `seatSurface()` of `pose/test-sweep-roles.ts`).
 - [ ] Penguin singer: ask the user to confirm the size, the flippers, the place of the folder, the
-      bind of the upper arms, and the white throat. Option: flippers 1.25 times as long.
+      wider folder (covers of 0.26 m) with the elbows further out, and the white throat. Option:
+      flippers 1.25 times as long.
 - [ ] Penguin: black wedges from the roots of the flippers show on the white belly under the folder
       in the front views.
 - [ ] Penguin: the crease angle 35° has no facet probe against the penguins of the reference images
       (`ANIMALS` of `tools/studio-body.ts`).
-- [ ] Penguin: a round bump at the armpit shows from az90, because the faces with a part of the arm
-      weight stretch when the flipper rises. Try a cut of the flipper with a side wall.
-- [ ] Penguin: the flippers go 1.3 cm into the body, and the edge of the orange beak and feet is not
-      cut. Check the roots of the flippers with a fill light.
+- [ ] Penguin with rebuilt flippers: under the raised flipper, the black and white edge of the side
+      lies up to about 1 cm further back than on the old rig, and the right side shows more white
+      under the flipper (`reports/2026-11-03-penguin-arms/crop-left-c4.png`). The straight bind
+      narrows the bent elbow rings to about 3.5 and 3.4 cm (old bind 3.80 and 4.28 cm), and one face
+      of the left flipper root still turns over in the bind after the relax. In the cast matrix,
+      the round upper arms go 3.6 to 6.2 cm into the body (old flippers 1.3 to 3.4 cm).
+- [ ] Penguin: the round rebuilt flippers go 1.3 cm into the chest, and the forearms 0.3 cm into
+      the folder (0 cm on the old flippers). The edge of the orange beak and feet is not cut.
+      Check the roots of the flippers with a fill light.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
 - [ ] Panda: at rest, the app view (front left, 30° up) shows a white wedge of the chest between
@@ -349,10 +355,6 @@ passes.
       play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
       goes 5.9 cm into the body in 2% of the samples.
-- [ ] Role-neutral bind (design 4.4): move the other bodies to straight bind arms and the bind
-      supination of the rule, one body at a time. The rabbit, the polar bear, the wolf, the mouse,
-      the elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, the
-      pig, the cat, and the dog have it.
 - [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.4 cm into the rim of
       the bell near the wrist (0.1 cm on the old arm, target 0.3 cm), with the rest
       right elbow (1, -0.5, -0.6) and the bind supination R 64 (0.3 cm on R 51). The left paw goes
