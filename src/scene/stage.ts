@@ -172,6 +172,11 @@ float woodGrain(vec3 p) {
  * light of the standard shader. The skirt lies below the stage top at y = 0, and the lip stands
  * within its width of the outline: the four edges and the four corner cuts. The planks and the
  * podium get no baked light. The light fades from the middle of each side to the corners.
+ *
+ * A plank is a face that points up at y = 0, so each test keeps one value on all of a visible
+ * face (design 4.5, materials). A test of y alone gave no light to a band of 2 mm at y = 0 on the
+ * outer face of the lip. MSAA does not smooth a test inside a face, so the band broke into dashes
+ * that moved with the camera.
  */
 const SIDE_GLOW_GLSL = /* glsl */ `
 vec2 sideAbs = abs(vWoodPosition.xz);
@@ -179,7 +184,8 @@ float sideEdge = min(
   uHalfSide - max(sideAbs.x, sideAbs.y),
   (2.0 * uHalfSide - uCornerCut - sideAbs.x - sideAbs.y) * 0.70710678
 );
-float onLip = step(0.001, vWoodPosition.y) * step(sideEdge, ${(STAGE_LIP.width + 0.001).toFixed(4)});
+float onPlank = step(0.99, normalize(vWoodNormal).y) * step(vWoodPosition.y, 0.001);
+float onLip = (1.0 - onPlank) * step(sideEdge, ${(STAGE_LIP.width + 0.001).toFixed(4)});
 float onSide = max(step(vWoodPosition.y, -0.001), onLip);
 float sideFade = 1.0 - uSideGlow.z * smoothstep(0.2 * uHalfSide, uHalfSide, abs(vWoodPosition.x));
 float sideGlow = vWoodPosition.y < -${STAGE_LIP.drop.toFixed(4)} ? uSideGlow.x : uSideGlow.y;
