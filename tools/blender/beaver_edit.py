@@ -158,7 +158,8 @@ def step_rip(s):
         if any(edge is None for edge in edges):
             raise RuntimeError('The seam of the side %d is no edge chain.' % side)
         seams[side] = edges
-    loose = [p for f in flaps for p in f.verts]
+    # Flaps can share corners, so each corner goes into the list one time.
+    loose = list(dict.fromkeys(p for f in flaps for p in f.verts))
     bmesh.ops.delete(bm, geom=flaps, context='FACES_ONLY')
     bmesh.ops.delete(bm, geom=[p for p in loose if not p.link_faces], context='VERTS')
     out['flaps'] = len(flaps)
