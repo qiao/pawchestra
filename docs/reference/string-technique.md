@@ -429,6 +429,10 @@ The app follows these facts:
   neck, and behind the front of the upper chest. Then the head turns until the jaw touches the chin
   rest, and the violin moves up or down for the rest of the gap, so that the head stays near
   straight.
+- **The thick wrist at rest (1.9).** A real player keeps the forearm free of the body of the
+  instrument. At rest, the left paw of a thick wrist holds the neck of the violin nearer to the
+  nut (`BowedHold.wristFit`, design 5.3), so that the wrist end of the forearm stays out of the
+  upper bout. The violin keeps its rest place, and the paw slides up the neck.
 - **The shoulder rest (1.10).** A shoulder rest lies under the back of the lower bout
   (`SHOULDER_REST`). Its high end is on the side of the E string, over the left shoulder and the
   upper arm of the animal.
@@ -451,8 +455,9 @@ The app does not follow these facts:
   further, so that its paw curls around the neck, and a smaller tilt pinches the skin of its
   wrist. Thus its wrist bends off the line of the forearm in the low positions.
 - **The thick wrist (1.9).** The thick wrist end of the left forearm of some bodies touches the
-  upper bout of the violin, at rest and in the play (`TODO.md`). The forearm of a real player
-  keeps free of the body of the instrument.
+  upper bout of the violin in the play (`TODO.md`). The forearm of a real player keeps free of the
+  body of the instrument, and the back of the hand is in a straight line with the elbow in the
+  low positions [68].
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm. The rabbit turns it out further, because its round rebuilt upper arm goes into the
