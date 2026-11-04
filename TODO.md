@@ -498,9 +498,15 @@ passes.
 - [ ] Shared violin hold (`BOWED_HOLDS.violin`, 5.3): 8 of the 14 seated bodies pass. The upper
       arms of the cat go 2.0 cm to 4.0 cm into its deep chest in the play and the lowering, and the
       upper arms of the pig 2.5 cm to 3.3 cm. The left paw of the dog stretches 0.56 in the lift,
-      the right upper arm of the monkey goes flat (0.53 to 0.55) in the play, and the left forearm
-      of the mannequin goes 1.7 cm into the violin. The polar bear folds 22 and 12 faces (body
-      weights).
+      the right upper arm of the monkey goes flat (0.53 to 0.55) in the play. The polar bear folds
+      22 and 12 faces (body weights).
+- [ ] Thick left wrist on the violin (5.3, matrix group 5): the wrist end of the left forearm of
+      the recast panda, polar bear, mannequin, hippo, penguin, rhino, and badger goes 1.5 cm to
+      2.0 cm into the upper bout at rest, in the moves, or in the play. A rest gap from the girth
+      of the wrist moved the violin into the belly (the elephant 6.1 cm, the bear 5.3 cm), because
+      the paw keeps its hanging wrist. A gap along the normal of the palm does not move the wrist
+      in the play. Next: move the wrist down from the back of the violin, and keep the rest
+      violin off the belly when the paw moves.
 - [ ] Violin lift on a pronated bind paw (5.2): the left paw turns through the direction of no
       paw twist, so the carried violin turns about 240° with it in the middle of the move (the
       deer at `lift50`, `reports/2026-11-01-violin-hold/`). The role-neutral bind supination of
@@ -552,12 +558,14 @@ passes.
       does not move these points, and a flute with no head turn makes most of them deeper (hippo
       11.3 cm). Next: a rule from the head, such as a lip place or elbows that fit a large low
       head (`reports/2026-11-04-belly-front/`).
-- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, the deer, and the dog
-      (own hold) pass. The left claws of the monkey (1.8 cm) go into the cello in a few play
-      samples. The cello of the foxes goes 5.0 cm into the
-      body in the play, the forearms of the polar bear and the mannequin go up to 2.4 cm into the
-      cello at rest and in the moves, and the upper arms of the cat and the pig go up to 4.0 cm into
-      the body.
+- [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the mannequin, the wolf, the
+      deer, and the dog (own hold) pass. The cello of the foxes goes 5.0 cm into the body in the
+      play, and the upper arms of the cat and the pig go up to 4.0 cm into the body. With the rest
+      grip on the neck and the paw girth rule, the knuckle end of the thick left paw of the bear,
+      the rhino, and the hippo still goes 1.6 cm to 1.9 cm into the neck in the moves, and the
+      curled claws of the badger (1.9 cm), the pig (1.8 cm, also at rest), and the monkey (1.8 cm,
+      play) go into the neck. Next: a curl of the rest grip from the claw length, or a tilt of a
+      thick paw over the neck.
 - [ ] Dog cellist: the fitted place (`cello@dog.fit`) with a cello of 0.87 gives the arm gate of
       `DOG_HOLD` on two demos. Sweep the dog with it, then remove `DOG_HOLD` if it is not worse.
 - [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
