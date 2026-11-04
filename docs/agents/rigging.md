@@ -14,7 +14,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 |---|---|---|
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), rigid faces under the arm roots (`rigidPainted`). Sits on a bench that fits its haunch (`benchFitOf()`). | `pianist` |
-| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, skin normals, a trunk share under the armpits (`paintedBelow`), the old chair (`shinFactor`, `sit.most`), wide thighs (`legGirth`), knees out (`studio.legTurns`), a longer neck and trunk, a smaller head (`neckFactor`, `trunkFactor`, `headFactor`), the old shape (`girthProfile`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
+| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, skin normals, a trunk share under the armpits (`paintedBelow`), the old chair and form (`shinFactor`, `sit.most`, `legGirth`, `studio.legTurns`, `neckFactor`, `trunkFactor`, `headFactor`, `girthProfile`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), close knees (`studio.legTurns`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), the shape of the old cat with narrow shoulders (`girthProfile`, `armGirth`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
@@ -115,8 +115,8 @@ upper arm weights, or a move of the elbow alone does not fix a twisted arm.
 - **Bones.** The linear blend collapses the skin under a large twist on one bone. Short segments
   keep each step below about 25°.
 - **Hold.** The hold sets the total twist. A real forearm turns about 90°, and a paw that turns
-  about 160° on its forearm folds the wrist. Then change the hold or the instrument first, and
-  hold the part near the direction of no paw twist.
+  about 160° on its forearm folds the wrist. Change the hold or the instrument first, near the
+  direction of no paw twist.
 
 Run `tools/blender/arm_rebuild.py` first. A clean quad
 mesh skips steps 2 to 5 (`--keep-faces`). Write a species script `tools/blender/<a>_arms.py` only
@@ -167,9 +167,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - The retarget turns each paw toward its forearm in the plane of the palm (`PAW_TURN`), up to 70°.
   A pose can give a paw its own turn (`pawTurnL`, `pawBendR`).
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist, where
-  `twistAngle()` flips. Supinate the bind paw (`studio.bindSupination`), also with straight bind
-  arms. Take the value of design 4.4 (`pnpm bind-supination <species>`), and probe the new rig
-  again. Else lower the twist of the hold. Carry no value from the last frame.
+  `twistAngle()` flips. Supinate the bind paw by the value of design 4.4
+  (`studio.bindSupination`, `pnpm bind-supination <species>`), and probe the new rig again, or
+  lower the twist of the hold. Carry no value from the last frame.
 - A turn of the bind forearm about the upper arm (`studio.bindArms`) moves the zero of the paw twist
   and of the upper arm roll. Straight bind arms keep the roll zero with the elbow axes of the bent
   bind (`StudioBody.hinges`).
@@ -241,9 +241,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both.
 - `weights.fingers` 0.5 keeps the curl small, and 1 closes a paw around a tube.
-- A bind that bends a thick paw (`studio.bindArms`) presses the inner wrist skin in the rest shape,
-  and each pose blends its bend on top, so no weight rule, ring, taper, or `raise` removes the dark
-  wrist slit. Bind the arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
+- A bind that bends a thick paw (`studio.bindArms`) gives a dark wrist slit that no weight rule or
+  `raise` removes (design 4.4). Bind the arms straight (`studio.straightArms`), and judge a wrist
+  by its 2x crops.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
   (`paintedLower`).
 - The glTF skin has no B-Bones and 4 weights for each vertex. In the Blender preview, set
@@ -257,8 +257,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   collapse at a cut loop can join two atlas islands in one face of a stray color (`spread`).
 - A raised arm pulls a seam where a hanging arm touches the trunk into dark flaps. Only a cut at
   the seam fixes them (`cut`). Give the caps the skin normals.
-- A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. No measure
-  sees it, so look at the sheets of `pnpm close-views audit`.
+- A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
+  sheets of `pnpm close-views audit`.
 - After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
   share (`weights.armRoot`). For painted weights, turn the elbow out (design 5.3).
 - End a cut above the shoulder joint, else a black triangle shows on the back.
@@ -275,7 +275,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   `raise R` at 0.
 - A shape or a longer elbow helper cannot widen an elbow ring that a straight bind narrows.
   Weights that keep the forearm and the helper off the upper arm widen it, but fold the inner
-  elbow, also with more Smooth rounds or one more ring.
+  elbow.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 - On an arm joined to the trunk, start an elbow shape with `below` 0, and read its rig log first:
@@ -342,8 +342,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
   wrist.
-- A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the
-  move.
+- A fix of a turn rate can move a prop to a wrong place. Render the move.
 - The bow values (`src/pose/bowed-rig.ts`, `src/pose/strokes.ts`), `HAND_MOTION`, the percussion
   `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits stay in meters. Compare a new body size
   in `H` first.
