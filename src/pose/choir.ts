@@ -15,12 +15,12 @@ export const CHOIR_HOLD = {
    * The elbows point down and out, so that the upper arms stay near the sides of the body, as in
    * the reference images. The rebuilt flippers are round tubes with their full inner half width
    * (design 5.3, "Free round arms"): with the elbows of the old flippers, (0.7, -1, 0.1), the
-   * upper arms go 3.3 cm into the chest, and 1.5 cm with these elbows and the wider folder of
+   * upper arms go 3.3 cm into the chest, and 1.3 cm with these elbows and the wider folder of
    * `CHOIR_FOLDER`. Out and down, (1, -0.6, 0), they stand 49° out from the side, and with
    * (2.5, -1, 0.1), the grips turn 28° from the accepted grip.
    */
-  poleL: [-1.2, -1, 0.1],
-  poleR: [1.2, -1, 0.1],
+  poleL: [-1.4, -1, 0.1],
+  poleR: [1.4, -1, 0.1],
   /** The curl of the fingers around the edges of the folder. */
   curl: 35 * MathUtils.DEG2RAD,
 } as const;

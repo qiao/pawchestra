@@ -15,8 +15,8 @@ import type { InstrumentModel } from './types.ts';
 export const CHOIR_FOLDER = {
   /**
    * The width of one cover, in meters. The grips lie at the outer edges, so a narrow folder puts
-   * the upper flippers of the penguin into the sides of the body. With 0.22 m and the elbows of
-   * `CHOIR_HOLD`, the round rebuilt flippers go 2.7 cm into the chest, and 1.5 cm with 0.26 m.
+   * the upper flippers of the penguin into the sides of the body. With 0.22 m and the elbows
+   * (1.2, -1, 0.1), the round rebuilt flippers go 2.7 cm into the chest, and 1.5 cm with 0.26 m.
    */
   width: 0.26,
   /** The height of one cover, in meters. */
