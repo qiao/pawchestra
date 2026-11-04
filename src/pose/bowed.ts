@@ -1106,6 +1106,8 @@ const gripRest = createGrip();
 const gripPlay = createGrip();
 const gripTurn = new Quaternion();
 const gripWrist = new Vector3();
+const carryShift = new Vector3();
+const carryInverse = new Quaternion();
 const carryPoint = new Vector3();
 const carryRestPole = new Vector3();
 const carryFore = new Vector3();
@@ -1267,6 +1269,15 @@ function carryLift(
     out.rotation.copy(restHand.rotation);
     return restTurn;
   }
+  // A paw nearer to the nut by the rule of the wrist clearance (design 5.3) carries the instrument
+  // on the path of the grip of `RigPoints.restCarryPlace`, and keeps its own grip up the neck from
+  // that grip by a share of `1 - weight`.
+  const slides = rig.restCarryPlace !== hold.restPlace;
+  if (slides) {
+    carryShift.copy(restHand.wrist);
+    restHandAt(rig, liftRest, carryStrings, restHand, rig.restCarryPlace);
+    carryShift.sub(restHand.wrist).applyQuaternion(carryInverse.copy(liftRest.rotation).invert());
+  }
 
   // The play: the instrument under the jaw, and the paw in the playing grip of the note.
   instrumentAt(rig, frames, 1, liftPlay);
@@ -1323,6 +1334,9 @@ function carryLift(
   const parent = rig.parent === BONES.chest ? frames.chest : frames.root;
   place.local.copy(parent.rotation).invert().multiply(place.rotation);
   placeOffset(rig, frames, place);
+  if (slides) {
+    out.wrist.addScaledVector(carryShift.applyQuaternion(place.rotation), 1 - weight);
+  }
   return angle;
 }
 

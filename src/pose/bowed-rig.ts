@@ -1453,6 +1453,14 @@ export interface BowedRig {
   /** The place of the `instrument` bone in the rest pose, in the model axes. */
   readonly restPivot: Vec3;
   /**
+   * The place of the left fingers on the target `fingerboard` that sets the place of a violin or
+   * a viola at rest and in the moves: 0 at the nut, 1 at the end of the fingerboard. It is the
+   * rest place of the hold before the rule of the wrist clearance (`BowedHold.wristFit`, design
+   * 5.3). The paw holds the neck at `BowedHold.restPlace`, and the instrument keeps its rest place
+   * and its path in the moves.
+   */
+  readonly restCarryPlace: number;
+  /**
    * The move of the instrument in the middle of the lift and of the lowering, in meters, in the
    * axes of the root (`BowedHold.liftReach`).
    */
@@ -1807,6 +1815,7 @@ export function bowedRig(
     restRotation: toQuat(restRotation),
     playShift: toVec3(playShift),
     restPivot: restPivotOf(model, hold, atSide, pivot, playShift),
+    restCarryPlace: hold.restPlace,
     liftReach: toVec3(new Vector3(...hold.liftReach).multiplyScalar(model.body.headHeight)),
     restPoleR: hold.restPoleR,
     restPoleL: hold.restPoleL,
@@ -1951,7 +1960,10 @@ function forearmGrip(model: PlayerModel, direction: Vec3): Vec3 {
  * 5.2, `BowedHold.restArms`): each arm hangs out to the side until it clears the body, with its own
  * forward swing and elbow bend (`hangingArm()`). The instrument moves from its place on the thigh
  * so that the left paw holds its neck in the rest grip at the hanging wrist, and the right paw
- * holds the bow in its rest turn at the hanging wrist.
+ * holds the bow in its rest turn at the hanging wrist. A rest grip nearer to the nut by the rule of
+ * the wrist clearance (`BowedHold.wristFit`) keeps the place of the instrument of the rest place
+ * before the rule (`RigPoints.restCarryPlace`), and the left paw moves up the neck from the
+ * hanging wrist.
  *
  * @param model The player model.
  * @param rig The points of the player, with the rest place on the thigh.
@@ -1968,10 +1980,13 @@ function armRest(
   const { place, strings } = createBowPlaces();
   instrumentAt(rig, bindFrames(rig), 0, place);
   stringsAt(rig, place, strings);
-  const hand = restHandAt(rig, place, strings, {
-    wrist: new Vector3(),
-    rotation: new Quaternion(),
-  });
+  const hand = restHandAt(
+    rig,
+    place,
+    strings,
+    { wrist: new Vector3(), rotation: new Quaternion() },
+    rig.restCarryPlace,
+  );
   const wristL = new Vector3(...rig.armL.bind.shoulder).add(new Vector3(...hangL.wrist));
   const wristR = new Vector3(...rig.armR.bind.shoulder).add(new Vector3(...hangR.wrist));
   const bowHand = new Quaternion(...rig.restBow.rotation);
@@ -2004,7 +2019,8 @@ function bindFrames(rig: RigPoints): TorsoFrames {
  * Gives the rest pose of a soloist who stands (design 5.2): the arms hang a little out to the
  * sides, the left hand holds the instrument at the rest place of the fingers, and the right hand
  * holds the bow at the hanging wrist, as in the bind pose or with the turn of
- * {@link BowedHold.standBow}.
+ * {@link BowedHold.standBow}. The place of the instrument comes from the grip of
+ * `RigPoints.restCarryPlace`, as in `armRest()`.
  *
  * @param model The player model.
  * @param rig The points of the player, with the instrument turned for the rest pose.
@@ -2030,9 +2046,9 @@ function standingRest(
   stringsAt(rig, place, strings);
   const hand = { wrist: new Vector3(), rotation: new Quaternion() };
   if (rig.hold.restPawTurnL !== null) {
-    restHandAt(rig, place, strings, hand);
+    restHandAt(rig, place, strings, hand, rig.restCarryPlace);
   } else {
-    stopHandAt(rig, place, strings, rig.hold.restPlace, 0, 0, MIDDLE_FINGER, hand);
+    stopHandAt(rig, place, strings, rig.restCarryPlace, 0, 0, MIDDLE_FINGER, hand);
   }
   const wristL = new Vector3(...rig.armL.bind.shoulder).add(new Vector3(...hangL.wrist));
 
