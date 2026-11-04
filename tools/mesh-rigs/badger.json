@@ -453,9 +453,96 @@
       ],
       "below": 0,
       "note": "The shape of the raised arm L of the percussionist (pnpm raise-fit). It corrects 10 faces at the front of the left shoulder, which fold in each sample of the triangle when the upper arm turns 98 degrees from the bind."
+    },
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          -0.0166,
+          -0.1728,
+          0.0944,
+          0.9803
+        ],
+        "upper_arm": [
+          -0.1921,
+          -0.4629,
+          0.7019,
+          0.5061
+        ],
+        "forearm": [
+          -0.048,
+          -0.1343,
+          -0.1409,
+          -0.9797
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the raised arm L of the flutist@badger (pnpm raise-fit). The shared hold turns the upper arm 119 degrees from the bind, and the front and the top of the arm root fold (faces 586 to 1059 of the note of raiseNote) in each sample of the play."
+    },
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          -0.0166,
+          -0.1728,
+          0.0944,
+          0.9803
+        ],
+        "upper_arm": [
+          -0.0925,
+          -0.6273,
+          0.5766,
+          0.5152
+        ],
+        "forearm": [
+          0.048,
+          0.1344,
+          0.1408,
+          0.9797
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the raised arm L of the clarinetist@badger (pnpm raise-fit). The shared hold turns the upper arm 118 degrees from the bind, and the front and the top of the arm root fold (faces 586 to 1059 of the note of raiseNote) in each sample of the play. It also holds the trumpeter@badger."
+    },
+    {
+      "side": "R",
+      "turns": {
+        "clavicle": [
+          -0.0166,
+          0.1729,
+          -0.0942,
+          0.9803
+        ],
+        "upper_arm": [
+          -0.1986,
+          0.5383,
+          -0.5953,
+          0.5625
+        ],
+        "forearm": [
+          0.048,
+          -0.1343,
+          -0.1409,
+          0.9797
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the raised arm R of the flutist@badger (pnpm raise-fit). The shared hold turns the upper arm 112 degrees from the bind, and the front of the right arm root folds (faces 539, 540, 692, 693, 697 to 699, 743, 744, 1109, and 2391) in each sample of the play. It also holds the trumpeter@badger."
     }
   ],
-  "raiseNote": "One corrective shape of a raised arm (pnpm raise-fit): the left arm that holds the triangle up. The straight bind turns the upper arm about 98 degrees from the bind there.",
+  "raiseNote": "Corrective shapes of a raised arm (pnpm raise-fit). The first is the left arm that holds the triangle up: the straight bind turns the upper arm about 98 degrees from the bind there. The next two are the left arm of the shared flute and clarinet holds of a recast badger, at about 118 degrees, and the last is the right arm of the flute hold. There the clavicle turns about 23 degrees, and the faces at the front and the top of the arm root (586, 587, 591, 630, 631, 636, 650, 651, 909, 976 to 978, 1020, 1021, 1424, 1577, 1058, and 1059) fold. A shape of the cellist@badger (101 degrees) also turned over 4 more faces in the play of the percussionist, so the cello has no shape. The four shapes are the limit of a body.",
   "refine": {
     "rings": [],
     "flip": {
