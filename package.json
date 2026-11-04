@@ -33,6 +33,7 @@
     "hold-scan": "node tools/hold-scan.ts",
     "pair-scan": "node tools/pair-scan.ts",
     "trunk-form": "node tools/trunk-form.ts",
+    "body-shape": "node tools/body-shape.ts",
     "raise-fit": "node tools/raise-fit.ts",
     "choir-check": "pnpm build && node tools/choir-check.ts",
     "body-probe": "node tools/body-probe.ts",
