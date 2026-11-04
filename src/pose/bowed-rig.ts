@@ -33,6 +33,7 @@ import { fitCelloPlace } from './cello-place.ts';
 import { fitViolinPlace } from './violin-place.ts';
 import type { ChinFit } from './violin-place.ts';
 import { lapPoint } from './lap.ts';
+import { elbowOutTurn, turnPoleOut } from './round-arms.ts';
 import type { LapPlace } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import type { BowRange } from './strokes.ts';
@@ -137,6 +138,13 @@ export interface BowedHold {
   readonly restPoleR: Vec3;
   /** The direction to which the left elbow points in the rest pose, in the axes of the chest. */
   readonly restPoleL: Vec3;
+  /**
+   * The rule of the round free arms (design 5.3): the out swing that the arms of the body that the
+   * hold fits need (`armOut()`), in radians. A rounder body turns each elbow out, at rest, in the
+   * moves, and in the play (`elbowOutTurn()`). `null` keeps the elbows of the hold on each body, as
+   * an own hold does.
+   */
+  readonly roundArms: number | null;
   /** The bow tip points to this side in pizzicato, as the plucking hand holds it. */
   readonly pizzicatoTip: Vec3;
   /**
@@ -426,6 +434,7 @@ const CHIN_HOLD = {
   playTurn: IDENTITY,
   restPoleR: [1, -0.9, -0.5],
   restPoleL: [0, -1, 0.5],
+  roundArms: null,
   pizzicatoTip: [0.3, 1, 0.4],
   stringTurn: 17 * MathUtils.DEG2RAD,
   bowTilt: 30 * MathUtils.DEG2RAD,
@@ -504,6 +513,7 @@ const FLOOR_HOLD = {
   playTurn: IDENTITY,
   restPoleR: [1, -0.6, -0.5],
   restPoleL: [0.3, -1, 0],
+  roundArms: null,
   pizzicatoTip: [-1, 1, 0],
   stringTurn: 17 * MathUtils.DEG2RAD,
   bowTilt: 20 * MathUtils.DEG2RAD,
@@ -886,6 +896,14 @@ const WOLF_VIOLIN_HOLD = {
 } as const satisfies BowedHold;
 
 /**
+ * The out swing of the arms of the body that each shared hold fits, in degrees
+ * (`BowedHold.roundArms`, design 5.3): the larger `armOut()` of the two arms of its accepted player. The violin fits the
+ * rabbit (29° and 30°), and the cello the dog (41° and 42°), so a rounder body turns its elbows
+ * out, and these bodies keep the elbows of the hold.
+ */
+const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
+
+/**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
  * values of the accepted rabbit violinist ({@link SHOULDER_HOLD}), as directions and in head
  * heights, with a place and a rest from the body. With the chin hold, the left upper arms and the
@@ -912,6 +930,7 @@ const WOLF_VIOLIN_HOLD = {
  */
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
+  roundArms: ROUND_ARMS_FIT.violin * MathUtils.DEG2RAD,
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
   frogHair: 0.15,
   liftReach: [0.15, 0.15, -0.3],
@@ -979,6 +998,7 @@ const LAP_CELLO_BOW = {
  */
 const CELLO_HOLD = {
   ...FLOOR_HOLD,
+  roundArms: ROUND_ARMS_FIT.cello * MathUtils.DEG2RAD,
   lean: 3 * MathUtils.DEG2RAD,
   reach: 30 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
@@ -1186,6 +1206,7 @@ const DOG_HOLD = {
   pluckSide: 0.25,
   restPoleR: [1.2, -1, 0.75],
   restPoleL: [-2, -1, 0],
+  roundArms: null,
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
   fit: null,
 } as const satisfies BowedHold;
@@ -1778,7 +1799,42 @@ export function bowedRig(
     : hold.restArms && hold.restPawTurnL !== null
       ? armRest(model, rig, hold.restArms)
       : rig;
-  return { ...rest, bowRange: bowRangeOf(rest), stopRange: stopRangeOf(rest) };
+  const round = roundElbows(model, rest);
+  return { ...round, bowRange: bowRangeOf(round), stopRange: stopRangeOf(round) };
+}
+
+/**
+ * Turns the elbows of a round body out by the rule of the round free arms
+ * ({@link BowedHold.roundArms}, design 5.3): each elbow of the hold and of the rest. The paws keep
+ * their places, so only the elbows move.
+ *
+ * @param model The player model.
+ * @param rig The points of the player.
+ * @returns The points, with the turned elbows, or `rig` for a hold with no rule.
+ */
+function roundElbows(model: PlayerModel, rig: RigPoints): RigPoints {
+  const { hold } = rig;
+  if (hold.roundArms === null) {
+    return rig;
+  }
+  const turnL = elbowOutTurn(model, rig.armL, hold.roundArms);
+  const turnR = elbowOutTurn(model, rig.armR, hold.roundArms);
+  const left = (pole: Vec3): Vec3 => turnPoleOut(pole, turnL, 'L');
+  const right = (pole: Vec3): Vec3 => turnPoleOut(pole, turnR, 'R');
+  return {
+    ...rig,
+    hold: {
+      ...hold,
+      poleL: left(hold.poleL),
+      liftPoleL: hold.liftPoleL && left(hold.liftPoleL),
+      poleR: right(hold.poleR),
+      poleTipR: right(hold.poleTipR),
+      polePizzicato: right(hold.polePizzicato),
+      liftPoleR: hold.liftPoleR && right(hold.liftPoleR),
+    },
+    restPoleL: left(rig.restPoleL),
+    restPoleR: right(rig.restPoleR),
+  };
 }
 
 /**
