@@ -493,14 +493,15 @@ The app follows these facts:
   middle of the bow (`balanceShift()`, `BOW_MOTION.fastSec`, `BOW_MOTION.balance`).
 - **The rest (2.9).** The violin and the viola rest upright on the left knee or thigh. The left paw
   holds the neck in a rest grip near the grip of the play (`restHandAt()`,
-  `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). The
-  cat rests the viola far to the front of its short lap, and the bow grip far to the front too,
-  so that each elbow of its straight bind bends less than 120°, and closes its paw around the
-  neck. Its right elbow hangs further out (`BowedHold.restPoleR`), so that the upper arm clears
-  the arm root of its narrow shoulders. In the shared violin hold, both arms hang out to the sides until they clear the body,
-  and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left
-  paw in front of the thigh, and the upright bow at the right paw. The rabbit hangs its arms so
-  too, with a smaller bend of the bow arm, so that the bow paw rests low at its side.
+  `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). In
+  the shared violin hold, both arms hang out to the sides until they clear the body, and the
+  elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
+  front of the thigh, and the upright bow at the right paw. The rabbit hangs its arms so too,
+  with a smaller bend of the bow arm, so that the bow paw rests low at its side. The cat hangs its
+  arms so too: the viola stands low in front of the lap, the left paw closes around the neck, and
+  the bow paw rests at the side of the belly. Its bow arm bends more, and its elbow turns out in
+  the middle of the moves (`BowedHold.liftPoleR`), so that the round upper arm keeps out of the
+  arm root.
 
 The app does not follow these facts:
 

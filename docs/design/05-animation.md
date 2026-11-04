@@ -222,9 +222,11 @@ The rest of each family:
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
-  arm root. The cat keeps a rest place on the thigh, far to the front of its short lap, and rests
-  the bow grip far to the front too. Reason: a grip near the shoulder bends a straight bind elbow
-  past 130°, and the inner elbow folds.
+  arm root. The cat hangs its arms so too, with the viola low in front of the lap, as the cat of
+  the A-pose mesh rested. Reason: on the long legs, a rest place on the thigh lies on the top of
+  the belly (`lapPoint()`), so the paws rested at the chin, and the cat looked hunched. Its bow
+  arm bends more at rest, and its elbow turns out in the middle of the moves
+  (`BowedHold.liftPoleR`, 5.3).
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
@@ -278,12 +280,14 @@ The rest of each family:
   into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
   the body (strings 1.8, 2.3), and a cellist starts a stroke open at the shoulder (strings 2.2). At
-  rest, the arms of such a body hang out until they clear the body (`restArms`). Each elbow turns
-  out about the line from the shoulder joint to the grip, and the shoulder turns forward when the
-  arm reaches forward. A grip nearer to the shoulder bends the elbow, so each degree of the turn
-  moves the upper arm further from the trunk. When the forearm and not the upper arm lies on the
-  trunk, a nearer grip pushes the forearm in. A grip away from the shoulder frees the forearm, but
-  moves the paw off its keys, so the pig keeps the grip of the play and moves only the grip of the
+  rest, the arms of such a body hang out until they clear the body (`restArms`). A hanging bow
+  arm turns its elbow out in the middle of the lift and the lowering (`liftPoleR`), because the
+  corrective shape of the bow arm keeps the arm root out only near the elbow bend of the play.
+  Each elbow turns out about the line from the shoulder joint to the grip, and the shoulder turns
+  forward when the arm reaches forward. A grip nearer to the shoulder bends the elbow, so each
+  degree of the turn moves the upper arm further from the trunk. When the forearm and not the upper
+  arm lies on the trunk, a nearer grip pushes the forearm in. A grip away from the shoulder frees
+  the forearm, but moves the paw off its keys, so the pig keeps the grip of the play and moves only the grip of the
   rest (`restGripShiftL`). The grip turn of the arm gate counts from the posed forearm, so the turn
   of the elbow adds to it (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the
   shoulder. Reason: on a bent arm, the swivel moves the arm root off the trunk, and each paw keeps
