@@ -230,10 +230,13 @@ The app follows these facts:
   badger stands behind the drum, and the right paw holds the beater at the near rim, one third up
   from the butt. At the strike, the beater lies along the head, as the photos of [13] show, and
   strikes about one third in from the rim [16]. The left arm hangs, because a single note often
-  needs no muffling.
+  needs no muffling. The right upper arm hangs beside the body with the elbow down and back
+  (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
-  The sticks make a V and slant down a little at a strike. At rest, the sticks lie across the body
-  in front of the waist, with the tips a little above the near rim (`PercussionHold.set`).
+  The sticks make a V and slant down a little at a strike. The elbows stand about a fist from the
+  body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the belly. At
+  rest, the sticks lie across the body in front of the waist, with the tips a little above the
+  near rim (`PercussionHold.set`).
 - **The suspended cymbal (section 7).** The badger plays the cymbal parts on a suspended cymbal
   (`SpeciesParams.cymbalForm`, `SUSPENDED_CYMBAL`). Its short arms cannot hold hand cymbals of the
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
