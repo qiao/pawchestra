@@ -347,15 +347,11 @@
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 1 degree out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 1 0). So the legs are close and parallel from the front, as on the cat of the A-pose mesh: the knee gap is 0.204 m (old 0.188 m, 0.244 m with 8 degrees out), and the ankle gap 0.203 m (old 0.222 m, 0.262 m with 8 degrees).",
     "straightArms": true,
     "tailBind": {
-      "tail": [
-        0.65,
-        -0.38,
-        -0.15
-      ],
-      "tail_tip": [0.6, -0.41, 0.75]
+      "tail": [0.858, -0.504, 0.101],
+      "tail_tip": [0.404, -0.909, -0.101]
     },
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
-    "tailBindNote": "Each tail bone of the seated bind turns onto its direction: the root bone goes to the left and a little down and back, so that the tail lies on the seat behind the haunch, and the tip bone goes to the left, forward, and down, so that the curled end hangs over the left side of the seat in front of the back post. The tail keeps the curl of the mesh, and the footprint of the seated cat is 1.2 cm deeper than the footprint of the cat of the A-pose mesh. With the root bone further back [0.75, -0.38, -0.3] and the tip bone [0.7, -0.41, 0.6], the tail went 1.2 cm into the left back post of the chair of 0.46 m, and the footprint was 4.5 cm deeper. With the tail back over the back edge of the seat, the footprint was 31 cm deeper, and the layout moved the seats of most demos. A curl of the tail along a curve (tailCurl) crumpled the U-shaped tail of the mesh. The tail keeps its curl in the standing body."
+    "tailBindNote": "The tail bones of the seated bind turn onto these directions (bind_turns() of tools/blender/rig_mesh.py): the root bone goes to the left and down along the back of the haunch, and the tip bone goes down, so that the tail hangs over the left side of the seat in front of the left back post, as the tail of a cat on a stool. The tip bone turns 110 degrees from its place on the curl of the mesh, and the bend spreads over 0.07 u on each side (weights.tail.bend), so that the tail bends in a smooth arc. The footprint of the seated cat is 0.8 cm less deep than with the old tail bind, and the tail is 2.4 cm from the left back post. A tip bone that keeps the curl of the mesh (a turn below 70 degrees) points back, and the footprint grew 4 cm to 6 cm. The old tip bone [0.6, -0.41, 0.75] turned 159 degrees from the curl, and the linear blend of that turn pressed the bend into a lump. A curl along a curve (tailCurl) crushed the tail into a flat spike. The tail keeps the curl of the mesh in the standing body."
   },
   "weights": {
     "armSplit": 0.12,
@@ -377,7 +373,7 @@
         0.0,
         0.04
       ],
-      "bend": 0.04,
+      "bend": 0.07,
       "smooth": 3
     },
     "sliver": {
@@ -487,7 +483,7 @@
       ]
     ],
     "armSplitNote": "The arm leaves the trunk at |x| 0.13. Beyond the plane |x| = armSplit, only the free arm follows the arm bones (armFree).",
-    "tailNote": "The vertices within radius of the tail line and behind the plane z = behind follow the two tail bones with soft shares (tail_weights() of tools/blender/rig_mesh.py).",
+    "tailNote": "The vertices within radius of the tail line and behind the plane z = behind follow the two tail bones with soft shares (tail_weights() of tools/blender/rig_mesh.py). The share of the tip bone grows over bend units on each side of the bend, so that the 110 degrees of the turn of the tip bone in the seated bind spread over the tail. With 0.04 u, the bend was a corner. With a sharper root (root [0, 0.03] and smooth 1), the root of the tail did not go down onto the seat any more, and the seat rose 1.8 cm.",
     "clavicleFromNote": "The share of the clavicle weight that a vertex keeps grows from 0 at the lower height to 1 at the upper height (units), and the chest takes the rest: the band under the clavicle joint (y 0.605).",
     "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the faces under the front and the back of each arm root. The T-pose arm turns about 80 degrees down to hang, and these faces folded in each sample of the rest (pnpm fold-probe violist --faces)."
   },
@@ -612,7 +608,9 @@
     "smooth": 6,
     "end": 0.02,
     "most": 0.045,
-    "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox and the rabbit (sit() of tools/blender/rig_mesh.py), at most 0.045 u."
+    "root": [0.8, 0.98],
+    "top": 0.2623,
+    "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox and the rabbit (sit() of tools/blender/rig_mesh.py), at most 0.045 u. root counts the root of the tail, which shares its weight with the hips, as the haunch, and top keeps the seat top of the chair of the cat of the A-pose mesh (0.300 m). The seat top is the lowest point of the body over the seat, and the root of the tail sets it: with the tail bind of the side of the seat and no root and top, the seat rose 1.7 cm."
   },
   "raise": [
     {
