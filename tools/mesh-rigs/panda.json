@@ -46,6 +46,14 @@
   "legFactorNote": "The thigh is 1.1 times and the shin 1.38 times as long as on the mesh, and the feet keep their size, so that the panda sits on the chair of the panda of the A-pose mesh: the seat top is 0.277 m high (0.278 m on the old panda, 0.181 m with the legs of the mesh), and the thigh and the shin are 0.115 m and 0.133 m long (old 0.114 m and 0.117 m). The shin grows more than the thigh, because the shin stands vertical and lifts the seat by its full length, and the sloped thigh lifts it by less than half of its length. The body rises 0.029 u, so the standing shoulder joints of ANIMALS rise with it and the trunk, the head, and the arms keep their meters.",
   "headFactor": 0.93,
   "headFactorNote": "The head and the ears are 0.93 times as large as on the mesh, around the neck joint, so that the head is as wide for its height H as the head of the panda of the A-pose mesh (1.128 H, old 1.128 H, 1.212 H with the factor 1) and the pea eyes are as far apart (0.407 H, old 0.406 H). The export keeps the head before the factor for the holds (ungrown() of tools/studio-body.ts). The nose and the mouthpiece move 3 cm back with the smaller head, so the trombone hold of the panda (PANDA_TROMBONE of src/pose/winds.ts) puts the right elbow further out and the rest place further forward.",
+  "girthProfile": [
+    [0.35, 1, 1, 1],
+    [0.5, 0.95, 1, 1],
+    [0.73, 0.83, 1, 1],
+    [0.875, 0.97, 1, 1],
+    [1, 1, 1, 1]
+  ],
+  "girthProfileNote": "The rows (share of the trunk axis of the source from the hips joint to the neck joint, width, front, back) give the upper chest and the back the taper of the panda of the A-pose mesh (7cf41074), on cuts of the seated bind from the seat to the neck joint (pnpm body-shape trombonist): the width at 0.55 of the cut span is 60.5 cm (old 56.2 cm, 63.5 cm with the width 1), at 0.65 55.0 cm (old 52.2 cm, 59.9 cm), and at 0.75 55.4 cm (old 47.7 cm, 61.7 cm). At 0.75, the widest points of the cut are the undersides of the arm roots, so the row at 0.73 is the narrowest. The shoulder joints are 49.8 cm apart (old 47.9 cm, 51.4 cm with the width 1). With the width 0.93 at the shoulder joint (0.875) and 0.85 at 0.73, the shoulder joints were 47.7 cm apart, and the left paw went 0.5 cm into the trombone at rest (0.2 cm with the width 1). The depth, the belly, the haunch, and the back on the chair keep their places.",
   "joints": {
     "root": {
       "head": [
