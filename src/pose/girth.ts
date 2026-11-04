@@ -5,7 +5,7 @@ import { boneIndex } from '../models/rig.ts';
 
 /**
  * The share of the corners of a part that lie within the girth of the part ({@link wristGirth},
- * {@link palmDepth}), so that a single far corner, such as the tip of a claw, does not count.
+ * {@link pawGirth}), so that a single far corner, such as the tip of a claw, does not count.
  */
 const GIRTH_SHARE = 0.9;
 
@@ -60,28 +60,30 @@ export function wristGirth(model: PlayerModel, side: 'L' | 'R'): number {
 }
 
 /**
- * Gives the depth of the palm of a paw in the bind pose (design 5.3, "Grip clearance from the
- * girth"): the distance of the corners of the paw and the claws on the side of the palm from the
- * wrist joint, along the normal of the palm, within which {@link GIRTH_SHARE} of these corners
- * lie. The palm of each bind hand faces the body: +x for the left hand, -x for the right hand.
- * The grip of a bowed string puts the finger block on the line of the wrist joint, so a deep palm
- * lies further into the neck.
+ * Gives the girth of a paw in the bind pose (design 5.3, "Grip clearance from the girth"): the
+ * distance of the corners of the paw and the claws from the line from the elbow to the wrist,
+ * within which {@link GIRTH_SHARE} of these corners lie. A thick paw on a neck lies further into
+ * the neck on each side.
  *
  * @param model The player model.
  * @param side The arm.
- * @returns The depth, in meters.
+ * @returns The girth, in meters.
  */
-export function palmDepth(model: PlayerModel, side: 'L' | 'R'): number {
-  const toPalm = side === 'L' ? 1 : -1;
-  const wrist = model.skeleton.positions[boneIndex(`hand${side}`)]?.[0] ?? 0;
+export function pawGirth(model: PlayerModel, side: 'L' | 'R'): number {
+  const at = (bone: 'forearm' | 'hand'): Vector3 =>
+    new Vector3(...(model.skeleton.positions[boneIndex(`${bone}${side}`)] ?? [0, 0, 0]));
+  const wrist = at('hand');
+  const axis = wrist.clone().sub(at('forearm')).normalize();
+
   const paw = new Set([boneIndex(`hand${side}`), boneIndex(`fingers${side}`)]);
   const { positions, bones } = model.mesh;
-  const depths: number[] = [];
+  const point = new Vector3();
+  const distances: number[] = [];
   for (let c = 0; c < bones.length; c++) {
-    const depth = toPalm * ((positions[c * 3] ?? 0) - wrist);
-    if (paw.has(bones[c] ?? -1) && depth > 0) {
-      depths.push(depth);
+    if (paw.has(bones[c] ?? -1)) {
+      point.fromArray(positions, c * 3).sub(wrist);
+      distances.push(point.addScaledVector(axis, -point.dot(axis)).length());
     }
   }
-  return shareOf(depths, GIRTH_SHARE);
+  return shareOf(distances, GIRTH_SHARE);
 }

@@ -23,7 +23,7 @@ import {
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
-import { palmDepth, wristGirth } from './girth.ts';
+import { pawGirth, wristGirth } from './girth.ts';
 import { hangingArm } from './hang.ts';
 import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
@@ -300,11 +300,11 @@ export interface BowedHold {
    * body that the hold fits, in meters. A thicker body moves its left paw further off the neck by
    * the difference, so that its paw and forearm keep the free gap of that body. `wrist` is the
    * girth of the wrist end of the forearm (`wristGirth()`), and the difference adds to
-   * {@link BowedHold.restGapL}. `palm` is the depth of the palm (`palmDepth()`), and the
-   * difference adds to {@link BowedHold.gapL}. `null` keeps the gaps of the hold on each body, as
+   * {@link BowedHold.restGapL}. `paw` is the girth of the paw (`pawGirth()`), and the difference
+   * adds to {@link BowedHold.gapL}. `null` keeps the gaps of the hold on each body, as
    * an own hold does.
    */
-  readonly girthGap: { readonly wrist: number | null; readonly palm: number | null } | null;
+  readonly girthGap: { readonly wrist: number | null; readonly paw: number | null } | null;
   /**
    * The direction to which the left elbow points in the middle of the lift and of the lowering, in
    * the axes of the chest (design 5.2). The elbow turns from the rest pole to this pole, then to
@@ -957,7 +957,7 @@ const GIRTH_FIT = { violin: 0.048 } as const;
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
   roundArms: ROUND_ARMS_FIT.violin * MathUtils.DEG2RAD,
-  girthGap: { wrist: GIRTH_FIT.violin, palm: null },
+  girthGap: { wrist: GIRTH_FIT.violin, paw: null },
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
   frogHair: 0.15,
   liftReach: [0.15, 0.15, -0.3],
@@ -1863,7 +1863,7 @@ function girthGaps(model: PlayerModel, hold: BowedHold): BowedHold {
   return {
     ...hold,
     restGapL: hold.restGapL + extra(rule.wrist, wristGirth),
-    gapL: hold.gapL + extra(rule.palm, palmDepth),
+    gapL: hold.gapL + extra(rule.paw, pawGirth),
   };
 }
 
