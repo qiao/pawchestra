@@ -109,6 +109,21 @@ export interface MeshRigConfig {
    */
   readonly girthFactor?: readonly [width: number, depth: number];
   /**
+   * The rows of the girth factors along the trunk axis, in place of {@link girthFactor}: each row
+   * gives a share of the axis of the source from the hips joint (0) to the neck joint (1), and
+   * the factors of the width, of the depth in front of the axis, and of the depth behind it there
+   * (`girth_profile()` of `tools/blender/rig_mesh.py`). The factors blend linearly between the
+   * rows, and keep the first or the last row beyond them. So the belly can become narrower and
+   * flatter and the chest wider and deeper, the back on the chair can keep its place, and each
+   * arm moves with the factors at its shoulder joint.
+   */
+  readonly girthProfile?: readonly (readonly [
+    share: number,
+    width: number,
+    front: number,
+    back: number,
+  ])[];
+  /**
    * The factors of the cross-section of the upper arm and of the forearm across their axes, 1 and
    * 1 when they are not given (`arm_girth()` of `tools/blender/rig_mesh.py`). The paws keep their
    * size, and the shoulder keeps its form.
@@ -199,6 +214,7 @@ export function parseConfig(text: string): MeshRigConfig {
     config.neckFactor ?? 1,
     config.trunkFactor ?? 1,
     ...(config.girthFactor ?? [1, 1]),
+    ...(config.girthProfile ?? []).flatMap(([, width, front, back]) => [width, front, back]),
     ...(config.armGirth ?? [1, 1]),
     ...(config.legGirth ?? [1, 1]),
     config.proportions?.width ?? 1,
@@ -212,6 +228,17 @@ export function parseConfig(text: string): MeshRigConfig {
     throw new Error(
       'The arm factor, the leg factor, the shin factor, the head factor, the neck factor, the trunk factor, the girth factors, the arm and leg girth factors, the proportions, app.shoulders, and app.reach must be positive numbers.',
     );
+  }
+  if (config.girthProfile !== undefined) {
+    if (config.girthFactor !== undefined) {
+      throw new Error('girthProfile replaces girthFactor: give only one of them.');
+    }
+    const rows = config.girthProfile;
+    if (rows.length === 0 || !rows.every((row) => row.length === 4 && Number.isFinite(row[0]))) {
+      throw new Error(
+        'girthProfile must hold rows of a share, a width factor, a front factor, and a back factor.',
+      );
+    }
   }
   const keep = config.proportions?.keep;
   if (keep === undefined && config.proportions?.head !== undefined) {
@@ -331,7 +358,7 @@ function parseConfigValue(text: string, old: ConfigValue, path: string): ConfigV
 /**
  * The optional rules of a config that a variant of `--set` can add, by their path, each with a
  * value of the kind of its value: the head factor (`headFactor`), the neck factor (`neckFactor`),
- * the trunk factor (`trunkFactor`) and the top joint of its part of the trunk (`trunkTop`), the girth factor (`girthFactor`), the factors of the
+ * the trunk factor (`trunkFactor`) and the top joint of its part of the trunk (`trunkTop`), the girth factor (`girthFactor`) or its rows along the trunk (`girthProfile`), the factors of the
  * cross-section of the arms (`armGirth`) and of the legs (`legGirth`), the trunk share of the painted weights under the armpits (`weights.paintedBelow`), the factors of the source on each axis
  * (`proportions`), the depth factor of the source and the factor of the kept head
  * (`proportions.depth`, `proportions.head`), the root share of the tail in
@@ -352,6 +379,7 @@ const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, Config
   ['trunkFactor', 1],
   ['trunkTop', 'neck'],
   ['girthFactor', [1, 1]],
+  ['girthProfile', [[0, 1, 1, 1]]],
   ['armGirth', [1, 1]],
   ['legGirth', [1, 1]],
   ['weights.paintedBelow', { height: [0, 0], inner: 0 }],
@@ -717,7 +745,7 @@ export function printedOnly(path: string, known: boolean): string | null {
  * unit of the base: the height of the standing shoulder joints of the variant over the height of
  * the shoulder joints of the base, after the rise of the legs and the drop of the trunk
  * ({@link shoulderHeight}). A variant of `legFactor` raises the shoulder joints, a variant of
- * `trunkFactor` lowers them, and a variant of the depth of `girthFactor` moves them a little. The landmark moves with them, so that the trunk, the head, and the
+ * `trunkFactor` lowers them, and a variant of the depth of `girthFactor` or `girthProfile` moves them a little. The landmark moves with them, so that the trunk, the head, and the
  * arms keep their meters. A variant of `headFactor` or `neckFactor` keeps the shoulder joints, so
  * its factor is 1.
  *
@@ -838,7 +866,9 @@ export function trunkDrop(config: MeshRigConfig): number {
  * `tools/blender/rig_mesh.py` gives it: the arm moves with its shoulder joint, which moves away
  * from the trunk axis through the hips joint and the neck joint. The axis lies in the middle
  * plane, so only the depth factor moves the joint up or down, by the depth factor less 1 times the
- * height of its distance across the axis.
+ * height of its distance across the axis. With `girthProfile`, the depth factor is the blend of
+ * the rows at the share of the joint along the axis, in front of the axis or behind it
+ * ({@link girthDepth}).
  *
  * @param config The config.
  * @returns The rise, in the units of the studio: small, because the axis is nearly vertical.
@@ -855,8 +885,43 @@ export function girthRise(config: MeshRigConfig): number {
   ];
   const rel: Vec3 = [shoulder[0] - hips[0], shoulder[1] - hips[1], shoulder[2] - hips[2]];
   const along = rel[0] * axis[0] + rel[1] * axis[1] + rel[2] * axis[2];
-  const depth = config.girthFactor?.[1] ?? 1;
+  // The source of a rig config faces +z, so a joint in front of the axis has a positive z part
+  // across it.
+  const depth = girthDepth(config, along / length, rel[2] - along * axis[2] > 0);
   return (depth - 1) * (rel[1] - along * axis[1]);
+}
+
+/**
+ * Gives the depth factor of the girth at a share of the trunk axis, as `girth_profile()` of
+ * `tools/blender/rig_mesh.py` gives it: the linear blend of the rows of `girthProfile` in the
+ * order of their shares, the first or the last row beyond them, or the depth of `girthFactor`.
+ *
+ * @param config The config.
+ * @param share The share of the axis from the hips joint (0) to the neck joint (1).
+ * @param front True for a point in front of the axis, false for a point behind it.
+ * @returns The depth factor, 1 with no girth rule.
+ */
+export function girthDepth(config: MeshRigConfig, share: number, front: boolean): number {
+  const depth = config.girthFactor?.[1] ?? 1;
+  const column = front ? 2 : 3;
+  const rows = (config.girthProfile ?? [[0, 1, depth, depth] as const]).toSorted(
+    (a, b) => a[0] - b[0],
+  );
+  let value = rows[0]?.[column] ?? 1;
+  for (const [i, row] of rows.entries()) {
+    const before = rows[i - 1];
+    if (share >= row[0]) {
+      value = row[column];
+      continue;
+    }
+    if (before) {
+      value =
+        before[column] +
+        ((share - before[0]) / (row[0] - before[0])) * (row[column] - before[column]);
+    }
+    break;
+  }
+  return value;
 }
 
 /**
