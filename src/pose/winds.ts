@@ -18,7 +18,7 @@ import type { ArmRig } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import { headBow } from './far-mouth.ts';
-import { elbowOutTurn, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
+import { elbowOutTurn, keepBent, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
 import { BRASS_FUNDAMENTALS } from './wind-notes.ts';
 import type { Fingering, WindState } from './wind-notes.ts';
 
@@ -2129,6 +2129,9 @@ function poseSide(
         .applyQuaternion(root.rotation)
         .multiplyScalar(4 * weight * (1 - weight)),
     );
+    if (rig.hold.roundArms !== null) {
+      keepBent(side.arm, shoulder.position, weight, wrist);
+    }
     mixRotation(restHand, hand, weight, hand);
   }
 
