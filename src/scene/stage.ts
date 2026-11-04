@@ -128,7 +128,8 @@ float seamOf(vec3 color) {
 // the four nearest texels that hold the surface of the point. A texel holds the highest surface
 // at its place, so at the edge of the podium, the floor must not read the lit podium top. A point
 // with no texel of its surface is under an overhang, such as the floor below the edge of the
-// podium top, or on a side. One texel is the texture of a stage with no bake.
+// podium top, on a side, or on a slope of the lip. One texel is the texture of a stage with no
+// bake.
 vec2 stageBakeAt(vec3 p, vec3 n) {
   ivec2 texels = textureSize(uStageBake, 0);
   if (texels.x == 1) {
@@ -151,11 +152,16 @@ vec2 stageBakeAt(vec3 p, vec3 n) {
   if (sum.z > 1e-4) {
     return sum.xy / sum.z;
   }
+  // The inner bevel of the lip rises more than the height test allows across one texel, so thin
+  // lines of it have no texel of their surface. With the rule of an overhang, the lines were dark,
+  // and they broke into dashes.
+  bool lipSlope = abs(n.y) < 0.9 && p.y < ${(STAGE_LIP.height + 0.001).toFixed(4)};
   // Under an overhang, the key light does not reach the point, and half the sky does.
-  if (abs(n.y) > 0.5) {
+  if (abs(n.y) > 0.5 && !lipSlope) {
     return vec2(0.0, 0.5);
   }
-  // A side reads the bake 4 cm in front of it, past the overhang of the podium top.
+  // A side or a slope of the lip reads the bake 4 cm in front of it, past the overhang of the
+  // podium top.
   return texture2D(uStageBake, (p.xz + normalize(n.xz) * 0.04) / (2.0 * uHalfSide) + 0.5).rg;
 }
 
