@@ -12,7 +12,7 @@ pig-upper.glb                     `armSource` of tools/mesh-rigs/pig.json
    │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
    v
 pig-arms.glb + pig-weights.json
-   │  tools/blender/pig_root.py   hidden arm roots moved toward the trunk wall
+   │  tools/blender/pig_root.py   hidden arm roots moved toward the trunk wall or the joint
    v
 pig-root.glb + pig-root-weights.json   `source` and `paintedWeights` of tools/mesh-rigs/pig.json
    │  pnpm rig-mesh pig
@@ -33,7 +33,7 @@ src/models/studio/pig.ts          studio body of the app
 | `pig-upper.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
 | `pig-arms.glb` | `pig-upper.glb` with rebuilt arms 1.5 times as long. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- pig --factor 1.5` |
 | `pig-weights.json` | Weights of the same Blender run. License as `pig.glb` | The same run |
-| `pig-root.glb` | `pig-arms.glb` with 7 moved vertices of the hidden arm roots. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/pig_root.py` |
+| `pig-root.glb` | `pig-arms.glb` with moved vertices of the hidden arm roots. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/pig_root.py` |
 | `pig-root-weights.json` | `pig-weights.json` at the places of `pig-root.glb`. License as `pig.glb` | The same run |
 | `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
 
@@ -118,11 +118,16 @@ inside the trunk, so that no gap shows at the shoulder. In the hornist, the turn
 this hidden root up to 3.9 cm into the shoulder, in each sample, and the sweep measured it as a
 clip of the upper arm (design 9.3). The bind pose alone put it 3.4 cm to 4.7 cm deep.
 `tools/blender/pig_root.py` moves the 7 vertices of `tools/arm-roots/pig-moves.json` out along the
-line to the nearest point of the trunk surface, by 0.3 cm to 2.8 cm. The move file gives the rule
-of the values. The other vertices, the faces, the UV, and the weights stay. A run gives the same
-bytes.
+line to the nearest point of the trunk surface, by 0.3 cm to 2.8 cm.
+
+In the recast violin, clarinet, cello, flute, and trumpet holds, 12 vertices of the domes went
+1.0 cm to 3.2 cm into the trunk, and some of them came up to 3 cm out of the shoulder in another
+pose. So no move toward the wall fits each role. The `shrinks` of the move file move these
+vertices 0.4 of the way to the shoulder joint of their side, by 1.8 cm to 3.7 cm. They then go at
+most 1.5 cm into the trunk. The move file gives the rule of the values. The other vertices, the
+faces, the UV, and the weights stay. A run gives the same bytes.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `pig-root.glb` | 965,548 bytes | `0e91fbb121e8f822e3f70f922f25c5b96386447c9e3b32811f87859f24acd150` |
-| `pig-root-weights.json` | 410,184 bytes | `f8f249305dabe7d442ebb88f068294bcfbcceda1d5918f894bb50c7dfb3ed4d6` |
+| `pig-root.glb` | 965,548 bytes | `66e99d5bb0dc1119e4c205559c35957ac2190b4799a39e6035ddaecdd092624a` |
+| `pig-root-weights.json` | 410,182 bytes | `0cb9c6f98b43d17f4949b33d251964c0a6efaf32caa16b8947fb90cc3631828a` |
