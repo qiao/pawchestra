@@ -274,8 +274,13 @@ The rest of each family:
   into the body. Reason: at the deepest moment, the arm is straight because the paw target of
   the lift or the lowering is out of reach, or the clip is at the root of the upper arm. Both
   points lie on the line of the swivel, so it does not move them. A shared hold lifts the
-  shoulder bones of a round body ("Free round arms in a shared hold"). The next approach is a
-  path of the paw in the lift and the lowering that keeps the elbow bent (`TODO.md`).
+  shoulder bones of a round body, and keeps a free paw bent in the moves ("Free round arms in a
+  shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm stays
+  too: on the cat, the dog, and the pig, the root goes into the arm root or the shoulder of the
+  mesh. A larger elbow turn up to the stop of `turnPoleOut()`, a larger lift of the shoulder, an
+  elbow out in the middle of the moves, and a larger forward turn of the shoulder each took only a
+  small part of the depth, and a larger turn moves the grip line of the arm gate past its limit.
+  So the next approach is the weights or the shape of the arm root of these meshes (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
   the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
   a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
@@ -301,7 +306,11 @@ The rest of each family:
   (`armOut()`). The hold keeps the swing of its accepted player (`ROUND_ARMS_FIT`), and a body that
   needs more turns each elbow of the play, the moves, and the rest out by `TURN_PER_SWING` times
   the difference (`elbowOutTurn()`), toward the side around the forward axis (`turnPoleOut()`). A
-  thin body keeps the elbows of the hold. The paws keep their grips. The percussion holds have no
+  thin body keeps the elbows of the hold. The paws keep their grips: in the 2x crops of the dog
+  and the rabbit flutists and the hippo clarinetist, each paw stays on its keys with and without
+  the turn, and the world pose of the palms changes much less than the elbows. The grip line of
+  the arm gate counts from the posed forearm, so the elbow turn adds to it (`ACCEPTED_GRIPS`), and
+  a grip line of a turned elbow is a fault of the gate (`TODO.md`). The percussion holds have no
   rule, because the badger plays them as its own holds. Reason: the sweep measures the inner half
   width of each arm against the trunk, so a body needs no value of its own.
 - **Lifted shoulders in a shared hold.** The elbow turn cannot clear a clip at the root of the upper
@@ -316,6 +325,15 @@ The rest of each family:
   keeps the shoulders down, and the clavicle rises only a little when the arm rises (winds 1.8), so
   the lift stays in that range and does not read as a shrug. Thus it clears only a part of the deep
   root clips, as on the pig (`TODO.md`).
+- **Bent arms in the moves.** In the lift and the lowering of a shared wind hold with the rule,
+  the wrist of the free hanging paw stays within `BENT_REACH` of the length of the arm from the
+  shoulder joint (`keepBent()`). The limit fades to the whole length at the rest and at the play,
+  so the paw keeps its places there. Reason: the straight line from the hanging wrist to the grip
+  went out of reach of a short arm, as on the dog, and a straight arm puts the round root of the
+  upper arm into the chest. A bent elbow follows its pole, so the elbow turn of the rule holds the
+  upper arm off the trunk. A real player keeps the upper arm away from the torso (winds 1.8). A paw
+  that holds the instrument or the bow keeps its path: a limit would move it off the instrument,
+  and on the bow arm of the cat it cleared no clip.
 - **Far mouth in a shared hold.** A long snout or a big head puts the mouth far in front of the
   shoulder joints, so the paws of a heavy body miss the valves of the trumpet, also at the smallest
   size. The shared trumpet hold takes the rule of the far mouth (`WindHold.farMouth`): the mouth
