@@ -536,11 +536,12 @@ passes.
       of the upper arm: violin play 2.3 cm, cello lowering 4.0 cm (left arm). The same vertices
       come up to 9 cm out of the trunk in other holds, so they are not a hidden root. Next: the
       elbow out in these holds, or a flatter inner side of the tube.
-- [ ] Right paw of the shared trumpet (4.4, 5.3): the hold does not roll the paws to the valves
-      (`faceTube` none), so the gate keeps the grip turn from the forearm. In the axes of the
-      trumpet, the right palm of each recast body turns 53° to 68° from the palm of the monkey.
-      Check the right paw in 2x crops against a real player, and give the hold a tube face if
-      the paw misses the valves. Then the palm turn can count it (`ACCEPTED_PALMS`).
+- [ ] Right fingers of the shared trumpet (5.3, winds 2.1): the right paw faces the valve tops
+      and points 0.4 of the way across them, but its fingers stay nearly straight (no
+      `gripCurl`), so they do not arch down onto the valve caps as the monkey's do. A grip curl
+      of the right paw alone needs a curl value for the left paw too. The margins are small: the
+      dog palm turn 28/30 and the deer folds R 8/8 in the cast matrix. A larger side aim or
+      shoulder turn made the dog miss its grip or the deer fold.
 - [ ] Percussion holds (5.3): the badger plays the shared percussion holds as its own holds, so
       they have no elbow rule. Give them a fit of the badger (`armOut()` 42° and 44°), so that a
       rounder recast body turns its elbows out and the badger stays the same.
