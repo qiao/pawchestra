@@ -7,7 +7,13 @@ joint, so their inner side lies inside the trunk. The turns of the arm move this
 deeper, and the sweep measures it as a clip of the upper arm in the body (design 9.3). The move
 file `tools/arm-roots/pig-moves.json` gives the source place of each vertex to move and its move
 in units. The script moves each of these arm vertices out along the line to the nearest point of
-the trunk surface. The other vertices, the faces, and the UV stay.
+the trunk surface.
+
+A vertex of the dome that goes deep into the trunk in one pose and comes out of the shoulder in
+another pose cannot move toward the wall. Its depth swings with its distance from the shoulder
+joint, so the list `shrinks` of the move file moves it, at its place after the moves, the share
+`share` of the way to the shoulder joint of its side (`upper_arm_L` of the rig config, mirrored
+for the right side). The other vertices, the faces, and the UV stay.
 
 The weights file of the rig (`paintedWeights`) finds the weights of each vertex by its place, so
 the script also writes a copy of `pig-weights.json` with the new place of each moved vertex. The
@@ -35,6 +41,7 @@ from mathutils.bvhtree import BVHTree
 SOURCE = 'assets/models/pig/pig-arms.glb'
 WEIGHTS = 'assets/models/pig/pig-weights.json'
 MOVES = 'tools/arm-roots/pig-moves.json'
+CONFIG = 'tools/mesh-rigs/pig.json'
 OUT_GLB = 'pig-root.glb'
 OUT_WEIGHTS = 'pig-root-weights.json'
 WELD = 1e-5
@@ -126,6 +133,27 @@ def run(moves_path, out_dir):
         moved[i] = p + out.normalized() * (row['move'] / scale)
         lines.append(f'vertex {i} at {[round(x, 3) for x in row["point"]]}: depth '
                      f'{depth * scale:.4f} u, move {row["move"]:.4f} u')
+    # Each shrink moves a vertex of the root dome, at its place after the moves, a share of the
+    # way to the shoulder joint of its side (`upper_arm_L` of the rig config, mirrored for the
+    # right side).
+    with open(CONFIG) as f:
+        joint = np.asarray(json.load(f)['joints']['upper_arm_L']['head'], float)
+    with open(moves_path) as f:
+        shrinks = json.load(f).get('shrinks', [])
+    now = table.copy()
+    for i, p in moved.items():
+        now[i] = studio(p)
+    for row in shrinks:
+        gaps = np.linalg.norm(now - np.asarray(row['point'], float), axis=1)
+        i = int(np.argmin(gaps))
+        if gaps[i] > 1e-4 or i in trunk:
+            raise SystemExit(f'No arm vertex at {row["point"]} (nearest {gaps[i]:.6f} u).')
+        target = joint * np.array([1.0 if now[i][0] > 0 else -1.0, 1.0, 1.0])
+        place = now[i] + (target - now[i]) * row['share']
+        moved[i] = Vector((place[0] / scale, -place[2] / scale, place[1] / scale + floor))
+        lines.append(f'vertex {i} at {[round(x, 3) for x in row["point"]]}: shrink '
+                     f'{row["share"]:.2f} toward the joint, '
+                     f'{np.linalg.norm(target - now[i]) * row["share"]:.4f} u')
     for i, p in moved.items():
         bm.verts[i].co = p
     bm.transform(mw.inverted())
