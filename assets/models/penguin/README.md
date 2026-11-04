@@ -169,3 +169,14 @@ triangles after the weld:
 ```bash
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- penguin --spec '{"free": 1.8, "spread": 0.2}'
 ```
+
+## penguin.rig.glb
+
+The rig has four `raise` shapes of the left flipper (`raise` of `tools/mesh-rigs/penguin.json`),
+for the recast roles of the cast matrix. The shared holds of the clarinet and the cello, and the
+rest holds of the cello and the trumpet, turn the flipper 75° to 140° from the hanging bind, and
+the clavicle only up to about 35°. The weights go from the clavicle to the arm in about 0.04 units
+at the front of the flipper root, so the linear blend crushes the front of the root, and its
+faces fold. Each shape relaxes these faces in the pose of its hold (`pnpm raise-fit`). The singer
+does not reach these turns, so its skin does not change. A shape of the flute hold (137°) turned
+over more faces after the relax than before, so the flute has no shape.
