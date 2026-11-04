@@ -433,6 +433,12 @@ The app follows these facts:
   rises [78]. So a round body in the shared flute, clarinet, or trumpet hold lifts each shoulder
   bone in each pose by at most that rise (`MAX_LIFT`), and the root of its upper arm turns less
   against the shoulder (design 5.3).
+- **The far mouth (1.4, 2.1, `farMouth`).** In seven trombonists, "the neck flexion varied with
+  the downward angle of the instrument" [18], and the trumpet keeps an angle to the plane of the
+  face of "slightly less than 90 degrees" [22]. So a recast trumpeter with a mouth far in front of
+  the shoulder joints bows the head in the play, and the trumpet turns down with the head
+  (`headBow()`, design 5.3). The mouth comes down and back, and the paws come nearer to the
+  valves.
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
@@ -522,6 +528,9 @@ The app does not follow these facts:
 - **The trumpet elbows (2.1).** Both elbows point down and out, and the forearms rise steeply. The
   big head of the monkey puts the mouthpiece high above the shoulder joints. With the elbows out
   and level, the right upper arm goes flat.
+- **The trumpet angle of a far mouth (2.1).** With the bowed head of a far mouth, the trumpet
+  points more than "slightly down" [19]. No source gives the range of the neck flexion of a
+  trumpet player in degrees, so the bow stays small (`MAX_BOW`).
 - **The trumpet size and rest (2.1).** The monkey plays a smaller trumpet
   (`SpeciesParams.trumpetScale`). No source gives its size or the rest. At rest, the trumpet turns
   down in front of the chest, and both paws keep the hold of the play (`restAim`,
