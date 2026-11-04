@@ -18,7 +18,7 @@ arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has th
 | rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
+| cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), close knees (`studio.legTurns`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), the body shape of the old cat (`girthProfile`, `armGirth`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), a right elbow `raise`, longer legs on the old chair (`shinFactor`, `chair.front`), a smaller head (`headFactor`). | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass, the left paw off the strings (`gapL`). | `bassist` |
@@ -177,8 +177,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 
 ### Holds and reach
 
-- Short arms do not reach the instruments. Size the instrument by the rule of real players, and
-  keep the limbs until the user asks for longer arms.
+- Short arms do not reach the instruments. Size the instrument by the rule of real players.
 - The arm factor follows the hold. Fit the hold with a first factor, measure the reach, and rig the
   final factor.
 - A new scale of `SpeciesParams` adds its instrument to `SCALED_INSTRUMENTS`, so the typecheck
@@ -205,9 +204,9 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 
 ### Bow
 
-- A turned paw moves on an arc around the wrist. Put the bow stick along that arc.
-- The paw slides on the stick when the forearm turns against the bow. Turn the hand around a grip in
-  the middle of the paw (`stickTurnR`).
+- A turned paw moves on an arc around the wrist: put the bow stick along it.
+- A forearm turn against the bow slides the paw on the stick. Turn the hand around a mid-paw grip
+  (`stickTurnR`).
 - A direct mix from an upright rest bow turns the tip through the head. Use a via (`BowVia`).
 
 ### Clearance
@@ -238,7 +237,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both.
-- `weights.fingers` 0.5 keeps the curl small. A paw that closes around a tube takes the weight 1.
+- `weights.fingers` 0.5 keeps the curl small, and 1 closes a paw around a tube.
 - A bind that bends a thick paw (`studio.bindArms`) presses the inner wrist skin in the rest shape,
   and each pose blends its bend on top, so no weight rule, ring, taper, or `raise` removes the dark
   wrist slit. Bind the arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
@@ -294,6 +293,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   Shorten only the trunk below the chest joint (`trunkTop`).
 - A long thigh puts the feet forward and moves the seats. Lengthen the shin (`shinFactor`). Move
   `headFloor` and each lap share (`lap.along`) with the legs.
+- A back factor of `girthProfile` moves the back on the chair and the chair depth. Keep it at 1
+  below the hips joint.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
@@ -338,7 +339,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   wrist.
 - A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the
   move.
-- Record the commit or the `--set` of each row of a variant table.
-- These pose values stay in meters at each body size: the bow values of `src/pose/bowed-rig.ts` and
-  `src/pose/strokes.ts`, `HAND_MOTION`, the percussion `sizes`, `CONDUCTOR_MOTION.scale`, and the
-  sweep limits. Compare a new body size in `H` first.
+- Record the commit or `--set` of each variant row.
+- The bow values (`src/pose/bowed-rig.ts`, `src/pose/strokes.ts`), `HAND_MOTION`, the percussion
+  `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits stay in meters. Compare a new body size
+  in `H` first.
