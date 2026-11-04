@@ -216,7 +216,10 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   because a mesh of a new source gives the same animal another build. A width row of `girthProfile`
   at the shoulder joints moves the joints and the arm roots in together, so the arm root keeps its
   form. The arms then hang nearer to the trunk, and the hold turns the elbows out where they go into
-  the body (5.3).
+  the body (5.3). On a T-pose body, the cut near the armpits goes through the level arm roots, and
+  the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
+  width row measures the arm roots, and a width row of `girthProfile` does not change it: the
+  images of the app view judge that height.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -437,6 +440,15 @@ each verdict.
   head of the mesh (`headFactor`), so that the head has the width of the old head for its height,
   as on the cat. The smaller head moves the mouth back, so the trombone hold of the panda puts the
   right elbow further out and the rest place further forward (5.2, 5.3).
+- The rabbit sits on the chair of the rabbit of its old mesh, as a product choice: the seat top
+  and the chair depth of that rabbit, with the hips joint as high. The haunch of the T-pose mesh
+  ends higher under the hips joint, so the shins are shorter (`shinFactor`), and the sit lowers
+  the haunch further onto the seat (`sit.most`). The shorter shins keep the feet in place. The
+  thighs are wider (`legGirth`), so their roots set the seat top under the haunch, and the haunch
+  must drop to it. The wider thighs also close the knees, so the thighs turn further out and the
+  shins further in (`studio.legTurns`). The neck and the trunk below the chest are longer
+  (`neckFactor`, `trunkFactor`), and the head is smaller (`headFactor`), so that the head does not
+  sit on the shoulders.
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
