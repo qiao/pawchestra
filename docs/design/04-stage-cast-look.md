@@ -420,7 +420,10 @@ needs no edit of the source. A value over its limit fails, unless the own pair o
 same open item. The grip of each pair counts from
 the accepted grip of the role, because the frame of the grip does not move with the bind. Run the
 matrix after a change of a shared hold, a bind rule, or the skeleton, and compare the counts of
-each verdict.
+each verdict. A shared hold can turn a hanging bind arm 110° or more from the bind, while the
+clavicle turns little. The linear blend then crushes the front of the arm root. A `raise` shape of
+that hold relaxes the root, because rigid faces or a Smooth of the weights only move the fold. A
+body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with the most folds.
 
 ### Seat
 
