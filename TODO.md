@@ -154,8 +154,6 @@ passes.
       trunk (piano-technique).
 - [ ] Polar bear pianist: at rest, the paws lie 8 cm to 10 cm below the key top, on the lower belly,
       because the arms do not reach the thighs. Lower paws fold the right shoulder.
-- [ ] Polar bear rig: the left shoulder folds about 16 faces at rest and in the play (limit 8). Add
-      loop edges or a corrective shape at the armpit (`pnpm fold-probe pianist`).
 - [ ] Polar bear rig: each forearm folds into a hard dark V at the inner elbow in the chord (faces
       574 to 576 on the right). Add loop edges or a corrective shape at the elbow.
 - [ ] Polar bear pedals: the case shades the brass pedals, and from the stage camera the bear and
@@ -613,9 +611,20 @@ passes.
 - [ ] Standing winds: a soloist plays the flute and the trumpet standing. Check if a standing hold
       (`stand`) helps the bodies whose seated flute and clarinet cells fail on the arms (the bear,
       the hippo, the elephant, the badger, the rhino, and the penguin).
-- [ ] Recast bodies: the bear, the rhino, the polar bear, the elephant, and the mannequin fold the
-      arms in each role of the matrix (folds p95 13 to 29 in the five roles of the strings and the
-      winds): a fault of the weights or the shapes of each body.
+- [ ] Recast bodies: the bear, the rhino, the elephant, and the mannequin fold the arms in each role
+      of the matrix (folds p95 13 to 29 in the five roles of the strings and the winds): a fault of
+      the weights or the shapes of each body.
+- [ ] Bear recast folds: the front of each arm root folds in the play of each recast role (flutist
+      L 26). The hold turns the upper arm 65 to 110 degrees from the bind, across the chest, and the
+      clavicle holds about half of the root and of the upper chest. A Smooth of the root weights
+      only moved the folds. Rigid groups (`rigidPainted`) with two conductor `raise` shapes put 8 of
+      12 recast arms under the limit, but the conductor showed dark facets on the upper chest and
+      `pose-depth conductor` grew 0.3 and 0.4 cm (branch `bear-folds-rigid-try`). Try a clavicle
+      share that ends at the shoulder line, or new faces at the front of the root in Blender.
+- [ ] Polar bear recast folds: with the rigid faces under the arm roots, the cellist folds L 10,
+      R 16 (the inner right elbow at rest and the right root), the clarinetist L 11, the flutist
+      L 10, the trumpeter L 12, and the snare drummer R 10. Rigid groups at the front of the
+      shoulder lines removed most of them, but their edges showed a dark notch in the 2x crops.
 - [ ] Cast matrix sizes: the violin, the viola (`hold-reach`), the cello (`cello-size.ts`), the
       trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
       instruments keep the scale 1 in a recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
