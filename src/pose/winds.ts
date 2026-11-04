@@ -17,7 +17,7 @@ import { armRig, handToward, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
-import { elbowOutTurn, turnPoleOut } from './round-arms.ts';
+import { elbowOutTurn, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
 import { BRASS_FUNDAMENTALS } from './wind-notes.ts';
 import type { Fingering, WindState } from './wind-notes.ts';
 
@@ -1309,6 +1309,11 @@ interface WindSide {
    * and the paw with it.
    */
   readonly aimSign: number;
+  /**
+   * The lift of the shoulder bone up and out in each pose, in radians, by the rule of the round
+   * free arms (`shoulderLift()`, design 5.3): 0 for a hold with no rule and for a thin body.
+   */
+  readonly lift: number;
 }
 
 /**
@@ -1405,30 +1410,34 @@ function turnShare(hold: WindHold, weight: number): number {
 }
 
 /**
- * Gives the forward turn of the right shoulder bone of a hold.
+ * Gives the turn of the right shoulder bone of a hold: the forward turn, and the lift of the side
+ * ({@link WindSide.lift}) in each pose.
  *
  * @param hold The hold.
+ * @param side The right side of the body.
  * @param out The quaternion to write.
- * @param share The share of the turn ({@link turnShare}). The whole turn by default.
+ * @param share The share of the forward turn ({@link turnShare}). The whole turn by default.
  * @returns `out`, with the local rotation of `shoulderR`.
  */
-function rightShoulderTurn(hold: WindHold, out: Quaternion, share = 1): Quaternion {
+function rightShoulderTurn(hold: WindHold, side: WindSide, out: Quaternion, share = 1): Quaternion {
   // A positive turn around y moves the right shoulder forward.
-  return out.setFromAxisAngle(Y_AXIS, hold.reach * share);
+  return liftShoulder(out.setFromAxisAngle(Y_AXIS, hold.reach * share), side.lift, 'R');
 }
 
 /**
- * Gives the forward turn of the left shoulder bone of a hold.
+ * Gives the turn of the left shoulder bone of a hold: the forward turn, and the lift of the side
+ * ({@link WindSide.lift}) in each pose.
  *
  * @param hold The hold.
+ * @param side The left side of the body.
  * @param out The quaternion to write.
- * @param share The share of the turn ({@link turnShare}). The whole turn by default.
+ * @param share The share of the forward turn ({@link turnShare}). The whole turn by default.
  * @returns `out`, with the local rotation of `shoulderL`.
  */
-function leftShoulderTurn(hold: WindHold, out: Quaternion, share = 1): Quaternion {
+function leftShoulderTurn(hold: WindHold, side: WindSide, out: Quaternion, share = 1): Quaternion {
   // A negative turn around y moves the left shoulder forward. The subtraction from 0 keeps a turn
   // of 0 at +0, so that a hold with no turn writes the same rotation as no turn.
-  return out.setFromAxisAngle(Y_AXIS, 0 - hold.reachL * share);
+  return liftShoulder(out.setFromAxisAngle(Y_AXIS, 0 - hold.reachL * share), side.lift, 'L');
 }
 
 /**
@@ -1446,7 +1455,7 @@ function slideReachOf(rig: Omit<WindRig, 'slideReach'>, travel: number): number 
   }
   const chest = { rotation: new Quaternion(), position: new Vector3(...rig.chestBind) };
   const arm = rig.right.arm;
-  const turn = rightShoulderTurn(rig.hold, new Quaternion());
+  const turn = rightShoulderTurn(rig.hold, rig.right, new Quaternion());
   const joint = poseShoulder(arm, chest, rig.chestBind, turn).position;
   const reach = arm.reach + new Vector3(...arm.palm).length();
   placeWind(rig, chest, 1);
@@ -1480,8 +1489,8 @@ function aimSignOf(rig: Omit<WindRig, 'slideReach'>, side: WindSide): number {
   placeWind(rig, chest, 1);
   const turn =
     side.arm.side === 'L'
-      ? leftShoulderTurn(rig.hold, new Quaternion())
-      : rightShoulderTurn(rig.hold, new Quaternion());
+      ? leftShoulderTurn(rig.hold, side, new Quaternion())
+      : rightShoulderTurn(rig.hold, side, new Quaternion());
   const from = poseShoulder(side.arm, chest, rig.chestBind, turn);
   const bind = new Vector3(...rig.pivot);
   const target = new Vector3(...side.grip).sub(bind).applyQuaternion(rotation).add(pivot);
@@ -1579,6 +1588,7 @@ export function windRig(
       onSlide: grips[s]?.bone === 'slide',
       tube,
       aimSign: 1,
+      lift: shoulderLift(model, arm, hold.roundArms),
     };
   };
   const slide = model.instrument.targets.find((t) => t.kind === 'slide');
@@ -1675,7 +1685,7 @@ function freeRoll(rig: Omit<WindRig, 'slideReach'>, hang: HangingArm): Quat {
   const side = rig.left;
   const at = new Vector3(...side.grip).sub(new Vector3(...rig.pivot)).applyQuaternion(rotation);
   at.add(pivot);
-  const turn = leftShoulderTurn(rig.hold, new Quaternion());
+  const turn = leftShoulderTurn(rig.hold, side, new Quaternion());
   const play = handOnGrip(
     rig,
     side,
@@ -1782,6 +1792,7 @@ const slide = new Vector3();
 const rightTurn = new Quaternion();
 const leftTurn = new Quaternion();
 const shoulder = createFrame();
+const hangFrom = createFrame();
 const grip = new Vector3();
 const restGrip = new Vector3();
 const playGrip = new Vector3();
@@ -2071,8 +2082,12 @@ function poseSide(
       posePoint(root, ORIGIN, free.wrist, restWrist);
       restHand.fromArray(free.rotation).premultiply(root.rotation);
     } else {
-      hangingWrist(free.hang, shoulder, restWrist);
-      hangingHand(free.hang, shoulder, restHand);
+      // The arm hangs from the lifted joint in the turn of the shoulder with no lift
+      // (`WindSide.lift`), so that the lift moves the joint and not the direction of the arm.
+      hangFrom.position.copy(shoulder.position);
+      liftShoulder(hangFrom.rotation.copy(shoulder.rotation), -side.lift, side.arm.side);
+      hangingWrist(free.hang, hangFrom, restWrist);
+      hangingHand(free.hang, hangFrom, restHand);
       if (free.roll) {
         restHand.multiply(rollTurn.fromArray(free.roll));
       }
@@ -2195,8 +2210,14 @@ export function windGrips(rig: WindRig, weight: number): Readonly<Record<'L' | '
     return { joint: toVec3(joint), grip: toVec3(at) };
   };
   return {
-    L: side(rig.left, leftShoulderTurn(rig.hold, new Quaternion(), turnShare(rig.hold, weight))),
-    R: side(rig.right, rightShoulderTurn(rig.hold, new Quaternion(), turnShare(rig.hold, weight))),
+    L: side(
+      rig.left,
+      leftShoulderTurn(rig.hold, rig.left, new Quaternion(), turnShare(rig.hold, weight)),
+    ),
+    R: side(
+      rig.right,
+      rightShoulderTurn(rig.hold, rig.right, new Quaternion(), turnShare(rig.hold, weight)),
+    ),
   };
 }
 
@@ -2231,10 +2252,10 @@ export function poseWind(
   const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
   const restPoleL = freeL?.kind === 'hang' ? freeL.hang.pole : rig.restPoleL;
   const poleL = mixPole(restPoleL, hold.poleL, weight);
-  leftShoulderTurn(hold, leftTurn, turnShare(hold, weight));
+  leftShoulderTurn(hold, rig.left, leftTurn, turnShare(hold, weight));
   poseSide(rig, rig.left, frames, leftTurn, poleL, left, freeL, weight, out.rotations);
   const right = curlOf(state.fingersR, weight, hold.gripCurl?.[1] ?? null);
-  rightShoulderTurn(hold, rightTurn, turnShare(hold, weight));
+  rightShoulderTurn(hold, rig.right, rightTurn, turnShare(hold, weight));
   const poleR = mixPole(rig.restPoleR, hold.poleR, weight);
   poseSide(rig, rig.right, frames, rightTurn, poleR, right, null, weight, out.rotations);
   setBoneRotation(out.rotations, BONES.instrument, local);
