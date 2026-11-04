@@ -578,9 +578,6 @@ passes.
       trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
       instruments keep the scale 1 in a recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
       violin.
-- [ ] Cast matrix `--base`: the base column takes `tools/recast-scale.ts` of the tree, so a change
-      of a size rule shows in both columns. Make the base column use the tools of the base commit
-      (`tools/base-tree.sh`), and check the base counts against a run in a base tree.
 - [ ] Test mannequin: upload `mannequin-human-tpose.fbx` to mixamo.com, and compare the auto-rig
       with `mannequin-human-mixamo.glb`. It needs the Adobe account of the user.
 - [ ] Test mannequin: the Mixamo help pages of Adobe refused the download (HTTP 403), so the
