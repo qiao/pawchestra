@@ -532,6 +532,21 @@ passes.
 - [ ] Percussion holds (5.3): the badger plays the shared percussion holds as its own holds, so
       they have no elbow rule. Give them a fit of the badger (`armOut()` 42° and 44°), so that a
       rounder recast body turns its elbows out and the badger stays the same.
+- [ ] Shared snare drum from the body (5.3, `PercussionHold.fit`): the raised drum clears the
+      bellies of the recast elephant, bear, cat, hippo, panda, and polar bear. Open: the hanging
+      trunk of the elephant goes 6.5 cm into the raised drum in the play, and its paws still miss
+      the targets by 205 mm. The rhino keeps its bind place (the near rim is 0.2 H in front of its
+      belly), and its forearms still go 2.1 cm into the belly. The pig moves only forward and
+      misses by 11 mm. Measure the front with the hanging head of the elephant, and check a
+      larger room for the rhino.
+- [ ] Front wind holds (5.3): the forearms and the paws of the recast heavy bodies go into the
+      head, and not into the belly (`pnpm pose-depth`, "into the head"): the flute of the
+      elephant, bear, hippo, panda, rhino, and mannequin (1.8 cm to 8.3 cm, left forearm under the
+      turned head), the penguin flute into the neck, and the trumpet of the elephant, bear, hippo,
+      and rhino (2.7 cm to 8.0 cm, right arm under the snout). A place from the front of the belly
+      does not move these points, and a flute with no head turn makes most of them deeper (hippo
+      11.3 cm). Next: a rule from the head, such as a lip place or elbows that fit a large low
+      head (`reports/2026-11-04-belly-front/`).
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, the deer, and the dog
       (own hold) pass. The left claws of the monkey (1.8 cm) go into the cello in a few play
       samples. The cello of the foxes goes 5.0 cm into the
