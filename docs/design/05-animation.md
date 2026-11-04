@@ -275,12 +275,15 @@ The rest of each family:
   the lift or the lowering is out of reach, or the clip is at the root of the upper arm. Both
   points lie on the line of the swivel, so it does not move them. A shared hold lifts the
   shoulder bones of a round body, and keeps a free paw bent in the moves ("Free round arms in a
-  shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm stays
-  too: on the cat and the pig, the root goes into the arm root or the shoulder of the mesh. A
-  larger elbow turn up to the stop of `turnPoleOut()`, a larger lift of the shoulder, an elbow out
-  in the middle of the moves, and a larger forward turn of the shoulder each took only a small part
-  of the depth, and a larger turn moves the grip line of the arm gate past its limit.
-  So the next approach is the weights or the shape of the arm root of these meshes (`TODO.md`).
+  shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm comes
+  from the arm root of the mesh, so the rig fixes it. A larger elbow turn up to the stop of
+  `turnPoleOut()`, a larger lift of the shoulder, an elbow out in the middle of the moves, and a
+  larger forward turn of the shoulder each took only a small part of the depth, and a larger turn
+  moves the grip line of the arm gate past its limit. The right armpit patch of the cat follows
+  the clavicle more than the arm (`cat_root.py`), because a patch on the arm swings across the
+  chest and folds the cut of the body over the arm beside it. The root domes of the pig shrink
+  toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
+  the joint, and some of them come out of the shoulder in another pose.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
   the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
   a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
