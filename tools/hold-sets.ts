@@ -32,7 +32,7 @@ import type { Fingering } from '../src/pose/wind-notes.ts';
 import { IDENTITY } from '../src/models/tuples.ts';
 import type { Quat } from '../src/models/tuples.ts';
 import { SPECIES_WIND_HOLDS, WIND_HOLDS, holdTurn } from '../src/pose/winds.ts';
-import type { FreePaw } from '../src/pose/winds.ts';
+import type { FreePaw, WindHold } from '../src/pose/winds.ts';
 
 /**
  * The own holds of the species (`SPECIES_HOLDS` of the bowed strings and `SPECIES_WIND_HOLDS` of
@@ -127,6 +127,7 @@ const NULL_FIELDS: ReadonlyMap<string, HoldValue> = new Map<string, HoldValue>([
   ['liftPoleL', [0, 0, 0] satisfies NonNullable<BowedHold['liftPoleL']>],
   ['liftPoleR', [0, 0, 0] satisfies NonNullable<BowedHold['liftPoleR']>],
   ['restPawTurnL', 0 satisfies NonNullable<BowedHold['restPawTurnL']>],
+  ['farMouth', 0 satisfies NonNullable<WindHold['farMouth']>],
   ['restBow.via', { tip: [0, 0, 0], hair: [0, 0, 0], reach: [0, 0, 0] } satisfies BowVia],
   [
     'standBow',

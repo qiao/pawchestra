@@ -385,10 +385,11 @@ function poseAnimal(
       const { wind } = scratch;
       windStateAt(note.track, noteTime, wind);
       // The head lifts off the mouthpiece in the rest pose, and keeps still while it plays. A
-      // hold can turn the head to the left while the player plays, as a real flutist does.
+      // hold can turn the head to the left while the player plays, as a real flutist does, and
+      // bow it toward a far mouthpiece (design 5.3).
       body.lean = -wind.breath * WIND_BODY.breath * player.amplitude * weight;
       body.look = 1 - weight;
-      body.lift = WIND_BODY.headLift * (1 - weight);
+      body.lift = WIND_BODY.headLift * (1 - weight) - note.rig.headBow * weight;
       body.headTurn = note.rig.hold.headTurn * weight;
       writeBody(pose, player, scratch);
       poseWind(note.rig, scratch.torso, wind, weight, pose);

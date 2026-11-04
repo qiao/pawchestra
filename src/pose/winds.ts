@@ -17,6 +17,7 @@ import { armRig, handToward, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
+import { headBow } from './far-mouth.ts';
 import { elbowOutTurn, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
 import { BRASS_FUNDAMENTALS } from './wind-notes.ts';
 import type { Fingering, WindState } from './wind-notes.ts';
@@ -53,6 +54,13 @@ export interface WindHold {
    * does.
    */
   readonly roundArms: number | null;
+  /**
+   * The rule of the far mouth (design 5.3): the mouth share of the body that the hold fits
+   * (`mouthShare()`). A body with a mouth further in front of the shoulders bows the head in the
+   * play, and the instrument turns down with the head (`headBow()`). `null` keeps the head of the
+   * hold on each body, as an own hold does.
+   */
+  readonly farMouth: number | null;
   /**
    * The rotation of the `instrument` bone while the player plays, relative to the chest. The
    * instrument turns around the mouthpiece, so that the mouthpiece stays at the mouth.
@@ -239,6 +247,7 @@ const WOODWIND = {
   restPoleL: POLE_L,
   restPoleR: POLE_R,
   roundArms: null,
+  farMouth: null,
   play: IDENTITY,
   rest: IDENTITY,
   restShift: [0, 0, 0],
@@ -1123,6 +1132,7 @@ const WOLF_CLARINET = {
 const MONKEY_TRUMPET = {
   ...WIND_HOLDS.trumpet,
   roundArms: null,
+  farMouth: null,
   reach: 34 * MathUtils.DEG2RAD,
   reachL: 0,
   play: holdTurn(-10, 0),
@@ -1338,6 +1348,12 @@ export interface WindRig {
   readonly headBind: Vec3;
   /** The move of the mouthpiece from the mouth, in meters (`WindHold.lipShift`). */
   readonly lip: Vec3;
+  /**
+   * The bow of the head in the play, in radians, by the rule of the far mouth (`headBow()`,
+   * design 5.3): 0 for a hold with no rule and for a body with a near mouth. The play turn of
+   * {@link WindRig.hold} has the turn of the instrument with the head.
+   */
+  readonly headBow: number;
   readonly left: WindSide;
   readonly right: WindSide;
   /** The left paw in the rest pose, or `null` when it stays on its grip. */
@@ -1596,8 +1612,10 @@ export function windRig(
     new Vector3(...placePoint(model.pieces, { bone: 'slide', at: point }));
   const travelVector = slide ? slideAt(slide.to).sub(slideAt(slide.from)) : new Vector3();
   const left = side('L');
+  const bow = headBow(model, hold.farMouth);
   const placed = {
-    hold,
+    hold: bow === 0 ? hold : { ...hold, play: bowedPlay(hold, bow) },
+    headBow: bow,
     pivot: at(BONES.instrument),
     restOffset: toVec3(new Vector3(...hold.restShift).multiplyScalar(model.body.headHeight)),
     restPoleL: hold.restPoleL,
@@ -2141,7 +2159,9 @@ function placeWind(rig: Omit<WindRig, 'slideReach'>, chest: Frame, weight: numbe
   rotation.multiplyQuaternions(chest.rotation, local);
   // In the rest pose, the instrument comes down from the mouth to the lap. While the player
   // plays, the mouthpiece follows the mouth of a turned head.
-  shift.fromArray(turnedMouth(rig, rig.hold.headTurn * weight)).sub(turned.fromArray(rig.pivot));
+  shift
+    .fromArray(turnedMouth(rig, rig.hold.headTurn * weight, rig.headBow * weight))
+    .sub(turned.fromArray(rig.pivot));
   shift.addScaledVector(turned.fromArray(rig.restOffset), 1 - weight);
   posePoint(chest, rig.chestBind, rig.pivot, pivot).add(
     turned.copy(shift).applyQuaternion(chest.rotation),
@@ -2150,24 +2170,64 @@ function placeWind(rig: Omit<WindRig, 'slideReach'>, chest: Frame, weight: numbe
 
 const neckTurn = new Quaternion();
 const headTurn = new Quaternion();
+const partTurn = new Quaternion();
 const neckBind = new Vector3();
 const mouth = new Vector3();
 const mouthTuple: [number, number, number] = [0, 0, 0];
 
 /**
- * Gives the place of the mouthpiece at the mouth after a turn of the head around y, in the bind
- * axes of the chest, with the move of the hold from the mouth (`WindRig.lip`):
- * the neck turns {@link NECK_SHARE} of the angle around its joint, and the head the rest around
- * its joint, as the look of the body layer turns them (`writeBody()` of `pose-at.ts`). The mouth
- * of the bind pose is the bind place of the mouthpiece.
+ * Writes the turns of the neck and of the head of a wind player around y and then x, in the bind
+ * axes of the chest, as the look of the body layer turns them (`writeBody()` of `pose-at.ts`):
+ * the neck takes {@link NECK_SHARE} of each angle, and the head the rest. It writes the module
+ * scratch objects `neckTurn` and `headTurn`: the turn of the neck, and the whole turn of the head.
+ *
+ * @param yaw The turn of the head to the left, in radians.
+ * @param bow The turn of the head down, in radians.
+ */
+function turnHead(yaw: number, bow: number): void {
+  neckTurn
+    .setFromAxisAngle(Y_AXIS, yaw * NECK_SHARE)
+    .multiply(partTurn.setFromAxisAngle(X_AXIS, -bow * NECK_SHARE));
+  headTurn
+    .copy(neckTurn)
+    .multiply(partTurn.setFromAxisAngle(Y_AXIS, yaw * (1 - NECK_SHARE)))
+    .multiply(partTurn.setFromAxisAngle(X_AXIS, -bow * (1 - NECK_SHARE)));
+}
+
+/**
+ * Gives the play turn of a hold with the head bowed by the rule of the far mouth (design 5.3):
+ * the instrument turns with the head from the head of the hold, so that it keeps its angle to the
+ * face.
+ *
+ * @param hold The hold.
+ * @param bow The bow of the head, in radians.
+ * @returns The turn, in the axes of the chest.
+ */
+function bowedPlay(hold: WindHold, bow: number): Quat {
+  turnHead(hold.headTurn, 0);
+  const square = headTurn.clone().invert();
+  turnHead(hold.headTurn, bow);
+  return toQuat(
+    headTurn
+      .clone()
+      .multiply(square)
+      .multiply(new Quaternion(...hold.play)),
+  );
+}
+
+/**
+ * Gives the place of the mouthpiece at the mouth after a turn of the head around y and a bow
+ * around x, in the bind axes of the chest, with the move of the hold from the mouth
+ * (`WindRig.lip`): the neck turns around its joint, and the head around its joint
+ * ({@link turnHead}). The mouth of the bind pose is the bind place of the mouthpiece.
  *
  * @param rig The points of the player.
  * @param yaw The turn of the head to the left, in radians.
+ * @param bow The turn of the head down, in radians.
  * @returns The place, in a module tuple that the next call writes again.
  */
-function turnedMouth(rig: Omit<WindRig, 'slideReach'>, yaw: number): Vec3 {
-  neckTurn.setFromAxisAngle(Y_AXIS, yaw * NECK_SHARE);
-  headTurn.setFromAxisAngle(Y_AXIS, yaw);
+function turnedMouth(rig: Omit<WindRig, 'slideReach'>, yaw: number, bow: number): Vec3 {
+  turnHead(yaw, bow);
   neckBind.fromArray(rig.neckBind);
   mouth
     .fromArray(rig.pivot)
