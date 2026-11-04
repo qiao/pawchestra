@@ -331,10 +331,14 @@ passes.
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
       shafts down. A real timpanist holds them one inch above the head with a level shaft.
-- [ ] Pig hornist: the dome of each upper arm lies inside the shoulder (3.9 cm in the sweep, at the
-      shoulder joint), and the free upper arm from 0.25 of the bone stays at most 1.3 cm in the
-      body. The same pair fails each recast role of the pig in the cast matrix (4.5 cm to 6.4 cm).
-      Give the pair an accepted depth, and fix the dark facets on the shoulders.
+- [ ] Pig hornist: the hidden root of each free arm lies in the shoulder. `pig_root.py` moves 7 of
+      its vertices toward the trunk wall, and the sweep gives 2.1 cm (3.9 cm before). The back of
+      the right arm root goes 2.1 cm in at a note and 0.6 cm out at rest, so no move clears it.
+      Next: more clavicle weight on the hidden root (below 0.5, else its faces join the body part
+      of the sweep), or an accepted depth for the pair. Fix the dark facets on the shoulders.
+- [ ] Pig in the cast matrix: the moved root vertices of `pig_root.py` come up to 1.5 cm out of the
+      shoulder in the snare drum (0.5 cm in before), and up to 1.2 cm in the other recast roles.
+      Check them in 2x crops of the recast roles.
 - [ ] Remove the unused high stool (`HIGH_STOOL` and the support `high-stool` of `props.ts`). No
       player sits on it.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
@@ -528,10 +532,9 @@ passes.
       recast cells (`reports/2026-11-04-shoulder-out/`). The lift in the range of a real clavicle
       takes 0.2 cm to 0.9 cm off the root clips and passes no new cell: the dog clips at 0.27 of the
       left upper arm in the flute (2.0 cm) and the clarinet (2.2 cm), and the pig at the root, into
-      the shoulder of the mesh, in each role (2.5 cm to 4.6 cm), also in its own horn hold. A pose
-      probe gave the pig flutist 3.3 cm with a lift of 20°, so the pose alone does not clear the
-      pig. Next: the weights of the arm root of the pig (the clavicle share, `rigging.md`, "Weights
-      and folds"), and a path of the paw in the lift and the lowering of the dog that keeps the
+      the shoulder of the mesh. Most of the pig clip was the hidden root of the free arm in the
+      trunk. With the moves of `pig_root.py`, the pig cells give 1.4 cm (flute) to 4.6 cm (cello).
+      Next: a path of the paw in the lift and the lowering of the dog that keeps the
       elbow bent. The lift turns the left flute paw of the dog 4° further from its grip (62°, limit
       45°), and the forearms of the hippo flutist and trumpeter go 0.4 cm and 0.7 cm deeper. The
       cat (27° to 28°) needs less swing than the rabbit and the dog that the violin and the cello
