@@ -553,26 +553,30 @@ passes.
       1.5 cm. At rest, the right paw can stand off the upright flute (rabbit images).
 - [ ] Shared clarinet hold (`WIND_HOLDS.clarinet`, 5.3): 3 of the 14 seated bodies pass (the wolf,
       the deer, the monkey). The upper arms of the cat, the pig, the polar bear, and the mannequin
-      go 4.1 cm to 5.3 cm into the deep chest in the play, and the paws of the foxes, the cat, the
-      mouse, and the beaver miss the keys by 3.5 cm to 13 cm.
-- [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`): the paws of each recast species miss the valves
-      by 9 cm to 45 cm at the size 1. With the arm values of the monkey and the rest from the
-      hanging arms, the paws still missed by 2.8 cm to 15 cm, and the arms went 3 cm to 15 cm into
-      the body at rest. A pocket trumpet is 24 cm long (Wikipedia, "Pocket trumpet"), about half of
-      a standard trumpet: a size rule needs the length of a standard trumpet from a source.
-- [ ] Wind size rules (4.6): a flute with a curved head joint is 51 cm against 67 cm straight
-      (Classic Cantabile FL-200U, kirstein.de), and an E♭ clarinet is about 49 cm (Wikipedia,
-      "E-flat clarinet"), against the 0.67 m of the clarinet of the app at 0.85. Add the flute and
-      the clarinet to `SCALED_INSTRUMENTS` with a rule of the cast matrix, for the mouse.
+      go 4.1 cm to 5.3 cm into the deep chest in the play. With the size rule of the winds, the paws
+      of the foxes and the beaver reach the keys, and the mouse misses them by 4.3 cm.
+- [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`, 4.6, 5.3): with the size rule of the winds and
+      both shoulders 34° forward, 11 recast bodies still miss the valves at the smallest trumpet
+      (wolf, elephant, bear, hippo, mouse, beaver, dog, pig, rhino, badger, penguin: 28 mm to
+      229 mm). The mouth is far in front of the shoulder joints, so a smaller trumpet does not
+      help. A hold change can help: a lower trumpet angle or a forward lean of the chest.
+- [ ] Rabbit trumpeter in the cast matrix: with the shared shoulder turn of the trumpet, the left
+      arm root folds 10 faces (limit 8). With square shoulders and the trumpet of 0.52, it passed.
+- [ ] Winds at the smallest size (4.6): the clarinet of 0.73 still misses the keys for the mouse
+      (43 mm), the hippo, the bear, the rhino, the badger, the penguin, and the elephant, and the
+      flute for the bear, the rhino, the badger, the penguin, and the elephant. The size rule
+      cannot help: a hold or a body change must.
+- [ ] Trumpet length: no source of `wind-technique.md` gives the length of a B-flat trumpet. The
+      size rule takes 0.48 m from the trumpet of the app at 0.85 (`REAL_WIND_SIZES`).
 - [ ] Standing winds: a soloist plays the flute and the trumpet standing. Check if a standing hold
       (`stand`) helps the bodies whose seated flute and clarinet cells fail on the arms (the bear,
       the hippo, the elephant, the badger, the rhino, and the penguin).
 - [ ] Recast bodies: the bear, the rhino, the polar bear, the elephant, and the mannequin fold the
       arms in each role of the matrix (folds p95 13 to 29 in the five roles of the strings and the
       winds): a fault of the weights or the shapes of each body.
-- [ ] Cast matrix sizes: only the violin, the viola (`hold-reach`), and the cello
-      (`cello-size.ts`) have a size rule. The other scaled instruments keep the scale 1 in a
-      recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
+- [ ] Cast matrix sizes: the violin, the viola (`hold-reach`), the cello (`cello-size.ts`), the
+      trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
+      instruments keep the scale 1 in a recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
       violin.
 - [ ] Test mannequin: upload `mannequin-human-tpose.fbx` to mixamo.com, and compare the auto-rig
       with `mannequin-human-mixamo.glb`. It needs the Adobe account of the user.
