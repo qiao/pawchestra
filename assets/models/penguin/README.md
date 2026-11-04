@@ -1,8 +1,8 @@
 # Penguin model
 
-This folder holds the source mesh of the penguin, two edited copies, and the rigged copy. The app
-does not serve these files. It loads the module `src/models/studio/penguin.ts`, which this chain
-writes:
+This folder holds the source mesh of the penguin, three edited copies, a copy with rebuilt
+flippers and its weights, and the rigged copy. The app does not serve these files. It loads the
+module `src/models/studio/penguin.ts`, which this chain writes:
 
 ```text
 penguin.glb                          source mesh
@@ -11,7 +11,13 @@ penguin.glb                          source mesh
 penguin-beak.glb
    │  tools/blender/penguin_edge.py  color edge cut
    v
-penguin-edge.glb                     source of the rig (`source` of tools/mesh-rigs/penguin.json)
+penguin-edge.glb
+   │  tools/blender/penguin_edit.py  flippers free of the trunk
+   v
+penguin-free.glb                     `armSource` of tools/mesh-rigs/penguin.json (git keeps it out)
+   │  tools/blender/arm_rebuild.py   rebuilt flippers and painted weights
+   v
+penguin-arms.glb + penguin-weights.json  `source` and `paintedWeights` of the config
    │  pnpm rig-mesh penguin
    v
 penguin.rig.glb                      rigged mesh
@@ -29,6 +35,9 @@ src/models/studio/penguin.ts         studio body of the app
 | `penguin.glb` | Source mesh (below) | None |
 | `penguin-beak.glb` | Copy of `penguin.glb` with a split beak. License as `penguin.glb` | `penguin_beak.py` (below) |
 | `penguin-edge.glb` | Copy of `penguin-beak.glb` with the color edge cut. License as `penguin.glb` | `penguin_edge.py` (below) |
+| `penguin-free.glb` | Copy of `penguin-edge.glb` with the flippers free of the trunk. Git keeps out its 14 MB. License as `penguin.glb` | `penguin_edit.py` (below) |
+| `penguin-arms.glb` | Copy of `penguin-free.glb` with rebuilt flippers. License as `penguin.glb` | `arm_rebuild.py` (below) |
+| `penguin-weights.json` | Weights of the same Blender run. License as `penguin.glb` | `arm_rebuild.py` (below) |
 | `penguin.rig.glb` | Output of the rig. License as `penguin.glb` | `pnpm rig-mesh penguin` |
 
 ## penguin.glb
@@ -120,4 +129,43 @@ headless run gives the same bytes:
 blender --background --factory-startup --python tools/blender/penguin_edge.py -- \
   assets/models/penguin/penguin-beak.glb assets/models/penguin/penguin-edge.glb
 shasum -a 256 assets/models/penguin/*.glb
+```
+
+## penguin-free.glb
+
+| Item | Value |
+|---|---|
+| Size | 13,539,948 bytes |
+| SHA-256 | `f4c6df462da8f5b619d7d709b6e5e4a16a548a96b23f41e671a35b69acd91788` |
+| Writer | Khronos glTF Blender I/O of the Blender of the script |
+
+The inner side of each flipper of `penguin-edge.glb` joins the side of the trunk in a deep crease
+from the shoulder down to about 0.85 of the upper arm, so `arm_rebuild.py` finds no free section.
+`tools/blender/penguin_edit.py` splits each flipper from the trunk along its crease with the steps
+of `beaver_edit.py`, turns it 8° out, and closes the flipper and the trunk with new faces. First it
+gives the trunk alone a vertex that the left flipper and the trunk both hold, and removes a flap
+face of the left crease and a small closed tetrahedron of the right crease. The new faces of the
+side wall take the black of the flipper, below a straight white edge along the flank line under
+the flipper. The split beak and the color edge cut stay. The copy has 1,985 vertices and 3,966
+triangles after the weld. Two runs give the same bytes. The script prints the joints of the turned
+flipper, which are the arm joints of the config:
+
+```bash
+blender -b --factory-startup -P tools/blender/penguin_edit.py -- assets/models/penguin/penguin-free.glb
+```
+
+## penguin-arms.glb
+
+| Item | Value |
+|---|---|
+| Size | 929,692 bytes |
+| SHA-256 | `9f2e89aa2e3f2c9f20f7275224a4624051b2b70b21505cc90357fb53f2d23e64` |
+
+`arm_rebuild.py` finds the shoulder line at 0.1 of the upper arm. The flat flipper needs a larger
+ratio in the free test (`free`), and a collapse at the cut loop joins two islands of the atlas in
+9 faces, which take the UV of a neighbor face (`spread`). The copy has 2,194 vertices and 4,384
+triangles after the weld:
+
+```bash
+blender -b --factory-startup -P tools/blender/arm_rebuild.py -- penguin --spec '{"free": 1.8, "spread": 0.2}'
 ```

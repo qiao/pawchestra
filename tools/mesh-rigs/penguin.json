@@ -1,5 +1,37 @@
 {
-  "source": "assets/models/penguin/penguin-edge.glb",
+  "source": "assets/models/penguin/penguin-arms.glb",
+  "sourceNote": "A copy of assets/models/penguin/penguin-free.glb (armSource) with new quad tubes on each flipper from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces with --spec '{\"free\": 1.8, \"spread\": 0.2}', and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy, with the split beak (penguin_beak.py) and the color edge cut (penguin_edge.py). See assets/models/penguin/README.md. penguin.glb does not change.",
+  "armSource": "assets/models/penguin/penguin-free.glb",
+  "armSourceNote": "The copy of assets/models/penguin/penguin-edge.glb with the flippers free of the trunk (tools/blender/penguin_edit.py, assets/models/penguin/README.md). Git keeps it out, and tools/blender/arm_rebuild.py reads it.",
+  "paintedWeights": "assets/models/penguin/penguin-weights.json",
+  "paintedLower": [
+    "root",
+    "hips",
+    "spine",
+    "spine1",
+    "chest",
+    "neck",
+    "head",
+    "ear_L",
+    "ear_R",
+    "thigh_L",
+    "shin_L",
+    "foot_L",
+    "toes_L",
+    "thigh_R",
+    "shin_R",
+    "foot_R",
+    "toes_R",
+    "tail",
+    "jaw"
+  ],
+  "paintedNote": "The weights of the clavicles and the flippers are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, with the jaw of the split beak and the tail ball.",
+  "armSegments": {
+    "helper": 0.0514,
+    "rootSegment": true,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it).",
+    "rootSegmentNote": "The rule weight of each upper arm goes to its first segment (segment_joints() and main() of tools/blender/rig_mesh.py), so that the trunk around the socket takes the roll of the first ring of the tube."
+  },
   "output": "assets/models/penguin/penguin.rig.glb",
   "name": "Penguin",
   "weld": 1e-05,
@@ -113,41 +145,41 @@
     },
     "forearm_L": {
       "head": [
-        0.245,
-        0.49,
-        0.012
+        0.269279,
+        0.50598,
+        0.011991
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.2625,
-        0.455,
-        0.015
+        0.29148,
+        0.473756,
+        0.014991
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.28,
-        0.42,
-        0.018
+        0.313681,
+        0.441532,
+        0.017991
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.298,
-        0.37,
-        0.025
+        0.338464,
+        0.394524,
+        0.024991
       ],
       "tail": [
-        0.312,
-        0.3,
-        0.03
+        0.36207,
+        0.327153,
+        0.029991
       ],
       "roll": "palm"
     },
@@ -237,7 +269,7 @@
     -0.46,
     0.0
   ],
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The body is one egg with no neck. The penguin has no ears, so each ear joint lies inside the crown. The jaw joint lies at the hinge of the beak.",
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The body is one egg with no neck. The penguin has no ears, so each ear joint lies inside the crown. The jaw joint lies at the hinge of the beak. The joints from the elbow to the finger tips are the joints of the flipper that tools/blender/penguin_edit.py turns 8 degrees out (it prints them). SOURCE_ARM of the script keeps the joints of penguin-edge.glb.",
   "studio": {
     "legTurns": {
       "thigh": [
@@ -286,14 +318,17 @@
         0.316246,
         0.757051,
         0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
       ]
     },
-    "note": "The penguin stands on its riser, and its legs hide in the egg, so each leg turn is the identity, and the trunk does not recline (open 0). The upper arm of the bind points out, down, and forward, at 40 degrees below the level, so that no face of the flipper root turns over."
+    "note": "The penguin stands on its riser, and its legs hide in the egg, so each leg turn is the identity, and the trunk does not recline (open 0).",
+    "straightArms": true,
+    "bindSupination": {
+      "L": 101,
+      "R": 65
+    },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind, 40 degrees below the level, so that the elbow axes and the zero of the roll of the upper arm stay, and the posed joints and palms of the singer stay the same (pnpm arm-check singer --world). The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArmsNote": "The bind keeps the flippers of the copy straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 101 degrees and the right 65 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. These are the values of the rule of design 4.4 (pnpm bind-supination penguin): the first probe at 0 and 0 degrees gives 96 and 65, and a second probe of the rig at 96 and 65 gives 101 and 65. With 0 and 0 degrees, the paw twist of the singer is 82 degrees, and five faces of the middle of the left flat flipper fold in each pose (arm gate folds L 8)."
   },
   "weights": {
     "armSplit": 0.226,
@@ -452,6 +487,5 @@
     "back": 0.1,
     "below": 0.03,
     "note": "The values of the fox."
-  },
-  "sourceNote": "The mesh with the beak split along the mouth line and closed with caps of a dark mouth color (tools/blender/penguin_beak.py). The faces across the black and white edge of the texture are cut along that edge (tools/blender/penguin_edge.py). See assets/models/penguin/README.md. penguin.glb does not change."
+  }
 }
