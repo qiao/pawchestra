@@ -483,6 +483,10 @@ The app follows these facts:
   arms than the accepted rabbit violinist or dog cellist turns each elbow of the shared violin or
   cello hold further out, at rest, in the moves, and in the play (design 5.3), so that its upper
   arms stay off the trunk.
+- **The lifted shoulders (`shoulderLift()`).** A round body in the shared violin or cello hold
+  lifts each shoulder bone a little in each pose, by at most the rise of the clavicle of a real
+  arm (`wind-technique.md`, section 1.8), so that the root of its upper arm turns less against the
+  shoulder (design 5.3).
 - **The sounding point (2.4).** `soundingPointAt()` moves the contact point from
   `BowedHold.soundingPoint[0]` of the string length in piano to `soundingPoint[1]` in forte, after
   the violinists of Askenfelt and the six cellists. The bow follows a change of the loudness with
