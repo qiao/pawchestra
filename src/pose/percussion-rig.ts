@@ -288,8 +288,9 @@ export const PERCUSSION_HOLDS = {
   // forearm of a real player. The head rests 5 cm off the drum head between strikes, and lifts up
   // to about 13 cm before a strike (sizes). The paw keeps the roll of the strike around the shaft,
   // so that the shaft leaves the fist at the side of the thumb (strikeRoll). The upper arm hangs
-  // near the side, with the elbow down and a little in and back: with the elbow out, the forearm
-  // comes within 26° of the shaft, and the shaft leaves the fist along the claws. The spine leans
+  // near the side, with the elbow down and back: with the elbow out, the forearm comes within 26°
+  // of the shaft, and the shaft leaves the fist along the claws. The rebuilt round arm is free of
+  // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans
   // 7° over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm,
   // and the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
   // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean
@@ -302,7 +303,7 @@ export const PERCUSSION_HOLDS = {
     // touches the head at the note start.
     offsetR: [0.0215, -0.03, 0.18],
     poleL: POLE_L,
-    poleR: [-0.6, -0.5, 0.4],
+    poleR: [0, -0.5, 0.4],
     rim: 0,
     home: [0.56, -0.389, -0.146],
     top: 'up',
