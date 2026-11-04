@@ -235,15 +235,17 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       eyeSize: 0.805,
     },
   ],
-  // The violinist rabbit (design 4.4). The rabbit sits 4 cm further forward on a seat 4 cm deeper,
-  // so that its back keeps off the chair back. The old eye of the T-pose mesh is a ball in a
-  // groove, so the head fills it (`eyeFill`), and the pea eyes take the size of the eyes of the
-  // A-pose rabbit (0.93) and face halfway toward the filled face (`eyeNormal`).
+  // The violinist rabbit (design 4.4). The standing shoulder joints are 0.859051 m high (the joints
+  // of the mesh, lowered by the shorter shins and raised by the longer trunk), so that the scale
+  // stays 1.4320 m for each unit (`app` of the rig config). The rabbit sits 4 cm further forward on
+  // a seat 4 cm deeper, so that its back keeps off the chair back. The old eye of the T-pose mesh
+  // is a ball in a groove, so the head fills it (`eyeFill`), and the pea eyes take the size of the
+  // eyes of the A-pose rabbit (0.93) and face halfway toward the filled face (`eyeNormal`).
   [
     'rabbit',
     {
       landmark: 'shoulders',
-      height: 0.8513179,
+      height: 0.859051,
       seated: true,
       soloist: true,
       backRoom: 0.04,

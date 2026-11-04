@@ -93,12 +93,14 @@ arm root.
 
 | Item | Value |
 |---|---|
-| Size | 511,920 bytes |
-| SHA-256 | `bc875f2e89e12f8126be4bff292915716e6d3781bd1e96d0d18d5c4583ee65b3` |
+| Size | 512,044 bytes |
+| SHA-256 | `6694eaef9a2d0e71faa3f353f0998febc4e9037d6d5167356b9b7abd8b132cb8` |
 | Bind | The role-neutral bind (design 4.4): the rebuilt arms straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Colors | The plain fur moves toward the cream of the fur swatch of `docs/reference/rabbit-views.png` (`colors.tone`) |
 | Armpits | The trunk under each arm root takes a part of the painted arm weights (`weights.paintedBelow`), so that a raised arm does not pull the side out |
-| Thighs | 1.6 times wider across their axes before the skin, up and to the sides (`legGirth`), because the leg factor makes the thin thighs of the mesh long |
+| Thighs | 2 times wider across their axes before the skin, up and to the sides (`legGirth`), because the leg factor makes the thin thighs of the mesh long. The thighs turn further out and the shins further in (`studio.legTurns`), so that the knees keep the gap of the A-pose rabbit |
+| Seat | The chair of the A-pose rabbit: the shins are shorter (`shinFactor`), and the haunch drops further onto the seat (`sit.most`) |
+| Form | A longer neck (`neckFactor`), a longer trunk below the chest (`trunkFactor`, `trunkTop`), and a smaller head (`headFactor`), so that the head does not sit on the shoulders. A rounder belly and shoulder joints further apart (`girthProfile`), as on the A-pose rabbit |
 | Shapes | The arm-down shape of each arm, and the straight legs of each side |
 
 A run of `pnpm rig-mesh rabbit` gives the same bytes.

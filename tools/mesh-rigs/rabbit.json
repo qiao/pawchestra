@@ -40,9 +40,9 @@
   "name": "Rabbit",
   "weld": 1e-05,
   "app": {
-    "shoulders": 0.8513179,
+    "shoulders": 0.859051,
     "reach": 0.3886,
-    "note": "The app puts the standing shoulder joints 0.8513179 m above the floor (ANIMALS of tools/studio-body.ts), as for the A-pose rabbit. The shoulder joints of the mesh are at 0.5945 u after the leg factor, so the scale is 1.4320 m for each unit. The reach is 0.3886 m, and the violin is 0.83 of the violin of the app."
+    "note": "The app puts the standing shoulder joints 0.859051 m above the floor (ANIMALS of tools/studio-body.ts), so that the scale stays 1.4320 m for each unit, as for the A-pose rabbit: the shoulder joints of the mesh are at 0.5999 u after the rise of the legs (shorter shins) and the longer trunk (trunkFactor). The reach is 0.3886 m, and the violin is 0.83 of the violin of the app."
   },
   "armFactor": 1,
   "armFactorNote": "The factor 1 keeps the arm length, because the rig with arm segments does not stretch the arms. The arms of rabbit-arms.glb are 1.18 times longer than the source arms (arm_rebuild.py --factor 1.18), and the arm joints are the joints of the longer arms. 1.18 is the smallest factor of the sweep 1, 1.1, 1.13, 1.16, 1.18, and 1.2 at which the left paw reaches the nut of the violin of 0.83 (stopRange from 0.01, as the A-pose rabbit). The reach is then 1.21 H, as the 1.22 H of the A-pose rabbit. With 1, the paw reaches the fingerboard only from 0.34.",
