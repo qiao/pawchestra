@@ -93,15 +93,15 @@ arm root.
 
 | Item | Value |
 |---|---|
-| Size | 512,044 bytes |
-| SHA-256 | `6694eaef9a2d0e71faa3f353f0998febc4e9037d6d5167356b9b7abd8b132cb8` |
+| Size | 622,644 bytes |
+| SHA-256 | `a199fd89f2131842b2be30573c763dbb62008e076a4d4973b0941adbd6e79c6a` |
 | Bind | The role-neutral bind (design 4.4): the rebuilt arms straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
 | Colors | The plain fur moves toward the cream of the fur swatch of `docs/reference/rabbit-views.png` (`colors.tone`) |
 | Armpits | The trunk under each arm root takes a part of the painted arm weights (`weights.paintedBelow`), so that a raised arm does not pull the side out |
 | Thighs | 2 times wider across their axes before the skin, up and to the sides (`legGirth`), because the leg factor makes the thin thighs of the mesh long. The thighs turn further out and the shins further in (`studio.legTurns`), so that the knees keep the gap of the A-pose rabbit |
-| Seat | The chair of the A-pose rabbit: the shins are shorter (`shinFactor`), and the haunch drops further onto the seat (`sit.most`) |
+| Seat | The chair of the A-pose rabbit: the shins are shorter (`shinFactor`), and the haunch drops further onto the seat (`sit.most`). The tail ball moves down with the ring of the haunch around it (`sit.carryTail`), and the haunch near the ball moves with it (`sit.tailSpread`), so that the ball keeps its round form |
 | Form | A longer neck (`neckFactor`), a longer trunk below the chest (`trunkFactor`, `trunkTop`), and a smaller head (`headFactor`), so that the head does not sit on the shoulders. A rounder belly and shoulder joints further apart (`girthProfile`), as on the A-pose rabbit |
-| Shapes | The arm-down shape of each arm, and the straight legs of each side |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and a shape of each arm at rest (`raise`) that takes the front of the arm root along with the hanging arm, so that no notch shows there |
 
 A run of `pnpm rig-mesh rabbit` gives the same bytes.
 

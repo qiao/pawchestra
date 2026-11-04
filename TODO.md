@@ -285,8 +285,15 @@ passes.
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
       (87°) to 70°.
-- [ ] Rabbit: at rest, a narrow groove runs between the front of each upper arm and the trunk. It is
-      the gap of the arm copy. Fill the gap in the copy.
+- [ ] Rabbit: the upper arms look thin. In the seated bind, the girth at 0.25 of the upper arm is
+      0.82 of the mesh as a share of the shoulder width (target 0.85 to 1.15). `armGirth` 1.06 to
+      1.10 puts both shares inside, but the flute recast of the cast matrix then folds 9 faces of
+      the left arm (limit 8). Fit that fold first (`pnpm raise-fit flutist@rabbit`), then add
+      `armGirth` 1.08 (`reports/2026-11-04-rabbit-form/measures.md` of the round).
+- [ ] Rabbit: from the back, the cleft of the haunch makes a point above the carried tail ball
+      (`sit.tailSpread`). The sit drops the haunch above the ball less than the ball.
+- [ ] Rabbit: in the lift and the lowering, a notch stays at the front of the right arm root under
+      the chin from az 70. The rest shape (`raise`) fades out 20 degrees from the rest.
 - [ ] Rabbit T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
       A-pose body there: the dark faces at the bow elbow, the V crease at the right arm root, and
       the left forearm twist step. Remove each item that the new body does not show.
