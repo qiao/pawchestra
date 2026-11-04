@@ -36,3 +36,7 @@ reports/
 # tools/blender/arm_rebuild.py reads it, and the script writes it again in about 5 s. Git keeps
 # out its 17 MB (assets/models/beaver/README.md).
 assets/models/beaver/beaver-edit.glb
+
+# The copy of the badger mesh with the arms free of the trunk (tools/blender/badger_edit.py).
+# tools/blender/arm_rebuild.py reads it. Git keeps out its 15 MB (assets/models/badger/README.md).
+assets/models/badger/badger-edit.glb
