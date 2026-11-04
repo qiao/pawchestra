@@ -308,9 +308,9 @@ The rest of each family:
   the difference (`elbowOutTurn()`), toward the side around the forward axis (`turnPoleOut()`). A
   thin body keeps the elbows of the hold. The paws keep their grips: in the 2x crops of the dog
   and the rabbit flutists and the hippo clarinetist, each paw stays on its keys with and without
-  the turn, and the world pose of the palms changes much less than the elbows. The grip line of
-  the arm gate counts from the posed forearm, so the elbow turn adds to it (`ACCEPTED_GRIPS`), and
-  a grip line of a turned elbow is a fault of the gate (`TODO.md`). The percussion holds have no
+  the turn, and the world pose of the palms changes much less than the elbows. So the arm gate
+  counts a paw that faces its tube in such a hold from the instrument (the palm turn,
+  `ACCEPTED_PALMS`, design 4.4). The percussion holds have no
   rule, because the badger plays them as its own holds. Reason: the sweep measures the inner half
   width of each arm against the trunk, so a body needs no value of its own.
 - **Lifted shoulders in a shared hold.** The elbow turn cannot clear a clip at the root of the upper
