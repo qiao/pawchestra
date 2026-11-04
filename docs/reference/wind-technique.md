@@ -443,6 +443,11 @@ The app follows these facts:
   the shoulder joints bows the head in the play, and the trumpet turns down with the head
   (`headBow()`, design 5.3). The mouth comes down and back, and the paws come nearer to the
   valves.
+- **The shared right paw on the valves (2.1, `faceTube`).** The index, the middle, and the ring
+  finger rest on the valves with the finger tips [1] [20]. So in the shared trumpet hold, the
+  right palm faces the valve tops and the paw points a part of the way across them, as the monkey
+  holds them (`faceTube`, `aimSide`, design 5.3). With the roll of the shoulder, the right paw of
+  a recast body stood up behind the valves, with its finger tips up.
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
@@ -529,6 +534,9 @@ The app does not follow these facts:
   over the lap, with the bell at the right and the leadpipe up (`rest`, `restShift`).
 - **The double horn (2.2).** The app has no B♭ side.
 - **The trumpet thumb (2.1).** The right thumb lies above the lead pipe.
+- **The shared trumpet fingers (2.1).** The right fingers of a recast trumpeter stay nearly
+  straight, and the paw points only a part of the way across the valves, so the fingers do not
+  arch down onto the valve caps (`TODO.md`).
 - **The trumpet elbows (2.1).** Both elbows point down and out, and the forearms rise steeply. The
   big head of the monkey puts the mouthpiece high above the shoulder joints. With the elbows out
   and level, the right upper arm goes flat.
