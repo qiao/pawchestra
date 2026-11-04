@@ -19,7 +19,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), close knees (`studio.legTurns`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), the shape of the old cat with narrow shoulders (`girthProfile`, `armGirth`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
-| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut at the eyes and the band (`panda_edge.py`), a right elbow `raise`, longer legs on the old chair (`shinFactor`, `chair.front`), a smaller head (`headFactor`). | `trombonist` |
+| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut (`panda_edge.py`), a right elbow `raise`, the old form: longer legs (`shinFactor`, `chair.front`), a smaller head (`headFactor`), a chest taper (`girthProfile`), thinner upper arms (`armGirth`). | `trombonist` |
 | hippo | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass. | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
@@ -34,8 +34,6 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 ## The asset chain
-
-The tools rig each textured mesh with no skeleton, then pack it into a module of the app.
 
 ```text
  assets/models/<s>/<s>.glb (source mesh, unchanged)
@@ -296,6 +294,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - A long thigh puts the feet forward and moves the seats. Lengthen the shin (`shinFactor`). Move
   `headFloor` and each lap share (`lap.along`) with the legs.
 - A back factor of `girthProfile` moves the back on the chair. Keep it at 1 below the hips joint.
+  A width row at the shoulder joints moves the rest paws. Narrow below them.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
