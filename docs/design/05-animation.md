@@ -273,8 +273,8 @@ The rest of each family:
   the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
   lowering that keeps the elbow bent (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
-  the beaver, the badger), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is a round tube with its
-  full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
+  the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
+  a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
   into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
   the body (strings 1.8, 2.3), and a cellist starts a stroke open at the shoulder (strings 2.2). At
@@ -400,7 +400,10 @@ knuckles stay out of the neck of the harp.
 
 **Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it to half
 between two notes, so that each note shows (`CHOIR_MOTION`). Neighbor voices sway to opposite
-sides, so that the choir does not move as one block.
+sides, so that the choir does not move as one block. The flippers hold the outer edges of the
+folder with the elbows down and out (`CHOIR_HOLD`), on a wide folder (`CHOIR_FOLDER`). Reason:
+the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
+went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
 
 ## 5.4 Conductor
 
