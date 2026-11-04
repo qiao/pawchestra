@@ -6,8 +6,8 @@ rigging round.
 
 ## Bodies and roles
 
-Each species has a studio body (`'studio-<a>'`). The role tools take the role names, and
-`pnpm pose-depth violinist` sweeps the rabbit and the red fox together. "Rebuilt arms" means quad
+Each species has a studio body (`'studio-<a>'`). `pnpm pose-depth violinist` sweeps the rabbit
+and the red fox together. "Rebuilt arms" means quad
 arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has the role-neutral bind
 (design 4.4).
 
@@ -27,7 +27,7 @@ arm tubes, Blender weights, and arm segments. Each body with rebuilt arms has th
 | beaver | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), rigid crease faces (`rigidPainted`), root skin normals, a broad tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
 | pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). The horn hold keeps the round left elbow off the belly. | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
-| badger | A tail ball and a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
+| badger | Arms freed in a copy (`badger_edit.py`), rebuilt arms, rigid shoulder faces (`rigidPainted`), a triangle arm `raise`, a tail ball, a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Longer rebuilt arms (`arm_rebuild.py --factor 1.2`), a long tail curled on the floor, a smaller trumpet, no chair. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms with a side wall (`deer_arms.py`), a right elbow `raise`, antlers on the head. Sits on the harp stool, with a smaller harp (`harpScale`) on its right shoulder. | `harpist` |
@@ -118,10 +118,10 @@ upper arm weights, or a move of the elbow alone does not fix a twisted arm.
   about 160° on its forearm folds the wrist. Then change the hold or the instrument first, and
   hold the part near the direction of no paw twist.
 
-Run `tools/blender/arm_rebuild.py` first. Its doc comment gives its eight steps. A clean quad
+Run `tools/blender/arm_rebuild.py` first. A clean quad
 mesh skips steps 2 to 5 (`--keep-faces`). Write a species script `tools/blender/<a>_arms.py` only
-for a fault that it does not fix, such as an arm joined to the trunk down to the elbow (the side
-wall of `cat_arms.py`, or the split crease of `beaver_edit.py`).
+for a fault that it does not fix, such as an arm joined to the trunk (the side wall of
+`cat_arms.py`, or the split crease of `beaver_edit.py` and `badger_edit.py`).
 
 ### Rules
 
