@@ -298,9 +298,16 @@ passes.
       Next: a lowering path that keeps the right elbow out of the chest until late in the move,
       or a smaller share of the rule where the arm passes. Then run the rule on the panda and the
       cat, which show the same fault.
-- [ ] Rabbit T-pose body: the seated thigh is 0.70 of its length across and 0.67 up after
-      `legGirth` 1.6 (A-pose rabbit 0.78 to 0.89 and 0.97). The back of the thigh keeps its place
-      on the seat, so the thigh grows up only on its top. Check a larger factor with the depths.
+- [ ] Rabbit T-pose body: the width W8 of `pnpm body-shape violinist` is 31.2 cm (A-pose rabbit
+      24.6 cm). The cut goes through the level arm roots, which `weights.paintedBelow` counts as
+      trunk, and a `girthProfile` width of 0.92 there did not change it. Judge the upper chest in
+      the app view, or measure the cut with the arm roots left out.
+- [ ] Rabbit T-pose body: the footprint of the old chair is 1.9 cm shorter (0.669 m, 0.688 m
+      before), so the stage of bach-bwv1047 is 0.8% and of bach-bwv1048 0.4% smaller, and the
+      other players there move. Find the part that moved (the feet or the back of the haunch).
+- [ ] Rabbit violinist: at rest, the raised arms lift the shoulders, so the neck of the new body
+      shows less than in the bind (the chin is 7.7 cm above the shoulder tops in the bind). Check it
+      again after the rabbit takes the rest pose of the cat round.
 - [ ] Rabbit T-pose body: after `eyeFill`, a thin light lip stays at the front of each eye from the
       side, and the right eye bone lies 1.2 cm nearer the middle than the left one.
 - [ ] `pnpm rig-mesh --check`: the standing body against the source counts the form rules that
