@@ -478,6 +478,11 @@ The app follows these facts:
   `crossStrings()` gives the notes next to a change of the string the mean of the two strings.
   `crossPole()` then keeps the right elbow near the elbow of the mean string, and the forearm and
   the wrist make the rest of the crossing. The bow turns the full angle to each string.
+- **The shared elbows (1.8, 2.2, `roundArms`).** A violinist keeps the left elbow under the
+  instrument (1.8), and a cellist starts a stroke open at the shoulder [85]. A body with rounder
+  arms than the accepted rabbit violinist or dog cellist turns each elbow of the shared violin or
+  cello hold further out, at rest, in the moves, and in the play (design 5.3), so that its upper
+  arms stay off the trunk.
 - **The sounding point (2.4).** `soundingPointAt()` moves the contact point from
   `BowedHold.soundingPoint[0]` of the string length in piano to `soundingPoint[1]` in forte, after
   the violinists of Askenfelt and the six cellists. The bow follows a change of the loudness with
