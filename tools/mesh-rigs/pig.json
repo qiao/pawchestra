@@ -1,9 +1,9 @@
 {
-  "source": "assets/models/pig/pig-arms.glb",
-  "sourceNote": "A copy of assets/models/pig/pig-upper.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.5 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.5 makes these faces. The other faces and pig-upper.glb stay unchanged.",
+  "source": "assets/models/pig/pig-root.glb",
+  "sourceNote": "A copy of assets/models/pig/pig-arms.glb with the hidden root of each free arm nearer to the trunk wall (tools/blender/pig_root.py, the moves of tools/arm-roots/pig-moves.json). pig-arms.glb is a copy of pig-upper.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.5 times longer than the arms of the source, from tools/blender/arm_rebuild.py --factor 1.5. The inner side of the top ring and of the dome of each tube lies inside the trunk, and the turns of the arm took it up to 3.9 cm into the shoulder in each sample of the hornist. The moves put 7 of these vertices about 1 cm inside the trunk in the hornist.",
   "armSource": "assets/models/pig/pig-upper.glb",
   "armSourceNote": "A copy of assets/models/pig/pig.glb with round upper arms (assets/models/pig/README.md). The mesh has no upper arm of its own, so tools/blender/pig_arms.py removes the bulge of the trunk wall above each elbow, fills the wall again, and builds a round tube up to a closed dome around the shoulder joint. tools/blender/arm_rebuild.py reads it.",
-  "paintedWeights": "assets/models/pig/pig-weights.json",
+  "paintedWeights": "assets/models/pig/pig-root-weights.json",
   "paintedLower": [
     "root",
     "hips",
@@ -24,7 +24,7 @@
     "toes_R",
     "tail"
   ],
-  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, as on the wolf, because the seated bind of the app depends on them.",
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py (pig-weights.json). pig-root-weights.json holds the same weights at the places of pig-root.glb. The vertices on the bones of paintedLower keep the rule weights, as on the wolf, because the seated bind of the app depends on them.",
   "armSegments": {
     "helper": 0.0498,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it)."
