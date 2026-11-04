@@ -450,10 +450,9 @@ The app does not follow these facts:
   (`BowedHold.tiltL`), so that the fingers come down on the strings from above. The cat tilts
   further, so that its paw curls around the neck, and a smaller tilt pinches the skin of its
   wrist. Thus its wrist bends off the line of the forearm in the low positions.
-- **The thick wrist (1.9, 2.9).** At rest, the left paw of the shared violin hold holds the neck
-  further off when the wrist end of the forearm is thicker than the wrist of the rabbit
-  (`BowedHold.girthGap`), so that the forearm keeps off the upper bout of the upright violin. In
-  the play, the thick wrist of some bodies still touches the upper bout (`TODO.md`).
+- **The thick wrist (1.9).** The thick wrist end of the left forearm of some bodies touches the
+  upper bout of the violin, at rest and in the play (`TODO.md`). The forearm of a real player
+  keeps free of the body of the instrument.
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm. The rabbit turns it out further, because its round rebuilt upper arm goes into the
@@ -598,7 +597,7 @@ The app does not follow these facts:
   takes the bend of the dog at its accepted cello, 65° between the upper arm and the forearm.
 - **The left hand (1.9).** The left paw tilts further over the neck from the bass side
   (`BowedHold.tiltL`), so that the thick paw keeps off the fingerboard. A paw that is thicker
-  than the paw of the dog lies further off the neck by the difference (`BowedHold.girthGap`), so
+  than the paw of the dog lies further off the neck by the difference (`BowedHold.girthFit`), so
   that it does not go into the neck. No claw presses a string.
 - **The left hand at rest (2.7).** No source gives the rest of an orchestral cellist. The left
   paw of the shared hold holds the neck near the nut (`BowedHold.restPlace`), so that the forearm
