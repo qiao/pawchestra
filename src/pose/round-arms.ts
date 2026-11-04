@@ -34,10 +34,21 @@ export function elbowOutTurn(model: PlayerModel, arm: ArmRig, fitOut: number | n
 }
 
 /**
- * The lift of a shoulder bone for each radian of out swing that an arm needs more than the arm of
- * the body that a shared hold fits ({@link shoulderLift}).
+ * The lift of a shoulder bone for each radian of out swing that an arm needs more than
+ * {@link LIFT_FROM} and more than the arm of the body that a shared hold fits
+ * ({@link shoulderLift}). With 0.5 and no {@link LIFT_FROM}, the upper arm root of the pig flutist
+ * went 3.8 cm in place of 4.3 cm into the body, and the rabbit clarinetist failed the grip turn
+ * (46°, limit 45°).
  */
-const LIFT_PER_SWING = 0.5;
+const LIFT_PER_SWING = 1.5;
+
+/**
+ * The out swing of the arms above which the shoulders lift ({@link shoulderLift}). The root of
+ * the upper arm turns against the shoulder by the swing from the hanging bind, so only the round
+ * bodies with a large swing lift: the dog, the pig, the badger, the penguin, and the hippo. The
+ * rabbit, the cat, and the panda keep their shoulders.
+ */
+const LIFT_FROM = 34 * MathUtils.DEG2RAD;
 
 /**
  * The largest lift of a shoulder bone: the rise of the clavicle of a real person from the arm at
@@ -48,11 +59,12 @@ const MAX_LIFT = 11 * MathUtils.DEG2RAD;
 
 /**
  * Gives the lift of a shoulder bone up and out around the forward axis by the rule of the round
- * free arms in a shared hold (design 5.3, "Free round arms in a shared hold"):
+ * free arms in a shared hold (design 5.3, "Lifted shoulders in a shared hold"):
  * {@link LIFT_PER_SWING} times the out swing that the arm needs beside the trunk
- * ({@link armOut}) less the swing of the body that the hold fits, up to {@link MAX_LIFT}. The
- * shoulder joint goes up with the shoulder bone, and the arm keeps its paw, so the upper arm turns
- * less against the shoulder, and its root stays out of the trunk.
+ * ({@link armOut}) less the larger of {@link LIFT_FROM} and the swing of the body that the hold
+ * fits, up to {@link MAX_LIFT}. The shoulder joint goes up with the shoulder bone, and the arm
+ * keeps its paw, so the upper arm turns less against the shoulder, and its root stays out of the
+ * trunk.
  *
  * @param model The player model.
  * @param arm The arm.
@@ -64,7 +76,8 @@ export function shoulderLift(model: PlayerModel, arm: ArmRig, fitOut: number | n
   if (fitOut === null) {
     return 0;
   }
-  return Math.min(MAX_LIFT, Math.max(0, LIFT_PER_SWING * (armOut(model, arm) - fitOut)));
+  const from = Math.max(LIFT_FROM, fitOut);
+  return Math.min(MAX_LIFT, Math.max(0, LIFT_PER_SWING * (armOut(model, arm) - from)));
 }
 
 const Z_AXIS = new Vector3(0, 0, 1);
