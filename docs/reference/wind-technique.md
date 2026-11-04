@@ -379,7 +379,8 @@ The app follows these facts:
   [70]. The top of the instrument stays below the mouth, and the slide end and the bell stay off
   the floor [6] [70] (`rest`, `restShift`). Both paws keep the grip of the play on the instrument
   (`restAim`), and the left paw slides down the inner slide tubes, away from the
-  mouthpiece (`restGripShiftL`).
+  mouthpiece, and a little toward the left shoulder, so that its finger tips stay on the tubes
+  (`restGripShiftL`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with

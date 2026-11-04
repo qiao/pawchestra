@@ -698,9 +698,14 @@ const PANDA_PLAY_TURN = toQuat(
  * (`restAim`), so that the lift and the lowering turn each hand with the trombone, and the right
  * paw does not turn past 180° on its forearm (move twist at most 93°). With a rest grip of its own
  * on the top of the brace, the right hand turned about 180° from the rest to the play, and each mix
- * of the move flipped the right paw. The left paw slides 0.11 H down its tubes at rest
- * (`restGripShiftL`), because at the grip of the play its finger tips do not reach the tubes. In
- * the middle of the lift and the lowering, the left finger tips leave the tubes for 0.1 s to 0.5 s.
+ * of the move flipped the right paw. The left paw slides 0.115 H down its tubes at rest, 0.03 H
+ * less far toward their axis than in the play, and 0.01 H toward the left shoulder
+ * (`restGripShiftL`), because at the grip of the play its finger tips do not reach the tubes. The
+ * narrower upper chest of the rig (`girthProfile`) moves the left shoulder joint 0.8 cm in: with
+ * 0.11 H down and 0.06 H toward the axis, the left finger tips then stood 1.5 cm off the tubes at
+ * rest, and with 0.04 H toward the axis and 0.02 H toward the shoulder, the left upper arm was
+ * flat at rest (arm gate flat 0.81, base 0.87). In the middle of the lift and the lowering, the
+ * left finger tips leave the tubes for 0.1 s to 0.5 s.
  * The elbows point out and down at rest (`restPoleL`, `restPoleR`). With the trombone 0.28 H lower
  * and the elbows further down, the right upper arm went 5.7 cm into the belly, and with the left
  * elbow less far out, the left forearm went 0.4 cm into the slide tubes in the lowering. A real
@@ -722,7 +727,7 @@ const PANDA_TROMBONE = {
   aimSide: [0.8, 0.8],
   gripShiftL: [-0.04, 0.07, 0],
   gripShiftR: [0.1, 0, 0.03],
-  restGripShiftL: [0.07, 0.06, 0],
+  restGripShiftL: [0.075, 0.04, -0.01],
   restAim: 1,
   gripCurl: curls(90, 110),
 } as const satisfies WindHold;
