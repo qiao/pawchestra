@@ -1021,8 +1021,10 @@ export const BOWED_HOLDS = {
  * of the play points out to the side, down, and forward, (2, -0.6, -0.7), so that the grip in the
  * bow paw stays near the accepted grip of the role: with (2, -0.3, -0.7), the grip turn p50 of the
  * arm gate is 46° (limit 45°), and with this elbow 41°. At the tip, the right elbow points down,
- * out, and forward, (1.5, -1, -1). The right shoulder bone turns 36° forward (`reach`, 30° in the
- * viola hold), so that the bow arm passes in front of the round belly. In pizzicato, the right
+ * out, and forward, (1.5, -1, -1). The right shoulder bone turns 30° forward, as in the viola
+ * hold (`reach`): the belly of the body shape of the old cat is flat enough for the bow arm, and
+ * with 36°, the right upper arm goes 0.8 cm into its arm root in the play of `mozart-k191` (0.6 cm
+ * with 30°). In pizzicato, the right
  * elbow points out, a little down, and forward, (1.2, -0.5, -1), and the right palm plucks 0.1 m
  * from the strings toward the frog side (`pluckSide`), as the hand of a real player comes up from
  * the side.
@@ -1082,7 +1084,6 @@ const CAT_HOLD = {
   poleTipR: [1.5, -1, -1],
   polePizzicato: [1.2, -0.5, -1],
   pluckSide: 0.1,
-  reach: 36 * MathUtils.DEG2RAD,
   restPoleR: [0.9, -1, 0.2],
   restPoleL: [-1.6, -1, -0.2],
   restPlace: 0.55,
