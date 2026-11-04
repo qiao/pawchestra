@@ -23,7 +23,7 @@ import {
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
-import { pawGirth } from './girth.ts';
+import { pawGirth, wristGirth } from './girth.ts';
 import { hangingArm } from './hang.ts';
 import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
@@ -303,6 +303,12 @@ export interface BowedHold {
    */
   readonly girthFit: number | null;
   /**
+   * The rule of the wrist clearance from the girth (design 5.3), or `null` for no rule, as an own
+   * hold has: a thicker wrist end of the left forearm holds the neck at rest nearer to the nut, so
+   * that it stays out of the upper bout.
+   */
+  readonly wristFit: WristFit | null;
+  /**
    * The direction to which the left elbow points in the middle of the lift and of the lowering, in
    * the axes of the chest (design 5.2). The elbow turns from the rest pole to this pole, then to
    * the playing pole. `null` mixes the rest pole and the playing pole directly.
@@ -381,6 +387,29 @@ export interface BowedHold {
    * places of `rest.lap` and `restBow.lap`.
    */
   readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
+}
+
+/**
+ * The rule of the wrist clearance from the girth ({@link BowedHold.wristFit}, design 5.3). The
+ * girth counts as a share of the length of the fingerboard, so that a smaller instrument of the
+ * size rule (design 4.6) counts as a thicker wrist.
+ */
+export interface WristFit {
+  /**
+   * The girth of the wrist end of the left forearm of the body that the hold fits
+   * (`wristGirth()`), as a share of the length of the fingerboard. A wrist with this share or
+   * less keeps {@link BowedHold.restPlace}.
+   */
+  readonly girth: number;
+  /** The share over {@link WristFit.girth} at which the rest grip reaches `restPlace`. */
+  readonly full: number;
+  /**
+   * The place of the left fingers on the target `fingerboard` in the rest pose for a wrist with
+   * a share of {@link WristFit.full} or more over the fit: 0 at the nut, 1 at the end of the
+   * fingerboard. A wrist between the two takes a place between this place and
+   * {@link BowedHold.restPlace}, in proportion.
+   */
+  readonly restPlace: number;
 }
 
 /**
@@ -471,6 +500,7 @@ const CHIN_HOLD = {
   restGapL: 0,
   gapL: 0,
   girthFit: null,
+  wristFit: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -547,6 +577,7 @@ const FLOOR_HOLD = {
   restGapL: 0,
   gapL: 0,
   girthFit: null,
+  wristFit: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -921,6 +952,13 @@ const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
 const GIRTH_FIT = { cello: 0.052 } as const;
 
 /**
+ * The rule of the wrist clearance of the shared violin hold (`BowedHold.wristFit`, design 5.3):
+ * the girth of the wrist end of the left forearm of the rabbit, as a share of its fingerboard
+ * (`wristGirth()`).
+ */
+const WRIST_FIT = { girth: 0.28, full: 0.04, restPlace: 0.15 } as const satisfies WristFit;
+
+/**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
  * values of the accepted rabbit violinist ({@link SHOULDER_HOLD}), as directions and in head
  * heights, with a place and a rest from the body. With the chin hold, the left upper arms and the
@@ -949,10 +987,23 @@ const GIRTH_FIT = { cello: 0.052 } as const;
  * (`girthFit`). A rest gap from the girth of the wrist moved the left forearm of the recast polar
  * bear out of the upright violin (1.8 cm to 0.0 cm), but the paw keeps its hanging wrist, so the
  * violin moved into the belly: the violin of the elephant 6.1 cm, and of the bear 5.3 cm.
+ *
+ * A thicker wrist end of the left forearm holds the neck at rest nearer to the nut (`wristFit`):
+ * the girth over the fingerboard (`wristGirth()`) over the 0.28 of the rabbit moves the rest grip
+ * from 0.4 toward 0.15 of the fingerboard, the whole way at 0.04 over it. At 0.4, the wrist end of
+ * the forearm of the recast mannequin and polar bear went 1.8 cm to 1.9 cm into the upper bout at
+ * rest and in the moves, and with the rule less than 1.0 cm. The violin keeps the rest place and
+ * the path of the grip at 0.4 (`RigPoints.restCarryPlace`), and the paw slides up the neck: with
+ * the violin hung from the grip at 0.15, the violin of the recast rhino went 2.6 cm into the belly
+ * at rest (1.3 cm with the path of 0.4), and of the penguin 4.0 cm in the moves (3.2 cm). A
+ * further tilt of the paw over the neck in the play (20° at 0.04 over the fit) moved the forearm
+ * of the polar bear out of the upper bout in the play (1.7 cm to 1.2 cm), but the violin of the
+ * penguin went 3.5 cm to 4.5 cm into the belly in the moves, so the play keeps its grip.
  */
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
   roundArms: ROUND_ARMS_FIT.violin * MathUtils.DEG2RAD,
+  wristFit: WRIST_FIT,
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
   frogHair: 0.15,
   liftReach: [0.15, 0.15, -0.3],
@@ -1716,10 +1767,11 @@ export function bowedRig(
   given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
   const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
-  const hold = girthGaps(
+  const placedHold = girthGaps(
     model,
     floor.chinFit ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) } : floor,
   );
+  const hold = wristRest(model, placedHold);
   const { positions, parents } = model.skeleton;
   const at = (bone: number): Vec3 => positions[bone] ?? [0, 0, 0];
   const pieceRotation = (bone: 'instrument' | 'bow'): Quaternion => {
@@ -1815,7 +1867,7 @@ export function bowedRig(
     restRotation: toQuat(restRotation),
     playShift: toVec3(playShift),
     restPivot: restPivotOf(model, hold, atSide, pivot, playShift),
-    restCarryPlace: hold.restPlace,
+    restCarryPlace: placedHold.restPlace,
     liftReach: toVec3(new Vector3(...hold.liftReach).multiplyScalar(model.body.headHeight)),
     restPoleR: hold.restPoleR,
     restPoleL: hold.restPoleL,
@@ -1870,6 +1922,30 @@ function girthGaps(model: PlayerModel, hold: BowedHold): BowedHold {
     return hold;
   }
   return { ...hold, gapL: hold.gapL + Math.max(0, pawGirth(model, 'L') - fit) };
+}
+
+/**
+ * Moves the rest grip of the left paw of a thicker wrist toward the nut by the rule of the wrist
+ * clearance from the girth ({@link BowedHold.wristFit}, design 5.3): the girth of the wrist end
+ * of the left forearm, as a share of the length of the fingerboard, over the girth of the body
+ * that the hold fits sets the share of the way from the rest place of the hold to the rest place
+ * of the rule. A wrist with the same share or less keeps the rest place of the hold.
+ *
+ * @param model The player model.
+ * @param hold The hold.
+ * @returns The hold with the rest place of the body, or `hold` for a hold with no rule.
+ */
+function wristRest(model: PlayerModel, hold: BowedHold): BowedHold {
+  const fit = hold.wristFit;
+  if (fit === null) {
+    return hold;
+  }
+  const board = targetOf(model, 'fingerboard');
+  const end = (at: Vec3): Vector3 =>
+    new Vector3(...placePoint(model.pieces, { bone: 'instrument', at }));
+  const share = wristGirth(model, 'L') / end(board.from).distanceTo(end(board.to));
+  const over = MathUtils.clamp((share - fit.girth) / fit.full, 0, 1);
+  return { ...hold, restPlace: MathUtils.lerp(hold.restPlace, fit.restPlace, over) };
 }
 
 /**
