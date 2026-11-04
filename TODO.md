@@ -329,11 +329,7 @@ passes.
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
       shafts down. A real timpanist holds them one inch above the head with a level shaft.
-- [ ] Pig hornist: the hidden root of each free arm lies in the shoulder. `pig_root.py` moves 7 of
-      its vertices toward the trunk wall, and the sweep gives 2.1 cm (3.9 cm before). The back of
-      the right arm root goes 2.1 cm in at a note and 0.6 cm out at rest, so no move clears it.
-      Next: more clavicle weight on the hidden root (below 0.5, else its faces join the body part
-      of the sweep), or an accepted depth for the pair. Fix the dark facets on the shoulders.
+- [ ] Pig hornist: fix the dark facets on the shoulders.
 - [ ] Pig in the cast matrix: the moved root vertices of `pig_root.py` come up to 1.5 cm out of the
       shoulder in the snare drum (0.5 cm in before), and up to 1.2 cm in the other recast roles.
       Check them in 2x crops of the recast roles.
@@ -530,16 +526,16 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Root clips of the cat and the pig in the shared holds (5.3): the right upper arm of the cat
-      goes 2.2 cm to 2.5 cm into the arm root at 0.27 to 0.31 of its length (violin moves, cello,
-      flute rest and moves, clarinet), and the upper arm of the pig 1.8 cm to 2.8 cm into the
-      shoulder of the mesh at 0.06 to 0.20 (violin, clarinet). No pose rule clears them
-      (`reports/2026-11-04-posed-clear/`): an elbow turn up to the stop of `turnPoleOut()` (cat
-      clarinet 1.4 cm, but grip L 62/45 from the forearm, which the palm turn now replaces, so
-      try it again), 11° more lift (0.1 cm to 0.7 cm less), an elbow out in
-      the middle of the bow moves (cat violin 1.7 cm), 15° to 30° more forward turn of the
-      shoulder (cat cello 2.1 cm), and a reach limit of the bow paw (no change). Next: the
-      weights or the shape of the arm root of the cat and the pig in a rig round, then a matrix.
+- [ ] Mid upper arm of the cat in the shared moves (5.3): with the root clips fixed in the rig
+      (`cat_root.py`), the inner side of the upper arm at 0.55 of its length still goes 1.5 cm
+      (violin lowering) and 1.9 cm (flute lift) into the trunk side in a few samples, on both
+      sides (`reports/2026-11-04-cat-root/matrix.md`). The left armpit keeps its weights, because
+      the same change grew the rest folds of the left arm of the violist from 3 to 6.
+- [ ] Inner upper arm of the pig in the shared holds (5.3): with the root domes shrunk
+      (`pig_root.py`), the round tube of `pig-upper.glb` still goes into the trunk at 0.36 to 0.47
+      of the upper arm: violin play 2.3 cm, cello lowering 4.0 cm (left arm). The same vertices
+      come up to 9 cm out of the trunk in other holds, so they are not a hidden root. Next: the
+      elbow out in these holds, or a flatter inner side of the tube.
 - [ ] Right paw of the shared trumpet (4.4, 5.3): the hold does not roll the paws to the valves
       (`faceTube` none), so the gate keeps the grip turn from the forearm. In the axes of the
       trumpet, the right palm of each recast body turns 53° to 68° from the palm of the monkey.
