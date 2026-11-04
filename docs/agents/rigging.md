@@ -14,7 +14,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 |---|---|---|
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`). Sits on a bench that fits its haunch (`benchFitOf()`). | `pianist` |
-| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, root and elbow skin normals, a trunk share under the armpits (`paintedBelow`), wider thighs (`legGirth`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
+| rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, skin normals, a trunk share under the armpits (`paintedBelow`), the old chair (`shinFactor`, `sit.most`), wide thighs (`legGirth`), knees out (`studio.legTurns`), a longer neck and trunk, a smaller head (`neckFactor`, `trunkFactor`, `headFactor`), the old shape (`girthProfile`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, long legs (`legFactor`, `shinFactor`, `legGirth`), close knees (`studio.legTurns`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), the shape of the old cat with narrow shoulders (`girthProfile`, `armGirth`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist` |
@@ -50,7 +50,7 @@ The tools rig each textured mesh with no skeleton, then pack it into a module of
  src/models/studio/<a>.ts --> STUDIO_BODIES --> SPECIES[<s>].body
 ```
 
-Test a change of the chain on the test mannequin first (`assets/models/mannequin/`, design 4.4):
+Test a change of the chain on the mannequin first (`assets/models/mannequin/`, design 4.4):
 `pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
 Its clean rings and twist markers show a fault of the chain.
 
@@ -102,7 +102,6 @@ round not done.
   bind differs from the base, they take only their limits (`REBIND`), and the gate prints the elbow
   and wrist ring widths. The grip turn ignores the bind. A rebind round proves the same bones with
   `pnpm arm-check <roles> --world --base <start>`.
-- `pnpm arm-look <role>` measures a crumpled upper arm.
 
 ## The rebuild of the arms in Blender
 
@@ -339,7 +338,6 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   wrist.
 - A fix of a turn rate can move a prop to a wrong place with all measures passed. Render the
   move.
-- Record the commit or `--set` of each variant row.
 - The bow values (`src/pose/bowed-rig.ts`, `src/pose/strokes.ts`), `HAND_MOTION`, the percussion
   `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits stay in meters. Compare a new body size
   in `H` first.
