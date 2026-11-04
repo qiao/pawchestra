@@ -750,7 +750,7 @@ const SHOULDER_HOLD = {
  *   at 0.3 of the fingerboard from the nut (`restPlace`). Thus the low paw keeps the violin near
  *   the middle, as the rabbit of the A-pose mesh: with the upright violin of the shoulder hold and
  *   0.4, the violin rests 3.6 cm further out to the left, and the left paw and forearm go 0.8 cm
- *   and 1.1 cm into the violin (0.6 cm and 0.7 cm with the lean).
+ *   and 1.1 cm into the violin (0.6 cm and 0.3 cm with the lean).
  * - The left paw takes no turn in the plane of its palm at rest (`restPawTurnL`): with the turn of
  *   20° of the shoulder hold, the low forearm bends the paw 39° off its forearm at rest, and with
  *   no turn, 29°.
