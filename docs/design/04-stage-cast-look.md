@@ -186,7 +186,14 @@ side wall on the trunk (`tools/blender/cat_arms.py`), or splits it from the trun
 in a copy (`tools/blender/beaver_edit.py`). An arm that joins the trunk only near the shoulder has
 a free section, but the shoulder line then lies far down the upper arm, and the long thin faces
 above it fold when the arm lifts. So the badger copy splits its crease too
-(`tools/blender/badger_edit.py`), and the tube starts near the shoulder joint. The `README.md` of
+(`tools/blender/badger_edit.py`), and the tube starts near the shoulder joint. The flipper of the
+penguin joins the trunk in a deep crease down to the elbow, so its copy splits the crease too
+(`tools/blender/penguin_edit.py`). A flat arm has rays of different lengths with no trunk in the
+section, so the free test of the rebuild takes a larger ratio for the flipper (`--spec` key
+`free`). The old faces keep their colors, so that the black and white edge of the trunk stays.
+The new faces of the side wall take the black of the flipper, except forward of one straight
+edge along the flank line under the flipper, where they take the white of the side. Reason: the
+flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of
 `assets/models/<a>/` gives the source and the steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
@@ -333,11 +340,9 @@ faces.
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
 shape that fits only that hold, and each other hold blends its own bend on top. So a body with
 the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
-species and each instrument (Cast matrix). The rabbit, the polar bear, the wolf, the mouse, the
-elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, the pig, the
-cat, the dog, the beaver, and the badger have this bind. A body with `raise` shapes also fits each
-shape against all its roles, because a
-shape fits only the poses near its hold. A pose gives the bend of a paw off its forearm as an
+species and each instrument (Cast matrix). Each body of the app has this bind. A body with
+`raise` shapes also fits each shape against all its roles, because a shape fits only the poses
+near its hold. A pose gives the bend of a paw off its forearm as an
 angle (`pawBendR`), so that a new bind keeps the paw in the world.
 
 The bind supination of each paw is the value that makes the largest paw twist p95 of any role
