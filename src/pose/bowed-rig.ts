@@ -23,7 +23,7 @@ import {
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
-import { pawGirth, wristGirth } from './girth.ts';
+import { pawGirth } from './girth.ts';
 import { hangingArm } from './hang.ts';
 import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
@@ -296,15 +296,12 @@ export interface BowedHold {
    */
   readonly gapL: number;
   /**
-   * The rule of the grip clearance from the girth (design 5.3): the girth of the left arm of the
-   * body that the hold fits, in meters. A thicker body moves its left paw further off the neck by
-   * the difference, so that its paw and forearm keep the free gap of that body. `wrist` is the
-   * girth of the wrist end of the forearm (`wristGirth()`), and the difference adds to
-   * {@link BowedHold.restGapL}. `paw` is the girth of the paw (`pawGirth()`), and the difference
-   * adds to {@link BowedHold.gapL}. `null` keeps the gaps of the hold on each body, as
-   * an own hold does.
+   * The rule of the grip clearance from the girth (design 5.3): the girth of the left paw of the
+   * body that the hold fits (`pawGirth()`), in meters. A thicker paw lies further off the neck by
+   * the difference, which adds to {@link BowedHold.gapL}, so that it keeps the free gap of that
+   * body. `null` keeps the gap of the hold on each body, as an own hold does.
    */
-  readonly girthGap: { readonly wrist: number | null; readonly paw: number | null } | null;
+  readonly girthFit: number | null;
   /**
    * The direction to which the left elbow points in the middle of the lift and of the lowering, in
    * the axes of the chest (design 5.2). The elbow turns from the rest pole to this pole, then to
@@ -473,7 +470,7 @@ const CHIN_HOLD = {
   restYawL: 0,
   restGapL: 0,
   gapL: 0,
-  girthGap: null,
+  girthFit: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -549,7 +546,7 @@ const FLOOR_HOLD = {
   restYawL: 0,
   restGapL: 0,
   gapL: 0,
-  girthGap: null,
+  girthFit: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -917,9 +914,9 @@ const WOLF_VIOLIN_HOLD = {
 const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
 
 /**
- * The girth of the left arm of the body that each shared hold fits, in meters
- * (`BowedHold.girthGap`, design 5.3): the girth of the paw of the dog for the cello
- * (`pawGirth()`). A thicker body moves its left paw further off the neck by the difference.
+ * The girth of the left paw of the body that each shared hold fits, in meters
+ * (`BowedHold.girthFit`, design 5.3): the girth of the paw of the dog for the cello
+ * (`pawGirth()`). A thicker paw lies further off the neck by the difference.
  */
 const GIRTH_FIT = { cello: 0.052 } as const;
 
@@ -949,7 +946,7 @@ const GIRTH_FIT = { cello: 0.052 } as const;
  * 2.2 cm into the body at the frog.
  *
  * The hold keeps the rest gap of the left paw on each body, with no rule of the girth
- * (`girthGap`). A rest gap from the girth of the wrist moved the left forearm of the recast polar
+ * (`girthFit`). A rest gap from the girth of the wrist moved the left forearm of the recast polar
  * bear out of the upright violin (1.8 cm to 0.0 cm), but the paw keeps its hanging wrist, so the
  * violin moved into the belly: the violin of the elephant 6.1 cm, and of the bear 5.3 cm.
  */
@@ -1024,7 +1021,7 @@ const LAP_CELLO_BOW = {
  * forearm or the left paw goes into the upper bout at rest and in the moves: the forearm of the
  * recast red fox 3.9 cm, and the paw of the bear 3.5 cm (0.1 cm and 1.6 cm at 0.4).
  *
- * A thicker paw holds the neck further off (`girthGap`): the gap of the left paw grows by the
+ * A thicker paw holds the neck further off (`girthFit`): the gap of the left paw grows by the
  * girth of the paw over the girth of the dog, in the play, at rest, and in the moves. A thick paw
  * otherwise goes into the neck: the paw of the recast panda went 1.9 cm into the neck in 83% of
  * the play samples and 1.9 cm in the moves, and with the rule less than 1.0 cm and 0.0 cm.
@@ -1032,7 +1029,7 @@ const LAP_CELLO_BOW = {
 const CELLO_HOLD = {
   ...FLOOR_HOLD,
   roundArms: ROUND_ARMS_FIT.cello * MathUtils.DEG2RAD,
-  girthGap: { wrist: null, paw: GIRTH_FIT.cello },
+  girthFit: GIRTH_FIT.cello,
   lean: 3 * MathUtils.DEG2RAD,
   reach: 30 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
@@ -1243,7 +1240,7 @@ const DOG_HOLD = {
   restPoleR: [1.2, -1, 0.75],
   restPoleL: [-2, -1, 0],
   roundArms: null,
-  girthGap: null,
+  girthFit: null,
   restPlace: 0.6,
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
   fit: null,
@@ -1850,26 +1847,20 @@ export function bowedRig(
 
 /**
  * Moves the left paw of a thicker body further off the neck by the rule of the grip clearance
- * from the girth ({@link BowedHold.girthGap}, design 5.3): each gap of the hold grows by the
- * girth of the left arm of the body over the girth of the body that the hold fits. A body with the
- * same girth or less keeps the gaps of the hold.
+ * from the girth ({@link BowedHold.girthFit}, design 5.3): the gap of the hold grows by the girth
+ * of the left paw of the body over the girth of the body that the hold fits. A paw with the same
+ * girth or less keeps the gap of the hold.
  *
  * @param model The player model.
  * @param hold The hold.
- * @returns The hold with the gaps of the body, or `hold` for a hold with no rule.
+ * @returns The hold with the gap of the body, or `hold` for a hold with no rule.
  */
 function girthGaps(model: PlayerModel, hold: BowedHold): BowedHold {
-  const rule = hold.girthGap;
-  if (!rule) {
+  const fit = hold.girthFit;
+  if (fit === null) {
     return hold;
   }
-  const extra = (fit: number | null, girth: (model: PlayerModel, side: 'L') => number): number =>
-    fit === null ? 0 : Math.max(0, girth(model, 'L') - fit);
-  return {
-    ...hold,
-    restGapL: hold.restGapL + extra(rule.wrist, wristGirth),
-    gapL: hold.gapL + extra(rule.paw, pawGirth),
-  };
+  return { ...hold, gapL: hold.gapL + Math.max(0, pawGirth(model, 'L') - fit) };
 }
 
 /**
