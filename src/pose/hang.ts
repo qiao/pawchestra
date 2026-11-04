@@ -190,19 +190,27 @@ function downward(out: number, forward: number, side: number, result: Vector3): 
   );
 }
 
+/** The swings of a hanging arm out to the side, in radians. */
+interface HangOut {
+  /** The swing of the upper arm. */
+  readonly upper: number;
+  /** The swing of the forearm. */
+  readonly lower: number;
+}
+
 /**
- * Finds the hanging arm of a standing player for the rest pose (design 5.2). The arm swings out
- * to the side by the smallest angle at which each part keeps {@link HANG.gap} from the torso and
- * the legs of the bind pose, seen along x: it touches their side. The inner half width of each part
- * comes from the mesh (`radiusOf()`), so a thicker body or arm swings the arm further out.
+ * Finds the swings of a hanging arm out to the side: the smallest angles at which each part keeps
+ * {@link HANG.gap} from the torso and the legs of the bind pose, seen along x. The inner half
+ * width of each part comes from the mesh (`radiusOf()`), so a thicker body or arm swings the arm
+ * further out.
  *
  * @param model The player model.
  * @param arm The arm.
  * @param angles The forward swing of the upper arm and the forward bend of the elbow, in radians.
- *   The angles of {@link HANG} by default.
- * @returns The hanging arm.
+ * @param minOut The smallest swing of the search.
+ * @returns The swings.
  */
-export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles = HANG): HangingArm {
+function hangOut(model: PlayerModel, arm: ArmRig, angles: HangAngles, minOut: number): HangOut {
   const { forward, bend } = angles;
   const h = model.body.headHeight;
   const side = arm.side === 'L' ? -1 : 1;
@@ -263,17 +271,38 @@ export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles =
 
   // First the upper arm swings out until it and the elbow are clear, then the forearm and the
   // hand swing out from the elbow until they are clear.
-  let outUpper = HANG.minOut;
+  let outUpper = minOut;
   while (outUpper < HANG.maxOut && !isClear(outUpper, outUpper, ['upper', 'elbow'])) {
     outUpper += HANG.step;
   }
-  let outLower = HANG.minOut;
+  let outLower = minOut;
   while (outLower < HANG.maxOut && !isClear(outUpper, outLower, ['lower', 'hand'])) {
     outLower += HANG.step;
   }
+  return { upper: outUpper, lower: outLower };
+}
 
-  downward(outUpper, forward, side, upper);
-  downward(outLower, forward + bend, side, lower);
+/**
+ * Finds the hanging arm of a standing player for the rest pose (design 5.2). The arm swings out
+ * to the side by the smallest angle at which each part keeps {@link HANG.gap} from the torso and
+ * the legs of the bind pose, seen along x: it touches their side ({@link hangOut}).
+ *
+ * @param model The player model.
+ * @param arm The arm.
+ * @param angles The forward swing of the upper arm and the forward bend of the elbow, in radians.
+ *   The angles of {@link HANG} by default.
+ * @returns The hanging arm.
+ */
+export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles = HANG): HangingArm {
+  const { forward, bend } = angles;
+  const side = arm.side === 'L' ? -1 : 1;
+  const shoulder = new Vector3(...arm.bind.shoulder);
+  const elbow = new Vector3(...arm.bind.elbow);
+  const upperLength = elbow.distanceTo(shoulder);
+  const lowerLength = new Vector3(...arm.bind.wrist).distanceTo(elbow);
+  const out = hangOut(model, arm, angles, HANG.minOut);
+  const upper = downward(out.upper, forward, side, new Vector3());
+  const lower = downward(out.lower, forward + bend, side, new Vector3());
   const hangWrist = upper.clone().multiplyScalar(upperLength).addScaledVector(lower, lowerLength);
   const along = hangWrist.clone().normalize();
   const pole = upper.clone().addScaledVector(along, -upper.dot(along)).normalize();
@@ -282,6 +311,21 @@ export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles =
     hand: toQuat(new Quaternion().setFromUnitVectors(new Vector3(0, -1, 0), lower)),
     pole: toVec3(pole),
   };
+}
+
+/**
+ * Finds the out swing that an arm needs beside the trunk (design 5.3, "Free round arms"): the
+ * smallest swing of the hanging upper arm out to the side, from 0, at which the upper arm and the
+ * elbow clear the side of the trunk and the legs of the bind pose, with the forward swing of
+ * {@link HANG} ({@link hangOut}). A thin arm beside a thin trunk needs a small swing, and a round
+ * arm beside a round trunk needs a large swing.
+ *
+ * @param model The player model.
+ * @param arm The arm.
+ * @returns The swing, in radians.
+ */
+export function armOut(model: PlayerModel, arm: ArmRig): number {
+  return hangOut(model, arm, HANG, 0).upper;
 }
 
 const offset = new Vector3();
