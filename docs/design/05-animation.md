@@ -381,10 +381,23 @@ The rest of each family:
   `gapL`), in the play, at rest, and in the moves. Thus the paw keeps the free gap of the accepted
   player. A thinner paw keeps the gap of the hold, and the own holds have no rule. Reason: a real
   player holds the neck with the fingers and keeps the forearm free of the body of the instrument
-  (strings 1.9), and the gap of the hold fits a thin paw. The shared violin hold has no rule.
-  Reason: the paw at rest keeps its hanging wrist, so a rest gap from the girth of the wrist moved
-  the violin into the belly of the heavy bodies, and a gap along the normal of the palm does not
-  move the thick wrist out of the upper bout in the play.
+  (strings 1.9), and the gap of the hold fits a thin paw. The shared violin hold has no gap rule,
+  and takes the wrist clearance in its place. Reason: the paw at rest keeps its hanging wrist, so a
+  rest gap from the girth of the wrist moved the violin into the belly of the heavy bodies, and a
+  gap along the normal of the palm does not move the thick wrist out of the upper bout in the play.
+- **Wrist clearance from the girth.** The shared violin hold takes the rest grip of the left paw
+  from the body (`BowedHold.wristFit`, `wristGirth()`). The girth of the wrist end of the left
+  forearm counts as a share of the length of the fingerboard, so a smaller violin of the size rule
+  (4.6) counts as a thicker wrist. A wrist thicker than the wrist of the accepted rabbit holds the
+  neck at rest nearer to the nut, in proportion up to a limit. The violin keeps the rest place and
+  the path of the grip of the hold (`RigPoints.restCarryPlace`), and the paw slides up the neck
+  in the moves. A thinner wrist and the own holds keep their grip. Reason: a real player keeps the
+  forearm free of the body of the instrument (strings 1.9), and at the grip of the hold, the thick
+  wrist end goes into the upper bout. With the violin hung from the new grip, the violin went into
+  the belly of the heavy bodies. The play keeps its grip. Reason: a move of the wrist down from the
+  back of the violin or toward the scroll, and a turn of the elbow, did not move the thick wrist
+  end out of the upper bout. A further tilt of the paw over the neck moved the violin into the
+  belly in the moves (`TODO.md`).
 - **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
   near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
