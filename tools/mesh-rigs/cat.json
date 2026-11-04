@@ -37,14 +37,6 @@
   "output": "assets/models/cat/cat.rig.glb",
   "name": "Cat",
   "weld": 1e-05,
-  "soften": {
-    "box": [[0.02, 0.81, 0.17], [0.1, 0.87, 0.24]],
-    "angle": 20,
-    "share": 0.5,
-    "rounds": 10,
-    "most": 0.01,
-    "note": "The 44 vertices of the sharp edges of the brow above each eye, on the front of the face, move toward the mean of their neighbors, at most 0.01 u (softened() of tools/blender/rig_mesh.py). Without it, the dark facets of the brow crease go up from the inner corner of each eye and read as a worried brow. The box starts above the eyes and in front of the ear roots, so that the eyes and the ears keep their form. With at most 0.016 u and 0.024 u, the pea eyes grew to teardrops. tools/blender/arm_rebuild.py writes the places after the soften into cat-weights.json, so that the painted weights find each vertex."
-  },
   "app": {
     "shoulders": 0.950065,
     "reach": 0.5305,

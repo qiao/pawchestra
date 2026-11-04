@@ -75,8 +75,7 @@ rings of 16 vertices. The rings of each elbow lie 0.035 units from the elbow joi
 the elbow helper is 0.07 units, twice that gap: with the gap of 0.0216 units that the script
 chooses, the inner faces of each elbow turned over in each pose of the play and the rest. The
 faces of the paws, the trunk, the legs, the tail, and the head are the faces of the source. The
-points of `cat-weights.json` are the places after the `soften` of the brow in the config, so that
-the painted weights find each softened vertex. A run gives the same bytes:
+points of `cat-weights.json` are the places of the source. A run gives the same bytes:
 
 ```bash
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"gap": 0.035}'
@@ -85,7 +84,7 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 | File | Size | SHA-256 |
 |---|---|---|
 | `cat-arms.glb` | 1,117,708 bytes | `534753ea563f0e71e438485a3b481535c26406b04571733aaf316f062f1cb6e2` |
-| `cat-weights.json` | 443,441 bytes | `02b0339c3aec91562a2f2f116c9926b79bade46a9b595ce3fc5d1de12edfb948` |
+| `cat-weights.json` | 443,443 bytes | `43c269c0e67de717f3637d84dfd22533fb7790118eb6596d7ca6cd889797a963` |
 
 ## cat-root-weights.json
 
@@ -101,7 +100,7 @@ of the violist grew from 3 to 6. A run gives the same bytes.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `cat-root-weights.json` | 443,342 bytes | `569fd8f343afcca51e7695e5d1e23a2d1235303137485ac1c12530fc10d8c149` |
+| `cat-root-weights.json` | 443,344 bytes | `55393f1a7fc16f38cd04299c4c4ed99035fd8b8ec37acda05ee6dec41713aa46` |
 
 ## cat.rig.glb
 
