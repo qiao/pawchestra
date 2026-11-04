@@ -52,6 +52,11 @@
   "shinFactorNote": "The shin is shorter than the thigh factor makes it (13.3 cm, old A-pose rabbit 14.8 cm, 15.6 cm with 1.75), so that the hips joint of the seated bind is as high as on the A-pose rabbit (35.2 cm, old 35.5 cm, 37.8 cm with 1.75). The feet keep their places, so the layout does not change. With the deeper haunch (sit.most) and the wider thighs (legGirth), the seat is 25.0 cm high (old 26.2 cm, 33.1 cm before).",
   "legGirth": [1.6, 1],
   "legGirthNote": "The thigh of the T-pose mesh is thinner than the thigh of the A-pose rabbit, and the leg factor makes it long, so the seated thigh looked thin. The thigh takes the factor 1.6 across its axis before the skin (leg_girth() of tools/blender/rig_mesh.py), up and to the sides, so that its width comes near the width of the A-pose rabbit. The back of the thigh keeps its place, so the underside stays on the seat. The shin keeps its form.",
+  "neckFactor": 1.95,
+  "trunkFactor": 1.1,
+  "trunkTop": "chest",
+  "headFactor": 0.93,
+  "neckFactorNote": "The head of the T-pose mesh sat on the shoulders: the neck was 4.3 cm (A-pose rabbit 7.5 cm), and the trunk 45.9 cm (49.1 cm). The neck between its joints is 1.95 times as long as on the mesh, the trunk from the hips joint to the chest joint 1.1 times (trunkTop: the upper chest and the arm roots keep their form), and the head and the ears are 0.93 times as large, around the neck joint. So the neck is 7.8 cm, the trunk 49.0 cm, and the chin of the seated bind 7.7 cm above the shoulder tops (4.4 cm before). The export keeps the head before the factor for the holds (ungrown() of tools/studio-body.ts). With 1.75 and no head factor, the neck was 7.5 cm, but the large head still covered it from the front and the back.",
   "joints": {
     "root": {
       "head": [
