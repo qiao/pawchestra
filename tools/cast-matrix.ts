@@ -10,7 +10,9 @@
  *   species keeps its own hold and its own instrument scale.
  * - **Scale.** A recast pair takes the size rule of its instrument (`setRecastScale()` of
  *   `tools/recast-scale.ts`): the rule of a violin shop for a violin or a viola, and the cello rule
- *   for a cello. Each other instrument keeps the scale 1, and the cell says so (`ScaleSource`).
+ *   for a cello, and the size rule of the winds for a trumpet, a clarinet, or a flute
+ *   (`tools/wind-size.ts`). Each other instrument keeps the scale 1, and the cell says so
+ *   (`ScaleSource`).
  * - **Verdict.** A value of the gate over its limit fails, a clip over the limit of its pair fails,
  *   and a note target missed by more than the limit of the role fails. A value is open when the own
  *   pair of the role is over the same limit and the value is not worse by more than the margin of

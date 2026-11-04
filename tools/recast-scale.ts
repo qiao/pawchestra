@@ -5,12 +5,15 @@
  * of the cello rule (`celloRule()` of `tools/cello-size.ts`). The cast matrix and the recast roles
  * `<role>@<species>` of `pnpm arm-check`, `pnpm pose-depth`, and `pnpm close-views` take this size,
  * so that a run of a recast role measures the pair of the matrix with no `<species>.violinScale=`
- * by hand. A change of `--set` that names the scale of the species takes the place of the rule.
+ * by hand. A trumpet, a clarinet, or a flute takes the size rule of the winds (`windRule()` of
+ * `tools/wind-size.ts`). A change of `--set` that names the scale of the species takes the place of
+ * the rule.
  */
 import { celloRule } from './cello-size.ts';
 import { REAL_VIOLINS, holdReach, ruleSize } from './hold-reach.ts';
 import { findRole } from './fold-probe.ts';
 import { setHolds } from './hold-sets.ts';
+import { isSizedWind, windRule } from './wind-size.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { isScaledInstrument } from '../src/models/instruments/types.ts';
 import { SCALE_PARAMS, SPECIES } from '../src/models/species.ts';
@@ -31,10 +34,19 @@ export const REAL_LENGTHS = {
 /**
  * The source of the instrument scale of a pair. `own`: the own role of the species, with the scale
  * of the app. `rule`: the rule of a violin shop or the cello rule. `smallest`, `largest`: the rule,
- * clamped to a real size. `none`: no rule fits the instrument or the arm, so the scale is 1.
- * `fixed`: the app has no scale of the instrument. `set`: a change of `--set` or `--variant`.
+ * clamped to a real size. `nearest`: no real size of a wind passes its rule, and the scale is the
+ * real size with the nearest grips. `none`: no rule fits the instrument or the arm, so the scale
+ * is 1. `fixed`: the app has no scale of the instrument. `set`: a change of `--set` or `--variant`.
  */
-export type ScaleSource = 'own' | 'rule' | 'smallest' | 'largest' | 'none' | 'fixed' | 'set';
+export type ScaleSource =
+  | 'own'
+  | 'rule'
+  | 'smallest'
+  | 'largest'
+  | 'nearest'
+  | 'none'
+  | 'fixed'
+  | 'set';
 
 /** The instrument scale of a pair. */
 export interface PairScale {
@@ -68,6 +80,10 @@ export function ruleScale(species: SpeciesId, instrument: InstrumentId): PairSca
       const source =
         cello.source === 'smallest' || cello.source === 'largest' ? cello.source : 'rule';
       return { value: cello.scale, source };
+    }
+    if (isSizedWind(instrument)) {
+      const wind = windRule(species, instrument);
+      return { value: wind.scale, source: wind.source };
     }
     if (instrument !== 'violin' && instrument !== 'viola') {
       return { value: 1, source: 'none' };
