@@ -23,6 +23,7 @@ import {
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
+import { palmDepth, wristGirth } from './girth.ts';
 import { hangingArm } from './hang.ts';
 import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
@@ -295,6 +296,16 @@ export interface BowedHold {
    */
   readonly gapL: number;
   /**
+   * The rule of the grip clearance from the girth (design 5.3): the girth of the left arm of the
+   * body that the hold fits, in meters. A thicker body moves its left paw further off the neck by
+   * the difference, so that its paw and forearm keep the free gap of that body. `wrist` is the
+   * girth of the wrist end of the forearm (`wristGirth()`), and the difference adds to
+   * {@link BowedHold.restGapL}. `palm` is the depth of the palm (`palmDepth()`), and the
+   * difference adds to {@link BowedHold.gapL}. `null` keeps the gaps of the hold on each body, as
+   * an own hold does.
+   */
+  readonly girthGap: { readonly wrist: number | null; readonly palm: number | null } | null;
+  /**
    * The direction to which the left elbow points in the middle of the lift and of the lowering, in
    * the axes of the chest (design 5.2). The elbow turns from the rest pole to this pole, then to
    * the playing pole. `null` mixes the rest pole and the playing pole directly.
@@ -462,6 +473,7 @@ const CHIN_HOLD = {
   restYawL: 0,
   restGapL: 0,
   gapL: 0,
+  girthGap: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -537,6 +549,7 @@ const FLOOR_HOLD = {
   restYawL: 0,
   restGapL: 0,
   gapL: 0,
+  girthGap: null,
   liftPoleL: null,
   liftPoleR: null,
   restAtSide: false,
@@ -1673,9 +1686,10 @@ export function bowedRig(
   given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
   const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
-  const hold = floor.chinFit
-    ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) }
-    : floor;
+  const hold = girthGaps(
+    model,
+    floor.chinFit ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) } : floor,
+  );
   const { positions, parents } = model.skeleton;
   const at = (bone: number): Vec3 => positions[bone] ?? [0, 0, 0];
   const pieceRotation = (bone: 'instrument' | 'bow'): Quaternion => {
@@ -1807,6 +1821,30 @@ export function bowedRig(
       : rig;
   const round = liftShoulders(model, roundElbows(model, rest));
   return { ...round, bowRange: bowRangeOf(round), stopRange: stopRangeOf(round) };
+}
+
+/**
+ * Moves the left paw of a thicker body further off the neck by the rule of the grip clearance
+ * from the girth ({@link BowedHold.girthGap}, design 5.3): each gap of the hold grows by the
+ * girth of the left arm of the body over the girth of the body that the hold fits. A body with the
+ * same girth or less keeps the gaps of the hold.
+ *
+ * @param model The player model.
+ * @param hold The hold.
+ * @returns The hold with the gaps of the body, or `hold` for a hold with no rule.
+ */
+function girthGaps(model: PlayerModel, hold: BowedHold): BowedHold {
+  const rule = hold.girthGap;
+  if (!rule) {
+    return hold;
+  }
+  const extra = (fit: number | null, girth: (model: PlayerModel, side: 'L') => number): number =>
+    fit === null ? 0 : Math.max(0, girth(model, 'L') - fit);
+  return {
+    ...hold,
+    restGapL: hold.restGapL + extra(rule.wrist, wristGirth),
+    gapL: hold.gapL + extra(rule.palm, palmDepth),
+  };
 }
 
 /**
