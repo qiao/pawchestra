@@ -1735,17 +1735,18 @@ export function gripLines(
  * Gives the value of the gate of one measure of one arm: the value of {@link ArmLimit.stat} of
  * the worst sample set, with the set.
  *
- * @param stats The summaries of the measure by sample set.
+ * @param stats The summaries of the measure by sample set, or `undefined` for a JSON text of a
+ *   tool before the measure.
  * @param limit The limit of the measure.
  * @returns The value and the set, or `null` with no sample.
  */
 export function gateValue(
-  stats: Partial<Record<GateSet, SetStats>>,
+  stats: Partial<Record<GateSet, SetStats>> | undefined,
   limit: ArmLimit,
 ): { readonly value: number; readonly set: GateSet } | null {
   let found: { readonly value: number; readonly set: GateSet } | null = null;
   for (const set of GATE_SETS) {
-    const of = stats[set];
+    const of = stats?.[set];
     if (!of || of.samples === 0) {
       continue;
     }
