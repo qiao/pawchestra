@@ -422,6 +422,10 @@ The app follows these facts:
   of the tan fox or the wolf, with the lip plate or the mouthpiece at its mouth. At rest, the
   right paw holds the instrument nearly upright at the right side, as a flutist rests the flute
   vertically on the right leg (2.4), and the left paw hangs (`restArms`, `restFreeL`).
+- **The shared elbows (1.8, 2.3, `roundArms`).** "There should be space between the elbows and
+  the musician's sides" [1], and "the elbows and hands are free from the body" [33]. So a body
+  with rounder arms than the accepted player of the shared flute, clarinet, or trumpet turns each
+  elbow further out, at rest and in the play (design 5.3), and its upper arms stay off the trunk.
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
