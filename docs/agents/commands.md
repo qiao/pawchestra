@@ -79,6 +79,7 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]... [--move <axis>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. 0.15 s for each variant. |
 | `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,... [--variant <name>=<changes>]...` | Scores the base and named variants on chosen pairs of parts. About 10 s for each demo and row. |
 | `pnpm trunk-form <role> [--sets <set>,...] [--base <ref>]` | Measures the form of the trunk of the first player in the bind and in the worst pose of each set. 1 s. |
+| `pnpm body-shape <role> [--base <ref>]` | Measures the body form of design 4.4 ("Replacing body") and the rest pose of a role. 2 s. |
 | `pnpm hold-reach <species> [--instrument <id>] [--set <changes>]...` | Measures the reach of the arms to the instrument (design 4.6). Less than 1 s. |
 | `pnpm hold-fit <role> [--set <changes>]... [--grid <path>=<a>:<b>:<step>]... [--base <ref>]`, or `--scan` | Fits a hold of a role, one row for each variant: the folds, the depths, the note-target errors, and the play turns of the arms. |
 | `pnpm wind-grip <role>... [--lines]` | Measures each paw on its tube over each sample set, and tells if it grasps the tube. About 3 s each. |
