@@ -18,7 +18,9 @@
  *   pair of the role is over the same limit and the value is not worse by more than the margin of
  *   the limit ({@link CLIP_MARGIN} for a clip and a note target): a known item of the role. The
  *   grip of each pair counts from the accepted grip of the role (`ACCEPTED_GRIPS`), because the
- *   grip frame does not move with the bind.
+ *   grip frame does not move with the bind. A paw that faces its tube in a shared wind hold counts
+ *   its palm on the instrument from the accepted palm of the role in place of the grip
+ *   (`ACCEPTED_PALMS`, `palmTurns()` of `tools/arm-check.ts`).
  *
  * Each pair runs in a child process, with at most `--jobs` children at the same time, and its JSON
  * goes into a cache by tree (`treeCacheFile()` of `tools/ref-tree.ts`), so a second run on the same
@@ -609,6 +611,7 @@ const SHORT: Readonly<Record<Measure, string>> = {
   pawJump: 'paw jumps',
   stretch: 'stretch',
   grip: 'grip',
+  palm: 'palm',
   moveTwist: 'move twist',
   moveTurn: 'move turn',
 };

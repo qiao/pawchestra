@@ -26,6 +26,13 @@
  *   ({@link GripFrames}), which no bind moves. The value is the median, so a paw that holds its
  *   prop in another grip fails with no base. For a role with no entry, the tool prints a ready
  *   entry under the table ({@link gripLines}), and the role has no value `grip`.
+ * - `palm turn`: in place of the grip turn, for a paw that faces its tube in a shared wind hold
+ *   with the elbow rule ({@link sharedPaws}): the angle in the play between the palm of the paw
+ *   and the palm of the accepted player of the role, both in the axes of the instrument
+ *   ({@link ACCEPTED_PALMS}). The elbow rule turns the forearm of a round body while the paw stays
+ *   on its keys, so the grip turn of such a paw grows with no fault. The value is the median. For
+ *   an instrument with no entry, the tool prints a ready entry from the own role
+ *   ({@link palmLines}). The trace (`--trace`) gives the grip turn of each paw.
  *
  * - `move twist` and `move turn`: the largest paw twist on the forearm, and the largest turn rate of
  *   the wrist in degrees per second, over the lifts and the lowerings of {@link probeMoves} at
@@ -152,8 +159,10 @@ import {
   withProbeTree,
   withTempFolder,
 } from './ref-tree.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
+import type { InstrumentId } from '../src/models/instruments/types.ts';
+import { BONE_NAMES } from '../src/models/rig.ts';
+import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import {
@@ -170,6 +179,7 @@ import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { LIFT_FIT_SEC, LOWER_MAX_SEC } from '../src/pose/rest.ts';
 import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 import type { Transport } from '../src/pose/types.ts';
+import { WIND_HOLDS, windHoldOf } from '../src/pose/winds.ts';
 
 /** The sides of the arms. */
 const SIDES = ['L', 'R'] as const;
@@ -207,6 +217,7 @@ export const MEASURES = [
   'pawJump',
   'stretch',
   'grip',
+  'palm',
   'moveTwist',
   'moveTurn',
 ] as const;
@@ -364,6 +375,16 @@ export const ARM_LIMITS: Readonly<Record<Measure, ArmLimit>> = {
     digits: 0,
     source: 'the paw twist of the accepted grip (ACCEPTED_GRIPS); half the 90° of anatomy',
   },
+  palm: {
+    name: 'palm turn p50',
+    stat: 'p50',
+    limit: 30,
+    up: true,
+    margin: 10,
+    digits: 0,
+    source:
+      'the palm of the accepted player on its instrument (ACCEPTED_PALMS); good recast paws turn up to 20° (red fox flute)',
+  },
   moveTwist: {
     name: 'move twist max',
     stat: 'worst',
@@ -463,6 +484,101 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
 ]);
 
 /**
+ * The accepted palm of each paw of the shared hold of an instrument, in the bind axes of the
+ * instrument ({@link palmTurns}): the mean palm of the accepted player of the role in the play of
+ * the gate, as a unit vector. The shared hold copies the hold of that player, and a real player
+ * keeps the turn of the hand on the instrument with any build of the arm. Each instrument whose
+ * shared hold rolls a paw to face its tube has an entry. For an instrument with no entry, the tool
+ * prints a ready entry from the own role under the table ({@link palmLines}).
+ */
+export const ACCEPTED_PALMS: ReadonlyMap<InstrumentId, Readonly<Record<Side, Vec3>>> = new Map<
+  InstrumentId,
+  Readonly<Record<Side, Vec3>>
+>([
+  // The tan fox (FOX_FLUTE) and the wolf (WOLF_CLARINET): the accepted players that the shared
+  // holds fit (ROUND_ARMS_FIT of pose/winds.ts).
+  ['flute', { L: [0.195, 0.909, 0.369], R: [-0.215, -0.388, -0.896] }],
+  ['clarinet', { L: [0.977, -0.09, 0.192], R: [-0.984, -0.076, 0.163] }],
+]);
+
+/** The parts of a wind hold that the line of the palm reads, which an older tree can leave out. */
+interface PalmHold {
+  /** The out swing of the body that the shared hold fits, or `null` for an own hold. */
+  readonly roundArms?: number | null;
+  /** The side of each paw that faces its tube. */
+  readonly faceTube?: readonly [left: string, right: string];
+}
+
+/**
+ * Gives the wind holds of the players of a role (`windHoldOf()`), or none for a role with no
+ * wind.
+ *
+ * @param role The role.
+ * @param shared True for the shared hold of the instrument in place of the hold of each species.
+ * @returns The holds.
+ */
+function windHolds(role: RoleSource, shared: boolean): PalmHold[] {
+  if (role.kind !== 'player' || !Object.hasOwn(WIND_HOLDS, role.instrument)) {
+    return [];
+  }
+  // SAFETY: the guard above makes the instrument a key of `WIND_HOLDS`.
+  const instrument = role.instrument as keyof typeof WIND_HOLDS;
+  return shared
+    ? [WIND_HOLDS[instrument]]
+    : role.species.map((species) => windHoldOf(species, instrument));
+}
+
+/**
+ * Tells for each paw if all holds are shared holds with the elbow rule (`WindHold.roundArms`,
+ * design 5.3) that roll the paw to face its tube (`WindHold.faceTube`). The elbow rule turns the
+ * forearms of a round body, and the hold keeps such a paw on its tube, so the grip of the paw
+ * counts from the instrument ({@link palmTurns}) and not from the forearm.
+ *
+ * @param holds The holds, none for a role with no wind.
+ * @returns For each side, true when the paw faces the tube in such holds.
+ */
+function tubePaws(holds: readonly PalmHold[]): Readonly<Record<Side, boolean>> {
+  const shared = holds.length > 0 && holds.every((hold) => (hold.roundArms ?? null) !== null);
+  const faces = (k: 0 | 1): boolean =>
+    shared && holds.every((hold) => (hold.faceTube?.[k] ?? 'none') !== 'none');
+  return { L: faces(0), R: faces(1) };
+}
+
+/**
+ * Tells for each paw of a role if it faces its tube in the shared hold of a wind with the elbow
+ * rule ({@link tubePaws}).
+ *
+ * @param role The role.
+ * @returns For each side, true when the grip of the paw counts from the instrument.
+ */
+export function sharedPaws(role: RoleSource): Readonly<Record<Side, boolean>> {
+  return tubePaws(windHolds(role, false));
+}
+
+/**
+ * Gives the accepted palm of each paw of a role whose grip counts from the instrument: a paw that
+ * faces its tube in a shared hold with the elbow rule ({@link sharedPaws}). The value `palm` of
+ * such a paw is the angle in the play between its palm and the accepted palm, both in the bind axes
+ * of the instrument ({@link ACCEPTED_PALMS}), and the paw has no value `grip`. The instrument
+ * moves with the mouth, and the paw stays on its keys, so the angle does not see the turn of the
+ * forearm that the elbow rule adds.
+ *
+ * @param role The role.
+ * @returns The accepted palm of each such paw, else `null` for the paw, or `null` when the
+ *   instrument has no entry.
+ */
+export function palmTurns(role: RoleSource): Readonly<Record<Side, Vector3 | null>> | null {
+  const accepted = role.kind === 'player' ? ACCEPTED_PALMS.get(role.instrument) : undefined;
+  if (!accepted) {
+    return null;
+  }
+  const paws = sharedPaws(role);
+  const of = (side: Side): Vector3 | null =>
+    paws[side] ? new Vector3(...accepted[side]).normalize() : null;
+  return { L: of('L'), R: of('R') };
+}
+
+/**
  * The smallest share of the weight of the three corners of a face on the bones of one arm, from
  * the clavicle to the fingers, that makes the face a face of that arm.
  */
@@ -536,6 +652,8 @@ interface ArmBind {
   readonly upper: number;
   /** The frames of the grip ({@link GripFrames}). */
   readonly grip: GripFrames;
+  /** The unit palm of the bind paw (`StudioBody.palms`). */
+  readonly palm: Vector3;
 }
 
 /**
@@ -568,6 +686,10 @@ export type ArmSample = Readonly<Record<Measure, number>> & {
    * The signed twist of the paw in the frame of the posed forearm, in degrees ({@link GripFrames}).
    */
   readonly gripRoll: number;
+  /**
+   * The unit palm of the posed paw in the bind axes of the posed instrument ({@link palmTurns}).
+   */
+  readonly palmOn: Vec3;
 };
 
 /**
@@ -837,11 +959,18 @@ function armBind(rig: StudioRig, side: Side): ArmBind {
     lengths: edgeLengths(mesh.positions, lower),
     upper: joints.elbow.distanceTo(joints.shoulder),
     grip: gripFrames(rig, side, joints),
+    palm: new Vector3(...rig.body.palms[side]).normalize(),
   };
 }
 
 /** The down axis: each bone of each arm of the player points down in its bind pose. */
 const DOWN = new Vector3(0, -1, 0);
+
+/**
+ * The index of the `instrument` bone in the skin matrices: the bones of the player follow the
+ * studio bones (`StudioPose.matrices`).
+ */
+const INSTRUMENT_BONE = STUDIO_BONES.length + BONE_NAMES.indexOf('instrument');
 
 /** The elbow axis of each arm of the player in its bind pose (`poseStudioBones()`). */
 const PLAYER_HINGE = new Vector3(1, 0, 0);
@@ -1140,6 +1269,13 @@ export function measureArm(
   const pawSwing = (2 * Math.acos(Math.min(1, Math.abs(swing.w))) * 180) / Math.PI;
   // The paw in the frame of the posed forearm: the frame of the player on both sides.
   const grip = arm.grip.fore.clone().invert().multiply(paw).multiply(arm.grip.paw);
+  // The palm in the axes of the instrument. The matrix of the instrument can hold its scale.
+  const instrument = new Quaternion();
+  matrixOf(matrices, INSTRUMENT_BONE).decompose(new Vector3(), instrument, new Vector3());
+  const palmOn = arm.palm
+    .clone()
+    .applyQuaternion(turnOf(matrices, arm.bones.hand))
+    .applyQuaternion(instrument.invert());
 
   const posedLengths = lowerLengths(arm, posed);
   const reference = rest ?? arm.lengths;
@@ -1156,11 +1292,13 @@ export function measureArm(
     pawSwing,
     pawJump: 0,
     grip: 0,
+    palm: 0,
     stretch: stretch / arm.upper,
     moveTwist: 0,
     moveTurn: 0,
     pawRoll: (pawTwist * 180) / Math.PI,
     gripRoll: (twistAngle(grip, DOWN) * 180) / Math.PI,
+    palmOn: [palmOn.x, palmOn.y, palmOn.z],
   };
 }
 
@@ -1288,6 +1426,12 @@ export interface RoleReport {
    */
   readonly grips?: Readonly<Record<Side, number>>;
   /**
+   * The mean palm of each paw in the play, in the bind axes of the instrument ({@link palmTurns}),
+   * rounded to 0.001, as an entry of {@link ACCEPTED_PALMS} gives it. A role with no play sample
+   * and a JSON text before format 6 have none.
+   */
+  readonly palms?: Readonly<Record<Side, Vec3>>;
+  /**
    * The key of the bind of the bodies of the role ({@link bindKey}). A JSON text before format 5
    * has none.
    */
@@ -1315,9 +1459,10 @@ export interface ArmJson {
 /**
  * The format version of {@link ArmJson}. Version 4 gives the grips in the frame of the posed
  * forearm ({@link GripFrames}), so it changes the grips of the older versions. Version 5 adds the
- * key of the bind and the ring widths of each role ({@link RoleReport.bind}).
+ * key of the bind and the ring widths of each role ({@link RoleReport.bind}). Version 6 adds the
+ * palm turn on the instrument ({@link palmTurns}) and the mean palms ({@link RoleReport.palms}).
  */
-export const ARM_FORMAT = 5;
+export const ARM_FORMAT = 6;
 
 /** The oldest format version that {@link ARM_FORMAT} only adds fields to. */
 const ARM_SINCE = 4;
@@ -1345,6 +1490,7 @@ function emptySamples(): Samples {
     pawSwing: [],
     pawJump: [],
     grip: [],
+    palm: [],
     stretch: [],
     moveTwist: [],
     moveTurn: [],
@@ -1591,6 +1737,8 @@ export function probeRole(
   };
   const found: string[] = [];
   const rolls: Record<Side, number[]> = { L: [], R: [] };
+  const palms = palmTurns(role);
+  const palmSums: Record<Side, Vector3> = { L: new Vector3(), R: new Vector3() };
   const keys = new Set<string>();
   const ringAt = REBIND_RINGS.map((name) => ARM_RINGS.findIndex((ring) => ring.name === name));
   const widths = (): Record<Side, number[][]> => ({
@@ -1638,7 +1786,12 @@ export function probeRole(
         const sample = measureArm(arms[side], studio.matrices, posed, folded, rests[side]);
         const values = store.values[side];
         for (const measure of MEASURES) {
-          if (measure !== 'pawJump' && measure !== 'grip' && !isMoveMeasure(measure)) {
+          if (
+            measure !== 'pawJump' &&
+            measure !== 'grip' &&
+            measure !== 'palm' &&
+            !isMoveMeasure(measure)
+          ) {
             values[measure].push(sample[measure]);
           }
         }
@@ -1649,9 +1802,13 @@ export function probeRole(
         const signed = side === 'R' ? -sample.gripRoll : sample.gripRoll;
         if (set === 'play') {
           rolls[side].push(signed);
+          palmSums[side].add(new Vector3(...sample.palmOn));
         }
+        const palm = palms?.[side];
         const grip = grips?.[side];
-        if (grip !== undefined && set === 'play') {
+        if (set === 'play' && palm) {
+          values.palm.push((new Vector3(...sample.palmOn).angleTo(palm) * 180) / Math.PI);
+        } else if (set === 'play' && grip !== undefined) {
           values.grip.push(Math.abs(wrap(signed - grip)));
         }
       }
@@ -1677,6 +1834,7 @@ export function probeRole(
       pawJump: of('pawJump'),
       stretch: of('stretch'),
       grip: of('grip'),
+      palm: of('palm'),
       moveTwist: of('moveTwist'),
       moveTurn: of('moveTurn'),
     };
@@ -1703,7 +1861,16 @@ export function probeRole(
   if (medians.L === null || medians.R === null) {
     return report;
   }
-  return { ...report, grips: { L: Math.round(medians.L), R: Math.round(medians.R) } };
+  const mean = (side: Side): Vec3 => {
+    const { x, y, z } = palmSums[side].clone().normalize();
+    const round = (k: number): number => Math.round(k * 1000) / 1000;
+    return [round(x), round(y), round(z)];
+  };
+  return {
+    ...report,
+    grips: { L: Math.round(medians.L), R: Math.round(medians.R) },
+    palms: { L: mean('L'), R: mean('R') },
+  };
 }
 
 /**
@@ -1726,6 +1893,40 @@ export function gripLines(
   }
   return [
     'The roles below have no entry in ACCEPTED_GRIPS. A ready entry from the median grip of each arm in the play, in the frame of the posed forearm:',
+    '',
+    ...lines,
+  ];
+}
+
+/**
+ * Gives a ready entry of {@link ACCEPTED_PALMS} for each instrument that has none, from the role
+ * that plays its own hold of an instrument whose shared hold takes the palm turn
+ * ({@link sharedPaws}): the mean palm of each paw in the play, as the line of the map.
+ *
+ * @param reports The report of each role.
+ * @returns The lines, empty when no such role is in the run.
+ */
+export function palmLines(
+  reports: readonly { readonly role: string; readonly tree: RoleReport | null }[],
+): string[] {
+  const lines = reports.flatMap(({ role, tree }) => {
+    const source = findRole(role);
+    if (!tree?.palms || source?.kind !== 'player' || ACCEPTED_PALMS.has(source.instrument)) {
+      return [];
+    }
+    const own = sharedPaws(source);
+    const shared = tubePaws(windHolds(source, true));
+    if (own.L || own.R || !(shared.L || shared.R)) {
+      return [];
+    }
+    const { L, R } = tree.palms;
+    return [`  ['${source.instrument}', { L: [${L.join(', ')}], R: [${R.join(', ')}] }],`];
+  });
+  if (lines.length === 0) {
+    return [];
+  }
+  return [
+    'The instruments below have no entry in ACCEPTED_PALMS. A ready entry from the mean palm of each paw of the own player in the play, in the axes of the instrument:',
     '',
     ...lines,
   ];
@@ -3723,7 +3924,7 @@ async function checkVariants(options: CheckArgs): Promise<number> {
     ].join('\n'),
   );
   for (const { variant, reports, rows } of blocks) {
-    const grips = gripLines(reports);
+    const grips = [...gripLines(reports), ...palmLines(reports)];
     const rebinds = options.rings
       ? ringLines(reports, options.base !== null)
       : rebindLines(reports);
@@ -3841,7 +4042,7 @@ async function main(): Promise<number> {
   if (options.rings) {
     console.log(['', ...ringLines(reports, options.base !== null)].join('\n'));
   }
-  const grips = gripLines(reports);
+  const grips = [...gripLines(reports), ...palmLines(reports)];
   if (grips.length > 0) {
     console.log(['', ...grips].join('\n'));
   }
