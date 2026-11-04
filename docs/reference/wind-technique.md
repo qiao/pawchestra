@@ -433,6 +433,10 @@ The app follows these facts:
   rises [78]. So a round body in the shared flute, clarinet, or trumpet hold lifts each shoulder
   bone in each pose by at most that rise (`MAX_LIFT`), and the root of its upper arm turns less
   against the shoulder (design 5.3).
+- **The bent free arm (1.8, `keepBent()`).** "The upper arm should be comfortably away from the
+  torso of the body" [1]. So in the lift and the lowering of the shared flute, clarinet, or
+  trumpet hold, the free hanging paw keeps its elbow a little bent on its way to the keys
+  (`BENT_REACH`), and the elbow turn holds the upper arm off the trunk (design 5.3).
 - **The far mouth (1.4, 2.1, `farMouth`).** In seven trombonists, "the neck flexion varied with
   the downward angle of the instrument" [18], and the trumpet keeps an angle to the plane of the
   face of "slightly less than 90 degrees" [22]. So a recast trumpeter with a mouth far in front of
