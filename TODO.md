@@ -532,22 +532,21 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Free round arms in the shared holds (5.3): with the elbow rule (`roundArms`) and the lifted
-      shoulders (`shoulderLift()`), the upper arms of round bodies still go into the trunk in many
-      recast cells (`reports/2026-11-04-shoulder-out/`). The lift in the range of a real clavicle
-      takes 0.2 cm to 0.9 cm off the root clips and passes no new cell: the dog clips at 0.27 of the
-      left upper arm in the flute (2.0 cm) and the clarinet (2.2 cm), and the pig at the root, into
-      the shoulder of the mesh. Most of the pig clip was the hidden root of the free arm in the
-      trunk. With the moves of `pig_root.py`, the pig cells give 1.4 cm (flute) to 4.6 cm (cello).
-      Next: a path of the paw in the lift and the lowering of the dog that keeps the
-      elbow bent. The lift turns the left flute paw of the dog 4° further from its grip (62°, limit
-      45°), and the forearms of the hippo flutist and trumpeter go 0.4 cm and 0.7 cm deeper. The
-      cat (27° to 28°) needs less swing than the rabbit and the dog that the violin and the cello
-      fit, so it gets no turn and no lift there (violin 2.4 cm, cello 2.5 cm).
-- [ ] Rabbit flutist (5.3): the elbow rule turns the left paw 50° from the accepted flute grip
-      (limit 45°), because the grip turn counts from the posed forearm. The cell went from PASS to
-      FAIL. Check the paw in crops, and give the grip turn of a turned elbow its own limit or a
-      roll of the paw that keeps the grip.
+- [ ] Root clips of the cat and the pig in the shared holds (5.3): the right upper arm of the cat
+      goes 2.2 cm to 2.5 cm into the arm root at 0.27 to 0.31 of its length (violin moves, cello,
+      flute rest and moves, clarinet), and the upper arm of the pig 1.8 cm to 2.8 cm into the
+      shoulder of the mesh at 0.06 to 0.20 (violin, clarinet). No pose rule clears them
+      (`reports/2026-11-04-posed-clear/`): an elbow turn up to the stop of `turnPoleOut()` (cat
+      clarinet 1.4 cm, but grip L 62/45), 11° more lift (0.1 cm to 0.7 cm less), an elbow out in
+      the middle of the bow moves (cat violin 1.7 cm), 15° to 30° more forward turn of the
+      shoulder (cat cello 2.1 cm), and a reach limit of the bow paw (no change). Next: the
+      weights or the shape of the arm root of the cat and the pig in a rig round, then a matrix.
+- [ ] Grip line of a turned elbow (5.3, `tools/arm-check.ts`): the grip line counts from the
+      posed forearm, so the elbow turn of `roundArms` adds to it, and the paws stay on their
+      keys: in the 2x crops of the dog and the rabbit flutists and the hippo clarinetist, and in
+      `arm-check --world` with no elbow rule (elbows move up to 12 cm, palms turn at most 4.5°).
+      Count the grip of a paw in a shared hold from the instrument. Then the rabbit and the pig
+      flutists and the dog flutist and clarinetist have no other fault (`reports/2026-11-04-posed-clear/matrix.md`).
 - [ ] Percussion holds (5.3): the badger plays the shared percussion holds as its own holds, so
       they have no elbow rule. Give them a fit of the badger (`armOut()` 42° and 44°), so that a
       rounder recast body turns its elbows out and the badger stays the same.
