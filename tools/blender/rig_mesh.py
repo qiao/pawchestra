@@ -3394,7 +3394,8 @@ def leg_girth(points, heads, thigh, shin, tail=None):
     the shin. The back of the thigh (-z of the source) keeps its place, so that the seated thigh
     widens up and to the sides and keeps its underside on the seat, and the inner side stops
     `LEG_GIRTH_GAP` from the middle plane. On the shin, the share falls from all at the knee joint to 0 at the ankle joint, so that
-    the ankle keeps the width of the foot. Only the points on the side of each leg move. `tail`
+    the ankle keeps the width of the foot, and it grows only by the part that the factor of the
+    thigh leaves, so that the knee takes the factor of the thigh. Only the points on the side of each leg move. `tail`
     gives the weight of each point on the tail bones (`tail_share()`): a point moves only by the
     rest of its weight, so that a tail that hangs behind the thighs keeps its form. Else the
     stop at the middle plane squeezes the root of a tail that hangs between the legs, such as the
@@ -3404,6 +3405,7 @@ def leg_girth(points, heads, thigh, shin, tail=None):
         hip, knee, ankle = (np.asarray(heads[f'{b}_{side}'], float)
                             for b in ('thigh', 'shin', 'foot'))
         own = points[:, 0] * sign > 0
+        thigh_fade = np.zeros(len(points))
         for head, end, factor, is_thigh in ((hip, knee, thigh, True), (knee, ankle, shin, False)):
             if factor == 1:
                 continue
@@ -3417,9 +3419,12 @@ def leg_girth(points, heads, thigh, shin, tail=None):
                 fade = (smoothstep(along, -LEG_GIRTH_FADE * length, 0.0)
                         * (1 - smoothstep(along, length, length + LEG_GIRTH_FADE * shin_length)))
                 across[:, 2] = np.maximum(across[:, 2], 0.0)
+                thigh_fade = fade
             else:
+                # The shin takes over where the thigh fades out, so that the two factors do not
+                # add up to a ridge at the knee.
                 fade = (smoothstep(along, -LEG_GIRTH_FADE * length, 0.0)
-                        * (1 - smoothstep(along, 0.0, length)))
+                        * (1 - smoothstep(along, 0.0, length)) * (1 - thigh_fade))
             out += ((factor - 1) * fade * own)[:, None] * across
         # The inner side stops short of the middle plane, so that the thighs do not cross it.
         out[own, 0] = sign * np.maximum(sign * out[own, 0], np.minimum(sign * points[own, 0],
