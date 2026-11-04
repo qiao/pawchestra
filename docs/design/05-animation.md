@@ -441,7 +441,13 @@ The rest of each family:
   forward (`reach`, `reachL`), as the shoulder blades of a real player slide forward. Reason: with
   square shoulders, the paws of most recast bodies miss the valves, also with the smallest trumpet
   of the size rule (4.6). A body with a far mouth also bows the head ("Far mouth in a shared
-  hold").
+  hold"). The right palm faces the valve tops, and the right paw points a part of the way across
+  them (`faceTube`, `aimSide`), as the monkey holds them. The right shoulder turns a little more
+  than the left. Reason: with the roll of the shoulder, the right paw of each recast body stood up
+  behind the valves, with its palm to the mouthpiece and its finger tips up, and a real player
+  rests the finger tips on the valves (winds 2.1). The side aim moves the wrist off the line from
+  the shoulder to the grip, so a short arm reaches the grip only with the larger turn, and a larger
+  aim or turn made the arm of a slim body fold. The left paw keeps the roll of its shoulder.
 - A brass player presses the valves of the pitch (`BRASS_FUNDAMENTALS`), and the partials skip
   the flat seventh partial, as real players do (`PARTIALS`).
 - The trombone slide takes the position of the pitch, mapped into the travel that the arm
