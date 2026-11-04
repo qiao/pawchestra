@@ -214,6 +214,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - The pair "instrument in body" gives the deepest corner. Measure the visible top plate alone.
 - `armGaps()` of `pose/test-arm-clearance.ts` gives false depths for an arm in front of the
   chest. Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
+- The sweep counts the hidden root of a free arm in the trunk as a clip. Move only its deep
+  vertices toward the wall (`pig_root.py`).
 
 ### Weights and folds
 
