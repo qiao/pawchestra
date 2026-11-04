@@ -79,3 +79,14 @@ y = 0, +z forward, and +x the left side of the animal. The mesh faces +z, with i
   and z 0.16. A dark smile line is under the snout.
 - The round ears with white rims stand at the sides of the top of the head, from y 0.90 to 0.98.
 - The short tail sits low on the back, from y 0.10 to 0.155 and back to z -0.289.
+
+## badger.rig.glb
+
+The rig has four `raise` shapes (`raise` of `tools/mesh-rigs/badger.json`): the left arm that
+holds the triangle up, and three arms of the recast roles of the cast matrix. The shared flute and
+clarinet holds turn the left upper arm about 118° from the bind, and the flute hold the right
+upper arm about 112°, while the clavicle turns only 23° to 37°. The linear blend then crushes the
+front and the top of the arm root, and its faces fold. Each shape relaxes these faces in the pose
+of its hold (`pnpm raise-fit`). The clarinet shape also holds the trumpet hold, and the right
+flute shape the right arm of the trumpet hold. A shape of the cello hold (101°) also gave the
+percussionist 4 more folded faces, so the cello has no shape.
