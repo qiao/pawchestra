@@ -4127,9 +4127,12 @@ def sit(bind, tris, weights, chair, rule, hip):
     never go below the seat top. With `root` (two shares of the tail), the vertices of the root of
     the tail, which share their weight with the hips, move and count as the haunch
     (`seat_masks()`). With `top` (units), the drop goes to that seat top in place of the lowest
-    point over the seat, so that a change of the tail does not move the seat. The corrective
-    shapes give the source back, so the standing body keeps its form. Gives the moved bind mesh, the number of moved vertices, the largest drop, and the
-    largest gap of the side view before and after."""
+    point over the seat, so that a change of the tail does not move the seat. With `carryTail`,
+    the tail moves down with the mean drop of its root: the vertices that share their weight with
+    the tail, or the ring of the haunch around a tail ball. With `tailSpread`, the haunch near the
+    tail moves with it (`tail_spread()`). The corrective shapes give the source
+    back, so the standing body keeps its form. Gives the moved bind mesh, the number of moved
+    vertices, the largest drop, and the largest gap of the side view before and after."""
     step = rule['step']
     root = rule.get('root')
     top, xs, zs, gaps = seat_gaps(bind, tris, weights, chair, hip, step, 2 * rule['band'], root)
@@ -4163,20 +4166,57 @@ def sit(bind, tris, weights, chair, rule, hip):
     out[ids, 1] = np.maximum(p[:, 1] - move, np.minimum(p[:, 1], top))
     if rule.get('carryTail'):
         # The root of the tail moves with the haunch, and the rest of the tail does not, so a
-        # large drop squeezes the tail into a flat wedge. Each vertex of the tail also moves down
-        # by the mean drop of the moved vertices of the root, by its share on the tail bones.
+        # large drop squeezes the tail into a flat wedge, or stretches the faces under a tail
+        # ball into a column. Each vertex of the tail also moves down by the mean drop of the
+        # moved vertices of the root, by its share on the tail bones.
         tails = [BONES.index(b) for b in ('tail', TAIL_TIP) if b in BONES]
         raw = weights[:, tails].sum(axis=1)
         ring = (raw[ids] > 0.0) & (move > 1e-6)
+        part = raw[ids]
+        if not ring.any():
+            # A tail ball (`tailBall`) follows the tail only, so no vertex of its root shares
+            # its weight with the hips. Its root is then the ring of the haunch around it: the
+            # vertices of the faces that join the ball to the haunch, each with the same part.
+            tail = raw > 0.0
+            joins = tail[tris].any(axis=1) & ~tail[tris].all(axis=1)
+            joined = np.zeros(len(bind), bool)
+            joined[tris[joins].ravel()] = True
+            ring = joined[ids] & ~tail[ids] & (move > 1e-6)
+            part = np.ones(len(ids))
         if ring.any():
-            carry = float(np.average(move[ring], weights=raw[ids][ring]))
+            carry = float(np.average(move[ring], weights=part[ring]))
             moved = out[:, 1] - bind[:, 1]
             carried = -carry * raw
             out[:, 1] = bind[:, 1] + np.where(raw > 0.0, np.minimum(moved, carried), moved)
             log(f'sit: the tail moves down with the mean drop {carry:.4f} u of its root')
+            if 'tailSpread' in rule:
+                out = tail_spread(bind, out, raw > 0.0, carry, rule['tailSpread'], top)
     _, _, _, after_gaps = seat_gaps(out, tris, weights, chair, hip, step, 2 * rule['band'], root)
     after = silhouette_gap(xs, zs, after_gaps, rule['end'])
     return out, int((move > 1e-6).sum()), float(move.max(initial=0.0)), before, after
+
+
+def tail_spread(bind, out, tail, carry, spread, top):
+    """Moves the haunch near a carried tail with the tail (`tailSpread` of the sit rule, two
+    distances in units). The drop of the sit is largest at the underside and falls with the
+    height, so the ring of the haunch around a tail ball drops by different amounts, and a ball
+    that moves as a whole stretches the faces above or below it into a point. A vertex within the
+    first distance of the tail moves down by the drop of the tail, and the share of that drop falls
+    to 0 at the second distance, so that the change of the drop spreads over several faces. A
+    vertex below the lowest point of the tail only moves further down, so that the seat top keeps
+    its place, and no vertex goes below the seat top `top`. Gives the moved bind mesh."""
+    inner, outer = spread
+    gaps = np.linalg.norm(bind[:, None, :] - bind[tail][None, :, :], axis=2).min(axis=1)
+    near = ~tail & (gaps < outer)
+    share = 1.0 - smoothstep(gaps[near], inner, outer)
+    drop = out[near, 1] - bind[near, 1]
+    blend = (1.0 - share) * drop - share * carry
+    low = bind[near, 1] < bind[tail, 1].min()
+    moved = bind[near, 1] + np.where(low, np.minimum(drop, blend), blend)
+    out = out.copy()
+    out[near, 1] = np.maximum(moved, np.minimum(bind[near, 1], top))
+    log(f'sit: {int(near.sum())} vertices of the haunch within {outer} u of the tail move with it')
+    return out
 
 
 def sit_pose(config, weights, points, tris, heads, ends, rolls, meters):

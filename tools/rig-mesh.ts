@@ -362,7 +362,9 @@ function parseConfigValue(text: string, old: ConfigValue, path: string): ConfigV
  * cross-section of the arms (`armGirth`) and of the legs (`legGirth`), the trunk share of the painted weights under the armpits (`weights.paintedBelow`), the factors of the source on each axis
  * (`proportions`), the depth factor of the source and the factor of the kept head
  * (`proportions.depth`, `proportions.head`), the root share of the tail in
- * the sit of the haunch (`sit.root`), the fixed seat top of the sit (`sit.top`), the curve of the
+ * the sit of the haunch (`sit.root`), the fixed seat top of the sit (`sit.top`), the move of
+ * the tail with the drop of its root (`sit.carryTail`) and of the haunch near it
+ * (`sit.tailSpread`), the curve of the
  * curled seated tail (`studio.tailCurl`), the move of the colors of the plain fur
  * (`colors.tone`), the light border of a black fur region (`colors.border`), the round eye
  * patches (`colors.patch`), the smile line (`colors.smile`), the move of a colored fur in Oklch
@@ -388,6 +390,8 @@ const OPTIONAL_VALUES: ReadonlyMap<string, ConfigValue> = new Map<string, Config
   ['proportions.head', 1],
   ['sit.root', [0, 1]],
   ['sit.top', 0],
+  ['sit.carryTail', false],
+  ['sit.tailSpread', [0, 0]],
   ['armSmooth', { rounds: 0, sides: 'LR', bones: ['upper_arm'] }],
   ['bindSmooth', { rounds: 0, sides: 'LR', bones: ['elbow'] }],
   ['studio.tailCurl', { points: [[0, 0, 0]] }],

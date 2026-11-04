@@ -316,7 +316,7 @@ extras of the asset as numbers ("Seat"), and only the preview images show a chai
 | Normals | `cut.skinNormals`, `cut.bodyNormals`, `rootNormals` | Shade a bent arm root, elbow, wrist, or knee soft, with no dark slot. |
 | Colors | `colors.tone`, `colors.shift`, `colors.dark`, `colors.border`, `colors.split`, `colors.flank` | Move the face colors toward the reference, and keep the black borders clean. |
 | Face | `colors.patch`, `colors.smile`, `soften`, `eyeShell` | Give a happy face: round eye patches, a thin smile line, and no brow crease. |
-| Tail, ears, jaw | `studio.tailCurl`, `studio.tailBind`, `tailBall`, `earFlap`, `noseFront`, `weights.jaw` | Lay a tail on the seat or the floor, let a trunk or a hanging ear follow the head, and open a beak. |
+| Tail, ears, jaw | `studio.tailCurl`, `studio.tailBind`, `tailBall`, `sit.carryTail`, `sit.tailSpread`, `earFlap`, `noseFront`, `weights.jaw` | Lay a tail on the seat or the floor, move a tail ball down with the haunch, let a trunk or a hanging ear follow the head, and open a beak. |
 
 **Arms.** A hold with the elbow out and level rolls the upper arm far, and the linear blend at
 the shoulder then twists the skin and squeezes the arm flat. So a body takes a twist bone of each
@@ -436,6 +436,12 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
   it at the haunch (`chair.front`).
 - The rig writes the seat of its config into the extras of the asset (`seat`, `SeatExtras` below),
   and the export fits the seat of the app to it.
+- The sit lowers the underside of the haunch onto the seat, most at the back of the haunch, and
+  less with the height. A tail ball stays on its bone, so the faces under it stretch into a
+  column. So the ball moves down with the mean drop of the ring of the haunch around it
+  (`sit.carryTail`). The ring drops by different amounts, so the haunch near the ball also moves
+  with the ball, with a share that falls to 0 over a band (`sit.tailSpread`). The change of the
+  drop then spreads over several faces, and the ball keeps its round form.
 - The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
