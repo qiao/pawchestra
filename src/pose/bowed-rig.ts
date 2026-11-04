@@ -918,11 +918,10 @@ const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
 
 /**
  * The girth of the left arm of the body that each shared hold fits, in meters
- * (`BowedHold.girthGap`, design 5.3): the girth of the wrist end of the forearm of the rabbit for
- * the violin (`wristGirth()`), and the girth of the paw of the dog for the cello (`pawGirth()`). A
- * thicker body moves its left paw further off the neck by the difference.
+ * (`BowedHold.girthGap`, design 5.3): the girth of the paw of the dog for the cello
+ * (`pawGirth()`). A thicker body moves its left paw further off the neck by the difference.
  */
-const GIRTH_FIT = { violin: 0.048, cello: 0.052 } as const;
+const GIRTH_FIT = { cello: 0.052 } as const;
 
 /**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
@@ -949,15 +948,14 @@ const GIRTH_FIT = { violin: 0.048, cello: 0.052 } as const;
  * (`frogHair`): with the 0.11 m of the rabbit, the bow paw of the deer and the dog went 1.9 cm and
  * 2.2 cm into the body at the frog.
  *
- * At rest, a thicker wrist holds the neck further off (`girthGap`): the rest gap of the left paw
- * grows by the girth of the wrist end of the forearm over the girth of the rabbit. The thick
- * wrist end of the forearm otherwise goes into the upper bout of the upright violin: at rest, the
- * forearm of the recast polar bear went 1.8 cm into the violin, and with the rule 0.0 cm.
+ * The hold keeps the rest gap of the left paw on each body, with no rule of the girth
+ * (`girthGap`). A rest gap from the girth of the wrist moved the left forearm of the recast polar
+ * bear out of the upright violin (1.8 cm to 0.0 cm), but the paw keeps its hanging wrist, so the
+ * violin moved into the belly: the violin of the elephant 6.1 cm, and of the bear 5.3 cm.
  */
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
   roundArms: ROUND_ARMS_FIT.violin * MathUtils.DEG2RAD,
-  girthGap: { wrist: GIRTH_FIT.violin, paw: null },
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
   frogHair: 0.15,
   liftReach: [0.15, 0.15, -0.3],
