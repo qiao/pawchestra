@@ -956,7 +956,7 @@ const GIRTH_FIT = { cello: 0.052 } as const;
  * the girth of the wrist end of the left forearm of the rabbit, as a share of its fingerboard
  * (`wristGirth()`).
  */
-const WRIST_FIT = { girth: 0.28, full: 0.04, restPlace: 0.15 } as const satisfies WristFit;
+const WRIST_FIT = { girth: 0.28, full: 0.04, restPlace: 0.25 } as const satisfies WristFit;
 
 /**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
@@ -990,9 +990,10 @@ const WRIST_FIT = { girth: 0.28, full: 0.04, restPlace: 0.15 } as const satisfie
  *
  * A thicker wrist end of the left forearm holds the neck at rest nearer to the nut (`wristFit`):
  * the girth over the fingerboard (`wristGirth()`) over the 0.28 of the rabbit moves the rest grip
- * from 0.4 toward 0.15 of the fingerboard, the whole way at 0.04 over it. At 0.4, the wrist end of
+ * from 0.4 toward 0.25 of the fingerboard, the whole way at 0.04 over it. At 0.4, the wrist end of
  * the forearm of the recast mannequin and polar bear went 1.8 cm to 1.9 cm into the upper bout at
- * rest and in the moves, and with the rule less than 1.0 cm. The violin keeps the rest place and
+ * rest and in the moves, and with the rule less than 1.0 cm. At 0.15, the big paw of the recast
+ * panda closed over the pegbox, and at 0.25 it holds the neck. The violin keeps the rest place and
  * the path of the grip at 0.4 (`RigPoints.restCarryPlace`), and the paw slides up the neck: with
  * the violin hung from the grip at 0.15, the violin of the recast rhino went 2.6 cm into the belly
  * at rest (1.3 cm with the path of 0.4), and of the penguin 4.0 cm in the moves (3.2 cm). A
