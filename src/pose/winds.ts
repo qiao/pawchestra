@@ -511,14 +511,23 @@ export const WIND_HOLDS = {
     fingering: 'valves-left',
     fundamental: BRASS_FUNDAMENTALS.horn,
   },
-  // Both shoulder bones turn 34° forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
+  // Both shoulder bones turn forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
   // as the shoulder blades of a real player slide forward. With square shoulders, the paws of most recast
   // bodies miss the valves, also with the smallest trumpet of the size rule of the winds. A body
   // with a far mouth bows the head, and the trumpet turns down with it (farMouth): with the head
   // up, the paws of 11 recast bodies missed the valves by 9 mm to 229 mm.
+  // The right palm faces the valve tops, and the right paw points 0.4 of the way across them
+  // (faceTube, aimSide), so that the finger tips come down onto the valve caps, as the monkey
+  // holds them (docs/reference/wind-technique.md 2.1). With the roll of the shoulder, the right
+  // paw of each recast body stood up behind the valves, with its palm to the mouthpiece and its
+  // finger tips up, 53° to 70° from the palm of the monkey. The side aim moves the wrist off the
+  // line from the shoulder to the grip, so the right shoulder turns 37° (34° for the left), and
+  // the short arms still reach the valves: with 34°, the right paw of the dog missed its grip by
+  // 1.4 mm, and with 45°, the right arm of the deer folded. With 0.8 of the monkey, the right paw
+  // of the dog missed its grip by 24 mm.
   trumpet: {
     ...WOODWIND,
-    reach: 34 * MathUtils.DEG2RAD,
+    reach: 37 * MathUtils.DEG2RAD,
     reachL: 34 * MathUtils.DEG2RAD,
     roundArms: ROUND_ARMS_FIT.trumpet * MathUtils.DEG2RAD,
     farMouth: FAR_MOUTH_FIT,
@@ -528,6 +537,8 @@ export const WIND_HOLDS = {
     restPoleR: [1, -1, -1],
     rest: holdTurn(-3, -20, holdTurn(-50, 0)),
     restShift: [0.19, 0.03, -0.03],
+    faceTube: ['none', 'palm'],
+    aimSide: [0, 0.4],
     fingering: 'valves-right',
     fundamental: BRASS_FUNDAMENTALS.trumpet,
   },
