@@ -24,7 +24,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), rigid crease faces (`rigidPainted`), root skin normals, a tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
-| pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). The horn hold keeps the round left elbow off the belly. | `hornist` |
+| pig | A copy with round upper arms free of the trunk (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), arm roots moved to the trunk wall (`pig_root.py`), two left `raise` shapes, forearm skin normals (`rootNormals.wrist`). | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | Arms freed in a copy (`badger_edit.py`), rebuilt arms, rigid shoulder faces (`rigidPainted`), a triangle arm `raise`, a tail ball, a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Longer rebuilt arms (`arm_rebuild.py --factor 1.2`), a long tail curled on the floor, a smaller trumpet, no chair. | `trumpeter` |
@@ -50,7 +50,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 
 Test a change of the chain on the mannequin first (`assets/models/mannequin/`, design 4.4):
 `pnpm rig-mesh mannequin --check` and `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
-Its clean rings and twist markers show a fault of the chain.
+Its clean rings and twist markers show a fault.
 
 ### Steps of a new body
 
@@ -190,9 +190,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - A long snout puts the mouthpiece far forward. Turn the instrument back around the mouthpiece, or
   move the mouthpiece under the muzzle (`lipShift`).
 - Rest elbows far from the play elbows twist the paws in the lift. Keep them near.
-- A freed round arm has its full inner half width, so the hold of the joined arm puts it into the
-  trunk. Turn each elbow out about the line from the shoulder to the grip, bend it with a nearer
-  grip, and check the grip turn.
+- A freed round arm has its full inner half width. Turn each elbow out, or bend it with a nearer
+  grip, and check the grip turn (design 5.3).
 - A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
 - A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head,
   and the fit then jumps. Measure the front of a band of the upper chest
