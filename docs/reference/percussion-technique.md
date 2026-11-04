@@ -261,7 +261,10 @@ The app does not follow these facts:
 - **The hand cymbals (section 7).** The plates meet vertical, in front of the shoulders
   (`PERCUSSION_PLACES.crash`, `plateTurn`).
 - **The xylophone grip (section 9).** The paws hang low in front of the belly, so each shaft runs
-  near the line of its forearm and leaves the paw under the curled claws.
+  near the line of its forearm and leaves the paw under the curled claws. The right elbow points
+  far out, and each mallet points from a place out from its shoulder (`PercussionHold.home`), so
+  that the round rebuilt arms stay out of the leaning belly. The mallets thus point a little
+  further in. No source gives this choice.
 - **The lean over the xylophone (section 9).** The spine leans forward over the bars
   (`PercussionHold.lean`), because the short arms do not reach the bars from an upright body. The
   hips keep their place, because a small move of the hips tilts the short legs far.
