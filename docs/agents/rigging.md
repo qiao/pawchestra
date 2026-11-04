@@ -1,8 +1,7 @@
 # Rigging
 
-This module of `AGENTS.md` gives the bodies, the asset chain, the arm gate, the arm rebuild, and
-the traps. Design 4.4 gives the body rules, and [`rig-rounds.md`](rig-rounds.md) the brief of a
-rigging round.
+Design 4.4 gives the body rules, and [`rig-rounds.md`](rig-rounds.md) the brief of a rigging
+round.
 
 ## Bodies and roles
 
@@ -19,8 +18,8 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | fox-tan    | The red fox rig with a tan palette (`palettes`).                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `flutist`                                                                    |
 | cat        | T-pose mesh, rebuilt arms with wider elbow rings (`arm_rebuild.py --spec`), four elbow `raise` shapes, rigid armpit faces, the right armpit on the clavicle (`cat_root.py`), long legs (`legFactor`, `shinFactor`, `legGirth`), close knees (`studio.legTurns`), a shorter trunk below the chest (`trunkFactor`, `trunkTop`), the shape of the old cat with narrow shoulders (`girthProfile`, `armGirth`), a smaller head (`headFactor`), a soft brow (`soften`), a tail on the seat, a viola of `violaScale`. | `violist`                                                                    |
 | dog        | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor 1.35`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail.                                                                                                                                                                                                                                                                                                                                      | `cellist`                                                                    |
-| panda      | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut (`panda_edge.py`), a right elbow `raise`, the old form: longer legs (`shinFactor`, `chair.front`), a smaller head (`headFactor`), a chest taper (`girthProfile`), thinner upper arms (`armGirth`).                                                                                                                                                                                                                          | `trombonist`                                                                 |
-| hippo      | T-pose mesh, rebuilt arms, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass.                                                                                                                                                                                                                                                                                                                                                                         | `bassist`                                                                    |
+| panda      | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.05`), color edges cut (`panda_edge.py`), a right elbow `raise`, rigid root faces (`rigidPainted`), the old form: longer legs (`shinFactor`, `chair.front`), a smaller head (`headFactor`), a chest taper (`girthProfile`), thinner upper arms (`armGirth`).                                                                                                                                                                                       | `trombonist`                                                                 |
+| hippo      | T-pose mesh, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes. Stands at the contrabass.                                                                                                                                                                                                                                                                                                                                                                                       | `bassist`                                                                    |
 | mouse      | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`).                                                                                                                                                                                                                                                                                                                                                                                                          | `oboist`                                                                     |
 | elephant   | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head.                                                                                                                                                                                                                                                                                                                                                                               | `timpanist`                                                                  |
 | beaver     | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor 1.5`), rigid crease faces (`rigidPainted`), root skin normals, a tail on the floor, a smaller bassoon, no chair.                                                                                                                                                                                                                                                                                                        | `bassoonist`                                                                 |
@@ -60,12 +59,11 @@ Its clean rings and twist markers show a fault.
 2. **Form.** A body that is shorter or wider than the mesh takes `proportions`. A head that keeps
    its form takes `"keep": "head"` with a blend zone on the neck above the shoulder tops. A larger
    head grows `H`, so fit the holds again.
-3. **Options.** Run `pnpm mesh-options <a> <dir> --size <label>=<head top>... --arms <f>,...
---legs <f>,... --instrument <id>`. Fix each warning of the rigs, then ask the user about the
-   size, arms, and legs with `options.md` and `options.png`.
-4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4). Run `arm_rebuild.py`, with
-   `--keep-faces` on `keep faces`. Look at the seated bind, standing body, knees, and
-   bones with `pnpm rig-mesh <a> --check --preview <dir>`, and each variant with `--set`. The
+3. **Options.** Run `pnpm mesh-options` ([`commands.md`](commands.md)). Fix each warning of the
+   rigs, then ask the user about the size, arms, and legs with `options.md` and `options.png`.
+4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4). Run `arm_rebuild.py`. Look at
+   the seated bind, standing body, knees, and bones with
+   `pnpm rig-mesh <a> --check --preview <dir>`, and each variant with `--set`. The
    triangles and the gzip size stay in their budgets, and the standing body stays within 1 mm of
    the source.
 5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale (the shoulder joints), a
@@ -89,8 +87,6 @@ table and crop pairs. A `FAIL`, or a better number with a worse look, makes the
 round not done.
 
 - `--trace <demo>:<from>-<to>` finds a fast turn of a paw.
-- `tools/merge-branch.sh` runs the gate of all roles for a change of `src/pose/`, `src/models/`,
-  or `tools/blender/`.
 - The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`. A new role adds
   its entry. A planned grip change expects a grip turn `FAIL`, and gives the new median with 2x
   paw crops at a strike and at rest. The manager accepts the new entry.
@@ -153,8 +149,7 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 ```
 
 `poseSegments()` and `StudioArmSegments` of `src/models/studio-rig.ts` and `driven_turns()` of
-`tools/blender/rig_mesh.py` turn the new bones with the same rule. `paintedWeights` names the
-weights file, and `paintedLower` lists the bones that keep the rule weights. Run
+`tools/blender/rig_mesh.py` turn the new bones with the same rule. Run
 `pnpm frame` after a new body with `armSegments` (20 more bone matrices).
 
 ## Traps
@@ -223,11 +218,11 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
   it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
-- A hanging T-pose arm folds the faces under its root, as a split crease does. Make them and the
-  first tube ring rigid (`rigidPainted`). A rigid group at the front of a root or across the chest
-  moves the fold to its edge, and the edge shades a dark notch. A Smooth of the root weights also
-  only moves the fold. A rigid patch on the arm swings across the chest, and the body cut folds
-  over it: give it more clavicle than arm (`cat_root.py`).
+- A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
+  (`rigidPainted`). Two rigid groups that touch fold at their shared edge: join them.
+- A rigid group at the front of a root or across the chest moves the fold to its edge, which shades
+  a dark notch. A Smooth of the root weights also moves the fold. A rigid patch on the arm swings
+  across the chest, and the body cut folds over it: give it more clavicle than arm (`cat_root.py`).
 - A raised arm pulls out a side with no trunk weight: give it a trunk share (`paintedBelow`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
@@ -336,6 +331,8 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 
 ### Probes
 
+- Split a recast fold count by the main bones of `pnpm fold-probe --faces` before a root fix:
+  paws and inner elbows at rest can hold most of it.
 - `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
   wrist.
 - A fix of a turn rate can move a prop to a wrong place. Render the move.
