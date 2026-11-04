@@ -3,7 +3,7 @@
   "sourceNote": "A copy of the T-pose mesh assets/models/cat/cat-tpose.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, at the length of the mesh. tools/blender/arm_rebuild.py makes these faces, with the elbow rings 0.035 u from the elbow (--spec, assets/models/cat/README.md). The other faces and cat-tpose.glb stay unchanged.",
   "armSource": "assets/models/cat/cat-tpose.glb",
   "armSourceNote": "The T-pose mesh of the cat (assets/models/cat/README.md). Its arms are level and free of the trunk, so tools/blender/arm_rebuild.py rebuilds them with no species script.",
-  "paintedWeights": "assets/models/cat/cat-weights.json",
+  "paintedWeights": "assets/models/cat/cat-root-weights.json",
   "paintedLower": [
     "root",
     "hips",
@@ -24,7 +24,7 @@
     "toes_R",
     "tail"
   ],
-  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, because the seated bind of the app depends on them.",
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, because the seated bind of the app depends on them. cat-root-weights.json is cat-weights.json with more clavicle weight at the right arm root (tools/blender/cat_root.py): the right armpit patch of rigidPainted takes the clavicle share 0.52, so it joins the body, and the root vertices with a clavicle share of 0.1 to 0.32 take at least 0.4. With the patch on the arm (clavicle 0.27), the patch swung to the front of the chest when the right arm reached across it, and the cut of the body at the arm root folded over the arm vertices beside the patch: the sweep measured them 2.2 cm to 2.6 cm in the body in the recast violin, cello, flute, and clarinet holds. The left side keeps its weights: with the same change, the rest folds of the left arm of the violist grew from 3 to 6.",
   "armSegments": {
     "helper": 0.07,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it). With the gap 0.0216 u that the script chooses (the helper 0.0432 u), the inner faces of each elbow turned over in each sample of the play and the rest (arm gate folds p95 L 13, R 20). With the gap 0.035 u, the bend spreads over more rings."
