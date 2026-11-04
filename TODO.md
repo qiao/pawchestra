@@ -621,6 +621,18 @@ passes.
       R 16 (the inner right elbow at rest and the right root), the clarinetist L 11, the flutist
       L 10, the trumpeter L 12, and the snare drummer R 10. Rigid groups at the front of the
       shoulder lines removed most of them, but their edges showed a dark notch in the 2x crops.
+- [ ] Panda recast folds: one rigid group under and in front of the left arm root puts the left
+      arms of the violinist, the cellist, the clarinetist, and the snare drummer under 8 (5 to
+      6), and the flutist L at 9. Open: the cellist R 10 (6 faces under the right root and 3 of
+      the inner elbow, at rest) and the flutist R 10 (7 faces of the inner right elbow in the
+      play). A rigid group under the right root folded more faces of the trombonist.
+- [ ] Elephant recast folds: the paws fold 3 to 10 faces in each sample (the finger roots, also
+      in the timpanist), and the inner elbows fold at rest (clarinetist R 12, cellist R 10,
+      snare drummer L 7). The front of the left root adds 2 to 9 in the play. Rigid root groups
+      moved the folds to the elbows. A right elbow `raise` (branch `folds-ep-elephant-shape`)
+      took the clarinetist R from 16 to 13 and the cellist R from 10 to 7, but grew the
+      clarinetist R stretch from 0.20 to 0.25 (`FAIL` on the margin, `MOVES` of
+      `--explain stretch`). Fix the paw faces first.
 - [ ] Cast matrix sizes: the violin, the viola (`hold-reach`), the cello (`cello-size.ts`), the
       trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
       instruments keep the scale 1 in a recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
