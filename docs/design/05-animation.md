@@ -294,6 +294,17 @@ The rest of each family:
   of the elbow adds to it (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the
   shoulder. Reason: on a bent arm, the swivel moves the arm root off the trunk, and each paw keeps
   its grip.
+- **Free round arms in a shared hold.** An own hold sets the elbows for its body. A shared hold
+  (the flute, the clarinet, the trumpet, the violin, the cello) takes the rule from the body
+  (`roundArms`): the out swing that an arm needs is the smallest swing of the hanging upper arm
+  out to the side at which the upper arm and the elbow clear the trunk of the bind pose
+  (`armOut()`). The hold keeps the swing of its accepted player (`ROUND_ARMS_FIT`), and a body that
+  needs more turns each elbow of the play, the moves, and the rest out by `TURN_PER_SWING` times
+  the difference (`elbowOutTurn()`), toward the side around the forward axis (`turnPoleOut()`). A
+  thin body keeps the elbows of the hold. The paws keep their grips. The percussion holds have no
+  rule, because the badger plays them as its own holds. Reason: the sweep measures the inner half
+  width of each arm against the trunk, so a body needs no value of its own. The turn cannot
+  clear a clip at the root of the upper arm, as on the pig.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
