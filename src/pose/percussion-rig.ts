@@ -353,7 +353,11 @@ export const PERCUSSION_HOLDS = {
   // the wrist lifts the tip over the head (across.pitch), as a real player's stroke from the
   // wrist. With the rest direction across the forearm, the tips swing out over the rim. The
   // elbows point out, so that the rebuilt round upper arms stay out of the belly (design 5.3): with
-  // the elbows nearer to the body, they went 2.4 cm into it.
+  // the elbows nearer to the body, they went 2.4 cm into it. The drum takes its place from the
+  // body (fit): at the bind place, the forearms or the paws of the recast elephant, bear, hippo,
+  // and panda went 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast
+  // hippo and panda missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for
+  // each body, the sticks of the recast wolf and deer went into the raised drum.
   'snare-drum': {
     hands: 'alternate',
     sizes: { lift: 0.1, rest: 0.03 },
@@ -374,7 +378,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0,
     side: null,
-    fit: null,
+    fit: { drop: 0.07, gap: 0.15 },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
