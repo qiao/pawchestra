@@ -208,6 +208,10 @@ The app follows these facts:
 
 The app does not follow these facts:
 
+- **The height of the snare drum for a thin body (section 6).** A thin recast body keeps the
+  height of the badger (`PercussionHold.fit`), also when the head is far below its elbows. Only
+  a body whose belly needs the drum forward sets it higher. With the head below the elbows of each
+  body, the sticks of the thin wolf and deer went into the raised drum in the lowering.
 - **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
 - **The set position (section 3).** Between strikes, the wrist lifts the head above its spot with
   the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
@@ -237,6 +241,9 @@ The app follows these facts:
   body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the belly. At
   rest, the sticks lie across the body in front of the waist, with the tips a little above the
   near rim (`PercussionHold.set`).
+  A deep recast body sets the drum higher and further forward (`PercussionHold.fit`): the head
+  toward the height below its elbows [17], and the near rim in front of its belly, so that its
+  paws stay in front of the body.
 - **The suspended cymbal (section 7).** The badger plays the cymbal parts on a suspended cymbal
   (`SpeciesParams.cymbalForm`, `SUSPENDED_CYMBAL`). Its short arms cannot hold hand cymbals of the
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
