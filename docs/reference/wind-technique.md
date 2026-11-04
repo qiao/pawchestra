@@ -469,6 +469,8 @@ The app follows these facts:
   also play a flute with a curved head joint [77]. The app does not show that head, and it scales
   the whole flute. No source gives a larger instrument with the same hold, so the largest size is
   the size of the app.
+  The shared trumpet hold turns both shoulders forward, as the monkey turns its right shoulder, so
+  that more recast bodies reach the valves (design 5.3).
 
 The app does not follow these facts:
 

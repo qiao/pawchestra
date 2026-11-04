@@ -474,8 +474,13 @@ export const WIND_HOLDS = {
     fingering: 'valves-left',
     fundamental: BRASS_FUNDAMENTALS.horn,
   },
+  // Both shoulder bones turn 34° forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
+  // as the shoulder blades of a real player slide forward. With square shoulders, the paws of most recast
+  // bodies miss the valves, also with the smallest trumpet of the size rule of the winds.
   trumpet: {
     ...WOODWIND,
+    reach: 34 * MathUtils.DEG2RAD,
+    reachL: 34 * MathUtils.DEG2RAD,
     poleL: [-0.5, -1, -1],
     poleR: [1, -1, -1],
     restPoleL: [-1, -1, -1],
@@ -1065,9 +1070,9 @@ const WOLF_CLARINET = {
  * (`docs/reference/wind-technique.md` 2.1): the left paw wraps the valve casings and holds the
  * weight, the right fingers arch down onto the valves, and the trumpet points forward, angled
  * slightly down. The arms are 1.2 times the arms of the mesh, so the monkey plays a trumpet of
- * 0.65 (`SpeciesParams.trumpetScale`), and each shoulder bone turns 34° forward (`reach`), as the
- * shoulder blade of a real player slides forward. With square shoulders, the right paw misses the
- * valves by 3.4 cm.
+ * 0.65 (`SpeciesParams.trumpetScale`), and the right shoulder bone turns 34° forward (`reach`), as
+ * the shoulder blade of a real player slides forward. The left shoulder stays square (`reachL`).
+ * With square shoulders, the right paw misses the valves by 3.4 cm.
  *
  * While the monkey plays, the bell turns 10° further down, to 15° below the level, as a real
  * player angles the trumpet "slightly down". With the bell 5° below the level, the paws cover the
@@ -1097,6 +1102,7 @@ const WOLF_CLARINET = {
 const MONKEY_TRUMPET = {
   ...WIND_HOLDS.trumpet,
   reach: 34 * MathUtils.DEG2RAD,
+  reachL: 0,
   play: holdTurn(-10, 0),
   poleL: [-1, -1, 0],
   poleR: [1, -1, 0],

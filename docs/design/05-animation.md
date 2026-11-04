@@ -352,8 +352,10 @@ The rest of each family:
   (`turnShare()`). The rest comes from the hanging arms (5.2). Reason: the sign from the geometry
   turned the right flute paw of 7 recast bodies about 180°, and the lip shift of the wolf under
   its long muzzle put the forearms of short snouts into the body. The tan fox and the wolf keep
-  their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). The trumpet keeps its fixed shared hold: at the
-  size 1, the paws of each recast body miss the valves.
+  their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). The shared trumpet hold turns both shoulder bones
+  forward (`reach`, `reachL`), as the shoulder blades of a real player slide forward. Reason: with
+  square shoulders, the paws of most recast bodies miss the valves, also with the smallest trumpet
+  of the size rule (4.6).
 - A brass player presses the valves of the pitch (`BRASS_FUNDAMENTALS`), and the partials skip
   the flat seventh partial, as real players do (`PARTIALS`).
 - The trombone slide takes the position of the pitch, mapped into the travel that the arm
