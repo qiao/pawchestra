@@ -54,6 +54,8 @@
     [1, 1, 1, 1]
   ],
   "girthProfileNote": "The rows (share of the trunk axis of the source from the hips joint to the neck joint, width, front, back) give the upper chest and the back the taper of the panda of the A-pose mesh (7cf41074), on cuts of the seated bind from the seat to the neck joint (pnpm body-shape trombonist): the width at 0.55 of the cut span is 60.5 cm (old 56.2 cm, 63.5 cm with the width 1), at 0.65 55.0 cm (old 52.2 cm, 59.9 cm), and at 0.75 55.4 cm (old 47.7 cm, 61.7 cm). At 0.75, the widest points of the cut are the undersides of the arm roots, so the row at 0.73 is the narrowest. The shoulder joints are 49.8 cm apart (old 47.9 cm, 51.4 cm with the width 1). With the width 0.93 at the shoulder joint (0.875) and 0.85 at 0.73, the shoulder joints were 47.7 cm apart, and the left paw went 0.5 cm into the trombone at rest (0.2 cm with the width 1). The depth, the belly, the haunch, and the back on the chair keep their places.",
+  "armGirth": [0.92, 1],
+  "armGirthNote": "The upper arm takes the factor 0.92 across its axis before the skin (arm_girth() of tools/blender/rig_mesh.py), so that the girth at the middle of the seated bind is 67.6 cm (old panda 65.5 cm, 72.8 cm with the factor 1). The forearm keeps its form (56.9 cm, old 58.5 cm). The arms keep their joints and their rings. With the factor, the upper arms go 0.2 cm less into the body at rest and in the lift (pnpm pose-depth trombonist --demo beethoven-5-4).",
   "joints": {
     "root": {
       "head": [
