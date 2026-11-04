@@ -96,6 +96,10 @@ round not done.
 - The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`. A new role adds
   its entry. A planned grip change expects a grip turn `FAIL`, and gives the new median with 2x
   paw crops at a strike and at rest. The manager accepts the new entry.
+- A paw that faces its tube in a shared wind hold (flute, clarinet) has the palm turn in place of
+  the grip turn: its palm against `ACCEPTED_PALMS` in the axes of the instrument, so the elbow
+  rule does not move it. A new shared hold that rolls a paw to its tube adds the entry that the
+  tool prints for the own role.
 - The paw twist, paw swing, forearm twist, move twist, and flat share count from the bind. When the
   bind differs from the base, they take only their limits (`REBIND`), and the gate prints the elbow
   and wrist ring widths. The grip turn ignores the bind. A rebind round proves the same bones with
