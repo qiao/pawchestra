@@ -242,12 +242,22 @@ passes.
       its root, so the right mid thigh girth alone stays at 1.18 of the cat of the A-pose mesh
       (`reports/2026-11-03-cat-shape2/measures.md`). Let `leg_girth()` skip the tail weights,
       then make the thigh thicker.
-- [ ] Cat violist: from the side and from above, the cat still looks hunched. The back line of the
-      bind is within 1 cm of the cat of the A-pose mesh, but the rest grip holds the viola neck
-      at the chin, far to the front of the long lap (`CAT_HOLD.rest.lap`, `restPlace`), so both
-      arms rise and the shoulders turn forward. That cat holds the neck at the chest
-      (`reports/2026-11-03-cat-shape2/final/sides-rest.png`). Try a lower rest grip with the arm
-      gate and `pnpm pose-depth violist`.
+- [ ] Cat violist: from the side and from above, the cat still looks hunched. The rest grip holds
+      the viola neck at the chin. `lapPoint()` counts the faces of the hips and the spine, so at
+      0.375 of the long thigh (`CAT_HOLD.rest.lap`) it finds the top of the belly. The viola tail
+      then stands 33 cm above the seat (18 cm on the cat of the A-pose mesh), the paws rest 15 cm
+      to 17 cm higher, and the elbows 6 cm to 7 cm further out. Two tries
+      (`reports/2026-11-03-cat-rest/`) fail `pnpm pose-depth violist`:
+      - Lower rest places (`rest.lap` y -0.62 H, `restBow.lap` y 0.15 H, `restPoleL`
+        (-1.3, -1, -0.1)): the paws rest at the old heights, but the elbows stay out. The right
+        upper arm goes 1.4 cm into its arm root in a lowering (0.7 cm on the base).
+      - Hanging arms (`restArms`: left 10° and 90°, right 20° and 80°): the paws, the elbows, and
+        the viola match the old cat. The left upper arm goes 1.2 cm into the belly at rest
+        (0.2 cm on the base). The right upper arm goes 1.8 cm into its arm root early in the lift,
+        and 2.2 cm late in the lowering, because the hanging elbow stays 13 cm out while the grip
+        moves forward. A shorter shoulder fade (`reachFade`) or a wider bow via does not help.
+      Next: an elbow pole for the right arm in the middle of the moves, as `liftPoleL`, in the
+      cat hold only, so that the elbow goes out before the grip moves forward.
 - [ ] Cat violist: the thinner arms raise the right arm folds p95 of the arm gate from 4 to 5,
       and the right upper arm goes 0.1 cm further into its arm root in the play and the lowering
       of the full sweep (`pnpm pose-depth violist`, 1.4 cm at most). Check the 2x crops of the
