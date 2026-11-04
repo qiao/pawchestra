@@ -241,6 +241,10 @@ passes.
       (`reports/2026-11-04-cat-form/leg-lineup.png`).
 - [ ] Cat eyes: with the brow of the mesh, the eye box of the left eye takes 18 of the 19 faces of a
       dark patch (rig warning, the right eye had it before). Check the left eye in the 2x crops.
+- [ ] Cat face: with the brow of the mesh, a dark facet line goes up and out from the inner corner of
+      each eye, and the face reads less happy than with the soft brow
+      (`reports/2026-11-04-cat-form/crops/face-front.png`). Choose between the brow of the mesh
+      and a soft brow (`soften`).
 - [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
       reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
 - [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
@@ -265,10 +269,10 @@ passes.
       right upper arm goes 1.9 cm into its arm root in the moves: the corrective shape of the bow
       arm in the play keeps the arm root out only near its own bend. Fit a shape of the hanging bow
       arm (`pnpm raise-fit violist --faces <list> --side R --sets rest,lift,lower`), then try 80°.
-- [ ] Cat violist: the thinner arms raise the right arm folds p95 of the arm gate from 4 to 5,
-      and the right upper arm goes 0.1 cm further into its arm root in the play and the lowering
-      of the full sweep (`pnpm pose-depth violist`, 1.4 cm at most). Check the 2x crops of the
-      right shoulder.
+- [ ] Cat violist: with the arm girths of the mesh, the hanging right upper arm goes 2.3 cm into
+      the belly at rest, in the lift, and in the lowering (`pnpm pose-depth violist`, 1.5 cm with
+      the thin arms, limit 1.5 cm). The arm gate passes (folds p95 L 3, R 5). Try a rest that
+      turns the right elbow out, or a `raise` shape of the hanging bow arm.
 - [ ] Cat: from the back, a dark band in a V lies on the lower back above the seat. Find the faces
       and the light that make it.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
@@ -548,6 +552,12 @@ passes.
       (violin lowering) and 1.9 cm (flute lift) into the trunk side in a few samples, on both
       sides (`reports/2026-11-04-cat-root/matrix.md`). The left armpit keeps its weights, because
       the same change grew the rest folds of the left arm of the violist from 3 to 6.
+- [ ] Cast matrix of the cat with the arm girths of the mesh: the recast cellist (3.5 cm), the
+      clarinetist (2.9 cm), and the snare drummer (4.0 cm) fail on the upper arms in the body
+      (1.2 cm, 1.0 cm, and 1.9 cm with the thin arms), and the flutist goes 4.2 cm in. With the
+      girths at the edge of 15 % below the mesh (`armGirth` [0.88, 0.94]), the same three cells
+      fail with 2.6 cm, 2.1 cm, and 3.2 cm (`reports/2026-11-04-cat-form/measures.md`). Turn
+      the elbows of the shared holds out for a round arm (5.3).
 - [ ] Inner upper arm of the pig in the shared holds (5.3): with the root domes shrunk
       (`pig_root.py`), the round tube of `pig-upper.glb` still goes into the trunk at 0.36 to 0.47
       of the upper arm: violin play 2.3 cm, cello lowering 4.0 cm (left arm). The same vertices
