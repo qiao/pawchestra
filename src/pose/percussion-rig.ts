@@ -4,6 +4,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import {
+  SNARE_DRUM,
   TIMPANI,
   XYLOPHONE,
   kettleHeadRadius,
@@ -15,6 +16,7 @@ import type { Quat, Vec3 } from '../models/tuples.ts';
 import type { InstrumentOf } from './family.ts';
 import { hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
+import { trunkFront } from './cello-place.ts';
 import { armRig } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { plantedLegs } from './side-move.ts';
@@ -205,6 +207,29 @@ interface PercussionHold {
    * keeps its place.
    */
   readonly side: SideMove | null;
+  /**
+   * The place of a drum on a stand from the body ({@link fitDrumPlace}), or `null`: the drum
+   * keeps its bind place.
+   */
+  readonly fit: DrumFit | null;
+}
+
+/**
+ * The place of a drum on a stand from the body of the player (design 5.3). A real snare drummer
+ * sets the head below the elbows of the hanging upper arms, so that the forearms are near level,
+ * and holds the sticks in front of the body (`docs/reference/percussion-technique.md` 6). The
+ * drum only goes up and forward from its bind place, so a body that it fits keeps that place.
+ * The values fit the accepted badger: it keeps its place.
+ */
+export interface DrumFit {
+  /** The least drop of the head below the elbows of the hanging upper arms, in head heights. */
+  readonly drop: number;
+  /**
+   * The least room between the front of the trunk and the near rim of the head, in head heights,
+   * at the heights from the head up to the shoulder joints. It is also the move forward at which
+   * the head goes up by the full raise.
+   */
+  readonly gap: number;
 }
 
 /**
@@ -271,6 +296,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0,
     side: null,
+    fit: null,
     // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and malletSpotR).
     curl: 100 * MathUtils.DEG2RAD,
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
@@ -317,6 +343,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0.12,
     side: null,
+    fit: null,
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -347,6 +374,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0,
     side: null,
+    fit: null,
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -373,6 +401,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0,
     side: null,
+    fit: null,
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -400,6 +429,7 @@ export const PERCUSSION_HOLDS = {
     reach: Infinity,
     lean: 0,
     side: null,
+    fit: null,
     // The left paw closes on the clip of the triangle and the right paw on the short beater with
     // less curl: at 90°, the left paw folds 10 faces at the knuckles.
     curl: 75 * MathUtils.DEG2RAD,
@@ -456,6 +486,7 @@ export const PERCUSSION_HOLDS = {
     // moves the shoulders 5.5 cm toward the notes, so that both paws reach more bars of a run. At
     // 14°, the left paw bends 70° on the forearm, the limit of the arm gate.
     side: { span: 0.25, hips: 0, spine: 12 * MathUtils.DEG2RAD, moveSec: 0.6 },
+    fit: null,
     curl: GRIP_CURL,
     // A roll that removes the side bend at each strike turns the paws fast between the bars, so
     // the forearm lies in the plane of the palm.
@@ -495,6 +526,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   reach: Infinity,
   lean: 0,
   side: null,
+  fit: null,
   curl: GRIP_CURL,
   strikeRoll: true,
 };
@@ -605,6 +637,11 @@ export interface PercussionRig {
    * the side lean of the spine (`SideMove.spine`).
    */
   readonly lever: number;
+  /**
+   * The move of the instrument from its bind place, in meters, in the model axes: the place of a
+   * drum from the body (`PercussionHold.fit`), or (0, 0, 0).
+   */
+  readonly place: Vec3;
 }
 
 /**
@@ -786,6 +823,62 @@ function pairOfPlates(
   ];
 }
 
+/** The number of heights at which {@link fitDrumPlace} measures the front of the trunk. */
+const FRONT_POINTS = 16;
+
+/**
+ * Finds the move of a drum on a stand from its bind place to the place that fits the body
+ * (`DrumFit`, design 5.3). The drum goes forward until its near rim is `gap` in front of the
+ * trunk on the middle line, at the heights from the head up to the shoulder joints
+ * (`trunkFront()`). A deep body also sets the head higher, toward `drop` below the elbows of the
+ * hanging upper arms. The raise grows with the move that the bind place needs, and is full at a
+ * move of one `gap`. Thus a thin body keeps the bind place, and the paws of a deep body stay in
+ * front of the belly and in reach. The drum does not go down or back.
+ *
+ * @param model The player model.
+ * @param fit The rule of the place.
+ * @param head The middle of the head in the bind pose.
+ * @param radius The radius of the head, in meters.
+ * @param arms The two arms.
+ * @returns The move, in meters, in the model axes.
+ */
+export function fitDrumPlace(
+  model: PlayerModel,
+  fit: DrumFit,
+  head: Vec3,
+  radius: number,
+  arms: readonly ArmRig[],
+): Vec3 {
+  const h = model.body.headHeight;
+  const shoulder = (arm: ArmRig): Vector3 => new Vector3(...arm.bind.shoulder);
+  // The elbow of a hanging upper arm is one upper arm length below the shoulder joint.
+  const elbows = arms.map(
+    (arm) => arm.bind.shoulder[1] - shoulder(arm).distanceTo(new Vector3(...arm.bind.elbow)),
+  );
+  const shoulders = arms.map((arm) => arm.bind.shoulder[1]);
+  const mean = (values: readonly number[]): number =>
+    values.reduce((sum, v) => sum + v, 0) / Math.max(values.length, 1);
+  const high = mean(shoulders);
+  const room = fit.gap * h;
+  // The player faces -z, so the near rim is at the larger z.
+  const rim = head[2] + radius;
+  // The move forward that the trunk needs with the head at a height.
+  const forwardAt = (top: number): number => {
+    let front = Infinity;
+    for (let k = 0; k <= FRONT_POINTS; k++) {
+      const z = trunkFront(model, 0, top + (k / FRONT_POINTS) * (high - top));
+      if (z !== null) {
+        front = Math.min(front, z);
+      }
+    }
+    return Number.isFinite(front) ? Math.max(0, rim - (front - room)) : 0;
+  };
+  // The raise grows with the move that the bind place needs, and is full at one room.
+  const share = room > 0 ? Math.min(1, forwardAt(head[1]) / room) : 0;
+  const raise = share * Math.max(0, mean(elbows) - fit.drop * h - head[1]);
+  return [0, raise, -forwardAt(head[1] + raise)];
+}
+
 /**
  * Finds the points of a percussion player that the pose needs.
  *
@@ -816,6 +909,20 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     const grip = model.skeleton.positions[boneIndex(bone)] ?? head;
     return new Vector3(...head).distanceTo(new Vector3(...grip));
   };
+  // The snare drum takes its place from the body (`PercussionHold.fit`), and the homes of the
+  // mallets and the targets move with it.
+  const place: Vec3 = hold.fit
+    ? fitDrumPlace(
+        model,
+        hold.fit,
+        bindTarget(
+          model,
+          findTarget(model, (t) => t.kind === 'head'),
+        ).point,
+        SNARE_DRUM.radius,
+        [left, right],
+      )
+    : [0, 0, 0];
   // The x of the home points to the out side of the hand.
   const homeOf = (arm: ArmRig): Vec3 => {
     const [x, y, z] = hold.home;
@@ -835,7 +942,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       kind: 'mallet',
       arm,
       head: malletHead(bone),
-      home: toVec3(fromShoulder(arm, homeOf(arm))),
+      home: toVec3(fromShoulder(arm, homeOf(arm)).add(new Vector3(...place))),
       top: hold.top,
       across:
         hold.across && hold.across.pitch !== null && arm.side === 'R'
@@ -876,9 +983,12 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     case 'snare-drum':
       targets.set(
         0,
-        bindTarget(
-          model,
-          findTarget(model, (t) => t.kind === 'head'),
+        offsetTarget(
+          bindTarget(
+            model,
+            findTarget(model, (t) => t.kind === 'head'),
+          ),
+          place,
         ),
       );
       sides = [
@@ -951,6 +1061,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     hangR: hangingArm(model, right),
     legs: hold.side ? plantedLegs(model) : null,
     lever: left.bind.shoulder[1] - (model.skeleton.positions[boneIndex('spine')]?.[1] ?? 0),
+    place,
   };
 }
 

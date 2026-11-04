@@ -472,6 +472,11 @@ function poseAnimal(
         pose.instrumentOffset[1] = -y;
         pose.instrumentOffset[2] = -z;
       }
+      // A drum that takes its place from the body moves there (`PercussionRig.place`).
+      const [px, py, pz] = note.rig.place;
+      pose.instrumentOffset[0] += px;
+      pose.instrumentOffset[1] += py;
+      pose.instrumentOffset[2] += pz;
       writeBody(pose, player, scratch);
       posePercussion(note.rig, scratch.torso, strikes, weight, pose.rotations);
       if (note.side && legs) {
