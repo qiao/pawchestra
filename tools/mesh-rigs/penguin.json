@@ -395,6 +395,125 @@
       "note": "Each vertex of the lower part of the beak, in the box of the beak and below the mouth plane, follows the jaw only (tools/blender/penguin_beak.py). The corners of the mouth lie on the plane and stay on the head."
     }
   },
+  "raise": [
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          -0.0045,
+          -0.1736,
+          0.0258,
+          0.9845
+        ],
+        "upper_arm": [
+          0.3446,
+          0.5847,
+          -0.5496,
+          -0.4872
+        ],
+        "forearm": [
+          0.0059,
+          0.0353,
+          0.0458,
+          0.9983
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the raised arm L of the clarinetist@penguin (pnpm raise-fit), which also holds the trumpeter@penguin. The shared hold turns the upper arm 122 degrees from the bind, and the front of the flipper root folds (faces 3691 to 3711, 3046, 3050, 1843, and 1844) in each sample of the play."
+    },
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          -0.1526,
+          -0.3933,
+          0.7058,
+          0.5691
+        ],
+        "forearm": [
+          0.0059,
+          0.0353,
+          0.0458,
+          0.9983
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the raised arm L of the cellist@penguin (pnpm raise-fit). The shared hold turns the upper arm 111 degrees from the bind, and the same faces fold in each sample of the play."
+    },
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "upper_arm": [
+          -0.276,
+          -0.5146,
+          0.2072,
+          0.7849
+        ],
+        "forearm": [
+          0.0059,
+          0.0353,
+          0.0458,
+          0.9983
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the left flipper of the cellist@penguin at rest (pnpm raise-fit --sets rest). The rest hold turns the upper arm 77 degrees from the bind, and the same faces fold in each rest sample."
+    },
+    {
+      "side": "L",
+      "turns": {
+        "clavicle": [
+          -0.0077,
+          -0.2923,
+          0.025,
+          0.956
+        ],
+        "upper_arm": [
+          0.4331,
+          0.4588,
+          -0.6587,
+          -0.4099
+        ],
+        "forearm": [
+          0.0059,
+          0.0353,
+          0.0458,
+          0.9983
+        ]
+      },
+      "fade": [
+        10,
+        20
+      ],
+      "below": 0,
+      "note": "The shape of the left flipper of the trumpeter@penguin at rest (pnpm raise-fit --sets rest). The rest hold turns the upper arm 132 degrees from the bind, and the same faces fold in each rest sample."
+    }
+  ],
+  "raiseNote": "Four corrective shapes of the left flipper in recast roles (pnpm raise-fit), which is the limit of a body. The shared holds turn the flipper 75 to 140 degrees from the hanging bind, and the clavicle only up to about 35 degrees. The weights go from the clavicle to the arm in about 0.04 u at the front of the root, so the linear blend crushes the front of the root. The singer does not reach these turns, so its pose has no shape weight. A shape of the flutist@penguin (137 degrees) turned over more faces after the relax than before, so the flute has no shape.",
   "refine": {
     "rings": [],
     "flip": {
