@@ -376,13 +376,13 @@ role (`ACCEPTED_GRIPS`), which is a question of the pose. So it reads the twist 
 frame of the posed forearm (`GripFrames`): the axis from the elbow to the wrist, and the elbow
 axis of the retarget. The palm comes from the hand of the player, and the zero is its hanging arm
 with the palm inward. A new bind of the same pose then keeps each grip, and one entry of a role
-holds for each body. A paw that faces its tube in a shared wind hold with the elbow rule (the flute
-and the clarinet, design 5.3) has the palm turn in place of the grip turn: the angle between its
+holds for each body. A paw that faces its tube in a shared wind hold with the elbow rule (the flute,
+the clarinet, and the right paw of the trumpet, design 5.3) has the palm turn in place of the grip turn: the angle between its
 palm and the palm of the accepted player of the role, both in the axes of the instrument
 (`ACCEPTED_PALMS`). Reason: the hold keeps such a paw on its keys while the elbow rule turns the
 forearm of a round body, and a real player keeps the turn of the hand on the instrument with any
-build of the arm. The shared trumpet hold keeps the grip turn, because it does not roll the paws
-to the tube, so each paw turns with its forearm. The bowed holds keep it too: no bowed cell of the
+build of the arm. The left paw of the shared trumpet keeps the grip turn, because the hold does not
+roll it to the tube, so it turns with its forearm. The bowed holds keep it too: no bowed cell of the
 cast matrix fails on it, and the bow paw holds the bow.
 
 A new bind of the same bone pose moves the zero of the lines that count from the bind
