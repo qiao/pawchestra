@@ -204,22 +204,25 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   chair fits the legs, and a species with short arms plays a smaller instrument in place of
   longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
   source file stays unchanged and a run gives the same bytes again.
-- **Replacing body.** A new body of a species keeps the look of its old body in the app view: the
-  chair, the seat, the leg length, the head size, the trunk length, and the body shape. The shape is
-  the width and the depth of the trunk at 10 heights from the seat to the neck joint, the girths of
-  the upper arm, the forearm, the thigh, and the shin at their middles, the knee and the ankle gaps
-  from the front, and the distance of the shoulder joints. Each value of the seated bind stays
-  within 15% of the old body. From the side, the back line is the rear outline at 10 heights behind
-  the line from the hips joint to the neck joint. Its bulge behind the line from the waist to the
-  neck stays within 1 cm of the bulge of the old body. The rig sets them with the form keys of "Mesh
-  rig" (`girthProfile`, `armGirth`, `legGirth`) and the leg turns of the seat (`studio.legTurns`),
-  because a mesh of a new source gives the same animal another build. A width row of `girthProfile`
-  at the shoulder joints moves the joints and the arm roots in together, so the arm root keeps its
-  form. The arms then hang nearer to the trunk, and the hold turns the elbows out where they go into
-  the body (5.3). On a T-pose body, the cut near the armpits goes through the level arm roots, and
-  the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
-  width row measures the arm roots, and a width row of `girthProfile` does not change it: the
-  images of the app view judge that height.
+- **Replacing body.** A new body of a species keeps three things of its old body in the app view:
+  the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
+  girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body
+  (a smaller head, a soft brow, thinner arms) made the cat differ from its own mesh, and its paws
+  then looked too large. The leg factors stretch the legs to the old seat, so the stretched legs take
+  a girth across their axes (`legGirth`) that keeps more of the stocky look of the legs of the
+  mesh: of the girth variants, the one whose mid thigh and mid shin widths, as a share of the head
+  height and of the hip width, are nearest to the mesh. The leg turns of the seat
+  (`studio.legTurns`) keep the knees of the old body. The trunk length and the trunk shape stay a
+  product choice of the form keys of "Mesh rig" (`trunkFactor`, `girthProfile`). `pnpm body-shape`
+  measures the seated bind: the width and the depth of the trunk at 10 heights from the seat to the
+  neck joint, the girths of the limbs at their middles, the knee and the ankle gaps from the front,
+  the distance of the shoulder joints, and the bulge of the back line behind the line from the
+  waist to the neck. A width row of `girthProfile` at the shoulder joints moves the joints and the
+  arm roots in together, so the arm root keeps its form. The arms then hang nearer to the trunk,
+  and the hold turns the elbows out where they go into the body (5.3). On a T-pose body, the cut
+  near the armpits goes through the level arm roots, and the trunk share of the painted weights
+  (`weights.paintedBelow`) counts them as trunk. So that width row measures the arm roots, and a
+  width row of `girthProfile` does not change it: the images of the app view judge that height.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -437,19 +440,22 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
 - The cat sits on the chair of the cat of its old mesh, as a product choice: the T-pose mesh has
-  short legs, a long trunk, and a wide head, which read as a large head on a lean body in front of
-  a low chair. So its legs are longer than the legs of the mesh, its trunk is shorter
-  (`trunkFactor`), and its head is smaller (`headFactor`), so that the body has the part ratios
-  of the old cat, and the head has the width of the old head for its height. The shin grows
-  more than the thigh (`shinFactor`): a long thigh puts the feet forward, and the deeper footprint
-  moves the seats of each demo (4.2).
+  short legs and a long trunk, which read as a lean body in front of a low chair. So its legs are
+  longer than the legs of the mesh, and its trunk is shorter (`trunkFactor`). The head, the arms,
+  the paws, and the tail keep the form of the mesh ("Replacing body"). The shin grows more than the
+  thigh (`shinFactor`): a long thigh puts the feet forward, and the deeper footprint moves the
+  seats of each demo (4.2). The seat top of the old chair stays fixed (`sit.top`), because the
+  root of the tail sets the lowest point of the body over the seat. The tail goes left along the
+  back of the haunch and hangs over the left side of the seat in front of the back post
+  (`studio.tailBind`), as the tail of a cat on a stool. A tail that keeps the curl of the mesh
+  points back past the chair and makes the footprint deeper, which moves the seats.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
   old panda. The vertical shin lifts the seat by its full length and the sloped thigh by less
   than half, so the shin grows more than the thigh (`shinFactor`). Its head is smaller than the
-  head of the mesh (`headFactor`), so that the head has the width of the old head for its height,
-  as on the cat. The smaller head moves the mouth back, so the trombone hold of the panda puts the
+  head of the mesh (`headFactor`), so that the head has the width of the old head for its height.
+  The smaller head moves the mouth back, so the trombone hold of the panda puts the
   right elbow further out and the rest place further forward (5.2, 5.3).
 - The rabbit sits on the chair of the rabbit of its old mesh, as a product choice: the seat top
   and the chair depth of that rabbit, with the hips joint as high. The haunch of the T-pose mesh
