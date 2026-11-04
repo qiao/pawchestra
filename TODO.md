@@ -633,6 +633,15 @@ passes.
       took the clarinetist R from 16 to 13 and the cellist R from 10 to 7, but grew the
       clarinetist R stretch from 0.20 to 0.25 (`FAIL` on the margin, `MOVES` of
       `--explain stretch`). Fix the paw faces first.
+- [ ] Penguin recast folds: four left flipper `raise` shapes (the limit) put 7 of 12 recast arms
+      under 8 (base 6). Open: the flutist L 26 (the front root and the flipper tip; a flute shape
+      at 137° turned over more faces after the relax), the clarinetist L 11 and R 12, and the
+      cellist L 10 in the lift. In the flute and clarinet holds the shared grip curls the fingers
+      125° to 176°, and the flipper tip folds (faces 1894 to 1899, 2903, 2907). A flipper needs a
+      smaller curl in a recast hold (pose code), or a rig with no finger bone weight at the tip.
+- [ ] Badger recast folds: four arm `raise` shapes (the limit) put 7 of 10 recast arms under 8
+      (base 3). Open: the cellist L 15 (play and lift; a cello shape gave the percussionist 4 more
+      folds), the clarinetist R 10, and the violinist R 10. No shape is free.
 - [ ] Cast matrix sizes: the violin, the viola (`hold-reach`), the cello (`cello-size.ts`), the
       trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
       instruments keep the scale 1 in a recast. The real viola sizes come from a chart of body lengths, times the ratio of a full
