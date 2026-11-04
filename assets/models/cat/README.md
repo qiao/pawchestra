@@ -8,7 +8,10 @@ and the rigged copy. The app does not serve these files. It loads the module
 cat-tpose.glb                      source mesh (`armSource` of tools/mesh-rigs/cat.json)
    │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
    v
-cat-arms.glb + cat-weights.json    `source` and `paintedWeights` of tools/mesh-rigs/cat.json
+cat-arms.glb + cat-weights.json    `source` of tools/mesh-rigs/cat.json
+   │  tools/blender/cat_root.py    more clavicle weight at the right armpit
+   v
+cat-root-weights.json              `paintedWeights` of tools/mesh-rigs/cat.json
    │  pnpm rig-mesh cat
    v
 cat.rig.glb                        rigged mesh
@@ -27,6 +30,7 @@ src/models/studio/cat.ts           studio body of the app
 | `cat-tpose.glb` | Source mesh (below) | None |
 | `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
+| `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
 | `cat.rig.glb` | Output of the rig. License as `cat-tpose.glb` | `pnpm rig-mesh cat` |
 
 ## cat-tpose.glb
@@ -83,12 +87,28 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"ga
 | `cat-arms.glb` | 1,117,708 bytes | `534753ea563f0e71e438485a3b481535c26406b04571733aaf316f062f1cb6e2` |
 | `cat-weights.json` | 443,441 bytes | `02b0339c3aec91562a2f2f116c9926b79bade46a9b595ce3fc5d1de12edfb948` |
 
+## cat-root-weights.json
+
+The faces of each armpit (`rigidPainted`) take one mean weight, with 0.27 on the clavicle and 0.73
+on the upper arm. In the recast violin, cello, flute, and clarinet holds, the right arm reaches
+across the chest. The right armpit patch then swings to the front of the chest, and the cut of the
+body at the arm root folds over the arm vertices beside it: the sweep measured them 2.2 cm to
+2.6 cm in the body (design 9.3). `tools/blender/cat_root.py` gives the right patch the clavicle
+share 0.52, so that it joins the body, and each other vertex of the right arm root with a clavicle
+share of 0.1 to 0.32 at least 0.4, so that the weights fade to the arm. The places and the other
+bones stay. The left side keeps its weights: with the same change, the rest folds of the left arm
+of the violist grew from 3 to 6. A run gives the same bytes.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `cat-root-weights.json` | 443,342 bytes | `569fd8f343afcca51e7695e5d1e23a2d1235303137485ac1c12530fc10d8c149` |
+
 ## cat.rig.glb
 
 | Item | Value |
 |---|---|
-| Size | 825,140 bytes |
-| SHA-256 | `840b652c391ea46254f445e9b2e1b4e9b44f982a6d2573db300ef65d73b3d96d` |
+| Size | 825,144 bytes |
+| SHA-256 | `74058c8815c17469ac22b6d6556916ca68edbcb14cb7bd9c5149914985b98ecd` |
 | Form | The thigh 1.6 and the shin 2.4 times as long as on the source, and the thigh 1.4 times as thick (`legFactor`, `shinFactor`, `legGirth`), so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.300 m high, 0.46 m wide, and 0.343 m deep. The trunk from the hips joint to the chest joint is 0.6 times as long (`trunkFactor`, `trunkTop`), so that the trunk from the hips joint to the neck joint is 1.61 H (that cat 1.49 H). The head and the ears are 0.85 times as large, around the neck joint (`headFactor`), so that the head is as wide for its height as the head of that cat. The sharp edges of the brow are softened (`soften`), so that the brow does not read as worried. The body comes near the shape of that cat on the seated bind: the upper arm 0.67 and the forearm 0.87 times as thick (`armGirth`); a flatter and narrower belly, a deeper chest, narrow shoulders (the shoulder joints 0.238 m apart, that cat 0.212 m), and a straight back into the neck (`girthProfile`); and the thighs 1 degree out in place of 8, so that the legs are close and parallel from the front (`studio.legTurns`) |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
 | Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
