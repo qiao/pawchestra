@@ -273,7 +273,7 @@ The rest of each family:
   the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
   lowering that keeps the elbow bent (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
-  the beaver), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is a round tube with its
+  the beaver, the badger), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is a round tube with its
   full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
   into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
@@ -364,7 +364,9 @@ The rest of each family:
   strike further in than a real timpanist (`PercussionHold.rim`). The short arms of the badger
   cannot hold hand cymbals out of the round body, so it plays a suspended cymbal
   (`SpeciesParams.cymbalForm`). The xylophone bars are smaller than real bars, so the short arms
-  reach each one.
+  reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
+  points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
+  stay out of the leaning belly. A home further out misses the bars.
 
 **Piano** (`pose/hands.ts`, `pose/piano-keys.ts`, piano):
 
