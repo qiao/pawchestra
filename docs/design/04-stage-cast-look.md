@@ -471,7 +471,9 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
   must drop to it. The wider thighs also close the knees, so the thighs turn further out and the
   shins further in (`studio.legTurns`). The neck and the trunk below the chest are longer
   (`neckFactor`, `trunkFactor`), and the head is smaller (`headFactor`), so that the head does not
-  sit on the shoulders.
+  sit on the shoulders. The deep sit pulls the back of the haunch far down, so the tail ball and
+  the haunch near it move down together (`sit.carryTail`, `sit.tailSpread`), and the ball keeps
+  the round form of the mesh.
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.

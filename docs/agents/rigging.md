@@ -280,6 +280,8 @@ after a new body with `armSegments`.
 - Short or sloped thighs set the seat top far under the hips. End the seat where the thighs leave
   it (`chair.front`).
 - A tail root moves the seat top. Give the sit a fixed top from the final `--check` (`sit.top`).
+- A large sit drop stretches the faces under a tail ball into a column. Carry the ball and the
+  haunch near it (`sit.carryTail`, `sit.tailSpread`).
 - A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
   bones.
 - A tip bone turned more than about 100° off the curl of the mesh pinches the bend. Spread the

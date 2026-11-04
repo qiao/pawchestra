@@ -604,6 +604,9 @@
     "smooth": 6,
     "end": 0.02,
     "most": 0.1,
+    "carryTail": true,
+    "tailSpread": [0.03, 0.1],
+    "tailNote": "The drop of the sit is up to 0.097 units at the back of the haunch, and the tail ball stays on its bone, so the faces under the ball stretched into a column that ended 11.2 cm below it (1.1 cm on the mesh). With carryTail, the ball moves down with the mean drop of the ring of the haunch around it, 0.067 units (sit() of tools/blender/rig_mesh.py). The ring drops 0.024 to 0.097 units, so with tailSpread the haunch within 0.03 units of the ball moves with the ball, with a share that falls to 0 at 0.1 units (tail_spread()). The ball keeps the three widths of the mesh ball, and the ring now ends 1.4 cm below it. A spread from 0 to 0.04 units left a point above the ball from the back, and a carry of 0.55 of the drop left a short cone under it.",
     "note": "The underside of the haunch goes down onto the seat in the seated bind, with the rule of the fox (sit of tools/mesh-rigs/fox.json). The drop fades over the last 0.02 units of the haunch, where the haunch meets the tail ball, so that no face between them turns over. The haunch of the T-pose mesh ends 4.6 cm higher under the hips joint than the haunch of the A-pose rabbit, and the wide thighs (legGirth) set the seat top 5.2 cm under the haunch. So the drop can be up to 0.1 units (most), and the haunch comes down onto the seat, as on the A-pose rabbit. With 0.045, the haunch stayed 6.5 cm above the seat from the side."
   }
 }
