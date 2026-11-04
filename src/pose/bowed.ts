@@ -603,6 +603,7 @@ export function stopHandAt(
  * @param place The place of the instrument.
  * @param strings The strings at their posed place.
  * @param out The hand of the player to write.
+ * @param at The place of the grip on the target `fingerboard`: 0 at the nut, 1 at the end.
  * @returns `out`, with the wrist and the rotation of the hand.
  */
 export function restHandAt(
@@ -610,9 +611,10 @@ export function restHandAt(
   place: InstrumentPlace,
   strings: StringsPlace,
   out: StopHand,
+  at: number = rig.hold.restPlace,
 ): StopHand {
   const hold = rig.hold;
-  stopHandAt(rig, place, strings, hold.restPlace, hold.restCurlL, 0, MIDDLE_FINGER, out);
+  stopHandAt(rig, place, strings, at, hold.restCurlL, 0, MIDDLE_FINGER, out);
   // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
   palmNormal.set(1, 0, 0).applyQuaternion(out.rotation);
   out.wrist.addScaledVector(palmNormal, -hold.restGapL);
@@ -620,7 +622,7 @@ export function restHandAt(
     onInstrument(
       rig,
       place,
-      stopPoint.fromArray(rig.nut).addScaledVector(neck.fromArray(rig.neck), hold.restPlace),
+      stopPoint.fromArray(rig.nut).addScaledVector(neck.fromArray(rig.neck), at),
     );
     rollPivot
       .copy(strings.top)
