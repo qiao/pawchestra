@@ -919,10 +919,10 @@ const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
 /**
  * The girth of the left arm of the body that each shared hold fits, in meters
  * (`BowedHold.girthGap`, design 5.3): the girth of the wrist end of the forearm of the rabbit for
- * the violin (`wristGirth()`). A thicker body moves its left paw further off the neck by the
- * difference.
+ * the violin (`wristGirth()`), and the girth of the paw of the dog for the cello (`pawGirth()`). A
+ * thicker body moves its left paw further off the neck by the difference.
  */
-const GIRTH_FIT = { violin: 0.048 } as const;
+const GIRTH_FIT = { violin: 0.048, cello: 0.052 } as const;
 
 /**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
@@ -1025,10 +1025,16 @@ const LAP_CELLO_BOW = {
  * instrument. At 0.6, the paw holds the fingerboard at the top of the upper bout, so the left
  * forearm or the left paw goes into the upper bout at rest and in the moves: the forearm of the
  * recast red fox 3.9 cm, and the paw of the bear 3.5 cm (0.1 cm and 1.6 cm at 0.4).
+ *
+ * A thicker paw holds the neck further off (`girthGap`): the gap of the left paw grows by the
+ * girth of the paw over the girth of the dog, in the play, at rest, and in the moves. A thick paw
+ * otherwise goes into the neck: the paw of the recast panda went 1.9 cm into the neck in 83% of
+ * the play samples and 1.9 cm in the moves, and with the rule less than 1.0 cm and 0.0 cm.
  */
 const CELLO_HOLD = {
   ...FLOOR_HOLD,
   roundArms: ROUND_ARMS_FIT.cello * MathUtils.DEG2RAD,
+  girthGap: { wrist: null, paw: GIRTH_FIT.cello },
   lean: 3 * MathUtils.DEG2RAD,
   reach: 30 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
@@ -1239,6 +1245,7 @@ const DOG_HOLD = {
   restPoleR: [1.2, -1, 0.75],
   restPoleL: [-2, -1, 0],
   roundArms: null,
+  girthGap: null,
   restPlace: 0.6,
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
   fit: null,
