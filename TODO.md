@@ -514,7 +514,8 @@ passes.
       the play (20° at the full rule) cleared the polar bear (1.2 cm) and the moves of the panda,
       but the violin of the penguin went 1.0 cm to 1.3 cm deeper into the belly in the moves. Next:
       the tilt with a path of the carried violin that keeps off the belly, or a thinner wrist end
-      of the rebuilt arms.
+      of the rebuilt arms. The rest grip of the rule moves the left forearm of the recast elephant
+      1.5 cm into the upper bout in one lowering sample (1.3 cm before).
 - [ ] Violin lift on a pronated bind paw (5.2): the left paw turns through the direction of no
       paw twist, so the carried violin turns about 240° with it in the middle of the move (the
       deer at `lift50`, `reports/2026-11-01-violin-hold/`). The role-neutral bind supination of
