@@ -268,10 +268,10 @@
   "studio": {
     "legTurns": {
       "thigh": [
-        0.562746,
-        0.022581,
-        -0.068456,
-        0.823481
+        0.566384,
+        0.020501,
+        -0.039956,
+        0.822917
       ],
       "shin": [
         0.041554,
@@ -324,7 +324,7 @@
       "R": 50
     },
     "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 97 degrees and the right 50 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix and the trombone smallest (design 4.4): about 140 degrees on the left (the flute and the snare drum) and 94 degrees on the right (the snare drum and the trombone). Three probes of pnpm bind-supination gave 101 and 50 on the straight rig, then 97 and 50, then no change.",
-    "note": "The posture of design 5.2: the thigh slopes 25 degrees down and 8 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 8 0). The foot and the toes keep the turn of the source, so that the soles stand flat on the floor. The tail has one bone, so it needs no bind direction."
+    "note": "The posture of design 5.2: the thigh slopes 25 degrees down and 5 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 5 0). So the feet stand near each other as on the panda of the A-pose mesh: the ankle gap is 23.7 cm (old 20.4 cm, 24.9 cm with 8 degrees out), and the knee gap 15.0 cm (old 15.7 cm, 15.6 cm with 8 degrees). A shin turned 3 degrees in gave the ankle gap 23.5 cm, and the left side folded 7 faces in the play (5 with the thighs 5 degrees out, pnpm fold-probe trombonist). The foot and the toes keep the turn of the source, so that the soles stand flat on the floor. The tail has one bone, so it needs no bind direction."
   },
   "weights": {
     "armSplit": 0.17,
