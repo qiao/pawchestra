@@ -366,9 +366,10 @@ The rest of each family:
   `gapL`), in the play, at rest, and in the moves. Thus the paw keeps the free gap of the accepted
   player. A thinner paw keeps the gap of the hold, and the own holds have no rule. Reason: a real
   player holds the neck with the fingers and keeps the forearm free of the body of the instrument
-  (strings 1.9), and the gap of the hold fits a thin paw. The shared violin hold has no rule. Reason: the paw at rest keeps its hanging wrist, so a rest gap from the girth of the
-  wrist moved the violin into the belly of the heavy bodies, and a gap along the normal of the
-  palm does not move the thick wrist out of the upper bout in the play.
+  (strings 1.9), and the gap of the hold fits a thin paw. The shared violin hold has no rule.
+  Reason: the paw at rest keeps its hanging wrist, so a rest gap from the girth of the wrist moved
+  the violin into the belly of the heavy bodies, and a gap along the normal of the palm does not
+  move the thick wrist out of the upper bout in the play.
 - **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
   near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
