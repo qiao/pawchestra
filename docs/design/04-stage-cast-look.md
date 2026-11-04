@@ -198,13 +198,18 @@ above it fold when the arm lifts. So the badger copy splits its crease too
   longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
   source file stays unchanged and a run gives the same bytes again.
 - **Replacing body.** A new body of a species keeps the look of its old body in the app view: the
-  chair, the seat, the leg length, the head size, the trunk length, and the body shape. The shape
-  is the width and the depth of the trunk at 10 heights from the seat to the neck joint, the
-  girths of the upper arm, the forearm, the thigh, and the shin at their middles, and the knee
-  and the ankle gaps from the front. Each value of the seated bind stays within 15% of the old
-  body. The rig sets them with the form keys of "Mesh rig" (`girthProfile`, `armGirth`,
-  `legGirth`) and the leg turns of the seat (`studio.legTurns`), because a mesh of a new source
-  gives the same animal another build.
+  chair, the seat, the leg length, the head size, the trunk length, and the body shape. The shape is
+  the width and the depth of the trunk at 10 heights from the seat to the neck joint, the girths of
+  the upper arm, the forearm, the thigh, and the shin at their middles, the knee and the ankle gaps
+  from the front, and the distance of the shoulder joints. Each value of the seated bind stays
+  within 15% of the old body. From the side, the back line is the rear outline at 10 heights behind
+  the line from the hips joint to the neck joint. Its bulge behind the line from the waist to the
+  neck stays within 1 cm of the bulge of the old body. The rig sets them with the form keys of "Mesh
+  rig" (`girthProfile`, `armGirth`, `legGirth`) and the leg turns of the seat (`studio.legTurns`),
+  because a mesh of a new source gives the same animal another build. A width row of `girthProfile`
+  at the shoulder joints moves the joints and the arm roots in together, so the arm root keeps its
+  form. The arms then hang nearer to the trunk, and the hold turns the elbows out where they go into
+  the body (5.3).
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
