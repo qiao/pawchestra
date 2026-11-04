@@ -374,6 +374,15 @@ const FOX_HANG = [20, 20] as const;
 const ROUND_ARMS_FIT = { flute: 23, clarinet: 12, trumpet: 16 } as const;
 
 /**
+ * The mouth share of the body that the shared trumpet hold fits (`WindHold.farMouth`, design
+ * 5.3): the share of the monkey (0.90), so a body with a mouth further in front of the shoulders
+ * bows the head. The flute has no rule: with the bow, the wolf and the beaver flutists failed the
+ * grip turn of the left paw, and the forearms of the heavy bodies stayed in the turned head. A
+ * lift of the head made them deeper.
+ */
+const FAR_MOUTH_FIT = 0.9;
+
+/**
  * The holds of the winds. In the rest pose, each instrument moves off the mouth, to the side and
  * a little forward, and tilts, so that the arms that hold it stay out of the body (design 5.3).
  */
@@ -504,12 +513,15 @@ export const WIND_HOLDS = {
   },
   // Both shoulder bones turn 34° forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
   // as the shoulder blades of a real player slide forward. With square shoulders, the paws of most recast
-  // bodies miss the valves, also with the smallest trumpet of the size rule of the winds.
+  // bodies miss the valves, also with the smallest trumpet of the size rule of the winds. A body
+  // with a far mouth bows the head, and the trumpet turns down with it (farMouth): with the head
+  // up, the paws of 11 recast bodies missed the valves by 9 mm to 229 mm.
   trumpet: {
     ...WOODWIND,
     reach: 34 * MathUtils.DEG2RAD,
     reachL: 34 * MathUtils.DEG2RAD,
     roundArms: ROUND_ARMS_FIT.trumpet * MathUtils.DEG2RAD,
+    farMouth: FAR_MOUTH_FIT,
     poleL: [-0.5, -1, -1],
     poleR: [1, -1, -1],
     restPoleL: [-1, -1, -1],
