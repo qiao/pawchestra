@@ -461,11 +461,12 @@ The app follows these facts:
   at the left of the head (`play`).
 - **The size rule of the winds (2.1, 2.4, 3).** A recast trumpeter, clarinetist, or flutist plays
   a smaller instrument when its arms are short (`windRule()` of `tools/wind-size.ts`, design 4.6).
-  The smallest size is the smallest instrument with the same hold and fingering, over the standard
-  instrument. A pocket trumpet is 24 cm long [71]. The trumpet of the app is 0.85 of a trumpet of
-  0.48 m, and no source of this list gives that length. An E-flat clarinet is about 49 cm long
-  [72], and a B-flat clarinet about 60 cm [73]. A piccolo is about 33 cm long [74], and a flute
-  about 66 cm [75]. The piccolo has the fingering of the flute [76]. A child with short arms can
+  The smallest size is the smallest instrument with the same hold and fingering, at the share of
+  the real length that the app shows (0.85, `BRASS`, `WOODWINDS`). A pocket trumpet is 24 cm long
+  [71], an E-flat clarinet about 49 cm [72], and a piccolo about 33 cm [74]. The app takes a
+  trumpet of 0.48 m and a clarinet and a flute of 0.67 m as the standard. A flute is about 66 cm
+  long [75]. One source gives about 60 cm for a B-flat clarinet [73], and no source of this list
+  gives the length of a trumpet. The piccolo has the fingering of the flute [76]. A child with short arms can
   also play a flute with a curved head joint [77]. The app does not show that head, and it scales
   the whole flute. No source gives a larger instrument with the same hold, so the largest size is
   the size of the app.

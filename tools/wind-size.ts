@@ -9,6 +9,8 @@
  *
  * Usage: node tools/wind-size.ts <trumpet | clarinet | flute> [<species>,...]
  */
+import { BRASS } from '../src/models/instruments/brass.ts';
+import { WOODWINDS } from '../src/models/instruments/woodwinds.ts';
 import { SCALE_PARAMS, SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import { windReach } from './hold-reach.ts';
@@ -30,19 +32,23 @@ export function isSizedWind(instrument: string): instrument is SizedWind {
 }
 
 /**
+ * The share of the real length of a trumpet, a clarinet, or a flute that the app shows, as for the
+ * violin (`BRASS`, `WOODWINDS`).
+ */
+const APP_SHARE = 0.85;
+
+/**
  * The real sizes of each wind, as a factor of the instrument of the app, which stands for the
- * standard instrument (`docs/reference/wind-technique.md`, section 4.2, "The size rule of the
- * winds"). The smallest size is the length of the smallest instrument with the same hold and
- * fingering over the length of the standard instrument: a pocket trumpet of 24 cm over the trumpet
- * of 0.48 m that the app shows at 0.85, an E-flat clarinet of 49 cm over a B-flat clarinet of
- * 60 cm, and a piccolo of 33 cm over a flute of 66 cm. The largest size is the size of the app,
- * because a player with long arms bends the elbows more, and no larger instrument has the same
- * hold.
+ * standard instrument at {@link APP_SHARE} of its real length (`docs/reference/wind-technique.md`,
+ * section 4.2, "The size rule of the winds"). The smallest size is the smallest instrument with the
+ * same hold and fingering: a pocket trumpet of 24 cm, an E-flat clarinet of 49 cm, and a piccolo
+ * of 33 cm. The largest size is the size of the app, because a player with long arms bends the
+ * elbows more, and no larger instrument has the same hold.
  */
 export const REAL_WIND_SIZES = {
-  trumpet: { smallest: 0.24 / 0.48, largest: 1 },
-  clarinet: { smallest: 49 / 60, largest: 1 },
-  flute: { smallest: 33 / 66, largest: 1 },
+  trumpet: { smallest: (0.24 * APP_SHARE) / BRASS.trumpet.length, largest: 1 },
+  clarinet: { smallest: (0.49 * APP_SHARE) / WOODWINDS.clarinet.length, largest: 1 },
+  flute: { smallest: (0.33 * APP_SHARE) / WOODWINDS.flute.length, largest: 1 },
 } as const satisfies Readonly<Record<SizedWind, { smallest: number; largest: number }>>;
 
 /**
