@@ -537,16 +537,16 @@ passes.
       flute rest and moves, clarinet), and the upper arm of the pig 1.8 cm to 2.8 cm into the
       shoulder of the mesh at 0.06 to 0.20 (violin, clarinet). No pose rule clears them
       (`reports/2026-11-04-posed-clear/`): an elbow turn up to the stop of `turnPoleOut()` (cat
-      clarinet 1.4 cm, but grip L 62/45), 11° more lift (0.1 cm to 0.7 cm less), an elbow out in
+      clarinet 1.4 cm, but grip L 62/45 from the forearm, which the palm turn now replaces, so
+      try it again), 11° more lift (0.1 cm to 0.7 cm less), an elbow out in
       the middle of the bow moves (cat violin 1.7 cm), 15° to 30° more forward turn of the
       shoulder (cat cello 2.1 cm), and a reach limit of the bow paw (no change). Next: the
       weights or the shape of the arm root of the cat and the pig in a rig round, then a matrix.
-- [ ] Grip line of a turned elbow (5.3, `tools/arm-check.ts`): the grip line counts from the
-      posed forearm, so the elbow turn of `roundArms` adds to it, and the paws stay on their
-      keys: in the 2x crops of the dog and the rabbit flutists and the hippo clarinetist, and in
-      `arm-check --world` with no elbow rule (elbows move up to 12 cm, palms turn at most 4.5°).
-      Count the grip of a paw in a shared hold from the instrument. Then the rabbit and the pig
-      flutists and the dog flutist and clarinetist have no other fault (`reports/2026-11-04-posed-clear/matrix.md`).
+- [ ] Right paw of the shared trumpet (4.4, 5.3): the hold does not roll the paws to the valves
+      (`faceTube` none), so the gate keeps the grip turn from the forearm. In the axes of the
+      trumpet, the right palm of each recast body turns 53° to 68° from the palm of the monkey.
+      Check the right paw in 2x crops against a real player, and give the hold a tube face if
+      the paw misses the valves. Then the palm turn can count it (`ACCEPTED_PALMS`).
 - [ ] Percussion holds (5.3): the badger plays the shared percussion holds as its own holds, so
       they have no elbow rule. Give them a fit of the badger (`armOut()` 42° and 44°), so that a
       rounder recast body turns its elbows out and the badger stays the same.
