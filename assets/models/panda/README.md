@@ -126,8 +126,8 @@ shasum -a 256 assets/models/panda/panda-edge.glb
 
 | Item | Value |
 |---|---|
-| Size | 583,912 bytes |
-| SHA-256 | `54420532150d11d6b4d0ef3218c46f8f6ebc5044972c2391daabfc68ca4486bc` |
+| Size | 583,596 bytes |
+| SHA-256 | `8e105ba7ebe21a6e0e7c3cb471ccb3ed304fc5123fb030c1bec905af679a659d` |
 | Form | The thigh 1.1 and the shin 1.38 times as long as on the source (`legFactor`, `shinFactor`), and the front edge of the seat at z -0.085 (`chair.front`), so that the panda sits on the chair of the panda of the A-pose mesh: the seat top is 0.277 m high, and the chair is 0.210 m deep. The head is 0.93 times as large around the neck joint (`headFactor`), so that it is 1.128 H wide, as the head of that panda. The trunk tapers from the belly to the shoulders (`girthProfile`), the upper arms are 0.92 times as thick (`armGirth`), and the thighs turn 5° out, so that the body keeps the shape of that panda (design 4.4, `pnpm body-shape trombonist --base 7cf41074`) |
 
 A run of `pnpm rig-mesh panda` gives the same bytes.
