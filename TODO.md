@@ -271,7 +271,7 @@ passes.
 - [ ] Rabbit T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
       A-pose body there: the dark faces at the bow elbow, the V crease at the right arm root, and
       the left forearm twist step. Remove each item that the new body does not show.
-- [ ] Rabbit T-pose body: at rest, the left paw goes 0.9 cm and the left forearm 1.2 cm into the
+- [ ] Rabbit T-pose body: at rest, the left paw goes 0.6 cm and the left forearm 0.3 cm into the
       violin (0.1 cm and 0.0 cm on the A-pose body), and in the lowering the right upper arm 1.0 cm
       into the violin. Check the crops of the rest grip.
 - [ ] Rabbit T-pose body: the tone step toward the cream of the fur swatch of `rabbit-views.png` is
@@ -305,9 +305,13 @@ passes.
 - [ ] Rabbit T-pose body: the footprint of the old chair is 1.9 cm shorter (0.669 m, 0.688 m
       before), so the stage of bach-bwv1047 is 0.8% and of bach-bwv1048 0.4% smaller, and the
       other players there move. Find the part that moved (the feet or the back of the haunch).
-- [ ] Rabbit violinist: at rest, the raised arms lift the shoulders, so the neck of the new body
-      shows less than in the bind (the chin is 7.7 cm above the shoulder tops in the bind). Check it
-      again after the rabbit takes the rest pose of the cat round.
+- [ ] Rabbit violinist: at rest, the right elbow is 9.5 cm out of the shoulder (A-pose rabbit
+      4.7 cm). The belly is widest at the elbow, so the hanging arm keeps the elbow out for each
+      angle. The A-pose rabbit kept the elbow in with the upper arm in its belly.
+- [ ] `lapPoint()` of `pose/lap.ts`: on the long belly of the T-pose rabbit, at 0.5 and 0.75 of
+      the way it finds the belly (41 cm and 32 cm above the seat), and at 1 the top of the knee.
+      The rabbit rest uses 1, and the hanging arms replace both rest places, so the rabbit does
+      not show it. Find the thigh under the belly.
 - [ ] Rabbit T-pose body: after `eyeFill`, a thin light lip stays at the front of each eye from the
       side, and the right eye bone lies 1.2 cm nearer the middle than the left one.
 - [ ] `pnpm rig-mesh --check`: the standing body against the source counts the form rules that
