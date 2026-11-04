@@ -103,9 +103,10 @@ shasum -a 256 assets/models/polar-bear/*.glb assets/models/polar-bear/*.json
 
 | Item | Value |
 |---|---|
-| Size | 957,452 bytes |
-| SHA-256 | `15744c7b9be62b5b9564d7dde67a99a79fab126d75b0b753d9fa7845346db7ac` |
+| Size | 957,836 bytes |
+| SHA-256 | `dae800f8004177639cd9b38d5dffcb08340e44083081a847416d396e971fe7e0` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the piano is smallest (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow of the piano hold |
+| Arm roots | The faces under each arm root move rigidly (`weights.rigidPainted`). Without the rule, they fold when the arm hangs at rest and in the lift |
 
 A run of `pnpm rig-mesh polar-bear` gives the same bytes.
