@@ -553,14 +553,15 @@ passes.
       belly), and its forearms still go 2.1 cm into the belly. The pig moves only forward and
       misses by 11 mm. Measure the front with the hanging head of the elephant, and check a
       larger room for the rhino.
-- [ ] Front wind holds (5.3): the forearms and the paws of the recast heavy bodies go into the
-      head, and not into the belly (`pnpm pose-depth`, "into the head"): the flute of the
-      elephant, bear, hippo, panda, rhino, and mannequin (1.8 cm to 8.3 cm, left forearm under the
-      turned head), the penguin flute into the neck, and the trumpet of the elephant, bear, hippo,
-      and rhino (2.7 cm to 8.0 cm, right arm under the snout). A place from the front of the belly
-      does not move these points, and a flute with no head turn makes most of them deeper (hippo
-      11.3 cm). Next: a rule from the head, such as a lip place or elbows that fit a large low
-      head (`reports/2026-11-04-belly-front/`).
+- [ ] Front wind holds (5.3): the forearms and the paws of the recast heavy bodies go into the head,
+      and not into the belly (`pnpm pose-depth`, "into the head"): the flute of the elephant, bear,
+      hippo, panda, rhino, and mannequin (1.8 cm to 8.7 cm, left forearm under the turned head), the
+      penguin flute into the neck, and the trumpet of the elephant, bear, hippo, and rhino (2.7 cm
+      to 10.0 cm, right arm under the snout). A place from the front of the belly, the head bow of
+      the far mouth, a head lift, a left grip further along the flute, a lower left elbow, and a
+      head turn of 15° do not clear them, and the bow makes the trumpet clips of the hippo, the
+      elephant, and the rhino up to 1.3 cm deeper (`reports/2026-11-04-wind-head/`). Next: a place
+      of the left grip and the elbows from the volume of the head under the mouth.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the mannequin, the wolf, the
       deer, and the dog (own hold) pass. The cello of the foxes goes 5.0 cm into the body in the
       play, and the upper arms of the cat and the pig go up to 4.0 cm into the body. With the rest
@@ -591,11 +592,12 @@ passes.
       the deer, the monkey). The upper arms of the cat, the pig, the polar bear, and the mannequin
       go 4.1 cm to 5.3 cm into the deep chest in the play. With the size rule of the winds, the paws
       of the foxes and the beaver reach the keys, and the mouse misses them by 4.3 cm.
-- [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`, 4.6, 5.3): with the size rule of the winds and
-      both shoulders 34° forward, 11 recast bodies still miss the valves at the smallest trumpet
-      (wolf, elephant, bear, hippo, mouse, beaver, dog, pig, rhino, badger, penguin: 28 mm to
-      229 mm). The mouth is far in front of the shoulder joints, so a smaller trumpet does not
-      help. A hold change can help: a lower trumpet angle or a forward lean of the chest.
+- [ ] Shared trumpet hold (`WIND_HOLDS.trumpet`, 4.6, 5.3): with the size rule of the winds,
+      both shoulders 34° forward, and the head bow of the far mouth, the dog, the pig, and the deer
+      pass, and the wolf and the beaver are open (4 mm and 16 mm). The elephant, the bear, the
+      hippo, the mouse, the rhino, the badger, and the penguin still miss the valves at the
+      smallest trumpet (25 mm to 152 mm). Four of them need a bow of more than 30°. A trumpet that
+      turns down twice the bow also passed the wolf, but it points far below "slightly down".
 - [ ] Rabbit trumpeter in the cast matrix: with the shared shoulder turn of the trumpet, the left
       arm root folds 10 faces (limit 8). With square shoulders and the trumpet of 0.52, it passed.
 - [ ] Winds at the smallest size (4.6): the clarinet of 0.73 still misses the keys for the mouse
