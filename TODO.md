@@ -504,13 +504,17 @@ passes.
       upper arms of the pig 2.5 cm to 3.3 cm. The left paw of the dog stretches 0.56 in the lift,
       the right upper arm of the monkey goes flat (0.53 to 0.55) in the play. The polar bear folds
       22 and 12 faces (body weights).
-- [ ] Thick left wrist on the violin (5.3, matrix group 5): the wrist end of the left forearm of
-      the recast panda, polar bear, mannequin, hippo, penguin, rhino, and badger goes 1.5 cm to
-      2.0 cm into the upper bout at rest, in the moves, or in the play. A rest gap from the girth
-      of the wrist moved the violin into the belly (the elephant 6.1 cm, the bear 5.3 cm), because
-      the paw keeps its hanging wrist. A gap along the normal of the palm does not move the wrist
-      in the play. Next: move the wrist down from the back of the violin, and keep the rest
-      violin off the belly when the paw moves.
+- [ ] Thick left wrist on the violin in the play (5.3, matrix group 5): the wrist end of the left
+      forearm of the recast panda (2.0 cm in 93% of the play), hippo (1.7 cm, 37%), penguin
+      (1.6 cm, 96%), badger (1.6 cm, 5%), polar bear (1.7 cm, 1%), and mannequin (1.6 cm, 2%) goes
+      into the upper bout in the play, and of the panda, the hippo, and the penguin also in the
+      moves (1.6 cm to 1.9 cm). The rest grip of the wrist clearance cleared the rest. On the
+      panda, a move of the paw 3 cm down from the back of the violin gave 1.8 cm, 3 cm toward the
+      scroll 1.7 cm, and a turn of the elbow 2.0 cm. A further tilt of the paw over the neck in
+      the play (20° at the full rule) cleared the polar bear (1.2 cm) and the moves of the panda,
+      but the violin of the penguin went 1.0 cm to 1.3 cm deeper into the belly in the moves. Next:
+      the tilt with a path of the carried violin that keeps off the belly, or a thinner wrist end
+      of the rebuilt arms.
 - [ ] Violin lift on a pronated bind paw (5.2): the left paw turns through the direction of no
       paw twist, so the carried violin turns about 240° with it in the middle of the move (the
       deer at `lift50`, `reports/2026-11-01-violin-hold/`). The role-neutral bind supination of
