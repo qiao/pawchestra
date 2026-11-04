@@ -316,6 +316,21 @@ The rest of each family:
   keeps the shoulders down, and the clavicle rises only a little when the arm rises (winds 1.8), so
   the lift stays in that range and does not read as a shrug. Thus it clears only a part of the deep
   root clips, as on the pig (`TODO.md`).
+- **Far mouth in a shared hold.** A long snout or a big head puts the mouth far in front of the
+  shoulder joints, so the paws of a heavy body miss the valves of the trumpet, also at the smallest
+  size. The shared trumpet hold takes the rule of the far mouth (`WindHold.farMouth`): the mouth
+  share of a body is the mean distance from the bind shoulder joints to the mouth, as a share of
+  the arm (`mouthShare()`). A body with a larger share than the accepted monkey (`FAR_MOUTH_FIT`)
+  bows the head in the play by `BOW_PER_SHARE` times the difference, up to `MAX_BOW`
+  (`headBow()`). The neck and the head share the bow as they share a look, the mouthpiece follows
+  the mouth, and the trumpet turns down with the head (`bowedPlay()`). Reason: a real player brings
+  the instrument to the mouth, the neck flexion follows the downward angle of the instrument, and
+  the trumpet keeps its angle to the face (winds 1.4, 2.1). A forward lean of the chest does not
+  help, because the head and the instrument move with the chest. The shared flute has no rule: a
+  bow put the left grip of the wolf and the beaver past the accepted grip, and neither a bow nor a
+  lift moved the left forearm of a heavy body out of its turned head (`TODO.md`). The bow does not
+  clear the snout clips of the trumpet, and the heaviest bodies still miss the valves at
+  `MAX_BOW`.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
@@ -391,7 +406,8 @@ The rest of each family:
   their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). The shared trumpet hold turns both shoulder bones
   forward (`reach`, `reachL`), as the shoulder blades of a real player slide forward. Reason: with
   square shoulders, the paws of most recast bodies miss the valves, also with the smallest trumpet
-  of the size rule (4.6).
+  of the size rule (4.6). A body with a far mouth also bows the head ("Far mouth in a shared
+  hold").
 - A brass player presses the valves of the pitch (`BRASS_FUNDAMENTALS`), and the partials skip
   the flat seventh partial, as real players do (`PARTIALS`).
 - The trombone slide takes the position of the pitch, mapped into the travel that the arm
