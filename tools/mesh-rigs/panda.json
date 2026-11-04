@@ -393,6 +393,46 @@
           0.1844,
           0.555,
           0.0483
+        ],
+        [
+          0.2009,
+          0.5276,
+          -0.02
+        ],
+        [
+          0.1966,
+          0.5319,
+          0.0124
+        ],
+        [
+          0.1964,
+          0.5381,
+          0.025
+        ],
+        [
+          0.1922,
+          0.5485,
+          0.04
+        ],
+        [
+          0.1961,
+          0.5534,
+          0.0439
+        ],
+        [
+          0.196,
+          0.5595,
+          0.0495
+        ],
+        [
+          0.1957,
+          0.5723,
+          0.0567
+        ],
+        [
+          0.2088,
+          0.6004,
+          0.0642
         ]
       ],
       [
@@ -430,7 +470,7 @@
         ]
       ]
     ],
-    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the thin bridge faces at the front of each arm root, in three groups on the left and one on the right, and of one face of the upper chest under the chin. The left shoulder turns forward in the play, and the right arm hangs down to the upright trombone at rest, and these faces folded in each sample of those poses (pnpm fold-probe trombonist --faces).",
+    "rigidPaintedNote": "The corners of each group of faces at these points take the mean of their painted weights (rigid_faces() of tools/blender/rig_mesh.py, after the painted weights). The points are the middles of the thin bridge faces at the front of each arm root, in three groups on the left and one on the right, and of one face of the upper chest under the chin. The left shoulder turns forward in the play, and the right arm hangs down to the upright trombone at rest, and these faces folded in each sample of those poses (pnpm fold-probe trombonist --faces). The second group also holds the faces under the left arm root. The T-pose left arm hangs in the rest and the lift of the shared holds, and these faces folded in each such sample of the recast roles (pnpm fold-probe <role>@panda --faces). In one group with the front faces, they move as one part, and the fold does not move to the edge between two groups. A group under the right arm root folded more faces on the right side of the trombonist.",
     "fingersNote": "The fingers keep this share of their bone heat weight, and the hand takes the rest, so that the curl of the fingers does not turn over the faces of the palm side of the paw. With the share 1, three faces of each paw folded in each sample, and the arm gate failed on the folds."
   },
   "refine": {
