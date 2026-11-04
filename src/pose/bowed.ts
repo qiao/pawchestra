@@ -1007,6 +1007,40 @@ function leftPole(rig: RigPoints, weight: number, play: Vector3): Vector3 {
     : mixDirection(liftPole, play, 2 * weight - 1, play);
 }
 
+/** The right elbow in the middle of the move, for {@link rightPole}. */
+const liftPoleR = new Vector3();
+
+/**
+ * Gives the direction of the right elbow at a weight of the playing pose below 1 (design 5.2): the
+ * rest pole at the rest, the playing pole at the play, and a mix between them. With a pole of the
+ * middle of the move (`BowedHold.liftPoleR`), the elbow turns from the rest pole to it, then to
+ * the playing pole.
+ *
+ * @param rig The points of the player.
+ * @param frames The posed frames of the torso.
+ * @param weight The eased weight of the playing pose: 0 is the rest pose.
+ * @param play The playing pole, in the world axes.
+ * @param out The vector to write.
+ * @returns `out`, with the pole in the world axes.
+ */
+function rightPole(
+  rig: RigPoints,
+  frames: TorsoFrames,
+  weight: number,
+  play: Vector3,
+  out: Vector3,
+): Vector3 {
+  out.fromArray(rig.restPoleR).applyQuaternion(frames.root.rotation);
+  const midPole = rig.hold.liftPoleR;
+  if (!midPole || weight <= 0) {
+    return mixDirection(out, play, weight, out);
+  }
+  liftPoleR.fromArray(midPole).applyQuaternion(frames.root.rotation);
+  return weight < 0.5
+    ? mixDirection(out, liftPoleR, 2 * weight, out)
+    : mixDirection(liftPoleR, play, 2 * weight - 1, out);
+}
+
 /** The grip of the left paw on an instrument: the paw in the axes of the instrument. */
 interface PawGrip {
   /** The turn of the paw that the viewer sees, from the turn of the instrument. */
@@ -1474,12 +1508,7 @@ export function poseBowed(
   }
   restPole.applyQuaternion(chest.rotation);
   if (weight < 1) {
-    mixDirection(
-      holdPole.fromArray(rig.restPoleR).applyQuaternion(frames.root.rotation),
-      restPole,
-      weight,
-      holdPole,
-    );
+    rightPole(rig, frames, weight, restPole, holdPole);
   } else {
     holdPole.copy(restPole);
   }
