@@ -68,6 +68,7 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    and the factor of the forearm fades out to the wrist, so that the shoulders and the paws keep
    their form. With `legGirth`, the thigh and the shin take its factors across their axes in the
    same way (`leg_girth()`), so that a thigh that the leg factor makes long does not look thin.
+   The vertices of the tail keep their places by their tail weights.
 5. Change the faces of the arms and the legs so that they bend at the joints: with `pointFlip`
    the edge at each of its points flips first (`point_flips()`), then a ring of new
    vertices at each joint of the config splits the faces that it crosses, and the long edge of a
@@ -3101,7 +3102,7 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     new_heads = {k: v.copy() for k, v in heads.items()}
     new_ends = {k: v.copy() for k, v in ends.items()}
     if tuple(factors.get('legGirth', (1, 1))) != (1, 1):
-        verts = leg_girth(verts, heads, *factors['legGirth'])
+        verts = leg_girth(verts, heads, *factors['legGirth'], tail_share(weights))
     if tuple(factors.get('armGirth', (1, 1))) != (1, 1):
         verts = arm_girth(verts, weights, heads, *factors['armGirth'])
     matrices = [move(np.eye(3), np.zeros(3), np.zeros(3)) for _ in BONES]
@@ -3383,7 +3384,7 @@ def arm_girth(points, weights, heads, upper, fore):
     return out
 
 
-def leg_girth(points, heads, thigh, shin):
+def leg_girth(points, heads, thigh, shin, tail=None):
     """Widens the thighs and the shins of the source across their axes by the factors `thigh` and
     `shin` (`legGirth` of the config), before the skin: each point moves by its place, whatever
     its weights, because the bone heat of a short thick thigh splits its middle between the thigh,
@@ -3393,7 +3394,11 @@ def leg_girth(points, heads, thigh, shin):
     the shin. The back of the thigh (-z of the source) keeps its place, so that the seated thigh
     widens up and to the sides and keeps its underside on the seat, and the inner side stops
     `LEG_GIRTH_GAP` from the middle plane. On the shin, the share falls from all at the knee joint to 0 at the ankle joint, so that
-    the ankle keeps the width of the foot. Only the points on the side of each leg move."""
+    the ankle keeps the width of the foot. Only the points on the side of each leg move. `tail`
+    gives the weight of each point on the tail bones (`tail_share()`): a point moves only by the
+    rest of its weight, so that a tail that hangs behind the thighs keeps its form. Else the
+    stop at the middle plane squeezes the root of a tail that hangs between the legs, such as the
+    tail of the cat, to a third of its width."""
     out = points.copy()
     for side, sign in (('L', 1.0), ('R', -1.0)):
         hip, knee, ankle = (np.asarray(heads[f'{b}_{side}'], float)
@@ -3419,7 +3424,18 @@ def leg_girth(points, heads, thigh, shin):
         # The inner side stops short of the middle plane, so that the thighs do not cross it.
         out[own, 0] = sign * np.maximum(sign * out[own, 0], np.minimum(sign * points[own, 0],
                                                                         LEG_GIRTH_GAP))
+    if tail is not None:
+        out = points + (1.0 - tail)[:, None] * (out - points)
     return out
+
+
+def tail_share(weights):
+    """Gives the weight of each vertex on the tail bones: the tail, and the tail tip of a tail of
+    two bones."""
+    share = weights[:, BONES.index('tail')].copy()
+    if TAIL_TIP in BONES:
+        share += weights[:, BONES.index(TAIL_TIP)]
+    return np.clip(share, 0.0, 1.0)
 
 
 def segment_stretch(points, head, start, end, factor):
