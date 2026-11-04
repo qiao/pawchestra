@@ -324,14 +324,16 @@ export const PERCUSSION_HOLDS = {
   // from the shoulders, so that they make a V of about 66° at a strike and slant down 9°, as the
   // matched grip of a real player. Between strikes, each stick keeps its strike direction, and
   // the wrist lifts the tip over the head (across.pitch), as a real player's stroke from the
-  // wrist. With the rest direction across the forearm, the tips swing out over the rim.
+  // wrist. With the rest direction across the forearm, the tips swing out over the rim. The
+  // elbows point out, so that the rebuilt round upper arms stay out of the belly (design 5.3): with
+  // the elbows nearer to the body, they went 2.4 cm into it.
   'snare-drum': {
     hands: 'alternate',
     sizes: { lift: 0.1, rest: 0.03 },
     offsetL: [-0.04, 0, 0],
     offsetR: [0.04, 0, 0],
-    poleL: [-0.6, -1, 0.3],
-    poleR: [0.6, -1, 0.3],
+    poleL: POLE_L,
+    poleR: POLE_R,
     rim: 0,
     home: [0.5, -0.3, -0.5],
     top: 'up',
