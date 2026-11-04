@@ -276,10 +276,10 @@ The rest of each family:
   points lie on the line of the swivel, so it does not move them. A shared hold lifts the
   shoulder bones of a round body, and keeps a free paw bent in the moves ("Free round arms in a
   shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm stays
-  too: on the cat, the dog, and the pig, the root goes into the arm root or the shoulder of the
-  mesh. A larger elbow turn up to the stop of `turnPoleOut()`, a larger lift of the shoulder, an
-  elbow out in the middle of the moves, and a larger forward turn of the shoulder each took only a
-  small part of the depth, and a larger turn moves the grip line of the arm gate past its limit.
+  too: on the cat and the pig, the root goes into the arm root or the shoulder of the mesh. A
+  larger elbow turn up to the stop of `turnPoleOut()`, a larger lift of the shoulder, an elbow out
+  in the middle of the moves, and a larger forward turn of the shoulder each took only a small part
+  of the depth, and a larger turn moves the grip line of the arm gate past its limit.
   So the next approach is the weights or the shape of the arm root of these meshes (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
   the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
