@@ -1020,8 +1020,11 @@ const LAP_CELLO_BOW = {
  * bow with the tip up and leaned out and forward, away from the cello ({@link LAP_CELLO_BOW}). With
  * the grip of the dog, 0.5 H above the thigh, the bow paw of the recast rabbit, panda, monkey, and
  * mouse twisted 136° to 179° at rest, folded 10 to 11 faces at the right arm, and flipped in the
- * lift. The left paw holds the cello at 0.6 of the fingerboard with the elbow down and out, near
- * the side.
+ * lift. The left paw holds the neck at 0.4 of the fingerboard with the elbow down and out, near
+ * the side, as a real player holds the neck and keeps the forearm off the body of the
+ * instrument. At 0.6, the paw holds the fingerboard at the top of the upper bout, so the left
+ * forearm or the left paw goes into the upper bout at rest and in the moves: the forearm of the
+ * recast red fox 3.9 cm, and the paw of the bear 3.5 cm (0.1 cm and 1.6 cm at 0.4).
  */
 const CELLO_HOLD = {
   ...FLOOR_HOLD,
@@ -1039,7 +1042,7 @@ const CELLO_HOLD = {
   pluckPlace: 0.2,
   pluckSide: 0.15,
   polePizzicato: [1, -1, -0.3],
-  restPlace: 0.6,
+  restPlace: 0.4,
   restPoleL: [-0.5, -1, 0],
   restPoleR: [0.6, -1, 0.75],
   restBow: { ...LAP_CELLO_BOW, forearm: [0.3, 0.3, -1] },
@@ -1221,6 +1224,8 @@ const CAT_HOLD = {
  * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
  *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
  *   into the cello.
+ * - At rest, the left paw holds the cello at 0.6 of the fingerboard (`restPlace`), the place at
+ *   which the dog was accepted.
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
@@ -1234,6 +1239,7 @@ const DOG_HOLD = {
   restPoleR: [1.2, -1, 0.75],
   restPoleL: [-2, -1, 0],
   roundArms: null,
+  restPlace: 0.6,
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
   fit: null,
 } as const satisfies BowedHold;
