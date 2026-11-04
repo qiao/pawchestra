@@ -38,9 +38,10 @@ Run it in a terminal from the root of the tree:
 `--source` is the mesh before the rebuild: `armSource` of the config by default, else `source`.
 `--factor` makes the arms longer, 1 by default. The joints of the config are the joints of the
 longer arms, as in the species scripts. `--spec` replaces settings of `step_measure()` with the
-keys of a species script, such as `{"cut": {"shoulder": 0.3, "tilt": 20, "wrist": 0.1}}`. `--out` is
-the folder of the output files, the folder of `output` of the config by default. `--views` writes
-the check images of `cat_arms.look()`.
+keys of a species script, such as `{"cut": {"shoulder": 0.3, "tilt": 20, "wrist": 0.1}}`. Its key
+`free` replaces `FREE_RATIO` of the free test (`measure_joints()`), and its key `spread` turns on
+the UV fix of `step_spread()`. `--out` is the folder of the output files, the folder of `output`
+of the config by default. `--views` writes the check images of `cat_arms.look()`.
 
 `--keep-faces` keeps the faces of a clean quad mesh that passes `pnpm mesh-intake` (design 4.4,
 "Source meshes"). It does steps 1, 6, 7, and 8, and of step 2 only the shoulder line, the zone,
@@ -212,11 +213,11 @@ def median(values):
     return values[n // 2] if n % 2 else (values[n // 2 - 1] + values[n // 2]) / 2
 
 
-def free(hits):
-    """Tells whether each ray of a section hits the arm within `FREE_RATIO` of the median hit."""
+def free(hits, ratio=FREE_RATIO):
+    """Tells whether each ray of a section hits the arm within `ratio` of the median hit."""
     if any(h is None for h in hits):
         return False
-    return max(hits) <= FREE_RATIO * median(hits)
+    return max(hits) <= ratio * median(hits)
 
 
 def arm_sections(s, bvh, side):
@@ -234,11 +235,12 @@ def arm_sections(s, bvh, side):
     }
 
 
-def first_free(upper):
-    """Gives the first share of the upper arm from which each section up to the elbow is free."""
+def first_free(upper, ratio=FREE_RATIO):
+    """Gives the first share of the upper arm from which each section up to the elbow is free
+    (`free()` with `ratio`)."""
     out = None
     for share, hits in reversed(upper):
-        if not free(hits):
+        if not free(hits, ratio):
             break
         out = share
     if out is None:
@@ -471,13 +473,15 @@ def measure_joints(s, bm, bvh):
       free arm.
     - `gap` and `wristGap`: `GAP_SHARE` of the median radius at the elbow and at the wrist.
 
-    The shoulder line is the first free share of the upper arm (`first_free()`) plus
-    `CUT_MARGIN`, the larger of the two sides, as long as the plane finds a closed loop around the
-    arm. Gives the share of the shoulder line, and the median radii of the free upper arm and of
+    The key `free` of `--spec` replaces `FREE_RATIO`: the rays of a flat arm, such as a flipper,
+    differ in length with no trunk in the section. The shoulder line is the first free share of
+    the upper arm (`first_free()`) plus `CUT_MARGIN`, the larger of the two sides, as long as the
+    plane finds a closed loop around the arm. Gives the share of the shoulder line, and the median radii of the free upper arm and of
     the forearm in units of the studio.
     """
     sections = {side: arm_sections(s, bvh, side) for side in (1, -1)}
-    start = max(first_free(sections[side]['upper']) for side in (1, -1))
+    ratio = s.overrides.get('free', FREE_RATIO)
+    start = max(first_free(sections[side]['upper'], ratio) for side in (1, -1))
     free_hits = [
         h
         for side in (1, -1)
@@ -931,6 +935,38 @@ def step_widen(s):
     return factor
 
 
+def step_spread(s):
+    """With the key `spread` of `--spec` (a UV distance), gives each face whose corners lie more
+    than `spread` apart in the UV map the UV middle of the neighbor face with the smallest spread.
+    A collapse at a cut loop can join corners of two islands of the atlas into one face, and its
+    color samples then cross other parts of the texture, such as the orange of a beak. Each face
+    of the rig takes one color, so the face loses no detail. Gives the count of the faces, or None
+    with no `spread`."""
+    limit = s.overrides.get('spread')
+    if limit is None:
+        return None
+    bm = bmesh.new()
+    bm.from_mesh(s.mesh.data)
+    uv = bm.loops.layers.uv.active
+
+    def spread(f):
+        pts = [lp[uv].uv for lp in f.loops]
+        return max((a - b).length for a in pts for b in pts)
+
+    wide = [f for f in bm.faces if spread(f) > limit]
+    for f in wide:
+        near = [g for x in f.edges for g in x.link_faces if g is not f and spread(g) <= limit]
+        if not near:
+            continue
+        g = min(near, key=spread)
+        at = sum((lp[uv].uv for lp in g.loops), Vector((0, 0))) / len(g.loops)
+        for lp in f.loops:
+            lp[uv].uv = at
+    bm.to_mesh(s.mesh.data)
+    bm.free()
+    return len(wide)
+
+
 def step_look(s):
     """Renders the check images of the left arm (`cat_arms.look()`) when `--views` names a
     folder, with the elbow in the middle of each image."""
@@ -961,6 +997,7 @@ STEPS = (
     va.step_shape,
     step_widen,
     va.step_atlas,
+    step_spread,
     step_look,
     va.step_export,
     step_skeleton,
