@@ -386,6 +386,16 @@ The rest of each family:
   reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
   points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
   stay out of the leaning belly. A home further out misses the bars.
+- **Snare drum from the body.** The shared snare drum hold takes the place of the drum from the
+  body (`PercussionHold.fit`, `fitDrumPlace()`). The drum goes forward until its near rim stands a
+  room in front of the trunk on the middle line, from the head up to the shoulder joints. A deep
+  body also sets the head higher, toward a drop below the elbows of the hanging upper arms, as a
+  real player sets the head below the elbows (percussion 6). The raise grows with the move that
+  the bind place needs, and it is full at a move of one room. The targets and the mallet homes
+  move with the drum. The drum does not go down or back, so the badger and each thin body keep
+  the bind place. Reason: at the bind place, the forearms and the paws of a deep body went into
+  the belly. A move forward alone put the targets further out of the reach of the short arms, and
+  a full raise for each body put the sticks of thin bodies into the drum in the lowering.
 
 **Piano** (`pose/hands.ts`, `pose/piano-keys.ts`, piano):
 
