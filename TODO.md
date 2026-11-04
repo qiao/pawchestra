@@ -626,15 +626,10 @@ scene of each demo has its seats and stage size with no overlap.
       (`restDown` 50, `restShift` [0, -0.28, -0.38]) cleared the face and passed the gate, but the
       upper arms went 0.5 cm deeper and the left paw left its rest grip
       (`reports/2026-11-03-panda-look/rest-tries.png`). Ask the user for the rest place.
-- [ ] Panda trombonist rest: the left finger tips leave the tubes at rest, in the lift, and in the
-      lowering (`pnpm wind-grip`: rest 0%, lift 84%, lowering 47%, tips 1.5 cm at rest). The
-      narrower upper chest of `girthProfile` moves the left rest paw: before it, rest 100%, lift
-      94%, and lowering 80% (tips 0.2 cm). The shoulder joints 0.8 cm or 1.9 cm further in gave
-      the same rest tips. On the older body, a left rest grip 0.02 H toward the left shoulder gave
-      94% and 87%, and with the left rest elbow less far out ([-1, -1, -0.3]) 97% and 90%, but both
-      flattened the left upper arm at rest (flat 0.77 and 0.79, base 0.86). Next: a width of 1 at
-      the shoulder joint with a narrower row under the arm roots, or a left rest grip change
-      (`restGripShiftL`).
+- [ ] Panda trombonist rest: in the middle of the lift and the lowering, the left finger tips
+      leave the tubes (`pnpm wind-grip`: lift 94%, lowering 83%). A left rest grip 0.02 H toward
+      the left shoulder gave 94% and 90%, but flattened the left upper arm at rest (arm gate flat
+      0.81, base 0.87).
 - [ ] Panda: the upper chest width at 0.75 of the seat to neck span (W7 of `pnpm body-shape
       trombonist --base 7cf41074`) is 0.86 of the old panda, near the limit of 15%. The old trunk
       is about 8% narrower at all heights, so the black band of the back still reads a little wider
