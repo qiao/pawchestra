@@ -194,6 +194,14 @@ in a copy (`tools/blender/beaver_edit.py`). The `README.md` of
   chair fits the legs, and a species with short arms plays a smaller instrument in place of
   longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
   source file stays unchanged and a run gives the same bytes again.
+- **Replacing body.** A new body of a species keeps the look of its old body in the app view: the
+  chair, the seat, the leg length, the head size, the trunk length, and the body shape. The shape
+  is the width and the depth of the trunk at 10 heights from the seat to the neck joint, the
+  girths of the upper arm, the forearm, the thigh, and the shin at their middles, and the knee
+  and the ankle gaps from the front. Each value of the seated bind stays within 15% of the old
+  body. The rig sets them with the form keys of "Mesh rig" (`girthProfile`, `armGirth`,
+  `legGirth`) and the leg turns of the seat (`studio.legTurns`), because a mesh of a new source
+  gives the same animal another build.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
