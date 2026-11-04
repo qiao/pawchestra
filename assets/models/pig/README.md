@@ -1,7 +1,7 @@
 # Pig model
 
 This folder holds the source mesh of the pig, a copy with new upper arms, a copy with rebuilt arms
-and its weights, and the rigged copy. The app does not serve these files. It loads the module
+and its weights, a copy with moved arm roots and its weights, and the rigged copy. The app does not serve these files. It loads the module
 `src/models/studio/pig.ts`, which this chain writes:
 
 ```text
@@ -11,7 +11,10 @@ pig.glb                           source mesh
 pig-upper.glb                     `armSource` of tools/mesh-rigs/pig.json
    │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
    v
-pig-arms.glb + pig-weights.json   `source` and `paintedWeights` of tools/mesh-rigs/pig.json
+pig-arms.glb + pig-weights.json
+   │  tools/blender/pig_root.py   hidden arm roots moved toward the trunk wall
+   v
+pig-root.glb + pig-root-weights.json   `source` and `paintedWeights` of tools/mesh-rigs/pig.json
    │  pnpm rig-mesh pig
    v
 pig.rig.glb                       rigged mesh
@@ -30,6 +33,8 @@ src/models/studio/pig.ts          studio body of the app
 | `pig-upper.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
 | `pig-arms.glb` | `pig-upper.glb` with rebuilt arms 1.5 times as long. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- pig --factor 1.5` |
 | `pig-weights.json` | Weights of the same Blender run. License as `pig.glb` | The same run |
+| `pig-root.glb` | `pig-arms.glb` with 7 moved vertices of the hidden arm roots. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/pig_root.py` |
+| `pig-root-weights.json` | `pig-weights.json` at the places of `pig-root.glb`. License as `pig.glb` | The same run |
 | `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
 
 ## pig.glb
@@ -105,3 +110,19 @@ horn hold keeps the left elbow away from the belly (design 5.3).
 |---|---|---|
 | `pig-arms.glb` | 965,548 bytes | `13450e613415d8bbcf3e2c4eaa9c9584019b7b2967f0a147fd44808758ebf4f6` |
 | `pig-weights.json` | 410,080 bytes | `9bea1248d22906b422644507a73a0426fd3742b7afe4d372b803ab19173f7f75` |
+
+## pig-root.glb and pig-root-weights.json
+
+Each free arm is a closed part. The inner side of the top ring and of the dome of its tube lies
+inside the trunk, so that no gap shows at the shoulder. In the hornist, the turns of the arm moved
+this hidden root up to 3.9 cm into the shoulder, in each sample, and the sweep measured it as a
+clip of the upper arm (design 9.3). The bind pose alone put it 3.4 cm to 4.7 cm deep.
+`tools/blender/pig_root.py` moves the 7 vertices of `tools/arm-roots/pig-moves.json` out along the
+line to the nearest point of the trunk surface, by 0.3 cm to 2.8 cm. The move file gives the rule
+of the values. The other vertices, the faces, the UV, and the weights stay. A run gives the same
+bytes.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `pig-root.glb` | 965,548 bytes | `0e91fbb121e8f822e3f70f922f25c5b96386447c9e3b32811f87859f24acd150` |
+| `pig-root-weights.json` | 410,184 bytes | `f8f249305dabe7d442ebb88f068294bcfbcceda1d5918f894bb50c7dfb3ed4d6` |
