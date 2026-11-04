@@ -223,9 +223,24 @@ passes.
       goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
       separate claws, so `pnpm pose-depth` marks the pair `paws in viola` as GROWS. Check the paw
       crops of the fifth position.
-- [ ] Cat T-pose body: the tail lies on the seat behind the haunch and touches the left back post
-      of the chair (0.0 cm, `node tools/tail-gap.ts violist`). The footprint is 1.2 cm deeper
-      than on the A-pose body.
+- [ ] Cat: choose the trunk length. With the head of the mesh, the head height is 0.62 of the trunk
+      from the hips joint to the neck joint, 1.39 times the share on the mesh (0.45). The variant
+      `trunkFactor` 0.82 brings it to 1.14, with the shoulders of `ANIMALS` at 1.066 m so that H
+      stays (`reports/2026-11-04-cat-form/trunk/`). It is not in the rig.
+- [ ] Cat tail: the tail hangs over the left side of the seat in an arc, and the curl of the mesh
+      opens. A tip bone that keeps the curl points back past the chair (footprint 4 cm to 6 cm
+      deeper). The root of the tail keeps a soft share with the hips, so its girth in the seated
+      bind is about 0.6 to 0.75 of the mesh near the root. Try a third tail bone, or a rest shape
+      of the tail root.
+- [ ] Cat seat: the root of the tail sets the seat top (`sit.top`), and the haunch behind the hip
+      joints is up to 6.3 cm above it from the side, the thighs near the hip joints 1.2 cm. A tail
+      root with no share in the leg girth, or a sharper tail root, raised the seat 1.3 cm to 1.8 cm.
+      Lower the haunch onto the seat, and give the seat top to the haunch.
+- [ ] Cat legs: the long legs keep 0.66 (thigh) and 0.46 (shin) of the width for the length of the
+      mesh legs. The thicker girth variants 2.0/1.5 and 2.3/1.75 raised the seat 2.2 cm and 2.3 cm
+      (`reports/2026-11-04-cat-form/leg-lineup.png`).
+- [ ] Cat eyes: with the brow of the mesh, the eye box of the left eye takes 18 of the 19 faces of a
+      dark patch (rig warning, the right eye had it before). Check the left eye in the 2x crops.
 - [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
       reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
 - [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
@@ -240,11 +255,6 @@ passes.
 - [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
       A-pose body there: the dark V band on the lower back above the seat, and the folds of the
       right shoulder at the tip. Remove each item that the new body does not show.
-- [ ] Cat T-pose body shape: `leg_girth()` of `tools/blender/rig_mesh.py` also moves the tail,
-      which hangs behind the thighs in the source. With `legGirth` 1.45, the tail crumpled near
-      its root, so the right mid thigh girth alone stays at 1.18 of the cat of the A-pose mesh
-      (`reports/2026-11-03-cat-shape2/measures.md`). Let `leg_girth()` skip the tail weights,
-      then make the thigh thicker.
 - [ ] Cat violist: at rest and in the moves, the hanging left upper arm touches the belly
       (1.5 cm in `bach-bwv1047`, 0.2 cm before the hanging arms), and the left forearm goes
       0.7 cm into the belly (`reports/2026-11-03-cat-rest/proof2/`). `hangingArm()` keeps no gap
