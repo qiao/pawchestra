@@ -226,7 +226,9 @@ The rest of each family:
   the A-pose mesh rested. Reason: on the long legs, a rest place on the thigh lies on the top of
   the belly (`lapPoint()`), so the paws rested at the chin, and the cat looked hunched. Its bow
   arm bends more at rest, and its elbow turns out in the middle of the moves
-  (`BowedHold.liftPoleR`, 5.3).
+  (`BowedHold.liftPoleR`, 5.3). The rabbit rests so too, with the paws and the violin low in front
+  of the lap, as the rabbit of the A-pose mesh. Reason: with the paws near the chin, the shoulders
+  rose, and the neck did not show.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
