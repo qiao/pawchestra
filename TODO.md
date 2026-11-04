@@ -517,14 +517,19 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Free round arms in the shared holds (5.3): with the elbow rule (`roundArms`), the upper
-      arms of round bodies still go into the trunk in many recast cells
-      (`reports/2026-11-03-shared-elbows/`). The dog clips at 0.27 of the left upper arm, near the
-      root, in the flute (2.3 cm), the clarinet (2.6 cm), and the trumpet (2.1 cm), and the pig at
-      the root in each role (3.4 cm to 4.6 cm), also in its own horn hold (3.8 cm). The elbow turn
-      does not move these points. Next: a turn of the shoulder bone from the same body measure
-      (`armOut()`). The cat (27° to 28°) needs less swing than the rabbit and the dog that the
-      violin and the cello fit, so it gets no turn there (violin 2.4 cm, cello 2.5 cm).
+- [ ] Free round arms in the shared holds (5.3): with the elbow rule (`roundArms`) and the lifted
+      shoulders (`shoulderLift()`), the upper arms of round bodies still go into the trunk in many
+      recast cells (`reports/2026-11-04-shoulder-out/`). The lift in the range of a real clavicle
+      takes 0.2 cm to 0.9 cm off the root clips and passes no new cell: the dog clips at 0.27 of the
+      left upper arm in the flute (2.0 cm) and the clarinet (2.2 cm), and the pig at the root, into
+      the shoulder of the mesh, in each role (2.5 cm to 4.6 cm), also in its own horn hold. A pose
+      probe gave the pig flutist 3.3 cm with a lift of 20°, so the pose alone does not clear the
+      pig. Next: the weights of the arm root of the pig (the clavicle share, `rigging.md`, "Weights
+      and folds"), and a path of the paw in the lift and the lowering of the dog that keeps the
+      elbow bent. The lift turns the left flute paw of the dog 4° further from its grip (62°, limit
+      45°), and the forearms of the hippo flutist and trumpeter go 0.4 cm and 0.7 cm deeper. The
+      cat (27° to 28°) needs less swing than the rabbit and the dog that the violin and the cello
+      fit, so it gets no turn and no lift there (violin 2.4 cm, cello 2.5 cm).
 - [ ] Rabbit flutist (5.3): the elbow rule turns the left paw 50° from the accepted flute grip
       (limit 45°), because the grip turn counts from the posed forearm. The cell went from PASS to
       FAIL. Check the paw in crops, and give the grip turn of a turned elbow its own limit or a
