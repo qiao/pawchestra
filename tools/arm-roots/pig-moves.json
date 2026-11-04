@@ -1,5 +1,5 @@
 {
-  "note": "The moves of tools/blender/pig_root.py, in the units of tools/mesh-rigs/pig.json. Each point is the place of a vertex of the hidden root of a free arm in pig-arms.glb (-x the right arm), and each move goes out along the line to the nearest point of the trunk surface. The values come from the sweep of the hornist (every fourth sample of the sample sets of two demos, with the module of pig-arms.glb): move = min(deepest - target, least + allowance), with the deepest and the least depth of the vertex in the body over the samples, the target 1.0 cm, and the allowance 0.3 cm, so that no moved vertex comes more than 0.3 cm out of the trunk in the hornist. A larger allowance pushes the dome out through the shoulder wall in the poses where the arm hangs.",
+  "note": "The moves of tools/blender/pig_root.py, in the units of tools/mesh-rigs/pig.json. Each point is the place of a vertex of the hidden root of a free arm in pig-arms.glb (-x the right arm), and each move goes out along the line to the nearest point of the trunk surface. The values come from the sweep of the hornist (every fourth sample of the sample sets of two demos, with the module of pig-arms.glb): move = min(deepest - target, least + allowance), with the deepest and the least depth of the vertex in the body over the samples, the target 1.0 cm, and the allowance 0.3 cm, so that no moved vertex comes more than 0.3 cm out of the trunk in the hornist. A larger allowance pushes the dome out through the shoulder wall in the poses where the arm hangs. The shrinks move 12 vertices of the dome, at their places after the moves, 0.4 of the way to the shoulder joint. They come from the signed depth of each root vertex over the hornist (mozart-k417) and the recast violinist, clarinetist, cellist, flutist (mendelssohn-op61), and trumpeter (beethoven-9) of the pig, every fourth play sample: these vertices went 1.0 cm to 3.2 cm into the trunk, and some of them also came up to 3 cm out of the shoulder in another pose, so no move toward the wall fits all roles. With the share 0.3, the deepest stayed 1.8 cm; with 0.4, 1.5 cm.",
   "target": 0.0083,
   "allowance": 0.0025,
   "moves": [
@@ -10,5 +10,19 @@
     { "point": [-0.13477, 0.5619, 0.06702], "move": 0.01005 },
     { "point": [0.13919, 0.56449, 0.07151], "move": 0.00385 },
     { "point": [0.14708, 0.50188, 0.06421], "move": 0.00223 }
+  ],
+  "shrinks": [
+    { "point": [-0.13808, 0.54732, 0.04679], "share": 0.4 },
+    { "point": [-0.143, 0.56458, 0.07212], "share": 0.4 },
+    { "point": [-0.12576, 0.52553, -0.02156], "share": 0.4 },
+    { "point": [-0.13391, 0.53418, 0.00847], "share": 0.4 },
+    { "point": [-0.14685, 0.48787, 0.02836], "share": 0.4 },
+    { "point": [-0.16431, 0.58027, 0.06567], "share": 0.4 },
+    { "point": [0.16929, 0.58254, 0.06433], "share": 0.4 },
+    { "point": [0.14267, 0.56484, 0.07311], "share": 0.4 },
+    { "point": [0.13699, 0.54331, 0.06241], "share": 0.4 },
+    { "point": [0.12828, 0.52991, 0.01292], "share": 0.4 },
+    { "point": [0.12275, 0.52452, -0.01605], "share": 0.4 },
+    { "point": [0.14921, 0.50125, 0.06411], "share": 0.4 }
   ]
 }
