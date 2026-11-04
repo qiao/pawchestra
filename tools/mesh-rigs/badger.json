@@ -1,5 +1,36 @@
 {
-  "source": "assets/models/badger/badger.glb",
+  "source": "assets/models/badger/badger-arms.glb",
+  "sourceNote": "A copy of assets/models/badger/badger-edit.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces, and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy.",
+  "armSource": "assets/models/badger/badger-edit.glb",
+  "armSourceNote": "The copy of assets/models/badger/badger.glb with the arms free of the trunk (tools/blender/badger_edit.py, assets/models/badger/README.md). Git keeps it out, and tools/blender/arm_rebuild.py reads it.",
+  "paintedWeights": "assets/models/badger/badger-weights.json",
+  "paintedLower": [
+    "root",
+    "hips",
+    "spine",
+    "spine1",
+    "chest",
+    "neck",
+    "head",
+    "ear_L",
+    "ear_R",
+    "thigh_L",
+    "shin_L",
+    "foot_L",
+    "toes_L",
+    "thigh_R",
+    "shin_R",
+    "foot_R",
+    "toes_R",
+    "tail"
+  ],
+  "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the weight rules of tools/blender/arm_rebuild.py. The vertices on the bones of paintedLower keep the rule weights, as on the monkey.",
+  "armSegments": {
+    "helper": 0.058,
+    "rootSegment": true,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The helper is twice the gap of the elbow rings of tools/blender/arm_rebuild.py (step_skeleton() prints it).",
+    "rootSegmentNote": "The rule weight of each upper arm goes to its first segment (segment_joints() and main() of tools/blender/rig_mesh.py), so that the trunk around the socket takes the roll of the first ring of the tube."
+  },
   "output": "assets/models/badger/badger.rig.glb",
   "name": "Badger",
   "weld": 1e-05,
@@ -113,41 +144,41 @@
     },
     "forearm_L": {
       "head": [
-        0.212,
-        0.49,
-        0.016
+        0.230642,
+        0.510143,
+        0.015812
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.2345,
-        0.4455,
-        0.048
+        0.259116,
+        0.469207,
+        0.047812
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.257,
-        0.401,
-        0.08
+        0.287591,
+        0.428271,
+        0.079812
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.2775,
-        0.3604,
-        0.1092
+        0.313541,
+        0.39092,
+        0.109012
       ],
       "tail": [
-        0.27,
-        0.3208,
-        0.1147
+        0.311626,
+        0.350661,
+        0.114512
       ],
       "roll": "palm"
     },
@@ -220,7 +251,7 @@
     -0.29,
     -0.591
   ],
-  "jointsNote": "The places are in the units and the axes of the studio in the source pose: 1 unit from the soles to the skull top, +z forward, +x the left side. The right side mirrors the left side. Each roll is the hint of the z axis of the bone.",
+  "jointsNote": "The places are in the units and the axes of the studio in the source pose: 1 unit from the soles to the skull top, +z forward, +x the left side. The right side mirrors the left side. Each roll is the hint of the z axis of the bone. The joints from the elbow to the finger tips are the joints of the arm that tools/blender/badger_edit.py turns 8 degrees out (it prints them). SOURCE_ARM of the script keeps the joints of the source.",
   "studio": {
     "legTurns": {
       "thigh": [
@@ -261,21 +292,24 @@
     },
     "bindArms": {
       "upper_arm": [
-        0.813873,
-        -0.143043,
-        0.563161
+        0.774268,
+        -0.554012,
+        0.305908
       ],
       "forearm": [
-        0.316246,
-        0.757051,
-        0.571719
-      ],
-      "hand": [
-        -0.078782,
-        0.677317,
-        0.731461
+        0.315991,
+        0.757242,
+        0.571606
       ]
     },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, along the upper arm of the turned copy, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The axis stays within 2 degrees of the axis of the old bent bind, so that the zero of the roll of the upper arm stays. A bind upper arm 39 degrees above the source arm crumpled the hanging arm roots.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 60,
+      "R": 45
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 60 degrees and the right 45 degrees (paw_supination() of tools/blender/rig_mesh.py). The rule of design 4.4 (pnpm bind-supination badger) gives about 120 and 90 degrees. The own roles win: with the left 123 degrees, the forearm twist p95 of the xylophonist L is 86 (limit 80), and with 90 and 90 degrees, the wrist rings of the snare drummer and the cymbalist narrow by up to 1.7 mm. A second probe of the rig at 60 and 45 degrees gives the same rule values.",
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and turns 15 degrees out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 15 0). The app takes the standing body."
   },
   "weights": {
@@ -348,38 +382,49 @@
       ]
     ],
     "rigidNote": "The corners of each thin face at these points take the mean of their weights (rigid_faces() of tools/blender/rig_mesh.py). The points are the middles of slivers at the front of the left shoulder, in the left armpit, and on the right paw (pnpm fold-probe <role> --faces).",
-    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. Above headFrom (the chin), each vertex follows the head only. The round ears follow the head (earBase). The tail ball holds the short tail behind the plane z = behind (tailBall)."
+    "note": "Beyond the plane |x| = armSplit, only the free arm follows the arm bones. Above headFrom (the chin), each vertex follows the head only. The round ears follow the head (earBase). The tail ball holds the short tail behind the plane z = behind (tailBall).",
+    "rigidPainted": [
+      [
+        [
+          -0.1503,
+          0.6118,
+          0.0607
+        ],
+        [
+          -0.1416,
+          0.6079,
+          0.0597
+        ]
+      ],
+      [
+        -0.1464,
+        0.6262,
+        0.0568
+      ],
+      [
+        -0.1426,
+        0.5511,
+        -0.053
+      ],
+      [
+        0.1474,
+        0.5443,
+        -0.0607
+      ],
+      [
+        -0.1243,
+        0.5414,
+        -0.0039
+      ],
+      [
+        -0.309,
+        0.3942,
+        0.113
+      ]
+    ],
+    "rigidPaintedNote": "The faces at these points take the mean of the painted weights of their corners, as rigid does for the rule weights. The first item holds two faces with a corner of less than 1 degree at the right shoulder line, and the last item a thin face between the right paw and the claws. The other items are thin faces at the shoulder lines. Each of these faces folded in each sample of the bass drummer, the percussionist, or the xylophonist (pnpm fold-probe <role> --faces)."
   },
   "raise": [
-    {
-      "side": "R",
-      "turns": {
-        "clavicle": [
-          0,
-          0,
-          0,
-          1
-        ],
-        "upper_arm": [
-          0.4067,
-          0.4158,
-          -0.2386,
-          0.7776
-        ],
-        "forearm": [
-          0.051,
-          -0.0295,
-          0.066,
-          0.9961
-        ]
-      },
-      "fade": [
-        10,
-        20
-      ],
-      "below": 0,
-      "note": "The shape of the raised arm R of the bass-drummer (pnpm raise-fit). It corrects faces 90, 91, and 61 at the front of the right shoulder, which fold when the beater is over the bass drum."
-    },
     {
       "side": "L",
       "turns": {
@@ -390,16 +435,16 @@
           1
         ],
         "upper_arm": [
-          -0.0226,
-          -0.3244,
-          0.5055,
-          0.7992
+          -0.1389,
+          -0.4582,
+          0.5866,
+          0.6532
         ],
         "forearm": [
-          0.1672,
-          0.0969,
-          -0.2167,
-          0.9569
+          0.118,
+          -0.0744,
+          -0.3043,
+          -0.9423
         ]
       },
       "fade": [
@@ -407,10 +452,10 @@
         20
       ],
       "below": 0,
-      "note": "The shape of the raised arm L of the percussionist (pnpm raise-fit). It corrects faces 142 to 145, 567, and 570 at the front of the left shoulder, which fold when the arm holds the triangle up."
+      "note": "The shape of the raised arm L of the percussionist (pnpm raise-fit). It corrects 10 faces at the front of the left shoulder, which fold in each sample of the triangle when the upper arm turns 98 degrees from the bind."
     }
   ],
-  "raiseNote": "Two corrective shapes of a raised arm (pnpm raise-fit): the right arm that holds the beater over the bass drum, and the left arm that holds the triangle up.",
+  "raiseNote": "One corrective shape of a raised arm (pnpm raise-fit): the left arm that holds the triangle up. The straight bind turns the upper arm about 98 degrees from the bind there.",
   "refine": {
     "rings": [],
     "flip": {
