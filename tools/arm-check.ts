@@ -495,10 +495,13 @@ export const ACCEPTED_PALMS: ReadonlyMap<InstrumentId, Readonly<Record<Side, Vec
   InstrumentId,
   Readonly<Record<Side, Vec3>>
 >([
-  // The tan fox (FOX_FLUTE) and the wolf (WOLF_CLARINET): the accepted players that the shared
-  // holds fit (ROUND_ARMS_FIT of pose/winds.ts).
+  // The tan fox (FOX_FLUTE), the wolf (WOLF_CLARINET), and the monkey (MONKEY_TRUMPET): the
+  // accepted players that the shared holds fit (ROUND_ARMS_FIT of pose/winds.ts). The right palm
+  // of the monkey faces down onto the valve tops. The shared trumpet hold rolls only the right
+  // paw, so the left paw of a recast trumpeter keeps the grip turn.
   ['flute', { L: [0.195, 0.909, 0.369], R: [-0.215, -0.388, -0.896] }],
   ['clarinet', { L: [0.977, -0.09, 0.192], R: [-0.984, -0.076, 0.163] }],
+  ['trumpet', { L: [0.959, -0.17, 0.225], R: [-0.184, -0.981, 0.061] }],
 ]);
 
 /** The parts of a wind hold that the line of the palm reads, which an older tree can leave out. */
