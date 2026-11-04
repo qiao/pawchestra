@@ -293,8 +293,7 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
   Shorten only the trunk below the chest joint (`trunkTop`).
 - A long thigh puts the feet forward and moves the seats. Lengthen the shin (`shinFactor`). Move
   `headFloor` and each lap share (`lap.along`) with the legs.
-- A back factor of `girthProfile` moves the back on the chair and the chair depth. Keep it at 1
-  below the hips joint.
+- A back factor of `girthProfile` moves the back on the chair. Keep it at 1 below the hips joint.
 - A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
   heels, because short thighs leave the feet under the haunch.
 
