@@ -194,6 +194,9 @@ from the first position (derived).
   position, "the upper arm should be comfortably away from the torso of the body", and "there
   should be space between the elbows and the musician's sides" [1]. Arms "close to parallel to the
   ground" and arms that "collapse against their rib cages" are faults of beginners [1].
+- The shoulders stay down. In 11 persons with sensors on pins in the bones, the clavicle rose 5.9°
+  above the horizontal with the arm at the side, and only from 11° to 17° while the arm rose in
+  front or to the side. "Little clavicular elevation occurred during the raising of the arm" [78].
 
 ## 2. Trumpet, horn, oboe, and flute
 
@@ -426,6 +429,10 @@ The app follows these facts:
   the musician's sides" [1], and "the elbows and hands are free from the body" [33]. So a body
   with rounder arms than the accepted player of the shared flute, clarinet, or trumpet turns each
   elbow further out, at rest and in the play (design 5.3), and its upper arms stay off the trunk.
+- **The lifted shoulders (1.8, `shoulderLift()`).** The clavicle rises only a little when the arm
+  rises [78]. So a round body in the shared flute, clarinet, or trumpet hold lifts each shoulder
+  bone in each pose by at most that rise (`MAX_LIFT`), and the root of its upper arm turns less
+  against the shoulder (design 5.3).
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
@@ -692,3 +699,7 @@ Each source opened on 2026-10-18, except where its entry gives another date.
 76. Wikipedia, "Piccolo" (opened 2026-11-03). https://en.wikipedia.org/wiki/Piccolo
 77. Wikipedia, "Western concert flute" (opened 2026-11-03).
     https://en.wikipedia.org/wiki/Western_concert_flute
+78. P. M. Ludewig, V. Phadke, J. P. Braman, D. R. Hassett, C. J. Cieminski, R. F. LaPrade,
+    "Motion of the shoulder complex during multiplanar humeral elevation", Journal of Bone and
+    Joint Surgery (American) 91 (2), 2009, pages 378 to 389 (opened 2026-11-04).
+    https://pmc.ncbi.nlm.nih.gov/articles/PMC2657311
