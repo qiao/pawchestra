@@ -273,9 +273,9 @@ The rest of each family:
   (a swivel) keeps the paw on its target, but it cannot clear an arm that the cast matrix puts
   into the body. Reason: at the deepest moment, the arm is straight because the paw target of
   the lift or the lowering is out of reach, or the clip is at the root of the upper arm. Both
-  points lie on the line of the swivel, so it does not move them. The next approach is a turn of
-  the shoulder bone for a clip at the arm root, and a path of the paw in the lift and the
-  lowering that keeps the elbow bent (`TODO.md`).
+  points lie on the line of the swivel, so it does not move them. A shared hold lifts the
+  shoulder bones of a round body ("Free round arms in a shared hold"). The next approach is a
+  path of the paw in the lift and the lowering that keeps the elbow bent (`TODO.md`).
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
   the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
   a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
@@ -303,8 +303,19 @@ The rest of each family:
   the difference (`elbowOutTurn()`), toward the side around the forward axis (`turnPoleOut()`). A
   thin body keeps the elbows of the hold. The paws keep their grips. The percussion holds have no
   rule, because the badger plays them as its own holds. Reason: the sweep measures the inner half
-  width of each arm against the trunk, so a body needs no value of its own. The turn cannot
-  clear a clip at the root of the upper arm, as on the pig.
+  width of each arm against the trunk, so a body needs no value of its own.
+- **Lifted shoulders in a shared hold.** The elbow turn cannot clear a clip at the root of the upper
+  arm, where the round arm root goes into the trunk or into the shoulder of the mesh. So a hold with
+  the rule also lifts each shoulder bone of a body with a large swing, up and out around the forward
+  axis, in each pose (`shoulderLift()`): `LIFT_PER_SWING` times the swing above the larger of
+  `LIFT_FROM` and the swing of the accepted player, up to `MAX_LIFT`. The shoulder joint goes up,
+  and the paws keep their grips, so the upper arm turns less against the shoulder. A free hanging
+  arm keeps its direction from the lifted joint. Reason: the arm root turns against the shoulder by
+  the swing from the hanging bind, so a body with a small swing keeps its shoulders, and a lift from
+  the fit of the hold alone turned the paw of a thinner body past its accepted grip. A real player
+  keeps the shoulders down, and the clavicle rises only a little when the arm rises (winds 1.8), so
+  the lift stays in that range and does not read as a shrug. Thus it clears only a part of the deep
+  root clips, as on the pig (`TODO.md`).
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
