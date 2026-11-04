@@ -496,7 +496,8 @@ The app follows these facts:
   `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). The
   cat rests the viola far to the front of its short lap, and the bow grip far to the front too,
   so that each elbow of its straight bind bends less than 120°, and closes its paw around the
-  neck. In the shared violin hold, both arms hang out to the sides until they clear the body,
+  neck. Its right elbow hangs further out (`BowedHold.restPoleR`), so that the upper arm clears
+  the arm root of its narrow shoulders. In the shared violin hold, both arms hang out to the sides until they clear the body,
   and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left
   paw in front of the thigh, and the upright bow at the right paw. The rabbit hangs its arms so
   too, with a smaller bend of the bow arm, so that the bow paw rests low at its side.

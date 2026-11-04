@@ -1045,9 +1045,11 @@ export const BOWED_HOLDS = {
  * 115°, with the palm 8 mm off the neck (`restGapL`), turned 10° around the normal of the top plate,
  * and with a turn of 42° in the plane of its palm (`restPawTurnL`). The grip of the bow rests
  * 0.4 H out, 0.5 H up, and 0.35 H to the front at 0.375 of the way to the knee, with the tip a
- * little forward, (0.15, 1, -0.45), and the right elbow hangs down, out, and a little back,
- * (0.9, -1, 0.2). With the grip 0.6 H up and 0.05 H to the front, the right elbow bends 140° at
- * rest, and its inner faces fold. In the rest pose, the top plate of the viola faces the front and
+ * little forward, (0.15, 1, -0.45), and the right elbow hangs out, down, and a little back,
+ * (1.5, -1, 0.2) (`restPoleR`), so that the right upper arm clears the arm root of the narrow
+ * shoulders of the body shape of the old cat: with (0.9, -1, 0.2), it went 0.7 cm into the arm
+ * root at rest in `mozart-k191` (0.2 cm with this elbow). With the grip 0.6 H up and 0.05 H to
+ * the front, the right elbow bends 140° at rest, and its inner faces fold. In the rest pose, the top plate of the viola faces the front and
  * 30° to the left, toward the audience, as the bridge of a resting violin faces out
  * (`docs/reference/string-technique.md`, section 2.9).
  *
@@ -1084,7 +1086,7 @@ const CAT_HOLD = {
   poleTipR: [1.5, -1, -1],
   polePizzicato: [1.2, -0.5, -1],
   pluckSide: 0.1,
-  restPoleR: [0.9, -1, 0.2],
+  restPoleR: [1.5, -1, 0.2],
   restPoleL: [-1.6, -1, -0.2],
   restPlace: 0.55,
   rest: {
