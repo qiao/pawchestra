@@ -40,3 +40,7 @@ assets/models/beaver/beaver-edit.glb
 # The copy of the badger mesh with the arms free of the trunk (tools/blender/badger_edit.py).
 # tools/blender/arm_rebuild.py reads it. Git keeps out its 15 MB (assets/models/badger/README.md).
 assets/models/badger/badger-edit.glb
+
+# The copy of the penguin mesh with the flippers free of the trunk (tools/blender/penguin_edit.py).
+# tools/blender/arm_rebuild.py reads it. Git keeps out its 14 MB (assets/models/penguin/README.md).
+assets/models/penguin/penguin-free.glb
