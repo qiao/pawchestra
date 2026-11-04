@@ -917,6 +917,14 @@ const WOLF_VIOLIN_HOLD = {
 const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
 
 /**
+ * The girth of the left arm of the body that each shared hold fits, in meters
+ * (`BowedHold.girthGap`, design 5.3): the girth of the wrist end of the forearm of the rabbit for
+ * the violin (`wristGirth()`). A thicker body moves its left paw further off the neck by the
+ * difference.
+ */
+const GIRTH_FIT = { violin: 0.048 } as const;
+
+/**
  * The hold of the violin on the left shoulder for each seated body (design 4.6, 5.3): the arm
  * values of the accepted rabbit violinist ({@link SHOULDER_HOLD}), as directions and in head
  * heights, with a place and a rest from the body. With the chin hold, the left upper arms and the
@@ -940,10 +948,16 @@ const ROUND_ARMS_FIT = { violin: 30, cello: 42 } as const;
  * and 3.3 cm into the body in a lowering. The bow plays no hair within 0.15 m of the frog
  * (`frogHair`): with the 0.11 m of the rabbit, the bow paw of the deer and the dog went 1.9 cm and
  * 2.2 cm into the body at the frog.
+ *
+ * At rest, a thicker wrist holds the neck further off (`girthGap`): the rest gap of the left paw
+ * grows by the girth of the wrist end of the forearm over the girth of the rabbit. The thick
+ * wrist end of the forearm otherwise goes into the upper bout of the upright violin: at rest, the
+ * forearm of the recast polar bear went 1.8 cm into the violin, and with the rule 0.0 cm.
  */
 const VIOLIN_HOLD = {
   ...SHOULDER_HOLD,
   roundArms: ROUND_ARMS_FIT.violin * MathUtils.DEG2RAD,
+  girthGap: { wrist: GIRTH_FIT.violin, palm: null },
   chinFit: { side: 0.45, up: 0.05, back: 0.18, press: 0 },
   frogHair: 0.15,
   liftReach: [0.15, 0.15, -0.3],
