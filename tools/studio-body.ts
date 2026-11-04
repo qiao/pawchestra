@@ -442,6 +442,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       constant: 'STUDIO_BADGER',
       crease: 35,
       glb: 'assets/models/badger/badger.rig.glb',
+      headFloor: 0.76,
     },
   ],
   // The trumpet monkey (design 4.4). It stands as a soloist.
