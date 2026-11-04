@@ -50,8 +50,8 @@
   "legFactorNote": "The factor of the thigh, as for the A-pose rabbit. It stretches only between its joints, the foot keeps its size, and the body rises by the growth of the legs, so that the soles stay at y 0. The chair of the app fits the legs, so the soles stand on the floor.",
   "shinFactor": 1.49,
   "shinFactorNote": "The shin is shorter than the thigh factor makes it (13.3 cm, old A-pose rabbit 14.8 cm, 15.6 cm with 1.75), so that the hips joint of the seated bind is as high as on the A-pose rabbit (35.2 cm, old 35.5 cm, 37.8 cm with 1.75). The feet keep their places, so the layout does not change. With the deeper haunch (sit.most) and the wider thighs (legGirth), the seat is 25.0 cm high (old 26.2 cm, 33.1 cm before).",
-  "legGirth": [1.6, 1],
-  "legGirthNote": "The thigh of the T-pose mesh is thinner than the thigh of the A-pose rabbit, and the leg factor makes it long, so the seated thigh looked thin. The thigh takes the factor 1.6 across its axis before the skin (leg_girth() of tools/blender/rig_mesh.py), up and to the sides, so that its width comes near the width of the A-pose rabbit. The back of the thigh keeps its place, so the underside stays on the seat. The shin keeps its form.",
+  "legGirth": [2, 1],
+  "legGirthNote": "The thigh of the T-pose mesh is thinner than the thigh of the A-pose rabbit, and the leg factor makes it long, so the seated thigh looked thin. The thigh takes the factor 2 across its axis before the skin (leg_girth() of tools/blender/rig_mesh.py), up and to the sides, so that its girth is 45.6 cm at the middle (A-pose rabbit 47.7 cm, 38.1 cm with 1.6). The back of the thigh keeps its place, so the underside stays on the seat. The wider thigh root sets the seat top under the haunch, so the haunch drops further (sit.most). The shin keeps its form.",
   "neckFactor": 1.95,
   "trunkFactor": 1.1,
   "trunkTop": "chest",
@@ -269,16 +269,16 @@
   "studio": {
     "legTurns": {
       "thigh": [
-        0.469069,
-        0.025825,
-        -0.053763,
-        0.881145
+        0.463006,
+        -0.04723,
+        -0.092421,
+        0.880257
       ],
       "shin": [
-        0.170381,
-        0,
-        0.034076,
-        0.984789
+        0.169796,
+        -0.014109,
+        0.115508,
+        0.978585
       ],
       "foot": [
         0,
@@ -325,7 +325,7 @@
       "R": 43
     },
     "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 90 degrees and the right 43 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 137 degrees on the left (the violin and the snare drum) and 93 degrees on the right (the cello and the snare drum). Three probes of pnpm bind-supination gave 97 and 43, then 90 and 43, then no change.",
-    "note": "The leg turns of the A-pose rabbit: the thighs of the T-pose mesh have the same direction, so the seat keeps its form. The shin is vertical, as the legs of the red fox."
+    "note": "The leg turns of the A-pose rabbit, with each bind thigh turned 9.5 degrees further out about the vertical and each bind shin 9.5 degrees further in about the forward axis: each turn is the turn of the A-pose rabbit times the inverse of the extra turn. The wide thighs (legGirth 2) closed the knee gap to 10.1 cm, and the knees now stand 13.8 cm apart (A-pose rabbit 15.2 cm), with the ankles in place (12.3 cm, old 12.2 cm). The shin is near vertical, as the legs of the red fox."
   },
   "weights": {
     "armSplit": 0.09,
