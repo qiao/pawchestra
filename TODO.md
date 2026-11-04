@@ -231,12 +231,17 @@ passes.
 - [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
       A-pose body there: the dark V band on the lower back above the seat, and the folds of the
       right shoulder at the tip. Remove each item that the new body does not show.
-- [ ] Cat T-pose body shape: on the seated bind, three values stay more than 15% from the cat of
-      the A-pose mesh (`reports/2026-11-03-cat-shape/measures.md`, old/new): the belly depth at
-      the hips joint 0.85, the mid thigh girth 1.17 (the flatter belly no longer lies on the top
-      of the thigh), and the shoulder joints 0.84 (0.254 m apart, old 0.212 m). With the width 0.9
-      at the shoulder rows of `girthProfile`, the right arm folds of the arm gate are 10 at rest
-      (limit 8). Try a shorter clavicle with a fold check.
+- [ ] Cat T-pose body shape: `leg_girth()` of `tools/blender/rig_mesh.py` also moves the tail,
+      which hangs behind the thighs in the source. With `legGirth` 1.45, the tail crumpled near
+      its root, so the right mid thigh girth alone stays at 1.18 of the cat of the A-pose mesh
+      (`reports/2026-11-03-cat-shape2/measures.md`). Let `leg_girth()` skip the tail weights,
+      then make the thigh thicker.
+- [ ] Cat violist: from the side and from above, the cat still looks hunched. The back line of the
+      bind is within 1 cm of the cat of the A-pose mesh, but the rest grip holds the viola neck
+      at the chin, far to the front of the long lap (`CAT_HOLD.rest.lap`, `restPlace`), so both
+      arms rise and the shoulders turn forward. That cat holds the neck at the chest
+      (`reports/2026-11-03-cat-shape2/final/sides-rest.png`). Try a lower rest grip with the arm
+      gate and `pnpm pose-depth violist`.
 - [ ] Cat violist: the thinner arms raise the right arm folds p95 of the arm gate from 4 to 5,
       and the right upper arm goes 0.1 cm further into its arm root in the play and the lowering
       of the full sweep (`pnpm pose-depth violist`, 1.4 cm at most). Check the 2x crops of the
