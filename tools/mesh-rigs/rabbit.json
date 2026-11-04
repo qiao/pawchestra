@@ -52,6 +52,16 @@
   "shinFactorNote": "The shin is shorter than the thigh factor makes it (13.3 cm, old A-pose rabbit 14.8 cm, 15.6 cm with 1.75), so that the hips joint of the seated bind is as high as on the A-pose rabbit (35.2 cm, old 35.5 cm, 37.8 cm with 1.75). The feet keep their places, so the layout does not change. With the deeper haunch (sit.most) and the wider thighs (legGirth), the seat is 25.0 cm high (old 26.2 cm, 33.1 cm before).",
   "legGirth": [2, 1],
   "legGirthNote": "The thigh of the T-pose mesh is thinner than the thigh of the A-pose rabbit, and the leg factor makes it long, so the seated thigh looked thin. The thigh takes the factor 2 across its axis before the skin (leg_girth() of tools/blender/rig_mesh.py), up and to the sides, so that its girth is 45.6 cm at the middle (A-pose rabbit 47.7 cm, 38.1 cm with 1.6). The back of the thigh keeps its place, so the underside stays on the seat. The wider thigh root sets the seat top under the haunch, so the haunch drops further (sit.most). The shin keeps its form.",
+  "girthProfile": [
+    [0.15, 1, 1, 1],
+    [0.3, 1, 1.15, 1],
+    [0.6, 1, 1.2, 1],
+    [0.75, 1, 1.05, 1],
+    [0.83, 1, 1, 1],
+    [0.91, 1.12, 1, 1],
+    [1, 1, 1, 1]
+  ],
+  "girthProfileNote": "The rows (share of the trunk axis of the source from the hips joint to the neck joint, width, front, back) give the trunk the shape of the A-pose rabbit (77b9d9d3^) on cuts of the seated bind at 10 heights from the seat to the neck joint: a rounder belly from the side (front 1.15 to 1.2 at 0.3 to 0.6: the depths D4 to D6 are 32.9, 31.7, and 29.3 cm, old 35.4, 33.1, and 30.0 cm, 29.8, 27.9, and 25.9 cm with no row), and the shoulder joints further apart (width 1.12 at 0.91, the share of the shoulder joints: 24.0 cm apart, old 27.0 cm, 21.5 cm with no row). The back keeps its place on the chair. The width W8 (31.2 cm, old 24.6 cm) is the cut through the arm roots of the T-pose mesh, where the trunk share of the painted weights (weights.paintedBelow) counts the arm roots as trunk. A width of 0.92 at 0.81 did not change it.",
   "neckFactor": 1.95,
   "trunkFactor": 1.1,
   "trunkTop": "chest",
