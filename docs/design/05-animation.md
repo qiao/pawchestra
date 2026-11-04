@@ -360,6 +360,23 @@ The rest of each family:
   real bassist keeps the wrist off the neck (strings 2.8). Reason: a larger tilt of the paw over
   the neck alone turns the paw past the accepted grip of the role. The cat keeps its left paw a
   little off the neck of the viola too, so that its round forearm keeps out of the neck.
+- **Grip clearance from the girth.** The shared violin and cello holds take the gap of the left
+  paw from the body (`BowedHold.girthGap`, `GIRTH_FIT`). Each hold keeps the girth of the left arm
+  of its accepted player, and a thicker body moves its paw further off the neck by the difference,
+  so that its paw and forearm keep the free gap of the accepted player. On the violin, the girth
+  of the wrist end of the forearm (`wristGirth()`) adds to the rest gap (`restGapL`), because the
+  thick wrist end goes into the upper bout of the upright violin at rest and in the moves. On the
+  cello, the girth of the paw around the line of the forearm (`pawGirth()`) adds to the gap of
+  the floor neck (`gapL`), because a thick paw goes into the neck in the play and the moves. A
+  thinner body keeps the gaps of the hold, and the own holds have no rule. Reason: a real player
+  holds the neck with the fingers and keeps the forearm free of the body of the instrument
+  (strings 1.9). The gaps of the holds fit a thin arm. The rule does not clear the thick wrist of
+  the violin in the play: a gap along the normal of the palm does not move it out of the upper
+  bout.
+- **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
+  near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
+  the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
+  most recast bodies goes into the upper bout at rest and in the moves.
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
