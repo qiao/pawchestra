@@ -675,6 +675,13 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.
 
+The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). Each test of
+its shader that selects a part of the stage, such as the baked light of the skirt and the lip
+(`SIDE_GLOW`), keeps one value on all of a visible face. For example, a plank is a face that
+points up at y = 0. Reason: MSAA smooths only the edges of the triangles. A test of y inside the
+outer face of the lip made a line thinner than one pixel, and the line broke into dashes that
+moved with the camera.
+
 **Light and render**
 
 `scene/lights.ts` holds the lights, `scene/light-pool.ts` the pool, `models/beam.ts` and
