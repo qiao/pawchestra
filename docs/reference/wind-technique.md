@@ -459,6 +459,16 @@ The app follows these facts:
   faces the valve tops, and the left paw grips the main branch at its left side, with the back of
   the paw out to the left. Both elbows point down and out, away from the rib cage. The bell stands
   at the left of the head (`play`).
+- **The size rule of the winds (2.1, 2.4, 3).** A recast trumpeter, clarinetist, or flutist plays
+  a smaller instrument when its arms are short (`windRule()` of `tools/wind-size.ts`, design 4.6).
+  The smallest size is the smallest instrument with the same hold and fingering, over the standard
+  instrument. A pocket trumpet is 24 cm long [71]. The trumpet of the app is 0.85 of a trumpet of
+  0.48 m, and no source of this list gives that length. An E-flat clarinet is about 49 cm long
+  [72], and a B-flat clarinet about 60 cm [73]. A piccolo is about 33 cm long [74], and a flute
+  about 66 cm [75]. The piccolo has the fingering of the flute [76]. A child with short arms can
+  also play a flute with a curved head joint [77]. The app does not show that head, and it scales
+  the whole flute. No source gives a larger instrument with the same hold, so the largest size is
+  the size of the app.
 
 The app does not follow these facts:
 
@@ -664,3 +674,14 @@ Each source opened on 2026-10-18, except where its entry gives another date.
 70. R. Patterson, J. Harvey, K. Wiechmann, "Trombone Toolbox: Essential Strategies", Texas
     Bandmasters Association Convention/Clinic (2024, opened 2026-11-02).
     https://texasbandmasters.org/wp-content/uploads/2024/08/Trombone-Toolbox-Essential-Strategies.pdf
+71. Wikipedia, "Pocket trumpet" (opened 2026-11-03). https://en.wikipedia.org/wiki/Pocket_trumpet
+72. Wikipedia, "E-flat clarinet" (opened 2026-11-03). https://en.wikipedia.org/wiki/E-flat_clarinet
+73. C. R. Nave, "Clarinet", HyperPhysics, Georgia State University (opened 2026-11-03).
+    https://hyperphysics.gsu.edu/hbase/Music/clarinet.html
+74. C. R. Nave, "Piccolo", HyperPhysics, Georgia State University (opened 2026-11-03).
+    https://hyperphysics.gsu.edu/hbase/Music/piccolo.html
+75. C. R. Nave, "Flute", HyperPhysics, Georgia State University (opened 2026-11-03).
+    https://hyperphysics.gsu.edu/hbase/Music/flute.html
+76. Wikipedia, "Piccolo" (opened 2026-11-03). https://en.wikipedia.org/wiki/Piccolo
+77. Wikipedia, "Western concert flute" (opened 2026-11-03).
+    https://en.wikipedia.org/wiki/Western_concert_flute

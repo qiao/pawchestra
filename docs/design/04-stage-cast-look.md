@@ -403,10 +403,11 @@ interface GripFrames {
 see "Retarget and render"), and runs the arm gate and the clearance sweep with its note targets
 on the shortest demo of the role. A recast pair plays the shared hold of the instrument, because an
 own hold would hide a fault of the body. A violin or a viola takes the size of the rule of a violin
-shop, and a cello the cello rule, each clamped to the real sizes (4.6). Each other instrument keeps
-the size of the app. The recast roles of `pnpm arm-check`, `pnpm pose-depth`, and `pnpm
-close-views` take the same size (`tools/recast-scale.ts`), so that a run of one pair measures
-its cell. `--quick` takes a coarse sample, so that a round finds the faults of a pair early.
+shop, a cello the cello rule, and a trumpet, a clarinet, or a flute the size rule of the winds,
+each clamped to the real sizes (4.6). Each other instrument keeps the size of the app. The recast
+roles of `pnpm arm-check`, `pnpm pose-depth`, and `pnpm close-views` take the same size
+(`tools/recast-scale.ts`), so that a run of one pair measures its cell. `--quick` takes a coarse
+sample, so that a round finds the faults of a pair early.
 `--set` and `--variant` change the holds in memory, as the other hold tools do, so that a try
 needs no edit of the source. A value over its limit fails, unless the own pair of the role has the
 same open item. The grip of each pair counts from
@@ -922,6 +923,16 @@ this size to a recast cellist, and a new cellist species takes it as its `celloS
 gets the end pin of its body (`celloPinOf()`), so that the top of its back rests on the chest at
 the lean of `CELLO_PLACE`, as a cellist sets the end pin.
 
+The size rule of the winds (`windRule()` of `tools/wind-size.ts`) sizes a trumpet, a clarinet, or
+a flute for the arms: the largest size at which each palm reaches its grip in the playing pose
+with at most `WIND_REACH_SHARE` of the arm, so that each elbow keeps a bend, as the monkey at its
+trumpet. The size stays between the smallest real instrument with the same hold and fingering (a
+pocket trumpet, an E-flat clarinet, a piccolo) and the size of the app (`REAL_WIND_SIZES`), because
+a player with long arms bends the elbows more and plays the standard instrument. When no real size
+passes, the rule takes the real size with the nearest grips. The cast matrix gives this size to a
+recast wind player. A smaller wind does not bring a mouth that is far in front of the shoulders
+nearer, so a long muzzle or a deep body still misses its grips at the smallest size.
+
 The hold gives the place of each piece in the bind pose of 4.7, in the axes of the model: the
 player faces -z, and its left is -x. An offset in `H` uses the head height of the player. Where
 the body sets the hold, the instrument fits the body, as the table names.
@@ -932,8 +943,8 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands at the left side. |
 | Harp | Leaned back onto the right shoulder. The deer plays a smaller harp on a box (`HARP_PLACE`, `HARP_STAND`). |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), so the keys stand a little below the elbows of the polar bear. The keys stand in front of its belly (`PIANO_FRONT_H`). |
-| Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3), at the size of the app: no size rule yet. |
-| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). |
+| Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
+| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
 | Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
