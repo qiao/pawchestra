@@ -110,7 +110,7 @@ export interface MeshRigConfig {
   readonly girthFactor?: readonly [width: number, depth: number];
   /**
    * The factors of the cross-section of the upper arm and of the forearm across their axes, 1 and
-   * 1 when they are not given (`arm_slim()` of `tools/blender/rig_mesh.py`). The paws keep their
+   * 1 when they are not given (`arm_girth()` of `tools/blender/rig_mesh.py`). The paws keep their
    * size, and the shoulder keeps its form.
    */
   readonly armGirth?: readonly [upper: number, fore: number];

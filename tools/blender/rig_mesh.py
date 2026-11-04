@@ -62,7 +62,7 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    factors across the trunk axis, one for the width and one for the depth (`girth_moves()`), and
    the arms, the legs, and the tail move out with their joints and keep their sizes. With
    `armGirth` of the config, the upper arm and the forearm take its factors across their axes
-   (`arm_slim()`, `fore_slim()`): the factor of the upper arm fades in from the shoulder joint,
+   before the skin (`arm_girth()`): the factor of the upper arm fades in from the shoulder joint,
    and the factor of the forearm fades out to the wrist, so that the shoulders and the paws keep
    their form. With `legGirth`, the thigh and the shin take its factors across their axes in the
    same way (`leg_girth()`), so that a thigh that the leg factor makes long does not look thin.
@@ -220,9 +220,14 @@ LEG = ('thigh', 'shin', 'foot', 'toes')
 TRUNK = ('hips', 'spine', 'spine1', 'chest')
 
 #: The share of the upper arm from the shoulder joint over which the factor of the cross-section
-#: of the upper arm (`armGirth` of the config) grows from 0 to all (`arm_slim()`), so that the
+#: of the upper arm (`armGirth` of the config) grows from 0 to all (`arm_girth()`), so that the
 #: shoulder and the side of the trunk next to the shoulder joint keep their form.
 ARM_GIRTH_FADE = 0.4
+
+#: The share of the upper arm before the elbow joint and of the forearm after it over which the
+#: factor of the upper arm changes to the factor of the forearm (`arm_girth()`), so that the
+#: elbow has no step.
+ARM_GIRTH_ELBOW = 0.15
 
 #: The share of the thigh above the hip joint over which the factor of the cross-section of the
 #: thigh (`legGirth` of the config) grows from 0 to all (`leg_girth()`), so that the haunch on
@@ -3072,7 +3077,7 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     shin). The upper
     arm and the forearm of each side grow by `arm` along their axes from the shoulder joint out,
     and the paw moves with the wrist and keeps its size. With `armGirth`, the upper arm and the
-    forearm take its two factors across their axes (`arm_slim()`, `fore_slim()`), and with
+    forearm take its two factors across their axes before the skin (`arm_girth()`), and with
     `legGirth`, the thigh and the shin (`leg_girth()`). A point on the inner side of the shoulder
     joint does not move with the upper arm. With a ramp (`weights.stretchRamp` of the config, in units), only the free arm
     beyond the plane |x| = `armSplit` stretches with the upper arm: the share of the stretch fades
@@ -3095,11 +3100,11 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
     new_ends = {k: v.copy() for k, v in ends.items()}
     if tuple(factors.get('legGirth', (1, 1))) != (1, 1):
         verts = leg_girth(verts, heads, *factors['legGirth'])
+    if tuple(factors.get('armGirth', (1, 1))) != (1, 1):
+        verts = arm_girth(verts, weights, heads, *factors['armGirth'])
     matrices = [move(np.eye(3), np.zeros(3), np.zeros(3)) for _ in BONES]
     halves = {}
-    fores = {}
 
-    slim_upper, slim_fore = factors.get('armGirth', (1, 1))
     for side in 'LR':
         factor = factors['arm']
         s = heads[f'upper_arm_{side}']
@@ -3114,9 +3119,6 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
             y = unit(axis)
             scale = np.eye(3) + (factor - 1) * np.outer(y, y)
             matrices[BONES.index(f'{name}_{side}')] = move(scale, origin, start)
-            if slim_fore != 1:
-                fores[BONES.index(f'{name}_{side}')] = (origin, y, slim_fore,
-                                                        np.linalg.norm(axis))
         # The upper arm stretches from the shoulder joint out. A point of the trunk on the inner
         # side of the shoulder joint keeps its place, so that a small arm weight on the throat or
         # the chest does not pull it across the middle.
@@ -3126,8 +3128,7 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
             sign = 1.0 if side == 'L' else -1.0
             split = rules['armSplit']
             share = smoothstep(verts[:, 0] * sign, split - ramp, split + ramp)
-        halves[BONES.index(f'upper_arm_{side}')] = (s, unit(e - s), factor, share,
-                                                    slim_upper, np.linalg.norm(e - s))
+        halves[BONES.index(f'upper_arm_{side}')] = (s, unit(e - s), factor, share)
         shift = wrist2 - wrist
         for name in ('hand', 'fingers'):
             matrices[BONES.index(f'{name}_{side}')] = move(np.eye(3), np.zeros(3), shift)
@@ -3224,8 +3225,7 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
             if name != 'root':
                 new_heads[name] = new_heads[name] + up
                 new_ends[name] = new_ends[name] + up
-    kept = {k: matrices[k].copy() for k in fores}
-    for k in (*segments, *halves, *fores):
+    for k in (*segments, *halves):
         matrices[k] = np.zeros((3, 4))
     plain = [np.zeros((3, 4)) if k in wide else m for k, m in enumerate(matrices)]
     out = skin(weights, plain, verts)
@@ -3238,12 +3238,8 @@ def stretch(verts, weights, heads, ends, children, factors, rules):
         if k in shifts:
             moved += shifts[k]
         out += weights[:, k, None] * moved
-    for k, (origin, axis, slim, length) in fores.items():
-        points = fore_slim(verts, origin, axis, slim, length)
-        out += weights[:, k, None] * (points @ kept[k][:, :3].T + kept[k][:, 3])
-    for k, (origin, axis, factor, share, slim, length) in halves.items():
-        points = verts if slim == 1 else arm_slim(verts, origin, axis, slim, share, length)
-        moved = outward_stretch(points, origin, axis, factor, share) + up
+    for k, (origin, axis, factor, share) in halves.items():
+        moved = outward_stretch(verts, origin, axis, factor, share) + up
         if k in shifts:
             moved += shifts[k]
         out += weights[:, k, None] * moved
@@ -3321,17 +3317,42 @@ def outward_stretch(points, head, axis, factor, share):
     return points + (factor - 1) * along[:, None] * axis
 
 
-def arm_slim(points, head, axis, factor, share, length):
-    """Moves points toward the axis of the upper arm, the line from `head` along the unit `axis`:
-    the part of each point across the axis takes the factor of the cross-section. The share of the
-    factor grows from 0 at the shoulder joint to all at `ARM_GIRTH_FADE` of the upper arm
-    (`length`), times the share of the stretch of each point. So a point on the inner side of the
-    shoulder joint keeps its place, and the shoulder keeps its form."""
-    rel = points - head
-    along = rel @ axis
-    across = rel - along[:, None] * axis
-    fade = smoothstep(along, 0.0, ARM_GIRTH_FADE * length) * share
-    return points - ((1 - factor) * fade)[:, None] * across
+def arm_girth(points, weights, heads, upper, fore):
+    """Moves the points of the upper arms and of the forearms of the source toward their axes by
+    the factors of the cross-section `upper` and `fore` (`armGirth` of the config), before the
+    skin. The share of each point is its weight on the arm bones of its side: the upper arm, the
+    forearm, the twist bone, the arm segments, and the helpers (`segment_bones()`), so the trunk,
+    the clavicle, and the paw keep their places. On the upper arm, the factor grows from 0 at the
+    shoulder joint to all at `ARM_GIRTH_FADE` of the upper arm, so that the shoulder keeps its
+    form. On the forearm, it falls from all at the elbow joint to 0 at the wrist, so that the
+    wrist keeps the width of the paw. Across the elbow joint, the factor of the upper arm changes
+    to the factor of the forearm over `ARM_GIRTH_ELBOW` of each bone. So the arm keeps its axis,
+    its joints, and its bone places, and a rebuilt arm keeps its rings, only thinner."""
+    out = points.copy()
+    for side in 'LR':
+        own = [k for k, name in enumerate(BONES) if name.endswith(f'_{side}')
+               and name.startswith(('upper_arm', 'forearm', 'elbow', 'wrist'))]
+        share = np.clip(weights[:, own].sum(axis=1), 0.0, 1.0)
+        s, e, w = (np.asarray(heads[f'{b}_{side}'], float) for b in ('upper_arm', 'forearm', 'hand'))
+        moves = []
+        for head, end, factor, is_upper in ((s, e, upper, True), (e, w, fore, False)):
+            length = float(np.linalg.norm(end - head))
+            axis = (end - head) / length
+            rel = points - head
+            along = rel @ axis
+            across = rel - along[:, None] * axis
+            if is_upper:
+                fade = smoothstep(along, 0.0, ARM_GIRTH_FADE * length)
+                upper_length = length
+                elbow = along
+            else:
+                fade = 1 - smoothstep(along, 0.0, length)
+                fore_length = length
+            moves.append(((factor - 1) * fade)[:, None] * across)
+        blend = smoothstep(elbow, (1 - ARM_GIRTH_ELBOW) * upper_length,
+                           upper_length + ARM_GIRTH_ELBOW * fore_length)[:, None]
+        out += share[:, None] * ((1 - blend) * moves[0] + blend * moves[1])
+    return out
 
 
 def leg_girth(points, heads, thigh, shin):
@@ -3371,18 +3392,6 @@ def leg_girth(points, heads, thigh, shin):
         out[own, 0] = sign * np.maximum(sign * out[own, 0], np.minimum(sign * points[own, 0],
                                                                         LEG_GIRTH_GAP))
     return out
-
-
-def fore_slim(points, head, axis, factor, length):
-    """Moves points toward the axis of the forearm, the line from the elbow joint `head` along the
-    unit `axis`: the part of each point across the axis takes the factor of the cross-section. The
-    share of the factor falls from all at the elbow joint to 0 at the wrist (`length` from the
-    elbow), so that the wrist keeps the width of the paw."""
-    rel = points - head
-    along = rel @ axis
-    across = rel - along[:, None] * axis
-    fade = 1 - smoothstep(along, 0.0, length)
-    return points - ((1 - factor) * fade)[:, None] * across
 
 
 def segment_stretch(points, head, start, end, factor):
