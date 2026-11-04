@@ -137,8 +137,8 @@ interface SpeciesParams {
   palette?: StudioPalette;
   /**
    * The scale of an instrument of `SCALED_INSTRUMENTS` for the species (4.6), 1 by default.
-   * Also `violaScale`, `celloScale`, `bassScale`, `oboeScale`, `bassoonScale`,
-   * `trumpetScale`, `cymbalScale`, and `harpScale`.
+   * Also `violaScale`, `celloScale`, `bassScale`, `fluteScale`, `oboeScale`,
+   * `clarinetScale`, `bassoonScale`, `trumpetScale`, `cymbalScale`, and `harpScale`.
    */
   violinScale?: number;
   /** `'suspended'` for a species whose arms cannot hold hand cymbals (4.6). */

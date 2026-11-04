@@ -65,12 +65,26 @@ export interface SpeciesParams {
    */
   readonly bassScale?: number;
   /**
+   * The scale of the flute for the species, as a factor of the flute of the app (design 4.6). It is
+   * 1 when it is not given. A species with short arms plays a smaller flute, as a child plays a
+   * fractional violin. The flute shrinks toward the lip plate, so the lip plate stays at the mouth,
+   * and the grips of the palms come nearer to the mouth.
+   */
+  readonly fluteScale?: number;
+  /**
    * The scale of the oboe for the species, as a factor of the oboe of the app (design 4.6). It is
    * 1 when it is not given. A species with short arms plays a smaller oboe, as a child plays a
    * fractional violin. The oboe shrinks toward the tip of the reed, so the reed stays in the
    * mouth, and the grips of the palms come nearer to the mouth.
    */
   readonly oboeScale?: number;
+  /**
+   * The scale of the clarinet for the species, as a factor of the clarinet of the app (design
+   * 4.6). It is 1 when it is not given. A species with short arms plays a smaller clarinet, as a
+   * child plays a fractional violin. The clarinet shrinks toward the mouthpiece, so the mouthpiece
+   * stays in the mouth, and the grips of the palms come nearer to the mouth.
+   */
+  readonly clarinetScale?: number;
   /**
    * The scale of the bassoon for the species, as a factor of the bassoon of the app (design 4.6).
    * It is 1 when it is not given. A species with short arms plays a smaller bassoon, as a child
@@ -210,7 +224,9 @@ export const SCALE_PARAMS = {
   viola: 'violaScale',
   cello: 'celloScale',
   contrabass: 'bassScale',
+  flute: 'fluteScale',
   oboe: 'oboeScale',
+  clarinet: 'clarinetScale',
   bassoon: 'bassoonScale',
   trumpet: 'trumpetScale',
   cymbals: 'cymbalScale',

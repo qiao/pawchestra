@@ -84,9 +84,6 @@ export function buildInstrument(
       return buildPiano();
     case 'choir-folder':
       return buildChoirFolder();
-    case 'flute':
-    case 'clarinet':
-      return buildWoodwind(id);
     case 'horn':
     case 'trombone':
       return buildBrass(id);
@@ -137,7 +134,9 @@ function buildScaled(
     case 'cello':
     case 'contrabass':
       return buildBowedString(id, scale, bowGrip, endPin);
+    case 'flute':
     case 'oboe':
+    case 'clarinet':
     case 'bassoon':
       return buildWoodwind(id, scale);
     case 'trumpet':
