@@ -354,15 +354,14 @@ passes.
       0.4 cm into the horn at rest (0.6 cm on the old hold): of 16 rest variants of the left elbow
       and the left rest grip, none kept the left paw at 0.1 cm and the left wrist at 0.3 cm or
       less. Try a rest grip on the far side of the valves, or accept the depths.
-- [ ] Badger bass drummer: the hanging left paw turns 22° from its accepted grip (`ACCEPTED_GRIPS`
-      L -22, gate FAIL by 7°). `hangingHand()` of `pose/hang.ts` turns the bind paw by the
-      shortest arc from straight down, so the straight bind of the freed arm turns the hanging
-      paw. Accept the new median with the 2x paw crops, or make the hanging hand independent of
-      the bind paw (`reports/2026-11-03-badger-arms2/`).
+- [ ] Hanging arms: make `hangingHand()` of `pose/hang.ts` independent of the bind paw (shared pose
+      code). It turns the bind paw by the shortest arc from straight down, so a straight bind turns
+      the hanging paw: the hanging left paw of the badger bass drummer has the grip -44° (-22° on
+      the old bind, `ACCEPTED_GRIPS`). The raised triangle upper arm of the badger goes 2.4 cm into
+      the left shoulder (base 2.1 cm, accepted), and elbow variants of the triangle hold fold the
+      arm root (L 8 to 10).
 - [ ] Badger with rebuilt arms: the straight bind narrows the bent elbows of the xylophonist to
       2.7 cm (base 4.0 cm) and of the cymbalist to 3.2 cm (base 4.1 cm). Read the 2x elbow crops.
-- [ ] Badger percussionist: the raised left upper arm goes 2.4 cm into the left shoulder (base
-      2.1 cm). Elbow variants of the triangle hold fold the arm root (L 8 to 10).
 - [ ] Badger recast roles: the freed round upper arms go 3.4 to 4.5 cm into the body in the shared
       holds of the violin, the flute, the clarinet, and the trumpet (base 2.0 to 3.0 cm).
 - [ ] Arm rebuild: a cut plane less than about 0.4 mm from a source vertex leaves a cluster of
