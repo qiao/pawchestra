@@ -28,10 +28,13 @@
  * `--quick` takes the coarse {@link QUICK_SAMPLE} in place of {@link CAST_SAMPLE}.
  *
  * `--base <ref>` runs the matrix on the code of a commit and on the working tree, each in a child
- * process (`probeBeside()` of `tools/ref-tree.ts`), with the matrix, the gate, and the size rule of
- * the working tree on both ({@link MATRIX_SCRIPTS}). The JSON of the commit goes into the cache by
- * tree. The table gives the cell of each pair on both trees with the change ({@link compareLines}).
- * A child writes its {@link MatrixJson} into the file of `--json`.
+ * process (`probeBeside()` of `tools/ref-tree.ts`). The child of the commit runs the tools of the
+ * commit: its matrix, its gate, and its size rule. Thus a change of a size rule or of a limit shows
+ * as a change of the cells, and the column of the commit is equal to a run in a tree of the commit
+ * (`tools/base-tree.sh`). The commit must have the `--json` of this tool (8d4f6da1 or newer). The
+ * JSON of the commit goes into the cache by commit. The table gives the cell of each pair on both
+ * trees with the change ({@link compareLines}). A child writes its {@link MatrixJson} into the file
+ * of `--json`.
  *
  * `--set <changes>` changes the holds of each pair in memory (`setHolds()` of
  * `tools/hold-sets.ts`), before the tool takes the shared hold and the size rule, so that a try
@@ -1090,12 +1093,6 @@ function readMatrix(text: string): MatrixJson {
 }
 
 /**
- * The scripts of the working tree that the probe tree of `--base` takes in place of its own, so
- * that both trees run the same matrix, gate, and size rule.
- */
-const MATRIX_SCRIPTS: readonly string[] = ['cast-matrix.ts', 'arm-check.ts', 'recast-scale.ts'];
-
-/**
  * Runs the tool.
  *
  * @returns The exit code.
@@ -1119,7 +1116,7 @@ async function main(): Promise<number> {
       options.base,
       'cast-matrix.ts',
       { base: child, tree: child },
-      { prefix: 'cast-matrix-', cache: true, scripts: MATRIX_SCRIPTS },
+      { prefix: 'cast-matrix-', cache: true },
     );
     const lines = compareLines(readMatrix(texts.base), readMatrix(texts.tree), options.base);
     mkdirSync(dirname(options.out), { recursive: true });
