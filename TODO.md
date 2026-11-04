@@ -517,16 +517,21 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Panda with the free arms in the cast matrix: each recast cell of the T-pose panda fails on
-      the upper arms in the body (violin 2.9 cm, cello 6.6 cm, flute 5.0 cm, clarinet 7.6 cm,
-      trumpet 10.0 cm) or the forearms (snare drum 7.6 cm), and the folds go over the limit 8 in
-      four cells (10 to 13 faces). The shared holds keep the elbows of joined arms near the trunk.
-      Give the shared holds the rule of the free round arms (5.3), and run the matrix for each body.
-- [ ] Dog with the free arms in the cast matrix: the rebuilt round arms of the dog go further into
-      the body in the recast cells than the old arms (lower or play, base in parentheses): violin
-      2.1 cm (1.9), flute 2.3 cm (1.3), clarinet 2.7 cm (1.8), trumpet 4.5 cm (2.6), snare drum
-      3.7 cm (2.6) (`reports/2026-11-03-dog-hold/proof/matrix.log`). Give the shared holds the rule
-      of the free round arms (5.3), as for the panda.
+- [ ] Free round arms in the shared holds (5.3): with the elbow rule (`roundArms`), the upper
+      arms of round bodies still go into the trunk in many recast cells
+      (`reports/2026-11-03-shared-elbows/`). The dog clips at 0.27 of the left upper arm, near the
+      root, in the flute (2.3 cm), the clarinet (2.6 cm), and the trumpet (2.1 cm), and the pig at
+      the root in each role (3.4 cm to 4.6 cm), also in its own horn hold (3.8 cm). The elbow turn
+      does not move these points. Next: a turn of the shoulder bone from the same body measure
+      (`armOut()`). The cat (27° to 28°) needs less swing than the rabbit and the dog that the
+      violin and the cello fit, so it gets no turn there (violin 2.4 cm, cello 2.5 cm).
+- [ ] Rabbit flutist (5.3): the elbow rule turns the left paw 50° from the accepted flute grip
+      (limit 45°), because the grip turn counts from the posed forearm. The cell went from PASS to
+      FAIL. Check the paw in crops, and give the grip turn of a turned elbow its own limit or a
+      roll of the paw that keeps the grip.
+- [ ] Percussion holds (5.3): the badger plays the shared percussion holds as its own holds, so
+      they have no elbow rule. Give them a fit of the badger (`armOut()` 42° and 44°), so that a
+      rounder recast body turns its elbows out and the badger stays the same.
 - [ ] Shared cello hold (`BOWED_HOLDS.cello`, 5.3): the rabbit, the wolf, the deer, and the dog
       (own hold) pass. The left claws of the monkey (1.8 cm) go into the cello in a few play
       samples. The cello of the foxes goes 5.0 cm into the
