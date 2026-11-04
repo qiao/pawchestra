@@ -183,7 +183,10 @@ The rebuild thus puts a ring at each color edge across the arm. A species script
 `tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. An arm that the
 mesh joins to the trunk down to the elbow has no free section. A species script frees it with a
 side wall on the trunk (`tools/blender/cat_arms.py`), or splits it from the trunk along its crease
-in a copy (`tools/blender/beaver_edit.py`). The `README.md` of
+in a copy (`tools/blender/beaver_edit.py`). An arm that joins the trunk only near the shoulder has
+a free section, but the shoulder line then lies far down the upper arm, and the long thin faces
+above it fold when the arm lifts. So the badger copy splits its crease too
+(`tools/blender/badger_edit.py`), and the tube starts near the shoulder joint. The `README.md` of
 `assets/models/<a>/` gives the source and the steps of each file.
 [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
@@ -327,7 +330,8 @@ shape that fits only that hold, and each other hold blends its own bend on top. 
 the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
 species and each instrument (Cast matrix). The rabbit, the polar bear, the wolf, the mouse, the
 elephant, the rhino, the bear, the deer, the hippo, the fox, the monkey, the panda, the pig, the
-cat, the dog, and the beaver have this bind. A body with `raise` shapes also fits each shape against all its roles, because a
+cat, the dog, the beaver, and the badger have this bind. A body with `raise` shapes also fits each
+shape against all its roles, because a
 shape fits only the poses near its hold. A pose gives the bend of a paw off its forearm as an
 angle (`pawBendR`), so that a new bind keeps the paw in the world.
 
