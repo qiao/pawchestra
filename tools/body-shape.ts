@@ -12,6 +12,7 @@
  * - The girths of the upper arm, the forearm, the thigh, and the shin: the perimeter of the convex
  *   hull of a cut square to the bone at its middle, as the mean of the two sides.
  * - The knee gap and the ankle gap: the gap between the inner sides of the legs near the joints.
+ * - The lengths of the trunk, the neck, and the bones of the left limbs.
  * - The distance of the shoulder joints.
  * - The back bulge: the largest distance of the rear outline of the trunk behind the chord from the
  *   waist to the neck, from the side.
@@ -507,9 +508,17 @@ function backBulge(
  */
 function bindRows(rig: StudioRig): FormRow[] {
   const heads = rig.body.heads;
+  const length = (a: Vec3, b: Vec3): number =>
+    Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) * 100;
   return [
     { name: 'H', value: rig.body.headHeight * 100 },
     { name: 'seat', value: (rig.body.seatHeight ?? Number.NaN) * 100 },
+    { name: 'trunk length', value: length(heads.hips, heads.neck) },
+    { name: 'neck length', value: length(heads.neck, heads.head) },
+    { name: 'upper arm length', value: length(heads.upper_arm_L, heads.forearm_L) },
+    { name: 'forearm length', value: length(heads.forearm_L, heads.hand_L) },
+    { name: 'thigh length', value: length(heads.thigh_L, heads.shin_L) },
+    { name: 'shin length', value: length(heads.shin_L, heads.foot_L) },
     ...trunkRows(rig),
     { name: 'upper arm girth', value: limbGirth(rig, 'upper_arm', 'forearm') },
     { name: 'forearm girth', value: limbGirth(rig, 'forearm', 'hand') },
