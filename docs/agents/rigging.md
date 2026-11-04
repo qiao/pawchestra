@@ -221,6 +221,7 @@ after a new body with `armSegments`.
   a dark notch. A Smooth of the root weights also moves the fold. A rigid patch on the arm swings
   across the chest, and the body cut folds over it: give it more clavicle than arm (`cat_root.py`).
 - A raised arm pulls out a side with no trunk weight: give it a trunk share (`paintedBelow`).
+  The share leaves a notch at the front of a hanging arm root. Fit a rest shape with `follow`.
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
