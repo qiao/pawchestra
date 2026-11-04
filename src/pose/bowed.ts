@@ -8,6 +8,7 @@ import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.
 import type { TorsoFrames } from './frames.ts';
 import { HAND_FRAMES, handPlaceOf } from './fingering.ts';
 import { createArmPose, poseShoulder, solveArm, writeArm, writeCurl } from './ik.ts';
+import { liftShoulder } from './round-arms.ts';
 import { smoothstep } from './rest.ts';
 import type { BowState } from './strokes.ts';
 
@@ -217,7 +218,8 @@ export function stringsAt(rig: RigPoints, place: InstrumentPlace, out: StringsPl
  * Gives the forward turn of the right shoulder bone, so that the bow arm reaches the strings. In
  * the lift and the lowering, the turn stays whole down to the weight `BowedHold.reachFade` of the
  * playing pose, and fades to none at the rest pose below it, so that a bow arm that still crosses
- * the chest keeps its shoulder forward.
+ * the chest keeps its shoulder forward. The lift of a round body (`RigPoints.shoulderLift`) adds
+ * to it in each pose.
  *
  * @param rig The points of the player.
  * @param weight The weight of the playing pose.
@@ -226,7 +228,11 @@ export function stringsAt(rig: RigPoints, place: InstrumentPlace, out: StringsPl
  */
 export function shoulderTurn(rig: RigPoints, weight: number, out: Quaternion): Quaternion {
   const share = Math.min(1, weight / rig.hold.reachFade);
-  return out.setFromAxisAngle(Y_AXIS, rig.hold.reach * share);
+  return liftShoulder(
+    out.setFromAxisAngle(Y_AXIS, rig.hold.reach * share),
+    rig.shoulderLift[1],
+    'R',
+  );
 }
 
 /**
@@ -234,7 +240,8 @@ export function shoulderTurn(rig: RigPoints, weight: number, out: Quaternion): Q
  * (`BowedHold.reachL`). A violin or a viola on the lap in the rest pose turns it with the weight
  * of the playing pose, as a player brings the left shoulder forward under the instrument
  * (`docs/reference/string-technique.md`, section 1.10). A floor instrument keeps the turn in the
- * rest pose, because the left hand holds it at its playing place in the rest.
+ * rest pose, because the left hand holds it at its playing place in the rest. The lift of a round
+ * body (`RigPoints.shoulderLift`) adds to it in each pose.
  *
  * @param rig The points of the player.
  * @param weight The weight of the playing pose.
@@ -243,7 +250,11 @@ export function shoulderTurn(rig: RigPoints, weight: number, out: Quaternion): Q
  */
 export function shoulderTurnL(rig: RigPoints, weight: number, out: Quaternion): Quaternion {
   const share = rig.hold.rest ? weight : 1;
-  return out.setFromAxisAngle(Y_AXIS, -rig.hold.reachL * share);
+  return liftShoulder(
+    out.setFromAxisAngle(Y_AXIS, -rig.hold.reachL * share),
+    rig.shoulderLift[0],
+    'L',
+  );
 }
 
 const stringTurn = new Quaternion();

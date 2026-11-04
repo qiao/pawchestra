@@ -33,7 +33,7 @@ import { fitCelloPlace } from './cello-place.ts';
 import { fitViolinPlace } from './violin-place.ts';
 import type { ChinFit } from './violin-place.ts';
 import { lapPoint } from './lap.ts';
-import { elbowOutTurn, turnPoleOut } from './round-arms.ts';
+import { elbowOutTurn, shoulderLift, turnPoleOut } from './round-arms.ts';
 import type { LapPlace } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import type { BowRange } from './strokes.ts';
@@ -1426,6 +1426,11 @@ export interface BowedRig {
   readonly restPoleR: Vec3;
   /** The direction to which the left elbow points in the rest pose, in the axes of the chest. */
   readonly restPoleL: Vec3;
+  /**
+   * The lift of each shoulder bone up and out in each pose, in radians, by the rule of the round
+   * free arms (`shoulderLift()`, design 5.3): 0 for a hold with no rule and for a thin body.
+   */
+  readonly shoulderLift: readonly [left: number, right: number];
   /** The bow in the rest pose: the place of the `bow` bone and its rotation, in the model axes. */
   readonly restBow: {
     /** The place of the `bow` bone: the grip on the stick. */
@@ -1769,6 +1774,7 @@ export function bowedRig(
     liftReach: toVec3(new Vector3(...hold.liftReach).multiplyScalar(model.body.headHeight)),
     restPoleR: hold.restPoleR,
     restPoleL: hold.restPoleL,
+    shoulderLift: [0, 0],
     restBow: {
       grip: restBow.forearm
         ? forearmGrip(model, restBow.forearm)
@@ -1799,7 +1805,7 @@ export function bowedRig(
     : hold.restArms && hold.restPawTurnL !== null
       ? armRest(model, rig, hold.restArms)
       : rig;
-  const round = roundElbows(model, rest);
+  const round = liftShoulders(model, roundElbows(model, rest));
   return { ...round, bowRange: bowRangeOf(round), stopRange: stopRangeOf(round) };
 }
 
@@ -1834,6 +1840,26 @@ function roundElbows(model: PlayerModel, rig: RigPoints): RigPoints {
     },
     restPoleL: left(rig.restPoleL),
     restPoleR: right(rig.restPoleR),
+  };
+}
+
+/**
+ * Lifts the shoulders of a round body by the rule of the round free arms
+ * ({@link BowedHold.roundArms}, design 5.3), in each pose. The paws keep their places, so the
+ * joints go up, and the upper arms turn less against the shoulders.
+ *
+ * @param model The player model.
+ * @param rig The points of the player.
+ * @returns The points, with the lifts, or `rig` for a hold with no rule.
+ */
+function liftShoulders(model: PlayerModel, rig: RigPoints): RigPoints {
+  const fit = rig.hold.roundArms;
+  if (fit === null) {
+    return rig;
+  }
+  return {
+    ...rig,
+    shoulderLift: [shoulderLift(model, rig.armL, fit), shoulderLift(model, rig.armR, fit)],
   };
 }
 
