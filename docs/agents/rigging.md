@@ -228,8 +228,10 @@ weights file, and `paintedLower` lists the bones that keep the rule weights. Run
 - A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
   it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
 - A hanging T-pose arm folds the faces under its root, as a split crease does. Make them and the
-  first tube ring rigid (`rigidPainted`). A raised arm pulls out a side with no trunk weight: give
-  it a trunk share (`paintedBelow`).
+  first tube ring rigid (`rigidPainted`). A rigid group at the front of a root or across the chest
+  moves the fold to its edge, and the edge shades a dark notch. A Smooth of the root weights also
+  only moves the fold.
+- A raised arm pulls out a side with no trunk weight: give it a trunk share (`paintedBelow`).
 - A narrow fade under a far bone turn moves the fold into the fade. Let the fade span several
   rings.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
