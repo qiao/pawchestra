@@ -80,6 +80,46 @@ export function shoulderLift(model: PlayerModel, arm: ArmRig, fitOut: number | n
   return Math.min(MAX_LIFT, Math.max(0, LIFT_PER_SWING * (armOut(model, arm) - from)));
 }
 
+/**
+ * The largest distance from the shoulder joint to the wrist in the middle of a move of a free paw,
+ * as a share of the length of the arm ({@link keepBent}). With no limit, the wrist of the free
+ * left paw of the dog flutist was up to 1.07 arm lengths from the shoulder joint, so the arm was
+ * straight, and the upper arm went 2.0 cm into the chest in the lift (1.0 cm with 0.97, and 0.9 cm
+ * with 0.94). With 0.97, the upper arm of the dog clarinetist still went 1.6 cm into the shoulder
+ * in a lowering (1.3 cm with 0.94, and 1.1 cm with 0.9).
+ */
+const BENT_REACH = 0.94;
+
+const toWrist = new Vector3();
+
+/**
+ * Keeps the elbow of a free paw bent in the lift and the lowering by the rule of the round free
+ * arms in a shared hold (design 5.3, "Bent arms in the moves"): a wrist further from the shoulder
+ * joint than {@link BENT_REACH} of the length of the arm comes nearer to the joint along the line
+ * between them. The limit fades to the whole length at the rest and at the play
+ * (`4 × weight × (1 - weight)`), so the paw keeps its places there and moves with no jump. A bent
+ * elbow follows its pole, so the elbow turn of the rule holds the upper arm off the trunk, and a
+ * straight arm does not.
+ *
+ * @param arm The arm.
+ * @param shoulder The posed shoulder joint.
+ * @param weight The eased weight of the playing pose: 0 is the rest pose.
+ * @param wrist The wrist of the move, which the function changes.
+ * @returns `wrist`.
+ */
+export function keepBent(arm: ArmRig, shoulder: Vector3, weight: number, wrist: Vector3): Vector3 {
+  if (weight <= 0 || weight >= 1) {
+    return wrist;
+  }
+  const { shoulder: root, elbow, wrist: hand } = arm.bind;
+  const length =
+    Math.hypot(elbow[0] - root[0], elbow[1] - root[1], elbow[2] - root[2]) +
+    Math.hypot(hand[0] - elbow[0], hand[1] - elbow[1], hand[2] - elbow[2]);
+  const limit = length * (1 - (1 - BENT_REACH) * 4 * weight * (1 - weight));
+  const distance = toWrist.subVectors(wrist, shoulder).length();
+  return distance > limit ? wrist.copy(shoulder).addScaledVector(toWrist, limit / distance) : wrist;
+}
+
 const Z_AXIS = new Vector3(0, 0, 1);
 const lift = new Quaternion();
 
