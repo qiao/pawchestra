@@ -13,7 +13,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | Species | Body | Role |
 |---|---|---|
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
-| polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`). Sits on a bench that fits its haunch (`benchFitOf()`). | `pianist` |
+| polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), rigid faces under the arm roots (`rigidPainted`). Sits on a bench that fits its haunch (`benchFitOf()`). | `pianist` |
 | rabbit | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor 1.18`), rigid armpit faces, skin normals, a trunk share under the armpits (`paintedBelow`), the old chair (`shinFactor`, `sit.most`), wide thighs (`legGirth`), knees out (`studio.legTurns`), a longer neck and trunk, a smaller head (`neckFactor`, `trunkFactor`, `headFactor`), the old shape (`girthProfile`), filled old eyes (`eyeFill`), a smaller violin, elbows out. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
