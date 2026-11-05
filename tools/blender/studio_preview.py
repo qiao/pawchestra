@@ -1,17 +1,18 @@
 """Shows the pose that the app draws for a player in Blender (design 4.4, "Hand rig").
 
-`pnpm pose-preview <role>` writes the pose of each moment: the turn and the head of each bone of
-the skin and the weight of each morph target, in the axes and the units of the `.blend`.
-`load_preview()` imports the export `<animal>.rig.glb` as the collection `app_preview`, beside
-the rig. The GLB file has the bind as its rest and the morph targets of the app, so the mesh of
-the preview skins from the bind as the app does. One Action holds one key for each moment, with a
+`pnpm pose-preview <role>` writes the pose of each moment: the turn and the head of each bone of the
+skin and the weight of each morph target, in the axes and the units of the `.blend`.
+`load_preview()` imports the export `<animal>.rig.glb` as the collection `app_preview`, beside the
+rig. The GLB file has the bind as its rest and the morph targets of the app, so the mesh of the
+preview skins from the bind as the app does. One Action holds one key for each moment, with a
 timeline marker of the name of the moment. The faces are flat, and a sun light comes from the
-direction of the key light of the stage. `refresh_preview()` exports the current state of the
-open file into a temporary folder, with no save of the file, and imports it again. The Action,
-the markers, the frame, and the view stay. `fold_colors()` colors each face whose normal turns
-more than an angle from its bind normal, moved by the mean skin turn of its corners (the test of
-`pnpm fold-probe`). A save of the file removes the preview first and adds it back after, so the
-`.blend` never holds it.
+direction of the key light of the stage: `shade_like_app()` shows the 3D views in Material Preview
+with the scene lights. `refresh_preview()` exports the current state of the open file into a
+temporary folder, with no save of the file, and imports it again. The Action, the markers, the
+frame, and the view stay. `fold_colors()` colors each face whose normal turns more than an angle
+from its bind normal, moved by the mean skin turn of its corners (the bind normal moves as in `pnpm
+fold-probe`). A save of the file removes the preview first and adds it back after, so the `.blend`
+never holds it.
 
 In a live Blender, call only the functions below. No function resets Blender or loads a file:
 
@@ -21,6 +22,7 @@ In a live Blender, call only the functions below. No function resets Blender or 
     sp.load_preview('cat', '<repo>/scratch/pose-preview/violist.json')
     sp.refresh_preview()
     sp.fold_colors(True)
+    sp.shade_like_app()
     sp.clear_preview()
 
 The check runs headless on a copy of the `.blend`, with a file of `pnpm pose-preview --skin`. It
@@ -588,6 +590,45 @@ def fold_colors(on=True, angle=60.0):
     state['folds'], state['angle'] = bool(on), float(angle)
     _paint_folds()
     return state.get('folded', 0) if on else 0
+
+
+#: The settings of a 3D view that `shade_like_app()` sets: Material Preview with the scene lights,
+#: so that the sun of the preview lights it, and a weak studio light in place of the world.
+SHADING = {
+    'type': 'MATERIAL',
+    'use_scene_lights': True,
+    'use_scene_world': False,
+    'studiolight_intensity': 0.35,
+}
+
+
+def shade_like_app(on=True):
+    """Shows each 3D view of the window in Material Preview with the scene lights, so that the
+    flat faces of the preview take the sun light from the direction of the app key light. With
+    `on` false, the views get back their settings of before. Gives the number of views."""
+    state = _state()
+    if state is None:
+        raise RuntimeError('No preview: call load_preview() first.')
+    screen = bpy.context.window.screen if bpy.context.window else None
+    spaces = [
+        space
+        for area in (screen.areas if screen else [])
+        if area.type == 'VIEW_3D'
+        for space in area.spaces
+        if space.type == 'VIEW_3D'
+    ]
+    saved = state.setdefault('shading', {})
+    for k, space in enumerate(spaces):
+        if on:
+            saved.setdefault(k, {name: getattr(space.shading, name) for name in SHADING})
+            for name, value in SHADING.items():
+                setattr(space.shading, name, value)
+        elif k in saved:
+            for name, value in saved[k].items():
+                setattr(space.shading, name, value)
+    if not on:
+        saved.clear()
+    return len(spaces)
 
 
 def _save_pre(*_):
