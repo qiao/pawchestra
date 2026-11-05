@@ -13,7 +13,7 @@ arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | bear       | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium.                                                                                                                                                                                                                                                                                                                                      | `conductor`                                                                  |
 | polar-bear | T-pose mesh, rebuilt arms and legs (`polar_bear_arms.py`, `polar_bear_legs.py`), dual quaternion knees (`bind.knee`, `kneeCrease`), the old bone heat (`heatSource`), rigid faces under the arm roots (`rigidPainted`). Sits on a bench that fits its haunch (`benchFitOf()`).                                                                                                                                                                                                                                 | `pianist`                                                                    |
-| rabbit     | Hand rig (`rabbit.blend`, its `README.md`): the Tripo mesh, round arm tubes 1.18 times longer, longer legs with full thighs, a round haunch back, smooth eye sockets, eye objects, the old chair, bind keys (sit, crease, lap, neck, nape, collar), elbow ramps, elbow `arm_raise_*` keys, a cream tone, a smaller violin. | `violinist`                                                                  |
+| rabbit     | Hand rig by point edits (`rabbit.blend`, its `README.md`): the Tripo mesh with a clean belly grid, round arm rings, both arm bones 1.14 times longer, longer legs with the girth of the mesh, knee rings, eye objects on the source eyes, the old chair, no shape keys, elbow ramps, a cream tone, a smaller violin. | `violinist`                                                                  |
 | fox-red    | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones.                                                                                                                                                                                                                                                                                                                                                                                                    | `fox-violinist`                                                              |
 | fox-tan    | The red fox rig with a tan palette (`palettes`).                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `flutist`                                                                    |
 | cat        | Hand rig (`cat.blend`, its `README.md`): T-pose mesh, arm and forearm rings, a soft brow, smooth eye sockets, eye objects, long thick legs, bind keys, `arm_raise` keys, a tail over the left side of the seat, a viola of `violaScale`.                                                                                                                                             | `violist`                                                                    |
@@ -319,14 +319,17 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 
 ### Head and colors
 
-- A big head over a thin neck shows a dark band. Smooth the neck with a box that ends behind the
-  chin.
+- A big head over a thin neck shows a dark band under the head. On a hand rig, keep this form of
+  the mesh: a fill of the groove made the rabbit neck a thick column.
 - A horn, a trunk, whiskers, or antlers distort the head measures. Use `noseTop`, `noseFront`,
   `headFloor`, and `headCeiling`.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye.
-  Fill it (`eyeFill`), or smooth it in a hand rig and run `se.fit_eyes()`.
+  Fill it (`eyeFill`), or put the middle of the eye object on the dome, on its axis, so that the
+  dome does not cut into the pea eye.
+- The eye box and the nose box of `add_surface()` are in the units of the source. Run it before
+  the legs lift the body, or lower the mesh for the run.
 - A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
   the config, and run `arm_rebuild.py`: it writes the softened places into the weights file.
 - A face rule can paint a dark block on the side. Check it from the front, at 60°, and the sides.
