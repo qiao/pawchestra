@@ -27,6 +27,7 @@ src/models/studio/rabbit.ts               studio body of the app
 | `rabbit-weights.json` | Weights of the same Blender run. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
 | `rabbit-tpose.glb` | Source mesh (below) | None |
 | `rabbit.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
+| `tripo/rabbit.fbx`, `tripo/rabbit.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
 
 ## rabbit-tpose.glb
 
@@ -60,6 +61,31 @@ than two faces, and 484 faces have a corner angle below 10°.
 ```bash
 shasum -a 256 assets/models/rabbit/rabbit-tpose.glb
 ```
+
+## tripo/rabbit.fbx
+
+A mesh of the same rabbit in the same T-pose, made with Tripo: quad faces, and arm and leg tubes
+of 8 to 16 vertices around. Its arm sections and its head width are those of
+`rabbit-tpose.glb` within 2 %.
+The FBX file keeps the quads (a GLB file of the same mesh holds only triangles). The folder
+`rabbit.fbm/` holds its textures, and the FBX file links them by name.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object `output_unwrapped`, turned 90° about X (the FBX axes have Y up), with no armature and no animation. 2,428 vertices and 2,638 faces: 2,217 quads and 421 triangles (4,855 triangles). One UV layer. One material that links the four textures |
+| Parts | One connected part, with the whiskers. No vertices merge at 1e-5. 10 open edges: 3 at the root of each whisker group, 1 at each side of the nose, and 2 under the left paw. 7 edges have more than two faces |
+| Box | After the turn: x ±0.3564, y ±0.1592, and z 0 to 0.998 in the units of the file. The rabbit faces -y |
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `rabbit.fbx` | 217,104 bytes | | `6ee4f87a767c16e80576e976244b013391857b53ef33e4a59996a6f120a85c44` |
+| `rabbit.fbm/rabbit_basecolor.jpg` | 889,716 bytes | 4096 × 4096 | `5c70fcccdbf4a272d9844e6f3f5ff4820f82f76062e5318cda85e99f77c3fe10` |
+| `rabbit.fbm/rabbit_metallic.jpg` | 355,829 bytes | 2048 × 2048 | `cf96150d0a4f567b21d6d09568f862399939595f11ed4e7c10e0da5ef810e3df` |
+| `rabbit.fbm/rabbit_normal.jpg` | 734,946 bytes | 2048 × 2048 | `e91b3d0f6c2a627e704f91778597ee0674ab9132a026b59be2db835545f812ee` |
+| `rabbit.fbm/rabbit_roughness.jpg` | 191,192 bytes | 2048 × 2048 | `47e6fbac3a29e63b8d677bfc13311d399a6f4572ce7356e5693f4327f4302d94` |
 
 ## rabbit-arms.glb and rabbit-weights.json
 
