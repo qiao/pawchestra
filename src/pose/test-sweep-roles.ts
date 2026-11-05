@@ -77,10 +77,10 @@ const BODY_LOOPS = 2;
 const MESH_BODY_LOOPS = 4;
 
 /**
- * The open loops of {@link BODY_BONES} of the T-pose rabbit mesh: the roots of the two upper arms,
- * and four small open edges at the whiskers and at the tail root, which the source mesh has.
+ * The open loops of {@link BODY_BONES} of the rabbit mesh in an A-pose: the roots of the two upper
+ * arms, and six small open edges at the whiskers, which the source mesh has.
  */
-const RABBIT_BODY_LOOPS = 6;
+const RABBIT_BODY_LOOPS = 8;
 
 /**
  * The open loops of {@link BODY_BONES} of the hand rig of the cat: the roots of the two upper
