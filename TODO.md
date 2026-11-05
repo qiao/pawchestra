@@ -313,8 +313,9 @@ passes.
 - [ ] Rabbit hand rig: the recasts of the cast matrix have no raise keys, and the bind supination
       leaves a left paw twist p95 of 135° (`flutist@rabbit`, `snare-drummer@rabbit`).
 - [ ] Rabbit hand rig: a small dark mark stays at the middle of the lap in the lift from az -45.
-      Find its faces with a 2D render of the bind from that view (`plot_lap.py` of the round
-      scripts in `scratch/rabbit-fix/`).
+      The lap does not move in the lift (`pnpm bind-view --pose` at `lift50`: 0.000 u), so the
+      mark is a shadow or a fault of the bind faces. Find the faces with
+      `pnpm bind-view --view az-45@20`, and try each fix with `pnpm rig-trial`.
 - [ ] Rabbit hand rig: from the back diagonal az -135, the side of the haunch still hangs a
       little over its seat line, and a thin dark band ends in a low corner there. A wider
       contact on the seat at the sides of the back could close it.
