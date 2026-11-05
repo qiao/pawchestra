@@ -3,7 +3,8 @@ sharp edges (design 4.4, "Hand rig").
 
     blender -b --factory-startup --python-exit-code 1 --python tools/blender/bind_view.py -- \
         <file.blend> [--box x0,x1,y0,y1,z0,z1] [--ids <id,...>] [--view <axis>] \
-        [--out <file.png>] [--thin <deg>] [--wide <deg>] [--sharp <deg>] [--size <px>]
+        [--out <file.png>] [--thin <deg>] [--wide <deg>] [--sharp <deg>] [--size <px>] \
+        [--pose <pose.json> --moment <name> [--glb <file>]]
 
 `pnpm bind-view <file.blend> ...` runs it. The bind is the mesh of the export: the Action `bind`
 with the keys `bind*` on (`pose_bind()` of `tools/blender/bind_edit.py`). The part is the
@@ -14,6 +15,11 @@ of the camera: `-Y` (the front, the default), `+Y`, `-X`, `+X`, `-Z`, `+Z`, a ve
 (`tools/close-views.ts`, where az 90 looks at the right side of the animal). The camera is
 orthographic. The image draws only the part and the faces around it, so that no other face hides
 the part.
+
+With `--pose` and `--moment`, the image and the lists show the part in the app pose of a moment of
+a file of `pnpm pose-preview <role> --glb <file>`, such as `lift50`. The part is still chosen in
+the bind. The preview of `tools/blender/studio_preview.py` skins the export of the pose file (or
+`--glb`) from the bind as the app does, so the GLB file must be the export of the open `.blend`.
 
 The image shows the part in gray, the faces around it lighter, and a face seen from its back in
 blue. A thin face (a corner below `--thin` or above `--wide` degrees) is red. A sharp edge (the
@@ -30,6 +36,7 @@ import zlib
 
 import bpy
 import numpy as np
+from mathutils.kdtree import KDTree
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bind_edit as be  # noqa: E402
@@ -82,6 +89,10 @@ MARGIN, BAND = 30, 40
 
 #: The depth gap that still counts as the visible surface, in units.
 DEPTH_SLACK = 0.002
+
+#: The largest gap of a vertex of the preview from the bind point of its vertex of the file, in
+#: units. The export writes the bind points as 32-bit floats.
+PLACE_GAP = 1e-4
 
 
 def fail(text):
@@ -198,6 +209,43 @@ def write_png(path, img):
         )
 
 
+def posed_points(bind, pose_json, moment, glb):
+    """Gives the points of the app pose of a moment for each vertex of the open file: the
+    preview of `tools/blender/studio_preview.py` skins the export from the bind as the app does.
+    Each vertex of the preview finds its vertex of the file by its bind point.
+
+    Raises:
+        RuntimeError: if the pose file has no such moment, or if a vertex of the file has no
+            vertex of the preview at its bind point.
+    """
+    import studio_preview as sp
+
+    pose = sp.read_pose(pose_json)
+    names = [m['name'] for m in pose['moments']]
+    if moment not in names:
+        raise RuntimeError(f'{pose_json} has no moment {moment}. It has {", ".join(names)}.')
+    sp.load_preview(pose['animal'], pose_json, glb, at=(0.0, 0.0, 0.0))
+    mesh = bpy.data.objects[sp.MESH]
+    world = np.array(mesh.matrix_world)
+    co = np.empty(len(mesh.data.vertices) * 3)
+    mesh.data.vertices.foreach_get('co', co)
+    rest = co.reshape(-1, 3) @ world[:3, :3].T + world[:3, 3]
+    bpy.context.scene.frame_set(1 + names.index(moment))
+    posed = be.bind_points(mesh) @ world[:3, :3].T + world[:3, 3]
+
+    tree = KDTree(len(rest))
+    for i, q in enumerate(rest):
+        tree.insert(q, i)
+    tree.balance()
+    out = np.empty_like(bind)
+    for v, q in enumerate(bind):
+        _, hit, gap = tree.find(q)
+        if gap > PLACE_GAP:
+            raise RuntimeError(f'The vertex {v} is {gap:.2e} u from the nearest preview vertex.')
+        out[v] = posed[hit]
+    return out
+
+
 def place(p):
     """Gives a point as text with 3 decimals."""
     return '(' + ', '.join(f'{v:.3f}' for v in p) + ')'
@@ -216,6 +264,9 @@ def main():
     out = option(rest, '--out') or os.path.splitext(blend)[0] + '-bind-view.png'
     small, large = float(option(rest, '--thin', '8')), float(option(rest, '--wide', '160'))
     limit, width = float(option(rest, '--sharp', '50')), int(option(rest, '--size', '1600'))
+    pose_json, moment = option(rest, '--pose'), option(rest, '--moment')
+    if (pose_json is None) != (moment is None):
+        fail('The options --pose and --moment go together.')
     if not os.path.isfile(blend):
         fail(f'The file {blend} does not exist.')
 
@@ -230,6 +281,14 @@ def main():
     keep = be.part_triangles(p, corners, box, ids)
     if not keep.any():
         fail('The part has no triangle. Check the box and the ids.')
+    if pose_json:
+        try:
+            posed = posed_points(p, os.path.abspath(pose_json), moment, option(rest, '--glb'))
+        except RuntimeError as error:
+            fail(str(error))
+        moved = np.linalg.norm(posed - p, axis=1)[np.unique(corners[keep])].max()
+        print(f'bind_view: the part moves at most {moved:.3f} u from the bind at {moment}')
+        p = posed
     part = np.unique(corners[keep])
     near = np.isin(corners, part).any(axis=1) & ~keep
     thin = be.thin_faces(p, corners, faces, keep, small, large)
