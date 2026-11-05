@@ -4992,13 +4992,15 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
 
 
 def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
-              bind_heads, src_frames, src_heads, extras, base=None, sit=None):
+              bind_heads, src_frames, src_heads, extras, base=None, sit=None,
+              generator='zoophony tools/blender/rig_mesh.py'):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
     for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
     before `colors.shift`, the attribute `COLOR_1` holds them. With `sit`, the world frame and the
     head of each bone in the sit pose (`sitPose` of the config), the file also has the clip
-    `sit`."""
+    `sit`. `generator` names the script that writes the file: `export_rig.py` also writes with
+    this function."""
     w = GlbWriter()
     shape_names = list(shapes)
     mats = [{'name': name, 'doubleSided': True,
@@ -5079,7 +5081,7 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
                                [1.0 if name.startswith('sit_') else 0.0 for name in shape_names]))
 
     gltf = {
-        'asset': {'generator': 'zoophony tools/blender/rig_mesh.py', 'version': '2.0'},
+        'asset': {'generator': generator, 'version': '2.0'},
         'scene': 0,
         'scenes': [{'name': 'Scene', 'nodes': [len(nodes) - 1]}],
         'nodes': nodes,
