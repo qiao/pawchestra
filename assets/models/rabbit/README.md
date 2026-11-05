@@ -143,12 +143,12 @@ colors, and `rabbit.rig.glb` and the module are the export of the last rig.
 
 | Item | Value |
 |---|---|
-| Size | 331,759 bytes |
-| SHA-256 | `62332835b45543a85dec550e9455e7fee60156cc2abd5e0b391d4adecdf8dfdb` |
+| Size | 352,722 bytes |
+| SHA-256 | `c7cb114c24be47aae87c106633e8c961c756ad1740d4fe022fb402f7a79e4dcd` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the edits below, with flat faces and no custom normals. 2,387 vertices and 2,595 faces |
+| Mesh | One object `rabbit`: the FBX mesh with the edits below, with flat faces and no custom normals. 2,821 vertices and 3,027 faces (2,614 quads and 413 triangles) |
 | Armature | The object `rabbit_rig` of the last rig, with the properties `palm`, `seat`, `hinges`, and the facts of the body (below). Phase B fits its bones again |
 
 The edits of the mesh, in the order of the work. Each id is the id in the mesh before its edit.
@@ -181,6 +181,42 @@ The edits of the mesh, in the order of the work. Each id is the id in the mesh b
   - The corner of the grid: 1183 → 946.
   - No edge of the belly, the groin, and the lower chest is now shorter than 8 mm (z 0.15 to
     0.45, |x| below 0.13, the front half).
+- **Arm tubes.** The source arm tube has rings of 8 to 13 vertices with long triangles. On each
+  side, the tube from the shoulder ring (8 vertices at |x| 0.1223) to the wrist ring (16 vertices
+  at |x| 0.2926 to 0.2965) goes, and 15 new rings of 16 vertices take its place.
+  - The 23 vertices of the rings at |x| 0.1693, 0.2162, and 0.2573 go: 467, 468, 575, 576, 577,
+    654, 655, 657, 658, 665, 1043, 1044, 1045, 1073, 1074, 1140, 1329, 1401, 1519, 1639, 1640,
+    1642, and 1704 on the left, and 336, 339, 362, 363, 633, 636, 637, 650, 651, 771, 780, 781,
+    1001, 1002, 1012, 1013, 1108, 1384, 1385, 1432, 1433, 1489, and 1584 on the right.
+  - The two triangles on the paw side of each wrist band go (147-148-838 and 602-631-632 on the
+    left, 634-635-1969 and 605-606-624 on the right), and then their 4 loose edges.
+  - The paw (the part from the wrist ring out, 221 vertices on the left and 220 on the right)
+    moves out 0.0312 units along x. This keeps the reach of the 1.18 arm of the last rig (0.385 m
+    from the shoulder joint to the palm in `pnpm hold-reach rabbit`), so the violin hold keeps
+    its reach to the nut.
+  - The new rings lie in planes of one x, 0.01277 units apart (0.39 to 0.45 arm radii): |x| 0.1351,
+    0.1478, 0.1606, 0.1734, 0.1861, 0.1989, 0.2117, 0.2244, 0.2372, 0.2500, 0.2627, 0.2755,
+    0.2883, 0.3010, and 0.3138.
+  - The upper arm keeps the length of the source: each ring up to the elbow (|x| 0.1898, at 0.39
+    of the source tube as on the last rig) takes the source section at its own x. The forearm is
+    1.30 times as long (0.1056 to 0.1368 units). Each forearm ring takes the source section at
+    the same share of the source forearm (|x| 0.1968, 0.2067, 0.2165, 0.2264, 0.2362, 0.2461,
+    0.2560, 0.2658, 0.2757, and 0.2855), and moves out along x by one translation.
+  - Vertex k of a ring lies where a ray from the area middle of the source section meets the
+    source surface, at the angle of k. The angles go in even steps from the shoulder ring (its 8
+    vertices and the 8 half angles) to the wrist ring, so the quads do not twist.
+  - A ring of 16 points on a faceted section cuts its corners. So each ring then takes one scale
+    in its plane about its middle: the source perimeter over the ring perimeter. From the
+    shoulder out: 1.0271, 1.0311, 1.0191, 1.0156, 1.0312, 1.0364, 1.0330, 1.0385, 1.0323,
+    1.0263, 1.0204, 1.0181, 1.0153, 1.0113, and 1.0057 on the left, and 1.0388, 1.0450, 1.0297,
+    1.0137, 1.0172, 1.0167, 1.0169, 1.0349, 1.0303, 1.0256, 1.0206, 1.0186, 1.0171, 1.0126, and
+    1.0063 on the right.
+  - The faces: 8 quads and 8 triangles from the shoulder ring to the first ring, and 16 quads
+    between two rings and from the last ring to the wrist ring. Each corner takes the UV of its
+    ray hit. A face whose corner UVs spread more than 0.08 crosses a seam of the atlas, so all its
+    corners take the UV of its first corner (97 faces on the left, 99 on the right).
+  - The mid upper arm girth (the ring at |x| 0.1606) is 0.209 units, 1.00 of the width of the
+    head at the eyes (0.209 units), as on the source.
 
 The facts of the body on the armature, from the last rig:
 
