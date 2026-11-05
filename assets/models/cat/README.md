@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 379,891 bytes |
-| SHA-256 | `adcaac738f0fb451e67f24dc241c3b22a2bec386492ea2a4fa37746027176e1d` |
+| Size | 379,889 bytes |
+| SHA-256 | `b91847231a3ac9a4e89c09b1ee2216ed79c40027cfcad961152e1eb610b0d4fe` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
