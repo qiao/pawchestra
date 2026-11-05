@@ -126,11 +126,11 @@ later step.
 
 | Item | Value |
 |---|---|
-| Size | 293,048 bytes |
-| SHA-256 | `fe96d1ecb015d6e45a62142c38e8c6c8cae66ba79f620b21a708f6f9b05d4018` |
+| Size | 291,412 bytes |
+| SHA-256 | `b017e3c5b505ff4711da8c428bd2bdd57b325b56acd78cc4f910d84f317aca63` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the animal faces -y, and +x is its left side. No object has a transform |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
 | Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,018 vertices and 3,988 triangles, 46 of them gloss |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint, and the property `palm` is (0, 0, -1) |
@@ -163,7 +163,8 @@ The fixes of the weights:
 - **Paws.** No wrist helper or forearm segment beyond |x| 0.395, a short Smooth of the wrist band,
   and the fingers keep half of their weight (`weights.fingers` of `cat.json`).
 
-The edits of the mesh, in the studio axes of the sections above (y up, z forward):
+The places above are places of the source, before the legs lift the body. The edits of the mesh,
+in the studio axes of the sections above (y up, z forward):
 
 - **Rings.** Ten planar edge rings go across each arm, so that the arm bends and twists over more
   vertices: three at the shoulder (x 0.13, 0.155, 0.18), three at the elbow (0.222, 0.247,
@@ -179,3 +180,12 @@ The edits of the mesh, in the studio axes of the sections above (y up, z forward
   to 0.10, y 0.832 to 0.88, and z 0.17 to 0.24, and the vertices below y 0.83 stay. The sharp
   edges shade dark slashes above the black pea eyes of the app, which read as a worried brow. A
   box from y 0.81 also moves the upper lids, and the eyes then look tired.
+- **Legs.** Each thigh is 1.6 times and each shin 2.32 times as long as on the source, along the
+  axis of its bone, and each foot keeps its size (the rule of `stretch()` of
+  `tools/blender/rig_mesh.py`). Before the stretch, the thighs and the shins are 1.5 times as
+  wide across their axes (`leg_girth()`). The body above the hips joint rises 0.1272 units, so
+  that the soles stay at z = 0, and the bones move with the mesh. Thus the seated cat sits on the
+  chair of the cat of the A-pose mesh: with the seat rules of `cat.json` and 1.588737 m for each
+  unit, the seat top is 0.300 m high (0.151 m with the legs of the source), the thigh is 0.205 m
+  long, and the shin 0.222 m. The wider legs keep the hip width (0.53 m) and the shin width
+  (0.14 m) of the cat of `pnpm rig-mesh`. Long legs with the width of the source look thin.
