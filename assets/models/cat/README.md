@@ -125,8 +125,8 @@ the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
 
 | Item | Value |
 |---|---|
-| Size | 314,141 bytes |
-| SHA-256 | `f077ab69551daebe59a87f839478d61696b3c232a67af6c4343bdb11033869ab` |
+| Size | 313,899 bytes |
+| SHA-256 | `b2bf3ef02ab2bcb9a490ce5646a1c7234ad7113eada3fd9852bbabb223255a8f` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
@@ -141,9 +141,10 @@ The seated bind:
 - **Bones.** The turns of `bind_turns()` of `tools/blender/rig_mesh.py` with the seat rules of
   `tools/mesh-rigs/cat.json`: the thighs slope 25° down and 1° out, the shins are vertical, the
   trunk leans 1.26° back (the hip angle opens 1°), and the arms are straight at the bind upper arm
-  of `bindArms`. The paws turn toward supination, the left 150° and the right 90°
-  (`bindSupination`), and the arm segments and the helpers turn by the rule of the app
-  (`drive_segments()` of `tools/blender/studio_armature.py`).
+  of `bindArms`. The paws turn toward supination, the left 130° and the right 81°
+  (`bindSupination`, the values of `pnpm bind-supination cat` on this rig), and the arm segments
+  and the helpers turn by the rule of the app (`drive_segments()` of
+  `tools/blender/studio_armature.py`).
 - **Tail.** The root bone goes left and down along the back of the haunch, as `tailBind` of
   `cat.json` gives it: (0.858, -0.504, 0.101) in the studio axes of the source. The tip bone keeps
   the curl of the mesh (104° from the root bone). It turns with the root bone, then 60° about it,
