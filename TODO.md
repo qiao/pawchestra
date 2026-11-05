@@ -246,7 +246,12 @@ passes.
       2224, 2254, 2255, 2256, 2258, 3721, 3730, and 4415 of `cat.rig.glb`). The seat hides them in
       each view of `reports/2026-11-05-cat-edits/`. Move them with point edits if a crop shows them.
 - [ ] Cat violist: the skin of the bow arm crumples in the play: `pnpm arm-look violist` gives a
-      crease share of 23.3% (limit 14.6%), and `pnpm arm-shape` up to 20 shoulder spikes.
+      crease share of 20.0% on `mozart-k525` (limit 14.6%), 3.3% in the bind, and 1.7% at rest.
+      The creased edges lie at the right arm root, where `clavicle_R` meets the chest, the neck,
+      and `spine1` in hard steps (30 places with a step above 0.5). The elbow poles change the share
+      by at most 1 point, and a shoulder reach of 26° gives 20%. A blend of the root weights gives
+      14.9% to 17.2%, but it doubles to quintuples the folded faces of `pnpm fold-probe`. Rebuild
+      the weights of the right arm root, or fit a `raise` shape.
 - [ ] Cat legs: ask the user for the leg girth step of
       `reports/2026-11-05-cat-edits/leg-lineup.png` (1.15, 1.25, or 1.35). The body has 1.25, and
       the README gives the rule for another step.
