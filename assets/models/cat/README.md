@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 983,932 bytes |
-| SHA-256 | `eebe4871fbb39d3046d230c7417f4602ed59ead8b23680110ae8be37180f5723` |
+| SHA-256 | `272369e8208bf76c14cd04458b70f9cd4dffbb6a357730b6733edf68e26f3365` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 376,875 bytes |
-| SHA-256 | `5dd7742908c611351ea220cbdbaa1e7a213f7a29faeeeff8d0037ec6fbed504b` |
+| Size | 376,324 bytes |
+| SHA-256 | `438398af5a59a83590a7ed077d5695a8f014addaf8c897c6766cadb1aed08dd3` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -219,6 +219,9 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   the centers (±0.171, 0.27, 0.184) and (±0.034, 0.265, 0.189) softens them. No point with a
   tail weight above 0.05, and no point on the seat (below the height 0.285 units and behind the
   forward 0.11), moves. 38 points move, at most 0.0233 units.
+- **Soft inner knees.** After the thigh taper, the inner side of each seated knee showed a dark
+  wedge from the front. The same relax (6 rounds, 0.05 units) at the centers (±0.045, 0.30,
+  0.185), with the same points kept, smooths it. 27 points move, at most 0.0062 units.
 - **`bind_tail`.** The tail lies on the seat behind the haunch and hangs over the left side of the
   seat in front of the left back post, as a seated cat lets its tail hang off a stool. Each vertex
   with a tail weight keeps its arc length along the middle line of the rest tail and its offset
@@ -338,6 +341,15 @@ The edits of the mesh, in the order of the work:
   0.05 below it, and out from 0.75 to 1.05 thigh lengths, so the knee keeps its place. The middle
   line is the mean of the points across the axis in 9 bins from the hip joint to the knee. 119
   points move, at most 0.034 units. Each key keeps its move from the basis.
+- **Thigh taper.** In the stand, the full thighs over the slim shins read as puffy pants with a
+  knob at each knee. Each thigh now tapers from the middle to the knee. At each height from up
+  0.14 to 0.255 (the knee joint is at up 0.181), the ring of the thigh takes, in each direction
+  from the joint line, the radius r(0.14) + (r(0.255) - r(0.14)) t^1.3, where t is 0 at up 0.14
+  and 1 at up 0.255. The radius of each ring comes from a cut at that height, at each 5° around
+  the joint line. No point moves out, and no tail point moves. 34 points of each leg move, at
+  most 0.0182 units. The mid thigh goes from 0.582 to 0.545 of the width of the head, the front
+  of the thigh at up 0.20 from forward 0.177 to 0.161, and the shin, the joints, the leg lengths,
+  and the feet stay. Each key keeps its move from the basis.
 - **Whiskers.** The Decimate of Blender (collapse, ratio 0.4) on the 5 whisker strands only
   takes them from 243 vertices and 465 triangles to 94 vertices and 165 triangles. The 2x face
   crops show the same whiskers with fewer bends.
@@ -346,10 +358,10 @@ The legs, in meters (1.588737 m for each unit), with the old file in parentheses
 seated bind of the seat rules of `cat.json`, the seat top is 0.3001 m (0.3002 m), the thigh is
 0.201 m (0.205 m) and the shin 0.213 m (0.222 m) long, and the seated cat is 1.651 m (1.675 m)
 high. The shin factor is 2.30, because 2.32 put the seat top at 0.3025 m. In the rest, the mid
-thigh is 0.582 and the mid shin 0.281 of the width of the head at the eyes (0.439 and 0.290; the
-source 0.304 and 0.22), and the hips are 0.637 m wide (0.539 m). The first offset gave 0.571,
-0.399, and 0.625 m, and the second offset 0.500, 0.343, and 0.591 m before the slim shins and
-the full thighs.
+thigh is 0.545 (0.582 before the thigh taper) and the mid shin 0.281 of the width of the head at
+the eyes (0.439 and 0.290; the source 0.304 and 0.22), and the hips are 0.637 m wide (0.539 m).
+The first offset gave 0.571, 0.399, and 0.625 m, and the second offset 0.500, 0.343, and 0.591 m
+before the slim shins and the full thighs.
 
 The fixes of the weights, in the studio axes of the source:
 
