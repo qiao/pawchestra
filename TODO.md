@@ -687,6 +687,19 @@ passes.
       skeleton options of the auto-rigger (65 or 25 bones) have no Adobe source yet.
 - [ ] Test bodies: the paused tests that build each species (`species.test.ts`, `player.test.ts`)
       need `loadTestBodies()` before the pause ends, because the mannequin body loads apart.
+- [ ] Hand rig pilot (4.4 "Hand rig"): when `assets/models/cat/cat.blend` merges, take the cat out
+      of `pnpm rig-mesh`, because a run of `rig-mesh cat` writes over the exported
+      `cat.rig.glb`. Then update the cat rows of `rigging.md` and of "Seat" (4.4), which name the
+      form keys of `tools/mesh-rigs/cat.json`.
+- [ ] Hand rig: a raise key needs its `turn` as a quaternion in Blender axes, typed by hand. Add a
+      helper that measures it from a pose of the rig, as `rule_key_turns()` of `rig_mesh.py`.
+- [ ] Hand rig: a pose in Blender blends from the T-pose rest, and the app blends from the bind.
+      Add a preview that shows the skin of the app in Blender, such as an import of the exported
+      GLB file with a pose of a role.
+- [ ] Hand rig: the export has no sit pose (`sitPose`, the clip `sit`), no `upperTwist`, and no
+      form factor (`headFactor`, `neckFactor`, `headShift`). Add them when a hand rig needs them.
+- [ ] Hand rig: `studio_armature.py` and `export_rig.py` load the functions of `rig_mesh.py` from
+      its source. Move the shared functions into a small module before `rig_mesh.py` goes.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
