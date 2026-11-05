@@ -11,25 +11,37 @@
  * -d, because the left paw supinates by a negative turn about its forearm (`paw_supination()` of
  * `tools/blender/rig_mesh.py`). So the twists of one rig give the value of each side
  * ({@link supinationChange}), with no new rig. The value is the supination of now plus the change.
- * The supination of now comes from `studio.bindSupination` of the rig config of the animal, or from
- * `--from` for a GLB file rigged with another value.
+ * The supination of now comes from `--from` for a GLB file rigged with another value, else from
+ * the export summary of a hand rig (`bindSupination` of `<file>.json` beside the GLB file, or
+ * `--summary`), else from `studio.bindSupination` of the rig config of the animal. A hand rig keeps
+ * its values only in its `.blend`, so the last line then says to key the values in its Action
+ * `bind`.
  *
  * The JSON of each pair goes into a cache by tree (`treeCacheFile()` of `tools/ref-tree.ts`). With
  * `--glb <file>`, the tool runs again in a copy of `src/` with the studio body of the file
  * (`tools/glb-swap.ts`), with no cache.
  *
- * Usage: pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--jobs <n>]
+ * Usage: pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--summary <file>] [--jobs <n>]
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 
 import { armBinds, measureArm } from './arm-check.ts';
 import { CAST_ROLES, CAST_SAMPLE, pairName, roleDemo, setPair } from './cast-matrix.ts';
 import { FOLD_ROLES, SAMPLE_SETS, findRole, findSweep, probeFolds } from './fold-probe.ts';
 import type { RoleSource, SampleSet } from './fold-probe.ts';
-import { glbAnimal, rigConfigPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
+import {
+  glbAnimal,
+  handRigOf,
+  handRigPath,
+  rigConfigPath,
+  runTool,
+  takeGlb,
+  withGlbBody,
+} from './glb-swap.ts';
 import { probeDemos } from './probe-demos.ts';
+import { ANIMALS } from './studio-body.ts';
 import {
   PROBE_NO_CACHE,
   ROOT,
@@ -326,26 +338,64 @@ async function eachLimited<T, R>(
 interface SupinationNow {
   /** The supination of each arm, in degrees. */
   readonly value: Readonly<Record<Side, number>>;
-  /** The source of the values: `--from`, a rig config, or none. */
+  /** The source of the values: `--from`, the export summary of a hand rig, a rig config, or none. */
   readonly source: string;
 }
 
 /**
- * Gives the supination of now of each arm: the value of `--from`, else `studio.bindSupination` of
- * the rig config of the animal of the species, with 0 for an arm with no value.
+ * Gives the export summary of the hand rig of the animal of a species (design 4.4, "Hand rig"):
+ * `<file>.json` beside its GLB file `<file>.glb`, which holds the bind supination of the rig
+ * (`bindSupination` of `tools/blender/export_rig.py`).
+ *
+ * @param species The species.
+ * @param glb The GLB file of `--glb`, or `null` for the GLB file of `ANIMALS`.
+ * @returns The absolute path of the summary, or `null` for an animal with no hand rig.
+ */
+function handRigSummary(species: SpeciesId, glb: string | null): string | null {
+  const animal = glbAnimal(species);
+  const file = animal === null ? undefined : ANIMALS.get(animal)?.glb;
+  if (animal === null || file === undefined || handRigOf(animal, file) === null) {
+    return null;
+  }
+  return (glb ?? join(ROOT, file)).replace(/\.glb$/, '.json');
+}
+
+/**
+ * Gives the supination of now of each arm: the value of `--from`, else the bind supination of the
+ * export summary of a hand rig ({@link handRigSummary}), else `studio.bindSupination` of the rig
+ * config of the animal of the species, with 0 for an arm with no value. A hand rig keeps its
+ * values only in its `.blend`, so the rig config does not count for it.
  *
  * @param species The species.
  * @param from The value of `--from`, or `null`.
+ * @param summary The export summary of a hand rig, or `null`.
  * @returns The supination of each arm.
- * @throws Error if `--from` is not two numbers.
+ * @throws Error if `--from` is not two numbers, or if the summary has no bind supination.
  */
-function supinationNow(species: SpeciesId, from: string | null): SupinationNow {
+function supinationNow(
+  species: SpeciesId,
+  from: string | null,
+  summary: string | null,
+): SupinationNow {
   if (from !== null) {
     const [left = Number.NaN, right = Number.NaN, ...rest] = from.split(',').map(Number);
     if (!Number.isFinite(left) || !Number.isFinite(right) || rest.length > 0) {
       throw new Error('The option --from takes <L>,<R> in degrees, such as 57,15.');
     }
     return { value: { L: left, R: right }, source: '--from' };
+  }
+  if (summary !== null) {
+    // SAFETY: the summary of `export_rig.py` is a JSON object, and the check below reads the one
+    // field that this tool needs.
+    const json = JSON.parse(readFileSync(summary, 'utf8')) as {
+      readonly bindSupination?: Partial<Record<Side, number>>;
+    };
+    const { L, R } = json.bindSupination ?? {};
+    if (L === undefined || R === undefined) {
+      throw new Error(`${summary} has no bindSupination. Run pnpm rig-export first.`);
+    }
+    const shown = summary.startsWith(ROOT) ? relative(ROOT, summary) : summary;
+    return { value: { L, R }, source: shown };
   }
   const animal = glbAnimal(species);
   const path = animal === null ? null : rigConfigPath(animal);
@@ -405,7 +455,8 @@ export function rollLines(
 }
 
 /** The usage text. */
-const USAGE = 'Usage: pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--jobs <n>]';
+const USAGE =
+  'Usage: pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--summary <file>] [--jobs <n>]';
 
 /**
  * Runs the tool as a child: it measures one pair, and writes {@link RollJson} into the file of
@@ -446,13 +497,16 @@ async function main(): Promise<number> {
     }
     // The empty git repository of the copy has no index to key a cache on.
     const env = { ...process.env, [PROBE_NO_CACHE]: '1' };
-    return withGlbBody(animal, glb, (dir) => runTool(dir, 'bind-supination.ts', rest, env));
+    // The copy has no assets, so the summary of a hand rig beside the GLB file goes to it.
+    const summary = rest.includes('--from') ? null : handRigSummary(species, glb);
+    const childArgs = summary === null ? rest : [...rest, '--summary', summary];
+    return withGlbBody(animal, glb, (dir) => runTool(dir, 'bind-supination.ts', childArgs, env));
   }
   const values = new Map<string, string>();
   for (let i = 1; i < rest.length; i += 2) {
     const name = rest[i] ?? '';
     const value = rest[i + 1];
-    if (!['--from', '--jobs'].includes(name) || value === undefined) {
+    if (!['--from', '--summary', '--jobs'].includes(name) || value === undefined) {
       throw new Error(`The option ${name} is unknown or has no value.\n${USAGE}`);
     }
     values.set(name, value);
@@ -461,7 +515,15 @@ async function main(): Promise<number> {
   if (!Number.isInteger(jobs) || jobs < 1) {
     throw new Error('The option --jobs takes a whole number above 0.');
   }
-  const now = supinationNow(species, values.get('--from') ?? null);
+  const from = values.get('--from') ?? null;
+  const summary = values.get('--summary') ?? (from === null ? handRigSummary(species, null) : null);
+  const now = supinationNow(species, from, summary);
+  const animal = glbAnimal(species);
+  const glbFile = animal === null ? undefined : ANIMALS.get(animal)?.glb;
+  const handRig =
+    from === null && summary !== null && animal !== null && glbFile !== undefined
+      ? handRigPath(animal, glbFile)
+      : null;
 
   const started = performance.now();
   const roles = supinationRoles(species);
@@ -491,7 +553,9 @@ async function main(): Promise<number> {
           `${side}: change ${both[side].change.toFixed(1)}, value ${value(side)}. Largest p95 ${both[side].now.toFixed(0)} now, ${both[side].worst.toFixed(0)} new (${worstOf(side)}). Changes within 1° of the best: ${both[side].near[0].toFixed(1)} to ${both[side].near[1].toFixed(1)}.`,
       ),
       '',
-      `studio.bindSupination: { "L": ${value('L')}, "R": ${value('R')} }`,
+      handRig === null
+        ? `studio.bindSupination: { "L": ${value('L')}, "R": ${value('R')} }`
+        : `Key the values in the Action bind of ${handRig}: { "L": ${value('L')}, "R": ${value('R')} }`,
     ].join('\n'),
   );
   return 0;
