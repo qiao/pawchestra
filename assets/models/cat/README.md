@@ -139,12 +139,12 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 834,508 bytes |
-| SHA-256 | `028814e18a15447bcd37cba8b0804ef4fa0cc13fb60a851f3d36cdf3e7af0a59` |
+| Size | 983,932 bytes |
+| SHA-256 | `277ec83cdae3af135c2b8bd41978f8f836e7cc274730d3fdc14d73158aa61f15` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
-| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R` and `arm_raise_L` of the inner elbows |
+| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_L`, `arm_raise_L2`, and `arm_raise_L3` (below) |
 | Footprint | The seated violist is 0.673 m deep and 0.708 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
 
 ## cat.blend
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 379,018 bytes |
-| SHA-256 | `917e9f91883dc7a178cbfdca9f4f217290ae2488fd7ad449a11ee9ce000287f8` |
+| Size | 379,891 bytes |
+| SHA-256 | `adcaac738f0fb451e67f24dc241c3b22a2bec386492ea2a4fa37746027176e1d` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -164,7 +164,7 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 | Eyes | The objects `eye_L` and `eye_R` (`tools/blender/studio_eyes.py`), children of the bone `head`, with the size (0.288572 units) and the direction (±0.6219, -0.7827, 0.0208) of the eyes of the old `cat.blend`. Each middle lies on the smooth eye socket, where the axis meets the head surface. `fit_eyes()` levels them in the bind, with the middles at (±0.0756, -0.1959, 0.9325) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, 0, -1), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`fix_rolls()`). The Action `bind` holds the seated bind at frame 1 (below) |
-| Shape keys | `Basis`, `bind_sit` and `bind_tail` at the value 1, and `arm_raise_R` and `arm_raise_L` at the value 0 (below), each with its custom property on the mesh. A body has at most 4 keys `arm_raise_*` (`STUDIO_RAISES`) |
+| Shape keys | `Basis`, `bind_sit` and `bind_tail` at the value 1, and `arm_raise_R`, `arm_raise_L`, `arm_raise_L2`, and `arm_raise_L3` at the value 0 (below), each with its custom property on the mesh. A body has at most 4 keys `arm_raise_*` (`STUDIO_RAISES`) |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
 
 The seated bind and its keys, in the studio axes of the bind (x left, up, forward):
@@ -203,18 +203,20 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   bind), its fix (the patch under the arm root and three rings with the skin of their smoothed
   weights) changes no 2x crop of the arm roots, so the file has no such key.
 - **Raise keys.** `raise_shape()` of `rig_mesh.py` relaxes the faces that fold in the pose of a
-  rule, on the bind. The rule is the output of `pnpm raise-fit violist --sets rest,play --bone
-  forearm` for the folded faces of `pnpm fold-probe violist`, the key is the move of the bind
-  turned back into the rest by the inverse of the blended skin, and the property holds the turn
-  of the forearm (w, x, y, z, Blender axes) and the fade:
+  rule, on the bind. The rule is the output of `pnpm raise-fit` for the folded faces of `pnpm
+  fold-probe`, the key is the move of the bind turned back into the rest by the inverse of the
+  blended skin, and the property holds the turn of the key bone (w, x, y, z, Blender axes) and
+  the fade:
 
-  | Key | Folded faces | Elbow from the bind | Turn | Fade | Folds in the pose |
+  | Key | Rule | Bone from the bind | Turn | Fade | Folds in the pose |
   |---|---|---|---|---|---|
-  | `arm_raise_R` | 5 of the right inner elbow, folded in each sample of the rest and the play | 102° | 0.6273, -0.5762, 0.5142, 0.1004 | 10° to 20° | 7 to 2 |
-  | `arm_raise_L` | 4 of the left inner elbow | 90° | 0.7063, -0.5215, -0.4721, -0.0799 | 10° to 20° | 5 to 0 |
+  | `arm_raise_R` | `violist`, 5 faces of the right inner elbow, sets rest and play | forearm 102° | 0.6273, -0.5762, 0.5142, 0.1004 | 10° to 20° | 7 to 2 |
+  | `arm_raise_L` | `violist`, 4 faces of the left inner elbow, sets rest and play | forearm 90° | 0.7063, -0.5215, -0.4721, -0.0799 | 10° to 20° | 5 to 0 |
+  | `arm_raise_L2` | `trumpeter@cat`, 4 faces of the left inner elbow, set rest | forearm 121° | -0.4950, 0.6461, 0.5664, 0.1292 | 10° to 20° | 10 to 7 |
+  | `arm_raise_L3` | `trumpeter@cat`, 4 faces of the front of the left armpit, sets rest and lift | upper arm 56° | 0.8814, 0.0523, -0.3505, -0.3123 | 20° to 30° | 5 to 1 |
 
-  The rules of the fronts of the armpits (the upper arm 66° and 29° from the bind) turn over no
-  face in the pose of Blender, so their keys moved less than 0.3 mm and the file has none.
+  The rules of the fronts of the armpits of the violist (the upper arm 66° and 29° from the bind)
+  turn over no face in the pose of Blender, so their keys moved less than 0.3 mm.
 
 The facts of the body:
 
