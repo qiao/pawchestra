@@ -120,7 +120,7 @@ steps of the side wall, with no run of the cat (672184a7), so the git history ke
 | Item | Value |
 |---|---|
 | Size | 880,372 bytes |
-| SHA-256 | `e7002bf290afb1c824dfff558a603cb05357d396ba254d3463d0a274ba56982a` |
+| SHA-256 | `3910ddda44bf5a999273e0fe0d3125cf464e506e1e96d4852dec41c9aa0968d4` |
 | Base | The rig of fc52d38f: 880,600 bytes, SHA-256 `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
 | Bind | The bind of the viola hold, with the elbows bent (below) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
@@ -147,8 +147,8 @@ run `pnpm rig-mesh cat` into this folder: it drops the point edits.
 
 ## Point edits
 
-The point edits of 2026-11-05 make the tail a round tube and the legs thicker
-(`cat-edits.json`). A script in a live Blender session made the moves. The edit file keeps each
+The point edits of 2026-11-05 make the tail a round tube, the legs thicker, and the left forearm
+flatter (`cat-edits.json`). A script in a live Blender session made the moves. The edit file keeps each
 move, by the index of a vertex of the primitive `fur`, in the stored space of the file (the
 seated bind, in units). The tool moves each vertex at the same stored place, so the face colors
 stay one surface. The module keeps its seat height, its chair depth, and its joints.
@@ -157,6 +157,7 @@ stay one surface. The module keeps its seat height, its chair depth, and its joi
             seated bind (stored)           standing soloist (clip reference)
 tail:  new tube = curve + frame · offset    bind + both leg shapes = source tail
 legs:  p + 0.25 · g · (p − axis point)      the leg shapes add on top of the move
+arm:   axis + r_new / r · (p − axis)        no shape changes
 ```
 
 **Tail (132 places, 199 vertices, largest move 0.0776 units).** The rig curled the tail of the
@@ -204,6 +205,17 @@ over the top of the paw, and the face below it showed as a dark dent above the p
 of the right ring takes 1.04: it lies lower, next to the paw, and 1.12 gives it a sharp edge to
 the paw. In the rest pose, the largest edge angle of the lower shin goes from 53.6° to 40.3° on
 the left (base 37.3°) and from 72.8° to 59.0° on the right (base 59.9°).
+
+**Left forearm (43 places, 85 vertices, largest move 0.0073 units).** The left forearm had a
+belly on the side that faces the upper arm (the elbow pit side): a radius of 3.31 cm at 0.55 of
+the forearm from the elbow, over a hollow of 2.05 cm at 0.27. The right forearm has 2.86 cm and
+2.31 cm there. In the play pose the forearm lies level, so the belly showed as a bump on the top
+of the arm. Each point of the pit side (out to 45° from the middle, with a fall to 70°) between
+0.26 and 0.76 of the forearm takes the radius of the right forearm at the mirrored place, with
+half of the belly of the right forearm over the straight line from 0.27 to 0.84. Each point moves
+only toward the forearm axis or away from it, in the bind. The new pit side runs from 2.30 cm
+near the elbow to 2.59 cm at 0.55 and 2.24 cm near the wrist. In the play pose, the mean edge
+angle of the forearm goes from 14.3° to 13.8°, and the largest from 58.1° to 54.2°.
 
 **Weights (61 places, 84 vertices).** The rig gave each vertex of the tail end 0.251 of its
 weight on the chest. The edit gives that share to `tail_tip`, so the tail end does not follow the
