@@ -223,10 +223,6 @@ passes.
       goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
       separate claws, so `pnpm pose-depth` marks the pair `paws in viola` as GROWS. Check the paw
       crops of the fifth position.
-- [ ] Cat: choose the trunk length. The hand rig keeps the trunk of the mesh, so the seated cat is
-      1.675 m high to the ear tips (1.472 m with the old shorter trunk), and the head height is
-      0.62 of the trunk from the hips joint to the neck joint. Show the user the play frame of the
-      cat beside its neighbors (`reports/2026-11-04-cat-hand/phase-b/play/`) before a trunk edit.
 - [ ] Cat armpits: with a hanging upper arm, a small crease stays at the back of each arm root.
       The key `bind_armpit` of `cat.blend` holds half of the fix of the hanging pose: the whole
       fix cut a deeper notch and failed the arm gate. The rigid patch under each arm root still
@@ -237,14 +233,14 @@ passes.
       main too. The 4 keys `arm_raise_*` of `cat.blend` serve the violist and the trumpeter.
 - [ ] Cat bind supination: on the final hand rig, `pnpm bind-supination cat` gives L 126 and R 85
       (the Action `bind` keys L 130 and R 81). The largest paw twist p95 of the cast roles goes
-      from 120 to 115 on the left and from 108 to 104 on the right. Key the values, then refit
-      the keys `arm_raise_*` of `cat.blend` and run the arm gate.
+      from 120 to 115 on the left and from 108 to 104 on the right. A trial bind with these
+      values makes the left arm of the violist worse (paw twist p95 98 to 102, move twist max 99
+      to 103), and the right arm better (79 to 75, 81 to 77), so the bind keeps L 130 and R 81.
+      Key them only with a refit of the keys `arm_raise_*` of `cat.blend` and a new arm gate.
 - [ ] Cat tail: in the hand rig, the tail curls up beside the left hip on the seat. From the
       left side and from the back, the curl reads as a round lump at the hip
       (`reports/2026-11-04-cat-hand/phase-b/crops-legs-tail.png`). Try a curl that opens more,
       or a tip that lies along the seat.
-- [ ] Cat eyes: with the brow of the mesh, the eye box of the left eye takes 18 of the 19 faces of a
-      dark patch (rig warning, the right eye had it before). Check the left eye in the 2x crops.
 - [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
       reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
 - [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
@@ -696,6 +692,12 @@ passes.
       form factor (`headFactor`, `neckFactor`, `headShift`). Add them when a hand rig needs them.
 - [ ] Hand rig: `studio_armature.py` and `export_rig.py` load the functions of `rig_mesh.py` from
       its source. Move the shared functions into a small module before `rig_mesh.py` goes.
+- [ ] Hand rig: `add_surface()` still adds a gloss fan on each old eye, and a hand rig deletes the
+      fans after `place_eyes()` (`pnpm studio-body` stops for a file with fans and eye objects).
+      Let `add_surface()` add no fans, and give `place_eyes()` the middles of the old eyes.
+- [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
+      (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
+      change of the pea eye of the app must change both, or the preview must come from the app.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
