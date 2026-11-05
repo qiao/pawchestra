@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 685,064 bytes |
-| SHA-256 | `8c72d68c1c532ad336dbc208f0537eebdeb6302045ce01556ba3b6268269aa21` |
+| SHA-256 | `1143dad80e287edbb3901c8abff3bc3a27249a92838eee819f460b6c8d6b23e1` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 378,339 bytes |
-| SHA-256 | `f3bf28b6a66aa07cb4078b9e38a7b69cb6b64bd2758b42e0178c702631d951cb` |
+| Size | 376,021 bytes |
+| SHA-256 | `7924534c2c4246afa903c067eec6f8aef58c25e7c2e627816ea1588941e1418a` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -302,6 +302,9 @@ The fixes of the weights, in the studio axes of the source:
   weight.
 - **Crotch.** After the leg stretch, 16 rounds of Smooth on the vertices of the front with a
   thigh share of 0.02 to 0.98 and |x| below 0.11.
+- **Armpit slivers.** 3 triangles under the arm roots, one on the left and two on the right, have
+  a corner above 165° in the bind. Their corners take one mean weight, so that each moves as one
+  piece. Each turned over in each sample of the play of the violist.
 
 The folds of the test poses of the last round (arms down 80°, the elbow at 90° and 130°, the bow
 arm, the sit with the thigh at 90°): the triangles whose normal turns more than 60° and more
