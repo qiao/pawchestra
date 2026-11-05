@@ -217,9 +217,11 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   stretch the legs to the old seat, so the stretched legs take a girth across their axes
   (`legGirth`) that keeps more of the stocky look of the legs of the mesh: of the girth variants,
   the one whose mid thigh and mid shin widths, as a share of the head height and of the hip width,
-  are nearest to the mesh. The leg turns of the seat (`studio.legTurns`) keep the knees of the old
-  body. The trunk length and the trunk shape stay a product choice of the form keys of "Mesh rig"
-  (`trunkFactor`, `girthProfile`). `pnpm body-shape` measures the seated bind: the width and the
+  are nearest to the mesh. The hand rig of the cat takes thicker legs, a product choice, with an
+  even offset outward from the bone axes, because a factor across the axes sharpens the bulge of
+  its haunch into fins (`assets/models/cat/README.md`). The leg turns of the seat
+  (`studio.legTurns`) keep the knees of the old body. The trunk length and the trunk shape stay a
+  product choice of the form keys of "Mesh rig" (`trunkFactor`, `girthProfile`). `pnpm body-shape` measures the seated bind: the width and the
   depth of the trunk at 10 heights from the seat to the neck joint, the girths of the limbs at their
   middles, the knee and the ankle gaps from the front, the distance of the shoulder joints, and the
   bulge of the back line behind the line from the waist to the neck. A width row of `girthProfile`
