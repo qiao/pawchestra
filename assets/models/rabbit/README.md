@@ -124,8 +124,8 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 729,816 bytes |
-| SHA-256 | `cd0675a5705624d0dc72926eb04a01e34a7ac20e6d2e424e3880dc075e0d8e90` |
+| Size | 729,784 bytes |
+| SHA-256 | `880c2cfe72bacc18c83afef00da3b043c77fa6e60f85e7865230935c8ce92aa3` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 338,250 bytes |
-| SHA-256 | `55d15a0a9e0ef46b1c586ecd986b7a8c7008d4ce8baa8f05d8ffc305fb848749` |
+| Size | 337,837 bytes |
+| SHA-256 | `185cf6b37f1e8f0ddf55618dc855a9a2096862e6c440d148515b3fabe8d600f0` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -286,7 +286,12 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   In `pnpm fold-probe violinist`, the right inner elbow faces folded in up to 93 % of the play
   samples and the left in up to 13 %. With the keys, the worst face folds in 77 %, the next in 48 %
   and less, and the left in 6 %. A key for a face at the front of the right arm root turned over
-  no face in the pose of Blender, so the file has no such key.
+  no face in the pose of Blender, so the file has no such key. After the elbow ramp of the right
+  arm (below), the keys `arm_raise_R` and `arm_raise_R2` are drawn again from the same rules on
+  the new weights (`raise_key()`, at most 3.0 and 0.9 cm). No right elbow face folds in any
+  sample, and the right arm has a fold in 0 % of the play samples (before: 75 % for the worst
+  face). A third right key of the rule 25° further (fade 30° to 40°) on the old weights made the
+  folds worse (82 %).
 
 The facts of the body:
 
@@ -338,6 +343,16 @@ The fixes of the weights, in the studio axes of the source, before the stretch o
   to 0.08 in twist and 0.21 in the wrist helper. Each ring of the arm tube from its second ring to
   the last ring before the wrist (14 on each side) takes one mean weight: each vertex of a ring
   takes the mean weights of its ring, at most 4 bones. Each key keeps its move of the bind.
+- **Right elbow ramp.** The shares of upper arm, elbow helper, and forearm of each ring of the
+  right arm tube (rest |x|, the elbow joint at 0.202) are: 0.1478: 0.97, 0.03, 0; 0.1606: 0.9,
+  0.1, 0; 0.1734: 0.75, 0.25, 0; 0.1861: 0.5, 0.5, 0; 0.1989: 0.25, 0.7, 0.05; 0.2117: 0.05,
+  0.7, 0.25; 0.2244: 0, 0.5, 0.5; 0.2372: 0, 0.25, 0.75; 0.2499: 0, 0.1, 0.9; 0.2627: 0, 0.03,
+  0.97. The upper arm segments and the forearm segments of a ring keep their proportions, at
+  most 4 bones, and each key keeps its move of the bind. Before, the upper arm kept 0.29 and
+  0.12 of the two rings past the joint and the helper at most 0.29, and the inner elbow folded at
+  the elbow turn of the play (98° from the bind). A narrow ramp (the helper at most 0.4) folded
+  more faces. In `pnpm arm-check violinist`, the right folds p95 go from 5 to 1, the twist p95
+  from 28° to 33° (limit 55°), and each measure passes.
 
 The legs, in meters (1.43199 m for each unit): in the seated bind, the seat top is 0.250 m (old
 0.250 m), the hips joint 0.3285 m above the soles (old 0.352 m), the mid thigh girth 0.517 m (old
