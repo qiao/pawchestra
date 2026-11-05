@@ -20,7 +20,14 @@ import {
   windRig,
 } from '../src/pose/winds.ts';
 import type { WindInstrument } from '../src/pose/winds.ts';
-import { glbAnimal, runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
+import {
+  animalHandRig,
+  glbAnimal,
+  runTool,
+  speciesAnimal,
+  takeGlb,
+  withGlbBody,
+} from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -337,12 +344,12 @@ export interface RigArm {
  *
  * @param species The species.
  * @returns The arm, or `null` when the species has no mesh rig config next to this script, as in
- *   the copy of `--glb`.
+ *   the copy of `--glb`, or when it has a hand rig, whose joints live only in its `.blend`.
  */
 function rigArm(species: SpeciesId): RigArm | null {
   const animal = speciesAnimal(species);
   const path = animal ? join(import.meta.dirname, 'mesh-rigs', `${animal}.json`) : '';
-  if (!animal || !existsSync(path)) {
+  if (!animal || !existsSync(path) || animalHandRig(animal) !== null) {
     return null;
   }
   const config = parseConfig(readFileSync(path, 'utf8'));

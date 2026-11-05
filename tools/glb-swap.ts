@@ -159,6 +159,18 @@ export function handRigOf(animal: string, glb: string): string | null {
 }
 
 /**
+ * Finds the hand rig of an animal of `ANIMALS` ({@link handRigOf} with its GLB file).
+ *
+ * @param animal The animal.
+ * @returns The path of the `.blend` file from the repository root, or `null` for an animal with
+ *   no hand rig or with no settings in `ANIMALS`.
+ */
+export function animalHandRig(animal: string): string | null {
+  const glb = ANIMALS.get(animal)?.glb;
+  return glb === undefined ? null : handRigOf(animal, glb);
+}
+
+/**
  * Gives the animal whose studio body `--glb <file>` swaps for a species: the animal of the studio
  * body of the species, or the species itself when it has no studio body and has a rig config
  * ({@link rigConfigPath}), such as a new mesh before the commit of its body.
