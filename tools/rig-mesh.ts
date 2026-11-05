@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -20,7 +20,7 @@ import type { FaceRecord, FoldCounts } from './fold-probe.ts';
 import { faceList, faceShares, foldShareText } from './face-shares.ts';
 import type { FaceShare } from './face-shares.ts';
 import { armGaps, gapLines } from './arm-gap.ts';
-import { animalSpecies, runTool, scratchSettings, withGlbBody } from './glb-swap.ts';
+import { animalSpecies, handRigOf, runTool, scratchSettings, withGlbBody } from './glb-swap.ts';
 import { measureLines, measureRig, triangleLine } from './rig-mesh-check.ts';
 import { FORM_FORMAT, readFormJson } from './rig-form.ts';
 import type { FormJson, PlayerForm } from './rig-form.ts';
@@ -2398,20 +2398,6 @@ async function checkVariants(
 }
 
 /**
- * Finds the hand rig of an animal (design 4.4, "Hand rig"): the file `<animal>.blend` in the
- * folder of the GLB file of its config. `pnpm rig-export` writes the GLB file of such an animal,
- * so this tool does not rig it.
- *
- * @param animal The animal.
- * @param config The rig config of the animal.
- * @returns The path of the `.blend` file from the repository root, or `null` with no hand rig.
- */
-function handRigOf(animal: string, config: MeshRigConfig): string | null {
-  const blend = join(dirname(config.output), `${animal}.blend`);
-  return existsSync(join(ROOT, blend)) ? blend : null;
-}
-
-/**
  * Rigs the source mesh of an animal into the format of a studio body (`docs/agents/rigging.md`,
  * "The asset chain"):
  * `node tools/rig-mesh.ts <animal> [--preview <dir>] [--check [--set <changes>]...]`.
@@ -2428,7 +2414,7 @@ async function main(): Promise<void> {
   const configPath = join(CONFIG_DIR, `${animal}.json`);
   const text = await readFile(configPath, 'utf8');
   const config = parseConfig(text);
-  const handRig = handRigOf(animal, config);
+  const handRig = handRigOf(animal, config.output);
   if (handRig !== null) {
     throw new Error(
       `${handRig} is the rig of ${animal} (design 4.4, "Hand rig"). pnpm rig-export ${animal} writes ${config.output} from it, and pnpm rig-mesh does not rig this animal.`,

@@ -134,6 +134,31 @@ export function rigConfigPath(animal: string): string {
 }
 
 /**
+ * Gives the path of the hand rig of an animal (design 4.4, "Hand rig"): the file `<animal>.blend`
+ * in the folder of its GLB file, which can be missing.
+ *
+ * @param animal The animal.
+ * @param glb The GLB file of the animal, from the repository root.
+ * @returns The path of the `.blend` file from the repository root.
+ */
+export function handRigPath(animal: string, glb: string): string {
+  return join(dirname(glb), `${animal}.blend`);
+}
+
+/**
+ * Finds the hand rig of an animal ({@link handRigPath}). Each value of a hand rig lives only in
+ * that file, and a tool reads it from the export, never from the rig config.
+ *
+ * @param animal The animal.
+ * @param glb The GLB file of the animal, from the repository root.
+ * @returns The path of the `.blend` file from the repository root, or `null` with no hand rig.
+ */
+export function handRigOf(animal: string, glb: string): string | null {
+  const blend = handRigPath(animal, glb);
+  return existsSync(join(ROOT, blend)) ? blend : null;
+}
+
+/**
  * Gives the animal whose studio body `--glb <file>` swaps for a species: the animal of the studio
  * body of the species, or the species itself when it has no studio body and has a rig config
  * ({@link rigConfigPath}), such as a new mesh before the commit of its body.
