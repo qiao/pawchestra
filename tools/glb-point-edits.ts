@@ -30,6 +30,8 @@ const UNSIGNED_BYTE = 5121;
 interface MoveGroup {
   /** The name of the group, such as `tail`. */
   readonly name: string;
+  /** The rule that gave the moves, for a reader. The tool does not read it. */
+  readonly note?: string;
   /** The delta of each vertex, by its index in the primitive, in the stored space. */
   readonly moves: Readonly<Record<string, readonly [number, number, number]>>;
   /** The morph targets that take the move back, so that their sum keeps its pose. */
@@ -38,6 +40,8 @@ interface MoveGroup {
 
 /** An edit file of point edits (`assets/models/<animal>/<animal>-edits.json`). */
 interface EditFile {
+  /** The purpose of the edits and the command, for a reader. The tool does not read it. */
+  readonly note?: string;
   /** The commit that holds the unedited GLB file. */
   readonly base: string;
   /** The SHA-256 of the unedited GLB file. */
