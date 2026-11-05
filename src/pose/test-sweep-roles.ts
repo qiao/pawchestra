@@ -83,11 +83,11 @@ const MESH_BODY_LOOPS = 4;
 const RABBIT_BODY_LOOPS = 6;
 
 /**
- * The open loops of {@link BODY_BONES} of the T-pose cat mesh: the roots of the two upper arms,
- * and nine open edge loops of 2.5 cm to 16 cm at the whiskers and the muzzle, which the source
- * mesh has.
+ * The open loops of {@link BODY_BONES} of the hand rig of the cat: the roots of the two upper
+ * arms, the two open edge loops of 5 cm and 6 cm of the slit under the nose, and three open edge
+ * pairs of 3 cm to 5 cm on the right whiskers, which the FBX mesh and its lighter whiskers have.
  */
-const CAT_BODY_LOOPS = 11;
+const CAT_BODY_LOOPS = 7;
 
 /**
  * The open loops of {@link BODY_BONES} of the dog mesh: the cuts to the two upper arms, two open
