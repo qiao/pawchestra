@@ -613,7 +613,8 @@ its rest is the bind.
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
   of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
   tube and the legs thicker (`assets/models/cat/cat-edits.json`), because the rig left the tail a
-  flat, crumpled sheet and the long legs looked thin. The rabbit sits with more room behind the
+  flat, crumpled sheet and the long legs looked thin. They also flatten the belly of the left
+  forearm, which showed as a bump on the top of the arm in the play pose. The rabbit sits with more room behind the
   back (`backRoom`), so that its back keeps off the chair back.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
