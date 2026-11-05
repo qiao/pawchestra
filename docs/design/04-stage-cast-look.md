@@ -174,6 +174,9 @@ user mesh (GLB)  ->  pnpm mesh-intake (keep faces | needs rebuild)
   ->  pnpm studio-body <a> (no Blender)  ->  src/models/studio/<a>.ts (the app reads only this)
 ```
 
+A body with a hand rig makes `<a>.rig.glb` with `pnpm rig-export` in place of the two middle steps
+("Hand rig").
+
 The rebuild applies only to a body whose arms or legs get new quad faces. A clean quad mesh
 (`keep faces`, "Source meshes") keeps its faces, and the step adds only the arm segments and the
 weights. The rig of another body reads the source mesh. The rebuild takes its settings from the
@@ -427,6 +430,110 @@ each verdict. A shared hold can turn a hanging bind arm 110° or more from the b
 clavicle turns little. The linear blend then crushes the front of the arm root. A `raise` shape of
 that hold relaxes the root, because rigid faces or a Smooth of the weights only move the fold. A
 body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with the most folds.
+
+### Hand rig
+
+A body can also come from a rig that a person or an agent makes by hand in Blender, saved as
+`assets/models/<s>/<s>.blend`. `pnpm rig-export <s>` (`tools/blender/export_rig.py`, headless
+Blender) reads it and writes `<s>.rig.glb` in the format of "Mesh rig". Thus `pnpm studio-body`,
+the app, and the gates (`arm-check`, `cast-matrix`, `pose-depth`, `close-views`) do not change.
+Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, so a rule for one
+fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows
+in Blender before the export. The cat is the pilot. The other bodies keep `rig-mesh`, and it gets
+no new rules.
+
+```text
+source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
+  ->  add_surface() of tools/blender/studio_armature.py (face colors, eye fans, gloss nose)
+  ->  armature, weights, bind, and shape keys by hand (studio_armature.py can start them)
+  ->  pnpm rig-export <s>  ->  <s>.rig.glb + <s>.rig.json (a text summary for diffs)
+  ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
+```
+
+The mesh of the `.blend` is the source of truth, and no tool makes it again from the source GLB
+file. `add_surface()` runs one time on that mesh: each face takes the color of the base color
+texture of the source GLB file through the UVs of the mesh, by the color rules of "Mesh rig"
+(`face_colors()`, `palette()`). Then a person edits the colors in Blender, and the export reads
+them only from the face attribute `color`. The `.blend` holds the data that a person draws. The
+export calculates only the measures, with the functions of `tools/blender/rig_mesh.py`, so that
+each measure has one definition. It checks each point of the layout below, and stops with the
+name of the first fault.
+
+| GLB item | Hand rig |
+| --- | --- |
+| Joints and parents | The bones of the armature, in the order of `STUDIO_BONES`, with the parents of `STUDIO_PARENTS`. |
+| Bind nodes, inverse bind matrices | The world frames of the bones in the Action `bind`. |
+| `POSITION` | The mesh in the bind: the basis and the shape keys `bind*`, moved by the linear blend of the bones. |
+| `JOINTS_0`, `WEIGHTS_0` | The vertex groups. |
+| `COLOR_0`, `COLOR_1` | The face attributes `color` and `color_base`, in linear RGB. |
+| Materials `fur` and `gloss` | The material slots. |
+| Targets `arm_raise_*` | The shape keys of these names: the move of the bind mesh from the key at 0 to the key at 1. |
+| Targets `arm_down_*`, `legs_straight_*` | Calculated: the moves that give the source back in the pose of the sheet (`correctives()`, `split_shapes()`). |
+| Clip `reference` | The rest pose of the armature: the pose of the sheet. |
+| `seat` | The custom property `seat` of the armature. The export measures the top (`seat_masks()`). |
+| `raise` | The custom property of the mesh that has the name of each key `arm_raise_*`. |
+| `hinges` | The custom property `hinges` of the armature. |
+| `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
+| `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
+| `headFactor`, `neckFactor`, `headShift`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
+
+The layout of the `.blend`:
+
+- **Units and axes.** One Blender unit is one unit of the studio: the T-pose source is 1 unit from
+  the soles to the top (`load_mesh()`), with the soles at z = 0. The animal faces -Y, with its left
+  side at +X. A form change in the mesh, such as longer legs, keeps the units, so that the settings
+  of `ANIMALS` in units, such as `headFloor`, keep their meaning. Each object has no transform.
+- **Objects.** One mesh and one armature. The export skips the objects of other types. The custom
+  properties of the armature are on the armature object, and the export also reads them from the
+  armature data.
+- **Armature.** The rest is the T-pose of the source. The bones are the bones of `STUDIO_BONES`
+  with no eye bones: the body bones, the optional `tail_tip` and `jaw`, and all or none of
+  `ARM_SEGMENT_BONES`. The Z axis of each bone points to its hint, at a right angle to the bone,
+  as `frame()` of `rig_mesh.py` does: up (+Z) for `root`, the feet, the toes, the tail, and the
+  jaw, the palm for the arm bones and their segments and helpers, and forward (-Y) for the other
+  bones. Each bone has one B-Bone segment, the quaternion rotation mode, and no constraint.
+- **Bind.** The Action `bind` holds the seated, role-neutral bind ("Role-neutral bind") at its
+  first frame. A bone with no key keeps its rest, and no bone scales. The arm segments and the
+  helpers turn by the rule of the app (`driven_turns()`): the helper keys them, and the export
+  checks them.
+- **Mesh.** The material slots are `fur` and `gloss`. Each eye has a small fan of gloss faces on
+  the head bone alone, out of the middle plane, and the nose has gloss faces on the head bone
+  alone ("Export"). The face attribute `color` gives one color to each face. Each vertex has 1 to
+  `STUDIO_INFLUENCES` weights that add up to 1. The mesh has one Armature modifier, with no
+  envelopes and no preserve volume, and no other modifier. A face can have more than three
+  corners, and the export divides it as Blender does.
+- **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
+  bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
+  `arm_raise_<side>2`, is a corrective shape of "Mesh rig", at most `STUDIO_RAISES`, in the order
+  of the keys. A rig that comes from a GLB file can also hold the pose of the sheet as the Action
+  `reference`, and the four shapes of the source as drawn keys.
+
+```typescript
+/** The custom properties of the armature object of a hand rig (`tools/blender/export_rig.py`). */
+interface HandRigArmature {
+  /** The palm hint of the left arm bones, in Blender axes. The right side mirrors it. */
+  readonly palm: Vec3;
+  /** `SeatExtras` with no top, in the units and the axes of the studio. */
+  readonly seat: Omit<SeatExtras, 'top'>;
+  /** The unit elbow axes of straight bind arms, in Blender axes (`StudioBody.hinges`). */
+  readonly hinges?: Readonly<Record<Side, Vec3>>;
+}
+
+/** The custom property of the mesh for each key `arm_raise_*`, under the name of the key. */
+interface HandRigRaise {
+  readonly side: Side;
+  readonly bone?: 'forearm' | 'hand';
+  /** `StudioRaise.turn` as w, x, y, z, in Blender axes. */
+  readonly turn: readonly [number, number, number, number];
+  /** `StudioRaise.fade`, in degrees. */
+  readonly fade: readonly [full: number, none: number];
+}
+```
+
+The rest of the armature is the T-pose, and the app blends each pose from the bind. So a pose in
+Blender differs from the same pose in the app where a vertex has bones with different turns, and
+a key `arm_raise_*` too. An import of the GLB file into Blender shows the skin of the app, because
+its rest is the bind.
 
 ### Seat
 
