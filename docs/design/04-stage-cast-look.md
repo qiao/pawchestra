@@ -232,8 +232,10 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
   of the app view judge that height.
   The arm tube of the mesh of the rabbit has coarse rings with long triangles, so its hand rig
-  replaces the tube with round rings on the section of the mesh, with the girth of the mesh. The
-  arm keeps the length of the arm of the old rabbit, so that the left paw reaches the nut of the
+  replaces the tube with round rings on the section of the mesh, with the girth of the mesh. Three
+  rings on the surface of the mesh also fill the gap between the trunk and the shoulder ring, with
+  a weight ramp from the clavicle to the upper arm, so that a bent arm root bends over several
+  rings and shows no large flat faces. The arm keeps the length of the arm of the old rabbit, so that the left paw reaches the nut of the
   violin (5.3). The upper arm and the forearm share the extra length by one factor, so that the
   elbow keeps its place on the arm of the mesh.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
