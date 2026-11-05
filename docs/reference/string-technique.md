@@ -515,11 +515,8 @@ The app follows these facts:
   elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The rabbit hangs its arms so too,
   with a smaller bend of each arm: the violin rests low in front of the lap, the left paw holds
-  the neck near the nut, and the bow paw rests low at its side. The cat hangs its
-  arms so too: the viola stands low in front of the lap, the left paw closes around the neck, and
-  the bow paw rests at the side of the belly. Its bow arm bends more, and its elbow turns out in
-  the middle of the moves (`BowedHold.liftPoleR`), so that the round upper arm keeps out of the
-  arm root.
+  the neck near the nut, and the bow paw rests low at its side. The cat rests the viola nearer to
+  the hip, so that its shorter arm bends, and closes its paw around the neck.
 
 The app does not follow these facts:
 
@@ -532,16 +529,16 @@ The app does not follow these facts:
   paw of the rabbit comes to its jaw.
 - **The bow elbow (2.3).** No source gives the direction of the right elbow at the frog. Each hold
   keeps the elbow near the level of the bow (`BowedHold.poleR`, and `poleTipR` at the tip). A
-  lower elbow turns the broad side of the flat upper arm of the rabbit to the front. The cat keeps
-  its elbow a little lower, so that the stick lies in its paw near the accepted grip. The right
-  shoulder turns forward (`BowedHold.reach`), so that the bow arm keeps off the belly.
+  lower elbow turns the broad side of the flat upper arm of the rabbit to the front, and puts the
+  upper arm of the cat into the trunk. The right shoulder turns forward (`BowedHold.reach`), so
+  that the bow arm keeps off the belly.
 - **The measured tremolo (2.5).** No source gives its stroke length. `measuredTremolo()` moves
   the bow a short way and back on each note of a fast run of one pitch (`BOW_MOTION.measured`), so
   the arm stays nearly still and only the hand moves.
 - **The pizzicato of the violin and the viola (2.8).** No source gives its place. The rabbit and
   the red fox pluck over the end of the fingerboard (`BowedHold.pluckPlace`), because a pluck near
   the bow puts the right forearm into the body. The cat plucks from the side of the frog
-  (`BowedHold.pluckSide`), as a bass hand comes up from the side, because its arm went into its
+  (`BowedHold.pluckSide`), as a bass hand comes up from the side. Its short arm goes into its
   round chest with the palm over the strings.
 - **The lift and the lowering.** No source gives the path of the violin or the viola from the lap
   to the chin. The left paw carries the instrument by its neck, and the instrument turns with the
@@ -549,8 +546,7 @@ The app does not follow these facts:
   bind of the left paw is supinated, so that the rest twist and the play twist lie on one side of
   180°, and the forearm skin follows the paw with no jump. In the middle of the move, the wrist
   moves off its line (`BowedHold.liftReach`), so that the instrument keeps out of the body near
-  the jaw. The cat turns the bow through the front with the hair down (the via of `UPRIGHT_BOW`),
-  so that its bow paw does not twist past 180°. A banjo roll with the scroll to the side avoids the twist, but no source gives it as a
+  the jaw. A banjo roll with the scroll to the side avoids the twist, but no source gives it as a
   rest. On a body with a pronated bind paw, the playing grip lies more than 180° from the bind in
   the supination. There the paw turns the other way, through the direction of no paw twist
   (`studioPawTwist()`), so that the skin of the forearm does not turn over. No source gives this

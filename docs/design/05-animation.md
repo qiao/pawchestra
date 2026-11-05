@@ -222,11 +222,8 @@ The rest of each family:
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
-  arm root. The cat hangs its arms so too, with the viola low in front of the lap, as the cat of
-  the A-pose mesh rested. Reason: on the long legs, a rest place on the thigh lies on the top of
-  the belly (`lapPoint()`), so the paws rested at the chin, and the cat looked hunched. Its bow
-  arm bends more at rest, and its elbow turns out in the middle of the moves
-  (`BowedHold.liftPoleR`, 5.3). The rabbit rests so too, with the paws and the violin low in front
+  arm root. The cat rests the viola upright on its left thigh, as a seated violist does. The
+  rabbit rests so too, with the paws and the violin low in front
   of the lap, as the rabbit of the A-pose mesh. Reason: with the paws near the chin, the shoulders
   rose, and the neck did not show.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
@@ -279,13 +276,11 @@ The rest of each family:
   from the arm root of the mesh, so the rig fixes it. A larger elbow turn up to the stop of
   `turnPoleOut()`, a larger lift of the shoulder, an elbow out in the middle of the moves, and a
   larger forward turn of the shoulder each took only a small part of the depth, and a larger turn
-  moves the grip line of the arm gate past its limit. The right armpit patch of the cat follows
-  the clavicle more than the arm (`cat_root.py`), because a patch on the arm swings across the
-  chest and folds the cut of the body over the arm beside it. The root domes of the pig shrink
+  moves the grip line of the arm gate past its limit. The root domes of the pig shrink
   toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
   the joint, and some of them come out of the shoulder in another pose.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
-  the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit, the cat), is
+  the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit), is
   a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
   into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
@@ -394,8 +389,7 @@ The rest of each family:
   block on the strings. The rebuilt round wrist of the hippo then goes into the back of the neck,
   so its paw lies a little off the strings along the normal of its palm (`BowedHold.gapL`), as a
   real bassist keeps the wrist off the neck (strings 2.8). Reason: a larger tilt of the paw over
-  the neck alone turns the paw past the accepted grip of the role. The cat keeps its left paw a
-  little off the neck of the viola too, so that its round forearm keeps out of the neck.
+  the neck alone turns the paw past the accepted grip of the role.
 - **Grip clearance from the girth.** The shared cello hold takes the gap of the left paw from the
   body (`BowedHold.girthFit`, `GIRTH_FIT`). It keeps the girth of the left paw of its accepted
   player, and a thicker paw lies further off the neck by the difference (`pawGirth()`, added to
