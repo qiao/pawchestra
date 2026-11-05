@@ -641,10 +641,18 @@ its rest is the bind.
   with a small drop, so that the tail ball keeps the round form of the mesh: a deep drop over the
   back of the haunch pulled the ball down into a column. The lower belly of the mesh turns down
   between the seated thighs, so the bind key `bind_lap` brings it forward onto the lap, and no
-  dark wedge shows at the crotch. The round head sits on the chest, so the bind keys `bind_neck`
-  and `bind_nape` make the groove under the jaw and at the back of the skull shallower, and no
-  dark collar shows. The body is less deep than the old body behind the front edge of the seat,
-  so the chair keeps its depth with more room behind the back (`backRoom`).
+  dark wedge shows at the crotch. The round head sits on the chest with no neck, as on the sheet,
+  so the bind keys `bind_neck`, `bind_nape`, and `bind_collar` fill the groove under the head at
+  the front, the right side, and the back, and no dark collar shows. The violin lies under the
+  left jaw and against the left side of the neck, so the fill stays off that side, and the
+  violin does not go deeper into the head. The two lobes of the haunch of the mesh ended in two
+  points on the seat, so the back of the haunch takes one round form, as on the back view of the
+  sheet, and the tail ball keeps its form and its place. The fur takes the cream tone step of the
+  old rig (`colors.tone` of `rabbit.json`), so that the rabbit keeps the look of its old body. The
+  right elbow spreads over its helper bone across the joint, because the bow arm bends far in
+  the play, and a narrow blend folded the inner elbow. The body is less deep than the old body
+  behind the front edge of the seat, so the chair keeps its depth with more room behind the back
+  (`backRoom`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
