@@ -460,6 +460,12 @@ export calculates only the measures, with the functions of `tools/blender/rig_me
 each measure has one definition. It checks each point of the layout below, and stops with the
 name of the first fault.
 
+Each value of a hand rig, such as the bind, the joints, the weights, and the keys, lives only in
+its `.blend`. A tool reads it from the export (`<s>.rig.glb` or its summary `<s>.rig.json`),
+never from the rig config `tools/mesh-rigs/<s>.json`, which keeps the values of the old chain.
+`pnpm rig-mesh <s>` stops for a body with a `.blend` beside its GLB file (`handRigOf()` of
+`tools/glb-swap.ts`).
+
 | GLB item | Hand rig |
 | --- | --- |
 | Joints and parents | The bones of the armature, in the order of `STUDIO_BONES`, with the parents of `STUDIO_PARENTS`. |
