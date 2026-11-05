@@ -72,6 +72,8 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
   before a commit, a report, or a merge: no lint, typecheck, format check, `check-commits.sh`, arm
   gate, clearance sweep, body probe, size check, cast matrix, frame measure, or image set. Run a
   check only when the user or the manager asks. This rule wins over the check rules of the modules.
+  A probe that helps you find a cause (`fold-probe`, `arm-look`, `pose-depth`, a render) is a
+  tool, not a gate: use it when it is faster than a guess.
 - **Tests.** All tests are paused. A change adds no test and runs no break test. A change that
   needs a check runs one file with `pnpm test:paused <path>`.
 - **Docs.** A change of behavior updates its design section in the same session. A decision goes
