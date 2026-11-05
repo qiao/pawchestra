@@ -139,8 +139,8 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 685,060 bytes |
-| SHA-256 | `2b6d281993f09a7695f602edeb108af29ea4c3b5e560a6b1c9ea49ca0b9129db` |
+| Size | 685,064 bytes |
+| SHA-256 | `8c72d68c1c532ad336dbc208f0537eebdeb6302045ce01556ba3b6268269aa21` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 378,198 bytes |
-| SHA-256 | `188aa2e7dde704af23f66c7dbc8c9b94be4d25bbf5b58114405fa16eee61f11f` |
+| Size | 378,339 bytes |
+| SHA-256 | `f3bf28b6a66aa07cb4078b9e38a7b69cb6b64bd2758b42e0178c702631d951cb` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -172,8 +172,10 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
 - **Bones.** The turns of `bind_turns()` of `tools/blender/rig_mesh.py` with the seat rules of
   `tools/mesh-rigs/cat.json`: the thighs slope 25° down and 1° out, the shins are vertical, the
   trunk leans 1.26° back, and the arms are straight at the bind upper arm of `bindArms`. The paws
-  turn toward supination, the left 130° and the right 81°, and `drive_segments()` turns the arm
-  segments and the helpers. The tail bones lie along the curve of `bind_tail`: the root bone on
+  turn toward supination, the left 132° and the right 89°, the values of `pnpm bind-supination
+  cat` on this rig, and `drive_segments()` turns the arm segments and the helpers. With the 130°
+  and 81° of the old file, the arm gate of the violist gave the paw twist p95 L 101 and R 72 and
+  the move twist max L 102 and R 75, and with these values 99, 64, 100, and 67. The tail bones lie along the curve of `bind_tail`: the root bone on
   (0.9925, -0.0112, -0.1214) and the tip bone on (0.6517, -0.7579, -0.0291).
 - **Hips bone.** The tail of the hips bone lies on the line of the thighs, up and 2° forward (8°
   at the spine joint before). Blender stores the frame of a bone about 6° off the line of its

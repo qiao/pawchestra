@@ -1,8 +1,8 @@
 {
- "sha256": "2b6d281993f09a7695f602edeb108af29ea4c3b5e560a6b1c9ea49ca0b9129db",
+ "sha256": "8c72d68c1c532ad336dbc208f0537eebdeb6302045ce01556ba3b6268269aa21",
  "bindSupination": {
-  "L": 130.0,
-  "R": 81.0
+  "L": 132.0,
+  "R": 89.0
  },
  "bones": {
   "root": {
@@ -133,9 +133,9 @@
   },
   "fingers_L": {
    "head": [
-    0.310327,
-    0.574058,
-    0.326766
+    0.310611,
+    0.574316,
+    0.326685
    ],
    "vertices": 232,
    "weights": "db17d545a4c1cea5"
@@ -187,9 +187,9 @@
   },
   "fingers_R": {
    "head": [
-    -0.305765,
-    0.565989,
-    0.32578
+    -0.306125,
+    0.567416,
+    0.326321
    ],
    "vertices": 224,
    "weights": "cc6c2b4647d97764"
@@ -466,8 +466,8 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.022935,
-  "arm_down_R": 0.008448,
+  "arm_down_L": 0.023641,
+  "arm_down_R": 0.010365,
   "legs_straight_L": 0.106602,
   "legs_straight_R": 0.094556
  },
