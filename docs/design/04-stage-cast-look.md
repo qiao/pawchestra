@@ -231,6 +231,11 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
   width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
   of the app view judge that height.
+  The arm tube of the mesh of the rabbit has coarse rings with long triangles, so its hand rig
+  replaces the tube with round rings on the section of the mesh. The tube
+  keeps the arm length of the old rabbit, so that the left paw reaches the nut of the violin
+  (5.3), and the upper arm is a little fuller than the mesh, a product choice, because the old
+  upper arms looked thin.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -448,7 +453,7 @@ Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, s
 fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows
 in Blender before the export. A pose in Blender skins from the T-pose and the app from the bind, so
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
-export of the open `.blend`, with the bind as its rest. The cat is the pilot. The other bodies keep `rig-mesh`, and it gets
+export of the open `.blend`, with the bind as its rest. The cat and the rabbit have hand rigs. The other bodies keep `rig-mesh`, and it gets
 no new rules.
 
 ```text
@@ -628,17 +633,18 @@ its rest is the bind.
   head of the mesh (`headFactor`), so that the head has the width of the old head for its height.
   The smaller head moves the mouth back, so the trombone hold of the panda puts the
   right elbow further out and the rest place further forward (5.2, 5.3).
-- The rabbit sits on the chair of the rabbit of its old mesh, as a product choice: the seat top
-  and the chair depth of that rabbit, with the hips joint as high. The haunch of the T-pose mesh
-  ends higher under the hips joint, so the shins are shorter (`shinFactor`), and the sit lowers
-  the haunch further onto the seat (`sit.most`). The shorter shins keep the feet in place. The
-  thighs are wider (`legGirth`), so their roots set the seat top under the haunch, and the haunch
-  must drop to it. The wider thighs also close the knees, so the thighs turn further out and the
-  shins further in (`studio.legTurns`). The neck and the trunk below the chest are longer
-  (`neckFactor`, `trunkFactor`), and the head is smaller (`headFactor`), so that the head does not
-  sit on the shoulders. The deep sit pulls the back of the haunch far down, so the tail ball and
-  the haunch near it move down together (`sit.carryTail`, `sit.tailSpread`), and the ball keeps
-  the round form of the mesh.
+- The rabbit sits on the chair of its old body, as a product choice: the seat top and the chair
+  depth of that chair. Its hand rig (`rabbit.blend`, "Hand rig") keeps the leg turns and the thigh
+  length of the old body, and makes the shins only as long as the seat needs. An even offset
+  outward from the thigh axes, faded into the haunch, makes the thighs full and round, and the
+  shins keep the slim form of the mesh. The bind key `bind_sit` lowers the haunch onto the seat
+  with a small drop, so that the tail ball keeps the round form of the mesh: a deep drop over the
+  back of the haunch pulled the ball down into a column. The lower belly of the mesh turns down
+  between the seated thighs, so the bind key `bind_lap` brings it forward onto the lap, and no
+  dark wedge shows at the crotch. The round head sits on the chest, so the bind keys `bind_neck`
+  and `bind_nape` make the groove under the jaw and at the back of the skull shallower, and no
+  dark collar shows. The body is less deep than the old body behind the front edge of the seat,
+  so the chair keeps its depth with more room behind the back (`backRoom`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
