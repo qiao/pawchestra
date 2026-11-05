@@ -559,16 +559,18 @@ its rest is the bind.
 - The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
-- The cat sits on the chair of the cat of its old mesh, as a product choice: the T-pose mesh has
-  short legs and a long trunk, which read as a lean body in front of a low chair. So its legs are
-  longer than the legs of the mesh, and its trunk is shorter (`trunkFactor`). The head, the arms,
-  the paws, and the tail keep the form of the mesh ("Replacing body"). The shin grows more than the
-  thigh (`shinFactor`): a long thigh puts the feet forward, and the deeper footprint moves the
-  seats of each demo (4.2). The seat top of the old chair stays fixed (`sit.top`), because the
-  root of the tail sets the lowest point of the body over the seat. The tail goes left along the
-  back of the haunch and hangs over the left side of the seat in front of the back post
-  (`studio.tailBind`), as the tail of a cat on a stool. A tail that keeps the curl of the mesh
-  points back past the chair and makes the footprint deeper, which moves the seats.
+- The cat sits on the chair of the cat of its old mesh, as a product choice: the legs of the
+  T-pose mesh put the seat top far below the old seat. So its hand rig (`cat.blend`, "Hand rig")
+  makes the thighs and the shins longer, and the feet keep their size. The shin grows more than
+  the thigh: a long thigh puts the feet forward, and the deeper footprint moves the seats of each
+  demo (4.2). The legs are also wider, so that they keep the hip width and the shin width of the
+  old body, because long legs with the width of the mesh look thin. The trunk keeps the length of
+  the mesh. The bind key `bind_sit` lowers the haunch onto the seat (`sit()`) and smooths the
+  crease of the belly and the thighs (`crease_relax()`). The tail goes left along the back of the
+  haunch, and its tip keeps the curl of the mesh: it curls up beside the left hip on the seat, in
+  front of the back post. A tip that keeps the curl with no turn about the root points back past
+  the chair and makes the footprint deeper, which moves the seats. The chair keeps the depth of
+  the old chair, with more room behind the back (`backRoom`).
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the

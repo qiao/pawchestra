@@ -272,15 +272,15 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat: the T-pose mesh (design 4.4). The standing shoulder joints are 0.950065 m high
-  // (the joints of the mesh, raised by the longer legs and lowered by the shorter trunk by the same
-  // 0.132 u), so that the head height H stays the H of the cat of the A-pose mesh, 0.339 m (`app`
-  // of the rig config). The cat
+  // The viola cat: the hand rig of the T-pose mesh (`cat.blend`, design 4.4). The standing shoulder
+  // joints are 1.152946 m high (the joints of the mesh, raised 0.1272 u by the longer legs), so
+  // that the head height H stays the H of the cat of the A-pose mesh, 0.339 m (1.588737 m for each
+  // unit). The cat
   // sits on the chair of the cat of the A-pose mesh: 0.46 m wide, and 0.343 m deep with the back
   // room. The haunch is 0.53 m wide, so it reaches a little past the sides of the seat. The tips of
-  // the lower whiskers hang below the chin and follow the head (`noseFront` of the rig config), so
-  // the head measures start at the chin, 0.7 u high after the rise of the legs and the drop of the
-  // trunk. The head keeps the size of the mesh, and H stays 0.339 m. The pea eyes are 1.35 times
+  // the lower whiskers hang below the chin and follow the head, so the head measures start at the
+  // chin, 0.827 u high after the rise of the legs. The head keeps the size of the mesh, and H stays
+  // 0.339 m. The pea eyes are 1.35 times
   // the share of the head of the mesh, because the eyes of the old cat sat in a light face and
   // looked larger. They lie 0.05 H of the eyes above the old eyes of the mesh, where the face is
   // flatter, so that the ovals stay round.
@@ -288,15 +288,15 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
     'cat',
     {
       landmark: 'shoulders',
-      height: 0.950065,
+      height: 1.152946,
       seated: true,
       soloist: true,
       seatWidth: 0.46,
-      backRoom: 0.014,
+      backRoom: 0.052,
       constant: 'STUDIO_CAT',
       crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
-      headFloor: 0.7,
+      headFloor: 0.827,
       eyeSize: 1.35,
       eyeShift: [0, 0.05],
     },

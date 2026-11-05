@@ -1,27 +1,29 @@
 # Cat model
 
-This folder holds the T-pose source mesh of the cat, a copy with rebuilt arms and its weights,
-the rigged copy, and a rig made by hand in Blender (`cat.blend`). The app does not serve these
-files. It loads the module
-`src/models/studio/cat.ts`, which this chain writes:
+This folder holds the T-pose source mesh of the cat, the rig made by hand in Blender
+(`cat.blend`), and the rigged copy that the export writes from it. The app does not serve these
+files. It loads the module `src/models/studio/cat.ts`, which this chain writes:
 
 ```text
-cat-tpose.glb                      source mesh (`armSource` of tools/mesh-rigs/cat.json)
-   │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
+cat-tpose.glb                      source mesh
+   │  work by hand in Blender (design 4.4, "Hand rig")
    v
-cat-arms.glb + cat-weights.json    `source` of tools/mesh-rigs/cat.json
-   │  tools/blender/cat_root.py    more clavicle weight at the right armpit
+cat.blend                          mesh, face colors, armature, bind, and keys
+   │  pnpm rig-export cat
    v
-cat-root-weights.json              `paintedWeights` of tools/mesh-rigs/cat.json
-   │  pnpm rig-mesh cat
-   v
-cat.rig.glb                        rigged mesh
+cat.rig.glb + cat.rig.json         rigged mesh and its text summary
    │  pnpm studio-body cat
    v
 src/models/studio/cat.ts           studio body of the app
 ```
 
-`docs/agents/rigging.md` gives the steps of the chain. The target of the form is the sheet
+`cat-arms.glb`, `cat-weights.json`, and `cat-root-weights.json` are the inputs of the old chain
+of `tools/mesh-rigs/cat.json`. `pnpm rig-mesh cat` stops now, because the folder holds
+`cat.blend`. Each value of the hand rig lives only in `cat.blend`, and the tools read it from the
+export (design 4.4, "Hand rig"). The bind of `cat.blend` started from the seat rules of
+`cat.json`.
+
+`docs/agents/rigging.md` gives the steps of a hand rig. The target of the form is the sheet
 `docs/reference/cat-views.png`. The cat has the same bead eyes as the fox and the rabbit.
 
 ## Files
@@ -32,8 +34,9 @@ src/models/studio/cat.ts           studio body of the app
 | `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
 | `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
-| `cat.rig.glb` | Output of the rig. License as `cat-tpose.glb` | `pnpm rig-mesh cat` |
 | `cat.blend` | Made by hand in Blender from `cat-tpose.glb` (below). License as `cat-tpose.glb` | None: edit it in Blender |
+| `cat.rig.glb` | Export of `cat.blend`. License as `cat-tpose.glb` | `pnpm rig-export cat` |
+| `cat.rig.json` | Text summary of the export, for diffs | The same run |
 
 ## cat-tpose.glb
 
@@ -106,17 +109,18 @@ of the violist grew from 3 to 6. A run gives the same bytes.
 
 ## cat.rig.glb
 
+`pnpm rig-export cat` writes it from `cat.blend`, with the text summary `cat.rig.json`. A run gives
+the same bytes.
+
 | Item | Value |
 |---|---|
-| Size | 820,144 bytes |
-| SHA-256 | `cf530ae52a410a05e4bcf71db492d64340019df2b5c54511cb437fabe33d716e` |
-| Form | The head, the brow, the arms, the paws, and the tail keep the form of the source (design 4.4, "Replacing body"). The thigh 1.6 and the shin 2.4 times as long as on the source (`legFactor`, `shinFactor`), so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.299 m high (`sit.top`), 0.46 m wide, and 0.343 m deep. The thigh 1.7 and the shin 1.25 times as thick (`legGirth`), so that the long legs keep more of the stocky look of the legs of the source. The trunk from the hips joint to the chest joint is 0.6 times as long (`trunkFactor`, `trunkTop`), so that the trunk from the hips joint to the neck joint is 1.61 H (2.23 H on the source). The seated cat is 1.45 m high to the ear tips. A flatter and narrower belly, a deeper chest, narrow shoulders (the shoulder joints 0.238 m apart), and a straight back into the neck (`girthProfile`); and the thighs 1 degree out in place of 8, so that the legs are close and parallel from the front (`studio.legTurns`) |
-| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 150 and R 90 (`studio.bindSupination`) |
-| Faces | 3,926 triangles: 3,902 of the body and the eye shells, of them 46 gloss |
-| Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes: the bent left elbow at rest (two), the bow arm in the play, and the bent right elbow at rest |
-| Tail | In the seated bind, the root of the tail goes left along the back of the haunch, and the tail hangs over the left side of the seat in front of the left back post (`studio.tailBind`), 2.4 cm from the post. The bend between the two tail bones spreads over 0.07 units on each side (`weights.tail.bend`). The tail keeps its curl in the standing body. The footprint of the seated cat is 0.633 m deep and 0.704 m wide |
-
-A run of `pnpm rig-mesh cat` gives the same bytes.
+| Size | 881,072 bytes |
+| SHA-256 | `63870894de42febd578a247a46ca2c6a063f08905c866a5b8bcd44109f7030ad` |
+| Form | The head, the brow, the trunk, the arms, the paws, and the tail of the source (design 4.4, "Replacing body"). The thigh 1.6 and the shin 2.32 times as long, and both 1.5 times as wide, so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.300 m high, 0.46 m wide, and 0.343 m deep. The seated cat is 1.675 m high to the ear tips |
+| Bind | The role-neutral bind of the Action `bind` (design 4.4): straight arms with the elbow axes of `hinges`, and the bind supination L 130 and R 81 |
+| Faces | 4,406 triangles, of them 46 gloss |
+| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_L`, `arm_raise_R`, `arm_raise_L2`, and `arm_raise_L3` of the elbows and the left wrist |
+| Tail | In the seated bind, the root of the tail goes left along the back of the haunch, and the tail curls up beside the left hip on the seat. The footprint of the seated cat is 0.652 m deep and 0.704 m wide (0.633 m and 0.704 m on the rig of `rig-mesh`) |
 
 ## cat.blend
 
