@@ -120,18 +120,48 @@ A run of `pnpm rig-mesh cat` gives the same bytes.
 
 ## cat.blend
 
-The rig of the cat, made by hand in Blender from `cat-tpose.glb`. The export into the studio
-format is a later step.
+The rig of the cat, made by hand in Blender from `cat-tpose.glb` (design 4.4, "Hand rig"). It
+has no Action `bind` and no shape keys yet: the seated bind, the bind fixes, and the export are a
+later step.
 
 | Item | Value |
 |---|---|
-| Size | 1,421,455 bytes |
-| SHA-256 | `f48e9b4bc05d0de9978af72b5b131a58ee6cfa4245512efb6748dcb8f4fb3bf3` |
+| Size | 293,048 bytes |
+| SHA-256 | `fe96d1ecb015d6e45a62142c38e8c6c8cae66ba79f620b21a708f6f9b05d4018` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the animal faces -y, and +x is its left side |
-| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals. 1,992 vertices and 3,964 triangles |
-| Material | The material of the source with a packed copy of the base color texture at 1,024 × 1,024 pixels. The copy is a preview: take the colors from the texture of `cat-tpose.glb`, because the UVs are the same |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the animal faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,018 vertices and 3,988 triangles, 46 of them gloss |
+| Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
+| Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint, and the property `palm` is (0, 0, -1) |
+| Weights | Automatic weights and the fixes below, at most 4 bones on each vertex. The upper arm, the forearm, and the forearm twist bone hold no weight |
+
+The joints are the joints of `tools/mesh-rigs/cat.json`, except the arm joints, which come from
+sections of the mesh, and the bend of the tail:
+
+- **Shoulder** (0.085, 0.5985, 0.087): on the axis of the upper arm, 0.035 units inside the line
+  where the arm leaves the trunk.
+- **Elbow** (0.247, 0.5985, 0.090): where the center line of the arm bends forward (the back line
+  bends at x 0.24, the front line at x 0.27).
+- **Wrist** (0.372, 0.5985, 0.113): the narrowest section of the arm, at the middle of the gray
+  to white blend of the paw. The forearm twist bone starts halfway between the elbow and the
+  wrist.
+- **Tail bend** (0, 0.122, -0.15): the middle of the tail tube at the bottom of its curl.
+
+The fixes of the weights:
+
+- **Thighs.** No thigh weight above y 0.21, then 6 rounds of Smooth from y 0.14 to 0.24. The
+  automatic weights gave the thighs the lower belly and the back of the haunch up to y 0.28, so a
+  sit pulled the belly into folds.
+- **Armpits.** The 19 vertices under each arm root (|x| 0.09 to 0.135, y 0.525 to 0.59, z 0 to
+  0.16) take one mean weight, so that they move as one rigid patch. A hanging arm folded them.
+- **Shoulder tops, face, ears.** No head weight on the shoulder tops (|x| above 0.075, y below
+  0.665), no neck weight above y 0.715, and no ear weight below y 0.865, each with a short Smooth
+  of its edge. The 85 vertices of the whiskers take the head bone alone.
+- **Tail root.** No tail weight on the body in front of z 0.01 or on the lower back above y 0.31,
+  then a Smooth of the root band.
+- **Paws.** No wrist helper or forearm segment beyond |x| 0.395, a short Smooth of the wrist band,
+  and the fingers keep half of their weight (`weights.fingers` of `cat.json`).
 
 The edits of the mesh, in the studio axes of the sections above (y up, z forward):
 
