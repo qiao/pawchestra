@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 983,932 bytes |
-| SHA-256 | `b1f408a889062d195e973d4c9f3c43a1b2cb8d1c88536b8221e6d2e880387034` |
+| SHA-256 | `e8a501329fec143185438336f33eedb0d6721ecd29edc6400cbad6f338326e3b` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 377,234 bytes |
-| SHA-256 | `8697ca4064dd10c9af9b5d10a939da3096da57bcaf1ab0d5fe44a46419d37980` |
+| Size | 375,029 bytes |
+| SHA-256 | `7e7f68152969df7620a6d334aae246fa5462296d02b1c9c9382f67ea456f9a22` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -337,6 +337,14 @@ The fixes of the weights, in the studio axes of the source:
   change at a time show it: with no keys `arm_raise_L` and `arm_raise_R`, the dent stays; with
   no loop cuts at the arms, the elbow folds more; with the mean weights of these 4 rings, the
   dent goes.
+- **Wrist rings.** The 3 forearm rings of each arm from 0.67 to 0.90 of the forearm also take
+  one mean weight each. The automatic weights gave the wrist helper and the paw up to 0.72 more
+  weight on one side of a ring than on the other, and the forearm segments other shares, so that
+  the twist of one ring differed up to 20° in the bind. The skin of the paw pulled one side of the
+  forearm, and the faces of the forearm turned in thin dark spikes that wound around it. With
+  these rings, each forearm ring turns as one piece, and the bind twist of the left forearm
+  grows from 15° at the first ring to 122° at the last (0° to 127° from the elbow joint to the
+  wrist joint). The bind supination of phase A (130° and 81°) changes no app render of the arm.
 
 The folds of the test poses of the last round (arms down 80°, the elbow at 90° and 130°, the bow
 arm, the sit with the thigh at 90°): the triangles whose normal turns more than 60° and more
