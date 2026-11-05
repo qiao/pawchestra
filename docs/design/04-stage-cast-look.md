@@ -209,24 +209,26 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   source file stays unchanged and a run gives the same bytes again.
 - **Replacing body.** A new body of a species keeps three things of its old body in the app view:
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
-  girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body
-  (a smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked
-  too large. The soft brow of the cat is a product choice that its `.blend` holds ("Hand rig"), so
-  that the face reads happy. The leg factors stretch the legs to the old seat, so the stretched legs take
-  a girth across their axes (`legGirth`) that keeps more of the stocky look of the legs of the
-  mesh: of the girth variants, the one whose mid thigh and mid shin widths, as a share of the head
-  height and of the hip width, are nearest to the mesh. The leg turns of the seat
-  (`studio.legTurns`) keep the knees of the old body. The trunk length and the trunk shape stay a
-  product choice of the form keys of "Mesh rig" (`trunkFactor`, `girthProfile`). `pnpm body-shape`
-  measures the seated bind: the width and the depth of the trunk at 10 heights from the seat to the
-  neck joint, the girths of the limbs at their middles, the knee and the ankle gaps from the front,
-  the distance of the shoulder joints, and the bulge of the back line behind the line from the
-  waist to the neck. A width row of `girthProfile` at the shoulder joints moves the joints and the
-  arm roots in together, so the arm root keeps its form. The arms then hang nearer to the trunk,
-  and the hold turns the elbows out where they go into the body (5.3). On a T-pose body, the cut
-  near the armpits goes through the level arm roots, and the trunk share of the painted weights
-  (`weights.paintedBelow`) counts them as trunk. So that width row measures the arm roots, and a
-  width row of `girthProfile` does not change it: the images of the app view judge that height.
+  girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
+  smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked too
+  large. The soft brow and the smooth eye sockets of the cat are product choices that its `.blend`
+  holds ("Hand rig"), so that the face reads happy and calm. The old eye of the mesh is an almond
+  eyeball in a groove, and the groove shaded a black almond around each pea eye. The leg factors
+  stretch the legs to the old seat, so the stretched legs take a girth across their axes
+  (`legGirth`) that keeps more of the stocky look of the legs of the mesh: of the girth variants,
+  the one whose mid thigh and mid shin widths, as a share of the head height and of the hip width,
+  are nearest to the mesh. The leg turns of the seat (`studio.legTurns`) keep the knees of the old
+  body. The trunk length and the trunk shape stay a product choice of the form keys of "Mesh rig"
+  (`trunkFactor`, `girthProfile`). `pnpm body-shape` measures the seated bind: the width and the
+  depth of the trunk at 10 heights from the seat to the neck joint, the girths of the limbs at their
+  middles, the knee and the ankle gaps from the front, the distance of the shoulder joints, and the
+  bulge of the back line behind the line from the waist to the neck. A width row of `girthProfile`
+  at the shoulder joints moves the joints and the arm roots in together, so the arm root keeps its
+  form. The arms then hang nearer to the trunk, and the hold turns the elbows out where they go into
+  the body (5.3). On a T-pose body, the cut near the armpits goes through the level arm roots, and
+  the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
+  width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
+  of the app view judge that height.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -283,13 +285,15 @@ joins each such pair into a quad again.
 ### Export
 
 `pnpm studio-body <animal>` reads the rigged GLB file with no Blender and writes the module. The
-entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings.
+entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings. A hand rig holds
+the facts of its body in its `.blend` ("Hand rig").
 
 - It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
 - It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
-  `eyeShift`, `eyeNormal`). An old eye that stands out as a ball in a groove shows a light rim
+  `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
+  with no rule. An old eye that stands out as a ball in a groove shows a light rim
   around the pea eye, so the head fills it first (`eyeFill`). Each eye bends to the head surface
   (`eyeBend()`), so its rim lies at the fur. Both eye lights show on the upper left, as the reflection of one lamp does.
 - The tip of the nose comes from the vertices near the middle plane (`NOSE_PLANE`), or below a
@@ -447,6 +451,7 @@ no new rules.
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
   ->  add_surface() of tools/blender/studio_armature.py (face colors, eye fans, gloss nose)
   ->  armature, weights, bind, and shape keys by hand (studio_armature.py can start them)
+  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py), and no eye fans
   ->  pnpm rig-export <s>  ->  <s>.rig.glb + <s>.rig.json (a text summary for diffs)
   ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
 ```
@@ -460,11 +465,16 @@ export calculates only the measures, with the functions of `tools/blender/rig_me
 each measure has one definition. It checks each point of the layout below, and stops with the
 name of the first fault.
 
-Each value of a hand rig, such as the bind, the joints, the weights, and the keys, lives only in
-its `.blend`. A tool reads it from the export (`<s>.rig.glb` or its summary `<s>.rig.json`),
-never from the rig config `tools/mesh-rigs/<s>.json`, which keeps the values of the old chain.
-`pnpm rig-mesh <s>` stops for a body with a `.blend` beside its GLB file (`handRigOf()` of
-`tools/glb-swap.ts`).
+Each value of a hand rig, such as the bind, the joints, the weights, the keys, the pea eyes, and
+the facts of the body, lives only in its `.blend`. The pea eyes are objects of the `.blend`, so
+that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves or sizes them. The
+facts of the body (`BODY_FACTS` of `tools/studio-body.ts`), such as the scale, the crease angle,
+and the width of the chair, are custom properties of the armature, so that each fact has one
+place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the landmark,
+the role, the constant, and the GLB file. A tool reads each value from the export
+(`<s>.rig.glb` or its summary `<s>.rig.json`), never from the rig config
+`tools/mesh-rigs/<s>.json`, which keeps the values of the old chain. `pnpm rig-mesh <s>` stops
+for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap.ts`).
 
 | GLB item | Hand rig |
 | --- | --- |
@@ -480,6 +490,8 @@ never from the rig config `tools/mesh-rigs/<s>.json`, which keeps the values of 
 | `seat` | The custom property `seat` of the armature. The export measures the top (`seat_masks()`). |
 | `raise` | The custom property of the mesh that has the name of each key `arm_raise_*`. |
 | `hinges` | The custom property `hinges` of the armature. |
+| `eyes` | The eye objects `eye_L` and `eye_R` in the bind: the middle, the unit direction, and the size of each eye (`eyes_of()`). |
+| `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
 | `headFactor`, `neckFactor`, `headShift`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
@@ -488,11 +500,11 @@ The layout of the `.blend`:
 
 - **Units and axes.** One Blender unit is one unit of the studio: the T-pose source is 1 unit from
   the soles to the top (`load_mesh()`), with the soles at z = 0. The animal faces -Y, with its left
-  side at +X. A form change in the mesh, such as longer legs, keeps the units, so that the settings
-  of `ANIMALS` in units, such as `headFloor`, keep their meaning. Each object has no transform.
-- **Objects.** One mesh and one armature. The export skips the objects of other types. The custom
-  properties of the armature are on the armature object, and the export also reads them from the
-  armature data.
+  side at +X. A form change in the mesh, such as longer legs, keeps the units, so that the facts
+  in units, such as `headFloor`, keep their meaning. The mesh and the armature have no transform.
+- **Objects.** One mesh, one armature, and the eye objects `eye_L` and `eye_R`. The export skips
+  the objects of other types. The custom properties of the armature are on the armature object,
+  and the export also reads them from the armature data.
 - **Armature.** The rest is the T-pose of the source. The bones are the bones of `STUDIO_BONES`
   with no eye bones: the body bones, the optional `tail_tip` and `jaw`, and all or none of
   `ARM_SEGMENT_BONES`. The Z axis of each bone points to its hint, at a right angle to the bone,
@@ -503,12 +515,20 @@ The layout of the `.blend`:
   first frame. A bone with no key keeps its rest, and no bone scales. The arm segments and the
   helpers turn by the rule of the app (`driven_turns()`): the helper keys them, and the export
   checks them.
-- **Mesh.** The material slots are `fur` and `gloss`. Each eye has a small fan of gloss faces on
-  the head bone alone, out of the middle plane, and the nose has gloss faces on the head bone
+- **Mesh.** The material slots are `fur` and `gloss`. The mesh has no gloss faces of an eye, and
+  `pnpm studio-body` stops for a file with eye fans. The nose has gloss faces on the head bone
   alone ("Export"). The face attribute `color` gives one color to each face. Each vertex has 1 to
   `STUDIO_INFLUENCES` weights that add up to 1. The mesh has one Armature modifier, with no
   envelopes and no preserve volume, and no other modifier. A face can have more than three
   corners, and the export divides it as Blender does.
+- **Eyes.** Each eye object is a mesh with the bone `head` as its parent. In the bind, its origin
+  is the middle of the eye, its Z axis the direction in which the eye faces, its Y axis up along
+  the plane of the eye (the turn of `addEye()`), and its even scale the head height `H` of the
+  eye. Both eyes have one size. The mesh of the object is a preview of the eye of the app: the
+  oval of `EYE` and its light, bent to the head surface by the rule of `eyeBend()`. The export
+  reads only the transform. `pnpm studio-body` measures the bend where the axis of the eye meets
+  the head surface, so that an eye can stand in front of the surface, and it reports a front of
+  an eye that the head covers (`eyePush()`).
 - **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
   bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
   `arm_raise_<side>2`, is a corrective shape of "Mesh rig", at most `STUDIO_RAISES`, in the order
@@ -524,6 +544,26 @@ interface HandRigArmature {
   readonly seat: Omit<SeatExtras, 'top'>;
   /** The unit elbow axes of straight bind arms, in Blender axes (`StudioBody.hinges`). */
   readonly hinges?: Readonly<Record<Side, Vec3>>;
+  /** The height of the landmark in the app, in meters: it sets the scale. */
+  readonly height: number;
+  /** The crease angle of the fur, in degrees. */
+  readonly crease: number;
+  /** The width of the seat of the chair, in meters. Each other fact of `BODY_FACTS` is optional. */
+  readonly seatWidth?: number;
+  /** The room behind the back on the chair, in meters. */
+  readonly backRoom?: number;
+  /** The lowest height of the head measures, in units. */
+  readonly headFloor?: number;
+}
+
+/** An entry of the extras `eyes`, in the bind, in the units and the axes of the studio. */
+interface EyeExtras {
+  /** The middle of the eye: the head of its eye bone. */
+  readonly middle: Vec3;
+  /** The unit direction in which the eye faces. */
+  readonly direction: Vec3;
+  /** The head height `H` of the eye. */
+  readonly size: number;
 }
 
 /** The custom property of the mesh for each key `arm_raise_*`, under the name of the key. */
