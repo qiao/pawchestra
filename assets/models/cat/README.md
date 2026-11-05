@@ -120,7 +120,7 @@ steps of the side wall, with no run of the cat (672184a7), so the git history ke
 | Item | Value |
 |---|---|
 | Size | 880,372 bytes |
-| SHA-256 | `f418116c71c8908bd193f19febeec1cb4e01700c73790b258ec0d3c02613cca0` |
+| SHA-256 | `e7002bf290afb1c824dfff558a603cb05357d396ba254d3463d0a274ba56982a` |
 | Base | The rig of fc52d38f: 880,600 bytes, SHA-256 `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
 | Bind | The bind of the viola hold, with the elbows bent (below) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
@@ -196,6 +196,14 @@ with |x| > 0.012, a distance below 0.075 from the axis, and at least 0.9 of thei
 hips and the leg bones. `leg-lineup.png` of `reports/2026-11-05-cat-edits/` shows the factors
 1.15, 1.25, and 1.35. Each leg move is linear in the factor, so another factor F takes the leg
 moves times (F − 1) / 0.25.
+
+The lowest ring of each shin then takes one factor, 1.12, around the shin axis: 9 places on the
+left (2288, 2291, 2296, 2299, 2317, 2318, 2340, 2347, 3780) and 10 on the right. The ring is
+slanted, so the ramp of g gave it 1.02 at the back and 1.23 at the front. Its front stood out
+over the top of the paw, and the face below it showed as a dark dent above the paw. Vertex 4818
+of the right ring takes 1.04: it lies lower, next to the paw, and 1.12 gives it a sharp edge to
+the paw. In the rest pose, the largest edge angle of the lower shin goes from 53.6° to 40.3° on
+the left (base 37.3°) and from 72.8° to 59.0° on the right (base 59.9°).
 
 **Weights (61 places, 84 vertices).** The rig gave each vertex of the tail end 0.251 of its
 weight on the chest. The edit gives that share to `tail_tip`, so the tail end does not follow the
