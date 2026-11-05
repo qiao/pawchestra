@@ -125,7 +125,7 @@ run gives the same bytes.
 | Item | Value |
 |---|---|
 | Size | 671,532 bytes |
-| SHA-256 | `4bb9916ec5ff3cc692138f5b24c57b5d818b7096b110c1ccdf32fb333663b4f9` |
+| SHA-256 | `902fd31710304bb243501e61dba7443b683c2f3a69ae6a96cb52bc18ae260516` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,12 +140,12 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 337,904 bytes |
-| SHA-256 | `8cd4c3ec1d5518f0b2b6ffe02937d1f550b284b5e4c6c542ff486878bde03d59` |
+| Size | 338,036 bytes |
+| SHA-256 | `1a24c986895a15155b24fc8971ba64376bee5d92a08af0260b46822c87e74a4e` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg', eye_fans=False)`: the face attributes `color` and `color_base` and a gloss nose. 2,939 vertices and 3,185 faces (2,692 quads and 493 triangles, 5,877 triangles), 42 faces of them gloss |
+| Mesh | One object `rabbit`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg', eye_fans=False)`: the face attributes `color` and `color_base` and a gloss nose. 2,939 vertices and 3,192 faces (2,685 quads and 507 triangles, 5,877 triangles), 42 faces of them gloss |
 | Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size of the pea eyes of the old module (0.200104 units, 0.286547 m) and the direction (±0.7526, -0.6512, 0.0974), the mean normal of the dark faces of the old eyes. Each middle lies where the axis through the middle of the old eye meets the smooth socket in the bind: (±0.0688, -0.0644, 0.7258) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
@@ -234,6 +234,19 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   point goes below the seat top. 49 vertices move, at most 2.6 cm. From the back and the back
   diagonals, the lobes now go down to the seat in one round curve, and the tail ball keeps its
   form and its place. One small face on the seat (274, 284, 2912) turns over under the haunch.
+  With the fade, the middle under the tail ball stayed back from the lobes and showed as a dark
+  column from the back, and the lowest point over the seat rose 2.9 mm. A second pass of the
+  same oval with a fade of one ring (1/2 at the border) puts the middle on the oval: 49 vertices,
+  at most 1.3 cm, and the seat top is 0.250 m again. The quads 102 (274, 283, 284, 2912) and 435
+  (229, 228, 286, 2923) on the seat split along the diagonals 283 to 2912 and 228 to 2923, so the
+  thin triangle at the seat edge does not turn over. Then the low ring of the sides of the back
+  goes down toward the seat, so that the lobe does not hang far over its seat line from the back
+  diagonals: each vertex behind y 0.02 (13 vertices), 0.01 to 0.06 units above the seat top, at
+  a plan angle from the back (around the line x 0, y -0.02) of 30° to 50° and more, takes the
+  height h (1 - 0.5 w), with w the smooth step from 1 at 0.01 to 0 at 0.06: at most 1.4 cm. The
+  quads 101, 115, 433, 455, and 1804, which these moves made nearly flat, split along their
+  better diagonals (2938 to 281, 318 to 2916, 230 to 2926, 1047 to 298, and 292 to 279). Each
+  move goes into `bind_sit`.
 - **`bind_crease`.** The folded faces of the front of the hips (up 0.15 to 0.29 units of the
   source, |x| below 0.14, in front of the trunk middle) take 60 rounds of the relax of the
   faces that turn more than 35° (each vertex moves halfway to the mean of its neighbors).
@@ -373,5 +386,5 @@ the mid shin 0.256 of the width of the head at the eyes (before the legs 0.442 a
 
 `pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
 objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 46.1 KB after gzip (the old module 28.6 KB), because the mesh has 5,877 triangles in
+module is 46.2 KB after gzip (the old module 28.6 KB), because the mesh has 5,877 triangles in
 place of 4,035.
