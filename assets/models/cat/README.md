@@ -139,8 +139,8 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 983,936 bytes |
-| SHA-256 | `04c404dda33e5aa750d0b05f3d79f275c6426851e75743bd711bbc33bf89a693` |
+| Size | 983,932 bytes |
+| SHA-256 | `e6319ec7d1d9d5dab7f08f0fe9ba2c24050fb341171b36e61c67321025e37903` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 377,328 bytes |
-| SHA-256 | `d45702630db22ff27a2759389bed1468d83ed79f19639d4315f2b38f084eae6c` |
+| Size | 376,820 bytes |
+| SHA-256 | `c5c6ff81af5da62cc68148afe09657db9c1ecfdecfb440bc7a01aa23ee4a65ed` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -200,6 +200,16 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   step down from h 0 to 0.05. 53 points move, at most 0.0104 units. No point with a tail weight
   of 0.1 or more, or with a shin or foot weight of 0.5 or more, moves. The seat top stays 0.3001
   m.
+- **Soft hip ledges.** After the full thighs, the outer top of each thigh made a sharp ledge
+  against the side of the haunch in the seated bind, which showed from the sides as a light flap.
+  A relax of the bind smooths it: 8 rounds in which each point within 0.07 units of a center
+  moves half of the way to the mean of its neighbors, times a smooth falloff (1 at the center, 0
+  at 0.07 units). The centers (x, up, forward) are (-0.175, 0.339, 0.13), (-0.164, 0.308, 0.112),
+  (-0.153, 0.301, 0.084), and (-0.169, 0.281, 0.177) on the right, and (0.176, 0.291, 0.147),
+  (0.171, 0.309, 0.114), (0.162, 0.311, 0.086), and (0.14, 0.292, 0.059) on the left. No point
+  with a tail weight above 0.05 or below the height 0.285 units moves. The move goes into
+  `bind_sit` by the inverse of the blended skin. 39 points move, at most 0.0233 units. The rest,
+  and with it the leg widths, stay.
 - **`bind_tail`.** The tail lies on the seat behind the haunch and hangs over the left side of the
   seat in front of the left back post, as a seated cat lets its tail hang off a stool. Each vertex
   with a tail weight keeps its arc length along the middle line of the rest tail and its offset
