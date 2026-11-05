@@ -300,16 +300,12 @@ passes.
       audit`), and check the hold items of the old body below against it.
 - [ ] Rabbit hand rig: the bind supination stays 115° (left) and 57° (right) of the last rig. Run
       `pnpm bind-supination rabbit` on the new rig.
-- [ ] Rabbit hand rig: a faint ring of the source eye shows around each pea eye from the front.
-      A clean fix moves the dome and the groove of each source eye onto the face surface (about
-      30 vertices each), a change of the form of the source: it waits for the user.
 - [ ] Rabbit hand rig: at rest, the hanging arm roots show flat flaps from the back (az 135 to
       -135), as on the last rig. Try a key `arm_raise_*` of the rest by point edits.
 - [ ] Rabbit hand rig: at rest, 3 faces of the left paw fold (`pnpm fold-probe violinist`, the
       paw turns 146°). Check the 2x crops of the rest grip.
-- [ ] Rabbit hand rig: in the seated bind, the underside of the lower belly between the thighs
-      shows as a dark wedge from the front. It is the form of the mesh, so the rig keeps it. Ask
-      the user before any lap key.
+- [ ] Rabbit hand rig: the lower belly follows the hips alone, so the seated thighs bend in the
+      groin creases. Check the groin from the front diagonals at 2x for thin light faces.
 - [ ] Rabbit violinist: measure the violin depth under the chin on the new rig (`pnpm pose-depth
       violinist`). The last rig put it 2.7 cm into the head (limit 2.0 cm). Fit the chin hold in
       `H` of the hand rig.
