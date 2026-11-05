@@ -610,11 +610,14 @@ its rest is the bind.
   demo (4.2). The legs are also wider, so that they keep the hip width and the shin width of the
   old body, because long legs with the width of the mesh look thin. The trunk keeps the length of
   the mesh. The bind key `bind_sit` lowers the haunch onto the seat (`sit()`) and smooths the
-  crease of the belly and the thighs (`crease_relax()`). The tail goes left along the back of the
-  haunch, and its tip keeps the curl of the mesh: it curls up beside the left hip on the seat, in
-  front of the back post. A tip that keeps the curl with no turn about the root points back past
-  the chair and makes the footprint deeper, which moves the seats. The chair keeps the depth of
-  the old chair, with more room behind the back (`backRoom`).
+  crease of the belly and the thighs (`crease_relax()`). The tail lies on the seat behind the
+  haunch and hangs over the left side of the seat in front of the left back post, as a seated cat
+  lets its tail hang off a stool. Two tail bones cannot give this curve, so the bind key
+  `bind_tail` bends the tail along it and keeps the haunch around the root: a tail turned only by
+  its bones made a lump at the hip and a knot on the seat. A tail that hangs behind the chair
+  makes the footprint deeper, which moves the seats. The chair keeps the depth of the old chair,
+  with more room behind the back (`backRoom`). The head measures start at the chin of the old
+  body (`headFloor`), so that `H` and each hold in `H` stay.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
