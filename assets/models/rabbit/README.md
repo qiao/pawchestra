@@ -124,8 +124,8 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 723,004 bytes |
-| SHA-256 | `ea8aee408379d51d5bc3c6a7011a1b4dd6d90372542cdeb178530cbcf48f9ba5` |
+| Size | 723,124 bytes |
+| SHA-256 | `807bd3f14f97dbaf54aef40ee01d73c7bf391c2c5f01eaf50f5406c011dd235b` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,799 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 331,242 bytes |
-| SHA-256 | `032215117029359cda4940b5005553b3441ed9d66332c84aaae2e3b6a762a122` |
+| Size | 334,069 bytes |
+| SHA-256 | `8cd6309bce07bd85f281bf0b9e9e25abef23de400988378781454a8ea30c0003` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -149,7 +149,7 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 | Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size of the pea eyes of the old module (0.200104 units, 0.286547 m) and the direction (±0.7526, -0.6512, 0.0974), the mean normal of the dark faces of the old eyes. Each middle lies where the axis through the middle of the old eye meets the smooth socket in the bind: (±0.0688, -0.0644, 0.7258) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
-| Shape keys | `Basis`, `bind_sit`, `bind_crease`, `bind_lap`, `bind_neck`, and `bind_nape` at the value 1, and `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` at the value 0 (below), each with its custom property on the mesh |
+| Shape keys | `Basis`, `bind_sit`, `bind_crease`, `bind_lap`, `bind_neck`, `bind_nape`, and `bind_collar` at the value 1, and `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` at the value 0 (below), each with its custom property on the mesh |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
 
 The edits of the mesh, in the order of the work:
@@ -236,6 +236,21 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   back of the skull (vertex 16) at the middle, less to the sides, then 4 Taubin rounds. 10
   vertices move, at most 3.9 cm. From behind and from the stage camera, the groove showed as a
   dark collar.
+- **`bind_collar`.** The keys of the neck and the nape left the groove under the round head, and
+  the app showed it as a dark collar under the chin and a dark band at the sides of the neck. In
+  the bind, with the keys before it, each azimuth around the vertical line through the neck joint
+  (0 at the front, +90 at the left) has a rim: the point of the largest radius where the head
+  faces (head share 0.9 or more, no whisker) cross the half plane of the azimuth between the
+  heights 0.64 and 0.75, smoothed over 5°. Each vertex below its rim (at most 0.004 under it,
+  above the height 0.53, with an arm share below 0.2) moves out from the line to the cone that
+  goes down and in from the rim with the slope 0.3 at the front and 0.12 at the sides and the
+  back (the change from 30° to 70° of azimuth), only when the cone is out of it. The move fades
+  out from 0.08 to 0.15 below the rim, with the arm share from 0.03 to 0.2, and on the violin
+  side from the azimuth 10° to 25° on, up to 95°, and back from 115°. Then the moved vertices
+  and their ring take 4 Taubin rounds (0.5, -0.53). 226 vertices move, at most 5.1 cm. The
+  violin of the hold lies under the left jaw and its tail end against the left side of the neck:
+  a fill there put the violin up to 4.3 cm deeper into the head in `pnpm pose-depth violinist`,
+  and with the fade it goes 0.3 cm deeper (2.7 cm, before 2.4 cm).
 - **Raise keys.** `rm.raise_shape()` relaxes the faces that fold in the pose of a rule of `pnpm
   raise-fit violinist`, on the bind, and the key is the move turned back into the rest by the
   inverse of the blended skin. The property holds the turn of the forearm (w, x, y, z, Blender
