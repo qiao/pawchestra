@@ -20,7 +20,7 @@ rules of the config (`bind_turns()`). With `--auto-weights`, the mesh takes the 
 Blender, at most four bones for each vertex. `--drive` keys the arm segments and the helpers of the
 Action `bind` by the rule of the app, and `--rolls` gives each bone the roll of its hint. The
 command line runs headless only. In a live Blender, import this module and call `add_surface()`,
-`drive_segments()`, and `fix_rolls()`.
+`drive_segments()`, `fix_rolls()`, and `set_weight_row()` (one vertex).
 """
 
 import json
@@ -33,6 +33,9 @@ import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
+
+#: The largest number of bones of a vertex (`STUDIO_INFLUENCES` of `src/models/studio-format.ts`).
+INFLUENCES = 4
 
 #: The repository root.
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -218,6 +221,38 @@ def fix_rolls(rig):
     for eb in rig.data.edit_bones:
         eb.align_roll(Vector(hint(rig, eb.name).tolist()))
     bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def set_weight_row(ob, index, row):
+    """Replaces all weights of the vertex `index` of the mesh `ob` with `row` ({bone: weight}):
+    the `INFLUENCES` largest weights, normalized to a sum of 1. The groups of other bones lose the
+    vertex. Each bone must be a deform bone of the armature of the mesh. Gives the written row.
+    Safe in a live Blender, in Object Mode."""
+    if ob.mode == 'EDIT':
+        raise RuntimeError(
+            'Leave Edit Mode first: the vertex groups of an edit mesh do not change.'
+        )
+    rig = ob.find_armature()
+    kept = sorted(((n, float(w)) for n, w in row.items() if w > 0), key=lambda p: -p[1])
+    kept = kept[:INFLUENCES]
+    total = sum(w for _, w in kept)
+    bad = [
+        n
+        for n, _ in kept
+        if rig is None or n not in rig.data.bones or not rig.data.bones[n].use_deform
+    ]
+    if total <= 0 or bad:
+        raise ValueError(f'The row {row} has no positive weight, or no deform bones {bad}.')
+    index = int(index)
+    # The list of the groups of the vertex is copied first: a removal changes `v.groups`.
+    old = [g.group for g in ob.data.vertices[index].groups]
+    for group in old:
+        ob.vertex_groups[group].remove([index])
+    for name, weight in kept:
+        group = ob.vertex_groups.get(name) or ob.vertex_groups.new(name=name)
+        group.add([index], weight / total, 'REPLACE')
+    ob.data.update()
+    return {name: weight / total for name, weight in kept}
 
 
 def image_pixels(img):
