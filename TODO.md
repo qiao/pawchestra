@@ -300,8 +300,15 @@ passes.
       audit`), and check the hold items of the old body below against it.
 - [ ] Rabbit hand rig: the bind supination stays 115° (left) and 57° (right) of the last rig. Run
       `pnpm bind-supination rabbit` on the new rig.
-- [ ] Rabbit hand rig: at rest, the hanging arm roots show flat flaps from the back (az 135 to
-      -135), as on the last rig. Try a key `arm_raise_*` of the rest by point edits.
+- [ ] Rabbit hand rig: three rings on the source surface now fill each arm root
+      (`reports/2026-11-05-rabbit-armpit/`), but the 8 sides of the source section and the near
+      right angle where the arm meets the trunk show as sharp edges in the bind and the play (50
+      to 75 edges above 35° at each root). A round section needs vertices off the source surface,
+      up to about 3 mm at the middle of each side. Ask the user before that form change.
+- [ ] Rabbit hand rig: at rest, 12 faces under the arm roots turn more than 60° (none more than
+      90°), because the hanging arm presses the root rings of the armpit together. The large
+      trunk faces behind each shoulder still show as flat planes from az 135 and -135. Try a key
+      `arm_raise_*` of the rest by point edits.
 - [ ] Rabbit hand rig: at rest, 3 faces of the left paw fold (`pnpm fold-probe violinist`, the
       paw turns 146°). Check the 2x crops of the rest grip.
 - [ ] Rabbit hand rig: the lower belly follows the hips alone, so the seated thighs bend in the
