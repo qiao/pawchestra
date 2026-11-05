@@ -78,7 +78,8 @@ the pea eyes, and the facts of the body, and its mesh is the source of truth. In
 call only the functions of `tools/blender/studio_preview.py` (`sp`), `add_surface()`,
 `fix_rolls()`, `drive_segments()`, `set_weight_row()`, and `ring_spread()` of
 `tools/blender/studio_armature.py` (`sa`), and `place_eyes()` and `fit_eyes()` of
-`tools/blender/studio_eyes.py` (`se`). Run the command lines of these files headless only.
+`tools/blender/studio_eyes.py` (`se`). Run the command lines of these files headless only. A
+scripted edit of a `.blend` writes its exact call and values in the `README.md` row of the file.
 
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
    eye_fans=False)` one time for the face colors and the gloss nose. The texture is the source
@@ -141,7 +142,8 @@ the trunk (`beaver_edit.py`).
 ### Rules
 
 - Work in Blender with the plain tools, one step at a time (`run_steps()`), and look at an image
-  after each step. Write no weight algorithm of your own.
+  after each step. Write no weight algorithm of your own. A hand fix in Blender, such as one mean
+  weight for each limb ring, is allowed.
 - Change only the limb faces from the shoulder line to the wrist, or from the haunch line to the
   ankle. The new surface lies on the old limb. Ask the user before the first rebuild of a species.
 - Keep the source file, and write the copy next to it with a note in its `README.md`.
@@ -244,8 +246,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
 - Uneven shares around one forearm ring, from a Smooth of a half ring or the weights of a large
-  paw, dent a bent elbow and shear the twisted faces into dark spikes. Give each forearm ring one
-  mean weight (`cat.blend`).
+  paw, dent a bent elbow and shear the twisted faces into dark spikes. Measure them with
+  `sa.ring_spread()`, and give each forearm ring one mean weight (`sa.set_weight_row()`).
 - A bent bind of a thick paw (`studio.bindArms`) presses the inner wrist into a dark slit. Bind the
   arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
