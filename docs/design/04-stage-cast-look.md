@@ -648,9 +648,9 @@ its rest is the bind.
   violin does not go deeper into the head. The two lobes of the haunch of the mesh ended in two
   points on the seat, so the back of the haunch takes one round form, as on the back view of the
   sheet, and the tail ball keeps its form and its place. The fur takes the cream tone step of the
-  old rig (`colors.tone` of `rabbit.json`), so that the rabbit keeps the look of its old body. The
-  right elbow spreads over its helper bone across the joint, because the bow arm bends far in
-  the play, and a narrow blend folded the inner elbow. The body is less deep than the old body
+  old rig (`colors.tone` of `rabbit.json`), so that the rabbit keeps the look of its old body. Each
+  elbow spreads over its helper bone across the joint, because the arms bend far in the play,
+  and a narrow blend folded the inner elbow. The body is less deep than the old body
   behind the front edge of the seat, so the chair keeps its depth with more room behind the back
   (`backRoom`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at

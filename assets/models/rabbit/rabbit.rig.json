@@ -1,5 +1,5 @@
 {
- "sha256": "49a88e85cebc10c9ce76d602067c5f6815d814da022d43a8a3caf4a307021da1",
+ "sha256": "4bb9916ec5ff3cc692138f5b24c57b5d818b7096b110c1ccdf32fb333663b4f9",
  "bindSupination": {
   "L": 115.0,
   "R": 57.0
@@ -92,8 +92,8 @@
     0.537637,
     -0.007549
    ],
-   "vertices": 114,
-   "weights": "1e0d9e04a02578dc"
+   "vertices": 98,
+   "weights": "afa4493202781f42"
   },
   "upper_arm_L": {
    "head": [
@@ -291,7 +291,7 @@
     0.007137
    ],
    "vertices": 84,
-   "weights": "ed653913a1fd043c"
+   "weights": "14f9041e7d77bc15"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -300,7 +300,7 @@
     0.025017
    ],
    "vertices": 105,
-   "weights": "b4f87d4d43e81820"
+   "weights": "c7ca0f7ecdd1bc9a"
   },
   "upper_arm_seg3_L": {
    "head": [
@@ -308,8 +308,8 @@
     0.550896,
     0.042898
    ],
-   "vertices": 132,
-   "weights": "4800a48d69a2f25d"
+   "vertices": 116,
+   "weights": "046b1692de22a8b5"
   },
   "forearm_seg0_L": {
    "head": [
@@ -317,8 +317,8 @@
     0.546355,
     0.060778
    ],
-   "vertices": 128,
-   "weights": "2151eed295cabfc5"
+   "vertices": 80,
+   "weights": "f784693de16168a5"
   },
   "forearm_seg1_L": {
    "head": [
@@ -327,7 +327,7 @@
     0.078195
    ],
    "vertices": 112,
-   "weights": "6a461b538a310fc2"
+   "weights": "cd9c1686ab19617a"
   },
   "forearm_seg2_L": {
    "head": [
@@ -336,7 +336,7 @@
     0.095612
    ],
    "vertices": 125,
-   "weights": "f8763ef090ad3196"
+   "weights": "be5a77532efd80fd"
   },
   "forearm_seg3_L": {
    "head": [
@@ -345,7 +345,7 @@
     0.113029
    ],
    "vertices": 133,
-   "weights": "ecc2931da25607a6"
+   "weights": "8a0a48311dafea33"
   },
   "elbow_L": {
    "head": [
@@ -353,8 +353,8 @@
     0.546355,
     0.060778
    ],
-   "vertices": 96,
-   "weights": "8583e0d2ad31dd25"
+   "vertices": 160,
+   "weights": "c441747ecb627923"
   },
   "wrist_L": {
    "head": [
@@ -461,7 +461,6 @@
   "arm_down_R": 0.028977,
   "legs_straight_L": 0.060636,
   "legs_straight_R": 0.060373,
-  "arm_raise_L": 0.00177,
   "arm_raise_R": 0.014407,
   "arm_raise_R2": 0.004609
  },
@@ -474,21 +473,6 @@
    "halfWidth": 0.1599999964237213
   },
   "raise": [
-   {
-    "side": "L",
-    "turn": [
-     -0.397203,
-     -0.236002,
-     0.527404,
-     0.713006
-    ],
-    "fade": [
-     15.0,
-     25.0
-    ],
-    "bone": "forearm",
-    "target": "arm_raise_L"
-   },
    {
     "side": "R",
     "turn": [
