@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Stops a commit that adds or changes an image or a video outside the folders that keep the images
 # of the product. The images of a report go into the folder `reports/`, which git ignores (design
-# 9.8), because report images made most of the size of the git history. `pnpm install` sets
+# 9.8), because report images made most of the size of the git history. The texture folder of an
+# FBX source mesh (`assets/models/<s>/**/<name>.fbm/`) is a source file. `pnpm install` sets
 # `core.hooksPath` to this folder.
 set -euo pipefail
 
 media='\.(webp|png|jpe?g|gif|webm|mp4|mov)$'
 kept='^(src|public|docs/reference|docs/prototype|tools/sheet-mattes)/'
 kept+='|^docs/[^/]+$'
+kept+='|^assets/models/.+\.fbm/'
 
 blocked="$(git diff --cached --name-only --diff-filter=AM -z | tr '\0' '\n' |
   grep -iE "$media" | grep -vE "$kept" || true)"
