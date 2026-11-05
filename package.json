@@ -27,6 +27,7 @@
     "sheet-check": "pnpm build && node tools/sheet-check.ts",
     "pose-probe": "node tools/pose-probe.ts",
     "pose-depth": "node tools/pose-depth.ts",
+    "pose-preview": "node tools/pose-preview.ts",
     "hold-reach": "node tools/hold-reach.ts",
     "hold-fit": "node tools/hold-fit.ts",
     "wind-grip": "node tools/wind-grip.ts",
