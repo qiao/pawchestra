@@ -11,7 +11,9 @@ basis with the keys `bind*`, moved by the linear blend of the bones in the Actio
 move of each key `arm_raise_*` is its move in the bind. The bake must match the mesh that Blender
 evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the shapes of the source
 (`correctives()`, `split_shapes()`), the seat top (`seat_masks()`), and the rule of the arm
-segments (`driven_turns()`). The bytes depend only on the `.blend`.
+segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
+middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). The bytes depend
+only on the `.blend`.
 """
 
 import hashlib
@@ -25,6 +27,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import studio_armature as sa  # noqa: E402
+import studio_eyes as se  # noqa: E402
 
 #: The largest gap of the bake from the mesh that Blender evaluates, in units.
 LIMIT = 1e-5
@@ -35,6 +38,10 @@ WEIGHT_LIMIT, FRAME_LIMIT, TURN_LIMIT = 1e-4, 1e-5, 1e-4
 
 #: The largest angle of the Z axis of a bone from its roll hint in the pose of the sheet (radians).
 ROLL_LIMIT = math.radians(0.5)
+
+#: The decimals of the values of the eyes in the extras. The module of the app rounds its points
+#: to 1e-6 m, and an eye gives the head of its eye bone.
+EYE_DECIMALS = 9
 
 #: The trunk bones whose turn from the pose of the sheet to the bind gives `trunk` of the extras.
 TRUNK_BONES = ('hips', 'spine', 'spine1', 'chest', 'neck', 'head')
@@ -53,16 +60,25 @@ def need(ok, text):
 
 
 def objects():
-    """Gives the one armature and the one mesh of the file."""
+    """Gives the one armature, the one mesh of the body, and the eye object of each side."""
     rigs = [o for o in bpy.data.objects if o.type == 'ARMATURE']
-    bodies = [o for o in bpy.data.objects if o.type == 'MESH']
+    names = set(se.EYE_OBJECTS.values())
+    bodies = [o for o in bpy.data.objects if o.type == 'MESH' and o.name not in names]
     need(
         len(rigs) == 1 and len(bodies) == 1,
         f'The file must have 1 armature and 1 mesh. It has {len(rigs)} and {len(bodies)}.',
     )
     for o in rigs + bodies:
         need(np.abs(sa.m64(o.matrix_world) - np.eye(4)).max() < 1e-6, f'{o.name} has a transform.')
-    return rigs[0], bodies[0]
+    eyes = {side: bpy.data.objects.get(name) for side, name in se.EYE_OBJECTS.items()}
+    for side, eye in eyes.items():
+        name = se.EYE_OBJECTS[side]
+        need(eye is not None and eye.type == 'MESH', f'The file has no mesh object {name}.')
+        need(
+            eye.parent == rigs[0] and eye.parent_type == 'BONE' and eye.parent_bone == se.EYE_BONE,
+            f'The parent of {name} must be the bone {se.EYE_BONE} of the armature.',
+        )
+    return rigs[0], bodies[0], eyes
 
 
 def check_rig(rig, body, rm, bones, order):
@@ -238,6 +254,38 @@ def frames_of(worlds, bones):
     return out
 
 
+def eyes_of(rig, eyes, bind):
+    """Gives the middle, the unit direction, and the size of each eye object in the bind, in the
+    units and the axes of the studio, after a check that the object has an even scale and that its
+    Y axis points up along the plane of the eye (`studio_eyes.fit_eyes()`)."""
+    out = {}
+    for side, eye in eyes.items():
+        world = se.eye_world(rig, eye, bind)
+        scales = np.linalg.norm(world[:3, :3], axis=0)
+        size = float(scales.mean())
+        frame = world[:3, :3] / scales
+        need(np.ptp(scales) <= 1e-5 * size, f'{eye.name} has no even scale: {scales}.')
+        need(
+            np.abs(frame.T @ frame - np.eye(3)).max() < FRAME_LIMIT and np.linalg.det(frame) > 0,
+            f'{eye.name} shears or mirrors.',
+        )
+        level = se.eye_frame(frame[:, 2])[:, 1]
+        roll = math.atan2(np.linalg.norm(np.cross(frame[:, 1], level)), frame[:, 1] @ level)
+        need(
+            roll <= ROLL_LIMIT,
+            f'The Y axis of {eye.name} is {math.degrees(roll):.2f} degrees off up. Run '
+            'studio_eyes.fit_eyes().',
+        )
+        middle = sa.TO_STUDIO @ world[:3, 3]
+        need(middle[0] * (1 if side == 'L' else -1) > 0, f'{eye.name} is on the wrong side.')
+        out[side] = {
+            'middle': [round(float(x), EYE_DECIMALS) + 0.0 for x in middle],
+            'direction': [round(float(x), EYE_DECIMALS) + 0.0 for x in sa.TO_STUDIO @ frame[:, 2]],
+            'size': round(size, EYE_DECIMALS),
+        }
+    return out
+
+
 def extras_of(rig, me, rm, bones, points, w, turns, raises):
     """Gives the extras of the asset: the seat, the corrective shapes, the elbow axes, the caps,
     the rim, and the recline."""
@@ -345,7 +393,7 @@ def main():
     out = rest[rest.index('--out') + 1] if '--out' in rest else f'{folder}/{species}.rig.glb'
     need(os.path.isfile(blend), f'The file {blend} does not exist.')
     bpy.ops.wm.open_mainfile(filepath=os.path.abspath(blend))
-    rig, body = objects()
+    rig, body, eyes = objects()
     rm = sa.rig_mesh_lib()
     order = sa.studio_order(rm)
     bones = [b for b in order if b in rig.data.bones]
@@ -412,6 +460,7 @@ def main():
         source = rm['split_shapes'](found, wn, points)
     shapes = {**source, **{n: moves[n] @ sa.TO_STUDIO.T for n in raises}}
     extras = extras_of(rig, body.data, rm, bones, points, wn, turns, raises)
+    extras['eyes'] = eyes_of(rig, eyes, bind)
     corners, kinds, colors, bases, caps, rim = triangles(body.data)
     fur = np.cumsum(kinds == 'fur') - 1
     if caps.any():
