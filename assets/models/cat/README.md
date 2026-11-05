@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 983,932 bytes |
-| SHA-256 | `e8a501329fec143185438336f33eedb0d6721ecd29edc6400cbad6f338326e3b` |
+| SHA-256 | `3a812899678ebc36b9e86d0f670641423eae85209d984121d56c70cfcbedba75` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 375,029 bytes |
-| SHA-256 | `7e7f68152969df7620a6d334aae246fa5462296d02b1c9c9382f67ea456f9a22` |
+| Size | 375,838 bytes |
+| SHA-256 | `b050bfe9518857005230d3b98fc7e0d037360e70d64c42c2fbf51a1b45f162c2` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -290,6 +290,13 @@ The edits of the mesh, in the order of the work:
   thigh is 1.6 and the shin 2.30 times as long along its bone, and each foot keeps its size
   (`stretch()` of `rig_mesh.py`, by the leg weights). The body rises 0.1227 units, and the bones
   move with the mesh.
+- **Slim shins.** The shins were thick and blocky. Each point of a shin (leg weights at least 0.5,
+  tail weight below 0.5, at most 0.12 units from the axis) moves toward the middle line of the
+  shin with the factor 1 - 0.21 s(u). Here u is 0 at the knee and 1 at the ankle, and s is the
+  smooth step up from u -0.05 to 0.3, times the smooth step down from u 0.75 to 1.0. The middle
+  line is the mean of the points across the axis in 11 bins of u. 53 points of each shin move, at
+  most 0.0137 units. The knee, the ankle, the feet, and the leg lengths stay. Each key keeps its
+  move from the basis.
 - **Whiskers.** The Decimate of Blender (collapse, ratio 0.4) on the 5 whisker strands only
   takes them from 243 vertices and 465 triangles to 94 vertices and 165 triangles. The 2x face
   crops show the same whiskers with fewer bends.
@@ -298,9 +305,9 @@ The legs, in meters (1.588737 m for each unit), with the old file in parentheses
 seated bind of the seat rules of `cat.json`, the seat top is 0.3010 m (0.3002 m), the thigh is
 0.201 m (0.205 m) and the shin 0.213 m (0.222 m) long, and the seated cat is 1.651 m (1.675 m)
 high. The shin factor is 2.30, because 2.32 put the seat top at 0.3025 m. In the rest, the mid
-thigh is 0.500 and the mid shin 0.343 of the width of the head at the eyes (0.439 and 0.290; the
+thigh is 0.500 and the mid shin 0.281 of the width of the head at the eyes (0.439 and 0.290; the
 source 0.304 and 0.22), and the hips are 0.591 m wide (0.539 m). The first offset gave 0.571,
-0.399, and 0.625 m.
+0.399, and 0.625 m, and the second offset 0.500 and 0.343 before the slim shins.
 
 The fixes of the weights, in the studio axes of the source:
 
