@@ -125,8 +125,8 @@ the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
 
 | Item | Value |
 |---|---|
-| Size | 313,963 bytes |
-| SHA-256 | `42c55275ee1e376d16ce5eec90aaf876aebf8c59061a8fc5c4dd1934f2901a04` |
+| Size | 314,141 bytes |
+| SHA-256 | `f077ab69551daebe59a87f839478d61696b3c232a67af6c4343bdb11033869ab` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
@@ -203,6 +203,10 @@ in the studio axes of the sections above (y up, z forward):
   to 0.10, y 0.832 to 0.88, and z 0.17 to 0.24, and the vertices below y 0.83 stay. The sharp
   edges shade dark slashes above the black pea eyes of the app, which read as a worried brow. A
   box from y 0.81 also moves the upper lids, and the eyes then look tired.
+- **Colors.** The plain fur takes the move of `colors.tone` of `cat.json` (`tone()` of
+  `tools/blender/rig_mesh.py`), as in the rig of `pnpm rig-mesh`: 2,974 faces move in Oklab toward
+  the gray blue of the cat of the A-pose mesh. The face attributes `color` and `color_base` hold
+  the result. With the colors of the texture alone, the fur is brown in the light of the stage.
 - **Legs.** Each thigh is 1.6 times and each shin 2.32 times as long as on the source, along the
   axis of its bone, and each foot keeps its size (the rule of `stretch()` of
   `tools/blender/rig_mesh.py`). Before the stretch, the thighs and the shins are 1.5 times as
