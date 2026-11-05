@@ -262,15 +262,14 @@ passes.
 - [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the fault of the
       A-pose body there: the folds of the right shoulder at the tip. Remove the item if the new
       body does not show it.
-- [ ] Cat violist, stand: the full thighs over the slim shins read as puffy pants with a knee knob
-      (the straight legs of the stand are the rest). A fade of the thigh fullness from the mid
-      thigh changed no crop (`reports/2026-11-05-cat-review/stand-taper-variants.png`). Ask the
-      user if the stand matters, or if the lower thigh can taper to the knee, which also thins
-      the seated thigh there.
-- [ ] Cat haunch: from the right, the back of the haunch near the tail root is a flat wall with a
-      fan of long thin triangles down to one corner on the seat. A relax there moves single
-      vertices up to 0.056 units, because the seat and the tail fix their neighbors. Try a loop
-      cut or edge turns in Blender, and keep the tail root still.
+- [ ] Cat violist, stand: after the thigh taper, the lower thigh still reads full over the slim
+      shin, with a dark underside at the knee in the key light
+      (`reports/2026-11-05-cat-review/taper-stand.png`). The mid thigh limit (about 0.55 of the
+      head width, now 0.545) holds the taper. Ask the user if a thinner mid thigh is allowed.
+- [ ] Cat haunch: after the cut of the right wall, the long faces from both sides of the back of
+      the haunch still meet in one low corner on the seat under the tail root, seen from the back
+      diagonals (`reports/2026-11-05-cat-review/haunch-cut-back.png`). Try one more cut of the
+      edges into that corner, with the tail root still.
 - [ ] Cat violist: at rest and in the moves, the hanging left upper arm touches the belly
       (1.5 cm in `bach-bwv1047`, 0.2 cm before the hanging arms), and the left forearm goes
       0.7 cm into the belly (`reports/2026-11-03-cat-rest/proof2/`). `hangingArm()` keeps no gap
