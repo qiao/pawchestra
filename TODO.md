@@ -295,30 +295,29 @@ passes.
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
       (87°) to 70°.
-- [ ] Rabbit hand rig (`rabbit.blend`): run the gates on the new body (`pnpm cast-matrix`, the
-      full `pnpm pose-depth violinist`, `pnpm close-views audit`), and check the hold items of the
-      old body below against it. `pnpm arm-check violinist` passes.
-- [ ] Rabbit hand rig: `pnpm fold-probe violinist` counts 5 left jaw faces as folds at rest and
-      in the start of the lift, because the key `arm_raise_L` (the left collar at rest) turns them
-      far from their bind normals. The app shows no fold there. Check them in the 2x crops of the
-      rest before a gate reads this count.
-- [ ] Rabbit hand rig: the arm-down shapes of the export take each vertex with an arm weight back
-      to the T-pose source, so a raised arm undoes a part of the bind keys at the arm roots and
-      the neck sides (`bind_collar`). Check the right neck side with the bow arm raised.
-- [ ] Rabbit violinist: the violin goes 2.7 cm into the head under the chin (limit 2.0 cm, 2.4
-      cm before `bind_collar`). Fit the chin hold in `H` of the hand rig.
+- [ ] Rabbit hand rig (`rabbit.blend`): run the gates on the new body (`pnpm arm-check
+      violinist`, `pnpm cast-matrix`, the full `pnpm pose-depth violinist`, `pnpm close-views
+      audit`), and check the hold items of the old body below against it.
+- [ ] Rabbit hand rig: the bind supination stays 115° (left) and 57° (right) of the last rig. Run
+      `pnpm bind-supination rabbit` on the new rig.
+- [ ] Rabbit hand rig: a faint ring of the source eye shows around each pea eye from the front.
+      A clean fix moves the dome and the groove of each source eye onto the face surface (about
+      30 vertices each), a change of the form of the source: it waits for the user.
+- [ ] Rabbit hand rig: at rest, the hanging arm roots show flat flaps from the back (az 135 to
+      -135), as on the last rig. Try a key `arm_raise_*` of the rest by point edits.
+- [ ] Rabbit hand rig: at rest, 3 faces of the left paw fold (`pnpm fold-probe violinist`, the
+      paw turns 146°). Check the 2x crops of the rest grip.
+- [ ] Rabbit hand rig: in the seated bind, the underside of the lower belly between the thighs
+      shows as a dark wedge from the front. It is the form of the mesh, so the rig keeps it. Ask
+      the user before any lap key.
+- [ ] Rabbit violinist: measure the violin depth under the chin on the new rig (`pnpm pose-depth
+      violinist`). The last rig put it 2.7 cm into the head (limit 2.0 cm). Fit the chin hold in
+      `H` of the hand rig.
 - [ ] Rabbit hand rig: the head height `H` is 0.3027 m (old body 0.3209 m), because the old rig
       counted a part of the ear base. Check the holds in `H` (the violin at the chin, the grips),
       or include the ear base in the head measures.
 - [ ] Rabbit hand rig: the recasts of the cast matrix have no raise keys, and the bind supination
       leaves a left paw twist p95 of 135° (`flutist@rabbit`, `snare-drummer@rabbit`).
-- [ ] Rabbit hand rig: a small dark mark stays at the middle of the lap in the lift from az -45.
-      The lap does not move in the lift (`pnpm bind-view --pose` at `lift50`: 0.000 u), so the
-      mark is a shadow or a fault of the bind faces. Find the faces with
-      `pnpm bind-view --view az-45@20`, and try each fix with `pnpm rig-trial`.
-- [ ] Rabbit hand rig: from the back diagonal az -135, the side of the haunch still hangs a
-      little over its seat line, and a thin dark band ends in a low corner there. A wider
-      contact on the seat at the sides of the back could close it.
 - [ ] Rabbit T-pose body: at rest, the left paw goes 0.6 cm and the left forearm 0.3 cm into the
       violin (0.1 cm and 0.0 cm on the A-pose body), and in the lowering the right upper arm 1.0 cm
       into the violin. Check the crops of the rest grip.
