@@ -1,5 +1,5 @@
 {
- "sha256": "12c1f9afbe48556893f1f9929f92af83e8955066f546b7c18126204be7c8c2c2",
+ "sha256": "028814e18a15447bcd37cba8b0804ef4fa0cc13fb60a851f3d36cdf3e7af0a59",
  "bindSupination": {
   "L": 132.0,
   "R": 89.0
@@ -48,7 +48,7 @@
     0.083325
    ],
    "vertices": 224,
-   "weights": "891c9f5388c6a4ad"
+   "weights": "e3ebc99ac3699661"
   },
   "neck": {
    "head": [
@@ -56,8 +56,8 @@
     0.788259,
     0.076727
    ],
-   "vertices": 127,
-   "weights": "234a29938ce3ee35"
+   "vertices": 147,
+   "weights": "704e4548314da759"
   },
   "head": {
    "head": [
@@ -65,8 +65,8 @@
     0.823286,
     0.081534
    ],
-   "vertices": 815,
-   "weights": "983d067ea0339cb4"
+   "vertices": 795,
+   "weights": "b921787dfb48a2fb"
   },
   "ear_L": {
    "head": [
@@ -93,7 +93,7 @@
     0.072389
    ],
    "vertices": 157,
-   "weights": "c4b20f1fe651bf61"
+   "weights": "ee2e2e51b2bd15ee"
   },
   "upper_arm_L": {
    "head": [
@@ -147,7 +147,7 @@
     0.072389
    ],
    "vertices": 146,
-   "weights": "d6209855ce831b74"
+   "weights": "9d2789b5c78f2b72"
   },
   "upper_arm_R": {
    "head": [
@@ -291,7 +291,7 @@
     0.086443
    ],
    "vertices": 73,
-   "weights": "779b8ec5643c6fdc"
+   "weights": "ef85c0afec5be214"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -300,7 +300,7 @@
     0.107976
    ],
    "vertices": 72,
-   "weights": "9004ae7d2a52a70c"
+   "weights": "40694ec1305fdb4e"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -309,7 +309,7 @@
     0.12951
    ],
    "vertices": 97,
-   "weights": "d862f87e66b3a27f"
+   "weights": "c38fb382dff693df"
   },
   "upper_arm_seg3_L": {
    "head": [
@@ -381,7 +381,7 @@
     0.086443
    ],
    "vertices": 76,
-   "weights": "5ac2e6aa6440e2ee"
+   "weights": "b52ecb360e5dc994"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -390,7 +390,7 @@
     0.107976
    ],
    "vertices": 71,
-   "weights": "a4f494b6712f209e"
+   "weights": "e43e7bc5ac237549"
   },
   "upper_arm_seg2_R": {
    "head": [
@@ -399,7 +399,7 @@
     0.12951
    ],
    "vertices": 97,
-   "weights": "1c965b88dcb9bb3e"
+   "weights": "6f8069c778b0e1aa"
   },
   "upper_arm_seg3_R": {
    "head": [

@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 834,508 bytes |
-| SHA-256 | `12c1f9afbe48556893f1f9929f92af83e8955066f546b7c18126204be7c8c2c2` |
+| SHA-256 | `028814e18a15447bcd37cba8b0804ef4fa0cc13fb60a851f3d36cdf3e7af0a59` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 379,174 bytes |
-| SHA-256 | `8594950bf9f9b46df21bd985d2945fd73e9d678ccdb1c1be1f23ba9bbef978b0` |
+| Size | 379,018 bytes |
+| SHA-256 | `917e9f91883dc7a178cbfdca9f4f217290ae2488fd7ad449a11ee9ce000287f8` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -312,7 +312,12 @@ The fixes of the weights, in the studio axes of the source:
   the front half of the band (forward above 0.09, |x| 0.19 to 0.31), where the forearm bends in.
 - **Shoulders.** 6 rounds of Smooth on the arm roots (|x| 0.08 to 0.19), then the 7 vertices
   under each arm root (|x| 0.09 to 0.135, up 0.525 to 0.59, forward 0 to 0.16) take one mean
-  weight.
+  weight with the clavicle share 0.52 and the arm bones in their ratio. With the mean of the
+  automatic weights (clavicle 0.28), the patch was a part of the upper arm, and `pnpm pose-depth
+  violist` measured it 3.3 cm in the arm root in each sample (main 1.0 cm to 1.4 cm).
+- **Head at the arm roots.** The 20 vertices of the fronts of the arm roots with a clavicle and
+  arm share of 0.5 or more give their head weight (0.06 to 0.31) to the neck. A turn of the head
+  folded the faces at the front of each armpit.
 - **Crotch.** After the leg stretch, 16 rounds of Smooth on the vertices of the front with a
   thigh share of 0.02 to 0.98 and |x| below 0.11.
 - **Armpit slivers.** 3 triangles under the arm roots, one on the left and two on the right, have
