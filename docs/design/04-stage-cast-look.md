@@ -206,7 +206,9 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   product choice sets an arm or a leg factor. The props and the instruments fit the body: each
   chair fits the legs, and a species with short arms plays a smaller instrument in place of
   longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
-  source file stays unchanged and a run gives the same bytes again.
+  source file stays unchanged and a run gives the same bytes again. A point edit of a rig file
+  goes into an edit file, and `pnpm glb-point-edits` writes it into the rig file of a base commit.
+  The cat has such edits, because a run of `pnpm rig-mesh cat` no longer gives its rig file.
 - **Replacing body.** A new body of a species keeps three things of its old body in the app view:
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
@@ -609,7 +611,9 @@ its rest is the bind.
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
 - The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
-  of the haunch (`studio.tailCurl` of the rig config). The rabbit sits with more room behind the
+  of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
+  tube and the legs thicker (`assets/models/cat/cat-edits.json`), because the rig left the tail a
+  flat, crumpled sheet and the long legs looked thin. The rabbit sits with more room behind the
   back (`backRoom`), so that its back keeps off the chair back.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
