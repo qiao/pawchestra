@@ -271,16 +271,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeSize: 0.805,
     },
   ],
-  // The violinist rabbit: the hand rig of the Tripo mesh (`rabbit.blend`, design 4.4). The armature
-  // of `rabbit.blend` holds the facts of its body, and its eye objects hold the pea eyes.
+  // The violinist rabbit (design 4.4). The rabbit sits 4 cm further forward on a seat 4 cm deeper,
+  // so that its back keeps off the chair back.
   [
     'rabbit',
     {
       landmark: 'shoulders',
+      height: 0.8513179,
       seated: true,
       soloist: true,
+      backRoom: 0.04,
       constant: 'STUDIO_RABBIT',
-      glb: 'assets/models/rabbit/rabbit.rig.glb',
+      crease: 35,
+      glb: 'assets/models/rabbit/rabbit-apose.rig.glb',
     },
   ],
   // The red and the tan foxes (design 4.4). The wide haunch of the fox sits on a wider chair.
