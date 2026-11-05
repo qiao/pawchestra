@@ -460,8 +460,7 @@ The app does not follow these facts:
   low positions [68].
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
-  its forearm. The rabbit turns it out further, because its round rebuilt upper arm goes into the
-  belly with the elbow further in (design 5.3, "Free round arms").
+  its forearm.
 - **The head (1.10).** The head of the cat lifts, so that the jaw lies on the chin rest near the
   neck, and its viola falls to the scroll. A larger shoulder turn sinks the back of the left arm
   root into the body. The rabbit lowers its head a little (`BowedHold.headDrop`), so that its
@@ -513,10 +512,8 @@ The app follows these facts:
   `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). In
   the shared violin hold, both arms hang out to the sides until they clear the body, and the
   elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
-  front of the thigh, and the upright bow at the right paw. The rabbit hangs its arms so too,
-  with a smaller bend of each arm: the violin rests low in front of the lap, the left paw holds
-  the neck near the nut, and the bow paw rests low at its side. The cat rests the viola nearer to
-  the hip, so that its shorter arm bends, and closes its paw around the neck.
+  front of the thigh, and the upright bow at the right paw. The cat rests the viola nearer to the
+  hip, so that its shorter arm bends, and closes its paw around the neck.
 
 The app does not follow these facts:
 

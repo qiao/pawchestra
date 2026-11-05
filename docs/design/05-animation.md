@@ -222,10 +222,8 @@ The rest of each family:
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
-  arm root. The cat rests the viola upright on its left thigh, as a seated violist does. The
-  rabbit rests so too, with the paws and the violin low in front
-  of the lap, as the rabbit of the A-pose mesh. Reason: with the paws near the chin, the shoulders
-  rose, and the neck did not show.
+  arm root. The cat and the rabbit rest the instrument upright on the left thigh or knee, with
+  the elbows near the sides, as a seated violinist does.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
@@ -280,9 +278,8 @@ The rest of each family:
   toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
   the joint, and some of them come out of the shoulder in another pose.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
-  the beaver, the badger, the penguin), or a rebuilt arm of a T-pose mesh (the rabbit), is
-  a round tube with its full inner half width. With the bone pose of a thinner arm, the inner side of the upper arm goes
-  into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
+  the beaver, the badger, the penguin) is a round tube with its full inner half width. With the
+  bone pose of a thinner arm, the inner side of the upper arm goes into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
   the body (strings 1.8, 2.3), and a cellist starts a stroke open at the shoulder (strings 2.2). At
   rest, the arms of such a body hang out until they clear the body (`restArms`). A hanging bow

@@ -650,8 +650,8 @@ const HANGING_BOW = {
 } as const satisfies NonNullable<BowedHold['standBow']>;
 
 /**
- * The hold of the violin on the left shoulder, the base of the holds of the rabbit, the red fox,
- * and the wolf (design 4.6, 5.3), as a real
+ * The hold of the violin on the left shoulder, for the rabbit and as the base of the holds of the
+ * red fox and the wolf (design 4.6, 5.3), as a real
  * violinist holds it (violinonline.com, "How to hold the violin", and Simon Fischer, "Basics:
  * Holding the violin"): the tail end on the left collarbone against the left side of the neck,
  * under the jaw, the jaw on the violin, the violin about 38° to the left of the front, and the
@@ -773,61 +773,6 @@ const SHOULDER_HOLD = {
     via: { tip: [0.4, 0.3, -1], hair: [0, 0, -1], reach: [0.3, 0.1, -0.3] },
   },
   standBow: HANGING_BOW,
-} as const satisfies BowedHold;
-
-/**
- * The hold of the violin for the rabbit (design 5.3, "Free round arms"): the hold of the shoulder
- * ({@link SHOULDER_HOLD}) on the T-pose body, whose rebuilt arms are round tubes 1.18 times longer
- * than the mesh. With the bone pose of the hold of the shoulder, the inner side of the round upper
- * arms went up to 3.9 cm into the belly, so the elbows keep away from the sides:
- *
- * - The left elbow points out, (-1, -1, -0.5): with (-0.5, -1, -0.5), the left upper arm goes
- *   2.3 cm into the belly in the play.
- * - The right shoulder turns 40° forward in the play (`reach`): with 30°, the right upper arm goes
- *   1.9 cm into the neck in the play, and with 20°, 2.2 cm. In the lift and the lowering, the
- *   turn stays whole down to half the weight of the playing pose (`reachFade`): with the fade over
- *   the whole move, the right upper arm goes 2.4 cm into the arm root at the end of a lowering,
- *   and with 0.5, 1.5 cm.
- * - In the middle of the lift and the lowering, the left wrist moves 0.3 H to the front
- *   (`liftReach`): with 0.15 H, the violin goes 3.4 cm into the chest in a lift.
- * - At rest, the arms hang out to the sides until they clear the body (`restArms`), as in the
- *   shared violin hold, and the paws and the violin rest low, as the rabbit of the A-pose mesh
- *   rested. The left upper arm swings 20° forward and the elbow bends 60°, so that the left paw
- *   holds the violin low in front of the thigh. The right upper arm swings 20° forward and the
- *   elbow bends 40°, so that the bow paw rests low at the side of the belly. With 30° and 80° on
- *   the left and 20° and 60° on the right, the paws rested 12 cm and 8 cm nearer the mouth, the
- *   shoulders rose, and the neck did not show.
- * - At rest, the scroll leans 0.1 out to the left (`rest.axis`), and the left paw holds the neck
- *   at 0.3 of the fingerboard from the nut (`restPlace`). Thus the low paw keeps the violin near
- *   the middle, as the rabbit of the A-pose mesh: with the upright violin of the shoulder hold and
- *   0.4, the violin rests 3.6 cm further out to the left, and the left paw and forearm go 0.8 cm
- *   and 1.1 cm into the violin (0.6 cm and 0.3 cm with the lean).
- * - The left paw takes no turn in the plane of its palm at rest (`restPawTurnL`): with the turn of
- *   20° of the shoulder hold, the low forearm bends the paw 39° off its forearm at rest, and with
- *   no turn, 29°.
- * - In the middle of the lift and the lowering, the bow grip moves 0.6 H out, 0.1 H up, and 0.3 H
- *   to the front (`restBow.via`). The bow follows the instrument on its path from the rest place,
- *   so the low violin brings the bow arm nearer to the chest: with the via of the shoulder hold,
- *   0.3 H out, the right upper arm goes 2.2 cm into the chest at the start of a lowering, and with
- *   0.6 H out, 1.1 cm. With 0.8 H out, the bow paw turns 959°/s in a lift.
- */
-const RABBIT_HOLD = {
-  ...SHOULDER_HOLD,
-  poleL: [-1, -1, -0.5],
-  reach: 40 * MathUtils.DEG2RAD,
-  reachFade: 0.5,
-  liftReach: [0.15, 0.15, -0.3],
-  restPlace: 0.3,
-  rest: { ...SHOULDER_HOLD.rest, axis: [-0.1, 1, -0.15] },
-  restPawTurnL: 0,
-  restBow: {
-    ...SHOULDER_HOLD.restBow,
-    via: { ...SHOULDER_HOLD.restBow.via, reach: [0.6, 0.1, -0.3] },
-  },
-  restArms: {
-    L: { forward: 20 * MathUtils.DEG2RAD, bend: 60 * MathUtils.DEG2RAD },
-    R: { forward: 20 * MathUtils.DEG2RAD, bend: 40 * MathUtils.DEG2RAD },
-  },
 } as const satisfies BowedHold;
 
 /**
@@ -1458,7 +1403,7 @@ const HIPPO_HOLD = {
 export const SPECIES_HOLDS: Partial<
   Record<SpeciesId, Partial<Record<BowedInstrument, BowedHold>>>
 > = {
-  rabbit: { violin: RABBIT_HOLD },
+  rabbit: { violin: SHOULDER_HOLD },
   'fox-red': { violin: FOX_HOLD },
   cat: { viola: CAT_HOLD },
   dog: { cello: DOG_HOLD },
