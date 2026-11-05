@@ -58,7 +58,7 @@ def objects():
     bodies = [o for o in bpy.data.objects if o.type == 'MESH']
     need(
         len(rigs) == 1 and len(bodies) == 1,
-        f'The file has {len(rigs)} armatures and {len(bodies)} meshes, not 1 and 1.',
+        f'The file must have 1 armature and 1 mesh. It has {len(rigs)} and {len(bodies)}.',
     )
     for o in rigs + bodies:
         need(np.abs(sa.m64(o.matrix_world) - np.eye(4)).max() < 1e-6, f'{o.name} has a transform.')
@@ -93,7 +93,10 @@ def check_rig(rig, body, rm, bones, order):
         'The Armature modifier needs vertex groups, no envelopes, no preserve volume.',
     )
     slots = [m.name if m else '' for m in body.data.materials]
-    need(set(slots) <= {'fur', 'gloss'}, f'The material slots are {slots}, not fur and gloss.')
+    need(
+        set(slots) <= {'fur', 'gloss'},
+        f'The material slots must be fur and gloss. They are {slots}.',
+    )
     kinds = {
         'color': 'FLOAT_COLOR',
         'color_base': 'FLOAT_COLOR',
@@ -175,14 +178,26 @@ def read_keys(body, rm):
             name = f'arm_raise_{side}' + (str(seen[side]) if seen[side] > 1 else '')
             need(k.name == name, f'The key {k.name} of the side {side} must be {name}.')
             turn, fade = list(props.get('turn', [])), list(props.get('fade', []))
-            need(props.get('bone') in (None, 'forearm', 'hand'), f'{name}: bone is not forearm.')
-            need(len(turn) == 4 and abs(math.hypot(*turn) - 1) < 1e-4, f'{name}: turn is no unit.')
-            need(len(fade) == 2 and 0 <= fade[0] < fade[1], f'{name}: fade does not fade.')
+            need(
+                props.get('bone') in (None, 'forearm', 'hand'),
+                f'{name}: the bone must be forearm, hand, or none.',
+            )
+            need(
+                len(turn) == 4 and abs(math.hypot(*turn) - 1) < 1e-4,
+                f'{name}: the turn must be a unit quaternion.',
+            )
+            need(
+                len(fade) == 2 and 0 <= fade[0] < fade[1],
+                f'{name}: the fade must be two angles with 0 <= full < none.',
+            )
             raises[name] = (props, move)
         else:
             fail(f'The key {k.name} is not bind*, arm_raise_*, or a shape of the source.')
     need(len(raises) <= rm['RAISE_LIMIT'], f'The mesh has {len(raises)} raise keys.')
-    need(len(drawn) in (0, 4), f'The mesh draws {sorted(drawn)}, not all four shapes.')
+    need(
+        len(drawn) in (0, 4),
+        f'The mesh draws {sorted(drawn)}. It must draw all four shapes or none.',
+    )
     return basis, fixes, raises, drawn
 
 

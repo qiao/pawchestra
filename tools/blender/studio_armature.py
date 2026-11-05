@@ -362,7 +362,7 @@ def import_source(path, weld):
     found = [o for o in bpy.data.objects if o not in before]
     source = [o for o in found if o.type == 'MESH']
     if len(source) != 1:
-        raise SystemExit(f'{path} has {len(source)} meshes, not 1.')
+        raise SystemExit(f'{path} must have 1 mesh. It has {len(source)}.')
     bm = bmesh.new()
     bm.from_mesh(source[0].data)
     bm.transform(source[0].matrix_world)
