@@ -210,6 +210,9 @@ def _materials(mesh, imported):
         starts = np.empty(len(me.polygons), int)
         me.polygons.foreach_get('loop_start', starts)
         colors = values.reshape(-1, 4)[starts]
+        # The export writes sRGB values into COLOR_0 (`write_glb()` of `rig_mesh.py`).
+        rgb = colors[:, :3]
+        colors[:, :3] = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
     if COLOR not in me.attributes:
         me.attributes.new(COLOR, 'FLOAT_COLOR', 'FACE')
     me.attributes[COLOR].data.foreach_set('color', colors.ravel())
