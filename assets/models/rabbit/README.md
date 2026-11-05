@@ -124,8 +124,8 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 729,820 bytes |
-| SHA-256 | `17f73f8807223cd588f0b5887f431f591f51f67a15ef78f723f6849a44a9b865` |
+| Size | 729,816 bytes |
+| SHA-256 | `cd0675a5705624d0dc72926eb04a01e34a7ac20e6d2e424e3880dc075e0d8e90` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,12 +140,12 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 338,346 bytes |
-| SHA-256 | `601d405213f5b3ac078dd4d5f94a4b6b4f7f0f754e2c5ece7457bf0daeb6ab56` |
+| Size | 338,250 bytes |
+| SHA-256 | `55d15a0a9e0ef46b1c586ecd986b7a8c7008d4ce8baa8f05d8ffc305fb848749` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg', eye_fans=False)`: the face attributes `color` and `color_base` and a gloss nose. 2,939 vertices and 3,184 faces (2,693 quads and 491 triangles, 5,877 triangles), 42 faces of them gloss |
+| Mesh | One object `rabbit`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg', eye_fans=False)`: the face attributes `color` and `color_base` and a gloss nose. 2,939 vertices and 3,185 faces (2,692 quads and 493 triangles, 5,877 triangles), 42 faces of them gloss |
 | Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size of the pea eyes of the old module (0.200104 units, 0.286547 m) and the direction (±0.7526, -0.6512, 0.0974), the mean normal of the dark faces of the old eyes. Each middle lies where the axis through the middle of the old eye meets the smooth socket in the bind: (±0.0688, -0.0644, 0.7258) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
@@ -261,12 +261,17 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   above the height 0.53, with an arm share below 0.2) moves out from the line to the cone that
   goes down and in from the rim with the slope 0.3 at the front and 0.12 at the sides and the
   back (the change from 30° to 70° of azimuth), only when the cone is out of it. The move fades
-  out from 0.08 to 0.15 below the rim, with the arm share from 0.03 to 0.2, and on the violin
-  side from the azimuth 10° to 25° on, up to 95°, and back from 115°. Then the moved vertices
-  and their ring take 4 Taubin rounds (0.5, -0.53). 226 vertices move, at most 5.1 cm. The
-  violin of the hold lies under the left jaw and its tail end against the left side of the neck:
-  a fill there put the violin up to 4.3 cm deeper into the head in `pnpm pose-depth violinist`,
-  and with the fade it goes 0.3 cm deeper (2.7 cm, before 2.4 cm).
+  out from 0.08 to 0.15 below the rim, with the arm share plus half the clavicle share from 0.03
+  to 0.2, and on the violin side from the azimuth 10° to 25° on, up to 95°, and back from 115°.
+  Then the moved vertices and their ring take 4 Taubin rounds (0.5, -0.53). 210 vertices move,
+  at most 5.1 cm. The violin of the hold lies under the left jaw and its tail end against the
+  left side of the neck: a fill there put the violin up to 4.3 cm deeper into the head in `pnpm
+  pose-depth violinist`, and with the fade it goes 0.3 cm deeper (2.7 cm, before 2.4 cm). With
+  no clavicle share in the fade, a face at the front of the right shoulder folded in 58 % of the
+  play samples of `pnpm fold-probe violinist` (7 % before). The fill made the quad 2369 under
+  the right jaw (296, 1781, 1380, 297) nearly flat in the bind, so a split along the diagonal
+  1781 to 297 (`bmesh.ops.connect_verts()`, largest corner 131° in place of 172°) keeps its thin
+  triangle from folding with the head.
 - **Raise keys.** `rm.raise_shape()` relaxes the faces that fold in the pose of a rule of `pnpm
   raise-fit violinist`, on the bind, and the key is the move turned back into the rest by the
   inverse of the blended skin. The property holds the turn of the forearm (w, x, y, z, Blender
