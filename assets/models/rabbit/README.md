@@ -124,10 +124,10 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 534,284 bytes |
-| SHA-256 | `79c7e48311b669abff226cc455bf8ecc404deffd29e43a2821e73f436ba0a2d6` |
+| Size | 533,636 bytes |
+| SHA-256 | `f62e7b552bba013bfe0e9b12f0764f9706b9c739670235c5f18311aea7102f8f` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
-| Faces | 5,713 triangles, of them 75 gloss (the nose) |
+| Faces | 5,705 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
 
@@ -141,13 +141,13 @@ name the functions of `tools/blender/studio_armature.py` (`sa`) and `studio_eyes
 
 | Item | Value |
 |---|---|
-| Size | 324,781 bytes |
-| SHA-256 | `0602da048fe2b4e63f4c5a5736cc34ea53fbc447d3ac52a0e7b61a58f65b17a3` |
+| Size | 323,438 bytes |
+| SHA-256 | `72934e52dbb0d4c90abc00d97fa3b4bf239c5407da984ff5e8be1b8ba4e67d74` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0806 units, so the ear tips are at z = 1.0806. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the edits below, flat faces, no custom normals, and the surface of `sa.add_surface()` (below). 2,857 vertices and 3,076 faces (2,637 quads and 439 triangles, 5,713 triangles), 42 faces of them gloss (the nose) |
-| Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size 0.200104 units (0.286547 m) and the direction (±0.7526, -0.6512, 0.0974) of the last rig. Each middle lies on the head surface on the eye axis in the bind: (±0.0710, -0.0663, 0.7395) |
+| Mesh | One object `rabbit`: the FBX mesh with the edits below, flat faces, no custom normals, and the surface of `sa.add_surface()` (below). 2,853 vertices and 3,074 faces (2,631 quads and 443 triangles, 5,705 triangles), 42 faces of them gloss (the nose) |
+| Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size 0.200104 units (0.286547 m) and the direction (±0.7526, -0.6512, 0.0974) of the last rig. Each middle lies on the flat eye area of the head on the eye axis in the bind: (0.0666, -0.0625, 0.7390) and (-0.0672, -0.0630, 0.7390) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
 | Shape keys | None. The seated bind and the play show no fault that a `bind*` or `arm_raise_*` key must fix (below) |
@@ -327,6 +327,38 @@ The bones, the weights, the bind, and the eyes:
 - **Eyes.** The middle of each eye object moves out along its axis onto the head surface in the
   bind (left 0.00288, right 0.0032 units), then `se.place_eyes()`. On the old middle, the dome of
   the source eye stood in front of the pea eye and cut into it.
+- **Belly weights.** In the seated bind, the thigh shares of the lower belly pulled it away from
+  the row above, so a fold line (18° to 40°) outlined a round lobe with dark sides. The 55
+  vertices of the lower belly (|x| below 0.085, y below -0.02, z 0.24 to 0.36 in the rest) give
+  their thigh weight to the hips: 43 of them had a thigh share, from 0.033 to 0.543 (ids 260, 261,
+  273, 274, 359, 360, 373, 745, 746, 937, 938, 986, 1046, 1173, 1216, 1281, 1282, 1441, 1526,
+  1527, 1613, 1614, 1717, 1718, 1740, 1743, 1744, 1745, 1860, 1861, 1878, 1879, 1881, 1885,
+  1886, 1890, 1891, 1893, 1904, 1946, 2034, 2052, 2065). The fold line goes down to 7° to 23° in
+  the bind, as in the rest, and the bend of the seated thighs stays in the groin creases.
+- **Eye areas.** The source eye is a dome in a groove, so a light ring showed around each pea eye.
+  In the frame of each eye object in the rest (u across, v up, h along the eye axis), the
+  vertices within 0.03 units of the axis move along the axis onto the face surface around the
+  eye: h = a + b u + c v + d (u² + v²), the least squares fit through the vertices 0.03 to 0.045
+  units from the axis, which do not move. The fit is (-0.0059, 0.0635, -0.2169, 3.4389) on the
+  left and (-0.0051, -0.0613, -0.2238, 3.0841) on the right. The moves along the axis, in mm:
+  - Left (axis 0.7526, -0.6512, 0.0974): 419 -5.9, 420 -1.9, 421 -0.8, 422 -4.7, 623 -6.0, 624
+    -5.8, 625 -2.4, 626 -3.3, 729 -1.9, 730 +3.0, 731 +3.1, 732 -2.6, 854 -2.8, 855 -2.7, 1169
+    +7.0, 1170 +8.0, 1172 +5.7, 1217 +2.7, 1218 +5.5, 1383 -5.2, 1384 -8.8, 1544 +1.7, 1552 -6.6,
+    1631 -2.4, 1632 -6.0, 1633 -4.6, 1634 -2.4, 1656 +6.1, 1657 +1.3, 1671 +0.6, 1672 -2.2, 1816
+    +6.2, 1817 +1.2, 1818 +2.3, 1819 +6.7, 1877 +1.7, 1903 +1.9, 2168 +0.5, 2169 -1.2, 2310 -4.8,
+    2311 -3.3, 2355 +4.2.
+  - Right (axis -0.7526, -0.6512, 0.0974): 141 -5.6, 142 -4.3, 143 -0.9, 144 -2.1, 301 -1.9, 302
+    -2.1, 507 -2.7, 508 -0.2, 509 +1.2, 510 -1.8, 782 +6.8, 783 +2.6, 784 +5.2, 785 +8.6, 977
+    +6.0, 1126 -8.2, 1127 -5.3, 1174 -5.9, 1175 -1.2, 1176 +2.0, 1177 -4.0, 1233 -6.7, 1234 -4.3,
+    1235 +2.1, 1278 +1.9, 1279 +3.8, 1423 -2.2, 1468 -3.2, 1469 +1.0, 1530 +6.2, 1531 +7.4, 1625
+    +7.5, 1880 +2.4, 1916 -1.3, 1984 -0.2, 1985 +3.0, 1997 -5.1, 2042 +3.8, 2123 +3.2, 2175 -1.8,
+    2177 +6.9.
+  - The groove had faces that hung over, so after the moves the triangles (1217, 1218, 2168) and
+    (1469, 1530, 2123) turned over. Each collapses to one vertex at its middle
+    (`bmesh.ops.pointmerge()`): (0.05273, -0.0981, 0.74559) and (-0.05316, -0.09847, 0.74565).
+  - The middle of each eye object then moves along its axis onto the new surface in the bind (left
+    -0.0058, right -0.00506 units), with `se.place_eyes()`. The sharp edges of each eye area (above
+    30°) go from 26 to 6 on the left and from 28 to 7 on the right.
 
 The facts of the body:
 
@@ -354,4 +386,4 @@ the source.
 
 `pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
 objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 41.2 KB after gzip (the module of the last hand rig 46.5 KB).
+module is 40.7 KB after gzip (the module of the last hand rig 46.5 KB).
