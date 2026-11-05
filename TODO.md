@@ -690,9 +690,8 @@ passes.
       form factor (`headFactor`, `neckFactor`, `headShift`). Add them when a hand rig needs them.
 - [ ] Hand rig: `studio_armature.py` and `export_rig.py` load the functions of `rig_mesh.py` from
       its source. Move the shared functions into a small module before `rig_mesh.py` goes.
-- [ ] Hand rig: `add_surface()` still adds a gloss fan on each old eye, and a hand rig deletes the
-      fans after `place_eyes()` (`pnpm studio-body` stops for a file with fans and eye objects).
-      Let `add_surface()` add no fans, and give `place_eyes()` the middles of the old eyes.
+- [ ] Hand rig: `add_surface(..., eye_fans=False)` adds no fans now. Give `place_eyes()` the
+      middles of the old eyes as a start.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the pea eye of the app must change both, or the preview must come from the app.

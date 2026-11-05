@@ -449,17 +449,19 @@ no new rules.
 
 ```text
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
-  ->  add_surface() of tools/blender/studio_armature.py (face colors, eye fans, gloss nose)
+  ->  add_surface(..., eye_fans=False) of tools/blender/studio_armature.py (face colors, gloss nose)
   ->  armature, weights, bind, and shape keys by hand (studio_armature.py can start them)
-  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py), and no eye fans
+  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py)
   ->  pnpm rig-export <s>  ->  <s>.rig.glb + <s>.rig.json (a text summary for diffs)
   ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
 ```
 
-The mesh of the `.blend` is the source of truth, and no tool makes it again from the source GLB
-file. `add_surface()` runs one time on that mesh: each face takes the color of the base color
-texture of the source GLB file through the UVs of the mesh, by the color rules of "Mesh rig"
-(`face_colors()`, `palette()`). Then a person edits the colors in Blender, and the export reads
+The mesh of the `.blend` is the source of truth, and no tool makes it again from the source file.
+`add_surface()` runs one time on that mesh: each face takes the color of the base color texture
+of the source (the GLB file, or the image file of an FBX source) through the UVs of the mesh, by
+the color rules of "Mesh rig" (`face_colors()`, `palette()`). The faces of the old eyes take the
+fur color, and with `eye_fans=False` the mesh gets no gloss fan on them, because the eye objects
+give the eyes. Then a person edits the colors in Blender, and the export reads
 them only from the face attribute `color`. The `.blend` holds the data that a person draws. The
 export calculates only the measures, with the functions of `tools/blender/rig_mesh.py`, so that
 each measure has one definition. It checks each point of the layout below, and stops with the

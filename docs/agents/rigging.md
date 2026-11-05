@@ -80,16 +80,19 @@ call only `add_surface()`, `fix_rolls()`, and `drive_segments()` of
 `tools/blender/studio_armature.py` (`sa`), and `place_eyes()` and `fit_eyes()` of
 `tools/blender/studio_eyes.py` (`se`). Run the command line of `studio_armature.py` headless only.
 
-1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>')` one time for the
-   face colors, the eye fans, and the gloss nose. A new species can start with the command line
-   ([`commands.md`](commands.md)), which also adds the armature and the Action `bind`.
+1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
+   eye_fans=False)` one time for the face colors and the gloss nose. The texture is the source
+   GLB file or an image file, such as the base color JPEG of an FBX source. A new species can
+   start with the command line ([`commands.md`](commands.md)), which also adds the armature, the
+   Action `bind`, and eye fans.
 2. **Rig.** Put `palm`, `seat`, `hinges`, and the facts of the body on the armature object: the
    names of `BODY_FACTS` of `tools/studio-body.ts`, with `height` and `crease` at least. Fit the
    bones, run `sa.fix_rolls(rig)`, and paint the weights (Limit Total 4, Normalize All). Pose the
    bind, run `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and `arm_raise_*`.
 3. **Eyes.** Run `se.place_eyes(rig, mesh, {side: (middle, direction, size)})` with each middle
-   on the head surface in the bind, and delete the eye fans. After an edit of an eye or of the
-   face, run `se.fit_eyes(rig, mesh)`: it levels each eye and bends its preview to the head.
+   on the head surface in the bind, and delete the eye fans if the mesh has them. After an edit
+   of an eye or of the face, run `se.fit_eyes(rig, mesh)`: it levels each eye and bends its
+   preview to the head.
 4. **Export.** Run `pnpm rig-export <s>`, `pnpm studio-body <s>`, and the gates. Diff
    `<s>.rig.json` to see what moved.
 

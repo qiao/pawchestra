@@ -6,10 +6,11 @@
     blender -b --factory-startup --python tools/blender/studio_armature.py -- --rolls <file.blend>
 
 The mesh of a hand rig is the source of truth. `add_surface()` runs on that mesh, also in a live
-Blender: it gives each face the color of the base color texture of the source GLB file through the
-UVs of the mesh (`face_colors()` and `palette()` of `rig_mesh.py`), adds a gloss fan on each eye,
-and makes the nose gloss (`features()`, `add_eye_shells()`). After this one run, the colors live in
-the face attributes `color` and `color_base`, and a person edits them in Blender.
+Blender: it gives each face the color of the base color texture of the source (a GLB file or an
+image file) through the UVs of the mesh (`face_colors()` and `palette()` of `rig_mesh.py`), adds a
+gloss fan on each eye unless `eye_fans` is false, and makes the nose gloss (`features()`,
+`add_eye_shells()`). After this one run, the colors live in the face attributes `color` and
+`color_base`, and a person edits them in Blender.
 
 The first form above starts a new species from `tools/mesh-rigs/<animal>.json`: the mesh of the
 source (`source` of the config, or `--source`) in the units of the studio with `add_surface()`, the
@@ -219,6 +220,29 @@ def fix_rolls(rig):
     bpy.ops.object.mode_set(mode='OBJECT')
 
 
+def image_pixels(img):
+    """Gives the pixels of a Blender image as sRGB values (height × width × 3), in the row order
+    of Blender."""
+    width, height = img.size
+    pixels = np.empty(width * height * 4, np.float32)
+    img.pixels.foreach_get(pixels)
+    return pixels.reshape(height, width, 4)[:, :, :3]
+
+
+def base_texture(texture):
+    """Reads a base color texture as sRGB pixels (`image_pixels()`): the texture of the first
+    mesh of a GLB file (`glb_texture()`), an image file, such as the base color JPEG of an FBX
+    source, or an image of Blender, such as the image of the material of the mesh."""
+    if isinstance(texture, bpy.types.Image):
+        return image_pixels(texture)
+    if texture.lower().endswith('.glb'):
+        return glb_texture(texture)
+    img = bpy.data.images.load(texture, check_existing=False)
+    pixels = image_pixels(img)
+    bpy.data.images.remove(img)
+    return pixels
+
+
 def glb_texture(path):
     """Reads the base color texture of the first mesh of a GLB file as sRGB pixels (height ×
     width × 3), in the row order of Blender, as `load_mesh()` of `rig_mesh.py` reads it."""
@@ -237,11 +261,9 @@ def glb_texture(path):
         with open(file, 'wb') as f:
             f.write(binary[start : start + view['byteLength']])
         img = bpy.data.images.load(file)
-        width, height = img.size
-        pixels = np.empty(width * height * 4, np.float32)
-        img.pixels.foreach_get(pixels)
+        pixels = image_pixels(img)
         bpy.data.images.remove(img)
-    return pixels.reshape(height, width, 4)[:, :, :3]
+    return pixels
 
 
 def polygon_colors(me, texture, rules, rm):
@@ -281,29 +303,37 @@ def surface_material(name):
     return mat
 
 
-def add_surface(body, species, texture=None):
+def add_surface(body, species, texture=None, eye_fans=True):
     """Gives the mesh of a hand rig its face colors, its eye fans, and its gloss nose (design 4.4,
     "Hand rig"), in place: each polygon takes the color of the base color texture of `texture`
-    (`assets/models/<species>/<species>-tpose.glb` by default) through the UVs of the mesh, by the
-    color rules of `tools/mesh-rigs/<species>.json`. The fans and the vertices of the nose take
-    the head bone alone, and the slots become `fur` and `gloss`. Gives the counts of the faces."""
+    through the UVs of the mesh, by the color rules of `tools/mesh-rigs/<species>.json`. The
+    texture is a GLB file (`assets/models/<species>/<species>-tpose.glb` by default) or an image
+    file, as a path from the repository root, or an image of Blender (`base_texture()`). The fans
+    and the vertices of the nose take the head bone alone, and the slots become `fur` and `gloss`.
+    With `eye_fans` false, the mesh gets no fans: a rig with eye objects (`studio_eyes.py`) needs
+    none. The faces of the old eyes take the fur color in both cases. Gives the counts of the
+    faces."""
     config = load_config(species)
     rm = rig_mesh_lib()
     me = body.data
     if 'color' in me.attributes:
         raise SystemExit('The mesh has the face attribute color: add_surface() ran already.')
-    texture = os.path.join(ROOT, texture or f'assets/models/{species}/{species}-tpose.glb')
+    if not isinstance(texture, bpy.types.Image):
+        texture = os.path.join(ROOT, texture or f'assets/models/{species}/{species}-tpose.glb')
     me.calc_loop_triangles()
     tris = np.array([t.vertices[:] for t in me.loop_triangles])
     owner = np.array([t.polygon_index for t in me.loop_triangles])
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
     verts = co.reshape(-1, 3) @ TO_STUDIO.T
-    rgb, dark = polygon_colors(me, glb_texture(texture), config['colors'], rm)
+    rgb, dark = polygon_colors(me, base_texture(texture), config['colors'], rm)
     eyes, nose = rm['features'](verts, tris, rgb[owner], dark[owner], config['colors'])
     points, _, tris_all, colors, kinds, old, near = rm['add_eye_shells'](
         verts, verts, tris, rgb[owner], dark[owner], eyes, config['eyeShell']
     )
+    if not eye_fans:
+        points, tris_all = points[: len(verts)], tris_all[: len(tris)]
+        colors, kinds = colors[: len(tris)], kinds[: len(tris)]
     kinds[nose] = 'gloss'
     colors, _, _ = rm['palette'](colors, config['colors']['palette'])
     for patch in list(old.values()) + [p for side in near.values() for p in side]:
