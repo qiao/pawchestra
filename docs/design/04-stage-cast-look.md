@@ -644,8 +644,9 @@ its rest is the bind.
   dark wedge shows at the crotch. The round head sits on the chest with no neck, as on the sheet,
   so the bind keys `bind_neck`, `bind_nape`, and `bind_collar` fill the groove under the head at
   the front, the right side, and the back, and no dark collar shows. The violin lies under the
-  left jaw and against the left side of the neck, so the fill stays off that side, and the
-  violin does not go deeper into the head. The two lobes of the haunch of the mesh ended in two
+  left jaw and against the left side of the neck, so `bind_collar` stays off that side, and the
+  violin does not go deeper into the head. The key `arm_raise_L` fills that side only while the
+  left arm hangs at rest, and it is 0 before the violin comes up. The two lobes of the haunch of the mesh ended in two
   points on the seat, so the back of the haunch takes one round form, as on the back view of the
   sheet, and the tail ball keeps its form and its place. The fur takes the cream tone step of the
   old rig (`colors.tone` of `rabbit.json`), so that the rabbit keeps the look of its old body. Each

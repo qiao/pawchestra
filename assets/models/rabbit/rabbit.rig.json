@@ -1,5 +1,5 @@
 {
- "sha256": "c2c112a58c7839e31dfc10f17737545988f9b6aea879222504a5255b404ebd58",
+ "sha256": "95ecc33a11855851154d26135ef01d6bf2c86777022fc5d2b8d02a43e7cfb9fa",
  "bindSupination": {
   "L": 115.0,
   "R": 57.0
@@ -462,7 +462,8 @@
   "legs_straight_L": 0.060636,
   "legs_straight_R": 0.060373,
   "arm_raise_R": 0.014407,
-  "arm_raise_R2": 0.004609
+  "arm_raise_R2": 0.004609,
+  "arm_raise_L": 0.025907
  },
  "extras": {
   "seat": {
@@ -502,6 +503,20 @@
     ],
     "bone": "forearm",
     "target": "arm_raise_R2"
+   },
+   {
+    "side": "L",
+    "turn": [
+     0.496109,
+     -0.165903,
+     -0.046101,
+     0.851015
+    ],
+    "fade": [
+     8.0,
+     22.0
+    ],
+    "target": "arm_raise_L"
    }
   ],
   "hinges": {

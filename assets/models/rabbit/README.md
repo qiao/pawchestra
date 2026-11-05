@@ -124,12 +124,12 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 671,532 bytes |
-| SHA-256 | `c2c112a58c7839e31dfc10f17737545988f9b6aea879222504a5255b404ebd58` |
+| Size | 729,840 bytes |
+| SHA-256 | `95ecc33a11855851154d26135ef01d6bf2c86777022fc5d2b8d02a43e7cfb9fa` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
-| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R` and `arm_raise_R2` (below) |
+| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` (below) |
 
 ## rabbit.blend
 
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 338,019 bytes |
-| SHA-256 | `52d99eb531af9767a7c263b12a4455af56eb7dba951a0c2a9b12e2eff67d0476` |
+| Size | 339,092 bytes |
+| SHA-256 | `bc8e740dbe22ed842c4a9d62507f68c9dccf37e2f260f8f62c6944bc53827d99` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -149,7 +149,7 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 | Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size of the pea eyes of the old module (0.200104 units, 0.286547 m) and the direction (±0.7526, -0.6512, 0.0974), the mean normal of the dark faces of the old eyes. Each middle lies where the axis through the middle of the old eye meets the smooth socket in the bind: (±0.0688, -0.0644, 0.7258) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
-| Shape keys | `Basis`, `bind_sit`, `bind_crease`, `bind_lap`, `bind_neck`, `bind_nape`, and `bind_collar` at the value 1, and `arm_raise_R` and `arm_raise_R2` at the value 0 (below), each with its custom property on the mesh |
+| Shape keys | `Basis`, `bind_sit`, `bind_crease`, `bind_lap`, `bind_neck`, `bind_nape`, and `bind_collar` at the value 1, and `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` at the value 0 (below), each with its custom property on the mesh |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
 
 The edits of the mesh, in the order of the work:
@@ -295,6 +295,19 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   the right jaw (296, 1781, 1380, 297) nearly flat in the bind, so a split along the diagonal
   1781 to 297 (`bmesh.ops.connect_verts()`, largest corner 131° in place of 172°) keeps its thin
   triangle from folding with the head.
+- **`arm_raise_L` (left collar at rest).** At rest, the violin hangs at the left side, and the
+  left side of the neck under the jaw stayed dark. The key `arm_raise_L` adds the full fill
+  there: the fill of `bind_collar` again with no violin fade (the bind with `bind_collar` at 0),
+  less the fill of `bind_collar`, times the smooth step of x from -0.02 to 0.02 (the left side
+  only): 105 vertices, at most 4.1 cm. It has no bone, so the app weights it by the turn of the
+  left upper arm in the axes of the chest: the turn of the rest pose (w, x, y, z: 0.851, 0.4961,
+  0.0461, -0.1659, Blender axes), full up to 8° and none from 22°. The play pose of the left arm
+  is 40° from it, and the lift at its middle 42°, so the key is 0 when the violin comes up. In
+  `pnpm pose-depth violinist`, the violin depths stay the same. A fade to 30° put the violin 0.1
+  cm deeper in one play sample. A fill in the bind that the key takes back in the play gave the
+  same look, but `pnpm fold-probe violinist` then counted the left jaw faces as folds in each
+  play sample. With this key, it counts 5 of them at rest, because the fill turns them far from
+  their bind normals.
 - **Raise keys.** `rm.raise_shape()` relaxes the faces that fold in the pose of a rule of `pnpm
   raise-fit violinist`, on the bind, and the key is the move turned back into the rest by the
   inverse of the blended skin. The property holds the turn of the forearm (w, x, y, z, Blender
@@ -315,7 +328,8 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   face). A third right key of the rule 25° further (fade 30° to 40°) on the old weights made the
   folds worse (82 %). The left key `arm_raise_L` (the rule of 9 faces of the left inner elbow,
   89° from the bind, fade 15° to 25°) was drawn again after the left elbow ramp (below), and its
-  pose turns over no face, so its move is 0 and the file has no such key.
+  pose turns over no face, so its move was 0 and the file dropped it. The key `arm_raise_L` now
+  fills the left collar at rest (`bind_collar`, below).
 
 The facts of the body:
 
@@ -390,5 +404,5 @@ the mid shin 0.256 of the width of the head at the eyes (before the legs 0.442 a
 
 `pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
 objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 46.2 KB after gzip (the old module 28.6 KB), because the mesh has 5,877 triangles in
+module is 46.5 KB after gzip (the old module 28.6 KB), because the mesh has 5,877 triangles in
 place of 4,035.
