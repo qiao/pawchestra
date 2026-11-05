@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 983,932 bytes |
-| SHA-256 | `e6319ec7d1d9d5dab7f08f0fe9ba2c24050fb341171b36e61c67321025e37903` |
+| SHA-256 | `6251d5fbcb6ef18fce86c9c79a47243ccba82c218dd92ef6aa56bd4a09c5edae` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 376,820 bytes |
-| SHA-256 | `c5c6ff81af5da62cc68148afe09657db9c1ecfdecfb440bc7a01aa23ee4a65ed` |
+| Size | 376,665 bytes |
+| SHA-256 | `5f25250629debacb69d9b7b65c12b6e066d8f81782250171790c6947f4b8c038` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -210,6 +210,10 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   with a tail weight above 0.05 or below the height 0.285 units moves. The move goes into
   `bind_sit` by the inverse of the blended skin. 39 points move, at most 0.0233 units. The rest,
   and with it the leg widths, stay.
+- **Soft crotch.** From the front, the bottom of the belly between the thighs was a dark notch
+  with spikes. The same relax (6 rounds, 0.06 units) at the centers (0, 0.33, 0.13),
+  (±0.03, 0.35, 0.15), and (0, 0.30, 0.085) makes it a smooth hollow. No point with a tail weight
+  above 0.05 or below the height 0.285 units moves. 37 points move, at most 0.0227 units.
 - **`bind_tail`.** The tail lies on the seat behind the haunch and hangs over the left side of the
   seat in front of the left back post, as a seated cat lets its tail hang off a stool. Each vertex
   with a tail weight keeps its arc length along the middle line of the rest tail and its offset
