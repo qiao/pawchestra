@@ -120,7 +120,7 @@ steps of the side wall, with no run of the cat (672184a7), so the git history ke
 | Item | Value |
 |---|---|
 | Size | 880,372 bytes |
-| SHA-256 | `2d3b0f03d2d27bf970198751c8687baa7d20d202c580396f3d52456b28d947c3` |
+| SHA-256 | `f418116c71c8908bd193f19febeec1cb4e01700c73790b258ec0d3c02613cca0` |
 | Base | The rig of fc52d38f: 880,600 bytes, SHA-256 `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
 | Bind | The bind of the viola hold, with the elbows bent (below) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
@@ -197,11 +197,17 @@ hips and the leg bones. `leg-lineup.png` of `reports/2026-11-05-cat-edits/` show
 1.15, 1.25, and 1.35. Each leg move is linear in the factor, so another factor F takes the leg
 moves times (F − 1) / 0.25.
 
-**Weights (57 places, 77 vertices).** The rig gave each vertex of the tail end 0.251 of its
+**Weights (61 places, 84 vertices).** The rig gave each vertex of the tail end 0.251 of its
 weight on the chest. The edit gives that share to `tail_tip`, so the tail end does not follow the
 chest. Six root places (2224, 3339, 3354, 3358, 4413, and 4414) get a tail share of 0.51 from the
 hips. The export then counts them as tail, so the moved root behind the haunch does not set the
 chair depth. Their standing places move up to 0.0037 units.
+
+**Bow arm root (4 places).** The Blender weights of the right arm root gave the head 0.13 to
+0.29 of four places (766, 799, 802, and 805). The edit gives that share to `clavicle_R`, so the
+head drop of the chin hold does not pull the root of the bow arm. The crease share of the bow arm
+in the play (`pnpm arm-look violist`) falls from 22.2% to 20.0% on `mozart-k525`, and the count
+of folded faces of `pnpm fold-probe violist` stays within 1%.
 
 ## Trial files
 
