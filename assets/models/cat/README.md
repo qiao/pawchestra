@@ -1,7 +1,8 @@
 # Cat model
 
 This folder holds the T-pose source mesh of the cat, a copy with rebuilt arms and its weights,
-and the rigged copy. The app does not serve these files. It loads the module
+the rigged copy, and a rig made by hand in Blender (`cat.blend`). The app does not serve these
+files. It loads the module
 `src/models/studio/cat.ts`, which this chain writes:
 
 ```text
@@ -32,6 +33,7 @@ src/models/studio/cat.ts           studio body of the app
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
 | `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
 | `cat.rig.glb` | Output of the rig. License as `cat-tpose.glb` | `pnpm rig-mesh cat` |
+| `cat.blend` | Made by hand in Blender from `cat-tpose.glb` (below). License as `cat-tpose.glb` | None: edit it in Blender |
 
 ## cat-tpose.glb
 
@@ -115,3 +117,35 @@ of the violist grew from 3 to 6. A run gives the same bytes.
 | Tail | In the seated bind, the root of the tail goes left along the back of the haunch, and the tail hangs over the left side of the seat in front of the left back post (`studio.tailBind`), 2.4 cm from the post. The bend between the two tail bones spreads over 0.07 units on each side (`weights.tail.bend`). The tail keeps its curl in the standing body. The footprint of the seated cat is 0.633 m deep and 0.704 m wide |
 
 A run of `pnpm rig-mesh cat` gives the same bytes.
+
+## cat.blend
+
+The rig of the cat, made by hand in Blender from `cat-tpose.glb`. The export into the studio
+format is a later step.
+
+| Item | Value |
+|---|---|
+| Size | 1,421,455 bytes |
+| SHA-256 | `f48e9b4bc05d0de9978af72b5b131a58ee6cfa4245512efb6748dcb8f4fb3bf3` |
+| Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
+| License | CC BY-NC 4.0, as `cat-tpose.glb` |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the animal faces -y, and +x is its left side |
+| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals. 1,992 vertices and 3,964 triangles |
+| Material | The material of the source with a packed copy of the base color texture at 1,024 × 1,024 pixels. The copy is a preview: take the colors from the texture of `cat-tpose.glb`, because the UVs are the same |
+
+The edits of the mesh, in the studio axes of the sections above (y up, z forward):
+
+- **Rings.** Ten planar edge rings go across each arm, so that the arm bends and twists over more
+  vertices: three at the shoulder (x 0.13, 0.155, 0.18), three at the elbow (0.222, 0.247,
+  0.272), two along the forearm (0.297, 0.323), and two at the wrist (0.35, 0.372). The ring at
+  0.372 lies at the middle of the gray to white blend of the paw. Each plane is at a right angle
+  to the arm axis, and it cuts only the arm faces (y 0.52 to 0.68, |x| above 0.10). Each new
+  vertex lies on an old edge, with the mix of the UVs of the edge ends, so the surface and the
+  colors stay. An old vertex less than 0.005 units from a plane joins the ring, so that the cut
+  makes no thin face.
+- **Brow.** 21 vertices of the sharp edges of the brow above each eye move toward the mean of
+  their neighbors, at most 0.01 units, with the rule of `softened()` of
+  `tools/blender/rig_mesh.py` (edges above 20°, a share of 0.5, 10 rounds). The box is |x| 0.015
+  to 0.10, y 0.832 to 0.88, and z 0.17 to 0.24, and the vertices below y 0.83 stay. The sharp
+  edges shade dark slashes above the black pea eyes of the app, which read as a worried brow. A
+  box from y 0.81 also moves the upper lids, and the eyes then look tired.
