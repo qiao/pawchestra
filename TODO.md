@@ -266,10 +266,11 @@ passes.
       shin, with a dark underside at the knee in the key light
       (`reports/2026-11-05-cat-review/taper-stand.png`). The mid thigh limit (about 0.55 of the
       head width, now 0.545) holds the taper. Ask the user if a thinner mid thigh is allowed.
-- [ ] Cat haunch: after the cut of the right wall, the long faces from both sides of the back of
-      the haunch still meet in one low corner on the seat under the tail root, seen from the back
-      diagonals (`reports/2026-11-05-cat-review/haunch-cut-back.png`). Try one more cut of the
-      edges into that corner, with the tail root still.
+- [ ] Cat haunch: after the corner cut, the bottom of the right haunch is round on the seat from
+      the right back diagonal (`reports/2026-11-05-cat-review/haunch-corner.png`). The inner crease
+      from the tail root down to the seat (1120-1137, 34.7°) still shows a dark line beside the
+      tail in the key light. The left haunch has the old fan into one corner (vertex 1130, edge
+      1130-1139 of 0.111 units) under the tail. Cut it in the same way if a view shows it.
 - [ ] Cat violist: at rest and in the moves, the hanging left upper arm touches the belly
       (1.5 cm in `bach-bwv1047`, 0.2 cm before the hanging arms), and the left forearm goes
       0.7 cm into the belly (`reports/2026-11-03-cat-rest/proof2/`). `hangingArm()` keeps no gap
