@@ -216,12 +216,6 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat violist and rabbit violinist: the holds `CAT_HOLD` and `RABBIT_HOLD` of
-      `pose/bowed-rig.ts` fit the trial bodies of 2026-11-03 to 2026-11-05 (5.3). The A-pose
-      bodies played `CAT_HOLD` of e491ff3c and `SHOULDER_HOLD`. The close views of the rabbit
-      match production. The A-pose cat holds the viola in front of the chin in the play, and its
-      rest arms hang out to the sides (`reports/2026-11-05-revert-bodies/cat-pair.png`). Take
-      `CAT_HOLD` of e491ff3c again, or fit the hold to the A-pose cat.
 - [ ] Cat: face 832 at the front of the right armpit folds in most of the play. Arm segments allow
       no `raise` shape there.
 - [ ] Cat: the armpit line at the lower back of each arm root folds a little in the play (faces 729,
