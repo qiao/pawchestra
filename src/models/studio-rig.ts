@@ -487,6 +487,12 @@ interface PosedStudioBody {
   readonly body: StudioBody;
   /** The mesh, with its bind places in the stance and the arm corrective shapes only. */
   readonly mesh: StudioMesh;
+  /**
+   * The move of each bone from the bind pose of the export to the stance, with the lift or the
+   * drop of the body: 16 numbers for each bone of `STUDIO_BONES`, column by column. A tool that
+   * skins the mesh of the export puts it before the pose of a frame (`pnpm pose-preview`).
+   */
+  readonly stance: Float32Array;
 }
 
 /**
@@ -681,7 +687,8 @@ function blended(
  *
  * @param body The seated studio body, with its standing pose.
  * @param mesh The unpacked mesh of the body, with the leg corrective shapes after the arm shapes.
- * @returns The standing body and its mesh, with the arm corrective shapes only.
+ * @returns The standing body and its mesh, with the arm corrective shapes only, and the move of
+ *   each bone from the bind pose to the stance.
  * @throws Error if the body has no standing pose.
  */
 export function standingBody(body: StudioBody, mesh: StudioMesh): PosedStudioBody {
@@ -716,6 +723,7 @@ export function standingBody(body: StudioBody, mesh: StudioMesh): PosedStudioBod
       standing: null,
     },
     mesh: { ...mesh, positions, correctives },
+    stance: movedMatrices(stand.matrices, lift),
   };
 }
 
@@ -730,7 +738,8 @@ export function standingBody(body: StudioBody, mesh: StudioMesh): PosedStudioBod
  *
  * @param body The standing studio body, with its seated pose.
  * @param mesh The unpacked mesh of the body, with the sit corrective shapes after the arm shapes.
- * @returns The seated body and its mesh, with the arm corrective shapes only.
+ * @returns The seated body and its mesh, with the arm corrective shapes only, and the move of
+ *   each bone from the bind pose to the stance.
  * @throws Error if the body has no seated pose.
  */
 export function seatedBody(body: StudioBody, mesh: StudioMesh): PosedStudioBody {
@@ -756,7 +765,25 @@ export function seatedBody(body: StudioBody, mesh: StudioMesh): PosedStudioBody 
       chairDepth: sitting.chairDepth,
     },
     mesh: { ...mesh, positions, correctives: mesh.correctives.slice(0, armCorrectives(body)) },
+    stance: movedMatrices(sit.matrices, drop),
   };
+}
+
+/**
+ * Gives a copy of the matrices of the bones that adds one move after each matrix.
+ *
+ * @param matrices 16 numbers for each bone, column by column.
+ * @param move The move.
+ * @returns The new matrices.
+ */
+function movedMatrices(matrices: Float32Array, move: Vector3): Float32Array {
+  const out = matrices.slice();
+  for (let b = 0; b < out.length; b += 16) {
+    out[b + 12] = (out[b + 12] ?? 0) + move.x;
+    out[b + 13] = (out[b + 13] ?? 0) + move.y;
+    out[b + 14] = (out[b + 14] ?? 0) + move.z;
+  }
+  return out;
 }
 
 /**
@@ -843,7 +870,7 @@ function boneMatrix(pose: ChainPose, bone: StudioBone): Matrix4 {
  */
 export function studioRig(bound: StudioBody, stands = false): StudioRig {
   const unpacked = unpackStudioMesh(bound.mesh);
-  const { body, mesh }: PosedStudioBody =
+  const { body, mesh }: Pick<PosedStudioBody, 'body' | 'mesh'> =
     stands && bound.standing
       ? standingBody(bound, unpacked)
       : !stands && bound.sitting
