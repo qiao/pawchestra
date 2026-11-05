@@ -80,6 +80,9 @@ call only the functions of `tools/blender/studio_preview.py` (`sp`), `add_surfac
 `tools/blender/studio_armature.py` (`sa`), and `place_eyes()` and `fit_eyes()` of
 `tools/blender/studio_eyes.py` (`se`). Run the command lines of these files headless only. A
 scripted edit of a `.blend` writes its exact call and values in the `README.md` row of the file.
+Try each scripted edit on a copy with `pnpm rig-trial`, find thin faces and sharp edges with
+`pnpm bind-view`, and write the winner with `pnpm rig-trial <a> --apply <tag>`
+([`commands.md`](commands.md)).
 
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
    eye_fans=False)` one time for the face colors and the gloss nose. The texture is the source
