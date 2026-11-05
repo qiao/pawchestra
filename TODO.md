@@ -59,8 +59,6 @@ render, and the memory.
       (`#compileSteps`, `#warmSteps` of `StageScene`). Now the first frame compiles the programs on
       the main thread, and the frames draw with empty maps for about 0.3 s (7.2).
 
-- [ ] Run `pnpm frame` on `fc321c78` with no other page that renders. The round of the stage lip
-      (4.5) got no valid GPU phase: in three runs, other processes used 21% to 27% of the GPU.
 - [ ] The score pages of the conductor desk go through the same height test of `stageBakeAt()` as
       the bevel of the stage lip (4.5). Check them for dark dashes in the close shots.
 - [ ] The side glow of the stage switches from the skirt to the lip with a hard test at
