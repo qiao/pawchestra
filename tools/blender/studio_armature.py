@@ -86,13 +86,22 @@ def load_config(species):
         return json.load(f)
 
 
+def rig_property(rig, name):
+    """Gives a custom property of the armature object, or of its armature data when the object has
+    none, as plain Python values."""
+    value = rig.get(name, rig.data.get(name))
+    if hasattr(value, 'to_dict'):
+        return value.to_dict()
+    return value.to_list() if hasattr(value, 'to_list') else value
+
+
 def hint(rig, name):
     """Gives the roll hint of a bone in Blender axes: up, the palm of its side, or forward."""
     if name in UP_BONES:
         return np.array([0.0, 0, 1])
     stem = name[:-2].split('_seg')[0] if name[-2:] in ('_L', '_R') else name
     if stem in PALM_STEMS:
-        palm = np.array(rig['palm'], float)
+        palm = np.array(rig_property(rig, 'palm'), float)
         return palm * [-1, 1, 1] if name.endswith('_R') else palm
     return np.array([0.0, -1, 0])
 
