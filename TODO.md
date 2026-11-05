@@ -235,9 +235,19 @@ passes.
       (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`). The open choice: a
       fifth shape (`STUDIO_RAISES`).
 - [ ] Cat: a run of `pnpm rig-mesh cat` today moves the tail root and 404 vertices near the haunch
-      and the tail by up to 4.8 cm against the committed `cat.rig.glb` of production
+      and the tail by up to 4.8 cm against the base `cat.rig.glb` of fc52d38f
       (`assets/models/cat/README.md`). Find the change of `rig_mesh.py`, and make the run give
-      the committed file again.
+      the base file again. Then `pnpm glb-point-edits assets/models/cat/cat-edits.json` adds the
+      point edits.
+- [ ] Cat tail: the haunch fills the width of the seat (`seatWidth`), so the outer half of the
+      curled tail end lies over the left edge of the seat (README, "Point edits"). Choose a wider
+      chair or a shorter curl.
+- [ ] Cat tail root: under the haunch, 6 edges at the tail root fold by 109° to 174° (vertices
+      2224, 2254, 2255, 2256, 2258, 3721, 3730, and 4415 of `cat.rig.glb`). The seat hides them in
+      each view of `reports/2026-11-05-cat-edits/`. Move them with point edits if a crop shows them.
+- [ ] Cat legs: ask the user for the leg girth step of
+      `reports/2026-11-05-cat-edits/leg-lineup.png` (1.15, 1.25, or 1.35). The body has 1.25, and
+      the README gives the rule for another step.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
