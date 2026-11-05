@@ -60,12 +60,11 @@ Its clean rings and twist markers show a fault.
    its form takes `"keep": "head"`. A larger head grows `H`, so fit the holds again.
 3. **Options.** Run `pnpm mesh-options` ([`commands.md`](commands.md)). Fix each warning of the
    rigs, then ask the user about the size, arms, and legs with `options.md` and `options.png`.
-4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4). Run `arm_rebuild.py`. Look at
-   the bind, the standing body, the knees, and the bones with `pnpm rig-mesh <a> --check --preview
-   <dir>`, and each variant with `--set`. Keep the budgets, and the standing body within 1 mm of
-   the source.
-5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, a crease angle that
-   matches the facet contrast of its reference crops, and the seat settings. Run
+4. **Rig.** Check the mesh with `pnpm mesh-intake` (design 4.4), and run `arm_rebuild.py`. Look
+   at each variant with `pnpm rig-mesh <a> --check --preview <dir> [--set]`. Keep the budgets, and
+   the standing body within 1 mm of the source.
+5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of the
+   facet contrast of its reference crops, and the seat settings. Run
    `pnpm studio-body <a>`, add the module to `STUDIO_BODIES`, and give the species the body.
 6. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
    `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit <role> --set`,
@@ -83,7 +82,7 @@ call only `add_surface()`, `fix_rolls()`, and `drive_segments()` of
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
    eye_fans=False)` one time for the face colors and the gloss nose. The texture is the source
    GLB file or an image file, such as the base color JPEG of an FBX source. A new species can
-   start with the command line ([`commands.md`](commands.md)), which also adds the armature, the
+   start with the command line ([`commands.md`](commands.md)): it also adds the armature, the
    Action `bind`, and eye fans.
 2. **Rig.** Put `palm`, `seat`, `hinges`, and the facts of the body on the armature object: the
    names of `BODY_FACTS` of `tools/studio-body.ts`, with `height` and `crease` at least. Fit the
@@ -108,9 +107,9 @@ an instrument size, or a seat runs the whole gate (`pnpm arm-check <roles> --bas
 <dir>`) and reports its table and crop pairs. A `FAIL`, or a better number with a worse look,
 makes the round not done.
 
-- The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`. A new role adds
-  its entry. A planned grip change expects a grip turn `FAIL`, and gives the new median with 2x
-  paw crops at a strike and at rest. The manager accepts the new entry.
+- The grip turn compares each paw with `ACCEPTED_GRIPS` of `tools/arm-check.ts`, with an entry for
+  each role. A planned grip change expects a `FAIL`, and gives the manager the new median with 2x
+  paw crops at a strike and at rest.
 - A paw that faces its tube in a shared wind hold has the palm turn against `ACCEPTED_PALMS` in
   place of the grip turn. A new such hold adds the entry that the tool prints.
 - The paw twist, paw swing, forearm twist, move twist, and flat share count from the bind. With a
@@ -184,9 +183,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 
 ### Holds and reach
 
-- Short arms do not reach the instruments. Size the instrument by the rule of real players.
-- The arm factor follows the hold. Fit the hold with a first factor, measure the reach, and rig the
-  final factor.
+- Short arms do not reach the instruments. Size the instrument by the rule of real players, fit the
+  hold with a first arm factor, measure the reach, and rig the final factor.
 - A hold trades folds against clearance. Check each hold change with `pnpm hold-fit --set`,
   `pnpm pose-depth --set`, and `pnpm arm-check --variant`.
 - The arm gate and the depths pass while a paw misses its instrument. Measure each grip with
@@ -200,9 +198,6 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   move the mouthpiece under the muzzle (`lipShift`).
 - A freed round arm has its full inner half width. Turn each elbow out, or bend it with a nearer
   grip, and check the grip turn (design 5.3).
-- A roll rule that aims at a far point flips when the prop points at it (`rollToward()`).
-- A line through the tail end (`trunkFront()`) can meet the back of a short neck under a large head.
-  Measure the front of a band of the upper chest (`chestFront()`).
 
 ### Bow
 
@@ -231,9 +226,9 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
 - A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
   (`rigidPainted`). Two rigid groups that touch fold at their shared edge: join them.
-- A rigid group at the front of a root or across the chest moves the fold to its edge, which shades
-  a dark notch. A Smooth of the root weights also moves the fold. A rigid patch on the arm swings
-  across the chest, and the body cut folds over it: give it more clavicle than arm (`cat_root.py`).
+- A rigid group at the front of a root or across the chest, or a Smooth of the root weights, moves
+  the fold to its edge as a dark notch. A rigid patch on the arm swings across the chest: give it
+  more clavicle than arm (`cat_root.py`).
 - A raised arm pulls out a side with no trunk weight: give it a trunk share (`paintedBelow`).
   The share leaves a notch at the front of a hanging arm root. Fit a rest shape with `follow`.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds, then run
@@ -245,13 +240,10 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 - Uneven shares around one forearm ring, from a Smooth of a half ring or the weights of a large
   paw, dent a bent elbow and shear the twisted faces into dark spikes. Give each forearm ring one
   mean weight (`cat.blend`).
-- A bent bind of a thick paw (`studio.bindArms`) presses the inner wrist into a dark slit that no
-  weight rule, ring, or `raise` removes. Bind the arms straight (`studio.straightArms`), and judge
-  a wrist by its 2x crops.
+- A bent bind of a thick paw (`studio.bindArms`) presses the inner wrist into a dark slit. Bind the
+  arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
   (`paintedLower`).
-- The glTF skin has no B-Bones and 4 weights for each vertex. In the Blender preview, set
-  `bbone_segments` to 1, turn off Preserve Volume, and run Limit Total 4.
 
 ### Seams and cuts
 
@@ -320,8 +312,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   `headFloor`, and `headCeiling`.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
-- An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye,
-  also with fur colors. Fill it (`eyeFill`), or smooth it in a hand rig and run `se.fit_eyes()`.
+- An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye.
+  Fill it (`eyeFill`), or smooth it in a hand rig and run `se.fit_eyes()`.
 - A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
   the config, and run `arm_rebuild.py`: it writes the softened places into the weights file.
 - A face rule can paint a dark block on the side. Check it from the front, at 60°, and the sides.
