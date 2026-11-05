@@ -433,8 +433,11 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   ['violinist', { L: -171, R: -29 }],
   ['fox-violinist', { L: -152, R: -33 }],
   // The cat violist with the right elbow down at the tip, which rolls the right forearm, from
-  // accepted 2x paw crops.
-  ['violist', { L: -175, R: -17 }],
+  // accepted 2x paw crops. The hand rig of the cat keeps the forearm of the mesh (0.202 m, 0.242 m
+  // on the rig of rig-mesh), so the hold reaches the bow at another turn of the right paw. The 2x
+  // crops at the frog and the tip show the same wrap of the stick
+  // (reports/2026-11-04-cat-hand/phase-b/grip/sheet-bow-paw.png).
+  ['violist', { L: -175, R: -70 }],
   ['cellist', { L: -90, R: 72 }],
   // The hippo bow arm with the elbow out and a little up, so that the forearm slopes down to the
   // bow with a nearly straight wrist.
