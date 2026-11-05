@@ -29,7 +29,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 import { Matrix3, Matrix4, Quaternion, Vector3 } from 'three';
 
-import { ROLE_VIEWS, castRoleOf, closeViewPath, viewsOf } from './close-views.ts';
+import { castRoleOf, closeViewPath, viewsOf } from './close-views.ts';
 import type { RoleViews } from './close-views.ts';
 import { findRole, roleBodies, roleScene } from './fold-probe.ts';
 import { runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
@@ -187,7 +187,7 @@ interface PreviewMoment {
   /** Each bone of the GLB file, by name. */
   readonly bones: Readonly<Record<string, PreviewBone>>;
   /** The weight of each morph target, by name. A morph target that is not here has the weight 0. */
-  readonly shapes: Readonly<Record<string, number>>;
+  readonly targets: Readonly<Record<string, number>>;
 }
 
 /** The skins of `--skin`, x, y, z of each vertex of the app mesh in the units of the `.blend`. */
@@ -277,10 +277,7 @@ function optionsOf(args: readonly string[]): Options {
   const list = (text: string | null): string[] | null =>
     text === null
       ? null
-      : text
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean);
+      : text.split(',').flatMap((item) => (item.trim() === '' ? [] : [item.trim()]));
   const times = (list(value('--times')) ?? []).map(Number);
   if (times.some((t) => !Number.isFinite(t))) {
     throw new Error(`The option --times takes song times in seconds. ${USAGE}`);
@@ -518,7 +515,7 @@ function keyLight(seat: RoleSeat): Vec3 {
   const place = seat.index === null ? layout.conductor : layout.players[seat.index];
   const facing = place?.facing ?? 0;
   const up = new Vector3(0, 1, 0);
-  const chest = new Vector3(...(seat.model.studio.body.heads.chest ?? [0, 0, 0]))
+  const chest = new Vector3(...seat.model.studio.body.heads.chest)
     .applyAxisAngle(up, facing)
     .add(new Vector3(...(place?.position ?? [0, 0, 0])));
   const toLight = new Vector3(...keyLightPlace(layout.stageSide))
@@ -708,7 +705,7 @@ function previewBones(frame: BlendFrame, matrices: Float32Array): Record<string,
  * @param stance The stance.
  * @returns The weights by name.
  */
-function previewShapes(
+function targetWeights(
   studio: StudioPose,
   raises: readonly string[],
   stance: Stance,
@@ -874,10 +871,10 @@ async function preview(options: Options): Promise<PosePreview> {
     );
     const { stance, matrices: stanceMatrices } = stanceOf(p.model, bound);
     const matrices = exportMatrices(studio, stanceMatrices);
-    const shapes = previewShapes(studio, raises, stance);
+    const targets = targetWeights(studio, raises, stance);
     if (exact) {
       appSkins[p.name] = blendPoints(frame, skinStudioMesh(p.model.studio.mesh, studio));
-      const weights = Float32Array.from(kept, (target) => shapes[target] ?? 0);
+      const weights = Float32Array.from(kept, (target) => targets[target] ?? 0);
       exactSkins[p.name] = blendPoints(
         frame,
         skinStudioMesh(exact.mesh, { matrices, correctives: weights }),
@@ -890,7 +887,7 @@ async function preview(options: Options): Promise<PosePreview> {
       wall: p.wall,
       stance,
       bones: previewBones(frame, matrices),
-      shapes,
+      targets,
     };
   });
 
@@ -938,19 +935,18 @@ async function main(): Promise<void> {
   const file = await preview(options);
   mkdirSync(dirname(options.out), { recursive: true });
   writeFileSync(options.out, `${JSON.stringify(file)}\n`);
-  const lines = file.moments.map(
-    (m) =>
-      `  ${m.name.padEnd(10)} ${m.source.padEnd(16)} ${m.time.toFixed(2).padStart(7)} s  ${m.stance.padEnd(8)} ${Object.entries(
-        m.shapes,
-      )
-        .filter(([, w]) => w > 0)
-        .map(([target, w]) => `${target} ${w.toFixed(3)}`)
-        .join(', ')}`,
-  );
+  const lines = file.moments.map((m) => {
+    const weights = Object.entries(m.targets).flatMap(([target, w]) =>
+      w > 0 ? [`${target} ${w.toFixed(3)}`] : [],
+    );
+    return `  ${m.name.padEnd(10)} ${m.source.padEnd(16)} ${m.time.toFixed(2).padStart(7)} s  ${m.stance.padEnd(8)} ${weights.join(', ')}`;
+  });
   console.log(
     `Wrote ${relative(process.cwd(), options.out)}: ${file.moments.length} moments of the ${file.species} (${file.role}), ${file.bones.length} bones.`,
   );
-  console.log(['  moment     source              time  stance   shapes', ...lines].join('\n'));
+  console.log(
+    ['  moment     source              time  stance   morph targets', ...lines].join('\n'),
+  );
 }
 
 if (import.meta.main) {

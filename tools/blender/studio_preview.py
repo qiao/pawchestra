@@ -310,7 +310,7 @@ def _keys(pose, rig, mesh, first):
             _curve(bones, f'{base}.rotation_quaternion', i, frames, [q[i] for _, q in keys], name)
     shapes = strip.channelbag(key_slot, ensure=True)
     for block in mesh.data.shape_keys.key_blocks[1:]:
-        values = [m['shapes'].get(block.name, 0.0) for m in pose['moments']]
+        values = [m['targets'].get(block.name, 0.0) for m in pose['moments']]
         _curve(shapes, f'key_blocks["{block.name}"].value', 0, frames, values)
 
     rig.animation_data_create()
