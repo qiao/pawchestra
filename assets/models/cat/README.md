@@ -24,7 +24,8 @@ export (design 4.4, "Hand rig"). The bind of `cat.blend` started from the seat r
 `cat.json`.
 
 `docs/agents/rigging.md` gives the steps of a hand rig. The target of the form is the sheet
-`docs/reference/cat-views.png`. The cat has the same bead eyes as the fox and the rabbit.
+`docs/reference/cat-views.png`. The cat has the same pea eyes as the fox and the rabbit: the eye
+objects of `cat.blend` place them.
 
 ## Files
 
@@ -114,31 +115,47 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 881,072 bytes |
-| SHA-256 | `63870894de42febd578a247a46ca2c6a063f08905c866a5b8bcd44109f7030ad` |
+| Size | 877,596 bytes |
+| SHA-256 | `d0e770d1e7250d0da7910d42b5558c641d64d5baa892ab87a7c508d8d1d308a7` |
 | Form | The head, the brow, the trunk, the arms, the paws, and the tail of the source (design 4.4, "Replacing body"). The thigh 1.6 and the shin 2.32 times as long, and both 1.5 times as wide, so that the cat sits on the chair of the cat of the A-pose mesh: the seat top is 0.300 m high, 0.46 m wide, and 0.343 m deep. The seated cat is 1.675 m high to the ear tips |
 | Bind | The role-neutral bind of the Action `bind` (design 4.4): straight arms with the elbow axes of `hinges`, and the bind supination L 130 and R 81 |
-| Faces | 4,406 triangles, of them 46 gloss |
+| Faces | 4,382 triangles, of them 22 gloss (the nose) |
+| Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature (below) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_L`, `arm_raise_R`, `arm_raise_L2`, and `arm_raise_L3` of the elbows and the left wrist |
 | Tail | In the seated bind, the root of the tail goes left along the back of the haunch, and the tail curls up beside the left hip on the seat. The footprint of the seated cat is 0.652 m deep and 0.704 m wide (0.633 m and 0.704 m on the rig of `rig-mesh`) |
 
 ## cat.blend
 
 The rig of the cat, made by hand in Blender from `cat-tpose.glb` (design 4.4, "Hand rig"), with
-the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
+the seated bind (the Action `bind`), its fix (the key `bind_sit`), the pea eyes, and the facts of
+the body.
 
 | Item | Value |
 |---|---|
-| Size | 335,637 bytes |
-| SHA-256 | `0364649ca30ad387ccea7cf31ba3c7e41ee96ed69c3f56a2a485e9e84db06727` |
+| Size | 352,950 bytes |
+| SHA-256 | `1a98bb2473ebb843007fae33ab3fd3d44aaa0a7471d6aef77ce00043dcc3965a` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
-| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,227 vertices and 4,406 triangles, 46 of them gloss |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. The mesh and the armature have no transform |
+| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, and a gloss nose. The gloss fans of the eyes are removed. 2,201 vertices and 4,382 triangles, 22 of them gloss |
+| Eyes | The objects `eye_L` and `eye_R` (`tools/blender/studio_eyes.py`), children of the bone `head`. In the bind, the origin of each is the middle of the eye on the head surface, its Z axis the direction of the eye, and its scale the head height `H` of the eye, 0.288572 units (0.458 m). Their meshes are previews of the eyes of the app. The eyes started at the places, the directions, and the size of the eyes that the rules of `pnpm studio-body` gave on `main` (1.35 times the share of the head, 0.05 `H` above the old eyes), and moved onto the smooth eye sockets (below) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint. The Action `bind` holds the seated bind at frame 1 (below). The property `palm` is (0, 0, -1), `seat` is the chair of `cat.json` (front 0.1, back -0.087, half width 0.184), and `hinges` holds the elbow axes of `bind_hinges()` |
+| Facts of the body | The properties of the armature (`BODY_FACTS` of `tools/studio-body.ts`), below |
 | Shape keys | `Basis`, `bind_sit` and `bind_armpit` at the value 1, and `arm_raise_L`, `arm_raise_R`, `arm_raise_L2`, and `arm_raise_L3` at the value 0 (below), each with its custom property on the mesh. A body has at most 4 keys `arm_raise_*` (`STUDIO_RAISES`) |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex. The upper arm, the forearm, and the forearm twist bone hold no weight |
+
+The facts of the body:
+
+- **`height` 1.152946.** The standing shoulder joints in the app, in meters: the joints of the
+  mesh, raised 0.1272 units by the longer legs. Thus the head height `H` stays the `H` of the cat
+  of the A-pose mesh, 0.339 m (1.588737 m for each unit).
+- **`crease` 35.** The crease angle of the fur, in degrees.
+- **`seatWidth` 0.46 and `backRoom` 0.052.** The cat sits on the chair of the cat of the A-pose
+  mesh: 0.46 m wide, and 0.343 m deep with the back room. The haunch is 0.53 m wide, so it reaches
+  a little past the sides of the seat.
+- **`headFloor` 0.827.** The tips of the lower whiskers hang below the chin and follow the head,
+  so the head measures start at the chin, 0.827 units high after the rise of the legs.
 
 The seated bind:
 
@@ -234,6 +251,12 @@ in the studio axes of the sections above (y up, z forward):
   vertex lies on an old edge, with the mix of the UVs of the edge ends, so the surface and the
   colors stay. An old vertex less than 0.005 units from a plane joins the ring, so that the cut
   makes no thin face.
+- **Eye sockets.** Each old eye of the mesh is an almond eyeball in a groove. The faces had the
+  fur color, but the groove and the corners of the almond faced away from the light, so a black
+  almond showed around each pea eye. 47 vertices of the eyeballs, the grooves, and the inner
+  corners (an ellipse of 0.042 by 0.03 units around each old eye, grown by 1.25, within 0.03
+  units of its plane) take 10 rounds of the Smooth of Blender with the factor 0.5, with the ring
+  around them fixed, and each shape key takes the same move. A vertex moves at most 0.021 units.
 - **Brow.** 21 vertices of the sharp edges of the brow above each eye move toward the mean of
   their neighbors, at most 0.01 units, with the rule of `softened()` of
   `tools/blender/rig_mesh.py` (edges above 20°, a share of 0.5, 10 rounds). The box is |x| 0.015
