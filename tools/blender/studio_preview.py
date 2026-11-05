@@ -605,7 +605,7 @@ SHADING = {
 def shade_like_app(on=True):
     """Shows each 3D view of the window in Material Preview with the scene lights, so that the
     flat faces of the preview take the sun light from the direction of the app key light. With
-    `on` false, the views get back their settings of before. Gives the number of views."""
+    `on` false, the views get back their settings of before. Gives the number of changed views."""
     state = _state()
     if state is None:
         raise RuntimeError('No preview: call load_preview() first.')
@@ -618,17 +618,25 @@ def shade_like_app(on=True):
         if space.type == 'VIEW_3D'
     ]
     saved = state.setdefault('shading', {})
+    shown = 0
     for k, space in enumerate(spaces):
         if on:
-            saved.setdefault(k, {name: getattr(space.shading, name) for name in SHADING})
-            for name, value in SHADING.items():
-                setattr(space.shading, name, value)
+            before = saved.setdefault(k, {name: getattr(space.shading, name) for name in SHADING})
+            try:
+                for name, value in SHADING.items():
+                    setattr(space.shading, name, value)
+                shown += 1
+            except TypeError as error:
+                # A Blender with no GPU view, such as a headless run, has no Material Preview.
+                print(f'studio_preview: a 3D view keeps its shading: {error}', flush=True)
+                for name, value in before.items():
+                    setattr(space.shading, name, value)
         elif k in saved:
             for name, value in saved[k].items():
                 setattr(space.shading, name, value)
     if not on:
         saved.clear()
-    return len(spaces)
+    return shown
 
 
 def _save_pre(*_):
