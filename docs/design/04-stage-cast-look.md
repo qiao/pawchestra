@@ -211,16 +211,11 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
   smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked too
-  large. The soft brow and the smooth eye sockets of the cat are product choices that its `.blend`
-  holds ("Hand rig"), so that the face reads happy and calm. The old eye of the mesh is an almond
-  eyeball in a groove, and the groove shaded a black almond around each pea eye. The leg factors
-  stretch the legs to the old seat, so the stretched legs take a girth across their axes
-  (`legGirth`) that keeps more of the stocky look of the legs of the mesh: of the girth variants,
-  the one whose mid thigh and mid shin widths, as a share of the head height and of the hip width,
-  are nearest to the mesh. The hand rig of the cat takes thicker legs, a product choice, with an
-  even offset outward from the bone axes, because a factor across the axes sharpens the bulge of
-  its haunch into fins (`assets/models/cat/README.md`). The leg turns of the seat
-  (`studio.legTurns`) keep the knees of the old body. The trunk length and the trunk shape stay a
+  large. The leg factors stretch the legs to the old seat, so the stretched legs take a girth
+  across their axes (`legGirth`) that keeps more of the stocky look of the legs of the mesh: of the
+  girth variants, the one whose mid thigh and mid shin widths, as a share of the head height and of
+  the hip width, are nearest to the mesh. The leg turns of the seat (`studio.legTurns`) keep the
+  knees of the old body. The trunk length and the trunk shape stay a
   product choice of the form keys of "Mesh rig" (`trunkFactor`, `girthProfile`). `pnpm body-shape` measures the seated bind: the width and the
   depth of the trunk at 10 heights from the seat to the neck joint, the girths of the limbs at their
   middles, the knee and the ankle gaps from the front, the distance of the shoulder joints, and the
@@ -231,13 +226,6 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
   width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
   of the app view judge that height.
-  The arm tube of the mesh of the rabbit has coarse rings with long triangles, so its hand rig
-  replaces the tube with round rings on the section of the mesh, with the girth of the mesh. Three
-  rings on the surface of the mesh also fill the gap between the trunk and the shoulder ring, with
-  a weight ramp from the clavicle to the upper arm, so that a bent arm root bends over several
-  rings and shows no large flat faces. The arm keeps the length of the arm of the old rabbit, so that the left paw reaches the nut of the
-  violin (5.3). The upper arm and the forearm share the extra length by one factor, so that the
-  elbow keeps its place on the arm of the mesh.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -363,10 +351,11 @@ faces.
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
 shape that fits only that hold, and each other hold blends its own bend on top. So a body with
 the role-neutral bind takes a new role with no new rig, which is the way to one skeleton for each
-species and each instrument (Cast matrix). Each body of the app has this bind. A body with
-`raise` shapes also fits each shape against all its roles, because a shape fits only the poses
-near its hold. A pose gives the bend of a paw off its forearm as an
-angle (`pawBendR`), so that a new bind keeps the paw in the world.
+species and each instrument (Cast matrix). Each body of the app has this bind, except the cat:
+its A-pose body keeps the bind of the viola hold, with the elbows bent. A body with `raise` shapes
+also fits each shape against all its roles, because a shape fits only the poses near its hold. A
+pose gives the bend of a paw off its forearm as an angle (`pawBendR`), so that a new bind keeps
+the paw in the world.
 
 The bind supination of each paw is the value that makes the largest paw twist p95 of any role
 smallest. The roles are the roles of the cast matrix (`CAST_ROLES`) and the own roles of the body,
@@ -455,8 +444,14 @@ Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, s
 fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows
 in Blender before the export. A pose in Blender skins from the T-pose and the app from the bind, so
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
-export of the open `.blend`, with the bind as its rest. The cat and the rabbit have hand rigs. The other bodies keep `rig-mesh`, and it gets
-no new rules.
+export of the open `.blend`, with the bind as its rest.
+
+No body of the app has a hand rig: each body comes from `rig-mesh`. The hand rigs of the cat and
+the rabbit are trials that the app does not use. Reason: they gave a thin, faceted arm root and
+other faults, so the cat and the rabbit keep the A-pose bodies that production shows. A trial
+keeps its `.blend`, its export, and its summary in `assets/models/<s>/hand-rig/`, so that no tool
+takes the trial for the body of the app: `pnpm rig-export <s> --blend <file> --out <file>`
+exports it there.
 
 ```text
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
@@ -612,21 +607,10 @@ its rest is the bind.
 - The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
-- The cat sits on the chair of the cat of its old mesh, as a product choice: the legs of the
-  T-pose mesh put the seat top far below the old seat. So its hand rig (`cat.blend`, "Hand rig")
-  makes the thighs and the shins longer, and the feet keep their size. The shin grows more than
-  the thigh: a long thigh puts the feet forward, and the deeper footprint moves the seats of each
-  demo (4.2). The legs are also wider, so that they keep the hip width and the shin width of the
-  old body, because long legs with the width of the mesh look thin. The trunk keeps the length of
-  the mesh. The bind key `bind_sit` lowers the haunch onto the seat (`sit()`) and smooths the
-  crease of the belly and the thighs (`crease_relax()`). The tail lies on the seat behind the
-  haunch and hangs over the left side of the seat in front of the left back post, as a seated cat
-  lets its tail hang off a stool. Two tail bones cannot give this curve, so the bind key
-  `bind_tail` bends the tail along it and keeps the haunch around the root: a tail turned only by
-  its bones made a lump at the hip and a knot on the seat. A tail that hangs behind the chair
-  makes the footprint deeper, which moves the seats. The chair keeps the depth of the old chair,
-  with more room behind the back (`backRoom`). The head measures start at the chin of the old
-  body (`headFloor`), so that `H` and each hold in `H` stay.
+- The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
+  sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
+  of the haunch (`studio.tailCurl` of the rig config). The rabbit sits with more room behind the
+  back (`backRoom`), so that its back keeps off the chair back.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
@@ -635,23 +619,6 @@ its rest is the bind.
   head of the mesh (`headFactor`), so that the head has the width of the old head for its height.
   The smaller head moves the mouth back, so the trombone hold of the panda puts the
   right elbow further out and the rest place further forward (5.2, 5.3).
-- The rabbit sits on the chair of its old body, as a product choice: the seat top and the chair
-  depth of that chair. Its hand rig (`rabbit.blend`, "Hand rig") keeps the leg turns and the thigh
-  length of the old body, and makes the shins only as long as the seat needs. The limbs keep the
-  girth of the mesh, a product choice. Each edit of the mesh is a point edit by hand, or one move
-  of a named ring or band, so that the form stays the form of the mesh: rules that filled and
-  smoothed many vertices made a thick neck and an uneven belly. The round head sits on the chest
-  with no neck, as on the sheet, and the dark underside under the head stays. The mesh has a
-  crumpled round patch on the lower belly, so the hand rig replaces it with an even grid. The
-  seated bind and the play show no fault that a shape key must fix, so the rig has no keys. The
-  lower belly follows the hips alone, so that the bend of the seated thighs stays in the groin and
-  no fold line outlines the belly. The old eye of the mesh is a dome in a groove, which showed a
-  light ring around each pea eye, so the eye areas lie flat on the face surface around them.
-  The fur takes the cream tone step of the old rig (`colors.tone` of `rabbit.json`), so that the
-  rabbit keeps the look of its old body. Each elbow spreads over its helper bone across the joint,
-  because the arms bend far in the play, and a narrow blend folded the inner elbow. The whiskers
-  move with the head alone, because a neck share folded them when the head turns. The chair keeps
-  its depth with more room behind the back (`backRoom`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
