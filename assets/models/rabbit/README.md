@@ -141,12 +141,12 @@ name the functions of `tools/blender/studio_armature.py` (`sa`) and `studio_eyes
 
 | Item | Value |
 |---|---|
-| Size | 323,438 bytes |
-| SHA-256 | `72934e52dbb0d4c90abc00d97fa3b4bf239c5407da984ff5e8be1b8ba4e67d74` |
+| Size | 330,824 bytes |
+| SHA-256 | `720afe210929c401e00aaac1dbbd8a469e4315c0327adfe1b82afb479795d373` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0806 units, so the ear tips are at z = 1.0806. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the edits below, flat faces, no custom normals, and the surface of `sa.add_surface()` (below). 2,853 vertices and 3,074 faces (2,631 quads and 443 triangles, 5,705 triangles), 42 faces of them gloss (the nose) |
+| Mesh | One object `rabbit`: the FBX mesh with the edits below, flat faces, no custom normals, and the surface of `sa.add_surface()` (below). 2,981 vertices and 3,202 faces (2,759 quads and 443 triangles, 5,961 triangles), 42 faces of them gloss (the nose) |
 | Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size 0.200104 units (0.286547 m) and the direction (±0.7526, -0.6512, 0.0974) of the last rig. Each middle lies on the flat eye area of the head on the eye axis in the bind: (0.0666, -0.0625, 0.7390) and (-0.0672, -0.0630, 0.7390) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
@@ -359,6 +359,129 @@ The bones, the weights, the bind, and the eyes:
   - The middle of each eye object then moves along its axis onto the new surface in the bind (left
     -0.0058, right -0.00506 units), with `se.place_eyes()`. The sharp edges of each eye area (above
     30°) go from 26 to 6 on the left and from 28 to 7 on the right.
+- **Arm roots.** On each side, no vertex lay between the trunk loop and the shoulder ring of the
+  source. 8 large quads closed the gap (mean area 0.0015, tube faces 0.0002), and 8 quads and 8
+  triangles joined the shoulder ring to the first tube ring. In a bent arm, these flat faces cut
+  across the inside of the bend. Below, s is the distance from the shoulder joint along the upper
+  arm bone, and each list goes around the arm in the order of its 16 columns.
+  - The trunk loops (s -0.009 to 0.012): right 247, 248, 408, 407, 1448, 991, 992, 1801, left 55,
+    54, 1698, 799, 1152, 1153, 111, 112. The shoulder rings (|x| 0.1223, s 0.047): right 1512,
+    1215, 405, 406, 338, 337, 1316, 1800, left 56, 53, 1072, 1890, 1505, 466, 469, 795. Vertex k
+    of each list is column 2k.
+  - The 8 quads of each gap (right 145, 562, 626, 730, 1071, 1651, 1968, 2140, left 20, 493,
+    749, 754, 1115, 1161, 2015, 2191) and the 16 faces from each shoulder ring to the first ring
+    (right 540, 681, 751, 756, 862, 1046, 1299, 1516, 1532, 1536, 1539, 1547, 1644, 2200, 2202,
+    2228, left 236, 468, 861, 863, 941, 1296, 1300, 1332, 1336, 1535, 1537, 1554, 1645, 1646,
+    1836, 2293) go, and then their loose edges.
+  - A copy of `tripo/rabbit.fbx` gives the source surface: the turn 90° about x, the scale
+    1.001957, and a rise of 0.0806 put its trunk loops and shoulder rings on those of the mesh
+    within 0.001 mm. The copy goes after the work.
+  - Each shoulder ring gets a vertex in each odd column: a ray from the bone axis at s 0.047, at
+    the angle of the odd vertex of the first ring, meets the source on the edge of the ring.
+    Right 2853 (-0.1223, -0.0234, 0.5465), 2854 (-0.1223, 0.0057, 0.5467), 2855 (-0.1223, 0.0270,
+    0.5649), 2856 (-0.1223, 0.0192, 0.5927), 2857 (-0.1223, -0.0012, 0.6067), 2858 (-0.1223,
+    -0.0230, 0.6048), 2859 (-0.1223, -0.0414, 0.5900), 2860 (-0.1223, -0.0465, 0.5637). Left 2909
+    (0.1223, 0.0049, 0.5468), 2910 (0.1223, -0.0240, 0.5463), 2911 (0.1223, -0.0464, 0.5634), 2912
+    (0.1223, -0.0415, 0.5899), 2913 (0.1223, -0.0225, 0.6041), 2914 (0.1223, -0.0002, 0.6059), 2915
+    (0.1223, 0.0206, 0.5922), 2916 (0.1223, 0.0270, 0.5649).
+  - Each trunk loop edge gets a vertex in the odd column, at the middle of the edge. Two of them
+    are at 0.7 of the edge from a sharp corner of the loop (right 2967 from 407 to 408, left 2980
+    from 112 to 55), so that no thin face stays at the corner. Right 2965 (-0.0861, -0.0254,
+    0.5356), 2966 (-0.0861, 0.0059, 0.5366), 2967 (-0.0822, 0.0252, 0.5473), 2968 (-0.0714,
+    0.0254, 0.5904), 2969 (-0.0685, 0.0020, 0.6148), 2970 (-0.0675, -0.0245, 0.6109), 2971
+    (-0.0695, -0.0489, 0.5845), 2972 (-0.0793, -0.0509, 0.5503). Left 2973 (0.0861, 0.0049,
+    0.5366), 2974 (0.0861, -0.0274, 0.5356), 2975 (0.0793, -0.0528, 0.5503), 2976 (0.0695,
+    -0.0509, 0.5845), 2977 (0.0675, -0.0254, 0.6100), 2978 (0.0685, 0.0029, 0.6139), 2979
+    (0.0714, 0.0264, 0.5904), 2980 (0.0822, 0.0252, 0.5473).
+  - Three rings of 16 vertices fill each gap. Vertex j of a ring lies where a ray from the bone
+    axis through the point at 0.25, 0.5, or 0.75 of the way from the trunk loop to the shoulder
+    ring in column j meets the source (the start of an odd column is the middle of its trunk
+    loop edge). The mean s of the rings is 0.0126, 0.0242, and 0.0357. All new vertices lie on
+    the source surface, so the T-pose form does not change.
+    - Right, ring 1: 2861 (-0.0944, -0.0426, 0.5405), 2862 (-0.0952, -0.0246, 0.5393), 2863
+      (-0.0959, -0.0088, 0.5366), 2864 (-0.0952, 0.0056, 0.5397), 2865 (-0.0944, 0.0215, 0.5420),
+      2866 (-0.0908, 0.0272, 0.5566), 2867 (-0.0871, 0.0347, 0.5713), 2868 (-0.0842, 0.0226,
+      0.5905), 2869 (-0.0812, 0.0127, 0.6109), 2870 (-0.0819, 0.0012, 0.6129), 2871 (-0.0827,
+      -0.0113, 0.6148), 2872 (-0.0812, -0.0241, 0.6093), 2873 (-0.0797, -0.0367, 0.6041), 2874
+      (-0.0827, -0.0464, 0.5857), 2875 (-0.0856, -0.0572, 0.5679), 2876 (-0.0900, -0.0505,
+      0.5532).
+    - Right, ring 2: 2877 (-0.1037, -0.0431, 0.5444), 2878 (-0.1042, -0.0238, 0.5426), 2879
+      (-0.1047, -0.0088, 0.5385), 2880 (-0.1042, 0.0054, 0.5426), 2881 (-0.1037, 0.0225, 0.5454),
+      2882 (-0.1013, 0.0260, 0.5599), 2883 (-0.0988, 0.0333, 0.5747), 2884 (-0.0969, 0.0199,
+      0.5905), 2885 (-0.0949, 0.0108, 0.6090), 2886 (-0.0954, 0.0004, 0.6109), 2887 (-0.0959,
+      -0.0117, 0.6129), 2888 (-0.0949, -0.0237, 0.6077), 2889 (-0.0939, -0.0352, 0.6031), 2890
+      (-0.0959, -0.0439, 0.5869), 2891 (-0.0978, -0.0548, 0.5718), 2892 (-0.1008, -0.0502,
+      0.5561).
+    - Right, ring 3: 2893 (-0.1130, -0.0435, 0.5483), 2894 (-0.1133, -0.0236, 0.5445), 2895
+      (-0.1135, -0.0088, 0.5405), 2896 (-0.1133, 0.0055, 0.5446), 2897 (-0.1130, 0.0235, 0.5488),
+      2898 (-0.1118, 0.0262, 0.5624), 2899 (-0.1106, 0.0318, 0.5782), 2900 (-0.1096, 0.0186,
+      0.5911), 2901 (-0.1086, 0.0088, 0.6070), 2902 (-0.1089, -0.0004, 0.6088), 2903 (-0.1091,
+      -0.0122, 0.6109), 2904 (-0.1086, -0.0233, 0.6062), 2905 (-0.1081, -0.0338, 0.6021), 2906
+      (-0.1091, -0.0421, 0.5882), 2907 (-0.1101, -0.0523, 0.5757), 2908 (-0.1116, -0.0486,
+      0.5599).
+    - Left, ring 1: 2917 (0.0944, 0.0215, 0.5420), 2918 (0.0952, 0.0047, 0.5397), 2919 (0.0959,
+      -0.0108, 0.5366), 2920 (0.0952, -0.0269, 0.5376), 2921 (0.0944, -0.0440, 0.5405), 2922
+      (0.0900, -0.0504, 0.5540), 2923 (0.0856, -0.0587, 0.5679), 2924 (0.0827, -0.0479, 0.5857),
+      2925 (0.0797, -0.0382, 0.6041), 2926 (0.0812, -0.0248, 0.6086), 2927 (0.0827, -0.0113,
+      0.6129), 2928 (0.0819, 0.0021, 0.6119), 2929 (0.0812, 0.0147, 0.6109), 2930 (0.0842, 0.0237,
+      0.5904), 2931 (0.0871, 0.0347, 0.5713), 2932 (0.0908, 0.0288, 0.5557).
+    - Left, ring 2: 2933 (0.1037, 0.0225, 0.5454), 2934 (0.1042, 0.0045, 0.5427), 2935 (0.1047,
+      -0.0108, 0.5385), 2936 (0.1042, -0.0263, 0.5395), 2937 (0.1037, -0.0440, 0.5444), 2938
+      (0.1008, -0.0479, 0.5577), 2939 (0.0978, -0.0558, 0.5718), 2940 (0.0959, -0.0449, 0.5869),
+      2941 (0.0939, -0.0362, 0.6031), 2942 (0.0949, -0.0241, 0.6072), 2943 (0.0959, -0.0117,
+      0.6109), 2944 (0.0954, 0.0014, 0.6099), 2945 (0.0949, 0.0127, 0.6090), 2946 (0.0969, 0.0211,
+      0.5903), 2947 (0.0988, 0.0333, 0.5747), 2948 (0.1013, 0.0292, 0.5583).
+    - Left, ring 3: 2949 (0.1130, 0.0235, 0.5488), 2950 (0.1133, 0.0047, 0.5447), 2951 (0.1135,
+      -0.0108, 0.5405), 2952 (0.1133, -0.0252, 0.5429), 2953 (0.1130, -0.0440, 0.5483), 2954
+      (0.1115, -0.0468, 0.5606), 2955 (0.1101, -0.0528, 0.5757), 2956 (0.1091, -0.0426, 0.5882),
+      2957 (0.1081, -0.0342, 0.6021), 2958 (0.1086, -0.0233, 0.6057), 2959 (0.1091, -0.0122,
+      0.6090), 2960 (0.1089, 0.0006, 0.6079), 2961 (0.1086, 0.0108, 0.6070), 2962 (0.1096, 0.0200,
+      0.5909), 2963 (0.1106, 0.0318, 0.5782), 2964 (0.1118, 0.0283, 0.5616).
+  - Faces: 16 quads in each row from the trunk loop to the first tube ring, 80 on each side. Each
+    trunk face on a trunk loop edge takes the new vertex of that edge. The trunk faces around
+    each new vertex then take the split into quads and triangles with the largest smallest
+    corner at rest and in the bind, and with the smallest bend between neighbor faces in the
+    moments of `pnpm pose-preview violinist`. The trunk faces that touch the loops are now:
+    right (2965, 248, 249), (247, 2965, 249, 250), (249, 248, 2966, 766), (766, 2966, 408),
+    (810, 759, 408, 2967), (2967, 407, 810), (390, 810, 407, 2968), (2968, 1448, 390), (1448,
+    2969, 994, 390), (2969, 991, 994), (991, 2970, 993, 994), (2970, 992, 993), (2018, 993, 992,
+    2971), (2971, 1801, 2007, 2018), (667, 1801, 2972), and (247, 667, 2972); left (2973, 808,
+    55), (54, 851, 808, 2973), (851, 54, 2974), (1103, 851, 2974, 1698), (1698, 2975, 798),
+    (2975, 799, 798), (796, 799, 2976), (1151, 796, 2976, 1152), (1151, 1152, 2977), (1154, 1151,
+    2977, 1153), (1154, 1153, 2978), (2978, 111, 1154), (111, 110, 1154), (113, 110, 111, 2979),
+    (2979, 112, 113), (112, 2980, 113), and (2980, 55, 809, 113). The triangle (1801, 993, 992)
+    of the source had a corner of 15°, and its two new quads have no corner below 44°.
+  - Weights: each new ring and each shoulder ring takes one weight row (`sa.set_weight_row()`):
+    a ramp from the clavicle to the upper arm segments, with no trunk share. The upper arm share
+    splits over the segments by the place of the ring between the middles of the segments, as in
+    "Ring rows". The first tube ring keeps the upper arm alone.
+
+    | Ring | s | Clavicle | Upper arm segment 0 | Upper arm segment 1 |
+    |---|---|---|---|---|
+    | 1 | 0.0126 | 0.70 | 0.300 | 0 |
+    | 2 | 0.0242 | 0.55 | 0.343 | 0.107 |
+    | 3 | 0.0357 | 0.40 | 0.246 | 0.354 |
+    | Shoulder ring | 0.0473 | 0.20 | 0.045 | 0.755 |
+
+  - Each trunk loop vertex gives its upper arm share to `upper_arm_seg0` (its s is below the
+    middle of segment 0), and half of each trunk share (chest, spine1, neck, head) to the
+    clavicle. In the play, the app turns the clavicle forward up to 40° (right) and 16° (left).
+    With the full trunk share on the loop, the first row of each root folded in each play moment.
+    Each new trunk loop vertex takes the blend of the rows of its two loop neighbors at its place.
+    The rows of the loops are now: right 247 (clavicle 0.535, segment 0 0.255, spine1 0.118,
+    chest 0.092), 248 (0.518, 0.292, spine1 0.115, chest 0.075), 408 (0.543, 0.249, chest 0.126,
+    spine1 0.082), 407 (0.518, 0.417, chest 0.065), 1448 (0.487, 0.378, head 0.069, neck 0.066),
+    991 (0.381, 0.538, neck 0.081), 992 (0.474, 0.383, neck 0.075, head 0.068), 1801 (0.552,
+    0.283, chest 0.107, head 0.059); left 55 (0.543, 0.249, chest 0.126, spine1 0.082), 54 (0.515,
+    0.294, spine1 0.115, chest 0.075), 1698 (0.525, 0.263, spine1 0.119, chest 0.093), 799 (0.513,
+    0.311, chest 0.112, spine1 0.064), 1152 (0.453, 0.400, neck 0.075, head 0.072), 1153 (0.372,
+    0.544, neck 0.084), 111 (0.484, 0.379, neck 0.069, head 0.069), 112 (0.517, 0.418, chest
+    0.065).
+  - The new faces of each root have a mean area of 0.0002, as the tube faces, and no corner below
+    18°. In the app rest, each new ring keeps 95 to 97 % of its girth in the bind. `pnpm
+    fold-probe violinist` stays at 12.2 % of the play samples with a fold and at most 2 faces, and
+    no root face folds. The 8 sides of the source section and the near right angle where the arm
+    meets the trunk stay, because each new vertex lies on the source surface.
 
 The facts of the body:
 
