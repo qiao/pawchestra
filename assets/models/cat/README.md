@@ -139,10 +139,10 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 721,044 bytes |
-| SHA-256 | `3955d0f0bdd87285d04f2aa5f34c34be26b4dcbc1b718b8ff465bdaa628033be` |
+| Size | 685,060 bytes |
+| SHA-256 | `2b6d281993f09a7695f602edeb108af29ea4c3b5e560a6b1c9ea49ca0b9129db` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
-| Faces | 6,451 triangles, of them 35 gloss (the nose) |
+| Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
 | Footprint | The seated violist is 0.673 m deep and 0.708 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
@@ -155,12 +155,12 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 387,514 bytes |
-| SHA-256 | `605bc82d8013ed1a204504b79d43fee8e4184b6ec802fe4dbc4e194290dad5b2` |
+| Size | 378,198 bytes |
+| SHA-256 | `188aa2e7dde704af23f66c7dbc8c9b94be4d25bbf5b58114405fa16eee61f11f` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
-| Mesh | One object `cat`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `add_surface(..., eye_fans=False)` of `tools/blender/studio_armature.py` with the base color JPEG: the face attributes `color` and `color_base` and a gloss nose. 3,239 vertices and 3,459 faces (2,992 quads and 467 triangles, 6,451 triangles), 35 of them gloss |
+| Mesh | One object `cat`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `add_surface(..., eye_fans=False)` of `tools/blender/studio_armature.py` with the base color JPEG: the face attributes `color` and `color_base` and a gloss nose. 3,090 vertices and 3,344 faces (2,807 quads and 537 triangles, 6,151 triangles), 35 faces of them gloss |
 | Eyes | The objects `eye_L` and `eye_R` (`tools/blender/studio_eyes.py`), children of the bone `head`, with the size (0.288572 units) and the direction (±0.6219, -0.7827, 0.0208) of the eyes of the old `cat.blend`. Each middle lies on the smooth eye socket, where the axis meets the head surface. `fit_eyes()` levels them in the bind, with the middles at (±0.0756, -0.1959, 0.9325) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, 0, -1), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`fix_rolls()`). The Action `bind` holds the seated bind at frame 1 (below) |
@@ -271,6 +271,9 @@ The edits of the mesh, in the order of the work:
   thigh is 1.6 and the shin 2.30 times as long along its bone, and each foot keeps its size
   (`stretch()` of `rig_mesh.py`, by the leg weights). The body rises 0.1227 units, and the bones
   move with the mesh.
+- **Whiskers.** The Decimate of Blender (collapse, ratio 0.4) on the 5 whisker strands only
+  takes them from 243 vertices and 465 triangles to 94 vertices and 165 triangles. The 2x face
+  crops show the same whiskers with fewer bends.
 
 The legs, in meters (1.588737 m for each unit), with the old file in parentheses: in the
 seated bind of the seat rules of `cat.json`, the seat top is 0.3010 m (0.3002 m), the thigh is
@@ -284,8 +287,7 @@ The fixes of the weights, in the studio axes of the source:
 - **Thighs.** No thigh weight above up 0.20, then 12 rounds of Smooth from up 0.10 to 0.25.
 - **Head, neck, ears, whiskers.** No head weight on the shoulder tops (|x| above 0.075, up below
   0.665), no neck weight above up 0.715, and no ear weight below up 0.865, each with 2 rounds of
-  Smooth of its edge. The gloss nose and the 243 vertices of the whiskers take the head bone
-  alone.
+  Smooth of its edge. The gloss nose and the vertices of the whiskers take the head bone alone.
 - **Tail root.** No tail weight on the body in front of forward 0.01 or above up 0.31, then 3
   rounds of Smooth of the root band.
 - **Paws.** No wrist helper or forearm segment beyond |x| 0.4025, 2 rounds of Smooth of the wrist
