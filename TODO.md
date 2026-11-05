@@ -156,6 +156,8 @@ passes.
       upper arms 13.0 cm into the trunk in the play (5.4 cm and 6.8 cm at 1.15 m), and the forearms
       slope down to the keys. Fit `HANDS_HOLDS.piano` to the larger bear (the elbow poles, the
       bench, the key distance) with the new polar bear body. A lean of 12° made it deeper.
+- [ ] Polar bear pianist: from the front, the open lid hides the paws. The head of the larger bear
+      shows over the lid.
 - [ ] Polar bear pianist: at the far keys, the outer upper arm stands 36° to 41° out from the round
       trunk (piano-technique).
 - [ ] Polar bear pianist: at rest, the paws lie 8 cm to 10 cm below the key top, on the lower belly,
