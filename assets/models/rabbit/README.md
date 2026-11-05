@@ -125,7 +125,7 @@ run gives the same bytes.
 | Item | Value |
 |---|---|
 | Size | 729,784 bytes |
-| SHA-256 | `880c2cfe72bacc18c83afef00da3b043c77fa6e60f85e7865230935c8ce92aa3` |
+| SHA-256 | `49a88e85cebc10c9ce76d602067c5f6815d814da022d43a8a3caf4a307021da1` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 337,837 bytes |
-| SHA-256 | `185cf6b37f1e8f0ddf55618dc855a9a2096862e6c440d148515b3fabe8d600f0` |
+| Size | 337,798 bytes |
+| SHA-256 | `a0c2c4f13aae960c10bde3ae6dc99296a8270c928c66d3f6c10e056635d5b377` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -241,7 +241,13 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   from 0.105 units in front of the trunk middle at the hips (up 0.31 of the bind) to 0.08 units at
   the seat (up 0.23), less to the sides, then the moved vertices and their ring take 8 Taubin
   rounds (0.5, -0.53). 48 vertices move, at most 9.5 cm. The lower belly of the mesh turns down
-  between the seated thighs, and the app showed it as a dark wedge at the crotch.
+  between the seated thighs, and the app showed it as a dark wedge at the crotch. The push
+  pressed the lower half of the small lump at the bottom of the belly flat onto the line, so that
+  its faces folded over each other (edges of 140° to 159° between the triangles of vertices 1901,
+  1283, 1284, 1869, and 1903), and the app showed a pinch at the middle of the lap. Then the 22
+  vertices within 0.035 units of the bind point (0, -0.095, 0.279) take 30 plain Laplacian rounds
+  of the share 0.4 times a falloff (1.5 times the smooth step to 0 at the radius, at most 1),
+  added to the key: at most 1.6 cm. The sharpest edge of the lap is now 66°.
 - **`bind_neck`.** Each vertex of the front of the neck between the chest and the chin (|x| below
   0.08) moves forward by 0.6 of its gap behind the line from the chest front (vertex 1628) to the
   chin front (vertex 689) at the middle, less to the sides, then 4 Taubin rounds. 27 vertices
