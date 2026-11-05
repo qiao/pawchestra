@@ -446,7 +446,9 @@ Blender) reads it and writes `<s>.rig.glb` in the format of "Mesh rig". Thus `pn
 the app, and the gates (`arm-check`, `cast-matrix`, `pose-depth`, `close-views`) do not change.
 Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, so a rule for one
 fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows
-in Blender before the export. The cat is the pilot. The other bodies keep `rig-mesh`, and it gets
+in Blender before the export. A pose in Blender skins from the T-pose and the app from the bind, so
+`pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
+export of the open `.blend`, with the bind as its rest. The cat is the pilot. The other bodies keep `rig-mesh`, and it gets
 no new rules.
 
 ```text
