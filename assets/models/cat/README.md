@@ -5,10 +5,10 @@ This folder holds the T-pose source mesh of the cat, the rig made by hand in Ble
 files. It loads the module `src/models/studio/cat.ts`, which this chain writes:
 
 ```text
-cat-tpose.glb                      source mesh
+tripo/cat-tpose.fbx                source mesh with quad faces
    │  work by hand in Blender (design 4.4, "Hand rig")
    v
-cat.blend                          mesh, face colors, armature, bind, and keys
+cat.blend                          mesh, face colors, armature, weights, eyes (bind and keys: phase B)
    │  pnpm rig-export cat
    v
 cat.rig.glb + cat.rig.json         rigged mesh and its text summary
@@ -17,11 +17,17 @@ cat.rig.glb + cat.rig.json         rigged mesh and its text summary
 src/models/studio/cat.ts           studio body of the app
 ```
 
+`cat.blend` is in phase A of a rebuild from `tripo/cat-tpose.fbx`: it has the mesh, the colors,
+the armature, the weights, and the eyes, and no bind, keys, or facts of the body yet. So
+`pnpm rig-export cat` stops on it, and `cat.rig.glb`, `cat.rig.json`, and
+`src/models/studio/cat.ts` still come from the hand rig of `cat-tpose.glb` (the `cat.blend` of
+commit 7c9e8074, described in the sections of `cat.rig.glb`). Phase B keys the bind and exports
+the new rig.
+
 `cat-arms.glb`, `cat-weights.json`, and `cat-root-weights.json` are the inputs of the old chain
 of `tools/mesh-rigs/cat.json`. `pnpm rig-mesh cat` stops now, because the folder holds
 `cat.blend`. Each value of the hand rig lives only in `cat.blend`, and the tools read it from the
-export (design 4.4, "Hand rig"). The bind of `cat.blend` started from the seat rules of
-`cat.json`.
+export (design 4.4, "Hand rig").
 
 `docs/agents/rigging.md` gives the steps of a hand rig. The target of the form is the sheet
 `docs/reference/cat-views.png`. The cat has the same pea eyes as the fox and the rabbit: the eye
@@ -36,8 +42,8 @@ objects of `cat.blend` place them.
 | `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
 | `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
-| `cat.blend` | Made by hand in Blender from `cat-tpose.glb` (below). License as `cat-tpose.glb` | None: edit it in Blender |
-| `cat.rig.glb` | Export of `cat.blend`. License as `cat-tpose.glb` | `pnpm rig-export cat` |
+| `cat.blend` | Made by hand in Blender from `tripo/cat-tpose.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `cat.rig.glb` | Export of the `cat.blend` of commit 7c9e8074 (from `cat-tpose.glb`). License as `cat-tpose.glb` | `pnpm rig-export cat` on that file |
 | `cat.rig.json` | Text summary of the export, for diffs | The same run |
 
 ## cat-tpose.glb
@@ -149,11 +155,12 @@ the same bytes.
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_L`, `arm_raise_R`, `arm_raise_L2`, and `arm_raise_L3` of the elbows and the left wrist |
 | Tail | In the seated bind, the root of the tail goes left along the back of the haunch, and the tail curls up beside the left hip on the seat. The footprint of the seated cat is 0.652 m deep and 0.704 m wide (0.633 m and 0.704 m on the rig of `rig-mesh`) |
 
-## cat.blend
+## The cat.blend of commit 7c9e8074
 
 The rig of the cat, made by hand in Blender from `cat-tpose.glb` (design 4.4, "Hand rig"), with
 the seated bind (the Action `bind`), its fix (the key `bind_sit`), the pea eyes, and the facts of
-the body.
+the body. `cat.rig.glb` comes from it. The new `cat.blend` (below) replaces it, and phase B
+removes this section.
 
 | Item | Value |
 |---|---|
@@ -306,3 +313,122 @@ in the studio axes of the sections above (y up, z forward):
   unit, the seat top is 0.300 m high (0.151 m with the legs of the source), the thigh is 0.205 m
   long, and the shin 0.222 m. The wider legs keep the hip width (0.53 m) and the shin width
   (0.14 m) of the cat of `pnpm rig-mesh`. Long legs with the width of the source look thin.
+
+## cat.blend
+
+The hand rig of the cat (design 4.4, "Hand rig"), made in Blender 5.2 from `tripo/cat-tpose.fbx`.
+This is phase A: the mesh, the colors, the armature in the rest, the weights, and the pea eyes.
+The bind (the Action `bind`), the keys `bind*` and `arm_raise_*`, the facts of the body, `seat`,
+and `hinges` come in phase B, before the export.
+
+| Item | Value |
+|---|---|
+| Size | 366,902 bytes |
+| SHA-256 | `495538bdad97169f24657a2b1eb87f73119e3cd49a6ab3d064c4520d50c00166` |
+| Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
+| License | CC BY-NC 4.0, as the FBX file |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
+| Mesh | One object `cat`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `add_surface(..., eye_fans=False)` of `tools/blender/studio_armature.py` with the base color JPEG: the face attributes `color` and `color_base` and a gloss nose. 3,239 vertices and 3,459 faces (2,992 quads and 467 triangles, 6,451 triangles), 35 of them gloss |
+| Eyes | The objects `eye_L` and `eye_R` (`tools/blender/studio_eyes.py`), children of the bone `head`, placed in the rest pose (the file has no bind yet). The size (0.288572 units) and the direction (±0.6219, -0.7827, 0.0208) are those of the eyes of the old `cat.blend`. Each middle lies on the smooth eye socket, where the axis meets the head surface: (±0.0756, -0.2044, 0.9319) |
+| Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
+| Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the property `palm` (0, 0, -1). The Z axis of each bone points to its hint: `fix_rolls()` changes no bone (the largest change of a matrix entry is 1.2e-6) |
+| Weights | Automatic weights and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
+
+The joints, in the studio axes of the source (x, up, forward), before the stretch of the legs:
+
+- **Trunk and head.** The joints of `tools/mesh-rigs/cat.json`, with the head end on the top of
+  the skull (0, 0.9119, 0.08) and the ear tips (±0.155, 0.998, 0.163).
+- **Arm.** The shoulder (0.085, 0.600, 0.094) on the axis of the upper arm. The elbow
+  (0.2413, 0.5997, 0.0956) is the middle of the ring at x 0.2413: the center lines of the upper
+  arm and of the forearm meet at x 0.232. The wrist (0.3795, 0.5992, 0.1254) is the middle of the
+  ring at x 0.3795, on the color line of the paw. The fingers go from (0.445, 0.588, 0.137) to
+  the paw tip (0.4765, 0.590, 0.137).
+- **Leg.** The hip (0.093, 0.185, 0.08), the knee (0.0934, 0.1059, 0.0773) on the middle knee
+  ring, the ankle (0.099, 0.048, 0.078) on the color line of the foot, and the toes from
+  (0.115, 0.018, 0.13) to (0.118, 0.008, 0.168).
+- **Tail.** The root (0, 0.215, -0.035), the bend (0, 0.125, -0.16), and the end
+  (0, 0.245, -0.222), each in the middle of the tail tube on a cut at x = 0.
+
+The edits of the mesh, in the order of the work:
+
+- **Import.** No vertices merge at 1e-5. The 2 extra triangles at the outer corners of the eyes
+  lay over the surface, each with one open edge and two edges of three faces: they go. 8 open
+  edges remain in a slit under the nose (the nostrils, a part of the form), and 2 on one whisker.
+- **Arm rings.** The arm had a ring every 0.035 units (about 0.8 arm radii) from x 0.172 to
+  0.353, then at 0.380, 0.390, and 0.400. A loop cut halfway between each two rings from x 0.206
+  to 0.380 (x 0.2235, 0.2586, 0.2958, 0.3344, 0.3662) gives rings about 0.4 radii apart, with
+  5 rings within one radius of the elbow and of the wrist. The cut at x 0.189 is not done: the ring
+  at x 0.172 is not planar, and the cut made a half ring. Each new vertex lies on an old edge,
+  with the mix of the UVs. A quad gives two quads, and a triangle a triangle and a quad.
+- **Knee rings.** The knee had 3 rings of 9 and 10 vertices (up 0.126, 0.106, 0.080) in an
+  irregular thigh. Two loop cuts at 0.116 and 0.093 give 5 rings within one leg radius. The
+  thigh above them keeps the flow of the source.
+- **Ankle line.** A planar cut at up 0.048 goes around each foot, where the texture goes from the
+  gray fur to the white paw (the middle lightness). Each face of five corners that a cut made
+  splits into a quad and a triangle (2 at the knees, 4 at the ankles).
+- **Colors.** One color line at each wrist and each ankle: the faces on the arm side of the ring
+  at x 0.380, and above the ankle cut, take the main fur color of the forearm or of the shin, and
+  the gray faces on the other side take the white of the paw. The pink pads keep their colors.
+  Then the plain fur takes the move of `colors.tone` of `cat.json` (`tone()` of
+  `tools/blender/rig_mesh.py`), with the paws and the feet beyond the lines kept: 2,208 faces.
+- **Eye sockets.** Each old eye of the mesh is a ball with a textured eye in a groove. 54 and 55
+  vertices in an ellipse of 0.0525 by 0.0375 units around the pupil (in the plane of the eye,
+  within 0.03 units of it) take 10 rounds of the Smooth of Blender with the factor 0.5, with the
+  ring around them fixed. A vertex moves at most 0.0174 units. No dark almond shows around the
+  pea eyes (`reports/2026-11-04-cat2/face/`).
+- **Brow.** 15 vertices of the sharp edges above the eyes move toward the mean of their
+  neighbors, at most 0.010 units, with the rule and the box of the old file (edges above 20°,
+  |x| 0.015 to 0.10, up 0.832 to 0.88). The bridge of the nose made a slanted edge of 46° above
+  each inner eye corner.
+- **Legs.** First an even offset outward from the bone axes, so that the bulge of the haunch keeps
+  its form: the thigh grows 0.044 units, faded in from 1.0 thigh lengths above the hip joint to
+  0.2 below it, and the shin grows 0.044 units at the knee, 0.027 at its middle, and 0 at the
+  ankle. The back of the thigh keeps its place, and near the crotch the inner side keeps its
+  place and the outer side grows 1.15 times. A factor across the axes made sharp fins at the
+  outer haunch and a ledge where the thigh met the belly, in the rest and in the bind. Then the
+  thigh is 1.6 and the shin 2.30 times as long along its bone, and each foot keeps its size
+  (`stretch()` of `rig_mesh.py`, by the leg weights). The body rises 0.1227 units, and the bones
+  move with the mesh.
+
+The legs, in meters (1.588737 m for each unit), with the old file in parentheses: in the
+seated bind of the seat rules of `cat.json`, the seat top is 0.3010 m (0.3002 m), the thigh is
+0.201 m (0.205 m) and the shin 0.213 m (0.222 m) long, and the seated cat is 1.651 m (1.675 m)
+high. The shin factor is 2.30, because 2.32 put the seat top at 0.3025 m. In the rest, the mid
+thigh is 0.571 and the mid shin 0.399 of the width of the head at the eyes (0.439 and 0.290; the
+source 0.304 and 0.22), and the hips are 0.625 m wide (0.539 m).
+
+The fixes of the weights, in the studio axes of the source:
+
+- **Thighs.** No thigh weight above up 0.20, then 12 rounds of Smooth from up 0.10 to 0.25.
+- **Head, neck, ears, whiskers.** No head weight on the shoulder tops (|x| above 0.075, up below
+  0.665), no neck weight above up 0.715, and no ear weight below up 0.865, each with 2 rounds of
+  Smooth of its edge. The gloss nose and the 243 vertices of the whiskers take the head bone
+  alone.
+- **Tail root.** No tail weight on the body in front of forward 0.01 or above up 0.31, then 3
+  rounds of Smooth of the root band.
+- **Paws.** No wrist helper or forearm segment beyond |x| 0.4025, 2 rounds of Smooth of the wrist
+  band (|x| 0.36 to 0.41), and the fingers keep half of their weight. The 6 vertices on the
+  fingers bone alone take hand 0.5 and fingers 0.5.
+- **Elbows.** 8 rounds of Smooth on the band of each elbow (|x| 0.19 to 0.30), then 30 rounds on
+  the front half of the band (forward above 0.09, |x| 0.19 to 0.31), where the forearm bends in.
+- **Shoulders.** 6 rounds of Smooth on the arm roots (|x| 0.08 to 0.19), then the 7 vertices
+  under each arm root (|x| 0.09 to 0.135, up 0.525 to 0.59, forward 0 to 0.16) take one mean
+  weight.
+- **Crotch.** After the leg stretch, 16 rounds of Smooth on the vertices of the front with a
+  thigh share of 0.02 to 0.98 and |x| below 0.11.
+
+The folds of the test poses of the last round (arms down 80°, the elbow at 90° and 130°, the bow
+arm, the sit with the thigh at 90°): the triangles whose normal turns more than 60° and more
+than 90° from the turn of the main bone of their face. The old file had a mesh of triangles, so
+both count triangles. The sit of the old file had the legs of the source. The column with the
+legs of the source has no crotch fix.
+
+| Pose | Old file | This file, legs of the source | This file, long legs |
+|---|---|---|---|
+| Arms down | 12 / 6 | 14 / 1 | 14 / 1 |
+| Elbow 90° | 29 / 24 | 28 / 7 | 28 / 7 |
+| Elbow 130° | 50 / 33 | 47 / 15 | 47 / 15 |
+| Bow | 39 / 24 | 33 / 17 | 33 / 17 |
+| Sit | 26 / 14 | 21 / 14 | 28 / 12 |
+
+The forearm turns of ±90°, the head turn of 30°, and the tail swing fold no triangle.
