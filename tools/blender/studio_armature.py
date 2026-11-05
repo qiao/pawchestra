@@ -20,7 +20,8 @@ rules of the config (`bind_turns()`). With `--auto-weights`, the mesh takes the 
 Blender, at most four bones for each vertex. `--drive` keys the arm segments and the helpers of the
 Action `bind` by the rule of the app, and `--rolls` gives each bone the roll of its hint. The
 command line runs headless only. In a live Blender, import this module and call `add_surface()`,
-`drive_segments()`, `fix_rolls()`, and `set_weight_row()` (one vertex).
+`drive_segments()`, `fix_rolls()`, `set_weight_row()` (one vertex), and `ring_spread()` (the
+shares of the weights across each edge ring of a limb).
 """
 
 import json
@@ -253,6 +254,130 @@ def set_weight_row(ob, index, row):
         group.add([index], weight / total, 'REPLACE')
     ob.data.update()
     return {name: weight / total for name, weight in kept}
+
+
+#: The share of the twist of the forearm (from the forearm to the paw) that each bone of the left
+#: arm takes in the app (`poseSegments()` of `src/models/studio-rig.ts`): the segment k takes
+#: (k + 0.5) / 4, the wrist helper and the paw all, the twist bone of a body with no segments
+#: half (`TWIST_SHARE`). Each other bone takes none.
+FORE_TWIST = {
+    **{f'forearm_seg{k}': (k + 0.5) / 4 for k in range(4)},
+    'forearm_twist': 0.5,
+    'wrist': 1.0,
+    'hand': 1.0,
+    'fingers': 1.0,
+}
+
+#: The share of the roll of the upper arm from the chest that each bone of the arm takes in the
+#: app: the segment k takes (k + 0.5) / 4, and the elbow helper and each bone below it all.
+UPPER_ROLL = {
+    **{f'upper_arm_seg{k}': (k + 0.5) / 4 for k in range(4)},
+    'upper_arm': 1.0,
+    'elbow': 1.0,
+    'forearm': 1.0,
+    **{f'forearm_seg{k}': 1.0 for k in range(4)},
+    'forearm_twist': 1.0,
+    'wrist': 1.0,
+    'hand': 1.0,
+    'fingers': 1.0,
+}
+
+#: The limb parts of `ring_spread()`: the bone at the start of the part, the bone at its end, and
+#: the share of the twist of each bone.
+LIMB_PARTS = {
+    'upper_arm': ('upper_arm', 'forearm', UPPER_ROLL),
+    'forearm': ('forearm', 'hand', FORE_TWIST),
+}
+
+
+def ring_spread(ob, limb, along=0.5):
+    """Prints, for each edge ring of a limb of the mesh `ob` in the rest, from the joint at its
+    start (0) to the joint at its end (1), the mean and the spread (the largest less the smallest
+    value) across the ring of three shares of each vertex: the twist share (the share of the twist
+    of the part that the weights of the vertex follow in the app, `FORE_TWIST` and `UPPER_ROLL`),
+    the elbow share, and the wrist share (the weights of the helpers). `limb` is `upper_arm_<side>`,
+    `forearm_<side>`, or `arm_<side>` for both. A ring is a loop of the edges of the limb that turn
+    from its axis by more than `along` in cosine. Gives the rows. Safe in a live Blender."""
+    side = limb[-1]
+    parts = ('upper_arm', 'forearm') if limb[:-2] == 'arm' else (limb[:-2],)
+    if side not in 'LR' or any(p not in LIMB_PARTS for p in parts):
+        raise ValueError(f'{limb} is no limb: upper_arm_<side>, forearm_<side>, or arm_<side>.')
+    if ob.mode == 'EDIT':
+        ob.update_from_editmode()
+    rig = ob.find_armature()
+    me = ob.data
+    co = np.empty(len(me.vertices) * 3)
+    me.vertices.foreach_get('co', co)
+    co = co.reshape(-1, 3)
+    names = {g.index: g.name for g in ob.vertex_groups}
+    weights = [{names[g.group]: g.weight for g in v.groups if g.weight > 0} for v in me.vertices]
+    weights = [{n: w / sum(row.values()) for n, w in row.items()} for row in weights]
+    edges = np.empty(len(me.edges) * 2, int)
+    me.edges.foreach_get('vertices', edges)
+    edges = edges.reshape(-1, 2)
+    arm = {n for n in rig.data.bones.keys() if n.endswith(f'_{side}')}
+
+    rows = []
+    for part in parts:
+        start, end, shares = LIMB_PARTS[part]
+        head = np.array(rig.data.bones[f'{start}_{side}'].head_local)
+        axis = np.array(rig.data.bones[f'{end}_{side}'].head_local) - head
+        length = np.linalg.norm(axis)
+        axis = axis / length
+        t = (co - head) @ axis / length
+        radius = np.linalg.norm((co - head) - np.outer((co - head) @ axis, axis), axis=1)
+        on = np.array(
+            [
+                -0.05 <= t[v] <= 1.05
+                and radius[v] < 0.6 * length
+                and sum(w for n, w in weights[v].items() if n in arm) > 0.5
+                for v in range(len(co))
+            ]
+        )
+        way = co[edges[:, 1]] - co[edges[:, 0]]
+        across = np.abs(way @ axis) < along * np.linalg.norm(way, axis=1)
+        links = {}
+        for a, b in edges[across & on[edges[:, 0]] & on[edges[:, 1]]].tolist():
+            links.setdefault(a, []).append(b)
+            links.setdefault(b, []).append(a)
+        seen, rings = set(), []
+        for first in links:
+            if first in seen:
+                continue
+            ring, stack = [], [first]
+            seen.add(first)
+            while stack:
+                v = stack.pop()
+                ring.append(v)
+                for u in links[v]:
+                    if u not in seen:
+                        seen.add(u)
+                        stack.append(u)
+            if len(ring) >= 6:
+                rings.append(sorted(ring))
+        rings.sort(key=lambda r: t[r].mean())
+
+        twist = [sum(w * shares.get(n[:-2], 0.0) for n, w in row.items()) for row in weights]
+        print(f'ring_spread {part}_{side}: {len(rings)} rings, mean and spread of each share')
+        print(f'{"t":>6} {"n":>3}   twist spread   elbow spread   wrist spread   twist low/high')
+        for ring in rings:
+            values = {
+                'twist': np.array([twist[v] for v in ring]),
+                'elbow': np.array([weights[v].get(f'elbow_{side}', 0.0) for v in ring]),
+                'wrist': np.array([weights[v].get(f'wrist_{side}', 0.0) for v in ring]),
+            }
+            row = {
+                'part': part,
+                't': float(t[ring].mean()),
+                'vertices': ring,
+                **{k: (float(x.mean()), float(np.ptp(x))) for k, x in values.items()},
+                'low': ring[int(np.argmin(values['twist']))],
+                'high': ring[int(np.argmax(values['twist']))],
+            }
+            rows.append(row)
+            cells = '   '.join(f'{row[k][0]:5.3f}  {row[k][1]:5.3f}' for k in values)
+            print(f'{row["t"]:6.3f} {len(ring):3d}   {cells}   {row["low"]}/{row["high"]}')
+    return rows
 
 
 def image_pixels(img):
