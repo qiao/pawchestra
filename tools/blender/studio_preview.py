@@ -484,10 +484,12 @@ def _export(state):
 
 def clear_preview():
     """Removes the preview: its objects, its data, its Action, its markers, its collection, and
-    its handlers."""
+    its handlers. The 3D views and the render engine get back their settings of before
+    `shade_like_app()`."""
     state = _state()
     if state is not None:
         _markers(bpy.context.scene, {'moments': []}, state)
+        shade_like_app(False)
     _remove()
     _handlers(False)
     bpy.app.driver_namespace.pop(STATE_KEY, None)
@@ -604,8 +606,10 @@ SHADING = {
 
 def shade_like_app(on=True):
     """Shows each 3D view of the window in Material Preview with the scene lights, so that the
-    flat faces of the preview take the sun light from the direction of the app key light. With
-    `on` false, the views get back their settings of before. Gives the number of changed views."""
+    flat faces of the preview take the sun light from the direction of the app key light. A
+    Workbench scene takes EEVEE for this time, because Workbench has no Material Preview, and a
+    save writes Workbench into the file. With `on` false, the views and the engine get back their
+    settings of before. Gives the number of changed views."""
     state = _state()
     if state is None:
         raise RuntimeError('No preview: call load_preview() first.')
@@ -618,6 +622,7 @@ def shade_like_app(on=True):
         if space.type == 'VIEW_3D'
     ]
     saved = state.setdefault('shading', {})
+    _material_engine(on)
     shown = 0
     for k, space in enumerate(spaces):
         if on:
@@ -639,10 +644,30 @@ def shade_like_app(on=True):
     return shown
 
 
-def _save_pre(*_):
-    """Takes the preview out of the file before a save."""
+def _material_engine(on):
+    """Sets the render engine of the scene to EEVEE when it is Workbench, because a view has no
+    Material Preview with Workbench. With `on` false, the engine of before comes back."""
     state = _state()
-    if state is None or state.get('busy') or bpy.data.objects.get(RIG) is None:
+    render = bpy.context.scene.render
+    if on and render.engine == 'BLENDER_WORKBENCH':
+        engines = [item.identifier for item in render.bl_rna.properties['engine'].enum_items]
+        eevee = next((name for name in engines if name.startswith('BLENDER_EEVEE')), None)
+        if eevee is not None:
+            state['engine'] = render.engine
+            render.engine = eevee
+    elif not on and 'engine' in state:
+        render.engine = state.pop('engine')
+
+
+def _save_pre(*_):
+    """Takes the preview out of the file before a save, with the render engine of before."""
+    state = _state()
+    if state is None or state.get('busy'):
+        return
+    if 'engine' in state:
+        state['shade'] = True
+        _material_engine(False)
+    if bpy.data.objects.get(RIG) is None:
         return
     state['frame'] = bpy.context.scene.frame_current
     _markers(bpy.context.scene, {'moments': []}, state)
@@ -651,8 +676,10 @@ def _save_pre(*_):
 
 
 def _save_post(*_):
-    """Puts the preview back after a save."""
+    """Puts the preview and the engine of `shade_like_app()` back after a save."""
     state = _state()
+    if state is not None and state.pop('shade', False):
+        _material_engine(True)
     if state is None or not state.pop('stashed', False):
         return
     try:
