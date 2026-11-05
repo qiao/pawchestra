@@ -173,6 +173,20 @@ interface PreviewBone {
 /** The stance of the body in a moment: the bind of the export, or a stance of `studioRig()`. */
 type Stance = 'bind' | 'standing' | 'sitting';
 
+/** The stance of a model and its matrices of the bones, or `null` for the bind of the export. */
+interface StanceMatrices {
+  readonly stance: Stance;
+  readonly matrices: Float32Array | null;
+}
+
+/** The mesh of the app from the data of the GLB file, and its bind in the `.blend`. */
+interface FileMesh {
+  /** The mesh in the model axes, with the vertices in the order of the module. */
+  readonly mesh: StudioMesh;
+  /** X, y, z of each vertex in the bind pose of the GLB file, in the `.blend`. */
+  readonly bind: number[];
+}
+
 /** One moment of the file. */
 interface PreviewMoment {
   /** The name: the moment of `ROLE_VIEWS`, or the demo time, such as `163.50s`. */
@@ -605,10 +619,7 @@ function fileToBlend(): Matrix4 {
  * @param bound The studio body of the module.
  * @returns The stance and its matrices.
  */
-function stanceOf(
-  model: PlayerModel,
-  bound: StudioBody,
-): { readonly stance: Stance; readonly matrices: Float32Array | null } {
+function stanceOf(model: PlayerModel, bound: StudioBody): StanceMatrices {
   if (model.studio.body === bound) {
     return { stance: 'bind', matrices: null };
   }
@@ -661,7 +672,7 @@ function fixed(value: number): number {
  * @returns The bones by name.
  * @throws Error if a matrix in the `.blend` is not a rigid move.
  */
-function previewBones(frame: BlendFrame, matrices: Float32Array): Record<string, PreviewBone> {
+function previewBones(frame: BlendFrame, matrices: Float32Array): PreviewMoment['bones'] {
   const turns = new Map<StudioBone, Quaternion>();
   const out: Record<string, PreviewBone> = {};
   const m = new Matrix4();
@@ -709,7 +720,7 @@ function targetWeights(
   studio: StudioPose,
   raises: readonly string[],
   stance: Stance,
-): Record<string, number> {
+): PreviewMoment['targets'] {
   const out: Record<string, number> = {};
   for (const [k, name] of [...CORRECTIVE_NAMES, ...raises].entries()) {
     out[name] = fixed(studio.correctives[k] ?? 0);
@@ -751,12 +762,7 @@ function blendPoints(frame: BlendFrame, points: ArrayLike<number>): number[] {
  * @returns The mesh, and the place of each vertex in the bind pose of the GLB file, in the `.blend`.
  * @throws Error if a vertex of the GLB file is not at the place of the vertex of the module.
  */
-function fileMesh(
-  glb: Glb,
-  kept: readonly string[],
-  frame: BlendFrame,
-  app: StudioMesh,
-): { readonly mesh: StudioMesh; readonly bind: number[] } {
+function fileMesh(glb: Glb, kept: readonly string[], frame: BlendFrame, app: StudioMesh): FileMesh {
   const welded = weldMesh(glb, kept);
   // The export drops the faces of the old eyes, as `studioBody()` does.
   const eyes = eyeVertices(welded);
