@@ -139,10 +139,10 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 983,932 bytes |
-| SHA-256 | `272369e8208bf76c14cd04458b70f9cd4dffbb6a357730b6733edf68e26f3365` |
+| Size | 984,704 bytes |
+| SHA-256 | `760316fbdf8a71843f319ebe3b3219adf098c5c57f2b496b655492c4c84bb40b` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
-| Faces | 6,151 triangles, of them 65 gloss (the nose) |
+| Faces | 6,157 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_L`, `arm_raise_L2`, and `arm_raise_L3` (below) |
 | Footprint | The seated violist is 0.673 m deep and 0.706 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
@@ -155,12 +155,12 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 376,324 bytes |
-| SHA-256 | `438398af5a59a83590a7ed077d5695a8f014addaf8c897c6766cadb1aed08dd3` |
+| Size | 376,672 bytes |
+| SHA-256 | `08a7cb8e6022c51877647b5400bd58d3f767d35d00bd014c0b22ad991f905f5d` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
-| Mesh | One object `cat`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `add_surface(..., eye_fans=False)` of `tools/blender/studio_armature.py` with the base color JPEG: the face attributes `color` and `color_base` and a gloss nose. 3,090 vertices and 3,344 faces (2,807 quads and 537 triangles, 6,151 triangles), 35 faces of them gloss |
+| Mesh | One object `cat`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `add_surface(..., eye_fans=False)` of `tools/blender/studio_armature.py` with the base color JPEG: the face attributes `color` and `color_base` and a gloss nose. 3,093 vertices and 3,348 faces (2,809 quads and 539 triangles, 6,157 triangles), 35 faces of them gloss |
 | Eyes | The objects `eye_L` and `eye_R` (`tools/blender/studio_eyes.py`), children of the bone `head`, with the size (0.288572 units) and the direction (±0.6219, -0.7827, 0.0208) of the eyes of the old `cat.blend`. Each middle lies on the smooth eye socket, where the axis meets the head surface. `fit_eyes()` levels them in the bind, with the middles at (±0.0756, -0.1959, 0.9325) |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, 0, -1), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`fix_rolls()`). The Action `bind` holds the seated bind at frame 1 (below) |
@@ -350,6 +350,15 @@ The edits of the mesh, in the order of the work:
   most 0.0182 units. The mid thigh goes from 0.582 to 0.545 of the width of the head, the front
   of the thigh at up 0.20 from forward 0.177 to 0.161, and the shin, the joints, the leg lengths,
   and the feet stay. Each key keeps its move from the basis.
+- **Haunch cut.** In the seated bind, the back of the right haunch near the tail root was a flat
+  wall with a fan of long thin triangles down to one corner on the seat (vertex 765): the edges
+  765-762 and 794-795 were 0.121 and 0.099 units long. A cut of the edge ring 765-762, 794-795,
+  and 1617-2148 (`subdivide_edges()` of bmesh, 1 cut) adds the vertices 3090 to 3092, each with
+  the mean weights and keys of its edge. Each face of five corners at an end of the cut splits
+  into a quad and a triangle (3090 to 763, 3091 to 1616). In the bind, each new vertex then goes
+  to the middle of a cubic curve along its edge, with the tangents of the surface at the two ends
+  (out 0.0087, 0.0045, and 0.0013 units), and the move goes into `bind_sit` by the inverse of the
+  blended skin. No old vertex moves, and the rest stays.
 - **Whiskers.** The Decimate of Blender (collapse, ratio 0.4) on the 5 whisker strands only
   takes them from 243 vertices and 465 triangles to 94 vertices and 165 triangles. The 2x face
   crops show the same whiskers with fewer bends.
