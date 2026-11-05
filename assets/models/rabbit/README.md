@@ -125,7 +125,7 @@ run gives the same bytes.
 | Item | Value |
 |---|---|
 | Size | 723,004 bytes |
-| SHA-256 | `39debdefd8dbc8a04590c8828d8f93ca3d42848b0f3acf8706c77afd9e86d6f7` |
+| SHA-256 | `ea8aee408379d51d5bc3c6a7011a1b4dd6d90372542cdeb178530cbcf48f9ba5` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,799 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 331,241 bytes |
-| SHA-256 | `40ab78d93c8a4ed38e5b45cb191f5fb6aa4d646480c960a47764bb8c80f72349` |
+| Size | 331,242 bytes |
+| SHA-256 | `032215117029359cda4940b5005553b3441ed9d66332c84aaae2e3b6a762a122` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -175,6 +175,13 @@ The edits of the mesh, in the order of the work:
   edge neighbors, and a thin pink triangle (a corner below 25°) with at most one pink neighbor
   becomes fur. Each pink face takes the most common pink of its region, the gloss nose one pink,
   a mixed fur face the fur of its neighbors, and the whiskers the main fur color: 454 faces.
+  Then the plain fur of the attributes `color` and `color_base` takes the move of `colors.tone`
+  of `tools/mesh-rigs/rabbit.json` (`tone()` of `tools/blender/rig_mesh.py`: chroma 0.03 or
+  less, the move fades out from the lightness 0.985 to 0.995, the rows [0.6, -0.02, 0.003,
+  0.009] and [0.97, -0.028, 0.003, 0.009] of [L, dL, da, db] in Oklab, no bone kept), as the old
+  rig did: 2,836 faces. The main fur goes from Oklab (0.979, 0.003, 0.007) to (0.951, 0.006,
+  0.016), toward the cream of the fur swatch of `rabbit-views.png`. The pink faces have more
+  chroma, so they keep their colors.
 - **Eye sockets.** Each old eye is a ball with a textured eye in a groove. 56 and 54 vertices in an
   ellipse of 0.036 by 0.042 units around the middle of the dark eye faces (in the plane of the
   eye, within 0.03 units of it) take 10 rounds of the Smooth of Blender with the factor 0.5, with
