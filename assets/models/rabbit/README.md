@@ -143,8 +143,8 @@ colors, and `rabbit.rig.glb` and the module are the export of the last rig.
 
 | Item | Value |
 |---|---|
-| Size | 282,840 bytes |
-| SHA-256 | `c735106748eead2ed33f7686594ff7ab0af2b53e0d9d35798bb5098501d18daf` |
+| Size | 282,681 bytes |
+| SHA-256 | `532b353a7402387b0dfc78b0e4ad4a881bf5ae0713545defc9b185035266ff29` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -236,6 +236,15 @@ The edits of the mesh, in the order of the work. Each id is the id in the mesh b
 
   The girth of the source stays: the mid thigh is 0.452 and the mid shin 0.261 of the width of
   the head at the eyes (the source 0.449 and 0.262, the last rig 0.542 and 0.256).
+- **Arm lengths.** The upper arm and the forearm share the extra length: each bone is 1.1416
+  times as long as on the source (upper arm 0.1148 to 0.1311 units from the shoulder joint at |x|
+  0.075, forearm 0.1056 to 0.1205), and the wrist stays at |x| 0.3266, so the reach stays. The
+  elbow joint moves from |x| 0.1898 to 0.2061. Each ring moves along x by one translation, and
+  its girth stays. The rings of the upper arm are then 0.01585 units apart, and those of the
+  forearm 0.01125 units. The 15 rings go to |x| 0.1381, 0.1540, 0.1698, 0.1857, 0.2015, 0.2141,
+  0.2253, 0.2366, 0.2478, 0.2591, 0.2703, 0.2816, 0.2928, 0.3041, and 0.3153 (moves of +0.0031,
+  +0.0061, +0.0092, +0.0123, +0.0154, +0.0152, +0.0137, +0.0121, +0.0106, +0.0091, +0.0076,
+  +0.0061, +0.0046, +0.0030, and +0.0015 on both sides).
 
 The facts of the body on the armature, from the last rig:
 
