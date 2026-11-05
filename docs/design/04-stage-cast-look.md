@@ -210,8 +210,9 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
 - **Replacing body.** A new body of a species keeps three things of its old body in the app view:
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body
-  (a smaller head, a soft brow, thinner arms) made the cat differ from its own mesh, and its paws
-  then looked too large. The leg factors stretch the legs to the old seat, so the stretched legs take
+  (a smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked
+  too large. The soft brow of the cat is a product choice that its `.blend` holds ("Hand rig"), so
+  that the face reads happy. The leg factors stretch the legs to the old seat, so the stretched legs take
   a girth across their axes (`legGirth`) that keeps more of the stocky look of the legs of the
   mesh: of the girth variants, the one whose mid thigh and mid shin widths, as a share of the head
   height and of the hip width, are nearest to the mesh. The leg turns of the seat
