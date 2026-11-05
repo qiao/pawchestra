@@ -37,7 +37,7 @@ import { Matrix4, Vector3 } from 'three';
 
 import { armBinds } from './arm-shape.ts';
 import { FOLD_ROLES, findRole, isRole, probeFolds, roleAnimal } from './fold-probe.ts';
-import { rigConfigPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
+import { animalHandRig, rigConfigPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { keptCorners } from './rig-mesh.ts';
 import { setHolds } from './hold-sets.ts';
 import type { DemoFile } from './patch-demos.ts';
@@ -377,12 +377,18 @@ export function parseCorners(text: string): (SourceFace | null)[] {
  *
  * @param animal The animal of the studio body.
  * @returns The source face of each face of the module, or null.
- * @throws Error if the animal has no mesh rig, or if the run fails.
+ * @throws Error if the animal has no mesh rig or has a hand rig, or if the run fails.
  */
 export async function sourceCorners(animal: string): Promise<(SourceFace | null)[]> {
   const config = rigConfigPath(animal);
   if (!existsSync(config)) {
     throw new Error(`The ${animal} has no mesh rig.`);
+  }
+  const blend = animalHandRig(animal);
+  if (blend !== null) {
+    throw new Error(
+      `The ${animal} has the hand rig ${blend}, and the faces of its module do not come from the rig config.`,
+    );
   }
   const dir = mkdtempSync(join(tmpdir(), 'arm-look-'));
   const release = trackFolder(dir);
@@ -474,14 +480,16 @@ export function lookVerdict(value: number, limit: ArmLookLimit): 'FAIL' | 'PASS'
 }
 
 /**
- * Gives the roles of `--all`: each role of `FOLD_ROLES` whose animal has a mesh rig.
+ * Gives the roles of `--all`: each role of `FOLD_ROLES` whose animal has a mesh rig and no hand
+ * rig, because the faces of a hand rig do not come from its rig config.
  *
  * @returns The roles.
  */
 function meshRoles(): string[] {
   return [...FOLD_ROLES].flatMap(([name, role]) => {
     try {
-      return existsSync(rigConfigPath(roleAnimal(role))) ? [name] : [];
+      const animal = roleAnimal(role);
+      return existsSync(rigConfigPath(animal)) && animalHandRig(animal) === null ? [name] : [];
     } catch {
       return [];
     }
