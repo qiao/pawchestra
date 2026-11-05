@@ -74,6 +74,22 @@ Its clean rings and twist markers show a fault.
    `pnpm hold-reach <species>`, and `pnpm pose-depth <role>`. After a change of shared code,
    `pnpm body-probe --base <start>` shows no change of the other players.
 
+### Steps of a hand rig
+
+A hand rig (design 4.4, "Hand rig") replaces `rig-mesh` for one body. Its `.blend` holds the rig,
+and its mesh is the source of truth. In a live Blender, call only `add_surface()`, `fix_rolls()`,
+and `drive_segments()` of `tools/blender/studio_armature.py` (`import studio_armature as sa`).
+Its command line calls `read_factory_settings`, so run it headless only.
+
+1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>')` one time for the
+   face colors, the eye fans, and the gloss nose. A new species can start with the command line
+   ([`commands.md`](commands.md)), which also adds the armature and the Action `bind`.
+2. **Rig.** Put `palm`, `seat`, and `hinges` on the armature object. Fit the bones, run
+   `sa.fix_rolls(rig)`, and paint the weights (Limit Total 4, Normalize All). Pose the bind, run
+   `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and `arm_raise_*`.
+3. **Export.** Run `pnpm rig-export <s>`, `pnpm studio-body <s>`, and the gates. Diff
+   `<s>.rig.json` to see what moved.
+
 A new role adds in the same commit its entries in `SWEEP_ROLES` of `src/pose/test-sweep-roles.ts`,
 `FOLD_ROLES` of `tools/fold-probe.ts`, and `ROLE_VIEWS` of `tools/close-views.ts`, and its rows in
 the table above and in the pose index of design 5. Only the last commit of a rig series writes the
