@@ -254,14 +254,16 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The polar bear pianist: the T-pose mesh (design 4.4). The landmark is its standing shoulder
-  // joints (0.725 u at 1.5828 m for each unit). The height is small enough that the bear does not
-  // look too tall, and the body keeps the legs of the mesh. The crease angle, the blend, and the
-  // eye size are those of the bear.
+  // joints (0.725 u at 2.0576 m for each unit). The polar bear is the largest player: 1.3 times
+  // the height of 1.1475 m, at which it was no taller than the foxes. At the same piano, a larger
+  // bear reaches further down to the keys: at 1.4 and 1.5 times, the forearms slope down more and
+  // the bench stands higher. The body keeps the legs of the mesh. The crease angle, the blend, and
+  // the eye size are those of the bear.
   [
     'polar-bear',
     {
       landmark: 'shoulders',
-      height: 1.14751,
+      height: 1.491763,
       seated: true,
       soloist: false,
       constant: 'STUDIO_POLAR_BEAR',
