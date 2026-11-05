@@ -216,75 +216,34 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat violist: the left paw goes 2.1 cm into the viola in the play and the lift, near the
-      upper bout, as the separate claws of the A-pose body did (2.2 cm and 2.1 cm). At rest it
-      goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
-      separate claws, so `pnpm pose-depth` marks the pair `paws in viola` as GROWS. Check the paw
-      crops of the fifth position.
-- [ ] Cat armpits: with a hanging upper arm, a crease shows at the back of each arm root
-      (`reports/2026-11-04-cat2/phase-b/work/pitcmp.png`). The fix of the old key `bind_armpit`
-      changed no 2x crop, so `cat.blend` has no such key. Check the crease in the rest crops.
-- [ ] Cat forearms: each forearm ring now takes one mean weight (`cat.blend`), and no gate ran on
-      it. Run `pnpm arm-check violist trumpeter@cat --base 6ea78fbd` and `pnpm fold-probe
-      violist`. The keys `arm_raise_*` keep their bind moves from the old weights: refit them
-      with `pnpm raise-fit` if the inner elbow folds more.
-- [ ] Cat forearms: the bind twist of the left forearm grows in steps of 9° to 25° from ring to
-      ring, because the automatic weights give `forearm_seg2` most of the middle. Even steps of
-      about 16° would show a smoother turn.
-- [ ] Cat violist: at the frog, the right forearm folds onto the upper arm in a dark wedge at the
-      inner elbow, as before the ring weights. Check it in the stage camera.
-- [ ] Cat recast violinist: `pnpm cast-matrix --species cat` gives FAIL (OPEN on main), because
-      the hanging right upper arm goes 2.9 cm into the belly at rest and in the moves (limit
-      1.5 cm). The 4 keys `arm_raise_*` of `cat.blend` serve the violist and the trumpeter, so no
-      key is free for a rest shape of that arm. Try a rest that turns the right elbow out.
-- [ ] Cat recast roles: `pnpm arm-check violinist@cat trumpeter@cat --base main` gives the right
-      arm 5 folds (p95) at the front of the right armpit (2 on main, limit 8), a FAIL by the
-      margin. One mean weight on that front fixed the trumpeter and failed the violist (R 9).
-      The front of the right armpit has two slivers of a loop cut, and the left has one: try an
-      edge turn there in Blender.
-- [ ] Cat head height: the head measures start at the chin height of the old body
-      (`headFloor` 0.8214), so that `H` and each hold keep their sizes. The underside of the jaw
-      of the FBX mesh is 2.7 cm lower, which gives `H` 0.367 m. Ask the user if `H` follows the
-      new head.
-- [ ] Cat tail: from the front, the tail shows below the seat beside the left thigh
-      (`reports/2026-11-04-cat2/phase-b/sides/rest-sheet.png`). Check it in the stage camera.
-- [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
-      reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
-- [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
-      play, 5.8 cm with the trunk of the mesh. The cuts are shares of the line from the hips joint
-      to the neck joint, so with the shorter trunk the cut 0.9 lies higher on the body, at the arm
-      root. On the same part of the body (`--from 0.083 --to 0.86`), the gap is 5.85 cm. Let
-      `trunk-form` place its cuts by the place on the source body, so that a trunk factor does not
-      move them.
-- [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
-      shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
-      smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.
-- [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the fault of the
-      A-pose body there: the folds of the right shoulder at the tip. Remove the item if the new
-      body does not show it.
-- [ ] Cat violist, stand: after the thigh taper, the lower thigh still reads full over the slim
-      shin, with a dark underside at the knee in the key light
-      (`reports/2026-11-05-cat-review/taper-stand.png`). The mid thigh limit (about 0.55 of the
-      head width, now 0.545) holds the taper. Ask the user if a thinner mid thigh is allowed.
-- [ ] Cat haunch: after the corner cut, the bottom of the right haunch is round on the seat from
-      the right back diagonal (`reports/2026-11-05-cat-review/haunch-corner.png`). The inner crease
-      from the tail root down to the seat (1120-1137, 34.7°) still shows a dark line beside the
-      tail in the key light. The left haunch has the old fan into one corner (vertex 1130, edge
-      1130-1139 of 0.111 units) under the tail. Cut it in the same way if a view shows it.
-- [ ] Cat violist: at rest and in the moves, the hanging left upper arm touches the belly
-      (1.5 cm in `bach-bwv1047`, 0.2 cm before the hanging arms), and the left forearm goes
-      0.7 cm into the belly (`reports/2026-11-03-cat-rest/proof2/`). `hangingArm()` keeps no gap
-      to the body. Check the 2x crops of the left side at rest, then try a rest shape of the
-      hanging left arm (`raise`) or a smaller forward swing.
-- [ ] Cat violist: the bow paw rests 9 cm higher than on the cat of the A-pose mesh (44.8 cm
-      above the seat against 35.4 cm), because the right elbow bends 110° at rest. With 80°, the
-      right upper arm goes 1.9 cm into its arm root in the moves: the corrective shape of the bow
-      arm in the play keeps the arm root out only near its own bend. Fit a shape of the hanging bow
-      arm (`pnpm raise-fit violist --faces <list> --side R --sets rest,lift,lower`), then try 80°.
-- [ ] Cat violist: with the arm girths of the mesh, the hanging right upper arm goes 2.3 cm into
-      the belly at rest, in the lift, and in the lowering (`pnpm pose-depth violist`, 1.5 cm with
-      the thin arms, limit 1.5 cm). The arm gate passes (folds p95 L 3, R 5). Try a rest that
-      turns the right elbow out, or a `raise` shape of the hanging bow arm.
+- [ ] Cat violist and rabbit violinist: the holds `CAT_HOLD` and `RABBIT_HOLD` of
+      `pose/bowed-rig.ts` fit the trial bodies of 2026-11-03 to 2026-11-05 (5.3). The A-pose
+      bodies played `CAT_HOLD` of e491ff3c and `SHOULDER_HOLD`. The close views of the rabbit
+      match production. The A-pose cat holds the viola in front of the chin in the play, and its
+      rest arms hang out to the sides (`reports/2026-11-05-revert-bodies/cat-pair.png`). Take
+      `CAT_HOLD` of e491ff3c again, or fit the hold to the A-pose cat.
+- [ ] Cat: face 832 at the front of the right armpit folds in most of the play. Arm segments allow
+      no `raise` shape there.
+- [ ] Cat: the armpit line at the lower back of each arm root folds a little in the play (faces 729,
+      688, and 728 on the right), and 11 to 12 hidden faces of the lines turn over.
+- [ ] Cat: a soft fold stays at the front of the left arm root, and a notch at rest. Put the socket
+      front and the first ring front of the copy onto the trunk surface before the weights.
+- [ ] Cat: at the ends of each armpit line, the wall meets the trunk at up to 108°, and a small
+      point shows from az ±150. Clean the 14 thin faces of the right line.
+- [ ] Cat: near the elbow, the left forearm is 0.89 of the tube in the play, because the linear
+      blend turns the paw about 100° from the bind over three forearm segments.
+- [ ] Cat: from the back, a dark band in a V lies on the lower back above the seat. Find the faces
+      and the light that make it.
+- [ ] Cat tail: 4 faces stay turned over against the bone turn after the bind. No image shows them.
+- [ ] Cat: the A-pose body keeps the bent bind of the viola hold (4.4, "Role-neutral bind"). The
+      straight bind (L 106, R 47) folded the inner right elbow of the violist (folds p95 R 8, base
+      2, margin 2), and six tries of a shape of the bent right elbow failed
+      (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`). The open choice: a
+      fifth shape (`STUDIO_RAISES`).
+- [ ] Cat: a run of `pnpm rig-mesh cat` today moves the tail root and 404 vertices near the haunch
+      and the tail by up to 4.8 cm against the committed `cat.rig.glb` of production
+      (`assets/models/cat/README.md`). Find the change of `rig_mesh.py`, and make the run give
+      the committed file again.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
@@ -295,52 +254,31 @@ passes.
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
       (87°) to 70°.
-- [ ] Rabbit hand rig (`rabbit.blend`): run the gates on the new body (`pnpm arm-check
-      violinist`, `pnpm cast-matrix`, the full `pnpm pose-depth violinist`, `pnpm close-views
-      audit`), and check the hold items of the old body below against it.
-- [ ] Rabbit hand rig: the bind supination stays 115° (left) and 57° (right) of the last rig. Run
-      `pnpm bind-supination rabbit` on the new rig.
-- [ ] Rabbit hand rig: three rings on the source surface now fill each arm root
-      (`reports/2026-11-05-rabbit-armpit/`), but the 8 sides of the source section and the near
-      right angle where the arm meets the trunk show as sharp edges in the bind and the play (50
-      to 75 edges above 35° at each root). A round section needs vertices off the source surface,
-      up to about 3 mm at the middle of each side. Ask the user before that form change.
-- [ ] Rabbit hand rig: at rest, 12 faces under the arm roots turn more than 60° (none more than
-      90°), because the hanging arm presses the root rings of the armpit together. The large
-      trunk faces behind each shoulder still show as flat planes from az 135 and -135. Try a key
-      `arm_raise_*` of the rest by point edits.
-- [ ] Rabbit hand rig: at rest, 3 faces of the left paw fold (`pnpm fold-probe violinist`, the
-      paw turns 146°). Check the 2x crops of the rest grip.
-- [ ] Rabbit hand rig: the lower belly follows the hips alone, so the seated thighs bend in the
-      groin creases. Check the groin from the front diagonals at 2x for thin light faces.
-- [ ] Rabbit violinist: measure the violin depth under the chin on the new rig (`pnpm pose-depth
-      violinist`). The last rig put it 2.7 cm into the head (limit 2.0 cm). Fit the chin hold in
-      `H` of the hand rig.
-- [ ] Rabbit hand rig: the head height `H` is 0.3027 m (old body 0.3209 m), because the old rig
-      counted a part of the ear base. Check the holds in `H` (the violin at the chin, the grips),
-      or include the ear base in the head measures.
-- [ ] Rabbit hand rig: the recasts of the cast matrix have no raise keys, and the bind supination
-      leaves a left paw twist p95 of 135° (`flutist@rabbit`, `snare-drummer@rabbit`).
-- [ ] Rabbit T-pose body: at rest, the left paw goes 0.6 cm and the left forearm 0.3 cm into the
-      violin (0.1 cm and 0.0 cm on the A-pose body), and in the lowering the right upper arm 1.0 cm
-      into the violin. Check the crops of the rest grip.
+- [ ] Rabbit: at rest, a narrow groove runs between the front of each upper arm and the trunk. It is
+      the gap of the arm copy. Fill the gap in the copy.
+- [ ] Rabbit violinist: the round elbow patch drops the section of the right upper arm of `pnpm
+      arm-look` to 0.60. Find the cause, and keep the round elbow.
+- [ ] Rabbit violinist: a dark lower face of the bow elbow shows from az150 in the moves, and a thin
+      dark line under the forearm near the elbow from the front at the frog.
+- [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
+      frog.
+- [ ] Rabbit with the neutral bind: in the cast matrix, the flute recast folds 9 faces of the right
+      arm in the play (limit 8), and the cello recast 8. The snare drum recast passes now.
+- [ ] Rabbit: under the raised bow arm, a shallow hollow with a small sharp tip stays in the right
+      armpit. A smoother hollow needs more vertices in the notch.
+- [ ] Rabbit: the narrow axis of each upper arm keeps 0.62 to 0.81 of the bind, so the shoulders
+      look flatter than the source from the back. Try a bind arm nearer to the play.
+- [ ] Rabbit: a flap face with two open edges (3.1 cm) stays under the right armpit. No frame shows
+      it.
 - [ ] Rabbit violinist: the bow goes up to 2.5 cm into the arms in the lowering and 1.0 cm at rest,
       near the grip.
 - [ ] Rabbit violinist: the violin points 50° to the left, 5° more than a real player. A bow arm
       round or a smaller violin can bring it to 45°.
-- [ ] Rabbit violinist: at rest, the right elbow is 9.5 cm out of the shoulder (A-pose rabbit
-      4.7 cm). The belly is widest at the elbow, so the hanging arm keeps the elbow out for each
-      angle. The A-pose rabbit kept the elbow in with the upper arm in its belly.
-- [ ] `lapPoint()` of `pose/lap.ts`: on the long belly of the T-pose rabbit, at 0.5 and 0.75 of
-      the way it finds the belly (41 cm and 32 cm above the seat), and at 1 the top of the knee.
-      The rabbit rest uses 1, and the hanging arms replace both rest places, so the rabbit does
-      not show it. Find the thigh under the belly.
 - [ ] Bowed strings: the left elbow points to the side under the instrument, and the upper arm turns
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
-- [ ] Cat violist: ask the user to confirm the 1/2 viola. The longer arms of the T-pose body
-      reach the nut with 9.5 cm to spare, and the rule of a violin shop gives the scale 0.919.
+- [ ] Cat violist: ask the user to confirm the 1/2 viola. A 3/4 viola reaches the nut at about 55°.
 - [ ] When the tests come back, run `pnpm test:paused src/shots/` and
       `src/models/layout-scene.test.ts`. The harp, the viola, and the piano gap moved seats.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
@@ -544,17 +482,6 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Mid upper arm of the cat in the shared moves (5.3): with the root clips fixed in the rig
-      (`cat_root.py`), the inner side of the upper arm at 0.55 of its length still goes 1.5 cm
-      (violin lowering) and 1.9 cm (flute lift) into the trunk side in a few samples, on both
-      sides (`reports/2026-11-04-cat-root/matrix.md`). The left armpit keeps its weights, because
-      the same change grew the rest folds of the left arm of the violist from 3 to 6.
-- [ ] Cast matrix of the cat with the arm girths of the mesh: the recast cellist (3.5 cm), the
-      clarinetist (2.9 cm), and the snare drummer (4.0 cm) fail on the upper arms in the body
-      (1.2 cm, 1.0 cm, and 1.9 cm with the thin arms), and the flutist goes 4.2 cm in. With the
-      girths at the edge of 15 % below the mesh (`armGirth` [0.88, 0.94]), the same three cells
-      fail with 2.6 cm, 2.1 cm, and 3.2 cm (`reports/2026-11-04-cat-form/measures.md`). Turn
-      the elbows of the shared holds out for a round arm (5.3).
 - [ ] Inner upper arm of the pig in the shared holds (5.3): with the root domes shrunk
       (`pig_root.py`), the round tube of `pig-upper.glb` still goes into the trunk at 0.36 to 0.47
       of the upper arm: violin play 2.3 cm, cello lowering 4.0 cm (left arm). The same vertices
@@ -621,8 +548,6 @@ passes.
       hippo, the mouse, the rhino, the badger, and the penguin still miss the valves at the
       smallest trumpet (25 mm to 152 mm). Four of them need a bow of more than 30°. A trumpet that
       turns down twice the bow also passed the wolf, but it points far below "slightly down".
-- [ ] Rabbit trumpeter in the cast matrix: with the shared shoulder turn of the trumpet, the left
-      arm root folds 10 faces (limit 8). With square shoulders and the trumpet of 0.52, it passed.
 - [ ] Winds at the smallest size (4.6): the clarinet of 0.73 still misses the keys for the mouse
       (43 mm), the hippo, the bear, the rhino, the badger, the penguin, and the elephant, and the
       flute for the bear, the rhino, the badger, the penguin, and the elephant. The size rule
