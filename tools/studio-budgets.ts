@@ -2,9 +2,10 @@ import { gzipSync } from 'node:zlib';
 
 /**
  * The most triangles of a studio body (design 4.4, 4.5), the value of `STUDIO_BODY_BUDGET` in
- * `src/models/budget.test.ts`. `pnpm rig-mesh --check` stops above it.
+ * `src/models/budget.test.ts`. `pnpm rig-mesh --check` stops above it. It holds the hand rig of the
+ * cat, the largest body.
  */
-export const STUDIO_TRIANGLE_BUDGET = 5600;
+export const STUDIO_TRIANGLE_BUDGET = 6200;
 
 /**
  * The largest gzip size of the packed mesh of one studio body, in bytes (design 7.2). Each studio

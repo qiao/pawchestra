@@ -26,7 +26,7 @@ const BODY_BUDGET = 2600;
  * file. The rabbit and the red fox play in the violin sections, so the budget of the full scene
  * holds the frame.
  */
-const STUDIO_BODY_BUDGET = 5600;
+const STUDIO_BODY_BUDGET = 6200;
 
 /** The most triangles of the scene with 60 players (design 4.5). */
 const SCENE_BUDGET = 200_000;
