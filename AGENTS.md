@@ -68,9 +68,10 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
   beside another agent works in its own worktree and branch. Push nothing.
 - **Commits.** Make very fine-grained commits: one logical change in each, with a Conventional
   Commit subject. Stage each path by its name, never with `git add -A` or `git add .`.
-- **Checks.** Each commit passes `pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. Before
-  your report, run `tools/check-commits.sh --tip <base>` one time in the background, with a clean
-  tree.
+- **Checks.** All gates are paused. The user verifies each result by hand in the app. Run no check
+  before a commit, a report, or a merge: no lint, typecheck, format check, `check-commits.sh`, arm
+  gate, clearance sweep, body probe, size check, cast matrix, frame measure, or image set. Run a
+  check only when the user or the manager asks. This rule wins over the check rules of the modules.
 - **Tests.** All tests are paused. A change adds no test and runs no break test. A change that
   needs a check runs one file with `pnpm test:paused <path>`.
 - **Docs.** A change of behavior updates its design section in the same session. A decision goes
