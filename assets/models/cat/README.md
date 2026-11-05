@@ -125,15 +125,15 @@ the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
 
 | Item | Value |
 |---|---|
-| Size | 313,899 bytes |
-| SHA-256 | `b2bf3ef02ab2bcb9a490ce5646a1c7234ad7113eada3fd9852bbabb223255a8f` |
+| Size | 317,045 bytes |
+| SHA-256 | `d4e0332daae65384e7f73ef1d61f51e1a587a83ec950dba741e4116616f57cb8` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
 | Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,018 vertices and 3,988 triangles, 46 of them gloss |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint. The Action `bind` holds the seated bind at frame 1 (below). The property `palm` is (0, 0, -1), `seat` is the chair of `cat.json` (front 0.1, back -0.087, half width 0.184), and `hinges` holds the elbow axes of `bind_hinges()` |
-| Shape keys | `Basis` and `bind_sit` at the value 1 (below) |
+| Shape keys | `Basis`, `bind_sit` at the value 1, and `arm_raise_L` and `arm_raise_R` at the value 0 (below), each with its custom property on the mesh |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex. The upper arm, the forearm, and the forearm twist bone hold no weight |
 
 The seated bind:
@@ -159,6 +159,16 @@ The seated bind:
   of each vertex. 236 vertices move, at most 16.4 cm in the bind. From the side, the underside
   behind the hip joints was up to 15.8 cm above the seat before, and 2.9 cm after. The seat top
   stays 0.300 m.
+- **`arm_raise_L`, `arm_raise_R`.** With a hanging upper arm, the rigid patch under each arm
+  root (the fix "Armpits" below) swings into the chest, and a notch shows at the front and the
+  back of the arm root. Each key holds the fix of one side in the hanging pose: the patch and three
+  rings of its neighbors (122 vertices on the left, 124 on the right) take the skin of their
+  weights after 12 rounds of Smooth, and the vertex of the back notch goes onto the line of its
+  two neighbors. The moves are at most 3.6 cm. The pose is a copy of the rig whose rest is the
+  bind, so that the skin blends from the bind as in the app, with each upper arm turned the least
+  way to hang down (54° from the bind). The property of each key gives the side, that turn in the
+  axes of the chest (w 0.8898, x 0.2809, y ±0.3598, z ∓0.0023, in Blender axes), and the fade
+  from 15° to 45°.
 
 The joints are the joints of `tools/mesh-rigs/cat.json`, except the arm joints, which come from
 sections of the mesh, and the bend of the tail:
