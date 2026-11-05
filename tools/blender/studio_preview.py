@@ -655,8 +655,12 @@ def _save_post(*_):
     state = _state()
     if state is None or not state.pop('stashed', False):
         return
-    _build(state)
-    bpy.context.scene.frame_set(state.get('frame', state['first']))
+    try:
+        _build(state)
+        bpy.context.scene.frame_set(state.get('frame', state['first']))
+    except (RuntimeError, ReferenceError) as error:
+        # A handler raises into the save of the user, so the error only goes to the console.
+        print(f'studio_preview: no preview after the save ({error}). Call load_preview().')
 
 
 #: The handlers of the preview: on each save, and on each frame change for the fold colors.
