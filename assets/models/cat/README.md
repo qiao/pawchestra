@@ -1,45 +1,152 @@
 # Cat model
 
-This folder holds the T-pose source mesh of the cat, the rig made by hand in Blender
-(`cat.blend`), and the rigged copy that the export writes from it. The app does not serve these
-files. It loads the module `src/models/studio/cat.ts`, which this chain writes:
+This folder holds the source mesh of the cat, a copy with rebuilt arms and its weights, and the
+rigged copy. The app does not serve these files. It loads the module `src/models/studio/cat.ts`,
+which this chain writes:
 
 ```text
-tripo/cat-tpose.fbx                source mesh with quad faces
-   │  work by hand in Blender (design 4.4, "Hand rig")
+cat.glb                            source mesh
+   │  cat_arms.py (e491ff3c)       rebuilt arms, belly, and painted weights
    v
-cat.blend                          mesh, face colors, armature, weights, eyes, bind, keys
-   │  pnpm rig-export cat
+cat-arms.glb + cat-weights.json    `source` and `paintedWeights` of tools/mesh-rigs/cat.json
+   │  pnpm rig-mesh cat
    v
-cat.rig.glb + cat.rig.json         rigged mesh and its text summary
+cat.rig.glb                        rigged mesh
    │  pnpm studio-body cat
    v
 src/models/studio/cat.ts           studio body of the app
 ```
 
-`cat-arms.glb`, `cat-weights.json`, and `cat-root-weights.json` are the inputs of the old chain
-of `tools/mesh-rigs/cat.json`. `pnpm rig-mesh cat` stops now, because the folder holds
-`cat.blend`. Each value of the hand rig lives only in `cat.blend`, and the tools read it from the
-export (design 4.4, "Hand rig").
+This is the body that production shows. `docs/agents/rigging.md` gives the steps of the chain.
+The target of the form is the sheet `docs/reference/cat-views.png`. The cat has the same bead eyes
+as the fox and the rabbit.
 
-`docs/agents/rigging.md` gives the steps of a hand rig. The target of the form is the sheet
-`docs/reference/cat-views.png`. The cat has the same pea eyes as the fox and the rabbit: the eye
-objects of `cat.blend` place them.
+The folder also holds the files of trials that the app does not use ("Trial files" below): the
+hand rig of 2026-11-04 and 2026-11-05 from a Tripo mesh (`hand-rig/`, `tripo/`), and the T-pose
+mesh of an earlier body (`cat-tpose.glb`). The hand rig is rejected: it gave a thin, faceted arm
+root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool finds it beside the GLB
+file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh cat` runs. Never
+export the trial to `cat.rig.glb` of this folder: that file is the rig of the app.
 
 ## Files
 
+The app chain:
+
 | File | Origin | Rebuild |
 |---|---|---|
-| `cat-tpose.glb` | Source mesh (below) | None |
-| `tripo/cat-tpose.fbx`, `tripo/cat-tpose.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
-| `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
-| `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
-| `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
-| `cat.blend` | Made by hand in Blender from `tripo/cat-tpose.fbx` (below). License as the FBX file | None: edit it in Blender |
-| `cat.rig.glb` | Export of `cat.blend`. License as the FBX file | `pnpm rig-export cat` |
-| `cat.rig.json` | Text summary of the export, for diffs | The same run |
+| `cat.glb` | Source mesh (below) | None |
+| `cat-arms.glb` | Copy of `cat.glb` with rebuilt arms and belly. License as `cat.glb` | `cat_arms.py` of e491ff3c |
+| `cat-weights.json` | Weights of the same Blender run. License as `cat.glb` | `cat_arms.py` of e491ff3c |
+| `cat.rig.glb` | Output of the rig. License as `cat.glb` | `pnpm rig-mesh cat` (below) |
 
-## cat-tpose.glb
+The trials, not in use:
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `cat-tpose.glb` | T-pose source mesh (below) | None |
+| `tripo/cat-tpose.fbx`, `tripo/cat-tpose.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
+| `hand-rig/cat.blend` | Made by hand in Blender from `tripo/cat-tpose.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `hand-rig/cat.rig.glb` | Export of `hand-rig/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/hand-rig/cat.blend --out assets/models/cat/hand-rig/cat.rig.glb` |
+| `hand-rig/cat.rig.json` | Text summary of the export, for diffs | The same run |
+
+## cat.glb
+
+| Item | Value |
+|---|---|
+| Size | 14,466,300 bytes |
+| SHA-256 | `0ca57eaa7f831ce5f17ff889d46b935e6c21400e69a597347c1381f0305cda9e` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Khronos glTF Blender I/O v4.3.47 |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,121 triangles and 4,148 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+| Material | One material `BakedMaterial`, double-sided, with a base color texture and a metallic-roughness texture, each a PNG of 4096 × 4096 pixels. The texture is an atlas of an automatic unwrap |
+
+Facts of the mesh:
+
+- A weld at 1e-5 gives 1,563 vertices in one connected part. The mesh has 2 open edges and 6
+  edges with more than two faces. 318 faces have a corner angle below 10°.
+- The box is x -0.491 to 0.490, y -0.952 to 0.952, and z -0.419 to 0.426. Thus the cat is 1.903
+  units high from the soles to the tips of the ears.
+- The cat faces +z, with its left side at +x. These are the axes of the studio.
+- The cat stands in an A-pose: the arms go down and out at about 58° below the horizontal.
+- The eyes are dark faces of the head surface with a few green faces, with no shells. Thin
+  whiskers stand out from the muzzle.
+- The tail hangs down behind the legs, and its end goes back along the floor. The sheet shows a
+  tail that curls up at its end.
+
+## cat-arms.glb and cat-weights.json
+
+| Item | Value |
+|---|---|
+| `cat-arms.glb` | 1,180,540 bytes, SHA-256 `ecfe907e75fac79a56df2e5aa98e82b95217ff78f0d17cddb95e880552d90d76` |
+| Mesh | 2,146 vertices after a weld at 1e-5, 4,287 triangles: on each arm a tube of 16 rings of 16 vertices, joined to the shoulder socket and to the paw with Bridge Edge Loops, and a side wall of 54 (left) and 50 (right) faces under each arm. Near the left armpit line, 8 vertices of the first two shoulder rings merged into the next ring or into the line |
+| Material | One material with one base color JPEG of 4096 × 4608 pixels: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. The side walls and the flat inner sides of the arms take one gray fur texel of the trunk beside the seam. No metallic-roughness texture |
+| `cat-weights.json` | 480,430 bytes, SHA-256 `588d9b38b0dff053118adf037f9c87521a1504fc48df949043622062a486155e` |
+| Weights | The automatic weights of Blender with the Weight Paint fixes of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config. The arms take the automatic weights of the copy before the round side walls (`step_tube_heat()`) |
+
+The upper arm of `cat.glb` joins the side of the trunk down to the elbow. Thus the script makes an
+armpit: a cut along the seam where the arm meets the trunk, a side wall of the trunk under the
+arm, and a quad tube from the shoulder to the wrist. The flat inner side of the tube lies on the
+side wall and meets it only at the armpit line. The faces of the paws, the trunk, the legs, and
+the head are the faces of the source.
+
+A rig with arm segments does not stretch the arms, so the arms get their length in the copy. The
+upper arm is 0.92 and the forearm 0.78 as long as on the source. The arm is 1.10 head heights from
+the shoulder joint to the wrist (1.30 on the source). The cross-section is 0.85 of the source.
+
+The other steps of the script:
+
+- **`step_belly()`.** It moves the belly front onto an ellipse arc and each side onto an even
+  curve, at most 0.016 units. Thus the trunk is an even oval from the front and from the side. The
+  front of the upper belly, where the bow upper arm lies in the play, is a little flatter, most at
+  the middle line (`flat`). The faces and the colors of the trunk stay.
+- **`step_round_wall()`.** It deletes the small trunk faces that turn back under the side wall,
+  fills the hole again with even faces, and smooths the wall and the trunk near it along the
+  normal of the plane of the seam. Thus the side wall rounds into the trunk.
+- **`step_clean_pit()`.** It merges the shoulder ring vertices near the left armpit line into the
+  next ring, and the socket vertices near the line ends. Then it fills the band again with a strip
+  of triangles. Thus the band has no thin face. The right arm keeps its band, because the clean
+  made the root ring of the bow arm flatter in the play.
+
+The run of `tools/blender/cat_arms.py` at e491ff3c made them. The script of today keeps only the
+steps of the side wall, with no run of the cat (672184a7), so the git history keeps the run.
+
+## cat.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 880,600 bytes |
+| SHA-256 | `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
+| Bind | The bind of the viola hold, with the elbows bent (below) |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
+
+The file is the rig of e491ff3c, which has the mesh data of production. A run of
+`pnpm rig-mesh cat` today gives another file: the tail root and 404 vertices near the haunch and
+the tail move by up to 0.029 units (4.8 cm), because `tools/blender/rig_mesh.py` changed after
+e491ff3c. The app keeps the committed file.
+
+## Rig facts of cat.rig.glb
+
+- The seated bind bends each elbow 79° and turns the left paw 120°. Thus the rig binds the left
+  lower arm with the dual quaternion blend (`bind.arm` of the config), and the elbow and the
+  forearm keep the round of the tube. The bow arm keeps the linear blend, because it bends
+  further than the bind in the play.
+- The front of each arm root keeps the trunk weights, so it stays with the chest. With no trunk
+  weights, the root folded.
+- Three `raise` shapes of the left arm (the turns of the play, of the rest, and between them) move
+  the front of the arm root half of the way with the first segment of the upper arm (`follow`).
+  In the shape of the play, the skin near the root front fills its valleys and moves no vertex in
+  (`follow.fill`). A fourth shape does the same for the bow arm in the play.
+
+## Trial files
+
+These files are the trials of 2026-11-03 to 2026-11-05: `cat-tpose.glb`, the source of the
+T-pose body of `pnpm rig-mesh cat` at bdc18111, and the hand rig of the Tripo mesh. The app does
+not use them. The text below gives the trials as they were: `cat-arms.glb`, `cat-weights.json`,
+and `cat-root-weights.json` in it are the files of the T-pose chain at 6b516429, which the git
+history keeps.
+
+### cat-tpose.glb
 
 The new source mesh of the cat, in a T-pose: the arms are level and out to the sides, free of the
 trunk. The mesh has no skeleton.
@@ -72,7 +179,7 @@ at 1e-5.
 - The long tail hangs from the back of the haunch (y 0.26, z -0.06) down to y 0.09 behind the
   legs, and curls up behind to y 0.25 at z -0.27.
 
-## tripo/cat-tpose.fbx
+### tripo/cat-tpose.fbx
 
 A retopology of `cat-tpose.glb` with Tripo: the same cat in the same T-pose, with quad faces in
 even rings around the arms and the tail. The FBX file keeps the quads (a GLB file of the same
@@ -96,46 +203,11 @@ links them by name.
 | `cat-tpose.fbm/cat-tpose_normal.jpg` | 694,704 bytes | 2048 × 2048 | `3ffdb62a5d31aae713042e474d4089fc6d31273c8463d99c3a8c72574b853bce` |
 | `cat-tpose.fbm/cat-tpose_roughness.jpg` | 184,077 bytes | 2048 × 2048 | `b6d74c6f642d089bd8ffd75ec9b739257ae814e41e1c42e76e3ba97c6ce37c7d` |
 
-## cat-arms.glb and cat-weights.json
+### hand-rig/cat.rig.glb
 
-`tools/blender/arm_rebuild.py` rebuilds the free T-pose arms of `cat-tpose.glb` with quad tubes
-at the length of the mesh (no `--factor`), and writes the Blender weights of the arms. The
-shoulder line lies at 0.25 of the upper arm, and the wrist cut at 0.1 of the paw. Each arm has 14
-rings of 16 vertices. The rings of each elbow lie 0.035 units from the elbow joint (`--spec`), and
-the elbow helper is 0.07 units, twice that gap: with the gap of 0.0216 units that the script
-chooses, the inner faces of each elbow turned over in each pose of the play and the rest. The
-faces of the paws, the trunk, the legs, the tail, and the head are the faces of the source. The
-points of `cat-weights.json` are the places of the source. A run gives the same bytes:
-
-```bash
-blender -b --factory-startup -P tools/blender/arm_rebuild.py -- cat --spec '{"gap": 0.035}'
-```
-
-| File | Size | SHA-256 |
-|---|---|---|
-| `cat-arms.glb` | 1,117,708 bytes | `534753ea563f0e71e438485a3b481535c26406b04571733aaf316f062f1cb6e2` |
-| `cat-weights.json` | 443,443 bytes | `43c269c0e67de717f3637d84dfd22533fb7790118eb6596d7ca6cd889797a963` |
-
-## cat-root-weights.json
-
-The faces of each armpit (`rigidPainted`) take one mean weight, with 0.27 on the clavicle and 0.73
-on the upper arm. In the recast violin, cello, flute, and clarinet holds, the right arm reaches
-across the chest. The right armpit patch then swings to the front of the chest, and the cut of the
-body at the arm root folds over the arm vertices beside it: the sweep measured them 2.2 cm to
-2.6 cm in the body (design 9.3). `tools/blender/cat_root.py` gives the right patch the clavicle
-share 0.52, so that it joins the body, and each other vertex of the right arm root with a clavicle
-share of 0.1 to 0.32 at least 0.4, so that the weights fade to the arm. The places and the other
-bones stay. The left side keeps its weights: with the same change, the rest folds of the left arm
-of the violist grew from 3 to 6. A run gives the same bytes.
-
-| File | Size | SHA-256 |
-|---|---|---|
-| `cat-root-weights.json` | 443,344 bytes | `55393f1a7fc16f38cd04299c4c4ed99035fd8b8ec37acda05ee6dec41713aa46` |
-
-## cat.rig.glb
-
-`pnpm rig-export cat` writes it from `cat.blend`, with the text summary `cat.rig.json`. A run gives
-the same bytes.
+`pnpm rig-export cat --blend assets/models/cat/hand-rig/cat.blend --out
+assets/models/cat/hand-rig/cat.rig.glb` writes it, with the text summary `cat.rig.json`. A run
+gives the same bytes.
 
 | Item | Value |
 |---|---|
@@ -147,7 +219,7 @@ the same bytes.
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_L`, `arm_raise_L2`, and `arm_raise_L3` (below) |
 | Footprint | The seated violist is 0.673 m deep and 0.706 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
 
-## cat.blend
+### hand-rig/cat.blend
 
 The hand rig of the cat (design 4.4, "Hand rig"), made in Blender 5.2 from `tripo/cat-tpose.fbx`:
 the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (the Action
