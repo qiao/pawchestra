@@ -75,9 +75,10 @@ Its clean rings and twist markers show a fault.
 
 A hand rig (design 4.4, "Hand rig") replaces `rig-mesh` for one body. Its `.blend` holds the rig,
 the pea eyes, and the facts of the body, and its mesh is the source of truth. In a live Blender,
-call only `add_surface()`, `fix_rolls()`, and `drive_segments()` of
+call only the functions of `tools/blender/studio_preview.py` (`sp`), `add_surface()`,
+`fix_rolls()`, `drive_segments()`, `set_weight_row()`, and `ring_spread()` of
 `tools/blender/studio_armature.py` (`sa`), and `place_eyes()` and `fit_eyes()` of
-`tools/blender/studio_eyes.py` (`se`). Run the command line of `studio_armature.py` headless only.
+`tools/blender/studio_eyes.py` (`se`). Run the command lines of these files headless only.
 
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
    eye_fans=False)` one time for the face colors and the gloss nose. The texture is the source
@@ -92,7 +93,12 @@ call only `add_surface()`, `fix_rolls()`, and `drive_segments()` of
    on the head surface in the bind, and delete the eye fans if the mesh has them. After an edit
    of an eye or of the face, run `se.fit_eyes(rig, mesh)`: it levels each eye and bends its
    preview to the head.
-4. **Export.** Run `pnpm rig-export <s>`, `pnpm studio-body <s>`, and the gates. Diff
+4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment, and
+   `sp.load_preview('<s>', <file>)` shows it beside the rig. After an edit of the mesh, the
+   weights, or the keys, `sp.refresh_preview()` shows the open file in about 1 s.
+   `sp.fold_colors(True)` marks the folds. A bone edit needs `pose-preview --glb` with the export
+   that the refresh prints.
+5. **Export.** Run `pnpm rig-export <s>`, `pnpm studio-body <s>`, and the gates. Diff
    `<s>.rig.json` to see what moved.
 
 A new role adds in the same commit its entries in `SWEEP_ROLES` of `src/pose/test-sweep-roles.ts`,
@@ -328,8 +334,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   for the local point.
 - A move of the basis of a mesh with shape keys must move each key too, else each key gets the
   move back as its own.
-- The glTF importer adds bone shapes and keys at 24 fps, and an FBX take can key the armature
-  scale.
+- The glTF importer adds bone shapes, keys at 24 fps, and the Action `reference` of an export,
+  which the next export reads as the pose of the sheet. An FBX take can key the armature scale.
 - An FBX armature with no mesh takes its current pose as its rest pose. Keep each quaternion key
   on the side of the key before it (a dot product of 0 or more), else the blend goes the long way.
 - The FBX exporter takes its ids from the Python string hash. Run Blender with `PYTHONHASHSEED=0`
