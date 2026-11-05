@@ -224,6 +224,15 @@ passes.
 - [ ] Cat armpits: with a hanging upper arm, a crease shows at the back of each arm root
       (`reports/2026-11-04-cat2/phase-b/work/pitcmp.png`). The fix of the old key `bind_armpit`
       changed no 2x crop, so `cat.blend` has no such key. Check the crease in the rest crops.
+- [ ] Cat forearms: each forearm ring now takes one mean weight (`cat.blend`), and no gate ran on
+      it. Run `pnpm arm-check violist trumpeter@cat --base 6ea78fbd` and `pnpm fold-probe
+      violist`. The keys `arm_raise_*` keep their bind moves from the old weights: refit them
+      with `pnpm raise-fit` if the inner elbow folds more.
+- [ ] Cat forearms: the bind twist of the left forearm grows in steps of 9° to 25° from ring to
+      ring, because the automatic weights give `forearm_seg2` most of the middle. Even steps of
+      about 16° would show a smoother turn.
+- [ ] Cat violist: at the frog, the right forearm folds onto the upper arm in a dark wedge at the
+      inner elbow, as before the ring weights. Check it in the stage camera.
 - [ ] Cat recast violinist: `pnpm cast-matrix --species cat` gives FAIL (OPEN on main), because
       the hanging right upper arm goes 2.9 cm into the belly at rest and in the moves (limit
       1.5 cm). The 4 keys `arm_raise_*` of `cat.blend` serve the violist and the trumpeter, so no
