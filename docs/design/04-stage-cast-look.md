@@ -232,10 +232,10 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
   of the app view judge that height.
   The arm tube of the mesh of the rabbit has coarse rings with long triangles, so its hand rig
-  replaces the tube with round rings on the section of the mesh. The tube
-  keeps the arm length of the old rabbit, so that the left paw reaches the nut of the violin
-  (5.3), and the upper arm is a little fuller than the mesh, a product choice, because the old
-  upper arms looked thin.
+  replaces the tube with round rings on the section of the mesh, with the girth of the mesh. The
+  arm keeps the length of the arm of the old rabbit, so that the left paw reaches the nut of the
+  violin (5.3). The upper arm and the forearm share the extra length by one factor, so that the
+  elbow keeps its place on the arm of the mesh.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
@@ -635,25 +635,19 @@ its rest is the bind.
   right elbow further out and the rest place further forward (5.2, 5.3).
 - The rabbit sits on the chair of its old body, as a product choice: the seat top and the chair
   depth of that chair. Its hand rig (`rabbit.blend`, "Hand rig") keeps the leg turns and the thigh
-  length of the old body, and makes the shins only as long as the seat needs. An even offset
-  outward from the thigh axes, faded into the haunch, makes the thighs full and round, and the
-  shins keep the slim form of the mesh. The bind key `bind_sit` lowers the haunch onto the seat
-  with a small drop, so that the tail ball keeps the round form of the mesh: a deep drop over the
-  back of the haunch pulled the ball down into a column. The lower belly of the mesh turns down
-  between the seated thighs, so the bind key `bind_lap` brings it forward onto the lap, and no
-  dark wedge shows at the crotch. The round head sits on the chest with no neck, as on the sheet,
-  so the bind keys `bind_neck`, `bind_nape`, and `bind_collar` fill the groove under the head at
-  the front, the right side, and the back, and no dark collar shows. The violin lies under the
-  left jaw and against the left side of the neck, so `bind_collar` stays off that side, and the
-  violin does not go deeper into the head. The key `arm_raise_L` fills that side only while the
-  left arm hangs at rest, and it is 0 before the violin comes up. The two lobes of the haunch of the mesh ended in two
-  points on the seat, so the back of the haunch takes one round form, as on the back view of the
-  sheet, and the tail ball keeps its form and its place. The fur takes the cream tone step of the
-  old rig (`colors.tone` of `rabbit.json`), so that the rabbit keeps the look of its old body. Each
-  elbow spreads over its helper bone across the joint, because the arms bend far in the play,
-  and a narrow blend folded the inner elbow. The body is less deep than the old body
-  behind the front edge of the seat, so the chair keeps its depth with more room behind the back
-  (`backRoom`).
+  length of the old body, and makes the shins only as long as the seat needs. The limbs keep the
+  girth of the mesh, a product choice. Each edit of the mesh is a point edit by hand, or one move
+  of a named ring or band, so that the form stays the form of the mesh: rules that filled and
+  smoothed many vertices made a thick neck and an uneven belly. The round head sits on the chest
+  with no neck, as on the sheet, and the dark underside under the head stays. The mesh has a
+  crumpled round patch on the lower belly, so the hand rig replaces it with an even grid. The
+  seated bind and the play show no fault that a shape key must fix, so the rig has no keys. The
+  pea eyes sit on the dome of the old eye of the mesh, so that the dome does not cut into them.
+  The fur takes the cream tone step of the old rig (`colors.tone` of `rabbit.json`), so that the
+  rabbit keeps the look of its old body. Each elbow spreads over its helper bone across the joint,
+  because the arms bend far in the play, and a narrow blend folded the inner elbow. The whiskers
+  move with the head alone, because a neck share folded them when the head turns. The chair keeps
+  its depth with more room behind the back (`backRoom`).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey has short legs under a
   large head, so its feet stand under its hips and its trunk leans forward with the head level.
