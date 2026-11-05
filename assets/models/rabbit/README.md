@@ -121,35 +121,37 @@ shasum -a 256 assets/models/rabbit/rabbit-arms.glb assets/models/rabbit/rabbit-w
 
 `pnpm rig-export rabbit` writes it from `rabbit.blend`, with the text summary `rabbit.rig.json`. A
 run gives the same bytes.
-Until phase B of `rabbit.blend` (below) ends, this file is the export of the last rig.
 
 | Item | Value |
 |---|---|
-| Size | 729,840 bytes |
-| SHA-256 | `95ecc33a11855851154d26135ef01d6bf2c86777022fc5d2b8d02a43e7cfb9fa` |
+| Size | 534,284 bytes |
+| SHA-256 | `79c7e48311b669abff226cc455bf8ecc404deffd29e43a2821e73f436ba0a2d6` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
-| Faces | 5,877 triangles, of them 75 gloss (the nose) |
+| Faces | 5,713 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
-| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` (below) |
+| Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
 
 ## rabbit.blend
 
-The hand rig of the rabbit (design 4.4, "Hand rig"). Each edit of the mesh is a point edit by hand
-in a live Blender 5.2, with its vertex ids and values below. The work has two phases. Phase A
-makes the form of the mesh in the T-pose. Phase B fits the armature, the weights, the seated bind,
-the keys, the eyes, and the colors again. Until phase B ends, the armature `rabbit_rig`, its
-Action `bind`, and the eye objects are those of the last rig. The mesh has no weights, keys, or
-colors, and `rabbit.rig.glb` and the module are the export of the last rig.
+The hand rig of the rabbit (design 4.4, "Hand rig"), made in a live Blender 5.2 from
+`tripo/rabbit.fbx`: the mesh, the colors, the armature, the weights, the pea eyes, the seated bind
+(the Action `bind`), and the facts of the body. Each edit of the mesh is a point edit by hand, or
+one translation, scale, or loop cut of a named part, with its ids and values below. The calls
+name the functions of `tools/blender/studio_armature.py` (`sa`) and `studio_eyes.py` (`se`).
 
 | Item | Value |
 |---|---|
-| Size | 282,681 bytes |
-| SHA-256 | `532b353a7402387b0dfc78b0e4ad4a881bf5ae0713545defc9b185035266ff29` |
+| Size | 324,781 bytes |
+| SHA-256 | `0602da048fe2b4e63f4c5a5736cc34ea53fbc447d3ac52a0e7b61a58f65b17a3` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the edits below, with flat faces and no custom normals. 2,821 vertices and 3,027 faces (2,614 quads and 413 triangles) |
-| Armature | The object `rabbit_rig` of the last rig, with the properties `palm`, `seat`, `hinges`, and the facts of the body (below). Phase B fits its bones again |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0806 units, so the ear tips are at z = 1.0806. No object has a transform |
+| Mesh | One object `rabbit`: the FBX mesh with the edits below, flat faces, no custom normals, and the surface of `sa.add_surface()` (below). 2,857 vertices and 3,076 faces (2,637 quads and 439 triangles, 5,713 triangles), 42 faces of them gloss (the nose) |
+| Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size 0.200104 units (0.286547 m) and the direction (±0.7526, -0.6512, 0.0974) of the last rig. Each middle lies on the head surface on the eye axis in the bind: (±0.0710, -0.0663, 0.7395) |
+| Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
+| Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
+| Shape keys | None. The seated bind and the play show no fault that a `bind*` or `arm_raise_*` key must fix (below) |
+| Weights | The automatic weights of Blender and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
 
 The edits of the mesh, in the order of the work. Each id is the id in the mesh before its edit.
 
@@ -245,39 +247,111 @@ The edits of the mesh, in the order of the work. Each id is the id in the mesh b
   0.2253, 0.2366, 0.2478, 0.2591, 0.2703, 0.2816, 0.2928, 0.3041, and 0.3153 (moves of +0.0031,
   +0.0061, +0.0092, +0.0123, +0.0154, +0.0152, +0.0137, +0.0121, +0.0106, +0.0091, +0.0076,
   +0.0061, +0.0046, +0.0030, and +0.0015 on both sides).
+- **Surface.** `sa.add_surface()` with the texture
+  `assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg` and `eye_fans=False`, with the mesh
+  0.0672 units lower for the run and back after it, because the eye box and the nose box of
+  `rabbit.json` are in the units of the source. 41 faces of the nose become gloss, and
+  79 and 69 faces of the old eyes take the fur color.
+- **Colors.** Each face is fur (Oklab chroma 0.02 or less), pink (0.035 or more on a foot, 0.04
+  on a paw, 0.045 elsewhere), or mixed. A mixed face takes the class of most of its edge
+  neighbors (2 rounds; 152 faces). Each of the 11 pink regions takes its most common pink, and
+  each fur face that was mixed takes the most common plain fur of its neighbors (79 faces). 378
+  faces change. The whiskers keep the white of the texture. Then the plain fur of `color` and
+  `color_base` takes the move of `colors.tone` of `rabbit.json` (`tone()` of `rig_mesh.py`, as
+  the last rig): 2,730 faces. The main fur goes to Oklab (0.951, 0.006, 0.016), the cream of the
+  fur swatch of `rabbit-views.png`.
+- **Knee rings.** At each knee, 2 loop cuts (`bmesh.ops.subdivide_edges()` of the 9 edges between
+  the knee rings at z 0.1135 and 0.1549, 2 cuts) give rings at z 0.1273 and 0.1411: 4 rings
+  within one leg radius of the knee joint (z 0.1308). 36 new vertices.
+- **Shins.** The seated bind of the last rig put the haunch 0.232 m above the soles, under the old
+  seat (0.250 m). So the shins are 0.0134 units longer (1.47 times the source): each band of one
+  height moves up by one translation, the share of the shin below its middle (ankle z 0.055, knee
+  z 0.1308). The shin ring (20 vertices) moves 0.00398, the low knee ring (18) 0.01033, the first
+  cut ring (18) 0.01277, and all above 0.0134. Each bone above the ankle moves up 0.0134 (the
+  head of each shin too). The seat top is now 0.250 m above the soles.
+- **Flat quads.** 13 quads with a straight corner (180°), at the paw tops and the nose, split
+  along the diagonal from that corner (`bmesh.ops.connect_verts()`), so no triangle has no area:
+  592-481, 536-567, 775-773, 1144-595, 1276-787, 1267-1202, 2184-2186, 2322-1434, 2183-2331,
+  2280-1906, 2347-2354, 2374-1751, and 1383-1552. Two of them folded in each sample of `pnpm
+  fold-probe violinist`.
 
-The facts of the body on the armature, from the last rig:
+The bones, the weights, the bind, and the eyes:
 
-- **`height` 0.807929.** The standing shoulder joints in the app, in meters: the joints of the
-  mesh (up 0.497 of the source) raised 0.0672 units by the longer legs of the last rig. Thus the
-  scale is 1.43199 m for each unit, as for the old rabbit.
+- **Arm bones.** The elbow joint goes to |x| 0.2061 (y -0.0097, z 0.5781 after the rise), the
+  middle of the forearm to |x| 0.2663, and each upper arm and forearm segment to a quarter of its
+  bone. The elbow helper starts at the elbow, 0.03 units along the forearm. Then
+  `sa.fix_rolls(rabbit_rig)`.
+- **Weights.** The automatic weights of Blender (`ARMATURE_AUTO`), Limit Total 4, Normalize All.
+  Then the fixes of the last rig, in the source heights plus 0.0672: no thigh weight above z
+  0.2972 or on the other side, and 6 rounds of Smooth from z 0.2172 to 0.3272. Only the tail ball
+  (within 0.06 of (0, 0.12, 0.3522), behind y 0.085) takes the tail, with 2 rounds of Smooth of
+  its root. No head weight on the shoulder tops (|x| above 0.07, z below 0.6322), no neck weight
+  above z 0.6672, no ear weight below z 0.8322 or on the other side, and 2 rounds of Smooth on the
+  edges of these groups. No clavicle or arm weight on the neck sides (z above 0.6522, |x| below
+  0.09), and 2 rounds of Smooth under them. The head weight of a vertex with an arm share of 0.5 or
+  more goes to the neck. 16 rounds of Smooth on the 75 vertices of the front of the crotch with a
+  thigh share of 0.02 to 0.98. No wrist or forearm segment weight beyond |x| 0.34, and 6 rounds of
+  Smooth on each arm root (|x| 0.06 to 0.13). After the shins, the 230 whisker vertices (|x|
+  above 0.09, y below -0.10, z 0.62 to 0.74) take the head bone alone, and 51 vertices of the
+  lower sides of the head (z above 0.635, |x| below 0.15) lose their clavicle and arm weights.
+  The whiskers folded with the turn of the head in 89 % of the play samples.
+- **Ring rows.** Each ring of each arm tube and each knee ring takes one weight row
+  (`sa.set_weight_row()`), so that no ring is uneven:
+
+  | Ring (|x|) | Upper arm segments | Elbow helper | Forearm segments | Wrist helper | Paw |
+  |---|---|---|---|---|---|
+  | 0.1381 | 1.00 | 0 | 0 | 0 | 0 |
+  | 0.1540 | 0.959 | 0.041 | 0 | 0 | 0 |
+  | 0.1698 | 0.840 | 0.160 | 0 | 0 | 0 |
+  | 0.1857 | 0.589 | 0.411 | 0 | 0 | 0 |
+  | 0.2015 | 0.279 | 0.677 | 0.044 | 0 | 0 |
+  | 0.2141 | 0.077 | 0.700 | 0.223 | 0 | 0 |
+  | 0.2253 | 0.013 | 0.550 | 0.438 | 0 | 0 |
+  | 0.2366 | 0 | 0.342 | 0.658 | 0 | 0 |
+  | 0.2478 | 0 | 0.173 | 0.827 | 0 | 0 |
+  | 0.2591 | 0 | 0.072 | 0.928 | 0 | 0 |
+  | 0.2703 | 0 | 0.022 | 0.978 | 0 | 0 |
+  | 0.2816, 0.2928 | 0 | 0 | 1.00 | 0 | 0 |
+  | 0.3041 | 0 | 0 | 0.850 | 0.150 | 0 |
+  | 0.3153 | 0 | 0 | 0.499 | 0.500 | 0.001 |
+  | Wrist ring | 0 | 0 | 0.150 | 0.600 | 0.250 |
+
+  The elbow ramp is the ramp of the last rig over the distance from the elbow joint (the helper
+  up to 0.7 over about 10 rings). The share of the upper arm splits over the segments by the place
+  of the ring between the middles of the segments, and so does the share of the forearm. The knee
+  rings take thigh and shin: 0.200 and 0.800 (z 0.1135), 0.458 and 0.542 (0.1273), 0.704 and
+  0.296 (0.1411), 0.900 and 0.100 (0.1549).
+- **Bind.** The Action `bind` of the last rig: the leg turns, the trunk 5.08° back, the straight
+  arms, and the bind supination 115° (left) and 57° (right). After the bone edits,
+  `sa.drive_segments(rabbit_rig, key_frame=1)`.
+- **Eyes.** The middle of each eye object moves out along its axis onto the head surface in the
+  bind (left 0.00288, right 0.0032 units), then `se.place_eyes()`. On the old middle, the dome of
+  the source eye stood in front of the pea eye and cut into it.
+
+The facts of the body:
+
+- **`height` 0.827117.** The standing shoulder joints in the app, in meters: the shoulder joint at
+  z 0.5776 times 1.43199. Thus the scale stays 1.43199 m for each unit, as for the old rabbit.
 - **`crease` 35.** The crease angle of the fur, in degrees.
 - **`backRoom` 0.0889.** The chair keeps the depth of the old chair (0.237 m).
 
 The property `seat` is the chair of `rabbit.json` with the back edge at -0.10 units (front -0.03,
-half width 0.16), and `hinges` holds the elbow axes of `rm.bind_hinges()` of the last rig.
+half width 0.16), and `hinges` holds the elbow axes of the bind arms of the last rig. The head
+height `H` is 0.3027 m.
 
-The joints of the last rig, in the studio axes of the source (x, up, forward), before the stretch
-of the legs:
+The joints, in Blender axes of the rest: the hips joint (0, 0, 0.2856), the shoulder (±0.075,
+-0.01, 0.5776), the elbow (±0.2061, -0.0097, 0.5781), the wrist (±0.3265, -0.0088, 0.5835), the
+fingers from (±0.3615, -0.0083, 0.5816) to the paw tip (±0.388, -0.0088, 0.5756), the hip
+(±0.072, 0, 0.2656), the knee (±0.0615, 0.01, 0.1442), the ankle (±0.0628, 0.0341, 0.055), the
+toes from (±0.0808, -0.0359, 0.018) to (±0.0858, -0.0709, 0.008), and the tail from (0, 0.075,
+0.3706) to (0, 0.16, 0.3706). The head goes from (0, -0.022, 0.6356) to (0, -0.022, 0.8356).
 
-- **Trunk and head.** The joints of `tools/mesh-rigs/rabbit.json`, with the head end on the top of
-  the skull (0, 0.755, 0.022) and the ear tips (±0.138, 0.995, -0.06).
-- **Arm.** The shoulder (0.075, 0.497, 0.010), the elbow (0.202, 0.4975, 0.0097) at 0.39 of the
-  tube, and the wrist (0.3265, 0.5029, 0.0088) in the middle of the wrist ring, on arms 1.18 times
-  longer than the source. The fingers go from (0.3615, 0.501, 0.0083) to the paw tip (0.388,
-  0.495, 0.0088).
-- **Leg.** The hip (0.072, 0.185, 0), the knee (0.066, 0.1156, -0.0057) in the middle of the knee
-  ring, the ankle (0.067, 0.055, -0.025), and the toes from (0.085, 0.018, 0.045) to (0.09,
-  0.008, 0.08).
-- **Tail.** From (0, 0.29, -0.075) to (0, 0.29, -0.16), through the tail ball.
-
-The last rig, in meters (1.43199 m for each unit): in the seated bind, the seat top is 0.250 m,
-the hips joint 0.3285 m above the soles, the mid thigh girth 0.517 m, and the mid shin girth
-0.259 m. Its head height `H` is 0.3027 m.
+In the seated bind, the seat top is 0.250 m above the soles and the hips joint 0.346 m. In the
+rest, the mid thigh is 0.452 and the mid shin 0.261 of the width of the head at the eyes, as on
+the source.
 
 ## The module
 
 `pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
 objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 46.5 KB after gzip (the old module 28.6 KB), because the mesh has 5,877 triangles in
-place of 4,035.
+module is 41.2 KB after gzip (the module of the last hand rig 46.5 KB).
