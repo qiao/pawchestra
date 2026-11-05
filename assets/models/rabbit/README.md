@@ -121,6 +121,7 @@ shasum -a 256 assets/models/rabbit/rabbit-arms.glb assets/models/rabbit/rabbit-w
 
 `pnpm rig-export rabbit` writes it from `rabbit.blend`, with the text summary `rabbit.rig.json`. A
 run gives the same bytes.
+Until phase B of `rabbit.blend` (below) ends, this file is the export of the last rig.
 
 | Item | Value |
 |---|---|
@@ -133,272 +134,82 @@ run gives the same bytes.
 
 ## rabbit.blend
 
-The hand rig of the rabbit (design 4.4, "Hand rig"), made in Blender 5.2 from `tripo/rabbit.fbx`
-in headless runs: the mesh, the colors, the armature, the weights, the pea eyes, the seated bind
-(the Action `bind`), its keys, and the facts of the body. The calls below name the functions of
-`tools/blender/studio_armature.py` (`sa`), `studio_eyes.py` (`se`), and `rig_mesh.py` (`rm`).
+The hand rig of the rabbit (design 4.4, "Hand rig"). Each edit of the mesh is a point edit by hand
+in a live Blender 5.2, with its vertex ids and values below. The work has two phases. Phase A
+makes the form of the mesh in the T-pose. Phase B fits the armature, the weights, the seated bind,
+the keys, the eyes, and the colors again. Until phase B ends, the armature `rabbit_rig`, its
+Action `bind`, and the eye objects are those of the last rig. The mesh has no weights, keys, or
+colors, and `rabbit.rig.glb` and the module are the export of the last rig.
 
 | Item | Value |
 |---|---|
-| Size | 339,092 bytes |
-| SHA-256 | `bc8e740dbe22ed842c4a9d62507f68c9dccf37e2f260f8f62c6944bc53827d99` |
+| Size | 331,759 bytes |
+| SHA-256 | `62332835b45543a85dec550e9455e7fee60156cc2abd5e0b391d4adecdf8dfdb` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
-| Mesh | One object `rabbit`: the FBX mesh with the turn of the file applied and the scale 1.001957, with flat faces and no custom normals, the edits below, and the surface of `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo/rabbit.fbm/rabbit_basecolor.jpg', eye_fans=False)`: the face attributes `color` and `color_base` and a gloss nose. 2,939 vertices and 3,192 faces (2,685 quads and 507 triangles, 5,877 triangles), 42 faces of them gloss |
-| Eyes | The objects `eye_L` and `eye_R` of `se.place_eyes()`, children of the bone `head`, with the size of the pea eyes of the old module (0.200104 units, 0.286547 m) and the direction (±0.7526, -0.6512, 0.0974), the mean normal of the dark faces of the old eyes. Each middle lies where the axis through the middle of the old eye meets the smooth socket in the bind: (±0.0688, -0.0644, 0.7258) |
-| Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
-| Armature | One object `rabbit_rig`: the 30 body bones with no tail tip, and the 20 arm segments and helpers (helpers 0.03 units long), with the parents of `STUDIO_PARENTS`, the rest in the T-pose, and the properties `palm` (0, -0.0201, -0.9998), `seat`, `hinges`, and the facts of the body (below). The Z axis of each bone points to its hint (`sa.fix_rolls(rabbit_rig)`). The Action `bind` holds the seated bind at frame 1 (below) |
-| Shape keys | `Basis`, `bind_sit`, `bind_crease`, `bind_lap`, `bind_neck`, `bind_nape`, and `bind_collar` at the value 1, and `arm_raise_R`, `arm_raise_R2`, and `arm_raise_L` at the value 0 (below), each with its custom property on the mesh |
-| Weights | Automatic weights and the fixes below, at most 4 bones on each vertex, each sum 1. The upper arm, the forearm, the forearm twist bone, and `root` hold no weight |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `rabbit`: the FBX mesh with the edits below, with flat faces and no custom normals. 2,387 vertices and 2,595 faces |
+| Armature | The object `rabbit_rig` of the last rig, with the properties `palm`, `seat`, `hinges`, and the facts of the body (below). Phase B fits its bones again |
 
-The edits of the mesh, in the order of the work:
+The edits of the mesh, in the order of the work. Each id is the id in the mesh before its edit.
 
-- **Import.** No vertices merge at 1e-5. The 10 open edges stay (the whisker roots, the sides of
-  the nose, and a slit under the left paw).
-- **Arm tubes.** The arm tube of the FBX mesh has rings of 8 to 13 vertices with long triangles,
-  0.035 to 0.04 units apart. The tube from the ring of 8 vertices at the shoulder (|x| 0.1223)
-  to the ring of 16 vertices at the wrist (|x| 0.2954) goes, and a new tube takes its place: 15
-  rings of 16 vertices in planes of one x, 0.01275 units apart (0.43 arm radii), with quads, and
-  one quad and one triangle for each edge of the shoulder ring. Each new vertex lies at its angle
-  on the round section of the source (a Fourier series of order 3 of 64 rays, scaled to the
-  perimeter of the source section), with the UV of the source surface there. The tube is 1.18
-  times longer from the shoulder ring, as the arms of the old rig, so that the paw keeps the reach
-  of the rabbit hold (0.385 m, old 0.3886 m): the paw moves out 0.0312 units. The upper arm is
-  1.1 times as thick as the source at its middle (in from the shoulder ring over 0.4 of the upper
-  arm, out to 1.0 at the wrist ring). The mid upper arm girth is 1.09 of the width of the head at
-  the eyes (`rabbit-tpose.glb` 0.99).
-- **Knee rings.** Two loop cuts at each knee: halfway between the rings at up 0.10 and 0.129,
-  and between the rings at up 0.072 and 0.10. 4 rings lie within one leg radius of the knee joint.
-- **Colors.** Each face is fur (Oklab chroma 0.02 or less), pink (0.035 or more on a foot, 0.04
-  on a paw, 0.045 on an ear or the nose), or mixed. A mixed face takes the class of most of its
-  edge neighbors, and a thin pink triangle (a corner below 25°) with at most one pink neighbor
-  becomes fur. Each pink face takes the most common pink of its region, the gloss nose one pink,
-  a mixed fur face the fur of its neighbors, and the whiskers the main fur color: 454 faces.
-  Then the plain fur of the attributes `color` and `color_base` takes the move of `colors.tone`
-  of `tools/mesh-rigs/rabbit.json` (`tone()` of `tools/blender/rig_mesh.py`: chroma 0.03 or
-  less, the move fades out from the lightness 0.985 to 0.995, the rows [0.6, -0.02, 0.003,
-  0.009] and [0.97, -0.028, 0.003, 0.009] of [L, dL, da, db] in Oklab, no bone kept), as the old
-  rig did: 2,836 faces. The main fur goes from Oklab (0.979, 0.003, 0.007) to (0.951, 0.006,
-  0.016), toward the cream of the fur swatch of `rabbit-views.png`. The pink faces have more
-  chroma, so they keep their colors.
-- **Eye sockets.** Each old eye is a ball with a textured eye in a groove. 56 and 54 vertices in an
-  ellipse of 0.036 by 0.042 units around the middle of the dark eye faces (in the plane of the
-  eye, within 0.03 units of it) take 10 rounds of the Smooth of Blender with the factor 0.5, with
-  the ring around them fixed. A vertex moves at most 0.0103 units. The brow needs no edit: no edge
-  above the eyes bends more than 29.3°, below the crease angle of 35°.
-- **Legs.** An even offset of 0.012 units outward from the thigh axes (`offset` below), then the
-  thighs are 1.75 and the shins 1.25 times as long along their bones, and each foot keeps its size
-  (`rm.segment_stretch()`, by the leg weights). The offset fades in from 1.0 thigh lengths above
-  the hip joint to 0.2 below it, and out from 0.8 to 1.1 thigh lengths. The back of the thigh
-  keeps its place, and near the crotch the inner side keeps its place and the outer side grows
-  1.15 times. The shin takes no offset. The body rises 0.0672 units, and the bones move with the
-  mesh. The thigh factor is that of the old rig, and the shin factor is the shortest that puts the
-  haunch of the bind on the seat top of 0.250 m (the old 1.49 put it at 0.272 m).
-- **Flat quads.** 12 quads with a straight corner (above 179°), at the paw tops and the nose,
-  split along the diagonal from that corner. Blender divided 5 of them into a triangle of no area,
-  which folded in each pose.
-- **Haunch cut.** The back of each haunch lobe was two large quads (up to 0.12 units high) that
-  met in one corner on the seat, and from the back each lobe ended in a point there. After the
-  bind keys up to `bind_collar`, the 12 faces whose corners all lie in the bind behind y 0.03,
-  below 0.14 units above the seat top, at |x| below 0.15, with a shin and foot share below 0.5
-  and a tail share below 0.85 (faces 99, 103, 110, 114, 429, 430, 440, 446, 1450, 1740, 1768,
-  and 1977) take `bmesh.ops.subdivide_edges()` of their 31 edges (1 cut, grid fill, the corner
-  type `INNER_VERT`), and `bmesh.ops.triangulate()` (`BEAUTY`) splits the 12 faces of more than
-  four corners. The 39 new vertices (2900 to 2938) take the mean weights and keys of their edges
-  (the interpolation of bmesh), at most 4 bones, so the bind does not move.
+- **Import.** The FBX mesh `output_unwrapped` turns 90° about x (the turn of the file). The scale
+  1.001957 (1 / 0.998047) gives 1 unit from the soles to the ear tips. No vertices merge at 1e-5.
+  The custom normals go, and each face is flat. 2,428 vertices and 2,638 faces.
+- **Belly patch.** The source has a round patch on the lower belly: a fan of 6 triangles around
+  vertex 339 and a ring of thin faces around it (vertex pairs 2 to 7 mm apart). The vertices 337,
+  1743, and 1744 lie at one point at its top. The fan stood 3.9 mm in front of the belly curve.
+  - The 19 vertices 337, 338, 339, 340, 790, 791, 954, 1298, 1299, 1744, 1859, 1860, 1861, 1893,
+    1943, 1944, 1952, 1963, and 2105 go.
+  - The vertices 1770, 1937, 1301, 1892, and 758 merge into 1769, 1742, 1551, 1638, and 759, at
+    the place of the second vertex.
+  - A grid of 4 × 3 quads fills the hole, with the rows (759, 370, 1743, 953, 952), (1742, a, b,
+    c, 1769), (1894, d, e, f, 1771), and (1638, 1926, 1923, 1300, 1551).
+  - The 6 new vertices lie on the belly curve between the rows: a (-0.0155, -0.1065, 0.2251), b
+    (-0.001, -0.1092, 0.2257), c (0.0155, -0.1065, 0.2251), d (-0.0141, -0.0943, 0.2075), e
+    (-0.001, -0.0949, 0.2068), and f (0.0141, -0.0943, 0.2075). Each corner of the 12 faces has
+    the UV of one point of the belly fur (0.4314, 0.5653).
+  - The edges 1771-1550 and 1894-278 dissolve, so each side of the grid has one quad in place of
+    two triangles.
+- **Belly bands.** On each side, a band of thin quads (4 to 8 mm wide) went from the corner of the
+  belly patch up to the side of the hip. In each pair across a band, the outer vertex merges into
+  the vertex on the belly side, at its place. A vertex moves at most 7.8 mm.
+  - Right: 261 → 365, 1792 → 321, 322 → 321, 1453 → 320, 319 → 320, 1452 → 1451, 1866 → 1865,
+    1772 → 1975, 1378 → 1379, 2101 → 1379, and 277 → 276.
+  - Left: 1489 → 1182, 186 → 185, 1722 → 185, 183 → 184, 2027 → 184, 560 → 559, 1981 → 1299,
+    437 → 436, 438 → 439, 2021 → 439, and 1540 → 1905.
+  - The corner of the grid: 1183 → 946.
+  - No edge of the belly, the groin, and the lower chest is now shorter than 8 mm (z 0.15 to
+    0.45, |x| below 0.13, the front half).
 
-The seated bind and its keys, in the studio axes of the bind (x left, up, forward):
-
-- **Bones.** The turns of `rm.bind_turns()` with the studio rules of `tools/mesh-rigs/rabbit.json`
-  (the leg turns, the trunk 5.08° back, the straight arms at the bind upper arm) and the bind
-  supination 115° (left) and 57° (right), the values of `pnpm bind-supination rabbit` on this rig
-  (a second probe gives a change of 0.5°). Then `sa.drive_segments(rabbit_rig, key_frame=1)`.
-  The largest paw twist p95 of the six roles goes from 159° to 135° on the left and from 92° to
-  79° on the right.
-- **Hips bone.** The tail of the hips bone lies 3° back from the vertical (0.0037 units), so that
-  each thigh lies 9° off its line. At 5°, Blender stored each leg frame with a shear of 2.7e-5
-  (the series of `vec_roll_to_mat3_normalized()` between about 2° and 6.3° off the -Y axis of the
-  parent), and the export stops above 1e-5.
-- **`bind_sit`.** `rm.sit()` with the rule `sit` of `rabbit.json` lowers the underside of the
-  haunch onto a seat top 0.250 m above the soles (`most` 0.015, then a second `sit()` with
-  0.005), with no `rm.crease_relax()`. 157 vertices move, at most 2.6 cm, and the tail ball
-  keeps its form. The key is this move of the bind, turned back into the rest by the inverse of
-  the blended skin of each vertex. With the back of the seat at -0.1396 units and the rule
-  `crease` of `rabbit.json`, the back of the haunch dropped up to 7.7 cm into a column under the
-  tail ball. After the haunch cut, the back of the haunch takes one oval in the bind, added to
-  `bind_sit`: each vertex behind y 0.03, below 0.11 units above the seat top, at |x| below 0.17,
-  with a shin and foot share below 0.5 and a tail share below 0.85 (49 vertices) moves along the
-  ray from the middle (0, 0, 0.06 above the seat top) onto the ellipsoid with the radii 0.15
-  (x), 0.105 (y), and 0.085 (up), by 1/3 at the border of the region and 2/3 one ring in, and no
-  point goes below the seat top. 49 vertices move, at most 2.6 cm. From the back and the back
-  diagonals, the lobes now go down to the seat in one round curve, and the tail ball keeps its
-  form and its place. One small face on the seat (274, 284, 2912) turns over under the haunch.
-  With the fade, the middle under the tail ball stayed back from the lobes and showed as a dark
-  column from the back, and the lowest point over the seat rose 2.9 mm. A second pass of the
-  same oval with a fade of one ring (1/2 at the border) puts the middle on the oval: 49 vertices,
-  at most 1.3 cm, and the seat top is 0.250 m again. The quads 102 (274, 283, 284, 2912) and 435
-  (229, 228, 286, 2923) on the seat split along the diagonals 283 to 2912 and 228 to 2923, so the
-  thin triangle at the seat edge does not turn over. Then the low ring of the sides of the back
-  goes down toward the seat, so that the lobe does not hang far over its seat line from the back
-  diagonals: each vertex behind y 0.02 (13 vertices), 0.01 to 0.06 units above the seat top, at
-  a plan angle from the back (around the line x 0, y -0.02) of 30° to 50° and more, takes the
-  height h (1 - 0.5 w), with w the smooth step from 1 at 0.01 to 0 at 0.06: at most 1.4 cm. The
-  quads 101, 115, 433, 455, and 1804, which these moves made nearly flat, split along their
-  better diagonals (2938 to 281, 318 to 2916, 230 to 2926, 1047 to 298, and 292 to 279). Each
-  move goes into `bind_sit`.
-- **`bind_crease`.** The folded faces of the front of the hips (up 0.15 to 0.29 units of the
-  source, |x| below 0.14, in front of the trunk middle) take 60 rounds of the relax of the
-  faces that turn more than 35° (each vertex moves halfway to the mean of its neighbors).
-- **`bind_lap`.** The lower belly between the thighs (|x| below 0.06) moves forward onto the line
-  from 0.105 units in front of the trunk middle at the hips (up 0.31 of the bind) to 0.08 units at
-  the seat (up 0.23), less to the sides, then the moved vertices and their ring take 8 Taubin
-  rounds (0.5, -0.53). 48 vertices move, at most 9.5 cm. The lower belly of the mesh turns down
-  between the seated thighs, and the app showed it as a dark wedge at the crotch. The push
-  pressed the lower half of the small lump at the bottom of the belly flat onto the line, so that
-  its faces folded over each other (edges of 140° to 159° between the triangles of vertices 1901,
-  1283, 1284, 1869, and 1903), and the app showed a pinch at the middle of the lap. Then the 22
-  vertices within 0.035 units of the bind point (0, -0.095, 0.279) take 30 plain Laplacian rounds
-  of the share 0.4 times a falloff (1.5 times the smooth step to 0 at the radius, at most 1),
-  added to the key: at most 1.6 cm. The sharpest edge of the lap is now 66°. The lower edge of
-  the smoothed lump still hung over the vertex 1901 below it, so a fan of faces from 1615 and
-  1529 to 1901 faced down and showed as a dark crease line from the front. Then 1901 moves 0.012
-  units down in the bind (z), added to the key: the fan faces forward like the belly under it.
-  A move forward (y) made the fan a light crescent.
-- **`bind_neck`.** Each vertex of the front of the neck between the chest and the chin (|x| below
-  0.08) moves forward by 0.6 of its gap behind the line from the chest front (vertex 1628) to the
-  chin front (vertex 689) at the middle, less to the sides, then 4 Taubin rounds. 27 vertices
-  move, at most 4.1 cm. The round head sits on the chest, and the app showed the groove under the
-  jaw as a dark band.
-- **`bind_nape`.** Each vertex of the back of the neck (|x| below 0.09, with an arm share below
-  0.3) moves back by 0.6 of its gap in front of the line from the upper back (vertex 1340) to the
-  back of the skull (vertex 16) at the middle, less to the sides, then 4 Taubin rounds. 10
-  vertices move, at most 3.9 cm. From behind and from the stage camera, the groove showed as a
-  dark collar.
-- **`bind_collar`.** The keys of the neck and the nape left the groove under the round head, and
-  the app showed it as a dark collar under the chin and a dark band at the sides of the neck. In
-  the bind, with the keys before it, each azimuth around the vertical line through the neck joint
-  (0 at the front, +90 at the left) has a rim: the point of the largest radius where the head
-  faces (head share 0.9 or more, no whisker) cross the half plane of the azimuth between the
-  heights 0.64 and 0.75, smoothed over 5°. Each vertex below its rim (at most 0.004 under it,
-  above the height 0.53, with an arm share below 0.2) moves out from the line to the cone that
-  goes down and in from the rim with the slope 0.3 at the front and 0.12 at the sides and the
-  back (the change from 30° to 70° of azimuth), only when the cone is out of it. The move fades
-  out from 0.08 to 0.15 below the rim, with the arm share plus half the clavicle share from 0.03
-  to 0.2, and on the violin side from the azimuth 10° to 25° on, up to 95°, and back from 115°.
-  Then the moved vertices and their ring take 4 Taubin rounds (0.5, -0.53). 210 vertices move,
-  at most 5.1 cm. The violin of the hold lies under the left jaw and its tail end against the
-  left side of the neck: a fill there put the violin up to 4.3 cm deeper into the head in `pnpm
-  pose-depth violinist`, and with the fade it goes 0.3 cm deeper (2.7 cm, before 2.4 cm). With
-  no clavicle share in the fade, a face at the front of the right shoulder folded in 58 % of the
-  play samples of `pnpm fold-probe violinist` (7 % before). The fill made the quad 2369 under
-  the right jaw (296, 1781, 1380, 297) nearly flat in the bind, so a split along the diagonal
-  1781 to 297 (`bmesh.ops.connect_verts()`, largest corner 131° in place of 172°) keeps its thin
-  triangle from folding with the head.
-- **`arm_raise_L` (left collar at rest).** At rest, the violin hangs at the left side, and the
-  left side of the neck under the jaw stayed dark. The key `arm_raise_L` adds the full fill
-  there: the fill of `bind_collar` again with no violin fade (the bind with `bind_collar` at 0),
-  less the fill of `bind_collar`, times the smooth step of x from -0.02 to 0.02 (the left side
-  only): 105 vertices, at most 4.1 cm. It has no bone, so the app weights it by the turn of the
-  left upper arm in the axes of the chest: the turn of the rest pose (w, x, y, z: 0.851, 0.4961,
-  0.0461, -0.1659, Blender axes), full up to 8° and none from 22°. The play pose of the left arm
-  is 40° from it, and the lift at its middle 42°, so the key is 0 when the violin comes up. In
-  `pnpm pose-depth violinist`, the violin depths stay the same. A fade to 30° put the violin 0.1
-  cm deeper in one play sample. A fill in the bind that the key takes back in the play gave the
-  same look, but `pnpm fold-probe violinist` then counted the left jaw faces as folds in each
-  play sample. With this key, it counts 5 of them at rest, because the fill turns them far from
-  their bind normals.
-- **Raise keys.** `rm.raise_shape()` relaxes the faces that fold in the pose of a rule of `pnpm
-  raise-fit violinist`, on the bind, and the key is the move turned back into the rest by the
-  inverse of the blended skin. The property holds the turn of the forearm (w, x, y, z, Blender
-  axes) and the fade:
-
-  | Key | Rule | Turn | Fade |
-  |---|---|---|---|
-  | `arm_raise_R` | 10 faces of the right inner elbow, the mean turn of the play (96° from the bind), `below` 0.3 | 0.6700, -0.4206, 0.5587, 0.2490 | 10° to 35° |
-  | `arm_raise_R2` | 7 faces of the right inner elbow, 15° further, `below` 0 | 0.5442, -0.4754, 0.6315, 0.2810 | 20° to 30° |
-
-  In `pnpm fold-probe violinist`, the right inner elbow faces folded in up to 93 % of the play
-  samples and the left in up to 13 %. With the keys, the worst face folds in 77 %, the next in 48 %
-  and less, and the left in 6 %. A key for a face at the front of the right arm root turned over
-  no face in the pose of Blender, so the file has no such key. After the elbow ramp of the right
-  arm (below), the keys `arm_raise_R` and `arm_raise_R2` are drawn again from the same rules on
-  the new weights (`raise_key()`, at most 3.0 and 0.9 cm). No right elbow face folds in any
-  sample, and the right arm has a fold in 0 % of the play samples (before: 75 % for the worst
-  face). A third right key of the rule 25° further (fade 30° to 40°) on the old weights made the
-  folds worse (82 %). The left key `arm_raise_L` (the rule of 9 faces of the left inner elbow,
-  89° from the bind, fade 15° to 25°) was drawn again after the left elbow ramp (below), and its
-  pose turns over no face, so its move was 0 and the file dropped it. The key `arm_raise_L` now
-  fills the left collar at rest (`bind_collar`, below).
-
-The facts of the body:
+The facts of the body on the armature, from the last rig:
 
 - **`height` 0.807929.** The standing shoulder joints in the app, in meters: the joints of the
-  mesh (up 0.497 of the source) raised 0.0672 units by the longer legs. Thus the scale stays
-  1.43199 m for each unit, as for the old rabbit.
+  mesh (up 0.497 of the source) raised 0.0672 units by the longer legs of the last rig. Thus the
+  scale is 1.43199 m for each unit, as for the old rabbit.
 - **`crease` 35.** The crease angle of the fur, in degrees.
-- **`backRoom` 0.0889.** The chair keeps the depth of the old chair (0.237 m). The body is less
-  deep than the old body behind the front edge of the seat, so the room behind its back grows.
-
-The head height `H` is 0.3027 m (old 0.3209 m): the head of the mesh from the chin to the top of
-the skull. The old rig counted a part of the ear base. The file has no `headFloor`, because no
-whisker or jaw vertex lies below the chin.
+- **`backRoom` 0.0889.** The chair keeps the depth of the old chair (0.237 m).
 
 The property `seat` is the chair of `rabbit.json` with the back edge at -0.10 units (front -0.03,
-half width 0.16), and `hinges` holds the elbow axes of `rm.bind_hinges()`.
+half width 0.16), and `hinges` holds the elbow axes of `rm.bind_hinges()` of the last rig.
 
-The joints, in the studio axes of the source (x, up, forward), before the stretch of the legs:
+The joints of the last rig, in the studio axes of the source (x, up, forward), before the stretch
+of the legs:
 
 - **Trunk and head.** The joints of `tools/mesh-rigs/rabbit.json`, with the head end on the top of
   the skull (0, 0.755, 0.022) and the ear tips (±0.138, 0.995, -0.06).
 - **Arm.** The shoulder (0.075, 0.497, 0.010), the elbow (0.202, 0.4975, 0.0097) at 0.39 of the
-  tube, and the wrist (0.3265, 0.5029, 0.0088) in the middle of the wrist ring. The fingers go
-  from (0.3615, 0.501, 0.0083) to the paw tip (0.388, 0.495, 0.0088).
+  tube, and the wrist (0.3265, 0.5029, 0.0088) in the middle of the wrist ring, on arms 1.18 times
+  longer than the source. The fingers go from (0.3615, 0.501, 0.0083) to the paw tip (0.388,
+  0.495, 0.0088).
 - **Leg.** The hip (0.072, 0.185, 0), the knee (0.066, 0.1156, -0.0057) in the middle of the knee
   ring, the ankle (0.067, 0.055, -0.025), and the toes from (0.085, 0.018, 0.045) to (0.09,
   0.008, 0.08).
 - **Tail.** From (0, 0.29, -0.075) to (0, 0.29, -0.16), through the tail ball.
 
-The fixes of the weights, in the studio axes of the source, before the stretch of the legs:
-
-- **Thighs.** No thigh weight above up 0.23 or on the other side, then 6 rounds of Smooth from
-  up 0.15 to 0.26.
-- **Tail.** The ball alone takes the tail (within 0.06 units of (0, 0.285, -0.12), behind
-  forward -0.085), then 2 rounds of Smooth of its root band.
-- **Head, neck, ears.** No head weight on the shoulder tops (|x| above 0.07, up below 0.565), no
-  neck weight above up 0.6, and no ear weight below up 0.765 or on the other side, each with 2
-  rounds of Smooth of its edge. The gloss nose and the whiskers take the head bone alone.
-- **Crotch.** After the leg stretch, 16 rounds of Smooth on the 152 vertices of the front of the
-  crotch and the lower belly with a thigh share of 0.02 to 0.98 and |x| below 0.12.
-- **Arms.** No wrist helper or forearm segment beyond |x| 0.34, 2 rounds of Smooth on the wrist
-  band (|x| 0.31 to 0.345), the fingers keep half of their weight, 4 rounds on each elbow band
-  (|x| 0.17 to 0.24), and 6 rounds on each arm root (|x| 0.06 to 0.14). The head weight of the
-  vertices with a clavicle and arm share of 0.5 or more goes to the neck.
-- **Neck sides.** No clavicle or arm weight on the sides of the neck under the jaw (up above
-  0.585, |x| below 0.09), with 2 rounds of Smooth under it. With the bow arm raised and the head
-  turned, a face there folded in 97 % of the play samples.
-- **Arm rings.** `sa.ring_spread(rabbit, 'arm_L')` gave a spread of the shares of one ring of up
-  to 0.08 in twist and 0.21 in the wrist helper. Each ring of the arm tube from its second ring to
-  the last ring before the wrist (14 on each side) takes one mean weight: each vertex of a ring
-  takes the mean weights of its ring, at most 4 bones. Each key keeps its move of the bind.
-- **Elbow ramps.** The shares of upper arm, elbow helper, and forearm of each ring of each
-  arm tube (rest |x|, the elbow joint at 0.202) are: 0.1478: 0.97, 0.03, 0; 0.1606: 0.9,
-  0.1, 0; 0.1734: 0.75, 0.25, 0; 0.1861: 0.5, 0.5, 0; 0.1989: 0.25, 0.7, 0.05; 0.2117: 0.05,
-  0.7, 0.25; 0.2244: 0, 0.5, 0.5; 0.2372: 0, 0.25, 0.75; 0.2499: 0, 0.1, 0.9; 0.2627: 0, 0.03,
-  0.97. The upper arm segments and the forearm segments of a ring keep their proportions, at
-  most 4 bones, and each key keeps its move of the bind. Before, the upper arm kept 0.29 and
-  0.12 of the two rings past the joint and the helper at most 0.29, and the inner elbow folded at
-  the elbow turn of the play (98° from the bind). A narrow ramp (the helper at most 0.4) folded
-  more faces. In `pnpm arm-check violinist`, the right folds p95 go from 5 to 1, the twist p95
-  from 28° to 33° (limit 55°), and each measure passes. The left arm takes the same ramp after
-  the right (`set_ring_shares()` of the round scripts, 160 vertices): the left inner elbow folded
-  in up to 6 % of the play samples, and now no left elbow face folds. The violin depths of `pnpm
-  pose-depth violinist` stay the same.
-
-The legs, in meters (1.43199 m for each unit): in the seated bind, the seat top is 0.250 m (old
-0.250 m), the hips joint 0.3285 m above the soles (old 0.352 m), the mid thigh girth 0.517 m (old
-rig 0.456 m) and the mid shin girth 0.259 m (old 0.299 m). In the rest, the mid thigh is 0.542 and
-the mid shin 0.256 of the width of the head at the eyes (before the legs 0.442 and 0.256).
+The last rig, in meters (1.43199 m for each unit): in the seated bind, the seat top is 0.250 m,
+the hips joint 0.3285 m above the soles, the mid thigh girth 0.517 m, and the mid shin girth
+0.259 m. Its head height `H` is 0.3027 m.
 
 ## The module
 
