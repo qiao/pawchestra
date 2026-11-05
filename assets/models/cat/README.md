@@ -141,10 +141,10 @@ The seated bind:
 - **Bones.** The turns of `bind_turns()` of `tools/blender/rig_mesh.py` with the seat rules of
   `tools/mesh-rigs/cat.json`: the thighs slope 25° down and 1° out, the shins are vertical, the
   trunk leans 1.26° back (the hip angle opens 1°), and the arms are straight at the bind upper arm
-  of `bindArms`. The paws turn toward supination, the left 130° and the right 81°
-  (`bindSupination`, the values of `pnpm bind-supination cat` on this rig), and the arm segments
-  and the helpers turn by the rule of the app (`drive_segments()` of
-  `tools/blender/studio_armature.py`).
+  of `bindArms`. The paws turn toward supination, the left 130° and the right 81°, the values of
+  `pnpm bind-supination cat` on this rig, and the arm segments and the helpers turn by the rule of
+  the app (`drive_segments()` of `tools/blender/studio_armature.py`). These values live only in
+  the Action `bind`.
 - **Tail.** The root bone goes left and down along the back of the haunch, as `tailBind` of
   `cat.json` gives it: (0.858, -0.504, 0.101) in the studio axes of the source. The tip bone keeps
   the curl of the mesh (104° from the root bone). It turns with the root bone, then 60° about it,

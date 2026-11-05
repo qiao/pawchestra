@@ -340,10 +340,10 @@
     },
     "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the cat of the A-pose mesh, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "bindSupination": {
-      "L": 130,
-      "R": 81
+      "L": 150,
+      "R": 90
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 130 degrees and the right 81 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The hand rig cat.blend keys these values in its Action bind. They are the values of the rule of design 4.4 on the hand rig (pnpm bind-supination cat --glb assets/models/cat/cat.rig.glb from L 150 and R 90): the largest left paw twist p95 of the cast roles goes from 140 to 120 degrees (the snare drummer and the flutist), and the largest right one from 117 to 108 degrees (the cellist and the snare drummer). The violist takes 95 degrees on the left and 69 on the right",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 150 degrees and the right 90 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. The rule of design 4.4 gives L 84 and R 53 (pnpm bind-supination cat on the rigs of L 0, L 90, and L 150), but the own role wins on both sides. With L 84, the left paw twist p95 of the violist is 149 degrees and its move twist 151 degrees, near the pinch of the wrist skin under the neck; with 150, 83 and 85 degrees. With R 53, the bow paw twists past 180 degrees in the lift (move twist 180, limit 176); with 90, its paw twist p95 is 61 degrees. With L 150, the largest left paw twist p95 of the cast roles is 168 degrees (the flutist and the snare drummer, limit 170).",
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 1 degree out, and the shin is vertical (tools/rig/leg_turns.py <config> 25 1 0). So the legs are close and parallel from the front, as on the cat of the A-pose mesh: the knee gap is 0.204 m (old 0.188 m, 0.244 m with 8 degrees out), and the ankle gap 0.203 m (old 0.222 m, 0.262 m with 8 degrees).",
     "straightArms": true,
     "tailBind": {
