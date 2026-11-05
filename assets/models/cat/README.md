@@ -139,13 +139,13 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 983,932 bytes |
-| SHA-256 | `277ec83cdae3af135c2b8bd41978f8f836e7cc274730d3fdc14d73158aa61f15` |
+| Size | 983,928 bytes |
+| SHA-256 | `8867f986c06ce54c0109ed94f775adc72f7df987d6b7e4d78d172911a60e243c` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates, and the keys `arm_raise_R`, `arm_raise_L`, `arm_raise_L2`, and `arm_raise_L3` (below) |
-| Footprint | The seated violist is 0.673 m deep and 0.708 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
+| Footprint | The seated violist is 0.673 m deep and 0.706 m wide (0.652 m and 0.704 m with the rig of commit 7c9e8074). The feet reach 1.7 cm further forward, and the tail 0.4 cm past the back of the chair |
 
 ## cat.blend
 
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 379,889 bytes |
-| SHA-256 | `b91847231a3ac9a4e89c09b1ee2216ed79c40027cfcad961152e1eb610b0d4fe` |
+| Size | 379,405 bytes |
+| SHA-256 | `b091f125ba558f61d3b0e2f35c360e3c42591ac309d00e49a2bb36cbb5a393c4` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -280,9 +280,11 @@ The edits of the mesh, in the order of the work:
   |x| 0.015 to 0.10, up 0.832 to 0.88). The bridge of the nose made a slanted edge of 46° above
   each inner eye corner.
 - **Legs.** First an even offset outward from the bone axes, so that the bulge of the haunch keeps
-  its form: the thigh grows 0.044 units, faded in from 1.0 thigh lengths above the hip joint to
-  0.2 below it, and the shin grows 0.044 units at the knee, 0.027 at its middle, and 0 at the
-  ankle. The back of the thigh keeps its place, and near the crotch the inner side keeps its
+  its form: the thigh grows 0.0323 units, faded in from 1.0 thigh lengths above the hip joint to
+  0.2 below it, and the shin grows 0.0323 units at the knee, 0.0183 at its middle, and 0 at the
+  ankle. The first offset (0.044 units, and 0.027 at the middle of the shin) made the legs too
+  thick, so a second offset of the same rule on the long legs (-0.0117 and -0.0087 units) took them
+  back to these values. Each key keeps its move from the basis. The back of the thigh keeps its place, and near the crotch the inner side keeps its
   place and the outer side grows 1.15 times. A factor across the axes made sharp fins at the
   outer haunch and a ledge where the thigh met the belly, in the rest and in the bind. Then the
   thigh is 1.6 and the shin 2.30 times as long along its bone, and each foot keeps its size
@@ -296,8 +298,9 @@ The legs, in meters (1.588737 m for each unit), with the old file in parentheses
 seated bind of the seat rules of `cat.json`, the seat top is 0.3010 m (0.3002 m), the thigh is
 0.201 m (0.205 m) and the shin 0.213 m (0.222 m) long, and the seated cat is 1.651 m (1.675 m)
 high. The shin factor is 2.30, because 2.32 put the seat top at 0.3025 m. In the rest, the mid
-thigh is 0.571 and the mid shin 0.399 of the width of the head at the eyes (0.439 and 0.290; the
-source 0.304 and 0.22), and the hips are 0.625 m wide (0.539 m).
+thigh is 0.500 and the mid shin 0.343 of the width of the head at the eyes (0.439 and 0.290; the
+source 0.304 and 0.22), and the hips are 0.591 m wide (0.539 m). The first offset gave 0.571,
+0.399, and 0.625 m.
 
 The fixes of the weights, in the studio axes of the source:
 
