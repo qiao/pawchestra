@@ -7,7 +7,7 @@
  * page of that moment, with the test notes of the role. A demo time (`--times`) poses the seat of
  * the first player of the role in the demo of `--demo`, or in the first demo with the role. With
  * no `--times`, the file holds each moment of the role. With `--times` and no `--moments`, it
- * holds only the demo times.
+ * holds only the demo times, and `--moments all` adds each moment.
  *
  * A standing or a seated stance of the body (`standingBody()`, `seatedBody()`) puts the stance
  * matrices before the pose, and sets the leg or the sit shapes to 1. The app skins such a body
@@ -144,7 +144,7 @@ const MODEL_TO_BLEND = new Matrix3().set(-1, 0, 0, 0, 0, 1, 0, 1, 0);
 interface Options {
   /** The role, such as `violist` or `violinist@wolf`. */
   readonly role: string;
-  /** The names of the moments of `--moments`, or `null` for each moment. */
+  /** The names of the moments of `--moments`, or `null` for each moment (`--moments all`). */
   readonly moments: readonly string[] | null;
   /** The song times of `--times`, in seconds. */
   readonly times: readonly number[];
@@ -294,7 +294,7 @@ function optionsOf(args: readonly string[]): Options {
   const from = value('--from');
   return {
     role,
-    moments: moments ?? (times.length > 0 ? [] : null),
+    moments: moments?.join() === 'all' ? null : (moments ?? (times.length > 0 ? [] : null)),
     times,
     demo: value('--demo'),
     wall,
