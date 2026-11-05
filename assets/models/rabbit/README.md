@@ -143,11 +143,11 @@ colors, and `rabbit.rig.glb` and the module are the export of the last rig.
 
 | Item | Value |
 |---|---|
-| Size | 352,722 bytes |
-| SHA-256 | `c7cb114c24be47aae87c106633e8c961c756ad1740d4fe022fb402f7a79e4dcd` |
+| Size | 282,840 bytes |
+| SHA-256 | `c735106748eead2ed33f7686594ff7ab0af2b53e0d9d35798bb5098501d18daf` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. No object has a transform |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
 | Mesh | One object `rabbit`: the FBX mesh with the edits below, with flat faces and no custom normals. 2,821 vertices and 3,027 faces (2,614 quads and 413 triangles) |
 | Armature | The object `rabbit_rig` of the last rig, with the properties `palm`, `seat`, `hinges`, and the facts of the body (below). Phase B fits its bones again |
 
@@ -194,9 +194,9 @@ The edits of the mesh, in the order of the work. Each id is the id in the mesh b
     moves out 0.0312 units along x. This keeps the reach of the 1.18 arm of the last rig (0.385 m
     from the shoulder joint to the palm in `pnpm hold-reach rabbit`), so the violin hold keeps
     its reach to the nut.
-  - The new rings lie in planes of one x, 0.01277 units apart (0.39 to 0.45 arm radii): |x| 0.1351,
-    0.1478, 0.1606, 0.1734, 0.1861, 0.1989, 0.2117, 0.2244, 0.2372, 0.2500, 0.2627, 0.2755,
-    0.2883, 0.3010, and 0.3138.
+  - The new rings lie in planes of one x, 0.01277 units apart (0.39 to 0.45 arm radii): |x|
+    0.1351, 0.1478, 0.1606, 0.1734, 0.1861, 0.1989, 0.2117, 0.2244, 0.2372, 0.2500, 0.2627,
+    0.2755, 0.2883, 0.3010, and 0.3138.
   - The upper arm keeps the length of the source: each ring up to the elbow (|x| 0.1898, at 0.39
     of the source tube as on the last rig) takes the source section at its own x. The forearm is
     1.30 times as long (0.1056 to 0.1368 units). Each forearm ring takes the source section at
@@ -217,6 +217,25 @@ The edits of the mesh, in the order of the work. Each id is the id in the mesh b
     corners take the UV of its first corner (97 faces on the left, 99 on the right).
   - The mid upper arm girth (the ring at |x| 0.1606) is 0.209 units, 1.00 of the width of the
     head at the eyes (0.209 units), as on the source.
+- **Legs.** The thighs are 1.75 and the shins 1.25 times as long, as on the last rig, so that the
+  seated bind of the last rig puts the haunch on the old seat (0.250 m). The soles stay at z 0.
+  Each vertex belongs to a band of one height: a ring of each leg, or the crotch at that height.
+  Each band moves up by one translation, the stretch at its mean height: 0.25 (z - 0.055) up to
+  the knee joint (z 0.1156), then 0.01515 + 0.75 (z - 0.1156) up to the hip joint (z 0.185).
+
+  | Band | z of the source | Vertices (both legs) | Move up |
+  |---|---|---|---|
+  | Feet | 0 to 0.057 | 286 | 0 |
+  | Shin ring | 0.0665 to 0.0802 | 20 | 0.0045 |
+  | Low knee ring | 0.0978 to 0.1057 | 18 | 0.0117 |
+  | High knee ring | 0.1272 to 0.1311 | 18 | 0.0255 |
+  | Low thigh | 0.1429 to 0.1566 | 14 | 0.0400 |
+  | High thigh | 0.1624 to 0.1683 | 16 | 0.0533 |
+  | Hips and crotch | 0.1742 to 0.1898 | 19 | 0.0642 |
+  | The rest of the body | 0.1957 and up | 2,430 | 0.0672 |
+
+  The girth of the source stays: the mid thigh is 0.452 and the mid shin 0.261 of the width of
+  the head at the eyes (the source 0.449 and 0.262, the last rig 0.542 and 0.256).
 
 The facts of the body on the armature, from the last rig:
 
