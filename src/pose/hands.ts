@@ -132,15 +132,19 @@ type RestingHand =
 
 /** The holds of the piano and the harp. */
 export const HANDS_HOLDS = {
-  // The paw of the studio polar bear is longer than a white key, so the palm is 0.03 m in front
+  // The paw of the studio polar bear is longer than a white key, so the palm is 0.039 m in front
   // of the front edge of the keys (`pianoKeyFront()`), and the curled claws lie on the key tops.
-  // The left palm is 0.044 m above the keys and the right palm 0.0505 m, because the two paws of
-  // the mesh differ. With the palm 0.065 m above the keys and 0.07 m in front of them, the claws
-  // stop about 2 cm above the keys at their front edge, and with 0.04 m in front, the right claws
-  // stand up to 9 mm above the keys.
+  // The left palm is 0.0572 m above the keys and the right palm 0.0657 m, because the two paws of
+  // the mesh differ. The offsets grow with the paw: they are 1.3 times the offsets of the bear at
+  // a shoulder height of 1.15 m, and the claws go at most 1 mm into the case in the play
+  // (`pnpm pose-depth pianist`).
   // The pose follows a professional pianist (`docs/reference/piano-technique.md`): the trunk leans
   // a little from the hips, the forearms are about level with the keys, the elbows stand a little
-  // above the keys, and the shoulders stay low (`shoulderDrop`). The polar bear sits on a low bench
+  // above the keys, and the shoulders stay low (`shoulderDrop`). The values below fit the polar
+  // bear at a shoulder height of 1.15 m. At 1.49 m, the arms reach further down to the keys and go
+  // up to 14 cm into the round trunk in the play, against 5 to 7 cm at 1.15 m. A larger lean of the
+  // trunk (12°) makes it deeper, and a piano that grows with the bear (`PIANO_SCALE` 1.508) brings
+  // it back to 8 cm, but hides the players behind the piano. The polar bear sits on a low bench
   // with the legs of its mesh, so its shoulders stand about 0.2 m above the keys of a real grand
   // piano (`PIANO_SCALE`). The lean of 6°, the shoulder turn of 4°, and the elbows that point out
   // and a little down put the elbows 4 to 6 cm above the keys, with level forearms. The lean of
@@ -162,8 +166,8 @@ export const HANDS_HOLDS = {
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
-    palmL: [0, 0.044, 0.03],
-    palmR: [0, 0.0505, 0.03],
+    palmL: [0, 0.0572, 0.039],
+    palmR: [0, 0.0657, 0.039],
     faceL: [0, -1, 0],
     faceR: [0, -1, 0],
     aimL: null,
