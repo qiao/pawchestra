@@ -120,21 +120,44 @@ A run of `pnpm rig-mesh cat` gives the same bytes.
 
 ## cat.blend
 
-The rig of the cat, made by hand in Blender from `cat-tpose.glb` (design 4.4, "Hand rig"). It
-has no Action `bind` and no shape keys yet: the seated bind, the bind fixes, and the export are a
-later step.
+The rig of the cat, made by hand in Blender from `cat-tpose.glb` (design 4.4, "Hand rig"), with
+the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
 
 | Item | Value |
 |---|---|
-| Size | 291,412 bytes |
-| SHA-256 | `b017e3c5b505ff4711da8c428bd2bdd57b325b56acd78cc4f910d84f317aca63` |
+| Size | 313,963 bytes |
+| SHA-256 | `42c55275ee1e376d16ce5eec90aaf876aebf8c59061a8fc5c4dd1934f2901a04` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
 | Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,018 vertices and 3,988 triangles, 46 of them gloss |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
-| Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint, and the property `palm` is (0, 0, -1) |
+| Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint. The Action `bind` holds the seated bind at frame 1 (below). The property `palm` is (0, 0, -1), `seat` is the chair of `cat.json` (front 0.1, back -0.087, half width 0.184), and `hinges` holds the elbow axes of `bind_hinges()` |
+| Shape keys | `Basis` and `bind_sit` at the value 1 (below) |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex. The upper arm, the forearm, and the forearm twist bone hold no weight |
+
+The seated bind:
+
+- **Bones.** The turns of `bind_turns()` of `tools/blender/rig_mesh.py` with the seat rules of
+  `tools/mesh-rigs/cat.json`: the thighs slope 25° down and 1° out, the shins are vertical, the
+  trunk leans 1.26° back (the hip angle opens 1°), and the arms are straight at the bind upper arm
+  of `bindArms`. The paws turn toward supination, the left 150° and the right 90°
+  (`bindSupination`), and the arm segments and the helpers turn by the rule of the app
+  (`drive_segments()` of `tools/blender/studio_armature.py`).
+- **Tail.** The root bone goes left and down along the back of the haunch, as `tailBind` of
+  `cat.json` gives it: (0.858, -0.504, 0.101) in the studio axes of the source. The tip bone keeps
+  the curl of the mesh (104° from the root bone). It turns with the root bone, then 60° about it,
+  to (0.286, 0.927, -0.243). Thus the tail lies on the seat at the back of the left hip and curls
+  up beside it, in front of the back post. With no turn about the root bone, the tip points back
+  past the chair, and with 100°, it goes into the hip.
+- **`bind_sit`.** `sit()` of `rig_mesh.py` lowers the underside of the haunch behind the hip
+  joints onto the seat (the rule `sit` of `cat.json` with `most` 0.07 and no `top`).
+  `crease_relax()` then smooths the crease of the belly and the thighs (the rule `crease`), and a
+  second `sit()` (`most` 0.03, `top` the seat top of the bind) puts the haunch back on the seat.
+  The key is this move of the bind, turned back into the rest by the inverse of the blended skin
+  of each vertex. 236 vertices move, at most 16.4 cm in the bind. From the side, the underside
+  behind the hip joints was up to 15.8 cm above the seat before, and 2.9 cm after. The seat top
+  stays 0.300 m.
 
 The joints are the joints of `tools/mesh-rigs/cat.json`, except the arm joints, which come from
 sections of the mesh, and the bend of the tail:
