@@ -152,9 +152,10 @@ passes.
       the user in a close play frame of the stage.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
-- [ ] Polar bear pianist: the arms go up to about 8 cm into the belly in the play (accepted 4 cm).
-      Try the elbow poles (`HANDS_HOLDS.piano`) further out, with the arm gate.
-- [ ] Polar bear pianist: from the front, the open lid hides the bear and its paws.
+- [ ] Polar bear pianist: at the shoulder height of 1.49 m, the forearms go up to 13.6 cm and the
+      upper arms 13.0 cm into the trunk in the play (5.4 cm and 6.8 cm at 1.15 m), and the forearms
+      slope down to the keys. Fit `HANDS_HOLDS.piano` to the larger bear (the elbow poles, the
+      bench, the key distance) with the new polar bear body. A lean of 12° made it deeper.
 - [ ] Polar bear pianist: at the far keys, the outer upper arm stands 36° to 41° out from the round
       trunk (piano-technique).
 - [ ] Polar bear pianist: at rest, the paws lie 8 cm to 10 cm below the key top, on the lower belly,
