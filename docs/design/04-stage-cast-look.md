@@ -642,7 +642,9 @@ its rest is the bind.
   with no neck, as on the sheet, and the dark underside under the head stays. The mesh has a
   crumpled round patch on the lower belly, so the hand rig replaces it with an even grid. The
   seated bind and the play show no fault that a shape key must fix, so the rig has no keys. The
-  pea eyes sit on the dome of the old eye of the mesh, so that the dome does not cut into them.
+  lower belly follows the hips alone, so that the bend of the seated thighs stays in the groin and
+  no fold line outlines the belly. The old eye of the mesh is a dome in a groove, which showed a
+  light ring around each pea eye, so the eye areas lie flat on the face surface around them.
   The fur takes the cream tone step of the old rig (`colors.tone` of `rabbit.json`), so that the
   rabbit keeps the look of its old body. Each elbow spreads over its helper bone across the joint,
   because the arms bend far in the play, and a narrow blend folded the inner elbow. The whiskers
