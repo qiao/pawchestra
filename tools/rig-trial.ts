@@ -307,10 +307,13 @@ function trialArgs(argv: readonly string[]): TrialArgs {
   if (!animal || !role || !tag || !step || words.length !== 4) {
     stop(USAGE);
   }
-  if (!/^[\w.-]+$/.test(tag)) {
-    stop(`The tag ${tag} must have only letters, digits, ".", "_", and "-".`);
+  // The tag names a folder that the trial deletes and writes again, so it cannot be "." or "..".
+  if (!/^\w[\w.-]*$/.test(tag)) {
+    stop(
+      `The tag ${tag} must start with a letter or a digit, then have only those, ".", "_", and "-".`,
+    );
   }
-  if (!existsSync(rigBlend(animal))) {
+  if (!/^\w[\w-]*$/.test(animal) || !existsSync(rigBlend(animal))) {
     stop(`The animal ${animal} has no hand rig ${shown(rigBlend(animal))}.`);
   }
   if (step !== '-' && !existsSync(resolve(step))) {
@@ -868,7 +871,7 @@ async function main(): Promise<void> {
   if (at >= 0) {
     const [animal] = argv;
     const tag = argv[at + 1];
-    if (!animal || !tag || argv.length !== 3 || at !== 1) {
+    if (!animal || !tag || argv.length !== 3 || at !== 1 || !/^\w[\w-]*$/.test(animal)) {
       stop(USAGE);
     }
     await applyTrial(animal, tag);
