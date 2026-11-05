@@ -11,7 +11,10 @@ cat.glb                            source mesh
 cat-arms.glb + cat-weights.json    `source` and `paintedWeights` of tools/mesh-rigs/cat.json
    │  pnpm rig-mesh cat
    v
-cat.rig.glb                        rigged mesh
+cat.rig.glb of fc52d38f            rigged mesh
+   │  pnpm glb-point-edits assets/models/cat/cat-edits.json
+   v
+cat.rig.glb                        rigged mesh with point edits
    │  pnpm studio-body cat
    v
 src/models/studio/cat.ts           studio body of the app
@@ -37,7 +40,8 @@ The app chain:
 | `cat.glb` | Source mesh (below) | None |
 | `cat-arms.glb` | Copy of `cat.glb` with rebuilt arms and belly. License as `cat.glb` | `cat_arms.py` of e491ff3c |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat.glb` | `cat_arms.py` of e491ff3c |
-| `cat.rig.glb` | Output of the rig. License as `cat.glb` | `pnpm rig-mesh cat` (below) |
+| `cat.rig.glb` | Output of the rig with point edits. License as `cat.glb` | `pnpm glb-point-edits assets/models/cat/cat-edits.json` ("Point edits" below) |
+| `cat-edits.json` | The point edits of the rig of fc52d38f | None: the edits of 2026-11-05 |
 
 The trial files, which the app does not use:
 
@@ -115,15 +119,18 @@ steps of the side wall, with no run of the cat (672184a7), so the git history ke
 
 | Item | Value |
 |---|---|
-| Size | 880,600 bytes |
-| SHA-256 | `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
+| Size | 880,372 bytes |
+| SHA-256 | `2d3b0f03d2d27bf970198751c8687baa7d20d202c580396f3d52456b28d947c3` |
+| Base | The rig of fc52d38f: 880,600 bytes, SHA-256 `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
 | Bind | The bind of the viola hold, with the elbows bent (below) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
 
-The file is the rig of e491ff3c, which has the mesh data of production. A run of
+The base is the rig of e491ff3c, which has the mesh data of production. A run of
 `pnpm rig-mesh cat` today gives another file: the tail root and 404 vertices near the haunch and
 the tail move by up to 0.029 units (4.8 cm), because `tools/blender/rig_mesh.py` changed after
-e491ff3c. The app keeps the committed file.
+e491ff3c. The app keeps the committed file. `pnpm glb-point-edits` reads the base with
+`git show fc52d38f:assets/models/cat/cat.rig.glb`, so a second run gives the same bytes. Never
+run `pnpm rig-mesh cat` into this folder: it drops the point edits.
 
 ## Rig facts of cat.rig.glb
 
@@ -137,6 +144,64 @@ e491ff3c. The app keeps the committed file.
   the front of the arm root half of the way with the first segment of the upper arm (`follow`).
   In the shape of the play, the skin near the root front fills its valleys and moves no vertex in
   (`follow.fill`). A fourth shape does the same for the bow arm in the play.
+
+## Point edits
+
+The point edits of 2026-11-05 make the tail a round tube and the legs thicker
+(`cat-edits.json`). A script in a live Blender session made the moves. The edit file keeps each
+move, by the index of a vertex of the primitive `fur`, in the stored space of the file (the
+seated bind, in units). The tool moves each vertex at the same stored place, so the face colors
+stay one surface. The module keeps its seat height, its chair depth, and its joints.
+
+```text
+            seated bind (stored)           standing soloist (clip reference)
+tail:  new tube = curve + frame · offset    bind + both leg shapes = source tail
+legs:  p + 0.25 · g · (p − axis point)      the leg shapes add on top of the move
+```
+
+**Tail (132 places, 199 vertices, largest move 0.0776 units).** The rig curled the tail of the
+seated bind along `studio.tailCurl`. It moved each vertex by `smoothstep(share, 0.5, 0.95)` of
+its tail share, and the tail end has a share of 0.75 (the chest has the rest), so the end moved
+only 58% of the way. Its source line ended at the bend, so the floor part of the source tail
+folded onto one point. The edit makes the tube again from the source:
+
+- The source is the standing tail of the file: the bind with both `legs_straight` shapes, skinned
+  by the first key of the clip `reference`. The tube is the welded vertices with |x| < 0.07,
+  stored z < -0.03, and stored y < 0.46 in that pose. Its middle line runs through the middles of
+  24 cuts across the tube: 0.367 units long, with a median radius of 0.0335.
+- Each vertex keeps its place along the line, times 0.737, and its offset from the line in the
+  rotation-minimizing frame, times a factor that falls from 1 at the place 0.02 to 0.72 at 0.08.
+  The first normal of both lines is +x.
+- The new line is a Catmull-Rom curve, 0.271 units long, through these stored points: (0, 0.315,
+  -0.066), (0.006, 0.306, -0.096), (0.036, 0.296, -0.097), (0.072, 0.294, -0.081), (0.106, 0.294,
+  -0.066), (0.138, 0.293, -0.033), (0.156, 0.291, 0.005), (0.160, 0.289, 0.045). The root starts
+  at the old root ring on the back of the haunch. The tube goes back onto the seat, then around
+  the back and the left side of the haunch.
+- Vertex 2223 keeps its stored z: it is the back of the body that sets the chair depth.
+- The `legs_straight` shapes take each move back, half each, so the standing soloist keeps the
+  source tail.
+
+Checks of the tube: its lowest point over the seat is at the seat top (0.2658), and it keeps
+0.0034 units from the back posts of the chair. Beyond the place 0.12, no vertex lies in the
+haunch. The haunch fills the width of the seat, so the outer half of the tail end lies over the
+left edge of the seat (largest x 0.182, edge 0.140).
+
+**Legs (111 places, 254 vertices, largest move 0.0142 units).** Each leg vertex moves away from
+its leg axis by 0.25 × g of its distance. The axis point blends the nearest points of the thigh
+line (hip joint to knee) and the shin line (knee to ankle) by the skin weights of the vertex. g
+grows from 0 at 0.2 to 1 at 0.5 of the thigh, and falls from 1 at 0.70 to 0 at 0.95 of the
+shin (smoothstep). Thus the girth blends into the haunch and the ankle with no ledge. A vertex
+below the axis keeps its height, so the thighs stay on the seat. The edit takes the vertices
+with |x| > 0.012, a distance below 0.075 from the axis, and at least 0.9 of their weight on the
+hips and the leg bones. `leg-lineup.png` of `reports/2026-11-05-cat-edits/` shows the factors
+1.15, 1.25, and 1.35. Each leg move is linear in the factor, so another factor F takes the leg
+moves times (F − 1) / 0.25.
+
+**Weights (57 places, 77 vertices).** The rig gave each vertex of the tail end 0.251 of its
+weight on the chest. The edit gives that share to `tail_tip`, so the tail end does not follow the
+chest. Six root places (2224, 3339, 3354, 3358, 4413, and 4414) get a tail share of 0.51 from the
+hips. The export then counts them as tail, so the moved root behind the haunch does not set the
+chair depth. Their standing places move up to 0.0037 units.
 
 ## Trial files
 
