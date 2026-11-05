@@ -139,8 +139,8 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 983,928 bytes |
-| SHA-256 | `8867f986c06ce54c0109ed94f775adc72f7df987d6b7e4d78d172911a60e243c` |
+| Size | 983,932 bytes |
+| SHA-256 | `b1f408a889062d195e973d4c9f3c43a1b2cb8d1c88536b8221e6d2e880387034` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 379,405 bytes |
-| SHA-256 | `b091f125ba558f61d3b0e2f35c360e3c42591ac309d00e49a2bb36cbb5a393c4` |
+| Size | 377,234 bytes |
+| SHA-256 | `8697ca4064dd10c9af9b5d10a939da3096da57bcaf1ab0d5fe44a46419d37980` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -328,6 +328,15 @@ The fixes of the weights, in the studio axes of the source:
 - **Armpit slivers.** 3 triangles under the arm roots, one on the left and two on the right, have
   a corner above 165° in the bind. Their corners take one mean weight, so that each moves as one
   piece. Each turned over in each sample of the play of the violist.
+- **Elbow rings.** The 4 forearm rings of each arm in the elbow band, from 0.12 to 0.54 of the
+  forearm from the elbow joint, take one mean weight each: each vertex of a ring takes the mean
+  weights of its ring, at most 4 bones. The Smooth of the elbow band gave the front half of each
+  ring more elbow helper and upper arm than the back half (0.26 more in the first ring), so that
+  in the bent elbow of the violist the inner side of the forearm stayed back and made a dent at
+  the inner elbow. Each key keeps its move of the bind. The app renders of the violist with one
+  change at a time show it: with no keys `arm_raise_L` and `arm_raise_R`, the dent stays; with
+  no loop cuts at the arms, the elbow folds more; with the mean weights of these 4 rings, the
+  dent goes.
 
 The folds of the test poses of the last round (arms down 80°, the elbow at 90° and 130°, the bow
 arm, the sit with the thigh at 90°): the triangles whose normal turns more than 60° and more
