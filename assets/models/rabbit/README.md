@@ -124,10 +124,10 @@ run gives the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 533,636 bytes |
-| SHA-256 | `f62e7b552bba013bfe0e9b12f0764f9706b9c739670235c5f18311aea7102f8f` |
+| Size | 551,340 bytes |
+| SHA-256 | `a2c1f3547193685c78e56365ccf16b591facd093f8d16f565487cdffac293e5c` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
-| Faces | 5,705 triangles, of them 75 gloss (the nose) |
+| Faces | 5,961 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
 
@@ -509,4 +509,4 @@ the source.
 
 `pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
 objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 40.7 KB after gzip (the module of the last hand rig 46.5 KB).
+module is 42.3 KB after gzip (the module of the last hand rig 46.5 KB).
