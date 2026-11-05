@@ -47,6 +47,7 @@
     "smoke": "pnpm prepare-site && node tools/smoke.ts",
     "rig-mesh": "node tools/rig-mesh.ts",
     "rig-export": "sh -c '\"${BLENDER:-blender}\" -b --factory-startup --python-exit-code 1 --python tools/blender/export_rig.py -- \"$@\"' rig-export",
+    "rig-trial": "node tools/rig-trial.ts",
     "bind-view": "sh -c '\"${BLENDER:-blender}\" -b --factory-startup --python-exit-code 1 --python tools/blender/bind_view.py -- \"$@\"' bind-view",
     "mixamo-import": "node tools/mixamo-import.ts",
     "mixamo-model": "node tools/mixamo-model.ts",
