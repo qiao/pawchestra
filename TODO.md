@@ -216,43 +216,29 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat rebuild from `tripo/cat-tpose.fbx`, phase B: `cat.blend` has the mesh, the colors, the
-      rig, the weights, the eyes, and the long legs (`assets/models/cat/README.md`). Key the
-      bind of the seat rules with a tail that lies naturally on the seat (no bump at the hip, no
-      knot on the seat), `bind_sit` with the crease relax (thin fins at the crease of the belly
-      and each thigh and a small point at the outer haunch in the seated bind), the facts of the
-      body for a rise of 0.1227 units, `seat`, `hinges`, `drive_segments()`, the bind
-      supination, `fit_eyes()` in the bind, and the keys `arm_raise_*`. Then export and run the
-      gates. Until then, `cat.rig.glb` comes from the `cat.blend` of commit 7c9e8074.
-- [ ] Cat rebuild: the new mesh has 6,451 triangles, above `STUDIO_TRIANGLE_BUDGET` (5,600). The
-      5 whisker strands hold 465 of them. Check the gzip size of the packed mesh in phase B, and
-      raise the budget or make the whiskers lighter.
-- [ ] Cat rebuild: in the test poses, 15 triangles of the inner elbows (7 and 8) fold over 90° at
-      130°, and 15 at the fronts of the armpits (8 and 7) in the bow arm. No crop shows them.
-      Check them in the arm gate of phase B.
 - [ ] Cat violist: the left paw goes 2.1 cm into the viola in the play and the lift, near the
       upper bout, as the separate claws of the A-pose body did (2.2 cm and 2.1 cm). At rest it
       goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
       separate claws, so `pnpm pose-depth` marks the pair `paws in viola` as GROWS. Check the paw
       crops of the fifth position.
-- [ ] Cat armpits: with a hanging upper arm, a small crease stays at the back of each arm root.
-      The key `bind_armpit` of `cat.blend` holds half of the fix of the hanging pose: the whole
-      fix cut a deeper notch and failed the arm gate. The rigid patch under each arm root still
-      swings into the chest. Try more clavicle weight on the patch (the trap of `cat_root.py` in
-      `rigging.md`), and check the 2x crops (`reports/2026-11-04-cat-hand/phase-b/armpit/`).
-- [ ] Cat recast roles: the left arm folds more than on the rig of `rig-mesh` in the recast
-      cellist, flutist, and clarinetist (`pnpm cast-matrix --species cat`). Each cell fails on
-      main too. The 4 keys `arm_raise_*` of `cat.blend` serve the violist and the trumpeter.
-- [ ] Cat bind supination: on the final hand rig, `pnpm bind-supination cat` gives L 126 and R 85
-      (the Action `bind` keys L 130 and R 81). The largest paw twist p95 of the cast roles goes
-      from 120 to 115 on the left and from 108 to 104 on the right. A trial bind with these
-      values makes the left arm of the violist worse (paw twist p95 98 to 102, move twist max 99
-      to 103), and the right arm better (79 to 75, 81 to 77), so the bind keeps L 130 and R 81.
-      Key them only with a refit of the keys `arm_raise_*` of `cat.blend` and a new arm gate.
-- [ ] Cat tail: in the hand rig, the tail curls up beside the left hip on the seat. From the
-      left side and from the back, the curl reads as a round lump at the hip
-      (`reports/2026-11-04-cat-hand/phase-b/crops-legs-tail.png`). Try a curl that opens more,
-      or a tip that lies along the seat.
+- [ ] Cat armpits: with a hanging upper arm, a crease shows at the back of each arm root
+      (`reports/2026-11-04-cat2/phase-b/work/pitcmp.png`). The fix of the old key `bind_armpit`
+      changed no 2x crop, so `cat.blend` has no such key. Check the crease in the rest crops.
+- [ ] Cat recast violinist: `pnpm cast-matrix --species cat` gives FAIL (OPEN on main), because
+      the hanging right upper arm goes 2.9 cm into the belly at rest and in the moves (limit
+      1.5 cm). The 4 keys `arm_raise_*` of `cat.blend` serve the violist and the trumpeter, so no
+      key is free for a rest shape of that arm. Try a rest that turns the right elbow out.
+- [ ] Cat recast roles: `pnpm arm-check violinist@cat trumpeter@cat --base main` gives the right
+      arm 5 folds (p95) at the front of the right armpit (2 on main, limit 8), a FAIL by the
+      margin. One mean weight on that front fixed the trumpeter and failed the violist (R 9).
+      The front of the right armpit has two slivers of a loop cut, and the left has one: try an
+      edge turn there in Blender.
+- [ ] Cat head height: the head measures start at the chin height of the old body
+      (`headFloor` 0.8214), so that `H` and each hold keep their sizes. The underside of the jaw
+      of the FBX mesh is 2.7 cm lower, which gives `H` 0.367 m. Ask the user if `H` follows the
+      new head.
+- [ ] Cat tail: from the front, the tail shows below the seat beside the left thigh
+      (`reports/2026-11-04-cat2/phase-b/sides/rest-sheet.png`). Check it in the stage camera.
 - [ ] Cat T-pose body: the haunch is 0.53 m wide on the chair of 0.46 m of the A-pose body, so it
       reaches past the sides of the seat. Check the 2x crops of the seat from the front and the back.
 - [ ] Cat T-pose body: `pnpm trunk-form violist --to 0.9` gives a right side gap of 7.5 cm in the
