@@ -1,41 +1,105 @@
 # Rabbit model
 
-This folder holds the T-pose source meshes of the rabbit, the rig made by hand in Blender
-(`rabbit.blend`), and the rigged copy that the export writes from it. The app does not serve these
-files. It loads the module `src/models/studio/rabbit.ts`, which this chain writes:
+This folder holds the A-pose source mesh of the rabbit, a copy with rebuilt arms and its weights,
+and the rigged copy. The app does not serve these files. It loads the module
+`src/models/studio/rabbit.ts`, which this chain writes:
 
 ```text
-tripo/rabbit.fbx                   source mesh with quad faces
-   │  work by hand in Blender (design 4.4, "Hand rig")
+rabbit-apose.glb                          source mesh
+   │  violin_arms.py rabbit (e491ff3c)    rebuilt arms and painted weights
    v
-rabbit.blend                       mesh, face colors, armature, weights, eyes, bind, keys
-   │  pnpm rig-export rabbit
+rabbit-arms.glb + rabbit-weights.json     `source` and `paintedWeights` of the config
+   │  pnpm rig-mesh rabbit                config tools/mesh-rigs/rabbit.json
    v
-rabbit.rig.glb + rabbit.rig.json   rigged mesh and its text summary
+rabbit-apose.rig.glb                      rigged mesh
    │  pnpm studio-body rabbit
    v
-src/models/studio/rabbit.ts        studio body of the app
+src/models/studio/rabbit.ts               studio body of the app
 ```
 
-`rabbit-arms.glb` and `rabbit-weights.json` are the inputs of the old chain of
-`tools/mesh-rigs/rabbit.json`. `pnpm rig-mesh rabbit` stops now, because the folder holds
-`rabbit.blend`. Each value of the hand rig lives only in `rabbit.blend`, and the tools read it from
-the export (design 4.4, "Hand rig"). `docs/agents/rigging.md` gives the steps of a hand rig. The
-target of the form is the sheet `docs/reference/rabbit-views.png`.
+This is the body that production shows. `docs/agents/rigging.md` gives the steps of the chain.
+
+The folder also holds the files of trials that the app does not use ("Trial files" below): the
+hand rig of 2026-11-04 and 2026-11-05 from a Tripo mesh (`hand-rig/`, `tripo/`), and the T-pose
+mesh of an earlier body (`rabbit-tpose.glb`). The hand rig is rejected: it gave a thin, faceted
+arm root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool finds it beside the
+GLB file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh rabbit` runs.
 
 ## Files
 
+The app chain:
+
 | File | Origin | Rebuild |
 |---|---|---|
-| `rabbit-tpose.glb` | Source mesh (below) | None |
-| `tripo/rabbit.fbx`, `tripo/rabbit.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
-| `rabbit-arms.glb` | Copy of `rabbit-tpose.glb` with rebuilt arms. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
-| `rabbit-weights.json` | Weights of the same Blender run. License as the source | `arm_rebuild.py rabbit --factor 1.18` |
-| `rabbit.blend` | Made by hand in Blender from `tripo/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
-| `rabbit.rig.glb` | Export of `rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit` |
-| `rabbit.rig.json` | Text summary of the export, for diffs | The same run |
+| `rabbit-apose.glb` | Source mesh (below) | None |
+| `rabbit-arms.glb` | Copy of the source with rebuilt arms. License as the source | `violin_arms.py rabbit` of e491ff3c |
+| `rabbit-weights.json` | Weights of the same Blender run. License as the source | `violin_arms.py rabbit` of e491ff3c |
+| `rabbit-apose.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
 
-## rabbit-tpose.glb
+The trial, not in use:
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `rabbit-tpose.glb` | T-pose source mesh (below) | None |
+| `tripo/rabbit.fbx`, `tripo/rabbit.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
+| `hand-rig/rabbit.blend` | Made by hand in Blender from `tripo/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `hand-rig/rabbit.rig.glb` | Export of `hand-rig/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/hand-rig/rabbit.blend --out assets/models/rabbit/hand-rig/rabbit.rig.glb` |
+| `hand-rig/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
+
+## rabbit-apose.glb
+
+The mesh has no skeleton. The arms are in an A-pose: out, down, and a little forward, apart from
+the trunk below the shoulders.
+
+| Item | Value |
+|---|---|
+| Size | 16,662,596 bytes |
+| SHA-256 | `ed1c4778be4ee6ceba54aaf8e92117684551c18c06448e3b4904d2415e56634a` |
+| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,118 triangles and 4,327 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
+
+## rabbit-arms.glb and rabbit-weights.json
+
+| Item | Value |
+|---|---|
+| `rabbit-arms.glb` | 1,066,280 bytes, SHA-256 `3a8d60065ea5679e331fc16e106e74e3f68546654b83176a55dba878e2554245` |
+| Mesh | 2,084 vertices after a weld at 1e-5, 4,154 triangles: on each arm a tube of 15 rings of 16 vertices, joined to the trunk and the paw with Bridge Edge Loops, with Beautify Faces on the bridge triangles |
+| Material | One material with one base color JPEG of 4096 × 4608 pixels: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. No metallic-roughness texture |
+| `rabbit-weights.json` | 460,502 bytes, SHA-256 `e257527785da440da83161e07fce7e3700bebaeaa527a6dec2ad88d072d99969` |
+| Weights | The automatic weights of Blender with the Weight Paint fixes of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config |
+
+The script puts new quad faces on each arm from the shoulder line to the wrist. The faces of the
+paws, the trunk, the legs, and the head are the faces of the source. The new arm surface lies on
+the old one. The arms are 1.15 times longer from the shoulder line, a little longer than the arms
+of the source. The copy gives them this length, because a rig with arm segments does not stretch
+the arms. The run of `tools/blender/violin_arms.py -- rabbit` at e491ff3c made them. The script of
+today has no entry of the rabbit (d46b8997), so the git history keeps the run.
+
+The rig gives the faces near each shoulder joint and each elbow joint the normals of the skin with
+no crease angle (`rootNormals` of the config). The seated bind raises the hanging arms, and each
+hold bends the elbows. A crease angle there splits the normals, and the split shows as a slit at the
+front of each arm root.
+
+## rabbit-apose.rig.glb
+
+| Item | Value |
+|---|---|
+| Size | 804,132 bytes |
+| SHA-256 | `cfc3fe4485e0917e049bad6024de04d73d5bf6e2e8a76d48c7b1047d17fe6785` |
+| Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind of the violin hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix is smallest (`studio.bindSupination`) |
+| Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent left elbow |
+
+A run of `pnpm rig-mesh rabbit` gives the same bytes.
+
+## Trial files
+
+These files are the trials of 2026-11-03 to 2026-11-05: `rabbit-tpose.glb`, the source of the
+T-pose body of `pnpm rig-mesh rabbit` at 77b9d9d3, and the hand rig of the Tripo mesh. The app
+does not use them. The text below gives the trials as they were: "the last rig" is the T-pose rig
+of 77b9d9d3, and `rabbit.json` is its config at that commit.
+
+### rabbit-tpose.glb
 
 The mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
 
@@ -68,7 +132,7 @@ than two faces, and 484 faces have a corner angle below 10°.
 shasum -a 256 assets/models/rabbit/rabbit-tpose.glb
 ```
 
-## tripo/rabbit.fbx
+### tripo/rabbit.fbx
 
 A mesh of the same rabbit in the same T-pose, made with Tripo: quad faces, and arm and leg tubes
 of 8 to 16 vertices around. Its arm sections and its head width are those of `rabbit-tpose.glb`
@@ -92,35 +156,11 @@ folder `rabbit.fbm/` holds its textures, and the FBX file links them by name.
 | `rabbit.fbm/rabbit_normal.jpg` | 734,946 bytes | 2048 × 2048 | `e91b3d0f6c2a627e704f91778597ee0674ab9132a026b59be2db835545f812ee` |
 | `rabbit.fbm/rabbit_roughness.jpg` | 191,192 bytes | 2048 × 2048 | `47e6fbac3a29e63b8d677bfc13311d399a6f4572ce7356e5693f4327f4302d94` |
 
-## rabbit-arms.glb and rabbit-weights.json
+### hand-rig/rabbit.rig.glb
 
-The inputs of the old chain of `tools/mesh-rigs/rabbit.json`.
-
-| Item | Value |
-|---|---|
-| `rabbit-arms.glb` | 922,252 bytes, SHA-256 `1cf55635efe10f9124c26ec0160366d144055c051a53fc7c8822464ac5a93dc1` |
-| Mesh | 2,022 vertices after a weld at 1e-5, 4,035 triangles: on each arm a tube of 14 quad rings of 16 vertices from 0.2 of the upper arm to 0.1 of the paw, joined to the trunk and the paw with Bridge Edge Loops, with Beautify Faces and Collapse Edges on the bridge triangles |
-| Material | One material with one base color JPEG of 4096 × 4608 pixels: the atlas of the source, and a strip of 512 pixels on top with the fur color of the source arms, baked onto the new faces. No metallic-roughness texture |
-| `rabbit-weights.json` | 446,496 bytes, SHA-256 `45af4710d2b4c2b9127e6ed17bfb3a96ef93710bea54ceb42af09e6d8f32e8b4` |
-| Weights | The automatic weights of Blender with the weight rules of the script, on the studio bones and the arm segments and helpers (`armSegments` of the config), for `paintedWeights` of the config |
-
-`tools/blender/arm_rebuild.py` puts new quad faces on each arm of `rabbit-tpose.glb` from the
-shoulder line to the wrist, with the settings that it finds from the joints of the config and from
-rays through the mesh. The new arm surface lies on the old one. The faces of the paws, the trunk,
-the legs, the tail, and the head are the faces of the source. The arms are 1.18 times longer from
-the shoulder line (`--factor 1.18`), because a rig with arm segments does not stretch the arms.
-With this factor, the left paw reaches the nut of the violin of the rabbit (`armFactorNote` of the
-config). A run gives the same bytes:
-
-```bash
-blender -b --factory-startup -P tools/blender/arm_rebuild.py -- rabbit --factor 1.18
-shasum -a 256 assets/models/rabbit/rabbit-arms.glb assets/models/rabbit/rabbit-weights.json
-```
-
-## rabbit.rig.glb
-
-`pnpm rig-export rabbit` writes it from `rabbit.blend`, with the text summary `rabbit.rig.json`. A
-run gives the same bytes.
+`pnpm rig-export rabbit --blend assets/models/rabbit/hand-rig/rabbit.blend --out
+assets/models/rabbit/hand-rig/rabbit.rig.glb` writes it, with the text summary `rabbit.rig.json`.
+A run gives the same bytes.
 
 | Item | Value |
 |---|---|
@@ -131,7 +171,7 @@ run gives the same bytes.
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
 
-## rabbit.blend
+### hand-rig/rabbit.blend
 
 The hand rig of the rabbit (design 4.4, "Hand rig"), made in a live Blender 5.2 from
 `tripo/rabbit.fbx`: the mesh, the colors, the armature, the weights, the pea eyes, the seated bind
@@ -504,9 +544,3 @@ toes from (±0.0808, -0.0359, 0.018) to (±0.0858, -0.0709, 0.008), and the tail
 In the seated bind, the seat top is 0.250 m above the soles and the hips joint 0.346 m. In the
 rest, the mid thigh is 0.452 and the mid shin 0.261 of the width of the head at the eyes, as on
 the source.
-
-## The module
-
-`pnpm studio-body rabbit` writes `src/models/studio/rabbit.ts` from `rabbit.rig.glb`. The eye
-objects of `rabbit.blend` give the pea eyes, and the armature gives the facts of the body. The
-module is 42.3 KB after gzip (the module of the last hand rig 46.5 KB).
