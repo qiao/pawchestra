@@ -308,28 +308,16 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat: the hand rig of the T-pose mesh (`cat.blend`, design 4.4). The standing shoulder
-  // joints are 1.152946 m high (the joints of the mesh, raised 0.1272 u by the longer legs), so
-  // that the head height H stays the H of the cat of the A-pose mesh, 0.339 m (1.588737 m for each
-  // unit). The cat
-  // sits on the chair of the cat of the A-pose mesh: 0.46 m wide, and 0.343 m deep with the back
-  // room. The haunch is 0.53 m wide, so it reaches a little past the sides of the seat. The tips of
-  // the lower whiskers hang below the chin and follow the head, so the head measures start at the
-  // chin, 0.827 u high after the rise of the legs. The head keeps the size of the mesh, and H stays
-  // 0.339 m. The pea eyes are the eye objects of `cat.blend`.
+  // The viola cat: the hand rig of the T-pose mesh (`cat.blend`, design 4.4). The armature of
+  // `cat.blend` holds the facts of its body, and its eye objects hold the pea eyes.
   [
     'cat',
     {
       landmark: 'shoulders',
-      height: 1.152946,
       seated: true,
       soloist: true,
-      seatWidth: 0.46,
-      backRoom: 0.052,
       constant: 'STUDIO_CAT',
-      crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
-      headFloor: 0.827,
     },
   ],
   // The cello dog (design 4.4).

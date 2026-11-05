@@ -1,5 +1,5 @@
 {
- "sha256": "100849403593fb8e6fddb3172b71f37e54f54d088c5b42034c6d06fde7f8ffed",
+ "sha256": "d0e770d1e7250d0da7910d42b5558c641d64d5baa892ab87a7c508d8d1d308a7",
  "bindSupination": {
   "L": 130.0,
   "R": 81.0
@@ -585,6 +585,13 @@
     ],
     "size": 0.288571629
    }
+  },
+  "body": {
+   "height": 1.152946,
+   "crease": 35.0,
+   "backRoom": 0.052,
+   "seatWidth": 0.46,
+   "headFloor": 0.827
   }
  }
 }

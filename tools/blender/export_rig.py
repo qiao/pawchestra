@@ -12,8 +12,9 @@ move of each key `arm_raise_*` is its move in the bind. The bake must match the 
 evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the shapes of the source
 (`correctives()`, `split_shapes()`), the seat top (`seat_masks()`), and the rule of the arm
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
-middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). The bytes depend
-only on the `.blend`.
+middle, the direction, and the size of each pea eye in the bind (`eyes_of()`), and the custom
+properties of the armature give the facts of the body (`body_of()`). The bytes depend only on the
+`.blend`.
 """
 
 import hashlib
@@ -42,6 +43,21 @@ ROLL_LIMIT = math.radians(0.5)
 #: The decimals of the values of the eyes in the extras. The module of the app rounds its points
 #: to 1e-6 m, and an eye gives the head of its eye bone.
 EYE_DECIMALS = 9
+
+#: The facts of the body that the armature holds as custom properties, under the names of the
+#: settings of `ANIMALS` of `tools/studio-body.ts` (`BODY_FACTS`), with their units there. The
+#: first two are required.
+BODY_FACTS = (
+    'height',
+    'crease',
+    'colorBlend',
+    'seatBack',
+    'backRoom',
+    'seatWidth',
+    'headFloor',
+    'noseTop',
+    'headCeiling',
+)
 
 #: The trunk bones whose turn from the pose of the sheet to the bind gives `trunk` of the extras.
 TRUNK_BONES = ('hips', 'spine', 'spine1', 'chest', 'neck', 'head')
@@ -286,6 +302,25 @@ def eyes_of(rig, eyes, bind):
     return out
 
 
+def body_of(rig):
+    """Gives the facts of the body of the custom properties of the armature (`BODY_FACTS`), after
+    a check that each is a finite number and that the required facts exist."""
+    out = {}
+    for name in BODY_FACTS:
+        value = sa.rig_property(rig, name)
+        if value is None:
+            need(name not in BODY_FACTS[:2], f'The armature needs the property {name}.')
+            continue
+        need(
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and math.isfinite(value),
+            f'The property {name} of the armature is not a number.',
+        )
+        out[name] = value
+    return out
+
+
 def extras_of(rig, me, rm, bones, points, w, turns, raises):
     """Gives the extras of the asset: the seat, the corrective shapes, the elbow axes, the caps,
     the rim, and the recline."""
@@ -461,6 +496,7 @@ def main():
     shapes = {**source, **{n: moves[n] @ sa.TO_STUDIO.T for n in raises}}
     extras = extras_of(rig, body.data, rm, bones, points, wn, turns, raises)
     extras['eyes'] = eyes_of(rig, eyes, bind)
+    extras['body'] = body_of(rig)
     corners, kinds, colors, bases, caps, rim = triangles(body.data)
     fur = np.cumsum(kinds == 'fur') - 1
     if caps.any():

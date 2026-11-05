@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_CAT = {
   source: 'assets/models/cat/cat.rig.glb',
-  sha256: '100849403593fb8e6fddb3172b71f37e54f54d088c5b42034c6d06fde7f8ffed',
+  sha256: 'd0e770d1e7250d0da7910d42b5558c641d64d5baa892ab87a7c508d8d1d308a7',
   scale: 1.588736,
   heads: {
     root: [0, -0.11656, 0.015778],
