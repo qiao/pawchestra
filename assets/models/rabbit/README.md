@@ -125,7 +125,7 @@ run gives the same bytes.
 | Item | Value |
 |---|---|
 | Size | 671,532 bytes |
-| SHA-256 | `902fd31710304bb243501e61dba7443b683c2f3a69ae6a96cb52bc18ae260516` |
+| SHA-256 | `c2c112a58c7839e31dfc10f17737545988f9b6aea879222504a5255b404ebd58` |
 | Form | The mesh of `rabbit.blend` in its seated bind (below). The seat top is 0.250 m high, and the chair is 0.42 m wide and 0.237 m deep, as the chair of the old rabbit |
 | Faces | 5,877 triangles, of them 75 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -140,8 +140,8 @@ in headless runs: the mesh, the colors, the armature, the weights, the pea eyes,
 
 | Item | Value |
 |---|---|
-| Size | 338,036 bytes |
-| SHA-256 | `1a24c986895a15155b24fc8971ba64376bee5d92a08af0260b46822c87e74a4e` |
+| Size | 338,019 bytes |
+| SHA-256 | `52d99eb531af9767a7c263b12a4455af56eb7dba951a0c2a9b12e2eff67d0476` |
 | Origin | Made by hand in Blender 5.2 from `tripo/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.0672 units, so the ear tips are at z = 1.0672. No object has a transform |
@@ -260,7 +260,11 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   1283, 1284, 1869, and 1903), and the app showed a pinch at the middle of the lap. Then the 22
   vertices within 0.035 units of the bind point (0, -0.095, 0.279) take 30 plain Laplacian rounds
   of the share 0.4 times a falloff (1.5 times the smooth step to 0 at the radius, at most 1),
-  added to the key: at most 1.6 cm. The sharpest edge of the lap is now 66°.
+  added to the key: at most 1.6 cm. The sharpest edge of the lap is now 66°. The lower edge of
+  the smoothed lump still hung over the vertex 1901 below it, so a fan of faces from 1615 and
+  1529 to 1901 faced down and showed as a dark crease line from the front. Then 1901 moves 0.012
+  units down in the bind (z), added to the key: the fan faces forward like the belly under it.
+  A move forward (y) made the fan a light crescent.
 - **`bind_neck`.** Each vertex of the front of the neck between the chest and the chin (|x| below
   0.08) moves forward by 0.6 of its gap behind the line from the chest front (vertex 1628) to the
   chin front (vertex 689) at the middle, less to the sides, then 4 Taubin rounds. 27 vertices
