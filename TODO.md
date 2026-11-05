@@ -259,9 +259,18 @@ passes.
 - [ ] Cat T-pose body: from the side and at 60°, a dark band lies under the large head, its
       shadow on the jaw line (`reports/2026-11-03-cat-new/face-final/`). The A-pose body had a
       smooth box under the head (`smooth`); try it on the new mesh with a 2x crop.
-- [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
-      A-pose body there: the dark V band on the lower back above the seat, and the folds of the
-      right shoulder at the tip. Remove each item that the new body does not show.
+- [ ] Cat T-pose body: run `pnpm close-views audit` on the new body, and check the fault of the
+      A-pose body there: the folds of the right shoulder at the tip. Remove the item if the new
+      body does not show it.
+- [ ] Cat violist, stand: the full thighs over the slim shins read as puffy pants with a knee knob
+      (the straight legs of the stand are the rest). A fade of the thigh fullness from the mid
+      thigh changed no crop (`reports/2026-11-05-cat-review/stand-taper-variants.png`). Ask the
+      user if the stand matters, or if the lower thigh can taper to the knee, which also thins
+      the seated thigh there.
+- [ ] Cat haunch: from the right, the back of the haunch near the tail root is a flat wall with a
+      fan of long thin triangles down to one corner on the seat. A relax there moves single
+      vertices up to 0.056 units, because the seat and the tail fix their neighbors. Try a loop
+      cut or edge turns in Blender, and keep the tail root still.
 - [ ] Cat violist: at rest and in the moves, the hanging left upper arm touches the belly
       (1.5 cm in `bach-bwv1047`, 0.2 cm before the hanging arms), and the left forearm goes
       0.7 cm into the belly (`reports/2026-11-03-cat-rest/proof2/`). `hangingArm()` keeps no gap
@@ -276,8 +285,6 @@ passes.
       the belly at rest, in the lift, and in the lowering (`pnpm pose-depth violist`, 1.5 cm with
       the thin arms, limit 1.5 cm). The arm gate passes (folds p95 L 3, R 5). Try a rest that
       turns the right elbow out, or a `raise` shape of the hanging bow arm.
-- [ ] Cat: from the back, a dark band in a V lies on the lower back above the seat. Find the faces
-      and the light that make it.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
