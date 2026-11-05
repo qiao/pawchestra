@@ -294,52 +294,33 @@ passes.
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
       (87°) to 70°.
-- [ ] Rabbit: the upper arms look thin. In the seated bind, the girth at 0.25 of the upper arm is
-      0.82 of the mesh as a share of the shoulder width (target 0.85 to 1.15). `armGirth` 1.06 to
-      1.10 puts both shares inside, but the flute recast of the cast matrix then folds 9 faces of
-      the left arm (limit 8). Fit that fold first (`pnpm raise-fit flutist@rabbit`), then add
-      `armGirth` 1.08 (`reports/2026-11-04-rabbit-form/measures.md` of the round).
-- [ ] Rabbit: from the back, the cleft of the haunch makes a point above the carried tail ball
-      (`sit.tailSpread`). The sit drops the haunch above the ball less than the ball.
-- [ ] Rabbit: in the lift and the lowering, a notch stays at the front of the right arm root under
-      the chin from az 70. The rest shape (`raise`) fades out 20 degrees from the rest.
-- [ ] Rabbit T-pose body: run `pnpm close-views audit` on the new body, and check the faults of the
-      A-pose body there: the dark faces at the bow elbow, the V crease at the right arm root, and
-      the left forearm twist step. Remove each item that the new body does not show.
+- [ ] Rabbit hand rig (`rabbit.blend`): run the gates on the new body (`pnpm arm-check
+      violinist`, `pnpm cast-matrix`, `pnpm pose-depth violinist`, `pnpm close-views audit`), and
+      check the hold items of the old body below against it.
+- [ ] Rabbit hand rig: the right inner elbow faces fold in up to 77 % of the play samples of `pnpm
+      fold-probe violinist` with the keys `arm_raise_R` and `arm_raise_R2` (93 % with none). The
+      close views hide them. Try a third ring near the inner elbow, or a key of the frog pose.
+- [ ] Rabbit hand rig: from the back, the haunch lobes of the low-poly mesh end in two points on
+      the seat. A relax of the corner moves only 5 vertices. Add loop cuts in the haunch, or shape
+      the underside in `rabbit.blend`.
+- [ ] Rabbit hand rig: a dark band stays under the round head at the sides of the neck. The keys
+      `bind_neck` and `bind_nape` fill the groove only at the front and at the back.
+- [ ] Rabbit hand rig: the head height `H` is 0.3027 m (old body 0.3209 m), because the old rig
+      counted a part of the ear base. Check the holds in `H` (the violin at the chin, the grips),
+      or include the ear base in the head measures.
+- [ ] Rabbit hand rig: the recasts of the cast matrix have no raise keys, and the bind supination
+      leaves a left paw twist p95 of 135° (`flutist@rabbit`, `snare-drummer@rabbit`).
+- [ ] Rabbit hand rig: the plain fur keeps the white of the texture, with no tone step toward the
+      cream of `rabbit-views.png` (`colors.tone` of the old rig). Compare it in the app view.
+- [ ] Rabbit hand rig: in the lift from az -45, a small pinch shows at the middle of the lap under
+      the violin (`bind_lap`).
 - [ ] Rabbit T-pose body: at rest, the left paw goes 0.6 cm and the left forearm 0.3 cm into the
       violin (0.1 cm and 0.0 cm on the A-pose body), and in the lowering the right upper arm 1.0 cm
       into the violin. Check the crops of the rest grip.
-- [ ] Rabbit T-pose body: the tone step toward the cream of the fur swatch of `rabbit-views.png` is
-      small in the close views. A dark band stays under the large head, its shadow on the neck. A
-      smooth box under the head made a hard shelf under the chin.
 - [ ] Rabbit violinist: the bow goes up to 2.5 cm into the arms in the lowering and 1.0 cm at rest,
       near the grip.
 - [ ] Rabbit violinist: the violin points 50° to the left, 5° more than a real player. A bow arm
       round or a smaller violin can bring it to 45°.
-- [ ] Rabbit violinist: the round elbow patch drops the section of the right upper arm of `pnpm
-      arm-look` to 0.60. Find the cause, and keep the round elbow.
-- [ ] Rabbit violinist: with the round elbow patch, the upper arms go 2.5 cm into the body at rest
-      and 5.9 cm in the lowering. Keep the patch out of the trunk when the arm hangs.
-- [ ] Rabbit violinist: a dark lower face of the bow elbow shows from az150 in the moves, and a thin
-      dark line under the forearm near the elbow from the front at the frog.
-- [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
-      frog.
-- [ ] Rabbit T-pose body: with `weights.paintedBelow` (0.40 to 0.52 u), the side gap of `pnpm
-      trunk-form violinist --to 0.9` in the play is 1.61 cm (left) and 2.40 cm (right), against
-      3.38 and 6.57 cm before and 2.04 and 0.72 cm on the A-pose rabbit. The accepted cost: at
-      the end of the lowering, the right upper arm goes 2.1 cm into the chest (1.5 cm before,
-      bach-bwv1050 wall 13.5 s). A lower height of 0.42 to 0.46 u made the gaps larger, and the
-      shoulder fade (`reachFade`) and the right rest arm angles did not bring it below 2.0 cm.
-      Next: a lowering path that keeps the right elbow out of the chest until late in the move,
-      or a smaller share of the rule where the arm passes. Then run the rule on the panda and the
-      cat, which show the same fault.
-- [ ] Rabbit T-pose body: the width W8 of `pnpm body-shape violinist` is 31.2 cm (A-pose rabbit
-      24.6 cm). The cut goes through the level arm roots, which `weights.paintedBelow` counts as
-      trunk, and a `girthProfile` width of 0.92 there did not change it. Judge the upper chest in
-      the app view, or measure the cut with the arm roots left out.
-- [ ] Rabbit T-pose body: the footprint of the old chair is 1.9 cm shorter (0.669 m, 0.688 m
-      before), so the stage of bach-bwv1047 is 0.8% and of bach-bwv1048 0.4% smaller, and the
-      other players there move. Find the part that moved (the feet or the back of the haunch).
 - [ ] Rabbit violinist: at rest, the right elbow is 9.5 cm out of the shoulder (A-pose rabbit
       4.7 cm). The belly is widest at the elbow, so the hanging arm keeps the elbow out for each
       angle. The A-pose rabbit kept the elbow in with the upper arm in its belly.
@@ -347,11 +328,6 @@ passes.
       the way it finds the belly (41 cm and 32 cm above the seat), and at 1 the top of the knee.
       The rabbit rest uses 1, and the hanging arms replace both rest places, so the rabbit does
       not show it. Find the thigh under the belly.
-- [ ] Rabbit T-pose body: after `eyeFill`, a thin light lip stays at the front of each eye from the
-      side, and the right eye bone lies 1.2 cm nearer the middle than the left one.
-- [ ] `pnpm rig-mesh --check`: the standing body against the source counts the form rules that
-      move the source on purpose (`eyeFill`, `legGirth`), so the rabbit is 19 mm above the limit.
-      Leave out the moved vertices.
 - [ ] Bowed strings: the left elbow points to the side under the instrument, and the upper arm turns
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
@@ -462,8 +438,6 @@ passes.
 - [ ] Deer cast matrix with the neutral bind: the snare drum recast fails on the left forearm
       twist (80°, limit 80°), and the flute recast on the left paw swing (73°, limit 70°) in place
       of a flip of the left paw (move turn 17,993°/s on `14ef3d67`).
-- [ ] Rabbit with the neutral bind: in the cast matrix, the flute recast folds 9 faces of the right
-      arm in the play (limit 8), and the cello recast 8. The snare drum recast passes now.
 - [ ] Polar bear with the neutral bind: in `pnpm arm-check pianist --world`, the fingers joints move
       0.013 cm (left) and 0.016 cm (right) against the bent bind (SAME up to 0.01 cm), with no turn
       of the palms. The straight bind puts the forearms 0.1 cm to 0.2 cm deeper into the case, and
@@ -839,12 +813,6 @@ scene of each demo has its seats and stage size with no overlap.
       the source arm to the bind arm makes them. Try `studio.bindArms` nearer to the source.
 - [ ] Rabbit: gate the branch `rabbit-depth` (`b1e270f02`, the bow grip further out in the lift and
       the lowering), then merge or remove it.
-- [ ] Rabbit: under the raised bow arm, a shallow hollow with a small sharp tip stays in the right
-      armpit. A smoother hollow needs more vertices in the notch.
-- [ ] Rabbit: the narrow axis of each upper arm keeps 0.62 to 0.81 of the bind, so the shoulders
-      look flatter than the source from the back. Try a bind arm nearer to the play.
-- [ ] Rabbit: a flap face with two open edges (3.1 cm) stays under the right armpit. No frame shows
-      it.
 - [ ] Rabbit soloist: the violin goes 2.3 cm into the body in the lift and the lowering. Check the
       chin and the left shoulder in the close views.
 - [ ] Rabbit violinist: the right forearm goes 2.1 cm into the body for 0.2 s at the song end of
