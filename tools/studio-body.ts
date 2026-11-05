@@ -2733,6 +2733,11 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
     throw new Error(`The GLB file holds its pea eyes, so the settings give no ${rule}.`);
   }
   const eyes = eyeVertices(mesh);
+  if (fileEyes && eyes.L.size + eyes.R.size > 0) {
+    throw new Error(
+      'The GLB file holds its pea eyes and the gloss fans of old eyes. Remove the fans in Blender, so that Blender shows the eyes of the app.',
+    );
+  }
   const eyeCenter = (side: Side): Vector3 => {
     const center = new Vector3();
     for (const v of eyes[side]) {
