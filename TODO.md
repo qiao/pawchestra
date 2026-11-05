@@ -216,6 +216,20 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
+- [ ] Cat rebuild from `tripo/cat-tpose.fbx`, phase B: `cat.blend` has the mesh, the colors, the
+      rig, the weights, the eyes, and the long legs (`assets/models/cat/README.md`). Key the
+      bind of the seat rules with a tail that lies naturally on the seat (no bump at the hip, no
+      knot on the seat), `bind_sit` with the crease relax (thin fins at the crease of the belly
+      and each thigh and a small point at the outer haunch in the seated bind), the facts of the
+      body for a rise of 0.1227 units, `seat`, `hinges`, `drive_segments()`, the bind
+      supination, `fit_eyes()` in the bind, and the keys `arm_raise_*`. Then export and run the
+      gates. Until then, `cat.rig.glb` comes from the `cat.blend` of commit 7c9e8074.
+- [ ] Cat rebuild: the new mesh has 6,451 triangles, above `STUDIO_TRIANGLE_BUDGET` (5,600). The
+      5 whisker strands hold 465 of them. Check the gzip size of the packed mesh in phase B, and
+      raise the budget or make the whiskers lighter.
+- [ ] Cat rebuild: in the test poses, 15 triangles of the inner elbows (7 and 8) fold over 90° at
+      130°, and 15 at the fronts of the armpits (8 and 7) in the bow arm. No crop shows them.
+      Check them in the arm gate of phase B.
 - [ ] Cat violist: the left paw goes 2.1 cm into the viola in the play and the lift, near the
       upper bout, as the separate claws of the A-pose body did (2.2 cm and 2.1 cm). At rest it
       goes 0.7 cm in, and in the lowering 1.4 cm (claws 0.3 cm and 1.1 cm). The new mesh has no
