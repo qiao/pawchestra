@@ -242,6 +242,9 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
+- Uneven shares around one forearm ring, from a Smooth of a half ring or the weights of a large
+  paw, dent a bent elbow and shear the twisted faces into dark spikes. Give each forearm ring one
+  mean weight (`cat.blend`).
 - A bent bind of a thick paw (`studio.bindArms`) presses the inner wrist into a dark slit that no
   weight rule, ring, or `raise` removes. Bind the arms straight (`studio.straightArms`), and judge
   a wrist by its 2x crops.
