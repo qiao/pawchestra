@@ -9,8 +9,11 @@ sharp edges (design 4.4, "Hand rig").
 with the keys `bind*` on (`pose_bind()` of `tools/blender/bind_edit.py`). The part is the
 triangles with the middle in the box and a corner in the list of ids, in the units and the
 Blender axes of the file: the animal faces -Y, and its left side is at +X. The view is the side
-of the camera: `-Y` (the front, the default), `+Y`, `-X`, `+X`, `-Z`, `+Z`, or a vector such as
-`1,-1,0.5`. The camera is orthographic.
+of the camera: `-Y` (the front, the default), `+Y`, `-X`, `+X`, `-Z`, `+Z`, a vector such as
+`1,-1,0.5`, or the azimuth and the elevation of a close view, such as `az-45@20`
+(`tools/close-views.ts`, where az 90 looks at the right side of the animal). The camera is
+orthographic. The image draws only the part and the faces around it, so that no other face hides
+the part.
 
 The image shows the part in gray, the faces around it lighter, and a face seen from its back in
 blue. A thin face (a corner below `--thin` or above `--wide` degrees) is red. A sharp edge (the
@@ -54,7 +57,7 @@ GLYPHS = {
     'W': '1111111515150A', 'X': '11110A040A1111', 'Y': '1111110A040404', 'Z': '1F01020408101F',
     '-': '0000001F000000', '.': '00000000000C0C', ',': '000000000C0408', ':': '000C0C000C0C00',
     '=': '00001F001F0000', '(': '02040808080402', ')': '08040202020408', '/': '00010204081000',
-    '+': '0004041F040400', ' ': '00000000000000',
+    '+': '0004041F040400', ' ': '00000000000000', '@': '0E11171517100F',
 }  # fmt: skip
 
 #: The size of a glyph pixel, and the width of a glyph with its gap, in image pixels.
@@ -107,7 +110,12 @@ def numbers(text, count=None):
 
 def camera(view):
     """Gives the unit vectors to the camera, to the right of the image, and to its top."""
-    to_camera = np.array(AXES.get(view.upper()) or numbers(view, 3), float)
+    if view.startswith('az'):
+        azimuth, _, elevation = view[2:].partition('@')
+        a, e = np.radians(float(azimuth)), np.radians(float(elevation or 0))
+        to_camera = np.array([-np.sin(a) * np.cos(e), -np.cos(a) * np.cos(e), np.sin(e)])
+    else:
+        to_camera = np.array(AXES.get(view.upper()) or numbers(view, 3), float)
     to_camera /= np.linalg.norm(to_camera)
     up = np.array([0.0, 1.0, 0.0]) if abs(to_camera[2]) > 0.9 else np.array([0.0, 0.0, 1.0])
     right = np.cross(up, to_camera)
