@@ -44,3 +44,6 @@ assets/models/badger/badger-edit.glb
 # The copy of the penguin mesh with the flippers free of the trunk (tools/blender/penguin_edit.py).
 # tools/blender/arm_rebuild.py reads it. Git keeps out its 14 MB (assets/models/penguin/README.md).
 assets/models/penguin/penguin-free.glb
+
+# The backup copies that Blender writes beside a .blend file at each save.
+*.blend1
