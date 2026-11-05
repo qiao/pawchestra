@@ -280,10 +280,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
   // room. The haunch is 0.53 m wide, so it reaches a little past the sides of the seat. The tips of
   // the lower whiskers hang below the chin and follow the head, so the head measures start at the
   // chin, 0.827 u high after the rise of the legs. The head keeps the size of the mesh, and H stays
-  // 0.339 m. The pea eyes are 1.35 times
-  // the share of the head of the mesh, because the eyes of the old cat sat in a light face and
-  // looked larger. They lie 0.05 H of the eyes above the old eyes of the mesh, where the face is
-  // flatter, so that the ovals stay round.
+  // 0.339 m. The pea eyes are the eye objects of `cat.blend`.
   [
     'cat',
     {
@@ -297,8 +294,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
       crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
       headFloor: 0.827,
-      eyeSize: 1.35,
-      eyeShift: [0, 0.05],
     },
   ],
   // The cello dog (design 4.4).
@@ -825,9 +820,52 @@ interface Gltf {
        * another tool has none.
        */
       readonly seat?: SeatExtras;
+      /**
+       * The pea eyes of a hand rig: the eye objects of its `.blend` (`eyes_of()` of
+       * `tools/blender/export_rig.py`). A file of `pnpm rig-mesh` has none.
+       */
+      readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
     };
   };
 }
+
+/**
+ * A pea eye of a hand rig in the extras of its GLB file (design 4.4, "Hand rig"): the eye object of
+ * its `.blend` in the bind pose, in the axes and the units of the studio.
+ */
+export interface EyeExtras {
+  /** The middle of the eye: the head of its eye bone. */
+  readonly middle?: readonly number[];
+  /** The unit direction in which the eye faces: the thin axis of the oval. */
+  readonly direction?: readonly number[];
+  /** The head height `H` of the eye, which sizes the oval (`EYE` of `models/eyes.ts`). */
+  readonly size?: number;
+}
+
+/** A pea eye of a hand rig ({@link eyesOf}), in the bind pose, in the axes and the units of the studio. */
+export interface FileEye {
+  /** The middle of the eye. */
+  readonly middle: Vector3;
+  /** The unit direction in which the eye faces. */
+  readonly direction: Vector3;
+  /** The head height `H` of the eye. */
+  readonly size: number;
+}
+
+/**
+ * The settings of the rules that place the pea eyes of a body of `pnpm rig-mesh` from the old eyes
+ * of its mesh. A hand rig holds its eyes ({@link eyesOf}), so its settings give none of them.
+ */
+const EYE_RULES = ['eyeLevel', 'eyeNormal', 'eyeShift', 'eyeSize', 'eyeFill'] as const;
+
+/** The largest difference of the sizes of the two eyes of a hand rig, as a share of the size. */
+const EYE_SIZE_GAP = 1e-5;
+
+/**
+ * The reach of the head faces around a pea eye of a hand rig, in `H` of the eyes: the faces that
+ * the bend and the push of the eye measure ({@link eyeBend}, {@link eyePush}).
+ */
+const EYE_REACH = 0.3;
 
 /**
  * The pose of a corrective shape of a raised arm or of a bent wrist in the extras of a GLB file of
@@ -941,6 +979,41 @@ export function hingesOf(glb: Glb): Record<Side, Vector3> | null {
     return out;
   };
   return { L: axis('L'), R: axis('R') };
+}
+
+/**
+ * Gives the pea eyes of a hand rig from the extras of its GLB file (design 4.4, "Hand rig").
+ *
+ * @param glb The file.
+ * @returns The eye of each side, or `null` for a file with no eyes, such as a file of
+ *   `pnpm rig-mesh`.
+ * @throws Error if a middle is not three finite numbers, if a direction is not a unit vector, if a
+ *   size is not a positive number, or if the two sizes differ by more than {@link EYE_SIZE_GAP}.
+ */
+export function eyesOf(glb: Glb): Record<Side, FileEye> | null {
+  const eyes = glb.json.asset?.extras?.eyes;
+  if (eyes === undefined) {
+    return null;
+  }
+  const eye = (side: Side): FileEye => {
+    const { middle = [], direction = [], size = NaN } = eyes[side] ?? {};
+    if (middle.length !== 3 || !middle.every((x) => Number.isFinite(x))) {
+      throw new Error(`The middle of the eye ${side} of the file is not three numbers.`);
+    }
+    const facing = new Vector3().fromArray(direction);
+    if (direction.length !== 3 || !(Math.abs(facing.length() - 1) <= 1e-4)) {
+      throw new Error(`The direction of the eye ${side} of the file is not a unit vector.`);
+    }
+    if (!(size > 0)) {
+      throw new Error(`The size of the eye ${side} of the file is not a positive number.`);
+    }
+    return { middle: new Vector3().fromArray(middle), direction: facing, size };
+  };
+  const out = { L: eye('L'), R: eye('R') };
+  if (Math.abs(out.L.size - out.R.size) > EYE_SIZE_GAP * out.L.size) {
+    throw new Error(`The eyes of the file have two sizes: ${out.L.size} and ${out.R.size}.`);
+  }
+  return out;
 }
 
 /**
@@ -2613,9 +2686,9 @@ interface Export {
   readonly sheetWeights: readonly number[];
   /**
    * The distance of each pea eye bone from the middle of the old eye, in `H` of the eyes, for the
-   * report.
+   * report, or `null` for a hand rig, which holds its eyes ({@link eyesOf}).
    */
-  readonly eyeShifts: Readonly<Record<Side, number>>;
+  readonly eyeShifts: Readonly<Record<Side, number>> | null;
   /** The move of each pea eye out of the head ({@link eyePush}), in `H` of the eyes. */
   readonly eyePushes: Readonly<Record<Side, number>>;
   /**
@@ -2653,7 +2726,12 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
 
   // The old eyes of the mesh go away, and the app adds the pea eyes at the eye bones (design
   // 4.5). The faces under the gloss fan of a rig of `pnpm rig-mesh` have the color of the fur
-  // around the eye.
+  // around the eye. A hand rig holds its pea eyes, so no rule of the settings places them.
+  const fileEyes = eyesOf(glb);
+  const rule = fileEyes ? EYE_RULES.find((key) => settings[key] !== undefined) : undefined;
+  if (rule) {
+    throw new Error(`The GLB file holds its pea eyes, so the settings give no ${rule}.`);
+  }
   const eyes = eyeVertices(mesh);
   const eyeCenter = (side: Side): Vector3 => {
     const center = new Vector3();
@@ -2783,7 +2861,9 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
   // (`eyeBend()`), so that the rim lies at the fur. Then it moves out along its direction until
   // its front face shows (`eyePush()`).
   const eyeHeight = (shown.max.y - shown.min.y) * scale;
-  const eyeSize = eyeHeight * (settings.eyeSize ?? 1);
+  const eyeSize = fileEyes
+    ? ((fileEyes.L.size + fileEyes.R.size) / 2) * scale
+    : eyeHeight * (settings.eyeSize ?? 1);
   const middle = toBind(shown.getCenter(new Vector3()));
   // An old eye that stands out of the head as a ball in a groove goes first (`eyeFill`), so that
   // the pea eye lies on a smooth face.
@@ -2794,6 +2874,18 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
     return { count, largest: largest / units };
   };
   const eyeFills = settings.eyeFill ? { L: fill('L'), R: fill('R') } : null;
+  // The faces of the head near a pea eye, in the model axes.
+  const facesNear = (at: Vector3, reach: number): Triangle[] =>
+    withoutEyes.faces.flatMap((face) => {
+      const [a, b, c] = face.corners.map((k) => mesh.vertices[k]?.position ?? new Vector3());
+      const triangle = new Triangle(
+        new Vector3(...model(a ?? new Vector3())),
+        new Vector3(...model(b ?? new Vector3())),
+        new Vector3(...model(c ?? new Vector3())),
+      );
+      const near = triangle.closestPointToPoint(at, new Vector3());
+      return near.distanceTo(at) < reach ? [triangle] : [];
+    });
   const eyeAt = (side: Side) => {
     const old = eyeCenter(side);
     // The studio puts the left side of the animal at +x, and `shown` is in the units of the
@@ -2809,16 +2901,7 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
     const point = eyeOnHead(withoutEyes, place);
     const out = point.clone().sub(middle);
     const at = new Vector3(...model(point));
-    const near = withoutEyes.faces.flatMap((face) => {
-      const [a, b, c] = face.corners.map((k) => mesh.vertices[k]?.position ?? new Vector3());
-      const triangle = new Triangle(
-        new Vector3(...model(a ?? new Vector3())),
-        new Vector3(...model(b ?? new Vector3())),
-        new Vector3(...model(c ?? new Vector3())),
-      );
-      const reach = triangle.closestPointToPoint(at, new Vector3());
-      return reach.distanceTo(at) < 0.3 * eyeHeight ? [triangle] : [];
-    });
+    const near = facesNear(at, 0.3 * eyeHeight);
     const look = direction(settings.eyeLevel === true ? out.setY(0) : out);
     // The eye turns toward the mean normal of the head surface under it by `eyeNormal`.
     const normal = new Vector3();
@@ -2841,8 +2924,27 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
     const head: Vec3 = [round(moved.x), round(moved.y), round(moved.z)];
     return { head, facing, bend, shift, push: push / eyeHeight };
   };
-  const eyeL = eyeAt('L');
-  const eyeR = eyeAt('R');
+  // The eye bone of a hand rig lies at the middle of its eye object, and the eye faces the
+  // direction of the object. The bend of the oval is a measure of the head surface where the axis
+  // of the eye meets it, so that the eye can stand in front of the surface. The push only reports
+  // a front that the head covers.
+  const handEye = (eye: FileEye, side: Side) => {
+    const head = model(eye.middle);
+    const facing = direction(eye.direction);
+    const at = new Vector3(...head);
+    const axis = new Vector3(...facing);
+    const near = facesNear(at, EYE_REACH * eyeSize);
+    const crossing = surfaceHeight(near, at, axis, EYE_REACH * eyeSize);
+    if (crossing === null) {
+      throw new Error(`The axis of the eye ${side} of the file meets no outer face of the head.`);
+    }
+    const surface = at.clone().addScaledVector(axis, crossing);
+    const bend = eyeBend(near, [surface.x, surface.y, surface.z], facing, eyeSize);
+    const push = eyePush(near, { point: head, normal: facing }, eyeSize, bend);
+    return { head, facing, bend, shift: 0, push: push / eyeSize };
+  };
+  const eyeL = fileEyes ? handEye(fileEyes.L, 'L') : eyeAt('L');
+  const eyeR = fileEyes ? handEye(fileEyes.R, 'R') : eyeAt('R');
   heads['eye_L'] = eyeL.head;
   heads['eye_R'] = eyeR.head;
   const peaEyes: StudioEyes = {
@@ -2927,7 +3029,7 @@ export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSe
   return {
     body,
     sheetWeights: sheet.weights,
-    eyeShifts: { L: eyeL.shift, R: eyeR.shift },
+    eyeShifts: fileEyes ? null : { L: eyeL.shift, R: eyeR.shift },
     eyePushes: { L: eyeL.push, R: eyeR.push },
     eyeFills,
   };
@@ -3514,9 +3616,15 @@ async function main(): Promise<void> {
   console.log(`Wrote ${relative(ROOT, out)} from ${source} (sha256 ${body.sha256.slice(0, 12)}).`);
   console.log(`Scale ${body.scale} m for each unit, head height ${body.headHeight} m.`);
   console.log(`Corrective weights of the sheet pose: ${sheetWeights.join(', ')}.`);
-  console.log(
-    `Pea eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
-  );
+  if (eyeShifts) {
+    console.log(
+      `Pea eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
+    );
+  } else {
+    console.log(
+      `Pea eyes of the eye objects of the .blend: head height ${body.eyes.headHeight} m. The front of each eye shows with a move of ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head.`,
+    );
+  }
   if (eyeFills) {
     console.log(
       `Eye fill: ${eyeFills.L.count} vertices (left) and ${eyeFills.R.count} vertices (right) move onto the head surface, at most ${eyeFills.L.largest.toFixed(3)} H (left) and ${eyeFills.R.largest.toFixed(3)} H (right).`,

@@ -352,20 +352,23 @@ export interface StudioRaise {
  * does. Each oval bends to the form of the head surface under it, so that its rim lies at the fur,
  * as the rim of an eye on a flat face of a parametric head does, and its bone lies on the head
  * surface. Each bone moves further out when the head still covers the front of the eye
- * (`eyePush()` of `tools/studio-body.ts`).
+ * (`eyePush()` of `tools/studio-body.ts`). A hand rig gives the place, the direction, and the size
+ * of each eye with the eye objects of its `.blend` (`eyesOf()` of `tools/studio-body.ts`).
  */
 export interface StudioEyes {
   /**
    * The head height that sizes the eyes, in meters: the head that shows, from the chin to the top
    * of the skull, times the eye size of the animal (`eyeSize` of `ANIMALS` in
-   * `tools/studio-body.ts`). It is larger than {@link StudioBody.headHeight} when the rig grows the
-   * head (`headFactor` of `pnpm rig-mesh`), so that the eyes fit the larger head.
+   * `tools/studio-body.ts`), or the size of the eye objects of a hand rig. It is larger than
+   * {@link StudioBody.headHeight} when the rig grows the head (`headFactor` of `pnpm rig-mesh`), so
+   * that the eyes fit the larger head.
    */
   readonly headHeight: number;
   /**
    * The unit direction in which each eye faces, in the bind pose: from the middle of the box of the
-   * head that shows through the eye. The head surface under the eye of the bear faces 29° up, so an
-   * eye along the normal of the surface shows less of its front in the front view.
+   * head that shows through the eye, or the Z axis of the eye object of a hand rig. The head
+   * surface under the eye of the bear faces 29° up, so an eye along the normal of the surface shows
+   * less of its front in the front view.
    */
   readonly directions: Readonly<Record<Side, Vec3>>;
   /**
