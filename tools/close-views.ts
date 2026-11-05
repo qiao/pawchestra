@@ -149,7 +149,7 @@ interface LineAim {
 }
 
 /** The close view of one role of the gallery. */
-interface RoleViews {
+export interface RoleViews {
   /** The species of the role, which the query `only` selects. */
   readonly species: SpeciesId;
   /**
@@ -1032,7 +1032,7 @@ export function roleOf(name: string | undefined): CloseRole | null {
  * @returns The role and its recast, or `null` for a name that is not a role.
  * @throws Error if the recast names an unknown species or the own species of the role.
  */
-function castRoleOf(
+export function castRoleOf(
   name: string | undefined,
 ): { readonly role: CloseRole; readonly recast: Recast | null } | null {
   const at = name?.indexOf('@') ?? -1;
@@ -1051,7 +1051,7 @@ function castRoleOf(
  * @param args The role and its recast.
  * @returns The view.
  */
-function viewsOf(args: Pick<CloseViewsArgs, 'role' | 'recast'>): RoleViews {
+export function viewsOf(args: Pick<CloseViewsArgs, 'role' | 'recast'>): RoleViews {
   const own = ROLE_VIEWS[args.role];
   return args.recast ? { ...own, species: args.recast.species, recast: args.recast } : own;
 }
