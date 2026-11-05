@@ -42,7 +42,7 @@ import {
   turnAngle,
 } from './fold-probe.ts';
 import type { SampleSet } from './fold-probe.ts';
-import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
+import { animalHandRig, handRigSummaryPath, runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { probeDemos } from './probe-demos.ts';
 import { setRecastHolds } from './recast-scale.ts';
@@ -526,6 +526,18 @@ export function raiseCount(text: string): number {
 function freeRaises(role: string): string | null {
   const source = findRole(role);
   const animal = source ? roleAnimal(source) : '';
+  const blend = animal ? animalHandRig(animal) : null;
+  const summary = animal ? handRigSummaryPath(animal) : null;
+  if (blend !== null && summary !== null && existsSync(summary)) {
+    // SAFETY: the summary of `export_rig.py` is a JSON object, and only `extras.raise` is read.
+    const json = JSON.parse(readFileSync(summary, 'utf8')) as {
+      readonly extras?: { readonly raise?: readonly unknown[] };
+    };
+    const count = json.extras?.raise?.length ?? 0;
+    const free = Math.max(0, STUDIO_RAISES - count);
+    const full = free === 0 ? ' A new key must take the place of a key of the hand rig.' : '';
+    return `Shapes: the hand rig ${blend} has ${count} keys arm_raise_* (its export), and a body has at most ${STUDIO_RAISES} (STUDIO_RAISES), so ${free} are free.${full}`;
+  }
   const path = join(import.meta.dirname, 'mesh-rigs', `${animal}.json`);
   if (!animal || !existsSync(path)) {
     return null;
@@ -553,6 +565,10 @@ function writeEntry(file: string, fit: RaiseFit, role: string): string {
   writeFileSync(file, `${JSON.stringify(entry, null, 2)}\n`);
   const source = findRole(role);
   const animal = source ? roleAnimal(source) : '<animal>';
+  const blend = source ? animalHandRig(animal) : null;
+  if (blend !== null) {
+    return `Wrote the entry to ${file}. The hand rig ${blend} takes it as a key arm_raise_* drawn in the pose of the rule, with the turn and the fade of the rule in the property of the key (design 4.4, "Hand rig").`;
+  }
   return `Wrote the entry to ${file}. Check it with: pnpm rig-mesh ${animal} --check --set 'raise+=@${file}'`;
 }
 

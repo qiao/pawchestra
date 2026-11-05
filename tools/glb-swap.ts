@@ -171,6 +171,20 @@ export function animalHandRig(animal: string): string | null {
 }
 
 /**
+ * Gives the export summary of the hand rig of an animal of `ANIMALS`: `<file>.json` beside its GLB
+ * file `<file>.glb` (`summary()` of `tools/blender/export_rig.py`).
+ *
+ * @param animal The animal.
+ * @returns The absolute path of the summary, or `null` for an animal with no hand rig.
+ */
+export function handRigSummaryPath(animal: string): string | null {
+  const glb = ANIMALS.get(animal)?.glb;
+  return glb === undefined || handRigOf(animal, glb) === null
+    ? null
+    : join(ROOT, glb.replace(/\.glb$/, '.json'));
+}
+
+/**
  * Gives the animal whose studio body `--glb <file>` swaps for a species: the animal of the studio
  * body of the species, or the species itself when it has no studio body and has a rig config
  * ({@link rigConfigPath}), such as a new mesh before the commit of its body.
