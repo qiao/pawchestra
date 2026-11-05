@@ -23,7 +23,7 @@ import {
   takeGlb,
   withGlbBody,
 } from './glb-swap.ts';
-import { ANIMALS, studioGlbPath } from './studio-body.ts';
+import { ANIMALS, rigMeshSettings, studioGlbPath } from './studio-body.ts';
 
 /** The repository root. */
 const ROOT = join(import.meta.dirname, '..');
@@ -91,7 +91,7 @@ describe('copiedTool', () => {
 
 describe('glbModule', () => {
   it('takes the landmark height of the settings that it gets, else the height of ANIMALS', () => {
-    const rabbit = ANIMALS.get('rabbit');
+    const rabbit = rigMeshSettings('rabbit');
     const file = studioGlbPath('rabbit', rabbit);
     const bytes = new Uint8Array(readFileSync(file));
     const base = glbModule('rabbit', file, bytes).body;
@@ -142,7 +142,7 @@ describe('withGlbBody', () => {
   });
 
   it('writes the module of the copy with the settings that it gets', async () => {
-    const rabbit = ANIMALS.get('rabbit');
+    const rabbit = rigMeshSettings('rabbit');
     const file = studioGlbPath('rabbit', rabbit);
     const out = join(parent, 'scale.txt');
     const settings = rabbit ? { ...rabbit, height: rabbit.height * 1.1 } : undefined;

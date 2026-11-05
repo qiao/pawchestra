@@ -29,7 +29,7 @@ import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.
 import { trackChild, trackFolder } from './stop-cleanup.ts';
 import { gzipSize } from './studio-budgets.ts';
 import type { ThinRule } from './rig-mesh-check.ts';
-import { ANIMALS, studioBody, writeStudioModule } from './studio-body.ts';
+import { ANIMALS, rigMeshSettings, studioBody, writeStudioModule } from './studio-body.ts';
 import type { AnimalSettings } from './studio-body.ts';
 
 /** The repository root. */
@@ -1435,9 +1435,10 @@ export interface AnimalRole {
  *   variant keeps the meters for each unit of the base. The config of a variant already holds the
  *   factor in `app.shoulders` ({@link variantText}), so only the height of `ANIMALS` takes it.
  * @returns The settings, and true when they come from `ANIMALS`.
+ * @throws Error for a hand rig, whose `.blend` holds the facts of its body.
  */
 export function rigSettings(animal: string, config: MeshRigConfig, factor = 1): RigSettings {
-  const known = ANIMALS.get(animal);
+  const known = rigMeshSettings(animal);
   if (known) {
     return {
       settings: factor === 1 ? known : { ...known, height: known.height * factor },

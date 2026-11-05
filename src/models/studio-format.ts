@@ -442,7 +442,8 @@ export interface StudioBody {
   /**
    * The width of the seat of the chair under a body that sits on a chair, in meters, when the
    * chair of design 4.5 is too narrow for its haunch (`seatWidth` of `ANIMALS` of
-   * `tools/studio-body.ts`). A body with no width sits on the chair of design 4.5.
+   * `tools/studio-body.ts`, or of the armature of a hand rig). A body with no width sits on the
+   * chair of design 4.5.
    */
   readonly chairWidth?: number;
   /**

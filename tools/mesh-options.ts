@@ -63,7 +63,7 @@ import type { MeshRigConfig } from './rig-mesh.ts';
 import { measureRig, noseWarning } from './rig-mesh-check.ts';
 import type { ThinRule } from './rig-mesh-check.ts';
 import { trackChild } from './stop-cleanup.ts';
-import { ANIMALS, readAccessor, readGlb, worldMatrices } from './studio-body.ts';
+import { ANIMALS, hasBodyFacts, readAccessor, readGlb, worldMatrices } from './studio-body.ts';
 import type { AnimalSettings } from './studio-body.ts';
 
 /** The repository root. */
@@ -607,7 +607,7 @@ async function rigVariant(
   const config = parseConfig(text);
   const known = ANIMALS.get(args.animal);
   const settings: AnimalSettings = {
-    ...(known ?? scratchSettings(args.animal, config.app.shoulders)),
+    ...(known && hasBodyFacts(known) ? known : scratchSettings(args.animal, config.app.shoulders)),
     landmark: 'shoulders',
     height: config.app.shoulders,
     glb: relative(ROOT, glb),

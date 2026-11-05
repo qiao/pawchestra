@@ -41,7 +41,7 @@ import type { CheckMeasures, CheckRow } from './rig-mesh.ts';
 import type { FormJson, PlayerForm } from './rig-form.ts';
 import { FOLD_ROLES, roleAnimal } from './fold-probe.ts';
 import type { FaceRecord } from './fold-probe.ts';
-import { ANIMALS } from './studio-body.ts';
+import { ANIMALS, rigMeshSettings } from './studio-body.ts';
 import type { MeshRigConfig, MeshRigJoint } from './rig-mesh.ts';
 
 /**
@@ -704,7 +704,7 @@ describe('keptHeight and the kept meters of a variant', () => {
   });
 
   it('gives the height of ANIMALS the factor, and keeps the entry with the factor 1', () => {
-    const rabbit = ANIMALS.get('rabbit');
+    const rabbit = rigMeshSettings('rabbit');
     expect(rigSettings('rabbit', short, 1).settings).toBe(rabbit);
     expect(rigSettings('rabbit', short, 1.3).settings.height).toBeCloseTo(
       (rabbit?.height ?? 0) * 1.3,

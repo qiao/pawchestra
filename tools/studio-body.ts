@@ -50,7 +50,11 @@ const ROOT = join(import.meta.dirname, '..');
 /** The folder of the modules of the studio bodies (design 4.4). */
 export const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');
 
-/** The settings of one animal of the studio that the app shows. */
+/**
+ * The settings of one animal of the studio that the app shows. A hand rig holds the facts of its
+ * body ({@link BODY_FACTS}) in its `.blend`, so its entry in `ANIMALS` leaves them out
+ * ({@link AnimalEntry}, {@link settingsOf}).
+ */
 export interface AnimalSettings {
   /**
    * The landmark of the scale (design 4.4): the shoulder joints of the standing body
@@ -185,6 +189,38 @@ export interface AnimalSettings {
 }
 
 /**
+ * The settings of an animal that are facts of its body: its scale, its look, its fit on the chair,
+ * and the bounds of its head measures. A hand rig holds them as custom properties of the armature
+ * of its `.blend`, and the export writes them into the extras `body` of its GLB file (`body_of()`
+ * of `tools/blender/export_rig.py`, design 4.4, "Hand rig"). The other settings, such as the
+ * constant, the GLB file, and the role, stay in `ANIMALS`.
+ */
+export const BODY_FACTS = [
+  'height',
+  'crease',
+  'colorBlend',
+  'seatBack',
+  'backRoom',
+  'seatWidth',
+  'headFloor',
+  'noseTop',
+  'headCeiling',
+] as const satisfies readonly (keyof AnimalSettings)[];
+
+/** A setting of an animal that is a fact of its body ({@link BODY_FACTS}). */
+export type BodyFact = (typeof BODY_FACTS)[number];
+
+/** A setting of the rules of the pea eyes of a body of `pnpm rig-mesh` ({@link EYE_RULES}). */
+type EyeRule = (typeof EYE_RULES)[number];
+
+/**
+ * The entry of an animal in `ANIMALS`: all settings of a body of `pnpm rig-mesh`, or the settings
+ * of a hand rig with no fact of the body and no eye rule, because its GLB file holds them
+ * ({@link settingsOf}).
+ */
+export type AnimalEntry = AnimalSettings | Omit<AnimalSettings, BodyFact | EyeRule>;
+
+/**
  * The colors of the texture of the fox mesh, from which the tan palette maps (design 4.5): the
  * colors of the red fox before the color shift of its rig (`colors.shift` of
  * `tools/mesh-rigs/fox.json`). The tan palette maps the face colors before the shift
@@ -197,7 +233,7 @@ const FOX_TEXTURE_COLORS: SpeciesColors = {
 };
 
 /** The animals that the app shows, by their ids. */
-export const ANIMALS: ReadonlyMap<string, AnimalSettings> = new Map([
+export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalEntry>([
   // The bear conductor: the T-pose mesh (design 4.4), with the size of the studio bear.
   [
     'bear',
@@ -825,6 +861,11 @@ interface Gltf {
        * `tools/blender/export_rig.py`). A file of `pnpm rig-mesh` has none.
        */
       readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
+      /**
+       * The facts of the body of a hand rig ({@link BODY_FACTS}): the custom properties of the
+       * armature of its `.blend`. A file of `pnpm rig-mesh` has none.
+       */
+      readonly body?: Readonly<Record<string, number>>;
     };
   };
 }
@@ -1014,6 +1055,72 @@ export function eyesOf(glb: Glb): Record<Side, FileEye> | null {
     throw new Error(`The eyes of the file have two sizes: ${out.L.size} and ${out.R.size}.`);
   }
   return out;
+}
+
+/**
+ * Finds if an entry of `ANIMALS` gives the facts of its body: the entry of a body of
+ * `pnpm rig-mesh`.
+ *
+ * @param entry The entry.
+ * @returns True when the entry gives the height and the crease angle.
+ */
+export function hasBodyFacts(entry: AnimalEntry): entry is AnimalSettings {
+  return 'height' in entry && 'crease' in entry;
+}
+
+/**
+ * Gives the entry of an animal of `ANIMALS` that gives the facts of its body: the settings of a
+ * body of `pnpm rig-mesh`.
+ *
+ * @param animal The animal.
+ * @returns The settings, or `undefined` for an animal that is not in `ANIMALS`.
+ * @throws Error for a hand rig, whose GLB file holds the facts of its body.
+ */
+export function rigMeshSettings(animal: string): AnimalSettings | undefined {
+  const entry = ANIMALS.get(animal);
+  if (entry && !hasBodyFacts(entry)) {
+    throw new Error(`The animal ${animal} is a hand rig: its .blend holds the facts of its body.`);
+  }
+  return entry;
+}
+
+/**
+ * Gives the settings of an animal for its GLB file: the entry of `ANIMALS`, with the facts of the
+ * body ({@link BODY_FACTS}) from the extras `body` of the file of a hand rig (design 4.4, "Hand
+ * rig"). Each fact thus has one place.
+ *
+ * @param glb The file.
+ * @param entry The entry of the animal.
+ * @returns The settings.
+ * @throws Error if the file holds the facts and the entry gives one too, if the file holds a fact
+ *   that is not a finite number or a name that is no fact, or if neither gives the height and the
+ *   crease angle.
+ */
+export function settingsOf(glb: Glb, entry: AnimalEntry): AnimalSettings {
+  const facts = glb.json.asset?.extras?.body;
+  if (facts === undefined) {
+    if (!hasBodyFacts(entry)) {
+      throw new Error('The GLB file holds no facts of the body, and the settings give none.');
+    }
+    return entry;
+  }
+  const given = BODY_FACTS.find((key) => key in entry);
+  if (given !== undefined) {
+    throw new Error(`The GLB file holds the facts of the body, so the settings give no ${given}.`);
+  }
+  const read: Partial<Record<BodyFact, number>> = {};
+  for (const [key, value] of Object.entries(facts)) {
+    const fact = BODY_FACTS.find((name) => name === key);
+    if (fact === undefined || !Number.isFinite(value)) {
+      throw new Error(`The fact ${key} ${String(value)} of the file is no fact of the body.`);
+    }
+    read[fact] = value;
+  }
+  const { height, crease } = read;
+  if (height === undefined || crease === undefined) {
+    throw new Error('The facts of the body of the file give no height or no crease angle.');
+  }
+  return { ...entry, ...read, height, crease };
 }
 
 /**
@@ -2705,11 +2812,13 @@ interface Export {
  *
  * @param bytes The GLB file.
  * @param source The GLB file, relative to the repository.
- * @param settings The settings of the animal.
+ * @param entry The entry of the animal in `ANIMALS`, with the facts of the body from a hand rig
+ *   ({@link settingsOf}).
  * @returns The body, and the corrective weights of the pose of the sheet for the report.
  */
-export function studioBody(bytes: Uint8Array, source: string, settings: AnimalSettings): Export {
+export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry): Export {
   const glb = readGlb(bytes);
+  const settings = settingsOf(glb, entry);
   const skeleton = readSkeleton(glb);
   const raises = raisesOf(glb);
   const sits = sitsIn(glb, settings);
@@ -3228,16 +3337,14 @@ function meshBox(glb: Glb, worlds: readonly Matrix4[], nodes: readonly number[])
  * part that the export refuses: it lists that part.
  *
  * @param bytes The GLB file.
- * @param settings The settings of the animal, or `null` for an animal that is not in `ANIMALS`.
- *   Then the scale puts the shoulder joints 1.0 m above the floor.
+ * @param entry The entry of the animal in `ANIMALS` ({@link settingsOf}), or `null` for an animal
+ *   that is not in `ANIMALS`. Then the scale puts the shoulder joints 1.0 m above the floor.
  * @returns The facts, in the axes and the units of the studio.
  * @throws Error if the file has no skin.
  */
-export function inspectStudioGlb(
-  bytes: Uint8Array,
-  settings: AnimalSettings | null,
-): StudioInspection {
+export function inspectStudioGlb(bytes: Uint8Array, entry: AnimalEntry | null): StudioInspection {
   const glb = readGlb(bytes);
+  const settings = entry ? settingsOf(glb, entry) : null;
   const gltf = glb.json;
   const skin = gltf.skins[0];
   if (!skin) {
@@ -3267,8 +3374,9 @@ export function inspectStudioGlb(
   // The export takes the shoulders of the standing body, as the clip `reference` gives them for a
   // rig with a reclined trunk (`standingShoulder()`).
   const landmark = standingShoulder(glb, readSkeleton(glb));
+  const owner = gltf.asset?.extras?.body ? 'the armature of the hand rig' : 'ANIMALS';
   const scaleFrom = settings
-    ? `ANIMALS: the ${used.landmark} at ${used.height} m`
+    ? `${owner}: the ${used.landmark} at ${used.height} m`
     : 'assumed: the shoulders at 1 m, because the animal is not in ANIMALS';
 
   // The joints, by what the export does with them.
@@ -3549,7 +3657,7 @@ export async function writeStudioModule(
  * @returns The absolute path of the file.
  * @throws Error if the settings name no GLB file.
  */
-export function studioGlbPath(animal: string, settings?: AnimalSettings): string {
+export function studioGlbPath(animal: string, settings?: AnimalEntry): string {
   if (!settings?.glb) {
     throw new Error(
       `The animal ${animal} has no GLB file in ANIMALS of tools/studio-body.ts. Give one with --inspect --glb <file>.`,

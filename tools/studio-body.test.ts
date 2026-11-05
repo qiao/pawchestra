@@ -15,6 +15,7 @@ import {
   eyePush,
   headRig,
   ownBone,
+  rigMeshSettings,
   studioBody,
   studioGlbPath,
   ungrown,
@@ -304,7 +305,7 @@ describe('pnpm studio-body with a head that the rig grows (design 4.4)', () => {
 });
 
 describe('pnpm studio-body with a seat height in the settings (design 4.4)', async () => {
-  const settings = ANIMALS.get('rabbit');
+  const settings = rigMeshSettings('rabbit');
   if (!settings?.glb) {
     throw new Error('The rabbit has no settings with a GLB file.');
   }

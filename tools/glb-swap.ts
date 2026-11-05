@@ -21,7 +21,7 @@ import type { StudioBodyName } from '../src/models/studio-body.ts';
 import type { StudioBody } from '../src/models/studio-format.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
 import { ANIMALS, studioBody, studioModule } from './studio-body.ts';
-import type { AnimalSettings } from './studio-body.ts';
+import type { AnimalEntry, AnimalSettings } from './studio-body.ts';
 
 /** The repository root. */
 const ROOT = join(import.meta.dirname, '..');
@@ -278,7 +278,7 @@ export function animalSpecies(animal: string): SpeciesId[] {
  * @returns The settings.
  * @throws Error if `ANIMALS` has no such animal and no rig config of the animal exists.
  */
-function glbSettings(animal: string, file: string): AnimalSettings {
+function glbSettings(animal: string, file: string): AnimalEntry {
   const known = ANIMALS.get(animal);
   if (known) {
     return { ...known, glb: relative(ROOT, file) };
@@ -315,7 +315,7 @@ export function glbModule(
   animal: string,
   file: string,
   bytes: Uint8Array,
-  settings: AnimalSettings = glbSettings(animal, file),
+  settings: AnimalEntry = glbSettings(animal, file),
 ): GlbModule {
   const { body } = studioBody(bytes, settings.glb ?? '', settings);
   return { body, text: studioModule(animal, settings.constant, body) };
@@ -393,7 +393,7 @@ function withSpeciesBody(
  * @returns The changed text.
  * @throws Error if the text has no `ANIMALS`.
  */
-function withAnimalEntry(text: string, animal: string, settings: AnimalSettings): string {
+function withAnimalEntry(text: string, animal: string, settings: AnimalEntry): string {
   if (!text.includes('export const ANIMALS')) {
     throw new Error('tools/studio-body.ts has no "export const ANIMALS".');
   }
@@ -417,11 +417,7 @@ function withAnimalEntry(text: string, animal: string, settings: AnimalSettings)
  * @param settings The settings of the export.
  * @throws Error if the animal has no studio body and is not a species.
  */
-async function addScratchBody(
-  dir: string,
-  animal: string,
-  settings: AnimalSettings,
-): Promise<void> {
+async function addScratchBody(dir: string, animal: string, settings: AnimalEntry): Promise<void> {
   if (!isStudioBodyName(`studio-${animal}`)) {
     if (!isSpeciesId(animal)) {
       throw new Error(
@@ -471,7 +467,7 @@ export async function withGlbBody<T>(
   file: string,
   work: (dir: string) => Promise<T>,
   parent: string = tmpdir(),
-  settings: AnimalSettings = glbSettings(animal, file),
+  settings: AnimalEntry = glbSettings(animal, file),
 ): Promise<T> {
   const { text } = glbModule(animal, file, new Uint8Array(await readFile(file)), settings);
   const dir = mkdtempSync(join(parent, 'glb-swap-'));
