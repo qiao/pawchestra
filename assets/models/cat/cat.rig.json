@@ -1,5 +1,5 @@
 {
- "sha256": "1143dad80e287edbb3901c8abff3bc3a27249a92838eee819f460b6c8d6b23e1",
+ "sha256": "12c1f9afbe48556893f1f9929f92af83e8955066f546b7c18126204be7c8c2c2",
  "bindSupination": {
   "L": 132.0,
   "R": 89.0
@@ -469,7 +469,9 @@
   "arm_down_L": 0.023641,
   "arm_down_R": 0.010365,
   "legs_straight_L": 0.106602,
-  "legs_straight_R": 0.094556
+  "legs_straight_R": 0.094556,
+  "arm_raise_R": 0.016095,
+  "arm_raise_L": 0.013812
  },
  "extras": {
   "seat": {
@@ -479,6 +481,38 @@
    "back": -0.08699999749660492,
    "halfWidth": 0.18400000035762787
   },
+  "raise": [
+   {
+    "side": "R",
+    "turn": [
+     -0.576202,
+     0.1004,
+     -0.514202,
+     0.627302
+    ],
+    "fade": [
+     10.0,
+     20.0
+    ],
+    "bone": "forearm",
+    "target": "arm_raise_R"
+   },
+   {
+    "side": "L",
+    "turn": [
+     -0.521478,
+     -0.079897,
+     0.47208,
+     0.70627
+    ],
+    "fade": [
+     10.0,
+     20.0
+    ],
+    "bone": "forearm",
+    "target": "arm_raise_L"
+   }
+  ],
   "hinges": {
    "L": [
     -0.688343,
