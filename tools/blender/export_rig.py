@@ -303,11 +303,26 @@ def srgb(linear):
     return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(c, 1 / 2.4) - 0.055)
 
 
-def summary(glb, bones, joints, w, shapes, extras):
+def bind_supination(rm, turns, heads):
+    """Gives the bind supination of each paw in degrees, by the definition of `paw_supination()` of
+    `rig_mesh.py`: the twist of the bind paw from the bind forearm about the forearm, from the
+    elbow to the wrist, toward supination. `turns` and `heads` are the world turns from the pose of
+    the sheet to the bind and the heads of the sheet, in the axes of the studio."""
+    out = {}
+    for side, sign in (('L', -1.0), ('R', 1.0)):
+        fore, hand = turns[f'forearm_{side}'], turns[f'hand_{side}']
+        along = rm['unit'](fore @ (heads[f'hand_{side}'] - heads[f'forearm_{side}']))
+        out[side] = round(math.degrees(sign * rm['twist_of'](hand @ fore.T, along)), 3) + 0.0
+    return out
+
+
+def summary(glb, bones, joints, w, shapes, extras, supination):
     """Gives the text summary of the rig for diffs: the bind head and a hash of the weights of each
-    bone, the largest move of each shape, and the extras."""
+    bone, the largest move of each shape, the extras, and the bind supination of each paw
+    (`bind_supination()`), which `pnpm bind-supination` reads as the value of now."""
     return {
         'sha256': hashlib.sha256(glb).hexdigest(),
+        'bindSupination': supination,
         'bones': {
             b: {
                 'head': [round(float(x), 6) + 0.0 for x in joints[b][1]],
@@ -349,7 +364,7 @@ def main():
             roll <= ROLL_LIMIT, f'The roll of {b} is {math.degrees(roll):.2f} degrees off its hint.'
         )
     driven = sa.driven_segments(rig, rm, bind, sheet)
-    turns, _ = sa.studio_turns(bind, sheet)
+    turns, sheet_heads = sa.studio_turns(bind, sheet)
     for b, t in driven.items():
         x, y, z, q = rm['matrix_quat'](t.T @ turns[b])
         gap = 2 * math.atan2(math.hypot(x, y, z), q)
@@ -412,7 +427,11 @@ def main():
     with open(out, 'rb') as f:
         glb = f.read()
     with open(os.path.splitext(out)[0] + '.json', 'w') as f:
-        json.dump(summary(glb, bones, frames, w, shapes, extras), f, indent=1)
+        json.dump(
+            summary(glb, bones, frames, w, shapes, extras, bind_supination(rm, turns, sheet_heads)),
+            f,
+            indent=1,
+        )
         f.write('\n')
     print(
         f'export_rig: wrote {out}: {len(glb)} bytes, {len(corners)} triangles, {len(bones)} '
