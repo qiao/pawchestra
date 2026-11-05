@@ -155,10 +155,8 @@ These rules hold for each test:
   of Lighthouse with `pnpm lighthouse`. Use the saved tool, because the Lighthouse of the
   chrome-devtools MCP server has no performance category. `--url https://www.zoophony.com/` audits
   the live site. Use `--quick` while you change the page, and the default runs for a report.
-- A round with several small changes of `src/scene/` that do not target speed runs
-  `pnpm frame-compare <base> <tip>` one time before its report, and gives that table in the
-  report. Each run takes about 3 minutes, so one run for each commit costs much and shows only the
-  noise. A speed change still gives its own table in its commit message.
+- A round runs no frame measure unless the user or the manager asks for one (design 9.7). A speed
+  change still gives its own table in its commit message.
 - An ablation of a GPU cost reads the Metal trace of `pnpm frame`. With no frame cap, the main
   thread limits the frame rate, so the frame time alone does not show a GPU change.
 - A change of the material IDs can change the order of the draws, and thus the pixels. Run

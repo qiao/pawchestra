@@ -163,8 +163,7 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 ```
 
 `poseSegments()` and `StudioArmSegments` of `src/models/studio-rig.ts` and `driven_turns()` of
-`tools/blender/rig_mesh.py` turn the new bones with the same rule. Run `pnpm frame`
-after a new body with `armSegments`.
+`tools/blender/rig_mesh.py` turn the new bones with the same rule.
 
 ## Traps
 
