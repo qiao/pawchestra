@@ -245,6 +245,13 @@ passes.
 - [ ] Cat tail root: under the haunch, 6 edges at the tail root fold by 109° to 174° (vertices
       2224, 2254, 2255, 2256, 2258, 3721, 3730, and 4415 of `cat.rig.glb`). The seat hides them in
       each view of `reports/2026-11-05-cat-edits/`. Move them with point edits if a crop shows them.
+- [ ] Cat violist: at rest, the pose rolls the left upper arm 72° from the bind (31° in the play).
+      The skin of the upper arm then twists 37° between its middle and the elbow (`pnpm arm-shape
+      violist --rings`: rolls 23, 30, 67), and the arm reads as bent. The bind tube is smooth, and
+      e491ff3c shows the same arm (`reports/2026-11-05-cat-edits/arm-vs-production.png`). Lower the
+      rest roll in the hold (`src/pose/bowed-rig.ts`).
+- [ ] Cat violist: the skin of the bow arm crumples in the play: `pnpm arm-look violist` gives a
+      crease share of 23.3% (limit 14.6%), and `pnpm arm-shape` up to 20 shoulder spikes.
 - [ ] Cat legs: ask the user for the leg girth step of
       `reports/2026-11-05-cat-edits/leg-lineup.png` (1.15, 1.25, or 1.35). The body has 1.25, and
       the README gives the rule for another step.
