@@ -355,20 +355,21 @@ export const SPECIES = {
     seatHeight: standingSeat(STUDIO_BEAR, 0.75),
   },
   /**
-   * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the
-   * T-pose mesh `assets/models/cat/cat-tpose.glb`, which `pnpm rig-mesh cat` rigs (design 4.4),
-   * with the head height of the cat of the A-pose mesh and the arms and the legs of the mesh. Its
-   * long tail lies on the seat behind the haunch and hangs over the left side of the seat, and it
-   * stands as a soloist. Its head height is the head of
-   * the studio body, and its chair fits its short legs: the seat height is the seat of the studio
-   * body, in H. It plays a viola of about 10 inches, with a body of 259 mm, 0.74 of the viola of
-   * the app (`violaScale`), so that the long arms keep the bend of a real violist.
+   * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the mesh
+   * `assets/models/cat/cat.glb`, which `pnpm rig-mesh cat` rigs (design 4.4), with the size, the
+   * reach, and the leg factor of the red fox. It sits with its tail curled on the seat around the
+   * left side of the haunch, and stands as a soloist. Its head height is the head of the studio
+   * body, and its chair fits its legs: the seat height is the seat of the studio body, in H. It
+   * plays a viola of about 10 inches, with a body of 259 mm, 0.74 of the viola of the app
+   * (`violaScale`), as a violin shop sizes a viola for its arm, so that its left paw reaches the
+   * nut and its bow paw the tip of the hair.
    *
-   * The stick of the bow passes through the closed right paw. The paw of the studio turns in the
-   * plane of its palm toward the forearm by 0° to 70° (`PAW_TURN` of `studio-rig.ts`), and its
-   * middle moves on an arc around the wrist. The stick lies along the line nearest to that arc,
-   * 50° from square toward the wrist, so that the paw slides along the stick and keeps it in each
-   * turn.
+   * The stick of the bow passes through the middle of the closed right paw. The paw of the studio
+   * turns in the plane of its palm toward the forearm by 0° to 70° (`PAW_TURN` of `studio-rig.ts`),
+   * and its middle moves on an arc around the wrist. The stick lies along the line nearest to that
+   * arc, 50° from square toward the wrist, so that the paw slides along the stick and keeps it in
+   * each turn. With the grip of `BOW_GRIP`, the stick lies 4.3 cm out from the middle of the paw on
+   * the palm side, under the paw.
    */
   cat: {
     body: 'studio-cat',

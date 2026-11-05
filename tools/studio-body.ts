@@ -301,16 +301,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat: the hand rig of the T-pose mesh (`cat.blend`, design 4.4). The armature of
-  // `cat.blend` holds the facts of its body, and its eye objects hold the pea eyes.
+  // The viola cat (design 4.4). The wider haunch of the cat sits on a wider chair. The tips of the
+  // lower whiskers hang below the chin and follow the head (`noseFront` of the rig config), so
+  // the head measures start at the chin.
   [
     'cat',
     {
       landmark: 'shoulders',
+      height: 1.042897,
       seated: true,
       soloist: true,
+      seatWidth: 0.46,
       constant: 'STUDIO_CAT',
+      crease: 35,
       glb: 'assets/models/cat/cat.rig.glb',
+      headFloor: 0.6885,
     },
   ],
   // The cello dog (design 4.4).
