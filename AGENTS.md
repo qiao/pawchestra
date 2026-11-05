@@ -58,8 +58,8 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 - **Privacy.** Keep the personal data of the user out of each request to an outside service: no
   email address or name in a header, a User-Agent, a URL, or a payload. When an API asks for
   contact data, send a neutral value such as `zoophony-build/1.0`.
-- **Frame time.** Each change of `src/scene/`, of a shader, or of the post effects runs
-  `pnpm frame`, and gives its table in the report or the commit message (design 9.7).
+- **Frame time.** A change does not need a `pnpm frame` run. Run it only when the user or the
+  manager asks, or for a change whose goal is speed, and then give its table (design 9.7).
 - **Work order.** Follow the steps of design 9.5. The largest risks come first.
 
 ## Work rules

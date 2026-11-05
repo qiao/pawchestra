@@ -133,9 +133,10 @@ The development Mac is an Apple M1 Max with Chrome.
 - The GPU time of a frame comes from a Metal System Trace with no frame cap, because at 60 fps the
   GPU lowers its clock and a timer query measures the clock more than the work. Guards check a
   quiet CPU and the highest GPU state.
-- Each change of `src/scene/`, of a shader, or of the post effects runs `pnpm frame` before its
-  report, with the table in the report or the commit message. CI has no GPU, so this check is
-  local.
+- A change does not need a `pnpm frame` run. The check runs when the user or the manager asks,
+  or for a change whose goal is speed, with the table in the report or the commit message. The
+  reason: a run takes about 3 minutes, its guards often refuse the GPU phase while other work runs,
+  and a run for each change cost more than it found. CI has no GPU, so this check is local.
 - The frame target leaves a margin of about 4 times for an integrated GPU of the Intel Iris Xe
   class. The manual test (9.4) checks a real phone at 30 fps or more at the low tier.
 
