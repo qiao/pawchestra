@@ -125,15 +125,15 @@ the seated bind (the Action `bind`) and its fix (the key `bind_sit`).
 
 | Item | Value |
 |---|---|
-| Size | 317,045 bytes |
-| SHA-256 | `d4e0332daae65384e7f73ef1d61f51e1a587a83ec950dba741e4116616f57cb8` |
+| Size | 335,637 bytes |
+| SHA-256 | `0364649ca30ad387ccea7cf31ba3c7e41ee96ed69c3f56a2a485e9e84db06727` |
 | Origin | Made by hand in Blender 5.2 from `cat-tpose.glb` |
 | License | CC BY-NC 4.0, as `cat-tpose.glb` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1272 units, so the ear tips are at z = 1.1272. No object has a transform |
-| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,018 vertices and 3,988 triangles, 46 of them gloss |
+| Mesh | One object `cat`: the source welded at 1e-5, with flat faces and no custom normals, the edits below, and the surface of `add_surface()` of `tools/blender/studio_armature.py`: the face attributes `color` and `color_base`, a gloss fan of 12 triangles on each eye, and a gloss nose. 2,227 vertices and 4,406 triangles, 46 of them gloss |
 | Materials | The slots `fur` and `gloss`. Each reads the face attribute `color` |
 | Armature | One object `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, with the parents of `STUDIO_PARENTS`. The rest is the T-pose. The Z axis of each bone points to its hint. The Action `bind` holds the seated bind at frame 1 (below). The property `palm` is (0, 0, -1), `seat` is the chair of `cat.json` (front 0.1, back -0.087, half width 0.184), and `hinges` holds the elbow axes of `bind_hinges()` |
-| Shape keys | `Basis`, `bind_sit` at the value 1, and `arm_raise_L` and `arm_raise_R` at the value 0 (below), each with its custom property on the mesh |
+| Shape keys | `Basis`, `bind_sit` and `bind_armpit` at the value 1, and `arm_raise_L`, `arm_raise_R`, `arm_raise_L2`, and `arm_raise_L3` at the value 0 (below), each with its custom property on the mesh. A body has at most 4 keys `arm_raise_*` (`STUDIO_RAISES`) |
 | Weights | Automatic weights and the fixes below, at most 4 bones on each vertex. The upper arm, the forearm, and the forearm twist bone hold no weight |
 
 The seated bind:
@@ -159,16 +159,28 @@ The seated bind:
   of each vertex. 236 vertices move, at most 16.4 cm in the bind. From the side, the underside
   behind the hip joints was up to 15.8 cm above the seat before, and 2.9 cm after. The seat top
   stays 0.300 m.
-- **`arm_raise_L`, `arm_raise_R`.** With a hanging upper arm, the rigid patch under each arm
-  root (the fix "Armpits" below) swings into the chest, and a notch shows at the front and the
-  back of the arm root. Each key holds the fix of one side in the hanging pose: the patch and three
-  rings of its neighbors (122 vertices on the left, 124 on the right) take the skin of their
-  weights after 12 rounds of Smooth, and the vertex of the back notch goes onto the line of its
-  two neighbors. The moves are at most 3.6 cm. The pose is a copy of the rig whose rest is the
-  bind, so that the skin blends from the bind as in the app, with each upper arm turned the least
-  way to hang down (54° from the bind). The property of each key gives the side, that turn in the
-  axes of the chest (w 0.8898, x 0.2809, y ±0.3598, z ∓0.0023, in Blender axes), and the fade
-  from 15° to 45°.
+- **`bind_armpit`.** With a hanging upper arm, the rigid patch under each arm root (the fix
+  "Armpits" below) swings into the chest, and a notch shows at the front and the back of the arm
+  root. The fix in the hanging pose: the patch and three rings of its neighbors take the skin of
+  their weights after 12 rounds of Smooth, and the vertex of the back notch goes onto the line of
+  its two neighbors. The pose is a copy of the rig whose rest is the bind, so that the skin blends
+  from the bind as in the app, with each upper arm turned the least way to hang down (54° from
+  the bind). The key holds half of that fix, moved back into the bind by the inverse of the skin
+  of the pose, at most 2.9 cm. Half makes the notch smaller and keeps the arm gate. The whole fix
+  (5.8 cm in the bind) cut a deeper notch at the back of the left arm root and failed the arm
+  gate. As a bind key, the fix uses none of the 4 keys `arm_raise_*`.
+- **Raise keys.** `raise_shape()` of `tools/blender/rig_mesh.py` relaxes the faces that fold in
+  the pose of a rule, on the bind of this rig. The rule is the output of `pnpm raise-fit` for the
+  folded faces, the key is the move of the bind turned back into the rest by the inverse of the
+  blended skin, and the property holds the turn of the key bone of the rule (w, x, y, z, Blender
+  axes) and the fade. A hand edit of a key starts from these:
+
+  | Key | Bone | Rule (`pnpm raise-fit`) | Turn | Fade |
+  |---|---|---|---|---|
+  | `arm_raise_L` | forearm | `violist`, the 11 folded faces of the left inner elbow, sets play: the elbow 90° from the bind | 0.7067, -0.5146, -0.4761, -0.0958 | 10° to 35° |
+  | `arm_raise_R` | forearm | `violist`, the 8 folded faces of the right inner elbow, sets rest: the elbow 112° from the bind | 0.5621, -0.6051, 0.5488, 0.1297 | 10° to 35° |
+  | `arm_raise_L2` | hand | `violist`, the 2 folded faces of the left wrist, sets play: the paw 95° from the forearm | 0.6062, -0.6229, 0.3503, 0.3491 | 15° to 25° |
+  | `arm_raise_L3` | forearm | `trumpeter@cat`, the 11 folded faces of the left inner elbow, sets rest: the elbow 123° from the bind | 0.4788, -0.6437, -0.5789, -0.1455 | 10° to 20° |
 
 The joints are the joints of `tools/mesh-rigs/cat.json`, except the arm joints, which come from
 sections of the mesh, and the bend of the tail:
@@ -196,6 +208,16 @@ The fixes of the weights:
   then a Smooth of the root band.
 - **Paws.** No wrist helper or forearm segment beyond |x| 0.395, a short Smooth of the wrist band,
   and the fingers keep half of their weight (`weights.fingers` of `cat.json`).
+- **Finger tips.** The 3 vertices of the paw tips with the fingers bone alone take hand 0.5 and
+  fingers 0.5, as the other paw vertices. A face at the right paw tip folded in each sample of the
+  bow grip.
+- **Elbows.** 4 rounds of Smooth on the band of each elbow (|x| 0.20 to 0.30 of the source), so
+  that the bend spreads over more rings. The inner elbow folded at small bends, as at the rest of
+  `trumpeter@cat`.
+- **Slivers.** Each group of faces with a corner below 4° on a forearm (18 faces in 8 groups,
+  most of them from the forearm rings) takes one mean weight, and the 5 vertices of a sliver at
+  the left wrist that is thin only in the bind too. A thin face with corners of different
+  weights turned over in each sample of the play.
 
 The places above are places of the source, before the legs lift the body. The edits of the mesh,
 in the studio axes of the sections above (y up, z forward):
@@ -214,6 +236,11 @@ in the studio axes of the sections above (y up, z forward):
   to 0.10, y 0.832 to 0.88, and z 0.17 to 0.24, and the vertices below y 0.83 stay. The sharp
   edges shade dark slashes above the black pea eyes of the app, which read as a worried brow. A
   box from y 0.81 also moves the upper lids, and the eyes then look tired.
+- **Forearm rings.** Three more planar rings go across each forearm, halfway between the rings
+  above (x 0.2845, 0.31, and 0.3365 of the source), with the rule of the rings (a snap of 0.005
+  units). Each new vertex takes the mix of the weights, the UVs, and the shape keys of its edge
+  ends. With the long faces of the forearm, the twist of the play stretched the left forearm
+  twice as much as on the rig of `rig-mesh` (stretch p95 0.12, 0.06 on main).
 - **Colors.** The plain fur takes the move of `colors.tone` of `cat.json` (`tone()` of
   `tools/blender/rig_mesh.py`), as in the rig of `pnpm rig-mesh`: 2,974 faces move in Oklab toward
   the gray blue of the cat of the A-pose mesh. The face attributes `color` and `color_base` hold
