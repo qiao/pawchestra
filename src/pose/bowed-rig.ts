@@ -1121,12 +1121,19 @@ export const BOWED_HOLDS = {
  * or (1.5, -0.5, -1), the move twist of the arm gate passes its margin.
  *
  * The rest pose is the upright rest of the rabbit and the red fox, as a seated violinist rests:
- * the viola stands upright on the top of the left thigh, 0.6 of the way from the hip to the knee,
- * and 0.12 H in from it, 0.05 H up, and 0.06 H to the front, in the reach of the short arms, and
- * the bow rests in the right paw at the front of the lap. The left paw holds the viola at 0.55 of
- * the fingerboard from the nut (`restPlace`), and the left elbow points down, out, and a little
- * forward, (-1.6, -1, -0.2), so that the left elbow bends near the side of the round belly, as a
- * seated violist holds the resting instrument with the elbow bent. With the viola 0.8 of the way
+ * the viola stands upright on the outer side of the left thigh, 0.6 of the way from the hip to the
+ * knee, and 0.22 H out from it, 0.05 H up, and 0.06 H to the front, in the reach of the short
+ * arms, and the bow rests in the right paw at the front of the lap. The left paw holds the viola at
+ * 0.55 of the fingerboard from the nut (`restPlace`), and the left elbow points down, a little out,
+ * and a little forward, (-0.55, -1, -0.3), so that the left elbow bends near the side of the round
+ * belly, as a seated violist holds the resting instrument with the elbow bent. There the left upper
+ * arm turns 15° about its axis from the bind, and its skin twists 14° from its middle to the elbow
+ * (`pnpm arm-shape violist --rings`). With the viola 0.12 H in from the thigh and the elbow
+ * (-1.6, -1, -0.2), the upper arm turns 72° and its skin twists 37°, so that the upper arm reads as
+ * bent. With the viola 0.12 H in and the elbow down and in, (-0.3, -1, -0.4), the upper arm turns
+ * 26°, but it goes 4.4 cm into the belly at rest. With the new place, the right claws go 2.0 cm
+ * into the viola in one sample of the lowering of four demos (0.7 cm with the old place), as deep
+ * as in the play. With the viola 0.8 of the way
  * and the elbow (-1.2, -1, 0.1), the left upper arm goes 2.3 cm into the belly at rest, and its
  * middle goes flat. With 0.95 of the way and 0.03 H back, on the front of the knee, the elbow
  * opens to 131°, and the arm reaches far forward and looks long. With the viola 0.03 H back at
@@ -1228,12 +1235,12 @@ const CAT_HOLD = {
   pluckSide: 0.1,
   reach: 36 * MathUtils.DEG2RAD,
   restPoleR: [0.9, -1, 0.2],
-  restPoleL: [-1.6, -1, -0.2],
+  restPoleL: [-0.55, -1, -0.3],
   restPlace: 0.55,
   rest: {
     axis: LAP_VIOLIN.axis,
     top: [-0.5, 0, -0.87],
-    lap: { along: 0.6, offset: [0.12, 0.05, -0.06] },
+    lap: { along: 0.6, offset: [-0.22, 0.05, -0.06] },
   },
   liftReach: [-0.14, 0.29, -0.19],
   restCurlL: 115 * MathUtils.DEG2RAD,

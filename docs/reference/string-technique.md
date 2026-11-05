@@ -513,7 +513,8 @@ The app follows these facts:
   the shared violin hold, both arms hang out to the sides until they clear the body, and the
   elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The cat rests the viola nearer to the
-  hip, so that its shorter arm bends, and closes its paw around the neck.
+  hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
+  side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
 
 The app does not follow these facts:
 

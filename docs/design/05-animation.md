@@ -223,7 +223,10 @@ The rest of each family:
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
   arm root. The cat and the rabbit rest the instrument upright on the left thigh or knee, with
-  the elbows near the sides, as a seated violinist does.
+  the elbows near the sides, as a seated violinist does. The cat rests the viola at the outer side
+  of the left thigh. Reason: with the viola on the top of the thigh, the elbow had to point out to
+  clear the round belly, and the left upper arm then turned far about its axis from the bind and
+  read as bent.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
