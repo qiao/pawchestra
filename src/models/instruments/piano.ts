@@ -48,10 +48,10 @@ export const PIANO = {
 /**
  * The scale of the whole piano around the origin of the piano axes: 1.16 times a real grand
  * piano, with the keys at 0.81 m, because the polar bear pianist is a large animal on a bench
- * that fits the legs of its mesh. At this scale, its elbows stand 4 to 6 cm above the keys, and
- * its forearms are about level with the keys, as a real pianist sits
- * (`docs/reference/piano-technique.md`). At 1.22, the elbows stand 1 to 4 cm above the keys,
- * and the forearms rise 6° to the keys, and at 1.12 they slope 5° down.
+ * that fits the legs of its mesh. At this scale, the elbows of the polar bear at a shoulder height
+ * of 1.15 m stand 4 to 6 cm above the keys, and its forearms are about level with the keys, as a
+ * real pianist sits (`docs/reference/piano-technique.md`). At 1.22, the elbows stand 1 to 4 cm
+ * above the keys, and the forearms rise 6° to the keys, and at 1.12 they slope 5° down.
  */
 export const PIANO_SCALE = 1.16;
 

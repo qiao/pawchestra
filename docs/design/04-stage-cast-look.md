@@ -606,6 +606,8 @@ its rest is the bind.
   (`sit.carryTail`). The ring drops by different amounts, so the haunch near the ball also moves
   with the ball, with a share that falls to 0 over a band (`sit.tailSpread`). The change of the
   drop then spreads over several faces, and the ball keeps its round form.
+- The polar bear is the largest player, as a real polar bear is larger than the other animals of
+  the cast. The piano does not grow with it, because a larger piano hides the players behind it.
 - The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
   shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
   keeps the part ratios of the mesh. The deer sits on the stool of the harp.
@@ -1128,7 +1130,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands at the left side. |
 | Harp | Leaned back onto the right shoulder. The deer plays a smaller harp on a box (`HARP_PLACE`, `HARP_STAND`). |
-| Piano | Larger than a real grand piano (`PIANO_SCALE`), so the keys stand a little below the elbows of the polar bear. The keys stand in front of its belly (`PIANO_FRONT_H`). |
+| Piano | Larger than a real grand piano (`PIANO_SCALE`), so the keys stand below the elbows of the polar bear. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
