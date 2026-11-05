@@ -140,7 +140,7 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 983,936 bytes |
-| SHA-256 | `0686cbacf1f0d283519c691e802c4ae2cec73de1ab78bcf3efa0ab9944f8a61e` |
+| SHA-256 | `04c404dda33e5aa750d0b05f3d79f275c6426851e75743bd711bbc33bf89a693` |
 | Form | The mesh of `cat.blend` in its seated bind (below). The seat top is 0.301 m high, and the chair is 0.46 m wide and 0.343 m deep, as the chair of the cat of the A-pose mesh |
 | Faces | 6,151 triangles, of them 65 gloss (the nose) |
 | Extras | `eyes`: the middle, the direction, and the size of each eye object. `body`: the facts of the body of the armature |
@@ -155,8 +155,8 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 | Item | Value |
 |---|---|
-| Size | 378,054 bytes |
-| SHA-256 | `50031cbe60a6c24ee19c1d1ec44c0950a761826159d71d399b8d98bf8a243f87` |
+| Size | 377,328 bytes |
+| SHA-256 | `d45702630db22ff27a2759389bed1468d83ed79f19639d4315f2b38f084eae6c` |
 | Origin | Made by hand in Blender 5.2 from `tripo/cat-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips of the source, the soles at z = 0, the animal faces -y, and +x is its left side. The longer legs lift the body 0.1227 units, so the ear tips are at z = 1.1227. No object has a transform |
@@ -188,6 +188,18 @@ The seated bind and its keys, in the studio axes of the bind (x left, up, forwar
   move of the bind, turned back into the rest by the inverse of the blended skin of each vertex.
   301 vertices move, at most 15.9 cm. From the side, the underside behind the hip joints was up to
   8.8 cm above the seat, and 1.1 cm after.
+- **Round haunch.** After the full thighs, the back of the haunch was a straight slant down to
+  one low point above the seat, with a dip under the hip joint in front of it. Two moves of the
+  bind, each turned back into the rest by the inverse of the blended skin and added to
+  `bind_sit`, make it round. First, in the side view (forward, up), the points behind the chord
+  from (-0.04, 0.38) to (0.053, 0.276) move out from it, back and down, by 0.022 units times
+  sin(pi t), where t is 0 to 1 along the chord. The move fades out over 0.045 units in front of
+  the chord and from |x| 0.15 to 0.20, and no point goes below the seat. 21 points move, at most
+  0.0215 units. Then the underside comes down toward the seat: each point at the height h above
+  the seat (forward -0.05 to 0.14, |x| 0.02 to 0.19) goes to h (1 - 0.8 f), with f the smooth
+  step down from h 0 to 0.05. 53 points move, at most 0.0104 units. No point with a tail weight
+  of 0.1 or more, or with a shin or foot weight of 0.5 or more, moves. The seat top stays 0.3001
+  m.
 - **`bind_tail`.** The tail lies on the seat behind the haunch and hangs over the left side of the
   seat in front of the left back post, as a seated cat lets its tail hang off a stool. Each vertex
   with a tail weight keeps its arc length along the middle line of the rest tail and its offset
@@ -312,7 +324,7 @@ The edits of the mesh, in the order of the work:
   crops show the same whiskers with fewer bends.
 
 The legs, in meters (1.588737 m for each unit), with the old file in parentheses: in the
-seated bind of the seat rules of `cat.json`, the seat top is 0.3011 m (0.3002 m), the thigh is
+seated bind of the seat rules of `cat.json`, the seat top is 0.3001 m (0.3002 m), the thigh is
 0.201 m (0.205 m) and the shin 0.213 m (0.222 m) long, and the seated cat is 1.651 m (1.675 m)
 high. The shin factor is 2.30, because 2.32 put the seat top at 0.3025 m. In the rest, the mid
 thigh is 0.582 and the mid shin 0.281 of the width of the head at the eyes (0.439 and 0.290; the
