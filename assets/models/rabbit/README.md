@@ -36,7 +36,7 @@ The app chain:
 | `rabbit-weights.json` | Weights of the same Blender run. License as the source | `violin_arms.py rabbit` of e491ff3c |
 | `rabbit-apose.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rabbit` |
 
-The trial, not in use:
+The trial files, which the app does not use:
 
 | File | Origin | Rebuild |
 |---|---|---|

@@ -39,7 +39,7 @@ The app chain:
 | `cat-weights.json` | Weights of the same Blender run. License as `cat.glb` | `cat_arms.py` of e491ff3c |
 | `cat.rig.glb` | Output of the rig. License as `cat.glb` | `pnpm rig-mesh cat` (below) |
 
-The trials, not in use:
+The trial files, which the app does not use:
 
 | File | Origin | Rebuild |
 |---|---|---|
