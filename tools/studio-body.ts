@@ -271,25 +271,15 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeSize: 0.805,
     },
   ],
-  // The violinist rabbit (design 4.4). The standing shoulder joints are 0.859051 m high (the joints
-  // of the mesh, lowered by the shorter shins and raised by the longer trunk), so that the scale
-  // stays 1.4320 m for each unit (`app` of the rig config). The rabbit sits 4 cm further forward on
-  // a seat 4 cm deeper, so that its back keeps off the chair back. The old eye of the T-pose mesh
-  // is a ball in a groove, so the head fills it (`eyeFill`), and the pea eyes take the size of the
-  // eyes of the A-pose rabbit (0.93) and face halfway toward the filled face (`eyeNormal`).
+  // The violinist rabbit: the hand rig of the Tripo mesh (`rabbit.blend`, design 4.4). The armature
+  // of `rabbit.blend` holds the facts of its body, and its eye objects hold the pea eyes.
   [
     'rabbit',
     {
       landmark: 'shoulders',
-      height: 0.859051,
       seated: true,
       soloist: true,
-      backRoom: 0.04,
       constant: 'STUDIO_RABBIT',
-      crease: 35,
-      eyeFill: [0.1, 0.16],
-      eyeNormal: 0.5,
-      eyeSize: 0.93,
       glb: 'assets/models/rabbit/rabbit.rig.glb',
     },
   ],
