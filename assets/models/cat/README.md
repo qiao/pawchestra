@@ -32,6 +32,7 @@ objects of `cat.blend` place them.
 | File | Origin | Rebuild |
 |---|---|---|
 | `cat-tpose.glb` | Source mesh (below) | None |
+| `tripo/cat-tpose.fbx`, `tripo/cat-tpose.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
 | `cat-arms.glb` | Copy of `cat-tpose.glb` with rebuilt arms. License as `cat-tpose.glb` | `arm_rebuild.py` (below) |
 | `cat-weights.json` | Weights of the same Blender run. License as `cat-tpose.glb` | The same run |
 | `cat-root-weights.json` | `cat-weights.json` with more clavicle weight at the right armpit. License as `cat-tpose.glb` | `blender -b --factory-startup -P tools/blender/cat_root.py` |
@@ -71,6 +72,30 @@ at 1e-5.
   is at y 0.75 and z 0.25. Thin whiskers stand out from the muzzle.
 - The long tail hangs from the back of the haunch (y 0.26, z -0.06) down to y 0.09 behind the
   legs, and curls up behind to y 0.25 at z -0.27.
+
+## tripo/cat-tpose.fbx
+
+A retopology of `cat-tpose.glb` with Tripo: the same cat in the same T-pose, with quad faces in
+even rings around the arms and the tail. The FBX file keeps the quads (a GLB file of the same
+mesh holds only triangles). The folder `cat-tpose.fbm/` holds its textures, and the FBX file
+links them by name.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo (a retopology of `cat-tpose.glb`) by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object `output_unwrapped`, turned 90° about X (the FBX axes have Y up), with no armature and no animation. 2,999 vertices and 3,213 faces: 2,760 quads and 453 triangles (5,973 triangles). One UV layer. One material that links the four textures |
+| Parts | The body (2,756 vertices) and 5 whisker strands (243 vertices, 465 triangles). The body has 10 open edges: a slit of 8 edges under the nose, and 1 edge at the outer corner of each eye, where a small extra triangle lies over the surface. 1 whisker has 2 open edges |
+| Box | After the turn: x ±0.4756, y ±0.2588, and z 0 to 0.998 in the units of the file. The cat faces -y |
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `cat-tpose.fbx` | 275,552 bytes | | `92e23f4c5440b892e29e1f61f988f90660f0cbd33ccf2f750e5605e7c8e8ca32` |
+| `cat-tpose.fbm/cat-tpose_basecolor.jpg` | 1,110,790 bytes | 4096 × 4096 | `6eb0f2d260b83001dbe886f4bbf946a0ab4a2e32d42636896452080150672924` |
+| `cat-tpose.fbm/cat-tpose_metallic.jpg` | 332,266 bytes | 2048 × 2048 | `f364d55404a594c11f5b68fc5d4148547af075c7ff53fef22313deb61c5ce52c` |
+| `cat-tpose.fbm/cat-tpose_normal.jpg` | 694,704 bytes | 2048 × 2048 | `3ffdb62a5d31aae713042e474d4089fc6d31273c8463d99c3a8c72574b853bce` |
+| `cat-tpose.fbm/cat-tpose_roughness.jpg` | 184,077 bytes | 2048 × 2048 | `b6d74c6f642d089bd8ffd75ec9b739257ae814e41e1c42e76e3ba97c6ce37c7d` |
 
 ## cat-arms.glb and cat-weights.json
 
