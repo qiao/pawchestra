@@ -109,14 +109,32 @@ def _collection(scene):
     return col
 
 
-def _import(glb, col):
-    """Imports the GLB file into the collection, and gives the rig and the mesh. The selection
-    stays. The Actions of the file go, because the export reads an Action `reference` of the
-    `.blend` as the pose of the sheet. The empty of the mesh node and the materials go too."""
+def _keep_mode():
+    """Gives a function that puts back the active object, the selection, and the mode of the
+    active object, such as Weight Paint: the glTF importer goes to Object Mode."""
     layer = bpy.context.view_layer
+    active = layer.objects.active.name if layer.objects.active else None
+    mode = layer.objects.active.mode if active else 'OBJECT'
+    selected = {o.name for o in layer.objects if o.select_get()}
+
+    def restore():
+        for o in layer.objects:
+            o.select_set(o.name in selected)
+        layer.objects.active = layer.objects.get(active) if active else None
+        if layer.objects.active is not None and layer.objects.active.mode != mode:
+            try:
+                bpy.ops.object.mode_set(mode=mode)
+            except RuntimeError as error:
+                print(f'studio_preview: the mode {mode} did not come back: {error}', flush=True)
+
+    return restore
+
+
+def _import(glb, col):
+    """Imports the GLB file into the collection, and gives the rig and the mesh. The Actions of
+    the file go, because the export reads an Action `reference` of the `.blend` as the pose of the
+    sheet. The empty of the mesh node and the materials go too."""
     before = {kind: set(getattr(bpy.data, kind)) for kind in KINDS}
-    selected = [o for o in layer.objects if o.select_get()]
-    active = layer.objects.active
     bpy.ops.import_scene.gltf(
         filepath=glb,
         import_shading='FLAT',
@@ -125,9 +143,6 @@ def _import(glb, col):
         import_scene_extras=False,
         disable_bone_shape=True,
     )
-    for o in layer.objects:
-        o.select_set(o in selected)
-    layer.objects.active = active
     new = {kind: [d for d in getattr(bpy.data, kind) if d not in before[kind]] for kind in KINDS}
     for action in new['actions']:
         bpy.data.actions.remove(action)
@@ -317,6 +332,16 @@ def _markers(scene, pose, state):
 
 
 def _build(state):
+    """Imports the GLB file of the state, and adds its keys, markers, light, and colors. The
+    active object, the selection, and the mode stay."""
+    restore = _keep_mode()
+    try:
+        _show(state)
+    finally:
+        restore()
+
+
+def _show(state):
     """Imports the GLB file of the state, and adds its keys, markers, light, and colors."""
     scene = bpy.context.scene
     pose = read_pose(state['pose'])
@@ -403,17 +428,34 @@ def load_preview(species, pose_json, glb=None, at=BESIDE, first=1):
 def refresh_preview():
     """Exports the current state of the open file into a temporary folder with
     `tools/blender/export_rig.py`, with no save of the file, and shows the new export with the
-    same Action, markers, frame, and view. Gives the time in seconds."""
+    same Action, markers, frame, and view. An edit in Edit Mode goes into the export, and the mode
+    comes back. Gives the time in seconds."""
     state = _state()
     if state is None:
         raise RuntimeError('No preview: call load_preview() first.')
     start = time.time()
+    restore = _keep_mode()
+    try:
+        glb = _export(state)
+    finally:
+        restore()
+    took = time.time() - start
+    print(f'studio_preview: refreshed from {glb} in {took:.2f} s', flush=True)
+    return took
+
+
+def _export(state):
+    """Saves a copy of the open file with no preview, exports it, and shows the export. With a
+    failed export, the last export comes back, and the error goes up. Gives the GLB file."""
     scene = bpy.context.scene
     frame = scene.frame_current
     folder = os.path.join(tempfile.gettempdir(), 'zoophony-app-preview', state['animal'])
     os.makedirs(folder, exist_ok=True)
     blend = os.path.join(folder, f'{state["animal"]}.blend')
     glb = os.path.join(folder, f'{state["animal"]}.rig.glb')
+    # The copy of a mesh in Edit Mode can hold the edit in one shape key only.
+    if bpy.context.mode != 'OBJECT':
+        bpy.ops.object.mode_set(mode='OBJECT')
     _remove(keep_action=True)
     state['busy'] = True
     try:
@@ -425,17 +467,14 @@ def refresh_preview():
          '--python', EXPORT, '--', state['animal'], '--blend', blend, '--out', glb],
         capture_output=True, text=True, check=False,
     )  # fmt: skip
-    if run.returncode != 0:
-        _build(state)
-        scene.frame_set(frame)
-        errors = [line for line in run.stderr.splitlines() if 'error' in line.lower()]
-        raise RuntimeError('\n'.join(errors) or run.stderr[-2000:])
-    state['glb'] = glb
+    if run.returncode == 0:
+        state['glb'] = glb
     _build(state)
     scene.frame_set(frame)
-    took = time.time() - start
-    print(f'studio_preview: refreshed from {glb} in {took:.2f} s', flush=True)
-    return took
+    if run.returncode != 0:
+        errors = [line for line in run.stderr.splitlines() if 'error' in line.lower()]
+        raise RuntimeError('\n'.join(errors) or run.stderr[-2000:])
+    return glb
 
 
 def clear_preview():
