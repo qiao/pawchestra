@@ -125,6 +125,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | `pnpm mesh-options <animal> <dir> --size <label>=<head top>...` | Makes the mid-report of a mesh: it rigs each size, leg factor, and arm factor, and writes `<dir>/options.md`. About 7 s for each variant. |
 | `pnpm mixamo-import <file.fbx\|file.glb> --out <dir>` | Converts a Mixamo file into `<dir>/<name>.glb` in meters, with one animation for each take (design 4.4). The folder must be one that git ignores (design 8.1). About 3 s. |
 | `pnpm mixamo-model <file.fbx\|file.glb> --out <dir>` | Writes the inputs of `rig-mesh` from a Mixamo-rigged mesh (design 4.4) into a folder that git ignores. About 6 s. |
+| `pnpm glb-point-edits <edits.json> [--out <file.glb>]` | Writes the point edits of an edit file into the rig GLB file of its base commit, which `git show` reads (design 4.4): each move moves the vertices at one stored place, `keepShapes` takes the moves back from those morph targets, and `weights` sets the bones of a place. It stops at another SHA-256 of the base. `--out` writes a trial file for `--glb`. Less than 1 s. |
 | `pnpm studio-body <animal> [--inspect [--glb <file>]]` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender. `--inspect` prints the joints, the clips, and the arm lengths. |
 | `pnpm view-point [<x>,<y>,<z>]... [--pixel <u>,<v>,<y>]...` | Projects each point into the default view with no render, and prints its pixel and its depth. About 1 s. |
 
