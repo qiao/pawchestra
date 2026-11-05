@@ -301,6 +301,8 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   `sit.root`).
 - A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
   leaned forward.
+- A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind
+  there in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps it.
 - A long leg factor thins a thigh. Widen it before the skin (`legGirth`): bone heat splits a short
   thigh.
 - A trunk factor up to the neck shortens the chest under the arm roots and folds the shoulders.
