@@ -120,7 +120,7 @@ export interface SeatHeights {
  * width and the depth of the seat of the chair of the body, as the chair does (`seatHeights()`).
  * A body with no chair depth keeps the seat size `seatSize`.
  */
-export const STOOL = {
+const STOOL = {
   seatSize: 0.36,
 } as const;
 
