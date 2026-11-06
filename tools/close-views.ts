@@ -1591,7 +1591,7 @@ function variantPlugin(variant: SiteVariant): Plugin {
       ? `const holds = ${JSON.stringify(holds)};\nsetHolds(holds[Number(new URLSearchParams(location.search).get(${JSON.stringify(HOLDS_QUERY)}) ?? 0)] ?? holds[0]);\n`
       : `setHolds(${JSON.stringify(holds[0] ?? '')});\n`;
   return {
-    name: 'zoophony:close-views-variant',
+    name: 'pawchestra:close-views-variant',
     apply: 'build',
     resolveId(id) {
       return id === HOLDS_MODULE ? resolved : null;
@@ -4183,7 +4183,7 @@ function recastPlugin(root: string): Plugin {
     '}',
   ].join('\n');
   return {
-    name: 'zoophony:close-views-recast',
+    name: 'pawchestra:close-views-recast',
     apply: 'build',
     enforce: 'pre',
     transform(code, id) {
@@ -4239,7 +4239,7 @@ function freezePlugin(root: string): Plugin {
   const app = join(realpathSync(root), 'src', 'app', 'app.ts');
   const freeze = `globalThis.${FREEZE_KEY}`;
   return {
-    name: 'zoophony:close-views-freeze',
+    name: 'pawchestra:close-views-freeze',
     apply: 'build',
     enforce: 'pre',
     transform(code, id) {
@@ -4293,7 +4293,7 @@ export function aimPlugin(root: string): Plugin {
     '}',
   ].join('\n');
   return {
-    name: 'zoophony:close-views-aim',
+    name: 'pawchestra:close-views-aim',
     apply: 'build',
     resolveId(id) {
       return id === AIM_MODULE ? resolved : null;

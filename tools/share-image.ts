@@ -115,7 +115,7 @@ function hideBeamPlugin(root: string): Plugin {
     '};',
   ].join('\n');
   return {
-    name: 'zoophony:share-hide-beam',
+    name: 'pawchestra:share-hide-beam',
     apply: 'build',
     resolveId(id) {
       return id === HIDE_BEAM_MODULE ? resolved : null;

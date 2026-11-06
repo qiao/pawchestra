@@ -86,7 +86,7 @@ const ANALYTICS = process.env['PAWCHESTRA_ANALYTICS'] === '1';
  * the first download by about 400 B after gzip (design 7.2). The stub keeps the old order.
  */
 const DEV_LOOK_OVERRIDE: Plugin = {
-  name: 'zoophony:dev-look-override',
+  name: 'pawchestra:dev-look-override',
   apply: 'build',
   load(id) {
     return id.endsWith('/src/app/look-override.ts') ? 'export function soloFromQuery() {}' : null;
@@ -149,7 +149,7 @@ function indexValues(base: string): ReadonlyMap<string, string> {
  * in the dev server and in the build. It keeps a placeholder with no value.
  */
 const INDEX_VALUES: Plugin = {
-  name: 'zoophony:index-values',
+  name: 'pawchestra:index-values',
   transformIndexHtml(html) {
     const values = indexValues(BASE);
     return html.replaceAll(/%([A-Z_]+)%/gu, (text, name: string) => values.get(name) ?? text);
@@ -161,7 +161,7 @@ const INDEX_VALUES: Plugin = {
  * of the start page, `llms.txt`, and the other pages for agents and for visitors.
  */
 const SITE_PAGES: Plugin = {
-  name: 'zoophony:site-pages',
+  name: 'pawchestra:site-pages',
   apply: 'build',
   generateBundle() {
     for (const [fileName, source] of sitePages(BASE)) {
@@ -177,7 +177,7 @@ const SITE_PAGES: Plugin = {
  * server keeps the links of `index.html`.
  */
 const INLINE_CSS: Plugin = {
-  name: 'zoophony:inline-css',
+  name: 'pawchestra:inline-css',
   apply: 'build',
   enforce: 'post',
   generateBundle(_options, bundle) {
@@ -214,7 +214,7 @@ const INLINE_CSS: Plugin = {
  * gzip. The dev server and the Node tools keep the plain files of `public/`.
  */
 const GZIP_AUDIO: Plugin = {
-  name: 'zoophony:gzip-audio',
+  name: 'pawchestra:gzip-audio',
   apply: 'build',
   async writeBundle() {
     const { root, build } = this.environment.config;
@@ -233,7 +233,7 @@ const GZIP_AUDIO: Plugin = {
  * The plugin makes the same text for each request.
  */
 const DEV_LICENSES: Plugin = {
-  name: 'zoophony:dev-licenses',
+  name: 'pawchestra:dev-licenses',
   apply: 'serve',
   configureServer(server) {
     const path = `${server.config.base}${LICENSES_FILE}`;
@@ -288,7 +288,7 @@ function clipFiles(base: string, root: string): Connect.NextHandleFunction {
  * Mixamo file permits no stand-alone copy (design 8.1).
  */
 const LOCAL_CLIPS: Plugin = {
-  name: 'zoophony:local-clips',
+  name: 'pawchestra:local-clips',
   configureServer(server) {
     server.middlewares.use(clipFiles(server.config.base, server.config.root));
   },
