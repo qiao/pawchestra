@@ -111,8 +111,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    the color of the nearest light face (`border_faces()`). Then `colors.patch` makes each eye
    patch round (`patch_shape()`), `colors.belly` makes a light belly patch an even oval by the
    share of the area of each face in the oval (`belly_patch()`), and `colors.smile` draws a smile
-   line in the dark of the patches, or in its own `color` (`smile_line()`). Last, `colors.shift`
-   moves the faces of a colored fur in Oklch
+   line in the dark of the patches, or in its own `color` (`smile_line()`). With
+   `colors.twoTone`, each fur face takes one of two colors, apart from the faces of a kept hue
+   (`two_tone()`). Last, `colors.shift` moves the faces of a colored fur in Oklch
    (`shift_colors()`). The faces go in the order of a walk over their shared edges.
 8. Find the corrective shapes: the move of each vertex in the bind pose that the skin of the clip
    `reference` takes to the source place. The arm vertices give `arm_down_L` and `arm_down_R`,
@@ -742,6 +743,28 @@ def gamut_chroma(light, hue, rounds=40):
         inside = (rgb.min(axis=1) >= 0.0) & (rgb.max(axis=1) <= 1.0)
         low, high = np.where(inside, mid, low), np.where(inside, high, mid)
     return low
+
+
+def two_tone(colors, fur, rule):
+    """Gives each fur face one of two colors (`colors.twoTone` of the config): the sRGB color
+    `black` when its Oklab lightness is below `light`, else the sRGB color `white`. A face whose
+    Oklch chroma is at least `keep.chroma` and whose hue is in the range `keep.hue` (degrees)
+    keeps its color, such as the orange beak, the orange feet, and the brown mouth. The texture
+    gives the faces near a color edge a gray, a tan, or a pale yellow color, and the color blend
+    of the app (`colorBlend`) spreads such a face into a smudge on the white. Gives the new colors,
+    the count of the faces that change, and the count of the kept faces."""
+    lab = oklab(colors)
+    chroma = np.hypot(lab[:, 1], lab[:, 2])
+    hue = np.degrees(np.arctan2(lab[:, 2], lab[:, 1])) % 360.0
+    low, high = rule['keep']['hue']
+    kept = fur & (chroma >= rule['keep']['chroma']) & (hue >= low) & (hue <= high)
+    toned = fur & ~kept
+    new = np.where((lab[:, 0] < rule['light'])[:, None], np.asarray(rule['black'], float),
+                   np.asarray(rule['white'], float))
+    out = colors.copy()
+    out[toned] = new[toned]
+    changed = toned & (np.abs(out - colors).max(axis=1) > 0)
+    return out, int(changed.sum()), int(kept.sum())
 
 def border_faces(corners, colors, fur, share, rule, tris=None):
     """Gives the faces at the border of a black fur region the color of most of their texture
@@ -5562,6 +5585,10 @@ def main():
         colors_all, bands = smile_line(corners, normals, colors_all, fur_all, smile,
                                        np.array(color, float))
         log(f'smile: the bands take {[len(b) for b in bands]} faces')
+    if 'twoTone' in config['colors']:
+        colors_all, count, kept = two_tone(colors_all, fur_all, config['colors']['twoTone'])
+        log(f'twoTone: {count} fur faces take the black or the white, and {kept} faces of the '
+            f'orange keep their colors')
     base_all = colors_all
     if 'shift' in config['colors']:
         colors_all, count, limited = shift_colors(colors_all, fur_all,
