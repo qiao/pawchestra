@@ -10,6 +10,7 @@ import type {
   InstrumentModel,
   InstrumentPiece,
   PiecePoint,
+  StringLine,
 } from './types.ts';
 
 /**
@@ -65,6 +66,24 @@ export interface PianoKeys {
   readonly angle: number;
 }
 
+/**
+ * The strings of a harp in the mesh of one player (design 4.6, 5.3): the corners of each string,
+ * and the line of each string, in the model axes of the bind pose.
+ */
+export interface HarpStrings {
+  /**
+   * The first corner of each string in the mesh, from the bass string, then the end of the last
+   * string. String `i` has the corners from `corners[i]` up to `corners[i + 1]`, the end excluded.
+   */
+  readonly corners: Uint32Array;
+  /** The line of each string, in the model axes. */
+  readonly lines: readonly StringLine[];
+  /** The unit direction of the largest swing of a string, in the model axes. */
+  readonly swing: Vec3;
+  /** The bone of the piece of the strings. */
+  readonly bone: InstrumentBone;
+}
+
 /** An instrument at its place in the bind pose of one player. */
 interface PlacedInstrument {
   readonly pieces: readonly PlacedPiece[];
@@ -72,6 +91,19 @@ interface PlacedInstrument {
   readonly bones: ReadonlyMap<InstrumentBone, Vec3>;
   /** The keys of a keyboard, or `null` for an instrument with no key parts. */
   readonly keys: PianoKeys | null;
+  /** The strings of a harp, or `null` for an instrument with no string parts. */
+  readonly strings: HarpStrings | null;
+}
+
+/** One string part in the mesh of a player. */
+interface StringCorners {
+  /** The index of the string. */
+  readonly index: number;
+  /** The first corner of the string in the mesh, and the end of its corners. */
+  readonly start: number;
+  readonly end: number;
+  /** The placed piece of the string. */
+  readonly placed: PlacedPiece;
 }
 
 /** One key part in the mesh of a player. */
@@ -168,18 +200,71 @@ export function attachInstrument(
   const pieces = holdInstrument(model, body);
   const bones = new Map<InstrumentBone, Vec3>();
   const keyed: KeyCorners[] = [];
-  for (const { piece, at } of pieces) {
+  const strung: StringCorners[] = [];
+  for (const placed of pieces) {
+    const { piece, at } = placed;
     const bone = boneIndex(piece.bone);
     for (const part of piece.parts) {
       const start = builder.triangleCount * 3;
       builder.add(part.corners, { color: part.color, finish: part.finish, bone, at });
+      const end = builder.triangleCount * 3;
       if (part.key !== undefined) {
-        keyed.push({ key: part.key, start, end: builder.triangleCount * 3, at });
+        keyed.push({ key: part.key, start, end, at });
+      }
+      if (part.string !== undefined) {
+        strung.push({ index: part.string, start, end, placed });
       }
     }
     bones.set(piece.bone, at.position);
   }
-  return { pieces, bones, keys: keyed.length > 0 ? pianoKeys(model, keyed) : null };
+  return {
+    pieces,
+    bones,
+    keys: keyed.length > 0 ? pianoKeys(model, keyed) : null,
+    strings: strung.length > 0 ? harpStrings(model, strung) : null,
+  };
+}
+
+/**
+ * Collects the string parts of a harp in the mesh of a player (design 4.6). The strings must be
+ * one run of parts in the order of their index on one piece, so that the corners of each string
+ * follow the corners of the string before it.
+ *
+ * @param model The instrument.
+ * @param strung The string parts in the order of the mesh.
+ * @returns The strings, with the lines of {@link InstrumentModel.strings} in the model axes.
+ * @throws Error if the instrument has no string lines, or if the strings are not one run in the
+ *   order of their index on one piece.
+ */
+function harpStrings(model: InstrumentModel, strung: readonly StringCorners[]): HarpStrings {
+  const strings = model.strings;
+  const first = strung[0];
+  if (!strings || !first || strings.lines.length !== strung.length) {
+    throw new Error(`The ${model.id} has string parts, but no line for each string.`);
+  }
+
+  const corners = new Uint32Array(strung.length + 1);
+  for (const [i, part] of strung.entries()) {
+    const before = strung[i - 1];
+    if (part.index !== i || part.placed !== first.placed || (before && part.start !== before.end)) {
+      throw new Error(`The strings of the ${model.id} are not one run of parts in order.`);
+    }
+    corners[i] = part.start;
+    corners[i + 1] = part.end;
+  }
+  const { at, piece } = first.placed;
+  const rotation = new Quaternion(...at.rotation);
+  return {
+    corners,
+    lines: strings.lines.map((line) => ({
+      bottom: applyTransform(at, line.bottom),
+      top: applyTransform(at, line.top),
+      radius: line.radius,
+      pluck: line.pluck,
+    })),
+    swing: toVec3(new Vector3(...strings.swing).applyQuaternion(rotation)),
+    bone: piece.bone,
+  };
 }
 
 /**
