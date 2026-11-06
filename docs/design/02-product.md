@@ -228,7 +228,7 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 | `--glass-blur` | `blur(18px) saturate(1.35)`, the `backdrop-filter` of the bar and the drawer (frosted glass) |
 | `--glass-sheen` | a gradient from `rgba(255, 240, 220, 0.05)` at the top to clear at 60% (the light on the glass) |
 | `--hairline` | `rgba(231, 180, 90, 0.24)` (the thin warm line along the top edge of the bar and the drawer) |
-| `--glow` | `rgba(231, 180, 90, 0.28)` (the soft glow of a control of the bar under the pointer) |
+| `--glow` | `rgba(231, 180, 90, 0.28)` (the soft glow of a control of the bar under the pointer, and of the active seek thumb) |
 | `--line-faint` | `rgba(255, 240, 220, 0.06)` (the line between two rows of a list, and the hover of a seat row) |
 | `--line` | `rgba(255, 240, 220, 0.10)` |
 | `--pill-line` | `rgba(255, 240, 220, 0.24)` (the outline of the pill "Open source") |
@@ -278,7 +278,11 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   because the title shows there.
 - **Bar**: the frosted glass of a film player: `--bg-overlay` with `--glass-sheen`,
   `--glass-blur`, the `--hairline` at the top edge, and a soft drop shadow. The glass keeps the
-  alpha of `--bg-overlay`, so the contrast of its text does not change. "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
+  alpha of `--bg-overlay`, so the contrast of its text does not change. The seek bar is quiet
+  during play: a track of 3 px and a thumb at 0.7 of its size. Under the pointer, in a drag, or
+  with the keyboard focus, the track grows to 6 px and the thumb gets its full size and `--glow`,
+  so that a seek is easy to aim. With reduced motion, the track changes with no transition.
+  "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
   again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
   ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button
   says "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit

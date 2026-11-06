@@ -771,6 +771,56 @@ input[type='range']:enabled:is(:hover, :active)::-moz-range-thumb {
   background: var(--accent-strong);
 }
 
+/* The seek bar is quiet during play: a track of 3 px and a small thumb. Under the pointer, in a
+   drag, or with the keyboard focus, the track grows to 6 px and the thumb to its full size with a
+   glow, so that a seek is easy to aim (design 2.8). The margin keeps the thumb on the middle of
+   the track. */
+input[type='range'].seek::-webkit-slider-runnable-track {
+  height: 3px;
+  transition: height 0.12s;
+}
+
+input[type='range'].seek::-webkit-slider-thumb {
+  margin-top: -5.5px;
+  box-shadow: none;
+  transform: scale(0.7);
+}
+
+input[type='range'].seek:enabled:is(
+    :hover,
+    :active,
+    :focus-visible
+  )::-webkit-slider-runnable-track {
+  height: 6px;
+}
+
+input[type='range'].seek:enabled:is(:hover, :active, :focus-visible)::-webkit-slider-thumb {
+  margin-top: -4px;
+  box-shadow: 0 0 10px var(--glow);
+  transform: scale(1.1);
+}
+
+input[type='range'].seek::-moz-range-track,
+input[type='range'].seek::-moz-range-progress {
+  height: 3px;
+}
+
+input[type='range'].seek::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+}
+
+input[type='range'].seek:enabled:is(:hover, :active, :focus-visible)::-moz-range-track,
+input[type='range'].seek:enabled:is(:hover, :active, :focus-visible)::-moz-range-progress {
+  height: 6px;
+}
+
+input[type='range'].seek:enabled:is(:hover, :active, :focus-visible)::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  box-shadow: 0 0 10px var(--glow);
+}
+
 /* The seek bar cannot seek before the samples are ready. */
 input[type='range']:disabled::-webkit-slider-thumb {
   background: var(--text-dim);
@@ -1792,7 +1842,8 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
     transition: none;
   }
 
-  input[type='range']::-webkit-slider-thumb {
+  input[type='range']::-webkit-slider-thumb,
+  input[type='range'].seek::-webkit-slider-runnable-track {
     transition: none;
   }
 
