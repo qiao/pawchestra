@@ -81,8 +81,6 @@ export const INSTRUMENT_COLORS = {
   harpStrip: srgb('#6e3f20'),
   /** The dark inside of the soundbox, seen through the holes in its back. */
   harpHole: srgb('#1a120c'),
-  /** The box under a raised harp: a dark wood, so that the harp stands out from it. */
-  harpStand: srgb('#3a2a22'),
   /** The gut strings of the middle of the harp. */
   harpGut: srgb('#e2d2ae'),
   /** The nylon strings of the treble, lighter than the gut strings. */

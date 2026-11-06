@@ -396,12 +396,14 @@ export const SPECIES = {
    * mesh `assets/models/deer/deer.glb`, which `pnpm rig-mesh deer` rigs (design 4.4). It sits fully
    * on the stool of the harp, which fits its legs, with no chair back, and the harp soloist keeps
    * the stool. Its head height is the head of the studio body without the antlers, and the seat
-   * height is the seat of the studio body, in H. It plays a harp of 0.84 m, near a lever harp of 26
-   * strings, leaned back on its right shoulder (`docs/reference/harp-technique.md`).
+   * height is the seat of the studio body, in H. It plays a harp of 1.12 m with its base on the
+   * floor, so that its hooves reach the pedals, and the soundbox rests on its right shoulder
+   * (`docs/reference/harp-technique.md`). At the scale 0.85, the neck of the harp touches the
+   * head of the deer.
    */
   deer: {
     body: 'studio-deer',
-    harpScale: 0.6,
+    harpScale: 0.8,
     colors: SPECIES_COLORS.deer,
     headHeight: STUDIO_DEER.headHeight,
     seatHeight: STUDIO_DEER.seatHeight / STUDIO_DEER.headHeight,

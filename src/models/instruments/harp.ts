@@ -60,47 +60,38 @@ export const HARP = {
 } as const;
 
 /**
- * The place of the harp at the player (design 4.6). As a harpist sits, the harp leans back, and
- * the top of its soundbox rests on the right shoulder, near the neck of the player
- * (`docs/reference/harp-technique.md`, section 2). The base stands in front of the player, between
- * the knees in the front view, on a box ({@link HARP_STAND}). The deer is the only harp player, and
- * its body sets the place: the top of the soundbox axis is at (0.12, 0.78, -0.14) m in the model
- * axes, in front of the right shoulder joint, and the soundbox touches the front of the shoulder.
+ * The place of the harp at the player (design 4.6). As a harpist sits, the base stands on the
+ * floor in front of the player, between the knees, with the pedals at the feet, and the soundbox
+ * rests on the right shoulder, near the neck of the player (`docs/reference/harp-technique.md`,
+ * sections 2 and 7.7). The deer is the only harp player, and its body sets the place: the top of
+ * the soundbox axis stands 7 cm in front of the right shoulder joint and 3 cm below it, so the
+ * soundbox rests on the front of the shoulder. The right hoof reaches the A pedal only with the
+ * harp this near: 1 cm further away, the pedal is at the end of the reach of the stretched leg.
  * `pnpm hold-fit --set` and the other probes change it as `harpPlace`.
  */
 export const HARP_PLACE = {
   /** The move of the base to the right of the floor point under the seat, in head heights. */
-  side: -0.017,
-  /** The move of the base up, in meters, at the scale 1 of the harp. */
-  lift: 0.404,
+  side: 0.0388,
+  /** The move of the base up, in meters, at the scale 1 of the harp: 0, on the floor. */
+  lift: 0,
   /** The distance of the base in front of the floor point, in meters, at the scale 1. */
-  front: 0.684,
+  front: 0.3184,
   /**
-   * The tilt of the harp back to the player. No source gives the angle. At 12°, the neck keeps
-   * 6.6 cm from the muzzle of the deer, near the 6.9 cm of an upright harp. At 15°, it keeps
-   * 5.0 cm, and at 20°, 2.4 cm.
+   * The tilt of the harp back to the player. A concert harp leans back onto the shoulder, but the
+   * soundbox of the model already leans 33° toward the player, and the short legs of the deer
+   * reach the pedals only when the base stands near the feet: at 6°, the right hoof misses the A
+   * pedal by 4.3 cm, and at 12°, by 9.7 cm. So the harp stands upright, as some smaller harps do
+   * (section 1).
    */
-  tilt: 12 * MathUtils.DEG2RAD,
+  tilt: 0,
   /**
    * The turn of the harp around the vertical, seen from above, so that the column goes to the
    * front left: the harp is diagonal to the player. The left hand plays the bass strings at the
-   * front left, and the right hand the treble strings near the right shoulder. At 15°, the left
-   * paw missed the far bass strings by up to 2.2 cm. At 45°, the neck crossed in front of the
-   * muzzle, 4.0 cm from it.
+   * front left, and the right hand the treble strings near the right shoulder. A larger turn
+   * brings the pedals of the right foot nearer to the right hoof, and the strings nearer to the
+   * chest: at 60°, the left paw goes 10 cm into the chest to play C5.
    */
-  turn: 25 * MathUtils.DEG2RAD,
-};
-
-/**
- * The box under a raised harp, in meters at the scale 1 (design 4.6). A short lever harp stands on
- * a box or a stool, so that it comes up to the right shoulder of the player
- * (`docs/reference/harp-technique.md`, section 1).
- */
-const HARP_STAND = {
-  /** The least lift of the base that gets a box (`HARP_PLACE.lift`). A lower harp stands on the floor. */
-  minLift: 0.05,
-  /** The width of the box, a little more than the width of the base. */
-  width: 0.3,
+  turn: 35 * MathUtils.DEG2RAD,
 };
 
 /**
@@ -837,43 +828,8 @@ function addStrings(piece: PieceBuilder, scale: number): StringLine[] {
 }
 
 /**
- * Adds the box under a raised harp (design 4.6), in the axes of the harp before its scale. The box
- * stands level on the floor, and the harp leans back on it (`HARP_PLACE.tilt`), so the box top
- * touches the lowest edge of the base, the edge at the player.
- *
- * @param piece The harp.
- * @param color The color of the box.
- */
-function addStand(piece: PieceBuilder, color: Rgb): void {
-  const level = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -HARP_PLACE.tilt);
-  const tilt = level.clone().invert();
-  let low = Infinity;
-  let near = -Infinity;
-  let far = Infinity;
-  const { base } = HARP;
-  for (const y of [base.y - base.height / 2, base.y + base.height / 2]) {
-    for (const z of base.z) {
-      const corner = new Vector3(0, y, z).applyQuaternion(tilt);
-      low = Math.min(low, corner.y);
-      near = Math.max(near, corner.z);
-      far = Math.min(far, corner.z);
-    }
-  }
-  // The floor is at -lift below the origin of the harp axes.
-  const height = low + HARP_PLACE.lift;
-  const middle = new Vector3(0, (low - HARP_PLACE.lift) / 2, (near + far) / 2).applyQuaternion(
-    level,
-  );
-  piece.add(
-    box(HARP_STAND.width, height, near - far),
-    color,
-    transform(toVec3(middle), toQuat(level)),
-  );
-}
-
-/**
- * Builds the concert pedal harp (design 4.6). It stands in front of the player and leans back onto
- * the right shoulder, at its place of {@link HARP_PLACE}, on a box when it stands high. Both hands
+ * Builds the concert pedal harp (design 4.6). It stands in front of the player and rests on the
+ * right shoulder, at its place of {@link HARP_PLACE}, with its base on the floor. Both hands
  * play the strings, the left hand from the left side of the strings and the right hand from the
  * right side. A species with short arms plays a smaller harp (`SpeciesParams.harpScale`), as a
  * child plays a smaller lever harp: the harp, its strings, and its distance in front of the player
@@ -887,9 +843,6 @@ export function buildHarp(scale = 1): InstrumentModel {
   const scaled = (at: Vec3): Vec3 => [at[0] * scale, at[1] * scale, at[2] * scale];
 
   addBase(piece);
-  if (HARP_PLACE.lift > HARP_STAND.minLift) {
-    addStand(piece, INSTRUMENT_COLORS.harpStand);
-  }
   addColumn(piece);
   addNeck(piece);
   addSoundbox(piece);
