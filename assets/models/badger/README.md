@@ -1,7 +1,7 @@
 # Badger model
 
-This folder holds the source mesh of the badger, a copy with rebuilt arms and its weights, and the
-rigged copy. The app does not serve these files. It loads the module `src/models/studio/badger.ts`,
+This folder holds the source mesh of the badger, a copy with rebuilt arms and its weights, a copy
+with fewer folds at the arm roots, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/badger.ts`,
 which this chain writes:
 
 ```text
@@ -11,7 +11,10 @@ badger.glb                               source mesh
 badger-edit.glb                          `armSource` of tools/mesh-rigs/badger.json (git keeps it out)
    │  tools/blender/arm_rebuild.py       rebuilt arms and painted weights
    v
-badger-arms.glb + badger-weights.json    `source` and `paintedWeights` of the config
+badger-arms.glb + badger-weights.json    `paintedWeights` of the config
+   │  point edits in Blender             fewer folds at the arm roots (badger-arms-pit.json)
+   v
+badger-arms-pit.glb                      `source` of the config
    │  pnpm rig-mesh badger
    v
 badger.rig.glb                           rigged mesh
@@ -30,6 +33,8 @@ src/models/studio/badger.ts              studio body of the app
 | `badger-edit.glb` | Copy of `badger.glb` with the arms free of the trunk. Git keeps out its 15 MB. License as `badger.glb` | `blender -b --factory-startup -P tools/blender/badger_edit.py -- assets/models/badger/badger-edit.glb` |
 | `badger-arms.glb` | Copy of `badger-edit.glb` with rebuilt arms. License as `badger.glb` | `arm_rebuild.py badger` |
 | `badger-weights.json` | Weights of the same Blender run. License as `badger.glb` | `arm_rebuild.py badger` |
+| `badger-arms-pit.glb` | Copy of `badger-arms.glb` with fewer folds at the arm roots. License as `badger.glb` | None: point edits in Blender (below) |
+| `badger-arms-pit.json` | The list of the edits of `badger-arms-pit.glb`. License as `badger.glb` | None |
 | `badger.rig.glb` | Output of the rig. License as `badger.glb` | `pnpm rig-mesh badger` |
 
 ## badger-edit.glb
@@ -79,6 +84,35 @@ y = 0, +z forward, and +x the left side of the animal. The mesh faces +z, with i
   and z 0.16. A dark smile line is under the snout.
 - The round ears with white rims stand at the sides of the top of the head, from y 0.90 to 0.98.
 - The short tail sits low on the back, from y 0.10 to 0.155 and back to z -0.289.
+
+## badger-arms-pit.glb
+
+| Item | Value |
+|---|---|
+| Size | 990,864 bytes |
+| SHA-256 | `86475b9251e91469992e603584c83e39d4a75363636ef8b6bce0fc38669ecd22` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+Where the rebuilt tube of `badger-arms.glb` meets the closed trunk side of `badger_edit.py`, these
+faults showed:
+
+- On the left, a V notch at the top front of the armpit in the bind, about 3 cm: an arm corner
+  1.6 cm from a trunk corner left a deep slot between them, also at the top front of the root at a
+  crash of the cymbals.
+- Along the seam under each root, slivers of about 1.5 cm between corners of other weights folded
+  over into fins and deep notches in the bind and in each moment of the cymbalist.
+
+The copy removes them with 11 point edits in the live Blender on the welded mesh: 8 on the left
+and 3 on the right. Each edit merges one vertex into a neighbor vertex at the place of that
+neighbor, so that no vertex goes to a new place. The left arm corner of the V notch merges into
+the trunk corner beside it, so that the arm meets the trunk in a crease. `badger-arms-pit.json`
+lists the merges in their order. Each merge moves a corner at most 0.020 units, and two merges in
+a row move one corner 0.028 units. The copy has 1,858 vertices and 3,711 triangles after the weld
+(1,869 and 3,734 before): 23 faces go, and each other face keeps the UVs of its own corners. Each
+merged corner takes the weight row of its new vertex in `badger-weights.json`.
+
+A row of folded slivers along the right front seam stays: a merge along the row collapses the
+whole row, and a merge across it does not remove the folds.
 
 ## badger.rig.glb
 
