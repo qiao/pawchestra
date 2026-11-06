@@ -89,8 +89,8 @@ y = 0, +z forward, and +x the left side of the animal. The mesh faces +z, with i
 
 | Item | Value |
 |---|---|
-| Size | 990,864 bytes |
-| SHA-256 | `86475b9251e91469992e603584c83e39d4a75363636ef8b6bce0fc38669ecd22` |
+| Size | 990,912 bytes |
+| SHA-256 | `716f32642c35ab94165063e2a2cc03300b9c37a379194d56f06dc0ec30c6c3c6` |
 | Writer | Khronos glTF Blender I/O v5.2.40 |
 
 Where the rebuilt tube of `badger-arms.glb` meets the closed trunk side of `badger_edit.py`, these
@@ -102,16 +102,18 @@ faults showed:
 - Along the seam under each root, slivers of about 1.5 cm between corners of other weights folded
   over into fins and deep notches in the bind and in each moment of the cymbalist.
 
-The copy removes them with 11 point edits in the live Blender on the welded mesh: 8 on the left
+The copy removes them with 10 point edits in the live Blender on the welded mesh: 7 on the left
 and 3 on the right. Each edit merges one vertex into a neighbor vertex at the place of that
 neighbor, so that no vertex goes to a new place. The left arm corner of the V notch merges into
 the trunk corner beside it, so that the arm meets the trunk in a crease. `badger-arms-pit.json`
 lists the merges in their order. Each merge moves a corner at most 0.020 units, and two merges in
-a row move one corner 0.028 units. The copy has 1,858 vertices and 3,711 triangles after the weld
-(1,869 and 3,734 before): 23 faces go, and each other face keeps the UVs of its own corners. Each
+a row move one corner 0.028 units. The copy has 1,859 vertices and 3,714 triangles after the weld
+(1,869 and 3,734 before): 20 faces go, and each other face keeps the UVs of its own corners. Each
 merged corner takes the weight row of its new vertex in `badger-weights.json`.
 
-A row of folded slivers along the right front seam stays: a merge along the row collapses the
+Each merge keeps each edge on two faces. A merge of a seam vertex on the back of the left root
+put three faces on one edge and opened a hole, so the copy does not keep it. A row of folded
+slivers along the right front seam stays: a merge along the row collapses the
 whole row, and a merge across it does not remove the folds.
 
 ## badger.rig.glb
