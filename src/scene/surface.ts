@@ -253,14 +253,44 @@ void main() {
 `;
 
 /**
+ * The first half of the blur of the floor gloss, at half size: a tent along each row of 16 pixels,
+ * with the weights 1 to 8 and 8 to 1. It takes only the floor pixels, so that a body beside the
+ * floor does not darken the reflection. The color is their mean, and the alpha is their share of
+ * the weight. Each value of the 4 × 4 pattern of the surface pass gets the same weight, so the
+ * pattern does not show. Each tap is at the middle of a pixel, so it reads that pixel alone.
+ */
+export const SURFACE_ROWS_FRAGMENT = /* glsl */ `
+uniform sampler2D uSource;
+uniform vec2 uTexel;
+uniform vec4 uClamp;
+varying vec2 vUv;
+
+void main() {
+  vec3 sum = vec3(0.0);
+  float weight = 0.0;
+  for (int x = -8; x < 8; x++) {
+    vec2 uv = clamp(vUv + vec2(uTexel.x * float(x), 0.0), uClamp.xy, uClamp.zw);
+    vec3 c = texture(uSource, uv).rgb;
+    float w = (8.5 - abs(float(x) + 0.5)) * step(-0.5, c.r);
+    sum += c * w;
+    weight += w;
+  }
+  // 72 is the sum of the weights of the tent.
+  gl_FragColor = vec4(sum / max(weight, 1e-3), weight / 72.0);
+}
+`;
+
+/**
  * The blur of the surface pass at half size. The contact shade is the mean of a box of 4 × 4
  * pixels, with four linear samples. The box holds each value of the 4 × 4 pattern of the surface
- * pass one time, so the pattern does not show. With `FLOOR_GLOSS`, the reflection is the mean of
- * only the floor pixels of a wider tent, so that a body beside the floor does not darken it. A
- * pixel with no floor in its tent gets no reflection.
+ * pass one time, so the pattern does not show. With `FLOOR_GLOSS`, the reflection is the second
+ * half of the tent of `SURFACE_ROWS_FRAGMENT`, along each column, with the floor share of each
+ * row as a weight. Thus one ray that hits or misses changes a soft spot and not a square. A pixel
+ * with no floor in its tent gets no reflection.
  */
 export const SURFACE_BLUR_FRAGMENT = /* glsl */ `
 uniform sampler2D uSource;
+uniform sampler2D uRows;
 uniform vec2 uTexel;
 uniform vec4 uClamp;
 varying vec2 vUv;
@@ -272,21 +302,16 @@ vec4 tap(float x, float y) {
 void main() {
   vec4 box = (tap(-1.5, -1.5) + tap(0.5, -1.5) + tap(-1.5, 0.5) + tap(0.5, 0.5)) * 0.25;
 #ifdef FLOOR_GLOSS
-  // A tent of 8 × 8 pixels with the weights 1, 2, 3, 4, 4, 3, 2, 1 on each axis. Each value of
-  // the 4 × 4 pattern gets the same weight, so the pattern does not show, and one ray that hits
-  // or misses changes a soft spot and not a square. Each tap is at the middle of a pixel, so it
-  // reads that pixel alone.
   vec3 sum = vec3(0.0);
   float weight = 0.0;
-  for (int y = -4; y < 4; y++) {
-    for (int x = -4; x < 4; x++) {
-      vec3 c = tap(float(x), float(y)).rgb;
-      float w = (4.5 - abs(float(x) + 0.5)) * (4.5 - abs(float(y) + 0.5)) * step(-0.5, c.r);
-      sum += c * w;
-      weight += w;
-    }
+  for (int y = -8; y < 8; y++) {
+    vec2 uv = clamp(vUv + vec2(0.0, uTexel.y * float(y)), uClamp.xy, uClamp.zw);
+    vec4 row = texture(uRows, uv);
+    float w = (8.5 - abs(float(y) + 0.5)) * row.a;
+    sum += row.rgb * w;
+    weight += w;
   }
-  box.rgb = sum / max(weight, 1.0);
+  box.rgb = sum / max(weight, 1e-3);
 #endif
   gl_FragColor = box;
 }

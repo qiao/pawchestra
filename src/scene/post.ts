@@ -45,6 +45,7 @@ import type { QualityTier } from './quality.ts';
 import {
   SURFACE_BLUR_FRAGMENT,
   SURFACE_FRAGMENT,
+  SURFACE_ROWS_FRAGMENT,
   setSurfaceCamera,
   surfaceUniforms,
 } from './surface.ts';
@@ -385,6 +386,8 @@ interface Targets {
    * blur.
    */
   readonly surface: WebGLRenderTarget | null;
+  /** The floor gloss after the first half of its blur, along the rows, or `null` with no gloss. */
+  readonly surfaceRows: WebGLRenderTarget | null;
   /** The contact shade and the floor gloss at half or quarter size, after the blur. */
   readonly surfaceBlur: WebGLRenderTarget | null;
   /** Each target above, for the crop of each frame and the disposal. */
@@ -415,6 +418,7 @@ export class PostPipeline {
   readonly #blurPrepare: ShaderMaterial;
   #blurGather: ShaderMaterial;
   #surface: ShaderMaterial;
+  readonly #surfaceRows: ShaderMaterial;
   #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
   /**
@@ -473,6 +477,11 @@ export class PostPipeline {
     });
     this.#blurGather = this.#createBlurGather();
     this.#surface = this.#createSurface();
+    this.#surfaceRows = passMaterial(SURFACE_ROWS_FRAGMENT, {
+      uSource: { value: null },
+      uTexel: { value: new Vector2() },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
+    });
     this.#surfaceBlur = this.#createSurfaceBlur();
     this.#final = this.#createFinal();
   }
@@ -611,6 +620,7 @@ export class PostPipeline {
       [this.#blurPrepare, target],
       [this.#blurGather, target],
       [this.#surface, target],
+      [this.#surfaceRows, target],
       [this.#surfaceBlur, target],
       [this.#final, null],
     ];
@@ -651,6 +661,9 @@ export class PostPipeline {
     const level = settings.surfaceLevel;
     const [surfaceWidth, surfaceHeight] = bloomSizes(width, height, level)[level - 1] ?? [1, 1];
     const surface = shade ? floatTarget(surfaceWidth, surfaceHeight, 'half') : null;
+    const surfaceRows = settings.floorGloss
+      ? floatTarget(surfaceWidth, surfaceHeight, 'half')
+      : null;
     const surfaceBlur = shade ? floatTarget(surfaceWidth, surfaceHeight, 'half') : null;
     const all = [
       scene,
@@ -660,9 +673,21 @@ export class PostPipeline {
       blurPrepare,
       blurGather,
       surface,
+      surfaceRows,
       surfaceBlur,
     ].filter((target) => target !== null);
-    return { scene, bloomDown, bloomUp, depth, blurPrepare, blurGather, surface, surfaceBlur, all };
+    return {
+      scene,
+      bloomDown,
+      bloomUp,
+      depth,
+      blurPrepare,
+      blurGather,
+      surface,
+      surfaceRows,
+      surfaceBlur,
+      all,
+    };
   }
 
   /**
@@ -678,7 +703,7 @@ export class PostPipeline {
     camera: PerspectiveCamera,
     depth: Texture,
   ): WebGLRenderTarget | null {
-    const { surface, surfaceBlur } = targets;
+    const { surface, surfaceRows, surfaceBlur } = targets;
     if (!surface || !surfaceBlur) {
       return null;
     }
@@ -692,8 +717,16 @@ export class PostPipeline {
     setClamp(pass, 'uClamp', targets.scene);
     setSurfaceCamera(pass, camera);
     this.#pass(pass, surface);
+    if (surfaceRows) {
+      const rows = this.#surfaceRows;
+      setUniform(rows.uniforms, 'uSource', surface.texture);
+      setTexel(rows, surface);
+      setClamp(rows, 'uClamp', surface);
+      this.#pass(rows, surfaceRows);
+    }
     const blur = this.#surfaceBlur;
     setUniform(blur.uniforms, 'uSource', surface.texture);
+    setUniform(blur.uniforms, 'uRows', surfaceRows?.texture ?? null);
     setTexel(blur, surface);
     setClamp(blur, 'uClamp', surface);
     this.#pass(blur, surfaceBlur);
@@ -886,6 +919,7 @@ export class PostPipeline {
       SURFACE_BLUR_FRAGMENT,
       {
         uSource: { value: null },
+        uRows: { value: null },
         uTexel: { value: new Vector2() },
         uClamp: { value: new Vector4(0, 0, 1, 1) },
       },
