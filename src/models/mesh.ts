@@ -90,34 +90,6 @@ export interface CornerSkin {
   readonly blendWeight: number;
 }
 
-/**
- * A rule that gives the skin of a corner from its bind position, in the model axes, after the
- * placement of its part.
- */
-type SkinRule = (point: Vec3) => CornerSkin;
-
-/**
- * Gives the skin of a corner that blends two bones. The bone with the larger weight becomes the
- * main bone.
- *
- * @param parent The parent bone.
- * @param child The child bone.
- * @param childWeight The weight of the child bone, from 0 to 1. The parent has 1 minus this
- *   weight.
- * @returns The skin of the corner.
- * @throws Error if the weight is not from 0 to 1.
- */
-export function blendSkin(parent: number, child: number, childWeight: number): CornerSkin {
-  if (!(childWeight >= 0 && childWeight <= 1)) {
-    throw new Error(`The weight of the child bone (${childWeight}) is not from 0 to 1.`);
-  }
-
-  if (childWeight > 0.5) {
-    return { bone: child, blendBone: parent, blendWeight: 1 - childWeight };
-  }
-  return { bone: parent, blendBone: child, blendWeight: childWeight };
-}
-
 /** A placement of a part: scale first, then rotation, then translation. */
 export interface Transform {
   readonly position: Vec3;
@@ -168,13 +140,8 @@ export function applyTransform(t: Transform, p: Vec3): Vec3 {
 export interface PartOptions {
   /** The linear color of each corner of the part. */
   readonly color: Rgb;
-  /** The index of the bone that a rigid part follows. Default 0. A part with `skin` ignores it. */
+  /** The index of the bone that a rigid part follows. Default 0. */
   readonly bone?: number;
-  /**
-   * The rule that gives the bones of each corner of a skinned part (design 4.7). Default: each
-   * corner follows `bone` with the weight 1.
-   */
-  readonly skin?: SkinRule;
   /** The placement of the part. Default: no change. */
   readonly at?: Transform;
   /** Default `matte`. */
@@ -282,7 +249,6 @@ export class MeshBuilder {
    *
    * @param corners The corner list of the part in its own axes, 9 numbers for each triangle.
    * @param options The color, the bones, the placement, and the finish.
-   * @throws Error if the skin rule gives a weight that is not from 0 to 0.5.
    */
   add(corners: readonly number[], options: PartOptions): void {
     const at = options.at ?? transform();
@@ -298,7 +264,7 @@ export class MeshBuilder {
         const p = applyTransform(at, [corners[i] ?? 0, corners[i + 1] ?? 0, corners[i + 2] ?? 0]);
         this.#positions.push(p[0], p[1], p[2]);
         this.#colors.push(options.color[0], options.color[1], options.color[2]);
-        this.#pushSkin(options.skin ? options.skin(p) : { bone, blendBone: bone, blendWeight: 0 });
+        this.#pushSkin({ bone, blendBone: bone, blendWeight: 0 });
       }
       this.#finishes.push(finish);
     }

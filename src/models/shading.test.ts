@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { MeshBuilder, blendSkin, splitByCentroid, transform } from './mesh.ts';
-import type { MeshData, PartOptions } from './mesh.ts';
+import { MeshBuilder, splitByCentroid, transform } from './mesh.ts';
+import type { CornerSkin, MeshData } from './mesh.ts';
 import { ball, box, cylinder, quad } from './primitives.ts';
 import { buildPlayer } from './player.ts';
 import { boneIndex } from './rig.ts';
@@ -158,13 +158,20 @@ const PARENTS = buildPlayer('rabbit', 'violin').skeleton.parents;
  *
  * @param floorBone The bone of the floor.
  * @param wallBone The bone of the wall.
- * @param wallSkin The skin rule of the wall. Default: the wall is rigid on `wallBone`.
+ * @param wallSkin The skin of each corner of the wall. Default: the wall is rigid on `wallBone`.
  */
-function floorLight(floorBone: number, wallBone: number, wallSkin?: PartOptions['skin']) {
+function floorLight(floorBone: number, wallBone: number, wallSkin?: CornerSkin) {
   const builder = new MeshBuilder();
   builder.add(floorCorners(), { color: [1, 1, 1], bone: floorBone });
-  const wall = { color: [1, 1, 1], bone: wallBone, at: transform([0.11, 0.1, 0]) } as const;
-  builder.add(box(0.02, 0.2, 0.2), wallSkin ? { ...wall, skin: wallSkin } : wall);
+  const wall = new MeshBuilder();
+  wall.add(box(0.02, 0.2, 0.2), {
+    color: [1, 1, 1],
+    bone: wallBone,
+    at: transform([0.11, 0.1, 0]),
+  });
+  const { positions, colors, finishes } = wall.build();
+  const skin = wallSkin ?? { bone: wallBone, blendBone: wallBone, blendWeight: 0 };
+  builder.addFaces(positions, colors, finishes, () => skin);
   const mesh = builder.build();
   const { light } = shadeMesh(mesh, PARENTS);
   const at = (point: readonly [number, number, number]): number =>
@@ -191,8 +198,12 @@ describe('shadeMesh occlusion', () => {
     const chest = boneIndex('chest');
     const arm = boneIndex('upperArmL');
     // A wall mainly on the arm does not shade the torso. A wall mainly on the chest does.
-    expect(floorLight(chest, chest, () => blendSkin(chest, arm, 0.6)).near).toBe(1);
-    expect(floorLight(chest, chest, () => blendSkin(chest, arm, 0.4)).near).toBeLessThan(0.9);
+    expect(floorLight(chest, chest, { bone: arm, blendBone: chest, blendWeight: 0.4 }).near).toBe(
+      1,
+    );
+    expect(
+      floorLight(chest, chest, { bone: chest, blendBone: arm, blendWeight: 0.4 }).near,
+    ).toBeLessThan(0.9);
   });
 
   it('keeps a convex part fully lit', () => {
