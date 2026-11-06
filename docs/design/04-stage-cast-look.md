@@ -915,6 +915,13 @@ scene ──> [depth 1/2] ──────────────────
 - The depth of field is a thin lens focused on the subject of the shot (5.6). The aperture
   closes for a far focus, so the wide views stay sharp and skip the blur. Free mode has none.
 - The bloom keeps a small part of all light, as a diffusion filter, with a warm halation.
+- **Lens fringe** (`LENS_FRINGE`). The final pass moves the red of the scene a little outward and
+  the blue a little inward, with the square of the distance from the middle of the frame, as the
+  lateral color of a real film lens. The middle of the frame stays sharp, so the faces do not
+  change. The strength is the middle of a lineup of three strengths. The low tier skips it,
+  because it costs two more samples of the scene for each pixel.
+- **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
+  and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
   vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.

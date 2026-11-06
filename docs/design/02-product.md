@@ -152,11 +152,11 @@ page starts in Free mode (`app/camera-mode.ts`).
 ## 2.6 Quality tiers and browser support
 
 The tiers are High, Medium, and Low (`TIER_SETTINGS` of `scene/quality.ts`). The low tier has no
-bloom, no depth of field, and no dust motes. No tier has side light shadows, because they cost GPU
-time in each frame and changed only small shadows on the players. Each tier keeps MSAA, because
-the hard edges of the low-poly parts show steps (4.5). No tier uses the full pixel ratio of a
-Retina screen, because the GPU time grows with the pixels and the frame target of 9.7 comes first.
-The image is a little softer.
+bloom, no lens fringe, no depth of field, and no dust motes. No tier has side light shadows,
+because they cost GPU time in each frame and changed only small shadows on the players. Each tier
+keeps MSAA, because the hard edges of the low-poly parts show steps (4.5). No tier uses the full
+pixel ratio of a Retina screen, because the GPU time grows with the pixels and the frame target of
+9.7 comes first. The image is a little softer.
 
 - A touch screen (`(pointer: coarse)`) or a small screen starts at the medium tier, and other
   devices at the high tier. The app does not read the GPU name, because Safari on iOS gives only

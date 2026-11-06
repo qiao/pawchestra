@@ -206,11 +206,12 @@ vec3 grade(vec3 color) {
 `;
 
 /**
- * The final pass to the canvas (design 4.5, post effects): the depth of field, the room haze, the
- * bloom, the tone mapping of the renderer, the color grade, the vignette, and the film grain. One
- * pass does all of them, so each pixel of the canvas reads the scene one time. Outside the frame
- * `uFrame` (left, bottom, right, top), the pass writes the black of the letterbox bars of
- * Cinematic mode (design 2.5), and reads no texture.
+ * The final pass to the canvas (design 4.5, post effects): the lens fringe, the depth of field, the
+ * room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, and the
+ * film grain. One pass does all of them, so each pixel of the canvas reads the scene one time,
+ * and two more times for the lens fringe. Outside the frame `uFrame` (left, bottom, right, top),
+ * the pass writes the black of the letterbox bars of Cinematic mode (design 2.5), and reads no
+ * texture.
  */
 export const FINAL_FRAGMENT = /* glsl */ `
 uniform vec4 uFrame;
@@ -240,6 +241,9 @@ uniform float uCinema;
 uniform vec2 uFrameVignette;
 uniform float uGrain;
 uniform float uSeed;
+// The lateral color of the lens: the shift of the red and the blue at a corner of the frame, as a
+// part of the distance from the middle.
+uniform float uFringe;
 #ifdef DEPTH_OF_FIELD
 ${VIEW_DEPTH}
 #endif
@@ -279,6 +283,16 @@ void main() {
   }
   vec2 halfUv = clamp(vUv, uHalfClamp.xy, uHalfClamp.zw);
   vec3 color = texture(uScene, vUv).rgb;
+#ifdef LENS_FRINGE
+  // The lateral color of a real lens: the red image is a little larger and the blue image a
+  // little smaller, with the square of the distance from the middle of the frame. The middle stays
+  // sharp.
+  vec2 middle = (uFrame.xy + uFrame.zw) * 0.5;
+  vec2 inFrame = (vUv - middle) / max((uFrame.zw - uFrame.xy) * 0.5, vec2(1e-5));
+  vec2 shift = (vUv - middle) * uFringe * 0.5 * dot(inFrame, inFrame);
+  color.r = texture(uScene, clamp(vUv - shift, uFrame.xy, uFrame.zw)).r;
+  color.b = texture(uScene, clamp(vUv + shift, uFrame.xy, uFrame.zw)).b;
+#endif
 #ifdef DEPTH_OF_FIELD
   // The blur of this pixel at full size decides how much of the soft image it takes, so the
   // outline of a sharp subject stays sharp.

@@ -65,6 +65,19 @@ export const POST_LOOK = {
 } as const;
 
 /**
+ * The lateral color of the lens (design 4.5, post effects): the red and the blue of the scene move
+ * a little outward and inward from the middle of the frame, with the square of the distance, as
+ * the color fringe at the edges of a real film lens. The middle of the frame stays sharp.
+ */
+export const LENS_FRINGE = {
+  /**
+   * The shift of the red and of the blue at a corner of the frame, as a part of the distance from
+   * the middle of the frame: about 3 px at a corner of a frame of 1440 × 617 CSS pixels.
+   */
+  shift: 0.004,
+} as const;
+
+/**
  * The vignette of the letterbox of Cinematic mode (design 2.5, 4.5): an oval with the shape of the
  * frame, so that the top and the bottom edges darken as much as the sides. The round vignette of
  * `POST_LOOK` comes from the middle of the canvas, and it darkened the middle of the top edge by
@@ -528,6 +541,7 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uVignette', frame.vignette);
     setUniform(final.uniforms, 'uCinema', view.cinema);
     setUniform(final.uniforms, 'uSeed', grainSeed(timeSec));
+    setUniform(final.uniforms, 'uFringe', LENS_FRINGE.shift);
     this.#pass(final, null);
   }
 
@@ -774,6 +788,9 @@ export class PostPipeline {
     if (settings.blurSamples > 0) {
       defines['DEPTH_OF_FIELD'] = 1;
     }
+    if (settings.lensFringe) {
+      defines['LENS_FRINGE'] = 1;
+    }
     const look = POST_LOOK;
     const material = passMaterial(
       FINAL_FRAGMENT,
@@ -801,6 +818,7 @@ export class PostPipeline {
         uFrameVignette: { value: new Vector2(...FRAME_VIGNETTE.fall) },
         uGrain: { value: look.grain },
         uSeed: { value: 0 },
+        uFringe: { value: LENS_FRINGE.shift },
         ...focusUniforms(),
       },
       defines,

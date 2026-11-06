@@ -23,7 +23,7 @@ import {
   RIM_LIGHT,
   SIDE_LIGHT,
 } from './lights.ts';
-import { FRAME_VIGNETTE, POST_LOOK, ROOM_HAZE } from './post.ts';
+import { FRAME_VIGNETTE, LENS_FRINGE, POST_LOOK, ROOM_HAZE } from './post.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import { STAGE_TONE } from './renderer.ts';
 import { SHOT_LOOK } from './shot-light.ts';
@@ -59,6 +59,7 @@ const LOOK_ROOTS = {
   KEY_LIGHT,
   KEY_PLACE,
   LENS,
+  LENS_FRINGE,
   LIGHT_POOL,
   OCCLUSION,
   POST_LOOK,

@@ -17,6 +17,8 @@ interface TierSettings {
   readonly bloomLevels: number;
   /** The number of samples of the depth of field for each pixel. 0 turns it off. */
   readonly blurSamples: number;
+  /** True for the lateral color of the lens at the frame edges (`LENS_FRINGE` of `post.ts`). */
+  readonly lensFringe: boolean;
   /** The number of dust motes in the visible beam. */
   readonly motes: number;
   /** The number of samples of the haze of the visible beam along each view ray. */
@@ -26,9 +28,9 @@ interface TierSettings {
 /**
  * The values of each tier (design 2.6). The low tier keeps the final pass of the post effects
  * (the tone mapping, the color grade, the vignette, and the grain), because it costs one sample
- * for each pixel. It drops the bloom, the depth of field, and the dust motes. No tier has the
- * shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of `perf-60.mid`,
- * and they changed only small shadows on the players.
+ * for each pixel. It drops the bloom, the lens fringe, the depth of field, and the dust motes.
+ * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
+ * `perf-60.mid`, and they changed only small shadows on the players.
  */
 export const TIER_SETTINGS = {
   high: {
@@ -41,6 +43,7 @@ export const TIER_SETTINGS = {
     maxPixelRatio: 1.5,
     bloomLevels: 6,
     blurSamples: 32,
+    lensFringe: true,
     motes: 140,
     beamSamples: 4,
   },
@@ -50,6 +53,7 @@ export const TIER_SETTINGS = {
     maxPixelRatio: 1.5,
     bloomLevels: 5,
     blurSamples: 16,
+    lensFringe: true,
     motes: 70,
     beamSamples: 3,
   },
@@ -59,6 +63,7 @@ export const TIER_SETTINGS = {
     maxPixelRatio: 1,
     bloomLevels: 0,
     blurSamples: 0,
+    lensFringe: false,
     motes: 0,
     beamSamples: 2,
   },
