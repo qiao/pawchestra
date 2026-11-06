@@ -1543,14 +1543,10 @@ function poseSegments(
  *
  * @param mesh The studio mesh.
  * @param pose The pose of the bones.
- * @param out The posed places, three numbers for each vertex. A new array by default.
- * @returns `out`.
+ * @returns The posed places, three numbers for each vertex.
  */
-export function skinStudioMesh(
-  mesh: StudioMesh,
-  pose: StudioPose,
-  out: Float32Array = new Float32Array(mesh.positions.length),
-): Float32Array {
+export function skinStudioMesh(mesh: StudioMesh, pose: StudioPose): Float32Array {
+  const out = new Float32Array(mesh.positions.length);
   const m = pose.matrices;
   const count = mesh.positions.length / 3;
   for (let v = 0; v < count; v++) {
