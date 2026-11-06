@@ -222,9 +222,11 @@ rights, so they need no entry.
 
 ## 7.4 Search and share
 
-The main URL of the site is `https://www.pawchestra.com/` (`SITE_URL` of `app/page-title.ts`). The
-plugin `INDEX_VALUES` of `vite.config.ts` writes the texts of this section into `index.html` from
-the constants of `app/page-title.ts`, so that the page and the app cannot differ.
+The main URL of the site is `https://www.pawchestra.com/` (`SITE_URL` of `app/page-title.ts`).
+The Vercel project `pawchestra` sends `pawchestra.com`, `zoophony.com`, and `www.zoophony.com` to
+it with the status 308, so that the old links stay good. The plugin `INDEX_VALUES` of
+`vite.config.ts` writes the texts of this section into `index.html` from the constants of
+`app/page-title.ts`, so that the page and the app cannot differ.
 
 - **Title**: the start page has the title `SITE_TITLE`: the name and the words that people search
   for, such as 3D, animal orchestra, MIDI player, and browser. Google renders the page with its
