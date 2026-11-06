@@ -7,7 +7,7 @@ export const HARP_STRING_COUNT = HARP.strings;
 
 /**
  * The swing of a plucked harp string over time (design 5.3, `docs/reference/harp-technique.md`,
- * section 8). A pluck releases the string at once, so the swing starts at its full size at the
+ * section 5). A pluck releases the string at once, so the swing starts at its full size at the
  * note start. Then it decays, and a damp at the note end stops it.
  */
 export const STRING_MOTION = {
@@ -15,7 +15,7 @@ export const STRING_MOTION = {
    * The time constant of the decay of the swing of a free string, for the bass string C1 and for
    * the treble string G7, in seconds. The strings between take the geometric mean by their place.
    * Thus the string C♭3 gets about 1.5 s, the decay of its first partial in a measure of a
-   * concert harp (`docs/reference/harp-technique.md`, section 8).
+   * concert harp (`docs/reference/harp-technique.md`, section 5).
    */
   ringSec: [3, 0.3],
   /**

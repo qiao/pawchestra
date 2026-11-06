@@ -260,14 +260,15 @@ const STRINGS = {
   nylon: 35,
   /**
    * The number of rings of each string, from the soundboard to the neck. Two rings make one
-   * straight segment. A string that bends, as a string that vibrates, needs more.
+   * straight segment. The scene draws the swing of a plucked string as a band of its own (design
+   * 4.6), so the part does not bend.
    */
   rings: 2,
   /**
    * The largest swing at the pluck point after a loudest pluck, of the bass string and of the
    * treble string, at the scale 1. The strings between take the geometric mean by their place. A
    * mezzo-forte pluck of a D♭2 string releases it at about 4 mm, and the largest measured release
-   * is about 7 mm (`docs/reference/harp-technique.md`, section 8). No source gives the treble.
+   * is about 7 mm (`docs/reference/harp-technique.md`, section 5). No source gives the treble.
    */
   swing: [0.007, 0.0015],
   /**
