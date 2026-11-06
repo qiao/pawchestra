@@ -557,21 +557,26 @@
       "note": "The texture paints the black flipper larger than the flipper of the mesh. Thus each black face of the side forward of the line from the armpit to the lower side takes the white of the nearest light face (flank_faces() of tools/blender/rig_mesh.py), so that a raised flipper leaves no black band on the white side. The source copy already holds this white with a smooth edge, so the rule changes no face of it, and it stays as a guard."
     },
     "splitNote": "A face whose samples spread over more than 0.3 of Oklab lightness takes the mean of the larger of its light and dark halves (face_colors() of tools/blender/rig_mesh.py). Thus the edge between the black and the white is sharp, with no gray band.",
-    "shift": {
-      "chroma": [
-        0.04,
-        0.07
+    "twoTone": {
+      "light": 0.5,
+      "black": [
+        0.0722,
+        0.0713,
+        0.0692
       ],
-      "light": [
-        0.8,
-        0.84
+      "white": [
+        0.9809,
+        0.9647,
+        0.9316
       ],
-      "scale": [
-        1,
-        0.25
-      ],
-      "turn": 0,
-      "note": "The pale yellow throat and cheeks take a quarter of their chroma, so that the front is white from the beak to the feet, as in orchestra-latest.png and SPECIES_COLORS.penguin (shift_colors() of tools/blender/rig_mesh.py). The white, the black, and the orange parts keep their colors."
+      "keep": {
+        "chroma": 0.065,
+        "hue": [
+          35,
+          70
+        ]
+      },
+      "note": "The penguin is black and white, with an orange beak and orange feet. The texture gives the faces near the black and white edge gray, tan, and pale yellow colors, and the color blend of the app (colorBlend of tools/studio-body.ts) spreads each such face into a smudge on the white cheek. Thus each fur face takes the black when its Oklab lightness is below 0.5, else the white (two_tone() of tools/blender/rig_mesh.py). The black is the color of most black faces. The white has the Oklab lightness of most white faces and the chroma and the hue of SPECIES_COLORS.penguin.belly, so that it shows no yellow. A face with an Oklch chroma of 0.065 or more and a hue from 35 to 70 degrees keeps its color: the orange beak and feet (chroma 0.12 or more) and the brown mouth (0.07). The yellow cheek faces have a hue of about 90 degrees, so a chroma near the limit does not keep them. The edge stays on the smooth curve of the source copy, because each face keeps its side."
     },
     "eyeBox": [
       [
