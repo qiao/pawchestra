@@ -745,26 +745,42 @@ def gamut_chroma(light, hue, rounds=40):
     return low
 
 
-def two_tone(colors, fur, rule):
+def two_tone(colors, fur, tris, rule):
     """Gives each fur face one of two colors (`colors.twoTone` of the config): the sRGB color
     `black` when its Oklab lightness is below `light`, else the sRGB color `white`. A face whose
     Oklch chroma is at least `keep.chroma` and whose hue is in the range `keep.hue` (degrees)
     keeps its color, such as the orange beak, the orange feet, and the brown mouth. The texture
     gives the faces near a color edge a gray, a tan, or a pale yellow color, and the color blend
-    of the app (`colorBlend`) spreads such a face into a smudge on the white. Gives the new colors,
-    the count of the faces that change, and the count of the kept faces."""
+    of the app (`colorBlend`) spreads such a face into a smudge on the white. Then each face whose
+    neighbors over all three edges (`tris`) take the other color takes that color too: a lone face
+    of the old texture edge shows as a sliver. Gives the new colors, the count of the faces that
+    change, the count of the kept faces, and the count of the lone faces."""
     lab = oklab(colors)
     chroma = np.hypot(lab[:, 1], lab[:, 2])
     hue = np.degrees(np.arctan2(lab[:, 2], lab[:, 1])) % 360.0
     low, high = rule['keep']['hue']
     kept = fur & (chroma >= rule['keep']['chroma']) & (hue >= low) & (hue <= high)
     toned = fur & ~kept
-    new = np.where((lab[:, 0] < rule['light'])[:, None], np.asarray(rule['black'], float),
+    dark = lab[:, 0] < rule['light']
+    faces = {}
+    for f, t in enumerate(tris):
+        for k in range(3):
+            faces.setdefault(tuple(sorted((t[k], t[(k + 1) % 3]))), []).append(f)
+    lone = np.zeros(len(tris), bool)
+    for f in np.nonzero(toned)[0]:
+        t = tris[f]
+        around = [n for k in range(3) for n in faces[tuple(sorted((t[k], t[(k + 1) % 3])))]
+                  if n != f]
+        lone[f] = (len(around) >= 3 and all(toned[n] for n in around)
+                   and all(dark[n] != dark[f] for n in around))
+    dark = dark ^ lone
+    new = np.where(dark[:, None], np.asarray(rule['black'], float),
                    np.asarray(rule['white'], float))
     out = colors.copy()
     out[toned] = new[toned]
     changed = toned & (np.abs(out - colors).max(axis=1) > 0)
-    return out, int(changed.sum()), int(kept.sum())
+    return out, int(changed.sum()), int(kept.sum()), int(lone.sum())
+
 
 def border_faces(corners, colors, fur, share, rule, tris=None):
     """Gives the faces at the border of a black fur region the color of most of their texture
@@ -5586,9 +5602,11 @@ def main():
                                        np.array(color, float))
         log(f'smile: the bands take {[len(b) for b in bands]} faces')
     if 'twoTone' in config['colors']:
-        colors_all, count, kept = two_tone(colors_all, fur_all, config['colors']['twoTone'])
-        log(f'twoTone: {count} fur faces take the black or the white, and {kept} faces of the '
-            f'orange keep their colors')
+        colors_all, count, kept, lone = two_tone(colors_all, fur_all, tris_all,
+                                                 config['colors']['twoTone'])
+        log(f'twoTone: {count} fur faces take the black or the white, {lone} of them lone faces '
+            f'that take the color of their neighbors, and {kept} faces of the orange keep their '
+            f'colors')
     base_all = colors_all
     if 'shift' in config['colors']:
         colors_all, count, limited = shift_colors(colors_all, fur_all,
