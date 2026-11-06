@@ -70,7 +70,8 @@ function waitForGpu(): Promise<void> {
  *
  * @param steps The steps.
  * @param live Tells if the result is still needed. A later selection makes it false, and the run
- *   then stops at the end of a slice.
+ *   then stops at the end of a slice. A stop ends the steps, so that their `finally` blocks free
+ *   the resources of the step that did not finish, such as the targets of a bake.
  * @returns The result, or `null` if the run stopped.
  */
 export async function runSliced<T>(steps: Steps<T>, live: () => boolean): Promise<T | null> {
@@ -78,6 +79,9 @@ export async function runSliced<T>(steps: Steps<T>, live: () => boolean): Promis
   let start = performance.now();
   for (;;) {
     if (!live()) {
+      // The steps give no result, so their end takes `null`.
+      const stopped: Generator<unknown, T | null, undefined> = steps;
+      stopped.return(null);
       return null;
     }
     const step = steps.next();
