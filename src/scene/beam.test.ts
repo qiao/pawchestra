@@ -293,7 +293,6 @@ describe('BeamDepth (design 4.5)', () => {
     expect(renderer.target).toBeNull();
     expect(renderer.shadowMap.autoUpdate).toBe(true);
     expect(depth.size).toEqual([2880, 1800]);
-    depth.dispose();
   });
 
   it('renders the shadow map of the frame', () => {
@@ -302,7 +301,6 @@ describe('BeamDepth (design 4.5)', () => {
     const depth = new BeamDepth();
     depth.render(renderer, scene, new PerspectiveCamera(), [], renderer);
     expect(renderer.renders.map((render) => render.shadows)).toEqual([true]);
-    depth.dispose();
   });
 });
 

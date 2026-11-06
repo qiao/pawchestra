@@ -798,12 +798,6 @@ export class BeamDepth {
       object.visible = visible[i] ?? true;
     }
   }
-
-  /** Frees the target and the depth texture. */
-  dispose(): void {
-    this.#texture.dispose();
-    this.#target.dispose();
-  }
 }
 
 /** The state of the beam in one frame. */

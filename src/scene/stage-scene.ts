@@ -1170,25 +1170,6 @@ export class StageScene {
   }
 
   /**
-   * Frees the GPU resources of the scene, the materials, and the renderer, and removes the
-   * listeners of the orbit controls. The scene must not render again.
-   */
-  dispose(): void {
-    this.#disposeView();
-    for (const material of this.#materials) {
-      material.dispose();
-    }
-    this.#discardPending();
-    this.#variants.dispose();
-    this.#post?.dispose();
-    this.#beamDepth.dispose();
-    this.#environment?.dispose();
-    this.#pmrem.dispose();
-    this.#compileTarget.dispose();
-    this.#renderer.dispose();
-  }
-
-  /**
    * Makes the environment of the reflections, the bake of the static props, and the captured
    * environment of the shown layout again after a restored WebGL context, in steps (design 7.2).
    * The PMREM of the environment, the bake, and the capture render one time, so a lost context

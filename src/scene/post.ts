@@ -588,22 +588,6 @@ export class PostPipeline {
     return undefined;
   }
 
-  /** Frees the targets, the materials, and the geometry. */
-  dispose(): void {
-    this.#disposeTargets();
-    for (const material of [
-      this.#bloomPrefilter,
-      this.#bloomDown,
-      this.#bloomUp,
-      this.#blurPrepare,
-      this.#blurGather,
-      this.#final,
-    ]) {
-      material.dispose();
-    }
-    this.#quad.geometry.dispose();
-  }
-
   #createTargets(): Targets {
     const width = this.#width;
     const height = this.#height;

@@ -288,17 +288,6 @@ export class VariantMaterials {
     }
   }
 
-  /** Frees each copy and each depth material. The shared material stays. */
-  dispose(): void {
-    for (const material of [...this.copies, ...this.#shadows.values(), ...this.#depths.values()]) {
-      material.dispose();
-    }
-    this.#copies.clear();
-    this.#shadows.clear();
-    this.#depths.clear();
-    this.#depthMeshes = [];
-  }
-
   /**
    * Gives the depth material of the variant of a mesh: it writes no color, as the material of
    * the depth passes of the beam and of the depth of field before this cut.
