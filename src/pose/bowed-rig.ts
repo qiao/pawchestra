@@ -1286,19 +1286,18 @@ const CAT_HOLD = {
  *   and down, (1.2, -1, 0.75): with the grip and the elbow of {@link LAP_CELLO_BOW}, the right
  *   upper arm goes 3.1 cm into the chest at rest. An elbow further out, (2, -1, 0.3), also clears
  *   the arm, but twists the bow paw 147° on its forearm at rest (105° with this hold).
- * - In the play, the left elbow points out to the left and a little down, (-1, -0.6, 0), so that
- *   the upper arm goes about 20° down from the shoulder and the forearm rises from the elbow to
- *   the neck, as a cellist holds the left elbow out from the body
+ * - In the play, the left elbow points out to the left and a little down, (-1, -0.25, 0), so
+ *   that the upper arm goes about 11° down from the shoulder in the mean of the play and the
+ *   forearm rises from the elbow to the neck, as a cellist holds the left elbow out from the body
  *   (`docs/reference/string-technique.md`, section 1.8). With the nearly level elbow of
- *   {@link CELLO_HOLD}, the upper arm stood out level from the shoulder, the elbow made a sharp
- *   point behind the forearm, and the skin of the upper arm twisted 55° in the play (44° with
- *   this elbow). The elbow turns up 6° for each lower string, so that it is nearly level on the C
- *   string, as a cellist raises the elbow for the lower strings. It turns up 30° further from the
- *   fourth position to the sixth position (`highElbow`), so that the forearm keeps out of the
- *   upper bout: with 15°, the left forearm goes 2.0 cm into the cello in a high position of
- *   `boulanger-matin` (1.4 cm with 30°, 1.5 cm with the old elbow). With the elbow further down,
- *   (-1, -1, 0), and the turns of {@link CELLO_HOLD}, the forearm goes 3.5 cm into the cello, and
- *   the upper arm 1.7 cm into the chest in the moves.
+ *   {@link CELLO_HOLD}, the upper arm goes about 6° down. A lower elbow bends the inner elbow skin
+ *   over: with (-1, -0.6, 0), the upper arm went about 20° down, and the faces 1711 and 1712 of
+ *   the dog turned over into a dark wedge at the inner elbow in 1.2% of the play samples. An
+ *   elbow further back, (-1, -0.15, -0.6), also lowers the arm with no wedge, but folds the faces
+ *   2580 and 2581 at the back of the left armpit. The elbow turns up 15° further from the fourth
+ *   position to the sixth position (`highElbow`), so that the forearm keeps out of the upper
+ *   bout: with the 6° of {@link CELLO_HOLD}, the left forearm goes 1.7 cm into the cello in a high
+ *   position of `boulanger-matin`.
  * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
  *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
  *   into the cello.
@@ -1315,9 +1314,8 @@ const DOG_HOLD = {
   polePizzicato: [2.5, -0.5, -0.3],
   pluckSide: 0.25,
   restPoleR: [1.2, -1, 0.75],
-  poleL: [-1, -0.6, 0],
-  elbowPerString: 6 * MathUtils.DEG2RAD,
-  highElbow: 30 * MathUtils.DEG2RAD,
+  poleL: [-1, -0.25, 0],
+  highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
   roundArms: null,
   girthFit: null,
