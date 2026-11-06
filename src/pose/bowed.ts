@@ -216,9 +216,7 @@ export function stringsAt(rig: RigPoints, place: InstrumentPlace, out: StringsPl
 
 /**
  * Gives the forward turn of the right shoulder bone, so that the bow arm reaches the strings. In
- * the lift and the lowering, the turn stays whole down to the weight `BowedHold.reachFade` of the
- * playing pose, and fades to none at the rest pose below it, so that a bow arm that still crosses
- * the chest keeps its shoulder forward. The lift of a round body (`RigPoints.shoulderLift`) adds
+ * the lift and the lowering, the turn fades with the weight of the playing pose. The lift of a round body (`RigPoints.shoulderLift`) adds
  * to it in each pose.
  *
  * @param rig The points of the player.
@@ -227,9 +225,8 @@ export function stringsAt(rig: RigPoints, place: InstrumentPlace, out: StringsPl
  * @returns `out`, with the local rotation of the `shoulderR` bone.
  */
 export function shoulderTurn(rig: RigPoints, weight: number, out: Quaternion): Quaternion {
-  const share = Math.min(1, weight / rig.hold.reachFade);
   return liftShoulder(
-    out.setFromAxisAngle(Y_AXIS, rig.hold.reach * share),
+    out.setFromAxisAngle(Y_AXIS, rig.hold.reach * Math.min(1, weight)),
     rig.shoulderLift[1],
     'R',
   );
