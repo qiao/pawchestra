@@ -449,7 +449,12 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 export of the open `.blend`, with the bind as its rest.
 
 The polar bear has the one hand rig of the app (`assets/models/polar-bear/polar-bear.blend`), from
-a Tripo retopology of its mesh. Each other body comes from `rig-mesh`. The hand rigs of the cat and
+a Tripo retopology of its mesh. Each paw has one digit bone for each claw (`DIGIT_BONES`,
+`digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
+claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
+share take half of each bone. The paw vertices follow the paw and the fingers, and the wrist
+helper only its own ring. Reason: with half of the wrist helper, the paw turned only about two
+thirds of the hand turn, and one claw could not press a key alone. Each other body comes from `rig-mesh`. The hand rigs of the cat and
 the rabbit are trials that the app does not use. Reason: they gave a thin, faceted arm root and
 other faults, so the cat and the rabbit keep the A-pose bodies that production shows. A trial
 keeps its `.blend`, its export, and its summary in `assets/models/<s>/hand-rig/`, so that no tool
