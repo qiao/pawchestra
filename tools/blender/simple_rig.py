@@ -157,6 +157,7 @@ def main():
         rig[name] = value
     body.name, rig.name = animal, f'{animal}_rig'
     bpy.data.orphans_purge(do_recursive=True)
+    bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=out)
     print(
         f'simple_rig: wrote {out}: {counts}, {len(rig.data.bones)} bones, {empty} vertices with '
