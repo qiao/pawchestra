@@ -262,15 +262,6 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 - **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
   line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
   free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
-- **Title card**: in Cinematic mode, the song start shows the composer in spaced gold capitals, a
-  short gold rule, and the piece title in the serif, centered in the lower part of the frame, as
-  the main title of a film (`ui/title-card.ts`). A window in portrait shows it in the top bar of
-  the letterbox, just above the frame. Its opacity is a function of the song time
-  (`TITLE_CARD`, `titleCardLevel()` of `app/title-card.ts`), so a pause holds it and a seek is
-  correct. It fades in after the count-in and fades out a few seconds later. With reduced motion
-  it shows and hides with no fade. A soft shade keeps 4.5:1 over the stage. A screen reader skips
-  it (`aria-hidden`), because the live region of the title reads the piece. Free mode has no card,
-  because the title shows there.
 - **Bar**: "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
   again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
   ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button

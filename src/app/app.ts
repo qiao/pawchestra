@@ -64,7 +64,6 @@ import {
 import type { FrameRateSetting, QualitySetting, TierWatch } from './settings.ts';
 import { songTimeValue, wholeSeconds } from './time-text.ts';
 import { filmFadeLevel } from './film-fade.ts';
-import { titleCardLevel } from './title-card.ts';
 import { STOPPED, followSongTime, seekPlayState, setPlaying, startPlay } from './transport.ts';
 import type { PlayState } from './transport.ts';
 
@@ -871,7 +870,6 @@ export class App {
    */
   #showTitle(lines: TitleLines, stageFile: boolean): void {
     this.#ui.title.show(lines.title, lines.composer);
-    this.#ui.titleCard.setPiece(lines.title, lines.composer);
     document.title = pageTitle(lines, stageFile);
   }
 
@@ -1118,14 +1116,6 @@ export class App {
       held: this.#message !== null || ui.creditsDialog.open,
     });
     ui.showPanels(shown.panels);
-    ui.titleCard.show(
-      titleCardLevel({
-        cinematic,
-        played: this.#state.transport.changedAtWall !== null,
-        songSec: this.#songTime,
-        still: this.#scene.reducedMotion,
-      }),
-    );
     ui.bar.update({
       playLabel: ended ? 'Play again' : playLabel(status),
       pieceShown: piece !== null,
