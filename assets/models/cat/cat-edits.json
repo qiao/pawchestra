@@ -309,6 +309,14 @@
         "3380": [0.005082, -0.002845, 0.000957],
         "3381": [0.005505, -0.00295, 0.000861]
       }
+    },
+    {
+      "name": "bow_arm_root",
+      "note": "Two places of the corner where the side wall under the right arm meets the back. The place 840 lay 6 mm in from the side wall at the height of 839, so the faces 839-840-838 and 847-840-839 made a shelf that faced down, and the play showed it as a dark slit behind the root of the bow arm. 840 moves 4 mm out to the side wall, and 839 moves 3 mm in. Both move 2 mm down and 1 mm forward. The deltas come from a grid of 1 mm steps, at most 5 mm long, with the least mean edge angle at the corner in the bind. That search also moved 841 and 848, but the slit also goes without 841, and 848 folded the small face 817-850-848 in the play.",
+      "moves": {
+        "839": [0.003, -0.002, 0.001],
+        "840": [-0.004, -0.002, 0.001]
+      }
     }
   ],
   "weights": {
