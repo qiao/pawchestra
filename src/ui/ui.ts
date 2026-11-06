@@ -20,6 +20,7 @@ import { ModalDialog } from './modal-dialog.ts';
 import { SeatList } from './seat-list.ts';
 import { Settings } from './settings.ts';
 import { Title } from './title.ts';
+import { TitleCard } from './title-card.ts';
 import { Tooltips } from './tooltip.ts';
 
 /** The time of the fade of the stage before a build, in milliseconds, as in `ui.css`. */
@@ -56,6 +57,8 @@ interface UiActions extends BarActions {
  */
 export class Ui {
   readonly title: Title;
+  /** The title card of Cinematic mode at the song start (design 2.8). */
+  readonly titleCard = new TitleCard();
   readonly firstScreen: FirstScreen;
   readonly bar: Bar;
   readonly message: MessageBox;
@@ -172,6 +175,7 @@ export class Ui {
       parent.append(this.title.element);
     }
     parent.append(
+      this.titleCard.element,
       this.firstScreen.element,
       this.bar.element,
       this.message.element,
