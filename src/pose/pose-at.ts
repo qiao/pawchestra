@@ -452,13 +452,11 @@ function poseAnimal(
     }
     case 'percussion': {
       const { strikes } = scratch;
-      for (const [track, state] of [
-        [note.left, strikes.left],
-        [note.right, strikes.right],
-      ] as const) {
-        if (track) {
-          strikeStateAt(track, noteTime, state);
-        }
+      if (note.left) {
+        strikeStateAt(note.left, noteTime, strikes.left);
+      }
+      if (note.right) {
+        strikeStateAt(note.right, noteTime, strikes.right);
       }
       // The spine leans over the instrument (`PercussionHold.lean`), also in the rest pose of a
       // player that stays ready at its instrument (`PercussionHold.ready`). The body moves to the
