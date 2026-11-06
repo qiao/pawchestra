@@ -102,6 +102,12 @@ passes.
       them. From the front, the crown of the column stands just below the muzzle.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
       0 cm now. Trim the entry when the tests come back.
+- [ ] Harp strings: ask the user to pick the strength and the density of the bands of the swinging
+      strings (`STRING_SWING`, 4.6). In the Cinematic solo shot, the default bands are thin.
+- [ ] Harp strings: the bands write no depth, so the depth of field of a close shot blurs a band
+      with the depth behind the strings. Check a close shot with a far background.
+- [ ] Harp strings: no source gives the decay of the treble strings, so the treble value of
+      `STRING_MOTION.ringSec` is an estimate (harp-technique, section 5).
 - [ ] Deer: a small cream fold of the haunch lies on the seat under the puff tail.
 - [ ] Add the chair as an obstacle to the sweeps of the seated roles, with the legs and the haunch
       as parts (`SEATED_PARTS`, `seatSurface()` of `pose/test-sweep-roles.ts`).
