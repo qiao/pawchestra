@@ -294,9 +294,10 @@ interface PlanStep {
  * {@link PLAN_REACH_SLACK} keys past its reach at a cost for each key. A dynamic program finds
  * the hands of the lowest cost: for each move of a palm, the square of its distance in semitones
  * over its time. Thus a fast move costs more than a slow one, as its speed is higher, and a move
- * of a hand out of the way of the other hand counts too. The search keeps the best way to play the chords
- * up to each chord for each hand of the chord. At the same cost, a chord goes to the nearer hand,
- * and at the same distance to the right hand from middle C up, and to the left hand below.
+ * of a hand out of the way of the other hand counts too. The search keeps the best way to play
+ * the chords up to each chord for each hand of the chord. At the same cost, a chord goes to the
+ * nearer hand, and at the same distance to the right hand from middle C up, and to the left hand
+ * below.
  *
  * @param chords The chords of the player, sorted by start.
  * @param reach The highest key of the left hand and the lowest key of the right hand.
