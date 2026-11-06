@@ -557,6 +557,12 @@ passes.
       thick paw over the neck.
 - [ ] Dog cellist: the fitted place (`cello@dog.fit`) with a cello of 0.87 gives the arm gate of
       `DOG_HOLD` on two demos. Sweep the dog with it, then remove `DOG_HOLD` if it is not worse.
+- [ ] Dog cellist left arm (5.3): the lowered elbow of `DOG_HOLD` keeps the bend of the elbow,
+      about 62° between the upper arm and the forearm, so the elbow skin still makes a sharp point
+      from behind (`reports/2026-11-05-dog-left-arm/crop-elbow-az-150.png`). Only a grip further
+      from the shoulder opens it (the place of the cello). The play folds of the cellist went from
+      3.8% to 4.7% (faces 1711 and 1712, new). Run the cast matrix with the new elbow on
+      `CELLO_HOLD`, and move it into the shared hold if the recast cells do not get worse.
 - [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
       (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
       14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
