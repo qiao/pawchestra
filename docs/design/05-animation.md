@@ -539,6 +539,11 @@ The rest of each family:
   keys and lifts it over the other paw. Reason: the paw came in from far away with an eased move,
   so it was near its keys before the other paw struck, and the paws went up to 1.4 cm into each
   other (`bach-bwv1050`).
+- A lifted paw that comes back to its keys after the next note also draws back from the
+  fallboard (`HAND_MOTION.overBack`). Reason: it comes down next to the other paw while that paw
+  rises, so the two paws pass at the same height, and they touched there. A draw back of each paw
+  that makes way turned the forearms faster, and a draw back toward the fallboard did not part
+  the paws.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key

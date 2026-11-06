@@ -351,7 +351,8 @@ The app does not follow these facts:
   strike of the note before, and ends near the next keys of the paw. For the rest of the distance,
   the paw lifts over the other paw (`HAND_MOTION.over`), as in a hand crossing. A paw that takes
   the keys from the other paw waits away from it and over it until the other paw strikes
-  (`waitAway()`). The paw of each
+  (`waitAway()`), and it draws back a little toward the player as it comes down
+  (`HAND_MOTION.overBack`), because the other paw rises next to it. The paw of each
   chord comes from a plan of the whole piece (`planHands()` of `src/pose/hand-notes.ts`): the
   paws of the least palm travel, in which a fast move costs more. Thus a paw does not take a
   note only because it is nearer, when both paws must then jump to the next chord. A paw also

@@ -50,6 +50,16 @@ export const HAND_MOTION = {
   /** The missing distance of a move at which a hand lifts the full height `over`, in meters. */
   overRamp: 0.05,
   /**
+   * The distance that a piano hand draws back from the fallboard, toward the player, at the full
+   * height `over`, in meters, when it makes way for one note and then comes back to its keys. That
+   * hand comes down next to the other hand while the other hand rises from its keys, and the two
+   * paws pass at the same height. With no draw back, the paws of the polar bear touched there in
+   * `bach-bwv1050` (`scratch/paw-gap.ts`), and with 0.03 m they stay apart. A draw back of each
+   * hand that makes way turned the left forearm faster than 1,000° per second in 3 more frames, and
+   * a draw back toward the fallboard put the paws 0.1 to 0.2 cm into each other.
+   */
+  overBack: 0.03,
+  /**
    * The drop of the wrist of a piano hand at the strike of a loud take-off, in radians. The wrist
    * goes down around the claw tips at the strike, rises a little after the release, and comes back
    * (`docs/reference/piano-technique.md` section 9.3, `wristKickAt()`).
@@ -662,7 +672,8 @@ export function buildHandTrack(
  * pass from the first note moves each palm toward the palm before, and a pass from the last note
  * toward the palm after, so that a run of such notes ends near the next keys. For the missing
  * distance, the hand lifts over the other hand: up to {@link HAND_MOTION.over} at a missing
- * distance of {@link HAND_MOTION.overRamp}.
+ * distance of {@link HAND_MOTION.overRamp}. When it comes back to its keys after the note, it
+ * also draws back from the fallboard, up to {@link HAND_MOTION.overBack}.
  *
  * @param notes The notes of the hand, sorted by start.
  * @param points The place of the palm for each note: three numbers for each note. The function
@@ -690,7 +701,13 @@ function limitYields(notes: readonly HandNote[], points: Float64Array): Float64A
     const missing = Math.hypot(
       ...[0, 1, 2].map((k) => (targets[3 * i + k] ?? 0) - (points[3 * i + k] ?? 0)),
     );
-    hovers[i] = HAND_MOTION.over * smoothstep(missing / HAND_MOTION.overRamp);
+    const share = smoothstep(missing / HAND_MOTION.overRamp);
+    hovers[i] = HAND_MOTION.over * share;
+    // A lifted hand that comes back to its keys after this note also draws back toward the player
+    // (+z), so two paws that pass at the same height do not touch.
+    if (notes[i + 1]?.keys.length) {
+      points[3 * i + 2] = (points[3 * i + 2] ?? 0) + HAND_MOTION.overBack * share;
+    }
   }
   return hovers;
 }
