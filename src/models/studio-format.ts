@@ -80,10 +80,9 @@ export const DIGITS = 5;
 /**
  * The thumb bones of a mesh rig whose paw is one fist with a free thumb (design 4.4), the left side
  * first. Each thumb is a child of the paw (`hand`), with its head at the root of the thumb and its
- * tail at the thumb tip, because the thumb of a real hand starts at the wrist, not at the
- * knuckles. The pose code turns each thumb about its close axis ({@link StudioBody.thumbAxes}) by
- * the bend of digit 1 of its paw (`poseArm()` of `models/studio-rig.ts`). With no bend, the thumb
- * keeps the turn of the paw.
+ * tail at the thumb tip, because the thumb of a real hand starts at the wrist. The pose code turns
+ * each thumb about its close axis ({@link StudioBody.thumbAxes}) by the bend of digit 1 of its paw
+ * (`poseArm()` of `models/studio-rig.ts`). With no bend, the thumb keeps the turn of the paw.
  */
 export const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
 
