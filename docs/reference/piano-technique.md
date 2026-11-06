@@ -172,7 +172,9 @@ The app follows these facts:
   Farther keys make the right leg reach for the damper pedal and pull the haunch into the bench.
   Nearer keys fold the shoulders.
 - **The trunk (section 3).** The spine leans a little toward the keys (`lean`), less than the
-  flexion of a posture that is not neutral, and the shoulders stay low (`shoulderDrop`).
+  flexion of a posture that is not neutral, and the shoulders stay low (`shoulderDrop`). On the
+  taller bench, the lean and the low shoulders also bring the shoulders down and forward, so the
+  paws reach their keys.
 - **The arms (section 4).** The elbows point out, down, and back (`poleL`, `poleR`), clear of the
   trunk. Elbows that hang nearer go into the wide trunk.
 - **The wrists and the hands (section 5).** The palm faces down, in line with the level forearm
