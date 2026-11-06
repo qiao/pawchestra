@@ -153,7 +153,6 @@ interface Engine {
   readonly node: AudioWorkletNode;
   /** The decode Workers. */
   readonly workers: readonly Worker[];
-  readonly index: readonly PresetFileEntry[];
   /** The number of scores that the player sent to the engine. The engine counts the same. */
   loads: number;
 }
@@ -474,7 +473,7 @@ export class WorkletPlayer implements Player {
     index: Promise<readonly PresetFileEntry[]>,
     failed: Promise<never>,
   ): Promise<Engine> {
-    const [entries] = await Promise.race([
+    await Promise.race([
       Promise.all([index, this.#context.audioWorklet.addModule(processorUrl), this.#loadHall()]),
       failed,
     ]);
@@ -484,7 +483,7 @@ export class WorkletPlayer implements Player {
       outputChannelCount: [2],
     });
     node.connect(this.#output.input);
-    const engine: Engine = { node, workers, index: entries, loads: 0 };
+    const engine: Engine = { node, workers, loads: 0 };
     node.port.addEventListener('message', (event: MessageEvent<ProcessorReply>) => {
       this.#receive(engine, event.data);
     });
