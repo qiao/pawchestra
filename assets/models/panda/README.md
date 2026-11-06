@@ -1,7 +1,7 @@
 # Panda model
 
 This folder holds the source mesh of the panda, a copy with rebuilt arms and its weights, a copy
-with the color edges cut, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/panda.ts`,
+with the color edges cut, a copy with fewer folds at the arm roots, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/panda.ts`,
 which this chain writes:
 
 ```text
@@ -11,7 +11,10 @@ panda-tpose.glb                      source mesh
 panda-arms.glb + panda-weights.json  `weightSource` and `paintedWeights` of tools/mesh-rigs/panda.json
    │  tools/blender/panda_edge.py
    v
-panda-edge.glb                       `source` of tools/mesh-rigs/panda.json
+panda-edge.glb
+   │  point edits in Blender            fewer folds at the arm roots (panda-edge-pit.json)
+   v
+panda-edge-pit.glb                   `source` of tools/mesh-rigs/panda.json
    │  pnpm rig-mesh panda
    v
 panda.rig.glb                        rigged mesh
@@ -30,6 +33,8 @@ src/models/studio/panda.ts           studio body of the app
 | `panda-arms.glb` | Copy of `panda-tpose.glb` with rebuilt arms. License as the source | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- panda --factor 1.05` |
 | `panda-weights.json` | Weights of the same Blender run. License as the source | The same run |
 | `panda-edge.glb` | Copy of `panda-arms.glb` with the color edges cut. License as the source | `panda_edge.py` (below) |
+| `panda-edge-pit.glb` | Copy of `panda-edge.glb` with fewer folds at the arm roots. License as the source | None: point edits in Blender (below) |
+| `panda-edge-pit.json` | The list of the edits of `panda-edge-pit.glb`. License as the source | None |
 | `panda.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh panda` |
 
 ## panda-tpose.glb
@@ -132,3 +137,32 @@ shasum -a 256 assets/models/panda/panda-edge.glb
 | Root faces | The thin faces at the front of each arm root, and the faces under the left arm root, take one mean weight in each group (`weights.rigidPainted` of the config). The left group joins the front faces and the faces under the root, so that the hanging T-pose arm folds fewer faces and the fold does not move to an edge between two groups |
 
 A run of `pnpm rig-mesh panda` gives the same bytes.
+
+## panda-edge-pit.glb
+
+| Item | Value |
+|---|---|
+| Size | 815,708 bytes |
+| SHA-256 | `c5c62488107b04892297f5f4692727e4eb5ed697f901d6fb012639d610530b5b` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+The bind of `panda-edge.glb` has no fold at the arm roots. The hold of the trombone brings the
+level arms of the T-pose down, and some faces at the roots then turn over:
+
+- On the top of the left root, a sliver with its three corners nearly on one line: a dark back
+  face at the top of the root at rest and at the lift and the lowering of the trombone.
+- At the top front of each root and on the front of the left root, faces between corners of other
+  weights: fins and deep notches at the notes and at rest.
+
+The copy removes them with point edits in the live Blender on the welded mesh. Each edit merges one
+vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to a new place.
+`panda-edge-pit.json` lists the 5 merges in their order. Each merge moves a corner at most
+0.035 units. The copy has 2,026 vertices and 4,047 triangles after the weld (2,031 and 4,057
+before): 10 faces go, and each other face keeps the UVs of its own corners. Each merged corner
+takes the weights of its new place on `panda-arms.glb` (`weightSource`).
+
+A merge at the back of the left root also removed folds at the notes, but it made a notch under
+the root in the bind, so the copy does not keep it. Two faults stay, because they are folds of the
+pose and no fault of the mesh: a face of the upper chest under the chin turns over when the head
+bends to the mouthpiece (a dark triangle beside each root in the front views), and the right
+upper arm twists into a zigzag band at rest.
