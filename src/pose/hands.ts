@@ -36,6 +36,8 @@ import type { LapHand } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import { pedalFoot } from './pedal.ts';
 import type { PedalFoot } from './pedal.ts';
+import { buildDigitTrack } from './piano-digits.ts';
+import type { DigitTrack } from './piano-digits.ts';
 import { POLAR_BEAR_PAW, clawOffset, planFingeringSteps } from './piano-fingering.ts';
 import type { PianoFingering } from './piano-fingering.ts';
 
@@ -575,6 +577,8 @@ function handTurns(
 interface HandTracks {
   readonly left: HandTrack;
   readonly right: HandTrack;
+  /** The presses of the claws of each piano paw, or `null` for a harp player. */
+  readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
 }
 
 /**
@@ -626,6 +630,13 @@ export function* handTracksSteps(
   return {
     left: track('L', left, fingeringL, firstL),
     right: track('R', right, fingeringR, firstR),
+    digits:
+      fingeringL && fingeringR
+        ? {
+            left: buildDigitTrack(left, fingeringL),
+            right: buildDigitTrack(right, fingeringR),
+          }
+        : null,
   };
 }
 

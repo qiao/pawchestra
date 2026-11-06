@@ -2,6 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { InstrumentId } from '../models/instruments/types.ts';
 import { boneIndex } from '../models/rig.ts';
+import { DIGITS } from '../models/studio-format.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';
 import { createIdleState, idleAt } from './idle.ts';
@@ -23,6 +24,7 @@ import type { HandsState } from './hands.ts';
 import { gestureSize } from './loudness.ts';
 import { activityAt } from './passages.ts';
 import { pedalLevelAt, posePedalFoot } from './pedal.ts';
+import { digitBendsAt } from './piano-digits.ts';
 import { PIANO_KEY_COUNT, keyLevelsAt } from './piano-keys.ts';
 import { posePercussion } from './percussion.ts';
 import type { PercussionState } from './percussion.ts';
@@ -48,6 +50,7 @@ export interface WritablePose extends AnimalPose {
   pawBendR: number;
   blink: number;
   readonly keys: Float32Array | null;
+  readonly digits: Float32Array | null;
 }
 
 /** The poses of a scene that `poseAt()` writes in place. */
@@ -101,6 +104,7 @@ function createPose(player: PlayerPlan): WritablePose {
     pawBendR: 0,
     blink: 0,
     keys: note.family === 'keyboard' && note.keys ? new Float32Array(PIANO_KEY_COUNT) : null,
+    digits: note.family === 'keyboard' && note.digits ? new Float32Array(2 * DIGITS) : null,
   };
 }
 
@@ -424,6 +428,11 @@ function poseAnimal(
         for (let k = 0; k < pose.keys.length; k++) {
           pose.keys[k] = (pose.keys[k] ?? 0) * weight;
         }
+      }
+      // The claw of each key presses it, and the claw of the next key lifts before its strike.
+      if (note.digits && pose.digits) {
+        digitBendsAt(note.digits.left, noteTime, weight, pose.digits, 0);
+        digitBendsAt(note.digits.right, noteTime, weight, pose.digits, DIGITS);
       }
       break;
     }

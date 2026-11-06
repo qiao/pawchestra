@@ -32,6 +32,7 @@ import { buildChoirTrack } from './choir-notes.ts';
 import type { ChoirTrack } from './choir-notes.ts';
 import { MOTION_FAMILIES, isInFamily } from './family.ts';
 import type { HandTrack } from './hand-notes.ts';
+import type { DigitTrack } from './piano-digits.ts';
 import { handTracksSteps, handsRig } from './hands.ts';
 import type { HandsRig } from './hands.ts';
 import { idleParams } from './idle.ts';
@@ -95,6 +96,8 @@ export interface HandsLayer {
   readonly pedal: PedalMotion;
   /** The presses of the piano keys of a pianist, or `null` for a harp player. */
   readonly keys: KeyTrack | null;
+  /** The presses of the claws of each paw of a pianist, or `null` for a harp player. */
+  readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
 }
 
 /** The note layer of a singer: the jaw and the sway of the phrases (design 5.3). */
@@ -407,7 +410,7 @@ function* noteLayerSteps(
       handsRig(model, instrument, instrumentScale(SPECIES[species], instrument)),
     );
     yield;
-    const { left, right } = yield* handTracksSteps(rig, notes, loudness, amplitude);
+    const { left, right, digits } = yield* handTracksSteps(rig, notes, loudness, amplitude);
     yield;
     const family = MOTION_FAMILIES[instrument];
     return {
@@ -417,6 +420,7 @@ function* noteLayerSteps(
       right,
       pedal: pedalMotion(rig.foot ? pedal : NO_PEDAL),
       keys: family === 'keyboard' ? buildKeyTrack(notes) : null,
+      digits,
     };
   }
   if (isInFamily(instrument, ['choir'])) {
