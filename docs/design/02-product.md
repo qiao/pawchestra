@@ -65,7 +65,8 @@ The UI has the style of a video player. The theme is dark only, because the scen
   `app/bar-rules.ts`). The title always shows, because it names the piece of the film. A pointer
   motion, a tap, or Tab shows them all. They stay while the pointer is over the bar, the drawer,
   or the link of the title, while one of these has the keyboard focus, and while a dialog or a
-  message is open. A pause shows them, and an open drawer comes back open. They fade in 0.2 s, at
+  message is open. A pause shows them, and an open drawer comes back open. They fade out in 0.8 s,
+  as a slow fade of a film, and fade in 0.2 s, so that a motion shows them at once. Both are at
   once with reduced motion. Free mode hides only the bar, because there the user works with the
   view and the drawer.
 - Each change from Free mode to Cinematic mode closes the drawer, so that the film starts with no
