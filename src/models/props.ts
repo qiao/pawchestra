@@ -92,8 +92,8 @@ export interface SeatHeights {
    * The depth of the seat of a chair or of the stool of the harp under a studio body, in meters
    * (`StudioBody.chairDepth`). The seat keeps the back of the chair, and its front edge is further
    * back. The piano bench under a studio body takes its depth from the haunch and the thighs
-   * (`StudioBody.benchDepth`), at least `PIANO_BENCH.studioDepth`. The other seats, and the seats
-   * under the parametric biped, keep their own depth.
+   * (`StudioBody.benchDepth`), at least `PIANO_BENCH.studioDepth`. The other seats keep their own
+   * depth.
    */
   readonly seatDepth?: number;
   /**
@@ -116,13 +116,11 @@ export interface SeatHeights {
 }
 
 /**
- * The stool of the harp (design 4.5, props), with no back. Under the parametric biped, its seat has
- * the height `seatHeight`, for the strings of the harp. Under a studio body, its seat fits the
- * legs, and it has the width and the depth of the seat of the chair of the body, as the chair does
- * (`seatHeights()`).
+ * The stool of the harp (design 4.5, props), with no back. Its seat fits the legs, and it has the
+ * width and the depth of the seat of the chair of the body, as the chair does (`seatHeights()`).
+ * A body with no chair depth keeps the seat size `seatSize`.
  */
 export const STOOL = {
-  seatHeight: 0.35,
   seatSize: 0.36,
 } as const;
 
@@ -220,18 +218,18 @@ function studioChairDepth(studio: StudioBody): number | null {
 }
 
 /**
- * Gives the heights of the chair of a body (design 4.5, props): the seat at the legs of the
- * species. A studio body sits on a chair as deep as the chair of the studio (design 4.4), and a
- * wide studio body on a wider chair.
+ * Gives the heights of the chair or of the stool of the harp under a body (design 4.5, props): the
+ * seat at the legs of the species, as deep as the chair of the studio body (design 4.4,
+ * `StudioBody.chairDepth`), and wider under a wide studio body (`chairWidth`).
  *
  * @param species The species of the body.
  * @param legs The height of the seat above the floor, in meters.
  * @returns The heights.
  */
 function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
-  const depth = studio ? studioChairDepth(studio) : null;
-  if (!studio || depth === null) {
+  const studio = studioBodyOf(species.body);
+  const depth = studioChairDepth(studio);
+  if (depth === null) {
     return { seatHeight: legs, footHeight: 0 };
   }
   const seat = { seatHeight: legs, footHeight: 0, seatDepth: depth };
@@ -239,38 +237,19 @@ function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
 }
 
 /**
- * Gives the heights of the stool of the harp under a body (design 4.5, props): the seat at the
- * given height, and under a studio body the depth and the width of the seat of its chair
- * (`StudioBody.chairDepth`, `chairWidth`), as on the chair.
- *
- * @param species The species of the body.
- * @param seatHeight The height of the seat above the floor, in meters.
- * @returns The heights.
- */
-function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
-  const depth = studio ? studioChairDepth(studio) : null;
-  if (!studio || depth === null) {
-    return { seatHeight, footHeight: 0 };
-  }
-  const seat = { seatHeight, footHeight: 0, seatDepth: depth };
-  return studio.chairWidth === undefined ? seat : { ...seat, seatWidth: studio.chairWidth };
-}
-
-/**
- * Gives the heights of the piano bench under a body (design 4.5, props): the seat at the given
- * height, and under a studio body the depth that fits its haunch and its thighs
+ * Gives the heights of the piano bench under a body (design 4.5, props): the seat at the legs of
+ * the species, and the depth that fits the haunch and the thighs of the studio body
  * (`StudioBody.benchDepth`), with the front edge of the fit and at least
  * `PIANO_BENCH.studioDepth` of depth behind it, so the whole haunch sits on the bench.
  *
  * @param species The species of the body.
- * @param seatHeight The height of the seat above the floor, in meters.
+ * @param legs The height of the seat above the floor, in meters.
  * @returns The heights.
  */
-function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
-  const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
-  const seat = { seatHeight, footHeight: 0 };
-  if (studio?.benchDepth === undefined) {
+function benchHeights(species: SpeciesParams, legs: number): SeatHeights {
+  const studio = studioBodyOf(species.body);
+  const seat = { seatHeight: legs, footHeight: 0 };
+  if (studio.benchDepth === undefined) {
     return seat;
   }
   const depth = Math.max(studio.benchDepth, PIANO_BENCH.studioDepth);
@@ -278,12 +257,10 @@ function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
 }
 
 /**
- * Gives the heights of the seat of a body on a support (design 4.5, props). The chair fits the
- * legs of the species: its seat is the `seatHeight` of the skeleton above the floor. A species
- * with no chair (`SpeciesParams.noChair`) keeps these heights, and the app builds no chair. The
- * stool of the harp and the piano bench keep their heights for the
- * parametric biped and the penguin. Under a studio body, such as the polar bear on its bench, they
- * fit the legs, as the chair does (design 4.4).
+ * Gives the heights of the seat of a body on a support (design 4.5, props). Each seat fits the
+ * legs of the species: its top is the `seatHeight` of the skeleton above the floor, as for the
+ * polar bear on its bench (design 4.4). A species with no chair (`SpeciesParams.noChair`) keeps
+ * these heights, and the app builds no chair.
  *
  * @param support The support.
  * @param species The species of the body.
@@ -291,16 +268,15 @@ function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
  */
 export function seatHeights(support: Support, species: SpeciesParams): SeatHeights | null {
   const legs = species.seatHeight * species.headHeight;
-  const studioLegs = species.body !== undefined;
   switch (support) {
     case 'chair': {
       const seat = chairHeights(species, legs);
       return species.noChair ? { ...seat, noChair: true } : seat;
     }
     case 'stool':
-      return stoolHeights(species, studioLegs ? legs : STOOL.seatHeight);
+      return chairHeights(species, legs);
     case 'bench':
-      return benchHeights(species, studioLegs ? legs : PIANO_BENCH.seatHeight);
+      return benchHeights(species, legs);
     case 'stand':
     case 'riser':
       return null;

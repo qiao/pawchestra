@@ -6,7 +6,6 @@ import type { MeshData } from './mesh.ts';
 import {
   CHAIR,
   STAGE_COLORS,
-  STOOL,
   buildChair,
   buildMusicStand,
   buildRisers,
@@ -112,9 +111,9 @@ describe('the desk of a music stand (design 4.5, UX audit 2026-10-05, SC9)', () 
 
 describe('buildStool', () => {
   it('builds the stool of the harp with no back, within 120 triangles (design 4.5)', () => {
-    const stool = buildStool({ seatHeight: STOOL.seatHeight, footHeight: 0 });
+    const stool = buildStool({ seatHeight: 0.35, footHeight: 0 });
     expect(stool.positions.length / 9).toBeLessThanOrEqual(120);
-    expect(Math.max(...heights(stool))).toBeCloseTo(STOOL.seatHeight, 6);
+    expect(Math.max(...heights(stool))).toBeCloseTo(0.35, 6);
     expect(Math.min(...heights(stool))).toBeCloseTo(0, 6);
   });
 });
@@ -170,19 +169,6 @@ describe('seatHeights (design 4.5)', () => {
     const [, standardBack] = depthOf(buildChair(0.13));
     expect(back).toBeCloseTo(standardBack, 6);
     expect(back - front).toBeCloseTo(STUDIO_RABBIT.chairDepth, 6);
-  });
-
-  it('keeps the stool of the harp and the bench of the piano at the heights of the strings and the keys', () => {
-    for (const species of [SPECIES.deer, SPECIES['fox-red'], SPECIES.mouse, SPECIES.penguin]) {
-      expect(seatHeights('stool', species)).toEqual({
-        seatHeight: STOOL.seatHeight,
-        footHeight: 0,
-      });
-      expect(seatHeights('bench', species)).toEqual({
-        seatHeight: PIANO_BENCH.seatHeight,
-        footHeight: 0,
-      });
-    }
   });
 
   it('fits the piano bench to the legs of the studio polar bear (design 4.4)', () => {
@@ -299,7 +285,7 @@ describe('buildSceneProps', () => {
     const parts = [
       buildChair(seatHeights('chair', SPECIES.rabbit)?.seatHeight ?? NaN),
       buildStool(
-        seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: STOOL.seatHeight, footHeight: 0 },
+        seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: 0.35, footHeight: 0 },
       ),
       buildMusicStand(),
       buildRisers(layout.risers, layout.podium),
