@@ -89,7 +89,12 @@ export function chainFrames<F extends readonly Frame[]>(
   frames: F,
   rootOffset: Vec3 = [0, 0, 0],
 ): F {
-  for (const [i, frame] of frames.entries()) {
+  // An index loop makes no pair for each frame, as `entries()` does in each call.
+  for (let i = 0; i < frames.length; i++) {
+    const frame = frames[i];
+    if (!frame) {
+      continue;
+    }
     boneRotation(rotations, i, local);
     frame.position.fromArray(skeleton.positions[i] ?? [0, 0, 0]);
     const parentIndex = skeleton.parents[i] ?? -1;
