@@ -311,6 +311,8 @@ The app does not follow these facts:
   (`KEY_MOTION.repeatShare`).
 - **The key bed (section 7).** The claws stay at the key surface and do not follow a pressed key
   down.
+- **The fingering (section 9).** The paw plays as one block. It chooses no finger for a note, and
+  no digit moves alone.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.
