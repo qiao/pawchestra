@@ -339,8 +339,6 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   each lap share (`lap.along`) with the legs.
 - A back factor of `girthProfile` moves the back on the chair. Keep it at 1 below the hips joint.
   A width row at the shoulder joints moves the rest paws. Narrow below them.
-- A standing bind sits with a sit pose of its rig (`sitPose`, design 4.4). End its chair behind the
-  heels, because short thighs leave the feet under the haunch.
 
 ### Head and colors
 

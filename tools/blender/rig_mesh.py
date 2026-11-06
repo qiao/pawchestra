@@ -94,11 +94,7 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    crease where the belly meets the top of each thigh (`crease_relax()`), with `crease.lap` a
    second time up the belly front, and with `kneeCrease`
    across the crease at the back of each knee (`knee_relax()`). With `kneeCrease.fair`, the calf
-   back is then faired along the vertex normals (`calf_fair()`). With `sitPose` of the config, a
-   body that binds standing also gets the sit pose of a seated bind with the same steps
-   (`sit_pose()`): the legs turn by `sitPose.legTurns`, and the rules `sit`, `crease`, and
-   `kneeCrease` of `sitPose` put the haunch on the seat of `sitPose.chair` and relax the creases.
-   The trunk, the arms, and the tail keep the bind.
+   back is then faired along the vertex normals (`calf_fair()`).
 7. Put a gloss shell over each eye: a fan from the middle of the eye to the edge of its dark
    faces, a little out of the surface. `pnpm studio-body` finds each eye by its fan, drops the
    fan, and puts the pea eye of the app at its place (design 4.5). The faces of the nose become
@@ -130,21 +126,17 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    arm rises, and with `follow.fill` its valleys then fill (`fill_valleys()`). A rig with
    `armSegments` turns its segments and helpers in the pose of a rule. With `upperTwist` of the
    config, the solve of each shape gives each upper arm the twist bone of the app
-   (`upper_twist()`), and the file names the share for `pnpm studio-body`. With `sitPose`, the
-   shapes `sit_L` and `sit_R` follow: the move of each vertex in the bind pose that the skin of
-   the clip `sit` takes to its place in the sit pose (`sit_shapes()`).
+   (`upper_twist()`), and the file names the share for `pnpm studio-body`.
 9. Write the GLB file with the code of this script: the materials `fur` and `gloss`, the skinned
-   mesh with its morph targets, the skeleton, the clip `reference` with one key, the clip `sit` of
-   a sit pose, and the facts that `pnpm studio-body` reads in the extras of the asset. The file
-   holds only the animal. The seat under the seated body or under the sit pose is numbers in the
+   mesh with its morph targets, the skeleton, the clip `reference` with one key, and the facts that `pnpm studio-body` reads in the extras of the asset. The file
+   holds only the animal. The seat under the seated body is numbers in the
    extras (`seat_extras()`). When `colors.shift` moves a face, `COLOR_1` holds the colors before
    the shift, from which `pnpm studio-body` maps the other palettes. The bytes depend only on the
    config and the source file.
 
 With `--preview`, the script also renders the seated bind on its chair and the standing body from
 four sides, the knees of the seated body from the side, the neck from four sides, and the main bone
-of each face, and with `sitPose` the sit pose on its chair from four sides and its knees,
-and it writes the long-armed source as `source-long-arms.obj` for the probes. With `--obj`, it
+of each face, and it writes the long-armed source as `source-long-arms.obj` for the probes. With `--obj`, it
 writes only the long-armed source, into the file, for `pnpm rig-mesh --check`. With `--check`, it
 also lists the faces that the stretch turns or squeezes (`stretch_faces()`) and the long thin faces
 across an arm joint that no ring cuts (`uncut_faces()`), before the fold probe of the check. It
@@ -4219,80 +4211,6 @@ def tail_spread(bind, out, tail, carry, spread, top):
     return out
 
 
-def sit_pose(config, weights, points, tris, heads, ends, rolls, meters):
-    """Makes the sit pose of a body that binds standing (`sitPose` of the config, design 4.4), with
-    the steps of the seated bind of a seated body. The legs take the turns of `legTurns`: the
-    world turn of each left leg bone from the sit pose to the source, as `studio.legTurns`. The
-    faces that the turn folds relax toward the source. The underside of the haunch goes down onto
-    the seat of `chair` with the rule `sit` (`sit()`). The crease of the belly and the thighs
-    relaxes with the rule `crease` (`crease_relax()`), and the crease of each knee with the rule
-    `kneeCrease` (`knee_relax()`). With `bind`, the skin of the sit pose takes that blend in place
-    of the `bind` of the config (`bind_skin()`). The trunk, the arms, and the tail keep the bind
-    of the config. Gives the sit mesh, the world turn of each bone from the source to the sit
-    pose, and the head of each bone in the sit pose."""
-    rule = config['sitPose']
-    seat = dict(config, studio=dict(config['studio'], legTurns=rule['legTurns']),
-                bind=rule.get('bind', config.get('bind', {})))
-    turns = bind_turns(seat, heads, ends, rolls)
-    posed = posed_heads(heads, turns)
-    matrices = [move(turns[n], heads[n], posed[n]) for n in BONES]
-    main_bone = weights[tris].sum(axis=1).argmax(axis=1)
-    mesh = bind_skin(seat, weights, matrices, points)
-    mesh, rounds = relax(points, mesh, tris, weights, matrices)
-    dots = turn_dots(points, mesh, tris, weights, matrices)
-    log(f'sit pose: after {rounds} rounds of relaxing, {int((dots < 0).sum())} faces turn over'
-        f'{turned_on(dots, main_bone)}')
-    chair = rule['chair']
-    hip = float(posed['thigh_L'][2])
-    top, low, _ = haunch_gap(mesh, weights, chair, rule.get('sit', {}), float(posed['hips'][2]))
-    gap = (low - top) * meters
-    log(f'sit pose: before the sit, the lowest point of the haunch behind the hips joint is '
-        f'{abs(gap) * 100:.2f} cm {"above" if gap >= 0 else "below"} the seat top {top:.4f} u')
-    if 'sit' in rule:
-        mesh, moved, largest, before, after = sit(mesh, tris, weights, chair, rule['sit'], hip)
-        log(f'sit pose: {moved} vertices of the haunch move down, at most {largest:.4f} u '
-            f'({largest * meters * 100:.2f} cm). The side view of the underside behind the hip '
-            f'joints is at most {before * meters * 100:.2f} cm above the seat before and '
-            f'{after * meters * 100:.2f} cm after')
-    if rule.get('crease', {}).get('rounds', 0) > 0:
-        mesh, seam, moved, largest = crease_relax(mesh, tris, weights, posed['thigh_L'],
-                                                  rule['crease'])
-        log(f'sit pose: crease of {seam} seam vertices, {moved} vertices move, at most '
-            f'{largest:.4f} u ({largest * meters * 100:.2f} cm)')
-    if rule.get('kneeCrease', {}).get('rounds', 0) > 0:
-        mesh, seam, moved, largest, _, _ = knee_relax(mesh, tris, weights, posed,
-                                                      rule['kneeCrease'])
-        log(f'sit pose: knee crease of {seam} seam vertices, {moved} vertices move, at most '
-            f'{largest:.4f} u ({largest * meters * 100:.2f} cm)')
-    dots = turn_dots(points, mesh, tris, weights, matrices)
-    log(f'sit pose: {int((dots < 0).sum())} faces turn over in the sit mesh'
-        f'{turned_on(dots, main_bone)}')
-    return mesh, turns, posed
-
-
-def sit_shapes(sit_mesh, sit_turns, sit_heads, bind, weights, turns, heads, upper_share=None):
-    """Finds the sit shapes of a body that binds standing (`sitPose` of the config): the move of
-    each vertex in the bind pose that the skin of the clip `sit` takes to its place in the sit
-    mesh (`sit_pose()`), as `correctives()` finds the shapes of the clip `reference`. The vertices
-    after the sit mesh, such as the eye shells, take the skin of the clip. Each move splits into
-    `sit_L` and `sit_R` with a smooth ramp across the middle plane, as `split_shapes()` splits the
-    leg shapes. Gives the shapes, the world turn of each bone from the bind pose to the sit pose,
-    the matrices of the clip, and the largest error of the clip with the shapes."""
-    rel = {n: np.eye(3) if np.array_equal(sit_turns[n], turns[n]) else sit_turns[n] @ turns[n].T
-           for n in BONES}
-    matrices = [move(rel[n], heads[n], sit_heads[n]) for n in BONES]
-    if upper_share is not None:
-        matrices += twist_matrices(rel, heads, sit_heads, upper_share)
-    target = skin(weights, matrices, bind)
-    target[:len(sit_mesh)] = sit_mesh
-    moves, det, worst = correctives(target, bind, weights, rel, sit_heads, heads, upper_share)
-    log(f'sit shapes: the smallest determinant of the skin is {det:.4f} at the vertex {worst}')
-    error = float(np.linalg.norm(skin(weights, matrices, bind + moves) - target, axis=1).max())
-    side = smoothstep(bind[:, 0], -0.02, 0.02)
-    shapes = {'sit_L': moves * side[:, None], 'sit_R': moves * (1 - side)[:, None]}
-    return shapes, rel, target, error
-
-
 def boundary_loop(tris):
     """Gives the longest closed loop of the open edges of a patch of faces, in the order of the
     faces (counterclockwise from outside for faces in that order). Two parts of a patch can touch
@@ -4992,14 +4910,12 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
 
 
 def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
-              bind_heads, src_frames, src_heads, extras, base=None, sit=None,
+              bind_heads, src_frames, src_heads, extras, base=None,
               generator='pawchestra tools/blender/rig_mesh.py'):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
     for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
-    before `colors.shift`, the attribute `COLOR_1` holds them. With `sit`, the world frame and the
-    head of each bone in the sit pose (`sitPose` of the config), the file also has the clip
-    `sit`. `generator` names the script that writes the file: `export_rig.py` also writes with
+    before `colors.shift`, the attribute `COLOR_1` holds them. `generator` names the script that writes the file: `export_rig.py` also writes with
     this function."""
     w = GlbWriter()
     shape_names = list(shapes)
@@ -5071,14 +4987,9 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         return {'name': name, 'channels': channels, 'samplers': samplers}
 
     # The clip `reference` gives the source back: each shape has its full weight, but the shapes
-    # of a raised arm and the sit shapes. The clip `sit` of a body with a sit pose gives the sit
-    # mesh back with the sit shapes alone.
+    # of a raised arm.
     animations = [clip('reference', src_frames, src_heads,
-                       [0.0 if name.startswith(('arm_raise', 'sit_')) else 1.0
-                        for name in shape_names])]
-    if sit is not None:
-        animations.append(clip('sit', *sit,
-                               [1.0 if name.startswith('sit_') else 0.0 for name in shape_names]))
+                       [0.0 if name.startswith('arm_raise') else 1.0 for name in shape_names])]
 
     gltf = {
         'asset': {'generator': generator, 'version': '2.0'},
@@ -5553,13 +5464,6 @@ def main():
         log(f'seat: the side view of the underside of the final bind behind the hip joints is at '
             f'most {silhouette_gap(xs, zs, gaps, rule["end"]) * meters * 100:.2f} cm above the '
             f'seat top')
-    if 'sitPose' in config:
-        # A body that binds standing also gets the sit pose of a seated bind, which its sit shapes
-        # give back in the app (`seatedBody()` of `src/models/studio-rig.ts`).
-        if trunk or TAIL_TIP in BONES or 'tailCurl' in config['studio']:
-            raise SystemExit('sitPose needs a bind with no recline and a tail of one bone.')
-        sit_mesh, sit_turns, sit_heads = sit_pose(config, weights, long_verts, tris, long_heads,
-                                                  long_ends, rolls, meters)
 
     if 'turn' in config.get('rootNormals', {}):
         # A face of the root rim whose corner takes a skin normal far from its own face shades
@@ -5721,23 +5625,11 @@ def main():
             f'{len(before)} faces turn over before and {len(after)} after {rounds} rounds of '
             f'relaxing, {count} vertices move (faces of the module before '
             f'{faces[before].tolist()}, after {faces[after].tolist()})')
-    sit_clip = None
-    if 'sitPose' in config:
-        found, sit_rel, sit_all, error = sit_shapes(sit_mesh, sit_turns, sit_heads, bind_all,
-                                                    twist_weights, turns, bind_heads,
-                                                    upper_share)
-        shapes.update(found)
-        log(f'sit shapes: the clip sit gives the sit mesh back within {error:.2e} u '
-            f'({error * meters * 1000:.4f} mm)')
-        sit_clip = ({n: sit_rel[n] @ bind_frames[n] for n in BONES}, sit_heads)
     for name, shape in shapes.items():
         log(f'shape {name}: {int((np.abs(shape).max(axis=1) > 1e-6).sum())} vertices, '
             f'largest move {np.abs(shape).max():.4f} u')
 
-    # The seat of a body with a sit pose is under the sit mesh, so that `pnpm studio-body` fits the
-    # seat of the app to the seated body (`StudioBody.sitting`).
-    seat_rule = config['sitPose']['chair'] if sit_clip else config['chair']
-    chair = chair_mesh(seat_rule, sit_all if sit_clip else bind_all, weights_all)
+    chair = chair_mesh(config['chair'], bind_all, weights_all)
     log(f'chair: seat top {chair[2]:.4f} u, lowest point of the body {bind_all[:, 1].min():.4f} u')
     if TAIL_TIP in BONES:
         tail = weights_all[:, [BONES.index('tail'), BONES.index(TAIL_TIP)]].sum(axis=1) > 0.5
@@ -5752,7 +5644,7 @@ def main():
               if config.get(key, 1) != 1}
     # The seat is a chair, or the piano bench of a pianist (`chair.prop`). `pnpm studio-body` puts
     # the front edge of the seat at the front edge of the seat of the app of that name.
-    extras['seat'] = seat_extras(seat_rule, config['chair'].get('prop', 'chair'), chair[2])
+    extras['seat'] = seat_extras(config['chair'], config['chair'].get('prop', 'chair'), chair[2])
     if skin_caps.any():
         # The app gives each corner of these faces the normal of the skin at its vertex
         # (`studioNormals()`), because the normals of the caps of the arm point into the gap
@@ -5798,7 +5690,7 @@ def main():
             f'({np.linalg.norm(shift) * meters * 100:.2f} cm), to the head before the smoothing')
     write_glb(out_path, config, bind_all, tris_all, colors_all, materials, weights_all, shapes,
               bind_frames, bind_heads, src_frames, long_heads, extras,
-              base_all if (base_all != colors_all).any() else None, sit_clip)
+              base_all if (base_all != colors_all).any() else None)
 
     if obj_path:
         write_obj(obj_path, long_verts, tris)
@@ -5822,15 +5714,7 @@ def main():
         neck_standing = np.array([0, long_heads['upper_arm_L'][1] + 0.12,
                                   long_heads['neck'][2] + 0.05])
         neck_views = [('right', 90, 0), ('front', 0, 0), ('q', 35, 10), ('back', 180, 0)]
-        # A body with a sit pose also shows the sit mesh on its chair, and its knees.
-        sitting = [] if sit_clip is None else [
-            ('sitting', [(sit_all, tris_all, colors_all), chair_part],
-             [(v, a, e, seated_center, 1.1 * tall) for v, a, e in four]),
-            ('sitting-knees', [(sit_all, tris_all, colors_all), chair_part],
-             [('right', 90, 0, knees, 0.4 + rise), ('left', 270, 0, knees, 0.4 + rise),
-              ('front', 0, 10, knees, 0.4 + rise)]),
-        ]
-        preview(preview_dir, sitting + [
+        preview(preview_dir, [
             ('seated', [(bind_all, tris_all, colors_all), chair_part],
              [(v, a, e, seated_center, 1.1 * tall) for v, a, e in four]),
             ('standing', [(src_all, tris_all, colors_all)],
