@@ -23,8 +23,11 @@ export const CONTACT_SHADE = {
  * The gloss of the stage floor (design 4.5, post effects): the lacquered planks show a soft
  * reflection of the players, the chairs, and the stands. The pass of the contact shade traces
  * each floor pixel along its mirror ray through the depth of the scene, at half size, and reads
- * the color of the scene at the hit. The ray takes a jitter in a small cone, and a blur at half
- * size joins 16 rays, so the reflection is soft.
+ * the mean of a small box of the scene color at the hit. The ray takes a jitter in a small cone.
+ * A blur in two passes over only the floor pixels (`SURFACE_ROWS_FRAGMENT`,
+ * `SURFACE_BLUR_FRAGMENT`) joins the rays of a wide tent, so the reflection is soft, and one ray
+ * that hits or misses as the camera moves changes only a faint spot. The final pass adds the
+ * reflection only on the floor pixels at full size, so it does not spread onto the feet.
  */
 export const FLOOR_GLOSS = {
   /**
@@ -101,7 +104,7 @@ const GLOSS_STEPS = 14;
  * channel, as the factor of the scene light, and the reflection of the floor gloss in the color.
  * `CONTACT_SAMPLES` sets the samples of the shade, and `FLOOR_GLOSS` turns the gloss on. Each
  * pixel takes a turn of its samples and a jitter of its ray from a 4 × 4 Bayer pattern, which the
- * blur of 4 × 4 pixels removes. With the gloss, a pixel that is not on the floor gets the color
+ * blur removes: a box of 4 × 4 pixels for the shade, and a tent for the gloss. With the gloss, a pixel that is not on the floor gets the color
  * `NO_FLOOR`, so that the blur mixes no such pixel into the reflection.
  */
 export const SURFACE_FRAGMENT = /* glsl */ `
