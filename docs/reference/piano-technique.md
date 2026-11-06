@@ -312,7 +312,9 @@ The app follows these facts:
   (`digitBendsAt()` of `src/pose/piano-digits.ts`). Before its strike, the next claw lifts
   (`DIGIT_MOTION.lift`): the thumb most and the ring claw least, and more at a faster rate. From
   8 notes/s, the next claw starts down before the last key reaches the key bed. The other claws
-  rest a little up, so the pressing claw shows. The whole paw still lifts before a far note. In
+  rest a little up, so the pressing claw shows. Each claw next to a pressing claw follows a small
+  part of its press (`DIGIT_MOTION.spill`), as little of the motion of a striking finger goes into
+  its neighbors. The whole paw still lifts before a far note. In
   the rest pose on the belly, the claws bend a little up (`DIGIT_MOTION.lap`), so the tips stay
   out of the belly.
 - **The wrist in the fingering (section 9.3).** The paw rolls a little toward the thumb at a thumb
@@ -339,8 +341,6 @@ The app does not follow these facts:
   (`KEY_MOTION.releaseSec`), so that the rise shows at 60 frames per second.
 - **The fast repeat (section 7).** Before a repeat, the key comes up the whole way
   (`KEY_MOTION.repeatShare`).
-- **The neighbor claws (section 9.3).** A neighbor claw does not follow the bend of a pressing
-  claw.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

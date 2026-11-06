@@ -524,7 +524,8 @@ The rest of each family:
 - The claw of each key drops to the key bed at the note start and stays down until the note end
   (`digitBendsAt()` of `pose/piano-digits.ts`, `DIGIT_MOTION`). Before its strike, the next claw
   lifts, the thumb most, and more at a faster rate. From 8 notes/s, the next claw starts down
-  before the last key reaches the key bed. The other claws rest a little up (piano 9.3). The bend
+  before the last key reaches the key bed. The other claws rest a little up, and each claw next to
+  a pressing claw follows a small part of its press (`DIGIT_MOTION.spill`, piano 9.3). The bend
   turns each digit bone around the curl axis of its paw, from -18° (up) to 20° (down). Reason:
   the claw is about 3 cm long in the app, so a larger bend tears the joined claw bases. A short
   drop takes a smaller lift, and a claw with no gap after its last press stays down, so that no

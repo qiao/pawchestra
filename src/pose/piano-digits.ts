@@ -15,6 +15,12 @@ const DIGIT_COUNT = 5;
 export const DIGIT_MOTION = {
   /** The bend of a claw on a key at the key bed. */
   press: 20 * MathUtils.DEG2RAD,
+  /**
+   * The share of the press of a claw, from the rest bend, that each claw next to it follows. Little
+   * of the motion of a striking finger goes into its neighbors [38], so the share is small: about
+   * 4° at the full press. A claw does not bend past the press by the spill.
+   */
+  spill: 0.15,
   /** The bend of a claw that plays no note: a little up, so that the pressing claw shows. */
   rest: -4 * MathUtils.DEG2RAD,
   /**
@@ -222,9 +228,19 @@ export function digitBendsAt(
   out: Float32Array,
   offset: number,
 ): void {
+  const m = DIGIT_MOTION;
   for (let k = 0; k < DIGIT_COUNT; k++) {
     const presses = track.digits[k];
-    const play = presses ? digitBendAt(presses, time) : 0;
-    out[offset + k] = play * weight + DIGIT_MOTION.lap * (1 - weight);
+    ownBends[k] = presses ? digitBendAt(presses, time) : 0;
+  }
+  for (let k = 0; k < DIGIT_COUNT; k++) {
+    // Each claw follows a part of the press of the claws next to it, as the tendons join them.
+    const press = (j: number): number => Math.max(0, (ownBends[j] ?? m.rest) - m.rest);
+    const own = ownBends[k] ?? 0;
+    const play = Math.min(Math.max(own, m.press), own + m.spill * (press(k - 1) + press(k + 1)));
+    out[offset + k] = play * weight + m.lap * (1 - weight);
   }
 }
+
+/** The bends of the claws of one paw before the spill. Each call writes it before it reads it. */
+const ownBends = new Float64Array(DIGIT_COUNT);
