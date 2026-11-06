@@ -560,9 +560,18 @@ passes.
 - [ ] Dog cellist left arm (5.3): the lowered elbow of `DOG_HOLD` keeps the bend of the elbow,
       about 62° between the upper arm and the forearm, so the elbow skin still makes a sharp point
       from behind (`reports/2026-11-05-dog-left-arm/crop-elbow-az-150.png`). Only a grip further
-      from the shoulder opens it (the place of the cello). The play folds of the cellist went from
-      3.8% to 4.7% (faces 1711 and 1712, new). Run the cast matrix with the new elbow on
-      `CELLO_HOLD`, and move it into the shared hold if the recast cells do not get worse.
+      from the shoulder opens it (the place of the cello). Run the cast matrix with the new elbow
+      on `CELLO_HOLD`, and move it into the shared hold if the recast cells do not get worse.
+- [ ] Dog cellist left elbow height (5.3): the left upper arm goes only about 11° down in the
+      play, and a cellist holds it about 45° down on the A string (strings 1.8). A lower elbow
+      folds the inner elbow faces 1711 and 1712 into a dark wedge (about 20° down: 1.2% of the
+      play), and an elbow further back folds the armpit faces 2580 and 2581. The two inner elbow
+      shapes of the dog (`raise` of `tools/mesh-rigs/dog.json`) come from the old level elbow
+      and are at full weight in nearly each play sample. Fit a shape to the low elbow
+      (`pnpm raise-fit`), or move the inner elbow rings, then lower `DOG_HOLD.poleL` again.
+- [ ] Dog cellist inner elbow (4.4): the faces 1713 and 1714 at the inner left elbow fold in 15 of
+      18 rest samples and in 2% to 5% of the play samples, also before the elbow changes. Look at
+      them in the 2x crops of the rest, and fix them in the rig.
 - [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
       (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
       14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
