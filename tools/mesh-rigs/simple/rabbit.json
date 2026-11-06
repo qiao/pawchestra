@@ -1,0 +1,361 @@
+{
+  "source": "assets/models/rabbit/rabbit-tpose.glb",
+  "sourceNote": "The T-pose rabbit mesh (assets/models/rabbit/README.md), with no edit. tools/blender/simple_rig.py rigs it with bone heat weights.",
+  "name": "Rabbit",
+  "weld": 1e-05,
+  "joints": {
+    "root": {
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.1
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "hips": {
+      "head": [
+        0,
+        0.205,
+        0.0
+      ],
+      "tail": "spine"
+    },
+    "spine": {
+      "head": [
+        0,
+        0.275,
+        0.006
+      ],
+      "tail": "spine1"
+    },
+    "spine1": {
+      "head": [
+        0,
+        0.345,
+        0.012
+      ],
+      "tail": "chest"
+    },
+    "chest": {
+      "head": [
+        0,
+        0.415,
+        0.018
+      ],
+      "tail": "neck"
+    },
+    "neck": {
+      "head": [
+        0,
+        0.525,
+        0.02
+      ],
+      "tail": "head"
+    },
+    "head": {
+      "head": [
+        0,
+        0.555,
+        0.022
+      ],
+      "tail": [
+        0,
+        0.755,
+        0.022
+      ]
+    },
+    "ear_L": {
+      "head": [
+        0.06,
+        0.765,
+        -0.009
+      ],
+      "tail": [
+        0.135,
+        0.995,
+        -0.065
+      ]
+    },
+    "clavicle_L": {
+      "head": [
+        0.02,
+        0.47,
+        0.012
+      ],
+      "tail": "upper_arm_L"
+    },
+    "upper_arm_L": {
+      "head": [
+        0.075,
+        0.497,
+        0.008
+      ],
+      "tail": "forearm_L",
+      "roll": "palm"
+    },
+    "forearm_L": {
+      "head": [
+        0.187,
+        0.497,
+        0.008
+      ],
+      "tail": "forearm_twist_L",
+      "roll": "palm"
+    },
+    "forearm_twist_L": {
+      "head": [
+        0.2395,
+        0.49995,
+        0.008
+      ],
+      "tail": "hand_L",
+      "roll": "palm"
+    },
+    "hand_L": {
+      "head": [
+        0.292,
+        0.5029,
+        0.008
+      ],
+      "tail": "fingers_L",
+      "roll": "palm"
+    },
+    "fingers_L": {
+      "head": [
+        0.327,
+        0.5009,
+        0.007
+      ],
+      "tail": [
+        0.356,
+        0.4949,
+        0.008
+      ],
+      "roll": "palm"
+    },
+    "thigh_L": {
+      "head": [
+        0.072,
+        0.185,
+        0.0
+      ],
+      "tail": "shin_L"
+    },
+    "shin_L": {
+      "head": [
+        0.07,
+        0.115,
+        -0.008
+      ],
+      "tail": "foot_L"
+    },
+    "foot_L": {
+      "head": [
+        0.072,
+        0.055,
+        -0.025
+      ],
+      "tail": "toes_L",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "toes_L": {
+      "head": [
+        0.085,
+        0.018,
+        0.045
+      ],
+      "tail": [
+        0.09,
+        0.008,
+        0.08
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail": {
+      "head": [
+        0,
+        0.29,
+        -0.09
+      ],
+      "tail": [
+        0,
+        0.29,
+        -0.16
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    }
+  },
+  "palm": [
+    0,
+    -1,
+    0.015
+  ],
+  "studio": {
+    "legTurns": {
+      "thigh": [
+        0.469069,
+        0.025825,
+        -0.053763,
+        0.881145
+      ],
+      "shin": [
+        0.170381,
+        0,
+        0.034076,
+        0.984789
+      ],
+      "foot": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "toes": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "trunk": {
+      "open": 4,
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
+    },
+    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns back until the hip angle opens by open degrees, as seated string players sit tall. The shares fall from the spine1 to the head in equal steps, so that the head stays level. The value 0 keeps the trunk of the source.",
+    "bindArms": {
+      "upper_arm": [
+        0.813873,
+        -0.143043,
+        0.563161
+      ],
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
+    },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 90,
+      "R": 43
+    },
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 90 degrees and the right 43 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 137 degrees on the left (the violin and the snare drum) and 93 degrees on the right (the cello and the snare drum). Three probes of pnpm bind-supination gave 97 and 43, then 90 and 43, then no change.",
+    "note": "The leg turns of the T-pose rabbit of 77b9d9d3. The legs keep the length of the source, so the seat is lower than on the rabbit of rig-mesh."
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.05,
+    "eyeShare": 0.34,
+    "eyeBox": [
+      [
+        0.03,
+        0.62,
+        0.05
+      ],
+      [
+        0.12,
+        0.71,
+        0.15
+      ]
+    ],
+    "noseBox": [
+      [
+        -0.03,
+        0.605,
+        0.13
+      ],
+      [
+        0.03,
+        0.64,
+        0.18
+      ]
+    ],
+    "nose": [
+      0.85,
+      0.55,
+      0.55
+    ],
+    "tone": {
+      "chroma": 0.03,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          -0.02,
+          0.003,
+          0.009
+        ],
+        [
+          0.97,
+          -0.028,
+          0.003,
+          0.009
+        ]
+      ],
+      "note": "The light grey fur takes the cream of the fur swatch of rabbit-views.png (Oklab 0.938, 0.009, 0.018): each plain face moves by a row [L, dL, da, db] in Oklab, blended by its lightness. The pink nose, inner ears, and paw pads have more chroma, and the white whiskers are lighter than light, so they keep their colors."
+    },
+    "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few."
+  },
+  "eyeShell": {
+    "lift": 0.002,
+    "points": 12,
+    "reach": 1,
+    "darkReach": 2,
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+  },
+  "chair": {
+    "halfWidth": 0.16,
+    "front": -0.03,
+    "back": -0.1396,
+    "backHeight": 0.15,
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat. Its front edge ends where the sloped thighs leave the seat top at the haunch. The chair of the app grows back until its back posts keep 1 cm behind the trunk (backRoom of ANIMALS of tools/studio-body.ts)."
+  },
+  "armSegments": {
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies. Bone heat gives them their weights."
+  },
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The joints are those of the T-pose rabbit of 77b9d9d3, with the arm joints on the arms of the source: the elbow at 0.39 of the free arm, the wrist at the wrist ring, and the paw tip at x 0.356. The palm is the true palm of the source: the mean normal of the pink pads of the palm faces down.",
+  "body": {
+    "height": 0.681364,
+    "crease": 35,
+    "backRoom": 0.04
+  },
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts). The height puts the standing shoulder joints (0.497 u) at 1.37095 m for each unit, so that the head height H is 0.2985 m, as on the rabbit of main, and the holds in H keep their size. The crease angle and the back room are those of the rabbit of main.",
+  "eyeSize": 0.217767,
+  "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as studio-body gives a rig-mesh body."
+}
