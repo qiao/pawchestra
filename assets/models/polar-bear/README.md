@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 339,444 bytes |
-| SHA-256 | `521c2a18ef7c827389cf29339ecf19267e2509eae35c3aab4e7fd083970f0f2e` |
+| Size | 339,814 bytes |
+| SHA-256 | `a2d703bdd1940749ebf6b97a69bc34e4d33a1aa356d451b430142d468b598d65` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -357,10 +357,12 @@ back -0.2, halfWidth 0.25}, and `hinges` L (-0.576037, -0.749779, -0.325597) and
     older body, so the rest and the lift of the pianist, which are in `H`, stay.
 
 **Bind.** The Action `bind` holds the seated bind at frame 1. The trunk, the head, and the tail
-keep the rest. The legs sit on a taller bench (design 4.4, "Seat"): each thigh turns the least
-way onto the direction 40° below the horizontal and 12° out, each shin onto the vertical with
-the ankle 5° in front of the knee, and each foot and toe bone keeps its rest turn, so the feet
-stand flat. The knee angle is 135°. Each upper arm turns the least way onto the bind direction
+keep the rest. The legs sit on a bench that fits them (design 4.4, "Seat"): each thigh turns the
+least way onto the direction 25° below the horizontal and 12° out, each shin onto the vertical
+with the ankle 5° in front of the knee, and each foot and toe bone keeps its rest turn, so the
+feet stand flat. The knee angle is 120°. The call was
+`sa.set_world_turns(rig, turns, sa.sheet_worlds(rig), key_frame=1)` with these world turns of
+`thigh_*`, `shin_*`, `foot_*`, and `toes_*`. Each upper arm turns the least way onto the bind direction
 (0.813873, -0.143043, 0.563161) of `studio.bindArms` (studio axes), and the forearm, the twist
 bone, the paw, and the fingers keep its turn (the role-neutral bind). Each paw then turns about
 the bind forearm toward supination, the left 112° and the right 43°: the values of
@@ -368,10 +370,12 @@ the bind forearm toward supination, the left 112° and the right 43°: the value
 supination. `sa.drive_segments(rig, key_frame=1)` keyed the segments and the helpers. The mesh
 has no shape key.
 
-The older body had thighs 25° below the horizontal and a seat top of 0.260 m. At 40°, the seat
-top is 0.331 m, the hip joints 0.49 m, and the knees 0.31 m above the floor. The front edge of the
-seat lies 0.05 units behind the hip joints: a front edge nearer the hips puts the seat top on the
-sloped thighs, about 3 cm lower.
+At 25°, the seat top is 0.268 m, the hip joints 0.43 m, and the knees 0.31 m above the floor.
+At 40°, the seat top was 0.331 m and the hip joints 0.49 m: the haunch sat on the front edge of
+the bench, and the bear looked as if it stood up. The exports of 20°, 22°, 28°, and 31° gave the
+seat tops 0.257 m, 0.267 m, 0.280 m, and 0.294 m. Below 25°, the thighs set the seat top. The front
+edge of the seat lies 0.05 units behind the hip joints: a front edge 0.02, 0.04, 0.06, or 0.08 units
+nearer the hips puts the seat top on the sloped thighs, 0.6 cm to 4.9 cm lower.
 
 **Eyes.** `se.place_eyes(rig, mesh, {side: (middle, direction, size)})` with the middles
 (±0.0422, -0.1016, 0.9417), the directions (±0.4450, -0.7197, 0.5329), and the size 0.165237
@@ -395,9 +399,9 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 716,792 bytes |
-| SHA-256 | `f4cf17d29d185f2d88311e9022d9a00f087e2cc3184fccc90d5cae64e32ef0a4` |
-| Summary | `polar-bear.rig.json`: 7,633 bytes, SHA-256 `dae23a667814e8a49eab04558cfb8ef3d801e788f9dac74c802ae7df5fc2b64d` |
-| Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.331 m high, and the bench is 0.195 m deep (`benchFitOf()`) |
+| Size | 716,768 bytes |
+| SHA-256 | `9b1aa52e2c75aca0cdf779749f36ace4352fd15303455279975866fec37a5710` |
+| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `074f41962c4625ec0b6b283ca3231bbf1c8e2c6b6bcfd50d16b6fbafac283a0b` |
+| Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
