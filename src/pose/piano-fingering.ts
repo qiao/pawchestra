@@ -28,6 +28,23 @@ export interface PianoPaw {
  */
 export const POLAR_BEAR_PAW: PianoPaw = { spanScale: 0.85, clawPitch: 0.87 };
 
+/** The width of one white key of the piano, in meters. */
+const WHITE_KEY = (PIANO.keyboardWidth / 52) * PIANO_SCALE;
+
+/**
+ * Gives the place of the tip of a claw along the keys, from the tip of claw 3 (design 5.3). The
+ * palm faces down, so the thumb of the right paw lies toward the low keys, and the thumb of the
+ * left paw toward the high keys.
+ *
+ * @param finger The finger: 1 (the thumb) to 5.
+ * @param side The hand.
+ * @param paw The paw.
+ * @returns The offset along the keys, in meters: positive toward the high keys.
+ */
+export function clawOffset(finger: number, side: 'L' | 'R', paw: PianoPaw): number {
+  return (side === 'R' ? finger - 3 : 3 - finger) * paw.clawPitch * WHITE_KEY;
+}
+
 /** The fingering of the notes of one hand (design 5.3). */
 export interface PianoFingering {
   /** The first entry of each hand note in `keys` and `fingers`, then the end: notes + 1 entries. */
@@ -262,7 +279,6 @@ export function* planFingeringSteps(
   const c = costs;
   const { spanScale, clawPitch } = paw;
   const limits = spanLimits(spanScale).values;
-  const whiteKey = (PIANO.keyboardWidth / 52) * PIANO_SCALE;
   const mirror = side === 'R' ? 1 : -1;
   const sounding: SearchNote[] = [];
   for (const [index, note] of notes.entries()) {
@@ -278,7 +294,7 @@ export function* planFingeringSteps(
       const k = note.keys[side === 'R' ? j : n - 1 - j] ?? 0;
       keys[j] = mirror * k;
       black[j] = isBlack(k) ? 1 : 0;
-      places[j] = (mirror * pianoKeyPosition(k)[0]) / whiteKey;
+      places[j] = (mirror * pianoKeyPosition(k)[0]) / WHITE_KEY;
     }
     const choices = choicesOf(keys, black);
     sounding.push({ index, start: note.start, end: note.end, keys, black, places, choices });

@@ -32,7 +32,7 @@ import { buildChoirTrack } from './choir-notes.ts';
 import type { ChoirTrack } from './choir-notes.ts';
 import { MOTION_FAMILIES, isInFamily } from './family.ts';
 import type { HandTrack } from './hand-notes.ts';
-import { handTracks, handsRig } from './hands.ts';
+import { handTracksSteps, handsRig } from './hands.ts';
 import type { HandsRig } from './hands.ts';
 import { idleParams } from './idle.ts';
 import type { IdleParams } from './idle.ts';
@@ -407,7 +407,7 @@ function* noteLayerSteps(
       handsRig(model, instrument, instrumentScale(SPECIES[species], instrument)),
     );
     yield;
-    const { left, right } = handTracks(rig, notes, loudness, amplitude);
+    const { left, right } = yield* handTracksSteps(rig, notes, loudness, amplitude);
     yield;
     const family = MOTION_FAMILIES[instrument];
     return {

@@ -500,6 +500,15 @@ The rest of each family:
   two parts stay in two paws, and one paw does not jump between them.
 - The paw lifts less before a near note (`HAND_MOTION.liftGapSec`), because the motion of a
   pianist gets smaller as the speed rises (piano 7).
+- Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
+  (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
+  (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key
+  (`clawOffset()`). The move of a thumb pass starts at the note before (`HAND_MOTION.passSec`),
+  as a pianist prepares the pass (piano 9.3). Reason: a palm at the middle of the keys of each
+  note slid one key along the keys at each note of a scale, and a real hand stays in one position
+  for a group of notes. A thumb pass has no hard span limit, and a chord has no legato limit,
+  because the arm carries the hand there. With the plain limits, the C major arpeggio took a thumb
+  pass on each second note.
 - Each key goes down with its notes, from the note start to the note end (`keyLevelsAt()`), so a
   seek and a mute give the correct keys at once.
 - The paw moves in for a black key, so the claws lie on it, as a pianist moves the hand in toward

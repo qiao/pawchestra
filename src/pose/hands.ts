@@ -8,6 +8,7 @@ import type { PlacedPiece } from '../models/instruments/hold.ts';
 import { pianoKeyFront } from '../models/instruments/piano.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
+import type { Steps } from '../score/steps.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { InstrumentOf } from './family.ts';
@@ -21,13 +22,15 @@ import {
   handStateAt,
   splitHands,
 } from './hand-notes.ts';
-import type { HandAction, HandReach, HandState, HandTrack } from './hand-notes.ts';
+import type { HandAction, HandNote, HandReach, HandState, HandTrack } from './hand-notes.ts';
 import { armRig, limitReach, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import { pedalFoot } from './pedal.ts';
 import type { PedalFoot } from './pedal.ts';
+import { POLAR_BEAR_PAW, clawOffset, planFingeringSteps } from './piano-fingering.ts';
+import type { PianoFingering } from './piano-fingering.ts';
 
 /** The instruments that the two hands play on keys or strings: the piano and the harp. */
 export type HandsInstrument = InstrumentOf<'keyboard' | 'harp'>;
@@ -429,16 +432,27 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
 /**
  * Gives the place of a palm for the keys of a note, in the model axes: the middle of its lowest
  * and its highest key, with the offset of the palm. A shifted hand plays at the side place of the
- * shifted keys, and at the height and the depth of its own keys.
+ * shifted keys, and at the height and the depth of its own keys. A fingered note puts each claw
+ * over its key: the palm stands at the mean of the keys minus the offsets of their claws
+ * (`clawOffset()`).
  *
  * @param rig The points of the player.
  * @param side The hand.
  * @param low The lowest key.
  * @param high The highest key.
  * @param shift The shift of the hand along the keys, in semitones (`HandNote.shift`).
+ * @param fingered The place of the palm along the keys for the fingers of the note, in the axes
+ *   of the instrument, or `null` for the middle of the keys.
  * @returns The place of the palm.
  */
-function palmPoint(rig: HandsRig, side: 'L' | 'R', low: number, high: number, shift: number): Vec3 {
+function palmPoint(
+  rig: HandsRig,
+  side: 'L' | 'R',
+  low: number,
+  high: number,
+  shift: number,
+  fingered: number | null = null,
+): Vec3 {
   const { keyPoint } = rig.hold;
   const offset = side === 'L' ? rig.hold.palmL : rig.hold.palmR;
   const middle = (a: number, b: number): Vector3 =>
@@ -446,11 +460,46 @@ function palmPoint(rig: HandsRig, side: 'L' | 'R', low: number, high: number, sh
       .add(new Vector3(...keyPoint(b, rig.scale)))
       .multiplyScalar(0.5);
   const at = middle(low, high);
+  const keysX = at.x;
+  if (fingered !== null) {
+    at.x = fingered;
+  }
   if (shift !== 0) {
-    at.x = middle(low + shift, high + shift).x;
+    at.x += middle(low + shift, high + shift).x - keysX;
   }
   at.add(new Vector3(...offset));
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
+}
+
+/**
+ * Gives the place of the palm along the keys for the fingers of one note (design 5.3): the mean
+ * of the key places minus the offsets of their claws, so that each claw stands over its key.
+ *
+ * @param rig The points of the player.
+ * @param side The hand.
+ * @param fingering The fingering of the hand.
+ * @param index The index of the note.
+ * @returns The place along the keys, in the axes of the instrument, or `null` for a note with no
+ *   keys.
+ */
+function fingeredPalmX(
+  rig: HandsRig,
+  side: 'L' | 'R',
+  fingering: PianoFingering,
+  index: number,
+): number | null {
+  const from = fingering.first[index] ?? 0;
+  const to = fingering.first[index + 1] ?? from;
+  if (to <= from) {
+    return null;
+  }
+  let sum = 0;
+  for (let j = from; j < to; j++) {
+    const key = fingering.keys[j] ?? 60;
+    const finger = fingering.fingers[j] ?? 3;
+    sum += rig.hold.keyPoint(key, rig.scale)[0] - clawOffset(finger, side, POLAR_BEAR_PAW);
+  }
+  return sum / (to - from);
 }
 
 /** The note data of the two hands. */
@@ -460,38 +509,53 @@ interface HandTracks {
 }
 
 /**
- * Calculates the note data of the two hands of a piano or harp player (design 5.3).
+ * Calculates the note data of the two hands of a piano or harp player (design 5.3), in steps
+ * (design 7.2). A piano hand plays the fingering of the lowest cost (`planFingeringSteps()`), and
+ * its palm stands so that the claw of each key is over the key.
  *
  * @param rig The points of the player.
  * @param notes The notes of the player, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
  * @param amplitude The seeded amplitude of the player.
- * @returns The note data of each hand.
+ * @returns The steps, which return the note data of each hand.
  */
-export function handTracks(
+export function* handTracksSteps(
   rig: HandsRig,
   notes: readonly PlayerNote[],
   loudness: readonly number[],
   amplitude: number,
-): HandTracks {
+): Steps<HandTracks> {
   const [left, right] = splitHands(notes, loudness, rig.hold.reach, rig.hold.apart);
   const [firstL, firstR] = HAND_MOTION.startKeys;
   const { action } = rig.hold;
+  const piano = action === 'strike';
+  const fingeringL = piano ? yield* planFingeringSteps(left, 'L', POLAR_BEAR_PAW) : null;
+  const fingeringR = piano ? yield* planFingeringSteps(right, 'R', POLAR_BEAR_PAW) : null;
+  const track = (
+    side: 'L' | 'R',
+    hand: readonly HandNote[],
+    fingering: PianoFingering | null,
+    firstKey: number,
+  ): HandTrack =>
+    buildHandTrack(
+      hand,
+      action,
+      (l, h, k, i) =>
+        palmPoint(
+          rig,
+          side,
+          l,
+          h,
+          k,
+          fingering && i >= 0 ? fingeredPalmX(rig, side, fingering, i) : null,
+        ),
+      amplitude,
+      firstKey,
+      fingering?.pass ?? null,
+    );
   return {
-    left: buildHandTrack(
-      left,
-      action,
-      (l, h, k) => palmPoint(rig, 'L', l, h, k),
-      amplitude,
-      firstL,
-    ),
-    right: buildHandTrack(
-      right,
-      action,
-      (l, h, k) => palmPoint(rig, 'R', l, h, k),
-      amplitude,
-      firstR,
-    ),
+    left: track('L', left, fingeringL, firstL),
+    right: track('R', right, fingeringR, firstR),
   };
 }
 

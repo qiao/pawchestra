@@ -288,6 +288,17 @@ The app follows these facts:
   lag, and the arms cross further into the belly. The paw has no fingers that move, so the
   whole paw lifts for each note, but less for a near note (`HAND_MOTION.liftGapSec`). Thus the
   motion gets smaller in a fast passage.
+- **The fingering (section 9).** Each paw plays the fingering of the lowest cost by the 12 rules
+  of section 9.2 (`planFingering()` of `src/pose/piano-fingering.ts`). A dynamic program over
+  pairs of notes keeps the rules of three notes exact. The spans scale with the paw
+  (`POLAR_BEAR_PAW`), the left paw mirrors the right paw, and the claws of a chord fit its keys
+  (`clawFit`). The palm stands so that the claw of each key is over the key (`clawOffset()`).
+  Thus the paw stays still for the notes of one position and moves at a thumb pass. The move of a
+  pass starts at the note before (`HAND_MOTION.passSec`), as the hand prepares a pass. The right
+  paw plays the C major scale 1231234 1231234 5 and the arpeggio 123123 5, and the left paw the
+  scale 54321321. A thumb pass has no hard span limit, because the arm carries the hand. A chord
+  has no legato limit and no rules of three notes, because the arm moves the hand from chord to
+  chord.
 - **The feet (section 6).** In the play, the right heel stays on the floor, and the ball of the
   foot lies on the front of the damper pedal (`posePedalFoot()` of `src/pose/pedal.ts`). The
   sustain pedal of the score (CC 64) presses the damper pedal, and the foot follows it. The paw is
@@ -311,8 +322,7 @@ The app does not follow these facts:
   (`KEY_MOTION.repeatShare`).
 - **The key bed (section 7).** The claws stay at the key surface and do not follow a pressed key
   down.
-- **The fingering (section 9).** The paw plays as one block. It chooses no finger for a note, and
-  no digit moves alone.
+- **The claws (section 9.3).** No claw moves alone, so the whole paw lifts for each note.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

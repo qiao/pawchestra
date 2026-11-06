@@ -18,6 +18,12 @@ export const HAND_MOTION = {
    * less for a nearer note, as the motion of a pianist gets smaller with the speed.
    */
   liftGapSec: 0.4,
+  /**
+   * A piano hand starts the move to a note with a pass of the thumb (`PianoFingering.pass`) at the
+   * start of the note before, at most this long before the note, as a pianist prepares a thumb
+   * pass up to 0.5 s before it (`docs/reference/piano-technique.md` section 9.3).
+   */
+  passSec: 0.5,
   /** A harp finger rests on its string for this time before the pluck: at most 0.2 of the gap. */
   restSec: 0.04,
   /** A pluck takes this time: at most 0.3 of the gap to the next note of the hand. */
@@ -248,18 +254,22 @@ export interface HandTrack {
  *
  * @param notes The notes of the hand, sorted by start.
  * @param action How the hand plays.
- * @param pointOf Gives the place of the palm for the lowest and the highest key of a note, and the
- *   shift of the hand in semitones.
+ * @param pointOf Gives the place of the palm for the lowest and the highest key of a note, the
+ *   shift of the hand in semitones, and the index of the note, or -1 for the place before the
+ *   first note.
  * @param amplitude The seeded amplitude of the player.
  * @param firstKey The key of the hand before its first note.
+ * @param passes For each note, a value other than 0 when the thumb passes under the hand or a
+ *   finger crosses over the thumb (`PianoFingering.pass`), or `null` for none.
  * @returns The note data.
  */
 export function buildHandTrack(
   notes: readonly HandNote[],
   action: HandAction,
-  pointOf: (low: number, high: number, shift: number) => Vec3,
+  pointOf: (low: number, high: number, shift: number, index: number) => Vec3,
   amplitude: number,
   firstKey: number,
+  passes: ArrayLike<number> | null = null,
 ): HandTrack {
   const m = HAND_MOTION;
   const plucks = action === 'pluck';
@@ -280,18 +290,24 @@ export function buildHandTrack(
   const moveStarts = Float64Array.from(notes, (_, i) => {
     const gap = gapBefore(i);
     const free = plucks ? gap - (rests[i] ?? 0) - (pluckTimes[i - 1] ?? 0) : m.strikeMove * gap;
-    return (moveEnds[i] ?? 0) - Math.min(m.moveSec, free);
+    const late = (moveEnds[i] ?? 0) - Math.min(m.moveSec, free);
+    // A pass moves the hand from the strike of the note before, so the hand moves smoothly.
+    const before = notes[i - 1];
+    if (!passes?.[i] || !before || plucks) {
+      return late;
+    }
+    return Math.min(late, Math.max(before.start, (moveEnds[i] ?? 0) - m.passSec));
   });
   // A piano hand lifts less for a near note.
   const liftShare = (i: number): number => (plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec));
   return {
     action,
-    first: pointOf(firstKey, firstKey, 0),
+    first: pointOf(firstKey, firstKey, 0, -1),
     starts: Float64Array.from(notes, (n) => n.start),
     moveStarts,
     moveEnds,
     pluckTimes,
-    points: Float64Array.from(notes.flatMap((n) => pointOf(n.low, n.high, n.shift ?? 0))),
+    points: Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, n.shift ?? 0, i))),
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
   };
 }
