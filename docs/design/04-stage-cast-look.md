@@ -898,7 +898,8 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
 - **Other terms.** Each layout bakes the soft key shadow on the stage one time
   (`scene/stage-bake.ts`), because the props and the stage do not move. A close shot adds a soft
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives
-  the back rows an aerial depth (`ROOM_HAZE`). A solo turns the key light, the pool, and the beams
+  the back rows an aerial depth (`ROOM_HAZE`), with a density from the middle of a lineup of
+  three densities in the close shots. A solo turns the key light, the pool, and the beams
   to the soloed players (`soloAim()`, 2.4). A captured cube of the lit hall gives the reflections
   (`captureEnvironmentSteps()`).
 - **Tone.** AgX tone mapping, because ACES moved the dark wood to red. Its exposure (`STAGE_TONE`)

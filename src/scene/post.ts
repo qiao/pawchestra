@@ -110,8 +110,11 @@ export const FRAME_VIGNETTE = {
  * subject gets no haze, so the black point of the stage stays.
  */
 export const ROOM_HAZE = {
-  /** The density of the haze, for each stage side of distance. */
-  density: 0.13,
+  /**
+   * The density of the haze, for each stage side of distance. The value is the middle of a lineup
+   * of three densities in the close shots, where the back rows fade a little more into the hall.
+   */
+  density: 0.17,
   /**
    * The light of the haze in all directions, in linear values, before the phase. The glow of the
    * hall above the stage in `orchestra-latest.png` has a luma p90 of 49, and the first light of
