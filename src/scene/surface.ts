@@ -253,11 +253,11 @@ void main() {
 `;
 
 /**
- * The blur of the surface pass at half size: the mean of a box of 4 × 4 pixels. The box holds each
- * value of the 4 × 4 pattern of the surface pass one time, so the pattern does not show. The
- * contact shade takes four linear samples. With `FLOOR_GLOSS`, the reflection is the mean of only
- * the floor pixels of the box, so that a body beside the floor does not darken it. A pixel with no
- * floor in its box gets no reflection.
+ * The blur of the surface pass at half size. The contact shade is the mean of a box of 4 × 4
+ * pixels, with four linear samples. The box holds each value of the 4 × 4 pattern of the surface
+ * pass one time, so the pattern does not show. With `FLOOR_GLOSS`, the reflection is the mean of
+ * only the floor pixels of a wider tent, so that a body beside the floor does not darken it. A
+ * pixel with no floor in its tent gets no reflection.
  */
 export const SURFACE_BLUR_FRAGMENT = /* glsl */ `
 uniform sampler2D uSource;
@@ -272,18 +272,21 @@ vec4 tap(float x, float y) {
 void main() {
   vec4 box = (tap(-1.5, -1.5) + tap(0.5, -1.5) + tap(-1.5, 0.5) + tap(0.5, 0.5)) * 0.25;
 #ifdef FLOOR_GLOSS
-  // Each tap is at the middle of a pixel, so it reads that pixel alone.
+  // A tent of 8 × 8 pixels with the weights 1, 2, 3, 4, 4, 3, 2, 1 on each axis. Each value of
+  // the 4 × 4 pattern gets the same weight, so the pattern does not show, and one ray that hits
+  // or misses changes a soft spot and not a square. Each tap is at the middle of a pixel, so it
+  // reads that pixel alone.
   vec3 sum = vec3(0.0);
-  float count = 0.0;
-  for (int y = -2; y < 2; y++) {
-    for (int x = -2; x < 2; x++) {
+  float weight = 0.0;
+  for (int y = -4; y < 4; y++) {
+    for (int x = -4; x < 4; x++) {
       vec3 c = tap(float(x), float(y)).rgb;
-      float floorPixel = step(-0.5, c.r);
-      sum += c * floorPixel;
-      count += floorPixel;
+      float w = (4.5 - abs(float(x) + 0.5)) * (4.5 - abs(float(y) + 0.5)) * step(-0.5, c.r);
+      sum += c * w;
+      weight += w;
     }
   }
-  box.rgb = sum / max(count, 1.0);
+  box.rgb = sum / max(weight, 1.0);
 #endif
   gl_FragColor = box;
 }
