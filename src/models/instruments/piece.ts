@@ -35,12 +35,6 @@ export function placeCorners(corners: readonly number[], at: Transform): number[
 }
 
 /**
- * Finds the smallest rotation that turns the y axis into a direction.
- *
- * @param direction The direction. It must not be 0.
- * @returns The rotation.
- */
-/**
  * Gives the smallest rotation that turns the y axis to a direction.
  *
  * @param direction The direction. It must not be 0.
