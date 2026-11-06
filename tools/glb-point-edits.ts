@@ -5,8 +5,8 @@
  * run gives the same bytes and never adds a move to a moved file. Each move is a delta of one
  * vertex of the primitive, in the stored space of the file (the bind pose of the rig). The tool
  * moves each vertex of the primitive at the same stored place by that delta, so that the copies of
- * a place for each face color stay one place. A group with `keepShapes` takes its move back from
- * those morph targets, split evenly, so that the sum of the shapes keeps its pose (the standing
+ * a place for each face color stay one place. A group with `keepTargets` takes its move back from
+ * those morph targets, split evenly, so that the sum of the targets keeps its pose (the standing
  * soloist of a seated body). A weight edit sets the bones of each vertex at a place. The tool
  * changes no other value: the other morph targets keep their deltas, so they stay valid. A rig file
  * of `pnpm rig-mesh` stores no normal (the app makes the normals), and the tool stops at a primitive
@@ -35,7 +35,7 @@ interface MoveGroup {
   /** The delta of each vertex, by its index in the primitive, in the stored space. */
   readonly moves: Readonly<Record<string, readonly [number, number, number]>>;
   /** The morph targets that take the move back, so that their sum keeps its pose. */
-  readonly keepShapes?: readonly string[];
+  readonly keepTargets?: readonly string[];
 }
 
 /** An edit file of point edits (`assets/models/<animal>/<animal>-edits.json`). */
@@ -182,6 +182,14 @@ function weldedCount(positions: AccessorView, joints: AccessorView): number {
   return keys.size;
 }
 
+/** The result of an edit file. */
+interface EditResult {
+  /** The bytes of the edited GLB file. */
+  readonly bytes: Uint8Array;
+  /** A line of facts for each group. */
+  readonly lines: readonly string[];
+}
+
 /**
  * Applies an edit file to the GLB bytes of its base commit.
  *
@@ -191,10 +199,7 @@ function weldedCount(positions: AccessorView, joints: AccessorView): number {
  * @throws Error if the base bytes have another SHA-256, if an index or a bone does not exist, or
  *   if two moves name one place with different deltas.
  */
-export function applyPointEdits(
-  edits: EditFile,
-  base: Uint8Array,
-): { bytes: Uint8Array; lines: string[] } {
+function applyPointEdits(edits: EditFile, base: Uint8Array): EditResult {
   const sha = createHash('sha256').update(base).digest('hex');
   if (sha !== edits.baseSha256) {
     throw new Error(
@@ -238,7 +243,7 @@ export function applyPointEdits(
   const moved = new Map<number, string>();
   const touched = new Set<number>();
   for (const group of edits.groups) {
-    const shapes = (group.keepShapes ?? []).map((name) => {
+    const targets = (group.keepTargets ?? []).map((name) => {
       const t = names.indexOf(name);
       const index = primitive.targets?.[t]?.['POSITION'];
       if (t < 0 || index === undefined) {
@@ -261,8 +266,8 @@ export function applyPointEdits(
         moved.set(i, text);
         for (let k = 0; k < 3; k++) {
           positions.set(i, k, positions.get(i, k) + (delta[k] ?? 0));
-          for (const shape of shapes) {
-            shape.set(i, k, shape.get(i, k) - (delta[k] ?? 0) / shapes.length);
+          for (const target of targets) {
+            target.set(i, k, target.get(i, k) - (delta[k] ?? 0) / targets.length);
           }
         }
         count += 1;

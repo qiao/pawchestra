@@ -8,7 +8,7 @@
     {
       "name": "tail",
       "note": "The tube of the standing source tail (the bind with the legs_straight shapes in the clip reference) along a new curve on the seat, around the back and the left side of the haunch. Each vertex keeps its place along the source line, times 0.737, and its offset from the line, times a factor that falls from 1 at the root to 0.72. Vertex 2223 keeps its stored z, the back of the body that sets the chair depth. The legs_straight shapes take the moves back, so the standing soloist keeps the source tail.",
-      "keepShapes": ["legs_straight_L", "legs_straight_R"],
+      "keepTargets": ["legs_straight_L", "legs_straight_R"],
       "moves": {
         "1189": [0.005807, -0.021097, 0.007366],
         "2218": [-0.001315, -0.011166, -0.0056],
