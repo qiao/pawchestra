@@ -1,3 +1,5 @@
+import { MathUtils } from 'three';
+
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
 import { smoothstep } from '../pose/rest.ts';
@@ -43,6 +45,20 @@ export const FOCUS_PULL = {
   seconds: 0.7,
 } as const;
 
+/**
+ * The establishing move of the opening shot (design 5.6). The film starts from black (2.5), so the
+ * first camera can stand higher and farther than the default view of the first screen. It then
+ * cranes down and pushes in to the low wide view over the opening, a reveal of the whole
+ * orchestra, as the first shot of a concert film. The end key of the opening does not change, so
+ * the shots after it do not change. With reduced motion, the opening holds the default view.
+ */
+export const ESTABLISH_MOVE = {
+  /** The rise of the first camera above the elevation of the default view, in degrees. */
+  riseDeg: 8,
+  /** The distance of the first camera, as a factor of the distance of the default view. */
+  pullBack: 1.2,
+} as const;
+
 /** The key of the frame, which `cameraAt()` writes before it reads it. */
 interface ScratchKey {
   azimuth: number;
@@ -52,6 +68,9 @@ interface ScratchKey {
 }
 
 const scratchKey: ScratchKey = { azimuth: 0, elevation: 0, zoom: 1, fov: FIELD_OF_VIEW };
+
+/** The first key of the establishing move, which `cameraAt()` writes before it reads it. */
+const establishKey: ScratchKey = { azimuth: 0, elevation: 0, zoom: 1, fov: FIELD_OF_VIEW };
 
 const blendStart: [number, number, number] = [0, 0, 0];
 
@@ -70,6 +89,7 @@ const driftTurn: [number, number] = [0, 0];
  * @param aspect The aspect of the view.
  * @param out The position to write.
  * @param look The point to write that the camera looks at.
+ * @param from The key at the start of the move: the `from` key of the shot by default.
  * @returns The vertical field of view, in degrees.
  */
 function writeShotCamera(
@@ -79,8 +99,9 @@ function writeShotCamera(
   aspect: number,
   out: [number, number, number],
   look: [number, number, number],
+  from: ShotKey = shot.from,
 ): number {
-  const a: ShotKey = shot.from;
+  const a: ShotKey = from;
   const b: ShotKey = shot.to;
   const key = scratchKey;
   key.azimuth = a.azimuth + (b.azimuth - a.azimuth) * u;
@@ -90,7 +111,8 @@ function writeShotCamera(
   if (shot.kind === 'wide') {
     // The landscape and portrait rules (design 4.5). The larger zoom of the two keys is the zoom
     // of the variant.
-    const wide = wideView(key.azimuth, key.elevation, key.zoom, Math.max(a.zoom, b.zoom), aspect);
+    const variant = Math.max(shot.from.zoom, b.zoom);
+    const wide = wideView(key.azimuth, key.elevation, key.zoom, variant, aspect);
     key.azimuth = wide.azimuth;
     key.elevation = wide.elevation;
     key.zoom = wide.zoom;
@@ -99,6 +121,22 @@ function writeShotCamera(
   writeKeyPosition(shot.target, key.azimuth, key.elevation, distance, out);
   writeLookPoint(out, shot.target, shot.composition, key.fov, aspect, look);
   return key.fov;
+}
+
+/**
+ * Writes the first key of the establishing move ({@link ESTABLISH_MOVE}): the `from` key of the
+ * opening shot, higher and farther.
+ *
+ * @param from The `from` key of the opening shot: the default view.
+ * @returns The key.
+ */
+function establishFrom(from: ShotKey): ShotKey {
+  const key = establishKey;
+  key.azimuth = from.azimuth;
+  key.elevation = from.elevation + ESTABLISH_MOVE.riseDeg * MathUtils.DEG2RAD;
+  key.zoom = from.zoom * ESTABLISH_MOVE.pullBack;
+  key.fov = from.fov;
+  return key;
 }
 
 /**
@@ -123,7 +161,8 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    start point. While paused, the time is the song time.
  * 3. The shot of the time moves from its `from` key to its `to` key with a smoothstep. With
  *    `still`, it holds its `from` key. A wide shot follows the landscape rule and the portrait
- *    rule of design 4.5.
+ *    rule of design 4.5. With no `still`, the opening shot starts higher and farther
+ *    ({@link ESTABLISH_MOVE}).
  * 4. In the blend time after its start, the shot blends from the end camera of the previous
  *    shot. With `still`, each cut is hard.
  * 5. The factor of the beam opacity comes from the kind of the shot, so it is constant in a
@@ -172,7 +211,9 @@ export function cameraAt(
   const moveStart = Math.max(current.startSec, 0);
   const span = current.moveEndSec - moveStart;
   const u = still || span <= 0 ? 0 : smoothstep((time - moveStart) / span);
-  out.fov = writeShotCamera(plan, current, u, aspect, out.position, out.target);
+  // The opening shot is the first shot, from `-Infinity` (design 5.6).
+  const from = i === 0 && !still ? establishFrom(current.from) : current.from;
+  out.fov = writeShotCamera(plan, current, u, aspect, out.position, out.target, from);
   out.beam = SHOT_BEAM_OPACITY[current.kind];
   out.light = SHOT_LIGHT[current.kind];
   out.spot = SHOT_SPOT[current.kind];

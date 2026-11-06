@@ -781,9 +781,14 @@ times its width. Thus a close shot fits the width of its subject with the shot s
 
 **Cuts and choice.** A cut falls on a downbeat or on the middle beat of a bar, with a bonus for a
 phrase line (`CUT_BONUS`). The camera films the player who just started to play: a cut at an
-entry gets the largest bonus. The first shot starts at the default view, as the establishing shot
-of a concert film, and it cranes down to the low wide view while it pushes in and zooms in to
-`WIDE_FOV`. The last shot cranes up from the low wide view into the default view, so a play from
+entry gets the largest bonus. The first shot is the establishing shot of a concert film. In the
+plan, it starts at the default view, and it cranes down to the low wide view while it pushes in and
+zooms in to `WIDE_FOV`. `cameraAt()` starts it higher and farther than the default view
+(`ESTABLISH_MOVE`), so the move reveals the whole orchestra over the opening bars. The picture
+fades in from black at the play (2.5), so the jump from the first screen does not show. The end
+key does not change, so the shots after the opening do not change. The first camera is farther
+from each animal than the default view, so the distance floor holds. With reduced motion, the
+opening holds the default view, as the plan says. The last shot cranes up from the low wide view into the default view, so a play from
 the start after the end makes no cut. The planner reads the music after the cut (`MUSIC_RULES`): the share of each group, the
 entries, a tutti, and the lead, because a concert film follows the melody. Then these rules apply,
 in this order (`CHOICE_WEIGHTS`, `SHOT_TIMES`):
