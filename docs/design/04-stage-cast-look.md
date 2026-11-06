@@ -200,7 +200,11 @@ Reason: a short clip of the root into the trunk looks better than a gap or a not
 top of the gap under each root was then a flat ledge from the trunk to the flipper. A second copy
 merges the inner vertices of the lowest free ring into the ring above them, so that the top of the
 gap is a crease with no flat face (`penguin-arms-crease.glb`). Reason: a move of these vertices onto
-the trunk wall left a shallow slope and a dent at the back of the root. The old faces keep their colors, so that the black and white edge of the trunk stays.
+the trunk wall left a shallow slope and a dent at the back of the root. A point edit can also move a
+vertex of a source copy. The rig then reads the moves (`weightMoves`), so that the vertex keeps its
+weight row. The dog copy moves the top front corner of each round inner arm to the edge of the
+trunk hole, so that the arm meets the cap of the cut in a crease (`dog-arms-clip.glb`). Reason: the
+gap between that corner and the cap showed as a deep notch at the top of the armpit. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of

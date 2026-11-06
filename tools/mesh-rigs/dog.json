@@ -1,6 +1,8 @@
 {
-  "source": "assets/models/dog/dog-arms.glb",
-  "sourceNote": "A copy of assets/models/dog/dog-patch.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.35 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.35 makes these faces. The other faces and dog-patch.glb stay unchanged.",
+  "source": "assets/models/dog/dog-arms-clip.glb",
+  "sourceNote": "A copy of assets/models/dog/dog-arms.glb with the arm roots at the trunk: point edits in Blender move the top front corner of the round inner side of each arm and the inner vertex below it toward the trunk, so that the arm meets the cap of the cut in a crease with no notch (assets/models/dog/README.md, dog-arms-clip.json). dog-arms.glb is a copy of assets/models/dog/dog-patch.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.35 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.35 makes these faces. The other faces and dog-patch.glb stay unchanged.",
+  "weightMoves": "assets/models/dog/dog-arms-clip.json",
+  "weightMovesNote": "The moves of the point edits. Each moved vertex takes the weights of its place in dog-arms.glb, the place that dog-weights.json knows (weight_places() of tools/blender/rig_mesh.py).",
   "armSource": "assets/models/dog/dog-patch.glb",
   "armSourceNote": "The dog mesh with one local edit (assets/models/dog/README.md). The faces that join each arm to the trunk below the cut top go, and a round patch of new vertices closes the inner side of each arm (tools/blender/arm_patch.py), so that the raised cello arms do not stretch the shoulder seam into flat shards. tools/blender/arm_rebuild.py reads it.",
   "paintedWeights": "assets/models/dog/dog-weights.json",
