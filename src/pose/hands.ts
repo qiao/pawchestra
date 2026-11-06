@@ -170,7 +170,8 @@ export const HANDS_HOLDS = {
   // in the lowering, and 0.15 H 1.1 cm. With the paws in the lap, an arc of 0.5 H out stands the
   // upper arms 61° out from the trunk in the lift. With no arc out, they stand out at most as far
   // as in a play. On the low bench, an arc 0.4 H up twists the paws up to 42° on the forearms in
-  // the lift, and 0.2 H up 28°.
+  // the lift, and 0.2 H up 28°. With the paws on the belly of the hand rig, arcs of 0 to 0.3 H out,
+  // up, or forward give the same depths in the lift and the lowering (`pnpm pose-depth pianist`).
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
@@ -202,27 +203,34 @@ export const HANDS_HOLDS = {
     // with a slight lean toward the piano, the head is up, and the hands rest in the lap
     // (`docs/reference/piano-technique.md`, section 8). The head lifts against the rest lean
     // (`restHeadLift`), so the gaze is level and the face shows over the lid. The round belly of
-    // the T-pose polar bear covers its short thighs, so the paws lie in the lap in front of the
-    // lower belly, over the thighs, with the palms down and the fingers forward and in. On the low
-    // bench, paws on the belly go 3 cm into it, and the left shoulder folds more faces than on a
-    // high bench. Paws 0.8 H in front of the lap point keep off the belly on the short thighs of
-    // the mesh: at 0.6 H, the shoulders fold 4 and 3 more faces. Rest elbows that point out and
-    // down, near the elbows of the play, keep the paws from a twist in the lift. The right paw lies
-    // higher than the left paw: a lower right paw folds up to 6 more faces at the right shoulder
-    // (`pnpm arm-check`, limit 8).
+    // the polar bear covers its thighs to the knees, and the thigh tops stand about 0.9 m from the
+    // shoulders, out of the reach of the arms (0.66 m to the palm). So the paws rest on the front
+    // of the belly, at its widest, with the palms back and down on it and the fingers in toward
+    // each other, as a hand rests on a round belly. The vertical line through the lap place finds
+    // the top of the belly over the knee (`along` 1, about 1.0 m high), and the paws lie 0.42 H in
+    // front of it and a little lower. On the shorter lines of `along` 0.45 to 0.7, the right line
+    // meets the top of the chest and the left line misses the leg, so the old paws stood in the air
+    // beside the face and near the knee. With the palms down, the forearms go 4.7 cm into the belly
+    // at rest, and with the palms back 1.1 cm, the upper arms none (`pnpm pose-depth pianist`).
+    // Paws 0.35 H in front of the belly top put the forearms 3.3 cm into it, and paws 0.6 H in
+    // front stand over the front edge of the keys, in the air. The rest elbows point out and a
+    // little back: elbows that point out, 0.3 down, and 0.4 back put the forearms 3.5 cm and the
+    // upper arms 0.4 cm into the belly. At rest, the right shoulder folds no face (13 before), and
+    // the left paw swings 57° from the straight paw of the source (73° before,
+    // `pnpm arm-check pianist`, limit 70°).
     restL: {
       kind: 'lap',
-      lap: { along: 0.45, offset: [0.03, 0.08, -0.8] },
-      palm: [0.15, -1, 0.1],
-      fingers: [0.5, 0, -1],
-      pole: [-1, -0.8, 0.2],
+      lap: { along: 1, offset: [0.14, -0.05, -0.42] },
+      palm: [0.3, -0.6, 1],
+      fingers: [1, -0.3, 0],
+      pole: [-1, 0, 0.3],
     },
     restR: {
       kind: 'lap',
-      lap: { along: 0.45, offset: [-0.03, 0.21, -0.87] },
-      palm: [-0.15, -1, 0.1],
-      fingers: [-0.5, 0, -1],
-      pole: [1, -0.8, 0.2],
+      lap: { along: 1, offset: [-0.14, -0.05, -0.42] },
+      palm: [-0.3, -0.6, 1],
+      fingers: [-1, -0.3, 0],
+      pole: [1, 0, 0.3],
     },
   },
   // The pose follows a harpist (`docs/reference/harp-technique.md`): the left hand plays the bass

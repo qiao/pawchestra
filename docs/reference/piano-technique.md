@@ -200,9 +200,8 @@ The app follows these facts:
 - **The keys (section 7).** Each of the 88 keys goes down with its notes (`buildKeyTrack()` and
   `keyLevelsAt()` of `src/pose/piano-keys.ts`). A key turns around a line under the balance rail
   (`PIANO.balanceRail`), so its front goes down by the key dip (`PIANO.keyDip`) and its back less.
-- **The rest (section 8).** The trunk sits tall, and the paws rest in the lap (`restL`,
-  `restR`). The round belly covers the short thighs, so the paws lie in front of the lower belly,
-  over the thighs, with the palms down. The head lifts against the rest lean (`restHeadLift`), so
+- **The rest (section 8).** The trunk sits tall, the shoulders stay down, and the elbows are relaxed
+  out from the trunk. The head lifts against the rest lean (`restHeadLift`), so
   the gaze is level and the face shows over the lid.
 
 The app does not follow these facts:
@@ -215,6 +214,9 @@ The app does not follow these facts:
   (`KEY_MOTION.repeatShare`).
 - **The key bed (section 7).** The claws stay at the key surface and do not follow a pressed key
   down.
+- **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
+  thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
+  widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.
 
 ## 10. Sources
 

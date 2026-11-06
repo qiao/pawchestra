@@ -250,8 +250,9 @@ The rest of each family:
   of its own, the right hand turned about 180° from the rest to the play, and each mix of the move
   turned the right paw past 180° on its forearm. The elbows point out and down.
 - **Piano and harp.** The polar bear sits tall with a small lean to the piano and the head up, as
-  a pianist before a performance, with the paws in front of the lower belly (`restLean`). The
-  deer sits up with each hand near a string.
+  a pianist before a performance (`restLean`). The paws rest on the front of the belly with the
+  palms back, because the belly covers the thighs and the thighs lie out of the reach of the arms.
+  The deer sits up with each hand near a string.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
   rest level across the waist, as a snare drummer between entries (`PercussionHold.set`).
