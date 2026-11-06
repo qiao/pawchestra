@@ -131,9 +131,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    (`upper_twist()`), and the file names the share for `pnpm studio-body`.
 9. With `thumbs` of the config, add a thumb bone to each paw (`thumb_bones()`): a child of the
    paw from the root of the free thumb to its tip, which turns with the paw in the bind and in the
-   clip `reference`. Each vertex of `free` gives its share of the paw and the fingers to the
-   thumb, and each vertex of `root` half of that share. The shares of the wrist helper and the
-   forearm segments stay. The file names the close axis of each thumb in the bind pose for
+   clip `reference`. Each vertex of `free` gives its share of the paw to the thumb. The shares of
+   the fingers, the wrist helper, and the forearm segments stay, so that the skin of the play does
+   not change. The file names the close axis of each thumb in the bind pose for
    `pnpm studio-body`.
 10. Write the GLB file with the code of this script: the materials `fur` and `gloss`, the skinned
    mesh with its morph targets, the skeleton, the clip `reference` with one key, and the facts that `pnpm studio-body` reads in the extras of the asset. The file
@@ -1325,11 +1325,12 @@ SEGMENTS_OF = {
 def thumb_bones(rule, weights, heads, long_heads, turns, bind_heads, palm):
     """Adds the thumb bone of each paw (`thumbs` of the config, design 4.4). The rule gives for
     each side the head and the tail of the thumb and its close axis, in the units and the axes of
-    the source, and the welded source vertices of the free thumb (`free`) and of the ring at its
-    root (`root`). The thumb takes the turn of the paw in the bind and in the clip `reference`, so
-    that the skin of the rig does not change: each vertex of `free` gives all of its share of the
-    paw and the fingers to the thumb, and each vertex of `root` half of it, in whole steps. The
-    paw keeps the other half. The shares of the wrist helper and the forearm segments stay. Gives
+    the source, and the welded source vertices of the free thumb (`free`). The thumb takes the
+    turn of the paw in the bind and in the clip `reference`, so that the skin of the rig does not
+    change: each vertex of `free` gives all of its share of the paw to the thumb. The shares of
+    the fingers, the wrist helper, and the forearm segments stay, so that a pose with no thumb
+    bend moves each vertex as before. A ring of half shares at the root of the thumb would need a
+    fifth bone on the vertices there, so the root has none. Gives
     the weights with a column for each thumb, the source frame, the long-armed source head, the
     bind head, and the bind frame of each thumb, and the unit close axis of each thumb in the
     bind."""
@@ -1338,7 +1339,7 @@ def thumb_bones(rule, weights, heads, long_heads, turns, bind_heads, palm):
     out = {'src_frames': {}, 'long_heads': {}, 'bind_heads': {}, 'bind_frames': {}, 'axes': {}}
     for side in 'LR':
         own = rule[side]
-        hand, fingers, thumb = f'hand_{side}', f'fingers_{side}', f'thumb_{side}'
+        hand, thumb = f'hand_{side}', f'thumb_{side}'
         head, tail = np.asarray(own['head'], float), np.asarray(own['tail'], float)
         roll = mirrored(palm) if side == 'R' else palm
         out['src_frames'][thumb] = frame(head, tail, roll)
@@ -1346,19 +1347,12 @@ def thumb_bones(rule, weights, heads, long_heads, turns, bind_heads, palm):
         out['bind_heads'][thumb] = bind_heads[hand] + turns[hand] @ (head - heads[hand])
         out['bind_frames'][thumb] = turns[hand] @ out['src_frames'][thumb]
         out['axes'][side] = unit(turns[hand] @ unit(own['axis']))
-        for share, vertices in ((1, own['free']), (0.5, own['root'])):
-            for v in vertices:
-                steps = np.rint(weights[v] * WEIGHT_STEPS).astype(int)
-                paw = steps[col[hand]] + steps[col[fingers]]
-                if paw == 0:
-                    raise SystemExit(f'thumbs {side}: the vertex {v} has no share of the paw.')
-                moved = int(paw * share)
-                steps[col[thumb]] = moved
-                steps[col[hand]] = paw - moved
-                steps[col[fingers]] = 0
-                weights[v] = steps / WEIGHT_STEPS
-        log(f"thumbs {side}: {len(own['free'])} free vertices and {len(own['root'])} root "
-            f"vertices on {thumb}, the close axis in the bind "
+        for v in own['free']:
+            if weights[v, col[hand]] == 0:
+                raise SystemExit(f'thumbs {side}: the vertex {v} has no share of the paw.')
+            weights[v, col[thumb]] = weights[v, col[hand]]
+            weights[v, col[hand]] = 0.0
+        log(f"thumbs {side}: {len(own['free'])} vertices on {thumb}, the close axis in the bind "
             f"{[round(float(x), 4) for x in out['axes'][side]]}")
     return weights, out
 
