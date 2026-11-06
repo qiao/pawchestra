@@ -114,8 +114,8 @@ export interface HandNote {
  * equal intervals, the one nearer to the middle of the chord splits it. A chord within one octave
  * goes to one hand. A chord far above the reach of the left hand goes to the right hand, and a
  * chord far below the reach of the right hand goes to the left hand, so that a melody changes
- * hands where one hand cannot cross over the other. These two rules also give a wide chord to one hand when
- * all its keys are past the reach of the other hand.
+ * hands where one hand cannot cross over the other. These two rules also give a wide chord to one
+ * hand when all its keys are past the reach of the other hand.
  *
  * With a distance `apart`, the middles of the keys of the two hands stay at least that far apart,
  * because two wide paws on near keys go into each other. When the middles of the two parts of a
@@ -292,9 +292,9 @@ interface PlanStep {
  * notes. A chord wider than one octave with a cut ({@link wideChordCut}) goes to both hands. A
  * chord within one octave goes to either hand that reaches it, or that plays at most
  * {@link PLAN_REACH_SLACK} keys past its reach at a cost for each key. A dynamic program finds
- * the hands of the lowest cost: for each move of a palm, the square of its distance in semitones over its
- * time. Thus a fast move costs more than a slow one, as its speed is higher, and a move of a hand
- * out of the way of the other hand counts too. The search keeps the best way to play the chords
+ * the hands of the lowest cost: for each move of a palm, the square of its distance in semitones
+ * over its time. Thus a fast move costs more than a slow one, as its speed is higher, and a move
+ * of a hand out of the way of the other hand counts too. The search keeps the best way to play the chords
  * up to each chord for each hand of the chord. At the same cost, a chord goes to the nearer hand,
  * and at the same distance to the right hand from middle C up, and to the left hand below.
  *
