@@ -1,4 +1,4 @@
-import { Color, MathUtils, SpotLight, Vector2, Vector3 } from 'three';
+import { Color, MathUtils, SpotLight, Vector2, Vector3, Vector4 } from 'three';
 import type { Object3D, PerspectiveCamera } from 'three';
 
 import type { UvRect } from './letterbox.ts';
@@ -56,6 +56,33 @@ export const LENS_FLARE = {
    * in front of the light hides the part of the samples that it covers.
    */
   occluder: 0.015,
+  /**
+   * The light of the bloom chain above which a bright part of the image, such as a lamp of the
+   * hall, gives a lamp flare, in linear values. The bloom chain also holds a small part of all
+   * light (`POST_LOOK.diffusion`), and the threshold keeps the lit fur out of the flare.
+   */
+  lampThreshold: 0.1,
+  /**
+   * The ghosts of the bright parts: the scale of their image through the optical middle of the
+   * image, and the light of the ghost for each unit of the light above the threshold. A negative
+   * scale mirrors the image through the middle. The ghosts take the colors of
+   * {@link LENS_FLARE}.ghostColors.
+   */
+  lampGhosts: [
+    [-0.55, 0.05],
+    [-1.25, 0.03],
+    [0.45, 0.04],
+  ],
+  /**
+   * The halo: a bright part near the middle of the image gives a soft ring of this radius around
+   * it, in frame heights, and the light of the ring for each unit of light above the threshold.
+   */
+  lampHalo: [0.42, 0.03],
+  /**
+   * The starburst of the aperture blades around each bright part: the length of each of the six
+   * rays, in frame heights, and the light of the rays for each unit of light above the threshold.
+   */
+  lampStar: [0.05, 0.15],
 } as const;
 
 /** The number of lights that give a flare in one frame: the strongest ones. */
@@ -307,4 +334,89 @@ export function writeFlare(
   }
   uniforms.uFlareDepthOn.value = depth ? 1 : 0;
   uniforms.uFlareOccluder.value = look.occluder;
+}
+
+/**
+ * The uniforms of the pass of the lamp flare (`LAMP_FLARE_FRAGMENT` of `post-shaders.ts`): the
+ * flare of the bright parts of the image, such as the lamps of the hall.
+ */
+export interface LampFlareUniforms {
+  /** The frame on the canvas: left, bottom, right, top, in texture coordinates. */
+  readonly uFrame: { value: Vector4 };
+  /** The optical middle of the image, in texture coordinates of the canvas. */
+  readonly uCenter: { value: Vector2 };
+  /** The width of the canvas divided by its height. */
+  readonly uAspect: { value: number };
+  /** The threshold of the bright parts ({@link LENS_FLARE}.lampThreshold). */
+  readonly uThreshold: { value: number };
+  /** The scale and the light of each ghost, times the strength, two numbers each. */
+  readonly uGhost: { value: Float32Array };
+  /** The linear color of each ghost, three numbers each. */
+  readonly uGhostColor: { value: Float32Array };
+  /** The radius and the light of the halo, times the strength. */
+  readonly uHalo: { value: Vector2 };
+  /** The length and the light of the starburst, times the strength. */
+  readonly uStar: { value: Vector2 };
+}
+
+/**
+ * Gives the number of ghosts of the lamp flare, for the arrays of its shader.
+ *
+ * @returns The number of ghosts of {@link LENS_FLARE}, at least 1.
+ */
+export function lampGhostCount(): number {
+  return Math.max(1, LENS_FLARE.lampGhosts.length);
+}
+
+/**
+ * Creates the uniforms of the pass of the lamp flare, with no light.
+ *
+ * @returns The uniforms.
+ */
+export function createLampFlareUniforms(): LampFlareUniforms {
+  const ghosts = lampGhostCount();
+  return {
+    uFrame: { value: new Vector4(0, 0, 1, 1) },
+    uCenter: { value: new Vector2(0.5, 0.5) },
+    uAspect: { value: 1 },
+    uThreshold: { value: LENS_FLARE.lampThreshold },
+    uGhost: { value: new Float32Array(2 * ghosts) },
+    uGhostColor: { value: new Float32Array(3 * ghosts) },
+    uHalo: { value: new Vector2() },
+    uStar: { value: new Vector2() },
+  };
+}
+
+/**
+ * Writes the lamp flare of a frame into the uniforms of its pass (design 4.5, post effects). It
+ * reads the look values at each call, so that the look override of the dev server reaches them.
+ *
+ * @param uniforms The uniforms of {@link createLampFlareUniforms}.
+ * @param camera The camera of the frame, with the projection of the frame.
+ * @param rect The part of the canvas that shows the scene, or `null` for the full canvas.
+ * @param aspect The width of the canvas divided by its height.
+ */
+export function writeLampFlare(
+  uniforms: LampFlareUniforms,
+  camera: PerspectiveCamera,
+  rect: UvRect | null,
+  aspect: number,
+): void {
+  const look = LENS_FLARE;
+  const strength = look.strength;
+  uniforms.uFrame.value.set(rect?.left ?? 0, rect?.bottom ?? 0, rect?.right ?? 1, rect?.top ?? 1);
+  const p = camera.projectionMatrix.elements;
+  uniforms.uCenter.value.set((1 - (p[8] ?? 0)) / 2, (1 - (p[9] ?? 0)) / 2);
+  uniforms.uAspect.value = aspect;
+  uniforms.uThreshold.value = look.lampThreshold;
+  const ghosts = uniforms.uGhost.value;
+  const colors = uniforms.uGhostColor.value;
+  for (let i = 0; i < ghosts.length / 2; i++) {
+    const [scale = 1, light = 0] = look.lampGhosts[i] ?? [];
+    ghosts[i * 2] = scale;
+    ghosts[i * 2 + 1] = light * strength;
+    ghostColor.set(look.ghostColors[i] ?? '#ffffff').toArray(colors, i * 3);
+  }
+  uniforms.uHalo.value.set(look.lampHalo[0], look.lampHalo[1] * strength);
+  uniforms.uStar.value.set(look.lampStar[0], look.lampStar[1] * strength);
 }
