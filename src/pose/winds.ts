@@ -856,7 +856,6 @@ const MOUSE_OBOE = {
   poleR: [0.5, -1, -0.5],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0, 0],
   gripShiftL: [0.05, 0.06, -0.05],
   gripShiftR: [0.15, 0.06, -0.05],
   restAim: 1,
@@ -1074,9 +1073,7 @@ const WOLF_CLARINET_FORWARD = 5;
  * spare, and the mouthpiece goes 1.2 cm into the head.
  *
  * Both elbows point down and a little out, as a seated clarinetist lets the arms hang near the
- * body, in the play. Of 4 elbow directions, this one gives the smallest paw turns on the forearms:
- * with the elbows of {@link WIND_HOLDS}, the right paw turns 141° and the left paw 123°, and with
- * these elbows 71° and 89°.
+ * body, in the play.
  *
  * At rest, the clarinet stands upright, in front of the belly between the knees, with the bell at
  * the height of the knee tops, 4 cm to the right of the middle and 22 cm in front of the seat. Both
@@ -1099,23 +1096,11 @@ const WOLF_CLARINET = {
   restArms: null,
   restFreeL: null,
   aimSigns: null,
-  reach: 35 * MathUtils.DEG2RAD,
-  reachL: 20 * MathUtils.DEG2RAD,
   lipShift: [0, -0.18, 0.4],
   play: holdTurn(WOLF_CLARINET_FORWARD, 0),
-  rest: holdTurn(-25, 0),
   restShift: [0.11, -0.56, -0.086],
-  poleL: [-0.3, -1, 0],
-  poleR: [0.3, -1, 0],
   restPoleL: [-1.5, -1.4, 0],
   restPoleR: [0.5, -1, -0.1],
-  faceTube: ['palm', 'palm'],
-  aimAcross: 1,
-  aimSide: [0.25, 0.25],
-  gripShiftL: [0.15, 0.14, -0.11],
-  gripShiftR: [0.05, 0.19, -0.11],
-  restAim: 1,
-  gripCurl: curls(115, 115),
 } as const satisfies WindHold;
 
 /**
