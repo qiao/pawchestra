@@ -213,7 +213,7 @@ class FakeWorker {
   /** Sends the progress of a request: the files that are ready, and the bytes that arrived. */
   progress(request: DecodeRequest, done: number, bytes = 0): void {
     this.#listeners.get('message')?.({
-      data: { type: 'progress', id: request.id, done, total: request.urls.length, bytes },
+      data: { type: 'progress', id: request.id, done, bytes },
     });
   }
 

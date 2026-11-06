@@ -28,13 +28,12 @@ async function fetchPcm(url: string, onBytes: (bytes: number) => void): Promise<
  * reply.
  */
 async function decode(request: DecodeRequest): Promise<void> {
-  const total = request.urls.length;
   let done = 0;
   let bytes = 0;
   let repliedAt = 0;
   const sendProgress = (): void => {
     repliedAt = performance.now();
-    reply({ type: 'progress', id: request.id, done, total, bytes });
+    reply({ type: 'progress', id: request.id, done, bytes });
   };
   const addBytes = (count: number): void => {
     bytes += count;
