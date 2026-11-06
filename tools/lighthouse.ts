@@ -8,7 +8,7 @@
 // text types, ETag, and the headers of `vercel.json`, at 40 Mbit/s (`LOCAL_NETWORK`). Then the
 // scores and the metrics of the mobile and the desktop preset are near those of the live site.
 // `--url` audits a live site, such as
-// https://www.zoophony.com/. The pinned Lighthouse of `package.json` runs in headless Chrome with
+// https://www.pawchestra.com/. The pinned Lighthouse of `package.json` runs in headless Chrome with
 // the default simulated throttle of each preset: mobile (a Moto G Power on slow 4G with a 4x CPU)
 // and desktop. `--preset` runs one preset, and `--desktop` is short for `--preset desktop`. Each
 // preset runs `--runs` times (3 by default), and the tool keeps the median run of Lighthouse: the

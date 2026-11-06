@@ -153,7 +153,7 @@ These rules hold for each test:
   shot of `pnpm frozen`.
 - A load round measures the times of the app with `pnpm load-probe`, and the scores and the metrics
   of Lighthouse with `pnpm lighthouse`. Use the saved tool, because the Lighthouse of the
-  chrome-devtools MCP server has no performance category. `--url https://www.zoophony.com/` audits
+  chrome-devtools MCP server has no performance category. `--url https://www.pawchestra.com/` audits
   the live site. Use `--quick` while you change the page, and the default runs for a report.
 - A round runs no frame measure unless the user or the manager asks for one (design 9.7). A speed
   change still gives its own table in its commit message.

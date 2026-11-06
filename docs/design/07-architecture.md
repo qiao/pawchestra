@@ -222,7 +222,7 @@ rights, so they need no entry.
 
 ## 7.4 Search and share
 
-The main URL of the site is `https://www.zoophony.com/` (`SITE_URL` of `app/page-title.ts`). The
+The main URL of the site is `https://www.pawchestra.com/` (`SITE_URL` of `app/page-title.ts`). The
 plugin `INDEX_VALUES` of `vite.config.ts` writes the texts of this section into `index.html` from
 the constants of `app/page-title.ts`, so that the page and the app cannot differ.
 

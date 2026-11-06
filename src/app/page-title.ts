@@ -8,7 +8,7 @@ export const APP_NAME = 'Pawchestra';
  * The URL of the start page on the main host (design 7.4). Each build names it as the canonical
  * URL, also the build for GitHub Pages.
  */
-export const SITE_URL = 'https://www.zoophony.com/';
+export const SITE_URL = 'https://www.pawchestra.com/';
 
 /**
  * The title of the start page (design 7.4): the name of the app and the words that people search

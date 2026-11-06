@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.zoophony.com/sitemap.xml
+Sitemap: https://www.pawchestra.com/sitemap.xml

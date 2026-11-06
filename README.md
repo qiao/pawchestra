@@ -2,7 +2,7 @@
 
 Zoophony is a WebGL MIDI player. An orchestra of 3D animals plays the music on a small stage.
 
-Live site: <https://www.zoophony.com/>
+Live site: <https://www.pawchestra.com/>
 
 ![Zoophony](docs/zoophony.png)
 
@@ -13,7 +13,7 @@ Live site: <https://www.zoophony.com/>
   the fingers, the bow strokes, the breaths, the mallet strokes, and the keys.
 - **Your own MIDI files.** Drop a `.mid` file onto the window, or select one of the built-in
   public domain pieces. A link with `#demo=<id>` opens a demo, for example
-  <https://www.zoophony.com/#demo=bach-bwv1047>.
+  <https://www.pawchestra.com/#demo=bach-bwv1047>.
 - **SoundFont synth.** An AudioWorklet plays the instruments from a SoundFont, with the reverb of
   a real concert hall.
 - **Camera.** Select the cinematic camera, which follows the sections that play, or the free
@@ -76,7 +76,7 @@ music with a lower visual quality.
 The site counts the page views with Vercel Web Analytics, which sets no cookies and stores no
 personal identifier. The site has no service worker. A MIDI file that you open stays on your
 device: the app sends it to no server. The page
-[`/privacy`](https://www.zoophony.com/privacy) of the live site gives the same facts.
+[`/privacy`](https://www.pawchestra.com/privacy) of the live site gives the same facts.
 
 ## Technology
 
