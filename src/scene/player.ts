@@ -13,7 +13,7 @@ import type { Matrix4Tuple, MeshStandardMaterial, Object3D } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { MeshData } from '../models/mesh.ts';
-import type { PianoKeys } from '../models/instruments/hold.ts';
+import type { HarpStrings, PianoKeys } from '../models/instruments/hold.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { Support } from '../models/props.ts';
@@ -37,6 +37,8 @@ import type { Skeleton as PlayerSkeleton } from '../models/rig.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { createGeometry } from './geometry.ts';
 import { createDepthGeometry, shareCorners } from './shared-corners.ts';
+import { createStringBands, updateStringBands } from './harp-strings.ts';
+import type { StringBands } from './harp-strings.ts';
 
 /**
  * Creates the geometry of a player model with a studio body (design 4.4): the body in the bind
@@ -78,10 +80,10 @@ function* createPlayerGeometrySteps(model: PlayerModel): Steps<BufferGeometry> {
   );
   // The moves add to the bind places, as in a glTF file.
   geometry.morphTargetsRelative = true;
-  // The keys of a keyboard move by their ranges of corners (`PianoKeys.corners`), so a geometry
-  // with keys keeps one vertex for each corner, and each player with keys gets its own depth
-  // geometry ({@link keyGeometry}).
-  if (!model.keys) {
+  // The keys of a keyboard and the strings of a harp move by their ranges of corners
+  // (`PianoKeys.corners`, `HarpStrings.corners`), so such a geometry keeps one vertex for each
+  // corner, and each such player gets its own depth geometry ({@link ownGeometry}).
+  if (!model.keys && !model.strings) {
     yield;
     createDepthGeometry(geometry);
     yield;
@@ -355,16 +357,38 @@ interface KeyMesh {
 const keyMeshes = new WeakMap<SkinnedMesh, KeyMesh>();
 
 /**
- * Creates the geometry of one player with a keyboard: a position attribute of its own, because
- * two players of one model play different notes, and each other attribute and the morph
- * attributes of the shared geometry (design 4.6). The attribute names stay the same, so the mesh
- * keeps the program variant of the shared geometry, and it adds no draw call.
+ * The strings of a player mesh with a harp, which {@link applyPose} moves (design 4.6, 5.3): the
+ * bands of the swinging strings, and the parts of the strings, which close onto their lines while
+ * their bands show.
+ */
+interface StringMesh {
+  readonly bands: StringBands;
+  /** The geometry that the players of the model share. Its positions are the bind places. */
+  readonly shared: BufferGeometry;
+  /** The bind places of the corners: the positions of {@link StringMesh.shared}. */
+  readonly bind: Float32Array;
+  /** The positions of the mesh, with the closed strings. */
+  readonly position: BufferAttribute;
+  /** The point on the line of its string of each corner of the strings, from the first string. */
+  readonly lines: Float32Array;
+  /** 1 for each string whose part is closed in {@link StringMesh.position}. */
+  readonly closed: Uint8Array;
+}
+
+/** The player meshes with a harp. */
+const stringMeshes = new WeakMap<SkinnedMesh, StringMesh>();
+
+/**
+ * Creates the geometry of one player with keys or strings that move: a position attribute of its
+ * own, because two players of one model play different notes, and each other attribute and the
+ * morph attributes of the shared geometry (design 4.6). The attribute names stay the same, so the
+ * mesh keeps the program variant of the shared geometry, and it adds no draw call.
  *
  * @param shared The geometry that the players of the model share.
  * @returns The geometry of the player.
  * @throws Error if the shared geometry has no positions of 32-bit floats.
  */
-function keyGeometry(shared: BufferGeometry): BufferGeometry {
+function ownGeometry(shared: BufferGeometry): BufferGeometry {
   const geometry = new BufferGeometry();
   for (const [name, attribute] of Object.entries(shared.attributes)) {
     if (name !== 'position') {
@@ -388,20 +412,50 @@ function keyGeometry(shared: BufferGeometry): BufferGeometry {
 }
 
 /**
- * Gives the geometry that the players of the model of a mesh share. A player with a keyboard has
- * a geometry of its own ({@link keyGeometry}), with the same bind places.
+ * Gives the geometry that the players of the model of a mesh share. A player with a keyboard or a
+ * harp has a geometry of its own ({@link ownGeometry}), with the same bind places.
  *
  * @param mesh A mesh of {@link createPlayerMesh}.
  * @returns The shared geometry.
  */
 export function sharedGeometryOf(mesh: SkinnedMesh): BufferGeometry {
-  return keyMeshes.get(mesh)?.shared ?? mesh.geometry;
+  return keyMeshes.get(mesh)?.shared ?? stringMeshes.get(mesh)?.shared ?? mesh.geometry;
+}
+
+/**
+ * Gives the point on the line of its string of each corner of the strings of a harp (design
+ * 4.6), in the bind pose: the place of the corner when the part of its string closes.
+ *
+ * @param strings The strings of the player model.
+ * @param bind The bind places of the corners.
+ * @returns Three numbers for each corner of the strings, from the first corner of the first
+ *   string.
+ */
+function stringLinePoints(strings: HarpStrings, bind: Float32Array): Float32Array {
+  const start = strings.corners[0] ?? 0;
+  const end = strings.corners[strings.lines.length] ?? start;
+  const out = new Float32Array((end - start) * 3);
+  for (const [i, line] of strings.lines.entries()) {
+    const [bx, by, bz] = line.bottom;
+    const [tx, ty, tz] = line.top;
+    const length = Math.hypot(tx - bx, ty - by, tz - bz);
+    const [ux, uy, uz] = [(tx - bx) / length, (ty - by) / length, (tz - bz) / length];
+    for (let c = strings.corners[i] ?? 0; c < (strings.corners[i + 1] ?? 0); c++) {
+      const along =
+        ((bind[c * 3] ?? 0) - bx) * ux +
+        ((bind[c * 3 + 1] ?? 0) - by) * uy +
+        ((bind[c * 3 + 2] ?? 0) - bz) * uz;
+      out.set([bx + ux * along, by + uy * along, bz + uz * along], (c - start) * 3);
+    }
+  }
+  return out;
 }
 
 /**
  * Creates the skinned mesh of one player (design 4.4). Each player has its own bones, so that
- * each player gets its own pose. A player with a keyboard also gets its own positions, so that
- * its keys go down with its notes ({@link keyGeometry}).
+ * each player gets its own pose. A player with a keyboard or a harp also gets its own positions,
+ * so that its keys go down with its notes, and its strings close while their bands show
+ * ({@link ownGeometry}). The bands of a harp are a child of the mesh ({@link createStringBands}).
  *
  * @param model The player model of `models/`.
  * @param geometry The geometry of the model, from {@link createPlayerGeometry}.
@@ -413,17 +467,33 @@ export function createPlayerMesh(
   geometry: BufferGeometry,
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
-  const own = model.keys ? keyGeometry(geometry) : geometry;
+  const own = model.keys || model.strings ? ownGeometry(geometry) : geometry;
   const mesh = createStudioMesh(model, model.studio, own, materials);
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
-  if (model.keys && position instanceof BufferAttribute && bind instanceof Float32Array) {
+  if (!(position instanceof BufferAttribute) || !(bind instanceof Float32Array)) {
+    return mesh;
+  }
+  if (model.keys) {
     keyMeshes.set(mesh, {
       keys: model.keys,
       shared: geometry,
       bind,
       position,
       levels: new Float32Array(model.keys.corners.length - 1),
+    });
+  }
+  const material = materials[0];
+  if (model.strings && material) {
+    const bands = createStringBands(model.strings, geometry, material);
+    mesh.add(bands.mesh);
+    stringMeshes.set(mesh, {
+      bands,
+      shared: geometry,
+      bind,
+      position,
+      lines: stringLinePoints(model.strings, bind),
+      closed: new Uint8Array(model.strings.lines.length),
     });
   }
   return mesh;
@@ -561,8 +631,8 @@ export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
 
 /**
  * Copies a pose to the bones of a player mesh: the bones of the studio body from the pose
- * ({@link applyStudioPose}), and the turns of the keys of a mesh with a keyboard
- * ({@link applyKeys}) (design 5.1).
+ * ({@link applyStudioPose}), the turns of the keys of a mesh with a keyboard ({@link applyKeys}),
+ * and the swings of the strings of a mesh with a harp ({@link applyStrings}) (design 5.1).
  *
  * @param mesh A mesh of {@link createPlayerMesh}.
  * @param pose The pose, with one rotation for each bone.
@@ -570,6 +640,76 @@ export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
 export function applyPose(mesh: SkinnedMesh, pose: AnimalPose): void {
   applyKeys(mesh, pose.keys);
   applyStudioPose(mesh, pose);
+  applyStrings(mesh, pose.strings);
+}
+
+/**
+ * Sends a range of corners of a position attribute to the GPU in the next render. A range that the
+ * renderer did not upload, for example of a culled mesh, joins the new range.
+ *
+ * @param position The positions.
+ * @param from The first corner of the range.
+ * @param to The end of the range, excluded.
+ */
+function uploadCorners(position: BufferAttribute, from: number, to: number): void {
+  let start = from;
+  let end = to;
+  const pending = position.updateRanges[0];
+  if (pending) {
+    start = Math.min(start, pending.start / 3);
+    end = Math.max(end, (pending.start + pending.count) / 3);
+    position.clearUpdateRanges();
+  }
+  position.addUpdateRange(start * 3, (end - start) * 3);
+  position.needsUpdate = true;
+}
+
+/**
+ * Moves the strings of a player mesh with a harp to the swings of a pose (design 4.6, 5.3): the
+ * bands of the swinging strings follow the bone of the strings, and the part of each swinging
+ * string closes onto its line, so that only its band shows. A still string opens again.
+ *
+ * @param mesh A mesh of {@link createPlayerMesh}. A mesh with no harp does not change.
+ * @param swings The swings of the strings, from `AnimalPose.strings`. With none, all are still.
+ */
+function applyStrings(mesh: SkinnedMesh, swings: Float32Array | null | undefined): void {
+  const own = stringMeshes.get(mesh);
+  const player = studioPlayers.get(mesh);
+  if (!own || !player) {
+    return;
+  }
+
+  const { bands, bind, position, lines, closed } = own;
+  const { strings } = bands;
+  const offset = (STUDIO_BONES.length + boneIndex(strings.bone)) * 16;
+  const shown = updateStringBands(bands, swings, player.pose.matrices, offset);
+  const out = position.array;
+  if (!(out instanceof Float32Array)) {
+    return;
+  }
+  const first = strings.corners[0] ?? 0;
+  let from = Infinity;
+  let to = -Infinity;
+  for (let i = 0; i < closed.length; i++) {
+    const close = (shown[2 * i] ?? 0) > 0 ? 1 : 0;
+    if (close === closed[i]) {
+      continue;
+    }
+    closed[i] = close;
+    const start = strings.corners[i] ?? 0;
+    const end = strings.corners[i + 1] ?? start;
+    out.set(
+      close
+        ? lines.subarray((start - first) * 3, (end - first) * 3)
+        : bind.subarray(start * 3, end * 3),
+      start * 3,
+    );
+    from = Math.min(from, start);
+    to = Math.max(to, end);
+  }
+  if (from < to) {
+    uploadCorners(position, from, to);
+  }
 }
 
 /**
@@ -636,19 +776,9 @@ function applyKeys(mesh: SkinnedMesh, levels: Float32Array | null | undefined): 
     from = Math.min(from, keys.corners[k] ?? 0);
     to = Math.max(to, keys.corners[k + 1] ?? 0);
   }
-  if (from >= to) {
-    return;
+  if (from < to) {
+    uploadCorners(position, from, to);
   }
-
-  // A range that the renderer did not upload, for example of a culled mesh, joins the new range.
-  const pending = position.updateRanges[0];
-  if (pending) {
-    from = Math.min(from, pending.start / 3);
-    to = Math.max(to, (pending.start + pending.count) / 3);
-    position.clearUpdateRanges();
-  }
-  position.addUpdateRange(from * 3, (to - from) * 3);
-  position.needsUpdate = true;
 }
 
 /**

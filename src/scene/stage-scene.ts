@@ -74,6 +74,7 @@ import {
   sharedGeometryOf,
 } from './player.ts';
 import type { PlayerSpot } from './player.ts';
+import { setBandViewHeight } from './harp-strings.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
 import type { HazeFrame, PostView, TargetFormat } from './post.ts';
 import { FRAME_VIGNETTE, POST_LOOK } from './post.ts';
@@ -863,6 +864,7 @@ export class StageScene {
     const buffer = this.#renderer.getDrawingBufferSize(new Vector2());
     this.#post?.setSize(buffer.x, buffer.y);
     this.#beamDepth.setSize(buffer.x, buffer.y);
+    setBandViewHeight(buffer.y);
     this.#view?.camera.resize(width, height);
   }
 
