@@ -108,12 +108,12 @@ page starts in Free mode (`app/camera-mode.ts`).
                     │
                     v
              +-------------+
-             |    FREE     |  orbit from the current camera
+             |    FREE     |  orbit camera
              +-------------+
                 │       ^
-   "Cinematic   │       │  drag, wheel, pinch,
-    camera", C  │       │  "Cinematic camera", C, or
-                │       │  "Reset view" (Free, default view)
+   "Cinematic   │       │  drag, wheel, pinch (at once),
+    camera", C  │       │  "Cinematic camera", C (blend), or
+    (blend)     │       │  "Reset view" (Free, default view)
                 v       │
              +-------------+
              |  CINEMATIC  |  cameraAt()
@@ -122,8 +122,9 @@ page starts in Free mode (`app/camera-mode.ts`).
 
 - The default view has the angle of view of `orchestra-latest.png` (1). It frames the used seats
   in the free area beside the open drawer (4.5).
-- **Free** is the orbit camera. It starts from the current camera, so the view does not jump. It
-  cannot go below the stage, and a zoom stops outside the box of the stage and the players.
+- **Free** is the orbit camera. After a drag, a pinch, or a wheel in Cinematic mode, it starts
+  from the current camera, so the view does not jump. It cannot go below the stage, and a zoom
+  stops outside the box of the stage and the players.
 - **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6. The first shot starts from
   the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
   at once. The change to Cinematic mode closes the drawer (2.3).
@@ -134,9 +135,28 @@ page starts in Free mode (`app/camera-mode.ts`).
   shots of 5.6 take this aspect in each view, so a piece gives the same film on each screen. The
   drawer and the bar do not move the frame. The title stands at its top-left corner (2.3). Free
   mode has no bars.
-- A change of the mode moves the bars in or out in `LETTERBOX_MOVE_MS` with a smoothstep, and at
-  once with reduced motion. The image of the camera moves with the bars, so the change has no
-  jump (`StageCamera.frameTo()`).
+- **Mode blend** (`MODE_BLEND`, `scene/mode-blend.ts`). The toggle moves the camera into the new
+  mode as a crane move of a film, with a smoothstep, because a cut from the orbit view into a
+  close shot was jarring. A blend into Cinematic mode goes to the live camera of the shots, which
+  moves on. A blend into Free mode goes back to the camera of Free mode at the last change into
+  Cinematic mode, or else to the default view.
+- The blend turns around the points that the two cameras look at. The point moves on a line, and
+  the camera moves on a sphere around it: the azimuth turns the short way, so a camera on the
+  other side of the stage goes around the players. A camera that comes nearer first turns and
+  then dollies in on the line of sight of the new camera, and a camera that goes away first
+  dollies out. The distance swells with the turn in the middle, as a crane swings out. A blend
+  with one weight for all parts came nearer than `ANIMAL_FLOOR` (5.6) to an animal in the middle
+  of many blends into a low shot. The ends keep the floor, and a few blends into a low solo or
+  section shot still come near for a short time.
+- Each change of the mode blends the bars, the field of view, the light of the shot, and the
+  focus over the same time, so the frame does not jump. The image of the camera moves with the
+  bars (`StageCamera.frameTo()`). A drag, a pinch, a wheel, or "Reset view" moves the camera at
+  once, because the user takes the camera. A drag, a pinch, or a wheel during a blend into Free
+  mode stops it, and the orbit continues from the camera on the screen.
+- Each frame of a blend moves the values on the screen a part of the rest of the way to the live
+  values (`blendShare()`). Thus a cut of the shots or a seek during the blend does not jump, and a
+  change during a blend starts a new blend from the frame on the screen. The blend runs on the wall
+  time, so it also runs during a pause.
 - On the first screen, the frame shrinks until the stage is clear of the play button (2.8). The
   frame uses the view of the stage at the default distance in the current direction, so a drag
   changes it and a zoom does not. Thus a wheel or a pinch zooms the camera there as during play,
@@ -145,7 +165,7 @@ page starts in Free mode (`app/camera-mode.ts`).
   zooms the camera. The root takes `touch-action: pan-x pan-y`, and the app stops the gesture
   events of Safari, which does not obey that rule for a pinch.
 - With reduced motion, Free mode has no inertia, a shot holds its first camera with no drift
-  (5.6), and each transition is a hard cut.
+  (5.6), and each transition is a hard cut, also a change of the mode.
 - A new piece keeps the mode and makes new shots. The shots do not follow a solo, because they come
   one time from the score. No setting stores the mode.
 
