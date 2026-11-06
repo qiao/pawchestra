@@ -46,14 +46,18 @@ export const PIANO = {
 } as const;
 
 /**
- * The scale of the whole piano around the origin of the piano axes: 1.16 times a real grand
- * piano, with the keys at 0.81 m, because the polar bear pianist is a large animal on a bench
- * that fits the legs of its mesh. At this scale, the elbows of the polar bear at a shoulder height
- * of 1.15 m stand 4 to 6 cm above the keys, and its forearms are about level with the keys, as a
- * real pianist sits (`docs/reference/piano-technique.md`). At 1.22, the elbows stand 1 to 4 cm
- * above the keys, and the forearms rise 6° to the keys, and at 1.12 they slope 5° down.
+ * The scale of the whole piano around the origin of the piano axes: 1.24 times a real grand
+ * piano, with the keys at 0.868 m, because the polar bear pianist is a large animal on a bench
+ * that fits the legs of its mesh. A larger piano hides the players behind it: in the default view
+ * of `bach-bwv1050` at 20 s, the faces of the hippos behind the piano show over the lid at 1.24,
+ * the lid hides their eyes at 1.30, all but their ears at 1.36, and the whole hippos at 1.508.
+ * The shoulders of the polar bear on its taller bench still stand about 0.54 m above the keys,
+ * 1.6 times its upper arm, so the forearms slope down to the keys (`HANDS_HOLDS.piano`). From
+ * 1.16 to 1.24, with the hold of the bear at a shoulder height of 1.15 m, the arms in the trunk in
+ * the play go from 16.0 cm to 15.3 cm (forearms) and stay at 14.9 cm (upper arms), and the palms
+ * on their keys go from 1% to 13% of the note targets within 5 mm (`pnpm pose-depth pianist`).
  */
-export const PIANO_SCALE = 1.16;
+export const PIANO_SCALE = 1.24;
 
 /**
  * The distance of the front of the keys in front of the floor point of the body of the pianist,
