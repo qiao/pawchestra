@@ -377,9 +377,9 @@ interface Targets {
   readonly blurPrepare: WebGLRenderTarget | null;
   /** The soft image at half size. */
   readonly blurGather: WebGLRenderTarget | null;
-  /** The contact shade at half size (`scene/surface.ts`), before its blur. */
+  /** The contact shade and the floor gloss at half size (`scene/surface.ts`), before the blur. */
   readonly surface: WebGLRenderTarget | null;
-  /** The contact shade at half size, after its blur. */
+  /** The contact shade and the floor gloss at half size, after the blur. */
   readonly surfaceBlur: WebGLRenderTarget | null;
   /** Each target above, for the crop of each frame and the disposal. */
   readonly all: readonly WebGLRenderTarget[];
@@ -639,7 +639,7 @@ export class PostPipeline {
     const blurPrepare = blur ? floatTarget(halfWidth, halfHeight, 'half') : null;
     const blurGather = blur ? floatTarget(halfWidth, halfHeight, format) : null;
     // The contact shade is in the alpha channel.
-    const shade = settings.contactSamples > 0;
+    const shade = settings.contactSamples > 0 || settings.floorGloss;
     const surface = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
     const surfaceBlur = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
     const all = [
@@ -674,6 +674,7 @@ export class PostPipeline {
     }
     const pass = this.#surface;
     setUniform(pass.uniforms, 'uDepth', depth);
+    setUniform(pass.uniforms, 'uScene', targets.scene.texture);
     const texel = pass.uniforms['uDepthTexel']?.value;
     if (texel instanceof Vector2) {
       texel.set(1 / this.#width, 1 / this.#height);
@@ -855,10 +856,13 @@ export class PostPipeline {
   }
 
   #createSurface(): ShaderMaterial {
-    const samples = TIER_SETTINGS[this.#tier].contactSamples;
+    const settings = TIER_SETTINGS[this.#tier];
     const defines: Record<string, number> = {};
-    if (samples > 0) {
-      defines['CONTACT_SAMPLES'] = samples;
+    if (settings.contactSamples > 0) {
+      defines['CONTACT_SAMPLES'] = settings.contactSamples;
+    }
+    if (settings.floorGloss) {
+      defines['FLOOR_GLOSS'] = 1;
     }
     return passMaterial(SURFACE_FRAGMENT, surfaceUniforms(), defines);
   }
@@ -875,7 +879,7 @@ export class PostPipeline {
     if (settings.lensFringe) {
       defines['LENS_FRINGE'] = 1;
     }
-    if (settings.contactSamples > 0) {
+    if (settings.contactSamples > 0 || settings.floorGloss) {
       defines['SURFACE'] = 1;
     }
     const look = POST_LOOK;

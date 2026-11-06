@@ -20,6 +20,28 @@ export const CONTACT_SHADE = {
 } as const;
 
 /**
+ * The gloss of the stage floor (design 4.5, post effects): the lacquered planks show a soft
+ * reflection of the players, the chairs, and the stands. The pass of the contact shade traces
+ * each floor pixel along its mirror ray through the depth of the scene, at half size, and reads
+ * the color of the scene at the hit. The ray takes a jitter in a small cone, and a blur at half
+ * size joins 16 rays, so the reflection is soft and not a mirror.
+ */
+export const FLOOR_GLOSS = {
+  /**
+   * The factor of the reflection. 0 turns it off. The lacquer of a real stage reflects about 5% at
+   * the angle of the default view, and the players in the dark hall are not bright, so the
+   * physical reflection did not show. The factor is the middle of a lineup of three factors.
+   */
+  strength: 3,
+  /** The reflection of the lacquer at a right angle (Schlick). It grows to 1 at a flat angle. */
+  f0: 0.04,
+  /** The longest mirror ray, in meters. The reflection fades along it. */
+  reach: 1.6,
+  /** The half angle of the cone of the jitter of the mirror ray, in radians: the blur. */
+  spread: 0.09,
+} as const;
+
+/**
  * The uniforms of the surface pass that change with each frame.
  *
  * @returns New uniforms.
@@ -27,10 +49,13 @@ export const CONTACT_SHADE = {
 export function surfaceUniforms() {
   return {
     uDepth: { value: null },
+    uScene: { value: null },
     uDepthTexel: { value: new Vector2(1, 1) },
     uProjection: { value: new Matrix4() },
     uProjectionInverse: { value: new Matrix4() },
+    uFloor: { value: new Vector4(0, 1, 0, 0) },
     uContact: { value: new Vector4() },
+    uGloss: { value: new Vector4() },
     uClamp: { value: new Vector4(0, 0, 1, 1) },
   };
 }
@@ -51,25 +76,45 @@ export function setSurfaceCamera(material: ShaderMaterial, camera: PerspectiveCa
   if (inverse instanceof Matrix4) {
     inverse.copy(camera.projectionMatrixInverse);
   }
+  // The world height of a point of the view space: the second row of the world matrix of the
+  // camera.
+  const floor = uniforms['uFloor']?.value;
+  if (floor instanceof Vector4) {
+    const e = camera.matrixWorld.elements;
+    floor.set(e[1] ?? 0, e[5] ?? 1, e[9] ?? 0, e[13] ?? 0);
+  }
   const contact = uniforms['uContact']?.value;
   if (contact instanceof Vector4) {
     contact.set(CONTACT_SHADE.radius, CONTACT_SHADE.strength, CONTACT_SHADE.bias, 0);
   }
+  const gloss = uniforms['uGloss']?.value;
+  if (gloss instanceof Vector4) {
+    gloss.set(FLOOR_GLOSS.strength, FLOOR_GLOSS.f0, FLOOR_GLOSS.reach, FLOOR_GLOSS.spread);
+  }
 }
+
+/** The number of steps of the mirror ray of the floor gloss, before the refine. */
+const GLOSS_STEPS = 14;
 
 /**
  * The surface pass at half size (design 4.5, post effects): the contact shade in the alpha
- * channel, as the factor of the scene light. `CONTACT_SAMPLES` sets the samples of the shade.
- * Each pixel takes a turn of its samples from a 4 × 4 Bayer pattern, which the blur of 4 × 4
- * pixels removes.
+ * channel, as the factor of the scene light, and the reflection of the floor gloss in the color.
+ * `CONTACT_SAMPLES` sets the samples of the shade, and `FLOOR_GLOSS` turns the gloss on. Each
+ * pixel takes a turn of its samples and a jitter of its ray from a 4 × 4 Bayer pattern, which the
+ * blur of 4 × 4 pixels removes.
  */
 export const SURFACE_FRAGMENT = /* glsl */ `
 uniform sampler2D uDepth;
+uniform sampler2D uScene;
 uniform vec2 uDepthTexel;
 uniform mat4 uProjection;
 uniform mat4 uProjectionInverse;
+// The world height of a view point p: dot(uFloor.xyz, p) + uFloor.w.
+uniform vec4 uFloor;
 // The radius, the strength, and the bias of the contact shade.
 uniform vec4 uContact;
+// The strength, the f0, the reach, and the spread of the floor gloss.
+uniform vec4 uGloss;
 uniform vec4 uClamp;
 varying vec2 vUv;
 
@@ -87,6 +132,11 @@ vec3 viewAt(vec2 uv, float depth) {
 
 vec3 viewAt(vec2 uv) {
   return viewAt(uv, texture(uDepth, uv).x);
+}
+
+// The view depth of the scene at a point of the texture: a positive distance along the view axis.
+float sceneDepthAt(vec2 uv) {
+  return -viewAt(uv).z;
 }
 
 void main() {
@@ -125,7 +175,61 @@ void main() {
   // mean gives a full shade there.
   light = 1.0 - uContact.y * min(3.0 * closed / float(CONTACT_SAMPLES) / (1.0 - uContact.z), 1.0);
 #endif
-  gl_FragColor = vec4(0.0, 0.0, 0.0, light);
+  vec3 reflection = vec3(0.0);
+#ifdef FLOOR_GLOSS
+  float height = dot(uFloor.xyz, p) + uFloor.w;
+  if (uGloss.x > 0.0 && abs(height) < 0.01 && dot(n, uFloor.xyz) > 0.97) {
+    vec3 eye = normalize(p);
+    // A jitter of the normal in a cone, from the same pattern, for a soft reflection.
+    vec3 side = normalize(cross(uFloor.xyz, eye));
+    vec3 ahead = cross(side, uFloor.xyz);
+    float turn = noise * 6.2831853 * 3.0;
+    float tilt = uGloss.w * sqrt(fract(noise * 7.0));
+    vec3 normal = normalize(uFloor.xyz + (side * cos(turn) + ahead * sin(turn)) * tilt);
+    vec3 ray = reflect(eye, normal);
+    float cosine = max(dot(-eye, uFloor.xyz), 0.0);
+    float fresnel = uGloss.y + (1.0 - uGloss.y) * pow(1.0 - cosine, 5.0);
+    float reach = uGloss.z;
+    float before = 0.02;
+    for (int i = 0; i < ${GLOSS_STEPS}; i++) {
+      // The steps grow along the ray, so the contact with the floor gets the short steps.
+      float s = (float(i) + noise) / float(${GLOSS_STEPS});
+      float t = 0.02 + reach * s * s;
+      vec3 q = p + ray * t;
+      vec4 clip = uProjection * vec4(q, 1.0);
+      vec2 uv = clip.xy / clip.w * 0.5 + 0.5;
+      if (any(lessThan(uv, uClamp.xy)) || any(greaterThan(uv, uClamp.zw))) {
+        break;
+      }
+      float behind = -q.z - sceneDepthAt(uv);
+      if (behind > 0.0 && behind < 0.35) {
+        // Three halvings between the last step in front and this step.
+        float a = before;
+        float b = t;
+        for (int k = 0; k < 3; k++) {
+          float m = (a + b) * 0.5;
+          vec3 h = p + ray * m;
+          vec4 c = uProjection * vec4(h, 1.0);
+          vec2 hu = c.xy / c.w * 0.5 + 0.5;
+          if (-h.z - sceneDepthAt(hu) > 0.0) {
+            b = m;
+          } else {
+            a = m;
+          }
+        }
+        vec3 hit = p + ray * b;
+        vec4 c = uProjection * vec4(hit, 1.0);
+        vec2 hu = c.xy / c.w * 0.5 + 0.5;
+        vec2 edge = min(hu - uClamp.xy, uClamp.zw - hu);
+        float fade = (1.0 - b / reach) * smoothstep(0.0, 0.05, min(edge.x, edge.y));
+        reflection = min(texture(uScene, hu).rgb, vec3(8.0)) * fresnel * uGloss.x * fade;
+        break;
+      }
+      before = t;
+    }
+  }
+#endif
+  gl_FragColor = vec4(reflection, light);
 }
 `;
 
