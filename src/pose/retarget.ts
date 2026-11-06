@@ -21,20 +21,20 @@ import { chainFrames, createFrame, posePoint } from './frames.ts';
 import { MIXAMO_BONES, isMixamoBone, mixamoDrivers } from './mixamo-bones.ts';
 
 /** The frames for each second of a retargeted clip. Mixamo gives its clips at 30 frames. */
-export const CLIP_RATE = 30;
+const CLIP_RATE = 30;
 
 /**
  * The height of an adult in head heights, the canon of figure drawing. The source skeleton has no
  * chin, so its head height `H` is its height over this number.
  */
-export const HUMAN_HEADS = 7.5;
+const HUMAN_HEADS = 7.5;
 
 /**
  * The share of the mean bend of the four long fingers, over their three joints, that the
  * `fingers` block of the player turns. A fist bends each finger by about 230° over its joints,
  * and the block then turns about 90°, as a closed paw does.
  */
-export const FINGER_CURL_SHARE = 0.4;
+const FINGER_CURL_SHARE = 0.4;
 
 /** The smallest and the largest curl of the fingers of a clip, in radians. */
 const CURL_RANGE = [-20 * MathUtils.DEG2RAD, 100 * MathUtils.DEG2RAD] as const;
@@ -141,7 +141,7 @@ export interface PlayerClip {
  * @param mesh The bind mesh of the player.
  * @returns Up to four points for each foot.
  */
-export function solePoints(mesh: MeshData): SolePoint[] {
+function solePoints(mesh: MeshData): SolePoint[] {
   const points: SolePoint[] = [];
   for (const bone of [boneIndex('footL'), boneIndex('footR')]) {
     const corners: Vec3[] = [];

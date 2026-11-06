@@ -226,7 +226,7 @@ function partPoints(mesh: PlayerModel['mesh'], bones: readonly BoneName[]): Part
  * The region of the body of each bone of a body obstacle, for the place of a clip. A cap of an
  * open loop of the body, such as the cut to an upper arm, is the `arm root`.
  */
-export const BODY_REGIONS: Readonly<Partial<Record<BoneName, string>>> = {
+const BODY_REGIONS: Readonly<Partial<Record<BoneName, string>>> = {
   hips: 'belly',
   spine: 'belly',
   chest: 'chest',
@@ -264,7 +264,7 @@ const END_PIN_FROM = 0.005;
  * @param point The posed point.
  * @returns The part, or `null` for an instrument with no fingerboard.
  */
-export function bowedPlace(posed: PosedSkeleton, point: Vector3): string | null {
+function bowedPlace(posed: PosedSkeleton, point: Vector3): string | null {
   const board = posed.model.instrument.targets.find((target) => target.kind === 'fingerboard');
   if (!board) {
     return null;

@@ -846,7 +846,7 @@ const FRONT_POINTS = 16;
  * @param arms The two arms.
  * @returns The move, in meters, in the model axes.
  */
-export function fitDrumPlace(
+function fitDrumPlace(
   model: PlayerModel,
   fit: DrumFit,
   head: Vec3,

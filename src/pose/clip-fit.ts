@@ -20,7 +20,7 @@ import { armRig, solveTwoBone } from './ik.ts';
  * full rule with a margin. A clap reaches forward at 79° or more, and a T-pose holds 90°, so these
  * keep the plain retarget.
  */
-export const HANG_FADE = { full: 30 * MathUtils.DEG2RAD, none: 60 * MathUtils.DEG2RAD } as const;
+const HANG_FADE = { full: 30 * MathUtils.DEG2RAD, none: 60 * MathUtils.DEG2RAD } as const;
 
 /** The rest arm of one side of a body: the world turns of its bones from the bind pose. */
 export interface RestArm {
@@ -92,7 +92,7 @@ export function hangShare(shoulder: Vector3, wrist: Vector3): number {
  * From `none` on, the arm keeps its plain turns. Reason: the wrists of the closed clap of the test
  * clip lie 0.17 H from the middle, its open clap 1.2 H, and a hanging arm 0.9 H or more.
  */
-export const MEET_FADE = { full: 0.4, none: 0.8 } as const;
+const MEET_FADE = { full: 0.4, none: 0.8 } as const;
 
 /**
  * Gives the share of the meeting paw rule for a source wrist: 1 near the middle plane of the
@@ -113,7 +113,7 @@ export function meetShare(distance: number): number {
  * distance of the wrist from the middle plane, so the paws of a clap meet in front of the body,
  * above a round belly.
  */
-export const FRONT_FADE = { none: 1, full: 1.5 } as const;
+const FRONT_FADE = { none: 1, full: 1.5 } as const;
 
 /**
  * Gives the share of the lift of the clearance rule for a source wrist: 0 near the chest, 1 past
