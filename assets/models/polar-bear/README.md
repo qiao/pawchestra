@@ -522,8 +522,8 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 716,772 bytes |
-| SHA-256 | `94e5789e869d9756340476bfaf6dd5da5c4b914d2cb4ebf442f1c5f916c3fb88` |
-| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `9d37b9a736a657e9d3022ad2052c6ef9e94ea9169199985998debc298a99acdd` |
+| SHA-256 | `f504a002d62330a23da4aa24fdcb4be5d76dd7ea12d5d242fb00b12d1e209e38` |
+| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `d8fea063bcc0877c30b0b3b22814c77759461fdba0716a66677938bfbb426ae5` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
