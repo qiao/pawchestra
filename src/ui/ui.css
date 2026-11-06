@@ -152,6 +152,23 @@ svg {
   }
 }
 
+/* In Cinematic mode, the title fades out and stays hidden (design 2.3), because the title card
+   (`ui/title-card.ts`) shows the piece in the frame. The title stays a live region, so that a
+   screen reader still reads a new piece. The link to the repository hides after the fade, so that
+   a hidden link takes no focus and no pointer. */
+.title {
+  transition: opacity 0.6s ease;
+}
+
+body:has(.camera[aria-pressed='true']) .title {
+  opacity: 0;
+}
+
+body:has(.camera[aria-pressed='true']) .title .github {
+  visibility: hidden;
+  transition: visibility 0s 0.6s;
+}
+
 /* Each line of the title has its own soft shade, which keeps 4.5:1 for its text over a white animal
    in a close shot. The app reads the frame behind each line and sets the level of its shade, from 0
    to 1 (`--title-shade-level`). Over the dark hall of the default view, the level is 0 and no shade
@@ -1769,7 +1786,9 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
     transform: none;
   }
 
-  .title .github {
+  .title,
+  .title .github,
+  body:has(.camera[aria-pressed='true']) .title .github {
     transition: none;
   }
 

@@ -55,16 +55,14 @@ The UI has the style of a video player. The theme is dark only, because the scen
   covers the bottom of the frame when it shows, because a bar that moved at each change of the
   mode looked like a fault.
 - In Cinematic mode, the title (the logo, the piece title, the composer, and the link to GitHub)
-  stands at the top-left corner of the frame, at the insets of Free mode, so that it stays with
-  the film. It moves with the bars (`--letterbox` and `--letterbox-side` of `ui/ui.css`). A
-  window in portrait has a low frame and a high top bar, so there the title stays at the top of
-  the window and covers no part of the frame.
-- In Cinematic mode during play, all controls and panels but the title hide after the same time:
-  the bar, the drawer (also when it is open), each tooltip, and the pointer (`uiShown()` of
-  `app/bar-rules.ts`). The title always shows, because it names the piece of the film. A pointer
-  motion, a tap, or Tab shows them all. They stay while the pointer is over the bar, the drawer,
-  or the link of the title, while one of these has the keyboard focus, and while a dialog or a
-  message is open. A pause shows them, and an open drawer comes back open. They fade in 0.2 s, at
+  fades out and stays hidden, because the title card shows the piece in the frame. It stays a
+  live region, so that a screen reader still reads a new piece. The link hides after the fade, so
+  that it takes no focus and no pointer.
+- In Cinematic mode during play, all controls and panels hide after the same time: the bar, the
+  drawer (also when it is open), each tooltip, and the pointer (`uiShown()` of
+  `app/bar-rules.ts`). A pointer motion, a tap, or Tab shows them all. They stay while the
+  pointer is over the bar or the drawer, while one of these has the keyboard focus, and while a
+  dialog or a message is open. A pause shows them, and an open drawer comes back open. They fade in 0.2 s, at
   once with reduced motion. Free mode hides only the bar, because there the user works with the
   view and the drawer.
 - Each change from Free mode to Cinematic mode closes the drawer, so that the film starts with no
@@ -250,7 +248,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   of the default demo, and the app keeps that header, so the piece title paints with the first
   paint (7.2). A hash that names a demo clears the lines before the first paint, and the app
   writes the title of its demo. The full-page message of 2.6 removes the header. In Cinematic
-  mode, the header stands at the top-left corner of the frame and does not hide (2.3).
+  mode, the header is hidden (2.3).
 - **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
   line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
   free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
