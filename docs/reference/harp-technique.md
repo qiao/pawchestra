@@ -142,6 +142,10 @@ The app follows these facts:
   points into the strings.
 - **The pluck (section 5).** The fingers curl after each pluck (`curl`, `curlClosed`), and the palm
   pulls away from the strings (`HAND_MOTION` of `src/pose/hand-notes.ts`).
+- **The strike point (section 7.3).** Each hand plucks at 0.37 of the string from the soundboard
+  (`PLUCK.share` of `src/models/instruments/harp.ts`), so the bass strings are plucked low. The
+  strings fill the frame from near the base of the soundboard to the neck near the column, as on
+  a concert harp (section 1).
 - **The swing of the string (section 5).** Each note swings its string
   (`stringSwingsAt()` of `src/pose/harp-strings.ts`). The swing starts at its full size at the
   note start, and the velocity sets its size. The largest swing goes from 7 mm in the bass, the
@@ -162,7 +166,9 @@ The app does not follow these facts:
 - **The level forearms (section 4).** The forearms rise from the elbow to the wrist, because the
   elbows of the short arms hang below the strings.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
-  (`palmL`, `palmR`). The short left arm reaches the far bass strings only higher on the strings.
+  (`palmL`, `palmR`). The short left arm reaches the low pluck points of the bass strings only
+  with the palm far above them, so the fingers of the left paw do not touch the bass strings at
+  their pluck points.
 - **The size of the swing (section 5).** The band shows the real swing times
   `STRING_SWING.strength`, and a denser blur (`STRING_SWING.density`), because a swing of a few
   millimeters on the small harp of the deer does not show in a stage shot.
@@ -327,9 +333,8 @@ names its place in the code, and updates design 5.3 "Harp" and section 6.
    the crossing flags as the piano uses `passes`.
 4. **The pluck (7.3).** `handStateAt()` pulls the palm away by `HAND_MOTION.pull` at each pluck.
    Keep the close of the fingers (`curlClosed`), and pull the palm less in a group.
-5. **The strike point (7.3).** `harpStringPosition()` of `src/models/instruments/harp.ts` gives
-   the middle of the string. Move it to about 0.37 of the string from the soundboard, then check
-   the left palm offset `palmL` again with `pnpm arm-check`.
+5. **The strike point (7.3).** Done: `harpStringPosition()` gives the point at 0.37 of the
+   string from the soundboard, and the hold fits it.
 6. **Rolled chords (7.4).** Close the fingers of a chord of three or more notes from low to high,
    so that the last close falls on the note start. The score keeps one start for the sound.
 7. **Damping (7.6).** A long rest of one hand can put the flat palm on the strings

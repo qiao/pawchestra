@@ -263,18 +263,21 @@ export const HANDS_HOLDS = {
   // strings from the left side and the right hand the treble strings from the right side, the
   // trunk sits erect, and the elbows rise out to the sides. The short arms of the deer set the
   // values. The spine leans 3° forward: at 8°, the muzzle comes to 1.0 cm of the neck of the
-  // leaned harp. The left palm lies 0.14 m above the middle of each string, nearer to the
-  // shoulder: at 0.10 m, the left paw bends 67° from the straight paw of the source (paw swing of
-  // `pnpm arm-check`, limit 70°), and at 0.06 m, it misses the far bass strings by up to 7 mm.
-  // The left palm faces the strings and a little down (`faceL`), as the wrists of a harpist go a
+  // leaned harp. The pluck points lie at 0.37 of each string (`PLUCK.share`), so the bass strings
+  // are plucked low. The left palm lies 0.22 m above the pluck point, nearer to the shoulder, and
+  // 2 cm toward the player: at 0.14 m and 2 cm toward the column, the left paw misses the bass
+  // strings C2 to A2 by up to 4.5 cm, and at 0.14 m and 4 cm toward the player, the left paw bends
+  // 75° from the straight paw of the source (paw swing p95 of `pnpm arm-check`, limit 70°).
+  // The left palm faces the strings and 39° down (`faceL`), as the wrists of a harpist go a
   // little down. The left shoulder lies 0.27 m from the plane of the strings, and the left upper
   // arm is 0.2 m long, so the left forearm points into the strings. With the palm square to the
   // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
   // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
-  // paw. The knuckles of the turned paw come nearer to the strings, so the left palm lies 6 cm
-  // from the strings and 2 cm toward the column: with 3 cm and no move, the knuckles go 1.5 cm
-  // into the neck of the harp, and the forearm goes deeper into the chest with no move toward the
-  // column. The left fingers point up and back along the strings (`aimL`): with the fingers on
+  // paw. At 39° down, the paw swing p95 is 56°, and at 31° 60° (`pnpm arm-check`). The knuckles
+  // of the turned paw come nearer to the strings, so the left palm lies 6 cm from the strings:
+  // with 3 cm, the knuckles go 1.5 cm into the neck of the harp. The right palm lies 3 cm above
+  // the pluck point: at the pluck point, the right upper arm goes 1.7 cm into the soundbox
+  // (`pnpm pose-depth harpist`). The left fingers point up and back along the strings (`aimL`): with the fingers on
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
   // on its bent bind forearm. The elbows point out and down, in the play and
   // at rest: with the elbows down, the left upper arm goes 6.3 cm into the chest when it reaches
@@ -283,9 +286,9 @@ export const HANDS_HOLDS = {
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.06, 0.14, -0.02],
-    palmR: [0.03, 0, 0],
-    faceL: [1, -0.6, 0],
+    palmL: [-0.06, 0.22, 0.02],
+    palmR: [0.03, 0.03, 0],
+    faceL: [1, -0.8, 0],
     faceR: [-1, 0, 0],
     aimL: [0, 1, 0.5],
     aimR: null,
@@ -302,11 +305,12 @@ export const HANDS_HOLDS = {
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
     restArc: [0, 0, 0],
-    // Both hands rest on a string, a little away from it, as in the play. A left palm on the left
-    // thigh folds the left shoulder of the deer and flattens its upper arm (flat p5 0.39, limit
-    // 0.55), and the lift twists the upper arm by 170°.
+    // Both hands rest on a string, a little away from it, as in the play. The right hand rests on
+    // G4: on C4, a face of the right arm folds at rest (`pnpm hold-fit harpist`). A left palm on
+    // the left thigh folds the left shoulder of the deer and flattens its upper arm (flat p5 0.39,
+    // limit 0.55), and the lift twists the upper arm by 170°.
     restL: { kind: 'string', key: 48, away: 0.02, pole: [-1, -1, 0] },
-    restR: { kind: 'string', key: 60, away: 0.02, pole: [1, -1, 0] },
+    restR: { kind: 'string', key: 67, away: 0.02, pole: [1, -1, 0] },
   },
 } as const satisfies Readonly<Record<HandsInstrument, HandsHold>>;
 
