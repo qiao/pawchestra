@@ -8,15 +8,22 @@ export const STRING_SWING = {
   /**
    * The factor of the swing of each string over the swing of a real pluck (`StringLine.swing`).
    * The harp of the deer is small, and a swing of a few millimeters shows only in a close shot,
-   * so the band is wider than the real swing.
+   * so the band is wider than the real swing. The band of a loud bass pluck then spans about two
+   * gaps of the strings, and it overlaps mostly the bands of the next strings.
    */
-  strength: 2.5,
+  strength: 1.5,
   /**
    * The factor of the coverage of each pixel of a band. 1 is the share of the time in which the
    * wire covers the pixel, as a camera with a long shutter sees it. A thin pale string on the
    * pale harp then almost disappears, so the band is denser than the real blur.
    */
-  density: 3,
+  density: 1.5,
+  /**
+   * The largest opacity of a pixel of a band. The bass strings stand closer than the width of
+   * their bands, so the bands of plucked neighbors overlap. Below 1, each band stays a
+   * translucent swing of its string, and a group of plucked strings does not fill one solid area.
+   */
+  opacity: 0.4,
 };
 
 /**
@@ -30,6 +37,9 @@ const bandViewHeight = { value: 900 };
 
 /** The factor of the coverage of the bands ({@link STRING_SWING.density}), set in each frame. */
 const bandDensity = { value: 1 };
+
+/** The largest opacity of the bands ({@link STRING_SWING.opacity}), set in each frame. */
+const bandOpacity = { value: 1 };
 
 /**
  * Sets the height of the target of the scene pass (design 4.6), so that each band is at least
@@ -98,6 +108,7 @@ varying vec3 vBandFront;
  */
 const BAND_FRAGMENT_HEAD = /* glsl */ `
 uniform float uBandDensity;
+uniform float uBandOpacity;
 varying float vBandLateral;
 varying float vBandHalfPixel;
 varying float vBandRadius;
@@ -127,7 +138,7 @@ const BAND_COVERAGE = /* glsl */ `
   if (c < 0.003) {
     discard;
   }
-  diffuseColor.a *= min(c * uBandDensity, 1.0);
+  diffuseColor.a *= min(c * uBandDensity, uBandOpacity);
 }
 `;
 
@@ -171,6 +182,7 @@ function addBand(shader: WebGLProgramParametersWithUniforms): void {
   }
   shader.uniforms['uBandViewHeight'] = bandViewHeight;
   shader.uniforms['uBandDensity'] = bandDensity;
+  shader.uniforms['uBandOpacity'] = bandOpacity;
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>\n${BAND_VERTEX_HEAD}`)
     .replace('#include <beginnormal_vertex>', BAND_VERTEX)
@@ -340,6 +352,7 @@ export function updateStringBands(
 ): Float32Array {
   const { strings, mesh, swing, shown } = bands;
   bandDensity.value = STRING_SWING.density;
+  bandOpacity.value = STRING_SWING.opacity;
   const out = swing.array;
   if (!(out instanceof Float32Array)) {
     return shown;
