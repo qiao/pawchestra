@@ -26,6 +26,7 @@ import { activityAt } from './passages.ts';
 import { pedalLevelAt, posePedalFoot } from './pedal.ts';
 import { digitBendsAt } from './piano-digits.ts';
 import { PIANO_KEY_COUNT, keyLevelsAt } from './piano-keys.ts';
+import { HARP_STRING_COUNT, stringSwingsAt } from './harp-strings.ts';
 import { posePercussion } from './percussion.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
@@ -50,6 +51,7 @@ export interface WritablePose extends AnimalPose {
   pawBendR: number;
   blink: number;
   readonly keys: Float32Array | null;
+  readonly strings: Float32Array | null;
   readonly digits: Float32Array | null;
 }
 
@@ -90,7 +92,8 @@ const BONES = {
 /**
  * Makes the pose of one animal in the bind pose.
  *
- * @param player The plan of the animal. A pianist gets the levels of its keys, all up.
+ * @param player The plan of the animal. A pianist gets the levels of its keys, all up, and a harp
+ *   player the swings of its strings, all still.
  * @returns The pose.
  */
 function createPose(player: PlayerPlan): WritablePose {
@@ -104,6 +107,8 @@ function createPose(player: PlayerPlan): WritablePose {
     pawBendR: 0,
     blink: 0,
     keys: note.family === 'keyboard' && note.keys ? new Float32Array(PIANO_KEY_COUNT) : null,
+    strings:
+      note.family === 'harp' && note.strings ? new Float32Array(2 * HARP_STRING_COUNT) : null,
     digits: note.family === 'keyboard' && note.digits ? new Float32Array(2 * DIGITS) : null,
   };
 }
@@ -427,6 +432,14 @@ function poseAnimal(
         keyLevelsAt(note.keys, noteTime, pose.keys);
         for (let k = 0; k < pose.keys.length; k++) {
           pose.keys[k] = (pose.keys[k] ?? 0) * weight;
+        }
+      }
+      // A plucked string swings and decays. The strings of a resting harpist are damped, and a
+      // muted harpist plays no string.
+      if (note.strings && pose.strings) {
+        stringSwingsAt(note.strings, noteTime, pose.strings);
+        for (let k = 0; k < pose.strings.length; k += 2) {
+          pose.strings[k] = (pose.strings[k] ?? 0) * weight;
         }
       }
       // The claw of each key presses it, and the claw of the next key lifts before its strike.

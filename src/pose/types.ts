@@ -49,6 +49,13 @@ export interface AnimalPose {
    * (4.6). It is `null` or absent for each player that is not a pianist.
    */
   readonly keys?: Float32Array | null;
+  /**
+   * Two values for each harp string from the bass string (`stringSwingsAt()`): the swing, as a
+   * share of the swing of a loudest pluck, times the weight of the playing pose, and the round
+   * share of its form (5.3). The scene draws the band of each string that swings (4.6). It is
+   * `null` or absent for each player that is not a harp player.
+   */
+  readonly strings?: Float32Array | null;
 }
 
 /** The poses of the scene for one frame (design 5.1). */

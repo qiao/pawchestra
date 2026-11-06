@@ -24,6 +24,7 @@ export function createClipPose(): WritablePose {
     pawBendR: 0,
     blink: 0,
     keys: null,
+    strings: null,
     digits: null,
   };
 }

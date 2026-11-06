@@ -44,6 +44,8 @@ import { pedalMotion } from './pedal.ts';
 import type { PedalMotion } from './pedal.ts';
 import { buildKeyTrack } from './piano-keys.ts';
 import type { KeyTrack } from './piano-keys.ts';
+import { buildStringTrack } from './harp-strings.ts';
+import type { StringTrack } from './harp-strings.ts';
 import { percussionTracks } from './percussion.ts';
 import { percussionRig } from './percussion-rig.ts';
 import type { PercussionRig } from './percussion-rig.ts';
@@ -96,6 +98,8 @@ export interface HandsLayer {
   readonly pedal: PedalMotion;
   /** The presses of the piano keys of a pianist, or `null` for a harp player. */
   readonly keys: KeyTrack | null;
+  /** The plucks of the harp strings of a harp player, or `null` for a pianist. */
+  readonly strings: StringTrack | null;
   /** The presses of the claws of each paw of a pianist, or `null` for a harp player. */
   readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
 }
@@ -420,6 +424,7 @@ function* noteLayerSteps(
       right,
       pedal: pedalMotion(rig.foot ? pedal : NO_PEDAL),
       keys: family === 'keyboard' ? buildKeyTrack(notes) : null,
+      strings: family === 'harp' ? buildStringTrack(notes) : null,
       digits,
     };
   }
