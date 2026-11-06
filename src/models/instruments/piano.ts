@@ -12,9 +12,16 @@ import type { InstrumentModel, KeyTurn } from './types.ts';
 /**
  * The lift of the case, the keys, the lid, the music desk, and the bar of the pedal lyre over the
  * floor, in meters before {@link PIANO_SCALE} (design 4.6). The legs and the posts of the lyre grow
- * by the lift, and the pedals and the box of the lyre stay on the floor.
+ * by the lift, and the pedals and the box of the lyre stay on the floor. The polar bear pianist
+ * sits tall on a bench that fits its legs, with its shoulders at about 1.33 m, so its keys stand
+ * at 1.009 m, as a pianist sets the bench so that the forearms are level with the keys. With the
+ * keys at 0.868 m (the scale 1.24 with no lift), the upright trunk of `HANDS_HOLDS.piano` slopes
+ * the forearms 35° to 38° down to the keys, and with this lift 4° to 10° in the chord of the
+ * close views (`pnpm pose-preview pianist`). A lift grows the piano up and leaves its width and
+ * its depth, so the lid hides less of the players behind it than a larger scale with the same
+ * keys.
  */
-export const PIANO_LIFT = 0;
+export const PIANO_LIFT = 0.17;
 
 /**
  * The sizes of the grand piano, in meters, before {@link PIANO_SCALE} (design 4.6), with the
@@ -54,18 +61,16 @@ export const PIANO = {
 } as const;
 
 /**
- * The scale of the whole piano around the origin of the piano axes: 1.24 times a real grand
- * piano, with the keys at 0.868 m, because the polar bear pianist is a large animal on a bench
- * that fits the legs of its mesh. A larger piano hides the players behind it: in the default view
- * of `bach-bwv1050` at 20 s, the faces of the hippos behind the piano show over the lid at 1.24,
- * the lid hides their eyes at 1.30, all but their ears at 1.36, and the whole hippos at 1.508.
- * The shoulders of the polar bear on its taller bench still stand about 0.54 m above the keys,
- * 1.6 times its upper arm, so the forearms slope down to the keys (`HANDS_HOLDS.piano`). From
- * 1.16 to 1.24, with the hold of the bear at a shoulder height of 1.15 m, the arms in the trunk in
- * the play go from 16.0 cm to 15.3 cm (forearms) and stay at 14.9 cm (upper arms), and the palms
- * on their keys go from 1% to 13% of the note targets within 5 mm (`pnpm pose-depth pianist`).
+ * The scale of the whole piano around the origin of the piano axes: 1.16 times a real grand
+ * piano, because the polar bear pianist is a large animal. {@link PIANO_LIFT} sets the height of
+ * the keys. A larger piano hides the players behind it: in the default view of `bach-bwv1050` at
+ * 20 s, with no lift, the faces of the hippos behind the piano show over the lid at 1.24, the lid
+ * hides their eyes at 1.30, all but their ears at 1.36, and the whole hippos at 1.508. With the
+ * lift, at 1.16 and the lid at 35°, the lid hides the face of the right hippo up to its ears and
+ * the lower face of the left hippo. The scale 1.24 with a lift of 0.13 puts the keys at the same
+ * height, and the far keys 0.05 m further out at each end.
  */
-export const PIANO_SCALE = 1.24;
+export const PIANO_SCALE = 1.16;
 
 /**
  * The distance of the front of the keys in front of the floor point of the body of the pianist,
