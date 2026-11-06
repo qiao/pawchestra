@@ -968,6 +968,24 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   the high tier has it (2.6).
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
+- **Lens flare** (`LENS_FLARE` of `scene/lens-flare.ts`). A stage spotlight that shines toward
+  the camera gives a flare, as in a concert film. The flare comes from the known lights. The stage
+  lights hang high and aim down, so no shot or orbit view has a light in the frame that faces the
+  lens, and a flare from the bright pixels would show nothing, as the streaks did. For each
+  spotlight, the CPU finds the light at the lens: the cone with a spill, because the front lens of
+  a stage lamp glows a little outside its beam, the decay 2, and a fall with the angle outside the
+  frame, because a lens with no hood also takes the light of a lamp just outside the frame. The
+  two strongest lights go to the final pass. Each one adds a wide veil that lifts the blacks near
+  it, a small glow at the light, and three faint ghosts of the aperture with their own tints, on
+  the line from the light through the optical middle of the image. The flare is linear light
+  before the tone mapping. The vertex shader of the final pass tests the depth on a small disc
+  around each light, so a player in front of a light hides its flare, and no pixel reads a
+  texture for it. Thus the flare adds no draw of the scene. The lamps of a close shot give no
+  flare: they stand just outside the frame of most close shots, so a flare would show in most of
+  the film. In the shot plans, the conductor light and the rim light give the flare in some
+  conductor shots and in close shots near the podium. In Free mode, the key light gives it in low
+  views from behind the orchestra. The strength is the middle of a lineup of three strengths,
+  about 1.25 times the weakest flare that shows. The low tier skips it (2.6).
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
   vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.
