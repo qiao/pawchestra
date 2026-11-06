@@ -161,10 +161,13 @@ piano of `src/models/instruments/piano.ts`.
 The app follows these facts:
 
 - **The height (section 1).** The bear is larger than a human pianist, so the piano is larger
-  than a real piano (`PIANO_SCALE`), and the bear sits on a low bench (`PIANO_BENCH`). The paw is
-  thick, so the elbows stand above the key top. At a shoulder height of 1.15 m, the forearms are
-  about level with the keys. At the shoulder height of 1.49 m of the app, the forearms slope down
-  to the keys, which does not follow this fact. A fit of the hold for the larger bear is open.
+  than a real piano (`PIANO_SCALE`). The bear sits on a bench that fits its legs (`PIANO_BENCH`,
+  `benchFitOf()`), with the seat top about 0.33 m high: the thighs slope down to the knees, as on
+  a higher bench, and the feet stand flat. The paw is thick, so the elbows stand above the key
+  top. At a shoulder height of 1.15 m, the forearms were about level with the keys. At the
+  shoulder height of 1.49 m of the app, on the taller bench, the forearms slope down to the keys,
+  which does not follow this fact. A fit of the hold or of the key height for the larger bear is
+  open.
 - **The distance (section 2).** The keys stand at `PIANO_FRONT_H` in front of the floor point.
   Farther keys make the right leg reach for the damper pedal and pull the haunch into the bench.
   Nearer keys fold the shoulders.
