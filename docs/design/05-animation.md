@@ -494,9 +494,9 @@ The rest of each family:
   nearer keys fold the shoulders.
 - The trunk leans toward the piano, less than the flexion of a posture that is not neutral, and
   the shoulders turn down (`lean`, `shoulderDrop`), as a pianist keeps the shoulders low (piano 3).
-  Reason: on its taller bench, the shoulders of the bear stand far above the keys, and with an
-  upright trunk the stretched arms stop short of the keys. A larger lean or shoulder turn folds the
-  right inner elbow of the hand rig more.
+  The trunk sits tall with a small lean (piano 3). Reason: a larger lean puts the trunk of the bear
+  over its knees, as if it stood up. The keys stand on a lifted piano at the height that the
+  upright trunk needs (4.6), so the paws reach their keys.
 - The elbows point out and a little up (`poleL`, `poleR`), so the arms stay clear of the round
   trunk, as the elbows of a pianist do not touch the torso (piano 4). Reason: elbows that hang
   down by the wide belly put the arms deep into the trunk.

@@ -140,38 +140,39 @@ export const HANDS_HOLDS = {
   // (`pnpm pose-depth pianist`).
   // The pose follows a professional pianist (`docs/reference/piano-technique.md`): the trunk leans
   // a little from the hips, less than the 20° of a posture that is not neutral, the elbows stand
-  // out from the trunk, and the shoulders stay low (`shoulderDrop`). The polar bear sits on a
-  // taller bench that fits its legs, so its shoulders stand about 0.54 m above the keys
-  // (`PIANO_SCALE`), 1.6 times its upper arm, and the forearms slope down to the keys. With the
-  // lean of 6° and the shoulder turn of 4° of the bear at a shoulder height of 1.15 m, the arms
-  // stretch, and only 13% of the note targets are within 5 mm: the palms stop up to 15 cm short of
-  // their keys. The lean of 15° and the shoulder turn of 16° bring the shoulders down and forward,
-  // so 96% are within 5 mm, and the palms stop at most 4.6 cm short (`pnpm pose-depth pianist`).
-  // With the shoulder turn of 4°, 82% are within 5 mm. The bent elbows of the reach fold the right
-  // inner elbow of the hand rig: a shoulder turn of 8° or more folds 9 or 10 faces there in the
-  // play, against 5 with 4° (`pnpm arm-check pianist`, limit 8), and a lean of 18° 9 faces. Elbows
-  // that point further down fold more faces of the left shoulder in the play, and elbows that point
-  // further out twist the paws more in the lift (`pnpm arm-check pianist`). The trunk leans toward
-  // the keys of the two paws (`sideLean`), as a pianist leans toward the far keys. A lean up to 16°
-  // raises the far right forearm 12° to the paw. The elbows point out, a little up, and a little
-  // back, clear of the round trunk, as the elbows of a pianist do not touch the trunk: with the
-  // elbows out and 0.7 down, the arms go 15.4 cm (forearms) and 14.9 cm (upper arms) into the trunk
-  // in the play, and with the elbows out and 0.15 up 10.6 cm and 9.5 cm
-  // (`pnpm pose-depth pianist`). Elbows that point 0.3 up put the paws 3 to 4 cm into the belly,
-  // and elbows that point further back put the arms deeper into the trunk. The paws reach from A0
-  // to F4 with the left paw and from E♭4 to C8 with the right paw (`pose/hands.test.ts`), so a
-  // melody changes paws between them. A paw that crosses to the middle of the keys puts its elbow
-  // in front of the chest: with the reach to B♭4 and from C4, the arms go 10.6 cm (forearms) and
-  // 9.5 cm (upper arms) into the trunk in the play, and with this reach 10.0 cm and 8.5 cm
-  // (`pnpm pose-depth pianist`). The wrists go up and forward over the case between the lap and the
-  // keys (`restArc`): with the paws in the lap, the arc 0.1 H forward puts the paws of the T-pose
-  // polar bear 2.6 cm into its body when they lower, and 0.25 H 0.8 cm or less. With the rest paws
-  // 0.8 H in front of the lap, the arc 0.25 H forward puts the forearms 1.6 cm into the case front
-  // in the lowering, and 0.15 H 1.1 cm. With the paws in the lap, an arc of 0.5 H out stands the
-  // upper arms 61° out from the trunk in the lift. With no arc out, they stand out at most as far
-  // as in a play. On the low bench, an arc 0.4 H up twists the paws up to 42° on the forearms in
-  // the lift, and 0.2 H up 28°. With the paws on the belly of the hand rig, arcs of 0 to 0.3 H out,
-  // up, or forward give the same depths in the lift and the lowering (`pnpm pose-depth pianist`).
+  // out from the trunk, and the shoulders stay low (`shoulderDrop`). The polar bear sits tall on a
+  // bench that fits its legs, and the keys stand on a lifted piano (`PIANO_LIFT`), so the lean of
+  // 6° and the shoulder turn of 4° put its shoulders about 0.32 m above the keys and bend the
+  // elbows 97° to 103° in the chord of the close views (`pnpm pose-preview pianist`). The lean of
+  // 15° and the shoulder turn of 16° put the trunk over the knees, as if the bear stood up, with
+  // the shoulders 6 cm lower and the elbows bent 69° to 74°. Keys 0.05 m or 0.1 m further away
+  // (`PIANO_FRONT_H` 1.05 or 1.1) bend the elbows less (114° at 1.1), but with the upright trunk
+  // only 89% or 72% of the note targets of `bach-bwv1050` are within 5 mm. A lean of 7° at 1.05 or
+  // 8° at 1.1 brings them to 96% or 92% (`pnpm pose-depth pianist`). The bent elbows fold the right
+  // inner elbow of the hand rig: 11 faces in the play (p95) with shoulder turns of 0° to 4° and the
+  // keys at 1.0, 10 at 1.05, and 7 at 1.1 with a turn of 2° (limit 8). A lean of 8° folds 9 faces
+  // of the left elbow and 13 of the right (`pnpm arm-check pianist`). Elbows that point further out
+  // twist the paws more in the lift (`pnpm arm-check pianist`). The trunk leans toward the keys of
+  // the two paws (`sideLean`), as a pianist leans toward the far keys. A lean up to 16° raises the
+  // far right forearm 12° to the paw. The elbows point out, a little up, and a little back, clear
+  // of the round trunk, as the elbows of a pianist do not touch the trunk: with the elbows out and
+  // 0.7 down, the arms go 15.4 cm (forearms) and 14.9 cm (upper arms) into the trunk in the play,
+  // and with the elbows out and 0.15 up 10.6 cm and 9.5 cm (`pnpm pose-depth pianist`). Elbows that
+  // point 0.3 up put the paws 3 to 4 cm into the belly, and elbows that point further back put the
+  // arms deeper into the trunk. The paws reach from A0 to F4 with the left paw and from E♭4 to C8
+  // with the right paw (`pose/hands.test.ts`), so a melody changes paws between them. A paw that
+  // crosses to the middle of the keys puts its elbow in front of the chest: with the reach to B♭4
+  // and from C4, the arms go 10.6 cm (forearms) and 9.5 cm (upper arms) into the trunk in the play,
+  // and with this reach 10.0 cm and 8.5 cm (`pnpm pose-depth pianist`). The wrists go up and
+  // forward over the case between the lap and the keys (`restArc`): with the paws in the lap, the
+  // arc 0.1 H forward puts the paws of the T-pose polar bear 2.6 cm into its body when they lower,
+  // and 0.25 H 0.8 cm or less. With the rest paws 0.8 H in front of the lap, the arc 0.25 H forward
+  // puts the forearms 1.6 cm into the case front in the lowering, and 0.15 H 1.1 cm. With the paws
+  // in the lap, an arc of 0.5 H out stands the upper arms 61° out from the trunk in the lift. With
+  // no arc out, they stand out at most as far as in a play. On the low bench, an arc 0.4 H up
+  // twists the paws up to 42° on the forearms in the lift, and 0.2 H up 28°. With the paws on the
+  // belly of the hand rig, arcs of 0 to 0.3 H out, up, or forward give the same depths in the lift
+  // and the lowering (`pnpm pose-depth pianist`).
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
@@ -181,12 +182,12 @@ export const HANDS_HOLDS = {
     faceR: [0, -1, 0],
     aimL: null,
     aimR: null,
-    lean: 15 * MathUtils.DEG2RAD,
+    lean: 6 * MathUtils.DEG2RAD,
     restLean: 8 * MathUtils.DEG2RAD,
     restHeadLift: 8 * MathUtils.DEG2RAD,
     sideLean: 60 * MathUtils.DEG2RAD,
     sideLeanMax: 10 * MathUtils.DEG2RAD,
-    shoulderDrop: 16 * MathUtils.DEG2RAD,
+    shoulderDrop: 4 * MathUtils.DEG2RAD,
     reach: { leftHighest: 65, rightLowest: 63 },
     // The wide paws of the polar bear point in along the forearms, so they go up to 4.7 cm into
     // each other when the palms are nearer than 33 cm, 24 semitones in the middle of the keys.
@@ -210,18 +211,17 @@ export const HANDS_HOLDS = {
     // (`along` 0.85, about 1.0 m high), and the paws lie 0.42 H in front of it and a little lower.
     // With the thighs 25° down, the knee stands 4 cm further forward than with the thighs 40° down,
     // and the line through the knee (`along` 1) finds the belly lower: the forearms go 9.5 cm into
-    // the belly at rest, and with `along` 0.85 1.4 cm (`pnpm pose-depth pianist`). `along` 0.85 puts
-    // the wrists 0.43 m below the shoulders, as `along` 1 did with the thighs 40° down. On the
-    // shorter lines of `along` 0.45 to 0.7, the right line
-    // meets the top of the chest and the left line misses the leg, so the old paws stood in the air
-    // beside the face and near the knee. With the palms down, the forearms go 4.7 cm into the belly
-    // at rest, and with the palms back 1.1 cm, the upper arms none (`pnpm pose-depth pianist`).
-    // Paws 0.35 H in front of the belly top put the forearms 3.3 cm into it, and paws 0.6 H in
-    // front stand over the front edge of the keys, in the air. The rest elbows point out and a
-    // little back: elbows that point out, 0.3 down, and 0.4 back put the forearms 3.5 cm and the
-    // upper arms 0.4 cm into the belly. At rest, the right shoulder folds no face (13 before), and
-    // the left paw swings 57° from the straight paw of the source (73° before,
-    // `pnpm arm-check pianist`, limit 70°).
+    // the belly at rest, and with `along` 0.85 1.4 cm (`pnpm pose-depth pianist`). `along` 0.85
+    // puts the wrists 0.43 m below the shoulders, as `along` 1 did with the thighs 40° down. On the
+    // shorter lines of `along` 0.45 to 0.7, the right line meets the top of the chest and the left
+    // line misses the leg, so the old paws stood in the air beside the face and near the knee. With
+    // the palms down, the forearms go 4.7 cm into the belly at rest, and with the palms back 1.1
+    // cm, the upper arms none (`pnpm pose-depth pianist`). Paws 0.35 H in front of the belly top
+    // put the forearms 3.3 cm into it, and paws 0.6 H in front stand over the front edge of the
+    // keys, in the air. The rest elbows point out and a little back: elbows that point out, 0.3
+    // down, and 0.4 back put the forearms 3.5 cm and the upper arms 0.4 cm into the belly. At rest,
+    // the right shoulder folds no face (13 before), and the left paw swings 57° from the straight
+    // paw of the source (73° before, `pnpm arm-check pianist`, limit 70°).
     restL: {
       kind: 'lap',
       lap: { along: 0.85, offset: [0.14, -0.05, -0.42] },

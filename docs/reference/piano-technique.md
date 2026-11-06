@@ -172,10 +172,10 @@ The app follows these facts:
 - **The distance (section 2).** The keys stand at `PIANO_FRONT_H` in front of the floor point.
   Farther keys make the right leg reach for the damper pedal and pull the haunch into the bench.
   Nearer keys fold the shoulders.
-- **The trunk (section 3).** The spine leans a little toward the keys (`lean`), less than the
-  flexion of a posture that is not neutral, and the shoulders stay low (`shoulderDrop`). On the
-  taller bench, the lean and the low shoulders also bring the shoulders down and forward, so the
-  paws reach their keys.
+- **The trunk (section 3).** The trunk sits tall over the sit bones. The spine leans a little
+  toward the keys (`lean`), far less than the flexion of a posture that is not neutral, and the
+  shoulders stay low and level (`shoulderDrop`). A larger lean puts the trunk over the knees, and
+  the bear looks as if it stands up from the bench.
 - **The arms (section 4).** The elbows point out, a little up, and a little back (`poleL`,
   `poleR`), clear of the trunk. Elbows that hang nearer go into the wide trunk. Each paw plays
   only to a few keys past the middle of the keys (`reach`), because a paw that crosses further puts
