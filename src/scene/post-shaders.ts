@@ -207,8 +207,8 @@ vec3 grade(vec3 color) {
 
 /**
  * The final pass to the canvas (design 4.5, post effects): the lens fringe, the depth of field, the
- * contact shade, the room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, the
- * film grain, and the film fade. One pass does all of them, so each pixel of the canvas reads the scene one time,
+ * contact shade, the room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, and the
+ * film grain. One pass does all of them, so each pixel of the canvas reads the scene one time,
  * and two more times for the lens fringe. Outside the frame `uFrame` (left, bottom, right, top),
  * the pass writes the black of the letterbox bars of Cinematic mode (design 2.5), and reads no
  * texture.
@@ -250,8 +250,6 @@ uniform float uSeed;
 // The lateral color of the lens: the shift of the red and the blue at a corner of the frame, as a
 // part of the distance from the middle.
 uniform float uFringe;
-// The level of the film fade (design 2.5): 1 shows the frame, 0 is black.
-uniform float uFade;
 #ifdef DEPTH_OF_FIELD
 ${VIEW_DEPTH}
 #endif
@@ -344,7 +342,6 @@ void main() {
   // breaks the bands of the dark gradients.
   float grain = hash(gl_FragCoord.xy + uSeed) - 0.5;
   c += grain * uGrain * (0.5 + 2.0 * luma * (1.0 - luma));
-  // The film fade darkens the whole frame, with its grain, to the black of the bars.
-  gl_FragColor = vec4(c * uFade, 1.0);
+  gl_FragColor = vec4(c, 1.0);
 }
 `;

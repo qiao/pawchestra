@@ -1,6 +1,5 @@
 import { MathUtils } from 'three';
 
-import { FILM_FADE } from '../app/film-fade.ts';
 import { KEY_PLACE, RIM_PLACE } from '../models/beam.ts';
 import type { PlayerPlace } from '../models/layout.ts';
 import { INSTRUMENT_COLORS, SCENE_COLORS, SPECIES_COLORS } from '../models/colors.ts';
@@ -52,7 +51,6 @@ const LOOK_ROOTS = {
   ENVIRONMENT,
   ESTABLISH_MOVE,
   FILL,
-  FILM_FADE,
   FINISHES,
   FLOOR_GLOSS,
   FOCUS_PULL,

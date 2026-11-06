@@ -960,7 +960,7 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
-  vignette, a grain, and the film fade of 2.5 (`uFade`). `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
+  vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.
 - **Letterbox** (2.5). Each target keeps the size of the canvas, and a scissor limits each pass to
   the letterbox (`cropTarget()` of `scene/letterbox.ts`): the scene pass, its MSAA resolve, the
