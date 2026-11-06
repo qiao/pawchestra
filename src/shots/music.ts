@@ -484,14 +484,8 @@ export function musicIn(music: ScoreMusic, from: number, to: number): WindowMusi
  * @returns The seats, in the order of the entries.
  */
 export function entriesIn(music: ScoreMusic, from: number, to: number): number[] {
-  const seats: number[] = [];
-  for (let k = lastAtOrBefore(music.entryStarts, to); k >= 0; k--) {
-    if ((music.entryStarts[k] ?? 0) < from) {
-      break;
-    }
-    seats.push(music.entrySeats[k] ?? -1);
-  }
-  return seats.toReversed();
+  // Each rest starts before the end of time, so each entry of the range counts.
+  return restingIn(music, Infinity, from, to);
 }
 
 /**
