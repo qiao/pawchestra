@@ -1,6 +1,6 @@
 {
-  "source": "assets/models/beaver/beaver-arms.glb",
-  "sourceNote": "The copy beaver-edit.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.5 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.5 makes these faces. The other faces stay as in beaver-edit.glb.",
+  "source": "assets/models/beaver/beaver-arms-crease.glb",
+  "sourceNote": "A copy of assets/models/beaver/beaver-arms.glb with no flap under the armpits: point edits in Blender merge each vertex of the top row of the wall under each arm into its nearest neighbor of the next row, so that the arm meets the wall in a crease, and no vertex goes to a new place (assets/models/beaver/README.md, beaver-arms-crease.json). beaver-arms.glb is the copy beaver-edit.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist, 1.5 times longer than the arms of the source. tools/blender/arm_rebuild.py --factor 1.5 makes these faces. The other faces stay as in beaver-edit.glb.",
   "armSource": "assets/models/beaver/beaver-edit.glb",
   "armSourceNote": "A copy of beaver.glb with the arms free of the trunk (tools/blender/beaver_edit.py, assets/models/beaver/README.md). tools/blender/arm_rebuild.py reads it. beaver.glb stays unchanged.",
   "paintedWeights": "assets/models/beaver/beaver-weights.json",
