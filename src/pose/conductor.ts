@@ -6,7 +6,7 @@ import { BATON_ALONG, BATON_TOP } from '../models/instruments/baton.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { mixDirection, mixRotation } from './blend.ts';
+import { mixPole, mixRotation } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import type { CueState } from './cues.ts';
 import type { LeftHandState } from './conductor-left.ts';
@@ -344,9 +344,6 @@ const liftTwist = new Quaternion();
 const handInverse = new Quaternion();
 const hanging = new Vector3();
 const restHand = new Quaternion();
-const poleMix = new Vector3();
-const polePlay = new Vector3();
-const poleTuple: [number, number, number] = [0, 0, 0];
 const direction = new Vector3();
 const toCue = new Vector3();
 const pivot = new Vector3();
@@ -443,19 +440,6 @@ function directionOf(yaw: number, lift: number, out: Vector3): Vector3 {
 }
 
 /**
- * Mixes the direction of the elbow of the hanging arm with the direction of the hold.
- *
- * @param hang The hanging arm.
- * @param pole The direction of the hold, in the axes of the chest.
- * @param weight The weight of the hold.
- * @returns The mixed unit direction, in a module tuple that the next call writes again.
- */
-function mixPole(hang: HangingArm, pole: Vec3, weight: number): Vec3 {
-  mixDirection(poleMix.fromArray(hang.pole), polePlay.fromArray(pole), weight, poleMix);
-  return poleMix.toArray(poleTuple);
-}
-
-/**
  * Writes the arms and the fingers of the conductor (design 5.4, 4.7). The right hand moves the tip
  * of the baton to its point in the beat plane, and the two-bone IK places the arm. The beat plane
  * turns by half of the turn of the upper body. The left hand shows the dynamics and the held chords between its
@@ -514,7 +498,7 @@ export function poseConductor(
       shoulder: right,
       wrist: wrist.lerpVectors(hanging, wrist, weight),
       hand,
-      pole: mixPole(rig.hangR, hold.poleR, weight),
+      pole: mixPole(rig.hangR.pole, hold.poleR, weight),
     },
     chest.rotation,
     rotations,
@@ -635,7 +619,7 @@ function poseLeftHand(
       shoulder: left,
       wrist: wrist.lerpVectors(hanging, wrist, up),
       hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, up, hand),
-      pole: mixPole(rig.hangL, CONDUCTOR_HOLD.poleL, up),
+      pole: mixPole(rig.hangL.pole, CONDUCTOR_HOLD.poleL, up),
     },
     chest.rotation,
     rotations,

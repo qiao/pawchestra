@@ -1,5 +1,7 @@
 import { Quaternion, Vector3 } from 'three';
 
+import type { Vec3 } from '../models/tuples.ts';
+
 /**
  * Mixes two rotations along the shorter path, with a normalized linear mix. For the small
  * changes of a pose, it is near a spherical mix (`Quaternion.slerp()`) and costs less.
@@ -44,6 +46,24 @@ export function mixDirection(a: Vector3, b: Vector3, t: number, out: Vector3): V
   fullTurn.setFromUnitVectors(fromUnit, toUnit);
   partTurn.identity().slerp(fullTurn, t);
   return out.copy(fromUnit).applyQuaternion(partTurn);
+}
+
+const poleRest = new Vector3();
+const polePlay = new Vector3();
+const poleTuple: [number, number, number] = [0, 0, 0];
+
+/**
+ * Mixes the direction of an elbow in the rest pose with its direction while the player plays, with
+ * {@link mixDirection}.
+ *
+ * @param rest The direction in the rest pose.
+ * @param play The direction while the player plays.
+ * @param weight The weight of the playing pose.
+ * @returns The mixed unit direction, in a module tuple that the next call writes again.
+ */
+export function mixPole(rest: Vec3, play: Vec3, weight: number): Vec3 {
+  mixDirection(poleRest.fromArray(rest), polePlay.fromArray(play), weight, poleRest);
+  return poleRest.toArray(poleTuple);
 }
 
 /**

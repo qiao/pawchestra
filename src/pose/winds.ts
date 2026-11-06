@@ -7,7 +7,7 @@ import { placePoint } from '../models/instruments/hold.ts';
 import type { PiecePoint } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
-import { mixDirection, mixRotation } from './blend.ts';
+import { mixPole, mixRotation } from './blend.ts';
 import type { InstrumentOf } from './family.ts';
 import { NECK_SHARE, createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
@@ -2149,23 +2149,6 @@ function poseSide(
   writeArm({ arm: side.arm, shoulder, wrist, hand, pole }, chest.rotation, rotations);
   setBoneRotation(rotations, side.arm.bones.shoulder, turn);
   writeCurl(side.arm, curl, rotations);
-}
-
-const poleMix = new Vector3();
-const polePlay = new Vector3();
-const poleTuple: [number, number, number] = [0, 0, 0];
-
-/**
- * Mixes the direction of an elbow in the rest pose with its direction while the player plays.
- *
- * @param rest The direction in the rest pose.
- * @param play The direction while the player plays.
- * @param weight The weight of the playing pose.
- * @returns The mixed unit direction, in a module tuple that the next call writes again.
- */
-function mixPole(rest: Vec3, play: Vec3, weight: number): Vec3 {
-  mixDirection(poleMix.fromArray(rest), polePlay.fromArray(play), weight, poleMix);
-  return poleMix.toArray(poleTuple);
 }
 
 /**

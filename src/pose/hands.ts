@@ -9,7 +9,7 @@ import { pianoKeyFront } from '../models/instruments/piano.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
-import { mixDirection, mixRotation } from './blend.ts';
+import { mixPole, mixRotation } from './blend.ts';
 import type { InstrumentOf } from './family.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
@@ -564,9 +564,6 @@ const wrist = new Vector3();
 const restWrist = new Vector3();
 const restHand = new Quaternion();
 const arcMove = new Vector3();
-const poleMix = new Vector3();
-const polePlay = new Vector3();
-const poleTuple: [number, number, number] = [0, 0, 0];
 const ORIGIN = [0, 0, 0] as const;
 
 /**
@@ -617,9 +614,6 @@ function poseHand(
   // In the rest pose, the hand rests in its lap, which does not move with the chest.
   posePoint(root, ORIGIN, side.rest.wrist, restWrist);
   restHand.fromArray(side.rest.rotation).premultiply(root.rotation);
-  // The elbow points out to the side in the rest pose.
-  mixDirection(poleMix.fromArray(side.rest.pole), polePlay.fromArray(pole), weight, poleMix);
-  poleMix.toArray(poleTuple);
   writeArm(
     {
       arm,
@@ -631,7 +625,8 @@ function poseHand(
           .multiplyScalar(4 * weight * (1 - weight)),
       ),
       hand: mixRotation(restHand, turn, weight, turn),
-      pole: poleTuple,
+      // The elbow points out to the side in the rest pose.
+      pole: mixPole(side.rest.pole, pole, weight),
     },
     chest.rotation,
     rotations,

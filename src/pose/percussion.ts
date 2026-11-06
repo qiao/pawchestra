@@ -2,7 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
-import { mixDirection, mixRotation } from './blend.ts';
+import { mixPole, mixRotation } from './blend.ts';
 import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingHand, hangingWrist } from './hang.ts';
@@ -171,9 +171,6 @@ const wrist = new Vector3();
 const turn = new Quaternion();
 const hanging = new Vector3();
 const restHand = new Quaternion();
-const poleMix = new Vector3();
-const polePlay = new Vector3();
-const poleTuple: [number, number, number] = [0, 0, 0];
 const head = new Vector3();
 const along = new Vector3();
 const top = new Vector3();
@@ -578,16 +575,14 @@ function poseHand(
   }
   limitReach(arm, shoulder.position, wrist);
 
-  // The elbow of the hanging arm points back and out.
-  mixDirection(poleMix.fromArray(hang.pole), polePlay.fromArray(pole), play, poleMix);
-  poleMix.toArray(poleTuple);
   writeArm(
     {
       arm,
       shoulder,
       wrist: wrist.lerpVectors(hanging, wrist, play),
       hand: mixRotation(restHand, turn, play, turn),
-      pole: poleTuple,
+      // The elbow of the hanging arm points back and out.
+      pole: mixPole(hang.pole, pole, play),
     },
     chest.rotation,
     rotations,
