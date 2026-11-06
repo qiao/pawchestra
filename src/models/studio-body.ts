@@ -361,7 +361,6 @@ export function* buildStudioBodySteps(
     palmL: midpoint(positions.handL, positions.fingersL),
     palmR: midpoint(positions.handR, positions.fingersR),
     fingerBlockL: midpoint(positions.fingersL, tip('L')),
-    fingerBlockR: midpoint(positions.fingersR, tip('R')),
     positions,
   };
 }

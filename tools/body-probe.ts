@@ -293,15 +293,7 @@ function studioMeshOf(
  */
 export function jointsOf(bones: BodyBones): JointTable {
   const sorted = Object.entries(bones.positions).toSorted(([a], [b]) => a.localeCompare(b));
-  const landmarks = [
-    'headCenter',
-    'mouth',
-    'floor',
-    'palmL',
-    'palmR',
-    'fingerBlockL',
-    'fingerBlockR',
-  ] as const;
+  const landmarks = ['headCenter', 'mouth', 'floor', 'palmL', 'palmR', 'fingerBlockL'] as const;
   return Object.fromEntries([
     ['headHeight', round(bones.headHeight)],
     ...sorted.map(([name, point]) => [name, roundPoint(point)] as const),

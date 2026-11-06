@@ -30,8 +30,6 @@ export interface BodyBones {
   readonly palmR: Vec3;
   /** The middle of the finger block of the left hand, on its `fingers` bone. */
   readonly fingerBlockL: Vec3;
-  /** The middle of the finger block of the right hand, on its `fingers` bone. */
-  readonly fingerBlockR: Vec3;
 }
 
 /**
