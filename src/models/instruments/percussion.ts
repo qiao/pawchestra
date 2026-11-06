@@ -185,6 +185,12 @@ export const SNARE_DRUM = {
   malletTilt: PAW_TILT,
   /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
   malletSpot: PAW_SPOT,
+  /**
+   * The radius of the ball at the tip of each stick, in meters. The hold lifts each strike target
+   * by it (`PercussionHold.offsetL`, `offsetR`), so that the ball touches the head and does not go
+   * into it.
+   */
+  tip: 0.008,
 } as const;
 
 /**
@@ -707,7 +713,7 @@ export function buildSnareDrum(): InstrumentModel {
   const left = mallet(
     'malletL',
     0.3,
-    0.008,
+    SNARE_DRUM.tip,
     INSTRUMENT_COLORS.stick,
     undefined,
     undefined,
@@ -717,7 +723,7 @@ export function buildSnareDrum(): InstrumentModel {
   const right = mallet(
     'malletR',
     0.3,
-    0.008,
+    SNARE_DRUM.tip,
     INSTRUMENT_COLORS.stick,
     undefined,
     undefined,

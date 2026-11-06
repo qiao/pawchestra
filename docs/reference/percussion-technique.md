@@ -238,10 +238,12 @@ The app follows these facts:
   (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
   The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
-  3.5 cm above the head, with the stick almost level, as in the ready position
+  4 cm above the head, with the stick almost level, as in the ready position
   (`MalletAcross.pitch`). Before a strike, the tip lifts higher for a louder note: about 11 cm to
-  15 cm above the head, and about 10 cm in a roll (`StrikeSizes.lift`, `MalletAcross.peak`). The elbows stand about a fist from the
-  body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the belly. At
+  15 cm above the head, and about 10 cm in a roll (`StrikeSizes.lift`, `MalletAcross.peak`). At a
+  strike, the ball at the tip touches the head (`SNARE_DRUM.tip`). The elbows stand about a fist
+  from the body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the
+  belly. At
   rest, the sticks lie across the body in front of the waist, with the tips a little above the
   near rim (`PercussionHold.set`).
   A deep recast body sets the drum higher and further forward (`PercussionHold.fit`): the head
