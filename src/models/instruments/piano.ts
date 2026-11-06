@@ -208,7 +208,7 @@ const CASE_OUTLINE: readonly OutlinePoint[] = (
  * @param key The MIDI key.
  * @returns True for a black key.
  */
-function isBlack(key: number): boolean {
+export function isBlack(key: number): boolean {
   return BLACK_KEYS.has(key % 12);
 }
 
