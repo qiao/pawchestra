@@ -306,6 +306,12 @@ the facts of its body in its `.blend` ("Hand rig").
 - The tip of the nose comes from the vertices near the middle plane (`NOSE_PLANE`), or below a
   horn (`noseTop`). The head measures leave out a long nose, the whiskers, and the antlers
   (`headFloor`, `headCeiling`), because the holds in `H` start at the head.
+- The mouth lies `MOUTH_DROP` H below the tip of the nose. A body whose nose is far in front of
+  its mouth gives the height of its mouth line (`mouthHeight`, a fact of the body), and its mouth
+  is then the front of the lips on the middle plane at that height (`mouthOf()`,
+  `StudioBody.mouth`). The pig takes it. Reason: the rule put the pig mouth on the front of the
+  snout disc, so the horn mouthpiece touched the disc in front of the lips. A real player rests
+  the mouthpiece on the lips (winds 2.1, 2.2).
 - **Scale.** The scale keeps a landmark that the scene depends on: the shoulders of the bear for
   the conductor stand, and the shoulders, the ear tips, or the head top at the chosen size for
   each other body. A longer leg raises the landmark, so the trunk, the head, and the arms keep
