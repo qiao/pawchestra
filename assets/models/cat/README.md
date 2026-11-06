@@ -264,11 +264,13 @@ small face 817-850-848 in the play, so 848 stays.
 | Root edges with a step of the clavicle and arm share above 0.5 / 0.3 | 30 / 83 | 15 / 68 |
 | Root edges above 90° at the tip / that turn 40° more than in the bind | 35 / 46 | 28 / 32 |
 | Mean edge angle of the root at the tip | 32.1° | 28.8° |
+| Right arm, `pnpm arm-check violist`: play samples with a fold / twist p95 (limit 55) | 54.4% / 35 | 10.0% / 38 |
 
 The root is the 151 places within 0.09 units of the shoulder joint. The 2x crops of
 `reports/2026-11-05-cat-bow-arm/crops/` show the slit behind the root gone at the tip and the rest
 from az150. The fourth `raise` shape is 0 at the tip and at the rest, where the slit was, so it is
 not the cause. At the frog and the crossing it removes 15 of 48 to 50 folded edges of the root.
+`pnpm pose-depth violist` gives the same depths as before.
 
 ## Trial files
 
