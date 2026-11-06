@@ -51,7 +51,7 @@ import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
 import { letterbox, mixBox, uvRectOf } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
-import { blendFocus, mix, modeBlendWeight } from './mode-blend.ts';
+import { blendFocus, blendShare, mix, modeBlendWeight } from './mode-blend.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
@@ -366,11 +366,12 @@ interface ModeLook {
   readonly focus: Focus | null;
 }
 
-/** The blend of a change of the camera mode: the values of the change, and its time. */
+/** The blend of a change of the camera mode: its time, and its weight in the last frame. */
 interface ModeMove {
-  readonly from: ModeLook;
   /** The time of the change, in milliseconds. */
   readonly startMs: number;
+  /** The weight of the blend in the last frame, from 0 to 1. */
+  weight: number;
 }
 
 export class StageScene {
@@ -981,18 +982,19 @@ export class StageScene {
   }
 
   /**
-   * Starts the blend of a change of the camera mode in the frame of the change (design 2.5), from
-   * the values of the last frame. With reduced motion, the change is a hard cut.
+   * Starts the blend of a change of the camera mode in the frame of the change (design 2.5), and
+   * gives the share of the rest of the way that this frame moves the values on the screen toward
+   * the live values (`blendShare()`). With reduced motion, the change is a hard cut.
    *
    * @param camera The camera of the layout.
    * @param cinematic True in Cinematic mode.
    * @param nowMs The time of the frame, in milliseconds.
-   * @returns The weight of the blend in this frame: 1 with no blend.
+   * @returns The share: 1 with no blend.
    */
   #followMode(camera: StageCamera, cinematic: boolean, nowMs: number): number {
     if (cinematic !== this.#cinematic) {
       this.#cinematic = cinematic;
-      this.#modeMove = this.#reducedMotion ? null : { from: this.#shown, startMs: nowMs };
+      this.#modeMove = this.#reducedMotion ? null : { startMs: nowMs, weight: 0 };
       if (this.#blendCamera) {
         camera.startBlend(nowMs, cinematic);
       } else {
@@ -1002,11 +1004,16 @@ export class StageScene {
     this.#blendCamera = false;
 
     const move = this.#modeMove;
-    const w = move ? modeBlendWeight(nowMs - move.startMs) : 1;
+    if (!move) {
+      return 1;
+    }
+    const w = modeBlendWeight(nowMs - move.startMs);
+    const share = blendShare(move.weight, w);
+    move.weight = w;
     if (w >= 1) {
       this.#modeMove = null;
     }
-    return w;
+    return share;
   }
 
   /**
@@ -1049,7 +1056,7 @@ export class StageScene {
       return;
     }
     const nowMs = performance.now();
-    const w = this.#followMode(view.camera, shot !== null, nowMs);
+    const share = this.#followMode(view.camera, shot !== null, nowMs);
     let beam: number;
     let light: number;
     let spot = 0;
@@ -1064,14 +1071,12 @@ export class StageScene {
       beam = freeBeamOpacity(view.stageSide, this.aspect, [x, y, z]);
       light = freeShotLight(view.stageSide, this.aspect, [x, y, z]);
     }
-    // The blend of a change of the mode starts from the values of the frame of the change.
-    const from = this.#modeMove?.from ?? null;
-    const cinema = from ? mix(from.cinema, shot ? 1 : 0, w) : shot ? 1 : 0;
-    if (from) {
-      beam = mix(from.beam, beam, w);
-      light = mix(from.light, light, w);
-      spot = mix(from.spot, spot, w);
-    }
+    // The blend of a change of the mode moves the values of the last frame toward the live ones.
+    const shown = this.#shown;
+    const cinema = mix(shown.cinema, shot ? 1 : 0, share);
+    beam = mix(shown.beam, beam, share);
+    light = mix(shown.light, light, share);
+    spot = mix(shown.spot, spot, share);
     this.#lightShot(view, light, spot);
     const postView = this.#letterboxView(cinema);
     view.camera.frameTo(cover, ring, performance.now(), postView.cinema);
@@ -1096,7 +1101,7 @@ export class StageScene {
     }
     setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);
     const live = this.#focusOf(view, shot, performance.now());
-    const focus = from?.focus ? blendFocus(from.focus, live, w) : live;
+    const focus = shown.focus ? blendFocus(shown.focus, live, share) : live;
     this.#shown = { cinema, beam, light, spot, focus };
     if (!depthPass) {
       this.#holdPose(view);

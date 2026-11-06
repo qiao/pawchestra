@@ -36,14 +36,38 @@ export function modeBlendWeight(elapsedMs: number): number {
 }
 
 /**
+ * Gives the share of the rest of the way that one frame of a blend moves (design 2.5). Each frame
+ * moves the values on the screen by this share toward the live values of the new mode. With a
+ * fixed end, the values thus follow the weight of {@link modeBlendWeight} exactly. A live end
+ * that jumps, such as a cut of the shots or a seek, moves the values on the screen only by the
+ * share, so the frame does not jump. The last frame of the blend has the share 1.
+ *
+ * @param before The weight of the blend in the last frame, from 0 to 1.
+ * @param after The weight of the blend in this frame, from 0 to 1.
+ * @returns The share, from 0 to 1.
+ */
+export function blendShare(before: number, after: number): number {
+  if (before >= 1 || after >= 1) {
+    return 1;
+  }
+  return Math.max(0, (after - before) / (1 - before));
+}
+
+/**
  * Mixes two numbers.
  *
  * @param from The value at the weight 0.
  * @param to The value at the weight 1.
  * @param w The weight.
- * @returns The value between them.
+ * @returns The value between them: exactly `from` at 0 and `to` at 1.
  */
 export function mix(from: number, to: number, w: number): number {
+  if (w <= 0) {
+    return from;
+  }
+  if (w >= 1) {
+    return to;
+  }
   return from + (to - from) * w;
 }
 

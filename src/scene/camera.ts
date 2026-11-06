@@ -27,7 +27,7 @@ import {
 
 import { letterbox, mixBox } from './letterbox.ts';
 import type { FrameBox } from './letterbox.ts';
-import { blendOrbitView, mix, modeBlendWeight } from './mode-blend.ts';
+import { blendOrbitView, blendShare, mix, modeBlendWeight } from './mode-blend.ts';
 import type { OrbitView } from './mode-blend.ts';
 
 /**
@@ -155,12 +155,10 @@ interface TargetGlide {
 
 /** The blend of the camera after a change of the mode with the toggle (design 2.5). */
 interface CameraBlend {
-  /** The camera on the screen at the change. */
-  readonly from: OrbitView;
-  /** The share of the fit of a close shot at the change. */
-  readonly fit: number;
   /** The time of the change, in milliseconds. */
   readonly startMs: number;
+  /** The weight of the blend in the last frame, from 0 to 1. */
+  weight: number;
   /** True for a blend into Cinematic mode, false for a blend into Free mode. */
   readonly toCinematic: boolean;
 }
@@ -404,12 +402,11 @@ export class StageCamera {
       return;
     }
 
-    const shown = this.#shownView();
     // A blend into Free mode that a toggle stops keeps its end, so the next one comes back to it.
     if (toCinematic && this.#blend?.toCinematic !== false) {
-      this.#freeView = shown;
+      this.#freeView = this.#shownView();
     }
-    this.#blend = { from: shown, fit: this.#fit, startMs: nowMs, toCinematic };
+    this.#blend = { startMs: nowMs, weight: 0, toCinematic };
   }
 
   /**
@@ -424,7 +421,8 @@ export class StageCamera {
    * Shows the camera of a shot (Cinematic mode, design 5.6). It also moves the target of the
    * orbit controls, so that a change to Free mode continues from this camera with no jump. In
    * the blend of a change into Cinematic mode, the camera on the screen goes from the camera of
-   * the change to the camera of the shot, which moves too.
+   * the change to the camera of the shot, which moves too. Each frame moves the camera by the
+   * share of `blendShare()` toward the camera of the shot, so a cut in the blend does not jump.
    *
    * @param pose The camera from `cameraAt()`.
    * @param nowMs The time of the frame, in milliseconds.
@@ -434,9 +432,13 @@ export class StageCamera {
     this.#input = false;
     const blend = this.#blend?.toCinematic ? this.#blend : null;
     const w = blend ? modeBlendWeight(nowMs - blend.startMs) : 1;
-    const view = blend ? blendOrbitView(blend.from, pose, w) : pose;
+    const share = blend ? blendShare(blend.weight, w) : 1;
+    const view = share >= 1 ? pose : blendOrbitView(this.#shownView(), pose, share);
     // A blend into Free mode ends in Cinematic mode.
     this.#blend = w < 1 ? blend : null;
+    if (blend) {
+      blend.weight = w;
+    }
     this.camera.position.set(...view.position);
     this.#controls.target.set(...view.target);
     this.camera.lookAt(this.#controls.target);
@@ -446,7 +448,7 @@ export class StageCamera {
     this.#glide = null;
     // A cut changes the fit at once, and a blend joins two close shots.
     const fit = pose.close ? 1 : 0;
-    this.#fit = blend ? mix(blend.fit, fit, w) : fit;
+    this.#fit = mix(this.#fit, fit, share);
     this.#fitGlide = null;
     this.#applyFrame();
     this.#updateFar();
@@ -463,7 +465,9 @@ export class StageCamera {
    */
   #blendToFree(blend: CameraBlend, nowMs: number): boolean {
     const w = modeBlendWeight(nowMs - blend.startMs);
-    const view = blendOrbitView(blend.from, this.#freeView ?? this.#defaultOrbit(), w);
+    const share = blendShare(blend.weight, w);
+    blend.weight = w;
+    const view = blendOrbitView(this.#shownView(), this.#freeView ?? this.#defaultOrbit(), share);
     this.camera.position.set(...view.position);
     this.#controls.target.set(...view.target);
     this.camera.lookAt(this.#controls.target);
@@ -471,7 +475,7 @@ export class StageCamera {
     this.#moved = true;
     this.#following = false;
     this.#glide = null;
-    this.#fit = blend.fit * (1 - w);
+    this.#fit = mix(this.#fit, 0, share);
     this.#fitGlide = null;
     this.#applyFrame();
     return w >= 1;
