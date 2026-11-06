@@ -19,6 +19,9 @@ src/models/studio/rabbit.ts               studio body of the app
 
 This is the body that production shows. `docs/agents/rigging.md` gives the steps of the chain.
 
+On the branch `rabbit-simple-rig`, the app shows the trial of the simple route in its place
+("simple/" below), and `ANIMALS` of `tools/studio-body.ts` reads `simple/rabbit.rig.glb`.
+
 The folder also holds the files of trials that the app does not use ("Trial files" below): the
 hand rig of 2026-11-04 and 2026-11-05 from a Tripo mesh (`hand-rig/`, `tripo/`), and the T-pose
 mesh of an earlier body (`rabbit-tpose.glb`). The hand rig is rejected: it gave a thin, faceted
@@ -98,6 +101,44 @@ These files are the trials of 2026-11-03 to 2026-11-05: `rabbit-tpose.glb`, the 
 T-pose body of `pnpm rig-mesh rabbit` at 77b9d9d3, and the hand rig of the Tripo mesh. The app
 does not use them. The text below gives the trials as they were: "the last rig" is the T-pose rig
 of 77b9d9d3, and `rabbit.json` is its config at that commit.
+
+### simple/
+
+The trial of the simple route of 2026-11-06: `rabbit-tpose.glb` with no edit of the mesh, rigged
+with bone heat weights and a weight smooth, as `~/proj/zoophony-test/blender/build_rig.py` rigs it.
+
+```text
+rabbit-tpose.glb + tools/mesh-rigs/simple/rabbit.json
+   │  blender -b --factory-startup --python tools/blender/simple_rig.py --
+   │      tools/mesh-rigs/simple/rabbit.json --out assets/models/rabbit/simple/rabbit.blend
+   v
+simple/rabbit.blend
+   │  pnpm rig-export rabbit --blend assets/models/rabbit/simple/rabbit.blend
+   │      --out assets/models/rabbit/simple/rabbit.rig.glb
+   v
+simple/rabbit.rig.glb + simple/rabbit.rig.json
+```
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `simple/rabbit.blend` | 296,609 bytes | `2fdb408eb0c05064fa2a4b1f3e4f6b6b8bb0c965e5d7eaa9b31e111c603162c1` |
+| `simple/rabbit.rig.glb` | 414,580 bytes | `5d7773546d3961c6e37de26d5cf3e6bc86450ce22b50672f9339d4e7de58886e` |
+
+- **Mesh.** The source welded at 1e-5 (1,566 vertices, 3,123 triangles), flat faces, the face
+  colors of `add_surface()` with `colors.tone`. No cut, cap, remesh, or rebuild.
+- **Bones.** The 50 bones of the app with the arm segments and the helpers, at the joints of the
+  config: the T-pose joints of 77b9d9d3, with the arm joints on the source arms (elbow x 0.187,
+  wrist x 0.292, paw tip x 0.356).
+- **Weights.** Automatic Weights (bone heat) on each deform bone, also on the arm segments and the
+  helpers. Then 3 passes of a Laplacian smooth over the mesh edges (each vertex takes 0.5 of the
+  mean of its neighbors), the 4 largest weights, and a sum of 1. The nose keeps the head bone.
+- **Bind.** The Action `bind` of the seat rules of the config: the leg turns, the trunk 4° open,
+  straight arms, and the bind supination of `pnpm bind-supination rabbit` (L 119, R 64).
+- **Facts.** `height` 0.681364 (the head height H 0.2985 m, as on the rabbit of main), `crease`
+  35, `backRoom` 0.04. The legs and the arms keep the length of the source, so the seat is lower
+  and the reach shorter than on the rabbit of main.
+
+A run gives the same `rabbit.rig.glb`.
 
 ### rabbit-tpose.glb
 
