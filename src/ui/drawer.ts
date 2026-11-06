@@ -1,9 +1,17 @@
 import { sheetCloses, sheetOffset } from '../app/phone-layout.ts';
 import { createButton, createElement, setAttribute } from './dom.ts';
 import { createIcon } from './icons.ts';
+import type { IconName } from './icons.ts';
 
 /** A tab of the drawer (design 2.8). */
 type DrawerTab = 'demos' | 'seats' | 'settings';
+
+/** The icon before the text of each tab (design 2.8). */
+const TAB_ICONS: Readonly<Record<DrawerTab, IconName>> = {
+  demos: 'music',
+  seats: 'seat',
+  settings: 'sliders',
+};
 
 /** The controls of one tab of the drawer. */
 interface TabParts {
@@ -132,7 +140,8 @@ export class Drawer {
   }
 
   /**
-   * Adds a tab and its panel at the end of the drawer. The first tab is the current tab.
+   * Adds a tab and its panel at the end of the drawer. The first tab is the current tab. The tab
+   * shows its icon before its text, and a screen reader reads only the text.
    *
    * @param id The tab.
    * @param label The text of the tab, for example "Music".
@@ -141,7 +150,7 @@ export class Drawer {
   addTab(id: DrawerTab, label: string, ...content: Element[]): void {
     const tab = createButton('tab', '');
     tab.id = `tab-${id}`;
-    tab.textContent = label;
+    tab.append(createIcon(TAB_ICONS[id]), label);
     tab.setAttribute('role', 'tab');
     const panel = createElement('div', 'tab-panel');
     panel.id = `panel-${id}`;

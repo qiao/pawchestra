@@ -889,14 +889,25 @@ body.is-building #stage {
   flex: 1;
 }
 
-/* A tab: 14 px text in --text-dim. The current tab has --text and a gold line at its foot. */
+/* A tab: a 16 px icon and 14 px text in --text-dim. The current tab has --text and a gold line at
+   its foot. */
 .tab {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-width: 0;
   min-height: var(--target-compact);
   padding: 0 10px 2px;
   font-size: 14px;
   color: var(--text-dim);
+}
+
+.tab svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
 }
 
 /* A tab shows its hover only in its color, so that no tab looks like the current tab. */

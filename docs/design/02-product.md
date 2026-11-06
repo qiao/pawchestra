@@ -73,7 +73,9 @@ The UI has the style of a video player. The theme is dark only, because the scen
 - The drawer has the tabs "Music" (the demos and the file button), "Seats", and "Settings" (with
   the link "Credits"). The UI says "Music", because each user knows the word, and it covers a demo
   and a MIDI file of the user. "Track" names a track of a MIDI file, and "song" does not fit the
-  movement of a symphony. The code keeps the names "demo" and "piece".
+  movement of a symphony. The code keeps the names "demo" and "piece". Each tab shows a 16 px
+  icon before its text: two notes for "Music", a seat of a hall for "Seats", and two sliders for
+  "Settings" (`TAB_ICONS` of `ui/drawer.ts`).
 - Each seat row has a mute button and a solo button. A click on an animal does nothing.
 - The UI uses the system fonts, so the first download does not grow and no request goes to a
   font server.
