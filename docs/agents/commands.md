@@ -39,7 +39,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html` (design 7.1), and a demo at `/#demo=<id>`. |
 | `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). `PAWCHESTRA_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
 | `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). `--base` also builds the commit, and prints the difference. |
-| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `zoophony` (design 9.2). Code: `tools/deploy-vercel.sh`. About 2 minutes. |
+| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `pawchestra` (design 9.2). Code: `tools/deploy-vercel.sh`. About 2 minutes. |
 | `pnpm load-probe [--phone] [--repeat] [--base <ref>]` | Measures the load of the default demo after `pnpm build`: FCP, LCP, the first frame, the time until play is ready, and the bytes. About 10 s. |
 | `pnpm lighthouse [--quick] [--desktop] [--url <url>]` | Audits the page with the pinned Lighthouse after `pnpm build`. About 15 s for each run. |
 | `pnpm typecheck` | Runs `tsc` with no output files. |
