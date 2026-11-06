@@ -1,4 +1,4 @@
-import { MathUtils, Matrix4, Quaternion, Vector3 } from 'three';
+import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { transform } from '../mesh.ts';
 import { toQuat } from '../tuples.ts';
@@ -6,7 +6,7 @@ import type { Quat, Vec3 } from '../tuples.ts';
 import type { Finish, Rgb } from '../mesh.ts';
 import { box, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
-import { PieceBuilder, hold, pieceSize } from './piece.ts';
+import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import type { GripTube, InstrumentModel } from './types.ts';
 
 /** The woodwinds of design 4.6. */
@@ -78,21 +78,6 @@ function keys(
     const x = from + ((to - from) * i) / (count - 1);
     piece.add(box(0.018, 0.004, 0.012), color, transform([x, height, 0]), 'metal');
   }
-}
-
-/**
- * Calculates the rotation of a tube that points along a direction, with the top of the tube (+y)
- * as near to a second direction as the first permits.
- *
- * @param along The direction of the tube from the mouth.
- * @param up The direction of the top of the tube.
- * @returns The rotation from the piece axes to the model axes.
- */
-function pointing(along: Vec3, up: Vec3): Quat {
-  const x = new Vector3(...along).normalize();
-  const y = new Vector3(...up).projectOnPlane(x).normalize();
-  const basis = new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y));
-  return toQuat(new Quaternion().setFromRotationMatrix(basis));
 }
 
 /**

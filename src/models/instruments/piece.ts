@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from 'three';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 import { IDENTITY, toQuat, toVec3 } from '../tuples.ts';
 import { applyTransform, transform } from '../mesh.ts';
 import type { Bounds } from '../bounds.ts';
@@ -50,6 +50,21 @@ function turnYTo(direction: Vector3): Quat {
   return toQuat(
     new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), direction.clone().normalize()),
   );
+}
+
+/**
+ * Calculates the rotation that turns the piece +x to a direction, with the piece +y as near to
+ * a second direction as the first permits. A tube of a wind instrument points +x from the mouth.
+ *
+ * @param along The new direction of +x.
+ * @param up The direction for +y.
+ * @returns The rotation from the piece axes to the model axes.
+ */
+export function pointing(along: Vec3, up: Vec3): Quat {
+  const x = new Vector3(...along).normalize();
+  const y = new Vector3(...up).projectOnPlane(x).normalize();
+  const basis = new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y));
+  return toQuat(new Quaternion().setFromRotationMatrix(basis));
 }
 
 /**

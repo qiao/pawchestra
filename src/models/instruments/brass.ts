@@ -1,11 +1,11 @@
-import { MathUtils, Matrix4, Quaternion, Vector3 } from 'three';
+import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { IDENTITY, toQuat, toVec3 } from '../tuples.ts';
 import { transform } from '../mesh.ts';
-import type { Quat, Vec3 } from '../tuples.ts';
+import type { Vec3 } from '../tuples.ts';
 import { cylinder, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
-import { PieceBuilder, hold, pieceSize } from './piece.ts';
+import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import type { GripTube, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
 
 /** The brass instruments of design 4.6. */
@@ -182,21 +182,6 @@ function valves(
       'metal',
     );
   }
-}
-
-/**
- * Calculates the rotation that turns the piece +x to a direction, with the piece +y as near to
- * a second direction as the first permits.
- *
- * @param along The new direction of +x.
- * @param up The direction for +y.
- * @returns The rotation.
- */
-function pointing(along: Vec3, up: Vec3): Quat {
-  const x = new Vector3(...along).normalize();
-  const y = new Vector3(...up).projectOnPlane(x).normalize();
-  const basis = new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y));
-  return toQuat(new Quaternion().setFromRotationMatrix(basis));
 }
 
 /** The parts and the play data of one brass instrument. */
