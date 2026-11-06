@@ -448,6 +448,50 @@ the band (691 edges) from 14.0°, 35.2°, 78.6° to 13.3°, 33.4°, 71.1°. The 
 thigh root went from 2.1 cm to 1.5 cm below its neighbors (2336), and the crotch vertex 1797 from
 2.0 cm to 1.1 cm. The seat top (0.268 m) and the folds of `pnpm fold-probe pianist` do not change.
 
+**Crotch key.** After `bind_belly`, a band of faces at the lower belly front faced down in the
+bind and in the app pose, and made a shelf with a sharp concave edge above each thigh root. The
+cause is the thigh share of the crotch and groin rows (0.3 to 0.7). The thighs turn about 65°
+forward into the bind, so these vertices go up to 13 cm back and up. The trunk vertices above them
+(200, 199, 1499, 1850, 1342) stay. The belly front then overhung a pocket 9 to 11 cm deep over the
+thigh roots and the crotch. The shape key `bind_crotch` (value 1) moves these vertices down and
+forward in the bind, so the belly rolls over onto the thigh tops, and fills the gap between the
+thighs. The weights do not change: trunk rows sink the crotch (weight step 16), and the key keeps
+the folds of the play. Each target was chosen by hand in the live Blender from the
+sections and the images of the bind, and `be.add_bind_move()` of `tools/blender/bind_edit.py`
+wrote the move. The right vertex takes the mirror target. The moves in the bind, in cm (Blender axes):
+
+| Vertex (right) | Move left | Move right | Reason |
+|---|---|---|---|
+| 201, 1772, 1193, 828, 827, 357 | 0, -8.7, -4.2 / 0, -7.5, -5.1 / 0, -5.4, -5.7 / 0, -3.1, -5.3 / 0, -1.3, -4.2 / 0, -0.2, -2.2 | (middle) | The middle column below 200 makes one round curve down to 358 |
+| 202 (1805), 1771 (903), 1770 (906), 2041 (825), 454 (826), 9 (761) | 0, -8.2, -3.9 / 0, -7.5, -5.1 / 0, -5.2, -5.7 / 0, -2.9, -5.3 / 0, -1.5, -3.9 / 0, -0.5, -2.5 | 0, -7.9, -3.9 / 0, -7.5, -5.2 / 0, -5.2, -5.7 / 0, -3.0, -5.3 / 0, -1.5, -4.0 / 0, -0.5, -2.6 | The same curve beside the middle |
+| 1863 (1806), 1795 (904), 1796 (905), 2164 (1287), 453 (2333) | 0, -6.6, -4.0 / 0, -8.1, -5.6 / 0, -5.4, -5.8 / 0, -3.3, -4.7 / 0, -1.7, -2.6 | 0, -6.5, -3.9 / 0, -8.6, -5.8 / 0, -5.4, -5.7 / 0, -3.3, -4.9 / 0, -1.7, -3.0 | The edge of the belly bulge between the thighs, beside the inner thigh |
+| 1342 (979), 1851 (980) | 0, -2.2, -4.2 / -0.5, -3.5, -4.6 | 0, -2.2, -4.2 / 0.1, -3.5, -4.6 | The belly front comes down to 1 to 3 cm above the thigh top |
+| 1677 (1908), 1676 (1220) | 0.3, -11.6, -6.7 / 1.3, -9.8, -4.8 | -0.3, -11.6, -6.7 / -1.7, -9.7, -4.7 | The lower belly row rests on the thigh top, at 629 and 450 |
+| 1679 (1219), 1678 (2335), 1797 (1285), 2388 (1633), 2386 (1634) | 0.5, -7.7, -2.5 / -0.2, -8.9, -4.5 / -1.2, -9.4, -5.7 / 0.4, -5.6, -2.7 / -0.1, -3.8, -2.8 | -0.5, -7.6, -2.5 / 0.2, -8.9, -4.5 / 1.1, -9.4, -5.7 / -0.4, -5.5, -2.7 / 0.1, -3.8, -3.0 | The pocket closes into the crease under the belly. 2388 and 2386 stay 4 to 8 mm off the lines of their neighbors. On a line, a triangle with them went thin, and the pedal pose folded it |
+| 2234 (2040), 450 (846) | 0, -1.9, -2.9 / 0, -0.8, -1.6 | 0, -1.5, -2.9 / 0.1, -0.3, -1.7 | The thigh top at the root goes under the belly, so it does not come through |
+| 2261 (1286), 805 (2119), 806 (2144), 1090 (2118), 1091 (1900), 1653 (1899) | -0.5, -5.8, -4.3 / 0, -2.2, -1.8 / 0.1, -1.4, -1.2 / 0.3, -2.7, -1.3 / 0.6, -2.3, -0.7 / 0.7, -1.5, 0.2 | 0.5, -5.8, -4.6 / -0.1, -2.2, -2.6 / -0.1, -1.1, -1.5 / -0.3, -2.4, -1.8 / -0.6, -2.0, -1.0 / -0.7, -1.3, 0.1 | The crease of the inner thigh comes forward with the belly. With 1090 and 1091 in place, the quad 1090, 2386, 2261, 805 turned over |
+
+The upper arc vertex 2336 and the lower arc vertex 2354 keep their places: a move of them put the
+triangle 2234, 2336, 2354 on one line, and the pedal pose folded it.
+
+Measures, before and after the key. The band is the 154 faces with the rest middle at |x| < 0.2,
+z 0.2 to 0.42, and y < 0:
+
+| Measure | Before | After |
+|---|---|---|
+| Faces whose normal turns down more than 45° from the rest, bind / chord / rest | 15 / 12 / 14 | 14 / 13 / 14 |
+| Of them, faces that a front, a front side, or a low view sees | 5 / 5 / 5 | 2 / 2 / 2 |
+| Angle of the normal above the horizontal, for the 15 shelf faces of before, in the bind | -41° to -73° | -16° to -42°, and -68° to -73° for 3 faces in the crease |
+| Edges of the band over 60°, bind / chord / rest | 46 / 45 / 48 | 32 / 36 / 38 |
+| `pnpm bind-view --sharp 30`, box at the crotch front: sharp edges, over 90°, concave over 60°, thin | 77, 16, 21, 0 | 89, 14, 13, 0 |
+| Deepest vertex of the thigh root below its neighbors | 1.5 cm (2336) | 0.3 cm (1895) |
+| Deepest crotch vertex below its neighbors | 1.6 cm (1678), 1797 1.1 cm | 1.0 cm (2119), 1797 0.4 cm above |
+
+The seat top (0.268343 m) and the folds of `pnpm fold-probe pianist` (play 25, lift 23) do not
+change. The added sharp edges lie in the crease under the belly, where the bind hides them. The
+images are in
+`reports/2026-11-05-polar-bear-crotch/`.
+
 At 25°, the seat top is 0.268 m, the hip joints 0.43 m, and the knees 0.31 m above the floor.
 At 40°, the seat top was 0.331 m and the hip joints 0.49 m: the haunch sat on the front edge of
 the bench, and the bear looked as if it stood up. The exports of 20°, 22°, 28°, and 31° gave the
