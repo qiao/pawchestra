@@ -178,7 +178,11 @@ export const HANDS_HOLDS = {
   // stand out at most as far as in a play. On the low bench, an arc 0.4 H up twists the paws up to
   // 42° on the forearms in the lift, and 0.2 H up 28°. With the paws on the belly of the hand rig,
   // arcs of 0 to 0.3 H out, up, or forward give the same depths in the lift and the lowering (`pnpm
-  // pose-depth pianist`).
+  // pose-depth pianist`). On the lifted piano, the case front stands above the rest paws: the arc
+  // 0.2 H up and 0.15 H forward puts the paws 3.1 cm into the case in the lift and 3.5 cm in the
+  // lowering, 0.35 H up and 0.05 H forward 0.4 cm and 2.1 cm, and 0.5 H up and 0.1 H forward 0.4 cm
+  // and 0.8 cm (`pnpm pose-depth pianist`). The higher arc folds up to 8 faces of the left arm in
+  // the lift (p95, 6 before, `pnpm arm-check pianist`).
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
@@ -205,7 +209,7 @@ export const HANDS_HOLDS = {
     poleR: [1, -0.3, 0.2],
     curl: 30 * MathUtils.DEG2RAD,
     curlClosed: 30 * MathUtils.DEG2RAD,
-    restArc: [0, 0.2, 0.15],
+    restArc: [0, 0.5, 0.1],
     // The rest pose is the rest position of a pianist before a performance: the trunk sits tall
     // with a slight lean toward the piano, the head is up, and the hands rest in the lap
     // (`docs/reference/piano-technique.md`, section 8). The head lifts against the rest lean
