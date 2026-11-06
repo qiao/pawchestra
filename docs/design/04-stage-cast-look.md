@@ -211,7 +211,10 @@ flap under the armpit. The deer copy merges a fold on the inner side of each arm
 into the arm (`deer-arms-crease.glb`). Reason: the fold showed as fins under the roots and slits
 on the inner upper arm in the bind. The pig copy merges each spike, sliver, and near twin vertex of
 the trunk fan under each arm into a neighbor (`pig-root-pit.glb`). Reason: the hanging arm hid
-them, and the bind and the play showed them as fins, notches, and dark back faces. The old faces keep their colors, so that the black and white edge of the trunk stays.
+them, and the bind and the play showed them as fins, notches, and dark back faces. The panda copy
+merges 5 vertices at the arm roots into a neighbor (`panda-edge-pit.glb`). Reason: the hold brings
+the level T-pose arms down, and a sliver and faces between corners of other weights turned over
+into a dark back face, fins, and deep notches. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of
