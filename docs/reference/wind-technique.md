@@ -238,6 +238,10 @@ from the first position (derived).
   torso and in front of it [25]. The mouthpiece slopes down [29]. The bell points past the right
   side of the body, so that the stomach does not mute it [1]. Tuckwell turns the head to the left
   to meet the mouthpiece [28 (secondary)].
+- **The mouthpiece on the lips.** Most horn teachers set the mouthpiece about two thirds on the
+  upper lip and one third on the lower lip, from one half to three quarters on the upper lip
+  [79 (secondary)]. The lips, the jaw, and the teeth of each player set the exact place
+  [80 (secondary)].
 - **The bell on the leg.** The sources disagree. Farkas sat with the lower rim of the bell on the
   outer side of the thigh [27 (secondary)]. Tuckwell holds the horn free of the body, also when
   seated [28 (secondary)]. The weight is on the hands, off the leg [1], and most players support
@@ -724,3 +728,7 @@ Each source opened on 2026-10-18, except where its entry gives another date.
     "Motion of the shoulder complex during multiplanar humeral elevation", Journal of Bone and
     Joint Surgery (American) 91 (2), 2009, pages 378 to 389 (opened 2026-11-04).
     https://pmc.ncbi.nlm.nih.gov/articles/PMC2657311
+79. Horn Matters, "Hornmasters on Mouthpiece Placement" (opened 2026-11-06).
+    https://www.hornmatters.com/?p=12440
+80. J. Boldin, "Why More Upper Lip in the Mouthpiece" (opened 2026-11-06).
+    https://jamesboldin.com/2010/07/30/why-more-upper-lip-in-the-mouthpiece/
