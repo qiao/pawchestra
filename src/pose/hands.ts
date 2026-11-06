@@ -203,12 +203,16 @@ export const HANDS_HOLDS = {
     // with a slight lean toward the piano, the head is up, and the hands rest in the lap
     // (`docs/reference/piano-technique.md`, section 8). The head lifts against the rest lean
     // (`restHeadLift`), so the gaze is level and the face shows over the lid. The round belly of
-    // the polar bear covers its thighs to the knees, and the thigh tops stand about 0.9 m from the
-    // shoulders, out of the reach of the arms (0.66 m to the palm). So the paws rest on the front
-    // of the belly, at its widest, with the palms back and down on it and the fingers in toward
-    // each other, as a hand rests on a round belly. The vertical line through the lap place finds
-    // the top of the belly over the knee (`along` 1, about 1.0 m high), and the paws lie 0.42 H in
-    // front of it and a little lower. On the shorter lines of `along` 0.45 to 0.7, the right line
+    // the polar bear covers its thighs to the knees, and the thigh tops lie out of the reach of the
+    // arms (0.66 m to the palm). So the paws rest on the front of the belly, at its widest, with
+    // the palms back and down on it and the fingers in toward each other, as a hand rests on a
+    // round belly. The vertical line through the lap place finds the top of the belly near the knee
+    // (`along` 0.85, about 1.0 m high), and the paws lie 0.42 H in front of it and a little lower.
+    // With the thighs 25° down, the knee stands 4 cm further forward than with the thighs 40° down,
+    // and the line through the knee (`along` 1) finds the belly lower: the forearms go 9.5 cm into
+    // the belly at rest, and with `along` 0.85 1.4 cm (`pnpm pose-depth pianist`). `along` 0.85 puts
+    // the wrists 0.43 m below the shoulders, as `along` 1 did with the thighs 40° down. On the
+    // shorter lines of `along` 0.45 to 0.7, the right line
     // meets the top of the chest and the left line misses the leg, so the old paws stood in the air
     // beside the face and near the knee. With the palms down, the forearms go 4.7 cm into the belly
     // at rest, and with the palms back 1.1 cm, the upper arms none (`pnpm pose-depth pianist`).
@@ -220,14 +224,14 @@ export const HANDS_HOLDS = {
     // `pnpm arm-check pianist`, limit 70°).
     restL: {
       kind: 'lap',
-      lap: { along: 1, offset: [0.14, -0.05, -0.42] },
+      lap: { along: 0.85, offset: [0.14, -0.05, -0.42] },
       palm: [0.3, -0.6, 1],
       fingers: [1, -0.3, 0],
       pole: [-1, 0, 0.3],
     },
     restR: {
       kind: 'lap',
-      lap: { along: 1, offset: [-0.14, -0.05, -0.42] },
+      lap: { along: 0.85, offset: [-0.14, -0.05, -0.42] },
       palm: [-0.3, -0.6, 1],
       fingers: [-1, -0.3, 0],
       pole: [1, 0, 0.3],
