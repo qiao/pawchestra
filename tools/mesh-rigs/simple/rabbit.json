@@ -266,10 +266,10 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 119,
-      "R": 64
+      "L": 115,
+      "R": 58
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 119 degrees and the right 64 degrees (paw_supination() of tools/blender/rig_mesh.py). pnpm bind-supination rabbit gives the values on this body (design 4.4).",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 115 degrees and the right 58 degrees (paw_supination() of tools/blender/rig_mesh.py). pnpm bind-supination rabbit gives the values on this body (design 4.4).",
     "note": "The leg turns of the T-pose rabbit of 77b9d9d3. The legs keep the length of the source, so the seat is lower than on the rabbit of rig-mesh."
   },
   "colors": {
@@ -351,11 +351,46 @@
   },
   "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The joints are those of the T-pose rabbit of 77b9d9d3, with the arm joints on the arms of the source: the elbow at 0.39 of the free arm, the wrist at the wrist ring, and the paw tip at x 0.356. The palm is the true palm of the source: the mean normal of the pink pads of the palm faces down.",
   "body": {
-    "height": 0.681364,
     "crease": 35,
     "backRoom": 0.04
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts). The height puts the standing shoulder joints (0.497 u) at 1.37095 m for each unit, so that the head height H is 0.2985 m, as on the rabbit of main, and the holds in H keep their size. The crease angle and the back room are those of the rabbit of main.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle and the back room of the rabbit of main.",
   "eyeSize": 0.217767,
-  "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as studio-body gives a rig-mesh body."
+  "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as studio-body gives a rig-mesh body.",
+  "limbs": {
+    "arm": 1.15,
+    "armNote": "The upper arm and the forearm grow 1.15 times from the shoulder joint to the wrist joint, and the paw keeps its size. The arm of the rabbit of main is 0.343 m from the shoulder joint to the wrist joint, and the source arm 0.298 m at the same H, so the factor gives the arm length of main (shoulder to paw tip 0.434 m against 0.429 m) and its reach to the violin.",
+    "armRoot": 0.03,
+    "armRadius": [
+      0.05,
+      0.065
+    ],
+    "armRadiusNote": "The arm of the source lies within 0.047 units of the line from the shoulder joint to the wrist joint. The trunk, the cheeks, and the whiskers lie more than 0.066 units from it, so they do not move.",
+    "leg": 1.75,
+    "legNote": "The band from the ankle joint to the hip joint grows 1.75 times, the leg factor of the rabbit of main: the thigh 0.169 m and the shin 0.150 m against 0.169 m and 0.148 m. The seat of the app fits the longer legs.",
+    "legRamp": 0.01
+  },
+  "rings": {
+    "elbow": [
+      -0.5,
+      0,
+      0.5
+    ],
+    "wrist": [
+      -0.5,
+      0
+    ],
+    "knee": [
+      -0.5,
+      0,
+      0.5
+    ],
+    "note": "The planes of the cuts of each joint, in radii of the limb at the joint from the joint along the bone. Thus each elbow and each knee has 3 rings within one radius, and each wrist 2 (JOINT_RINGS of design 4.4).",
+    "snap": 0.003,
+    "reach": 0.02,
+    "armRadius": 0.065,
+    "legInner": 0.01
+  },
+  "metersPerUnit": 1.370954,
+  "metersPerUnitNote": "The scale of the app: H stays 0.2985 m, as on the rabbit of main. The script gives the fact height from the shoulder joints after the stretch of the legs."
 }
