@@ -866,6 +866,12 @@ interface Gltf {
        */
       readonly hinges?: Readonly<Record<Side, readonly number[]>>;
       /**
+       * The unit close axis of each thumb in the bind pose of a rig with thumb bones (`thumbs` of
+       * the config of the mesh rig, `StudioBody.thumbAxes`), in the axes of the file. The file has
+       * none with no such rule.
+       */
+      readonly thumbs?: Readonly<Record<Side, readonly number[]>>;
+      /**
        * The seat under the seated bind pose, or under the sit pose of a standing bind. A file of
        * another tool has none.
        */
@@ -1021,15 +1027,41 @@ function upperTwistOf(glb: Glb): number | null {
  * @throws Error if an axis is not a unit vector of three numbers.
  */
 function hingesOf(glb: Glb): Record<Side, Vector3> | null {
-  const hinges = glb.json.asset?.extras?.hinges;
-  if (hinges === undefined) {
+  return sideAxes(glb.json.asset?.extras?.hinges, 'hinge');
+}
+
+/**
+ * Gives the unit close axes of the thumbs in the rig of a GLB file with thumb bones (`thumbs` of
+ * the config of `pnpm rig-mesh`, design 4.4), in the axes of the file.
+ *
+ * @param glb The file.
+ * @returns The axis of each side, or `null` for a file with no thumbs.
+ * @throws Error if an axis is not a unit vector of three numbers.
+ */
+function thumbAxesOf(glb: Glb): Record<Side, Vector3> | null {
+  return sideAxes(glb.json.asset?.extras?.thumbs, 'thumb axis');
+}
+
+/**
+ * Reads one unit axis for each side from the extras of a GLB file.
+ *
+ * @param axes The value of the extras, or `undefined`.
+ * @param name The name of the axis in an error message.
+ * @returns The axis of each side, or `null` with no value.
+ * @throws Error if an axis is not a unit vector of three numbers.
+ */
+function sideAxes(
+  axes: Readonly<Record<Side, readonly number[]>> | undefined,
+  name: string,
+): Record<Side, Vector3> | null {
+  if (axes === undefined) {
     return null;
   }
   const axis = (side: Side): Vector3 => {
-    const [x, y, z] = hinges[side];
+    const [x, y, z] = axes[side];
     const out = new Vector3(x, y, z);
-    if (hinges[side].length !== 3 || Math.abs(out.length() - 1) > 1e-3) {
-      throw new Error(`The hinge ${side} of the file is not a unit vector of three numbers.`);
+    if (axes[side].length !== 3 || Math.abs(out.length() - 1) > 1e-3) {
+      throw new Error(`The ${name} ${side} of the file is not a unit vector of three numbers.`);
     }
     return out;
   };
@@ -3068,6 +3100,10 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const hinges = hingesOf(glb);
   if (hinges !== null) {
     body = { ...body, hinges: { L: direction(hinges.L), R: direction(hinges.R) } };
+  }
+  const thumbAxes = thumbAxesOf(glb);
+  if (thumbAxes !== null) {
+    body = { ...body, thumbAxes: { L: direction(thumbAxes.L), R: direction(thumbAxes.R) } };
   }
   if (frame.chairWidth !== null) {
     body = { ...body, chairWidth: frame.chairWidth };
