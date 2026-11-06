@@ -237,6 +237,11 @@ export class App {
    * that two builds do not share the renderer. A later selection stops the build before it.
    */
   #lastBuild: Promise<unknown> = Promise.resolve();
+  /**
+   * The number of builds and restores of a scene that run in slices. Their slices make the frames
+   * slow, so the automatic tier does not measure them (design 2.6).
+   */
+  #building = 0;
   /** The demo whose file did not load, for "Try again", or `null` (design 2.2, 2.8). */
   #failedFile: StageFile | null = null;
   /**
@@ -403,7 +408,7 @@ export class App {
    */
   #restoreScene(): void {
     const steps = this.#scene.restoreSteps();
-    const run = this.#lastBuild.then(async () => runSliced(steps, () => true));
+    const run = this.#lastBuild.then(async () => this.#runSliced(steps, () => true));
     this.#lastBuild = run.catch(() => null);
     run.catch(reportError);
   }
@@ -692,9 +697,26 @@ export class App {
       const prepared = yield* scene.prepareSteps(plans.layout, plans.models);
       return { score, scene: plans, prepared };
     })();
-    const run = before.then(async () => runSliced(steps, live));
+    const run = before.then(async () => this.#runSliced(steps, live));
     this.#lastBuild = run.catch(() => null);
     return run;
+  }
+
+  /**
+   * Runs the steps of a build in slices of the main thread (`runSliced()`), and counts the build
+   * while it runs.
+   *
+   * @param steps The steps.
+   * @param live Tells if the result is still needed.
+   * @returns The result, or `null` if the run stopped.
+   */
+  async #runSliced<T>(steps: Steps<T>, live: () => boolean): Promise<T | null> {
+    this.#building++;
+    try {
+      return await runSliced(steps, live);
+    } finally {
+      this.#building--;
+    }
   }
 
   /**
@@ -1028,8 +1050,8 @@ export class App {
 
   /**
    * Measures the frame for the automatic tier, and drops the tier of the renderer when the frames
-   * are slow (design 2.6). It measures only while the music plays, the tab is visible, and the
-   * quality setting is "Auto".
+   * are slow (design 2.6). It measures only while the music plays, the tab is visible, no
+   * build of a scene runs, and the quality setting is "Auto".
    *
    * @param wallTime The wall time of the frame, in seconds.
    */
@@ -1037,7 +1059,8 @@ export class App {
     const measuring =
       this.#quality === 'auto' &&
       this.#state.transport.playing &&
-      document.visibilityState === 'visible';
+      document.visibilityState === 'visible' &&
+      this.#building === 0;
     const before = this.#tierWatch.tier;
     this.#tierWatch = followFrame(this.#tierWatch, wallTime, measuring);
     if (this.#tierWatch.tier !== before) {

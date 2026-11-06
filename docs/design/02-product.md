@@ -163,8 +163,9 @@ The image is a little softer.
   "Apple GPU".
 - The automatic tier drops one tier when the frames are slow for a time window (`followFrame()`
   in `app/settings.ts`). It measures the time between frames, because the work time of a frame
-  does not hold the GPU time. It measures only during play, with a visible tab and the setting
-  "Auto". It only goes down, so the quality does not go down and up many times.
+  does not hold the GPU time. It measures only during play, with a visible tab, with no build of a
+  scene, and with the setting "Auto". The slices of a build make the frames slow on each GPU. The
+  tier only goes down, so the quality does not go down and up many times.
 - A steady 30 fps or 50 fps does not drop the tier (`slowWindow()`), because energy saver modes
   and 50 Hz displays cap the rate, and a lower tier does not make these frames faster.
 - A manual setting overrides the automatic tier. The setting "Frame rate" draws at each refresh
