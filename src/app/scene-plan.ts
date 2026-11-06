@@ -31,7 +31,7 @@ export interface ScoreScene {
  * @param score The score.
  * @returns The steps, which return the layout, the player models, and the plans.
  */
-export function* planSceneSteps(score: Score): Steps<ScoreScene> {
+function* planSceneSteps(score: Score): Steps<ScoreScene> {
   const models = new ModelCache();
   const layout = yield* layoutSceneSteps(score, models);
   const plan = yield* preparePosesSteps(score, layout, POSE_SEED, models);
@@ -49,11 +49,7 @@ export function* planSceneSteps(score: Score): Steps<ScoreScene> {
  * @returns The steps, which return the score.
  * @throws Error if `buildScore()` refuses the file.
  */
-export function* scoreSteps(
-  bytes: Uint8Array,
-  sectionSize: SectionSize,
-  name: string,
-): Steps<Score> {
+function* scoreSteps(bytes: Uint8Array, sectionSize: SectionSize, name: string): Steps<Score> {
   const result = yield* buildScoreSteps(bytes, sectionSize);
   if (!result.ok) {
     throw new Error(`The file "${name}" is not valid: ${result.error}.`);

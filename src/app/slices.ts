@@ -5,7 +5,7 @@ import type { Steps } from '../score/steps.ts';
  * each task by 4 for a phone, and a task above 50 ms blocks. A slice ends after the first step past
  * this time, so a step of up to about 7 ms keeps each task below 10 ms on the development Mac.
  */
-export const SLICE_MS = 3;
+const SLICE_MS = 3;
 
 /** The resolvers of the calls of {@link yieldToMain} that wait for the message of the channel. */
 const waiting: (() => void)[] = [];

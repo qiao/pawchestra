@@ -16,13 +16,13 @@ export interface HallImpulse {
 }
 
 /** The impulse response of St Paul's Hall, Huddersfield: T30 about 2.1 s. */
-export const ST_PAULS_HALL: HallImpulse = { flacUrl: stPaulsFlacUrl, wavUrl: stPaulsWavUrl };
+const ST_PAULS_HALL: HallImpulse = { flacUrl: stPaulsFlacUrl, wavUrl: stPaulsWavUrl };
 
 /**
  * The impulse response of the Konzerthaus of Detmold with its enhancement preset "Choir and
  * Orchestra": T30 about 2.7 s.
  */
-export const KONZERTHAUS: HallImpulse = { flacUrl: konzerthausFlacUrl, wavUrl: konzerthausWavUrl };
+const KONZERTHAUS: HallImpulse = { flacUrl: konzerthausFlacUrl, wavUrl: konzerthausWavUrl };
 
 /** The settings of a `DynamicsCompressorNode` (design 6.8). */
 export interface Compressor {
@@ -75,7 +75,7 @@ export type MixName = 'hall' | 'cinematic';
  * The frequencies in Hz and the Q values of the tone EQ (design 6.8). The two mix presets share
  * them, and differ only in the gains.
  */
-export const TONE_EQ = {
+const TONE_EQ = {
   lowShelf: { frequency: 100 },
   lowMid: { frequency: 300, q: 1 },
   presence: { frequency: 3150, q: 1.4 },

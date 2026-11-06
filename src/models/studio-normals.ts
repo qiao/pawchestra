@@ -1,4 +1,3 @@
-import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import { FINISH_ORDER } from './mesh.ts';
 import type { StudioMesh } from './studio-format.ts';
@@ -87,6 +86,9 @@ export function studioNormals(
   return out;
 }
 
+/** The number of corners of one step of {@link studioCornerColorsSteps}. */
+const COLOR_CORNERS_PER_STEP = 4000;
+
 /**
  * Calculates the color of each corner of a studio mesh with a blend of the colors of the fur
  * (design 4.5). A corner of a `matte` face gets the mean of the colors of the `matte` faces at its
@@ -95,37 +97,13 @@ export function studioNormals(
  * Each face counts with the angle of its corner at the vertex. Thus the small steps of the paint
  * and of the baked occlusion fade across the fur, and a large step, such as the edge of a muzzle
  * or of a brow, stays sharp. A corner of another finish, such as a claw, and a corner of a cap
- * keep the color of their face.
+ * keep the color of their face. The work runs in steps (design 7.2).
  *
  * @param mesh The places of the welded vertices, the corners, and the finishes of the mesh.
  * @param colors Linear r, g, b of each triangle.
  * @param crease The crease angle in degrees.
  * @param blend The largest difference of two face colors that blend, in each sRGB channel from
  *   0 to 1. With 0, each corner keeps the color of its face.
- * @param caps The `matte` triangles of the caps of the arms (`StudioBody.caps`).
- * @returns Linear r, g, b of each corner, in the order of `mesh.corners`.
- */
-export function studioCornerColors(
-  mesh: Pick<StudioMesh, 'positions' | 'corners' | 'finishes'>,
-  colors: ArrayLike<number>,
-  crease: number,
-  blend: number,
-  caps: readonly number[] = [],
-): Float32Array {
-  return runAll(studioCornerColorsSteps(mesh, colors, crease, blend, caps));
-}
-
-/** The number of corners of one step of {@link studioCornerColorsSteps}. */
-const COLOR_CORNERS_PER_STEP = 4000;
-
-/**
- * Gives the color of each corner of a studio body as {@link studioCornerColors} does, in steps
- * (design 7.2).
- *
- * @param mesh The places of the welded vertices, the corners, and the finishes of the mesh.
- * @param colors Linear r, g, b of each triangle.
- * @param crease The crease angle in degrees.
- * @param blend The largest difference of two face colors that blend, in each sRGB channel.
  * @param caps The `matte` triangles of the caps of the arms (`StudioBody.caps`).
  * @returns The steps, which return linear r, g, b of each corner, in the order of
  *   `mesh.corners`.

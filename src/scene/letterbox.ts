@@ -27,7 +27,7 @@ export interface UvRect {
  * The time of the move of the letterbox bars between Free mode and Cinematic mode, in
  * milliseconds (design 2.5). With reduced motion, the bars move at once.
  */
-export const LETTERBOX_MOVE_MS = 600;
+const LETTERBOX_MOVE_MS = 600;
 
 /**
  * Gives the frame of Cinematic mode (design 2.5): the largest box of the aspect

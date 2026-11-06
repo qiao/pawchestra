@@ -58,7 +58,7 @@ export function celloAxes(): CelloAxes {
  * @param body The body in its bind pose.
  * @returns The height, in meters.
  */
-export function celloChestHeight(body: BodyBones): number {
+function celloChestHeight(body: BodyBones): number {
   const hips = body.positions.hips[1];
   const shoulders = (body.positions.upperArmL[1] + body.positions.upperArmR[1]) / 2;
   return hips + CELLO_PLACE.chest * (shoulders - hips);

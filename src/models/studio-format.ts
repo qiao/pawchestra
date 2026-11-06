@@ -477,7 +477,7 @@ export interface StudioBody {
   readonly crease: number;
   /**
    * The largest difference of two face colors of the fur that blend at a vertex, in each sRGB
-   * channel from 0 to 1 (`studioCornerColors()`, design 4.5), from the settings of the animal. A
+   * channel from 0 to 1 (`studioCornerColorsSteps()`, design 4.5), from the settings of the animal. A
    * body with no value keeps one color for each face.
    */
   readonly colorBlend?: number;

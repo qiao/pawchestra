@@ -21,7 +21,7 @@ import type { InstrumentModel, KeyTurn } from './types.ts';
  * its depth, so the lid hides less of the players behind it than a larger scale with the same
  * keys.
  */
-export const PIANO_LIFT = 0.17;
+const PIANO_LIFT = 0.17;
 
 /**
  * The sizes of the grand piano, in meters, before {@link PIANO_SCALE} (design 4.6), with the
