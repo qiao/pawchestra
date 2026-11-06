@@ -233,7 +233,7 @@ export function applyCommand(
  * one block early. The block that reaches the start point of a play also starts the held notes
  * again, so that they sound from the same block as the first events after the count-in. The
  * song ends in the block that reaches the song length, after the events at or before it. The
- * events after the song length do not sound.
+ * events after the song length do not sound, and that block starts no held note again.
  *
  * @param state The state at the block start.
  * @param timeSec The event times, in ascending order.
@@ -266,7 +266,8 @@ export function planBlock(
       from,
       to,
       ended: true,
-      restartHeld,
+      // The end releases all notes, so a held note that starts again would only click.
+      restartHeld: false,
     };
   }
   return {
