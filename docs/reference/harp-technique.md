@@ -26,7 +26,16 @@ of the source.
 ## 1. The size of the harp
 
 - A pedal harp stands about 1.8 m high, weighs about 36 kg, and has 47 strings, seven in each
-  octave [7].
+  octave [7]. A concert grand of 47 strings goes from G7 down to C1 [21].
+- The C strings are red, the F strings black or blue, and the other strings white [7].
+- The lowest strings are wound with copper or steel wire, the middle and lower strings are gut,
+  and the higher strings are nylon [7].
+- A Lyon & Healy Style 23 is about 188 cm high, with a Sitka spruce soundboard of about 55 cm
+  [19].
+- On a concert harp, the D♭2 string is 97.5 cm long, D♭3 54.2 cm, D♭4 31 cm, and D♭5 17.6 cm [9].
+  On a Salvi harp of 44 strings, the highest string is 0.071 m long and the lowest 1.475 m [20].
+- In equal temperament with A4 at 440 Hz, the C1 string sounds at about 32.7 Hz, and the G7
+  string at about 3136 Hz (derived).
 - A lever harp of 26 strings (Dusty Strings Ravenna 26) is 35 inches (0.89 m) high at the back and
   39 inches (0.99 m) at the front, from C3 to G6 [6]. A leg, a stand, or a step-stool raises it to
   a comfortable height [6].
@@ -223,8 +232,8 @@ up in one hand.
 
 ### 7.7 The pedals
 
-- Seven pedals set the seven note names, each to flat, natural, or sharp [13]. The left foot moves
-  D, C, and B, and the right foot E, F, G, and A [12, 13].
+- Seven pedals set the seven note names, each to flat, natural, or sharp [7, 13]. The left foot
+  moves D, C, and B, and the right foot E, F, G, and A [7, 12, 13].
 - The heels stay on the floor as much as possible [1, 8]. The knee relaxes, so that the ball of the
   foot guides the pedal silently into its notch [1].
 - A harpist moves 1 to 2 pedals per second in short bursts. Two pedals of one foot at the same
@@ -293,7 +302,7 @@ These parts need a decision first:
 
 ## 8. Sources
 
-Sources 1 to 7 opened on 2026-10-25, and sources 8 to 18 on 2026-11-06, except the search
+Sources 1 to 7 opened on 2026-10-25, and sources 8 to 21 on 2026-11-06, except the search
 summary 18.
 
 1. L. Lawrence, "Method for the Harp: Fundamental Exercises with Illustrations and Technical
@@ -335,3 +344,7 @@ summary 18.
     https://andrewhugill.com/OrchestraManual/harp_techniques.html
 18. Harp Column forum, "String spacing on pedal harps" (a search summary only).
     https://harpcolumn.com/forums/topic/string-spacing-on-pedal-harps/
+19. Fischer Harfen, "Lyon & Healy". https://www.fischerharfen.de/en/lyon_healy
+20. A. J. Bell, "An acoustical investigation of the concert harp", PhD thesis, University of St
+    Andrews, 1988, Tables 2.1 and 2.2. https://hdl.handle.net/10023/2768
+21. Lyon & Healy, the range of a concert grand harp. https://www.harp.com/?p=13419
