@@ -93,7 +93,6 @@ export const INSTRUMENT_COLORS = {
   harpF: srgb('#26305a'),
   /** The wound wire strings of the bass. */
   harpWire: srgb('#b08850'),
-  harpStrings: srgb('#e8e2d4'),
   pianoCase: srgb('#15120f'),
   /** The iron plate inside the piano: a dark gold, as in `mockup.png`. */
   pianoPlate: srgb('#6b5226'),

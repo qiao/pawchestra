@@ -3,12 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { HARP, buildHarp, harpString, harpStringPosition } from './harp.ts';
 
 describe('harpString', () => {
-  it('shows the 47 strings from C1 to G7 on the 24 strings of the model', () => {
+  it('gives each natural note from C1 to G7 its own string', () => {
     expect(harpString(24)).toBe(0);
     expect(harpString(103)).toBe(HARP.strings - 1);
-    // C4 is string 21 of 47 (3 octaves of 7 strings above C1): 21 × 23 / 46 = 10.5, which
-    // rounds to 11.
-    expect(harpString(60)).toBe(11);
+    // C4 is 3 octaves of 7 strings above C1.
+    expect(harpString(60)).toBe(21);
   });
 
   it('plays a sharp on the string of the natural below it', () => {
@@ -30,7 +29,7 @@ describe('harpString', () => {
 });
 
 describe('harpStringPosition', () => {
-  it('gives the middle of the string, on the line of the target "strings"', () => {
+  it('gives the pluck point of the string, on the line of the target "strings"', () => {
     const target = buildHarp().targets.find((t) => t.kind === 'strings');
     expect(harpStringPosition(24)).toEqual(target?.from);
     expect(harpStringPosition(103)).toEqual(target?.to);
