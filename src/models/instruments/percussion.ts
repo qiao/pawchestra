@@ -191,6 +191,20 @@ export const SNARE_DRUM = {
    * into it.
    */
   tip: 0.008,
+  /** The length of each stick from the grip to the middle of the ball at its tip, in meters. */
+  // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
+  stick: 0.3 as number,
+  /**
+   * The length of each stick behind its grip, in meters ({@link MALLET_BUTT}): one third of the
+   * whole stick, so that the paw holds the stick one third up from the butt, as a real player
+   * holds it (`docs/reference/percussion-technique.md` 6). The length in front of the grip stays
+   * {@link SNARE_DRUM.stick}: with the grip 0.24 m from the middle of the ball, the short arms of
+   * the badger missed each strike by 3.5 cm. With the butt of 0.04 m of the other sticks, the
+   * paw held the stick 12% up from the butt. The whole stick is 0.45 m, a little longer than a
+   * real stick of 16 inches.
+   */
+  // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
+  malletButt: 0.15 as number,
 } as const;
 
 /**
@@ -365,8 +379,8 @@ const MALLET_BUTT = 0.04;
 
 /**
  * Gives the length of the shaft behind the grip of the mallets of an instrument, in meters: the
- * own butt of the timpani, the bass drum, and the triangle beater, and {@link MALLET_BUTT} for the
- * other mallets and sticks.
+ * own butt of the timpani, the bass drum, the snare drum, and the triangle beater, and
+ * {@link MALLET_BUTT} for the other mallets.
  *
  * @param id The instrument.
  * @returns The butt length.
@@ -379,6 +393,8 @@ export function malletButt(id: InstrumentId): number {
       return BASS_DRUM.malletButt;
     case 'small-percussion':
       return TRIANGLE.malletButt;
+    case 'snare-drum':
+      return SNARE_DRUM.malletButt;
     default:
       return MALLET_BUTT;
   }
@@ -712,23 +728,25 @@ export function buildSnareDrum(): InstrumentModel {
   const spot = SNARE_DRUM.malletSpot;
   const left = mallet(
     'malletL',
-    0.3,
+    SNARE_DRUM.stick,
     SNARE_DRUM.tip,
     INSTRUMENT_COLORS.stick,
     undefined,
     undefined,
     tilt,
     spot,
+    SNARE_DRUM.malletButt,
   );
   const right = mallet(
     'malletR',
-    0.3,
+    SNARE_DRUM.stick,
     SNARE_DRUM.tip,
     INSTRUMENT_COLORS.stick,
     undefined,
     undefined,
     tilt,
     spot,
+    SNARE_DRUM.malletButt,
   );
   const instrument = piece.build('instrument', hold('floor'));
   const head: Vec3 = [center[0], top, center[2]];

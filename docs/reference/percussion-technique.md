@@ -241,7 +241,10 @@ The app follows these facts:
   4 cm above the head, with the stick almost level, as in the ready position
   (`MalletAcross.pitch`). Before a strike, the tip lifts higher for a louder note: about 11 cm to
   15 cm above the head, and about 10 cm in a roll (`StrikeSizes.lift`, `MalletAcross.peak`). At a
-  strike, the ball at the tip touches the head (`SNARE_DRUM.tip`). The elbows stand about a fist
+  strike, the ball at the tip touches the head (`SNARE_DRUM.tip`). Each paw holds its stick one
+  third up from the butt (`SNARE_DRUM.malletButt`). The stick is 0.45 m long, a little longer
+  than a real stick, because a shorter stick in front of the grip put the tips out of the reach
+  of the short arms. The elbows stand about a fist
   from the body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the
   belly. At
   rest, the sticks lie across the body in front of the waist, with the tips a little above the
