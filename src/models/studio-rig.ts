@@ -104,6 +104,8 @@ export const STUDIO_FOLLOWS = {
   digit3_R: 'fingersR',
   digit4_R: 'fingersR',
   digit5_R: 'fingersR',
+  thumb_L: 'handL',
+  thumb_R: 'handR',
 } as const satisfies Readonly<Record<StudioBone, BodyBoneName>>;
 
 /**
@@ -186,6 +188,12 @@ interface StudioArm {
    * `models/studio-format.ts`).
    */
   readonly digits: readonly { readonly index: number; readonly head: Vec3 }[] | null;
+  /**
+   * The thumb bone of a fist: the index in `STUDIO_BONES`, the head in the bind pose, and the
+   * close axis ({@link StudioBody.thumbAxes}), or `null` for a body with no thumb
+   * (`THUMB_BONES` of `models/studio-format.ts`).
+   */
+  readonly thumb: { readonly index: number; readonly head: Vec3; readonly axis: Vec3 } | null;
 }
 
 /**
@@ -925,6 +933,7 @@ export function studioRig(bound: StudioBody, stands = false): StudioRig {
             head: h[bone] ?? h[`fingers_${side}`],
           }))
         : null,
+      thumb: thumbOf(body, side),
     };
   };
   return {
@@ -934,6 +943,28 @@ export function studioRig(bound: StudioBody, stands = false): StudioRig {
     follows: skinFollows(),
     arms: { L: arm('L'), R: arm('R') },
   };
+}
+
+/**
+ * Gives the thumb bone of one paw of a body with thumb bones (`THUMB_BONES` of
+ * `models/studio-format.ts`).
+ *
+ * @param body The studio body.
+ * @param side The side of the paw.
+ * @returns The index, the bind head, and the close axis of the thumb, or `null` for a body with no
+ *   thumb.
+ * @throws Error if the body has a thumb bone and no close axis for it.
+ */
+function thumbOf(body: StudioBody, side: Side): StudioArm['thumb'] {
+  const head = body.heads[`thumb_${side}`];
+  if (!head) {
+    return null;
+  }
+  const axis = body.thumbAxes?.[side];
+  if (!axis) {
+    throw new Error(`The studio body has the bone thumb_${side} and no close axis for it.`);
+  }
+  return { index: STUDIO_BONES.indexOf(`thumb_${side}`), head, axis };
 }
 
 /**
@@ -1464,6 +1495,9 @@ function poseArm(
   head.copy(elbow).lerp(wrist, arm.twistAt);
   writeMatrix(out.matrices, arm.bones.twist, twistTurn, bind.fromArray(h[keys.twist]), head);
   writeMatrix(out.matrices, arm.bones.hand, handTurn, bind.fromArray(h[keys.hand]), wrist);
+  if (arm.thumb) {
+    poseThumb(rig, arm, arm.thumb, offsets.digits, out);
+  }
   // The fingers start at the knuckle of the turned paw.
   head
     .fromArray(h[keys.fingers])
@@ -1477,6 +1511,36 @@ function poseArm(
   if (arm.segments) {
     poseSegments(rig, arm.segments, side, twist, out);
   }
+}
+
+/**
+ * Writes the thumb bone of one paw of a fist (design 4.4, 5.3) from the turn of the paw that
+ * {@link poseArm} leaves in the module values. The thumb takes the turn of the paw, then its own
+ * bend about its close axis, and it turns around its head on the posed paw. The bend is the bend
+ * of digit 1 of the paw (`digits` of `AnimalPose`): a positive bend moves the thumb tip across the
+ * palm. With no bend, the thumb moves as the paw.
+ *
+ * @param rig The studio rig.
+ * @param arm The arm.
+ * @param thumb The thumb of the arm.
+ * @param bends The bend of each digit, the left paw first, or `null` for no bend.
+ * @param out The pose to write.
+ */
+function poseThumb(
+  rig: StudioRig,
+  arm: StudioArm,
+  thumb: NonNullable<StudioArm['thumb']>,
+  bends: Float32Array | null,
+  out: StudioPose,
+): void {
+  const handBind = rig.body.heads[ARM_HEADS[arm.side].hand];
+  curlTurn.setFromAxisAngle(
+    curlAxis.fromArray(thumb.axis),
+    bends?.[arm.side === 'L' ? 0 : DIGITS] ?? 0,
+  );
+  segmentTurn.copy(handTurn).multiply(curlTurn);
+  digitAt.fromArray(thumb.head).sub(bind.fromArray(handBind)).applyQuaternion(handTurn).add(wrist);
+  writeMatrix(out.matrices, thumb.index, segmentTurn, bind.fromArray(thumb.head), digitAt);
 }
 
 /**

@@ -78,13 +78,23 @@ export const DIGIT_BONES = [
 export const DIGITS = 5;
 
 /**
+ * The thumb bones of a mesh rig whose paw is one fist with a free thumb (design 4.4), the left side
+ * first. Each thumb is a child of the paw (`hand`), with its head at the root of the thumb and its
+ * tail at the thumb tip, because the thumb of a real hand starts at the wrist, not at the
+ * knuckles. The pose code turns each thumb about its close axis ({@link StudioBody.thumbAxes}) by
+ * the bend of digit 1 of its paw (`poseArm()` of `models/studio-rig.ts`). With no bend, the thumb
+ * keeps the turn of the paw.
+ */
+export const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
+
+/**
  * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig of `pnpm rig-mesh`, in
  * parent order, the two eye bones that `pnpm studio-body` adds, so that the eyes blink (design
  * 5.1), and the optional bones ({@link OPTIONAL_STUDIO_BONES}): the tip of a tail of two bones,
- * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), and the digit bones
- * of a hand rig ({@link DIGIT_BONES}). The optional bones come last, so that the index of each
- * other bone stays. The names keep the spelling of the
- * rig. The packed skin names each bone by its index in this list.
+ * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), the digit bones
+ * of a hand rig ({@link DIGIT_BONES}), and the thumb bones of a fist ({@link THUMB_BONES}). The
+ * optional bones come last, so that the index of each other bone stays. The names keep the
+ * spelling of the rig. The packed skin names each bone by its index in this list.
  */
 export const STUDIO_BONES = [
   'root',
@@ -123,6 +133,7 @@ export const STUDIO_BONES = [
   'jaw',
   ...ARM_SEGMENT_BONES,
   ...DIGIT_BONES,
+  ...THUMB_BONES,
 ] as const;
 
 /** A bone of a studio body. */
@@ -131,16 +142,18 @@ export type StudioBone = (typeof STUDIO_BONES)[number];
 /**
  * The bones that a studio body can lack: the tip of a tail of two bones, as the rig of the fox
  * mesh has, the jaw of a beak that opens, as the rig of the penguin mesh has, and the arm segments
- * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7), and the digits of a hand
- * rig, as the polar bear has. The `tail` bone then holds the root of the tail, and the `jaw` bone
- * the lower part of the beak, at the hinge of the beak. A body with no tip, no jaw, no arm
- * segments, or no digits, such as the bear or the rabbit, has no vertex on them.
+ * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7), the digits of a hand
+ * rig, as the polar bear has, and the thumbs of a fist, as the deer has. The `tail` bone then
+ * holds the root of the tail, and the `jaw` bone the lower part of the beak, at the hinge of the
+ * beak. A body with no tip, no jaw, no arm segments, no digits, or no thumbs, such as the bear or
+ * the rabbit, has no vertex on them.
  */
 export const OPTIONAL_STUDIO_BONES = [
   'tail_tip',
   'jaw',
   ...ARM_SEGMENT_BONES,
   ...DIGIT_BONES,
+  ...THUMB_BONES,
 ] as const;
 
 /** A bone that a studio body can lack. */
@@ -219,6 +232,8 @@ export const STUDIO_PARENTS = {
   digit3_R: 'fingers_R',
   digit4_R: 'fingers_R',
   digit5_R: 'fingers_R',
+  thumb_L: 'hand_L',
+  thumb_R: 'hand_R',
 } as const satisfies Readonly<Record<StudioBone, StudioBone | null>>;
 
 /** A side of the body: the left side of the animal is at -x (design 4.4). */
@@ -537,6 +552,12 @@ export interface StudioBody {
    * the upper arm × the forearm.
    */
   readonly hinges?: Readonly<Record<Side, Vec3>>;
+  /**
+   * The unit close axis of each thumb in the bind pose of a body with thumb bones (design 4.4,
+   * {@link THUMB_BONES}): a turn about it by a positive angle moves the thumb tip across the palm
+   * (`thumbs` of the config of `pnpm rig-mesh`). A body with no thumbs has none.
+   */
+  readonly thumbAxes?: Readonly<Record<Side, Vec3>>;
 }
 
 /** The largest number of bones of a vertex of a studio body. */
