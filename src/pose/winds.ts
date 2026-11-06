@@ -967,10 +967,13 @@ interface HornTurns {
 
 /** The turns of the horn of the pig in the playing pose and in the rest pose. */
 const PIG_TURNS = {
-  /** The playing pose: the bell at the right of the torso and in front of it. */
-  play: { right: 20, back: 40, left: 0 },
-  /** The rest pose: the horn lower and further forward, on the belly over the lap. */
-  rest: { right: 20, back: 40, left: 15 },
+  /**
+   * The playing pose: the bell at the right of the torso and in front of it, and the coil in front
+   * of the round belly.
+   */
+  play: { right: 10, back: 20, left: 0 },
+  /** The rest pose: the horn lower and further forward, in front of the belly over the lap. */
+  rest: { right: 10, back: 30, left: 15 },
 } as const satisfies Readonly<Record<'play' | 'rest', HornTurns>>;
 
 /**
@@ -991,12 +994,14 @@ function pigTurn(turns: HornTurns): Quat {
  * The horn hold of the pig (design 5.3), the hold of a real hornist
  * (`docs/reference/wind-technique.md` 2.2): the left paw on the valves at
  * the middle of the body, the right paw in the bell, and the horn across the body from the mouth to
- * the bell at the right of the torso and in front of it. The long snout puts the mouthpiece
- * 0.29 m in front of the shoulder joints, so with the hold of {@link WIND_HOLDS} the left grip
- * is 0.507 m from the left shoulder joint, beyond the arm of 0.385 m. The horn turns its lower end
- * 40° back toward the body and its right side 20° forward ({@link PIG_TURNS}). The left shoulder
- * turns 36° forward, as the shoulder blade of a real player slides forward. The left paw then has
- * 10.6 cm to spare, and the right paw 7.4 cm (`pnpm hold-reach pig --instrument horn`).
+ * the bell at the right of the torso and in front of it. The mouthpiece rests on the lips under
+ * the snout disc (`StudioBody.mouth`), and the long snout puts it far in front of the shoulder
+ * joints. The horn turns its lower end 20° back toward the body and its right side 10° forward
+ * ({@link PIG_TURNS}), so that the coil stands in front of the round belly. With 40° and 20°, the
+ * coil went 6.0 cm into the belly. With 15° back and 20° right, or with 25° right, the right paw
+ * missed the bell. The left shoulder turns 36° forward, as the shoulder blade of a real player
+ * slides forward. The left paw then has 7.6 cm to spare, and the right paw 6.6 cm
+ * (`pnpm hold-reach pig --instrument horn`).
  *
  * The left elbow points out and a little forward, and the right elbow out and down. The arms of
  * the body are round tubes free of the trunk, so the left elbow stays away from the side, as a horn
@@ -1004,23 +1009,22 @@ function pigTurn(turns: HornTurns): Quat {
  * elbow turns out about the line from the shoulder joint to the valves, from (-1, -0.5, -1) to
  * (-1, 0.05, -0.5), and the left shoulder turns 36° forward in place of 26°: with the old elbow,
  * the left forearm went 2.7 cm and the left upper arm 2.7 cm into the belly. The rest elbow points
- * a little higher, (-1, 0.2, -0.7), because the left upper arm then lies on the side of the chest
- * (1.9 cm into it with the elbow of the play). The grip turn of the arm gate counts from the posed
- * forearm, and the two turns move it in opposite directions: the shoulder alone at 40° turns the
- * left grip 19°, the elbow alone 21°, and both 5°. On the rig with the raise shapes of the old
+ * higher, (-1, 0.6, -0.7), because the left upper arm then lies on the side of the belly: with
+ * (-1, 0.2, -0.7), it went 1.6 cm into the belly. The grip turn of the arm gate counts from the
+ * posed forearm, and the two turns move it in opposite directions: the shoulder alone at 40° turns
+ * the left grip 19°, the elbow alone 21°, and both 5°. On the rig with the raise shapes of the old
  * hold, a forward turn of the shoulder of 40° or more folds 7 to 9 faces of the left arm, so the
  * shoulder turns 36°. The left paw holds the valves at the grip of the horn, and the left forearm
- * then goes 1.3 cm into the belly near the wrist. A move of the left grip of 0.03 H toward the
- * mouthpiece and 0.03 H away from the left shoulder keeps the forearm off the belly, but puts the
- * left palm 1.7 cm off the valves.
+ * stays off the belly.
  *
- * At rest, the horn comes down 0.2 H and 0.2 H forward onto the round belly, which covers the short
- * thighs, with the bell at the right of the belly beside the right haunch. A lower rest puts the
- * right forearm 2.3 cm to 5.4 cm into the belly. At rest, the left grip moves 0.015 H toward the
- * mouthpiece and 0.015 H away from the left shoulder (`restGripShiftL`), so that the left wrist
- * goes at most 0.3 cm in place of 0.9 cm into the horn. The right elbow points out, down, and
- * forward (`restPoleR`), so that the round right forearm lies 0.4 cm in place of 0.6 cm in the
- * rim of the bell, with the bind supination of the right paw that this elbow gives.
+ * At rest, the horn comes down 0.2 H and 0.25 H forward, in front of the round belly, which covers
+ * the short thighs, with the bell at the right of the belly beside the right haunch. The coil
+ * touches the belly at most 0.2 cm. With 0.2 H forward, the coil went 2.2 cm into the belly, and
+ * with 20° back, the right paw missed the bell. At rest, the left grip moves 0.015 H toward the
+ * mouthpiece and 0.015 H away from the left shoulder (`restGripShiftL`), so that the left paw and
+ * forearm go at most 0.5 cm into the horn. The right elbow points out, down, and forward
+ * (`restPoleR`), so that the round right forearm stays off the rim of the bell, with the bind
+ * supination of the right paw that this elbow gives.
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
@@ -1029,8 +1033,8 @@ const PIG_HORN = {
   poleL: [-1, 0.05, -0.5],
   poleR: [1, -1, 0],
   rest: pigTurn(PIG_TURNS.rest),
-  restShift: [0.05, -0.2, -0.2],
-  restPoleL: [-1, 0.2, -0.7],
+  restShift: [0.05, -0.2, -0.25],
+  restPoleL: [-1, 0.6, -0.7],
   restPoleR: [1, -0.5, -0.6],
   restGripShiftL: [-0.015, 0, 0.015],
 } as const satisfies WindHold;
