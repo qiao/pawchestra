@@ -466,7 +466,7 @@ def surface_material(name):
     return mat
 
 
-def add_surface(body, species, texture=None, eye_fans=True):
+def add_surface(body, species, texture=None, eye_fans=True, config=None):
     """Gives the mesh of a hand rig its face colors, its eye fans, and its gloss nose (design 4.4,
     "Hand rig"), in place: each polygon takes the color of the base color texture of `texture`
     through the UVs of the mesh, by the color rules of `tools/mesh-rigs/<species>.json`. The
@@ -474,9 +474,9 @@ def add_surface(body, species, texture=None, eye_fans=True):
     file, as a path from the repository root, or an image of Blender (`base_texture()`). The fans
     and the vertices of the nose take the head bone alone, and the slots become `fur` and `gloss`.
     With `eye_fans` false, the mesh gets no fans: a rig with eye objects (`studio_eyes.py`) needs
-    none. The faces of the old eyes take the fur color in both cases. Gives the counts of the
-    faces."""
-    config = load_config(species)
+    none. The faces of the old eyes take the fur color in both cases. A `config` dict replaces the
+    config of the species. Gives the counts of the faces."""
+    config = config or load_config(species)
     rm = rig_mesh_lib()
     me = body.data
     if 'color' in me.attributes:
