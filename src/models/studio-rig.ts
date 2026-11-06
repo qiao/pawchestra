@@ -6,6 +6,7 @@ import type { Skeleton } from './rig.ts';
 import {
   ARM_SEGMENTS,
   DIGITS,
+  DIGIT_BONES,
   STUDIO_ARM_BONES,
   STUDIO_BONES,
   STUDIO_LEG_BONES,
@@ -180,10 +181,11 @@ interface StudioArm {
   /** The arm segments and the helpers of a body with them, or `null` (design 4.4, 4.7). */
   readonly segments: StudioArmSegments | null;
   /**
-   * The digit bones of a hand rig, as indices in `STUDIO_BONES`, from the thumb side, or `null`
-   * for a body with no digits (`DIGIT_BONES` of `models/studio-format.ts`).
+   * The digit bones of a hand rig, from the thumb side: the index in `STUDIO_BONES` and the head
+   * in the bind pose, or `null` for a body with no digits (`DIGIT_BONES` of
+   * `models/studio-format.ts`).
    */
-  readonly digits: readonly number[] | null;
+  readonly digits: readonly { readonly index: number; readonly head: Vec3 }[] | null;
 }
 
 /**
@@ -918,9 +920,10 @@ export function studioRig(bound: StudioBody, stands = false): StudioRig {
           }
         : null,
       digits: h[`digit1_${side}`]
-        ? Array.from({ length: DIGITS }, (_, k) =>
-            STUDIO_BONES.indexOf(`digit${String(k + 1)}_${side}` as StudioBone),
-          )
+        ? DIGIT_BONES.filter((bone) => bone.endsWith(side)).map((bone) => ({
+            index: STUDIO_BONES.indexOf(bone),
+            head: h[bone] ?? h[`fingers_${side}`],
+          }))
         : null,
     };
   };
@@ -1499,9 +1502,9 @@ function poseDigits(
   const fingersBind = h[ARM_HEADS[arm.side].fingers];
   const first = arm.side === 'L' ? 0 : DIGITS;
   curlAxis.fromArray(arm.curl);
-  for (let k = 0; k < DIGITS; k++) {
-    const index = arm.digits?.[k] ?? 0;
-    const digitBind = h[`digit${String(k + 1)}_${arm.side}` as keyof StudioHeads] ?? fingersBind;
+  for (const [k, digit] of (arm.digits ?? []).entries()) {
+    const digitBind = digit.head;
+    const index = digit.index;
     curlTurn.setFromAxisAngle(curlAxis, bends?.[first + k] ?? 0);
     segmentTurn.copy(fingersTurn).multiply(curlTurn);
     digitAt
