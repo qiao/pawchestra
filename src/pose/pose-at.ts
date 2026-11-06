@@ -138,6 +138,15 @@ export function beatSway(beats: Float64Array, time: number, beatsPerSide = 1): n
   return Math.sin((Math.PI * (b + (time - start) / (end - start))) / beatsPerSide);
 }
 
+/**
+ * The bones of the look and the part of the look that each one turns (design 5.1). A module
+ * constant, so that a frame makes no new list for each animal.
+ */
+const HEAD_SHARES = [
+  [BONES.neck, BODY_MOTION.lookNeck],
+  [BONES.head, 1 - BODY_MOTION.lookNeck],
+] as const;
+
 const X_AXIS = new Vector3(1, 0, 0);
 const Y_AXIS = new Vector3(0, 1, 0);
 const Z_AXIS = new Vector3(0, 0, 1);
@@ -244,10 +253,7 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   rollAxis.set(0, -Math.sin(body.upright), Math.cos(body.upright));
   const yaw = player.lookYaw * idle.look * body.look + body.headTurn;
   const pitch = player.lookPitch * idle.look * body.look + body.lift + body.nodHead;
-  for (const [bone, part] of [
-    [BONES.neck, m.lookNeck],
-    [BONES.head, 1 - m.lookNeck],
-  ] as const) {
+  for (const [bone, part] of HEAD_SHARES) {
     turn.setFromAxisAngle(rollAxis, body.roll * part);
     turn.multiply(second.setFromAxisAngle(yawAxis, yaw * part));
     setBoneRotation(r, bone, turn.multiply(second.setFromAxisAngle(X_AXIS, pitch * part)));
