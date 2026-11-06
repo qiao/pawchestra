@@ -187,35 +187,16 @@ function onSphere(p: Corner, radius: number): Corner {
   return [p[0] * n, p[1] * n, p[2] * n];
 }
 
-function middle(a: Corner, b: Corner): Corner {
-  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-}
-
 /**
- * Makes a sphere from an icosahedron with its center at the origin.
+ * Makes an icosahedron with its center at the origin and its corners on a sphere.
  *
- * @param radius The radius.
- * @param detail The number of times that each face splits into four. Design 4.5 uses 1 for a head.
- * @returns `20 × 4^detail` triangles.
+ * @param radius The radius of the sphere.
+ * @returns 20 triangles.
  */
-export function icosphere(radius: number, detail: number): number[] {
-  let faces: Corner[][] = ICOSAHEDRON_FACES.map((face) =>
-    face.map((i) => ICOSAHEDRON_CORNERS[i] ?? [0, 0, 0]),
+export function icosphere(radius: number): number[] {
+  return ICOSAHEDRON_FACES.flatMap((face) =>
+    face.flatMap((i) => onSphere(ICOSAHEDRON_CORNERS[i] ?? [0, 0, 0], radius)),
   );
-  for (let level = 0; level < detail; level++) {
-    faces = faces.flatMap(([a = [0, 0, 0], b = [0, 0, 0], c = [0, 0, 0]]) => {
-      const ab = middle(a, b);
-      const bc = middle(b, c);
-      const ca = middle(c, a);
-      return [
-        [a, ab, ca],
-        [ab, b, bc],
-        [ca, bc, c],
-        [ab, bc, ca],
-      ];
-    });
-  }
-  return faces.flatMap((face) => face.flatMap((p) => onSphere(p, radius)));
 }
 
 /**

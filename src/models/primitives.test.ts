@@ -46,9 +46,9 @@ describe('primitives', () => {
     expect(inwardFaces(corners, [0, 0.1, 0])).toBe(0);
   });
 
-  it('makes an icosphere of detail 1 with 80 outward triangles', () => {
-    const corners = icosphere(0.5, 1);
-    expect(corners.length / 9).toBe(80);
+  it('makes an icosphere with 20 outward triangles', () => {
+    const corners = icosphere(0.5);
+    expect(corners.length / 9).toBe(20);
     expect(inwardFaces(corners, [0, 0, 0])).toBe(0);
     for (let i = 0; i < corners.length; i += 3) {
       expect(Math.hypot(corners[i] ?? 0, corners[i + 1] ?? 0, corners[i + 2] ?? 0)).toBeCloseTo(

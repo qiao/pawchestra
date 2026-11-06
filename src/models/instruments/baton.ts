@@ -73,7 +73,7 @@ const BATON_GRIP: Vec3 = [-0.03, 0.05, -0.04];
 export function buildBaton(): InstrumentModel {
   const color = INSTRUMENT_COLORS.baton;
   const piece = new PieceBuilder();
-  piece.add(icosphere(0.016, 0), color, transform([0, 0, 0], undefined, [1.6, 1, 1]));
+  piece.add(icosphere(0.016), color, transform([0, 0, 0], undefined, [1.6, 1, 1]));
   piece.taper([0.02, 0, 0], [BATON_TIP, 0, 0], BATON_RADII[0], BATON_RADII[1], 6, color);
   // The x axis of the baton turns along the fingers, and its y axis to the top.
   const xAxis = new Vector3(...BATON_ALONG);

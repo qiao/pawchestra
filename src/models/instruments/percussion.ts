@@ -427,7 +427,7 @@ function mallet(
   const piece = new PieceBuilder();
   piece.rod([-butt, 0, 0], [length, 0, 0], 0.0055, 4, stickColor, finish);
   if (ball > 0) {
-    piece.add(icosphere(ball, 0), ballColor, transform([length, 0, 0]));
+    piece.add(icosphere(ball), ballColor, transform([length, 0, 0]));
   }
   const palm = bone === 'malletL' ? 'palmL' : 'palmR';
   // The tilt turns the forward mallet down around the x axis of the player.

@@ -228,7 +228,7 @@ export function buildHarp(scale = 1): InstrumentModel {
   const [columnBottom, columnTop] = h.column;
   piece.rod(yz(columnBottom), yz(columnTop), 0.03, 6, frame);
   const crown = new Vector3(...yz(columnTop)).add(new Vector3(0, 0.04, 0));
-  piece.add(icosphere(0.055, 0), frame, transform(toVec3(crown)));
+  piece.add(icosphere(0.055), frame, transform(toVec3(crown)));
   for (let i = 0; i + 1 < h.neck.length; i++) {
     piece.bar(yz(h.neck[i] ?? [0, 0]), yz(h.neck[i + 1] ?? [0, 0]), 0.05, 0.07, frame);
   }
