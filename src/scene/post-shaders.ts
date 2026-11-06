@@ -257,6 +257,80 @@ vec3 grade(vec3 color) {
 `;
 
 /**
+ * The pass of the lamp flare at a quarter of the size (design 4.5, post effects; `LENS_FLARE` of
+ * `scene/lens-flare.ts`): the flare of the bright parts of the image, such as the lamps of the
+ * hall, from the bloom chain. The part of the light above `uThreshold` gives three effects of a
+ * real lens:
+ *
+ * - Ghosts: the image of the bright parts, scaled through the optical middle, from the soft
+ *   level of the bloom (`uSoft`), so each ghost is a soft blob.
+ * - A halo: a soft ring around a bright part near the middle of the image.
+ * - A starburst: six short rays around each bright part, as the blades of the aperture give.
+ *
+ * A sample outside the frame takes no light, so the flare follows the letterbox. A lamp that a
+ * player hides is not bright in the image, so it gives no flare.
+ */
+export const LAMP_FLARE_FRAGMENT = /* glsl */ `
+uniform sampler2D uSource;
+uniform sampler2D uSoft;
+uniform vec4 uClamp;
+uniform vec4 uSoftClamp;
+uniform vec4 uFrame;
+uniform vec2 uCenter;
+uniform float uAspect;
+uniform float uThreshold;
+uniform vec2 uGhost[FLARE_GHOSTS];
+uniform vec3 uGhostColor[FLARE_GHOSTS];
+uniform vec2 uHalo;
+uniform vec2 uStar;
+varying vec2 vUv;
+
+// 1 inside the frame, with a short fade at its edges.
+float inFrame(vec2 uv) {
+  vec2 edge = min(uv - uFrame.xy, uFrame.zw - uv) / (uFrame.zw - uFrame.xy);
+  return smoothstep(0.0, 0.04, min(edge.x, edge.y));
+}
+
+vec3 sharp(vec2 uv) {
+  vec3 c = texture(uSource, clamp(uv, uClamp.xy, uClamp.zw)).rgb;
+  return max(c - uThreshold, 0.0) * inFrame(uv);
+}
+
+vec3 soft(vec2 uv) {
+  vec3 c = texture(uSoft, clamp(uv, uSoftClamp.xy, uSoftClamp.zw)).rgb;
+  return max(c - uThreshold, 0.0) * inFrame(uv);
+}
+
+void main() {
+  float frameHeight = uFrame.w - uFrame.y;
+  vec2 fromCenter = vUv - uCenter;
+  vec3 sum = vec3(0.0);
+  // A bright part at p gives a ghost at center + (p - center) * scale.
+  for (int k = 0; k < FLARE_GHOSTS; k++) {
+    sum += soft(uCenter + fromCenter / uGhost[k].x) * uGhostColor[k] * uGhost[k].y;
+  }
+  // The halo takes the light at the radius toward the middle of the image.
+  vec2 way = fromCenter * vec2(uAspect, 1.0);
+  float away = length(way);
+  if (away > 1e-4) {
+    vec2 at = vUv - way / away * uHalo.x * frameHeight * vec2(1.0 / uAspect, 1.0);
+    float near = 1.0 - smoothstep(0.0, 0.5 * frameHeight, length((at - uCenter) * vec2(uAspect, 1.0)));
+    sum += soft(at) * (uHalo.y * near);
+  }
+  // Six rays: three axes, each in both directions, with a light that falls along the ray.
+  for (int axis = 0; axis < 3; axis++) {
+    float angle = 0.26 + float(axis) * 1.0471976;
+    vec2 ray = vec2(cos(angle) / uAspect, sin(angle)) * (uStar.x * frameHeight / 6.0);
+    for (int i = 1; i <= 6; i++) {
+      float fall = 1.0 - float(i) / 7.0;
+      sum += (sharp(vUv + ray * float(i)) + sharp(vUv - ray * float(i))) * (uStar.y * fall * fall);
+    }
+  }
+  gl_FragColor = vec4(sum, 1.0);
+}
+`;
+
+/**
  * The GLSL of the lens flare of the final pass (design 4.5, post effects; `LENS_FLARE` of
  * `scene/lens-flare.ts`). `flareOf()` gives the linear light of the flare of one light at the
  * pixel: a wide veil, which lifts the blacks most near the light, a small glow at the light, and
@@ -343,6 +417,11 @@ varying vec2 vUv;
 #ifdef LENS_FLARE
 ${FLARE_FUNCTION}
 #endif
+#ifdef LAMP_FLARE
+// The lamp flare at a quarter of the size, and the part of it that the frame wrote.
+uniform sampler2D uLampFlare;
+uniform vec4 uLampClamp;
+#endif
 
 // The room haze (design 4.5): the light of the air between the camera and the point of the
 // pixel. It starts behind the subject of the camera (uHaze.x, in meters) and grows with the
@@ -413,6 +492,9 @@ void main() {
 #ifdef BLOOM
   // The halation: the glow is warmer than the light, as the red glow around a light on film.
   color += texture(uBloom, halfUv).rgb * uBloomStrength * uHalation;
+#endif
+#ifdef LAMP_FLARE
+  color += texture(uLampFlare, clamp(vUv, uLampClamp.xy, uLampClamp.zw)).rgb;
 #endif
 #ifdef LENS_FLARE
   // The flare is light in the lens, so it comes after the haze of the room.
