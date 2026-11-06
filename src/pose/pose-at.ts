@@ -109,7 +109,10 @@ function createPose(player: PlayerPlan): WritablePose {
     keys: note.family === 'keyboard' && note.keys ? new Float32Array(PIANO_KEY_COUNT) : null,
     strings:
       note.family === 'harp' && note.strings ? new Float32Array(2 * HARP_STRING_COUNT) : null,
-    digits: note.family === 'keyboard' && note.digits ? new Float32Array(2 * DIGITS) : null,
+    digits:
+      (note.family === 'keyboard' && note.digits) || note.family === 'harp'
+        ? new Float32Array(2 * DIGITS)
+        : null,
   };
 }
 
@@ -446,6 +449,12 @@ function poseAnimal(
       if (note.digits && pose.digits) {
         digitBendsAt(note.digits.left, noteTime, weight, pose.digits, 0);
         digitBendsAt(note.digits.right, noteTime, weight, pose.digits, DIGITS);
+      }
+      // The thumb of a harp hand closes on its own after its pluck (digit 1 of each paw).
+      if (note.family === 'harp' && pose.digits) {
+        const { thumbClosed } = note.rig.hold;
+        pose.digits[0] = hands.left.thumb * thumbClosed * weight;
+        pose.digits[DIGITS] = hands.right.thumb * thumbClosed * weight;
       }
       break;
     }

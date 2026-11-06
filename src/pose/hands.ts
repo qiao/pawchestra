@@ -116,6 +116,11 @@ interface HandsHold {
   readonly curl: number;
   readonly curlClosed: number;
   /**
+   * The bend of the thumb of a fist after its pluck, in radians: digit 1 of `AnimalPose.digits`
+   * (`poseThumb()` of `models/studio-rig.ts`). 0 for a hold whose thumb does not close alone.
+   */
+  readonly thumbClosed: number;
+  /**
    * The move of each wrist away from the straight line from its rest place to its playing place,
    * at the middle of the change, in head heights: out to the side of the hand, up, and forward. A
    * paw of the round studio polar bear goes up over the front of the keys.
@@ -228,6 +233,7 @@ export const HANDS_HOLDS = {
     poleR: [1, -0.3, 0.2],
     curl: 30 * MathUtils.DEG2RAD,
     curlClosed: 30 * MathUtils.DEG2RAD,
+    thumbClosed: 0,
     restArc: [0, 0.5, 0.1],
     // The rest pose is the rest position of a pianist before a performance: the trunk sits tall
     // with a slight lean toward the piano, the head is up, and the hands rest in the lap
@@ -321,6 +327,10 @@ export const HANDS_HOLDS = {
     poleR: [0.7, -1, 0],
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
+    // After its pluck, the thumb bends over finger 2 (`docs/reference/harp-technique.md`, section
+    // 7.3). The thumb of the deer takes about three quarters of the bend, and near 90° the root of
+    // the right thumb shows a thin crease, so the bend stays at 50°.
+    thumbClosed: 50 * MathUtils.DEG2RAD,
     restArc: [0, 0, 0],
     // Both hands rest on a string, a little away from it, as in the play. The right hand rests on
     // G4: on C4, a face of the right arm folds at rest (`pnpm hold-fit harpist`). A left palm on
