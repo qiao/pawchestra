@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import type { Vec3 } from './tuples.ts';
 import { triangleNormal } from './mesh.ts';
-import { ball, box, cylinder, icosphere, lathe, plate, prism, tube, wedge } from './primitives.ts';
+import { ball, box, cylinder, icosphere, lathe, plate, prism, tube } from './primitives.ts';
 
 function centroid(corners: readonly number[], t: number): Vec3 {
   const sum = (axis: number): number =>
@@ -118,19 +118,6 @@ describe('primitives', () => {
     // The top is smaller than the middle, so the edge is round.
     const topXs = corners.filter((_, i) => i % 3 === 0 && corners[i + 1] === 0.3);
     expect(Math.max(...topXs)).toBeCloseTo(0.6, 9);
-  });
-
-  it('makes a wedge of 12 outward triangles that slopes down to the front', () => {
-    const corners = wedge(0.4, 0.2, 0.1, 0.6);
-    expect(corners.length / 9).toBe(12);
-    expect(inwardFaces(corners, [0, 0.05, 0])).toBe(0);
-    let frontTop = 0;
-    for (let i = 0; i < corners.length; i += 3) {
-      if ((corners[i + 2] ?? 0) < 0) {
-        frontTop = Math.max(frontTop, corners[i + 1] ?? 0);
-      }
-    }
-    expect(frontTop).toBeCloseTo(0.1, 9);
   });
 
   it('makes a faceted tube with a turned middle ring and outward triangles', () => {

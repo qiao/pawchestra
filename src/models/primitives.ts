@@ -282,30 +282,6 @@ export function plate(outline: readonly OutlinePoint[], levels: readonly PlateLe
   return out;
 }
 
-/**
- * Makes a wedge: a box whose top slopes down from the back (+z) to the front (-z), such as a foot.
- * Its bottom is at y = 0, and its center is above the origin.
- *
- * @param width The size on x.
- * @param back The height of the back end.
- * @param front The height of the front end.
- * @param depth The size on z.
- * @returns 12 triangles.
- */
-export function wedge(width: number, back: number, front: number, depth: number): number[] {
-  const x = width / 2;
-  const z = depth / 2;
-  const out: number[] = [];
-  // +x, -x, top, bottom, back (+z), front (-z)
-  pushQuad(out, [x, 0, z], [x, 0, -z], [x, front, -z], [x, back, z]);
-  pushQuad(out, [-x, 0, -z], [-x, 0, z], [-x, back, z], [-x, front, -z]);
-  pushQuad(out, [-x, back, z], [x, back, z], [x, front, -z], [-x, front, -z]);
-  pushQuad(out, [-x, 0, -z], [x, 0, -z], [x, 0, z], [-x, 0, z]);
-  pushQuad(out, [-x, 0, z], [x, 0, z], [x, back, z], [-x, back, z]);
-  pushQuad(out, [x, 0, -z], [-x, 0, -z], [-x, front, -z], [x, front, -z]);
-  return out;
-}
-
 /** One ring of a faceted tube: a radius at a height, turned around the axis. */
 interface TubeRing {
   readonly radius: number;
