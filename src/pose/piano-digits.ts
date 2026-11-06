@@ -18,6 +18,12 @@ export const DIGIT_MOTION = {
   /** The bend of a claw that plays no note: a little up, so that the pressing claw shows. */
   rest: -4 * MathUtils.DEG2RAD,
   /**
+   * The bend of each claw in the rest pose, when the paw lies on the belly: up, so that the claw
+   * tips stay out of the round belly. With no bend, they go 0.9 cm into the belly, with -10° 0.4
+   * cm, and with -18° 0.5 cm (`pnpm pose-depth pianist`).
+   */
+  lap: -10 * MathUtils.DEG2RAD,
+  /**
    * The lift of each claw before its strike at a slow tempo, from the thumb side: the thumb lifts
    * highest (26.1 mm) and the ring finger lowest (21.7 mm) [39].
    */
@@ -198,12 +204,14 @@ function digitBendAt(presses: DigitPresses, time: number): number {
 }
 
 /**
- * Writes the bends of the five claws of a paw at a song time (design 5.3): only from the track and
- * the time, so a seek or a speed change is correct.
+ * Writes the bends of the five claws of a paw at a song time (design 5.3): only from the track, the
+ * time, and the weight, so a seek or a speed change is correct. Between the rest pose and the
+ * play, the bend blends from the lap bend to the bend of the play.
  *
  * @param track The presses of the claws of the paw.
  * @param time The song time.
- * @param weight The weight of the playing pose: 0 is the rest pose, with no bend.
+ * @param weight The weight of the playing pose: 0 is the rest pose, with the bend
+ *   {@link DIGIT_MOTION.lap}.
  * @param out The bends of both paws, the left paw first.
  * @param offset The index of the first claw of the paw in `out`: 0 or 5.
  */
@@ -216,6 +224,7 @@ export function digitBendsAt(
 ): void {
   for (let k = 0; k < DIGIT_COUNT; k++) {
     const presses = track.digits[k];
-    out[offset + k] = presses ? digitBendAt(presses, time) * weight : 0;
+    const play = presses ? digitBendAt(presses, time) : 0;
+    out[offset + k] = play * weight + DIGIT_MOTION.lap * (1 - weight);
   }
 }

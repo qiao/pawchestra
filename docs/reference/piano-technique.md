@@ -305,7 +305,9 @@ The app follows these facts:
   (`digitBendsAt()` of `src/pose/piano-digits.ts`). Before its strike, the next claw lifts
   (`DIGIT_MOTION.lift`): the thumb most and the ring claw least, and more at a faster rate. From
   8 notes/s, the next claw starts down before the last key reaches the key bed. The other claws
-  rest a little up, so the pressing claw shows. The whole paw still lifts before a far note.
+  rest a little up, so the pressing claw shows. The whole paw still lifts before a far note. In
+  the rest pose on the belly, the claws bend a little up (`DIGIT_MOTION.lap`), so the tips stay
+  out of the belly.
 - **The wrist in the fingering (section 9.3).** The paw rolls a little toward the thumb at a thumb
   pass, and turns toward the next key of an arpeggio, as a cartwheel (`FINGER_MOTION` of
   `src/pose/hands.ts`). It turns around the claw of the note, so the claw stays on its key.

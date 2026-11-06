@@ -524,7 +524,9 @@ The rest of each family:
   turns each digit bone around the curl axis of its paw, from -18° (up) to 20° (down). Reason:
   the claw is about 3 cm long in the app, so a larger bend tears the joined claw bases. A short
   drop takes a smaller lift, and a claw with no gap after its last press stays down, so that no
-  claw turns faster than about 1,000° per second.
+  claw turns faster than about 1,000° per second. In the rest pose, the claws bend up a little
+  (`DIGIT_MOTION.lap`), and they blend to the bends of the play in the lift. Reason: with straight
+  claws, the claw tips go into the round belly at rest.
 - Each key goes down with its notes, from the note start to the note end (`keyLevelsAt()`), so a
   seek and a mute give the correct keys at once.
 - The paw moves in for a black key, so the claws lie on it, as a pianist moves the hand in toward
