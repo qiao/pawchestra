@@ -497,9 +497,10 @@ The rest of each family:
   The trunk sits tall with a small lean (piano 3). Reason: a larger lean puts the trunk of the bear
   over its knees, as if it stood up. The keys stand on a lifted piano at the height that the
   upright trunk needs (4.6), so the paws reach their keys.
-- The elbows point out and a little up (`poleL`, `poleR`), so the arms stay clear of the round
-  trunk, as the elbows of a pianist do not touch the torso (piano 4). Reason: elbows that hang
-  down by the wide belly put the arms deep into the trunk.
+- The elbows point out and a little down (`poleL`, `poleR`), so the arms stay clear of the round
+  trunk, as the elbows of a pianist do not touch the torso (piano 4), and the forearms are almost
+  level with the keys (piano 1). Reason: elbows that hang far down by the wide belly put the arms
+  deep into the trunk, and elbows that point up slope the forearms down to the keys.
 - The trunk leans toward the keys of the paws over a window of song time (`sideLeanAt()`), so it
   moves smoothly toward the register of a passage, as a real pianist.
 - The right foot presses the damper pedal with the sustain pedal of the score (CC 64,

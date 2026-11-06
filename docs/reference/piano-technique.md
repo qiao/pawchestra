@@ -176,8 +176,8 @@ The app follows these facts:
   toward the keys (`lean`), far less than the flexion of a posture that is not neutral, and the
   shoulders stay low and level (`shoulderDrop`). A larger lean puts the trunk over the knees, and
   the bear looks as if it stands up from the bench.
-- **The arms (section 4).** The elbows point out, a little up, and a little back (`poleL`,
-  `poleR`), clear of the trunk. Elbows that hang nearer go into the wide trunk. Each paw plays
+- **The arms (section 4).** The elbows point out, a little down, and a little back (`poleL`,
+  `poleR`), clear of the trunk, so the forearms are almost level with the keys. Elbows that hang nearer go into the wide trunk. Each paw plays
   only to a few keys past the middle of the keys (`reach`), because a paw that crosses further puts
   its elbow in front of the chest.
 - **The wrists and the hands (section 5).** The palm faces down, in line with the level forearm
