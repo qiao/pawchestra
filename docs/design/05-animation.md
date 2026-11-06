@@ -424,10 +424,11 @@ The rest of each family:
   goes up for each lower string (`elbowPerString`), as a cellist raises the elbow for the lower
   strings (strings 1.8), and further in the high positions (`highElbow`). Reason: with the
   nearly level elbow of the shared hold, the upper arm stood out level from the shoulder, and the
-  elbow made a sharp point behind the forearm. A lower elbow puts the forearm into the upper bout
-  and the upper arm into the chest, and the elbow turn of the high positions keeps the forearm
-  out of the upper bout. The shared hold keeps its nearly level elbow until a cast matrix run
-  checks the new elbow on the recast bodies (`TODO.md`).
+  elbow made a sharp point behind the forearm. A lower elbow bends the skin of the inner elbow of
+  the dog over into a dark wedge, and an elbow further back folds the back of the left armpit.
+  The elbow turn of the high positions keeps the forearm out of the upper bout. The shared hold
+  keeps its nearly level elbow until a cast matrix run checks the new elbow on the recast bodies
+  (`TODO.md`).
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
