@@ -519,10 +519,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       seated: true,
       soloist: true,
       constant: 'STUDIO_PENGUIN',
-      // The penguin looks round. With the crease 35° and no blend, the sides show hard facets and
-      // a sawtooth of white, tan, and black faces along the belly. The crease 60° smooths the
-      // shading, and the blend 0.7 fades the face colors across the border. With 1.0, the beak
-      // blurs into the head.
+      // The penguin looks round. With the crease 35°, the sides show hard facets. The crease 60°
+      // smooths the shading. Each fur face is black or white (`colors.twoTone` of the rig), and
+      // the two differ by more than the blend, so their edge stays sharp. The blend 0.7 fades the
+      // steps of the orange of the beak and the feet. With 1.0, the beak blurs into the head.
       crease: 60,
       colorBlend: 0.7,
       glb: 'assets/models/penguin/penguin.rig.glb',
