@@ -21,6 +21,14 @@ const PEDAL_LIFT = 0.03;
 /** The height above the lowest point of the foot that still counts as the sole, in meters. */
 const SOLE = 0.015;
 
+/**
+ * The largest pitch of a hoof around its heel, in radians. A harpist keeps the heel on the floor
+ * and presses a pedal with the ball of the foot (`docs/reference/harp-technique.md`, section 7.7),
+ * so the hoof turns up around its heel until the front of its sole is on the pedal. Above this
+ * pitch, the whole hoof lifts.
+ */
+const HEEL_PITCH = 45 * (Math.PI / 180);
+
 /** One leg of a harpist and the harp pedals in front of it, in the model axes. */
 interface HarpFoot {
   /** The bind joints of the leg: the hip (`thigh`), the knee (`shin`), the ankle (`foot`). */
@@ -29,6 +37,8 @@ interface HarpFoot {
   readonly pole: Vec3;
   /** The front of the sole of the hoof in the bind: the point that presses a pedal. */
   readonly toe: Vec3;
+  /** The back of the sole of the hoof in the bind: the heel, which stays on the floor. */
+  readonly heel: Vec3;
   /** The bones of the leg. */
   readonly bones: { readonly thigh: number; readonly shin: number; readonly foot: number };
 }
@@ -71,6 +81,7 @@ export function harpFeet(model: PlayerModel, scale: number): HarpFeet | null {
     const low = Math.min(...corners.map((c) => c.y));
     const sole = corners.filter((c) => c.y <= low + SOLE);
     const front = Math.min(...sole.map((c) => c.z));
+    const back = Math.max(...sole.map((c) => c.z));
     const x = sole.reduce((sum, c) => sum + c.x, 0) / sole.length;
     const p = model.skeleton.positions;
     const hip = new Vector3(...(p[bones.thigh] ?? [0, 0, 0]));
@@ -81,6 +92,7 @@ export function harpFeet(model: PlayerModel, scale: number): HarpFeet | null {
       bind: { shoulder: toVec3(hip), elbow: toVec3(knee), wrist: toVec3(ankle) },
       pole: toVec3(pole),
       toe: [x, low, front],
+      heel: [x, low, back],
       bones,
     };
   };
@@ -112,6 +124,11 @@ const toeAt = new Vector3();
 const fromAt = new Vector3();
 const pedalAt = new Vector3();
 const ankleAt = new Vector3();
+const heelAt = new Vector3();
+const sole = new Vector3();
+/** The axis of the pitch of a hoof: the sole points to -z, so the toe goes up around +x. */
+const PITCH_AXIS = new Vector3(1, 0, 0);
+const pitch = new Quaternion();
 const poleAt = new Vector3();
 const local = new Quaternion();
 const IDENTITY = new Quaternion();
@@ -143,9 +160,10 @@ function pressPoint(feet: HarpFeet, pedal: number, notch: number, out: Vector3):
  * Puts the legs of a harpist on the harp pedals and writes the local rotations of the thighs, the
  * shins, and the feet (design 5.3). Each foot goes from its rest place to the pedal of its next
  * change ({@link footStateAt}), lifted in the move, presses the pedal into its new notch, and goes
- * back. The foot keeps its bind turn, so the front of the sole lies on the top of the pedal. The
- * two-bone IK of each leg places the knee, and a pedal out of the reach of the leg stays at the
- * end of the stretched leg.
+ * back. The hoof turns up around its heel until the front of its sole lies on the top of the
+ * pedal, so the heel stays on the floor, as a harpist presses a pedal with the ball of the foot.
+ * The two-bone IK of each leg places the knee, and a pedal out of the reach of the leg stays at
+ * the end of the stretched leg.
  *
  * @param feet The feet.
  * @param plan The pedal plan of the player.
@@ -176,9 +194,16 @@ export function poseHarpFeet(
       pedalAt.y += PEDAL_LIFT * footState.lift;
       fromAt.lerp(pedalAt, footState.share);
     }
-    // The ankle keeps its place over the front of the sole.
     toeAt.lerp(fromAt, weight);
-    ankleAt.fromArray(foot.bind.wrist).sub(press.fromArray(foot.toe)).add(toeAt);
+
+    // The hoof pitches around its heel until the front of the sole reaches its height above the
+    // rest, and the heel goes to the place behind it. The ankle turns with the hoof.
+    sole.fromArray(foot.toe).sub(press.fromArray(foot.heel));
+    const length = sole.length();
+    const rise = Math.min(Math.max((toeAt.y - (foot.toe[1] ?? 0)) / length, 0), 1);
+    pitch.setFromAxisAngle(PITCH_AXIS, Math.min(Math.asin(rise), HEEL_PITCH));
+    heelAt.copy(toeAt).sub(sole.applyQuaternion(pitch));
+    ankleAt.fromArray(foot.bind.wrist).sub(press).applyQuaternion(pitch).add(heelAt);
     hipAt.fromArray(foot.bind.shoulder);
     poleAt.fromArray(foot.pole);
     solveArm(foot.bind, hipAt, IDENTITY, ankleAt, poleAt, legPose);
@@ -188,6 +213,6 @@ export function poseHarpFeet(
       foot.bones.shin,
       local.copy(legPose.upper).invert().multiply(legPose.lower),
     );
-    setBoneRotation(rotations, foot.bones.foot, local.copy(legPose.lower).invert());
+    setBoneRotation(rotations, foot.bones.foot, local.copy(legPose.lower).invert().multiply(pitch));
   }
 }
