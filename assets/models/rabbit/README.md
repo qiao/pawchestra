@@ -104,8 +104,10 @@ of 77b9d9d3, and `rabbit.json` is its config at that commit.
 
 ### simple/
 
-The trial of the simple route of 2026-11-06: `rabbit-tpose.glb` with no edit of the mesh, rigged
-with bone heat weights and a weight smooth, as `~/proj/zoophony-test/blender/build_rig.py` rigs it.
+The trial of the simple route of 2026-11-06: `rabbit-tpose.glb`, rigged with bone heat weights and
+a weight smooth, as `~/proj/zoophony-test/blender/build_rig.py` rigs it, with two plain mesh steps
+before the bone heat: longer limbs and plane cuts at the joints. No cut of the outline, no cap, no
+remesh, and no rebuild. Trial 1 (commit 04612e5e) had no mesh step.
 
 ```text
 rabbit-tpose.glb + tools/mesh-rigs/simple/rabbit.json
@@ -121,22 +123,28 @@ simple/rabbit.rig.glb + simple/rabbit.rig.json
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `simple/rabbit.blend` | 296,609 bytes | `2fdb408eb0c05064fa2a4b1f3e4f6b6b8bb0c965e5d7eaa9b31e111c603162c1` |
-| `simple/rabbit.rig.glb` | 414,580 bytes | `5d7773546d3961c6e37de26d5cf3e6bc86450ce22b50672f9339d4e7de58886e` |
+| `simple/rabbit.blend` | 315,946 bytes | `0d7085b19467e7c0ed1d13cfdc7cc56c59a34a94e8fdf5cbdfee2259be440f52` |
+| `simple/rabbit.rig.glb` | 452,896 bytes | `02366336093ea3668cf827f3f23c5e376d1eeb6d5b052557a8b22653e3f87b10` |
 
 - **Mesh.** The source welded at 1e-5 (1,566 vertices, 3,123 triangles), flat faces, the face
-  colors of `add_surface()` with `colors.tone`. No cut, cap, remesh, or rebuild.
-- **Bones.** The 50 bones of the app with the arm segments and the helpers, at the joints of the
-  config: the T-pose joints of 77b9d9d3, with the arm joints on the source arms (elbow x 0.187,
-  wrist x 0.292, paw tip x 0.356).
+  colors of `add_surface()` with `colors.tone`.
+- **Limbs.** Each upper arm and forearm 1.15 times as long from the shoulder joint to the wrist
+  joint, and the paw moves with the wrist (`limbs.arm`). Only the points within 0.05 to 0.065
+  units of the arm line move, with a smooth share over 0.03 units from the shoulder plane. The
+  band from the ankle joint to the hip joint 1.75 times as high, with a ramp of 0.01 units at each
+  end (`limbs.leg`). The joints and the old eyes move with the mesh.
+- **Joint rings.** Plane cuts at a right angle to the bone: at each elbow and knee at -0.5, 0, and
+  0.5 radii from the joint, at each wrist at -0.5 and 0 radii (`rings`). A corner within 0.003
+  units of a plane stays. 16 cuts add 498 triangles (3,621 in all).
+- **Bones.** The 50 bones of the app with the arm segments and the helpers, at the moved joints of
+  the config (the T-pose joints of 77b9d9d3, with the arm joints on the source arms).
 - **Weights.** Automatic Weights (bone heat) on each deform bone, also on the arm segments and the
   helpers. Then 3 passes of a Laplacian smooth over the mesh edges (each vertex takes 0.5 of the
   mean of its neighbors), the 4 largest weights, and a sum of 1. The nose keeps the head bone.
 - **Bind.** The Action `bind` of the seat rules of the config: the leg turns, the trunk 4° open,
-  straight arms, and the bind supination of `pnpm bind-supination rabbit` (L 119, R 64).
-- **Facts.** `height` 0.681364 (the head height H 0.2985 m, as on the rabbit of main), `crease`
-  35, `backRoom` 0.04. The legs and the arms keep the length of the source, so the seat is lower
-  and the reach shorter than on the rabbit of main.
+  straight arms, and the bind supination of `pnpm bind-supination rabbit` (L 115, R 58).
+- **Facts.** `height` from the shoulder joints at 1.370954 m for each unit (the head height H
+  0.2985 m, as on the rabbit of main), `crease` 35, `backRoom` 0.04.
 
 A run gives the same `rabbit.rig.glb`.
 
