@@ -30,6 +30,7 @@ import type { Vec3 } from '../models/tuples.ts';
 import { cropTarget } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
 import type { StagePair } from './light-pool.ts';
+import { setUniform } from './programs.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 
@@ -855,8 +856,8 @@ function setHazeFrame(haze: Object3D, frame: BeamFrame, foot: StagePair, lightX:
     }
     // The two sides of the cone share their uniforms.
     const u = first.uniforms;
-    setValue(u, 'uNear', camera.near);
-    setValue(u, 'uFar', camera.far);
+    setUniform(u, 'uNear', camera.near);
+    setUniform(u, 'uFar', camera.far);
     const texture = u['uDepth'];
     if (texture) {
       texture.value = depth.texture;
@@ -876,8 +877,8 @@ function setHazeFrame(haze: Object3D, frame: BeamFrame, foot: StagePair, lightX:
     }
     if (child instanceof Mesh) {
       leanCone(child, stageSide, foot, lightX);
-      setValue(u, 'uStrength', (BEAM_LOOK.strength / stageSide) * factor);
-      setValue(u, 'uInside', inside ? 1 : 0);
+      setUniform(u, 'uStrength', (BEAM_LOOK.strength / stageSide) * factor);
+      setUniform(u, 'uInside', inside ? 1 : 0);
       // A camera in the haze cone sees the back faces. The depth of the scene ends each view ray,
       // so a player in front of a back face does not hide the haze before the player.
       for (const material of materials) {
@@ -889,9 +890,9 @@ function setHazeFrame(haze: Object3D, frame: BeamFrame, foot: StagePair, lightX:
         drift.set(d * 0.3, d, d * 0.2);
       }
     } else {
-      setValue(u, 'uStrength', BEAM_LOOK.moteStrength * factor);
-      setValue(u, 'uTime', timeSec);
-      setValue(u, 'uPixels', height);
+      setUniform(u, 'uStrength', BEAM_LOOK.moteStrength * factor);
+      setUniform(u, 'uTime', timeSec);
+      setUniform(u, 'uPixels', height);
     }
   }
 }
@@ -931,12 +932,4 @@ function shaderMaterials(child: Object3D): ShaderMaterial[] {
     ? child.material
     : [child.material];
   return own.filter((material) => material instanceof ShaderMaterial);
-}
-
-/** Sets a number uniform, if the material has it. */
-function setValue(uniforms: ShaderMaterial['uniforms'], name: string, value: number): void {
-  const uniform = uniforms[name];
-  if (uniform) {
-    uniform.value = value;
-  }
 }

@@ -1,4 +1,14 @@
-import type { WebGLProgram, WebGLRenderTarget, WebGLRenderer } from 'three';
+import type {
+  IUniform,
+  Matrix4,
+  Texture,
+  Vector2,
+  Vector3,
+  Vector4,
+  WebGLProgram,
+  WebGLRenderTarget,
+  WebGLRenderer,
+} from 'three';
 
 import type { Steps } from '../score/steps.ts';
 
@@ -10,6 +20,27 @@ declare module 'three' {
      * but its types do not declare it.
      */
     isReady(): boolean;
+  }
+}
+
+/** A value of a uniform of a pass. */
+export type UniformValue = Texture | number | Vector2 | Vector3 | Vector4 | Matrix4 | null;
+
+/**
+ * Sets the value of a uniform of a material, if the material has it.
+ *
+ * @param uniforms The uniforms of the material.
+ * @param name The name of the uniform.
+ * @param value The value.
+ */
+export function setUniform(
+  uniforms: Readonly<Record<string, IUniform>>,
+  name: string,
+  value: UniformValue,
+): void {
+  const uniform = uniforms[name];
+  if (uniform) {
+    uniform.value = value;
   }
 }
 

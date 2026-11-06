@@ -29,7 +29,8 @@ import { LENS } from './focus.ts';
 import { cropTarget } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
 import { gradeLut } from './grade.ts';
-import { compileInto } from './programs.ts';
+import { compileInto, setUniform } from './programs.ts';
+import type { UniformValue } from './programs.ts';
 import type { Focus } from './focus.ts';
 import {
   BLOOM_DOWN_FRAGMENT,
@@ -251,9 +252,6 @@ function floatTarget(
   });
 }
 
-/** A value of a uniform of a pass. */
-type UniformValue = Texture | number | Vector2 | Vector3 | Vector4 | Matrix4 | null;
-
 /** The uniforms of a pass by name. */
 type PassUniforms = Record<string, { value: UniformValue }>;
 
@@ -299,20 +297,6 @@ function focusUniforms() {
     uMaxNearBlur: { value: LENS.maxNearBlur },
     uPixelsPerBlur: { value: 1 },
   };
-}
-
-/**
- * Sets the value of a uniform of a material, if the material has it.
- *
- * @param material The material.
- * @param name The name of the uniform.
- * @param value The value.
- */
-function setUniform(material: ShaderMaterial, name: string, value: UniformValue): void {
-  const uniform = material.uniforms[name];
-  if (uniform) {
-    uniform.value = value;
-  }
 }
 
 /**
@@ -524,10 +508,10 @@ export class PostPipeline {
       : null;
 
     const final = this.#final;
-    setUniform(final, 'uScene', targets.scene.texture);
-    setUniform(final, 'uBloom', bloom?.texture ?? null);
-    setUniform(final, 'uBlur', blur?.texture ?? null);
-    setUniform(final, 'uBlurOn', blur ? 1 : 0);
+    setUniform(final.uniforms, 'uScene', targets.scene.texture);
+    setUniform(final.uniforms, 'uBloom', bloom?.texture ?? null);
+    setUniform(final.uniforms, 'uBlur', blur?.texture ?? null);
+    setUniform(final.uniforms, 'uBlurOn', blur ? 1 : 0);
     // The bloom and the blur have the same half size, so one clamp serves both.
     const half = bloom ?? blur;
     if (half) {
@@ -539,11 +523,11 @@ export class PostPipeline {
       frameRect.set(rect?.left ?? 0, rect?.bottom ?? 0, rect?.right ?? 1, rect?.top ?? 1);
     }
     this.#setFocus(final, camera, focus, (this.#height / 2) * view.imageHeight);
-    setUniform(final, 'uAspect', this.#width / this.#height);
+    setUniform(final.uniforms, 'uAspect', this.#width / this.#height);
     this.#setHaze(final, camera, frame.haze);
-    setUniform(final, 'uVignette', frame.vignette);
-    setUniform(final, 'uCinema', view.cinema);
-    setUniform(final, 'uSeed', grainSeed(timeSec));
+    setUniform(final.uniforms, 'uVignette', frame.vignette);
+    setUniform(final.uniforms, 'uCinema', view.cinema);
+    setUniform(final.uniforms, 'uSeed', grainSeed(timeSec));
     this.#pass(final, null);
   }
 
@@ -621,7 +605,7 @@ export class PostPipeline {
     let source = targets.scene;
     for (const [i, level] of levels.entries()) {
       const material = i === 0 ? this.#bloomPrefilter : this.#bloomDown;
-      setUniform(material, 'uSource', source.texture);
+      setUniform(material.uniforms, 'uSource', source.texture);
       setTexel(material, source);
       setClamp(material, 'uClamp', source);
       this.#pass(material, level);
@@ -634,8 +618,8 @@ export class PostPipeline {
       const base = levels[i];
       const to = targets.bloomUp[i];
       if (base && to) {
-        setUniform(this.#bloomUp, 'uSource', source.texture);
-        setUniform(this.#bloomUp, 'uBase', base.texture);
+        setUniform(this.#bloomUp.uniforms, 'uSource', source.texture);
+        setUniform(this.#bloomUp.uniforms, 'uBase', base.texture);
         setTexel(this.#bloomUp, source);
         setClamp(this.#bloomUp, 'uClamp', source);
         this.#pass(this.#bloomUp, to);
@@ -672,15 +656,15 @@ export class PostPipeline {
     this.#renderDepth(depth, scene, camera, effects);
     const pixelsPerBlur = (blurPrepare.height / 2) * imageHeight;
     const prepare = this.#blurPrepare;
-    setUniform(prepare, 'uColor', targets.scene.texture);
+    setUniform(prepare.uniforms, 'uColor', targets.scene.texture);
     setClamp(prepare, 'uClamp', targets.scene);
     this.#setFocus(prepare, camera, focus, pixelsPerBlur);
     this.#pass(prepare, blurPrepare);
     const gather = this.#blurGather;
-    setUniform(gather, 'uSource', blurPrepare.texture);
+    setUniform(gather.uniforms, 'uSource', blurPrepare.texture);
     setTexel(gather, blurPrepare);
     setClamp(gather, 'uClamp', blurPrepare);
-    setUniform(gather, 'uPixelsPerBlur', pixelsPerBlur);
+    setUniform(gather.uniforms, 'uPixelsPerBlur', pixelsPerBlur);
     this.#pass(gather, blurGather);
     return blurGather;
   }
@@ -716,8 +700,8 @@ export class PostPipeline {
    * @param haze The haze of the frame, or `null` for no haze.
    */
   #setHaze(material: ShaderMaterial, camera: PerspectiveCamera, haze: HazeFrame | null): void {
-    setUniform(material, 'uHazeOn', haze ? 1 : 0);
-    setUniform(material, 'uSceneDepth', haze?.depth ?? null);
+    setUniform(material.uniforms, 'uHazeOn', haze ? 1 : 0);
+    setUniform(material.uniforms, 'uSceneDepth', haze?.depth ?? null);
     if (!haze) {
       return;
     }
@@ -749,12 +733,12 @@ export class PostPipeline {
     focus: Focus,
     pixelsPerBlur: number,
   ): void {
-    setUniform(material, 'uDepth', this.#targets?.depth?.depthTexture ?? null);
-    setUniform(material, 'uNear', camera.near);
-    setUniform(material, 'uFar', camera.far);
-    setUniform(material, 'uFocus', focus.distance);
-    setUniform(material, 'uBlurScale', focus.scale);
-    setUniform(material, 'uPixelsPerBlur', pixelsPerBlur);
+    setUniform(material.uniforms, 'uDepth', this.#targets?.depth?.depthTexture ?? null);
+    setUniform(material.uniforms, 'uNear', camera.near);
+    setUniform(material.uniforms, 'uFar', camera.far);
+    setUniform(material.uniforms, 'uFocus', focus.distance);
+    setUniform(material.uniforms, 'uBlurScale', focus.scale);
+    setUniform(material.uniforms, 'uPixelsPerBlur', pixelsPerBlur);
   }
 
   #pass(material: ShaderMaterial, target: WebGLRenderTarget | null): void {

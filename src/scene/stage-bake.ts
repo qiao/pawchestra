@@ -21,12 +21,12 @@ import {
   Vector3,
   WebGLRenderTarget,
 } from 'three';
-import type { IUniform, Material, Matrix4, Texture, WebGLRenderer } from 'three';
+import type { Material, Texture, WebGLRenderer } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { Steps } from '../score/steps.ts';
 import { SHADOW_TOP } from './lights.ts';
-import { compileInto, gpuDoneSteps, programsReadySteps } from './programs.ts';
+import { compileInto, gpuDoneSteps, programsReadySteps, setUniform } from './programs.ts';
 
 /**
  * The values of the bake of the static props (design 4.5, light and render). The props and the
@@ -445,14 +445,15 @@ export function* bakeStageSteps(
         renderer.clear(false, true, false);
         renderer.render(casterScene, camera);
         const uniforms = material.uniforms;
-        setValue(uniforms['uDepth'], depth.depthTexture);
-        setValue(
-          uniforms['uLightMatrix'],
+        setUniform(uniforms, 'uDepth', depth.depthTexture);
+        setUniform(
+          uniforms,
+          'uLightMatrix',
           camera.projectionMatrix.clone().multiply(camera.matrixWorldInverse),
         );
-        setValue(uniforms['uNear'], camera.near);
-        setValue(uniforms['uFar'], camera.far);
-        setValue(uniforms['uWeight'], weight);
+        setUniform(uniforms, 'uNear', camera.near);
+        setUniform(uniforms, 'uFar', camera.far);
+        setUniform(uniforms, 'uWeight', weight);
         surface.material = material;
         renderer.setRenderTarget(target);
         renderer.render(receiverScene, flat);
@@ -491,18 +492,6 @@ function placedCopy(mesh: Mesh, material: Material): Mesh {
   copy.matrixWorld.copy(mesh.matrixWorld);
   copy.frustumCulled = false;
   return copy;
-}
-
-/**
- * Sets the value of a uniform.
- *
- * @param uniform The uniform, or `undefined` for a material with no such uniform.
- * @param value The value.
- */
-function setValue(uniform: IUniform | undefined, value: Texture | Matrix4 | number | null): void {
-  if (uniform) {
-    uniform.value = value;
-  }
 }
 
 /** The texture of a stage with no bake: all light reaches each point. */
