@@ -193,7 +193,10 @@ above it fold when the arm lifts. So the badger copy splits its crease too
 penguin joins the trunk in a deep crease down to the elbow, so its copy splits the crease too
 (`tools/blender/penguin_edit.py`). A flat arm has rays of different lengths with no trunk in the
 section, so the free test of the rebuild takes a larger ratio for the flipper (`--spec` key
-`free`). The old faces keep their colors, so that the black and white edge of the trunk stays.
+`free`). The tube wraps onto the freed flipper, so the inner vertices of its lowest rings stay on
+the trunk, as a thin box of fins under the root. A copy merges each into the next vertex of its
+ring on the flipper, up to the place where the root meets the trunk (`penguin-arms-pit.glb`).
+Reason: a short clip of the root into the trunk looks better than a gap or a notch under it. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of
