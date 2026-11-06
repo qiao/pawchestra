@@ -12,7 +12,6 @@ import { box, quad } from './primitives.ts';
 import { SPECIES } from './species.ts';
 import type { SpeciesParams } from './species.ts';
 import { studioBodyOf } from './studio-body.ts';
-import type { StudioBody } from './studio-format.ts';
 
 /**
  * The colors of the stage, the steps, the podium, and the choir risers (design 4.5, scene
@@ -207,17 +206,6 @@ export function standDeskHeight(eyes: readonly number[]): number {
 export const CHAIR_LEG = 0.035;
 
 /**
- * Gives the depth of the chair under a studio body (design 4.4): the chair of its seated bind, or
- * the chair of its seated pose for a standing body that also sits (`StudioBody.sitting`).
- *
- * @param studio The studio body.
- * @returns The depth, in meters, or `null` for a body with no chair.
- */
-function studioChairDepth(studio: StudioBody): number | null {
-  return studio.chairDepth ?? studio.sitting?.chairDepth ?? null;
-}
-
-/**
  * Gives the heights of the chair or of the stool of the harp under a body (design 4.5, props): the
  * seat at the legs of the species, as deep as the chair of the studio body (design 4.4,
  * `StudioBody.chairDepth`), and wider under a wide studio body (`chairWidth`).
@@ -228,7 +216,7 @@ function studioChairDepth(studio: StudioBody): number | null {
  */
 function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
   const studio = studioBodyOf(species.body);
-  const depth = studioChairDepth(studio);
+  const depth = studio.chairDepth;
   if (depth === null) {
     return { seatHeight: legs, footHeight: 0 };
   }

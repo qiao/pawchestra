@@ -9,8 +9,8 @@
  * no `--times`, the file holds each moment of the role. With `--times` and no `--moments`, it
  * holds only the demo times, and `--moments all` adds each moment.
  *
- * A standing or a seated stance of the body (`standingBody()`, `seatedBody()`) puts the stance
- * matrices before the pose, and sets the leg or the sit shapes to 1. The app skins such a body
+ * A standing stance of the body (`standingBody()`) puts the stance matrices before the pose, and
+ * sets the leg shapes to 1. The app skins such a body
  * twice, so the preview of that moment differs from the app at the joints of the legs. `--skin`
  * also writes, for `studio_preview.py --check`, the place of each vertex of the app in the bind of
  * the GLB file, its posed place in the app (`skinStudioMesh()` on the packed mesh), and its posed
@@ -39,7 +39,6 @@ import { ROOT } from './ref-tree.ts';
 import {
   CORRECTIVE_NAMES,
   LEG_CORRECTIVE_NAMES,
-  SIT_CORRECTIVE_NAMES,
   ANIMALS,
   eyeVertices,
   keptCorrectives,
@@ -48,7 +47,6 @@ import {
   readGlb,
   readSkeleton,
   settingsOf,
-  sitsIn,
   weldMesh,
 } from './studio-body.ts';
 import type { Glb } from './studio-body.ts';
@@ -76,7 +74,6 @@ import type { StudioBody, StudioBone, StudioMesh } from '../src/models/studio-fo
 import {
   createStudioPose,
   poseStudioBones,
-  seatedBody,
   skinStudioMesh,
   standingBody,
   studioOffsets,
@@ -171,7 +168,7 @@ interface PreviewBone {
 }
 
 /** The stance of the body in a moment: the bind of the export, or a stance of `studioRig()`. */
-type Stance = 'bind' | 'standing' | 'sitting';
+type Stance = 'bind' | 'standing';
 
 /** The stance of a model and its matrices of the bones, or `null` for the bind of the export. */
 interface StanceMatrices {
@@ -612,8 +609,8 @@ function fileToBlend(): Matrix4 {
 }
 
 /**
- * Gives the stance matrices of the rig of a model (`standingBody()`, `seatedBody()`), or `null` for
- * a rig in the bind of the export.
+ * Gives the stance matrices of the rig of a model (`standingBody()`), or `null` for a rig in the
+ * bind of the export.
  *
  * @param model The model.
  * @param bound The studio body of the module.
@@ -623,10 +620,7 @@ function stanceOf(model: PlayerModel, bound: StudioBody): StanceMatrices {
   if (model.studio.body === bound) {
     return { stance: 'bind', matrices: null };
   }
-  const unpacked = unpackStudioMesh(bound.mesh);
-  return bound.standing && model.studio.body.standing === null
-    ? { stance: 'standing', matrices: standingBody(bound, unpacked).stance }
-    : { stance: 'sitting', matrices: seatedBody(bound, unpacked).stance };
+  return { stance: 'standing', matrices: standingBody(bound, unpackStudioMesh(bound.mesh)).stance };
 }
 
 /**
@@ -725,9 +719,7 @@ function targetWeights(
   for (const [k, name] of [...CORRECTIVE_NAMES, ...raises].entries()) {
     out[name] = fixed(studio.correctives[k] ?? 0);
   }
-  const full =
-    stance === 'standing' ? LEG_CORRECTIVE_NAMES : stance === 'sitting' ? SIT_CORRECTIVE_NAMES : [];
-  for (const name of full) {
+  for (const name of stance === 'standing' ? LEG_CORRECTIVE_NAMES : []) {
     out[name] = 1;
   }
   return out;
@@ -861,7 +853,7 @@ async function preview(options: Options): Promise<PosePreview> {
     throw new Error(`ANIMALS of tools/studio-body.ts has no animal ${animal}.`);
   }
   const settings = settingsOf(glb, entry);
-  const kept = keptCorrectives(settings, raises, sitsIn(glb, settings));
+  const kept = keptCorrectives(settings, raises);
   const app = unpackStudioMesh(bound.mesh);
   const exact = options.skin ? fileMesh(glb, kept, frame, app) : null;
   const appSkins: Record<string, number[]> = {};

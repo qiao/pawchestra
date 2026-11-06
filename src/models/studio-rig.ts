@@ -728,48 +728,6 @@ export function standingBody(body: StudioBody, mesh: StudioMesh): PosedStudioBod
 }
 
 /**
- * Makes the seated body of a standing studio body that also sits, such as the conductor bear in a
- * seated role (design 4.4). It is the mirror of {@link standingBody}: the legs take the turns of
- * the seated pose, with the sit corrective shapes of the rig at their full weight, and the body
- * moves from its standing place to sit over its seat. The weight of each sit shape comes from the
- * stance alone, so the pose stays stateless. The bind places of the mesh, of the bones, and of
- * the points of the holds become the seated places, so that the rig poses the seated body as it
- * poses a body that the rig bound seated.
- *
- * @param body The standing studio body, with its seated pose.
- * @param mesh The unpacked mesh of the body, with the sit corrective shapes after the arm shapes.
- * @returns The seated body and its mesh, with the arm corrective shapes only, and the move of
- *   each bone from the bind pose to the stance.
- * @throws Error if the body has no seated pose.
- */
-export function seatedBody(body: StudioBody, mesh: StudioMesh): PosedStudioBody {
-  const { sitting, ...standing } = body;
-  if (!sitting) {
-    throw new Error('The studio body has no seated pose.');
-  }
-
-  const sit = chainPose(
-    body,
-    new Map<StudioBone, Quat>(STUDIO_LEG_BONES.map((bone) => [bone, sitting.turns[bone]] as const)),
-  );
-  const weights = new Float32Array(mesh.correctives.length).fill(1, armCorrectives(body));
-  const positions = skinStudioMesh(mesh, { matrices: sit.matrices, correctives: weights });
-  const drop = new Vector3(...sitting.drop);
-  moveAll(positions, drop);
-  return {
-    body: {
-      ...standing,
-      ...stancePlaces(body, sit, drop),
-      floor: [0, 0, sitting.drop[2]],
-      seatHeight: sitting.seatHeight,
-      chairDepth: sitting.chairDepth,
-    },
-    mesh: { ...mesh, positions, correctives: mesh.correctives.slice(0, armCorrectives(body)) },
-    stance: movedMatrices(sit.matrices, drop),
-  };
-}
-
-/**
  * Gives a copy of the matrices of the bones that adds one move after each matrix.
  *
  * @param matrices 16 numbers for each bone, column by column.
@@ -860,9 +818,7 @@ function boneMatrix(pose: ChainPose, bone: StudioBone): Matrix4 {
 /**
  * Prepares a studio body to pose (design 4.4): unpacks its mesh, and finds the skeleton of the
  * player and the constants of the arms. A seated body that also stands gets its standing body
- * ({@link standingBody}) for a player that stands, and a standing body that also sits gets its
- * seated body ({@link seatedBody}) for a player that sits. Each other body keeps the stance of
- * its role.
+ * ({@link standingBody}) for a player that stands. Each other body keeps the stance of its role.
  *
  * @param bound The studio body, as the export wrote it.
  * @param stands True for a player that stands.
@@ -873,15 +829,13 @@ export function studioRig(bound: StudioBody, stands = false): StudioRig {
   const { body, mesh }: Pick<PosedStudioBody, 'body' | 'mesh'> =
     stands && bound.standing
       ? standingBody(bound, unpacked)
-      : !stands && bound.sitting
-        ? seatedBody(bound, unpacked)
-        : {
-            body: bound,
-            mesh: {
-              ...unpacked,
-              correctives: unpacked.correctives.slice(0, armCorrectives(bound)),
-            },
-          };
+      : {
+          body: bound,
+          mesh: {
+            ...unpacked,
+            correctives: unpacked.correctives.slice(0, armCorrectives(bound)),
+          },
+        };
   const twisted = body.upperTwist === undefined ? mesh : withUpperTwist(body, mesh);
   const h = body.heads;
   const unit = (from: Vec3, to: Vec3): Vector3 =>
