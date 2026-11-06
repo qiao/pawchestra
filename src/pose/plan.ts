@@ -45,6 +45,7 @@ import type { PedalMotion } from './pedal.ts';
 import { buildKeyTrack } from './piano-keys.ts';
 import type { KeyTrack } from './piano-keys.ts';
 import { buildStringTrack } from './harp-strings.ts';
+import { notePlucks } from './harp-fingering.ts';
 import type { HarpFingering } from './harp-fingering.ts';
 import type { StringTrack } from './harp-strings.ts';
 import { percussionTracks } from './percussion.ts';
@@ -435,7 +436,7 @@ function* noteLayerSteps(
       right,
       pedal: pedalMotion(rig.foot ? pedal : NO_PEDAL),
       keys: family === 'keyboard' ? buildKeyTrack(notes) : null,
-      strings: family === 'harp' ? buildStringTrack(notes) : null,
+      strings: family === 'harp' ? buildStringTrack(notes, notePlucks(notes, [left, right])) : null,
       digits,
       fingering,
     };

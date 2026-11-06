@@ -75,15 +75,22 @@ function levelOf(velocity: number): number {
 
 /**
  * Builds the pluck track of the harp strings of one player from its notes (design 5.3). Each
- * note plucks the string of its key (`harpString()`). Two notes of one string that start within
- * `CHORD_SEC` of each other are one pluck, with the larger velocity and the later end.
+ * note plucks the string of its key (`harpString()`) at its pluck time: the note start, or the
+ * earlier pluck of its finger in a rolled chord (`notePlucks()`). Two notes of one string that
+ * start within `CHORD_SEC` of each other are one pluck, with the larger velocity and the later
+ * end.
  *
  * @param notes The notes of the player, sorted by start.
+ * @param pluckTimes The pluck time of each note, in the order of `notes`, or `null` for the note
+ *   starts.
  * @returns The track.
  */
-export function buildStringTrack(notes: readonly PlayerNote[]): StringTrack {
+export function buildStringTrack(
+  notes: readonly PlayerNote[],
+  pluckTimes: Float64Array | null = null,
+): StringTrack {
   const plucks = Array.from({ length: HARP_STRING_COUNT }, (): Pluck[] => []);
-  for (const note of notes) {
+  for (const [k, note] of notes.entries()) {
     const own = plucks[harpString(note.pitch)];
     const last = own?.[own.length - 1];
     const level = levelOf(note.velocity);
@@ -91,7 +98,9 @@ export function buildStringTrack(notes: readonly PlayerNote[]): StringTrack {
       last.end = Math.max(last.end, note.endSec);
       last.level = Math.max(last.level, level);
     } else {
-      own?.push({ start: note.startSec, end: note.endSec, level });
+      // The plucks of one string stay in order.
+      const start = Math.max(pluckTimes?.[k] ?? note.startSec, last?.start ?? -Infinity);
+      own?.push({ start, end: note.endSec, level });
     }
   }
 
