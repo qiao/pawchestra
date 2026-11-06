@@ -944,8 +944,12 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   above a small angle over the face (`bias`), so the flat faces of a low-poly body stay clean.
   Each pixel turns its samples by a 4 × 4 pattern, and a blur of 4 × 4 pixels removes the
   pattern. The hall gets no shade, because the depth pass has no hall. The strength is the middle
-  of a lineup of three strengths. Only the high tier has it (2.6), because it reads the depth many
-  times for each pixel.
+  of a lineup of three strengths. The high tier reads the depth many times for each pixel at
+  half size (`TIER_SETTINGS.high.contactSamples`). Without the shade, the medium tier of a phone
+  looked flat, so it has a cheap shade: a quarter size and fewer samples (`surfaceLevel`,
+  `contactSamples`). It reads the depth about 15% as often as the high tier. The
+  blur of 4 × 4 pixels at a quarter size is wider, which a soft contact shade permits. The low
+  tier has none (2.6).
 - **Floor gloss** (`FLOOR_GLOSS` of `scene/surface.ts`). The same pass traces each pixel of the
   stage top along its mirror ray through the depth, and reads the scene color at the hit. The ray
   takes a jitter in a small cone, and the blur joins 16 rays, so the reflection is soft. The
@@ -956,7 +960,7 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
-  vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
+  vignette, a grain, and the film fade of 2.5 (`uFade`). `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.
 - **Letterbox** (2.5). Each target keeps the size of the canvas, and a scissor limits each pass to
   the letterbox (`cropTarget()` of `scene/letterbox.ts`): the scene pass, its MSAA resolve, the

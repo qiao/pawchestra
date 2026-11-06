@@ -4,8 +4,8 @@ import type { PerspectiveCamera, ShaderMaterial } from 'three';
 /**
  * The contact shade (design 4.5, post effects): a soft dark where two surfaces meet, such as under
  * the feet, the chairs, and the stands, and in the crease between an arm and the trunk. A pass at
- * half size finds it from the depth of the scene, as the ambient occlusion of a film render. The
- * final pass multiplies the scene by it.
+ * half size (a quarter on the medium tier) finds it from the depth of the scene, as the ambient
+ * occlusion of a film render. The final pass multiplies the scene by it.
  */
 export const CONTACT_SHADE = {
   /** The reach of the shade from a surface, in meters. */

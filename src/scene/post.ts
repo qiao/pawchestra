@@ -382,9 +382,12 @@ interface Targets {
   readonly blurPrepare: WebGLRenderTarget | null;
   /** The soft image at half size. */
   readonly blurGather: WebGLRenderTarget | null;
-  /** The contact shade and the floor gloss at half size (`scene/surface.ts`), before the blur. */
+  /**
+   * The contact shade and the floor gloss at half or quarter size (`scene/surface.ts`), before the
+   * blur.
+   */
   readonly surface: WebGLRenderTarget | null;
-  /** The contact shade and the floor gloss at half size, after the blur. */
+  /** The contact shade and the floor gloss at half or quarter size, after the blur. */
   readonly surfaceBlur: WebGLRenderTarget | null;
   /** Each target above, for the crop of each frame and the disposal. */
   readonly all: readonly WebGLRenderTarget[];
@@ -558,10 +561,14 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uBlurOn', blur ? 1 : 0);
     setUniform(final.uniforms, 'uSurface', surface?.texture ?? null);
     setUniform(final.uniforms, 'uSurfaceOn', surface ? 1 : 0);
-    // The bloom, the blur, and the surface pass have the same half size, so one clamp serves all.
-    const half = bloom ?? blur ?? surface;
+    // The bloom and the blur have the same half size, so one clamp serves both. The surface pass
+    // can have a quarter size, so it has its own clamp.
+    const half = bloom ?? blur;
     if (half) {
       setClamp(final, 'uHalfClamp', half);
+    }
+    if (surface) {
+      setClamp(final, 'uSurfaceClamp', surface);
     }
     const rect = view.rect;
     const frameRect = final.uniforms['uFrame']?.value;
@@ -644,10 +651,12 @@ export class PostPipeline {
     // The blur of each pixel needs the alpha channel.
     const blurPrepare = blur ? floatTarget(halfWidth, halfHeight, 'half') : null;
     const blurGather = blur ? floatTarget(halfWidth, halfHeight, format) : null;
-    // The contact shade is in the alpha channel.
+    // The contact shade is in the alpha channel. The pass has half or a quarter of the size.
     const shade = settings.contactSamples > 0 || settings.floorGloss;
-    const surface = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
-    const surfaceBlur = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
+    const level = settings.surfaceLevel;
+    const [surfaceWidth, surfaceHeight] = bloomSizes(width, height, level)[level - 1] ?? [1, 1];
+    const surface = shade ? floatTarget(surfaceWidth, surfaceHeight, 'half') : null;
+    const surfaceBlur = shade ? floatTarget(surfaceWidth, surfaceHeight, 'half') : null;
     const all = [
       scene,
       ...bloomDown,
@@ -662,7 +671,7 @@ export class PostPipeline {
   }
 
   /**
-   * Renders the surface pass at half size and its blur (`scene/surface.ts`).
+   * Renders the surface pass at half or quarter size and its blur (`scene/surface.ts`).
    *
    * @param targets The targets.
    * @param camera The camera of the frame.
@@ -900,6 +909,7 @@ export class PostPipeline {
         uBlurOn: { value: 0 },
         uSurface: { value: null },
         uSurfaceOn: { value: 0 },
+        uSurfaceClamp: { value: new Vector4(0, 0, 1, 1) },
         uBloomStrength: { value: look.bloomStrength },
         uHalation: { value: new Vector3(...look.halation) },
         uSceneDepth: { value: null },

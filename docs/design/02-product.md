@@ -160,9 +160,10 @@ page starts in Free mode (`app/camera-mode.ts`).
 ## 2.6 Quality tiers and browser support
 
 The tiers are High, Medium, and Low (`TIER_SETTINGS` of `scene/quality.ts`). The low tier has no
-bloom, no lens fringe, no depth of field, and no dust motes. Only the high tier has the contact
-shade and the floor gloss (4.5), because they read the depth many times for each pixel. No tier has side light shadows,
-because they cost GPU time in each frame and changed only small shadows on the players. Each tier
+bloom, no lens fringe, no depth of field, and no dust motes. Only the high tier has the floor
+gloss and the full contact shade at half size (4.5), because they read the depth many times for
+each pixel. The medium tier has a cheap contact shade at a quarter size, so a phone does not look
+flat. The low tier has neither. No tier has side light shadows, because they cost GPU time in each frame and changed only small shadows on the players. Each tier
 keeps MSAA, because the hard edges of the low-poly parts show steps (4.5). No tier uses the full
 pixel ratio of a Retina screen, because the GPU time grows with the pixels and the frame target of
 9.7 comes first. The image is a little softer.

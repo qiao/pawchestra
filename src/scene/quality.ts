@@ -24,10 +24,15 @@ interface TierSettings {
   /** The number of samples of the haze of the visible beam along each view ray. */
   readonly beamSamples: number;
   /**
-   * The number of samples of the contact shade for each pixel at half size (`CONTACT_SHADE` of
-   * `surface.ts`). 0 turns it off.
+   * The number of samples of the contact shade for each pixel of the surface pass (`CONTACT_SHADE`
+   * of `surface.ts`). 0 turns it off.
    */
   readonly contactSamples: number;
+  /**
+   * The size of the surface pass: 1 for half the size of the canvas, 2 for a quarter. A quarter
+   * reads the depth for a quarter of the pixels of the half size.
+   */
+  readonly surfaceLevel: 1 | 2;
   /** True for the floor gloss of the surface pass (`FLOOR_GLOSS` of `surface.ts`). */
   readonly floorGloss: boolean;
 }
@@ -36,8 +41,10 @@ interface TierSettings {
  * The values of each tier (design 2.6). The low tier keeps the final pass of the post effects
  * (the tone mapping, the color grade, the vignette, and the grain), because it costs one sample
  * for each pixel. It drops the bloom, the lens fringe, the depth of field, and the dust motes.
- * Only the high tier has the surface pass of the contact shade and the floor gloss, because it
- * reads the depth many times for each pixel.
+ * The high tier has the surface pass of the contact shade and the floor gloss at half size. The
+ * medium tier has only a cheap contact shade, at a quarter size with fewer samples, so that a
+ * phone does not look flat. The floor gloss traces a ray for each floor pixel, so it stays on the
+ * high tier.
  * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
  * `perf-60.mid`, and they changed only small shadows on the players.
  */
@@ -56,6 +63,7 @@ export const TIER_SETTINGS = {
     motes: 140,
     beamSamples: 4,
     contactSamples: 10,
+    surfaceLevel: 1,
     floorGloss: true,
   },
   medium: {
@@ -67,7 +75,8 @@ export const TIER_SETTINGS = {
     lensFringe: true,
     motes: 70,
     beamSamples: 3,
-    contactSamples: 0,
+    contactSamples: 6,
+    surfaceLevel: 2,
     floorGloss: false,
   },
   low: {
@@ -80,6 +89,7 @@ export const TIER_SETTINGS = {
     motes: 0,
     beamSamples: 2,
     contactSamples: 0,
+    surfaceLevel: 1,
     floorGloss: false,
   },
 } as const satisfies Readonly<Record<QualityTier, TierSettings>>;

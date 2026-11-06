@@ -221,10 +221,12 @@ uniform sampler2D uScene;
 uniform sampler2D uBloom;
 uniform sampler2D uBlur;
 uniform float uBlurOn;
-// The blurred surface pass at half size (scene/surface.ts): the reflection of the floor gloss in
+// The blurred surface pass at half or quarter size (scene/surface.ts): the reflection of the floor gloss in
 // the color, and the factor of the contact shade in the alpha channel.
 uniform sampler2D uSurface;
 uniform float uSurfaceOn;
+// The part of the surface pass that the frame wrote. It has half or a quarter of the size.
+uniform vec4 uSurfaceClamp;
 uniform float uBloomStrength;
 uniform vec3 uHalation;
 uniform sampler2D uSceneDepth;
@@ -309,7 +311,7 @@ void main() {
 #endif
 #ifdef SURFACE
   if (uSurfaceOn > 0.5) {
-    vec4 surface = texture(uSurface, halfUv);
+    vec4 surface = texture(uSurface, clamp(vUv, uSurfaceClamp.xy, uSurfaceClamp.zw));
     color = color * surface.a + surface.rgb;
   }
 #endif
