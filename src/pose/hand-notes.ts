@@ -138,7 +138,9 @@ export interface HandNote {
  * chord wider than one octave are nearer, the palm of each hand asks for half of the difference
  * away from its keys (`HandNote.shift`), so that a bass and a melody stay in two hands. When a hand
  * plays nearer to the other hand, the other hand moves out of its way, away from it, at the start
- * of the chord: a note of loudness 0 on the key at that distance, with no sound.
+ * of the chord: a note of loudness 0 on the key at that distance, with no sound. A hand that takes
+ * the keys from the other hand waits at that distance from the other hand until the strike of the
+ * other hand, with such a note ({@link waitAway}).
  *
  * With a distance `apart`, the hand of each chord within one octave comes from a plan of the
  * whole piece ({@link planHands}), as a pianist plans which hand takes which notes: the plan finds
@@ -179,8 +181,9 @@ export function splitHands(
   const left: HandNote[] = [];
   const right: HandNote[] = [];
   let places: HandPlaces = { left: HAND_MOTION.startKeys[0], right: HAND_MOTION.startKeys[1] };
-  // The start of the last note of either hand.
+  // The start of the last note of either hand, and the hand of the last chord.
   let lastStart = -Infinity;
+  let lastChoice: HandChoice | null = null;
   for (const [index, chord] of chords.entries()) {
     const { group, keys } = chord;
     const choice = choices ? (choices[index] ?? 'right') : nearerHand(chord, places, reach);
@@ -208,7 +211,15 @@ export function splitHands(
       toLeft = part(group.low, group.high);
       toRight = next.right === places.right ? null : makeWay(group.start, next.right);
     }
+    const wait = apart > 0 ? waitAway(choice, lastChoice, places, next, apart) : null;
+    const waiting = wait === 'left' ? left : right;
+    if (wait && (waiting.at(-1)?.start ?? -Infinity) < lastStart) {
+      // The hand waits away from the other hand until the strike of the other hand.
+      const key = wait === 'left' ? places.right - apart : places.left + apart;
+      waiting.push(makeWay(lastStart, wait === 'left' ? Math.floor(key) : Math.ceil(key)));
+    }
     places = next;
+    lastChoice = choice;
     if (toLeft && toRight && apart > 0 && Number.isFinite(lastStart)) {
       // Both hands move to the chord in the same time, so that they keep apart in the moves.
       toLeft = { ...toLeft, since: lastStart };
@@ -247,6 +258,34 @@ function nearerHand(chord: SplitChord, last: HandPlaces, reach: HandReach): Hand
   return group.low >= reach.rightLowest && (nearerRight || group.high > reach.leftHighest)
     ? 'right'
     : 'left';
+}
+
+/**
+ * Finds the hand that takes the keys from the other hand (design 5.3): the hand of a chord after a
+ * chord of the other hand alone, when it comes nearer than `apart` to the place of the other hand.
+ * Such a hand waits away from the other hand until the strike of the chord of the other hand, as
+ * a pianist keeps a hand clear of the keys of the other hand until that hand has played.
+ *
+ * @param choice The hand of the chord.
+ * @param last The hand of the chord before, or `null` for the first chord.
+ * @param before The middles of the two hands before the chord.
+ * @param after The middles of the two hands after the chord.
+ * @param apart The least distance between the middles of the two hands.
+ * @returns The hand that waits, or `null` for none.
+ */
+function waitAway(
+  choice: HandChoice,
+  last: HandChoice | null,
+  before: HandPlaces,
+  after: HandPlaces,
+  apart: number,
+): 'left' | 'right' | null {
+  if (choice === 'both' || last === 'both' || last === null || last === choice) {
+    return null;
+  }
+  const near =
+    choice === 'left' ? before.right - after.left < apart : after.right - before.left < apart;
+  return near ? choice : null;
 }
 
 /** A chord of a player for {@link splitHands}. */

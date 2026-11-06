@@ -534,6 +534,11 @@ The rest of each family:
   fast, from the strike of the note before and back to its next keys (`limitYields()`). For the
   missing distance, the paw lifts over the other paw (`HAND_MOTION.over`, `HandTrack.hovers`).
   Reason: in a two-voice passage, a paw jumped up to 34 cm in 50 ms out of the way and back.
+- A paw that takes the keys from the other paw waits away from it until the strike of the other
+  paw (`waitAway()`), with a note that only makes way. `limitYields()` then holds it near its next
+  keys and lifts it over the other paw. Reason: the paw came in from far away with an eased move,
+  so it was near its keys before the other paw struck, and the paws went up to 1.4 cm into each
+  other (`bach-bwv1050`).
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key
