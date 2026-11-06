@@ -1,7 +1,8 @@
 # Pig model
 
 This folder holds the source mesh of the pig, a copy with new upper arms, a copy with rebuilt arms
-and its weights, a copy with moved arm roots and its weights, and the rigged copy. The app does not serve these files. It loads the module
+and its weights, a copy with moved arm roots and its weights, a copy with no folds at the arm roots,
+and the rigged copy. The app does not serve these files. It loads the module
 `src/models/studio/pig.ts`, which this chain writes:
 
 ```text
@@ -14,7 +15,10 @@ pig-upper.glb                     `armSource` of tools/mesh-rigs/pig.json
 pig-arms.glb + pig-weights.json
    │  tools/blender/pig_root.py   hidden arm roots moved toward the trunk wall or the joint
    v
-pig-root.glb + pig-root-weights.json   `source` and `paintedWeights` of tools/mesh-rigs/pig.json
+pig-root.glb + pig-root-weights.json   `paintedWeights` of tools/mesh-rigs/pig.json
+   │  point edits in Blender      no folds at the arm roots (pig-root-pit.json)
+   v
+pig-root-pit.glb                  `source` of tools/mesh-rigs/pig.json
    │  pnpm rig-mesh pig
    v
 pig.rig.glb                       rigged mesh
@@ -35,6 +39,8 @@ src/models/studio/pig.ts          studio body of the app
 | `pig-weights.json` | Weights of the same Blender run. License as `pig.glb` | The same run |
 | `pig-root.glb` | `pig-arms.glb` with moved vertices of the hidden arm roots. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/pig_root.py` |
 | `pig-root-weights.json` | `pig-weights.json` at the places of `pig-root.glb`. License as `pig.glb` | The same run |
+| `pig-root-pit.glb` | Copy of `pig-root.glb` with no folds at the arm roots. License as `pig.glb` | None: point edits in Blender (below) |
+| `pig-root-pit.json` | The list of the edits of `pig-root-pit.glb`. License as `pig.glb` | None |
 | `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
 
 ## pig.glb
@@ -131,3 +137,37 @@ faces, the UV, and the weights stay. A run gives the same bytes.
 |---|---|---|
 | `pig-root.glb` | 965,548 bytes | `66e99d5bb0dc1119e4c205559c35957ac2190b4799a39e6035ddaecdd092624a` |
 | `pig-root-weights.json` | 410,182 bytes | `0cb9c6f98b43d17f4949b33d251964c0a6efaf32caa16b8947fb90cc3631828a` |
+
+## pig-root-pit.glb
+
+| Item | Value |
+|---|---|
+| Size | 965,332 bytes |
+| SHA-256 | `8f802f369c5ee40a7a387f4a2d72f260924cdf4cb8c23f4b63e9dd4cd12bec0a` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+The trunk wall under each arm of `pig-root.glb` is the fan that `pig_arms.py` put into the hole of
+the old bulge. The hanging arm hides it in the source, and the bind and the play show it. These
+faults showed:
+
+- On the right, a trunk vertex 0.03 units out of the wall at the front of the fan: a thin fin
+  under the front of the root in the bind and at the top front of the root in the play.
+- On each side, a sliver of the fan, with its three corners nearly on one line: the sliver turned
+  over into a fin and a dark back face under the root (the left one at a note of the horn, the
+  right one at the back of the root in each pose).
+- On the left, the next fan triangle toward the shoulder turned over in the rest and the lift.
+- On the right, two near twin vertices: a trunk vertex 0.006 units from its neighbor, and a dome
+  vertex 0.002 units from the top ring of the tube, with other weights. Each made a notch at the
+  front of the root.
+- On the right, a trunk vertex 0.01 units out of the wall at the top front of the root, which
+  showed as a small fin in the play.
+
+The copy removes them with point edits in the live Blender on the welded mesh. Each edit merges one
+vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to a new place.
+`pig-root-pit.json` lists the 7 merges in their order. Each merge moves a corner at most
+0.034 units. The copy has 1,838 vertices and 3,668 triangles after the weld (1,845 and 3,682
+before): 14 faces go, and each other face keeps the UVs of its own corners. Each merged corner
+takes the weight row of its new vertex in `pig-root-weights.json`.
+
+The flat back face of the right dome and the step where the left tube meets its dome stay: they
+are the forms of the dome of `pig_arms.py` and of the rebuilt tube, with no fold.
