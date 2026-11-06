@@ -1,6 +1,6 @@
 # TODO
 
-This list holds the open tasks of Zoophony, under the steps of the work order (design 9.5). It is
+This list holds the open tasks of Pawchestra, under the steps of the work order (design 9.5). It is
 the only place for the status of the work. The rules for each task are in the design files of
 [`docs/design/`](docs/design.md). The numbers in parentheses name the design sections, and the
 index `docs/design.md` gives the file of each section.

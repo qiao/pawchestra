@@ -1,4 +1,4 @@
-# Contributing to Zoophony
+# Contributing to Pawchestra
 
 This file gives the setup, the commands, the checks, and the rules of a change. The design in
 [`docs/design.md`](docs/design.md) is the source of truth for the product. Read the design

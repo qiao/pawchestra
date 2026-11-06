@@ -1,4 +1,4 @@
-# Zoophony: design
+# Pawchestra: design
 
 This document records the design of a WebGL MIDI player for orchestral music. Low-poly animals
 play the music on a small stage.

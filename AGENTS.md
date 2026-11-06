@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Zoophony is a WebGL MIDI player in which low-poly animals play orchestral music on a small stage.
+Pawchestra is a WebGL MIDI player in which low-poly animals play orchestral music on a small stage.
 It uses Three.js, TypeScript, Vite, and pnpm, and it is a static site on Vercel.
 
 This file holds the rules that each agent needs in each round. The modules in `docs/agents/` hold
@@ -57,7 +57,7 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
   and 7.3. Add each new dependency to the third-party license file.
 - **Privacy.** Keep the personal data of the user out of each request to an outside service: no
   email address or name in a header, a User-Agent, a URL, or a payload. When an API asks for
-  contact data, send a neutral value such as `zoophony-build/1.0`.
+  contact data, send a neutral value such as `pawchestra-build/1.0`.
 - **Frame time.** A change does not need a `pnpm frame` run. Run it only when the user or the
   manager asks, or for a change whose goal is speed, and then give its table (design 9.7).
 - **Work order.** Follow the steps of design 9.5. The largest risks come first.
