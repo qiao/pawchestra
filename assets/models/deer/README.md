@@ -1,14 +1,17 @@
 # Deer model
 
-This folder holds the source mesh of the deer, a copy with rebuilt arms and its weights, and the
-rigged copy. The app does not serve these files. It loads the module `src/models/studio/deer.ts`,
+This folder holds the source mesh of the deer, a copy with rebuilt arms and its weights, a copy of
+that with no fold on the inner side of the arm roots, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/deer.ts`,
 which this chain writes:
 
 ```text
 deer.glb                           source mesh
    │  tools/blender/deer_arms.py   rebuilt arms and painted weights
    v
-deer-arms.glb + deer-weights.json  `source` and `paintedWeights` of tools/mesh-rigs/deer.json
+deer-arms.glb + deer-weights.json  `paintedWeights` of tools/mesh-rigs/deer.json
+   │  point edits in Blender         no fold at the inner arm roots (deer-arms-crease.json)
+   v
+deer-arms-crease.glb               `source` of tools/mesh-rigs/deer.json
    │  pnpm rig-mesh deer
    v
 deer.rig.glb                       rigged mesh
@@ -26,6 +29,8 @@ src/models/studio/deer.ts          studio body of the app
 | `deer.glb` | Source mesh (below) | None |
 | `deer-arms.glb` | Copy of `deer.glb` with rebuilt arms. License as `deer.glb` | `deer_arms.py` |
 | `deer-weights.json` | Weights of the same Blender run. License as `deer.glb` | `deer_arms.py` |
+| `deer-arms-crease.glb` | Copy of `deer-arms.glb` with no fold on the inner side of the arm roots. License as `deer.glb` | None: point edits in Blender (below) |
+| `deer-arms-crease.json` | The list of the edits of `deer-arms-crease.glb`. License as `deer.glb` | None |
 | `deer.rig.glb` | Output of the rig. License as `deer.glb` | `pnpm rig-mesh deer` |
 
 ## deer.glb
@@ -75,6 +80,35 @@ has 4,152 triangles. A run gives the same bytes:
 blender -b --factory-startup -P tools/blender/deer_arms.py
 shasum -a 256 assets/models/deer/*.glb assets/models/deer/deer-weights.json
 ```
+
+## deer-arms-crease.glb
+
+| Item | Value |
+|---|---|
+| Size | 1,001,772 bytes |
+| SHA-256 | `23f46cdc03936985a20e8aef900804c41b02f41a08d9d06a24e4ae5bf0d7b5ff` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+On the inner side of each upper arm of `deer-arms.glb`, below the root, the surface of the arm
+went up to a chain of short edges at y 0.505 and folded back down to y 0.47: a thin fin about
+0.035 units tall, with a slit on each side of it, from z -0.03 to z 0.03. In the bind it showed as
+thin fins under the front of each root and as deep slits on the inner side of the upper arm.
+
+The copy removes each fold with point edits in the live Blender on the welded mesh. Each edit
+merges one vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to
+a new place. `deer-arms-crease.json` lists the 27 merges in their order:
+
+1. Each vertex of the chain merges into its nearest neighbor of the row below it on the arm: 9 on
+   the left and 10 on the right.
+2. Each vertex of that row (but the back one) merges into its neighbor at the foot of the fold:
+   4 on each side.
+
+The arm surface now goes from the arm to the side wall of `deer_arms.py` with no fin. A shallow
+crease about 0.01 units deep stays where the wall meets the arm, and a fold of the trunk wall at
+x 0.077, y 0.49 to 0.52 stays: a merge there made the fold sharper, so the copy keeps it. Each
+merge moves a corner at most 0.024 units. The copy has 2,052 vertices and 4,098 triangles after
+the weld (2,079 and 4,152 before): 54 faces go, and each other face keeps the UVs of its own
+corners. Each merged corner takes the weight row of its new vertex in `deer-weights.json`.
 
 ## deer.rig.glb
 
