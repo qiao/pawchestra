@@ -1269,6 +1269,32 @@ pedal harp (`docs/reference/harp-technique.md`):
   share `PLUCK.share` of a length from the soundboard up to the line `PLUCK.top`. The hold of the
   deer fits these points, so they stay when the neck changes. `PLUCK.top` lies a little below
   the bottom of the neck over the bass strings and over the hump.
+- **Swing.** A plucked string swings (5.3), and the scene draws it as a camera with a long
+  shutter sees it: the envelope of the swing, as a translucent band (`scene/harp-strings.ts`).
+  A sampled swing flickers at each frame rate, and the envelope stays steady. Each string line
+  (`InstrumentStrings`) holds the largest swing of a loudest pluck (`STRINGS.swing`), larger in
+  the bass than in the treble. The swing follows an ellipse whose long axis lies across the
+  string, near the plane of the strings (`STRINGS.swingTilt`, `swingCross`), as a measure of real
+  plucks gives (harp 5).
+
+The band of a string is a strip of `BAND_SEGMENTS` segments, one border at the pluck point. The
+vertex shader turns it to the camera and widens it by the radius of the wire and the part of the
+swing that the camera sees across the string. The form goes from the triangle of the pluck to
+the arc of the first mode. Each pixel takes the share of the time in which the wire covers it,
+as a mean over the pixel, so the band is brightest at its edges, where the wire turns. The
+normal of a round wire across the band keeps the light along the string. While a band shows,
+the part of its string closes onto its line (`applyStrings()` of `scene/player.ts`), so the
+player of a harp has positions of its own, as a pianist has for its keys.
+
+- **Strength.** `STRING_SWING.strength` scales the real swing, because a swing of a few
+  millimeters on the small harp of the deer does not show in a stage shot. `STRING_SWING.density`
+  scales the coverage, because the blur of a thin pale string on the pale harp almost
+  disappears. Both are look paths (`LOOK_ROOTS`), such as
+  `?look={"STRING_SWING.strength":4}` on the dev server.
+- **Cost.** The bands are one draw for each harp player, with alpha blend and no depth write, so
+  the depth passes and the shadow map skip them. A still harp has an empty draw range, so it
+  draws no band. The bands are not in the triangle budget of the harp, because they are no part
+  of the model. All tiers show them.
 
 The frame and the box under the harp (`harpStand`, a dark wood) stay in the triangle budget of
 the harp (`INSTRUMENT_BUDGETS`).
