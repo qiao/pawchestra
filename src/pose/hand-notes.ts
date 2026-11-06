@@ -48,9 +48,16 @@ export type HandAction = 'strike' | 'pluck';
 export interface HandNote {
   /** The start of the chord, in song seconds. */
   readonly start: number;
+  /** The latest end of the notes of the chord, in song seconds. */
+  readonly end: number;
   /** The lowest and the highest key of the notes. */
   readonly low: number;
   readonly high: number;
+  /**
+   * The keys of the notes, sorted up, each key one time. Empty for a hand that only moves out of
+   * the way of the other hand.
+   */
+  readonly keys: readonly number[];
   /** The highest loudness of the chord. */
   readonly loudness: number;
   /**
@@ -113,8 +120,10 @@ export function splitHands(
       .toSorted((a, b) => a - b);
     const part = (low: number, high: number, shift = 0): HandNote => ({
       start: group.start,
+      end: group.end,
       low,
       high,
+      keys: [...new Set(keys.filter((k) => k >= low && k <= high))],
       loudness: group.loudness,
       shift,
     });
@@ -178,7 +187,7 @@ export function splitHands(
  * @returns The note of the hand.
  */
 function makeWay(start: number, key: number): HandNote {
-  return { start, low: key, high: key, loudness: 0 };
+  return { start, end: start, low: key, high: key, keys: [], loudness: 0 };
 }
 
 /**

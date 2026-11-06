@@ -41,8 +41,10 @@ const pointOf = (low: number, high: number): Vec3 => [(low + high) / 200, 0.7, 0
 function track(action: HandAction, starts: readonly number[], keys: readonly number[]): HandTrack {
   const notes = starts.map((start, i) => ({
     start,
+    end: start,
     low: keys[i] ?? 60,
     high: keys[i] ?? 60,
+    keys: [keys[i] ?? 60],
     loudness: 2 / 3,
   }));
   return buildHandTrack(notes, action, pointOf, 1, 48);
