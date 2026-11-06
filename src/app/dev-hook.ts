@@ -13,6 +13,10 @@ export interface DevHook {
   readonly cameraMode: CameraMode;
   /** The position of the camera of the last frame, or an empty list with no scene. */
   readonly cameraPosition: readonly number[];
+  /** The unit direction of the view of the camera of the last frame, or an empty list. */
+  readonly cameraLook: readonly number[];
+  /** The vertical field of view of the camera of the last frame, in degrees, or 0. */
+  readonly cameraFov: number;
   /** The instrument of each player of the current demo, in the order of `ScenePose.players`. */
   readonly instruments: readonly InstrumentId[];
   /**

@@ -852,6 +852,16 @@ export class StageScene {
     return this.#view ? this.#view.camera.camera.position.toArray() : null;
   }
 
+  /** The unit direction of the view of the camera of the last frame, for the probes. */
+  get cameraLook(): Vec3 | null {
+    return this.#view ? this.#view.camera.camera.getWorldDirection(new Vector3()).toArray() : null;
+  }
+
+  /** The vertical field of view of the camera of the last frame, in degrees, for the probes. */
+  get cameraFov(): number | null {
+    return this.#view?.camera.camera.fov ?? null;
+  }
+
   /** The quality tier of the renderer (design 2.6). */
   get tier(): QualityTier {
     return this.#tier;

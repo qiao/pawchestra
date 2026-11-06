@@ -67,6 +67,12 @@ function installDevHook(app: App, scene: StageScene): void {
     get cameraPosition() {
       return scene.cameraPosition ?? [];
     },
+    get cameraLook() {
+      return scene.cameraLook ?? [];
+    },
+    get cameraFov() {
+      return scene.cameraFov ?? 0;
+    },
     get instruments() {
       return app.plan?.players.map((p) => p.instrument) ?? [];
     },
