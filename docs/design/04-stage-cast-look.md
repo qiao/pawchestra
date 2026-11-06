@@ -1289,8 +1289,10 @@ player of a harp has positions of its own, as a pianist has for its keys.
 - **Strength.** `STRING_SWING.strength` scales the real swing, because a swing of a few
   millimeters on the small harp of the deer does not show in a stage shot. `STRING_SWING.density`
   scales the coverage, because the blur of a thin pale string on the pale harp almost
-  disappears. Both are look paths (`LOOK_ROOTS`), such as
-  `?look={"STRING_SWING.strength":4}` on the dev server.
+  disappears. `STRING_SWING.opacity` caps the opacity of each pixel of a band, because the bass
+  strings stand closer than the width of their bands: with no cap, a group of plucked bass
+  strings filled one solid area. All three are look paths (`LOOK_ROOTS`), such as
+  `?look={"STRING_SWING.strength":3}` on the dev server.
 - **Cost.** The bands are one draw for each harp player, with alpha blend and no depth write, so
   the depth passes and the shadow map skip them. A still harp has an empty draw range, so it
   draws no band. The bands are not in the triangle budget of the harp, because they are no part
