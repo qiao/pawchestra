@@ -578,6 +578,11 @@ The app follows these facts:
   bow elbow points out in the play, as a stroke starts open at the shoulder [85], and both elbows
   point out at rest, so that the upper arms stay off the chest. In pizzicato, the paw plucks
   further right of the strings than in `CELLO_HOLD`, with the elbow out.
+- **The left elbow of the dog (1.8).** The left elbow points out to the side and a little down
+  (`DOG_HOLD.poleL`), so that the forearm rises from the elbow to the neck. The elbow is lower on
+  the A string and goes up for each lower string, to nearly level on the C string [33]
+  (`elbowPerString`). It goes up further in the high positions (`highElbow`), so that the forearm
+  keeps out of the upper bout.
 - **The high positions (1.5).** The left paw tilts further over the neck from the second position
   to the fifth position (`BowedHold.highTilt`), as the hand goes over the shoulder of the
   instrument.
@@ -594,6 +599,10 @@ The app does not follow these facts:
   cello, so the knees do not touch it.
 - **The elbow (1.9).** No source gives the bend of the left elbow at the first position. The rule
   takes the bend of the dog at its accepted cello, 65° between the upper arm and the forearm.
+- **The left elbow height (1.8).** On the A string, the left upper arm of the dog goes about 20°
+  down from the shoulder, and not 45° [33]. A lower elbow puts the left forearm into the upper
+  bout of the cello and the upper arm into the chest. The shared hold keeps the nearly level
+  elbow of the old dog hold (`CELLO_HOLD.poleL`).
 - **The left hand (1.9).** The left paw tilts further over the neck from the bass side
   (`BowedHold.tiltL`), so that the thick paw keeps off the fingerboard. A paw that is thicker
   than the paw of the dog lies further off the neck by the difference (`BowedHold.girthFit`), so
