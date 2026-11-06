@@ -24,6 +24,41 @@ export function mixRotation(a: Quaternion, b: Quaternion, t: number, out: Quater
     .normalize();
 }
 
+/**
+ * Mixes two rotations along the path whose middle is nearer a reference rotation, with a
+ * normalized linear mix. When the two rotations are near 180° apart, the shorter path of
+ * {@link mixRotation} goes to the other side each time that their dot product crosses 0, and the
+ * mix jumps by up to 180° in one frame. The side of this path changes only when one of the two
+ * rotations is near 180° from the reference. A reference near both rotations, such as the
+ * forearm for two turns of the hand, thus keeps the side.
+ *
+ * @param a The rotation at the weight 0.
+ * @param b The rotation at the weight 1.
+ * @param t The weight.
+ * @param near The reference rotation.
+ * @param out The quaternion to write. It can be `a` or `b`.
+ * @returns `out`, a unit quaternion.
+ */
+export function mixRotationNear(
+  a: Quaternion,
+  b: Quaternion,
+  t: number,
+  near: Quaternion,
+  out: Quaternion,
+): Quaternion {
+  // The middle of a + b is nearer `near` than the middle of a - b when both dot products with
+  // `near` have the same sign.
+  const sign = a.dot(near) * b.dot(near) < 0 ? -1 : 1;
+  return out
+    .set(
+      a.x + (sign * b.x - a.x) * t,
+      a.y + (sign * b.y - a.y) * t,
+      a.z + (sign * b.z - a.z) * t,
+      a.w + (sign * b.w - a.w) * t,
+    )
+    .normalize();
+}
+
 const fromUnit = new Vector3();
 const toUnit = new Vector3();
 const fullTurn = new Quaternion();

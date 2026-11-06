@@ -357,6 +357,10 @@ The rest of each family:
 - The bow changes direction on each note, and short notes in one beat join into one slur
   (`slurSizes()`), because the MIDI files have no slurs. Pizzicato plucks the string, and tremolo
   makes short fast strokes (`BOW_MOTION`).
+- In a change between the bow and pizzicato, the right hand turns on the side on which it stays
+  nearer the forearm (`mixRotationNear()`). Reason: the bow hand and the pluck hand of the
+  contrabass are near 180° apart, and the shorter path went to the other side in the middle of
+  the change, a turn of up to 140° in one frame.
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
 - **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of

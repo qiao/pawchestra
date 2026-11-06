@@ -2,7 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { boneIndex } from '../models/rig.ts';
 import { palmTurnAngle, studioPawTwist } from '../models/studio-rig.ts';
-import { mixDirection, mixRotation } from './blend.ts';
+import { mixDirection, mixRotation, mixRotationNear } from './blend.ts';
 import type { BowedHold, BowedRig, RigPoints } from './bowed-rig.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
@@ -1555,10 +1555,18 @@ export function poseBowed(
       }
       const playRoll = bowRoll + (pluckRoll - bowRoll) * pizzicato;
 
-      // A change to pizzicato turns the hand in its own axes, and the bow turns in the hand.
+      // A change to pizzicato turns the hand in its own axes, and the bow turns in the hand. The
+      // two hands of the contrabass are near 180° apart, so the turn takes the side on which
+      // the hand stays nearer the forearm of the last solve.
       gripHand(rig, bow, bowRoll, heldHand);
       if (pizzicato > 0) {
-        mixRotation(heldHand.rotation, pluckHand.rotation, pizzicato, heldHand.rotation);
+        mixRotationNear(
+          heldHand.rotation,
+          pluckHand.rotation,
+          pizzicato,
+          solved.lower,
+          heldHand.rotation,
+        );
         heldHand.wrist.lerpVectors(heldHand.wrist, pluckHand.wrist, pizzicato);
       }
       held.rotation
