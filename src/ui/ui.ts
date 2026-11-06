@@ -66,8 +66,6 @@ export class Ui {
   readonly credits = new Credits(licensesUrl(import.meta.env.BASE_URL));
   /** The modal dialog that holds the credits (design 2.8). */
   readonly creditsDialog: ModalDialog;
-  /** The link "Credits" at the end of the tab "Settings", which opens the credits dialog. */
-  readonly creditsLink: HTMLButtonElement;
   readonly dropOverlay: DropOverlay;
   readonly tooltips: Tooltips;
   readonly #phone: MediaQueryList;
@@ -153,7 +151,6 @@ export class Ui {
     creditsLink.addEventListener('click', () => {
       this.creditsDialog.show(creditsLink);
     });
-    this.creditsLink = creditsLink;
     const creditsLine = createElement('div', 'credits-line');
     creditsLine.append(creditsLink);
     this.drawer.addTab('settings', 'Settings', this.settings.element, creditsLine);
