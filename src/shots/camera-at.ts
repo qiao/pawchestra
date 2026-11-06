@@ -25,8 +25,23 @@ export function createCameraPose(): CameraPoseBuffer {
     close: false,
     light: 0,
     spot: 0,
+    focusPull: 1,
   };
 }
+
+/**
+ * The focus pull after a hard cut into a close shot (design 5.6): the focus starts behind the
+ * subject and pulls onto it, as the focus puller of a film camera finds the subject after a cut.
+ */
+export const FOCUS_PULL = {
+  /**
+   * The focus distance at the cut, as a factor of the distance to the subject. The blur in front
+   * of the focus has a limit (`LENS.maxNearBlur`), so the subject is only a little soft.
+   */
+  start: 1.3,
+  /** The length of the pull, in song seconds. */
+  seconds: 0.7,
+} as const;
 
 /** The key of the frame, which `cameraAt()` writes before it reads it. */
 interface ScratchKey {
@@ -120,6 +135,8 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    shot, as the factor of the beam. The default view has the light of the stage.
  * 8. The view drifts a little around the camera position ({@link CAMERA_DRIFT}), with the size of
  *    the kind of the shot, blended as the beam. With `still`, it does not drift.
+ * 9. After a hard cut into a close shot, the focus pulls onto the subject ({@link FOCUS_PULL}).
+ *    With `still`, the focus is on the subject.
  *
  * @param plan The plan from `prepareShots()`.
  * @param songTime The song time, in seconds.
@@ -148,6 +165,7 @@ export function cameraAt(
     out.close = false;
     out.light = 0;
     out.spot = 0;
+    out.focusPull = 1;
     return out;
   }
   // The move of the first shot starts at the downbeat: its count-in holds the first camera.
@@ -160,10 +178,15 @@ export function cameraAt(
   out.spot = SHOT_SPOT[current.kind];
   // A blend joins two close shots, so the kind of the current shot holds for the blend.
   out.close = isCloseShot(current.kind);
+  out.focusPull = 1;
   const previous = plan.shots[i - 1];
   const sinceCut = time - current.startSec;
   const share = CAMERA_DRIFT.shares[current.kind];
   if (still || !previous || current.blendSec <= 0 || sinceCut >= current.blendSec) {
+    if (!still && previous && current.blendSec <= 0 && out.close && sinceCut < FOCUS_PULL.seconds) {
+      const pulled = smoothstep(Math.max(0, sinceCut) / FOCUS_PULL.seconds);
+      out.focusPull = FOCUS_PULL.start + (1 - FOCUS_PULL.start) * pulled;
+    }
     if (!still) {
       writeDrift(time, share, driftTurn);
       turnTarget(out.position, out.target, driftTurn);

@@ -717,6 +717,10 @@ the beam fade of Free mode starts there (4.5).
   the same camera, a pause holds it, and a blend has no jump. The position does not move, so the
   distance floor to each animal holds. A wide or a high shot stands on a crane and drifts less.
   With reduced motion, the view does not drift (2.5).
+- **Focus pull** (`FOCUS_PULL`, `CameraPose.focusPull`). After a hard cut into a close shot, the
+  focus starts a little behind the subject and pulls onto it in under a second, as a focus puller
+  finds the subject after a cut. The blur in front of the focus has a limit (4.5), so the subject
+  is only a little soft. With reduced motion, the focus stays on the subject.
 
 **The frame of a close shot.** A 21:9 frame that fits the height of one player shows about 2.3
 times its width. Thus a close shot fits the width of its subject with the shot size of its kind

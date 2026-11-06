@@ -112,6 +112,12 @@ export interface CameraPose {
   readonly light: number;
   /** The weight of the follow-spot of a solo shot, from 0 to 1, as {@link CameraPose.light}. */
   readonly spot: number;
+  /**
+   * The factor of the focus distance (design 4.5, 5.6): 1 on the subject. After a hard cut into a
+   * close shot, the focus starts behind the subject and pulls onto it (`FOCUS_PULL`). A pose with
+   * no value has the focus on the subject.
+   */
+  readonly focusPull?: number;
 }
 
 /** A `CameraPose` with writable values. `cameraAt()` writes each frame into it. */
@@ -123,6 +129,7 @@ export interface CameraPoseBuffer {
   close: boolean;
   light: number;
   spot: number;
+  focusPull: number;
 }
 
 /** The view of one frame. */

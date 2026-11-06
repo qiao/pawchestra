@@ -105,6 +105,8 @@ export function apertureAt(distance: number, stageSide: number): number {
  * @param fovDegrees The vertical field of view, in degrees.
  * @param far The far plane, in meters.
  * @param stageSide The stage side `S`, in meters.
+ * @param pull The factor of the focus distance of a focus pull, 1 on the point. The aperture
+ *   follows the distance to the point, so a pull does not open or close it.
  * @returns The focus.
  */
 export function focusOf(
@@ -113,12 +115,14 @@ export function focusOf(
   fovDegrees: number,
   far: number,
   stageSide: number,
+  pull = 1,
 ): Focus {
-  const distance = Math.max(
+  const toPoint = Math.max(
     0.1,
     Math.hypot(target[0] - position[0], target[1] - position[1], target[2] - position[2]),
   );
-  const scale = blurScale(distance, fovDegrees, apertureAt(distance, stageSide));
+  const distance = toPoint * pull;
+  const scale = blurScale(distance, fovDegrees, apertureAt(toPoint, stageSide));
   return { distance, scale, active: blurAt(far, distance, scale) > LENS.sharpBlur };
 }
 

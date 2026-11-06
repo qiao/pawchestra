@@ -1020,7 +1020,7 @@ export class StageScene {
       });
     }
     setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);
-    const focus = this.#focusOf(view, shot !== null, performance.now());
+    const focus = this.#focusOf(view, shot, performance.now());
     if (!depthPass) {
       this.#holdPose(view);
     }
@@ -1147,22 +1147,30 @@ export class StageScene {
   }
 
   /**
-   * Calculates the focus of a frame (design 4.5). A shot focuses on its subject. Free mode
-   * focuses on the first player or the stage top in the middle of the frame, and the focus moves
-   * to a new distance in about 0.3 s, at once with reduced motion.
+   * Calculates the focus of a frame (design 4.5). A shot focuses on its subject, after the focus
+   * pull of a cut (`CameraPose.focusPull`). Free mode focuses on the first player or the stage top
+   * in the middle of the frame, and the focus moves to a new distance in about 0.3 s, at once
+   * with reduced motion.
    *
    * @param view The layout of the frame.
-   * @param following True when the camera of the frame comes from a shot.
+   * @param shot The camera of the shot of the frame, or `null` in Free mode.
    * @param nowMs The time of the frame, in milliseconds.
    * @returns The focus.
    */
-  #focusOf(view: LayoutView, following: boolean, nowMs: number): Focus {
+  #focusOf(view: LayoutView, shot: CameraPose | null, nowMs: number): Focus {
     const camera = view.camera.camera;
     const position = camera.position.toArray();
     const target = view.camera.target;
     let focus: Focus;
-    if (following) {
-      focus = focusOf(position, target, camera.fov, camera.far, view.stageSide);
+    if (shot) {
+      focus = focusOf(
+        position,
+        target,
+        camera.fov,
+        camera.far,
+        view.stageSide,
+        shot.focusPull ?? 1,
+      );
     } else {
       let distance = freeFocusDistance(position, target, view.stageSide, view.spots);
       const last = this.#focusDistance;
