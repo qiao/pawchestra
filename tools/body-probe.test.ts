@@ -145,12 +145,7 @@ describe('probeBodies', () => {
   it('probes each species on each support and the conductor', () => {
     const probe = probeBodies();
     expect(Object.keys(probe.species)).toContain('bear');
-    expect(Object.keys(probe.species['bear'] ?? {})).toEqual([
-      'chair',
-      'stool',
-      'bench',
-      'stand',
-    ]);
+    expect(Object.keys(probe.species['bear'] ?? {})).toEqual(['chair', 'stool', 'bench', 'stand']);
     expect(Object.keys(probe.players)).toContain('conductor/bear/baton');
   });
 });

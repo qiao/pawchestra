@@ -284,9 +284,7 @@ describe('buildSceneProps', () => {
     const mesh = buildSceneProps(layout);
     const parts = [
       buildChair(seatHeights('chair', SPECIES.rabbit)?.seatHeight ?? NaN),
-      buildStool(
-        seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: 0.35, footHeight: 0 },
-      ),
+      buildStool(seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: 0.35, footHeight: 0 }),
       buildMusicStand(),
       buildRisers(layout.risers, layout.podium),
     ];
