@@ -500,6 +500,12 @@ The rest of each family:
   move out of the way of the other paw counts too. Thus a melody stays in one paw. Reason: a
   chord that went to the nearer paw after a move out of the way made both paws jump at the next
   chord, up to 6.5 m/s (`bach-bwv1050`).
+- The plan lets a paw play a narrow chord a few keys past its reach (`PLAN_REACH_SLACK`), at a
+  cost for each key (`PLAN_REACH_COST`). Thus one paw plays a melody near the middle of the keys,
+  and the two paws do not trade it note by note. Reason: in such a trade, the paw that came onto
+  the keys went up to 2.4 cm into the other paw (`bach-bwv1050`). A higher lift over the
+  other paw (`HAND_MOTION.over` up to 0.16 m) did not part the paws, because the paw that comes
+  lowers next to the paw that leaves, and it made the palms up to 5 times faster.
 - The wide paws keep apart (`apart`). When the two parts of a wide chord, such as a bass and a
   melody, come nearer, each part asks its palm to stand a few keys away from it
   (`HandNote.shift`). Thus the two parts stay in two paws, and one paw does not jump between them.

@@ -349,7 +349,9 @@ The app does not follow these facts:
   the paw lifts over the other paw (`HAND_MOTION.over`), as in a hand crossing. The paw of each
   chord comes from a plan of the whole piece (`planHands()` of `src/pose/hand-notes.ts`): the
   paws of the least palm travel, in which a fast move costs more. Thus a paw does not take a
-  note only because it is nearer, when both paws must then jump to the next chord.
+  note only because it is nearer, when both paws must then jump to the next chord. A paw also
+  plays a narrow chord a few keys past its reach (`PLAN_REACH_SLACK`), so the two paws do not
+  trade a melody in the middle of the keys note by note: the wide paws go into each other there.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

@@ -112,9 +112,9 @@ export interface HandNote {
  * and the right hand the high notes. A chord wider than one octave splits at its largest
  * interval that keeps each hand in its reach: the left hand plays the notes below it. Of two
  * equal intervals, the one nearer to the middle of the chord splits it. A chord within one octave
- * goes to one hand. A chord above the reach of the left hand goes to the right hand, and a chord
- * below the reach of the right hand goes to the left hand, so that a melody changes hands where
- * one hand cannot cross over the other. These two rules also give a wide chord to one hand when
+ * goes to one hand. A chord far above the reach of the left hand goes to the right hand, and a
+ * chord far below the reach of the right hand goes to the left hand, so that a melody changes
+ * hands where one hand cannot cross over the other. These two rules also give a wide chord to one hand when
  * all its keys are past the reach of the other hand.
  *
  * With a distance `apart`, the middles of the keys of the two hands stay at least that far apart,
@@ -263,6 +263,15 @@ function placeHands(
  */
 const PLAN_MIN_GAP = 0.02;
 
+/**
+ * The keys past its reach (`HandReach`) that a hand of the plan of {@link planHands} can play a
+ * chord within one octave, at the cost {@link PLAN_REACH_COST} for each key.
+ */
+const PLAN_REACH_SLACK = 3;
+
+/** The cost of each key past the reach of a hand in the plan of {@link planHands}. */
+const PLAN_REACH_COST = 500;
+
 /** One way to play the chords up to one chord, in the search of {@link planHands}. */
 interface PlanStep {
   /** The hand of the last chord. */
@@ -281,8 +290,9 @@ interface PlanStep {
 /**
  * Plans the hand of each chord of a player (design 5.3), as a pianist plans which hand takes which
  * notes. A chord wider than one octave with a cut ({@link wideChordCut}) goes to both hands. A
- * chord within one octave goes to either hand that reaches it. A dynamic program finds the hands
- * of the lowest cost: for each move of a palm, the square of its distance in semitones over its
+ * chord within one octave goes to either hand that reaches it, or that plays at most
+ * {@link PLAN_REACH_SLACK} keys past its reach at a cost for each key. A dynamic program finds
+ * the hands of the lowest cost: for each move of a palm, the square of its distance in semitones over its
  * time. Thus a fast move costs more than a slow one, as its speed is higher, and a move of a hand
  * out of the way of the other hand counts too. The search keeps the best way to play the chords
  * up to each chord for each hand of the chord. At the same cost, a chord goes to the nearer hand,
@@ -312,10 +322,11 @@ function planHands(chords: readonly SplitChord[], reach: HandReach, apart: numbe
     if (chord.cut !== null) {
       options.push('both');
     } else {
-      if (group.high <= reach.leftHighest || group.low < reach.rightLowest) {
+      const slack = PLAN_REACH_SLACK;
+      if (group.high <= reach.leftHighest + slack || group.low < reach.rightLowest - slack) {
         options.push('left');
       }
-      if (group.low >= reach.rightLowest) {
+      if (group.low >= reach.rightLowest - slack) {
         options.push('right');
       }
     }
@@ -329,10 +340,15 @@ function planHands(chords: readonly SplitChord[], reach: HandReach, apart: numbe
         // The nearer hand and the side of middle C break a tie.
         const near = choice === 'left' ? middle - step.places.left : step.places.right - middle;
         const side = (choice === 'left') === middle >= 60 ? 1e-9 : 0;
+        const past =
+          choice === 'left'
+            ? Math.max(0, group.high - reach.leftHighest)
+            : Math.max(0, reach.rightLowest - group.low);
         const cost =
           step.cost +
           travel(places.left, step.places.left, step.leftAt) +
           travel(places.right, step.places.right, step.rightAt) +
+          PLAN_REACH_COST * past +
           1e-6 * Math.abs(near) +
           side;
         if (!best || cost < best.cost) {
