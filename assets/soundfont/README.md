@@ -1,6 +1,6 @@
 # SoundFont
 
-`Zoophony.sf3` is the SoundFont of the app, an SF3 file (Ogg Vorbis samples). The build splits it
+`Pawchestra.sf3` is the SoundFont of the app, an SF3 file (Ogg Vorbis samples). The build splits it
 into one file for each preset (design 6.2). `tools/build-soundfont.ts` makes it from three
 sources:
 
@@ -13,7 +13,7 @@ sources:
 
 | Item | Value |
 |---|---|
-| File | `Zoophony.sf3`, 21,967,054 bytes |
+| File | `Pawchestra.sf3`, 21,967,054 bytes |
 | SHA-256 | `cbe84ed015583bfe7cff32dd951668236a1f2e4fe45a330d5cb1dbc2905b6260` |
 | Build | `node tools/build-soundfont.ts`, Node 24 |
 | Source checksums | `tools/soundfont-lock.json` (SHA-256 and size of each file) |
@@ -21,7 +21,7 @@ sources:
 To check the file:
 
 ```bash
-shasum -a 256 assets/soundfont/Zoophony.sf3
+shasum -a 256 assets/soundfont/Pawchestra.sf3
 ```
 
 ## Sources and licenses
@@ -84,11 +84,11 @@ that holds the given velocity.
 
 The build needs Node 24 and the packages of `pnpm install`. It downloads 783 source files
 (1.42 GB) from GitHub into a cache folder, checks each file with `tools/soundfont-lock.json`,
-and writes `assets/soundfont/Zoophony.sf3`. Two builds with the same sources write the same
+and writes `assets/soundfont/Pawchestra.sf3`. Two builds with the same sources write the same
 bytes.
 
 ```bash
-node tools/build-soundfont.ts                    # cache: <os tmpdir>/zoophony-soundfont
+node tools/build-soundfont.ts                    # cache: <os tmpdir>/pawchestra-soundfont
 node tools/build-soundfont.ts --cache <folder>   # another cache folder
 node tools/build-soundfont.ts --fetch-only       # only the downloads
 node tools/build-soundfont.ts --update-lock      # after a change of the recipes

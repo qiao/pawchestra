@@ -195,13 +195,13 @@ export async function soundFontEntries(root: string): Promise<LicenseEntry[]> {
         'VS Chamber Orchestra 2: Community Edition 1.1.0, by Versilian Studios (Sam Gossner) and Ivy Audio (Simon Dalzell)',
       license: 'CC0 1.0',
       source: 'https://github.com/sgossner/VSCO-2-CE',
-      text: `Zoophony.sf3 holds changed samples of this library: cut, mixed to mono, looped, and encoded as Ogg Vorbis.\n\n${CC0_LINK}`,
+      text: `Pawchestra.sf3 holds changed samples of this library: cut, mixed to mono, looped, and encoded as Ogg Vorbis.\n\n${CC0_LINK}`,
     },
     {
       title: 'Versilian Community Sample Library, by Versilian Studios',
       license: 'CC0 1.0',
       source: 'https://github.com/sgossner/VCSL',
-      text: `Zoophony.sf3 holds changed samples of this library: cut, mixed to mono, looped, and encoded as Ogg Vorbis.\n\n${CC0_LINK}`,
+      text: `Pawchestra.sf3 holds changed samples of this library: cut, mixed to mono, looped, and encoded as Ogg Vorbis.\n\n${CC0_LINK}`,
     },
   ];
 }

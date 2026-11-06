@@ -16,7 +16,7 @@ export const SOUNDFONT_PATH = join(
   '..',
   'assets',
   'soundfont',
-  'Zoophony.sf3',
+  'Pawchestra.sf3',
 );
 
 /** The fields of a preset that select its output file. */

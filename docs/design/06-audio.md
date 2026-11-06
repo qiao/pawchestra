@@ -48,7 +48,7 @@ The sound is full and professional, in the room of a concert hall, and never dry
 The SoundFont has high quality, and a larger download is acceptable for it: about 10 MB of
 preset files for one piece, after the first frame. The first download stays below 1 MB (7.2).
 
-- `tools/build-soundfont.ts` makes `assets/soundfont/Zoophony.sf3` from locked sources
+- `tools/build-soundfont.ts` makes `assets/soundfont/Pawchestra.sf3` from locked sources
   (`tools/soundfont-lock.json`), so two builds write the same bytes.
 - The base is GeneralUser GS. Its license asks us not to link to the files of the author, so the
   site serves its own copy. The orchestral presets come from the CC0 libraries VSCO 2 CE and VCSL

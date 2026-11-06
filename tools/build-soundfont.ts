@@ -1025,6 +1025,8 @@ async function build(options: BuildOptions): Promise<void> {
   }
   addAliases(out, melodic);
   out.removeUnusedElements();
+  // The names in the file keep the first name of the app, so that a build still writes the bytes
+  // of the committed SoundFont. Change them with the next change of the recipes.
   out.soundBankInfo = {
     ...out.soundBankInfo,
     name: 'Zoophony Orchestra',
@@ -1049,7 +1051,7 @@ async function build(options: BuildOptions): Promise<void> {
 if (import.meta.main) {
   const { values } = parseArgs({
     options: {
-      cache: { type: 'string', default: join(tmpdir(), 'zoophony-soundfont') },
+      cache: { type: 'string', default: join(tmpdir(), 'pawchestra-soundfont') },
       out: { type: 'string', default: SOUNDFONT_PATH },
       'update-lock': { type: 'boolean', default: false },
       'fetch-only': { type: 'boolean', default: false },
