@@ -231,7 +231,9 @@ export function applyCommand(
  * Selects the events of one block. An event is due when its time is before the song time at the
  * end of the block. Thus each event starts at the start of the block that holds its time, up to
  * one block early. The block that reaches the start point of a play also starts the held notes
- * again, so that they sound from the same block as the first events after the count-in.
+ * again, so that they sound from the same block as the first events after the count-in. The
+ * song ends in the block that reaches the song length, after the events at or before it. The
+ * events after the song length do not sound.
  *
  * @param state The state at the block start.
  * @param timeSec The event times, in ascending order.
@@ -256,7 +258,9 @@ export function planBlock(
   while (to < timeSec.length && (timeSec[to] ?? Infinity) < endSec) {
     to += 1;
   }
-  if (to === timeSec.length && endSec >= durationSec) {
+  // The song ends at the last note off (design 6.5). A later event, such as a pedal up, does not
+  // keep the transport in play, because the app pauses at the song length.
+  if (endSec >= durationSec && (timeSec[to] ?? Infinity) > durationSec) {
     return {
       state: { ...state, playing: false, songSec: durationSec, cursor: to, startSec: null },
       from,

@@ -132,7 +132,9 @@ Main thread                           AudioWorklet thread (our processor)
   (`sustainsAfterSeek()`). The same rule applies after a pause, after the count-in, and at an
   unmute. `notePairs()` sends a note off only when its note on sounds, because the synth pairs note
   offs first in, first out.
-- At the song end, the transport pauses at the song length, and a play there starts from 0.
+- At the song end, the transport pauses at the song length, and a play there starts from 0. The
+  song length is the last note off (3.2), so an event after it, such as a pedal up, does not
+  sound. Else the processor plays on after the app pauses, and it ignores the next play.
 - **Count-in.** The conductor gives a count-in before the music (5.4). The song time starts one
   count-in before the start point (the pause point, or 0), in song seconds. `startPlay()` of
   `app/transport.ts` gives both values, so the `Player` and the pose use one count-in.
