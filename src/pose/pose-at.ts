@@ -614,9 +614,10 @@ export function poseAt(
   };
   // In the count-in after a pause, the note layers hold the pause point (design 5.2).
   const noteTime = noteLayerTime(scratch.countIn, songTime);
-  for (const [i, player] of plan.players.entries()) {
+  for (let i = 0; i < plan.players.length; i++) {
+    const player = plan.players[i];
     const pose = out.players[i];
-    if (!pose) {
+    if (!player || !pose) {
       continue;
     }
     idleAt(player.idle, wallTime, scratch.idle);
