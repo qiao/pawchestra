@@ -534,8 +534,10 @@ The rest of each family:
   the claw is about 3 cm long in the app, so a larger bend tears the joined claw bases. A short
   drop takes a smaller lift, and a claw with no gap after its last press stays down, so that no
   claw turns faster than about 1,000° per second. In the rest pose, the claws bend up a little
-  (`DIGIT_MOTION.lap`), and they blend to the bends of the play in the lift. Reason: with straight
-  claws, the claw tips go into the round belly at rest.
+  (`DIGIT_MOTION.lap`), and they blend to the bends of the play in the lift. The lap bend is gone
+  early in the lift (`DIGIT_MOTION.lapFade`), when the paw leaves the belly. Reason: with straight
+  claws, the claw tips go into the round belly at rest. With the lap bend over the whole lift, they
+  go into the front of the case in the lowering onto the keys.
 - Each key goes down with its notes, from the note start to the note end (`keyLevelsAt()`), so a
   seek and a mute give the correct keys at once.
 - The paw moves in for a black key, so the claws lie on it, as a pianist moves the hand in toward

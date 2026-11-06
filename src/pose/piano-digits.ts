@@ -30,6 +30,13 @@ export const DIGIT_MOTION = {
    */
   lap: -10 * MathUtils.DEG2RAD,
   /**
+   * The weight of the playing pose at which the lap bend is gone. The paw leaves the belly early
+   * in the lift. With a lap bend over the whole lift, the claw tips went 1.7 cm into the front of
+   * the case in the lowering onto the keys, and with no lap bend 1.1 cm. With 0.25, they go 1.2 cm
+   * into the case and 0.4 cm into the belly (`pnpm pose-depth pianist`).
+   */
+  lapFade: 0.25,
+  /**
    * The lift of each claw before its strike at a slow tempo, from the thumb side: the thumb lifts
    * highest (26.1 mm) and the ring finger lowest (21.7 mm) [39].
    */
@@ -212,7 +219,8 @@ function digitBendAt(presses: DigitPresses, time: number): number {
 /**
  * Writes the bends of the five claws of a paw at a song time (design 5.3): only from the track, the
  * time, and the weight, so a seek or a speed change is correct. Between the rest pose and the
- * play, the bend blends from the lap bend to the bend of the play.
+ * play, the bend blends to the bend of the play. The lap bend is gone at the weight
+ * {@link DIGIT_MOTION.lapFade}.
  *
  * @param track The presses of the claws of the paw.
  * @param time The song time.
@@ -238,7 +246,7 @@ export function digitBendsAt(
     const press = (j: number): number => Math.max(0, (ownBends[j] ?? m.rest) - m.rest);
     const own = ownBends[k] ?? 0;
     const play = Math.min(Math.max(own, m.press), own + m.spill * (press(k - 1) + press(k + 1)));
-    out[offset + k] = play * weight + m.lap * (1 - weight);
+    out[offset + k] = play * weight + m.lap * (1 - smoothstep(weight / m.lapFade));
   }
 }
 

@@ -316,7 +316,8 @@ The app follows these facts:
   part of its press (`DIGIT_MOTION.spill`), as little of the motion of a striking finger goes into
   its neighbors. The whole paw still lifts before a far note. In
   the rest pose on the belly, the claws bend a little up (`DIGIT_MOTION.lap`), so the tips stay
-  out of the belly.
+  out of the belly. The bend is gone early in the lift (`DIGIT_MOTION.lapFade`), so the tips stay
+  out of the front of the case.
 - **The wrist in the fingering (section 9.3).** The paw rolls a little toward the thumb at a thumb
   pass, and turns toward the next key of an arpeggio, as a cartwheel (`FINGER_MOTION` of
   `src/pose/hands.ts`). It turns around the claw of the note, so the claw stays on its key.
