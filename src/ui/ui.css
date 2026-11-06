@@ -540,13 +540,10 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
     transform 0.2s;
 }
 
-/* The hidden bar keeps its controls in the focus order, so that keyboard focus shows it again.
-   It fades out slowly (0.8 s), as a slow fade of a film, and fades in fast (0.2 s), so that a
-   pointer motion shows it at once (design 2.3). */
+/* The hidden bar keeps its controls in the focus order, so that keyboard focus shows it again. */
 .bar.is-hidden {
   opacity: 0;
   transform: translateY(8px);
-  transition-duration: 0.8s;
 }
 
 /* The controls of the hidden bar ignore the pointer, so that the first tap only shows the bar
@@ -564,7 +561,6 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
    0.2 s with its own transition. */
 body.is-ui-hidden .drawer {
   opacity: 0;
-  transition-duration: 0.8s, 0.8s, 0.8s, 0s;
 }
 
 body.is-ui-hidden .drawer,
