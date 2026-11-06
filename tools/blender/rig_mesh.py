@@ -1238,13 +1238,24 @@ def driven_turns(turns, heads):
 def arm_bones(side):
     """Gives the arm bones of one side that move the arm vertices: the bones of `ARM`, and the arm
     segments and helpers of a rig with `armSegments`."""
-    return [f'{b}_{side}' for b in ARM] + [b for b in BONES
-                                           if b.endswith('_' + side) and b in SEGMENT_PARENTS]
+    return [f'{b}_{side}' for b in ARM] + [b for b in BONES if b.endswith('_' + side)
+                                           and (b in SEGMENT_PARENTS or b in DIGIT_PARENTS)]
+
+
+def digit_bones():
+    """Gives the names of the digit bones of a hand rig, the left side first
+    (`DIGIT_BONES` of `src/models/studio-format.ts`): one bone for each claw, from `digit1` at the
+    thumb side to `digit5`, each a child of the fingers of its side."""
+    return tuple(f'digit{k}_{side}' for side in 'LR' for k in range(1, 6))
 
 
 #: The parent of each arm segment and helper.
 SEGMENT_PARENTS = segment_parents()
 PARENTS.update(SEGMENT_PARENTS)
+
+#: The parent of each digit bone: the fingers of its side.
+DIGIT_PARENTS = {name: f'fingers_{name[-1]}' for name in digit_bones()}
+PARENTS.update(DIGIT_PARENTS)
 
 #: The arm segments and the helpers that hold the skin of each arm bone that the shape of a rule of
 #: `raise` relaxes (`raise_shape()`), with no side: the upper arm segments, the forearm segments

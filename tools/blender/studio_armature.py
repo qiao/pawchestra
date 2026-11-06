@@ -51,7 +51,10 @@ TO_STUDIO = np.array([[1.0, 0, 0], [0, 0, 1], [0, -1, 0]])
 UP_BONES = ('root', 'foot_L', 'foot_R', 'toes_L', 'toes_R', 'tail', 'tail_tip', 'jaw')
 
 #: The stems of the bones whose roll hint is the palm.
-PALM_STEMS = ('upper_arm', 'forearm', 'forearm_twist', 'hand', 'fingers', 'elbow', 'wrist')
+PALM_STEMS = (
+    'upper_arm', 'forearm', 'forearm_twist', 'hand', 'fingers', 'elbow', 'wrist',
+    'digit1', 'digit2', 'digit3', 'digit4', 'digit5',
+)  # fmt: skip
 
 #: The bones of a body with arm segments that hold no vertex: the pose code turns them, and they
 #: drive the segments (`ARM_SEGMENT_BONES` of `src/models/studio-format.ts`).
@@ -76,7 +79,7 @@ def rig_mesh_lib(bones=None):
 
 def studio_order(rm):
     """Gives each bone that a studio body can have, in the order of `STUDIO_BONES` with no eyes."""
-    return rm['BONES'] + (rm['TAIL_TIP'], rm['JAW']) + rm['segment_bones']()
+    return rm['BONES'] + (rm['TAIL_TIP'], rm['JAW']) + rm['segment_bones']() + rm['digit_bones']()
 
 
 def config_bones(rm, config):

@@ -101,11 +101,13 @@ def check_rig(rig, body, rm, bones, order):
     """Checks the bones, the modifier, the materials, and the face attributes of the layout."""
     names = set(rig.data.bones.keys())
     extra = sorted(names - set(order))
-    optional = (rm['TAIL_TIP'], rm['JAW']) + rm['segment_bones']()
+    optional = (rm['TAIL_TIP'], rm['JAW']) + rm['segment_bones']() + rm['digit_bones']()
     missing = [b for b in order if b not in names and b not in optional]
     need(not extra and not missing, f'The bones add {extra} and lack {missing}.')
     segments = [b for b in rm['segment_bones']() if b in names]
     need(len(segments) in (0, 20), f'The rig has {len(segments)} of the 20 arm segments.')
+    digits = [b for b in rm['digit_bones']() if b in names]
+    need(len(digits) in (0, 10), f'The rig has {len(digits)} of the 10 digit bones.')
     for name in bones:
         bone, pb = rig.data.bones[name], rig.pose.bones[name]
         parent = bone.parent.name if bone.parent else None
