@@ -5,10 +5,10 @@ describes the bench, the distance to the keys, the trunk, the arms, the wrists, 
 feet, the motion, and the rest pose of a professional pianist, with a source for each fact.
 
 **Upkeep.** This file is current. A change of the pose or the motion of the pianist updates
-section 9 "Use in the app" and each fact that it finds wrong, in the same commit. Each new fact
+section 10 "Use in the app" and each fact that it finds wrong, in the same commit. Each new fact
 gets its source.
 
-**Source marks.** Each fact names its source by a number of section 10. "(abstract)" marks a fact
+**Source marks.** Each fact names its source by a number of section 11. "(abstract)" marks a fact
 from an abstract only. "(secondary)" marks a fact that another source quotes. "(derived)" marks a
 value that this file calculates from the values of its sources. "(a search summary only)" marks a
 fact from a search summary, because the page did not open. A fact with no mark comes from the
@@ -153,7 +153,100 @@ front of the trunk, and the trunk upright over the sit bones.
 - In a competition, a pianist waited before the first note with the hands poised over the keys,
   or with the hands in the lap [22 (a search summary only)].
 
-## 9. Use in the app
+## 9. Fingering
+
+The fingers have the numbers 1 (the thumb) to 5 (the little finger) on each hand [34][37].
+
+### 9.1 The rules of the pianists
+
+- **Scales.** The scales set the fingering of almost all runs [42]. The right hand plays the C
+  major scale up as 1231234, in the groups 123 and 1234, and the left hand as 54321321 [42].
+- **Arpeggios.** The C major arpeggio goes 123123…5 in the right hand and 5421421…1 in the left
+  hand, up [42].
+- **Thumb and fifth finger on black keys.** Pianists mostly keep 1 and 5 off the black keys. These
+  fingers are short, so on a black key they move the hand into the keys [34][42]. A black 1 or 5
+  is easier when the notes before and after are also black [34].
+- **Octaves.** Most pianists play an octave 1-5 on white keys and 1-4 on black keys. The arm moves
+  in for black keys and out for white keys [43 (a search summary only)]. In the right hand, the
+  thumb almost always plays the lower note of an octave [37].
+- **Chords.** The fingers of a chord do not cross [37]. Notes within 30 ms of each other are one
+  chord [37].
+- **Repeated notes.** A fast repeat changes fingers, such as 3-2-1 [44 (a search summary only)].
+- **Substitution.** A finger change on a held key is rare: 0.34% of the notes of the PIG data set
+  [37].
+- **Agreement.** Two pianists give the same finger to 60% to 80% of the notes [37]. The best
+  statistical model matches 64.5% (general match), against 71.4% between pianists [37].
+
+### 9.2 The cost model
+
+Parncutt et al. [34] give each fingering a cost: the sum of 12 rules. A dynamic program finds the
+fingering of the lowest cost as the shortest path through a network with one node for each
+finger of each note [34]. Later models add chords and both hands [36], and learn the costs from
+data with hidden Markov models [37]. Jacobs [35] changes the rules of finger strength and of wide
+intervals (abstract).
+
+The table gives the spans of the right hand in semitones, from the first finger of the pair to
+the second [34]. A negative span passes the thumb under a finger, or a finger over the thumb. The
+reverse pair (such as 2-1) takes the negative values with Min and Max swapped. The left hand
+mirrors the right hand [34]. MinPrac and MaxPrac are the hard limits.
+
+```text
+ pair  MinPrac MinComf MinRel MaxRel MaxComf MaxPrac
+ 1-2     -5      -3      1      5      8      10
+ 1-3     -4      -2      3      7     10      12
+ 1-4     -3      -1      5      9     12      14
+ 1-5     -1       1      7     10     13      15
+ 2-3      1       1      1      2      3       5
+ 2-4      1       1      3      4      5       7
+ 2-5      2       2      5      6      8      10
+ 3-4      1       1      1      2      2       4
+ 3-5      1       1      3      4      5       7
+ 4-5      1       1      1      2      3       5
+```
+
+The 12 rules [34], with their points:
+
+1. **Stretch.** 2 for each semitone past MaxComf or below MinComf.
+2. **Small span.** 1 (thumb pairs) or 2 (other pairs) for each semitone below MinRel.
+3. **Large span.** 1 (thumb pairs) or 2 (other pairs) for each semitone past MaxRel.
+4. **Position change count.** Over three notes, the first and the third note span more than
+   MaxComf or less than MinComf of their fingers: 2 for a full change (the thumb plays the middle
+   note between the two), else 1.
+5. **Position change size.** The semitones past MaxComf or below MinComf of that span.
+6. **Weak finger.** 1 for each use of finger 4 or 5.
+7. **Three-four-five.** 1 for each run of 3, 4, and 5 in any order.
+8. **Three to four.** 1 for 3 followed by 4.
+9. **Four on black.** 1 for 3 and 4 in either order, with 3 on white and 4 on black.
+10. **Thumb on black.** 1, plus 2 for a white note before, plus 2 for a white note after.
+11. **Five on black.** 0, plus 2 for a white note before, plus 2 for a white note after.
+12. **Thumb passing.** 1 for a pass on one level (white to white, black to black). 3 for a finger on
+    white below the thumb on black.
+
+The best pass goes from a finger on a black key to the thumb on a white key [34]. A hand of 0.9
+times the size takes the spans times 0.9 [34]. An octave spans about 165 mm, about 13.7 mm for
+each semitone [34].
+
+### 9.3 The motion of the fingers and the wrist
+
+- **Lift.** Before a strike, the finger lifts above the keys and then drops. The thumb lifts
+  highest (mean 26.1 mm) and the ring finger lowest (21.7 mm). The lift grows with the tempo [39].
+- **Overlap.** At about 8 notes/s, the next finger starts its drop before the last finger reaches
+  the key bed. At 14 notes/s, the next finger touches its key first, and the finger after it
+  already drops [40].
+- **The other fingers.** The striking finger moves the same way each time. Little of its motion
+  goes into its neighbors [38] (abstract).
+- **Thumb under.** The thumb goes under the hand as soon as it plays its note. The wrist stays high
+  enough for the pass, and the forearm does not drop. The arm moves the hand to the next position
+  [16]. The hand prepares a thumb pass up to 500 ms before it [41 (secondary)]. The thumb pass has
+  two forms of motion, one for each direction of the hand [38] (abstract).
+- **Thumb over.** In a fast scale, the thumb moves as the other fingers do. The hand moves
+  smoothly and keeps its angle to the keys [42].
+- **Arpeggios.** The hand turns in the horizontal plane like a cartwheel [42].
+- **The wrist and the forearm.** In a tremolo of a sixth, experts move more from the wrist turn
+  and less from the fingers than novices. At a higher tempo, experts use the joints near the body
+  more [41 (secondary)].
+
+## 10. Use in the app
 
 The polar bear pianist plays with the hold `HANDS_HOLDS.piano` of `src/pose/hands.ts`, at the
 piano of `src/models/instruments/piano.ts`.
@@ -222,10 +315,11 @@ The app does not follow these facts:
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.
 
-## 10. Sources
+## 11. Sources
 
 Sources 1 to 20 opened on 2026-10-24, source 21 on 2026-10-25, and sources 23 to 29 on
-2026-10-28. Sources 32 and 33 come from a web search on 2026-10-30.
+2026-10-28. Sources 32 and 33 come from a web search on 2026-10-30. Sources 34 to 44 opened on
+2026-11-06, except the search summaries 43 and 44.
 
 1. Yamaha Corporation. "How to Play the Piano: Correct Posture." Musical Instrument Guide.
    https://www.yamaha.com/en/musical_instrument_guide/piano/play/play002.html
@@ -302,6 +396,39 @@ Sources 1 to 20 opened on 2026-10-24, source 21 on 2026-10-25, and sources 23 to
     https://livingpianos.com/how-to-achieve-speed-lightness-in-your-piano-playing
 33. Living Pianos. "Finger Staccato Technique on the Piano."
     https://www.livingpianos.com/articles/finger-staccato-technique-on-the-piano/
+34. R. Parncutt, J. A. Sloboda, E. F. Clarke, M. Raekallio, and P. Desain. "An ergonomic model of
+    keyboard fingering for melodic fragments." Music Perception 14(4), 341-382, 1997.
+    https://static.uni-graz.at/fileadmin/_Persoenliche_Webseite/parncutt_richard/Pdfs/PaSlClRaDe97_FingeringModel.pdf
+35. J. P. Jacobs. "Refinements to the ergonomic model for keyboard fingering of Parncutt,
+    Sloboda, Clarke, Raekallio, and Desain." Music Perception 18(4), 505-511, 2001 (abstract).
+    https://acnpsearch.tweb-dev.unibo.it/singlejournalindex/82968845
+36. M. Balliauw, D. Herremans, D. Palhazi Cuervo, and K. Sörensen. "A variable neighborhood
+    search algorithm to generate piano fingerings for polyphonic sheet music." International
+    Transactions in Operational Research 24(3), 509-535, 2017 (abstract).
+    https://dorienherremans.com/content/variable-neighborhood-search-algorithm-generate-piano-fingerings-polyphonic-sheet-music
+37. E. Nakamura, Y. Saito, and K. Yoshii. "Statistical learning and estimation of piano
+    fingering." Information Sciences 517, 68-85, 2020. https://arxiv.org/abs/1904.10237
+38. S. Furuya, M. Flanders, and J. F. Soechting. "Hand kinematics of piano playing." Journal of
+    Neurophysiology 106(6), 2849-2864, 2011 (abstract).
+    https://experts.umn.edu/en/publications/hand-kinematics-of-piano-playing/
+39. S. Dalla Bella and C. Palmer. "Rate effects on timing, key velocity, and finger kinematics in
+    piano performance." PLoS ONE 6(6), e20518, 2011.
+    https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0020518
+40. W. Goebl and C. Palmer. "Finger motion in piano performance: Touch and tempo." International
+    Symposium on Performance Science, 2009.
+    https://iwk.mdw.ac.at/goebl/papers/GoeblPalmer2009_ISPS-Touch.pdf
+41. E. Altenmüller, W. Trappe, and H.-C. Jabusch. "Expertise-related differences in cyclic motion
+    patterns in drummers: a kinematic analysis." Frontiers in Psychology 11, 538958, 2020. It
+    quotes Engel, Flanders, and Soechting (1997) and Furuya and Kinoshita (2008).
+    https://pmc.ncbi.nlm.nih.gov/articles/PMC7693443
+42. C. C. Chang. "Playing Fast: Scales, Arpeggios, and Chromatic Scales" and "Fingering."
+    Fundamentals of Piano Practice.
+    https://fundamentals-of-piano-practice.readthedocs.io/chapter1/ch1_topics/III.5.html and
+    https://fundamentals-of-piano-practice.readthedocs.io/chapter1/ch1_procedures/II.18.html
+43. R. Estrin. "How to finger octaves." Living Pianos.
+    https://www.livingpianos.com/articles/how-to-finger-octaves/
+44. R. Estrin. "How to play repeated notes on the piano." Living Pianos.
+    https://www.livingpianos.com/articles/how-to-play-repeated-notes-on-the-piano-piano-techniques/
 
 **Conflicts.** The sources put the elbow from a little below the keys [5][8] to about 2.5 cm
 above them [4][5]. Most sources put the pianist on the front half of the bench, and one on the
