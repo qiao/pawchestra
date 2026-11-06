@@ -1,7 +1,8 @@
 # Penguin model
 
 This folder holds the source mesh of the penguin, three edited copies, a copy with rebuilt
-flippers and its weights, a copy of it with a smooth color edge, and the rigged copy. The app does not serve these files. It loads the
+flippers and its weights, a copy of it with a smooth color edge, a copy of that with clean
+armpits, and the rigged copy. The app does not serve these files. It loads the
 module `src/models/studio/penguin.ts`, which this chain writes:
 
 ```text
@@ -20,7 +21,10 @@ penguin-free.glb                     `armSource` of tools/mesh-rigs/penguin.json
 penguin-arms.glb + penguin-weights.json  `weightSource` and `paintedWeights` of the config
    │  point edits in Blender           smooth black and white edge (penguin-arms-edge.json)
    v
-penguin-arms-edge.glb                `source` of the config
+penguin-arms-edge.glb
+   │  point edits in Blender           no fins under the flippers (penguin-arms-pit.json)
+   v
+penguin-arms-pit.glb                 `source` of the config
    │  pnpm rig-mesh penguin
    v
 penguin.rig.glb                      rigged mesh
@@ -43,6 +47,8 @@ src/models/studio/penguin.ts         studio body of the app
 | `penguin-weights.json` | Weights of the same Blender run. License as `penguin.glb` | `arm_rebuild.py` (below) |
 | `penguin-arms-edge.glb` | Copy of `penguin-arms.glb` with a smooth black and white edge. License as `penguin.glb` | None: point edits in Blender (below) |
 | `penguin-arms-edge.json` | The list of the edits of `penguin-arms-edge.glb`. License as `penguin.glb` | None |
+| `penguin-arms-pit.glb` | Copy of `penguin-arms-edge.glb` with no fins under the flippers. License as `penguin.glb` | None: point edits in Blender (below) |
+| `penguin-arms-pit.json` | The list of the edits of `penguin-arms-pit.glb`. License as `penguin.glb` | None |
 | `penguin.rig.glb` | Output of the rig. License as `penguin.glb` | `pnpm rig-mesh penguin` |
 
 ## penguin.glb
@@ -214,6 +220,42 @@ place) and each recolored face. The rig takes the weights of each vertex from it
 `penguin-arms.glb` (`weightSource` of the config), so that `penguin-weights.json` still keys to
 those vertices, and a new vertex takes the weights of the two ends of its edge in the ratio of its
 place. The flank rule changes no face of this copy.
+
+## penguin-arms-pit.glb
+
+| Item | Value |
+|---|---|
+| Size | 950,188 bytes |
+| SHA-256 | `bb54e163e48e133a15e70e3656827f6997fffa447796bd54bc15f43934c43ee3` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+The rebuilt tube of each flipper lay on the trunk below the shoulder: `arm_rebuild.py` wrapped the
+tube onto the old flipper, which `penguin_edit.py` freed from a crease that went far down the
+side. The inner vertices of the lower rings of the tube stayed on the trunk wall. Thus a thin box
+went from the inner side of each flipper to the trunk: two walls 0.02 to 0.04 units apart and a
+flat floor, from y 0.46 up to y 0.52 on the left and from y 0.49 up to y 0.52 on the right. From
+the front and a little below, the floor and the walls showed as dark fins under the flipper root.
+The tube faces on the trunk also hid small crumpled faces of the trunk wall.
+
+The copy removes the fins with point edits in the live Blender on the welded mesh. Each edit
+merges one vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to
+a new place. `penguin-arms-pit.json` lists the 24 merges in their order:
+
+1. On each side, each inner vertex of the three lowest tube rings that lay on the trunk merges into
+   the next vertex of its ring on the inner side of the flipper: 6 vertices on the left and 5 on
+   the right. Each ring then closes across the inner side of the flipper, and the flipper is free
+   of the trunk up to y 0.52. The tube stays on the trunk above it, so the armpit stays a short
+   crease with no gap at the root: a clip is better than an over-cut.
+2. Each vertex of a thin or flat triangle of the trunk wall that the tube faces hid merges into its
+   nearest neighbor of the same wall: 8 vertices on the left, and 5 vertices of the color edge cut
+   of `penguin-arms-edge.glb` near the front of the right root.
+
+The copy has 2,282 vertices and 4,560 triangles after the weld (2,306 and 4,608 before): 48
+faces go (28 on the left, 20 on the right), and 34 faces take a new corner (19 and 15). A new
+corner keeps the UV of its vertex from a face across a shared edge, so the black and white edge
+stays. Each vertex keeps its place on `penguin-arms-edge.glb`, so the rig gives it the weights of
+its place on `penguin-arms.glb` (`weightSource` of the config). The faces that close the inner
+side of a flipper lie up to 0.024 units from the old surface, where the walls were.
 
 ## penguin.rig.glb
 
