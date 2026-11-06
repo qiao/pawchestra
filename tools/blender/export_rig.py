@@ -508,7 +508,7 @@ def main():
         {b: f for b, (f, _) in frames.items()}, heads,
         {b: f for b, (f, _) in sheet_frames.items()}, {b: h for b, (_, h) in sheet_frames.items()},
         extras, None if (bases == colors).all() else srgb(bases),
-        generator='zoophony tools/blender/export_rig.py')  # fmt: skip
+        generator='pawchestra tools/blender/export_rig.py')  # fmt: skip
     with open(out, 'rb') as f:
         glb = f.read()
     with open(os.path.splitext(out)[0] + '.json', 'w') as f:

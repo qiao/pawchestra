@@ -76,7 +76,7 @@ BESIDE = (1.2, 0.0, 0.0)
 
 #: The key in `bpy.app.driver_namespace` of the state of the preview, which a reload of this module
 #: keeps.
-STATE_KEY = 'zoophony_app_preview'
+STATE_KEY = 'pawchestra_app_preview'
 
 #: The kinds of data that an import can add.
 KINDS = ('objects', 'meshes', 'armatures', 'actions', 'materials', 'images', 'lights')
@@ -454,7 +454,7 @@ def _export(state):
     failed export, the last export comes back, and the error goes up. Gives the GLB file."""
     scene = bpy.context.scene
     frame = scene.frame_current
-    folder = os.path.join(tempfile.gettempdir(), 'zoophony-app-preview', state['animal'])
+    folder = os.path.join(tempfile.gettempdir(), 'pawchestra-app-preview', state['animal'])
     os.makedirs(folder, exist_ok=True)
     blend = os.path.join(folder, f'{state["animal"]}.blend')
     glb = os.path.join(folder, f'{state["animal"]}.rig.glb')

@@ -4993,7 +4993,7 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
 
 def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
               bind_heads, src_frames, src_heads, extras, base=None, sit=None,
-              generator='zoophony tools/blender/rig_mesh.py'):
+              generator='pawchestra tools/blender/rig_mesh.py'):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
     for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors

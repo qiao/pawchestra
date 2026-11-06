@@ -1073,7 +1073,7 @@ interface UncappedMeasure {
  */
 async function measureUncapped(base: string, options: FrameOptions): Promise<UncappedMeasure> {
   const browser = await launchChrome(options, true);
-  const folder = await mkdtemp(join(tmpdir(), 'zoophony-frame-'));
+  const folder = await mkdtemp(join(tmpdir(), 'pawchestra-frame-'));
   RUNNING.folders.add(folder);
   try {
     const page = await playDemo(browser, base, options);
