@@ -144,7 +144,7 @@ export const RIM_LIGHT = {
   /**
    * The wrap of the rim light around the players, from 0 to 1: a face that turns this part of a
    * right angle past the light still gets a little of it. Fur scatters the light under its tips,
-   * so the rim of a real animal in a back light is a soft band and not a hard line.
+   * so the rim of a real animal in a back light is a soft band.
    */
   wrap: 0.35,
 } as const;

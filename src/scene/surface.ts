@@ -24,7 +24,7 @@ export const CONTACT_SHADE = {
  * reflection of the players, the chairs, and the stands. The pass of the contact shade traces
  * each floor pixel along its mirror ray through the depth of the scene, at half size, and reads
  * the color of the scene at the hit. The ray takes a jitter in a small cone, and a blur at half
- * size joins 16 rays, so the reflection is soft and not a mirror.
+ * size joins 16 rays, so the reflection is soft.
  */
 export const FLOOR_GLOSS = {
   /**

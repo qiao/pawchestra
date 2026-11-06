@@ -948,10 +948,10 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   times for each pixel.
 - **Floor gloss** (`FLOOR_GLOSS` of `scene/surface.ts`). The same pass traces each pixel of the
   stage top along its mirror ray through the depth, and reads the scene color at the hit. The ray
-  takes a jitter in a small cone, and the blur joins 16 rays, so the reflection is soft and not a
-  mirror. The Fresnel term of the lacquer makes it stronger at a flat angle. It fades along the
-  ray and at the frame edges. The physical reflection of the lacquer did not show on the dark
-  players, so a factor makes it visible. A planar reflection renders the scene again, which costs
+  takes a jitter in a small cone, and the blur joins 16 rays, so the reflection is soft. The
+  Fresnel term of the lacquer makes it stronger at a flat angle. It fades along the ray and at the
+  frame edges. The physical reflection of the lacquer did not show on the dark players, so a
+  factor makes it visible. A planar reflection renders the scene again, which costs
   too much GPU time (9.7). Only the high tier has it (2.6).
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
