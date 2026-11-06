@@ -16,22 +16,25 @@ import type { UvRect } from './letterbox.ts';
 export const LENS_FLARE = {
   /**
    * The factor of all parts of the flare. 0 turns the flare off. The values below give the middle
-   * of a lineup of three strengths, about 1.25 times the weakest flare that shows.
+   * of a lineup of three strengths, in which the flare shows plainly in the default view and in
+   * the close shots with the hall lamps.
    */
   strength: 1,
   /**
    * The facing of a light falls from the axis of its cone to 0 at this factor of the half angle
-   * of the cone. The front lens of a stage spotlight also glows a little outside its beam, so the
-   * factor is above 1.
+   * of the cone. The front lens of a stage spotlight also glows outside its beam, so the factor
+   * is above 1. The default view stands about 38° off the axis of the rim light, and this factor
+   * gives it about one half of the facing.
    */
-  spill: 2.5,
+  spill: 3.5,
   /**
    * The angle outside the edge of the frame at which the flare falls to 0, in radians. The stage
-   * lights hang high, and the close shots on the stage see them only above the frame.
+   * lights hang high, and the views see them only above the frame: the default view sees the rim
+   * light about 41° above the top edge.
    */
-  reach: 40 * MathUtils.DEG2RAD,
+  reach: 70 * MathUtils.DEG2RAD,
   /** The linear light of the veil at the light, for each lux of the light at the lens. */
-  veil: 0.018,
+  veil: 0.04,
   /** The distance from the light at which the veil falls to one half, in frame heights. */
   veilSize: 0.6,
   /** The linear light of the glow at the light, for each lux of the light at the lens. */
@@ -42,12 +45,13 @@ export const LENS_FLARE = {
    * The ghosts of the aperture: the place on the line from the middle of the image (0) to the
    * light (1), the radius in frame heights, and the linear light for each lux at the lens. A
    * negative place is on the other side of the middle, as the reflections between the lens
-   * elements put it.
+   * elements put it. The places are near the middle, so the ghosts of a light far above the frame
+   * fall into the frame.
    */
   ghosts: [
-    [-0.35, 0.09, 0.027],
-    [-0.8, 0.16, 0.014],
-    [0.3, 0.05, 0.036],
+    [-0.15, 0.12, 0.12],
+    [-0.45, 0.2, 0.06],
+    [0.25, 0.07, 0.15],
   ],
   /** The color of each ghost, in sRGB: the coatings of the lens give each one its own tint. */
   ghostColors: ['#a9c6ff', '#ffc58a', '#bff0c6'],
@@ -69,9 +73,9 @@ export const LENS_FLARE = {
    * {@link LENS_FLARE}.ghostColors.
    */
   lampGhosts: [
-    [-0.55, 0.05],
-    [-1.25, 0.03],
-    [0.45, 0.04],
+    [-0.55, 0.2],
+    [-1.25, 0.12],
+    [0.45, 0.16],
   ],
   /**
    * The halo: a bright part near the middle of the image gives a soft ring of this radius around
