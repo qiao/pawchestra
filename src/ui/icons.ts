@@ -52,6 +52,14 @@ const ICONS = {
   folder:
     '<path d="M3.5 18.5V6A1.5 1.5 0 0 1 5 4.5h4l2 2.5h7.5A1.5 1.5 0 0 1 20 8.5v2"/><path d="M3.5 18.5l2.6-7a1.5 1.5 0 0 1 1.4-1h12.6a1 1 0 0 1 .95 1.3l-2.1 6.2a1.5 1.5 0 0 1-1.4 1z"/>',
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  // The icons of the tabs of the drawer (design 2.8): two notes with a beam for "Music", a seat of
+  // a hall from the front for "Seats", and two sliders for "Settings". A plain chair read as a
+  // letter at 16 px.
+  music:
+    '<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/>',
+  seat: '<path d="M6 11V7a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v4"/><path d="M4 12.5a1.5 1.5 0 0 1 3 0V14h10v-1.5a1.5 1.5 0 0 1 3 0V17a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17z"/><path d="M6.5 18.5v2M17.5 18.5v2"/>',
+  sliders:
+    '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   chevron: '<path d="M9.5 6l6 6-6 6"/>',
 } as const;
 
