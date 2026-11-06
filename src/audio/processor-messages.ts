@@ -4,7 +4,7 @@ import type { EngineBank } from './engine.ts';
 import type { SynthEventTable } from './synth-events.ts';
 
 /** The name of the worklet processor in `registerProcessor()`. */
-export const PROCESSOR_NAME = 'zoophony-synth';
+export const PROCESSOR_NAME = 'pawchestra-synth';
 
 /** A message from the `Player` to the worklet processor. */
 export type ProcessorCommand =
