@@ -836,7 +836,8 @@ when no light value can match the lit pixels of the reference.
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
   top and darker edges. The clarinet is black lacquer with silver keys, the flutes are silver, the
   brass is gold with lit bells, and the timpani are copper. The piano is black lacquer with a dark
-  well and a dark gold plate in its open case (`PIANO_INSIDE`).
+  well and a dark gold plate in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
+  lighter soundboard, gilded parts, and red C strings and dark blue F strings.
 
 **Materials**
 
@@ -853,7 +854,7 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | Finish    | Parts                                                     | Intent                                                                |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
-| `varnish` | The varnished wood of the bowed strings.                  | A soft gloss.                                                         |
+| `varnish` | The varnished wood of the bowed strings and the harp.     | A soft gloss.                                                         |
 | `lacquer` | The black lacquer of the piano and the clarinet, the eyes. | A sharp gloss.                                                        |
 | `metal`   | Brass, copper, and silver.                                | Sharp highlights, and a half metal look with the color of the metal.  |
 
@@ -1225,6 +1226,37 @@ change of the detail does not move the seats.
 sizes of a real grand piano (`PIANO_PEDALS`). The lift raises the case, the keys, the lid, and the
 bar of the lyre, and the pedals stay on the floor. Each key turns down with its notes
 (`PIANO.keyDip`), and the damper pedal goes down under the right foot (5.3).
+
+**Harp** (`models/instruments/harp.ts`). A concert pedal harp in the varnished maple of
+`harpFrame`, with gilded parts, as a natural Lyon & Healy Style 23. The parts follow a real
+pedal harp (`docs/reference/harp-technique.md`):
+
+- **Column.** A fluted shaft between a gilded foot and a gilded crown (`COLUMN`).
+- **Neck.** An S curve (`HARP.neck`): it falls from the crown, rises in a hump over the middle
+  strings, and falls onto the top of the soundbox. A brass plate covers the bottom of each side
+  over the strings (`NECK`), as the plates of the action.
+- **Soundbox.** A round back of five staves and a flat spruce soundboard, wide at the base and
+  narrow at the top (`SOUNDBOX`). The strings start in a center strip of the soundboard, and the
+  middle stave of the back has four holes.
+- **Base.** A bevelled pedestal with seven brass pedals in a fan at the end of the player: D, C,
+  and B at the left, and E, F, G, and A at the right, as the harpist sees them (`HARP_PEDALS`).
+  Each pedal is one part, in the order of `HARP_PEDALS.order`, so that a pose can move it. A pedal
+  has three notches: flat at the top, natural in the middle, and sharp at the bottom.
+  `harpPedalEnds()` gives a pedal in a notch, and `harpPedalFoot()` the point where the hoof
+  presses it. The model shows each pedal in the natural notch.
+- **Strings.** 47 strings, one for each natural note from C1 to G7 (`HARP.strings`), so that the
+  colors of a real harp fall on the correct notes. The C strings are red and the F strings dark
+  blue. The bass strings are wound wire, the middle strings gut, and the treble strings a lighter
+  nylon, thinner toward the treble (`STRINGS`). Each string is one part: a prism of three sides
+  with open ends, from the center strip up into the neck. Thus the clearance probes do not read
+  the strings as a part of the frame.
+- **Pluck points.** `harpStringPosition()` gives the pluck point of the string of the key: the
+  share `PLUCK.share` of a length from the soundboard up to the line `PLUCK.top`. The hold of the
+  deer fits these points, so they stay when the neck changes. `PLUCK.top` lies a little below
+  the bottom of the neck over the bass strings and over the hump.
+
+The frame and the box under the harp (`harpStand`, a dark wood) stay in the triangle budget of
+the harp (`INSTRUMENT_BUDGETS`).
 
 ### Instrument data
 
