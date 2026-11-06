@@ -30,7 +30,7 @@ export interface HangAngles {
   readonly bend: number;
 }
 
-/** The angles of the hanging arm, and its gap to the body. */
+/** The angles of the hanging arm. */
 const HANG = {
   /**
    * The forward swing of the upper arm. The arm hangs in front of the widest part of the hips, so
@@ -52,12 +52,6 @@ const HANG = {
   maxOut: 50 * MathUtils.DEG2RAD,
   /** The step of the search for the swing out to the side. */
   step: 1 * MathUtils.DEG2RAD,
-  /**
-   * The space between the side of the arm and the side of the body, in head heights. The arm
-   * touches the body, as the arms of the reference images do (design 5.2). The gap of 0.03 H held
-   * it out in the air.
-   */
-  gap: 0,
 } as const;
 
 /** The parts of the body that a hanging arm keeps clear of. */
@@ -199,8 +193,9 @@ interface HangOut {
 }
 
 /**
- * Finds the swings of a hanging arm out to the side: the smallest angles at which each part keeps
- * {@link HANG.gap} from the torso and the legs of the bind pose, seen along x. The inner half
+ * Finds the swings of a hanging arm out to the side: the smallest angles at which each part touches
+ * the side of the torso and the legs of the bind pose, seen along x, as the arms of the reference
+ * images do (design 5.2). The inner half
  * width of each part comes from the mesh (`radiusOf()`), so a thicker body or arm swings the arm
  * further out.
  *
@@ -212,7 +207,6 @@ interface HangOut {
  */
 function hangOut(model: PlayerModel, arm: ArmRig, angles: HangAngles, minOut: number): HangOut {
   const { forward, bend } = angles;
-  const h = model.body.headHeight;
   const side = arm.side === 'L' ? -1 : 1;
   const shoulder = new Vector3(...arm.bind.shoulder);
   const elbow = new Vector3(...arm.bind.elbow);
@@ -265,7 +259,7 @@ function hangOut(model: PlayerModel, arm: ArmRig, angles: HangAngles, minOut: nu
         }
       }
       const body = outermost(triangles, point, side);
-      return side * point.x - body >= radii[part] + HANG.gap * h;
+      return side * point.x - body >= radii[part];
     });
   };
 
@@ -284,8 +278,8 @@ function hangOut(model: PlayerModel, arm: ArmRig, angles: HangAngles, minOut: nu
 
 /**
  * Finds the hanging arm of a standing player for the rest pose (design 5.2). The arm swings out
- * to the side by the smallest angle at which each part keeps {@link HANG.gap} from the torso and
- * the legs of the bind pose, seen along x: it touches their side ({@link hangOut}).
+ * to the side by the smallest angle at which each part touches the side of the torso and the legs
+ * of the bind pose, seen along x ({@link hangOut}).
  *
  * @param model The player model.
  * @param arm The arm.
