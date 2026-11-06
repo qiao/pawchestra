@@ -1067,7 +1067,8 @@ async function checkHiddenBarTap(browser: Browser, base: string): Promise<KeyChe
 
   // Each control that shows in the bar and in the drawer has the touch size of 2.8.
   await page.tap('.bar button[aria-label="Open the drawer"]');
-  await page.tap('.collapse');
+  // The tab Seats shows the mute and solo buttons of each seat row.
+  await page.tap('#tab-seats');
   // The drawer slides in for 200 ms (design 2.8). A measure during the slide gave sizes a little
   // below 44 px in one run.
   await page.waitForTimeout(400);
@@ -1085,7 +1086,7 @@ async function checkHiddenBarTap(browser: Browser, base: string): Promise<KeyChe
     .map((box) => `${box.name} ${box.width.toFixed(1)} × ${box.height.toFixed(1)}`);
   c.record(
     'Touch size of each control',
-    'tap on the drawer button, tap on the collapse button',
+    'tap on the drawer button, tap on the tab Seats',
     small.length === 0 ? `all ${controls.length} controls are 44 px or more` : small.join('; '),
     small.length === 0,
   );
