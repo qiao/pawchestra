@@ -834,7 +834,15 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
 | `varnish` | The varnished wood of the bowed strings.                  | A soft gloss.                                                         |
 | `lacquer` | The black lacquer of the piano and the clarinet, the eyes. | A sharp gloss.                                                        |
-| `metal`   | Brass, copper, and silver.                                | Sharp highlights. The hall is dark, so a high metalness looks black.  |
+| `metal`   | Brass, copper, and silver.                                | Sharp highlights, and a half metal look with the color of the metal.  |
+
+Each finish also has a factor of the reflection of the environment (`reflection`). The red
+channel of the finish table holds it, and the player shader scales the reflection by it
+(`addFinishReflection()` of `scene/geometry.ts`). The hall is dark, so the physical reflection
+of a polished finish showed almost nothing, and a full metalness looked black. With the factor,
+the brass, the copper, the piano lacquer, and the string varnish show the warm lamps and the
+lit stage. The fur stays matte with the factor 1. The values are the middle of a lineup of
+three finish sets.
 
 The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.

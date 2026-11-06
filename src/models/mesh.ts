@@ -20,11 +20,17 @@ export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal';
 
 /**
  * The shading values of a finish: the roughness and the metalness, each 0 to 1 (the values of
- * three.js), and the crease angle of its normals.
+ * three.js), the factor of its reflection, and the crease angle of its normals.
  */
 interface FinishValues {
   readonly roughness: number;
   readonly metalness: number;
+  /**
+   * The factor of the reflection of the environment, from 0 to 4 (design 4.5, materials). The
+   * hall is dark, so a polished finish needs more than the physical reflection to show the warm
+   * lamps and the lit stage.
+   */
+  readonly reflection: number;
   /**
    * The crease angle in degrees (design 4.5, materials). The shading smooths the normals across
    * an edge with a smaller angle between its two faces, and keeps a larger angle as a hard edge.
@@ -38,10 +44,10 @@ interface FinishValues {
  * finish in {@link MeshData.finishes}.
  */
 export const FINISHES = {
-  matte: { roughness: 0.85, metalness: 0, crease: 0 },
-  varnish: { roughness: 0.38, metalness: 0, crease: 60 },
-  lacquer: { roughness: 0.22, metalness: 0, crease: 60 },
-  metal: { roughness: 0.3, metalness: 0.35, crease: 60 },
+  matte: { roughness: 0.85, metalness: 0, reflection: 1, crease: 0 },
+  varnish: { roughness: 0.3, metalness: 0, reflection: 1.8, crease: 60 },
+  lacquer: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
+  metal: { roughness: 0.26, metalness: 0.6, reflection: 2.4, crease: 60 },
 } as const satisfies Readonly<Record<Finish, FinishValues>>;
 
 /**

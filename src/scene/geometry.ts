@@ -23,13 +23,15 @@ import type { ShotUniforms } from './shot-light.ts';
 /**
  * Makes the finish table of design 4.5: one texel for each finish, with the roughness in the
  * green channel and the metalness in the blue channel, as three.js reads them from a roughness map
- * and a metalness map. The red channel is not read.
+ * and a metalness map. The red channel holds a quarter of the factor of the reflection
+ * ({@link addFinishReflection}).
  *
  * @returns The texture, one texel high.
  */
 function createFinishTexture(): DataTexture {
   const texels = new Uint8Array(FINISH_ORDER.length * 4);
   for (const [i, finish] of FINISH_ORDER.entries()) {
+    texels[i * 4] = Math.round(Math.min(FINISHES[finish].reflection / 4, 1) * 255);
     texels[i * 4 + 1] = Math.round(FINISHES[finish].roughness * 255);
     texels[i * 4 + 2] = Math.round(FINISHES[finish].metalness * 255);
     texels[i * 4 + 3] = 255;
@@ -56,6 +58,24 @@ function addPlayerFill(shader: WebGLProgramParametersWithUniforms): void {
   shader.fragmentShader = shader.fragmentShader.replace(
     '#include <lights_fragment_end>',
     `#include <lights_fragment_end>\nreflectedLight.indirectDiffuse *= ${FILL.players.toFixed(3)};`,
+  );
+}
+
+/**
+ * Scales the reflection of the environment of a material by the factor of the finish of each
+ * pixel: the red channel of the finish table (design 4.5, materials). Call it in
+ * `onBeforeCompile`.
+ *
+ * @param shader The shader of the material.
+ * @throws Error if the shader has no light chunk of three.js that the patch knows.
+ */
+function addFinishReflection(shader: WebGLProgramParametersWithUniforms): void {
+  if (!shader.fragmentShader.includes('#include <lights_fragment_end>')) {
+    throw new Error('The shader has no light chunk of three.js. Update addFinishReflection().');
+  }
+  shader.fragmentShader = shader.fragmentShader.replace(
+    '#include <lights_fragment_end>',
+    '#include <lights_fragment_end>\nreflectedLight.indirectSpecular *= texture2D(roughnessMap, vRoughnessMapUv).r * 4.0;',
   );
 }
 
@@ -89,6 +109,7 @@ export function createMaterials(
     material.onBeforeCompile = (shader) => {
       addLightPool(shader, pool, 'players');
       addPlayerFill(shader);
+      addFinishReflection(shader);
       if (shot) {
         addShotLight(shader, shot);
       }
