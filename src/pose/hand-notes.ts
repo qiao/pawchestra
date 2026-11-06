@@ -112,19 +112,21 @@ export interface HandNote {
  * and the right hand the high notes. A chord wider than one octave splits at its largest
  * interval that keeps each hand in its reach: the left hand plays the notes below it. Of two
  * equal intervals, the one nearer to the middle of the chord splits it. A chord within one octave
- * goes to the hand that is nearer to it, so that a melody stays in one hand. At the same
- * distance, it goes to the right hand from middle C up, and to the left hand below. A chord above
- * the reach of the left hand goes to the right hand, and a chord below the reach of the right
- * hand goes to the left hand, so that a melody changes hands where one hand cannot cross over the
- * other. These two rules also give a wide chord to one hand when all its keys are past the reach
- * of the other hand.
+ * goes to one hand. A chord above the reach of the left hand goes to the right hand, and a chord
+ * below the reach of the right hand goes to the left hand, so that a melody changes hands where
+ * one hand cannot cross over the other. These two rules also give a wide chord to one hand when
+ * all its keys are past the reach of the other hand.
  *
  * With a distance `apart`, the middles of the keys of the two hands stay at least that far apart,
  * because two wide paws on near keys go into each other. When the middles of the two parts of a
  * chord wider than one octave are nearer, the palm of each hand asks for half of the difference
- * away from its keys (`HandNote.shift`), so that a bass and a melody stay in two hands. When a hand plays nearer
- * to the other hand, the other hand moves out of its way, away from it, at the start of the chord:
- * a note of loudness 0 on the key at that distance, with no sound.
+ * away from its keys (`HandNote.shift`), so that a bass and a melody stay in two hands. When a hand
+ * plays nearer to the other hand, the other hand moves out of its way, away from it, at the start
+ * of the chord: a note of loudness 0 on the key at that distance, with no sound.
+ *
+ * The hand of each chord within one octave comes from a plan of the whole piece
+ * ({@link planHands}), as a pianist plans which hand takes which notes: the plan finds the hands
+ * with the least travel of the two palms, and a fast move costs more than a slow move.
  *
  * @param notes The notes of the player, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
@@ -140,17 +142,23 @@ export function splitHands(
   reach: HandReach = NO_REACH_LIMIT,
   apart = 0,
 ): readonly [left: HandNote[], right: HandNote[]] {
-  const left: HandNote[] = [];
-  const right: HandNote[] = [];
-  let lastLeft: number = HAND_MOTION.startKeys[0];
-  let lastRight: number = HAND_MOTION.startKeys[1];
-  // The start of the last note of either hand.
-  let lastStart = -Infinity;
-  for (const group of groupChords(notes, loudness)) {
+  const chords = groupChords(notes, loudness).map((group): SplitChord => {
     const keys = notes
       .slice(group.first, group.first + group.count)
       .map((n) => n.pitch)
       .toSorted((a, b) => a - b);
+    const cut = group.high - group.low > HAND_MOTION.span ? wideChordCut(keys, reach) : null;
+    return { group, keys, cut };
+  });
+  const choices = planHands(chords, reach, apart);
+  const left: HandNote[] = [];
+  const right: HandNote[] = [];
+  let places: HandPlaces = { left: HAND_MOTION.startKeys[0], right: HAND_MOTION.startKeys[1] };
+  // The start of the last note of either hand.
+  let lastStart = -Infinity;
+  for (const [index, chord] of chords.entries()) {
+    const { group, keys } = chord;
+    const choice = choices[index] ?? 'right';
     const part = (low: number, high: number, shift = 0): HandNote => ({
       start: group.start,
       end: group.end,
@@ -160,41 +168,22 @@ export function splitHands(
       loudness: group.loudness,
       shift,
     });
+    const next = placeHands(chord, choice, places, apart);
     let toLeft: HandNote | null = null;
     let toRight: HandNote | null = null;
-    const cut = group.high - group.low > HAND_MOTION.span ? wideChordCut(keys, reach) : null;
-    const below = cut === null ? group.low : (keys[cut - 1] ?? group.low);
-    const above = cut === null ? group.high : (keys[cut] ?? group.high);
-    const middle = (group.low + group.high) / 2;
-    if (cut !== null) {
-      // Each hand moves half of the missing distance away from the other hand.
-      const lowMiddle = (group.low + below) / 2;
-      const highMiddle = (above + group.high) / 2;
-      const shift = Math.ceil(Math.max(0, apart - (highMiddle - lowMiddle)) / 2);
-      toLeft = part(group.low, below, -shift);
-      toRight = part(above, group.high, shift);
-      lastLeft = lowMiddle - shift;
-      lastRight = highMiddle + shift;
+    if (choice === 'both') {
+      const below = keys[(chord.cut ?? 1) - 1] ?? group.low;
+      const above = keys[chord.cut ?? 0] ?? group.high;
+      toLeft = part(group.low, below, -next.shift);
+      toRight = part(above, group.high, next.shift);
+    } else if (choice === 'right') {
+      toRight = part(group.low, group.high);
+      toLeft = next.left === places.left ? null : makeWay(group.start, next.left);
     } else {
-      const fromLeft = Math.abs(middle - lastLeft);
-      const fromRight = Math.abs(middle - lastRight);
-      const nearerRight = fromRight < fromLeft || (fromRight === fromLeft && middle >= 60);
-      if (group.low >= reach.rightLowest && (nearerRight || group.high > reach.leftHighest)) {
-        toRight = part(group.low, group.high);
-        lastRight = middle;
-        if (apart > 0 && lastLeft > middle - apart) {
-          lastLeft = Math.floor(middle - apart);
-          toLeft = makeWay(group.start, lastLeft);
-        }
-      } else {
-        toLeft = part(group.low, group.high);
-        lastLeft = middle;
-        if (apart > 0 && lastRight < middle + apart) {
-          lastRight = Math.ceil(middle + apart);
-          toRight = makeWay(group.start, lastRight);
-        }
-      }
+      toLeft = part(group.low, group.high);
+      toRight = next.right === places.right ? null : makeWay(group.start, next.right);
     }
+    places = next;
     if (toLeft && toRight && apart > 0 && Number.isFinite(lastStart)) {
       // Both hands move to the chord in the same time, so that they keep apart in the moves.
       toLeft = { ...toLeft, since: lastStart };
@@ -209,6 +198,179 @@ export function splitHands(
     lastStart = group.start;
   }
   return [left, right];
+}
+
+/** A chord of a player for {@link splitHands}. */
+interface SplitChord {
+  /** The notes of the chord. */
+  readonly group: ReturnType<typeof groupChords>[number];
+  /** The keys of the notes, sorted up. */
+  readonly keys: readonly number[];
+  /**
+   * The index of the lowest key of the right hand in a chord wider than one octave
+   * ({@link wideChordCut}), or `null` for a chord that one hand plays.
+   */
+  readonly cut: number | null;
+}
+
+/** The hand that plays a chord: one hand, or both hands for a wide chord that splits. */
+type HandChoice = 'left' | 'right' | 'both';
+
+/** The middles of the keys of the two hands, in semitones. */
+interface HandPlaces {
+  readonly left: number;
+  readonly right: number;
+}
+
+/**
+ * Gives the middles of the keys of the two hands after a chord (design 5.3). The hand of a chord
+ * goes to the middle of its keys, and the other hand moves out of its way to the distance
+ * `apart`. Both hands of a wide chord go to the middles of their parts, each with half of the
+ * missing distance `apart` away from the other hand.
+ *
+ * @param chord The chord.
+ * @param choice The hand of the chord.
+ * @param last The middles of the two hands before the chord.
+ * @param apart The least distance between the middles of the two hands, or 0 for no limit.
+ * @returns The middles after the chord, and the shift of each hand of a wide chord in semitones.
+ */
+function placeHands(
+  chord: SplitChord,
+  choice: HandChoice,
+  last: HandPlaces,
+  apart: number,
+): HandPlaces & { readonly shift: number } {
+  const { group, keys, cut } = chord;
+  const middle = (group.low + group.high) / 2;
+  if (choice === 'both') {
+    const lowMiddle = (group.low + (keys[(cut ?? 1) - 1] ?? group.low)) / 2;
+    const highMiddle = ((keys[cut ?? 0] ?? group.high) + group.high) / 2;
+    // Each hand moves half of the missing distance away from the other hand.
+    const shift = Math.ceil(Math.max(0, apart - (highMiddle - lowMiddle)) / 2);
+    return { left: lowMiddle - shift, right: highMiddle + shift, shift };
+  }
+  if (choice === 'right') {
+    const way = apart > 0 && last.left > middle - apart;
+    return { left: way ? Math.floor(middle - apart) : last.left, right: middle, shift: 0 };
+  }
+  const way = apart > 0 && last.right < middle + apart;
+  return { left: middle, right: way ? Math.ceil(middle + apart) : last.right, shift: 0 };
+}
+
+/**
+ * The shortest time of a move of a hand in the cost of {@link planHands}, in seconds: a move in a
+ * shorter time costs as much as a move in this time.
+ */
+const PLAN_MIN_GAP = 0.02;
+
+/** One way to play the chords up to one chord, in the search of {@link planHands}. */
+interface PlanStep {
+  /** The hand of the last chord. */
+  readonly choice: HandChoice;
+  /** The middles of the two hands after the chord. */
+  readonly places: HandPlaces;
+  /** The start of the last note or move of each hand, in song seconds. */
+  readonly leftAt: number;
+  readonly rightAt: number;
+  /** The sum of the costs up to the chord. */
+  readonly cost: number;
+  /** The index of the step before in the steps of the chord before, or -1 for the first chord. */
+  readonly from: number;
+}
+
+/**
+ * Plans the hand of each chord of a player (design 5.3), as a pianist plans which hand takes which
+ * notes. A chord wider than one octave with a cut ({@link wideChordCut}) goes to both hands. A
+ * chord within one octave goes to either hand that reaches it. A dynamic program finds the hands
+ * of the lowest cost: for each move of a palm, the square of its distance in semitones over its
+ * time. Thus a fast move costs more than a slow one, as its speed is higher, and a move of a hand
+ * out of the way of the other hand counts too. The search keeps the best way to play the chords
+ * up to each chord for each hand of the chord. At the same cost, a chord goes to the nearer hand,
+ * and at the same distance to the right hand from middle C up, and to the left hand below.
+ *
+ * @param chords The chords of the player, sorted by start.
+ * @param reach The highest key of the left hand and the lowest key of the right hand.
+ * @param apart The least distance between the middles of the two hands, or 0 for no limit.
+ * @returns The hand of each chord.
+ */
+function planHands(chords: readonly SplitChord[], reach: HandReach, apart: number): HandChoice[] {
+  const steps: PlanStep[][] = [];
+  let before: readonly PlanStep[] = [
+    {
+      choice: 'both',
+      places: { left: HAND_MOTION.startKeys[0], right: HAND_MOTION.startKeys[1] },
+      leftAt: -Infinity,
+      rightAt: -Infinity,
+      cost: 0,
+      from: -1,
+    },
+  ];
+  for (const chord of chords) {
+    const { group } = chord;
+    const middle = (group.low + group.high) / 2;
+    const options: HandChoice[] = [];
+    if (chord.cut !== null) {
+      options.push('both');
+    } else {
+      if (group.high <= reach.leftHighest || group.low < reach.rightLowest) {
+        options.push('left');
+      }
+      if (group.low >= reach.rightLowest) {
+        options.push('right');
+      }
+    }
+    const now: PlanStep[] = [];
+    for (const choice of options) {
+      let best: PlanStep | null = null;
+      for (const [from, step] of before.entries()) {
+        const places = placeHands(chord, choice, step.places, apart);
+        const travel = (a: number, b: number, at: number): number =>
+          (a - b) ** 2 / Math.max(PLAN_MIN_GAP, group.start - at);
+        // The nearer hand and the side of middle C break a tie.
+        const near = choice === 'left' ? middle - step.places.left : step.places.right - middle;
+        const side = (choice === 'left') === middle >= 60 ? 1e-9 : 0;
+        const cost =
+          step.cost +
+          travel(places.left, step.places.left, step.leftAt) +
+          travel(places.right, step.places.right, step.rightAt) +
+          1e-6 * Math.abs(near) +
+          side;
+        if (!best || cost < best.cost) {
+          const moved = (a: number, b: number, at: number): number => (a === b ? at : group.start);
+          best = {
+            choice,
+            places,
+            leftAt:
+              choice === 'right' ? moved(places.left, step.places.left, step.leftAt) : group.start,
+            rightAt:
+              choice === 'left'
+                ? moved(places.right, step.places.right, step.rightAt)
+                : group.start,
+            cost,
+            from,
+          };
+        }
+      }
+      if (best) {
+        now.push(best);
+      }
+    }
+    steps.push(now);
+    before = now;
+  }
+
+  // Follow the best steps back from the last chord.
+  const choices: HandChoice[] = Array.from({ length: chords.length }, () => 'right');
+  let at = before.reduce((b, s, i) => ((before[b]?.cost ?? Infinity) <= s.cost ? b : i), 0);
+  for (let i = chords.length - 1; i >= 0; i--) {
+    const step = steps[i]?.[at];
+    if (!step) {
+      break;
+    }
+    choices[i] = step.choice;
+    at = step.from;
+  }
+  return choices;
 }
 
 /**

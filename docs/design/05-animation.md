@@ -491,10 +491,15 @@ The rest of each family:
 
 **Piano** (`pose/hands.ts`, `pose/piano-keys.ts`, piano):
 
-- The left hand plays low notes and the right hand high notes. A narrow chord goes to the nearer
-  hand, so a melody stays in one hand (`HANDS_HOLDS`, `splitHands()`). Each paw plays only to a few keys past
-  the middle of the keys (`reach`), because a paw that crosses further puts its elbow in front of
-  the round chest.
+- The left hand plays low notes and the right hand high notes (`HANDS_HOLDS`, `splitHands()`).
+  Each paw plays only to a few keys past the middle of the keys (`reach`), because a paw that
+  crosses further puts its elbow in front of the round chest.
+- A plan of the whole piece gives each narrow chord to a paw (`planHands()`), as a pianist plans
+  which hand takes which notes. A dynamic program finds the paws of the least cost, in which each
+  move of a palm costs the square of its distance over its time, so a fast move costs more. A
+  move out of the way of the other paw counts too. Thus a melody stays in one paw. Reason: a
+  chord that went to the nearer paw after a move out of the way made both paws jump at the next
+  chord, up to 6.5 m/s (`bach-bwv1050`).
 - The wide paws keep apart (`apart`). When the two parts of a wide chord, such as a bass and a
   melody, come nearer, each part asks its palm to stand a few keys away from it
   (`HandNote.shift`). Thus the two parts stay in two paws, and one paw does not jump between them.
