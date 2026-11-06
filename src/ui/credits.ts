@@ -44,7 +44,7 @@ export class Credits {
     const name = createElement('p', 'credits-author');
     name.append(newTabLink(AUTHOR_LINK.text, AUTHOR_LINK.href));
     card.append(
-      createElement('p', 'credits-app', 'Zoophony'),
+      createElement('p', 'credits-app', 'Pawchestra'),
       createElement('p', 'credits-role', AUTHOR_TEXT),
       name,
     );

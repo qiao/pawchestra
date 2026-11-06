@@ -1,6 +1,6 @@
 # Fraunces wordmark
 
-The logo shows the name "Zoophony" in the font Fraunces, as one SVG path (design 2.8).
+The logo shows the name "Pawchestra" in the font Fraunces, as one SVG path (design 2.8).
 `WORDMARK_PATH` in `src/ui/icons.ts` and the load state of `index.html` hold the path. The app loads no font file.
 
 `fraunces.ttf` in this folder is the source file with no change. Only `pnpm share-image` reads it,

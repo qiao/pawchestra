@@ -10,13 +10,13 @@ import { pageTitle } from './page-title.ts';
 describe('pageTitle (design 2.8, audit 2026-10-05-ux-design, CP1)', () => {
   it('names the demo and its composer', () => {
     expect(pageTitle(DEMOS['beethoven-9'], true)).toBe(
-      `${DEMOS['beethoven-9'].title}, Ludwig van Beethoven · Zoophony`,
+      `${DEMOS['beethoven-9'].title}, Ludwig van Beethoven · Pawchestra`,
     );
   });
 
   it('names a file of the user with no file name', () => {
-    expect(pageTitle(fileTitle('Bolero', 'ravel.mid'), false)).toBe('Bolero · Zoophony');
-    expect(pageTitle(fileTitle('', 'drums-only.mid'), false)).toBe('drums-only · Zoophony');
+    expect(pageTitle(fileTitle('Bolero', 'ravel.mid'), false)).toBe('Bolero · Pawchestra');
+    expect(pageTitle(fileTitle('', 'drums-only.mid'), false)).toBe('drums-only · Pawchestra');
   });
 });
 

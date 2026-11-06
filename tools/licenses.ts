@@ -51,7 +51,7 @@ export function licenseDocument(entries: readonly LicenseEntry[]): string {
       '\n',
     ),
   );
-  const header = 'Zoophony includes the third-party software and data below, under these licenses.';
+  const header = 'Pawchestra includes the third-party software and data below, under these licenses.';
   return `${[header, ...sections].join('\n\n')}\n`;
 }
 

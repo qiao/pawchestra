@@ -30,7 +30,7 @@ The UI has the style of a video player. The theme is dark only, because the scen
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ Logo (paw, Zoophony)                                 ┌─────────────────┐ │
+│ Logo (paw, Pawchestra)                               ┌─────────────────┐ │
 │ Title of the piece                                   │ Drawer:         │ │
 │ Composer                                             │                 │ │
 │                                                      │  Music          │ │
@@ -237,7 +237,7 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 The modules of `ui/` and `app/` hold the sizes, the places, and the motions. Each motion is
 instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over the scene.
 
-- **Title**: the logo (a gold paw and the wordmark "Zoophony" in Fraunces, one SVG path
+- **Title**: the logo (a gold paw and the wordmark "Pawchestra" in Fraunces, one SVG path
   `WORDMARK_PATH`, so no font file loads), the piece title, and the composer. The wordmark is the
   `h1` of the page, with the name as its accessible name, because the page is the app. The piece
   title is an `h2`. A gray pill with the
@@ -304,12 +304,12 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   or the focus (`followMessage()`). A new message or a new piece replaces it. The failure texts
   end with "Check the connection.", because the button "Try again" stands next to them.
 - **Build cover**: the canvas fades out before a build and in after the first render.
-- **Page title**: "{title}, {composer} · Zoophony" for a demo, and "{title} · Zoophony" for a
+- **Page title**: "{title}, {composer} · Pawchestra" for a demo, and "{title} · Pawchestra" for a
   file (`pageTitle()`). The default demo keeps the title of the start page (7.4).
 - **Tooltips** name the action and its key: "Play (Space)", "Pause (Space)", "Play again (Space)",
   "Seek (← →, Home)", "Mute (M)", "Volume (↑ ↓)", "Cinematic camera (C)", "Full screen (F)",
   "Exit full screen (F)", and "Speed", "Reset view", and "Open the drawer" with no key. The link
-  to GitHub shows "Zoophony on GitHub". The tooltips keep their keys, although the mockup shows
+  to GitHub shows "Pawchestra on GitHub". The tooltips keep their keys, although the mockup shows
   only the names, because they are the only visible hint of the keys. A tooltip follows WCAG
   1.4.13, and never shows for a touch. A bar that hides hides only the tooltips of its own
   controls, so the tooltip of the link to GitHub stays while the link has the focus. A screen
@@ -362,7 +362,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | More than 4 MB | This file is larger than 4 MB. Select a smaller file. |
 | No notes | This MIDI file has no notes. |
 | No WebGL2 (a full-page message) | This browser cannot show the orchestra, because it does not support WebGL2. Use a current version of Chrome, Firefox, or Safari. |
-| Above the full-page message: the name (24 px) and one line about the app (16 px, dim) | Zoophony / An orchestra of animals plays your MIDI file. |
+| Above the full-page message: the name (24 px) and one line about the app (16 px, dim) | Pawchestra / An orchestra of animals plays your MIDI file. |
 | Demo file failure (with a "Try again" button) | The demo did not load. Check the connection. |
 | Load failure (with a "Try again" button) | The instruments did not load. Check the connection. |
 | Audio failure after the load, for example during play (with a "Try again" button) | An error stopped the music. Try again. |
@@ -372,7 +372,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Load progress after a long load, when the sizes are known (megabytes of 1,000,000 bytes, one decimal) | Loading instruments: {done} of {total} ({arrived} of {sum} MB) |
 | Second line of the load text while the piece waits for its samples | The music starts after the load. |
 | Drop overlay | Drop the MIDI file to play it. |
-| First screen, until the first play of the session | Zoophony: an orchestra of animals plays your MIDI file. |
+| First screen, until the first play of the session | Pawchestra: an orchestra of animals plays your MIDI file. |
 | First screen, the button that opens the demo list | Select music |
 
 **Accessibility**

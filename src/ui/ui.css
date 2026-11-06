@@ -187,7 +187,7 @@ svg {
   transition: opacity 0.15s linear;
 }
 
-/* The logo of the mockup above the piece title: the gold paw and "Zoophony" (design 2.8). Its
+/* The logo of the mockup above the piece title: the gold paw and "Pawchestra" (design 2.8). Its
    bottom gap puts the top of the title at about 72 px, as in the mockup. It is no control. */
 .title .logo {
   display: flex;
@@ -208,10 +208,10 @@ svg {
   stroke: none;
 }
 
-/* The flex line centers the box of the wordmark, which holds the tails of the "p" and the "y", so
-   with no lift the paw and the GitHub mark sit 2 px under the capitals, and the paw hangs under
-   the baseline. The paw moves up, so it stands on the baseline and reaches the height of the
-   capitals. */
+/* The flex line centers the box of the wordmark, which holds the depth of the tails of a "p" and
+   a "y" (`tools/wordmark.ts`), so with no lift the paw and the GitHub mark sit 2 px under the
+   capitals, and the paw hangs under the baseline. The paw moves up, so it stands on the baseline
+   and reaches the height of the capitals. */
 .title .logo > svg:first-child {
   translate: 0 var(--logo-lift);
 }

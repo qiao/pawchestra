@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 /** The limits of the first paint of the page (design 2.8, `index.html`). */
 const FIRST_PAINT = {
   /**
-   * The largest share of white pixels: pixels with each channel above 200. The title "Zoophony"
+   * The largest share of white pixels: pixels with each channel above 200. The title "Pawchestra"
    * in `--text` has a few. A page with no styles is white in full.
    */
   whiteShare: 0.02,

@@ -70,7 +70,7 @@ test.describe('the load state on a slow network (audit 2026-10-05-ux-design, LD2
     await page.goto('./', { waitUntil: 'commit' });
     // The logo stands where the logo of the app stands, so the first paint does not jump. The
     // wordmark is an SVG path, and the name is the accessible name of the heading (design 2.8).
-    await expect(page.getByRole('heading', { level: 1, name: 'Zoophony' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Pawchestra' })).toBeVisible();
     await expect(page.locator('.first-screen .status')).toHaveText(LOADING_TEXT);
     release();
     await expect(page.locator('.boot')).toHaveCount(0);
@@ -340,7 +340,7 @@ test('the title of the page names the demo (audit 2026-10-05-ux-design, CP1)', a
   await page.goto('./#demo=beethoven-9');
   await page.waitForSelector('#stage[data-demo="beethoven-9"]');
   const demo = DEMOS['beethoven-9'];
-  await expect(page).toHaveTitle(`${demo.title}, ${demo.composer} · Zoophony`);
+  await expect(page).toHaveTitle(`${demo.title}, ${demo.composer} · Pawchestra`);
 });
 
 test('a demo switch fades the stage out and in (audit 2026-10-05-ux-design, PF1)', async ({
@@ -375,7 +375,7 @@ test.describe('the page with no WebGL2 (audit 2026-10-05-ux-design, LE5)', () =>
         };`,
     });
     await page.goto('./');
-    await expect(page.getByRole('heading', { name: 'Zoophony' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pawchestra' })).toBeVisible();
     await expect(page.getByText(ABOUT_TEXT)).toBeVisible();
     await expect(page.getByText(NO_WEBGL2_TEXT)).toBeVisible();
   });

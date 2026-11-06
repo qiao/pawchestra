@@ -5,7 +5,7 @@ import { LINE_MARGIN, LOGO_BACKDROP_LIMIT, TEXT_BACKDROP_LIMIT } from './title-s
 import type { TitleLine } from './title-shade.ts';
 
 /**
- * Creates the logo (design 2.8): the gold paw and the wordmark "Zoophony". It is plain content, no
+ * Creates the logo (design 2.8): the gold paw and the wordmark "Pawchestra". It is plain content, no
  * control. The wordmark is the heading of the page (`h1`), with the name of the app as its
  * accessible name. A screen reader reads the name and skips the paw.
  *

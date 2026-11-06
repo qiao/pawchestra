@@ -579,7 +579,7 @@ async function checkPlayback(c: Checker, page: Page, place: string): Promise<voi
  */
 async function checkRepositoryLink(c: Checker, page: Page): Promise<void> {
   await page.context().route(REPOSITORY_URL, async (route) => {
-    await route.fulfill({ contentType: 'text/plain', body: 'Zoophony' });
+    await route.fulfill({ contentType: 'text/plain', body: 'Pawchestra' });
   });
   const tabs = await c.tabTo(named(REPOSITORY_NAME));
   const [tab] = await Promise.all([

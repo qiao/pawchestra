@@ -44,7 +44,7 @@ export interface PieceCredit {
 export const AUTHOR_TEXT = 'Created by';
 
 /**
- * The author of Zoophony, on the title card of the credits dialog (design 2.8). The link goes to
+ * The author of Pawchestra, on the title card of the credits dialog (design 2.8). The link goes to
  * the owner of `REPOSITORY_URL`.
  */
 export const AUTHOR_LINK: CreditLink = {

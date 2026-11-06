@@ -23,7 +23,7 @@ apply in addition to the license:
   combine it with other words or design elements.
 
 Thus the page shows the mark in the neutral gray `--github-mark` (`#c8c8c8`), and white on a
-hover, at its own proportions. A gap separates it from the name "Zoophony", so it is a link of
+hover, at its own proportions. A gap separates it from the name "Pawchestra", so it is a link of
 its own and no part of the logo of the app.
 
 ## Third-party license file

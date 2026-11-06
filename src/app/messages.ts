@@ -15,7 +15,7 @@ export const PLAY_FAILURE_TEXT = 'An error stopped the music. Try again.';
 
 /**
  * The line about the app above the full-page message of a browser with no WebGL2, below the name
- * "Zoophony" (design 2.8).
+ * "Pawchestra" (design 2.8).
  */
 export const ABOUT_TEXT = 'An orchestra of animals plays your MIDI file.';
 

@@ -2,7 +2,7 @@ import { DEFAULT_DEMO, DEMOS } from './demos.ts';
 import type { TitleLines } from './file-rules.ts';
 
 /** The name of the app, at the end of the title of the page (design 2.8). */
-export const APP_NAME = 'Zoophony';
+export const APP_NAME = 'Pawchestra';
 
 /**
  * The URL of the start page on the main host (design 7.4). Each build names it as the canonical
@@ -33,7 +33,7 @@ export const SHARE_IMAGE: ShareImage = {
   path: 'share.jpg',
   width: 1200,
   height: 630,
-  alt: 'The Zoophony logo and the line "A web-based MIDI player with an animal orchestra." above an orchestra of animals on a wooden stage. A bear conducts them, and the view is from above and behind the bear.',
+  alt: 'The Pawchestra logo and the line "A web-based MIDI player with an animal orchestra." above an orchestra of animals on a wooden stage. A bear conducts them, and the view is from above and behind the bear.',
 };
 
 /** The description of the start page for search results and shares, at most 155 characters. */
@@ -44,7 +44,7 @@ export const SITE_DESCRIPTION =
 export const REPOSITORY_URL = 'https://github.com/qiao/zoophony';
 
 /** The accessible name and the tooltip of the link to the repository (design 2.8). */
-export const REPOSITORY_LABEL = 'Zoophony on GitHub';
+export const REPOSITORY_LABEL = 'Pawchestra on GitHub';
 
 /**
  * The visible text of the link to the repository, in its pill after the logo (design 2.8). The
@@ -61,7 +61,7 @@ export const REPOSITORY_TEXT = 'Open source';
  * @param lines The title lines of the piece.
  * @param demo True for a demo, whose second line is the composer. The second line of a file of
  *   the user is its file name, which the title leaves out.
- * @returns For example "Ode to Joy, Ludwig van Beethoven · Zoophony".
+ * @returns For example "Ode to Joy, Ludwig van Beethoven · Pawchestra".
  */
 export function pageTitle(lines: TitleLines, demo: boolean): string {
   const start = DEMOS[DEFAULT_DEMO];

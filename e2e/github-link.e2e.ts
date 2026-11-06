@@ -13,7 +13,7 @@ test.describe('the link to GitHub after the logo (design 2.8)', () => {
     const github: string[] = [];
     await context.route(/^https:\/\/([\w-]+\.)?github(usercontent)?\.com\//u, async (route) => {
       github.push(route.request().url());
-      await route.fulfill({ contentType: 'text/plain', body: 'Zoophony' });
+      await route.fulfill({ contentType: 'text/plain', body: 'Pawchestra' });
     });
     await page.goto('./');
     await page.waitForSelector('#stage[data-demo]');

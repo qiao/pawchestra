@@ -132,7 +132,7 @@ describe('the play button of the first screen (design 2.2, audit 2026-10-05-ux-d
 
 describe('the intro of the first screen (audit 2026-10-05-ux-design, FI2)', () => {
   it('names the app until the first play of the session', () => {
-    expect(INTRO_TEXT.startsWith('Zoophony: ')).toBe(true);
+    expect(INTRO_TEXT.startsWith('Pawchestra: ')).toBe(true);
     expect(firstScreenView(READY, null, true, false).intro).toBe(true);
     expect(firstScreenView(noPieceStatus(false, false), null, false, false).intro).toBe(true);
     // A new piece after the first play shows the first screen with no intro.
