@@ -448,7 +448,8 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
-No body of the app has a hand rig: each body comes from `rig-mesh`. The hand rigs of the cat and
+The polar bear has the one hand rig of the app (`assets/models/polar-bear/polar-bear.blend`), from
+a Tripo retopology of its mesh. Each other body comes from `rig-mesh`. The hand rigs of the cat and
 the rabbit are trials that the app does not use. Reason: they gave a thin, faceted arm root and
 other faults, so the cat and the rabbit keep the A-pose bodies that production shows. A trial
 keeps its `.blend`, its export, and its summary in `assets/models/<s>/hand-rig/`, so that no tool
@@ -608,9 +609,14 @@ its rest is the bind.
   drop then spreads over several faces, and the ball keeps its round form.
 - The polar bear is the largest player, as a real polar bear is larger than the other animals of
   the cast. The piano does not grow with it, because a larger piano hides the players behind it.
-- The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), with vertical
-  shins and flat feet, as a real pianist sits. Its legs keep the length of the mesh, so the body
-  keeps the part ratios of the mesh. The deer sits on the stool of the harp.
+- The polar bear sits on a taller bench that fits its haunch and legs (`benchFitOf()`), as a real
+  pianist sits on a higher bench: the thighs slope down from the hips to the knees, the knees
+  open past 90°, the shins lean a little forward, and the feet stand flat. Its legs keep the
+  length of the mesh, so the body keeps the part ratios of the mesh, and only the slope of the
+  thighs sets the height of the bench. Reason: on a low bench with level thighs, the large bear
+  hangs its haunch over a small stool and looks as if it squats. A higher bench also puts the
+  shoulders higher over the keys, so the arms reach further down to them. The deer sits on the
+  stool of the harp.
 - The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
   of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
