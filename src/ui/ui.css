@@ -23,6 +23,14 @@
   --pill-line: rgba(255, 240, 220, 0.24);
   /* The dark color of an icon or a text on --accent. */
   --on-accent: #1a140d;
+  /* The frosted glass of the bar and the drawer, as the controls of a film player (design 2.8):
+     a blur with more color of the stage behind it, a faint light at the top, and a thin warm
+     hairline along the top edge. */
+  --glass-blur: blur(18px) saturate(1.35);
+  --glass-sheen: linear-gradient(to bottom, rgba(255, 240, 220, 0.05), rgba(255, 240, 220, 0) 60%);
+  --hairline: rgba(231, 180, 90, 0.24);
+  /* The soft warm glow around a control of the bar under the pointer. */
+  --glow: rgba(231, 180, 90, 0.28);
   --radius-panel: 10px;
   /* The radius of the floating panel of the drawer and of the bar. */
   --radius-float: 12px;
@@ -90,7 +98,8 @@ button {
 button {
   transition:
     background-color 0.12s,
-    color 0.12s;
+    color 0.12s,
+    box-shadow 0.12s;
 }
 
 button:hover {
@@ -531,13 +540,22 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
   gap: 4px;
   padding: 0 8px;
   background: var(--bg-overlay);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-image: var(--glass-sheen);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--line);
   border-radius: var(--radius-float);
+  box-shadow:
+    inset 0 1px 0 var(--hairline),
+    0 12px 40px rgba(0, 0, 0, 0.5);
   transition:
     opacity 0.2s,
     transform 0.2s;
+}
+
+/* A control of the bar under the pointer gets a soft warm glow, as a lit key of a film player. */
+.bar button:hover {
+  box-shadow: 0 0 14px var(--glow);
 }
 
 /* The hidden bar keeps its controls in the focus order, so that keyboard focus shows it again.
@@ -592,6 +610,7 @@ body.is-ui-hidden .drawer * {
   border-color: var(--accent-strong);
   background: rgba(231, 180, 90, 0.12);
   color: var(--accent-strong);
+  box-shadow: 0 0 18px var(--glow);
 }
 
 .bar .play svg {
@@ -609,9 +628,13 @@ body.is-ui-hidden .drawer * {
   stroke-width: 1.5;
 }
 
+/* The times of the bar: 12 px tabular figures with a little letter space, as the time code of a
+   film player, so that the digits do not move during play (design 2.8). */
 .time {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
   color: var(--text);
   padding: 0 4px;
 }
@@ -795,11 +818,14 @@ input[type='range']:disabled::-moz-range-thumb {
   bottom: calc(80px + var(--bar-lift));
   width: 340px;
   background: var(--panel-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-image: var(--glass-sheen);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--line);
   border-radius: var(--radius-float);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    inset 0 1px 0 var(--hairline),
+    0 12px 40px rgba(0, 0, 0, 0.5);
   /* The drawer itself does not scroll and does not bounce. The panel of a tab scrolls below the
      tabs, and in the tab "Music" only the demo list scrolls (design 2.8). */
   display: flex;
