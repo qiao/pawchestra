@@ -71,7 +71,7 @@ export const ANIMAL_FLOOR = 1.2;
  * at the bottom edge and over the subject, and the piano case or a head of another player over a
  * large part of the frame (N1 to N3).
  */
-export const FOREGROUND = {
+const FOREGROUND = {
   /**
    * A head of another player is in the foreground when it is nearer to the camera than this part
    * of the distance of the focus of the subject. Then it shows at least 1.3 times larger.

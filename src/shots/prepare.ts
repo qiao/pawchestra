@@ -243,7 +243,7 @@ const BLEND_RULES = {
  * camera films the players near the height of their eyes, as the cameras on the railings of a
  * concert hall do. A lower camera sees more heads in the foreground, so more close shots rise.
  */
-export const CAMERA_LOWER = 0.7;
+const CAMERA_LOWER = 0.7;
 
 /**
  * Gives the elevation of a camera at {@link CAMERA_LOWER} of the height of a nominal elevation
@@ -453,7 +453,7 @@ const DESKTOP_ASPECT = 1.6;
  * view. At 30°, the low wide shots showed the stage in less than half of the width, over a band of
  * the dark floor.
  */
-export const WIDE_FOV =
+const WIDE_FOV =
   (2 * Math.atan((Math.tan((FIELD_OF_VIEW / 2) * DEG) * DESKTOP_ASPECT) / CINEMA_ASPECT)) / DEG;
 
 /**
