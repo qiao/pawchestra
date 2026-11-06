@@ -8,7 +8,7 @@
 #
 # tools/check-cache.ts gives the plan and the key of each commit. The key holds the tree of the
 # commit, the tree of its parent, the check commands, the hash of this script and of the module,
-# the versions of Node and pnpm, ZOOPHONY_BASE, and the hash of the installed lockfile. A commit
+# the versions of Node and pnpm, PAWCHESTRA_BASE, and the hash of the installed lockfile. A commit
 # that changes code runs the lint, the typecheck, the unit tests that its changes reach, and the
 # format check. A commit that changes only docs/ and Markdown files runs the format check and the
 # tests that read docs paths.

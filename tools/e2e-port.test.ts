@@ -14,7 +14,7 @@ describe('e2ePort', () => {
 
   it('throws for a value that is not a free port number', () => {
     for (const value of ['abc', '4182.5', '80', '70000']) {
-      expect(() => e2ePort(value)).toThrow('ZOOPHONY_E2E_PORT');
+      expect(() => e2ePort(value)).toThrow('PAWCHESTRA_E2E_PORT');
     }
   });
 });

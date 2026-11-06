@@ -15,7 +15,7 @@ import { StageScene } from './scene/stage-scene.ts';
 import { showFullPageMessage } from './ui/full-page-message.ts';
 
 /** True in the build of `pnpm deploy:vercel` (`vite.config.ts`, design 2.7). */
-declare const ZOOPHONY_ANALYTICS: boolean;
+declare const PAWCHESTRA_ANALYTICS: boolean;
 
 /**
  * Makes the scene of the stage, or gives `null` for a browser with no WebGL2 (design 2.6). The
@@ -126,7 +126,7 @@ function start(canvas: HTMLCanvasElement, scene: StageScene): void {
 
 // The deploy build counts the page views with Vercel Web Analytics. The script comes from the
 // site itself, at `/_vercel/insights/script.js` (design 2.7).
-if (ZOOPHONY_ANALYTICS) {
+if (PAWCHESTRA_ANALYTICS) {
   inject({ mode: 'production' });
 }
 

@@ -801,7 +801,7 @@ interface PlayerClip {
   source stays on the floor, and a jump stays a jump.
 - **Gallery.** The animals of a clip stand, and the bones of the instrument hide, because a clip
   cannot hold an instrument. The dev and preview servers serve the clip files from a local folder
-  (`ZOOPHONY_CLIPS`, `scratch/clips/` by default), so `dist/` gets no Mixamo file (8.1).
+  (`PAWCHESTRA_CLIPS`, `scratch/clips/` by default), so `dist/` gets no Mixamo file (8.1).
   `pnpm clip-views` shows a clip from the four sides, and measures the floor depth and the depth
   of each arm part in the body.
 - **Models.** `pnpm mixamo-model` reads a Mixamo-rigged mesh, and writes the inputs of

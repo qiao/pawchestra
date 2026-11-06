@@ -412,7 +412,7 @@ async function main(): Promise<void> {
   }
 
   mkdirSync(args.out, { recursive: true });
-  process.env['ZOOPHONY_CLIPS'] = args.clips;
+  process.env['PAWCHESTRA_CLIPS'] = args.clips;
   const server = await createServer({
     root: ROOT,
     logLevel: 'error',

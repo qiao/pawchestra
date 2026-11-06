@@ -30,7 +30,7 @@
 # The end-to-end tests fail on a busy machine (a load average above about 30),
 # and main fails in the same way. Before each run of these tests, the script waits
 # until the 1-minute load average is at most MERGE_E2E_MAX_LOAD (default 20) and
-# the test port (ZOOPHONY_E2E_PORT, default 4182) is free, for MERGE_E2E_WAIT
+# the test port (PAWCHESTRA_E2E_PORT, default 4182) is free, for MERGE_E2E_WAIT
 # seconds at most (default 900). It prints the cause of each wait. After a failure,
 # the tests run one more time. A second failure stops the script. MERGE_E2E_CMD
 # replaces the test command (for a test of this script).
@@ -91,7 +91,7 @@ E2E_MAX_LOAD=${MERGE_E2E_MAX_LOAD:-20}
 E2E_WAIT=${MERGE_E2E_WAIT:-900}
 E2E_CMD=${MERGE_E2E_CMD:-pnpm -s test:e2e --project=chromium}
 # The port of `vite preview` in playwright.config.ts. A second test run on the same port fails.
-E2E_PORT=${ZOOPHONY_E2E_PORT:-4182}
+E2E_PORT=${PAWCHESTRA_E2E_PORT:-4182}
 
 # Prints the 1-minute load average (Linux: /proc/loadavg, macOS: sysctl).
 load_average() {

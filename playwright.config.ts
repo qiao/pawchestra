@@ -4,16 +4,16 @@ import { chromiumArgs } from './tools/chromium-args.ts';
 import { e2ePort } from './tools/e2e-port.ts';
 
 /**
- * The port of `vite preview` for the Playwright tests: `ZOOPHONY_E2E_PORT`, or 4182. Ports 4179 to
- * 4181, and 4300 and above for `pnpm close-views`, are for the tools.
+ * The port of `vite preview` for the Playwright tests: `PAWCHESTRA_E2E_PORT`, or 4182. Ports 4179
+ * to 4181, and 4300 and above for `pnpm close-views`, are for the tools.
  */
-const PORT = e2ePort(process.env['ZOOPHONY_E2E_PORT']);
+const PORT = e2ePort(process.env['PAWCHESTRA_E2E_PORT']);
 
 /**
- * The URL of the built site. With `ZOOPHONY_BASE`, the build and `vite preview` use that base path
- * (design 9.2).
+ * The URL of the built site. With `PAWCHESTRA_BASE`, the build and `vite preview` use that base
+ * path (design 9.2).
  */
-const SITE = `http://localhost:${PORT}${process.env['ZOOPHONY_BASE'] ?? '/'}`;
+const SITE = `http://localhost:${PORT}${process.env['PAWCHESTRA_BASE'] ?? '/'}`;
 
 /**
  * The Playwright tests run on the built site in `dist/`, so that CI tests what it deploys (design

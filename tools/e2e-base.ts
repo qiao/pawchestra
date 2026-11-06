@@ -45,7 +45,7 @@ pass on the base. A failure of the tree that the base skips or does not have is 
   -- <args>    The arguments of "playwright test", such as test files or --grep <text>.
   --help       Show this text.
 
-Each run uses the port of ZOOPHONY_E2E_PORT, or a free port of the system. The runs go one
+Each run uses the port of PAWCHESTRA_E2E_PORT, or a free port of the system. The runs go one
 after the other, because two runs at the same time give more timeouts on a loaded machine.
 
 The whole output of each run (the build and the tests) goes into a log file in
@@ -345,7 +345,7 @@ function freePort(): Promise<number> {
  * @param command The command and its arguments.
  * @param cwd The folder.
  * @param log The log file.
- * @param env The variables of the command, such as `ZOOPHONY_E2E_PORT=4391`.
+ * @param env The variables of the command, such as `PAWCHESTRA_E2E_PORT=4391`.
  * @returns A promise of the exit code, or `null` when a signal ended the command.
  */
 async function runLogged(
@@ -390,7 +390,7 @@ async function runTests(
     [...command, '--reporter=list,json', ...testArgs],
     root,
     files.log,
-    [`ZOOPHONY_E2E_PORT=${port}`, `PLAYWRIGHT_JSON_OUTPUT_FILE=${files.json}`],
+    [`PAWCHESTRA_E2E_PORT=${port}`, `PLAYWRIGHT_JSON_OUTPUT_FILE=${files.json}`],
   );
   if (!existsSync(files.json)) {
     throw new Error(`The tests wrote no report (exit code ${status}). Log: ${files.log}`);
@@ -473,7 +473,7 @@ async function main(): Promise<void> {
   // The ref must exist before the long run of the tree.
   shortHash(args.ref);
 
-  const set = process.env['ZOOPHONY_E2E_PORT'];
+  const set = process.env['PAWCHESTRA_E2E_PORT'];
   const port = set ? e2ePort(set) : await freePort();
   const out = join(ROOT, 'scratch', 'e2e-base');
   mkdirSync(out, { recursive: true });

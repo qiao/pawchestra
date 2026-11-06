@@ -66,17 +66,17 @@ const ALL_TESTS_PAUSED: boolean = true;
 const PAUSED_FILES = ALL_TESTS_PAUSED ? ['**/*.test.ts'] : PAUSED_TESTS;
 
 /**
- * The base path of the site. `ZOOPHONY_BASE` sets it for the build and for `vite preview` (design
+ * The base path of the site. `PAWCHESTRA_BASE` sets it for the build and for `vite preview` (design
  * 9.2). Without it, the site is at `/`.
  */
-const BASE = process.env['ZOOPHONY_BASE'] ?? '/';
+const BASE = process.env['PAWCHESTRA_BASE'] ?? '/';
 
 /**
- * True in the build of `pnpm deploy:vercel`, which sets `ZOOPHONY_ANALYTICS=1`. Only that build
+ * True in the build of `pnpm deploy:vercel`, which sets `PAWCHESTRA_ANALYTICS=1`. Only that build
  * loads Vercel Web Analytics (design 2.7), so that the local servers of the probes get no request
  * for its script.
  */
-const ANALYTICS = process.env['ZOOPHONY_ANALYTICS'] === '1';
+const ANALYTICS = process.env['PAWCHESTRA_ANALYTICS'] === '1';
 
 /**
  * The plugin that gives the production build an empty module in place of the look override of
@@ -252,15 +252,15 @@ const DEV_LICENSES: Plugin = {
 
 /**
  * Makes the handler that serves the local clip files at `clips/<name>.glb` (design 4.4, 8.1). The
- * folder is `ZOOPHONY_CLIPS`, or `scratch/clips/` of the root. Git ignores `scratch/`, so a Mixamo
- * file there stays out of git. A name holds only letters, digits, `.`, `_`, and `-`.
+ * folder is `PAWCHESTRA_CLIPS`, or `scratch/clips/` of the root. Git ignores `scratch/`, so a
+ * Mixamo file there stays out of git. A name holds only letters, digits, `.`, `_`, and `-`.
  *
  * @param base The base path of the site.
  * @param root The root of the project.
  * @returns The handler of the server.
  */
 function clipFiles(base: string, root: string): Connect.NextHandleFunction {
-  const dir = process.env['ZOOPHONY_CLIPS'] ?? resolve(root, 'scratch', 'clips');
+  const dir = process.env['PAWCHESTRA_CLIPS'] ?? resolve(root, 'scratch', 'clips');
   return (request, response, next) => {
     const match = /^clips\/([\w.-]+\.glb)$/u.exec(
       (request.url ?? '').split('?')[0]?.slice(base.length) ?? '',
@@ -300,7 +300,7 @@ const LOCAL_CLIPS: Plugin = {
 export default defineConfig({
   base: BASE,
   // `src/main.ts` reads the constant. A build with no analytics drops the code of the package.
-  define: { ZOOPHONY_ANALYTICS: JSON.stringify(ANALYTICS) },
+  define: { PAWCHESTRA_ANALYTICS: JSON.stringify(ANALYTICS) },
   plugins: [
     DEV_LOOK_OVERRIDE,
     INDEX_VALUES,

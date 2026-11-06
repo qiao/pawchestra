@@ -179,7 +179,7 @@ and no service worker. The owner of the project needs the number of visits, and 
 gives it with no cookie and no identifier that follows a visitor to other sites.
 
 - Only the build of `pnpm deploy:vercel` loads the analytics. The script sets
-  `ZOOPHONY_ANALYTICS=1`, and `vite.config.ts` gives the constant `ZOOPHONY_ANALYTICS` to
+  `PAWCHESTRA_ANALYTICS=1`, and `vite.config.ts` gives the constant `PAWCHESTRA_ANALYTICS` to
   `src/main.ts`. The dev server and the local builds load no analytics. Thus the local probes get
   no request for a missing script, and the dev server sends no request to a host of Vercel.
 - `inject()` loads `/_vercel/insights/script.js` from the site itself, and the script sends the

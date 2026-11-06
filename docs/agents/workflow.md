@@ -83,7 +83,7 @@ worktree only when another agent works on the repository at the same time. Then 
 
 In both cases:
 
-- Run `pnpm test:e2e e2e/smoke.e2e.ts --project=chromium` with `ZOOPHONY_E2E_PORT` set to a free
+- Run `pnpm test:e2e e2e/smoke.e2e.ts --project=chromium` with `PAWCHESTRA_E2E_PORT` set to a free
   port, because the merge script and other agents use port 4182. A change of `src/ui/` runs
   `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
   tree that pass on the base. It runs Firefox and WebKit too only when it changes code that one

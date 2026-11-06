@@ -3,9 +3,10 @@
 #
 # Builds the site at the base path `/`, and deploys `dist/` with the cache headers of `vercel.json`
 # to the Vercel project `zoophony` (design 9.2). Only this build counts the page views with Vercel
-# Web Analytics (`ZOOPHONY_ANALYTICS=1`, design 2.7). The script copies `dist/` and `vercel.json` into a
-# temporary folder that has the name of the project, so that Vercel serves the files as they are
-# and runs no build. The Vercel CLI must be logged in. VERCEL_SCOPE selects a team.
+# Web Analytics (`PAWCHESTRA_ANALYTICS=1`, design 2.7). The script copies `dist/` and
+# `vercel.json` into a temporary folder that has the name of the project, so that Vercel serves
+# the files as they are and runs no build. The Vercel CLI must be logged in. VERCEL_SCOPE selects
+# a team.
 #
 # Without --preview, the deploy goes to production.
 set -euo pipefail
@@ -21,7 +22,7 @@ if [[ -n "${VERCEL_SCOPE:-}" ]]; then
 fi
 
 cd "$root"
-ZOOPHONY_BASE=/ ZOOPHONY_ANALYTICS=1 pnpm build
+PAWCHESTRA_BASE=/ PAWCHESTRA_ANALYTICS=1 pnpm build
 
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT

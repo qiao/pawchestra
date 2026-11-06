@@ -30,7 +30,7 @@ interface RunParts {
   readonly node: string;
   /** The version of pnpm. */
   readonly pnpm: string;
-  /** The value of `ZOOPHONY_BASE`, the base path of the site, or empty when it is not set. */
+  /** The value of `PAWCHESTRA_BASE`, the base path of the site, or empty when it is not set. */
   readonly siteBase: string;
   /** The SHA-256 of the lockfile that `pnpm install` used, or "none" with no install. */
   readonly modulesHash: string;
@@ -297,7 +297,7 @@ function main(args: readonly string[]): void {
     scriptHash: scriptHashOf(),
     node: `${process.version} ${process.platform}-${process.arch}`,
     pnpm: execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim(),
-    siteBase: process.env['ZOOPHONY_BASE'] ?? '',
+    siteBase: process.env['PAWCHESTRA_BASE'] ?? '',
     modulesHash: modulesHashOf(),
   };
   const lines: string[] = [];

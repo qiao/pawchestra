@@ -37,7 +37,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm install` | Installs the dependencies. |
 | `pnpm prepare-site` | Writes the SF3 presets into `public/sf/` and the changed demos into `public/demos/` (design 8.3). `pnpm dev`, `build`, `smoke`, `frame`, and `frozen` run it first. |
 | `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html` (design 7.1), and a demo at `/#demo=<id>`. |
-| `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). `ZOOPHONY_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
+| `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). `PAWCHESTRA_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
 | `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). `--base` also builds the commit, and prints the difference. |
 | `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `zoophony` (design 9.2). Code: `tools/deploy-vercel.sh`. About 2 minutes. |
 | `pnpm load-probe [--phone] [--repeat] [--base <ref>]` | Measures the load of the default demo after `pnpm build`: FCP, LCP, the first frame, the time until play is ready, and the bytes. About 10 s. |
@@ -139,7 +139,7 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | `pnpm test` | Runs the Vitest project `unit` (design 9.3). During the pause, it runs no test. |
 | `pnpm test:paused [--base <ref>] [<path>]...` | Runs the paused tests, or only the file of each path. `--base <ref>` prints only the failures of the working tree. |
 | `pnpm test:perf` | Runs the speed tests (`*-speed.test.ts`) one file at a time. |
-| `pnpm test:e2e [--project=chromium]` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site. Set `ZOOPHONY_E2E_PORT` to a free port (4182 by default). |
+| `pnpm test:e2e [--project=chromium]` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site. Set `PAWCHESTRA_E2E_PORT` to a free port (4182 by default). |
 | `pnpm e2e-base <ref> [--no-cache] [-- <args of playwright test>]` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. About 1.5 minutes. |
 | `pnpm smoke` | Runs the smoke test on the Vite dev server: the bow arm of a violin and the camera modes. |
 | `pnpm frame [--demo=<id>] [--free] [--gpu-only] [--keep=<dir>]` | Measures the frame target of design 9.7 in Google Chrome with a Metal System Trace. About 3 minutes. Code: `tools/measure-frame.ts`. |
