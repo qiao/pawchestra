@@ -131,11 +131,6 @@ export class Drawer {
     return this.#hovered && this.open;
   }
 
-  /** The current tab, or `null` before the first tab. */
-  get tab(): DrawerTab | null {
-    return this.#current;
-  }
-
   /**
    * Adds a tab and its panel at the end of the drawer. The first tab is the current tab.
    *
