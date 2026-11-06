@@ -1290,9 +1290,9 @@ pedal harp (`docs/reference/harp-technique.md`):
   foot of the soundbox stands near the foot of the column (`HARP.soundbox`), so that the long bass
   strings can start low.
 - **Pluck points.** `harpStringPosition()` gives the pluck point of the string of the key: the
-  share `PLUCK.share` of a length from the soundboard up to the line `PLUCK.top`. The hold of the
-  deer fits these points, so they stay when the neck changes. `PLUCK.top` lies a little below
-  the bottom of the neck over the bass strings and over the hump.
+  share `PLUCK.share` of the string from the soundboard up to the bottom of the neck, as harpists
+  pluck at one third to two fifths of the string (harp 7.3). Thus the bass strings are plucked
+  low, and the treble strings near the top of the soundbox.
 - **Swing.** A plucked string swings (5.3), and the scene draws it as a camera with a long
   shutter sees it: the envelope of the swing, as a translucent band (`scene/harp-strings.ts`).
   A sampled swing flickers at each frame rate, and the envelope stays steady. Each string line

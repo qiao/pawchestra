@@ -288,21 +288,15 @@ const STRINGS = {
 } as const;
 
 /**
- * The pluck point of each string (design 4.6): a share of the length from the top of the center
- * strip of the soundboard up to the line `top`. The hold of the harp player
- * (`HANDS_HOLDS.harp`) fits these points. The line `top` lies a little below the neck over the
- * bass strings and over the hump. To pluck at a share of the real string, measure to the bottom
- * of the neck (`neckBottom()`) in place of `top`.
+ * The pluck point of each string (design 4.6): a share of the string from the top of the center
+ * strip of the soundboard up to the bottom of the neck (`neckBottom()`). Harpists pluck at about
+ * one third to two fifths of the string from the soundboard, and the fingers differ by less than
+ * 1% of the length (`docs/reference/harp-technique.md`, section 7.3). The hold of the harp player
+ * (`HANDS_HOLDS.harp`) fits these points.
  */
 const PLUCK = {
   /** The share of the length from the soundboard. 0.5 is the middle. */
-  share: 0.5,
-  /** The top of the length that the share measures, as (y, z). */
-  top: [
-    [1.215, -0.18],
-    [1.085, 0.04],
-    [0.965, 0.28],
-  ],
+  share: 0.37,
 } as const;
 
 /** The diatonic step of each pitch class: a sharp plays on the string of the natural below it. */
@@ -420,7 +414,7 @@ function stringZ(index: number): number {
 function pluckPoint(index: number): Vec3 {
   const z = stringZ(index);
   const bottom = boardHeight(z);
-  return [0, bottom + PLUCK.share * (heightOn(PLUCK.top, z) - bottom), z];
+  return [0, bottom + PLUCK.share * (heightOn(neckBottom(), z) - bottom), z];
 }
 
 /**
@@ -443,7 +437,7 @@ export function harpString(key: number): number {
  * @param key The MIDI key. A key outside the harp plays the nearest string.
  * @param scale The scale of the harp of the species (`SpeciesParams.harpScale`): the harp
  *   shrinks toward its base on the floor.
- * @returns The pluck point of the string of the key, near the middle of the string.
+ * @returns The pluck point of the string of the key, at `PLUCK.share` of the string.
  */
 export function harpStringPosition(key: number, scale = 1): Vec3 {
   const [x, y, z] = pluckPoint(harpString(key));
