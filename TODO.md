@@ -269,13 +269,18 @@ passes.
 - [ ] Cat tail root: under the haunch, 6 edges at the tail root fold by 109° to 174° (vertices
       2224, 2254, 2255, 2256, 2258, 3721, 3730, and 4415 of `cat.rig.glb`). The seat hides them in
       each view of `reports/2026-11-05-cat-edits/`. Move them with point edits if a crop shows them.
-- [ ] Cat violist: the skin of the bow arm crumples in the play: `pnpm arm-look violist` gives a
-      crease share of 20.0% on `mozart-k525` (limit 14.6%), 3.3% in the bind, and 1.7% at rest.
-      The creased edges lie at the right arm root, where `clavicle_R` meets the chest, the neck,
-      and `spine1` in hard steps (30 places with a step above 0.5). The elbow poles change the share
-      by at most 1 point, and a shoulder reach of 26° gives 20%. A blend of the root weights gives
-      14.9% to 17.2%, but it doubles to quintuples the folded faces of `pnpm fold-probe`. Rebuild
-      the weights of the right arm root, or fit a `raise` shape.
+- [ ] Cat violist: the front of the bow arm root keeps hard steps of the clavicle share: 886, 890,
+      and 892 (`clavicle_R` 0.77 to 0.87) beside the neck places 889, 894, and 908 (README "Bow
+      arm root"). Rows with more chest share there moved the folds to the neck. Try rows that
+      blend `clavicle_R` into the neck at the front.
+- [ ] Cat violist: a small dark pinch stays behind the bow arm root at the crossing from az120 and
+      at the frog from the back (`reports/2026-11-05-cat-bow-arm/crops/pair-crossing-az120.png`,
+      `pair-frog-az180.png`). At the tip, the small faces 817-850-848 and 817-818-850 fold, and the
+      fourth `raise` shape is 0 there.
+- [ ] Cat violist: the left arm root has the same corner as the right one, where the side wall
+      meets the back (places 1744 to 1757 and 3259 to 3270 of `cat.rig.glb`). It shows as a notch
+      on the far edge of the back from az150. Mirror the moves of 839 and 840 if the left arm may
+      change.
 - [ ] Cat legs: ask the user for the leg girth step of
       `reports/2026-11-05-cat-edits/leg-lineup.png` (1.15, 1.25, or 1.35). The body has 1.25, and
       the README gives the rule for another step.
