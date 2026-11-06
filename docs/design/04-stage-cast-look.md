@@ -951,12 +951,21 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   blur of 4 × 4 pixels at a quarter size is wider, which a soft contact shade permits. The low
   tier has none (2.6).
 - **Floor gloss** (`FLOOR_GLOSS` of `scene/surface.ts`). The same pass traces each pixel of the
-  stage top along its mirror ray through the depth, and reads the scene color at the hit. The ray
-  takes a jitter in a small cone, and the blur joins 16 rays, so the reflection is soft. The
-  Fresnel term of the lacquer makes it stronger at a flat angle. It fades along the ray and at the
-  frame edges. The physical reflection of the lacquer did not show on the dark players, so a
-  factor makes it visible. A planar reflection renders the scene again, which costs
-  too much GPU time (9.7). Only the high tier has it (2.6).
+  stage top along its mirror ray through the depth. The thickness of a surface follows the step
+  of the ray, so that a ray that passes behind a thin leg goes on and draws no streak. The hit
+  reads the mean of a small box of the scene color, so that one bright pixel does not sparkle.
+  The ray takes a jitter in a small cone. A blur in two passes, along the rows and then along the
+  columns, joins the rays of a wide tent, so the reflection is soft. Then the hit or the miss of
+  one ray, as the camera moves, changes only a faint soft spot. The tent gives each value of the
+  jitter pattern the same weight, so the pattern does not show. The blur takes only the
+  floor pixels, and the final pass adds the reflection only where the depth at full size is on
+  the floor, so that it does not spread onto the feet and the chair legs. The jitter is fixed on
+  the screen and the pass keeps no history, so a still camera shows a still reflection, and a
+  seek or a cut needs no reset. The Fresnel term of the lacquer makes the reflection stronger at
+  a flat angle. It fades along the ray and at the frame edges. The physical reflection of the
+  lacquer did not show on the dark players, so a factor makes it visible. A planar reflection
+  renders the scene again, which costs too much time on the main thread and the GPU (9.7). Only
+  the high tier has it (2.6).
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
