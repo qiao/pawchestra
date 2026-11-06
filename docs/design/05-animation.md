@@ -493,6 +493,9 @@ The rest of each family:
   Reason: on its taller bench, the shoulders of the bear stand far above the keys, and with an
   upright trunk the stretched arms stop short of the keys. A larger lean or shoulder turn folds the
   right inner elbow of the hand rig more.
+- The elbows point out and a little up (`poleL`, `poleR`), so the arms stay clear of the round
+  trunk, as the elbows of a pianist do not touch the torso (piano 4). Reason: elbows that hang
+  down by the wide belly put the arms deep into the trunk.
 - The trunk leans toward the keys of the paws over a window of song time (`sideLeanAt()`), so it
   moves smoothly toward the register of a passage, as a real pianist.
 - The right foot presses the damper pedal with the sustain pedal of the score (CC 64,
