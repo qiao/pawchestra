@@ -81,10 +81,7 @@ export interface DigitTrack {
  * @param fingering The fingering of the hand.
  * @returns The track.
  */
-export function buildDigitTrack(
-  notes: readonly HandNote[],
-  fingering: PianoFingering,
-): DigitTrack {
+export function buildDigitTrack(notes: readonly HandNote[], fingering: PianoFingering): DigitTrack {
   const m = DIGIT_MOTION;
   const rows: [number, number, number, number][][] = Array.from({ length: DIGIT_COUNT }, () => []);
   let before = Number.NEGATIVE_INFINITY;
@@ -101,7 +98,10 @@ export function buildDigitTrack(
     const drop = rate >= m.fastRate ? m.fastDrop * gap : Math.min(m.dropSec, gap);
     for (let j = from; j < to; j++) {
       const finger = MathUtils.clamp(fingering.fingers[j] ?? 3, 1, DIGIT_COUNT) - 1;
-      const lift = Math.min((m.lift[finger] ?? 0) * growth, Math.max(0, drop * m.dropSpeed - m.press));
+      const lift = Math.min(
+        (m.lift[finger] ?? 0) * growth,
+        Math.max(0, drop * m.dropSpeed - m.press),
+      );
       rows[finger]?.push([note.start - drop, note.start, Math.max(note.end, note.start), lift]);
     }
   }
