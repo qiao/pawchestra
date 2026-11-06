@@ -286,6 +286,76 @@ svg {
   color: var(--text);
 }
 
+/* The title card of Cinematic mode at the song start (design 2.8): the composer in spaced gold
+   capitals, a short gold rule, and the piece title in the serif, centered in the lower part of the
+   letterbox frame, as the main title of a film. The app sets its opacity from the song time
+   (`--card-level`, `titleCardLevel()` of app/title-card.ts), so it needs no transition. A soft
+   shade behind it keeps 4.5:1 over a lit stage. It takes no pointer. */
+.title-card {
+  position: fixed;
+  left: calc(var(--letterbox-side, 0px) + 24px);
+  right: calc(var(--letterbox-side, 0px) + 24px);
+  bottom: calc(var(--letterbox, 0px) + (100vh - 2 * var(--letterbox, 0px)) * 0.08);
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  text-shadow: 0 1px 3px #000;
+  opacity: var(--card-level, 0);
+  pointer-events: none;
+}
+
+.title-card[hidden] {
+  display: none;
+}
+
+.title-card::before {
+  content: '';
+  position: absolute;
+  inset: -28px 18%;
+  z-index: -1;
+  border-radius: 999px;
+  background: var(--title-shade);
+  filter: blur(24px);
+}
+
+.title-card p {
+  margin: 0;
+  max-width: 900px;
+}
+
+.title-card-composer {
+  font-size: clamp(11px, 0.95vw, 14px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.title-card-rule {
+  width: 48px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.title-card-title {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 3vw, 46px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+
+/* A window in portrait has a low frame and a high top bar (2.3). There the card stands in the top
+   bar, just above the frame, so that it covers no part of the low frame. */
+@media (orientation: portrait) {
+  .title-card {
+    bottom: calc(100vh - var(--letterbox, 0px) + 20px);
+  }
+}
+
 /* The center of the play button sits at 72% of the height. While it shows, the frame of the
    camera shrinks until the front edge of the stage stands above it, so that the button does not
    cover the orchestra (design 2.8, `clearFirstScreen()` of shots/frame.ts). */
