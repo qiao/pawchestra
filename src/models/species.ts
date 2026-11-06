@@ -405,12 +405,11 @@ export const SPECIES = {
   /**
    * Deer, the harp: a brown deer with a cream chest, belly, and muzzle, large ears, dark brown
    * antlers, dark hooves, and a puff tail with a white underside. It has the studio body of the
-   * mesh `assets/models/deer/deer.glb`, which `pnpm rig-mesh deer` rigs (design 4.4), with 1.2
-   * times the head top of the parametric deer. It sits fully on the stool of the harp, which fits
-   * its legs, with no chair back, and the harp soloist keeps the stool. Its head height is the head
-   * of the studio body without the antlers, and the seat height is the seat of the studio body, in
-   * H. It plays a harp of 0.84 m, near a lever harp of 26 strings, leaned back on its right
-   * shoulder (`docs/reference/harp-technique.md`).
+   * mesh `assets/models/deer/deer.glb`, which `pnpm rig-mesh deer` rigs (design 4.4). It sits fully
+   * on the stool of the harp, which fits its legs, with no chair back, and the harp soloist keeps
+   * the stool. Its head height is the head of the studio body without the antlers, and the seat
+   * height is the seat of the studio body, in H. It plays a harp of 0.84 m, near a lever harp of 26
+   * strings, leaned back on its right shoulder (`docs/reference/harp-technique.md`).
    */
   deer: {
     body: 'studio-deer',
@@ -437,12 +436,12 @@ export const SPECIES = {
   /**
    * Mouse, the oboes: a gray-brown mouse with a cream belly, large round ears, and a long pink
    * tail. It has the studio body of the mesh `assets/models/mouse/mouse.glb`, which `pnpm rig-mesh
-   * mouse` rigs (design 4.4), with the size of the parametric mouse and arms 1.25 times the arms of
-   * the mesh. It plays a smaller oboe, 0.45 of the oboe of the app, in place of longer arms. It has
-   * no chair: the round belly hides the short thighs, so it stands on its hind legs with bent
-   * knees, in the seated pose at the seat height of its legs. Its long tail goes back and lies on
-   * the floor behind it, and it stands upright as a soloist. Its head height is the head of the
-   * studio body, and the seat height is the seat of the studio body, in H.
+   * mouse` rigs (design 4.4), with arms 1.25 times the arms of the mesh. It plays a smaller oboe,
+   * 0.45 of the oboe of the app, in place of longer arms. It has no chair: the round belly hides
+   * the short thighs, so it stands on its hind legs with bent knees, in the seated pose at the seat
+   * height of its legs. Its long tail goes back and lies on the floor behind it, and it stands
+   * upright as a soloist. Its head height is the head of the studio body, and the seat height is
+   * the seat of the studio body, in H.
    */
   mouse: {
     body: 'studio-mouse',
@@ -455,13 +454,13 @@ export const SPECIES = {
   /**
    * Beaver, the bassoons: an orange-brown beaver with a cream belly and muzzle, two white front
    * teeth, and a broad flat tail. It has the studio body of the mesh
-   * `assets/models/beaver/beaver.glb`, which `pnpm rig-mesh beaver` rigs (design 4.4), with the
-   * size of the parametric beaver and longer arms. It plays a smaller bassoon, the largest at which
-   * each paw reaches its grip with 3 cm to spare. It has no chair: the round belly hides the short
-   * thighs, so it stands on its hind legs with bent knees, in the seated pose at the seat height of
-   * its legs. Its broad tail goes back and lies on the floor behind it. A bassoon soloist keeps its
-   * seat (`supportOf()` of `player.ts`). Its head height is the head of the studio body, and the
-   * seat height is the seat of the studio body, in H.
+   * `assets/models/beaver/beaver.glb`, which `pnpm rig-mesh beaver` rigs (design 4.4), with longer
+   * arms. It plays a smaller bassoon, the largest at which each paw reaches its grip with 3 cm to
+   * spare. It has no chair: the round belly hides the short thighs, so it stands on its hind legs
+   * with bent knees, in the seated pose at the seat height of its legs. Its broad tail goes back
+   * and lies on the floor behind it. A bassoon soloist keeps its seat (`supportOf()` of
+   * `player.ts`). Its head height is the head of the studio body, and the seat height is the seat
+   * of the studio body, in H.
    */
   beaver: {
     body: 'studio-beaver',
@@ -491,13 +490,13 @@ export const SPECIES = {
    * Monkey, the trumpets: a brown monkey with a cream face, belly, and ears, dark brown hands and
    * feet, a small tuft of hair, and a long tail that ends in a curl. It has the studio body of the
    * mesh `assets/models/monkey/monkey.glb`, which `pnpm rig-mesh monkey` rigs (design 4.4), with
-   * 1.1 times the size of the parametric monkey and arms 1.2 times the arms of the mesh. It plays a
-   * smaller trumpet, 0.65 of the trumpet of the app. It has no chair, so it stands on its hind legs
-   * with bent knees, in the seated pose at the seat height of its legs. Its feet stand under its
-   * hips, and its trunk leans forward with the head level, so that its center of mass is over the
-   * middle of its soles. Its long tail goes back and down, and its curl stands on the floor behind
-   * it. It stands upright as a soloist. Its head height is the head of the studio body, and the
-   * seat height is the seat of the studio body, in H.
+   * arms 1.2 times the arms of the mesh. It plays a smaller trumpet, 0.65 of the trumpet of the
+   * app. It has no chair, so it stands on its hind legs with bent knees, in the seated pose at the
+   * seat height of its legs. Its feet stand under its hips, and its trunk leans forward with the
+   * head level, so that its center of mass is over the middle of its soles. Its long tail goes back
+   * and down, and its curl stands on the floor behind it. It stands upright as a soloist. Its head
+   * height is the head of the studio body, and the seat height is the seat of the studio body, in
+   * H.
    */
   monkey: {
     body: 'studio-monkey',
@@ -510,9 +509,9 @@ export const SPECIES = {
   /**
    * Pig, the horns: a pink pig with a paler belly, a pink snout disc, dark hooves, and a small
    * curled tail. It has the studio body of the mesh `assets/models/pig/pig.glb`, which `pnpm
-   * rig-mesh pig` rigs (design 4.4), with the size of the parametric pig and longer arms. It sits
-   * on a chair that fits its short legs, and stands as a soloist. Its head height is the head of
-   * the studio body, and the seat height is the seat of the studio body, in H.
+   * rig-mesh pig` rigs (design 4.4), with longer arms. It sits on a chair that fits its short legs,
+   * and stands as a soloist. Its head height is the head of the studio body, and the seat height is
+   * the seat of the studio body, in H.
    */
   pig: {
     body: 'studio-pig',
@@ -524,11 +523,11 @@ export const SPECIES = {
    * Rhino, the tuba: a gray rhino with a pale belly, a large pale horn on the muzzle and a small
    * one behind it, tall ears, light claws, and a thin tail with a dark tuft. It has the studio body
    * of the mesh with rebuilt arms, `assets/models/rhino/rhino-tpose-arms.glb`, which `pnpm rig-mesh
-   * rhino` rigs (design 4.4), with the size of the parametric rhino. It stands to play the tuba.
-   * Its long muzzle puts the mouthpiece far in front of the chest, so the lead pipe of its tuba is
-   * 0.25 m longer back and 0.1 m to the left: the tuba stands under the muzzle in front of the
-   * chest, and the bell at the left of the horn and the head. Its head height is the head of the
-   * studio body, and the seat height is the seat of the studio body, in H.
+   * rhino` rigs (design 4.4). It stands to play the tuba. Its long muzzle puts the mouthpiece far
+   * in front of the chest, so the lead pipe of its tuba is 0.25 m longer back and 0.1 m to the
+   * left: the tuba stands under the muzzle in front of the chest, and the bell at the left of the
+   * horn and the head. Its head height is the head of the studio body, and the seat height is the
+   * seat of the studio body, in H.
    */
   rhino: {
     body: 'studio-rhino',
@@ -541,10 +540,10 @@ export const SPECIES = {
    * Badger, the percussion: a badger with a dark gray front, arms, and legs, a gray back and tail,
    * and a white head with a black stripe over each eye, round ears with white rims, and light
    * claws. It has the studio body of the mesh `assets/models/badger/badger.glb`, which `pnpm
-   * rig-mesh badger` rigs (design 4.4), with the size of the parametric badger. It stands at each
-   * percussion instrument. Its head height is the head of the studio body, and the seat height is
-   * the seat of the studio body, in H. Its short arms cannot hold hand cymbals of a real size out
-   * of its round body, so it plays a suspended cymbal.
+   * rig-mesh badger` rigs (design 4.4). It stands at each percussion instrument. Its head height is
+   * the head of the studio body, and the seat height is the seat of the studio body, in H. Its
+   * short arms cannot hold hand cymbals of a real size out of its round body, so it plays a
+   * suspended cymbal.
    */
   badger: {
     body: 'studio-badger',

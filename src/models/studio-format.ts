@@ -346,14 +346,13 @@ export interface StudioRaise {
 }
 
 /**
- * The pea eyes of a studio body (design 4.4, 4.5): the eyes of the parametric bodies (`addEye()` of
- * `models/eyes.ts`), which replace the eyes of the mesh. Each eye lies at the bind place of its eye
- * bone and faces out from the middle of the head, as an eye on the round head of a parametric body
- * does. Each oval bends to the form of the head surface under it, so that its rim lies at the fur,
- * as the rim of an eye on a flat face of a parametric head does, and its bone lies on the head
- * surface. Each bone moves further out when the head still covers the front of the eye
- * (`eyePush()` of `tools/studio-body.ts`). A hand rig gives the place, the direction, and the size
- * of each eye with the eye objects of its `.blend` (`eyesOf()` of `tools/studio-body.ts`).
+ * The pea eyes of a studio body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
+ * which replace the eyes of the mesh. Each eye lies at the bind place of its eye bone and faces out
+ * from the middle of the head. Each oval bends to the form of the head surface under it, so that
+ * its rim lies at the fur, and its bone lies on the head surface. Each bone moves further out when
+ * the head still covers the front of the eye (`eyePush()` of `tools/studio-body.ts`). A hand rig
+ * gives the place, the direction, and the size of each eye with the eye objects of its `.blend`
+ * (`eyesOf()` of `tools/studio-body.ts`).
  */
 export interface StudioEyes {
   /**
@@ -375,7 +374,7 @@ export interface StudioEyes {
    * The bend of each oval along its direction: a fit of the heights of the head surface over the
    * oval, from the plane of the eye (`eyeBend()` of `tools/studio-body.ts`). Thus a direction that
    * differs from the normal of the surface, or a curved cheek, moves no edge of the oval out of the
-   * fur. A body with no bends keeps flat ovals with the light of a parametric eye.
+   * fur. A body with no bends keeps flat ovals.
    */
   readonly bends?: Readonly<Record<Side, EyeBend>>;
 }

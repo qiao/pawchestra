@@ -246,7 +246,7 @@ function playerSkins(rig: StudioRig): CornerSkin[] {
  * 4.4). The arms of the studio come down from their bind pose to hang straight, with the skin and
  * the corrective shapes of the studio, as the GPU poses them. The trunk, the head, and the legs
  * keep the bind pose of the studio. Each corner follows the two bones of the player with the
- * largest weights, for the readers of the bind mesh. The pea eyes of the parametric bodies follow
+ * largest weights, for the readers of the bind mesh. The pea eyes (`addEye()`) follow
  * the triangles of the body, each on its eye bone (`StudioBody.eyes`, design 4.5). The scene draws
  * the body with the skin of the studio (`StudioRig`). A studio body keeps the stance of its role
  * on each support: the bear conductor stands, and the polar bear pianist sits on its bench
