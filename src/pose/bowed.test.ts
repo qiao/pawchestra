@@ -472,9 +472,7 @@ describe('the rest pose of the bowed strings (design 5.2, 5.5)', () => {
   });
 
   it('rests the violin and the viola upright on the left thigh (user report of 2026-10-06)', () => {
-    const lapped = players.slice(0, 2).filter((p) => !holdOfPlayer(scene, p).restAtSide);
-    expect(lapped.length).toBeGreaterThan(0);
-    for (const player of lapped) {
+    for (const player of players.slice(0, 2)) {
       const posed = posedAt(scene, player, 1, 0, NOT_STARTED);
       const h = player.model.body.headHeight;
       // The tail end stands on the top of the thigh, and the scroll points up.
@@ -486,24 +484,6 @@ describe('the rest pose of the bowed strings (design 5.2, 5.5)', () => {
       const board = target(player.model, 'fingerboard');
       const nut = v(posedPiecePoint(posed, { bone: 'instrument', at: board.from }));
       expect(nut.sub(tail).normalize().y, player.instrument).toBeGreaterThan(0.85);
-    }
-  });
-
-  it('holds the violin at the left side in the rest pose of a body with no lap (design 5.2)', () => {
-    const sided = players.filter((p) => holdOfPlayer(scene, p).restAtSide);
-    expect(sided.length).toBeGreaterThan(0);
-    for (const player of sided) {
-      const posed = posedAt(scene, player, 1, 0, NOT_STARTED);
-      // The tail end is beside the body, out of the left shoulder joint and below it, and the
-      // scroll points forward, near the level.
-      const tail = positionOf(posed, 'instrument');
-      const shoulder = positionOf(posed, 'upperArmL');
-      expect(tail.x).toBeLessThan(shoulder.x);
-      expect(tail.y).toBeLessThan(shoulder.y);
-      const board = target(player.model, 'fingerboard');
-      const nut = v(posedPiecePoint(posed, { bone: 'instrument', at: board.from }));
-      const axis = nut.sub(tail).normalize();
-      expect(axis.z).toBeLessThan(-0.8);
     }
   });
 

@@ -321,12 +321,6 @@ export interface BowedHold {
    * forward. `null` mixes the rest pole and the playing pole directly.
    */
   readonly liftPoleR: Vec3 | null;
-  /**
-   * True when the left paw holds the instrument at the left side in the rest pose and the bow
-   * hangs from the right paw, also on a seat, as for a soloist who stands (design 5.2). A body with
-   * no lap, such as the rabbit, whose round belly covers its short thighs, rests so.
-   */
-  readonly restAtSide: boolean;
   /** The bow in the rest pose. */
   readonly restBow: {
     /** The place of the grip on the right thigh. */
@@ -350,9 +344,8 @@ export interface BowedHold {
     readonly via: BowVia | null;
   };
   /**
-   * The bow in the rest pose of a soloist who stands, and of a player who rests at the side
-   * ({@link BowedHold.restAtSide}), in the model axes of the bind pose (design 5.2). `null` keeps
-   * the bow in the right hand as in the bind pose.
+   * The bow in the rest pose of a soloist who stands, in the model axes of the bind pose (design
+   * 5.2). `null` keeps the bow in the right hand as in the bind pose.
    */
   readonly standBow: {
     /** The direction from the frog to the tip. */
@@ -503,7 +496,6 @@ const CHIN_HOLD = {
   wristFit: null,
   liftPoleL: null,
   liftPoleR: null,
-  restAtSide: false,
   restBow: {
     lap: { along: 1, offset: [0.18, 0.08, 0] },
     tip: [-1, 0, -0.3],
@@ -580,7 +572,6 @@ const FLOOR_HOLD = {
   wristFit: null,
   liftPoleL: null,
   liftPoleR: null,
-  restAtSide: false,
   restBow: {
     lap: { along: 1, offset: [0.2, 0.08, 0] },
     tip: [-0.1, -0.1, -1],
@@ -1830,7 +1821,7 @@ export function bowedRig(
   const hairNormal = new Vector3(...hair.normal).applyQuaternion(pieceRotation('bow')).normalize();
 
   const parent = parents[BONES.instrument] ?? 0;
-  const atSide = (model.support === 'stand' || hold.restAtSide) && hold.rest !== null;
+  const atSide = model.support === 'stand' && hold.rest !== null;
   const lapRest = atSide ? STANDING_REST : hold.rest;
   const restRotation = new Quaternion();
   const bindTurn = setFromBasis(new Quaternion(), axis, top).invert();
