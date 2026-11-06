@@ -419,6 +419,15 @@ The rest of each family:
   near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
   most recast bodies goes into the upper bout at rest and in the moves.
+- **Cello left elbow of the dog.** In the play, the left elbow of the dog points out to the side
+  and a little down (`DOG_HOLD.poleL`), so that the forearm rises from the elbow to the neck. It
+  goes up for each lower string (`elbowPerString`), as a cellist raises the elbow for the lower
+  strings (strings 1.8), and further in the high positions (`highElbow`). Reason: with the
+  nearly level elbow of the shared hold, the upper arm stood out level from the shoulder, and the
+  elbow made a sharp point behind the forearm. A lower elbow puts the forearm into the upper bout
+  and the upper arm into the chest, and the elbow turn of the high positions keeps the forearm
+  out of the upper bout. The shared hold keeps its nearly level elbow until a cast matrix run
+  checks the new elbow on the recast bodies (`TODO.md`).
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
