@@ -222,13 +222,9 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 
 | Token | Value |
 |---|---|
-| `--bg-overlay` | `rgba(16, 13, 11, 0.72)`, the glass of the bar, and the dim of the dialog with `backdrop-filter: blur(10px)` |
+| `--bg-overlay` | `rgba(16, 13, 11, 0.72)`, with `backdrop-filter: blur(10px)` |
 | `--panel` | `#17130f` |
-| `--panel-glass` | `rgba(21, 18, 16, 0.96)` (the floating panel of the drawer) |
-| `--glass-blur` | `blur(18px) saturate(1.35)`, the `backdrop-filter` of the bar and the drawer (frosted glass) |
-| `--glass-sheen` | a gradient from `rgba(255, 240, 220, 0.05)` at the top to clear at 60% (the light on the glass) |
-| `--hairline` | `rgba(231, 180, 90, 0.24)` (the thin warm line along the top edge of the bar and the drawer) |
-| `--glow` | `rgba(231, 180, 90, 0.28)` (the soft glow of a control of the bar under the pointer) |
+| `--panel-glass` | `rgba(21, 18, 16, 0.96)`, with `backdrop-filter: blur(16px)` (the floating panel of the drawer) |
 | `--line-faint` | `rgba(255, 240, 220, 0.06)` (the line between two rows of a list, and the hover of a seat row) |
 | `--line` | `rgba(255, 240, 220, 0.10)` |
 | `--pill-line` | `rgba(255, 240, 220, 0.24)` (the outline of the pill "Open source") |
@@ -243,11 +239,11 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 | `--track` | `rgba(255, 240, 220, 0.2)` (the track of a slider, where it is not filled) |
 | Font | `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` |
 | `--font-serif` | `"Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, "Noto Serif", serif` (the piece title) |
-| Font sizes | 12 px for times (tabular numbers, weight 500, letter space 0.06 em), 13 px for secondary text, 14 px body. The piece title is `clamp(24px, 2.5vw, 36px)` (32 px at 1280 px), and the composer `clamp(13px, 1.15vw, 16px)` |
+| Font sizes | 12 px for times (tabular numbers), 13 px for secondary text, 14 px body. The piece title is `clamp(24px, 2.5vw, 36px)` (32 px at 1280 px), and the composer `clamp(13px, 1.15vw, 16px)` |
 | Radius | 10 px for panels, 12 px for the floating panel of the drawer and for the bar, 8 px for buttons |
 | Control size | at least 40 px for the controls of the bar and the first screen. 32 px for the compact controls in the drawer, in messages, and in dialogs (tabs, M, S, segmented buttons, close, the link "Credits"). At least 44 px for every control on a touch screen |
 | Focus | a 2 px ring in `--accent`, with a 2 px offset, and the button radius on a slider |
-| Button states | the hover and the color change in 120 ms (none with reduced motion), and a pressed button gets `rgba(255, 240, 220, 0.18)`. A button of the bar under the pointer also gets a 14 px `--glow`, and the play button of the bar 18 px. The large play button gets `--accent-strong` and the scale 0.96 while pressed |
+| Button states | the hover and the color change in 120 ms (none with reduced motion), and a pressed button gets `rgba(255, 240, 220, 0.18)`. The large play button gets `--accent-strong` and the scale 0.96 while pressed |
 
 **Components**
 
@@ -276,9 +272,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   it shows and hides with no fade. A soft shade keeps 4.5:1 over the stage. A screen reader skips
   it (`aria-hidden`), because the live region of the title reads the piece. Free mode has no card,
   because the title shows there.
-- **Bar**: the frosted glass of a film player: `--bg-overlay` with `--glass-sheen`,
-  `--glass-blur`, the `--hairline` at the top edge, and a soft drop shadow. The glass keeps the
-  alpha of `--bg-overlay`, so the contrast of its text does not change. "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
+- **Bar**: "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
   again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
   ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button
   says "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit
@@ -295,7 +289,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   no verb "choose", so the buttons say "Select".
   `index.html` holds the same load state as static HTML and the style sheets in its head (inline
   in the build, 7.2), so the first paint shows no unstyled page.
-- **Drawer**: a floating panel in `--panel-glass` with the glass of the bar, nearly opaque, so that its dim text keeps
+- **Drawer**: a floating panel in `--panel-glass`, nearly opaque, so that its dim text keeps
   4.5:1 over white fur. Only the panel of the current tab scrolls. The arrow keys, Home, and End
   move between the tabs, as the tabs pattern of WAI-ARIA says. While the drawer is open in Free
   mode, the camera moves its frame with `setViewOffset()` (`stageCover()`), and the canvas fills
