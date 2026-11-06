@@ -152,10 +152,22 @@ passes.
       the user in a close play frame of the stage.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
-- [ ] Polar bear pianist: at the shoulder height of 1.49 m, the forearms go up to 13.6 cm and the
-      upper arms 13.0 cm into the trunk in the play (5.4 cm and 6.8 cm at 1.15 m), and the forearms
-      slope down to the keys. Fit `HANDS_HOLDS.piano` to the larger bear (the elbow poles, the
-      bench, the key distance) with the new polar bear body. A lean of 12° made it deeper.
+- [ ] Polar bear pianist: on the taller bench of the hand rig, the shoulders stand 5.9 cm higher,
+      and the forearms go up to 16.0 cm and the upper arms 14.9 cm into the trunk in the play (13.6
+      cm and 13.0 cm on the low bench, 5.4 cm and 6.8 cm at 1.15 m). Keys 5.9 cm higher (key top
+      0.869 m, `PIANO_SCALE` about 1.24) keep the arms of the low bench. Fit `HANDS_HOLDS.piano` or
+      the key height to the larger bear. A lean of 12° made it deeper.
+- [ ] Polar bear pianist: on the taller bench, the rest and the lift put the forearms 12.4 cm and the
+      upper arms 12.6 cm into the belly (0.0 cm and 1.7 cm at rest on the low bench). The left rest
+      paw hangs to the knee, and the right rest paw stays near the keys. Fit `restL` and `restR`.
+- [ ] Polar bear hand rig: a pocket stays at the front of each armpit in the chord and the far-left
+      keys (0.0102 units, 2.1 cm, below its neighbors after the weight fixes, 4.9 cm before). Ask
+      the user: a corrective key `arm_raise_*`, or a point edit of the armpit corner of the mesh.
+- [ ] Polar bear hand rig: a soft ledge stays at the top of the right seated thigh near the groin in
+      the pedal pose. Check it in the stage light.
+- [ ] Polar bear hand rig: the right inner elbow folds 13 faces at rest (7 on the low bench).
+- [ ] Polar bear hand rig: the bench is 0.195 m deep (0.318 m on the low bench), because only the
+      round haunch lies on it. Ask the user if the bench must be deeper.
 - [ ] Polar bear pianist: from the front, the open lid hides the paws. The head of the larger bear
       shows over the lid.
 - [ ] Polar bear pianist: at the far keys, the outer upper arm stands 36° to 41° out from the round
