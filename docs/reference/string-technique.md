@@ -404,7 +404,10 @@ The app follows these facts:
   hand moves only in a shift.
 - **The shift (1.5).** `bowStateAt()` moves the hand in the second half of the note before the
   shift. The shift ends when the finger of the new note lands, a little before the note
-  (`LEFT_HAND`).
+  (`LEFT_HAND`). A large shift takes at least a time for each length of the fingerboard
+  (`LEFT_HAND.shiftSecPerPlace`), so in fast notes it starts in an earlier note of the old
+  position (`shiftSpan()`). No source gives the shortest shift. The time keeps the forearm turn
+  below about 1000° a second.
 - **The fingers (1.6).** The finger of each stopped note lands before the note and presses at the
   note start. An open string has no press. The hand turns a little toward the finger of the note,
   and rolls around the neck to its string (`BOWED_HANDS.reachTurn`, `BOWED_HANDS.rollL`).

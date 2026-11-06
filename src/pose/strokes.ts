@@ -111,6 +111,13 @@ const LEFT_HAND = {
   shiftShare: 0.5,
   /** The most time of a shift. Six professional violinists took 0.29 s to 0.46 s. */
   shiftSec: 0.35,
+  /**
+   * The least time of a shift for each 1.0 of `fingerboard` that the hand moves, up to
+   * `shiftSec`. A large shift in fast notes starts in an earlier note of the old position. With
+   * only the second half of a fast note, a shift of 0.4 turned the cello forearm by 89° in one
+   * frame at 120 fps.
+   */
+  shiftSecPerPlace: 0.7,
   /** The most time of a change of the finger or of the stop string with no shift. */
   fingerSec: 0.08,
   /** The time constant of the press of the finger after the note start. */
@@ -848,24 +855,104 @@ function pressOf(stroke: Stroke, time: number, land: number): number {
   return land > 0 ? smoothstep(1 + dt / land) : 0;
 }
 
+/** The start and the end of a shift, from {@link shiftSpan}. */
+const span: [number, number] = [0, 0];
+
+/**
+ * Gives the time span of the shift into a stroke (design 5.3). The shift takes the second part
+ * of the note before it, at most `LEFT_HAND.shiftSec`, and it ends when the finger of the stroke
+ * lands, `LEFT_HAND.landSec` before the note. A large shift takes at least
+ * `LEFT_HAND.shiftSecPerPlace` for each 1.0 of `fingerboard`, so in fast notes it starts in an
+ * earlier note of the old position, at the earliest at the first note of that position.
+ *
+ * @param strokes The strokes of the player.
+ * @param index The index of the stroke after the shift. It is at least 1.
+ * @returns The start and the end of the shift, in a module tuple that the next call writes again.
+ */
+function shiftSpan(strokes: readonly Stroke[], index: number): readonly [number, number] {
+  const l = LEFT_HAND;
+  const before = strokes[index - 1];
+  const after = strokes[index];
+  if (!before || !after) {
+    return span.fill(Infinity);
+  }
+  const interval = after.start - before.start;
+  const landed = after.start - Math.min(l.landSec, 0.25 * interval);
+  let from = Math.max(
+    landed - l.shiftSec,
+    Math.min(before.start + l.shiftShare * interval, before.end),
+  );
+  const least = Math.min(
+    l.shiftSec,
+    l.shiftSecPerPlace * Math.abs(after.hand.place - before.hand.place),
+  );
+  if (landed - from < least) {
+    // Go back to the earliest note of the old position that the shift needs.
+    let first = index - 1;
+    while (
+      first > 0 &&
+      (strokes[first]?.start ?? 0) > landed - least &&
+      strokes[first - 1]?.hand.position === before.hand.position
+    ) {
+      first--;
+    }
+    from = Math.min(from, Math.max(landed - least, strokes[first]?.start ?? from));
+  }
+  span[0] = from;
+  span[1] = landed;
+  return span;
+}
+
+/**
+ * Finds the next shift that can start before a time: the first stroke after the next stroke
+ * with another position, up to the longest span of a shift after the time.
+ *
+ * @param strokes The strokes of the player.
+ * @param index The index of the stroke at the time.
+ * @param time The song time.
+ * @returns The index of the stroke after the shift, or -1.
+ */
+function laterShift(strokes: readonly Stroke[], index: number, time: number): number {
+  const position = strokes[index]?.hand.position;
+  const horizon = time + LEFT_HAND.shiftSec + LEFT_HAND.landSec;
+  for (let j = index + 2; j < strokes.length; j++) {
+    const stroke = strokes[j];
+    if (!stroke || stroke.start > horizon) {
+      return -1;
+    }
+    if (stroke.hand.position !== position) {
+      return j;
+    }
+  }
+  return -1;
+}
+
 /**
  * Writes the left hand of a bowed string player at one time (design 5.3). The hand frame keeps
- * its place in a position, and moves only in a shift to the next position. A shift takes the
- * second part of the note before it, at most `LEFT_HAND.shiftSec`, with a quintic ease, and it
- * ends when the finger of the next note lands, `LEFT_HAND.landSec` before the note. The finger
- * turns toward the next note and moves to its string with the shift, or in at most
- * `LEFT_HAND.fingerSec` before the landing. The press of a finger lifts in a shift, and a
- * stopped note of the stroke has vibrato, with its phase from the note start. The vibrato stops
- * before the end of the note and before a shift.
+ * its place in a position, and moves only in a shift to the next position, in the span of
+ * {@link shiftSpan}, with a quintic ease. The finger turns toward the next note and moves to its
+ * string with the shift, or in at most `LEFT_HAND.fingerSec` before the landing. The press of a
+ * finger lifts in a shift, and a stopped note of the stroke has vibrato, with its phase from the
+ * note start. The vibrato stops before the end of the note and before a shift.
  *
- * @param current The stroke at the time.
- * @param next The next stroke, or `undefined` after the last stroke.
- * @param time The song time, at or after the start of `current`.
+ * @param strokes The strokes of the player.
+ * @param index The index of the stroke at the time.
+ * @param time The song time, at or after the start of the stroke.
  * @param out The state to write: the fingerboard, the reach, the stop string, the vibrato, and
  *   the press.
  */
-function leftHandAt(current: Stroke, next: Stroke | undefined, time: number, out: BowState): void {
+function leftHandAt(
+  strokes: readonly Stroke[],
+  index: number,
+  time: number,
+  out: BowState,
+): void {
   const l = LEFT_HAND;
+  const current = strokes[index];
+  if (!current) {
+    return;
+  }
+  const next = strokes[index + 1];
   const hand = current.hand;
   out.fingerboard = hand.place;
   out.reach = hand.reach;
@@ -873,27 +960,40 @@ function leftHandAt(current: Stroke, next: Stroke | undefined, time: number, out
   let shift = 0;
   let stop = current.end;
   let landing = 0;
+  // A shift that starts in an earlier note also lifts the landing of the next note.
+  let landingShare = 1;
   if (next) {
     const interval = next.start - current.start;
     const land = Math.min(l.landSec, 0.25 * interval);
     const landed = next.start - land;
     let x: number;
     if (next.hand.position !== hand.position) {
-      const from = Math.max(
-        landed - l.shiftSec,
-        Math.min(current.start + l.shiftShare * interval, current.end),
-      );
-      shift = quintic((time - from) / (landed - from));
-      x = shift;
+      const [from, end] = shiftSpan(strokes, index + 1);
+      shift = quintic((time - from) / (end - from));
+      // The finger of the next note moves only in this note.
+      const fingerFrom = Math.max(from, current.start);
+      x = quintic((time - fingerFrom) / (end - fingerFrom));
       stop = Math.min(stop, from);
       out.fingerboard += (next.hand.place - hand.place) * shift;
     } else {
       const from = Math.max(current.start, landed - l.fingerSec);
       x = smoothstep((time - from) / (landed - from));
+      // A large shift in fast notes can start in this note.
+      const later = laterShift(strokes, index, time);
+      const target = strokes[later];
+      if (target) {
+        const [shiftFrom, end] = shiftSpan(strokes, later);
+        if (time > shiftFrom) {
+          shift = quintic((time - shiftFrom) / (end - shiftFrom));
+          landingShare = 1 - shift;
+          stop = Math.min(stop, shiftFrom);
+          out.fingerboard += (target.hand.place - hand.place) * shift;
+        }
+      }
     }
     out.reach += (next.hand.reach - hand.reach) * x;
     out.stopString += (next.hand.stopString - hand.stopString) * x;
-    landing = pressOf(next, time, land);
+    landing = pressOf(next, time, land) * landingShare;
   }
 
   out.vibrato = 0;
@@ -1008,7 +1108,7 @@ export function bowStateAt(
     out.crossMean += (next.crossMean - current.crossMean) * x;
   }
   out.loudness = followLoudness(current.loudnessFrom, current.loudness, time - current.start);
-  leftHandAt(current, next, time, out);
+  leftHandAt(strokes, i, time, out);
 
   // The change between the bow and pizzicato.
   out.pizzicato = pizzicatoOf(current);

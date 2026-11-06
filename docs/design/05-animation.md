@@ -354,6 +354,9 @@ The rest of each family:
 - A search (Viterbi) gives each stroke its string, position, and finger before the play
   (`planHand()`, `FINGERING_COSTS`), in the orchestral style: low positions and open strings. The
   hand shifts only when the notes leave its position. Vibrato keeps the width of a real player.
+  A large shift takes a least time for its length (`LEFT_HAND.shiftSecPerPlace`), and in fast
+  notes it starts in an earlier note of the old position. Reason: in the second half of one fast
+  note, a large shift turned the left forearm by up to 89° in one frame.
 - The bow changes direction on each note, and short notes in one beat join into one slur
   (`slurSizes()`), because the MIDI files have no slurs. Pizzicato plucks the string, and tremolo
   makes short fast strokes (`BOW_MOTION`).
