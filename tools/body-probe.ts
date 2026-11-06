@@ -45,12 +45,7 @@ import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.
 await loadTestBodies();
 
 /** The supports of each species in the probe: each seat, and standing. */
-const PROBE_SUPPORTS = [
-  'chair',
-  'stool',
-  'bench',
-  'stand',
-] as const satisfies readonly Support[];
+const PROBE_SUPPORTS = ['chair', 'stool', 'bench', 'stand'] as const satisfies readonly Support[];
 
 /** The rest joints and the landmarks of a body by name, and its head height. */
 type JointTable = Record<string, Vec3 | number>;

@@ -941,12 +941,7 @@ function laterShift(strokes: readonly Stroke[], index: number, time: number): nu
  * @param out The state to write: the fingerboard, the reach, the stop string, the vibrato, and
  *   the press.
  */
-function leftHandAt(
-  strokes: readonly Stroke[],
-  index: number,
-  time: number,
-  out: BowState,
-): void {
+function leftHandAt(strokes: readonly Stroke[], index: number, time: number, out: BowState): void {
   const l = LEFT_HAND;
   const current = strokes[index];
   if (!current) {
