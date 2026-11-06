@@ -165,6 +165,10 @@ export interface HandNote {
  *   default.
  * @param apart The least distance between the middles of the keys of the two hands, in semitones,
  *   or 0 for no limit (the default).
+ * @param span The widest chord of one hand, in semitones: one octave by default
+ *   ({@link HAND_MOTION.span}). A harp hand reaches a tenth.
+ * @param most The most keys of a chord of one hand. A chord with more keys splits as a wide chord
+ *   does, when the reach of the hands lets it. No limit by default.
  * @returns The notes of the left hand and of the right hand, sorted by start.
  */
 export function splitHands(
@@ -172,6 +176,8 @@ export function splitHands(
   loudness: readonly number[],
   reach: HandReach = NO_REACH_LIMIT,
   apart = 0,
+  span: number = HAND_MOTION.span,
+  most = Infinity,
 ): readonly [left: HandNote[], right: HandNote[]] {
   const chords = groupChords(notes, loudness).map((group): SplitChord => {
     const keys = notes
@@ -183,11 +189,11 @@ export function splitHands(
     const slack = PLAN_REACH_SLACK;
     const oneHand =
       group.high <= reach.leftHighest + slack || group.low >= reach.rightLowest - slack;
-    const cut =
-      group.high - group.low > HAND_MOTION.span || !oneHand ? wideChordCut(keys, reach) : null;
+    const wide = group.high - group.low > span || keys.length > most;
+    const cut = wide || !oneHand ? wideChordCut(keys, reach) : null;
     return { group, keys, cut };
   });
-  const choices = apart > 0 ? planHands(chords, reach, apart) : null;
+  const choices = apart > 0 ? planHands(chords, reach, apart, span) : null;
   const left: HandNote[] = [];
   const right: HandNote[] = [];
   let places: HandPlaces = { left: HAND_MOTION.startKeys[0], right: HAND_MOTION.startKeys[1] };
@@ -402,9 +408,15 @@ interface PlanStep {
  * @param chords The chords of the player, sorted by start.
  * @param reach The highest key of the left hand and the lowest key of the right hand.
  * @param apart The least distance between the middles of the two hands, or 0 for no limit.
+ * @param span The widest chord of one hand, in semitones.
  * @returns The hand of each chord.
  */
-function planHands(chords: readonly SplitChord[], reach: HandReach, apart: number): HandChoice[] {
+function planHands(
+  chords: readonly SplitChord[],
+  reach: HandReach,
+  apart: number,
+  span: number,
+): HandChoice[] {
   const steps: PlanStep[][] = [];
   let before: readonly PlanStep[] = [
     {
@@ -424,7 +436,7 @@ function planHands(chords: readonly SplitChord[], reach: HandReach, apart: numbe
       options.push('both');
     }
     // A chord within one octave can also go to one hand.
-    if (chord.cut === null || group.high - group.low <= HAND_MOTION.span) {
+    if (chord.cut === null || group.high - group.low <= span) {
       const slack = PLAN_REACH_SLACK;
       if (group.high <= reach.leftHighest + slack || group.low < reach.rightLowest - slack) {
         options.push('left');
