@@ -93,6 +93,24 @@ interface TrialBase {
   readonly sha256: string;
 }
 
+/** The base of a trial with its bytes. */
+interface BaseFile {
+  /** The base. */
+  readonly base: TrialBase;
+  /** The bytes of the base file. */
+  readonly bytes: Buffer;
+}
+
+/** The close views of a folder, in the order of the moments and the views. */
+interface TrialCells {
+  /** The moments, in order. */
+  readonly moments: readonly string[];
+  /** The views, in order. */
+  readonly views: readonly string[];
+  /** The image file of each cell, by the key `<moment>|<view>`. */
+  readonly files: ReadonlyMap<string, string>;
+}
+
 /** The record of a trial, in `scratch/trials/<animal>/<tag>.json`. */
 interface TrialRecord {
   /** The animal of the hand rig, the name of its folder in `assets/models/`. */
@@ -345,7 +363,7 @@ function trialArgs(argv: readonly string[]): TrialArgs {
  * @param args The command line.
  * @returns The base and its bytes.
  */
-function baseOf(args: TrialArgs): { readonly base: TrialBase; readonly bytes: Buffer } {
+function baseOf(args: TrialArgs): BaseFile {
   const name = args.options.get('--base');
   if (name === undefined) {
     const bytes = readFileSync(rigBlend(args.animal));
@@ -517,11 +535,7 @@ function probeSummary(probe: ProbeName, text: string, animal: string): string {
  * @param args The command line.
  * @returns The moments, the views, and the file of each moment and view.
  */
-function cellsOf(
-  dir: string,
-  role: string,
-  args: TrialArgs,
-): { moments: string[]; views: string[]; files: Map<string, string> } {
+function cellsOf(dir: string, role: string, args: TrialArgs): TrialCells {
   const pattern = new RegExp(`^${role.replace(/[-.]/g, '\\$&')}-(.+)-(az-?\\d+|[a-z]+)\\.png$`);
   const found = readdirSync(dir)
     .flatMap((name) => {
@@ -578,7 +592,7 @@ async function writePair(args: TrialArgs, other: string, out: string): Promise<v
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();
-    const images = rows.map((row) =>
+    const sources = rows.map((row) =>
       row.cells.map((file) =>
         file ? `data:image/png;base64,${readFileSync(file).toString('base64')}` : null,
       ),
@@ -639,7 +653,7 @@ async function writePair(args: TrialArgs, other: string, out: string): Promise<v
         return canvas.toDataURL('image/png');
       },
       {
-        images,
+        images: sources,
         labels: rows.map((row) => row.label),
         views: mine.views,
         box: crop,
