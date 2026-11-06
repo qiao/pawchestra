@@ -140,8 +140,11 @@ The app follows these facts:
   that the left wrist bends only a little, as the wrists of a harpist go a little down. A palm
   square to the strings bends the left wrist of the short arm far back, because the left forearm
   points into the strings.
-- **The pluck (section 5).** The fingers curl after each pluck (`curl`, `curlClosed`), and the palm
-  pulls away from the strings (`HAND_MOTION` of `src/pose/hand-notes.ts`).
+- **The pluck (sections 5, 7.3).** After its pluck, the thumb bends over the palm (`thumbClosed`),
+  and fingers 2 to 4 close into the palm (`curlClosed`). The last pluck of a group pulls the palm
+  away from the strings, and a pluck inside a group pulls it only a little (`HAND_MOTION` of
+  `src/pose/hand-notes.ts`).
+- **The fingering (section 7).** Section 7.10 gives the rules of the app.
 - **The strike point (section 7.3).** Each hand plucks at 0.37 of the string from the soundboard
   (`PLUCK.share` of `src/models/instruments/harp.ts`), so the bass strings are plucked low. The
   strings fill the frame from near the base of the soundboard to the neck near the column, as on
@@ -179,7 +182,8 @@ The app does not follow these facts:
   real film frame sees only a part of the swing.
 - **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
   (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
-- **The fingering (section 7).** Section 7.10 gives the plan to follow it.
+- **The fingers (section 7.1).** The deer paw is a fist: a free thumb and three fingers joined into
+  the palm. Thus fingers 2 to 4 close as one group, after the last of their plucks in a group.
 
 ## 7. Fingering
 
@@ -316,37 +320,41 @@ No source gives a cost model of harp fingering. These rules follow from the fact
 
 ### 7.10 Use in the app
 
-The app follows none of section 7 yet. This plan follows it, in order of the risk. Each step
-names its place in the code, and updates design 5.3 "Harp" and section 6.
+`planHarpFingerings()` of `src/pose/harp-fingering.ts` plans the fingering of both hands, a pure
+function of the notes. Design 5.3 "Harp" gives the motion. The app follows these facts:
 
-1. **The split of the hands (7.1, 7.9).** `splitHands()` of `src/pose/hand-notes.ts` gives the
-   harp the reach and the span of the piano. Give the harp `reach.rightLowest` near G2
-   (`HANDS_HOLDS.harp.reach`), a span of a tenth in place of `HAND_MOTION.span`, and at most four
-   strings in each hand.
-2. **A harp fingering (7.4, 7.9).** Add a pure module `src/pose/harp-fingering.ts`, beside
-   `piano-fingering.ts`. It gives each note a finger 1 to 4, a group, a crossing flag, and a place
-   time. `handTracksSteps()` of `src/pose/hands.ts` calls it where it calls
-   `planFingeringSteps()` for the piano.
-3. **Placing and the still hand (7.2, 7.3).** `buildHandTrack()` moves the palm to each note, and
-   `HAND_MOTION.restSec` rests the finger 0.04 s before the pluck. Move the palm once for each
-   group, at the pluck of the last note of the group before, and keep it still in the group. Use
-   the crossing flags as the piano uses `passes`.
-4. **The pluck (7.3).** `handStateAt()` pulls the palm away by `HAND_MOTION.pull` at each pluck.
-   Keep the close of the fingers (`curlClosed`), and pull the palm less in a group.
-5. **The strike point (7.3).** Done: `harpStringPosition()` gives the point at 0.37 of the
-   string from the soundboard, and the hold fits it.
-6. **Rolled chords (7.4).** Close the fingers of a chord of three or more notes from low to high,
-   so that the last close falls on the note start. The score keeps one start for the sound.
-7. **Damping (7.6).** A long rest of one hand can put the flat palm on the strings
-   (`restL`, `restR` with no `away`).
+- **The split of the hands (7.1, 7.9).** The right hand plays down to G2, and the left hand up to
+  C5 (`HANDS_HOLDS.harp.reach`). One hand reaches a tenth and plays at most four strings
+  (`span`, `most`).
+- **The groups and the fingers (7.4, 7.9).** The notes of a hand go into groups of at most four
+  strings within a tenth. The thumb plays the highest string of a group and finger 4 the lowest,
+  so a scale plays 4321 up and 1234 down. A wide gap at the bottom of a group of two or three
+  strings takes finger 3 or 4. The first note of a group that goes on with a run gets a crossing
+  flag: finger 4 under the thumb up, or the thumb over finger 4 down (`HarpFingering.crossings`).
+- **Placing (7.2).** The hand places each group right after the last pluck of the group before
+  (`HarpFingering.places`), and stays still in the group: the palm stands at the middle of the
+  strings of the group.
+- **The pluck (7.3).** The hand pulls away from the strings only at the last pluck of a group.
+  Each fingered note has a pluck time and a close time (`plucks`, `closes`), and
+  `fingerClosesAt()` gives the close of the thumb and of fingers 2 to 4.
+- **Rolled chords (7.4).** A chord of three or more strings of both hands rolls up, with the last
+  pluck on the note start. An octave does not roll. The strings swing from the plucks of the roll,
+  and the sound keeps one start.
+- **Damping (7.6).** After a hand rest of more than a second, the flat palm goes onto the strings
+  with the fingers open, then the hand places the next group.
 
-These parts need a decision first:
+The app does not follow these facts:
 
-- **The fingers.** The deer has one `fingers` bone in each hand and no `DIGIT_BONES`
-  (`src/models/studio-format.ts`), so one curl shows all fingers (`writeCurl()`). A close of each
-  finger needs digit bones in the deer rig.
-- **The pedals.** The harp of the app has no pedals (`buildHarp()`), and the harp pose moves no
-  foot. Pedal moves need pedals in the model and a foot pose such as `posePedalFoot()`.
+- **The fingers (7.1).** The deer has a thumb bone and one bone for fingers 2 to 4, so fingers 2
+  to 4 close together. A digit pose for a paw with a bone for each finger reads the finger, the
+  pluck time, and the close time of each note (`HarpFingering`) and closes each finger from its
+  pluck to its close time.
+- **Thirds of fingers, glissandos, and repeated notes (7.5).** The app plays a glissando as single
+  plucks, and a fast repeat on one string with one finger.
+- **The left palm (section 3).** The left palm stands far above the low pluck points of the bass
+  strings (section 6, "The level hands").
+- **The cost (7.9).** The groups come from a greedy rule. No search weighs the cost of a change of
+  direction or of a repeated string.
 
 ## 8. Sources
 
