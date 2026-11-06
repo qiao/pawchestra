@@ -207,7 +207,9 @@ trunk hole, so that the arm meets the cap of the cut in a crease (`dog-arms-clip
 gap between that corner and the cap showed as a deep notch at the top of the armpit. The beaver
 copy merges the top row of the wall under each freed arm into the next row, so that the arm meets
 the wall in a crease (`beaver-arms-crease.glb`). Reason: the strip between the two rows was a thin
-flap under the armpit. The old faces keep their colors, so that the black and white edge of the trunk stays.
+flap under the armpit. The deer copy merges a fold on the inner side of each arm root
+into the arm (`deer-arms-crease.glb`). Reason: the fold showed as fins under the roots and slits
+on the inner upper arm in the bind. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of

@@ -1,6 +1,6 @@
 {
-  "source": "assets/models/deer/deer-arms.glb",
-  "sourceNote": "The deer mesh (assets/models/deer/deer.glb, assets/models/deer/README.md), with new quad faces on each arm from the socket to the wrist, a side wall of the trunk under each arm, and arms 1.25 times longer. tools/blender/deer_arms.py replays the Blender session that made it. deer.glb stays unchanged.",
+  "source": "assets/models/deer/deer-arms-crease.glb",
+  "sourceNote": "A copy of assets/models/deer/deer-arms.glb with no fold on the inner side of the arm roots: point edits in Blender merge the top chain of each fold into the row below it and that row into the foot of the fold, so that no vertex goes to a new place (assets/models/deer/README.md, deer-arms-crease.json). deer-arms.glb is the deer mesh (assets/models/deer/deer.glb, assets/models/deer/README.md), with new quad faces on each arm from the socket to the wrist, a side wall of the trunk under each arm, and arms 1.25 times longer. tools/blender/deer_arms.py replays the Blender session that made it. deer.glb stays unchanged.",
   "paintedWeights": "assets/models/deer/deer-weights.json",
   "paintedLower": [
     "root",
