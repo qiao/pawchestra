@@ -60,7 +60,7 @@ function isCommand(token: string): token is Command['kind'] {
  * @param text The text.
  * @returns The commands of all glyphs, at their places on the line.
  */
-function shape(text: string): Command[] {
+function outline(text: string): Command[] {
   const folder = mkdtempSync(join(tmpdir(), 'wordmark-'));
   const file = join(folder, 'raw.svg');
   try {
@@ -118,16 +118,24 @@ function extent(commands: readonly Command[], axis: 0 | 1): [number, number] {
   return [Math.min(...values), Math.max(...values)];
 }
 
+/** The wordmark of a name: the view box and the path of its SVG. */
+interface Wordmark {
+  /** The view box of the SVG, as `0 0 <width> <height>`. */
+  readonly viewBox: string;
+  /** The path data of all glyphs. */
+  readonly path: string;
+}
+
 /**
  * Makes the wordmark of a name.
  *
  * @param name The name.
  * @returns The view box and the path.
  */
-export function wordmark(name: string): { viewBox: string; path: string } {
-  const commands = shape(name);
+function wordmark(name: string): Wordmark {
+  const commands = outline(name);
   const [left, right] = extent(commands, 0);
-  const [top, bottom] = extent(shape(BOX_LETTERS), 1);
+  const [top, bottom] = extent(outline(BOX_LETTERS), 1);
 
   let path = '';
   let last = '';
@@ -146,7 +154,9 @@ export function wordmark(name: string): { viewBox: string; path: string } {
       ([x, y]) => [Math.round((x - left) / UNIT), Math.round((y - top) / UNIT)] as const,
     );
     const values = points.flatMap(([x, y]) => [x - current[0], y - current[1]]);
-    const text = values.map((value, index) => (value < 0 || index === 0 ? `${value}` : ` ${value}`));
+    const text = values.map((value, index) =>
+      value < 0 || index === 0 ? `${value}` : ` ${value}`,
+    );
     const letter = command.kind.toLowerCase();
     if (letter === last && letter !== 'm') {
       path += (values[0] ?? 0) < 0 ? '' : ' ';
@@ -171,7 +181,7 @@ export function wordmark(name: string): { viewBox: string; path: string } {
  *
  * @param mark The view box and the path.
  */
-function write(mark: { viewBox: string; path: string }): void {
+function write(mark: Wordmark): void {
   const icons = join(ROOT, 'src', 'ui', 'icons.ts');
   writeFileSync(
     icons,
