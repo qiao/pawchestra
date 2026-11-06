@@ -38,8 +38,17 @@ import {
   BLUR_GATHER_FRAGMENT,
   BLUR_PREPARE_FRAGMENT,
   FINAL_FRAGMENT,
+  FINAL_VERTEX,
   FULL_SCREEN_VERTEX,
 } from './post-shaders.ts';
+import {
+  FLARE_SOURCES,
+  FLARE_TAPS,
+  LENS_FLARE,
+  createFlareUniforms,
+  writeFlare,
+} from './lens-flare.ts';
+import type { FlareUniforms } from './lens-flare.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 import {
@@ -176,6 +185,8 @@ interface PostFrame {
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
   readonly view: PostView;
+  /** The group of the stage lights, whose spotlights give the lens flare, or `null` for none. */
+  readonly lights: Object3D | null;
 }
 
 /**
@@ -281,7 +292,7 @@ function floatTarget(
 }
 
 /** The uniforms of a pass by name. */
-type PassUniforms = Record<string, { value: UniformValue }>;
+type PassUniforms = Record<string, { value: UniformValue | Float32Array }>;
 
 /**
  * Creates the material of a full-screen pass.
@@ -289,15 +300,17 @@ type PassUniforms = Record<string, { value: UniformValue }>;
  * @param fragmentShader The fragment shader.
  * @param uniforms The uniforms.
  * @param defines The defines of the shader.
+ * @param vertexShader The vertex shader: one triangle that covers the view by default.
  * @returns The material. It reads no depth and writes no depth.
  */
 function passMaterial(
   fragmentShader: string,
   uniforms: PassUniforms,
   defines: Record<string, string | number> = {},
+  vertexShader = FULL_SCREEN_VERTEX,
 ): ShaderMaterial {
   return new ShaderMaterial({
-    vertexShader: FULL_SCREEN_VERTEX,
+    vertexShader,
     fragmentShader,
     uniforms,
     defines,
@@ -421,6 +434,8 @@ export class PostPipeline {
   readonly #surfaceRows: ShaderMaterial;
   #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
+  /** The uniforms of the lens flare, which each final pass of a tier shares. */
+  readonly #flare: FlareUniforms = createFlareUniforms();
   /**
    * The draw of the depth pass of the depth of field with the depth materials of the meshes. The
    * resolve of the depth of the multisample target cost 2.1 ms on the development Mac, and a
@@ -587,6 +602,9 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uCinema', view.cinema);
     setUniform(final.uniforms, 'uSeed', grainSeed(timeSec));
     setUniform(final.uniforms, 'uFringe', LENS_FRINGE.shift);
+    if (TIER_SETTINGS[this.#tier].lensFlare) {
+      writeFlare(this.#flare, frame.lights, camera, rect, frame.haze !== null);
+    }
     this.#pass(final, null);
   }
 
@@ -945,6 +963,12 @@ export class PostPipeline {
     if (settings.floorGloss) {
       defines['FLOOR_GLOSS'] = 1;
     }
+    if (settings.lensFlare) {
+      defines['LENS_FLARE'] = 1;
+      defines['FLARE_SOURCES'] = FLARE_SOURCES;
+      defines['FLARE_TAPS'] = FLARE_TAPS;
+      defines['FLARE_GHOSTS'] = Math.max(1, LENS_FLARE.ghosts.length);
+    }
     const look = POST_LOOK;
     const material = passMaterial(
       FINAL_FRAGMENT,
@@ -977,8 +1001,10 @@ export class PostPipeline {
         uSeed: { value: 0 },
         uFringe: { value: LENS_FRINGE.shift },
         ...focusUniforms(),
+        ...this.#flare,
       },
       defines,
+      FINAL_VERTEX,
     );
     // The final pass draws to the canvas, so it takes the tone mapping of the renderer.
     material.toneMapped = true;

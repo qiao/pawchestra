@@ -1033,6 +1033,7 @@ export class StageScene {
           depth: depthPass ? this.#beamDepth.texture : null,
           vignette,
           view: postView,
+          lights: view.lights,
         });
       } else {
         this.#scissorCanvas(postView.rect);
