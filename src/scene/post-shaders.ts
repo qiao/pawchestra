@@ -13,6 +13,57 @@ void main() {
 `;
 
 /**
+ * The vertex shader of the final pass (design 4.5, post effects). With `LENS_FLARE`, each of the
+ * three vertices also does the depth test of each light of the flare (`writeFlare()` of
+ * `scene/lens-flare.ts`): `FLARE_TAPS` samples of the depth on a small disc around the light. The
+ * part of the samples that no player or set piece covers is the visible part of the light. The
+ * three vertices give the same value, so each pixel gets it with no sample of its own. A sample
+ * outside the frame counts as visible, because the depth pass did not write it.
+ */
+export const FINAL_VERTEX = /* glsl */ `
+varying vec2 vUv;
+#ifdef LENS_FLARE
+uniform sampler2D uSceneDepth;
+uniform vec4 uFrame;
+uniform float uAspect;
+uniform float uFlareOn;
+uniform float uFlareDepthOn;
+uniform float uFlareOccluder;
+uniform vec4 uFlareSource[FLARE_SOURCES];
+varying float vFlareSeen[FLARE_SOURCES];
+
+float flareSeen(vec4 source) {
+  if (uFlareDepthOn < 0.5) {
+    return 1.0;
+  }
+  float radius = uFlareOccluder * (uFrame.w - uFrame.y);
+  // The light can stand behind the far plane, and the clear value of the depth is 1.
+  float far = min(source.z, 0.99999);
+  float seen = 0.0;
+  for (int i = 0; i < FLARE_TAPS; i++) {
+    float r = sqrt((float(i) + 0.5) / float(FLARE_TAPS)) * radius;
+    float angle = float(i) * 2.39996323;
+    vec2 at = source.xy + vec2(cos(angle) / uAspect, sin(angle)) * r;
+    bool inside = all(greaterThanEqual(at, uFrame.xy)) && all(lessThanEqual(at, uFrame.zw));
+    float depth = inside ? textureLod(uSceneDepth, at, 0.0).x : 1.0;
+    seen += step(far, depth);
+  }
+  return seen / float(FLARE_TAPS);
+}
+#endif
+
+void main() {
+  vUv = uv;
+#ifdef LENS_FLARE
+  for (int i = 0; i < FLARE_SOURCES; i++) {
+    vFlareSeen[i] = uFlareOn > 0.5 ? flareSeen(uFlareSource[i]) : 0.0;
+  }
+#endif
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}
+`;
+
+/**
  * The GLSL clamp of a sample to the part of its source that the frame wrote: `uClamp` holds the
  * lowest and the highest texture coordinates (design 2.5, 4.5). In Cinematic mode, each pass
  * writes only the letterbox, so a sample outside it would read an old frame.
@@ -206,9 +257,44 @@ vec3 grade(vec3 color) {
 `;
 
 /**
+ * The GLSL of the lens flare of the final pass (design 4.5, post effects; `LENS_FLARE` of
+ * `scene/lens-flare.ts`). `flareOf()` gives the linear light of the flare of one light at the
+ * pixel: a wide veil, which lifts the blacks most near the light, a small glow at the light, and
+ * the ghosts of the aperture on the line from the light through the optical middle of the image.
+ * Each ghost is a soft disc with a brighter rim. The distances are in frame heights, so the flare
+ * keeps its size in the letterbox. It reads no texture.
+ */
+const FLARE_FUNCTION = /* glsl */ `
+uniform float uFlareOn;
+uniform vec4 uFlareSource[FLARE_SOURCES];
+uniform vec3 uFlareLight[FLARE_SOURCES];
+uniform vec2 uFlareCenter;
+uniform vec4 uFlareGlare;
+uniform vec3 uFlareGhost[FLARE_GHOSTS];
+uniform vec3 uFlareGhostColor[FLARE_GHOSTS];
+varying float vFlareSeen[FLARE_SOURCES];
+
+vec3 flareOf(vec4 source, vec3 light) {
+  vec2 scale = vec2(uAspect, 1.0) / (uFrame.w - uFrame.y);
+  float d = length((vUv - source.xy) * scale);
+  float veil = uFlareGlare.x / (1.0 + d * d / (uFlareGlare.y * uFlareGlare.y));
+  float glow = uFlareGlare.z * exp(-d * d / (uFlareGlare.w * uFlareGlare.w));
+  vec3 ghosts = vec3(0.0);
+  for (int k = 0; k < FLARE_GHOSTS; k++) {
+    vec3 ghost = uFlareGhost[k];
+    vec2 at = uFlareCenter + (source.xy - uFlareCenter) * ghost.x;
+    float g = length((vUv - at) * scale) / max(ghost.y, 1e-4);
+    float disc = smoothstep(1.0, 0.8, g) * (0.6 + 0.4 * smoothstep(0.4, 0.95, g));
+    ghosts += uFlareGhostColor[k] * (ghost.z * disc);
+  }
+  return light * (veil + glow + ghosts);
+}
+`;
+
+/**
  * The final pass to the canvas (design 4.5, post effects): the lens fringe, the depth of field, the
- * contact shade, the room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, and the
- * film grain. One pass does all of them, so each pixel of the canvas reads the scene one time,
+ * contact shade, the room haze, the bloom, the lens flare, the tone mapping of the renderer, the
+ * color grade, the vignette, and the film grain. One pass does all of them, so each pixel of the canvas reads the scene one time,
  * and two more times for the lens fringe. Outside the frame `uFrame` (left, bottom, right, top),
  * the pass writes the black of the letterbox bars of Cinematic mode (design 2.5), and reads no
  * texture.
@@ -254,6 +340,9 @@ uniform float uFringe;
 ${VIEW_DEPTH}
 #endif
 varying vec2 vUv;
+#ifdef LENS_FLARE
+${FLARE_FUNCTION}
+#endif
 
 // The room haze (design 4.5): the light of the air between the camera and the point of the
 // pixel. It starts behind the subject of the camera (uHaze.x, in meters) and grows with the
@@ -324,6 +413,14 @@ void main() {
 #ifdef BLOOM
   // The halation: the glow is warmer than the light, as the red glow around a light on film.
   color += texture(uBloom, halfUv).rgb * uBloomStrength * uHalation;
+#endif
+#ifdef LENS_FLARE
+  // The flare is light in the lens, so it comes after the haze of the room.
+  if (uFlareOn > 0.5) {
+    for (int i = 0; i < FLARE_SOURCES; i++) {
+      color += flareOf(uFlareSource[i], uFlareLight[i] * vFlareSeen[i]);
+    }
+  }
 #endif
 #ifdef TONE_MAPPING
   color = toneMapping(color);
