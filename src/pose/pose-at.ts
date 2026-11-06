@@ -27,6 +27,9 @@ import { pedalLevelAt, posePedalFoot } from './pedal.ts';
 import { digitBendsAt } from './piano-digits.ts';
 import { PIANO_KEY_COUNT, keyLevelsAt } from './piano-keys.ts';
 import { HARP_STRING_COUNT, stringSwingsAt } from './harp-strings.ts';
+import { poseHarpFeet } from './harp-feet.ts';
+import { pedalNotchesAt } from './harp-pedals.ts';
+import { HARP_PEDALS } from '../models/instruments/harp.ts';
 import { posePercussion } from './percussion.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
@@ -52,6 +55,7 @@ export interface WritablePose extends AnimalPose {
   blink: number;
   readonly keys: Float32Array | null;
   readonly strings: Float32Array | null;
+  readonly pedals: Float32Array | null;
   readonly digits: Float32Array | null;
 }
 
@@ -109,6 +113,8 @@ function createPose(player: PlayerPlan): WritablePose {
     keys: note.family === 'keyboard' && note.keys ? new Float32Array(PIANO_KEY_COUNT) : null,
     strings:
       note.family === 'harp' && note.strings ? new Float32Array(2 * HARP_STRING_COUNT) : null,
+    pedals:
+      note.family === 'harp' && note.pedals ? new Float32Array(HARP_PEDALS.order.length) : null,
     digits:
       (note.family === 'keyboard' && note.digits) || note.family === 'harp'
         ? new Float32Array(2 * DIGITS)
@@ -455,6 +461,13 @@ function poseAnimal(
         const { thumbClosed } = note.rig.hold;
         pose.digits[0] = hands.left.thumb * thumbClosed * weight;
         pose.digits[DIGITS] = hands.right.thumb * thumbClosed * weight;
+      }
+      // The pedals of a harp go into the notches of the score, and the feet move them.
+      if (note.family === 'harp' && note.pedals && pose.pedals) {
+        pedalNotchesAt(note.pedals, noteTime, pose.pedals);
+        if (note.rig.feet) {
+          poseHarpFeet(note.rig.feet, note.pedals, pose.pedals, noteTime, weight, pose.rotations);
+        }
       }
       break;
     }

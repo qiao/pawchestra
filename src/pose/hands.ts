@@ -39,6 +39,8 @@ import { buildDigitTrack } from './piano-digits.ts';
 import type { DigitTrack } from './piano-digits.ts';
 import { POLAR_BEAR_PAW, clawOffset, planFingeringSteps } from './piano-fingering.ts';
 import type { PianoFingering } from './piano-fingering.ts';
+import { harpFeet } from './harp-feet.ts';
+import type { HarpFeet } from './harp-feet.ts';
 import { HARP_FINGERING, planHarpFingerings } from './harp-fingering.ts';
 import type { HarpFingering } from './harp-fingering.ts';
 
@@ -426,6 +428,8 @@ export interface HandsRig {
   readonly right: HandSide;
   /** The right foot on the damper pedal of the piano, or `null` for the harp. */
   readonly foot: PedalFoot | null;
+  /** The feet on the pedals of the harp, or `null` for the piano. */
+  readonly feet: HarpFeet | null;
 }
 
 /**
@@ -466,6 +470,7 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
     left: side('L', hold.faceL, hold.aimL, hold.restL),
     right: side('R', hold.faceR, hold.aimR, hold.restR),
     foot: instrument === 'piano' ? pedalFoot(model) : null,
+    feet: instrument === 'harp' ? harpFeet(model, scale) : null,
   };
 }
 

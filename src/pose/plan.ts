@@ -46,6 +46,8 @@ import { buildKeyTrack } from './piano-keys.ts';
 import type { KeyTrack } from './piano-keys.ts';
 import { buildStringTrack } from './harp-strings.ts';
 import { notePlucks } from './harp-fingering.ts';
+import { planPedals } from './harp-pedals.ts';
+import type { PedalPlan } from './harp-pedals.ts';
 import type { HarpFingering } from './harp-fingering.ts';
 import type { StringTrack } from './harp-strings.ts';
 import { percussionTracks } from './percussion.ts';
@@ -109,6 +111,8 @@ export interface HandsLayer {
    * pianist: a finger, a pluck time, and a close time for each note, for a pose of the digits.
    */
   readonly fingering: { readonly left: HarpFingering; readonly right: HarpFingering } | null;
+  /** The pedal changes of a harp player (`planPedals()`), or `null` for a pianist. */
+  readonly pedals: PedalPlan | null;
 }
 
 /** The note layer of a singer: the jaw and the sway of the phrases (design 5.3). */
@@ -429,6 +433,7 @@ function* noteLayerSteps(
     );
     yield;
     const family = MOTION_FAMILIES[instrument];
+    const plucks = family === 'harp' ? notePlucks(notes, [left, right]) : null;
     return {
       family,
       rig,
@@ -436,9 +441,10 @@ function* noteLayerSteps(
       right,
       pedal: pedalMotion(rig.foot ? pedal : NO_PEDAL),
       keys: family === 'keyboard' ? buildKeyTrack(notes) : null,
-      strings: family === 'harp' ? buildStringTrack(notes, notePlucks(notes, [left, right])) : null,
+      strings: plucks ? buildStringTrack(notes, plucks) : null,
       digits,
       fingering,
+      pedals: plucks ? planPedals(notes, plucks) : null,
     };
   }
   if (isInFamily(instrument, ['choir'])) {
