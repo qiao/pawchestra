@@ -804,9 +804,9 @@ interface PageInfo {
  * @returns The facts.
  */
 async function pageInfo(browser: Browser, page: Page, options: FrameOptions): Promise<PageInfo> {
-  const players = await page.evaluate(() => window.zoophony?.instruments.length ?? 0);
+  const players = await page.evaluate(() => window.pawchestra?.instruments.length ?? 0);
   // The frame target holds in both camera modes (design 9.7).
-  const camera = await page.evaluate(() => window.zoophony?.cameraMode ?? '');
+  const camera = await page.evaluate(() => window.pawchestra?.cameraMode ?? '');
   const mode = options.headed ? 'headed' : 'headless';
   return { browser: `Chrome ${browser.version()}, ${mode}`, players, camera };
 }
@@ -992,7 +992,7 @@ function isNumbers(value: unknown): value is number[] {
  * @returns The song time in seconds, or `NaN` when the page has none.
  */
 async function songTimeOf(page: Page): Promise<number> {
-  const song = await page.evaluate('[window.zoophony?.songTime]').catch(() => null);
+  const song = await page.evaluate('[window.pawchestra?.songTime]').catch(() => null);
   return isNumbers(song) && song[0] !== undefined ? song[0] : NaN;
 }
 

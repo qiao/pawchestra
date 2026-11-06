@@ -79,7 +79,7 @@ function installDevHook(app: App, scene: StageScene): void {
       return rotations ? [...rotations.subarray(i, i + 4)] : [];
     },
   };
-  window.zoophony = hook;
+  window.pawchestra = hook;
 }
 
 /**

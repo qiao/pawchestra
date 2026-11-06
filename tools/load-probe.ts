@@ -41,7 +41,7 @@ const ROOT = resolve(import.meta.dirname, '..');
 const USAGE =
   'Usage: pnpm load-probe [--phone] [--repeat] [--base <ref>] [--profile] [--runs <n>] [--port <p>] [--out <file.json>]';
 
-/** The marks that the init script of the page writes into `window.zoophonyLoad`. */
+/** The marks that the init script of the page writes into `window.pawchestraLoad`. */
 interface LoadMarks {
   /** The first contentful paint, in ms from the navigation, or `null`. */
   readonly fcp: number | null;
@@ -63,7 +63,7 @@ declare global {
   /** The page of the app with the init script of the probe. */
   interface Window {
     /** The marks of the load ({@link LoadMarks}). */
-    zoophonyLoad?: LoadMarks;
+    pawchestraLoad?: LoadMarks;
   }
 }
 
@@ -116,13 +116,13 @@ const PHONE_CPU_RATE = 4;
 
 /**
  * The init script of the page: it writes the marks of {@link LoadMarks} into
- * `window.zoophonyLoad`. A draw call of the WebGL2 context of the stage gives the empty stage, and
- * the first one after `data-demo` of the canvas gives the first frame. The load ring hides when the
- * demo is ready.
+ * `window.pawchestraLoad`. A draw call of the WebGL2 context of the stage gives the empty stage,
+ * and the first one after `data-demo` of the canvas gives the first frame. The load ring hides
+ * when the demo is ready.
  */
 const INIT = `(() => {
   const load = { fcp: null, lcp: null, longTasks: [], emptyDraw: null, firstDraw: null, firstFrame: null, ready: null };
-  window.zoophonyLoad = load;
+  window.pawchestraLoad = load;
   new PerformanceObserver((list) => {
     for (const e of list.getEntries()) if (e.name === 'first-contentful-paint') load.fcp = e.startTime;
   }).observe({ type: 'paint', buffered: true });
@@ -135,8 +135,8 @@ const INIT = `(() => {
   const getContext = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (kind, options) {
     const gl = getContext.call(this, kind, options);
-    if (gl && kind === 'webgl2' && this.id === 'stage' && !gl.zoophonyWrapped) {
-      gl.zoophonyWrapped = true;
+    if (gl && kind === 'webgl2' && this.id === 'stage' && !gl.pawchestraWrapped) {
+      gl.pawchestraWrapped = true;
       for (const name of ['drawElements', 'drawArrays', 'drawElementsInstanced', 'drawArraysInstanced']) {
         const draw = gl[name].bind(gl);
         gl[name] = function (...a) {
@@ -337,11 +337,11 @@ async function measureSite(
           waitUntil: 'load',
           timeout: 120_000,
         });
-        await page.waitForFunction(() => (window.zoophonyLoad?.ready ?? null) !== null, null, {
+        await page.waitForFunction(() => (window.pawchestraLoad?.ready ?? null) !== null, null, {
           timeout: 180_000,
           polling: 500,
         });
-        const marks = await page.evaluate(() => window.zoophonyLoad ?? null);
+        const marks = await page.evaluate(() => window.pawchestraLoad ?? null);
         if (!marks) {
           throw new Error('The page has no marks of the load.');
         }

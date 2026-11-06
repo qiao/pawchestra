@@ -334,7 +334,7 @@ async function record(args: CpuProfileArgs): Promise<CpuProfile> {
     await cdp.send('Profiler.start');
     await page.waitForTimeout(args.sec * 1000);
     const { profile } = await cdp.send('Profiler.stop');
-    const song = await page.evaluate(() => window.zoophony?.songTime ?? Number.NaN);
+    const song = await page.evaluate(() => window.pawchestra?.songTime ?? Number.NaN);
     console.log(`Recorded ${args.sec} s of ${args.demo} up to the song time ${song.toFixed(1)} s.`);
     return profile;
   } finally {

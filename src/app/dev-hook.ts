@@ -4,7 +4,7 @@ import type { InstrumentId } from '../models/instruments/types.ts';
 
 /**
  * The values of the page that the smoke test reads (`tools/smoke.ts`, design 9.3). Only the dev
- * server gives `window.zoophony`, so the build does not hold it.
+ * server gives `window.pawchestra`, so the build does not hold it.
  */
 export interface DevHook {
   /** The song time of the last frame, in seconds: `Player.now()` after the load, else 0. */
@@ -40,6 +40,6 @@ export const FIRST_PLAY = '.first-screen .play';
 declare global {
   interface Window {
     /** The values of the page for the smoke test. Only the dev server sets it. */
-    zoophony?: DevHook;
+    pawchestra?: DevHook;
   }
 }

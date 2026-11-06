@@ -236,7 +236,7 @@ async function renderShots(
           await page.waitForTimeout(300);
         }
         await writeFile(join(out, `${name}.png`), await page.screenshot({ type: 'png' }));
-        const song = await page.evaluate(() => window.zoophony?.songTime ?? Number.NaN);
+        const song = await page.evaluate(() => window.pawchestra?.songTime ?? Number.NaN);
         console.log(`${relative(ROOT, join(out, `${name}.png`))}: song time ${song.toFixed(2)} s`);
       } finally {
         await page.close();

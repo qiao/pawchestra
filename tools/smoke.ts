@@ -241,7 +241,7 @@ async function readSample(page: Page, violin: number, clickMs: number): Promise<
   const elapsedSec = (Date.now() - clickMs) / 1000;
   return page.evaluate(
     ({ player, elapsed }) => {
-      const hook = window.zoophony;
+      const hook = window.pawchestra;
       return {
         elapsedSec: elapsed,
         songTime: hook?.songTime ?? Number.NaN,
@@ -263,7 +263,7 @@ async function readSample(page: Page, violin: number, clickMs: number): Promise<
  * @returns The mode, or '' with no hook.
  */
 async function modeOf(page: Page): Promise<string> {
-  return page.evaluate(() => window.zoophony?.cameraMode ?? '');
+  return page.evaluate(() => window.pawchestra?.cameraMode ?? '');
 }
 
 /**
@@ -278,7 +278,7 @@ async function checkCameraControls(
 ): Promise<Omit<CameraChecks, 'modeAtLoad' | 'modeReduced'>> {
   await page.keyboard.press('Space');
   await page.waitForTimeout(300);
-  const before = await page.evaluate(() => [...(window.zoophony?.cameraPosition ?? [])]);
+  const before = await page.evaluate(() => [...(window.pawchestra?.cameraPosition ?? [])]);
   const viewport = page.viewportSize() ?? { width: 1440, height: 900 };
   const x = viewport.width / 2;
   const y = viewport.height / 3;
@@ -287,7 +287,7 @@ async function checkCameraControls(
   await page.mouse.move(x + SMOKE.dragPx, y, { steps: 3 });
   await page.mouse.up();
   await page.waitForTimeout(300);
-  const after = await page.evaluate(() => [...(window.zoophony?.cameraPosition ?? [])]);
+  const after = await page.evaluate(() => [...(window.pawchestra?.cameraPosition ?? [])]);
   const modeAfterDrag = await modeOf(page);
   await page.getByRole('button', { name: 'Cinematic camera' }).click();
   const modeAfterButton = await modeOf(page);
@@ -333,7 +333,7 @@ async function runSmoke(
   await page.goto(base);
   // The first play waits until the Player has loaded the samples of the default demo.
   await page.waitForSelector(SAMPLES_READY, { timeout: 60_000 });
-  const violin = await page.evaluate(() => window.zoophony?.instruments.indexOf('violin') ?? -1);
+  const violin = await page.evaluate(() => window.pawchestra?.instruments.indexOf('violin') ?? -1);
   const modeAtLoad = await modeOf(page);
   // The play is in Cinematic mode, so that the camera check sees the shots move the camera.
   await startCinematic(page);
@@ -373,7 +373,7 @@ async function reducedMode(browser: Browser, base: string): Promise<string> {
   try {
     const page = await context.newPage();
     await page.goto(base);
-    await page.waitForFunction(() => window.zoophony !== undefined);
+    await page.waitForFunction(() => window.pawchestra !== undefined);
     return await modeOf(page);
   } finally {
     await context.close();
