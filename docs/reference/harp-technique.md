@@ -9,7 +9,7 @@ fact.
 updates section 6 "Use in the app" and each fact that it finds wrong, in the same commit. Each new
 fact gets its source.
 
-**Source marks.** Each fact names its source by a number of section 7. "(derived)" marks a value
+**Source marks.** Each fact names its source by a number of section 8. "(derived)" marks a value
 that this file calculates from the values of its sources. A fact with no mark comes from the text
 of the source.
 
@@ -122,9 +122,10 @@ The app does not follow these facts:
 - **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
   (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
 
-## 7. Sources
+## 8. Sources
 
-All sources opened on 2026-10-25.
+Sources 1 to 7 opened on 2026-10-25, and sources 8 to 18 on 2026-11-06, except the search
+summary 18.
 
 1. L. Lawrence, "Method for the Harp: Fundamental Exercises with Illustrations and Technical
    Explanations", Schirmer's Scholastic Series vol. 209, G. Schirmer, 1929 (an introduction to
@@ -140,3 +141,28 @@ All sources opened on 2026-10-25.
 5. S. Chadwick, "Orientation", Early Gaelic Harp Info. https://earlygaelicharp.info/orientation
 6. Dusty Strings, "Ravenna 26". https://manufacturing.dustystrings.com/harp-models/ravenna-26
 7. Wikipedia, "Pedal harp". https://en.wikipedia.org/wiki/Pedal_harp
+8. C. Salzedo, "Modern Study of the Harp" ("L'étude moderne de la harpe"), G. Schirmer, 1921.
+   https://archive.org/download/letudemodernedel00salz4/letudemodernedel00salz4.pdf
+9. D. Chadefaux, J.-L. Le Carrou, B. Fabre, and L. Daudet, "Experimentally based description of
+   harp plucking", J. Acoust. Soc. Am. 131(1), 844-855, 2012. doi:10.1121/1.3651246.
+   https://www.lam.jussieu.fr/Membres/LeCarrou/Articles/A5_Chadefaux_HarpPluckingDescription.pdf
+10. D. Chadefaux, M. Wanderley, J.-L. Le Carrou, B. Fabre, and L. Daudet, "Experimental study of
+    the musician / instrument interaction in the case of the concert harp", Acoustics 2012,
+    Nantes. https://www-media.idmil.org/media/2012/chadefaux_2012_acoustics.pdf
+11. D. Freund and D. Cutler, "Harp | Scoring", Extreme Orchestration, Timbre and Orchestration
+    Resource, 2024. https://timbreandorchestration.org/isfee/extreme-orchestration/harp/scoring
+12. C. Mills (principal harpist, New Zealand Symphony Orchestra), "Writing for the Harp in the
+    Orchestra", 2016.
+    https://nzso.sgp1.cdn.digitaloceanspaces.com/writing-for-harp-in-orchestra.pdf
+13. F. Pomeranz, "Writing for the Harp", Berklee Today, Fall 2004.
+    https://www.berklee.edu/node/2392666
+14. Trinity College London, "Suggested Fingerings for Harp Technical Work".
+    https://pubweb-prod.trinitycollege.com/resource?id=5525
+15. Music Mark, "A Common Approach", harp, area B, "Tone quality, sound production and damping"
+    (P3, B4). https://www.musicmark.org.uk/a-common-approach/harp/area-b/pos-3/b4/
+16. Music Mark, "A Common Approach", harp, area B (P4, B3).
+    https://www.musicmark.org.uk/a-common-approach/harp/area-b/pos-4/b3/
+17. A. Hugill, "Harp: Hand Techniques", The Orchestra: A User's Manual.
+    https://andrewhugill.com/OrchestraManual/harp_techniques.html
+18. Harp Column forum, "String spacing on pedal harps" (a search summary only).
+    https://harpcolumn.com/forums/topic/string-spacing-on-pedal-harps/
