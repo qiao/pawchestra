@@ -460,16 +460,8 @@ function mallet(
  * @param axis The unit direction from the back head to the front head.
  * @param radius The radius of the heads.
  * @param depth The depth of the shell.
- * @param shell The color of the shell.
  */
-function drum(
-  piece: PieceBuilder,
-  center: Vec3,
-  axis: Vec3,
-  radius: number,
-  depth: number,
-  shell: Rgb,
-): void {
+function drum(piece: PieceBuilder, center: Vec3, axis: Vec3, radius: number, depth: number): void {
   const corners = lathe(
     [
       [radius, -depth / 2],
@@ -484,7 +476,7 @@ function drum(
     new Vector3(...axis).normalize(),
   );
   const at = transform(center, toQuat(turn));
-  piece.add(wall, shell, at);
+  piece.add(wall, INSTRUMENT_COLORS.drumShell, at);
   piece.add([...top, ...bottom], INSTRUMENT_COLORS.drumHead, at);
 }
 
@@ -649,7 +641,7 @@ export function buildBassDrum(): InstrumentModel {
     new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), BASS_DRUM.turn * MathUtils.DEG2RAD),
   );
   const normal = toVec3(axis);
-  drum(piece, center, normal, radius, depth, INSTRUMENT_COLORS.drumShell);
+  drum(piece, center, normal, radius, depth);
   // The stand: a frame under the drum, from the floor to the shell. Its legs and its cross bar
   // scale with the heads.
   const across = new Vector3(axis.z, 0, -axis.x).normalize();
@@ -708,7 +700,7 @@ export function buildSnareDrum(): InstrumentModel {
   const piece = new PieceBuilder();
   const { radius, depth, top } = SNARE_DRUM;
   const center: Vec3 = [0, top - depth / 2, -SNARE_DRUM.forward];
-  drum(piece, center, [0, 1, 0], radius, depth, INSTRUMENT_COLORS.drumShell);
+  drum(piece, center, [0, 1, 0], radius, depth);
   tripod(piece, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
   const tilt = SNARE_DRUM.malletTilt;
   const spot = SNARE_DRUM.malletSpot;
