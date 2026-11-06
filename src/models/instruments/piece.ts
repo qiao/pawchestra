@@ -136,6 +136,18 @@ export class PieceBuilder {
   }
 
   /**
+   * Adds one string of a harp as a part of its own (design 4.6), in the piece axes.
+   *
+   * @param index The index of the string, from 0 (the bass string).
+   * @param corners The corner list of the string in the piece axes, before the size scale.
+   * @param color The color.
+   * @param finish The finish.
+   */
+  string(index: number, corners: readonly number[], color: Rgb, finish: Finish): void {
+    this.#parts.push({ corners: this.#place(corners, transform()), color, finish, string: index });
+  }
+
+  /**
    * Places the corners of a part in the piece axes, and applies the size scale.
    *
    * @param corners The corner list of the part in its own axes.

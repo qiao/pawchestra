@@ -86,6 +86,11 @@ export interface InstrumentPart {
    * note plays (5.3). A part with no key does not move on its piece.
    */
   readonly key?: number;
+  /**
+   * The index of a part that is one string of a harp, from 0 (the bass string) (design 4.6). The
+   * string swings after its pluck (5.3). A part with no string index does not swing.
+   */
+  readonly string?: number;
 }
 
 /**
@@ -221,6 +226,29 @@ export interface PlayTarget {
   readonly keys: readonly [low: number, high: number] | null;
 }
 
+/** One string of a harp, as a straight line in the axes of its piece (design 4.6). */
+export interface StringLine {
+  /** The point where the string leaves the soundboard. */
+  readonly bottom: Vec3;
+  /** The point where the string ends in the neck. */
+  readonly top: Vec3;
+  /** The radius of the part of the string, in meters. */
+  readonly radius: number;
+  /** The share of the length from `bottom` to the pluck point of the string. */
+  readonly pluck: number;
+}
+
+/** The strings of a harp, which swing after a pluck (design 4.6, 5.3). */
+export interface InstrumentStrings {
+  /** The line of each string, from the bass string, in the order of the string parts. */
+  readonly lines: readonly StringLine[];
+  /**
+   * The unit direction of the largest swing of a string, in the axes of the piece: the normal of
+   * the plane of the strings, in which a finger pulls a string.
+   */
+  readonly swing: Vec3;
+}
+
 /** The geometry and the play data of one instrument, with no Three.js object. */
 export interface InstrumentModel {
   readonly id: InstrumentId;
@@ -234,4 +262,6 @@ export interface InstrumentModel {
   readonly size: Vec3;
   /** The turn of the keys of a keyboard, on the piece of its key parts. Only a keyboard has it. */
   readonly keyTurn?: KeyTurn;
+  /** The strings of a harp, on the piece of its string parts. Only a harp has them. */
+  readonly strings?: InstrumentStrings;
 }

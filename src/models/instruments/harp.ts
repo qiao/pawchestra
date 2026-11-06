@@ -7,7 +7,7 @@ import type { Vec3 } from '../tuples.ts';
 import { box, lathe, plate, sweep } from '../primitives.ts';
 import type { OutlinePoint, PlateLevel } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize } from './piece.ts';
-import type { InstrumentModel } from './types.ts';
+import type { InstrumentModel, StringLine } from './types.ts';
 
 /** A point of the strings plane x = 0 of the harp, as (y, z) in meters. */
 type PlanePoint = readonly [y: number, z: number];
@@ -760,10 +760,13 @@ function stringLook(index: number): readonly [Rgb, Finish] {
  * the neck, with {@link STRINGS.rings} rings and open ends. The bass strings are thicker.
  *
  * @param piece The harp.
+ * @param scale The scale of the harp.
+ * @returns The line of each string, in the harp axes after the scale.
  */
-function addStrings(piece: PieceBuilder): void {
+function addStrings(piece: PieceBuilder, scale: number): StringLine[] {
   const bottomLine = neckBottom();
   const [thick, thin] = STRINGS.radius;
+  const lines: StringLine[] = [];
   for (let i = 0; i < HARP.strings; i++) {
     const z = stringZ(i);
     const from = boardHeight(z);
@@ -778,8 +781,15 @@ function addStrings(piece: PieceBuilder): void {
       });
     });
     const [color, finish] = stringLook(i);
-    piece.add(sweep(rings, false), color, transform(), finish);
+    piece.string(i, sweep(rings, false), color, finish);
+    lines.push({
+      bottom: [0, from * scale, z * scale],
+      top: [0, to * scale, z * scale],
+      radius: radius * scale,
+      pluck: ((pluckPoint(i)[1] ?? from) - from) / (to - from),
+    });
   }
+  return lines;
 }
 
 /**
@@ -839,7 +849,7 @@ export function buildHarp(scale = 1): InstrumentModel {
   addColumn(piece);
   addNeck(piece);
   addSoundbox(piece);
-  addStrings(piece);
+  const lines = addStrings(piece, scale);
 
   const instrument = piece.build(
     'instrument',
@@ -884,5 +894,7 @@ export function buildHarp(scale = 1): InstrumentModel {
       },
     ],
     size: pieceSize(instrument),
+    // A finger pulls its string out of the plane of the strings, toward the palm.
+    strings: { lines, swing: [1, 0, 0] },
   };
 }
