@@ -217,7 +217,7 @@ export function buildHarp(scale = 1): InstrumentModel {
   const frame = INSTRUMENT_COLORS.harpFrame;
   const piece = new PieceBuilder(scale);
   const scaled = (at: Vec3): Vec3 => [at[0] * scale, at[1] * scale, at[2] * scale];
-  const yz = ([y, z]: readonly [number, number], x = 0): Vec3 => [x, y, z];
+  const yz = ([y, z]: readonly [number, number]): Vec3 => [0, y, z];
 
   // The base, the column with its crown, and the neck.
   const { base } = h;
