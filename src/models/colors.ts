@@ -73,7 +73,26 @@ export const INSTRUMENT_COLORS = {
   bowStick: srgb('#3b2a20'),
   bowHair: srgb('#e8e2d4'),
   strings: srgb('#9a9080'),
-  harpFrame: srgb('#b07a45'),
+  /** The varnished maple of the harp: the column, the neck, the soundbox, and the base. */
+  harpFrame: srgb('#c9965e'),
+  /** The spruce soundboard of the harp, lighter than the frame. */
+  harpBoard: srgb('#e3c491'),
+  /** The center strip of the soundboard, in which the strings start. */
+  harpStrip: srgb('#6e3f20'),
+  /** The dark inside of the soundbox, seen through the holes in its back. */
+  harpHole: srgb('#1a120c'),
+  /** The box under a raised harp: a dark wood, so that the harp stands out from it. */
+  harpStand: srgb('#3a2a22'),
+  /** The gut strings of the middle of the harp. */
+  harpGut: srgb('#e2d2ae'),
+  /** The nylon strings of the treble, lighter than the gut strings. */
+  harpNylon: srgb('#f0eadc'),
+  /** The C strings of the harp. */
+  harpC: srgb('#b8282a'),
+  /** The F strings of the harp: a dark blue. */
+  harpF: srgb('#26305a'),
+  /** The wound wire strings of the bass. */
+  harpWire: srgb('#b08850'),
   harpStrings: srgb('#e8e2d4'),
   pianoCase: srgb('#15120f'),
   /** The iron plate inside the piano: a dark gold, as in `mockup.png`. */
