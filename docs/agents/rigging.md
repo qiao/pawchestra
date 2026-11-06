@@ -283,10 +283,14 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 
 ### Seams and cuts
 
+- A small clip of the arm root into the trunk is better than an over-cut. A notch, a gap, a fin, a
+  flap, or a ledge at the armpit or the inner elbow is a fault, and a hidden one still counts.
 - A crease can hold a closed tetrahedron, or a vertex of two surfaces. Remove them before the
   split (`penguin_edit.py`). A collapse at a cut loop can give a face of a stray color (`spread`).
-- A raised arm pulls a seam where a hanging arm touches the trunk into dark flaps. Only a cut at
-  the seam fixes them (`cut`). Give the caps the skin normals.
+- A raised arm pulls a seam where a hanging arm touches the trunk into dark flaps. Free the arm
+  with a cut at the seam (`cut`) only as far as a raised arm of the played roles needs it, and
+  stop where the root meets the trunk. Give the caps the skin normals. Then check the flat rig
+  view (front, below, back) for a notch, a fin, a flap, or a ledge.
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
   sheets of `pnpm close-views audit`.
 - A tube that `arm_rebuild.py` wraps onto a freed arm can keep the inner vertices of its lowest
