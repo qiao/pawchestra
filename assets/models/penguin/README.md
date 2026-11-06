@@ -225,8 +225,8 @@ place. The flank rule changes no face of this copy.
 
 | Item | Value |
 |---|---|
-| Size | 950,188 bytes |
-| SHA-256 | `bb54e163e48e133a15e70e3656827f6997fffa447796bd54bc15f43934c43ee3` |
+| Size | 950,476 bytes |
+| SHA-256 | `bd3924084f81698e4197b5a5244d46060b620354c7d25e4bfca0297cbe279600` |
 | Writer | Khronos glTF Blender I/O v5.2.40 |
 
 The rebuilt tube of each flipper lay on the trunk below the shoulder: `arm_rebuild.py` wrapped the
@@ -252,8 +252,9 @@ a new place. `penguin-arms-pit.json` lists the 24 merges in their order:
 
 The copy has 2,282 vertices and 4,560 triangles after the weld (2,306 and 4,608 before): 48
 faces go (28 on the left, 20 on the right), and 34 faces take a new corner (19 and 15). A new
-corner keeps the UV of its vertex from a face across a shared edge, so the black and white edge
-stays. Each vertex keeps its place on `penguin-arms-edge.glb`, so the rig gives it the weights of
+corner takes the UV of its vertex in a face that shares a corner UV with it, so that the face
+stays on its island of the atlas. Where no such face exists, the corner keeps its old UV. Thus
+the black and white edge stays, and the rig gives no new lone face. Each vertex keeps its place on `penguin-arms-edge.glb`, so the rig gives it the weights of
 its place on `penguin-arms.glb` (`weightSource` of the config). The faces that close the inner
 side of a flipper lie up to 0.024 units from the old surface, where the walls were.
 
