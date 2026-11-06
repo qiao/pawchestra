@@ -27,8 +27,8 @@ import {
 
 import { letterbox, mixBox } from './letterbox.ts';
 import type { FrameBox } from './letterbox.ts';
-import { blendOrbitView, blendShare, mix, modeBlendWeight } from './mode-blend.ts';
-import type { OrbitView } from './mode-blend.ts';
+import { blendShare, mix, modeBlendWeight, startOrbitBlend, stepOrbitBlend } from './mode-blend.ts';
+import type { OrbitBlend, OrbitView } from './mode-blend.ts';
 
 /**
  * The move of the orbit target to the stage center after a change from a close shot to Free mode
@@ -157,10 +157,17 @@ interface TargetGlide {
 interface CameraBlend {
   /** The time of the change, in milliseconds. */
   readonly startMs: number;
-  /** The weight of the blend in the last frame, from 0 to 1. */
-  weight: number;
   /** True for a blend into Cinematic mode, false for a blend into Free mode. */
   readonly toCinematic: boolean;
+  /** The blend of the camera of the last frame, or `null` before the first frame. */
+  orbit: OrbitBlend | null;
+}
+
+/** The camera of one frame of a blend, and the share of the rest of the way of the frame. */
+interface BlendFrame {
+  readonly view: OrbitView;
+  /** The share of `blendShare()`: 1 in the last frame. */
+  readonly share: number;
 }
 
 /**
@@ -406,7 +413,7 @@ export class StageCamera {
     if (toCinematic && this.#blend?.toCinematic !== false) {
       this.#freeView = this.#shownView();
     }
-    this.#blend = { startMs: nowMs, weight: 0, toCinematic };
+    this.#blend = { startMs: nowMs, toCinematic, orbit: null };
   }
 
   /**
@@ -421,8 +428,9 @@ export class StageCamera {
    * Shows the camera of a shot (Cinematic mode, design 5.6). It also moves the target of the
    * orbit controls, so that a change to Free mode continues from this camera with no jump. In
    * the blend of a change into Cinematic mode, the camera on the screen goes from the camera of
-   * the change to the camera of the shot, which moves too. Each frame moves the camera by the
-   * share of `blendShare()` toward the camera of the shot, so a cut in the blend does not jump.
+   * the change to the camera of the shot, which moves too. Each frame moves the camera a part of
+   * the rest of the way toward the camera of the shot (`stepOrbitBlend()` of `mode-blend.ts`), so
+   * a cut in the blend does not jump.
    *
    * @param pose The camera from `cameraAt()`.
    * @param nowMs The time of the frame, in milliseconds.
@@ -430,14 +438,11 @@ export class StageCamera {
   follow(pose: CameraPose, nowMs = performance.now()): void {
     // Each frame of Cinematic mode clears the input, because a press in it changes no camera.
     this.#input = false;
-    const blend = this.#blend?.toCinematic ? this.#blend : null;
-    const w = blend ? modeBlendWeight(nowMs - blend.startMs) : 1;
-    const share = blend ? blendShare(blend.weight, w) : 1;
-    const view = share >= 1 ? pose : blendOrbitView(this.#shownView(), pose, share);
     // A blend into Free mode ends in Cinematic mode.
-    this.#blend = w < 1 ? blend : null;
-    if (blend) {
-      blend.weight = w;
+    const blend = this.#blend?.toCinematic ? this.#blend : null;
+    const { view, share } = blend ? this.#stepBlend(blend, pose, nowMs) : { view: pose, share: 1 };
+    if (share >= 1) {
+      this.#blend = null;
     }
     this.camera.position.set(...view.position);
     this.#controls.target.set(...view.target);
@@ -464,10 +469,7 @@ export class StageCamera {
    * @returns True at the end of the blend.
    */
   #blendToFree(blend: CameraBlend, nowMs: number): boolean {
-    const w = modeBlendWeight(nowMs - blend.startMs);
-    const share = blendShare(blend.weight, w);
-    blend.weight = w;
-    const view = blendOrbitView(this.#shownView(), this.#freeView ?? this.#defaultOrbit(), share);
+    const { view, share } = this.#stepBlend(blend, this.#freeView ?? this.#defaultOrbit(), nowMs);
     this.camera.position.set(...view.position);
     this.#controls.target.set(...view.target);
     this.camera.lookAt(this.#controls.target);
@@ -478,7 +480,25 @@ export class StageCamera {
     this.#fit = mix(this.#fit, 0, share);
     this.#fitGlide = null;
     this.#applyFrame();
-    return w >= 1;
+    return share >= 1;
+  }
+
+  /**
+   * Moves a blend of a change of the mode to a frame (`stepOrbitBlend()`). The first frame starts
+   * the blend from the camera on the screen.
+   *
+   * @param blend The blend.
+   * @param live The live camera of the new mode.
+   * @param nowMs The time of the frame, in milliseconds.
+   * @returns The camera on the screen, and the share of the frame for the other values.
+   */
+  #stepBlend(blend: CameraBlend, live: OrbitView, nowMs: number): BlendFrame {
+    const w = modeBlendWeight(nowMs - blend.startMs);
+    const orbit = blend.orbit ?? startOrbitBlend(this.#shownView(), live);
+    const share = blendShare(orbit.weight, w);
+    const step = stepOrbitBlend(orbit, live, w);
+    blend.orbit = step.blend;
+    return { view: step.view, share };
   }
 
   /**
