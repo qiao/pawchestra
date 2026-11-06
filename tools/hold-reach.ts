@@ -41,6 +41,7 @@ import {
   strikeReachLines,
 } from './strike-reach.ts';
 import type { PercussionInstrument } from '../src/pose/percussion-rig.ts';
+import { harpReach, harpReachLines } from './harp-reach.ts';
 
 /** An instrument that the player holds under the chin. */
 export type ChinInstrument = 'violin' | 'viola';
@@ -812,7 +813,7 @@ interface ReachOptions {
 
 /** The usage text of `pnpm hold-reach`. */
 const USAGE =
-  'Usage: pnpm hold-reach <species> [--instrument violin|viola|<wind>|<percussion>] [--support chair|stand] [--set <path>=<value>[;<path>=<value>]...]... [--size <scale>[,<scale>]...] [--glb <file>]';
+  'Usage: pnpm hold-reach <species> [--instrument violin|viola|<wind>|<percussion>|harp] [--support chair|stand] [--set <path>=<value>[;<path>=<value>]...]... [--size <scale>[,<scale>]...] [--glb <file>]';
 
 /**
  * Reads the options after the species. Each option has one value, and `--set` can come more than
@@ -995,6 +996,26 @@ async function main(): Promise<void> {
 
   const { glb, rest } = takeGlb(args);
   const { sizes, rest: others } = takeSizes(rest);
+  const harp = others.indexOf('--instrument');
+  if (harp >= 0 && others[harp + 1] === 'harp') {
+    // The harp has two hands on many strings, so it has a report of its own (`tools/harp-reach.ts`).
+    const sets = others.flatMap((value, i) => (others[i - 1] === '--set' ? [value] : []));
+    const demos = await probeDemos();
+    for (const set of ['', ...sets]) {
+      const { undo, text } = setHolds(set);
+      try {
+        console.log(
+          [
+            ...(sets.length > 0 ? [`${text || 'base'}:`] : []),
+            ...harpReachLines(species, harpReach(species, demos)),
+          ].join('\n'),
+        );
+      } finally {
+        undo();
+      }
+    }
+    return;
+  }
   const options = parseReachOptions(others);
   if (sizes.length > 0 && options.instrument !== 'violin') {
     throw new Error('The option --size takes the violin only.');
