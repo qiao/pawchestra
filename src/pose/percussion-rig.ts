@@ -351,9 +351,15 @@ export const PERCUSSION_HOLDS = {
   // from the shoulders, so that they make a V of about 66° at a strike and slant down 9°, as the
   // matched grip of a real player. Between strikes, each stick keeps its strike direction, and
   // the wrist lifts the tip over the head (across.pitch), as a real player's stroke from the
-  // wrist. With the rest direction across the forearm, the tips swing out over the rim. The
-  // elbows point out, so that the rebuilt round upper arms stay out of the belly (design 5.3): with
-  // the elbows nearer to the body, they went 2.4 cm into it. The drum takes its place from the
+  // wrist. With the rest direction across the forearm, the tips swing out over the rim. The pitch
+  // of 0.17 rad holds each tip about 3.5 cm above the head between strikes, with the stick almost
+  // level, as the ready position of a real player (1 to 2 inches, percussion 6). Before a
+  // strike, the wrist lifts the tip higher by the loudness (sizes.lift, across.peak): about 11 cm
+  // above the head at a velocity of 40, 14 cm at 100, and 15 cm at 127, below the 8 inches of a
+  // full stroke, and about 10 cm in a roll. With a pitch of 0.9 rad and a peak of 1, each tip
+  // stood 21 cm above the head between strikes, the stick 35° up, and the stroke did not grow
+  // with the loudness. The elbows point out, so that the rebuilt round upper arms stay out of the
+  // belly (design 5.3): with the elbows nearer to the body, they went 2.4 cm into it. The drum takes its place from the
   // body (fit): at the bind place, the forearms or the paws of the recast elephant, bear, hippo,
   // and panda went 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast
   // hippo and panda missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for
@@ -368,7 +374,7 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: [0.5, -0.3, -0.5],
     top: 'up',
-    across: { rest: -0.6, lift: 0.3, pitch: 0.9, peak: 1 },
+    across: { rest: -0.6, lift: 0.3, pitch: 0.17, peak: 5 },
     pitchR: 1,
     ready: false,
     set: { raise: 0.01, rise: [0.1, 0.22] },

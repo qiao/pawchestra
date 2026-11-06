@@ -478,6 +478,12 @@ The rest of each family:
   reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
   points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
   stay out of the leaning belly. A home further out misses the bars.
+- **Snare sticks between strikes.** Each stick keeps its strike direction, and the wrist holds
+  the tip a few cm above the head with the stick almost level (`MalletAcross.pitch`), as the
+  ready position of a real player (percussion 6). Before a strike, the wrist lifts the tip
+  higher by the loudness of the note (`StrikeSizes.lift`, `MalletAcross.peak`), and the tip comes
+  back to the ready height after the rebound. Reason: with a large pitch and no higher lift, the
+  tips stood high above the head between strikes, and the stroke did not grow with the loudness.
 - **Snare drum from the body.** The shared snare drum hold takes the place of the drum from the
   body (`PercussionHold.fit`, `fitDrumPlace()`). The drum goes forward until its near rim stands a
   room in front of the trunk on the middle line, from the head up to the shoulder joints. A deep

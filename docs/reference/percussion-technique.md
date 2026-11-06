@@ -237,7 +237,10 @@ The app follows these facts:
   needs no muffling. The right upper arm hangs beside the body with the elbow down and back
   (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
-  The sticks make a V and slant down a little at a strike. The elbows stand about a fist from the
+  The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
+  3.5 cm above the head, with the stick almost level, as in the ready position
+  (`MalletAcross.pitch`). Before a strike, the tip lifts higher for a louder note: about 11 cm to
+  15 cm above the head, and about 10 cm in a roll (`StrikeSizes.lift`, `MalletAcross.peak`). The elbows stand about a fist from the
   body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the belly. At
   rest, the sticks lie across the body in front of the waist, with the tips a little above the
   near rim (`PercussionHold.set`).
@@ -257,6 +260,9 @@ The app follows these facts:
 
 The app does not follow these facts:
 
+- **The full stroke of the snare drum (section 6).** The tip of a loud note lifts about 15 cm,
+  less than the 8 inches of a full stroke, because the size of a gesture grows only up to two
+  times from a soft note to a loud note (`gestureSize()`), and a soft note must stay low.
 - **The lean over the bass drum (section 5).** The spine leans over the drum
   (`PercussionHold.lean`), so that the short arm can bend.
 - **The hold of the triangle (section 8).** The clip is at the height of the mouth
