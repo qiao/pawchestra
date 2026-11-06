@@ -74,12 +74,6 @@ export const CUE_MOTION = {
   /** The eyes of the players are this far above their place, in meters. */
   eyeHeight: 1.1,
   /**
-   * The left hand points at most this far to the right of the front of the upper body: not to the
-   * right of it. With 20°, the forearm crosses in front of the head, which turns further to the
-   * section, and goes through its muzzle.
-   */
-  handRight: 0,
-  /**
    * The left hand points at least this far to the left of the front of the bear, so that it shows
    * beside the head from behind. At the front of the upper body, a cue to a section in the middle
    * or at the right puts the hand behind the head in the view from behind.
@@ -369,7 +363,9 @@ function turnsTo(inputs: CueInputs, target: Vec3): Turns {
     torsoYaw,
     headYaw,
     headPitch: Math.min(m.pitchUp, Math.max(-m.pitchDown, pitch)),
-    handYaw: Math.min(m.maxTurn, Math.max(torsoYaw - m.handRight, m.handLeft, fromShoulder)),
+    // The left hand points no further right than the front of the upper body. A hand 20° to the
+    // right of it crosses in front of the head, and the forearm goes through the muzzle.
+    handYaw: Math.min(m.maxTurn, Math.max(torsoYaw, m.handLeft, fromShoulder)),
     toSection,
   };
 }
