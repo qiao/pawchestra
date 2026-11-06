@@ -167,7 +167,8 @@ The app follows these facts:
   its legs, so the piano stands on longer legs (`PIANO_LIFT`) in place of a higher bench, with
   the keys at about 1.01 m. Thus the forearms are almost level with the keys. The paw is thick,
   so the elbows stand about 10 cm above the key top, as one Taubman text and Czerny put them a
-  little higher than the keys.
+  little higher than the keys. The lid stands on the short prop stick (`PIANO.lidAngle`), so the
+  higher case hides less of the players behind it.
 - **The distance (section 2).** The keys stand at `PIANO_FRONT_H` in front of the floor point.
   Farther keys make the right leg reach for the damper pedal and pull the haunch into the bench.
   Nearer keys fold the shoulders.

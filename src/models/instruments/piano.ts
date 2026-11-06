@@ -56,19 +56,23 @@ export const PIANO = {
   /** The bottom and the top of the rim of the case. */
   caseBottom: 0.62 + PIANO_LIFT,
   caseTop: 0.95 + PIANO_LIFT,
-  /** The angle of the open lid. */
-  lidAngle: 35 * MathUtils.DEG2RAD,
+  /**
+   * The angle of the open lid: the short prop stick of a grand piano. With the lift and the scale
+   * 1.16, in the default view of `bach-bwv1050` at 20 s, the faces of both hippos behind the piano
+   * show over the lid at 25°. At 35°, the long prop stick, the lid hides the face of the right
+   * hippo up to its ears and the lower face of the left hippo.
+   */
+  lidAngle: 25 * MathUtils.DEG2RAD,
 } as const;
 
 /**
  * The scale of the whole piano around the origin of the piano axes: 1.16 times a real grand
  * piano, because the polar bear pianist is a large animal. {@link PIANO_LIFT} sets the height of
  * the keys. A larger piano hides the players behind it: in the default view of `bach-bwv1050` at
- * 20 s, with no lift, the faces of the hippos behind the piano show over the lid at 1.24, the lid
- * hides their eyes at 1.30, all but their ears at 1.36, and the whole hippos at 1.508. With the
- * lift, at 1.16 and the lid at 35°, the lid hides the face of the right hippo up to its ears and
- * the lower face of the left hippo. The scale 1.24 with a lift of 0.13 puts the keys at the same
- * height, and the far keys 0.05 m further out at each end.
+ * 20 s, with no lift and the lid at 35°, the faces of the hippos behind the piano show over the
+ * lid at 1.24, the lid hides their eyes at 1.30, all but their ears at 1.36, and the whole hippos
+ * at 1.508. The scale 1.24 with a lift of 0.13 puts the keys at the same height, and the far keys
+ * 0.05 m further out at each end.
  */
 export const PIANO_SCALE = 1.16;
 
