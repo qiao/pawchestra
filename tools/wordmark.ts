@@ -132,10 +132,13 @@ export function wordmark(name: string): { viewBox: string; path: string } {
   let path = '';
   let last = '';
   let current: readonly [number, number] = [0, 0];
+  let start = current;
   for (const command of commands) {
+    // A close command puts the current point back at the start of the subpath.
     if (command.kind === 'Z') {
       path += 'z';
       last = 'z';
+      current = start;
       continue;
     }
 
@@ -153,6 +156,9 @@ export function wordmark(name: string): { viewBox: string; path: string } {
     path += text.join('');
     last = letter;
     current = points.at(-1) ?? current;
+    if (command.kind === 'M') {
+      start = current;
+    }
   }
 
   const width = Math.round((right - left) / UNIT);
