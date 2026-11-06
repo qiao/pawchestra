@@ -2,14 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import type { Rgb } from '../mesh.ts';
-import {
-  PIANO,
-  PIANO_BENCH,
-  PIANO_INSIDE,
-  buildPiano,
-  buildPianoBench,
-  pianoKeyPosition,
-} from './piano.ts';
+import { PIANO, PIANO_INSIDE, buildPiano, buildPianoBench, pianoKeyPosition } from './piano.ts';
 
 describe('pianoKeyPosition', () => {
   const width = PIANO.keyboardWidth / 52;
@@ -71,15 +64,15 @@ describe('buildPiano', () => {
 });
 
 describe('buildPianoBench', () => {
-  it('has the seat height of a chair and at most 120 triangles (design 4.5)', () => {
-    const bench = buildPianoBench();
+  it('has at most 120 triangles (design 4.5)', () => {
+    const bench = buildPianoBench(0.45);
     const triangles = bench.positions.length / 9;
     expect(triangles).toBeLessThanOrEqual(120);
     let top = -Infinity;
     for (let i = 1; i < bench.positions.length; i += 3) {
       top = Math.max(top, bench.positions[i] ?? -Infinity);
     }
-    expect(top).toBeCloseTo(PIANO_BENCH.seatHeight, 6);
+    expect(top).toBeCloseTo(0.45, 6);
   });
 
   it('puts a seat of another height at that height', () => {

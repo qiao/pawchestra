@@ -14,7 +14,7 @@ import {
   buildSupport,
   seatHeights,
 } from './props.ts';
-import { PIANO_BENCH, buildPianoBench } from './instruments/piano.ts';
+import { buildPianoBench } from './instruments/piano.ts';
 import { STUDIO_POLAR_BEAR } from './studio/polar-bear.ts';
 import { STUDIO_RABBIT } from './studio/rabbit.ts';
 import { SCENE_COLORS } from './colors.ts';
@@ -173,7 +173,6 @@ describe('seatHeights (design 4.5)', () => {
   it('fits the piano bench to the legs of the studio polar bear (design 4.4)', () => {
     const seat = seatHeights('bench', SPECIES['polar-bear']);
     expect(seat?.seatHeight).toBeCloseTo(STUDIO_POLAR_BEAR.seatHeight, 9);
-    expect(seat?.seatHeight).toBeLessThan(PIANO_BENCH.seatHeight);
   });
 });
 

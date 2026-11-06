@@ -107,7 +107,6 @@ export const PIANO_BENCH = {
    * 0.198 m behind the floor point, 0.076 m behind the back edge of the fit.
    */
   studioDepth: 0.32,
-  seatHeight: 0.45,
   pad: 0.26,
   apron: 0.1,
   foot: 0.12,
@@ -694,7 +693,7 @@ function postSides(bottom: number, top: number, lower: number, upper: number): n
  * @returns The mesh data, with all vertices on bone 0.
  */
 export function buildPianoBench(
-  seatHeight: number = PIANO_BENCH.seatHeight,
+  seatHeight: number,
   depth: number = PIANO_BENCH.depth,
   front: number = depth / 2,
 ): MeshData {
