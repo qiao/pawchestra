@@ -142,23 +142,32 @@ export function* fromSceneSteps(
       }
     }
   });
-  yield* programsReadySteps(renderer);
-  const saved = renderer.getRenderTarget();
-  // The blur makes the mipmaps of the source cube, so the capture makes none.
-  cube.texture.mipmapsAutoUpdate = source.sigma <= 0;
-  captureScene(renderer, source.scene, cube);
-  cube.texture.mipmapsAutoUpdate = true;
-  renderer.setRenderTarget(saved);
-  yield;
-  if (source.sigma > 0) {
-    generator._blur(target, source.sigma);
+  let done = false;
+  try {
+    yield* programsReadySteps(renderer);
+    const saved = renderer.getRenderTarget();
+    // The blur makes the mipmaps of the source cube, so the capture makes none.
+    cube.texture.mipmapsAutoUpdate = source.sigma <= 0;
+    captureScene(renderer, source.scene, cube);
+    cube.texture.mipmapsAutoUpdate = true;
     renderer.setRenderTarget(saved);
     yield;
+    if (source.sigma > 0) {
+      generator._blur(target, source.sigma);
+      renderer.setRenderTarget(saved);
+      yield;
+    }
+    generator._applyPMREM(target);
+    renderer.setRenderTarget(saved);
+    yield* gpuDoneSteps(renderer);
+    done = true;
+    return target;
+  } finally {
+    // A stopped run also frees the target (`runSliced()`).
+    if (!done) {
+      target.dispose();
+    }
   }
-  generator._applyPMREM(target);
-  renderer.setRenderTarget(saved);
-  yield* gpuDoneSteps(renderer);
-  return target;
 }
 
 /**
@@ -181,11 +190,20 @@ export function* fromCubemapSteps(
   const saved = renderer.getRenderTarget();
   generator._setSize(size);
   const target = generator._allocateTarget();
-  generator._textureToCubemap(texture);
-  renderer.setRenderTarget(saved);
-  yield;
-  generator._applyPMREM(target);
-  renderer.setRenderTarget(saved);
-  yield* gpuDoneSteps(renderer);
-  return target;
+  let done = false;
+  try {
+    generator._textureToCubemap(texture);
+    renderer.setRenderTarget(saved);
+    yield;
+    generator._applyPMREM(target);
+    renderer.setRenderTarget(saved);
+    yield* gpuDoneSteps(renderer);
+    done = true;
+    return target;
+  } finally {
+    // A stopped run also frees the target (`runSliced()`).
+    if (!done) {
+      target.dispose();
+    }
+  }
 }

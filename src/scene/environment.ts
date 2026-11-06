@@ -151,23 +151,26 @@ export function* captureEnvironmentSteps(
   options: CaptureOptions,
 ): Steps<WebGLRenderTarget> {
   const cube = new WebGLCubeRenderTarget(CAPTURE.size, { type: HalfFloatType });
-  const camera = new CubeCamera(0.05, 500, cube);
-  camera.position.set(...options.position);
-  camera.updateMatrixWorld();
+  // A stopped capture also frees its cube (`runSliced()`).
+  try {
+    const camera = new CubeCamera(0.05, 500, cube);
+    camera.position.set(...options.position);
+    camera.updateMatrixWorld();
 
-  const shown = options.hidden.map((object) => object.visible);
-  for (const object of options.hidden) {
-    object.visible = false;
-  }
-  const saved = renderer.getRenderTarget();
-  camera.update(renderer, scene);
-  renderer.setRenderTarget(saved);
-  for (const [i, object] of options.hidden.entries()) {
-    object.visible = shown[i] ?? true;
-  }
-  yield;
+    const shown = options.hidden.map((object) => object.visible);
+    for (const object of options.hidden) {
+      object.visible = false;
+    }
+    const saved = renderer.getRenderTarget();
+    camera.update(renderer, scene);
+    renderer.setRenderTarget(saved);
+    for (const [i, object] of options.hidden.entries()) {
+      object.visible = shown[i] ?? true;
+    }
+    yield;
 
-  const target = yield* fromCubemapSteps(renderer, generator, cube.texture, CAPTURE.size);
-  cube.dispose();
-  return target;
+    return yield* fromCubemapSteps(renderer, generator, cube.texture, CAPTURE.size);
+  } finally {
+    cube.dispose();
+  }
 }
