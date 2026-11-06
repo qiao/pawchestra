@@ -636,6 +636,16 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 - **Damping.** After the last note before a rest of at least `HAND_MOTION.dampRestSec`, the flat
   palm goes onto the strings, with the fingers open, and leaves before the hand places the next
   group (harp 7.6).
+- **Pedals.** Each note needs the pedal of its string in its notch (`planPedals()` of
+  `pose/harp-pedals.ts`): natural for a white key, and sharp for a black key, which the app plays
+  on the string of the natural below it (`harpString()`). Each pedal starts in the notch of its
+  first note. A pedal changes as early as the music lets it, after the last pluck in its old
+  notch, and the changes of one foot keep `PEDAL_MOTION.footGapSec` apart when the music lets
+  them, as a harpist moves 1 to 2 pedals each second (harp 7.7). The left foot moves D, C, and B,
+  and the right foot E, F, G, and A (`PEDAL_FEET`). For each change, the foot goes from its rest
+  to the pedal, lifted, presses the pedal into the notch, and goes back (`poseHarpFeet()` of
+  `pose/harp-feet.ts`). The foot keeps its bind turn, and the two-bone IK of the leg places the
+  knee. The pedal turns into its notch with the press (`pedalNotchesAt()`, 4.6).
 
 Each note plucks the string of its key (`harpString()`), and the string swings (harp 5,
 `pose/harp-strings.ts`). `stringSwingsAt()` gives the swing of each string at a song time as a

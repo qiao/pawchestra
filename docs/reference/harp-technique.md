@@ -342,6 +342,11 @@ function of the notes. Design 5.3 "Harp" gives the motion. The app follows these
   and the sound keeps one start.
 - **Damping (7.6).** After a hand rest of more than a second, the flat palm goes onto the strings
   with the fingers open, then the hand places the next group.
+- **The pedals (7.7).** Each note needs the pedal of its string in its notch, and the pedal changes
+  as early as the music lets it, after the last pluck in the old notch (`planPedals()` of
+  `src/pose/harp-pedals.ts`). The left foot moves D, C, and B, and the right foot E, F, G, and A.
+  The changes of one foot keep 0.5 s apart when the music lets them. The foot goes to the pedal,
+  presses it into its notch, and goes back to its rest (`poseHarpFeet()`).
 
 The app does not follow these facts:
 
@@ -355,6 +360,12 @@ The app does not follow these facts:
   strings (section 6, "The level hands").
 - **The cost (7.9).** The groups come from a greedy rule. No search weighs the cost of a change of
   direction or of a repeated string.
+- **The spelling (7.7).** The app plays each black key as the sharp of the natural below it, so no
+  pedal goes into the flat notch, and the app does not spell a note as a flat or a sharp to save
+  a pedal change. A harpist spells G sharp as A flat when G natural comes soon.
+- **The heels (7.7).** The deer harp stands on a box, so the pedals stand at about the height of
+  the hips of the seated deer, and the hoof goes up onto the pedal. The heel does not stay on the
+  floor.
 
 ## 8. Sources
 
