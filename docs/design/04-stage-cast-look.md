@@ -966,26 +966,30 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   lacquer did not show on the dark players, so a factor makes it visible. A planar reflection
   renders the scene again, which costs too much time on the main thread and the GPU (9.7). Only
   the high tier has it (2.6).
-- **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
-  and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
-- **Lens flare** (`LENS_FLARE` of `scene/lens-flare.ts`). A stage spotlight that shines toward
-  the camera gives a flare, as in a concert film. The flare comes from the known lights. The stage
-  lights hang high and aim down, so no shot or orbit view has a light in the frame that faces the
-  lens, and a flare from the bright pixels would show nothing, as the streaks did. For each
-  spotlight, the CPU finds the light at the lens: the cone with a spill, because the front lens of
-  a stage lamp glows a little outside its beam, the decay 2, and a fall with the angle outside the
-  frame, because a lens with no hood also takes the light of a lamp just outside the frame. The
-  two strongest lights go to the final pass. Each one adds a wide veil that lifts the blacks near
-  it, a small glow at the light, and three faint ghosts of the aperture with their own tints, on
-  the line from the light through the optical middle of the image. The flare is linear light
-  before the tone mapping. The vertex shader of the final pass tests the depth on a small disc
-  around each light, so a player in front of a light hides its flare, and no pixel reads a
-  texture for it. Thus the flare adds no draw of the scene. The lamps of a close shot give no
-  flare: they stand just outside the frame of most close shots, so a flare would show in most of
-  the film. In the shot plans, the conductor light and the rim light give the flare in some
-  conductor shots and in close shots near the podium. In Free mode, the key light gives it in low
-  views from behind the orchestra. The strength is the middle of a lineup of three strengths,
-  about 1.25 times the weakest flare that shows. The low tier skips it (2.6).
+- **Streaks.** The app has no anamorphic streaks. A long streak across the frame from each hall
+  lamp would look like a game. The lamp flare gives each lamp a short starburst.
+- **Lens flare** (`LENS_FLARE` of `scene/lens-flare.ts`). A light that shines into the lens gives
+  a flare, as in a concert film. It has two parts, and the strength of the flare scales both.
+  - **Spotlight flare.** The stage spotlights hang high and aim down, so no view has a spotlight
+    in the frame. The flare comes from the known lights. For each spotlight, the CPU finds the
+    light at the lens: the cone with a spill, because the front lens of a stage lamp glows outside
+    its beam, the decay 2, and a fall with the angle outside the frame, because a lens with no
+    hood also takes the light of a lamp outside the frame. The reach holds the rim light of the
+    default view, which stands far above the frame. The two strongest lights go to the final
+    pass. Each one adds a wide veil that lifts the blacks near it, a small glow at the light, and
+    three ghosts of the aperture with their own tints, on the line from the light through the
+    optical middle of the image. The ghosts sit near the middle, so the ghosts of a light far
+    above the frame fall into it. The vertex shader of the final pass tests the depth on a small
+    disc around each light, so a player in front of a light hides its flare. The lamps of a close
+    shot give no flare: they stand just outside the frame of most close shots.
+  - **Lamp flare.** The hall lamps are in the frame of many close shots, and they pass the bloom
+    threshold. A pass at a quarter of the size takes the light above `lampThreshold` from the
+    bloom chain: soft ghosts through the optical middle and a halo from the sixteenth level, and
+    a short starburst of six rays from the quarter level. A screen-space pass costs the same for
+    each number of lamps, and a lamp that a player hides is not bright, so it gives no flare.
+  - The flare is linear light before the tone mapping, and it adds no draw of the scene. The
+    strength is the middle of a lineup of three strengths, in which the flare shows plainly in the
+    default view and in the close shots with the hall lamps. The low tier skips it (2.6).
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a
   vignette, and a grain. `pnpm look-lab` fits the grade to `orchestra-latest.png`. The curve
   keeps the soft shoulder of AgX, because a steep shoulder clipped the floor and the white fur.
