@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 339,814 bytes |
-| SHA-256 | `a2d703bdd1940749ebf6b97a69bc34e4d33a1aa356d451b430142d468b598d65` |
+| Size | 338,863 bytes |
+| SHA-256 | `be1d3ea9dc763624b1c951c97d23620d7cf8b295bd09672fc0f0089fc251b0d6` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -355,6 +355,21 @@ back -0.2, halfWidth 0.25}, and `hinges` L (-0.576037, -0.749779, -0.325597) and
 14. Nape: the vertex 909 takes `head` 0.52, and its other bones scale to 0.48. The head height
     `H` (the lowest point with a head share above 0.5) then is 0.4228 m, as the 0.4224 m of the
     older body, so the rest and the lift of the pianist, which are in `H`, stay.
+15. Thigh root rings: two arcs of the rings of the thigh root, from the inner groin over the front
+    to the outer side, take one mean row each, from the rows before the step:
+    `sa.set_weight_row(mesh, v, row)` for each vertex of the arc. The upper arc is 2336, 2389,
+    2390, 2189, 1883, 1006, and 1008 (left), with {`thigh_L` 0.3915, `hips` 0.5291, `spine`
+    0.0794}. The lower arc is 2354, 2328, 1858, 1857, 61, 60, and 1007, with {`thigh_L` 0.6906,
+    `hips` 0.2837, `spine` 0.0251, `shin_L` 0.0006}. The right arcs 1893, 1894, 2096, 2097, 967,
+    570, 565 and 1892, 1895, 2098, 314, 315, 569, 568 take the mirror rows. The step replaces step
+    13 for these vertices. In the seated bind with the thighs 25° down, the thigh shares of the
+    upper arc went from 0.21 to 0.60 around the front, and the groin vertices 2390 and 1858 sank
+    into a dent at the front of the thigh root: 3.6 cm and 3.2 cm below the mean of their edge
+    neighbors, along the normal (2.1 cm at 40°). After the step, the deepest vertex of the thigh
+    root is 1.5 cm below its neighbors (2354), and the deepest of the crotch 1.9 cm (1797, at the
+    middle of the front). Arcs of shares 0.25 to 0.46 and 0.60 to 0.78 gave 2.0 cm to 5.1 cm, and
+    longer arcs to the back of the haunch (1401, 1402, 522, 523) gave 2.9 cm. The folds of
+    `pnpm fold-probe pianist` do not change.
 
 **Bind.** The Action `bind` holds the seated bind at frame 1. The trunk, the head, and the tail
 keep the rest. The legs sit on a bench that fits them (design 4.4, "Seat"): each thigh turns the
@@ -399,9 +414,9 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 716,768 bytes |
-| SHA-256 | `9b1aa52e2c75aca0cdf779749f36ace4352fd15303455279975866fec37a5710` |
-| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `074f41962c4625ec0b6b283ca3231bbf1c8e2c6b6bcfd50d16b6fbafac283a0b` |
+| Size | 716,772 bytes |
+| SHA-256 | `cbc9026e26863356f7c408ff37d20b2c421995edccaf0c828da18bd8536b78fb` |
+| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `7f481491924c836fac15b5b081887b5f8cb620c99bfa60aac8b791aba8787eb6` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
