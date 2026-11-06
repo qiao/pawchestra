@@ -314,13 +314,6 @@ export interface BowedHold {
    * the playing pole. `null` mixes the rest pole and the playing pole directly.
    */
   readonly liftPoleL: Vec3 | null;
-  /**
-   * The direction to which the right elbow points in the middle of the lift and of the lowering,
-   * in the axes of the root (design 5.2, 5.3). The elbow turns from the rest pole to this pole,
-   * then to the playing pole, so that a bow arm that hangs at rest goes out before the grip moves
-   * forward. `null` mixes the rest pole and the playing pole directly.
-   */
-  readonly liftPoleR: Vec3 | null;
   /** The bow in the rest pose. */
   readonly restBow: {
     /** The place of the grip on the right thigh. */
@@ -495,7 +488,6 @@ const CHIN_HOLD = {
   girthFit: null,
   wristFit: null,
   liftPoleL: null,
-  liftPoleR: null,
   restBow: {
     lap: { along: 1, offset: [0.18, 0.08, 0] },
     tip: [-1, 0, -0.3],
@@ -571,7 +563,6 @@ const FLOOR_HOLD = {
   girthFit: null,
   wristFit: null,
   liftPoleL: null,
-  liftPoleR: null,
   restBow: {
     lap: { along: 1, offset: [0.2, 0.08, 0] },
     tip: [-0.1, -0.1, -1],
@@ -1993,7 +1984,6 @@ function roundElbows(model: PlayerModel, rig: RigPoints): RigPoints {
       poleR: right(hold.poleR),
       poleTipR: right(hold.poleTipR),
       polePizzicato: right(hold.polePizzicato),
-      liftPoleR: hold.liftPoleR && right(hold.liftPoleR),
     },
     restPoleL: left(rig.restPoleL),
     restPoleR: right(rig.restPoleR),

@@ -287,10 +287,8 @@ The rest of each family:
   bone pose of a thinner arm, the inner side of the upper arm goes into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
   the body (strings 1.8, 2.3), and a cellist starts a stroke open at the shoulder (strings 2.2). At
-  rest, the arms of such a body hang out until they clear the body (`restArms`). A hanging bow
-  arm turns its elbow out in the middle of the lift and the lowering (`liftPoleR`), because the
-  corrective shape of the bow arm keeps the arm root out only near the elbow bend of the play.
-  Each elbow turns out about the line from the shoulder joint to the grip, and the shoulder turns
+  rest, the arms of such a body hang out until they clear the body (`restArms`). Each elbow turns
+  out about the line from the shoulder joint to the grip, and the shoulder turns
   forward when the arm reaches forward. A grip nearer to the shoulder bends the elbow, so each
   degree of the turn moves the upper arm further from the trunk. When the forearm and not the upper
   arm lies on the trunk, a nearer grip pushes the forearm in. A grip away from the shoulder frees
