@@ -173,9 +173,16 @@ passes.
       thin faces at the back of the right knee (2035, 2036, 3918, 5406, 4201) and 1 of the thigh
       (3917) in each play sample (`pnpm fold-probe pianist`: `shin_R`, `thigh_R`). Check the back
       of the right knee in the stage light.
-- [ ] Polar bear hand rig: a dent stays at the middle of the front of the crotch, 1.9 cm below its
+- [ ] Polar bear hand rig: a dent stays at the middle of the front of the crotch, 1.1 cm below its
       neighbors (vertex 1797), and the edge of the belly overhangs the thigh roots. The piano hides
       both from the stage camera.
+- [ ] Polar bear hand rig: the bottom of the haunch keeps long thin faces from the rump to the back
+      of each thigh in the bind and the play (faces of 1311, 1354, 642, 219, 218). The rows of these
+      vertices set the seat top, so no row and no move of `bind_belly` changes them. Loop edges on
+      the underside of the haunch can fix them (`reports/2026-11-05-polar-bear-belly/`).
+- [ ] Polar bear hand rig: the key `bind_belly` moves the thigh root band up to 7.9 cm forward and
+      up, so the side of the haunch is fuller in the bind. Check the side of the haunch in the
+      stage light.
 - [ ] Polar bear rig: each forearm folds into a hard dark V at the inner elbow in the chord (faces
       574 to 576 on the right). Add loop edges or a corrective shape at the elbow.
 - [ ] Polar bear pedals: the case shades the brass pedals, and from the stage camera the bear and
