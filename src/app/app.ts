@@ -971,7 +971,7 @@ export class App {
     const cover = stageCover({
       phone: this.#phone.matches,
       drawerOpen: drawer.open,
-      height: this.#canvas.clientHeight,
+      height: this.#scene.height,
     });
     // The sheet of a phone covers the first screen, so the stage does not need to clear it.
     const ring = this.#phone.matches && drawer.open ? null : this.#ui.firstScreen.ringBox;

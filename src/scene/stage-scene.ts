@@ -887,6 +887,14 @@ export class StageScene {
     return this.#view?.camera.frame ?? null;
   }
 
+  /**
+   * The height of the canvas from the last {@link StageScene.resize}, in CSS pixels. A read of the
+   * canvas size in a frame after a write of the DOM forces a style and layout pass.
+   */
+  get height(): number {
+    return this.#height;
+  }
+
   /** The width of the canvas divided by its height, for the shots of design 5.6. */
   get aspect(): number {
     return this.#width / this.#height;
