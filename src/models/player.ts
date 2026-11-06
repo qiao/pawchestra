@@ -19,7 +19,7 @@ import type { StudioRig } from './studio-rig.ts';
 import type { SpeciesId, SpeciesParams } from './species.ts';
 import { buildInstrument } from './instruments/catalog.ts';
 import { attachInstrument } from './instruments/hold.ts';
-import type { HarpStrings, PianoKeys, PlacedPiece } from './instruments/hold.ts';
+import type { HarpPedals, HarpStrings, PianoKeys, PlacedPiece } from './instruments/hold.ts';
 import type { KettleCount } from './instruments/percussion.ts';
 import type { InstrumentBone, InstrumentId, InstrumentModel } from './instruments/types.ts';
 
@@ -175,6 +175,11 @@ export interface PlayerModel {
    */
   readonly strings: HarpStrings | null;
   /**
+   * The pedals of a harp in {@link PlayerModel.mesh}, which turn into their notches (design 4.6,
+   * 5.3), or `null` for each other instrument.
+   */
+  readonly pedals: HarpPedals | null;
+  /**
    * The rig of the studio body (design 4.4). The scene draws the body with the skin of the
    * studio, and `mesh` holds the body in the bind pose of the player.
    */
@@ -272,6 +277,7 @@ export function* buildPlayerSteps(
     pieces: placed.pieces,
     keys: placed.keys,
     strings: placed.strings,
+    pedals: placed.pedals,
     studio: studioRigOf(params.body, stance.kind === 'standing'),
   };
 }

@@ -91,6 +91,11 @@ export interface InstrumentPart {
    * string swings after its pluck (5.3). A part with no string index does not swing.
    */
   readonly string?: number;
+  /**
+   * The index of a part that is one pedal of a harp, in the order of `HARP_PEDALS.order` (design
+   * 4.6). The pedal turns into its notch (5.3). A part with no pedal index does not turn.
+   */
+  readonly pedal?: number;
 }
 
 /**
@@ -104,6 +109,20 @@ export interface KeyTurn {
   readonly axis: Vec3;
   /** The turn of a key at the key bottom, in radians. */
   readonly angle: number;
+}
+
+/**
+ * The turn of one pedal of a harp around its root, from the natural notch of the bind pose into
+ * the other notches (design 4.6, 5.3).
+ */
+export interface PedalTurn {
+  /** The root of the pedal, in the axes of its piece. */
+  readonly pivot: Vec3;
+  /** The unit direction of the line of the turn. A positive angle moves the end of the pedal down. */
+  readonly axis: Vec3;
+  /** The turn into the sharp notch and into the flat notch, in radians: + down, - up. */
+  readonly sharp: number;
+  readonly flat: number;
 }
 
 /**
@@ -268,4 +287,6 @@ export interface InstrumentModel {
   readonly keyTurn?: KeyTurn;
   /** The strings of a harp, on the piece of its string parts. Only a harp has them. */
   readonly strings?: InstrumentStrings;
+  /** The turn of each pedal of a harp, in the order of its pedal parts. Only a harp has them. */
+  readonly pedalTurns?: readonly PedalTurn[];
 }

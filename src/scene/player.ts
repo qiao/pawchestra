@@ -13,7 +13,7 @@ import type { Matrix4Tuple, MeshStandardMaterial, Object3D } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { MeshData } from '../models/mesh.ts';
-import type { HarpStrings, PianoKeys } from '../models/instruments/hold.ts';
+import type { HarpPedals, HarpStrings, PianoKeys } from '../models/instruments/hold.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { Support } from '../models/props.ts';
@@ -83,7 +83,7 @@ function* createPlayerGeometrySteps(model: PlayerModel): Steps<BufferGeometry> {
   // The keys of a keyboard and the strings of a harp move by their ranges of corners
   // (`PianoKeys.corners`, `HarpStrings.corners`), so such a geometry keeps one vertex for each
   // corner, and each such player gets its own depth geometry ({@link ownGeometry}).
-  if (!model.keys && !model.strings) {
+  if (!model.keys && !model.strings && !model.pedals) {
     yield;
     createDepthGeometry(geometry);
     yield;
@@ -356,6 +356,20 @@ interface KeyMesh {
 /** The player meshes with a keyboard. */
 const keyMeshes = new WeakMap<SkinnedMesh, KeyMesh>();
 
+/** The pedals of a player mesh with a harp, which {@link applyPose} turns (design 4.6, 5.3). */
+interface PedalMesh {
+  readonly pedals: HarpPedals;
+  /** The bind places of the corners. */
+  readonly bind: Float32Array;
+  /** The positions of the mesh, with the turns of its pedals. */
+  readonly position: BufferAttribute;
+  /** The notch of each pedal in {@link PedalMesh.position}. */
+  readonly notches: Float32Array;
+}
+
+/** The player meshes with a harp that has pedals. */
+const pedalMeshes = new WeakMap<SkinnedMesh, PedalMesh>();
+
 /**
  * The strings of a player mesh with a harp, which {@link applyPose} moves (design 4.6, 5.3): the
  * bands of the swinging strings, and the parts of the strings, which close onto their lines while
@@ -467,7 +481,7 @@ export function createPlayerMesh(
   geometry: BufferGeometry,
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
-  const own = model.keys || model.strings ? ownGeometry(geometry) : geometry;
+  const own = model.keys || model.strings || model.pedals ? ownGeometry(geometry) : geometry;
   const mesh = createStudioMesh(model, model.studio, own, materials);
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
@@ -481,6 +495,14 @@ export function createPlayerMesh(
       bind,
       position,
       levels: new Float32Array(model.keys.corners.length - 1),
+    });
+  }
+  if (model.pedals) {
+    pedalMeshes.set(mesh, {
+      pedals: model.pedals,
+      bind,
+      position,
+      notches: new Float32Array(model.pedals.turns.length),
     });
   }
   const material = materials[0];
@@ -639,6 +661,7 @@ export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
  */
 export function applyPose(mesh: SkinnedMesh, pose: AnimalPose): void {
   applyKeys(mesh, pose.keys);
+  applyPedals(mesh, pose.pedals);
   applyStudioPose(mesh, pose);
   applyStrings(mesh, pose.strings);
 }
@@ -728,13 +751,34 @@ function turnKey(
   key: number,
   angle: number,
 ): void {
-  const [ux, uy, uz] = keys.axis;
-  const [px, py, pz] = keys.pivot;
+  turnCorners(bind, out, keys.corners[key] ?? 0, keys.corners[key + 1] ?? 0, keys, angle);
+}
+
+/**
+ * Turns a range of corners from their bind places around a line (design 4.6).
+ *
+ * @param bind The bind places of the corners.
+ * @param out The positions to write.
+ * @param from The first corner.
+ * @param to The end of the corners, excluded.
+ * @param line A point on the line and its unit direction.
+ * @param angle The turn, in radians, around the direction of the line.
+ */
+function turnCorners(
+  bind: Float32Array,
+  out: Float32Array,
+  from: number,
+  to: number,
+  line: { readonly pivot: Vec3; readonly axis: Vec3 },
+  angle: number,
+): void {
+  const [ux, uy, uz] = line.axis;
+  const [px, py, pz] = line.pivot;
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  const end = (keys.corners[key + 1] ?? 0) * 3;
+  const end = to * 3;
   // The rotation formula of Rodrigues, around the unit axis through the pivot.
-  for (let i = (keys.corners[key] ?? 0) * 3; i < end; i += 3) {
+  for (let i = from * 3; i < end; i += 3) {
     const x = (bind[i] ?? 0) - px;
     const y = (bind[i + 1] ?? 0) - py;
     const z = (bind[i + 2] ?? 0) - pz;
@@ -778,6 +822,40 @@ function applyKeys(mesh: SkinnedMesh, levels: Float32Array | null | undefined): 
   }
   if (from < to) {
     uploadCorners(position, from, to);
+  }
+}
+
+/**
+ * Turns the pedals of a player mesh with a harp into their notches (design 4.6, 5.3). Only the
+ * pedals whose notch changed since the last frame move.
+ *
+ * @param mesh A mesh of {@link createPlayerMesh}. A mesh with no pedals does not change.
+ * @param notches The notch of each pedal, from `AnimalPose.pedals`. With none, each pedal stays
+ *   in its natural notch.
+ */
+function applyPedals(mesh: SkinnedMesh, notches: Float32Array | null | undefined): void {
+  const own = pedalMeshes.get(mesh);
+  const out = own?.position.array;
+  if (!own || !(out instanceof Float32Array)) {
+    return;
+  }
+
+  let from = Infinity;
+  let to = -Infinity;
+  for (const [p, turn] of own.pedals.turns.entries()) {
+    const notch = notches?.[p] ?? 0;
+    if (notch === own.notches[p]) {
+      continue;
+    }
+    own.notches[p] = notch;
+    const start = own.pedals.corners[p] ?? 0;
+    const end = own.pedals.corners[p + 1] ?? start;
+    turnCorners(own.bind, out, start, end, turn, notch * (notch > 0 ? turn.sharp : -turn.flat));
+    from = Math.min(from, start);
+    to = Math.max(to, end);
+  }
+  if (from < to) {
+    uploadCorners(own.position, from, to);
   }
 }
 

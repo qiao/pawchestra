@@ -59,6 +59,12 @@ export interface AnimalPose {
    * `null` or absent for each player that is not a harp player.
    */
   readonly strings?: Float32Array | null;
+  /**
+   * The notch of each harp pedal in the order of `HARP_PEDALS.order` (`pedalNotchesAt()`): -1 is
+   * flat, 0 natural, and 1 sharp, with the values between in a move (5.3). The scene turns each
+   * pedal into its notch (4.6). It is `null` or absent for each player that is not a harp player.
+   */
+  readonly pedals?: Float32Array | null;
 }
 
 /** The poses of the scene for one frame (design 5.1). */

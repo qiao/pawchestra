@@ -7,7 +7,7 @@ import type { Vec3 } from '../tuples.ts';
 import { box, lathe, plate, sweep } from '../primitives.ts';
 import type { OutlinePoint, PlateLevel } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize } from './piece.ts';
-import type { InstrumentModel, StringLine } from './types.ts';
+import type { InstrumentModel, PedalTurn, StringLine } from './types.ts';
 
 /** A point of the strings plane x = 0 of the harp, as (y, z) in meters. */
 type PlanePoint = readonly [y: number, z: number];
@@ -731,20 +731,46 @@ function addBase(piece: PieceBuilder): void {
   // Each pedal is one part, in the order of `HARP_PEDALS.order`. A pedal is a bar with no face at
   // its root, which is inside the base: the triangles 6 and 7 of a box are its -y face.
   const [width, depth] = HARP_PEDALS.bar;
-  for (const pedal of HARP_PEDALS.order) {
+  for (const [index, pedal] of HARP_PEDALS.order.entries()) {
     const [root, end] = harpPedalEnds(pedal);
     const along = new Vector3(...end).sub(new Vector3(...root));
     const bar = box(width, along.length(), depth);
-    piece.add(
+    piece.pedal(
+      index,
       [...bar.slice(0, 6 * 9), ...bar.slice(8 * 9)],
       INSTRUMENT_COLORS.brass,
       transform(
         toVec3(new Vector3(...root).addScaledVector(along, 0.5)),
         toQuat(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), along.normalize())),
       ),
-      'metal',
     );
   }
+}
+
+/**
+ * Gives the turn of each pedal around its root from the natural notch into the sharp and the flat
+ * notch (design 4.6), in the order of `HARP_PEDALS.order`.
+ *
+ * @param scale The scale of the harp.
+ * @returns The turn of each pedal, in the harp axes after the scale.
+ */
+function pedalTurns(scale: number): PedalTurn[] {
+  return HARP_PEDALS.order.map((pedal): PedalTurn => {
+    const [root, natural] = harpPedalEnds(pedal, 'natural', scale);
+    const along = new Vector3(...natural).sub(new Vector3(...root));
+    const toward = (notch: PedalNotch): Vector3 =>
+      new Vector3(...harpPedalEnds(pedal, notch, scale)[1]).sub(new Vector3(...root));
+    // A turn around the axis along x up moves the end down: the axis is along x up.
+    const axis = new Vector3(0, 1, 0).cross(along).normalize();
+    const signed = (to: Vector3): number =>
+      Math.sign(new Vector3().crossVectors(along, to).dot(axis)) * along.angleTo(to);
+    return {
+      pivot: root,
+      axis: toVec3(axis),
+      sharp: signed(toward('sharp')),
+      flat: signed(toward('flat')),
+    };
+  });
 }
 
 /**
@@ -917,5 +943,6 @@ export function buildHarp(scale = 1): InstrumentModel {
       swing: [Math.sin(STRINGS.swingTilt), 0, Math.cos(STRINGS.swingTilt)],
       cross: STRINGS.swingCross,
     },
+    pedalTurns: pedalTurns(scale),
   };
 }

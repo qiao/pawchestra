@@ -148,6 +148,18 @@ export class PieceBuilder {
   }
 
   /**
+   * Adds one pedal of a harp as a part of its own (design 4.6), with the metal finish.
+   *
+   * @param index The index of the pedal, in the order of `HARP_PEDALS.order`.
+   * @param corners The corner list of the pedal in its own axes.
+   * @param color The color.
+   * @param at The placement of the pedal in the piece axes, before the size scale.
+   */
+  pedal(index: number, corners: readonly number[], color: Rgb, at: Transform): void {
+    this.#parts.push({ corners: this.#place(corners, at), color, finish: 'metal', pedal: index });
+  }
+
+  /**
    * Places the corners of a part in the piece axes, and applies the size scale.
    *
    * @param corners The corner list of the part in its own axes.

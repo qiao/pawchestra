@@ -1277,7 +1277,9 @@ pedal harp (`docs/reference/harp-technique.md`):
   Each pedal is one part, in the order of `HARP_PEDALS.order`, so that a pose can move it. A pedal
   has three notches: flat at the top, natural in the middle, and sharp at the bottom.
   `harpPedalEnds()` gives a pedal in a notch, and `harpPedalFoot()` the point where the hoof
-  presses it. The model shows each pedal in the natural notch.
+  presses it. The model shows each pedal in the natural notch, and the scene turns each pedal
+  around its root into the notch of the pose (`PedalTurn`, `applyPedals()` of `scene/player.ts`),
+  as it turns the piano keys.
 - **Strings.** 47 strings, one for each natural note from C1 to G7 (`HARP.strings`), so that the
   colors of a real harp fall on the correct notes. The C strings are red and the F strings dark
   blue. The bass strings are silver wound wire, the middle strings gut, and the treble strings a lighter

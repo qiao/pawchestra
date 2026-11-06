@@ -9,6 +9,7 @@ import type {
   InstrumentBone,
   InstrumentModel,
   InstrumentPiece,
+  PedalTurn,
   PiecePoint,
   StringLine,
 } from './types.ts';
@@ -86,6 +87,20 @@ export interface HarpStrings {
   readonly bone: InstrumentBone;
 }
 
+/**
+ * The pedals of a harp in the mesh of one player (design 4.6, 5.3): the corners of each pedal, and
+ * the turn of each pedal into its notches, in the model axes of the bind pose.
+ */
+export interface HarpPedals {
+  /**
+   * The first corner of each pedal in the mesh, in the order of `HARP_PEDALS.order`, then the end
+   * of the last pedal. Pedal `i` has the corners from `corners[i]` up to `corners[i + 1]`.
+   */
+  readonly corners: Uint32Array;
+  /** The turn of each pedal, with its pivot and its axis in the model axes. */
+  readonly turns: readonly PedalTurn[];
+}
+
 /** An instrument at its place in the bind pose of one player. */
 interface PlacedInstrument {
   readonly pieces: readonly PlacedPiece[];
@@ -95,6 +110,8 @@ interface PlacedInstrument {
   readonly keys: PianoKeys | null;
   /** The strings of a harp, or `null` for an instrument with no string parts. */
   readonly strings: HarpStrings | null;
+  /** The pedals of a harp, or `null` for an instrument with no pedal parts. */
+  readonly pedals: HarpPedals | null;
 }
 
 /** One string part in the mesh of a player. */
@@ -203,6 +220,7 @@ export function attachInstrument(
   const bones = new Map<InstrumentBone, Vec3>();
   const keyed: KeyCorners[] = [];
   const strung: StringCorners[] = [];
+  const pedaled: KeyCorners[] = [];
   for (const placed of pieces) {
     const { piece, at } = placed;
     const bone = boneIndex(piece.bone);
@@ -216,6 +234,9 @@ export function attachInstrument(
       if (part.string !== undefined) {
         strung.push({ index: part.string, start, end, placed });
       }
+      if (part.pedal !== undefined) {
+        pedaled.push({ key: part.pedal, start, end, at });
+      }
     }
     bones.set(piece.bone, at.position);
   }
@@ -224,6 +245,45 @@ export function attachInstrument(
     bones,
     keys: keyed.length > 0 ? pianoKeys(model, keyed) : null,
     strings: strung.length > 0 ? harpStrings(model, strung) : null,
+    pedals: pedaled.length > 0 ? harpPedals(model, pedaled) : null,
+  };
+}
+
+/**
+ * Collects the pedal parts of a harp in the mesh of a player (design 4.6). The pedals must be one
+ * run of parts in the order of their index on one piece.
+ *
+ * @param model The instrument.
+ * @param pedaled The pedal parts in the order of the mesh, each with its index as its key.
+ * @returns The pedals, with the turns of {@link InstrumentModel.pedalTurns} in the model axes.
+ * @throws Error if the instrument has no turn for each pedal, or if the pedals are not one run in
+ *   the order of their index on one piece.
+ */
+function harpPedals(model: InstrumentModel, pedaled: readonly KeyCorners[]): HarpPedals {
+  const turns = model.pedalTurns;
+  const first = pedaled[0];
+  if (!turns || !first || turns.length !== pedaled.length) {
+    throw new Error(`The ${model.id} has pedal parts, but no turn for each pedal.`);
+  }
+
+  const corners = new Uint32Array(pedaled.length + 1);
+  for (const [i, part] of pedaled.entries()) {
+    const before = pedaled[i - 1];
+    if (part.key !== i || part.at !== first.at || (before && part.start !== before.end)) {
+      throw new Error(`The pedals of the ${model.id} are not one run of parts in order.`);
+    }
+    corners[i] = part.start;
+    corners[i + 1] = part.end;
+  }
+  const rotation = new Quaternion(...first.at.rotation);
+  return {
+    corners,
+    turns: turns.map((turn) => ({
+      pivot: applyTransform(first.at, turn.pivot),
+      axis: toVec3(new Vector3(...turn.axis).applyQuaternion(rotation)),
+      sharp: turn.sharp,
+      flat: turn.flat,
+    })),
   };
 }
 
