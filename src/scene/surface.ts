@@ -1,0 +1,150 @@
+import { Matrix4, Vector2, Vector4 } from 'three';
+import type { PerspectiveCamera, ShaderMaterial } from 'three';
+
+/**
+ * The contact shade (design 4.5, post effects): a soft dark where two surfaces meet, such as under
+ * the feet, the chairs, and the stands, and in the crease between an arm and the trunk. A pass at
+ * half size finds it from the depth of the scene, as the ambient occlusion of a film render. The
+ * final pass multiplies the scene by it.
+ */
+export const CONTACT_SHADE = {
+  /** The reach of the shade from a surface, in meters. */
+  radius: 0.28,
+  /** The part of the light that a fully closed point loses. */
+  strength: 0.7,
+  /**
+   * The cosine of the smallest angle above the surface that a sample needs to count. It keeps the
+   * flat faces of a low-poly body free of shade.
+   */
+  bias: 0.12,
+} as const;
+
+/**
+ * The uniforms of the surface pass that change with each frame.
+ *
+ * @returns New uniforms.
+ */
+export function surfaceUniforms() {
+  return {
+    uDepth: { value: null },
+    uDepthTexel: { value: new Vector2(1, 1) },
+    uProjection: { value: new Matrix4() },
+    uProjectionInverse: { value: new Matrix4() },
+    uContact: { value: new Vector4() },
+    uClamp: { value: new Vector4(0, 0, 1, 1) },
+  };
+}
+
+/**
+ * Sets the uniforms of the surface pass for the camera of a frame and the current look values.
+ *
+ * @param material The surface pass.
+ * @param camera The camera of the frame. Its world matrix is current.
+ */
+export function setSurfaceCamera(material: ShaderMaterial, camera: PerspectiveCamera): void {
+  const uniforms = material.uniforms;
+  const projection = uniforms['uProjection']?.value;
+  if (projection instanceof Matrix4) {
+    projection.copy(camera.projectionMatrix);
+  }
+  const inverse = uniforms['uProjectionInverse']?.value;
+  if (inverse instanceof Matrix4) {
+    inverse.copy(camera.projectionMatrixInverse);
+  }
+  const contact = uniforms['uContact']?.value;
+  if (contact instanceof Vector4) {
+    contact.set(CONTACT_SHADE.radius, CONTACT_SHADE.strength, CONTACT_SHADE.bias, 0);
+  }
+}
+
+/**
+ * The surface pass at half size (design 4.5, post effects): the contact shade in the alpha
+ * channel, as the factor of the scene light. `CONTACT_SAMPLES` sets the samples of the shade.
+ * Each pixel takes a turn of its samples from a 4 × 4 Bayer pattern, which the blur of 4 × 4
+ * pixels removes.
+ */
+export const SURFACE_FRAGMENT = /* glsl */ `
+uniform sampler2D uDepth;
+uniform vec2 uDepthTexel;
+uniform mat4 uProjection;
+uniform mat4 uProjectionInverse;
+// The radius, the strength, and the bias of the contact shade.
+uniform vec4 uContact;
+uniform vec4 uClamp;
+varying vec2 vUv;
+
+const float BAYER[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0,
+  15.0, 7.0, 13.0, 5.0);
+
+vec2 inSource(vec2 uv) {
+  return clamp(uv, uClamp.xy, uClamp.zw);
+}
+
+vec3 viewAt(vec2 uv, float depth) {
+  vec4 p = uProjectionInverse * vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+  return p.xyz / p.w;
+}
+
+vec3 viewAt(vec2 uv) {
+  return viewAt(uv, texture(uDepth, uv).x);
+}
+
+void main() {
+  float depth = texture(uDepth, vUv).x;
+  if (depth >= 0.99999) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    return;
+  }
+  vec3 p = viewAt(vUv, depth);
+  // The normal of the face from the neighbor on each axis with the smaller step, so that an edge
+  // does not bend it.
+  vec3 right = viewAt(vUv + vec2(uDepthTexel.x, 0.0)) - p;
+  vec3 left = p - viewAt(vUv - vec2(uDepthTexel.x, 0.0));
+  vec3 up = viewAt(vUv + vec2(0.0, uDepthTexel.y)) - p;
+  vec3 down = p - viewAt(vUv - vec2(0.0, uDepthTexel.y));
+  vec3 dx = abs(right.z) < abs(left.z) ? right : left;
+  vec3 dy = abs(up.z) < abs(down.z) ? up : down;
+  vec3 n = normalize(cross(dx, dy));
+  ivec2 cell = ivec2(gl_FragCoord.xy) & 3;
+  float noise = (BAYER[cell.y * 4 + cell.x] + 0.5) / 16.0;
+  float light = 1.0;
+#ifdef CONTACT_SAMPLES
+  float radius = uContact.x;
+  vec2 radiusUv = radius * 0.5 / -p.z * vec2(uProjection[0][0], uProjection[1][1]);
+  float closed = 0.0;
+  for (int i = 0; i < CONTACT_SAMPLES; i++) {
+    float angle = (float(i) + noise) * 2.39996323 + noise * 6.2831853;
+    float r = sqrt((float(i) + noise) / float(CONTACT_SAMPLES));
+    vec2 uv = inSource(vUv + vec2(cos(angle), sin(angle)) * r * radiusUv);
+    vec3 v = viewAt(uv) - p;
+    float vv = dot(v, v);
+    float fall = max(1.0 - vv / (radius * radius), 0.0);
+    closed += max(dot(v, n) * inversesqrt(vv + 1e-6) - uContact.z, 0.0) * fall;
+  }
+  // A point beside a wall sees about one third of its samples on the wall, so three times the
+  // mean gives a full shade there.
+  light = 1.0 - uContact.y * min(3.0 * closed / float(CONTACT_SAMPLES) / (1.0 - uContact.z), 1.0);
+#endif
+  gl_FragColor = vec4(0.0, 0.0, 0.0, light);
+}
+`;
+
+/**
+ * The blur of the surface pass at half size: the mean of a box of 4 × 4 pixels, with four linear
+ * samples. The box holds each value of the 4 × 4 pattern of the surface pass one time, so the
+ * pattern does not show.
+ */
+export const SURFACE_BLUR_FRAGMENT = /* glsl */ `
+uniform sampler2D uSource;
+uniform vec2 uTexel;
+uniform vec4 uClamp;
+varying vec2 vUv;
+
+vec4 tap(float x, float y) {
+  return texture(uSource, clamp(vUv + uTexel * vec2(x, y), uClamp.xy, uClamp.zw));
+}
+
+void main() {
+  gl_FragColor = (tap(-1.5, -1.5) + tap(0.5, -1.5) + tap(-1.5, 0.5) + tap(0.5, 0.5)) * 0.25;
+}
+`;

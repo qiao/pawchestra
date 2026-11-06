@@ -23,12 +23,19 @@ interface TierSettings {
   readonly motes: number;
   /** The number of samples of the haze of the visible beam along each view ray. */
   readonly beamSamples: number;
+  /**
+   * The number of samples of the contact shade for each pixel at half size (`CONTACT_SHADE` of
+   * `surface.ts`). 0 turns it off.
+   */
+  readonly contactSamples: number;
 }
 
 /**
  * The values of each tier (design 2.6). The low tier keeps the final pass of the post effects
  * (the tone mapping, the color grade, the vignette, and the grain), because it costs one sample
  * for each pixel. It drops the bloom, the lens fringe, the depth of field, and the dust motes.
+ * Only the high tier has the surface pass of the contact shade, because it reads the depth many
+ * times for each pixel.
  * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
  * `perf-60.mid`, and they changed only small shadows on the players.
  */
@@ -46,6 +53,7 @@ export const TIER_SETTINGS = {
     lensFringe: true,
     motes: 140,
     beamSamples: 4,
+    contactSamples: 10,
   },
   medium: {
     shadowMapSize: 1024,
@@ -56,6 +64,7 @@ export const TIER_SETTINGS = {
     lensFringe: true,
     motes: 70,
     beamSamples: 3,
+    contactSamples: 0,
   },
   low: {
     shadowMapSize: 512,
@@ -66,6 +75,7 @@ export const TIER_SETTINGS = {
     lensFringe: false,
     motes: 0,
     beamSamples: 2,
+    contactSamples: 0,
   },
 } as const satisfies Readonly<Record<QualityTier, TierSettings>>;
 

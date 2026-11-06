@@ -1030,6 +1030,7 @@ export class StageScene {
         const vignette = vignetteOf(light, postView.cinema);
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, {
           haze,
+          depth: depthPass ? this.#beamDepth.texture : null,
           vignette,
           view: postView,
         });

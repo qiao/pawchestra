@@ -42,6 +42,12 @@ import {
 } from './post-shaders.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
+import {
+  SURFACE_BLUR_FRAGMENT,
+  SURFACE_FRAGMENT,
+  setSurfaceCamera,
+  surfaceUniforms,
+} from './surface.ts';
 
 /** The values of the post effects (design 4.5, post effects). */
 export const POST_LOOK = {
@@ -158,6 +164,11 @@ export interface PostView {
 interface PostFrame {
   /** The room haze, or `null` for no haze. */
   readonly haze: HazeFrame | null;
+  /**
+   * The depth of the scene at full size, with no hall and no light effects (`BeamDepth`), for the
+   * surface pass (`scene/surface.ts`), or `null` with no depth pass.
+   */
+  readonly depth: Texture | null;
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
   readonly view: PostView;
@@ -366,6 +377,10 @@ interface Targets {
   readonly blurPrepare: WebGLRenderTarget | null;
   /** The soft image at half size. */
   readonly blurGather: WebGLRenderTarget | null;
+  /** The contact shade at half size (`scene/surface.ts`), before its blur. */
+  readonly surface: WebGLRenderTarget | null;
+  /** The contact shade at half size, after its blur. */
+  readonly surfaceBlur: WebGLRenderTarget | null;
   /** Each target above, for the crop of each frame and the disposal. */
   readonly all: readonly WebGLRenderTarget[];
 }
@@ -393,6 +408,8 @@ export class PostPipeline {
   readonly #bloomUp: ShaderMaterial;
   readonly #blurPrepare: ShaderMaterial;
   #blurGather: ShaderMaterial;
+  #surface: ShaderMaterial;
+  readonly #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
   /**
    * The draw of the depth pass of the depth of field with the depth materials of the meshes. The
@@ -449,6 +466,12 @@ export class PostPipeline {
       ...focusUniforms(),
     });
     this.#blurGather = this.#createBlurGather();
+    this.#surface = this.#createSurface();
+    this.#surfaceBlur = passMaterial(SURFACE_BLUR_FRAGMENT, {
+      uSource: { value: null },
+      uTexel: { value: new Vector2() },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
+    });
     this.#final = this.#createFinal();
   }
 
@@ -479,8 +502,10 @@ export class PostPipeline {
     }
     this.#tier = tier;
     this.#blurGather.dispose();
+    this.#surface.dispose();
     this.#final.dispose();
     this.#blurGather = this.#createBlurGather();
+    this.#surface = this.#createSurface();
     this.#final = this.#createFinal();
     this.#disposeTargets();
     this.#targets = this.#createTargets();
@@ -515,6 +540,7 @@ export class PostPipeline {
     renderer.setRenderTarget(targets.scene);
     renderer.render(scene, camera);
 
+    const surface = frame.depth ? this.#renderSurface(targets, camera, frame.depth) : null;
     const bloom = this.#renderBloom(targets);
     const blur = focus.active
       ? this.#renderBlur(targets, scene, camera, focus, effects, view.imageHeight)
@@ -525,8 +551,10 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uBloom', bloom?.texture ?? null);
     setUniform(final.uniforms, 'uBlur', blur?.texture ?? null);
     setUniform(final.uniforms, 'uBlurOn', blur ? 1 : 0);
-    // The bloom and the blur have the same half size, so one clamp serves both.
-    const half = bloom ?? blur;
+    setUniform(final.uniforms, 'uSurface', surface?.texture ?? null);
+    setUniform(final.uniforms, 'uSurfaceOn', surface ? 1 : 0);
+    // The bloom, the blur, and the surface pass have the same half size, so one clamp serves all.
+    const half = bloom ?? blur ?? surface;
     if (half) {
       setClamp(final, 'uHalfClamp', half);
     }
@@ -574,6 +602,8 @@ export class PostPipeline {
       [this.#bloomUp, target],
       [this.#blurPrepare, target],
       [this.#blurGather, target],
+      [this.#surface, target],
+      [this.#surfaceBlur, target],
       [this.#final, null],
     ];
     for (const [material, into] of passes) {
@@ -608,10 +638,55 @@ export class PostPipeline {
     // The blur of each pixel needs the alpha channel.
     const blurPrepare = blur ? floatTarget(halfWidth, halfHeight, 'half') : null;
     const blurGather = blur ? floatTarget(halfWidth, halfHeight, format) : null;
-    const all = [scene, ...bloomDown, ...bloomUp, depth, blurPrepare, blurGather].filter(
-      (target) => target !== null,
-    );
-    return { scene, bloomDown, bloomUp, depth, blurPrepare, blurGather, all };
+    // The contact shade is in the alpha channel.
+    const shade = settings.contactSamples > 0;
+    const surface = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
+    const surfaceBlur = shade ? floatTarget(halfWidth, halfHeight, 'half') : null;
+    const all = [
+      scene,
+      ...bloomDown,
+      ...bloomUp,
+      depth,
+      blurPrepare,
+      blurGather,
+      surface,
+      surfaceBlur,
+    ].filter((target) => target !== null);
+    return { scene, bloomDown, bloomUp, depth, blurPrepare, blurGather, surface, surfaceBlur, all };
+  }
+
+  /**
+   * Renders the surface pass at half size and its blur (`scene/surface.ts`).
+   *
+   * @param targets The targets.
+   * @param camera The camera of the frame.
+   * @param depth The depth of the scene at full size.
+   * @returns The target of the blurred surface pass, or `null` when the tier has none.
+   */
+  #renderSurface(
+    targets: Targets,
+    camera: PerspectiveCamera,
+    depth: Texture,
+  ): WebGLRenderTarget | null {
+    const { surface, surfaceBlur } = targets;
+    if (!surface || !surfaceBlur) {
+      return null;
+    }
+    const pass = this.#surface;
+    setUniform(pass.uniforms, 'uDepth', depth);
+    const texel = pass.uniforms['uDepthTexel']?.value;
+    if (texel instanceof Vector2) {
+      texel.set(1 / this.#width, 1 / this.#height);
+    }
+    setClamp(pass, 'uClamp', targets.scene);
+    setSurfaceCamera(pass, camera);
+    this.#pass(pass, surface);
+    const blur = this.#surfaceBlur;
+    setUniform(blur.uniforms, 'uSource', surface.texture);
+    setTexel(blur, surface);
+    setClamp(blur, 'uClamp', surface);
+    this.#pass(blur, surfaceBlur);
+    return surfaceBlur;
   }
 
   #renderBloom(targets: Targets): WebGLRenderTarget | null {
@@ -779,6 +854,15 @@ export class PostPipeline {
     );
   }
 
+  #createSurface(): ShaderMaterial {
+    const samples = TIER_SETTINGS[this.#tier].contactSamples;
+    const defines: Record<string, number> = {};
+    if (samples > 0) {
+      defines['CONTACT_SAMPLES'] = samples;
+    }
+    return passMaterial(SURFACE_FRAGMENT, surfaceUniforms(), defines);
+  }
+
   #createFinal(): ShaderMaterial {
     const settings = TIER_SETTINGS[this.#tier];
     const defines: Record<string, number> = {};
@@ -791,6 +875,9 @@ export class PostPipeline {
     if (settings.lensFringe) {
       defines['LENS_FRINGE'] = 1;
     }
+    if (settings.contactSamples > 0) {
+      defines['SURFACE'] = 1;
+    }
     const look = POST_LOOK;
     const material = passMaterial(
       FINAL_FRAGMENT,
@@ -801,6 +888,8 @@ export class PostPipeline {
         uBloom: { value: null },
         uBlur: { value: null },
         uBlurOn: { value: 0 },
+        uSurface: { value: null },
+        uSurfaceOn: { value: 0 },
         uBloomStrength: { value: look.bloomStrength },
         uHalation: { value: new Vector3(...look.halation) },
         uSceneDepth: { value: null },

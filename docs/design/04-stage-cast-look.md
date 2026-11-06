@@ -913,6 +913,7 @@ scene ──> [scene target, MSAA] ──┬──> bloom down 1/2 ... ──> b
                                  └──> blur prepare 1/2 ──> blur gather 1/2 ──┐  │
 scene ──> [depth 1/2] ──────────────────────^ (only with a shallow focus)    v  v
           [scene target] ───────────────────────────────────────────────> final pass ──> canvas
+beam depth ──> surface 1/2 ──> surface blur 1/2 ─────────────────────────────────^
 ```
 
 - With no float target, the scene renders with no post effects. The bloom levels follow the tier
@@ -925,6 +926,15 @@ scene ──> [depth 1/2] ──────────────────
   lateral color of a real film lens. The middle of the frame stays sharp, so the faces do not
   change. The strength is the middle of a lineup of three strengths. The low tier skips it,
   because it costs two more samples of the scene for each pixel.
+- **Contact shade** (`CONTACT_SHADE` of `scene/surface.ts`). A pass at half size reads the depth
+  of the beam pass and finds the soft dark where two surfaces meet: under the feet, the chairs,
+  and the stands, and in the crease between an arm and the trunk. The final pass multiplies the
+  scene by it, before the haze, as the ambient occlusion of a film render. A sample counts only
+  above a small angle over the face (`bias`), so the flat faces of a low-poly body stay clean.
+  Each pixel turns its samples by a 4 × 4 pattern, and a blur of 4 × 4 pixels removes the
+  pattern. The hall gets no shade, because the depth pass has no hall. The strength is the middle
+  of a lineup of three strengths. Only the high tier has it (2.6), because it reads the depth many
+  times for each pixel.
 - **Streaks.** The app has no anamorphic streaks. Only the hall lamps pass the bloom threshold,
   and the shots do not show them, so a streak pass showed nothing in the shots and cost GPU time.
 - The final pass does the tone mapping, a grade (`gradeColor()`, `GRADE` of `scene/grade.ts`), a

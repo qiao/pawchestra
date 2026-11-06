@@ -13,6 +13,7 @@ import { CAMERA_DRIFT } from '../shots/drift.ts';
 import { FREE_LIGHT_FADE, SHOT_LIGHT, SHOT_RIG, SHOT_SPOT } from '../shots/shot-light.ts';
 import { BEAM_LOOK } from './beam.ts';
 import { CAPTURE, ENVIRONMENT } from './environment.ts';
+import { CONTACT_SHADE } from './surface.ts';
 import { FREE_LENS, LENS } from './focus.ts';
 import { GRADE } from './grade.ts';
 import { GLOW_LIGHT, HALL_COLORS, HALL_FLOOR, HALL_LIGHT } from './hall.ts';
@@ -46,6 +47,7 @@ const LOOK_ROOTS = {
   CAMERA_DRIFT,
   CAPTURE,
   CONDUCTOR_LIGHT,
+  CONTACT_SHADE,
   ENVIRONMENT,
   FILL,
   FINISHES,

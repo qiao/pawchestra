@@ -207,7 +207,7 @@ vec3 grade(vec3 color) {
 
 /**
  * The final pass to the canvas (design 4.5, post effects): the lens fringe, the depth of field, the
- * room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, and the
+ * contact shade, the room haze, the bloom, the tone mapping of the renderer, the color grade, the vignette, and the
  * film grain. One pass does all of them, so each pixel of the canvas reads the scene one time,
  * and two more times for the lens fringe. Outside the frame `uFrame` (left, bottom, right, top),
  * the pass writes the black of the letterbox bars of Cinematic mode (design 2.5), and reads no
@@ -221,6 +221,10 @@ uniform sampler2D uScene;
 uniform sampler2D uBloom;
 uniform sampler2D uBlur;
 uniform float uBlurOn;
+// The blurred surface pass at half size (scene/surface.ts): the reflection of the floor gloss in
+// the color, and the factor of the contact shade in the alpha channel.
+uniform sampler2D uSurface;
+uniform float uSurfaceOn;
 uniform float uBloomStrength;
 uniform vec3 uHalation;
 uniform sampler2D uSceneDepth;
@@ -299,6 +303,12 @@ void main() {
   if (uBlurOn > 0.5) {
     float radius = abs(blurAt(vUv)) * uPixelsPerBlur;
     color = mix(color, texture(uBlur, halfUv).rgb, smoothstep(0.5, 2.0, radius));
+  }
+#endif
+#ifdef SURFACE
+  if (uSurfaceOn > 0.5) {
+    vec4 surface = texture(uSurface, halfUv);
+    color = color * surface.a + surface.rgb;
   }
 #endif
   color = hazed(color);
