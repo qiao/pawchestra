@@ -206,7 +206,8 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   knees, vertical shins, and the soles flat, as real seated string players sit: "The main point
   is that your hips are higher than your knees" (violinist.com, discussion 9372). The seat stays
   level, and its height fits the legs (`seatHeights()` of `models/props.ts`, 4.4). The polar bear
-  sits on the front half of a low bench, as a pianist does (piano 2).
+  sits on the front half of a taller bench, with the thighs sloped down (4.4, seat), as a pianist
+  sits on the front half of the bench (piano 2).
 - **Hanging arms.** A standing player with free hands hangs its arms (`HANG` of `pose/hang.ts`),
   with the palms at the height of the hips. The slim standing tan fox bends the free left elbow
   less (`FOX_HANG`), because the full bend points its forearm forward into the air.
