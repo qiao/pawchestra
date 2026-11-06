@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 338,863 bytes |
-| SHA-256 | `be1d3ea9dc763624b1c951c97d23620d7cf8b295bd09672fc0f0089fc251b0d6` |
+| Size | 339,027 bytes |
+| SHA-256 | `030a9f00413f7151bd0f3ef89a65e17a6b3d39b7492d8439d2c74b8f45906c33` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -370,6 +370,28 @@ back -0.2, halfWidth 0.25}, and `hinges` L (-0.576037, -0.749779, -0.325597) and
     middle of the front). Arcs of shares 0.25 to 0.46 and 0.60 to 0.78 gave 2.0 cm to 5.1 cm, and
     longer arcs to the back of the haunch (1401, 1402, 522, 523) gave 2.9 cm. The folds of
     `pnpm fold-probe pianist` do not change.
+16. Belly and flank: the thighs turn about 65° from the rest into the bind, and each vertex with
+    a mix of trunk and thigh shears. The fade of step 5 above the upper arc of step 15 folded the
+    lower flank into long thin faces. Each vertex below takes one exact row with
+    `sa.set_weight_row()`, and its mirror vertex the mirror row:
+    - Trunk rows (the thigh share goes, and the trunk shares scale to 1), so that the vertex
+      keeps its source place in the bind: 1343, 1344, 1342, 1786, 1205, and 1160 (thigh 0.01 to
+      0.17 before), and 969, 970, 311, 1130, and 1353 (thigh below 0.005). Right: 1218, 1587,
+      979, 2223, 972, 618, 901, 902, 961, 1586, 1206.
+    - The upper arc row of step 15 on 1401 (right 566), so that the arc holds one row up to the
+      side of the haunch.
+    - The lower arc row of step 15 on 1402, 522, and 523 (right 567, 1391, 246), so that the
+      lower arc holds one row from the inner groin to the side of the haunch.
+
+    The vertices of the crotch, the groin (1676 to 1679, 2388), the rump (1310, 1311, 1354), and
+    the bottom of the haunch keep their rows: with trunk rows, the crotch sank 9.3 cm (2388) and
+    3.9 cm (1678) below its neighbors, the rump showed a dark fold at the back, and the bottom of
+    the haunch sets the seat top. One row on the whole lower ring (also 643, 642, 219, and the
+    inner arc to 52) lowered the lowest point of the haunch by 1.4 cm. The thigh share of the
+    upper arc now has a spread of 0 (0.18 before), and of the front and the side of the lower
+    ring 0 (0.37 before).
+    The seat top (0.268 m) and the folds of `pnpm fold-probe pianist` do not change, and each dent
+    of step 15 changes by 1 mm or less.
 
 **Bind.** The Action `bind` holds the seated bind at frame 1. The trunk, the head, and the tail
 keep the rest. The legs sit on a bench that fits them (design 4.4, "Seat"): each thigh turns the
@@ -415,8 +437,8 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 716,772 bytes |
-| SHA-256 | `cbc9026e26863356f7c408ff37d20b2c421995edccaf0c828da18bd8536b78fb` |
-| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `7f481491924c836fac15b5b081887b5f8cb620c99bfa60aac8b791aba8787eb6` |
+| SHA-256 | `4496e419c6504c7a0e001d2f243cf8c4480b8a0a96987aecc6f4f72c01a5941c` |
+| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `634dd9d9e3fe479f555fc3b3a8469dc8831b37d7d1745828e4c7e033502218c1` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
