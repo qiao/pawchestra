@@ -152,32 +152,30 @@ passes.
       the user in a close play frame of the stage.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
-- [ ] Polar bear pianist: on the taller bench, the shoulders stand about 0.54 m above the keys (1.6
-      times the upper arm), so the forearms slope 30° to 45° down to the keys, and the elbows stand
-      about 20 cm to 28 cm above the keys (piano-technique: level forearms). Keys above 0.87 m hide
-      the hippos behind the piano. Only a lower seat makes the forearms level: ask the user.
-- [ ] Polar bear pianist: in the play, the arms go up to 10.0 cm (forearms) and 8.5 cm (upper arms)
-      into the trunk (5.4 cm and 6.8 cm at 1.15 m), in 0.1% and 1.3% of the samples over the
-      limits. In the lowering, 10.6 cm and 9.6 cm.
+- [ ] Polar bear pianist: in the play, the arms go up to 6.3 cm (forearms) and 7.4 cm (upper arms)
+      into the trunk. In the lowering, 6.7 cm and 6.5 cm.
 - [ ] Polar bear hand rig: a pocket stays at the front of each armpit in the chord and the far-left
       keys (0.0102 units, 2.1 cm, below its neighbors after the weight fixes, 4.9 cm before). Ask
       the user: a corrective key `arm_raise_*`, or a point edit of the armpit corner of the mesh.
 - [ ] Polar bear hand rig: a soft ledge stays at the top of the right seated thigh near the groin in
       the pedal pose. Check it in the stage light.
-- [ ] Polar bear hand rig: the right inner elbow folds up to 10 faces in the play (p95 9, limit 8),
-      because the elbows bend for the reach (lean 15°, shoulder turn 16°). A shoulder turn of 4°
-      folds 5, but 18% of the paws stop short of their keys. Ask the user: a corrective key at the
-      elbow, or loop edges.
-- [ ] Polar bear pianist: the outer elbows point up (`poleL`, `poleR`), so the upper arm twist p95
-      rises from 28° and 32° to 45° (limit 55°), and the right paw twist p95 from 32° to 36°
-      (`pnpm arm-check pianist --base 3643593a`).
-- [ ] Polar bear pianist: from the front, the open lid hides the paws. With the lean of 15°, the lid
-      also hides the lower face from the front at 40° above.
+- [ ] Polar bear hand rig: the right inner elbow folds up to 15 faces in the play (p95 11, limit 8)
+      with the upright trunk and the keys at 1.0 H, and the left arm 8 in the lift. Keys at 1.1 H
+      fold 7, but the upright trunk then reaches only 72% of the note targets of `bach-bwv1050`.
+      Ask the user: a corrective key at the elbow, or loop edges.
+- [ ] Polar bear pianist: from the front, the higher case and the lid hide the bear below the face.
 - [ ] Polar bear pianist: at the far keys, the outer upper arm stands 36° to 41° out from the round
       trunk (piano-technique).
-- [ ] Polar bear pianist: at rest, the paws lie on the front of the belly at about the key height,
-      not in the lap, because the thighs stand 0.9 m from the shoulders (reach 0.66 m). The lap
-      place of `along` 0.45 to 0.7 meets the chest or misses the leg on this body (`legTop()`).
+- [ ] Polar bear pianist: at rest, the paws lie on the front of the belly, not in the lap, because
+      the thighs lie out of the reach of the arms (0.66 m). The lap place of `along` 0.45 to 0.7
+      meets the chest or misses the leg on this body (`legTop()`).
+- [ ] Polar bear legs: with the thighs 25° down (knee 120° in the bind), the pedal pose folds 5
+      thin faces at the back of the right knee (2035, 2036, 3918, 5406, 4201) and 1 of the thigh
+      (3917) in each play sample (`pnpm fold-probe pianist`: `shin_R`, `thigh_R`). Check the back
+      of the right knee in the stage light.
+- [ ] Polar bear hand rig: a dent stays at the middle of the front of the crotch, 1.9 cm below its
+      neighbors (vertex 1797), and the edge of the belly overhangs the thigh roots. The piano hides
+      both from the stage camera.
 - [ ] Polar bear rig: each forearm folds into a hard dark V at the inner elbow in the chord (faces
       574 to 576 on the right). Add loop edges or a corrective shape at the elbow.
 - [ ] Polar bear pedals: the case shades the brass pedals, and from the stage camera the bear and
@@ -197,8 +195,8 @@ passes.
       side two times each second. Find a calmer side lean that keeps the reach of the far paw.
 - [ ] Polar bear keys: with the gaps between the white keys, the soft shadow of the paws on the keys
       is weaker. The claws stay at the key top and do not follow a pressed key down.
-- [ ] Polar bear pianist: at 3.3% of the notes of the demos, the arm is at its full reach, and the
-      palm stops up to 4.3 cm short of the key (the note target check of the pianist clearance).
+- [ ] Polar bear pianist: at 1% of the notes of the demos, the arm is at its full reach, and the
+      palm stops up to 3.2 cm short of the key (the note target check of the pianist clearance).
       A lean toward the keys for a far black key can give the reach.
 - [ ] Polar bear pianist: on a white key, the lowest claw point hangs about 3 cm in front of the
       front edge, at the height of the key top, so the claws do not rest on the key. Check it in a
@@ -209,9 +207,10 @@ passes.
       paw turns about two thirds of the hand turn. Take the helper off the paws (`step_wrist()`).
 - [ ] Polar bear copy: `tools/blender/polar_bear_legs.py` stops when the JPEG of the arm image leaks
       into the free columns of the strip. Skip a border of 8 columns in `atlas_strip()`.
-- [ ] Piano: the larger piano (`PIANO_SCALE` 1.24) moves the rows of the demos, such as the flute and
-      the violas of `bach-bwv1050`, and the lid hides the lower faces of the contrabasses. Show the
-      user the default views (`reports/2026-11-05-polar-bear-hold/stage-final/`).
+- [ ] Piano: the lifted piano (`PIANO_LIFT`, `PIANO_SCALE` 1.16, the lid at 25°) moves the rows of
+      the demos, the lid hides the lower muzzle of the right contrabass of `bach-bwv1050`, and its
+      legs show under the higher case. Show the user the default views
+      (`reports/2026-11-05-polar-bear-seat/after-stage/`).
 - [ ] Close views: the pianist has no lift or lowering moment in `ROLE_VIEWS`, so `close-views
       pianist --moments lift50` fails. Give the role the moments of `halfMoves()`.
 - [ ] Bear: at rest, the arms stand out about 35° around the wide belly, and the upper arms go 2.2
