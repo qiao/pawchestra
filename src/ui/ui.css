@@ -152,21 +152,26 @@ svg {
   }
 }
 
-/* In Cinematic mode, the title fades out and stays hidden (design 2.3), because the title card
-   (`ui/title-card.ts`) shows the piece in the frame. The title stays a live region, so that a
-   screen reader still reads a new piece. The link to the repository hides after the fade, so that
-   a hidden link takes no focus and no pointer. */
-.title {
+/* In Cinematic mode, the piece title, the composer, and the link to the repository fade out and
+   stay hidden (design 2.3), because the title card (`ui/title-card.ts`) shows the piece in the
+   frame. The logo stays. The title stays a live region, so that a screen reader still reads a new
+   piece. The link hides after the fade, so that a hidden link takes no focus and no pointer. */
+.title h2,
+.title p {
   transition: opacity 0.6s ease;
 }
 
-body:has(.camera[aria-pressed='true']) .title {
+body:has(.camera[aria-pressed='true']) .title h2,
+body:has(.camera[aria-pressed='true']) .title p {
   opacity: 0;
 }
 
 body:has(.camera[aria-pressed='true']) .title .github {
+  opacity: 0;
   visibility: hidden;
-  transition: visibility 0s 0.6s;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s 0.6s;
 }
 
 /* Each line of the title has its own soft shade, which keeps 4.5:1 for its text over a white animal
@@ -268,7 +273,8 @@ body:has(.camera[aria-pressed='true']) .title .github {
   transition:
     background-color 0.12s,
     border-color 0.12s,
-    color 0.12s;
+    color 0.12s,
+    opacity 0.6s ease;
 }
 
 .title .github:hover {
@@ -1786,7 +1792,8 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
     transform: none;
   }
 
-  .title,
+  .title h2,
+  .title p,
   .title .github,
   body:has(.camera[aria-pressed='true']) .title .github {
     transition: none;

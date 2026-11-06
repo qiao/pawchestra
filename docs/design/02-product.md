@@ -54,10 +54,11 @@ The UI has the style of a video player. The theme is dark only, because the scen
 - The bar keeps its place at the bottom of the window in both camera modes. In Cinematic mode it
   covers the bottom of the frame when it shows, because a bar that moved at each change of the
   mode looked like a fault.
-- In Cinematic mode, the title (the logo, the piece title, the composer, and the link to GitHub)
-  fades out and stays hidden, because the title card shows the piece in the frame. It stays a
-  live region, so that a screen reader still reads a new piece. The link hides after the fade, so
-  that it takes no focus and no pointer.
+- In Cinematic mode, the piece title, the composer, and the link to GitHub fade out and stay
+  hidden, because the title card shows the piece in the frame. The logo stays at the top-left
+  corner of the frame and moves with the bars (`--letterbox` and `--letterbox-side` of
+  `ui/ui.css`). The title stays a live region, so that a screen reader still reads a new piece.
+  The link hides after the fade, so that it takes no focus and no pointer.
 - In Cinematic mode during play, all controls and panels hide after the same time: the bar, the
   drawer (also when it is open), each tooltip, and the pointer (`uiShown()` of
   `app/bar-rules.ts`). A pointer motion, a tap, or Tab shows them all. They stay while the
@@ -248,7 +249,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   of the default demo, and the app keeps that header, so the piece title paints with the first
   paint (7.2). A hash that names a demo clears the lines before the first paint, and the app
   writes the title of its demo. The full-page message of 2.6 removes the header. In Cinematic
-  mode, the header is hidden (2.3).
+  mode, the header shows only the logo (2.3).
 - **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
   line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
   free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
