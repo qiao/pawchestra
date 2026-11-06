@@ -51,6 +51,7 @@ import type { PosedSkeleton } from '../src/pose/test-kinematics.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';
 import type { RoleSweep, SweepPlayer } from '../src/pose/test-sweep.ts';
 import { SWEEP_ROLES } from '../src/pose/test-sweep-roles.ts';
+import { weightOn } from './skin-weight.ts';
 
 /** The text of the usage. */
 const USAGE = 'Usage: pnpm body-shape <role> [--demo <id>] [--base <ref>] [--json <file>]';
@@ -122,24 +123,6 @@ const NOT_BACK = boneSet(
 
 /** The bones that the posed back line leaves out: the legs and the tail. */
 const NOT_POSED_BACK = boneSet(/thigh|shin|foot|toes|^tail/);
-
-/**
- * Gives the weight of a vertex on a set of bones.
- *
- * @param mesh The mesh.
- * @param v The vertex.
- * @param set The bones.
- * @returns The weight.
- */
-function weightOn(mesh: StudioMesh, v: number, set: ReadonlySet<number>): number {
-  let w = 0;
-  for (let k = 0; k < 4; k++) {
-    if (set.has(mesh.joints[v * 4 + k] ?? 0)) {
-      w += mesh.weights[v * 4 + k] ?? 0;
-    }
-  }
-  return w;
-}
 
 /**
  * Gives a point of a list of positions.

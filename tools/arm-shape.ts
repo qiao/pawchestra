@@ -46,6 +46,7 @@ import { sideSegmentBones } from './arm-segments.ts';
 import type { Side, StudioBody, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
 import { UPPER_TWIST_BONES, twistAngle } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
+import { weightOn } from './skin-weight.ts';
 
 /** A ring of the arm skin: the bone of its axis and its place along the bone. */
 export interface ArmRing {
@@ -145,28 +146,6 @@ export interface ArmSample {
  */
 function boneAt(bone: StudioBone): number {
   return STUDIO_BONES.indexOf(bone);
-}
-
-/**
- * Gives the weight of a vertex on some bones.
- *
- * @param mesh The skin.
- * @param v The vertex.
- * @param bones The indices of the bones.
- * @returns The sum of the weights.
- */
-function weightOn(
-  mesh: Pick<StudioMesh, 'joints' | 'weights'>,
-  v: number,
-  bones: readonly number[],
-): number {
-  let sum = 0;
-  for (let k = 0; k < 4; k++) {
-    if (bones.includes(mesh.joints[v * 4 + k] ?? -1)) {
-      sum += mesh.weights[v * 4 + k] ?? 0;
-    }
-  }
-  return sum;
 }
 
 /**

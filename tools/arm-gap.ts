@@ -28,8 +28,9 @@ import { Triangle, Vector3 } from 'three';
 
 import { STUDIO_BONES, unpackStudioMesh } from '../src/models/studio-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
-import type { Side, StudioBody, StudioMesh } from '../src/models/studio-format.ts';
+import type { Side, StudioBody } from '../src/models/studio-format.ts';
 import { UPPER_TWIST_BONES, standingBody } from '../src/models/studio-rig.ts';
+import { weightOn } from './skin-weight.ts';
 
 /** The smallest share of the weight of a vertex on a group of bones that puts it in the group. */
 const GAP_SHARE = 0.5;
@@ -68,24 +69,6 @@ const TRUNK_BONES: ReadonlySet<number> = new Set(
     STUDIO_BONES.indexOf(bone),
   ),
 );
-
-/**
- * Gives the weight of a vertex on some joints.
- *
- * @param mesh The mesh.
- * @param v The vertex.
- * @param joints The joints.
- * @returns The sum of the weights.
- */
-function weightOn(mesh: StudioMesh, v: number, joints: ReadonlySet<number>): number {
-  let sum = 0;
-  for (let k = 0; k < 4; k++) {
-    if (joints.has(mesh.joints[v * 4 + k] ?? -1)) {
-      sum += mesh.weights[v * 4 + k] ?? 0;
-    }
-  }
-  return sum;
-}
 
 /**
  * Gives the place of a point along an arm, on the nearest of the two bones: 0 at the shoulder, 1 at

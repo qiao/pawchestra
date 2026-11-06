@@ -44,9 +44,10 @@ import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
 import { trackFolder } from './stop-cleanup.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
+import type { Side, StudioBone } from '../src/models/studio-format.ts';
 import { UPPER_TWIST_BONES } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
+import { weightOn } from './skin-weight.ts';
 
 /** The smallest weight of a corner on the upper arm or the clavicle that puts a face in a region. */
 const REGION_WEIGHT = 0.05;
@@ -117,24 +118,6 @@ interface ArmLookValues {
  */
 function boneAt(bone: StudioBone): number {
   return STUDIO_BONES.indexOf(bone);
-}
-
-/**
- * Gives the weight of a vertex on some bones.
- *
- * @param mesh The skin.
- * @param v The vertex.
- * @param bones The indices of the bones.
- * @returns The sum of the weights.
- */
-function weightOn(mesh: StudioMesh, v: number, bones: readonly number[]): number {
-  let sum = 0;
-  for (let k = 0; k < 4; k++) {
-    if (bones.includes(mesh.joints[v * 4 + k] ?? -1)) {
-      sum += mesh.weights[v * 4 + k] ?? 0;
-    }
-  }
-  return sum;
 }
 
 /**
