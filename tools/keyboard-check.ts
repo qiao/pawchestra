@@ -406,8 +406,8 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
     tip === 'Mute (M)' && tipAfter === '' && stays === 'Mute',
   );
 
-  // The speed menu and the volume slider of the bar have tooltips with no key. On a phone, they
-  // are in the drawer.
+  // The speed menu of the bar has a tooltip with no key, and the volume slider names its arrow
+  // keys (design 2.8). On a phone, they are in the drawer.
   if (!phone) {
     await c.tabTo(named('Volume'));
     await page.waitForTimeout(600);
@@ -419,7 +419,7 @@ async function checkBar(c: Checker, page: Page, phone: boolean): Promise<void> {
       'Tooltips of the speed menu and the volume slider',
       'Tab to Volume, wait 0.6 s, Shift+Tab to Speed, wait 0.6 s',
       `tooltips "${volumeTip}" and "${speedTip}"`,
-      volumeTip === 'Volume' && speedTip === 'Speed',
+      volumeTip === 'Volume (↑ ↓)' && speedTip === 'Speed',
     );
   }
 
@@ -1116,10 +1116,11 @@ async function checkHiddenBarTap(browser: Browser, base: string): Promise<KeyChe
     githubMisses.length === 0,
   );
 
-  // The credit links are in the credits dialog. A tap on the link "Credits" opens it, and its
-  // controls also have the touch size.
-  await page.locator('.drawer-footer button').scrollIntoViewIfNeeded();
-  await page.tap('.drawer-footer button');
+  // The credit links are in the credits dialog. A tap on the link "Credits" of the tab Settings
+  // opens it, and its controls also have the touch size.
+  await page.tap('#tab-settings');
+  await page.locator('.credits-line button').scrollIntoViewIfNeeded();
+  await page.tap('.credits-line button');
   await page.waitForTimeout(400);
   const dialogControls = await page.evaluate(() =>
     [...document.querySelectorAll('dialog.credits-dialog :is(button, a)')].map((control) => {
@@ -1339,7 +1340,7 @@ async function checkDemoFailure(browser: Browser, base: string): Promise<KeyChec
     `Tab x${tabs} to Try again, Enter`,
     `${atStart}; Try again plays the demo: ${plays}`,
     atStart.startsWith(
-      `${failure}; retry true; title "D'un matin de printemps"; first play true`,
+      `${failure}; retry true; title "${DEMOS[DEFAULT_DEMO].title}"; first play true`,
     ) && plays,
   );
 
@@ -1360,7 +1361,7 @@ async function checkDemoFailure(browser: Browser, base: string): Promise<KeyChec
     'Enter on the Ode to Joy row, Shift+Tab to Try again, Enter',
     `${selected}; after Try again, hash "${hashAfter}"`,
     selected ===
-      `${failure}; retry true; title "D'un matin de printemps"; first play false; hash "${hashBefore}"` &&
+      `${failure}; retry true; title "${DEMOS[DEFAULT_DEMO].title}"; first play false; hash "${hashBefore}"` &&
       hashAfter === '#demo=beethoven-9',
   );
   await context.close();
@@ -1392,7 +1393,7 @@ async function checkRetryAfterFailedSelection(browser: Browser, base: string): P
     }
   });
   await page.goto(base);
-  await page.waitForSelector('canvas[data-demo="boulanger-matin"]', { timeout: 60_000 });
+  await page.waitForSelector(`canvas[data-demo="${DEFAULT_DEMO}"]`, { timeout: 60_000 });
   await context.route('**/demos/**', (route) => route.abort());
   // A wide window opens the drawer at start (design 2.8).
   await page.click('button.demo:has-text("Ode to Joy")');
@@ -1413,7 +1414,7 @@ async function checkRetryAfterFailedSelection(browser: Browser, base: string): P
     'Try again after a failed selection and a failed load',
     'select the Ode to Joy (fails), the samples fail, click Try again',
     `first message "${first}"; Try again loads "${demo}"`,
-    first.startsWith('The demo did not load.') && demo === 'boulanger-matin',
+    first.startsWith('The demo did not load.') && demo === DEFAULT_DEMO,
   );
   await context.close();
   return c.checks;
