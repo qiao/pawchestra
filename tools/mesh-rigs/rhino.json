@@ -1,6 +1,6 @@
 {
-  "source": "assets/models/rhino/rhino-tpose-arms.glb",
-  "sourceNote": "A copy of the T-pose mesh rhino-tpose.glb with a quad tube on each arm (assets/models/rhino/README.md). tools/blender/rhino_tpose_arms.py makes it. The faces of the paws, the trunk, the legs, and the head are the faces of the source.",
+  "source": "assets/models/rhino/rhino-tpose-arms-pit.glb",
+  "sourceNote": "A copy of assets/models/rhino/rhino-tpose-arms.glb with no turned faces at the left arm root: point edits in Blender merge 2 vertices of the root into a neighbor, so that no vertex goes to a new place (assets/models/rhino/README.md, rhino-tpose-arms-pit.json). rhino-tpose-arms.glb is a copy of the T-pose mesh rhino-tpose.glb with a quad tube on each arm (assets/models/rhino/README.md). tools/blender/rhino_tpose_arms.py makes it. The faces of the paws, the trunk, the legs, and the head are the faces of the source.",
   "paintedWeights": "assets/models/rhino/rhino-tpose-weights.json",
   "paintedNote": "The weights of the clavicles and the arms are the automatic weights of Blender with the Weight Paint fixes of tools/blender/rhino_tpose_arms.py. The vertices on the bones of paintedLower keep the rule weights, so that the curl around the tubes does not fold the faces of the paws.",
   "paintedLower": [

@@ -93,8 +93,8 @@ corner takes the weight row of its new vertex in `rhino-tpose-weights.json`.
 
 | Item | Value |
 |---|---|
-| Size | 742,196 bytes |
-| SHA-256 | `55890747c98b59e5f9d913df608e049fd4e5d83e60cab8306453950797d58a2b` |
+| Size | 741,668 bytes |
+| SHA-256 | `aef0c622b929ce01e4470150777d06dbc8c303b9eee38ca7e2bb61f4e03864a9` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bind with the elbows bent forward (`studio.bindArms`). The left bind paw is supinated by the rule of the cast matrix and the tuba. The right bind paw keeps no supination, because the value of the rule takes the right forearm deeper into the tuba (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow of the tuba hold |
 
