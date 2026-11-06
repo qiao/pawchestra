@@ -4,6 +4,8 @@ import { lastAtOrBefore } from './blend.ts';
 import { gestureSize } from './loudness.ts';
 import { groupChords } from './note-groups.ts';
 import { clamp01, smoothstep } from './rest.ts';
+import { fingerClosesAt } from './harp-fingering.ts';
+import type { FingerCloses, HarpFingering } from './harp-fingering.ts';
 
 /** The times and the sizes of the hand motion of the piano and the harp (design 5.3). */
 export const HAND_MOTION = {
@@ -80,6 +82,23 @@ export const HAND_MOTION = {
   pluckSec: 0.08,
   /** A pluck pulls the palm this far from the strings, at a gesture size of 1. */
   pull: 0.025,
+  /**
+   * The share of the pull of a pluck inside a group of a harp hand: the hand stays still in a
+   * group, and only the fingers move (`docs/reference/harp-technique.md` section 7.3). The last
+   * pluck of a group pulls the whole hand away. No source gives the share.
+   */
+  groupPull: 0.3,
+  /**
+   * A harp hand damps its strings in a rest of at least this time, from the end of its notes to
+   * its next pluck, in seconds: the flat palm goes onto the strings (section 7.6).
+   */
+  dampRestSec: 1.2,
+  /** The time that the flat palm stays on the strings in a damp, in seconds. */
+  dampSec: 0.5,
+  /** The time in which the palm goes onto the strings, and off them, in seconds. */
+  dampMoveSec: 0.12,
+  /** The distance that the flat palm of a damp moves onto the strings, in meters. */
+  dampPress: 0.02,
   /** One hand plays the notes of a chord within this span, in semitones. */
   span: 12,
   /** The keys of the left and the right hand before the first note: C3 and C5. */
@@ -589,6 +608,18 @@ export interface HandTrack {
   readonly hovers: Float64Array | null;
   /** The wrist kicks of a piano hand ({@link HAND_MOTION.kickDrop}), or `null` for a harp hand. */
   readonly kicks: WristKicks | null;
+  /** The fingering of a harp hand (`planHarpFingerings()`), or `null` for a piano hand. */
+  readonly fingering: HarpFingering | null;
+  /**
+   * The time from the first pluck of each note of a harp hand to the note start, in seconds: more
+   * than 0 for a rolled chord. `null` for a piano hand.
+   */
+  readonly rolls: Float64Array | null;
+  /**
+   * The start and the end of the damp after each note of a harp hand, in song seconds: two
+   * numbers for each note, equal for a note with no damp. `null` for a piano hand.
+   */
+  readonly damps: Float64Array | null;
 }
 
 /** The wrist kicks of the notes of a piano hand (design 5.3). */
@@ -611,6 +642,8 @@ export interface WristKicks {
  * @param passes For each note, a value other than 0 when the thumb passes under the hand or a
  *   finger crosses over the thumb (`PianoFingering.pass`), or `null` for none.
  * @param turns The turns of the hand at each note, or `null` for none.
+ * @param fingering The fingering of a harp hand, or `null` for none. With a fingering, the hand
+ *   places each group at its place time and stays still in the group (`harpPlacing()`).
  * @returns The note data.
  */
 export function buildHandTrack(
@@ -621,6 +654,7 @@ export function buildHandTrack(
   firstKey: number,
   passes: ArrayLike<number> | null = null,
   turns: HandTurns | null = null,
+  fingering: HarpFingering | null = null,
 ): HandTrack {
   const m = HAND_MOTION;
   const plucks = action === 'pluck';
@@ -660,21 +694,106 @@ export function buildHandTrack(
     const leap = moveLength(points, first, i) / (yields(i) ? m.yieldSpeed : m.leapSpeed);
     return Math.min(late, Math.max(before.start, end - Math.max(pass, leap)));
   });
-  // A piano hand lifts less for a near note.
-  const liftShare = (i: number): number => (plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec));
+  // A piano hand lifts less for a near note. A harp hand pulls less inside a group.
+  const harp = fingering ? harpPlacing(notes, fingering, rests, pluckTimes) : null;
+  const share = (i: number): number =>
+    harp ? (harp.pulls[i] ?? 1) : plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec);
   return {
     action,
     first,
     starts: Float64Array.from(notes, (n) => n.start),
-    moveStarts,
-    moveEnds,
+    moveStarts: harp?.moveStarts ?? moveStarts,
+    moveEnds: harp?.moveEnds ?? moveEnds,
     pluckTimes,
     points,
-    gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
+    gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * share(i)),
     turns,
     hovers,
     kicks,
+    fingering,
+    rolls: harp?.rolls ?? null,
+    damps: harp?.damps ?? null,
   };
+}
+
+/** The moves, the pulls, the rolls, and the damps of a harp hand with a fingering. */
+interface HarpPlacing {
+  readonly moveStarts: Float64Array;
+  readonly moveEnds: Float64Array;
+  /** The share of the pull of each pluck ({@link HAND_MOTION.groupPull}). */
+  readonly pulls: Float64Array;
+  readonly rolls: Float64Array;
+  readonly damps: Float64Array;
+}
+
+/**
+ * Calculates the moves of a harp hand from its fingering (design 5.3,
+ * `docs/reference/harp-technique.md` section 7.2): the hand moves to the place of each group at
+ * the place time of the group, right after the pluck before, and it rests there with the fingers
+ * on their strings until the first pluck of the group. Inside a group, the place of the palm does
+ * not change, so the hand stays still, and each pluck pulls it only a little
+ * ({@link HAND_MOTION.groupPull}). After the last note before a long rest, the flat palm damps the
+ * strings ({@link HAND_MOTION.dampRestSec}), and the hand places the next group after the damp.
+ *
+ * @param notes The notes of the hand, sorted by start.
+ * @param fingering The fingering of the hand.
+ * @param rests The rest of the finger on its string before each pluck, in seconds.
+ * @param pluckTimes The time of the pluck of each note, in seconds.
+ * @returns The moves, the pulls, the rolls, and the damps.
+ */
+function harpPlacing(
+  notes: readonly HandNote[],
+  fingering: HarpFingering,
+  rests: readonly number[],
+  pluckTimes: Float64Array,
+): HarpPlacing {
+  const m = HAND_MOTION;
+  const { first, plucks, groups, places } = fingering;
+  const rolls = Float64Array.from(notes, (n, i) => {
+    let earliest = n.start;
+    for (let j = first[i] ?? 0; j < (first[i + 1] ?? 0); j++) {
+      earliest = Math.min(earliest, plucks[j] ?? earliest);
+    }
+    return n.start - earliest;
+  });
+  // The damp after each note: from its end, when the next pluck comes after a long rest.
+  const damps = new Float64Array(2 * notes.length);
+  let ends = -Infinity;
+  for (const [i, note] of notes.entries()) {
+    ends = Math.max(ends, note.end);
+    const next = notes[i + 1];
+    const nextPluck = next ? next.start - (rolls[i + 1] ?? 0) : Infinity;
+    const free = nextPluck - ends;
+    const length = Math.min(m.dampSec, free - 2 * m.dampMoveSec);
+    if (note.keys.length > 0 && free >= m.dampRestSec && length > 0) {
+      damps[2 * i] = ends;
+      damps[2 * i + 1] = ends + length;
+    } else {
+      damps[2 * i] = note.start;
+      damps[2 * i + 1] = note.start;
+    }
+  }
+
+  const moveStarts = new Float64Array(notes.length);
+  const moveEnds = new Float64Array(notes.length);
+  const pulls = new Float64Array(notes.length);
+  let lastStart = -Infinity;
+  for (const [i, note] of notes.entries()) {
+    const group = groups[i] ?? 0;
+    const startsGroup = i === 0 || groups[i - 1] !== group;
+    const end = note.start - (rolls[i] ?? 0) - (rests[i] ?? 0);
+    // A new group places at its place time, and after the damp before it. A note inside a group
+    // keeps the place of the palm, so its move only eases the pull back.
+    const before = i > 0 ? (notes[i - 1]?.start ?? 0) + (pluckTimes[i - 1] ?? 0) : -Infinity;
+    const damped = i > 0 ? (damps[2 * i - 1] ?? -Infinity) : -Infinity;
+    const place = startsGroup ? (places[group] ?? end) : before;
+    const start = Math.min(end, Math.max(place, damped, lastStart));
+    moveStarts[i] = start;
+    moveEnds[i] = Math.max(start, Math.min(start + m.moveSec, end));
+    lastStart = start;
+    pulls[i] = groups[i + 1] === group ? m.groupPull : 1;
+  }
+  return { moveStarts, moveEnds, pulls, rolls, damps };
 }
 
 /**
@@ -768,8 +887,15 @@ export interface HandState {
   lift: number;
   /** The pull of a harp palm away from the strings, in meters. */
   pull: number;
-  /** The close of the fingers after a pluck, from 0 to 1. */
+  /**
+   * The close of the fingers after a pluck, from 0 to 1. For a harp hand with a fingering, the
+   * close of fingers 2 to 4, which close as one group (`fingerClosesAt()`).
+   */
   closed: number;
+  /** The close of the thumb of a harp hand with a fingering, from 0 to 1, or 0. */
+  thumb: number;
+  /** The share of the flat palm of a harp hand that damps its strings, from 0 to 1. */
+  flat: number;
   /** The roll of a piano hand around the line of its fingers, in radians (`HandTurns.rolls`). */
   roll: number;
   /** The turn of a piano hand in the plane of the palm, in radians (`HandTurns.yaws`). */
@@ -786,7 +912,18 @@ export interface HandState {
  * @returns The state.
  */
 export function createHandState(): HandState {
-  return { point: [0, 0, 0], lift: 0, pull: 0, closed: 0, roll: 0, yaw: 0, pivot: 0, kick: 0 };
+  return {
+    point: [0, 0, 0],
+    lift: 0,
+    pull: 0,
+    closed: 0,
+    thumb: 0,
+    flat: 0,
+    roll: 0,
+    yaw: 0,
+    pivot: 0,
+    kick: 0,
+  };
 }
 
 /**
@@ -812,6 +949,8 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
     out.lift = 0;
     out.pull = 0;
     out.closed = 0;
+    out.thumb = 0;
+    out.flat = 0;
     out.roll = 0;
     out.yaw = 0;
     out.pivot = 0;
@@ -839,16 +978,53 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
       hover + (time < moveEnd ? Math.sin(Math.PI * progress) * HAND_MOTION.lift * gesture : 0);
     out.pull = 0;
     out.closed = 0;
+    out.thumb = 0;
+    out.flat = 0;
     out.kick = track.kicks ? wristKickAt(track.kicks, track.starts, time) : 0;
     return;
   }
-  // Before the move, the hand is away from the strings after the pluck of the note before.
+  // Before the move, the hand is away from the strings after the pluck of the note before. In a
+  // rolled chord, the fingers pluck from the first pluck on, and the hand pulls away only after
+  // the last pluck, at the note start.
   const before = i > 0 ? (track.gestures[i - 1] ?? 1) * (1 - eased) : 0;
   const pluck = time < start ? 0 : smoothstep((time - start) / (track.pluckTimes[i] ?? 1));
   out.lift = 0;
-  out.closed = time < start ? (i > 0 ? 1 - eased : 0) : pluck;
-  out.pull = HAND_MOTION.pull * (time < start ? before : gesture * pluck);
   out.kick = 0;
+  out.pull = HAND_MOTION.pull * (time < start ? before : gesture * pluck);
+  if (track.fingering) {
+    fingerClosesAt(track.fingering, time, closes);
+    out.closed = closes.fingers;
+    out.thumb = closes.thumb;
+  } else {
+    out.closed = time < start ? (i > 0 ? 1 - eased : 0) : pluck;
+    out.thumb = 0;
+  }
+  // A damp after the note before puts the flat palm onto the strings.
+  const flat = track.damps ? dampShare(track.damps, i, time) : 0;
+  out.flat = flat;
+  out.pull = out.pull * (1 - flat) - HAND_MOTION.dampPress * flat;
+}
+
+/** The scratch closes of {@link handStateAt}. Each call writes them before it reads them. */
+const closes: FingerCloses = { thumb: 0, fingers: 0 };
+
+/**
+ * Gives the share of the flat palm of a damp at a time: it goes onto the strings at the damp
+ * start, stays, and leaves at the damp end, each move in {@link HAND_MOTION.dampMoveSec}.
+ *
+ * @param damps The start and the end of the damp after each note.
+ * @param i The note after which the hand damps.
+ * @param time The song time.
+ * @returns The share, from 0 to 1.
+ */
+function dampShare(damps: Float64Array, i: number, time: number): number {
+  const from = damps[2 * i] ?? 0;
+  const to = damps[2 * i + 1] ?? 0;
+  if (to <= from) {
+    return 0;
+  }
+  const t = HAND_MOTION.dampMoveSec;
+  return smoothstep((time - from) / t) * (1 - smoothstep((time - to) / t));
 }
 
 /**

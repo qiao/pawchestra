@@ -16,7 +16,6 @@ import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.
 import type { TorsoFrames } from './frames.ts';
 import {
   HAND_MOTION,
-  NO_REACH_LIMIT,
   buildHandTrack,
   createHandState,
   handStateAt,
@@ -40,6 +39,8 @@ import { buildDigitTrack } from './piano-digits.ts';
 import type { DigitTrack } from './piano-digits.ts';
 import { POLAR_BEAR_PAW, clawOffset, planFingeringSteps } from './piano-fingering.ts';
 import type { PianoFingering } from './piano-fingering.ts';
+import { HARP_FINGERING, planHarpFingerings } from './harp-fingering.ts';
+import type { HarpFingering } from './harp-fingering.ts';
 
 /** The instruments that the two hands play on keys or strings: the piano and the harp. */
 export type HandsInstrument = InstrumentOf<'keyboard' | 'harp'>;
@@ -98,6 +99,10 @@ interface HandsHold {
   readonly shoulderDrop: number;
   /** The keys that each hand reaches on the side of the other hand. */
   readonly reach: HandReach;
+  /** The widest chord of one hand, in semitones (`splitHands()`). */
+  readonly span: number;
+  /** The most keys of a chord of one hand (`splitHands()`). */
+  readonly most: number;
   /**
    * The least distance between the middles of the keys of the two hands, in semitones (12
    * semitones are 7 white keys), or 0 for no limit. The other hand moves out of the way of a hand
@@ -211,6 +216,8 @@ export const HANDS_HOLDS = {
     sideLeanMax: 10 * MathUtils.DEG2RAD,
     shoulderDrop: 4 * MathUtils.DEG2RAD,
     reach: { leftHighest: 65, rightLowest: 63 },
+    span: HAND_MOTION.span,
+    most: Infinity,
     // The wide paws of the polar bear point in along the forearms, so they go up to 4.7 cm into
     // each other when the palms are nearer than 33 cm, 24 semitones in the middle of the keys.
     // At 24 semitones, they go at most 0.2 cm into each other in the demos, and at 22 up to 1.1 cm.
@@ -268,14 +275,17 @@ export const HANDS_HOLDS = {
   // 2 cm toward the player: at 0.14 m and 2 cm toward the column, the left paw misses the bass
   // strings C2 to A2 by up to 4.5 cm, and at 0.14 m and 4 cm toward the player, the left paw bends
   // 75° from the straight paw of the source (paw swing p95 of `pnpm arm-check`, limit 70°).
-  // The left palm faces the strings and 39° down (`faceL`), as the wrists of a harpist go a
+  // The left palm faces the strings and 45° down (`faceL`), as the wrists of a harpist go a
   // little down. The left shoulder lies 0.27 m from the plane of the strings, and the left upper
   // arm is 0.2 m long, so the left forearm points into the strings. With the palm square to the
   // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
   // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
-  // paw. At 39° down, the paw swing p95 is 56°, and at 31° 60° (`pnpm arm-check`). The knuckles
-  // of the turned paw come nearer to the strings, so the left palm lies 6 cm from the strings:
-  // with 3 cm, the knuckles go 1.5 cm into the neck of the harp. The right palm lies 3 cm above
+  // paw. With the group places of the fingering, the paw swing p95 is 57° at 45° down, 61° at
+  // 39°, and 59° at 42° (`pnpm arm-check`). The right palm faces the strings and 9° down
+  // (`faceR`): square to the strings, the right paw swing p95 is 46°, and 9° down 42°. The knuckles
+  // of the turned paw come nearer to the strings, so the left palm lies 7 cm from the strings:
+  // with 3 cm, the knuckles go 1.5 cm into the neck of the harp, and with 6 cm, the left paw goes
+  // 0.7 cm into the harp at rest (`pnpm pose-depth harpist`). The right palm lies 3 cm above
   // the pluck point: at the pluck point, the right upper arm goes 1.7 cm into the soundbox
   // (`pnpm pose-depth harpist`). The left fingers point up and back along the strings (`aimL`): with the fingers on
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
@@ -286,10 +296,10 @@ export const HANDS_HOLDS = {
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.06, 0.22, 0.02],
+    palmL: [-0.07, 0.22, 0.02],
     palmR: [0.03, 0.03, 0],
-    faceL: [1, -0.8, 0],
-    faceR: [-1, 0, 0],
+    faceL: [1, -1, 0],
+    faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
     aimR: null,
     lean: 3 * MathUtils.DEG2RAD,
@@ -298,7 +308,14 @@ export const HANDS_HOLDS = {
     sideLean: 0,
     sideLeanMax: 0,
     shoulderDrop: 0,
-    reach: NO_REACH_LIMIT,
+    // The right hand reaches around the soundbox down to about G2, the lowest line of the bass
+    // staff, and the left hand plays up to about C5 (`docs/reference/harp-technique.md`, section
+    // 7.9). With no limit, the left hand played up to D6, where the left paw stands 0.22 m above
+    // the short treble strings, at the neck. One hand reaches a tenth (16 semitones) and plays at
+    // most four strings (section 7.4).
+    reach: { leftHighest: 72, rightLowest: 43 },
+    span: 16,
+    most: HARP_FINGERING.fingers,
     apart: 0,
     poleL: [-0.85, -1, 0],
     poleR: [0.7, -1, 0],
@@ -577,12 +594,16 @@ interface HandTracks {
   readonly right: HandTrack;
   /** The presses of the claws of each piano paw, or `null` for a harp player. */
   readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
+  /** The fingering of each hand of a harp player, or `null` for a pianist. */
+  readonly fingering: { readonly left: HarpFingering; readonly right: HarpFingering } | null;
 }
 
 /**
  * Calculates the note data of the two hands of a piano or harp player (design 5.3), in steps
  * (design 7.2). A piano hand plays the fingering of the lowest cost (`planFingeringSteps()`), and
- * its palm stands so that the claw of each key is over the key.
+ * its palm stands so that the claw of each key is over the key. A harp hand plays the fingering of
+ * a harpist (`planHarpFingerings()`): its palm stands at the middle of the strings of each group,
+ * so it moves once for each group.
  *
  * @param rig The points of the player.
  * @param notes The notes of the player, sorted by start.
@@ -596,37 +617,47 @@ export function* handTracksSteps(
   loudness: readonly number[],
   amplitude: number,
 ): Steps<HandTracks> {
-  const [left, right] = splitHands(notes, loudness, rig.hold.reach, rig.hold.apart);
+  const { hold } = rig;
+  const [left, right] = splitHands(notes, loudness, hold.reach, hold.apart, hold.span, hold.most);
   const [firstL, firstR] = HAND_MOTION.startKeys;
   const { action } = rig.hold;
   const piano = action === 'strike';
   const fingeringL = piano ? yield* planFingeringSteps(left, 'L', POLAR_BEAR_PAW) : null;
   const fingeringR = piano ? yield* planFingeringSteps(right, 'R', POLAR_BEAR_PAW) : null;
+  const harp = piano ? null : planHarpFingerings(left, right);
   const track = (
     side: 'L' | 'R',
     hand: readonly HandNote[],
     fingering: PianoFingering | null,
+    strings: HarpFingering | null,
     firstKey: number,
   ): HandTrack =>
     buildHandTrack(
       hand,
       action,
-      (l, h, i) =>
-        palmPoint(
+      (l, h, i) => {
+        // A harp hand stands at the middle of the strings of the group of the note.
+        const group = strings && i >= 0 ? (strings.groups[i] ?? 0) : -1;
+        if (strings && group >= 0) {
+          return palmPoint(rig, side, strings.groupLow[group] ?? l, strings.groupHigh[group] ?? h);
+        }
+        return palmPoint(
           rig,
           side,
           l,
           h,
           fingering && i >= 0 ? fingeredPalmX(rig, side, fingering, i) : null,
-        ),
+        );
+      },
       amplitude,
       firstKey,
       fingering?.pass ?? null,
       fingering && handTurns(hand, fingering, side),
+      strings,
     );
   return {
-    left: track('L', left, fingeringL, firstL),
-    right: track('R', right, fingeringR, firstR),
+    left: track('L', left, fingeringL, harp?.[0] ?? null, firstL),
+    right: track('R', right, fingeringR, harp?.[1] ?? null, firstR),
     digits:
       fingeringL && fingeringR
         ? {
@@ -634,6 +665,7 @@ export function* handTracksSteps(
             right: buildDigitTrack(right, fingeringR),
           }
         : null,
+    fingering: harp ? { left: harp[0], right: harp[1] } : null,
   };
 }
 
@@ -854,7 +886,9 @@ function poseHand(
     chest.rotation,
     rotations,
   );
-  writeCurl(arm, (hold.curl + (hold.curlClosed - hold.curl) * hand.closed) * weight, rotations);
+  // The flat palm of a damp opens the fingers.
+  const curl = hold.curl + (hold.curlClosed - hold.curl) * hand.closed;
+  writeCurl(arm, curl * (1 - hand.flat) * weight, rotations);
 }
 
 /**
