@@ -225,6 +225,19 @@ function wideChordCut(keys: readonly number[], reach: HandReach): number | null 
   return cut;
 }
 
+/** The turns of a piano hand at each note (design 5.3). */
+export interface HandTurns {
+  /** The roll of the hand around the line of its fingers, in radians: + to the thumb side. */
+  readonly rolls: Float64Array;
+  /** The turn of the hand in the plane of the palm, in radians: + toward the high keys. */
+  readonly yaws: Float64Array;
+  /**
+   * The place of the claw of the note along the keys, from the palm, in meters: the hand turns
+   * around this claw, so that the claw stays on its key. 0 for a chord.
+   */
+  readonly pivots: Float64Array;
+}
+
 /** The note data of one hand that the pose looks up at each frame. */
 export interface HandTrack {
   readonly action: HandAction;
@@ -247,6 +260,8 @@ export interface HandTrack {
    * near note (`HAND_MOTION.liftGapSec`).
    */
   readonly gestures: Float64Array;
+  /** The turns of the hand at each note, or `null` for a hand that does not turn. */
+  readonly turns: HandTurns | null;
 }
 
 /**
@@ -261,6 +276,7 @@ export interface HandTrack {
  * @param firstKey The key of the hand before its first note.
  * @param passes For each note, a value other than 0 when the thumb passes under the hand or a
  *   finger crosses over the thumb (`PianoFingering.pass`), or `null` for none.
+ * @param turns The turns of the hand at each note, or `null` for none.
  * @returns The note data.
  */
 export function buildHandTrack(
@@ -270,6 +286,7 @@ export function buildHandTrack(
   amplitude: number,
   firstKey: number,
   passes: ArrayLike<number> | null = null,
+  turns: HandTurns | null = null,
 ): HandTrack {
   const m = HAND_MOTION;
   const plucks = action === 'pluck';
@@ -309,6 +326,7 @@ export function buildHandTrack(
     pluckTimes,
     points: Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, n.shift ?? 0, i))),
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
+    turns,
   };
 }
 
@@ -322,6 +340,12 @@ export interface HandState {
   pull: number;
   /** The close of the fingers after a pluck, from 0 to 1. */
   closed: number;
+  /** The roll of a piano hand around the line of its fingers, in radians (`HandTurns.rolls`). */
+  roll: number;
+  /** The turn of a piano hand in the plane of the palm, in radians (`HandTurns.yaws`). */
+  yaw: number;
+  /** The claw around which a piano hand turns, in meters (`HandTurns.pivots`). */
+  pivot: number;
 }
 
 /**
@@ -330,7 +354,7 @@ export interface HandState {
  * @returns The state.
  */
 export function createHandState(): HandState {
-  return { point: [0, 0, 0], lift: 0, pull: 0, closed: 0 };
+  return { point: [0, 0, 0], lift: 0, pull: 0, closed: 0, roll: 0, yaw: 0, pivot: 0 };
 }
 
 /**
@@ -356,6 +380,9 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
     out.lift = 0;
     out.pull = 0;
     out.closed = 0;
+    out.roll = 0;
+    out.yaw = 0;
+    out.pivot = 0;
     return;
   }
   const progress = clamp01((time - moveStart) / (moveEnd - moveStart));
@@ -365,6 +392,11 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
     const a = (i > 0 ? p[3 * i - 3 + k] : track.first[k]) ?? 0;
     out.point[k] = a + ((p[3 * i + k] ?? a) - a) * eased;
   }
+  // The turns ease from the turns of the note before, as the palm does.
+  const { turns } = track;
+  out.roll = turns ? easeTurn(turns.rolls, i, eased) : 0;
+  out.yaw = turns ? easeTurn(turns.yaws, i, eased) : 0;
+  out.pivot = turns ? easeTurn(turns.pivots, i, eased) : 0;
   const gesture = track.gestures[i] ?? 1;
   if (track.action === 'strike') {
     // The lift ends with its full speed at the note start: the hand strikes the keys.
@@ -379,4 +411,17 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
   out.lift = 0;
   out.closed = time < start ? (i > 0 ? 1 - eased : 0) : pluck;
   out.pull = HAND_MOTION.pull * (time < start ? before : gesture * pluck);
+}
+
+/**
+ * Eases a turn of a hand from its value at the note before to its value at a note.
+ *
+ * @param values The value at each note.
+ * @param i The index of the note.
+ * @param eased The eased progress of the move to the note, from 0 to 1.
+ * @returns The value. The value before the first note is 0.
+ */
+function easeTurn(values: Float64Array, i: number, eased: number): number {
+  const a = i > 0 ? (values[i - 1] ?? 0) : 0;
+  return a + ((values[i] ?? 0) - a) * eased;
 }

@@ -299,6 +299,9 @@ The app follows these facts:
   scale 54321321. A thumb pass has no hard span limit, because the arm carries the hand. A chord
   has no legato limit and no rules of three notes, because the arm moves the hand from chord to
   chord.
+- **The wrist in the fingering (section 9.3).** The paw rolls a little toward the thumb at a thumb
+  pass, and turns toward the next key of an arpeggio, as a cartwheel (`FINGER_MOTION` of
+  `src/pose/hands.ts`). It turns around the claw of the note, so the claw stays on its key.
 - **The feet (section 6).** In the play, the right heel stays on the floor, and the ball of the
   foot lies on the front of the damper pedal (`posePedalFoot()` of `src/pose/pedal.ts`). The
   sustain pedal of the score (CC 64) presses the damper pedal, and the foot follows it. The paw is

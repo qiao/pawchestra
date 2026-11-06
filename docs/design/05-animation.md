@@ -509,6 +509,11 @@ The rest of each family:
   for a group of notes. A thumb pass has no hard span limit, and a chord has no legato limit,
   because the arm carries the hand there. With the plain limits, the C major arpeggio took a thumb
   pass on each second note.
+- The paw rolls a little toward the thumb at a thumb pass, away from it at a finger pass over the
+  thumb, and toward the little finger in a chord. It turns toward the next key of an arpeggio
+  (`FINGER_MOTION`), as a hand turns like a cartwheel (piano 9.3). The paw turns around the claw
+  of the note, so the claw stays on its key. Reason: the paw already turns about 40° on its
+  forearm in the play, so larger turns twist the wrist.
 - Each key goes down with its notes, from the note start to the note end (`keyLevelsAt()`), so a
   seek and a mute give the correct keys at once.
 - The paw moves in for a black key, so the claws lie on it, as a pianist moves the hand in toward

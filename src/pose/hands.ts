@@ -22,7 +22,14 @@ import {
   handStateAt,
   splitHands,
 } from './hand-notes.ts';
-import type { HandAction, HandNote, HandReach, HandState, HandTrack } from './hand-notes.ts';
+import type {
+  HandAction,
+  HandNote,
+  HandReach,
+  HandState,
+  HandTrack,
+  HandTurns,
+} from './hand-notes.ts';
 import { armRig, limitReach, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
@@ -502,6 +509,68 @@ function fingeredPalmX(
   return sum / (to - from);
 }
 
+/**
+ * The turns of the wrist of a piano paw (design 5.3). The paw already turns up to about 40° on its
+ * forearm in the play, so each turn stays small, and the wrist does not twist.
+ */
+export const FINGER_MOTION = {
+  /**
+   * The roll of a paw at a thumb pass under the hand (+) or a finger over the thumb (-), in radians,
+   * as the wrist of a pianist turns a little toward the thumb in the pass
+   * (`docs/reference/piano-technique.md` section 9.3).
+   */
+  passRoll: 6 * MathUtils.DEG2RAD,
+  /** The roll of a paw toward its little finger in a chord, in radians: the weight of the outer key. */
+  chordRoll: -4 * MathUtils.DEG2RAD,
+  /**
+   * The largest turn of a paw in the plane of the palm toward the next key of an arpeggio, in
+   * radians, as the hand of a pianist turns like a cartwheel (section 9.3).
+   */
+  arpeggioYaw: 8 * MathUtils.DEG2RAD,
+  /** The paw turns toward a next note that starts within this time, in seconds. */
+  yawGapSec: 0.3,
+} as const;
+
+/**
+ * Calculates the turns of a piano paw at each note from its fingering (design 5.3): the roll of a
+ * thumb pass and of a chord, the turn toward the next key of an arpeggio, and the claw of each
+ * note, around which the paw turns.
+ *
+ * @param notes The notes of the hand.
+ * @param fingering The fingering of the hand.
+ * @param side The hand.
+ * @returns The turns.
+ */
+function handTurns(
+  notes: readonly HandNote[],
+  fingering: PianoFingering,
+  side: 'L' | 'R',
+): HandTurns {
+  const m = FINGER_MOTION;
+  const rolls = new Float64Array(notes.length);
+  const yaws = new Float64Array(notes.length);
+  const pivots = new Float64Array(notes.length);
+  for (const [i, note] of notes.entries()) {
+    const from = fingering.first[i] ?? 0;
+    const count = (fingering.first[i + 1] ?? from) - from;
+    const pass = fingering.pass[i] ?? 0;
+    rolls[i] = pass * m.passRoll + (count > 1 ? m.chordRoll : 0);
+    if (count === 1) {
+      pivots[i] = clawOffset(fingering.fingers[from] ?? 3, side, POLAR_BEAR_PAW);
+    }
+    // The paw turns toward the next key of a leap of three semitones or more, as in an arpeggio.
+    const next = notes[i + 1];
+    const key = note.keys[0];
+    const nextKey = next?.keys[0];
+    if (count === 1 && next?.keys.length === 1 && key !== undefined && nextKey !== undefined) {
+      const step = nextKey - key;
+      const share = MathUtils.clamp((Math.abs(step) - 2) / 3, 0, 1);
+      yaws[i] = next.start - note.start < m.yawGapSec ? Math.sign(step) * share * m.arpeggioYaw : 0;
+    }
+  }
+  return { rolls, yaws, pivots };
+}
+
 /** The note data of the two hands. */
 interface HandTracks {
   readonly left: HandTrack;
@@ -552,6 +621,7 @@ export function* handTracksSteps(
       amplitude,
       firstKey,
       fingering?.pass ?? null,
+      fingering && handTurns(hand, fingering, side),
     );
   return {
     left: track('L', left, fingeringL, firstL),
@@ -617,6 +687,12 @@ export function sideLeanAt(rig: HandsRig, left: HandTrack, right: HandTrack, tim
 
 const Z_AXIS = new Vector3(0, 0, 1);
 
+const tip = new Vector3();
+const lateral = new Vector3();
+const pivot = new Vector3();
+const yawTurn = new Quaternion();
+const rollTurn = new Quaternion();
+
 const shoulder = createFrame();
 const face = new Vector3();
 const palm = new Vector3();
@@ -629,6 +705,39 @@ const restWrist = new Vector3();
 const restHand = new Quaternion();
 const arcMove = new Vector3();
 const ORIGIN = [0, 0, 0] as const;
+
+/**
+ * Turns a piano paw by the roll and the yaw of its hand state, around the claw of the note
+ * (design 5.3): the paw turns in the plane of the palm (+ toward the high keys), then rolls
+ * around the line of its claws (+ to the thumb side, down). The palm moves so that the claw stays
+ * at its place.
+ *
+ * @param side The side of the body.
+ * @param hand The state of the hand.
+ * @param down The side of the palm, in the model axes.
+ * @param back The direction from the claws to the wrist, in the plane of the palm.
+ * @param palmAt The place of the palm, in the model axes. The call moves it.
+ * @param rotation The world rotation of the hand. The call turns it.
+ */
+function turnPaw(
+  side: 'L' | 'R',
+  hand: HandState,
+  down: Vector3,
+  back: Vector3,
+  palmAt: Vector3,
+  rotation: Quaternion,
+): void {
+  // The claws point from the shoulder to the palm, and the claw row runs toward the high keys.
+  tip.copy(back).negate();
+  lateral.crossVectors(down, tip).normalize();
+  yawTurn.setFromAxisAngle(down, hand.yaw);
+  tip.applyQuaternion(yawTurn);
+  // A roll about the claw line takes the side of +x down: the thumb side of the left paw.
+  rollTurn.setFromAxisAngle(tip, side === 'L' ? hand.roll : -hand.roll).multiply(yawTurn);
+  rotation.premultiply(rollTurn);
+  pivot.copy(lateral).multiplyScalar(hand.pivot);
+  palmAt.add(pivot).sub(pivot.applyQuaternion(rollTurn));
+}
 
 /**
  * Writes one arm and its fingers on the keys or the strings.
@@ -672,6 +781,9 @@ function poseHand(
   // The bind palm side of a hand is +x on the left and -x on the right, to the body.
   palmSide.copy(face).multiplyScalar(arm.side === 'L' ? 1 : -1);
   setFromBasis(turn, palmSide, fingers);
+  if (hand.roll !== 0 || hand.yaw !== 0) {
+    turnPaw(arm.side, hand, face, fingers, palm, turn);
+  }
   wrist.fromArray(arm.palm).applyQuaternion(turn);
   limitReach(arm, shoulder.position, wrist.subVectors(palm, wrist));
 
