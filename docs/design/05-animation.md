@@ -711,6 +711,12 @@ the beam fade of Free mode starts there (4.5).
   candidate gets a higher band, except the best candidate at its entry.
 - Each move blends its keys with a smoothstep over the full shot and turns around the target, so
   it starts and ends at rest and never cuts through the subject.
+- **Drift** (`CAMERA_DRIFT`, `shots/drift.ts`). The view turns a little around the camera
+  position, as a camera on a fluid head or a steadicam, so a shot does not look like a still
+  render. The turn is a sum of sines of the song time with fixed phases, so the same time gives
+  the same camera, a pause holds it, and a blend has no jump. The position does not move, so the
+  distance floor to each animal holds. A wide or a high shot stands on a crane and drifts less.
+  With reduced motion, the view does not drift (2.5).
 
 **The frame of a close shot.** A 21:9 frame that fits the height of one player shows about 2.3
 times its width. Thus a close shot fits the width of its subject with the shot size of its kind

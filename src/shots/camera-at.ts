@@ -4,6 +4,7 @@ import { smoothstep } from '../pose/rest.ts';
 import type { Transport } from '../pose/types.ts';
 import { SHOT_BEAM_OPACITY } from './beam-opacity.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';
+import { CAMERA_DRIFT, turnTarget, writeDrift } from './drift.ts';
 import { writeLookPoint } from './grammar.ts';
 import { SHOT_LIGHT, SHOT_SPOT } from './shot-light.ts';
 import { isCloseShot } from './types.ts';
@@ -40,6 +41,8 @@ const scratchKey: ScratchKey = { azimuth: 0, elevation: 0, zoom: 1, fov: FIELD_O
 const blendStart: [number, number, number] = [0, 0, 0];
 
 const blendLook: [number, number, number] = [0, 0, 0];
+
+const driftTurn: [number, number] = [0, 0];
 
 /**
  * Writes the camera of a shot at a part of its move, and the point that it looks at for the
@@ -115,6 +118,8 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    The camera turns around the target of the shot.
  * 7. The weights of the light of a close shot and of the follow-spot come from the kind of the
  *    shot, as the factor of the beam. The default view has the light of the stage.
+ * 8. The view drifts a little around the camera position ({@link CAMERA_DRIFT}), with the size of
+ *    the kind of the shot, blended as the beam. With `still`, it does not drift.
  *
  * @param plan The plan from `prepareShots()`.
  * @param songTime The song time, in seconds.
@@ -157,7 +162,12 @@ export function cameraAt(
   out.close = isCloseShot(current.kind);
   const previous = plan.shots[i - 1];
   const sinceCut = time - current.startSec;
+  const share = CAMERA_DRIFT.shares[current.kind];
   if (still || !previous || current.blendSec <= 0 || sinceCut >= current.blendSec) {
+    if (!still) {
+      writeDrift(time, share, driftTurn);
+      turnTarget(out.position, out.target, driftTurn);
+    }
     return out;
   }
   const w = smoothstep(sinceCut / current.blendSec);
@@ -175,5 +185,8 @@ export function cameraAt(
   out.light = light + (out.light - light) * w;
   const spot = SHOT_SPOT[previous.kind];
   out.spot = spot + (out.spot - spot) * w;
+  const before = CAMERA_DRIFT.shares[previous.kind];
+  writeDrift(time, before + (share - before) * w, driftTurn);
+  turnTarget(out.position, out.target, driftTurn);
   return out;
 }

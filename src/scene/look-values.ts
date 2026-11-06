@@ -8,6 +8,7 @@ import { STAGE_COLORS } from '../models/props.ts';
 import { OCCLUSION } from '../models/shading.ts';
 import { SPECIES_IDS, isSpeciesId } from '../models/species.ts';
 import { FREE_BEAM_FADE, SHOT_BEAM_OPACITY } from '../shots/beam-opacity.ts';
+import { CAMERA_DRIFT } from '../shots/drift.ts';
 import { FREE_LIGHT_FADE, SHOT_LIGHT, SHOT_RIG, SHOT_SPOT } from '../shots/shot-light.ts';
 import { BEAM_LOOK } from './beam.ts';
 import { CAPTURE, ENVIRONMENT } from './environment.ts';
@@ -41,6 +42,7 @@ import { SIDE_GLOW, STAGE_FINISH, STAGE_SHADOW } from './stage.ts';
 const LOOK_ROOTS = {
   BACK_ROW_LIGHT,
   BEAM_LOOK,
+  CAMERA_DRIFT,
   CAPTURE,
   CONDUCTOR_LIGHT,
   ENVIRONMENT,

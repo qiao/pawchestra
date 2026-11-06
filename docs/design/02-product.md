@@ -144,8 +144,8 @@ page starts in Free mode (`app/camera-mode.ts`).
 - A pinch never zooms the page, because the page is the frame of the stage. On the stage, a pinch
   zooms the camera. The root takes `touch-action: pan-x pan-y`, and the app stops the gesture
   events of Safari, which does not obey that rule for a pinch.
-- With reduced motion, Free mode has no inertia, a shot holds its first camera, and each
-  transition is a hard cut.
+- With reduced motion, Free mode has no inertia, a shot holds its first camera with no drift
+  (5.6), and each transition is a hard cut.
 - A new piece keeps the mode and makes new shots. The shots do not follow a solo, because they come
   one time from the score. No setting stores the mode.
 
