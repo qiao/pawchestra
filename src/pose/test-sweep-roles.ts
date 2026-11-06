@@ -454,9 +454,10 @@ const HARP_FRAMES = new WeakMap<PlayerModel, ClosedSurface>();
 
 /**
  * Gives the frame of the harp of a harp player: the closed shells of the base, the column, the
- * crown, the neck, and the soundbox. The strings are thin boxes that a palm plucks, so the frame
- * leaves out each shell with a small ratio of its area to its size ({@link HARP_STRING_RATIO}),
- * as the case of the piano leaves out the keys. The harp stands on the floor and does not move,
+ * crown, the neck, and the soundbox. The strings are thin prisms with open ends that a palm
+ * plucks, so the frame leaves out each open shell, and each shell with a small ratio of its area
+ * to its size ({@link HARP_STRING_RATIO}), such as a pedal, as the case of the piano leaves out
+ * the keys. The harp stands on the floor and does not move,
  * so the frame of one pose serves all poses.
  *
  * @param posed The posed skeleton.
