@@ -196,7 +196,11 @@ section, so the free test of the rebuild takes a larger ratio for the flipper (`
 `free`). The tube wraps onto the freed flipper, so the inner vertices of its lowest rings stay on
 the trunk, as a thin box of fins under the root. A copy merges each into the next vertex of its
 ring on the flipper, up to the place where the root meets the trunk (`penguin-arms-pit.glb`).
-Reason: a short clip of the root into the trunk looks better than a gap or a notch under it. The old faces keep their colors, so that the black and white edge of the trunk stays.
+Reason: a short clip of the root into the trunk looks better than a gap or a notch under it. The
+top of the gap under each root was then a flat ledge from the trunk to the flipper. A second copy
+merges the inner vertices of the lowest free ring into the ring above them, so that the top of the
+gap is a crease with no flat face (`penguin-arms-crease.glb`). Reason: a move of these vertices onto
+the trunk wall left a shallow slope and a dent at the back of the root. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of
