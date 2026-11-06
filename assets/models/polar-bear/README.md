@@ -24,6 +24,9 @@ src/models/studio/polar-bear.ts            studio body of the app
 `docs/agents/rigging.md` gives the steps of the chain. The polar bear has the same eye size as the
 bear.
 
+The folder also holds the source of a hand rig in progress (design 4.4, "Hand rig") in `tripo/`.
+The app does not use it, and `polar-bear-tpose.rig.glb` stays the rig of the app.
+
 ## Files
 
 | File | Origin | Rebuild |
@@ -36,6 +39,12 @@ bear.
 | `polar-bear-tpose.rig.glb` | Output of the rig | `pnpm rig-mesh polar-bear` |
 
 The license of each copy is the license of the source.
+
+The files of the hand rig, which the app does not use:
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo/polar-bear-tpose.fbx`, `tripo/polar-bear-tpose.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
 
 ## polar-bear-tpose.glb
 
@@ -110,3 +119,33 @@ shasum -a 256 assets/models/polar-bear/*.glb assets/models/polar-bear/*.json
 | Arm roots | The faces under each arm root move rigidly (`weights.rigidPainted`). Without the rule, they fold when the arm hangs at rest and in the lift |
 
 A run of `pnpm rig-mesh polar-bear` gives the same bytes.
+
+## tripo/polar-bear-tpose.fbx
+
+A retopology of `polar-bear-tpose.glb` with Tripo: the same bear in the same T-pose, with quad
+faces. The FBX file keeps the quads (a GLB file of the same mesh holds only triangles). In the
+units of the studio (1 unit high), each vertex of the FBX mesh lies at most 0.0064 units (mean
+0.0013) from the surface of the GLB mesh. Each GLB vertex lies at most 0.0059 units from the FBX
+surface, and the two boxes agree within 0.002 units. The form is mirror symmetric, but the faces
+of the left and the right leg and armpit differ.
+
+The folder `polar-bear-tpose.fbm/` keeps the JPEG names of the zip file. The FBX file links
+`polar_bear.fbm/<name>`, and the FBX import of Blender finds each JPEG by its name next to the FBX
+file.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo (a retopology of `polar-bear-tpose.glb`), and given by the project author on 2026-11-05 (`polar_bear.zip`, SHA-256 `fde047fd52387cc06b2e71cc9619cd1fee1b114ca1f2746614d76f1a79c2b661`). The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object `output_unwrapped`, turned 90° about X (the FBX axes have Y up), with no armature and no animation. 2,461 vertices and 2,656 faces: 2,260 quads and 396 triangles (4,916 triangles). One UV layer. One material that links the four textures |
+| Parts | One connected part. No two vertices lie within 0.001 units. 6 open edges: a crack of zero width at the back of each thigh, where one vertex lies at the middle of an edge of the other side |
+| Box | After the turn: x ±0.4990, y ±0.1787, and z 0 to 0.9980 in the units of the file. The bear faces -y |
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `polar-bear-tpose.fbx` | 225,280 bytes | | `0bcc6f2946ad69f1592cafc1a5ae0a9f583d878e8abfd5f6e8432598dc5f945e` |
+| `polar-bear-tpose.fbm/polar_bear_basecolor.jpg` | 913,087 bytes | 4096 × 4096 | `c63132f98c8142ad5165978fa30d5978f17661c35381016e1d0d6d6c159f3946` |
+| `polar-bear-tpose.fbm/polar_bear_metallic.jpg` | 348,066 bytes | 2048 × 2048 | `c760954e644e72f2bf2d646f929249e7cc7244322b5f44eddbcd1081795f5e24` |
+| `polar-bear-tpose.fbm/polar_bear_normal.jpg` | 510,600 bytes | 2048 × 2048 | `3dd83e580acb8d84675339dc89b2de9eee7e43d6d9ae9bb7d5e50d96e761aee8` |
+| `polar-bear-tpose.fbm/polar_bear_roughness.jpg` | 181,275 bytes | 2048 × 2048 | `4a50a8a8ca4bd0877a1de4fdf836f711017d4aaf0a40208d9055d4786e06ff0c` |
