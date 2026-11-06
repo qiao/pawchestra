@@ -173,9 +173,11 @@ passes.
       thin faces at the back of the right knee (2035, 2036, 3918, 5406, 4201) and 1 of the thigh
       (3917) in each play sample (`pnpm fold-probe pianist`: `shin_R`, `thigh_R`). Check the back
       of the right knee in the stage light.
-- [ ] Polar bear hand rig: a dent stays at the middle of the front of the crotch, 1.1 cm below its
-      neighbors (vertex 1797), and the edge of the belly overhangs the thigh roots. The piano hides
-      both from the stage camera.
+- [ ] Polar bear hand rig: in the crease where the belly rests on each thigh, the key
+      `bind_crotch` turns hidden pocket faces over (edges 2336-2389 and 2386-2388, up to 167°). The
+      quad of 1676 to 1679 (right 2456) shows a small dark triangle from a low front side view, and
+      the sides of the belly bulge between the thighs read dark from the front sides. Check the
+      crease in the stage light (`reports/2026-11-05-polar-bear-crotch/pair-bind-crops.png`).
 - [ ] Polar bear hand rig: the bottom of the haunch keeps long thin faces from the rump to the back
       of each thigh in the bind and the play (faces of 1311, 1354, 642, 219, 218). The rows of these
       vertices set the seat top, so no row and no move of `bind_belly` changes them. Loop edges on
