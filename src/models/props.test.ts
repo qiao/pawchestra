@@ -111,7 +111,7 @@ describe('the desk of a music stand (design 4.5, UX audit 2026-10-05, SC9)', () 
 
 describe('buildStool', () => {
   it('builds the stool of the harp with no back, within 120 triangles (design 4.5)', () => {
-    const stool = buildStool({ seatHeight: 0.35, footHeight: 0 });
+    const stool = buildStool({ seatHeight: 0.35 });
     expect(stool.positions.length / 9).toBeLessThanOrEqual(120);
     expect(Math.max(...heights(stool))).toBeCloseTo(0.35, 6);
     expect(Math.min(...heights(stool))).toBeCloseTo(0, 6);
@@ -120,7 +120,7 @@ describe('buildStool', () => {
 
 describe('buildSupport', () => {
   it('builds each seat at the heights that it gets', () => {
-    const seat = { seatHeight: 0.3, footHeight: 0 };
+    const seat = { seatHeight: 0.3 };
 
     expect(buildSupport('chair', seat)).toEqual(buildChair(0.3));
     expect(buildSupport('stool', seat)).toEqual(buildStool(seat));
@@ -142,7 +142,6 @@ describe('seatHeights (design 4.5)', () => {
 
       expect(seatHeights('chair', species)).toEqual({
         seatHeight: seatHeight * headHeight,
-        footHeight: 0,
       });
     }
     expect(seatHeights('chair', SPECIES.mouse)?.seatHeight).toBeLessThan(
@@ -174,7 +173,6 @@ describe('seatHeights (design 4.5)', () => {
   it('fits the piano bench to the legs of the studio polar bear (design 4.4)', () => {
     const seat = seatHeights('bench', SPECIES['polar-bear']);
     expect(seat?.seatHeight).toBeCloseTo(STUDIO_POLAR_BEAR.seatHeight, 9);
-    expect(seat?.footHeight).toBe(0);
     expect(seat?.seatHeight).toBeLessThan(PIANO_BENCH.seatHeight);
   });
 });
@@ -284,7 +282,7 @@ describe('buildSceneProps', () => {
     const mesh = buildSceneProps(layout);
     const parts = [
       buildChair(seatHeights('chair', SPECIES.rabbit)?.seatHeight ?? NaN),
-      buildStool(seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: 0.35, footHeight: 0 }),
+      buildStool(seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: 0.35 }),
       buildMusicStand(),
       buildRisers(layout.risers, layout.podium),
     ];

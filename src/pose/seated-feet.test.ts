@@ -21,8 +21,6 @@ interface SeatedCast {
   readonly species: SpeciesId;
   readonly instrument: InstrumentId;
   readonly support: Support;
-  /** The height of the rest under the feet: the floor, or the foot ring of the high stool. */
-  readonly rest: number;
   readonly label: string;
 }
 
@@ -42,7 +40,6 @@ const SEATED: readonly SeatedCast[] = Object.keys(SECTION_SPECIES)
             species,
             instrument,
             support,
-            rest: stance.footHeight,
             label: `${species} ${instrument} (${support})`,
           },
         ];
@@ -53,10 +50,10 @@ const SEATED: readonly SeatedCast[] = Object.keys(SECTION_SPECIES)
 /** The wall times of the samples: the idle motion breathes and sways the body. */
 const WALL_TIMES = [10, 13.7, 21.1, 29.3];
 
-/** The largest gap from the lowest point of a foot to its rest, in meters. */
+/** The largest gap from the lowest point of a foot to the floor, in meters. */
 const FOOT_GAP = 0.02;
 
-/** The rounding error of the skin that counts as on the rest, in meters. */
+/** The rounding error of the skin that counts as on the floor, in meters. */
 const ROUNDING = 1e-6;
 
 /**
@@ -82,8 +79,8 @@ function soles(posed: PosedSkeleton): readonly [left: number, right: number] {
 }
 
 /**
- * Finds the feet of the seated animals that float above their rest or go into it, in the rest
- * pose at each wall time.
+ * Finds the feet of the seated animals that float above the floor or go into it, in the rest pose
+ * at each wall time.
  *
  * @returns One line for each foot out of place.
  */
@@ -123,9 +120,8 @@ function feetOutOfPlace(): string[] {
         ['left', left],
         ['right', right],
       ] as const) {
-        const gap = sole - cast.rest;
-        if (gap < -ROUNDING || gap > FOOT_GAP) {
-          faults.add(`${cast.label}: the ${side} foot is ${gap.toFixed(4)} m above its rest`);
+        if (sole < -ROUNDING || sole > FOOT_GAP) {
+          faults.add(`${cast.label}: the ${side} foot is ${sole.toFixed(4)} m above the floor`);
         }
       }
     }
@@ -136,12 +132,12 @@ function feetOutOfPlace(): string[] {
 describe('the feet of the seated players (design 4.5)', () => {
   it('covers each seat and each species that sits', () => {
     expect(new Set(SEATED.map((cast) => cast.support))).toEqual(
-      new Set(['chair', 'stool', 'high-stool', 'bench']),
+      new Set(['chair', 'stool', 'bench']),
     );
     expect(SEATED.some((cast) => cast.species === 'fox-red')).toBe(true);
   });
 
-  it('rests each foot on the floor, or on the foot ring of the high stool', () => {
+  it('rests each foot on the floor', () => {
     // The feet of a rigged body can float above the floor on a chair, 0.0725 m (right) and
     // 0.0882 m (left) on the red fox. The model sheet `fox-views.png` lets the feet hang.
     expect(feetOutOfPlace()).toEqual([]);

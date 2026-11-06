@@ -85,8 +85,6 @@ export const CHAIR = {
 export interface SeatHeights {
   /** The height of the top of the seat above the floor, in meters. */
   readonly seatHeight: number;
-  /** The height of the rest under the feet, in meters: 0 for the floor. */
-  readonly footHeight: number;
   /**
    * The depth of the seat of a chair or of the stool of the harp under a studio body, in meters
    * (`StudioBody.chairDepth`). The seat keeps the back of the chair, and its front edge is further
@@ -218,9 +216,9 @@ function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
   const studio = studioBodyOf(species.body);
   const depth = studio.chairDepth;
   if (depth === null) {
-    return { seatHeight: legs, footHeight: 0 };
+    return { seatHeight: legs };
   }
-  const seat = { seatHeight: legs, footHeight: 0, seatDepth: depth };
+  const seat = { seatHeight: legs, seatDepth: depth };
   return studio.chairWidth === undefined ? seat : { ...seat, seatWidth: studio.chairWidth };
 }
 
@@ -236,7 +234,7 @@ function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
  */
 function benchHeights(species: SpeciesParams, legs: number): SeatHeights {
   const studio = studioBodyOf(species.body);
-  const seat = { seatHeight: legs, footHeight: 0 };
+  const seat = { seatHeight: legs };
   if (studio.benchDepth === undefined) {
     return seat;
   }
@@ -648,7 +646,6 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
     const key = [
       support,
       heights?.seatHeight,
-      heights?.footHeight,
       heights?.seatDepth,
       heights?.seatFront,
       heights?.seatWidth,

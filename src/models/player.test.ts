@@ -178,7 +178,7 @@ describe('buildPlayer with each instrument', () => {
   it('gives each support of 5.1 a stance at the heights of its seat', () => {
     const cat = SPECIES.cat;
     const legs = cat.seatHeight * cat.headHeight;
-    expect(stanceOn('chair', cat)).toEqual(seated(legs, 0, chairForward(cat)));
+    expect(stanceOn('chair', cat)).toEqual(seated(legs, chairForward(cat)));
     expect(stanceOn('stool', cat)).toEqual(seated(legs));
     expect(stanceOn('bench', cat)).toEqual(seated(0.45));
     expect(stanceOn('stand', cat)).toEqual({ kind: 'standing' });

@@ -110,7 +110,7 @@ function* chairForwardSteps(species: SpeciesParams): Steps<number> {
   }
 
   const builder = new MeshBuilder();
-  yield* buildBipedSteps(builder, species, seated(seat.seatHeight, seat.footHeight));
+  yield* buildBipedSteps(builder, species, seated(seat.seatHeight));
   const mesh = builder.build();
   const tail = new Set([boneIndex('tail1'), boneIndex('tail2')]);
   let forward = 0;
@@ -148,7 +148,7 @@ function* stanceOnSteps(support: Support, species: SpeciesParams): Steps<Stance>
   }
 
   const forward = support === 'chair' ? yield* chairForwardSteps(species) : 0;
-  return seated(seat.seatHeight, seat.footHeight, forward);
+  return seated(seat.seatHeight, forward);
 }
 
 /** One player: an animal and its instrument as one skinned mesh (design 4.4). */
