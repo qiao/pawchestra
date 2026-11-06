@@ -1,7 +1,7 @@
 # Dog model
 
 This folder holds the source mesh of the dog, a copy with patched arms, a copy with rebuilt arms
-and its weights, and the rigged copy. The app does not serve these files. It loads the module
+and its weights, a copy of that with the arm roots at the trunk, and the rigged copy. The app does not serve these files. It loads the module
 `src/models/studio/dog.ts`, which this chain writes:
 
 ```text
@@ -11,7 +11,10 @@ dog.glb                               source mesh
 dog-patch.glb                         `armSource` of tools/mesh-rigs/dog.json
    │  tools/blender/arm_rebuild.py    rebuilt arms and painted weights
    v
-dog-arms.glb + dog-weights.json       `source` and `paintedWeights` of tools/mesh-rigs/dog.json
+dog-arms.glb + dog-weights.json       `paintedWeights` of tools/mesh-rigs/dog.json
+   │  point edits in Blender           arm roots at the trunk (dog-arms-clip.json)
+   v
+dog-arms-clip.glb                     `source` of tools/mesh-rigs/dog.json
    │  pnpm rig-mesh dog
    v
 dog.rig.glb                           rigged mesh
@@ -30,6 +33,8 @@ src/models/studio/dog.ts              studio body of the app
 | `dog-patch.glb` | Copy of `dog.glb` with patched arms. License as `dog.glb` | `arm_patch.py` (below) |
 | `dog-arms.glb` | Copy of `dog-patch.glb` with rebuilt arms. License as `dog.glb` | `arm_rebuild.py dog --factor 1.35` |
 | `dog-weights.json` | Weights of the same Blender run. License as `dog.glb` | `arm_rebuild.py dog --factor 1.35` |
+| `dog-arms-clip.glb` | Copy of `dog-arms.glb` with the arm roots at the trunk. License as `dog.glb` | None: point edits in Blender (below) |
+| `dog-arms-clip.json` | The list of the edits of `dog-arms-clip.glb`, and `weightMoves` of the config. License as `dog.glb` | None |
 | `dog.rig.glb` | Output of the rig. License as `dog.glb` | `pnpm rig-mesh dog` |
 
 ## dog.glb
@@ -106,6 +111,34 @@ of the trunk. A run gives the same bytes:
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- dog --factor 1.35
 shasum -a 256 assets/models/dog/dog-arms.glb assets/models/dog/dog-weights.json
 ```
+
+## dog-arms-clip.glb
+
+| Item | Value |
+|---|---|
+| Size | 1,123,920 bytes |
+| SHA-256 | `1d2eeb94b3796df5ecccbf346cab080562c78965569e101d1e2999c49a80102d` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+The trunk of `dog-arms.glb` has a hole beside each arm root, and the cut of the rig closes it with
+a cap. The round inner side of each arm turns away from the trunk at its top front corner, up to
+0.035 units out from the edge of the hole. In the bind and in a flat front view, the gap between
+that corner and the cap showed as a deep notch with a dark triangle at the top of each armpit.
+
+The copy moves the top front corner of the round inner side of each arm toward the trunk, with
+point edits in the live Blender on the welded mesh. `dog-arms-clip.json` lists the 4 moves:
+
+1. The corner vertex at the top of the hole (the arm run of the cut) moves 0.019 units on the
+   left and 0.021 units on the right toward the middle plane. It stays just beyond the plane of
+   `weights.armSplit`, so that the cut still finds it in the free arm.
+2. The vertex of the inner side below it moves onto the edge of the hole: 0.017 units on the left
+   and 0.032 units on the right. It lies inside the plane, and only free arm vertices surround it,
+   so it stays a part of the arm (`armIslands`).
+
+Thus the arm meets the cap of the trunk in a crease, with a small clip at the top front of the
+root. Each move goes only along x, and no face goes or comes. The copy has the same 1,893 vertices
+and 3,756 triangles after the weld. The rig reads `dog-arms-clip.json` as `weightMoves`, so that
+each moved vertex keeps its weight row of `dog-weights.json`.
 
 ## dog.rig.glb
 
