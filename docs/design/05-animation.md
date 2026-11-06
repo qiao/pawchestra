@@ -503,6 +503,10 @@ The rest of each family:
   claws by the shift jumped about 12 cm between two notes.
 - The paw lifts less before a near note (`HAND_MOTION.liftGapSec`), because the motion of a
   pianist gets smaller as the speed rises (piano 7).
+- A long move of a paw starts early enough for its length (`HAND_MOTION.leapSpeed`), at the
+  earliest at the strike of the note before, as a pianist gets to the keys of a jump ahead of time
+  (piano 9.3). Reason: a move that fit only in a part of a short gap turned the forearm faster
+  than 1,000° per second.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key

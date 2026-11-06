@@ -24,6 +24,15 @@ export const HAND_MOTION = {
    * pass up to 0.5 s before it (`docs/reference/piano-technique.md` section 9.3).
    */
   passSec: 0.5,
+  /**
+   * The mean speed of the palm of a piano hand in a leap, in meters per second. A move that is
+   * too long for its time starts earlier, at the earliest at the start of the note before, so the
+   * hand gets to its keys ahead of time (`docs/reference/piano-technique.md` section 9.3). With
+   * no early start, the right forearm of the polar bear turned faster than 1,000° per second in
+   * 384 frames of `bach-bwv1050` at 120 frames per second, with 1.5 m/s in 55, and with 1.0 m/s
+   * in 54 (`scratch/piano-jumps.ts`).
+   */
+  leapSpeed: 1.5,
   /** A harp finger rests on its string for this time before the pluck: at most 0.2 of the gap. */
   restSec: 0.04,
   /** A pluck takes this time: at most 0.3 of the gap to the next note of the hand. */
@@ -305,30 +314,53 @@ export function buildHandTrack(
     const n = notes[i];
     return n?.since === undefined ? gapAfter(i - 1) : n.start - n.since;
   };
+  const points = Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, i)));
+  const first = pointOf(firstKey, firstKey, -1);
   const moveStarts = Float64Array.from(notes, (_, i) => {
     const gap = gapBefore(i);
     const free = plucks ? gap - (rests[i] ?? 0) - (pluckTimes[i - 1] ?? 0) : m.strikeMove * gap;
-    const late = (moveEnds[i] ?? 0) - Math.min(m.moveSec, free);
-    // A pass moves the hand from the strike of the note before, so the hand moves smoothly.
+    const end = moveEnds[i] ?? 0;
+    const late = end - Math.min(m.moveSec, free);
     const before = notes[i - 1];
-    if (!passes?.[i] || !before || plucks) {
+    if (!before || plucks) {
       return late;
     }
-    return Math.min(late, Math.max(before.start, (moveEnds[i] ?? 0) - m.passSec));
+    // A pass moves the hand from the strike of the note before, so the hand moves smoothly. A
+    // leap starts early enough for its length, as a pianist gets to the keys ahead of time.
+    const pass = passes?.[i] ? m.passSec : 0;
+    const leap = moveLength(points, first, i) / m.leapSpeed;
+    return Math.min(late, Math.max(before.start, end - Math.max(pass, leap)));
   });
   // A piano hand lifts less for a near note.
   const liftShare = (i: number): number => (plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec));
   return {
     action,
-    first: pointOf(firstKey, firstKey, -1),
+    first,
     starts: Float64Array.from(notes, (n) => n.start),
     moveStarts,
     moveEnds,
     pluckTimes,
-    points: Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, i))),
+    points,
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
     turns,
   };
+}
+
+/**
+ * Gives the length of the move of a palm to a note.
+ *
+ * @param points The place of the palm for each note: three numbers for each note.
+ * @param first The place of the palm before the first note.
+ * @param i The index of the note.
+ * @returns The distance from the place of the note before, in meters.
+ */
+function moveLength(points: Float64Array, first: Vec3, i: number): number {
+  let sum = 0;
+  for (let k = 0; k < 3; k++) {
+    const a = i > 0 ? (points[3 * i - 3 + k] ?? 0) : (first[k] ?? 0);
+    sum += ((points[3 * i + k] ?? 0) - a) ** 2;
+  }
+  return Math.sqrt(sum);
 }
 
 /** The motion of one hand at one time. The pose reads it. */

@@ -242,6 +242,10 @@ each semitone [34].
 - **Thumb over.** In a fast scale, the thumb moves as the other fingers do. The hand moves
   smoothly and keeps its angle to the keys [42].
 - **Arpeggios.** The hand turns in the horizontal plane like a cartwheel [42].
+- **Jumps.** A jump has two motions: the horizontal travel of the hand to the new position, and
+  the down motion that plays. The pianist makes the travel fast and gets to the keys ahead of
+  time, and feels the keys before the play. The take-off starts with a small down and sideways
+  kick of the wrist, and it can join the travel [45].
 - **The wrist and the forearm.** In a tremolo of a sixth, experts move more from the wrist turn
   and less from the fingers than novices. At a higher tempo, experts use the joints near the body
   more [41 (secondary)].
@@ -300,6 +304,9 @@ The app follows these facts:
   scale 54321321. A thumb pass has no hard span limit, because the arm carries the hand. A chord
   has no legato limit and no rules of three notes, because the arm moves the hand from chord to
   chord.
+- **The jumps (section 9.3).** A long move starts early enough for its length
+  (`HAND_MOTION.leapSpeed`), at the earliest at the strike of the note before, so the paw gets to
+  its keys ahead of time.
 - **The claws (section 9.3).** Each paw has a digit bone for each claw. The claw of each key
   drops to the key bed at the note start and stays down while the key is held
   (`digitBendsAt()` of `src/pose/piano-digits.ts`). Before its strike, the next claw lifts
@@ -341,7 +348,7 @@ The app does not follow these facts:
 ## 11. Sources
 
 Sources 1 to 20 opened on 2026-10-24, source 21 on 2026-10-25, and sources 23 to 29 on
-2026-10-28. Sources 32 and 33 come from a web search on 2026-10-30. Sources 34 to 44 opened on
+2026-10-28. Sources 32 and 33 come from a web search on 2026-10-30. Sources 34 to 45 opened on
 2026-11-06, except the search summaries 43 and 44.
 
 1. Yamaha Corporation. "How to Play the Piano: Correct Posture." Musical Instrument Guide.
@@ -452,6 +459,8 @@ Sources 1 to 20 opened on 2026-10-24, source 21 on 2026-10-25, and sources 23 to
     https://www.livingpianos.com/articles/how-to-finger-octaves/
 44. R. Estrin. "How to play repeated notes on the piano." Living Pianos.
     https://www.livingpianos.com/articles/how-to-play-repeated-notes-on-the-piano-piano-techniques/
+45. C. C. Chang. "Practicing Jumps" (III.7.f). Fundamentals of Piano Practice.
+    https://fundamentals-of-piano-practice.readthedocs.io/chapter1/ch1_topics/III.7.html
 
 **Conflicts.** The sources put the elbow from a little below the keys [5][8] to about 2.5 cm
 above them [4][5]. Most sources put the pianist on the front half of the bench, and one on the
