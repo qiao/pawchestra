@@ -126,11 +126,12 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 
 The app follows these facts:
 
-- **The size (section 1).** The deer plays a smaller harp (`SpeciesParams.harpScale`), near the
-  lever harp. The harp stands on a box (`HARP_STAND`), as a short harp does.
-- **The place and the lean (section 2).** The harp leans back (`HARP_PLACE.tilt`), and the top of
-  its soundbox rests on the front of the right shoulder, near the neck. The harp is diagonal to the
-  deer, with the column at the front left (`HARP_PLACE.turn`).
+- **The size (section 1).** The deer plays a harp of 0.8 of the concert harp of the app
+  (`SpeciesParams.harpScale`), 1.12 m high. Its base stands on the floor, so the pedals lie at the
+  hooves. A larger harp brings its neck to the head of the deer.
+- **The place (section 2).** The base stands in front of the deer, and the top of the soundbox
+  rests on the front of the right shoulder, near the neck. The harp is diagonal to the deer, with
+  the column at the front left (`HARP_PLACE.turn`).
 - **The trunk (section 2).** The spine leans a little forward (`HANDS_HOLDS.harp.lean`), near the
   erect seat. A larger lean brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
@@ -166,6 +167,9 @@ The app does not follow these facts:
 
 - **The knees (section 2).** The short knees of the deer lie under its round belly. Thus the base
   stands in front of the knees, and between them only in the front view.
+- **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
+  model leans toward the player, and the short legs of the deer reach the pedals only when the
+  base stands near the hooves. A tilt back moves the base away from the deer.
 - **The level forearms (section 4).** The forearms rise from the elbow to the wrist, because the
   elbows of the short arms hang below the strings.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
@@ -347,6 +351,9 @@ function of the notes. Design 5.3 "Harp" gives the motion. The app follows these
   `src/pose/harp-pedals.ts`). The left foot moves D, C, and B, and the right foot E, F, G, and A.
   The changes of one foot keep 0.5 s apart when the music lets them. The foot goes to the pedal,
   presses it into its notch, and goes back to its rest (`poseHarpFeet()`).
+- **The heels (7.7).** The pedals stand on the floor, and the hoof presses a pedal with the heel
+  on the floor: it turns up around its heel until the front of its sole is on the pedal, and
+  higher over the pedal in the move to it.
 
 The app does not follow these facts:
 
@@ -363,9 +370,6 @@ The app does not follow these facts:
 - **The spelling (7.7).** The app plays each black key as the sharp of the natural below it, so no
   pedal goes into the flat notch, and the app does not spell a note as a flat or a sharp to save
   a pedal change. A harpist spells G sharp as A flat when G natural comes soon.
-- **The heels (7.7).** The deer harp stands on a box, so the pedals stand at about the height of
-  the hips of the seated deer, and the hoof goes up onto the pedal. The heel does not stay on the
-  floor.
 
 ## 8. Sources
 
