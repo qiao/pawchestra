@@ -10,15 +10,23 @@ import { PieceBuilder, hold, pieceSize, placeCorners } from './piece.ts';
 import type { InstrumentModel, KeyTurn } from './types.ts';
 
 /**
- * The sizes of the grand piano, in meters, before {@link PIANO_SCALE} (design 4.6). In the piano
- * axes, the origin is on the floor below the middle of the front edge of the keys. The player sits
- * at +z, the case runs to -z, and the keys run along x with the lowest key at -x.
+ * The lift of the case, the keys, the lid, the music desk, and the bar of the pedal lyre over the
+ * floor, in meters before {@link PIANO_SCALE} (design 4.6). The legs and the posts of the lyre grow
+ * by the lift, and the pedals and the box of the lyre stay on the floor.
+ */
+export const PIANO_LIFT = 0;
+
+/**
+ * The sizes of the grand piano, in meters, before {@link PIANO_SCALE} (design 4.6), with the
+ * heights of a real grand piano plus {@link PIANO_LIFT}. In the piano axes, the origin is on the
+ * floor below the middle of the front edge of the keys. The player sits at +z, the case runs to -z,
+ * and the keys run along x with the lowest key at -x.
  */
 export const PIANO = {
   /** The width of the 52 white keys together. */
   keyboardWidth: 1.24,
   /** The height of the top of the white keys. */
-  keyTop: 0.7,
+  keyTop: 0.7 + PIANO_LIFT,
   /** The visible length of a white key and of a black key. */
   whiteKeyLength: 0.15,
   blackKeyLength: 0.09,
@@ -39,8 +47,8 @@ export const PIANO = {
   caseWidth: 1.4,
   caseLength: 2.0,
   /** The bottom and the top of the rim of the case. */
-  caseBottom: 0.62,
-  caseTop: 0.95,
+  caseBottom: 0.62 + PIANO_LIFT,
+  caseTop: 0.95 + PIANO_LIFT,
   /** The angle of the open lid. */
   lidAngle: 35 * MathUtils.DEG2RAD,
 } as const;
