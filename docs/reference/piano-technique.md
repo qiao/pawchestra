@@ -285,9 +285,8 @@ The app follows these facts:
   (`sideLeanAt()`, `sideLean`, `sideLeanMax`). The lean follows the mean place of the paws over
   `SIDE_LEAN_WINDOW` before and after the song time. Thus the trunk moves smoothly toward the
   register of a passage, and the weight shifts come at the leaps. A wider window lets the trunk
-  lag, and the arms cross further into the belly. The paw has no fingers that move, so the
-  whole paw lifts for each note, but less for a near note (`HAND_MOTION.liftGapSec`). Thus the
-  motion gets smaller in a fast passage.
+  lag, and the arms cross further into the belly. The whole paw lifts for each note, but less
+  for a near note (`HAND_MOTION.liftGapSec`). Thus the motion gets smaller in a fast passage.
 - **The fingering (section 9).** Each paw plays the fingering of the lowest cost by the 12 rules
   of section 9.2 (`planFingering()` of `src/pose/piano-fingering.ts`). A dynamic program over
   pairs of notes keeps the rules of three notes exact. The spans scale with the paw
@@ -299,6 +298,12 @@ The app follows these facts:
   scale 54321321. A thumb pass has no hard span limit, because the arm carries the hand. A chord
   has no legato limit and no rules of three notes, because the arm moves the hand from chord to
   chord.
+- **The claws (section 9.3).** Each paw has a digit bone for each claw. The claw of each key
+  drops to the key bed at the note start and stays down while the key is held
+  (`digitBendsAt()` of `src/pose/piano-digits.ts`). Before its strike, the next claw lifts
+  (`DIGIT_MOTION.lift`): the thumb most and the ring claw least, and more at a faster rate. From
+  8 notes/s, the next claw starts down before the last key reaches the key bed. The other claws
+  rest a little up, so the pressing claw shows. The whole paw still lifts before a far note.
 - **The wrist in the fingering (section 9.3).** The paw rolls a little toward the thumb at a thumb
   pass, and turns toward the next key of an arpeggio, as a cartwheel (`FINGER_MOTION` of
   `src/pose/hands.ts`). It turns around the claw of the note, so the claw stays on its key.
@@ -323,9 +328,8 @@ The app does not follow these facts:
   (`KEY_MOTION.releaseSec`), so that the rise shows at 60 frames per second.
 - **The fast repeat (section 7).** Before a repeat, the key comes up the whole way
   (`KEY_MOTION.repeatShare`).
-- **The key bed (section 7).** The claws stay at the key surface and do not follow a pressed key
-  down.
-- **The claws (section 9.3).** No claw moves alone, so the whole paw lifts for each note.
+- **The neighbor claws (section 9.3).** A neighbor claw does not follow the bend of a pressing
+  claw.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

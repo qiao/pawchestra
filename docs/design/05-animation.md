@@ -514,6 +514,14 @@ The rest of each family:
   (`FINGER_MOTION`), as a hand turns like a cartwheel (piano 9.3). The paw turns around the claw
   of the note, so the claw stays on its key. Reason: the paw already turns about 40° on its
   forearm in the play, so larger turns twist the wrist.
+- The claw of each key drops to the key bed at the note start and stays down until the note end
+  (`digitBendsAt()` of `pose/piano-digits.ts`, `DIGIT_MOTION`). Before its strike, the next claw
+  lifts, the thumb most, and more at a faster rate. From 8 notes/s, the next claw starts down
+  before the last key reaches the key bed. The other claws rest a little up (piano 9.3). The bend
+  turns each digit bone around the curl axis of its paw, from -18° (up) to 20° (down). Reason:
+  the claw is about 3 cm long in the app, so a larger bend tears the joined claw bases. A short
+  drop takes a smaller lift, and a claw with no gap after its last press stays down, so that no
+  claw turns faster than about 1,000° per second.
 - Each key goes down with its notes, from the note start to the note end (`keyLevelsAt()`), so a
   seek and a mute give the correct keys at once.
 - The paw moves in for a black key, so the claws lie on it, as a pianist moves the hand in toward
