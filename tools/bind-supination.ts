@@ -27,7 +27,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
-import { armBinds, measureArm } from './arm-check.ts';
+import { armBinds, eachLimited, measureArm } from './arm-check.ts';
 import { CAST_ROLES, CAST_SAMPLE, pairName, roleDemo, setPair } from './cast-matrix.ts';
 import { FOLD_ROLES, SAMPLE_SETS, findRole, findSweep, probeFolds } from './fold-probe.ts';
 import type { RoleSource, SampleSet } from './fold-probe.ts';
@@ -303,35 +303,6 @@ async function runPair(species: SpeciesId, role: string): Promise<RollJson> {
     storeBase(cache, text);
   }
   return readRolls(text);
-}
-
-/**
- * Runs a function on each item, with at most a number of calls at the same time.
- *
- * @param items The items.
- * @param jobs The largest number of calls at the same time.
- * @param work The function.
- * @returns The results, in the order of the items.
- */
-async function eachLimited<T, R>(
-  items: readonly T[],
-  jobs: number,
-  work: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = [];
-  let next = 0;
-  const lane = async (): Promise<void> => {
-    while (next < items.length) {
-      const k = next;
-      next += 1;
-      const item = items[k];
-      if (item !== undefined) {
-        results[k] = await work(item);
-      }
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(jobs, items.length) }, lane));
-  return results;
 }
 
 /** The supination of now of each arm. */

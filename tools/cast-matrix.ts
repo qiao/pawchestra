@@ -51,7 +51,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 
-import { ACCEPTED_GRIPS, ARM_LIMITS, gateRows, probeRole } from './arm-check.ts';
+import { ACCEPTED_GRIPS, ARM_LIMITS, eachLimited, gateRows, probeRole } from './arm-check.ts';
 import type { GateRow, Measure, RoleReport } from './arm-check.ts';
 import { FOLD_ROLES, findRole, findSweep } from './fold-probe.ts';
 import type { RoleSource } from './fold-probe.ts';
@@ -886,35 +886,6 @@ async function runPair(
 function readPair(text: string): PairJson {
   // SAFETY: the text comes from childMain() of this tool, with the format of the cache key.
   return JSON.parse(text) as PairJson;
-}
-
-/**
- * Runs a function on each item, with at most a number of calls at the same time.
- *
- * @param items The items.
- * @param jobs The largest number of calls at the same time.
- * @param work The function.
- * @returns The results, in the order of the items.
- */
-async function eachLimited<T, R>(
-  items: readonly T[],
-  jobs: number,
-  work: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = [];
-  let next = 0;
-  const lane = async (): Promise<void> => {
-    while (next < items.length) {
-      const k = next;
-      next += 1;
-      const item = items[k];
-      if (item !== undefined) {
-        results[k] = await work(item);
-      }
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(jobs, items.length) }, lane));
-  return results;
 }
 
 /**

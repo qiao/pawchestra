@@ -3726,7 +3726,7 @@ async function measureRole(
  * @param work The function.
  * @returns The results, in the order of the items.
  */
-async function eachLimited<T, R>(
+export async function eachLimited<T, R>(
   items: readonly T[],
   jobs: number,
   work: (item: T) => Promise<R>,
