@@ -607,6 +607,36 @@ the arm gate in the rest, in the lift, and in the play. The turned paw comes nea
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
 knuckles stay out of the neck of the harp.
 
+Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
+`pose/harp-fingering.ts`), a pure function of the notes of the hands:
+
+- **Hands.** The right hand plays down to about G2, and the left hand up to about C5
+  (`HANDS_HOLDS.harp.reach`). One hand reaches a tenth (`span`) and plays at most four strings
+  (`most`): a chord with more strings splits between the hands, and a hand keeps four strings of
+  a chord that does not split. The sound keeps each note.
+- **Groups.** The notes of a hand go into groups of at most four strings within a tenth, one
+  position of the hand each. A note after a gap of `HARP_FINGERING.groupGapSec` starts a new
+  group. The thumb (finger 1) plays the highest string of a group and finger 4 the lowest, so a
+  scale plays 4321 up and 1234 down (harp 7.4). A crossing flag marks a group that goes on with a
+  run: finger 4 under the thumb up, or the thumb over finger 4 down.
+- **Placing.** The palm stands at the middle of the strings of its group, so the hand moves once
+  for each group and stays still in the group. It places the next group right after the last
+  pluck of the group before (`HarpFingering.places`), and rests on the strings until the pluck,
+  as a harpist places the fingers before they sound (harp 7.2).
+- **Pluck.** The last pluck of a group pulls the palm away from the strings, and a pluck inside a
+  group pulls it only a little (`HAND_MOTION.groupPull`), because the hand stays still and the
+  fingers move (harp 7.3). The thumb closes on its own after its pluck (`thumbClosed`, digit 1 of
+  `AnimalPose.digits`), and fingers 2 to 4 close as one group on the `fingers` bone after the last
+  of their plucks in the group (`fingerClosesAt()`). The deer paw is a fist with a free thumb, so
+  fingers 2 to 4 have no bones of their own.
+- **Rolled chords.** A chord of three or more strings of both hands rolls from the lowest string
+  to the highest, with the last pluck on the note start (`HARP_FINGERING.rollSec`). A chord of two
+  strings, such as an octave, does not roll. Each string swings from the pluck of its finger
+  (`notePlucks()`), and the sound keeps one start.
+- **Damping.** After the last note before a rest of at least `HAND_MOTION.dampRestSec`, the flat
+  palm goes onto the strings, with the fingers open, and leaves before the hand places the next
+  group (harp 7.6).
+
 Each note plucks the string of its key (`harpString()`), and the string swings (harp 5,
 `pose/harp-strings.ts`). `stringSwingsAt()` gives the swing of each string at a song time as a
 pure function of the pluck track, so a seek, a pause, and a change of speed show the correct
