@@ -115,6 +115,8 @@ The app follows these facts:
   shots between them (`SHOT_TIMES.conductorSpacing`).
 - **The moves (section 4).** Each move starts and ends at rest (a smoothstep), and the close
   shots push in slowly.
+- **The change of the camera mode (section 4).** The toggle between Free mode and Cinematic mode
+  is a crane move that starts and ends at rest (`MODE_BLEND`, design 2.5), not a cut.
 - **The line (section 1).** The default view is the master shot. Each camera looks at most
   `FILM_GRAMMAR.lineAzimuth` (75°) away from the audience axis, so it stays in the hall, as the
   cameras of a concert hall do.
