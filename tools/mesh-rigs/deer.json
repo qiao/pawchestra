@@ -253,6 +253,66 @@
     -0.14,
     -0.609
   ],
+  "thumbs": {
+    "L": {
+      "head": [
+        0.1775,
+        0.2904,
+        0.0812
+      ],
+      "tail": [
+        0.1748,
+        0.2679,
+        0.0856
+      ],
+      "axis": [
+        0.944,
+        -0.169,
+        -0.283
+      ],
+      "free": [
+        811,
+        812,
+        815,
+        817,
+        820,
+        823,
+        827,
+        841,
+        842,
+        843
+      ]
+    },
+    "R": {
+      "head": [
+        -0.1782,
+        0.2913,
+        0.0788
+      ],
+      "tail": [
+        -0.1772,
+        0.2685,
+        0.0835
+      ],
+      "axis": [
+        0.953,
+        0.1,
+        0.286
+      ],
+      "free": [
+        1039,
+        1040,
+        1041,
+        1046,
+        1047,
+        1049,
+        1050,
+        1051,
+        1053
+      ]
+    },
+    "note": "Each paw of the source is one fist with a free thumb stub on its front edge (assets/models/deer/README.md). The vertices are welded source vertices, chosen by hand in Blender: free is the stub below the gap that frees it. The head is the middle of the ring of the neighbors of the stub (L 809, 810, 814, 816, 821, 822, 826; R 1033, 1034, 1038, 1042, 1045, 1048, 1052), which keeps its rows, and the tail the middle of the three lowest free vertices. A turn about the axis moves the thumb tip back across the inner face of the paw and 0.3 inward: axis = the thumb direction x the unit of (-0.3, 0, -1) on the left and its mirror on the right (thumb_bones() of tools/blender/rig_mesh.py)."
+  },
   "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the antler tips, +z forward, +x the left side. The elbow, forearm twist, wrist, and paw joints are the joints of the longer arms. source_joints() of tools/blender/violin_arms.py holds the source joints.",
   "studio": {
     "legTurns": {
