@@ -518,6 +518,12 @@ The rest of each family:
   earliest at the strike of the note before, as a pianist gets to the keys of a jump ahead of time
   (piano 9.3). Reason: a move that fit only in a part of a short gap turned the forearm faster
   than 1,000° per second.
+- At a loud note after the paw leaves the keys, the wrist drops a few degrees at the strike and
+  rises a little at the release (`HAND_MOTION.kickDrop`, `wristKickAt()`), as the take-off of a
+  jump starts with a small down kick of the wrist (piano 9.3). The paw turns around its claw tips
+  (`kickPaw()`), so the claws stay on their keys. The drop grows with the loudness. A note kicks
+  only when the kick of the note before has ended. Reason: in legato chords, two kicks added up to
+  twice the drop.
 - A paw that moves out of the way of the other paw goes there at most `HAND_MOTION.yieldSpeed`
   fast, from the strike of the note before and back to its next keys (`limitYields()`). For the
   missing distance, the paw lifts over the other paw (`HAND_MOTION.over`, `HandTrack.hovers`).

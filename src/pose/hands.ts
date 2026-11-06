@@ -744,6 +744,42 @@ function turnPaw(
 }
 
 /**
+ * The distance from the palm of a piano paw to its claw tips on the keys, in meters, along the
+ * claws: the wrist kick turns the paw around the tips (`kickPaw()`), so the claws stay on their
+ * keys.
+ */
+const KICK_PIVOT = 0.06;
+
+const kickAxis = new Vector3();
+const kickTips = new Vector3();
+const kickTurn = new Quaternion();
+
+/**
+ * Drops the wrist of a piano paw by the kick of its hand state (design 5.3): the paw turns around
+ * the line of its claw tips, so the wrist goes down and the claws stay on their keys.
+ *
+ * @param kick The drop, in radians: + down.
+ * @param down The side of the palm, in the model axes.
+ * @param back The direction from the claws to the wrist, in the plane of the palm.
+ * @param palmAt The place of the palm, in the model axes. The call moves it.
+ * @param rotation The world rotation of the hand. The call turns it.
+ */
+function kickPaw(
+  kick: number,
+  down: Vector3,
+  back: Vector3,
+  palmAt: Vector3,
+  rotation: Quaternion,
+): void {
+  // A turn around back x down takes the back of the paw toward down.
+  kickAxis.crossVectors(back, down).normalize();
+  kickTurn.setFromAxisAngle(kickAxis, kick);
+  rotation.premultiply(kickTurn);
+  kickTips.copy(back).multiplyScalar(-KICK_PIVOT).add(palmAt);
+  palmAt.sub(kickTips).applyQuaternion(kickTurn).add(kickTips);
+}
+
+/**
  * Writes one arm and its fingers on the keys or the strings.
  *
  * @param rig The points of the player.
@@ -787,6 +823,9 @@ function poseHand(
   setFromBasis(turn, palmSide, fingers);
   if (hand.roll !== 0 || hand.yaw !== 0) {
     turnPaw(arm.side, hand, face, fingers, palm, turn);
+  }
+  if (hand.kick !== 0) {
+    kickPaw(hand.kick, face, fingers, palm, turn);
   }
   wrist.fromArray(arm.palm).applyQuaternion(turn);
   limitReach(arm, shoulder.position, wrist.subVectors(palm, wrist));

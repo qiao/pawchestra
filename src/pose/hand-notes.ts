@@ -49,6 +49,21 @@ export const HAND_MOTION = {
   over: 0.08,
   /** The missing distance of a move at which a hand lifts the full height `over`, in meters. */
   overRamp: 0.05,
+  /**
+   * The drop of the wrist of a piano hand at the strike of a loud take-off, in radians. The wrist
+   * goes down around the claw tips at the strike, rises a little after the release, and comes back
+   * (`docs/reference/piano-technique.md` section 9.3, `wristKickAt()`).
+   */
+  kickDrop: (5 * Math.PI) / 180,
+  /** The rise of the wrist after the release, as a share of the drop of the kick. */
+  kickRise: 0.4,
+  /** The loudness of a note from which the wrist kicks, and the loudness of the full kick. */
+  kickSoft: 0.35,
+  kickLoud: 0.7,
+  /** The time of the drop of the wrist before the strike, in seconds. */
+  kickDropSec: 0.08,
+  /** The time of the rise of the wrist after the release, and of its return, in seconds. */
+  kickRiseSec: 0.12,
   /** A harp finger rests on its string for this time before the pluck: at most 0.2 of the gap. */
   restSec: 0.04,
   /** A pluck takes this time: at most 0.3 of the gap to the next note of the hand. */
@@ -473,6 +488,16 @@ export interface HandTrack {
    * a hand that lifts over the other hand ({@link HAND_MOTION.over}), or `null` for none.
    */
   readonly hovers: Float64Array | null;
+  /** The wrist kicks of a piano hand ({@link HAND_MOTION.kickDrop}), or `null` for a harp hand. */
+  readonly kicks: WristKicks | null;
+}
+
+/** The wrist kicks of the notes of a piano hand (design 5.3). */
+export interface WristKicks {
+  /** The drop of the wrist at each note, in radians: 0 for a note with no kick. */
+  readonly drops: Float64Array;
+  /** The release of each note: its end, at the latest at the start of the next note. */
+  readonly releases: Float64Array;
 }
 
 /**
@@ -517,6 +542,7 @@ export function buildHandTrack(
   const points = Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, i)));
   const first = pointOf(firstKey, firstKey, -1);
   const hovers = plucks ? null : limitYields(notes, points);
+  const kicks = plucks ? null : wristKicks(notes);
   // A move to or from a note that only makes way goes at the speed of a yield.
   const yields = (i: number): boolean =>
     notes[i]?.keys.length === 0 || (i > 0 && notes[i - 1]?.keys.length === 0);
@@ -548,6 +574,7 @@ export function buildHandTrack(
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
     turns,
     hovers,
+    kicks,
   };
 }
 
@@ -643,6 +670,8 @@ export interface HandState {
   yaw: number;
   /** The claw around which a piano hand turns, in meters (`HandTurns.pivots`). */
   pivot: number;
+  /** The drop of the wrist of a piano hand around its claw tips, in radians (`wristKickAt()`). */
+  kick: number;
 }
 
 /**
@@ -651,7 +680,7 @@ export interface HandState {
  * @returns The state.
  */
 export function createHandState(): HandState {
-  return { point: [0, 0, 0], lift: 0, pull: 0, closed: 0, roll: 0, yaw: 0, pivot: 0 };
+  return { point: [0, 0, 0], lift: 0, pull: 0, closed: 0, roll: 0, yaw: 0, pivot: 0, kick: 0 };
 }
 
 /**
@@ -680,6 +709,7 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
     out.roll = 0;
     out.yaw = 0;
     out.pivot = 0;
+    out.kick = 0;
     return;
   }
   const progress = clamp01((time - moveStart) / (moveEnd - moveStart));
@@ -703,6 +733,7 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
       hover + (time < moveEnd ? Math.sin(Math.PI * progress) * HAND_MOTION.lift * gesture : 0);
     out.pull = 0;
     out.closed = 0;
+    out.kick = track.kicks ? wristKickAt(track.kicks, track.starts, time) : 0;
     return;
   }
   // Before the move, the hand is away from the strings after the pluck of the note before.
@@ -711,6 +742,66 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
   out.lift = 0;
   out.closed = time < start ? (i > 0 ? 1 - eased : 0) : pluck;
   out.pull = HAND_MOTION.pull * (time < start ? before : gesture * pluck);
+  out.kick = 0;
+}
+
+/**
+ * Finds the wrist kick of each note of a piano hand (design 5.3): a drop for a loud note after the
+ * hand leaves the keys, as the take-off of a jump starts with a small down kick of the wrist
+ * (`docs/reference/piano-technique.md` section 9.3). The drop grows with the loudness from
+ * {@link HAND_MOTION.kickSoft} to {@link HAND_MOTION.kickLoud}. A note with no keys has no kick.
+ * A note kicks only when the rise and the return of the note before end before its drop, so two
+ * kicks do not add up.
+ *
+ * @param notes The notes of the hand, sorted by start.
+ * @returns The kicks.
+ */
+function wristKicks(notes: readonly HandNote[]): WristKicks {
+  const m = HAND_MOTION;
+  const releases = Float64Array.from(notes, (n, i) =>
+    Math.min(n.end, notes[i + 1]?.start ?? n.end),
+  );
+  // The wrist of the note before ends its rise and its return before the drop starts.
+  const free = (i: number): boolean =>
+    i === 0 || (releases[i - 1] ?? 0) + 2 * m.kickRiseSec + m.kickDropSec <= (notes[i]?.start ?? 0);
+  const drops = Float64Array.from(notes, (n, i) =>
+    n.keys.length === 0 || !free(i)
+      ? 0
+      : m.kickDrop * clamp01((n.loudness - m.kickSoft) / (m.kickLoud - m.kickSoft)),
+  );
+  return { drops, releases };
+}
+
+/**
+ * Calculates the drop of the wrist of a piano hand at a song time (design 5.3). The wrist of each
+ * kick goes down in {@link HAND_MOTION.kickDropSec} before the strike, stays down while the keys
+ * are down, rises a little above its place after the release in {@link HAND_MOTION.kickRiseSec},
+ * and comes back in the same time. Each part eases, and the kicks of near notes add up, so the
+ * drop changes with no step.
+ *
+ * @param kicks The wrist kicks of the hand.
+ * @param starts The start of each note of the hand.
+ * @param time The song time of the note layer.
+ * @returns The drop, in radians: + down.
+ */
+function wristKickAt(kicks: WristKicks, starts: Float64Array, time: number): number {
+  const m = HAND_MOTION;
+  let sum = 0;
+  for (let j = lastAtOrBefore(starts, time + m.kickDropSec); j >= 0; j--) {
+    const drop = kicks.drops[j] ?? 0;
+    const release = kicks.releases[j] ?? 0;
+    if (drop > 0) {
+      const down = smoothstep((time - (starts[j] ?? 0) + m.kickDropSec) / m.kickDropSec);
+      const up = smoothstep((time - release) / m.kickRiseSec);
+      const back = smoothstep((time - release - m.kickRiseSec) / m.kickRiseSec);
+      sum += drop * (down - (1 + m.kickRise) * up + m.kickRise * back);
+    }
+    // A release is at the latest at the next start, so the notes before end their kicks earlier.
+    if (release + 2 * m.kickRiseSec < time) {
+      break;
+    }
+  }
+  return sum;
 }
 
 /**
