@@ -253,24 +253,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeSize: 0.805,
     },
   ],
-  // The polar bear pianist: the T-pose mesh (design 4.4). The landmark is its standing shoulder
-  // joints (0.725 u at 2.0576 m for each unit). The polar bear is the largest player: 1.3 times
-  // the height of 1.1475 m, at which it was no taller than the foxes. At the same piano, a larger
-  // bear reaches further down to the keys: at 1.4 and 1.5 times, the forearms slope down more and
-  // the bench stands higher. The body keeps the legs of the mesh. The crease angle, the blend, and
-  // the eye size are those of the bear.
+  // The polar bear pianist: the hand rig of the Tripo mesh (design 4.4, "Hand rig"). Its `.blend`
+  // holds the facts of the body: the landmark is its standing shoulder joints (0.725 u at 2.0576 m
+  // for each unit, 1.3 times the height of 1.1475 m, so that the polar bear is the largest
+  // player), and the crease angle and the blend of the bear. The body keeps the legs of the mesh
+  // and sits on a taller bench with the thighs sloped down.
   [
     'polar-bear',
     {
       landmark: 'shoulders',
-      height: 1.491763,
       seated: true,
       soloist: false,
       constant: 'STUDIO_POLAR_BEAR',
-      crease: 40,
-      colorBlend: 0.05,
-      glb: 'assets/models/polar-bear/polar-bear-tpose.rig.glb',
-      eyeSize: 0.805,
+      glb: 'assets/models/polar-bear/polar-bear.rig.glb',
     },
   ],
   // The violinist rabbit (design 4.4). The rabbit sits 4 cm further forward on a seat 4 cm deeper,
