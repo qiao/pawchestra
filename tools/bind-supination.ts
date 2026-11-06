@@ -64,16 +64,16 @@ const ROLL_FORMAT = 1;
  * The sign of the move of the signed paw twist of each arm for a larger supination: the left paw
  * supinates by a negative turn about its forearm, and the right paw by a positive turn.
  */
-export const SUPINATION_SIGN: Readonly<Record<Side, 1 | -1>> = { L: 1, R: -1 };
+const SUPINATION_SIGN: Readonly<Record<Side, 1 | -1>> = { L: 1, R: -1 };
 
 /** The step of the changes that {@link supinationChange} tries, in degrees. */
 const CHANGE_STEP = 0.5;
 
 /** The signed paw twists of one pair, in degrees, by arm and sample set. */
-export type PawRolls = Readonly<Record<Side, Readonly<Record<SampleSet, readonly number[]>>>>;
+type PawRolls = Readonly<Record<Side, Readonly<Record<SampleSet, readonly number[]>>>>;
 
 /** The JSON of one pair, as a child writes it. */
-export interface RollJson {
+interface RollJson {
   /** The format version ({@link ROLL_FORMAT}). */
   readonly version: number;
   /** The species. */
@@ -89,7 +89,7 @@ export interface RollJson {
 }
 
 /** The best change of the supination of one arm. */
-export interface SupinationChange {
+interface SupinationChange {
   /** The change of the supination, in degrees. */
   readonly change: number;
   /** The largest paw twist p95 of any role and sample set with the change, in degrees. */
@@ -131,7 +131,7 @@ function p95(values: readonly number[]): number {
  * @param change The change of the supination, in degrees.
  * @returns The largest p95, in degrees.
  */
-export function worstTwist(pairs: readonly PawRolls[], side: Side, change: number): number {
+function worstTwist(pairs: readonly PawRolls[], side: Side, change: number): number {
   const shift = SUPINATION_SIGN[side] * change;
   let worst = 0;
   for (const rolls of pairs) {
@@ -154,7 +154,7 @@ export function worstTwist(pairs: readonly PawRolls[], side: Side, change: numbe
  * @param side The arm.
  * @returns The change.
  */
-export function supinationChange(pairs: readonly PawRolls[], side: Side): SupinationChange {
+function supinationChange(pairs: readonly PawRolls[], side: Side): SupinationChange {
   const tries: { readonly change: number; readonly worst: number }[] = [];
   for (let k = -180 / CHANGE_STEP; k < 180 / CHANGE_STEP; k++) {
     const change = k * CHANGE_STEP;
@@ -182,7 +182,7 @@ export function supinationChange(pairs: readonly PawRolls[], side: Side): Supina
  * @param species The species.
  * @returns The roles.
  */
-export function supinationRoles(species: SpeciesId): string[] {
+function supinationRoles(species: SpeciesId): string[] {
   const own = [...FOLD_ROLES]
     .filter(([, role]) => role.kind === 'player' && role.species.includes(species))
     .map(([name]) => name);
@@ -433,10 +433,7 @@ function range(values: readonly number[]): string {
  * @param changes The change of each arm.
  * @returns The lines.
  */
-export function rollLines(
-  pairs: readonly RollJson[],
-  changes: Readonly<Record<Side, number>>,
-): string[] {
+function rollLines(pairs: readonly RollJson[], changes: Readonly<Record<Side, number>>): string[] {
   const lines = [
     '| Role | Demo | Arm | Rest | Play | Lift | p95 now | p95 new |',
     '|---|---|---|---|---|---|---:|---:|',

@@ -9,7 +9,7 @@ import { openShot, startSite, toWebp } from './screenshots.ts';
  * One view of the choir check: a crop of one penguin in a reference image, and the gallery camera
  * that copies the camera of that image (design 4.4, 7.1).
  */
-export interface ChoirView {
+interface ChoirView {
   /** The name of the view in the file names. */
   readonly name: 'front' | 'side';
   /** The reference image in `docs/reference/`. */
@@ -52,7 +52,7 @@ export const CHOIR_VIEWS: readonly ChoirView[] = [
 ];
 
 /** The size of the gallery page of each view, in CSS pixels. */
-export const CHOIR_PAGE = { width: 480, height: 600 } as const;
+const CHOIR_PAGE = { width: 480, height: 600 } as const;
 
 /** The close view of the gallery on the penguin: the zoom and the height of the target. */
 const CLOSE = { zoom: 2.6, target: 0.55 } as const;

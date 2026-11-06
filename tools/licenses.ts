@@ -18,7 +18,7 @@ const BUNDLED_PACKAGES: readonly string[] = [
 const CC0_LINK = 'CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/legalcode';
 
 /** One part of the third-party license file. */
-export interface LicenseEntry {
+interface LicenseEntry {
   /** Name and version, such as `three 0.180.0`. */
   readonly title: string;
   /** SPDX identifier or license name. */
@@ -51,7 +51,8 @@ export function licenseDocument(entries: readonly LicenseEntry[]): string {
       '\n',
     ),
   );
-  const header = 'Pawchestra includes the third-party software and data below, under these licenses.';
+  const header =
+    'Pawchestra includes the third-party software and data below, under these licenses.';
   return `${[header, ...sections].join('\n\n')}\n`;
 }
 
@@ -160,7 +161,7 @@ export async function githubMarkEntry(root: string): Promise<LicenseEntry> {
  * @param root The folder of the root package.json.
  * @returns The entry.
  */
-export async function frauncesEntry(root: string): Promise<LicenseEntry> {
+async function frauncesEntry(root: string): Promise<LicenseEntry> {
   const license = await readFile(join(root, 'assets', 'fraunces', 'LICENSE.txt'), 'utf8');
   return {
     title: 'Fraunces 1.0, by Undercase Type',

@@ -160,10 +160,10 @@ export const MEASURES = [
 ] as const;
 
 /** A measure of the probe. */
-export type MeasureName = (typeof MEASURES)[number];
+type MeasureName = (typeof MEASURES)[number];
 
 /** The result of one measure in one file. */
-export interface MeasureResult {
+interface MeasureResult {
   /** The deepest depth over all samples in meters, or the share of the samples for a cross. */
   readonly value: number;
   /** The share of the samples over the limit, from 0 to 1. */
@@ -177,7 +177,7 @@ export interface MeasureResult {
 }
 
 /** The results of one file. */
-export interface FileResult {
+interface FileResult {
   /** The name of the file, such as `beethoven-9.mid`. */
   readonly file: string;
   /** The number of players. */
@@ -189,7 +189,7 @@ export interface FileResult {
 }
 
 /** The JSON of `--json`. */
-export interface ProbeOutput {
+interface ProbeOutput {
   /** The format version ({@link FORMAT}). */
   readonly version: number;
   /** The step of the samples, in seconds. */

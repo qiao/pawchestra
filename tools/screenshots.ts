@@ -85,7 +85,7 @@ export function reviewShots(): Shot[] {
 }
 
 /** One screenshot during play: the shot, and the play time before it. */
-export interface PlayShot extends Shot {
+interface PlayShot extends Shot {
   /** The time from the click on play to the screenshot, in seconds. */
   readonly playSec: number;
 }
@@ -114,7 +114,7 @@ export function playShots(): PlayShot[] {
 }
 
 /** One screenshot of the UI: the shot, the device scale, and the state of the page. */
-export interface UiShot extends Shot {
+interface UiShot extends Shot {
   /** The device pixels for each CSS pixel: 2 at 390 × 844, as the prototype screenshots. */
   readonly scale: number;
   /**
@@ -150,7 +150,7 @@ export function uiShots(): UiShot[] {
 }
 
 /** One screenshot of a kind of camera shot during play (design 5.6, 9.8). */
-export interface CameraShot extends Shot {
+interface CameraShot extends Shot {
   readonly kind: ShotKind;
   /** The seek point, in whole song seconds. The screenshot comes 1.5 s after the seek. */
   readonly seekSec: number;
@@ -264,7 +264,7 @@ async function cameraScreenshot(browser: Browser, base: string, shot: CameraShot
 const UI_PLAY_SEC = 4;
 
 /** One screenshot of a part of the drawer, or of the drop overlay, during play. */
-export interface DrawerShot extends Shot {
+interface DrawerShot extends Shot {
   /** The device pixels for each CSS pixel: 2 at 390 × 844, as the prototype screenshots. */
   readonly scale: number;
   /**
@@ -300,7 +300,7 @@ export function drawerShots(): DrawerShot[] {
 }
 
 /** One screenshot of the load of the samples, or of a message of design 2.8. */
-export interface LoadShot extends Shot {
+interface LoadShot extends Shot {
   /** The device pixels for each CSS pixel: 2 at 390 × 844, as the prototype screenshots. */
   readonly scale: number;
   /**

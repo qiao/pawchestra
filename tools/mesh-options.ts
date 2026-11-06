@@ -77,10 +77,10 @@ const PLOT_SCRIPT = join(ROOT, 'tools', 'mesh_options.py');
  * studio. The ears of the source meshes stand beside the skull, outside the strip, so the
  * head top of a size leaves the ears out, as the head top of the parametric bodies does.
  */
-export const HEAD_STRIP = 0.03;
+const HEAD_STRIP = 0.03;
 
 /** The pixels for each meter of the rows of the image that have one scale. */
-export const IMAGE_SCALE = 260;
+const IMAGE_SCALE = 260;
 
 /**
  * The rule of the thin faces of a config with no `check.thin`: it lists no face, because the tool
@@ -99,7 +99,7 @@ const INSTRUMENT_BONES: readonly BoneName[] = [
 ];
 
 /** One size of the options: a label and the height of the standing head top. */
-export interface SizeOption {
+interface SizeOption {
   /** The label in the table and in the image, such as `fox`. */
   readonly label: string;
   /** The height of the standing head top (the skull top, with no ear), in meters. */
@@ -107,7 +107,7 @@ export interface SizeOption {
 }
 
 /** The options of `pnpm mesh-options`. */
-export interface OptionsArgs {
+interface OptionsArgs {
   /** The animal of the rig config `tools/mesh-rigs/<animal>.json`. */
   readonly animal: string;
   /** The folder of the output, as an absolute path. */
@@ -156,10 +156,7 @@ function positiveList(flag: string, text: string): number[] {
  * @throws Error if the animal has no rig config, if no size is given, if an option is not known or
  *   has no value, or if a value does not fit.
  */
-export function parseOptionsArgs(
-  args: readonly string[],
-  cwd: string = process.cwd(),
-): OptionsArgs {
+function parseOptionsArgs(args: readonly string[], cwd: string = process.cwd()): OptionsArgs {
   const [animal = '', dir = '', ...rest] = args;
   if (animal === '' || dir === '' || animal.startsWith('--') || dir.startsWith('--')) {
     throw new Error(USAGE);
@@ -221,7 +218,7 @@ export function parseOptionsArgs(
 }
 
 /** One variant of the options: a size, a leg factor, and an arm factor. */
-export interface OptionVariant {
+interface OptionVariant {
   /** The name of the variant in the files, such as `fox-legs1.5-arms1.497`. */
   readonly name: string;
   /** The size. */
@@ -239,7 +236,7 @@ export interface OptionVariant {
  * @param args The options.
  * @returns The variants, in the order of the rows of the table.
  */
-export function optionVariants(args: OptionsArgs): OptionVariant[] {
+function optionVariants(args: OptionsArgs): OptionVariant[] {
   const variant = (size: SizeOption, leg: number, arm: number): OptionVariant => ({
     name: `${size.label}-legs${leg}-arms${arm}`,
     size,
@@ -255,7 +252,7 @@ export function optionVariants(args: OptionsArgs): OptionVariant[] {
 }
 
 /** The heights of the source mesh of a rig, in the units of the studio. */
-export interface SourceTops {
+interface SourceTops {
   /** The skull top: the highest vertex in the middle strip of {@link HEAD_STRIP}. */
   readonly skull: number;
   /** The highest vertex, which the units put at 1. */
@@ -270,7 +267,7 @@ export interface SourceTops {
  * @returns The heights.
  * @throws Error if no point lies in the middle strip.
  */
-export function topsOf(points: readonly (readonly number[])[]): SourceTops {
+function topsOf(points: readonly (readonly number[])[]): SourceTops {
   let skull = -Infinity;
   let top = -Infinity;
   for (const [x = 0, y = 0] of points) {
@@ -296,7 +293,7 @@ export function topsOf(points: readonly (readonly number[])[]): SourceTops {
  * @param bytes The source GLB file.
  * @returns The heights.
  */
-export function sourceTops(bytes: Uint8Array): SourceTops {
+function sourceTops(bytes: Uint8Array): SourceTops {
   const glb = readGlb(bytes);
   const worlds = worldMatrices(glb.json, new Map());
   const points: Vector3[] = [];
@@ -326,7 +323,7 @@ export function sourceTops(bytes: Uint8Array): SourceTops {
  * @param top The height of the head top in the app, in meters.
  * @returns The height of the shoulder joints, in meters (`app.shoulders`).
  */
-export function sizeShoulders(config: MeshRigConfig, skull: number, top: number): number {
+function sizeShoulders(config: MeshRigConfig, skull: number, top: number): number {
   return (top / (skull + legRise(config))) * shoulderHeight(config);
 }
 
@@ -349,7 +346,7 @@ interface VariantFields {
  * @param skull The skull top of the source, in the units of the studio.
  * @returns The JSON text.
  */
-export function variantConfig(text: string, variant: OptionVariant, skull: number): string {
+function variantConfig(text: string, variant: OptionVariant, skull: number): string {
   // SAFETY: a rig config holds one JSON object, and parseConfig() checks the fields below.
   const json = JSON.parse(text) as VariantFields;
   json.legFactor = variant.leg;
@@ -366,7 +363,7 @@ export function variantConfig(text: string, variant: OptionVariant, skull: numbe
  * @param config The config.
  * @returns The length.
  */
-export function trunkUnits(config: MeshRigConfig): number {
+function trunkUnits(config: MeshRigConfig): number {
   const hips = jointHead(config, 'hips');
   const shoulder = jointHead(config, 'upper_arm_L');
   const rise = shoulderHeight(config) - legRise(config) - shoulder[1];
@@ -374,7 +371,7 @@ export function trunkUnits(config: MeshRigConfig): number {
 }
 
 /** The measures of one row of the table of the options. */
-export interface OptionMeasures {
+interface OptionMeasures {
   /** The height of the standing head top (the skull top), in meters. */
   readonly headTop: number;
   /** The height of the highest point of the standing body, in meters. */
@@ -413,7 +410,7 @@ export interface OptionMeasures {
  * @param demos The demos of a percussion instrument, or none for another instrument.
  * @returns The text, such as `slide 0.155 m`.
  */
-export function reachCell(
+function reachCell(
   species: SpeciesId,
   instrument: ReachInstrument,
   demos: readonly DemoFile[] = [],
@@ -435,7 +432,7 @@ export function reachCell(
 }
 
 /** The faces of a body for the image: the corners in meters and their linear colors. */
-export interface BodyFaces {
+interface BodyFaces {
   /** x, y, z of each corner, three corners for each triangle. */
   readonly positions: readonly number[];
   /** Linear r, g, b of each corner. */
@@ -448,7 +445,7 @@ export interface BodyFaces {
  * @param model The player.
  * @returns The faces, rounded to 0.1 mm and to 1/1000 of a color.
  */
-export function bodyFaces(model: PlayerModel): BodyFaces {
+function bodyFaces(model: PlayerModel): BodyFaces {
   const skip = new Set(INSTRUMENT_BONES.map((bone) => boneIndex(bone)));
   const positions: number[] = [];
   const colors: number[] = [];
@@ -468,7 +465,7 @@ export function bodyFaces(model: PlayerModel): BodyFaces {
 }
 
 /** The body of a species in the working tree: its measures and its standing player. */
-export interface WorkingBody {
+interface WorkingBody {
   /** The measures, with no scale and no chair depth. */
   readonly measures: OptionMeasures;
   /** The standing player, for the image. */
@@ -487,7 +484,7 @@ export interface WorkingBody {
  * @param demos The demos of a percussion instrument, or none for another instrument.
  * @returns The measures, and the standing player.
  */
-export function workingBody(
+function workingBody(
   species: SpeciesId,
   instrument: ReachInstrument | null,
   demos: readonly DemoFile[] = [],
@@ -568,7 +565,7 @@ function runBlender(args: readonly string[], log: string): Promise<string> {
 }
 
 /** One rigged variant: its measures and the files of its rig. */
-export interface RiggedVariant {
+interface RiggedVariant {
   /** The variant. */
   readonly variant: OptionVariant;
   /** The measures. */
@@ -675,7 +672,7 @@ async function rigVariant(
  * @param rows The rigged variants.
  * @returns The lines of the Markdown table.
  */
-export function optionsTable(
+function optionsTable(
   species: SpeciesId,
   working: OptionMeasures,
   rows: readonly RiggedVariant[],
@@ -730,7 +727,7 @@ export function optionsTable(
  * @param rows The rigged variants.
  * @returns The lines: a heading and one item for each warning, or none with no warning.
  */
-export function warningLines(rows: readonly RiggedVariant[]): string[] {
+function warningLines(rows: readonly RiggedVariant[]): string[] {
   const items = rows.flatMap(({ variant, warnings }) =>
     warnings.map((warning) => `- ${variant.name}: ${warning.slice(RIG_WARNING.length).trim()}`),
   );

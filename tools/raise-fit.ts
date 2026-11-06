@@ -51,48 +51,48 @@ import type { Side } from '../src/models/studio-format.ts';
 import type { Quat } from '../src/models/tuples.ts';
 
 /** The keys of one arm: the turns that the shapes of `raise` read, and the turn of the clavicle. */
-export const ARM_KEYS = ['clavicle', 'upper', 'elbow', 'wrist'] as const;
+const ARM_KEYS = ['clavicle', 'upper', 'elbow', 'wrist'] as const;
 
 /** One key of an arm. */
-export type ArmKey = (typeof ARM_KEYS)[number];
+type ArmKey = (typeof ARM_KEYS)[number];
 
 /** The bone of a rule: the upper arm, the forearm of a bent elbow, or the paw of a bent wrist. */
-export type RuleBone = 'upper' | 'forearm' | 'hand';
+type RuleBone = 'upper' | 'forearm' | 'hand';
 
 /** The key of the turn that gives the weight of the shape of each kind of rule. */
-export const RULE_KEYS: Readonly<Record<RuleBone, ArmKey>> = {
+const RULE_KEYS: Readonly<Record<RuleBone, ArmKey>> = {
   upper: 'upper',
   forearm: 'elbow',
   hand: 'wrist',
 };
 
 /** The angle by which a rule of a bent wrist turns further than the mean turn, in degrees. */
-export const WRIST_FURTHER = 10;
+const WRIST_FURTHER = 10;
 
 /**
  * The angle by which a rule of a bent elbow turns further than the mean turn by default, in
  * degrees. `--further` sets another angle.
  */
-export const ELBOW_FURTHER = 0;
+const ELBOW_FURTHER = 0;
 
 /** The angle by which each kind of rule turns further than the mean turn by default, in degrees. */
-export const RULE_FURTHER: Readonly<Record<RuleBone, number>> = {
+const RULE_FURTHER: Readonly<Record<RuleBone, number>> = {
   upper: 0,
   forearm: ELBOW_FURTHER,
   hand: WRIST_FURTHER,
 };
 
 /** The share of the folded samples that the full weight of a proposed fade holds. */
-export const FADE_SHARE = 0.9;
+const FADE_SHARE = 0.9;
 
 /** The angle from the full weight to no weight of a proposed fade, in degrees. */
-export const FADE_WIDTH = 10;
+const FADE_WIDTH = 10;
 
 /** The step of the angles of a proposed fade, in degrees. */
-export const FADE_STEP = 5;
+const FADE_STEP = 5;
 
 /** The smallest full angle of a proposed fade, in degrees: the angle of the rules of the mouse and of the arms of the elephant. */
-export const FADE_MIN = 10;
+const FADE_MIN = 10;
 
 /** The fades of the table: the fades of the rules of the cat, the mouse, and the elephant. */
 export const FADES: readonly (readonly [number, number])[] = [
@@ -105,7 +105,7 @@ export const FADES: readonly (readonly [number, number])[] = [
 ];
 
 /** The step of the song time of the play by default, in seconds. */
-export const RAISE_STEP = 1;
+const RAISE_STEP = 1;
 
 /** One posed sample of the arm. */
 export interface ArmSample {
@@ -118,7 +118,7 @@ export interface ArmSample {
 }
 
 /** The options of the command. */
-export interface RaiseOptions {
+interface RaiseOptions {
   /** The name of the role: a key of `FOLD_ROLES`, or a recast role `<role>@<species>`. */
   readonly role: string;
   /** The faces of the module whose folds the rule must remove. */
@@ -151,7 +151,7 @@ export interface RaiseOptions {
  * @param turn The turn in the model axes.
  * @returns The turn in the axes of the studio.
  */
-export function studioAxes(turn: Quat): Quat {
+function studioAxes(turn: Quat): Quat {
   return [-turn[0], turn[1], -turn[2], turn[3]];
 }
 
@@ -193,7 +193,7 @@ export function armKeys(matrices: ArrayLike<number>, side: Side): Record<ArmKey,
  * @param degrees The added angle, in degrees.
  * @returns The turn on the same axis with the larger angle.
  */
-export function turnFurther(turn: Quat, degrees: number): Quat {
+function turnFurther(turn: Quat, degrees: number): Quat {
   const sign = turn[3] < 0 ? -1 : 1;
   const [x, y, z, w] = [sign * turn[0], sign * turn[1], sign * turn[2], sign * turn[3]];
   const length = Math.hypot(x, y, z);
@@ -214,7 +214,7 @@ export function turnFurther(turn: Quat, degrees: number): Quat {
  * @param fade The angles of the fade, in degrees.
  * @returns The weight, from 0 to 1.
  */
-export function fadeWeight(angle: number, fade: readonly [number, number]): number {
+function fadeWeight(angle: number, fade: readonly [number, number]): number {
   const [full, none] = fade;
   const t = Math.min(1, Math.max(0, (none - angle) / (none - full)));
   return t * t * (3 - 2 * t);
@@ -228,7 +228,7 @@ export function fadeWeight(angle: number, fade: readonly [number, number]): numb
  * @param angles The angle of each folded sample from the turn of the rule, in degrees.
  * @returns The fade, in degrees.
  */
-export function proposeFade(angles: readonly number[]): [number, number] {
+function proposeFade(angles: readonly number[]): [number, number] {
   const sorted = angles.toSorted((a, b) => a - b);
   const at = Math.max(0, Math.ceil(FADE_SHARE * sorted.length) - 1);
   const full = Math.max(FADE_MIN, Math.ceil((sorted[at] ?? 0) / FADE_STEP) * FADE_STEP);
@@ -257,7 +257,7 @@ function fromBind(turn: Quat): number {
 }
 
 /** The result of a fit: the lines to print and the entry of the config. */
-export interface RaiseFit {
+interface RaiseFit {
   /** The lines of the report. */
   readonly lines: readonly string[];
   /** The `raise` entry, or `null` when no sample of the sets folds. */
@@ -272,7 +272,7 @@ export interface RaiseFit {
  * @param options The options of the command.
  * @returns The lines and the entry.
  */
-export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): RaiseFit {
+function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): RaiseFit {
   const chosen = samples.filter((s) => options.sets.includes(s.set));
   const folded = chosen.filter((s) => s.folded);
   const share = (100 * folded.length) / Math.max(1, chosen.length);
@@ -372,7 +372,7 @@ export function fitRaise(samples: readonly ArmSample[], options: RaiseOptions): 
  * @returns The options.
  * @throws Error if an argument is missing or does not fit.
  */
-export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
+function parseRaiseArgs(args: readonly string[]): RaiseOptions {
   const role = args[0] ?? '';
   const usage = `Usage: pnpm raise-fit <role> --faces <list> --side L|R [--bone upper|forearm|hand] [--further <degrees>] [--sets <set>,...] [--demo <id>|all]... [--step <seconds>] [--set <changes>]... [--json <file>] [--glb <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}, or a recast role <role>@<species>.`;
   if (!isRole(role)) {
@@ -429,7 +429,7 @@ export function parseRaiseArgs(args: readonly string[]): RaiseOptions {
  * @returns The samples of all sample sets.
  * @throws Error if a demo has an unknown name.
  */
-export async function armSamples(options: RaiseOptions): Promise<ArmSample[]> {
+async function armSamples(options: RaiseOptions): Promise<ArmSample[]> {
   const role = findRole(options.role);
   if (!role) {
     throw new Error(`No role has the name ${options.role}.`);
@@ -506,7 +506,7 @@ async function main(): Promise<void> {
  * @param text The JSON text of the config.
  * @returns The count.
  */
-export function raiseCount(text: string): number {
+function raiseCount(text: string): number {
   // SAFETY: a config file of tools/mesh-rigs/ holds one JSON object, and only `raise` is read.
   const config = JSON.parse(text) as { readonly raise?: unknown };
   if (Array.isArray(config.raise)) {

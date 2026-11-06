@@ -49,13 +49,13 @@ import { UPPER_TWIST_BONES } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
 
 /** The smallest weight of a corner on the upper arm or the clavicle that puts a face in a region. */
-export const REGION_WEIGHT = 0.05;
+const REGION_WEIGHT = 0.05;
 
 /** The change of a fold angle from the source, in degrees, above which an edge is a crease. */
-export const CREASE_ANGLE = 40;
+const CREASE_ANGLE = 40;
 
 /** One limit of {@link ARM_LOOK_LIMITS}. */
-export interface ArmLookLimit {
+interface ArmLookLimit {
   /** The limit. */
   readonly limit: number;
   /** True when a value above the limit fails, false when a value below it fails. */
@@ -68,13 +68,13 @@ export interface ArmLookLimit {
  * The limits of the values, from the red fox (`fox-violinist`): its play medians are 3.5% and
  * 7.3% creases and the sections 0.74 and 0.93, left and right.
  */
-export const ARM_LOOK_LIMITS: Readonly<Record<'crease' | 'section', ArmLookLimit>> = {
+const ARM_LOOK_LIMITS: Readonly<Record<'crease' | 'section', ArmLookLimit>> = {
   crease: { limit: 0.146, up: true, source: 'twice the worst arm of the red fox (7.3%)' },
   section: { limit: 0.44, up: false, source: '0.6 of the worst arm of the red fox (0.74)' },
 };
 
 /** The source face of a face of the module: its corners in the source and the long-armed source. */
-export interface SourceFace {
+interface SourceFace {
   /** The corners in the source, x, y, and z of each one. */
   readonly s: readonly (readonly number[])[];
   /** The corners in the long-armed source. */
@@ -92,7 +92,7 @@ interface Region {
 }
 
 /** The values of one arm in one sample. */
-export interface ArmLookSample {
+interface ArmLookSample {
   /** The share of the edges of the region that crease against the source. */
   readonly crease: number;
   /** The narrow axis of the middle ring of the upper arm as a share of its wide axis. */
@@ -100,7 +100,7 @@ export interface ArmLookSample {
 }
 
 /** The medians of one arm over the play samples. */
-export interface ArmLookValues {
+interface ArmLookValues {
   /** The median crease share. */
   readonly crease: number;
   /** The median section. */
@@ -193,11 +193,7 @@ function angleOf(a: Vector3, b: Vector3): number {
  * @param sources The source face of each face of the module, or null.
  * @returns The region.
  */
-export function armRegion(
-  rig: StudioRig,
-  side: Side,
-  sources: readonly (SourceFace | null)[],
-): Region {
+function armRegion(rig: StudioRig, side: Side, sources: readonly (SourceFace | null)[]): Region {
   const { mesh } = rig;
   const bones = [boneAt(`upper_arm_${side}`), UPPER_TWIST_BONES[side], boneAt(`clavicle_${side}`)];
   const faces: number[] = [];
@@ -254,7 +250,7 @@ function matrixOf(matrices: ArrayLike<number>, bone: number): Matrix4 {
  * @param axis The unit axis.
  * @returns The ratio, or 1 for fewer than three points.
  */
-export function sectionRatio(points: readonly Vector3[], axis: Vector3): number {
+function sectionRatio(points: readonly Vector3[], axis: Vector3): number {
   if (points.length < 3) {
     return 1;
   }
@@ -293,7 +289,7 @@ export function sectionRatio(points: readonly Vector3[], axis: Vector3): number 
  * @param posed The posed places of the vertices.
  * @returns The values.
  */
-export function measureArmLook(
+function measureArmLook(
   rig: StudioRig,
   side: Side,
   region: Region,
@@ -350,7 +346,7 @@ function median(values: readonly number[]): number {
  * @returns The source face of each face, or null.
  * @throws Error if the text holds no such list.
  */
-export function parseCorners(text: string): (SourceFace | null)[] {
+function parseCorners(text: string): (SourceFace | null)[] {
   const value: unknown = JSON.parse(text);
   if (!Array.isArray(value)) {
     throw new Error('The corners file holds no list.');
@@ -379,7 +375,7 @@ export function parseCorners(text: string): (SourceFace | null)[] {
  * @returns The source face of each face of the module, or null.
  * @throws Error if the animal has no mesh rig or has a hand rig, or if the run fails.
  */
-export async function sourceCorners(animal: string): Promise<(SourceFace | null)[]> {
+async function sourceCorners(animal: string): Promise<(SourceFace | null)[]> {
   const config = rigConfigPath(animal);
   if (!existsSync(config)) {
     throw new Error(`The ${animal} has no mesh rig.`);
@@ -427,7 +423,7 @@ export async function sourceCorners(animal: string): Promise<(SourceFace | null)
  * @returns The medians of each arm.
  * @throws Error for an unknown role, or when the corners do not fit the module.
  */
-export function probeArmLook(
+function probeArmLook(
   role: string,
   sources: readonly (SourceFace | null)[],
   demos: readonly DemoFile[],
@@ -475,7 +471,7 @@ export function probeArmLook(
  * @param limit The limit.
  * @returns `FAIL` or `PASS`.
  */
-export function lookVerdict(value: number, limit: ArmLookLimit): 'FAIL' | 'PASS' {
+function lookVerdict(value: number, limit: ArmLookLimit): 'FAIL' | 'PASS' {
   return (limit.up ? value > limit.limit : value < limit.limit) ? 'FAIL' : 'PASS';
 }
 

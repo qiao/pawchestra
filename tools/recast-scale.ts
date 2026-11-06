@@ -26,7 +26,7 @@ import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
  * viola chart (`docs/reference/string-technique.md`, 1.10), times the 1.66 of the total length of
  * a full violin (0.59 m) to its body (0.356 m).
  */
-export const REAL_LENGTHS = {
+const REAL_LENGTHS = {
   violin: REAL_VIOLINS,
   viola: { smallest: 0.42, largest: 0.7 },
 } as const;

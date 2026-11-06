@@ -13,7 +13,7 @@ import { ROOT, optionValue, shortHash, withRefBuild } from './ref-tree.ts';
 const SIZE_LIMIT_BYTES = 1_000_000;
 
 /** One file of the first download, with its sizes in bytes. */
-export interface DownloadPart {
+interface DownloadPart {
   /** Path relative to the repository root. */
   readonly path: string;
   readonly gzipBytes: number;

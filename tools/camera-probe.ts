@@ -35,13 +35,13 @@ import { patchedDemos } from './patch-demos.ts';
 import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
 
 /** The step of the song time between two samples, in seconds. */
-export const CAMERA_STEP = 0.25;
+const CAMERA_STEP = 0.25;
 
 /**
  * The views of the probe: the aspect of the frame of Cinematic mode (design 2.5), with and
  * without motion. Each window shows that frame.
  */
-export const CAMERA_VIEWS: readonly CameraView[] = [
+const CAMERA_VIEWS: readonly CameraView[] = [
   { aspect: CINEMA_ASPECT, still: false },
   { aspect: CINEMA_ASPECT, still: true },
 ];
@@ -57,7 +57,7 @@ const PLAYING: Transport = {
 };
 
 /** The probe of the camera of one demo. */
-export interface DemoCamera {
+interface DemoCamera {
   /** The number of samples of each view. */
   readonly samples: number;
   /** The hash of the cameras of all samples of all views, as 16 hex digits. */
@@ -72,7 +72,7 @@ export interface DemoCamera {
 }
 
 /** The output of the probe. */
-export interface CameraProbe {
+interface CameraProbe {
   /** The camera of each demo, by the name of the demo file with no `.mid`. */
   readonly demos: Readonly<Record<string, DemoCamera>>;
   /** The hash of the hashes of all demos, in the order of their names, as 16 hex digits. */
@@ -80,7 +80,7 @@ export interface CameraProbe {
 }
 
 /** The comparison of two probes. */
-export interface CameraComparison {
+interface CameraComparison {
   /** The count of the equal demos, and the count of the changed samples of all demos. */
   readonly counts: readonly string[];
   /** One line for each difference. */
@@ -108,7 +108,7 @@ function viewName(view: CameraView): string {
  * @returns The probe of the demo.
  * @throws Error if `buildScore()` refuses the file.
  */
-export function probeDemoCamera(bytes: Uint8Array): DemoCamera {
+function probeDemoCamera(bytes: Uint8Array): DemoCamera {
   const result = buildScore(bytes, 'auto');
   if (!result.ok) {
     throw new Error(`buildScore() refused the demo: ${result.error}.`);

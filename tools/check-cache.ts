@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** The kind of a check: the check of one commit, or the full unit suite on the last commit. */
-export type CheckKind = 'commit' | 'tip';
+type CheckKind = 'commit' | 'tip';
 
 /** One check of a plan. */
 export interface Check {

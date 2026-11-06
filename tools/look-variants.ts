@@ -109,7 +109,7 @@ function readArgs(args: readonly string[]): VariantsArgs {
  * @returns The variants, in the order of the file.
  * @throws Error that names the variant, for a wrong name, a wrong solo, or a wrong change.
  */
-export function parseVariants(text: string): Variant[] {
+function parseVariants(text: string): Variant[] {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -249,7 +249,7 @@ async function startServer(
  * @param variant The variant.
  * @returns The URL.
  */
-export function variantUrl(site: string, variant: Variant): string {
+function variantUrl(site: string, variant: Variant): string {
   const query = new URLSearchParams();
   if (variant.look.size > 0) {
     query.set('look', JSON.stringify(Object.fromEntries(variant.look)));
@@ -322,7 +322,7 @@ function runVariant(out: string, site: string, variant: Variant): Promise<number
  * @param rows The label and the columns of each row.
  * @returns The table.
  */
-export function summaryTable(rows: readonly (readonly [label: string, row: SummaryRow])[]): string {
+function summaryTable(rows: readonly (readonly [label: string, row: SummaryRow])[]): string {
   const first = rows[0]?.[1] ?? [];
   const lines = [
     `| variant | ${first.map(([name]) => name).join(' | ')} |`,

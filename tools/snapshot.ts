@@ -22,7 +22,7 @@ export interface SnapshotCommit {
 }
 
 /** One image of a snapshot. */
-export interface SnapshotImage {
+interface SnapshotImage {
   /** The name of the WebP file. */
   readonly file: string;
   /** What the image shows. */
@@ -30,13 +30,13 @@ export interface SnapshotImage {
 }
 
 /** The song time of the seek before the play frame, in seconds. */
-export const SNAPSHOT_SEEK_SEC = 30;
+const SNAPSHOT_SEEK_SEC = 30;
 
 /**
  * The time from the seek to the play frame, in seconds. The bar hides 3 s after the last pointer
  * event (design 2.3), so the frame shows the scene only.
  */
-export const SNAPSHOT_WAIT_SEC = 3.5;
+const SNAPSHOT_WAIT_SEC = 3.5;
 
 /** The play frame: the default demo at the size of the reference images of the scene. */
 const PLAY_SHOT: Shot = {

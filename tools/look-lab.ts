@@ -61,7 +61,7 @@ export interface PixelMask {
  * shaded surface. `contrast` gives the contrast of the cast shadows on the floor. `tone` gives the
  * luma percentiles, the median hue, and the median saturation of the pixels of a mask.
  */
-export interface LookRegion {
+interface LookRegion {
   /**
    * The name of the region. The box of the app and the box of the reference show the same kind
    * of surface.
@@ -85,7 +85,7 @@ export interface LookRegion {
  * {@link LOOK_TIME_SEC}. A new layout or a new camera moves them, so check them again on a new
  * frame.
  */
-export const LOOK_REGIONS: readonly LookRegion[] = [
+const LOOK_REGIONS: readonly LookRegion[] = [
   {
     name: 'lit floor, left of the podium',
     kind: 'color',
@@ -157,16 +157,16 @@ export const LOOK_REGIONS: readonly LookRegion[] = [
 ];
 
 /** The cameras of `pnpm close-views` that the look lab renders. The first one has the regions. */
-export const LOOK_CAMERAS = ['orchestra', 'default', 'violins'] as const;
+const LOOK_CAMERAS = ['orchestra', 'default', 'violins'] as const;
 
 /** The demo of the frames: the default demo, as `pnpm close-views play` renders it. */
-export const LOOK_DEMO: DemoId = DEFAULT_DEMO;
+const LOOK_DEMO: DemoId = DEFAULT_DEMO;
 
 /** The size of the frames, in pixels: `PLAY_FRAME` of `tools/close-views.ts`. */
-export const LOOK_FRAME = { width: 1440, height: 900 } as const;
+const LOOK_FRAME = { width: 1440, height: 900 } as const;
 
 /** The song time of the frames, in seconds: the time of the play frame of `pnpm snapshot`. */
-export const LOOK_TIME_SEC = 33.5;
+const LOOK_TIME_SEC = 33.5;
 
 /** The reference image of the look. */
 const REFERENCE = 'docs/reference/orchestra-latest.png';
@@ -182,7 +182,7 @@ function luma(r: number, g: number, b: number): number {
  * @param rgb The color, from 0 to 255 for each channel.
  * @returns The hue in degrees, and the saturation from 0 to 1.
  */
-export function hueSaturation(rgb: readonly [number, number, number]): [number, number] {
+function hueSaturation(rgb: readonly [number, number, number]): [number, number] {
   const [r, g, b] = rgb;
   const top = Math.max(r, g, b);
   const range = top - Math.min(r, g, b);
@@ -236,7 +236,7 @@ function at<T>(sorted: readonly T[], q: number): T {
 }
 
 /** The tone of the stage area of a frame. */
-export interface StageTone {
+interface StageTone {
   /** The luma at 5%, 25%, 50%, 75%, and 95% of the pixels, from 0 to 255. */
   readonly percentiles: readonly number[];
   /** The median of the saturation of the pixels, from 0 to 1. */
@@ -251,7 +251,7 @@ export interface StageTone {
  * @param height The height of the image, in pixels.
  * @returns The tone.
  */
-export function stageTone(image: Pixels, height: number): StageTone {
+function stageTone(image: Pixels, height: number): StageTone {
   const box: PixelBox = [
     Math.round(image.width * 0.2),
     Math.round(height * 0.45),
@@ -274,13 +274,13 @@ export function stageTone(image: Pixels, height: number): StageTone {
  * @param box The region.
  * @returns The color, from 0 to 255 for each channel.
  */
-export function regionColor(image: Pixels, box: PixelBox): [number, number, number] {
+function regionColor(image: Pixels, box: PixelBox): [number, number, number] {
   const sorted = boxColors(image, box).toSorted((a, b) => a[0] + a[1] + a[2] - b[0] - b[1] - b[2]);
   return at(sorted, 0.5);
 }
 
 /** The contrast of the cast shadows in a region of the floor. */
-export interface RegionContrast {
+interface RegionContrast {
   /** The luma at 5% of the pixels. */
   readonly dark: number;
   /** The luma at 90% of the pixels. */
@@ -296,7 +296,7 @@ export interface RegionContrast {
  * @param box The region.
  * @returns The contrast.
  */
-export function regionContrast(image: Pixels, box: PixelBox): RegionContrast {
+function regionContrast(image: Pixels, box: PixelBox): RegionContrast {
   const sorted = boxColors(image, box).toSorted(
     (a, b) => luma(a[0], a[1], a[2]) - luma(b[0], b[1], b[2]),
   );
@@ -311,7 +311,7 @@ export function regionContrast(image: Pixels, box: PixelBox): RegionContrast {
 }
 
 /** The tone of the pixels of a mask in a region. */
-export interface RegionTone {
+interface RegionTone {
   /** The number of pixels in the mask. A change of the count shows a change of the pixel set. */
   readonly pixels: number;
   /** The luma at 10%, 50%, and 90% of the pixels, from 0 to 255. */
@@ -343,7 +343,7 @@ function inMask(color: readonly [number, number, number], mask: PixelMask): bool
  * @param colors The colors, from 0 to 255 for each channel.
  * @returns The tone, or `null` with no colors.
  */
-export function toneOf(colors: readonly (readonly [number, number, number])[]): RegionTone | null {
+function toneOf(colors: readonly (readonly [number, number, number])[]): RegionTone | null {
   if (colors.length === 0) {
     return null;
   }
@@ -366,11 +366,7 @@ export function toneOf(colors: readonly (readonly [number, number, number])[]): 
  * @param mask The mask, or `null` for all pixels.
  * @returns The tone, or `null` when no pixel is in the mask.
  */
-export function regionTone(
-  image: Pixels,
-  box: PixelBox,
-  mask: PixelMask | null,
-): RegionTone | null {
+function regionTone(image: Pixels, box: PixelBox, mask: PixelMask | null): RegionTone | null {
   const colors = boxColors(image, box);
   return toneOf(mask ? colors.filter((c) => inMask(c, mask)) : colors);
 }
@@ -390,7 +386,7 @@ export interface LookFrame {
 }
 
 /** A camera of {@link LOOK_CAMERAS}. */
-export type LookCamera = (typeof LOOK_CAMERAS)[number];
+type LookCamera = (typeof LOOK_CAMERAS)[number];
 
 /**
  * Gives the box of a region in a frame.
@@ -407,7 +403,7 @@ function boxIn(region: LookRegion, frame: LookFrame): PixelBox | null {
 }
 
 /** The measures of the regions of {@link LOOK_REGIONS} in one frame, by the name of the region. */
-export interface RegionMeasures {
+interface RegionMeasures {
   /** The median color of each region of the kind `color`. */
   readonly colors: ReadonlyMap<string, readonly [number, number, number]>;
   /** The contrast of each region of the kind `contrast`. */
@@ -423,7 +419,7 @@ export interface RegionMeasures {
  * @param frame The frame.
  * @returns The measures.
  */
-export function measureRegions(frame: LookFrame): RegionMeasures {
+function measureRegions(frame: LookFrame): RegionMeasures {
   const colors = new Map<string, [number, number, number]>();
   const contrasts = new Map<string, RegionContrast>();
   const tones = new Map<string, RegionTone | null>();
@@ -450,10 +446,7 @@ export function measureRegions(frame: LookFrame): RegionMeasures {
  * @param regions The regions of the camera `default`, from {@link lookRegions}.
  * @returns The text.
  */
-export function lookTables(
-  frames: readonly LookFrame[],
-  regions: readonly DefaultRegion[],
-): string {
+function lookTables(frames: readonly LookFrame[], regions: readonly DefaultRegion[]): string {
   const f = (value: number, digits = 0): string => value.toFixed(digits);
   const lines = [
     '## Stage tone',
@@ -594,7 +587,7 @@ export async function lookRegions(): Promise<DefaultRegion[]> {
 }
 
 /** The measure of a region of the camera `default` in one frame. */
-export interface DefaultMeasure {
+interface DefaultMeasure {
   /** The region. */
   readonly region: DefaultRegion;
   /** The tone of the pixels of the region, or `null` with no pixel. */
@@ -654,7 +647,7 @@ function pixelColors(image: Pixels, pixels: Uint32Array): [number, number, numbe
  * @param region The region.
  * @returns The pixels, or `null` when the frame has no such region.
  */
-export function maskedPixels(frame: LookFrame, region: DefaultRegion): Uint32Array | null {
+function maskedPixels(frame: LookFrame, region: DefaultRegion): Uint32Array | null {
   const pixels = regionPixels(frame, region);
   const mask = region.mask;
   if (!pixels || !mask) {
@@ -679,7 +672,7 @@ export function maskedPixels(frame: LookFrame, region: DefaultRegion): Uint32Arr
  *   for the frame itself.
  * @returns The measure of each region that the frame has.
  */
-export function measureDefault(
+function measureDefault(
   frame: LookFrame,
   regions: readonly DefaultRegion[],
   pixelsOf: LookFrame | null,
@@ -703,10 +696,7 @@ export function measureDefault(
  * @param regions The regions of {@link lookRegions}.
  * @returns The lines.
  */
-export function defaultTable(
-  frames: readonly LookFrame[],
-  regions: readonly DefaultRegion[],
-): string[] {
+function defaultTable(frames: readonly LookFrame[], regions: readonly DefaultRegion[]): string[] {
   const f = (value: number, digits = 0): string => value.toFixed(digits);
   const base = frames.find((frame) => frame.label === 'base, default') ?? null;
   const tree = frames.find((frame) => frame.label === 'tree, default') ?? null;
@@ -808,7 +798,7 @@ const REGION_TINTS: readonly (readonly [number, number, number])[] = [
  * @param regions The regions of {@link lookRegions}.
  * @param file The path of the PNG image.
  */
-export async function writeRegionsImage(
+async function writeRegionsImage(
   browser: Parameters<typeof rgbaPixels>[0],
   frame: LookFrame,
   regions: readonly DefaultRegion[],
@@ -856,7 +846,7 @@ export async function writeRegionsImage(
  * @param camera The camera of the frame, or `null` for the reference.
  * @returns The frame.
  */
-export async function readFrame(
+async function readFrame(
   browser: Parameters<typeof rgbaPixels>[0],
   path: string,
   label: string,

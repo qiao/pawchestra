@@ -45,10 +45,10 @@ import { patchedDemo } from './patch-demos.ts';
 export const CHEST = 0.8;
 
 /** The demos of the probe with no `--demo`. */
-export const PROBE_DEMOS = ['beethoven-9', 'brahms-2', 'boulanger-matin'] as const;
+const PROBE_DEMOS = ['beethoven-9', 'brahms-2', 'boulanger-matin'] as const;
 
 /** The light of the stage lights on the front of one player, in lux, with the pool factor. */
-export interface PlayerLight {
+interface PlayerLight {
   /** The row: the distance to the podium center in steps of `ROW_STEP`, rounded. */
   readonly row: number;
   /** The light of the key light. */
@@ -66,7 +66,7 @@ export interface PlayerLight {
 }
 
 /** The options of the light of the probe. */
-export interface ProbeLight {
+interface ProbeLight {
   /** The tier of `createLights()`. */
   readonly tier: QualityTier;
   /** True to multiply each spotlight with a shadow map by the hot spot of the key light. */
@@ -141,7 +141,7 @@ function stageLights(layout: SceneLayout, options: ProbeLight) {
  * @param options The tier and the hot spot.
  * @returns The light of each player, in the order of `layout.players`.
  */
-export function playerLights(layout: SceneLayout, options: ProbeLight): PlayerLight[] {
+function playerLights(layout: SceneLayout, options: ProbeLight): PlayerLight[] {
   const { spots, aim, hot } = stageLights(layout, options);
   const [px, , pz] = layout.podium;
   return layout.players.map((player) => {
@@ -207,7 +207,7 @@ export function floorLight(
 }
 
 /** The players of one row, with the mean light of each kind. */
-export interface RowLight {
+interface RowLight {
   /** The row index. */
   readonly row: number;
   /** The players of the row. */
@@ -224,7 +224,7 @@ export interface RowLight {
  * @param players The light of each player.
  * @returns The rows.
  */
-export function rowLights(players: readonly PlayerLight[]): RowLight[] {
+function rowLights(players: readonly PlayerLight[]): RowLight[] {
   const rows = new Map<number, PlayerLight[]>();
   for (const player of players) {
     rows.set(player.row, [...(rows.get(player.row) ?? []), player]);
@@ -250,7 +250,7 @@ export function rowLights(players: readonly PlayerLight[]): RowLight[] {
 const total = (light: KindLight): number => light.key + light.side + light.back + light.rim;
 
 /** The measures of one demo that decide the back-row lights. */
-export interface DemoMeasures {
+interface DemoMeasures {
   /** The mean light of the first row, in lux. */
   readonly first: number;
   /** The back row: the last row with no choir, as a part of the first row. */
@@ -277,7 +277,7 @@ export interface DemoMeasures {
  * @returns The measures.
  * @throws Error if the layout has no row with no choir.
  */
-export function demoMeasures(rows: readonly RowLight[], floor: KindLight): DemoMeasures {
+function demoMeasures(rows: readonly RowLight[], floor: KindLight): DemoMeasures {
   const seated = rows.filter((r) => !r.choir);
   const [first] = rows;
   const backRow = seated.at(-1);
@@ -335,7 +335,7 @@ export function rowLines(
  * @param measures The measures of each demo.
  * @returns The line.
  */
-export function measuresLine(names: readonly string[], measures: readonly DemoMeasures[]): string {
+function measuresLine(names: readonly string[], measures: readonly DemoMeasures[]): string {
   const pct = (v: number): string => `${(v * 100).toFixed(1)}%`;
   const spill = Math.max(...measures.map((m) => m.spill));
   const floor = Math.max(...measures.map((m) => m.floor));
@@ -377,7 +377,7 @@ const MAX_CELLS = 5000;
  * @returns The path and its values.
  * @throws Error for a text of another form.
  */
-export function gridValues(text: string): [string, LookValue[]] {
+function gridValues(text: string): [string, LookValue[]] {
   const equals = text.indexOf('=');
   const path = text.slice(0, equals);
   const values = text.slice(equals + 1);
@@ -403,7 +403,7 @@ export function gridValues(text: string): [string, LookValue[]] {
  * @returns The command line.
  * @throws Error for an unknown option, a missing value, or a wrong value.
  */
-export function probeArgs(args: readonly string[]): ProbeArgs {
+function probeArgs(args: readonly string[]): ProbeArgs {
   const demos: string[] = [];
   const grid: [string, LookValue[]][] = [];
   let look: LookChanges = new Map();
@@ -470,7 +470,7 @@ export function probeArgs(args: readonly string[]): ProbeArgs {
  * @param grid The values of each path.
  * @returns The cells. With no grid, one empty cell.
  */
-export function gridCells(
+function gridCells(
   grid: readonly (readonly [string, readonly LookValue[]])[],
 ): Map<string, LookValue>[] {
   let cells: Map<string, LookValue>[] = [new Map()];

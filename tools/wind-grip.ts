@@ -259,10 +259,10 @@ function percussion(
 }
 
 /** The largest gap of the skin of a paw to the instrument for a hold, in meters. */
-export const TOUCH = 0.003;
+const TOUCH = 0.003;
 
 /** The largest gap of the finger tips to the instrument for a hold, in meters. */
-export const TIPS = 0.006;
+const TIPS = 0.006;
 
 /** The share of the corners of the paw, farthest from the wrist, that make the finger tips. */
 const TIP_SHARE = 0.15;
@@ -274,7 +274,7 @@ const FAR = 0.3;
 const AXIS_STEP = 0.0025;
 
 /** The measures of one paw in one sample. */
-export interface PawContact {
+interface PawContact {
   /** The gap of the skin of the paw to the instrument, in meters: 0 when they touch. */
   readonly gap: number;
   /** The distance from the middle of the closed paw to the axis of the tube, in meters. */
@@ -306,7 +306,7 @@ export interface PawContact {
 }
 
 /** The measures of a shaft of a mallet, a stick, or a beater in one paw. */
-export interface ShaftContact {
+interface ShaftContact {
   /**
    * The length of the shaft from its butt end to its first point in the closed paw, in meters, or
    * `null` when no point of the shaft is in the paw. A real player has 13 mm to 25 mm of the butt
@@ -346,13 +346,13 @@ export function holds(c: PawContact): boolean {
  * The distance of the middle of a paw from the axis below which the tool skips the palm and the
  * place, in meters: the tube goes through the closed paw.
  */
-export const CENTERED = 0.01;
+const CENTERED = 0.01;
 
 /** The largest angle of the palm from the tube for a grasp, in degrees. */
-export const PALM_LIMIT = 60;
+const PALM_LIMIT = 60;
 
 /** The largest angle of the paw from the side of the tube that the technique names, in degrees. */
-export const PLACE_LIMIT = 60;
+const PLACE_LIMIT = 60;
 
 /**
  * Tells if a paw grasps its tube as a person sees a hand that holds it: its finger tips are on the
@@ -376,7 +376,7 @@ export function grasps(c: PawContact): boolean {
  * The largest angle of a shaft from the thumb side of the paw for a grasp, in degrees
  * ({@link ShaftContact.exit}). A shaft at a larger angle leaves the paw along the fingers.
  */
-export const EXIT_LIMIT = 60;
+const EXIT_LIMIT = 60;
 
 /** The tube of a woodwind in one pose, from the mouthpiece, or the neck of a violin from the nut. */
 interface Tube {
@@ -618,7 +618,7 @@ function placeDirection(
  *   ({@link placeDirection}), or none.
  * @returns The measures.
  */
-export function pawContact(
+function pawContact(
   posed: PosedSkeleton,
   tube: Tube,
   side: Side,

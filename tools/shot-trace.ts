@@ -57,7 +57,7 @@ const CHAMBER_FILES: ReadonlyMap<string, () => TestFile> = new Map([
 const USAGE = `Usage: pnpm shot-trace <demo> [--from <s>] [--to <s>] [--cameras] [--base <ref>] [--json <file>], with a demo of demos/src, with or without .mid, or a chamber test file: ${[...CHAMBER_FILES.keys()].join(', ')}.`;
 
 /** The options of `pnpm shot-trace`. */
-export interface TraceOptions {
+interface TraceOptions {
   /** The demo, with no `.mid`, or a key of {@link CHAMBER_FILES}. */
   readonly demo: string;
   /** The first cut of the range, in song seconds. */
@@ -144,7 +144,7 @@ function timeValue(flag: string, text: string): number {
 }
 
 /** The text of each refusal of a camera, as the tool prints it. */
-export const REFUSAL_TEXTS: Readonly<Record<CameraRefusal, string>> = {
+const REFUSAL_TEXTS: Readonly<Record<CameraRefusal, string>> = {
   axis: 'over the line of the stage',
   look: 'look to the other side',
   jump: 'jump cut',
@@ -161,7 +161,7 @@ export const REFUSAL_TEXTS: Readonly<Record<CameraRefusal, string>> = {
 };
 
 /** The text of each rule of the choice that drops a candidate, as the tool prints it. */
-export const RULE_TEXTS: Readonly<Record<ChoiceRule, string>> = {
+const RULE_TEXTS: Readonly<Record<ChoiceRule, string>> = {
   subject: `rule 1, the subject of the previous shot`,
   group: 'rule 2, the group of the previous shot',
   wideSpacing: `rule 3, fewer than ${planner.SHOT_TIMES.wideSpacing} shots since the last wide or high shot`,
@@ -219,7 +219,7 @@ export function shotRows(shots: readonly Shot[], fromSec: number, toSec: number)
 }
 
 /** The header of the table of {@link shotRows}. */
-export const SHOT_HEADER: readonly string[] = [
+const SHOT_HEADER: readonly string[] = [
   '| Start s | End s | Kind | Seats | From (azimuth, elevation) | To | Blend s |',
   '|---:|---:|---|---|---|---|---:|',
 ];
@@ -352,7 +352,7 @@ export function cutLines(cuts: readonly CutTrace[], cameras: boolean): string[] 
 export const TRACE_FORMAT = 1;
 
 /** The output of one tree, as `--json` writes it. */
-export interface TraceOutput {
+interface TraceOutput {
   /** True when the tree has `traceShots()`. */
   readonly traced: boolean;
   /** The rows of the shots that start in the range ({@link shotRows}). */

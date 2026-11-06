@@ -28,10 +28,10 @@ import {
 import type { DroppedBuffers, FrameCheck, TraceTable } from './gpu-trace.ts';
 
 /** The frame target of design 9.7: main-thread time and GPU time, in milliseconds. */
-export const FRAME_LIMIT_MS = 4;
+const FRAME_LIMIT_MS = 4;
 
 /** The part of the frames that must be within {@link FRAME_LIMIT_MS} (design 9.7). */
-export const FRAME_SHARE = 0.95;
+const FRAME_SHARE = 0.95;
 
 /** The length of one measurement, in seconds (design 9.7). */
 const MEASURE_SEC = 10;
@@ -46,16 +46,16 @@ const WARM_SEC = 3;
 const METAL_SEC = 3;
 
 /** The largest part of the Metal trace with other GPU work for a valid GPU phase (design 9.7). */
-export const OTHER_GPU_LIMIT = 0.1;
+const OTHER_GPU_LIMIT = 0.1;
 
 /** The least part of the GPU state time in the state "Maximum" for a valid GPU phase. */
-export const MIN_MAXIMUM_SHARE = 0.9;
+const MIN_MAXIMUM_SHARE = 0.9;
 
 /**
  * The least part of the span of the GPU intervals that the rows of the state "Maximum" cover for
  * a valid GPU phase (design 9.7). Kept traces give 73.6% to 95.9%.
  */
-export const MIN_MAXIMUM_COVER = 0.6;
+const MIN_MAXIMUM_COVER = 0.6;
 
 /**
  * The song time of the seek before the Chrome trace, in seconds. The trace of 10 s then covers
@@ -86,7 +86,7 @@ const TRACE_CATEGORIES = [
 ];
 
 /** The statistics of the time of the frames, in milliseconds. */
-export interface FrameStats {
+interface FrameStats {
   readonly count: number;
   readonly p50: number;
   readonly p95: number;
@@ -116,7 +116,7 @@ export function frameStats(times: readonly number[]): FrameStats {
 }
 
 /** One complete event of a Chrome trace (phase `X`). Times are in microseconds. */
-export interface TraceSlice {
+interface TraceSlice {
   readonly ts: number;
   readonly dur: number;
 }
@@ -163,7 +163,7 @@ interface TraceEvent {
 }
 
 /** The frame values of a trace, in milliseconds for each frame. */
-export interface TraceFrames {
+interface TraceFrames {
   /** The duration of the callback of `requestAnimationFrame` (`FireAnimationFrame`). */
   readonly callback: readonly number[];
   /** The sum of the top-level tasks of the main thread of the page. */
@@ -335,7 +335,7 @@ async function probeFor(page: Page, seconds: number): Promise<ProbeValues> {
 }
 
 /** One row of the frame table: a measure and the time of each of its frames. */
-export interface FrameRow {
+interface FrameRow {
   /** What the row measures. */
   readonly name: string;
   /** The time of each frame, in milliseconds. */
@@ -411,7 +411,7 @@ const VALUE_FLAGS = new Set(['demo', 'scale', 'max-cpu', 'wait', 'keep']);
 const SWITCH_FLAGS = new Set(['headed', 'free', 'no-metal', 'gpu-only']);
 
 /** The options of the frame measure (the flags of `pnpm frame`). */
-export interface FrameOptions {
+interface FrameOptions {
   /** The demo id, or `perf-60`, the file of the frame target. */
   readonly demo: string;
   /** The device pixels for each CSS pixel. */
@@ -1234,7 +1234,7 @@ export function checkLines(
 }
 
 /** The 1-minute load average at the start of each phase and at the end of a run. */
-export interface RunLoads {
+interface RunLoads {
   /** At the start of the main-thread phase, or `null` with `--gpu-only`. */
   readonly mainThread: number | null;
   /** At the start of the first record of the GPU phase. */
@@ -1244,7 +1244,7 @@ export interface RunLoads {
 }
 
 /** The record of a kept run: `run.json` beside the traces of `--keep` (design 9.7). */
-export interface RunRecord {
+interface RunRecord {
   /** The commit of the working tree. */
   readonly commit: string;
   /** True if the working tree had changes. */

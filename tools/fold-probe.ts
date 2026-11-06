@@ -382,7 +382,7 @@ export interface FaceWorst {
 }
 
 /** One corner of a face in a posed sample ({@link cornerSamples}). */
-export interface CornerSample {
+interface CornerSample {
   /** The index of the vertex in the mesh. */
   readonly vertex: number;
   /** The place of the vertex in the bind pose, in meters. */
@@ -639,7 +639,7 @@ function skinVertex(
 }
 
 /** The bone whose turn changes the normal of a face most, with the change. */
-export interface FaceTurn {
+interface FaceTurn {
   /** The name of the studio bone, or empty when no bone of the face has a parent. */
   readonly bone: string;
   /** The change of the normal, in degrees. */
@@ -705,7 +705,7 @@ export function turnBone(
  * @param face The index of the triangle.
  * @returns The corners, in the order of the corners of the face.
  */
-export function cornerSamples(
+function cornerSamples(
   mesh: Pick<StudioMesh, 'positions' | 'corners' | 'correctives'>,
   correctiveWeights: ArrayLike<number>,
   posed: ArrayLike<number>,
@@ -849,7 +849,7 @@ function countPose(
 }
 
 /** One studio body of a role in a scene. */
-export interface RoleBody {
+interface RoleBody {
   /** The index of the player in the layout, or `null` for the conductor. */
   readonly index: number | null;
   /** The player model, with its studio rig. */
@@ -1003,7 +1003,7 @@ export function foldLines(name: string, report: FoldReport, step: number): strin
 }
 
 /** One bone of a corner of a face, with its weight. */
-export interface CornerWeight {
+interface CornerWeight {
   /** The name of the studio bone. */
   readonly bone: string;
   /** The weight, from 0 to 1. */
@@ -1011,7 +1011,7 @@ export interface CornerWeight {
 }
 
 /** The facts of one face of a studio mesh in the bind pose. */
-export interface FaceFacts {
+interface FaceFacts {
   /** The index of the triangle in the mesh. */
   readonly face: number;
   /** The main studio bone of the face ({@link mainBone}). */
@@ -1114,7 +1114,7 @@ export function worstText(worst: FaceWorst | null): string {
  * @returns True when each set with samples has the face folded in all its samples. A report with
  *   no samples gives false.
  */
-export function foldsInAll(report: FoldReport, face: number): boolean {
+function foldsInAll(report: FoldReport, face: number): boolean {
   const counts = SAMPLE_SETS.map((set) => report.sets[set]).filter((count) => count.samples > 0);
   return (
     counts.length > 0 && counts.every((count) => (count.byFace.get(face) ?? 0) === count.samples)
@@ -1131,7 +1131,7 @@ export function foldsInAll(report: FoldReport, face: number): boolean {
  * @param faces The indices of the faces.
  * @returns The lines, or none when no face has a worst fold.
  */
-export function cornerLines(report: FoldReport, faces: readonly number[]): string[] {
+function cornerLines(report: FoldReport, faces: readonly number[]): string[] {
   const mesh = report.mesh;
   if (!mesh) {
     return [];
@@ -1262,7 +1262,7 @@ function parseMiddles(text: string): (Vec3 | null)[] | null {
 }
 
 /** The source middles of the faces of a module, or the reason why the tool has none. */
-export interface SourceMiddles {
+interface SourceMiddles {
   /** The middle of each face, or `null` for a face with no source face, or `null` for none. */
   readonly middles: readonly (Vec3 | null)[] | null;
   /** The reason why the tool has no middles, or `null`. */
@@ -1280,7 +1280,7 @@ export interface SourceMiddles {
  * @param faces The number of faces of the module, which the rig must have.
  * @returns The middle of each face, or the reason why the tool has none.
  */
-export async function sourceMiddles(animal: string, faces: number): Promise<SourceMiddles> {
+async function sourceMiddles(animal: string, faces: number): Promise<SourceMiddles> {
   const config = rigConfigPath(animal);
   if (!existsSync(config) || !existsSync(RIG_SCRIPT)) {
     return {
@@ -1325,7 +1325,7 @@ export async function sourceMiddles(animal: string, faces: number): Promise<Sour
 }
 
 /** The width of an angle bin of the turn probe of `--turns`, in degrees. */
-export const TURN_BIN = 10;
+const TURN_BIN = 10;
 
 /**
  * Gives the side of the body of a face: the side of its middle in the bind pose. The animal faces
@@ -1412,7 +1412,7 @@ export interface TurnSample {
 }
 
 /** The samples of one bin of the angle from the mean turn. */
-export interface TurnBin {
+interface TurnBin {
   /** The smallest angle of the bin, in degrees. */
   readonly from: number;
   /** The samples in the bin. */
@@ -1501,7 +1501,7 @@ export function turnLines(
 }
 
 /** The turn probe of a face: a visit of {@link probeFolds} and the lines of its result. */
-export interface TurnProbe {
+interface TurnProbe {
   /** Keeps the turn of the upper arm and the fold of the face in each sample. */
   readonly visit: FoldVisit;
   /**
@@ -1549,13 +1549,13 @@ export function turnProbe(face: number): TurnProbe {
 }
 
 /** The width of a bin of the bin probe (`--bins`), in degrees. */
-export const BONE_BIN = 20;
+const BONE_BIN = 20;
 
 /** The turn of no turn: the bind pose. */
 const NO_TURN: Quat = [0, 0, 0, 1];
 
 /** The bins of one bone of the bin probe of a face. */
-export interface BoneBins {
+interface BoneBins {
   /** The bone, such as `forearm_R`. */
   readonly bone: string;
   /** The mean turn of the bone from its bind pose in the samples with a fold, in degrees. */
@@ -1576,7 +1576,7 @@ export interface BoneBins {
  *   sample.
  * @returns The bins of each bone.
  */
-export function boneBins(
+function boneBins(
   bones: readonly string[],
   samples: readonly { readonly turns: readonly Quat[]; readonly folded: boolean }[],
 ): BoneBins[] {
@@ -1608,7 +1608,7 @@ export function boneBins(
  * @param samples The number of samples, and the samples with a fold.
  * @returns The lines.
  */
-export function binLines(
+function binLines(
   face: number,
   side: Side,
   bins: readonly BoneBins[],
@@ -1641,7 +1641,7 @@ export function binLines(
  * @param face The index of the face.
  * @returns The visit, and a function that writes the lines of the probe ({@link binLines}).
  */
-export function binProbe(face: number): TurnProbe {
+function binProbe(face: number): TurnProbe {
   const samples: { readonly turns: Quat[]; readonly folded: boolean }[] = [];
   let side: Side | null = null;
   let faces = 0;
@@ -1677,7 +1677,7 @@ export function binProbe(face: number): TurnProbe {
 }
 
 /** The samples, the samples with a fold, and the most folded faces of one sample set. */
-export interface SetCount {
+interface SetCount {
   /** The number of posed bodies. */
   readonly samples: number;
   /** The number of posed bodies with one folded face or more. */
@@ -1735,7 +1735,7 @@ export const FOLD_FORMAT = 3;
  * {@link FOLD_FORMAT}. A change that only adds fields keeps it, and a change of a field sets it to
  * the new version.
  */
-export const FOLD_SINCE = 2;
+const FOLD_SINCE = 2;
 
 /**
  * Gives the fields of a worst fold that the JSON text of `--json` holds: the sample, the angle,
@@ -1963,7 +1963,7 @@ export function faceCompareLines(
 }
 
 /** A face of `--faces-of` of the commit with its pair in the working tree ({@link pairBaseFaces}). */
-export interface BaseFacePair {
+interface BaseFacePair {
   /** The index of the face in the mesh of the commit. */
   readonly face: number;
   /** The folds of the face on the commit, or `null` when it folds in no sample. */
@@ -1992,11 +1992,7 @@ export interface BaseFacePair {
  * @returns The pair of each face, in the order of the faces.
  * @throws Error if the meshes have other corners and the commit gives no middle of a face.
  */
-export function pairBaseFaces(
-  base: FaceJson,
-  tree: FaceJson,
-  faces: readonly number[],
-): BaseFacePair[] {
+function pairBaseFaces(base: FaceJson, tree: FaceJson, faces: readonly number[]): BaseFacePair[] {
   const baseFaces = new Map(base.faces.map((record) => [record.face, record]));
   const treeFaces = new Map(tree.faces.map((record) => [record.face, record]));
   if (base.topology === tree.topology) {
@@ -2051,7 +2047,7 @@ export function pairBaseFaces(
  * @param pairs The pairs.
  * @returns The lines.
  */
-export function baseFaceLines(
+function baseFaceLines(
   label: string,
   base: FaceJson,
   tree: FaceJson,

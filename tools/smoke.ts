@@ -60,7 +60,7 @@ export interface SmokeSample extends PlaySample {
 }
 
 /** The camera checks of one run (design 2.5, 5.6). */
-export interface CameraChecks {
+interface CameraChecks {
   /** The mode of the camera at the page load. */
   readonly modeAtLoad: string;
   /** The mode at the page load with reduced motion. */
@@ -79,7 +79,7 @@ export interface CameraChecks {
  * The values of one play of the default demo. The Playwright test on the built site
  * (`e2e/smoke.e2e.ts`) collects only these values.
  */
-export interface PlayRun {
+interface PlayRun {
   /** The samples during play, in order. */
   readonly samples: readonly PlaySample[];
   /** True if a screenshot of the page changes when the canvas is hidden. */

@@ -231,7 +231,7 @@ interface CpuProfile {
  * @param count The number of lines.
  * @returns One line for each function, the most time first.
  */
-export function profileTop(profile: CpuProfile, count: number): string[] {
+function profileTop(profile: CpuProfile, count: number): string[] {
   const parent = new Map<number, number>();
   const byId = new Map<number, ProfileNode>();
   for (const node of profile.nodes) {

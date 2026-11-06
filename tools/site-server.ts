@@ -68,7 +68,7 @@ const LINK_TURN_BYTES = 4096;
 const BROTLI_QUALITY = 3;
 
 /** The host whose answers the server copies. */
-export type SiteHost = 'pages' | 'vercel';
+type SiteHost = 'pages' | 'vercel';
 
 /** The `Cache-Control` header of each file of GitHub Pages. */
 const PAGES_CACHE = 'max-age=600';
@@ -159,7 +159,7 @@ interface SiteFile {
  * itself, so that the fetches of the Workers also get it: each body gets a turn of
  * {@link LINK_TURN_BYTES} bytes, so that each body keeps the order of its own bytes.
  */
-export class SiteServer {
+class SiteServer {
   /** The folder of the site. */
   readonly #root: string;
   /** The host whose answers the server copies. */
@@ -482,7 +482,7 @@ export interface RunningSite {
 }
 
 /** The options of a site server. */
-export interface SiteOptions {
+interface SiteOptions {
   /** The folder of the site, such as `dist/`. */
   readonly root: string;
   /** The host whose answers the server copies. */

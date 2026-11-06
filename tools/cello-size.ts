@@ -41,27 +41,27 @@ import { loadTestBodies } from '../src/models/studio-body.ts';
  * length of a 1/10 cello, 19.5 in, over the back length of a 4/4 cello, 30 in
  * (`docs/reference/string-technique.md`, section 2.7).
  */
-export const REAL_CELLOS = { smallest: 19.5 / 30, largest: 1 } as const;
+const REAL_CELLOS = { smallest: 19.5 / 30, largest: 1 } as const;
 
 /**
  * The largest angle of the left elbow at the first position, between the upper arm and the
  * forearm, in radians: the angle of the dog at its accepted cello of 0.86 in the shared hold.
  */
-export const CELLO_ELBOW = 65 * MathUtils.DEG2RAD;
+const CELLO_ELBOW = 65 * MathUtils.DEG2RAD;
 
 /**
  * The place of the first position on the target `fingerboard`, from 0 at the nut to 1 at its end:
  * the first finger a whole tone above the open string (`docs/reference/string-technique.md`,
  * section 1.2), 1 − 2^(−2/12) of the string, over the fingerboard of 0.6875 of the string.
  */
-export const FIRST_POSITION =
+const FIRST_POSITION =
   (1 - 2 ** (-2 / 12)) / ((VIOLIN.nut - VIOLIN.fingerboardEnd) / (VIOLIN.nut - VIOLIN.bridge));
 
 /** The source of the size of the rule: the limit that sets it, or the clamp. */
-export type CelloSizeSource = 'reach' | 'chest' | 'knees' | 'smallest' | 'largest';
+type CelloSizeSource = 'reach' | 'chest' | 'knees' | 'smallest' | 'largest';
 
 /** The size of a cello for a body. */
-export interface CelloRule {
+interface CelloRule {
   /** The scale, as a factor of the cello of the app, clamped to {@link REAL_CELLOS}. */
   readonly scale: number;
   /** The limit or the clamp that sets the scale. */
@@ -107,7 +107,7 @@ function cellistAt(species: SpeciesId, scale: number): PlayerModel {
  * @param model The cellist.
  * @returns The angle, in radians.
  */
-export function firstPositionElbow(model: PlayerModel): number {
+function firstPositionElbow(model: PlayerModel): number {
   const rig = bowedRig(model, 'cello', BOWED_HOLDS.cello);
   const frames = playingFrames(rig);
   const { place, strings } = createBowPlaces();

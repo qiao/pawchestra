@@ -48,7 +48,7 @@ import type { PaletteMap } from './studio-palette.ts';
 const ROOT = join(import.meta.dirname, '..');
 
 /** The folder of the modules of the studio bodies (design 4.4). */
-export const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');
+const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');
 
 /**
  * The settings of one animal of the studio that the app shows. A hand rig holds the facts of its
@@ -195,7 +195,7 @@ export interface AnimalSettings {
  * of `tools/blender/export_rig.py`, design 4.4, "Hand rig"). The other settings, such as the
  * constant, the GLB file, and the role, stay in `ANIMALS`.
  */
-export const BODY_FACTS = [
+const BODY_FACTS = [
   'height',
   'crease',
   'colorBlend',
@@ -208,7 +208,7 @@ export const BODY_FACTS = [
 ] as const satisfies readonly (keyof AnimalSettings)[];
 
 /** A setting of an animal that is a fact of its body ({@link BODY_FACTS}). */
-export type BodyFact = (typeof BODY_FACTS)[number];
+type BodyFact = (typeof BODY_FACTS)[number];
 
 /** A setting of the rules of the pea eyes of a body of `pnpm rig-mesh` ({@link EYE_RULES}). */
 type EyeRule = (typeof EYE_RULES)[number];
@@ -600,7 +600,7 @@ const EYE_SIDE = 0.02;
  * 0.33 m. The front of the muzzle of the hippo, a nostril, lies 2.8 cm from the plane, and it
  * stays the tip.
  */
-export const NOSE_PLANE = 0.03;
+const NOSE_PLANE = 0.03;
 
 /**
  * The distance of the tip of the nose and of the mouth below it from the middle plane, in meters,
@@ -635,7 +635,7 @@ const SIT_CLIP = 'sit';
  * for the second shape of the right arm. These shapes follow {@link CORRECTIVE_NAMES} in the packed
  * mesh.
  */
-export const RAISE_NAMES = { L: 'arm_raise_L', R: 'arm_raise_R' } as const;
+const RAISE_NAMES = { L: 'arm_raise_L', R: 'arm_raise_R' } as const;
 
 /** The form of the name of the morph target of a shape of a raised arm or of a bent wrist. */
 const RAISE_TARGET = /^arm_raise_[LR]\d*$/;
@@ -857,7 +857,7 @@ interface Gltf {
  * A pea eye of a hand rig in the extras of its GLB file (design 4.4, "Hand rig"): the eye object of
  * its `.blend` in the bind pose, in the axes and the units of the studio.
  */
-export interface EyeExtras {
+interface EyeExtras {
   /** The middle of the eye: the head of its eye bone. */
   readonly middle?: readonly number[];
   /** The unit direction in which the eye faces: the thin axis of the oval. */
@@ -867,7 +867,7 @@ export interface EyeExtras {
 }
 
 /** A pea eye of a hand rig ({@link eyesOf}), in the bind pose, in the axes and the units of the studio. */
-export interface FileEye {
+interface FileEye {
   /** The middle of the eye. */
   readonly middle: Vector3;
   /** The unit direction in which the eye faces. */
@@ -895,7 +895,7 @@ const EYE_REACH = 0.3;
  * The pose of a corrective shape of a raised arm or of a bent wrist in the extras of a GLB file of
  * `pnpm rig-mesh` (`raise` of its config), in the axes of the studio.
  */
-export interface RaiseExtras {
+interface RaiseExtras {
   /** The side of the arm: `L` or `R`. */
   readonly side?: string;
   /**
@@ -926,7 +926,7 @@ export interface RaiseExtras {
  * `sitPose.chair` of a sit pose), in the axes and the units of the studio. The file holds no prop,
  * so that it holds only the animal (design 4.4).
  */
-export interface SeatExtras {
+interface SeatExtras {
   /** The seat of the app that takes its place: `chair`, or `bench` for the piano bench. */
   readonly prop: string;
   /** The height of the seat top: the lowest point of the body over the seat. */
@@ -954,7 +954,7 @@ export interface Glb {
  * @returns The indices of the triangles of the primitive `fur`, or none for a file with no list.
  * @throws Error if an index is not a whole number of at least 0.
  */
-export function cutFacesOf(glb: Glb, key: 'caps' | 'rim'): ReadonlySet<number> {
+function cutFacesOf(glb: Glb, key: 'caps' | 'rim'): ReadonlySet<number> {
   const faces = glb.json.asset?.extras?.[key] ?? [];
   if (faces.some((t) => !Number.isInteger(t) || t < 0)) {
     throw new Error(`The ${key} ${JSON.stringify(faces)} of the file are not triangle indices.`);
@@ -970,7 +970,7 @@ export function cutFacesOf(glb: Glb, key: 'caps' | 'rim'): ReadonlySet<number> {
  * @returns The share, or `null` for a file with no twist bone of the upper arm.
  * @throws Error if the share is not a number from 0 to 1.
  */
-export function upperTwistOf(glb: Glb): number | null {
+function upperTwistOf(glb: Glb): number | null {
   const share = glb.json.asset?.extras?.upperTwist;
   if (share === undefined) {
     return null;
@@ -989,7 +989,7 @@ export function upperTwistOf(glb: Glb): number | null {
  * @returns The axis of each side, or `null` for a file with bent bind arms.
  * @throws Error if an axis is not a unit vector of three numbers.
  */
-export function hingesOf(glb: Glb): Record<Side, Vector3> | null {
+function hingesOf(glb: Glb): Record<Side, Vector3> | null {
   const hinges = glb.json.asset?.extras?.hinges;
   if (hinges === undefined) {
     return null;
@@ -1113,7 +1113,7 @@ export function settingsOf(glb: Glb, entry: AnimalEntry): AnimalSettings {
  * @returns The factor, or 1 when the file has none.
  * @throws Error if the factor is not a positive number.
  */
-export function headFactorOf(glb: Glb): number {
+function headFactorOf(glb: Glb): number {
   const factor = glb.json.asset?.extras?.headFactor ?? 1;
   if (!Number.isFinite(factor) || factor <= 0) {
     throw new Error(`The head factor ${factor} of the file is not a positive number.`);
@@ -1128,7 +1128,7 @@ export function headFactorOf(glb: Glb): number {
  * @returns The factor, or 1 when the file has none.
  * @throws Error if the factor is not a positive number.
  */
-export function neckFactorOf(glb: Glb): number {
+function neckFactorOf(glb: Glb): number {
   const factor = glb.json.asset?.extras?.neckFactor ?? 1;
   if (!Number.isFinite(factor) || factor <= 0) {
     throw new Error(`The neck factor ${factor} of the file is not a positive number.`);
@@ -1146,7 +1146,7 @@ export function neckFactorOf(glb: Glb): number {
  * @returns The move, in the units and the axes of the studio, or no move when the file has none.
  * @throws Error if the move is not three finite numbers.
  */
-export function headShiftOf(glb: Glb): Vector3 {
+function headShiftOf(glb: Glb): Vector3 {
   const shift = glb.json.asset?.extras?.headShift ?? [0, 0, 0];
   if (!Array.isArray(shift) || shift.length !== 3 || !shift.every((x) => Number.isFinite(x))) {
     throw new Error(`The head shift ${JSON.stringify(shift)} of the file is not three numbers.`);
@@ -1155,7 +1155,7 @@ export function headShiftOf(glb: Glb): Vector3 {
 }
 
 /** A corrective shape of a raised arm or of a bent wrist of a GLB file. */
-export interface FileRaise {
+interface FileRaise {
   /** The pose of the shape in the model axes. */
   readonly pose: StudioRaise;
   /** The morph target of the shape. */
@@ -1243,7 +1243,7 @@ export function raisesOf(glb: Glb): FileRaise[] {
  * factor less 1 times its place along the neck, and a point beyond the head joint by the whole
  * drop of the neck.
  */
-export interface HeadRig {
+interface HeadRig {
   /** The neck joint. */
   readonly neck: Vector3;
   /** The unit direction of the neck, from the neck joint to the head joint. */
@@ -1924,7 +1924,7 @@ const FILL_LEAST_RING = 10;
  * @returns The number of the moved vertices and the largest move, in the units of the studio.
  * @throws Error if fewer than {@link FILL_LEAST_RING} vertices lie in the ring.
  */
-export function fillEye(mesh: SourceMesh, middle: Vector3, inner: number, outer: number): EyeFill {
+function fillEye(mesh: SourceMesh, middle: Vector3, inner: number, outer: number): EyeFill {
   const onHead = (v: SourceVertex | undefined): v is SourceVertex =>
     v?.material === 'fur' && (v.skin.find(([bone]) => bone === 'head')?.[1] ?? 0) > 0.5;
   const used = new Set<number>();
@@ -3167,7 +3167,7 @@ function baseTriangles(
 }
 
 /** A box in the axes and the units of the studio. */
-export interface UnitBox {
+interface UnitBox {
   /** The lowest corner. */
   readonly min: Vec3;
   /** The highest corner. */
@@ -3175,7 +3175,7 @@ export interface UnitBox {
 }
 
 /** One node of the scene of a GLB file, in the order of a walk from the roots down. */
-export interface InspectedNode {
+interface InspectedNode {
   /** The name of the node. */
   readonly name: string;
   /** The number of parents of the node. */
@@ -3191,7 +3191,7 @@ export interface InspectedNode {
 }
 
 /** The joints of the skin of a GLB file, by what the export does with them. */
-export interface InspectedJoints {
+interface InspectedJoints {
   /** All joints, in the order of the skin. */
   readonly all: readonly string[];
   /** The digits of each paw, which become the one `fingers` bone of their side. */
@@ -3205,7 +3205,7 @@ export interface InspectedJoints {
 }
 
 /** One animation clip of a GLB file. */
-export interface InspectedClip {
+interface InspectedClip {
   /** The name of the clip. */
   readonly name: string;
   /** The time of the last key, in seconds. */
@@ -3217,7 +3217,7 @@ export interface InspectedClip {
 }
 
 /** One prop: a scene node with a mesh and no skin. */
-export interface InspectedProp {
+interface InspectedProp {
   /** The name of the node. */
   readonly name: string;
   /** The box of the mesh of the node. */
@@ -3225,7 +3225,7 @@ export interface InspectedProp {
 }
 
 /** One morph target of the skinned mesh. */
-export interface InspectedTarget {
+interface InspectedTarget {
   /** The name of the target, such as `arm_down_L`. */
   readonly name: string;
   /** True when the export keeps the target as a corrective shape. */
@@ -3236,7 +3236,7 @@ export interface InspectedTarget {
  * The facts of a GLB file of the studio that a new studio body needs (design 4.4). The values
  * are in the axes and the units of the studio. The animal faces +z with its left side at +x.
  */
-export interface StudioInspection {
+interface StudioInspection {
   /** The meters for each unit of the studio. */
   readonly scale: number;
   /** The source of the scale: the settings of `ANIMALS`, or the assumed settings. */
@@ -3513,7 +3513,7 @@ export function inspectStudioGlb(bytes: Uint8Array, entry: AnimalEntry | null): 
  * @param facts The facts.
  * @returns The lines.
  */
-export function inspectionLines(facts: StudioInspection): string[] {
+function inspectionLines(facts: StudioInspection): string[] {
   const units = (value: number): string =>
     `${value.toFixed(3)} u (${(value * facts.scale).toFixed(3)} m)`;
   const list = (names: readonly string[]): string => (names.length > 0 ? names.join(' ') : 'none');

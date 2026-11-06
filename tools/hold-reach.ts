@@ -52,10 +52,10 @@ export type ChinInstrument = 'violin' | 'viola';
 export type ReachInstrument = ChinInstrument | WindInstrument | PercussionInstrument;
 
 /** The instruments under the chin. */
-export const CHIN_INSTRUMENTS = ['violin', 'viola'] as const satisfies readonly ChinInstrument[];
+const CHIN_INSTRUMENTS = ['violin', 'viola'] as const satisfies readonly ChinInstrument[];
 
 /** The wind instruments, in the order of `WIND_HOLDS`. */
-export const WIND_INSTRUMENTS: readonly WindInstrument[] = Object.keys(WIND_HOLDS).filter(
+const WIND_INSTRUMENTS: readonly WindInstrument[] = Object.keys(WIND_HOLDS).filter(
   (id): id is WindInstrument => Object.hasOwn(WIND_HOLDS, id),
 );
 
@@ -77,7 +77,7 @@ export function isWind(instrument: ReachInstrument): instrument is WindInstrumen
 }
 
 /** A support of the player that `pnpm hold-reach` takes. */
-export type ReachSupport = 'chair' | 'stand';
+type ReachSupport = 'chair' | 'stand';
 
 /**
  * The total lengths of the smallest and the largest violin of the size chart of a violin teacher,
@@ -302,7 +302,7 @@ export function armFactorFor(reach: number, arm: number, paw: number): number {
 }
 
 /** The reach that one size of the violin needs in the hold of a species. */
-export interface SizeReach {
+interface SizeReach {
   /** The scale of the violin, as a factor of the violin of the app (`violinScale`). */
   readonly scale: number;
   /** The length of the violin from the tail end to the scroll, in meters. */
@@ -328,7 +328,7 @@ export interface SizeReach {
 }
 
 /** The arm of a mesh rig, in the meters of the app. */
-export interface RigArm {
+interface RigArm {
   /** The config file, relative to the repository. */
   readonly file: string;
   /** The arm factor of the config. */
@@ -423,7 +423,7 @@ export function sizeReach(
  * @param scales The scales of the violin (`violinScale`).
  * @returns The lines.
  */
-export function sizeReachLines(
+function sizeReachLines(
   species: SpeciesId,
   support: ReachSupport,
   scales: readonly number[],
@@ -447,7 +447,7 @@ export function sizeReachLines(
 }
 
 /** The arguments of `pnpm hold-reach` with the option `--size` taken out. */
-export interface SizeArgs {
+interface SizeArgs {
   /** The scales of `--size`, or none with no option. */
   readonly sizes: readonly number[];
   /** The other arguments, in their order. */
@@ -481,7 +481,7 @@ export function takeSizes(args: readonly string[]): SizeArgs {
 }
 
 /** The size of the instrument by the rule of a violin shop. */
-export interface RuleSize {
+interface RuleSize {
   /** The scale, as a factor of the instrument of the app (`violinScale` for a violin). */
   readonly scale: number;
   /** The length from the tail end to the scroll, in meters. */
@@ -503,7 +503,7 @@ export function ruleSize(reach: HoldReach): RuleSize | null {
 }
 
 /** The reach of one arm to its grip on a wind instrument, in meters. */
-export interface GripReach {
+interface GripReach {
   /** The arm from the shoulder joint over the elbow and the wrist to the middle of the palm. */
   readonly arm: number;
   /** The distance from the shoulder joint to the grip of the palm in the playing pose. */
@@ -544,7 +544,7 @@ export function windReach(
 }
 
 /** The reach of an arm to the rest place of a paw that leaves its grip in the rest pose. */
-export interface FreeRestReach {
+interface FreeRestReach {
   /** The side of the paw. */
   readonly side: 'L' | 'R';
   /**
@@ -612,7 +612,7 @@ export function reachShare(reach: FreeRestReach): number | null {
 }
 
 /** The slide of a trombone player: its full travel and the part that the right arm reaches. */
-export interface SlideReach {
+interface SlideReach {
   /** The travel of the slide from the first to the seventh position, in meters. */
   readonly travel: number;
   /**
@@ -713,7 +713,7 @@ function freeRestLine(reach: FreeRestReach): string {
 }
 
 /** The texts of the reached parts of a reach. */
-export interface RangeTexts {
+interface RangeTexts {
   /** The reached part of the fingerboard. */
   readonly stop: string;
   /** The reached part of the bow hair. */
@@ -798,7 +798,7 @@ export function holdReachLines(
 }
 
 /** The options of `pnpm hold-reach <species>`. */
-export interface ReachOptions {
+interface ReachOptions {
   /** The instrument under the chin, or a wind instrument. */
   readonly instrument: ReachInstrument;
   /** The support of the player. */
@@ -865,7 +865,7 @@ export interface GripSpare {
 }
 
 /** The spare reach of each grip of a wind hold in one variant, in meters. */
-export interface SpareRow {
+interface SpareRow {
   /** The text of the changes, or empty for the base. */
   readonly variant: string;
   /**
@@ -909,7 +909,7 @@ export function spareRow(
  * @param rows The rows, the base first.
  * @returns The lines.
  */
-export function spareTable(rows: readonly SpareRow[]): string[] {
+function spareTable(rows: readonly SpareRow[]): string[] {
   const cm = (value: number | null): string => {
     if (value === null) {
       return 'free';

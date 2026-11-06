@@ -84,7 +84,7 @@ export interface PlayerForm {
 }
 
 /** The stage side of one demo. */
-export interface DemoStage {
+interface DemoStage {
   /** The file of the demo, such as `mozart-k525.mid`. */
   readonly demo: string;
   /** The side of the square stage of the layout, in meters. */

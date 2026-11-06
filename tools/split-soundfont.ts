@@ -20,7 +20,7 @@ export const SOUNDFONT_PATH = join(
 );
 
 /** The fields of a preset that select its output file. */
-export type PresetPatch = Pick<BasicPreset, 'bankMSB' | 'program' | 'isGMGSDrum' | 'isDrum'>;
+type PresetPatch = Pick<BasicPreset, 'bankMSB' | 'program' | 'isGMGSDrum' | 'isDrum'>;
 
 /**
  * Finds the output file of a preset.
@@ -61,7 +61,7 @@ export function presetFilePath(target: ScorePreset): string {
  * @param data The bytes of the file.
  * @returns The path.
  */
-export function hashedPresetFilePath(target: ScorePreset, data: ArrayBuffer): string {
+function hashedPresetFilePath(target: ScorePreset, data: ArrayBuffer): string {
   const hash = createHash('sha256').update(new Uint8Array(data)).digest('hex').slice(0, 10);
   return presetFilePath(target).replace(/\.sf3$/u, `.${hash}.sf3`);
 }

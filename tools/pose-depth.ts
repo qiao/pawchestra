@@ -128,7 +128,7 @@ export interface WhereRequest {
  * The most `--set` rows of a run over all demos of its role: a run with more rows needs `--demo`
  * or `--long`. A sweep of the hornist with 4 rows over its 10 demos runs for more than 20 minutes.
  */
-export const ROW_LIMIT = 5;
+const ROW_LIMIT = 5;
 
 /** The text of the usage. */
 const USAGE = `Usage: pnpm pose-depth <${Object.keys(SWEEP_ROLES).join(' | ')} | <role>@<species>> [--demo <id>]... [--midi <path>]... [--soloist <species>] [--set <path>=<value>[;<path>=<value>]...]... [--bones <list>] [--into <list>] [--times <list>] [--gaps] [--targets] [--goal <cm>] [--per-bone] [--every <n>] [--base <ref>] [--json <file>] [--long] [--glb <file>], or pnpm pose-depth <role> --where <bone> <demo>:<time> [--set <changes>]`;
@@ -404,7 +404,7 @@ export interface TargetReach {
 export const NO_TARGETS: TargetReach = { samples: 0, within: 0, worst: 0 };
 
 /** The note targets of one player: the largest error of each hand, and the reach of all. */
-export interface TargetMeasure {
+interface TargetMeasure {
   /** The largest error of each hand. */
   readonly worst: readonly TargetError[];
   /** The reach of all targets. */
@@ -419,7 +419,7 @@ export interface TargetMeasure {
  * @param player The player.
  * @returns The largest error of each hand, and the reach of all targets.
  */
-export function measureTargets(player: SweepPlayer): TargetMeasure {
+function measureTargets(player: SweepPlayer): TargetMeasure {
   const worst = new Map<'L' | 'R', TargetError>();
   let samples = 0;
   let within = 0;
@@ -459,7 +459,7 @@ export function joinReach(results: readonly DemoResult[]): TargetReach {
  * @param reach The reach.
  * @returns The text, such as `98.2% of 1220 within 5 mm, worst 7.10 mm`, or `-` with no target.
  */
-export function reachText(reach: TargetReach): string {
+function reachText(reach: TargetReach): string {
   if (reach.samples === 0) {
     return '-';
   }
@@ -468,7 +468,7 @@ export function reachText(reach: TargetReach): string {
 }
 
 /** The deepest point and the smallest gap of each pair in one set of samples. */
-export interface SetResult {
+interface SetResult {
   /** The name of the set, such as `play`. */
   readonly name: string;
   /** The deepest point of each pair of a moving part and an obstacle, with its phase. */
@@ -501,7 +501,7 @@ export interface PairPhase {
 }
 
 /** A deepest point of a pair, with the phase of its sample, or none for no point in an obstacle. */
-export type PhasedDepth = PairDepth & {
+type PhasedDepth = PairDepth & {
   /** The phase of the sample, or none in a text before the format version 4. */
   readonly phase?: PairPhase;
 };
@@ -557,7 +557,7 @@ function strikeHeight(track: StrikeTrack, time: number): number {
  * @param pair The deepest point of a pair.
  * @returns The phase.
  */
-export function pairPhase(plan: PlayerPlan, pair: PairDepth): PairPhase {
+function pairPhase(plan: PlayerPlan, pair: PairDepth): PairPhase {
   const end = pair.bone?.at(-1);
   const side = end === 'L' || end === 'R' ? end : null;
   const time = pair.song - plan.timeOffset;
@@ -628,7 +628,7 @@ export function playerLabel(name: string, species: SpeciesId | null): string {
 }
 
 /** The options of a sweep of {@link sweepDemos}. */
-export type SweepOptions = Pick<Options, 'demos' | 'times' | 'gaps'> & {
+type SweepOptions = Pick<Options, 'demos' | 'times' | 'gaps'> & {
   /** The absolute paths of the MIDI files of the user of `--midi`, or none. */
   readonly midi?: readonly string[];
   /** The goal of each pair of `--goal`, in meters, or `null` or none for the limit of each pair. */
@@ -940,7 +940,7 @@ async function timedSweep(
  * @returns The time, in seconds, and the count of the demos with a time, or `null` when no demo
  *   has a time.
  */
-export function rowTime(
+function rowTime(
   ids: readonly string[],
   known: Readonly<Record<string, number>>,
 ): { readonly seconds: number; readonly known: number } | null {
@@ -966,7 +966,7 @@ export function rowTime(
  * @param known The time of each demo of the last rows of the sweep, in seconds.
  * @returns The lines.
  */
-export function planLines(
+function planLines(
   options: Options,
   ids: readonly string[],
   cached: number | null,
@@ -1004,7 +1004,7 @@ export function planLines(
  * @returns The text, such as `; 120 of 1162 samples over 1.5 cm (10.3%)`, or empty with no count
  *   or no goal.
  */
-export function overText(pair: PairDepth, goal: number): string {
+function overText(pair: PairDepth, goal: number): string {
   if (pair.samples === undefined || pair.over === undefined || !Number.isFinite(goal)) {
     return '';
   }
@@ -1018,7 +1018,7 @@ export function overText(pair: PairDepth, goal: number): string {
  * @param phase The phase, or none.
  * @returns The text, such as `; next note in 0.12 s, lift 14.8 cm`, or empty with no phase.
  */
-export function phaseText(phase: PairPhase | undefined): string {
+function phaseText(phase: PairPhase | undefined): string {
   if (!phase) {
     return '';
   }
@@ -1292,7 +1292,7 @@ function roleOf(options: Options): RoleSweep {
 }
 
 /** The rows of one run: the deepest points of each variant. */
-export interface SweepRow {
+interface SweepRow {
   /** The text of the changes of the variant, or empty for the base. */
   readonly variant: string;
   /** The time of the sweep of the variant, in seconds. */
@@ -1353,7 +1353,7 @@ export const ROWS_FORMAT = 5;
  * {@link ROWS_FORMAT}. A change that only adds fields keeps it, and a change of a field sets it to
  * the new version.
  */
-export const ROWS_SINCE = 1;
+const ROWS_SINCE = 1;
 
 /**
  * Writes the rows of a run as JSON (`--json`), with the format version {@link ROWS_FORMAT} and

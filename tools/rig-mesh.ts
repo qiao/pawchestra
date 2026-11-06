@@ -260,10 +260,10 @@ export function parseConfig(text: string): MeshRigConfig {
 }
 
 /** A value of the JSON text of a config of a mesh rig. */
-export type ConfigValue = number | string | boolean | null | ConfigValue[] | ConfigObject;
+type ConfigValue = number | string | boolean | null | ConfigValue[] | ConfigObject;
 
 /** An object of the JSON text of a config of a mesh rig. */
-export interface ConfigObject {
+interface ConfigObject {
   /** The value of each key. */
   [key: string]: ConfigValue;
 }
@@ -293,7 +293,7 @@ function kindOf(value: ConfigValue): string {
  * @param text The text.
  * @returns The text with no outer pair of `"` or `'`, or the text as it is.
  */
-export function unquoted(text: string): string {
+function unquoted(text: string): string {
   const first = text[0];
   const quoted = text.length >= 2 && (first === '"' || first === "'") && text.at(-1) === first;
   return quoted ? text.slice(1, -1) : text;
@@ -575,7 +575,7 @@ function hasPath(config: ConfigObject, path: string): boolean {
  * @returns The new paths, in the order of the changes.
  * @throws Error as {@link setConfig} does.
  */
-export function newKeys(text: string, list: string): string[] {
+function newKeys(text: string, list: string): string[] {
   // SAFETY: a config file of tools/mesh-rigs/ holds one JSON object.
   const config = JSON.parse(text) as ConfigObject;
   const added: string[] = [];
@@ -634,7 +634,7 @@ function setChild(node: ConfigValue, key: string, value: ConfigValue): void {
 }
 
 /** One change of a config: the path of a value and the text of its new value. */
-export interface ConfigChange {
+interface ConfigChange {
   /** The path, such as `weights.haunch.height`. */
   readonly path: string;
   /** The text of the new value, such as `0.16,0.27`. */
@@ -847,7 +847,7 @@ export function legRise(config: MeshRigConfig): number {
  * @param config The config.
  * @returns The drop, in the units of the studio: negative for a factor below 1.
  */
-export function trunkDrop(config: MeshRigConfig): number {
+function trunkDrop(config: MeshRigConfig): number {
   const hips = jointHead(config, 'hips');
   const neck = jointHead(config, config.trunkTop ?? 'neck');
   const clavicle = jointHead(config, 'clavicle_L');
@@ -877,7 +877,7 @@ export function trunkDrop(config: MeshRigConfig): number {
  * @param config The config.
  * @returns The rise, in the units of the studio: small, because the axis is nearly vertical.
  */
-export function girthRise(config: MeshRigConfig): number {
+function girthRise(config: MeshRigConfig): number {
   const hips = jointHead(config, 'hips');
   const neck = jointHead(config, 'neck');
   const shoulder = jointHead(config, 'upper_arm_L');
@@ -905,7 +905,7 @@ export function girthRise(config: MeshRigConfig): number {
  * @param front True for a point in front of the axis, false for a point behind it.
  * @returns The depth factor, 1 with no girth rule.
  */
-export function girthDepth(config: MeshRigConfig, share: number, front: boolean): number {
+function girthDepth(config: MeshRigConfig, share: number, front: boolean): number {
   const depth = config.girthFactor?.[1] ?? 1;
   const column = front ? 2 : 3;
   const rows = (config.girthProfile ?? [[0, 1, depth, depth] as const]).toSorted(
@@ -1027,7 +1027,7 @@ export function reachLine(config: MeshRigConfig): string {
  * The options of the app checks of `--check`, which make one variant faster: the roles, the play
  * step, and the demos of the fold probes, and the faces of the table of the variants.
  */
-export interface CheckProbe {
+interface CheckProbe {
   /** The roles of `--roles` (keys of `FOLD_ROLES`), or `null` for each role of the animal. */
   readonly roles: readonly string[] | null;
   /** The play step of `pnpm fold-probe` of `--step`, in seconds, or `null` for its default. */
@@ -1062,7 +1062,7 @@ export const DEFAULT_PROBE: CheckProbe = {
 };
 
 /** The arguments of `pnpm rig-mesh`. */
-export interface RigMeshArgs {
+interface RigMeshArgs {
   /** The id of the animal: the name of its config in `tools/mesh-rigs/`. */
   readonly animal: string;
   /** The folder of the preview images, or `null` for no preview. */
@@ -1342,7 +1342,7 @@ export function rigWarnings(log: string): string[] {
  * @param errors The error output of Blender.
  * @returns The line, or `null` when the output has no line.
  */
-export function blenderCause(errors: string): string | null {
+function blenderCause(errors: string): string | null {
   const lines = errors
     .split('\n')
     .map((line) => line.trim())
@@ -1409,7 +1409,7 @@ function sha256(bytes: Uint8Array): string {
 }
 
 /** The settings of the animal of a rig. */
-export interface RigSettings {
+interface RigSettings {
   /** The settings of the export. */
   readonly settings: AnimalSettings;
   /** True when the settings come from `ANIMALS`. */
@@ -1417,7 +1417,7 @@ export interface RigSettings {
 }
 
 /** A role of the app with the studio body of an animal. */
-export interface AnimalRole {
+interface AnimalRole {
   /** The role, a key of `FOLD_ROLES`. */
   readonly role: string;
   /** The species of the role with the body. */
@@ -1464,7 +1464,7 @@ export function animalRoles(animal: string): AnimalRole[] {
 }
 
 /** The face-samples of the folded faces of one main bone. */
-export interface BoneFolds {
+interface BoneFolds {
   /** The main studio bone of the faces, as `pnpm fold-probe` gives it. */
   readonly bone: string;
   /** The total over the faces of the samples of all sets in which each face folds. */
@@ -1472,7 +1472,7 @@ export interface BoneFolds {
 }
 
 /** A folded face with the samples of all sets in which it folds. */
-export interface FaceFolds {
+interface FaceFolds {
   /** The index of the triangle in the packed mesh, as `pnpm fold-probe` counts the faces. */
   readonly face: number;
   /** The samples of all sets in which the face folds. */
@@ -1480,7 +1480,7 @@ export interface FaceFolds {
 }
 
 /** The folds of one role of the app with the body of a rig. */
-export interface RoleFolds {
+interface RoleFolds {
   /** The role, a key of `FOLD_ROLES`. */
   readonly role: string;
   /** The counts of each sample set of `pnpm fold-probe`. */
@@ -1506,7 +1506,7 @@ export interface RoleFolds {
 }
 
 /** A face of `--watch` of the base with its share of folded samples in a variant. */
-export interface WatchPair {
+interface WatchPair {
   /** The face of the base. */
   readonly face: number;
   /**
@@ -1576,7 +1576,7 @@ export function watchPairs(base: RoleFolds, variant: RoleFolds): WatchPair[] | n
  * @param watch The indices of the faces of `--watch`.
  * @returns The watched faces, in the order of `--watch`.
  */
-export function watchFaces(
+function watchFaces(
   counts: FoldCounts,
   faces: readonly FaceRecord[],
   watch: readonly number[],
@@ -1590,7 +1590,7 @@ export function watchFaces(
 }
 
 /** The number of main bones of the folds of each role in the table of `--check`. */
-export const FOLD_BONES = 3;
+const FOLD_BONES = 3;
 
 /**
  * Gives the main bones of the folded faces of a role with the most face-samples: for each main
@@ -1639,7 +1639,7 @@ export function topFaces(faces: readonly FaceRecord[], count: number): FaceFolds
  * after its relax (`raise_shape()` of `tools/blender/rig_mesh.py`). A relax that leaves a face
  * turned failed.
  */
-export interface RaiseTurns {
+interface RaiseTurns {
   /** The name of the shape, such as `arm_raise_R`. */
   readonly name: string;
   /** The faces of the module that turn over before the relax. */
@@ -1655,7 +1655,7 @@ export interface RaiseTurns {
  * @param lines The lines of the log.
  * @returns The faces of each shape, in the order of the log.
  */
-export function raiseTurns(lines: readonly string[]): RaiseTurns[] {
+function raiseTurns(lines: readonly string[]): RaiseTurns[] {
   const faces = (text: string): number[] =>
     text
       .split(',')
@@ -1719,7 +1719,7 @@ export interface CheckRow {
  * @param raises The shapes of `raise`.
  * @returns The text, or `none` with no shape.
  */
-export function raisesCell(raises: readonly RaiseTurns[]): string {
+function raisesCell(raises: readonly RaiseTurns[]): string {
   const texts = raises.map(
     ({ name, after }) => `${name}: ${after.length > 0 ? `${after.join(', ')} FAIL` : 'none'}`,
   );
@@ -1825,7 +1825,7 @@ export function checkTable(rows: readonly CheckRow[]): string[] {
  * @param rows The rows, the base first.
  * @returns The lines, or none when no role has a watched face.
  */
-export function watchLines(rows: readonly CheckRow[]): string[] {
+function watchLines(rows: readonly CheckRow[]): string[] {
   const faces = rows.flatMap((row) => row.measures?.folds ?? []).at(0)?.watched ?? [];
   if (faces.length === 0) {
     return [];
@@ -1859,7 +1859,7 @@ export function watchLines(rows: readonly CheckRow[]): string[] {
 }
 
 /** The commit that the form of the players and the stage sides of `--check` compare with. */
-export const FORM_BASE = 'main';
+const FORM_BASE = 'main';
 
 /**
  * Gives the arguments of `tools/rig-form.ts` for the roles of an animal: one `--player` with the
@@ -2133,7 +2133,7 @@ async function baseForm(args: readonly string[]): Promise<FormJson | null> {
  * @returns The absolute path of the source file.
  * @throws Error that names the path of the config and the absolute path, if no file exists there.
  */
-export function checkSource(config: MeshRigConfig, label: string): string {
+function checkSource(config: MeshRigConfig, label: string): string {
   const path = resolve(ROOT, config.source);
   if (!statSync(path, { throwIfNoEntry: false })?.isFile()) {
     throw new Error(

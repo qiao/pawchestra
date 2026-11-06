@@ -1,5 +1,5 @@
 /** Loop points in sample frames. The end is the first frame after the loop. */
-export interface LoopPoints {
+interface LoopPoints {
   readonly start: number;
   readonly end: number;
 }
@@ -18,7 +18,7 @@ export interface CutSample {
 }
 
 /** The volume envelope that continues the natural decay of a sound after its tail loop starts. */
-export interface TailEnvelope {
+interface TailEnvelope {
   /** The time from the note start to the start of the decay, in seconds. */
   readonly holdSec: number;
   /** The decay rate in dB for each second. */

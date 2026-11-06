@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { parseMidi } from '../src/midi/parse.ts';
 
 /** The program changes of one demo file (design 8.3). */
-export interface DemoPatch {
+interface DemoPatch {
   /** File name in demos/src/. */
   readonly file: string;
   /** Sets the program of all program changes in one track. The index starts at 0. */

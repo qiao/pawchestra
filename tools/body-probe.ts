@@ -45,7 +45,7 @@ import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.
 await loadTestBodies();
 
 /** The supports of each species in the probe: each seat, and standing. */
-export const PROBE_SUPPORTS = [
+const PROBE_SUPPORTS = [
   'chair',
   'stool',
   'bench',
@@ -53,7 +53,7 @@ export const PROBE_SUPPORTS = [
 ] as const satisfies readonly Support[];
 
 /** The rest joints and the landmarks of a body by name, and its head height. */
-export type JointTable = Record<string, Vec3 | number>;
+type JointTable = Record<string, Vec3 | number>;
 
 /**
  * The fields of a mesh that the probe hashes: the places, the colors, the bones, the blend
@@ -72,16 +72,16 @@ export const MESH_FIELDS = [
 ] as const;
 
 /** A field of a mesh that the probe hashes. */
-export type MeshField = (typeof MESH_FIELDS)[number];
+type MeshField = (typeof MESH_FIELDS)[number];
 
 /**
  * The hash of each field of a mesh, as 16 hex digits. A mesh with no studio skin has no
  * `correctives` and no `normals`.
  */
-export type FieldHashes = Partial<Record<MeshField, string>>;
+type FieldHashes = Partial<Record<MeshField, string>>;
 
 /** The probe of one body on one support. */
-export interface BodyProbe {
+interface BodyProbe {
   /** The rest joints and the landmarks of the body, rounded to micrometers. */
   readonly joints: Readonly<JointTable>;
   /** The number of triangles of the body. */
@@ -93,7 +93,7 @@ export interface BodyProbe {
 }
 
 /** The probe of one player: the body, the instrument, and its support. */
-export interface PlayerProbe {
+interface PlayerProbe {
   /** The position of each bone of the skeleton, by name, rounded to micrometers. */
   readonly skeleton: Readonly<Record<string, Vec3>>;
   /** The number of triangles of the player. */
@@ -108,13 +108,13 @@ export interface PlayerProbe {
 export const POSE_SETS = ['rest', 'lift', 'play', 'lower'] as const;
 
 /** The name of a set of samples of the pose probe. */
-export type PoseSetName = (typeof POSE_SETS)[number];
+type PoseSetName = (typeof POSE_SETS)[number];
 
 /** One sample of the pose probe: a song time, a wall time, and a transport. */
 export type PoseSample = readonly [song: number, wall: number, transport: Transport];
 
 /** The poses of one player in one set of samples. */
-export interface PoseSetProbe {
+interface PoseSetProbe {
   /** The hash of the rounded poses of all samples of the set, as 16 hex digits. */
   readonly hash: string;
   /**
@@ -136,7 +136,7 @@ export interface DemoPoses {
 }
 
 /** The bodies and the players of the probe, with no poses. */
-export interface BodiesProbe {
+interface BodiesProbe {
   /** The body of each species on each support. */
   readonly species: Readonly<Record<string, Readonly<Record<string, BodyProbe>>>>;
   /** Each player of the section cast and the conductor, by section, species, and instrument. */
@@ -153,7 +153,7 @@ export interface Probe extends BodiesProbe {
 }
 
 /** The comparison of two probes. */
-export interface ProbeComparison {
+interface ProbeComparison {
   /** The counts of the equal bodies, players, and pose sets. */
   readonly counts: readonly string[];
   /** One line for each difference. */
@@ -411,7 +411,7 @@ const PAUSED: Transport = { ...PLAYING, playing: false, changedAtWall: 10, befor
  * @param scene The scene.
  * @returns The samples of each set.
  */
-export function poseSamples(scene: TestScene): Record<PoseSetName, PoseSample[]> {
+function poseSamples(scene: TestScene): Record<PoseSetName, PoseSample[]> {
   const start = -countInAt(scene.plan.beats, 0).lengthSec;
   const end = scene.score.durationSec;
   const rest = Array.from({ length: 4 }, (_, i): PoseSample => [start, 10 + i, NOT_STARTED]);
@@ -530,7 +530,7 @@ export function probeScenePoses(scene: TestScene): DemoPoses {
  *
  * @returns The poses of each demo, by the name of the file with no `.mid`.
  */
-export async function probePoses(): Promise<Record<string, DemoPoses>> {
+async function probePoses(): Promise<Record<string, DemoPoses>> {
   const poses: Record<string, DemoPoses> = {};
   for (const demo of await patchedDemos()) {
     poses[demo.file.replace(/\.mid$/, '')] = probeScenePoses(sceneOf(demo.bytes));

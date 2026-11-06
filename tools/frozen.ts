@@ -33,7 +33,7 @@ import { ROOT, optionValue, runChild, shortHash, withRefTree } from './ref-tree.
  * The frozen shots: the demo, the song time of the pause, and Free mode at the default view. The
  * section shot is the shot of the Chrome trace of `pnpm frame`, with the depth of field.
  */
-export const FROZEN_SHOTS = {
+const FROZEN_SHOTS = {
   play: { demo: 'boulanger-matin', seek: 30, free: true },
   conductor: { demo: 'boulanger-matin', seek: 73, free: false },
   'perf-wide': { demo: 'perf-60', seek: 5, free: false },
@@ -41,7 +41,7 @@ export const FROZEN_SHOTS = {
 } as const;
 
 /** The name of a frozen shot. */
-export type FrozenShot = keyof typeof FROZEN_SHOTS;
+type FrozenShot = keyof typeof FROZEN_SHOTS;
 
 /** The names of the frozen shots in their order. */
 export const SHOT_NAMES: readonly FrozenShot[] = ['play', 'conductor', 'perf-wide', 'perf-section'];
@@ -86,7 +86,7 @@ const FREEZE = `(() => {
 const CANVAS_ONLY = 'body > :not(#stage) { opacity: 0 !important; transition: none !important; }';
 
 /** The command line of the tool. */
-export interface FrozenArgs {
+interface FrozenArgs {
   /** The commit, the branch, or the tag to compare with the working tree, or `null`. */
   readonly base: string | null;
   /** The shots to render. */
@@ -119,7 +119,7 @@ function isShot(name: string): name is FrozenShot {
  * @returns The arguments. The default output folder is `scratch/frozen/` of the repository.
  * @throws Error for an option with no value, or for a shot that does not exist.
  */
-export function frozenArgs(args: readonly string[]): FrozenArgs {
+function frozenArgs(args: readonly string[]): FrozenArgs {
   const base = optionValue(args, '--base');
   const shots = optionValue(args, '--shots');
   const out = optionValue(args, '--out');
@@ -248,7 +248,7 @@ async function renderShots(
 }
 
 /** The difference of two frames of one size. */
-export interface PixelDiff {
+interface PixelDiff {
   /** The mean absolute difference of the channels, from 0 to 255. */
   readonly mean: number;
   /** The largest difference of a channel. */

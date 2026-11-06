@@ -81,19 +81,19 @@ export const RING_WEIGHT = 0.25;
 export const RING_REACH = 2;
 
 /** The growth of the longest edge of a face above which the face is a spike. */
-export const SPIKE_GROWTH = 1.8;
+const SPIKE_GROWTH = 1.8;
 
 /**
  * The largest distance of the bind middle of a face of the shoulder or the armpit from the
  * shoulder joint, as a share of the length of the upper arm.
  */
-export const SPIKE_REACH = 0.6;
+const SPIKE_REACH = 0.6;
 
 /**
  * The smallest weight of a corner on the upper arm or the clavicle that puts a face in the spike
  * region.
  */
-export const SPIKE_WEIGHT = 0.05;
+const SPIKE_WEIGHT = 0.05;
 
 /** The bind facts of one ring of one arm. */
 interface RingBind {
@@ -544,7 +544,7 @@ interface SideSamples {
 }
 
 /** The samples of a role, by the sample set and the side. */
-export type ArmSamples = Readonly<Record<SampleSet, Readonly<Record<Side, SideSamples>>>>;
+type ArmSamples = Readonly<Record<SampleSet, Readonly<Record<Side, SideSamples>>>>;
 
 /**
  * Makes an empty store of samples.
@@ -572,7 +572,7 @@ export function quantile(values: readonly number[], share: number): number {
 }
 
 /** The summary of the samples of one side in one sample set. */
-export interface ArmSummary {
+interface ArmSummary {
   readonly samples: number;
   /** The median roll of the upper arm bone, in degrees. */
   readonly boneRoll: number;
@@ -630,7 +630,7 @@ export function summarize(samples: readonly ArmSample[]): ArmSummary {
 }
 
 /** The report of a role: the arm samples and the folds of `pnpm fold-probe`. */
-export interface ArmReport {
+interface ArmReport {
   readonly samples: ArmSamples;
   readonly folds: FoldReport;
 }
@@ -645,7 +645,7 @@ export interface ArmReport {
  * @returns The report.
  * @throws Error for an unknown role.
  */
-export async function probeArms(
+async function probeArms(
   role: string,
   demos: Awaited<ReturnType<typeof patchedDemos>>,
   step: number,
@@ -683,7 +683,7 @@ function fixed(value: number, digits: number): string {
  * @param rings True to add the median values of each ring.
  * @returns The lines.
  */
-export function armLines(role: string, report: ArmReport, rings: boolean): string[] {
+function armLines(role: string, report: ArmReport, rings: boolean): string[] {
   const lines = [
     `Arm skin of ${role} over ${report.folds.demos.length} demos: twist and roll in degrees, collapse and flat as shares of the bind, spikes of the shoulder and the armpit (edge growth > ${SPIKE_GROWTH}).`,
     '',
@@ -727,7 +727,7 @@ export function armLines(role: string, report: ArmReport, rings: boolean): strin
  * @param report The report.
  * @returns The JSON text.
  */
-export function armJson(report: ArmReport): string {
+function armJson(report: ArmReport): string {
   const sets = Object.fromEntries(
     SAMPLE_SETS.map((set) => {
       const count = report.folds.sets[set];
@@ -763,10 +763,7 @@ const BODY_RULES: Readonly<Partial<Record<keyof StudioBody, (text: string) => st
  * @returns A function that puts the old values back.
  * @throws Error for an unknown rule or a wrong value.
  */
-export function setBodyRules(
-  bodies: readonly StudioBodyName[],
-  rules: readonly string[],
-): () => void {
+function setBodyRules(bodies: readonly StudioBodyName[], rules: readonly string[]): () => void {
   const undo: (() => void)[] = [];
   for (const rule of rules) {
     const [key = '', text = ''] = rule.split('=');

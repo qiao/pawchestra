@@ -63,7 +63,7 @@ const DEG = Math.PI / 180;
  * moves are the values of `FILM_GRAMMAR` of `src/shots/grammar.ts`, copied here so that the tool
  * also checks a commit from before it. The room and the eye limits are the tolerances of the check.
  */
-export const GRAMMAR = {
+const GRAMMAR = {
   /** The largest angle of a camera from the audience axis, in radians. */
   lineAzimuth: 75 * DEG,
   /**
@@ -98,10 +98,10 @@ export const SAMPLE_STEP = 0.25;
 const BLEND_SAMPLES = 32;
 
 /** A rule of film grammar that the tool checks. */
-export type GrammarRule = 'line' | 'look' | 'jump' | 'motion' | 'room' | 'headroom' | 'head';
+type GrammarRule = 'line' | 'look' | 'jump' | 'motion' | 'room' | 'headroom' | 'head';
 
 /** The rules, in the order of the output. */
-export const GRAMMAR_RULES: readonly GrammarRule[] = [
+const GRAMMAR_RULES: readonly GrammarRule[] = [
   'line',
   'look',
   'jump',
@@ -112,7 +112,7 @@ export const GRAMMAR_RULES: readonly GrammarRule[] = [
 ];
 
 /** One break of a rule. */
-export interface RuleBreak {
+interface RuleBreak {
   /** The rule. */
   readonly rule: GrammarRule;
   /** The demo. */
@@ -126,7 +126,7 @@ export interface RuleBreak {
 }
 
 /** The elevations and the heights of the cameras of one kind of shot. */
-export interface KindHeights {
+interface KindHeights {
   /** The elevation of each sample above the target of its shot, in degrees. */
   readonly elevations: number[];
   /** The height of each sample above the stage top, in meters. */
@@ -143,7 +143,7 @@ export interface KindHeights {
 }
 
 /** The nearest animal of one shot. */
-export interface ShotNear {
+interface ShotNear {
   /** The demo. */
   readonly demo: string;
   /** The kind of the shot. */
@@ -159,7 +159,7 @@ export interface ShotNear {
 }
 
 /** The result of the check of the demos. */
-export interface RulesOutput {
+interface RulesOutput {
   /** Each break, in the order of the demos and of the time. */
   readonly breaks: readonly RuleBreak[];
   /** The number of shots of each demo. */
@@ -181,7 +181,7 @@ export interface RulesOutput {
 const CLOSEST_SHOTS = 3;
 
 /** The median and the largest elevation and height of the cameras of one kind of shot. */
-export interface KindSummary {
+interface KindSummary {
   /** The number of samples. */
   readonly samples: number;
   /** In degrees. */
@@ -245,7 +245,7 @@ interface ShotSubject {
 }
 
 /** The top of the head and the footprint of one player, for the head rule and the width share. */
-export interface PlayerExtent {
+interface PlayerExtent {
   /**
    * The top of the head over the middle of the head, or `null` for a commit with no list of the
    * bones of the head.
@@ -272,7 +272,7 @@ const headBones: ReadonlySet<number> | null =
  * @param subjects The places of the subjects.
  * @returns The extent of each player, by its index in `SceneLayout.players`.
  */
-export function playerExtents(
+function playerExtents(
   layout: SceneLayout,
   models: ModelCache,
   subjects: StageSubjects,
@@ -324,7 +324,7 @@ interface ModelPoints {
 }
 
 /** The body of one animal on the stage in the bind pose, for the measure of the nearest animal. */
-export interface AnimalBody {
+interface AnimalBody {
   /** The corners of the body with no instrument, as x, y, z in the stage axes. */
   readonly points: Float64Array;
   /** The corners of the head with no ears, as x, y, z. Empty for a commit with no head list. */
@@ -445,7 +445,7 @@ function placePoints(points: Float64Array, place: PlayerPlaceLike): PlacedPoints
  * @param models The models of the score.
  * @returns The bodies.
  */
-export function animalBodies(layout: SceneLayout, models: ModelCache): AnimalBody[] {
+function animalBodies(layout: SceneLayout, models: ModelCache): AnimalBody[] {
   const known = new Map<PlayerModel, ModelPoints>();
   const bodyOf = (model: PlayerModel, place: PlayerPlaceLike): AnimalBody => {
     const local = known.get(model) ?? modelPoints(model);
@@ -845,7 +845,7 @@ function degrees(radians: number): string {
  * @param bodies The body of each animal ({@link animalBodies}).
  * @returns The breaks.
  */
-export function checkPlan(
+function checkPlan(
   demo: string,
   plan: ShotPlan,
   layout: SceneLayout,
@@ -1045,7 +1045,7 @@ function median(values: readonly number[]): number {
  * @param only The names of the demos to check, with no `.mid`, or none for all demos.
  * @returns The output.
  */
-export async function checkDemos(only: readonly string[]): Promise<RulesOutput> {
+async function checkDemos(only: readonly string[]): Promise<RulesOutput> {
   const breaks: RuleBreak[] = [];
   const shots: Record<string, number> = {};
   const kinds = new Map<ShotKind, KindHeights>();
@@ -1102,7 +1102,7 @@ export async function checkDemos(only: readonly string[]): Promise<RulesOutput> 
 }
 
 /** The options of `pnpm shot-trace --rules`. */
-export interface RulesOptions {
+interface RulesOptions {
   /** The demos to check, or none for all. */
   readonly demos: readonly string[];
   /** The commit to compare with the working tree, or `null`. */
@@ -1124,7 +1124,7 @@ const USAGE =
  * @returns The options.
  * @throws Error for an unknown option or a missing value.
  */
-export function parseRulesOptions(args: readonly string[]): RulesOptions {
+function parseRulesOptions(args: readonly string[]): RulesOptions {
   const demos: string[] = [];
   let base: string | null = null;
   let json: string | null = null;
@@ -1164,10 +1164,7 @@ export function parseRulesOptions(args: readonly string[]): RulesOptions {
  * @param list True to list each break.
  * @returns The lines.
  */
-export function rulesLines(
-  outputs: readonly (readonly [string, RulesOutput])[],
-  list: boolean,
-): string[] {
+function rulesLines(outputs: readonly (readonly [string, RulesOutput])[], list: boolean): string[] {
   const names = outputs.map(([name]) => name);
   const lines = [`| Rule | ${names.join(' | ')} |`, `|---|${names.map(() => '---:').join('|')}|`];
   for (const rule of GRAMMAR_RULES) {

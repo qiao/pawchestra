@@ -101,7 +101,7 @@ const CHECK_TRUE_PEAK = -1;
 const TABLE_FILE = 'src/audio/demo-loudness.ts';
 
 /** The synth output of one demo and its song length. */
-export interface SynthRender {
+interface SynthRender {
   /** The stereo output of the synth at 48 kHz, with the tail. */
   readonly audio: Stereo;
   /** The song length in seconds. */
@@ -152,7 +152,7 @@ interface Row {
  * @returns The stereo output of the synth, before the output chain, and the song length.
  * @throws Error if the file does not give a score.
  */
-export async function renderSynth(bytes: Uint8Array): Promise<SynthRender> {
+async function renderSynth(bytes: Uint8Array): Promise<SynthRender> {
   const result = buildScore(bytes, 'auto');
   if (!result.ok) {
     throw new Error(result.error);

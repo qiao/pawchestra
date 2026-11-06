@@ -16,10 +16,10 @@ import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import { windReach } from './hold-reach.ts';
 
 /** The winds with a size rule. */
-export type SizedWind = 'trumpet' | 'clarinet' | 'flute';
+type SizedWind = 'trumpet' | 'clarinet' | 'flute';
 
 /** The winds with a size rule, in the order of the report. */
-export const SIZED_WINDS = ['trumpet', 'clarinet', 'flute'] as const satisfies SizedWind[];
+const SIZED_WINDS = ['trumpet', 'clarinet', 'flute'] as const satisfies SizedWind[];
 
 /**
  * Tells if an instrument has the size rule of the winds.
@@ -45,7 +45,7 @@ const APP_SHARE = 0.85;
  * of 33 cm. The largest size is the size of the app, because a player with long arms bends the
  * elbows more, and no larger instrument has the same hold.
  */
-export const REAL_WIND_SIZES = {
+const REAL_WIND_SIZES = {
   trumpet: { smallest: (0.24 * APP_SHARE) / BRASS.trumpet.length, largest: 1 },
   clarinet: { smallest: (0.49 * APP_SHARE) / WOODWINDS.clarinet.length, largest: 1 },
   flute: { smallest: (0.33 * APP_SHARE) / WOODWINDS.flute.length, largest: 1 },
@@ -56,7 +56,7 @@ export const REAL_WIND_SIZES = {
  * share of the arm: the share of the monkey at its accepted trumpet of 0.65, the most stretched
  * own wind player.
  */
-export const WIND_REACH_SHARE = 0.95;
+const WIND_REACH_SHARE = 0.95;
 
 /** The step of the search of the scale, from the largest real size down. */
 const STEP = 0.01;
@@ -66,10 +66,10 @@ const STEP = 0.01;
  * grip. `largest`: the largest real size, which each palm reaches. `smallest`, `nearest`: no real
  * size passes, and the size with the nearest grips is the smallest real size, or another one.
  */
-export type WindSizeSource = 'rule' | 'largest' | 'smallest' | 'nearest';
+type WindSizeSource = 'rule' | 'largest' | 'smallest' | 'nearest';
 
 /** The size of a wind for a body. */
-export interface WindRule {
+interface WindRule {
   /** The scale, as a factor of the instrument of the app, within {@link REAL_WIND_SIZES}. */
   readonly scale: number;
   /** The source of the scale. */

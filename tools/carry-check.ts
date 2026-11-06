@@ -44,22 +44,22 @@ const USAGE =
   'Usage: pnpm carry-check <role,...> [--demo <id>]... [--set <changes>] [--base <ref>] [--json <file>]';
 
 /** The instruments that the left paw carries in the lift and in the lowering. */
-export const CARRIED: readonly InstrumentId[] = ['violin', 'viola'];
+const CARRIED: ReadonlySet<InstrumentId> = new Set(['violin', 'viola']);
 
 /** The turn rate above which a step of the instrument or of the paw is fast, in degrees per second. */
-export const FAST_TURN = 20;
+const FAST_TURN = 20;
 
 /**
  * The angle between the turn axes of a fast step above which the instrument and the paw turn in
  * opposite senses, in degrees.
  */
-export const OPPOSED_ANGLE = 90;
+const OPPOSED_ANGLE = 90;
 
 /** The format version of the JSON text of `--json` (`probeFormat()` of `tools/ref-tree.ts`). */
 const CARRY_FORMAT = 1;
 
 /** The values of one lift or one lowering of one body. */
-export interface MoveCarry {
+interface MoveCarry {
   /** The file of the demo, such as `bach-bwv1047.mid`. */
   readonly demo: string;
   /** The kind of the move. */
@@ -79,7 +79,7 @@ export interface MoveCarry {
 }
 
 /** The moves of one role, as the JSON text of `--json` holds them. */
-export interface RoleCarry {
+interface RoleCarry {
   /** The role, such as `violist`. */
   readonly role: string;
   /** The moves of each body of the role in each demo, in their order. */
@@ -87,7 +87,7 @@ export interface RoleCarry {
 }
 
 /** The values of one role over all its moves. */
-export interface CarrySummary {
+interface CarrySummary {
   /** The number of moves. */
   readonly moves: number;
   /** The sum of the fast steps. */
@@ -105,7 +105,7 @@ export interface CarrySummary {
 }
 
 /** The command line of `pnpm carry-check`. */
-export interface CarryArgs {
+interface CarryArgs {
   /** The roles, in their order. */
   readonly roles: readonly string[];
   /** The demos of `--demo`, with no `.mid`, or none for all demos and tool scores. */
@@ -124,9 +124,9 @@ export interface CarryArgs {
  *
  * @returns The roles, in the order of the table.
  */
-export function carryRoles(): string[] {
+function carryRoles(): string[] {
   return [...FOLD_ROLES]
-    .filter(([, source]) => source.kind === 'player' && CARRIED.includes(source.instrument))
+    .filter(([, source]) => source.kind === 'player' && CARRIED.has(source.instrument))
     .map(([role]) => role);
 }
 
@@ -139,7 +139,7 @@ export function carryRoles(): string[] {
  */
 function carries(role: string): boolean {
   const source = isRole(role) ? findRole(role) : undefined;
-  return source?.kind === 'player' && CARRIED.includes(source.instrument);
+  return source?.kind === 'player' && CARRIED.has(source.instrument);
 }
 
 /**
@@ -151,7 +151,7 @@ function carries(role: string): boolean {
  *   value, and an error that lists the roles for a role with no carried instrument or a role that
  *   comes two times. `--base` and `--json` do not go together.
  */
-export function carryArgs(args: readonly string[]): CarryArgs {
+function carryArgs(args: readonly string[]): CarryArgs {
   const [list = '', ...rest] = args;
   if (list === '' || list.startsWith('--')) {
     throw new Error(USAGE);
@@ -262,7 +262,7 @@ type StepValues = Omit<MoveCarry, 'demo' | 'kind' | 'at'>;
  * @returns The fast steps, the opposed steps, the largest angle, and the path and the net turn
  *   of the instrument in the paw.
  */
-export function stepsCarry(steps: readonly CarryStep[]): StepValues {
+function stepsCarry(steps: readonly CarryStep[]): StepValues {
   const inPaw = steps.map((step) => step.held.clone().invert().multiply(step.carried));
   let fast = 0;
   let opposed = 0;
@@ -302,9 +302,9 @@ export function stepsCarry(steps: readonly CarryStep[]): StepValues {
  * @returns The moves of each body in each demo.
  * @throws Error if the role has no carried instrument.
  */
-export function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
+function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
   const source = findRole(role);
-  if (source?.kind !== 'player' || !CARRIED.includes(source.instrument)) {
+  if (source?.kind !== 'player' || !CARRIED.has(source.instrument)) {
     throw new Error(`The role ${role} has no carried instrument.`);
   }
   const instrument = STUDIO_BONES.length + boneIndex('instrument');
@@ -357,7 +357,7 @@ export function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarr
  * @param moves The moves.
  * @returns The sums and the largest values.
  */
-export function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
+function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
   let worst: MoveCarry | null = null;
   for (const move of moves) {
     if (!worst || move.angle > worst.angle) {
@@ -382,10 +382,7 @@ export function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
  * @param base The roles of the commit, or `null` with no `--base`.
  * @returns The lines.
  */
-export function carryLines(
-  tree: readonly RoleCarry[],
-  base: readonly RoleCarry[] | null,
-): string[] {
+function carryLines(tree: readonly RoleCarry[], base: readonly RoleCarry[] | null): string[] {
   const degrees = (value: number): string => `${value.toFixed(0)}°`;
   const lines = [
     `| Role | Moves | Steps >${OPPOSED_ANGLE}° of the fast steps | Largest angle | Turn in the paw: path | Turn in the paw: net | Move of the largest angle |`,

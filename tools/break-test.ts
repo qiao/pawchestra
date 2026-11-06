@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { relative } from 'node:path';
 
 /** The result of one test in the JSON report of Vitest. */
-export interface VitestAssertion {
+interface VitestAssertion {
   /** The titles of the `describe` blocks around the test, from the outside in. */
   readonly ancestorTitles: readonly string[];
   /** The title of the test. */

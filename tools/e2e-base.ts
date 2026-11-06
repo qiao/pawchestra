@@ -61,7 +61,7 @@ usage error or a run that did not finish.`;
 const CACHE_VERSION = 'e2e-base 1';
 
 /** The command line of the tool. */
-export interface E2eBaseArgs {
+interface E2eBaseArgs {
   /** The base: a commit, a branch, or a tag. */
   readonly ref: string;
   /** True with `--no-cache`: the tests run on the base also when the cache holds its result. */
@@ -71,10 +71,10 @@ export interface E2eBaseArgs {
 }
 
 /** The result of one test in one run. A test that passes on a retry is flaky. */
-export type TestStatus = 'passed' | 'failed' | 'flaky' | 'skipped';
+type TestStatus = 'passed' | 'failed' | 'flaky' | 'skipped';
 
 /** One test of a run and its result. */
-export interface TestOutcome {
+interface TestOutcome {
   /**
    * The key of the test: the project, the file, and the titles, with no line number, so that a
    * test keeps its key when a change moves it in its file.
@@ -89,7 +89,7 @@ export interface TestOutcome {
 }
 
 /** A failure of the tree that does not fail on the base. */
-export interface NewFailure {
+interface NewFailure {
   /** The test on the tree. */
   readonly test: TestOutcome;
   /** The result of the test on the base, or `null` when the base does not have the test. */
@@ -97,7 +97,7 @@ export interface NewFailure {
 }
 
 /** The compare of the tree with the base. */
-export interface RunCompare {
+interface RunCompare {
   /** The failures of the tree that pass on the base, or that the base skips or does not have. */
   readonly added: readonly NewFailure[];
   /** The count of the tests that fail on the tree and on the base. */
@@ -141,7 +141,7 @@ const STATUS = {
  * @returns The arguments.
  * @throws Error with no ref, with two refs, or with an option that does not exist.
  */
-export function e2eBaseArgs(args: readonly string[]): E2eBaseArgs {
+function e2eBaseArgs(args: readonly string[]): E2eBaseArgs {
   const end = args.indexOf('--');
   const own = end < 0 ? args : args.slice(0, end);
   const testArgs = end < 0 ? [] : args.slice(end + 1);
@@ -171,7 +171,7 @@ export function e2eBaseArgs(args: readonly string[]): E2eBaseArgs {
  * @param report The report.
  * @returns One result for each test and project, in the order of the report.
  */
-export function reportOutcomes(report: JSONReport): TestOutcome[] {
+function reportOutcomes(report: JSONReport): TestOutcome[] {
   const folder = basename(report.config.rootDir);
   const outcomes: TestOutcome[] = [];
   const visit = (suite: JSONReportSuite, titles: readonly string[]): void => {
@@ -205,10 +205,7 @@ export function reportOutcomes(report: JSONReport): TestOutcome[] {
  * @param base The results of the base.
  * @returns The new failures and the counts.
  */
-export function compareRuns(
-  tree: readonly TestOutcome[],
-  base: readonly TestOutcome[],
-): RunCompare {
+function compareRuns(tree: readonly TestOutcome[], base: readonly TestOutcome[]): RunCompare {
   const onBase = new Map(base.map((test) => [test.key, test.status]));
   const onTree = new Map(tree.map((test) => [test.key, test.status]));
   const added: NewFailure[] = [];
@@ -241,7 +238,7 @@ export function compareRuns(
  * @param outcomes The results of the run.
  * @returns The line.
  */
-export function countLine(label: string, outcomes: readonly TestOutcome[]): string {
+function countLine(label: string, outcomes: readonly TestOutcome[]): string {
   const count = (status: TestStatus): number =>
     outcomes.filter((test) => test.status === status).length;
   return (

@@ -13,10 +13,10 @@ import type { AnimalPose } from '../src/pose/types.ts';
 import { setHolds } from './hold-sets.ts';
 
 /** A place from a shoulder joint, in head heights `H`: out to the side, up, and forward. */
-export type ArmPlace = readonly [out: number, up: number, forward: number];
+type ArmPlace = readonly [out: number, up: number, forward: number];
 
 /** The posed joints of one arm, from its shoulder joint. */
-export interface ArmProbe {
+interface ArmProbe {
   /** The elbow: the `forearm` bone. */
   readonly elbow: ArmPlace;
   /** The wrist: the `hand` bone. */

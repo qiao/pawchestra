@@ -31,7 +31,7 @@ import type { PixelBox, PixelMask } from './look-lab.ts';
 const WHITE_FUR: PixelMask = { hue: [-1, 361], saturation: [-1, 0.4], luma: [60, 256] };
 
 /** The names of the regions of the camera `default`. */
-export type DefaultRegionName =
+type DefaultRegionName =
   | 'front rows'
   | 'back rows'
   | 'back floor'

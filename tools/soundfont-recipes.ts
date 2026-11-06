@@ -42,7 +42,7 @@ export const BASE_SOUNDFONT = {
 } as const;
 
 /** The cut of a sustained sound: the attack and one loop (`tools/sample-cut.ts`). */
-export interface SustainCut {
+interface SustainCut {
   readonly mode: 'sustain';
   readonly loopSec: number;
   readonly crossfadeSec: number;
@@ -51,7 +51,7 @@ export interface SustainCut {
 }
 
 /** The cut of a decaying sound (`tools/sample-cut.ts`). */
-export interface DecayCut {
+interface DecayCut {
   readonly mode: 'decay';
   /** The level below the peak at which the sample ends, in dB. */
   readonly floorDb: number;
@@ -62,7 +62,7 @@ export interface DecayCut {
 }
 
 /** A drum kit key that plays the regions of another key of the source. */
-export interface KeyMapping {
+interface KeyMapping {
   /** The key of the kit. */
   readonly key: number;
   /** The key of the source regions. */

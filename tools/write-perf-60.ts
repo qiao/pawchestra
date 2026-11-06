@@ -5,13 +5,13 @@ import { writeSmf } from '../src/midi/test-smf.ts';
 import { perf60File } from '../src/models/test-perf-60.ts';
 
 /** The length of `perf-60.mid` in chords: one chord each second, 60 s of notes (design 9.5). */
-export const PERF_60_CHORDS = 60;
+const PERF_60_CHORDS = 60;
 
 /**
  * The folder of `perf-60.mid`. Only the Vite dev server serves it, at `/perf/perf-60.mid`. The
  * build does not copy it into `dist/` (design 9.5).
  */
-export const PERF_60_DIR = join(import.meta.dirname, '..', 'perf');
+const PERF_60_DIR = join(import.meta.dirname, '..', 'perf');
 
 /**
  * Writes the bytes of `perf-60.mid` from the seats of `perf60File()`, so that the tests and the

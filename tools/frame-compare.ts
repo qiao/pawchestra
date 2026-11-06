@@ -44,7 +44,7 @@ const RETRY_WAIT_MS = 60_000;
 const RUN_MAX_SEC = 900;
 
 /** One item of the command line: a commit or a patch. */
-export interface CompareItem {
+interface CompareItem {
   /** The name in the table, such as `main (70b948a4)` or `HEAD + msaa2.patch`. */
   readonly label: string;
   /** The ref of the tree: the item itself, or `HEAD` for a patch. */
@@ -54,7 +54,7 @@ export interface CompareItem {
 }
 
 /** The command line of the tool. */
-export interface CompareArgs {
+interface CompareArgs {
   readonly items: readonly CompareItem[];
   /** The runs of `pnpm frame` for each item. */
   readonly runs: number;
@@ -81,7 +81,7 @@ const USAGE =
  * @returns The arguments.
  * @throws Error with fewer than one item, a missing patch, or an option with no valid value.
  */
-export function compareArgs(args: readonly string[]): CompareArgs {
+function compareArgs(args: readonly string[]): CompareArgs {
   const end = args.indexOf('--');
   const own = end < 0 ? args : args.slice(0, end);
   const frameFlags = end < 0 ? [] : args.slice(end + 1);
@@ -131,7 +131,7 @@ export function compareArgs(args: readonly string[]): CompareArgs {
 }
 
 /** The values of one run of `pnpm frame`, in milliseconds, or `null` for a missing row. */
-export interface FrameRun {
+interface FrameRun {
   /** The main thread: p50 and p95. */
   readonly main: readonly [number, number] | null;
   /** The GPU row of the Metal trace: p50 and p95. */
@@ -161,7 +161,7 @@ function rowValues(output: string, start: string): readonly [number, number] | n
  * @param output The output.
  * @returns The values.
  */
-export function frameRun(output: string): FrameRun {
+function frameRun(output: string): FrameRun {
   const rate = /([\d.]+) fps with no cap/.exec(output)?.[1];
   return {
     main: rowValues(output, '| Main thread'),

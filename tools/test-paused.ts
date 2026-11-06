@@ -42,7 +42,7 @@ export const PAUSED_PATHS: readonly string[] = [
 ];
 
 /** The arguments of `pnpm test:paused`. */
-export interface PausedArgs {
+interface PausedArgs {
   /** The commit, the branch, or the tag of `--base`, or `null`. */
   readonly base: string | null;
   /** The test files to run, or none for all paused test files. */
@@ -155,7 +155,7 @@ export function readReport(text: string): PausedReport {
  * kind of error and its message. The parts stay apart, so that two paths whose names join to the
  * same text stay two issues.
  */
-export type Issue = readonly string[];
+type Issue = readonly string[];
 
 /**
  * Gives the failed tests and the errors of one run: each failed test by its title path, each error

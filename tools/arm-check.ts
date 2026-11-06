@@ -226,7 +226,7 @@ export const MEASURES = [
 export type Measure = (typeof MEASURES)[number];
 
 /** The measures of the moves: the lifts and the lowerings of {@link probeMoves}. */
-export const MOVE_MEASURES = ['moveTwist', 'moveTurn'] as const satisfies readonly Measure[];
+const MOVE_MEASURES = ['moveTwist', 'moveTurn'] as const satisfies readonly Measure[];
 
 /**
  * The measures that count from the bind pose of the body: the twists and the swing of the paw on
@@ -234,7 +234,7 @@ export const MOVE_MEASURES = ['moveTwist', 'moveTurn'] as const satisfies readon
  * zero with the same pose of the bones, so a rebind judges them only by their limits (design 4.4,
  * "Arm gate").
  */
-export const BIND_MEASURES = [
+const BIND_MEASURES = [
   'foreTwist',
   'flat',
   'pawTwist',
@@ -253,22 +253,22 @@ const BIND_BONES = [
 ] as const;
 
 /** The rings whose narrow axes a rebind prints in place of the flat share ({@link ARM_RINGS}). */
-export const REBIND_RINGS = ['elbow', 'wrist'] as const;
+const REBIND_RINGS = ['elbow', 'wrist'] as const;
 
 /** A ring of {@link REBIND_RINGS}. */
-export type RebindRing = (typeof REBIND_RINGS)[number];
+type RebindRing = (typeof REBIND_RINGS)[number];
 
 /**
  * The sample sets of the gate: the sets of `probeFolds()`, and `move`, the lifts and the
  * lowerings of {@link probeMoves} at steps of {@link MOVE_STEP}.
  */
-export const GATE_SETS = [...SAMPLE_SETS, 'move'] as const;
+const GATE_SETS = [...SAMPLE_SETS, 'move'] as const;
 
 /** A sample set of the gate. */
-export type GateSet = (typeof GATE_SETS)[number];
+type GateSet = (typeof GATE_SETS)[number];
 
 /** The limit of one measure of the gate. */
-export interface ArmLimit {
+interface ArmLimit {
   /** The name of the measure in the tables. */
   readonly name: string;
   /**
@@ -408,7 +408,7 @@ export const ARM_LIMITS: Readonly<Record<Measure, ArmLimit>> = {
 };
 
 /** The paw twist change between two samples above which the change is a jump, in degrees. */
-export const JUMP_ANGLE = 90;
+const JUMP_ANGLE = 90;
 
 /**
  * The accepted grip of each arm of each role: the median grip of the arm in the play of accepted
@@ -554,7 +554,7 @@ function tubePaws(holds: readonly PalmHold[]): Readonly<Record<Side, boolean>> {
  * @param role The role.
  * @returns For each side, true when the grip of the paw counts from the instrument.
  */
-export function sharedPaws(role: RoleSource): Readonly<Record<Side, boolean>> {
+function sharedPaws(role: RoleSource): Readonly<Record<Side, boolean>> {
   return tubePaws(windHolds(role, false));
 }
 
@@ -585,7 +585,7 @@ export function palmTurns(role: RoleSource): Readonly<Record<Side, Vector3 | nul
  * The smallest share of the weight of the three corners of a face on the bones of one arm, from
  * the clavicle to the fingers, that makes the face a face of that arm.
  */
-export const ARM_FACE_SHARE = 0.5;
+const ARM_FACE_SHARE = 0.5;
 
 /** A ring of the arm skin: the bone of its axis and its place along the bone. */
 export interface ArmRing {
@@ -667,7 +667,7 @@ interface ArmBind {
  * is the hanging arm of the player in its bind pose: the palm inward, along the elbow axis. A
  * positive grip turns the palm of each arm toward pronation.
  */
-export interface GripFrames {
+interface GripFrames {
   /**
    * The turn from the frame of the player to the bind forearm: the down axis to the axis from the
    * elbow to the wrist, and +x to the elbow axis (`StudioRig.arms`).
@@ -706,7 +706,7 @@ export type ArmSample = Readonly<Record<Measure, number>> & {
  * @param clavicle True to add the clavicle.
  * @returns The indices of the skin joints.
  */
-export function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
+function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
   const names: StudioBone[] = [
     ...(clavicle ? [`clavicle_${side}` as const] : []),
     `upper_arm_${side}`,
@@ -754,7 +754,7 @@ function weightOn(
  * @param joints The joints of the arm.
  * @returns The indices of the faces.
  */
-export function armFaces(
+function armFaces(
   mesh: Pick<StudioMesh, 'joints' | 'weights' | 'corners'>,
   joints: readonly number[],
 ): Set<number> {
@@ -1306,7 +1306,7 @@ export function measureArm(
 }
 
 /** The summary of the values of one measure of one arm in one sample set. */
-export interface SetStats {
+interface SetStats {
   /** The number of samples. */
   readonly samples: number;
   /** The median. */
@@ -1346,7 +1346,7 @@ function quantile(sorted: readonly number[], share: number): number {
  * @param angles The angles, in degrees.
  * @returns The median in -180° to 180°, or `null` with no angle.
  */
-export function angleMedian(angles: readonly number[]): number | null {
+function angleMedian(angles: readonly number[]): number | null {
   if (angles.length === 0) {
     return null;
   }
@@ -1414,7 +1414,7 @@ export function setStats(
 }
 
 /** The summaries of one arm: by measure, then by sample set. */
-export type ArmStats = Readonly<Record<Measure, Partial<Record<GateSet, SetStats>>>>;
+type ArmStats = Readonly<Record<Measure, Partial<Record<GateSet, SetStats>>>>;
 
 /** The report of one role. */
 export interface RoleReport {
@@ -1448,7 +1448,7 @@ export interface RoleReport {
 }
 
 /** The JSON text of a run of the tool for one tree (`--json`). */
-export interface ArmJson {
+interface ArmJson {
   /** The format version (`probeFormat()` of `tools/ref-tree.ts`). */
   readonly version: number;
   /** The oldest version that this version only adds fields to. */
@@ -1465,7 +1465,7 @@ export interface ArmJson {
  * key of the bind and the ring widths of each role ({@link RoleReport.bind}). Version 6 adds the
  * palm turn on the instrument ({@link palmTurns}) and the mean palms ({@link RoleReport.palms}).
  */
-export const ARM_FORMAT = 6;
+const ARM_FORMAT = 6;
 
 /** The oldest format version that {@link ARM_FORMAT} only adds fields to. */
 const ARM_SINCE = 4;
@@ -1543,7 +1543,7 @@ function isMoveMeasure(measure: Measure): boolean {
 export const MOVE_STEP = 0.01;
 
 /** The number of pause points of each demo with a lowering and a lift in the moves. */
-export const MOVE_PAUSES = 2;
+const MOVE_PAUSES = 2;
 
 /** One move of {@link probeMoves}: a lift or a lowering at a song time. */
 interface Move {
@@ -1684,7 +1684,7 @@ const bindKeys = new WeakMap<StudioRig, string>();
  * @param rig The studio rig.
  * @returns The first 12 hex digits of the SHA-256 of the bind data.
  */
-export function bindKey(rig: StudioRig): string {
+function bindKey(rig: StudioRig): string {
   const found = bindKeys.get(rig);
   if (found !== undefined) {
     return found;
@@ -1712,7 +1712,7 @@ export function bindKey(rig: StudioRig): string {
  * @param base The report of the base, or `null` with no base.
  * @returns True for a rebind.
  */
-export function isRebind(tree: RoleReport, base: RoleReport | null): boolean {
+function isRebind(tree: RoleReport, base: RoleReport | null): boolean {
   return (
     base !== null && tree.bind !== undefined && base.bind !== undefined && tree.bind !== base.bind
   );
@@ -1883,7 +1883,7 @@ export function probeRole(
  * @param reports The report of each role.
  * @returns The lines, empty when each role has an entry or no play sample.
  */
-export function gripLines(
+function gripLines(
   reports: readonly { readonly role: string; readonly tree: RoleReport | null }[],
 ): string[] {
   const lines = reports.flatMap(({ role, tree }) =>
@@ -1909,7 +1909,7 @@ export function gripLines(
  * @param reports The report of each role.
  * @returns The lines, empty when no such role is in the run.
  */
-export function palmLines(
+function palmLines(
   reports: readonly { readonly role: string; readonly tree: RoleReport | null }[],
 ): string[] {
   const lines = reports.flatMap(({ role, tree }) => {
@@ -1944,7 +1944,7 @@ export function palmLines(
  * @param limit The limit of the measure.
  * @returns The value and the set, or `null` with no sample.
  */
-export function gateValue(
+function gateValue(
   stats: Partial<Record<GateSet, SetStats>> | undefined,
   limit: ArmLimit,
 ): { readonly value: number; readonly set: GateSet } | null {
@@ -2074,7 +2074,7 @@ function show(value: number | null, measure: Measure): string {
  * @param base True when the run has a base.
  * @returns The lines of the table.
  */
-export function summaryLines(rows: readonly GateRow[], base: boolean): string[] {
+function summaryLines(rows: readonly GateRow[], base: boolean): string[] {
   const head = MEASURES.map((m) => `${ARM_LIMITS[m].name} (${show(ARM_LIMITS[m].limit, m)})`);
   const lines = [
     `| Role | Arm | ${head.join(' | ')} | Verdict |`,
@@ -2109,7 +2109,7 @@ export function summaryLines(rows: readonly GateRow[], base: boolean): string[] 
  * @param reports The reports of each role.
  * @returns The lines, empty with no rebind.
  */
-export function rebindLines(
+function rebindLines(
   reports: readonly {
     readonly role: string;
     readonly tree: RoleReport | null;
@@ -2142,7 +2142,7 @@ export function rebindLines(
 }
 
 /** One value of a line of {@link GateFile}: one measure of one arm. */
-export interface GateValue {
+interface GateValue {
   /** The measure. */
   readonly measure: Measure;
   /** The worst sample set. */
@@ -2156,7 +2156,7 @@ export interface GateValue {
 }
 
 /** One line of {@link GateFile}: one arm of one role, as a row of the table of the gate. */
-export interface GateLine {
+interface GateLine {
   /** The role. */
   readonly role: string;
   /** The arm. */
@@ -2170,7 +2170,7 @@ export interface GateLine {
 }
 
 /** The file of `--json`: the lines of one run of the gate, which `--compare` reads. */
-export interface GateFile {
+interface GateFile {
   /** The format version ({@link GATE_FILE_FORMAT}). */
   readonly version: number;
   /** The commit of `--base`, or `null`. */
@@ -2180,7 +2180,7 @@ export interface GateFile {
 }
 
 /** The format version of {@link GateFile}. */
-export const GATE_FILE_FORMAT = 1;
+const GATE_FILE_FORMAT = 1;
 
 /** The verdicts from the worst to the best, for the verdict of a line. */
 const VERDICT_ORDER: readonly Verdict[] = ['FAIL', 'OPEN', 'REBIND', 'PASS'];
@@ -2193,7 +2193,7 @@ const VERDICT_ORDER: readonly Verdict[] = ['FAIL', 'OPEN', 'REBIND', 'PASS'];
  * @param base The commit of `--base`, or `null`.
  * @returns The file.
  */
-export function gateFile(
+function gateFile(
   rows: readonly GateRow[],
   reports: readonly { readonly role: string; readonly tree: RoleReport | null }[],
   base: string | null,
@@ -2306,7 +2306,7 @@ async function readGateFile(path: string): Promise<GateFile> {
  * @param base True when the run has a base.
  * @returns The lines.
  */
-export function ringLines(
+function ringLines(
   reports: readonly {
     readonly role: string;
     readonly tree: RoleReport | null;
@@ -2365,7 +2365,7 @@ export function variantLines(
  * @param rows The values to write.
  * @returns The lines of the table.
  */
-export function detailLines(rows: readonly GateRow[]): string[] {
+function detailLines(rows: readonly GateRow[]): string[] {
   const lines = [
     '| Role | Arm | Measure | Set | Samples | p50 | p95 or p5 | Share > 0 | Worst (demo, time) | Value | Limit | Base | Verdict |',
     '|---|---|---|---|---|---|---|---|---|---|---|---|---|',
@@ -2427,7 +2427,7 @@ const USAGE =
   'Usage: pnpm arm-check <role>... | --all [--base <ref>] [--set <changes>]... [--variant <name> [--set <changes>]...]... [--glb <file>] [--views <dir> [--views-all]] [--demo <id>]... [--midi <path>]... [--step <seconds>] [--jobs <n>] [--long] [--states <ref>,...] [--json <file>] [--compare <file>] [--rings], or pnpm arm-check <role>... | --all --world --base <ref> [--set <changes>]... [--glb <file>], or pnpm arm-check <role> --trace <demo>:[lift]<from>-<to> [--midi <path>] [--step <seconds>] [--set <changes>]..., or pnpm arm-check <role> --explain <stretch | flat> [--demo <id>]... [--midi <path>]... [--step <seconds>] [--set <changes>]... [--glb <file>]';
 
 /** One variant of `--variant`: a name and the changes of the holds of its `--set` options. */
-export interface ArmVariant {
+interface ArmVariant {
   /** The name of the variant, which the table gives. */
   readonly name: string;
   /** The value of each `--set` option of the variant, in their order. */
@@ -2443,7 +2443,7 @@ export interface ArmVariant {
  * @throws Error if a `--set` comes before the first `--variant`, if a name comes more than one
  *   time, or if `--variant` has no name.
  */
-export function variantGroups(args: readonly string[]): ArmVariant[] {
+function variantGroups(args: readonly string[]): ArmVariant[] {
   if (!args.includes('--variant')) {
     return [];
   }
@@ -2485,7 +2485,7 @@ export function variantGroups(args: readonly string[]): ArmVariant[] {
  * @param roles The roles of the command line.
  * @throws Error if the roles have more than one animal, or if a role has no studio body.
  */
-export function checkGlbRoles(roles: readonly string[]): void {
+function checkGlbRoles(roles: readonly string[]): void {
   const animals = roles.map((role) => {
     const source = findRole(role);
     try {
@@ -2511,7 +2511,7 @@ export function checkGlbRoles(roles: readonly string[]): void {
  * @throws Error for an unknown role or option, a missing value, or roles of `--glb` with more than
  *   one animal ({@link checkGlbRoles}).
  */
-export function checkArgs(args: readonly string[]): CheckArgs {
+function checkArgs(args: readonly string[]): CheckArgs {
   const valued = new Set([
     '--base',
     '--set',
@@ -2858,13 +2858,13 @@ export async function traceLines(
 export const GATE_STEP = 0.25;
 
 /** The measures that `--explain` takes. */
-export const EXPLAINED = ['stretch', 'flat'] as const;
+const EXPLAINED = ['stretch', 'flat'] as const;
 
 /** A measure of `--explain`. */
-export type Explained = (typeof EXPLAINED)[number];
+type Explained = (typeof EXPLAINED)[number];
 
 /** The number of edges of the worst sample that `--explain stretch` lists for each arm. */
-export const EXPLAIN_EDGES = 8;
+const EXPLAIN_EDGES = 8;
 
 /** The parts of one posed arm that `--explain` reads. */
 interface ArmParts {
@@ -3159,7 +3159,7 @@ function restShrink(measure: Explained, entry: PartSample, side: Side): RestShri
  * @param measure The measure.
  * @returns The lines.
  */
-export function explainLines(
+function explainLines(
   role: string,
   source: RoleSource,
   demos: readonly DemoFile[],
@@ -3362,7 +3362,7 @@ const WORLD_FORMAT = 1;
 const WORLD_STRIDE = BIND_BONES.length * 3 + 3;
 
 /** The posed joints and palms of one role at each sample of the gate (`--world`). */
-export interface WorldSamples {
+interface WorldSamples {
   /** The label of each sample: the demo and the time. */
   readonly labels: readonly string[];
   /**
@@ -3373,7 +3373,7 @@ export interface WorldSamples {
 }
 
 /** The JSON text of a child of `--world` for one tree. */
-export interface WorldJson {
+interface WorldJson {
   /** The format version ({@link WORLD_FORMAT}). */
   readonly version: number;
   /** The samples of each role. */
@@ -3381,10 +3381,10 @@ export interface WorldJson {
 }
 
 /** A move of a joint above this distance, in meters, is no longer the same bone. */
-export const WORLD_MOVE = 1e-4;
+const WORLD_MOVE = 1e-4;
 
 /** A turn of a palm above this angle, in degrees, is no longer the same palm. */
-export const WORLD_TURN = 0.1;
+const WORLD_TURN = 0.1;
 
 /**
  * Gives the posed head of each bone of {@link BIND_BONES} and the posed palm of each arm at each
@@ -3397,11 +3397,7 @@ export const WORLD_TURN = 0.1;
  * @param step The step of the play, in seconds.
  * @returns The samples.
  */
-export function probeWorld(
-  role: RoleSource,
-  demos: readonly DemoFile[],
-  step: number,
-): WorldSamples {
+function probeWorld(role: RoleSource, demos: readonly DemoFile[], step: number): WorldSamples {
   const labels: string[] = [];
   const arms: Record<Side, number[]> = { L: [], R: [] };
   const round = (value: number): number => Math.round(value * 1e6) / 1e6;
@@ -3426,7 +3422,7 @@ export function probeWorld(
 }
 
 /** The largest move of one arm of one role between two trees (`--world`). */
-export interface WorldMove {
+interface WorldMove {
   /** The role. */
   readonly role: string;
   /** The arm. */
@@ -3452,7 +3448,7 @@ export interface WorldMove {
  * @param tree The samples of the working tree.
  * @returns The move of each arm.
  */
-export function worldMoves(role: string, base: WorldSamples, tree: WorldSamples): WorldMove[] {
+function worldMoves(role: string, base: WorldSamples, tree: WorldSamples): WorldMove[] {
   const index = new Map(base.labels.map((label, k) => [label, k]));
   return SIDES.map((side) => {
     let found: WorldMove = { role, side, samples: 0, move: 0, moveAt: '-', turn: 0, turnAt: '-' };
@@ -3501,7 +3497,7 @@ export function worldMoves(role: string, base: WorldSamples, tree: WorldSamples)
  * @param ref The commit of the base.
  * @returns The lines.
  */
-export function worldLines(moves: readonly WorldMove[], ref: string): string[] {
+function worldLines(moves: readonly WorldMove[], ref: string): string[] {
   return [
     `The posed joints (${BIND_BONES.join(', ')}) and palms of the working tree against ${ref}, at each sample of the rest, the play, and the lift that both trees have. SAME: no joint moves more than ${(WORLD_MOVE * 100).toFixed(2)} cm, and no palm turns more than ${WORLD_TURN}°.`,
     '',
@@ -3783,7 +3779,7 @@ function withStateTrees<T>(
 }
 
 /** The reports of the roles on one state of `--states`, or on the working tree. */
-export interface StateRun {
+interface StateRun {
   /** The name of the column: the commit as the command line gives it, or `tree`. */
   readonly name: string;
   /** The report of each role, or `null` for a role that the state does not have. */
@@ -3834,7 +3830,7 @@ async function measureStates(options: CheckArgs): Promise<StateRun[]> {
  * @param runs The runs, one column each.
  * @returns The lines of the table.
  */
-export function stateLines(roles: readonly string[], runs: readonly StateRun[]): string[] {
+function stateLines(roles: readonly string[], runs: readonly StateRun[]): string[] {
   const lines = [
     `| Role | Arm | Measure (limit) | ${runs.map((run) => run.name).join(' | ')} |`,
     `|---|---|---|${runs.map(() => '---').join('|')}|`,

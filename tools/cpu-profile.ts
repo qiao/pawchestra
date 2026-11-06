@@ -57,7 +57,7 @@ export interface CpuProfile {
 }
 
 /** The command line of the tool. */
-export interface CpuProfileArgs {
+interface CpuProfileArgs {
   readonly demo: string;
   /** The song time of the seek, in seconds. */
   readonly seek: number;
@@ -87,7 +87,7 @@ const USAGE =
  * @returns The arguments.
  * @throws Error for an option with no value or a number that is not positive.
  */
-export function cpuProfileArgs(args: readonly string[]): CpuProfileArgs {
+function cpuProfileArgs(args: readonly string[]): CpuProfileArgs {
   const text = (name: string): string | null => {
     const value = optionValue(args, name);
     if (value === undefined) {
@@ -121,7 +121,7 @@ export function cpuProfileArgs(args: readonly string[]): CpuProfileArgs {
  * @param node The node.
  * @returns The name, such as `update three.module-D6Z8HiYx.js:18279`.
  */
-export function nodeName(node: ProfileNode): string {
+function nodeName(node: ProfileNode): string {
   const frame = node.callFrame;
   const file = frame.url.split('/').at(-1)?.split('?')[0] ?? '';
   return `${frame.functionName || '(anonymous)'} ${file}:${frame.lineNumber + 1}`;
@@ -149,12 +149,12 @@ function parents(profile: CpuProfile): Map<number, number> {
  * @param profile The profile.
  * @returns The count.
  */
-export function profileFrames(profile: CpuProfile): number {
+function profileFrames(profile: CpuProfile): number {
   return ((profile.endTime - profile.startTime) / 1e6) * FRAME_RATE;
 }
 
 /** The time of the functions of a profile, in milliseconds for the whole profile, by name. */
-export interface ProfileTimes {
+interface ProfileTimes {
   /** The time of the samples in the function itself. */
   readonly self: ReadonlyMap<string, number>;
   /** The time of the samples in the function and in the functions that it calls. */
@@ -168,7 +168,7 @@ export interface ProfileTimes {
  * @param profile The profile.
  * @returns The times by the name of {@link nodeName}.
  */
-export function profileTimes(profile: CpuProfile): ProfileTimes {
+function profileTimes(profile: CpuProfile): ProfileTimes {
   const nodes = new Map(profile.nodes.map((node) => [node.id, node]));
   const parent = parents(profile);
   const self = new Map<string, number>();
@@ -201,7 +201,7 @@ export function profileTimes(profile: CpuProfile): ProfileTimes {
  * @param target The function, as `name` or `name:line` with the line from 1.
  * @returns True if the name and, when given, the line match.
  */
-export function isTarget(node: ProfileNode, target: string): boolean {
+function isTarget(node: ProfileNode, target: string): boolean {
   const at = target.lastIndexOf(':');
   const line = at > 0 ? Number(target.slice(at + 1)) : Number.NaN;
   const name = Number.isInteger(line) ? target.slice(0, at) : target;
@@ -219,11 +219,7 @@ export function isTarget(node: ProfileNode, target: string): boolean {
  * @returns The time of each path in milliseconds for the whole profile, by the path, such as
  *   `setProgram:52328 < renderBufferDirect:51786`.
  */
-export function callerTimes(
-  profile: CpuProfile,
-  target: string,
-  depth: number,
-): Map<string, number> {
+function callerTimes(profile: CpuProfile, target: string, depth: number): Map<string, number> {
   const nodes = new Map(profile.nodes.map((node) => [node.id, node]));
   const parent = parents(profile);
   const short = (node: ProfileNode): string =>
@@ -262,11 +258,7 @@ export function callerTimes(
  * @param top The count of lines.
  * @returns The lines, such as `1.323  update three.module.js:18279`.
  */
-export function topLines(
-  times: ReadonlyMap<string, number>,
-  frames: number,
-  top: number,
-): string[] {
+function topLines(times: ReadonlyMap<string, number>, frames: number, top: number): string[] {
   return [...times]
     .filter(([, ms]) => ms / frames >= 0.0005)
     .toSorted((a, b) => b[1] - a[1])

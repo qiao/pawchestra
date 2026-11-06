@@ -44,7 +44,7 @@ const USAGE =
   'Usage: pnpm plan-time [--base <ref>]... [--no-tree] [--demo <id>]... [--runs <n>] [--turns <n>] [--gate <load>]';
 
 /** The command line of the tool. */
-export interface PlanTimeArgs {
+interface PlanTimeArgs {
   /** The commits to time beside the working tree, in their order. */
   readonly bases: readonly string[];
   /** The demos with no `.mid`, or none for all demos. */
@@ -69,7 +69,7 @@ export interface PlanTimeArgs {
  * @throws Error for an unknown option, a missing value, or a count that is not a whole number
  *   above 0.
  */
-export function parsePlanTimeArgs(args: readonly string[]): PlanTimeArgs {
+function parsePlanTimeArgs(args: readonly string[]): PlanTimeArgs {
   const bases: string[] = [];
   const demos: string[] = [];
   let runs = 5;
@@ -126,10 +126,7 @@ export function parsePlanTimeArgs(args: readonly string[]): PlanTimeArgs {
  * @returns The median of each demo, by its name.
  * @throws Error if `buildScore()` refuses a demo.
  */
-export async function timeDemos(
-  demos: readonly string[],
-  runs: number,
-): Promise<Record<string, number>> {
+async function timeDemos(demos: readonly string[], runs: number): Promise<Record<string, number>> {
   const times: Record<string, number> = {};
   for (const demo of await patchedDemos()) {
     const name = demo.file.replace(/\.mid$/, '');

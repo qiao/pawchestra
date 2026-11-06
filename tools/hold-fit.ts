@@ -150,10 +150,10 @@ export const FIT_STEP = 1;
 /**
  * The largest share of the play samples with a fold: the goal of a mesh rig.
  */
-export const PLAY_FOLD_GOAL = 0.01;
+const PLAY_FOLD_GOAL = 0.01;
 
 /** The number of the faces that fold most, which each row names ({@link topFolds}). */
-export const TOP_FOLDS = 5;
+const TOP_FOLDS = 5;
 
 /** The largest number of variants of the grids of a run. One variant takes 45 s to 90 s. */
 export const GRID_LIMIT = 40;
@@ -162,81 +162,81 @@ export const GRID_LIMIT = 40;
  * The largest number of variants of the grids of a scan (`--scan`). One variant of the violinist
  * takes about 0.04 s for each rest sample.
  */
-export const SCAN_GRID_LIMIT = 1000;
+const SCAN_GRID_LIMIT = 1000;
 
 /**
  * The sample sets of a run: the play, the lift of the arms at the start, the rest pose before the
  * start, and the lowering after the song end. The folds have no lowering, and a role with no sweep
  * has the folds only.
  */
-export const FIT_SETS = ['play', 'lift', 'rest', 'lower'] as const;
+const FIT_SETS = ['play', 'lift', 'rest', 'lower'] as const;
 
 /** A sample set of a run ({@link FIT_SETS}). */
-export type FitSet = (typeof FIT_SETS)[number];
+type FitSet = (typeof FIT_SETS)[number];
 
 /**
  * The largest gap of the lower end of the instrument to the skin under it in the rest without the
  * mark `OVER`, in meters: the goal of the lap rest.
  */
-export const LAP_GAP_GOAL = 0.02;
+const LAP_GAP_GOAL = 0.02;
 
 /**
  * The deepest corner of the lower end of a violin in the body in the rest without the mark `OVER`,
  * in meters.
  */
-export const END_DEPTH_GOAL = 0.01;
+const END_DEPTH_GOAL = 0.01;
 
 /**
  * The deepest corner of a violin in the body in the rest without the mark `OVER`, in meters: the
  * violin may touch the body, at most 1 cm deep (design 5.3).
  */
-export const HELD_DEPTH_GOAL = 0.01;
+const HELD_DEPTH_GOAL = 0.01;
 
 /** The largest tilt of the violin and of the bow from the vertical in the rest without the mark `OVER`, in degrees. */
-export const TILT_GOAL = 15;
+const TILT_GOAL = 15;
 
 /** The largest gap of the frog end of the bow to the right thigh in the rest without the mark `OVER`, in meters. */
-export const FROG_GAP_GOAL = 0.03;
+const FROG_GAP_GOAL = 0.03;
 
 /** The deepest corner of the frog end of the bow in the body in the rest without the mark `OVER`, in meters. */
-export const FROG_DEPTH_GOAL = 0.01;
+const FROG_DEPTH_GOAL = 0.01;
 
 /**
  * The deepest point of the bow in the body or in the arms in the rest without the mark `OVER`, in
  * meters.
  */
-export const BOW_DEPTH_GOAL = 0.005;
+const BOW_DEPTH_GOAL = 0.005;
 
 /**
  * The highest right elbow joint above the right shoulder joint in the rest without the mark
  * `OVER`, in meters: the elbow hangs below the shoulder, as the elbows of the seated violinist of
  * the reference image.
  */
-export const ELBOW_RISE_GOAL = 0;
+const ELBOW_RISE_GOAL = 0;
 
 /**
  * The right elbow joint farthest behind the back of the trunk at its height in the rest without
  * the mark `OVER`, in meters.
  */
-export const ELBOW_BACK_GOAL = 0.05;
+const ELBOW_BACK_GOAL = 0.05;
 
 /**
  * The right elbow joint farthest out from the right side of the trunk at its height, seen from the
  * front, in the rest without the mark `OVER`, in meters.
  */
-export const ELBOW_OUT_GOAL = 0.08;
+const ELBOW_OUT_GOAL = 0.08;
 
 /**
  * The largest angle of the right upper arm from the vertical in the rest without the mark `OVER`,
  * in degrees.
  */
-export const UPPER_ARM_GOAL = 35;
+const UPPER_ARM_GOAL = 35;
 
 /**
  * The wind holds whose rest stands the instrument on a leg, by the root of `--set`: the flute of
  * the tan fox stands upright on the right leg. Each other wind role has no lap rest.
  */
-export const LEG_RESTS: ReadonlySet<string> = new Set(['flute@fox-tan']);
+const LEG_RESTS: ReadonlySet<string> = new Set(['flute@fox-tan']);
 
 /** The usage text of `pnpm hold-fit`. */
 const USAGE = `Usage: pnpm hold-fit <${[...FOLD_ROLES.keys()].join(' | ')} | <role>@<species>> [--set <path>=<value>[;<path>=<value>]...]... [--grid <path>=<a>:<b>:<step>]... [--sets <${FIT_SETS.join(' | ')}>[,<set>]...] [--demo <id>|all]... [--midi <path>]... [--step <seconds>] [--faces <n>] [--faces-of <face>[,<face>]...] [--technique <normal | pizzicato | tremolo>] [--base <ref>] [--json <file>] [--glb <file>]
@@ -259,7 +259,7 @@ function isFitSet(name: string): name is FitSet {
  * @returns The sets, in the order of {@link FIT_SETS}.
  * @throws Error if a name is not a set of {@link FIT_SETS}, or if the list is empty.
  */
-export function parseSets(value: string): FitSet[] {
+function parseSets(value: string): FitSet[] {
   const names = value
     .split(',')
     .map((name) => name.trim())
@@ -355,11 +355,7 @@ export function gridVariants(
 }
 
 /** The techniques of the notes of a seat (design 3.5), which `--technique` takes. */
-export const TECHNIQUES = [
-  'normal',
-  'pizzicato',
-  'tremolo',
-] as const satisfies readonly Technique[];
+const TECHNIQUES = ['normal', 'pizzicato', 'tremolo'] as const satisfies readonly Technique[];
 
 /**
  * Reads the technique of `--technique`.
@@ -386,7 +382,7 @@ export function techniqueOf(value: string): Technique {
  * @param technique The technique.
  * @returns The filter, for `probeFolds()` and the sweep.
  */
-export function techniqueFilter(technique: Technique): PlayFilter {
+function techniqueFilter(technique: Technique): PlayFilter {
   const seen = new WeakMap<TestScene, Map<number, { starts: number[]; techniques: Technique[] }>>();
   return (scene, player, song) => {
     const seat = player === null ? null : (scene.layout.players[player]?.cast.seatIndex ?? null);
@@ -422,7 +418,7 @@ export function techniqueFilter(technique: Technique): PlayFilter {
 }
 
 /** The options of `pnpm hold-fit`. */
-export interface FitOptions {
+interface FitOptions {
   /** The name of the role, a key of `FOLD_ROLES` or a recast role (`findRole()`). */
   readonly name: string;
   /** The role. */
@@ -486,7 +482,7 @@ const SCAN_REFUSES: readonly string[] = [
  * @returns The times.
  * @throws Error if a time is not a number of 0 or more, or if the list is empty.
  */
-export function parseWalls(value: string): number[] {
+function parseWalls(value: string): number[] {
   const walls = value.split(',').map((text) => (text.trim() === '' ? Number.NaN : Number(text)));
   if (walls.length === 0 || walls.some((wall) => !Number.isFinite(wall) || wall < 0)) {
     throw new Error(`The option --walls takes wall times of 0 s or more, and "${value}" has none.`);
@@ -665,7 +661,7 @@ export function fitSweep(
 }
 
 /** The results of a sweep with the instrument in the body taken out. */
-export interface HeldSplit {
+interface HeldSplit {
   /** The deepest pair of the instrument in the body, or `null`. */
   readonly held: SetWorst | null;
   /** The results with no pair of the instrument, for the deepest points of the role. */
@@ -711,7 +707,7 @@ export function splitHeld(role: RoleSweep, results: readonly DemoResult[]): Held
 }
 
 /** The gap of a paw that leaves its grip in the rest pose to the body. */
-export interface PawGap {
+interface PawGap {
   /** The name of the paw, such as `paw L`. */
   readonly paw: string;
   /**
@@ -763,7 +759,7 @@ export function freeGaps(role: RoleSource): GapsOf {
 }
 
 /** The reach share of the rest place of a free paw (`reachShare()` of `pnpm hold-reach`). */
-export interface FreeShare {
+interface FreeShare {
   /** The side of the paw. */
   readonly side: 'L' | 'R';
   /** The share of the arm, or `null` for a hanging arm. Above 1, the arm cannot reach the place. */
@@ -771,7 +767,7 @@ export interface FreeShare {
 }
 
 /** The pair of a sample set that is nearest to its limit, or most over it. */
-export interface SetWorst {
+interface SetWorst {
   /** The name of the sample set, such as `lift`. */
   readonly set: string;
   /** The demo and the player of the deepest point, such as
@@ -809,7 +805,7 @@ export function worstPairs(role: RoleSweep, results: readonly DemoResult[]): Set
 }
 
 /** The samples of a set and the samples with a fold. */
-export type FoldShare = Readonly<Pick<FoldCount, 'samples' | 'withFold'>>;
+type FoldShare = Readonly<Pick<FoldCount, 'samples' | 'withFold'>>;
 
 /**
  * The rest samples, and the most folded faces of one rest sample, split by the side of their main
@@ -817,13 +813,13 @@ export type FoldShare = Readonly<Pick<FoldCount, 'samples' | 'withFold'>>;
  * of the samples cannot show a change of the rest, and the faces can. A run with no rest set has
  * no rest sample.
  */
-export type RestFolds = Readonly<Pick<FoldCount, 'samples' | 'most' | 'split'>>;
+type RestFolds = Readonly<Pick<FoldCount, 'samples' | 'most' | 'split'>>;
 
 /**
  * The shares of the samples with a fold in the play and in the lift, and the most folded faces of
  * one rest sample.
  */
-export interface FoldShares {
+interface FoldShares {
   /** The samples of the play and the samples with a fold. */
   readonly play: FoldShare;
   /** The samples of the lift and the samples with a fold. */
@@ -856,7 +852,7 @@ export function foldShares(report: FoldReport): FoldShares {
  * @param faces The indices of the faces.
  * @returns The shares of each face, in the order of the faces.
  */
-export function reportShares(report: FoldReport, faces: readonly number[]): FaceShare[] {
+function reportShares(report: FoldReport, faces: readonly number[]): FaceShare[] {
   const { rest, play, lift } = report.sets;
   return faceShares(
     { rest: rest.samples, play: play.samples, lift: lift.samples },
@@ -870,7 +866,7 @@ export function reportShares(report: FoldReport, faces: readonly number[]): Face
 }
 
 /** A face that folds in many samples of a variant ({@link topFolds}). */
-export interface TopFold {
+interface TopFold {
   /** The index of the face. */
   readonly face: number;
   /** The share of the samples of all sets in which the face folds, from 0 to 1. */
@@ -923,7 +919,7 @@ export function topFolds(
  * @param folds The faces.
  * @returns The text, such as `116 13.7%, 1738 5.0% new`, or `none` when no face folds.
  */
-export function topFoldsText(folds: readonly TopFold[]): string {
+function topFoldsText(folds: readonly TopFold[]): string {
   if (folds.length === 0) {
     return 'none';
   }
@@ -973,10 +969,10 @@ export interface FitRow {
 }
 
 /** The spare reach of the grip of each side of a wind hold (`spareRow()` of `pnpm hold-reach`). */
-export type GripSpares = Readonly<Record<'L' | 'R', GripSpare>>;
+type GripSpares = Readonly<Record<'L' | 'R', GripSpare>>;
 
 /** The angles of the mean turns of one arm, in degrees. */
-export interface ArmAngles {
+interface ArmAngles {
   /** The mean turn of the upper arm from its bind pose, in the axes of the chest. */
   readonly upper: number;
   /** The mean turn of the paw from the forearm. */
@@ -991,7 +987,7 @@ export interface ArmAngles {
 }
 
 /** The mean turns of both arms over the samples of one sample set of the folds. */
-export interface ArmTurns {
+interface ArmTurns {
   /** The sample set: the play, or the first set of the run with no play. */
   readonly set: SampleSet;
   /** The left arm. */
@@ -1004,7 +1000,7 @@ export interface ArmTurns {
 type TurnSamples = Map<SampleSet, { readonly upper: Quat[]; readonly paw: Quat[] }[]>;
 
 /** The probe of the arm turns of a fold probe ({@link armTurns}). */
-export interface ArmTurnProbe {
+interface ArmTurnProbe {
   /** Keeps the turns of the arms in each sample. */
   readonly visit: FoldVisit;
   /** Gives the angles of the mean turns, or `null` with no sample. */
@@ -1012,7 +1008,7 @@ export interface ArmTurnProbe {
 }
 
 /** The angles of the mean turn of a paw from its forearm, in degrees ({@link pawAngles}). */
-export interface PawAngles {
+interface PawAngles {
   /** The whole turn. */
   readonly paw: number;
   /** The twist around the bind axis of the forearm, from -180 to 180. */
@@ -1160,7 +1156,7 @@ interface StoredFit {
 }
 
 /** The rows of a run and its demos. */
-export interface FitRun {
+interface FitRun {
   /** The demos of the run. */
   readonly demos: readonly string[];
   /** The rows, the base first. */
@@ -1190,7 +1186,7 @@ export const FIT_FORMAT = 14;
  * field sets it to the new version. An added field that the reader gives as `-` on an older text
  * is an optional field of the stored types.
  */
-export const FIT_SINCE = 6;
+const FIT_SINCE = 6;
 
 /**
  * Writes the rows of a run as JSON (`--json`), with the format version {@link FIT_FORMAT} and
@@ -1570,7 +1566,7 @@ export function fitTable(rows: readonly FitRow[]): string[] {
  * @param rows The rows, in the order of the fit table.
  * @returns The lines: an empty line, a title, and the table, or none with no deepest point.
  */
-export function placeTable(rows: readonly FitRow[]): string[] {
+function placeTable(rows: readonly FitRow[]): string[] {
   const sets = [...new Set(rows.flatMap((row) => row.depths.map((d) => d.set)))];
   const held = rows.some((row) => row.held);
   if (sets.length === 0 && !held) {
@@ -1622,7 +1618,7 @@ export interface ScanRow {
  * @param bow True for a table with the violin columns.
  * @returns The number of missed goals.
  */
-export function scanMisses(row: ScanRow, bow: boolean): number {
+function scanMisses(row: ScanRow, bow: boolean): number {
   const lap = row.lap ? lapCells(row.lap, bow).filter((cell) => cell.includes('OVER')).length : 0;
   return lap + spareMisses(row.spare);
 }
@@ -1637,7 +1633,7 @@ export function scanMisses(row: ScanRow, bow: boolean): number {
  * @param rows The rows, the base first.
  * @returns The lines.
  */
-export function scanTable(rows: readonly ScanRow[]): string[] {
+function scanTable(rows: readonly ScanRow[]): string[] {
   const samples = new Set(rows.map((row) => row.sample)).size > 1;
   const bow = rows.some((row) => row.lap?.bowTilt);
   const grips = rows.some((row) => row.spare);
@@ -1674,7 +1670,7 @@ export function scanTable(rows: readonly ScanRow[]): string[] {
  * @param rows The rows, the base first, the rows of each variant together.
  * @returns The sorted rows.
  */
-export function sortScanRows(rows: readonly ScanRow[]): ScanRow[] {
+function sortScanRows(rows: readonly ScanRow[]): ScanRow[] {
   const bow = rows.some((row) => row.lap?.bowTilt);
   const groups = new Map<string, ScanRow[]>();
   for (const row of rows) {
@@ -1809,7 +1805,7 @@ function windOf(
  * @param role The role.
  * @returns True for a role whose rest the lap columns measure.
  */
-export function hasLapRest(role: RoleSource): boolean {
+function hasLapRest(role: RoleSource): boolean {
   const wind = windOf(role);
   return chinOf(role) !== null || (!!wind && LEG_RESTS.has(`${wind.instrument}@${wind.species}`));
 }
@@ -1852,7 +1848,7 @@ function windSpare(role: RoleSource): GripSpares | null {
  * @param scene The scene.
  * @returns The number of notes.
  */
-export function roleNotes(role: RoleSource, scene: TestScene): number {
+function roleNotes(role: RoleSource, scene: TestScene): number {
   if (role.kind === 'conductor') {
     return scene.plan.beats.length;
   }

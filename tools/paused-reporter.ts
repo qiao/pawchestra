@@ -99,7 +99,7 @@ function moduleErrors(module: TestModule, root: string): string[][] {
  * @param root The root of the run.
  * @returns The report.
  */
-export function pausedReport(
+function pausedReport(
   modules: readonly TestModule[],
   unhandled: readonly UnhandledError[],
   reason: TestRunEndReason,

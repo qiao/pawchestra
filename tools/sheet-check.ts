@@ -8,7 +8,7 @@ import type { SheetId, ViewSheet } from '../src/gallery/sheets.ts';
 import { openShot, startSite } from './screenshots.ts';
 
 /** The match of the silhouette of one view with the matte of the sheet. */
-export interface ViewMatch {
+interface ViewMatch {
   /** The name of the view. */
   readonly view: 'front' | 'side' | 'back';
   /** The intersection over the union of the two silhouettes, from 0 to 1. */
@@ -142,7 +142,7 @@ export function differenceImage(matte: Uint8Array, silhouette: Uint8Array): Uint
  * The pixels of one row of one view where the sheet and the page differ, on each side of the seat
  * of the view.
  */
-export interface RowDiff {
+interface RowDiff {
   /** The name of the view. */
   readonly view: 'front' | 'side' | 'back';
   /** The row of the sheet. */
@@ -154,7 +154,7 @@ export interface RowDiff {
 }
 
 /** The rows of the top and the bottom of the animal in one view of the sheet and of the page. */
-export interface ViewExtent {
+interface ViewExtent {
   /** The name of the view. */
   readonly view: 'front' | 'side' | 'back';
   /** The first and the last row of the animal in the sheet. */
@@ -279,7 +279,7 @@ export function viewExtents(
 }
 
 /** The colors of the animal pixels of one view of an image. */
-export interface ColorStats {
+interface ColorStats {
   /** The name of the view. */
   readonly view: 'front' | 'side' | 'back';
   /** The number of pixels. */

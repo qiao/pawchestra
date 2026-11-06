@@ -26,7 +26,7 @@ import { APP_NAME } from '../src/app/page-title.ts';
 import { PAW_MARKUP, WORDMARK_PATH, WORDMARK_VIEW_BOX } from '../src/ui/icons.ts';
 
 /** The one line of the share card under the logo, in Fraunces. */
-export const SHARE_LINE = 'A web-based MIDI player with an animal orchestra.';
+const SHARE_LINE = 'A web-based MIDI player with an animal orchestra.';
 
 /** The size of a card. */
 export interface CardSize {

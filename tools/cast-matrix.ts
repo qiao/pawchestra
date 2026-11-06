@@ -108,10 +108,10 @@ export const CAST_SAMPLE = { step: 0.5, every: 4 } as const;
  * faults of a pair early: a pair alone takes about half of the time of {@link CAST_SAMPLE}. A change
  * still gets its full sample before its report.
  */
-export const QUICK_SAMPLE = { step: 2, every: 16 } as const;
+const QUICK_SAMPLE = { step: 2, every: 16 } as const;
 
 /** The sample of each pair: {@link CAST_SAMPLE} or {@link QUICK_SAMPLE}. */
-export interface CastSample {
+interface CastSample {
   /** The step of song time between two play samples of the arm gate, in seconds. */
   readonly step: number;
   /** The sweep takes each `every`-th play sample of its role. */
@@ -122,13 +122,13 @@ export interface CastSample {
  * The depth of a clip, or the error of a note target, past the own pair of the role above which
  * the value fails, in meters.
  */
-export const CLIP_MARGIN = 0.01;
+const CLIP_MARGIN = 0.01;
 
 /** The format version of {@link PairJson}. A new version gives new cache keys. */
-export const CAST_FORMAT = 2;
+const CAST_FORMAT = 2;
 
 /** One variant of a run: a column of each role, with the hold changes of the variant. */
-export interface MatrixVariant {
+interface MatrixVariant {
   /** The name: `base` for the changes of `--set` alone, else the name of `--variant`. */
   readonly name: string;
   /** The hold changes (`setHolds()` of `tools/hold-sets.ts`), or `''` for no change. */
@@ -136,7 +136,7 @@ export interface MatrixVariant {
 }
 
 /** The deepest point of one pair of parts in one sample set of the sweep. */
-export interface PairClip {
+interface PairClip {
   /** The sample set, such as `play`. */
   readonly set: string;
   /** The moving part, such as `paws`. */
@@ -152,7 +152,7 @@ export interface PairClip {
 }
 
 /** The JSON of one pair, as a child writes it. */
-export interface PairJson {
+interface PairJson {
   /** The format version ({@link CAST_FORMAT}). */
   readonly version: number;
   /** The species. */
@@ -182,7 +182,7 @@ export interface PairJson {
 }
 
 /** One value of a cell: a value that does not pass, or the value nearest to its limit. */
-export interface CellItem {
+interface CellItem {
   /** The verdict of the value. */
   readonly verdict: 'PASS' | 'OPEN' | 'FAIL';
   /** The text, such as `grip L 62/45` or `paws>body 4.1/1.5 cm`. */
@@ -192,7 +192,7 @@ export interface CellItem {
 }
 
 /** One cell of the matrix. */
-export interface MatrixCell {
+interface MatrixCell {
   /** The verdict of the cell: the worst verdict of its values. */
   readonly verdict: 'PASS' | 'OPEN' | 'FAIL';
   /** The value of the gate with the largest ratio, or `null` with no value. */
@@ -206,7 +206,7 @@ export interface MatrixCell {
 }
 
 /** The JSON file of a run. */
-export interface MatrixJson {
+interface MatrixJson {
   /** The format version ({@link CAST_FORMAT}). */
   readonly version: number;
   /** The roles, in the order of the columns. */
@@ -226,7 +226,7 @@ export interface MatrixJson {
 }
 
 /** One pair of the matrix with its cell. */
-export interface MatrixPair {
+interface MatrixPair {
   /** The name of the variant of the pair ({@link MatrixVariant}). */
   readonly variant: string;
   /** The JSON of the pair. */
@@ -267,7 +267,7 @@ const USAGE =
  * @throws Error for an unknown option, role, or species, for a variant with no name or a name
  *   that comes two times, and for a hold change that does not fit.
  */
-export function parseMatrixArgs(args: readonly string[]): MatrixArgs {
+function parseMatrixArgs(args: readonly string[]): MatrixArgs {
   const values = new Map<string, string>();
   const sets: string[] = [];
   const named: (readonly [string, string])[] = [];
@@ -449,7 +449,7 @@ function scaleOfChanges(
 }
 
 /** One pair of the matrix, set up in memory by {@link setPair}. */
-export interface CastPair {
+interface CastPair {
   /** The name of the pair for the role tools: the role, or `<role>@<species>`. */
   readonly name: string;
   /** True for the own role of the species. */
@@ -588,7 +588,7 @@ async function measurePair(
  * @param margin The margin.
  * @returns The verdict.
  */
-export function cellVerdict(
+function cellVerdict(
   over: boolean,
   homeOver: boolean,
   worse: number,
@@ -690,7 +690,7 @@ function targetItem(pair: PairJson, home: PairJson | null): CellItem | null {
  * @param home The own pair of the role, or `null` when it failed.
  * @returns The cell.
  */
-export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
+function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
   if (pair.error !== null || !pair.arms) {
     const text = `error: ${(pair.error ?? 'no report').split('\n')[0] ?? ''}`;
     const item: CellItem = { verdict: 'FAIL', text, ratio: Infinity };
@@ -747,7 +747,7 @@ export function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
  * @param cell The cell.
  * @returns The text.
  */
-export function cellText(pair: PairJson, cell: MatrixCell): string {
+function cellText(pair: PairJson, cell: MatrixCell): string {
   const scale =
     pair.scale.source === 'fixed'
       ? ''
@@ -770,7 +770,7 @@ export function cellText(pair: PairJson, cell: MatrixCell): string {
  * @param json The matrix.
  * @returns The lines.
  */
-export function matrixLines(json: MatrixJson): string[] {
+function matrixLines(json: MatrixJson): string[] {
   const named = json.variants.length > 1;
   const columns = json.variants.flatMap((variant) =>
     json.roles.map((role) => ({ variant: variant.name, role })),
