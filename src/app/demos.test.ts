@@ -128,6 +128,6 @@ describe('DEMOS (design 8.2)', () => {
 
 describe('demoUrl', () => {
   it('gives the file in the demos folder of the site (design 8.3)', () => {
-    expect(demoUrl('beethoven-9', '/zoophony/')).toBe('/zoophony/demos/beethoven-9.mid');
+    expect(demoUrl('beethoven-9', '/pawchestra/')).toBe('/pawchestra/demos/beethoven-9.mid');
   });
 });

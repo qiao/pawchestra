@@ -60,6 +60,6 @@ describe('HALL_REVERB_CREDITS (design 2.8, 6.8)', () => {
 
 describe('licensesUrl (design 7.3)', () => {
   it('gives the license file at the base of the site', () => {
-    expect(licensesUrl('/zoophony/')).toBe('/zoophony/third-party-licenses.txt');
+    expect(licensesUrl('/pawchestra/')).toBe('/pawchestra/third-party-licenses.txt');
   });
 });

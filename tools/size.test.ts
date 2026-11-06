@@ -51,7 +51,7 @@ describe('staticChunkFiles', () => {
 describe('htmlAssetFiles', () => {
   it('lists the scripts and the stylesheets of the assets folder', () => {
     const html = [
-      '<script type="module" crossorigin src="/zoophony/assets/polyfill.js"></script>',
+      '<script type="module" crossorigin src="/pawchestra/assets/polyfill.js"></script>',
       '<link rel="stylesheet" crossorigin href="/assets/index.css">',
       '<link rel="icon" href="/favicon.svg">',
       '<script src="https://example.org/assets/remote.js"></script>',

@@ -74,7 +74,7 @@ describe('withRefTree', () => {
         },
         { parent, paths: ['package.json'] },
       );
-      expect(JSON.parse(text)).toHaveProperty('name', 'zoophony');
+      expect(JSON.parse(text)).toHaveProperty('name', 'pawchestra');
       expect(await readdir(parent)).toEqual([]);
 
       const failing = withRefTree('HEAD', () => Promise.reject(new Error('the reader fails')), {

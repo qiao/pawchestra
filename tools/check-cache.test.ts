@@ -59,7 +59,7 @@ describe('checkKey', () => {
       { ...PARTS, scriptHash: 'e'.repeat(64) },
       { ...PARTS, node: 'v24.11.0 darwin-arm64' },
       { ...PARTS, pnpm: '10.9.0' },
-      { ...PARTS, siteBase: '/zoophony/' },
+      { ...PARTS, siteBase: '/pawchestra/' },
       { ...PARTS, modulesHash: 'none' },
     ];
 

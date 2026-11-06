@@ -14,7 +14,7 @@ describe('fetchOk', () => {
       vi.fn(async () => response),
     );
 
-    await expect(fetchOk('https://zoophony.test/a.sf3')).resolves.toBe(response);
+    await expect(fetchOk('https://pawchestra.test/a.sf3')).resolves.toBe(response);
   });
 
   it('refuses an HTTP error status, with the URL in the message', async () => {
@@ -23,8 +23,8 @@ describe('fetchOk', () => {
       vi.fn(async () => new Response('', { status: 404 })),
     );
 
-    await expect(fetchOk(new URL('https://zoophony.test/sf/index.json'))).rejects.toThrow(
-      'Cannot load https://zoophony.test/sf/index.json: HTTP 404.',
+    await expect(fetchOk(new URL('https://pawchestra.test/sf/index.json'))).rejects.toThrow(
+      'Cannot load https://pawchestra.test/sf/index.json: HTTP 404.',
     );
   });
 });

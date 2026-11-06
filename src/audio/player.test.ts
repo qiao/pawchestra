@@ -19,7 +19,7 @@ import type { PresetFileEntry } from './preset-index.ts';
 import type { ProcessorCommand, ProcessorReply } from './processor-messages.ts';
 
 /** The site root of the tests. */
-const BASE_URL = new URL('https://zoophony.test/');
+const BASE_URL = new URL('https://pawchestra.test/');
 
 /** The content of `sf/index.json` in the tests. */
 const INDEX: readonly PresetFileEntry[] = [
@@ -649,7 +649,7 @@ describe('WorkletPlayer loads at the same time', () => {
     worker.progress(firstRequest, 1);
     expect(progress).toEqual([]);
     const secondRequest = last(worker.requests);
-    expect(secondRequest.urls).toEqual(['https://zoophony.test/sf/0/40.sf3']);
+    expect(secondRequest.urls).toEqual(['https://pawchestra.test/sf/0/40.sf3']);
     worker.decode(secondRequest);
     await flush();
     expect(node.port.commands.map((command) => command.type)).toEqual([
@@ -679,9 +679,9 @@ describe('WorkletPlayer session banks (design 6.3)', () => {
     );
 
     expect(urls).toEqual([
-      ['https://zoophony.test/sf/0/0.sf3'],
+      ['https://pawchestra.test/sf/0/0.sf3'],
       [],
-      ['https://zoophony.test/sf/0/40.sf3'],
+      ['https://pawchestra.test/sf/0/40.sf3'],
     ]);
     expect(banks).toEqual(urls);
     expect(player.pcmBytes).toBe(16);
@@ -694,7 +694,7 @@ describe('WorkletPlayer session banks (design 6.3)', () => {
     await loadFully(player, scoreWith(0));
 
     expect(last(workers).requests.map((request) => request.urls)).toEqual([
-      ['https://zoophony.test/sf/0/0.sf3'],
+      ['https://pawchestra.test/sf/0/0.sf3'],
     ]);
     expect(player.pcmBytes).toBe(8);
   });
