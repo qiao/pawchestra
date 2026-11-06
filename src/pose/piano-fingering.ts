@@ -10,6 +10,12 @@ export interface FingeringNote {
   readonly end: number;
   /** The MIDI keys of the note, sorted up. Empty for a hand that only moves. */
   readonly keys: readonly number[];
+  /**
+   * The semitones that the palm stands from the keys, away from the other hand: up for a positive
+   * value (`HandNote.shift`). The plan picks the fingers that move the palm this far, so the claws
+   * stay on their keys. 0 when it is missing.
+   */
+  readonly shift?: number;
 }
 
 /** The size and the claws of the paw that plays the fingering (design 5.3). */
@@ -111,6 +117,13 @@ export const PIANO_FINGERING_COSTS = {
    * arm carries the hand from chord to chord, so the move has no fixed points.
    */
   chordSemitone: 0.5,
+  /**
+   * The points for each white key that the palm stands nearer to the other hand than the shift of
+   * the note asks (`FingeringNote.shift`). Thus a paw near the other paw takes the claws on the
+   * side of the other paw, and each claw stays on its key. A palm that moved off its claws by the
+   * shift jumped 12 cm between two notes of `bach-bwv1050`.
+   */
+  room: 4,
   /** The points of a pair past MinPrac or MaxPrac in legato: a hard limit. */
   hard: 1000,
   /** The points of the same finger on the same key within {@link PIANO_FINGERING_COSTS.repeatSec}. */
@@ -195,6 +208,11 @@ interface SearchNote {
   readonly places: Float64Array;
   /** The finger choices: the fingers of each key, in the order of `keys`. */
   readonly choices: readonly Uint8Array[];
+  /**
+   * The distance of the palm from the mean of the keys that the shift of the note asks, in white
+   * keys, in the axes of a right hand: positive away from the other hand.
+   */
+  readonly away: number;
 }
 
 /** The choice of finger 3 alone: a fallback for a missing choice. */
@@ -297,7 +315,8 @@ export function* planFingeringSteps(
       places[j] = (mirror * pianoKeyPosition(k)[0]) / WHITE_KEY;
     }
     const choices = choicesOf(keys, black);
-    sounding.push({ index, start: note.start, end: note.end, keys, black, places, choices });
+    const away = (mirror * (note.shift ?? 0) * 7) / 12;
+    sounding.push({ index, start: note.start, end: note.end, keys, black, places, choices, away });
   }
 
   const limit = (a: number, b: number, k: number): number => limits[6 * (6 * a + b) + k] ?? 0;
@@ -378,9 +397,11 @@ export function* planFingeringSteps(
     const topWhiteBefore = before && !before.black[before.black.length - 1] ? 1 : 0;
     const topWhiteAfter = after && !after.black[after.black.length - 1] ? 1 : 0;
     let cost = 0;
+    let fingerSum = 0;
     for (let j = 0; j < fingers.length; j++) {
       const f = fingers[j] ?? 1;
       const black = note.black[j] ?? 0;
+      fingerSum += f - 3;
       if (f >= 4) {
         cost += c.weak;
       }
@@ -394,6 +415,11 @@ export function* planFingeringSteps(
         const s = (note.keys[j] ?? 0) - (note.keys[j - 1] ?? 0);
         cost += spanCost(fingers[j - 1] ?? 1, f, s);
       }
+    }
+    if (note.away > 0) {
+      // The palm stands from the mean of the keys by the offsets of the claws, in the other way.
+      const palm = (-fingerSum / fingers.length) * clawPitch;
+      cost += c.room * Math.max(0, note.away - palm);
     }
     return fingers.length > 1 ? cost + c.clawFit * clawMisfit(note, fingers) : cost;
   };

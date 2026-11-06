@@ -74,8 +74,10 @@ export interface HandNote {
    */
   readonly since?: number;
   /**
-   * The hand plays this many semitones from its keys, up for a positive value, so that it keeps
-   * away from the other hand (`splitHands()` with a distance `apart`). 0 when it is missing.
+   * The semitones that the palm of the hand stands from its keys, up for a positive value, so that
+   * it keeps away from the other hand (`splitHands()` with a distance `apart`). A piano hand gets
+   * it from its fingering (`FingeringNote.shift`), so each claw stays on its key. 0 when it is
+   * missing.
    */
   readonly shift?: number;
 }
@@ -94,8 +96,8 @@ export interface HandNote {
  *
  * With a distance `apart`, the middles of the keys of the two hands stay at least that far apart,
  * because two wide paws on near keys go into each other. When the middles of the two parts of a
- * chord wider than one octave are nearer, each hand plays half of the difference away from its
- * keys (`HandNote.shift`), so that a bass and a melody stay in two hands. When a hand plays nearer
+ * chord wider than one octave are nearer, the palm of each hand asks for half of the difference
+ * away from its keys (`HandNote.shift`), so that a bass and a melody stay in two hands. When a hand plays nearer
  * to the other hand, the other hand moves out of its way, away from it, at the start of the chord:
  * a note of loudness 0 on the key at that distance, with no sound.
  *
@@ -269,9 +271,8 @@ export interface HandTrack {
  *
  * @param notes The notes of the hand, sorted by start.
  * @param action How the hand plays.
- * @param pointOf Gives the place of the palm for the lowest and the highest key of a note, the
- *   shift of the hand in semitones, and the index of the note, or -1 for the place before the
- *   first note.
+ * @param pointOf Gives the place of the palm for the lowest and the highest key of a note and the
+ *   index of the note, or -1 for the place before the first note.
  * @param amplitude The seeded amplitude of the player.
  * @param firstKey The key of the hand before its first note.
  * @param passes For each note, a value other than 0 when the thumb passes under the hand or a
@@ -282,7 +283,7 @@ export interface HandTrack {
 export function buildHandTrack(
   notes: readonly HandNote[],
   action: HandAction,
-  pointOf: (low: number, high: number, shift: number, index: number) => Vec3,
+  pointOf: (low: number, high: number, index: number) => Vec3,
   amplitude: number,
   firstKey: number,
   passes: ArrayLike<number> | null = null,
@@ -319,12 +320,12 @@ export function buildHandTrack(
   const liftShare = (i: number): number => (plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec));
   return {
     action,
-    first: pointOf(firstKey, firstKey, 0, -1),
+    first: pointOf(firstKey, firstKey, -1),
     starts: Float64Array.from(notes, (n) => n.start),
     moveStarts,
     moveEnds,
     pluckTimes,
-    points: Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, n.shift ?? 0, i))),
+    points: Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, i))),
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
     turns,
   };

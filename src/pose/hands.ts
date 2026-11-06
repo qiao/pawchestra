@@ -440,16 +440,15 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
 
 /**
  * Gives the place of a palm for the keys of a note, in the model axes: the middle of its lowest
- * and its highest key, with the offset of the palm. A shifted hand plays at the side place of the
- * shifted keys, and at the height and the depth of its own keys. A fingered note puts each claw
- * over its key: the palm stands at the mean of the keys minus the offsets of their claws
- * (`clawOffset()`).
+ * and its highest key, with the offset of the palm. A fingered note puts each claw over its key:
+ * the palm stands at the mean of the keys minus the offsets of their claws (`clawOffset()`). The
+ * shift of a note (`HandNote.shift`) does not move the palm off its claws: the fingering puts the
+ * palm away from the other hand (`PIANO_FINGERING_COSTS.room`).
  *
  * @param rig The points of the player.
  * @param side The hand.
  * @param low The lowest key.
  * @param high The highest key.
- * @param shift The shift of the hand along the keys, in semitones (`HandNote.shift`).
  * @param fingered The place of the palm along the keys for the fingers of the note, in the axes
  *   of the instrument, or `null` for the middle of the keys.
  * @returns The place of the palm.
@@ -459,7 +458,6 @@ function palmPoint(
   side: 'L' | 'R',
   low: number,
   high: number,
-  shift: number,
   fingered: number | null = null,
 ): Vec3 {
   const { keyPoint } = rig.hold;
@@ -469,12 +467,8 @@ function palmPoint(
       .add(new Vector3(...keyPoint(b, rig.scale)))
       .multiplyScalar(0.5);
   const at = middle(low, high);
-  const keysX = at.x;
   if (fingered !== null) {
     at.x = fingered;
-  }
-  if (shift !== 0) {
-    at.x += middle(low + shift, high + shift).x - keysX;
   }
   at.add(new Vector3(...offset));
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
@@ -613,13 +607,12 @@ export function* handTracksSteps(
     buildHandTrack(
       hand,
       action,
-      (l, h, k, i) =>
+      (l, h, i) =>
         palmPoint(
           rig,
           side,
           l,
           h,
-          k,
           fingering && i >= 0 ? fingeredPalmX(rig, side, fingering, i) : null,
         ),
       amplitude,

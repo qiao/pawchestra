@@ -496,8 +496,11 @@ The rest of each family:
   the middle of the keys (`reach`), because a paw that crosses further puts its elbow in front of
   the round chest.
 - The wide paws keep apart (`apart`). When the two parts of a wide chord, such as a bass and a
-  melody, come nearer, each paw plays a few keys away from its part (`HandNote.shift`). Thus the
-  two parts stay in two paws, and one paw does not jump between them.
+  melody, come nearer, each part asks its palm to stand a few keys away from it
+  (`HandNote.shift`). Thus the two parts stay in two paws, and one paw does not jump between them.
+  The fingering gives the shift: the paw takes the claws on the side of the other paw
+  (`PIANO_FINGERING_COSTS.room`), and each claw stays on its key. Reason: a palm that moved off its
+  claws by the shift jumped about 12 cm between two notes.
 - The paw lifts less before a near note (`HAND_MOTION.liftGapSec`), because the motion of a
   pianist gets smaller as the speed rises (piano 7).
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.

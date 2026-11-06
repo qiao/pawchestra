@@ -292,6 +292,8 @@ The app follows these facts:
   pairs of notes keeps the rules of three notes exact. The spans scale with the paw
   (`POLAR_BEAR_PAW`), the left paw mirrors the right paw, and the claws of a chord fit its keys
   (`clawFit`). The palm stands so that the claw of each key is over the key (`clawOffset()`).
+  Near the other paw, the paw takes the claws on the side of the other paw, so the palms keep
+  apart and the claws stay on their keys (`room`).
   Thus the paw stays still for the notes of one position and moves at a thumb pass. The move of a
   pass starts at the note before (`HAND_MOTION.passSec`), as the hand prepares a pass. The right
   paw plays the C major scale 1231234 1231234 5 and the arpeggio 123123 5, and the left paw the
