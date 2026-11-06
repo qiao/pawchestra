@@ -100,8 +100,12 @@ Try each scripted edit on a copy with `pnpm rig-trial`, find thin faces and shar
    Action `bind`, and eye fans.
 2. **Rig.** Put `palm`, `seat`, `hinges`, and the facts of the body on the armature object: the
    names of `BODY_FACTS` of `tools/studio-body.ts`, with `height` and `crease` at least. Fit the
-   bones, run `sa.fix_rolls(rig)`, and paint the weights (Limit Total 4, Normalize All). Pose the
-   bind, run `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and `arm_raise_*`.
+   bones, run `sa.fix_rolls(rig)`, and give the weights: Automatic Weights (Limit Total 4,
+   Normalize All), then exact rows on chosen vertices with `sa.set_weight_row()`. Each joint
+   blends only in its own rings, with one row for each ring. Each vertex outside the rings
+   follows one bone. Write no fade formula over a region, and paint no brush strokes through MCP.
+   Pose the bind, run `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and
+   `arm_raise_*`.
 3. **Eyes.** Run `se.place_eyes(rig, mesh, {side: (middle, direction, size)})` with each middle
    on the head surface in the bind, and delete the eye fans if the mesh has them. After an edit
    of an eye or of the face, run `se.fit_eyes(rig, mesh)`: it levels each eye and bends its
@@ -110,7 +114,10 @@ Try each scripted edit on a copy with `pnpm rig-trial`, find thin faces and shar
    `sp.load_preview('<s>', <file>)` shows it beside the rig. After an edit of the mesh, the
    weights, or the keys, `sp.refresh_preview()` shows the open file in about 1 s.
    `sp.fold_colors(True)` marks the folds. A bone edit needs `pose-preview --glb` with the export
-   that the refresh prints.
+   that the refresh prints. Check each weight edit in the bind and the app pose. After a change
+   of the bind (the seat, a thigh slope, the arms), check all weights again in the new bind: the
+   folds, the dents, and the sharp edges of the smooth areas against the rest
+   (`pnpm bind-view --sharp`).
 5. **Export.** Run `pnpm rig-export <s>`, `pnpm studio-body <s>`, and the gates. Diff
    `<s>.rig.json` to see what moved.
 
@@ -267,6 +274,9 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   arms straight (`studio.straightArms`), and judge a wrist by its 2x crops.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
   (`paintedLower`).
+- A fade of the thigh share over the flank (a `smoothstep` of the height) passed a 40° seat and
+  folded the belly into a zigzag at 25°, where the thigh turns 65° from the rest. Give the belly
+  trunk rows, and blend only in the rings of the thigh root.
 
 ### Seams and cuts
 
