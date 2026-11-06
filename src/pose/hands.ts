@@ -159,15 +159,18 @@ export const HANDS_HOLDS = {
   // in the play, and with the elbows out and 0.15 up 10.6 cm and 9.5 cm
   // (`pnpm pose-depth pianist`). Elbows that point 0.3 up put the paws 3 to 4 cm into the belly,
   // and elbows that point further back put the arms deeper into the trunk. The paws reach from A0
-  // to B♭4 with the left paw and from C4 to C8 with the right paw (`pose/hands.test.ts`), so a
-  // melody changes paws between them. The wrists go up and forward over the case between the lap
-  // and the keys (`restArc`): with the paws in the lap, the arc 0.1 H forward puts the paws of the
-  // T-pose polar bear 2.6 cm into its body when they lower, and 0.25 H 0.8 cm or less. With the
-  // rest paws 0.8 H in front of the lap, the arc 0.25 H forward puts the forearms 1.6 cm into the
-  // case front in the lowering, and 0.15 H 1.1 cm. With the paws in the lap, an arc of 0.5 H out
-  // stands the upper arms 61° out from the trunk in the lift. With no arc out, they stand out at
-  // most as far as in a play. On the low bench, an arc 0.4 H up twists the paws up to 42° on the
-  // forearms in the lift, and 0.2 H up 28°.
+  // to F4 with the left paw and from E♭4 to C8 with the right paw (`pose/hands.test.ts`), so a
+  // melody changes paws between them. A paw that crosses to the middle of the keys puts its elbow
+  // in front of the chest: with the reach to B♭4 and from C4, the arms go 10.6 cm (forearms) and
+  // 9.5 cm (upper arms) into the trunk in the play, and with this reach 10.0 cm and 8.5 cm
+  // (`pnpm pose-depth pianist`). The wrists go up and forward over the case between the lap and the
+  // keys (`restArc`): with the paws in the lap, the arc 0.1 H forward puts the paws of the T-pose
+  // polar bear 2.6 cm into its body when they lower, and 0.25 H 0.8 cm or less. With the rest paws
+  // 0.8 H in front of the lap, the arc 0.25 H forward puts the forearms 1.6 cm into the case front
+  // in the lowering, and 0.15 H 1.1 cm. With the paws in the lap, an arc of 0.5 H out stands the
+  // upper arms 61° out from the trunk in the lift. With no arc out, they stand out at most as far
+  // as in a play. On the low bench, an arc 0.4 H up twists the paws up to 42° on the forearms in
+  // the lift, and 0.2 H up 28°.
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
@@ -183,7 +186,7 @@ export const HANDS_HOLDS = {
     sideLean: 60 * MathUtils.DEG2RAD,
     sideLeanMax: 10 * MathUtils.DEG2RAD,
     shoulderDrop: 16 * MathUtils.DEG2RAD,
-    reach: { leftHighest: 70, rightLowest: 60 },
+    reach: { leftHighest: 65, rightLowest: 63 },
     // The wide paws of the polar bear point in along the forearms, so they go up to 4.7 cm into
     // each other when the palms are nearer than 33 cm, 24 semitones in the middle of the keys.
     // At 24 semitones, they go at most 0.2 cm into each other in the demos, and at 22 up to 1.1 cm.

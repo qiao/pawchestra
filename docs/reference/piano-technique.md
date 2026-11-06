@@ -176,7 +176,9 @@ The app follows these facts:
   taller bench, the lean and the low shoulders also bring the shoulders down and forward, so the
   paws reach their keys.
 - **The arms (section 4).** The elbows point out, a little up, and a little back (`poleL`,
-  `poleR`), clear of the trunk. Elbows that hang nearer go into the wide trunk.
+  `poleR`), clear of the trunk. Elbows that hang nearer go into the wide trunk. Each paw plays
+  only to a few keys past the middle of the keys (`reach`), because a paw that crosses further puts
+  its elbow in front of the chest.
 - **The wrists and the hands (section 5).** The palm faces down, in line with the level forearm
   (`faceL`, `faceR`). The claws curl (`curl`), and their tips lie on the key tops at each strike.
   The paw is longer than a white key, so the palm stands in front of the front edge of the keys

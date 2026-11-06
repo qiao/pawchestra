@@ -475,7 +475,9 @@ The rest of each family:
 **Piano** (`pose/hands.ts`, `pose/piano-keys.ts`, piano):
 
 - The left hand plays low notes and the right hand high notes. A narrow chord goes to the nearer
-  hand, so a melody stays in one hand (`HANDS_HOLDS`, `splitHands()`).
+  hand, so a melody stays in one hand (`HANDS_HOLDS`, `splitHands()`). Each paw plays only to a few keys past
+  the middle of the keys (`reach`), because a paw that crosses further puts its elbow in front of
+  the round chest.
 - The wide paws keep apart (`apart`). When the two parts of a wide chord, such as a bass and a
   melody, come nearer, each paw plays a few keys away from its part (`HandNote.shift`). Thus the
   two parts stay in two paws, and one paw does not jump between them.
