@@ -255,7 +255,7 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   (`rigidPainted`). Two rigid groups that touch fold at their shared edge: join them.
 - A rigid group at the front of a root or across the chest, or a Smooth of the root weights, moves
   the fold to its edge as a dark notch. A rigid patch on the arm swings across the chest: give it
-  more clavicle than arm (`cat_root.py`).
+  more clavicle than arm.
 - A ring next to the trunk loop of a hand rig folds when its trunk share drops to 0 in one row,
   because the play turns the clavicle forward up to 40°. Move half of the trunk share of the loop
   to the clavicle.
