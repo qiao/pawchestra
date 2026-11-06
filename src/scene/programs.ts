@@ -43,13 +43,15 @@ const used = new WeakSet<WebGLProgram>();
  * Waits until the GPU links each shader program of the renderer, and then does the first use of
  * each new program (design 7.2). With `KHR_parallel_shader_compile`, the GPU compiles in parallel,
  * and a draw with a program that is not ready blocks the main thread until the link ends. Each
- * check is a step that waits.
+ * check is a step that waits. A lost context gives no link status, so the wait ends: the restore
+ * of the context compiles the programs again.
  *
  * @param renderer The renderer.
  * @returns The steps.
  */
 export function* programsReadySteps(renderer: WebGLRenderer): Steps<undefined> {
-  while (renderer.info.programs?.some((program) => !program.isReady())) {
+  const gl = renderer.getContext();
+  while (!gl.isContextLost() && renderer.info.programs?.some((program) => !program.isReady())) {
     yield 'wait';
   }
   // The first draw with a program reads its log, its uniforms, and its attributes. A step does it
