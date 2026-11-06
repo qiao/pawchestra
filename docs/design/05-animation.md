@@ -601,6 +601,21 @@ the arm gate in the rest, in the lift, and in the play. The turned paw comes nea
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
 knuckles stay out of the neck of the harp.
 
+Each note plucks the string of its key (`harpString()`), and the string swings (harp 5,
+`pose/harp-strings.ts`). `stringSwingsAt()` gives the swing of each string at a song time as a
+pure function of the pluck track, so a seek, a pause, and a change of speed show the correct
+swing. A paused song keeps the swing of its time, as a film camera sees a string that rings.
+
+- The swing starts at its full size at the note start, because the finger releases the string in
+  1 to 6 ms. The velocity sets its size (`STRING_MOTION.softShare`).
+- The swing decays with the time constant of its register (`STRING_MOTION.ringSec`, geometric
+  from the bass to the treble), and faster after the note end (`dampSec`), as the hand damps it.
+- The triangle of the pluck rounds off to the arc of the first mode (`roundSec`), because the
+  high partials decay first.
+- A new pluck of a string replaces the swing before it, as the finger stops the string.
+- The swing takes the weight of the playing pose, so a resting or a muted harpist shows still
+  strings (5.5).
+
 **Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it to half
 between two notes, so that each note shows (`CHOIR_MOTION`). Neighbor voices sway to opposite
 sides, so that the choir does not move as one block. The flippers hold the outer edges of the
