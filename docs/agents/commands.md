@@ -52,6 +52,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 |---|---|
 | `pnpm screenshots <dir> [--sheet] [--play] [--ui] [--drawer] [--load] [--shots]` | Writes the review screenshots of design 9.8: each demo at 1440 × 900 and 390 × 844, the gallery, and the animal views. |
 | `pnpm share-image [--out <file>]` | Writes `public/share.jpg` (design 7.4) from `SHARE_CAMERA`. Run it after a change of the look. About 15 s. |
+| `node tools/wordmark.ts [--write]` | Makes the wordmark of the logo from `APP_NAME` with HarfBuzz (design 2.8). `--write` puts it into `src/ui/icons.ts` and `index.html`. Needs `hb-view`. About 1 s. |
 | `pnpm snapshot` | Saves the play frame of the default demo and a close view of each gallery model into `scratch/snapshots/<date>-<hash>/`. |
 | `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). A matte of `tools/sheet-mattes/` adds the silhouette IoU of each view. |
 | `pnpm choir-check <dir>` | Puts the gallery penguin beside a penguin of each of the two newest reference images. |

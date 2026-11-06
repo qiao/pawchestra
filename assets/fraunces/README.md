@@ -19,12 +19,14 @@ does not copy it.
 
 ## How the path was made
 
+`node tools/wordmark.ts --write` makes the path from `APP_NAME` and writes it into the two files.
+
 1. HarfBuzz 11.0.0 shapes the word at the instance `wght=600,SOFT=100,WONK=1,opsz=72`, with
-   kerning: `hb-view --font-file=<ttf> --variations='wght=600,SOFT=100,WONK=1,opsz=72'
-   --output-format=svg --font-size=upem --margin=0 --output-file=raw.svg 'Zoophony'`.
-2. A script moves each glyph of `raw.svg` to its place, scales the em of 2000 units to 200 units,
-   moves the box to 0, and writes one path with relative integer commands. The view box is
-   `0 0 909 197`. The rounding moves a point by at most 0.25% of the em.
+   kerning, in font units (`hb-view --font-size=upem --margin=0`).
+2. The tool moves each glyph to its place, scales the em of 2000 units to 200 units, and writes
+   one path with relative integer commands. The rounding moves a point by at most 0.25% of the
+   em. The view box goes from the left side to the right side of the ink, and from the top of the
+   "h" to the bottom of the "p" and the "y". Thus each name gets the same height.
 
 The SVG keeps the glyph outlines and no font data, so the app does not hold the Font Software.
 The license file of the app still credits the font. The repository holds the Font Software in
