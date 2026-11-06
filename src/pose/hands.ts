@@ -294,8 +294,11 @@ export const HANDS_HOLDS = {
   // of the turned paw come nearer to the strings, so the left palm lies 7 cm from the strings:
   // with 3 cm, the knuckles go 1.5 cm into the neck of the harp, and with 6 cm, the left paw goes
   // 0.7 cm into the harp at rest (`pnpm pose-depth harpist`). The right palm lies 3 cm above
-  // the pluck point: at the pluck point, the right upper arm goes 1.7 cm into the soundbox
-  // (`pnpm pose-depth harpist`). The left fingers point up and back along the strings (`aimL`): with the fingers on
+  // the pluck point and 5 cm right of the strings, and the right elbow points out and down at
+  // 45°: on the larger harp on the floor, with the palm 3 cm right of the strings and the elbow
+  // at [0.7, -1, 0], the right arm folds (folds p95 9 of `pnpm arm-check`, limit 8), and with
+  // this hold, 6. The right upper arm rests on the soundbox, 2.4 cm into it in the play, as the
+  // shoulder of a harpist holds the harp (`pnpm pose-depth harpist`). The left fingers point up and back along the strings (`aimL`): with the fingers on
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
   // on its bent bind forearm. The elbows point out and down, in the play and
   // at rest: with the elbows down, the left upper arm goes 6.3 cm into the chest when it reaches
@@ -305,7 +308,7 @@ export const HANDS_HOLDS = {
     action: 'pluck',
     keyPoint: harpStringPosition,
     palmL: [-0.07, 0.22, 0.02],
-    palmR: [0.03, 0.03, 0],
+    palmR: [0.05, 0.03, 0],
     faceL: [1, -1, 0],
     faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
@@ -326,7 +329,7 @@ export const HANDS_HOLDS = {
     most: HARP_FINGERING.fingers,
     apart: 0,
     poleL: [-0.85, -1, 0],
-    poleR: [0.7, -1, 0],
+    poleR: [1, -1, 0],
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
     // After its pluck, the thumb bends over finger 2 (`docs/reference/harp-technique.md`, section
