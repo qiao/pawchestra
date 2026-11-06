@@ -2,7 +2,7 @@
 
 This folder holds the source mesh of the penguin, three edited copies, a copy with rebuilt
 flippers and its weights, a copy of it with a smooth color edge, a copy of that with clean
-armpits, and the rigged copy. The app does not serve these files. It loads the
+armpits, a copy of that with a crease at each flipper root, and the rigged copy. The app does not serve these files. It loads the
 module `src/models/studio/penguin.ts`, which this chain writes:
 
 ```text
@@ -24,7 +24,10 @@ penguin-arms.glb + penguin-weights.json  `weightSource` and `paintedWeights` of 
 penguin-arms-edge.glb
    │  point edits in Blender           no fins under the flippers (penguin-arms-pit.json)
    v
-penguin-arms-pit.glb                 `source` of the config
+penguin-arms-pit.glb
+   │  point edits in Blender           a crease at each root, no flat ledge (penguin-arms-crease.json)
+   v
+penguin-arms-crease.glb              `source` of the config
    │  pnpm rig-mesh penguin
    v
 penguin.rig.glb                      rigged mesh
@@ -49,6 +52,8 @@ src/models/studio/penguin.ts         studio body of the app
 | `penguin-arms-edge.json` | The list of the edits of `penguin-arms-edge.glb`. License as `penguin.glb` | None |
 | `penguin-arms-pit.glb` | Copy of `penguin-arms-edge.glb` with no fins under the flippers. License as `penguin.glb` | None: point edits in Blender (below) |
 | `penguin-arms-pit.json` | The list of the edits of `penguin-arms-pit.glb`. License as `penguin.glb` | None |
+| `penguin-arms-crease.glb` | Copy of `penguin-arms-pit.glb` with a crease at each flipper root. License as `penguin.glb` | None: point edits in Blender (below) |
+| `penguin-arms-crease.json` | The list of the edits of `penguin-arms-crease.glb`. License as `penguin.glb` | None |
 | `penguin.rig.glb` | Output of the rig. License as `penguin.glb` | `pnpm rig-mesh penguin` |
 
 ## penguin.glb
@@ -257,6 +262,40 @@ stays on its island of the atlas. Where no such face exists, the corner keeps it
 the black and white edge stays, and the rig gives no new lone face. Each vertex keeps its place on `penguin-arms-edge.glb`, so the rig gives it the weights of
 its place on `penguin-arms.glb` (`weightSource` of the config). The faces that close the inner
 side of a flipper lie up to 0.024 units from the old surface, where the walls were.
+
+## penguin-arms-crease.glb
+
+| Item | Value |
+|---|---|
+| Size | 950,372 bytes |
+| SHA-256 | `3c552e5fd5f7fe13b8e79bdf1eb6fdaccc857bf61d327aeda94f9cbe161db3f7` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+After the merges of `penguin-arms-pit.glb`, the top of the gap under each flipper root was a flat
+ledge: the faces from the inner vertices of the lowest free tube ring to the vertices of the next
+ring that lie on the trunk, about 0.03 units wide at y 0.52. At the back of each root, a second
+flat ledge lay one ring higher, at y 0.54. From the front, the back, and below, each ledge showed
+as a short flat dark edge.
+
+The copy turns each ledge into a crease, with point edits in the live Blender on the welded mesh.
+Each edit merges one vertex into a neighbor vertex of the ring above it, at the place of that
+neighbor, so that no vertex goes to a new place. `penguin-arms-crease.json` lists the 7 merges in
+their order:
+
+1. On each side, the inner vertices of the lowest free ring merge into the vertices of the next
+   ring that do not lie on the trunk: 2 on the left and 3 on the right (one of them in two steps).
+   The top of the gap is then a ridge between the trunk and the inner side of the flipper, with no
+   flat face.
+2. On each side, the vertex of the trunk at the back ledge merges into the vertex of the next ring
+   above it: 1 on the left and 1 on the right.
+
+A first try moved the free ring vertices onto the trunk wall at their height. It gave a shallow
+slope from the trunk to the flipper and a dent at the back of the root, so the copy uses the
+merges. Each merge moves a corner at most 0.027 units. The copy has 2,275 vertices and 4,546
+triangles after the weld (2,282 and 4,560 before): 14 faces go, and each other face keeps the UVs
+of its own corners, so that it stays on its island of the atlas. Each vertex keeps its place on
+`penguin-arms-pit.glb`, so the rig gives it the weights of its place on `penguin-arms.glb`
+(`weightSource` of the config).
 
 ## penguin.rig.glb
 
