@@ -1284,7 +1284,11 @@ pedal harp (`docs/reference/harp-technique.md`):
   nylon, thinner toward the treble (`STRINGS`). Each string is one part: a prism of three sides
   with open ends, from the center strip up into the neck. Thus the clearance probes do not read
   the strings as a part of the frame. A bronze wire under the warm light read as one red area
-  beside the red C strings, so the wires are silver.
+  beside the red C strings, so the wires are silver. The strings fill the frame, as on a concert
+  harp: the bass string starts near the bottom of the soundboard and ends in the neck near the
+  column, and the treble string ends where the neck meets the soundbox (`STRINGS.ends`). The
+  foot of the soundbox stands near the foot of the column (`HARP.soundbox`), so that the long bass
+  strings can start low.
 - **Pluck points.** `harpStringPosition()` gives the pluck point of the string of the key: the
   share `PLUCK.share` of a length from the soundboard up to the line `PLUCK.top`. The hold of the
   deer fits these points, so they stay when the neck changes. `PLUCK.top` lies a little below

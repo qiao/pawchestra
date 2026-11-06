@@ -27,9 +27,12 @@ export const HARP = {
     [0.08, -0.38],
     [1.3, -0.38],
   ],
-  /** The bottom and the top of the soundbox axis, as (y, z). */
+  /**
+   * The bottom and the top of the soundbox axis, as (y, z). The bottom stands near the foot of the
+   * column, so that the long bass strings start near the base, as on a concert harp.
+   */
   soundbox: [
-    [0.08, -0.22],
+    [0.08, -0.29],
     [0.98, 0.3],
   ],
   /**
@@ -248,8 +251,12 @@ export const HARP_PEDALS = {
  * stays out of the frame that the clearance probes read.
  */
 const STRINGS = {
-  /** The places of the bass string and of the treble string along z. */
-  ends: [-0.17, 0.24],
+  /**
+   * The places of the bass string and of the treble string along z. The bass string starts near
+   * the bottom of the soundboard and ends in the neck near the column, and the treble string ends
+   * where the neck meets the soundbox, so the strings fill the frame.
+   */
+  ends: [-0.295, 0.24],
   /** The radius of the prism of the bass string and of the treble string. */
   radius: [0.0026, 0.0014],
   /** The extra radius of a wound wire string. */
