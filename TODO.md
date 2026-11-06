@@ -214,6 +214,11 @@ passes.
       at a groove of the mesh. Check it from below in the stage light, and fair the groove.
 - [ ] Polar bear paws: the automatic weights give each paw about 0.35 of the wrist helper, so the
       paw turns about two thirds of the hand turn. Take the helper off the paws (`step_wrist()`).
+- [ ] Polar bear digits: give each paw 5 one-joint digit bones under `fingers_*`, so the claw of
+      each note presses its key (piano-technique 9.3, the plan `piano-fingering-plan.md` of
+      `scratch/merged/piano-fingering/`). The claw rows blend `wrist_*` (up to 0.48), `hand_*`,
+      and `fingers_*`, and the dark claw patches join around the tip
+      (`reports/2026-11-06-piano-fingering/claws/`). Take the wrist helper off the paws first.
 - [ ] Polar bear copy: `tools/blender/polar_bear_legs.py` stops when the JPEG of the arm image leaks
       into the free columns of the strip. Skip a border of 8 columns in `atlas_strip()`.
 - [ ] Piano: the lifted piano (`PIANO_LIFT`, `PIANO_SCALE` 1.16, the lid at 25°) moves the rows of
