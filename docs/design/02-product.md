@@ -51,10 +51,9 @@ The UI has the style of a video player. The theme is dark only, because the scen
   "Cinematic camera", "Reset view" (2.5), full screen, and the drawer. During play, the bar and
   the pointer hide after a short time with no pointer motion. A hidden bar ignores the pointer, so
   the first tap only shows it.
-- In Cinematic mode, the bar stands in the middle of the bottom bar of the letterbox (2.5) where
-  that bar has room for it and two gaps, so that the controls do not cover the film
-  (`--bar-lift` of `ui/ui.css`). The drawer and the messages move up with it. Else the bar covers
-  the bottom of the frame.
+- The bar keeps its place at the bottom of the window in both camera modes. In Cinematic mode it
+  covers the bottom of the frame when it shows, because a bar that moved at each change of the
+  mode looked like a fault.
 - In Cinematic mode, the title (the logo, the piece title, the composer, and the link to GitHub)
   stands at the top-left corner of the frame, at the insets of Free mode, so that it stays with
   the film. It moves with the bars (`--letterbox` and `--letterbox-side` of `ui/ui.css`). A

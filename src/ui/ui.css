@@ -43,11 +43,6 @@
   --title-top: 14px;
   /* The space between the bar and the bottom edge of the window. */
   --bar-gap: 12px;
-  /* The lift of the bar into the middle of the bottom bar of the letterbox of Cinematic mode, so
-     that the controls do not cover the film (design 2.3, 2.5). The app sets --letterbox, the
-     height of that bar. A letterbox bar lower than the bar and its two gaps lifts nothing, and the
-     bar covers the bottom of the frame. The drawer and the messages above the bar move with it. */
-  --bar-lift: max(0px, (var(--letterbox, 0px) - 56px) / 2 - var(--bar-gap));
   color-scheme: dark;
   font-family:
     system-ui,
@@ -524,7 +519,7 @@ body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select
   position: fixed;
   left: 12px;
   right: 12px;
-  bottom: calc(var(--bar-gap) + var(--bar-lift));
+  bottom: var(--bar-gap);
   height: 56px;
   display: flex;
   align-items: center;
@@ -788,7 +783,7 @@ input[type='range']:disabled::-moz-range-thumb {
   position: fixed;
   top: 12px;
   right: 12px;
-  bottom: calc(80px + var(--bar-lift));
+  bottom: 80px;
   width: 340px;
   background: var(--panel-glass);
   backdrop-filter: blur(16px);
@@ -1631,7 +1626,7 @@ body.is-building #stage {
 .messages {
   position: fixed;
   left: 50%;
-  bottom: calc(84px + var(--bar-lift));
+  bottom: 84px;
   z-index: 1;
   transform: translateX(-50%);
   width: max-content;
@@ -1859,7 +1854,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
     top: auto;
     left: 8px;
     right: 8px;
-    bottom: calc(76px + var(--bar-lift));
+    bottom: 76px;
     width: auto;
     max-height: 60vh;
     padding-top: 4px;
@@ -1872,7 +1867,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
   }
 
   body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
-    bottom: calc(84px + var(--bar-lift));
+    bottom: 84px;
     translate: none;
   }
 
@@ -1884,7 +1879,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
   .bar {
     left: 8px;
     right: 8px;
-    bottom: calc(var(--bar-gap) + var(--bar-lift));
+    bottom: var(--bar-gap);
   }
 
   /* The seek bar of a phone gets the width of the duration. The seek bar names the duration to a
@@ -1991,7 +1986,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
   body:has(.first-screen:not([hidden])) .messages {
     left: 12px;
     right: calc(100% - var(--side-left) + 12px);
-    bottom: calc(84px + var(--bar-lift));
+    bottom: 84px;
     display: grid;
     justify-items: center;
     width: auto;

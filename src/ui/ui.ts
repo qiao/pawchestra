@@ -262,10 +262,8 @@ export class Ui {
   /**
    * Gives the CSS the sizes of the bars of the letterbox of Cinematic mode (design 2.3, 2.5):
    * `--letterbox`, the height of the top and the bottom bars, and `--letterbox-side`, the width of
-   * each side bar. Where the bottom bar has room for the bar of the controls, the bar of the
-   * controls stands in its middle, so that the controls do not cover the film. The title stands at
-   * the top-left corner of the frame. It writes the DOM only when a size changes by half a pixel or
-   * more.
+   * each side bar. The title stands at the top-left corner of the frame. The bar of the controls
+   * keeps its place. It writes the DOM only when a size changes by half a pixel or more.
    *
    * @param height The height of the top and the bottom bars, in CSS pixels: 0 for none.
    * @param width The width of each side bar, in CSS pixels: 0 for none.
