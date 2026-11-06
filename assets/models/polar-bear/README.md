@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 339,027 bytes |
-| SHA-256 | `030a9f00413f7151bd0f3ef89a65e17a6b3d39b7492d8439d2c74b8f45906c33` |
+| Size | 339,898 bytes |
+| SHA-256 | `2d72ba2a58088a40e6fe6866fda939b8ba89bd25977c844182ee6ead0f65afe9` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -404,8 +404,49 @@ feet stand flat. The knee angle is 120°. The call was
 bone, the paw, and the fingers keep its turn (the role-neutral bind). Each paw then turns about
 the bind forearm toward supination, the left 112° and the right 43°: the values of
 `pnpm bind-supination polar-bear --glb <export> --summary <export>.json` on the export with no
-supination. `sa.drive_segments(rig, key_frame=1)` keyed the segments and the helpers. The mesh
-has no shape key.
+supination. `sa.drive_segments(rig, key_frame=1)` keyed the segments and the helpers.
+
+**Bind key.** With the trunk rows of weight step 16, the turn of the thigh from the rest to the
+bind falls on the band between the upper arc and the lower arc of the thigh root, and the band
+made a ledge with a pinch at the top of the seated thigh. The shape key `bind_belly` (value 1)
+moves the band vertices in the bind, and `pnpm rig-export` bakes it into the bind. Each band
+vertex sits in a column of four vertices: a trunk vertex above, the upper arc vertex, the lower
+arc vertex, and a thigh vertex below, such as 1205, 1883, 61, 62. The move of each band vertex
+puts it on the cubic curve from the trunk vertex to the thigh vertex, with the end directions of
+the column beyond each end, at the share of the rest arc length. The trunk vertex and the thigh
+vertex do not move. The columns of the left side start at 1679, 1343, 1344, 1786, 1205, 969, 970,
+and 311. The moves of 2336, 2389, and 2390 are 0.45, 0.6, and 0.8 of the curve move: full moves
+folded the faces at the inner groin in the play. Two point edits follow: 1858 goes to the mean of
+its edge neighbors, and the crotch vertex 1797 halfway to that mean. The key writes each move as
+a move of the rest by the inverse skin turn of the vertex. The moves in the bind, in cm (Blender
+axes):
+
+| Vertex (right) | Move left | Move right |
+|---|---|---|
+| 60 (569) | -0.6, -5.8, 2.0 | 0.9, -7.3, 2.7 |
+| 61 (315) | -0.4, -4.8, 2.5 | 0.3, -5.1, 2.8 |
+| 1006 (570) | -0.7, -6.3, 2.6 | 0.8, -6.9, 2.8 |
+| 1007 (568) | -0.4, -5.3, 3.4 | 0.3, -5.2, 3.3 |
+| 1008 (565) | -0.2, -4.1, 3.3 | 0.1, -4.0, 3.3 |
+| 1401 (566) | -0.2, -4.2, 3.9 | 0.2, -3.8, 3.5 |
+| 1402 (567) | 0.2, -5.6, 4.4 | -0.2, -4.7, 3.4 |
+| 1797 (1285) | 0.0, -1.1, -0.2 | 0.0, -1.1, -0.1 |
+| 1857 (314) | -0.6, -4.6, 2.4 | 0.5, -5.4, 3.0 |
+| 1858 (2098) | -0.3, -4.2, 2.3 | 0.3, -4.5, 2.4 |
+| 1883 (967) | 0.0, -5.6, 2.6 | -0.1, -5.8, 2.7 |
+| 2189 (2097) | 0.0, -5.5, 2.5 | 0.0, -5.8, 2.7 |
+| 2328 (1895) | 1.2, -2.2, 1.9 | -1.2, -2.4, 1.8 |
+| 2336 (1893) | -0.5, 0.3, 2.1 | 0.5, 0.3, 2.1 |
+| 2354 (1892) | 0.3, -0.9, 2.0 | -0.4, -1.1, 2.0 |
+| 2389 (1894) | 0.5, -3.0, 0.8 | -0.5, -3.1, 0.8 |
+| 2390 (2096) | -0.1, -4.9, 1.8 | 0.0, -4.9, 1.7 |
+
+The right leg has other faces than the left, so the right moves differ a little. The dihedral
+angle of each edge with the rest z from 0.15 to 0.48 and |x| < 0.2 (1,049 edges) went from mean
+16.7°, p95 55.5°, max 153.1° to 16.2°, 54.9°, 149.4° in the bind, and on the side and the back of
+the band (691 edges) from 14.0°, 35.2°, 78.6° to 13.3°, 33.4°, 71.1°. The deepest vertex of the
+thigh root went from 2.1 cm to 1.5 cm below its neighbors (2336), and the crotch vertex 1797 from
+2.0 cm to 1.1 cm. The seat top (0.268 m) and the folds of `pnpm fold-probe pianist` do not change.
 
 At 25°, the seat top is 0.268 m, the hip joints 0.43 m, and the knees 0.31 m above the floor.
 At 40°, the seat top was 0.331 m and the hip joints 0.49 m: the haunch sat on the front edge of
@@ -437,8 +478,8 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 716,772 bytes |
-| SHA-256 | `4496e419c6504c7a0e001d2f243cf8c4480b8a0a96987aecc6f4f72c01a5941c` |
-| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `634dd9d9e3fe479f555fc3b3a8469dc8831b37d7d1745828e4c7e033502218c1` |
+| SHA-256 | `94e5789e869d9756340476bfaf6dd5da5c4b914d2cb4ebf442f1c5f916c3fb88` |
+| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `9d37b9a736a657e9d3022ad2052c6ef9e94ea9169199985998debc298a99acdd` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
