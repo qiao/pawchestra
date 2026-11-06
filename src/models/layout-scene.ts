@@ -1033,7 +1033,6 @@ function groupOf(seat: Seat, player: number): RowGroup {
 /** The items of a layout with the podium center at the origin. */
 interface Draft {
   readonly players: readonly (PlayerPlace | undefined)[];
-  readonly stands: readonly StandPlace[];
   readonly risers: readonly RiserLevel[];
   readonly obstacles: readonly Obstacle[];
   /** The largest z of the soloist, with its instrument, or -Infinity with no soloist. */
@@ -1721,11 +1720,10 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
     return places;
   };
   const obstacles = [...fixed, ...rows.flatMap((r) => obstaclesOfRow(r.placement))];
-  const stands = rows.flatMap((r) => r.placement.stands.map((stand) => stand.place));
 
   const empty: ChoirPlacement = { singers: [], risers: [], obstacles: [] };
   let choir = empty;
-  let draft: Draft = { players: withRows(rows), stands, risers: [], obstacles, soloistFront };
+  let draft: Draft = { players: withRows(rows), risers: [], obstacles, soloistFront };
   const singers = inGroup('choir');
   const soloSingers = inGroup('vocal-soloists');
   const choirLevels = RISER.levels - (soloSingers.length > 0 ? 1 : 0);
@@ -1740,7 +1738,6 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
     }
     const candidate: Draft = {
       players: withChoir,
-      stands,
       risers: candidateChoir.risers,
       obstacles: [...obstacles, ...candidateChoir.obstacles],
       soloistFront,
