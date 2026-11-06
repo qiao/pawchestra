@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 339,898 bytes |
-| SHA-256 | `2d72ba2a58088a40e6fe6866fda939b8ba89bd25977c844182ee6ead0f65afe9` |
+| Size | 340,372 bytes |
+| SHA-256 | `5a0c6a59999016e7bff927c37c38105d0aa80afd6bd12f2bc7a98dc21acef18a` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -274,7 +274,8 @@ body in the live Blender. Each value lives only in the `.blend`, and
 `tools/mesh-rigs/polar-bear.json` keeps the values of the older chain. The places are in the axes
 of Blender (x left, y back, z up), in units.
 
-**Bones.** The armature `polar_bear_rig` has the 50 bones of the older body: the 30 body bones
+**Bones.** The armature `polar_bear_rig` has the 50 bones of the older body and 10 digit bones
+(weight step 18): the 30 body bones
 with the ears and one tail bone, and the 20 arm segments and helpers (no `tail_tip`, no `jaw`).
 The parents are those of `STUDIO_PARENTS`. `root`, the upper arms, the forearms, and the forearm
 twist bones hold no weight. Each joint lies at the middle of a ring of the mesh:
@@ -392,6 +393,24 @@ back -0.2, halfWidth 0.25}, and `hinges` L (-0.576037, -0.749779, -0.325597) and
     ring 0 (0.37 before).
     The seat top (0.268 m) and the folds of `pnpm fold-probe pianist` do not change, and each dent
     of step 15 changes by 1 mm or less.
+
+17. Paws: `pnpm rig-trial polar-bear pianist wrist-off tools/blender/trial_steps/paw_wrist_off.py`
+    gives the `wrist` share of each paw vertex (a share of `hand` or `fingers`, |x| of 0.445 or
+    more, and not the ring row of step 8) to `hand` (115 left and 112 right vertices, shares up
+    to 0.61). In the bind, the wrist helper and the paw have the same turn, so the bind moves by
+    at most 6e-8 units.
+18. Digits: `pnpm rig-trial polar-bear pianist digits tools/blender/trial_steps/paw_digits.py
+    --base wrist-off` adds `digit1_<side>` (the claw at -y) to `digit5_<side>` under `fingers`,
+    from the middle of the fur rim at the base of each claw to its tip (`DIGITS` of the step), and
+    gives 183 claw vertices exact rows (`ROWS` of the step): each spike {`digit k`: 1}, each base
+    vertex at the fur rim {`digit k`: 0.5, `fingers`: 0.5}, and each joined base of two claws 0.5
+    of each digit. A claw vertex keeps its share of `forearm_seg3`. The claw tips of the left paw
+    are 2206 and 1080 (digit 1), 518 and 204 (2), 1635 (3), 2110 (4), and 1379 (5), and of the
+    right paw 2351 and 1657, 1692 and 124, 448, 753, and 467. The 7 vertices of the middle claw of
+    the right paw (445 to 448, 1025, 1026, 1387) had half of their weight on `clavicle_R` and the
+    upper arm segments, and the claw was a spike of thin faces 5 cm long in the bind. With their
+    digit rows they go back onto the paw (a move of up to 0.0555 units in the bind). No other
+    vertex moves in the bind.
 
 **Bind.** The Action `bind` holds the seated bind at frame 1. The trunk, the head, and the tail
 keep the rest. The legs sit on a bench that fits them (design 4.4, "Seat"): each thigh turns the
@@ -521,9 +540,9 @@ the same bytes.
 
 | Item | Value |
 |---|---|
-| Size | 716,772 bytes |
-| SHA-256 | `f504a002d62330a23da4aa24fdcb4be5d76dd7ea12d5d242fb00b12d1e209e38` |
-| Summary | `polar-bear.rig.json`: 7,643 bytes, SHA-256 `d8fea063bcc0877c30b0b3b22814c77759461fdba0716a66677938bfbb426ae5` |
+| Size | 724,120 bytes |
+| SHA-256 | `12669782062478b7f7af157291711b470c4d637c791972a025bdda7386a0a0c1` |
+| Summary | `polar-bear.rig.json`: 8,964 bytes, SHA-256 `8b18dc336c3b8da2da0d872f383afe45930a7ccd38fde4006329ce3c32633dbc` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
