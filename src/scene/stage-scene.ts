@@ -567,6 +567,8 @@ export class StageScene {
   show(prepared: PreparedLayout): void {
     const { view, aim } = prepared;
     view.camera.resize(this.#width, this.#height);
+    // A change of the tier during the build changed only the lights of the shown layout.
+    setLightsTier(view.lights, this.#tier);
     this.#pending = null;
     setPoolAim(this.#pool, aim);
     setRimLights(this.#rim, view.lights);
