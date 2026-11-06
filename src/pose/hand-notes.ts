@@ -139,9 +139,12 @@ export interface HandNote {
  * plays nearer to the other hand, the other hand moves out of its way, away from it, at the start
  * of the chord: a note of loudness 0 on the key at that distance, with no sound.
  *
- * The hand of each chord within one octave comes from a plan of the whole piece
- * ({@link planHands}), as a pianist plans which hand takes which notes: the plan finds the hands
- * with the least travel of the two palms, and a fast move costs more than a slow move.
+ * With a distance `apart`, the hand of each chord within one octave comes from a plan of the
+ * whole piece ({@link planHands}), as a pianist plans which hand takes which notes: the plan finds
+ * the hands with the least travel of the two palms, and a fast move costs more than a slow move.
+ * With no distance, as for the harp, such a chord goes to the hand that is nearer to it, so that a
+ * melody stays in one hand. At the same distance, it goes to the right hand from middle C up, and
+ * to the left hand below.
  *
  * @param notes The notes of the player, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
@@ -165,7 +168,7 @@ export function splitHands(
     const cut = group.high - group.low > HAND_MOTION.span ? wideChordCut(keys, reach) : null;
     return { group, keys, cut };
   });
-  const choices = planHands(chords, reach, apart);
+  const choices = apart > 0 ? planHands(chords, reach, apart) : null;
   const left: HandNote[] = [];
   const right: HandNote[] = [];
   let places: HandPlaces = { left: HAND_MOTION.startKeys[0], right: HAND_MOTION.startKeys[1] };
@@ -173,7 +176,7 @@ export function splitHands(
   let lastStart = -Infinity;
   for (const [index, chord] of chords.entries()) {
     const { group, keys } = chord;
-    const choice = choices[index] ?? 'right';
+    const choice = choices ? (choices[index] ?? 'right') : nearerHand(chord, places, reach);
     const part = (low: number, high: number, shift = 0): HandNote => ({
       start: group.start,
       end: group.end,
@@ -213,6 +216,30 @@ export function splitHands(
     lastStart = group.start;
   }
   return [left, right];
+}
+
+/**
+ * Gives the hand of a chord with no plan (design 5.3): both hands for a wide chord with a cut, a
+ * hand that alone reaches the chord, or else the hand that is nearer to it. At the same distance,
+ * the right hand plays from middle C up, and the left hand below.
+ *
+ * @param chord The chord.
+ * @param last The middles of the two hands before the chord.
+ * @param reach The highest key of the left hand and the lowest key of the right hand.
+ * @returns The hand.
+ */
+function nearerHand(chord: SplitChord, last: HandPlaces, reach: HandReach): HandChoice {
+  const { group } = chord;
+  if (chord.cut !== null) {
+    return 'both';
+  }
+  const middle = (group.low + group.high) / 2;
+  const fromLeft = Math.abs(middle - last.left);
+  const fromRight = Math.abs(middle - last.right);
+  const nearerRight = fromRight < fromLeft || (fromRight === fromLeft && middle >= 60);
+  return group.low >= reach.rightLowest && (nearerRight || group.high > reach.leftHighest)
+    ? 'right'
+    : 'left';
 }
 
 /** A chord of a player for {@link splitHands}. */
