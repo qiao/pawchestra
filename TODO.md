@@ -1102,7 +1102,7 @@ passes, and the quality tiers of 2.6 keep 60 fps on a laptop.
 - [ ] Run `pnpm deploy:vercel`, open the deployed site, play the default demo, and check that the
       CI run passes (9.2).
 - [ ] Put the Vercel URL in the line "Live site" of `README.md`, and turn off GitHub Pages in the
-      settings of the repository. The old site at <https://qiao.github.io/zoophony/> stays online
+      settings of the repository. The old site at <https://qiao.github.io/pawchestra/> stays online
       until then.
 - [ ] Check the notes on GitHub Pages against Vercel: design 7.2 and 8.3, and the comments of
       `tools/gzip-site.ts`, `tools/size.ts`, `tools/load-probe.ts`, `src/audio/plain-bytes.ts`, and
