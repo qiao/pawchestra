@@ -459,7 +459,7 @@ export function seatSeedOf(seed: number, seatIndex: number): number {
  */
 function tailSwayOf(model: PlayerModel, species: SpeciesId): number {
   const params: SpeciesParams = SPECIES[species];
-  return model.seat && params.body !== undefined && params.seatedTail === 'curl' ? 0 : 1;
+  return model.seat && params.seatedTail === 'curl' ? 0 : 1;
 }
 
 /**
@@ -471,7 +471,7 @@ function tailSwayOf(model: PlayerModel, species: SpeciesId): number {
  */
 function earTwitchOf(species: SpeciesId): number {
   const params: SpeciesParams = SPECIES[species];
-  return params.body !== undefined && params.hangingEars ? 0 : 1;
+  return params.hangingEars ? 0 : 1;
 }
 
 /**
