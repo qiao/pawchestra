@@ -277,6 +277,9 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
 - A fade of the thigh share over the flank (a `smoothstep` of the height) passed a 40° seat and
   folded the belly into a zigzag at 25°, where the thigh turns 65° from the rest. Give the belly
   trunk rows, and blend only in the rings of the thigh root.
+- A thigh share in the crotch lifts the lower belly band of a seated bind into a shelf under the
+  belly front. Move the band onto the thigh tops with a key `bind*`, and keep each crease vertex
+  off the line of its neighbors: a thin triangle there folds in the play.
 
 ### Seams and cuts
 
