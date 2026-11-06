@@ -310,6 +310,13 @@ void main() {
 #ifdef SURFACE
   if (uSurfaceOn > 0.5) {
     vec4 surface = texture(uSurface, clamp(vUv, uSurfaceClamp.xy, uSurfaceClamp.zw));
+#ifdef FLOOR_GLOSS
+    // The reflection comes from a smaller pass, so it covers only the pixels of the floor at full
+    // size, and not the edge of a foot or a chair leg on the floor. The depth of the haze comes
+    // with each frame of the surface pass.
+    vec4 world = uHazeInverse * vec4(vUv * 2.0 - 1.0, texture(uSceneDepth, vUv).x * 2.0 - 1.0, 1.0);
+    surface.rgb *= step(abs(world.y / world.w), 0.01);
+#endif
     color = color * surface.a + surface.rgb;
   }
 #endif

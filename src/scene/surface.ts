@@ -101,7 +101,8 @@ const GLOSS_STEPS = 14;
  * channel, as the factor of the scene light, and the reflection of the floor gloss in the color.
  * `CONTACT_SAMPLES` sets the samples of the shade, and `FLOOR_GLOSS` turns the gloss on. Each
  * pixel takes a turn of its samples and a jitter of its ray from a 4 × 4 Bayer pattern, which the
- * blur of 4 × 4 pixels removes.
+ * blur of 4 × 4 pixels removes. With the gloss, a pixel that is not on the floor gets the color
+ * `NO_FLOOR`, so that the blur mixes no such pixel into the reflection.
  */
 export const SURFACE_FRAGMENT = /* glsl */ `
 uniform sampler2D uDepth;
@@ -117,6 +118,9 @@ uniform vec4 uContact;
 uniform vec4 uGloss;
 uniform vec4 uClamp;
 varying vec2 vUv;
+
+// The color of a pixel that is not on the floor. A reflection is never below 0.
+const float NO_FLOOR = -1.0;
 
 const float BAYER[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0,
   15.0, 7.0, 13.0, 5.0);
@@ -142,7 +146,11 @@ float sceneDepthAt(vec2 uv) {
 void main() {
   float depth = texture(uDepth, vUv).x;
   if (depth >= 0.99999) {
+#ifdef FLOOR_GLOSS
+    gl_FragColor = vec4(vec3(NO_FLOOR), 1.0);
+#else
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+#endif
     return;
   }
   vec3 p = viewAt(vUv, depth);
@@ -177,8 +185,10 @@ void main() {
 #endif
   vec3 reflection = vec3(0.0);
 #ifdef FLOOR_GLOSS
+  reflection = vec3(NO_FLOOR);
   float height = dot(uFloor.xyz, p) + uFloor.w;
   if (uGloss.x > 0.0 && abs(height) < 0.01 && dot(n, uFloor.xyz) > 0.97) {
+    reflection = vec3(0.0);
     vec3 eye = normalize(p);
     // A jitter of the normal in a cone, from the same pattern, for a soft reflection.
     vec3 side = normalize(cross(uFloor.xyz, eye));
@@ -234,9 +244,11 @@ void main() {
 `;
 
 /**
- * The blur of the surface pass at half size: the mean of a box of 4 × 4 pixels, with four linear
- * samples. The box holds each value of the 4 × 4 pattern of the surface pass one time, so the
- * pattern does not show.
+ * The blur of the surface pass at half size: the mean of a box of 4 × 4 pixels. The box holds each
+ * value of the 4 × 4 pattern of the surface pass one time, so the pattern does not show. The
+ * contact shade takes four linear samples. With `FLOOR_GLOSS`, the reflection is the mean of only
+ * the floor pixels of the box, so that a body beside the floor does not darken it. A pixel with no
+ * floor in its box gets no reflection.
  */
 export const SURFACE_BLUR_FRAGMENT = /* glsl */ `
 uniform sampler2D uSource;
@@ -249,6 +261,21 @@ vec4 tap(float x, float y) {
 }
 
 void main() {
-  gl_FragColor = (tap(-1.5, -1.5) + tap(0.5, -1.5) + tap(-1.5, 0.5) + tap(0.5, 0.5)) * 0.25;
+  vec4 box = (tap(-1.5, -1.5) + tap(0.5, -1.5) + tap(-1.5, 0.5) + tap(0.5, 0.5)) * 0.25;
+#ifdef FLOOR_GLOSS
+  // Each tap is at the middle of a pixel, so it reads that pixel alone.
+  vec3 sum = vec3(0.0);
+  float count = 0.0;
+  for (int y = -2; y < 2; y++) {
+    for (int x = -2; x < 2; x++) {
+      vec3 c = tap(float(x), float(y)).rgb;
+      float floorPixel = step(-0.5, c.r);
+      sum += c * floorPixel;
+      count += floorPixel;
+    }
+  }
+  box.rgb = sum / max(count, 1.0);
+#endif
+  gl_FragColor = box;
 }
 `;

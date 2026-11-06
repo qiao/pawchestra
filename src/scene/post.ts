@@ -415,7 +415,7 @@ export class PostPipeline {
   readonly #blurPrepare: ShaderMaterial;
   #blurGather: ShaderMaterial;
   #surface: ShaderMaterial;
-  readonly #surfaceBlur: ShaderMaterial;
+  #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
   /**
    * The draw of the depth pass of the depth of field with the depth materials of the meshes. The
@@ -473,11 +473,7 @@ export class PostPipeline {
     });
     this.#blurGather = this.#createBlurGather();
     this.#surface = this.#createSurface();
-    this.#surfaceBlur = passMaterial(SURFACE_BLUR_FRAGMENT, {
-      uSource: { value: null },
-      uTexel: { value: new Vector2() },
-      uClamp: { value: new Vector4(0, 0, 1, 1) },
-    });
+    this.#surfaceBlur = this.#createSurfaceBlur();
     this.#final = this.#createFinal();
   }
 
@@ -509,9 +505,11 @@ export class PostPipeline {
     this.#tier = tier;
     this.#blurGather.dispose();
     this.#surface.dispose();
+    this.#surfaceBlur.dispose();
     this.#final.dispose();
     this.#blurGather = this.#createBlurGather();
     this.#surface = this.#createSurface();
+    this.#surfaceBlur = this.#createSurfaceBlur();
     this.#final = this.#createFinal();
     this.#disposeTargets();
     this.#targets = this.#createTargets();
@@ -879,6 +877,22 @@ export class PostPipeline {
     return passMaterial(SURFACE_FRAGMENT, surfaceUniforms(), defines);
   }
 
+  #createSurfaceBlur(): ShaderMaterial {
+    const defines: Record<string, number> = {};
+    if (TIER_SETTINGS[this.#tier].floorGloss) {
+      defines['FLOOR_GLOSS'] = 1;
+    }
+    return passMaterial(
+      SURFACE_BLUR_FRAGMENT,
+      {
+        uSource: { value: null },
+        uTexel: { value: new Vector2() },
+        uClamp: { value: new Vector4(0, 0, 1, 1) },
+      },
+      defines,
+    );
+  }
+
   #createFinal(): ShaderMaterial {
     const settings = TIER_SETTINGS[this.#tier];
     const defines: Record<string, number> = {};
@@ -893,6 +907,9 @@ export class PostPipeline {
     }
     if (settings.contactSamples > 0 || settings.floorGloss) {
       defines['SURFACE'] = 1;
+    }
+    if (settings.floorGloss) {
+      defines['FLOOR_GLOSS'] = 1;
     }
     const look = POST_LOOK;
     const material = passMaterial(
