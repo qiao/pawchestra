@@ -359,6 +359,7 @@ extras of the asset as numbers ("Seat"), and only the preview images show a chai
 | Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource`, `weightSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. A planar split of the faces takes the weights of the mesh before it. The trunk under a T-pose arm root keeps a trunk share of the painted weights (`weights.paintedBelow`), so that a raised arm does not pull the side out. That share also holds the front of the root with the chest, so a hanging arm leaves a dark notch there. A shape of the rest takes the front of the root along with the arm (`raise` with `follow`), and the play keeps the share. |
 | Shapes | `raise` | Give the source back in the standing pose, and relax the faces of a bent arm. |
 | Arms | `upperTwist`, `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms`, `armSmooth` | Spread the roll of an arm along the arm, so the skin does not twist. |
+| Thumbs | `thumbs` | Give the free thumb of a fist its own bone. |
 | Splits | `weights.armSplit`, `weights.armFree`, `weights.armCrease`, `cut` | Free an arm that the mesh joins to the trunk, so a raised arm pulls no flap out. Free it only as far as a raised arm needs: a small clip is better than an over-cut. |
 | Normals | `cut.skinNormals`, `cut.bodyNormals`, `rootNormals` | Shade a bent arm root, elbow, wrist, or knee soft, with no dark slot. |
 | Colors | `colors.tone`, `colors.shift`, `colors.dark`, `colors.border`, `colors.split`, `colors.flank`, `colors.twoTone` | Move the face colors toward the reference, and keep the black borders clean. |
@@ -371,6 +372,17 @@ upper arm (`upperTwist`), or arm segments with a helper bone at the elbow and at
 (`armSegments`). The arms of a body with segments are quad tubes that a script of
 `tools/blender/` builds on the arms of the mesh. The bind paw sets the zero of the paw twist, so
 the rig turns it toward supination where a hold supinates far (`studio.bindSupination`).
+
+**Thumb of a fist.** A paw of a mesh can be one fist with a free thumb stub, as each deer paw
+is. Point edits that split the fist into digits would change the form, so such a paw keeps the one
+`fingers` bone, and only the thumb takes a bone of its own (`thumbs`, `THUMB_BONES`). The thumb
+is a child of the paw, because the thumb of a real hand starts at the wrist. The config
+lists the vertices of the free stub, chosen by hand. Each gives only its share of the paw to the
+thumb, and keeps its shares of the fingers and the wrist helper. Thus a pose with no thumb bend
+skins each vertex as before. The vertices around the root of the stub keep their rows, because
+each already has four bones. The pose bends the thumb by the bend of digit 1 of its paw
+(`AnimalPose.digits`) about its close axis (`StudioBody.thumbAxes`), which moves the tip across
+the palm, so the pose data has one format for claws and thumbs.
 
 **Straight bind.** A bind that bends a thick elbow or paw (`studio.bindArms`) makes the rest shape
 a linear blend of that bend, with the skin on the inner side already pressed. Each pose then blends
@@ -1382,14 +1394,19 @@ type BoneName =
 
 - **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
   eye bones for the pea eyes, and the optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip
-  (`tail_tip`), the jaw of a beak (`jaw`), and the arm segments and helpers
-  (`ARM_SEGMENT_BONES`). The optional bones come after the other bones, so that a new one keeps
+  (`tail_tip`), the jaw of a beak (`jaw`), the arm segments and helpers
+  (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`), and the thumbs of a fist
+  (`THUMB_BONES`). The optional bones come after the other bones, so that a new one keeps
   each other index. The scene gives the mesh the studio bones and the bones of the player, and
   `poseStudioBones()` writes their matrices from the pose of the player. A pose also holds the
   twist bones of the upper arms (`UPPER_TWIST_BONES`).
 - **Arm segments.** `poseArm()` writes each segment from the turns of its arm, around the joint at
   the start of its part. The readers of the bind mesh read the upper arm or the forearm of the
   player for them (`STUDIO_FOLLOWS`).
+- **Digits and thumbs.** Each digit of a hand rig takes the turn of the fingers and its own bend
+  around the curl axis of its paw. Each thumb of a fist takes the turn of the paw and its own bend
+  about its close axis. With no bend, a digit moves as the fingers and a thumb as the paw. The
+  readers of the bind mesh read the fingers or the paw of the player for them.
 - **Jaw.** The `jaw` of a studio body is a child of `head` at the hinge of the beak, and the choir
   pose opens it (5.3). A body with no jaw keeps the `jaw` of the player with no vertex on it.
 - **Arms.** Analytic two-bone IK (upper arm and forearm). `poseAt()` calculates the hand targets
