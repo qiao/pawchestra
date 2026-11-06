@@ -1168,8 +1168,8 @@ change of the detail does not move the seats.
 
 **Piano** (`models/instruments/piano.ts`). 88 separate keys, a lyre, and three brass pedals in the
 sizes of a real grand piano (`PIANO_PEDALS`). The lift raises the case, the keys, the lid, and the
-bar of the lyre, and the pedals stay on the floor. Each key turns down with its notes (`PIANO.keyDip`),
-and the damper pedal goes down under the right foot (5.3).
+bar of the lyre, and the pedals stay on the floor. Each key turns down with its notes
+(`PIANO.keyDip`), and the damper pedal goes down under the right foot (5.3).
 
 ### Instrument data
 

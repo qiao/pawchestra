@@ -171,7 +171,8 @@ The app follows these facts:
   higher case hides less of the players behind it.
 - **The distance (section 2).** The keys stand at `PIANO_FRONT_H` in front of the floor point.
   Farther keys make the right leg reach for the damper pedal and pull the haunch into the bench.
-  Nearer keys fold the shoulders.
+  They also open the elbows past the 90° to 110° of section 1, but the upright trunk then stops
+  short of more keys. Nearer keys fold the shoulders.
 - **The trunk (section 3).** The trunk sits tall over the sit bones. The spine leans a little
   toward the keys (`lean`), far less than the flexion of a posture that is not neutral, and the
   shoulders stay low and level (`shoulderDrop`). A larger lean puts the trunk over the knees, and
