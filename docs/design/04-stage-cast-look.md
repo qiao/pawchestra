@@ -238,6 +238,10 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   play. There the cut adds few and large faces: it splits no face at the middles of its edges, and
   a change near a corner goes through that corner. The texture has a soft gray step at each edge,
   so a face of the edge takes the larger half of its samples (`colors.split`).
+  A cut at the change of a noisy texture gives a jagged line, and the faces along it a staircase.
+  So the penguin copy cuts along the zero line of a smoothed side field over the surface in place
+  of the texture change, and a face of the other texture side takes the UVs of a near face of its
+  side (`assets/models/penguin/README.md`).
 - **Intake spec.** A new mesh comes with clean quad faces, so that its arms keep their faces: the
   rig adds only the arm segments and the weights (`arm_rebuild.py --keep-faces`). `pnpm
   mesh-intake` checks each point of the intake table below with the limits of

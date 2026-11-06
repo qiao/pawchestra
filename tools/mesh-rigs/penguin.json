@@ -1,8 +1,10 @@
 {
-  "source": "assets/models/penguin/penguin-arms.glb",
-  "sourceNote": "A copy of assets/models/penguin/penguin-free.glb (armSource) with new quad tubes on each flipper from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces with --spec '{\"free\": 1.8, \"spread\": 0.2}', and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy, with the split beak (penguin_beak.py) and the color edge cut (penguin_edge.py). See assets/models/penguin/README.md. penguin.glb does not change.",
+  "source": "assets/models/penguin/penguin-arms-edge.glb",
+  "sourceNote": "A copy of assets/models/penguin/penguin-arms.glb (weightSource) with the black and white edge on a smooth curve: point edits in Blender split the faces along the zero line of a smoothed side field and give each face of the wrong texture side the UVs of a near face of its side (assets/models/penguin/README.md, penguin-arms-edge.json). penguin-arms.glb is the copy of assets/models/penguin/penguin-free.glb (armSource) with new quad tubes on each flipper from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces with --spec '{\"free\": 1.8, \"spread\": 0.2}', and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy, with the split beak (penguin_beak.py) and the first color edge cut (penguin_edge.py). penguin.glb does not change.",
   "armSource": "assets/models/penguin/penguin-free.glb",
   "armSourceNote": "The copy of assets/models/penguin/penguin-edge.glb with the flippers free of the trunk (tools/blender/penguin_edit.py, assets/models/penguin/README.md). Git keeps it out, and tools/blender/arm_rebuild.py reads it.",
+  "weightSource": "assets/models/penguin/penguin-arms.glb",
+  "weightSourceNote": "The weights come from the mesh before the edge edits, and each vertex takes the weights of its place on it (placed_weights() of tools/blender/rig_mesh.py). Thus paintedWeights still keys to the vertices of penguin-arms.glb, and a new vertex on an edge takes the weights of the two ends of the edge in the ratio of its place.",
   "paintedWeights": "assets/models/penguin/penguin-weights.json",
   "paintedLower": [
     "root",
@@ -552,7 +554,7 @@
       ],
       "x": 0.15,
       "arm": 0.5,
-      "note": "The texture paints the black flipper larger than the flipper of the mesh. Thus each black face of the side forward of the line from the armpit to the lower side takes the white of the nearest light face (flank_faces() of tools/blender/rig_mesh.py), so that a raised flipper leaves no black band on the white side."
+      "note": "The texture paints the black flipper larger than the flipper of the mesh. Thus each black face of the side forward of the line from the armpit to the lower side takes the white of the nearest light face (flank_faces() of tools/blender/rig_mesh.py), so that a raised flipper leaves no black band on the white side. The source copy already holds this white with a smooth edge, so the rule changes no face of it, and it stays as a guard."
     },
     "splitNote": "A face whose samples spread over more than 0.3 of Oklab lightness takes the mean of the larger of its light and dark halves (face_colors() of tools/blender/rig_mesh.py). Thus the edge between the black and the white is sharp, with no gray band.",
     "shift": {
