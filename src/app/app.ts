@@ -586,11 +586,6 @@ export class App {
     return this.#songTime;
   }
 
-  /** True while the transport plays. */
-  get playing(): boolean {
-    return this.#state.transport.playing;
-  }
-
   /** The pose plan of the current piece, or `null` before the first piece. */
   get plan(): PosePlan | null {
     return this.#piece?.plan ?? null;

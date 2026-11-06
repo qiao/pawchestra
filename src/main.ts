@@ -61,9 +61,6 @@ function installDevHook(app: App, scene: StageScene): void {
     get songTime() {
       return app.songTime;
     },
-    get playing() {
-      return app.playing;
-    },
     get cameraMode() {
       return app.cameraMode;
     },

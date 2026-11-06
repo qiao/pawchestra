@@ -9,8 +9,6 @@ import type { InstrumentId } from '../models/instruments/types.ts';
 export interface DevHook {
   /** The song time of the last frame, in seconds: `Player.now()` after the load, else 0. */
   readonly songTime: number;
-  /** True while the transport plays. */
-  readonly playing: boolean;
   /** Cinematic or Free (design 2.5). */
   readonly cameraMode: CameraMode;
   /** The position of the camera of the last frame, or an empty list with no scene. */
