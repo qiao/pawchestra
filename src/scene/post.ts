@@ -38,21 +38,8 @@ import {
   BLUR_GATHER_FRAGMENT,
   BLUR_PREPARE_FRAGMENT,
   FINAL_FRAGMENT,
-  FINAL_VERTEX,
   FULL_SCREEN_VERTEX,
-  LAMP_FLARE_FRAGMENT,
 } from './post-shaders.ts';
-import {
-  FLARE_SOURCES,
-  FLARE_TAPS,
-  LENS_FLARE,
-  createFlareUniforms,
-  createLampFlareUniforms,
-  lampGhostCount,
-  writeFlare,
-  writeLampFlare,
-} from './lens-flare.ts';
-import type { FlareUniforms, LampFlareUniforms } from './lens-flare.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 import {
@@ -189,8 +176,6 @@ interface PostFrame {
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
   readonly view: PostView;
-  /** The group of the stage lights, whose spotlights give the lens flare, or `null` for none. */
-  readonly lights: Object3D | null;
 }
 
 /**
@@ -296,7 +281,7 @@ function floatTarget(
 }
 
 /** The uniforms of a pass by name. */
-type PassUniforms = Record<string, { value: UniformValue | Float32Array }>;
+type PassUniforms = Record<string, { value: UniformValue }>;
 
 /**
  * Creates the material of a full-screen pass.
@@ -304,17 +289,15 @@ type PassUniforms = Record<string, { value: UniformValue | Float32Array }>;
  * @param fragmentShader The fragment shader.
  * @param uniforms The uniforms.
  * @param defines The defines of the shader.
- * @param vertexShader The vertex shader: one triangle that covers the view by default.
  * @returns The material. It reads no depth and writes no depth.
  */
 function passMaterial(
   fragmentShader: string,
   uniforms: PassUniforms,
   defines: Record<string, string | number> = {},
-  vertexShader = FULL_SCREEN_VERTEX,
 ): ShaderMaterial {
   return new ShaderMaterial({
-    vertexShader,
+    vertexShader: FULL_SCREEN_VERTEX,
     fragmentShader,
     uniforms,
     defines,
@@ -384,24 +367,6 @@ function setTexel(material: ShaderMaterial, source: WebGLRenderTarget): void {
   }
 }
 
-/**
- * The level of the bloom chain of the ghosts and the halo of the lamp flare: a sixteenth of the
- * size of the canvas, so each ghost is a soft blob.
- */
-const LAMP_SOFT_LEVEL = 3;
-
-/**
- * Tells if a tier has the lamp flare (design 4.5, post effects): the lens flare, and a bloom chain
- * down to {@link LAMP_SOFT_LEVEL}.
- *
- * @param tier The quality tier.
- * @returns True for the lamp flare.
- */
-function hasLampFlare(tier: QualityTier): boolean {
-  const settings = TIER_SETTINGS[tier];
-  return settings.lensFlare && settings.bloomLevels > LAMP_SOFT_LEVEL;
-}
-
 /** The targets of one size of the canvas and one tier. */
 interface Targets {
   /** The scene, with MSAA. */
@@ -425,8 +390,6 @@ interface Targets {
   readonly surfaceRows: WebGLRenderTarget | null;
   /** The contact shade and the floor gloss at half or quarter size, after the blur. */
   readonly surfaceBlur: WebGLRenderTarget | null;
-  /** The lamp flare at a quarter of the size, or `null` with no lamp flare. */
-  readonly lampFlare: WebGLRenderTarget | null;
   /** Each target above, for the crop of each frame and the disposal. */
   readonly all: readonly WebGLRenderTarget[];
 }
@@ -456,14 +419,8 @@ export class PostPipeline {
   #blurGather: ShaderMaterial;
   #surface: ShaderMaterial;
   readonly #surfaceRows: ShaderMaterial;
-  /** The pass of the lamp flare (`LAMP_FLARE_FRAGMENT` of `post-shaders.ts`). */
-  readonly #lampFlare: ShaderMaterial;
-  /** The uniforms of the pass of the lamp flare that change with each frame. */
-  readonly #lampFlareFrame: LampFlareUniforms = createLampFlareUniforms();
   #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
-  /** The uniforms of the lens flare, which each final pass of a tier shares. */
-  readonly #flare: FlareUniforms = createFlareUniforms();
   /**
    * The draw of the depth pass of the depth of field with the depth materials of the meshes. The
    * resolve of the depth of the multisample target cost 2.1 ms on the development Mac, and a
@@ -526,17 +483,6 @@ export class PostPipeline {
       uClamp: { value: new Vector4(0, 0, 1, 1) },
     });
     this.#surfaceBlur = this.#createSurfaceBlur();
-    this.#lampFlare = passMaterial(
-      LAMP_FLARE_FRAGMENT,
-      {
-        uSource: { value: null },
-        uSoft: { value: null },
-        uClamp: { value: new Vector4(0, 0, 1, 1) },
-        uSoftClamp: { value: new Vector4(0, 0, 1, 1) },
-        ...this.#lampFlareFrame,
-      },
-      { FLARE_GHOSTS: lampGhostCount() },
-    );
     this.#final = this.#createFinal();
   }
 
@@ -609,7 +555,6 @@ export class PostPipeline {
 
     const surface = frame.depth ? this.#renderSurface(targets, camera, frame.depth) : null;
     const bloom = this.#renderBloom(targets);
-    const lampFlare = this.#renderLampFlare(targets, camera, frame.view.rect);
     const blur = focus.active
       ? this.#renderBlur(targets, scene, camera, focus, effects, view.imageHeight)
       : null;
@@ -630,10 +575,6 @@ export class PostPipeline {
     if (surface) {
       setClamp(final, 'uSurfaceClamp', surface);
     }
-    setUniform(final.uniforms, 'uLampFlare', lampFlare?.texture ?? null);
-    if (lampFlare) {
-      setClamp(final, 'uLampClamp', lampFlare);
-    }
     const rect = view.rect;
     const frameRect = final.uniforms['uFrame']?.value;
     if (frameRect instanceof Vector4) {
@@ -646,9 +587,6 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uCinema', view.cinema);
     setUniform(final.uniforms, 'uSeed', grainSeed(timeSec));
     setUniform(final.uniforms, 'uFringe', LENS_FRINGE.shift);
-    if (TIER_SETTINGS[this.#tier].lensFlare) {
-      writeFlare(this.#flare, frame.lights, camera, rect, frame.haze !== null);
-    }
     this.#pass(final, null);
   }
 
@@ -684,7 +622,6 @@ export class PostPipeline {
       [this.#surface, target],
       [this.#surfaceRows, target],
       [this.#surfaceBlur, target],
-      [this.#lampFlare, target],
       [this.#final, null],
     ];
     for (const [material, into] of passes) {
@@ -728,10 +665,6 @@ export class PostPipeline {
       ? floatTarget(surfaceWidth, surfaceHeight, 'half')
       : null;
     const surfaceBlur = shade ? floatTarget(surfaceWidth, surfaceHeight, 'half') : null;
-    const [quarterWidth, quarterHeight] = sizes[1] ?? [1, 1];
-    const lampFlare = hasLampFlare(this.#tier)
-      ? floatTarget(quarterWidth, quarterHeight, format)
-      : null;
     const all = [
       scene,
       ...bloomDown,
@@ -742,7 +675,6 @@ export class PostPipeline {
       surface,
       surfaceRows,
       surfaceBlur,
-      lampFlare,
     ].filter((target) => target !== null);
     return {
       scene,
@@ -754,40 +686,8 @@ export class PostPipeline {
       surface,
       surfaceRows,
       surfaceBlur,
-      lampFlare,
       all,
     };
-  }
-
-  /**
-   * Renders the lamp flare at a quarter of the size from the bloom chain
-   * (`LAMP_FLARE_FRAGMENT` of `post-shaders.ts`): the sharp quarter level for the starburst, and
-   * the soft level of a sixteenth for the ghosts and the halo.
-   *
-   * @param targets The targets. The bloom chain of the frame is ready.
-   * @param camera The camera of the frame.
-   * @param rect The part of the canvas that shows the scene, or `null` for the full canvas.
-   * @returns The target of the lamp flare, or `null` when the tier has none.
-   */
-  #renderLampFlare(
-    targets: Targets,
-    camera: PerspectiveCamera,
-    rect: UvRect | null,
-  ): WebGLRenderTarget | null {
-    const sharp = targets.bloomDown[1];
-    const soft = targets.bloomDown[LAMP_SOFT_LEVEL];
-    const to = targets.lampFlare;
-    if (!sharp || !soft || !to) {
-      return null;
-    }
-    const pass = this.#lampFlare;
-    writeLampFlare(this.#lampFlareFrame, camera, rect, this.#width / this.#height);
-    setUniform(pass.uniforms, 'uSource', sharp.texture);
-    setUniform(pass.uniforms, 'uSoft', soft.texture);
-    setClamp(pass, 'uClamp', sharp);
-    setClamp(pass, 'uSoftClamp', soft);
-    this.#pass(pass, to);
-    return to;
   }
 
   /**
@@ -1045,15 +945,6 @@ export class PostPipeline {
     if (settings.floorGloss) {
       defines['FLOOR_GLOSS'] = 1;
     }
-    if (hasLampFlare(this.#tier)) {
-      defines['LAMP_FLARE'] = 1;
-    }
-    if (settings.lensFlare) {
-      defines['LENS_FLARE'] = 1;
-      defines['FLARE_SOURCES'] = FLARE_SOURCES;
-      defines['FLARE_TAPS'] = FLARE_TAPS;
-      defines['FLARE_GHOSTS'] = Math.max(1, LENS_FLARE.ghosts.length);
-    }
     const look = POST_LOOK;
     const material = passMaterial(
       FINAL_FRAGMENT,
@@ -1086,12 +977,8 @@ export class PostPipeline {
         uSeed: { value: 0 },
         uFringe: { value: LENS_FRINGE.shift },
         ...focusUniforms(),
-        ...this.#flare,
-        uLampFlare: { value: null },
-        uLampClamp: { value: new Vector4(0, 0, 1, 1) },
       },
       defines,
-      FINAL_VERTEX,
     );
     // The final pass draws to the canvas, so it takes the tone mapping of the renderer.
     material.toneMapped = true;

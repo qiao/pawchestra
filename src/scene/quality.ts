@@ -19,8 +19,6 @@ interface TierSettings {
   readonly blurSamples: number;
   /** True for the lateral color of the lens at the frame edges (`LENS_FRINGE` of `post.ts`). */
   readonly lensFringe: boolean;
-  /** True for the lens flare of the stage lights (`LENS_FLARE` of `lens-flare.ts`). */
-  readonly lensFlare: boolean;
   /** The number of dust motes in the visible beam. */
   readonly motes: number;
   /** The number of samples of the haze of the visible beam along each view ray. */
@@ -42,14 +40,11 @@ interface TierSettings {
 /**
  * The values of each tier (design 2.6). The low tier keeps the final pass of the post effects
  * (the tone mapping, the color grade, the vignette, and the grain), because it costs one sample
- * for each pixel. It drops the bloom, the lens fringe, the lens flare, the depth of field, and the
- * dust motes.
+ * for each pixel. It drops the bloom, the lens fringe, the depth of field, and the dust motes.
  * The high tier has the surface pass of the contact shade and the floor gloss at half size. The
  * medium tier has only a cheap contact shade, at a quarter size with fewer samples, so that a
  * phone does not look flat. The floor gloss traces a ray for each floor pixel, so it stays on the
  * high tier.
- * The lens flare reads no texture for each pixel, and the final pass skips it in a frame with no
- * light that faces the lens, so the medium tier keeps it.
  * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
  * `perf-60.mid`, and they changed only small shadows on the players.
  */
@@ -65,7 +60,6 @@ export const TIER_SETTINGS = {
     bloomLevels: 6,
     blurSamples: 32,
     lensFringe: true,
-    lensFlare: true,
     motes: 140,
     beamSamples: 4,
     contactSamples: 10,
@@ -79,7 +73,6 @@ export const TIER_SETTINGS = {
     bloomLevels: 5,
     blurSamples: 16,
     lensFringe: true,
-    lensFlare: true,
     motes: 70,
     beamSamples: 3,
     contactSamples: 6,
@@ -93,7 +86,6 @@ export const TIER_SETTINGS = {
     bloomLevels: 0,
     blurSamples: 0,
     lensFringe: false,
-    lensFlare: false,
     motes: 0,
     beamSamples: 2,
     contactSamples: 0,
