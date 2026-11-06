@@ -423,6 +423,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_PIG',
       crease: 35,
+      // The crease between the lips under the snout disc, on a cut of the head with the middle
+      // plane. The tip of the nose is the front of the disc, 3.5 cm in front of the lips.
+      mouthHeight: 0.755,
       glb: 'assets/models/pig/pig.rig.glb',
     },
   ],
