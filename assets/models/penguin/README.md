@@ -1,7 +1,7 @@
 # Penguin model
 
 This folder holds the source mesh of the penguin, three edited copies, a copy with rebuilt
-flippers and its weights, and the rigged copy. The app does not serve these files. It loads the
+flippers and its weights, a copy of it with a smooth color edge, and the rigged copy. The app does not serve these files. It loads the
 module `src/models/studio/penguin.ts`, which this chain writes:
 
 ```text
@@ -17,7 +17,10 @@ penguin-edge.glb
 penguin-free.glb                     `armSource` of tools/mesh-rigs/penguin.json (git keeps it out)
    │  tools/blender/arm_rebuild.py   rebuilt flippers and painted weights
    v
-penguin-arms.glb + penguin-weights.json  `source` and `paintedWeights` of the config
+penguin-arms.glb + penguin-weights.json  `weightSource` and `paintedWeights` of the config
+   │  point edits in Blender           smooth black and white edge (penguin-arms-edge.json)
+   v
+penguin-arms-edge.glb                `source` of the config
    │  pnpm rig-mesh penguin
    v
 penguin.rig.glb                      rigged mesh
@@ -38,6 +41,8 @@ src/models/studio/penguin.ts         studio body of the app
 | `penguin-free.glb` | Copy of `penguin-edge.glb` with the flippers free of the trunk. Git keeps out its 14 MB. License as `penguin.glb` | `penguin_edit.py` (below) |
 | `penguin-arms.glb` | Copy of `penguin-free.glb` with rebuilt flippers. License as `penguin.glb` | `arm_rebuild.py` (below) |
 | `penguin-weights.json` | Weights of the same Blender run. License as `penguin.glb` | `arm_rebuild.py` (below) |
+| `penguin-arms-edge.glb` | Copy of `penguin-arms.glb` with a smooth black and white edge. License as `penguin.glb` | None: point edits in Blender (below) |
+| `penguin-arms-edge.json` | The list of the edits of `penguin-arms-edge.glb`. License as `penguin.glb` | None |
 | `penguin.rig.glb` | Output of the rig. License as `penguin.glb` | `pnpm rig-mesh penguin` |
 
 ## penguin.glb
@@ -169,6 +174,46 @@ triangles after the weld:
 ```bash
 blender -b --factory-startup -P tools/blender/arm_rebuild.py -- penguin --spec '{"free": 1.8, "spread": 0.2}'
 ```
+
+## penguin-arms-edge.glb
+
+| Item | Value |
+|---|---|
+| Size | 951,812 bytes |
+| SHA-256 | `08fa8b59bd82314c4dd9c90819898d8d6923f49368561d3a86c9aa2eb2aea781` |
+| Writer | Khronos glTF Blender I/O of Blender 5.2 |
+
+The texture edge of the Meshy mesh is noisy. `penguin_edge.py` cut each edge where the texture
+changes, so the cut points made a jagged line, and the faces on its two sides made a staircase on
+the head, the cheek patch, the throat, and the flank. The face color rule then took the larger half
+of the samples of each face, and the flank rule turned single black faces white along a straight
+line: both added steps. The copy moves the edge onto a smooth curve on the surface. The edits, made
+in the live Blender on the welded mesh of `penguin-arms.glb`, in the units of the studio:
+
+1. Each face has a side: white or black, from its color in the rig of `penguin-arms.glb`, after the
+   flank rule. The orange faces, the faces of the eye boxes, and the faces of the flipper tubes
+   (each corner with an arm weight of 0.9 or more in the rig) keep their faces and colors.
+2. Each vertex takes the mean side of the other faces within 0.09 units over the surface, weighted
+   by the face area and a Gauss curve of the distance with sigma 0.03 units. Forward of the line of
+   `colors.flank`, a smooth term adds up to 1 toward white, so that a raised flipper still leaves
+   no black band on the side. The edge is the zero line of this field.
+3. A zero within 0.15 of an edge end moves to that end, so that no new face is a thin sliver. A
+   zero on an edge of a face at the flipper root (each corner with a clavicle and arm weight of
+   0.6 or more in `penguin-weights.json`) also moves to the nearer end: there the weights change
+   fast, and small new faces folded at the front of the left root. Each other edge with a zero
+   splits there: 112 new vertices, each on its old edge. Each face splits along the line between
+   its new vertices, or from its new vertex to its corner on the line.
+4. Each face whose texture side differs from its side of the line takes the UVs of the nearest face
+   of its side, corner by corner: 339 faces (215 to white, 124 to black). The rig then gives it the
+   color of that face.
+
+No old vertex moves. The largest distance from a new vertex to the surface of `penguin-arms.glb`
+is 1.4e-8 units. The copy has 2,306 vertices and 4,608 triangles after the weld (4,384 before).
+The texture is the same JPEG. `penguin-arms-edge.json` lists each new vertex (its old edge and its
+place) and each recolored face. The rig takes the weights of each vertex from its place on
+`penguin-arms.glb` (`weightSource` of the config), so that `penguin-weights.json` still keys to
+those vertices, and a new vertex takes the weights of the two ends of its edge in the ratio of its
+place. The flank rule changes no face of this copy.
 
 ## penguin.rig.glb
 
