@@ -81,7 +81,10 @@ export const PIANO_SCALE = 1.16;
  * in head heights `H`, before a further 0.05 m (design 4.6). The keys and the pedals stand near
  * the polar bear pianist, so that its short right leg reaches the damper pedal. At 1.0 H, the
  * thigh of the pedal leg pulls the haunch 2.3 cm into the bench, and 0.9 H keeps the haunch on the
- * pad but folds up to 3 more faces at the left shoulder.
+ * pad but folds up to 3 more faces at the left shoulder. With the upright trunk of
+ * `HANDS_HOLDS.piano`, keys at 1.05 H or 1.1 H bend the elbows less (114° at 1.1 H, 102° at
+ * 1.0 H), but only 89% or 72% of the note targets of `bach-bwv1050` are within 5 mm (99% at 1.0 H,
+ * `pnpm pose-depth pianist`).
  */
 export const PIANO_FRONT_H = 1.0;
 
@@ -96,12 +99,12 @@ export const PIANO_BENCH = {
   width: 0.75,
   depth: 0.35,
   /**
-   * The least depth of the bench under a studio body, in meters. The fit of the polar bear on its
-   * taller bench holds only the haunch from the seat top to 0.15 m above it (0.195 m deep), and
-   * its round haunch bulges up to 0.16 m behind the floor point above that, over the back edge at
-   * 0.098 m. A deeper bench grows back from its front edge, so the sloped thighs stay off it, and
-   * at 0.32 m, about the depth of the fit of the old body on the low bench (0.318 m), its back edge stands 0.22 m behind the
-   * floor point.
+   * The least depth of the bench under a studio body, in meters. The fit of the polar bear holds
+   * only the haunch from the seat top to 0.15 m above it, and its round haunch bulges further back
+   * above that. A deeper bench grows back from its front edge, so the sloped thighs stay off it.
+   * With the thighs 25° down, the fit is 0.244 m deep (0.195 m with the thighs 40° down), and the
+   * bench of 0.32 m, about the depth of the fit of the old body on the low bench (0.318 m), reaches
+   * 0.198 m behind the floor point, 0.076 m behind the back edge of the fit.
    */
   studioDepth: 0.32,
   seatHeight: 0.45,
@@ -615,8 +618,8 @@ export function buildPiano(): InstrumentModel {
   // The round belly of the studio polar bear reaches 0.45 m in front of the floor point, so keys
   // at 0.55 H + 0.05 m (0.26 m) go 15 cm into it. With an upright trunk, keys at 1.37 H stretch
   // the elbows to 117° with the upper arms 28° forward. With the claws on the key tops
-  // (`HANDS_HOLDS.piano`) and the lean of the high bench, the keys at `PIANO_FRONT_H` bend the
-  // elbows about 105°, and the forearms go at most 8.8 cm into the belly, under the limit of 9 cm.
+  // (`HANDS_HOLDS.piano`) and the upright trunk, the keys at `PIANO_FRONT_H` bend the elbows 97° to
+  // 103°, and the forearms go at most 6.3 cm into the belly, under the limit of 9 cm.
   const instrument = piece.build(
     'instrument',
     hold('floor', [0, 0, -PIANO_FRONT_H], undefined, [0, 0, -0.05]),

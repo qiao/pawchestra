@@ -569,7 +569,7 @@ export const SPECIES = {
   /**
    * Polar bear, the piano and the other keyboards. It has the studio body of the hand rig
    * `assets/models/polar-bear/polar-bear.blend` (design 4.4, "Hand rig"), with the legs of its
-   * mesh. It sits on the taller bench of the rig with the thighs sloped down, and its soles touch
+   * mesh. It sits on the bench of the rig with the thighs 25° down, and its soles touch
    * the floor. Its head height is the head of the studio body, and the seat height is the seat of
    * the studio body, in H.
    */
