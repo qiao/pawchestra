@@ -2,8 +2,8 @@
 
 This file is the target of the pose and the motion of the deer harpist of the app. It describes
 the size of the harp, the place of the harp at the player, the lean, the hands and their
-registers, the arms, the hand shape, the pluck, the rest, and the fingering of a harpist, with a
-source for each fact.
+registers, the arms, the hand shape, the pluck, the swing of a plucked string, the rest, and the
+fingering of a harpist, with a source for each fact.
 
 **Upkeep.** This file is current. A change of the pose, the motion, or the place of the harp
 updates section 6 "Use in the app", section 7.10 for a change of the fingering, and each fact that
@@ -96,6 +96,29 @@ of the source.
 - When one hand plays alone, the other hand rests lightly on the edge of the soundboard, or gets
   ready for the next passage [1].
 
+**The swing of the string.**
+
+- At the release, the string has the form of a triangle, with its apex at the pluck point [9].
+  The triangle splits into two waves that travel to the two ends, each with half of the
+  displacement [22].
+- A pluck excites the mode n of the string in proportion to 1/n², and a pluck at 1/n of the
+  length gives no partial n [23]. A pluck at one third of the length puts about 68% of the energy
+  into the first mode (derived from [9, 23]).
+- A mezzo-forte pluck of the D♭2 string releases it at a displacement of about 4 mm on average,
+  and from 0.5 mm to 7 mm at the extremes [9]. No source gives the displacement of other
+  dynamics or of the treble strings.
+- The first free swing is close to an ellipse. Its long axis lies 7° to 43° from the plane of the
+  strings, so the string swings mostly across itself in that plane [9]. Before the release, the
+  finger turns the string by 7° to 82° [9].
+- The swing at a right angle to the soundboard gives its energy to the soundboard and decays
+  fast. The swing parallel to the flat soundboard decays slowly [24].
+- The first partial of the C♭3 string (123.6 Hz) decays with a damping factor of about 0.57 to
+  0.68 [24]. As a factor for each second of the amplitude, this is a time constant of about 1.5 s
+  and a T60 of about 10 s (derived). The source does not state the unit. No source gives the
+  decay of the treble strings.
+- A film camera with a shutter of 1/48 s sees more than one full swing of each string above about
+  48 Hz, from about G1 up (derived). A lower string shows only a part of its swing in one frame.
+
 ## 6. Use in the app
 
 The deer plays the harp at its place of `HARP_PLACE` of `src/models/instruments/harp.ts`, with the
@@ -119,6 +142,18 @@ The app follows these facts:
   points into the strings.
 - **The pluck (section 5).** The fingers curl after each pluck (`curl`, `curlClosed`), and the palm
   pulls away from the strings (`HAND_MOTION` of `src/pose/hand-notes.ts`).
+- **The swing of the string (section 5).** Each note swings its string
+  (`stringSwingsAt()` of `src/pose/harp-strings.ts`). The swing starts at its full size at the
+  note start, and the velocity sets its size. The largest swing goes from 7 mm in the bass, the
+  extreme of the measure, to 1.5 mm in the treble (`STRINGS.swing` of
+  `src/models/instruments/harp.ts`), times the scale of the harp. The swing decays with a time
+  constant from 3 s in the bass to 0.3 s in the treble (`STRING_MOTION.ringSec`), so the C♭3
+  string gets the measured 1.5 s, and faster after the note end (`dampSec`). The triangle of the
+  pluck rounds off to the arc of the first mode (`roundSec`). The long axis of the ellipse lies
+  25° from the plane of the strings, the middle of the measure (`STRINGS.swingTilt`).
+- **The look of the swing (section 5).** The scene draws the envelope of the swing, as a film
+  camera with a long shutter sees it (`src/scene/harp-strings.ts`): a translucent band, brightest
+  at its edges, where the string turns.
 
 The app does not follow these facts:
 
@@ -128,6 +163,14 @@ The app does not follow these facts:
   elbows of the short arms hang below the strings.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
   (`palmL`, `palmR`). The short left arm reaches the far bass strings only higher on the strings.
+- **The size of the swing (section 5).** The band shows the real swing times
+  `STRING_SWING.strength`, and a denser blur (`STRING_SWING.density`), because a swing of a few
+  millimeters on the small harp of the deer does not show in a stage shot.
+- **The decay of each axis (section 5).** One time constant decays the whole ellipse. A real
+  string loses the swing at a right angle to the soundboard faster. No source gives the treble
+  decay, so the treble time constant is an estimate.
+- **The lowest strings (section 5).** The band shows the whole envelope also below G1, where a
+  real film frame sees only a part of the swing.
 - **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
   (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
 - **The fingering (section 7).** Section 7.10 gives the plan to follow it.
@@ -302,7 +345,7 @@ These parts need a decision first:
 
 ## 8. Sources
 
-Sources 1 to 7 opened on 2026-10-25, and sources 8 to 21 on 2026-11-06, except the search
+Sources 1 to 7 opened on 2026-10-25, and sources 8 to 24 on 2026-11-06, except the search
 summary 18.
 
 1. L. Lawrence, "Method for the Harp: Fundamental Exercises with Illustrations and Technical
@@ -348,3 +391,10 @@ summary 18.
 20. A. J. Bell, "An acoustical investigation of the concert harp", PhD thesis, University of St
     Andrews, 1988, Tables 2.1 and 2.2. https://hdl.handle.net/10023/2768
 21. Lyon & Healy, the range of a concert grand harp. https://www.harp.com/?p=13419
+22. J. O. Smith III, "The Ideal Plucked String", Physical Audio Signal Processing, 2010.
+    https://ccrma.stanford.edu/~jos/pasp/Ideal_Plucked_String.html
+23. G. Scavone, "MUMT 618 Week 5: String Instrument Acoustics", McGill University.
+    https://caml.music.mcgill.ca/~gary/618/week5/week5.pdf
+24. J.-L. Le Carrou, F. Gautier, and R. Badeau, "Sympathetic String Modes in the Concert Harp",
+    Acta Acustica united with Acustica 95, 744-752, 2009, Table II and section 4.
+    https://www.lam.jussieu.fr/Membres/LeCarrou/Articles/A3_LeCarrou_SympatheticStringModes.pdf
