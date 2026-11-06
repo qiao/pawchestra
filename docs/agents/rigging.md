@@ -346,6 +346,9 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   the mesh: a fill of the groove made the rabbit neck a thick column.
 - A horn, a trunk, whiskers, or antlers distort the head measures. Use `noseTop`, `noseFront`,
   `headFloor`, and `headCeiling`.
+- The mouth rule drops from the tip of the nose, so a snout disc puts the mouth on the disc, in
+  front of the lips. Read the crease between the lips on a cut of the head with the middle plane,
+  and give its height (`mouthHeight`, the pig).
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - A gray or tan face at a black and white edge shows as a smudge under the color blend. Give a
