@@ -212,7 +212,9 @@ void main() {
         break;
       }
       float behind = -q.z - sceneDepthAt(uv);
-      if (behind > 0.0 && behind < 0.35) {
+      // The thickness of a surface follows the step, so that a ray that passes behind a thin leg
+      // goes on, and does not draw a streak of the leg.
+      if (behind > 0.0 && behind < max(0.06, 1.5 * (t - before))) {
         // Three halvings between the last step in front and this step.
         float a = before;
         float b = t;
@@ -232,7 +234,14 @@ void main() {
         vec2 hu = c.xy / c.w * 0.5 + 0.5;
         vec2 edge = min(hu - uClamp.xy, uClamp.zw - hu);
         float fade = (1.0 - b / reach) * smoothstep(0.0, 0.05, min(edge.x, edge.y));
-        reflection = min(texture(uScene, hu).rgb, vec3(8.0)) * fresnel * uGloss.x * fade;
+        // The mean of a box of 4 × 4 pixels of the scene, so that a single bright pixel does not
+        // sparkle.
+        vec2 d = uDepthTexel;
+        vec3 color = texture(uScene, inSource(hu + d * vec2(-1.0, -1.0))).rgb;
+        color += texture(uScene, inSource(hu + d * vec2(1.0, -1.0))).rgb;
+        color += texture(uScene, inSource(hu + d * vec2(-1.0, 1.0))).rgb;
+        color += texture(uScene, inSource(hu + d * vec2(1.0, 1.0))).rgb;
+        reflection = min(color * 0.25, vec3(8.0)) * fresnel * uGloss.x * fade;
         break;
       }
       before = t;
