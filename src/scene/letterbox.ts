@@ -24,12 +24,6 @@ export interface UvRect {
 }
 
 /**
- * The time of the move of the letterbox bars between Free mode and Cinematic mode, in
- * milliseconds (design 2.5). With reduced motion, the bars move at once.
- */
-const LETTERBOX_MOVE_MS = 600;
-
-/**
  * Gives the frame of Cinematic mode (design 2.5): the largest box of the aspect
  * {@link CINEMA_ASPECT} inside the canvas, at its middle. A canvas narrower than 21:9 gets bars at
  * the top and the bottom, and a wider canvas gets bars at the sides.
@@ -100,29 +94,4 @@ export function cropTarget(target: WebGLRenderTarget, rect: UvRect | null): void
   const top = Math.min(height, Math.ceil(rect.top * height));
   target.scissor.set(left, bottom, Math.max(1, right - left), Math.max(1, top - bottom));
   target.scissorTest = true;
-}
-
-/**
- * Moves the letterbox bars in a frame (design 2.5): the progress goes toward 1 in Cinematic mode
- * and toward 0 in Free mode, in {@link LETTERBOX_MOVE_MS}.
- *
- * @param progress The progress of the last frame, from 0 to 1.
- * @param cinematic True in Cinematic mode.
- * @param dtMs The time since the last frame, in milliseconds: `Infinity` for a move at once.
- * @returns The new progress, from 0 to 1.
- */
-export function stepLetterbox(progress: number, cinematic: boolean, dtMs: number): number {
-  const step = dtMs / LETTERBOX_MOVE_MS;
-  return cinematic ? Math.min(1, progress + step) : Math.max(0, progress - step);
-}
-
-/**
- * Gives the share of the letterbox at a progress of its move: a smoothstep, so that the bars
- * start and stop softly.
- *
- * @param progress The progress, from 0 to 1.
- * @returns The share, from 0 (Free mode, no bars) to 1 (the frame of {@link letterbox}).
- */
-export function letterboxShare(progress: number): number {
-  return progress * progress * (3 - 2 * progress);
 }

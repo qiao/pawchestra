@@ -1,5 +1,6 @@
 import type { Vec3 } from '../models/tuples.ts';
 import { smoothstep } from '../pose/rest.ts';
+import type { Focus } from './focus.ts';
 
 /**
  * The blend between Free mode and Cinematic mode (design 2.5). A change of the mode moves the
@@ -86,6 +87,26 @@ export function blendOrbitView(from: OrbitView, to: OrbitView, w: number): Orbit
     target[2] + flat * Math.cos(azimuth),
   ];
   return { position, target, fov: mix(from.fov, to.fov, w) };
+}
+
+/**
+ * Blends two focuses of the lens (design 2.5, 4.5): the focus distance and the blur scale change
+ * linearly. The blur passes run while one of the two focuses needs them.
+ *
+ * @param from The focus at the weight 0.
+ * @param to The focus at the weight 1.
+ * @param w The weight, from 0 to 1.
+ * @returns The focus between them: `to` at 1.
+ */
+export function blendFocus(from: Focus, to: Focus, w: number): Focus {
+  if (w >= 1) {
+    return to;
+  }
+  return {
+    distance: mix(from.distance, to.distance, w),
+    scale: mix(from.scale, to.scale, w),
+    active: from.active || to.active,
+  };
 }
 
 /** The place of a camera on the sphere around the point that it looks at. */

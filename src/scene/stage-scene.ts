@@ -49,8 +49,9 @@ import type { Focus, FocusSpot } from './focus.ts';
 import { createMaterials } from './geometry.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
-import { letterbox, letterboxShare, mixBox, stepLetterbox, uvRectOf } from './letterbox.ts';
+import { letterbox, mixBox, uvRectOf } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
+import { blendFocus, mix, modeBlendWeight } from './mode-blend.ts';
 import { boneSpheres, fitPoseSphere } from './bounds.ts';
 import type { BoneSpheres } from './bounds.ts';
 import {
@@ -351,6 +352,27 @@ export function renderScenePass(
   shadowMap.autoUpdate = shadows;
 }
 
+/** The values of a frame that the blend of a change of the camera mode moves (design 2.5). */
+interface ModeLook {
+  /** The share of the letterbox, from 0 (Free mode, no bars) to 1 (the frame of `letterbox()`). */
+  readonly cinema: number;
+  /** The factor of the beam opacity, from 0 to 1. */
+  readonly beam: number;
+  /** The weight of the light of a close shot, from 0 to 1. */
+  readonly light: number;
+  /** The weight of the follow-spot of a solo shot, from 0 to 1. */
+  readonly spot: number;
+  /** The focus of the lens, or `null` before the first frame. */
+  readonly focus: Focus | null;
+}
+
+/** The blend of a change of the camera mode: the values of the change, and its time. */
+interface ModeMove {
+  readonly from: ModeLook;
+  /** The time of the change, in milliseconds. */
+  readonly startMs: number;
+}
+
 export class StageScene {
   readonly #canvas: HTMLCanvasElement;
   readonly #renderer: WebGLRenderer;
@@ -410,13 +432,14 @@ export class StageScene {
   #aimTarget: LightAim | null = null;
   /** The time of the last frame, in milliseconds, for the ease of the stage lights. */
   #aimMs = 0;
-  /**
-   * The progress of the move of the letterbox bars (design 2.5), from 0 (Free mode) to 1
-   * (Cinematic mode).
-   */
-  #letterbox = 0;
-  /** The time of the last move of the letterbox bars, in milliseconds, or `null` before it. */
-  #letterboxMs: number | null = null;
+  /** True when the last frame was in Cinematic mode (design 2.5). */
+  #cinematic = false;
+  /** The values of the last frame that a change of the camera mode blends. */
+  #shown: ModeLook = { cinema: 0, beam: 1, light: 0, spot: 0, focus: null };
+  /** The blend of the last change of the camera mode, or `null` after its end (design 2.5). */
+  #modeMove: ModeMove | null = null;
+  /** True when the next change of the camera mode also blends the camera: the toggle. */
+  #blendCamera = false;
 
   /**
    * Creates the renderer on a canvas. The scene shows nothing until {@link StageScene.show}.
@@ -940,7 +963,7 @@ export class StageScene {
    * @returns The size of the bar, in CSS pixels.
    */
   #barSize(canvas: number, frame: number): number {
-    const share = letterboxShare(this.#letterbox);
+    const share = this.#shown.cinema;
     if (share <= 0) {
       return 0;
     }
@@ -948,19 +971,51 @@ export class StageScene {
   }
 
   /**
-   * Moves the letterbox bars toward the mode of the frame, and gives the view of the frame (design
-   * 2.5). The bars move in `LETTERBOX_MOVE_MS` of `letterbox.ts`, at once with reduced motion.
+   * Asks the next change of the camera mode to blend the camera too (design 2.5). The toggle
+   * asks it. A drag, a pinch, a wheel, or "Reset view" changes the mode with no blend of the
+   * camera, so the user input or the default view takes the camera at once. The bars, the light
+   * of the shot, and the focus blend at each change.
+   */
+  blendNextModeChange(): void {
+    this.#blendCamera = true;
+  }
+
+  /**
+   * Starts the blend of a change of the camera mode in the frame of the change (design 2.5), from
+   * the values of the last frame. With reduced motion, the change is a hard cut.
    *
+   * @param camera The camera of the layout.
    * @param cinematic True in Cinematic mode.
    * @param nowMs The time of the frame, in milliseconds.
-   * @returns The view of the post effects, with the share of the letterbox, from 0 to 1.
+   * @returns The weight of the blend in this frame: 1 with no blend.
    */
-  #followLetterbox(cinematic: boolean, nowMs: number): PostView {
-    const last = this.#letterboxMs;
-    const dtMs = last === null || this.#reducedMotion ? Infinity : nowMs - last;
-    this.#letterboxMs = nowMs;
-    this.#letterbox = stepLetterbox(this.#letterbox, cinematic, dtMs);
-    const share = letterboxShare(this.#letterbox);
+  #followMode(camera: StageCamera, cinematic: boolean, nowMs: number): number {
+    if (cinematic !== this.#cinematic) {
+      this.#cinematic = cinematic;
+      this.#modeMove = this.#reducedMotion ? null : { from: this.#shown, startMs: nowMs };
+      if (this.#blendCamera) {
+        camera.startBlend(nowMs, cinematic);
+      } else {
+        camera.stopBlend();
+      }
+    }
+    this.#blendCamera = false;
+
+    const move = this.#modeMove;
+    const w = move ? modeBlendWeight(nowMs - move.startMs) : 1;
+    if (w >= 1) {
+      this.#modeMove = null;
+    }
+    return w;
+  }
+
+  /**
+   * Gives the view of the frame for a share of the letterbox (design 2.5).
+   *
+   * @param share The share of the letterbox, from 0 (Free mode) to 1 (Cinematic mode).
+   * @returns The view of the post effects.
+   */
+  #letterboxView(share: number): PostView {
     if (share <= 0) {
       return { rect: null, imageHeight: 1, cinema: 0 };
     }
@@ -993,22 +1048,32 @@ export class StageScene {
     if (!view) {
       return;
     }
+    const nowMs = performance.now();
+    const w = this.#followMode(view.camera, shot !== null, nowMs);
     let beam: number;
     let light: number;
     let spot = 0;
     if (shot) {
-      view.camera.follow(shot);
+      view.camera.follow(shot, nowMs);
       beam = shot.beam;
       light = shot.light;
       spot = shot.spot;
     } else {
-      view.camera.update();
+      view.camera.update(nowMs);
       const [x, y, z] = view.camera.camera.position.toArray();
       beam = freeBeamOpacity(view.stageSide, this.aspect, [x, y, z]);
       light = freeShotLight(view.stageSide, this.aspect, [x, y, z]);
     }
+    // The blend of a change of the mode starts from the values of the frame of the change.
+    const from = this.#modeMove?.from ?? null;
+    const cinema = from ? mix(from.cinema, shot ? 1 : 0, w) : shot ? 1 : 0;
+    if (from) {
+      beam = mix(from.beam, beam, w);
+      light = mix(from.light, light, w);
+      spot = mix(from.spot, spot, w);
+    }
     this.#lightShot(view, light, spot);
-    const postView = this.#followLetterbox(shot !== null, performance.now());
+    const postView = this.#letterboxView(cinema);
     view.camera.frameTo(cover, ring, performance.now(), postView.cinema);
     const foot = this.#followAim(view, performance.now());
     const camera = view.camera.camera;
@@ -1030,7 +1095,9 @@ export class StageScene {
       });
     }
     setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);
-    const focus = this.#focusOf(view, shot, performance.now());
+    const live = this.#focusOf(view, shot, performance.now());
+    const focus = from?.focus ? blendFocus(from.focus, live, w) : live;
+    this.#shown = { cinema, beam, light, spot, focus };
     if (!depthPass) {
       this.#holdPose(view);
     }
