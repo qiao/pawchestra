@@ -1,7 +1,7 @@
 import { ShaderChunk, SpotLight, Vector2, Vector3 } from 'three';
 import type { Group, WebGLProgramParametersWithUniforms } from 'three';
 
-import { LIGHT_NAMES } from './lights.ts';
+import { LIGHT_NAMES, RIM_LIGHT } from './lights.ts';
 
 /** The most rim lights that the shaders take (`RIM_PLACE.count` of `models/beam.ts`). */
 const MAX_RIM_LIGHTS = 3;
@@ -118,7 +118,7 @@ for (int i = 0; i < ${MAX_RIM_LIGHTS}; i++) {
   float distanceSquared = max(dot(toLamp, toLamp), 1e-4);
   vec3 direction = toLamp * inversesqrt(distanceSquared);
   float cone = smoothstep(uRimCone[i].x, uRimCone[i].y, dot(-direction, uRimAxis[i]));
-  float facing = saturate(dot(rimNormal, direction));
+  float facing = saturate((dot(rimNormal, direction) + RIM_WRAP) / (1.0 + RIM_WRAP));
   vRimLight += uRimColor[i] * (facing * cone / distanceSquared);
 }
 `;
@@ -161,9 +161,12 @@ export function addRimLight(
   shader.uniforms['uRimCone'] = uniforms.uRimCone;
   shader.uniforms['uRimColor'] = uniforms.uRimColor;
   const fragment = RIM_FRAGMENT.replace('RIM_SKY', surface === 'stage' ? 'stageBake.g' : '1.0');
+  // The floor gets no wrap: it is no fur, and the wrap would light the stage behind each lamp.
+  const wrap = surface === 'players' ? RIM_LIGHT.wrap : 0;
+  const vertex = RIM_VERTEX.replaceAll('RIM_WRAP', wrap.toFixed(3));
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>\n${RIM_UNIFORMS}`)
-    .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>\n${RIM_VERTEX}`);
+    .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>\n${vertex}`);
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', `#include <common>\n${RIM_UNIFORMS}`)
     .replace('#include <lights_fragment_end>', `#include <lights_fragment_end>\n${fragment}`);

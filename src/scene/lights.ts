@@ -141,6 +141,12 @@ export const RIM_LIGHT = {
   angle: 16 * MathUtils.DEG2RAD,
   /** The full penumbra, for a soft pool of light. */
   penumbra: 1,
+  /**
+   * The wrap of the rim light around the players, from 0 to 1: a face that turns this part of a
+   * right angle past the light still gets a little of it. Fur scatters the light under its tips,
+   * so the rim of a real animal in a back light is a soft band and not a hard line.
+   */
+  wrap: 0.35,
 } as const;
 
 /**
