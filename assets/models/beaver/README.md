@@ -1,7 +1,7 @@
 # Beaver model
 
-This folder holds the source mesh of the beaver, a copy with rebuilt arms and its weights, and the
-rigged copy. The app does not serve these files. It loads the module `src/models/studio/beaver.ts`,
+This folder holds the source mesh of the beaver, a copy with rebuilt arms and its weights, a copy
+of that with no flap under the armpits, and the rigged copy. The app does not serve these files. It loads the module `src/models/studio/beaver.ts`,
 which this chain writes:
 
 ```text
@@ -11,7 +11,10 @@ beaver.glb                               source mesh
 beaver-edit.glb                          `armSource` of tools/mesh-rigs/beaver.json (git keeps it out)
    │  tools/blender/arm_rebuild.py       rebuilt arms and painted weights
    v
-beaver-arms.glb + beaver-weights.json    `source` and `paintedWeights` of the config
+beaver-arms.glb + beaver-weights.json    `paintedWeights` of the config
+   │  point edits in Blender             no flap under the armpits (beaver-arms-crease.json)
+   v
+beaver-arms-crease.glb                   `source` of the config
    │  pnpm rig-mesh beaver
    v
 beaver.rig.glb                           rigged mesh
@@ -30,6 +33,8 @@ src/models/studio/beaver.ts              studio body of the app
 | `beaver-edit.glb` | Copy of `beaver.glb` with the arms free of the trunk. Git keeps out its 17 MB. License as `beaver.glb` | `blender -b --factory-startup -P tools/blender/beaver_edit.py -- assets/models/beaver/beaver-edit.glb --factor 1.5` |
 | `beaver-arms.glb` | Copy of `beaver-edit.glb` with rebuilt arms. License as `beaver.glb` | `arm_rebuild.py beaver --factor 1.5` |
 | `beaver-weights.json` | Weights of the same Blender run. License as `beaver.glb` | `arm_rebuild.py beaver --factor 1.5` |
+| `beaver-arms-crease.glb` | Copy of `beaver-arms.glb` with no flap under the armpits. License as `beaver.glb` | None: point edits in Blender (below) |
+| `beaver-arms-crease.json` | The list of the edits of `beaver-arms-crease.glb`. License as `beaver.glb` | None |
 | `beaver.rig.glb` | Output of the rig. License as `beaver.glb` | `pnpm rig-mesh beaver` |
 
 ## beaver-edit.glb
@@ -40,6 +45,31 @@ from the trunk along its crease, turns it 10° out, and closes the arm and the t
 It removes the flap face of the left armpit first. The other faces stay as in `beaver.glb`. Two
 runs give the same bytes. The script prints the joints of the turned arm 1.5 times longer, which
 are the arm joints of the config.
+
+## beaver-arms-crease.glb
+
+| Item | Value |
+|---|---|
+| Size | 1,188,124 bytes |
+| SHA-256 | `1375c9e678aa98b9447c16d978acf9b64ddaad44bb470dcab7f9aad666b6eeca` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+`beaver_edit.py` closes the trunk under each freed arm with a wall. In `beaver-arms.glb` the top
+row of that wall is a chain of vertices along the armpit, from the front of the shoulder to the
+back, and it stands about 0.02 units above the next row of the wall. The wall and the underside of
+the upper arm meet at the chain at an angle of 40° to 85°, so the strip of the wall between the
+chain and the next row was a thin flap under each armpit. Seen edge-on, it showed as a dark sliver
+between the upper arm and the trunk, and in the bind it stretched into a web of thin faces.
+
+The copy removes each flap with point edits in the live Blender on the welded mesh. Each chain
+vertex merges into its nearest neighbor of the next row of the wall, at the place of that
+neighbor, so that no vertex goes to a new place: 7 merges on the right and 6 on the left.
+`beaver-arms-crease.json` lists the 13 merges in their order. The two ends of each chain, at the
+top of the shoulder and at the back of the armpit, stay. The underside of the arm now meets the
+wall in a crease at the next row, with no notch. Each merge moves a corner at most 0.022 units.
+The copy has 1,911 vertices and 3,808 triangles after the weld (1,924 and 3,834 before): 26
+faces go, and each other face keeps the UVs of its own corners. Each merged corner takes the
+weight row of its new vertex in `beaver-weights.json`.
 
 ## beaver.glb
 
