@@ -348,21 +348,6 @@ function setKeyTier(spot: SpotLight, tier: QualityTier): void {
 }
 
 /**
- * Sets the shadow of a side light for a quality tier (design 2.6). A tier with no shadow map of
- * the side lights turns their shadow off.
- *
- * @param spot The side light.
- * @param tier The quality tier.
- */
-function setSideTier(spot: SpotLight, tier: QualityTier): void {
-  const settings = TIER_SETTINGS[tier];
-  spot.castShadow = settings.sideShadowMapSize > 0;
-  if (spot.castShadow) {
-    setShadowMap(spot, settings.sideShadowMapSize, settings.shadowRadius);
-  }
-}
-
-/**
  * Calculates the normal bias of the shadow of a spotlight for its aim, its shadow map, and its
  * blur ({@link shadowNormalBias}).
  *
@@ -440,8 +425,8 @@ export function aimRimLights(lights: Group, stageSide: number, x: number, z: num
 }
 
 /**
- * Sets the lights of the stage for a new quality tier (design 2.6): the shadows of the key light
- * and of the side lights, and the haze samples and the dust motes of the visible beam.
+ * Sets the lights of the stage for a new quality tier (design 2.6): the shadow of the key light,
+ * and the haze samples and the dust motes of the visible beam.
  *
  * @param lights The group of {@link createLights}.
  * @param tier The quality tier.
@@ -450,8 +435,6 @@ export function setLightsTier(lights: Group, tier: QualityTier): void {
   for (const child of lights.children) {
     if (child instanceof SpotLight && child.name === KEY_NAME) {
       setKeyTier(child, tier);
-    } else if (child instanceof SpotLight && child.name === SIDE_NAME) {
-      setSideTier(child, tier);
     } else if (child instanceof Group) {
       setBeamTier(child, tier);
     }
@@ -604,7 +587,7 @@ interface LightOptions {
  * (design 4.5). The lights scale with the stage.
  *
  * @param stageSide The stage side `S`, in meters.
- * @param tier The quality tier. It sets the shadow map sizes and the shadow blur.
+ * @param tier The quality tier. It sets the shadow map and the shadow blur of the key light.
  * @param conductor The place of the conductor, or `null` for a view with no conductor, such as
  *   the gallery.
  * @param options The options.
@@ -625,9 +608,6 @@ export function createLights(
   group.add(new HemisphereLight(FILL.sky, FILL.ground, FILL.intensity));
 
   for (const light of crossPair(stageSide, SIDE_LIGHT, SIDE_NAME)) {
-    light.shadow.bias = -0.0005;
-    setSideTier(light, tier);
-    fitShadow(light, stageSide);
     group.add(light, light.target);
   }
   if (options.backRows ?? true) {

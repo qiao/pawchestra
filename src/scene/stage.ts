@@ -234,8 +234,8 @@ const KEY_SHADOW =
 /**
  * Adds the bake of the static props (`scene/stage-bake.ts`) to the lights of the stage shader,
  * after {@link addLightPool}: the key light takes the smaller of its shadow map (the players) and
- * R (the props), and the other spotlights take G, the open sky of the props. The stage takes no
- * shadow map of the side lights, so the floor keeps the shadows of the key light alone. three.js
+ * R (the props), and the other spotlights take G, the open sky of the props. The side lights cast
+ * no shadow, so the floor keeps the shadows of the key light alone. three.js
  * puts the spotlights with a shadow first, in the order of the scene, so the key light, the first
  * light of `createLights()`, is spotlight 0.
  *

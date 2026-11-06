@@ -6,11 +6,6 @@ interface TierSettings {
   /** The width and the height of the shadow map of the key light, in texels. */
   readonly shadowMapSize: number;
   /**
-   * The width and the height of the shadow map of each side light, in texels, or 0 for side
-   * lights with no shadow. Their maps hold the players only, in a narrow cone.
-   */
-  readonly sideShadowMapSize: number;
-  /**
    * The blur radius of the `PCFShadowMap` filter, in texels. three.js r186 replaces
    * `PCFSoftShadowMap` with `PCFShadowMap`, so a larger radius makes the soft shadows of the high
    * tier.
@@ -38,7 +33,6 @@ interface TierSettings {
 export const TIER_SETTINGS = {
   high: {
     shadowMapSize: 2048,
-    sideShadowMapSize: 0,
     // 5 in place of 3: with 3, the shadow of an arm on the white trunk of the rabbit shows black
     // wedges with the steps of the map.
     shadowRadius: 5,
@@ -52,7 +46,6 @@ export const TIER_SETTINGS = {
   },
   medium: {
     shadowMapSize: 1024,
-    sideShadowMapSize: 0,
     shadowRadius: 1,
     maxPixelRatio: 1.5,
     bloomLevels: 5,
@@ -62,7 +55,6 @@ export const TIER_SETTINGS = {
   },
   low: {
     shadowMapSize: 512,
-    sideShadowMapSize: 0,
     shadowRadius: 1,
     maxPixelRatio: 1,
     bloomLevels: 0,
