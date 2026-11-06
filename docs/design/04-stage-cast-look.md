@@ -1223,7 +1223,10 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Baton | Along the index finger, with its grip in the palm, as a conductor holds it (`BATON_ALONG`). |
 
 Each mallet, stick, and beater slants down toward the line of the forearm, as a real player holds
-the shaft along the thumb (`malletTilt`). No vertex of a player is below the floor.
+the shaft along the thumb (`malletTilt`). The paw holds each snare stick one third up from the
+butt (`SNARE_DRUM.malletButt`), as a real player holds the fulcrum, and keeps the full length in
+front of the grip (`SNARE_DRUM.stick`), because the short arms reach the head only with it. No
+vertex of a player is below the floor.
 
 **Bowed strings** (`models/instruments/strings.ts`). The strings stay at one height over the
 board (`VIOLIN`), because the holds and the play targets read that height. The neck under the
