@@ -229,7 +229,11 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
   of the app view judge that height.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
-  fur toward the color of the species in the reference images.
+  fur toward the color of the species in the reference images. The faces near a color edge of the
+  texture take gray, tan, or pale yellow mixes, and the color blend of the render (`colorBlend`)
+  spreads each such face into a smudge. So a body of two plain colors, such as the black and white
+  penguin, gives each face one of the two colors, and its orange keeps its colors
+  (`colors.twoTone`).
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
   eye patch. A script cuts such faces along the edge in a copy (`tools/blender/penguin_edge.py`,
   `panda_edge.py`), and each new vertex lies on an old face. The rig takes the weights of the mesh
@@ -325,7 +329,7 @@ extras of the asset as numbers ("Seat"), and only the preview images show a chai
 | Arms | `upperTwist`, `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms`, `armSmooth` | Spread the roll of an arm along the arm, so the skin does not twist. |
 | Splits | `weights.armSplit`, `weights.armFree`, `weights.armCrease`, `cut` | Free an arm that the mesh joins to the trunk, so a raised arm pulls no flap out. |
 | Normals | `cut.skinNormals`, `cut.bodyNormals`, `rootNormals` | Shade a bent arm root, elbow, wrist, or knee soft, with no dark slot. |
-| Colors | `colors.tone`, `colors.shift`, `colors.dark`, `colors.border`, `colors.split`, `colors.flank` | Move the face colors toward the reference, and keep the black borders clean. |
+| Colors | `colors.tone`, `colors.shift`, `colors.dark`, `colors.border`, `colors.split`, `colors.flank`, `colors.twoTone` | Move the face colors toward the reference, and keep the black borders clean. |
 | Face | `colors.patch`, `colors.smile`, `soften`, `eyeShell` | Give a happy face: round eye patches, a thin smile line, and no brow crease. |
 | Tail, ears, jaw | `studio.tailCurl`, `studio.tailBind`, `tailBall`, `sit.carryTail`, `sit.tailSpread`, `earFlap`, `noseFront`, `weights.jaw` | Lay a tail on the seat or the floor, move a tail ball down with the haunch, let a trunk or a hanging ear follow the head, and open a beak. |
 
