@@ -216,7 +216,10 @@ merges 5 vertices at the arm roots into a neighbor (`panda-edge-pit.glb`). Reaso
 the level T-pose arms down, and a sliver and faces between corners of other weights turned over
 into a dark back face, fins, and deep notches. The rhino copy merges 2 vertices at the left arm
 root into a neighbor (`rhino-tpose-arms-pit.glb`). Reason: a face at the top front of the root
-turned over in the bind, and a thin face at its back folded into a fin in the play. The old faces keep their colors, so that the black and white edge of the trunk stays.
+turned over in the bind, and a thin face at its back folded into a fin in the play. The badger
+copy merges 10 vertices of the arm seams into a neighbor (`badger-arms-pit.glb`). Reason: an arm
+corner beside a trunk corner left a V notch at the front of the left armpit, and slivers along the
+seams folded into fins and notches. The old faces keep their colors, so that the black and white edge of the trunk stays.
 The new faces of the side wall take the black of the flipper, except forward of one straight
 edge along the flank line under the flipper, where they take the white of the side. Reason: the
 flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of

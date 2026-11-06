@@ -1,6 +1,6 @@
 {
-  "source": "assets/models/badger/badger-arms.glb",
-  "sourceNote": "A copy of assets/models/badger/badger-edit.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces, and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy.",
+  "source": "assets/models/badger/badger-arms-pit.glb",
+  "sourceNote": "A copy of assets/models/badger/badger-arms.glb with fewer folds at the arm roots: point edits in Blender merge 10 vertices of the arm seams into a neighbor, so that no vertex goes to a new place (assets/models/badger/README.md, badger-arms-pit.json). badger-arms.glb is a copy of assets/models/badger/badger-edit.glb (armSource) with new quad tubes on each arm from the shoulder line to the wrist. tools/blender/arm_rebuild.py makes these faces, and finds the shoulder line at 0.1 of the upper arm. The other faces stay as in the copy.",
   "armSource": "assets/models/badger/badger-edit.glb",
   "armSourceNote": "The copy of assets/models/badger/badger.glb with the arms free of the trunk (tools/blender/badger_edit.py, assets/models/badger/README.md). Git keeps it out, and tools/blender/arm_rebuild.py reads it.",
   "paintedWeights": "assets/models/badger/badger-weights.json",
