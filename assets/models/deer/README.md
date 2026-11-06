@@ -114,9 +114,35 @@ corners. Each merged corner takes the weight row of its new vertex in `deer-weig
 
 | Item | Value |
 |---|---|
-| Size | 594,412 bytes |
-| SHA-256 | `3e80455fa7353c66ed9f7fcf79e2b72637f73a4b69290325ff80437b054f0120` |
+| Size | 595,160 bytes |
+| SHA-256 | `40f89619333d71b6eda4df1a5ebd0ac3ee85ea975287db2a0d23d9c3386b17e2` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the harp is smallest (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of the bent right elbow of the harp hold |
+| Thumbs | A bone `thumb_L` and `thumb_R` on the free thumb of each paw (`thumbs` of the config, below) |
 
-A run of `pnpm rig-mesh deer` gives the same bytes.
+A run of `pnpm rig-mesh deer` gives the same bytes. The arms have a side wall of the trunk under
+each root (`deer_arms.py`). The deer plays a smaller harp (`harpScale`), which leans on its right
+shoulder.
+
+### Thumbs
+
+Each paw of the source is one closed fist. Three finger lobes curl into the palm and join side by
+side over their full length, so one `fingers` bone holds them. A short thumb stub on the front edge
+of each paw is free of the fist from about y 0.28 down to its tip at y 0.267. Point edits that
+split the lobes would change the form, so only the thumb takes a bone of its own.
+
+The vertices of each stub were chosen by hand in Blender on the welded source (the weld and the
+order of `load_mesh()` of `rig_mesh.py`). They are the vertices below the gap that frees the stub:
+
+| Side | Free vertices | Root ring (keeps its rows) |
+|---|---|---|
+| L | 811, 812, 815, 817, 820, 823, 827, 841, 842, 843 | 809, 810, 814, 816, 821, 822, 826 |
+| R | 1039, 1040, 1041, 1046, 1047, 1049, 1050, 1051, 1053 | 1033, 1034, 1038, 1042, 1045, 1048, 1052 |
+
+Each free vertex gives its share of the paw (`hand`, about 0.67 to 0.81) to the thumb, and keeps its
+shares of the fingers, the wrist helper, and the last forearm segment. The thumb is a child of the
+paw and turns with it, so a pose with no thumb bend skins each vertex as before. The vertices of the
+root ring already have four bones each, so the root has no ring of half shares. The thumb head is
+the middle of the root ring, and its tail the middle of the three lowest free vertices. A turn
+about the close axis moves the thumb tip back across the inner face of the paw.
+
