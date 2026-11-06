@@ -609,15 +609,17 @@ its rest is the bind.
   drop then spreads over several faces, and the ball keeps its round form.
 - The polar bear is the largest player, as a real polar bear is larger than the other animals of
   the cast. The piano does not grow with it, because a larger piano hides the players behind it.
-- The polar bear sits on a taller bench that fits its haunch and legs (`benchFitOf()`), as a real
-  pianist sits on a higher bench: the thighs slope down from the hips to the knees, the knees open
-  past 90°, the shins lean a little forward, and the feet stand flat. Its legs keep the length of
-  the mesh, so the body keeps the part ratios of the mesh, and only the slope of the thighs sets the
-  height of the bench. Reason: on a low bench with level thighs, the large bear hangs its haunch
-  over a small stool and looks as if it squats. A higher bench also puts the shoulders higher over
-  the keys, so the arms reach further down to them. The bench reaches back from the front edge of
-  its fit to at least `PIANO_BENCH.studioDepth`, so the round haunch that bulges back above the fit
-  sits on the bench, and the sloped thighs stay off it. The deer sits on the stool of the harp.
+- The polar bear sits on a bench that fits its haunch and legs (`benchFitOf()`), as a real
+  pianist sits on the front half of the bench: the whole haunch sits on the seat, the thighs slope
+  a little down from the hips to the knees, the knees open past 90°, the shins stand near
+  vertical, and the feet stand flat. Its legs keep the length of the mesh, so the body keeps the
+  part ratios of the mesh, and only the slope of the thighs in the bind sets the height of the
+  bench. The thighs slope down at most about 25°. Reason: thighs that slope further down put the
+  haunch on the front edge of the bench, and the bear looks as if it stands up. A smaller slope
+  lowers the hips, and below about 25° the thighs set the seat top in place of the haunch. The
+  bench reaches back from the front edge of its fit to at least `PIANO_BENCH.studioDepth`, so the
+  round haunch sits on the bench with a little room behind it. The deer sits on the stool of the
+  harp.
 - The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
   of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
