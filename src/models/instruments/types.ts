@@ -236,6 +236,8 @@ export interface StringLine {
   readonly radius: number;
   /** The share of the length from `bottom` to the pluck point of the string. */
   readonly pluck: number;
+  /** The largest swing of the string at its pluck point after a loudest pluck, in meters. */
+  readonly swing: number;
 }
 
 /** The strings of a harp, which swing after a pluck (design 4.6, 5.3). */
@@ -243,10 +245,12 @@ export interface InstrumentStrings {
   /** The line of each string, from the bass string, in the order of the string parts. */
   readonly lines: readonly StringLine[];
   /**
-   * The unit direction of the largest swing of a string, in the axes of the piece: the normal of
-   * the plane of the strings, in which a finger pulls a string.
+   * The unit direction of the largest swing of a string, in the axes of the piece, at a right
+   * angle to the strings. A plucked string swings on an ellipse, and this is its long axis.
    */
   readonly swing: Vec3;
+  /** The short axis of the ellipse of a swing, as a share of the long axis. */
+  readonly cross: number;
 }
 
 /** The geometry and the play data of one instrument, with no Three.js object. */

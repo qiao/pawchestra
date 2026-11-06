@@ -263,6 +263,20 @@ const STRINGS = {
    * straight segment. A string that bends, as a string that vibrates, needs more.
    */
   rings: 2,
+  /**
+   * The largest swing at the pluck point after a loudest pluck, of the bass string and of the
+   * treble string, at the scale 1. The strings between take the geometric mean by their place. A
+   * mezzo-forte pluck of a D♭2 string releases it at about 4 mm, and the largest measured release
+   * is about 7 mm (`docs/reference/harp-technique.md`, section 8). No source gives the treble.
+   */
+  swing: [0.007, 0.0015],
+  /**
+   * The angle of the long axis of the ellipse of a swing out of the plane of the strings. A
+   * measure gives 7° to 43°, so the string swings mostly in the plane, across the string.
+   */
+  swingTilt: 25 * MathUtils.DEG2RAD,
+  /** The short axis of the ellipse of a swing, as a share of the long axis. No source gives it. */
+  swingCross: 0.3,
 } as const;
 
 /**
@@ -782,11 +796,13 @@ function addStrings(piece: PieceBuilder, scale: number): StringLine[] {
     });
     const [color, finish] = stringLook(i);
     piece.string(i, sweep(rings, false), color, finish);
+    const [bassSwing, trebleSwing] = STRINGS.swing;
     lines.push({
       bottom: [0, from * scale, z * scale],
       top: [0, to * scale, z * scale],
       radius: radius * scale,
       pluck: ((pluckPoint(i)[1] ?? from) - from) / (to - from),
+      swing: bassSwing * (trebleSwing / bassSwing) ** share * scale,
     });
   }
   return lines;
@@ -894,7 +910,10 @@ export function buildHarp(scale = 1): InstrumentModel {
       },
     ],
     size: pieceSize(instrument),
-    // A finger pulls its string out of the plane of the strings, toward the palm.
-    strings: { lines, swing: [1, 0, 0] },
+    strings: {
+      lines,
+      swing: [Math.sin(STRINGS.swingTilt), 0, Math.cos(STRINGS.swingTilt)],
+      cross: STRINGS.swingCross,
+    },
   };
 }

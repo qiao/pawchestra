@@ -80,6 +80,8 @@ export interface HarpStrings {
   readonly lines: readonly StringLine[];
   /** The unit direction of the largest swing of a string, in the model axes. */
   readonly swing: Vec3;
+  /** The short axis of the ellipse of a swing, as a share of the long axis. */
+  readonly cross: number;
   /** The bone of the piece of the strings. */
   readonly bone: InstrumentBone;
 }
@@ -261,8 +263,10 @@ function harpStrings(model: InstrumentModel, strung: readonly StringCorners[]): 
       top: applyTransform(at, line.top),
       radius: line.radius,
       pluck: line.pluck,
+      swing: line.swing,
     })),
     swing: toVec3(new Vector3(...strings.swing).applyQuaternion(rotation)),
+    cross: strings.cross,
     bone: piece.bone,
   };
 }
