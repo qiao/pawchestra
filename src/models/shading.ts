@@ -15,8 +15,6 @@ const WELD_STEP = 1e-4;
  * follows its own bones (design 4.4).
  */
 interface Welds {
-  /** The vertex of each corner. */
-  readonly vertexOf: Uint32Array;
   /**
    * The start of the corner list of each vertex in {@link Welds.corners}, with one more entry
    * at the end. The corners of vertex `v` are `corners[start[v]]` to `corners[start[v + 1] - 1]`.
@@ -85,7 +83,7 @@ export function weldCorners(mesh: MeshData): Welds {
     corners[at] = c;
     fill[vertex] = at + 1;
   }
-  return { vertexOf, start, corners };
+  return { start, corners };
 }
 
 /** The face values of a mesh. */
