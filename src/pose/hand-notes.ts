@@ -127,7 +127,8 @@ export interface HandNote {
  * and the right hand the high notes. A chord wider than one octave splits at its largest
  * interval that keeps each hand in its reach: the left hand plays the notes below it. Of two
  * equal intervals, the one nearer to the middle of the chord splits it. A chord within one octave
- * goes to one hand. A chord far above the reach of the left hand goes to the right hand, and a
+ * goes to one hand. With a plan, such a chord can also split when no hand reaches it whole
+ * ({@link planHands}). A chord far above the reach of the left hand goes to the right hand, and a
  * chord far below the reach of the right hand goes to the left hand, so that a melody changes
  * hands where one hand cannot cross over the other. These two rules also give a wide chord to one
  * hand when all its keys are past the reach of the other hand.
@@ -165,7 +166,13 @@ export function splitHands(
       .slice(group.first, group.first + group.count)
       .map((n) => n.pitch)
       .toSorted((a, b) => a - b);
-    const cut = group.high - group.low > HAND_MOTION.span ? wideChordCut(keys, reach) : null;
+    // A chord that no hand reaches whole, also with the slack of the plan, can split as a wide
+    // chord does: the left hand plays its low keys and the right hand its high keys.
+    const slack = PLAN_REACH_SLACK;
+    const oneHand =
+      group.high <= reach.leftHighest + slack || group.low >= reach.rightLowest - slack;
+    const cut =
+      group.high - group.low > HAND_MOTION.span || !oneHand ? wideChordCut(keys, reach) : null;
     return { group, keys, cut };
   });
   const choices = apart > 0 ? planHands(chords, reach, apart) : null;
@@ -249,8 +256,8 @@ interface SplitChord {
   /** The keys of the notes, sorted up. */
   readonly keys: readonly number[];
   /**
-   * The index of the lowest key of the right hand in a chord wider than one octave
-   * ({@link wideChordCut}), or `null` for a chord that one hand plays.
+   * The index of the lowest key of the right hand in a chord wider than one octave, or in a chord
+   * that no hand reaches whole ({@link wideChordCut}). `null` for a chord that one hand plays.
    */
   readonly cut: number | null;
 }
@@ -333,7 +340,9 @@ interface PlanStep {
  * Plans the hand of each chord of a player (design 5.3), as a pianist plans which hand takes which
  * notes. A chord wider than one octave with a cut ({@link wideChordCut}) goes to both hands. A
  * chord within one octave goes to either hand that reaches it, or that plays at most
- * {@link PLAN_REACH_SLACK} keys past its reach at a cost for each key. A dynamic program finds
+ * {@link PLAN_REACH_SLACK} keys past its reach at a cost for each key. A chord within one octave
+ * that no hand reaches so goes to the left hand or splits between both hands, so that the hand of
+ * a melody can keep its keys and play the high key of the chord. A dynamic program finds
  * the hands of the lowest cost: for each move of a palm, the square of its distance in semitones
  * over its time. Thus a fast move costs more than a slow one, as its speed is higher, and a move
  * of a hand out of the way of the other hand counts too. The search keeps the best way to play
@@ -364,7 +373,9 @@ function planHands(chords: readonly SplitChord[], reach: HandReach, apart: numbe
     const options: HandChoice[] = [];
     if (chord.cut !== null) {
       options.push('both');
-    } else {
+    }
+    // A chord within one octave can also go to one hand.
+    if (chord.cut === null || group.high - group.low <= HAND_MOTION.span) {
       const slack = PLAN_REACH_SLACK;
       if (group.high <= reach.leftHighest + slack || group.low < reach.rightLowest - slack) {
         options.push('left');

@@ -355,6 +355,8 @@ The app does not follow these facts:
   note only because it is nearer, when both paws must then jump to the next chord. A paw also
   plays a narrow chord a few keys past its reach (`PLAN_REACH_SLACK`), so the two paws do not
   trade a melody in the middle of the keys note by note: the wide paws go into each other there.
+  A narrow chord that no paw reaches whole can split between the two paws, so the paw of a melody
+  keeps its keys and plays the high key of the chord.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

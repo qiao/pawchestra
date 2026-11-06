@@ -506,6 +506,12 @@ The rest of each family:
   the keys went up to 2.4 cm into the other paw (`bach-bwv1050`). A higher lift over the
   other paw (`HAND_MOTION.over` up to 0.16 m) did not part the paws, because the paw that comes
   lowers next to the paw that leaves, and it made the palms up to 5 times faster.
+- A narrow chord that no paw reaches whole, also with the slack, can split as a wide chord does
+  (`wideChordCut()`): the left paw plays its low keys and the right paw its high keys. The plan
+  picks the split or the left paw by the cost. Thus the paw of a melody keeps its keys and plays
+  the high key of the chord. Reason: such an octave under a melody of the right paw went to the
+  left paw, so the right paw moved away and came back at once, and the paws went up to 2.5 cm into
+  each other (`bach-bwv1050`).
 - The wide paws keep apart (`apart`). When the two parts of a wide chord, such as a bass and a
   melody, come nearer, each part asks its palm to stand a few keys away from it
   (`HandNote.shift`). Thus the two parts stay in two paws, and one paw does not jump between them.
