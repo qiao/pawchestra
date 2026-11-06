@@ -144,6 +144,15 @@ export interface AnimalSettings {
    */
   readonly noseTop?: number;
   /**
+   * The height of the mouth line on the middle plane, in the bind pose of the GLB file, in its
+   * units, for a body whose tip of the nose is far in front of the mouth, as the snout disc of the
+   * pig. The middle of the mouth is then the front of the lips at this height ({@link mouthOf}).
+   * Read the height from a cut of the head with the middle plane: the crease between the lips.
+   * With no value, the mouth lies `MOUTH_DROP` H below the tip of the nose
+   * (`src/models/studio-body.ts`).
+   */
+  readonly mouthHeight?: number;
+  /**
    * The highest height of the head measures in the bind pose of the GLB file, in its units, for
    * antlers or horns that rise from the skull top and follow the head, as the antlers of the deer.
    * The head height, the head center, the box of the pea eyes, and the tip of the nose then leave
@@ -203,6 +212,7 @@ const BODY_FACTS = [
   'seatWidth',
   'headFloor',
   'noseTop',
+  'mouthHeight',
   'headCeiling',
 ] as const satisfies readonly (keyof AnimalSettings)[];
 
@@ -607,6 +617,54 @@ const NOSE_PLANE = 0.03;
  * `tools/rig-mesh-check.ts`).
  */
 export const NOSE_WARNING = 0.02;
+
+/**
+ * The band of the lower lip below the mouth line, in H, in which {@link mouthOf} looks for the
+ * front of the lips. The crease of the pig mouth goes 1.5 cm into the head, and its lower lip is
+ * about 1 cm high. The upper lip of the pig joins the underside of the snout disc 0.4 cm above
+ * the crease, so a band above the line would find the disc.
+ */
+const MOUTH_LIP = 0.025;
+
+/**
+ * Gives the middle of the mouth of a body with a mouth line (`mouthHeight`): the point on the
+ * middle plane at the height of the line, as far forward as the front of the lower lip. The lower
+ * lip is the cut of the faces of the head with the middle plane, from the line down to
+ * {@link MOUTH_LIP} H below it. Thus the point lies at the front of the lips, in front of the
+ * crease, and a mouthpiece rests on the lips (design 4.4).
+ *
+ * @param mesh The welded mesh, in the axes and the units of the studio.
+ * @param middle The x of the middle plane, in the units of the studio.
+ * @param height The height of the mouth line, in the units of the studio.
+ * @param band The height of the band of the lower lip, in the units of the studio.
+ * @returns The middle of the mouth, in the units of the studio.
+ * @throws Error if no face of the head cuts the middle plane in the band.
+ */
+function mouthOf(mesh: SourceMesh, middle: number, height: number, band: number): Vector3 {
+  const onHead = (c: number): boolean =>
+    (mesh.vertices[c]?.skin.find(([bone]) => bone === 'head')?.[1] ?? 0) > 0.5;
+  let front = -Infinity;
+  for (const face of mesh.faces) {
+    if (!face.corners.every(onHead)) {
+      continue;
+    }
+    for (let e = 0; e < 3; e++) {
+      const a = mesh.vertices[face.corners[e] ?? 0]?.position;
+      const b = mesh.vertices[face.corners[(e + 1) % 3] ?? 0]?.position;
+      if (!a || !b || a.x === b.x || a.x < middle === b.x < middle) {
+        continue;
+      }
+      const cut = a.clone().lerp(b, (middle - a.x) / (b.x - a.x));
+      if (cut.y <= height && cut.y >= height - band) {
+        front = Math.max(front, cut.z);
+      }
+    }
+  }
+  if (front === -Infinity) {
+    throw new Error(`No face of the head cuts the middle plane below the mouth line ${height}.`);
+  }
+  return new Vector3(middle, height, front);
+}
 
 /** The order of the corrective shapes in a studio body: the left arm, then the right arm. */
 export const CORRECTIVE_NAMES = ['arm_down_L', 'arm_down_R'] as const;
@@ -2984,6 +3042,13 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   }
   if (settings.colorBlend !== undefined) {
     body = { ...body, colorBlend: settings.colorBlend };
+  }
+  if (settings.mouthHeight !== undefined) {
+    const band = MOUTH_LIP * (top - chin);
+    body = {
+      ...body,
+      mouth: model(mouthOf(mesh, -frame.offset.x, settings.mouthHeight, band)),
+    };
   }
   const caps = withoutEyes.faces.flatMap((face, t) => (face.cap === true ? [t] : []));
   if (caps.length > 0) {

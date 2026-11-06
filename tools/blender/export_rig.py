@@ -56,6 +56,7 @@ BODY_FACTS = (
     'seatWidth',
     'headFloor',
     'noseTop',
+    'mouthHeight',
     'headCeiling',
 )
 
