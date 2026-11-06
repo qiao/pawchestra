@@ -34,6 +34,13 @@ export interface AnimalPose {
    * pose with no value takes 0.
    */
   readonly pawBendR?: number;
+  /**
+   * The bend of each claw of a body with digit bones, in radians, the five digits of the left paw
+   * first, from the thumb side (`digitBendsAt()` of `pose/piano-digits.ts`, 4.4, 5.3). A positive
+   * bend turns the claw down toward the palm. It is `null` or absent for a pose with no claw
+   * motion: then each digit keeps the turn of the fingers.
+   */
+  readonly digits?: Float32Array | null;
   /** 0 is open eyes, 1 is closed eyes. The eye bones scale on y by `max(0.05, 1 - blink)`. */
   readonly blink: number;
   /**

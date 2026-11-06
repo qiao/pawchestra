@@ -5,6 +5,7 @@ import { BONE_NAMES, boneIndex } from './rig.ts';
 import type { Skeleton } from './rig.ts';
 import {
   ARM_SEGMENTS,
+  DIGITS,
   STUDIO_ARM_BONES,
   STUDIO_BONES,
   STUDIO_LEG_BONES,
@@ -33,7 +34,8 @@ import type { Quat, Vec3 } from './tuples.ts';
  * `jaw`, which the choir pose opens (design 5.3). The arm bones of the studio take the joints and
  * the hand of the player, with the bend of the elbow of the studio and the twist split of the
  * forearm ({@link poseStudioBones}). The arm segments and the elbow helper follow the upper arm or
- * the forearm of their part, and the wrist helper the forearm. The readers of the bind mesh, such
+ * the forearm of their part, the wrist helper the forearm, and the digits of a hand rig the
+ * fingers. The readers of the bind mesh, such
  * as the footprints, read the bone of the player of the largest weight.
  */
 export const STUDIO_FOLLOWS = {
@@ -91,6 +93,16 @@ export const STUDIO_FOLLOWS = {
   forearm_seg3_R: 'forearmR',
   elbow_R: 'upperArmR',
   wrist_R: 'forearmR',
+  digit1_L: 'fingersL',
+  digit2_L: 'fingersL',
+  digit3_L: 'fingersL',
+  digit4_L: 'fingersL',
+  digit5_L: 'fingersL',
+  digit1_R: 'fingersR',
+  digit2_R: 'fingersR',
+  digit3_R: 'fingersR',
+  digit4_R: 'fingersR',
+  digit5_R: 'fingersR',
 } as const satisfies Readonly<Record<StudioBone, BodyBoneName>>;
 
 /**
@@ -167,6 +179,11 @@ interface StudioArm {
   readonly sheet: Vec3;
   /** The arm segments and the helpers of a body with them, or `null` (design 4.4, 4.7). */
   readonly segments: StudioArmSegments | null;
+  /**
+   * The digit bones of a hand rig, as indices in `STUDIO_BONES`, from the thumb side, or `null`
+   * for a body with no digits (`DIGIT_BONES` of `models/studio-format.ts`).
+   */
+  readonly digits: readonly number[] | null;
 }
 
 /**
@@ -250,6 +267,11 @@ interface BoneOffsets {
    * body keeps the paw in the world.
    */
   readonly pawBendR: number;
+  /**
+   * The bend of each digit around the curl axis of its paw, in radians, the left paw first
+   * (`digits` of `AnimalPose`), or `null` for no bend.
+   */
+  readonly digits: Float32Array | null;
 }
 
 /** The offsets of a pose that moves no bone from its bind place. */
@@ -259,6 +281,7 @@ export const NO_OFFSETS: BoneOffsets = {
   slide: [0, 0, 0],
   pawTurnL: null,
   pawBendR: 0,
+  digits: null,
 };
 
 /** The offsets that a pose of a player holds (`AnimalPose` of `pose/types.ts`, design 5.1). */
@@ -273,6 +296,8 @@ interface PoseOffsets {
   readonly pawTurnL?: number | null;
   /** The bend of the right paw off the line of its forearm, in radians, or none for 0. */
   readonly pawBendR?: number;
+  /** The bend of each digit, or none for no bend. */
+  readonly digits?: Float32Array | null;
 }
 
 /**
@@ -288,6 +313,7 @@ export function studioOffsets(pose: PoseOffsets): BoneOffsets {
     slide: pose.slideOffset,
     pawTurnL: pose.pawTurnL ?? null,
     pawBendR: pose.pawBendR ?? 0,
+    digits: pose.digits ?? null,
   };
 }
 
@@ -891,6 +917,11 @@ export function studioRig(bound: StudioBody, stands = false): StudioRig {
             wrist: STUDIO_BONES.indexOf(`wrist_${side}`),
           }
         : null,
+      digits: h[`digit1_${side}`]
+        ? Array.from({ length: DIGITS }, (_, k) =>
+            STUDIO_BONES.indexOf(`digit${String(k + 1)}_${side}` as StudioBone),
+          )
+        : null,
     };
   };
   return {
@@ -1025,6 +1056,7 @@ const fingersTurn = new Quaternion();
 const palmTurn = new Quaternion();
 const curlTurn = new Quaternion();
 const curlAxis = new Vector3();
+const digitAt = new Vector3();
 const X_AXIS = new Vector3(1, 0, 0);
 const twistTurn = new Quaternion();
 const segmentTurn = new Quaternion();
@@ -1436,8 +1468,48 @@ function poseArm(
     .applyQuaternion(handTurn)
     .add(wrist);
   writeMatrix(out.matrices, arm.bones.fingers, fingersTurn, bind.fromArray(h[keys.fingers]), head);
+  if (arm.digits) {
+    poseDigits(rig, arm, offsets.digits, head, out);
+  }
   if (arm.segments) {
     poseSegments(rig, arm.segments, side, twist, out);
+  }
+}
+
+/**
+ * Writes the digit bones of one paw of a hand rig (design 4.4, 5.3) from the turn of the fingers
+ * that {@link poseArm} leaves in the module values. Each digit takes the turn of the fingers, then
+ * its own bend around the curl axis of the paw, and it turns around its head on the posed fingers.
+ * A positive bend curls the claw down toward the palm, as the curl of the fingers does.
+ *
+ * @param rig The studio rig.
+ * @param arm The arm, with its digits.
+ * @param bends The bend of each digit, the left paw first, or `null` for no bend.
+ * @param fingersAt The posed head of the fingers.
+ * @param out The pose to write.
+ */
+function poseDigits(
+  rig: StudioRig,
+  arm: StudioArm,
+  bends: Float32Array | null,
+  fingersAt: Vector3,
+  out: StudioPose,
+): void {
+  const h = rig.body.heads;
+  const fingersBind = h[ARM_HEADS[arm.side].fingers];
+  const first = arm.side === 'L' ? 0 : DIGITS;
+  curlAxis.fromArray(arm.curl);
+  for (let k = 0; k < DIGITS; k++) {
+    const index = arm.digits?.[k] ?? 0;
+    const digitBind = h[`digit${String(k + 1)}_${arm.side}` as keyof StudioHeads] ?? fingersBind;
+    curlTurn.setFromAxisAngle(curlAxis, bends?.[first + k] ?? 0);
+    segmentTurn.copy(fingersTurn).multiply(curlTurn);
+    digitAt
+      .fromArray(digitBind)
+      .sub(bind.fromArray(fingersBind))
+      .applyQuaternion(fingersTurn)
+      .add(fingersAt);
+    writeMatrix(out.matrices, index, segmentTurn, bind.fromArray(digitBind), digitAt);
   }
 }
 

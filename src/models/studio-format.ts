@@ -55,11 +55,35 @@ export const ARM_SEGMENT_BONES = [
 export type ArmSegmentBone = (typeof ARM_SEGMENT_BONES)[number];
 
 /**
+ * The digit bones of a hand rig (design 4.4, "Hand rig"), the left side first: one bone for each
+ * claw of a paw, from `digit1` at the thumb side to `digit5`. Each digit is a child of the fingers
+ * of its side, with its head at the base of its claw and its tail at the claw tip. The pose code
+ * bends each digit around the curl axis of its paw (`poseArm()` of `models/studio-rig.ts`), so
+ * that one claw presses a key (design 5.3).
+ */
+export const DIGIT_BONES = [
+  'digit1_L',
+  'digit2_L',
+  'digit3_L',
+  'digit4_L',
+  'digit5_L',
+  'digit1_R',
+  'digit2_R',
+  'digit3_R',
+  'digit4_R',
+  'digit5_R',
+] as const;
+
+/** The number of digit bones of each paw. */
+export const DIGITS = 5;
+
+/**
  * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig of `pnpm rig-mesh`, in
  * parent order, the two eye bones that `pnpm studio-body` adds, so that the eyes blink (design
  * 5.1), and the optional bones ({@link OPTIONAL_STUDIO_BONES}): the tip of a tail of two bones,
- * the jaw of a beak, and the arm segments and helpers ({@link ARM_SEGMENT_BONES}). The optional
- * bones come last, so that the index of each other bone stays. The names keep the spelling of the
+ * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), and the digit bones
+ * of a hand rig ({@link DIGIT_BONES}). The optional bones come last, so that the index of each
+ * other bone stays. The names keep the spelling of the
  * rig. The packed skin names each bone by its index in this list.
  */
 export const STUDIO_BONES = [
@@ -98,6 +122,7 @@ export const STUDIO_BONES = [
   'tail_tip',
   'jaw',
   ...ARM_SEGMENT_BONES,
+  ...DIGIT_BONES,
 ] as const;
 
 /** A bone of a studio body. */
@@ -106,12 +131,17 @@ export type StudioBone = (typeof STUDIO_BONES)[number];
 /**
  * The bones that a studio body can lack: the tip of a tail of two bones, as the rig of the fox
  * mesh has, the jaw of a beak that opens, as the rig of the penguin mesh has, and the arm segments
- * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7). The `tail` bone then holds
- * the root of the tail, and the `jaw` bone the lower part of the beak, at the hinge of the beak. A
- * body with no tip, no jaw, or no arm segments, such as the bear or the rabbit, has no vertex on
- * them.
+ * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7), and the digits of a hand
+ * rig, as the polar bear has. The `tail` bone then holds the root of the tail, and the `jaw` bone
+ * the lower part of the beak, at the hinge of the beak. A body with no tip, no jaw, no arm
+ * segments, or no digits, such as the bear or the rabbit, has no vertex on them.
  */
-export const OPTIONAL_STUDIO_BONES = ['tail_tip', 'jaw', ...ARM_SEGMENT_BONES] as const;
+export const OPTIONAL_STUDIO_BONES = [
+  'tail_tip',
+  'jaw',
+  ...ARM_SEGMENT_BONES,
+  ...DIGIT_BONES,
+] as const;
 
 /** A bone that a studio body can lack. */
 type OptionalStudioBone = (typeof OPTIONAL_STUDIO_BONES)[number];
@@ -179,6 +209,16 @@ export const STUDIO_PARENTS = {
   forearm_seg3_R: 'forearm_R',
   elbow_R: 'upper_arm_R',
   wrist_R: 'forearm_twist_R',
+  digit1_L: 'fingers_L',
+  digit2_L: 'fingers_L',
+  digit3_L: 'fingers_L',
+  digit4_L: 'fingers_L',
+  digit5_L: 'fingers_L',
+  digit1_R: 'fingers_R',
+  digit2_R: 'fingers_R',
+  digit3_R: 'fingers_R',
+  digit4_R: 'fingers_R',
+  digit5_R: 'fingers_R',
 } as const satisfies Readonly<Record<StudioBone, StudioBone | null>>;
 
 /** A side of the body: the left side of the animal is at -x (design 4.4). */
