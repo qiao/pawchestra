@@ -1228,7 +1228,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands at the left side. |
-| Harp | Leaned back onto the right shoulder. The deer plays a smaller harp on a box (`HARP_PLACE`, `HARP_STAND`). |
+| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright and diagonal (`HARP_PLACE`): the largest harp at which its short arms reach the strings of the demos, its legs reach each pedal with the heel down, and the neck of the harp stays off its head. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
@@ -1324,8 +1324,7 @@ player of a harp has positions of its own, as a pianist has for its keys.
   draws no band. The bands are not in the triangle budget of the harp, because they are no part
   of the model. All tiers show them.
 
-The frame and the box under the harp (`harpStand`, a dark wood) stay in the triangle budget of
-the harp (`INSTRUMENT_BUDGETS`).
+The frame stays in the triangle budget of the harp (`INSTRUMENT_BUDGETS`).
 
 ### Instrument data
 

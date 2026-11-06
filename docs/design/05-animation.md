@@ -644,8 +644,11 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   them, as a harpist moves 1 to 2 pedals each second (harp 7.7). The left foot moves D, C, and B,
   and the right foot E, F, G, and A (`PEDAL_FEET`). For each change, the foot goes from its rest
   to the pedal, lifted, presses the pedal into the notch, and goes back (`poseHarpFeet()` of
-  `pose/harp-feet.ts`). The foot keeps its bind turn, and the two-bone IK of the leg places the
-  knee. The pedal turns into its notch with the press (`pedalNotchesAt()`, 4.6).
+  `pose/harp-feet.ts`). The pedals stand on the floor (4.6), so the hoof turns up around its
+  heel until the front of its sole is on the pedal, as a harpist keeps the heel on the floor and
+  presses with the ball of the foot (harp 7.7). Above `HEEL_PITCH`, the whole hoof lifts. The
+  two-bone IK of the leg places the knee. The pedal turns into its notch with the press
+  (`pedalNotchesAt()`, 4.6).
 
 Each note plucks the string of its key (`harpString()`), and the string swings (harp 5,
 `pose/harp-strings.ts`). `stringSwingsAt()` gives the swing of each string at a song time as a
