@@ -266,10 +266,10 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 90,
-      "R": 43
+      "L": 119,
+      "R": 64
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 90 degrees and the right 43 degrees (paw_supination() of tools/blender/rig_mesh.py), and the forearm segments share the turn. Each value makes the largest paw twist p95 of the six roles of the cast matrix on the straight bind smallest (design 4.4): about 137 degrees on the left (the violin and the snare drum) and 93 degrees on the right (the cello and the snare drum). Three probes of pnpm bind-supination gave 97 and 43, then 90 and 43, then no change.",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 119 degrees and the right 64 degrees (paw_supination() of tools/blender/rig_mesh.py). pnpm bind-supination rabbit gives the values on this body (design 4.4).",
     "note": "The leg turns of the T-pose rabbit of 77b9d9d3. The legs keep the length of the source, so the seat is lower than on the rabbit of rig-mesh."
   },
   "colors": {
