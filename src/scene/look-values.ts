@@ -17,6 +17,7 @@ import { CONTACT_SHADE, FLOOR_GLOSS } from './surface.ts';
 import { FREE_LENS, LENS } from './focus.ts';
 import { GRADE } from './grade.ts';
 import { GLOW_LIGHT, HALL_COLORS, HALL_FLOOR, HALL_LIGHT } from './hall.ts';
+import { STRING_SWING } from './harp-strings.ts';
 import { LIGHT_POOL } from './light-pool.ts';
 import { MODE_BLEND } from './mode-blend.ts';
 import {
@@ -36,11 +37,11 @@ import { STAGE_BAKE } from './stage-bake.ts';
 import { SIDE_GLOW, STAGE_FINISH, STAGE_SHADOW } from './stage.ts';
 
 /**
- * The roots of the look paths: each exported light, pool, color, grade, tone, finish, haze, lens, and
- * beam constant of the scene (design 4.5). A look path starts with a root and names a value in it,
- * such as `BACK_ROW_LIGHT.illuminance` or `BACK_ROW_LIGHT.position.1`. The look override of the
- * dev server (`src/app/look-override.ts`), `pnpm look-variants`, and `pnpm light-probe` read this
- * list. A new constant of the look goes into it.
+ * The roots of the look paths: each exported light, pool, color, grade, tone, finish, haze, lens,
+ * beam, and string swing constant of the scene (design 4.5). A look path starts with a root and
+ * names a value in it, such as `BACK_ROW_LIGHT.illuminance` or `BACK_ROW_LIGHT.position.1`. The
+ * look override of the dev server (`src/app/look-override.ts`), `pnpm look-variants`, and
+ * `pnpm light-probe` read this list. A new constant of the look goes into it.
  */
 const LOOK_ROOTS = {
   BACK_ROW_LIGHT,
@@ -91,6 +92,7 @@ const LOOK_ROOTS = {
   STAGE_FINISH,
   STAGE_SHADOW,
   STAGE_TONE,
+  STRING_SWING,
   TIER_SETTINGS,
 } as const;
 
