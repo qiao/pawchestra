@@ -122,6 +122,139 @@ The app does not follow these facts:
 - **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
   (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
 
+## 7. Fingering
+
+### 7.1 The fingers and the hands
+
+- A harpist plays with four fingers of each hand, and does not use the fifth finger [1, 12, 17].
+  The numbers are 1 (the thumb), 2, 3, and 4 (the ring finger) [1, 14].
+- Both thumbs are on top [11]. In each hand, the thumb plays the highest string of a position, and
+  finger 4 the lowest [11, 14]. The largest gap of the hand is between the thumb and finger 2, so
+  the widest interval of a chord goes there [11].
+- The right hand cannot reach the lowest strings, because it reaches around the soundbox. Two
+  hands do not play together below the bass staff [12]. Fast passages sound best in the middle
+  octaves, and the highest octave has little room for the hands [12].
+- Two hands can share one fast line [12]. An arpeggio goes from hand to hand in groups of at most
+  four notes [11, 16].
+- The strings of one pedal harp are about 13 mm apart in the middle and 15 mm in the bass [18].
+  Thus a tenth (9 gaps) spans about 12 cm (derived).
+
+### 7.2 Placing
+
+- **Placing** puts the fingers onto their strings before they sound [1]. The harpist places at
+  once after the pluck before, in the order of the play [1]. A sign of the score places a group of
+  strings at once [8].
+- In a chord, the four fingers go onto their strings at the same time [1]. In an exercise, the
+  harpist places the next measure during the count of an empty measure [1].
+- The fingers rest lightly on the strings [1]. The hand and the wrist keep the same angle when
+  they place anew, and the line of knuckles 2, 3, and 4 sets that angle [1].
+- When time separates two notes of a phrase, the next finger slides silently up along its string
+  and back, so that the hand keeps its contact [1, 8].
+- In an arpeggio at 120 beats per minute, the finger touches its string for the full 250 ms before
+  the next note. In a chord at 60 beats per minute, the contact is a quarter of the 500 ms [9].
+
+### 7.3 The pluck and the strike point
+
+- The finger plays with its tip, and the thumb with its outer edge [1]. The pluck is a pull into
+  the hand, with the full travel of the finger, because the strings are thick and tight [12].
+- After the pluck, the finger closes into the palm, and the thumb bends over finger 2 [1]. The
+  hand stays still, and only the fingers move. The strength comes from the arm and the back [1].
+- The stick phase of a pluck lasts about 56 to 431 ms, and the slip phase about 1 to 6 ms [9].
+  The finger mostly pulls the string out, and turns it by a mean of about 40° to 45° [9].
+- Harpists pluck at about one third to two fifths of the string, from the soundboard to the neck.
+  The fingers differ by less than 1% of the string length [9]. The fingers play a little below the
+  middle, and the thumb a little above [1].
+- **Près de la table** (p.d.l.t.) plays very near the soundboard, with a nasal sound like a guitar
+  [8, 11]. The hand then spans at most an octave [11], and the wrists rest on the soundboard [1].
+
+### 7.4 Scales, arpeggios, and chords
+
+One fingering serves all scales, because the harp is diatonic [1]. The diagram shows one octave
+up in one hand.
+
+```text
+ strings, low to high --->
+ group A: 4  3  2  1    group B: 4  3  2  1
+          (4 lowest, 1 highest)  ^
+                                 '-- 4 passes under the thumb before the thumb
+                                     plays. Then 3 and 2 go low and 1 high at once.
+```
+
+- **Scale up.** Before the thumb plays, finger 4 passes under it and goes low on its string. After
+  the thumb plays, the hand pivots on finger 4 as the arm pulls back a little. Then fingers 3 and
+  2 go low, and the thumb high, at the same time [1].
+- **Scale down.** Before finger 4 plays, the thumb crosses over it and goes high on its string.
+  After finger 4 plays, fingers 2, 3, and 4 go low at the same time. The elbow pushes the hand
+  forward [1].
+- **Groups.** One octave plays 4321 4321 up and 1234 1234 down [14]. In two or more octaves,
+  finger 3 turns under after the tonic, so the octave plays in groups of 3 and 4 [14]. The
+  arpeggios of seventh chords play groups of 4 only [14].
+- **Hard figures.** One hand does not easily play five notes in one group. A figure that changes
+  direction, such as an Alberti bass, is harder than a run [11].
+- **Chords.** A chord has up to eight notes, at most four in each hand [11, 13]. One hand easily
+  reaches a tenth, and spans at most an octave and a fourth [11, 13]. In a large stretch, the
+  thumb need not stand up [1].
+- **Rolled chords.** A chord with no mark rolls up a little, fast and even, and its last note falls
+  on the beat [1, 11]. An octave or a chord of two notes does not roll [1].
+
+### 7.5 Glissandos and repeated notes
+
+- **Glissando.** The hand glides in the middle of the strings: up with finger 3, down with the
+  thumb, the hand open and relaxed [8]. Down, each hand plays one note. Up, one hand can play
+  thirds or fourths [11]. In a glissando of opposite directions, the hands cross [11].
+- **Repeated notes.** A fast repeat is very hard, because a finger that goes back onto a ringing
+  string muffles it [12]. A fast repeat uses two hands, or two strings tuned to one pitch, such as
+  C sharp and D flat [11, 12].
+
+### 7.6 Damping
+
+- For silence, the harpist places the hands wide open on the strings [8]. A damp puts the flat of
+  the hand firmly on the strings, with the fingers apart, from the lowest to the highest string of
+  the group [8, 15].
+- The left hand damps the bass after a passage while the right hand plays on [15]. The hand then
+  leaves with a small outward turn of the wrist, and the finger tips leave last [1].
+- **Étouffé** (sons étouffés) stops each note just after it sounds [8]. In skips, the left hand
+  lies flat, plucks, and goes back flat at once. The flat hand stops the sound, and the finger that
+  played does not. In steps up, the back of the last joint of the finger stops the string before
+  [8].
+- A staccato note needs a pluck and a damp, and a damp takes twice the time of a pluck. Thus fast
+  passages cannot be staccato [11, 12].
+
+### 7.7 The pedals
+
+- Seven pedals set the seven note names, each to flat, natural, or sharp [13]. The left foot moves
+  D, C, and B, and the right foot E, F, G, and A [12, 13].
+- The heels stay on the floor as much as possible [1, 8]. The knee relaxes, so that the ball of the
+  foot guides the pedal silently into its notch [1].
+- A harpist moves 1 to 2 pedals per second in short bursts. Two pedals of one foot at the same
+  time are difficult [8, 12]. The pedal moves follow the accents of the music [1].
+
+### 7.8 The arm between notes
+
+- In the left arm of three harpists, the elbow is raised about 48° to the front and bends about
+  120°. The hand bends back about 26° from the forearm, which helps the fingers close [10].
+- The shoulder stays almost still. The elbow, the wrist, and the hand move more, in that order. The
+  path of the hand between two notes is smooth and bell-shaped [10].
+
+### 7.9 Rules for a fingering program
+
+No source gives a cost model of harp fingering. These rules follow from the facts above.
+
+- **Hands.** The right hand plays down to about G2, the lowest line of the bass staff (derived
+  from [12]). A hand plays at most four strings in one position, with the thumb on the highest
+  string [11, 14].
+- **Span.** A tenth is easy, and an octave and a fourth is the limit [11, 13]. The widest gap goes
+  between the thumb and finger 2 [11]. At p.d.l.t., the limit is an octave [11].
+- **Groups.** A run up plays 4321 and passes 4 under the thumb. A run down plays 1234 and crosses
+  the thumb over 4 [1, 14]. Groups of 4 and 3 are normal, and a group of 5 is hard [11, 14].
+- **Placing time.** A group is placed at the latest at the pluck of the last note of the group
+  before, and a chord is placed whole [1]. A finger can rest on its string for the full gap [9].
+- **Cost.** A change of direction costs more than a run [11]. A string that sounds again in the
+  same hand costs much, because the finger damps it [12]. A damp costs about one more pluck time
+  [12].
+- **Pedals.** A new accidental of a note name is a move of the pedal of that note, by its foot
+  (derived from [13]). Two moves of one foot need time between them [12].
+
 ## 8. Sources
 
 Sources 1 to 7 opened on 2026-10-25, and sources 8 to 18 on 2026-11-06, except the search
