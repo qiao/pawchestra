@@ -289,6 +289,10 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   the seam fixes them (`cut`). Give the caps the skin normals.
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
   sheets of `pnpm close-views audit`.
+- A tube that `arm_rebuild.py` wraps onto a freed arm can keep the inner vertices of its lowest
+  rings on the trunk. They make a thin box of fins under the root. Merge each into the next vertex
+  of its ring on the arm (`penguin-arms-pit.json`), and stop where the root meets the trunk: a
+  clip is better than an over-cut.
 - After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
   share (`weights.armRoot`), or turn the elbow out (design 5.3).
 - End a cut above the shoulder joint, else a black triangle shows on the back.
