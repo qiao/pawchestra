@@ -1099,13 +1099,6 @@ passes, and the quality tiers of 2.6 keep 60 fps on a laptop.
 
 ## Step 7. Demo build, tests, and deploy (8, 9)
 
-- [ ] Finish the move to `www.pawchestra.com` (7.4). In Cloudflare, remove the redirect rule of
-      `pawchestra.com`, and add the CNAME records `@` and `www` to the target that
-      `vercel domains verify www.pawchestra.com` gives, with no proxy. Then run
-      `pnpm deploy:vercel`, and send `zoophony.com` and `www.zoophony.com` to `www.pawchestra.com`
-      with the status 308 in the Vercel project.
-- [ ] Rename the repository `qiao/zoophony` to `qiao/pawchestra` in the GitHub settings, and run
-      `git remote set-url origin git@github.com:qiao/pawchestra.git`.
 - [ ] Run `pnpm deploy:vercel`, open the deployed site, play the default demo, and check that the
       CI run passes (9.2).
 - [ ] Put the Vercel URL in the line "Live site" of `README.md`, and turn off GitHub Pages in the
