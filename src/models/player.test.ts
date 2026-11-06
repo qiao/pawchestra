@@ -14,7 +14,7 @@ import {
   supportOf,
 } from './player.ts';
 import type { PlayerModel } from './player.ts';
-import { HIGH_STOOL, STOOL, chairBack } from './props.ts';
+import { STOOL, chairBack } from './props.ts';
 import { SPECIES, SPECIES_IDS } from './species.ts';
 import { INSTRUMENT_IDS } from './instruments/catalog.ts';
 import { boneIndex } from './rig.ts';
@@ -181,9 +181,6 @@ describe('buildPlayer with each instrument', () => {
     expect(stanceOn('chair', cat)).toEqual(seated(legs, 0, chairForward(cat)));
     expect(stanceOn('stool', cat)).toEqual(seated(STOOL.seatHeight));
     expect(stanceOn('bench', cat)).toEqual(seated(0.45));
-    expect(stanceOn('high-stool', cat)).toEqual(
-      seated(HIGH_STOOL.seatHeight, HIGH_STOOL.seatHeight - legs),
-    );
     expect(stanceOn('stand', cat)).toEqual({ kind: 'standing' });
     expect(stanceOn('riser', cat)).toEqual({ kind: 'standing' });
   });

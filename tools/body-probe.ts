@@ -48,7 +48,6 @@ await loadTestBodies();
 export const PROBE_SUPPORTS = [
   'chair',
   'stool',
-  'high-stool',
   'bench',
   'stand',
 ] as const satisfies readonly Support[];

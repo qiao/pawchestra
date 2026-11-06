@@ -9,10 +9,7 @@ export type Stance =
       readonly kind: 'seated';
       /** The height of the top of the seat above the floor, in meters. */
       readonly seatHeight: number;
-      /**
-       * The height of the rest under the feet, in meters: 0 for the floor, or the height of the
-       * foot ring of a high stool.
-       */
+      /** The height of the rest under the feet, in meters: 0 for the floor. */
       readonly footHeight: number;
       /**
        * The distance of the body in front of the seat center (-z), in meters, so that the torso

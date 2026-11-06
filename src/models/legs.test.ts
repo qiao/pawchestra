@@ -44,7 +44,7 @@ describe('the seated legs (design 4.3, 4.5)', () => {
   it('has a seated player of each support', () => {
     const supports = new Set(seatedCast.map(({ model }) => model.support));
 
-    expect([...supports].toSorted()).toEqual(['bench', 'chair', 'high-stool', 'stool']);
+    expect([...supports].toSorted()).toEqual(['bench', 'chair', 'stool']);
   });
 
   it('keeps the knees near the height of the seat, as in the reference images', () => {

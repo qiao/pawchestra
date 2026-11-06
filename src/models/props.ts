@@ -61,7 +61,7 @@ export const STAGE_COLORS = {
  * The item that a player sits or stands on (design 5.1). `stand` is the floor or the podium, and
  * `riser` is a level of the choir risers.
  */
-export type Support = 'chair' | 'stool' | 'high-stool' | 'bench' | 'stand' | 'riser';
+export type Support = 'chair' | 'stool' | 'bench' | 'stand' | 'riser';
 
 /**
  * The chair (design 4.5, props). The player sits on it and faces -z. The seat of each chair fits
@@ -86,10 +86,7 @@ export const CHAIR = {
 export interface SeatHeights {
   /** The height of the top of the seat above the floor, in meters. */
   readonly seatHeight: number;
-  /**
-   * The height of the rest under the feet, in meters: 0 for the floor, or the height of the foot
-   * ring of the high stool.
-   */
+  /** The height of the rest under the feet, in meters: 0 for the floor. */
   readonly footHeight: number;
   /**
    * The depth of the seat of a chair or of the stool of the harp under a studio body, in meters
@@ -126,16 +123,6 @@ export interface SeatHeights {
  */
 export const STOOL = {
   seatHeight: 0.35,
-  seatSize: 0.36,
-} as const;
-
-/**
- * The high stool of the contrabass (design 4.5, props). Its seat keeps its height for the
- * contrabass. The feet rest on a ring between the legs, at the legs of the species below the seat
- * (`seatHeights()`). No player sits on it since the hippo stands at its contrabass.
- */
-export const HIGH_STOOL = {
-  seatHeight: 0.7,
   seatSize: 0.36,
 } as const;
 
@@ -294,8 +281,7 @@ function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
  * Gives the heights of the seat of a body on a support (design 4.5, props). The chair fits the
  * legs of the species: its seat is the `seatHeight` of the skeleton above the floor. A species
  * with no chair (`SpeciesParams.noChair`) keeps these heights, and the app builds no chair. The
- * high stool keeps its seat for the contrabass, and its foot ring is the `seatHeight` of the
- * skeleton below the seat. The stool of the harp and the piano bench keep their heights for the
+ * stool of the harp and the piano bench keep their heights for the
  * parametric biped and the penguin. Under a studio body, such as the polar bear on its bench, they
  * fit the legs, as the chair does (design 4.4).
  *
@@ -313,8 +299,6 @@ export function seatHeights(support: Support, species: SpeciesParams): SeatHeigh
     }
     case 'stool':
       return stoolHeights(species, studioLegs ? legs : STOOL.seatHeight);
-    case 'high-stool':
-      return { seatHeight: HIGH_STOOL.seatHeight, footHeight: HIGH_STOOL.seatHeight - legs };
     case 'bench':
       return benchHeights(species, studioLegs ? legs : PIANO_BENCH.seatHeight);
     case 'stand':
@@ -483,29 +467,25 @@ export function addDesk(builder: MeshBuilder, plate: readonly number[], at: Tran
 }
 
 /**
- * Builds a stool with four legs and no back: the stool of the harp, or the high stool of the
- * contrabass with its foot ring (design 4.5). The seat center is above the origin. Under a studio
- * body, the seat of the stool of the harp has the width and the depth of the seat of the chair of
+ * Builds the stool of the harp: four legs and no back (design 4.5). The seat center is above the
+ * origin. Under a studio body, the seat has the width and the depth of the seat of the chair of
  * the body (`SeatHeights.seatWidth`, `seatDepth`), with its back at the back of the chair and its
  * legs at its corners, so that the knees, the shins, and the hooves stay out of it.
  *
- * @param high True for the high stool.
- * @param seat The heights of the seat and of the foot ring. The stool of the harp has no ring.
+ * @param seat The heights of the seat.
  * @returns The mesh data, with all vertices on bone 0.
  */
-export function buildStool(high: boolean, seat: SeatHeights): MeshData {
+export function buildStool(seat: SeatHeights): MeshData {
   const { seatHeight } = seat;
-  const { seatSize } = high ? HIGH_STOOL : STOOL;
-  const width = high ? seatSize : (seat.seatWidth ?? seatSize);
-  const depth = high ? seatSize : (seat.seatDepth ?? seatSize);
+  const width = seat.seatWidth ?? STOOL.seatSize;
+  const depth = seat.seatDepth ?? STOOL.seatSize;
   // A seat as deep as the seat of a studio body keeps the back of the chair, as the chair does
   // (`chairSeat()`): its front edge ends where the thighs leave it, behind the knees and the shins.
-  const center = high || seat.seatDepth === undefined ? 0 : (CHAIR.seatDepth - depth) / 2;
+  const center = seat.seatDepth === undefined ? 0 : (CHAIR.seatDepth - depth) / 2;
   const builder = new MeshBuilder();
   const color = SCENE_COLORS.chair;
   addBox(builder, centeredBox([0, seatHeight - 0.02, center], [width, 0.04, depth]), color);
   const legHeight = seatHeight - 0.04;
-  const at = seatSize / 2 - CHAIR_LEG / 2;
   const atX = width / 2 - CHAIR_LEG / 2;
   const atZ = depth / 2 - CHAIR_LEG / 2;
   for (const x of [-atX, atX]) {
@@ -513,20 +493,11 @@ export function buildStool(high: boolean, seat: SeatHeights): MeshData {
       addBox(builder, centeredBox([x, legHeight / 2, z], [CHAIR_LEG, legHeight, CHAIR_LEG]), color);
     }
   }
-  if (high) {
-    // The foot ring: four rails between the legs, with their tops at the height of the ring.
-    const rail = seatSize - 2 * CHAIR_LEG;
-    const y = seat.footHeight - 0.0125;
-    for (const side of [-at, at]) {
-      addBox(builder, centeredBox([0, y, side], [rail, 0.025, 0.025]), color);
-      addBox(builder, centeredBox([side, y, 0], [0.025, 0.025, rail]), color);
-    }
-  }
   return builder.build();
 }
 
 /**
- * Builds the seat of a player: the chair, a stool, the high stool, or the piano bench. The seat
+ * Builds the seat of a player: the chair, the stool, or the piano bench. The seat
  * center is above the origin, and the player sits on it and faces -z. A species with no chair
  * (`SeatHeights.noChair`) gets no chair.
  *
@@ -543,9 +514,7 @@ export function buildSupport(support: Support, seat: SeatHeights | null): MeshDa
     case 'chair':
       return seat.noChair ? null : buildChair(seat.seatHeight, seat.seatDepth, seat.seatWidth);
     case 'stool':
-      return buildStool(false, seat);
-    case 'high-stool':
-      return buildStool(true, seat);
+      return buildStool(seat);
     case 'bench':
       return buildPianoBench(seat.seatHeight, seat.seatDepth, seat.seatFront);
     case 'stand':

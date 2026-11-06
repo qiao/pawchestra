@@ -333,8 +333,6 @@ passes.
 - [ ] Pig in the cast matrix: the moved root vertices of `pig_root.py` come up to 1.5 cm out of the
       shoulder in the snare drum (0.5 cm in before), and up to 1.2 cm in the other recast roles.
       Check them in 2x crops of the recast roles.
-- [ ] Remove the unused high stool (`HIGH_STOOL` and the support `high-stool` of `props.ts`). No
-      player sits on it.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.

@@ -5,7 +5,6 @@ import type { Vec3 } from './tuples.ts';
 import type { MeshData } from './mesh.ts';
 import {
   CHAIR,
-  HIGH_STOOL,
   STAGE_COLORS,
   STOOL,
   buildChair,
@@ -25,9 +24,6 @@ import { SPECIES } from './species.ts';
 
 /** The seat height of the chairs of the tests, in meters. */
 const SEAT = 0.35;
-
-/** The heights of the high stool of the tests, in meters. */
-const HIGH_SEAT = { seatHeight: HIGH_STOOL.seatHeight, footHeight: 0.35 } as const;
 
 function heights(mesh: MeshData): number[] {
   return [...mesh.positions].filter((_, i) => i % 3 === 1);
@@ -116,28 +112,10 @@ describe('the desk of a music stand (design 4.5, UX audit 2026-10-05, SC9)', () 
 
 describe('buildStool', () => {
   it('builds the stool of the harp with no back, within 120 triangles (design 4.5)', () => {
-    const stool = buildStool(false, { seatHeight: STOOL.seatHeight, footHeight: 0 });
+    const stool = buildStool({ seatHeight: STOOL.seatHeight, footHeight: 0 });
     expect(stool.positions.length / 9).toBeLessThanOrEqual(120);
     expect(Math.max(...heights(stool))).toBeCloseTo(STOOL.seatHeight, 6);
     expect(Math.min(...heights(stool))).toBeCloseTo(0, 6);
-  });
-
-  it('builds the high stool with a foot ring, within 120 triangles (design 4.5)', () => {
-    const stool = buildStool(true, HIGH_SEAT);
-    expect(stool.positions.length / 9).toBeLessThanOrEqual(120);
-    const ys = heights(stool);
-    expect(Math.max(...ys)).toBeCloseTo(HIGH_STOOL.seatHeight, 6);
-    expect(ys.some((y) => Math.abs(y - HIGH_SEAT.footHeight) < 1e-6)).toBe(true);
-    const xs = [...stool.positions].filter((_, i) => i % 3 === 0);
-    expect(Math.max(...xs)).toBeCloseTo(HIGH_STOOL.seatSize / 2, 6);
-  });
-
-  it('puts the seat and the foot ring of a high stool at the heights that it gets', () => {
-    const ys = heights(buildStool(true, { seatHeight: 0.66, footHeight: 0.3 }));
-
-    expect(Math.max(...ys)).toBeCloseTo(0.66, 6);
-    expect(ys.some((y) => Math.abs(y - 0.3) < 1e-6)).toBe(true);
-    expect(ys.some((y) => Math.abs(y - HIGH_SEAT.footHeight) < 1e-6)).toBe(false);
   });
 });
 
@@ -146,10 +124,7 @@ describe('buildSupport', () => {
     const seat = { seatHeight: 0.3, footHeight: 0 };
 
     expect(buildSupport('chair', seat)).toEqual(buildChair(0.3));
-    expect(buildSupport('stool', seat)).toEqual(buildStool(false, seat));
-    expect(buildSupport('high-stool', { seatHeight: 0.7, footHeight: 0.3 })).toEqual(
-      buildStool(true, { seatHeight: 0.7, footHeight: 0.3 }),
-    );
+    expect(buildSupport('stool', seat)).toEqual(buildStool(seat));
     expect(buildSupport('bench', seat)).toEqual(buildPianoBench(0.3));
     expect(buildSupport('stand', null)).toBeNull();
   });
@@ -215,15 +190,6 @@ describe('seatHeights (design 4.5)', () => {
     expect(seat?.seatHeight).toBeCloseTo(STUDIO_POLAR_BEAR.seatHeight, 9);
     expect(seat?.footHeight).toBe(0);
     expect(seat?.seatHeight).toBeLessThan(PIANO_BENCH.seatHeight);
-  });
-
-  it('keeps the seat of the high stool, and fits its foot ring to the legs', () => {
-    const { seatHeight, headHeight } = SPECIES.hippo;
-
-    expect(seatHeights('high-stool', SPECIES.hippo)).toEqual({
-      seatHeight: HIGH_STOOL.seatHeight,
-      footHeight: HIGH_STOOL.seatHeight - seatHeight * headHeight,
-    });
   });
 });
 
@@ -322,7 +288,7 @@ describe('buildSceneProps', () => {
     players: [
       player([1, 0, 2], Math.PI / 2, 'chair'),
       player([0, 0.25, -2], 0, 'riser'),
-      player([-1, 0, 0], 0, 'high-stool'),
+      player([-1, 0, 0], 0, 'stool'),
     ],
     stands: [{ position: [-1, 0, -1], facing: 0, deskHeight: 1.05 }],
     risers: [{ level: 0, radius: 5, height: 0.25, halfAngle: 0.3 }],
@@ -332,7 +298,9 @@ describe('buildSceneProps', () => {
     const mesh = buildSceneProps(layout);
     const parts = [
       buildChair(seatHeights('chair', SPECIES.rabbit)?.seatHeight ?? NaN),
-      buildStool(true, seatHeights('high-stool', SPECIES.rabbit) ?? HIGH_SEAT),
+      buildStool(
+        seatHeights('stool', SPECIES.rabbit) ?? { seatHeight: STOOL.seatHeight, footHeight: 0 },
+      ),
       buildMusicStand(),
       buildRisers(layout.risers, layout.podium),
     ];

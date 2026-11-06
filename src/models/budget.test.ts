@@ -88,7 +88,7 @@ describe('triangle budgets (design 4.5)', () => {
   });
 
   it('keeps each seat within 120 triangles and the music stand within 80', () => {
-    const seats: readonly Support[] = ['chair', 'stool', 'high-stool', 'bench'];
+    const seats: readonly Support[] = ['chair', 'stool', 'bench'];
     for (const support of seats) {
       const seat = buildSupport(support, seatHeights(support, SPECIES.rabbit));
       expect(seat, support).not.toBeNull();

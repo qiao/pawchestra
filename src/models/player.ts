@@ -124,8 +124,7 @@ function* chairForwardSteps(species: SpeciesParams): Steps<number> {
 
 /**
  * Gives the stance of a body on a support. A body on a seat sits at the heights of its seat
- * (`seatHeights()`), and rests its feet on the floor or on the foot ring of the high stool. On a
- * chair, the body moves forward until the torso is clear of the back ({@link chairForward}).
+ * (`seatHeights()`), and rests its feet on the floor. On a chair, the body moves forward until the torso is clear of the back ({@link chairForward}).
  *
  * @param support The support.
  * @param species The species of the body.

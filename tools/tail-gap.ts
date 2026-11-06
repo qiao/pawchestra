@@ -193,7 +193,6 @@ function tailLines(role: string, gaps: TailGaps | null): string[] {
   const others: Readonly<Record<Support, string>> = {
     chair: 'seated with no chair',
     stool: 'on the stool',
-    'high-stool': 'on the high stool',
     bench: 'on the bench',
     stand: 'standing',
     riser: 'on a riser',

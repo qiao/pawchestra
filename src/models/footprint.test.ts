@@ -16,7 +16,7 @@ import {
 import type { Footprint } from './footprint.ts';
 import type { MeshData } from './mesh.ts';
 import { buildPlayer } from './player.ts';
-import { CHAIR, HIGH_STOOL, MUSIC_STAND, buildMusicStand, buildSupport } from './props.ts';
+import { CHAIR, MUSIC_STAND, buildMusicStand, buildSupport } from './props.ts';
 import type { SpeciesId } from './species.ts';
 import type { KettleCount } from './instruments/percussion.ts';
 import type { InstrumentId } from './instruments/types.ts';
@@ -124,8 +124,6 @@ describe('playerFootprint', () => {
     // The end pin of the cello stands in front of the player.
     expect(cello.bounds.min[2]).toBeLessThan(-0.65);
     expect(cello.boxes.length).toBeGreaterThan(40);
-    const bass = playerFootprint(buildPlayer('hippo', 'contrabass'));
-    expect(bass.boxes.some((b) => Math.abs(b.max[1] - HIGH_STOOL.seatHeight) < 1e-6)).toBe(true);
   });
 
   it('holds each vertex of each player model and of its seat (review of step 4, F5)', () => {

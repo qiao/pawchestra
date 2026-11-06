@@ -148,7 +148,6 @@ describe('probeBodies', () => {
     expect(Object.keys(probe.species['bear'] ?? {})).toEqual([
       'chair',
       'stool',
-      'high-stool',
       'bench',
       'stand',
     ]);
