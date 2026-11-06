@@ -50,7 +50,8 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    so that the holds keep their places. With `paintedWeights`, the weights come from a file of
    Blender. With `weightSource`, a mesh before a planar split of some faces, the steps give the
    weights of that mesh, and each vertex takes the weights of its place on it
-   (`placed_weights()`), so that the split moves no weight.
+   (`placed_weights()`), so that the split moves no weight. With `weightMoves`, each vertex that
+   a point edit moved takes the weights of its old place (`weight_places()`).
 4. Make the upper arm and the forearm longer by the arm factor of the config, and the thigh and
    the shin by the leg factor. Each bone scales along its axis, and the weights blend the stretch
    to 0 at the shoulder and at the hip. The paws and the feet keep their size, and the body rises
@@ -2954,6 +2955,27 @@ def weight_steps(row):
     return steps
 
 
+def weight_places(verts, config):
+    """Gives the place at which each vertex of the source takes its weights. A point edit of a
+    source copy can move a vertex off the surface that the weights know (`weightMoves` of the
+    config: a JSON file whose `moves` give the `from` and the `to` place of each moved vertex).
+    The vertex at `to` takes the weights of its place `from`, so that it keeps its own weight row.
+    Each other vertex takes the weights of its own place."""
+    if 'weightMoves' not in config:
+        return verts
+    with open(config['weightMoves']) as f:
+        moves = json.load(f)['moves']
+    places = verts.copy()
+    for move in moves:
+        gaps = np.linalg.norm(verts - np.asarray(move['to'], float), axis=1)
+        v = int(np.argmin(gaps))
+        if gaps[v] > 1e-5:
+            raise SystemExit(f"weightMoves: no source vertex at {move['to']} "
+                             f'(nearest {gaps[v]:.6f} u).')
+        places[v] = move['from']
+    return places
+
+
 def placed_weights(verts, old_verts, old_tris, old_weights):
     """Gives each vertex the weights of its place on an old mesh (`weightSource` of the config): a
     vertex at the place of an old vertex takes its weights, and each other vertex the mix of the
@@ -5212,7 +5234,9 @@ def main():
                         rule_weights[:, new] += rule_weights[:, old]
                         rule_weights[:, old] = 0.0
         # The painted file holds the places of the source, before the smooth of a box.
-        weights = painted_weights(unsmoothed, config['paintedWeights'])
+        weights = painted_weights(unsmoothed if 'weightSource' in config
+                                  else weight_places(unsmoothed, config),
+                                  config['paintedWeights'])
         if rule_weights is not None:
             # Each vertex mixes the painted weights and the rule weights by its painted share on
             # the lower bones.
@@ -5241,7 +5265,8 @@ def main():
                                    rigid_slivers(verts, source_tris, weights, rules), rules)
         weights = limit(rigid_faces(verts, source_tris, weights, rules))
     if 'weightSource' in config:
-        weights, kept = placed_weights(mesh_verts, verts, source_tris, weights)
+        weights, kept = placed_weights(weight_places(mesh_verts, config), verts, source_tris,
+                                       weights)
         log(f"weights: {kept} of {len(mesh_verts)} vertices take the weights of the vertex at "
             f"their place in {config['weightSource']}, and the others the mix on their face")
         verts, source_tris = mesh_verts, mesh_tris
