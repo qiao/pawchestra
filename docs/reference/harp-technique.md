@@ -2,12 +2,12 @@
 
 This file is the target of the pose and the motion of the deer harpist of the app. It describes
 the size of the harp, the place of the harp at the player, the lean, the hands and their
-registers, the arms, the hand shape, the pluck, and the rest of a harpist, with a source for each
-fact.
+registers, the arms, the hand shape, the pluck, the rest, and the fingering of a harpist, with a
+source for each fact.
 
 **Upkeep.** This file is current. A change of the pose, the motion, or the place of the harp
-updates section 6 "Use in the app" and each fact that it finds wrong, in the same commit. Each new
-fact gets its source.
+updates section 6 "Use in the app", section 7.10 for a change of the fingering, and each fact that
+it finds wrong, in the same commit. Each new fact gets its source.
 
 **Source marks.** Each fact names its source by a number of section 8. "(derived)" marks a value
 that this file calculates from the values of its sources. A fact with no mark comes from the text
@@ -121,6 +121,7 @@ The app does not follow these facts:
   (`palmL`, `palmR`). The short left arm reaches the far bass strings only higher on the strings.
 - **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
   (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
+- **The fingering (section 7).** Section 7.10 gives the plan to follow it.
 
 ## 7. Fingering
 
@@ -254,6 +255,41 @@ No source gives a cost model of harp fingering. These rules follow from the fact
   [12].
 - **Pedals.** A new accidental of a note name is a move of the pedal of that note, by its foot
   (derived from [13]). Two moves of one foot need time between them [12].
+
+### 7.10 Use in the app
+
+The app follows none of section 7 yet. This plan follows it, in order of the risk. Each step
+names its place in the code, and updates design 5.3 "Harp" and section 6.
+
+1. **The split of the hands (7.1, 7.9).** `splitHands()` of `src/pose/hand-notes.ts` gives the
+   harp the reach and the span of the piano. Give the harp `reach.rightLowest` near G2
+   (`HANDS_HOLDS.harp.reach`), a span of a tenth in place of `HAND_MOTION.span`, and at most four
+   strings in each hand.
+2. **A harp fingering (7.4, 7.9).** Add a pure module `src/pose/harp-fingering.ts`, beside
+   `piano-fingering.ts`. It gives each note a finger 1 to 4, a group, a crossing flag, and a place
+   time. `handTracksSteps()` of `src/pose/hands.ts` calls it where it calls
+   `planFingeringSteps()` for the piano.
+3. **Placing and the still hand (7.2, 7.3).** `buildHandTrack()` moves the palm to each note, and
+   `HAND_MOTION.restSec` rests the finger 0.04 s before the pluck. Move the palm once for each
+   group, at the pluck of the last note of the group before, and keep it still in the group. Use
+   the crossing flags as the piano uses `passes`.
+4. **The pluck (7.3).** `handStateAt()` pulls the palm away by `HAND_MOTION.pull` at each pluck.
+   Keep the close of the fingers (`curlClosed`), and pull the palm less in a group.
+5. **The strike point (7.3).** `harpStringPosition()` of `src/models/instruments/harp.ts` gives
+   the middle of the string. Move it to about 0.37 of the string from the soundboard, then check
+   the left palm offset `palmL` again with `pnpm arm-check`.
+6. **Rolled chords (7.4).** Close the fingers of a chord of three or more notes from low to high,
+   so that the last close falls on the note start. The score keeps one start for the sound.
+7. **Damping (7.6).** A long rest of one hand can put the flat palm on the strings
+   (`restL`, `restR` with no `away`).
+
+These parts need a decision first:
+
+- **The fingers.** The deer has one `fingers` bone in each hand and no `DIGIT_BONES`
+  (`src/models/studio-format.ts`), so one curl shows all fingers (`writeCurl()`). A close of each
+  finger needs digit bones in the deer rig.
+- **The pedals.** The harp of the app has no pedals (`buildHarp()`), and the harp pose moves no
+  foot. Pedal moves need pedals in the model and a foot pose such as `posePedalFoot()`.
 
 ## 8. Sources
 
