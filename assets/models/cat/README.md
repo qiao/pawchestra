@@ -120,7 +120,7 @@ steps of the side wall, with no run of the cat (672184a7), so the git history ke
 | Item | Value |
 |---|---|
 | Size | 880,372 bytes |
-| SHA-256 | `3910ddda44bf5a999273e0fe0d3125cf464e506e1e96d4852dec41c9aa0968d4` |
+| SHA-256 | `ef16dc6ec32c36d73e9a5f5619dbf69b21121236dabbbcc771f597338a254594` |
 | Base | The rig of fc52d38f: 880,600 bytes, SHA-256 `2c10b8cd816073ed359990699c274573b6246820389f4d6b05fb645975b517cb` |
 | Bind | The bind of the viola hold, with the elbows bent (below) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and four `raise` shapes (below) |
@@ -147,11 +147,12 @@ run `pnpm rig-mesh cat` into this folder: it drops the point edits.
 
 ## Point edits
 
-The point edits of 2026-11-05 make the tail a round tube, the legs thicker, and the left forearm
-flatter (`cat-edits.json`). A script in a live Blender session made the moves. The edit file keeps each
-move, by the index of a vertex of the primitive `fur`, in the stored space of the file (the
-seated bind, in units). The tool moves each vertex at the same stored place, so the face colors
-stay one surface. The module keeps its seat height, its chair depth, and its joints.
+The point edits of 2026-11-05 make the tail a round tube, the legs thicker, the left forearm
+flatter, and the root of the bow arm even (`cat-edits.json`). A script in a live Blender session
+made the moves. The edit file keeps each move, by the index of a vertex of the primitive `fur`, in
+the stored space of the file (the seated bind, in units). The tool moves each vertex at the same
+stored place, so the face colors stay one surface. The module keeps its seat height, its chair
+depth, and its joints.
 
 ```text
             seated bind (stored)           standing soloist (clip reference)
@@ -223,11 +224,51 @@ chest. Six root places (2224, 3339, 3354, 3358, 4413, and 4414) get a tail share
 hips. The export then counts them as tail, so the moved root behind the haunch does not set the
 chair depth. Their standing places move up to 0.0037 units.
 
-**Bow arm root (4 places).** The Blender weights of the right arm root gave the head 0.13 to
-0.29 of four places (766, 799, 802, and 805). The edit gives that share to `clavicle_R`, so the
-head drop of the chin hold does not pull the root of the bow arm. The crease share of the bow arm
-in the play (`pnpm arm-look violist`) falls from 22.2% to 20.0% on `mozart-k525`, and the count
-of folded faces of `pnpm fold-probe violist` stays within 1%.
+**Bow arm root (27 places, 2 moves).** The play turns `clavicle_R` 36° from the bind, and the
+upper arm 65° to 77°. The rig gave the right arm root hard steps: a band of places on
+`clavicle_R` alone across the back of the shoulder (849, 984, 986) lay beside places on the chest,
+the neck, or `spine1` alone. 30 edges of the root had a step of the clavicle and arm share above
+0.5. In the play, the band moved up to 4 cm against its neighbors, and the skin creased and
+folded. The edit gives the root one row for each ring, from the joint to the back and the neck
+(the rule of "Steps of a hand rig" of `docs/agents/rigging.md`):
+
+| Ring | Places | Row |
+|---|---|---|
+| 1 | 796, 799, 802, 805 | `clavicle_R` 0.6, `upper_arm_R` 0.3, `chest` 0.1 |
+| 2 | 794, 820, 821, 824 | `clavicle_R` 0.8, `chest` 0.2 |
+| 3 | 819, 857, 861, 863 | `clavicle_R` 0.6, `chest` 0.4 |
+| 4 | 818, 854, 856 | `clavicle_R` 0.3, `chest` 0.7 |
+| 5 | 849, 850, 984 | `clavicle_R` 0.1, `chest` 0.9 |
+| Around | 986 | `chest` 1 |
+| Around | 814, 817, 837, 838, 839, 840, 847, 848 | `spine1` 1 |
+
+The chest, `spine1`, and the neck move less than 1 cm against each other at the root in the play, so
+the rows use the chest for the trunk share. The rows of ring 4 and 5 come from a lineup of `pnpm
+arm-look` (ring 4 at 0.4 or 0.35 and ring 5 at 0.2 or 0.15 gave 14.2% to 14.8%). The front of the
+root (825, 827, 828, 864, 884, 885, 886, 890, 892, 912) keeps the weights of the rig: more chest
+share there moved the folds to the neck (889, 894, 908). The underside keeps its trunk share ("Rig
+facts"). The place 766 keeps its head share on `clavicle_R`, as before.
+
+Two moves (`bow_arm_root`) remove a dark slit behind the root. The places 839 and 840 lie where
+the side wall under the arm meets the back. 840 lay 6 mm in from the wall, so the faces 839-840-838
+and 847-840-839 made a shelf that faced down. 840 moves 4 mm out to the wall and 839 3 mm in, both
+2 mm down and 1 mm forward (largest move 4.6 mm). The deltas come from a grid of 1 mm steps with the
+least mean edge angle at the corner in the bind. The same search also moved 848, which folded the
+small face 817-850-848 in the play, so 848 stays.
+
+| Measure | Before | After |
+|---|---|---|
+| Crease share of the bow arm, `pnpm arm-look violist` (limit 14.6%) | 21.7% | 13.6% |
+| Most folded faces in a play sample, `pnpm fold-probe violist` (right side) | 21 (7) | 16 (2) |
+| Folded faces of all samples on `clavicle_R` / `spine1` / `chest` | 41,183 / 50,519 / 5,679 | 26,667 / 47,734 / 7,496 |
+| Root edges with a step of the clavicle and arm share above 0.5 / 0.3 | 30 / 83 | 15 / 68 |
+| Root edges above 90° at the tip / that turn 40° more than in the bind | 35 / 46 | 28 / 32 |
+| Mean edge angle of the root at the tip | 32.1° | 28.8° |
+
+The root is the 151 places within 0.09 units of the shoulder joint. The 2x crops of
+`reports/2026-11-05-cat-bow-arm/crops/` show the slit behind the root gone at the tip and the rest
+from az150. The fourth `raise` shape is 0 at the tip and at the rest, where the slit was, so it is
+not the cause. At the frog and the crossing it removes 15 of 48 to 50 folded edges of the root.
 
 ## Trial files
 
