@@ -23,6 +23,8 @@
   `AudioContext` at once, because Safari can refuse a resume outside a user gesture (6.8).
 - A demo file that does not load keeps the current piece and shows its message with "Try again"
   (`noPieceStatus()`).
+- The last selection wins. A selection, also of the demo that shows, stops each earlier selection
+  that still loads (`App.select()`).
 
 ## 2.3 Layout
 

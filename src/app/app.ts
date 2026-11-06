@@ -610,6 +610,9 @@ export class App {
   async select(file: StageFile, playWhenReady: boolean): Promise<boolean> {
     const current = this.#piece;
     if (current?.file === file) {
+      // A selection of the current demo also replaces a selection that still loads, so that the
+      // earlier file does not show after it.
+      this.#request++;
       // A selection of the current demo replaces a failed selection and its message.
       if (this.#failedFile !== null) {
         this.#failedFile = null;
