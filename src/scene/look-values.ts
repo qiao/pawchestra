@@ -19,6 +19,7 @@ import { GRADE } from './grade.ts';
 import { GLOW_LIGHT, HALL_COLORS, HALL_FLOOR, HALL_LIGHT } from './hall.ts';
 import { LENS_FLARE } from './lens-flare.ts';
 import { LIGHT_POOL } from './light-pool.ts';
+import { MODE_BLEND } from './mode-blend.ts';
 import {
   BACK_ROW_LIGHT,
   CONDUCTOR_LIGHT,
@@ -71,6 +72,7 @@ const LOOK_ROOTS = {
   LENS_FLARE,
   LENS_FRINGE,
   LIGHT_POOL,
+  MODE_BLEND,
   OCCLUSION,
   POST_LOOK,
   RIM_LIGHT,
