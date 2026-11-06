@@ -27,6 +27,8 @@ import {
 
 import { letterbox, mixBox } from './letterbox.ts';
 import type { FrameBox } from './letterbox.ts';
+import { blendOrbitView, mix, modeBlendWeight } from './mode-blend.ts';
+import type { OrbitView } from './mode-blend.ts';
 
 /**
  * The move of the orbit target to the stage center after a change from a close shot to Free mode
@@ -151,6 +153,18 @@ interface TargetGlide {
   readonly outDistance: number;
 }
 
+/** The blend of the camera after a change of the mode with the toggle (design 2.5). */
+interface CameraBlend {
+  /** The camera on the screen at the change. */
+  readonly from: OrbitView;
+  /** The share of the fit of a close shot at the change. */
+  readonly fit: number;
+  /** The time of the change, in milliseconds. */
+  readonly startMs: number;
+  /** True for a blend into Cinematic mode, false for a blend into Free mode. */
+  readonly toCinematic: boolean;
+}
+
 /**
  * The camera and the orbit controls of the stage (design 2.5, 4.5). In Cinematic mode, the shots
  * of design 5.6 move the camera with {@link StageCamera.follow}. In Free mode, the orbit controls
@@ -189,6 +203,15 @@ export class StageCamera {
   #cinema = 0;
   /** The highest point of the players above the stage top, in meters. */
   readonly #stageTop: number;
+  /** The blend after a change of the mode, or `null` (design 2.5). */
+  #blend: CameraBlend | null = null;
+  /**
+   * The camera of Free mode at the last blend into Cinematic mode. A blend back into Free mode
+   * ends at it.
+   */
+  #freeView: OrbitView | null = null;
+  /** True after a drag, a pinch, or a wheel on the controls, until the next frame. */
+  #input = false;
 
   /**
    * Creates the camera and its orbit controls.
@@ -215,6 +238,7 @@ export class StageCamera {
     controls.minDistance = MIN_DISTANCE;
     controls.addEventListener('start', () => {
       this.#moved = true;
+      this.#input = true;
     });
     this.#controls = controls;
   }
@@ -358,29 +382,120 @@ export class StageCamera {
     this.#glide = null;
     this.#fit = 0;
     this.#fitGlide = null;
+    this.#blend = null;
     this.#applyFrame();
     this.#updateFar();
   }
 
   /**
+   * Starts the blend of a change of the mode with the toggle (design 2.5): from the camera on the
+   * screen to the camera of the new mode, in `MODE_BLEND` of `mode-blend.ts`. A blend into
+   * Cinematic mode goes to the live camera of the shots, and a blend into Free mode goes back to
+   * the camera of Free mode at the last change into Cinematic mode. A change during a blend
+   * starts a new blend from the camera on the screen. With reduced motion, the change is a hard
+   * cut.
+   *
+   * @param nowMs The time of the frame of the change, in milliseconds.
+   * @param toCinematic True for a change into Cinematic mode.
+   */
+  startBlend(nowMs: number, toCinematic: boolean): void {
+    if (this.#reducedMotion) {
+      this.#blend = null;
+      return;
+    }
+
+    const shown = this.#shownView();
+    // A blend into Free mode that a toggle stops keeps its end, so the next one comes back to it.
+    if (toCinematic && this.#blend?.toCinematic !== false) {
+      this.#freeView = shown;
+    }
+    this.#blend = { from: shown, fit: this.#fit, startMs: nowMs, toCinematic };
+  }
+
+  /**
+   * Stops the blend of a change of the mode, at the camera on the screen: a drag, a pinch, a
+   * wheel, or "Reset view" changes the mode with no blend (design 2.5).
+   */
+  stopBlend(): void {
+    this.#blend = null;
+  }
+
+  /**
    * Shows the camera of a shot (Cinematic mode, design 5.6). It also moves the target of the
-   * orbit controls, so that a change to Free mode continues from this camera with no jump.
+   * orbit controls, so that a change to Free mode continues from this camera with no jump. In
+   * the blend of a change into Cinematic mode, the camera on the screen goes from the camera of
+   * the change to the camera of the shot, which moves too.
    *
    * @param pose The camera from `cameraAt()`.
+   * @param nowMs The time of the frame, in milliseconds.
    */
-  follow(pose: CameraPose): void {
-    this.camera.position.set(...pose.position);
-    this.#controls.target.set(...pose.target);
+  follow(pose: CameraPose, nowMs = performance.now()): void {
+    // Each frame of Cinematic mode clears the input, because a press in it changes no camera.
+    this.#input = false;
+    const blend = this.#blend?.toCinematic ? this.#blend : null;
+    const w = blend ? modeBlendWeight(nowMs - blend.startMs) : 1;
+    const view = blend ? blendOrbitView(blend.from, pose, w) : pose;
+    // A blend into Free mode ends in Cinematic mode.
+    this.#blend = w < 1 ? blend : null;
+    this.camera.position.set(...view.position);
+    this.#controls.target.set(...view.target);
     this.camera.lookAt(this.#controls.target);
-    this.camera.fov = pose.fov;
+    this.camera.fov = view.fov;
     this.#moved = true;
     this.#following = true;
     this.#glide = null;
     // A cut changes the fit at once, and a blend joins two close shots.
-    this.#fit = pose.close ? 1 : 0;
+    const fit = pose.close ? 1 : 0;
+    this.#fit = blend ? mix(blend.fit, fit, w) : fit;
     this.#fitGlide = null;
     this.#applyFrame();
     this.#updateFar();
+  }
+
+  /**
+   * Shows the frame of the blend of a change into Free mode (design 2.5): the camera goes from
+   * the camera of the change to the last camera of Free mode, or to the default view, and the fit
+   * of a close shot goes to 0.
+   *
+   * @param blend The blend.
+   * @param nowMs The time of the frame, in milliseconds.
+   * @returns True at the end of the blend.
+   */
+  #blendToFree(blend: CameraBlend, nowMs: number): boolean {
+    const w = modeBlendWeight(nowMs - blend.startMs);
+    const view = blendOrbitView(blend.from, this.#freeView ?? this.#defaultOrbit(), w);
+    this.camera.position.set(...view.position);
+    this.#controls.target.set(...view.target);
+    this.camera.lookAt(this.#controls.target);
+    this.camera.fov = view.fov;
+    this.#moved = true;
+    this.#following = false;
+    this.#glide = null;
+    this.#fit = blend.fit * (1 - w);
+    this.#fitGlide = null;
+    this.#applyFrame();
+    return w >= 1;
+  }
+
+  /**
+   * Gives the camera on the screen.
+   *
+   * @returns The position, the point that the camera looks at, and the field of view.
+   */
+  #shownView(): OrbitView {
+    const { x, y, z } = this.camera.position;
+    return { position: [x, y, z], target: this.target, fov: this.camera.fov };
+  }
+
+  /**
+   * Gives the default view of the stage at the current size of the canvas, with the field of
+   * view of design 4.5.
+   *
+   * @returns The camera.
+   */
+  #defaultOrbit(): OrbitView {
+    const view = defaultView(this.#stageSide, this.#width, this.#height);
+    return { position: view.position, target: view.target, fov: FIELD_OF_VIEW };
   }
 
   /**
@@ -391,9 +506,24 @@ export class StageCamera {
    * stage and the players, so a drag turns the view around the stage (design 2.5). After the
    * move, a zoom stops at the near limit of {@link orbitMinDistance}.
    *
+   * In the blend of a change into Free mode, the blend moves the camera in place of the
+   * controls. A drag, a pinch, or a wheel stops the blend, and the controls continue from the
+   * camera on the screen.
+   *
    * @param nowMs The time of the frame, in milliseconds.
    */
   update(nowMs = performance.now()): void {
+    const blend = this.#blend;
+    if (blend && (blend.toCinematic || this.#input)) {
+      this.#blend = null;
+    } else if (blend && !this.#blendToFree(blend, nowMs)) {
+      this.#updateFar();
+      return;
+    } else if (blend) {
+      this.#blend = null;
+    }
+    this.#input = false;
+
     const target = this.#controls.target;
     if (this.#following) {
       this.#following = false;
