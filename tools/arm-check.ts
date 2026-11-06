@@ -160,6 +160,7 @@ import {
   withTempFolder,
 } from './ref-tree.ts';
 import { sideSegmentBones } from './arm-segments.ts';
+import { weightOn } from './skin-weight.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { BONE_NAMES } from '../src/models/rig.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
@@ -722,28 +723,6 @@ function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
     (j) => j >= STUDIO_BONES.length && rig.follows[j] === upper,
   );
   return [...own, ...extra];
-}
-
-/**
- * Gives the weight of a vertex on some joints.
- *
- * @param mesh The skin.
- * @param v The vertex.
- * @param joints The joints.
- * @returns The sum of the weights.
- */
-function weightOn(
-  mesh: Pick<StudioMesh, 'joints' | 'weights'>,
-  v: number,
-  joints: readonly number[],
-): number {
-  let sum = 0;
-  for (let k = 0; k < 4; k++) {
-    if (joints.includes(mesh.joints[v * 4 + k] ?? -1)) {
-      sum += mesh.weights[v * 4 + k] ?? 0;
-    }
-  }
-  return sum;
 }
 
 /**
