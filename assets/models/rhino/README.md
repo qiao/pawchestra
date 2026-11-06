@@ -1,15 +1,18 @@
 # Rhino model
 
 This folder holds the T-pose source mesh of the rhino, a copy with rebuilt arms and its weights,
-and the rigged copy. The app does not serve these files. It loads the module
+a copy with no turned faces at the left arm root, and the rigged copy. The app does not serve these files. It loads the module
 `src/models/studio/rhino.ts`, which this chain writes:
 
 ```text
 rhino-tpose.glb                          source mesh
    │  tools/blender/rhino_tpose_arms.py  rebuilt arms and painted weights
    v
-rhino-tpose-arms.glb                     `source` of tools/mesh-rigs/rhino.json
-  + rhino-tpose-weights.json             `paintedWeights` of the same config
+rhino-tpose-arms.glb
+  + rhino-tpose-weights.json             `paintedWeights` of tools/mesh-rigs/rhino.json
+   │  point edits in Blender             no turned faces at the left root (rhino-tpose-arms-pit.json)
+   v
+rhino-tpose-arms-pit.glb                 `source` of the same config
    │  pnpm rig-mesh rhino
    v
 rhino.rig.glb                            rigged mesh
@@ -27,6 +30,8 @@ src/models/studio/rhino.ts               studio body of the app
 | `rhino-tpose.glb` | Source mesh (below) | None |
 | `rhino-tpose-arms.glb` | Copy of the source with rebuilt arms. License as the source | `rhino_tpose_arms.py` |
 | `rhino-tpose-weights.json` | Weights of the same Blender run. License as the source | `rhino_tpose_arms.py` |
+| `rhino-tpose-arms-pit.glb` | Copy of `rhino-tpose-arms.glb` with no turned faces at the left arm root. License as the source | None: point edits in Blender (below) |
+| `rhino-tpose-arms-pit.json` | The list of the edits of `rhino-tpose-arms-pit.glb`. License as the source | None |
 | `rhino.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh rhino` |
 
 ## rhino-tpose.glb
@@ -62,6 +67,27 @@ source. A run gives the same bytes:
 blender -b --factory-startup -P tools/blender/rhino_tpose_arms.py
 shasum -a 256 assets/models/rhino/*.glb assets/models/rhino/rhino-tpose-weights.json
 ```
+
+## rhino-tpose-arms-pit.glb
+
+| Item | Value |
+|---|---|
+| Size | 967,140 bytes |
+| SHA-256 | `324d7fe9ee1730a3a752f60061b408f51abc5fdf5897f10bca76b8119d00b62e` |
+| Writer | Khronos glTF Blender I/O v5.2.40 |
+
+At the top front of the left arm root of `rhino-tpose-arms.glb`, one face between the bridge of the
+tube and the trunk turned over in the bind: a dark back face with a slit, about 1.3 cm, that grew
+to about 5 cm with folded faces in the play. At the back of the same root, a thin face folded into
+a fin of about 3.5 cm in each moment of the tuba.
+
+The copy removes them with 2 point edits in the live Blender on the welded mesh. Each edit merges
+one vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to a new
+place. `rhino-tpose-arms-pit.json` lists the merges: the trunk corner of the turned face into the
+trunk vertex above it (0.016 units), and the root vertex of the fin into its neighbor on the
+root (0.014 units). The copy has 1,939 vertices and 3,873 triangles after the weld (1,941 and
+3,877 before): 4 faces go, and each other face keeps the UVs of its own corners. Each merged
+corner takes the weight row of its new vertex in `rhino-tpose-weights.json`.
 
 ## rhino.rig.glb
 
