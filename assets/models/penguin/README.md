@@ -220,7 +220,9 @@ place. The flank rule changes no face of this copy.
 Each fur face of the rig is black or white, apart from the orange beak and feet and the brown
 mouth (`colors.twoTone` of `tools/mesh-rigs/penguin.json`). The texture gives the faces near the
 black and white edge gray, tan, and pale yellow colors, and the color blend of the app spreads such
-a face into a smudge on the cheek patch. Each face keeps its side of the smooth edge of
+a face into a smudge on the cheek patch. A lone face whose three neighbors are of the other color
+takes that color: a white sliver at the top of the left cheek patch and one white face on the
+front of each flipper. Each other face keeps its side of the smooth edge of
 `penguin-arms-edge.glb`.
 
 The rig has four `raise` shapes of the left flipper (`raise` of `tools/mesh-rigs/penguin.json`),
