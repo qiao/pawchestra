@@ -65,9 +65,6 @@ export const ARM_RINGS: readonly ArmRing[] = [
   { name: 'forearm', bone: 'fore', at: 0.5 },
 ];
 
-/** The half width of the slab of a ring along its bone, as a share of the bone length. */
-export const RING_HALF_WIDTH = 0.08;
-
 /**
  * The smallest weight of a vertex of a ring on the bones of its arm, from the upper arm out. A
  * vertex of the trunk near the shoulder has less.
