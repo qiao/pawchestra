@@ -610,13 +610,14 @@ its rest is the bind.
 - The polar bear is the largest player, as a real polar bear is larger than the other animals of
   the cast. The piano does not grow with it, because a larger piano hides the players behind it.
 - The polar bear sits on a taller bench that fits its haunch and legs (`benchFitOf()`), as a real
-  pianist sits on a higher bench: the thighs slope down from the hips to the knees, the knees
-  open past 90°, the shins lean a little forward, and the feet stand flat. Its legs keep the
-  length of the mesh, so the body keeps the part ratios of the mesh, and only the slope of the
-  thighs sets the height of the bench. Reason: on a low bench with level thighs, the large bear
-  hangs its haunch over a small stool and looks as if it squats. A higher bench also puts the
-  shoulders higher over the keys, so the arms reach further down to them. The deer sits on the
-  stool of the harp.
+  pianist sits on a higher bench: the thighs slope down from the hips to the knees, the knees open
+  past 90°, the shins lean a little forward, and the feet stand flat. Its legs keep the length of
+  the mesh, so the body keeps the part ratios of the mesh, and only the slope of the thighs sets the
+  height of the bench. Reason: on a low bench with level thighs, the large bear hangs its haunch
+  over a small stool and looks as if it squats. A higher bench also puts the shoulders higher over
+  the keys, so the arms reach further down to them. The bench reaches back from the front edge of
+  its fit to at least `PIANO_BENCH.studioDepth`, so the round haunch that bulges back above the fit
+  sits on the bench, and the sloped thighs stay off it. The deer sits on the stool of the harp.
 - The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
   of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
@@ -976,7 +977,7 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | --------------- | --------------------------------------------------------------------------------------------------------- |
 | Chair           | A level seat, two back posts, one wide top rail, and four legs (`CHAIR`). It fits the body (4.4, seat).   |
 | Stool           | For the harp, with no back (`STOOL`). It fits the legs, so the knees and the hooves stay out of it.       |
-| Piano bench     | A padded seat with four tapered legs (`PIANO_BENCH`), as in `polar-bear-views.png`. It fits the body.     |
+| Piano bench     | A padded seat with four tapered legs (`PIANO_BENCH`), as in `polar-bear-views.png`. It fits the legs and holds the whole haunch. |
 | Music stand     | A tripod and a tilted desk with a sheet (`MUSIC_STAND`), below the eyes of its players.                   |
 | Podium          | A box with cut corners and framed panels (`PODIUM_SIZE`, `PODIUM_TRIM`), as in `bear-views.png`.          |
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |

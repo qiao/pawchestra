@@ -70,13 +70,23 @@ export const PIANO_FRONT_H = 1.0;
 
 /**
  * The piano bench (design 4.5): a seat of 0.75 × 0.35 m at the height of a chair seat. Under a
- * studio body, the bench fits the legs and the haunch (`StudioBody.benchDepth`). The parts of the
+ * studio body, the bench fits the legs and the haunch (`StudioBody.benchDepth`), and it reaches
+ * back to at least {@link PIANO_BENCH.studioDepth} behind its front edge. The parts of the
  * bench of `polar-bear-views.png` are shares of the seat height: the padded seat (`pad`), the
  * apron under it (`apron`), and the brass foot of each leg (`foot`).
  */
 export const PIANO_BENCH = {
   width: 0.75,
   depth: 0.35,
+  /**
+   * The least depth of the bench under a studio body, in meters. The fit of the polar bear on its
+   * taller bench holds only the haunch from the seat top to 0.15 m above it (0.195 m deep), and
+   * its round haunch bulges up to 0.16 m behind the floor point above that, over the back edge at
+   * 0.098 m. A deeper bench grows back from its front edge, so the sloped thighs stay off it, and
+   * at 0.32 m, about the depth of the fit of the old body on the low bench (0.318 m), its back edge stands 0.22 m behind the
+   * floor point.
+   */
+  studioDepth: 0.32,
   seatHeight: 0.45,
   pad: 0.26,
   apron: 0.1,
@@ -659,11 +669,14 @@ function postSides(bottom: number, top: number, lower: number, upper: number): n
  *
  * @param seatHeight The height of the seat, in meters.
  * @param depth The depth of the seat, in meters.
+ * @param front The reach of the front edge of the seat in front of the origin, in meters: half the
+ *   depth for a seat around the origin.
  * @returns The mesh data, with all vertices on bone 0.
  */
 export function buildPianoBench(
   seatHeight: number = PIANO_BENCH.seatHeight,
   depth: number = PIANO_BENCH.depth,
+  front: number = depth / 2,
 ): MeshData {
   const b = PIANO_BENCH;
   const builder = new MeshBuilder();
@@ -673,6 +686,8 @@ export function buildPianoBench(
   const padBottom = seatHeight - pad;
   const halfX = b.width / 2;
   const halfZ = depth / 2;
+  // The middle of the seat: behind the origin when the seat reaches further back than forward.
+  const middle = halfZ - front;
   const seat: OutlinePoint[] = [
     [halfX, halfZ],
     [halfX, -halfZ],
@@ -685,11 +700,11 @@ export function buildPianoBench(
       [1, padBottom + 0.7 * pad],
       [0.96, seatHeight],
     ]),
-    { color, finish: 'lacquer' },
+    { color, at: transform([0, 0, middle]), finish: 'lacquer' },
   );
   builder.add(box(b.width - 2 * b.inset, apron, depth - 2 * b.inset), {
     color,
-    at: transform([0, padBottom - apron / 2, 0]),
+    at: transform([0, padBottom - apron / 2, middle]),
     finish: 'lacquer',
   });
   const legTop = padBottom - apron;
@@ -700,7 +715,7 @@ export function buildPianoBench(
       const at = transform([
         (x * (b.width - 2 * b.inset - b.leg)) / 2,
         0,
-        (z * (depth - 2 * b.inset - b.leg)) / 2,
+        middle + (z * (depth - 2 * b.inset - b.leg)) / 2,
       ]);
       builder.add(postSides(foot, legTop, 0.8 * half, half), { color, at, finish: 'lacquer' });
       builder.add(postSides(0, foot, 0.72 * half, 0.8 * half), {

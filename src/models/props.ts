@@ -95,10 +95,16 @@ export interface SeatHeights {
    * The depth of the seat of a chair or of the stool of the harp under a studio body, in meters
    * (`StudioBody.chairDepth`). The seat keeps the back of the chair, and its front edge is further
    * back. The piano bench under a studio body takes its depth from the haunch and the thighs
-   * (`StudioBody.benchDepth`), around the floor point. The other seats, and the seats under the
-   * parametric biped, keep their own depth.
+   * (`StudioBody.benchDepth`), at least `PIANO_BENCH.studioDepth`. The other seats, and the seats
+   * under the parametric biped, keep their own depth.
    */
   readonly seatDepth?: number;
+  /**
+   * The reach of the front edge of the piano bench under a studio body in front of the floor
+   * point, in meters: half the depth of its fit, so a deeper bench grows back. The other seats
+   * stand around the floor point.
+   */
+  readonly seatFront?: number;
   /**
    * The width of the seat of a chair or of the stool of the harp under a studio body with a wide
    * haunch, in meters (`StudioBody.chairWidth`). The legs and the back posts stay at the side edges
@@ -267,7 +273,8 @@ function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
 /**
  * Gives the heights of the piano bench under a body (design 4.5, props): the seat at the given
  * height, and under a studio body the depth that fits its haunch and its thighs
- * (`StudioBody.benchDepth`).
+ * (`StudioBody.benchDepth`), with the front edge of the fit and at least
+ * `PIANO_BENCH.studioDepth` of depth behind it, so the whole haunch sits on the bench.
  *
  * @param species The species of the body.
  * @param seatHeight The height of the seat above the floor, in meters.
@@ -276,7 +283,11 @@ function stoolHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
 function benchHeights(species: SpeciesParams, seatHeight: number): SeatHeights {
   const studio: StudioBody | null = species.body ? studioBodyOf(species.body) : null;
   const seat = { seatHeight, footHeight: 0 };
-  return studio?.benchDepth === undefined ? seat : { ...seat, seatDepth: studio.benchDepth };
+  if (studio?.benchDepth === undefined) {
+    return seat;
+  }
+  const depth = Math.max(studio.benchDepth, PIANO_BENCH.studioDepth);
+  return { ...seat, seatDepth: depth, seatFront: studio.benchDepth / 2 };
 }
 
 /**
@@ -536,7 +547,7 @@ export function buildSupport(support: Support, seat: SeatHeights | null): MeshDa
     case 'high-stool':
       return buildStool(true, seat);
     case 'bench':
-      return buildPianoBench(seat.seatHeight, seat.seatDepth);
+      return buildPianoBench(seat.seatHeight, seat.seatDepth, seat.seatFront);
     case 'stand':
     case 'riser':
       return null;
@@ -706,6 +717,7 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
       heights?.seatHeight,
       heights?.footHeight,
       heights?.seatDepth,
+      heights?.seatFront,
       heights?.seatWidth,
       heights?.noChair,
     ].join(' ');
