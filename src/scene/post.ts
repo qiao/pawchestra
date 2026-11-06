@@ -174,6 +174,8 @@ interface PostFrame {
   readonly depth: Texture | null;
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
+  /** The level of the film fade (design 2.5): 1 shows the frame, 0 is black. */
+  readonly fade: number;
   readonly view: PostView;
 }
 
@@ -573,6 +575,7 @@ export class PostPipeline {
     setUniform(final.uniforms, 'uCinema', view.cinema);
     setUniform(final.uniforms, 'uSeed', grainSeed(timeSec));
     setUniform(final.uniforms, 'uFringe', LENS_FRINGE.shift);
+    setUniform(final.uniforms, 'uFade', frame.fade);
     this.#pass(final, null);
   }
 
@@ -915,6 +918,7 @@ export class PostPipeline {
         uGrain: { value: look.grain },
         uSeed: { value: 0 },
         uFringe: { value: LENS_FRINGE.shift },
+        uFade: { value: 1 },
         ...focusUniforms(),
       },
       defines,

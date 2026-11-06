@@ -145,8 +145,15 @@ page starts in Free mode (`app/camera-mode.ts`).
 - A pinch never zooms the page, because the page is the frame of the stage. On the stage, a pinch
   zooms the camera. The root takes `touch-action: pan-x pan-y`, and the app stops the gesture
   events of Safari, which does not obey that rule for a pinch.
+- **Film fade** (`FILM_FADE`, `filmFadeLevel()` of `app/film-fade.ts`). A play from the song start
+  fades the picture in from black over the count-in, as the first shot of a film. At the song end,
+  after the bow of the conductor (5.4), the picture fades to black, holds, and fades in again to
+  the stage at rest with "Play again". Both modes fade, because the film open and the film end
+  belong to the piece. A play from a pause point and a seek show the picture at once. The level is
+  a function of the transport, the song time, and the wall time, as the pose (5.1), so a pause
+  holds it. The final pass multiplies the frame by it (4.5), so the fade costs no pass.
 - With reduced motion, Free mode has no inertia, a shot holds its first camera with no drift
-  (5.6), and each transition is a hard cut.
+  (5.6), each transition is a hard cut, and the picture does not fade.
 - A new piece keeps the mode and makes new shots. The shots do not follow a solo, because they come
   one time from the score. No setting stores the mode.
 

@@ -977,8 +977,10 @@ export class StageScene {
    * @param cover The parts of the page over the canvas, which move the frame (design 2.8).
    * @param ring The box of the load ring of the play button of the first screen, in CSS pixels,
    *   or `null` while it does not show. The stage shrinks until it is clear of it.
+   * @param fade The level of the film fade (design 2.5): 1 shows the frame, 0 is black. The
+   *   render with no post effects shows no fade.
    */
-  render(shot: CameraPose | null, cover: FrameCover, ring: ScreenBox | null): void {
+  render(shot: CameraPose | null, cover: FrameCover, ring: ScreenBox | null, fade = 1): void {
     const view = this.#view;
     if (!view) {
       return;
@@ -1032,6 +1034,7 @@ export class StageScene {
           haze,
           depth: depthPass ? this.#beamDepth.texture : null,
           vignette,
+          fade,
           view: postView,
         });
       } else {

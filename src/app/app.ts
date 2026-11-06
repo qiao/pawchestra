@@ -63,6 +63,7 @@ import {
 } from './settings.ts';
 import type { FrameRateSetting, QualitySetting, TierWatch } from './settings.ts';
 import { songTimeValue, wholeSeconds } from './time-text.ts';
+import { filmFadeLevel } from './film-fade.ts';
 import { titleCardLevel } from './title-card.ts';
 import { STOPPED, followSongTime, seekPlayState, setPlaying, startPlay } from './transport.ts';
 import type { PlayState } from './transport.ts';
@@ -970,6 +971,7 @@ export class App {
     const shade = this.#backdrop.collect(() => this.#ui.title.lines);
     const piece = this.#piece;
     let shot: CameraPose | null = null;
+    let fade = 1;
     if (piece) {
       // After a failure, the clock of the `Player` stays at the song time of the failure (6.8).
       const audio = this.#audio;
@@ -982,6 +984,14 @@ export class App {
       this.#scene.pose(poseAt(plan, this.#songTime, wallTime, transport, audibility, poses));
       // The key light moves to the soloed seats (design 2.4, 4.5).
       this.#scene.solo(piece.flags);
+      // The picture fades in at a play from the song start and out at the song end (design 2.5).
+      fade = filmFadeLevel({
+        transport,
+        songSec: this.#songTime,
+        durationSec: piece.score.durationSec,
+        wallSec: wallTime,
+        still: this.#scene.reducedMotion,
+      });
       if (this.#cameraMode === 'cinematic') {
         // The shots fill the letterbox of the aspect 21:9 in each viewport. With reduced motion,
         // each shot holds its first camera, and each cut is hard (2.5).
@@ -999,7 +1009,7 @@ export class App {
     });
     // The sheet of a phone covers the first screen, so the stage does not need to clear it.
     const ring = this.#phone.matches && drawer.open ? null : this.#ui.firstScreen.ringBox;
-    this.#scene.render(shot, cover, ring);
+    this.#scene.render(shot, cover, ring, fade);
     this.#ui.showLetterbox(this.#scene.letterboxBar, this.#scene.letterboxSide);
     this.#followShade(wallTime, shade);
     this.#showFrame();
