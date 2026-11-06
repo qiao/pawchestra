@@ -440,6 +440,12 @@ export interface StudioBody {
   readonly headCenter: Vec3;
   /** The tip of the nose. */
   readonly nose: Vec3;
+  /**
+   * The middle of the mouth: the front of the lips on the middle plane, at the height of the mouth
+   * line (`mouthHeight` of `pnpm studio-body`, design 4.4). A body with no value has its mouth
+   * `MOUTH_DROP` H below the tip of the nose (`models/studio-body.ts`).
+   */
+  readonly mouth?: Vec3;
   /** The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. */
   readonly eyes: StudioEyes;
   /**

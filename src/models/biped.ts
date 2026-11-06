@@ -20,7 +20,10 @@ export interface BodyBones {
   readonly headHeight: number;
   /** The center of the head. */
   readonly headCenter: Vec3;
-  /** The middle of the mouth, at the front of the snout or the beak (design 4.6). */
+  /**
+   * The middle of the mouth, at the front of the lips or the beak (`StudioBody.mouth`, design 4.4,
+   * 4.6).
+   */
   readonly mouth: Vec3;
   /** The point on the floor under the middle of the body. */
   readonly floor: Vec3;

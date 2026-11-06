@@ -20,7 +20,7 @@ export interface HoldBody {
   /** The head height `H` of the species, in meters (design 4.5). */
   readonly headHeight: number;
   readonly headCenter: Vec3;
-  /** The middle of the mouth, at the front of the snout or the beak. */
+  /** The middle of the mouth, at the front of the lips or the beak (`BodyBones.mouth`). */
   readonly mouth: Vec3;
   /** The middle of each palm in the bind pose, with the arms down. */
   readonly palmL: Vec3;

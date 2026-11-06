@@ -200,7 +200,10 @@ function colorsWith(name: StudioBodyName, palette: StudioPalette): Float32Array 
   return colors;
 }
 
-/** The place of the mouth below the tip of the nose, in H. */
+/**
+ * The place of the mouth below the tip of the nose, in H, for a body with no mouth of its own
+ * (`StudioBody.mouth`).
+ */
 const MOUTH_DROP = 0.08;
 
 /** The colors of the pea eyes: the eyes of all species (design 4.5). */
@@ -356,7 +359,7 @@ export function* buildStudioBodySteps(
   return {
     headHeight: h,
     headCenter: body.headCenter,
-    mouth: [body.nose[0], body.nose[1] - MOUTH_DROP * h, body.nose[2]],
+    mouth: body.mouth ?? [body.nose[0], body.nose[1] - MOUTH_DROP * h, body.nose[2]],
     floor: body.floor,
     palmL: midpoint(positions.handL, positions.fingersL),
     palmR: midpoint(positions.handR, positions.fingersR),
