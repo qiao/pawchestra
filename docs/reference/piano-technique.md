@@ -341,6 +341,11 @@ The app does not follow these facts:
   (`KEY_MOTION.releaseSec`), so that the rise shows at 60 frames per second.
 - **The fast repeat (section 7).** Before a repeat, the key comes up the whole way
   (`KEY_MOTION.repeatShare`).
+- **The yield (section 9.3).** Two human hands play near keys side by side. The wide paws go
+  into each other there, so a paw moves out of the way of the other paw (`apart`). In a passage in
+  which the two paws share the keys, that move goes at most `HAND_MOTION.yieldSpeed` from the
+  strike of the note before, and ends near the next keys of the paw. For the rest of the distance,
+  the paw lifts over the other paw (`HAND_MOTION.over`), as in a hand crossing.
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.

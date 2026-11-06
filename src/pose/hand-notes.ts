@@ -33,6 +33,22 @@ export const HAND_MOTION = {
    * in 54 (`scratch/piano-jumps.ts`).
    */
   leapSpeed: 1.5,
+  /**
+   * The mean speed of the palm of a piano hand that moves out of the way of the other hand
+   * (`splitHands()`), and back to its keys, in meters per second. The move goes at most this fast
+   * from the strike of the note before. A hand that cannot get the full distance in that time
+   * lifts over the other hand for the rest ({@link HAND_MOTION.over}), as a pianist lifts one hand
+   * over the other in a passage in which the hands share the keys. At 1.2 m/s, the eased move is
+   * at most 1.8 m/s fast.
+   */
+  yieldSpeed: 1.2,
+  /**
+   * The height above its keys at which a piano hand passes over the other hand, in meters: more
+   * than the depth of the paw of the polar bear from its palm to its claw tips.
+   */
+  over: 0.08,
+  /** The missing distance of a move at which a hand lifts the full height `over`, in meters. */
+  overRamp: 0.05,
   /** A harp finger rests on its string for this time before the pluck: at most 0.2 of the gap. */
   restSec: 0.04,
   /** A pluck takes this time: at most 0.3 of the gap to the next note of the hand. */
@@ -273,6 +289,11 @@ export interface HandTrack {
   readonly gestures: Float64Array;
   /** The turns of the hand at each note, or `null` for a hand that does not turn. */
   readonly turns: HandTurns | null;
+  /**
+   * The height above its keys at which a piano hand stays at each note, in meters: more than 0 for
+   * a hand that lifts over the other hand ({@link HAND_MOTION.over}), or `null` for none.
+   */
+  readonly hovers: Float64Array | null;
 }
 
 /**
@@ -316,6 +337,10 @@ export function buildHandTrack(
   };
   const points = Float64Array.from(notes.flatMap((n, i) => pointOf(n.low, n.high, i)));
   const first = pointOf(firstKey, firstKey, -1);
+  const hovers = plucks ? null : limitYields(notes, points);
+  // A move to or from a note that only makes way goes at the speed of a yield.
+  const yields = (i: number): boolean =>
+    notes[i]?.keys.length === 0 || (i > 0 && notes[i - 1]?.keys.length === 0);
   const moveStarts = Float64Array.from(notes, (_, i) => {
     const gap = gapBefore(i);
     const free = plucks ? gap - (rests[i] ?? 0) - (pluckTimes[i - 1] ?? 0) : m.strikeMove * gap;
@@ -328,7 +353,7 @@ export function buildHandTrack(
     // A pass moves the hand from the strike of the note before, so the hand moves smoothly. A
     // leap starts early enough for its length, as a pianist gets to the keys ahead of time.
     const pass = passes?.[i] ? m.passSec : 0;
-    const leap = moveLength(points, first, i) / m.leapSpeed;
+    const leap = moveLength(points, first, i) / (yields(i) ? m.yieldSpeed : m.leapSpeed);
     return Math.min(late, Math.max(before.start, end - Math.max(pass, leap)));
   });
   // A piano hand lifts less for a near note.
@@ -343,7 +368,67 @@ export function buildHandTrack(
     points,
     gestures: Float64Array.from(notes, (n, i) => gestureSize(n.loudness, amplitude) * liftShare(i)),
     turns,
+    hovers,
   };
+}
+
+/**
+ * Limits the moves of a piano hand out of the way of the other hand (design 5.3). The palm of a
+ * note that only makes way (a note with no keys) goes toward its place only so far that the move
+ * from the note before and the move to the note after keep to {@link HAND_MOTION.yieldSpeed}. A
+ * pass from the first note moves each palm toward the palm before, and a pass from the last note
+ * toward the palm after, so that a run of such notes ends near the next keys. For the missing
+ * distance, the hand lifts over the other hand: up to {@link HAND_MOTION.over} at a missing
+ * distance of {@link HAND_MOTION.overRamp}.
+ *
+ * @param notes The notes of the hand, sorted by start.
+ * @param points The place of the palm for each note: three numbers for each note. The function
+ *   moves the places of the notes that make way.
+ * @returns The height above the keys at each note, in meters, or `null` when no hand lifts over.
+ */
+function limitYields(notes: readonly HandNote[], points: Float64Array): Float64Array | null {
+  const yields = notes.flatMap((n, i) => (n.keys.length === 0 && i > 0 ? [i] : []));
+  if (yields.length === 0) {
+    return null;
+  }
+  const targets = Float64Array.from(points);
+  const reach = (i: number, j: number): number =>
+    HAND_MOTION.yieldSpeed * Math.abs((notes[j]?.start ?? 0) - (notes[i]?.start ?? 0));
+  for (const i of yields) {
+    pullToward(points, i, i - 1, reach(i, i - 1));
+  }
+  for (const i of yields.toReversed()) {
+    if (i + 1 < notes.length) {
+      pullToward(points, i, i + 1, reach(i, i + 1));
+    }
+  }
+  const hovers = new Float64Array(notes.length);
+  for (const i of yields) {
+    const missing = Math.hypot(
+      ...[0, 1, 2].map((k) => (targets[3 * i + k] ?? 0) - (points[3 * i + k] ?? 0)),
+    );
+    hovers[i] = HAND_MOTION.over * smoothstep(missing / HAND_MOTION.overRamp);
+  }
+  return hovers;
+}
+
+/**
+ * Moves the palm of one note toward the palm of another note until it is at most a distance away.
+ *
+ * @param points The place of the palm for each note: three numbers for each note.
+ * @param i The index of the note to move.
+ * @param j The index of the other note.
+ * @param most The largest distance, in meters.
+ */
+function pullToward(points: Float64Array, i: number, j: number, most: number): void {
+  const offset = [0, 1, 2].map((k) => (points[3 * i + k] ?? 0) - (points[3 * j + k] ?? 0));
+  const length = Math.hypot(...offset);
+  if (length <= most) {
+    return;
+  }
+  for (let k = 0; k < 3; k++) {
+    points[3 * i + k] = (points[3 * j + k] ?? 0) + ((offset[k] ?? 0) * most) / length;
+  }
 }
 
 /**
@@ -432,8 +517,11 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
   out.pivot = turns ? easeTurn(turns.pivots, i, eased) : 0;
   const gesture = track.gestures[i] ?? 1;
   if (track.action === 'strike') {
-    // The lift ends with its full speed at the note start: the hand strikes the keys.
-    out.lift = time < moveEnd ? Math.sin(Math.PI * progress) * HAND_MOTION.lift * gesture : 0;
+    // The lift ends with its full speed at the note start: the hand strikes the keys. A hand that
+    // lifts over the other hand eases its height from the note before, as the palm does.
+    const hover = track.hovers ? easeTurn(track.hovers, i, eased) : 0;
+    out.lift =
+      hover + (time < moveEnd ? Math.sin(Math.PI * progress) * HAND_MOTION.lift * gesture : 0);
     out.pull = 0;
     out.closed = 0;
     return;

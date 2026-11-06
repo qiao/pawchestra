@@ -507,6 +507,10 @@ The rest of each family:
   earliest at the strike of the note before, as a pianist gets to the keys of a jump ahead of time
   (piano 9.3). Reason: a move that fit only in a part of a short gap turned the forearm faster
   than 1,000° per second.
+- A paw that moves out of the way of the other paw goes there at most `HAND_MOTION.yieldSpeed`
+  fast, from the strike of the note before and back to its next keys (`limitYields()`). For the
+  missing distance, the paw lifts over the other paw (`HAND_MOTION.over`, `HandTrack.hovers`).
+  Reason: in a two-voice passage, a paw jumped up to 34 cm in 50 ms out of the way and back.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key
