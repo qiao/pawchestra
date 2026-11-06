@@ -217,6 +217,12 @@ place. The flank rule changes no face of this copy.
 
 ## penguin.rig.glb
 
+Each fur face of the rig is black or white, apart from the orange beak and feet and the brown
+mouth (`colors.twoTone` of `tools/mesh-rigs/penguin.json`). The texture gives the faces near the
+black and white edge gray, tan, and pale yellow colors, and the color blend of the app spreads such
+a face into a smudge on the cheek patch. Each face keeps its side of the smooth edge of
+`penguin-arms-edge.glb`.
+
 The rig has four `raise` shapes of the left flipper (`raise` of `tools/mesh-rigs/penguin.json`),
 for the recast roles of the cast matrix. The shared holds of the clarinet and the cello, and the
 rest holds of the cello and the trumpet, turn the flipper 75° to 140° from the hanging bind, and
