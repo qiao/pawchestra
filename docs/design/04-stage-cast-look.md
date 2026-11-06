@@ -1257,10 +1257,11 @@ pedal harp (`docs/reference/harp-technique.md`):
   presses it. The model shows each pedal in the natural notch.
 - **Strings.** 47 strings, one for each natural note from C1 to G7 (`HARP.strings`), so that the
   colors of a real harp fall on the correct notes. The C strings are red and the F strings dark
-  blue. The bass strings are wound wire, the middle strings gut, and the treble strings a lighter
+  blue. The bass strings are silver wound wire, the middle strings gut, and the treble strings a lighter
   nylon, thinner toward the treble (`STRINGS`). Each string is one part: a prism of three sides
   with open ends, from the center strip up into the neck. Thus the clearance probes do not read
-  the strings as a part of the frame.
+  the strings as a part of the frame. A bronze wire under the warm light read as one red area
+  beside the red C strings, so the wires are silver.
 - **Pluck points.** `harpStringPosition()` gives the pluck point of the string of the key: the
   share `PLUCK.share` of a length from the soundboard up to the line `PLUCK.top`. The hold of the
   deer fits these points, so they stay when the neck changes. `PLUCK.top` lies a little below

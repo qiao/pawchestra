@@ -91,8 +91,12 @@ export const INSTRUMENT_COLORS = {
   harpC: srgb('#b8282a'),
   /** The F strings of the harp: a dark blue. */
   harpF: srgb('#26305a'),
-  /** The wound wire strings of the bass. */
-  harpWire: srgb('#b08850'),
+  /**
+   * The wound wire strings of the bass: the silver of a silver-plated copper winding. A bronze
+   * color with the metal finish took the warm light of the hall, so the 12 wires read as one red
+   * area beside the red C strings.
+   */
+  harpWire: srgb('#a9aaa8'),
   pianoCase: srgb('#15120f'),
   /** The iron plate inside the piano: a dark gold, as in `mockup.png`. */
   pianoPlate: srgb('#6b5226'),
