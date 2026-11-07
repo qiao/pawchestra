@@ -4,7 +4,7 @@ import { toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
 import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
-import { ball, box, icosphere, lathe } from '../primitives.ts';
+import { ball, box, cylinder, icosphere, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, placeCorners, pointing } from './piece.ts';
 import type { PartSink } from './piece.ts';
@@ -493,12 +493,15 @@ function openBox(
  * Makes a solid of revolution around the y axis with no flat caps at its end rings: a band, such
  * as a hoop, whose ends meet other parts.
  *
- * @param profile The profile ({@link lathe}). Both end radii are larger than 0.
+ * @param profile The profile ({@link lathe}).
  * @param segments The number of faces around the axis.
- * @returns 2 triangles for each segment of each profile step.
+ * @returns 2 triangles for each segment of each profile step, less the triangles at a radius of
+ *   0.
  */
 function band(profile: readonly ProfilePoint[], segments: number): number[] {
-  return lathe(profile, segments).slice(0, -2 * segments * 9);
+  const corners = lathe(profile, segments);
+  const caps = [profile[0], profile.at(-1)].filter((p) => (p?.[0] ?? 0) > 0).length;
+  return corners.slice(0, corners.length - caps * segments * 9);
 }
 
 /**
@@ -1420,12 +1423,14 @@ export function buildSnareDrum(): InstrumentModel {
  */
 const CYMBAL_LIFT = 0.12;
 
+/** The faces around the axis of a cymbal. */
+const CYMBAL_SEGMENTS = 16;
+
 /**
- * The profile of a cymbal of the scale 1 around its axis (+y), in meters: from the inner face at
- * the axis out to the rim, then back over the dome to the bell. The 12 faces around the axis make
- * the cymbal 0.40 m wide between two opposite faces.
+ * The layout form of a cymbal of the scale 1 around its axis (+y), in meters: from the inner face
+ * at the axis out to the rim, then back over the dome to the bell, with 12 faces around the axis.
  */
-const CYMBAL_PROFILE: readonly ProfilePoint[] = [
+const CYMBAL_SPACE: readonly ProfilePoint[] = [
   [0, -0.023],
   [0.06, -0.041],
   [0.2 / Math.cos(15 * MathUtils.DEG2RAD), -0.045],
@@ -1433,6 +1438,54 @@ const CYMBAL_PROFILE: readonly ProfilePoint[] = [
   [0.045, -0.017],
   [0, -0.01],
 ];
+
+/**
+ * The rings of a cymbal of the scale 1 around its axis (+y), in meters, as an orchestral cymbal
+ * (design 4.6): from the inner face at the axis out to the rim, then back over the bow to the
+ * bell. Each ring is a profile and a color. The bow has lathe grooves, so its rings alternate a
+ * polished bronze and a darker groove bronze. The 16 faces around the axis make the cymbal 0.40 m
+ * wide between two opposite faces, and the bow stays within 1 mm of the straight bow of
+ * {@link CYMBAL_SPACE}, so that a mallet at the edge strikes it at the same height.
+ */
+const CYMBAL_RINGS: readonly (readonly [readonly ProfilePoint[], Rgb])[] = (() => {
+  const rim = 0.2 / Math.cos(Math.PI / CYMBAL_SEGMENTS);
+  const bronze = INSTRUMENT_COLORS.brass;
+  const groove = INSTRUMENT_COLORS.cymbalGroove;
+  const bow: ProfilePoint[] = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+    const r = rim - 0.004 - (i / 6) * (rim - 0.004 - 0.065);
+    // A straight line from the bell to the rim, with a slight dome of up to 0.7 mm.
+    const share = (r - 0.065) / (rim - 0.065);
+    return [r, -0.033 - 0.012 * share + 0.003 * share * (1 - share)];
+  });
+  return [
+    [
+      [
+        [0, -0.023],
+        [0.05, -0.034],
+        [0.064, -0.041],
+        [0.14, -0.0438],
+        [rim, -0.045],
+        bow[0] ?? [rim, -0.045],
+      ],
+      bronze,
+    ],
+    ...bow
+      .slice(0, -1)
+      .map((p, i): readonly [readonly ProfilePoint[], Rgb] => [
+        [p, bow[i + 1] ?? p],
+        i % 2 === 1 ? groove : bronze,
+      ]),
+    [
+      [
+        [0.065, -0.033],
+        [0.058, -0.025],
+        [0.046, -0.016],
+        [0, -0.01],
+      ],
+      bronze,
+    ],
+  ];
+})();
 
 /** The height of the rim of a cymbal of the scale 1 on its axis, from the strap at the bell. */
 const CYMBAL_RIM = -0.045;
@@ -1443,6 +1496,57 @@ const CYMBAL_INNER = -0.023;
 /** A cymbal: its piece, its target, and the point of the piece at the palm. */
 interface Cymbal extends HandTool {
   readonly grip: Vec3;
+}
+
+/**
+ * Adds the plate of a cymbal ({@link CYMBAL_RINGS}) with its strap point at a place, bell up.
+ *
+ * @param piece The piece.
+ * @param at The strap point at the top of the bell.
+ * @param scale The scale of the cymbal.
+ */
+function addCymbalPlate(piece: PieceBuilder, at: Vec3, scale: number): void {
+  for (const [profile, color] of CYMBAL_RINGS) {
+    const scaled = profile.map(([r, y]): ProfilePoint => [r * scale, y * scale]);
+    piece.add(band(scaled, CYMBAL_SEGMENTS), color, transform(at), 'metal');
+  }
+}
+
+/**
+ * Adds the leather strap of a hand cymbal: a knot on the bell, and a loop above it, which the
+ * thumb and the forefinger hold near the bell (`docs/reference/percussion-technique.md` 7).
+ *
+ * @param piece The piece of the cymbal.
+ */
+function addStrap(piece: PieceBuilder): void {
+  const leather = INSTRUMENT_COLORS.leather;
+  piece.add(box(0.03, 0.012, 0.012), leather, transform([0, -0.004, 0]));
+  const loop: readonly Vec3[] = [
+    [-0.012, 0, 0],
+    [-0.016, 0.022, 0],
+    [0, 0.032, 0],
+    [0.016, 0.022, 0],
+    [0.012, 0, 0],
+  ];
+  for (let i = 0; i + 1 < loop.length; i++) {
+    piece.bar(loop[i] ?? [0, 0, 0], loop[i + 1] ?? [0, 0, 0], 0.003, 0.016, leather);
+  }
+}
+
+/**
+ * Adds the top of the stand of a suspended cymbal: a felt washer under and over the bell, and a
+ * wing nut on the rod above them.
+ *
+ * @param piece The piece.
+ * @param center The strap point at the top of the bell.
+ * @param scale The scale of the cymbal.
+ */
+function addCymbalNut(piece: PieceBuilder, center: Vec3, scale: number): void {
+  const felt = INSTRUMENT_COLORS.felt;
+  const at = (dy: number): Vec3 => [center[0], center[1] + dy, center[2]];
+  piece.add(cylinder(0.022, 0.022, 0.008, 8), felt, transform(at(CYMBAL_INNER * scale - 0.008)));
+  piece.add(cylinder(0.022, 0.022, 0.008, 8), felt, transform(at(-0.0105 * scale)));
+  piece.add(box(0.03, 0.01, 0.008), INSTRUMENT_COLORS.silver, transform(at(0.01)), 'metal');
 }
 
 /**
@@ -1457,8 +1561,11 @@ interface Cymbal extends HandTool {
 function cymbal(bone: 'malletL' | 'malletR', scale: number): Cymbal {
   const piece = new PieceBuilder(scale);
   const lift = CYMBAL_LIFT * scale;
-  piece.add(lathe(CYMBAL_PROFILE, 12), INSTRUMENT_COLORS.brass, transform(), 'metal');
-  piece.add(box(0.03, 0.012, 0.012), INSTRUMENT_COLORS.hardware, transform([0, -0.004, 0]));
+  addCymbalPlate(piece, [0, 0, 0], 1);
+  addStrap(piece);
+  const space = piece.space();
+  space.add(lathe(CYMBAL_SPACE, 12), INSTRUMENT_COLORS.brass);
+  space.add(box(0.03, 0.012, 0.012), INSTRUMENT_COLORS.hardware, transform([0, -0.004, 0]));
   // The inner face of the left cymbal looks to the right (+x), and the right cymbal to the left.
   const inward: Vec3 = bone === 'malletL' ? [1, 0, 0] : [-1, 0, 0];
   const palm = bone === 'malletL' ? 'palmL' : 'palmR';
@@ -1545,16 +1652,21 @@ export function buildSuspendedCymbal(scale = 1): InstrumentModel {
   const piece = new PieceBuilder();
   // The bell is up, so the rim hangs below the strap.
   const center: Vec3 = [0, c.height - CYMBAL_RIM * scale, -c.forward];
-  const profile = CYMBAL_PROFILE.map(([r, y]): ProfilePoint => [r * scale, y * scale]);
-  piece.add(lathe(profile, 12), INSTRUMENT_COLORS.brass, transform(center), 'metal');
+  addCymbalPlate(piece, center, scale);
   const under = center[1] + CYMBAL_INNER * scale;
-  tripod(piece, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
+  addStand(piece, [center[0], 0, center[2]], [center[0], center[1] + 0.035, center[2]], 0.24);
+  addCymbalNut(piece, center, scale);
+  // The layout form: the cymbal of 12 faces on a tripod up to its inner face.
+  const space = piece.space();
+  const profile = CYMBAL_SPACE.map(([r, y]): ProfilePoint => [r * scale, y * scale]);
+  space.add(lathe(profile, 12), INSTRUMENT_COLORS.brass, transform(center));
+  tripod(space, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
   const [left, right] = malletPair({
     length: 0.3,
     tilt: c.malletTilt,
     spot: c.malletSpot,
     butt: MALLET_BUTT,
-    look: plainMallet(c.ball, INSTRUMENT_COLORS.drumShell),
+    look: roundMallet(c.ball, INSTRUMENT_COLORS.yarn),
     space: c.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
