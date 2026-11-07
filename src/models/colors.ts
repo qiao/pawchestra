@@ -135,6 +135,6 @@ export const INSTRUMENT_COLORS = {
   /** The hard rubber heads of the xylophone mallets. */
   malletRubber: srgb('#2c3346'),
   /** The Honduras rosewood of the xylophone bars: a reddish brown under a clear lacquer. */
-  rosewood: srgb('#9a5232'),
+  rosewood: srgb('#7c3a24'),
   baton: srgb('#ece6d6'),
 } as const satisfies Readonly<Record<string, Rgb>>;
