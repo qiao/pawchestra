@@ -808,9 +808,10 @@ function addDrum(
 }
 
 /**
- * Adds the simple form of a drum: a shell of 12 faces with a head at each end, along an axis.
+ * Adds the layout form of a drum to a footprint: a shell of 12 faces with a head at each end,
+ * along an axis.
  *
- * @param piece The piece, or its footprint ({@link PieceBuilder.space}).
+ * @param piece The footprint ({@link PieceBuilder.space}).
  * @param center The middle of the drum.
  * @param axis The unit direction from the back head to the front head.
  * @param radius The radius of the heads.
@@ -1110,14 +1111,14 @@ function handGrips(): InstrumentModel['grips'] {
 }
 
 /**
- * Adds a tripod: a post and three legs on the floor.
+ * Adds the layout form of a stand to a footprint: a post and three legs on the floor.
  *
- * @param piece The piece, or its footprint ({@link PieceBuilder.space}).
+ * @param piece The footprint ({@link PieceBuilder.space}).
  * @param base The point on the floor under the post.
  * @param top The top of the post.
  * @param spread The distance of the feet from the post.
  */
-function tripod(piece: PartSink, base: Vec3, top: Vec3, spread: number): void {
+function tripodSpace(piece: PartSink, base: Vec3, top: Vec3, spread: number): void {
   const color = INSTRUMENT_COLORS.hardware;
   piece.rod(base, top, 0.01, 4, color);
   const knee = toVec3(new Vector3(...base).add(new Vector3(0, 0.12, 0)));
@@ -1396,7 +1397,7 @@ export function buildSnareDrum(): InstrumentModel {
   // The layout form: the shell on a tripod.
   const space = piece.space();
   drumSpace(space, center, [0, 1, 0], radius, depth);
-  tripod(space, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
+  tripodSpace(space, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
   const tilt = SNARE_DRUM.malletTilt;
   const spot = SNARE_DRUM.malletSpot;
   const [left, right] = malletPair({
@@ -1673,7 +1674,7 @@ export function buildSuspendedCymbal(scale = 1): InstrumentModel {
   const space = piece.space();
   const profile = CYMBAL_SPACE.map(([r, y]): ProfilePoint => [r * scale, y * scale]);
   space.add(lathe(profile, 12), INSTRUMENT_COLORS.brass, transform(center));
-  tripod(space, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
+  tripodSpace(space, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
   const [left, right] = malletPair({
     length: 0.3,
     tilt: c.malletTilt,
@@ -1752,7 +1753,12 @@ function tambourineSpace(sink: PartSink, tilt: Quaternion): void {
   const metal = INSTRUMENT_COLORS.silver;
   const { mount } = TAMBOURINE;
   const mountAt = new Vector3(...mount);
-  tripod(sink, [mount[0], 0, mount[2]], toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0))), 0.2);
+  tripodSpace(
+    sink,
+    [mount[0], 0, mount[2]],
+    toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0))),
+    0.2,
+  );
   const ring = lathe(
     [
       [0.11, 0],
