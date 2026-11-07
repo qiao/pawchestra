@@ -329,6 +329,18 @@ function plainBell(
   return { kind: 'bell', bone: 'instrument', from: mouth, to: mouth, normal, keys: null };
 }
 
+/**
+ * Adds a short band of nickel silver around a tube, as a ferrule at the end of a slide tube.
+ *
+ * @param piece The piece.
+ * @param from The middle of the start of the band.
+ * @param to The middle of the end of the band.
+ * @param radius The radius of the band.
+ */
+function ferrule(piece: PieceBuilder, from: Vec3, to: Vec3, radius: number): void {
+  piece.rod(from, to, radius, TUBE_SEGMENTS, TRIM, 'metal');
+}
+
 /** The parts and the play data of one brass instrument. */
 interface BrassBuild {
   readonly pieces: readonly InstrumentPiece[];
@@ -540,9 +552,11 @@ function trumpet(scale: number): BrassBuild {
 }
 
 /**
- * Builds the trombone with its slide. The mouthpiece is at the origin, and the slide runs along
- * +x. The two slide tubes lie one above the other. The bell section lies at the left of the slide
- * (-z), and its tuning loop goes back over the left shoulder.
+ * Builds the trombone with its slide, as a Bach 42 or a Yamaha YSL-891Z
+ * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the slide runs
+ * along +x. The two slide tubes lie one above the other. The bell section lies at the left of the
+ * slide (-z), and its tuning slide goes back over the left shoulder, with a counterweight on its
+ * bow.
  *
  * The slide is a second piece on the `slide` bone. Its origin is the slide brace in the first
  * position, and it moves along +x by `travel` to the seventh position.
@@ -552,59 +566,94 @@ function trumpet(scale: number): BrassBuild {
 function trombone(): BrassBuild {
   const t = BRASS.trombone;
   const main = new PieceBuilder();
-  plainMouthpiece(main, [1, 0, 0], 0.01);
+  mouthpiece(main, [1, 0, 0], 0.0115, 0.085);
   const low = -0.07;
   const side = -0.11;
-  // The inner slide tubes, and the brace near the mouthpiece that the left hand holds.
-  pipe(
-    main,
-    [
-      [0.04, 0, 0],
-      [0.62, 0, 0],
-    ],
-    0.006,
-  );
-  pipe(
-    main,
-    [
-      [0.04, low, 0],
-      [0.62, low, 0],
-    ],
-    0.006,
-  );
-  pipe(
-    main,
-    [
-      [0.08, 0, 0],
-      [0.08, low, 0],
-      [0.08, low, side],
-    ],
-    0.005,
-  );
-  // The bell section, its tuning loop over the shoulder, and the bell.
+  // The inner slide tubes of nickel silver, with the stockings at their ends, and the brace near
+  // the mouthpiece that the left hand holds.
+  for (const y of [0, low]) {
+    main.rod([0.04, y, 0], [0.62, y, 0], 0.0058, TUBE_SEGMENTS, TRIM, 'metal');
+    ferrule(main, [0.04, y, 0], [0.12, y, 0], 0.0072);
+  }
+  main.rod([0.08, 0, 0], [0.08, low, 0], 0.0042, TUBE_SEGMENTS, TRIM, 'metal');
+  main.rod([0.08, low / 2, 0], [0.08, low / 2, side], 0.0038, TUBE_SEGMENTS, TRIM, 'metal');
+  // The bell section: the bell pipe from the bell back to the tuning slide over the shoulder,
+  // and the return to the lower inner slide tube. The bell pipe widens toward the bell.
   const back = t.length - 0.7;
-  pipe(
+  const bellStart = 0.42;
+  tubeAlong(
     main,
-    [
-      [0.54, low / 2, side],
-      [0.03 - back, low / 2, side],
-      [-back, low * 0.75, side],
-      [0.03 - back, low, side],
-      [0.04, low, side],
-      [0.04, low, 0],
-    ],
-    0.007,
+    rounded(
+      [
+        [bellStart, low / 2, side],
+        [-back, low / 2, side],
+        [-back, low - 0.006, side],
+        [0.04, low - 0.006, side],
+        [0.04, low, 0],
+      ],
+      0.022,
+      3,
+    ),
+    [0.0105, 0.0075, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068, 0.0068],
+    TUBE_SEGMENTS,
+    METAL,
   );
-  const bellTarget = plainBell(main, [0.7, low / 2, side], [1, 0, 0], t.bellRadius, 0.16);
+  // The tuning slide: two ferrules on its legs and the counterweight on its bow.
+  for (const y of [low / 2, low - 0.006]) {
+    ferrule(main, [0.03 - back, y, side], [0.08 - back, y, side], 0.0085);
+  }
+  turned(
+    main,
+    [-back - 0.032, low * 0.53, side],
+    [0, 0, -1],
+    [
+      [0.009, -0.015],
+      [0.011, -0.012],
+      [0.011, 0.012],
+      [0.009, 0.015],
+    ],
+    TUBE_SEGMENTS,
+    TRIM,
+  );
+  // A brace between the bell pipe and the return, and one to the slide in front of the brace.
+  main.rod([0.2, low / 2, side], [0.2, low - 0.006, side], 0.0025, ROD_SEGMENTS, TRIM, 'metal');
+  const bellTarget = bell(
+    main,
+    [0.7, low / 2, side],
+    [1, 0, 0],
+    t.bellRadius,
+    0.7 - bellStart,
+    0.0105,
+    SMALL_BELL_SEGMENTS,
+  );
 
-  // The outer slide: two tubes over the inner tubes, the bow at the end, and the brace.
+  // The outer slide: the two tubes and the bow at the end as one bent tube, a ferrule at the
+  // open end of each tube, the brace, and the rubber bumper on the bow.
   const brace: Vec3 = [0.3, low / 2, 0];
   const slide = new PieceBuilder();
   const local = (p: Vec3): Vec3 => [p[0] - brace[0], p[1] - brace[1], p[2] - brace[2]];
-  pipe(slide, [local([0.14, 0, 0]), local([0.68, 0, 0])], 0.009);
-  pipe(slide, [local([0.14, low, 0]), local([0.68, low, 0])], 0.009);
-  pipe(slide, [local([0.68, 0, 0]), local([0.7, low / 2, 0]), local([0.68, low, 0])], 0.009);
-  pipe(slide, [local([0.3, 0, 0]), local([0.3, low, 0])], 0.005);
+  tubeAlong(
+    slide,
+    rounded(
+      [local([0.14, 0, 0]), local([0.7, 0, 0]), local([0.7, low, 0]), local([0.14, low, 0])],
+      0.035,
+      4,
+    ),
+    [0.0088],
+    TUBE_SEGMENTS,
+    METAL,
+  );
+  for (const y of [0, low]) {
+    ferrule(slide, local([0.14, y, 0]), local([0.165, y, 0]), 0.0102);
+  }
+  slide.rod(local([0.3, 0, 0]), local([0.3, low, 0]), 0.0045, TUBE_SEGMENTS, TRIM, 'metal');
+  slide.rod(
+    local([0.7, low / 2, 0]),
+    local([0.718, low / 2, 0]),
+    0.006,
+    TUBE_SEGMENTS,
+    INSTRUMENT_COLORS.hardware,
+  );
 
   tromboneSpace(main, slide, t.length, t.bellRadius, brace);
 
