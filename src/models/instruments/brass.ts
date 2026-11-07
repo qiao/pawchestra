@@ -2,8 +2,6 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { IDENTITY, toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
-import { transform } from '../mesh.ts';
-import { cylinder, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import { arc, rounded, tubeAlong, turned } from './tubing.ts';
@@ -43,6 +41,9 @@ const ROD_SEGMENTS = 4;
 
 /** The faces around the axis of the bell of the horn. */
 const BELL_SEGMENTS = 16;
+
+/** The faces around the axis of the bell branch of the tuba, which is a long cone. */
+const TUBA_SEGMENTS = 14;
 
 /** The faces around the axis of a bell of the trumpet or the trombone. */
 const SMALL_BELL_SEGMENTS = 12;
@@ -175,124 +176,6 @@ function piston(piece: PieceBuilder, at: Vec3, radius: number, height: number, s
     INSTRUMENT_COLORS.pearl,
     'lacquer',
   );
-}
-
-/** The faces around the axis of a bell of the simple brass models. */
-const PLAIN_BELL_SEGMENTS = 12;
-
-/**
- * Gives the inside of an open bell: the profile from the rim back into the throat, which a lathe
- * adds after the outside of the bell. Its faces point into the bell.
- *
- * @param radius The radius of the opening.
- * @param depth The height of the rim in the profile.
- * @returns The profile points after the rim.
- */
-function plainOpenBell(radius: number, depth: number): ProfilePoint[] {
-  return [
-    [radius * 0.9, depth - radius * 0.06],
-    [radius * 0.45, depth - radius * 0.6],
-    [0, depth - radius * 0.8],
-  ];
-}
-
-/**
- * Adds a solid of revolution along an axis.
- *
- * @param piece The piece.
- * @param from The point on the axis where the profile height is 0.
- * @param axis The direction of the axis.
- * @param profile The radius at each distance along the axis.
- * @param segments The number of faces around the axis.
- */
-function plainTurned(
-  piece: PieceBuilder,
-  from: Vec3,
-  axis: Vec3,
-  profile: readonly ProfilePoint[],
-  segments: number,
-): void {
-  const turn = new Quaternion().setFromUnitVectors(
-    new Vector3(0, 1, 0),
-    new Vector3(...axis).normalize(),
-  );
-  piece.add(lathe(profile, segments), METAL, transform(from, toQuat(turn)), 'metal');
-}
-
-/**
- * Adds a tube through a list of points.
- *
- * @param piece The piece.
- * @param points The points along the tube.
- * @param radius The radius of the tube.
- */
-function pipe(piece: PieceBuilder, points: readonly Vec3[], radius: number): void {
-  for (let i = 0; i + 1 < points.length; i++) {
-    piece.rod(
-      points[i] ?? [0, 0, 0],
-      points[i + 1] ?? [0, 0, 0],
-      radius,
-      TUBE_SEGMENTS,
-      METAL,
-      'metal',
-    );
-  }
-}
-
-/**
- * Adds the mouthpiece: a small cup at the origin that opens to -along.
- *
- * @param piece The piece.
- * @param along The direction from the mouthpiece into the instrument.
- * @param radius The radius of the cup.
- */
-function plainMouthpiece(piece: PieceBuilder, along: Vec3, radius: number): void {
-  plainTurned(
-    piece,
-    [0, 0, 0],
-    along,
-    [
-      [radius, 0],
-      [radius * 0.4, radius * 2.5],
-      [radius * 0.35, radius * 4],
-    ],
-    TUBE_SEGMENTS,
-  );
-}
-
-/**
- * Adds valve casings: short upright cylinders in a row.
- *
- * @param piece The piece.
- * @param first The middle of the first casing.
- * @param step The offset from one casing to the next.
- * @param count The number of casings.
- * @param radius The radius of a casing.
- * @param height The height of a casing.
- * @param up The direction of the casings.
- */
-function valves(
-  piece: PieceBuilder,
-  first: Vec3,
-  step: Vec3,
-  count: number,
-  radius: number,
-  height: number,
-  up: Vec3 = [0, 1, 0],
-): void {
-  const n = new Vector3(...up).normalize();
-  const turn = toQuat(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), n));
-  for (let i = 0; i < count; i++) {
-    const base = new Vector3(...first)
-      .addScaledVector(new Vector3(...step), i)
-      .addScaledVector(n, -height / 2);
-    piece.add(
-      cylinder(radius, radius, height, TUBE_SEGMENTS),
-      METAL,
-      transform(toVec3(base), turn),
-      'metal',
-    );
-  }
 }
 
 /**
@@ -825,10 +708,15 @@ function horn(): BrassBuild {
 }
 
 /**
- * Builds the tuba. The mouthpiece is at the origin, and the tuba has the axes of the player: the
- * body stands in front of the player, and the bell opens up at the left of the head. A longer
- * lead pipe moves the body back toward the player and to the left, and the pipe goes down from
- * the mouthpiece before it goes back to the valves, so that it passes under the chin.
+ * Builds the tuba, as a top-action piston tuba such as a Yamaha YFB-822
+ * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the tuba has the
+ * axes of the player: the body stands in front of the player, and the bell opens up at the left
+ * of the head. A longer lead pipe moves the body back toward the player and to the left, and the
+ * pipe goes down from the mouthpiece before it goes back to the valves, so that it passes under
+ * the chin.
+ *
+ * The parts: the bell branch, the bottom bow, the valve branch, four piston valves with pearl
+ * buttons, the valve slides at the right of the valves, and the main tuning slide over them.
  *
  * @param lead The lengths by which the lead pipe reaches back and to the left from the
  *   mouthpiece, in meters (`SpeciesParams.tubaPipe`).
@@ -838,35 +726,73 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const [back, left] = lead;
   const t = BRASS.tuba;
   const piece = new PieceBuilder();
-  plainMouthpiece(piece, [0, 0, -1], 0.012);
+  mouthpiece(piece, [0, 0, -1], 0.014, 0.09);
   // The axes of the drawing: the bottom bow is at y = 0. The mouthpiece is 0.72 m above it, and
   // 0.2 m behind it with no longer lead pipe.
   const bottom = new Vector3(-0.06 - left, -0.72, back - 0.2);
   const at = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(bottom));
-  // The main branch rises from the bottom bow to the bell.
-  plainTurned(
+  // The bell branch rises from the bottom bow to the bell, and widens more and more toward it.
+  const rise = 0.13;
+  turned(
     piece,
-    at([-0.06, 0, 0]),
+    at([-0.06, rise, 0]),
     [0, 1, 0],
     [
-      [0, 0],
-      [0.07, 0.03],
-      [0.08, 0.45],
-      [0.11, t.height - 0.25],
-      [t.bellRadius * 0.7, t.height - 0.06],
-      [t.bellRadius, t.height],
-      ...plainOpenBell(t.bellRadius, t.height),
+      [0.068, 0],
+      [0.085, 0.42],
+      [0.108, t.height - rise - 0.28],
+      [0.135, t.height - rise - 0.15],
+      [t.bellRadius * 0.82, t.height - rise - 0.05],
+      [t.bellRadius * 1.02, t.height - rise],
+      ...openBell(t.bellRadius, t.height - rise),
     ],
-    PLAIN_BELL_SEGMENTS,
+    TUBA_SEGMENTS,
+    METAL,
   );
-  // The second branch with the valves, the bottom bow, and the lead pipe to the mouthpiece.
-  pipe(piece, [at([0.1, 0.06, 0]), at([0.1, 0.5, 0])], 0.04);
-  pipe(piece, [at([-0.06, 0.06, 0]), at([0.1, 0.06, 0])], 0.05);
-  valves(piece, at([0.1, 0.42, -0.06]), [0, 0, 0.035], 4, 0.012, 0.11, [0, 1, 0]);
-  pipe(
+  // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves.
+  tubeAlong(
     piece,
-    [at([0.1, 0.5, 0]), at([0.1, 0.65 - back / 4, 0.08 - back / 2]), [0, 0, 0.05]],
-    0.012,
+    [...arc(at([0.02, rise, 0]), [-1, 0, 0], [0, -1, 0], 0.08, 0, Math.PI, 6), at([0.1, 0.34, 0])],
+    [0.068, 0.066, 0.061, 0.055, 0.049, 0.044, 0.04, 0.03],
+    TUBE_SEGMENTS + 2,
+    METAL,
+  );
+  // The four valves in a row from the front to the back, with the right fingers on their tops.
+  const valveZ = [-0.06, -0.025, 0.01, 0.045];
+  for (const z of valveZ) {
+    piston(piece, at([0.1, 0.475, z]), 0.0125, 0.11, 0.026);
+  }
+  // The valve slides hang at the right of the valves.
+  for (const [i, z] of valveZ.entries()) {
+    const reach = 0.06 + 0.035 * i;
+    tubeAlong(
+      piece,
+      rounded(
+        [
+          at([0.11, 0.43, z]),
+          at([0.13 + 0.012 * i, 0.43, z]),
+          at([0.13 + 0.012 * i, 0.43 - reach, z]),
+          at([0.11, 0.43 - reach, z]),
+        ],
+        0.014,
+        1,
+      ),
+      [0.0085],
+      TUBE_SEGMENTS,
+      METAL,
+    );
+  }
+  // The lead pipe from the last valve over the main tuning slide to the mouthpiece.
+  tubeAlong(
+    piece,
+    rounded(
+      [at([0.1, 0.5, 0.045]), at([0.1, 0.65 - back / 4, 0.08 - back / 2]), [0, 0, 0.05]],
+      0.08,
+      4,
+    ),
+    [0.013, 0.012, 0.011, 0.01, 0.0095, 0.009, 0.0085, 0.008],
+    TUBE_SEGMENTS,
+    METAL,
   );
   tubaSpace(piece, at, back, t.height, t.bellRadius);
   const bellTarget: PlayTarget = {
