@@ -60,6 +60,26 @@ function tube(
 }
 
 /**
+ * Adds a band of silver around a tube along +x, as the ring of a tenon or of a bell.
+ *
+ * @param piece The piece.
+ * @param from The distance of the start of the band from the origin.
+ * @param to The distance of the end of the band.
+ * @param radius The radius of the band.
+ */
+function band(piece: PieceBuilder, from: number, to: number, radius: number): void {
+  tube(
+    piece,
+    [
+      [radius, from],
+      [radius, to],
+    ],
+    INSTRUMENT_COLORS.silver,
+    'metal',
+  );
+}
+
+/**
  * Adds the silver key work along a tube along +x: a cup over each tone hole, and a rod beside
  * the cups, as the axle of the keys of a real woodwind.
  *
@@ -236,27 +256,57 @@ function ellipse(x: number, z: number, count: number): OutlinePoint[] {
 }
 
 /**
- * Adds the parts of the oboe: a thin dark tube with the reed, metal keys, and a small bell. The
- * origin is at the tip of the reed, and the tube runs along +x to the bell.
+ * Adds the parts of the oboe, as a conservatory oboe of grenadilla
+ * (`docs/reference/wind-technique.md` 6.2): the double reed with its thread, the silver ring at
+ * the top, the upper and the lower joint with a ring at each tenon, the bell with its rim, and
+ * the silver key work on the front. The origin is at the tip of the reed, and the tube runs along
+ * +x to the bell.
  *
  * @param piece The piece builder.
  */
 function oboeParts(piece: PieceBuilder): void {
   const o = WOODWINDS.oboe;
   const wood = INSTRUMENT_COLORS.oboe;
-  piece.add(box(0.03, 0.002, 0.007), wood, transform([0.015, 0, 0]));
+  // The two blades of cane, and the thread that binds them to the staple. The reed, the thread,
+  // and the top ring stay inside the form of the simple model, because a thread that started
+  // 0.4 cm nearer the tip put the oboe 0.3 cm deeper into the mouth of the mouse.
+  piece.add(box(0.03, 0.0018, 0.0068), INSTRUMENT_COLORS.reed, transform([0.015, 0, 0]));
   tube(
     piece,
     [
-      [0.003, 0.03],
-      [0.008, 0.04],
-      [0.009, o.length - 0.07],
-      [0.013, o.length - 0.04],
-      [0.022, o.length],
+      [0.0026, 0.03],
+      [0.0032, 0.032],
+      [0.0036, 0.04],
+    ],
+    INSTRUMENT_COLORS.reedThread,
+  );
+  band(piece, 0.04, 0.046, 0.0068);
+  tube(
+    piece,
+    [
+      [0.0064, 0.046],
+      [0.0085, 0.2],
+      [0.0094, 0.205],
+      [0.0094, 0.215],
+      [0.0092, 0.22],
+      [0.0102, 0.431],
+      [0.0112, 0.437],
+      [0.0112, 0.447],
+      [0.0145, 0.5],
+      [0.0185, 0.536],
+      [0.021, 0.548],
+      [0.0205, o.length],
+      [0.012, o.length - 0.02],
     ],
     wood,
+    'lacquer',
   );
-  keys(piece, 0.1, o.length - 0.1, 10, 0.009, INSTRUMENT_COLORS.silver);
+  band(piece, 0.204, 0.212, 0.0098);
+  band(piece, 0.436, 0.443, 0.0116);
+  keyWork(piece, [0.12, 0.15, 0.18, 0.27, 0.3, 0.33], [-1, 0], 0.009, 0.0055, [
+    [0.08, 0.2],
+    [0.23, 0.42],
+  ]);
 }
 
 /**
