@@ -4,11 +4,12 @@ import { transform } from '../mesh.ts';
 import { toQuat } from '../tuples.ts';
 import type { Quat, Vec3 } from '../tuples.ts';
 import type { Finish, Rgb } from '../mesh.ts';
-import { box, lathe } from '../primitives.ts';
-import type { ProfilePoint } from '../primitives.ts';
+import { box, lathe, plate } from '../primitives.ts';
+import type { OutlinePoint, ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
-import type { GripTube, InstrumentModel } from './types.ts';
+import { turned } from './tubing.ts';
 import { bassoonSpace, clarinetSpace, fluteSpace, oboeSpace } from './wind-space.ts';
+import type { GripTube, InstrumentModel } from './types.ts';
 
 /** The woodwinds of design 4.6. */
 export type WoodwindId = 'flute' | 'oboe' | 'clarinet' | 'bassoon';
@@ -32,16 +33,17 @@ export const WOODWINDS = {
  */
 const BASSOON_REED: Vec3 = [0.16, 0.7, 0.155];
 
-/** The faces around the axis of a tube. */
+/** The faces around the axis of a tube. A face angle of 60° shades as a round tube. */
 const TUBE_SEGMENTS = 6;
 
-/** The turn of a lathe along +y to a tube along +x. */
-const ALONG_X = toQuat(
-  new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), new Vector3(1, 0, 0)),
-);
+/** The faces around the axis of a key cup or a thin rod. */
+const KEY_SEGMENTS = 5;
+
+/** The faces around the axis of a key rod. */
+const ROD_SEGMENTS = 4;
 
 /**
- * Adds a tube along +x.
+ * Adds a solid of revolution along +x.
  *
  * @param piece The piece.
  * @param profile The radius at each distance from the origin, as (radius, x).
@@ -54,7 +56,59 @@ function tube(
   color: Rgb,
   finish: Finish = 'matte',
 ): void {
-  piece.add(lathe(profile, TUBE_SEGMENTS), color, transform([0, 0, 0], ALONG_X), finish);
+  turned(piece, [0, 0, 0], [1, 0, 0], profile, TUBE_SEGMENTS, color, finish);
+}
+
+/**
+ * Adds the silver key work along a tube along +x: a cup over each tone hole, and a rod beside
+ * the cups, as the axle of the keys of a real woodwind.
+ *
+ * @param piece The piece.
+ * @param cups The distance of each cup from the origin.
+ * @param side The unit direction from the axis of the tube to the cups, normal to x.
+ * @param radius The radius of the tube under the cups.
+ * @param cup The radius of a cup.
+ * @param rods The start and the end of each rod along x.
+ */
+function keyWork(
+  piece: PieceBuilder,
+  cups: readonly number[],
+  side: readonly [y: number, z: number],
+  radius: number,
+  cup: number,
+  rods: readonly (readonly [number, number])[],
+): void {
+  const [y, z] = side;
+  const metal = INSTRUMENT_COLORS.silver;
+  for (const x of cups) {
+    turned(
+      piece,
+      [x, y * radius * 0.92, z * radius * 0.92],
+      [0, y, z],
+      [
+        [cup, 0],
+        [cup, cup * 0.45],
+        [0, cup * 0.6],
+      ],
+      KEY_SEGMENTS,
+      metal,
+    );
+  }
+  // The rod lies beside the cups, turned 55° around the tube from the cups.
+  const turn = 55 * MathUtils.DEG2RAD;
+  const ry = y * Math.cos(turn) + z * Math.sin(turn);
+  const rz = z * Math.cos(turn) - y * Math.sin(turn);
+  const out = radius + cup * 0.25;
+  for (const [from, to] of rods) {
+    piece.rod(
+      [from, ry * out, rz * out],
+      [to, ry * out, rz * out],
+      cup * 0.22,
+      ROD_SEGMENTS,
+      metal,
+      'metal',
+    );
+  }
 }
 
 /**
@@ -93,29 +147,92 @@ function hanging(angle: number): Quat {
 }
 
 /**
- * Adds the parts of the flute: a silver tube with the lip plate, the head cap, and the keys. The
- * origin is at the hole of the lip plate, and the tube runs along +x to the foot. The hole faces
- * +y.
+ * Adds the parts of the flute, as a Boehm flute of silver (`docs/reference/wind-technique.md`
+ * 6.2): the head joint with the crown and the lip plate around the embouchure hole, the body
+ * joint and the foot joint with a ring at each tenon, and the key cups on their rods. The origin
+ * is at the embouchure hole, and the tube runs along +x to the foot. The hole faces +y.
  *
  * @param piece The piece builder.
  */
 function fluteParts(piece: PieceBuilder): void {
   const f = WOODWINDS.flute;
   const metal = INSTRUMENT_COLORS.silver;
+  const end = f.length - 0.05;
   tube(
     piece,
     [
-      [0.009, -0.05],
-      [0.0095, f.length - 0.05],
-      [0.0095, f.length - 0.05 + 0.001],
+      [0.0088, -0.045],
+      [0.0092, 0.112],
+      [0.0104, 0.116],
+      [0.0104, 0.128],
+      [0.0095, 0.132],
+      [0.0095, 0.405],
+      [0.0104, 0.409],
+      [0.0104, 0.42],
+      [0.0095, 0.424],
+      [0.0095, end],
     ],
     metal,
     'metal',
   );
-  // The lip plate around the hole, and the crown of the head cap.
-  piece.add(box(0.03, 0.006, 0.02), metal, transform([0, 0.008, 0]), 'metal');
-  piece.add(box(0.012, 0.022, 0.022), metal, transform([-0.05, 0, 0]), 'metal');
-  keys(piece, 0.13, f.length - 0.09, 9, 0.01, metal);
+  // The crown that closes the head joint, with its round top.
+  tube(
+    piece,
+    [
+      [0, -0.064],
+      [0.0055, -0.0625],
+      [0.0098, -0.058],
+      [0.0098, -0.045],
+    ],
+    metal,
+    'metal',
+  );
+  // The lip plate: a curved oval plate around the embouchure hole, and the dark hole in it.
+  piece.add(
+    plate(LIP_PLATE, [
+      [0.85, 0],
+      [1, 0.0012],
+      [0.9, 0.0022],
+    ]),
+    metal,
+    transform([0, 0.0082, 0]),
+    'metal',
+  );
+  piece.add(
+    plate(EMBOUCHURE_HOLE, [
+      [1, 0],
+      [0.75, 0.0004],
+    ]),
+    INSTRUMENT_COLORS.windBore,
+    transform([0, 0.0103, 0]),
+  );
+  keyWork(piece, [0.15, 0.178, 0.205, 0.232, 0.29, 0.318, 0.346], [1, 0], 0.0095, 0.0062, [
+    [0.135, 0.4],
+  ]);
+  keyWork(piece, [0.47], [1, 0], 0.0095, 0.0062, [[0.43, end - 0.005]]);
+}
+
+/** The outline of the lip plate of the flute, in the x-z plane: an oval, longer along the tube. */
+const LIP_PLATE: readonly OutlinePoint[] = ellipse(0.0135, 0.0105, 8);
+
+/** The outline of the embouchure hole in the lip plate of the flute. */
+const EMBOUCHURE_HOLE: readonly OutlinePoint[] = ellipse(0.0052, 0.0042, 6);
+
+/**
+ * Gives the corners of an ellipse in the x-z plane, counterclockwise when seen from +y.
+ *
+ * @param x The half axis on x.
+ * @param z The half axis on z.
+ * @param count The number of corners.
+ * @returns The corners.
+ */
+function ellipse(x: number, z: number, count: number): OutlinePoint[] {
+  const out: OutlinePoint[] = [];
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * 2 * Math.PI;
+    out.push([x * Math.cos(angle), -z * Math.sin(angle)]);
+  }
+  return out;
 }
 
 /**
