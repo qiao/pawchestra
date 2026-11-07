@@ -125,7 +125,7 @@ export const INSTRUMENT_COLORS = {
   /** The wood hoops of the bass drum: a darker lacquer than the shell. */
   drumHoop: srgb('#3e1714'),
   /** The lathe grooves of a cymbal: a darker bronze between the polished rings. */
-  cymbalGroove: srgb('#a07834'),
+  cymbalGroove: srgb('#c89d4c'),
   /** The leather straps of the hand cymbals. */
   leather: srgb('#4b2e1c'),
   /** The felt of the timpani mallets and the bass drum beater. */
