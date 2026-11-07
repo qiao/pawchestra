@@ -41,6 +41,9 @@ const TUBE_SEGMENTS = 6;
 /** The faces around the axis of a thin rod, such as a brace or a lever. */
 const ROD_SEGMENTS = 4;
 
+/** The faces around the axis of the bell of the horn. */
+const BELL_SEGMENTS = 16;
+
 /** The faces around the axis of a bell of the trumpet or the trombone. */
 const SMALL_BELL_SEGMENTS = 12;
 
@@ -290,43 +293,6 @@ function valves(
       'metal',
     );
   }
-}
-
-/**
- * Adds a bell that opens along an axis.
- *
- * @param piece The piece.
- * @param mouth The middle of the opening of the bell.
- * @param axis The direction in which the bell opens.
- * @param radius The radius of the opening.
- * @param depth The length of the flare.
- * @returns The target at the middle of the opening.
- */
-function plainBell(
-  piece: PieceBuilder,
-  mouth: Vec3,
-  axis: Vec3,
-  radius: number,
-  depth: number,
-): PlayTarget {
-  const n = new Vector3(...axis).normalize();
-  const normal = toVec3(n);
-  plainTurned(
-    piece,
-    toVec3(new Vector3(...mouth).addScaledVector(n, -depth)),
-    normal,
-    [
-      [radius * 0.18, 0],
-      [radius * 0.35, depth * 0.6],
-      [radius * 0.7, depth * 0.9],
-      [radius, depth],
-      // The rim turns back into the bell, so that the opening shows the lit inside of the
-      // flare, as the bells of the polished images.
-      ...plainOpenBell(radius, depth),
-    ],
-    PLAIN_BELL_SEGMENTS,
-  );
-  return { kind: 'bell', bone: 'instrument', from: mouth, to: mouth, normal, keys: null };
 }
 
 /**
@@ -710,9 +676,14 @@ const HORN_TURN = toQuat(
 const HORN_PALM_DEPTH = 0.025;
 
 /**
- * Builds the horn. The mouthpiece is at the origin, and the horn has the axes of the player: the
- * coil stands in front of the right side of the chest, and the bell opens to the right and to
- * the back, above the right thigh. The hold turns it by {@link HORN_TURN}.
+ * Builds the horn, as a double horn such as a Conn 8D (`docs/reference/wind-technique.md` 6.1).
+ * The mouthpiece is at the origin, and the horn has the axes of the player: the coil stands in
+ * front of the right side of the chest, and the bell opens to the right and to the back, above
+ * the right thigh. The hold turns it by {@link HORN_TURN}.
+ *
+ * The parts: the lead pipe from the mouthpiece to the valves, four rotary valves with their caps
+ * and the levers of the left fingers, the two inner loops of the F side and the B♭ side, the
+ * valve slides, and the outer hoop, which widens into the bell tail and the bell.
  *
  * @returns The parts and the play data.
  */
@@ -720,45 +691,126 @@ function horn(): BrassBuild {
   const h = BRASS.horn;
   const piece = new PieceBuilder();
   const into = new Vector3(0.25, -0.35, -1).normalize();
-  plainMouthpiece(piece, toVec3(into), 0.009);
+  mouthpiece(piece, toVec3(into), 0.009, 0.065);
   // The coil leans back 20° from the vertical, with its middle low, 0.08 m at the right of the
   // mouth, and 0.1 m in front of it. With the coil 0.24 m in front of the mouth, the left palm on
   // the valves is 1.16 times the reach of the arm.
   const center = new Vector3(0.08, -0.3, -0.1);
   const lean = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -20 * MathUtils.DEG2RAD);
-  const ring = (angle: number, r: number): Vec3 =>
+  const ring = (angle: number, r: number, out = 0): Vec3 =>
     toVec3(
-      new Vector3(r * Math.cos(angle), r * Math.sin(angle), 0).applyQuaternion(lean).add(center),
+      new Vector3(r * Math.cos(angle), r * Math.sin(angle), out).applyQuaternion(lean).add(center),
     );
-  const coil: Vec3[] = [];
-  for (let i = 0; i <= 12; i++) {
-    coil.push(ring((i / 12) * 2 * Math.PI, h.coilRadius));
-  }
-  pipe(piece, coil, 0.011);
-  // The lead pipe from the mouthpiece to the top of the coil, and the valves at its front left.
-  pipe(
-    piece,
-    [toVec3(into.clone().multiplyScalar(0.04)), ring(Math.PI * 0.6, h.coilRadius)],
-    0.005,
-  );
-  valves(
-    piece,
-    ring(Math.PI * 0.85, h.coilRadius * 0.55),
-    toVec3(new Vector3(0.024, -0.012, 0).applyQuaternion(lean)),
-    3,
-    0.009,
-    0.06,
-    toVec3(new Vector3(0, 0, 1).applyQuaternion(lean)),
-  );
+  const normal = toVec3(new Vector3(0, 0, 1).applyQuaternion(lean));
   // The bell leaves the coil at its bottom right, and opens to the right and to the back.
   const bellAxis = new Vector3(0.75, -0.25, 0.6).normalize();
-  const bellStart = ring(-Math.PI * 0.35, h.coilRadius);
-  const bellTarget = plainBell(
+  const bellAngle = -Math.PI * 0.35;
+  const bellStart = ring(bellAngle, h.coilRadius);
+  // The outer hoop: one turn that widens from the valves into the bell tail.
+  const hoop: Vec3[] = [];
+  const radii: number[] = [];
+  const turnSteps = 22;
+  for (let i = 0; i <= turnSteps; i++) {
+    const share = i / turnSteps;
+    hoop.push(ring(bellAngle + 2 * Math.PI * (1 - share), h.coilRadius * (0.9 + 0.1 * share)));
+    radii.push(0.0065 + 0.0075 * share * share);
+  }
+  tubeAlong(piece, hoop, radii, TUBE_SEGMENTS, METAL);
+  // The four rotary valves in a row, each a short casing across the coil with a cap of nickel
+  // silver, and the lever of a left finger, which reaches toward the lead pipe.
+  const step = new Vector3(0.024, -0.012, 0).applyQuaternion(lean);
+  const valve = (i: number): Vector3 =>
+    new Vector3(...ring(Math.PI * 0.85, h.coilRadius * 0.55)).addScaledVector(step, i - 1);
+  const across = new Vector3(...normal);
+  const leverTip = new Vector3(...ring(Math.PI * 0.93, h.coilRadius * 0.86, 0.022));
+  for (let i = 0; i < 4; i++) {
+    const at = valve(i);
+    piece.rod(
+      toVec3(at.clone().addScaledVector(across, -0.02)),
+      toVec3(at.clone().addScaledVector(across, 0.02)),
+      0.0105,
+      TUBE_SEGMENTS,
+      METAL,
+      'metal',
+    );
+    const cap = at.clone().addScaledVector(across, 0.02);
+    piece.rod(
+      toVec3(cap),
+      toVec3(cap.clone().addScaledVector(across, 0.004)),
+      0.0115,
+      TUBE_SEGMENTS,
+      TRIM,
+      'metal',
+    );
+    const tip = leverTip.clone().addScaledVector(step, i * 0.45);
+    piece.bar(toVec3(cap), toVec3(tip), 0.004, 0.0025, TRIM, 'metal');
+  }
+  // The two inner loops of the double horn, the F side and the B♭ side: each leaves one valve,
+  // goes around inside the hoop, and comes back to another valve.
+  const inPlane = (x: number): Vec3 => toVec3(new Vector3(x, 0, 0).applyQuaternion(lean));
+  const coilU = inPlane(1);
+  const coilV = toVec3(new Vector3(0, 1, 0).applyQuaternion(lean));
+  for (const [r, from, to, first, last] of [
+    [0.1, 0.35, -1.1, 3, 0],
+    [0.076, 0.2, -1.0, 2, 1],
+  ] as const) {
+    tubeAlong(
+      piece,
+      [
+        toVec3(valve(first)),
+        ...arc(toVec3(center), coilU, coilV, r, from * Math.PI, to * Math.PI, 12),
+        toVec3(valve(last)),
+      ],
+      [0.006],
+      TUBE_SEGMENTS,
+      METAL,
+    );
+  }
+  // The lead pipe from the mouthpiece to the first valve, and the valve slides that rise from
+  // the valves behind the loops.
+  tubeAlong(
+    piece,
+    rounded(
+      [
+        toVec3(into.clone().multiplyScalar(0.06)),
+        ring(Math.PI * 0.62, h.coilRadius * 0.95),
+        ring(Math.PI * 0.8, h.coilRadius * 0.72),
+        toVec3(valve(0)),
+      ],
+      0.04,
+      2,
+    ),
+    [0.0042, 0.0046, 0.005, 0.0052, 0.0054, 0.0056, 0.0058, 0.006],
+    TUBE_SEGMENTS,
+    METAL,
+  );
+  const up = new Vector3(...coilV);
+  const out = new Vector3(...coilU);
+  for (let i = 1; i < 4; i++) {
+    const at = valve(i).addScaledVector(across, -0.012);
+    const reach = 0.035 + 0.012 * i;
+    const point = (rise: number, side: number): Vec3 =>
+      toVec3(at.clone().addScaledVector(up, rise).addScaledVector(out, side));
+    tubeAlong(
+      piece,
+      rounded(
+        [point(0, -0.006), point(reach, -0.006), point(reach, 0.012), point(0, 0.012)],
+        0.008,
+        1,
+      ),
+      [0.0045],
+      TUBE_SEGMENTS,
+      METAL,
+    );
+  }
+  const bellTarget = bell(
     piece,
     toVec3(new Vector3(...bellStart).addScaledVector(bellAxis, 0.2)),
     toVec3(bellAxis),
     h.bellRadius,
     0.2,
+    0.014,
+    BELL_SEGMENTS,
   );
   hornSpace(piece, h.coilRadius, h.bellRadius);
   return {
