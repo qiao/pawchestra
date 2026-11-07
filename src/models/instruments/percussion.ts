@@ -2,11 +2,11 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
-import { splitByCentroid, splitByFacing, transform } from '../mesh.ts';
+import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
-import { box, icosphere, lathe } from '../primitives.ts';
+import { ball, box, icosphere, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
-import { PieceBuilder, hold, pieceSize } from './piece.ts';
+import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import type { InstrumentId, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
 
 /** The number of kettles of the timpani (design 4.6). */
@@ -347,8 +347,42 @@ export function kettleHeadRadius(index: number): number {
   return (TIMPANI.radii[index] ?? 0) * KETTLE_FIT;
 }
 
-/** The height of the silver hoop at the top of a kettle, in meters. */
-const HOOP = 0.035;
+/**
+ * The parts of a kettle of the timpani around its head, in meters, as a concert timpano with a
+ * copper bowl in a frame of struts (design 4.6, `docs/reference/orchestra-latest.png`): the
+ * counter hoop under the edge of the head, the tension rods down the bowl to a base ring, the
+ * legs with casters, and the tuning pedal at the side of the player.
+ */
+const KETTLE = {
+  /**
+   * The counter hoop: the drop of its top below the head, its width out from the head, the height
+   * of its chrome top band, and the height of its black band under it. The top stays below the
+   * head, so that a mallet at a strike near the rim does not touch it.
+   */
+  hoop: { drop: 0.001, width: 0.016, chrome: 0.014, band: 0.034 },
+  /** The number of tension rods around a kettle. */
+  rods: 8,
+  /** The width of a tension rod around the bowl, and its depth out from the bowl. */
+  rod: [0.013, 0.008],
+  /** The width, the height, and the depth of the chrome lug of a rod on the counter hoop. */
+  lug: [0.02, 0.03, 0.012],
+  /**
+   * The base ring: its height below the head, in kettle radii, its radius, in head radii, and the
+   * height and the width of its section.
+   */
+  base: { below: 0.98, radius: 0.9, section: [0.022, 0.018] },
+  /** The distance of each foot from the axis, in head radii, and the height of each caster. */
+  foot: [0.98, 0.035],
+  /**
+   * The tuning pedal toward the player: the distances of its toe end and of its heel end from the
+   * axis, in head radii, their heights, and the width of the foot plate. The toe end is high near
+   * the drum, as on a balanced action pedal, and the heel end is near the floor.
+   */
+  pedal: { toe: [0.45, 0.15], heel: [0.92, 0.035], width: 0.09 },
+} as const;
+
+/** The faces around the axis of the base ring of a kettle. */
+const BASE_SEGMENTS = 12;
 
 /** The pitch classes of the sharp keys. */
 const SHARPS: ReadonlySet<number> = new Set([1, 3, 6, 8, 10]);
@@ -426,6 +460,77 @@ interface HandTool {
  */
 type MalletLook = (piece: PieceBuilder, length: number, butt: number) => void;
 
+/** The faces of a box of `box()` of `primitives.ts`, in the order of its corner list. */
+type BoxFace = '+x' | '-x' | '+y' | '-y' | '+z' | '-z';
+
+/** The faces of a box in the order of the corner list of `box()`, two triangles each. */
+const BOX_FACES: readonly BoxFace[] = ['+x', '-x', '+y', '-y', '+z', '-z'];
+
+/**
+ * Makes a box with its center at the origin, with only some of its faces: a face that the
+ * instrument always hides needs no triangles.
+ *
+ * @param width The size on x.
+ * @param height The size on y.
+ * @param depth The size on z.
+ * @param faces The faces to keep.
+ * @returns 2 triangles for each face.
+ */
+function openBox(
+  width: number,
+  height: number,
+  depth: number,
+  faces: readonly BoxFace[],
+): number[] {
+  const all = box(width, height, depth);
+  return BOX_FACES.flatMap((face, i) =>
+    faces.includes(face) ? all.slice(i * 18, i * 18 + 18) : [],
+  );
+}
+
+/**
+ * Makes a solid of revolution around the y axis with no flat caps at its end rings: a band, such
+ * as a hoop, whose ends meet other parts.
+ *
+ * @param profile The profile ({@link lathe}). Both end radii are larger than 0.
+ * @param segments The number of faces around the axis.
+ * @returns 2 triangles for each segment of each profile step.
+ */
+function band(profile: readonly ProfilePoint[], segments: number): number[] {
+  return lathe(profile, segments).slice(0, -2 * segments * 9);
+}
+
+/**
+ * Adds a flat strut from one point to another: a box with its outer face and its two sides, and
+ * no ends and no inner face, which the parts at its ends and behind it hide.
+ *
+ * @param piece The piece.
+ * @param from The middle of the first end.
+ * @param to The middle of the second end.
+ * @param size The width of the strut across, and its depth toward `outward`.
+ * @param outward The direction of the outer face.
+ * @param color The color.
+ * @param finish The finish.
+ */
+function strut(
+  piece: PieceBuilder,
+  from: Vec3,
+  to: Vec3,
+  size: readonly [width: number, depth: number],
+  outward: Vec3,
+  color: Rgb,
+  finish: Finish,
+): void {
+  const a = new Vector3(...from);
+  const b = new Vector3(...to);
+  const corners = openBox(a.distanceTo(b), size[1], size[0], ['+y', '+z', '-z']);
+  const middle = toVec3(a.clone().add(b).multiplyScalar(0.5));
+  piece.add(corners, color, transform(middle, pointing(toVec3(b.sub(a)), outward)), finish);
+}
+
+/** The rotation that turns the y axis of a lathe onto the x axis of a mallet. */
+const ALONG_X = toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 2));
+
 /** The radius of the shaft of a mallet, in meters. */
 const SHAFT = 0.0055;
 
@@ -449,6 +554,34 @@ function plainMallet(
     if (head > 0) {
       piece.add(icosphere(head), headColor, transform([length, 0, 0]));
     }
+  };
+}
+
+/**
+ * Gives the look of a mallet with a round head: a shaft of 6 faces and a ball, such as the felt
+ * mallet of the timpani or the yarn mallet of the suspended cymbal.
+ *
+ * @param head The radius of the head.
+ * @param headColor The color of the head.
+ * @param segments The faces around the axis of the head. The head has half as many rings, at
+ *   least 4.
+ * @returns The look.
+ */
+function roundMallet(head: number, headColor: Rgb, segments = 6): MalletLook {
+  return (piece, length, butt) => {
+    piece.rod(
+      [-butt, 0, 0],
+      [length - 0.5 * head, 0, 0],
+      SHAFT,
+      6,
+      INSTRUMENT_COLORS.stick,
+      'varnish',
+    );
+    piece.add(
+      ball(head, segments, Math.max(4, segments / 2)),
+      headColor,
+      transform([length, 0, 0], ALONG_X),
+    );
   };
 }
 
@@ -550,6 +683,205 @@ function drum(piece: PieceBuilder, center: Vec3, axis: Vec3, radius: number, dep
 }
 
 /**
+ * Adds one kettle of the timpani ({@link KETTLE}): the head, the copper bowl, the counter hoop,
+ * the tension rods with their lugs, the base ring, three legs with casters, and the tuning pedal.
+ *
+ * @param piece The piece.
+ * @param center The point on the floor under the axis of the kettle.
+ * @param r The radius of the kettle ({@link TIMPANI.radii}).
+ */
+function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
+  const y = TIMPANI.headHeight;
+  const { hoop, base, foot, pedal } = KETTLE;
+  const colors = INSTRUMENT_COLORS;
+  const at = transform(center);
+  // The head of the bowl of 16 faces has the real radius, and the bowl keeps the box of the
+  // first bowl of 8 faces (KETTLE_FIT).
+  const head = KETTLE_FIT * r;
+  const top = y - hoop.drop;
+  const chrome = top - hoop.chrome;
+  const under = chrome - hoop.band;
+  const [skin] = splitByFacing(
+    lathe(
+      [
+        [head, y - 0.01],
+        [head, y],
+      ],
+      KETTLE_SEGMENTS,
+    ),
+    [0, 1, 0],
+    0.999,
+  );
+  piece.add(skin, colors.drumHead, at);
+  // A deep round bowl, as a parabola from the bottom up to the rolled lip under the hoop.
+  const bowl: readonly ProfilePoint[] = [
+    [0, y - 1.05 * r],
+    [0.4 * head, y - 1 * r],
+    [0.68 * head, y - 0.89 * r],
+    [0.87 * head, y - 0.7 * r],
+    [0.97 * head, y - 0.45 * r],
+    [head, y - 0.2 * r],
+    [head, under],
+  ];
+  piece.add(band(bowl, KETTLE_SEGMENTS), colors.kettle, at, 'metal');
+  const out = head + hoop.width;
+  piece.add(
+    band(
+      [
+        [head, under],
+        [out, under],
+        [out, chrome],
+      ],
+      KETTLE_SEGMENTS,
+    ),
+    colors.timpaniBlack,
+    at,
+    'lacquer',
+  );
+  piece.add(
+    band(
+      [
+        [out, chrome],
+        [head, top],
+      ],
+      KETTLE_SEGMENTS,
+    ),
+    colors.silver,
+    at,
+    'metal',
+  );
+  // The tension rods run from the counter hoop down outside the bowl to the base ring. Each rod
+  // stands at the middle of a face of the bowl, where the bowl is nearest to the axis.
+  const low = y - base.below * r;
+  const [lugWidth, lugHeight, lugDepth] = KETTLE.lug;
+  const around = (radius: number, height: number, turn: number): Vec3 => [
+    center[0] + radius * Math.sin(turn),
+    height,
+    center[2] + radius * Math.cos(turn),
+  ];
+  for (let i = 0; i < KETTLE.rods; i++) {
+    const turn = (i / KETTLE.rods) * 2 * Math.PI;
+    const outward: Vec3 = [Math.sin(turn), 0, Math.cos(turn)];
+    strut(
+      piece,
+      around(out, under + 0.002, turn),
+      around(base.radius * head + base.section[1] / 2, low, turn),
+      KETTLE.rod,
+      outward,
+      colors.timpaniBlack,
+      'lacquer',
+    );
+    piece.add(
+      openBox(lugWidth, lugHeight, lugDepth, ['+x', '-x', '+y', '+z']),
+      colors.silver,
+      transform(
+        around(out + lugDepth / 2 - 0.004, under + lugHeight / 2, turn),
+        toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), turn)),
+      ),
+      'metal',
+    );
+  }
+  const [ringHeight, ringWidth] = base.section;
+  const inner = base.radius * head;
+  piece.add(
+    band(
+      [
+        [inner, low - ringHeight / 2],
+        [inner + ringWidth, low - ringHeight / 2],
+        [inner + ringWidth, low + ringHeight / 2],
+        [inner, low + ringHeight / 2],
+      ],
+      BASE_SEGMENTS,
+    ),
+    colors.timpaniBlack,
+    at,
+    'lacquer',
+  );
+  // The pedal points to the player at the origin, and the legs stand away from it.
+  const toPlayer = Math.atan2(-center[0], -center[2]);
+  const [reach, caster] = foot;
+  for (let leg = 0; leg < 3; leg++) {
+    const turn = toPlayer + ((leg + 0.5) / 3) * 2 * Math.PI;
+    const outward: Vec3 = [Math.sin(turn), 0, Math.cos(turn)];
+    const end = around(reach * head, caster, turn);
+    strut(
+      piece,
+      around(inner + ringWidth / 2, low, turn),
+      end,
+      [0.02, 0.014],
+      outward,
+      colors.timpaniBlack,
+      'lacquer',
+    );
+    piece.add(
+      openBox(0.03, caster, 0.03, ['+x', '-x', '+y', '+z', '-z']),
+      colors.hardware,
+      transform([end[0], caster / 2, end[2]]),
+    );
+  }
+  const toe = around(pedal.toe[0] * head, pedal.toe[1], toPlayer);
+  const heel = around(pedal.heel[0] * head, pedal.heel[1], toPlayer);
+  const step = new Vector3(...heel).sub(new Vector3(...toe));
+  piece.add(
+    box(step.length(), 0.014, pedal.width),
+    colors.timpaniBlack,
+    transform(
+      toVec3(new Vector3(...toe).addScaledVector(step, 0.5)),
+      pointing(toVec3(step), [0, 1, 0]),
+    ),
+    'metal',
+  );
+  strut(
+    piece,
+    toe,
+    around(pedal.toe[0] * head, y - 0.96 * r, toPlayer),
+    [0.016, 0.016],
+    [Math.sin(toPlayer), 0, Math.cos(toPlayer)],
+    colors.timpaniBlack,
+    'lacquer',
+  );
+}
+
+/**
+ * Adds the layout form of one kettle to the footprint of the piece (`InstrumentPiece.footprint`):
+ * a bowl of 16 faces from the head down to its bottom, on three legs. Thus the parts of the
+ * kettle do not move the seats (design 4.6).
+ *
+ * @param piece The piece.
+ * @param center The point on the floor under the axis of the kettle.
+ * @param r The radius of the kettle ({@link TIMPANI.radii}).
+ */
+function addKettleSpace(piece: PieceBuilder, center: Vec3, r: number): void {
+  const y = TIMPANI.headHeight;
+  const head = KETTLE_FIT * r;
+  const profile: readonly ProfilePoint[] = [
+    [0, y - 1.05 * r],
+    [0.45 * head, y - 0.98 * r],
+    [0.75 * head, y - 0.8 * r],
+    [0.93 * head, y - 0.5 * r],
+    [head, y - 0.2 * r],
+    [head, y - 0.035],
+    [head, y],
+  ];
+  piece.footprint(lathe(profile, KETTLE_SEGMENTS), transform(center));
+  for (let leg = 0; leg < 3; leg++) {
+    const turn = ((leg + 0.5) / 3) * 2 * Math.PI + Math.PI / 2;
+    const top = new Vector3(
+      0.55 * head * Math.sin(turn),
+      y - 0.9 * r,
+      0.55 * head * Math.cos(turn),
+    );
+    const foot = new Vector3(0.85 * head * Math.sin(turn), 0.01, 0.85 * head * Math.cos(turn));
+    piece.footprintRod(
+      toVec3(top.add(new Vector3(...center))),
+      toVec3(foot.add(new Vector3(...center))),
+      0.012,
+      4,
+    );
+  }
+}
+
+/**
  * Builds the timpani: two to four kettles with their heads, and two mallets (design 4.6). The
  * kettles stand on the floor around the player, and the player stands.
  *
@@ -579,41 +911,8 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     const distance = i === split - 1 || i === split ? t.arc : Math.max(t.arc, t.side);
     const center: Vec3 = [distance * Math.sin(a), 0, -distance * Math.cos(a)];
     const y = t.headHeight;
-    // A deep round copper bowl under the head, with a silver hoop at its top, on three black
-    // legs, as the timpani of the polished images. The bowl has 16 faces, and its radius is
-    // smaller by the factor that keeps the box of the first bowl of 8 faces.
-    const k = KETTLE_FIT;
-    const profile: readonly ProfilePoint[] = [
-      [0, y - 1.05 * r],
-      [0.45 * k * r, y - 0.98 * r],
-      [0.75 * k * r, y - 0.8 * r],
-      [0.93 * k * r, y - 0.5 * r],
-      [k * r, y - 0.2 * r],
-      [k * r, y - HOOP],
-      [k * r, y],
-    ];
-    const [head, sides] = splitByFacing(lathe(profile, KETTLE_SEGMENTS), [0, 1, 0], 0.999);
-    const [hoop, bowl] = splitByCentroid(sides, ([, py]) => py > y - HOOP);
-    const at = transform(center);
-    piece.add(bowl, INSTRUMENT_COLORS.kettle, at, 'metal');
-    piece.add(hoop, INSTRUMENT_COLORS.silver, at, 'metal');
-    piece.add(head, INSTRUMENT_COLORS.drumHead, at);
-    for (let leg = 0; leg < 3; leg++) {
-      const turn = ((leg + 0.5) / 3) * 2 * Math.PI + Math.PI / 2;
-      const top = new Vector3(
-        0.55 * k * r * Math.sin(turn),
-        y - 0.9 * r,
-        0.55 * k * r * Math.cos(turn),
-      );
-      const foot = new Vector3(0.85 * k * r * Math.sin(turn), 0.01, 0.85 * k * r * Math.cos(turn));
-      piece.rod(
-        toVec3(top.add(new Vector3(...center))),
-        toVec3(foot.add(new Vector3(...center))),
-        0.012,
-        4,
-        INSTRUMENT_COLORS.hardware,
-      );
-    }
+    addKettle(piece, center, r);
+    addKettleSpace(piece, center, r);
     const keys = t.keys[i] ?? t.keys[0];
     const point = toVec3(new Vector3(...center).add(new Vector3(0, y, 0)));
     targets.push({
@@ -631,7 +930,7 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     tilt,
     spot: t.malletSpotL,
     butt: t.malletButt,
-    look: plainMallet(0.025, INSTRUMENT_COLORS.drumHead),
+    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 8),
     space: 0.025,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
