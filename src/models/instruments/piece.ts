@@ -124,6 +124,23 @@ export class PieceBuilder {
   }
 
   /**
+   * Adds a closed cylinder from one point to another to the footprint ({@link footprint}), with
+   * the corners of {@link rod}.
+   *
+   * @param from The center of the first end.
+   * @param to The center of the second end.
+   * @param radius The radius.
+   * @param segments The number of side faces.
+   */
+  footprintRod(from: Vec3, to: Vec3, radius: number, segments: number): void {
+    const axis = new Vector3(...to).sub(new Vector3(...from));
+    this.footprint(
+      cylinder(radius, radius, axis.length(), segments),
+      transform(from, turnYTo(axis)),
+    );
+  }
+
+  /**
    * Adds one key of a keyboard as a part of its own (design 4.6), with the matte finish.
    *
    * @param key The MIDI key.

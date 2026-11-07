@@ -464,6 +464,12 @@ interface MalletHold {
   readonly butt: number;
   /** The parts of the mallet. */
   readonly look: MalletLook;
+  /**
+   * The radius of the ball of the layout form of the mallet, or 0 for no ball. The layout form is
+   * a shaft of 4 faces with an icosphere at its end, so that a change of the look does not move
+   * the seats (`InstrumentPiece.footprint`).
+   */
+  readonly space: number;
 }
 
 /**
@@ -477,6 +483,10 @@ interface MalletHold {
 function mallet(bone: 'malletL' | 'malletR', m: MalletHold): HandTool {
   const piece = new PieceBuilder();
   m.look(piece, m.length, m.butt);
+  piece.footprintRod([-m.butt, 0, 0], [m.length, 0, 0], SHAFT, 4);
+  if (m.space > 0) {
+    piece.footprint(icosphere(m.space), transform([m.length, 0, 0]));
+  }
   const palm = bone === 'malletL' ? 'palmL' : 'palmR';
   // The tilt turns the forward mallet down around the x axis of the player.
   const turn =
@@ -622,6 +632,7 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     spot: t.malletSpotL,
     butt: t.malletButt,
     look: plainMallet(0.025, INSTRUMENT_COLORS.drumHead),
+    space: 0.025,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
   const instrument = piece.build('instrument', hold('floor'));
@@ -715,6 +726,7 @@ export function buildBassDrum(): InstrumentModel {
     spot: BASS_DRUM.malletSpot,
     butt: BASS_DRUM.malletButt,
     look: plainMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.drumHead),
+    space: BASS_DRUM.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
   const head = toVec3(new Vector3(...center).addScaledVector(axis, depth / 2));
@@ -751,6 +763,7 @@ export function buildSnareDrum(): InstrumentModel {
     spot,
     butt: SNARE_DRUM.malletButt,
     look: plainMallet(SNARE_DRUM.tip, INSTRUMENT_COLORS.stick),
+    space: SNARE_DRUM.tip,
   });
   const instrument = piece.build('instrument', hold('floor'));
   const head: Vec3 = [center[0], top, center[2]];
@@ -911,6 +924,7 @@ export function buildSuspendedCymbal(scale = 1): InstrumentModel {
     spot: c.malletSpot,
     butt: MALLET_BUTT,
     look: plainMallet(c.ball, INSTRUMENT_COLORS.drumShell),
+    space: c.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
   const spot: Vec3 = [center[0], c.height + c.ball, center[2]];
@@ -997,6 +1011,7 @@ export function buildSmallPercussion(): InstrumentModel {
     spot: TRIANGLE.malletSpot,
     butt: TRIANGLE.malletButt,
     look: plainMallet(0, metal, metal, 'metal'),
+    space: 0,
   });
   return {
     id: 'small-percussion',
@@ -1153,6 +1168,7 @@ export function buildXylophone(): InstrumentModel {
     spot: x.malletSpot,
     butt: MALLET_BUTT,
     look: plainMallet(x.head, INSTRUMENT_COLORS.drumShell),
+    space: x.head,
   });
   const instrument = piece.build('instrument', hold('floor'));
   return {
