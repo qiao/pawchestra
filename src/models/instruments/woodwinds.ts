@@ -132,30 +132,6 @@ function keyWork(
 }
 
 /**
- * Adds small key plates along the top of a tube.
- *
- * @param piece The piece.
- * @param from The distance of the first key from the origin.
- * @param to The distance of the last key.
- * @param count The number of keys.
- * @param height The height of the plates above the axis.
- * @param color The color of the keys.
- */
-function keys(
-  piece: PieceBuilder,
-  from: number,
-  to: number,
-  count: number,
-  height: number,
-  color: Rgb,
-): void {
-  for (let i = 0; i < count; i++) {
-    const x = from + ((to - from) * i) / (count - 1);
-    piece.add(box(0.018, 0.004, 0.012), color, transform([x, height, 0]), 'metal');
-  }
-}
-
-/**
  * Calculates the rotation of a tube that hangs from the mouth to the front: the tube points down
  * and the given angle forward from the vertical. The top of the tube faces the player.
  *
@@ -310,51 +286,79 @@ function oboeParts(piece: PieceBuilder): void {
 }
 
 /**
- * Adds the parts of the clarinet: a black tube with the black mouthpiece, silver rings at the
- * joints, silver keys, and a bell, as the clarinet of `mockup.png`. The origin is at the tip of
+ * The clarinet along +x from the tip of the mouthpiece, at the size 1, in meters: the end of the
+ * mouthpiece, the barrel, the joint of the upper and the lower joint, and the start of the bell,
+ * as on a Buffet R13 or a Yamaha YCL-650 at 0.85 of the real length
+ * (`docs/reference/wind-technique.md` 6.2).
+ */
+const CLARINET = { mouthpiece: 0.07, barrel: 0.125, middle: 0.32, bell: 0.5 } as const;
+
+/**
+ * Adds the parts of the clarinet: the black mouthpiece with the cane reed under it and the
+ * silver ligature with its two screws, the barrel, the upper and the lower joint, and the bell,
+ * with silver rings at the joints and at the rim of the bell, the silver key work on the front,
+ * and the thumb rest at the back, as the clarinet of `mockup.png`. The origin is at the tip of
  * the mouthpiece, and the tube runs along +x to the bell.
  *
  * @param piece The piece builder.
  */
 function clarinetParts(piece: PieceBuilder): void {
   const c = WOODWINDS.clarinet;
+  const k = CLARINET;
   const body = INSTRUMENT_COLORS.clarinet;
   const metal = INSTRUMENT_COLORS.silver;
   tube(
     piece,
     [
-      [0.004, 0],
-      [0.011, 0.05],
-      [0.011, 0.07],
+      [0.0035, 0],
+      [0.0085, 0.012],
+      [0.0105, 0.035],
+      [0.0108, k.mouthpiece],
     ],
     body,
     'lacquer',
   );
+  // The reed lies on the side of the player (+y), from the tip of the mouthpiece.
+  piece.bar([0.003, 0.0042, 0], [0.058, 0.0118, 0], 0.011, 0.0015, INSTRUMENT_COLORS.reed);
+  band(piece, 0.04, 0.052, 0.0118);
+  for (const x of [0.042, 0.05]) {
+    piece.rod([x, 0.011, 0.004], [x, 0.016, 0.004], 0.0012, ROD_SEGMENTS, metal, 'metal');
+  }
+  // The barrel, the two joints, and the bell, which turns in at the rim to the dark bore.
   tube(
     piece,
     [
-      [0.012, 0.07],
-      [0.012, c.length - 0.08],
-      [0.018, c.length - 0.04],
-      [0.032, c.length],
+      [0.0118, k.mouthpiece],
+      [0.0132, (k.mouthpiece + k.barrel) / 2],
+      [0.0122, k.barrel],
+      [0.012, k.middle],
+      [0.0124, k.bell],
+      [0.0155, c.length - 0.045],
+      [0.023, c.length - 0.018],
+      [0.033, c.length],
+      [0.026, c.length - 0.003],
+      [0.012, c.length - 0.03],
     ],
     body,
     'lacquer',
   );
-  // Silver rings at the barrel, the middle tenon, and the bell.
-  for (const x of [0.07, 0.13, 0.31, c.length - 0.08, c.length - 0.003]) {
-    const r = x > c.length - 0.01 ? 0.033 : 0.014;
-    tube(
-      piece,
-      [
-        [r, x - 0.006],
-        [r, x + 0.006],
-      ],
-      metal,
-      'metal',
-    );
+  // Silver rings at the ends of the barrel, at the middle tenon, at the bell tenon, and at the
+  // rim of the bell.
+  for (const [from, to, radius] of [
+    [k.mouthpiece, k.mouthpiece + 0.006, 0.0128],
+    [k.barrel - 0.006, k.barrel + 0.002, 0.0132],
+    [k.middle - 0.005, k.middle + 0.005, 0.0132],
+    [k.bell - 0.004, k.bell + 0.004, 0.0134],
+    [c.length - 0.008, c.length - 0.001, 0.0338],
+  ] as const) {
+    band(piece, from, to, radius);
   }
-  keys(piece, 0.16, c.length - 0.12, 8, 0.011, metal);
+  keyWork(piece, [0.17, 0.2, 0.235, 0.35, 0.385, 0.42, 0.465], [-1, 0], 0.012, 0.0058, [
+    [0.14, 0.31],
+    [0.33, 0.49],
+  ]);
+  // The thumb rest at the back of the lower joint.
+  piece.add(box(0.012, 0.006, 0.01), metal, transform([0.345, 0.0135, 0]), 'metal');
 }
 
 /**
