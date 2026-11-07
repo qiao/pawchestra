@@ -7,6 +7,7 @@ import { cylinder, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import type { GripTube, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
+import { hornSpace, tromboneSpace, trumpetSpace, tubaSpace } from './wind-space.ts';
 
 /** The brass instruments of design 4.6. */
 type BrassId = 'horn' | 'trumpet' | 'trombone' | 'tuba';
@@ -253,6 +254,7 @@ function trumpet(scale: number): BrassBuild {
     0.006,
   );
   const bellTarget = bell(piece, [t.length, -0.05, 0], [1, 0, 0], t.bellRadius, 0.13);
+  trumpetSpace(piece, t.length, t.bellRadius);
   const bellMouth = scaled(bellTarget.from);
   return {
     pieces: [
@@ -348,6 +350,8 @@ function trombone(): BrassBuild {
   pipe(slide, [local([0.14, low, 0]), local([0.68, low, 0])], 0.009);
   pipe(slide, [local([0.68, 0, 0]), local([0.7, low / 2, 0]), local([0.68, low, 0])], 0.009);
   pipe(slide, [local([0.3, 0, 0]), local([0.3, low, 0])], 0.005);
+
+  tromboneSpace(main, slide, t.length, t.bellRadius, brace);
 
   const rotation = pointing(
     [0, -Math.sin(15 * MathUtils.DEG2RAD), -Math.cos(15 * MathUtils.DEG2RAD)],
@@ -452,6 +456,7 @@ function horn(): BrassBuild {
     h.bellRadius,
     0.2,
   );
+  hornSpace(piece, h.coilRadius, h.bellRadius);
   return {
     pieces: [piece.build('instrument', hold('mouth', [0, 0, 0], HORN_TURN))],
     // The left palm holds the coil at 0.9 of a half turn and 0.8 of its radius. At 0.8 and 0.6,
@@ -507,6 +512,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
     [at([0.1, 0.5, 0]), at([0.1, 0.65 - back / 4, 0.08 - back / 2]), [0, 0, 0.05]],
     0.012,
   );
+  tubaSpace(piece, at, back, t.height, t.bellRadius);
   const bellTarget: PlayTarget = {
     kind: 'bell',
     bone: 'instrument',

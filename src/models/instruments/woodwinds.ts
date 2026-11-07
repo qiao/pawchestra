@@ -8,6 +8,7 @@ import { box, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import type { GripTube, InstrumentModel } from './types.ts';
+import { bassoonSpace, clarinetSpace, fluteSpace, oboeSpace } from './wind-space.ts';
 
 /** The woodwinds of design 4.6. */
 export type WoodwindId = 'flute' | 'oboe' | 'clarinet' | 'bassoon';
@@ -296,6 +297,17 @@ const WOODWIND_PARTS = {
 } as const satisfies Readonly<Record<WoodwindId, (piece: PieceBuilder) => void>>;
 
 /**
+ * The function that adds the space of each woodwind in the layout (`InstrumentPiece.footprint`):
+ * the simple model of `wind-space.ts`, so that the detail of the model does not move the seats.
+ */
+const WOODWIND_SPACE = {
+  flute: (piece) => fluteSpace(piece, WOODWINDS.flute.length),
+  oboe: (piece) => oboeSpace(piece, WOODWINDS.oboe.length),
+  clarinet: (piece) => clarinetSpace(piece, WOODWINDS.clarinet.length),
+  bassoon: (piece) => bassoonSpace(piece, WOODWINDS.bassoon.length, BASSOON_REED),
+} as const satisfies Readonly<Record<WoodwindId, (piece: PieceBuilder) => void>>;
+
+/**
  * Builds a woodwind (design 4.6). The origin of the piece is the point at the mouth, and the
  * instrument bone hangs on the chest (4.7). A species with short arms plays a smaller woodwind
  * (`SpeciesParams.fluteScale`, `oboeScale`, `clarinetScale`, `bassoonScale`), as a child plays a
@@ -310,6 +322,7 @@ export function buildWoodwind(id: WoodwindId, scale = 1): InstrumentModel {
   const w = WOODWINDS[id];
   const piece = new PieceBuilder(scale);
   WOODWIND_PARTS[id](piece);
+  WOODWIND_SPACE[id](piece);
   const instrument = piece.build('instrument', hold('mouth', [0, 0, 0], woodwindRotation(id)));
   // The palms hold the tube from below, on the side away from the keys. The bassoon tube runs
   // along +y, and the palms hold its wing joint from the side of the player.
