@@ -299,11 +299,33 @@ The app does not follow these facts:
   the far part of the bars. The right head lifts higher (`PercussionHold.pitchR`), so that the two
   heads pass each other at two heights in a run. No source gives the height between strikes.
 
+### The instruments
+
+The models of `percussion.ts` follow these facts of real concert instruments (design 4.6):
+
+- **Timpani.** A Ludwig Grand Symphonic timpano has a copper kettle with a rolled lip, which hangs
+  in the suspension ring, a Balanced Action pedal, and pull rods in its struts [46 (a search
+  summary only)]. The app gives each kettle a black frame of struts and a pedal at the side of the
+  player, as `orchestra-latest.png` shows.
+- **Bass drum.** The Yamaha CB-7000 concert bass drums have a birch shell, birch hoops, and 12
+  lugs [43 (a search summary only)].
+- **Snare drum.** The Ludwig Supraphonic LM402 is 14 by 6.5 inches, with 10 lugs, triple flanged
+  hoops, and a throw-off strainer [47 (a search summary only)].
+- **Cymbals.** Zildjian orchestral pairs come with a pair of leather straps [48 (a search summary
+  only)]. The lathe cuts tonal grooves into a cast cymbal as it spins [49 (a search summary
+  only)].
+- **Xylophone.** The Musser M50 has rosewood bars from F4 to C8 and aluminum resonators [50 (a
+  search summary only)]. A uniform free bar vibrates with its nodes at 0.224 of its length from
+  each end [51 (a search summary only)], and the cord and the rails hold the bars there. A
+  resonator tube that is closed at the bottom resonates at a quarter of the wavelength of the note
+  [52 (a search summary only)]. In air at 343 m/s, this gives 16 cm for C5 and 3 cm for F7
+  (derived).
+
 ## 11. Sources
 
 Sources 1 to 12 opened on 2026-10-19, sources 13 to 33 on 2026-10-20, sources 36 to 42 on
-2026-10-25, and sources 43 to 45 on 2026-10-28, except where a source says "a search summary
-only".
+2026-10-25, sources 43 to 45 on 2026-10-28, and sources 46 to 52 on 2026-11-06, except where a
+source says "a search summary only".
 
 1. "3 Timpani Grips", The Instrumentalist, December 2014.
    https://theinstrumentalist.com/december-2014/3-timpani-grips/
@@ -393,3 +415,18 @@ only".
 45. C. D. Fryar and others, "Anthropometric Reference Data for Children and Adults: United
     States, 2015–2018", Vital and Health Statistics series 3, no. 46, NCHS, 2021, tables 9 and 11.
     https://stacks.cdc.gov/view/cdc/100478
+46. Conn-Selmer, "Ludwig Grand Symphonic Timpani" (a search summary only: the page refused the
+    fetch). https://s.connselmer.com/print/ludwig-grand-symphonic-timpani
+47. Scan, "Ludwig LM402 14x6.5\" Supraphonic Snare Drum" (a search summary only).
+    https://www.scan.co.uk/products/ludwig-lm402-14x65-supraphonic-snare-drum-smooth-17mm-seamless-aluminum-shell-10-imperial-lugs
+48. Drum Supply, "Zildjian 18\" K Constantinople ML Pair W/Pads Straps & Bag" (a search summary
+    only). https://www.drumsupply.com/products/zildjian-18-k-conststantinople-ml-pair-w-pads-straps-bag
+49. Wikipedia, "Cymbal making" (a search summary only).
+    https://en.wikipedia.org/wiki/Cymbal_making
+50. Music Arts, "Musser M50 Xylophone" (a search summary only).
+    https://www.musicarts.com/musser-m-50-xylophone-main0134984
+51. Mechanical Music Digest, "Nodal Points of Xylophone Bars", 2006-11-21, after H. F. Olson,
+    "Music, Physics and Engineering" (a search summary only).
+    https://www.mmdigest.com/Archives/Digests/200611/2006.11.21.10.html
+52. Wikibooks, "Acoustics/Basic Acoustics of the Marimba" (a search summary only).
+    https://en.wikibooks.org/wiki/Acoustics/Basic_Acoustics_of_the_Marimba
