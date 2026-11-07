@@ -731,50 +731,65 @@ function addDrum(
   );
   const at = transform(center, toQuat(turn));
   const end = depth / 2;
-  const [top, rest] = splitByFacing(
-    lathe(
-      [
-        [radius, -end],
-        [radius, end],
-      ],
-      DRUM_SEGMENTS,
-    ),
-    [0, 1, 0],
-    0.99,
-  );
-  const [bottom] = splitByFacing(rest, [0, -1, 0], 0.99);
-  piece.add([...top, ...bottom], INSTRUMENT_COLORS.drumHead, at);
+  // One profile from the middle of the bottom head, over the bottom hoop, up the shell, over the
+  // top hoop, and in over the top head: one closed solid, because the clearance probes read only
+  // closed solids (design 9.3). Each hoop has its underside on the shell, its outer wall, its rim
+  // beyond the head, and its inner lip down to the head.
   const { hoop, lugs } = look;
-  piece.add(
-    band(
+  const out = radius + hoop.width;
+  const inside = radius - 0.003;
+  const rim = end + hoop.rise;
+  const steps: readonly (readonly [readonly ProfilePoint[], Rgb, Finish])[] = [
+    [
+      [
+        [0, -end],
+        [inside, -end],
+      ],
+      INSTRUMENT_COLORS.drumHead,
+      'matte',
+    ],
+    [
+      [
+        [inside, -end],
+        [inside, -rim],
+        [out, -rim],
+        [out, hoop.down - end],
+        [radius, hoop.down - end],
+      ],
+      hoop.color,
+      hoop.finish,
+    ],
+    [
       [
         [radius, hoop.down - end],
         [radius, end - hoop.down],
       ],
-      DRUM_SEGMENTS,
-    ),
-    look.shell,
-    at,
-    look.shellFinish,
-  );
-  // Each hoop: its underside on the shell, its outer wall, its top above the head, and its inner
-  // face down onto the edge of the head.
-  const out = radius + hoop.width;
-  const ring = band(
-    [
-      [radius, end - hoop.down],
-      [out, end - hoop.down],
-      [out, end + hoop.rise],
-      [radius - 0.003, end + hoop.rise],
-      [radius - 0.003, end],
+      look.shell,
+      look.shellFinish,
     ],
-    DRUM_SEGMENTS,
-  );
-  const flip = transform(
-    [0, 0, 0],
-    toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), Math.PI)),
-  );
-  piece.add([...ring, ...placeCorners(ring, flip)], hoop.color, at, hoop.finish);
+    [
+      [
+        [radius, end - hoop.down],
+        [out, end - hoop.down],
+        [out, rim],
+        [inside, rim],
+        [inside, end],
+      ],
+      hoop.color,
+      hoop.finish,
+    ],
+    [
+      [
+        [inside, end],
+        [0, end],
+      ],
+      INSTRUMENT_COLORS.drumHead,
+      'matte',
+    ],
+  ];
+  for (const [profile, color, finish] of steps) {
+    piece.add(band(profile, DRUM_SEGMENTS), color, at, finish);
+  }
   const [lugWidth, lugLength, lugDepth] = lugs.size;
   const rodLength = depth - 2 * hoop.down;
   const parts: number[] = [];
@@ -843,55 +858,54 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
   const top = y - hoop.drop;
   const chrome = top - hoop.chrome;
   const under = chrome - hoop.band;
-  const [skin] = splitByFacing(
-    lathe(
-      [
-        [head, y - 0.01],
-        [head, y],
-      ],
-      KETTLE_SEGMENTS,
-    ),
-    [0, 1, 0],
-    0.999,
-  );
-  piece.add(skin, colors.drumHead, at);
-  // A deep round bowl, as a parabola from the bottom up to the rolled lip under the hoop.
-  const bowl: readonly ProfilePoint[] = [
-    [0, y - 1.05 * r],
-    [0.4 * head, y - 1 * r],
-    [0.68 * head, y - 0.89 * r],
-    [0.87 * head, y - 0.7 * r],
-    [0.97 * head, y - 0.45 * r],
-    [head, y - 0.2 * r],
-    [head, under],
-  ];
-  piece.add(band(bowl, KETTLE_SEGMENTS), colors.kettle, at, 'metal');
+  // One profile from the bottom of the bowl up to the rolled lip, over the hoop, and in over the
+  // head: one closed solid, because the clearance probes read only closed solids (design 9.3).
+  // The bowl is a deep round parabola.
   const out = head + hoop.width;
-  piece.add(
-    band(
+  const steps: readonly (readonly [readonly ProfilePoint[], Rgb, Finish])[] = [
+    [
+      [
+        [0, y - 1.05 * r],
+        [0.4 * head, y - 1 * r],
+        [0.68 * head, y - 0.89 * r],
+        [0.87 * head, y - 0.7 * r],
+        [0.97 * head, y - 0.45 * r],
+        [head, y - 0.2 * r],
+        [head, under],
+      ],
+      colors.kettle,
+      'metal',
+    ],
+    [
       [
         [head, under],
         [out, under],
         [out, chrome],
       ],
-      KETTLE_SEGMENTS,
-    ),
-    colors.timpaniBlack,
-    at,
-    'lacquer',
-  );
-  piece.add(
-    band(
+      colors.timpaniBlack,
+      'lacquer',
+    ],
+    [
       [
         [out, chrome],
         [head, top],
+        [head, y],
       ],
-      KETTLE_SEGMENTS,
-    ),
-    colors.silver,
-    at,
-    'metal',
-  );
+      colors.silver,
+      'metal',
+    ],
+    [
+      [
+        [head, y],
+        [0, y],
+      ],
+      colors.drumHead,
+      'matte',
+    ],
+  ];
+  for (const [profile, color, finish] of steps) {
+    piece.add(band(profile, KETTLE_SEGMENTS), color, at, finish);
+  }
   // The tension rods run from the counter hoop down outside the bowl to the base ring. Each rod
   // stands at the middle of a face of the bowl, where the bowl is nearest to the axis.
   const low = y - base.below * r;
@@ -1451,7 +1465,12 @@ const CYMBAL_RINGS: readonly (readonly [readonly ProfilePoint[], Rgb])[] = (() =
   const rim = 0.2 / Math.cos(Math.PI / CYMBAL_SEGMENTS);
   const bronze = INSTRUMENT_COLORS.brass;
   const groove = INSTRUMENT_COLORS.cymbalGroove;
+  // The bow ends exactly at the foot of the bell, so that the rings make one closed solid for the
+  // clearance probes (design 9.3).
   const bow: ProfilePoint[] = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+    if (i === 6) {
+      return [0.065, -0.033];
+    }
     const r = rim - 0.004 - (i / 6) * (rim - 0.004 - 0.065);
     // A straight line from the bell to the rim, with a slight dome of up to 0.7 mm.
     const share = (r - 0.065) / (rim - 0.065);
