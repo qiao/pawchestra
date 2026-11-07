@@ -548,29 +548,6 @@ const ALONG_X = toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), -
 const SHAFT = 0.0055;
 
 /**
- * Gives the look of a plain mallet: a shaft of 4 faces with an icosphere at its end.
- *
- * @param head The radius of the ball, or 0 for no ball.
- * @param headColor The color of the ball.
- * @param shaftColor The color of the shaft.
- * @param finish The finish of the shaft.
- * @returns The look.
- */
-function plainMallet(
-  head: number,
-  headColor: Rgb,
-  shaftColor: Rgb = INSTRUMENT_COLORS.stick,
-  finish: Finish = 'matte',
-): MalletLook {
-  return (piece, length, butt) => {
-    piece.rod([-butt, 0, 0], [length, 0, 0], SHAFT, 4, shaftColor, finish);
-    if (head > 0) {
-      piece.add(icosphere(head), headColor, transform([length, 0, 0]));
-    }
-  };
-}
-
-/**
  * Gives the look of a mallet with a round head: a shaft of 6 faces and a ball, such as the felt
  * mallet of the timpani or the yarn mallet of the suspended cymbal.
  *
@@ -2034,36 +2011,179 @@ export function xylophoneBarPosition(key: number): Vec3 {
 }
 
 /**
- * Builds the xylophone on its frame, and two mallets (design 4.6). It stands in front of the
- * player, with the lowest bar at the left.
- *
- * @returns The model.
+ * The resonator tubes and the frame of the xylophone, in meters (design 4.6), as a concert
+ * xylophone with rosewood bars (Musser M50): an aluminum tube under each bar, and a dark frame on
+ * casters.
  */
-export function buildXylophone(): InstrumentModel {
+const XYLOPHONE_FRAME = {
+  /** The radius of each resonator tube, within the width of its bar. */
+  tube: 0.011,
+  /** The gap from the bottom of a bar down to the open top of its tube. */
+  gap: 0.012,
+  /** The speed of sound in the air at 20 °C, in meters per second, for the tube lengths. */
+  sound: 343,
+  /**
+   * The share of the length of a bar from each end to the node line, where the rail holds the
+   * bar: a free bar vibrates with its nodes at 0.224 of its length from each end.
+   */
+  node: 0.224,
+  /** The height and the width of each rail under a node line. */
+  rail: [0.03, 0.02],
+  /** The height of each caster. */
+  caster: 0.035,
+} as const;
+
+/**
+ * Adds the resonator tube under a bar of the xylophone: an aluminum tube with no end faces. The
+ * bar hides its open top, and only a camera on the floor sees its bottom. Its length is a quarter
+ * of the wavelength of the note of the bar, as a tube with a closed end resonates at that length.
+ *
+ * @param piece The piece.
+ * @param key The MIDI key of the bar.
+ * @param top The middle of the top of the bar.
+ */
+function addResonator(piece: PieceBuilder, key: number, top: Vec3): void {
+  const f = XYLOPHONE_FRAME;
+  const pitch = 440 * 2 ** ((key - 69) / 12);
+  const length = f.sound / (4 * pitch);
+  const mouth = top[1] - 0.02 - f.gap;
+  piece.add(
+    band(
+      [
+        [f.tube, mouth - length],
+        [f.tube, mouth],
+      ],
+      6,
+    ),
+    INSTRUMENT_COLORS.silver,
+    transform([top[0], 0, top[2]]),
+    'metal',
+  );
+}
+
+/**
+ * Adds a beam from one point to another: a box with its length along the segment and its height
+ * up.
+ *
+ * @param piece The piece.
+ * @param from The middle of the first end.
+ * @param to The middle of the second end.
+ * @param size The height and the width of the beam.
+ * @param color The color.
+ * @param finish The finish.
+ */
+function beam(
+  piece: PieceBuilder,
+  from: Vec3,
+  to: Vec3,
+  size: readonly [height: number, width: number],
+  color: Rgb,
+  finish: Finish,
+): void {
+  const a = new Vector3(...from);
+  const b = new Vector3(...to);
+  piece.add(
+    box(a.distanceTo(b), size[0], size[1]),
+    color,
+    transform(toVec3(a.clone().add(b).multiplyScalar(0.5)), pointing(toVec3(b.sub(a)), [0, 1, 0])),
+    finish,
+  );
+}
+
+/**
+ * Adds the frame of the xylophone: a rail under each node line of each row, an end frame at each
+ * end with two legs, a foot, and two casters, and a low stretcher between the end frames.
+ *
+ * @param piece The piece.
+ */
+function addXylophoneFrame(piece: PieceBuilder): void {
   const x = XYLOPHONE;
-  const piece = new PieceBuilder();
-  // A bar has no bottom face, which nobody sees.
+  const f = XYLOPHONE_FRAME;
+  const color = INSTRUMENT_COLORS.xylophoneFrame;
+  const half = (NATURALS * x.pitch) / 2 + 0.03;
+  const [railHeight, railWidth] = f.rail;
+  // Each node line is straight, because the bar lengths fall linearly from the lowest bar.
+  const nodeLines: readonly (readonly [near: number, share: number, top: number])[] = [
+    [0, f.node, x.barHeight - 0.02],
+    [0, 1 - f.node, x.barHeight - 0.02],
+    [1, f.node, x.barHeight],
+    [1, 1 - f.node, x.barHeight],
+  ];
+  const nodeZ = (row: number, share: number, length: number): number =>
+    -(x.front + row * (length + x.rowGap) + share * length);
+  const ends: number[] = [];
+  for (const [row, share, top] of nodeLines) {
+    const y = top - railHeight / 2;
+    const left = nodeZ(row, share, x.longest);
+    const right = nodeZ(row, share, x.shortest);
+    beam(piece, [-half, y, left], [half, y, right], f.rail, color, 'varnish');
+    ends.push(left, right);
+  }
+  const low = f.caster;
+  for (const side of [-1, 1]) {
+    const zs = ends.filter((_, i) => i % 2 === (side < 0 ? 0 : 1));
+    const near = Math.max(...zs);
+    const far = Math.min(...zs);
+    const topY = x.barHeight - 0.02 - railHeight;
+    const sx = side * (half + railWidth / 2);
+    beam(piece, [sx, topY, near + 0.02], [sx, topY, far - 0.02], [0.03, 0.024], color, 'varnish');
+    for (const z of [near, far]) {
+      strut(
+        piece,
+        [sx, topY, z],
+        [sx, low + 0.02, z],
+        [0.026, 0.02],
+        [side, 0, 0],
+        color,
+        'varnish',
+      );
+      piece.add(
+        openBox(0.03, low, 0.03, ['+x', '-x', '+y', '+z', '-z']),
+        INSTRUMENT_COLORS.hardware,
+        transform([sx, low / 2, z]),
+      );
+    }
+    beam(
+      piece,
+      [sx, low + 0.02, near + 0.02],
+      [sx, low + 0.02, far - 0.02],
+      [0.03, 0.03],
+      color,
+      'varnish',
+    );
+  }
+  const middle = -(x.front + x.longest);
+  beam(piece, [-half, 0.12, middle], [half, 0.12, middle], [0.025, 0.02], color, 'varnish');
+}
+
+/**
+ * Adds the layout form of the xylophone to a footprint: each bar as a box, two straight rails,
+ * and four legs.
+ *
+ * @param sink The footprint ({@link PieceBuilder.space}).
+ */
+function xylophoneSpace(sink: PartSink): void {
+  const x = XYLOPHONE;
   const bar = (length: number): number[] => {
     const corners = box(x.pitch - 0.005, 0.02, length);
     return [...corners.slice(0, 54), ...corners.slice(72)];
   };
   for (let k = x.keys[0]; k <= x.keys[1]; k++) {
     const [top, length] = barTop(k);
-    piece.add(
+    sink.add(
       bar(length),
       INSTRUMENT_COLORS.xylophoneBars,
       transform([top[0], top[1] - 0.01, top[2]]),
     );
   }
-  // The frame: two rails under the rows, on four legs.
   const half = (NATURALS * x.pitch) / 2 + 0.03;
   const frame = INSTRUMENT_COLORS.xylophoneFrame;
   for (const z of [-(x.front + 0.05), -(x.front + 2 * x.longest)]) {
-    piece.bar([-half, x.barHeight - 0.04, z], [half, x.barHeight - 0.04, z], 0.04, 0.03, frame);
+    sink.bar([-half, x.barHeight - 0.04, z], [half, x.barHeight - 0.04, z], 0.04, 0.03, frame);
   }
   for (const side of [-1, 1]) {
     for (const z of [-(x.front + 0.05), -(x.front + 2 * x.longest)]) {
-      piece.rod(
+      sink.rod(
         [side * (half - 0.02), 0, z],
         [side * (half - 0.02), x.barHeight - 0.04, z],
         0.015,
@@ -2072,13 +2192,39 @@ export function buildXylophone(): InstrumentModel {
       );
     }
   }
+}
+
+/**
+ * Builds the xylophone on its frame, and two mallets (design 4.6). It stands in front of the
+ * player, with the lowest bar at the left.
+ *
+ * @returns The model.
+ */
+export function buildXylophone(): InstrumentModel {
+  const x = XYLOPHONE;
+  const piece = new PieceBuilder();
+  // A bar has no bottom face, which the resonators hide.
+  const bar = (length: number): number[] =>
+    openBox(x.pitch - 0.005, 0.02, length, ['+x', '-x', '+y', '+z', '-z']);
+  for (let k = x.keys[0]; k <= x.keys[1]; k++) {
+    const [top, length] = barTop(k);
+    piece.add(
+      bar(length),
+      INSTRUMENT_COLORS.rosewood,
+      transform([top[0], top[1] - 0.01, top[2]]),
+      'varnish',
+    );
+    addResonator(piece, k, top);
+  }
+  addXylophoneFrame(piece);
+  xylophoneSpace(piece.space());
   const tilt = x.malletTilt;
   const [left, right] = malletPair({
     length: x.mallet,
     tilt,
     spot: x.malletSpot,
     butt: MALLET_BUTT,
-    look: plainMallet(x.head, INSTRUMENT_COLORS.drumShell),
+    look: roundMallet(x.head, INSTRUMENT_COLORS.malletRubber),
     space: x.head,
   });
   const instrument = piece.build('instrument', hold('floor'));
