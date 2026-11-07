@@ -79,8 +79,21 @@ export function hold(
   return { anchor, offsetH, offset, rotation };
 }
 
+/**
+ * The methods that add the parts of a piece: a {@link PieceBuilder}, or its footprint
+ * ({@link PieceBuilder.space}).
+ */
+export interface PartSink {
+  /** Adds one part ({@link PieceBuilder.add}). */
+  add(corners: readonly number[], color: Rgb, at?: Transform, finish?: Finish): void;
+  /** Adds a closed cylinder from one point to another ({@link PieceBuilder.rod}). */
+  rod(from: Vec3, to: Vec3, radius: number, segments: number, color: Rgb, finish?: Finish): void;
+  /** Adds a box from one point to another ({@link PieceBuilder.bar}). */
+  bar(from: Vec3, to: Vec3, width: number, depth: number, color: Rgb, finish?: Finish): void;
+}
+
 /** Collects the parts of one piece in the axes of the piece. */
-export class PieceBuilder {
+export class PieceBuilder implements PartSink {
   readonly #parts: InstrumentPart[] = [];
   /** The corners that the footprint counts in place of the parts ({@link InstrumentPiece.footprint}). */
   readonly #footprint: number[] = [];
@@ -138,6 +151,30 @@ export class PieceBuilder {
       cylinder(radius, radius, axis.length(), segments),
       transform(from, turnYTo(axis)),
     );
+  }
+
+  /**
+   * Gives the footprint of the piece as a sink of parts: each part that goes into it counts only
+   * for the layout ({@link footprint}), with the corners that the piece gives the same part. A
+   * detailed piece adds its simple form here, so that its detail does not move the seats.
+   */
+  space(): PartSink {
+    return {
+      add: (...args: Parameters<PartSink['add']>) => {
+        const [corners, , at = transform()] = args;
+        this.footprint(corners, at);
+      },
+      rod: (from, to, radius, segments) => {
+        this.footprintRod(from, to, radius, segments);
+      },
+      bar: (from, to, width, depth) => {
+        const axis = new Vector3(...to).sub(new Vector3(...from));
+        this.footprint(
+          box(width, axis.length(), depth),
+          transform(toVec3(new Vector3(...from).addScaledVector(axis, 0.5)), turnYTo(axis)),
+        );
+      },
+    };
   }
 
   /**
