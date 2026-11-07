@@ -586,6 +586,26 @@ function roundMallet(head: number, headColor: Rgb, segments = 6): MalletLook {
   };
 }
 
+/**
+ * The look of a snare drum stick: a hickory stick with a round butt, a long taper toward the tip,
+ * a thin neck, and an oval bead (design 4.6). The bead has the radius of `SNARE_DRUM.tip`, and its
+ * middle is at the length of the stick.
+ */
+const SNARE_STICK: MalletLook = (piece, length, butt) => {
+  const tip = SNARE_DRUM.tip;
+  const profile: readonly ProfilePoint[] = [
+    [0, -butt],
+    [SHAFT, 0.004 - butt],
+    [SHAFT, length - 0.1],
+    [0.45 * SHAFT, length - 0.013],
+    [0.8 * tip, length - 0.006],
+    [tip, length],
+    [0.7 * tip, length + 0.6 * tip],
+    [0, length + tip],
+  ];
+  piece.add(lathe(profile, 6), INSTRUMENT_COLORS.stick, transform([0, 0, 0], ALONG_X), 'varnish');
+};
+
 /** The place and the look of one mallet, stick, or beater in a paw. */
 interface MalletHold {
   /** The length from the grip to the middle of the head. */
@@ -782,7 +802,7 @@ function addDrum(
  * @param radius The radius of the heads.
  * @param depth The depth of the shell.
  */
-function drum(piece: PartSink, center: Vec3, axis: Vec3, radius: number, depth: number): void {
+function drumSpace(piece: PartSink, center: Vec3, axis: Vec3, radius: number, depth: number): void {
   const corners = lathe(
     [
       [radius, -depth / 2],
@@ -1205,7 +1225,7 @@ export function buildBassDrum(): InstrumentModel {
   addBassDrumStand(piece, axis, across);
   // The layout form: the shell, two posts, and a cross bar.
   const space = piece.space();
-  drum(space, center, normal, radius, depth);
+  drumSpace(space, center, normal, radius, depth);
   // The stand: a frame under the drum, from the floor to the shell. Its legs and its cross bar
   // scale with the heads.
   for (const side of [-1, 1]) {
@@ -1251,6 +1271,103 @@ export function buildBassDrum(): InstrumentModel {
 }
 
 /**
+ * The look of the snare drum (design 4.6), as a concert snare drum of 14 by 6.5 inches (Ludwig
+ * Supraphonic LM402): a shell with triple flanged chrome hoops and 10 chrome lugs. The shell has
+ * the lacquer of the bass drum, as a matched concert set.
+ */
+const SNARE_DRUM_LOOK: DrumLook = {
+  shell: INSTRUMENT_COLORS.drumShell,
+  shellFinish: 'varnish',
+  hoop: {
+    width: 0.008,
+    down: 0.018,
+    rise: 0.005,
+    color: INSTRUMENT_COLORS.silver,
+    finish: 'metal',
+  },
+  lugs: { count: 10, size: [0.016, 0.05, 0.012] },
+};
+
+/**
+ * Adds the snares of the snare drum: the strainer on the side of the shell, at the right of the
+ * player, and the band of snare wires across the bottom head.
+ *
+ * @param piece The piece.
+ * @param center The middle of the drum.
+ */
+function addSnares(piece: PieceBuilder, center: Vec3): void {
+  const { radius, depth } = SNARE_DRUM;
+  const metal = INSTRUMENT_COLORS.silver;
+  piece.add(
+    openBox(0.012, 0.045, 0.026, ['+x', '+y', '-y', '+z', '-z']),
+    metal,
+    transform([center[0] + radius + 0.006, center[1], center[2]]),
+    'metal',
+  );
+  piece.add(
+    openBox(2 * radius - 0.02, 0.003, 0.07, ['-y', '+z', '-z']),
+    metal,
+    transform([center[0], center[1] - depth / 2 - 0.0015, center[2]]),
+    'metal',
+  );
+}
+
+/**
+ * Adds a stand on the floor: a chrome post with a black clamp, on three black legs with braces
+ * from the low end of the post and rubber feet, as the stand of a snare drum or a suspended cymbal.
+ *
+ * @param piece The piece.
+ * @param base The point on the floor under the post.
+ * @param top The top of the post.
+ * @param spread The distance of the feet from the post.
+ */
+function addStand(piece: PieceBuilder, base: Vec3, top: Vec3, spread: number): void {
+  const black = INSTRUMENT_COLORS.timpaniBlack;
+  const at = (height: number): Vector3 => new Vector3(base[0], height, base[2]);
+  piece.rod(toVec3(at(0.05)), top, 0.009, 6, INSTRUMENT_COLORS.silver, 'metal');
+  const clamp = Math.min(top[1] - 0.06, 0.32);
+  piece.add(box(0.03, 0.04, 0.03), black, transform(toVec3(at(clamp))));
+  const hub = 0.16;
+  piece.add(box(0.032, 0.03, 0.032), black, transform(toVec3(at(hub))));
+  const foot = 0.012;
+  for (let i = 0; i < 3; i++) {
+    const a = (i * 120 + 60) * MathUtils.DEG2RAD;
+    const out = new Vector3(Math.sin(a), 0, Math.cos(a));
+    const end = at(foot).addScaledVector(out, spread);
+    strut(piece, toVec3(at(hub)), toVec3(end), [0.014, 0.01], [0, 1, 0], black, 'lacquer');
+    const middle = at(hub).lerp(end, 0.55);
+    strut(piece, toVec3(at(0.06)), toVec3(middle), [0.008, 0.006], [0, 1, 0], black, 'lacquer');
+    piece.add(
+      openBox(0.03, 2 * foot, 0.022, ['+x', '-x', '+y', '+z', '-z']),
+      INSTRUMENT_COLORS.hardware,
+      transform([end.x, foot, end.z], pointing(toVec3(out), [0, 1, 0])),
+    );
+  }
+}
+
+/**
+ * Adds the basket of a snare drum stand: three chrome arms from the top of the post out to the
+ * bottom hoop, each with a rubber tip that holds the hoop.
+ *
+ * @param piece The piece.
+ * @param hub The top of the post.
+ * @param hoop The height of the lower edge of the bottom hoop.
+ */
+function addBasket(piece: PieceBuilder, hub: Vec3, hoop: number): void {
+  const reach = SNARE_DRUM.radius + 0.004;
+  for (let i = 0; i < 3; i++) {
+    const a = (i * 120 + 60) * MathUtils.DEG2RAD;
+    const tip: Vec3 = [hub[0] + reach * Math.sin(a), hoop - 0.008, hub[2] + reach * Math.cos(a)];
+    strut(piece, hub, tip, [0.01, 0.008], [0, 1, 0], INSTRUMENT_COLORS.silver, 'metal');
+    piece.add(
+      openBox(0.018, 0.026, 0.018, ['+x', '-x', '+y', '+z', '-z']),
+      INSTRUMENT_COLORS.hardware,
+      transform([tip[0], hoop - 0.002, tip[2]]),
+    );
+  }
+}
+
+/**
  * Builds the snare drum on its stand, and two sticks (design 4.6). The drum stands in front of
  * the player at the height of the hips, with its heads up and down.
  *
@@ -1260,8 +1377,15 @@ export function buildSnareDrum(): InstrumentModel {
   const piece = new PieceBuilder();
   const { radius, depth, top } = SNARE_DRUM;
   const center: Vec3 = [0, top - depth / 2, -SNARE_DRUM.forward];
-  drum(piece, center, [0, 1, 0], radius, depth);
-  tripod(piece, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
+  addDrum(piece, center, [0, 1, 0], radius, depth, SNARE_DRUM_LOOK);
+  addSnares(piece, center);
+  const hub: Vec3 = [center[0], top - depth - 0.05, center[2]];
+  addStand(piece, [center[0], 0, center[2]], hub, 0.24);
+  addBasket(piece, hub, top - depth - SNARE_DRUM_LOOK.hoop.down);
+  // The layout form: the shell on a tripod.
+  const space = piece.space();
+  drumSpace(space, center, [0, 1, 0], radius, depth);
+  tripod(space, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
   const tilt = SNARE_DRUM.malletTilt;
   const spot = SNARE_DRUM.malletSpot;
   const [left, right] = malletPair({
@@ -1269,7 +1393,7 @@ export function buildSnareDrum(): InstrumentModel {
     tilt,
     spot,
     butt: SNARE_DRUM.malletButt,
-    look: plainMallet(SNARE_DRUM.tip, INSTRUMENT_COLORS.stick),
+    look: SNARE_STICK,
     space: SNARE_DRUM.tip,
   });
   const instrument = piece.build('instrument', hold('floor'));
