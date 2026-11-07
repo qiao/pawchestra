@@ -421,57 +421,94 @@ interface HandTool {
 }
 
 /**
- * Builds a mallet: a stick along +x from the grip at the origin, with a ball at the end. In the
- * bind pose, it lies in the hanging hand and points forward.
+ * The look of a mallet, a stick, or a beater: the parts along +x from the grip at the origin, in
+ * the axes of the piece.
+ */
+type MalletLook = (piece: PieceBuilder, length: number, butt: number) => void;
+
+/** The radius of the shaft of a mallet, in meters. */
+const SHAFT = 0.0055;
+
+/**
+ * Gives the look of a plain mallet: a shaft of 4 faces with an icosphere at its end.
+ *
+ * @param head The radius of the ball, or 0 for no ball.
+ * @param headColor The color of the ball.
+ * @param shaftColor The color of the shaft.
+ * @param finish The finish of the shaft.
+ * @returns The look.
+ */
+function plainMallet(
+  head: number,
+  headColor: Rgb,
+  shaftColor: Rgb = INSTRUMENT_COLORS.stick,
+  finish: Finish = 'matte',
+): MalletLook {
+  return (piece, length, butt) => {
+    piece.rod([-butt, 0, 0], [length, 0, 0], SHAFT, 4, shaftColor, finish);
+    if (head > 0) {
+      piece.add(icosphere(head), headColor, transform([length, 0, 0]));
+    }
+  };
+}
+
+/** The place and the look of one mallet, stick, or beater in a paw. */
+interface MalletHold {
+  /** The length from the grip to the middle of the head. */
+  readonly length: number;
+  /** The angle of the mallet below the level in the bind pose, in radians. */
+  readonly tilt: number;
+  /** The grip in the closed paw ({@link MalletSpot}). */
+  readonly spot: MalletSpot;
+  /** The length of the shaft behind the grip ({@link MALLET_BUTT}). */
+  readonly butt: number;
+  /** The parts of the mallet. */
+  readonly look: MalletLook;
+}
+
+/**
+ * Builds a mallet: a stick along +x from the grip at the origin, with its head at the length. In
+ * the bind pose, it lies in the hanging hand and points forward.
  *
  * @param bone The bone of the mallet.
- * @param length The length from the grip to the middle of the ball.
- * @param ball The radius of the ball.
- * @param ballColor The color of the ball.
- * @param stickColor The color of the stick.
- * @param finish The finish of the stick.
- * @param tilt The angle of the mallet below the level in the bind pose, in radians.
- * @param spot The grip in the closed paw ({@link MalletSpot}).
- * @param butt The length of the shaft behind the grip ({@link MALLET_BUTT}).
- * @returns The piece and the target at the ball.
+ * @param m The place and the look of the mallet.
+ * @returns The piece and the target at the middle of the head.
  */
-function mallet(
-  bone: 'malletL' | 'malletR',
-  length: number,
-  ball: number,
-  ballColor: Rgb,
-  stickColor: Rgb = INSTRUMENT_COLORS.stick,
-  finish: Finish = 'matte',
-  tilt: number,
-  spot: MalletSpot,
-  butt: number = MALLET_BUTT,
-): HandTool {
+function mallet(bone: 'malletL' | 'malletR', m: MalletHold): HandTool {
   const piece = new PieceBuilder();
-  piece.rod([-butt, 0, 0], [length, 0, 0], 0.0055, 4, stickColor, finish);
-  if (ball > 0) {
-    piece.add(icosphere(ball), ballColor, transform([length, 0, 0]));
-  }
+  m.look(piece, m.length, m.butt);
   const palm = bone === 'malletL' ? 'palmL' : 'palmR';
   // The tilt turns the forward mallet down around the x axis of the player.
   const turn =
-    tilt === 0
+    m.tilt === 0
       ? FORWARD
       : toQuat(
           new Quaternion()
-            .setFromAxisAngle(new Vector3(1, 0, 0), -tilt)
+            .setFromAxisAngle(new Vector3(1, 0, 0), -m.tilt)
             .multiply(new Quaternion(...FORWARD)),
         );
   return {
-    piece: piece.build(bone, hold(palm, spotOffset(spot, bone), turn)),
+    piece: piece.build(bone, hold(palm, spotOffset(m.spot, bone), turn)),
     target: {
       kind: 'mallet-head',
       bone,
-      from: [length, 0, 0],
-      to: [length, 0, 0],
+      from: [m.length, 0, 0],
+      to: [m.length, 0, 0],
       normal: [0, -1, 0],
       keys: null,
     },
   };
+}
+
+/**
+ * Builds a pair of mallets, one in each paw.
+ *
+ * @param m The place and the look of each mallet.
+ * @param right The place of the right mallet, when it differs.
+ * @returns The left and the right mallet.
+ */
+function malletPair(m: MalletHold, right: MalletHold = m): readonly [HandTool, HandTool] {
+  return [mallet('malletL', m), mallet('malletR', right)];
 }
 
 /**
@@ -579,28 +616,14 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     });
   }
   const tilt = t.malletTilt;
-  const left = mallet(
-    'malletL',
-    0.3,
-    0.025,
-    INSTRUMENT_COLORS.drumHead,
-    undefined,
-    undefined,
+  const timpaniMallet: MalletHold = {
+    length: 0.3,
     tilt,
-    t.malletSpotL,
-    t.malletButt,
-  );
-  const right = mallet(
-    'malletR',
-    0.3,
-    0.025,
-    INSTRUMENT_COLORS.drumHead,
-    undefined,
-    undefined,
-    tilt,
-    t.malletSpotR,
-    t.malletButt,
-  );
+    spot: t.malletSpotL,
+    butt: t.malletButt,
+    look: plainMallet(0.025, INSTRUMENT_COLORS.drumHead),
+  };
+  const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
   const instrument = piece.build('instrument', hold('floor'));
   return {
     id: 'timpani',
@@ -686,17 +709,13 @@ export function buildBassDrum(): InstrumentModel {
     0.03,
     INSTRUMENT_COLORS.hardware,
   );
-  const beater = mallet(
-    'malletR',
-    BASS_DRUM.mallet,
-    BASS_DRUM.ball,
-    INSTRUMENT_COLORS.drumHead,
-    undefined,
-    undefined,
-    BASS_DRUM.malletTilt,
-    BASS_DRUM.malletSpot,
-    BASS_DRUM.malletButt,
-  );
+  const beater = mallet('malletR', {
+    length: BASS_DRUM.mallet,
+    tilt: BASS_DRUM.malletTilt,
+    spot: BASS_DRUM.malletSpot,
+    butt: BASS_DRUM.malletButt,
+    look: plainMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.drumHead),
+  });
   const instrument = piece.build('instrument', hold('floor'));
   const head = toVec3(new Vector3(...center).addScaledVector(axis, depth / 2));
   return {
@@ -726,28 +745,13 @@ export function buildSnareDrum(): InstrumentModel {
   tripod(piece, [center[0], 0, center[2]], [center[0], top - depth, center[2]], 0.24);
   const tilt = SNARE_DRUM.malletTilt;
   const spot = SNARE_DRUM.malletSpot;
-  const left = mallet(
-    'malletL',
-    SNARE_DRUM.stick,
-    SNARE_DRUM.tip,
-    INSTRUMENT_COLORS.stick,
-    undefined,
-    undefined,
+  const [left, right] = malletPair({
+    length: SNARE_DRUM.stick,
     tilt,
     spot,
-    SNARE_DRUM.malletButt,
-  );
-  const right = mallet(
-    'malletR',
-    SNARE_DRUM.stick,
-    SNARE_DRUM.tip,
-    INSTRUMENT_COLORS.stick,
-    undefined,
-    undefined,
-    tilt,
-    spot,
-    SNARE_DRUM.malletButt,
-  );
+    butt: SNARE_DRUM.malletButt,
+    look: plainMallet(SNARE_DRUM.tip, INSTRUMENT_COLORS.stick),
+  });
   const instrument = piece.build('instrument', hold('floor'));
   const head: Vec3 = [center[0], top, center[2]];
   return {
@@ -901,19 +905,13 @@ export function buildSuspendedCymbal(scale = 1): InstrumentModel {
   piece.add(lathe(profile, 12), INSTRUMENT_COLORS.brass, transform(center), 'metal');
   const under = center[1] + CYMBAL_INNER * scale;
   tripod(piece, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
-  const yarn = (bone: 'malletL' | 'malletR'): HandTool =>
-    mallet(
-      bone,
-      0.3,
-      c.ball,
-      INSTRUMENT_COLORS.drumShell,
-      undefined,
-      undefined,
-      c.malletTilt,
-      c.malletSpot,
-    );
-  const left = yarn('malletL');
-  const right = yarn('malletR');
+  const [left, right] = malletPair({
+    length: 0.3,
+    tilt: c.malletTilt,
+    spot: c.malletSpot,
+    butt: MALLET_BUTT,
+    look: plainMallet(c.ball, INSTRUMENT_COLORS.drumShell),
+  });
   const instrument = piece.build('instrument', hold('floor'));
   const spot: Vec3 = [center[0], c.height + c.ball, center[2]];
   return {
@@ -993,17 +991,13 @@ export function buildSmallPercussion(): InstrumentModel {
     triangle.rod(clipEnd, onSide, 0.0018, 4, INSTRUMENT_COLORS.bowHair);
   }
   const barMiddle: Vec3 = [side / 4, -0.05 - (side * Math.sin(60 * MathUtils.DEG2RAD)) / 2, 0];
-  const beater = mallet(
-    'malletR',
-    0.15,
-    0,
-    metal,
-    metal,
-    'metal',
-    TRIANGLE.malletTilt,
-    TRIANGLE.malletSpot,
-    TRIANGLE.malletButt,
-  );
+  const beater = mallet('malletR', {
+    length: 0.15,
+    tilt: TRIANGLE.malletTilt,
+    spot: TRIANGLE.malletSpot,
+    butt: TRIANGLE.malletButt,
+    look: plainMallet(0, metal, metal, 'metal'),
+  });
   return {
     id: 'small-percussion',
     parent: 'root',
@@ -1153,26 +1147,13 @@ export function buildXylophone(): InstrumentModel {
     }
   }
   const tilt = x.malletTilt;
-  const left = mallet(
-    'malletL',
-    x.mallet,
-    x.head,
-    INSTRUMENT_COLORS.drumShell,
-    undefined,
-    undefined,
+  const [left, right] = malletPair({
+    length: x.mallet,
     tilt,
-    x.malletSpot,
-  );
-  const right = mallet(
-    'malletR',
-    x.mallet,
-    x.head,
-    INSTRUMENT_COLORS.drumShell,
-    undefined,
-    undefined,
-    tilt,
-    x.malletSpot,
-  );
+    spot: x.malletSpot,
+    butt: MALLET_BUTT,
+    look: plainMallet(x.head, INSTRUMENT_COLORS.drumShell),
+  });
   const instrument = piece.build('instrument', hold('floor'));
   return {
     id: 'xylophone',
