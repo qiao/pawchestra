@@ -119,5 +119,20 @@ export const INSTRUMENT_COLORS = {
   stick: srgb('#cdb27a'),
   xylophoneBars: srgb('#b07a45'),
   xylophoneFrame: srgb('#3a2a22'),
+  // Percussion
+  /** The black of the struts, the counter hoops, and the base rings of the timpani. */
+  timpaniBlack: srgb('#191614'),
+  /** The wood hoops of the bass drum: a darker lacquer than the shell. */
+  drumHoop: srgb('#3e1714'),
+  /** The lathe grooves of a cymbal: a darker bronze between the polished rings. */
+  cymbalGroove: srgb('#a07834'),
+  /** The leather straps of the hand cymbals. */
+  leather: srgb('#4b2e1c'),
+  /** The felt of the timpani mallets and the bass drum beater. */
+  felt: srgb('#ece4d2'),
+  /** The yarn of the mallets of the suspended cymbal. */
+  yarn: srgb('#7a2a36'),
+  /** The hard rubber heads of the xylophone mallets. */
+  malletRubber: srgb('#2c3346'),
   baton: srgb('#ece6d6'),
 } as const satisfies Readonly<Record<string, Rgb>>;
