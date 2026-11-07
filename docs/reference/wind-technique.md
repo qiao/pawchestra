@@ -735,3 +735,55 @@ Each source opened on 2026-10-18, except where its entry gives another date.
     https://www.hornmatters.com/?p=12440
 80. J. Boldin, "Why More Upper Lip in the Mouthpiece" (opened 2026-11-06).
     https://jamesboldin.com/2010/07/30/why-more-upper-lip-in-the-mouthpiece/
+81. Wikipedia, "Trumpet" (opened 2026-11-06). https://en.wikipedia.org/wiki/Trumpet
+82. Wikipedia, "Trombone" (opened 2026-11-06). https://en.wikipedia.org/wiki/Trombone
+83. Wikipedia, "French horn" (opened 2026-11-06). https://en.wikipedia.org/wiki/French_horn
+84. Wikipedia, "Tuba" (opened 2026-11-06). https://en.wikipedia.org/wiki/Tuba
+85. Wikipedia, "Oboe" (opened 2026-11-06). https://en.wikipedia.org/wiki/Oboe
+86. Wikipedia, "Clarinet" (opened 2026-11-06). https://en.wikipedia.org/wiki/Clarinet
+87. Wikipedia, "Bassoon" (opened 2026-11-06). https://en.wikipedia.org/wiki/Bassoon
+88. Wikimedia Commons, photographs of a Yamaha YTR-8335LA trumpet, a Yamaha YHR-667V horn, a
+    Yamaha YSL-891Z trombone, a Yamaha YFB-822 tuba, a Fox bassoon, and a Patricola PT1 oboe, the
+    images of the articles 81 to 87 (opened 2026-11-06).
+    https://commons.wikimedia.org/wiki/File:Yamaha_Trumpet_YTR-8335LA_crop.jpg
+
+## 6. The parts of the instruments
+
+The models of `src/models/instruments/woodwinds.ts` and `brass.ts` follow these parts (design
+4.6, "Winds").
+
+### 6.1 Brass
+
+- **Trumpet.** Three piston valves [81]. The left thumb works the first valve slide and the left
+  ring finger the third valve slide [81]. On a photograph of a Yamaha YTR-8335, the lead pipe
+  runs from the mouthpiece past the valves to the main tuning slide in front of them, the bell bow
+  is behind the valves, and the bell pipe runs above the lead pipe to the bell [88]. The
+  mouthpiece is silver, and the finger buttons have light tops [88].
+- **Trombone.** The slide section has a lead pipe, inner and outer slide tubes, and stays [82].
+  Stockings at the ends of the slide tubes decrease the friction [82]. The neckpipe and the bell
+  bow join the slide to the bell section, with a short tuning slide in that bend [82]. The parts
+  include a bumper on the slide, a water key, and a counterweight [82]. A tenor trombone bell is 18
+  to 23 cm wide [82].
+- **Horn.** A double horn joins a horn in F and a horn in B♭, with a fourth valve that the thumb
+  works [83]. Most horns have rotary valves with levers for the left hand [83]. The tubing wraps
+  into a coil with a large flared bell [83].
+- **Tuba.** Professional tubas have four or five valves, piston or rotary [84]. Top-action
+  pistons stand up, with the buttons on the top [84].
+
+### 6.2 Woodwinds
+
+- **Flute.** Three parts: the head joint, the body, and the foot joint [77]. The lip plate on the
+  head joint touches the lower lip, the player blows over the embouchure hole, and the crown caps
+  the end of the head joint [77]. Plateau keys close the holes [77]. Professional flutes are
+  sterling silver [77].
+- **Oboe.** About 65 cm long, with metal keys, a conical bore, and a flared bell, most often of
+  grenadilla [85]. The double reed is two blades of cane tied on a metal staple [85].
+- **Clarinet.** A mouthpiece of hard rubber, a cane reed that the ligature fastens, a barrel, an
+  upper joint for the left hand, a lower joint for the right hand, and a flared bell [86]. Most
+  wooden clarinets are grenadilla, and the Boehm system has 17 keys and 6 rings [86]. The right
+  thumb holds the thumb rest behind the lower joint [86].
+- **Bassoon.** Six pieces: the reed, the bocal (a bent metal tube from the wing joint to the
+  reed), the wing joint, the boot, which folds over on itself, the long joint, and the bell [87].
+  It is about 1.34 m tall, of maple, with the Heckel or the Buffet system [87]. On a photograph
+  of a Fox bassoon, the wood is a dark red brown with silver rings, and the boot has a silver cap
+  [88].
