@@ -274,8 +274,9 @@ export class StageCamera {
    * open drawer of a wide window, and above the sheet of a phone. The canvas fills the window,
    * and the camera also renders the area under the bar and the drawer. The frame glides to a new
    * place in about 200 ms, at once with reduced motion and at the first call. While the play
-   * button of the first screen shows, the frame shrinks until the stage is clear of it (design
-   * 2.2, 2.8). After the first play, it grows back to the default view in about 0.4 s.
+   * button of the first screen shows in Free mode, the frame shrinks until the stage is clear of
+   * it (design 2.2, 2.8). After the first play, it grows back to the default view in about 0.4 s.
+   * Cinematic mode does not shrink the frame, so its film starts with no zoom.
    *
    * In Cinematic mode, the frame is the letterbox of the aspect `CINEMA_ASPECT` (design 2.5). The
    * parts of the page over the canvas do not move it. While the bars move, the frame moves from the
@@ -304,8 +305,11 @@ export class StageCamera {
           ? stageOnCanvas(stage, this.#imageBox(base))
           : boxOnCanvas(stage, this.#width, this.#height, base);
       const clear = clearFirstScreen(onCanvas, ring);
-      factor = clear.factor;
-      this.#clear = clear;
+      // Cinematic mode keeps the full letterbox frame: the play button shows over the film for a
+      // moment, and the film starts at full size, with no zoom at the first play. While the bars
+      // move, the shrink follows the share of Free mode.
+      factor = 1 + (clear.factor - 1) * (1 - cinema);
+      this.#clear = { ...clear, factor };
     }
     this.#clear = {
       ...this.#clear,

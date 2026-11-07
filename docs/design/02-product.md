@@ -157,7 +157,9 @@ page starts in Free mode (`app/camera-mode.ts`).
   values (`blendShare()`). Thus a cut of the shots or a seek during the blend does not jump, and a
   change during a blend starts a new blend from the frame on the screen. The blend runs on the wall
   time, so it also runs during a pause.
-- On the first screen, the frame shrinks until the stage is clear of the play button (2.8). The
+- On the first screen in Free mode, the frame shrinks until the stage is clear of the play button
+  (2.8). Cinematic mode keeps the full letterbox frame, and the button shows over the film for a
+  moment, because a shrink that grows back at the first play reads as a zoom of the film. The
   frame uses the view of the stage at the default distance in the current direction, so a drag
   changes it and a zoom does not. Thus a wheel or a pinch zooms the camera there as during play,
   and a zoom in can move the stage under the play button.
@@ -292,8 +294,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   in the groups of the mockup. From 700 px to 899 px, the groups do not fit, so the controls stand
   closer. The volume slider shrinks to half its width before a control leaves the bar.
 - **First screen**: a round play button below the front edge of the stage, so that it does not
-  cover the orchestra. The camera frame shrinks until the stage is clear of it
-  (`clearFirstScreen()`). A ring shows the load progress of the bytes, and the load text counts
+  cover the orchestra. In Free mode, the camera frame shrinks until the stage is clear of it
+  (`clearFirstScreen()`); Cinematic mode keeps its full frame (2.5). A ring shows the load progress of the bytes, and the load text counts
   the files (`loadText()`). Until the first play, an intro line names the app, and "Select
   music" opens the demo list. While the drawer shows the demo list, the button has nothing to
   open, so it hides (`visibility: hidden`, so that the first screen keeps its size). A wide window
