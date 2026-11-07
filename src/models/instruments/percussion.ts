@@ -365,11 +365,11 @@ export function kettleHeadRadius(index: number): number {
  */
 const KETTLE = {
   /**
-   * The counter hoop: the drop of its top below the head, its width out from the head, the height
-   * of its chrome top band, and the height of its black band under it. The top stays below the
+   * The counter hoop: its width out from the head, the height of its chrome top band, and the
+   * height of its black band under it. The chrome band slopes down and out from the edge of the
    * head, so that a mallet at a strike near the rim does not touch it.
    */
-  hoop: { drop: 0.001, width: 0.016, chrome: 0.014, band: 0.034 },
+  hoop: { width: 0.016, chrome: 0.014, band: 0.034 },
   /** The number of tension rods around a kettle. */
   rods: 8,
   /** The width of a tension rod around the bowl, and its depth out from the bowl. */
@@ -874,8 +874,7 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
   // The head of the bowl of 16 faces has the real radius, and the bowl keeps the box of the
   // first bowl of 8 faces (KETTLE_FIT).
   const head = KETTLE_FIT * r;
-  const top = y - hoop.drop;
-  const chrome = top - hoop.chrome;
+  const chrome = y - hoop.chrome;
   const under = chrome - hoop.band;
   // One profile from the bottom of the bowl up to the rolled lip, over the hoop, and in over the
   // head: one closed solid, because the clearance probes read only closed solids (design 9.3).
@@ -907,7 +906,6 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
     [
       [
         [out, chrome],
-        [head, top],
         [head, y],
       ],
       colors.silver,
@@ -958,10 +956,10 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
   }
   const [ringHeight, ringWidth] = base.section;
   const inner = base.radius * head;
+  // The base ring shows its outer wall and its top. Only a camera on the floor sees its bottom.
   piece.add(
     band(
       [
-        [inner, low - ringHeight / 2],
         [inner + ringWidth, low - ringHeight / 2],
         [inner + ringWidth, low + ringHeight / 2],
         [inner, low + ringHeight / 2],
