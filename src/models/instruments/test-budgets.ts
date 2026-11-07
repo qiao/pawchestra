@@ -17,7 +17,7 @@ export const INSTRUMENT_BUDGETS = {
   clarinet: 800,
   bassoon: 800,
   horn: 800,
-  trumpet: 800,
+  trumpet: 1000,
   trombone: 800,
   tuba: 800,
   timpani: 2400,

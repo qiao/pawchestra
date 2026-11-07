@@ -1,13 +1,14 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { IDENTITY, toQuat, toVec3 } from '../tuples.ts';
-import { transform } from '../mesh.ts';
 import type { Vec3 } from '../tuples.ts';
+import { transform } from '../mesh.ts';
 import { cylinder, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
-import type { GripTube, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
+import { arc, rounded, tubeAlong, turned } from './tubing.ts';
 import { hornSpace, tromboneSpace, trumpetSpace, tubaSpace } from './wind-space.ts';
+import type { GripTube, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
 
 /** The brass instruments of design 4.6. */
 type BrassId = 'horn' | 'trumpet' | 'trombone' | 'tuba';
@@ -25,13 +26,23 @@ export const BRASS = {
   tuba: { height: 0.95, bellRadius: 0.21 },
 } as const;
 
+/** The lacquered brass of the tubes and the bells. */
 const METAL = INSTRUMENT_COLORS.brass;
 
-/** The faces around the axis of a tube. */
+/**
+ * The nickel silver of the trim: the mouthpieces, the ferrules, the valve caps, and the slide
+ * tubes, as on a real instrument.
+ */
+const TRIM = INSTRUMENT_COLORS.silver;
+
+/** The faces around the axis of a tube. A face angle of 60° shades as a round tube. */
 const TUBE_SEGMENTS = 6;
 
-/** The faces around the axis of a bell. */
-const BELL_SEGMENTS = 12;
+/** The faces around the axis of a thin rod, such as a brace or a lever. */
+const ROD_SEGMENTS = 4;
+
+/** The faces around the axis of a bell of the trumpet or the trombone. */
+const SMALL_BELL_SEGMENTS = 12;
 
 /**
  * Gives the inside of an open bell: the profile from the rim back into the throat, which a lathe
@@ -42,6 +53,139 @@ const BELL_SEGMENTS = 12;
  * @returns The profile points after the rim.
  */
 function openBell(radius: number, depth: number): ProfilePoint[] {
+  return [
+    [radius * 0.85, depth - radius * 0.1],
+    [0, depth - radius * 0.8],
+  ];
+}
+
+/**
+ * Adds a mouthpiece of nickel silver: the rim at the origin, the cup, and the shank, which goes
+ * into the receiver of the lead pipe along `along`.
+ *
+ * @param piece The piece.
+ * @param along The direction from the mouthpiece into the instrument.
+ * @param rim The outer radius of the rim.
+ * @param length The length from the rim to the end of the shank.
+ */
+function mouthpiece(piece: PieceBuilder, along: Vec3, rim: number, length: number): void {
+  turned(
+    piece,
+    [0, 0, 0],
+    along,
+    [
+      [0, rim * 0.6],
+      [rim * 0.75, 0],
+      [rim, rim * 0.25],
+      [rim * 0.5, rim * 1.6],
+      [rim * 0.4, length * 0.6],
+      [rim * 0.5, length],
+    ],
+    TUBE_SEGMENTS,
+    TRIM,
+  );
+}
+
+/**
+ * Adds a bell that opens along an axis: a flare that widens more and more toward the rim, as the
+ * bell of a real brass instrument, with the lit inside of the flare. The last tenth of the flare
+ * keeps the width of the simple model, because a narrower flare there put the right forearm of
+ * the pig 0.2 cm deeper into the rim of the horn.
+ *
+ * @param piece The piece.
+ * @param mouth The middle of the opening of the bell.
+ * @param axis The direction in which the bell opens.
+ * @param radius The radius of the opening.
+ * @param depth The length of the flare.
+ * @param throat The radius at the start of the flare.
+ * @param segments The number of faces around the axis.
+ * @returns The target at the middle of the opening.
+ */
+function bell(
+  piece: PieceBuilder,
+  mouth: Vec3,
+  axis: Vec3,
+  radius: number,
+  depth: number,
+  throat: number,
+  segments: number,
+): PlayTarget {
+  const n = new Vector3(...axis).normalize();
+  const normal = toVec3(n);
+  const spread = radius - throat;
+  turned(
+    piece,
+    toVec3(new Vector3(...mouth).addScaledVector(n, -depth)),
+    normal,
+    [
+      [throat, 0],
+      [throat + spread * 0.15, depth * 0.5],
+      [throat + spread * 0.35, depth * 0.75],
+      [throat + spread * 0.66, depth * 0.9],
+      [radius, depth],
+      // The rim turns back into the bell, so that the opening shows the lit inside of the
+      // flare, as the bells of the polished images.
+      ...openBell(radius, depth),
+    ],
+    segments,
+    METAL,
+  );
+  return { kind: 'bell', bone: 'instrument', from: mouth, to: mouth, normal, keys: null };
+}
+
+/**
+ * Adds a piston valve that stands along y: the casing with its caps, the stem, and the finger
+ * button with a pearl top, as on a trumpet or a tuba.
+ *
+ * @param piece The piece.
+ * @param at The middle of the top of the casing.
+ * @param radius The radius of the casing.
+ * @param height The height of the casing.
+ * @param stem The height of the button above the casing.
+ */
+function piston(piece: PieceBuilder, at: Vec3, radius: number, height: number, stem: number): void {
+  const [x, y, z] = at;
+  turned(
+    piece,
+    [x, y - height, z],
+    [0, 1, 0],
+    [
+      [radius * 0.6, -radius * 0.5],
+      [radius, 0],
+      [radius * 1.05, height],
+      [radius * 0.3, height],
+    ],
+    TUBE_SEGMENTS,
+    METAL,
+  );
+  piece.rod([x, y, z], [x, y + stem * 0.6, z], radius * 0.22, ROD_SEGMENTS, TRIM, 'metal');
+  turned(
+    piece,
+    [x, y + stem * 0.6, z],
+    [0, 1, 0],
+    [
+      [radius * 0.7, 0],
+      [radius * 0.7, stem * 0.32],
+      [0, stem * 0.4],
+    ],
+    TUBE_SEGMENTS,
+    INSTRUMENT_COLORS.pearl,
+    'lacquer',
+  );
+}
+
+/** The faces around the axis of a bell of the simple brass models. */
+const PLAIN_BELL_SEGMENTS = 12;
+
+/**
+ * Gives the inside of an open bell: the profile from the rim back into the throat, which a lathe
+ * adds after the outside of the bell. Its faces point into the bell.
+ *
+ * @param radius The radius of the opening.
+ * @param depth The height of the rim in the profile.
+ * @returns The profile points after the rim.
+ */
+function plainOpenBell(radius: number, depth: number): ProfilePoint[] {
   return [
     [radius * 0.9, depth - radius * 0.06],
     [radius * 0.45, depth - radius * 0.6],
@@ -58,7 +202,7 @@ function openBell(radius: number, depth: number): ProfilePoint[] {
  * @param profile The radius at each distance along the axis.
  * @param segments The number of faces around the axis.
  */
-function turned(
+function plainTurned(
   piece: PieceBuilder,
   from: Vec3,
   axis: Vec3,
@@ -99,8 +243,8 @@ function pipe(piece: PieceBuilder, points: readonly Vec3[], radius: number): voi
  * @param along The direction from the mouthpiece into the instrument.
  * @param radius The radius of the cup.
  */
-function mouthpiece(piece: PieceBuilder, along: Vec3, radius: number): void {
-  turned(
+function plainMouthpiece(piece: PieceBuilder, along: Vec3, radius: number): void {
+  plainTurned(
     piece,
     [0, 0, 0],
     along,
@@ -111,43 +255,6 @@ function mouthpiece(piece: PieceBuilder, along: Vec3, radius: number): void {
     ],
     TUBE_SEGMENTS,
   );
-}
-
-/**
- * Adds a bell that opens along an axis.
- *
- * @param piece The piece.
- * @param mouth The middle of the opening of the bell.
- * @param axis The direction in which the bell opens.
- * @param radius The radius of the opening.
- * @param depth The length of the flare.
- * @returns The target at the middle of the opening.
- */
-function bell(
-  piece: PieceBuilder,
-  mouth: Vec3,
-  axis: Vec3,
-  radius: number,
-  depth: number,
-): PlayTarget {
-  const n = new Vector3(...axis).normalize();
-  const normal = toVec3(n);
-  turned(
-    piece,
-    toVec3(new Vector3(...mouth).addScaledVector(n, -depth)),
-    normal,
-    [
-      [radius * 0.18, 0],
-      [radius * 0.35, depth * 0.6],
-      [radius * 0.7, depth * 0.9],
-      [radius, depth],
-      // The rim turns back into the bell, so that the opening shows the lit inside of the
-      // flare, as the bells of the polished images.
-      ...openBell(radius, depth),
-    ],
-    BELL_SEGMENTS,
-  );
-  return { kind: 'bell', bone: 'instrument', from: mouth, to: mouth, normal, keys: null };
 }
 
 /**
@@ -185,6 +292,43 @@ function valves(
   }
 }
 
+/**
+ * Adds a bell that opens along an axis.
+ *
+ * @param piece The piece.
+ * @param mouth The middle of the opening of the bell.
+ * @param axis The direction in which the bell opens.
+ * @param radius The radius of the opening.
+ * @param depth The length of the flare.
+ * @returns The target at the middle of the opening.
+ */
+function plainBell(
+  piece: PieceBuilder,
+  mouth: Vec3,
+  axis: Vec3,
+  radius: number,
+  depth: number,
+): PlayTarget {
+  const n = new Vector3(...axis).normalize();
+  const normal = toVec3(n);
+  plainTurned(
+    piece,
+    toVec3(new Vector3(...mouth).addScaledVector(n, -depth)),
+    normal,
+    [
+      [radius * 0.18, 0],
+      [radius * 0.35, depth * 0.6],
+      [radius * 0.7, depth * 0.9],
+      [radius, depth],
+      // The rim turns back into the bell, so that the opening shows the lit inside of the
+      // flare, as the bells of the polished images.
+      ...plainOpenBell(radius, depth),
+    ],
+    PLAIN_BELL_SEGMENTS,
+  );
+  return { kind: 'bell', bone: 'instrument', from: mouth, to: mouth, normal, keys: null };
+}
+
 /** The parts and the play data of one brass instrument. */
 interface BrassBuild {
   readonly pieces: readonly InstrumentPiece[];
@@ -204,11 +348,38 @@ interface BrassBuild {
 const VALVES_TO_RIGHT_PALM = 0.045;
 
 /**
+ * The trumpet at the size 1, in meters, from the mouthpiece along +x (design 4.6), as a Bach
+ * Stradivarius or a Yamaha YTR-8335 (`docs/reference/wind-technique.md` 6.1). The valves stand
+ * at `valves` along x, and their tops are at `valveTop`. The lead pipe passes the valves at
+ * their left (`leadSide`), and the bell pipe at their right (`bellSide`), at the height of the
+ * valve tops (`bellHeight`). The main tuning slide turns down at `slideEnd` in front of the
+ * valves, and the bell bow turns at `bowEnd` behind them. `low` is the height of the lower tubes.
+ */
+const TRUMPET = {
+  valves: [0.15, 0.176, 0.202],
+  valveRadius: 0.009,
+  valveTop: 0.0125,
+  valveBottom: -0.0625,
+  leadSide: -0.0155,
+  bellSide: 0.0145,
+  bellHeight: 0.013,
+  bellStart: 0.26,
+  slideEnd: 0.32,
+  bowEnd: 0.035,
+  low: -0.047,
+} as const;
+
+/**
  * Builds the trumpet. The mouthpiece is at the origin, and the trumpet runs along +x to the bell.
  * The valves stand up (+y), and the player holds it horizontal and forward. A species with short
  * arms plays a smaller trumpet (`SpeciesParams.trumpetScale`), as a child plays a fractional
  * violin. The trumpet, its grips, and its bell target shrink toward the mouthpiece, so the
  * mouthpiece stays at the mouth.
+ *
+ * The parts follow a real trumpet ({@link TRUMPET}): the lead pipe from the mouthpiece to the
+ * main tuning slide in front of the valves, the return into the third valve, the bell bow
+ * behind the valves, and the bell pipe over the lead pipe to the bell. The first valve slide has
+ * a saddle for the left thumb, and the third valve slide a ring for the left ring finger.
  *
  * The left palm holds the valve casings from the left, below the middle of their height, and its
  * fingers close around the upright casings, as the left hand of a real player wraps the casings
@@ -222,38 +393,122 @@ const VALVES_TO_RIGHT_PALM = 0.045;
  */
 function trumpet(scale: number): BrassBuild {
   const t = BRASS.trumpet;
+  const v = TRUMPET;
   const piece = new PieceBuilder(scale);
   const scaled = (at: Vec3): Vec3 => [at[0] * scale, at[1] * scale, at[2] * scale];
-  mouthpiece(piece, [1, 0, 0], 0.009);
-  // The lead pipe, the valve block, the lower loop, and the bell.
-  pipe(
+  const [first, middle, third] = v.valves;
+  mouthpiece(piece, [1, 0, 0], 0.0095, 0.07);
+  // The lead pipe, the main tuning slide in front of the valves, and the return into the third
+  // valve, as one bent tube.
+  tubeAlong(
     piece,
-    [
-      [0.035, 0, 0],
-      [0.2, 0, 0],
-    ],
-    0.006,
+    rounded(
+      [
+        [0.06, 0, 0],
+        [0.1, 0, 0],
+        [0.135, 0, v.leadSide],
+        [v.slideEnd, 0, v.leadSide],
+        [v.slideEnd, v.low, v.leadSide / 2],
+        [third, v.low, 0],
+      ],
+      0.02,
+      2,
+    ),
+    [0.0045, 0.0048, 0.005, 0.0052, 0.0054, 0.0055, 0.0055, 0.0056],
+    TUBE_SEGMENTS,
+    METAL,
   );
-  valves(piece, [0.15, -0.025, 0], [0.026, 0, 0], 3, 0.009, 0.075);
-  pipe(
+  // The bell section: from the first valve back to the bell bow, up, and forward over the lead
+  // pipe to the bell.
+  tubeAlong(
     piece,
-    [
-      [0.12, -0.05, 0],
-      [0.06, -0.05, 0],
-      [0.06, -0.025, 0],
-      [0.12, -0.025, 0],
-    ],
-    0.005,
+    rounded(
+      [
+        [first, v.low, 0],
+        [first - 0.03, v.low, v.bellSide],
+        [v.bowEnd, v.low, v.bellSide],
+        [v.bowEnd, v.bellHeight, v.bellSide],
+        [third + 0.02, v.bellHeight, v.bellSide],
+        [v.bellStart, v.bellHeight, 0],
+      ],
+      0.028,
+      2,
+    ),
+    [0.0052],
+    TUBE_SEGMENTS,
+    METAL,
   );
-  pipe(
+  const bellTarget = bell(
     piece,
-    [
-      [0.2, -0.05, 0],
-      [t.length - 0.13, -0.05, 0],
-    ],
-    0.006,
+    [t.length, v.bellHeight, 0],
+    [1, 0, 0],
+    t.bellRadius,
+    t.length - v.bellStart,
+    0.0056,
+    SMALL_BELL_SEGMENTS,
   );
-  const bellTarget = bell(piece, [t.length, -0.05, 0], [1, 0, 0], t.bellRadius, 0.13);
+  for (const x of v.valves) {
+    piston(piece, [x, v.valveTop, 0], v.valveRadius, v.valveTop - v.valveBottom, 0.016);
+  }
+  // The first valve slide goes back with the saddle of the left thumb on its bend, and the third
+  // valve slide goes forward with the ring of the left ring finger.
+  const slide = -0.028;
+  tubeAlong(
+    piece,
+    rounded(
+      [
+        [first, slide, -0.004],
+        [first - 0.045, slide, -0.004],
+        [first - 0.045, slide - 0.012, -0.004],
+        [first, slide - 0.012, -0.004],
+      ],
+      0.006,
+      1,
+    ),
+    [0.0042],
+    TUBE_SEGMENTS,
+    METAL,
+  );
+  piece.bar(
+    [first - 0.042, slide - 0.018, -0.004],
+    [first - 0.042, slide - 0.03, -0.004],
+    0.004,
+    0.003,
+    TRIM,
+    'metal',
+  );
+  tubeAlong(
+    piece,
+    rounded(
+      [
+        [third, slide, -0.004],
+        [third + 0.055, slide, -0.004],
+        [third + 0.055, slide - 0.012, -0.004],
+        [third, slide - 0.012, -0.004],
+      ],
+      0.006,
+      1,
+    ),
+    [0.0042],
+    TUBE_SEGMENTS,
+    METAL,
+  );
+  tubeAlong(
+    piece,
+    arc([third + 0.04, slide + 0.004, -0.012], [1, 0, 0], [0, 1, 0], 0.006, 0, 2 * Math.PI, 5),
+    [0.0012],
+    ROD_SEGMENTS,
+    TRIM,
+  );
+  // A brace from the lead pipe to the bell pipe in front of the valves.
+  piece.rod(
+    [0.235, 0, v.leadSide],
+    [0.235, v.bellHeight, v.bellSide / 2],
+    0.0018,
+    ROD_SEGMENTS,
+    METAL,
+    'metal',
+  );
   trumpetSpace(piece, t.length, t.bellRadius);
   const bellMouth = scaled(bellTarget.from);
   return {
@@ -263,21 +518,21 @@ function trumpet(scale: number): BrassBuild {
         hold('mouth', [0, 0, 0], pointing([0, -Math.sin(5 * MathUtils.DEG2RAD), -1], [0, 1, 0])),
       ),
     ],
-    palmL: scaled([0.176, -0.07, -0.038]),
-    palmR: scaled([0.176, 0.045, VALVES_TO_RIGHT_PALM]),
+    palmL: scaled([middle, -0.07, -0.038]),
+    palmR: scaled([middle, 0.045, VALVES_TO_RIGHT_PALM]),
     tubes: {
       // The left fingers close around the upright middle casing.
       tubeL: {
         bone: 'instrument',
-        from: scaled([0.176, -0.0625, 0]),
-        to: scaled([0.176, 0.0125, 0]),
+        from: scaled([middle, v.valveBottom, 0]),
+        to: scaled([middle, v.valveTop, 0]),
       },
       // The right palm faces down onto the line of the valve tops under it, so the line lies to
       // the right of the valves by the same distance as the palm.
       tubeR: {
         bone: 'instrument',
-        from: scaled([0.15, 0.0125, VALVES_TO_RIGHT_PALM]),
-        to: scaled([0.202, 0.0125, VALVES_TO_RIGHT_PALM]),
+        from: scaled([first, v.valveTop, VALVES_TO_RIGHT_PALM]),
+        to: scaled([third, v.valveTop, VALVES_TO_RIGHT_PALM]),
       },
     },
     targets: [{ ...bellTarget, from: bellMouth, to: bellMouth }],
@@ -297,7 +552,7 @@ function trumpet(scale: number): BrassBuild {
 function trombone(): BrassBuild {
   const t = BRASS.trombone;
   const main = new PieceBuilder();
-  mouthpiece(main, [1, 0, 0], 0.01);
+  plainMouthpiece(main, [1, 0, 0], 0.01);
   const low = -0.07;
   const side = -0.11;
   // The inner slide tubes, and the brace near the mouthpiece that the left hand holds.
@@ -340,7 +595,7 @@ function trombone(): BrassBuild {
     ],
     0.007,
   );
-  const bellTarget = bell(main, [0.7, low / 2, side], [1, 0, 0], t.bellRadius, 0.16);
+  const bellTarget = plainBell(main, [0.7, low / 2, side], [1, 0, 0], t.bellRadius, 0.16);
 
   // The outer slide: two tubes over the inner tubes, the bow at the end, and the brace.
   const brace: Vec3 = [0.3, low / 2, 0];
@@ -416,7 +671,7 @@ function horn(): BrassBuild {
   const h = BRASS.horn;
   const piece = new PieceBuilder();
   const into = new Vector3(0.25, -0.35, -1).normalize();
-  mouthpiece(piece, toVec3(into), 0.009);
+  plainMouthpiece(piece, toVec3(into), 0.009);
   // The coil leans back 20° from the vertical, with its middle low, 0.08 m at the right of the
   // mouth, and 0.1 m in front of it. With the coil 0.24 m in front of the mouth, the left palm on
   // the valves is 1.16 times the reach of the arm.
@@ -449,7 +704,7 @@ function horn(): BrassBuild {
   // The bell leaves the coil at its bottom right, and opens to the right and to the back.
   const bellAxis = new Vector3(0.75, -0.25, 0.6).normalize();
   const bellStart = ring(-Math.PI * 0.35, h.coilRadius);
-  const bellTarget = bell(
+  const bellTarget = plainBell(
     piece,
     toVec3(new Vector3(...bellStart).addScaledVector(bellAxis, 0.2)),
     toVec3(bellAxis),
@@ -482,13 +737,13 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const [back, left] = lead;
   const t = BRASS.tuba;
   const piece = new PieceBuilder();
-  mouthpiece(piece, [0, 0, -1], 0.012);
+  plainMouthpiece(piece, [0, 0, -1], 0.012);
   // The axes of the drawing: the bottom bow is at y = 0. The mouthpiece is 0.72 m above it, and
   // 0.2 m behind it with no longer lead pipe.
   const bottom = new Vector3(-0.06 - left, -0.72, back - 0.2);
   const at = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(bottom));
   // The main branch rises from the bottom bow to the bell.
-  turned(
+  plainTurned(
     piece,
     at([-0.06, 0, 0]),
     [0, 1, 0],
@@ -499,9 +754,9 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       [0.11, t.height - 0.25],
       [t.bellRadius * 0.7, t.height - 0.06],
       [t.bellRadius, t.height],
-      ...openBell(t.bellRadius, t.height),
+      ...plainOpenBell(t.bellRadius, t.height),
     ],
-    BELL_SEGMENTS,
+    PLAIN_BELL_SEGMENTS,
   );
   // The second branch with the valves, the bottom bow, and the lead pipe to the mouthpiece.
   pipe(piece, [at([0.1, 0.06, 0]), at([0.1, 0.5, 0])], 0.04);
