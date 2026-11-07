@@ -865,8 +865,9 @@ when no light value can match the lit pixels of the reference.
   A studio body keeps the face colors of its rig (4.4). The UI seat dots read the fur color, and a
   color rule of a rig can move the fur toward it. All eyes are black with a light.
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
-  top and darker edges. The clarinet is black lacquer with silver keys, the flutes are silver, the
-  brass is gold with lit bells, and the timpani are copper. The piano is black lacquer with a dark
+  top and darker edges. The clarinet and the oboe are black lacquer with silver keys, the
+  bassoon is a dark red maple, the flutes are silver, the brass is gold with lit bells and nickel
+  silver trim, and the timpani are copper. The piano is black lacquer with a dark
   well and a dark gold plate in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
   lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are
   copper in a black frame with chrome lugs. The drums are a red lacquered wood with chrome or wood
@@ -888,9 +889,9 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | Finish    | Parts                                                     | Intent                                                                |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
-| `varnish` | The varnished wood of the bowed strings, the harp, the drums, and the xylophone. | A soft gloss.                                                         |
-| `lacquer` | The black lacquer of the piano, the clarinet, and the timpani frame, the eyes. | A sharp gloss.                                                        |
-| `metal`   | Brass, bronze, copper, chrome, and silver.                | Sharp highlights, and a half metal look with the color of the metal.  |
+| `varnish` | The varnished wood of the bowed strings, the harp, the bassoon, the drums, and the xylophone. | A soft gloss.                                                         |
+| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, the eyes. | A sharp gloss.                                                        |
+| `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
@@ -1127,8 +1128,8 @@ interface SpreadLimits {
 ```
 
 The **footprint** of a player is one box for the parts of each bone in each band of height, in
-the bind pose, and the box of its seat. A bowed string and its bow count a simple box model
-(`InstrumentPiece.footprint`), so the detail of the model does not move the seats.
+the bind pose, and the box of its seat. A bowed string, its bow, and each wind count a simple
+model (`InstrumentPiece.footprint`), so the detail of the model does not move the seats.
 
 | Row | Sections, from left to right                                                   |
 | --- | ------------------------------------------------------------------------------ |
@@ -1369,6 +1370,42 @@ These rules hold for the models:
 - **Layout.** Each piece adds its old simple form to its footprint (`PieceBuilder.space()`,
   `MalletHold.space`), as the bowed strings do, so that a change of the detail does not move the
   seats.
+
+**Winds** (`models/instruments/woodwinds.ts`, `brass.ts`). Each wind follows the parts of a real
+orchestral instrument (`docs/reference/wind-technique.md` 6), in the low-poly style of the scene.
+A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded()` of
+`tubing.ts`), so it shows no seam at a bend.
+
+- **Flute.** Silver: the head joint with the crown and the lip plate around the dark embouchure
+  hole, the body joint and the foot joint with a ring at each tenon, and the key cups on the top
+  with their rod at the side of the audience.
+- **Oboe and clarinet.** The polished black wood with silver rings at the joints, and the silver
+  key cups and rods on the front, where the fingers close the holes. The oboe has a double reed of
+  cane bound with thread, and a narrow bell with a rim. The clarinet has a black mouthpiece with
+  the cane reed on the side of the player, a silver ligature with two screws, a barrel, two
+  joints, a thumb rest at the back, and a wide bell that turns in at the rim.
+- **Bassoon.** A dark red stained maple (`bassoonStain`): the boot joint as an oval around both
+  bores with the silver cap of its U-tube, the wing joint, the long joint, and the bell joint, with
+  silver rings, key rods, and cups. The silver bocal bends over and turns into the reed, a blade
+  of cane bound with thread.
+- **Trumpet** (`TRUMPET`). The lead pipe passes the valves at their left to the main tuning slide
+  in front of them. The bell bow behind the valves brings the bell pipe forward at the height of
+  the valve tops, so the bell lies above the lead pipe, as on a real trumpet. Three piston valves
+  with pearl buttons, the saddle of the first valve slide, and the ring of the third valve slide.
+- **Trombone.** The inner slide and its stockings are nickel silver. The outer slide is one bent
+  tube with a ferrule at each open end and a dark bumper on its bow. The bell section has a
+  tuning slide behind the shoulder with a counterweight on its bow.
+- **Horn.** A double horn: the outer hoop widens in one spiral turn into the bell tail. Four
+  rotary valves with silver caps and the levers of the left fingers, the loops of the F side and
+  the B♭ side, and the valve slides.
+- **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, the bottom
+  bow joins it to the valves, four piston valves with pearl buttons, and four valve slides at the
+  right of the valves.
+
+The mouthpieces, the ferrules, the valve caps, and the levers are nickel silver, as on the real
+instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell
+of the horn, and the slide line. The layout reads the space of the simpler model of each wind
+(`wind-space.ts`, `InstrumentPiece.footprint`), so the detail does not move the seats.
 
 ### Instrument data
 
