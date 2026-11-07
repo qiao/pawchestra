@@ -4,7 +4,7 @@ import { toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
 import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
-import { ball, box, cylinder, icosphere, lathe } from '../primitives.ts';
+import { ball, box, cylinder, icosphere, lathe, sweep } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, placeCorners, pointing } from './piece.ts';
 import type { PartSink } from './piece.ts';
@@ -306,6 +306,15 @@ export const TRIANGLE = {
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
   malletButt: 0.07 as number,
+  /** The length of each side of the triangle, from corner to corner. */
+  side: 0.17,
+  /**
+   * The distance from each closed corner to the ends of its round bend, along each side. The bend
+   * stays out of the middle of the right side, which the beater strikes.
+   */
+  bend: 0.012,
+  /** The distance from the open corner to each end of the rod, along its side. */
+  gap: 0.014,
 } as const;
 
 /**
@@ -607,6 +616,16 @@ const SNARE_STICK: MalletLook = (piece, length, butt) => {
     [0, length + tip],
   ];
   piece.add(lathe(profile, 6), INSTRUMENT_COLORS.stick, transform([0, 0, 0], ALONG_X), 'varnish');
+};
+
+/**
+ * The look of the steel beater of the triangle: a rod with a black grip sleeve at the paw, and no
+ * head.
+ */
+const TRIANGLE_BEATER: MalletLook = (piece, length, butt) => {
+  const metal = INSTRUMENT_COLORS.silver;
+  piece.rod([0.03, 0, 0], [length, 0, 0], 0.0035, 6, metal, 'metal');
+  piece.rod([-butt, 0, 0], [0.03, 0, 0], 0.006, 6, INSTRUMENT_COLORS.hardware);
 };
 
 /** The place and the look of one mallet, stick, or beater in a paw. */
@@ -1705,25 +1724,60 @@ export function buildSuspendedCymbal(scale = 1): InstrumentModel {
 }
 
 /**
- * Builds the instruments of the small percussion player (design 4.6): the triangle in the left
- * hand, its metal beater in the right hand, and the tambourine on a stand at the front right of
- * the player. The right hand strikes the tambourine for key 54.
+ * Adds the tambourine with its head up at y = 0.045 m in its own axes: a varnished wood frame of
+ * 0.22 m, a head on its top, and five pairs of jingles in slots of the frame.
  *
- * @returns The model.
+ * @param piece The piece.
+ * @param at The place of the tambourine.
  */
-export function buildSmallPercussion(): InstrumentModel {
+function addTambourine(piece: PieceBuilder, at: Transform): void {
+  const r = 0.11;
+  const top = 0.045;
+  const wall = 0.008;
+  // The head is a thin closed disc, with a face on each side, because the frame is open below it.
+  const head = lathe(
+    [
+      [r - wall, top - 0.001],
+      [r - wall, top],
+    ],
+    DRUM_SEGMENTS,
+  );
+  piece.add(placeCorners(head, at), INSTRUMENT_COLORS.drumHead);
+  const frame = band(
+    [
+      [r, 0],
+      [r, top],
+      [r - wall, top],
+      [r - wall, 0],
+      [r, 0],
+    ],
+    DRUM_SEGMENTS,
+  );
+  piece.add(placeCorners(frame, at), INSTRUMENT_COLORS.stick, transform(), 'varnish');
+  // Each pair of jingles sits in a slot through the frame, flat in the plane of the head, and
+  // shows on both sides of the frame.
+  for (let i = 0; i < 5; i++) {
+    const a = (i * 72 + 36) * MathUtils.DEG2RAD;
+    const jingles = placeCorners(
+      cylinder(0.015, 0.015, 0.01, 6),
+      transform([(r - wall / 2) * Math.sin(a), 0.0175, (r - wall / 2) * Math.cos(a)]),
+    );
+    piece.add(placeCorners(jingles, at), INSTRUMENT_COLORS.silver, transform(), 'metal');
+  }
+}
+
+/**
+ * Adds the layout form of the tambourine to a footprint: a ring of 12 faces with five boxes for
+ * the jingles, on a tripod.
+ *
+ * @param sink The footprint ({@link PieceBuilder.space}).
+ * @param tilt The lean of the tambourine.
+ */
+function tambourineSpace(sink: PartSink, tilt: Quaternion): void {
   const metal = INSTRUMENT_COLORS.silver;
-  // The tambourine leans 30° to the player on its stand.
-  const stand = new PieceBuilder();
   const { mount } = TAMBOURINE;
   const mountAt = new Vector3(...mount);
-  tripod(
-    stand,
-    [mount[0], 0, mount[2]],
-    toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0))),
-    0.2,
-  );
-  const tilt = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 30 * MathUtils.DEG2RAD);
+  tripod(sink, [mount[0], 0, mount[2]], toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0))), 0.2);
   const ring = lathe(
     [
       [0.11, 0],
@@ -1733,46 +1787,143 @@ export function buildSmallPercussion(): InstrumentModel {
   );
   const [head, shell] = splitByFacing(ring, [0, 1, 0], 0.99);
   const ringAt: Transform = transform(mount, toQuat(tilt));
-  stand.add(shell, INSTRUMENT_COLORS.drumShell, ringAt);
-  stand.add(head, INSTRUMENT_COLORS.drumHead, ringAt);
+  sink.add(shell, INSTRUMENT_COLORS.drumShell, ringAt);
+  sink.add(head, INSTRUMENT_COLORS.drumHead, ringAt);
   for (let i = 0; i < 5; i++) {
     const a = (i * 72 + 36) * MathUtils.DEG2RAD;
     const at = new Vector3(0.11 * Math.sin(a), 0.022, 0.11 * Math.cos(a))
       .applyQuaternion(tilt)
       .add(mountAt);
     const turn = tilt.clone().multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), a));
-    stand.add(box(0.03, 0.02, 0.012), metal, transform(toVec3(at), toQuat(turn)), 'metal');
+    sink.add(box(0.03, 0.02, 0.012), metal, transform(toVec3(at), toQuat(turn)), 'metal');
   }
+}
+
+/**
+ * Makes a round tube along a path in the plane x-y, with a ring of corners at each point of the
+ * path, square to the path.
+ *
+ * @param path The points of the path.
+ * @param radius The radius of the tube.
+ * @param sides The corners of each ring.
+ * @returns The corner list, with a cap at each end.
+ */
+function tube(path: readonly Vec3[], radius: number, sides: number): number[] {
+  const z = new Vector3(0, 0, 1);
+  const rings = path.map((p, i) => {
+    const before = new Vector3(...(path[Math.max(i - 1, 0)] ?? p));
+    const after = new Vector3(...(path[Math.min(i + 1, path.length - 1)] ?? p));
+    const along = after.sub(before).normalize();
+    const across = new Vector3().crossVectors(along, z);
+    return Array.from({ length: sides }, (_, k): Vec3 => {
+      const angle = (k / sides) * 2 * Math.PI;
+      return toVec3(
+        new Vector3(...p)
+          .addScaledVector(z, radius * Math.cos(angle))
+          .addScaledVector(across, radius * Math.sin(angle)),
+      );
+    });
+  });
+  return sweep(rings);
+}
+
+/**
+ * Adds the triangle in the axes of its piece (design 4.6): a steel rod bent into a triangle with
+ * round corners and one open corner at the lower left, and the clip with its loop of cord. The
+ * right side, which the beater strikes, keeps its line.
+ *
+ * @param piece The piece of the triangle.
+ */
+function addTriangle(piece: PieceBuilder): void {
+  const metal = INSTRUMENT_COLORS.silver;
+  const { side, bend, gap } = TRIANGLE;
+  const top = new Vector3(0, -0.05, 0);
+  const low = -0.05 - side * Math.sin(60 * MathUtils.DEG2RAD);
+  const right = new Vector3(side / 2, low, 0);
+  const left = new Vector3(-side / 2, low, 0);
+  const toward = (from: Vector3, to: Vector3, d: number): Vec3 =>
+    toVec3(from.clone().add(to.clone().sub(from).setLength(d)));
+  // The path starts at the open end on the bottom side, and goes around the right corner and the
+  // top corner down to the open end on the left side.
+  const path: Vec3[] = [
+    toward(left, right, gap),
+    toward(right, left, bend),
+    toward(right, top, bend),
+    toward(top, right, bend),
+    toward(top, left, bend),
+    toward(left, top, gap),
+  ];
+  piece.add(tube(path, 0.005, 6), metal, transform(), 'metal');
+  // A real player holds the triangle by a clip in the left hand, and the triangle hangs in a loop
+  // of cord through the clip (`docs/reference/percussion-technique.md` 8). The clip lies in the
+  // palm of the closed left paw and leaves its heel, and the loop goes around the top corner.
+  const { clip, clipEnd, loop } = TRIANGLE_CLIP;
+  piece.bar(clip, clipEnd, 0.012, 0.006, metal, 'metal');
+  for (const sideX of [-1, 1]) {
+    const onSide: Vec3 = [sideX * loop[0], loop[1], 0];
+    piece.rod(clipEnd, onSide, 0.0018, 4, INSTRUMENT_COLORS.bowHair);
+  }
+}
+
+/**
+ * Adds the layout form of the triangle to a footprint: three straight rods, the clip, and the
+ * loop.
+ *
+ * @param sink The footprint ({@link PieceBuilder.space}).
+ */
+function triangleSpace(sink: PartSink): void {
+  const metal = INSTRUMENT_COLORS.silver;
+  const side = TRIANGLE.side;
+  const topCorner: Vec3 = [0, -0.05, 0];
+  const low = -0.05 - side * Math.sin(60 * MathUtils.DEG2RAD);
+  const corners: Vec3[] = [topCorner, [side / 2, low, 0], [-side / 2, low, 0], topCorner];
+  for (let i = 0; i + 1 < corners.length; i++) {
+    sink.rod(corners[i] ?? topCorner, corners[i + 1] ?? topCorner, 0.005, 4, metal, 'metal');
+  }
+  const { clip, clipEnd, loop } = TRIANGLE_CLIP;
+  sink.bar(clip, clipEnd, 0.012, 0.006, metal, 'metal');
+  for (const sideX of [-1, 1]) {
+    const onSide: Vec3 = [sideX * loop[0], loop[1], 0];
+    sink.rod(clipEnd, onSide, 0.0018, 4, INSTRUMENT_COLORS.bowHair);
+  }
+}
+
+/**
+ * Builds the instruments of the small percussion player (design 4.6): the triangle in the left
+ * hand, its metal beater in the right hand, and the tambourine on a stand at the front right of
+ * the player. The right hand strikes the tambourine for key 54.
+ *
+ * @returns The model.
+ */
+export function buildSmallPercussion(): InstrumentModel {
+  const { mount } = TAMBOURINE;
+  const mountAt = new Vector3(...mount);
+  const stand = new PieceBuilder();
+  // The tambourine leans 30° to the player on its stand.
+  const tilt = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 30 * MathUtils.DEG2RAD);
+  const ringAt: Transform = transform(mount, toQuat(tilt));
+  addTambourine(stand, ringAt);
+  const post = toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0)));
+  addStand(stand, [mount[0], 0, mount[2]], post, 0.2);
+  stand.add(box(0.036, 0.03, 0.03), INSTRUMENT_COLORS.timpaniBlack, transform(post));
+  tambourineSpace(stand.space(), tilt);
   const tambourine = stand.build('instrument', hold('floor'));
   const tambourineHead = toVec3(new Vector3(0, 0.045, 0).applyQuaternion(tilt).add(mountAt));
 
   // The triangle hangs 0.05 m below the origin of its piece, in the plane x-y. In the bind pose,
   // it points forward from the hanging hand, as a mallet does, so that it stays above the floor.
   // Else it hangs 0.2 m down and cuts 0.08 m into the floor.
-  const side = 0.17;
   const triangle = new PieceBuilder();
-  const topCorner: Vec3 = [0, -0.05, 0];
-  const low = -0.05 - side * Math.sin(60 * MathUtils.DEG2RAD);
-  const corners: Vec3[] = [topCorner, [side / 2, low, 0], [-side / 2, low, 0], topCorner];
-  for (let i = 0; i + 1 < corners.length; i++) {
-    triangle.rod(corners[i] ?? topCorner, corners[i + 1] ?? topCorner, 0.005, 4, metal, 'metal');
-  }
-  // A real player holds the triangle by a clip in the left hand, and the triangle hangs in a loop
-  // of cord through the clip (`docs/reference/percussion-technique.md` 8). The clip lies in the
-  // palm of the closed left paw and leaves its heel, and the loop goes around the top corner.
-  const { clip, clipEnd, loop } = TRIANGLE_CLIP;
-  triangle.bar(clip, clipEnd, 0.012, 0.006, metal, 'metal');
-  for (const sideX of [-1, 1]) {
-    const onSide: Vec3 = [sideX * loop[0], loop[1], 0];
-    triangle.rod(clipEnd, onSide, 0.0018, 4, INSTRUMENT_COLORS.bowHair);
-  }
+  addTriangle(triangle);
+  triangleSpace(triangle.space());
+  const side = TRIANGLE.side;
   const barMiddle: Vec3 = [side / 4, -0.05 - (side * Math.sin(60 * MathUtils.DEG2RAD)) / 2, 0];
   const beater = mallet('malletR', {
     length: 0.15,
     tilt: TRIANGLE.malletTilt,
     spot: TRIANGLE.malletSpot,
     butt: TRIANGLE.malletButt,
-    look: plainMallet(0, metal, metal, 'metal'),
+    look: TRIANGLE_BEATER,
     space: 0,
   });
   return {
