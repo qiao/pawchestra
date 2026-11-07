@@ -868,7 +868,10 @@ when no light value can match the lit pixels of the reference.
   top and darker edges. The clarinet is black lacquer with silver keys, the flutes are silver, the
   brass is gold with lit bells, and the timpani are copper. The piano is black lacquer with a dark
   well and a dark gold plate in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
-  lighter soundboard, gilded parts, and red C strings and dark blue F strings.
+  lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are
+  copper in a black frame with chrome lugs. The drums are a red lacquered wood with chrome or wood
+  hoops, the cymbals are bronze with darker lathe rings, and the xylophone is rosewood over
+  aluminum tubes.
 
 **Materials**
 
@@ -885,9 +888,9 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | Finish    | Parts                                                     | Intent                                                                |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
-| `varnish` | The varnished wood of the bowed strings and the harp.     | A soft gloss.                                                         |
-| `lacquer` | The black lacquer of the piano and the clarinet, the eyes. | A sharp gloss.                                                        |
-| `metal`   | Brass, copper, and silver.                                | Sharp highlights, and a half metal look with the color of the metal.  |
+| `varnish` | The varnished wood of the bowed strings, the harp, the drums, and the xylophone. | A soft gloss.                                                         |
+| `lacquer` | The black lacquer of the piano, the clarinet, and the timpani frame, the eyes. | A sharp gloss.                                                        |
+| `metal`   | Brass, bronze, copper, chrome, and silver.                | Sharp highlights, and a half metal look with the color of the metal.  |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
@@ -1233,7 +1236,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
-| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). |
+| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
 | Baton | Along the index finger, with its grip in the palm, as a conductor holds it (`BATON_ALONG`). |
 
@@ -1325,6 +1328,47 @@ player of a harp has positions of its own, as a pianist has for its keys.
   of the model. All tiers show them.
 
 The frame stays in the triangle budget of the harp (`INSTRUMENT_BUDGETS`).
+
+**Percussion** (`models/instruments/percussion.ts`). Each instrument follows a real concert
+instrument, with the polished finishes of the other instruments
+(`docs/reference/percussion-technique.md` 10). The heads, the bars, the strike targets, and the
+grips keep their places, so the holds and the strikes do not change with the detail.
+
+- **Timpani.** Each kettle follows the timpani of `orchestra-latest.png` and a Ludwig Grand
+  Symphonic timpano (`KETTLE`): a deep copper bowl, a black counter hoop with a chrome top that
+  slopes down from the edge of the head, eight black tension rods with chrome lugs down to a base
+  ring, three legs with casters, and a balanced action pedal at the side of the player.
+- **Drums.** One builder makes the shell, the heads, the hoops, the lugs, and the tension rods of
+  each drum (`addDrum()`). The bass drum has wood hoops and 12 lugs, as a Yamaha CB-7036
+  (`BASS_DRUM_LOOK`), and lies on the rubber pads of two black A frames with casters. The snare
+  drum has triple flanged chrome hoops and 10 lugs, as a Ludwig Supraphonic (`SNARE_DRUM_LOOK`),
+  a strainer, snare wires under the bottom head, and a basket stand. Both shells have one
+  lacquer, as a matched set. Each hoop rises a few millimeters over its head, so that a stick or a
+  beater at the head does not touch it.
+- **Cymbals.** A bell, a domed bow, and a thin rim (`CYMBAL_RINGS`). The rings of the bow
+  alternate a polished and a groove bronze, as the lathe grooves of a cymbal. The bow stays near
+  the straight bow of the layout form, so that a mallet at the edge strikes it at the same height.
+  A hand cymbal has a leather strap, and the suspended cymbal sits between felt washers under a
+  wing nut.
+- **Small percussion.** The tambourine has a wood frame, a head, and five pairs of jingles in
+  slots. The triangle is one rod with round corners and one open corner (`TRIANGLE`).
+- **Xylophone.** Rosewood bars in the layout of a keyboard, at the small sizes of `XYLOPHONE`.
+  Under each bar hangs an aluminum tube a quarter of the wavelength of its note long, and a rail
+  runs under each node line of the bars, where a free bar does not move (`XYLOPHONE_FRAME`).
+- **Mallets.** Each mallet has a look of its own (`MalletLook`): a felt ball on the timpani
+  mallets and the bass drum beater, a yarn ball on the cymbal mallets, a rubber head on the
+  xylophone mallets, a hickory snare stick with a taper and a bead, and a steel triangle beater
+  with a grip sleeve.
+
+These rules hold for the models:
+
+- **Closed solids.** The clearance probes read only the closed shells of an instrument
+  (`instrumentSurface()` of `pose/test-sweep-roles.ts`, 9.3). Thus each kettle and each drum is
+  one closed profile from head to head over its hoops, and each cymbal one closed profile. The
+  hoops are a part of the profile, because a point in two overlapping shells reads as outside.
+- **Layout.** Each piece adds its old simple form to its footprint (`PieceBuilder.space()`,
+  `MalletHold.space`), as the bowed strings do, so that a change of the detail does not move the
+  seats.
 
 ### Instrument data
 
