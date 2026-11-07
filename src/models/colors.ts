@@ -107,6 +107,20 @@ export const INSTRUMENT_COLORS = {
   whiteKeys: srgb('#f2eee6'),
   blackKeys: srgb('#15120f'),
   folder: srgb('#2a2522'),
+  // Winds
+  /** The pearl tops of the finger buttons of the trumpet and the tuba. */
+  pearl: srgb('#efe6d2'),
+  /** The cane of the reeds of the oboe, the clarinet, and the bassoon. */
+  reed: srgb('#d9b46a'),
+  /** The thread that binds the cane of a double reed to its staple or its tube. */
+  reedThread: srgb('#8a2f2a'),
+  /** The dark bore, seen in the bell of a woodwind and the embouchure hole of the flute. */
+  windBore: srgb('#120e0b'),
+  /**
+   * The stained maple of the bassoon: a dark red brown, as a Heckel or a Fox bassoon. The lighter
+   * brown of `bassoon` read as orange under the warm light with the varnish.
+   */
+  bassoonStain: srgb('#5c2a1c'),
   silver: srgb('#c9c6bf'),
   oboe: srgb('#2a2522'),
   clarinet: srgb('#1f1b19'),
