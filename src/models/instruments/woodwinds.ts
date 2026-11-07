@@ -7,7 +7,7 @@ import type { Finish, Rgb } from '../mesh.ts';
 import { box, lathe, plate } from '../primitives.ts';
 import type { OutlinePoint, ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
-import { turned } from './tubing.ts';
+import { rounded, tubeAlong, turned } from './tubing.ts';
 import { bassoonSpace, clarinetSpace, fluteSpace, oboeSpace } from './wind-space.ts';
 import type { GripTube, InstrumentModel } from './types.ts';
 
@@ -362,42 +362,164 @@ function clarinetParts(piece: PieceBuilder): void {
 }
 
 /**
- * Adds the parts of the bassoon: a tall wooden tube with the boot, the wing joint, and the metal
- * bocal (design 4.6). The origin is at the tip of the reed. The tube runs along +y from the boot
- * to the bell. The bocal comes from the wing joint on the side of the player (+z) to the reed at
- * the right (+x) of the tube, so that the tube passes the left side of the head.
+ * Adds the parts of the bassoon, as a Heckel-system bassoon of maple
+ * (`docs/reference/wind-technique.md` 6.2): the boot joint with its silver cap, the wing joint
+ * and the long joint with silver rings, the bell joint with its rim, the silver bocal, the reed
+ * with its thread, and the silver key rods and cups (design 4.6). The origin is at the tip of the
+ * reed. The tube runs along +y from the boot to the bell. The bocal comes from the wing joint on
+ * the side of the player (+z) to the reed at the right (+x) of the tube, so that the tube passes
+ * the left side of the head.
  *
  * @param piece The piece builder.
  */
 function bassoonParts(piece: PieceBuilder): void {
   const b = WOODWINDS.bassoon;
-  const wood = INSTRUMENT_COLORS.bassoon;
+  const wood = INSTRUMENT_COLORS.bassoonStain;
   const metal = INSTRUMENT_COLORS.silver;
   // The axes of the drawing: the bottom of the boot is at y = 0, and the reed at `BASSOON_REED`.
   const reed = BASSOON_REED;
   const at = (p: Vec3): Vec3 => [p[0] - reed[0], p[1] - reed[1], p[2] - reed[2]];
+  const wing = 0.065;
+  const boot = 0.2;
+  // The boot joint holds both bores: an oval around the two tubes, with the silver cap of the
+  // U-tube at its bottom.
+  piece.add(
+    plate(BOOT, [
+      [0.86, 0.03],
+      [1, 0.045],
+      [1, boot],
+    ]),
+    wood,
+    transform(at([0, 0, wing / 2])),
+    'varnish',
+  );
+  piece.add(
+    plate(BOOT, [
+      [0.88, 0],
+      [1.04, 0.008],
+      [1.04, 0.045],
+    ]),
+    metal,
+    transform(at([0, 0, wing / 2])),
+    'metal',
+  );
+  // The wing joint, on the side of the player, and the long joint with the bell joint.
   piece.add(
     lathe(
       [
-        [0.033, 0.06],
-        [0.033, b.length - 0.08],
-        [0.042, b.length],
+        [0.021, boot],
+        [0.022, boot + 0.12],
+        [0.019, 0.62],
+        [0.012, 0.625],
+      ],
+      TUBE_SEGMENTS,
+    ),
+    wood,
+    transform(at([0, 0, wing])),
+    'varnish',
+  );
+  piece.add(
+    lathe(
+      [
+        [0.028, boot],
+        [0.027, 0.8],
+        [0.03, 0.81],
+        [0.03, b.length - 0.03],
+        [0.036, b.length],
+        [0.026, b.length - 0.006],
       ],
       TUBE_SEGMENTS,
     ),
     wood,
     transform(at([0, 0, 0])),
+    'varnish',
   );
-  piece.rod(at([0, 0.06, 0.065]), at([0, 0.62, 0.065]), 0.022, TUBE_SEGMENTS, wood);
-  piece.add(box(0.07, 0.12, 0.14), wood, transform(at([0, 0.06, 0.035])));
-  // The bocal rises from the wing joint to its top, then comes down to the reed. The tube of a
+  for (const [y, z, radius] of [
+    [boot + 0.004, wing, 0.0225],
+    [boot + 0.004, 0, 0.0292],
+    [0.8, 0, 0.0305],
+  ] as const) {
+    piece.rod(at([0, y - 0.008, z]), at([0, y + 0.008, z]), radius, TUBE_SEGMENTS, metal, 'metal');
+  }
+  // The silver key rods along the front of the long joint and the boot, and the cups of the
+  // tone holes of the boot.
+  for (const [x, from, to] of [
+    [0.027, 0.07, 0.62],
+    [0.02, 0.1, 0.78],
+  ] as const) {
+    piece.rod(at([x, from, -0.012]), at([x, to, -0.012]), 0.0018, ROD_SEGMENTS, metal, 'metal');
+  }
+  for (const y of [0.11, 0.27]) {
+    turned(
+      piece,
+      at([0.03, y, wing / 2]),
+      [1, 0, 0],
+      [
+        [0.007, 0],
+        [0.007, 0.003],
+        [0, 0.0042],
+      ],
+      KEY_SEGMENTS,
+      metal,
+    );
+  }
+  // The bocal rises from the wing joint, bends over, and turns into the reed. The tube of a
   // player leans, so the end of the bocal brings the reed to the mouth at a nearly level angle,
   // as on a real bassoon (`docs/reference/wind-technique.md` 3): 1.7° above the level with the
   // turn of the beaver (`BEAVER_PLAY` of `pose/winds.ts`). With the top at 0.78, the end pointed
   // 15.7° down into the mouth.
-  piece.rod(at([0, 0.62, 0.065]), at([0.08, 0.74, 0.09]), 0.004, 4, metal, 'metal');
-  piece.rod(at([0.08, 0.74, 0.09]), at([0.16, 0.7, 0.125]), 0.004, 4, metal, 'metal');
-  piece.add(box(0.006, 0.002, 0.03), wood, transform(at([0.16, 0.7, 0.14])));
+  tubeAlong(
+    piece,
+    rounded(
+      [
+        at([0, 0.62, wing]),
+        at([0, 0.665, wing]),
+        at([0.08, 0.74, 0.09]),
+        at([0.16, 0.7, 0.108]),
+        at([0.16, 0.7, 0.124]),
+      ],
+      0.025,
+      1,
+    ),
+    [0.0042, 0.0038, 0.0035, 0.0032, 0.003, 0.0028, 0.0027, 0.0026],
+    ROD_SEGMENTS,
+    metal,
+  );
+  // The reed: the thread around its tube, and the blade of cane up to the tip at the origin.
+  piece.rod(
+    at([0.16, 0.7, 0.124]),
+    at([0.16, 0.7, 0.136]),
+    0.0042,
+    TUBE_SEGMENTS,
+    INSTRUMENT_COLORS.reedThread,
+  );
+  piece.add(box(0.009, 0.0022, 0.02), INSTRUMENT_COLORS.reed, transform(at([0.16, 0.7, 0.145])));
+}
+
+/**
+ * The outline of the boot joint of the bassoon in the x-z plane: an oval around the bores of the
+ * wing joint (+z) and the long joint, with the origin between them.
+ */
+const BOOT: readonly OutlinePoint[] = stadium(0.034, 0.0325, 3);
+
+/**
+ * Gives the outline of a stadium in the x-z plane: two half circles at z = ±`half`, joined by
+ * straight sides, counterclockwise when seen from +y.
+ *
+ * @param radius The radius of the half circles.
+ * @param half The distance of the middle of each half circle from the origin.
+ * @param steps The number of steps of each half circle.
+ * @returns The corners.
+ */
+function stadium(radius: number, half: number, steps: number): OutlinePoint[] {
+  const out: OutlinePoint[] = [];
+  for (const side of [1, -1]) {
+    for (let i = 0; i <= steps; i++) {
+      const angle = (i / steps) * Math.PI + (side > 0 ? 0 : Math.PI);
+      out.push([radius * Math.cos(angle), side * half - radius * Math.sin(angle)]);
+    }
+  }
+  return out;
 }
 
 /**
