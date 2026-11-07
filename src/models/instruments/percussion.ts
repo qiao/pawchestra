@@ -6,7 +6,8 @@ import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
 import { ball, box, icosphere, lathe } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
-import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
+import { PieceBuilder, hold, pieceSize, placeCorners, pointing } from './piece.ts';
+import type { PartSink } from './piece.ts';
 import type { InstrumentId, InstrumentModel, InstrumentPiece, PlayTarget } from './types.ts';
 
 /** The number of kettles of the timpani (design 4.6). */
@@ -654,16 +655,134 @@ function malletPair(m: MalletHold, right: MalletHold = m): readonly [HandTool, H
   return [mallet('malletL', m), mallet('malletR', right)];
 }
 
+/** The faces around the axis of a drum, its hoops, and the tambourine. */
+const DRUM_SEGMENTS = 16;
+
+/** The look of a drum around its shell and its heads, in meters (design 4.6). */
+interface DrumLook {
+  /** The color of the shell. */
+  readonly shell: Rgb;
+  /** The finish of the shell. */
+  readonly shellFinish: Finish;
+  /**
+   * The hoop at each head: its width out from the shell, its height down the shell from the head,
+   * its rise above the head, its color, and its finish. The rise keeps the hoop low, so that a
+   * stick or a beater near the head does not touch it.
+   */
+  readonly hoop: {
+    readonly width: number;
+    readonly down: number;
+    readonly rise: number;
+    readonly color: Rgb;
+    readonly finish: Finish;
+  };
+  /**
+   * The lugs on the middle of the shell: their number, and the width, the length along the axis,
+   * and the depth of each lug. A chrome tension rod runs from hoop to hoop under each lug.
+   */
+  readonly lugs: { readonly count: number; readonly size: readonly [number, number, number] };
+}
+
 /**
- * Adds a drum: a shell with a head at each end, along an axis.
+ * Adds a drum: a shell with a head at each end along an axis, a hoop at each head, and the lugs
+ * and the tension rods on the shell (design 4.6).
  *
  * @param piece The piece.
  * @param center The middle of the drum.
  * @param axis The unit direction from the back head to the front head.
  * @param radius The radius of the heads.
  * @param depth The depth of the shell.
+ * @param look The look of the drum.
  */
-function drum(piece: PieceBuilder, center: Vec3, axis: Vec3, radius: number, depth: number): void {
+function addDrum(
+  piece: PieceBuilder,
+  center: Vec3,
+  axis: Vec3,
+  radius: number,
+  depth: number,
+  look: DrumLook,
+): void {
+  const turn = new Quaternion().setFromUnitVectors(
+    new Vector3(0, 1, 0),
+    new Vector3(...axis).normalize(),
+  );
+  const at = transform(center, toQuat(turn));
+  const end = depth / 2;
+  const [top, rest] = splitByFacing(
+    lathe(
+      [
+        [radius, -end],
+        [radius, end],
+      ],
+      DRUM_SEGMENTS,
+    ),
+    [0, 1, 0],
+    0.99,
+  );
+  const [bottom] = splitByFacing(rest, [0, -1, 0], 0.99);
+  piece.add([...top, ...bottom], INSTRUMENT_COLORS.drumHead, at);
+  const { hoop, lugs } = look;
+  piece.add(
+    band(
+      [
+        [radius, hoop.down - end],
+        [radius, end - hoop.down],
+      ],
+      DRUM_SEGMENTS,
+    ),
+    look.shell,
+    at,
+    look.shellFinish,
+  );
+  // Each hoop: its underside on the shell, its outer wall, its top above the head, and its inner
+  // face down onto the edge of the head.
+  const out = radius + hoop.width;
+  const ring = band(
+    [
+      [radius, end - hoop.down],
+      [out, end - hoop.down],
+      [out, end + hoop.rise],
+      [radius - 0.003, end + hoop.rise],
+      [radius - 0.003, end],
+    ],
+    DRUM_SEGMENTS,
+  );
+  const flip = transform(
+    [0, 0, 0],
+    toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), Math.PI)),
+  );
+  piece.add([...ring, ...placeCorners(ring, flip)], hoop.color, at, hoop.finish);
+  const [lugWidth, lugLength, lugDepth] = lugs.size;
+  const rodLength = depth - 2 * hoop.down;
+  const parts: number[] = [];
+  const rods: number[] = [];
+  for (let i = 0; i < lugs.count; i++) {
+    const a = ((i + 0.5) / lugs.count) * 2 * Math.PI;
+    const spin = toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), a));
+    const place = (lift: number): Transform =>
+      transform([(radius + lift) * Math.sin(a), 0, (radius + lift) * Math.cos(a)], spin);
+    parts.push(
+      ...placeCorners(
+        openBox(lugWidth, lugLength, lugDepth, ['+x', '-x', '+y', '-y', '+z']),
+        place(lugDepth / 2),
+      ),
+    );
+    rods.push(...placeCorners(openBox(0.004, rodLength, 0.004, ['+x', '-x', '+z']), place(0.004)));
+  }
+  piece.add(rods, INSTRUMENT_COLORS.silver, at, 'metal');
+  piece.add(parts, INSTRUMENT_COLORS.silver, at, 'metal');
+}
+
+/**
+ * Adds the simple form of a drum: a shell of 12 faces with a head at each end, along an axis.
+ *
+ * @param piece The piece, or its footprint ({@link PieceBuilder.space}).
+ * @param center The middle of the drum.
+ * @param axis The unit direction from the back head to the front head.
+ * @param radius The radius of the heads.
+ * @param depth The depth of the shell.
+ */
+function drum(piece: PartSink, center: Vec3, axis: Vec3, radius: number, depth: number): void {
   const corners = lathe(
     [
       [radius, -depth / 2],
@@ -962,12 +1081,12 @@ function handGrips(): InstrumentModel['grips'] {
 /**
  * Adds a tripod: a post and three legs on the floor.
  *
- * @param piece The piece.
+ * @param piece The piece, or its footprint ({@link PieceBuilder.space}).
  * @param base The point on the floor under the post.
  * @param top The top of the post.
  * @param spread The distance of the feet from the post.
  */
-function tripod(piece: PieceBuilder, base: Vec3, top: Vec3, spread: number): void {
+function tripod(piece: PartSink, base: Vec3, top: Vec3, spread: number): void {
   const color = INSTRUMENT_COLORS.hardware;
   piece.rod(base, top, 0.01, 4, color);
   const knee = toVec3(new Vector3(...base).add(new Vector3(0, 0.12, 0)));
@@ -984,6 +1103,91 @@ function tripod(piece: PieceBuilder, base: Vec3, top: Vec3, spread: number): voi
 }
 
 /**
+ * The look of the bass drum (design 4.6), as a concert bass drum of 36 by 16 inches (Yamaha
+ * CB-7036): a lacquered shell, wood hoops, and 12 chrome lugs.
+ */
+const BASS_DRUM_LOOK: DrumLook = {
+  shell: INSTRUMENT_COLORS.drumShell,
+  shellFinish: 'varnish',
+  hoop: {
+    width: 0.014,
+    down: 0.03,
+    rise: 0.006,
+    color: INSTRUMENT_COLORS.drumHoop,
+    finish: 'varnish',
+  },
+  lugs: { count: 12, size: [0.022, 0.07, 0.012] },
+};
+
+/**
+ * Adds the stand of the bass drum: two black A frames under the shell, each with a rubber pad on
+ * which the shell lies, a cross bar between them, and a caster under each foot.
+ *
+ * @param piece The piece.
+ * @param axis The unit axis of the drum.
+ * @param across The unit direction along the floor across the axis.
+ */
+function addBassDrumStand(piece: PieceBuilder, axis: Vector3, across: Vector3): void {
+  const { center, radius } = BASS_DRUM;
+  const black = INSTRUMENT_COLORS.timpaniBlack;
+  const floor = new Vector3(center[0], 0, center[2]);
+  const caster = 0.03;
+  // Each pad lies under the shell at the side of a frame.
+  const side = 0.57 * radius;
+  const pad = center[1] - Math.sqrt(radius * radius - side * side) - 0.012;
+  for (const s of [-1, 1]) {
+    const top = floor
+      .clone()
+      .addScaledVector(across, s * side)
+      .setY(pad);
+    for (const t of [-1, 1]) {
+      const foot = floor
+        .clone()
+        .addScaledVector(across, s * 0.62 * radius)
+        .addScaledVector(axis, t * 0.55 * radius)
+        .setY(caster);
+      strut(
+        piece,
+        toVec3(top.clone().addScaledVector(axis, t * 0.03)),
+        toVec3(foot),
+        [0.02, 0.016],
+        toVec3(across.clone().multiplyScalar(s)),
+        black,
+        'lacquer',
+      );
+      piece.add(
+        openBox(0.03, caster, 0.03, ['+x', '-x', '+y', '+z', '-z']),
+        INSTRUMENT_COLORS.hardware,
+        transform([foot.x, caster / 2, foot.z]),
+      );
+    }
+    piece.add(
+      box(0.12, 0.024, 0.045),
+      INSTRUMENT_COLORS.hardware,
+      transform(toVec3(top.clone().setY(pad + 0.004)), pointing(toVec3(axis), [0, 1, 0])),
+    );
+  }
+  piece.bar(
+    toVec3(
+      floor
+        .clone()
+        .addScaledVector(across, -0.62 * radius)
+        .setY(0.08),
+    ),
+    toVec3(
+      floor
+        .clone()
+        .addScaledVector(across, 0.62 * radius)
+        .setY(0.08),
+    ),
+    0.02,
+    0.02,
+    black,
+    'lacquer',
+  );
+}
+
+/**
  * Builds the bass drum on its stand, and one beater (design 4.6). The drum stands in front of the
  * player, with its heads to the left and to the right.
  *
@@ -996,13 +1200,17 @@ export function buildBassDrum(): InstrumentModel {
     new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), BASS_DRUM.turn * MathUtils.DEG2RAD),
   );
   const normal = toVec3(axis);
-  drum(piece, center, normal, radius, depth);
+  addDrum(piece, center, normal, radius, depth, BASS_DRUM_LOOK);
+  const across = new Vector3(axis.z, 0, -axis.x).normalize();
+  addBassDrumStand(piece, axis, across);
+  // The layout form: the shell, two posts, and a cross bar.
+  const space = piece.space();
+  drum(space, center, normal, radius, depth);
   // The stand: a frame under the drum, from the floor to the shell. Its legs and its cross bar
   // scale with the heads.
-  const across = new Vector3(axis.z, 0, -axis.x).normalize();
   for (const side of [-1, 1]) {
     const foot = new Vector3(center[0], 0, center[2]).addScaledVector(across, side * 0.57 * radius);
-    piece.rod(
+    space.rod(
       toVec3(foot),
       toVec3(foot.clone().add(new Vector3(0, center[1] - radius + 0.02, 0))),
       0.012,
@@ -1012,7 +1220,7 @@ export function buildBassDrum(): InstrumentModel {
   }
   // The cross bar turns with the drum, so its corners reach 0.022 m from its middle.
   const barMiddle = new Vector3(center[0], 0.025, center[2]);
-  piece.bar(
+  space.bar(
     toVec3(barMiddle.clone().addScaledVector(across, -0.71 * radius)),
     toVec3(barMiddle.clone().addScaledVector(across, 0.71 * radius)),
     0.03,
@@ -1024,7 +1232,7 @@ export function buildBassDrum(): InstrumentModel {
     tilt: BASS_DRUM.malletTilt,
     spot: BASS_DRUM.malletSpot,
     butt: BASS_DRUM.malletButt,
-    look: plainMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.drumHead),
+    look: roundMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.felt, 8),
     space: BASS_DRUM.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
