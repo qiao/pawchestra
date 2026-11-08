@@ -5,16 +5,16 @@ round.
 
 ## Bodies and roles
 
-Each species has a studio body (`'studio-<a>'`). "Rebuilt arms" means quad arm tubes, Blender
-weights, and arm segments. Each body has rebuilt arms and the role-neutral bind (design 4.4),
-except the cat, which keeps the bind of the viola hold. The polar bear has a hand rig with the
-role-neutral bind in place of rebuilt arms.
+Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4), except the
+cat, which keeps the bind of the viola hold. "Rebuilt arms" means quad arm tubes, Blender weights,
+and arm segments. Each body except the polar bear (a hand rig) has them. The `README.md` of each
+model folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
 | bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
-| polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): the mesh of the source with loop cuts at the elbows, the wrists, and the knees, weights by hand with one mean row on each arm ring and on the front of each thigh root, the role-neutral bind, a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
-| rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), the role-neutral bind, a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. | `violinist` |
+| polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): loop cuts at the elbows, the wrists, and the knees, weights by hand (its `README.md`), a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
+| rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. | `violist` |
