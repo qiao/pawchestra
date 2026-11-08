@@ -2361,9 +2361,8 @@ function* sightRowsSteps(
     const front = done.find((d) => d.row.row === 0)?.row;
     const inner =
       row.row === BACK_DESK_ROW && front ? Math.min(...front.angles.map((a) => Math.abs(a))) : null;
-    // Each group from row 2 can rise. A try in which the riser of a raised group does not fit at
-    // the new places of its players is not valid.
-    const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
+    // The seat groups from row 2 can rise.
+    const rises = row.row >= ROW_RISER.firstRow;
 
     // With `gap`, the back desks can also pass 0° into the gap of the conductor.
     const attempt = function* (levels: readonly number[], gap = false): Steps<SightTry> {
@@ -2436,8 +2435,8 @@ function* sightRowsSteps(
 
     // The rows rise toward the back: a group starts at the height of the risers in front of it.
     const fronts = done.flatMap((d) => d.risers);
-    const levels = extents.map((extent, k) =>
-      rises[k]
+    const levels = extents.map((extent) =>
+      rises
         ? Math.max(
             0,
             ...fronts.filter((r) => r.from < extent.to && r.to > extent.from).map((r) => r.height),
@@ -2452,10 +2451,10 @@ function* sightRowsSteps(
       next.blocked.forEach((count, k) => {
         const level = levels[k] ?? 0;
         const lift = next.lifts[k] ?? 0;
-        if (rises[k] && lift > level + 1e-9) {
+        if (rises && lift > level + 1e-9) {
           levels[k] = lift;
           raised = true;
-        } else if (count > 0 && rises[k] && level + ROW_RISER.step <= riserTop(row.row) + 1e-9) {
+        } else if (count > 0 && rises && level + ROW_RISER.step <= riserTop(row.row) + 1e-9) {
           levels[k] = Math.round((level + ROW_RISER.step) * 1000) / 1000;
           raised = true;
         }
