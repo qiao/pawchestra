@@ -1487,14 +1487,29 @@ export function boxOnStage(b: PlacedBox, stage: StageSize, margin = EDGE_MARGIN)
 }
 
 /**
- * Finds if each box of a row keeps the edge margin from the outline of the stage.
+ * Finds if each angle of a row stays within ±90° ({@link SPREAD_LIMITS}).
+ *
+ * @param angles The angle of each player.
+ * @returns True if each angle is inside.
+ */
+function withinSpread(angles: readonly number[]): boolean {
+  return !angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9);
+}
+
+/**
+ * Finds if each box of a row keeps the edge margin from the outline of the stage, and if the row
+ * keeps its gaps from the other items ({@link rowClear}).
  *
  * @param row The places of the row, relative to the podium center.
+ * @param clearance The other items on the stage.
  * @param stage The stage side and the front distance.
- * @returns True if each box is inside.
+ * @returns True if the row fits.
  */
-function rowOnStage(row: RowPlacement, stage: StageSize): boolean {
-  return obstaclesOfRow(row).every((obstacle) => obstacle.boxes.every((b) => boxOnStage(b, stage)));
+function rowFits(row: RowPlacement, clearance: RowClearance, stage: StageSize): boolean {
+  return (
+    obstaclesOfRow(row).every((obstacle) => obstacle.boxes.every((b) => boxOnStage(b, stage))) &&
+    rowClear(row, clearance)
+  );
 }
 
 /**
@@ -1556,15 +1571,14 @@ function* spreadSideSteps(
   clearance: RowClearance,
   stage: StageSize,
 ): Steps<FittedRow> {
-  const { maxAngle, maxArc } = SPREAD_LIMITS;
-  for (let k = maxArc / SEATED_ARC; k > 1 + 1e-9; k -= SPREAD_STEP) {
+  for (let k = SPREAD_LIMITS.maxArc / SEATED_ARC; k > 1 + 1e-9; k -= SPREAD_STEP) {
     yield;
     const next = spreadAngles(row, side, k);
-    if (next.some((a) => Math.abs(a) > maxAngle + 1e-9)) {
+    if (!withinSpread(next)) {
       continue;
     }
     const placement = placeRow(row.members, next, row.radius);
-    if (rowOnStage(placement, stage) && rowClear(placement, clearance)) {
+    if (rowFits(placement, clearance, stage)) {
       return { ...row, angles: next, placement };
     }
   }
@@ -1655,11 +1669,11 @@ function* wedgeSideSteps(
     const next = spread.angles.map((angle, i) =>
       side * (packed.angles[i] ?? 0) > 0 ? angle + blend * ((target[i] ?? angle) - angle) : angle,
     );
-    if (next.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9)) {
+    if (!withinSpread(next)) {
       continue;
     }
     const placement = placeRow(spread.members, next, spread.radius);
-    if (rowOnStage(placement, stage) && rowClear(placement, clearance)) {
+    if (rowFits(placement, clearance, stage)) {
       return { ...spread, angles: next, placement };
     }
   }
@@ -2310,11 +2324,7 @@ function* sightRowsSteps(
           )
         : yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
       let placement = placeRow(row.members, angles, row.radius, heights);
-      if (
-        angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9) ||
-        !rowOnStage(placement, stage) ||
-        !rowClear(placement, clearance)
-      ) {
+      if (!withinSpread(angles) || !rowFits(placement, clearance, stage)) {
         angles = [...row.angles];
         placement = placeRow(row.members, angles, row.radius, heights);
       }
@@ -2536,11 +2546,7 @@ function* sightRowsSteps(
             continue;
           }
           const placement = placeRow(front.members, next, front.radius);
-          if (
-            !rowOnStage(placement, stage) ||
-            !rowClear(placement, clearance) ||
-            frontBlind(placement) > blindBefore
-          ) {
+          if (!rowFits(placement, clearance, stage) || frontBlind(placement) > blindBefore) {
             continue;
           }
           const steps = next.map((b, i) =>
