@@ -303,7 +303,88 @@ export function obstacleOf(label: string, boxes: readonly PlacedBox[]): Obstacle
 }
 
 /**
- * Finds if two obstacles come closer than a gap.
+ * The margin of the broad phase of {@link obstaclesTouch}, in meters. It is much larger than the
+ * rounding errors, so the broad phase skips only the pairs that {@link boxesTouch} also finds
+ * apart.
+ */
+const BROAD_MARGIN = 1e-9;
+
+/**
+ * The projections of a list of boxes on the two axes of a box: 4 numbers for each box, the low
+ * end and the high end of its span on the first axis, then on the second axis. A box that the
+ * broad phase must not skip has an infinite span on each axis.
+ */
+type Projections = Float64Array;
+
+/**
+ * Projects boxes on the two axes of a box, from a point.
+ *
+ * @param boxes The boxes.
+ * @param axes The box that gives the axes.
+ * @param x The x of the point.
+ * @param z The z of the point.
+ * @param pad The distance that each span grows on each side, in meters.
+ * @param own True for the boxes of the obstacle of `axes`. A box with other axes then gets an
+ *   infinite span, because the two axes are not axes of its separating axis test.
+ * @returns The projections.
+ */
+function project(
+  boxes: readonly PlacedBox[],
+  axes: PlacedBox,
+  x: number,
+  z: number,
+  pad: number,
+  own: boolean,
+): Projections {
+  const out = new Float64Array(boxes.length * 4);
+  boxes.forEach((box, i) => {
+    if (own && (box.cos !== axes.cos || box.sin !== axes.sin)) {
+      out[i * 4] = -Infinity;
+      out[i * 4 + 1] = Infinity;
+      out[i * 4 + 2] = -Infinity;
+      out[i * 4 + 3] = Infinity;
+      return;
+    }
+    const dx = box.x - x;
+    const dz = box.z - z;
+    // The axes of `axes`: (cos, -sin) and (sin, cos), as in `boxesTouch()`.
+    const u = dx * axes.cos - dz * axes.sin;
+    const v = dx * axes.sin + dz * axes.cos;
+    const ru = reachOn(box, axes.cos, -axes.sin) + pad;
+    const rv = reachOn(box, axes.sin, axes.cos) + pad;
+    out[i * 4] = u - ru;
+    out[i * 4 + 1] = u + ru;
+    out[i * 4 + 2] = v - rv;
+    out[i * 4 + 3] = v + rv;
+  });
+  return out;
+}
+
+/**
+ * Finds if two spans of projections overlap on both axes.
+ *
+ * @param p The projections of one list.
+ * @param i The index of a box in `p`.
+ * @param q The projections of another list.
+ * @param j The index of a box in `q`.
+ * @returns False if an axis separates the two spans.
+ */
+function spansOverlap(p: Projections, i: number, q: Projections, j: number): boolean {
+  return (
+    (p[i * 4] ?? 0) < (q[j * 4 + 1] ?? 0) &&
+    (q[j * 4] ?? 0) < (p[i * 4 + 1] ?? 0) &&
+    (p[i * 4 + 2] ?? 0) < (q[j * 4 + 3] ?? 0) &&
+    (q[j * 4 + 2] ?? 0) < (p[i * 4 + 3] ?? 0)
+  );
+}
+
+/**
+ * Finds if two obstacles come closer than a gap. A player has 30 to 50 boxes, so a near pair of
+ * players has more than 1,000 pairs of boxes. A broad phase skips most pairs before the full test:
+ * the heights, then the projections on the two axes of the first box of `a`. These axes are axes
+ * of the separating axis test of each box of `a` with the same axes. The broad phase skips a pair
+ * only when such an axis separates it by more than {@link BROAD_MARGIN}, so the result does not
+ * change.
  *
  * @param a An obstacle.
  * @param b Another obstacle.
@@ -314,9 +395,39 @@ export function obstaclesTouch(a: Obstacle, b: Obstacle, gap: number): boolean {
   if (Math.hypot(a.x - b.x, a.z - b.z) >= a.radius + b.radius + gap) {
     return false;
   }
-  for (const p of a.boxes) {
-    for (const q of b.boxes) {
-      if (boxesTouch(p, q, gap)) {
+  const axes = a.boxes[0];
+  if (!axes) {
+    return false;
+  }
+  const own = project(a.boxes, axes, a.x, a.z, gap + BROAD_MARGIN, true);
+  const other = project(b.boxes, axes, a.x, a.z, 0, false);
+
+  // The boxes of `b` that come into the spans of all boxes of `a`.
+  const all = new Float64Array([Infinity, -Infinity, Infinity, -Infinity]);
+  for (let i = 0; i < a.boxes.length; i++) {
+    all[0] = Math.min(all[0] ?? 0, own[i * 4] ?? 0);
+    all[1] = Math.max(all[1] ?? 0, own[i * 4 + 1] ?? 0);
+    all[2] = Math.min(all[2] ?? 0, own[i * 4 + 2] ?? 0);
+    all[3] = Math.max(all[3] ?? 0, own[i * 4 + 3] ?? 0);
+  }
+  const near: number[] = [];
+  for (let j = 0; j < b.boxes.length; j++) {
+    if (spansOverlap(all, 0, other, j)) {
+      near.push(j);
+    }
+  }
+
+  for (let i = 0; i < a.boxes.length; i++) {
+    const p = a.boxes[i];
+    for (let k = 0; p && k < near.length; k++) {
+      const j = near[k] ?? 0;
+      const q = b.boxes[j];
+      if (
+        q &&
+        !(p.minY >= q.maxY - 1e-9 || q.minY >= p.maxY - 1e-9) &&
+        spansOverlap(own, i, other, j) &&
+        boxesTouch(p, q, gap)
+      ) {
         return true;
       }
     }
