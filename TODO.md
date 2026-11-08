@@ -323,6 +323,9 @@ passes.
       `src/models/layout-scene.test.ts`. The harp, the viola, and the piano gap moved seats.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
+- [ ] Layout sight lines (4.5): with no row risers, 63 of 453 players stay blocked and 18 are hidden
+      from the audience (`pnpm sight-lines`), most in rows 3 and 4. The sweep places one row at a
+      time, so a row cannot leave a gap for the row behind it. Try a search of rows 2 to 4 together.
 - [ ] Elephant: a short light sliver stays at the inner root of the right arm, near the tusk, from
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
