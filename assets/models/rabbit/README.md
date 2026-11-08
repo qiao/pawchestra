@@ -99,6 +99,12 @@ T-pose body of `pnpm rig-mesh rabbit` at 77b9d9d3, and the hand rig of the Tripo
 does not use them. The text below gives the trials as they were: "the last rig" is the T-pose rig
 of 77b9d9d3, and `rabbit.json` is its config at that commit.
 
+`tripo-p2/` holds the trial of 2026-11-07: a Tripo P2 quad mesh (`rabbit.fbx`, its base color in
+`rabbit.fbm/`) rigged by the simple route (design 4.4, "Simple route") with the config
+`tools/mesh-rigs/simple/rabbit-tripo.json`, and its rig (`rabbit.blend`, `rabbit.rig.glb`,
+`rabbit.rig.json`). It was the app rabbit from bf942d8b until 3e06a62a, which gave the app the
+A-pose rabbit again. The report is in `reports/2026-11-07-tripo-rabbit/` (git ignores it).
+
 ### rabbit-tpose.glb
 
 The mesh has no skeleton. The arms stand out level to the sides, free of the trunk.
