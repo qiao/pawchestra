@@ -512,14 +512,18 @@ function poseAnimal(
       const { legs } = note.rig;
       const ready = note.rig.hold.ready ? 1 : weight;
       body.lean = note.rig.hold.lean * ready;
-      body.upright = body.lean;
       // At a damp of the bass drum, the upper body turns the left shoulder toward the far head, and
       // the head turns back (`PalmDamp.turn`).
-      const palm = note.rig.hold.damp;
-      if (palm?.kind === 'palm') {
-        body.turn = -palm.turn * strikes.damp.weight * ready;
+      const damp = note.rig.hold.damp;
+      if (damp?.kind === 'palm') {
+        body.turn = -damp.turn * strikes.damp.weight * ready;
         body.headTurn = -body.turn;
       }
+      // At a damp of the suspended cymbal, the spine leans further over the cymbal (`EdgeDamp`).
+      if (damp?.kind === 'edge') {
+        body.lean += damp.lean * strikes.damp.weight * weight;
+      }
+      body.upright = body.lean;
       if (note.side && legs) {
         const share = sideMoveAt(note.side, noteTime) * weight;
         body.sway -= share * note.side.move.spine;

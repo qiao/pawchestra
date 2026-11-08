@@ -825,8 +825,6 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Badger: ask the user to confirm the size of the badger.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
       the stripes on the head as a mid brown. Show the user the faces.
-- [ ] Suspended cymbal: the free paw does not muffle the plate after a note, and the moments of
-      `ROLE_VIEWS.cymbalist` keep the names of a crash.
 - [ ] Badger triangle: the left paw stands with the fingers up. A real player holds the clip between
       the thumb and the fingers at eye level (percussion-technique 10).
 - [ ] Snare and cymbal: at rest, the arms hang, so the tips stand 5 cm to 9 cm outside the rim

@@ -310,7 +310,10 @@ The app follows these facts:
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
   other. Between strikes, each ball stays about 3.5 cm above the plate, with the shaft almost
   level, as the ready position of the snare drum. Before a strike, it lifts higher for a louder
-  note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`).
+  note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`). After a note with a rest of at
+  least 0.5 s after it, the paw that did not strike goes to the near rim, its fingers touch the
+  edge, and the spine leans 9° over the cymbal, as a player stops the ring of a short note
+  [15] [20] [22] (`EdgeDamp`).
 - **The triangle (section 8).** The clip lies in the palm under the curled fingers, and the
   triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
@@ -351,8 +354,11 @@ The app does not follow these facts:
   (`TAMBOURINE`), because the left paw holds the triangle through the whole part. The tip of the
   beater strikes it, with no shake roll and no thumb roll.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
-  body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`). The plate has no
-  muffling.
+  body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
+- **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand
+  cymbals at the chest, and no grip of a suspended cymbal. The paw keeps its mallet at the rim,
+  and the rule of the rest is the rule of the hand cymbals. A MIDI drum note has no written
+  length, so each note before a rest of 0.5 s stops.
 - **The hand cymbals (section 7).** The plates stay parallel at the crash, with no angle of a
   flam between them [60] [61], and tilt 15° from vertical [16]. No concert source gives the rest place:
   in a long rest, the arms hang with the plates at the sides, as a marching method holds them

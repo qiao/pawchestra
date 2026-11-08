@@ -120,8 +120,9 @@ export interface MalletSet {
  *
  * - `chest`: the hand cymbals go against the chest.
  * - `palm`: the free paw lays its palm on the far head of the bass drum.
+ * - `edge`: the paw that did not strike the note grips the rim of the suspended cymbal.
  */
-export type DampRule = ChestDamp | PalmDamp;
+export type DampRule = ChestDamp | PalmDamp | EdgeDamp;
 
 /** The damp of the hand cymbals against the chest ({@link DampRule}). */
 export interface ChestDamp {
@@ -133,6 +134,34 @@ export interface ChestDamp {
   readonly drop: number;
   /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
   readonly room: number;
+}
+
+/**
+ * The damp of the suspended cymbal ({@link DampRule}): the paw that did not strike the note goes
+ * to the rim nearest to its shoulder, and the wrist lifts the head of its mallet, so that the
+ * fingers touch the edge.
+ */
+export interface EdgeDamp {
+  readonly kind: 'edge';
+  readonly restSec: number;
+  /** The longest contact, in seconds. */
+  readonly hold: number;
+  /** The distance of the rim from the middle of the cymbal, in meters. */
+  readonly rim: number;
+  /**
+   * The grip of the mallet at the damp, from the rim point, in meters: out from the rim on the
+   * line from the middle of the cymbal to the shoulder joint, and up.
+   */
+  readonly grip: readonly [out: number, up: number];
+  /**
+   * The turn of the rim point around the middle of the cymbal from the line to the shoulder joint
+   * toward the out side of the hand, in radians.
+   */
+  readonly around: number;
+  /** The share of the pitch of the mallet at the damp (`MalletAcross.pitch`). */
+  readonly share: number;
+  /** The forward lean of the spine at the damp, in radians, on top of `PercussionHold.lean`. */
+  readonly lean: number;
 }
 
 /** The damp of the free paw on the far head of the bass drum ({@link DampRule}). */
@@ -598,7 +627,11 @@ export const PERCUSSION_HOLDS = {
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
  * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
- * With the rest direction across the forearm, the heads swing out past the rim.
+ * With the rest direction across the forearm, the heads swing out past the rim. In a rest after a
+ * note, the paw that did not strike takes its grip to the near rim, and the spine leans 9° more
+ * (`damp`), so that the fingers touch the edge: with no lean, the arm stretched 0.12 of the upper
+ * arm (main 0.04), and a grip at the rim point nearest to the shoulder joint twisted the arm in a
+ * lift 64° (main 60°).
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
@@ -621,7 +654,16 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   lean: 0,
   side: null,
   fit: null,
-  damp: null,
+  damp: {
+    kind: 'edge',
+    restSec: 0.5,
+    hold: 0.5,
+    rim: 0.2,
+    grip: [0.04, -0.03],
+    around: -0.35,
+    share: 3,
+    lean: 0.16,
+  },
   curl: GRIP_CURL,
   strikeRoll: true,
 };
@@ -832,17 +874,36 @@ export interface PercussionRig {
    */
   readonly place: Vec3;
   /**
-   * The place of a damp (`PercussionHold.damp`), in the model axes, or `null` for a hold with no
-   * damp: the crash point of the hand cymbals at the chest, or the wrist of the free paw on the
-   * far head of the bass drum.
+   * The crash point of the hand cymbals at the damp against the chest (`PercussionHold.damp`), in
+   * the model axes, or `null` for another hold.
    */
   readonly dampPlace: Vec3 | null;
   /**
-   * The world rotation of the free paw at the damp on the far head of the bass drum, from the
-   * bind pose, or `null` for another hold.
+   * The paw of each hand at a damp with the paw (`PalmDamp`, `EdgeDamp`), or `null` for a hand
+   * with no such damp.
    */
-  readonly dampHand: Quat | null;
+  readonly dampHands: readonly [left: DampHand | null, right: DampHand | null];
 }
+
+/**
+ * The place of a paw at a damp: the wrist and the turn of the free paw (`PalmDamp`), or the grip
+ * of a mallet (`EdgeDamp`), whose paw keeps the turn of its hold.
+ */
+export type DampHand =
+  | {
+      readonly kind: 'palm';
+      /** The wrist, in the model axes. */
+      readonly wrist: Vec3;
+      /** The world rotation of the hand from the bind pose. */
+      readonly hand: Quat;
+    }
+  | {
+      readonly kind: 'edge';
+      /** The grip of the mallet, in the model axes. */
+      readonly grip: Vec3;
+      /** The share of the pitch of the mallet. */
+      readonly share: number;
+    };
 
 /**
  * Finds a play target of the instrument of a player.
@@ -1195,7 +1256,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   const heads = model.instrument.targets.filter((t) => t.kind === 'head');
   let sides: readonly [PercussionSide, PercussionSide];
   let dampPlace: Vec3 | null = null;
-  let dampHand: Quat | null = null;
+  let dampHands: readonly [DampHand | null, DampHand | null] = [null, null];
   switch (instrument) {
     case 'timpani':
       for (const [i, head] of heads.entries()) {
@@ -1206,14 +1267,15 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       break;
     case 'cymbals':
       if (suspended) {
-        targets.set(
-          0,
-          bindTarget(
-            model,
-            findTarget(model, (t) => t.kind === 'head'),
-          ),
+        const top = bindTarget(
+          model,
+          findTarget(model, (t) => t.kind === 'head'),
         );
+        targets.set(0, top);
         sides = [mallet(left, 'malletL'), mallet(right, 'malletR')];
+        if (hold.damp?.kind === 'edge') {
+          dampHands = pawsOnRim(top.point, hold.damp, [left, right]);
+        }
       } else {
         const plates = pairOfPlates(model, left, right, inH, targets);
         sides = plates.sides;
@@ -1228,9 +1290,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       targets.set(0, head);
       sides = [{ kind: 'free', arm: left }, mallet(right, 'malletR')];
       if (hold.damp?.kind === 'palm') {
-        const palm = palmOnFarHead(head, hold.damp);
-        dampPlace = palm.wrist;
-        dampHand = palm.hand;
+        dampHands = [palmOnFarHead(head, hold.damp), null];
       }
       break;
     }
@@ -1329,7 +1389,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     lever: left.bind.shoulder[1] - (model.skeleton.positions[boneIndex('spine')]?.[1] ?? 0),
     place,
     dampPlace,
-    dampHand,
+    dampHands,
   };
 }
 
@@ -1359,7 +1419,7 @@ function headAxes(normal: Vec3): readonly [normal: Vector3, up: Vector3, toward:
  * @param rule The rule of the damp.
  * @returns The wrist and the rotation of the hand from the bind pose.
  */
-function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): { wrist: Vec3; hand: Quat } {
+function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): DampHand {
   const [n, up, toward] = headAxes(near.normal);
   const middle = new Vector3(...near.point).addScaledVector(n, -BASS_DRUM.depth);
   const wrist = middle
@@ -1370,17 +1430,60 @@ function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): { wrist: Vec3; hand:
     .clone()
     .multiplyScalar(-Math.cos(rule.fingers))
     .addScaledVector(up, -Math.sin(rule.fingers));
-  const thumb = new Vector3().crossVectors(n, fingers);
-  const target = new Matrix4().makeBasis(n, fingers, thumb);
+  const hand = new Quaternion()
+    .setFromAxisAngle(Y_AXIS, -rule.yaw)
+    .multiply(pawTurn('L', n, fingers));
+  return { kind: 'palm', wrist: toVec3(wrist), hand: toQuat(hand) };
+}
+
+/**
+ * Gives the grip of the mallet of each hand at a damp of the suspended cymbal (`EdgeDamp`, design
+ * 5.3): near the rim point nearest to the shoulder joint of the hand.
+ *
+ * @param middle The middle of the top of the cymbal.
+ * @param rule The rule of the damp.
+ * @param arms The left and the right arm.
+ * @returns The paw of the left and of the right hand.
+ */
+function pawsOnRim(
+  middle: Vec3,
+  rule: EdgeDamp,
+  arms: readonly [ArmRig, ArmRig],
+): readonly [DampHand, DampHand] {
+  const paw = (arm: ArmRig): DampHand => {
+    const center = new Vector3(...middle);
+    const out = new Vector3(...arm.bind.shoulder)
+      .sub(center)
+      .setY(0)
+      .normalize()
+      .applyAxisAngle(Y_AXIS, (arm.side === 'L' ? 1 : -1) * rule.around);
+    const grip = center
+      .addScaledVector(out, rule.rim + rule.grip[0])
+      .add(new Vector3(0, rule.grip[1], 0));
+    return { kind: 'edge', grip: toVec3(grip), share: rule.share };
+  };
+  return [paw(arms[0]), paw(arms[1])];
+}
+
+/**
+ * Gives the turn of a paw from the bind pose to a palm and a finger direction. In the bind pose,
+ * the palm of each paw faces in, the fingers point down, and the thumb points forward.
+ *
+ * @param side The side of the paw.
+ * @param palm The unit direction out of the palm.
+ * @param fingers The unit direction of the fingers, normal to the palm.
+ * @returns The world rotation of the hand from the bind pose.
+ */
+function pawTurn(side: 'L' | 'R', palm: Vector3, fingers: Vector3): Quaternion {
+  const sign = side === 'L' ? 1 : -1;
+  const thumb = new Vector3().crossVectors(palm, fingers).multiplyScalar(sign);
+  const target = new Matrix4().makeBasis(palm, fingers, thumb);
   const bind = new Matrix4().makeBasis(
-    new Vector3(1, 0, 0),
+    new Vector3(sign, 0, 0),
     new Vector3(0, -1, 0),
     new Vector3(0, 0, -1),
   );
-  const hand = new Quaternion()
-    .setFromAxisAngle(Y_AXIS, -rule.yaw)
-    .multiply(new Quaternion().setFromRotationMatrix(target.multiply(bind.transpose())));
-  return { wrist: toVec3(wrist), hand: toQuat(hand) };
+  return new Quaternion().setFromRotationMatrix(target.multiply(bind.transpose()));
 }
 
 /**

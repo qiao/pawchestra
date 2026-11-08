@@ -191,7 +191,7 @@ export function percussionTracks(
       )
     : null;
   const [left, right] = handTracks(rig, groups, side, amplitude, beats);
-  const damp = hold.damp && right ? dampTrackOf(hold.damp, noteGroups, right) : null;
+  const damp = hold.damp && right ? dampTrackOf(hold.damp, noteGroups, left, right) : null;
   const ring =
     hold.hands === 'pair' && right
       ? ringTrack(
@@ -201,13 +201,14 @@ export function percussionTracks(
         )
       : null;
   // A hold with a set position and no ready pose puts the sticks there in a long rest, and the
-  // hand cymbals go down after the move after the last crash.
+  // hand cymbals go down. The move down starts after the damp and the follow move of the last
+  // strike.
   const rests =
     (hold.set || hold.hands === 'pair') && !hold.ready
       ? setRests(
           groups.map((g) => g.start),
           beats,
-          hold.hands === 'pair' ? afterEnds(groups, [damp, ring]) : [],
+          afterEnds(groups, [damp, ring]),
         )
       : null;
   return { left, right, side, rests, damp, ring };
@@ -407,37 +408,59 @@ function afterEnds(
  * Finds the damps of a player (`PercussionHold.damp`, design 5.3). A note is damped at its end
  * when the silence to the next note of the player is at least `restSec`. The hand cymbals go to
  * the chest: the move starts at the crash of the note and ends before the next lift. The free paw
- * of the bass drum goes to the far head: the move starts after the rebound of the beater and ends
- * at the next note.
+ * of the bass drum goes to the far head, and the paw that did not strike a note of the suspended
+ * cymbal grips its rim: the move starts after the rebound of the strike, and ends at the next note
+ * or before the next lift of a paw. The key of each window is the hand: 0 for the left hand,
+ * and 1 for the right hand.
  *
  * @param rule The rule of the damp.
  * @param groups The note groups of the player, sorted by start.
- * @param strikes The strikes of the hand cymbals or of the beater.
+ * @param left The strikes of the left hand, or `null`.
+ * @param right The strikes of the right hand: the hand cymbals, the beater, or the right mallet.
  * @returns The damps.
  */
 function dampTrackOf(
   rule: DampRule,
   groups: readonly NoteGroup[],
-  strikes: StrikeTrack,
+  left: StrikeTrack | null,
+  right: StrikeTrack,
 ): DampTrack {
   const m = DAMP_MOTION;
   const wishes: DampWish[] = [];
+  // The last strike of a hand at or before a time, or -1.
+  const lastOf = (track: StrikeTrack | null, time: number): number =>
+    track ? lastAtOrBefore(track.starts, time + 1e-6) : -1;
   for (const [k, g] of groups.entries()) {
     const next = groups[k + 1];
-    // The strike of the note: the last strike at or before its start.
-    const i = lastAtOrBefore(strikes.starts, g.start + 1e-6);
-    if ((next && next.start - g.end < rule.restSec) || i < 0) {
+    const i = lastOf(right, g.start);
+    if ((next && next.start - g.end < rule.restSec) || (i < 0 && lastOf(left, g.start) < 0)) {
       continue;
     }
-    const palm = rule.kind === 'palm';
+    const after = { contact: g.end, hold: rule.hold, inSec: m.inSec, outSec: m.outSec };
+    if (rule.kind === 'chest') {
+      wishes.push({
+        ...after,
+        earliest: right.starts[i] ?? g.start,
+        latest: right.upStarts[i + 1] ?? Infinity,
+        key: 0,
+      });
+      continue;
+    }
+    // The free paw: the left paw of the bass drum, or the paw whose last strike is older.
+    const j = lastOf(left, g.start);
+    const free =
+      rule.kind === 'palm' || (right.starts[i] ?? -Infinity) > (left?.starts[j] ?? -Infinity)
+        ? left
+        : right;
+    // The next lift of a paw with a mallet.
+    const liftOf = (track: StrikeTrack | null): number =>
+      track ? (track.upStarts[lastOf(track, g.start) + 1] ?? Infinity) : Infinity;
+    const lift = rule.kind === 'palm' ? Infinity : Math.min(liftOf(left), liftOf(right));
     wishes.push({
-      contact: g.end,
-      earliest: palm ? g.start + STRIKE_MOTION.reboundSec : (strikes.starts[i] ?? g.start),
-      latest: palm ? (next?.start ?? Infinity) : (strikes.upStarts[i + 1] ?? Infinity),
-      hold: rule.hold,
-      key: 0,
-      inSec: m.inSec,
-      outSec: m.outSec,
+      ...after,
+      earliest: g.start + STRIKE_MOTION.reboundSec,
+      latest: Math.min(next?.start ?? Infinity, lift),
+      key: free === right ? 1 : 0,
     });
   }
   return dampTrack(wishes);
@@ -952,16 +975,25 @@ function poseHand(
   if (side.kind === 'mallet' && rig.hold.set) {
     setHand(side, rig.hold.set, hang.pole, shoulder.position, chest, hanging, restHand);
   }
-  // The free paw goes to the far head at a damp (`PalmDamp`) while the player plays, and else
-  // hangs.
-  const free = rig.dampHand ? state.damp.weight * weight : 0;
-  const play = side.kind === 'free' ? free : rig.hold.ready ? 1 : weight;
+  // A paw goes to its place at a damp of its hand (`PalmDamp`, `EdgeDamp`) while the player
+  // plays. The free paw else hangs.
+  const index = left ? 0 : 1;
+  const damped = rig.dampHands[index];
+  const muffle = damped && state.damp.key === index ? state.damp.weight * weight : 0;
+  const play = side.kind === 'free' ? muffle : rig.hold.ready ? 1 : weight;
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
   if (side.kind === 'mallet' && side.across) {
     const rest = rig.hold.sizes.rest;
-    const share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
+    let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
+    // At a damp, the grip goes to the rim, and the wrist lifts the head of the mallet.
+    if (damped?.kind === 'edge' && muffle > 0) {
+      grip.fromArray(damped.grip);
+      along.copy(grip).sub(offset.fromArray(side.home)).normalize();
+      head.lerp(grip.addScaledVector(along, side.length), muffle);
+      share += (damped.share - share) * muffle;
+    }
     acrossHand(side, head, share, shoulder.position, turnedPole);
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);
@@ -970,9 +1002,9 @@ function poseHand(
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
-  } else if (rig.dampPlace && rig.dampHand) {
-    wrist.fromArray(rig.dampPlace);
-    turn.fromArray(rig.dampHand);
+  } else if (damped?.kind === 'palm') {
+    wrist.fromArray(damped.wrist);
+    turn.fromArray(damped.hand);
   } else {
     wrist.copy(hanging);
     turn.copy(restHand);

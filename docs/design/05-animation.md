@@ -509,11 +509,13 @@ The rest of each family:
   come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the contact,
   stays for at most the hold, and ends before the next lift or note. The hand cymbals go against
   the chest (`ChestDamp`). The free left paw of the bass drummer lays its palm on the near part of
-  the far head, and the upper body turns 20° to bring the left shoulder forward, with the head
-  turned back (`PalmDamp`). Reason: the near rim of the far head stands out of the reach of the
-  short arm. With no turn, the left upper arm went 4.8 cm into the body. A drum moved 3 cm to
-  6 cm to the left, or turned 15° to 35°, still put the left upper arm 3.3 cm to 4.3 cm into the
-  body, or put the right upper arm into the belly and the beater off its spot. The timpanist does
+  the far head, and the upper body turns to bring the left shoulder forward, with the head turned
+  back (`PalmDamp`). Reason: the far head stands out of the reach of the short arm. With no turn,
+  the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
+  into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
+  the note takes its grip to the near rim, so that its fingers touch the edge, and the spine leans
+  further over the cymbal (`EdgeDamp`). The window ends before the next lift of each paw. Reason
+  of the lean: with no lean, the arm stretched past the margin of the arm gate. The timpanist does
   not damp: the short arms of the elephant held the lowest point of the paw a few cm over the
   head plane and outside the head in each tried place.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
