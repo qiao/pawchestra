@@ -76,6 +76,13 @@ from the V).
 - The spot is directly in front of the player [7]. The smallest drum plays nearer the rim, at
   about 2 inches [7].
 - The two mallets strike about 6 inches (15 cm) apart [4], in the same area of the head [7].
+- Timpani rolls are single strokes from hand to hand. A student starts with eighth notes at 80
+  beats each minute, then plays sixteenth notes and thirty-second notes. The roll does not have
+  to be very fast, because a roll that is too fast sounds choked, and the stick height does not
+  change with the speed [53]. A roll of thirty-second notes at 80 beats each minute has about 10.7
+  strokes each second, about 5.3 for each hand (derived).
+- A roll on a low note and a large drum is slower than a roll on a high note and a small drum,
+  because a loose head vibrates longer [53] [54].
 
 ## 5. The bass drum
 
@@ -157,7 +164,11 @@ from the V).
   the beater [15] [25].
 - The beater strikes the middle of the bottom side [9], or the outside near the bottom [16], with
   a motion that pushes the bottom side away [15]. A strike at 45° gives a darker sound [9].
-- The fingers of the left hand mute the triangle [16] [25].
+- The fingers of the left hand mute the triangle [16] [25]. Interlochen mutes it with the back of
+  the hand and the fingers, and holds it in the non-dominant hand on the ring finger and the thumb
+  [25].
+- A triangle roll moves the beater fast between two edges, the two top edges or the two bottom
+  edges [25].
 - The left hand holds the tambourine by its frame, at or a little below the chest, tilted in at
   about 45°, and the right hand strikes it [15] [16]. No source of this file gives a tambourine on
   a stand.
@@ -217,6 +228,10 @@ The app does not follow these facts:
   the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
   closed paw. Each paw keeps the roll that has no side bend at the strike
   (`PercussionHold.strikeRoll`), so the shaft stays in the paw.
+- **The roll (section 4).** A roll on one kettle stays in one hand, because each hand plays only
+  the front kettle on its side (`PercussionHold.pair`). The hand strikes on some notes of the roll,
+  at most 6 times each second (`STRIKE_MOTION.handRollSec`, `thinRolls()`), the rate of one hand
+  in a real roll.
 - **The playing spot (section 4).** Each mallet strikes farther in from the near rim
   (`PercussionHold.rim`), because the short arms hold the paws above the near rims. Each hand
   plays only the front kettle on its side (`PercussionHold.pair`), so the two mallets never strike
@@ -255,7 +270,7 @@ The app follows these facts:
 - **The suspended cymbal (section 7).** The badger plays the cymbal parts on a suspended cymbal
   (`SpeciesParams.cymbalForm`, `SUSPENDED_CYMBAL`). Its short arms cannot hold hand cymbals of the
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
-  other. The roll of the app is the alternate strikes of the notes.
+  other.
 - **The triangle (section 8).** The clip lies in the palm under the curled fingers, and the
   triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`).
 - **The xylophone (section 9).** The body moves from side to side behind the notes with the feet
@@ -270,6 +285,10 @@ The app does not follow these facts:
   times from a soft note to a loud note (`gestureSize()`), and a soft note must stay low.
 - **The lean over the bass drum (section 5).** The spine leans over the drum
   (`PercussionHold.lean`), so that the short arm can bend.
+- **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
+  second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
+  strikes the bottom side in one place, at most 6 times each second (`handRollSec`), and does not
+  move between two edges.
 - **The hold of the triangle (section 8).** The clip is at the height of the mouth
   (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of the
   long snout. The paw holds the clip in the palm, with the fingers up. No source gives the turn of
@@ -324,8 +343,8 @@ The models of `percussion.ts` follow these facts of real concert instruments (de
 ## 11. Sources
 
 Sources 1 to 12 opened on 2026-10-19, sources 13 to 33 on 2026-10-20, sources 36 to 42 on
-2026-10-25, sources 43 to 45 on 2026-10-28, and sources 46 to 52 on 2026-11-06, except where a
-source says "a search summary only".
+2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 54
+on 2026-11-08, except where a source says "a search summary only".
 
 1. "3 Timpani Grips", The Instrumentalist, December 2014.
    https://theinstrumentalist.com/december-2014/3-timpani-grips/
@@ -430,3 +449,7 @@ source says "a search summary only".
     https://www.mmdigest.com/Archives/Digests/200611/2006.11.21.10.html
 52. Wikibooks, "Acoustics/Basic Acoustics of the Marimba" (a search summary only).
     https://en.wikibooks.org/wiki/Acoustics/Basic_Acoustics_of_the_Marimba
+53. A. Proctor, "How to Properly Perform a Timpani Roll", Free Percussion Lessons.
+    https://freepercussionlessons.com/how-to-properly-perform-a-timpani-roll/
+54. A. Proctor, "How to Play Timpani Rolls on Low and High Notes", Free Percussion Lessons.
+    https://freepercussionlessons.com/how-to-play-timpani-rolls-on-low-and-high-notes

@@ -21,6 +21,16 @@ export const STRIKE_MOTION = {
    * the hand on the side of its target (design 5.3).
    */
   alternateSec: 0.5,
+  /**
+   * The least time between two visible strikes of a roll that alternates the two hands, in
+   * seconds: at most 12 strokes each second ({@link thinRolls}).
+   */
+  rollSec: 1 / 12,
+  /**
+   * The least time between two visible strikes of a roll in one hand, in seconds: at most 6
+   * strokes each second, as one hand of a roll of 32nd notes at 80 beats each minute.
+   */
+  handRollSec: 1 / 6,
 } as const;
 
 /** The sizes of the strike motion of one instrument, in meters. */
@@ -104,6 +114,62 @@ const BASE_RULES: HandRules = {
   ],
   shift: () => 0,
 };
+
+/**
+ * Removes strikes from the fast rolls of a player, so that the mallets move at a rate that the eye
+ * reads as a roll (design 5.3). A roll is a run of single strikes on one target, each nearer than
+ * `least` to the strike before it. The run keeps its first strike and then each `k`-th strike,
+ * with the smallest `k` that puts the kept strikes at least `least` apart on average. Thus the
+ * kept strikes stay on the note grid and follow the tempo. A kept strike takes the highest
+ * loudness of the strikes up to the next kept strike. The sound plays each note.
+ *
+ * @param groups The strikes of the player, sorted by start.
+ * @param least The least time between two kept strikes of a roll, in seconds.
+ * @returns The kept strikes, sorted by start.
+ */
+export function thinRolls(groups: readonly StrikeGroup[], least: number): StrikeGroup[] {
+  const same = (a: StrikeGroup | undefined, b: StrikeGroup | undefined): boolean => {
+    const p = a?.targets[0]?.point;
+    const q = b?.targets[0]?.point;
+    return (
+      !!p &&
+      !!q &&
+      a.targets.length === 1 &&
+      b.targets.length === 1 &&
+      p[0] === q[0] &&
+      p[1] === q[1] &&
+      p[2] === q[2] &&
+      b.start - a.start < least
+    );
+  };
+  const kept: StrikeGroup[] = [];
+  for (let i = 0; i < groups.length;) {
+    let end = i + 1;
+    while (end < groups.length && same(groups[end - 1], groups[end])) {
+      end++;
+    }
+    const first = groups[i];
+    const last = groups[end - 1];
+    if (!first || !last) {
+      break;
+    }
+    const mean = end - i > 1 ? (last.start - first.start) / (end - i - 1) : least;
+    const step = Math.max(1, Math.ceil(least / mean - 1e-9));
+    for (let k = i; k < end; k += step) {
+      const group = groups[k];
+      if (!group) {
+        break;
+      }
+      let loudness = group.loudness;
+      for (let j = k + 1; j < Math.min(k + step, end); j++) {
+        loudness = Math.max(loudness, groups[j]?.loudness ?? 0);
+      }
+      kept.push(step === 1 ? group : { ...group, loudness });
+    }
+    i = end;
+  }
+  return kept;
+}
 
 /**
  * Gives the strikes of a player to its two hands (design 5.3). A chord with two or more targets

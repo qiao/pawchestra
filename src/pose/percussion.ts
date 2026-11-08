@@ -19,7 +19,7 @@ import {
 import type { MalletSet, PercussionRig, PercussionSide } from './percussion-rig.ts';
 import { buildSideTrack, sideMoveAt } from './side-move.ts';
 import type { SideTrack } from './side-move.ts';
-import { STRIKE_MOTION, alternateHands, buildStrikeTrack } from './strikes.ts';
+import { STRIKE_MOTION, alternateHands, buildStrikeTrack, thinRolls } from './strikes.ts';
 import type { Strike, StrikeGroup, StrikeState, StrikeTarget, StrikeTrack } from './strikes.ts';
 
 /** The strike data of the two hands. A hand with no strikes has `null`. */
@@ -32,7 +32,8 @@ interface PercussionTracks {
 
 /**
  * Calculates the strike data of the two hands of a percussion player (design 5.3). The notes that
- * start within 50 ms of each other strike together. A drum player strikes its own instrument for
+ * start within 50 ms of each other strike together. A fast roll strikes only on some of its notes
+ * ({@link thinRolls}). A drum player strikes its own instrument for
  * each of its notes, also for the notes of another key group (design 3.8). Of a chord of the
  * small percussion player, the triangle sounds unless all notes are the tambourine. A timpani
  * hold with a pair of front kettles (`PercussionHold.pair`) plays each note on one of them. A
@@ -66,7 +67,7 @@ export function percussionTracks(
   const shift = instrument === 'xylophone' ? xylophoneShift(lowest, highest) : 0;
   const keyOf = (pitch: number): number =>
     pair ? (pitch < middle ? frontL : frontR) : targetKeyOf(instrument, pitch, kettles, shift);
-  const groups = groupChords(notes, loudness).map((group): StrikeGroup => {
+  const chords = groupChords(notes, loudness).map((group): StrikeGroup => {
     const keys = new Set<number>();
     for (const note of notes.slice(group.first, group.first + group.count)) {
       keys.add(keyOf(note.pitch));
@@ -82,6 +83,11 @@ export function percussionTracks(
     }
     return { start: group.start, loudness: group.loudness, targets };
   });
+  // A fast roll keeps the strikes of a rate that reads as a roll: two hands in turn, or one hand.
+  const groups = thinRolls(
+    chords,
+    hold.hands === 'alternate' ? STRIKE_MOTION.rollSec : STRIKE_MOTION.handRollSec,
+  );
   const side = hold.side
     ? buildSideTrack(
         hold.side,

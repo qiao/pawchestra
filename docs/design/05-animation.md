@@ -478,6 +478,13 @@ The rest of each family:
   reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
   points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
   stay out of the leaning belly. A home further out misses the bars.
+- **Fast rolls.** A roll is a run of single strikes on one target, faster than the visible stroke
+  rate. It keeps its first strike and then each `k`-th strike (`thinRolls()`), so the kept strikes
+  stay on the note grid and follow the tempo. Two hands in turn strike at most 12 times each
+  second (`STRIKE_MOTION.rollSec`), and one hand at most 6 times (`handRollSec`). The sound plays
+  each note. Reason: a hand that struck each note of a roll of 20 notes each second moved as a
+  buzz, and a real roll of 32nd notes at 80 beats each minute has about 11 strokes each second
+  (percussion 4).
 - **Snare sticks between strikes.** Each stick keeps its strike direction, and the wrist holds
   the tip a few cm above the head with the stick almost level (`MalletAcross.pitch`), as the
   ready position of a real player (percussion 6). Before a strike, the wrist lifts the tip
