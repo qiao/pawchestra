@@ -239,8 +239,7 @@ Design 4.4 gives the rule and the reason of each config key.
   band onto the thigh tops with a key `bind*`, and keep each crease vertex off the line of its
   neighbors.
 - When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
-  `pnpm raise-fit`. A shape fixes only the poses near its rule, and a body has at most
-  `RAISE_LIMIT` shapes. A shape cannot widen an elbow ring that a straight bind narrows.
+  `pnpm raise-fit`. A shape fixes only the poses near its rule, and design 4.4 gives its limits.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 - On an arm joined to the trunk, start an elbow shape with `below` 0, because `below` 0.3 also
