@@ -14,7 +14,7 @@ import {
 import type { PlayTarget } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
-import { Z_AXIS } from './axes.ts';
+import { Y_AXIS, Z_AXIS } from './axes.ts';
 import type { InstrumentOf } from './family.ts';
 import { hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
@@ -683,9 +683,11 @@ export const TRIANGLE_ROLL = {
  */
 function triangleCorner(): readonly (readonly [number, Vec3, Vec3])[] {
   const { side } = TRIANGLE;
-  const low = -0.05 - side * Math.sin(60 * MathUtils.DEG2RAD);
-  const corner = new Vector3(side / 2, low, 0);
+  const sin60 = Math.sin(60 * MathUtils.DEG2RAD);
+  // The top corner hangs 0.05 m below the origin of the piece (`TRIANGLE_CLIP`).
   const top = new Vector3(0, -0.05, 0);
+  const low = top.y - side * sin60;
+  const corner = new Vector3(side / 2, low, 0);
   const leftCorner = new Vector3(-side / 2, low, 0);
   const { keys, fromCorner, touch } = TRIANGLE_ROLL;
   const point = (to: Vector3, inward: Vector3): Vec3 =>
@@ -695,10 +697,9 @@ function triangleCorner(): readonly (readonly [number, Vec3, Vec3])[] {
         .add(to.clone().sub(corner).setLength(fromCorner))
         .addScaledVector(inward, touch),
     );
-  const up = new Vector3(0, 1, 0);
-  const intoRight = new Vector3(-Math.sin(60 * MathUtils.DEG2RAD), -0.5, 0);
+  const intoRight = new Vector3(-sin60, -0.5, 0);
   return [
-    [keys[0], point(leftCorner, up), toVec3(up)],
+    [keys[0], point(leftCorner, Y_AXIS), toVec3(Y_AXIS)],
     [keys[1], point(top, intoRight), toVec3(intoRight)],
   ];
 }
