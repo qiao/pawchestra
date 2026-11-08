@@ -2793,19 +2793,23 @@ function* sightRowsSteps(
           (view !== null && audienceShare(member, place, others.solid, view) >= AUDIENCE.hidden)
         );
       });
-      const placed = groupExtents(row.members, placement, groups);
+      // A row with no raised group has no riser to check.
+      const raised = levels.some((h) => h > 0);
+      const placed = raised ? groupExtents(row.members, placement, groups) : [];
       const own = levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null));
-      const owners = standGroups(row.members, placement, groups);
-      const items = [
-        ...placement.players.map((p, i) => ({
-          obstacle: p.obstacle,
-          group: groupIndex[i] ?? -1,
-        })),
-        ...placement.stands.map((p, j) => ({
-          obstacle: p.obstacle,
-          group: owners[j] ?? -1,
-        })),
-      ];
+      const owners = raised ? standGroups(row.members, placement, groups) : [];
+      const items = raised
+        ? [
+            ...placement.players.map((p, i) => ({
+              obstacle: p.obstacle,
+              group: groupIndex[i] ?? -1,
+            })),
+            ...placement.stands.map((p, j) => ({
+              obstacle: p.obstacle,
+              group: owners[j] ?? -1,
+            })),
+          ]
+        : [];
       return {
         heights,
         angles,
@@ -2846,7 +2850,12 @@ function* sightRowsSteps(
         break;
       }
     }
-    const last = yield* attempt(chosenHeights(tries, groups));
+    const chosen = chosenHeights(tries, groups);
+    // A try with the chosen heights gives the same try again.
+    const same = tries.find((t) =>
+      groups.every((g, k) => Math.abs((t.heights[g[0] ?? 0] ?? 0) - (chosen[k] ?? 0)) < 1e-9),
+    );
+    const last = same ?? (yield* attempt(chosen));
     const total = (t: SightTry): number => t.blocked.reduce((a, b) => a + b, 0);
     const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
     const valid = [last, ...tries].filter((t) => !t.contact);
