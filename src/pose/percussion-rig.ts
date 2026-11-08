@@ -969,7 +969,7 @@ function pairOfPlates(
   const plateTurn = toQuat(new Quaternion().setFromAxisAngle(Z_AXIS, CRASH_MOTION.tilt));
   const normal = new Vector3(1, 0, 0).applyQuaternion(new Quaternion(...plateTurn));
   targets.set(0, { point: toVec3(crash), normal: toVec3(normal) });
-  const rim = (bone: 'malletL' | 'malletR'): { readonly point: Vec3; readonly radius: number } => {
+  const rim = (bone: 'malletL' | 'malletR') => {
     const target = findTarget(model, (t) => t.kind === 'plate' && t.bone === bone);
     const { point } = bindTarget(model, target);
     const to = bindTarget(model, target, target.to).point;
