@@ -103,8 +103,7 @@ export const PIANO_BENCH = {
    * only the haunch from the seat top to 0.15 m above it, and its round haunch bulges further back
    * above that. A deeper bench grows back from its front edge, so the sloped thighs stay off it.
    * With the thighs 25° down, the fit is 0.244 m deep (0.195 m with the thighs 40° down), and the
-   * bench of 0.32 m, about the depth of the fit of the old body on the low bench (0.318 m), reaches
-   * 0.198 m behind the floor point, 0.076 m behind the back edge of the fit.
+   * bench of 0.32 m reaches 0.198 m behind the floor point, 0.076 m behind the back edge of the fit.
    */
   studioDepth: 0.32,
   pad: 0.26,
