@@ -377,7 +377,11 @@ function placeAt(member: Member, position: Vec3, facing: number, boxFacing = fac
     cos: Math.cos(facing),
     sin: Math.sin(facing),
   });
-  return { index: member.index, place: { position, facing, cast: member.cast }, obstacle };
+  return {
+    index: member.index,
+    place: { position, facing, cast: member.cast },
+    obstacle,
+  };
 }
 
 /**
@@ -559,7 +563,10 @@ function* aloneStandArcSteps(member: Member, radius: number): Steps<number> {
   if (known !== undefined) {
     return known;
   }
-  const partner: Member = { ...member, cast: { ...member.cast, player: member.cast.player + 1 } };
+  const partner: Member = {
+    ...member,
+    cast: { ...member.cast, player: member.cast.player + 1 },
+  };
   const arc = (yield* spacingSteps(member, partner, radius)) / 2;
   const arcs = aloneStandArcs.get(member) ?? new Map<number, number>();
   arcs.set(radius, arc);
@@ -845,7 +852,13 @@ function riserReserve(row: RowPlacement): RowRiser {
   const { inner, outer } = rowExtent(row);
   // A seat at 90° reaches past 90° by half a chair and the lip.
   const end = SPREAD_LIMITS.maxAngle + (CHAIR_ROOM + ROW_RISER.lip) / inner;
-  return { inner: inner - ROW_RISER.lip, outer, height: ROW_RISER.highest, from: -end, to: end };
+  return {
+    inner: inner - ROW_RISER.lip,
+    outer,
+    height: ROW_RISER.highest,
+    from: -end,
+    to: end,
+  };
 }
 
 /**
@@ -1027,7 +1040,10 @@ export function widenRisers(
  * @returns The place of the conductor.
  */
 export function conductorOn(podium: Vec3): ConductorPlace {
-  return { position: [podium[0], podium[1] + PODIUM_SIZE[1], podium[2]], facing: 0 };
+  return {
+    position: [podium[0], podium[1] + PODIUM_SIZE[1], podium[2]],
+    facing: 0,
+  };
 }
 
 /** The label of the obstacle of the podium, the conductor stand, and the conductor. */
@@ -1260,7 +1276,10 @@ function stageOf(draft: Draft): StageSize {
     ...seats.map((p) => -p.position[2] + CHAIR_ROOM + EDGE_MARGIN),
     ...boxes.map((b) => -b.z + reachZ(b) + EDGE_MARGIN),
   );
-  return { side: Math.max(SMALLEST_STAGE, 2 * halfWidth, front + behind), front };
+  return {
+    side: Math.max(SMALLEST_STAGE, 2 * halfWidth, front + behind),
+    front,
+  };
 }
 
 /**
@@ -1490,7 +1509,10 @@ interface SpreadLimits {
  * The limits of the spread (design 4.5, seat geometry). In the reference image, the seats reach
  * ±90°, and two neighbors are 1.1 to 1.7 m apart.
  */
-export const SPREAD_LIMITS: SpreadLimits = { maxAngle: (90 * Math.PI) / 180, maxArc: 1.6 };
+export const SPREAD_LIMITS: SpreadLimits = {
+  maxAngle: (90 * Math.PI) / 180,
+  maxArc: 1.6,
+};
 
 /** The step of the spread factor of one side of a row. */
 const SPREAD_STEP = 0.02;
@@ -2086,9 +2108,7 @@ function nearSegment(from: Vec3, to: Vec3, o: Obstacle, margin: number): boolean
   const dz = to[2] - from[2];
   const length = dx * dx + dz * dz;
   const t =
-    length > 0
-      ? Math.min(1, Math.max(0, ((cx - from[0]) * dx + (cz - from[2]) * dz) / length))
-      : 0;
+    length > 0 ? Math.min(1, Math.max(0, ((cx - from[0]) * dx + (cz - from[2]) * dz) / length)) : 0;
   const ex = from[0] + t * dx - cx;
   const ez = from[2] + t * dz - cz;
   return ex * ex + ez * ez <= reach * reach;
@@ -2186,6 +2206,66 @@ function sightOf(
 }
 
 /**
+ * The view of the audience on the raised rows (design 4.5, seat geometry). A row on a riser sits
+ * behind the strings, and a small animal there can hide behind them in the low wide shots of
+ * Cinematic. The points stand for those shots and the default view, as multiples of the stage
+ * side, relative to the podium center: the low and the middle camera at the front, and the two
+ * side cameras.
+ */
+const AUDIENCE = {
+  /** The first row that keeps its view: row 2, the first row on risers. */
+  firstRow: 2,
+  cameras: [
+    [0, 0.36, 1.3],
+    [0, 0.6, 1.25],
+    [-0.9, 0.5, 1.4],
+    [0.9, 0.5, 1.4],
+  ],
+  /** The points of the head around the eyes: the side move and the height, in meters. */
+  head: [
+    [0, 0],
+    [-0.1, 0.05],
+    [0.1, 0.05],
+    [0, 0.15],
+  ],
+  /** The hidden share of the head from which a player of a raised row counts as hidden. */
+  hidden: 0.2,
+} as const;
+
+/**
+ * Finds the share of the head of a player that the items in front hide from the audience
+ * ({@link AUDIENCE}).
+ *
+ * @param member The player.
+ * @param place The place of the player.
+ * @param solid The items that can hide the head.
+ * @param side The stage side, in meters.
+ * @returns The share, from 0 to 1.
+ */
+function audienceShare(
+  member: Member,
+  place: PlayerPlace,
+  solid: readonly Obstacle[],
+  side: number,
+): number {
+  const c = Math.cos(place.facing);
+  const s = Math.sin(place.facing);
+  const [x, y, z] = member.sight;
+  const points = AUDIENCE.head.map(([dx, dy]): Vec3 => [
+    place.position[0] + (x + dx) * c + z * s,
+    place.position[1] + y + dy,
+    place.position[2] - (x + dx) * s + z * c,
+  ]);
+  let hidden = 0;
+  for (const [cx, cy, cz] of AUDIENCE.cameras) {
+    const camera: Vec3 = [cx * side, cy * side, cz * side];
+    const items = solid.filter((o) => nearSegment(camera, points[0] ?? camera, o, 0.3));
+    hidden += points.filter((p) => items.some((o) => segmentHitsObstacle(camera, p, o))).length;
+  }
+  return hidden / (AUDIENCE.cameras.length * points.length);
+}
+
+/**
  * Gives the cost of a sight in the searches of the layout. A blocked player outweighs all partial
  * sights, and a partial sight outweighs all moves of 1° steps. Among the blocked places, a place
  * with less of the head and the baton paw hidden costs less, so that the search keeps the player
@@ -2213,6 +2293,8 @@ function sightCost(result: SightResult): number {
  * @param arcs The packed arc from each player to its right neighbor, in radians.
  * @param targets The points of the conductor.
  * @param blockers The items in front of the row.
+ * @param view The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or
+ *   `null`. A hidden head then costs as much as a hidden conductor.
  * @returns The steps, which return the angle of each player.
  */
 function* sightSweepSteps(
@@ -2221,6 +2303,7 @@ function* sightSweepSteps(
   arcs: readonly number[],
   targets: SightTargets,
   blockers: SightBlockers,
+  view: number | null,
 ): Steps<number[]> {
   const { members, radius, angles } = row;
   const next = [...angles];
@@ -2236,7 +2319,16 @@ function* sightSweepSteps(
         ? [placeStand(angle, radius - member.standDistance, i, [member], height).obstacle]
         : [];
     const place = placePlayer(member, angle, radius, height).place;
-    return sightOf(member, place, targets, { ...blockers, stands: [...blockers.stands, ...own] });
+    const seen = sightOf(member, place, targets, {
+      ...blockers,
+      stands: [...blockers.stands, ...own],
+    });
+    return view === null
+      ? seen
+      : {
+          ...seen,
+          hidden: seen.hidden + audienceShare(member, place, blockers.solid, view),
+        };
   };
   const steps = Math.round(CONDUCTOR_SIGHT.nudge / CONDUCTOR_SIGHT.nudgeStep);
   const right = angles.flatMap((a, i) => (a >= 0 ? [i] : []));
@@ -2650,13 +2742,14 @@ function* sightRowsSteps(
     const groups = seatGroups(row.members);
     const groupIndex = row.members.map((_, i) => groups.findIndex((g) => g.includes(i)));
     const extents = groupExtents(row.members, row.placement, groups);
+    const view = row.row >= AUDIENCE.firstRow ? stage.side : null;
     // Each group from row 2 can rise. A try in which the riser of a raised group does not fit at
     // the new places of its players is not valid.
     const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
 
     const attempt = function* (levels: readonly number[]): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers);
+      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view);
       let placement = placeRow(row.members, angles, row.radius, heights);
       if (
         angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9) ||
@@ -2668,17 +2761,34 @@ function* sightRowsSteps(
       }
       const bodies = placement.players.map((p) => p.obstacle);
       const stands = [...blockers.stands, ...placement.stands.map((p) => p.obstacle)];
+      // A player of a raised row that the audience does not see counts as blocked, so that its
+      // group rises.
       const blind = row.members.map((member, i) => {
         const place = placement.players[i]?.place;
-        const others = { solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)], stands };
-        return place !== undefined && sightOf(member, place, targets, others).sight === 2;
+        if (place === undefined) {
+          return false;
+        }
+        const others = {
+          solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)],
+          stands,
+        };
+        return (
+          sightOf(member, place, targets, others).sight === 2 ||
+          (view !== null && audienceShare(member, place, others.solid, view) >= AUDIENCE.hidden)
+        );
       });
       const placed = groupExtents(row.members, placement, groups);
       const own = levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null));
       const owners = standGroups(row.members, placement, groups);
       const items = [
-        ...placement.players.map((p, i) => ({ obstacle: p.obstacle, group: groupIndex[i] ?? -1 })),
-        ...placement.stands.map((p, j) => ({ obstacle: p.obstacle, group: owners[j] ?? -1 })),
+        ...placement.players.map((p, i) => ({
+          obstacle: p.obstacle,
+          group: groupIndex[i] ?? -1,
+        })),
+        ...placement.stands.map((p, j) => ({
+          obstacle: p.obstacle,
+          group: owners[j] ?? -1,
+        })),
       ];
       return {
         heights,
@@ -2961,7 +3071,12 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
 
   const empty: ChoirPlacement = { singers: [], risers: [], obstacles: [] };
   let choir = empty;
-  let draft: Draft = { players: withRows(rows), risers: [], obstacles, soloistFront };
+  let draft: Draft = {
+    players: withRows(rows),
+    risers: [],
+    obstacles,
+    soloistFront,
+  };
   const singers = inGroup('choir');
   const soloSingers = inGroup('vocal-soloists');
   const choirLevels = RISER.levels - (soloSingers.length > 0 ? 1 : 0);
