@@ -150,7 +150,7 @@ export const CHAMBER = {
 /** The facing of a player alone at the stage center: the audience (+z). */
 const AUDIENCE_FACING = Math.PI;
 
-/** The largest angle of one box of a riser arc, for the overlap check. */
+/** The largest angle of one box of an arc of the choir risers or a band, for the overlap test. */
 const RISER_BOX_ANGLE = (5 * Math.PI) / 180;
 
 /** How the players of a section use music stands (design 4.5, seat geometry). */
@@ -354,7 +354,7 @@ function placePlayer(member: Member, angle: number, radius: number, height = 0):
  * @param distance The radius of the stand.
  * @param owner The index of the player that has it as its own stand, or -1.
  * @param readers The players who read from the stand.
- * @param height The height of the floor under the stand: the riser of its row, or 0.
+ * @param height The height of the floor under the stand: a level of the choir risers, or 0.
  * @returns The place and the obstacle.
  */
 function placeStand(
@@ -597,8 +597,8 @@ function rowAngles(arrangement: Arrangement, radius: number): number[] {
  * @param members The players from left to right.
  * @param angles The angle of each player.
  * @param radius The radius of the row.
- * @param heights The height of the floor under each player: a riser, or 0 when absent. A stand
- *   stands at the height of its first reader.
+ * @param heights The height of the floor under each player: a level of the choir risers, or 0.
+ *   A stand stands at the height of its first reader.
  * @returns The places, with their obstacles.
  */
 function placeRow(
@@ -1743,7 +1743,7 @@ function widenGapSteps(
  *
  * @param rows The packed rows, from the front.
  * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
- *   risers, and the singers.
+ *   choir risers, and the singers.
  * @param soloPianos The obstacles of the piano soloists, which are also in `fixed`.
  * @param stage The stage side and the front distance.
  * @param gap The angle of the gap of the conductor in row 0, in radians.
@@ -2599,7 +2599,7 @@ function onStage(
 }
 
 /**
- * Calculates the positions of the stage, the players, the music stands, and the risers for a
+ * Calculates the positions of the stage, the players, the music stands, and the choir risers for a
  * score (design 4.5, 5.1). The sections sit in rows around the podium. The footprints of the
  * players, their instruments, their seats, and the stands keep 0.05 m from each other: a seat
  * arc grows for a wide footprint, and a row moves back until it is clear of the items in front.
