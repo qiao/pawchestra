@@ -1175,19 +1175,19 @@ const MONKEY_TRUMPET = {
  * strap (`docs/reference/wind-technique.md` 3): the tuba stands against the body, the bell at the
  * left of the head, the left paw on the main branch, and the right paw on the valves. The long
  * muzzle puts the mouthpiece 0.51 m in front of the shoulder joints, so the lead pipe of the tuba
- * is longer (`SpeciesParams.tubaPipe`), the right shoulder turns 45° forward, and the left
- * shoulder 40°, as the shoulder blades of a real player slide forward. The lower end of the tuba
- * turns 25° to the right, so that the bell stands at the left of the horn on the muzzle, and 4°
- * forward, so that the body of the tuba stays off the round belly (0.2 cm, against 1.5 cm with no
- * forward turn). The
- * elbows point down and out, a little more down than out (`poleL`, `poleR`, `restPoleL`,
- * `restPoleR`), as the arms of a real player stay away from the rib cage
- * (`docs/reference/wind-technique.md` 1.8) and each forearm stays in its range of turn. With the
- * palms on their tubes, the elbows out turn the left forearm 84° and the right forearm 57° from
- * neutral, near the end of the turn of a real forearm, and the skin of each forearm twists. With
- * these elbows, the left forearm turns 67° and the right forearm 15°. With the elbows straight
- * down, the thick upper arms go into the round belly. At rest, the tuba moves off the mouth and its
- * lower end turns 5° forward.
+ * is longer (`SpeciesParams.tubaPipe`), the right shoulder turns 45° forward, and the left shoulder
+ * 40°, as the shoulder blades of a real player slide forward. The lower end of the tuba turns 25°
+ * to the right, so that the bell stands at the left of the horn on the muzzle, and 7° forward, so
+ * that the body of the tuba stays off the round belly and the valves stay in front of the paws.
+ * With 4°, faces of the right elbow fold in the play (arm gate folds 5, base 1), and with no
+ * forward turn, the tuba goes 1.5 cm into the belly. The elbows point down and out, a little more
+ * down than out (`poleL`, `poleR`, `restPoleL`, `restPoleR`), as the arms of a real player stay
+ * away from the rib cage (`docs/reference/wind-technique.md` 1.8) and each forearm stays in its
+ * range of turn. With the palms on their tubes, the elbows out turn the left forearm 84° and the
+ * right forearm 57° from neutral, near the end of the turn of a real forearm, and the skin of each
+ * forearm twists. With these elbows, the left forearm turns 67° and the right forearm 15°. With the
+ * elbows straight down, the thick upper arms go into the round belly. At rest, the tuba moves off
+ * the mouth and its lower end turns 5° forward.
  *
  * The right palm faces the valve tops, and the left palm faces the main branch (`faceTube`,
  * `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as the left hand of a real tubist
@@ -1215,7 +1215,7 @@ const RHINO_TUBA = {
   ...WIND_HOLDS.tuba,
   reach: 45 * MathUtils.DEG2RAD,
   reachL: 40 * MathUtils.DEG2RAD,
-  play: holdTurn(4, 25),
+  play: holdTurn(7, 25),
   poleL: [-0.75, -1, 0],
   poleR: [0.75, -1, 0],
   rest: holdTurn(5, 20),
