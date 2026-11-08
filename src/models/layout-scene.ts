@@ -2700,6 +2700,8 @@ interface RowSight {
   readonly cost: number;
   /** The indices of the blocked players. */
   readonly blind: readonly number[];
+  /** The largest hidden share of the head and the baton paw of a player ({@link SightResult}). */
+  readonly worst: number;
 }
 
 /**
@@ -2717,12 +2719,21 @@ const FRONT_MOVES = {
   reach: 0.45,
 } as const;
 
+/**
+ * The hidden share of the head and the baton paw of a back desk player ({@link SightResult}) from
+ * which row 1 tries the gap of the conductor ({@link sightRowsSteps}). A player that sees most of
+ * the conductor keeps its desk, so that a small fault does not move the desks into the gap.
+ */
+const OPEN_GAP_HIDDEN = 0.5;
+
 /** One try of the heights of the seat groups of a row. */
 interface SightTry {
   /** The sum of the costs of the sights of the players ({@link sightCost}). */
   readonly cost: number;
   /** The indices of the blocked players. */
   readonly blind: readonly number[];
+  /** The largest hidden share of the head and the baton paw of a player ({@link SightResult}). */
+  readonly worst: number;
   /** The height of the floor under each player. */
   readonly heights: readonly number[];
   readonly angles: readonly number[];
@@ -2775,9 +2786,10 @@ function chosenHeights(
  * the lowest height with its fewest blocked players. A try with a riser that does not fit on the
  * stage is not valid. The strings sit on the stage top. After row 1, the players of row 0 move
  * for the back desks ({@link FRONT_MOVES}). The moves keep the gaps, the stage, and the limits of
- * the spread. When a back desk stays blocked, row 1 tries again with the gap of the conductor
- * open: its inner players can pass 0°, and the view of the audience counts in the cost. The row
- * keeps this try only when it has fewer blocked players.
+ * the spread. When a back desk stays blocked and loses at least {@link OPEN_GAP_HIDDEN} of the
+ * conductor, row 1 tries again with the gap of the conductor open: its inner players can pass 0°,
+ * and the view of the audience counts in the cost. The row keeps this try only when it has fewer
+ * blocked players.
  *
  * @param rows The rows after the spread, from the front.
  * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
@@ -2877,6 +2889,7 @@ function* sightRowsSteps(
       // A player of a raised row that the audience does not see counts as blocked, so that its
       // group rises.
       let cost = 0;
+      let worst = 0;
       const blind = row.members.map((member, i) => {
         const place = placement.players[i]?.place;
         if (place === undefined) {
@@ -2889,6 +2902,7 @@ function* sightRowsSteps(
         const seen = sightOf(member, place, targets, others);
         const hidden = view === null ? 0 : audienceShare(member, place, others.solid, view);
         cost += sightCost(seen) + 300 * hidden;
+        worst = Math.max(worst, seen.hidden);
         return seen.sight === 2 || hidden >= AUDIENCE.hidden;
       });
       // A row with no raised group has no riser to check.
@@ -2911,6 +2925,7 @@ function* sightRowsSteps(
       return {
         cost,
         blind: blind.flatMap((b, i) => (b ? [i] : [])),
+        worst,
         heights,
         angles,
         placement,
@@ -2983,6 +2998,7 @@ function* sightRowsSteps(
       },
       cost: pick.cost,
       blind: pick.blind,
+      worst: pick.worst,
     };
   };
 
@@ -3136,7 +3152,7 @@ function* sightRowsSteps(
       const moved = yield* moveFrontSteps(front.row, at, row, n, result);
       done[at] = { row: moved.front, risers: [] };
       result = moved.back;
-      if (result.blind.length > 0) {
+      if (result.worst >= OPEN_GAP_HIDDEN) {
         result = yield* seeRow(row, n, done, null, true);
       }
     }
