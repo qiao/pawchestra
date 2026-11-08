@@ -1513,6 +1513,35 @@ function rowFits(row: RowPlacement, clearance: RowClearance, stage: StageSize): 
 }
 
 /**
+ * Places a row at the first angles of a list that keep each seat within ±90°, each box 0.3 m from
+ * the edges, and each footprint its gaps from the other items ({@link rowFits}), in steps.
+ *
+ * @param row The row.
+ * @param tries The angles of the players to try, in order.
+ * @param clearance The other items on the stage.
+ * @param stage The stage side and the front distance.
+ * @returns The steps, which return the row at the first angles that fit, or the same row.
+ */
+function* firstFitSteps(
+  row: FittedRow,
+  tries: readonly (readonly number[])[],
+  clearance: RowClearance,
+  stage: StageSize,
+): Steps<FittedRow> {
+  for (const angles of tries) {
+    yield;
+    if (!withinSpread(angles)) {
+      continue;
+    }
+    const placement = placeRow(row.members, angles, row.radius);
+    if (rowFits(placement, clearance, stage)) {
+      return { ...row, angles, placement };
+    }
+  }
+  return row;
+}
+
+/**
  * Calculates the angles of a row after the spread of one side. Each arc between two neighbors
  * on that side, and the arc from 0° to the innermost player, grows by a factor up to 1.6 m. An
  * arc that is already longer stays. With no player at 0°, the innermost arc of a centered row
@@ -1565,24 +1594,17 @@ function spreadAngles(row: FittedRow, side: -1 | 1, factor: number): number[] {
  * @param stage The stage side and the front distance.
  * @returns The row with the new angles, or the same row if no factor above 1 fits.
  */
-function* spreadSideSteps(
+function spreadSideSteps(
   row: FittedRow,
   side: -1 | 1,
   clearance: RowClearance,
   stage: StageSize,
 ): Steps<FittedRow> {
+  const tries: number[][] = [];
   for (let k = SPREAD_LIMITS.maxArc / SEATED_ARC; k > 1 + 1e-9; k -= SPREAD_STEP) {
-    yield;
-    const next = spreadAngles(row, side, k);
-    if (!withinSpread(next)) {
-      continue;
-    }
-    const placement = placeRow(row.members, next, row.radius);
-    if (rowFits(placement, clearance, stage)) {
-      return { ...row, angles: next, placement };
-    }
+    tries.push(spreadAngles(row, side, k));
   }
-  return row;
+  return firstFitSteps(row, tries, clearance, stage);
 }
 
 /** The row of the desks after the first desk of each string seat. */
@@ -1653,7 +1675,7 @@ function wedgeAngles(packed: FittedRow, front: FittedRow, side: -1 | 1): number[
  * @param stage The stage side and the front distance.
  * @returns The row with the new angles, or the spread row if no blend fits.
  */
-function* wedgeSideSteps(
+function wedgeSideSteps(
   spread: FittedRow,
   packed: FittedRow,
   front: FittedRow,
@@ -1663,21 +1685,13 @@ function* wedgeSideSteps(
 ): Steps<FittedRow> {
   const target = wedgeAngles(packed, front, side);
   const steps = Math.round(1 / WEDGE_STEP);
-  for (let k = steps; k > 0; k--) {
-    yield;
-    const blend = k / steps;
-    const next = spread.angles.map((angle, i) =>
+  const tries = Array.from({ length: steps }, (_, j) => {
+    const blend = (steps - j) / steps;
+    return spread.angles.map((angle, i) =>
       side * (packed.angles[i] ?? 0) > 0 ? angle + blend * ((target[i] ?? angle) - angle) : angle,
     );
-    if (!withinSpread(next)) {
-      continue;
-    }
-    const placement = placeRow(spread.members, next, spread.radius);
-    if (rowFits(placement, clearance, stage)) {
-      return { ...spread, angles: next, placement };
-    }
-  }
-  return spread;
+  });
+  return firstFitSteps(spread, tries, clearance, stage);
 }
 
 /**
