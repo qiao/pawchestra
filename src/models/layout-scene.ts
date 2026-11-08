@@ -2355,7 +2355,7 @@ function* sightRowsSteps(
 }
 
 /** The largest lift of the choir risers for the sight of the singers, in meters. */
-const CHOIR_LIFT = 0.6;
+const CHOIR_LIFT = 1.0;
 
 /**
  * Finds the lift of the choir risers (design 4.5, seat geometry): the lowest lift in steps of
