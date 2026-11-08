@@ -16,13 +16,7 @@ import {
 } from './footprint.ts';
 import type { Footprint, Obstacle, PlacedBox } from './footprint.ts';
 import { FIRST_ROW_RADIUS, SEATED_ARC, STAND_DISTANCE, seatAt } from './layout.ts';
-import type {
-  ConductorPlace,
-  PlayerPlace,
-  RiserLevel,
-  SceneLayout,
-  StandPlace,
-} from './layout.ts';
+import type { ConductorPlace, PlayerPlace, RiserLevel, SceneLayout, StandPlace } from './layout.ts';
 import type { Vec3 } from './tuples.ts';
 import { ModelCache } from './model-cache.ts';
 import type { PlayerModel } from './player.ts';
@@ -1457,13 +1451,12 @@ const SPREAD_STEP = 0.02;
  *
  * @param b The box, relative to the podium center.
  * @param stage The stage side and the front distance.
- * @param margin The margin, in meters: 0.3 m, or {@link RISER_EDGE} for a riser.
- * @returns True if each corner of the box keeps the margin.
+ * @returns True if each corner of the box keeps the margin of 0.3 m.
  */
-export function boxOnStage(b: PlacedBox, stage: StageSize, margin = EDGE_MARGIN): boolean {
+export function boxOnStage(b: PlacedBox, stage: StageSize): boolean {
   // The z of the stage center, relative to the podium center.
   const center = stage.front - stage.side / 2;
-  return boxCorners(b).every(([x, z]) => keepsStageMargin(x, z - center, stage.side, margin));
+  return boxCorners(b).every(([x, z]) => keepsStageMargin(x, z - center, stage.side, EDGE_MARGIN));
 }
 
 /**
