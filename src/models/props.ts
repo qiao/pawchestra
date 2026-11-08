@@ -176,8 +176,12 @@ export const MUSIC_STAND = {
    * to the top edge at 1.202 m.
    */
   eyeGap: 0.123,
-  /** The lowest height of the middle of the desk above the floor, in meters. */
-  lowestDesk: 0.6,
+  /**
+   * The lowest height of the middle of the desk above the floor, in meters. The desk of the mouse
+   * thus stays below its eyes, so that it does not hide the conductor (design 4.5, seat
+   * geometry).
+   */
+  lowestDesk: 0.4,
   /** The tilt of the desk toward the reader. */
   tilt: 30 * MathUtils.DEG2RAD,
   /** The length of each leg of the tripod base. */
