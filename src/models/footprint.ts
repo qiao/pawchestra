@@ -52,6 +52,27 @@ function around(boxes: readonly Bounds[]): Bounds {
 }
 
 /**
+ * Gives the box around a list of corners.
+ *
+ * @param corners 3 numbers for each corner. There is at least one corner.
+ * @returns The low corner and the high corner.
+ */
+export function cornerBounds(corners: ArrayLike<number>): Bounds {
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < corners.length; i++) {
+    const a = i % 3;
+    const v = corners[i] ?? 0;
+    min[a] = Math.min(min[a] ?? Infinity, v);
+    max[a] = Math.max(max[a] ?? -Infinity, v);
+  }
+  return {
+    min: [min[0] ?? 0, min[1] ?? 0, min[2] ?? 0],
+    max: [max[0] ?? 0, max[1] ?? 0, max[2] ?? 0],
+  };
+}
+
+/**
  * Calculates one box for each group of the triangles of a corner list.
  *
  * @param p The corner list, 9 numbers for each triangle, such as the positions of a mesh.

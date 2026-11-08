@@ -1,3 +1,5 @@
+import type { Bounds } from './bounds.ts';
+import { cornerBounds } from './footprint.ts';
 import type { Obstacle, PlacedBox } from './footprint.ts';
 import type { PlayerPlace } from './layout.ts';
 import type { PlayerModel } from './player.ts';
@@ -165,16 +167,8 @@ function slabHit(start: number, d: number, low: number, high: number, span: Span
   return !(span.t0 > span.t1);
 }
 
-/** A box that is parallel to the axes. */
-interface AxisBox {
-  /** The low corner. */
-  readonly min: Vec3;
-  /** The high corner. */
-  readonly max: Vec3;
-}
-
 /** A node of the box tree of a sight mesh, in the model axes. */
-interface SightNode extends AxisBox {
+interface SightNode extends Bounds {
   /** The two children, or `null` for a leaf. */
   readonly kids: readonly [SightNode, SightNode] | null;
   /** 9 numbers for each triangle of a leaf. */
@@ -231,27 +225,6 @@ export function attachSightMesh(
 }
 
 /**
- * Gives the box around a list of corners.
- *
- * @param corners 3 numbers for each corner.
- * @returns The low corner and the high corner.
- */
-function cornerBox(corners: ArrayLike<number>): AxisBox {
-  const min = [Infinity, Infinity, Infinity];
-  const max = [-Infinity, -Infinity, -Infinity];
-  for (let i = 0; i < corners.length; i++) {
-    const a = i % 3;
-    const v = corners[i] ?? 0;
-    min[a] = Math.min(min[a] ?? Infinity, v);
-    max[a] = Math.max(max[a] ?? -Infinity, v);
-  }
-  return {
-    min: [min[0] ?? 0, min[1] ?? 0, min[2] ?? 0],
-    max: [max[0] ?? 0, max[1] ?? 0, max[2] ?? 0],
-  };
-}
-
-/**
  * Gives the sight mesh of a model: its triangles in a box tree. Each node splits its triangles
  * at the middle of its longest side, down to {@link SIGHT_LEAF} triangles.
  *
@@ -271,7 +244,7 @@ function sightMeshOf(model: PlayerModel): SightMesh {
     ids.forEach((t, k) => {
       corners.set(p.subarray(t * 9, t * 9 + 9), k * 9);
     });
-    const box = cornerBox(corners);
+    const box = cornerBounds(corners);
     if (ids.length <= SIGHT_LEAF) {
       return { ...box, kids: null, corners };
     }
