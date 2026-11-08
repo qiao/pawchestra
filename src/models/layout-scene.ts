@@ -1797,8 +1797,8 @@ function* sightSweepSteps(
   targets: SightTargets,
   blockers: SightBlockers,
   view: number | null,
-  innerLimit: number | null = null,
-  memo: SightMemo | null = null,
+  innerLimit: number | null,
+  memo: SightMemo | null,
 ): Steps<number[]> {
   const { members, radius, angles } = row;
   const next = [...angles];
@@ -2375,6 +2375,8 @@ function* sightRowsSteps(
             targets,
             blockers,
             stage.side,
+            null,
+            null,
           )
         : yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
       let placement = placeRow(row.members, angles, row.radius, heights);
