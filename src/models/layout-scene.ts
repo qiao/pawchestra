@@ -1668,11 +1668,75 @@ function wedgeSideSteps(
 }
 
 /**
+ * The gap of the conductor in row 0 (design 4.5, seat geometry): the angle from 0° to which the
+ * inner first desk of each side moves out, in radians: 32°. The rows behind the strings stand on
+ * the stage floor, and the heads of the seated strings are about as high as the eyes of the
+ * conductor. Thus the winds, the brass, and the percussion see the conductor through this gap.
+ */
+const CONDUCTOR_GAP = (32 * Math.PI) / 180;
+
+/**
+ * Calculates the angles of one side of a row with its inner player at an angle from 0° or farther
+ * out. Each next player to the outside keeps its angle, or moves out to keep its packed arc
+ * ({@link packedArcs}) from its inner neighbor.
+ *
+ * @param row The row.
+ * @param side -1 for the players left of 0°, 1 for the players right of 0°.
+ * @param gap The smallest angle of the inner player from 0°, in radians.
+ * @returns The angle of each player. The players of the other side keep their angles.
+ */
+function gapAngles(row: FittedRow, side: -1 | 1, gap: number): number[] {
+  const arcs = packedArcs(row);
+  const order = row.angles
+    .map((angle, i) => ({ out: side * angle, i }))
+    .filter((p) => p.out > 0)
+    .toSorted((a, b) => a.out - b.out);
+  const next = [...row.angles];
+  let inner = -1;
+  for (const { out, i } of order) {
+    const from = side * (next[inner] ?? 0);
+    const at =
+      inner < 0 ? Math.max(out, gap) : Math.max(out, from + (arcs[side > 0 ? inner : i] ?? 0));
+    next[i] = side * at;
+    inner = i;
+  }
+  return next;
+}
+
+/**
+ * Widens the gap of the conductor on one side of row 0 (design 4.5, seat geometry), in steps. The
+ * inner first desk moves out to {@link CONDUCTOR_GAP}, or to the largest angle in steps of 1° below
+ * it that keeps each seat within ±90°, each box 0.3 m from the edges, and each footprint its gaps
+ * from the other items ({@link rowFits}). Its outer neighbors move out with it
+ * ({@link gapAngles}).
+ *
+ * @param row Row 0 after the spread.
+ * @param side -1 for the players left of 0°, 1 for the players right of 0°.
+ * @param clearance The other items on the stage.
+ * @param stage The stage side and the front distance.
+ * @returns The row with the new angles, or the same row if no wider gap fits.
+ */
+function widenGapSteps(
+  row: FittedRow,
+  side: -1 | 1,
+  clearance: RowClearance,
+  stage: StageSize,
+): Steps<FittedRow> {
+  const inner = Math.min(...row.angles.filter((a) => side * a > 0).map((a) => side * a));
+  const tries: number[][] = [];
+  for (let gap = CONDUCTOR_GAP; gap > inner + 1e-9; gap -= CONDUCTOR_SIGHT.nudgeStep) {
+    tries.push(gapAngles(row, side, gap));
+  }
+  return firstFitSteps(row, tries, clearance, stage);
+}
+
+/**
  * Spreads each instrumental row inside the stage, from the front (design 4.5, seat geometry), so
  * that the rows fill the front corners of the stage. The left side and the right side of a row
  * each get their own factor. Rows 0 and 1 keep the violins left of
- * 0° and the other strings right of it. After its spread, row 1 moves its back desks toward their
- * first desks ({@link wedgeSideSteps}). The stage side does not change.
+ * 0° and the other strings right of it. After its spread, row 0 widens the gap of the conductor
+ * ({@link widenGapSteps}), and row 1 moves its back desks toward their first desks
+ * ({@link wedgeSideSteps}). The stage side does not change.
  *
  * @param rows The packed rows, from the front.
  * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
@@ -1693,6 +1757,10 @@ function* spreadRowsSteps(
     const left = yield* spreadSideSteps(row, -1, clearance, stage);
     let next = yield* spreadSideSteps(left, 1, clearance, stage);
     const front = done.find((r) => r.row === 0);
+    if (row.row === 0) {
+      next = yield* widenGapSteps(next, -1, clearance, stage);
+      next = yield* widenGapSteps(next, 1, clearance, stage);
+    }
     if (row.row === BACK_DESK_ROW && front) {
       next = yield* wedgeSideSteps(next, row, front, -1, clearance, stage);
       next = yield* wedgeSideSteps(next, row, front, 1, clearance, stage);
@@ -2287,6 +2355,10 @@ function* moveFrontSteps(
   const arcs = packedArcs(front);
   const clearance = clearanceOf(pass.fixed, pass.soloPianos, [], pass.rows.slice(at + 1));
   const blindBefore = frontBlind(pass, front, front.placement);
+  // The inner first desks keep the gap of the conductor of the spread row on each side.
+  const gapOf = (side: -1 | 1): number =>
+    Math.min(...front.angles.filter((b) => side * b > 0).map((b) => side * b));
+  const gaps = { left: gapOf(-1), right: gapOf(1) };
   const known = new Map<string, SightResult>();
   let best = first;
   let angles = [...front.angles];
@@ -2310,6 +2382,7 @@ function* moveFrontSteps(
             Math.abs(a) <= SPREAD_LIMITS.maxAngle + 1e-9 &&
             Math.sign(a) === Math.sign(angles[i] ?? 0) &&
             Math.abs(a) >= Math.abs(packedFront?.angles[i] ?? 0) - 1e-9 &&
+            Math.abs(a) >= (a < 0 ? gaps.left : gaps.right) - 1e-9 &&
             (i === next.length - 1 || (next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9),
         );
         if (!valid) {
