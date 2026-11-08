@@ -1365,13 +1365,15 @@ function chamberStage(
   players: readonly PlacedPlayer[],
   stands: readonly PlacedStand[],
 ): ChamberStage {
-  const low = [Infinity, Infinity];
-  const high = [-Infinity, -Infinity];
+  let x0 = Infinity;
+  let z0 = Infinity;
+  let x1 = -Infinity;
+  let z1 = -Infinity;
   const add = (x: number, z: number, rx: number, rz: number): void => {
-    low[0] = Math.min(low[0] ?? 0, x - rx);
-    low[1] = Math.min(low[1] ?? 0, z - rz);
-    high[0] = Math.max(high[0] ?? 0, x + rx);
-    high[1] = Math.max(high[1] ?? 0, z + rz);
+    x0 = Math.min(x0, x - rx);
+    z0 = Math.min(z0, z - rz);
+    x1 = Math.max(x1, x + rx);
+    z1 = Math.max(z1, z + rz);
   };
   const seat = CHAIR_ROOM + EDGE_MARGIN;
   for (const p of players) {
@@ -1380,8 +1382,6 @@ function chamberStage(
   for (const b of [...players, ...stands].flatMap((p) => p.obstacle.boxes)) {
     add(b.x, b.z, reachOn(b, 1, 0) + EDGE_MARGIN, reachOn(b, 0, 1) + EDGE_MARGIN);
   }
-  const [x0 = 0, z0 = 0] = low;
-  const [x1 = 0, z1 = 0] = high;
   return {
     side: Math.max(SMALLEST_STAGE, x1 - x0, z1 - z0),
     shift: [-(x0 + x1) / 2, 0, -(z0 + z1) / 2],
