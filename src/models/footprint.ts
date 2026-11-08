@@ -205,6 +205,21 @@ export function placeFootprint(footprint: Footprint, position: Vec3, facing: num
 }
 
 /**
+ * Calculates half the length of the projection of a placed box on an axis of the plane.
+ *
+ * @param box The box.
+ * @param nx The x part of the unit axis.
+ * @param nz The z part of the unit axis.
+ * @returns The half length, in meters.
+ */
+function reachOn(box: PlacedBox, nx: number, nz: number): number {
+  return (
+    box.halfX * Math.abs(box.cos * nx - box.sin * nz) +
+    box.halfZ * Math.abs(box.sin * nx + box.cos * nz)
+  );
+}
+
+/**
  * Finds if an axis of the plane separates two placed boxes by a gap.
  *
  * @param a A box.
@@ -225,11 +240,7 @@ function axisSeparates(
   nz: number,
   gap: number,
 ): boolean {
-  const reachA =
-    a.halfX * Math.abs(a.cos * nx - a.sin * nz) + a.halfZ * Math.abs(a.sin * nx + a.cos * nz);
-  const reachB =
-    b.halfX * Math.abs(b.cos * nx - b.sin * nz) + b.halfZ * Math.abs(b.sin * nx + b.cos * nz);
-  return Math.abs(dx * nx + dz * nz) >= reachA + reachB + gap;
+  return Math.abs(dx * nx + dz * nz) >= reachOn(a, nx, nz) + reachOn(b, nx, nz) + gap;
 }
 
 /**
