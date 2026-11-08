@@ -394,6 +394,18 @@ interface Targets {
   readonly all: readonly WebGLRenderTarget[];
 }
 
+/** The pass materials whose programs change with the quality tier. */
+interface TierPasses {
+  /** The gather pass of the depth of field. Its sample count follows the tier. */
+  readonly blurGather: ShaderMaterial;
+  /** The pass of the contact shade and the floor gloss. */
+  readonly surface: ShaderMaterial;
+  /** The blur pass of the contact shade and the floor gloss. */
+  readonly surfaceBlur: ShaderMaterial;
+  /** The final pass to the canvas. Its effects follow the tier. */
+  readonly final: ShaderMaterial;
+}
+
 /**
  * The post effects of the stage (design 2.6, 4.5). The scene renders with MSAA into a target of
  * floats, then the bloom, the depth of field, and one final pass make the image of the canvas.
@@ -475,15 +487,16 @@ export class PostPipeline {
       uClamp: { value: new Vector4(0, 0, 1, 1) },
       ...focusUniforms(),
     });
-    this.#blurGather = this.#createBlurGather();
-    this.#surface = this.#createSurface();
     this.#surfaceRows = passMaterial(SURFACE_ROWS_FRAGMENT, {
       uSource: { value: null },
       uTexel: { value: new Vector2() },
       uClamp: { value: new Vector4(0, 0, 1, 1) },
     });
-    this.#surfaceBlur = this.#createSurfaceBlur();
-    this.#final = this.#createFinal();
+    const passes = createTierPasses(tier);
+    this.#blurGather = passes.blurGather;
+    this.#surface = passes.surface;
+    this.#surfaceBlur = passes.surfaceBlur;
+    this.#final = passes.final;
   }
 
   /**
@@ -516,10 +529,11 @@ export class PostPipeline {
     this.#surface.dispose();
     this.#surfaceBlur.dispose();
     this.#final.dispose();
-    this.#blurGather = this.#createBlurGather();
-    this.#surface = this.#createSurface();
-    this.#surfaceBlur = this.#createSurfaceBlur();
-    this.#final = this.#createFinal();
+    const passes = createTierPasses(tier);
+    this.#blurGather = passes.blurGather;
+    this.#surface = passes.surface;
+    this.#surfaceBlur = passes.surfaceBlur;
+    this.#final = passes.final;
     this.#disposeTargets();
     this.#targets = this.#createTargets();
   }
@@ -885,106 +899,6 @@ export class PostPipeline {
     renderer.autoClear = autoClear;
   }
 
-  #createBlurGather(): ShaderMaterial {
-    return passMaterial(
-      BLUR_GATHER_FRAGMENT,
-      {
-        uSource: { value: null },
-        uTexel: { value: new Vector2() },
-        uPixelsPerBlur: { value: 1 },
-        uClamp: { value: new Vector4(0, 0, 1, 1) },
-      },
-      { SAMPLES: Math.max(1, TIER_SETTINGS[this.#tier].blurSamples) },
-    );
-  }
-
-  #createSurface(): ShaderMaterial {
-    const settings = TIER_SETTINGS[this.#tier];
-    const defines: Record<string, number> = {};
-    if (settings.contactSamples > 0) {
-      defines['CONTACT_SAMPLES'] = settings.contactSamples;
-    }
-    if (settings.floorGloss) {
-      defines['FLOOR_GLOSS'] = 1;
-    }
-    return passMaterial(SURFACE_FRAGMENT, surfaceUniforms(), defines);
-  }
-
-  #createSurfaceBlur(): ShaderMaterial {
-    const defines: Record<string, number> = {};
-    if (TIER_SETTINGS[this.#tier].floorGloss) {
-      defines['FLOOR_GLOSS'] = 1;
-    }
-    return passMaterial(
-      SURFACE_BLUR_FRAGMENT,
-      {
-        uSource: { value: null },
-        uRows: { value: null },
-        uTexel: { value: new Vector2() },
-        uClamp: { value: new Vector4(0, 0, 1, 1) },
-      },
-      defines,
-    );
-  }
-
-  #createFinal(): ShaderMaterial {
-    const settings = TIER_SETTINGS[this.#tier];
-    const defines: Record<string, number> = {};
-    if (settings.bloomLevels > 0) {
-      defines['BLOOM'] = 1;
-    }
-    if (settings.blurSamples > 0) {
-      defines['DEPTH_OF_FIELD'] = 1;
-    }
-    if (settings.lensFringe) {
-      defines['LENS_FRINGE'] = 1;
-    }
-    if (settings.contactSamples > 0 || settings.floorGloss) {
-      defines['SURFACE'] = 1;
-    }
-    if (settings.floorGloss) {
-      defines['FLOOR_GLOSS'] = 1;
-    }
-    const look = POST_LOOK;
-    const material = passMaterial(
-      FINAL_FRAGMENT,
-      {
-        uFrame: { value: new Vector4(0, 0, 1, 1) },
-        uHalfClamp: { value: new Vector4(0, 0, 1, 1) },
-        uScene: { value: null },
-        uBloom: { value: null },
-        uBlur: { value: null },
-        uBlurOn: { value: 0 },
-        uSurface: { value: null },
-        uSurfaceOn: { value: 0 },
-        uSurfaceClamp: { value: new Vector4(0, 0, 1, 1) },
-        uBloomStrength: { value: look.bloomStrength },
-        uHalation: { value: new Vector3(...look.halation) },
-        uSceneDepth: { value: null },
-        uHazeOn: { value: 0 },
-        uHazeInverse: { value: new Matrix4() },
-        uHazeCamera: { value: new Vector3() },
-        uHazeLight: { value: new Vector3(0, 1, 0) },
-        uHazeColor: { value: new Vector3(...ROOM_HAZE.color) },
-        uHaze: { value: new Vector4() },
-        ...gradeUniforms(),
-        uVignette: { value: look.vignette },
-        uAspect: { value: 1 },
-        uCinema: { value: 0 },
-        // The fall does not change, so no frame sets it.
-        uFrameVignette: { value: new Vector2(...FRAME_VIGNETTE.fall) },
-        uGrain: { value: look.grain },
-        uSeed: { value: 0 },
-        uFringe: { value: LENS_FRINGE.shift },
-        ...focusUniforms(),
-      },
-      defines,
-    );
-    // The final pass draws to the canvas, so it takes the tone mapping of the renderer.
-    material.toneMapped = true;
-    return material;
-  }
-
   #disposeTargets(): void {
     const targets = this.#targets;
     if (!targets) {
@@ -996,4 +910,143 @@ export class PostPipeline {
     }
     this.#targets = null;
   }
+}
+
+/**
+ * Creates the gather pass of the depth of field of a tier.
+ *
+ * @param tier The quality tier.
+ * @returns The material.
+ */
+function createBlurGather(tier: QualityTier): ShaderMaterial {
+  return passMaterial(
+    BLUR_GATHER_FRAGMENT,
+    {
+      uSource: { value: null },
+      uTexel: { value: new Vector2() },
+      uPixelsPerBlur: { value: 1 },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
+    },
+    { SAMPLES: Math.max(1, TIER_SETTINGS[tier].blurSamples) },
+  );
+}
+
+/**
+ * Creates the pass of the contact shade and the floor gloss of a tier.
+ *
+ * @param tier The quality tier.
+ * @returns The material.
+ */
+function createSurface(tier: QualityTier): ShaderMaterial {
+  const settings = TIER_SETTINGS[tier];
+  const defines: Record<string, number> = {};
+  if (settings.contactSamples > 0) {
+    defines['CONTACT_SAMPLES'] = settings.contactSamples;
+  }
+  if (settings.floorGloss) {
+    defines['FLOOR_GLOSS'] = 1;
+  }
+  return passMaterial(SURFACE_FRAGMENT, surfaceUniforms(), defines);
+}
+
+/**
+ * Creates the blur pass of the contact shade and the floor gloss of a tier.
+ *
+ * @param tier The quality tier.
+ * @returns The material.
+ */
+function createSurfaceBlur(tier: QualityTier): ShaderMaterial {
+  const defines: Record<string, number> = {};
+  if (TIER_SETTINGS[tier].floorGloss) {
+    defines['FLOOR_GLOSS'] = 1;
+  }
+  return passMaterial(
+    SURFACE_BLUR_FRAGMENT,
+    {
+      uSource: { value: null },
+      uRows: { value: null },
+      uTexel: { value: new Vector2() },
+      uClamp: { value: new Vector4(0, 0, 1, 1) },
+    },
+    defines,
+  );
+}
+
+/**
+ * Creates the final pass of a tier, which draws to the canvas.
+ *
+ * @param tier The quality tier.
+ * @returns The material.
+ */
+function createFinal(tier: QualityTier): ShaderMaterial {
+  const settings = TIER_SETTINGS[tier];
+  const defines: Record<string, number> = {};
+  if (settings.bloomLevels > 0) {
+    defines['BLOOM'] = 1;
+  }
+  if (settings.blurSamples > 0) {
+    defines['DEPTH_OF_FIELD'] = 1;
+  }
+  if (settings.lensFringe) {
+    defines['LENS_FRINGE'] = 1;
+  }
+  if (settings.contactSamples > 0 || settings.floorGloss) {
+    defines['SURFACE'] = 1;
+  }
+  if (settings.floorGloss) {
+    defines['FLOOR_GLOSS'] = 1;
+  }
+  const look = POST_LOOK;
+  const material = passMaterial(
+    FINAL_FRAGMENT,
+    {
+      uFrame: { value: new Vector4(0, 0, 1, 1) },
+      uHalfClamp: { value: new Vector4(0, 0, 1, 1) },
+      uScene: { value: null },
+      uBloom: { value: null },
+      uBlur: { value: null },
+      uBlurOn: { value: 0 },
+      uSurface: { value: null },
+      uSurfaceOn: { value: 0 },
+      uSurfaceClamp: { value: new Vector4(0, 0, 1, 1) },
+      uBloomStrength: { value: look.bloomStrength },
+      uHalation: { value: new Vector3(...look.halation) },
+      uSceneDepth: { value: null },
+      uHazeOn: { value: 0 },
+      uHazeInverse: { value: new Matrix4() },
+      uHazeCamera: { value: new Vector3() },
+      uHazeLight: { value: new Vector3(0, 1, 0) },
+      uHazeColor: { value: new Vector3(...ROOM_HAZE.color) },
+      uHaze: { value: new Vector4() },
+      ...gradeUniforms(),
+      uVignette: { value: look.vignette },
+      uAspect: { value: 1 },
+      uCinema: { value: 0 },
+      // The fall does not change, so no frame sets it.
+      uFrameVignette: { value: new Vector2(...FRAME_VIGNETTE.fall) },
+      uGrain: { value: look.grain },
+      uSeed: { value: 0 },
+      uFringe: { value: LENS_FRINGE.shift },
+      ...focusUniforms(),
+    },
+    defines,
+  );
+  // The final pass draws to the canvas, so it takes the tone mapping of the renderer.
+  material.toneMapped = true;
+  return material;
+}
+
+/**
+ * Creates the pass materials whose programs change with the tier.
+ *
+ * @param tier The quality tier.
+ * @returns The materials.
+ */
+function createTierPasses(tier: QualityTier): TierPasses {
+  return {
+    blurGather: createBlurGather(tier),
+    surface: createSurface(tier),
+    surfaceBlur: createSurfaceBlur(tier),
+    final: createFinal(tier),
+  };
 }
