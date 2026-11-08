@@ -1881,10 +1881,16 @@ function slabHit(start: number, d: number, low: number, high: number, span: Span
   return !(span.t0 > span.t1);
 }
 
-/** A node of the box tree of a sight mesh, in the model axes. */
-interface SightNode {
+/** A box that is parallel to the axes. */
+interface AxisBox {
+  /** The low corner. */
   readonly min: Vec3;
+  /** The high corner. */
   readonly max: Vec3;
+}
+
+/** A node of the box tree of a sight mesh, in the model axes. */
+interface SightNode extends AxisBox {
   /** The two children, or `null` for a leaf. */
   readonly kids: readonly [SightNode, SightNode] | null;
   /** 9 numbers for each triangle of a leaf. */
@@ -1928,7 +1934,7 @@ const meshPlaces = new WeakMap<Obstacle, MeshPlace>();
  * @param corners 3 numbers for each corner.
  * @returns The low corner and the high corner.
  */
-function cornerBox(corners: ArrayLike<number>): { min: Vec3; max: Vec3 } {
+function cornerBox(corners: ArrayLike<number>): AxisBox {
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < corners.length; i++) {
@@ -2292,8 +2298,8 @@ function sightCost(result: SightResult): number {
  * blocked players, then the fewest players with no sight of the left paw, then the smallest
  * moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor, and the
  * outer player does not pass its spread angle, because the spread took the room to the stage
- * edge. The inner player of a split row stays at its spread angle or farther out, or with `inner`
- * at that angle from 0° or farther out.
+ * edge. The inner player of a split row stays at its spread angle or farther out, or with
+ * `innerLimit` at that angle from 0° or farther out.
  *
  * @param row The row after the spread.
  * @param heights The height of the floor under each player.
@@ -2302,7 +2308,7 @@ function sightCost(result: SightResult): number {
  * @param blockers The items in front of the row.
  * @param view The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or
  *   `null`. A hidden head then costs as much as a hidden conductor.
- * @param inner The smallest angle of a player of a split row from 0°, in radians, or `null`.
+ * @param innerLimit The smallest angle of a player of a split row from 0°, in radians, or `null`.
  * @param memo The known sights of the players at their angles, or `null`.
  * @returns The steps, which return the angle of each player.
  */
@@ -2313,7 +2319,7 @@ function* sightSweepSteps(
   targets: SightTargets,
   blockers: SightBlockers,
   view: number | null,
-  inner: number | null = null,
+  innerLimit: number | null = null,
   memo: SightMemo | null = null,
 ): Steps<number[]> {
   const { members, radius, angles } = row;
@@ -2363,8 +2369,8 @@ function* sightSweepSteps(
       side: 1,
       order: right,
       bound: (): number => {
-        if (row.split && inner !== null) {
-          return Math.min(angles[innerRight ?? 0] ?? 0, inner);
+        if (row.split && innerLimit !== null) {
+          return Math.min(angles[innerRight ?? 0] ?? 0, innerLimit);
         }
         return row.split || innerLeft === undefined
           ? (angles[innerRight ?? 0] ?? 0)
@@ -2375,8 +2381,8 @@ function* sightSweepSteps(
       side: -1,
       order: left,
       bound: (): number => {
-        if (row.split && inner !== null) {
-          return Math.max(angles[innerLeft ?? 0] ?? 0, -inner);
+        if (row.split && innerLimit !== null) {
+          return Math.max(angles[innerLeft ?? 0] ?? 0, -innerLimit);
         }
         return row.split || innerRight === undefined
           ? (angles[innerLeft ?? 0] ?? 0)
