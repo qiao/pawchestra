@@ -131,6 +131,8 @@ export interface PercussionLayer {
   readonly right: StrikeTrack | null;
   /** The side move of the body behind the notes (`PercussionHold.side`), or `null`. */
   readonly side: SideTrack | null;
+  /** The long rests with the sticks in their set position (`setRests()`), or `null`. */
+  readonly rests: Float64Array | null;
 }
 
 /** The note layer of the conductor: the baton, the cues, and the left hand (design 5.4). */

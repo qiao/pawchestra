@@ -19,7 +19,14 @@ import {
 import type { MalletSet, PercussionRig, PercussionSide } from './percussion-rig.ts';
 import { buildSideTrack, sideMoveAt } from './side-move.ts';
 import type { SideTrack } from './side-move.ts';
-import { STRIKE_MOTION, alternateHands, buildStrikeTrack, thinRolls } from './strikes.ts';
+import { smoothstep } from './rest.ts';
+import {
+  STRIKE_MOTION,
+  alternateHands,
+  beatSecAt,
+  buildStrikeTrack,
+  thinRolls,
+} from './strikes.ts';
 import type { Strike, StrikeGroup, StrikeState, StrikeTarget, StrikeTrack } from './strikes.ts';
 
 /** The strike data of the two hands. A hand with no strikes has `null`. */
@@ -28,6 +35,98 @@ interface PercussionTracks {
   readonly right: StrikeTrack | null;
   /** The side move of the body behind the notes (`PercussionHold.side`), or `null`. */
   readonly side: SideTrack | null;
+  /**
+   * The long rests in which the sticks go to their set position (`PercussionHold.set`), or `null`
+   * for a hold with no set position or a ready hold ({@link setRests}).
+   */
+  readonly rests: Float64Array | null;
+}
+
+/**
+ * The timing of the set position in a long rest of the music (design 5.3), in beats. A drumline
+ * goes back to the set position one beat after the end of a passage, and to the playing position
+ * two beats before an entrance (`docs/reference/percussion-technique.md` 6).
+ */
+export const SET_MOTION = {
+  /** A rest between two strikes of at least this length takes the set position. */
+  restBeats: 6,
+  /** The sticks go down to the set position in this time after the last strike. */
+  lowerBeats: 1,
+  /**
+   * The sticks lift from the set position from this time before the next strike to the time of
+   * {@link liftEndBeats} before it. The lift of the strike from the rest height follows.
+   */
+  liftStartBeats: 2,
+  /** The lift from the set position ends this time before the next strike. */
+  liftEndBeats: 1,
+  /** The length of a beat with no conducted beats, in seconds. */
+  beatSec: 0.5,
+} as const;
+
+/**
+ * Finds the long rests of a player in which the sticks go to their set position (design 5.3).
+ * Before the first strike, the sticks stay in the set position until the lift before it, and after
+ * the last strike, they go down and stay.
+ *
+ * @param starts The starts of the strikes of the player, sorted.
+ * @param beats The times of the conducted beats, sorted.
+ * @returns Four times for each rest: the start and the end of the lowering, and the start and the
+ *   end of the lift. A rest with no lowering or no lift has infinite times there.
+ */
+export function setRests(starts: readonly number[], beats: Float64Array): Float64Array {
+  const m = SET_MOTION;
+  const beat = (time: number): number => beatSecAt(beats, time) || m.beatSec;
+  const rests: number[] = [];
+  const lift = (start: number): [number, number] => [
+    start - m.liftStartBeats * beat(start),
+    start - m.liftEndBeats * beat(start),
+  ];
+  const lower = (end: number): [number, number] => [end, end + m.lowerBeats * beat(end)];
+  const first = starts[0];
+  const last = starts.at(-1);
+  if (first === undefined || last === undefined) {
+    return new Float64Array();
+  }
+  rests.push(-Infinity, -Infinity, ...lift(first));
+  for (let i = 1; i < starts.length; i++) {
+    const end = starts[i - 1] ?? 0;
+    const start = starts[i] ?? 0;
+    if (start - end >= m.restBeats * beat(end)) {
+      rests.push(...lower(end), ...lift(start));
+    }
+  }
+  rests.push(...lower(last), Infinity, Infinity);
+  return Float64Array.from(rests);
+}
+
+/**
+ * Gives the weight of the playing position against the set position at a song time (design 5.3):
+ * 0 in the set position of a long rest, and 1 in a passage.
+ *
+ * @param rests The long rests of the player ({@link setRests}).
+ * @param time The song time of the note layer.
+ * @returns The weight, from 0 to 1.
+ */
+export function setWeightAt(rests: Float64Array, time: number): number {
+  for (let k = 0; k + 3 < rests.length; k += 4) {
+    const lowerStart = rests[k] ?? 0;
+    const lowerEnd = rests[k + 1] ?? 0;
+    const liftStart = rests[k + 2] ?? 0;
+    const liftEnd = rests[k + 3] ?? 0;
+    if (time < lowerStart) {
+      return 1;
+    }
+    if (time < liftEnd) {
+      if (time < lowerEnd) {
+        return 1 - smoothstep((time - lowerStart) / (lowerEnd - lowerStart));
+      }
+      if (time < liftStart) {
+        return 0;
+      }
+      return smoothstep((time - liftStart) / (liftEnd - liftStart));
+    }
+  }
+  return 1;
 }
 
 /**
@@ -44,7 +143,8 @@ interface PercussionTracks {
  * @param notes The notes of the player, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
  * @param amplitude The seeded amplitude of the player.
- * @param beats The times of the conducted beats, sorted: the lift before an entry follows them.
+ * @param beats The times of the conducted beats, sorted: the lift before an entry and the set
+ *   position of a long rest follow them.
  * @returns The strike data of each hand.
  */
 export function percussionTracks(
@@ -116,6 +216,14 @@ export function percussionTracks(
       amplitude,
       beats,
     );
+  // A hold with a set position and no ready pose puts the sticks there in a long rest.
+  const rests =
+    hold.set && !hold.ready
+      ? setRests(
+          groups.map((g) => g.start),
+          beats,
+        )
+      : null;
   if (hold.hands === 'alternate' || hold.hands === 'sides') {
     const [left, right] = alternateHands(groups, {
       alternateSec: hold.hands === 'sides' ? 0 : STRIKE_MOTION.alternateSec,
@@ -137,6 +245,7 @@ export function percussionTracks(
       left: track(left, hold.offsetL, rig.restL),
       right: track(right, hold.offsetR, rig.restR),
       side,
+      rests,
     };
   }
   const strikes = groups.flatMap((g): Strike[] => {
@@ -144,7 +253,9 @@ export function percussionTracks(
     return target ? [{ ...target, start: g.start, loudness: g.loudness }] : [];
   });
   const one = track(strikes, hold.offsetR, rig.restR);
-  return hold.hands === 'pair' ? { left: one, right: one, side } : { left: null, right: one, side };
+  return hold.hands === 'pair'
+    ? { left: one, right: one, side, rests }
+    : { left: null, right: one, side, rests };
 }
 
 /**

@@ -256,7 +256,12 @@ The rest of each family:
   The deer sits up with each hand near a string.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
-  rest level across the waist, as a snare drummer between entries (`PercussionHold.set`).
+  rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). A hold
+  with a set position and no ready pose also takes it in a long rest of the music (`setRests()`,
+  `SET_MOTION`): before the first note, in a rest of at least 6 beats, and after the last note.
+  The sticks go down in the beat after the last strike, and lift from 2 beats to 1 beat before
+  the next strike, as a drumline does (percussion 6). Reason: the sticks stood still a few cm
+  over the head through each long rest.
 - **Choir.** The penguin keeps the folder in front of the chest, as a choir between two pieces.
 
 ## 5.3 Instrument motion

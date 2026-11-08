@@ -30,7 +30,7 @@ import { HARP_STRING_COUNT, stringSwingsAt } from './harp-strings.ts';
 import { poseHarpFeet } from './harp-feet.ts';
 import { pedalNotchesAt } from './harp-pedals.ts';
 import { HARP_PEDALS } from '../models/instruments/harp.ts';
-import { posePercussion } from './percussion.ts';
+import { posePercussion, setWeightAt } from './percussion.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
 import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
@@ -527,7 +527,9 @@ function poseAnimal(
       pose.instrumentOffset[1] += py;
       pose.instrumentOffset[2] += pz;
       writeBody(pose, player, scratch);
-      posePercussion(note.rig, scratch.torso, strikes, weight, pose.rotations);
+      // In a long rest of the music, the sticks go to their set position (`setRests()`).
+      const set = note.rests ? setWeightAt(note.rests, noteTime) : 1;
+      posePercussion(note.rig, scratch.torso, strikes, weight * set, pose.rotations);
       if (note.side && legs) {
         plantFeet(legs, pose.rootOffset, pose.rotations);
       }
