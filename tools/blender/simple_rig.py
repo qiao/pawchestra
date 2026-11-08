@@ -15,7 +15,8 @@ The steps:
  2. Give each face the color of the texture, and make the nose gloss (`add_surface()`).
  3. With `limbs` in the config, make the limbs longer along their bones (`limb_moves()`), and
     move the joints with them. With `rings`, cut the faces of each elbow, wrist, and knee with
-    planes at a right angle to the bone (`joint_rings()`).
+    planes at a right angle to the bone (`joint_rings()`). With `rings.between`, also cut each
+    arm halfway between each two rings of the mesh (`between_rings()`).
  4. Add the armature of the app at the joints of the config, in the T-pose of the mesh, with the
     Action `bind` of the seat rules of the config (`build_armature()`).
  5. Give the weights by bone heat (Automatic Weights). The arm segments and the helpers take
@@ -207,6 +208,64 @@ def roll_split(w, names, co, rig):
             w[:, cols] = split
 
 
+def between_rings(body, config):
+    """Cuts the faces of each arm with a plane halfway between each two neighboring rings of the
+    mesh, at a right angle to the line from the shoulder joint to the wrist joint, so that each
+    arm segment has about two rings and the faces between the rings are short. A cut only splits
+    the faces on its plane, so the surface keeps its form. A ring is a group of at least
+    `ringVerts` vertices of the arm (within `armRadius` of the line) whose places along the line
+    lie within `ringGap` units of the next. The cuts lie between the shares `between` of the line,
+    so that the arm root at the trunk and the paw keep their faces. Two rings less than `minGap`
+    units apart, such as the rings of a joint cut, take no cut between them, because the short
+    faces there fold at a bent joint. Gives the count of the cuts."""
+    rule = config['rings']
+    low, high = rule['between']
+    bm = bmesh.new()
+    bm.from_mesh(body.data)
+    count = 0
+    for sign in (1.0, -1.0):
+        shoulder, along, length = arm_axis(config, sign)
+
+        def places():
+            """Gives the place along the line, the distance from it, and the arm mask of each
+            vertex."""
+            co = np.array([v.co[:] for v in bm.verts]) @ sa.TO_STUDIO.T
+            t = (co - shoulder) @ along
+            r = np.linalg.norm(co - shoulder - np.outer(t, along), axis=1)
+            return t, r < rule['armRadius']
+
+        t, arm = places()
+        found = np.sort(t[arm & (t > low * length) & (t < high * length)])
+        groups = [[found[0]]]
+        for x in found[1:]:
+            if x - groups[-1][-1] < rule['ringGap']:
+                groups[-1].append(x)
+            else:
+                groups.append([x])
+        rings = [float(np.mean(g)) for g in groups if len(g) >= rule['ringVerts']]
+        for a, b in zip(rings, rings[1:]):
+            if b - a < rule['minGap']:
+                continue
+            t, arm = places()
+            inside = arm & (t > 0)
+            faces = [f for f in bm.faces if all(inside[v.index] for v in f.verts)]
+            edges = {e for f in faces for e in f.edges}
+            verts = {v for f in faces for v in f.verts}
+            bmesh.ops.bisect_plane(
+                bm,
+                geom=[*verts, *edges, *faces],
+                dist=rule['snap'],
+                plane_co=((shoulder + along * (a + b) / 2) @ sa.TO_STUDIO).tolist(),
+                plane_no=(along @ sa.TO_STUDIO).tolist(),
+            )
+            bm.verts.index_update()
+            count += 1
+    bm.to_mesh(body.data)
+    bm.free()
+    body.data.update()
+    return count
+
+
 def smooth_weights(body, passes, share, rig=None):
     """Smooths the bone weights over the mesh edges, then keeps the 4 largest weights of each
     vertex and normalizes them. Bone heat gives a sharp step where the T-pose arm meets the chest,
@@ -347,6 +406,8 @@ def main():
     if 'limbs' in config:
         config, eyes = stretch_limbs(body, config, eyes)
     cuts = joint_rings(body, config) if 'rings' in config else 0
+    if 'between' in config.get('rings', {}):
+        cuts += between_rings(body, config)
     body.data.calc_loop_triangles()
     added = len(body.data.loop_triangles) - triangles
 
