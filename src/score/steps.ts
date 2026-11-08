@@ -1,9 +1,10 @@
 /**
- * The value of a yield of {@link Steps}: `undefined` between two steps, or `wait` before a step
- * that waits for the GPU, such as a shader program that compiles in parallel. The pure modules
- * yield only `undefined`.
+ * The value of a yield of {@link Steps}: `undefined` between two steps, `wait` before a step that
+ * waits for the GPU, such as a shader program that compiles in parallel, or the promise of a load
+ * that the next step needs, such as the modules of the studio bodies of a piece (design 7.2). The
+ * pure modules yield only `undefined`.
  */
-type StepYield = undefined | 'wait';
+type StepYield = undefined | 'wait' | Promise<void>;
 
 /**
  * The step form of a long calculation (design 7.2): a generator that yields between its steps and
@@ -17,7 +18,8 @@ export type Steps<T> = Generator<StepYield, T, undefined>;
 /**
  * Runs all steps of a calculation at once. It cannot run a step that yields `wait`: WebGL changes
  * the status of a fence or of a parallel compile only between two tasks, so that wait never ends
- * in one task (design 7.2).
+ * in one task (design 7.2). It also does not wait for a promise of a load, so the caller loads
+ * first.
  *
  * @param steps The steps.
  * @returns The result of the last step.

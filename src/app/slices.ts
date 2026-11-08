@@ -66,7 +66,8 @@ function waitForGpu(): Promise<void> {
 /**
  * Runs the steps of a calculation in slices of the main thread (design 7.2). A slice runs steps
  * until {@link SLICE_MS} pass, and then gives the main thread back. A step that waits for the GPU
- * gives it back at once. The first slice starts in a later task.
+ * gives it back at once, and a step that yields the promise of a load gives it back until the load
+ * ends. The first slice starts in a later task.
  *
  * @param steps The steps.
  * @param live Tells if the result is still needed. A later selection makes it false, and the run
@@ -92,6 +93,15 @@ export async function runSliced<T>(steps: Steps<T>, live: () => boolean): Promis
     if (step.value === 'wait') {
       // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
       await waitForGpu();
+      start = performance.now();
+    } else if (step.value !== undefined) {
+      // A failed load ends the steps, so that their `finally` blocks run, and the run fails.
+      const stopped: Generator<unknown, T | null, undefined> = steps;
+      // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
+      await step.value.catch((error: unknown) => {
+        stopped.return(null);
+        throw error;
+      });
       start = performance.now();
     } else if (performance.now() - start >= SLICE_MS) {
       // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
