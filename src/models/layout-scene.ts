@@ -2233,12 +2233,14 @@ function joinRisers(risers: readonly (RowRiser | null)[]): RowRiser[] {
 
 /**
  * Finds where the risers of the seat groups of a row go into an item. A riser that goes into an
- * item of a lower group lifts that group to the height of the riser.
+ * item of a lower group lifts that group to the height of the riser. A raised group with no riser
+ * on the stage counts as a contact, because its players have no floor.
  *
  * @param risers The riser of each group, or `null` for a group on the stage top.
  * @param items The players and the stands of the row, with the index of their group.
  * @param count The number of groups.
  * @param around The items around the row that a riser must not go into.
+ * @param levels The height of each group.
  * @returns The height to which each group must rise, and true if a riser goes into an item.
  */
 function riserContact(
@@ -2246,9 +2248,10 @@ function riserContact(
   items: readonly { readonly obstacle: Obstacle; readonly group: number }[],
   count: number,
   around: readonly Obstacle[],
+  levels: readonly number[],
 ): Pick<SightTry, 'lifts' | 'contact'> {
   const lifts = Array.from({ length: count }, () => 0);
-  let contact = false;
+  let contact = levels.some((h, k) => h > 0 && !risers[k]);
   for (const riser of risers) {
     if (!riser) {
       continue;
@@ -2280,7 +2283,10 @@ interface SightTry {
    * one of its items, or 0.
    */
   readonly lifts: readonly number[];
-  /** True if a riser goes into an item of the row or of the stage. */
+  /**
+   * True if a riser goes into an item of the row or of the stage, or if a raised group has no
+   * riser.
+   */
   readonly contact: boolean;
 }
 
@@ -2361,12 +2367,9 @@ function* sightRowsSteps(
     const groups = seatGroups(row.members);
     const groupIndex = row.members.map((_, i) => groups.findIndex((g) => g.includes(i)));
     const extents = groupExtents(row.members, row.placement, groups);
-    // A group rises only when its riser fits on the stage.
-    const rises = groups.map(
-      (_, k) =>
-        row.row >= ROW_RISER.firstRow &&
-        groupRiser(row, extents, k, ROW_RISER.step, stage) !== null,
-    );
+    // Each group from row 2 can rise. A try in which the riser of a raised group does not fit at
+    // the new places of its players is not valid.
+    const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
 
     const attempt = function* (levels: readonly number[]): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
@@ -2400,7 +2403,7 @@ function* sightRowsSteps(
         placement,
         risers: joinRisers(own),
         blocked: groups.map((g) => g.filter((i) => blind[i]).length),
-        ...riserContact(own, items, groups.length, around),
+        ...riserContact(own, items, groups.length, around, levels),
       };
     };
 
