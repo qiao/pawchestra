@@ -4,6 +4,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { NO_TURN } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { setBoneRotation } from './frames.ts';
 import { createArmPose, solveArm } from './ik.ts';
@@ -177,7 +178,6 @@ const ankle = new Vector3();
 const move = new Vector3();
 const pole = new Vector3();
 const local = new Quaternion();
-const IDENTITY = new Quaternion();
 
 /**
  * Writes the local rotations of the thigh, the shin, and the foot of each leg, so that each ankle
@@ -192,7 +192,7 @@ export function plantFeet(legs: PlantedLegs, root: Vec3, rotations: Float32Array
   for (const leg of [legs.left, legs.right]) {
     hip.fromArray(leg.bind.shoulder).add(move.fromArray(root));
     ankle.fromArray(leg.bind.wrist);
-    solveArm(leg.bind, hip, IDENTITY, ankle, pole.fromArray(leg.pole), legPose);
+    solveArm(leg.bind, hip, NO_TURN, ankle, pole.fromArray(leg.pole), legPose);
     setBoneRotation(rotations, leg.thigh, legPose.upper);
     setBoneRotation(
       rotations,

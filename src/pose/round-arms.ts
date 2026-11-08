@@ -2,6 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { Z_AXIS } from './axes.ts';
 import { armOut } from './hang.ts';
 import type { ArmRig } from './ik.ts';
 
@@ -120,7 +121,6 @@ export function keepBent(arm: ArmRig, shoulder: Vector3, weight: number, wrist: 
   return distance > limit ? wrist.copy(shoulder).addScaledVector(toWrist, limit / distance) : wrist;
 }
 
-const Z_AXIS = new Vector3(0, 0, 1);
 const lift = new Quaternion();
 
 /**

@@ -2,6 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { boneIndex } from '../models/rig.ts';
 import { palmTurnAngle, studioPawTwist } from '../models/studio-rig.ts';
+import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixDirection, mixRotation, mixRotationNear } from './blend.ts';
 import type { BowedHold, BowedRig, RigPoints } from './bowed-rig.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
@@ -91,10 +92,6 @@ interface BowHand {
   /** The world rotation of the `handR` bone. */
   readonly rotation: Quaternion;
 }
-
-/** The rotation that changes nothing. Nothing writes it. */
-
-const Y_AXIS = new Vector3(0, 1, 0);
 
 const rest = new Quaternion();
 const playTurn = new Quaternion();
@@ -498,7 +495,6 @@ interface StopFinger {
 /** The finger in the middle of the hand frame and of the strings: no turn and no roll. */
 export const MIDDLE_FINGER: StopFinger = { reach: 0, stopString: 1.5 };
 
-const Z_AXIS = new Vector3(0, 0, 1);
 const neck = new Vector3();
 const fingers = new Vector3();
 const fingersUp = new Vector3();
@@ -1160,7 +1156,6 @@ function retargetTurn(hand: Quaternion): number {
 }
 
 const pawTurn = new Quaternion();
-const X_AXIS = new Vector3(1, 0, 0);
 
 /**
  * Gives the left paw that the viewer sees: the hand of the player turned in the plane of its palm,

@@ -16,6 +16,7 @@ import type { PedalTrack } from '../score/pedal.ts';
 import type { Beat, PlayerNote, Score, SectionId } from '../score/types.ts';
 import { SPECIES, instrumentScale } from '../models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../models/species.ts';
+import { Y_AXIS } from './axes.ts';
 import { bowedRig, holdOf } from './bowed-rig.ts';
 import type { BowedRig } from './bowed-rig.ts';
 import { choirRig } from './choir.ts';
@@ -308,9 +309,6 @@ function cached<K, V>(cache: Map<K, V>, key: K, make: () => V): V {
   }
   return value;
 }
-
-/** The axis of the facing of a player. A positive turn turns -z toward -x. */
-const Y_AXIS = new Vector3(0, 1, 0);
 
 /**
  * Calculates the turn of the head of a player to look at a point (design 5.1, the looks at the

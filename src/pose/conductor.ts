@@ -6,6 +6,7 @@ import { BATON_ALONG, BATON_TOP } from '../models/instruments/baton.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { NO_TURN, Y_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import type { CueState } from './cues.ts';
@@ -303,9 +304,6 @@ export interface ConductorState {
   bow: number;
 }
 
-/** The rotation that changes nothing. Nothing writes it. */
-const NO_TURN = new Quaternion();
-
 const right = createFrame();
 const left = createFrame();
 /**
@@ -341,7 +339,6 @@ const pivot = new Vector3();
 const place = new Vector3();
 const fingers = new Vector3();
 const toPlace = new Vector3();
-const Y_AXIS = new Vector3(0, 1, 0);
 
 /** The direction of the baton in the middle of a lift or a lowering. Each call writes it first. */
 const liftBaton = new Vector3();

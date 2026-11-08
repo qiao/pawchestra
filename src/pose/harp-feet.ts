@@ -6,6 +6,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { NO_TURN } from './axes.ts';
 import { setBoneRotation } from './frames.ts';
 import { createFootState, footStateAt } from './harp-pedals.ts';
 import type { PedalPlan } from './harp-pedals.ts';
@@ -131,7 +132,6 @@ const PITCH_AXIS = new Vector3(1, 0, 0);
 const pitch = new Quaternion();
 const poleAt = new Vector3();
 const local = new Quaternion();
-const IDENTITY = new Quaternion();
 const press = new Vector3();
 const pressNext = new Vector3();
 
@@ -206,7 +206,7 @@ export function poseHarpFeet(
     ankleAt.fromArray(foot.bind.wrist).sub(press).applyQuaternion(pitch).add(heelAt);
     hipAt.fromArray(foot.bind.shoulder);
     poleAt.fromArray(foot.pole);
-    solveArm(foot.bind, hipAt, IDENTITY, ankleAt, poleAt, legPose);
+    solveArm(foot.bind, hipAt, NO_TURN, ankleAt, poleAt, legPose);
     setBoneRotation(rotations, foot.bones.thigh, legPose.upper);
     setBoneRotation(
       rotations,

@@ -4,6 +4,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { Z_AXIS } from './axes.ts';
 import { createFrame, posePoint, setBoneRotation } from './frames.ts';
 import type { Frame } from './frames.ts';
 
@@ -250,8 +251,6 @@ export function writeArm(task: ArmTask, chest: Quaternion, rotations: Float32Arr
   );
   setBoneRotation(rotations, arm.bones.hand, local.copy(solved.lower).invert().multiply(task.hand));
 }
-
-const Z_AXIS = new Vector3(0, 0, 1);
 
 /**
  * Writes the curl of the fingers of one hand. A positive curl closes the fingers of each side.

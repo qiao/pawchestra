@@ -3,6 +3,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 import type { InstrumentId } from '../models/instruments/types.ts';
 import { boneIndex } from '../models/rig.ts';
 import { DIGITS } from '../models/studio-format.ts';
+import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';
 import { createIdleState, idleAt } from './idle.ts';
@@ -166,9 +167,6 @@ const HEAD_SHARES = [
   [BONES.head, 1 - BODY_MOTION.lookNeck],
 ] as const;
 
-const X_AXIS = new Vector3(1, 0, 0);
-const Y_AXIS = new Vector3(0, 1, 0);
-const Z_AXIS = new Vector3(0, 0, 1);
 const turn = new Quaternion();
 const second = new Quaternion();
 const yawAxis = new Vector3();

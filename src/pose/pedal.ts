@@ -7,6 +7,7 @@ import { boneIndex } from '../models/rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { PedalTrack } from '../score/pedal.ts';
+import { NO_TURN, X_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { setBoneRotation } from './frames.ts';
 import { createArmPose, solveArm } from './ik.ts';
@@ -160,7 +161,6 @@ export function pedalFoot(model: PlayerModel): PedalFoot | null {
   };
 }
 
-const X_AXIS = new Vector3(1, 0, 0);
 const leg = createArmPose();
 const hipAt = new Vector3();
 const ankleAt = new Vector3();
@@ -169,7 +169,6 @@ const heelBind = new Vector3();
 const poleAt = new Vector3();
 const footTurn = new Quaternion();
 const local = new Quaternion();
-const IDENTITY = new Quaternion();
 
 /**
  * Puts the right foot of a pianist on the damper pedal and writes the local rotations of the
@@ -211,7 +210,7 @@ export function posePedalFoot(
 
   hipAt.fromArray(foot.bind.shoulder);
   poleAt.fromArray(foot.pole);
-  solveArm(foot.bind, hipAt, IDENTITY, ankleAt, poleAt, leg);
+  solveArm(foot.bind, hipAt, NO_TURN, ankleAt, poleAt, leg);
   setBoneRotation(rotations, LEG.thigh, leg.upper);
   setBoneRotation(rotations, LEG.shin, local.copy(leg.upper).invert().multiply(leg.lower));
   setBoneRotation(rotations, LEG.foot, local.copy(leg.lower).invert().multiply(footTurn));

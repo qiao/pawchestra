@@ -10,6 +10,7 @@ import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import type { Steps } from '../score/steps.ts';
 import type { PlayerNote } from '../score/types.ts';
+import { Z_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { InstrumentOf } from './family.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
@@ -740,8 +741,6 @@ export function sideLeanAt(rig: HandsRig, left: HandTrack, right: HandTrack, tim
   }
   return MathUtils.clamp((-sideLean * sum) / total, -sideLeanMax, sideLeanMax);
 }
-
-const Z_AXIS = new Vector3(0, 0, 1);
 
 const tip = new Vector3();
 const lateral = new Vector3();
