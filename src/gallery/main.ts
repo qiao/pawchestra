@@ -15,6 +15,7 @@ import {
 import type { SkinnedMesh } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+import { loadStudioBodies } from '../app/body-loads.ts';
 import type { Bounds } from '../models/bounds.ts';
 import { CONDUCTOR } from '../models/cast.ts';
 import { SCENE_COLORS } from '../models/colors.ts';
@@ -23,7 +24,6 @@ import { buildPlayer } from '../models/player.ts';
 import type { PlayerModel } from '../models/player.ts';
 import { buildSupport } from '../models/props.ts';
 import { readSourceFile } from '../models/source-clips.ts';
-import { loadTestBodies } from '../models/studio-body.ts';
 import { clipDuration, clipPoseAt, createClipPose } from '../pose/clip-pose.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
@@ -187,9 +187,8 @@ element(`#page-${page}`, HTMLAnchorElement).setAttribute('aria-current', 'page')
 const renderer = createRenderer(canvas, 'high', window.devicePixelRatio);
 const scene = new Scene();
 const materials = createMaterials();
-// A recast name can name a test species, such as violin@mannequin, whose body the app does not load
-// (design 4.4, "Test mannequin").
-await loadTestBodies();
+// The gallery shows each species, also a test species such as the mannequin (design 7.2).
+await loadStudioBodies();
 const items = selectItems(
   page === 'species' ? speciesItems() : instrumentItems(),
   search.get('only'),

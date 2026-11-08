@@ -325,8 +325,8 @@ export function glbModule(
 const SCRATCH_MARK = '// A scratch addition of tools/glb-swap.ts for --glb.';
 
 /**
- * Adds the studio body of an animal to the text of `src/models/studio-body.ts`: the import of its
- * module and its entry in `STUDIO_BODIES`.
+ * Adds the studio body of an animal to the text of `src/models/studio-bodies.ts`: the import of
+ * its module and its entry in `STUDIO_BODIES`.
  *
  * @param text The text of the file.
  * @param animal The animal, such as `panda`.
@@ -335,14 +335,43 @@ const SCRATCH_MARK = '// A scratch addition of tools/glb-swap.ts for --glb.';
  * @throws Error if the text has not exactly one start of `STUDIO_BODIES`.
  */
 function withStudioBody(text: string, animal: string, constant: string): string {
-  const start = 'export const STUDIO_BODIES = {';
+  const start =
+    'export const STUDIO_BODIES: Readonly<Partial<Record<StudioBodyName, StudioBody>>> = {';
   if (text.split(start).length !== 2) {
-    throw new Error(`src/models/studio-body.ts has not exactly one "${start}".`);
+    throw new Error(`src/models/studio-bodies.ts has not exactly one "${start}".`);
   }
   return [
     SCRATCH_MARK,
     `import { ${constant} } from './studio/${animal}.ts';`,
     text.replace(start, `${start}\n  ${JSON.stringify(`studio-${animal}`)}: ${constant},`),
+  ].join('\n');
+}
+
+/**
+ * Adds the head height and the seat height of the studio body of an animal to the text of
+ * `src/models/studio-heights.ts`, at the end of the file, so that `isStudioBodyName()` takes it.
+ *
+ * @param text The text of the file.
+ * @param animal The animal, such as `panda`.
+ * @param constant The name of the constant of the module.
+ * @returns The changed text.
+ * @throws Error if the text has no `STUDIO_HEIGHTS`.
+ */
+function withStudioHeights(text: string, animal: string, constant: string): string {
+  if (!text.includes('export const STUDIO_HEIGHTS = {')) {
+    throw new Error('src/models/studio-heights.ts has no "export const STUDIO_HEIGHTS = {".');
+  }
+  return [
+    text,
+    SCRATCH_MARK,
+    `import { ${constant} as GLB_SWAP_BODY } from './studio/${animal}.ts';`,
+    'Object.assign(STUDIO_HEIGHTS, {',
+    `  ${JSON.stringify(`studio-${animal}`)}: {`,
+    '    headHeight: GLB_SWAP_BODY.headHeight,',
+    '    seatHeight: GLB_SWAP_BODY.seatHeight,',
+    '  },',
+    '});',
+    '',
   ].join('\n');
 }
 
@@ -407,8 +436,8 @@ function withAnimalEntry(text: string, animal: string, settings: AnimalEntry): s
 
 /**
  * Adds the scratch entries of an animal with no studio body to a copy ({@link withGlbBody}). An
- * animal with no studio body (`isStudioBodyName()`) gets its entry in `STUDIO_BODIES`, and the
- * species of the same id gets the body ({@link withSpeciesBody}). An animal with no entry in
+ * animal with no studio body (`isStudioBodyName()`) gets its entry in `STUDIO_BODIES` and in
+ * `STUDIO_HEIGHTS`, and the species of the same id gets the body ({@link withSpeciesBody}). An animal with no entry in
  * `ANIMALS` gets the settings of the export as its entry in `ANIMALS` of the copy. An animal with
  * a studio body, also a test body, and an entry changes nothing.
  *
@@ -424,10 +453,15 @@ async function addScratchBody(dir: string, animal: string, settings: AnimalEntry
         `The animal ${animal} has no studio body and is not a species, so no species can take its body.`,
       );
     }
-    const bodies = join(dir, 'src', 'models', 'studio-body.ts');
+    const bodies = join(dir, 'src', 'models', 'studio-bodies.ts');
     await writeFile(
       bodies,
       withStudioBody(await readFile(bodies, 'utf8'), animal, settings.constant),
+    );
+    const heights = join(dir, 'src', 'models', 'studio-heights.ts');
+    await writeFile(
+      heights,
+      withStudioHeights(await readFile(heights, 'utf8'), animal, settings.constant),
     );
     const species = join(dir, 'src', 'models', 'species.ts');
     await writeFile(

@@ -11,7 +11,8 @@ import { join, relative } from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { STUDIO_BODIES } from '../src/models/studio-body.ts';
+import { STUDIO_BODIES } from '../src/models/studio-bodies.ts';
+import { studioBodyOf } from '../src/models/studio-body.ts';
 import type { StudioBodyName } from '../src/models/studio-body.ts';
 import {
   animalSpecies,
@@ -124,8 +125,8 @@ describe('withGlbBody', () => {
           join(dir, 'tools', 'print-source.ts'),
           [
             "import { writeFileSync } from 'node:fs';",
-            "import { STUDIO_BODIES } from '../src/models/studio-body.ts';",
-            `writeFileSync(${JSON.stringify(out)}, STUDIO_BODIES['studio-rabbit'].source);`,
+            "import { studioBodyOf } from '../src/models/studio-body.ts';",
+            `writeFileSync(${JSON.stringify(out)}, studioBodyOf('studio-rabbit').source);`,
           ].join('\n'),
         );
         return runTool(dir, 'print-source.ts', []);
@@ -136,7 +137,7 @@ describe('withGlbBody', () => {
     expect(code).toBe(0);
     expect(readFileSync(out, 'utf8')).toBe(relative(ROOT, file));
     expect(configs).toBe(readFileSync(join(ROOT, 'tools', 'mesh-rigs', 'rabbit.json'), 'utf8'));
-    expect(STUDIO_BODIES['studio-rabbit'].source).not.toBe(relative(ROOT, file));
+    expect(studioBodyOf('studio-rabbit').source).not.toBe(relative(ROOT, file));
     expect(copy).not.toBe('');
     expect(existsSync(copy)).toBe(false);
   });
@@ -155,8 +156,8 @@ describe('withGlbBody', () => {
           join(dir, 'tools', 'print-scale.ts'),
           [
             "import { writeFileSync } from 'node:fs';",
-            "import { STUDIO_BODIES } from '../src/models/studio-body.ts';",
-            `writeFileSync(${JSON.stringify(out)}, String(STUDIO_BODIES['studio-rabbit'].scale));`,
+            "import { studioBodyOf } from '../src/models/studio-body.ts';",
+            `writeFileSync(${JSON.stringify(out)}, String(studioBodyOf('studio-rabbit').scale));`,
           ].join('\n'),
         );
         return runTool(dir, 'print-scale.ts', []);
@@ -166,7 +167,7 @@ describe('withGlbBody', () => {
     );
 
     expect(code).toBe(0);
-    expect(Number(readFileSync(out, 'utf8')) / STUDIO_BODIES['studio-rabbit'].scale).toBeCloseTo(
+    expect(Number(readFileSync(out, 'utf8')) / studioBodyOf('studio-rabbit').scale).toBeCloseTo(
       1.1,
       5,
     );

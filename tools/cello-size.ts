@@ -34,7 +34,6 @@ import {
   stringsAt,
 } from '../src/pose/bowed.ts';
 import { poseShoulder } from '../src/pose/ik.ts';
-import { loadTestBodies } from '../src/models/studio-body.ts';
 
 /**
  * The real sizes of the cello, as a factor of the cello of the app (a 4/4 of 1.2 m): the back
@@ -211,7 +210,6 @@ export function celloRule(species: SpeciesId): CelloRule {
  * Prints the rule for each species of the command line, or for each species.
  */
 async function main(): Promise<void> {
-  await loadTestBodies();
   const asked = (process.argv[2] ?? '').split(',').filter((id) => id !== '');
   const species = asked.length > 0 ? asked.filter(isSpeciesId) : [...SPECIES_IDS];
   const deg = (a: number): string => (a * MathUtils.RAD2DEG).toFixed(0);

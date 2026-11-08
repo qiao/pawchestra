@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { STUDIO_BODIES } from '../src/models/studio-body.ts';
+import { studioBodyOf } from '../src/models/studio-body.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import type { StudioBone, StudioMesh } from '../src/models/studio-format.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
@@ -165,7 +165,7 @@ describe('thinFaces', () => {
   });
 
   it('looks at the joints of the arms and the legs of the studio bodies', () => {
-    const body = STUDIO_BODIES['studio-rabbit'];
+    const body = studioBodyOf('studio-rabbit');
     for (const [bone] of LIMB_JOINTS) {
       expect(body.heads[`${bone}_L`]).toBeDefined();
     }
@@ -188,7 +188,7 @@ describe('the standing check', () => {
   });
 
   it('refuses a body that does not stand', () => {
-    expect(() => standingError(new Uint8Array(), STUDIO_BODIES['studio-bear'], '')).toThrow(
+    expect(() => standingError(new Uint8Array(), studioBodyOf('studio-bear'), '')).toThrow(
       'does not stand',
     );
   });

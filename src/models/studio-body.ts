@@ -18,134 +18,69 @@ import {
   studioRig,
 } from './studio-rig.ts';
 import type { StudioRig } from './studio-rig.ts';
-import { STUDIO_BADGER } from './studio/badger.ts';
-import { STUDIO_BEAR } from './studio/bear.ts';
-import { STUDIO_BEAVER } from './studio/beaver.ts';
-import { STUDIO_CAT } from './studio/cat.ts';
-import { STUDIO_DEER } from './studio/deer.ts';
-import { STUDIO_DOG } from './studio/dog.ts';
-import { STUDIO_ELEPHANT } from './studio/elephant.ts';
-import { STUDIO_FOX } from './studio/fox.ts';
-import { STUDIO_HIPPO } from './studio/hippo.ts';
-import { STUDIO_MONKEY } from './studio/monkey.ts';
-import { STUDIO_MOUSE } from './studio/mouse.ts';
-import { STUDIO_PANDA } from './studio/panda.ts';
-import { STUDIO_PENGUIN } from './studio/penguin.ts';
-import { STUDIO_PIG } from './studio/pig.ts';
-import { STUDIO_POLAR_BEAR } from './studio/polar-bear.ts';
-import { STUDIO_RABBIT } from './studio/rabbit.ts';
-import { STUDIO_RHINO } from './studio/rhino.ts';
-import { STUDIO_WOLF } from './studio/wolf.ts';
+import { STUDIO_BODIES } from './studio-bodies.ts';
+import { STUDIO_HEIGHTS } from './studio-heights.ts';
 import { EYE_COLOR, EYE_LIGHT_COLOR } from './species.ts';
 import type { Vec3 } from './tuples.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 
-/** The studio bodies that a species can have (design 4.4), by the value of `SpeciesParams.body`. */
-export const STUDIO_BODIES = {
-  'studio-badger': STUDIO_BADGER,
-  'studio-bear': STUDIO_BEAR,
-  'studio-beaver': STUDIO_BEAVER,
-  'studio-cat': STUDIO_CAT,
-  'studio-deer': STUDIO_DEER,
-  'studio-dog': STUDIO_DOG,
-  'studio-elephant': STUDIO_ELEPHANT,
-  'studio-fox': STUDIO_FOX,
-  'studio-hippo': STUDIO_HIPPO,
-  'studio-monkey': STUDIO_MONKEY,
-  'studio-mouse': STUDIO_MOUSE,
-  'studio-panda': STUDIO_PANDA,
-  'studio-penguin': STUDIO_PENGUIN,
-  'studio-pig': STUDIO_PIG,
-  'studio-rhino': STUDIO_RHINO,
-  'studio-polar-bear': STUDIO_POLAR_BEAR,
-  'studio-rabbit': STUDIO_RABBIT,
-  'studio-wolf': STUDIO_WOLF,
-} as const satisfies Readonly<Record<string, StudioBody>>;
+/** The name of a studio body of a species (design 4.4): the value of `SpeciesParams.body`. */
+export type StudioBodyName = keyof typeof STUDIO_HEIGHTS;
 
 /**
- * The test bodies (design 4.4, "Test mannequin"), by the value of `SpeciesParams.body`, each with
- * the load of its module: bodies of the rig chain that no section casts. The app loads no test
- * body, so the first download has none. A role tool or the gallery loads them with
- * {@link loadTestBodies} before it builds a player.
+ * The studio bodies that a player can have: in Node all bodies of `STUDIO_BODIES`, and in the
+ * browser the bodies that the app or the gallery loaded with {@link addStudioBody} (design 7.2).
  */
-const TEST_BODIES = {
-  'studio-mannequin': async (): Promise<StudioBody> =>
-    (await import('./studio/mannequin.ts')).STUDIO_MANNEQUIN,
-} as const;
-
-/** The name of a studio body of the app. */
-type AppBodyName = keyof typeof STUDIO_BODIES;
-
-/** The name of a test body. */
-type TestBodyName = keyof typeof TEST_BODIES;
-
-/** The name of a studio body of a species: a body of the app or a test body. */
-export type StudioBodyName = AppBodyName | TestBodyName;
-
-/** The test bodies that {@link loadTestBodies} loaded. */
-const testBodies = new Map<TestBodyName, StudioBody>();
-
-/**
- * Loads the module of each test body (design 4.4, "Test mannequin"), so that a player can have it.
- * Each module loads one time.
- */
-export async function loadTestBodies(): Promise<void> {
-  const loads = Object.entries(TEST_BODIES).map(async ([name, load]) => {
-    if (isTestBody(name) && !testBodies.has(name)) {
-      testBodies.set(name, await load());
-    }
-  });
-  await Promise.all(loads);
+const loaded = new Map<StudioBodyName, StudioBody>();
+for (const [name, body] of Object.entries(STUDIO_BODIES)) {
+  if (isStudioBodyName(name)) {
+    loaded.set(name, body);
+  }
 }
 
 /**
- * Tells if a name is the name of a test body.
- *
- * @param name The name.
- * @returns True for a key of {@link TEST_BODIES}.
- */
-function isTestBody(name: string): name is TestBodyName {
-  return Object.hasOwn(TEST_BODIES, name);
-}
-
-/**
- * Tells if a text names a studio body: a body of the app or a test body.
+ * Tells if a text names a studio body.
  *
  * @param name The text.
- * @returns True for a key of {@link STUDIO_BODIES} or of the test bodies.
+ * @returns True for a key of `STUDIO_HEIGHTS`.
  */
 export function isStudioBodyName(name: string): name is StudioBodyName {
-  return Object.hasOwn(STUDIO_BODIES, name) || isTestBody(name);
+  return Object.hasOwn(STUDIO_HEIGHTS, name);
 }
 
 /**
- * Tells if a body name is the name of a body of the app.
+ * Adds a loaded studio body, so that a player can have it (design 7.2).
  *
- * @param name The name of a studio body.
- * @returns True for a key of {@link STUDIO_BODIES}.
+ * @param name The studio body.
+ * @param body The body of its module.
  */
-function isAppBody(name: StudioBodyName): name is AppBodyName {
-  return Object.hasOwn(STUDIO_BODIES, name);
+export function addStudioBody(name: StudioBodyName, body: StudioBody): void {
+  loaded.set(name, body);
 }
 
 /**
- * Gives a studio body by its name: a body of the app, or a test body that
- * {@link loadTestBodies} loaded.
+ * Tells if a studio body is loaded.
+ *
+ * @param name The studio body.
+ * @returns True if a player can have the body.
+ */
+export function hasStudioBody(name: StudioBodyName): boolean {
+  return loaded.has(name);
+}
+
+/**
+ * Gives a loaded studio body by its name.
  *
  * @param name The studio body.
  * @returns The body.
- * @throws Error if the name is a test body that is not loaded.
+ * @throws Error if the body is not loaded.
  */
 export function studioBodyOf(name: StudioBodyName): StudioBody {
-  if (isAppBody(name)) {
-    return STUDIO_BODIES[name];
-  }
-
-  const body = testBodies.get(name);
+  const body = loaded.get(name);
   if (!body) {
     throw new Error(
-      `The test body ${name} is not loaded. Call loadTestBodies() before a player of a test species (design 4.4).`,
+      `The studio body ${name} is not loaded. Call loadStudioBodies() of app/body-loads.ts before a player of its species (design 7.2).`,
     );
   }
   return body;

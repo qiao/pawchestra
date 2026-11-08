@@ -65,7 +65,6 @@ import {
   studioOffsets,
 } from '../src/models/studio-rig.ts';
 import type { StudioPose, StudioRig } from '../src/models/studio-rig.ts';
-import { loadTestBodies } from '../src/models/studio-body.ts';
 import { toVec3 } from '../src/models/tuples.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
@@ -76,10 +75,6 @@ import { SWEEP_ROLES, TEST_BODY_OBSTACLES, recastSweep } from '../src/pose/test-
 import { BODY_OBSTACLE } from '../src/pose/test-sweep.ts';
 import type { RoleSweep, SweepObstacle } from '../src/pose/test-sweep.ts';
 import type { AnimalPose, Transport } from '../src/pose/types.ts';
-
-// A recast role can name a test species, such as violinist@mannequin, whose body the app does not
-// load (design 4.4, "Test mannequin"). Each role tool imports this module, so the load is here.
-await loadTestBodies();
 
 /** The source of the body of a role: the conductor, or each player of an instrument. */
 export type RoleSource =

@@ -30,6 +30,7 @@ import {
 import { createRenderer } from '../scene/renderer.ts';
 import { gradeUniforms } from '../scene/post.ts';
 import { GRADE_FUNCTION } from '../scene/post-shaders.ts';
+import { loadStudioBodies } from '../app/body-loads.ts';
 import { demoUrl } from '../app/demos.ts';
 import { fetchPlainBytes } from '../audio/plain-bytes.ts';
 import { layoutScene } from '../models/layout-scene.ts';
@@ -204,6 +205,8 @@ function viewPose(
   return played.get(`${group.species} ${group.instrument}`) ?? gripPose(model);
 }
 
+// The page shows each species (design 7.2).
+await loadStudioBodies();
 const demo = await fetchPlainBytes(demoUrl(PAGE.poseDemo, import.meta.env.BASE_URL));
 const result = buildScore(demo, 'auto');
 if (!result.ok) {
