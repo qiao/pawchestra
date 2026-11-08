@@ -1,11 +1,13 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
-import { gzipSync } from 'node:zlib';
+import { gunzipSync, gzipSync } from 'node:zlib';
 
 import type { Manifest } from 'vite';
 
+import { castBodies } from '../src/app/body-loads.ts';
 import { DEFAULT_DEMO } from '../src/app/demos.ts';
+import { buildScore } from '../src/score/score.ts';
 import { isGzip } from './gzip-site.ts';
 import { ROOT, optionValue, shortHash, withRefBuild } from './ref-tree.ts';
 
@@ -122,6 +124,27 @@ export function defaultDemoFile(
 }
 
 /**
+ * Lists the output files of the studio bodies that the default demo casts (design 7.2). The app
+ * loads these chunks before the layout of the first piece, so they count as a part of the first
+ * download. A build that has the bodies in a static chunk has no chunk for a body, and gives none.
+ *
+ * @param manifest The Vite build manifest.
+ * @param demo The bytes of the file of the default demo, also as gzip data.
+ * @returns The file paths, relative to the output directory.
+ * @throws Error if the demo is not a valid file.
+ */
+export function castBodyFiles(manifest: Manifest, demo: Uint8Array): string[] {
+  const result = buildScore(isGzip(demo) ? gunzipSync(demo) : demo, 'auto');
+  if (!result.ok) {
+    throw new Error(`The default demo ${DEFAULT_DEMO} is not valid: ${result.error}.`);
+  }
+  return castBodies(result.score)
+    .map((name) => `src/models/studio/${name.replace(/^studio-/, '')}.ts`)
+    .filter((key) => manifest[key] !== undefined)
+    .flatMap((key) => staticChunkFiles(manifest, key));
+}
+
+/**
  * Formats the totals of a base commit and of the working tree, and their difference.
  *
  * @param label The name of the base, such as `main (cc83899c)`.
@@ -165,7 +188,8 @@ async function measure(root: string, path: string): Promise<DownloadPart> {
 }
 
 /**
- * Measures the files of the first download of a build.
+ * Measures the files of the first download of a build: the page, its static chunks, the default
+ * demo, and the bodies that the default demo casts.
  *
  * @param root The folder of the build, with its `dist/` and its `demos/`.
  * @returns The parts, with their paths relative to the folder.
@@ -183,7 +207,8 @@ async function measureBuild(root: string): Promise<DownloadPart[]> {
   const chunks = staticChunkFiles(manifest, 'index.html').filter(
     (file) => !file.endsWith('.css') || linked.includes(file),
   );
-  const files = new Set([...chunks, ...linked]);
+  const bodies = castBodyFiles(manifest, await readFile(demo));
+  const files = new Set([...chunks, ...linked, ...bodies]);
   const paths = [join(dist, 'index.html'), ...[...files].map((file) => join(dist, file)), demo];
   return Promise.all(paths.map((path) => measure(root, path)));
 }
