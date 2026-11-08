@@ -2759,7 +2759,9 @@ function chosenHeights(
  * the lowest height with its fewest blocked players. A try with a riser that does not fit on the
  * stage is not valid. The strings sit on the stage top. After row 1, the players of row 0 move
  * for the back desks ({@link FRONT_MOVES}). The moves keep the gaps, the stage, and the limits of
- * the spread.
+ * the spread. When a back desk stays blocked, row 1 tries again with the gap of the conductor
+ * open: its inner players can pass 0°, and the view of the audience counts in the cost. The row
+ * keeps this try only when it has fewer blocked players.
  *
  * @param rows The rows after the spread, from the front.
  * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
@@ -2787,6 +2789,7 @@ function* sightRowsSteps(
    * @param n The index of the row in `rows`.
    * @param done The rows in front, after their sight pass.
    * @param memo The known sights of the players of the row, or `null`.
+   * @param open True if a row that stays blocked can also try the gap of the conductor.
    * @returns The steps, which return the row with its risers, its cost, and its blocked players.
    */
   const seeRow = function* (
@@ -2794,6 +2797,7 @@ function* sightRowsSteps(
     n: number,
     done: readonly SeenRow[],
     memo: SightMemo | null,
+    open = false,
   ): Steps<RowSight> {
     const behind = rows.slice(n + 1);
     const placedRows = done.map((d) => d.row.placement);
@@ -2830,9 +2834,19 @@ function* sightRowsSteps(
     // the new places of its players is not valid.
     const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
 
-    const attempt = function* (levels: readonly number[]): Steps<SightTry> {
+    // With `open`, the back desks can also pass 0° into the gap of the conductor.
+    const attempt = function* (levels: readonly number[], open = false): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
+      let angles = open
+        ? yield* sightSweepSteps(
+            { ...row, split: false },
+            heights,
+            arcs,
+            targets,
+            blockers,
+            stage.side,
+          )
+        : yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
       let placement = placeRow(row.members, angles, row.radius, heights);
       if (
         angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9) ||
@@ -2930,12 +2944,22 @@ function* sightRowsSteps(
     const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
     const valid = [last, ...tries].filter((t) => !t.contact);
     // The row on the stage top has no riser, so it is the try of last resort.
-    const pick =
+    let pick =
       valid.length > 0
         ? valid.reduce((a, b) =>
             total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
           )
         : yield* attempt(groups.map(() => 0));
+    // A side of the back desks with no free arc can use the gap of the conductor.
+    if (open && pick.blind.length > 0) {
+      const wide = yield* attempt(
+        groups.map(() => 0),
+        true,
+      );
+      if (!wide.contact && wide.blind.length < pick.blind.length) {
+        pick = wide;
+      }
+    }
     return {
       seen: {
         row: { ...row, angles: pick.angles, placement: pick.placement },
@@ -3096,6 +3120,9 @@ function* sightRowsSteps(
       const moved = yield* moveFrontSteps(front.row, at, row, n, result);
       done[at] = { row: moved.front, risers: [] };
       result = moved.back;
+      if (result.blind.length > 0) {
+        result = yield* seeRow(row, n, done, null, true);
+      }
     }
     done.push(result.seen);
   }
