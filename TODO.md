@@ -864,7 +864,8 @@ scene of each demo has its seats and stage size with no overlap.
       would let the free paw reach.
 - [ ] Hand cymbals: the plates stay parallel at the crash, with no angle of a flam between them
       (percussion-technique 7). Only recast bodies play them.
-- [ ] Triangle: a louder note swings the right paw 35° on the forearm at p95 (base 19°).
+- [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
+      turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
 - [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player
       holds it, strikes with the fingertips, the fingers, or the knuckles by the dynamic, and plays
       a shake roll or a thumb roll (percussion-technique 8). The left paw holds the triangle.
