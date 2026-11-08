@@ -389,8 +389,8 @@ The app follows these facts:
   mouthpiece, and a little toward the left shoulder, so that its finger tips stay on the tubes
   (`restGripShiftL`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
-- **The mouthpiece (1.1).** The rim rests on the lips, with its middle 0.5 cm below the mouth line
-  of the body (`mouthHeight`, design 4.4), and presses the lips 0.25 cm (`lipShift`).
+- **The mouthpiece (1.1).** The rim rests on the lips, with its middle 0.5 cm below the crease
+  between the lips, and presses the lips 0.2 cm (`lipShift`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3, 7.3).** Each note takes the lowest position on the partials of B♭1,
   with no seventh partial, or an alternate of a fast note that saves two positions of travel
@@ -463,10 +463,9 @@ The app follows these facts:
   lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
   elbows a little out (`poleL`, `poleR`).
 - **The clarinet (3, `WOLF_CLARINET`).** The clarinet is at the middle of the body, and the head
-  does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle, at the
-  mouth line of the body (`mouthHeight`, design 4.4, `lipShift`). The elbows point down and a little
-  out. At rest, the clarinet stands upright between the knees, with both paws on their grips
-  (`rest`, `restShift`).
+  does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle
+  (`lipShift`). The elbows point down and a little out. At rest, the clarinet stands upright between
+  the knees, with both paws on their grips (`rest`, `restShift`).
 - **The woodwind palms (2.3, 2.4, 3).** Each paw of the oboe, the clarinet, and the bassoon holds
   its tube from the side of its own shoulder. The palm faces the tube, the fingers curl over the
   front in a C, and the thumb points up the tube (`faceTube`, `aimAcross`, `aimSide`).

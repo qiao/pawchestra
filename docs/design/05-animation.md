@@ -444,15 +444,16 @@ The rest of each family:
 
 - A wind player shows one note, and breathes in before a phrase. The mouthpiece stays at the
   mouth, so the look at the conductor does not turn the head.
-- **Mouthpiece on the lips.** The mouthpiece of each own hold touches the lips over the whole
-  play, and the lift ends on the lips (winds 4.2): a brass rim presses the lips 0.2 cm to 0.3 cm,
-  with its middle at or a little below the mouth line, so that it lies mostly on the upper lip. A
-  reed or a clarinet mouthpiece goes 0.3 cm to 0.6 cm between the lips. The flute lip plate
-  presses the lips and the chin, with the embouchure hole at the lower lip. The mouth point of the
-  body sets the place (4.4, `mouthHeight`), and the hold moves the mouthpiece from it
-  (`WindHold.lipShift`). A hold that moves the mouthpiece moves its rest place by the opposite
-  step (`restShift`), so the rest pose stays. Reason: with the mouth of the rule of the nose drop,
-  the mouthpieces of five holds stood 0.15 cm to 2.4 cm off the lips.
+- **Mouthpiece on the lips.** The mouthpiece of each own hold touches the lips over the whole play,
+  and the lift ends on the lips (winds 4.2): a brass rim presses the lips 0.2 cm to 0.3 cm, with its
+  middle at or a little below the mouth line, so that it lies mostly on the upper lip. A reed or a
+  clarinet mouthpiece goes 0.3 cm to 0.6 cm between the lips. The flute lip plate presses the lips
+  and the chin, with the embouchure hole at the lower lip. The hold moves the mouthpiece from the
+  mouth point of the body (4.4) to the lips (`WindHold.lipShift`). A new mouth point of the body
+  moves the seats of the layout, so only the pig has one (`mouthHeight`). A hold that moves the
+  mouthpiece moves its rest place by the opposite step (`restShift`), so the rest pose stays.
+  Reason: with the mouth of the rule of the nose drop, the mouthpieces of five holds stood 0.15 cm
+  to 2.4 cm off the lips.
 - Each paw closes around its tube (`WindHold.faceTube`, `gripShiftL`). `pnpm wind-grip` measures
   the grasp in each phase.
 - **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)

@@ -333,14 +333,14 @@ the facts of its body in its `.blend` ("Hand rig").
 - The tip of the nose comes from the vertices near the middle plane (`NOSE_PLANE`), or below a
   horn (`noseTop`). The head measures leave out a long nose, the whiskers, and the antlers
   (`headFloor`, `headCeiling`), because the holds in `H` start at the head.
-- The mouth lies `MOUTH_DROP` H below the tip of the nose. A body whose nose is far in front of
-  its mouth gives the height of its mouth line (`mouthHeight`, a fact of the body), and its mouth
-  is then the front of the lips on the middle plane at that height (`mouthOf()`,
-  `StudioBody.mouth`). The pig, the panda, and the wolf take it. Reason: the rule put the pig
-  mouth on the front of the snout disc, and the panda and the wolf mouths 2 cm to 2.5 cm in front
-  of the face above their lips, so the mouthpiece did not rest on the lips. A real player rests
-  the mouthpiece on the lips (winds 2.1, 2.2). The cut takes only the faces with all corners on
-  the head, so a line in a band of faces that blend into the neck finds no lips.
+- The mouth lies `MOUTH_DROP` H below the tip of the nose. A body whose nose is far in front of its
+  mouth gives the height of its mouth line (`mouthHeight`, a fact of the body), and its mouth is
+  then the front of the lips on the middle plane at that height (`mouthOf()`, `StudioBody.mouth`).
+  The pig takes it. Reason: the rule put the pig mouth on the front of the snout disc, so the horn
+  mouthpiece touched the disc in front of the lips. A real player rests the mouthpiece on the lips
+  (winds 2.1, 2.2). A new mouth point moves the instrument of the bind pose, and the layout reads
+  that place (4.2), so the mouth points of the panda and the wolf moved each seat about 3 cm. Their
+  holds move the mouthpiece to the lips (`WindHold.lipShift`, 5.3).
 - **Scale.** The scale keeps a landmark that the scene depends on: the shoulders of the bear for
   the conductor stand, and the shoulders, the ear tips, or the head top at the chosen size for
   each other body. A longer leg raises the landmark, so the trunk, the head, and the arms keep
