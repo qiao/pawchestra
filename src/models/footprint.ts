@@ -36,7 +36,7 @@ export interface PlacedBox {
  * @param boxes The boxes. There is at least one.
  * @returns The box around them.
  */
-function around(boxes: readonly Bounds[]): Bounds {
+export function boundsAround(boxes: readonly Bounds[]): Bounds {
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
   for (const box of boxes) {
@@ -107,7 +107,7 @@ function groupBoxes(p: ArrayLike<number>, groupOf: (triangle: number) => number)
  * @returns The footprint.
  */
 export function footprintOf(boxes: readonly Bounds[]): Footprint {
-  return { boxes, bounds: around(boxes) };
+  return { boxes, bounds: boundsAround(boxes) };
 }
 
 /** The height of one band of the boxes of a player footprint, in meters. */
