@@ -274,7 +274,7 @@ describe('takeSizes', () => {
 });
 
 describe('sizeReach (design 4.6)', () => {
-  it('needs the reach of the arm at the size of the rule', () => {
+  it('needs the reach of the arm at the size of the rule, and the arm factor of the rig there', () => {
     const now = holdReach('rabbit', 'violin', 'chair');
     const rule = ruleSize(now);
     if (!rule) {
@@ -286,6 +286,10 @@ describe('sizeReach (design 4.6)', () => {
     // At the size of the rule, the scroll lies in the palm of the current arm.
     expect(fit?.reach).toBeCloseTo(report.arm, 6);
     expect(fit?.factor).toBeCloseTo(1, 6);
+    // The arm of the app comes from the rig within 1% (pnpm rig-mesh --check).
+    const rig = report.rig;
+    expect(rig?.file).toBe('tools/mesh-rigs/rabbit.json');
+    expect(Math.abs((fit?.rigFactor ?? 0) / (rig?.armFactor ?? 1) - 1)).toBeLessThan(0.02);
     // The player rebuilt at each scale keeps its tail end, so the check agrees within 1 mm.
     for (const size of report.sizes) {
       expect(Math.abs(size.rebuilt - size.reach)).toBeLessThan(0.001);

@@ -77,12 +77,10 @@ const BODY_LOOPS = 2;
 const MESH_BODY_LOOPS = 4;
 
 /**
- * The open loops of {@link BODY_BONES} of the rabbit mesh of the simple rig (the Tripo P2 mesh with
- * no cut): the 8 whisker strips, the 2 eye sockets, and the backs of the 2 eyeballs, which the
- * source mesh has, and the edge between the clavicle faces and the upper arm faces at each arm
- * root.
+ * The open loops of {@link BODY_BONES} of the rabbit mesh in an A-pose: the roots of the two upper
+ * arms, and six small open edges at the whiskers, which the source mesh has.
  */
-const RABBIT_BODY_LOOPS = 14;
+const RABBIT_BODY_LOOPS = 8;
 
 /**
  * The open loops of {@link BODY_BONES} of the cat mesh: the cuts to the two upper arms, and one
