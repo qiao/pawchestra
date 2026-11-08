@@ -14,7 +14,14 @@ import {
 } from './footprint.ts';
 import type { Footprint, Obstacle, PlacedBox } from './footprint.ts';
 import { FIRST_ROW_RADIUS, SEATED_ARC, STAND_DISTANCE, seatAt } from './layout.ts';
-import type { ConductorPlace, PlayerPlace, RiserLevel, SceneLayout, StandPlace } from './layout.ts';
+import type {
+  ConductorPlace,
+  PlayerPlace,
+  RiserLevel,
+  RowRiser,
+  SceneLayout,
+  StandPlace,
+} from './layout.ts';
 import type { Vec3 } from './tuples.ts';
 import { ModelCache } from './model-cache.ts';
 import type { PlayerModel } from './player.ts';
@@ -747,6 +754,27 @@ function riserObstacle(level: RiserLevel, podium: Vec3): Obstacle {
   return obstacleOf(`riser level ${level.level}`, boxes);
 }
 
+/**
+ * Makes the obstacle of the riser of a row: one box for each part of at most 5° of its arc, from
+ * the stage top to its height.
+ *
+ * @param riser The riser.
+ * @param podium The podium center.
+ * @returns The obstacle.
+ */
+export function rowRiserObstacle(riser: RowRiser, podium: Vec3): Obstacle {
+  const parts = Math.max(1, Math.ceil((riser.to - riser.from) / RISER_BOX_ANGLE));
+  const step = (riser.to - riser.from) / parts;
+  const front = riser.inner * Math.cos(step / 2);
+  const size: Vec3 = [2 * riser.outer * Math.sin(step / 2), riser.height, riser.outer - front];
+  const box = footprintOf([centeredBox([0, riser.height / 2, 0], size)]);
+  const boxes = Array.from({ length: parts }, (_, i) => {
+    const spot = seatAt(podium, riser.from + (i + 0.5) * step, (front + riser.outer) / 2);
+    return placeFootprint(box, spot.position, spot.facing);
+  }).flat();
+  return obstacleOf('row riser', boxes);
+}
+
 /** The singers and the risers for one count of levels. */
 interface ChoirPlacement {
   readonly singers: readonly PlacedPlayer[];
@@ -904,8 +932,8 @@ function conductorObstacle(podium: Vec3, models: ModelCache): Obstacle {
 
 /**
  * Makes the obstacles of a layout: the podium with the conductor (when the layout has one), each
- * player with its instrument and its seat, each music stand, and each riser level. The overlap
- * test and the layout use the same footprints.
+ * player with its instrument and its seat, each music stand, and the risers: each riser level
+ * and the riser of each row. The overlap test and the layout use the same footprints.
  *
  * @param layout The layout.
  * @param models The player models of the score. A new cache by default.
@@ -929,7 +957,10 @@ export function layoutObstacles(layout: SceneLayout, models = new ModelCache()):
       placeFootprint(standFootprint(stand.deskHeight), stand.position, stand.facing),
     ),
   );
-  const risers = layout.risers.map((level) => riserObstacle(level, layout.podium));
+  const risers = [
+    ...layout.risers.map((level) => riserObstacle(level, layout.podium)),
+    ...layout.rowRisers.map((riser) => rowRiserObstacle(riser, layout.podium)),
+  ];
   // The levels of the risers stand against each other, so they form one obstacle.
   const riserBlock =
     risers.length > 0
@@ -1331,6 +1362,7 @@ function layoutChamber(
       deskHeight: stand.place.deskHeight,
     })),
     risers: [],
+    rowRisers: [],
   };
 }
 
@@ -1779,5 +1811,6 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
         deskHeight: stand.place.deskHeight,
       })),
     risers,
+    rowRisers: [],
   };
 }

@@ -5,7 +5,7 @@ import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
 import { centeredBox } from './bounds.ts';
 import type { Bounds } from './bounds.ts';
-import type { RiserLevel, SceneLayout } from './layout.ts';
+import type { RiserLevel, RowRiser, SceneLayout } from './layout.ts';
 import { MeshBuilder, splitByFacing, srgb, transform } from './mesh.ts';
 import type { MeshData, Rgb, Transform } from './mesh.ts';
 import { box, quad } from './primitives.ts';
@@ -503,8 +503,10 @@ interface RiserBlock {
   readonly outer: number;
   /** The height of the top above the stage top, in meters. */
   readonly height: number;
-  /** Half the angle of the arc, in radians. The arc is centered on 0°. */
-  readonly halfAngle: number;
+  /** The angle of the left end, in radians. 0 points to the back, and the left is negative. */
+  readonly from: number;
+  /** The angle of the right end, in radians. */
+  readonly to: number;
 }
 
 /**
@@ -541,24 +543,24 @@ function treadBands(inner: number, outer: number): [number, number, Rgb][] {
  * @param podium The podium center, the center of the arc.
  */
 function addRiserBlock(builder: MeshBuilder, block: RiserBlock, podium: Vec3): void {
-  const { inner, outer, height, halfAngle } = block;
+  const { inner, outer, height, from, to } = block;
   const point = (r: number, angle: number, y: number): Vec3 => [
     podium[0] + r * Math.sin(angle),
     podium[1] + y,
     podium[2] - r * Math.cos(angle),
   ];
-  const segments = Math.max(1, Math.ceil((2 * halfAngle) / RISER_FACET));
+  const segments = Math.max(1, Math.ceil((to - from) / RISER_FACET));
   const sides: number[] = [];
   for (let i = 0; i < segments; i++) {
-    const a0 = -halfAngle + (2 * halfAngle * i) / segments;
-    const a1 = -halfAngle + (2 * halfAngle * (i + 1)) / segments;
-    for (const [from, to, color] of treadBands(inner, outer)) {
+    const a0 = from + ((to - from) * i) / segments;
+    const a1 = from + ((to - from) * (i + 1)) / segments;
+    for (const [near, far, color] of treadBands(inner, outer)) {
       builder.add(
         quad(
-          point(from, a0, height),
-          point(from, a1, height),
-          point(to, a1, height),
-          point(to, a0, height),
+          point(near, a0, height),
+          point(near, a1, height),
+          point(far, a1, height),
+          point(far, a0, height),
         ),
         { color },
       );
@@ -580,16 +582,16 @@ function addRiserBlock(builder: MeshBuilder, block: RiserBlock, podium: Vec3): v
   }
   sides.push(
     ...quad(
-      point(inner, -halfAngle, 0),
-      point(inner, -halfAngle, height),
-      point(outer, -halfAngle, height),
-      point(outer, -halfAngle, 0),
+      point(inner, from, 0),
+      point(inner, from, height),
+      point(outer, from, height),
+      point(outer, from, 0),
     ),
     ...quad(
-      point(inner, halfAngle, 0),
-      point(outer, halfAngle, 0),
-      point(outer, halfAngle, height),
-      point(inner, halfAngle, height),
+      point(inner, to, 0),
+      point(outer, to, 0),
+      point(outer, to, height),
+      point(inner, to, height),
     ),
   );
   builder.add(sides, { color: STAGE_COLORS.skirt });
@@ -609,7 +611,8 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
   const builder = new MeshBuilder();
   for (const { level, radius, height, halfAngle } of levels) {
     const inner = radius - RISER.depth / 2;
-    addRiserBlock(builder, { inner, outer: radius + RISER.depth / 2, height, halfAngle }, podium);
+    const arc = { from: -halfAngle, to: halfAngle };
+    addRiserBlock(builder, { inner, outer: radius + RISER.depth / 2, height, ...arc }, podium);
     if (level !== 0) {
       continue;
     }
@@ -619,7 +622,7 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
         inner: inner - j * depth,
         outer: inner - (j - 1) * depth,
         height: (height * (count + 1 - j)) / (count + 1),
-        halfAngle,
+        ...arc,
       };
       addRiserBlock(builder, step, podium);
     }
@@ -628,9 +631,25 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
 }
 
 /**
+ * Builds the risers of the instrumental rows (design 4.5, seat geometry): one arc block for each
+ * row, with the treads and the faces of the choir risers.
+ *
+ * @param risers The risers of the rows.
+ * @param podium The podium center, the center of the arcs.
+ * @returns The mesh data in the stage axes, with all vertices on bone 0.
+ */
+export function buildRowRisers(risers: readonly RowRiser[], podium: Vec3): MeshData {
+  const builder = new MeshBuilder();
+  for (const riser of risers) {
+    addRiserBlock(builder, riser, podium);
+  }
+  return builder.build();
+}
+
+/**
  * Builds the static props of a layout as one mesh: the seat of each player, each music stand,
- * and the choir risers (design 4.4). Each kind of seat at each height and depth and each stand
- * at each desk height is built one time.
+ * the choir risers, and the risers of the rows (design 4.4). Each kind of seat at each height and
+ * depth and each stand at each desk height is built one time.
  *
  * @param layout The layout of a score.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
@@ -667,6 +686,9 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
   }
   if (layout.risers.length > 0) {
     builder.addMesh(buildRisers(layout.risers, layout.podium), transform());
+  }
+  if (layout.rowRisers.length > 0) {
+    builder.addMesh(buildRowRisers(layout.rowRisers, layout.podium), transform());
   }
   return builder.build();
 }
