@@ -70,7 +70,8 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
   players of the first desk in front of it, so the first desks move a little to give each such
   gap the room of a desk. The winds, the brass, and the percussion look through the gap of the
   conductor between the second violins and the violas, so the inner first desks move out to make
-  this gap wide. A few players behind the strings stay blocked.
+  this gap wide. A joint search of all rows then opens lanes for the players behind (4.5, lanes).
+  A few players behind the strings stay blocked.
 - The vocal soloists of 3.8 stand in front of the choir, on the lowest level of the risers,
   because a place beside the conductor covers the first violins or the cellos.
 - The soloist of 3.8 stands or sits at the front left of the conductor, as in a concerto. A
@@ -1221,11 +1222,27 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
   - **Gap of the conductor.** The layout runs the spread and the sight pass with each gap of
     `CONDUCTOR_GAPS`, and keeps the gap with the fewest blocked players. The best gap depends on
     the score, because a keyboard or many first desks on one side leave less room.
+  - **Lanes.** The sight pass places one row at a time, so it cannot keep a lane open for a row
+    behind. After the pass, a joint search moves the players of all rows (`laneSearchSteps()`).
+    For each blocked player from row 1, from the front, it tries runs of the items that hide the
+    conductor from it and of the player itself: the player alone, with one neighbor, or with all
+    players to the inside or to the outside on its side. Each run moves by 1° steps up to
+    `LANES.reach`. A move keeps the packed arcs, arcs of at most 1.6 m or the arc after the pass,
+    the spread angles of the outer players, the gap of the conductor, the back desks outside it,
+    the stage, and the gaps to the other items. It must lower the cost of the blocked player and
+    the sum of the costs of all players (`sightCost()`, with the view of the audience from row 2).
+    Thus a back desk of the violas can leave the gap of row 0 that a trumpet looks through, and
+    take a free gap farther out. The search runs only on the gap of the conductor that the sight
+    pass chose, because a search for each gap takes too much time.
   - The choir risers then rise together, up to `CHOIR_LIFT.highest`, until each singer sees the
     conductor.
   - `pnpm sight-lines` measures the result on the meshes of all demos. A few players behind the
-    strings stay blocked, most of them in rows 3 and 4. A player there looks through the gaps of
-    up to four rows on the same floor, and the gaps of two rows in a line rarely meet.
+    strings stay blocked, most of them horns and percussion on the left of rows 3 and 4. Four
+    first desk players on each side of row 0 at their packed arcs keep the gap of the conductor
+    at about ±30°, and the back desks of row 1 sit in all the other gaps of row 0 on the left.
+    Thus a player on the left behind the strings sees the conductor only through the gap of the
+    conductor. A larger radius of row 0 would widen the gap, but the stages of these demos fill
+    their depth, so it would make the stage larger.
 
 ```typescript
 /** The limits of the spread of a row. */
