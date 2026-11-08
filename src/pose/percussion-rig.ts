@@ -14,6 +14,7 @@ import {
 import type { PlayTarget } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
+import { Z_AXIS } from './axes.ts';
 import type { InstrumentOf } from './family.ts';
 import { hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
@@ -258,9 +259,6 @@ interface DrumFit {
  */
 const POLE_L: Vec3 = [-1, -1, 0.3];
 const POLE_R: Vec3 = [1, -1, 0.3];
-
-/** The forward axis of the model, around which the hand cymbals tilt. Nothing writes it. */
-const Z_AXIS = new Vector3(0, 0, 1);
 
 /** The place from which a mallet points to its target in most holds (`PercussionHold.home`). */
 const MALLET_HOME: Vec3 = [0, -0.2, -0.75];

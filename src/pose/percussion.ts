@@ -2,6 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
+import { NO_TURN, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore, mixPole, mixRotation } from './blend.ts';
 import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
@@ -485,9 +486,6 @@ export interface PercussionState {
   readonly ring: DampState;
 }
 
-/** The rotation that changes nothing. Nothing writes it. */
-const NO_TURN = new Quaternion();
-
 const shoulder = createFrame();
 const wrist = new Vector3();
 const turn = new Quaternion();
@@ -502,7 +500,6 @@ const grip = new Vector3();
 const level = new Vector3();
 const swing = new Quaternion();
 const inverse = new Quaternion();
-const UP = new Vector3(0, 1, 0);
 const strikeAlong = new Vector3();
 const forearm = new Vector3();
 const upperArm = new Vector3();
@@ -522,7 +519,6 @@ const strikeHand = new Quaternion();
 const rollTurn = new Quaternion();
 const strikeDirection = new Vector3();
 const inward = new Vector3();
-const Z_AXIS = new Vector3(0, 0, 1);
 
 /**
  * Writes the turn of a paw that holds its mallet across the forearm with no bend and the
@@ -585,7 +581,7 @@ function holdTurn(
   crossTurn(side, armForearm, across.rest, out, direction);
   // The wrist lifts the head: a out of the paw around the level axis normal to the armForearm,
   // with no twist on the armForearm.
-  level.crossVectors(armForearm, UP);
+  level.crossVectors(armForearm, Y_AXIS);
   if (across.lift !== 0 && level.lengthSq() > 1e-8) {
     swing.setFromAxisAngle(level.normalize(), across.lift);
     out.premultiply(swing);
@@ -600,7 +596,7 @@ function holdTurn(
   direction.applyQuaternion(swing);
   // With a pitch, the paw keeps the out of the strike, and the wrist lifts the head over its
   // spot by a share of the pitch.
-  level.crossVectors(armForearm, UP);
+  level.crossVectors(armForearm, Y_AXIS);
   if (across.pitch !== null && level.lengthSq() > 1e-8) {
     swing.setFromAxisAngle(level.normalize(), across.pitch * share);
     out.premultiply(swing);
@@ -888,7 +884,7 @@ function plateHand(
   head.addScaledVector(normal, side.sign * side.radius * Math.sin(turnOut));
   head.y += c.ringLift * h * follow;
   // The turn out around the vertical, after the turn up around the forward axis, after the tilt.
-  swing.setFromAxisAngle(UP, -side.sign * turnOut);
+  swing.setFromAxisAngle(Y_AXIS, -side.sign * turnOut);
   turn
     .setFromAxisAngle(Z_AXIS, -side.sign * c.ringUp * follow)
     .premultiply(swing)
