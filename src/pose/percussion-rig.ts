@@ -340,14 +340,14 @@ export const PERCUSSION_HOLDS = {
   // so that the shaft leaves the fist at the side of the thumb (strikeRoll). The upper arm hangs
   // near the side, with the elbow down and back: with the elbow out, the forearm comes within 26°
   // of the shaft, and the shaft leaves the fist along the claws. The rebuilt round arm is free of
-  // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans
-  // 7° over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm,
-  // and the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
-  // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean
-  // also at rest (ready). The left arm hangs, because a single note often needs no muffling. The
-  // left paw does not muffle the left head (damp): the head stands at the middle of the body, so
-  // with the palm on it the left upper arm went 5.9 cm into the body (base 2.6 cm), and a place
-  // further forward left the palm 6 cm to 8 cm off the head.
+  // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans 7°
+  // over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm, and
+  // the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
+  // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean also
+  // at rest (ready). The left arm hangs, because a single note often needs no muffling. The left
+  // paw does not muffle the left head (damp): the head stands at the middle of the body, so with
+  // the palm on it the left upper arm went 5.9 cm into the body, and a place further forward left
+  // the palm 6 cm to 8 cm off the head.
   'bass-drum': {
     hands: 'right',
     sizes: { lift: 0.13, rest: 0.05 },
@@ -375,24 +375,22 @@ export const PERCUSSION_HOLDS = {
     curl: GRIP_CURL,
     strikeRoll: true,
   },
-  // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes out
-  // from the shoulders, so that they make a V of about 66° at a strike and slant down 9°, as the
-  // matched grip of a real player. Between strikes, each stick keeps its strike direction, and
-  // the wrist lifts the tip over the head (across.pitch), as a real player's stroke from the
-  // wrist. With the rest direction across the forearm, the tips swing out over the rim. The pitch
-  // of 0.15 rad holds each tip about 4 cm above the head between strikes, with the stick almost
-  // level, as the ready position of a real player (1 to 2 inches, percussion 6). Before a
-  // strike, the wrist lifts the tip higher by the loudness (sizes.lift, across.peak): about 11 cm
-  // above the head at a velocity of 40, 14 cm at 100, and 15 cm at 127, below the 8 inches of a
-  // full stroke, and about 10 cm in a roll. The ball at the tip touches the head at a strike
-  // (offsetL, offsetR). With a pitch of 0.9 rad and a peak of 1, each tip stood 21 cm above the
-  // head between strikes, the stick 35° up, and the stroke did not grow with the loudness. The
-  // elbows point out, so that the rebuilt round upper arms stay out of the belly (design 5.3):
-  // with the elbows nearer to the body, they went 2.4 cm into it. The drum takes its place from
-  // the body (fit): at the bind place, the forearms or the paws of the recast elephant, bear, hippo,
-  // and panda went 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast
-  // hippo and panda missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for
-  // each body, the sticks of the recast wolf and deer went into the raised drum.
+  // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes out from
+  // the shoulders, so that they make a V of about 66° at a strike and slant down 9°, as the matched
+  // grip of a real player. Between strikes, each stick keeps its strike direction, and the wrist
+  // lifts the tip over the head (across.pitch), as a real player's stroke from the wrist. With the
+  // rest direction across the forearm, the tips swing out over the rim. The pitch of 0.15 rad holds
+  // each tip about 4 cm above the head between strikes, with the stick almost level, as the ready
+  // position of a real player (1 to 2 inches, percussion 6). Before a strike, the wrist lifts the
+  // tip higher by the loudness (sizes.lift, across.peak): about 11 cm above the head at a velocity
+  // of 40, 14 cm at 100, and 15 cm at 127, below the 8 inches of a full stroke, and about 10 cm in
+  // a roll. The ball at the tip touches the head at a strike (offsetL, offsetR). The elbows point
+  // out, so that the rebuilt round upper arms stay out of the belly (design 5.3): with the elbows
+  // nearer to the body, they went 2.4 cm into it. The drum takes its place from the body (fit): at
+  // the bind place, the forearms or the paws of the recast elephant, bear, hippo, and panda went
+  // 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast hippo and panda
+  // missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for each body, the
+  // sticks of the recast wolf and deer went into the raised drum.
   'snare-drum': {
     hands: 'alternate',
     sizes: { lift: 0.11, rest: 0.03 },
@@ -484,18 +482,16 @@ export const PERCUSSION_HOLDS = {
     strikeRoll: false,
   },
   // The mallets leave the front of the fists (XYLOPHONE.malletTilt), as the sticks of the snare
-  // drum, because a real player holds them in the matched grip of the snare drum. Between
-  // strikes, each mallet keeps its strike direction, and the wrist holds the head about 4 cm over
-  // its bar (across.pitch), as the low ready height of a real player. Before a strike, the wrist
-  // lifts the head higher by the loudness (sizes.lift, across.peak), about 12 cm in the test
-  // score, as a real player sets the stick height by the dynamic. With a pitch of 0.5 rad and a
-  // peak of 1, the heads stood 13 cm (left) and 27 cm (right) over the bars, and the stroke did
-  // not grow with the loudness. The short arms do not reach the bars from an
-  // upright body, so the spine leans over them (lean), and the body moves from side to side
-  // behind the notes with the feet in place (side). A run alternates the paws where the paws do
-  // not cross, and else takes a double stroke, as a real player puts in a double stroke where
-  // alternate strokes would cross the hands (pass). The paws keep to their sides of the bars
-  // (gap), and a bar out of the reach of one paw goes to the other paw (reach).
+  // drum, because a real player holds them in the matched grip of the snare drum. Between strikes,
+  // each mallet keeps its strike direction, and the wrist holds the head about 4 cm over its bar
+  // (across.pitch), as the low ready height of a real player. Before a strike, the wrist lifts the
+  // head higher by the loudness (sizes.lift, across.peak), about 12 cm in the test score, as a real
+  // player sets the stick height by the dynamic. The short arms do not reach the bars from an
+  // upright body, so the spine leans over them (lean), and the body moves from side to side behind
+  // the notes with the feet in place (side). A run alternates the paws where the paws do not cross,
+  // and else takes a double stroke, as a real player puts in a double stroke where alternate
+  // strokes would cross the hands (pass). The paws keep to their sides of the bars (gap), and a bar
+  // out of the reach of one paw goes to the other paw (reach).
   xylophone: {
     hands: 'alternate',
     sizes: { lift: 0.09, rest: 0.03 },
@@ -555,9 +551,7 @@ export const PERCUSSION_HOLDS = {
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
  * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
- * With a pitch of 0.7 rad and a peak of 1, each ball stood 15 cm above the plate between strikes,
- * the shaft 29° up, and the stroke did not grow with the loudness. With the rest direction across
- * the forearm, the heads swing out past the rim.
+ * With the rest direction across the forearm, the heads swing out past the rim.
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
