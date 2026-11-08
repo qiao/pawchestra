@@ -9,10 +9,12 @@ Then `pnpm rig-export <animal> --blend <dir>/<animal>.blend --out <dir>/<animal>
 the GLB file of the body, and `pnpm studio-body <animal>` writes its module.
 
 The steps:
- 1. Import the source mesh, weld its vertices, and make each face flat. With `joinQuads` in the
-    config, join each two triangles of a quad of the source into the quad again (`join_quads()` of
-    `mesh_intake.py`), because a GLB file holds only triangles.
- 2. Give each face the color of the texture, and make the nose gloss (`add_surface()`).
+ 1. Import the source mesh (a GLB file, or an FBX file that keeps its quads), weld its vertices,
+    and make each face flat. With `joinQuads` in the config, join each two triangles of a quad of a
+    GLB source into the quad again (`join_quads()` of `mesh_intake.py`), because a GLB file holds
+    only triangles. The join is a guess: two source triangles in a row can join too.
+ 2. Give each face the color of the texture (`texture` of the config, or the texture of a GLB
+    source), and make the nose gloss (`add_surface()`).
  3. With `limbs` in the config, make the limbs longer along their bones (`limb_moves()`), and
     move the joints with them. With `rings`, add a ring halfway between each two rings of each
     arm: split each edge of the quad edge ring between them at its middle (`subdivide_rings()`).
@@ -333,7 +335,7 @@ def old_eyes(body, config, rm):
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
     co = co.reshape(-1, 3)
-    texture = sa.base_texture(os.path.join(sa.ROOT, config['source']))
+    texture = sa.base_texture(os.path.join(sa.ROOT, config.get('texture', config['source'])))
     rgb, dark = sa.polygon_colors(me, texture, config['colors'], rm)
     eyes, _ = rm['features'](co @ sa.TO_STUDIO.T, tris, rgb[owner], dark[owner], config['colors'])
     out = {}
@@ -365,7 +367,8 @@ def main():
 
     # 2. The face colors and the gloss nose.
     animal = os.path.splitext(os.path.basename(out))[0]
-    counts = sa.add_surface(body, animal, config['source'], eye_fans=False, config=config)
+    texture = config.get('texture', config['source'])
+    counts = sa.add_surface(body, animal, texture, eye_fans=False, config=config)
     tone_faces(body, rm, config['colors']['tone'])
 
     # 3. The longer limbs and the joint rings.
