@@ -1818,39 +1818,18 @@ function* sightSweepSteps(
   const steps = Math.round(CONDUCTOR_SIGHT.nudge / CONDUCTOR_SIGHT.nudgeStep);
   const right = angles.flatMap((a, i) => (a >= 0 ? [i] : []));
   const left = angles.flatMap((a, i) => (a < 0 ? [i] : [])).toReversed();
-  const innerRight = right[0];
-  const innerLeft = left[0];
-  const between = innerLeft !== undefined ? (arcs[innerLeft] ?? 0) : 0;
+  const between = left[0] !== undefined ? (arcs[left[0]] ?? 0) : 0;
   // The right side goes first. A centered row keeps the packed arc between its two inner
   // players, and the strings keep the gap of the conductor.
-  const sides = [
-    {
-      side: 1,
-      order: right,
-      bound: (): number => {
-        if (row.split && innerLimit !== null) {
-          return Math.min(angles[innerRight ?? 0] ?? 0, innerLimit);
-        }
-        return row.split || innerLeft === undefined
-          ? (angles[innerRight ?? 0] ?? 0)
-          : (angles[innerLeft] ?? 0) + between;
-      },
-    },
-    {
-      side: -1,
-      order: left,
-      bound: (): number => {
-        if (row.split && innerLimit !== null) {
-          return Math.max(angles[innerLeft ?? 0] ?? 0, -innerLimit);
-        }
-        return row.split || innerRight === undefined
-          ? (angles[innerLeft ?? 0] ?? 0)
-          : (next[innerRight] ?? 0) - between;
-      },
-    },
-  ] as const;
-  for (const { side, order, bound } of sides) {
-    const limit = bound();
+  for (const side of [1, -1] as const) {
+    const order = side > 0 ? right : left;
+    const other = (side > 0 ? left : right)[0];
+    let limit = angles[order[0] ?? 0] ?? 0;
+    if (row.split && innerLimit !== null) {
+      limit = side * Math.min(side * limit, innerLimit);
+    } else if (!row.split && other !== undefined) {
+      limit = (next[other] ?? 0) + side * between;
+    }
     // The candidates of each player, from the inner player out: the angle and its cost.
     const options: { readonly angle: number; readonly cost: number }[][] = [];
     for (const [k, i] of order.entries()) {
