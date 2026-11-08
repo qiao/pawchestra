@@ -1793,37 +1793,51 @@ function sightTargets(models: ModelCache): SightTargets {
  */
 function segmentHitsBox(from: Vec3, to: Vec3, b: PlacedBox): boolean {
   // A point goes into the axes of the box by the turn back of `placeFootprint()`.
-  const local = (p: Vec3): Vec3 => {
-    const dx = p[0] - b.x;
-    const dz = p[2] - b.z;
-    return [dx * b.cos - dz * b.sin, p[1], dx * b.sin + dz * b.cos];
-  };
-  const a = local(from);
-  const e = local(to);
-  // The slabs of the three axes: the start, the move, and the two faces.
-  const slabs = [
-    [a[0], e[0] - a[0], -b.halfX, b.halfX],
-    [a[1], e[1] - a[1], b.minY, b.maxY],
-    [a[2], e[2] - a[2], -b.halfZ, b.halfZ],
-  ] as const;
-  let t0 = 0;
-  let t1 = 1;
-  for (const [start, d, low, high] of slabs) {
-    if (Math.abs(d) < 1e-12) {
-      if (start < low || start > high) {
-        return false;
-      }
-      continue;
-    }
-    const ta = (low - start) / d;
-    const tb = (high - start) / d;
-    t0 = Math.max(t0, Math.min(ta, tb));
-    t1 = Math.min(t1, Math.max(ta, tb));
-    if (t0 > t1) {
-      return false;
-    }
+  const fx = from[0] - b.x;
+  const fz = from[2] - b.z;
+  const tx = to[0] - b.x;
+  const tz = to[2] - b.z;
+  const ax = fx * b.cos - fz * b.sin;
+  const az = fx * b.sin + fz * b.cos;
+  const ex = tx * b.cos - tz * b.sin;
+  const ez = tx * b.sin + tz * b.cos;
+  // The slabs of the three axes: the start, the move, and the two faces. The sight sweep calls
+  // this function millions of times, so it makes no arrays.
+  const span: Span = { t0: 0, t1: 1 };
+  return (
+    slabHit(ax, ex - ax, -b.halfX, b.halfX, span) &&
+    slabHit(from[1], to[1] - from[1], b.minY, b.maxY, span) &&
+    slabHit(az, ez - az, -b.halfZ, b.halfZ, span)
+  );
+}
+
+/** The part of a segment that is inside the slabs so far, as fractions of the segment. */
+interface Span {
+  /** The fraction at which the segment goes into all slabs. */
+  t0: number;
+  /** The fraction at which the segment comes out of a slab first. */
+  t1: number;
+}
+
+/**
+ * Clips the span of a segment by one slab: the space between two parallel faces of a box.
+ *
+ * @param start The start of the segment on the axis of the slab.
+ * @param d The move of the segment on the axis.
+ * @param low The lower face.
+ * @param high The upper face.
+ * @param span The span so far. The function makes it smaller.
+ * @returns False if no part of the segment is inside all slabs so far.
+ */
+function slabHit(start: number, d: number, low: number, high: number, span: Span): boolean {
+  if (Math.abs(d) < 1e-12) {
+    return !(start < low || start > high);
   }
-  return true;
+  const ta = (low - start) / d;
+  const tb = (high - start) / d;
+  span.t0 = Math.max(span.t0, Math.min(ta, tb));
+  span.t1 = Math.min(span.t1, Math.max(ta, tb));
+  return !(span.t0 > span.t1);
 }
 
 /**
