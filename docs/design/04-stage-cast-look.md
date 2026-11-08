@@ -321,8 +321,8 @@ the facts of its body in its `.blend` ("Hand rig").
   The pig takes it. Reason: the rule put the pig mouth on the front of the snout disc, so the horn
   mouthpiece touched the disc in front of the lips. A real player rests the mouthpiece on the lips
   (winds 2.1, 2.2). A new mouth point moves the instrument of the bind pose, and the layout reads
-  that place (4.2), so the mouth points of the panda and the wolf moved each seat about 3 cm. Their
-  holds move the mouthpiece to the lips (`WindHold.lipShift`, 5.3).
+  that place (4.2), so a new mouth point moves the seats. A hold can move the mouthpiece to the lips
+  in place of it (`WindHold.lipShift`, 5.3).
 - **Scale.** The scale keeps a landmark that the scene depends on: the shoulders of the bear for
   the conductor stand, and the shoulders, the ear tips, or the head top at the chosen size for
   each other body. A longer leg raises the landmark, so the trunk, the head, and the arms keep
@@ -915,8 +915,7 @@ channel of the finish table holds it, and the player shader scales the reflectio
 (`addFinishReflection()` of `scene/geometry.ts`). The hall is dark, so the physical reflection
 of a polished finish showed almost nothing, and a full metalness looked black. With the factor,
 the brass, the copper, the piano lacquer, and the string varnish show the warm lamps and the
-lit stage. The fur stays matte with the factor 1. The values are the middle of a lineup of
-three finish sets.
+lit stage. The fur stays matte with the factor 1.
 
 The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.
@@ -979,8 +978,7 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
 - **Other terms.** Each layout bakes the soft key shadow on the stage one time
   (`scene/stage-bake.ts`), because the props and the stage do not move. A close shot adds a soft
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives
-  the back rows an aerial depth (`ROOM_HAZE`), with a density from the middle of a lineup of
-  three densities in the close shots. A solo turns the key light, the pool, and the beams
+  the back rows an aerial depth (`ROOM_HAZE`). A solo turns the key light, the pool, and the beams
   to the soloed players (`soloAim()`, 2.4). A captured cube of the lit hall gives the reflections
   (`captureEnvironmentSteps()`).
 - **Tone.** AgX tone mapping, because ACES moved the dark wood to red. Its exposure (`STAGE_TONE`)
@@ -1016,7 +1014,7 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
 - **Lens fringe** (`LENS_FRINGE`). The final pass moves the red of the scene a little outward and
   the blue a little inward, with the square of the distance from the middle of the frame, as the
   lateral color of a real film lens. The middle of the frame stays sharp, so the faces do not
-  change. The strength is the middle of a lineup of three strengths. The low tier skips it,
+  change. The low tier skips it,
   because it costs two more samples of the scene for each pixel.
 - **Contact shade** (`CONTACT_SHADE` of `scene/surface.ts`). A pass at half size reads the depth
   of the beam pass and finds the soft dark where two surfaces meet: under the feet, the chairs,
@@ -1024,8 +1022,7 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   scene by it, before the haze, as the ambient occlusion of a film render. A sample counts only
   above a small angle over the face (`bias`), so the flat faces of a low-poly body stay clean.
   Each pixel turns its samples by a 4 × 4 pattern, and a blur of 4 × 4 pixels removes the
-  pattern. The hall gets no shade, because the depth pass has no hall. The strength is the middle
-  of a lineup of three strengths. The high tier reads the depth many times for each pixel at
+  pattern. The hall gets no shade, because the depth pass has no hall. The high tier reads the depth many times for each pixel at
   half size (`TIER_SETTINGS.high.contactSamples`). Without the shade, the medium tier of a phone
   looked flat, so it has a cheap shade: a quarter size and fewer samples (`surfaceLevel`,
   `contactSamples`). It reads the depth about 15% as often as the high tier. The
@@ -1064,8 +1061,7 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   letterbox has an oval vignette with the shape of the frame (`FRAME_VIGNETTE`), so that the top
   and the bottom edges darken as much as the sides, and the vignette shows on the lit stage. A
   close shot gets the stronger vignette of `SHOT_LOOK`, and the letterbox takes the same ratio as
-  a boost (`vignetteOf()` of `scene/stage-scene.ts`). The strength is the middle of a lineup of
-  three strengths.
+  a boost (`vignetteOf()` of `scene/stage-scene.ts`).
 
 **Camera**
 
