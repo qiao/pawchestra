@@ -152,20 +152,20 @@ or slits. Fix all three causes, because they add up:
 - **Faces.** Long thin triangles across a joint fold into a spiral. New quad faces fix it.
 - **Bones.** The linear blend collapses the skin under a large twist on one bone. Short segments
   keep each step below about 25°.
-- **Hold.** A real forearm turns about 90°, and a paw turned about 160° folds the wrist. Then
+- **Hold.** A paw turned about 160° folds the wrist, and a real forearm turns about 90°. Then
   change the hold or the instrument first.
 
 Run `tools/blender/arm_rebuild.py` first (`--keep-faces` for a clean quad mesh). Write a species
 script `tools/blender/<a>_arms.py` only for a fault that it does not fix.
 
 - Ask the user before the first rebuild of a species. Change only the limb faces from the
-  shoulder line to the wrist, or from the haunch line to the ankle, on the old limb surface.
+  shoulder line to the wrist, or from the haunch line to the ankle.
 - Work one step at a time (`run_steps()`), and look at an image after each step. Write no weight
   algorithm of your own. Keep the source file, and note the copy in its `README.md`.
-- Never call `read_factory_settings`: it stops the MCP server.
+- Never call `read_factory_settings`, because it stops the MCP server.
 - Merge by Distance first, because automatic weights fail on split seams.
-- Put the rings of 16 vertices about 0.45 arm radii apart, with a ring on each side of the elbow
-  and the wrist.
+- Put the rings by the rule "Limb rings" of design 4.4, with a ring on each side of the elbow and
+  the wrist.
 - In Weight Paint, remove the arm bones from the trunk below the armpits. Look at the arm down,
   forward, an elbow at 100°, and a forearm turn of 90°.
 - New faces move the bone heat of the whole mesh, so give the kept vertices the old bone heat
