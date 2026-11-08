@@ -71,11 +71,26 @@ const ROW_RISER = {
   firstRow: 2,
   /** The step of the height of a riser, in meters. */
   step: 0.1,
-  /** The largest height of a riser, in meters. */
+  /** The largest height of a riser of rows 2 and 3, in meters. */
   highest: 1.2,
+  /**
+   * The largest height of a riser of the back row (row 4), in meters: a step above the winds,
+   * because a real hall puts the percussion on its highest riser.
+   */
+  backHighest: 1.4,
   /** The edge of a riser in front of the stands of its row and at its ends, in meters. */
   lip: 0.05,
 } as const;
+
+/**
+ * Gives the largest height of a riser of a row ({@link ROW_RISER}).
+ *
+ * @param row The index of the row in {@link ROWS}.
+ * @returns The height, in meters.
+ */
+function riserTop(row: number): number {
+  return row >= ROWS.length - 1 ? ROW_RISER.backHighest : ROW_RISER.highest;
+}
 
 /**
  * The points of the conductor that each player sees (design 4.5, seat geometry), relative to the
@@ -792,7 +807,7 @@ function* fitRowSteps(
     const placement = placeRow(members, angles, radius);
     // The band of each row behind the first row lets its players move along the arc after the
     // spread, and lets a seat group from row 2 rise.
-    const reserve = row > 0 ? riserReserve(placement) : null;
+    const reserve = row > 0 ? riserReserve(placement, row) : null;
     if (
       rowClear(placement, clearance) &&
       (!reserve || !touchesAny([rowRiserObstacle(reserve, CENTER)], clearance.placed))
@@ -846,16 +861,17 @@ function rowExtent(row: RowPlacement): RowExtent {
  * riser of the spread row stays in this space.
  *
  * @param row The places of the packed row.
+ * @param n The index of the row in {@link ROWS}.
  * @returns The space, with the largest height of a riser.
  */
-function riserReserve(row: RowPlacement): RowRiser {
+function riserReserve(row: RowPlacement, n: number): RowRiser {
   const { inner, outer } = rowExtent(row);
   // A seat at 90° reaches past 90° by half a chair and the lip.
   const end = SPREAD_LIMITS.maxAngle + (CHAIR_ROOM + ROW_RISER.lip) / inner;
   return {
     inner: inner - ROW_RISER.lip,
     outer,
-    height: ROW_RISER.highest,
+    height: riserTop(n),
     from: -end,
     to: end,
   };
@@ -2925,7 +2941,7 @@ function* sightRowsSteps(
         if (rises[k] && lift > level + 1e-9) {
           levels[k] = lift;
           raised = true;
-        } else if (count > 0 && rises[k] && level + ROW_RISER.step <= ROW_RISER.highest + 1e-9) {
+        } else if (count > 0 && rises[k] && level + ROW_RISER.step <= riserTop(row.row) + 1e-9) {
           levels[k] = Math.round((level + ROW_RISER.step) * 1000) / 1000;
           raised = true;
         }
