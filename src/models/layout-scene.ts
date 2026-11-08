@@ -2166,15 +2166,10 @@ function riserContact(
   return { lifts, contact };
 }
 
-/** A row after its sight pass, with its cost and its blocked players. */
-interface RowSight {
+/** A row after its sight pass, with the cost, the blocked players, and the worst sight. */
+interface RowSight extends Pick<SightTry, 'cost' | 'blind' | 'worst'> {
+  /** The row with its risers. */
   readonly seen: SeenRow;
-  /** The sum of the costs of the sights of the players ({@link sightCost}). */
-  readonly cost: number;
-  /** The indices of the blocked players. */
-  readonly blind: readonly number[];
-  /** The largest hidden share of the head and the baton paw of a player ({@link SightResult}). */
-  readonly worst: number;
 }
 
 /** The moves of row 0 for the sight of the back desks ({@link moveFrontSteps}). */
