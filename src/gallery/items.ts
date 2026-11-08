@@ -308,7 +308,7 @@ export function gallerySupport(search: URLSearchParams, instrument: InstrumentId
 }
 
 /** A clip of the gallery query `clip=<file>[:<animation>]` (design 4.4, 7.1). */
-export interface GalleryClipQuery {
+interface GalleryClipQuery {
   /** The name of the file `clips/<file>.glb`, which the dev and preview servers serve. */
   readonly file: string;
   /** The name of the animation in the file, or `null` for its first animation. */
