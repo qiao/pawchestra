@@ -2750,9 +2750,10 @@ function chosenHeights(
  * 4.5, seat geometry), from the front row to the back row. {@link sightSweepSteps} moves the
  * players along the row. From row 2, each seat group with a blocked player then rises by
  * {@link ROW_RISER}.step, up to its largest height, and the players move again. Each group takes
- * the lowest height with its fewest blocked players. A group whose riser does not fit on the
- * stage stays on the stage top. The strings sit on the stage top. The moves keep the gaps, the
- * stage, and the limits of the spread.
+ * the lowest height with its fewest blocked players. A try with a riser that does not fit on the
+ * stage is not valid. The strings sit on the stage top. After row 1, the players of row 0 move
+ * for the back desks ({@link FRONT_MOVES}). The moves keep the gaps, the stage, and the limits of
+ * the spread.
  *
  * @param rows The rows after the spread, from the front.
  * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
