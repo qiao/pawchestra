@@ -313,7 +313,10 @@ export interface StrikeTrack {
   readonly upStarts: Float64Array;
   /** The time of the down stroke of each strike, from the top to the target, in seconds. */
   readonly downs: Float64Array;
-  /** 1 for a legato stroke, which lifts at once from the strike before, and 0 for a lift from rest. */
+  /**
+   * 1 for a legato stroke, which lifts at once from the strike before, and 0 for a lift from
+   * rest.
+   */
   readonly legato: Uint8Array;
   /** The end of the rebound after each strike. */
   readonly reboundEnds: Float64Array;
@@ -331,11 +334,12 @@ export interface StrikeTrack {
 /**
  * Calculates the strike data of one hand (design 5.3). A strike within `legatoSec` of the strike
  * before it is a legato stroke: the mallet lifts at once after the strike before and waits at its
- * top. Another strike lifts from the rest height, one beat before the note, at least 0.25 s and
- * at most 1 s before it, and in at most 0.6 of the time from the strike before. The height of the top follows the gesture size of the
- * note, and a short lift is lower in proportion. The down stroke takes at most 0.125 s, and at most
- * half of the lift. After a strike with no legato stroke after it, the mallet rebounds to its rest
- * height in at most 0.1 s, and in at most 0.4 of the time to the next strike.
+ * top. Another strike lifts from the rest height, one beat before the note, at least 0.25 s and at
+ * most 1 s before it, and in at most 0.6 of the time from the strike before. The height of the top
+ * follows the gesture size of the note, and a short lift is lower in proportion. The down stroke
+ * takes at most 0.125 s, and at most half of the lift. After a strike with no legato stroke after
+ * it, the mallet rebounds to its rest height in at most 0.1 s, and in at most 0.4 of the time to
+ * the next strike.
  *
  * @param strikes The strikes of the hand, sorted by start.
  * @param first The target of the hand before its first strike.
