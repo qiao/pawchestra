@@ -193,7 +193,7 @@ old arm bones hold no skin and only drive the new bones (`armSegments`).
 
 Design 4.4 gives the rule and the reason of each config key.
 
-### Paws, holds, and the bow
+### Holds and reach
 
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist, where
   `twistAngle()` flips. Use `pnpm bind-supination <species>` (design 4.4), or lower the twist of
