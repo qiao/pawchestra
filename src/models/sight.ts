@@ -485,6 +485,33 @@ export function sightOf(
 }
 
 /**
+ * Lists the items that hide a point of the head or of the baton paw of the conductor from a
+ * player, as {@link sightOf} counts them. A music stand can hide only the head.
+ *
+ * @param eyes The middle of the eyes of the player in its model axes ({@link eyesOf}).
+ * @param place The place of the player.
+ * @param targets The points of the conductor.
+ * @param blockers The items that can hide the points.
+ * @returns The items that hide at least one point.
+ */
+export function hidersOf(
+  eyes: Vec3,
+  place: PlayerPlace,
+  targets: SightTargets,
+  blockers: SightBlockers,
+): Obstacle[] {
+  const eye = pointOnStage(eyes, place.position, place.facing);
+  const near = (items: readonly Obstacle[]): Obstacle[] =>
+    items.filter((o) => nearSegment(eye, PODIUM_CENTER, o, SIGHT_REACH));
+  const hides = (o: Obstacle, points: readonly Vec3[]): boolean =>
+    points.some((p) => segmentHitsObstacle(eye, p, o));
+  return [
+    ...near(blockers.solid).filter((o) => hides(o, targets.head) || hides(o, targets.baton)),
+    ...near(blockers.stands).filter((o) => hides(o, targets.head)),
+  ];
+}
+
+/**
  * The view of the audience on the rows behind the strings (design 4.5, seat geometry). A small
  * animal there can hide behind the strings in the low wide shots of Cinematic. The points stand
  * for those shots and the default view, as multiples of the stage side, relative to the podium
@@ -507,6 +534,12 @@ export const AUDIENCE = {
     [0, 0.15],
   ],
 } as const;
+
+/**
+ * The distance from a line of the view of the audience in the plane of the stage beyond which an
+ * item hides no point of the head, in meters. It holds the side moves of {@link AUDIENCE}.head.
+ */
+const VIEW_MARGIN = 0.3;
 
 /**
  * Finds the share of the head of a player that the items in front hide from the audience
@@ -532,10 +565,39 @@ export function audienceShare(
   let hidden = 0;
   for (const [cx, cy, cz] of AUDIENCE.cameras) {
     const camera: Vec3 = [cx * side, cy * side, cz * side];
-    const items = solid.filter((o) => nearSegment(camera, points[0] ?? camera, o, 0.3));
+    const items = solid.filter((o) => nearSegment(camera, points[0] ?? camera, o, VIEW_MARGIN));
     hidden += points.filter((p) => items.some((o) => segmentHitsObstacle(camera, p, o))).length;
   }
   return hidden / (AUDIENCE.cameras.length * points.length);
+}
+
+/**
+ * Finds if an item can change the sight of a player ({@link sightOf}) or the view of the
+ * audience on it ({@link audienceShare}). An item that is not near changes neither, because both
+ * functions skip it.
+ *
+ * @param eyes The middle of the eyes of the player in its model axes ({@link eyesOf}).
+ * @param place The place of the player.
+ * @param o The item.
+ * @param side The stage side when the view of the audience counts, or `null`.
+ * @returns True if the item is near a line of the sight or of the view.
+ */
+export function sightNear(
+  eyes: Vec3,
+  place: PlayerPlace,
+  o: Obstacle,
+  side: number | null,
+): boolean {
+  const eye = pointOnStage(eyes, place.position, place.facing);
+  if (nearSegment(eye, PODIUM_CENTER, o, SIGHT_REACH)) {
+    return true;
+  }
+  if (side === null) {
+    return false;
+  }
+  return AUDIENCE.cameras.some(([cx, cy, cz]) =>
+    nearSegment([cx * side, cy * side, cz * side], eye, o, VIEW_MARGIN),
+  );
 }
 
 /**
