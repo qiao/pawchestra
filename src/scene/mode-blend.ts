@@ -123,7 +123,7 @@ export interface OrbitBlend {
 }
 
 /** One frame of a blend of the camera: the blend of the frame, and the camera on the screen. */
-export interface OrbitStep {
+interface OrbitStep {
   readonly blend: OrbitBlend;
   readonly view: OrbitView;
 }
