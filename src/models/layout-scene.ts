@@ -1771,6 +1771,20 @@ function clearanceOf(
 }
 
 /**
+ * Moves a point of a model into the stage axes.
+ *
+ * @param p The point in the model axes.
+ * @param position The place of the model origin.
+ * @param facing The turn of the model around y, in radians.
+ * @returns The point on the stage.
+ */
+function pointOnStage(p: Vec3, position: Vec3, facing: number): Vec3 {
+  const c = Math.cos(facing);
+  const s = Math.sin(facing);
+  return [position[0] + p[0] * c + p[2] * s, position[1] + p[1], position[2] - p[0] * s + p[2] * c];
+}
+
+/**
  * Gives the middle of the two eye bones of a model, in the model axes, in the bind pose.
  *
  * @param model The model.
@@ -2162,26 +2176,19 @@ const SIGHT_REACH = 0.9;
  * the eyes of the player to the points of {@link CONDUCTOR_SIGHT}, and the triangles of the
  * players and the boxes of the other items can hide them.
  *
- * @param member The player.
+ * @param eyes The middle of the eyes of the player in its model axes ({@link eyesOf}).
  * @param place The place of the player.
  * @param targets The points of the conductor.
  * @param blockers The items that can hide the points.
  * @returns The sight.
  */
 function sightOf(
-  member: Member,
+  eyes: Vec3,
   place: PlayerPlace,
   targets: SightTargets,
   blockers: SightBlockers,
 ): SightResult {
-  const c = Math.cos(place.facing);
-  const s = Math.sin(place.facing);
-  const [x, y, z] = member.sight;
-  const eye: Vec3 = [
-    place.position[0] + x * c + z * s,
-    place.position[1] + y,
-    place.position[2] - x * s + z * c,
-  ];
+  const eye = pointOnStage(eyes, place.position, place.facing);
   const near = (items: readonly Obstacle[]): Obstacle[] =>
     items.filter((o) => nearSegment(eye, CENTER, o, SIGHT_REACH));
   const solid = near(blockers.solid);
@@ -2232,26 +2239,23 @@ const AUDIENCE = {
  * Finds the share of the head of a player that the items in front hide from the audience
  * ({@link AUDIENCE}).
  *
- * @param member The player.
+ * @param eyes The middle of the eyes of the player in its model axes ({@link eyesOf}).
  * @param place The place of the player.
  * @param solid The items that can hide the head.
  * @param side The stage side, in meters.
  * @returns The share, from 0 to 1.
  */
 function audienceShare(
-  member: Member,
+  eyes: Vec3,
   place: PlayerPlace,
   solid: readonly Obstacle[],
   side: number,
 ): number {
-  const c = Math.cos(place.facing);
-  const s = Math.sin(place.facing);
-  const [x, y, z] = member.sight;
-  const points = AUDIENCE.head.map(([dx, dy]): Vec3 => [
-    place.position[0] + (x + dx) * c + z * s,
-    place.position[1] + y + dy,
-    place.position[2] - (x + dx) * s + z * c,
-  ]);
+  const [x, y, z] = eyes;
+  const points = AUDIENCE.head.map(([dx, dy]): Vec3 => {
+    const p = pointOnStage([x + dx, y, z], place.position, place.facing);
+    return [p[0], p[1] + dy, p[2]];
+  });
   let hidden = 0;
   for (const [cx, cy, cz] of AUDIENCE.cameras) {
     const camera: Vec3 = [cx * side, cy * side, cz * side];
@@ -2335,7 +2339,7 @@ function* sightSweepSteps(
         ? [placeStand(angle, radius - member.standDistance, i, [member], height).obstacle]
         : [];
     const place = placePlayer(member, angle, radius, height).place;
-    const seen = sightOf(member, place, targets, {
+    const seen = sightOf(member.sight, place, targets, {
       ...blockers,
       stands: [...blockers.stands, ...own],
     });
@@ -2343,7 +2347,7 @@ function* sightSweepSteps(
       ? seen
       : {
           ...seen,
-          hidden: seen.hidden + audienceShare(member, place, blockers.solid, view),
+          hidden: seen.hidden + audienceShare(member.sight, place, blockers.solid, view),
         };
   };
   const steps = Math.round(CONDUCTOR_SIGHT.nudge / CONDUCTOR_SIGHT.nudgeStep);
@@ -2873,8 +2877,8 @@ function* sightRowsSteps(
           solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)],
           stands,
         };
-        const seen = sightOf(member, place, targets, others);
-        const hidden = view === null ? 0 : audienceShare(member, place, others.solid, view);
+        const seen = sightOf(member.sight, place, targets, others);
+        const hidden = view === null ? 0 : audienceShare(member.sight, place, others.solid, view);
         cost += sightCost(seen) + 300 * hidden;
         worst = Math.max(worst, seen.hidden);
         return seen.sight === 2 || hidden >= AUDIENCE.hidden;
@@ -3013,7 +3017,8 @@ function* sightRowsSteps(
         const place = placement.players[i]?.place;
         const solid = [...soloists, ...bodies.filter((_, j) => j !== i)];
         return (
-          place !== undefined && sightOf(member, place, targets, { solid, stands }).sight === 2
+          place !== undefined &&
+          sightOf(member.sight, place, targets, { solid, stands }).sight === 2
         );
       }).length;
     };
@@ -3166,7 +3171,7 @@ function choirLift(
       const member = members[singer.index];
       const [x, y, z] = singer.place.position;
       const place = { ...singer.place, position: [x, y + lift, z] as const };
-      return member !== undefined && sightOf(member, place, targets, blockers).sight === 2;
+      return member !== undefined && sightOf(member.sight, place, targets, blockers).sight === 2;
     }).length;
     if (blocked < best.blocked) {
       best = { lift, blocked };
