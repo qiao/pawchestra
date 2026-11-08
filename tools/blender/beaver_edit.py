@@ -428,7 +428,7 @@ def turned_joints(joints, factor):
 
 
 def step_export(s, path):
-    """Writes the mesh as a GLB file, as `arm_root.py` does. Gives the size of the file."""
+    """Writes the mesh as a GLB file. Gives the size of the file."""
     bpy.ops.object.select_all(action='DESELECT')
     s.mesh.select_set(True)
     bpy.context.view_layer.objects.active = s.mesh

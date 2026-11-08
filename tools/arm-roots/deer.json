@@ -1,8 +1,0 @@
-{
-  "source": "assets/models/deer/deer.glb",
-  "output": "assets/models/deer/deer-roots.glb",
-  "weld": 1e-05,
-  "metersPerUnit": 1.6769,
-  "note": "The edit of the deer arm roots. A smooth of the web at the back of each arm root moves vertices by 3.4 cm, above the limit of about 2 cm, so the list has no edit and the rig reads deer.glb.",
-  "edits": []
-}
