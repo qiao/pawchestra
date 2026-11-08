@@ -1184,8 +1184,11 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     so the desks do not move into the gap for a small fault.
   - From row 2, each seat group with a blocked player rises in steps of `ROW_RISER`, and the
     search runs again. A group starts at the height of the risers in front of it, so the rows rise
-    toward the back, and it takes the lowest height with its fewest blocked players. Each group
-    has its own riser, as the modular risers of a real orchestra. A riser reaches at least
+    toward the back, and it takes the lowest height with its fewest blocked players. The back row
+    (row 4) can rise one step more than the winds (`ROW_RISER.backHighest`), because a real hall
+    puts the percussion on its highest riser. Thus a small percussion player sees past the ears
+    of a tall flute player in front. Each group has its own riser, as the modular risers of a
+    real orchestra. A riser reaches at least
     `RISER_BACK` behind the seat centers and keeps `RISER_EDGE` from the outline of the stage, at
     the places of the players after the search. When a riser goes into an item of a lower
     neighbor group, that group rises to the same height, and a row keeps no riser that goes into
