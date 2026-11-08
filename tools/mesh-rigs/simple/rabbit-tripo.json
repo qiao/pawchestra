@@ -1,6 +1,6 @@
 {
-  "source": "assets/models/rabbit/tripo-p2/rabbit.glb",
-  "sourceNote": "The Tripo P2 rabbit mesh (assets/models/rabbit/README.md, \"tripo-p2/\"), with no edit. tools/blender/simple_rig.py rigs it with bone heat weights.",
+  "source": "assets/models/rabbit/tripo-p2/rabbit.fbx",
+  "sourceNote": "The Tripo P2 rabbit mesh with its quads (assets/models/rabbit/README.md), with no edit, and its base color texture at 2048 pixels. tools/blender/simple_rig.py rigs it with bone heat weights.",
   "name": "Rabbit",
   "weld": 1e-05,
   "joints": {
@@ -266,10 +266,10 @@
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
-      "L": 100,
-      "R": 50
+      "L": 97,
+      "R": 47
     },
-    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 100 degrees and the right 50 degrees (paw_supination() of tools/blender/rig_mesh.py). pnpm bind-supination rabbit gives the values on this body (design 4.4).",
+    "bindSupinationNote": "The bind paw of each arm turns about its bind forearm toward supination, the left 97 degrees and the right 47 degrees (paw_supination() of tools/blender/rig_mesh.py). pnpm bind-supination rabbit gives the values on this body (design 4.4).",
     "note": "The leg turns of the T-pose rabbit of 77b9d9d3. The legs of the source are shorter by limbs.leg, so that the seat of the app is the seat of the rabbit of main."
   },
   "colors": {
@@ -360,10 +360,8 @@
   "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as studio-body gives a rig-mesh body.",
   "metersPerUnit": 1.6833,
   "metersPerUnitNote": "The scale of the app: H (0.177334 units, the head height that studio-body measures) stays 0.2985 m, as on the rabbit of main. The script gives the fact height from the shoulder joints after the change of the legs.",
-  "joinQuads": true,
-  "joinQuadsNote": "The GLB file holds the quads of the source as pairs of triangles. The rig joins each pair into its quad again, so that each quad takes one face color.",
   "limbs": {
-    "arm": 1.14,
+    "arm": 1.2,
     "armRoot": 0.03,
     "armRadius": [
       0.045,
@@ -374,21 +372,23 @@
       0.739
     ],
     "legRamp": 0.01,
-    "armNote": "The upper arm and the forearm grow 1.14 times from the shoulder joint to the wrist joint, and the paw keeps its size. With the arms of the source (0.335 m from the shoulder joint to the middle of the palm), the left paw reaches the fingerboard only from 0.38 of its length (pnpm hold-reach rabbit --instrument violin), and the bow range is 0.11 to 0.30 m. With 1.14 (0.378 m), the paw reaches it from 0.12, and the bow range is the range of the rabbit of main (0.11 to 0.361 m).",
+    "armNote": "The upper arm and the forearm grow 1.2 times from the shoulder joint to the wrist joint, and the paw keeps its size. With the arms of the source (0.335 m from the shoulder joint to the middle of the palm), the left paw reaches the fingerboard only from 0.38 of its length (pnpm hold-reach rabbit --instrument violin). With 1.2 (0.39 m), it reaches it from 0.01, as on the rabbit of main, and the bow range is that of main (0.11 to 0.361 m). With 1.17, it reaches it from 0.06, with the same depths in pnpm pose-depth.",
     "armRadiusNote": "The arm of the source lies within 0.04 units of the line from the shoulder joint to the wrist joint. The trunk, the cheeks, and the whiskers lie more than 0.06 units from it, so they do not move.",
     "legNote": "The shin band (from the ankle joint to the knee joint) is 0.85 times as high, and the thigh band (from the knee joint to the hip joint) 0.739 times. At the scale of H the legs of the source are longer than the legs of the rabbit of main (thigh 0.228 m, shin 0.240 m). The thigh factor gives the thigh of main (0.169 m). The shin factor gives the seat height of main (0.260 m against 0.262 m): the hip joint lies high in the large haunch, so a shin of the length of main put the seat 5.5 cm lower."
   },
   "rings": {
-    "elbow": [
-      0.3
+    "subdivide": [
+      0.1,
+      0.97
     ],
-    "wrist": [],
-    "knee": [],
-    "snap": 0.003,
-    "reach": 0.02,
+    "ringGap": 0.004,
+    "ringVerts": 8,
+    "minGap": 0.02,
     "armRadius": 0.05,
-    "legInner": 0.01,
-    "note": "The planes of the cuts of each joint, in radii of the limb at the joint from the joint along the bone. The arm rings of the source have 11 or 12 vertices, about 0.9 radii apart. Each elbow has two rings within one radius (at -0.2 and +0.7 radii), so one cut at +0.3 radii gives the 3 rings of JOINT_RINGS (design 4.4). Each wrist (2 rings) and each knee (3 rings) has its rings in the source."
+    "note": "A new ring halfway between each two rings of each arm, from 0.1 to 0.97 of the line from the shoulder joint to the wrist joint: each edge of the quad edge ring between them splits at its middle (subdivide_rings() of tools/blender/simple_rig.py), so the form stays. The arm rings of the source have 11 or 12 vertices, about 0.9 radii apart, and so about one ring in each roll segment. The split gives 5 new rings on each arm, and the elbow 3 rings within one radius (JOINT_RINGS of design 4.4). The edge ring between the rings at 0.47 and 0.75 of each upper arm holds 3 source triangles on the front of the arm, so it takes no split. Rings less than minGap units apart take none."
   },
-  "chairNote": "The seat of the rabbit of main in meters at the scale of this body: a half width of 0.219 m, the front edge at z -0.04 m, and the back edge at z -0.19 m, as on the rabbit of trial 2."
+  "chairNote": "The seat of the rabbit of main in meters at the scale of this body: a half width of 0.219 m, the front edge at z -0.04 m, and the back edge at z -0.19 m, as on the rabbit of trial 2.",
+  "texture": "assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg",
+  "rollSplit": true,
+  "rollSplitNote": "Each vertex keeps its total weight on the 4 roll segments of an upper arm or a forearm, and the total goes to the two segments around its place along the bone by a linear ramp (roll_split() of tools/blender/simple_rig.py). Bone heat gave the segments their weights by distance, so the roll gathered in bands at the segment borders: the roll share changed up to 4.1 times the even rate, and the faces there showed a spiral of long facets."
 }
