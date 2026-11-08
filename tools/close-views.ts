@@ -707,11 +707,14 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
     moments: [
       { name: 'strike', time: 0.5, rest: false },
       { name: 'between', time: 1, rest: false },
+      // The free left paw on the far head, in the rest after the first note (`PalmDamp`).
+      { name: 'muffle', time: 1.2, rest: false },
       { name: 'rest', time: 0, rest: true },
       ...halfMoves(0.5),
     ],
     camera: { kind: 'body', zoom: 1, elevation: 20 },
-    // Three strikes of the bass drum (key 36) with the beater in the right paw.
+    // Three strikes of the bass drum (key 36) with the beater in the right paw, each with a rest
+    // after it.
     notes: ['0.5 0.5 36', '1.5 0.5 36', '2.5 0.5 36'].join('\n'),
   },
   'snare-drummer': {
