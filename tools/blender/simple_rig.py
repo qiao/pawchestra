@@ -9,7 +9,9 @@ Then `pnpm rig-export <animal> --blend <dir>/<animal>.blend --out <dir>/<animal>
 the GLB file of the body, and `pnpm studio-body <animal>` writes its module.
 
 The steps:
- 1. Import the source mesh, weld its vertices, and make each face flat.
+ 1. Import the source mesh, weld its vertices, and make each face flat. With `joinQuads` in the
+    config, join each two triangles of a quad of the source into the quad again (`join_quads()` of
+    `mesh_intake.py`), because a GLB file holds only triangles.
  2. Give each face the color of the texture, and make the nose gloss (`add_surface()`).
  3. With `limbs` in the config, make the limbs longer along their bones (`limb_moves()`), and
     move the joints with them. With `rings`, cut the faces of each elbow, wrist, and knee with
@@ -31,6 +33,7 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import mesh_intake as mi  # noqa: E402
 import studio_armature as sa  # noqa: E402
 import studio_eyes as se  # noqa: E402
 
@@ -198,6 +201,18 @@ def smooth_weights(body, passes, share):
             group.add([int(i)], float(w[i, k]), 'REPLACE')
 
 
+def join_source_quads(body):
+    """Joins each two triangles of a quad of the source into the quad again. Gives the number of
+    quads."""
+    bm = bmesh.new()
+    bm.from_mesh(body.data)
+    quads = mi.join_quads(bm)
+    bm.to_mesh(body.data)
+    bm.free()
+    body.data.update()
+    return quads
+
+
 def tone_faces(body, rm, rule):
     """Moves the plain fur toward the color of the sheet (`colors.tone` of the config, `tone()` of
     `rig_mesh.py`), as the rig of the T-pose rabbit did."""
@@ -250,6 +265,7 @@ def main():
 
     # 1. The source mesh, welded, with flat faces.
     body = sa.import_source(os.path.join(sa.ROOT, config['source']), config['weld'])
+    quads = join_source_quads(body) if config.get('joinQuads') else 0
     body.data.polygons.foreach_set('use_smooth', [False] * len(body.data.polygons))
     eyes = old_eyes(body, config, rm)
 
@@ -301,8 +317,9 @@ def main():
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=out)
     print(
-        f'simple_rig: wrote {out}: {counts}, {len(rig.data.bones)} bones, {empty} vertices with '
-        f'no bone heat, {passes} smooth passes, {cuts} cuts that add {added} triangles',
+        f'simple_rig: wrote {out}: {counts}, {quads} joined quads, {len(rig.data.bones)} bones, '
+        f'{empty} vertices with no bone heat, {passes} smooth passes, {cuts} cuts that add '
+        f'{added} triangles',
         flush=True,
     )
 
