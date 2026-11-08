@@ -8,13 +8,13 @@ round.
 Each species has a studio body (`'studio-<a>'`). "Rebuilt arms" means quad
 arm tubes, Blender weights, and arm segments. Each body has rebuilt arms and the role-neutral bind
 (design 4.4), except the cat, which keeps the bind of the viola hold. The polar bear has a hand rig
-with the role-neutral bind in place of rebuilt arms.
+with the role-neutral bind in place of rebuilt arms, and the rabbit the simple route (below).
 
 | Species    | Body                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Role                                                                         |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | bear       | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium.                                                                                                                                                                                                                                                                                                                                      | `conductor`                                                                  |
 | polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): the mesh of the source with loop cuts at the elbows, the wrists, and the knees, weights by hand with one mean row on each arm ring and on the front of each thigh root, the role-neutral bind, a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs 25° down (`benchFitOf()`). | `pianist` |
-| rabbit     | A-pose mesh, longer rebuilt arms (`violin_arms.py` of e491ff3c), the role-neutral bind, a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The hand rig trial in `hand-rig/` is not in use.                                                                                                                                                                                                                                                                                     | `violinist`                                                                  |
+| rabbit     | Tripo P2 quad mesh by the simple route (`tools/mesh-rigs/simple/rabbit-tripo.json`): arms 1.2 times as long, shorter legs for the seat of the old body, edge ring splits on the arms, the roll split, the role-neutral bind. | `violinist`                                                                  |
 | fox-red    | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones.                                                                                                                                                                                                                                                                                                                                                                                                    | `fox-violinist`                                                              |
 | fox-tan    | The red fox rig with a tan palette (`palettes`).                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `flutist`                                                                    |
 | cat        | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py` of e491ff3c), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. The hand rig trial in `hand-rig/` is not in use.                                                                                                                                                             | `violist`                                                                    |
@@ -78,8 +78,7 @@ Its clean rings and twist markers show a fault.
 ### Steps of a hand rig
 
 The polar bear has the hand rig of the app (`assets/models/polar-bear/polar-bear.blend`). The
-trials of the cat and the rabbit lie in `assets/models/<s>/hand-rig/`, so a tool takes their files
-only by path, such as `pnpm rig-export <s> --blend <file> --out <file>`. Never export a trial to
+trial of the cat lies in `assets/models/cat/hand-rig/`, so a tool takes its files only by path, such as `pnpm rig-export <s> --blend <file> --out <file>`. Never export a trial to
 `assets/models/<s>/`: `cat.rig.glb` there is the rig of the app.
 
 A hand rig (design 4.4, "Hand rig") replaces `rig-mesh` for one body. Its `.blend` holds the rig,
@@ -125,6 +124,19 @@ A new role adds in the same commit its entries in `SWEEP_ROLES` of `src/pose/tes
 `FOLD_ROLES` of `tools/fold-probe.ts`, and `ROLE_VIEWS` of `tools/close-views.ts`, and its rows in
 the table above and in the pose index of design 5. Only the last commit of a rig series writes the
 GLB file and its module.
+
+### Simple route
+
+Design 4.4 ("Simple route") gives the route of a clean quad mesh with the arms apart. Run
+`simple_rig.py` ([`commands.md`](commands.md)), then the export and the module of a hand rig. Try
+a variant config with the `--glb` probes before a commit.
+
+- Commit a quad source as an FBX file, with its base color in `<name>.fbm/`. A GLB file holds
+  only triangles.
+- `Image.save_render()` of Blender changes the colors by the view transform. Write a texture with
+  `Image.save()`.
+- An edge ring with a triangle or a pole takes no split. The build line names its place.
+- A high hip joint in a large haunch lowers the seat. Fit the shin factor to the seat height.
 
 ## The arm gate
 
