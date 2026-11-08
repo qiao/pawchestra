@@ -188,8 +188,11 @@ export interface TierWatch {
   readonly windowStart: number | null;
   /** The wall time of the last frame of the window, in seconds. */
   readonly lastFrame: number;
-  /** The intervals between the frames of the window, in seconds, in order. */
-  readonly intervals: readonly number[];
+  /**
+   * The intervals between the frames of the window, in seconds, in order. Each window has a new
+   * list, and {@link followFrame} adds to it in place.
+   */
+  readonly intervals: number[];
 }
 
 /**
@@ -245,9 +248,11 @@ export function slowWindow(intervals: readonly number[]): boolean {
  * Follows the frames of the page for the automatic tier (design 2.6). The tier drops one step
  * when the frames of a window of 2 s are slow ({@link slowWindow}). It only goes down, so the
  * quality does not go down and up many times. A frame that does not measure ends the window, so
- * that the time of a pause or of a hidden tab does not count.
+ * that the time of a pause or of a hidden tab does not count. The function adds the interval to
+ * the list of the watch in place, with no copy of the list in each frame. Thus the caller keeps
+ * only the watch that the function returns.
  *
- * @param watch The watch before the frame.
+ * @param watch The watch before the frame. The function changes its list of intervals.
  * @param wallTime The wall time of the frame, in seconds.
  * @param measuring True while the music plays, the tab is visible, and the setting is "Auto".
  * @returns The watch after the frame.
@@ -259,7 +264,8 @@ export function followFrame(watch: TierWatch, wallTime: number, measuring: boole
   if (watch.windowStart === null) {
     return { tier: watch.tier, windowStart: wallTime, lastFrame: wallTime, intervals: [] };
   }
-  const intervals = [...watch.intervals, wallTime - watch.lastFrame];
+  const intervals = watch.intervals;
+  intervals.push(wallTime - watch.lastFrame);
   if (wallTime - watch.windowStart < TIER_WINDOW_SEC) {
     return { tier: watch.tier, windowStart: watch.windowStart, lastFrame: wallTime, intervals };
   }
