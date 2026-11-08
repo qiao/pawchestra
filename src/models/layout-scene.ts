@@ -10,6 +10,7 @@ import {
   obstaclesTouch,
   placeFootprint,
   playerFootprint,
+  reachOn,
   standFootprint,
 } from './footprint.ts';
 import type { Footprint, Obstacle, PlacedBox } from './footprint.ts';
@@ -1243,16 +1244,6 @@ interface StageSize {
   readonly front: number;
 }
 
-/** Calculates the half extent of a placed box along x of the stage. */
-function reachX(b: PlacedBox): number {
-  return b.halfX * Math.abs(b.cos) + b.halfZ * Math.abs(b.sin);
-}
-
-/** Calculates the half extent of a placed box along z of the stage. */
-function reachZ(b: PlacedBox): number {
-  return b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos);
-}
-
 /**
  * Lists the four corners of a placed box in the plane of the stage.
  *
@@ -1284,13 +1275,13 @@ function stageOf(draft: Draft): StageSize {
   const boxes = draft.obstacles.flatMap((o) => o.boxes);
   const halfWidth = Math.max(
     ...seats.map((p) => Math.abs(p.position[0]) + CHAIR_ROOM + EDGE_MARGIN),
-    ...boxes.map((b) => Math.abs(b.x) + reachX(b) + EDGE_MARGIN),
+    ...boxes.map((b) => Math.abs(b.x) + reachOn(b, 1, 0) + EDGE_MARGIN),
   );
   const front = Math.max(PODIUM_FROM_FRONT, draft.soloistFront + EDGE_MARGIN);
   const behind = Math.max(
     0,
     ...seats.map((p) => -p.position[2] + CHAIR_ROOM + EDGE_MARGIN),
-    ...boxes.map((b) => -b.z + reachZ(b) + EDGE_MARGIN),
+    ...boxes.map((b) => -b.z + reachOn(b, 0, 1) + EDGE_MARGIN),
   );
   return {
     side: Math.max(SMALLEST_STAGE, 2 * halfWidth, front + behind),
@@ -1348,7 +1339,7 @@ function placeSoloist(member: Member): PlacedPlayer & { readonly front: number }
     return placePiano(member);
   }
   const soloist = placeAt(member, [SOLOIST_PLACE[0], 0, SOLOIST_PLACE[1]], SOLOIST_FACING);
-  const front = Math.max(...soloist.obstacle.boxes.map((b) => b.z + reachZ(b)));
+  const front = Math.max(...soloist.obstacle.boxes.map((b) => b.z + reachOn(b, 0, 1)));
   return { ...soloist, front };
 }
 
@@ -1447,7 +1438,7 @@ function chamberStage(
     add(p.place.position[0], p.place.position[2], seat, seat);
   }
   for (const b of [...players, ...stands].flatMap((p) => p.obstacle.boxes)) {
-    add(b.x, b.z, reachX(b) + EDGE_MARGIN, reachZ(b) + EDGE_MARGIN);
+    add(b.x, b.z, reachOn(b, 1, 0) + EDGE_MARGIN, reachOn(b, 0, 1) + EDGE_MARGIN);
   }
   const [x0 = 0, z0 = 0] = low;
   const [x1 = 0, z1 = 0] = high;

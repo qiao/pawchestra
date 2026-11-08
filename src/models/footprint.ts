@@ -205,14 +205,15 @@ export function placeFootprint(footprint: Footprint, position: Vec3, facing: num
 }
 
 /**
- * Calculates half the length of the projection of a placed box on an axis of the plane.
+ * Calculates half the length of the projection of a placed box on an axis of the plane. The axis
+ * (1, 0) gives the half extent of the box along x of the stage, and (0, 1) along z.
  *
  * @param box The box.
  * @param nx The x part of the unit axis.
  * @param nz The z part of the unit axis.
  * @returns The half length, in meters.
  */
-function reachOn(box: PlacedBox, nx: number, nz: number): number {
+export function reachOn(box: PlacedBox, nx: number, nz: number): number {
   return (
     box.halfX * Math.abs(box.cos * nx - box.sin * nz) +
     box.halfZ * Math.abs(box.sin * nx + box.cos * nz)
