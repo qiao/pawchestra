@@ -1175,6 +1175,13 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     packed arcs, the packed gap of the conductor, the stage, the gaps to the other items, and the
     sight of row 0 past the soloists. Real back desks also sit behind the gaps of the desks in
     front.
+  - **Gap of the conductor.** On a small stage, one side of row 1 can have no free arc, for
+    example six violin back desks beside a keyboard at the front left. When a back desk player
+    still loses `OPEN_GAP_HIDDEN` of the head and the baton paw, row 1 searches again with the
+    gap open: its inner players can pass 0°, up to the packed arc from the inner player of the
+    other side, and the view of the audience counts in the cost. The row keeps this search only
+    when it has fewer blocked players. A player that sees most of the conductor keeps its desk,
+    so the desks do not move into the gap for a small fault.
   - From row 2, each seat group with a blocked player rises in steps of `ROW_RISER`, and the
     search runs again. A group starts at the height of the risers in front of it, so the rows rise
     toward the back, and it takes the lowest height with its fewest blocked players. Each group
@@ -1190,9 +1197,8 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     strings in the low shots.
   - The choir risers then rise together, up to `CHOIR_LIFT`, until each singer sees the
     conductor.
-  - `pnpm sight-lines` measures the result on the meshes of all demos. A few players stay
-    blocked: back desks on a small stage beside a piano soloist, where the row has no free arc,
-    and a player directly behind a tall animal on a full riser.
+  - `pnpm sight-lines` measures the result on the meshes of all demos. Each player of the demos
+    sees the conductor.
 
 ```typescript
 /** The limits of the spread of a row. */
