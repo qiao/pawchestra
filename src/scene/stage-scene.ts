@@ -485,8 +485,9 @@ export class StageScene {
   /**
    * Builds the scene of a layout in steps (design 7.2), with no change of the shown layout. The
    * steps compile the shader programs of the scene and wait for the GPU, so that the first frame
-   * of the layout compiles nothing. {@link StageScene.show} then shows the scene. A new build
-   * frees the scene of a build that did not show.
+   * of the layout compiles nothing. {@link StageScene.show} then shows the scene. A stopped build
+   * calls {@link StageScene.cancelBuild}, and a new build also frees the scene of a build that did
+   * not show.
    *
    * @param layout The positions of the stage, the players, and the stands.
    * @param models The player models of the score, which the layout and the pose plan share.
@@ -610,6 +611,21 @@ export class StageScene {
     this.#aim = aim;
     this.#aimTarget = aim;
     this.#view = view;
+  }
+
+  /**
+   * Frees the scene of a stopped build (design 7.2), and gives the shown layout its own lights
+   * again. The build wrote the pool and the rim lights of its layout into the shared uniforms.
+   */
+  cancelBuild(): void {
+    this.#discardPending();
+    const view = this.#view;
+    const aim = this.#aim;
+    if (!view || !aim) {
+      return;
+    }
+    setPoolAim(this.#pool, aim);
+    setRimLights(this.#rim, view.lights);
   }
 
   /**
