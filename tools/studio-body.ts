@@ -3660,6 +3660,14 @@ export function studioHeightsModule(bodies: ReadonlyMap<string, StudioBody>): st
   ].join('\n');
 }
 
+/** The body that the command wrote just now, with its animal. */
+interface WrittenBody {
+  /** The id of the animal. */
+  readonly animal: string;
+  /** The body of the animal. */
+  readonly body: StudioBody;
+}
+
 /**
  * Reads the module of the studio body of each animal of `ANIMALS` that has a module.
  *
@@ -3667,10 +3675,7 @@ export function studioHeightsModule(bodies: ReadonlyMap<string, StudioBody>): st
  *   animal.
  * @returns The body of each animal, by the id of the animal.
  */
-async function readStudioBodies(written?: {
-  readonly animal: string;
-  readonly body: StudioBody;
-}): Promise<Map<string, StudioBody>> {
+async function readStudioBodies(written?: WrittenBody): Promise<Map<string, StudioBody>> {
   const loads = [...ANIMALS].map(
     async ([animal, settings]): Promise<[string, StudioBody] | null> => {
       if (animal === written?.animal) {
@@ -3699,10 +3704,7 @@ async function readStudioBodies(written?: {
  *   animal.
  * @throws Error if the formatter fails.
  */
-async function writeStudioHeights(written?: {
-  readonly animal: string;
-  readonly body: StudioBody;
-}): Promise<void> {
+async function writeStudioHeights(written?: WrittenBody): Promise<void> {
   await writeFile(HEIGHTS_MODULE, studioHeightsModule(await readStudioBodies(written)));
   const format = spawnSync(join(ROOT, 'node_modules', '.bin', 'oxfmt'), [HEIGHTS_MODULE], {
     stdio: 'inherit',
