@@ -135,6 +135,49 @@ float blurAt(vec2 uv) {
 `;
 
 /**
+ * The copy of the depth of the beam pass (full size) into the depth of the depth of field (half
+ * size), as the first step of its depth (design 4.5, post effects). Each pixel at half size lies
+ * between four pixels at full size. On one flat face, the depth on the screen is linear, so the
+ * linear mix of the four depths gives the depth that a draw at half size gives. At an outline,
+ * three of the four depths are often on one face, and the middle of the two diagonal depths of
+ * that face gives the depth of the face at the pixel. Else the pixel takes the nearest of the
+ * four. Against a draw at half size, this rule changed about half as many pixels by more than 16
+ * of 255 as a rule that always took the nearest depth.
+ */
+export const DEPTH_COPY_FRAGMENT = /* glsl */ `
+uniform highp sampler2D uSceneDepth;
+// The size of the depth at full size divided by the size of this pass.
+uniform vec2 uScale;
+
+// The largest difference of the two diagonal sums of four depths on one plane: two steps of a
+// depth buffer of 24 bits.
+const float PLANE_LIMIT = 2.0 / 16777216.0;
+
+void main() {
+  vec2 at = gl_FragCoord.xy * uScale - 0.5;
+  ivec2 last = textureSize(uSceneDepth, 0) - 2;
+  ivec2 corner = clamp(ivec2(floor(at)), ivec2(0), last);
+  vec2 part = clamp(at - vec2(corner), 0.0, 1.0);
+  float a = texelFetch(uSceneDepth, corner, 0).x;
+  float b = texelFetch(uSceneDepth, corner + ivec2(1, 0), 0).x;
+  float c = texelFetch(uSceneDepth, corner + ivec2(0, 1), 0).x;
+  float d = texelFetch(uSceneDepth, corner + ivec2(1, 1), 0).x;
+  // Three depths on one face: the fourth depth is far from the other depth of its diagonal.
+  float ad = abs(a - d);
+  float bc = abs(b - c);
+  if (abs(a + d - b - c) <= PLANE_LIMIT) {
+    gl_FragDepth = mix(mix(a, b, part.x), mix(c, d, part.x), part.y);
+  } else if (bc * 4.0 < ad) {
+    gl_FragDepth = 0.5 * (b + c);
+  } else if (ad * 4.0 < bc) {
+    gl_FragDepth = 0.5 * (a + d);
+  } else {
+    gl_FragDepth = min(min(a, b), min(c, d));
+  }
+}
+`;
+
+/**
  * The first pass of the depth of field, at half size: the color of the scene, and the signed blur
  * of each pixel in the alpha channel (scene/focus.ts).
  */
