@@ -75,11 +75,8 @@ passes.
       the mouth. Try a lower right grip or a smaller curl.
 - [ ] Monkey trumpeter: the right thumb points back to the mouthpiece. A real player puts it under
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
-- [ ] Monkey: ask the user to confirm the stand of the monkey, which has no chair.
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
-- [ ] Monkey: if the monkey gets a chair again, the root of the tail goes into the seat. Then give
-      the tail three bones, or put it over the back edge of the seat.
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
 - [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
@@ -200,7 +197,8 @@ passes.
 - [ ] Polar bear legs: the knee crease of the seated bind makes the thigh near the knee thinner than
       the mesh, and the back of each knee has 6 edges that turn more than 40°.
 - [ ] Polar bear legs: the seated thigh keeps one depth from the haunch to the knee, but the source
-      tapers. Try a cut higher on the outer side of the hip, with tilted top rings.
+      tapers. Try point edits or an edge ring split at the outer side of the hip (rigging.md,
+      "Rules of the mesh").
 - [ ] Polar bear legs: the thighs are short, so the lap is small.
 - [ ] Polar bear legs: 4 edges of the crease of the left instep and 4 edges of the cut loop at the
       crotch turn more than 40° in the bind. Check them in the stage light.
@@ -220,8 +218,6 @@ passes.
       at a groove of the mesh. Check it from below in the stage light, and fair the groove.
 - [ ] Polar bear bind supination: `pnpm bind-supination polar-bear` gives L 118 (now 112) and R
       44 for the cast roles. A new key moves the bind, so it waits for a user check.
-- [ ] Polar bear copy: `tools/blender/polar_bear_legs.py` stops when the JPEG of the arm image leaks
-      into the free columns of the strip. Skip a border of 8 columns in `atlas_strip()`.
 - [ ] Piano: the lifted piano (`PIANO_LIFT`, `PIANO_SCALE` 1.16, the lid at 25°) moves the rows of
       the demos, the lid hides the lower muzzle of the right contrabass of `bach-bwv1050`, and its
       legs show under the higher case. Show the user the default views
@@ -879,8 +875,7 @@ scene of each demo has its seats and stage size with no overlap.
       of its first bar of 1/8 is 0.3 s. A fold needs an uneven grouping, such as 2+2+3.
 - [ ] Conductor: the sway stops at the last pulse, so a file can stop its sway up to 0.5 s before
       its end.
-- [ ] Docs: cut `docs/agents/commands.md` to about 3,000 words and `docs/agents/rigging.md` to about
-      4,000 words (writing.md).
+- [ ] Docs: cut `docs/agents/commands.md` to about 3,000 words (writing.md).
 - [ ] Tool: let `pnpm arm-check --views` render a `--midi` file and the percussion test score, so
       that the snare drummer and the xylophonist get crops.
 - [ ] Tool: add `pnpm move-views <role> <demo> lift|lower <at> <times> [--base <ref>]`, which writes
