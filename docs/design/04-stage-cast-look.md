@@ -45,15 +45,14 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
                           back of the stage
 ┌──────────────────────────────────────────────────────────────────┐
 │                        choir (on risers)                         │
-│ row 4:  percussion  contrabasses  timpani  trombones  tuba  (r)  │
-│ row 3:        horns   clarinets | bassoons   trumpets       (r)  │
-│ row 2:  keyboard  harp   flutes | oboes                     (r)  │
+│ row 4:  percussion  contrabasses  timpani  trombones  tuba       │
+│ row 3:        horns   clarinets | bassoons   trumpets            │
+│ row 2:  keyboard  harp   flutes | oboes                          │
 │ row 1: 1st violins  2nd violins | violas  cellos  (other desks)  │
 │ row 0: 1st violins  2nd violins | violas  cellos  (first desks)  │
 │     soloist (piano)        [bear on the podium]                  │
 └──────────────────────────────────────────────────────────────────┘
                         front of the stage
-   (r): each seat group of the row can stand on its own riser
 ```
 
 - The strings sit in wedges. The first desk of each string seat (its players 0 and 1) sits in
@@ -62,15 +61,16 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 - A keyboard of the orchestra (a celesta, a harpsichord, or an organ that is not the soloist of
   3.8) sits at the place of the piano soloist when the score has no soloist, as the piano of
   `orchestra-latest.png`. In row 2, its case and its open lid hid the conductor from the players
-  behind it at each riser height. With a soloist, it sits at the left of the harp, as the celesta
+  behind it. With a soloist, it sits at the left of the harp, as the celesta
   of a professional orchestra. With no harp and no woodwinds, it then sits in the middle behind
   the strings, as a continuo harpsichord.
-- Each player sees the head and the baton paw of the conductor, as in a real orchestra: the
-  players look through the gaps of the rows in front, and the winds, the brass, and the
-  percussion sit on risers that rise toward the back (4.5, seat geometry). The strings sit on the
-  stage top. A back desk of the strings looks through the gap between the two players of the
-  first desk in front of it, so the first desks move a little to give each such gap the room of a
-  desk. The audience sees each player on a riser.
+- The instrument rows stand on the stage floor. Only the choir stands on risers. The layout
+  clears the sight lines by the seat places only (4.5, seat geometry). The players look through
+  the gaps of the rows in front. A back desk of the strings looks through the gap between the two
+  players of the first desk in front of it, so the first desks move a little to give each such
+  gap the room of a desk. The winds, the brass, and the percussion look through the gap of the
+  conductor between the second violins and the violas, so the inner first desks move out to make
+  this gap wide. A few players behind the strings stay blocked.
 - The vocal soloists of 3.8 stand in front of the choir, on the lowest level of the risers,
   because a place beside the conductor covers the first violins or the cellos.
 - The soloist of 3.8 stands or sits at the front left of the conductor, as in a concerto. A
@@ -1094,7 +1094,7 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 
 **Props and stage**
 
-`models/props.ts` holds the chairs, the stools, the music stands, and the risers.
+`models/props.ts` holds the chairs, the stools, the music stands, and the choir risers.
 `models/stage.ts` holds the stage, the podium, and the conductor stand.
 
 | Item            | Rules                                                                                                     |
@@ -1107,7 +1107,6 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |
 | Stage           | A slab of side `S` with cut corners (`STAGE_CORNER_CUT`), a raised lip (`STAGE_LIP`), and lacquered planks. |
 | Choir risers    | Up to three arc levels behind the orchestra, with three steps in front (`RISER`).                         |
-| Row risers      | One arc block under each raised seat group of rows 2 to 4 (`RowRiser`), with the treads of the choir risers. |
 
 **Stage origin**
 
@@ -1144,64 +1143,58 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
   because it reaches toward the case in play.
 - The choir risers stand behind the last row, each level higher, so the back row hides no singer.
 - After the stage size, each row spreads to the side edges (`SPREAD_LIMITS`), because the packed
-  rows left the front corners empty. Then row 1 moves its back desks toward their first desks, as
-  the wedges of a professional orchestra.
-- Each row from row 1 reserves the band of its items over the whole arc (`riserReserve()`): from
-  the lip in front of its stands to the back of its chairs. The other rows keep their gaps from
-  the band, so that the players can move along the arc and the seat groups can rise after the
-  spread. Thus the rows stand farther apart, and the stage is deeper.
+  rows left the front corners empty. Then row 0 widens the gap of the conductor
+  (`CONDUCTOR_GAPS`): the inner first desk of each side moves out to the angle of the gap, or to
+  the largest angle below it that fits, and its outer neighbors keep their packed arcs. Then row 1
+  moves its back desks toward their first desks, as the wedges of a professional orchestra.
+- Row 1 reserves the band of its items over the whole arc (`backDeskBand()`): from the lip in front
+  of its stands to the back of its chairs. The other rows keep their gaps from the band, so that
+  the back desks can move along the arc after the spread. The band gives fewer blocked players
+  than no band, and the other rows have no band, so that the stage stays small.
 - **Sight lines.** After the spread and the wedges, each player sees the head and the baton paw of
   the conductor (`CONDUCTOR_SIGHT` of `models/sight.ts`). The points cover the parts of the posed conductor that the
   `sight-lines` probe measures: a grid on the head with its front and its back, the baton paw with
   the baton, and the left paw. The lines go from the eyes of the player to the points, against the
   triangles of the player meshes of the rows in front (a box tree of each model) and the boxes of
-  the stands and the risers. The boxes of a footprint are too large for this test, because a box
+  the stands. The boxes of a footprint are too large for this test, because a box
   of a head band holds the ears and the whole head. A player is blocked when an item hides one
   head point or one baton point. A music stand hides only the head, and the own stand of the
-  player counts. The eyes of the bear are only about 0.1 m above the heads of the seated strings,
-  so a player behind them sees the conductor only through a gap or from a riser. From the front
-  row to the back row:
+  player counts. The instrument rows stand on the stage floor. Only the choir stands on risers.
+  The layout clears the sight lines by the seat places only. The eyes of the bear are only about
+  0.1 m above the heads of the seated strings, so a player behind them sees the conductor only
+  through a gap. From the front row to the back row:
   - A search moves the players of the row along the arc, up to `CONDUCTOR_SIGHT.nudge`, with the
     fewest blocked players, then the fewest players with no sight of the left paw, then the
     smallest moves (`sightCost()`). Among blocked places, it takes the place with the least
     hidden. Neighbors keep their packed arcs, and the outer players keep the edges of the spread.
     The strings keep the gap of the conductor: the back desks of row 1 stay at least as far from
-    0° as the inner first desks.
+    0° as the inner first desks. When the angles of the search do not fit, the search runs again
+    and skips each angle at which a player or its own stand does not fit (`fitsAt()`). From row
+    2, the view of the audience (`AUDIENCE`) also counts in the cost, because a small animal
+    behind the strings can hide in the low wide shots of Cinematic.
   - **First desks.** The spread gives each gap of row 0 the same arc, but a desk of two partners
     fits into the gap between two first desk players only when the gap is a little larger. When a
     back desk player stays blocked, a greedy search moves runs of row 0 players next to it (the
     player alone, with one neighbor, or with all players to the inside or to the outside) by 1°
     steps (`FRONT_MOVES`), and keeps the move with the lowest cost of row 1. A move keeps the
-    packed arcs, the packed gap of the conductor, the stage, the gaps to the other items, and the
+    packed arcs, the gap of the conductor of the spread row 0, the stage, the gaps to the other items, and the
     sight of row 0 past the soloists. Real back desks also sit behind the gaps of the desks in
     front.
-  - **Gap of the conductor.** On a small stage, one side of row 1 can have no free arc, for
+  - **Open gap.** On a small stage, one side of row 1 can have no free arc, for
     example six violin back desks beside a keyboard at the front left. When a back desk player
     still loses `OPEN_GAP_HIDDEN` of the head and the baton paw, row 1 searches again with the
     gap open: its inner players can pass 0°, up to the packed arc from the inner player of the
     other side, and the view of the audience counts in the cost. The row keeps this search only
     when it has fewer blocked players. A player that sees most of the conductor keeps its desk,
     so the desks do not move into the gap for a small fault.
-  - From row 2, each seat group with a blocked player rises in steps of `ROW_RISER`, and the
-    search runs again. A group starts at the height of the risers in front of it, so the rows rise
-    toward the back, and it takes the lowest height with its fewest blocked players. The back row
-    (row 4) can rise one step more than the winds (`ROW_RISER.backHighest`), because a real hall
-    puts the percussion on its highest riser. Thus a small percussion player sees past the ears
-    of a tall flute player in front. Each group has its own riser, as the modular risers of a
-    real orchestra. A riser reaches at least
-    `RISER_BACK` behind the seat centers and keeps `RISER_EDGE` from the outline of the stage, at
-    the places of the players after the search. When a riser goes into an item of a lower
-    neighbor group, that group rises to the same height, and a row keeps no riser that goes into
-    an item or that does not fit on the stage.
-  - **Audience.** From row 2, the head of each player also faces the audience (`AUDIENCE`): the
-    low and the middle front camera and the two side cameras of the Cinematic wide shots, as
-    multiples of the stage side. A player that loses `AUDIENCE.hidden` of its head counts as
-    blocked, so that its group rises, because a small animal on a low riser hides behind the
-    strings in the low shots.
-  - The choir risers then rise together, up to `CHOIR_LIFT`, until each singer sees the
+  - **Gap of the conductor.** The layout runs the spread and the sight pass with each gap of
+    `CONDUCTOR_GAPS`, and keeps the gap with the fewest blocked players. The best gap depends on
+    the score, because a keyboard or many first desks on one side leave less room.
+  - The choir risers then rise together, up to `CHOIR_LIFT.highest`, until each singer sees the
     conductor.
-  - `pnpm sight-lines` measures the result on the meshes of all demos. Each player of the demos
-    sees the conductor.
+  - `pnpm sight-lines` measures the result on the meshes of all demos. A few players behind the
+    strings stay blocked, most of them in rows 3 and 4. A player there looks through the gaps of
+    up to four rows on the same floor, and the gaps of two rows in a line rarely meet.
 
 ```typescript
 /** The limits of the spread of a row. */
