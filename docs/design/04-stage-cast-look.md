@@ -985,7 +985,14 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
   conductor and the middle of the orchestra, because a separate light costs GPU time. A hot spot
   holds only the podium on the players, so the white fur of the front rows does not clip.
 - **Beam** (`BEAM_LOOK`). The haze cone leans toward its rim light, which stands at the x of the
-  beam, so the beam has a visible source and stands upright. The camera dims it in a close shot.
+  beam, so the beam has a visible source and stands upright. The camera dims it in a close shot,
+  because a near camera sees the additive haze as a veil over the image (5.6).
+- **Beam in Free mode** (`freeBeamOpacity()`). The beam dims with the distance from the camera to
+  the stage center over the range `FREE_BEAM_FADE`, down to `CLOSE_BEAM_OPACITY`. The fade is a
+  smoothstep on the logarithm of the distance, because a wheel step multiplies the distance by a
+  constant factor. Thus each step dims the beam by a small, almost equal amount, and the first
+  steps from the default view keep the full beam. A short range removes the beam in two wheel
+  steps.
 - **Other terms.** Each layout bakes the soft key shadow on the stage one time
   (`scene/stage-bake.ts`), because the props and the stage do not move. A close shot adds a soft
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives

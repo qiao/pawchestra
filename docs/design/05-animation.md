@@ -808,8 +808,8 @@ interface Shot {
 Each camera stands on a sphere around its target. Cinematic mode always shows a frame of
 `CINEMA_ASPECT` (21:9, design 2.5), so the planner fits and tests each shot at that aspect. A wide
 or a high shot takes `WIDE_FOV`: at 21:9 it shows the horizontal angle of the stage view of a
-desktop, so the stage fills the width of the frame. The wide camera cannot come nearer, because
-the beam fade of Free mode starts there (4.5).
+desktop, so the stage fills the width of the frame. The wide camera cannot come nearer, so that
+it stays out of the beam fade of Free mode (4.5) and keeps the full beam.
 
 | Kind | Camera | Shot size |
 |---|---|---|
@@ -965,7 +965,8 @@ with no instrument.
 slow or quiet window between two close shots (`BLEND_RULES`, `isCloseShot`), because a true
 dissolve needs two renders for each frame.
 The beam fades in the close shots, because a close camera sees the additive beam over the full
-image. A close shot gets its own soft key, a kicker, and a stronger vignette, as a film crew
+image. Each close camera stays nearer than the end of the beam fade of Free mode
+(`CLOSE_DISTANCE_SHARE`), so a change from a close shot to Free mode never gives the full beam. A close shot gets its own soft key, a kicker, and a stronger vignette, as a film crew
 lights each setup again (`SHOT_LIGHT`). The weights come from the kind of the shot, so they do not
 change in a shot.
 

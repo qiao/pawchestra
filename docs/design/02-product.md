@@ -148,8 +148,8 @@ page starts in Free mode (`app/camera-mode.ts`).
   with one weight for all parts came nearer than `ANIMAL_FLOOR` (5.6) to an animal in the middle
   of many blends into a low shot. The ends keep the floor, and a few blends into a low solo or
   section shot still come near for a short time.
-- Each change of the mode blends the bars, the field of view, the light of the shot, and the
-  focus over the same time, so the frame does not jump. The image of the camera moves with the
+- Each change of the mode blends the bars, the field of view, the beam, the light of the shot,
+  and the focus over the same time, so the frame does not jump. The image of the camera moves with the
   bars (`StageCamera.frameTo()`). A drag, a pinch, a wheel, or "Reset view" moves the camera at
   once, because the user takes the camera. A drag, a pinch, or a wheel during a blend into Free
   mode stops it, and the orbit continues from the camera on the screen.
