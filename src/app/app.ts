@@ -702,7 +702,14 @@ export class App {
       const prepared = yield* scene.prepareSteps(plans.layout, plans.models);
       return { score, scene: plans, prepared };
     })();
-    const run = before.then(async () => this.#runSliced(steps, live));
+    const run = before.then(async () => {
+      const built = await this.#runSliced(steps, live);
+      // A stopped build frees its scene before the next build starts.
+      if (!built) {
+        scene.cancelBuild();
+      }
+      return built;
+    });
     this.#lastBuild = run.catch(() => null);
     return run;
   }
