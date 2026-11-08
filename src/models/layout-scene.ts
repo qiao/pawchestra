@@ -2286,7 +2286,8 @@ function sightCost(result: SightResult): number {
  * blocked players, then the fewest players with no sight of the left paw, then the smallest
  * moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor, and the
  * outer player does not pass its spread angle, because the spread took the room to the stage
- * edge.
+ * edge. The inner player of a split row stays at its spread angle or farther out, or with `inner`
+ * at that angle from 0° or farther out.
  *
  * @param row The row after the spread.
  * @param heights The height of the floor under each player.
@@ -2295,6 +2296,7 @@ function sightCost(result: SightResult): number {
  * @param blockers The items in front of the row.
  * @param view The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or
  *   `null`. A hidden head then costs as much as a hidden conductor.
+ * @param inner The smallest angle of a player of a split row from 0°, in radians, or `null`.
  * @returns The steps, which return the angle of each player.
  */
 function* sightSweepSteps(
@@ -2304,6 +2306,7 @@ function* sightSweepSteps(
   targets: SightTargets,
   blockers: SightBlockers,
   view: number | null,
+  inner: number | null = null,
 ): Steps<number[]> {
   const { members, radius, angles } = row;
   const next = [...angles];
@@ -2342,18 +2345,26 @@ function* sightSweepSteps(
     {
       side: 1,
       order: right,
-      bound: (): number =>
-        row.split || innerLeft === undefined
+      bound: (): number => {
+        if (row.split && inner !== null) {
+          return Math.min(angles[innerRight ?? 0] ?? 0, inner);
+        }
+        return row.split || innerLeft === undefined
           ? (angles[innerRight ?? 0] ?? 0)
-          : (angles[innerLeft] ?? 0) + between,
+          : (angles[innerLeft] ?? 0) + between;
+      },
     },
     {
       side: -1,
       order: left,
-      bound: (): number =>
-        row.split || innerRight === undefined
+      bound: (): number => {
+        if (row.split && inner !== null) {
+          return Math.max(angles[innerLeft ?? 0] ?? 0, -inner);
+        }
+        return row.split || innerRight === undefined
           ? (angles[innerLeft ?? 0] ?? 0)
-          : (next[innerRight] ?? 0) - between,
+          : (next[innerRight] ?? 0) - between;
+      },
     },
   ] as const;
   for (const { side, order, bound } of sides) {
@@ -2743,13 +2754,18 @@ function* sightRowsSteps(
     const groupIndex = row.members.map((_, i) => groups.findIndex((g) => g.includes(i)));
     const extents = groupExtents(row.members, row.placement, groups);
     const view = row.row >= AUDIENCE.firstRow ? stage.side : null;
+    // The back desks can move into the gap of the conductor up to the inner first desks, so
+    // that a desk fits into the gap between two players of the first row.
+    const front = done.find((d) => d.row.row === 0)?.row;
+    const inner =
+      row.row === BACK_DESK_ROW && front ? Math.min(...front.angles.map((a) => Math.abs(a))) : null;
     // Each group from row 2 can rise. A try in which the riser of a raised group does not fit at
     // the new places of its players is not valid.
     const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
 
     const attempt = function* (levels: readonly number[]): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view);
+      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner);
       let placement = placeRow(row.members, angles, row.radius, heights);
       if (
         angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9) ||
