@@ -3671,21 +3671,23 @@ async function readStudioBodies(written?: {
   readonly animal: string;
   readonly body: StudioBody;
 }): Promise<Map<string, StudioBody>> {
-  const loads = [...ANIMALS].map(async ([animal, settings]): Promise<[string, StudioBody] | null> => {
-    if (animal === written?.animal) {
-      return [animal, written.body];
-    }
-    const file = join(STUDIO_DIR, `${animal}.ts`);
-    if (!existsSync(file)) {
-      return null;
-    }
-    const module: Readonly<Record<string, StudioBody>> = await import(pathToFileURL(file).href);
-    const body = module[settings.constant];
-    if (!body) {
-      throw new Error(`${relative(ROOT, file)} has no export ${settings.constant}.`);
-    }
-    return [animal, body];
-  });
+  const loads = [...ANIMALS].map(
+    async ([animal, settings]): Promise<[string, StudioBody] | null> => {
+      if (animal === written?.animal) {
+        return [animal, written.body];
+      }
+      const file = join(STUDIO_DIR, `${animal}.ts`);
+      if (!existsSync(file)) {
+        return null;
+      }
+      const module: Readonly<Record<string, StudioBody>> = await import(pathToFileURL(file).href);
+      const body = module[settings.constant];
+      if (!body) {
+        throw new Error(`${relative(ROOT, file)} has no export ${settings.constant}.`);
+      }
+      return [animal, body];
+    },
+  );
   return new Map((await Promise.all(loads)).filter((entry) => entry !== null));
 }
 
