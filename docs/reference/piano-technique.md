@@ -292,7 +292,7 @@ The app follows these facts:
   lag, and the arms cross further into the belly. The whole paw lifts for each note, but less
   for a near note (`HAND_MOTION.liftGapSec`). Thus the motion gets smaller in a fast passage.
 - **The fingering (section 9).** Each paw plays the fingering of the lowest cost by the 12 rules
-  of section 9.2 (`planFingering()` of `src/pose/piano-fingering.ts`). A dynamic program over
+  of section 9.2 (`planFingeringSteps()` of `src/pose/piano-fingering.ts`). A dynamic program over
   pairs of notes keeps the rules of three notes exact. The spans scale with the paw
   (`POLAR_BEAR_PAW`), the left paw mirrors the right paw, and the claws of a chord fit its keys
   (`clawFit`). The palm stands so that the claw of each key is over the key (`clawOffset()`).

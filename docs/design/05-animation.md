@@ -360,7 +360,7 @@ The rest of each family:
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
 
 - A search (Viterbi) gives each stroke its string, position, and finger before the play
-  (`planHand()`, `FINGERING_COSTS`), in the orchestral style: low positions and open strings. The
+  (`planHandSteps()`, `FINGERING_COSTS`), in the orchestral style: low positions and open strings. The
   hand shifts only when the notes leave its position. Vibrato keeps the width of a real player.
   A large shift takes a least time for its length (`LEFT_HAND.shiftSecPerPlace`), and in fast
   notes it starts in an earlier note of the old position. Reason: in the second half of one fast
@@ -617,7 +617,7 @@ The rest of each family:
   fallboard (`HAND_MOTION.overBack`). Reason: it comes down next to the other paw while that paw
   rises, so the two paws pass at the same height, and they touch there.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
-  (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
+  (piano 9.2, `planFingeringSteps()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key
   (`clawOffset()`). The move of a thumb pass starts at the note before (`HAND_MOTION.passSec`),
   as a pianist prepares the pass (piano 9.3). Reason: a palm at the middle of the keys of each

@@ -251,7 +251,7 @@ A **seat** is one group of animals of one section. The seat key is (port, channe
 
 ## 3.8 Players
 
-`assignPlayers()` in `score/players.ts` gives the players. `CAPS` holds the cap of each seat, and
+`assignPlayersSteps()` in `score/players.ts` gives the players. `CAPS` holds the cap of each seat, and
 `BASE_SIZES` the base sizes of the strings and the choir.
 
 | Seat | Players |

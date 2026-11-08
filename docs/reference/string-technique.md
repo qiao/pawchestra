@@ -398,7 +398,7 @@ thumb on the neck.
 
 The app follows these facts:
 
-- **The position plan (1.2 to 1.4).** `planHand()` plans the position, the string, and the
+- **The position plan (1.2 to 1.4).** `planHandSteps()` plans the position, the string, and the
   finger of each stroke from the score, with the frames of `HAND_FRAMES` and the rules of
   `FINGERING_COSTS`. Each player takes the orchestral style: low positions and open strings. The
   hand moves only in a shift.
