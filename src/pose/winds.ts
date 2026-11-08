@@ -1061,18 +1061,16 @@ const WOLF_CLARINET_FORWARD = 5;
 
 /**
  * The clarinet hold of the wolf (design 5.3), the hold of a real clarinetist
- * (`docs/reference/wind-technique.md` 3): the clarinet at the middle of
- * the body, from the mouth to between the knees. The clarinet turns its lower end
- * {@link WOLF_CLARINET_FORWARD}° forward from {@link WIND_HOLDS}, to 30° from the vertical, the
- * angle of the wolf in `orchestra-latest.png` and `orchestra-side.png`: a render of the app from
- * the camera of the images shows the clarinet at 30° as 25° in the image, and the images show it
- * at 24° and 28°. A real clarinetist holds it at about 45°, and the long muzzle already puts the
- * mouthpiece far in front of the chest: at 45°, the bell is
- * far in front of the knees. With the mouthpiece 0.18 H below the mouth, the mouthpiece does not
- * go into the jaw. Each paw aims across the tube (`aimAcross`) and a quarter toward the side
- * across it (`aimSide`), and its grip moves around the tube (`gripShiftL`, `gripShiftR`). Each
- * palm faces the tube (`faceTube`), and the fingers curl 115° over its front (`gripCurl`), as a
- * clarinetist curves the fingers over the tube with the thumb behind it. Each grip moves toward
+ * (`docs/reference/wind-technique.md` 3): the clarinet at the middle of the body, from the mouth to
+ * between the knees. The clarinet turns its lower end {@link WOLF_CLARINET_FORWARD}° forward from
+ * {@link WIND_HOLDS}, to 30° from the vertical, the angle of the wolf in `orchestra-latest.png` and
+ * `orchestra-side.png`: a render of the app from the camera of the images shows the clarinet at 30°
+ * as 25° in the image, and the images show it at 24° and 28°. A real clarinetist holds it at about
+ * 45°, and the long muzzle already puts the mouthpiece far in front of the chest: at 45°, the bell
+ * is far in front of the knees. Each paw aims across the tube (`aimAcross`) and a quarter toward
+ * the side across it (`aimSide`), and its grip moves around the tube (`gripShiftL`, `gripShiftR`).
+ * Each palm faces the tube (`faceTube`), and the fingers curl 115° over its front (`gripCurl`), as
+ * a clarinetist curves the fingers over the tube with the thumb behind it. Each grip moves toward
  * the axis and to the side of its own shoulder, so that each paw holds the tube from its own side,
  * the palm faces the tube, and the thumb points up the clarinet to the mouthpiece. The left grip
  * moves 0.14 H toward the axis and 0.11 H across it toward the left shoulder, and the right grip
@@ -1084,11 +1082,12 @@ const WOLF_CLARINET_FORWARD = 5;
  * tube, the paws lie in front of it and point away from it, with the finger tips 7.6 cm and 8.3 cm
  * from the tube.
  *
- * The long muzzle puts the tip of the nose far in front of the mouth, so the mouthpiece sits 0.4 H
- * further back than the mouth of the bind pose, in the mouth under the muzzle, and each shoulder
- * bone turns forward, the right 35° and the left 20°. At 45°, the grips move further forward, out
- * of the reach of the arms. The paws reach their grips with 6.3 cm (left) and 0.9 cm (right) to
- * spare, and the mouthpiece goes 1.2 cm into the head.
+ * The muzzle puts the tip of the nose in front of the mouth, so the mouthpiece sits 0.1 H lower and
+ * 0.21 H further back than the mouth of the bind pose (`lipShift`), at the dark lips under the
+ * muzzle, and goes 0.6 cm into the mouth, as a real clarinetist takes the mouthpiece between the
+ * lips (`docs/reference/wind-technique.md` 3). With 0.18 H lower and 0.4 H back, the mouthpiece
+ * stood 1.1 cm below the jaw, 8 cm behind the lips. Each shoulder bone turns forward, the right 35°
+ * and the left 20°. At 45°, the grips move further forward, out of the reach of the arms.
  *
  * Both elbows point down and a little out, as a seated clarinetist lets the arms hang near the
  * body, in the play.
@@ -1114,9 +1113,9 @@ const WOLF_CLARINET = {
   restArms: null,
   restFreeL: null,
   aimSigns: null,
-  lipShift: [0, -0.18, 0.4],
+  lipShift: [0, -0.1, 0.21],
   play: holdTurn(WOLF_CLARINET_FORWARD, 0),
-  restShift: [0.11, -0.56, -0.086],
+  restShift: [0.11, -0.64, 0.104],
   restPoleL: [-1.5, -1.4, 0],
   restPoleR: [0.5, -1, -0.1],
 } as const satisfies WindHold;
