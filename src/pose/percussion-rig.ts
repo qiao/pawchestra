@@ -509,9 +509,8 @@ export const PERCUSSION_HOLDS = {
     poleL: [-0.8, -1, 0.3],
     // The rebuilt round arms of the badger are free of the trunk (design 5.3, "Free round arms").
     // The right elbow points further out, and each mallet points from a place out from the
-    // shoulder, so that the paws stay out from the leaning belly. With the hold of the old arms,
-    // the right upper arm went 3.1 cm into the belly. With the home 0.3 H out, the mallets miss
-    // the bars by up to 4 cm.
+    // shoulder, so that the paws stay out from the leaning belly. With the home 0.3 H out, the
+    // mallets miss the bars by up to 4 cm.
     poleR: [2, -1, 0.3],
     rim: 0,
     home: [0.15, -0.2, -0.75],

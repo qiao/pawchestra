@@ -186,9 +186,7 @@ export const HANDS_HOLDS = {
   // (forearms) and 7.4 cm (upper arms) into the trunk in the play, with 0.2 down 5.7 cm and 7.0 cm,
   // and with 0.5 down 7.3 cm and 7.9 cm (`pnpm pose-depth pianist`). With the trunk upright and the
   // elbows down, the upper arm twist p95 falls from 45° to 39° and the paw swing p95 from 57° to
-  // 40° or less (`pnpm arm-check pianist`). On the low keys of the old bench, elbows that point 0.7
-  // down put the arms 15.4 cm and 14.9 cm into the trunk, and elbows that point 0.3 up put the paws
-  // 3 to 4 cm into the belly. Elbows that point further back put the arms deeper into the trunk.
+  // 40° or less (`pnpm arm-check pianist`). Elbows that point further back put the arms deeper into the trunk.
   // The paws reach from A0 to F4 with the left paw and from E♭4 to C8 with the right paw
   // (`pose/hands.test.ts`), so a melody changes paws between them. A paw that crosses to the middle
   // of the keys puts its elbow in front of the chest: with the reach to B♭4 and from C4, the arms

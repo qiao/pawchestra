@@ -930,8 +930,7 @@ const VIOLIN_HOLD = {
 /**
  * The bow of the cellist at rest (design 5.2): the right paw holds the bow over the right knee,
  * 0.25 H out and 0.5 H above the top of the thigh at 0.9 of the way to the knee, with the tip up
- * and leaned out and forward, away from the cello. The short arm of the old dog body then bent
- * softly at the elbow, and the wrist bent 22° with the palm toward the body. In the lift and the
+ * and leaned out and forward, away from the cello. In the lift and the
  * lowering, the bow turns through the front, and the grip moves 0.3 H out, away from the cello.
  * The dog keeps the bow and moves the grip lower and further out ({@link DOG_HOLD}).
  */
@@ -1098,7 +1097,7 @@ export const BOWED_HOLDS = {
  * (-1.6, -1, -0.2), the upper arm turns 72° and its skin twists 37°, so that the upper arm reads as
  * bent. With the viola 0.12 H in and the elbow down and in, (-0.3, -1, -0.4), the upper arm turns
  * 26°, but it goes 4.4 cm into the belly at rest. With the new place, the right claws go 2.0 cm
- * into the viola in one sample of the lowering of four demos (0.7 cm with the old place), as deep
+ * into the viola in one sample of the lowering of four demos, as deep
  * as in the play. With the viola 0.8 of the way
  * and the elbow (-1.2, -1, 0.1), the left upper arm goes 2.3 cm into the belly at rest, and its
  * middle goes flat. With 0.95 of the way and 0.03 H back, on the front of the knee, the elbow
@@ -1240,7 +1239,7 @@ const CAT_HOLD = {
  * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
  *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
  *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
- *   its accepted grip (4° on the old body). The right shoulder turns 20° forward (`reach`): with
+ *   its accepted grip. The right shoulder turns 20° forward (`reach`): with
  *   30°, the right upper arm goes 1.8 cm into the chest in a stroke of `bach-bwv1050`, and with
  *   25°, 1.7 cm in a stroke of `beethoven-8-4`.
  * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
@@ -1294,7 +1293,7 @@ const DOG_HOLD = {
  * leans the contrabass on the body, and the contrabass does not go in
  * (`docs/reference/string-technique.md`, section 2.8). The body comes from the T-pose mesh with
  * rebuilt arms at the length of the mesh (`assets/models/hippo/README.md`), so the round arm
- * tubes are thicker at the wrist than the arms of the old body.
+ * tubes are thick at the wrist.
  *
  * The back of the smaller contrabass (`bassScale`) touches the front of the round belly. The end
  * pin (`BASS_END_PIN`) stands on the floor right of the place of `UPRIGHT_HOLDS` and forward
