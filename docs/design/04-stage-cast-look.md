@@ -1186,7 +1186,8 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     search runs again. A group starts at the height of the risers in front of it, so the rows rise
     toward the back, and it takes the lowest height with its fewest blocked players. Each group
     has its own riser, as the modular risers of a real orchestra. A riser keeps `RISER_EDGE` from
-    the outline of the stage.
+    the outline of the stage. When a riser goes into an item of a lower neighbor group, that group
+    rises to the same height, and a row keeps no riser that goes into an item.
   - The choir risers then rise together, up to `CHOIR_LIFT`, until each singer sees the
     conductor.
   - `pnpm sight-lines` measures the result on the meshes of all demos. Some back desks of the

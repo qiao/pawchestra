@@ -2079,18 +2079,25 @@ function seatGroups(members: readonly Member[]): number[][] {
 }
 
 /**
- * Gives the extent of each seat group of a row: its players, and the stands nearest to them.
+ * Finds the seat group of each stand of a row: the group of its own reader, or the group of the
+ * nearest player for a shared stand.
  *
+ * @param members The players of the row.
  * @param placement The places of the row.
  * @param groups The seat groups.
- * @returns The extent of each group.
+ * @returns The index of the group of each stand.
  */
-function groupExtents(
+function standGroups(
+  members: readonly Member[],
   placement: RowPlacement,
   groups: readonly (readonly number[])[],
-): RowExtent[] {
+): number[] {
   const angleOf = (p: Vec3): number => Math.atan2(p[0], -p[2]);
-  const owner = placement.stands.map((stand) => {
+  return placement.stands.map((stand) => {
+    const reader = members.findIndex((m) => m.index === stand.owner);
+    if (reader >= 0) {
+      return groups.findIndex((g) => g.includes(reader));
+    }
     const angle = angleOf(stand.place.position);
     const distance = (g: readonly number[]): number =>
       Math.min(
@@ -2099,6 +2106,22 @@ function groupExtents(
     const near = groups.map(distance);
     return near.indexOf(Math.min(...near));
   });
+}
+
+/**
+ * Gives the extent of each seat group of a row: its players and their stands.
+ *
+ * @param members The players of the row.
+ * @param placement The places of the row.
+ * @param groups The seat groups.
+ * @returns The extent of each group.
+ */
+function groupExtents(
+  members: readonly Member[],
+  placement: RowPlacement,
+  groups: readonly (readonly number[])[],
+): RowExtent[] {
+  const owner = standGroups(members, placement, groups);
   return groups.map((g, k) =>
     rowExtent({
       players: g.flatMap((i) => placement.players[i] ?? []),
@@ -2205,6 +2228,13 @@ interface SightTry {
   readonly risers: readonly RowRiser[];
   /** The number of blocked players of each seat group. */
   readonly blocked: readonly number[];
+  /**
+   * The height to which each seat group must rise, because a riser of a neighbor group goes into
+   * one of its items, or 0.
+   */
+  readonly lifts: readonly number[];
+  /** True if a riser goes into an item of the row or of the stage. */
+  readonly contact: boolean;
 }
 
 /**
@@ -2259,8 +2289,16 @@ function* sightRowsSteps(
       const right = row.members[i + 1];
       return right ? runAll(spacingSteps(m, right, row.radius)) / row.radius : 0;
     });
+    // The items around the row that a riser must not go into: the fixed items, the items and
+    // the risers of the rows in front, and the items of the rows behind.
+    const around = [
+      ...fixed,
+      ...placedRows.flatMap(obstaclesOfRow),
+      ...doneRisers,
+      ...behind.flatMap((r) => obstaclesOfRow(r.placement)),
+    ];
     const groups = seatGroups(row.members);
-    const extents = groupExtents(row.placement, groups);
+    const extents = groupExtents(row.members, row.placement, groups);
     // A group rises only when its riser fits on the stage.
     const rises = groups.map(
       (_, k) =>
@@ -2282,23 +2320,47 @@ function* sightRowsSteps(
         angles = [...row.angles];
         placement = placeRow(row.members, angles, row.radius, heights);
       }
-      const own = placement.players.map((p) => p.obstacle);
+      const bodies = placement.players.map((p) => p.obstacle);
       const stands = [...blockers.stands, ...placement.stands.map((p) => p.obstacle)];
       const blind = row.members.map((member, i) => {
         const place = placement.players[i]?.place;
-        const others = { solid: [...blockers.solid, ...own.filter((_, j) => j !== i)], stands };
+        const others = { solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)], stands };
         return place !== undefined && sightOf(member, place, targets, others) === 2;
       });
-      const placed = groupExtents(placement, groups);
-      const risers = joinRisers(
-        levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null)),
-      );
+      const placed = groupExtents(row.members, placement, groups);
+      const own = levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null));
+      // A riser goes into an item at a lower height: its group must rise to the riser.
+      const lifts = groups.map(() => 0);
+      const owners = standGroups(row.members, placement, groups);
+      const items = [
+        ...placement.players.map((p, i) => ({
+          obstacle: p.obstacle,
+          group: groups.findIndex((g) => g.includes(i)),
+        })),
+        ...placement.stands.map((p, j) => ({ obstacle: p.obstacle, group: owners[j] ?? -1 })),
+      ];
+      let contact = false;
+      for (const riser of own) {
+        if (!riser) {
+          continue;
+        }
+        const box = rowRiserObstacle(riser, CENTER);
+        for (const item of items) {
+          if (obstaclesTouch(box, item.obstacle, 0)) {
+            contact = true;
+            lifts[item.group] = Math.max(lifts[item.group] ?? 0, riser.height);
+          }
+        }
+        contact ||= around.some((o) => obstaclesTouch(box, o, 0));
+      }
       return {
         heights,
         angles,
         placement,
-        risers,
+        risers: joinRisers(own),
         blocked: groups.map((g) => g.filter((i) => blind[i]).length),
+        lifts,
+        contact,
       };
     };
 
@@ -2319,7 +2381,11 @@ function* sightRowsSteps(
       let raised = false;
       next.blocked.forEach((count, k) => {
         const level = levels[k] ?? 0;
-        if (count > 0 && rises[k] && level + ROW_RISER.step <= ROW_RISER.highest + 1e-9) {
+        const lift = next.lifts[k] ?? 0;
+        if (rises[k] && lift > level + 1e-9) {
+          levels[k] = lift;
+          raised = true;
+        } else if (count > 0 && rises[k] && level + ROW_RISER.step <= ROW_RISER.highest + 1e-9) {
           levels[k] = Math.round((level + ROW_RISER.step) * 1000) / 1000;
           raised = true;
         }
@@ -2343,9 +2409,14 @@ function* sightRowsSteps(
     const last = yield* attempt(chosen);
     const total = (t: SightTry): number => t.blocked.reduce((a, b) => a + b, 0);
     const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
-    const pick = [last, ...tries].reduce((a, b) =>
-      total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
-    );
+    const valid = [last, ...tries].filter((t) => !t.contact);
+    // The row on the stage top has no riser, so it is the try of last resort.
+    const pick =
+      valid.length > 0
+        ? valid.reduce((a, b) =>
+            total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
+          )
+        : yield* attempt(groups.map(() => 0));
     done.push({
       row: { ...row, angles: pick.angles, placement: pick.placement },
       risers: pick.risers,
