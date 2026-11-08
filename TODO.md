@@ -858,6 +858,12 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player
       holds it, strikes with the fingertips, the fingers, or the knuckles by the dynamic, and plays
       a shake roll or a thumb roll (percussion-technique 8). The left paw holds the triangle.
+      Blocked: each piece follows one bone, and only the `instrument` bone and the `slide` bone
+      move apart from a paw. A switch at the rests needs three pieces that move apart (the
+      tambourine, the triangle, and a fixed trap table), and the beater must leave the right paw.
+      Two of the three demos with this player play both instruments (boulanger-matin, with a
+      switch in 0.4 s at 62 s, and the percussion test score). A new bone for a prop changes the
+      pose of each player. Ask the user for the route.
 - [ ] Polar bear pianist: the claw tips almost touch when the paws play two octaves apart, because
       the paws point in along the forearms (`PAW_TURN`).
 - [ ] Conductor: start `docs/reference/conducting-technique.md` with sources: the beat patterns, the
