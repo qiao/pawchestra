@@ -175,7 +175,8 @@ user mesh (GLB)  ->  pnpm mesh-intake (keep faces | needs rebuild)
 ```
 
 A body with a hand rig makes `<a>.rig.glb` with `pnpm rig-export` in place of the two middle steps
-("Hand rig").
+("Hand rig"). A body of the simple route makes the `.blend` of such a rig with a script ("Simple
+route").
 
 The rebuild applies only to a body whose arms or legs get new quad faces. A clean quad mesh
 (`keep faces`, "Source meshes") keeps its faces, and the step adds only the arm segments and the
@@ -279,7 +280,8 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
   fixes the meshes that exist.
 - **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
   each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`, and
-  `STUDIO_MESH_GZIP_BUDGETS` for a body with its own budget). The first download of 1 MB and the frame time of 9.7 stay the limits.
+  `STUDIO_MESH_GZIP_BUDGETS` for a body with its own budget). The first download of 1 MB and the
+  frame time of 9.7 stay the limits.
 - **Licenses.** The project author made the meshes with Meshy on a paid plan, and holds their
   rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
   `README.md` of the repository), with no entry in the third-party license file (7.3).
@@ -506,9 +508,10 @@ a Tripo retopology of its mesh. Each paw has one digit bone for each claw (`DIGI
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
 share take half of each bone. The paw vertices follow the paw and the fingers, and the wrist
 helper only its own ring. Reason: with half of the wrist helper, the paw turned only about two
-thirds of the hand turn, and one claw could not press a key alone. Each other body comes from `rig-mesh`. The hand rigs of the cat and
-the rabbit are trials that the app does not use. Reason: they gave a thin, faceted arm root and
-other faults, so the cat and the rabbit keep the A-pose bodies that production shows. A trial
+thirds of the hand turn, and one claw could not press a key alone. The rabbit comes from the
+simple route ("Simple route"), and each other body from `rig-mesh`. The hand rig of the cat is a
+trial that the app does not use. Reason: it gave a thin, faceted arm root and other faults, so the
+cat keeps the A-pose body that production shows. A trial
 keeps its `.blend`, its export, and its summary in `assets/models/<s>/hand-rig/`, so that no tool
 takes the trial for the body of the app: `pnpm rig-export <s> --blend <file> --out <file>`
 exports it there.
@@ -650,6 +653,38 @@ Blender differs from the same pose in the app where a vertex has bones with diff
 a key `arm_raise_*` too. An import of the GLB file into Blender shows the skin of the app, because
 its rest is the bind.
 
+### Simple route
+
+A clean quad mesh with the arms apart from the trunk, such as a Tripo mesh in a T-pose, can take
+the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rigs/simple/`. It
+makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
+writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
+rig"). The rabbit has this body. An arm that the mesh joins to the trunk needs a cut, so such a
+mesh takes the mesh rig ("Mesh rig").
+
+```text
+source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
+  ->  limb factors (limbs)  ->  edge ring splits on the arms (rings.subdivide)
+  ->  armature and seated bind of the config  ->  bone heat, weight smooth, roll split
+  ->  pea eyes and facts  ->  <a>.blend  ->  pnpm rig-export  ->  pnpm studio-body
+```
+
+- **Quads.** An FBX source keeps its quads, and a GLB source holds only triangles. The join of a
+  GLB into quads (`joinQuads`) is a guess, so a quad source comes as an FBX file.
+- **Limbs.** An arm factor gives the reach of the role, and a shin and a thigh factor give the seat
+  of the old body (`limbs`). Each factor is a plain stretch along the bone or the height.
+- **Rings.** A new ring halfway between two arm rings splits each edge of the quad edge ring
+  between them at its middle (`rings.subdivide`), so that each roll segment has about two rings and
+  each elbow the rings of `JOINT_RINGS`. Reason: a plane cut goes through the faces at any angle
+  and leaves slivers, and a new ring on the quads follows them. An edge ring that holds a triangle
+  or a pole takes no split.
+- **Roll split.** Each vertex keeps its weight on the roll segments of its arm part, and the
+  segments share it by the place of the vertex along the bone (`rollSplit`). Reason: bone heat
+  gives each segment its weights by distance, so the roll gathered in bands at the segment
+  borders, and the faces twisted into a spiral of long facets.
+- **Loose parts.** Each part other than the body, such as an eyeball or a whisker strip, takes the
+  head bone alone, because bone heat gives a loose part no sure weights.
+
 ### Seat
 
 - A seated role binds its mesh seated. The export puts the soles on the floor and the haunch on
@@ -680,7 +715,9 @@ its rest is the bind.
   bench reaches back from the front edge of its fit to at least `PIANO_BENCH.studioDepth`, so the
   round haunch sits on the bench with a little room behind it. The deer sits on the stool of the
   harp.
-- The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
+- The cat sits on the chair of its A-pose body, and the rabbit on the chair of its old A-pose body:
+  its legs are shorter than the legs of its source, so that the seat height stays (`limbs.leg`).
+  The wider haunch of the cat
   sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
   of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
   tube and the legs thicker (`assets/models/cat/cat-edits.json`), because the rig left the tail a

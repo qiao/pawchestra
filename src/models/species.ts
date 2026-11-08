@@ -237,12 +237,11 @@ export function instrumentScale(params: SpeciesParams, instrument: InstrumentId)
 export const SPECIES = {
   /**
    * Rabbit, the first violins (reference image). It has the studio body of the Tripo P2 mesh
-   * `assets/models/rabbit/tripo-p2/rabbit.glb`, which `tools/blender/simple_rig.py` rigs by the
-   * simple route (design 4.4), seated with the bind pose of the studio rabbit, and standing as a soloist. Its
-   * head height is the head of the studio body, and its chair fits its legs: the seat height is the
-   * seat of the studio body, in H. The rabbit has short arms that bend less to play, so the arms
-   * reach 0.36 m, and the violin is 0.83 of the violin of the app. With the full violin of 0.958,
-   * the arms must stretch 1.62 times, and their long faces fold.
+   * `assets/models/rabbit/tripo-p2/rabbit.fbx`, which `tools/blender/simple_rig.py` rigs by the
+   * simple route (design 4.4), seated with the bind pose of the studio rabbit, and standing as a
+   * soloist. Its head height is the head of the studio body, and its chair fits its legs: the seat
+   * height is the seat of the studio body, in H. The arms of the rig are 1.2 times the arms of the
+   * mesh, so they reach 0.40 m, and the violin is 0.83 of the violin of the app.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
    * stick lies 40° from square toward the wrist, near the line of the middles of the turned paw, so
