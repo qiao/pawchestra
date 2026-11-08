@@ -273,9 +273,8 @@ traps of the rig.
   hand have two colors, and the two sides have two tints. Each joint has quad rings of 16
   vertices. The species `mannequin` has the animal preset with its own faces as its body
   (`arm_rebuild.py --keep-faces`), and no section casts it.
-  The role tools test it with a recast role, such as `violinist@mannequin`. A test body loads
-  apart from the bodies of the app (`loadTestBodies()` of `models/studio-body.ts`), so the first
-  download does not grow by it.
+  The role tools test it with a recast role, such as `violinist@mannequin`. No piece casts it,
+  so the app does not load it (7.2).
 
 | Intake point | Target | Reason |
 | --- | --- | --- |

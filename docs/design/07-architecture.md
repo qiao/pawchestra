@@ -29,7 +29,7 @@ first download                                lazy, after the first frame
 | `midi/` | Parse the bytes of a Standard MIDI File into tracks of events in ticks. | yes | first download |
 | `score/` | Apply the rules of section 3, and build the `Score` with `buildScore()` (3.2). | yes | first download |
 | `pose/` | `poseAt()` (5.1). | yes | first download |
-| `models/` | The species, the studio bodies, the instruments, and `layoutScene()`. | yes | first download |
+| `models/` | The species, the studio bodies, the instruments, and `layoutScene()`. | yes | first download; each body with the piece that casts it (7.2) |
 | `shots/` | The camera shots of 5.6: `prepareShots()` and `cameraAt()`. | yes | first download |
 | `scene/` | Three.js: stage, lights, camera, quality tiers, poses applied to bones. | no | first download |
 | `audio/` | The `Player`, the Worker, and the worklet processor. | no (the block scheduler is pure) | lazy |
@@ -120,16 +120,36 @@ limit and prints the size on each run. The limit goes up only with the approval 
 owner. A change that moves the size by more than 5 KB states the reason in its commit message.
 
 `pnpm size` (`tools/size.ts`) sums the gzip sizes of `index.html`, the CSS, the entry chunk with
-its static imports and their assets, and the MIDI file of the default demo (`DEFAULT_DEMO`, 8.2).
-It does not count the audio code, the SF3 files, the development pages, and the other demos. The
+its static imports and their assets, the MIDI file of the default demo (`DEFAULT_DEMO`, 8.2), and
+the chunks of the studio bodies that the default demo casts. It does not count the audio code, the SF3 files, the development pages, and the other demos. The
 app loads the audio code after the first frame, and another demo when the user selects it. A
 file that is gzip data already counts with its own size, because the host sends it with no
 second gzip. `--base <ref>` also builds a commit, and prints both totals.
 
-The packed meshes of the studio bodies are most of the first download. The default demo casts
-nearly all bodies, so all bodies stay in the first download, and each packed mesh has a gzip
-budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`). `packStudioMesh()` writes one
-stream for each kind of number, so that gzip finds the repeats.
+The packed meshes of the studio bodies are the largest part of the app. Thus each body module
+is a chunk of its own, and the app loads only the bodies that a piece casts. The first step of
+the scene plan loads the bodies of the score (`castBodiesSteps()` of `app/body-loads.ts`): the
+bear conductor and the species of each seat with players. A body loads one time, so a piece
+change loads only its new species. The layout needs the head height and the seat height of each
+species before the load, so `pnpm studio-body` writes these two values into
+`models/studio-heights.ts`, and `species.ts` reads them from there.
+
+The pure core reads each body from a registry (`studioBodyOf()` of `models/studio-body.ts`). In
+Node, the registry holds all bodies of `models/studio-bodies.ts`, so the tools and the tests load
+nothing. The plugin `BROWSER_STUDIO_BODIES` of `vite.config.ts` gives the browser code an empty
+record in place of that module, in the dev server and in the build. The app and the gallery thus
+fill the registry with `loadStudioBodies()`, which loads each module with `import()`.
+
+```typescript
+/** Loads the body modules that are not loaded. All bodies when no names are given. */
+export function loadStudioBodies(names?: readonly StudioBodyName[]): Promise<void>;
+/** Gives the bodies that a score casts: the conductor and each seat with players. */
+export function castBodies(score: Score): StudioBodyName[];
+```
+
+Each packed mesh has a gzip budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`), and
+the bodies of the default demo count against the limit. `packStudioMesh()` writes one stream for
+each kind of number, so that gzip finds the repeats.
 
 `index.html` preloads the file of the default demo with a low priority when the hash names no
 demo, so that the score build does not wait for a fetch after the scripts. The preload starts
@@ -158,7 +178,7 @@ stays below about 10 ms on the development Mac.
 ```text
 module task ─> probe of WebGL2 ─> renderer ─> app and fetch ─> slices of the build ─> show
                                                                 │ (SLICE_MS each)
-   score ─> models and layout ─> pose plan ─> shot plan ─> scene steps (GPU waits)
+   score ─> cast bodies (import) ─> models and layout ─> pose plan ─> shot plan ─> scene steps
 ```
 
 - **Step form.** A long pure calculation has a step form: a generator that yields between its
@@ -166,7 +186,8 @@ module task ─> probe of WebGL2 ─> renderer ─> app and fetch ─> slices of
   slices of the app give the same result.
 - **Slices.** `runSliced()` of `app/slices.ts` runs steps until `SLICE_MS` pass, and then gives
   the main thread back with `scheduler.yield()`, or a `MessageChannel` message. A step that waits
-  for the GPU yields `wait`. A later selection stops a build at its next slice. The builds run
+  for the GPU yields `wait`. A step that needs a load yields its promise, and the slices wait
+  for it. A later selection stops a build at its next slice. The builds run
   one after the other, because they share the renderer.
 - **Scene build.** `StageScene.prepareSteps()` builds the scene of a layout, and `show()` swaps
   it in one task. The steps compile the programs of each pass with a render target, as the pass
