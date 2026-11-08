@@ -58,7 +58,7 @@ export interface BodyPart {
 }
 
 /** The body of the clearance rules of the arms (design 4.4), one time for each body. */
-export interface SliceBody {
+interface SliceBody {
   /** One part for each bone of {@link SLICE_BONES} with enough corners. */
   readonly parts: readonly BodyPart[];
 }

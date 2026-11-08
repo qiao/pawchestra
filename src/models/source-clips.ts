@@ -17,7 +17,7 @@ const TOP_BONE = 'Hips';
  * the axes and the units of the file: y up, the character faces +z, and its left side is +x after
  * `pnpm mixamo-import`. The rest pose of Mixamo is the T-pose.
  */
-export interface SourceSkeleton {
+interface SourceSkeleton {
   /** The name of each bone, with no prefix. Each parent comes before its children. */
   readonly names: readonly string[];
   /** The index of the parent of each bone, or -1 for the top bone. */

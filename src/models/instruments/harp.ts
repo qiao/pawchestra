@@ -199,7 +199,7 @@ export type HarpPedal = 'D' | 'C' | 'B' | 'E' | 'F' | 'G' | 'A';
  * A notch of a harp pedal: the top notch makes its strings flat, the middle notch natural, and
  * the bottom notch sharp.
  */
-export type PedalNotch = 'flat' | 'natural' | 'sharp';
+type PedalNotch = 'flat' | 'natural' | 'sharp';
 
 /**
  * The seven pedals of a concert harp (design 4.6), in meters at the scale 1. The pedals of D, C,
@@ -667,7 +667,7 @@ function addNeck(piece: PieceBuilder): void {
  * @param scale The scale of the harp of the species (`SpeciesParams.harpScale`).
  * @returns The root and the end.
  */
-export function harpPedalEnds(
+function harpPedalEnds(
   pedal: HarpPedal,
   notch: PedalNotch = 'natural',
   scale = 1,

@@ -66,7 +66,7 @@ const PIANO_REACH_GAP = 0.15;
  * sees the conductor only through a gap between two heads, or from a riser. The strings sit on
  * the stage top, as in a real orchestra.
  */
-export const ROW_RISER = {
+const ROW_RISER = {
   /** The first row that can stand on a riser: row 2, the first row behind the strings. */
   firstRow: 2,
   /** The step of the height of a riser, in meters. */
@@ -84,7 +84,7 @@ export const ROW_RISER = {
  * at 0.42 m to 0.48 m to each side, 1.11 m to 1.25 m above the podium top, and 0.15 m to 0.24 m
  * in front of the bear.
  */
-export const CONDUCTOR_SIGHT = {
+const CONDUCTOR_SIGHT = {
   /** The distance of the side points of the head from the middle of the eyes, in meters. */
   headSide: 0.15,
   /** The right paw at a beat: x, the height above the podium top, and z. The left paw has -x. */
@@ -898,7 +898,7 @@ function riserObstacle(level: RiserLevel, podium: Vec3): Obstacle {
  * @param podium The podium center.
  * @returns The obstacle.
  */
-export function rowRiserObstacle(riser: RowRiser, podium: Vec3): Obstacle {
+function rowRiserObstacle(riser: RowRiser, podium: Vec3): Obstacle {
   const parts = Math.max(1, Math.ceil((riser.to - riser.from) / RISER_BOX_ANGLE));
   const step = (riser.to - riser.from) / parts;
   const front = riser.inner * Math.cos(step / 2);

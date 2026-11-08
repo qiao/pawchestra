@@ -143,7 +143,7 @@ export function applyTransform(t: Transform, p: Vec3): Vec3 {
 }
 
 /** The placement and the look of one part of a mesh. */
-export interface PartOptions {
+interface PartOptions {
   /** The linear color of each corner of the part. */
   readonly color: Rgb;
   /** The index of the bone that a rigid part follows. Default 0. */

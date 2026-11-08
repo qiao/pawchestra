@@ -84,7 +84,7 @@ export const DIGITS = 5;
  * each thumb about its close axis ({@link StudioBody.thumbAxes}) by the bend of digit 1 of its paw
  * (`poseArm()` of `models/studio-rig.ts`). With no bend, the thumb keeps the turn of the paw.
  */
-export const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
+const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
 
 /**
  * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig of `pnpm rig-mesh`, in

@@ -261,7 +261,7 @@ export interface StringLine {
 }
 
 /** The strings of a harp, which swing after a pluck (design 4.6, 5.3). */
-export interface InstrumentStrings {
+interface InstrumentStrings {
   /** The line of each string, from the bass string, in the order of the string parts. */
   readonly lines: readonly StringLine[];
   /**

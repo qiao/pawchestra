@@ -31,7 +31,7 @@ export const CELLO_PLACE = {
 } as const;
 
 /** The axes of a cello in its place (design 4.6), in the model axes. */
-export interface CelloAxes {
+interface CelloAxes {
   /** The unit direction from the end pin to the scroll. */
   readonly axis: Vec3;
   /** The unit normal of the top plate, to the strings. */

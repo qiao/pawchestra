@@ -638,7 +638,7 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
  * @param podium The podium center, the center of the arcs.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
  */
-export function buildRowRisers(risers: readonly RowRiser[], podium: Vec3): MeshData {
+function buildRowRisers(risers: readonly RowRiser[], podium: Vec3): MeshData {
   const builder = new MeshBuilder();
   for (const riser of risers) {
     addRiserBlock(builder, riser, podium);
