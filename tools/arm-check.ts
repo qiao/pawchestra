@@ -160,6 +160,7 @@ import {
   withTempFolder,
 } from './ref-tree.ts';
 import { sideSegmentBones } from './arm-segments.ts';
+import { narrowAxis } from './arm-shape.ts';
 import { matrixOf, turnOf, wrap } from './bone-turns.ts';
 import { weightOn } from './skin-weight.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
@@ -752,46 +753,6 @@ function armFaces(
     }
   }
   return faces;
-}
-
-/**
- * Gives the root of the smaller principal value of some vectors in the plane normal to an axis
- * (`narrowAxis()` of `tools/arm-shape.ts`).
- *
- * @param vectors The vectors, x, y, z of each one.
- * @param axis The unit axis.
- * @returns The root, in the units of the vectors.
- */
-function narrowAxis(vectors: ArrayLike<number>, axis: Vector3): number {
-  const e1 = new Vector3(1, 0, 0);
-  if (Math.abs(axis.x) > 0.9) {
-    e1.set(0, 1, 0);
-  }
-  e1.addScaledVector(axis, -e1.dot(axis)).normalize();
-  const e2 = new Vector3().crossVectors(axis, e1);
-  const count = vectors.length / 3;
-  const p = new Vector3();
-  let mx = 0;
-  let my = 0;
-  for (let i = 0; i < count; i++) {
-    p.fromArray(vectors, i * 3);
-    mx += p.dot(e1) / count;
-    my += p.dot(e2) / count;
-  }
-  let xx = 0;
-  let yy = 0;
-  let xy = 0;
-  for (let i = 0; i < count; i++) {
-    p.fromArray(vectors, i * 3);
-    const a = p.dot(e1) - mx;
-    const b = p.dot(e2) - my;
-    xx += (a * a) / count;
-    yy += (b * b) / count;
-    xy += (a * b) / count;
-  }
-  const half = (xx + yy) / 2;
-  const root = Math.sqrt(Math.max(0, half * half - (xx * yy - xy * xy)));
-  return Math.sqrt(Math.max(0, half - root));
 }
 
 /**

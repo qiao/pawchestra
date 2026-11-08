@@ -156,7 +156,7 @@ function boneAt(bone: StudioBone): number {
  * @param axis The unit axis.
  * @returns The root, in the units of the vectors.
  */
-function narrowAxis(vectors: ArrayLike<number>, axis: Vector3): number {
+export function narrowAxis(vectors: ArrayLike<number>, axis: Vector3): number {
   const e1 = new Vector3(1, 0, 0);
   if (Math.abs(axis.x) > 0.9) {
     e1.set(0, 1, 0);
