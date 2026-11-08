@@ -2202,7 +2202,7 @@ function sightOf(
   let sight: Sight = 0;
   if (head > 0 || baton > 0) {
     sight = 2;
-  } else if (share(targets.cue, solid) > 0) {
+  } else if (targets.cue.some((p) => hides(p, solid))) {
     sight = 1;
   }
   return { sight, hidden: head + baton };
