@@ -212,7 +212,8 @@ interface InstrumentGrips {
  * - `head`: the middle of a drum head, a kettle head, the tambourine head, or a suspended cymbal.
  * - `bars`: the line over the xylophone bars, from the lowest bar to the highest.
  * - `mallet-head`: the part of a mallet, a stick, or a beater that strikes.
- * - `plate`: the middle of the inner face of a cymbal.
+ * - `plate`: the middle of the plane of the rim of a cymbal on its inner side, and a corner of
+ *   the rim.
  * - `bar`: the side of the triangle that the beater strikes.
  * - `tip`: the tip of the baton.
  */

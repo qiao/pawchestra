@@ -1368,8 +1368,8 @@ const TIMPANISTS: ReadonlySet<SpeciesId> = new Set(['elephant']);
 
 /**
  * Gives the note targets of the hands of a percussion player: the head of each mallet, stick, or
- * beater, or the inner face of each cymbal, is on its strike point at the start of each of its
- * strikes (design 5.3), in a play that started at the count-in.
+ * beater, or the plane of the rim of each cymbal, is on its strike point at the start of each
+ * of its strikes (design 5.3), in a play that started at the count-in.
  *
  * @param scene The scene.
  * @param index The index of the player.

@@ -1570,7 +1570,8 @@ function addCymbalNut(piece: PieceBuilder, center: Vec3, scale: number): void {
  *
  * @param bone The bone of the cymbal.
  * @param scale The scale of the cymbal (`SpeciesParams.cymbalScale`).
- * @returns The piece, the target at the middle of the inner face, and the grip of the palm.
+ * @returns The piece, the target at the middle of the plane of the rim on the inner side, and the
+ *   grip of the palm.
  */
 function cymbal(bone: 'malletL' | 'malletR', scale: number): Cymbal {
   const piece = new PieceBuilder(scale);
@@ -1590,11 +1591,13 @@ function cymbal(bone: 'malletL' | 'malletR', scale: number): Cymbal {
   return {
     piece: piece.build(bone, hold(palm, [0, 0, 0], toQuat(rotation), [0, lift, 0])),
     grip: toVec3(new Vector3(0, -lift, 0).applyQuaternion(rotation.clone().invert())),
+    // The rims of two plates meet first, so the target is the plane of the rim, and `to` is a
+    // corner of the rim.
     target: {
       kind: 'plate',
       bone,
-      from: [0, CYMBAL_INNER * scale, 0],
-      to: [0, CYMBAL_INNER * scale, 0],
+      from: [0, CYMBAL_RIM * scale, 0],
+      to: [(0.2 / Math.cos(Math.PI / CYMBAL_SEGMENTS)) * scale, CYMBAL_RIM * scale, 0],
       normal: [0, -1, 0],
       keys: null,
     },
