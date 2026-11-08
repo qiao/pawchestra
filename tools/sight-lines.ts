@@ -29,7 +29,7 @@ import type { PlayerModel } from '../src/models/player.ts';
 import { buildMusicStand } from '../src/models/props.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import type { BoneName } from '../src/models/rig.ts';
-import { rayHitsBox, rayHitsTriangle } from '../src/models/sight.ts';
+import { eyesOf, pointOnStage, rayHitsBox, rayHitsTriangle } from '../src/models/sight.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { preparePoses } from '../src/pose/plan.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
@@ -130,20 +130,6 @@ function blockerOf(
 }
 
 /**
- * Moves a point of a model into the stage axes.
- *
- * @param p The point in the model axes.
- * @param position The place of the model origin.
- * @param facing The turn around y.
- * @returns The point on the stage.
- */
-function place(p: Vec3, position: Vec3, facing: number): Vec3 {
-  const c = Math.cos(facing);
-  const s = Math.sin(facing);
-  return [position[0] + p[0] * c + p[2] * s, position[1] + p[1], position[2] - p[0] * s + p[2] * c];
-}
-
-/**
  * Gives the triangles of a model in the stage axes, split by a test of the bone of each triangle.
  *
  * @param model The model.
@@ -166,7 +152,7 @@ function modelCorners(
     }
     for (let k = 0; k < 3; k++) {
       const i = t * 9 + k * 3;
-      out.push(...place([p[i] ?? 0, p[i + 1] ?? 0, p[i + 2] ?? 0], position, facing));
+      out.push(...pointOnStage([p[i] ?? 0, p[i + 1] ?? 0, p[i + 2] ?? 0], position, facing));
     }
   }
   return out;
@@ -224,7 +210,11 @@ function blockersOf(layout: SceneLayout, models: ModelCache, withConductor: bool
     const corners: number[] = [];
     for (let k = 0; k < mesh.length; k += 3) {
       corners.push(
-        ...place([mesh[k] ?? 0, mesh[k + 1] ?? 0, mesh[k + 2] ?? 0], stand.position, stand.facing),
+        ...pointOnStage(
+          [mesh[k] ?? 0, mesh[k + 1] ?? 0, mesh[k + 2] ?? 0],
+          stand.position,
+          stand.facing,
+        ),
       );
     }
     const b = blockerOf(`stand ${i}`, 'stand', -1, corners);
@@ -300,18 +290,11 @@ function pickCorners(model: PlayerModel, bones: readonly BoneName[]): number[] {
   return all.filter((_, k) => k % step === 0);
 }
 
-/** The eye point of a player in the stage axes, in the bind pose. */
-function eyeOf(model: PlayerModel, position: Vec3, facing: number): Vec3 {
-  const l = model.skeleton.positions[boneIndex('eyeL')] ?? [0, 0, 0];
-  const r = model.skeleton.positions[boneIndex('eyeR')] ?? [0, 0, 0];
-  return place([(l[0] + r[0]) / 2, (l[1] + r[1]) / 2, (l[2] + r[2]) / 2], position, facing);
-}
-
 /** The head points of a player in the stage axes, in the bind pose. */
 function headPoints(model: PlayerModel, position: Vec3, facing: number): Vec3[] {
   const p = model.mesh.positions;
   return pickCorners(model, HEAD_BONES).map((c) =>
-    place([p[c * 3] ?? 0, p[c * 3 + 1] ?? 0, p[c * 3 + 2] ?? 0], position, facing),
+    pointOnStage([p[c * 3] ?? 0, p[c * 3 + 1] ?? 0, p[c * 3 + 2] ?? 0], position, facing),
   );
 }
 
@@ -383,12 +366,13 @@ export function probeSight(
       }
       const posed = poseSkeleton(model, pose);
       const at = (c: number): Vec3 =>
-        place(posedCorner(posed, c), conductor.position, conductor.facing);
+        pointOnStage(posedCorner(posed, c), conductor.position, conductor.facing);
       return { head: parts.head.map(at), baton: parts.baton.map(at), cue: parts.cue.map(at) };
     });
     layout.players.forEach((p, i) => {
       const { species, instrument, kettles, support } = p.cast;
-      const eye = eyeOf(models.get(species, instrument, kettles, support), p.position, p.facing);
+      const player = models.get(species, instrument, kettles, support);
+      const eye = pointOnStage(eyesOf(player), p.position, p.facing);
       const by: Record<string, number> = {};
       const hidden = { head: 0, baton: 0, cue: 0 };
       const counts = { head: 0, baton: 0, cue: 0 };
