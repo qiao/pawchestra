@@ -209,8 +209,7 @@ Design 4.4 gives the rule and the reason of each config key.
   (`bowPoints()`). The depth of an open part is false near its edge, so the sweep measures closed
   parts (`closedPart()`).
 - The pair "instrument in body" gives the deepest corner. Measure the visible top plate alone.
-- `armGaps()` of `pose/test-arm-clearance.ts` gives false depths for an arm in front of the
-  chest. Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
+- Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
 - The sweep counts the hidden root of a free arm in the trunk as a clip. Move only its deep
   vertices toward the wall, or toward the joint when they also come out (`pig_root.py`).
 - Before a root fix, split a recast fold count by bone with `pnpm fold-probe --faces`. Paws and
