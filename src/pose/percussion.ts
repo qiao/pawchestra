@@ -7,7 +7,6 @@ import { lastAtOrBefore, mixPole, mixRotation } from './blend.ts';
 import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingHand, hangingWrist } from './hang.ts';
-import type { HangingArm } from './hang.ts';
 import { limitReach, poseShoulder, solveTwoBone, writeArm, writeCurl } from './ik.ts';
 import { groupChords } from './note-groups.ts';
 import type { NoteGroup } from './note-groups.ts';
@@ -922,28 +921,26 @@ function plateHand(
  * Writes one arm and its fingers. An arm with no instrument hangs, also while the player plays.
  *
  * @param rig The points of the player.
- * @param side The hand.
- * @param hang The arm of the rest pose.
- * @param hand The strike state of the hand.
- * @param damp The damp of the hand cymbals.
- * @param ring The follow move of the hand cymbals.
- * @param pole The direction to which the elbow points while the player plays.
+ * @param which The hand: `L` for the left hand and `R` for the right hand.
+ * @param state The motion of the hands at the song time of the note layer.
  * @param chest The posed frame of the chest.
  * @param weight The eased weight of the playing pose.
  * @param rotations The rotations of the pose to write.
  */
 function poseHand(
   rig: PercussionRig,
-  side: PercussionSide,
-  hang: HangingArm,
-  hand: StrikeState,
-  damp: DampState,
-  ring: DampState,
-  pole: Vec3,
+  which: 'L' | 'R',
+  state: PercussionState,
   chest: Frame,
   weight: number,
   rotations: Float32Array,
 ): void {
+  const left = which === 'L';
+  const side = left ? rig.left : rig.right;
+  const hang = left ? rig.hangL : rig.hangR;
+  const hand = left ? state.left : state.right;
+  // The direction to which the elbow points while the player plays.
+  const pole = left ? rig.hold.poleL : rig.hold.poleR;
   const { arm } = side;
   poseShoulder(arm, chest, rig.chestBind, NO_TURN, shoulder);
   hangingWrist(hang, shoulder, hanging);
@@ -963,7 +960,7 @@ function poseHand(
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);
   } else if (side.kind === 'plate') {
-    plateHand(rig, side, hand, damp, ring);
+    plateHand(rig, side, hand, state.damp, state.ring);
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
@@ -1008,30 +1005,6 @@ export function posePercussion(
   weight: number,
   rotations: Float32Array,
 ): void {
-  const chest = frames.chest;
-  const { hold } = rig;
-  poseHand(
-    rig,
-    rig.left,
-    rig.hangL,
-    state.left,
-    state.damp,
-    state.ring,
-    hold.poleL,
-    chest,
-    weight,
-    rotations,
-  );
-  poseHand(
-    rig,
-    rig.right,
-    rig.hangR,
-    state.right,
-    state.damp,
-    state.ring,
-    hold.poleR,
-    chest,
-    weight,
-    rotations,
-  );
+  poseHand(rig, 'L', state, frames.chest, weight, rotations);
+  poseHand(rig, 'R', state, frames.chest, weight, rotations);
 }
