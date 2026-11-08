@@ -363,7 +363,9 @@ export const PERCUSSION_HOLDS = {
   // 7° over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm,
   // and the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
   // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean
-  // also at rest (ready). The left arm hangs, because a single note often needs no muffling.
+  // also at rest (ready). The left arm hangs, because a single note often needs no muffling, and
+  // after a note with a rest after it, the left palm goes onto the left head (damp), about 1.5 cm
+  // off it. Nearer to the head, the left arm folds 9 faces (limit 8).
   'bass-drum': {
     hands: 'right',
     sizes: { lift: 0.13, rest: 0.05 },
@@ -387,7 +389,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0.12,
     side: null,
     fit: null,
-    damp: { kind: 'palm', restSec: 0.5, hold: 0.5, wrist: [0.12, 0.05, -0.06] },
+    damp: { kind: 'palm', restSec: 0.5, hold: 0.5, wrist: [0.1, 0.05, -0.06] },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
