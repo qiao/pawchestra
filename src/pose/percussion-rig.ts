@@ -683,6 +683,12 @@ export const CRASH_MOTION = {
    * raised right plate went 3.4 cm into the right shoulder of the wolf (1.7 cm with no tilt).
    */
   tilt: 15 * MathUtils.DEG2RAD,
+  /**
+   * The angle of the flam, in radians: the right plate turns its top rim toward the left plate,
+   * so that the plates are not parallel and the top rims meet first, as a glancing blow with the
+   * air out between the plates (`docs/reference/percussion-technique.md` 7).
+   */
+  flam: 15 * MathUtils.DEG2RAD,
   /** The full slide of the right plate along its face, from the top of the lift to the rebound. */
   slide: 0.1,
   /** The share of the slide of the right plate that the left plate makes the other way. */

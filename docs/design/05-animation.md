@@ -519,7 +519,8 @@ The rest of each family:
   not damp: the short arms of the elephant held the lowest point of the paw a few cm over the
   head plane and outside the head in each tried place.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
-  plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
+  plate comes down onto the left plate at the angle of a flam (`CRASH_MOTION.flam`), so that the
+  top rims meet first. The rims meet at the crash point, a little offset, and the
   plates slide on past each other, the right plate down and the left plate up by a share
   (`StrikeState.slide`). A louder crash meets higher. After a crash, each plate turns out to the
   front and up, parts, and rises, by the loudness, until the damp or the next

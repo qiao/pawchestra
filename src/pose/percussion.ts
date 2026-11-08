@@ -933,10 +933,15 @@ function plateHand(
   // back rims do not meet and the plates do not come back to the body.
   head.addScaledVector(normal, side.sign * side.radius * Math.sin(turnOut));
   head.y += c.ringLift * h * follow;
-  // The turn out around the vertical, after the turn up around the forward axis, after the tilt.
+  // The right plate leads with its top rim at the angle of the flam, and moves out by the swing
+  // of that rim, so that the top rims meet first.
+  const flam = side.sign > 0 ? c.flam * (1 - closed) : 0;
+  head.addScaledVector(normal, side.radius * Math.sin(flam));
+  // The turn out around the vertical, after the turn up around the forward axis, after the flam
+  // and the tilt.
   swing.setFromAxisAngle(Y_AXIS, -side.sign * turnOut);
   turn
-    .setFromAxisAngle(Z_AXIS, -side.sign * c.ringUp * follow)
+    .setFromAxisAngle(Z_AXIS, -side.sign * c.ringUp * follow + flam)
     .premultiply(swing)
     .multiply(strikeTurn.fromArray(side.turn));
   offset.fromArray(side.face).sub(wristBind.fromArray(side.arm.bind.wrist)).applyQuaternion(turn);

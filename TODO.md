@@ -849,8 +849,6 @@ scene of each demo has its seats and stage size with no overlap.
       (`PercussionHold.pair`). Offer the user longer arms.
 - [ ] Elephant timpanist: no muffle, because the short arms hold the paw a few cm over the head
       plane and outside the head (5.3). Higher kettles or longer arms let the paw reach the spot.
-- [ ] Hand cymbals: the plates stay parallel at the crash, with no angle of a flam between them
-      (percussion-technique 7). Only recast bodies play them.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
 - [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player

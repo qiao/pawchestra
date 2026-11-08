@@ -326,8 +326,10 @@ The app follows these facts:
   its bar, and before a strike it lifts higher for a louder note [62] (`MalletAcross.peak`). A
   mallet strikes a sharp bar near its edge near the player.
 - **The hand cymbals of a recast body (section 7).** The plates tilt from vertical, and the right
-  plate comes down onto the left plate. The rims meet a little offset and slide on past each
-  other, as a glancing blow [21] [60]. A louder crash meets higher. After a crash, the plates turn
+  plate comes down onto the left plate. The right plate comes in at an angle of 15° to the left
+  plate, so that the top rims meet first, as a flam [20] [21] [23], and the plates are not
+  parallel [61]. The rims meet a little offset and slide on past each other, as a glancing blow
+  [21] [60]. A louder crash meets higher. After a crash, the plates turn
   out to the front and up and rise, less after a soft crash and not after a fast one [21] [23]. At
   the end of a note before a rest, the plates go against the chest [20] [22] (`CRASH_MOTION`,
   `DampRule`).
@@ -359,10 +361,9 @@ The app does not follow these facts:
   cymbals at the chest, and no grip of a suspended cymbal. The paw keeps its mallet at the rim,
   and the rule of the rest is the rule of the hand cymbals. A MIDI drum note has no written
   length, so each note before a rest of 0.5 s stops.
-- **The hand cymbals (section 7).** The plates stay parallel at the crash, with no angle of a
-  flam between them [60] [61], and tilt 15° from vertical [16]. No concert source gives the rest place:
-  in a long rest, the arms hang with the plates at the sides, as a marching method holds them
-  [24].
+- **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than
+  the 35° to 45° of [60]: a small angle that keeps the plates not parallel [61]. The plates tilt 15° from vertical [16]. No concert source gives the rest place: in a long
+  rest, the arms hang with the plates at the sides, as a marching method holds them [24].
 - **The xylophone grip (section 9).** The paws hang low in front of the belly, so each shaft runs
   near the line of its forearm and leaves the paw under the curled claws. The right elbow points
   far out, and each mallet points from a place out from its shoulder (`PercussionHold.home`), so
