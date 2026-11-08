@@ -9,26 +9,21 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 ## Shared options
 
 - **`--set <changes>`.** One variant of a hold in memory, with its changes separated by `;`, such
-  as `piano.lean=16deg`. The root `<instrument>@<species>` changes the own hold of one species
-  (`violin@rabbit.lean=12deg`), and `<instrument>` the shared hold. The root `<species>` changes
-  an instrument scale, a cymbal form, or a tuba pipe (`mouse.oboeScale=0.62`). Code:
+  as `piano.lean=16deg`. The root `<instrument>@<species>` changes the own hold of one species, and
+  the root `<species>` an instrument scale, a cymbal form, or a tuba pipe. Code:
   `tools/hold-sets.ts`.
-- **`--base <ref>`.** Runs a commit in a child process (`probeBeside()` of `tools/ref-tree.ts`),
-  and compares it with the working tree. A cache by tree keeps the JSON of the commit
-  (`base: cached`). `PROBE_NO_CACHE=1` runs the commit again.
+- **`--base <ref>`.** Runs a commit in a child process (`tools/ref-tree.ts`), and compares it with
+  the working tree. A cache by tree keeps the result. `PROBE_NO_CACHE=1` runs the commit again.
 - **`--glb <file>`.** Gives the animal the studio body of another GLB file, in a copy of `src/`
-  (`tools/glb-swap.ts`), so a file of `rig-mesh --check --keep` needs no `pnpm studio-body`. With
-  `--base`, only the working tree takes it. `arm-check` takes each role of its animal, also a
-  recast role.
+  (`tools/glb-swap.ts`), with no `pnpm studio-body`. With `--base`, only the working tree takes it.
 - **Recast role `<role>@<species>`.** The role tools take a role with another species, such as
-  `violinist@wolf`, in the seats of the role (`findRole()` of `tools/fold-probe.ts`), with the size
-  rule of the matrix (`tools/recast-scale.ts`). A test species takes `TEST_BODY_OBSTACLES`.
-  `close-views play --recast` puts it into the app.
+  `violinist@wolf`, with the size rule of `tools/recast-scale.ts`. `close-views play --recast`
+  puts it into the app.
 - **`--midi <path>`.** A MIDI file of the user, read from its path and never copied into the
   repository. In `pose-depth`, `hold-fit`, `arm-check`, and `clip-probe`, it is one more `--demo`.
-- **Image tools.** The tools of the table "Images" build the site or start a dev server, and use
-  headless Chromium with ANGLE on Metal (`pnpm exec playwright install chromium` one time). Do not
-  edit the working tree while they build.
+- **Image tools.** The tools of the table "Images" use headless Chromium with ANGLE on Metal
+  (`pnpm exec playwright install chromium` one time). Do not edit the working tree while they
+  build.
 
 ## Build and site
 
