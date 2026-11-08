@@ -62,7 +62,7 @@ Result. Numbers (| Measure | main | round |, and the gate table). Choices. Commi
 ## Rules of a round
 
 - Commit the mechanism first, with values that change nothing. Then tune with `--set`, and commit
-  the tuned values.
+  the tuned values. Only the last commit of a rig series writes the GLB file and its module.
 - When a measure chooses a value, check that the reference lies inside the range of the variants.
   Else stop, and send the table to the manager.
 - When two goals conflict, keep this order: the clearance, the arm gate, the range of the
@@ -101,8 +101,10 @@ Copy this list into `<scratch>/rules-common.md`.
   scale and the reach), 4.7 (the optional bones), 7.1 (`VIEW_SHEETS`), the table "Bodies and
   roles" and the traps of [`rigging.md`](rigging.md), and `assets/models/<s>/README.md` (the
   source, the license, and the checksum).
-- **A new role.** The pose index of design 5, the moments of `pnpm close-views` in design 7.1, the
-  sweep of design 9.3, and the role column of "Bodies and roles" of [`rigging.md`](rigging.md).
+- **A new role.** In the same commit: `SWEEP_ROLES` of `src/pose/test-sweep-roles.ts`,
+  `FOLD_ROLES` of `tools/fold-probe.ts`, `ROLE_VIEWS` of `tools/close-views.ts`, the pose index of
+  design 5, the moments of `pnpm close-views` in design 7.1, the sweep of design 9.3, and the role
+  column of "Bodies and roles" of [`rigging.md`](rigging.md).
 - **A new hold.** The pose index of design 5, design 5.2 (the rest), 5.3 (the hold), and 4.6 (the
   reach). Put each choice and its reason into its design section.
 
