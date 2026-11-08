@@ -188,52 +188,26 @@ route").
 
 The rebuild applies only to a body whose arms or legs get new quad faces. A clean quad mesh
 (`keep faces`, "Source meshes") keeps its faces, and the step adds only the arm segments and the
-weights. The rig of another body reads the source mesh. The rebuild takes its settings from the
-joints of the config and from the mesh, so that a new mesh gets clean arms with no work by hand.
-Each face takes one color, so a face across a color edge of the old arm gives a saw-tooth edge.
-The rebuild thus puts a ring at each color edge across the arm. A species script
-`tools/blender/<a>_arms.py` replaces it only for a fault that it does not fix. An arm that the
-mesh joins to the trunk down to the elbow has no free section. A species script frees it with a
-side wall on the trunk (`tools/blender/cat_arms.py`), or splits it from the trunk along its crease
-in a copy (`tools/blender/beaver_edit.py`). An arm that joins the trunk only near the shoulder has
-a free section, but the shoulder line then lies far down the upper arm, and the long thin faces
-above it fold when the arm lifts. So the badger copy splits its crease too
-(`tools/blender/badger_edit.py`), and the tube starts near the shoulder joint. The flipper of the
-penguin joins the trunk in a deep crease down to the elbow, so its copy splits the crease too
-(`tools/blender/penguin_edit.py`). A flat arm has rays of different lengths with no trunk in the
-section, so the free test of the rebuild takes a larger ratio for the flipper (`--spec` key
-`free`). The tube wraps onto the freed flipper, so the inner vertices of its lowest rings stay on
-the trunk, as a thin box of fins under the root. A copy merges each into the next vertex of its
-ring on the flipper, up to the place where the root meets the trunk (`penguin-arms-pit.glb`).
-Reason: a short clip of the root into the trunk looks better than a gap or a notch under it. The
-top of the gap under each root was then a flat ledge from the trunk to the flipper. A second copy
-merges the inner vertices of the lowest free ring into the ring above them, so that the top of the
-gap is a crease with no flat face (`penguin-arms-crease.glb`). Reason: a move of these vertices onto
-the trunk wall left a shallow slope and a dent at the back of the root. A point edit can also move a
-vertex of a source copy. The rig then reads the moves (`weightMoves`), so that the vertex keeps its
-weight row. The dog copy moves the top front corner of each round inner arm to the edge of the
-trunk hole, so that the arm meets the cap of the cut in a crease (`dog-arms-clip.glb`). Reason: the
-gap between that corner and the cap showed as a deep notch at the top of the armpit. The beaver
-copy merges the top row of the wall under each freed arm into the next row, so that the arm meets
-the wall in a crease (`beaver-arms-crease.glb`). Reason: the strip between the two rows was a thin
-flap under the armpit. The deer copy merges a fold on the inner side of each arm root
-into the arm (`deer-arms-crease.glb`). Reason: the fold showed as fins under the roots and slits
-on the inner upper arm in the bind. The pig copy merges each spike, sliver, and near twin vertex of
-the trunk fan under each arm into a neighbor (`pig-root-pit.glb`). Reason: the hanging arm hid
-them, and the bind and the play showed them as fins, notches, and dark back faces. The panda copy
-merges 5 vertices at the arm roots into a neighbor (`panda-edge-pit.glb`). Reason: the hold brings
-the level T-pose arms down, and a sliver and faces between corners of other weights turned over
-into a dark back face, fins, and deep notches. The rhino copy merges 2 vertices at the left arm
-root into a neighbor (`rhino-tpose-arms-pit.glb`). Reason: a face at the top front of the root
-turned over in the bind, and a thin face at its back folded into a fin in the play. The badger
-copy merges 10 vertices of the arm seams into a neighbor (`badger-arms-pit.glb`). Reason: an arm
-corner beside a trunk corner left a V notch at the front of the left armpit, and slivers along the
-seams folded into fins and notches. The old faces keep their colors, so that the black and white edge of the trunk stays.
-The new faces of the side wall take the black of the flipper, except forward of one straight
-edge along the flank line under the flipper, where they take the white of the side. Reason: the
-flank rule of the rig made the wall faces white one by one, with a saw-tooth edge. The `README.md` of
-`assets/models/<a>/` gives the source and the steps of each file.
-[`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
+weights. The rebuild takes its settings from the joints of the config and from the mesh, so that
+a new mesh gets clean arms with no work by hand. Each face takes one color, so a face across a
+color edge of the old arm gives a saw-tooth edge. The rebuild thus puts a ring at each color edge
+across the arm. A species script `tools/blender/<a>_arms.py` replaces it only for a fault that it
+does not fix.
+
+An arm that the mesh joins to the trunk needs a free section. A species script frees it with a
+side wall on the trunk (`cat_arms.py`), or splits it from the trunk along its crease in a copy
+(`beaver_edit.py`, `badger_edit.py`, `penguin_edit.py`). An arm that joins the trunk only near the
+shoulder also takes the split, because the long thin faces above a low shoulder line fold when the
+arm lifts. A flat flipper has rays of different lengths with no trunk in the section, so the free
+test takes a larger ratio for it (`--spec` key `free`).
+
+Point edits of a copy then clean the seams, and the rig reads each moved vertex with its weight row
+(`weightMoves`). They merge fins, slivers, spikes, and near twin vertices into a neighbor, and
+they merge a flat ledge or a strip under a freed root into a crease. Reason: a short clip of the
+root into the trunk looks better than a gap, a notch, a flap, or a ledge under it. The old faces
+keep their colors. The `README.md` of `assets/models/<a>/` gives the source, the steps, and the
+reason of each file. [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the
+traps of the rig.
 
 ### Source meshes
 
@@ -289,8 +263,8 @@ flank rule of the rig made the wall faces white one by one, with a saw-tooth edg
 - **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
   each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`).
   The first download of 1 MB and the frame time of 9.7 stay the limits.
-- **Licenses.** The project author made the meshes with Meshy on a paid plan, and holds their
-  rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
+- **Licenses.** The project author made the meshes with Meshy or Tripo on a paid plan, and holds
+  their rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
   `README.md` of the repository), with no entry in the third-party license file (7.3).
 - **Test mannequin.** `tools/blender/mannequin.py` makes an original test body for the rig chain
   and for the Mixamo route (`assets/models/mannequin/README.md`). The preset `human` has the
@@ -517,12 +491,11 @@ a Tripo retopology of its mesh. Each paw has one digit bone for each claw (`DIGI
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
 share take half of each bone. The paw vertices follow the paw and the fingers, and the wrist
 helper only its own ring. Reason: with half of the wrist helper, the paw turned only about two
-thirds of the hand turn, and one claw could not press a key alone. Each other body comes from `rig-mesh`. The hand rigs of the cat and
-the rabbit are trials that the app does not use. Reason: they gave a thin, faceted arm root and
-other faults, so the cat and the rabbit keep the A-pose bodies that production shows. A trial
-keeps its `.blend`, its export, and its summary in `assets/models/<s>/hand-rig/`, so that no tool
-takes the trial for the body of the app: `pnpm rig-export <s> --blend <file> --out <file>`
-exports it there.
+thirds of the hand turn, and one claw could not press a key alone. Each other body comes from
+`rig-mesh`. The hand rigs of the cat and the rabbit are trials that the app does not use, because
+they gave a thin, faceted arm root. A trial keeps its files in `assets/models/<s>/hand-rig/`, so
+that no tool takes it for the body of the app (`pnpm rig-export <s> --blend <file> --out
+<file>`).
 
 ```text
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
@@ -668,8 +641,8 @@ the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rig
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
 rig"). The Tripo P2 rabbit of `assets/models/rabbit/tripo-p2/` is a trial of this route that the
-app does not use: the app keeps the A-pose rabbit. An arm that the mesh joins to the trunk needs a cut, so such a
-mesh takes the mesh rig ("Mesh rig").
+app does not use: the app keeps the A-pose rabbit. An arm that the mesh joins to the trunk needs a
+cut, so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
 source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
