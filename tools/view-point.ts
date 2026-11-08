@@ -14,15 +14,14 @@
  * The frame has no open drawer and no sheet of a phone. The y axis of the pixels points down.
  * About 1 s.
  */
-import { PerspectiveCamera, Vector3 } from 'three';
+import { Vector3 } from 'three';
 
 import { DEFAULT_DEMO } from '../src/app/demos.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { scoreOf } from '../src/score/test-score.ts';
-import { viewFrame, viewOffset } from '../src/shots/frame.ts';
-import { DEFAULT_TARGET, FIELD_OF_VIEW, NEAR, defaultView, farPlane } from '../src/shots/view.ts';
+import { defaultCamera } from './look-regions.ts';
 import { patchedDemo } from './patch-demos.ts';
 import { optionValue } from './ref-tree.ts';
 
@@ -44,31 +43,6 @@ function triple(text: string, what: string): Vec3 {
   }
   const [a = 0, b = 0, c = 0] = values;
   return [a, b, c];
-}
-
-/**
- * Creates the camera of the default view for a canvas, with the frame above the bar.
- *
- * @param stageSide The stage side `S`, in meters.
- * @param width The width of the canvas, in CSS pixels.
- * @param height The height of the canvas, in CSS pixels.
- * @returns The camera, with its matrices up to date.
- */
-function defaultCamera(stageSide: number, width: number, height: number): PerspectiveCamera {
-  const view = defaultView(stageSide, width, height);
-  const camera = new PerspectiveCamera(
-    FIELD_OF_VIEW,
-    width / height,
-    NEAR,
-    farPlane(view.distance, stageSide),
-  );
-  camera.position.set(...view.position);
-  camera.lookAt(...DEFAULT_TARGET);
-  camera.setViewOffset(
-    ...viewOffset(width, height, viewFrame(width, height, { right: 0, lift: 0 })),
-  );
-  camera.updateMatrixWorld();
-  return camera;
 }
 
 /**

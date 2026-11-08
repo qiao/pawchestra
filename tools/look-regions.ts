@@ -81,7 +81,7 @@ const REFERENCE_BOXES = {
  * @param height The height of the frame, in pixels.
  * @returns The camera, with its matrices up to date.
  */
-function defaultCamera(stageSide: number, width: number, height: number): PerspectiveCamera {
+export function defaultCamera(stageSide: number, width: number, height: number): PerspectiveCamera {
   const view = defaultView(stageSide, width, height);
   const camera = new PerspectiveCamera(
     FIELD_OF_VIEW,
