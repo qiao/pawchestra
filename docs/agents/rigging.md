@@ -140,10 +140,10 @@ hold, a rig, a pose, an instrument size, or a seat runs `pnpm arm-check <roles> 
 look, makes the round not done. Gate only the roles that the body plays. A recast cell is a report
 only. Design 4.4 ("Arm gate") gives the measures.
 
-- A planned grip change expects a `FAIL` against `ACCEPTED_GRIPS`, and gives the manager the new
-  median with 2x paw crops at a strike and at rest.
+- A planned grip change expects a `FAIL` against `ACCEPTED_GRIPS`. Report the new median with 2x
+  paw crops at a strike and at rest.
 - A new wind hold whose paw faces its tube adds the `ACCEPTED_PALMS` entry that the tool prints.
-- After a new bind, `pnpm arm-check <roles> --world --base <start>` proves the same bones.
+- After a new bind, `--world --base <start>` proves the same bones.
 
 ## The rebuild of the arms in Blender
 
