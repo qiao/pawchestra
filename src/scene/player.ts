@@ -291,7 +291,7 @@ const IDENTITY: Matrix4Tuple = new Matrix4().elements;
  * Computes the bone matrices of the players of a frame one time, and keeps them for each render of
  * the frame ({@link FrameSkeleton}). The world matrices of the bones must be ready.
  *
- * @param meshes The player meshes of {@link createPlayers}.
+ * @param meshes The player meshes of {@link createPlayersSteps}.
  */
 export function holdSkeletons(meshes: readonly SkinnedMesh[]): void {
   for (const mesh of meshes) {
@@ -304,7 +304,7 @@ export function holdSkeletons(meshes: readonly SkinnedMesh[]): void {
 /**
  * Ends the hold of {@link holdSkeletons} after the renders of a frame.
  *
- * @param meshes The player meshes of {@link createPlayers}.
+ * @param meshes The player meshes of {@link createPlayersSteps}.
  */
 export function releaseSkeletons(meshes: readonly SkinnedMesh[]): void {
   for (const mesh of meshes) {
@@ -862,7 +862,7 @@ function applyPedals(mesh: SkinnedMesh, notches: Float32Array | null | undefined
 /**
  * Copies the poses of a scene to the player meshes (design 5.1).
  *
- * @param meshes The meshes of {@link createPlayers}: one for each player in the order of
+ * @param meshes The meshes of {@link createPlayersSteps}: one for each player in the order of
  *   `ScenePose.players`, then the conductor.
  * @param pose The poses of the frame, from `poseAt()`.
  */
@@ -888,29 +888,13 @@ export interface PlayerSpot {
 }
 
 /**
- * Creates the players of a scene in the bind pose. The players of one kind (species, instrument,
- * and kettle count) share one model and one geometry, and all players share the material.
- * `poseAt()` gives their poses from the first frame (design 5.1).
+ * Creates the players of a scene in the bind pose, in steps (design 7.2). The players of one kind
+ * (species, instrument, and kettle count) share one model and one geometry, and all players share
+ * the material. `poseAt()` gives their poses from the first frame (design 5.1).
  *
  * @param spots The players and their places.
  * @param materials The shared material.
  * @param models The player models of the score, which the layout and the pose plan share.
- * @returns One skinned mesh for each player, in the order of `spots`.
- */
-export function createPlayers(
-  spots: readonly PlayerSpot[],
-  materials: readonly MeshStandardMaterial[],
-  models: ModelCache,
-): SkinnedMesh[] {
-  return runAll(createPlayersSteps(spots, materials, models));
-}
-
-/**
- * Creates the players of a scene as {@link createPlayers} does, in steps (design 7.2).
- *
- * @param spots The players and their places.
- * @param materials The shared material.
- * @param models The player models of the score.
  * @returns The steps, which return one skinned mesh for each player, in the order of `spots`.
  */
 export function* createPlayersSteps(

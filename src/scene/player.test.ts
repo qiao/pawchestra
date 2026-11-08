@@ -15,6 +15,7 @@ import { posedCorner } from '../pose/test-skin.ts';
 import { poseAt } from '../pose/pose-at.ts';
 import { PLAYING, allAudible, demoSceneOf } from '../pose/test-scene.ts';
 import type { AnimalPose } from '../pose/types.ts';
+import { runAll } from '../score/steps.ts';
 import { createMaterials } from './geometry.ts';
 import {
   CLOSED_EYE_SCALE,
@@ -22,7 +23,7 @@ import {
   applyScenePose,
   createPlayerGeometry,
   createPlayerMesh,
-  createPlayers,
+  createPlayersSteps,
   hideBone,
 } from './player.ts';
 import type { PlayerSpot } from './player.ts';
@@ -249,7 +250,7 @@ describe('a studio body with the shape of a raised arm (design 4.4)', async () =
   });
 });
 
-describe('createPlayers', () => {
+describe('createPlayersSteps', () => {
   it('shares one geometry for each kind of player, and the shared material', () => {
     const materials = createMaterials();
     const asked: string[] = [];
@@ -261,10 +262,12 @@ describe('createPlayers', () => {
         return super.get(...args);
       }
     }
-    const meshes = createPlayers(
-      [spot('wolf', 'violin'), spot('cat', 'viola'), spot('wolf', 'violin')],
-      materials,
-      new RecordingCache(),
+    const meshes = runAll(
+      createPlayersSteps(
+        [spot('wolf', 'violin'), spot('cat', 'viola'), spot('wolf', 'violin')],
+        materials,
+        new RecordingCache(),
+      ),
     );
     // The models come from the cache of the score.
     expect(asked).toEqual(['wolf violin 4', 'cat viola 4', 'wolf violin 4']);
@@ -283,10 +286,12 @@ describe('createPlayers', () => {
 
 describe('applyScenePose', () => {
   it('gives each player its pose, and the last mesh the pose of the conductor', () => {
-    const meshes = createPlayers(
-      [spot('wolf', 'violin'), spot('cat', 'viola'), spot('bear', 'baton')],
-      createMaterials(),
-      new ModelCache(),
+    const meshes = runAll(
+      createPlayersSteps(
+        [spot('wolf', 'violin'), spot('cat', 'viola'), spot('bear', 'baton')],
+        createMaterials(),
+        new ModelCache(),
+      ),
     );
     const head = boneIndex('head');
     /** Makes a pose that turns the head about x by an angle. */
