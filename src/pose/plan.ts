@@ -134,9 +134,8 @@ export interface PercussionLayer {
   readonly side: SideTrack | null;
   /** The long rests with the sticks in their set position (`setRests()`), or `null`. */
   readonly rests: Float64Array | null;
-  /** The damps of each hand after a note (`PercussionHold.damp`), or `null`. */
-  readonly dampL: DampTrack | null;
-  readonly dampR: DampTrack | null;
+  /** The damps of the hand cymbals against the chest (`PercussionHold.damp`), or `null`. */
+  readonly damp: DampTrack | null;
   /** The follow move of the hand cymbals after a crash (`CRASH_MOTION`), or `null`. */
   readonly ring: DampTrack | null;
 }

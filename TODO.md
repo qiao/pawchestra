@@ -858,8 +858,10 @@ scene of each demo has its seats and stage size with no overlap.
       (`PercussionHold.pair`). Offer the user longer arms.
 - [ ] Elephant timpanist: no muffle, because the short arms hold the paw a few cm over the head
       plane and outside the head (5.3). Higher kettles or longer arms let the paw reach the spot.
-- [ ] Bass drum muffle: the left palm stays about 1.5 cm off the left head, and the left arm folds
-      8 faces at p95 there (limit 8). Nearer to the head, it folds 9.
+- [ ] Bass drum muffle: no muffle, because the left head stands in front of the middle of the
+      badger: the palm on it put the left upper arm 5.9 cm into the body (base 2.6 cm), and a
+      place further forward left the palm 6 cm to 8 cm off the head. A drum turned or moved left
+      would let the free paw reach.
 - [ ] Hand cymbals: the plates stay parallel at the crash, with no angle of a flam between them
       (percussion-technique 7). Only recast bodies play them.
 - [ ] Triangle: a louder note swings the right paw 35° on the forearm at p95 (base 19°).

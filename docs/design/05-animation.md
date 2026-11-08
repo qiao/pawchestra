@@ -507,14 +507,14 @@ The rest of each family:
   player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
   no preparation. A chord takes both hands, a fast repeat takes the other hand, and a hand
   does not cross the other.
-- **Damps.** A note is damped at its end when the silence to the next note of the player is at
-  least `DampRule.restSec`, as a real player muffles at a rest or after a short note
-  (percussion 5, 7). The windows come from the score alone (`dampTrack()` of `pose/damps.ts`):
-  the move ends at the contact, stays for at most the hold, and ends before the next note or lift.
-  The bass drummer lays the palm of its free paw on the left head (`DampRule` `palm`). The hand
-  cymbals go against the chest (`chest`). The timpanist does not damp. Reason: the short arms of
-  the elephant held the lowest point of the paw a few cm over the head plane and outside the head
-  in each tried place, so a damp read as a paw in the air.
+- **Damps.** The hand cymbals damp a note at its end against the chest when the silence to the
+  next note is at least `DampRule.restSec`, as a real player stops a short note (percussion 7).
+  The windows come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the
+  contact, stays for at most the hold, and ends before the next lift. The drums do not damp.
+  Reason: the short arms of the elephant held the lowest point of the paw a few cm over the head
+  plane and outside the head in each tried place. The bass drum stands in front of the middle of
+  the badger, so with its free palm on the left head, the left upper arm went into the body, and a
+  place further forward was out of reach.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
   plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
   plates slide on past each other, the right plate down and the left plate up by a share

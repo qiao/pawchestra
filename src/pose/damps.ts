@@ -7,13 +7,13 @@ import { smoothstep } from './rest.ts';
  * let the sound ring. The hand moves to the place of the move, stays there, and goes back.
  */
 export const DAMP_MOTION = {
-  /** The move of a hand to the head of a drum takes this time, and ends at the contact. */
+  /** The move of a hand to the place of a damp takes this time, and ends at the contact. */
   inSec: 0.12,
   /** The shortest move to the place, when the strike before is near. */
   minInSec: 0.06,
   /** The shortest time at the place. A shorter window has no move. */
   minHoldSec: 0.08,
-  /** The move of a hand back from the head of a drum takes this time. */
+  /** The move of a hand back from the place of a damp takes this time. */
   outSec: 0.15,
 } as const;
 

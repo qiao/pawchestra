@@ -22,7 +22,7 @@ interface Span {
 }
 
 /** The notes of one player that start within {@link CHORD_SEC} of the first of them. */
-interface NoteGroup extends Span {
+export interface NoteGroup extends Span {
   /** The start of the first note, in song seconds. */
   readonly start: number;
   /** The latest end of the notes of the group. */

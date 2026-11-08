@@ -281,10 +281,7 @@ The app follows these facts:
   badger stands behind the drum, and the right paw holds the beater at the near rim, one third up
   from the butt. At the strike, the beater lies along the head, as the photos of [13] show, and
   strikes about one third in from the rim [16]. The left arm hangs, because a single note often
-  needs no muffling. After a note with a rest after it, the left paw lays its open palm on the
-  left head, the back head, and goes back before the next note, as a player muffles in the rests
-  of a march with the free hand [13] [58] (`DampRule` `palm`). The right upper arm hangs beside
-  the body with the elbow down and back
+  needs no muffling. The right upper arm hangs beside the body with the elbow down and back
   (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
   The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
@@ -326,7 +323,7 @@ The app follows these facts:
   other, as a glancing blow [21] [60]. A louder crash meets higher. After a crash, the plates turn
   out to the front and up and rise, less after a soft crash and not after a fast one [21] [23]. At
   the end of a note before a rest, the plates go against the chest [20] [22] (`CRASH_MOTION`,
-  `DampRule` `chest`).
+  `DampRule`).
 
 The app does not follow these facts:
 
@@ -335,6 +332,9 @@ The app does not follow these facts:
   times from a soft note to a loud note (`gestureSize()`), and a soft note must stay low.
 - **The lean over the bass drum (section 5).** The spine leans over the drum
   (`PercussionHold.lean`), so that the short arm can bend.
+- **The muffle of the bass drum (section 5).** The free paw does not muffle the head in the rests.
+  The left head stands in front of the middle of the body, so the palm on it put the left upper
+  arm into the body, and a place further forward was out of reach.
 - **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
   second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
   strikes at most 6 times each second (`handRollSec`).

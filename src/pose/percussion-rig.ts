@@ -4,7 +4,6 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import {
-  BASS_DRUM,
   SNARE_DRUM,
   TIMPANI,
   TRIANGLE,
@@ -113,36 +112,20 @@ export interface MalletSet {
 }
 
 /**
- * The damp of the sound of an instrument after a note (design 5.3), as a real player stops the
- * ring of a drum or a cymbal at a rest or after a short note
- * (`docs/reference/percussion-technique.md` 5, 7). A note is damped at its end when the silence
- * from its end to the next note of the player is at least `restSec`.
- *
- * - `palm`: the free paw lays its palm on the other head of the bass drum.
- * - `chest`: the hand cymbals go against the chest.
+ * The damp of the hand cymbals after a note (design 5.3), as a real player stops the ring of the
+ * plates against the chest after a short note (`docs/reference/percussion-technique.md` 7). A note
+ * is damped at its end when the silence from its end to the next note of the player is at least
+ * `restSec`.
  */
-export type DampRule =
-  | {
-      readonly kind: 'palm';
-      readonly restSec: number;
-      /** The longest contact, in seconds. */
-      readonly hold: number;
-      /**
-       * The wrist at the damp, from the middle of the left head of the drum, in meters in the
-       * model axes. The paw keeps the turn of the hanging arm, with the palm in toward the head.
-       */
-      readonly wrist: Vec3;
-    }
-  | {
-      readonly kind: 'chest';
-      readonly restSec: number;
-      /** The longest contact, in seconds. */
-      readonly hold: number;
-      /** The drop of the crash point at the damp, in head heights. */
-      readonly drop: number;
-      /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
-      readonly room: number;
-    };
+export interface DampRule {
+  readonly restSec: number;
+  /** The longest contact, in seconds. */
+  readonly hold: number;
+  /** The drop of the crash point at the damp, in head heights. */
+  readonly drop: number;
+  /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
+  readonly room: number;
+}
 
 /**
  * The values of the hold of each percussion instrument (design 5.3). The directions are in the
@@ -363,9 +346,10 @@ export const PERCUSSION_HOLDS = {
   // 7° over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm,
   // and the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
   // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean
-  // also at rest (ready). The left arm hangs, because a single note often needs no muffling, and
-  // after a note with a rest after it, the left palm goes onto the left head (damp), about 1.5 cm
-  // off it. Nearer to the head, the left arm folds 9 faces (limit 8).
+  // also at rest (ready). The left arm hangs, because a single note often needs no muffling. The
+  // left paw does not muffle the left head (damp): the head stands at the middle of the body, so
+  // with the palm on it the left upper arm went 5.9 cm into the body (base 2.6 cm), and a place
+  // further forward left the palm 6 cm to 8 cm off the head.
   'bass-drum': {
     hands: 'right',
     sizes: { lift: 0.13, rest: 0.05 },
@@ -389,7 +373,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0.12,
     side: null,
     fit: null,
-    damp: { kind: 'palm', restSec: 0.5, hold: 0.5, wrist: [0.1, 0.05, -0.06] },
+    damp: null,
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -462,7 +446,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
-    damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
+    damp: { restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -804,9 +788,8 @@ export interface PercussionRig {
    */
   readonly place: Vec3;
   /**
-   * The place of a damp with no mallet (`PercussionHold.damp`), in the model axes: the wrist of the
-   * free paw on the left head of the bass drum, or the crash point of the hand cymbals at the
-   * chest. `null` for another hold.
+   * The crash point of the hand cymbals at the damp against the chest (`PercussionHold.damp`), in
+   * the model axes, or `null` for another hold.
    */
   readonly dampPlace: Vec3 | null;
 }
@@ -1008,7 +991,7 @@ function pairOfPlates(
   });
   const hold = PERCUSSION_HOLDS.cymbals.damp;
   let chest: Vec3 | null = null;
-  if (hold.kind === 'chest') {
+  {
     const radius = Math.max(rimL.radius, rimR.radius);
     const y = crash.y - hold.drop * model.body.headHeight;
     let front = Infinity;
@@ -1199,18 +1182,6 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         instrument === 'snare-drum' ? mallet(left, 'malletL') : { kind: 'free', arm: left },
         mallet(right, 'malletR'),
       ];
-      // The free paw damps the left head: the right head one depth of the shell back along its
-      // normal.
-      if (hold.damp?.kind === 'palm') {
-        const head = targets.get(0);
-        if (head) {
-          dampPlace = toVec3(
-            new Vector3(...head.point)
-              .addScaledVector(new Vector3(...head.normal), -BASS_DRUM.depth)
-              .add(new Vector3(...hold.damp.wrist)),
-          );
-        }
-      }
       break;
     case 'xylophone': {
       const bars = findTarget(model, (t) => t.kind === 'bars');

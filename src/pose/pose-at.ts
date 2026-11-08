@@ -503,8 +503,7 @@ function poseAnimal(
       if (note.right) {
         strikeStateAt(note.right, noteTime, strikes.right);
       }
-      dampStateAt(note.dampL, noteTime, strikes.dampL);
-      dampStateAt(note.dampR, noteTime, strikes.dampR);
+      dampStateAt(note.damp, noteTime, strikes.damp);
       dampStateAt(note.ring, noteTime, strikes.ring);
       // The spine leans over the instrument (`PercussionHold.lean`), also in the rest pose of a
       // player that stays ready at its instrument (`PercussionHold.ready`). The body moves to the
@@ -647,8 +646,7 @@ export function poseAt(
     strikes: {
       left: createStrikeState(),
       right: createStrikeState(),
-      dampL: createDampState(),
-      dampR: createDampState(),
+      damp: createDampState(),
       ring: createDampState(),
     },
     conductor: {
