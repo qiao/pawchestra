@@ -417,10 +417,8 @@ export function obstaclesTouch(a: Obstacle, b: Obstacle, gap: number): boolean {
     }
   }
 
-  for (let i = 0; i < a.boxes.length; i++) {
-    const p = a.boxes[i];
-    for (let k = 0; p && k < near.length; k++) {
-      const j = near[k] ?? 0;
+  for (const [i, p] of a.boxes.entries()) {
+    for (const j of near) {
       const q = b.boxes[j];
       if (
         q &&
