@@ -3,7 +3,6 @@ import type { PercussionPart } from './drum-map.ts';
 import { techniqueOf } from './program-map.ts';
 import type { SeatPlan, Seating } from './seats.ts';
 import { findSoloist } from './soloist.ts';
-import { runAll } from './steps.ts';
 import type { Steps } from './steps.ts';
 import { findVocalSoloists } from './vocal-soloists.ts';
 import type { Note, Timeline } from './timeline.ts';
@@ -97,29 +96,12 @@ type Allocation =
   | 'none';
 
 /**
- * Gives each seat its player count and each note its players (design 3.8).
+ * Gives each seat its player count and each note its players, in steps (design 3.8, 7.2).
  *
  * @param timeline The notes of the file.
  * @param seating The seats and the seat of each note, from `assignSeats()`.
  * @param sectionSize The value of the setting "Section size" (2.8, 3.8).
- * @returns The seats with their player counts, and the player notes.
- */
-export function assignPlayers(
-  timeline: Timeline,
-  seating: Seating,
-  sectionSize: SectionSize,
-): PlayerAssignment {
-  return runAll(assignPlayersSteps(timeline, seating, sectionSize));
-}
-
-/**
- * Gives the seats their player counts and the notes to the players as {@link assignPlayers} does,
- * in steps (design 7.2).
- *
- * @param timeline The timeline of the file.
- * @param seating The seats and the seat of each note.
- * @param sectionSize The value of the setting "Section size".
- * @returns The steps, which return the seats with their counts and the player notes.
+ * @returns The steps, which return the seats with their player counts and the player notes.
  */
 export function* assignPlayersSteps(
   timeline: Timeline,

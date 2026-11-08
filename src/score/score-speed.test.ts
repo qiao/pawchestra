@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { patchedDemo } from '../../tools/patch-demos.ts';
 import { chord, programChange } from '../midi/test-smf.ts';
 import { timeRatio } from '../test-speed.ts';
-import { assignPlayers } from './players.ts';
+import { assignPlayersSteps } from './players.ts';
 import { buildScore } from './score.ts';
 import { assignSeats } from './seats.ts';
+import { runAll } from './steps.ts';
 import { timelineOf } from './test-score.ts';
 
 /**
@@ -24,7 +25,7 @@ const BUILD_LIMIT = 13;
 const BUILD_ROUNDS = 40;
 
 /**
- * The most time of `assignPlayers()` for a flute chord of 16,000 notes, as a multiple of the time
+ * The most time of `assignPlayersSteps()` for a flute chord of 16,000 notes, as a multiple of the time
  * of the reference work of {@link timeRatio}. On the development Mac, the ratio is 3.0 (about
  * 8 ms), and the limit is 2 times the ratio. Thus an assignment that is 3 times slower fails.
  */
@@ -52,7 +53,7 @@ describe('the time of the score (design 9.7)', () => {
     });
     const seating = assignSeats(timeline);
     const ratio = timeRatio(() => {
-      assignPlayers(timeline, seating, 'auto');
+      runAll(assignPlayersSteps(timeline, seating, 'auto'));
     }, CHORD_ROUNDS);
     expect(ratio).toBeLessThan(CHORD_LIMIT);
   });

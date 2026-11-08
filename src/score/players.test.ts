@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest';
 
 import { chord, port, programChange, tempo, track } from '../midi/test-smf.ts';
 import type { TestEvent, TestFile } from '../midi/test-smf.ts';
-import { assignPlayers } from './players.ts';
+import { assignPlayersSteps } from './players.ts';
 import type { PlayerAssignment } from './players.ts';
 import { assignSeats } from './seats.ts';
+import { runAll } from './steps.ts';
 import { timelineOf } from './test-score.ts';
 import type { SectionSize } from './types.ts';
 
 function cast(file: TestFile, sectionSize: SectionSize = 'auto'): PlayerAssignment {
   const timeline = timelineOf(file);
-  return assignPlayers(timeline, assignSeats(timeline), sectionSize);
+  return runAll(assignPlayersSteps(timeline, assignSeats(timeline), sectionSize));
 }
 
 /** Makes a part: a program change at tick 0, then chords of quarter notes, one after another. */
@@ -40,7 +41,7 @@ function players(result: PlayerAssignment, seatIndex = 0): string[] {
   return [...map].map(([key, list]) => `${key.split(' ')[1]}: ${list.join(',')}`);
 }
 
-describe('assignPlayers', () => {
+describe('assignPlayersSteps', () => {
   it('gives a woodwind one player for each simultaneous note, highest note first', () => {
     const result = cast({ tracks: [part(0, 73, [72, 76], [74], [71, 79])] });
 
