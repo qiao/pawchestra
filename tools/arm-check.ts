@@ -477,7 +477,10 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   // The wrist lifts the tip of the stick or the mallet over its spot between strikes, and the paws
   // close on their sticks and mallets, from accepted paw crops.
   ['snare-drummer', { L: 65, R: 66 }],
-  ['cymbalist', { L: 67, R: 67 }],
+  // The mallets of the suspended cymbal lie almost level a few cm over the plate between strikes
+  // (SUSPENDED_CYMBAL_HOLD.across), so each paw turns 25° (L) and 36° (R) from the grip of the old
+  // high mallets, from the close views of 2026-11-08.
+  ['cymbalist', { L: 42, R: 31 }],
   ['percussionist', { L: -7, R: 35 }],
   // The spine leans over the bars, and the wrist lifts the head of each mallet over its bar
   // between strikes, from accepted 2x paw crops.
