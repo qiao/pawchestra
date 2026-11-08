@@ -1831,11 +1831,11 @@ function* sightSweepSteps(
       limit = (next[other] ?? 0) + side * between;
     }
     // The candidates of each player, from the inner player out: the angle and its cost.
-    const options: { readonly angle: number; readonly cost: number }[][] = [];
+    const options: SweepOption[][] = [];
     for (const [k, i] of order.entries()) {
       yield;
       const base = angles[i] ?? 0;
-      const own: { angle: number; cost: number }[] = [];
+      const own: SweepOption[] = [];
       for (let n = -steps; n <= steps; n++) {
         const angle = base + side * n * CONDUCTOR_SIGHT.nudgeStep;
         const out = side * angle;
@@ -1850,44 +1850,79 @@ function* sightSweepSteps(
       }
       options.push(own);
     }
-    // The best total cost of each candidate with the players inside it, and the candidate of the
-    // inner neighbor on that path.
-    const totals: number[][] = [];
-    const links: number[][] = [];
-    for (const [k, own] of options.entries()) {
-      const before = options[k - 1];
+    // The packed arc from each player to its inner neighbor.
+    const gaps = order.map((i, k) => {
       const inner = order[k - 1];
-      const arc = inner === undefined ? 0 : (arcs[side > 0 ? inner : (order[k] ?? 0)] ?? 0);
-      totals.push([]);
-      links.push([]);
-      for (const option of own) {
-        let best = before ? Infinity : 0;
-        let link = -1;
-        before?.forEach((previous, j) => {
-          const total = totals[k - 1]?.[j] ?? Infinity;
-          if (side * (option.angle - previous.angle) >= arc - 1e-9 && total < best) {
-            best = total;
-            link = j;
-          }
-        });
-        totals[k]?.push(best + option.cost);
-        links[k]?.push(link);
-      }
-    }
-    const last = totals.at(-1) ?? [];
-    const lowest = Math.min(...last);
+      return inner === undefined ? 0 : (arcs[side > 0 ? inner : i] ?? 0);
+    });
     // With no path, the side keeps its spread angles.
-    let at = Number.isFinite(lowest) ? last.indexOf(lowest) : -1;
-    for (let k = order.length - 1; k >= 0 && at >= 0; k--) {
+    cheapestPath(options, gaps, side).forEach((at, k) => {
       const i = order[k];
       const option = options[k]?.[at];
       if (i !== undefined && option) {
         next[i] = option.angle;
       }
-      at = links[k]?.[at] ?? -1;
-    }
+    });
   }
   return next;
+}
+
+/** A candidate angle of a player in the sight sweep, with its cost. */
+interface SweepOption {
+  /** The angle, in radians. */
+  readonly angle: number;
+  /** The cost of the sight at the angle ({@link sightCost}) plus the steps of the move. */
+  readonly cost: number;
+}
+
+/**
+ * Finds the path of the lowest total cost through the candidates of the players of one side of a
+ * row, from the inner player out. Two neighbors on a path keep their packed arc.
+ *
+ * @param options The candidates of each player, from the inner player out.
+ * @param gaps The packed arc from each player to its inner neighbor, in radians: 0 for the inner
+ *   player.
+ * @param side 1 for the right side, -1 for the left side.
+ * @returns The index of the chosen candidate of each player, from the inner player out, or -1
+ *   for each player with no path.
+ */
+function cheapestPath(
+  options: readonly (readonly SweepOption[])[],
+  gaps: readonly number[],
+  side: 1 | -1,
+): number[] {
+  // The best total cost of each candidate with the players inside it, and the candidate of the
+  // inner neighbor on that path.
+  const totals: number[][] = [];
+  const links: number[][] = [];
+  for (const [k, own] of options.entries()) {
+    const before = options[k - 1];
+    const arc = gaps[k] ?? 0;
+    totals.push([]);
+    links.push([]);
+    for (const option of own) {
+      let best = before ? Infinity : 0;
+      let link = -1;
+      before?.forEach((previous, j) => {
+        const total = totals[k - 1]?.[j] ?? Infinity;
+        if (side * (option.angle - previous.angle) >= arc - 1e-9 && total < best) {
+          best = total;
+          link = j;
+        }
+      });
+      totals[k]?.push(best + option.cost);
+      links[k]?.push(link);
+    }
+  }
+  const path = options.map(() => -1);
+  const last = totals.at(-1) ?? [];
+  const lowest = Math.min(...last);
+  let at = Number.isFinite(lowest) ? last.indexOf(lowest) : -1;
+  for (let k = options.length - 1; k >= 0 && at >= 0; k--) {
+    path[k] = at;
+    at = links[k]?.[at] ?? -1;
+  }
+  return path;
 }
 
 /**
