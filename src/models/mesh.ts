@@ -209,32 +209,6 @@ export function splitByFacing(
   return [matching, others];
 }
 
-/**
- * Splits the triangles of a corner list by the place of their centroids.
- *
- * @param corners The corner list, 9 numbers for each triangle.
- * @param match The test of a centroid.
- * @returns The matching triangles, then the other triangles.
- */
-export function splitByCentroid(
-  corners: readonly number[],
-  match: (centroid: Vec3) => boolean,
-): [number[], number[]] {
-  const matching: number[] = [];
-  const others: number[] = [];
-  for (let t = 0; t < corners.length / 9; t++) {
-    const mean = (axis: number): number =>
-      ((corners[t * 9 + axis] ?? 0) +
-        (corners[t * 9 + 3 + axis] ?? 0) +
-        (corners[t * 9 + 6 + axis] ?? 0)) /
-      3;
-    (match([mean(0), mean(1), mean(2)]) ? matching : others).push(
-      ...corners.slice(t * 9, t * 9 + 9),
-    );
-  }
-  return [matching, others];
-}
-
 /** Collects the parts of one mesh, and makes its {@link MeshData}. */
 export class MeshBuilder {
   /** x, y, z of each corner. */

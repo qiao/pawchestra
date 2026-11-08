@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MeshBuilder, splitByCentroid, transform } from './mesh.ts';
+import { MeshBuilder, transform } from './mesh.ts';
 import type { CornerSkin, MeshData } from './mesh.ts';
 import { ball, box, cylinder, quad } from './primitives.ts';
 import { buildPlayer } from './player.ts';
@@ -37,6 +37,27 @@ const RIM = [Math.sin(Math.PI / 16), 1, Math.cos(Math.PI / 16)] as const;
 /** Splits the faces of the cylinder at the corner {@link RIM}. */
 function atSeam([x, , z]: readonly [number, number, number]): boolean {
   return Math.atan2(x, z) < Math.PI / 16;
+}
+
+/**
+ * Splits the triangles of a corner list by the place of their centroids.
+ *
+ * @param corners The corner list, 9 numbers for each triangle.
+ * @param match The test of a centroid.
+ * @returns The matching triangles, then the other triangles.
+ */
+function splitByCentroid(
+  corners: readonly number[],
+  match: (centroid: [number, number, number]) => boolean,
+): [number[], number[]] {
+  const parts: [number[], number[]] = [[], []];
+  for (let t = 0; t < corners.length; t += 9) {
+    const triangle = corners.slice(t, t + 9);
+    const mean = (axis: number): number =>
+      ((triangle[axis] ?? 0) + (triangle[3 + axis] ?? 0) + (triangle[6 + axis] ?? 0)) / 3;
+    parts[match([mean(0), mean(1), mean(2)]) ? 0 : 1].push(...triangle);
+  }
+  return parts;
 }
 
 describe('weldCorners', () => {
