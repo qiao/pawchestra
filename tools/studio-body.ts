@@ -277,17 +277,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/polar-bear/polar-bear.rig.glb',
     },
   ],
-  // The violinist rabbit (design 4.4): the trial rig of the simple route (`simple_rig.py`) on the
-  // Tripo P2 mesh. Its `.blend` holds the facts of the body: the scale that keeps H of main, the
-  // crease angle 35°, and a seat 4 cm deeper, so that its back keeps off the chair back.
+  // The violinist rabbit (design 4.4). The rabbit sits 4 cm further forward on a seat 4 cm deeper,
+  // so that its back keeps off the chair back.
   [
     'rabbit',
     {
       landmark: 'shoulders',
+      height: 0.8513179,
       seated: true,
       soloist: true,
+      backRoom: 0.04,
       constant: 'STUDIO_RABBIT',
-      glb: 'assets/models/rabbit/tripo-p2/rabbit.rig.glb',
+      crease: 35,
+      glb: 'assets/models/rabbit/rabbit-apose.rig.glb',
     },
   ],
   // The red and the tan foxes (design 4.4). The wide haunch of the fox sits on a wider chair.
