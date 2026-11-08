@@ -278,7 +278,7 @@ function sightMeshOf(model: PlayerModel): SightMesh {
  * @param max The high corner.
  * @returns True if a part of the segment is inside the box.
  */
-function rayHitsBox(o: Vec3, d: Vec3, min: Vec3, max: Vec3): boolean {
+export function rayHitsBox(o: Vec3, d: Vec3, min: Vec3, max: Vec3): boolean {
   const span: Span = { t0: 0, t1: 1 };
   return (
     slabHit(o[0], d[0], min[0], max[0], span) &&
@@ -297,7 +297,12 @@ function rayHitsBox(o: Vec3, d: Vec3, min: Vec3, max: Vec3): boolean {
  * @param i The index of the first number of the triangle.
  * @returns True on a hit.
  */
-function rayHitsTriangle(o: Vec3, d: Vec3, c: Float32Array, i: number): boolean {
+export function rayHitsTriangle(
+  o: Vec3,
+  d: Vec3,
+  c: Float32Array | Float64Array,
+  i: number,
+): boolean {
   const ax = c[i] ?? 0;
   const ay = c[i + 1] ?? 0;
   const az = c[i + 2] ?? 0;

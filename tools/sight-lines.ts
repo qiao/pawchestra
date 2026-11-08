@@ -19,7 +19,9 @@
  */
 import { writeFile } from 'node:fs/promises';
 
+import type { Bounds } from '../src/models/bounds.ts';
 import { CONDUCTOR } from '../src/models/cast.ts';
+import { boundsAround, cornerBounds } from '../src/models/footprint.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
@@ -27,6 +29,7 @@ import type { PlayerModel } from '../src/models/player.ts';
 import { buildMusicStand } from '../src/models/props.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import type { BoneName } from '../src/models/rig.ts';
+import { rayHitsBox, rayHitsTriangle } from '../src/models/sight.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { preparePoses } from '../src/pose/plan.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
@@ -68,25 +71,17 @@ const FIRST_INSTRUMENT_BONE = boneIndex('instrument');
 type BlockerKind = 'body' | 'instrument' | 'piano' | 'harp' | 'stand' | 'conductor';
 
 /** A group of triangles with its box, for the ray test. */
-interface TriangleGroup {
-  /** The low corner of the box of the group: x, y, and z. */
-  readonly min: readonly number[];
-  /** The high corner of the box of the group. */
-  readonly max: readonly number[];
+interface TriangleGroup extends Bounds {
   /** 9 numbers for each triangle, in the stage axes. */
   readonly corners: Float64Array;
 }
 
-/** One item that can hide a target. */
-interface Blocker {
+/** One item that can hide a target, with the box of all its groups. */
+interface Blocker extends Bounds {
   readonly label: string;
   readonly kind: BlockerKind;
   /** The index of the player of the item, or -1. */
   readonly player: number;
-  /** The low corner of the box of all groups. */
-  readonly min: readonly number[];
-  /** The high corner of the box of all groups. */
-  readonly max: readonly number[];
   readonly groups: readonly TriangleGroup[];
 }
 
@@ -124,28 +119,14 @@ function blockerOf(
   for (let g = 0; g < count; g += GROUP_SIZE) {
     const ids = order.slice(g, g + GROUP_SIZE);
     const out = new Float64Array(ids.length * 9);
-    const min = [Infinity, Infinity, Infinity];
-    const max = [-Infinity, -Infinity, -Infinity];
     ids.forEach((t, k) => {
       for (let i = 0; i < 9; i++) {
-        const v = corners[t * 9 + i] ?? 0;
-        out[k * 9 + i] = v;
-        const a = i % 3;
-        min[a] = Math.min(min[a] ?? Infinity, v);
-        max[a] = Math.max(max[a] ?? -Infinity, v);
+        out[k * 9 + i] = corners[t * 9 + i] ?? 0;
       }
     });
-    groups.push({ min, max, corners: out });
+    groups.push({ ...cornerBounds(out), corners: out });
   }
-  const min = [Infinity, Infinity, Infinity];
-  const max = [-Infinity, -Infinity, -Infinity];
-  for (const g of groups) {
-    for (let a = 0; a < 3; a++) {
-      min[a] = Math.min(min[a] ?? Infinity, g.min[a] ?? Infinity);
-      max[a] = Math.max(max[a] ?? -Infinity, g.max[a] ?? -Infinity);
-    }
-  }
-  return { label, kind, player, min, max, groups };
+  return { label, kind, player, ...boundsAround(groups), groups };
 }
 
 /**
@@ -267,80 +248,6 @@ function blockersOf(layout: SceneLayout, models: ModelCache, withConductor: bool
 }
 
 /**
- * Finds if a segment crosses a box.
- *
- * @param o The start.
- * @param d The vector to the end.
- * @param min The low corner.
- * @param max The high corner.
- * @returns True if a part of the segment is in the box.
- */
-function segmentHitsBox(o: Vec3, d: Vec3, min: readonly number[], max: readonly number[]): boolean {
-  let t0 = 0;
-  let t1 = 1;
-  for (let a = 0; a < 3; a++) {
-    const start = o[a] ?? 0;
-    const inv = 1 / (d[a] ?? 0);
-    let ta = ((min[a] ?? 0) - start) * inv;
-    let tb = ((max[a] ?? 0) - start) * inv;
-    if (ta > tb) {
-      [ta, tb] = [tb, ta];
-    }
-    t0 = Math.max(t0, ta);
-    t1 = Math.min(t1, tb);
-    if (t0 > t1) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Finds if a segment crosses a triangle (Moller and Trumbore), away from its ends.
- *
- * @param o The start.
- * @param d The vector to the end.
- * @param c The corners.
- * @param i The index of the first number of the triangle.
- * @returns True on a hit.
- */
-function segmentHitsTriangle(o: Vec3, d: Vec3, c: Float64Array, i: number): boolean {
-  const ax = c[i] ?? 0;
-  const ay = c[i + 1] ?? 0;
-  const az = c[i + 2] ?? 0;
-  const e1x = (c[i + 3] ?? 0) - ax;
-  const e1y = (c[i + 4] ?? 0) - ay;
-  const e1z = (c[i + 5] ?? 0) - az;
-  const e2x = (c[i + 6] ?? 0) - ax;
-  const e2y = (c[i + 7] ?? 0) - ay;
-  const e2z = (c[i + 8] ?? 0) - az;
-  const px = d[1] * e2z - d[2] * e2y;
-  const py = d[2] * e2x - d[0] * e2z;
-  const pz = d[0] * e2y - d[1] * e2x;
-  const det = e1x * px + e1y * py + e1z * pz;
-  if (Math.abs(det) < 1e-12) {
-    return false;
-  }
-  const inv = 1 / det;
-  const tx = o[0] - ax;
-  const ty = o[1] - ay;
-  const tz = o[2] - az;
-  const u = (tx * px + ty * py + tz * pz) * inv;
-  if (u < 0 || u > 1) {
-    return false;
-  }
-  const qx = ty * e1z - tz * e1y;
-  const qy = tz * e1x - tx * e1z;
-  const qz = tx * e1y - ty * e1x;
-  const v = (d[0] * qx + d[1] * qy + d[2] * qz) * inv;
-  if (v < 0 || u + v > 1) {
-    return false;
-  }
-  const t = (e2x * qx + e2y * qy + e2z * qz) * inv;
-  return t > 1e-4 && t < 0.999;
-}
-
-/**
  * Finds the first blocker of a segment.
  *
  * @param from The start.
@@ -357,15 +264,15 @@ function blockerOn(
 ): Blocker | null {
   const d: Vec3 = [to[0] - from[0], to[1] - from[1], to[2] - from[2]];
   for (const b of blockers) {
-    if (skip(b) || !segmentHitsBox(from, d, b.min, b.max)) {
+    if (skip(b) || !rayHitsBox(from, d, b.min, b.max)) {
       continue;
     }
     for (const g of b.groups) {
-      if (!segmentHitsBox(from, d, g.min, g.max)) {
+      if (!rayHitsBox(from, d, g.min, g.max)) {
         continue;
       }
       for (let i = 0; i < g.corners.length; i += 9) {
-        if (segmentHitsTriangle(from, d, g.corners, i)) {
+        if (rayHitsTriangle(from, d, g.corners, i)) {
           return b;
         }
       }
