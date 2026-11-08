@@ -241,6 +241,12 @@ interface LayoutView {
   readonly hall: Group;
   /** The light effects that write no depth, such as the visible beam (scene/post.ts). */
   readonly effects: readonly Object3D[];
+  /**
+   * The objects in the depth pass of the beam that are not in the hall: the stage, the props, and
+   * the players. The depth of field copies their depth from that pass (`SceneDepth` of
+   * scene/post.ts).
+   */
+  readonly depthParts: readonly Object3D[];
   /** The bake of the static props, or `null` for a GPU with no target of floats (design 4.5). */
   readonly bake: LayoutBake | null;
   /** The captured environment, or `null` for a GPU with no target of floats (design 4.5). */
@@ -578,6 +584,7 @@ export class StageScene {
         culled,
         hall,
         effects: lightEffects(scene),
+        depthParts: [stageGroup, props, playerGroup],
         bake,
         capture,
       },
@@ -1136,7 +1143,7 @@ export class StageScene {
         const vignette = vignetteOf(light, postView.cinema);
         this.#post.render(view.scene, camera, focus, view.effects, timeSec, {
           haze,
-          depth: depthPass ? this.#beamDepth.texture : null,
+          depth: depthPass ? { texture: this.#beamDepth.texture, parts: view.depthParts } : null,
           vignette,
           view: postView,
         });

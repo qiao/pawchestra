@@ -1000,7 +1000,7 @@ The scene renders into a target with MSAA, then the post effects make the image 
 ```text
 scene ──> [scene target, MSAA] ──┬──> bloom down 1/2 ... ──> bloom up ──────────┐
                                  └──> blur prepare 1/2 ──> blur gather 1/2 ──┐  │
-scene ──> [depth 1/2] ──────────────────────^ (only with a shallow focus)    v  v
+beam depth + hall ──> [depth 1/2] ──────────^ (only with a shallow focus)    v  v
           [scene target] ───────────────────────────────────────────────> final pass ──> canvas
 beam depth ──> surface 1/2 ──> surface blur 1/2 ─────────────────────────────────^
 ```
@@ -1009,6 +1009,13 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   (2.6).
 - The depth of field is a thin lens focused on the subject of the shot (5.6). The aperture
   closes for a far focus, so the wide views stay sharp and skip the blur. Free mode has none.
+- **Depth of the blur.** The blur reads a depth at half size with the hall, and the depth pass of
+  the beam has no hall. A pass copies the depth of the beam pass to half size
+  (`DEPTH_COPY_FRAGMENT`), and a draw of only the hall adds the hall. Thus each player and each
+  prop draws its depth one time in each frame. On a flat face, the copy mixes the four depths
+  around the pixel. At an outline, it takes the face of three of the four depths, else the
+  nearest. The frames change only at some outline pixels, where a draw at half size had another
+  face.
 - The bloom keeps a small part of all light, as a diffusion filter, with a warm halation.
 - **Lens fringe** (`LENS_FRINGE`). The final pass moves the red of the scene a little outward and
   the blue a little inward, with the square of the distance from the middle of the frame, as the

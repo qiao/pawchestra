@@ -1,4 +1,5 @@
 import {
+  AlwaysDepth,
   BufferGeometry,
   DepthTexture,
   Float32BufferAttribute,
@@ -37,6 +38,7 @@ import {
   BLOOM_UP_FRAGMENT,
   BLUR_GATHER_FRAGMENT,
   BLUR_PREPARE_FRAGMENT,
+  DEPTH_COPY_FRAGMENT,
   FINAL_FRAGMENT,
   FULL_SCREEN_VERTEX,
 } from './post-shaders.ts';
@@ -164,15 +166,27 @@ export interface PostView {
   readonly cinema: number;
 }
 
+/** The depth pass of the beam of one frame (`BeamDepth`, design 4.5). */
+export interface SceneDepth {
+  /** The depth of the scene at full size, with no hall and no light effects. */
+  readonly texture: Texture;
+  /**
+   * The objects of the scene that the depth holds and that are not in the hall: the stage, the
+   * props, and the players. The depth of field copies their depth from the texture and draws only
+   * the hall.
+   */
+  readonly parts: readonly Object3D[];
+}
+
 /** The values of the final pass that change with each frame. */
 interface PostFrame {
   /** The room haze, or `null` for no haze. */
   readonly haze: HazeFrame | null;
   /**
-   * The depth of the scene at full size, with no hall and no light effects (`BeamDepth`), for the
-   * surface pass (`scene/surface.ts`), or `null` with no depth pass.
+   * The depth pass of the beam, for the surface pass (`scene/surface.ts`) and the depth of field,
+   * or `null` with no depth pass.
    */
-  readonly depth: Texture | null;
+  readonly depth: SceneDepth | null;
   /** The part of the light that the vignette takes from the corners. */
   readonly vignette: number;
   readonly view: PostView;
@@ -394,6 +408,14 @@ interface Targets {
   readonly all: readonly WebGLRenderTarget[];
 }
 
+/** The inputs of the depth pass of the depth of field ({@link PostPipeline}). */
+interface DepthSources {
+  /** The light effects that write no depth. The depth pass hides them. */
+  readonly effects: readonly Object3D[];
+  /** The depth pass of the beam of the frame, or `null` with none. */
+  readonly depth: SceneDepth | null;
+}
+
 /** The pass materials whose programs change with the quality tier. */
 interface TierPasses {
   /** The gather pass of the depth of field. Its sample count follows the tier. */
@@ -426,7 +448,7 @@ interface TierChange {
  * ```text
  * scene ──> [scene target, MSAA] ──┬──> bloom down 1/2 ... ──> bloom up ──────────┐
  *                                  └──> blur prepare 1/2 ──> blur gather 1/2 ──┐  │
- * scene ──> [depth 1/2] ──────────────────────^ (only with a shallow focus)    v  v
+ * beam depth + hall ──> [depth 1/2] ──────────^ (only with a shallow focus)    v  v
  *           [scene target] ───────────────────────────────────────────────> final pass ──> canvas
  * ```
  */
@@ -441,6 +463,8 @@ export class PostPipeline {
   readonly #bloomDown: ShaderMaterial;
   readonly #bloomUp: ShaderMaterial;
   readonly #blurPrepare: ShaderMaterial;
+  /** The copy of the depth of the beam pass into the depth of the depth of field. */
+  readonly #depthCopy: ShaderMaterial;
   #blurGather: ShaderMaterial;
   #surface: ShaderMaterial;
   readonly #surfaceRows: ShaderMaterial;
@@ -502,6 +526,7 @@ export class PostPipeline {
       uClamp: { value: new Vector4(0, 0, 1, 1) },
       ...focusUniforms(),
     });
+    this.#depthCopy = depthCopyMaterial();
     this.#surfaceRows = passMaterial(SURFACE_ROWS_FRAGMENT, {
       uSource: { value: null },
       uTexel: { value: new Vector2() },
@@ -622,10 +647,11 @@ export class PostPipeline {
     renderer.setRenderTarget(targets.scene);
     renderer.render(scene, camera);
 
-    const surface = frame.depth ? this.#renderSurface(targets, camera, frame.depth) : null;
+    const depth = frame.depth;
+    const surface = depth ? this.#renderSurface(targets, camera, depth.texture) : null;
     const bloom = this.#renderBloom(targets);
     const blur = focus.active
-      ? this.#renderBlur(targets, scene, camera, focus, effects, view.imageHeight)
+      ? this.#renderBlur(targets, scene, camera, focus, { effects, depth }, view.imageHeight)
       : null;
 
     const final = this.#final;
@@ -685,6 +711,7 @@ export class PostPipeline {
       [this.#bloomPrefilter, target],
       [this.#bloomDown, target],
       [this.#bloomUp, target],
+      [this.#depthCopy, target],
       [this.#blurPrepare, target],
       [this.#blurGather, target],
       [this.#surface, target],
@@ -741,7 +768,7 @@ export class PostPipeline {
     }
     const scene = floatTarget(width, height, format, MSAA_SAMPLES);
     // No pass reads the depth of the scene target, so the resolve of its samples copies only the
-    // color. The depth of field and the haze render their own depth.
+    // color. The depth of field and the haze read the depth pass of the beam.
     scene.resolveDepthBuffer = false;
     const bloomDown = sizes.map(([w, h]) => floatTarget(w, h, format));
     const bloomUp = sizes.slice(0, -1).map(([w, h]) => floatTarget(w, h, format));
@@ -862,7 +889,7 @@ export class PostPipeline {
    * @param scene The scene.
    * @param camera The camera.
    * @param focus The focus of the frame.
-   * @param effects The light effects that write no depth.
+   * @param sources The light effects and the depth pass of the beam of {@link #renderDepth}.
    * @param imageHeight The height of the image of the camera divided by the height of the canvas.
    * @returns The target of the soft image, or `null` when the tier has no depth of field.
    */
@@ -871,14 +898,14 @@ export class PostPipeline {
     scene: Scene,
     camera: PerspectiveCamera,
     focus: Focus,
-    effects: readonly Object3D[],
+    sources: DepthSources,
     imageHeight: number,
   ): WebGLRenderTarget | null {
     const { depth, blurPrepare, blurGather } = targets;
     if (!depth || !blurPrepare || !blurGather) {
       return null;
     }
-    this.#renderDepth(depth, scene, camera, effects);
+    this.#renderDepth(depth, scene, camera, sources);
     const pixelsPerBlur = (blurPrepare.height / 2) * imageHeight;
     const prepare = this.#blurPrepare;
     setUniform(prepare.uniforms, 'uColor', targets.scene.texture);
@@ -894,25 +921,52 @@ export class PostPipeline {
     return blurGather;
   }
 
+  /**
+   * Renders the depth of the scene at half size for the depth of field, with the hall and with no
+   * light effects. With the depth pass of the beam, a pass copies its depth, and a draw of the
+   * scene adds only the hall: each player and each prop then draws its depth one time in each
+   * frame. With no depth pass of the beam, a draw of the scene gives all of the depth.
+   *
+   * @param depth The target of the depth at half size.
+   * @param scene The scene.
+   * @param camera The camera.
+   * @param sources The light effects and the depth pass of the beam.
+   */
   #renderDepth(
     depth: WebGLRenderTarget,
     scene: Scene,
     camera: PerspectiveCamera,
-    effects: readonly Object3D[],
+    sources: DepthSources,
   ): void {
     const renderer = this.#renderer;
+    const beam = sources.depth;
     // The shadow map of the frame is ready, so the depth pass needs no new one.
     const shadows = renderer.shadowMap.autoUpdate;
     renderer.shadowMap.autoUpdate = false;
-    for (const effect of effects) {
-      effect.visible = false;
+    const hidden = beam ? [...sources.effects, ...beam.parts] : sources.effects;
+    if (beam) {
+      const copy = this.#depthCopy;
+      setUniform(copy.uniforms, 'uSceneDepth', beam.texture);
+      const scale = copy.uniforms['uScale']?.value;
+      if (scale instanceof Vector2) {
+        scale.set(this.#width / depth.width, this.#height / depth.height);
+      }
+      // The copy writes the depth of each pixel of the crop, so the draw of the hall clears
+      // nothing.
+      this.#pass(copy, depth);
+    }
+    for (const object of hidden) {
+      object.visible = false;
     }
     renderer.setRenderTarget(depth);
+    const autoClear = renderer.autoClear;
+    renderer.autoClear = !beam;
     this.#depth.renderDepth(() => {
       renderer.render(scene, camera);
     });
-    for (const effect of effects) {
-      effect.visible = true;
+    renderer.autoClear = autoClear;
+    for (const object of hidden) {
+      object.visible = true;
     }
     renderer.shadowMap.autoUpdate = shadows;
   }
@@ -988,6 +1042,25 @@ export class PostPipeline {
     }
     this.#targets = null;
   }
+}
+
+/**
+ * Creates the copy of the depth of the beam pass into the depth of the depth of field
+ * (`DEPTH_COPY_FRAGMENT`). It writes the depth of each pixel and no color.
+ *
+ * @returns The material.
+ */
+function depthCopyMaterial(): ShaderMaterial {
+  const material = passMaterial(DEPTH_COPY_FRAGMENT, {
+    uSceneDepth: { value: null },
+    uScale: { value: new Vector2(2, 2) },
+  });
+  // A depth test that always passes, because WebGL writes no depth with the test off.
+  material.depthTest = true;
+  material.depthFunc = AlwaysDepth;
+  material.depthWrite = true;
+  material.colorWrite = false;
+  return material;
 }
 
 /**
