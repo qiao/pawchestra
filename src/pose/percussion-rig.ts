@@ -996,21 +996,34 @@ function pairOfPlates(
   {
     const radius = Math.max(rimL.radius, rimR.radius);
     const y = crash.y - hold.drop * model.body.headHeight;
-    let front = Infinity;
-    for (let k = 0; k <= FRONT_POINTS; k++) {
-      const z = trunkFront(model, 0, y - radius + (2 * radius * k) / FRONT_POINTS);
-      if (z !== null) {
-        front = Math.min(front, z);
-      }
-    }
+    const front = frontmostTrunk(model, (k) => y - radius + (2 * radius * k) / FRONT_POINTS);
     const z = Number.isFinite(front) ? front - radius - hold.room : crash.z;
     chest = [crash.x, y, Math.max(z, crash.z)];
   }
   return { sides: [plate(left, rimL, -1), plate(right, rimR, 1)], chest };
 }
 
-/** The number of heights at which {@link fitDrumPlace} measures the front of the trunk. */
+/** The number of steps between the heights at which {@link frontmostTrunk} measures. */
 const FRONT_POINTS = 16;
+
+/**
+ * Gives the most forward point of the front of the trunk on the middle line (`trunkFront()`), at
+ * `FRONT_POINTS + 1` heights.
+ *
+ * @param model The player model.
+ * @param height Gives the height of the step `k`, from 0 to `FRONT_POINTS`, in meters.
+ * @returns The least z of the front, or `Infinity` where the trunk has no front.
+ */
+function frontmostTrunk(model: PlayerModel, height: (k: number) => number): number {
+  let front = Infinity;
+  for (let k = 0; k <= FRONT_POINTS; k++) {
+    const z = trunkFront(model, 0, height(k));
+    if (z !== null) {
+      front = Math.min(front, z);
+    }
+  }
+  return front;
+}
 
 /**
  * Finds the move of a drum on a stand from its bind place to the place that fits the body
@@ -1050,13 +1063,7 @@ function fitDrumPlace(
   const rim = head[2] + radius;
   // The move forward that the trunk needs with the head at a height.
   const forwardAt = (top: number): number => {
-    let front = Infinity;
-    for (let k = 0; k <= FRONT_POINTS; k++) {
-      const z = trunkFront(model, 0, top + (k / FRONT_POINTS) * (high - top));
-      if (z !== null) {
-        front = Math.min(front, z);
-      }
-    }
+    const front = frontmostTrunk(model, (k) => top + (k / FRONT_POINTS) * (high - top));
     return Number.isFinite(front) ? Math.max(0, rim - (front - room)) : 0;
   };
   // The raise grows with the move that the bind place needs, and is full at one room.
