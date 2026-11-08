@@ -20,7 +20,9 @@ The steps:
     Action `bind` of the seat rules of the config (`build_armature()`).
  5. Give the weights by bone heat (Automatic Weights). The arm segments and the helpers take
     their weights by the same bone heat. Then smooth the weights over the mesh edges in a few
-    Laplacian passes, keep the 4 largest weights of each vertex, and normalize them.
+    Laplacian passes, keep the 4 largest weights of each vertex, and normalize them. Each loose
+    part of the mesh other than the largest, such as an eyeball or a whisker of the face, takes
+    the head bone alone (`loose_parts()`): bone heat gives a loose part no sure weights.
  6. Put a pea eye on each old eye, write the facts of the body, and save the file.
 """
 
@@ -194,7 +196,8 @@ def smooth_weights(body, passes, share):
     order = np.argsort(-w, axis=1)
     w[np.arange(n)[:, None], order[:, sa.INFLUENCES :]] = 0.0
     w[w < SMALLEST] = 0.0
-    w /= w.sum(axis=1, keepdims=True)
+    # A vertex with no weight, such as a vertex of a loose part, keeps none.
+    w /= np.maximum(w.sum(axis=1, keepdims=True), SMALLEST)
     for k, group in enumerate(groups):
         group.remove(range(n))
         for i in np.nonzero(w[:, k])[0]:
@@ -211,6 +214,28 @@ def join_source_quads(body):
     bm.free()
     body.data.update()
     return quads
+
+
+def loose_parts(body):
+    """Gives the vertices of each loose part of the mesh other than the largest part."""
+    me = body.data
+    edges = np.empty(len(me.edges) * 2, int)
+    me.edges.foreach_get('vertices', edges)
+    part = np.arange(len(me.vertices))
+
+    def find(i):
+        while part[i] != i:
+            part[i] = part[part[i]]
+            i = part[i]
+        return i
+
+    for a, b in edges.reshape(-1, 2):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            part[max(ra, rb)] = min(ra, rb)
+    roots = np.array([find(i) for i in range(len(part))])
+    largest = np.bincount(roots).argmax()
+    return np.nonzero(roots != largest)[0].tolist()
 
 
 def tone_faces(body, rm, rule):
@@ -290,10 +315,12 @@ def main():
     # 5. Bone heat, then the smooth of the weights.
     empty = sa.skin_mesh(body, rig, auto=True)
     smooth_weights(body, passes, SMOOTH_SHARE)
-    gloss = sorted({v for p in body.data.polygons if p.material_index == 1 for v in p.vertices})
+    gloss = {v for p in body.data.polygons if p.material_index == 1 for v in p.vertices}
+    loose = loose_parts(body)
+    on_head = sorted(gloss | set(loose))
     for group in body.vertex_groups:
-        group.remove(gloss)
-    body.vertex_groups['head'].add(gloss, 1.0, 'REPLACE')
+        group.remove(on_head)
+    body.vertex_groups['head'].add(on_head, 1.0, 'REPLACE')
 
     # 6. The eyes in the bind, the facts of the body, and the file.
     head = sa.action_worlds(rig, bpy.data.actions['bind'])['head']
@@ -318,8 +345,8 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=out)
     print(
         f'simple_rig: wrote {out}: {counts}, {quads} joined quads, {len(rig.data.bones)} bones, '
-        f'{empty} vertices with no bone heat, {passes} smooth passes, {cuts} cuts that add '
-        f'{added} triangles',
+        f'{empty} vertices with no bone heat, {len(loose)} vertices of loose parts on the head, '
+        f'{passes} smooth passes, {cuts} cuts that add {added} triangles',
         flush=True,
     )
 
