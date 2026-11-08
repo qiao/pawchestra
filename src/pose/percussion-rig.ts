@@ -941,8 +941,8 @@ export function kettleOf(pitch: number, kettles: number): number {
 /** The two hands of a pair of hand cymbals, and the crash point of the damp at the chest. */
 interface PlatePair {
   readonly sides: readonly [PercussionSide, PercussionSide];
-  /** The crash point of the damp against the chest, or `null` with no damp. */
-  readonly chest: Vec3 | null;
+  /** The crash point of the damp against the chest. */
+  readonly chest: Vec3;
 }
 
 /**
@@ -956,7 +956,7 @@ interface PlatePair {
  * @param right The right arm.
  * @param inH Gives a vector in head heights in meters.
  * @param targets Gets the crash target as key 0.
- * @returns The left and the right hand, and the crash point of the damp, or `null` with no damp.
+ * @returns The left and the right hand, and the crash point of the damp.
  * @throws Error if a cymbal has no target of its plane of the rim.
  */
 function pairOfPlates(
@@ -973,14 +973,11 @@ function pairOfPlates(
   const plateTurn = toQuat(new Quaternion().setFromAxisAngle(Z_AXIS, CRASH_MOTION.tilt));
   const normal = new Vector3(1, 0, 0).applyQuaternion(new Quaternion(...plateTurn));
   targets.set(0, { point: toVec3(crash), normal: toVec3(normal) });
-  const rim = (bone: 'malletL' | 'malletR'): StrikeTarget & { radius: number } => {
+  const rim = (bone: 'malletL' | 'malletR'): { readonly point: Vec3; readonly radius: number } => {
     const target = findTarget(model, (t) => t.kind === 'plate' && t.bone === bone);
-    const from = bindTarget(model, target).point;
+    const { point } = bindTarget(model, target);
     const to = bindTarget(model, target, target.to).point;
-    return {
-      ...bindTarget(model, target),
-      radius: new Vector3(...from).distanceTo(new Vector3(...to)),
-    };
+    return { point, radius: new Vector3(...point).distanceTo(new Vector3(...to)) };
   };
   const [rimL, rimR] = [rim('malletL'), rim('malletR')];
   const plate = (arm: ArmRig, at: typeof rimL, sign: -1 | 1): PercussionSide => ({
@@ -991,16 +988,15 @@ function pairOfPlates(
     turn: plateTurn,
     radius: at.radius,
   });
-  const hold = PERCUSSION_HOLDS.cymbals.damp;
-  let chest: Vec3 | null = null;
-  {
-    const radius = Math.max(rimL.radius, rimR.radius);
-    const y = crash.y - hold.drop * model.body.headHeight;
-    const front = frontmostTrunk(model, (k) => y - radius + (2 * radius * k) / FRONT_POINTS);
-    const z = Number.isFinite(front) ? front - radius - hold.room : crash.z;
-    chest = [crash.x, y, Math.max(z, crash.z)];
-  }
-  return { sides: [plate(left, rimL, -1), plate(right, rimR, 1)], chest };
+  const damp = PERCUSSION_HOLDS.cymbals.damp;
+  const radius = Math.max(rimL.radius, rimR.radius);
+  const y = crash.y - damp.drop * model.body.headHeight;
+  const front = frontmostTrunk(model, (k) => y - radius + (2 * radius * k) / FRONT_POINTS);
+  const z = Number.isFinite(front) ? front - radius - damp.room : crash.z;
+  return {
+    sides: [plate(left, rimL, -1), plate(right, rimR, 1)],
+    chest: [crash.x, y, Math.max(z, crash.z)],
+  };
 }
 
 /** The number of steps between the heights at which {@link frontmostTrunk} measures. */
