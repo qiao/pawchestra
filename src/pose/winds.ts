@@ -1082,11 +1082,12 @@ const WOLF_CLARINET_FORWARD = 5;
  * tube, the paws lie in front of it and point away from it, with the finger tips 7.6 cm and 8.3 cm
  * from the tube.
  *
- * The muzzle puts the tip of the nose in front of the mouth, so the mouthpiece sits 0.1 H lower and
- * 0.21 H further back than the mouth of the bind pose (`lipShift`), at the dark lips under the
- * muzzle, and goes 0.6 cm into the mouth, as a real clarinetist takes the mouthpiece between the
- * lips (`docs/reference/wind-technique.md` 3). With 0.18 H lower and 0.4 H back, the mouthpiece
- * stood 1.1 cm below the jaw, 8 cm behind the lips. Each shoulder bone turns forward, the right 35°
+ * The mouth of the wolf is at its dark lips under the muzzle (`mouthHeight` of
+ * `tools/studio-body.ts`), and the mouthpiece moves 0.008 H down and 0.037 H back from it
+ * (`lipShift`), so that it goes 0.6 cm into the mouth, as a real clarinetist takes the mouthpiece
+ * between the lips (`docs/reference/wind-technique.md` 3). The hold of the mouth of the rule of the
+ * nose drop, 0.18 H lower and 0.4 H further back, put the mouthpiece 1.1 cm below the jaw, 8 cm
+ * behind the lips. Each shoulder bone turns forward, the right 35°
  * and the left 20°. At 45°, the grips move further forward, out of the reach of the arms.
  *
  * Both elbows point down and a little out, as a seated clarinetist lets the arms hang near the
@@ -1113,7 +1114,7 @@ const WOLF_CLARINET = {
   restArms: null,
   restFreeL: null,
   aimSigns: null,
-  lipShift: [0, -0.1, 0.21],
+  lipShift: [0, -0.008, 0.037],
   play: holdTurn(WOLF_CLARINET_FORWARD, 0),
   restShift: [0.11, -0.64, 0.104],
   restPoleL: [-1.5, -1.4, 0],

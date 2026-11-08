@@ -336,12 +336,11 @@ the facts of its body in its `.blend` ("Hand rig").
 - The mouth lies `MOUTH_DROP` H below the tip of the nose. A body whose nose is far in front of
   its mouth gives the height of its mouth line (`mouthHeight`, a fact of the body), and its mouth
   is then the front of the lips on the middle plane at that height (`mouthOf()`,
-  `StudioBody.mouth`). The pig and the panda take it. Reason: the rule put the pig mouth on the
-  front of the snout disc, and the panda mouth 2 cm in front of the face above its lips, so the
-  mouthpiece did not rest on the lips. A real player rests the mouthpiece on the lips (winds 2.1,
-  2.2). The rule needs faces of the head that cut the middle plane below the line, so a body whose
-  lower jaw follows another bone (the wolf) places its mouthpiece with the move of its hold
-  (`WindHold.lipShift`, 5.3).
+  `StudioBody.mouth`). The pig, the panda, and the wolf take it. Reason: the rule put the pig
+  mouth on the front of the snout disc, and the panda and the wolf mouths 2 cm to 2.5 cm in front
+  of the face above their lips, so the mouthpiece did not rest on the lips. A real player rests
+  the mouthpiece on the lips (winds 2.1, 2.2). The cut takes only the faces with all corners on
+  the head, so a line in a band of faces that blend into the neck finds no lips.
 - **Scale.** The scale keeps a landmark that the scene depends on: the shoulders of the bear for
   the conductor stand, and the shoulders, the ear tips, or the head top at the chosen size for
   each other body. A longer leg raises the landmark, so the trunk, the head, and the arms keep

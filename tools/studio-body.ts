@@ -443,6 +443,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_WOLF',
       crease: 35,
+      // The dark lips under the muzzle, on a cut of the head with the middle plane. The rule of the
+      // nose drop put the mouth on the black nose, 2.5 cm in front of the face and 3.8 cm above the
+      // lips. Above this height, the cut of the lower jaw has no faces of the head alone.
+      mouthHeight: 0.675,
       eyeLevel: true,
       glb: 'assets/models/wolf/wolf.rig.glb',
     },

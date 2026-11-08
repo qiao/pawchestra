@@ -375,7 +375,7 @@ old arm bones hold no skin and only drive the new bones. `armSegments` of the co
   `headFloor`, and `headCeiling`.
 - The mouth rule drops from the tip of the nose, so a snout disc puts the mouth on the disc, in
   front of the lips. Read the crease between the lips on a cut of the head with the middle plane,
-  and give its height (`mouthHeight`, the pig and the panda). The crease is the deepest point
+  and give its height (`mouthHeight`, the pig, the panda, the wolf). The crease is the deepest point
   of the front profile, and a dark lip color often marks it.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
