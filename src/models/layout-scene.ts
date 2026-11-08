@@ -2272,6 +2272,19 @@ function chosenHeights(
 }
 
 /**
+ * Calculates the packed arc from each player of a row to its right neighbor ({@link spacingSteps}).
+ *
+ * @param row The row.
+ * @returns The arcs, in radians, with 0 for the rightmost player.
+ */
+function packedArcs(row: FittedRow): number[] {
+  return row.members.map((m, i) => {
+    const right = row.members[i + 1];
+    return right ? runAll(spacingSteps(m, right, row.radius)) / row.radius : 0;
+  });
+}
+
+/**
  * Places each row so that each player sees the head and the baton paw of the conductor (design
  * 4.5, seat geometry), from the front row to the back row. {@link sightSweepSteps} moves the
  * players along the row. From row 2, each seat group with a blocked player then rises by
@@ -2330,10 +2343,7 @@ function* sightRowsSteps(
       behind,
     );
     const blockers = blockersOf(soloists, done);
-    const arcs = row.members.map((m, i) => {
-      const right = row.members[i + 1];
-      return right ? runAll(spacingSteps(m, right, row.radius)) / row.radius : 0;
-    });
+    const arcs = packedArcs(row);
     // The items around the row that a riser must not go into: the fixed items, the items and
     // the risers of the rows in front, and the items of the rows behind.
     const around = [
@@ -2516,10 +2526,7 @@ function* sightRowsSteps(
     first: RowSight,
   ): Steps<{ front: FittedRow; back: RowSight }> {
     const packedFront = packed.find((r) => r.row === front.row);
-    const arcs = front.members.map((m, i) => {
-      const right = front.members[i + 1];
-      return right ? runAll(spacingSteps(m, right, front.radius)) / front.radius : 0;
-    });
+    const arcs = packedArcs(front);
     const clearance = clearanceOf(fixed, soloPianos, [], rows.slice(at + 1));
     const frontBlind = (placement: RowPlacement): number => {
       const bodies = placement.players.map((p) => p.obstacle);
