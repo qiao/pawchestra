@@ -81,14 +81,14 @@ const SET_MOTION = {
  * @param starts The starts of the strikes of the player, sorted.
  * @param beats The times of the conducted beats, sorted.
  * @param after The end of the move of the hands after each strike, such as a damp, in the order
- *   of `starts`. The lowering starts there. With no value, it starts at the strike.
+ *   of `starts`. The lowering starts there. A strike with no value starts it at the strike.
  * @returns Four times for each rest: the start and the end of the lowering, and the start and the
  *   end of the lift. A rest with no lowering or no lift has infinite times there.
  */
 function setRests(
   starts: readonly number[],
   beats: Float64Array,
-  after: readonly number[] = [],
+  after: readonly number[],
 ): Float64Array {
   const m = SET_MOTION;
   const beat = (time: number): number => beatSecAt(beats, time) || m.beatSec;
