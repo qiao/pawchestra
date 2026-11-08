@@ -598,8 +598,11 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
  * lengths are in head heights `H`.
  */
 export const CRASH_MOTION = {
-  /** The tilt of both plates from vertical around the forward axis, in radians. */
-  tilt: 30 * MathUtils.DEG2RAD,
+  /**
+   * The tilt of both plates from vertical around the forward axis, in radians. With 30°, the
+   * raised right plate went 3.4 cm into the right shoulder of the wolf (1.7 cm with no tilt).
+   */
+  tilt: 15 * MathUtils.DEG2RAD,
   /** The full slide of the right plate along its face, from the top of the lift to the rebound. */
   slide: 0.1,
   /** The share of the slide of the right plate that the left plate makes the other way. */
@@ -607,8 +610,9 @@ export const CRASH_MOTION = {
   /** The rise of the crash point from the softest to the loudest crash (`gestureSize()`). */
   raise: 0.15,
   /**
-   * The turn of each inner face out to the front after a crash, in radians. Each plate turns
-   * around its back rim, as a door on its hinge, so that the back rims do not meet.
+   * The turn of each inner face out to the front after a crash, in radians. Each plate also moves
+   * out by the swing of its back rim, so that the back rims do not meet and the plates do not move
+   * back toward the body, as a turn around the back rim moves them.
    */
   ringTurn: 45 * MathUtils.DEG2RAD,
   /** The turn of each inner face up after a crash, in radians. */

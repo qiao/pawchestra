@@ -849,8 +849,8 @@ function malletHand(
  * {@link CRASH_MOTION}). The rims of the two plates meet at the crash point at the note start, and
  * part along the crash normal by the height of the strike state. The plates slide along their
  * faces by the slide of the strike state: the right plate down past the left plate, and the left
- * plate up by a share. After a crash, each plate turns out to the front and up around its back
- * rim, parts further, and rises, by the follow weight and the loudness. At a damp, the crash point
+ * plate up by a share. After a crash, each plate turns out to the front and up, parts further,
+ * and rises, by the follow weight and the loudness. At a damp, the crash point
  * goes to the chest, and the plates close. The function writes the module vectors `wrist` and
  * `turn`.
  *
@@ -883,9 +883,9 @@ function plateHand(
   head
     .addScaledVector(normal, side.sign * (hand.height * (1 - closed) + c.ringOpen * h * follow))
     .addScaledVector(along, slide);
-  // Each plate turns around its back rim, so its middle moves out and back.
+  // Each plate turns around its middle and moves out by the swing of its back rim, so that the
+  // back rims do not meet and the plates do not come back to the body.
   head.addScaledVector(normal, side.sign * side.radius * Math.sin(turnOut));
-  head.z += side.radius * (1 - Math.cos(turnOut));
   head.y += c.ringLift * h * follow;
   // The turn out around the vertical, after the turn up around the forward axis, after the tilt.
   swing.setFromAxisAngle(UP, -side.sign * turnOut);

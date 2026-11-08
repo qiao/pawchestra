@@ -519,7 +519,7 @@ The rest of each family:
   plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
   plates slide on past each other, the right plate down and the left plate up by a share
   (`StrikeState.slide`). A louder crash meets higher. After a crash, each plate turns out to the
-  front and up around its back rim, parts, and rises, by the loudness, until the damp or the next
+  front and up, parts, and rises, by the loudness, until the damp or the next
   lift (`ringTrack()`). A crash with no time for it goes to the chest at once. Reason: a real crash
   is a glancing blow as a flam, and a long crash turns out to the hall (percussion 7). The target
   is the plane of the rim, because the rims of two plates meet first.

@@ -349,7 +349,7 @@ The app does not follow these facts:
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`). The plate has no
   muffling.
 - **The hand cymbals (section 7).** The plates stay parallel at the crash, with no angle of a
-  flam between them [60] [61], and tilt 30° from vertical. No concert source gives the rest place:
+  flam between them [60] [61], and tilt 15° from vertical [16]. No concert source gives the rest place:
   in a long rest, the arms hang with the plates at the sides, as a marching method holds them
   [24].
 - **The xylophone grip (section 9).** The paws hang low in front of the belly, so each shaft runs
