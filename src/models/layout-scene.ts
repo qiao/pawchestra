@@ -821,14 +821,7 @@ function rowExtent(row: RowPlacement): RowExtent {
   let from = Infinity;
   let to = -Infinity;
   for (const b of obstaclesOfRow(row).flatMap((o) => o.boxes)) {
-    for (const [sx, sz] of [
-      [-1, -1],
-      [-1, 1],
-      [1, -1],
-      [1, 1],
-    ] as const) {
-      const x = b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin;
-      const z = b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos;
+    for (const [x, z] of boxCorners(b)) {
       const r = Math.hypot(x, z);
       const angle = Math.atan2(x, -z);
       inner = Math.min(inner, r);
@@ -1217,6 +1210,34 @@ interface StageSize {
   readonly front: number;
 }
 
+/** Calculates the half extent of a placed box along x of the stage. */
+function reachX(b: PlacedBox): number {
+  return b.halfX * Math.abs(b.cos) + b.halfZ * Math.abs(b.sin);
+}
+
+/** Calculates the half extent of a placed box along z of the stage. */
+function reachZ(b: PlacedBox): number {
+  return b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos);
+}
+
+/**
+ * Lists the four corners of a placed box in the plane of the stage.
+ *
+ * @param b The box.
+ * @returns The x and the z of each corner.
+ */
+function boxCorners(b: PlacedBox): (readonly [x: number, z: number])[] {
+  return ([-1, 1] as const).flatMap((sx) =>
+    ([-1, 1] as const).map(
+      (sz) =>
+        [
+          b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin,
+          b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos,
+        ] as const,
+    ),
+  );
+}
+
 /**
  * Calculates the stage side and the front distance of a draft (design 4.5, stage origin). The
  * half width `L` is the largest `|x|` of a seat plus 0.5 m for the chair and 0.3 m of margin, or
@@ -1228,8 +1249,6 @@ interface StageSize {
 function stageOf(draft: Draft): StageSize {
   const seats = draft.players.filter((p): p is PlayerPlace => p !== undefined);
   const boxes = draft.obstacles.flatMap((o) => o.boxes);
-  const reachX = (b: PlacedBox): number => b.halfX * Math.abs(b.cos) + b.halfZ * Math.abs(b.sin);
-  const reachZ = (b: PlacedBox): number => b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos);
   const halfWidth = Math.max(
     ...seats.map((p) => Math.abs(p.position[0]) + CHAIR_ROOM + EDGE_MARGIN),
     ...boxes.map((b) => Math.abs(b.x) + reachX(b) + EDGE_MARGIN),
@@ -1293,11 +1312,7 @@ function placeSoloist(member: Member): PlacedPlayer & { readonly front: number }
     return placePiano(member);
   }
   const soloist = placeAt(member, [SOLOIST_PLACE[0], 0, SOLOIST_PLACE[1]], SOLOIST_FACING);
-  const front = Math.max(
-    ...soloist.obstacle.boxes.map(
-      (b) => b.z + b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos),
-    ),
-  );
+  const front = Math.max(...soloist.obstacle.boxes.map((b) => b.z + reachZ(b)));
   return { ...soloist, front };
 }
 
@@ -1385,23 +1400,18 @@ function chamberStage(
 ): ChamberStage {
   const low = [Infinity, Infinity];
   const high = [-Infinity, -Infinity];
-  const add = (x: number, z: number, reachX: number, reachZ: number): void => {
-    low[0] = Math.min(low[0] ?? 0, x - reachX);
-    low[1] = Math.min(low[1] ?? 0, z - reachZ);
-    high[0] = Math.max(high[0] ?? 0, x + reachX);
-    high[1] = Math.max(high[1] ?? 0, z + reachZ);
+  const add = (x: number, z: number, rx: number, rz: number): void => {
+    low[0] = Math.min(low[0] ?? 0, x - rx);
+    low[1] = Math.min(low[1] ?? 0, z - rz);
+    high[0] = Math.max(high[0] ?? 0, x + rx);
+    high[1] = Math.max(high[1] ?? 0, z + rz);
   };
   const seat = CHAIR_ROOM + EDGE_MARGIN;
   for (const p of players) {
     add(p.place.position[0], p.place.position[2], seat, seat);
   }
   for (const b of [...players, ...stands].flatMap((p) => p.obstacle.boxes)) {
-    add(
-      b.x,
-      b.z,
-      b.halfX * Math.abs(b.cos) + b.halfZ * Math.abs(b.sin) + EDGE_MARGIN,
-      b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos) + EDGE_MARGIN,
-    );
+    add(b.x, b.z, reachX(b) + EDGE_MARGIN, reachZ(b) + EDGE_MARGIN);
   }
   const [x0 = 0, z0 = 0] = low;
   const [x1 = 0, z1 = 0] = high;
@@ -1505,16 +1515,7 @@ const SPREAD_STEP = 0.02;
 export function boxOnStage(b: PlacedBox, stage: StageSize, margin = EDGE_MARGIN): boolean {
   // The z of the stage center, relative to the podium center.
   const center = stage.front - stage.side / 2;
-  return [-1, 1].every((sx) =>
-    [-1, 1].every((sz) =>
-      keepsStageMargin(
-        b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin,
-        b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos - center,
-        stage.side,
-        margin,
-      ),
-    ),
-  );
+  return boxCorners(b).every(([x, z]) => keepsStageMargin(x, z - center, stage.side, margin));
 }
 
 /**
