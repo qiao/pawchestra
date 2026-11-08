@@ -167,6 +167,24 @@ export const RISER = {
    * the nosing of a stair tread (IBC 1011.5.5 asks for 3/4 in to 1 1/4 in), in meters.
    */
   lip: { overhang: 0.025, height: 0.04 },
+  /**
+   * The rails of the risers, of square posts and bars in the dark metal of the music stands. Real
+   * riser back rails and stage guard rails are 42 in (1.07 m) high, and stair hand rails 34 in to
+   * 38 in. The penguins are about 0.6 of the height of a person, so the rails here are about 0.6 of
+   * these heights, as the low rail behind the choir in `orchestra-latest.png`.
+   */
+  rail: {
+    /** The height of the top bar above the tread, in meters. */
+    height: 0.65,
+    /** The height of the hand rail of a stair above its treads, in meters. */
+    hand: 0.55,
+    /** The side of a post, in meters. */
+    post: 0.04,
+    /** The side of a bar, in meters. */
+    bar: 0.03,
+    /** The distance of the middle of a post from the edge of its tread, in meters. */
+    inset: 0.04,
+  },
   /** The widest board of a tread, in meters. A dark line divides a deeper tread into boards. */
   board: 0.4,
   /**
@@ -555,6 +573,52 @@ function addFace(
 }
 
 /**
+ * Adds one straight rail part of the risers between two points: a post or a bar with a square
+ * section, in the dark metal of the music stands. A post turns one side to the podium center,
+ * and a bar keeps two sides level.
+ *
+ * @param builder The builder.
+ * @param from The middle of one end.
+ * @param to The middle of the other end.
+ * @param size The side of the square section, in meters.
+ * @param podium The podium center.
+ */
+function addRailPart(builder: MeshBuilder, from: Vec3, to: Vec3, size: number, podium: Vec3): void {
+  const start = new Vector3(...from);
+  const end = new Vector3(...to);
+  const along = end.clone().sub(start).normalize();
+  const across =
+    Math.abs(along.y) > 0.99
+      ? new Vector3(from[0] - podium[0], 0, from[2] - podium[2])
+      : new Vector3(0, 1, 0).cross(along);
+  across.normalize();
+  const up = along.clone().cross(across);
+  const corner = (p: Vector3, s: number, u: number): Vec3 =>
+    toVec3(
+      p
+        .clone()
+        .addScaledVector(across, (s * size) / 2)
+        .addScaledVector(up, (u * size) / 2),
+    );
+  const ring = (p: Vector3) =>
+    [corner(p, 1, 1), corner(p, -1, 1), corner(p, -1, -1), corner(p, 1, -1)] as const;
+  const [a0, b0, c0, d0] = ring(start);
+  const [a1, b1, c1, d1] = ring(end);
+  const inside = toVec3(start.clone().add(end).multiplyScalar(0.5));
+  const color = SCENE_COLORS.stand;
+  for (const face of [
+    [a0, b0, b1, a1],
+    [b0, c0, c1, b1],
+    [c0, d0, d1, c1],
+    [d0, a0, a1, d1],
+    [a0, b0, c0, d0],
+    [a1, b1, c1, d1],
+  ] as const) {
+    addFace(builder, face, inside, color);
+  }
+}
+
+/**
  * Adds one level of the choir risers (design 4.5): the tread with its boards, the nosing lip at
  * its front, the face under the lip, and the two end panels. The face under the lip of a higher
  * level is a riser face of wood from the tread in front of it. The lowest level has a dark skirt
@@ -712,6 +776,24 @@ function addRiserStairs(builder: MeshBuilder, level: RiserLevel, podium: Vec3): 
       if (last) {
         addFace(builder, face(open, wall, d1, d1, 0, top), body, STAGE_COLORS.skirt);
       }
+    }
+    // The hand rail on the open side: a post on the first step, a post at each end of the
+    // landing, and a bar on them that follows the nosings, then the landing.
+    const { hand, post, bar, inset } = RISER.rail;
+    const r = open + inset;
+    const turn = (count - 1) * tread;
+    const posts = [
+      at(r, tread / 2, level.height / count),
+      at(r, turn + inset, level.height),
+      at(r, turn + landing - inset, level.height),
+    ];
+    let previous: Vec3 | null = null;
+    for (const [x, y, z] of posts) {
+      addRailPart(builder, [x, y, z], [x, y + hand + bar / 2, z], post, podium);
+      if (previous) {
+        addRailPart(builder, previous, [x, y + hand, z], bar, podium);
+      }
+      previous = [x, y + hand, z];
     }
   }
 }
