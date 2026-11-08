@@ -1055,6 +1055,10 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Move `shareCorners()` and `createDepthGeometry()` out of the main thread, into the build or
       a Worker: about 75 ms of the build of `perf-60.mid` on the development Mac, in steps.
 - [ ] Cut `poseStudioBones()`: about 0.5 ms of each frame for the 55 bodies of `perf-60.mid`.
+- [ ] Draw the scene depth one time in each frame. When the depth of field is on, the blur draws a
+      second depth pass of the scene (`PostPipeline` in `post.ts`) next to the depth of the beam.
+      If the blur reads the beam depth, the hall has no depth, so the blur of the hall changes.
+      Measure the GPU time with `pnpm frame` before a change (audit of 2026-11-08, finding 6).
 - [ ] Compile the shaders before the first frame with no block (`compileAsync()`): `setProgram()`
       takes about 335 ms in the first frame of the default demo. The first frame stays the same.
 - [ ] Cut the frame cost of the cinematic light: about 0.67 ms in each frame of `perf-60.mid`,
