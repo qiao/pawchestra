@@ -1164,7 +1164,9 @@ const MONKEY_TRUMPET = {
  * muzzle puts the mouthpiece 0.51 m in front of the shoulder joints, so the lead pipe of the tuba
  * is longer (`SpeciesParams.tubaPipe`), the right shoulder turns 45° forward, and the left
  * shoulder 40°, as the shoulder blades of a real player slide forward. The lower end of the tuba
- * turns 25° to the right, so that the bell stands at the left of the horn on the muzzle. The
+ * turns 25° to the right, so that the bell stands at the left of the horn on the muzzle, and 4°
+ * forward, so that the body of the tuba stays off the round belly (0.2 cm, against 1.5 cm with no
+ * forward turn). The
  * elbows point down and out, a little more down than out (`poleL`, `poleR`, `restPoleL`,
  * `restPoleR`), as the arms of a real player stay away from the rib cage
  * (`docs/reference/wind-technique.md` 1.8) and each forearm stays in its range of turn. With the
@@ -1191,15 +1193,16 @@ const MONKEY_TRUMPET = {
  * (`gripShiftR`), so that the right paw lies on the valve tops at the front right of the valve
  * branch, where it shows from the front and from the right front. On the grip of the instrument,
  * the valve branch hides it from both views. A grip further forward is out of the reach of the arm.
- * The mesh has a round belly, so the mouthpiece moves 0.05 H from the mouth along -z of the head
- * under the long muzzle (`lipShift`): with no shift, the tuba goes 4.6 cm into the belly, and with
- * the shift 2.7 cm.
+ * The mouthpiece rim rests on the lips, as the rim of a real tubist
+ * (`docs/reference/wind-technique.md` 3): it moves 0.013 H up and 0.022 H back from the mouth of
+ * the body (`lipShift`), so that its top lies on the upper lip and the rim presses the lips 0.2 cm.
+ * At the mouth, the rim stood 2.4 cm in front of the lips.
  */
 const RHINO_TUBA = {
   ...WIND_HOLDS.tuba,
   reach: 45 * MathUtils.DEG2RAD,
   reachL: 40 * MathUtils.DEG2RAD,
-  play: holdTurn(0, 25),
+  play: holdTurn(4, 25),
   poleL: [-0.75, -1, 0],
   poleR: [0.75, -1, 0],
   rest: holdTurn(5, 20),
@@ -1211,7 +1214,7 @@ const RHINO_TUBA = {
   restGripShiftL: [0.07, 0.14, 0.05],
   restAim: 1,
   gripCurl: curls(92, 80),
-  lipShift: [0, 0, -0.05],
+  lipShift: [0, 0.013, 0.022],
 } as const satisfies WindHold;
 
 /**
