@@ -2197,9 +2197,7 @@ interface RowSight {
   readonly worst: number;
 }
 
-/**
- * The moves of row 0 for the sight of the back desks ({@link sightRowsSteps}).
- */
+/** The moves of row 0 for the sight of the back desks ({@link moveFrontSteps}). */
 const FRONT_MOVES = {
   /** The largest number of rounds of the greedy search. */
   rounds: 4,
@@ -2284,370 +2282,547 @@ function packedArcs(row: FittedRow): number[] {
   });
 }
 
-/**
- * Places each row so that each player sees the head and the baton paw of the conductor (design
- * 4.5, seat geometry), from the front row to the back row. {@link sightSweepSteps} moves the
- * players along the row. From row 2, each seat group with a blocked player then rises by
- * {@link ROW_RISER}.step, up to its largest height, and the players move again. Each group takes
- * the lowest height with its fewest blocked players. A try with a riser that does not fit on the
- * stage is not valid. The strings sit on the stage top. After row 1, the players of row 0 move
- * for the back desks ({@link FRONT_MOVES}). The moves keep the gaps, the stage, and the limits of
- * the spread. When a back desk stays blocked and loses at least {@link OPEN_GAP_HIDDEN} of the
- * conductor, row 1 tries again with the gap of the conductor open: its inner players can pass 0°,
- * and the view of the audience counts in the cost. The row keeps this try only when it has fewer
- * blocked players.
- *
- * @param rows The rows after the spread, from the front.
- * @param fixed The obstacles that do not move: the podium with the conductor, the soloist, the
- *   risers, and the singers.
- * @param soloists The obstacles of the soloists. They are also in `fixed`.
- * @param soloPianos The obstacles of the piano soloists. They are also in `fixed`.
- * @param stage The stage side and the front distance.
- * @param targets The points of the conductor.
- * @param packed The rows before the spread. Row 0 keeps the packed gap of the conductor.
- * @returns The steps, which return the rows with their risers.
- */
-function* sightRowsSteps(
-  rows: readonly FittedRow[],
-  fixed: readonly Obstacle[],
-  soloists: readonly Obstacle[],
-  soloPianos: readonly Obstacle[],
-  stage: StageSize,
-  targets: SightTargets,
-  packed: readonly FittedRow[],
-): Steps<SeenRow[]> {
+/** The inputs of the sight pass that stay the same for each row ({@link sightRowsSteps}). */
+interface SightPass {
+  /** The rows after the spread, from the front. */
+  readonly rows: readonly FittedRow[];
+  /** The rows before the spread. Row 0 keeps the packed gap of the conductor. */
+  readonly packed: readonly FittedRow[];
   /**
-   * Places one row behind the rows that are done.
-   *
-   * @param row The row after the spread.
-   * @param n The index of the row in `rows`.
-   * @param done The rows in front, after their sight pass.
-   * @param memo The known sights of the players of the row, or `null`.
-   * @param open True if a row that stays blocked can also try the gap of the conductor.
-   * @returns The steps, which return the row with its risers, its cost, and its blocked players.
+   * The obstacles that do not move: the podium with the conductor, the soloist, the risers, and
+   * the singers.
    */
-  const seeRow = function* (
-    row: FittedRow,
-    n: number,
-    done: readonly SeenRow[],
-    memo: SightMemo | null,
-    open = false,
-  ): Steps<RowSight> {
-    const behind = rows.slice(n + 1);
-    const placedRows = done.map((d) => d.row.placement);
-    const doneRisers = done.flatMap((d) => d.risers.map((r) => rowRiserObstacle(r, CENTER)));
-    const clearance = clearanceOf(
-      fixed,
-      soloPianos,
+  readonly fixed: readonly Obstacle[];
+  /** The obstacles of the soloists. They are also in `fixed`. */
+  readonly soloists: readonly Obstacle[];
+  /** The obstacles of the piano soloists. They are also in `fixed`. */
+  readonly soloPianos: readonly Obstacle[];
+  /** The stage side and the front distance. */
+  readonly stage: StageSize;
+  /** The points of the conductor. */
+  readonly targets: SightTargets;
+}
+
+/** One row in its sight pass, with the items around it ({@link rowSearchOf}). */
+interface RowSearch {
+  /** The inputs of the pass. */
+  readonly pass: SightPass;
+  /** The row after the spread. */
+  readonly row: FittedRow;
+  /** The items that the row keeps clear of. */
+  readonly clearance: RowClearance;
+  /** The items in front of the row that can hide the conductor. */
+  readonly blockers: SightBlockers;
+  /** The packed arc from each player to its right neighbor, in radians ({@link packedArcs}). */
+  readonly arcs: readonly number[];
+  /**
+   * The items around the row that a riser must not go into: the fixed items, the items and the
+   * risers of the rows in front, and the items of the rows behind.
+   */
+  readonly around: readonly Obstacle[];
+  /** The players of each seat group ({@link seatGroups}). */
+  readonly groups: readonly (readonly number[])[];
+  /** The index of the seat group of each player. */
+  readonly groupIndex: readonly number[];
+  /** The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or `null`. */
+  readonly view: number | null;
+  /**
+   * The smallest angle of a back desk player from 0°, or `null` for the other rows: the angle of
+   * the inner first desks, so that a desk fits into the gap between two players of row 0.
+   */
+  readonly inner: number | null;
+  /** The known sights of the players of the row, or `null`. */
+  readonly memo: SightMemo | null;
+}
+
+/**
+ * Gives a row in its sight pass with the items around it.
+ *
+ * @param pass The inputs of the pass.
+ * @param row The row after the spread.
+ * @param n The index of the row in `pass.rows`.
+ * @param done The rows in front, after their sight pass.
+ * @param memo The known sights of the players of the row, or `null`.
+ * @returns The search of the row.
+ */
+function rowSearchOf(
+  pass: SightPass,
+  row: FittedRow,
+  n: number,
+  done: readonly SeenRow[],
+  memo: SightMemo | null,
+): RowSearch {
+  const behind = pass.rows.slice(n + 1);
+  const front = done.find((d) => d.row.row === 0)?.row;
+  const groups = seatGroups(row.members);
+  return {
+    pass,
+    row,
+    clearance: clearanceOf(
+      pass.fixed,
+      pass.soloPianos,
       done.map((d) => d.row),
       behind,
-    );
-    const blockers = blockersOf(soloists, done);
-    const arcs = packedArcs(row);
-    // The items around the row that a riser must not go into: the fixed items, the items and
-    // the risers of the rows in front, and the items of the rows behind.
-    const around = [
-      ...fixed,
-      ...placedRows.flatMap(obstaclesOfRow),
-      ...doneRisers,
+    ),
+    blockers: blockersOf(pass.soloists, done),
+    arcs: packedArcs(row),
+    around: [
+      ...pass.fixed,
+      ...done.flatMap((d) => obstaclesOfRow(d.row.placement)),
+      ...done.flatMap((d) => d.risers.map((r) => rowRiserObstacle(r, CENTER))),
       ...behind.flatMap((r) => obstaclesOfRow(r.placement)),
-    ];
-    const groups = seatGroups(row.members);
-    const groupIndex = row.members.map((_, i) => groups.findIndex((g) => g.includes(i)));
-    const extents = groupExtents(row.members, row.placement, groups);
-    const view = row.row >= AUDIENCE.firstRow ? stage.side : null;
-    // The back desks can move into the gap of the conductor up to the inner first desks, so
-    // that a desk fits into the gap between two players of the first row.
-    const front = done.find((d) => d.row.row === 0)?.row;
-    const inner =
-      row.row === BACK_DESK_ROW && front ? Math.min(...front.angles.map((a) => Math.abs(a))) : null;
-    // The seat groups from row 2 can rise.
-    const rises = row.row >= ROW_RISER.firstRow;
+    ],
+    groups,
+    groupIndex: row.members.map((_, i) => groups.findIndex((g) => g.includes(i))),
+    view: row.row >= AUDIENCE.firstRow ? pass.stage.side : null,
+    inner:
+      row.row === BACK_DESK_ROW && front ? Math.min(...front.angles.map((a) => Math.abs(a))) : null,
+    memo,
+  };
+}
 
-    // With `gap`, the back desks can also pass 0° into the gap of the conductor.
-    const attempt = function* (levels: readonly number[], gap = false): Steps<SightTry> {
-      const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = gap
-        ? yield* sightSweepSteps(
-            { ...row, split: false },
-            heights,
-            arcs,
-            targets,
-            blockers,
-            stage.side,
-            null,
-            null,
-          )
-        : yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
-      let placement = placeRow(row.members, angles, row.radius, heights);
-      if (!withinSpread(angles) || !rowFits(placement, clearance, stage)) {
-        angles = [...row.angles];
-        placement = placeRow(row.members, angles, row.radius, heights);
-      }
-      const bodies = placement.players.map((p) => p.obstacle);
-      const stands = [...blockers.stands, ...placement.stands.map((p) => p.obstacle)];
-      // A player of a raised row that the audience does not see counts as blocked, so that its
-      // group rises.
-      let cost = 0;
-      let worst = 0;
-      const blind = row.members.map((member, i) => {
-        const place = placement.players[i]?.place;
-        if (place === undefined) {
-          return false;
-        }
-        const others = {
-          solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)],
-          stands,
-        };
-        const seen = sightOf(member.sight, place, targets, others);
-        const hidden = view === null ? 0 : audienceShare(member.sight, place, others.solid, view);
-        cost += sightCost(seen) + 300 * hidden;
-        worst = Math.max(worst, seen.hidden);
-        return seen.sight === 2 || hidden >= AUDIENCE.hidden;
-      });
-      // A row with no raised group has no riser to check.
-      const raised = levels.some((h) => h > 0);
-      const placed = raised ? groupExtents(row.members, placement, groups) : [];
-      const own = levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null));
-      const owners = raised ? standGroups(row.members, placement, groups) : [];
-      const items = raised
-        ? [
-            ...placement.players.map((p, i) => ({
-              obstacle: p.obstacle,
-              group: groupIndex[i] ?? -1,
-            })),
-            ...placement.stands.map((p, j) => ({
-              obstacle: p.obstacle,
-              group: owners[j] ?? -1,
-            })),
-          ]
-        : [];
-      return {
-        cost,
-        blind: blind.flatMap((b, i) => (b ? [i] : [])),
-        worst,
+/**
+ * Finds the sight of each player of a row at its place, past the rows in front and the other
+ * players of the row. A player of a raised row that the audience does not see counts as blocked,
+ * so that its group rises.
+ *
+ * @param search The row and the items around it.
+ * @param placement The places of the row.
+ * @returns The sum of the costs ({@link sightCost}), the largest hidden share of the head and the
+ *   baton paw of a player, and true for each blocked player.
+ */
+function rowSightOf(
+  search: RowSearch,
+  placement: RowPlacement,
+): Pick<SightTry, 'cost' | 'worst'> & { readonly blind: readonly boolean[] } {
+  const { row, blockers, view } = search;
+  const bodies = placement.players.map((p) => p.obstacle);
+  const stands = [...blockers.stands, ...placement.stands.map((p) => p.obstacle)];
+  let cost = 0;
+  let worst = 0;
+  const blind = row.members.map((member, i) => {
+    const place = placement.players[i]?.place;
+    if (place === undefined) {
+      return false;
+    }
+    const others = {
+      solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)],
+      stands,
+    };
+    const seen = sightOf(member.sight, place, search.pass.targets, others);
+    const hidden = view === null ? 0 : audienceShare(member.sight, place, others.solid, view);
+    cost += sightCost(seen) + 300 * hidden;
+    worst = Math.max(worst, seen.hidden);
+    return seen.sight === 2 || hidden >= AUDIENCE.hidden;
+  });
+  return { cost, worst, blind };
+}
+
+/**
+ * Gives the risers of the raised seat groups of a row at the places of its players
+ * ({@link groupRiser}), and where they go into an item ({@link riserContact}). A row with no
+ * raised group has no riser to check.
+ *
+ * @param search The row and the items around it.
+ * @param placement The places of the row.
+ * @param levels The height of each seat group.
+ * @returns The joined risers, the lift of each group, and true for a contact.
+ */
+function groupRisersOf(
+  search: RowSearch,
+  placement: RowPlacement,
+  levels: readonly number[],
+): Pick<SightTry, 'risers' | 'lifts' | 'contact'> {
+  const { row, groups, groupIndex } = search;
+  const raised = levels.some((h) => h > 0);
+  const placed = raised ? groupExtents(row.members, placement, groups) : [];
+  const own = levels.map((h, k) =>
+    h > 0 ? groupRiser(row, placed, k, h, search.pass.stage) : null,
+  );
+  const owners = raised ? standGroups(row.members, placement, groups) : [];
+  const items = raised
+    ? [
+        ...placement.players.map((p, i) => ({ obstacle: p.obstacle, group: groupIndex[i] ?? -1 })),
+        ...placement.stands.map((p, j) => ({ obstacle: p.obstacle, group: owners[j] ?? -1 })),
+      ]
+    : [];
+  return {
+    risers: joinRisers(own),
+    ...riserContact(own, items, groups.length, search.around, levels),
+  };
+}
+
+/**
+ * Places a row with its seat groups at given heights, in steps. {@link sightSweepSteps} moves the
+ * players along the row. A sweep that leaves the limits of the spread, the stage, or the gaps
+ * keeps the spread angles.
+ *
+ * @param search The row and the items around it.
+ * @param levels The height of each seat group.
+ * @param gap True if the back desks can also pass 0° into the gap of the conductor. The view of
+ *   the audience then counts in the cost of the sweep.
+ * @returns The steps, which return the try.
+ */
+function* trySteps(search: RowSearch, levels: readonly number[], gap = false): Steps<SightTry> {
+  const { row, arcs, blockers, groups, groupIndex } = search;
+  const { stage, targets } = search.pass;
+  const heights = groupIndex.map((k) => levels[k] ?? 0);
+  let angles = gap
+    ? yield* sightSweepSteps(
+        { ...row, split: false },
         heights,
-        angles,
-        placement,
-        risers: joinRisers(own),
-        blocked: groups.map((g) => g.filter((i) => blind[i]).length),
-        ...riserContact(own, items, groups.length, around, levels),
-      };
-    };
-
-    // The rows rise toward the back: a group starts at the height of the risers in front of it.
-    const fronts = done.flatMap((d) => d.risers);
-    const levels = extents.map((extent) =>
-      rises
-        ? Math.max(
-            0,
-            ...fronts.filter((r) => r.from < extent.to && r.to > extent.from).map((r) => r.height),
-          )
-        : 0,
-    );
-    const tries: SightTry[] = [];
-    for (;;) {
-      const next = yield* attempt(levels);
-      tries.push(next);
-      let raised = false;
-      next.blocked.forEach((count, k) => {
-        const level = levels[k] ?? 0;
-        const lift = next.lifts[k] ?? 0;
-        if (rises && lift > level + 1e-9) {
-          levels[k] = lift;
-          raised = true;
-        } else if (count > 0 && rises && level + ROW_RISER.step <= riserTop(row.row) + 1e-9) {
-          levels[k] = Math.round((level + ROW_RISER.step) * 1000) / 1000;
-          raised = true;
-        }
-      });
-      if (!raised) {
-        break;
-      }
-    }
-    const chosen = chosenHeights(tries, groups);
-    // A try with the chosen heights gives the same try again.
-    const same = tries.find((t) =>
-      groups.every((g, k) => Math.abs((t.heights[g[0] ?? 0] ?? 0) - (chosen[k] ?? 0)) < 1e-9),
-    );
-    const last = same ?? (yield* attempt(chosen));
-    const total = (t: SightTry): number => t.blocked.reduce((a, b) => a + b, 0);
-    const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
-    const valid = [last, ...tries].filter((t) => !t.contact);
-    // The row on the stage top has no riser, so it is the try of last resort.
-    let pick =
-      valid.length > 0
-        ? valid.reduce((a, b) =>
-            total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
-          )
-        : yield* attempt(groups.map(() => 0));
-    // A side of the back desks with no free arc can use the gap of the conductor.
-    if (open && pick.blind.length > 0) {
-      const wide = yield* attempt(
-        groups.map(() => 0),
-        true,
+        arcs,
+        targets,
+        blockers,
+        stage.side,
+        null,
+        null,
+      )
+    : yield* sightSweepSteps(
+        row,
+        heights,
+        arcs,
+        targets,
+        blockers,
+        search.view,
+        search.inner,
+        search.memo,
       );
-      if (!wide.contact && wide.blind.length < pick.blind.length) {
-        pick = wide;
-      }
-    }
-    return {
-      seen: {
-        row: { ...row, angles: pick.angles, placement: pick.placement },
-        risers: pick.risers,
-      },
-      cost: pick.cost,
-      blind: pick.blind,
-      worst: pick.worst,
-    };
+  let placement = placeRow(row.members, angles, row.radius, heights);
+  if (!withinSpread(angles) || !rowFits(placement, search.clearance, stage)) {
+    angles = [...row.angles];
+    placement = placeRow(row.members, angles, row.radius, heights);
+  }
+  const { cost, worst, blind } = rowSightOf(search, placement);
+  return {
+    cost,
+    blind: blind.flatMap((b, i) => (b ? [i] : [])),
+    worst,
+    heights,
+    angles,
+    placement,
+    blocked: groups.map((g) => g.filter((i) => blind[i]).length),
+    ...groupRisersOf(search, placement, levels),
   };
+}
 
-  /**
-   * Moves the players of row 0 so that the back desks of row 1 see the conductor (design 4.5,
-   * seat geometry). The spread gives each gap of row 0 the same arc, but a desk of two partners
-   * fits into a gap only when the gap is a little larger. A greedy search tries runs of neighbors
-   * of one side next to each blocked back desk player: the player alone, the player with one
-   * neighbor, and the player with all players to the inside or to the outside. Each run moves by
-   * 1° steps up to {@link FRONT_MOVES}.shift, and the move with the lowest cost of row 1 wins, for
-   * up to {@link FRONT_MOVES}.rounds rounds. A move keeps the packed arcs, the packed gap of the
-   * conductor, the stage, the gaps to the other items, and the sight of row 0 past the soloists.
-   *
-   * @param front Row 0 after its sight pass.
-   * @param at The index of row 0 in `rows`.
-   * @param back Row 1 after the spread.
-   * @param n The index of row 1 in `rows`.
-   * @param first Row 1 behind the spread row 0.
-   * @returns The steps, which return row 0 and row 1.
-   */
-  const moveFrontSteps = function* (
-    front: FittedRow,
-    at: number,
-    back: FittedRow,
-    n: number,
-    first: RowSight,
-  ): Steps<{ front: FittedRow; back: RowSight }> {
-    const packedFront = packed.find((r) => r.row === front.row);
-    const arcs = packedArcs(front);
-    const clearance = clearanceOf(fixed, soloPianos, [], rows.slice(at + 1));
-    const frontBlind = (placement: RowPlacement): number => {
-      const bodies = placement.players.map((p) => p.obstacle);
-      const stands = placement.stands.map((p) => p.obstacle);
-      return front.members.filter((member, i) => {
-        const place = placement.players[i]?.place;
-        const solid = [...soloists, ...bodies.filter((_, j) => j !== i)];
-        return (
-          place !== undefined &&
-          sightOf(member.sight, place, targets, { solid, stands }).sight === 2
+/**
+ * Raises the seat groups of a row from row 2, in steps. A group starts at the height of the
+ * risers in front of it, so the rows rise toward the back. A group with a blocked player then
+ * rises by {@link ROW_RISER}.step up to its largest height, and a group that a riser of a
+ * neighbor group goes into rises to that riser. The rise stops when no group rises.
+ *
+ * @param search The row and the items around it.
+ * @param fronts The risers of the rows in front.
+ * @returns The steps, which return each try, from the lowest heights.
+ */
+function* riseSteps(search: RowSearch, fronts: readonly RowRiser[]): Steps<SightTry[]> {
+  const { row, groups } = search;
+  const rises = row.row >= ROW_RISER.firstRow;
+  const levels = groupExtents(row.members, row.placement, groups).map((extent) =>
+    rises
+      ? Math.max(
+          0,
+          ...fronts.filter((r) => r.from < extent.to && r.to > extent.from).map((r) => r.height),
+        )
+      : 0,
+  );
+  const tries: SightTry[] = [];
+  for (;;) {
+    const next = yield* trySteps(search, levels);
+    tries.push(next);
+    let raised = false;
+    next.blocked.forEach((count, k) => {
+      const level = levels[k] ?? 0;
+      const lift = next.lifts[k] ?? 0;
+      if (rises && lift > level + 1e-9) {
+        levels[k] = lift;
+        raised = true;
+      } else if (count > 0 && rises && level + ROW_RISER.step <= riserTop(row.row) + 1e-9) {
+        levels[k] = Math.round((level + ROW_RISER.step) * 1000) / 1000;
+        raised = true;
+      }
+    });
+    if (!raised) {
+      return tries;
+    }
+  }
+}
+
+/**
+ * Places one row behind the rows that are done, in steps (design 4.5, seat geometry). The seat
+ * groups rise ({@link riseSteps}), and each group takes the lowest height with its fewest blocked
+ * players. A try with a riser that goes into an item or that does not fit on the stage is not
+ * valid. Of the valid tries, the row takes the try with the fewest blocked players, then the
+ * lowest risers.
+ *
+ * @param pass The inputs of the pass.
+ * @param row The row after the spread.
+ * @param n The index of the row in `pass.rows`.
+ * @param done The rows in front, after their sight pass.
+ * @param memo The known sights of the players of the row, or `null`.
+ * @param open True if a row that stays blocked can also try the gap of the conductor.
+ * @returns The steps, which return the row with its risers, its cost, and its blocked players.
+ */
+function* seeRowSteps(
+  pass: SightPass,
+  row: FittedRow,
+  n: number,
+  done: readonly SeenRow[],
+  memo: SightMemo | null,
+  open = false,
+): Steps<RowSight> {
+  const search = rowSearchOf(pass, row, n, done, memo);
+  const { groups } = search;
+  const tries = yield* riseSteps(
+    search,
+    done.flatMap((d) => d.risers),
+  );
+  const chosen = chosenHeights(tries, groups);
+  // A try with the chosen heights gives the same try again.
+  const same = tries.find((t) =>
+    groups.every((g, k) => Math.abs((t.heights[g[0] ?? 0] ?? 0) - (chosen[k] ?? 0)) < 1e-9),
+  );
+  const last = same ?? (yield* trySteps(search, chosen));
+  const total = (t: SightTry): number => t.blocked.reduce((a, b) => a + b, 0);
+  const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
+  const valid = [last, ...tries].filter((t) => !t.contact);
+  // The row on the stage top has no riser, so it is the try of last resort.
+  let pick =
+    valid.length > 0
+      ? valid.reduce((a, b) =>
+          total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
+        )
+      : yield* trySteps(
+          search,
+          groups.map(() => 0),
         );
-      }).length;
-    };
-    const blindBefore = frontBlind(front.placement);
-    // The sights of the back row for each move of the front row. A front player hides no target
-    // of a back player more than {@link FRONT_MOVES}.reach away in angle, so the key holds only
-    // the moves of the front players near the angle.
-    const known = new Map<string, SightResult>();
-    let best = first;
-    let angles = [...front.angles];
-    for (let round = 0; round < FRONT_MOVES.rounds && best.blind.length > 0; round++) {
-      const runs: number[][] = [];
-      for (const i of best.blind) {
-        const a = best.seen.row.angles[i] ?? 0;
-        const nearest = angles
-          .map((b, j) => ({ d: Math.abs(b - a), j }))
-          .toSorted((x, y) => x.d - y.d)
-          .slice(0, 2);
-        for (const { j } of nearest) {
-          const same = (k: number): boolean =>
-            Math.sign(angles[k] ?? 0) === Math.sign(angles[j] ?? 0);
-          let inside = j;
-          let outside = j;
-          while (inside > 0 && same(inside - 1)) {
-            inside--;
-          }
-          while (outside < angles.length - 1 && same(outside + 1)) {
-            outside++;
-          }
-          const span = (from: number, to: number): number[] =>
-            Array.from({ length: to - from + 1 }, (_, q) => from + q);
-          runs.push([j], span(inside, j), span(j, outside));
-          if (j > inside) {
-            runs.push([j - 1, j]);
-          }
-          if (j < outside) {
-            runs.push([j, j + 1]);
-          }
-        }
-      }
-      let chosen: { angles: number[]; back: RowSight } | null = null;
-      for (const run of runs) {
-        for (let k = -FRONT_MOVES.shift; k <= FRONT_MOVES.shift; k++) {
-          if (k === 0) {
-            continue;
-          }
-          yield;
-          const next = angles.map((b, i) =>
-            run.includes(i) ? b + k * CONDUCTOR_SIGHT.nudgeStep : b,
-          );
-          const valid = next.every(
-            (a, i) =>
-              Math.abs(a) <= SPREAD_LIMITS.maxAngle + 1e-9 &&
-              Math.sign(a) === Math.sign(angles[i] ?? 0) &&
-              Math.abs(a) >= Math.abs(packedFront?.angles[i] ?? 0) - 1e-9 &&
-              (i === next.length - 1 || (next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9),
-          );
-          if (!valid) {
-            continue;
-          }
-          const placement = placeRow(front.members, next, front.radius);
-          if (!rowFits(placement, clearance, stage) || frontBlind(placement) > blindBefore) {
-            continue;
-          }
-          const steps = next.map((b, i) =>
-            Math.round((b - (front.angles[i] ?? 0)) / CONDUCTOR_SIGHT.nudgeStep),
-          );
-          const key = (i: number, angle: number): string => {
-            let text = `${i}:${Math.round(angle * 1e4)}`;
-            next.forEach((b, j) => {
-              if (Math.abs(b - angle) < FRONT_MOVES.reach) {
-                text += `:${j}=${steps[j]}`;
-              }
-            });
-            return text;
-          };
-          const memo: SightMemo = {
-            get: (i, angle) => known.get(key(i, angle)),
-            set: (i, angle, result) => {
-              known.set(key(i, angle), result);
-            },
-          };
-          const moved: SeenRow = { row: { ...front, angles: next, placement }, risers: [] };
-          const result = yield* seeRow(back, n, [moved], memo);
-          if (result.cost < (chosen?.back.cost ?? best.cost) - 1e-6) {
-            chosen = { angles: next, back: result };
-          }
-        }
-      }
-      if (!chosen) {
-        break;
-      }
-      angles = chosen.angles;
-      best = chosen.back;
+  // A side of the back desks with no free arc can use the gap of the conductor.
+  if (open && pick.blind.length > 0) {
+    const wide = yield* trySteps(
+      search,
+      groups.map(() => 0),
+      true,
+    );
+    if (!wide.contact && wide.blind.length < pick.blind.length) {
+      pick = wide;
     }
-    const placement = placeRow(front.members, angles, front.radius);
-    return { front: { ...front, angles, placement }, back: best };
+  }
+  return {
+    seen: {
+      row: { ...row, angles: pick.angles, placement: pick.placement },
+      risers: pick.risers,
+    },
+    cost: pick.cost,
+    blind: pick.blind,
+    worst: pick.worst,
   };
+}
 
+/**
+ * Counts the blocked players of row 0 at its places, past the soloists and the other players of
+ * the row.
+ *
+ * @param pass The inputs of the pass.
+ * @param front Row 0.
+ * @param placement The places of row 0.
+ * @returns The number of blocked players.
+ */
+function frontBlind(pass: SightPass, front: FittedRow, placement: RowPlacement): number {
+  const bodies = placement.players.map((p) => p.obstacle);
+  const stands = placement.stands.map((p) => p.obstacle);
+  return front.members.filter((member, i) => {
+    const place = placement.players[i]?.place;
+    const solid = [...pass.soloists, ...bodies.filter((_, j) => j !== i)];
+    return (
+      place !== undefined &&
+      sightOf(member.sight, place, pass.targets, { solid, stands }).sight === 2
+    );
+  }).length;
+}
+
+/**
+ * Lists the runs of row 0 players that can move for the blocked back desk players
+ * ({@link moveFrontSteps}). For each of the two players of row 0 nearest to a blocked player,
+ * the runs are the player alone, the player with one neighbor, and the player with all players
+ * to the inside or to the outside on its side.
+ *
+ * @param blind The angles of the blocked back desk players.
+ * @param angles The angles of row 0.
+ * @returns The runs, as indices of row 0.
+ */
+function frontRuns(blind: readonly number[], angles: readonly number[]): number[][] {
+  const runs: number[][] = [];
+  const span = (from: number, to: number): number[] =>
+    Array.from({ length: to - from + 1 }, (_, q) => from + q);
+  for (const a of blind) {
+    const nearest = angles
+      .map((b, j) => ({ d: Math.abs(b - a), j }))
+      .toSorted((x, y) => x.d - y.d)
+      .slice(0, 2);
+    for (const { j } of nearest) {
+      const same = (k: number): boolean => Math.sign(angles[k] ?? 0) === Math.sign(angles[j] ?? 0);
+      let inside = j;
+      let outside = j;
+      while (inside > 0 && same(inside - 1)) {
+        inside--;
+      }
+      while (outside < angles.length - 1 && same(outside + 1)) {
+        outside++;
+      }
+      runs.push([j], span(inside, j), span(j, outside));
+      if (j > inside) {
+        runs.push([j - 1, j]);
+      }
+      if (j < outside) {
+        runs.push([j, j + 1]);
+      }
+    }
+  }
+  return runs;
+}
+
+/**
+ * Makes the memo of the sights of row 1 for one move of row 0. A front player hides no target of
+ * a back player more than {@link FRONT_MOVES}.reach away in angle, so the key holds only the
+ * moves of the front players near the angle.
+ *
+ * @param known The sights of row 1 over all moves, by key.
+ * @param next The angles of row 0 after the move.
+ * @param steps The move of each player of row 0 from its angle after its sight pass, in steps of
+ *   {@link CONDUCTOR_SIGHT}.nudgeStep.
+ * @returns The memo.
+ */
+function frontMemo(
+  known: Map<string, SightResult>,
+  next: readonly number[],
+  steps: readonly number[],
+): SightMemo {
+  const key = (i: number, angle: number): string => {
+    let text = `${i}:${Math.round(angle * 1e4)}`;
+    next.forEach((b, j) => {
+      if (Math.abs(b - angle) < FRONT_MOVES.reach) {
+        text += `:${j}=${steps[j]}`;
+      }
+    });
+    return text;
+  };
+  return {
+    get: (i, angle) => known.get(key(i, angle)),
+    set: (i, angle, result) => {
+      known.set(key(i, angle), result);
+    },
+  };
+}
+
+/**
+ * Moves the players of row 0 so that the back desks of row 1 see the conductor, in steps (design
+ * 4.5, seat geometry). The spread gives each gap of row 0 the same arc, but a desk of two partners
+ * fits into a gap only when the gap is a little larger. A greedy search tries the runs of
+ * {@link frontRuns}. Each run moves by 1° steps up to {@link FRONT_MOVES}.shift, and the move with
+ * the lowest cost of row 1 wins, for up to {@link FRONT_MOVES}.rounds rounds. A move keeps the
+ * packed arcs, the packed gap of the conductor, the stage, the gaps to the other items, and the
+ * sight of row 0 past the soloists.
+ *
+ * @param pass The inputs of the pass.
+ * @param front Row 0 after its sight pass.
+ * @param at The index of row 0 in `pass.rows`.
+ * @param back Row 1 after the spread.
+ * @param n The index of row 1 in `pass.rows`.
+ * @param first Row 1 behind the spread row 0.
+ * @returns The steps, which return row 0 and row 1.
+ */
+function* moveFrontSteps(
+  pass: SightPass,
+  front: FittedRow,
+  at: number,
+  back: FittedRow,
+  n: number,
+  first: RowSight,
+): Steps<{ front: FittedRow; back: RowSight }> {
+  const packedFront = pass.packed.find((r) => r.row === front.row);
+  const arcs = packedArcs(front);
+  const clearance = clearanceOf(pass.fixed, pass.soloPianos, [], pass.rows.slice(at + 1));
+  const blindBefore = frontBlind(pass, front, front.placement);
+  const known = new Map<string, SightResult>();
+  let best = first;
+  let angles = [...front.angles];
+  for (let round = 0; round < FRONT_MOVES.rounds && best.blind.length > 0; round++) {
+    const runs = frontRuns(
+      best.blind.map((i) => best.seen.row.angles[i] ?? 0),
+      angles,
+    );
+    let chosen: { angles: number[]; back: RowSight } | null = null;
+    for (const run of runs) {
+      for (let k = -FRONT_MOVES.shift; k <= FRONT_MOVES.shift; k++) {
+        if (k === 0) {
+          continue;
+        }
+        yield;
+        const next = angles.map((b, i) =>
+          run.includes(i) ? b + k * CONDUCTOR_SIGHT.nudgeStep : b,
+        );
+        const valid = next.every(
+          (a, i) =>
+            Math.abs(a) <= SPREAD_LIMITS.maxAngle + 1e-9 &&
+            Math.sign(a) === Math.sign(angles[i] ?? 0) &&
+            Math.abs(a) >= Math.abs(packedFront?.angles[i] ?? 0) - 1e-9 &&
+            (i === next.length - 1 || (next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9),
+        );
+        if (!valid) {
+          continue;
+        }
+        const placement = placeRow(front.members, next, front.radius);
+        if (
+          !rowFits(placement, clearance, pass.stage) ||
+          frontBlind(pass, front, placement) > blindBefore
+        ) {
+          continue;
+        }
+        const steps = next.map((b, i) =>
+          Math.round((b - (front.angles[i] ?? 0)) / CONDUCTOR_SIGHT.nudgeStep),
+        );
+        const moved: SeenRow = { row: { ...front, angles: next, placement }, risers: [] };
+        const result = yield* seeRowSteps(pass, back, n, [moved], frontMemo(known, next, steps));
+        if (result.cost < (chosen?.back.cost ?? best.cost) - 1e-6) {
+          chosen = { angles: next, back: result };
+        }
+      }
+    }
+    if (!chosen) {
+      break;
+    }
+    angles = chosen.angles;
+    best = chosen.back;
+  }
+  const placement = placeRow(front.members, angles, front.radius);
+  return { front: { ...front, angles, placement }, back: best };
+}
+
+/**
+ * Places each row so that each player sees the head and the baton paw of the conductor (design
+ * 4.5, seat geometry), from the front row to the back row ({@link seeRowSteps}). The strings sit
+ * on the stage top. After row 1, the players of row 0 move for the back desks
+ * ({@link moveFrontSteps}). When a back desk stays blocked and loses at least
+ * {@link OPEN_GAP_HIDDEN} of the conductor, row 1 tries again with the gap of the conductor open:
+ * its inner players can pass 0°, and the view of the audience counts in the cost. The row keeps
+ * this try only when it has fewer blocked players.
+ *
+ * @param pass The inputs of the pass.
+ * @returns The steps, which return the rows with their risers.
+ */
+function* sightRowsSteps(pass: SightPass): Steps<SeenRow[]> {
   const done: SeenRow[] = [];
-  for (const [n, row] of rows.entries()) {
-    let result = yield* seeRow(row, n, done, null);
+  for (const [n, row] of pass.rows.entries()) {
+    let result = yield* seeRowSteps(pass, row, n, done, null);
     const at = done.findIndex((d) => d.row.row === 0);
     const front = done[at];
     if (row.row === BACK_DESK_ROW && result.blind.length > 0 && front) {
-      const moved = yield* moveFrontSteps(front.row, at, row, n, result);
+      const moved = yield* moveFrontSteps(pass, front.row, at, row, n, result);
       done[at] = { row: moved.front, risers: [] };
       result = moved.back;
       if (result.worst >= OPEN_GAP_HIDDEN) {
-        result = yield* seeRow(row, n, done, null, true);
+        result = yield* seeRowSteps(pass, row, n, done, null, true);
       }
     }
     done.push(result.seen);
@@ -2921,7 +3096,15 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin).
   const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage);
   yield;
-  const seen = yield* sightRowsSteps(spread, still, soloists, soloPianos, stage, targets, rows);
+  const seen = yield* sightRowsSteps({
+    rows: spread,
+    packed: rows,
+    fixed: still,
+    soloists,
+    soloPianos,
+    stage,
+    targets,
+  });
   const final = seen.map((r) => r.row);
   const rowRisers = seen.flatMap((r) => r.risers);
   const lift = choirLift(choir, members, seen, soloists, targets);
