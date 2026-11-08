@@ -321,7 +321,8 @@ export const PERCUSSION_HOLDS = {
     // No damp: in each tried place, the short arms held the lowest point of the paw 2 cm to 10 cm
     // over the head plane, and outside the head (design 5.3).
     damp: null,
-    // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and malletSpotR).
+    // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and
+    // malletSpotR).
     curl: 100 * MathUtils.DEG2RAD,
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
     // between strikes, so that the shaft stays in the closed paw. Each hand strikes one kettle in
@@ -580,13 +581,13 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
 };
 
 /**
- * The motion of the hand cymbals (design 5.3), as a real crash (`docs/reference/percussion-technique.md`
- * 7). The plates tilt from vertical, so that the right plate comes down onto the left plate. They
- * meet a little offset, as a glancing blow, and slide on past each other: the right plate down and
- * the left plate up (`StrikeState.slide`). After a crash, the plates part, turn their inner faces
- * out to the front and up, and rise, so that the sound rings to the hall. At the end of a note
- * before a rest, they go against the chest (`PercussionHold.damp`). A louder crash meets higher.
- * The lengths are in head heights `H`.
+ * The motion of the hand cymbals (design 5.3), as a real crash
+ * (`docs/reference/percussion-technique.md` 7). The plates tilt from vertical, so that the right
+ * plate comes down onto the left plate. They meet a little offset, as a glancing blow, and slide on
+ * past each other: the right plate down and the left plate up (`StrikeState.slide`). After a crash,
+ * the plates part, turn their inner faces out to the front and up, and rise, so that the sound
+ * rings to the hall. At the end of a note before a rest, they go against the chest
+ * (`PercussionHold.damp`). A louder crash meets higher. The lengths are in head heights `H`.
  */
 export const CRASH_MOTION = {
   /**
