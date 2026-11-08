@@ -77,6 +77,18 @@ export function countInAt(beats: Float64Array, startSec: number): CountIn {
 }
 
 /**
+ * The count-in of a start point that a seek during play sets (`Transport.seekStart`, design 5.4,
+ * 6.5): no count-in. Its start point is before each song time, so no song time is in it, and it
+ * gives no ready gesture, no leader nod, and no lift of the baton.
+ */
+export const NO_COUNT_IN: CountIn = {
+  startSec: Number.NEGATIVE_INFINITY,
+  readySec: 0,
+  beatSec: 0,
+  lengthSec: 0,
+};
+
+/**
  * Tells if a song time is in a count-in: from its start to the start point.
  *
  * @param count The count-in of the last play.

@@ -11,7 +11,7 @@ import type { ConductorState } from './conductor.ts';
 import { createLeftHandState, leftHandAt } from './conductor-left.ts';
 import { batonAt, resumeLift } from './conductor-notes.ts';
 import { createCueState, cueStateAt } from './cues.ts';
-import { countInAt, leaderNodAt, noteLayerTime, readyAt } from './count-in.ts';
+import { NO_COUNT_IN, countInAt, leaderNodAt, noteLayerTime, readyAt } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { poseChoir } from './choir.ts';
 import { CHOIR_MOTION, choirStateAt, createChoirState } from './choir-notes.ts';
@@ -329,7 +329,7 @@ interface FrameScratch {
   /** The audibility of the seats and the wall clock time, for the cues of the conductor. */
   readonly audibility: readonly (SeatAudibility | undefined)[];
   readonly wallTime: number;
-  /** The count-in of the last play (design 5.2, 5.4). */
+  /** The count-in of the last play, or `NO_COUNT_IN` after a seek during play (5.2, 5.4). */
   readonly countIn: CountIn;
   /** The song time of the frame, for the preparatory beat of a count-in after a pause. */
   readonly songTime: number;
@@ -658,7 +658,7 @@ export function poseAt(
     },
     audibility,
     wallTime,
-    countIn: countInAt(plan.beats, transport.startSec),
+    countIn: transport.seekStart ? NO_COUNT_IN : countInAt(plan.beats, transport.startSec),
     songTime,
     endElapsed:
       !transport.playing && transport.changedAtWall !== null && songTime >= plan.endSec - 1e-3
