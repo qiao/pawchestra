@@ -281,8 +281,6 @@ Design 4.4 gives the merges of each copy.
 
 - A big head over a thin neck shows a dark band under the head. Keep this form, because a fill of
   the groove makes the neck a thick column.
-- A horn, a trunk, whiskers, or antlers distort the head measures. Use `noseTop`, `noseFront`,
-  `headFloor`, and `headCeiling`.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye.
