@@ -71,32 +71,16 @@ export const FOOTPRINT_GAP = 0.05;
 const PIANO_REACH_GAP = 0.15;
 
 /**
- * The risers of the instrumental rows (design 4.5, seat geometry). The eyes of the conductor are
- * only about 0.1 m above the tops of the heads of the seated strings, so a row behind the strings
- * sees the conductor only through a gap between two heads, or from a riser. The strings sit on
- * the stage top, as in a real orchestra.
+ * The band of the back desks of the strings over the whole arc (design 4.5, seat geometry,
+ * {@link backDeskBand}). The items of the other rows keep their gaps from it, so that the back
+ * desks can move along the arc after the spread.
  */
-const ROW_RISER = {
-  /** The largest height of a riser of rows 2 and 3, in meters. */
-  highest: 1.2,
-  /**
-   * The largest height of a riser of the back row (row 4), in meters: a step above the winds,
-   * because a real hall puts the percussion on its highest riser.
-   */
-  backHighest: 1.4,
-  /** The edge of a riser in front of the stands of its row and at its ends, in meters. */
+const BACK_DESK_BAND = {
+  /** The height of the band above the stage top, in meters. */
+  height: 1.2,
+  /** The edge of the band in front of the stands of the row and at its ends, in meters. */
   lip: 0.05,
 } as const;
-
-/**
- * Gives the largest height of a riser of a row ({@link ROW_RISER}).
- *
- * @param row The index of the row in {@link ROWS}.
- * @returns The height, in meters.
- */
-function riserTop(row: number): number {
-  return row >= ROWS.length - 1 ? ROW_RISER.backHighest : ROW_RISER.highest;
-}
 
 /** The step by which a row, a stand, or a seat arc grows until it is clear, in meters. */
 const CLEAR_STEP = 0.02;
@@ -664,10 +648,10 @@ interface FittedRow {
   readonly angles: readonly number[];
   readonly placement: RowPlacement;
   /**
-   * The space of the riser of a row from row 2 ({@link riserReserve}), or `null` for the rows of
-   * the strings. The other items keep their gaps from it, so the row can rise after the spread.
+   * The band of the back desks of the strings ({@link backDeskBand}), or `null` for the other
+   * rows. The other items keep their gaps from it, so the back desks can move after the spread.
    */
-  readonly reserve: ArcBlock | null;
+  readonly band: ArcBlock | null;
 }
 
 /**
@@ -759,14 +743,13 @@ function* fitRowSteps(
     }
     const angles = rowAngles(arrangement, radius);
     const placement = placeRow(members, angles, radius);
-    // The band of each row behind the first row lets its players move along the arc after the
-    // spread, and lets a seat group from row 2 rise.
-    const reserve = row > 0 ? riserReserve(placement, row) : null;
+    // The band of the back desks lets them move along the arc after the spread.
+    const band = row === BACK_DESK_ROW ? backDeskBand(placement) : null;
     if (
       rowClear(placement, clearance) &&
-      (!reserve || !touchesAny([arcBlockObstacle(reserve, CENTER)], clearance.placed))
+      (!band || !touchesAny([arcBlockObstacle(band, CENTER)], clearance.placed))
     ) {
-      return { members, row, split, radius, angles, placement, reserve };
+      return { members, row, split, radius, angles, placement, band };
     }
     radius += CLEAR_STEP;
   }
@@ -809,23 +792,22 @@ function rowExtent(row: RowPlacement): RowExtent {
 }
 
 /**
- * Gives the space that the riser of a row can take (design 4.5, seat geometry): from
- * {@link ROW_RISER}.lip in front of the stands of the row to the back of its chairs, over the
- * largest arc of a spread row. The spread moves the items of a row only along its arc, so the
- * riser of the spread row stays in this space.
+ * Gives the band of the back desks of the strings (design 4.5, seat geometry): from
+ * {@link BACK_DESK_BAND}.lip in front of the stands of the row to the back of its chairs, over the
+ * largest arc of a spread row. The spread and the sight pass move the items of the row only along
+ * its arc, so they stay in this band.
  *
  * @param row The places of the packed row.
- * @param n The index of the row in {@link ROWS}.
- * @returns The space, with the largest height of a riser.
+ * @returns The band.
  */
-function riserReserve(row: RowPlacement, n: number): ArcBlock {
+function backDeskBand(row: RowPlacement): ArcBlock {
   const { inner, outer } = rowExtent(row);
   // A seat at 90° reaches past 90° by half a chair and the lip.
-  const end = SPREAD_LIMITS.maxAngle + (CHAIR_ROOM + ROW_RISER.lip) / inner;
+  const end = SPREAD_LIMITS.maxAngle + (CHAIR_ROOM + BACK_DESK_BAND.lip) / inner;
   return {
-    inner: inner - ROW_RISER.lip,
+    inner: inner - BACK_DESK_BAND.lip,
     outer,
-    height: riserTop(n),
+    height: BACK_DESK_BAND.height,
     from: -end,
     to: end,
   };
@@ -1728,14 +1710,14 @@ function* spreadRowsSteps(
 }
 
 /**
- * Gives the obstacles of a fitted row: its players and its stands, and the space of its riser.
+ * Gives the obstacles of a fitted row: its players and its stands, and its band.
  *
  * @param row The row.
  * @returns The obstacles.
  */
 function rowObstacles(row: FittedRow): Obstacle[] {
   const own = obstaclesOfRow(row.placement);
-  return row.reserve ? [...own, arcBlockObstacle(row.reserve, CENTER)] : own;
+  return row.band ? [...own, arcBlockObstacle(row.band, CENTER)] : own;
 }
 
 /**
@@ -2619,9 +2601,9 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
     }
     return places;
   };
-  // The stage holds the items of the rows. The space of a riser is wider than its riser.
+  // The stage holds the items of the rows. The band of the back desks is wider than the row.
   const obstacles = [...fixed, ...rows.flatMap((r) => obstaclesOfRow(r.placement))];
-  const reserves = rows.flatMap((r) => (r.reserve ? [arcBlockObstacle(r.reserve, CENTER)] : []));
+  const bands = rows.flatMap((r) => (r.band ? [arcBlockObstacle(r.band, CENTER)] : []));
 
   const empty: ChoirPlacement = { singers: [], risers: [], obstacles: [] };
   let choir = empty;
@@ -2642,7 +2624,7 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
       singers,
       levels,
       radius + ROW_STEP,
-      [...obstacles, ...reserves],
+      [...obstacles, ...bands],
       soloSingers,
     );
     const withChoir = withRows(rows);
