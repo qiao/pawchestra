@@ -1,6 +1,6 @@
 """Rigs a source mesh into the `.blend` of a studio body by the simple route: no cut, no cap, no
 remesh, and no rebuild of the arms. The only edits of the mesh are a plain stretch of the limbs
-and plane cuts at the joints, which keep the form of the surface.
+and new rings on the quads of the arms, which keep the form of the surface.
 
     blender -b --factory-startup --python tools/blender/simple_rig.py -- <config.json> \
         --out <dir>/<animal>.blend [--smooth <passes>]
@@ -14,9 +14,8 @@ The steps:
     `mesh_intake.py`), because a GLB file holds only triangles.
  2. Give each face the color of the texture, and make the nose gloss (`add_surface()`).
  3. With `limbs` in the config, make the limbs longer along their bones (`limb_moves()`), and
-    move the joints with them. With `rings`, cut the faces of each elbow, wrist, and knee with
-    planes at a right angle to the bone (`joint_rings()`). With `rings.between`, also cut each
-    arm halfway between each two rings of the mesh (`between_rings()`).
+    move the joints with them. With `rings`, add a ring halfway between each two rings of each
+    arm: split each edge of the quad edge ring between them at its middle (`subdivide_rings()`).
  4. Add the armature of the app at the joints of the config, in the T-pose of the mesh, with the
     Action `bind` of the seat rules of the config (`build_armature()`).
  5. Give the weights by bone heat (Automatic Weights). The arm segments and the helpers take
@@ -123,60 +122,87 @@ def stretch_limbs(body, config, eyes):
     return {**config, 'joints': joints}, eyes
 
 
-def joint_rings(body, config):
-    """Cuts the faces of each elbow, wrist, and knee with planes at a right angle to the bone
-    (`rings` of the config), so that each joint has the joint rings of design 4.4. A cut only
-    splits the faces on its plane, so the surface keeps its form. Each list of a joint gives the
-    places of the planes from the joint, in radii of the limb there. A corner within `snap` units
-    of a plane stays a corner, so that a cut makes no thin face. Gives the count of the cuts."""
+def edge_ring(start, faces_ok):
+    """Walks the edge ring of an edge over quads: from each quad to the edge across it. Gives the
+    edges of the ring when it closes around the arm over quads of `faces_ok` alone, else `None`
+    (a triangle, a pole, or a face off the arm stops it)."""
+    ring, edge, face = [start], start, None
+    face = next((f for f in start.link_faces if f in faces_ok), None)
+    while face is not None:
+        if len(face.verts) != 4:
+            return None
+        across = [e for e in face.edges if not set(e.verts) & set(edge.verts)]
+        if len(across) != 1:
+            return None
+        edge = across[0]
+        if edge is start:
+            return ring
+        if len(edge.link_faces) != 2:
+            return None
+        ring.append(edge)
+        face = next(f for f in edge.link_faces if f is not face)
+        if face not in faces_ok or len(ring) > 64:
+            return None
+    return None
+
+
+def subdivide_rings(body, config):
+    """Adds a ring of vertices halfway between each two neighboring rings of each arm: it splits
+    each edge of the quad edge ring that runs along the arm between the two rings at its middle
+    (`bmesh.ops.subdivide_edges()`), so that each new ring follows the quads of the mesh and the
+    surface keeps its form. A ring of the mesh is a group of at least `ringVerts` vertices of the
+    arm (within `armRadius` of the line from the shoulder joint to the wrist joint) whose places
+    along the line lie within `ringGap` units of the next. Only the rings between the shares
+    `subdivide` of the line take a new ring between them, so that the arm root at the trunk and
+    the paw keep their faces, and two rings less than `minGap` units apart take none. An edge ring
+    that does not close around the arm over quads, at a triangle or a pole, takes no split. Gives
+    the count of the new rings and the places of the skipped ones."""
     rule = config['rings']
+    low, high = rule['subdivide']
     bm = bmesh.new()
     bm.from_mesh(body.data)
-    cuts = []
-    joints = config['joints']
+    added, skipped = 0, []
     for sign in (1.0, -1.0):
-        mirror = np.array([sign, 1.0, 1.0])
-        shoulder, along, _ = arm_axis(config, sign)
-        for joint, bone in (('elbow', 'forearm_L'), ('wrist', 'hand_L')):
-            at = float((np.array(joints[bone]['head']) * mirror - shoulder) @ along)
-            cuts.append(('arm', sign, shoulder, along, at, rule[joint]))
-        hip = np.array(joints['thigh_L']['head']) * mirror
-        knee = np.array(joints['shin_L']['head']) * mirror
-        ankle = np.array(joints['foot_L']['head']) * mirror
-        down = (ankle - hip) / np.linalg.norm(ankle - hip)
-        cuts.append(('leg', sign, hip, down, float((knee - hip) @ down), rule['knee']))
-
-    def region(limb, sign, origin, along):
-        """Gives the place along the bone and the distance from it of each vertex, and the
-        vertices of the limb."""
+        shoulder, along, length = arm_axis(config, sign)
         co = np.array([v.co[:] for v in bm.verts]) @ sa.TO_STUDIO.T
-        t = (co - origin) @ along
-        r = np.linalg.norm(co - origin - np.outer(t, along), axis=1)
-        side = r < rule['armRadius'] if limb == 'arm' else co[:, 0] * sign > rule['legInner']
-        return t, r, side & (t > 0)
-
-    count = 0
-    for limb, sign, origin, along, at, places in cuts:
-        t, r, inside = region(limb, sign, origin, along)
-        radius = float(np.median(r[(np.abs(t - at) < rule['reach']) & inside]))
-        for place in places:
-            faces = [f for f in bm.faces if all(inside[v.index] for v in f.verts)]
-            edges = {e for f in faces for e in f.edges}
-            verts = {v for f in faces for v in f.verts}
-            bmesh.ops.bisect_plane(
-                bm,
-                geom=[*verts, *edges, *faces],
-                dist=rule['snap'],
-                plane_co=((origin + along * (at + place * radius)) @ sa.TO_STUDIO).tolist(),
-                plane_no=(along @ sa.TO_STUDIO).tolist(),
-            )
-            bm.verts.index_update()
-            t, r, inside = region(limb, sign, origin, along)
-            count += 1
+        t = (co - shoulder) @ along
+        r = np.linalg.norm(co - shoulder - np.outer(t, along), axis=1)
+        arm = (r < rule['armRadius']) & (t > 0)
+        found = np.sort(t[arm & (t > low * length) & (t < high * length)])
+        groups = [[found[0]]]
+        for x in found[1:]:
+            if x - groups[-1][-1] < rule['ringGap']:
+                groups[-1].append(x)
+            else:
+                groups.append([x])
+        rings = [float(np.mean(g)) for g in groups if len(g) >= rule['ringVerts']]
+        faces_ok = {f for f in bm.faces if all(arm[v.index] for v in f.verts)}
+        rings_to_split = []
+        for a, b in zip(rings, rings[1:]):
+            if b - a < rule['minGap']:
+                continue
+            # The edges along the arm that cross the middle plane between the two rings.
+            middle = (a + b) / 2
+            starts = [
+                e for e in bm.edges
+                if all(arm[v.index] for v in e.verts)
+                and (t[e.verts[0].index] - middle) * (t[e.verts[1].index] - middle) < 0
+            ]
+            ring = edge_ring(starts[0], faces_ok) if starts else None
+            if ring is None or len(ring) != len(starts) or set(ring) != set(starts):
+                skipped.append(round(middle / length, 3) * sign)
+                continue
+            rings_to_split.append(ring)
+        for ring in rings_to_split:
+            bmesh.ops.subdivide_edges(bm, edges=ring, cuts=1, use_grid_fill=True)
+            added += 1
+        bm.verts.index_update()
+        bm.edges.index_update()
+        bm.faces.index_update()
     bm.to_mesh(body.data)
     bm.free()
     body.data.update()
-    return count
+    return added, skipped
 
 
 def roll_split(w, names, co, rig):
@@ -206,64 +232,6 @@ def roll_split(w, names, co, rig):
             split[rows, low] = total * (1 - ramp)
             split[rows, low + 1] += total * ramp
             w[:, cols] = split
-
-
-def between_rings(body, config):
-    """Cuts the faces of each arm with a plane halfway between each two neighboring rings of the
-    mesh, at a right angle to the line from the shoulder joint to the wrist joint, so that each
-    arm segment has about two rings and the faces between the rings are short. A cut only splits
-    the faces on its plane, so the surface keeps its form. A ring is a group of at least
-    `ringVerts` vertices of the arm (within `armRadius` of the line) whose places along the line
-    lie within `ringGap` units of the next. The cuts lie between the shares `between` of the line,
-    so that the arm root at the trunk and the paw keep their faces. Two rings less than `minGap`
-    units apart, such as the rings of a joint cut, take no cut between them, because the short
-    faces there fold at a bent joint. Gives the count of the cuts."""
-    rule = config['rings']
-    low, high = rule['between']
-    bm = bmesh.new()
-    bm.from_mesh(body.data)
-    count = 0
-    for sign in (1.0, -1.0):
-        shoulder, along, length = arm_axis(config, sign)
-
-        def places():
-            """Gives the place along the line, the distance from it, and the arm mask of each
-            vertex."""
-            co = np.array([v.co[:] for v in bm.verts]) @ sa.TO_STUDIO.T
-            t = (co - shoulder) @ along
-            r = np.linalg.norm(co - shoulder - np.outer(t, along), axis=1)
-            return t, r < rule['armRadius']
-
-        t, arm = places()
-        found = np.sort(t[arm & (t > low * length) & (t < high * length)])
-        groups = [[found[0]]]
-        for x in found[1:]:
-            if x - groups[-1][-1] < rule['ringGap']:
-                groups[-1].append(x)
-            else:
-                groups.append([x])
-        rings = [float(np.mean(g)) for g in groups if len(g) >= rule['ringVerts']]
-        for a, b in zip(rings, rings[1:]):
-            if b - a < rule['minGap']:
-                continue
-            t, arm = places()
-            inside = arm & (t > 0)
-            faces = [f for f in bm.faces if all(inside[v.index] for v in f.verts)]
-            edges = {e for f in faces for e in f.edges}
-            verts = {v for f in faces for v in f.verts}
-            bmesh.ops.bisect_plane(
-                bm,
-                geom=[*verts, *edges, *faces],
-                dist=rule['snap'],
-                plane_co=((shoulder + along * (a + b) / 2) @ sa.TO_STUDIO).tolist(),
-                plane_no=(along @ sa.TO_STUDIO).tolist(),
-            )
-            bm.verts.index_update()
-            count += 1
-    bm.to_mesh(body.data)
-    bm.free()
-    body.data.update()
-    return count
 
 
 def smooth_weights(body, passes, share, rig=None):
@@ -405,9 +373,9 @@ def main():
     triangles = len(body.data.loop_triangles)
     if 'limbs' in config:
         config, eyes = stretch_limbs(body, config, eyes)
-    cuts = joint_rings(body, config) if 'rings' in config else 0
-    if 'between' in config.get('rings', {}):
-        cuts += between_rings(body, config)
+    cuts, skipped = 0, []
+    if 'subdivide' in config.get('rings', {}):
+        cuts, skipped = subdivide_rings(body, config)
     body.data.calc_loop_triangles()
     added = len(body.data.loop_triangles) - triangles
 
@@ -449,7 +417,8 @@ def main():
     print(
         f'simple_rig: wrote {out}: {counts}, {quads} joined quads, {len(rig.data.bones)} bones, '
         f'{empty} vertices with no bone heat, {len(loose)} vertices of loose parts on the head, '
-        f'{passes} smooth passes, {cuts} cuts that add {added} triangles',
+        f'{passes} smooth passes, {cuts} new arm rings that add {added} triangles, skipped edge '
+        f'rings at the arm shares {skipped}',
         flush=True,
     )
 
