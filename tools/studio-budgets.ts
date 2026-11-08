@@ -7,10 +7,10 @@ import { gzipSync } from 'node:zlib';
 export const STUDIO_TRIANGLE_BUDGET = 6200;
 
 /**
- * The largest gzip size of the packed mesh of one studio body, in bytes (design 7.2). Each studio
- * body of `STUDIO_BODIES` is in the first download, so its mesh counts against the limit of 1 MB.
- * The budget keeps room above the largest body, the rhino with a round shoulder and a round tube
- * for each arm.
+ * The largest gzip size of the packed mesh of one studio body, in bytes (design 7.2). The bodies
+ * that the default demo casts are in the first download, so their meshes count against the limit
+ * of 1 MB. The budget keeps room above the largest body, the rhino with a round shoulder and a
+ * round tube for each arm.
  */
 export const STUDIO_MESH_GZIP_BUDGET = 34_000;
 
