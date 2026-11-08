@@ -86,22 +86,21 @@ change of the chain on the mannequin first: `pnpm rig-mesh mannequin --check` an
 
 Steps 1 to 4 are the steps of the mesh rig. Steps 5 and 6 hold for each route.
 
-1. **Joints.** Measure the joints on cuts of the mesh, and write them in
-   `tools/mesh-rigs/<a>.json` with a note on each measure. `pnpm rig-mesh <a> --check` gives the
-   arm factor of the target reach.
-2. **Form.** A body that is shorter or wider than the mesh takes `proportions`. A head that keeps
-   its form takes `"keep": "head"`. A larger head grows `H`, so fit the holds again.
-3. **Options.** Run `pnpm mesh-options`. Fix each warning, then ask the user about the size, arms,
-   and legs with `options.md` and `options.png`.
+1. **Joints.** Measure the joints on cuts of the mesh, and write them with a note on each measure
+   in `tools/mesh-rigs/<a>.json`. `pnpm rig-mesh <a> --check` gives the arm factor of the reach.
+2. **Form.** A body that is shorter or wider than the mesh takes `proportions`, and a head that
+   keeps its form takes `"keep": "head"`. A larger head grows `H`, so fit the holds again.
+3. **Options.** Run `pnpm mesh-options`, and fix each warning. Then ask the user about the size,
+   the arms, and the legs with `options.md` and `options.png`.
 4. **Rig.** Check the mesh with `pnpm mesh-intake`, and run `arm_rebuild.py`. Look at each
-   variant with `pnpm rig-mesh <a> --check --preview <dir> [--set]`. Keep the budgets, and the
+   variant with `pnpm rig-mesh <a> --check --preview <dir>`. Keep the budgets, and keep the
    standing body within 1 mm of the source.
-5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of the
-   facet contrast of its reference crops, and the seat settings. Run `pnpm studio-body <a>`, add
-   the module to `STUDIO_BODIES`, and give the species the body.
+5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of its
+   reference crops, and the seat settings. Run `pnpm studio-body <a>`, add the module to
+   `STUDIO_BODIES`, and give the species the body.
 6. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
-   `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit <role> --set`,
-   `pnpm hold-reach <species>`, and `pnpm pose-depth <role>`.
+   `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit`, `pnpm hold-reach`, and
+   `pnpm pose-depth`.
 
 ### Steps of a hand rig
 
@@ -109,13 +108,13 @@ Design 4.4 ("Hand rig") gives the layout of the `.blend` and the folder of a tri
 only by path (`--blend <file> --out <file>`), never to `assets/models/<s>/`.
 
 In a live Blender, call only the functions of `studio_preview.py` (`sp`), `studio_armature.py`
-(`sa`), and `studio_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only. A
-scripted edit of a `.blend` writes its exact call and values in the `README.md` row of the file.
-Try each scripted edit on a copy with `pnpm rig-trial`, and find thin faces and sharp edges with
-`pnpm bind-view`.
+(`sa`), and `studio_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only.
+Write the exact call and values of each scripted edit of a `.blend` in the `README.md` row of the
+file. Try each scripted edit on a copy with `pnpm rig-trial`, and find thin faces and sharp edges
+with `pnpm bind-view`.
 
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
-   eye_fans=False)` one time for the face colors and the gloss nose, from the source texture.
+   eye_fans=False)` one time for the face colors and the gloss nose.
 2. **Rig.** Put `palm`, `seat`, `hinges`, and the facts of `BODY_FACTS` (at least `height` and
    `crease`) on the armature object. Fit the bones, run `sa.fix_rolls(rig)`, and give Automatic
    Weights (Limit Total 4, Normalize All), then exact rows. Pose the bind, run
@@ -128,9 +127,9 @@ Try each scripted edit on a copy with `pnpm rig-trial`, and find thin faces and 
 5. **Export.** Run `pnpm rig-export <s>` and `pnpm studio-body <s>`. Diff `<s>.rig.json` to see
    what moved.
 
-For the simple route, run `simple_rig.py` ([`commands.md`](commands.md)), then step 5. Try a
-variant config with the `--glb` probes before a commit. Write a texture with `Image.save()`,
-because `Image.save_render()` changes the colors by the view transform.
+For the simple route, run `simple_rig.py`, then step 5. Try a variant config with the `--glb`
+probes before a commit. Write a texture with `Image.save()`, because `Image.save_render()` changes
+the colors by the view transform.
 
 ## The arm gate
 
