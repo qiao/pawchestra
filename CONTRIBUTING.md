@@ -101,9 +101,8 @@ MIDI file ──> midi/ ──> score/ ──> Score ──┬──> audio/ (wo
 - **Size.** The first download is less than 1 MB after gzip (design 7.2). The audio code, the
   Worker, the worklet, and the SoundFont files load with a dynamic import or a fetch after the
   first frame.
-- **Frame time.** Each change of `src/scene/`, of a shader, or of the post effects runs
-  `pnpm frame`, and gives its table in the pull request. CI has no GPU, so this check is local
-  (design 9.7).
+- **Frame time.** Run `pnpm frame` only for a change whose goal is speed, or on request, and give
+  its table in the pull request. CI has no GPU, so this check is local (design 9.7).
 - **Licenses.** Before you add a MIDI file, a SoundFont, or a dependency, check the rules of
   design 8.1 and 7.3. Add each new dependency to the third-party license file.
 
