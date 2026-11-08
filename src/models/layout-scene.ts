@@ -1869,7 +1869,8 @@ function* sightSweepSteps(search: RowSearch): Steps<number[]> {
         if (
           out < side * limit - 1e-12 ||
           Math.abs(angle) > SPREAD_LIMITS.maxAngle + 1e-9 ||
-          (k === order.length - 1 && out > side * base + 1e-12)
+          (k === order.length - 1 && out > side * base + 1e-12) ||
+          !fitsAt(members[i], angle, search)
         ) {
           continue;
         }
@@ -1892,6 +1893,38 @@ function* sightSweepSteps(search: RowSearch): Steps<number[]> {
     });
   }
   return next;
+}
+
+/**
+ * Finds if a player of a row keeps its gaps at an angle (design 4.5, seat geometry): the player
+ * and its own stand keep 0.05 m from the items around the row and 0.3 m from the edges, and a
+ * player keeps {@link PIANO_REACH_GAP} from a piano case in front of it or behind it. The sight
+ * sweep skips the other angles, so that one player does not make the whole row keep its spread
+ * angles. A shared stand depends on two players, so the check of the row ({@link rowFits}) stays.
+ *
+ * @param member The player.
+ * @param angle The angle of the player.
+ * @param search The row and the items around it.
+ * @returns True if the player fits at the angle.
+ */
+function fitsAt(member: Member | undefined, angle: number, search: RowSearch): boolean {
+  if (!member) {
+    return false;
+  }
+  const { clearance } = search;
+  const { radius } = search.row;
+  const player = placePlayer(member, angle, radius).obstacle;
+  const items = [player];
+  if (member.stand === 'own') {
+    items.push(placeStand(angle, radius - member.standDistance, member.index, [member]).obstacle);
+  }
+  const piano = member.cast.instrument === 'piano';
+  return (
+    items.every((o) => o.boxes.every((b) => boxOnStage(b, search.pass.stage))) &&
+    !touchesAny(items, clearance.placed) &&
+    !clearance.pianosInFront.some((b) => obstaclesTouch(player, b, PIANO_REACH_GAP)) &&
+    !(piano && clearance.playersBehind.some((b) => obstaclesTouch(player, b, PIANO_REACH_GAP)))
+  );
 }
 
 /** A candidate angle of a player in the sight sweep, with its cost. */
