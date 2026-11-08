@@ -105,9 +105,8 @@ Steps 1 to 4 are the steps of the mesh rig. Steps 5 and 6 hold for each route.
 
 ### Steps of a hand rig
 
-Design 4.4 ("Hand rig") gives the layout of the `.blend`. The trials of the cat and the rabbit in
-`assets/models/<s>/hand-rig/` are not in use. Export a trial only by path
-(`pnpm rig-export <s> --blend <file> --out <file>`), never to `assets/models/<s>/`.
+Design 4.4 ("Hand rig") gives the layout of the `.blend` and the folder of a trial. Export a trial
+only by path (`--blend <file> --out <file>`), never to `assets/models/<s>/`.
 
 In a live Blender, call only the functions of `studio_preview.py` (`sp`), `studio_armature.py`
 (`sa`), and `studio_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only. A
