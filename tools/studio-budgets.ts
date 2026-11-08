@@ -18,11 +18,11 @@ export const STUDIO_MESH_GZIP_BUDGET = 34_000;
  * The gzip budgets of the bodies that need more than {@link STUDIO_MESH_GZIP_BUDGET}, in bytes,
  * by the name of the body in `STUDIO_BODIES`.
  */
-export const STUDIO_MESH_GZIP_BUDGETS: Readonly<Partial<Record<string, number>>> = {
+export const STUDIO_MESH_GZIP_BUDGETS = new Map([
   // The Tripo P2 rabbit keeps the quads of its source and the arm rings of the simple rig, and a
   // decimate would break the quad arm rings (design 4.4, "Simple route").
-  'studio-rabbit': 40_000,
-};
+  ['studio-rabbit', 40_000],
+]);
 
 /**
  * Gives the gzip budget of the packed mesh of a studio body.
@@ -31,7 +31,7 @@ export const STUDIO_MESH_GZIP_BUDGETS: Readonly<Partial<Record<string, number>>>
  * @returns The budget, in bytes.
  */
 export function meshGzipBudget(name: string): number {
-  return STUDIO_MESH_GZIP_BUDGETS[name] ?? STUDIO_MESH_GZIP_BUDGET;
+  return STUDIO_MESH_GZIP_BUDGETS.get(name) ?? STUDIO_MESH_GZIP_BUDGET;
 }
 
 /**
