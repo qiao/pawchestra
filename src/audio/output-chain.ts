@@ -8,7 +8,7 @@ import stPaulsWavUrl from '../../assets/hall/st-pauls-hall-c8m.wav?url';
  * both files into `dist/assets/`. The `Player` fetches the file of its mix preset with the
  * presets, after the first frame.
  */
-export interface HallImpulse {
+interface HallImpulse {
   /** The lossless FLAC file, about a third of the size of the WAV file. */
   readonly flacUrl: string;
   /** The same samples as WAV, for a browser whose `decodeAudioData()` refuses the FLAC file. */
@@ -25,7 +25,7 @@ const ST_PAULS_HALL: HallImpulse = { flacUrl: stPaulsFlacUrl, wavUrl: stPaulsWav
 const KONZERTHAUS: HallImpulse = { flacUrl: konzerthausFlacUrl, wavUrl: konzerthausWavUrl };
 
 /** The settings of a `DynamicsCompressorNode` (design 6.8). */
-export interface Compressor {
+interface Compressor {
   /** The threshold in dBFS. */
   readonly threshold: number;
   /** The knee in dB. */
@@ -39,7 +39,7 @@ export interface Compressor {
 }
 
 /** The gains of the tone EQ on the sum in dB, at the frequencies of {@link TONE_EQ}. */
-export interface Tone {
+interface Tone {
   /** The low shelf. */
   readonly lowShelf: number;
   /** The peak in the low mids. */
@@ -51,7 +51,7 @@ export interface Tone {
 }
 
 /** The settings of the mix bus of one mix preset (design 6.8). */
-export interface MixBus {
+interface MixBus {
   /** The impulse response of the hall reverb. */
   readonly hall: HallImpulse;
   /** The delay before the convolver, in seconds. */
