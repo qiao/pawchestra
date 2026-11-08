@@ -315,8 +315,9 @@ The app follows these facts:
   least 0.5 s after it, the paw that did not strike goes to the near rim, its fingers touch the
   edge, and the spine leans 9° over the cymbal, as a player stops the ring of a short note
   [15] [20] [22] (`EdgeDamp`).
-- **The triangle (section 8).** The clip lies in the palm under the curled fingers, and the
-  triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`). A single note strikes the side
+- **The triangle (section 8).** The left paw holds the upper end of the clip between the tip of
+  the thumb and the curled fingers, with the thumb down, and the clip and the triangle hang below
+  the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
   (`MalletAcross.peak`). A roll moves the beater fast between the two sides of the closed lower
   corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
@@ -349,10 +350,10 @@ The app does not follow these facts:
 - **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
   second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
   strikes at most 6 times each second (`handRollSec`).
-- **The hold of the triangle (section 8).** The clip is at the height of the mouth
-  (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of the
-  long snout. The paw holds the clip in the palm, with the fingers up. No source gives the turn of
-  the hand.
+- **The hold of the triangle (section 8).** The clip is a little below the mouth, not at eye
+  level (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of
+  the long snout: a clip 2 cm higher twisted the arm past the margin of the arm gate in a lift.
+  No source gives the turn of the hand.
 - **The tambourine (section 8).** The tambourine stands on a stand at the front right
   (`TAMBOURINE`), because the left paw holds the triangle through the whole part. The tip of the
   beater strikes it, with no shake roll and no thumb roll.

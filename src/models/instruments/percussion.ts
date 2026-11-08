@@ -324,22 +324,34 @@ export const TRIANGLE = {
 /**
  * The clip of the triangle and its loop of cord, in meters, in the axes of the piece of the
  * triangle: the triangle hangs in the plane x-y, along -y, with its top corner 0.05 m below the
- * origin. The left paw of the badger holds the triangle up, with its palm toward +x and its fingers
- * along +y, and its skin from 2.6 cm below the origin to 9.2 cm above it, and from 4.7 cm at -x to
- * 3.8 cm at +x. Thus the clip runs down the palm, under the curled fingers, and leaves the heel of
- * the paw.
+ * origin. The left paw of the badger holds the upper end of the clip at the origin, between the
+ * tip of the thumb and the curled fingers, as a real player holds it
+ * (`docs/reference/percussion-technique.md` 8), and the clip hangs down from it.
  */
 export const TRIANGLE_CLIP = {
-  /** The upper end of the clip, in the palm under the curled fingers. */
-  clip: [0.025, 0.075, -0.016],
-  /** The lower end of the clip, below the heel of the paw, where the loop goes through it. */
-  clipEnd: [0.008, -0.032, -0.004],
+  /** The upper end of the clip, between the thumb and the fingers. */
+  clip: [0, 0.01, 0],
+  /** The lower end of the clip, where the loop goes through it. */
+  clipEnd: [0, -0.025, 0],
   /**
    * The points where the loop meets the two upper sides of the triangle, just below its top
    * corner: the distance to each side of the middle, and the height.
    */
   loop: [0.006, -0.06],
 } as const satisfies Readonly<Record<'clip' | 'clipEnd', Vec3> & { loop: readonly number[] }>;
+
+/**
+ * The place of the triangle in the hanging left paw of the bind pose (design 4.6): the origin of
+ * its piece at the tip of the thumb, where the thumb and the curled fingers meet
+ * ({@link TRIANGLE_CLIP}), from the middle of the palm, in head heights `H`: toward the palm, down
+ * along the fingers, and forward toward the thumb. The piece points forward, as a mallet does, so
+ * that the triangle hangs down from the thumb when the paw takes its turn of the play, with the
+ * thumb down (`PERCUSSION_PLACES.triangleHand`).
+ */
+const TRIANGLE_PINCH = {
+  at: [0.03, -0.06, -0.15] as Vec3,
+  turn: toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 90 * MathUtils.DEG2RAD)),
+};
 
 /** The faces around the axis of a kettle. */
 const KETTLE_SEGMENTS = 16;
@@ -1919,14 +1931,7 @@ export function buildSmallPercussion(): InstrumentModel {
     parent: 'root',
     pieces: [
       tambourine,
-      triangle.build(
-        'malletL',
-        hold(
-          'palmL',
-          [0, 0, -0.07],
-          toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 90 * MathUtils.DEG2RAD)),
-        ),
-      ),
+      triangle.build('malletL', hold('palmL', TRIANGLE_PINCH.at, TRIANGLE_PINCH.turn)),
       beater.piece,
     ],
     grips: handGrips(),

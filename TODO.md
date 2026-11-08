@@ -825,8 +825,9 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Badger: ask the user to confirm the size of the badger.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
       the stripes on the head as a mid brown. Show the user the faces.
-- [ ] Badger triangle: the left paw stands with the fingers up. A real player holds the clip between
-      the thumb and the fingers at eye level (percussion-technique 10).
+- [ ] Badger triangle: the clip hangs from the tip of the thumb a little below the mouth, not at
+      eye level, because the short arm reaches no higher in front of the snout: a clip 2 cm higher
+      twisted the arm 5° more in a lift (margin 3°). Longer arms would let it reach.
 - [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
       paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
       player alternates the hands over the two rows of bars (percussion-technique 9).

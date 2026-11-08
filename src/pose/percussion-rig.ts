@@ -725,15 +725,18 @@ export const PERCUSSION_PLACES = {
    */
   crash: [0, -0.09, -1.1],
   /**
-   * The clip of the triangle in the left hand, from the left shoulder joint: at the height of the
-   * mouth of the badger, as near to the eye level of a real player as its short arm reaches.
+   * The clip of the triangle at the tip of the left thumb, from the left shoulder joint: below the
+   * mouth of the badger, as near to the eye level of a real player as its short arm reaches. The
+   * wrist keeps its place of a clip in the palm, so that the arm gate keeps its values: a clip
+   * 2 cm higher twisted the arm 5° more in a lift (main 22°, margin 3°).
    */
-  triangleClip: [0.3, 0.5, -0.9],
+  triangleClip: [0.36, 0.46, -0.87],
   /**
-   * The world rotation of the left hand that holds the triangle up, from the bind pose: the
-   * clip, which is in front of the palm in the bind pose, comes under the hand, and the triangle
-   * hangs in the plane x-y. Thus the side of the triangle that the beater strikes faces the right
-   * hand.
+   * The world rotation of the left hand that holds the triangle, from the bind pose: the thumb
+   * points down, so that the clip hangs from its tip, between the thumb and the curled fingers
+   * (`TRIANGLE_PINCH` of `models/instruments/percussion.ts`), and the triangle hangs in the plane
+   * x-y, turned 40° around the vertical. Thus the side of the triangle that the beater strikes
+   * faces the right hand.
    */
   // holdTurn(-90, 40) of pose/winds.ts: the paw turns 40° around z, so that it bends less on the
   // forearm of the raised arm.
