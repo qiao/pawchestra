@@ -72,7 +72,9 @@ def limb_moves(points, config):
     0 at the shoulder plane over `armRoot` units, so that the trunk and the root keep their form.
     The legs grow by `leg` in the height band from the ankle joint to the hip joint, the feet keep
     their size, and the body above the hips rises, so that the soles stay on the floor. The band
-    starts and ends with a smooth ramp of `legRamp` units."""
+    starts and ends with a smooth ramp of `legRamp` units. A `leg` of two factors [shin, thigh]
+    changes the band below the knee joint and the band above it by different factors, with a
+    smooth ramp at the knee. A factor below 1 makes a leg shorter."""
     rule = config['limbs']
     out = np.array(points, float)
     for sign in (1.0, -1.0):
@@ -85,8 +87,11 @@ def limb_moves(points, config):
     ankle = config['joints']['foot_L']['head'][1]
     hip = config['joints']['thigh_L']['head'][1]
     ramp = rule['legRamp']
+    knee = config['joints']['shin_L']['head'][1]
+    shin, thigh = rule['leg'] if isinstance(rule['leg'], list) else (rule['leg'], rule['leg'])
     grid = np.linspace(-0.1, 1.5, 3201)
-    rate = (rule['leg'] - 1) * smoothstep(grid, ankle - ramp, ankle + ramp)
+    factor = shin + (thigh - shin) * smoothstep(grid, knee - ramp, knee + ramp)
+    rate = (factor - 1) * smoothstep(grid, ankle - ramp, ankle + ramp)
     rate *= 1 - smoothstep(grid, hip - ramp, hip + ramp)
     rise = np.concatenate([[0.0], np.cumsum((rate[1:] + rate[:-1]) / 2 * np.diff(grid))])
     out[:, 1] += np.interp(points[:, 1], grid, rise)
