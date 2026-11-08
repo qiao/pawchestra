@@ -297,8 +297,9 @@ The app follows these facts:
   than a real stick, because a shorter stick in front of the grip put the tips out of the reach
   of the short arms. The elbows stand about a fist
   from the body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the
-  belly. At rest, the sticks lie across the body in front of the waist, with the tips a little
-  above the near rim (`PercussionHold.set`). The sticks also go there in a long rest of the
+  belly. At rest, the sticks lie across the body in front of the waist, 3° and 8° from level,
+  with the tips 3.5 cm and 6.8 cm above the head and about 1 cm in from the near rim, as the set
+  position of a drumline [37] (`PercussionHold.set`). The two heights keep the sticks 3 cm apart. The sticks also go there in a long rest of the
   music, of at least 6 beats: one beat after the last strike, and back from 2 beats to 1 beat
   before the next strike, as the set position of a drumline [37] (`SET_MOTION`). The mallets of
   the suspended cymbal do the same.

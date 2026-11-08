@@ -827,8 +827,6 @@ scene of each demo has its seats and stage size with no overlap.
       the stripes on the head as a mid brown. Show the user the faces.
 - [ ] Badger triangle: the left paw stands with the fingers up. A real player holds the clip between
       the thumb and the fingers at eye level (percussion-technique 10).
-- [ ] Snare and cymbal: at rest, the arms hang, so the tips stand 5 cm to 9 cm outside the rim
-      (5.2). Ask the user if `ready` keeps the tips over the instrument at rest.
 - [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
       paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
       player alternates the hands over the two rows of bars (percussion-technique 9).
