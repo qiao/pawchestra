@@ -570,13 +570,16 @@ export const WIND_HOLDS = {
 } as const satisfies Readonly<Record<WindInstrument, WindHold>>;
 
 /**
- * The flute hold of the tan fox (design 5.3), the hold of a real flutist. The head turns 30° to
- * the left while the fox plays, as Debost writes, and the flute lies 9° back from square to the
- * face, 8° down to the right ({@link FOX_FLUTE_BACK}). The lip plate sits 0.05 H below the mouth,
- * under the long muzzle: at the mouth, the jaw touches the flute. The shoulders stay square and
- * low, with no forward turn of the right shoulder. The left elbow points down and out, and the
- * right elbow down, out, and a little forward, as a seated flutist lets the arms hang
- * (`docs/reference/wind-technique.md` 2.4).
+ * The flute hold of the tan fox (design 5.3), the hold of a real flutist. The head turns 30° to the
+ * left while the fox plays, as Debost writes, and the flute lies 9° back from square to the face,
+ * 8° down to the right ({@link FOX_FLUTE_BACK}). The embouchure hole sits at the lower lip, 0.1 H
+ * below the mouth of the body and 0.125 H back under the long muzzle (`lipShift`), and the lip
+ * plate presses the lips and the chin about 0.5 cm, as a real flutist rests the lip plate against
+ * the chin under the lower lip (`docs/reference/wind-technique.md` 2.4). At 0.05 H below the mouth,
+ * the hole stood 2.1 cm in front of the face. Further back, the plate goes deeper into the face
+ * before the hole reaches the lip. The shoulders stay square and low, with no forward turn of the
+ * right shoulder. The left elbow points down and out, and the right elbow down, out, and a little
+ * forward, as a seated flutist lets the arms hang (`docs/reference/wind-technique.md` 2.4).
  *
  * Each palm faces the flute, and the fingers curl over it (`faceTube`, `gripCurl`), as a real
  * flutist curves the fingers over the keys (`docs/reference/wind-technique.md` 2.4). The left paw
@@ -616,12 +619,12 @@ export const WIND_HOLDS = {
 const FOX_FLUTE = {
   ...WOODWIND,
   headTurn: FOX_HEAD_TURN * MathUtils.DEG2RAD,
-  lipShift: [0, -0.05, 0],
+  lipShift: [0, -0.1, 0.125],
   play: fluteTurn(FOX_HEAD_TURN - FOX_FLUTE_BACK, 8),
   poleL: [-1, -1, -0.3],
   poleR: [1, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
-  restShift: [0.8, -0.958, 0.5],
+  restShift: [0.8, -0.908, 0.375],
   restPoleL: [-0.4, -1, 0.38],
   restPoleR: [0.8, -1, 0.6],
   restFreeL: {
