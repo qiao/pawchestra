@@ -143,6 +143,11 @@ export const RISER = {
   steps: { count: 3, depth: 0.2 },
   /** The width of the lighter edge at the front of each tread, in meters. */
   nosing: 0.04,
+  /**
+   * The nosing lip of each level: the front edge of the tread passes the riser face below it, as
+   * the nosing of a stair tread (IBC 1011.5.5 asks for 3/4 in to 1 1/4 in), in meters.
+   */
+  lip: { overhang: 0.025, height: 0.04 },
   /** The widest board of a tread, in meters. A dark line divides a deeper tread into boards. */
   board: 0.4,
   /**
@@ -494,6 +499,104 @@ const RISER_FACET = 5 * MathUtils.DEG2RAD;
 /** The width of the dark line between two boards of a tread, as between two planks of the stage. */
 const PLANK_LINE = 0.012;
 
+/**
+ * Gives a point at a distance and an angle from the podium center, on the arcs of the risers.
+ *
+ * @param podium The podium center, the center of the arcs.
+ * @param r The distance from the podium center, in meters.
+ * @param angle The angle, in radians. 0 points to the back, and the left is negative.
+ * @param y The height above the stage top, in meters.
+ * @returns The point.
+ */
+function arcPoint(podium: Vec3, r: number, angle: number, y: number): Vec3 {
+  return [podium[0] + r * Math.sin(angle), podium[1] + y, podium[2] - r * Math.cos(angle)];
+}
+
+/**
+ * Adds one flat face of four corners. The front of the face points away from a point in its
+ * solid, so the order of the corners does not matter.
+ *
+ * @param builder The builder.
+ * @param corners The corners, in order around the face.
+ * @param inside A point in the solid of the face.
+ * @param color The color.
+ */
+function addFace(
+  builder: MeshBuilder,
+  corners: readonly [Vec3, Vec3, Vec3, Vec3],
+  inside: Vec3,
+  color: Rgb,
+): void {
+  const [a, b, c, d] = corners;
+  const start = new Vector3(...a);
+  const normal = new Vector3(...b).sub(start).cross(new Vector3(...c).sub(start));
+  const out = start.add(new Vector3(...c)).multiplyScalar(0.5).sub(new Vector3(...inside));
+  builder.add(normal.dot(out) >= 0 ? quad(a, b, c, d) : quad(d, c, b, a), { color });
+}
+
+/**
+ * Adds one level of the choir risers (design 4.5): the tread with its boards, the nosing lip at
+ * its front, the face under the lip, and the two end panels. The face under the lip of a higher
+ * level is a riser face of wood from the tread in front of it. The lowest level has a dark skirt
+ * face from the stage top, and only the top level has a back face, because each other face stands
+ * against the next level.
+ *
+ * @param builder The builder.
+ * @param level The level.
+ * @param below The height of the level in front of it, or 0 for the lowest level.
+ * @param top True for the top level.
+ * @param podium The podium center, the center of the arcs.
+ */
+function addRiserLevel(
+  builder: MeshBuilder,
+  level: RiserLevel,
+  below: number,
+  top: boolean,
+  podium: Vec3,
+): void {
+  const { radius, height, halfAngle } = level;
+  const inner = radius - RISER.depth / 2;
+  const outer = radius + RISER.depth / 2;
+  const front = inner - RISER.lip.overhang;
+  const under = height - RISER.lip.height;
+  const at = (r: number, angle: number, y: number): Vec3 => arcPoint(podium, r, angle, y);
+  const segments = Math.max(1, Math.ceil((2 * halfAngle) / RISER_FACET));
+  for (let i = 0; i < segments; i++) {
+    const a0 = -halfAngle + (2 * halfAngle * i) / segments;
+    const a1 = -halfAngle + (2 * halfAngle * (i + 1)) / segments;
+    const body = at(radius, (a0 + a1) / 2, height / 2);
+    const lip = at((front + inner) / 2, (a0 + a1) / 2, height - RISER.lip.height / 2);
+    for (const [near, far, color] of treadBands(front, outer)) {
+      const tread = [
+        at(near, a0, height),
+        at(near, a1, height),
+        at(far, a1, height),
+        at(far, a0, height),
+      ] as const;
+      addFace(builder, tread, body, color);
+    }
+    const lipFront = [at(front, a0, under), at(front, a1, under), at(front, a1, height)] as const;
+    addFace(builder, [...lipFront, at(front, a0, height)], lip, STAGE_COLORS.riserNosing);
+    const lipUnder = [at(front, a0, under), at(inner, a0, under), at(inner, a1, under)] as const;
+    addFace(builder, [...lipUnder, at(front, a1, under)], lip, STAGE_COLORS.riserNosing);
+    const face = [at(inner, a0, below), at(inner, a1, below), at(inner, a1, under)] as const;
+    const faceColor = below > 0 ? STAGE_COLORS.podiumPanel : STAGE_COLORS.skirt;
+    addFace(builder, [...face, at(inner, a0, under)], body, faceColor);
+    if (top) {
+      const back = [at(outer, a0, 0), at(outer, a1, 0), at(outer, a1, height)] as const;
+      addFace(builder, [...back, at(outer, a0, height)], body, STAGE_COLORS.skirt);
+    }
+  }
+  // A point at the angle 0 is on the inner side of each end.
+  const body = at(radius, 0, height / 2);
+  for (const end of [-halfAngle, halfAngle]) {
+    const panel = [at(inner, end, 0), at(outer, end, 0), at(outer, end, height)] as const;
+    addFace(builder, [...panel, at(inner, end, height)], body, STAGE_COLORS.skirt);
+    const lipEnd = [at(front, end, under), at(inner, end, under), at(inner, end, height)] as const;
+    addFace(builder, [...lipEnd, at(front, end, height)], body, STAGE_COLORS.riserNosing);
+  }
+}
+
 /** One arc block of the choir risers around the podium center: a level or a step. */
 interface RiserBlock {
   /** The distance of the front face from the podium center, in meters. */
@@ -598,20 +701,24 @@ function addRiserBlock(builder: MeshBuilder, block: RiserBlock, podium: Vec3): v
 
 /**
  * Builds the choir risers: one arc block for each level, from the stage top to the height of the
- * level, and the steps in front of the lowest level (design 4.5). Each tread has a lighter edge
- * at its front and boards of a wood a little lighter than the stage top, and the faces have the
- * color of the stage sides, as the wooden risers of `orchestra-latest.png` and `orchestra-side.png`.
+ * level, and the steps in front of the lowest level (design 4.5). Each tread has a lighter nosing
+ * lip at its front and boards of a wood a little lighter than the stage top. A riser face of a
+ * darker wood joins two levels, and the faces down to the stage top have the color of the stage
+ * sides, as the wooden risers of `orchestra-latest.png` and `orchestra-side.png`.
  *
- * @param levels The levels of the layout.
+ * @param levels The levels of the layout, from the lowest level.
  * @param podium The podium center, the center of the arcs.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
  */
 export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshData {
   const builder = new MeshBuilder();
+  levels.forEach((riser, k) => {
+    const below = levels[k - 1]?.height ?? 0;
+    addRiserLevel(builder, riser, below, k === levels.length - 1, podium);
+  });
   for (const { level, radius, height, halfAngle } of levels) {
     const inner = radius - RISER.depth / 2;
     const arc = { from: -halfAngle, to: halfAngle };
-    addRiserBlock(builder, { inner, outer: radius + RISER.depth / 2, height, ...arc }, podium);
     if (level !== 0) {
       continue;
     }
