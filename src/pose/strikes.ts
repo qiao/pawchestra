@@ -350,7 +350,7 @@ export function buildStrikeTrack(
   first: StrikeTarget,
   sizes: StrikeSizes,
   amplitude: number,
-  beats: Float64Array = new Float64Array(),
+  beats: Float64Array,
 ): StrikeTrack {
   const m = STRIKE_MOTION;
   const gapBefore = (i: number): number => {

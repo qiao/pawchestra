@@ -32,7 +32,7 @@ const SIZES = { lift: 0.1, rest: 0.03 } as const;
 
 function trackOf(starts: readonly number[], xs: readonly number[] = []): StrikeTrack {
   const strikes = starts.map((start, i): Strike => ({ ...at(xs[i] ?? 0), start, loudness: 2 / 3 }));
-  return buildStrikeTrack(strikes, at(-0.2), SIZES, 1);
+  return buildStrikeTrack(strikes, at(-0.2), SIZES, 1, new Float64Array());
 }
 
 function stateAt(track: StrikeTrack, time: number): StrikeState {
