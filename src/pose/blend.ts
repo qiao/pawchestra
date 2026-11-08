@@ -106,11 +106,18 @@ export function mixPole(rest: Vec3, play: Vec3, weight: number): Vec3 {
  *
  * @param times The times, sorted.
  * @param time The time.
- * @returns The index, or -1 before the first time.
+ * @param from The first index of the search.
+ * @param to The end of the search, the index excluded.
+ * @returns The index, or -1 before the time at `from`.
  */
-export function lastAtOrBefore(times: Float64Array, time: number): number {
-  let low = 0;
-  let high = times.length;
+export function lastAtOrBefore(
+  times: Float64Array,
+  time: number,
+  from = 0,
+  to = times.length,
+): number {
+  let low = from;
+  let high = to;
   while (low < high) {
     const mid = (low + high) >>> 1;
     if ((times[mid] ?? 0) <= time) {
@@ -119,5 +126,5 @@ export function lastAtOrBefore(times: Float64Array, time: number): number {
       high = mid;
     }
   }
-  return low - 1;
+  return low > from ? low - 1 : -1;
 }

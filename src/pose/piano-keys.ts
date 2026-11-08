@@ -1,5 +1,6 @@
 import { PIANO } from '../models/instruments/piano.ts';
 import type { PlayerNote } from '../score/types.ts';
+import { lastAtOrBefore } from './blend.ts';
 import { CHORD_SEC } from './note-groups.ts';
 import { smoothstep } from './rest.ts';
 
@@ -126,29 +127,6 @@ export function buildKeyTrack(notes: readonly PlayerNote[]): KeyTrack {
 }
 
 /**
- * Finds the last press of one key that starts to go down at or before a time.
- *
- * @param starts The times when the presses start to go down.
- * @param from The first press of the key.
- * @param to The end of the presses of the key.
- * @param time The time.
- * @returns The index of the press, or -1 before the first press of the key.
- */
-function lastPress(starts: Float64Array, from: number, to: number, time: number): number {
-  let low = from;
-  let high = to;
-  while (low < high) {
-    const mid = (low + high) >>> 1;
-    if ((starts[mid] ?? Infinity) <= time) {
-      low = mid + 1;
-    } else {
-      high = mid;
-    }
-  }
-  return low > from ? low - 1 : -1;
-}
-
-/**
  * Calculates the press level of each piano key at a song time (design 5.3): a pure function of
  * the track and the time, with no state between frames. A key goes down with a rising speed, and
  * reaches the key bottom at its full speed at the note start, as the paw strikes it. It comes up
@@ -161,7 +139,7 @@ function lastPress(starts: Float64Array, from: number, to: number, time: number)
  */
 export function keyLevelsAt(track: KeyTrack, time: number, out: Float32Array): void {
   for (let k = 0; k < PIANO_KEY_COUNT; k++) {
-    const j = lastPress(track.downStarts, track.first[k] ?? 0, track.first[k + 1] ?? 0, time);
+    const j = lastAtOrBefore(track.downStarts, time, track.first[k] ?? 0, track.first[k + 1] ?? 0);
     const downStart = track.downStarts[j];
     const downEnd = track.downEnds[j];
     const upStart = track.upStarts[j];

@@ -1,5 +1,6 @@
 import { HARP, harpString } from '../models/instruments/harp.ts';
 import type { PlayerNote } from '../score/types.ts';
+import { lastAtOrBefore } from './blend.ts';
 import { CHORD_SEC } from './note-groups.ts';
 
 /** The number of strings of the harp, from C1 to G7. */
@@ -129,29 +130,6 @@ export function buildStringTrack(
 }
 
 /**
- * Finds the last pluck of one string that starts at or before a time.
- *
- * @param starts The note starts of the plucks.
- * @param from The first pluck of the string.
- * @param to The end of the plucks of the string.
- * @param time The time.
- * @returns The index of the pluck, or -1 before the first pluck of the string.
- */
-function lastPluck(starts: Float64Array, from: number, to: number, time: number): number {
-  let low = from;
-  let high = to;
-  while (low < high) {
-    const mid = (low + high) >>> 1;
-    if ((starts[mid] ?? Infinity) <= time) {
-      low = mid + 1;
-    } else {
-      high = mid;
-    }
-  }
-  return low > from ? low - 1 : -1;
-}
-
-/**
  * Calculates the swing of each harp string at a song time (design 5.3): a pure function of the
  * track and the time, with no state between frames, so a seek, a pause, and a change of speed
  * give the correct swing. A paused song keeps the swing of its time, as a film camera sees a
@@ -168,7 +146,7 @@ function lastPluck(starts: Float64Array, from: number, to: number, time: number)
 export function stringSwingsAt(track: StringTrack, time: number, out: Float32Array): void {
   const { dampSec, roundSec, stillShare } = STRING_MOTION;
   for (let i = 0; i < HARP_STRING_COUNT; i++) {
-    const j = lastPluck(track.starts, track.first[i] ?? 0, track.first[i + 1] ?? 0, time);
+    const j = lastAtOrBefore(track.starts, time, track.first[i] ?? 0, track.first[i + 1] ?? 0);
     const start = track.starts[j];
     const end = track.ends[j];
     const level = track.levels[j];
