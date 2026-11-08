@@ -47,6 +47,13 @@ export const STRIKE_MOTION = {
    * strokes each second, as one hand of a roll of 32nd notes at 80 beats each minute.
    */
   handRollSec: 1 / 6,
+  /**
+   * The slide of a glancing stroke at the strike, as a share of its full slide
+   * (`StrikeState.slide`): the hand cymbals meet a little offset, and slide on past each other.
+   */
+  slideContact: 0.3,
+  /** After the rebound, the slide goes back to 0 in this time, in seconds. */
+  slideSettleSec: 0.4,
 } as const;
 
 /** The sizes of the strike motion of one instrument, in meters. */
@@ -382,6 +389,12 @@ export interface StrikeState {
   readonly normal: [number, number, number];
   /** The height of the mallet head above the target, along the normal, in meters. */
   height: number;
+  /**
+   * The share of the slide of a glancing stroke along the face of the target, from -1 to 1: it
+   * goes to -1 in the lift, comes to `-slideContact` at the strike, and goes on to 1 in the
+   * rebound, then back to 0 (`STRIKE_MOTION.slideSettleSec`). Only the hand cymbals read it.
+   */
+  slide: number;
 }
 
 /**
@@ -390,7 +403,7 @@ export interface StrikeState {
  * @returns The state.
  */
 export function createStrikeState(): StrikeState {
-  return { point: [0, 0, 0], normal: [0, 1, 0], height: 0 };
+  return { point: [0, 0, 0], normal: [0, 1, 0], height: 0, slide: 0 };
 }
 
 /**
@@ -449,8 +462,10 @@ export function strikeStateAt(track: StrikeTrack, time: number, out: StrikeState
   if (start === undefined || upStart === undefined) {
     writeTarget(track, -1, 1, out);
     out.height = track.rest;
+    out.slide = 0;
     return;
   }
+  out.slide = slideAt(track, i, time);
   if (time < start) {
     // The mallet moves to the new target in the last part of the lift, also in a legato stroke.
     const moveStart = Math.max(upStart, start - STRIKE_MOTION.upSec);
@@ -476,4 +491,45 @@ export function strikeStateAt(track: StrikeTrack, time: number, out: StrikeState
   const rebound = Math.min(1, (time - start) / ((track.reboundEnds[i] ?? start) - start || 1));
   // The rebound starts with its full speed and slows to the rest height.
   out.height = track.rest * rebound * (2 - rebound);
+}
+
+/**
+ * Gives the slide of a glancing stroke of one strike of a track at a time (`StrikeState.slide`).
+ * In the lift, the slide goes from its value at the start of the lift to -1. In the down stroke,
+ * it comes to `-slideContact` at the strike, and in the rebound it goes on to 1. Then it goes back
+ * to 0 in `slideSettleSec`. A legato stroke lifts from the slide of the strike before.
+ *
+ * @param track The strike data of the hand.
+ * @param i The index of the strike whose lift has started at the time.
+ * @param time The song time.
+ * @returns The share of the slide.
+ */
+function slideAt(track: StrikeTrack, i: number, time: number): number {
+  const m = STRIKE_MOTION;
+  const start = track.starts[i] ?? 0;
+  const upStart = track.upStarts[i] ?? 0;
+  const after = (k: number, at: number): number => {
+    const struck = track.starts[k];
+    if (struck === undefined) {
+      return 0;
+    }
+    const rebound = (track.reboundEnds[k] ?? struck) - struck;
+    const since = at - struck;
+    if (since < rebound) {
+      const share = since / (rebound || 1);
+      return -m.slideContact + (1 + m.slideContact) * share * (2 - share);
+    }
+    return 1 - smoothstep((since - rebound) / m.slideSettleSec);
+  };
+  if (time >= start) {
+    return after(i, time);
+  }
+  const down = track.downs[i] ?? 0;
+  const downStart = start - down;
+  if (time >= downStart) {
+    return -1 + (1 - m.slideContact) * (1 - (start - time) / (down || 1));
+  }
+  // The lift starts from the slide of the strike before at the start of the lift.
+  const from = i > 0 ? after(i - 1, upStart) : 0;
+  return from + (-1 - from) * smoothstep((time - upStart) / (downStart - upStart || 1));
 }
