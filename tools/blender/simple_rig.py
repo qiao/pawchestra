@@ -22,7 +22,9 @@ The steps:
     their weights by the same bone heat. Then smooth the weights over the mesh edges in a few
     Laplacian passes, keep the 4 largest weights of each vertex, and normalize them. Each loose
     part of the mesh other than the largest, such as an eyeball or a whisker of the face, takes
-    the head bone alone (`loose_parts()`): bone heat gives a loose part no sure weights.
+    the head bone alone (`loose_parts()`): bone heat gives a loose part no sure weights. With
+    `rollSplit` in the config, the 4 roll segments of each upper arm and forearm share the weight
+    of their arm part by the place of the vertex along the bone (`roll_split()`).
  6. Put a pea eye on each old eye, write the facts of the body, and save the file.
 """
 
@@ -176,10 +178,41 @@ def joint_rings(body, config):
     return count
 
 
-def smooth_weights(body, passes, share):
+def roll_split(w, names, co, rig):
+    """Splits the weight of each arm part among its roll segments by the place of the vertex along
+    the bone, in place. Bone heat gives each segment its weights by distance, so the roll gathers
+    in bands at the borders of the segments, and the faces there twist into a spiral. For each
+    vertex, the total weight on the 4 segments of the upper arm (or of the forearm) stays. The
+    place t along the bone goes from 0 at the joint at the start of the part to 1 at the joint at
+    its end. Segment k takes the share (k + 0.5) / 4 of the roll (`segment_share()` of
+    `rig_mesh.py`), so the total goes to the two segments around t with a linear ramp, and the
+    vertex takes the roll of its place: t of the roll from 1/8 to 7/8, the first segment below,
+    and the last segment above. The helpers of the elbow and the wrist keep their weights."""
+    count = 4
+    for side in 'LR':
+        for part, end in (('upper_arm', 'forearm'), ('forearm', 'hand')):
+            head = np.array(rig.data.bones[f'{part}_{side}'].head_local)
+            axis = np.array(rig.data.bones[f'{end}_{side}'].head_local) - head
+            length = np.linalg.norm(axis)
+            cols = [names.index(f'{part}_seg{k}_{side}') for k in range(count)]
+            total = w[:, cols].sum(axis=1)
+            t = np.clip((co - head) @ axis / length**2, 0.0, 1.0)
+            place = np.clip(t * count - 0.5, 0.0, count - 1.0)
+            low = np.minimum(np.floor(place).astype(int), count - 2)
+            ramp = place - low
+            split = np.zeros((len(w), count))
+            rows = np.arange(len(w))
+            split[rows, low] = total * (1 - ramp)
+            split[rows, low + 1] += total * ramp
+            w[:, cols] = split
+
+
+def smooth_weights(body, passes, share, rig=None):
     """Smooths the bone weights over the mesh edges, then keeps the 4 largest weights of each
     vertex and normalizes them. Bone heat gives a sharp step where the T-pose arm meets the chest,
-    and the smooth spreads it over a few rings of vertices."""
+    and the smooth spreads it over a few rings of vertices. With an armature `rig`, the roll
+    segments then share the weight of their arm part by the place along the bone
+    (`roll_split()`)."""
     me = body.data
     n, groups = len(me.vertices), list(body.vertex_groups)
     w = np.zeros((n, len(groups)))
@@ -196,6 +229,10 @@ def smooth_weights(body, passes, share):
         np.add.at(total, b, w[a])
         mean = np.divide(total, count[:, None], out=w.copy(), where=count[:, None] > 0)
         w = w * (1 - share) + mean * share
+    if rig is not None:
+        co = np.empty(n * 3)
+        me.vertices.foreach_get('co', co)
+        roll_split(w, [g.name for g in groups], co.reshape(-1, 3), rig)
 
     # The 4 largest weights of each vertex, each at least SMALLEST, with a sum of 1.
     order = np.argsort(-w, axis=1)
@@ -319,7 +356,7 @@ def main():
 
     # 5. Bone heat, then the smooth of the weights.
     empty = sa.skin_mesh(body, rig, auto=True)
-    smooth_weights(body, passes, SMOOTH_SHARE)
+    smooth_weights(body, passes, SMOOTH_SHARE, rig if config.get('rollSplit') else None)
     gloss = {v for p in body.data.polygons if p.material_index == 1 for v in p.vertices}
     loose = loose_parts(body)
     on_head = sorted(gloss | set(loose))
