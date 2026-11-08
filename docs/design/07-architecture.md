@@ -128,10 +128,8 @@ second gzip. `--base <ref>` also builds a commit, and prints both totals.
 
 The packed meshes of the studio bodies are most of the first download. The default demo casts
 nearly all bodies, so all bodies stay in the first download, and each packed mesh has a gzip
-budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`). A body that keeps the quads of
-its source with more arm rings, such as the rabbit, has its own budget
-(`STUDIO_MESH_GZIP_BUDGETS`), because a decimate would break its quad arm rings.
-`packStudioMesh()` writes one stream for each kind of number, so that gzip finds the repeats.
+budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`). `packStudioMesh()` writes one
+stream for each kind of number, so that gzip finds the repeats.
 
 `index.html` preloads the file of the default demo with a low priority when the hash names no
 demo, so that the score build does not wait for a fetch after the scripts. The preload starts
