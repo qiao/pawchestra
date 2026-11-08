@@ -611,14 +611,19 @@ export async function main(): Promise<void> {
     }
     const result = probeSight(id, built.score);
     results.push(result);
+    const isHidden = (v: PlayerView): boolean =>
+      v.view >= BLOCKED.audience || v.wide >= BLOCKED.audience;
     const blocked = result.sights
       .filter((s) => showAll || isBlocked(s))
       .toSorted((a, b) => b.head + b.baton - a.head - a.baton);
     const hidden = result.views
-      .filter((v) => showAll || v.view >= BLOCKED.audience || v.wide >= BLOCKED.audience)
+      .filter((v) => showAll || isHidden(v))
       .toSorted((a, b) => b.view + b.wide - a.view - a.wide);
+    // With --all, the lists hold each player, but the counts hold only the faults.
+    const blockedCount = result.sights.filter(isBlocked).length;
+    const hiddenCount = result.views.filter(isHidden).length;
     console.log(
-      `${id}: ${result.players} players, ${result.conductor ? `${blocked.length} blocked from the conductor` : 'no conductor'}, ${hidden.length} hidden from the audience`,
+      `${id}: ${result.players} players, ${result.conductor ? `${blockedCount} blocked from the conductor` : 'no conductor'}, ${hiddenCount} hidden from the audience`,
     );
     for (const s of blocked) {
       const top = Object.entries(s.blockers)
