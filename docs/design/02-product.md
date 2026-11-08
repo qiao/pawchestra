@@ -194,6 +194,9 @@ pixel ratio of a Retina screen, because the GPU time grows with the pixels and t
   and 50 Hz displays cap the rate, and a lower tier does not make these frames faster.
 - A manual setting overrides the automatic tier. The setting "Frame rate" draws at each refresh
   ("Auto"), or caps the rate at 60 or 30 fps (`frameDue()`).
+- A change of the tier compiles the new post passes in the next frames, one step in each frame
+  (`PostPipeline.setTier()`). The post effects keep the old tier until the GPU links the new
+  programs, because a frame that links a program waits on the main thread.
 - The app needs WebGL2 (`probeWebgl2()` of `app/webgl.ts`). With no WebGL2, a full-page message
   replaces the stage and the UI.
 - Supported browsers: the current and the previous major versions of Chrome, Firefox, and Safari
