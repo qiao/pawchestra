@@ -1140,6 +1140,11 @@ const WOLF_CLARINET = {
  * down and out, as a real player lets the elbows hang. With the elbows out and level, the forearms
  * are flatter, but the right upper arm goes flat (0.51, limit 0.55) and the right wrist bends 71°
  * (limit 70°).
+ *
+ * The mouthpiece rim rests on the lips, as the rim of a real trumpet player
+ * (`docs/reference/wind-technique.md` 2.1): it moves 0.012 H back from the mouth of the body
+ * (`lipShift`), so that it presses the lips 0.2 cm. At the mouth, the rim stood 0.16 cm in front of
+ * the lips.
  */
 const MONKEY_TRUMPET = {
   ...WIND_HOLDS.trumpet,
@@ -1155,6 +1160,7 @@ const MONKEY_TRUMPET = {
   restGripShiftL: [0, 0, 0.04],
   restAim: 1,
   gripCurl: curls(130, 92),
+  lipShift: [0, 0, 0.012],
 } as const satisfies WindHold;
 
 /**
