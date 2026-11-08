@@ -1770,29 +1770,16 @@ interface SightMemo {
  * moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor, and the
  * outer player does not pass its spread angle, because the spread took the room to the stage
  * edge. The inner player of a split row stays at its spread angle or farther out, or with
- * `innerLimit` at that angle from 0° or farther out.
+ * `inner` at that angle from 0° or farther out. With `view`, a hidden head costs as much as a
+ * hidden conductor.
  *
- * @param row The row after the spread.
+ * @param search The row and the items around it.
  * @param heights The height of the floor under each player.
- * @param arcs The packed arc from each player to its right neighbor, in radians.
- * @param targets The points of the conductor.
- * @param blockers The items in front of the row.
- * @param view The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or
- *   `null`. A hidden head then costs as much as a hidden conductor.
- * @param innerLimit The smallest angle of a player of a split row from 0°, in radians, or `null`.
- * @param memo The known sights of the players at their angles, or `null`.
  * @returns The steps, which return the angle of each player.
  */
-function* sightSweepSteps(
-  row: FittedRow,
-  heights: readonly number[],
-  arcs: readonly number[],
-  targets: SightTargets,
-  blockers: SightBlockers,
-  view: number | null,
-  innerLimit: number | null,
-  memo: SightMemo | null,
-): Steps<number[]> {
+function* sightSweepSteps(search: RowSearch, heights: readonly number[]): Steps<number[]> {
+  const { row, arcs, blockers, view, inner: innerLimit, memo } = search;
+  const { targets } = search.pass;
   const { members, radius, angles } = row;
   const next = [...angles];
   const sight = (i: number, angle: number): SightResult => {
@@ -2457,30 +2444,13 @@ function groupRisersOf(
  * @returns The steps, which return the try.
  */
 function* trySteps(search: RowSearch, levels: readonly number[], gap = false): Steps<SightTry> {
-  const { row, arcs, blockers, groups, groupIndex } = search;
-  const { stage, targets } = search.pass;
+  const { row, groups, groupIndex } = search;
+  const { stage } = search.pass;
   const heights = groupIndex.map((k) => levels[k] ?? 0);
-  let angles = gap
-    ? yield* sightSweepSteps(
-        { ...row, split: false },
-        heights,
-        arcs,
-        targets,
-        blockers,
-        stage.side,
-        null,
-        null,
-      )
-    : yield* sightSweepSteps(
-        row,
-        heights,
-        arcs,
-        targets,
-        blockers,
-        search.view,
-        search.inner,
-        search.memo,
-      );
+  const sweep = gap
+    ? { ...search, row: { ...row, split: false }, view: stage.side, inner: null, memo: null }
+    : search;
+  let angles = yield* sightSweepSteps(sweep, heights);
   let placement = placeRow(row.members, angles, row.radius, heights);
   if (!withinSpread(angles) || !rowFits(placement, search.clearance, stage)) {
     angles = [...row.angles];
