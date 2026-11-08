@@ -2246,6 +2246,40 @@ function joinRisers(risers: readonly (RowRiser | null)[]): RowRiser[] {
   return joined;
 }
 
+/**
+ * Finds where the risers of the seat groups of a row go into an item. A riser that goes into an
+ * item of a lower group lifts that group to the height of the riser.
+ *
+ * @param risers The riser of each group, or `null` for a group on the stage top.
+ * @param items The players and the stands of the row, with the index of their group.
+ * @param count The number of groups.
+ * @param around The items around the row that a riser must not go into.
+ * @returns The height to which each group must rise, and true if a riser goes into an item.
+ */
+function riserContact(
+  risers: readonly (RowRiser | null)[],
+  items: readonly { readonly obstacle: Obstacle; readonly group: number }[],
+  count: number,
+  around: readonly Obstacle[],
+): Pick<SightTry, 'lifts' | 'contact'> {
+  const lifts = Array.from({ length: count }, () => 0);
+  let contact = false;
+  for (const riser of risers) {
+    if (!riser) {
+      continue;
+    }
+    const box = rowRiserObstacle(riser, CENTER);
+    for (const item of items) {
+      if (obstaclesTouch(box, item.obstacle, 0)) {
+        contact = true;
+        lifts[item.group] = Math.max(lifts[item.group] ?? 0, riser.height);
+      }
+    }
+    contact ||= around.some((o) => obstaclesTouch(box, o, 0));
+  }
+  return { lifts, contact };
+}
+
 /** One try of the heights of the seat groups of a row. */
 interface SightTry {
   /** The height of the floor under each player. */
@@ -2263,6 +2297,30 @@ interface SightTry {
   readonly lifts: readonly number[];
   /** True if a riser goes into an item of the row or of the stage. */
   readonly contact: boolean;
+}
+
+/**
+ * Gives each seat group the lowest height with its fewest blocked players over the tries.
+ *
+ * @param tries The tries of the row.
+ * @param groups The seat groups of the row.
+ * @returns The height of each group.
+ */
+function chosenHeights(
+  tries: readonly SightTry[],
+  groups: readonly (readonly number[])[],
+): number[] {
+  return groups.map((group, k) => {
+    let best = { blocked: Infinity, height: 0 };
+    for (const t of tries) {
+      const count = t.blocked[k] ?? 0;
+      const height = t.heights[group[0] ?? 0] ?? 0;
+      if (count < best.blocked || (count === best.blocked && height < best.height)) {
+        best = { blocked: count, height };
+      }
+    }
+    return best.height;
+  });
 }
 
 /**
@@ -2316,6 +2374,7 @@ function* sightRowsSteps(
       ...behind.flatMap((r) => obstaclesOfRow(r.placement)),
     ];
     const groups = seatGroups(row.members);
+    const groupIndex = row.members.map((_, i) => groups.findIndex((g) => g.includes(i)));
     const extents = groupExtents(row.members, row.placement, groups);
     // A group rises only when its riser fits on the stage.
     const rises = groups.map(
@@ -2325,9 +2384,7 @@ function* sightRowsSteps(
     );
 
     const attempt = function* (levels: readonly number[]): Steps<SightTry> {
-      const heights = row.members.map(
-        (_, i) => levels[groups.findIndex((g) => g.includes(i))] ?? 0,
-      );
+      const heights = groupIndex.map((k) => levels[k] ?? 0);
       let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers);
       let placement = placeRow(row.members, angles, row.radius, heights);
       if (
@@ -2347,38 +2404,18 @@ function* sightRowsSteps(
       });
       const placed = groupExtents(row.members, placement, groups);
       const own = levels.map((h, k) => (h > 0 ? groupRiser(row, placed, k, h, stage) : null));
-      // A riser goes into an item at a lower height: its group must rise to the riser.
-      const lifts = groups.map(() => 0);
       const owners = standGroups(row.members, placement, groups);
       const items = [
-        ...placement.players.map((p, i) => ({
-          obstacle: p.obstacle,
-          group: groups.findIndex((g) => g.includes(i)),
-        })),
+        ...placement.players.map((p, i) => ({ obstacle: p.obstacle, group: groupIndex[i] ?? -1 })),
         ...placement.stands.map((p, j) => ({ obstacle: p.obstacle, group: owners[j] ?? -1 })),
       ];
-      let contact = false;
-      for (const riser of own) {
-        if (!riser) {
-          continue;
-        }
-        const box = rowRiserObstacle(riser, CENTER);
-        for (const item of items) {
-          if (obstaclesTouch(box, item.obstacle, 0)) {
-            contact = true;
-            lifts[item.group] = Math.max(lifts[item.group] ?? 0, riser.height);
-          }
-        }
-        contact ||= around.some((o) => obstaclesTouch(box, o, 0));
-      }
       return {
         heights,
         angles,
         placement,
         risers: joinRisers(own),
         blocked: groups.map((g) => g.filter((i) => blind[i]).length),
-        lifts,
-        contact,
+        ...riserContact(own, items, groups.length, around),
       };
     };
 
@@ -2412,19 +2449,7 @@ function* sightRowsSteps(
         break;
       }
     }
-    // Each group takes the lowest height with its fewest blocked players over the tries.
-    const chosen = groups.map((_, k) => {
-      let best = { blocked: Infinity, height: 0 };
-      for (const t of tries) {
-        const count = t.blocked[k] ?? 0;
-        const height = t.heights[groups[k]?.[0] ?? 0] ?? 0;
-        if (count < best.blocked || (count === best.blocked && height < best.height)) {
-          best = { blocked: count, height };
-        }
-      }
-      return best.height;
-    });
-    const last = yield* attempt(chosen);
+    const last = yield* attempt(chosenHeights(tries, groups));
     const total = (t: SightTry): number => t.blocked.reduce((a, b) => a + b, 0);
     const lift = (t: SightTry): number => t.heights.reduce((a, b) => a + b, 0);
     const valid = [last, ...tries].filter((t) => !t.contact);
