@@ -927,18 +927,22 @@ const BEAVER_REST = holdTurn(0, 0);
  * lies behind the tube with its palm to the audience and its thumb down the bassoon.
  *
  * The long muzzle and the front teeth put the tip of the nose far in front of the mouth, so the
- * reed sits 0.33 H lower and 0.25 H further back than the mouth of the bind pose, under the front
- * teeth. The beaver keeps its arms, so it plays a smaller bassoon
+ * reed sits 0.33 H lower and 0.27 H further back than the mouth of the bind pose, under the tips of
+ * the front teeth, and goes 0.3 cm between the lips, as the reed of a real bassoonist goes straight
+ * into the mouth (`docs/reference/wind-technique.md` 3). With 0.25 H back, the reed tip stood
+ * 0.4 cm off the lips. With 0.28 H back, the left paw swings 71° on its forearm in the play, over
+ * the limit of the arm gate. The beaver keeps its arms, so it plays a smaller bassoon
  * (`SpeciesParams.bassoonScale`), and each shoulder bone turns forward
  * ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a real player slides forward when the
  * arm reaches forward: with square shoulders, the right paw reaches its grip with 3 cm to spare
- * only on a bassoon of 0.75. The arms are round tubes free of the trunk, as a real bassoonist
- * keeps the elbows a little away from the body. So each elbow points further out than the elbow
- * of the old arm that the mesh joined to the trunk: the left elbow out, down, and a little back,
- * and the right elbow out, down, and forward. At rest, the right elbow points higher, and the left
- * elbow does not point back. With the old elbows, the left upper arm went 2.8 cm and the right
- * upper arm 2.5 cm into the belly. With the left elbow further out, the left paw swings more than
- * 70° on its forearm in the play. With the right elbow higher in the play, the right paw turns
+ * only on a bassoon of 0.75. The arms are round tubes free of the trunk, as a real bassoonist keeps
+ * the elbows a little away from the body. So each elbow points further out than the elbow of the
+ * old arm that the mesh joined to the trunk: the left elbow out, down, and a little back, and the
+ * right elbow out, down, and forward. At rest, the right elbow points higher, and the left elbow
+ * does not point back. With the old elbows, the left upper arm went 2.8 cm and the right upper arm
+ * 2.5 cm into the belly. With the left elbow further out, the left paw swings more than 70° on its
+ * forearm in the play, and with the left elbow less far back (0.1 back for each 1 down), it swings
+ * 71° with the reed between the lips. With the right elbow higher in the play, the right paw turns
  * more than 25° from its accepted grip.
  *
  * The right fingers curl 120° around the boot joint, against 100° on the left: with 100°, the
@@ -948,11 +952,11 @@ const BEAVER_BASSOON = {
   ...WIND_HOLDS.bassoon,
   reach: BEAVER_SHOULDER_TURN.right * MathUtils.DEG2RAD,
   reachL: BEAVER_SHOULDER_TURN.left * MathUtils.DEG2RAD,
-  lipShift: [0, -0.33, 0.25],
+  lipShift: [0, -0.33, 0.27],
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
   restShift: [0, -0.05, -0.15],
-  poleL: [-0.75, -1, 0.1],
+  poleL: [-0.75, -1, 0.2],
   poleR: [1, -1, -0.5],
   restPoleL: [-0.75, -1, 0],
   restPoleR: [1, -0.5, -0.5],
