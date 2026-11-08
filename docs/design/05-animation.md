@@ -473,10 +473,21 @@ The rest of each family:
   rests the finger tips on the valves (winds 2.1). The side aim moves the wrist off the line from
   the shoulder to the grip, so a short arm reaches the grip only with the larger turn, and a larger
   aim or turn made the arm of a slim body fold. The left paw keeps the roll of its shoulder.
-- A brass player presses the valves of the pitch (`BRASS_FUNDAMENTALS`), and the partials skip
-  the flat seventh partial, as real players do (`PARTIALS`).
-- The trombone slide takes the position of the pitch, mapped into the travel that the arm
-  reaches (`slideTravel()`). The arms do not grow for the slide.
+- **Fingering.** Each note takes the fingering of a real chart (winds 7, `windFingering()` of
+  `pose/wind-fingering.ts`), a pure function of the notes. A woodwind paw closes by the share of
+  its main fingers that close a hole or a plate. A brass paw closes by the share of its valves
+  that go down: the trumpet and the horn press with three valves, the horn takes the B♭ side
+  above the written G4, and the tuba takes valve 4 for 1-3 and 2-4 for 1-2-3 below B♭2. The
+  partials skip the flat seventh partial, as real players do (`PARTIALS`). Reason: a paw has one
+  `fingers` bone, so the count of the closed fingers is the part of the chart that shows.
+- **Presses.** A press ends at the note start and takes `WIND_MOTION.pressSec`, and a release
+  `releaseSec`, about two times the measured key times, so that each move shows in one frame. The
+  press adds a small curl to the grip (`WIND_BODY.keyCurl`), so the fingers stay close to the
+  keys, as the fingers of a professional do (winds 7.4).
+- The trombone slide takes the position of the chart, the lowest one, or an alternate of a fast
+  note that saves two positions of travel (`planSlide()`, `SLIDE_ALTERNATE`). The positions map
+  into the travel that the arm reaches, with the ratios of the real distances (`slideTravel()`).
+  The arms do not grow for the slide.
 
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 

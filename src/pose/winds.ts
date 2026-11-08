@@ -19,8 +19,7 @@ import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import { headBow } from './far-mouth.ts';
 import { elbowOutTurn, keepBent, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
-import { BRASS_FUNDAMENTALS } from './wind-notes.ts';
-import type { Fingering, WindState } from './wind-notes.ts';
+import type { WindState } from './wind-notes.ts';
 
 /** The woodwinds and the brass of design 4.6. */
 export type WindInstrument = InstrumentOf<'woodwind' | 'brass'>;
@@ -91,9 +90,6 @@ export interface WindHold {
    * mouth and the rest elbows of the hold.
    */
   readonly restArms: { readonly L: HangAngles; readonly R: HangAngles } | null;
-  readonly fingering: Fingering;
-  /** The fundamental of a brass tube, as a MIDI key. 0 for a woodwind. */
-  readonly fundamental: number;
   /**
    * The turn of the head to the left while the player plays, in radians, as the look turns the
    * neck and the head (design 5.3). The mouthpiece follows the turned mouth. A real flutist turns
@@ -252,8 +248,6 @@ const WOODWIND = {
   rest: IDENTITY,
   restShift: [0, 0, 0],
   restArms: null,
-  fingering: 'holes',
-  fundamental: 0,
   headTurn: 0,
   lipShift: [0, 0, 0],
   restFreeL: null,
@@ -508,8 +502,6 @@ export const WIND_HOLDS = {
     restPoleR: [0.5, -1, 0],
     rest: holdTurn(23, -7),
     restShift: [-0.16, 0.29, -0.1],
-    fingering: 'valves-left',
-    fundamental: BRASS_FUNDAMENTALS.horn,
   },
   // Both shoulder bones turn forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
   // as the shoulder blades of a real player slide forward. With square shoulders, the paws of most recast
@@ -539,8 +531,6 @@ export const WIND_HOLDS = {
     restShift: [0.19, 0.03, -0.03],
     faceTube: ['none', 'palm'],
     aimSide: [0, 0.4],
-    fingering: 'valves-right',
-    fundamental: BRASS_FUNDAMENTALS.trumpet,
   },
   // The slide needs the right arm far forward. Even so, the arm reaches only the first part of
   // the slide travel (design 5.3). The elbows point down, near the torso.
@@ -553,8 +543,6 @@ export const WIND_HOLDS = {
     restPoleR: [1, -1, -1],
     rest: holdTurn(-14, -2, holdTurn(-45, 0)),
     restShift: [-0.14, 0.05, -0.28],
-    fingering: 'slide',
-    fundamental: BRASS_FUNDAMENTALS.trombone,
   },
   tuba: {
     ...WOODWIND,
@@ -564,8 +552,6 @@ export const WIND_HOLDS = {
     restPoleR: [1, -1, -1],
     rest: holdTurn(1, -13, holdTurn(-10, 30)),
     restShift: [-0.01, 0.02, -0.03],
-    fingering: 'valves-right',
-    fundamental: BRASS_FUNDAMENTALS.tuba,
   },
 } as const satisfies Readonly<Record<WindInstrument, WindHold>>;
 

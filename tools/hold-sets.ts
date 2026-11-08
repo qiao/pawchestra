@@ -28,7 +28,6 @@ import {
 } from '../src/pose/percussion-rig.ts';
 import type { HandsRule, MalletAcross, MalletSet, MalletTop } from '../src/pose/percussion-rig.ts';
 import type { SideMove } from '../src/pose/side-move.ts';
-import type { Fingering } from '../src/pose/wind-notes.ts';
 import { IDENTITY } from '../src/models/tuples.ts';
 import type { Quat } from '../src/models/tuples.ts';
 import { SPECIES_WIND_HOLDS, WIND_HOLDS, holdTurn } from '../src/pose/winds.ts';
@@ -179,15 +178,6 @@ const TEXT_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
   ],
   ['action', Object.keys({ strike: true, pluck: true } satisfies Record<HandAction, true>)],
   ['top', Object.keys({ up: true, shoulder: true } satisfies Record<MalletTop, true>)],
-  [
-    'fingering',
-    Object.keys({
-      holes: true,
-      'valves-left': true,
-      'valves-right': true,
-      slide: true,
-    } satisfies Record<Fingering, true>),
-  ],
 ]);
 
 /**

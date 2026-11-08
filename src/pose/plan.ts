@@ -419,7 +419,7 @@ function* noteLayerSteps(
     return {
       family: MOTION_FAMILIES[instrument],
       rig,
-      track: buildWindTrack(notes, rig.hold.fingering, rig.hold.fundamental),
+      track: buildWindTrack(notes, instrument),
     };
   }
   if (isInFamily(instrument, ['keyboard', 'harp'])) {

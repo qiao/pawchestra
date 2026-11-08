@@ -358,9 +358,9 @@ These facts hold for each wind player:
   note of a phrase after a gap of at least `PHRASE_GAP_SEC`.
 - **The breath motion (1.6).** The app differs: the spine leans back at the top of the breath
   (`WIND_BODY.breath`), in place of an expansion of the chest and the abdomen.
-- **The fingers of the woodwinds (2.3, 2.4).** Both paws close for a low note, and the right paw
-  opens first up the octave (`holesClosed()`). The paws curl as one block (`WindHold.gripCurl`,
-  `WIND_BODY.keyCurl`).
+- **The fingering (7).** Each note takes the fingering of the charts of section 7
+  (`windFingering()` of `src/pose/wind-fingering.ts`), and section 7.5 gives its use. The paws
+  curl as one block (`WindHold.gripCurl`, `WIND_BODY.keyCurl`).
 - **The lift (1.7, 2.2).** The winds lift first in the count-in (`REST_MOTION` of
   `src/pose/rest.ts`). No source gives the time.
 
@@ -392,9 +392,10 @@ The app follows these facts:
 - **The mouthpiece (1.1).** The rim rests on the lips, with its middle 0.5 cm below the mouth line
   of the body (`mouthHeight`, design 4.4), and presses the lips 0.25 cm (`lipShift`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
-- **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with
-  no seventh partial (`slidePosition()`, `PARTIALS`). The steps keep the ratio of the real
-  distances (`slideTravel()`).
+- **The positions (1.2, 1.3, 7.3).** Each note takes the lowest position on the partials of B♭1,
+  with no seventh partial, or an alternate of a fast note that saves two positions of travel
+  (`planSlide()`, `SLIDE_ALTERNATE`). The steps keep the ratio of the real distances
+  (`slideTravel()`).
 - **The slide move (1.5).** The slide moves late and fast, ends at the note start, and stops in
   each position (`WIND_MOTION.slideSec`). The speed grows with the distance.
 - **The rest (1.7).** The slide stays closed.
@@ -475,13 +476,12 @@ The app follows these facts:
   the reed, and the reed goes 0.3 cm between the lips under the tips of the front teeth
   (`lipShift`). The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
   free arms stay out of the belly (design 5.3).
-- **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body
-  (`fingering`). The horn lies across the body, with the bell at the right of the torso and in
-  front of it, off the leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The
-  mouthpiece rests on the lips under the snout disc, at the mouth line of the body (`mouthHeight`,
-  design 4.4), and its rim presses the upper lip most. The coil stands in front of the round belly,
-  with a gap. The valves follow the single F horn chart (`BRASS_FUNDAMENTALS.horn`,
-  `HORN_PARTIALS`).
+- **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body. The
+  horn lies across the body, with the bell at the right of the torso and in front of it, off the
+  leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The mouthpiece rests on the lips
+  under the snout disc, at the mouth line of the body (`mouthHeight`, design 4.4), and its rim
+  presses the upper lip most. The coil stands in front of the round belly, with a gap. The valves
+  follow the double horn chart, with the B♭ side above the written G4 (7.3, `HORN_B_FLAT`).
 - **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
   them. The left elbow points out to the side, and the left shoulder turns forward (`poleL`,
   `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
@@ -490,10 +490,10 @@ The app follows these facts:
   elbow points out, down, and forward (`restPoleR`), so that the left wrist and the round right
   forearm stay off the horn.
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
-  holds the trumpet around the upright casings (`fingering`, `faceTube`). The right palm lies
+  holds the trumpet around the upright casings (`faceTube`). The right palm lies
   above the valves and faces down. The trumpet points a little down, straight ahead (`trumpet()`
-  of `src/models/instruments/brass.ts`, `play`). The valves follow the trumpet fingering
-  (`VALVES`, `semitonesBelowPartial()`). The rim presses the lips 0.24 cm (`lipShift`).
+  of `src/models/instruments/brass.ts`, `play`). The valves follow the trumpet chart (7.3). The
+  rim presses the lips 0.24 cm (`lipShift`).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
   paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
   the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
@@ -548,7 +548,6 @@ The app does not follow these facts:
   into the belly.
 - **The horn rest (2.2).** The round belly covers the short thighs, so the horn rests in front of
   the belly over the lap, with the bell at the right and the leadpipe up (`rest`, `restShift`).
-- **The double horn (2.2).** The app has no B♭ side.
 - **The trumpet thumb (2.1).** The right thumb lies above the lead pipe.
 - **The shared trumpet fingers (2.1).** The right fingers of a recast trumpeter stay nearly
   straight, and the paw points only a part of the way across the valves, so the fingers do not
