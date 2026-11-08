@@ -1706,9 +1706,9 @@ function gapAngles(row: FittedRow, side: -1 | 1, gap: number): number[] {
 
 /**
  * Widens the gap of the conductor on one side of row 0 (design 4.5, seat geometry), in steps. The
- * inner first desk moves out to an angle of {@link CONDUCTOR_GAPS}, or to the largest angle in steps
- * of 1° below it that keeps each seat within ±90°, each box 0.3 m from the edges, and each footprint its gaps
- * from the other items ({@link rowFits}). Its outer neighbors move out with it
+ * inner first desk moves out to an angle of {@link CONDUCTOR_GAPS}, or to the largest angle in
+ * steps of 1° below it that keeps each seat within ±90°, each box 0.3 m from the edges, and each
+ * footprint its gaps from the other items ({@link rowFits}). Its outer neighbors move out with it
  * ({@link gapAngles}).
  *
  * @param row Row 0 after the spread.
