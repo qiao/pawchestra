@@ -278,7 +278,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The violinist rabbit (design 4.4): the trial rig of the simple route (`simple_rig.py`) on the
-  // T-pose mesh. Its `.blend` holds the facts of the body: the scale of the T-pose rabbit, the
+  // Tripo P2 mesh. Its `.blend` holds the facts of the body: the scale that keeps H of main, the
   // crease angle 35°, and a seat 4 cm deeper, so that its back keeps off the chair back.
   [
     'rabbit',
@@ -287,7 +287,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       seated: true,
       soloist: true,
       constant: 'STUDIO_RABBIT',
-      glb: 'assets/models/rabbit/simple/rabbit.rig.glb',
+      glb: 'assets/models/rabbit/tripo-p2/rabbit.rig.glb',
     },
   ],
   // The red and the tan foxes (design 4.4). The wide haunch of the fox sits on a wider chair.
