@@ -1151,7 +1151,7 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
   the band, so that the players can move along the arc and the seat groups can rise after the
   spread. Thus the rows stand farther apart, and the stage is deeper.
 - **Sight lines.** After the spread and the wedges, each player sees the head and the baton paw of
-  the conductor (`CONDUCTOR_SIGHT`). The points cover the parts of the posed conductor that the
+  the conductor (`CONDUCTOR_SIGHT` of `models/sight.ts`). The points cover the parts of the posed conductor that the
   `sight-lines` probe measures: a grid on the head with its front and its back, the baton paw with
   the baton, and the left paw. The lines go from the eyes of the player to the points, against the
   triangles of the player meshes of the rows in front (a box tree of each model) and the boxes of
