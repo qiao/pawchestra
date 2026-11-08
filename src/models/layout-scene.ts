@@ -67,9 +67,7 @@ export const FOOTPRINT_GAP = 0.05;
 /**
  * The smallest free space between the footprint of a piano case and the footprint of a player in
  * a row behind it, in meters (design 4.5, seat geometry). A footprint is the bind pose, and a
- * player behind the case faces it and reaches toward it in play. With the gap of 0.05 m, the bow
- * arm of the hippo contrabass of `bach-bwv1050` touched the curved side of the case. With 0.15 m,
- * the nearest part keeps 14 cm through the whole song.
+ * player behind the case faces it and reaches toward it in play.
  */
 const PIANO_REACH_GAP = 0.15;
 
@@ -128,8 +126,8 @@ const PIANIST_FACING = -Math.PI / 2;
  * The turn of a keyboard of the orchestra from the facing of its row: a quarter turn to the
  * left, so that the pianist faces along the arc toward the middle of the stage, and the case
  * lies along the row (design 4.5, seat geometry). At 0°, the keyboard thus has the facing of the
- * piano of a concerto: the pianist faces +x, and the lid opens to the audience. Facing the
- * podium, the case of 2.3 m with the bench pushed its row 2 m back.
+ * piano of a concerto: the pianist faces +x, and the lid opens to the audience. A case that
+ * faced the podium would push its row far back.
  */
 const KEYBOARD_TURN = Math.PI / 2;
 
@@ -137,19 +135,14 @@ const KEYBOARD_TURN = Math.PI / 2;
  * The place of a soloist that does not play the piano, from the podium center: 1.75 m to the
  * left and 0.35 m to the front (design 4.5, seat geometry). It is the front left of the
  * conductor, as in a concerto. The default view and the wide views then see the heads, the arms,
- * and the violins of the first desk beside the soloist: the K. 315 flute hides at most 8.9% of
- * a first-desk player, and 4.4% of its head, arms, and violin. With the wider cute heads, the place
- * of 1.8 m and 0.3 m hid 10% of the first violin. At 0.05 m to the front, it hid 17% of a
- * first-desk player in the default view. At 1.4 m to the left, the body of the bear stood in the
- * frame of the solo shots of the flute.
+ * and the violins of the first desk beside the soloist.
  */
 export const SOLOIST_PLACE = [-1.75, 0.35] as const;
 
 /**
  * The facing of a soloist that does not play the piano: the audience, turned 40° to the
  * conductor (design 4.5, seat geometry). Thus the default view sees the face of the soloist, and
- * the soloist sees the conductor at the side. With a turn of 30° at this place, the middle of
- * the bear stood 1% of the half width outside the frame of a solo shot of the K. 315 flute.
+ * the soloist sees the conductor at the side.
  */
 export const SOLOIST_FACING = Math.PI + (40 * Math.PI) / 180;
 
@@ -1695,9 +1688,9 @@ function wedgeSideSteps(
 }
 
 /**
- * Spreads each instrumental row inside the stage, from the front (design 4.5, seat geometry). The
- * packed rows end at ±43° to ±74°, so the front corners of the stage stayed empty. The left side
- * and the right side of a row each get their own factor. Rows 0 and 1 keep the violins left of
+ * Spreads each instrumental row inside the stage, from the front (design 4.5, seat geometry), so
+ * that the rows fill the front corners of the stage. The left side and the right side of a row
+ * each get their own factor. Rows 0 and 1 keep the violins left of
  * 0° and the other strings right of it. After its spread, row 1 moves its back desks toward their
  * first desks ({@link wedgeSideSteps}). The stage side does not change.
  *
@@ -2950,7 +2943,7 @@ export function layoutScene(score: Score, models = new ModelCache()): SceneLayou
  * Finds if a keyboard of the orchestra takes the place of the piano soloist (design 4.2): the
  * first keyboard of a score with no soloist. At the front left of the conductor, its case and its
  * open lid stand in front of the rows, so they hide the conductor from no player, as the piano
- * of `orchestra-latest.png`. In row 2, the case hid the conductor from the players behind it.
+ * of `orchestra-latest.png`.
  *
  * @param score The score.
  * @param seat The seat of the player.
