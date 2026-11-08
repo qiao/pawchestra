@@ -2,7 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
-import { mixPole, mixRotation } from './blend.ts';
+import { lastAtOrBefore, mixPole, mixRotation } from './blend.ts';
 import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingHand, hangingWrist } from './hang.ts';
@@ -10,13 +10,17 @@ import type { HangingArm } from './hang.ts';
 import { limitReach, poseShoulder, solveTwoBone, writeArm, writeCurl } from './ik.ts';
 import { groupChords } from './note-groups.ts';
 import {
+  CRASH_MOTION,
+  TRIANGLE_ROLL,
   acrossAxes,
   frontKettles,
   offsetTarget,
   targetKeyOf,
   xylophoneShift,
 } from './percussion-rig.ts';
-import type { MalletSet, PercussionRig, PercussionSide } from './percussion-rig.ts';
+import type { DampRule, MalletSet, PercussionRig, PercussionSide } from './percussion-rig.ts';
+import { DAMP_MOTION, dampTrack } from './damps.ts';
+import type { DampState, DampTrack, DampWish } from './damps.ts';
 import { buildSideTrack, sideMoveAt } from './side-move.ts';
 import type { SideTrack } from './side-move.ts';
 import { smoothstep } from './rest.ts';
@@ -36,10 +40,18 @@ interface PercussionTracks {
   /** The side move of the body behind the notes (`PercussionHold.side`), or `null`. */
   readonly side: SideTrack | null;
   /**
-   * The long rests in which the sticks go to their set position (`PercussionHold.set`), or `null`
-   * for a hold with no set position or a ready hold ({@link setRests}).
+   * The long rests in which the sticks go to their set position (`PercussionHold.set`), or the
+   * hand cymbals go down, or `null` for another hold or a ready hold ({@link setRests}).
    */
   readonly rests: Float64Array | null;
+  /**
+   * The damps of each hand after a note (`PercussionHold.damp`, {@link dampWishes}), or `null`
+   * for a hand with no damps.
+   */
+  readonly dampL: DampTrack | null;
+  readonly dampR: DampTrack | null;
+  /** The follow move of the hand cymbals after a crash ({@link CRASH_MOTION}), or `null`. */
+  readonly ring: DampTrack | null;
 }
 
 /**
@@ -70,10 +82,16 @@ export const SET_MOTION = {
  *
  * @param starts The starts of the strikes of the player, sorted.
  * @param beats The times of the conducted beats, sorted.
+ * @param after The end of the move of the hands after each strike, such as a damp, in the order
+ *   of `starts`. The lowering starts there. With no value, it starts at the strike.
  * @returns Four times for each rest: the start and the end of the lowering, and the start and the
  *   end of the lift. A rest with no lowering or no lift has infinite times there.
  */
-export function setRests(starts: readonly number[], beats: Float64Array): Float64Array {
+export function setRests(
+  starts: readonly number[],
+  beats: Float64Array,
+  after: readonly number[] = [],
+): Float64Array {
   const m = SET_MOTION;
   const beat = (time: number): number => beatSecAt(beats, time) || m.beatSec;
   const rests: number[] = [];
@@ -92,10 +110,10 @@ export function setRests(starts: readonly number[], beats: Float64Array): Float6
     const end = starts[i - 1] ?? 0;
     const start = starts[i] ?? 0;
     if (start - end >= m.restBeats * beat(end)) {
-      rests.push(...lower(end), ...lift(start));
+      rests.push(...lower(after[i - 1] ?? end), ...lift(start));
     }
   }
-  rests.push(...lower(last), Infinity, Infinity);
+  rests.push(...lower(after[starts.length - 1] ?? last), Infinity, Infinity);
   return Float64Array.from(rests);
 }
 
@@ -169,13 +187,16 @@ export function percussionTracks(
   const shift = instrument === 'xylophone' ? xylophoneShift(lowest, highest) : 0;
   const keyOf = (pitch: number): number =>
     pair ? (pitch < middle ? frontL : frontR) : targetKeyOf(instrument, pitch, kettles, shift);
-  const chords = groupChords(notes, loudness).map((group): StrikeGroup => {
+  const noteGroups = groupChords(notes, loudness);
+  const chordKeys: number[] = [];
+  const chords = noteGroups.map((group): StrikeGroup => {
     const keys = new Set<number>();
     for (const note of notes.slice(group.first, group.first + group.count)) {
       keys.add(keyOf(note.pitch));
     }
     // The triangle (key 0) sounds over the tambourine (key 1).
     const chosen = instrument === 'small-percussion' ? [Math.min(...keys)] : [...keys];
+    chordKeys.push(chosen.length === 1 ? (chosen[0] ?? -1) : -1);
     const targets: StrikeTarget[] = [];
     for (const key of chosen) {
       const target = rig.targets.get(key) ?? nearestTarget(rig, key);
@@ -186,10 +207,11 @@ export function percussionTracks(
     return { start: group.start, loudness: group.loudness, targets };
   });
   // A fast roll keeps the strikes of a rate that reads as a roll: two hands in turn, or one hand.
-  const groups = thinRolls(
+  const kept = thinRolls(
     chords,
     hold.hands === 'alternate' ? STRIKE_MOTION.rollSec : STRIKE_MOTION.handRollSec,
   );
+  const groups = instrument === 'small-percussion' ? triangleRolls(rig, chords, kept) : kept;
   const side = hold.side
     ? buildSideTrack(
         hold.side,
@@ -216,16 +238,10 @@ export function percussionTracks(
       amplitude,
       beats,
     );
-  // A hold with a set position and no ready pose puts the sticks there in a long rest.
-  const rests =
-    hold.set && !hold.ready
-      ? setRests(
-          groups.map((g) => g.start),
-          beats,
-        )
-      : null;
+  let left: StrikeTrack | null;
+  let right: StrikeTrack | null;
   if (hold.hands === 'alternate' || hold.hands === 'sides') {
-    const [left, right] = alternateHands(groups, {
+    const [strikesL, strikesR] = alternateHands(groups, {
       alternateSec: hold.hands === 'sides' ? 0 : STRIKE_MOTION.alternateSec,
       gap: hold.gap,
       pass: hold.pass,
@@ -241,21 +257,284 @@ export function percussionTracks(
           ? sideMoveAt(side, start) * (hold.side.hips + Math.sin(hold.side.spine) * rig.lever)
           : 0,
     });
-    return {
-      left: track(left, hold.offsetL, rig.restL),
-      right: track(right, hold.offsetR, rig.restR),
-      side,
-      rests,
-    };
+    left = track(strikesL, hold.offsetL, rig.restL);
+    right = track(strikesR, hold.offsetR, rig.restR);
+  } else {
+    const strikes = groups.flatMap((g): Strike[] => {
+      const target = g.targets[0];
+      if (!target) {
+        return [];
+      }
+      // A louder crash of the hand cymbals meets higher.
+      const raise = hold.hands === 'pair' ? CRASH_MOTION.raise * rig.headHeight * g.loudness : 0;
+      return [
+        {
+          ...offsetTarget(target, [0, raise, 0]),
+          start: g.start,
+          loudness: g.loudness,
+        },
+      ];
+    });
+    right = track(strikes, hold.offsetR, rig.restR);
+    left = hold.hands === 'pair' ? right : null;
   }
-  const strikes = groups.flatMap((g): Strike[] => {
-    const target = g.targets[0];
-    return target ? [{ ...target, start: g.start, loudness: g.loudness }] : [];
+  const notesOf = noteGroups.map((g, k) => ({
+    start: g.start,
+    end: g.end,
+    key: chordKeys[k] ?? -1,
+  }));
+  const damps = hold.damp ? dampTracks(hold.damp, notesOf, left, right, rig) : null;
+  const ring =
+    hold.hands === 'pair' && right
+      ? ringTrack(
+          right,
+          groups.flatMap((g) => (g.targets.length > 0 ? [g.loudness] : [])),
+          damps?.[1] ?? null,
+        )
+      : null;
+  // A hold with a set position and no ready pose puts the sticks there in a long rest, and the
+  // hand cymbals go down after the move after the last crash.
+  const rests =
+    (hold.set || hold.hands === 'pair') && !hold.ready
+      ? setRests(
+          groups.map((g) => g.start),
+          beats,
+          hold.hands === 'pair' ? afterEnds(groups, [damps?.[1] ?? null, ring]) : [],
+        )
+      : null;
+  return {
+    left,
+    right,
+    side,
+    rests,
+    dampL: damps?.[0] ?? null,
+    dampR: damps?.[1] ?? null,
+    ring,
+  };
+}
+
+/**
+ * Moves the strikes of a triangle roll into the closed corner ({@link TRIANGLE_ROLL}). A roll is a
+ * run of notes on the triangle, each within `rollSec` of the note before it. Its kept strikes
+ * ({@link thinRolls}) strike the two sides of the corner in turn, from inside, from the bottom
+ * side. Another strike keeps the outer face of the right side.
+ *
+ * @param rig The points of the small percussion player.
+ * @param chords All strikes of the player, sorted by start.
+ * @param groups The kept strikes, sorted by start.
+ * @returns The kept strikes with the roll targets.
+ */
+function triangleRolls(
+  rig: PercussionRig,
+  chords: readonly StrikeGroup[],
+  groups: readonly StrikeGroup[],
+): StrikeGroup[] {
+  const bar = rig.targets.get(0);
+  const corner = TRIANGLE_ROLL.keys.map((key) => rig.targets.get(key));
+  const onBar = (g: StrikeGroup | undefined): boolean => !!g && g.targets[0] === bar;
+  // The spans of the rolls: from the first to the last note of each run.
+  const spans: [number, number][] = [];
+  for (const [i, g] of chords.entries()) {
+    const before = chords[i - 1];
+    if (!onBar(g) || !before || !onBar(before) || g.start - before.start >= TRIANGLE_ROLL.rollSec) {
+      continue;
+    }
+    const last = spans.at(-1);
+    if (last && last[1] === before.start) {
+      last[1] = g.start;
+    } else {
+      spans.push([before.start, g.start]);
+    }
+  }
+  let turn = 0;
+  return groups.map((g) => {
+    const rolls = onBar(g) && spans.some(([from, to]) => g.start >= from && g.start <= to);
+    if (!rolls) {
+      turn = 0;
+      return g;
+    }
+    const target = corner[turn % corner.length];
+    turn++;
+    return target ? { ...g, targets: [target] } : g;
   });
-  const one = track(strikes, hold.offsetR, rig.restR);
-  return hold.hands === 'pair'
-    ? { left: one, right: one, side, rests }
-    : { left: null, right: one, side, rests };
+}
+
+/**
+ * Gives the times at which the moves after each strike end their stay at the place: the start of
+ * the move back of the last window that starts before the next strike, or the strike itself.
+ *
+ * @param groups The strikes, sorted by start.
+ * @param tracks The moves after the strikes.
+ * @returns One time for each strike.
+ */
+function afterEnds(
+  groups: readonly StrikeGroup[],
+  tracks: readonly (DampTrack | null)[],
+): number[] {
+  return groups.map((g, i) => {
+    const next = groups[i + 1]?.start ?? Infinity;
+    let end = g.start;
+    for (const t of tracks) {
+      if (!t) {
+        continue;
+      }
+      for (let k = 0; k < t.starts.length; k++) {
+        const start = t.starts[k] ?? 0;
+        if (start >= g.start && start < next) {
+          end = Math.max(end, t.releases[k] ?? 0);
+        }
+      }
+    }
+    return end;
+  });
+}
+
+/** A note group of a player for the damps: its start, its end, and the key of its one target. */
+interface DampNote {
+  readonly start: number;
+  readonly end: number;
+  /** The key of the target, or -1 for a chord of more targets. */
+  readonly key: number;
+}
+
+/**
+ * Finds the damps of the two hands of a player (`PercussionHold.damp`, design 5.3). A note is
+ * damped at its end when the silence to the next note of the player is at least `restSec`. With
+ * `change`, a note on one kettle is also damped when the next note sounds on another kettle. A
+ * paw with a mallet damps the notes that it struck: the move starts after the rebound of its
+ * strike and ends before its next lift. The free paw of the bass drum damps each note: its move
+ * starts after the rebound of the beater, and ends at the next note. The hand cymbals damp with
+ * both hands.
+ *
+ * @param rule The rule of the damp.
+ * @param groups The note groups of the player, sorted by start.
+ * @param left The strikes of the left hand, or `null`.
+ * @param right The strikes of the right hand, or `null`.
+ * @param rig The points of the player.
+ * @returns The damps of the left and of the right hand.
+ */
+function dampTracks(
+  rule: DampRule,
+  groups: readonly DampNote[],
+  left: StrikeTrack | null,
+  right: StrikeTrack | null,
+  rig: PercussionRig,
+): readonly [DampTrack | null, DampTrack | null] {
+  const m = DAMP_MOTION;
+  // The hand of a group: the hand whose last strike at or before the group struck its target.
+  const struck = (hand: StrikeTrack | null, g: DampNote): number => {
+    if (!hand) {
+      return -1;
+    }
+    const i = lastAtOrBefore(hand.starts, g.start + 1e-6);
+    const at = i >= 0 ? hand.starts[i] : undefined;
+    return at !== undefined && g.start - at < 1 ? i : -1;
+  };
+  // A mallet paw damps only the kettle of its own strike, and the other paw strikes the next note
+  // at a change: the strike of the paw is on the target of the group, with the offset of the paw.
+  const onTarget = (hand: StrikeTrack, i: number, key: number, offset: Vec3): boolean => {
+    const target = rig.targets.get(key);
+    return !!target && Math.abs((hand.points[3 * i] ?? 0) - target.point[0] - offset[0]) < 1e-6;
+  };
+  const wishes = (hand: StrikeTrack | null, offset: Vec3 | null): DampWish[] => {
+    const out: DampWish[] = [];
+    for (const [k, g] of groups.entries()) {
+      const next = groups[k + 1];
+      let contact: number | null = null;
+      if (!next || next.start - g.end >= rule.restSec) {
+        contact = g.end;
+      } else if (rule.kind === 'mallet' && rule.change && next.key !== g.key && g.key >= 0) {
+        contact = next.start;
+      }
+      if (contact === null) {
+        continue;
+      }
+      if (rule.kind === 'palm') {
+        out.push({
+          contact,
+          earliest: g.start + STRIKE_MOTION.reboundSec,
+          latest: next?.start ?? Infinity,
+          hold: rule.hold,
+          key: 0,
+          inSec: m.inSec,
+          outSec: m.outSec,
+        });
+        continue;
+      }
+      const i = struck(hand, g);
+      if (!hand || i < 0 || (offset && !onTarget(hand, i, g.key, offset))) {
+        continue;
+      }
+      out.push({
+        contact,
+        earliest: hand.reboundEnds[i] ?? g.start,
+        latest: hand.upStarts[i + 1] ?? Infinity,
+        hold: rule.hold,
+        key: g.key,
+        inSec: m.inSec,
+        outSec: m.outSec,
+      });
+    }
+    return out;
+  };
+  switch (rule.kind) {
+    case 'mallet':
+      return [
+        dampTrack(wishes(left, rig.hold.offsetL)),
+        dampTrack(wishes(right, rig.hold.offsetR)),
+      ];
+    case 'palm':
+      return [dampTrack(wishes(null, null)), null];
+    case 'chest': {
+      const both = dampTrack(wishes(right, null));
+      return [both, both];
+    }
+    default: {
+      const unhandled: never = rule;
+      throw new Error(`The damp "${String(unhandled)}" has no hands.`);
+    }
+  }
+}
+
+/**
+ * Finds the follow moves of the hand cymbals after each crash ({@link CRASH_MOTION}): the plates
+ * turn out from the crash, and turn back before the damp of the note or the next lift. A crash
+ * with too little time has no follow move, so a short note goes to the chest at once. The key of
+ * each move is the loudness of its crash.
+ *
+ * @param crashes The crashes.
+ * @param loudness The loudness of each crash.
+ * @param damps The damps of the crashes.
+ * @returns The follow moves.
+ */
+function ringTrack(
+  crashes: StrikeTrack,
+  loudness: readonly number[],
+  damps: DampTrack | null,
+): DampTrack {
+  const c = CRASH_MOTION;
+  const wishes: DampWish[] = [];
+  for (let i = 0; i < crashes.starts.length; i++) {
+    const start = crashes.starts[i] ?? 0;
+    let latest = crashes.upStarts[i + 1] ?? Infinity;
+    if (damps) {
+      const k = lastAtOrBefore(damps.starts, latest);
+      const damp = damps.starts[k];
+      if (damp !== undefined && damp >= start) {
+        latest = Math.min(latest, damps.contacts[k] ?? latest);
+      }
+    }
+    wishes.push({
+      contact: start + c.ringInSec,
+      earliest: start,
+      latest,
+      hold: Infinity,
+      key: loudness[i] ?? 0,
+      inSec: c.ringInSec,
+      outSec: c.ringOutSec,
+    });
+  }
+  return dampTrack(wishes);
 }
 
 /**
@@ -281,6 +560,11 @@ function nearestTarget(rig: PercussionRig, key: number): StrikeTarget | undefine
 export interface PercussionState {
   readonly left: StrikeState;
   readonly right: StrikeState;
+  /** The damp of each hand after a note (`PercussionHold.damp`). */
+  readonly dampL: DampState;
+  readonly dampR: DampState;
+  /** The follow move of the hand cymbals after a crash ({@link CRASH_MOTION}). */
+  readonly ring: DampState;
 }
 
 /** The rotation that changes nothing. Nothing writes it. */
@@ -389,7 +673,8 @@ function holdTurn(
     out.premultiply(swing);
     direction.applyQuaternion(swing);
   }
-  // The smallest out from the rest direction to the strike direction, by the share left.
+  // The smallest turn from the rest direction to the strike direction, by the share left. A share
+  // above 1 turns past the rest direction, away from the strike.
   swing
     .setFromUnitVectors(direction, strikeAlong)
     .slerp(NO_TURN, across.pitch === null ? share : 0);
@@ -642,12 +927,68 @@ function malletHand(
 }
 
 /**
+ * Writes the wrist and the world rotation of a hand with a cymbal (design 5.3,
+ * {@link CRASH_MOTION}). The rims of the two plates meet at the crash point at the note start, and
+ * part along the crash normal by the height of the strike state. The plates slide along their
+ * faces by the slide of the strike state: the right plate down past the left plate, and the left
+ * plate up by a share. After a crash, each plate turns out to the front and up around its back
+ * rim, parts further, and rises, by the follow weight and the loudness. At a damp, the crash point
+ * goes to the chest, and the plates close. The function writes the module vectors `wrist` and
+ * `turn`.
+ *
+ * @param rig The points of the player.
+ * @param side The hand with a cymbal.
+ * @param hand The strike state of the pair.
+ * @param damp The damp of the pair.
+ * @param ring The follow move of the pair.
+ */
+function plateHand(
+  rig: PercussionRig,
+  side: Extract<PercussionSide, { kind: 'plate' }>,
+  hand: StrikeState,
+  damp: DampState,
+  ring: DampState,
+): void {
+  const c = CRASH_MOTION;
+  const h = rig.headHeight;
+  const closed = rig.dampPlace ? damp.weight : 0;
+  const follow = ring.weight * (c.ringSoft + (1 - c.ringSoft) * Math.max(ring.key, 0));
+  const normal = offset.fromArray(hand.normal);
+  head.fromArray(hand.point);
+  if (rig.dampPlace) {
+    head.lerp(along.fromArray(rig.dampPlace), closed);
+  }
+  // The slide runs down along the faces: the down direction with no part along the normal.
+  along.set(0, -1, 0).addScaledVector(normal, normal.y).normalize();
+  const slide = c.slide * h * hand.slide * (1 - closed) * (side.sign > 0 ? 1 : -c.leftShare);
+  const turnOut = c.ringTurn * follow;
+  head
+    .addScaledVector(normal, side.sign * (hand.height * (1 - closed) + c.ringOpen * h * follow))
+    .addScaledVector(along, slide);
+  // Each plate turns around its back rim, so its middle moves out and back.
+  head.addScaledVector(normal, side.sign * side.radius * Math.sin(turnOut));
+  head.z += side.radius * (1 - Math.cos(turnOut));
+  head.y += c.ringLift * h * follow;
+  // The turn out around the vertical, after the turn up around the forward axis, after the tilt.
+  swing.setFromAxisAngle(UP, -side.sign * turnOut);
+  turn
+    .setFromAxisAngle(Z_AXIS, -side.sign * c.ringUp * follow)
+    .premultiply(swing)
+    .multiply(strikeTurn.fromArray(side.turn));
+  offset.fromArray(side.face).sub(wristBind.fromArray(side.arm.bind.wrist)).applyQuaternion(turn);
+  wrist.subVectors(head, offset);
+}
+
+/**
  * Writes one arm and its fingers. An arm with no instrument hangs, also while the player plays.
+ * A free paw with a damp lays its palm on the other head of the bass drum.
  *
  * @param rig The points of the player.
  * @param side The hand.
  * @param hang The arm of the rest pose.
  * @param hand The strike state of the hand.
+ * @param damp The damp of the hand.
+ * @param ring The follow move of the hand cymbals.
  * @param pole The direction to which the elbow points while the player plays.
  * @param chest The posed frame of the chest.
  * @param weight The eased weight of the playing pose.
@@ -658,6 +999,8 @@ function poseHand(
   side: PercussionSide,
   hang: HangingArm,
   hand: StrikeState,
+  damp: DampState,
+  ring: DampState,
   pole: Vec3,
   chest: Frame,
   weight: number,
@@ -671,21 +1014,35 @@ function poseHand(
   if (side.kind === 'mallet' && rig.hold.set) {
     setHand(side, rig.hold.set, hang.pole, shoulder.position, chest, hanging, restHand);
   }
+  // The free paw of the bass drum moves from its hanging place to the other head.
+  if (side.kind === 'free' && rig.dampPlace && damp.weight > 0) {
+    hanging.lerp(head.fromArray(rig.dampPlace), damp.weight * weight);
+  }
   const play = side.kind === 'free' ? 0 : rig.hold.ready ? 1 : weight;
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
+  const rule = rig.hold.damp;
   if (side.kind === 'mallet' && side.across) {
     const rest = rig.hold.sizes.rest;
-    const share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
+    let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
+    // A damp moves the mallet target toward the player and down, so that the fingers touch the
+    // head, and the wrist turns the head of the mallet up.
+    if (rule?.kind === 'mallet' && damp.weight > 0) {
+      const [x, , z] = hand.point;
+      const length = Math.hypot(x, z) || 1;
+      along
+        .copy(head)
+        .add(offset.set((-x / length) * rule.toward, 0, (-z / length) * rule.toward))
+        .addScaledVector(offset.fromArray(hand.normal), -rule.drop[side.arm.side === 'L' ? 0 : 1]);
+      head.lerp(along, damp.weight);
+      share += (rule.share - share) * damp.weight;
+    }
     acrossHand(side, head, share, shoulder.position, turnedPole);
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);
   } else if (side.kind === 'plate') {
-    head.addScaledVector(offset.fromArray(hand.normal), side.sign * hand.height);
-    turn.fromArray(side.turn);
-    offset.fromArray(side.face).sub(wristBind.fromArray(arm.bind.wrist)).applyQuaternion(turn);
-    wrist.subVectors(head, offset);
+    plateHand(rig, side, hand, damp, ring);
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
@@ -713,9 +1070,9 @@ function poseHand(
 
 /**
  * Writes the arms and the fingers of a percussion player (design 5.3, 4.7). Each mallet head goes
- * to the place of its strike state, and the two-bone IK places each arm. The cymbals keep
- * one turn from the bind pose (`PERCUSSION_PLACES.plateTurn`), and their inner faces meet at the crash point at the note start. In the
- * rest pose, the arms hang a little out to the sides, clear of the body (design 5.2).
+ * to the place of its strike state, and the two-bone IK places each arm. The rims of the hand
+ * cymbals meet at the crash point at the note start ({@link plateHand}). In the rest pose, the
+ * arms hang a little out to the sides, clear of the body (design 5.2).
  *
  * @param rig The points of the player.
  * @param frames The posed frames of the root and of the chest.
@@ -731,6 +1088,29 @@ export function posePercussion(
   rotations: Float32Array,
 ): void {
   const chest = frames.chest;
-  poseHand(rig, rig.left, rig.hangL, state.left, rig.hold.poleL, chest, weight, rotations);
-  poseHand(rig, rig.right, rig.hangR, state.right, rig.hold.poleR, chest, weight, rotations);
+  const { hold } = rig;
+  poseHand(
+    rig,
+    rig.left,
+    rig.hangL,
+    state.left,
+    state.dampL,
+    state.ring,
+    hold.poleL,
+    chest,
+    weight,
+    rotations,
+  );
+  poseHand(
+    rig,
+    rig.right,
+    rig.hangR,
+    state.right,
+    state.dampR,
+    state.ring,
+    hold.poleR,
+    chest,
+    weight,
+    rotations,
+  );
 }

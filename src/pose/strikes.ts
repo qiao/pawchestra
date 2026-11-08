@@ -62,6 +62,11 @@ export interface StrikeSizes {
   readonly lift: number;
   /** The height above the target between two strikes. */
   readonly rest: number;
+  /**
+   * The highest lift of a stroke in a roll of one hand, at a gesture size of 1: a stroke within
+   * `1.5 × handRollSec` of the stroke before it. With no value, a roll lifts as other strokes.
+   */
+  readonly roll?: number;
 }
 
 /** A place that a mallet strikes, in the model axes. */
@@ -374,7 +379,9 @@ export function buildStrikeTrack(
     peaks: Float64Array.from(
       strikes,
       (s, i) =>
-        sizes.lift * gestureSize(s.loudness, amplitude) * Math.min(1, (ups[i] ?? 0) / m.upSec),
+        (gapBefore(i) < 1.5 * m.handRollSec ? (sizes.roll ?? sizes.lift) : sizes.lift) *
+        gestureSize(s.loudness, amplitude) *
+        Math.min(1, (ups[i] ?? 0) / m.upSec),
     ),
     rest: sizes.rest,
     first,

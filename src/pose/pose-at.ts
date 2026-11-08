@@ -37,6 +37,7 @@ import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
 import { END_BOW, endBowAt, seatHeight, smoothstep, transportHeight } from './rest.ts';
 import { hipsOffset, plantFeet, sideMoveAt } from './side-move.ts';
 import { createStrikeState, strikeStateAt } from './strikes.ts';
+import { createDampState, dampStateAt } from './damps.ts';
 import { bowStateAt, createBowState } from './strokes.ts';
 import type { BowState } from './strokes.ts';
 import { createWindState, windStateAt } from './wind-notes.ts';
@@ -502,6 +503,9 @@ function poseAnimal(
       if (note.right) {
         strikeStateAt(note.right, noteTime, strikes.right);
       }
+      dampStateAt(note.dampL, noteTime, strikes.dampL);
+      dampStateAt(note.dampR, noteTime, strikes.dampR);
+      dampStateAt(note.ring, noteTime, strikes.ring);
       // The spine leans over the instrument (`PercussionHold.lean`), also in the rest pose of a
       // player that stays ready at its instrument (`PercussionHold.ready`). The body moves to the
       // side behind the notes, and the instrument and the feet stay in place
@@ -640,7 +644,13 @@ export function poseAt(
     wind: createWindState(),
     hands: { left: createHandState(), right: createHandState() },
     choir: createChoirState(),
-    strikes: { left: createStrikeState(), right: createStrikeState() },
+    strikes: {
+      left: createStrikeState(),
+      right: createStrikeState(),
+      dampL: createDampState(),
+      dampR: createDampState(),
+      ring: createDampState(),
+    },
     conductor: {
       baton: { x: 0, y: 0 },
       cue: createCueState(),

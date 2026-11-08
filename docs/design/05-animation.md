@@ -261,7 +261,10 @@ The rest of each family:
   `SET_MOTION`): before the first note, in a rest of at least 6 beats, and after the last note.
   The sticks go down in the beat after the last strike, and lift from 2 beats to 1 beat before
   the next strike, as a drumline does (percussion 6). Reason: the sticks stood still a few cm
-  over the head through each long rest.
+  over the head through each long rest. The hand cymbals also go down to the hanging arms in a
+  long rest, after the damp or the follow move of the last crash (`setRests()` `after`), because
+  no concert source gives a rest place, and a marching method holds the plates at the sides
+  (percussion 7).
 - **Choir.** The penguin keeps the folder in front of the chest, as a choir between two pieces.
 
 ## 5.3 Instrument motion
@@ -504,10 +507,28 @@ The rest of each family:
   player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
   no preparation. A chord takes both hands, a fast repeat takes the other hand, and a hand
   does not cross the other.
+- **Damps.** A note is damped at its end when the silence to the next note of the player is at
+  least `DampRule.restSec`, as a real player muffles at a rest or after a short note
+  (percussion 4, 5, 7). The windows come from the score alone (`dampTrack()` of `pose/damps.ts`):
+  the move ends at the contact, stays for at most the hold, and ends before the next lift of the
+  hand. The timpanist damps with the paw that struck, and also damps a kettle when the next note
+  sounds on the other kettle (`change`). Its paw goes down onto the near edge of the head, and the
+  wrist turns the mallet head up (`DampRule` `mallet`). Reason: a real timpanist muffles with the
+  back fingers in the playing spot and keeps the mallet, but the short arms of the elephant reach
+  the head only at its near edge. The bass drummer lays the palm of its free paw on the left head
+  (`palm`). The hand cymbals go against the chest (`chest`).
+- **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
+  plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
+  plates slide on past each other, the right plate down and the left plate up by a share
+  (`StrikeState.slide`). A louder crash meets higher. After a crash, each plate turns out to the
+  front and up around its back rim, parts, and rises, by the loudness, until the damp or the next
+  lift (`ringTrack()`). A crash with no time for it goes to the chest at once. Reason: a real crash
+  is a glancing blow as a flam, and a long crash turns out to the hall (percussion 7). The target
+  is the plane of the rim, because the rims of two plates meet first.
 - The paws of the elephant rest above the near rims, as in the reference images, so its mallets
   strike further in than a real timpanist (`PercussionHold.rim`). The short arms of the badger
   cannot hold hand cymbals out of the round body, so it plays a suspended cymbal
-  (`SpeciesParams.cymbalForm`). The xylophone bars are smaller than real bars, so the short arms
+  (`SpeciesParams.cymbalForm`). Only a recast body plays the hand cymbals. The xylophone bars are smaller than real bars, so the short arms
   reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
   points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
   stay out of the leaning belly. A home further out misses the bars.
@@ -517,7 +538,13 @@ The rest of each family:
   second (`STRIKE_MOTION.rollSec`), and one hand at most 6 times (`handRollSec`). The sound plays
   each note. Reason: a hand that struck each note of a roll of 20 notes each second moved as a
   buzz, and a real roll of 32nd notes at 80 beats each minute has about 11 strokes each second
-  (percussion 4).
+  (percussion 4). A stroke in a roll of one hand lifts by `StrikeSizes.roll`.
+- **Triangle.** A single note strikes the outer face of the right side. The beater turns past its
+  rest direction before a louder note (`MalletAcross.peak` above 1). A roll, a run of notes each
+  within `TRIANGLE_ROLL.rollSec`, strikes the two sides of the closed lower corner in turn from
+  inside, with a small lift (`triangleRolls()`), as a real player rolls in a closed corner
+  (percussion 8). The roll targets lift toward the player, so the beater goes in and out in front
+  of the rods.
 - **Sticks and mallets between strikes.** Each snare stick and each mallet of the suspended
   cymbal keeps its strike direction, and the wrist holds the tip a few cm above the head with the
   stick almost level (`MalletAcross.pitch`), as the ready position of a real player (percussion

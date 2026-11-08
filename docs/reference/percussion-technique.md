@@ -83,6 +83,13 @@ from the V).
   strokes each second, about 5.3 for each hand (derived).
 - A roll on a low note and a large drum is slower than a roll on a high note and a small drum,
   because a loose head vibrates longer [53] [54].
+- The player muffles a head with the middle, ring, and little fingers, and keeps the mallet
+  between the thumb and the index finger [55] [56] [58]. The fingers touch the head lightly in the
+  playing spot, and do not press or slap [55] [56] [57].
+- The player muffles at the rests of the music, until the sound stops or the next note needs the
+  hand [56]. A rest does not always need a muffle [58 (secondary)]. One method muffles the last
+  note at the attack of the new note [57], and another muffles a half note on its third beat and a
+  quarter note on its second beat [59]. The most recent drums come first [56] [59].
 
 ## 5. The bass drum
 
@@ -95,7 +102,10 @@ from the V).
 - The stroke uses the wrist and the forearm, with an upstroke, and the upper arm for loud notes
   [15] [16]. The beater rebounds and moves away, so that the head rings [13].
 - The free hand muffles the head with the open palm and the fingers, mostly in the rests [13]
-  [14]. A single note often needs no muffling [13].
+  [14]. A single note often needs no muffling [13]. The player muffles only for a rest, a note
+  length, the style, or the conductor, and in a march muffles in the rests and not at the
+  strikes [13]. A knee on the playing side can muffle the playing head, and the free hand the back
+  head [58].
 - The frame tilts the drum from vertical to horizontal. Rolls take a tilt of about 45°, but the
   drum does not lie flat [14] [28].
 - In the photos of the set-up and the grip, the hand holds the mallet at the near rim of the
@@ -140,7 +150,13 @@ from the V).
 - The right plate leads and comes down onto the left plate, one edge first, as a flam [20] [21]
   [23]. Better players move both plates [20] [22].
 - After a long crash, the plates keep moving and turn out to let the sound go to the hall [21],
-  or go up above the shoulders [22]. A short note stops against the chest or the stomach [15]
+  or go up above the shoulders [22]. A fast note takes less of this follow move [21].
+- Before a crash, the player holds the plates in front of the middle of the chest, about 4 inches
+  apart [21]. The non-dominant plate stays still, and the dominant plate comes in at 35° to 45°
+  with its tip 1 to 2 inches down the inside of the other plate [60]. The plates meet as a
+  glancing blow, as a flam, so that the air between them escapes [21] [60]. A large slice up or
+  down after the crash is a fault [60]. A soft crash has a smaller angle between the plates, but
+  the plates are still not parallel [61]. A short note stops against the chest or the stomach [15]
   [20] [22]. No concert source gives the rest place. A marching method holds the plates at the
   sides, almost vertical [24].
 - A part marked "with stick" or "with mallet" plays on a suspended cymbal: one cymbal on a stand,
@@ -168,10 +184,17 @@ from the V).
   the hand and the fingers, and holds it in the non-dominant hand on the ring finger and the thumb
   [25].
 - A triangle roll moves the beater fast between two edges, the two top edges or the two bottom
-  edges [25].
+  edges [25]. A roll can play in each closed corner, and not in the open corner [63]. One teacher
+  finds the bottom corner best [64 (secondary)].
 - The left hand holds the tambourine by its frame, at or a little below the chest, tilted in at
-  about 45°, and the right hand strikes it [15] [16]. No source of this file gives a tambourine on
-  a stand.
+  about 45°, and the right hand strikes it [15] [16] [65]. Between uses it lies on a padded trap
+  table, and a soft fast passage can play on the table [65] [66]. No source of this file gives a
+  tambourine on a stand, or a table for a quick change of instruments.
+- Single notes: three bunched fingers at the middle for mf to f, a loose fist or the flat of the
+  knuckles for f to ff, and the fingertips near the rim for pp to mp [65]. Another source strikes
+  1 to 2 inches from the edge [63]. A louder passage holds the tambourine higher [66].
+- A long note is a shake roll: a turn of the forearm, as a door knob [65] [66]. A soft roll is a
+  thumb roll or a finger roll [65].
 
 ## 9. The xylophone
 
@@ -220,6 +243,11 @@ The app follows these facts:
   mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
   longer rest, the head lifts one beat before the note, at most 1 s before it
   (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
+- **The muffle (section 4).** A note is muffled at its end when a rest follows, and a kettle is
+  muffled when the next note sounds on the other kettle, as one method muffles the last note at
+  the new attack [57] (`DampRule`, `dampTrack()`). The paw that struck keeps its mallet, and the
+  wrist turns the mallet head up, as the mallet stays between the thumb and the index finger
+  [56].
 
 The app does not follow these facts:
 
@@ -228,6 +256,9 @@ The app does not follow these facts:
   a body whose belly needs the drum forward sets it higher. With the head below the elbows of each
   body, the sticks of the thin wolf and deer went into the raised drum in the lowering.
 - **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
+- **The muffle spot (section 4).** The paw goes down onto the near edge of the head, not onto the
+  playing spot, because the short arms reach the head only there. The round paw touches with its
+  end, not with three fingers.
 - **The set position (section 3).** Between strikes, the wrist lifts the head above its spot with
   the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
   closed paw. Each paw keeps the roll that has no side bend at the strike
@@ -253,7 +284,10 @@ The app follows these facts:
   badger stands behind the drum, and the right paw holds the beater at the near rim, one third up
   from the butt. At the strike, the beater lies along the head, as the photos of [13] show, and
   strikes about one third in from the rim [16]. The left arm hangs, because a single note often
-  needs no muffling. The right upper arm hangs beside the body with the elbow down and back
+  needs no muffling. After a note with a rest after it, the left paw lays its open palm on the
+  left head, the back head, and goes back before the next note, as a player muffles in the rests
+  of a march with the free hand [13] [58] (`DampRule` `palm`). The right upper arm hangs beside
+  the body with the elbow down and back
   (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
   The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
@@ -280,11 +314,20 @@ The app follows these facts:
   level, as the ready position of the snare drum. Before a strike, it lifts higher for a louder
   note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`).
 - **The triangle (section 8).** The clip lies in the palm under the curled fingers, and the
-  triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`).
+  triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`). A single note strikes the side
+  across from the open corner [63]. Before a louder note, the beater turns further back
+  (`MalletAcross.peak`). A roll moves the beater fast between the two sides of the closed lower
+  corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
 - **The xylophone (section 9).** The body moves from side to side behind the notes with the feet
   in place (`PercussionHold.side`), and the head turns back so the eyes stay level. A fast strike
   takes the other paw (`PercussionHold.pass`, `PercussionHold.gap`), and a wider leap takes a
   double stroke. A mallet strikes a sharp bar near its edge near the player.
+- **The hand cymbals of a recast body (section 7).** The plates tilt from vertical, and the right
+  plate comes down onto the left plate. The rims meet a little offset and slide on past each
+  other, as a glancing blow [21] [60]. A louder crash meets higher. After a crash, the plates turn
+  out to the front and up and rise, less after a soft crash and not after a fast one [21] [23]. At
+  the end of a note before a rest, the plates go against the chest [20] [22] (`CRASH_MOTION`,
+  `DampRule` `chest`).
 
 The app does not follow these facts:
 
@@ -295,19 +338,21 @@ The app does not follow these facts:
   (`PercussionHold.lean`), so that the short arm can bend.
 - **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
   second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
-  strikes the bottom side in one place, at most 6 times each second (`handRollSec`), and does not
-  move between two edges.
+  strikes at most 6 times each second (`handRollSec`).
 - **The hold of the triangle (section 8).** The clip is at the height of the mouth
   (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of the
   long snout. The paw holds the clip in the palm, with the fingers up. No source gives the turn of
   the hand.
 - **The tambourine (section 8).** The tambourine stands on a stand at the front right
-  (`TAMBOURINE`).
+  (`TAMBOURINE`), because the left paw holds the triangle through the whole part. The tip of the
+  beater strikes it, with no shake roll and no thumb roll.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`). The plate has no
   muffling.
-- **The hand cymbals (section 7).** The plates meet vertical, in front of the shoulders
-  (`PERCUSSION_PLACES.crash`, `plateTurn`).
+- **The hand cymbals (section 7).** The plates stay parallel at the crash, with no angle of a
+  flam between them [60] [61], and tilt 30° from vertical. No concert source gives the rest place:
+  in a long rest, the arms hang with the plates at the sides, as a marching method holds them
+  [24].
 - **The xylophone grip (section 9).** The paws hang low in front of the belly, so each shaft runs
   near the line of its forearm and leaves the paw under the curled claws. The right elbow points
   far out, and each mallet points from a place out from its shoulder (`PercussionHold.home`), so
@@ -351,7 +396,7 @@ The models of `percussion.ts` follow these facts of real concert instruments (de
 ## 11. Sources
 
 Sources 1 to 12 opened on 2026-10-19, sources 13 to 33 on 2026-10-20, sources 36 to 42 on
-2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 54
+2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 66
 on 2026-11-08, except where a source says "a search summary only".
 
 1. "3 Timpani Grips", The Instrumentalist, December 2014.
@@ -461,3 +506,28 @@ on 2026-11-08, except where a source says "a search summary only".
     https://freepercussionlessons.com/how-to-properly-perform-a-timpani-roll/
 54. A. Proctor, "How to Play Timpani Rolls on Low and High Notes", Free Percussion Lessons.
     https://freepercussionlessons.com/how-to-play-timpani-rolls-on-low-and-high-notes
+55. T. McCutchen and K. Broadway, "Timpani Fundamentals", PASIC 2003 clinic handout.
+    https://core-docs.s3.us-east-1.amazonaws.com/documents/asset/uploaded_file/3707/SWHS/3585299/Timpani_Fundamentals.pdf
+56. J. Gottry, "Timpani Technique".
+    https://cachepe2.samedaymusic.com/media/gotry_learn-59cff78b3b50899e6a98bc0c9f3d6c43.pdf
+57. S. Hemphill, "Enhancing Student Timpani Skills", PAS Educators' Companion, vol. II.
+    https://pas.org/wp-content/uploads/2024/04/ECV0212-15.pdf
+58. N. Buonviri, "Muffling Percussion Instruments", The Instrumentalist, December 2018.
+    https://theinstrumentalist.com/december-2018/muffling-percussion-instruments
+59. A. Proctor, "How to Dampen Timpani", Free Percussion Lessons.
+    https://freepercussionlessons.com/how-to-dampen-timpani
+60. T. Dobbs, "Accessory Percussion Fundamentals: Crash Cymbals, Part One", PAS Educators'
+    Companion, vol. VI. https://pas.org/wp-content/uploads/2024/04/ECV0608-14.pdf
+61. N. Buonviri, "Fixing Cymbal Crashes", The Instrumentalist, January 2017.
+    https://theinstrumentalist.com/?p=5074
+62. D. Skidmore, "A Fresh Approach to Four Mallets", lesson 1, Vic Firth education.
+    https://ae.vicfirth.com/wp-content/uploads/Skidmore-FA4M-excerpt-Lesson1.pdf
+63. M. Weyer, "Accessory Chops", PAS Educators' Companion, vol. III.
+    https://pas.org/wp-content/uploads/2024/04/ECV0356-60.pdf
+64. W. James, "Technique Improvement and Maintenance Warm-Up Routines: Triangle", Grover Pro
+    Percussion.
+    https://groverpro.com/technique-improvement-and-maintenance-warm-up-routines-triangle-by-will-james
+65. B. Stiers, "Tambourine Essentials", Grover Pro Percussion.
+    https://groverpro.com/docs/Tech-Talk/Tambourine_Essentials_Ben_Stiers.pdf
+66. G. Hicken and M. Lortz, "Tambourine Technique", The Instrumentalist, October/November 2020.
+    https://theinstrumentalist.com/october-november-2020/tambourine-technique/

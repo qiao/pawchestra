@@ -4,8 +4,10 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import {
+  BASS_DRUM,
   SNARE_DRUM,
   TIMPANI,
+  TRIANGLE,
   XYLOPHONE,
   kettleHeadRadius,
   xylophoneBarPosition,
@@ -85,7 +87,8 @@ export interface MalletAcross {
    * strike state over the rest height of the hold (`StrikeSizes.rest`), so a share above 1 lifts
    * the head higher than between strikes, as a real timpanist lifts the mallet before the stroke
    * (`docs/reference/percussion-technique.md` 4). 1: the head lifts no higher than between
-   * strikes. A hold with no pitch takes 1, because its share mixes two turns.
+   * strikes. With no pitch, a share above 1 turns the mallet past its rest direction, away from
+   * the strike direction.
    */
   readonly peak: number;
 }
@@ -108,6 +111,56 @@ export interface MalletSet {
    */
   readonly rise: readonly [left: number, right: number];
 }
+
+/**
+ * The damp of the sound of an instrument after a note (design 5.3), as a real player stops the
+ * ring of a drum or a cymbal at a rest or after a short note
+ * (`docs/reference/percussion-technique.md` 4, 5, 7). A note is damped at its end when the
+ * silence from its end to the next note of the player is at least `restSec`.
+ *
+ * - `mallet`: the paw that struck the head puts its fingers on the head and keeps its mallet, as
+ *   a timpanist damps with the fingertips. The mallet target moves toward the player and down,
+ *   and the wrist turns the head of the mallet up. With `change`, the paw also damps its kettle
+ *   when the next note sounds on another kettle, as a timpanist stops the old pitch at a change.
+ * - `palm`: the free paw lays its palm on the other head of the bass drum.
+ * - `chest`: the hand cymbals go against the chest.
+ */
+export type DampRule =
+  | {
+      readonly kind: 'mallet';
+      readonly restSec: number;
+      readonly change: boolean;
+      /** The longest contact, in seconds. */
+      readonly hold: number;
+      /** The move of the mallet target toward the player on the floor plane, in meters. */
+      readonly toward: number;
+      /**
+       * The move of the mallet target down along the normal of the head, in meters, for the left
+       * and the right paw.
+       */
+      readonly drop: readonly [left: number, right: number];
+      /** The share of the pitch of the mallet at the damp (`MalletAcross.pitch`). */
+      readonly share: number;
+    }
+  | {
+      readonly kind: 'palm';
+      readonly restSec: number;
+      readonly hold: number;
+      /**
+       * The wrist at the damp, from the middle of the left head of the drum, in meters in the
+       * model axes. The paw keeps the turn of the hanging arm, with the palm in toward the head.
+       */
+      readonly wrist: Vec3;
+    }
+  | {
+      readonly kind: 'chest';
+      readonly restSec: number;
+      readonly hold: number;
+      /** The drop of the crash point at the damp, in head heights. */
+      readonly drop: number;
+      /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
+      readonly room: number;
+    };
 
 /**
  * The values of the hold of each percussion instrument (design 5.3). The directions are in the
@@ -212,6 +265,8 @@ interface PercussionHold {
    * keeps its bind place.
    */
   readonly fit: DrumFit | null;
+  /** The damp of the sound after a note, or `null`: the instrument rings. */
+  readonly damp: DampRule | null;
 }
 
 /**
@@ -238,6 +293,9 @@ export interface DrumFit {
  */
 const POLE_L: Vec3 = [-1, -1, 0.3];
 const POLE_R: Vec3 = [1, -1, 0.3];
+
+/** The forward axis of the model, around which the hand cymbals tilt. Nothing writes it. */
+const Z_AXIS = new Vector3(0, 0, 1);
 
 /** The place from which a mallet points to its target in most holds (`PercussionHold.home`). */
 const MALLET_HOME: Vec3 = [0, -0.2, -0.75];
@@ -297,6 +355,15 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
+    damp: {
+      kind: 'mallet',
+      restSec: 0.3,
+      change: true,
+      hold: 0.25,
+      toward: 0.04,
+      drop: [0.3, 0.3],
+      share: 18,
+    },
     // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and malletSpotR).
     curl: 100 * MathUtils.DEG2RAD,
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
@@ -344,6 +411,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0.12,
     side: null,
     fit: null,
+    damp: { kind: 'palm', restSec: 0.5, hold: 0.5, wrist: [0.12, 0.05, -0.06] },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -388,6 +456,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: { drop: 0.07, gap: 0.15 },
+    damp: null,
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -415,6 +484,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
+    damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -424,7 +494,7 @@ export const PERCUSSION_HOLDS = {
   // turn of the left paw from the hanging arm swings the paw far in the lift.
   'small-percussion': {
     hands: 'right',
-    sizes: { lift: 0.05, rest: 0.02 },
+    sizes: { lift: 0.05, rest: 0.02, roll: 0.01 },
     offsetL: [0, 0, 0],
     offsetR: [0, 0, 0],
     poleL: [-1, -0.5, 0.3],
@@ -432,7 +502,7 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: MALLET_HOME,
     top: 'up',
-    across: { rest: -0.6, lift: 0.3, pitch: null, peak: 1 },
+    across: { rest: -0.6, lift: 0.3, pitch: null, peak: 3 },
     pitchR: 1,
     ready: true,
     set: null,
@@ -443,6 +513,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
+    damp: null,
     // The left paw closes on the clip of the triangle and the right paw on the short beater with
     // less curl: at 90°, the left paw folds 10 faces at the knuckles.
     curl: 75 * MathUtils.DEG2RAD,
@@ -500,6 +571,7 @@ export const PERCUSSION_HOLDS = {
     // 14°, the left paw bends 70° on the forearm, the limit of the arm gate.
     side: { span: 0.25, hips: 0, spine: 12 * MathUtils.DEG2RAD, moveSec: 0.6 },
     fit: null,
+    damp: null,
     curl: GRIP_CURL,
     // A roll that removes the side bend at each strike turns the paws fast between the bars, so
     // the forearm lies in the plane of the palm.
@@ -544,23 +616,57 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   lean: 0,
   side: null,
   fit: null,
+  damp: null,
   curl: GRIP_CURL,
   strikeRoll: true,
 };
+
+/**
+ * The motion of the hand cymbals (design 5.3), as a real crash (`docs/reference/percussion-technique.md`
+ * 7). The plates tilt from vertical, so that the right plate comes down onto the left plate. They
+ * meet a little offset, as a glancing blow, and slide on past each other: the right plate down and
+ * the left plate up (`StrikeState.slide`). After a crash, the plates part, turn their inner faces
+ * out to the front and up, and rise, so that the sound rings to the hall. At the end of a note
+ * before a rest, they go against the chest (`DampRule` `chest`). A louder crash meets higher. The
+ * lengths are in head heights `H`.
+ */
+export const CRASH_MOTION = {
+  /** The tilt of both plates from vertical around the forward axis, in radians. */
+  tilt: 30 * MathUtils.DEG2RAD,
+  /** The full slide of the right plate along its face, from the top of the lift to the rebound. */
+  slide: 0.1,
+  /** The share of the slide of the right plate that the left plate makes the other way. */
+  leftShare: 0.5,
+  /** The rise of the crash point from the softest to the loudest crash (`gestureSize()`). */
+  raise: 0.15,
+  /**
+   * The turn of each inner face out to the front after a crash, in radians. Each plate turns
+   * around its back rim, as a door on its hinge, so that the back rims do not meet.
+   */
+  ringTurn: 45 * MathUtils.DEG2RAD,
+  /** The turn of each inner face up after a crash, in radians. */
+  ringUp: 20 * MathUtils.DEG2RAD,
+  /** The move of each plate away from the other plate after a crash, more than the rest height. */
+  ringOpen: 0.06,
+  /** The rise of the plates after a crash. */
+  ringLift: 0.08,
+  /** The turn out takes this time after the crash, in seconds. */
+  ringInSec: 0.35,
+  /** The plates turn back in this time, in seconds. */
+  ringOutSec: 0.3,
+  /** The share of the follow move after the softest crash. It grows to 1 at the loudest crash. */
+  ringSoft: 0.25,
+} as const;
 
 /** The places of the hands of a percussion player, in head heights `H` (design 5.3). */
 export const PERCUSSION_PLACES = {
   /** The place from which a mallet points to its target in most holds (`PercussionHold.home`). */
   malletHome: MALLET_HOME,
-  /** The cymbals meet here, from the middle of the two shoulder joints. */
-  crash: [0, -0.09, -1.1],
   /**
-   * The world rotation of both cymbals from the bind pose, where the plates are vertical and
-   * their inner faces look along x. The crash normal turns with them, so the inner faces stay
-   * parallel at the crash. `holdTurn(0, <z>)` of `pose/winds.ts` tilts the plates from vertical:
-   * a positive turn puts the left plate under the right plate.
+   * The cymbals meet here at a soft crash, from the middle of the two shoulder joints. A louder
+   * crash meets higher (`CRASH_MOTION.raise`).
    */
-  plateTurn: IDENTITY,
+  crash: [0, -0.09, -1.1],
   /**
    * The clip of the triangle in the left hand, from the left shoulder joint: at the height of the
    * mouth of the badger, as near to the eye level of a real player as its short arm reaches.
@@ -576,6 +682,58 @@ export const PERCUSSION_PLACES = {
   // forearm of the raised arm.
   triangleHand: [-0.664463, 0.241845, 0.241845, 0.664463],
 } as const;
+
+/**
+ * The roll of the triangle (design 5.3): the beater moves fast between the two sides of the closed
+ * lower corner, inside the corner, as a real player rolls in a closed corner
+ * (`docs/reference/percussion-technique.md` 8).
+ */
+export const TRIANGLE_ROLL = {
+  /** The keys of the targets on the bottom side and on the right side, near the corner. */
+  keys: [2, 3],
+  /** The distance of each target from the corner, along its side, in meters. */
+  fromCorner: 0.035,
+  /**
+   * The radius of the rod and of the beater: each target is this far in from the middle line of
+   * its side, so that the beater touches the rod and does not go into it.
+   */
+  touch: TRIANGLE.rod + TRIANGLE.beater,
+  /** The part of the lift toward the player, against the part toward the inside of the corner. */
+  front: 1,
+  /**
+   * A note on the triangle within this time of the note before it is a part of a roll, in
+   * seconds: faster than eight notes each second.
+   */
+  rollSec: 0.125,
+} as const;
+
+/**
+ * Gives the two roll targets of the triangle in the axes of its piece ({@link TRIANGLE_ROLL}):
+ * the key, the point on the inner face of the side, and the unit normal into the corner.
+ *
+ * @returns The target on the bottom side and the target on the right side.
+ */
+function triangleCorner(): readonly (readonly [number, Vec3, Vec3])[] {
+  const { side } = TRIANGLE;
+  const low = -0.05 - side * Math.sin(60 * MathUtils.DEG2RAD);
+  const corner = new Vector3(side / 2, low, 0);
+  const top = new Vector3(0, -0.05, 0);
+  const leftCorner = new Vector3(-side / 2, low, 0);
+  const { keys, fromCorner, touch } = TRIANGLE_ROLL;
+  const point = (to: Vector3, inward: Vector3): Vec3 =>
+    toVec3(
+      corner
+        .clone()
+        .add(to.clone().sub(corner).setLength(fromCorner))
+        .addScaledVector(inward, touch),
+    );
+  const up = new Vector3(0, 1, 0);
+  const intoRight = new Vector3(-Math.sin(60 * MathUtils.DEG2RAD), -0.5, 0);
+  return [
+    [keys[0], point(leftCorner, up), toVec3(up)],
+    [keys[1], point(top, intoRight), toVec3(intoRight)],
+  ];
+}
 
 /** The MIDI key of the tambourine (design 4.6). The other keys of the player strike the triangle. */
 const TAMBOURINE_KEY = 54;
@@ -615,12 +773,14 @@ export type PercussionSide =
   | {
       readonly kind: 'plate';
       readonly arm: ArmRig;
-      /** The middle of the inner face of the cymbal in the bind pose. */
+      /** The middle of the plane of the rim on the inner side of the cymbal in the bind pose. */
       readonly face: Vec3;
       /** -1 for the left cymbal and 1 for the right cymbal: the side of the crash point. */
       readonly sign: -1 | 1;
-      /** The world rotation of the hand from the bind pose (`PERCUSSION_PLACES.plateTurn`). */
+      /** The world rotation of the hand from the bind pose: the tilt of `CRASH_MOTION`. */
       readonly turn: Quat;
+      /** The distance from the middle of the plane of the rim to a corner of the rim, in meters. */
+      readonly radius: number;
     }
   | {
       readonly kind: 'hold';
@@ -635,6 +795,8 @@ export type PercussionSide =
 export interface PercussionRig {
   readonly instrument: PercussionInstrument;
   readonly hold: PercussionHold;
+  /** The head height `H` of the body, in meters. */
+  readonly headHeight: number;
   readonly chestBind: Vec3;
   readonly left: PercussionSide;
   readonly right: PercussionSide;
@@ -659,6 +821,12 @@ export interface PercussionRig {
    * drum from the body (`PercussionHold.fit`), or (0, 0, 0).
    */
   readonly place: Vec3;
+  /**
+   * The place of a damp with no mallet (`PercussionHold.damp`), in the model axes: the wrist of the
+   * free paw on the left head of the bass drum, or the crash point of the hand cymbals at the
+   * chest. `null` for another hold.
+   */
+  readonly dampPlace: Vec3 | null;
 }
 
 /**
@@ -804,16 +972,18 @@ export function kettleOf(pitch: number, kettles: number): number {
 }
 
 /**
- * Gives the two hands of a pair of hand cymbals, and sets the crash target (design 5.3): the
- * inner faces meet at the crash point, along the crash normal of `PERCUSSION_PLACES.plateTurn`.
+ * Gives the two hands of a pair of hand cymbals, and sets the crash target (design 5.3): the rims
+ * meet at the crash point, along the crash normal of the tilt of `CRASH_MOTION`. It also gives the
+ * crash point of the damp against the chest (`DampRule` `chest`): lower by the drop, and as far
+ * forward as the room between the rims and the front of the trunk needs.
  *
  * @param model The player with the hand cymbals.
  * @param left The left arm.
  * @param right The right arm.
  * @param inH Gives a vector in head heights in meters.
  * @param targets Gets the crash target as key 0.
- * @returns The left and the right hand.
- * @throws Error if a cymbal has no target of its inner face.
+ * @returns The left and the right hand, and the crash point of the damp, or `null` with no damp.
+ * @throws Error if a cymbal has no target of its plane of the rim.
  */
 function pairOfPlates(
   model: PlayerModel,
@@ -821,23 +991,48 @@ function pairOfPlates(
   right: ArmRig,
   inH: (v: Vec3) => Vector3,
   targets: Map<number, StrikeTarget>,
-): readonly [PercussionSide, PercussionSide] {
+): { readonly sides: readonly [PercussionSide, PercussionSide]; readonly chest: Vec3 | null } {
   const middle = new Vector3(...left.bind.shoulder)
     .add(new Vector3(...right.bind.shoulder))
     .multiplyScalar(0.5);
   const crash = inH(PERCUSSION_PLACES.crash).add(middle);
-  const plateTurn = PERCUSSION_PLACES.plateTurn;
+  const plateTurn = toQuat(new Quaternion().setFromAxisAngle(Z_AXIS, CRASH_MOTION.tilt));
   const normal = new Vector3(1, 0, 0).applyQuaternion(new Quaternion(...plateTurn));
   targets.set(0, { point: toVec3(crash), normal: toVec3(normal) });
-  const face = (bone: 'malletL' | 'malletR'): Vec3 =>
-    bindTarget(
-      model,
-      findTarget(model, (t) => t.kind === 'plate' && t.bone === bone),
-    ).point;
-  return [
-    { kind: 'plate', arm: left, face: face('malletL'), sign: -1, turn: plateTurn },
-    { kind: 'plate', arm: right, face: face('malletR'), sign: 1, turn: plateTurn },
-  ];
+  const rim = (bone: 'malletL' | 'malletR'): StrikeTarget & { radius: number } => {
+    const target = findTarget(model, (t) => t.kind === 'plate' && t.bone === bone);
+    const from = bindTarget(model, target).point;
+    const to = bindTarget(model, target, target.to).point;
+    return {
+      ...bindTarget(model, target),
+      radius: new Vector3(...from).distanceTo(new Vector3(...to)),
+    };
+  };
+  const [rimL, rimR] = [rim('malletL'), rim('malletR')];
+  const plate = (arm: ArmRig, at: typeof rimL, sign: -1 | 1): PercussionSide => ({
+    kind: 'plate',
+    arm,
+    face: at.point,
+    sign,
+    turn: plateTurn,
+    radius: at.radius,
+  });
+  const hold = PERCUSSION_HOLDS.cymbals.damp;
+  let chest: Vec3 | null = null;
+  if (hold.kind === 'chest') {
+    const radius = Math.max(rimL.radius, rimR.radius);
+    const y = crash.y - hold.drop * model.body.headHeight;
+    let front = Infinity;
+    for (let k = 0; k <= FRONT_POINTS; k++) {
+      const z = trunkFront(model, 0, y - radius + (2 * radius * k) / FRONT_POINTS);
+      if (z !== null) {
+        front = Math.min(front, z);
+      }
+    }
+    const z = Number.isFinite(front) ? front - radius - hold.room : crash.z;
+    chest = [crash.x, y, Math.max(z, crash.z)];
+  }
+  return { sides: [plate(left, rimL, -1), plate(right, rimR, 1)], chest };
 }
 
 /** The number of heights at which {@link fitDrumPlace} measures the front of the trunk. */
@@ -974,6 +1169,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   const targets = new Map<number, StrikeTarget>();
   const heads = model.instrument.targets.filter((t) => t.kind === 'head');
   let sides: readonly [PercussionSide, PercussionSide];
+  let dampPlace: Vec3 | null = null;
   switch (instrument) {
     case 'timpani':
       for (const [i, head] of heads.entries()) {
@@ -993,7 +1189,9 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         );
         sides = [mallet(left, 'malletL'), mallet(right, 'malletR')];
       } else {
-        sides = pairOfPlates(model, left, right, inH, targets);
+        const plates = pairOfPlates(model, left, right, inH, targets);
+        sides = plates.sides;
+        dampPlace = plates.chest;
       }
       break;
     case 'bass-drum':
@@ -1012,6 +1210,18 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         instrument === 'snare-drum' ? mallet(left, 'malletL') : { kind: 'free', arm: left },
         mallet(right, 'malletR'),
       ];
+      // The free paw damps the left head: the right head one depth of the shell back along its
+      // normal.
+      if (hold.damp?.kind === 'palm') {
+        const head = targets.get(0);
+        if (head) {
+          dampPlace = toVec3(
+            new Vector3(...head.point)
+              .addScaledVector(new Vector3(...head.normal), -BASS_DRUM.depth)
+              .add(new Vector3(...hold.damp.wrist)),
+          );
+        }
+      }
       break;
     case 'xylophone': {
       const bars = findTarget(model, (t) => t.kind === 'bars');
@@ -1032,10 +1242,8 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       const held = (point: Vec3): Vector3 =>
         new Vector3(...point).sub(bindWrist).applyQuaternion(hand);
       const wrist = toVec3(clip.sub(held(clipBind)));
-      const bar = bindTarget(
-        model,
-        findTarget(model, (t) => t.kind === 'bar'),
-      );
+      const barTarget = findTarget(model, (t) => t.kind === 'bar');
+      const bar = bindTarget(model, barTarget);
       targets.set(0, {
         point: toVec3(held(bar.point).add(new Vector3(...wrist))),
         normal: toVec3(new Vector3(...bar.normal).applyQuaternion(hand)),
@@ -1047,6 +1255,22 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
           findTarget(model, (t) => t.kind === 'head'),
         ),
       );
+      // A roll strikes the two sides of the closed lower corner from inside, in turn
+      // (TRIANGLE_ROLL_KEYS). Each target lies on the inner face of its side, and lifts toward
+      // the inside of the corner and toward the player, so that the beater goes in and out in
+      // front of the rods.
+      for (const [key, local, inward] of triangleCorner()) {
+        const placed = bindTarget(model, { ...barTarget, normal: inward }, local);
+        targets.set(key, {
+          point: toVec3(held(placed.point).add(new Vector3(...wrist))),
+          normal: toVec3(
+            new Vector3(...placed.normal)
+              .applyQuaternion(hand)
+              .add(new Vector3(0, 0, TRIANGLE_ROLL.front))
+              .normalize(),
+          ),
+        });
+      }
       sides = [
         { kind: 'hold', arm: left, wrist, hand: PERCUSSION_PLACES.triangleHand },
         mallet(right, 'malletR'),
@@ -1068,6 +1292,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   return {
     instrument,
     hold,
+    headHeight: h,
     chestBind: model.skeleton.positions[boneIndex('chest')] ?? [0, 0, 0],
     left: sides[0],
     right: sides[1],
@@ -1079,6 +1304,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     legs: hold.side ? plantedLegs(model) : null,
     lever: left.bind.shoulder[1] - (model.skeleton.positions[boneIndex('spine')]?.[1] ?? 0),
     place,
+    dampPlace,
   };
 }
 

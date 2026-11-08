@@ -50,6 +50,7 @@ import { planPedals } from './harp-pedals.ts';
 import type { PedalPlan } from './harp-pedals.ts';
 import type { HarpFingering } from './harp-fingering.ts';
 import type { StringTrack } from './harp-strings.ts';
+import type { DampTrack } from './damps.ts';
 import { percussionTracks } from './percussion.ts';
 import { percussionRig } from './percussion-rig.ts';
 import type { PercussionRig } from './percussion-rig.ts';
@@ -133,6 +134,11 @@ export interface PercussionLayer {
   readonly side: SideTrack | null;
   /** The long rests with the sticks in their set position (`setRests()`), or `null`. */
   readonly rests: Float64Array | null;
+  /** The damps of each hand after a note (`PercussionHold.damp`), or `null`. */
+  readonly dampL: DampTrack | null;
+  readonly dampR: DampTrack | null;
+  /** The follow move of the hand cymbals after a crash (`CRASH_MOTION`), or `null`. */
+  readonly ring: DampTrack | null;
 }
 
 /** The note layer of the conductor: the baton, the cues, and the left hand (design 5.4). */

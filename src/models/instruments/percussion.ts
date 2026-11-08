@@ -315,6 +315,10 @@ export const TRIANGLE = {
   bend: 0.012,
   /** The distance from the open corner to each end of the rod, along its side. */
   gap: 0.014,
+  /** The radius of the rod of the triangle. */
+  rod: 0.005,
+  /** The radius of the metal rod of the beater. */
+  beater: 0.0035,
 } as const;
 
 /**
@@ -601,7 +605,7 @@ const SNARE_STICK: MalletLook = (piece, length, butt) => {
  */
 const TRIANGLE_BEATER: MalletLook = (piece, length, butt) => {
   const metal = INSTRUMENT_COLORS.silver;
-  piece.rod([0.03, 0, 0], [length, 0, 0], 0.0035, 6, metal, 'metal');
+  piece.rod([0.03, 0, 0], [length, 0, 0], TRIANGLE.beater, 6, metal, 'metal');
   piece.rod([-butt, 0, 0], [0.03, 0, 0], 0.006, 6, INSTRUMENT_COLORS.hardware);
 };
 
@@ -1837,7 +1841,7 @@ function addTriangle(piece: PieceBuilder): void {
     toward(top, left, bend),
     toward(left, top, gap),
   ];
-  piece.add(tube(path, 0.005, 6), metal, transform(), 'metal');
+  piece.add(tube(path, TRIANGLE.rod, 6), metal, transform(), 'metal');
   // A real player holds the triangle by a clip in the left hand, and the triangle hangs in a loop
   // of cord through the clip (`docs/reference/percussion-technique.md` 8). The clip lies in the
   // palm of the closed left paw and leaves its heel, and the loop goes around the top corner.
