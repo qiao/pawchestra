@@ -547,11 +547,15 @@ def add_surface(body, species, texture=None, eye_fans=True, config=None):
 
 
 def import_source(path, weld):
-    """Adds the mesh of a source GLB file in the units of the studio, as `load_mesh()` of
-    `rig_mesh.py` reads it: welded, 1 unit from the soles to the top, the soles at z = 0. The
-    UVs stay."""
+    """Adds the mesh of a source GLB file or FBX file in the units of the studio, as `load_mesh()`
+    of `rig_mesh.py` reads it: welded, 1 unit from the soles to the top, the soles at z = 0. The
+    UVs and the faces stay: an FBX file keeps its quads, and a GLB file holds only triangles. The
+    mesh takes no vertex group of the file, such as the weights of a Tripo armature."""
     before = set(bpy.data.objects)
-    bpy.ops.import_scene.gltf(filepath=path)
+    if path.lower().endswith('.fbx'):
+        bpy.ops.import_scene.fbx(filepath=path)
+    else:
+        bpy.ops.import_scene.gltf(filepath=path)
     found = [o for o in bpy.data.objects if o not in before]
     source = [o for o in found if o.type == 'MESH']
     if len(source) != 1:
@@ -559,6 +563,8 @@ def import_source(path, weld):
     bm = bmesh.new()
     bm.from_mesh(source[0].data)
     bm.transform(source[0].matrix_world)
+    for layer in list(bm.verts.layers.deform.values()):
+        bm.verts.layers.deform.remove(layer)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=weld)
     heights = [v.co.z for v in bm.verts]
     scale = 1.0 / (max(heights) - min(heights))
