@@ -98,8 +98,9 @@ const playerFootprints = new WeakMap<PlayerModel, Footprint>();
 /**
  * Calculates the footprint of a player in its bind pose: one box for the parts of each bone in
  * each band of 0.2 m of height, and one box for its seat (`buildSupport()`). A piece with its own
- * footprint corners (`InstrumentPiece.footprint`) counts them in place of its parts. A body with no chair
- * (`SeatHeights.noChair`) has no box of a seat. The function keeps the result of each model.
+ * footprint corners (`InstrumentPiece.footprint`) counts them in place of its parts. A body with
+ * no chair (`SeatHeights.noChair`) has no box of a seat. The function keeps the result of each
+ * model.
  *
  * @param player The player model, for example from a `ModelCache`.
  * @returns The footprint in the axes of the player model.
@@ -109,8 +110,7 @@ export function playerFootprint(player: PlayerModel): Footprint {
   if (known) {
     return known;
   }
-  // The triangles of the mesh, each with its bone. A piece with its own footprint corners
-  // (`InstrumentPiece.footprint`) counts these corners in place of its parts.
+  // The triangles of the mesh, each with its bone.
   const replaced = new Set(
     player.pieces.flatMap(({ piece }) => (piece.footprint ? [boneIndex(piece.bone)] : [])),
   );
