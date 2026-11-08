@@ -35,6 +35,7 @@ export const PLAYING: Transport = {
   changedAtWall: -100,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: 3,
   leadSec: Number.POSITIVE_INFINITY,
 };

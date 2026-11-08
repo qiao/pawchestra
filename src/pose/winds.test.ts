@@ -183,6 +183,7 @@ describe('poseWind (design 5.3, 4.7)', () => {
       changedAtWall: 20,
       before: { ...PLAYING, changedAtWall: -100 },
       startSec: 0,
+      seekStart: false,
       holdSec: 3,
       leadSec: Number.POSITIVE_INFINITY,
     };

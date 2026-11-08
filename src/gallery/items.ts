@@ -279,6 +279,7 @@ const PLAYING: Transport = {
   changedAtWall: -100,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: 3,
   leadSec: Number.POSITIVE_INFINITY,
 };
@@ -289,6 +290,7 @@ const REST: Transport = {
   changedAtWall: null,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: 3,
   leadSec: 0,
 };
@@ -420,6 +422,7 @@ export function moveTransport(move: GalleryMove, motion: RestMotion, wallTime: n
       changedAtWall: wallTime - elapsed,
       before: null,
       startSec: 0,
+      seekStart: false,
       holdSec: REST_TIMES.hold,
       leadSec,
     };
@@ -432,6 +435,7 @@ export function moveTransport(move: GalleryMove, motion: RestMotion, wallTime: n
     changedAtWall: wallTime - elapsed,
     before: PLAYING,
     startSec: 0,
+    seekStart: false,
     holdSec: REST_TIMES.hold,
     leadSec: Number.POSITIVE_INFINITY,
   };

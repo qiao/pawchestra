@@ -312,6 +312,7 @@ describe('the seeks before the traces', () => {
       changedAtWall: 0,
       before: null,
       startSec: 0,
+      seekStart: false,
       holdSec: 3,
       leadSec: Infinity,
     };

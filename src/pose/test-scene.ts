@@ -168,6 +168,7 @@ export const PLAYING: Transport = {
   changedAtWall: 0,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: 3,
   leadSec: Number.POSITIVE_INFINITY,
 };
@@ -178,6 +179,7 @@ export const NOT_STARTED: Transport = {
   changedAtWall: null,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: 3,
   leadSec: Number.POSITIVE_INFINITY,
 };

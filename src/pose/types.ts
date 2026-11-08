@@ -75,7 +75,7 @@ export interface ScenePose {
   readonly conductor: AnimalPose | null;
 }
 
-/** The play state. It changes only on play, pause, and stop (design 5.1, 5.2). */
+/** The play state. It changes on play, pause, stop, and a seek during play (design 5.1, 5.2). */
 export interface Transport {
   readonly playing: boolean;
   /** Wall clock seconds of the last play, pause, or stop. `null` before the first play. */
@@ -93,6 +93,12 @@ export interface Transport {
    * the seek point. 0 before the first play.
    */
   readonly startSec: number;
+  /**
+   * True when a seek during play set `startSec` (design 5.4, 6.5). A seek ends the count-in, so
+   * the pose gives no count-in for this start point: no leader nod and no lift of the baton. A
+   * pause keeps the value of its play.
+   */
+  readonly seekStart: boolean;
   /**
    * The time in seconds that the instruments stay up after a pause: `REST_TIMES.hold` (3 s), or
    * 0 after a pause in the count-in. Then the animals lower their instruments with no hold (5.2).

@@ -8,6 +8,7 @@ export const NOT_STARTED: Transport = {
   changedAtWall: null,
   before: null,
   startSec: 0,
+  seekStart: false,
   holdSec: REST_TIMES.hold,
   leadSec: Number.POSITIVE_INFINITY,
 };
@@ -61,6 +62,7 @@ export function changeTransport(
       changedAtWall: wallTime,
       before,
       startSec: songTime,
+      seekStart: false,
       holdSec: REST_TIMES.hold,
       leadSec,
     };
@@ -70,6 +72,7 @@ export function changeTransport(
     changedAtWall: wallTime,
     before,
     startSec: transport.startSec,
+    seekStart: transport.seekStart,
     holdSec: songTime <= transport.startSec ? 0 : REST_TIMES.hold,
     leadSec: transport.leadSec,
   };

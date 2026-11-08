@@ -35,7 +35,7 @@ function transport(
   holdSec = 3,
   leadSec = Number.POSITIVE_INFINITY,
 ): Transport {
-  return { playing, changedAtWall, before, startSec: 0, holdSec, leadSec };
+  return { playing, changedAtWall, before, startSec: 0, seekStart: false, holdSec, leadSec };
 }
 
 /** A transport that plays since long ago, so each player holds its instruments up. */
