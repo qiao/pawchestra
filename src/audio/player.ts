@@ -170,6 +170,14 @@ interface EngineStart {
   readonly engine: Promise<Engine>;
 }
 
+/** A preset file that a load decodes. */
+interface BankFile {
+  /** The absolute URL of the SF3 file. It is also the id of its bank. */
+  readonly url: string;
+  /** The size of the file, from `sf/index.json`, in bytes. */
+  readonly size: number;
+}
+
 /** The resolve and reject functions of a pending promise. */
 interface Pending<T> {
   readonly resolve: (value: T) => void;
@@ -194,6 +202,12 @@ export class WorkletPlayer implements Player {
   #requestId = 0;
   /** The URLs of the banks that the synth of the live engine holds for the session (6.3). */
   readonly #loadedBanks = new Set<string>();
+  /**
+   * The decode of each bank that a load started and that no load sent to the synth yet, by the URL
+   * of its file. A later load waits for the same decode (6.3). A failed decode leaves the map, so
+   * that the next load tries the file again.
+   */
+  readonly #bankDecodes = new Map<string, Promise<EngineBank>>();
   readonly #decodes = new Map<number, Pending<readonly EngineBank[]>>();
   readonly #progress = new Map<number, (done: number, bytes: number) => void>();
   /** One entry for each `banks` message. The processor answers each one with `ready`, in order. */
@@ -266,9 +280,8 @@ export class WorkletPlayer implements Player {
     const index = await Promise.race([start.index, replaced]);
     // The synth keeps each bank for the session, so the Worker decodes only the new presets.
     const files = resolvePresetFiles(index, score.presets)
-      .map((file) => ({ url: new URL(file.file, this.#baseUrl).href, size: file.size }))
+      .map((file): BankFile => ({ url: new URL(file.file, this.#baseUrl).href, size: file.size }))
       .filter((file) => !this.#loadedBanks.has(file.url));
-    const urls = files.map((file) => file.url);
     const total = files.length;
     const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
     const report = (done: number, bytes: number): void => {
@@ -278,12 +291,7 @@ export class WorkletPlayer implements Player {
     };
     report(0, 0);
     // The decode runs while the worklet module and the hall impulse response load (design 6.3).
-    const decoding = this.#decodeAll(
-      start.workers,
-      files.map((file) => file.size),
-      urls,
-      report,
-    );
+    const decoding = this.#decodeBanks(start.workers, files, report);
     const [engine, banks] = await Promise.race([Promise.all([start.engine, decoding]), replaced]);
     const table = packSynthEvents(mixSynthEvents(score.synthEvents, score.mix));
     this.#durationSec = score.durationSec;
@@ -320,6 +328,7 @@ export class WorkletPlayer implements Player {
     // The processor adds the banks also when a later load replaces this one.
     for (const bank of banks) {
       this.#loadedBanks.add(bank.id);
+      this.#bankDecodes.delete(bank.id);
     }
     this.#pcmBytes += pcmBytes;
     await Promise.race([ready, replaced]);
@@ -521,51 +530,102 @@ export class WorkletPlayer implements Player {
   }
 
   /**
-   * Decodes the preset files on the decode Workers ({@link splitDecodes}), and gives the banks in
-   * the order of the files, so that the synth gets the banks in the same order.
+   * Gives the banks of the preset files in the order of the files, so that the synth gets the
+   * banks in the same order. A file with a decode of an earlier load waits for that decode, and
+   * the Workers decode only the other files (design 6.3). The progress counts a file of an earlier
+   * decode, with its full size, when its bank is ready.
    *
    * @param workers The decode Workers.
-   * @param sizes The size of each file, from `sf/index.json`.
-   * @param urls The URL of each file.
-   * @param onProgress Gets the files that are ready and the bytes that arrived, on all Workers.
+   * @param files The preset files that the synth does not have.
+   * @param onProgress Gets the files that are ready and the bytes that arrived.
    * @returns The banks.
    */
-  async #decodeAll(
+  #decodeBanks(
     workers: readonly Worker[],
-    sizes: readonly number[],
-    urls: readonly string[],
+    files: readonly BankFile[],
     onProgress: (done: number, bytes: number) => void,
   ): Promise<readonly EngineBank[]> {
+    const earlier = files.filter((file) => this.#bankDecodes.has(file.url));
+    let earlierDone = 0;
+    let earlierBytes = 0;
+    let newDone = 0;
+    let newBytes = 0;
+    const report = (): void => {
+      onProgress(earlierDone + newDone, earlierBytes + newBytes);
+    };
+    for (const file of earlier) {
+      void this.#bankDecodes.get(file.url)?.then(
+        () => {
+          earlierDone += 1;
+          earlierBytes += file.size;
+          report();
+        },
+        () => undefined,
+      );
+    }
+    this.#decodeAll(
+      workers,
+      files.filter((file) => !earlier.includes(file)),
+      (done, bytes) => {
+        newDone = done;
+        newBytes = bytes;
+        report();
+      },
+    );
+    return Promise.all(
+      files.map(
+        (file) =>
+          this.#bankDecodes.get(file.url) ??
+          Promise.reject(new Error(`No decode of ${file.url} started.`)),
+      ),
+    );
+  }
+
+  /**
+   * Starts the decode of the preset files on the decode Workers ({@link splitDecodes}), and adds
+   * the decode of each bank to `#bankDecodes`. A failed decode leaves the map.
+   *
+   * @param workers The decode Workers.
+   * @param files The preset files that no decode has.
+   * @param onProgress Gets the files that are ready and the bytes that arrived, on all Workers.
+   */
+  #decodeAll(
+    workers: readonly Worker[],
+    files: readonly BankFile[],
+    onProgress: (done: number, bytes: number) => void,
+  ): void {
+    const sizes = files.map((file) => file.size);
     const lists = splitDecodes(sizes, workers.length).filter((list) => list.length > 0);
     const done = lists.map(() => 0);
     const bytes = lists.map(() => 0);
-    const parts = await Promise.all(
-      lists.map((list, part) =>
-        this.#decode(
-          // Each list has a Worker of its own: there are at most as many lists as Workers.
-          workers[part] ?? workers[0]!,
-          list.map((i) => urls[i] ?? ''),
-          (partDone, partBytes) => {
-            done[part] = partDone;
-            bytes[part] = partBytes;
-            onProgress(
-              done.reduce((sum, d) => sum + d, 0),
-              bytes.reduce((sum, b) => sum + b, 0),
-            );
-          },
-        ),
-      ),
-    );
-    const banks: EngineBank[] = [];
     for (const [part, list] of lists.entries()) {
-      for (const [k, i] of list.entries()) {
-        const bank = parts[part]?.[k];
-        if (bank) {
-          banks[i] = bank;
-        }
+      const urls = list.map((i) => files[i]?.url ?? '');
+      const request = this.#decode(
+        // Each list has a Worker of its own: there are at most as many lists as Workers.
+        workers[part] ?? workers[0]!,
+        urls,
+        (partDone, partBytes) => {
+          done[part] = partDone;
+          bytes[part] = partBytes;
+          onProgress(
+            done.reduce((sum, d) => sum + d, 0),
+            bytes.reduce((sum, b) => sum + b, 0),
+          );
+        },
+      );
+      for (const [k, url] of urls.entries()) {
+        const bank = request.then(
+          (banks) =>
+            banks[k] ?? Promise.reject(new Error(`The decode Worker sent no bank for ${url}.`)),
+        );
+        this.#bankDecodes.set(url, bank);
+        void bank.catch(() => {
+          if (this.#bankDecodes.get(url) === bank) {
+            this.#bankDecodes.delete(url);
+          }
+        });
       }
     }
-    return banks;
   }
 
   #decode(
@@ -625,6 +685,7 @@ export class WorkletPlayer implements Player {
     this.#live = undefined;
     this.#engine = undefined;
     this.#loadedBanks.clear();
+    this.#bankDecodes.clear();
     this.#pcmBytes = 0;
     engine.node.disconnect();
     for (const worker of engine.workers) {
