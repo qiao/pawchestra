@@ -112,7 +112,7 @@ with `pnpm bind-view`.
    the eye fans. After an edit of an eye or of the face, run `se.fit_eyes(rig, mesh)`.
 4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment.
    `sp.load_preview()` shows it beside the rig, `sp.refresh_preview()` shows the open file, and
-   `sp.fold_colors(True)` marks the folds. Check each weight edit in both poses.
+   `sp.fold_colors(True)` marks the folds. Check each weight edit in the bind and the app pose.
 5. **Export.** Run `pnpm rig-export <s>` and `pnpm studio-body <s>`. Diff `<s>.rig.json` to see
    what moved.
 
@@ -152,8 +152,6 @@ script `tools/blender/<a>_arms.py` only for a fault that it does not fix.
   algorithm of your own. Keep the source file, and note the copy in its `README.md`.
 - Never call `read_factory_settings`, because it stops the MCP server.
 - Merge by Distance first, because automatic weights fail on split seams.
-- Put the rings by the rule "Limb rings" of design 4.4, with a ring on each side of the elbow and
-  the wrist.
 - In Weight Paint, remove the arm bones from the trunk below the armpits. Look at the arm down,
   forward, an elbow at 100°, and a forearm turn of 90°.
 - New faces move the bone heat of the whole mesh, so give the kept vertices the old bone heat
