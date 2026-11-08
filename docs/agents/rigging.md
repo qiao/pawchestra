@@ -67,7 +67,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
   it.
 
 A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
-`pnpm glb-point-edits <file>` writes it into the rig file of its base commit (the cat). Test a
+`pnpm glb-point-edits <file>` writes it into the rig file of its base commit. Test a
 change of the chain on the mannequin first: `pnpm rig-mesh mannequin --check` and
 `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
 
@@ -243,7 +243,7 @@ Design 4.4 gives the rule and the reason of each config key.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 - On an arm joined to the trunk, start an elbow shape with `below` 0, because `below` 0.3 also
-  turns over the relaxed faces of the arm root. Read its rig log first.
+  turns over the relaxed faces of the arm root.
 
 ### Seams
 
