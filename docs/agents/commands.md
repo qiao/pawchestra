@@ -51,7 +51,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm snapshot` | Saves the play frame of the default demo and a close view of each gallery model into `scratch/snapshots/<date>-<hash>/`. |
 | `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). |
 | `pnpm choir-check <dir>` | Puts the gallery penguin beside a penguin of each of the two newest reference images. |
-| `pnpm close-views <role> <dir> [--lineup] [--base <ref>] [--set <changes>]...`, or `<mode> <dir>` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. Only the role mode takes `--glb`. The other modes are `lineup`, `species`, `batch` (the image set of a round), and `play` (a demo at chosen times from a chosen camera or seat). The mode `audit` gives 2x crops of the seams of the arms and the upper trunk in each moment, the commit above the tree. |
+| `pnpm close-views <role> <dir> [--lineup] [--base <ref>] [--set <changes>]...`, or `<mode> <dir>` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. Only the role mode takes `--glb`. The other modes are `lineup`, `species`, `batch` (the image set of a round), `play` (a demo from a chosen camera or seat), and `audit` (2x crops of the arm seams). |
 | `pnpm clip-views <dir> --clip <file>[:<animation>]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), with the depth of each arm part in the body. |
 | `pnpm look-lab <dir>`, `pnpm look-variants <file> --out <dir>` | Measure frames of `close-views play` against `orchestra-latest.png`: one tree, or each variant. |
 | `pnpm keyboard` | Checks each control with the keyboard alone at 1440 × 900 and 390 × 844. |
@@ -69,7 +69,7 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | Command | Action |
 |---|---|
 | `pnpm pose-probe <sheet> [--time <s>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. |
-| `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` into `scratch/pose-preview/<role>.json`: each bone of the skin and each morph target, at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
+| `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` into `scratch/pose-preview/<role>.json` at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
 | `pnpm pose-depth <role> [--demo <id>]... [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. `--where` gives the corners of a bone in the axes of the instrument. |
 | `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. |
 | `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,...` | Scores the base and named variants on chosen pairs of parts. |
@@ -81,14 +81,14 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the studio skin folds. |
 | `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. |
 | `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. |
-| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>]`, or `--world --base <ref>` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND`, or `PASS`. `--world` gives the largest move of the arm joints and turn of the palms against the commit, with `SAME` or `MOVED` (exit code 1). All roles: 5 to 7 minutes cold. |
+| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>]`, or `--world --base <ref>` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND`, or `PASS`. `--world` gives the largest move of the arm joints and turn of the palms against the commit, with `SAME` or `MOVED` (exit code 1). |
 | `pnpm cast-matrix [--roles <list>] [--species <list>] [--quick] [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst arm gate value and the deepest clip. |
-| `pnpm bind-supination <species> [--glb <file>]` | Gives the bind supination of each paw by the rule of design 4.4, with the signed paw twists of each cast role and own role. For a hand rig, it reads the export summary beside the GLB file, and says to key the values in the Action `bind` of its `.blend`. |
+| `pnpm bind-supination <species> [--glb <file>]` | Gives the bind supination of each paw by the rule of design 4.4, with the signed paw twists of each role. For a hand rig, key the values in the Action `bind` of its `.blend`. |
 | `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. |
 | `pnpm raise-fit <role> --faces <list> --side L\|R [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces, also of a recast role. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. |
 | `pnpm body-probe [--out <file>]`, `--compare <a> <b>`, or `--base <ref>` | Probes the rest joints and a mesh hash of each species, and a hash of the poses of each player of each demo. `--compare` and `--base` fail on a difference. |
 | `pnpm camera-probe [--out <file>]`, `--compare <a> <b>`, or `--base <ref>` | Prints a hash of the camera of `cameraAt()` for each demo (design 5.6). `--compare` and `--base` print the changed samples. |
-| `pnpm sight-lines [--demo <id>]...` | Prints for each demo the players that do not see the head or the baton paw of the conductor (design 4.5), with the main blockers, and the players that the default view or the Cinematic wide shots do not see. |
+| `pnpm sight-lines [--demo <id>]...` | Prints for each demo the players that do not see the head or the baton paw of the conductor (design 4.5), with the main blockers, and the players that the default view or the wide shots do not see. |
 | `pnpm beat-rates [--demo <id>]... [--limit <bpm>]` | Prints the rate of each beat or note motion over a song (design 5.1, 5.4), and fails above the limit. |
 | `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. |
 | `pnpm shot-trace <demo> [--from <s>] [--to <s>]`, or `--rules` | Prints the choice of the shot planner at each cut (design 5.6). |
