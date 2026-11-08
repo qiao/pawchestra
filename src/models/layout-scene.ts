@@ -2354,6 +2354,56 @@ function* sightRowsSteps(
   return done;
 }
 
+/** The largest lift of the choir risers for the sight of the singers, in meters. */
+const CHOIR_LIFT = 0.6;
+
+/**
+ * Finds the lift of the choir risers (design 4.5, seat geometry): the lowest lift in steps of
+ * {@link ROW_RISER}.step, up to {@link CHOIR_LIFT}, at which each singer sees the head and the
+ * baton paw of the conductor over the rows and their risers, or else the lowest lift with the
+ * fewest blocked singers. A lift moves only up, so the risers keep their gaps.
+ *
+ * @param choir The singers and the risers.
+ * @param members The players of the score, by their index.
+ * @param rows The rows after the sight pass.
+ * @param soloists The obstacles of the soloists.
+ * @param targets The points of the conductor.
+ * @returns The lift, in meters.
+ */
+function choirLift(
+  choir: ChoirPlacement,
+  members: readonly Member[],
+  rows: readonly SeenRow[],
+  soloists: readonly Obstacle[],
+  targets: SightTargets,
+): number {
+  const blockers: SightBlockers = {
+    solid: [
+      ...soloists,
+      ...rows.flatMap((r) => r.row.placement.players.map((p) => p.obstacle)),
+      ...rows.flatMap((r) => r.risers.map((riser) => rowRiserObstacle(riser, CENTER))),
+    ],
+    stands: rows.flatMap((r) => r.row.placement.stands.map((p) => p.obstacle)),
+  };
+  let best = { lift: 0, blocked: Infinity };
+  for (let k = 0; k * ROW_RISER.step <= CHOIR_LIFT + 1e-9; k++) {
+    const lift = Math.round(k * ROW_RISER.step * 1000) / 1000;
+    const blocked = choir.singers.filter((singer) => {
+      const member = members[singer.index];
+      const [x, y, z] = singer.place.position;
+      const place = { ...singer.place, position: [x, y + lift, z] as const };
+      return member !== undefined && sightOf(member, place, targets, blockers) === 2;
+    }).length;
+    if (blocked < best.blocked) {
+      best = { lift, blocked };
+    }
+    if (blocked === 0) {
+      break;
+    }
+  }
+  return best.lift;
+}
+
 /**
  * Checks that each player of the cast has a place, and gives the places in the order of the cast
  * (design 5.1).
@@ -2530,16 +2580,24 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   );
   const final = seen.map((r) => r.row);
   const rowRisers = seen.flatMap((r) => r.risers);
+  const lift = choirLift(choir, members, seen, soloists, sightTargets(models));
   const places = withRows(final);
   for (const s of choir.singers) {
-    places[s.index] = s.place;
+    const [x, y, z] = s.place.position;
+    places[s.index] = { ...s.place, position: [x, y + lift, z] };
   }
   const others = [
     ...fixed,
     ...final.flatMap((r) => obstaclesOfRow(r.placement)),
     ...rowRisers.map((r) => rowRiserObstacle(r, CENTER)),
   ];
-  const risers = widenRisers(draft.risers, others, stage);
+  const lifted = draft.risers.map((level): RiserLevel => ({
+    level: level.level,
+    radius: level.radius,
+    height: level.height + lift,
+    halfAngle: level.halfAngle,
+  }));
+  const risers = widenRisers(lifted, others, stage);
   const podium: Vec3 = [0, 0, stage.side / 2 - stage.front];
   const move = (p: Vec3): Vec3 => [p[0] + podium[0], p[1] + podium[1], p[2] + podium[2]];
   return {
