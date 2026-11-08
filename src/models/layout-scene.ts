@@ -516,22 +516,15 @@ function* spacingSteps(left: Member, right: Member, radius: number): Steps<numbe
 }
 
 /**
- * The arcs of {@link aloneStandArc} for each player and radius. The spread of a row places the
- * row many times at one radius, so the layout calculates each arc one time.
+ * The arcs of {@link aloneStandArcSteps} for each player and radius. The spread of a row places
+ * the row many times at one radius, so the layout calculates each arc one time.
  */
 const aloneStandArcs = new WeakMap<Member, Map<number, number>>();
 
 /**
- * Calculates the arc from a string player with no partner to its stand. The stand stands where a
- * partner of the same seat would share it: half the arc to such a partner, to the right.
- */
-function aloneStandArc(member: Member, radius: number): number {
-  return aloneStandArcs.get(member)?.get(radius) ?? runAll(aloneStandArcSteps(member, radius));
-}
-
-/**
- * Calculates the arc from a string player with no partner to its stand as {@link aloneStandArc}
- * does, in steps (design 7.2).
+ * Calculates the arc from a string player with no partner to its stand, in steps (design 7.2).
+ * The stand stands where a partner of the same seat would share it: half the arc to such a
+ * partner, to the right.
  *
  * @param member The player.
  * @param radius The radius of the row.
@@ -571,32 +564,14 @@ interface Arrangement {
 }
 
 /**
- * Places the players of a row on its arc (design 4.5, seat geometry). In a split row, 0° is
- * between the violins and the other sections, and each side spans at most 80°. Else the row is
- * centered on 0°, and it spans at most 160°.
+ * Places the players of a row on its arc, in steps (design 4.5 seat geometry, design 7.2). In a
+ * split row, 0° is between the violins and the other sections, and each side spans at most 80°.
+ * Else the row is centered on 0°, and it spans at most 160°.
  *
  * @param members The players from left to right. There is at least one.
  * @param split True for rows 0 and 1.
  * @param radius The radius at which the spacing is measured.
  * @param halfSpan The largest angle of one side: 80°, or 60° for the arc of a chamber group.
- * @returns The arrangement.
- */
-function arrange(
-  members: readonly Member[],
-  split: boolean,
-  radius: number,
-  halfSpan = HALF_SPAN,
-): Arrangement {
-  return runAll(arrangeSteps(members, split, radius, halfSpan));
-}
-
-/**
- * Places the players of a row on its arc as {@link arrange} does, in steps (design 7.2).
- *
- * @param members The players from left to right. There is at least one.
- * @param split True for rows 0 and 1.
- * @param radius The radius at which the spacing is measured.
- * @param halfSpan The largest angle of one side.
  * @returns The steps, which return the arrangement.
  */
 function* arrangeSteps(
@@ -668,7 +643,7 @@ function placeRow(
       const middle = (angle + (angles[i + 1] ?? angle)) / 2;
       stands.push(placeStand(middle, radius - STAND_DISTANCE, -1, [member, next], height));
     } else if (standsAlone(member, next)) {
-      const arc = aloneStandArc(member, radius);
+      const arc = runAll(aloneStandArcSteps(member, radius));
       stands.push(
         placeStand(angle + arc / radius, radius - STAND_DISTANCE, member.index, [member], height),
       );
@@ -947,7 +922,9 @@ function fitChoir(
   let radius = smallest;
   for (;;) {
     const levelRadius = (k: number): number => radius + RISER.depth * k;
-    const arrangements = groups.map((group, k) => arrange(group, false, levelRadius(k)));
+    const arrangements = groups.map((group, k) =>
+      runAll(arrangeSteps(group, false, levelRadius(k))),
+    );
     if (arrangements.some((a, k) => a.radius > levelRadius(k))) {
       radius += CLEAR_STEP;
       continue;
@@ -966,7 +943,7 @@ function fitChoir(
       (group, k) =>
         placeRow(
           group,
-          rowAngles(arrangements[k] ?? arrange(group, false, 1), levelRadius(k)),
+          rowAngles(arrangements[k] ?? runAll(arrangeSteps(group, false, 1)), levelRadius(k)),
           levelRadius(k),
           group.map(() => RISER.base + RISER.rise * k),
         ).players,
@@ -1328,7 +1305,7 @@ function placeSoloist(member: Member): PlacedPlayer & { readonly front: number }
 function fitArc(members: readonly Member[]): RowPlacement {
   let radius: number = CHAMBER.radius;
   for (;;) {
-    const arrangement = arrange(members, false, radius, CHAMBER.halfSpan);
+    const arrangement = runAll(arrangeSteps(members, false, radius, CHAMBER.halfSpan));
     if (arrangement.radius <= radius) {
       return placeRow(members, rowAngles(arrangement, radius), radius);
     }
