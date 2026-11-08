@@ -2669,20 +2669,15 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   }
 
   const stage = stageOf(draft);
+  const still = [...fixed, ...choir.obstacles];
+  const targets = sightTargets(models);
   // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin).
-  const spread = yield* spreadRowsSteps(rows, [...fixed, ...choir.obstacles], soloPianos, stage);
+  const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage);
   yield;
-  const seen = yield* sightRowsSteps(
-    spread,
-    [...fixed, ...choir.obstacles],
-    soloists,
-    soloPianos,
-    stage,
-    sightTargets(models),
-  );
+  const seen = yield* sightRowsSteps(spread, still, soloists, soloPianos, stage, targets);
   const final = seen.map((r) => r.row);
   const rowRisers = seen.flatMap((r) => r.risers);
-  const lift = choirLift(choir, members, seen, soloists, sightTargets(models));
+  const lift = choirLift(choir, members, seen, soloists, targets);
   const places = withRows(final);
   for (const s of choir.singers) {
     const [x, y, z] = s.place.position;
