@@ -169,7 +169,7 @@ passes.
 - [ ] Polar bear pianist: from the front, the higher case and the lid hide the bear below the face.
 - [ ] Polar bear pianist: at the far keys, the outer upper arm stands 36° to 41° out from the round
       trunk (piano-technique).
-- [ ] Polar bear pianist: at rest, the paws lie on the front of the belly, not in the lap, because
+- [ ] Polar bear pianist: at rest, the paws lie on the front of the belly in place of the lap, because
       the thighs lie out of the reach of the arms (0.66 m). The lap place of `along` 0.45 to 0.7
       meets the chest or misses the leg on this body (`legTop()`).
 - [ ] Polar bear legs: with the thighs 25° down (knee 120° in the bind), the pedal pose folds 5
@@ -641,13 +641,13 @@ passes.
       clarinetist R stretch from 0.20 to 0.25 (`FAIL` on the margin, `MOVES` of
       `--explain stretch`). Fix the paw faces first.
 - [ ] Penguin recast folds: four left flipper `raise` shapes (the limit) put 7 of 12 recast arms
-      under 8 (base 6). Open: the flutist L 26 (the front root and the flipper tip; a flute shape
+      under 8 (base 6). Open: the flutist L 26 (the front root and the flipper tip, and a flute shape
       at 137° turned over more faces after the relax), the clarinetist L 11 and R 12, and the
       cellist L 10 in the lift. In the flute and clarinet holds the shared grip curls the fingers
       125° to 176°, and the flipper tip folds (faces 1894 to 1899, 2903, 2907). A flipper needs a
       smaller curl in a recast hold (pose code), or a rig with no finger bone weight at the tip.
 - [ ] Badger recast folds: four arm `raise` shapes (the limit) put 7 of 10 recast arms under 8
-      (base 3). Open: the cellist L 15 (play and lift; a cello shape gave the percussionist 4 more
+      (base 3). Open: the cellist L 15 (play and lift, and a cello shape gave the percussionist 4 more
       folds), the clarinetist R 10, and the violinist R 10. No shape is free.
 - [ ] Cast matrix sizes: the violin, the viola (`hold-reach`), the cello (`cello-size.ts`), the
       trumpet, the clarinet, and the flute (`wind-size.ts`) have a size rule. The other scaled
