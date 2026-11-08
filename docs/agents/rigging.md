@@ -110,15 +110,14 @@ with `pnpm bind-view`.
    `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and `arm_raise_*`.
 3. **Eyes.** Run `se.place_eyes()` with each middle on the head surface in the bind, and delete
    the eye fans. After an edit of an eye or of the face, run `se.fit_eyes(rig, mesh)`.
-4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment, and
-   `sp.load_preview()` shows it beside the rig. `sp.refresh_preview()` shows the open file, and
-   `sp.fold_colors(True)` marks the folds. Check each weight edit in the bind and the app pose.
+4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment.
+   `sp.load_preview()` shows it beside the rig, `sp.refresh_preview()` shows the open file, and
+   `sp.fold_colors(True)` marks the folds. Check each weight edit in both poses.
 5. **Export.** Run `pnpm rig-export <s>` and `pnpm studio-body <s>`. Diff `<s>.rig.json` to see
    what moved.
 
-For the simple route, run `simple_rig.py`, then step 5. Try a variant config with the `--glb`
-probes before a commit. Write a texture with `Image.save()`, because `Image.save_render()` changes
-the colors by the view transform.
+For the simple route, run `simple_rig.py`, then step 5. Write a texture with `Image.save()`,
+because `Image.save_render()` changes the colors by the view transform.
 
 ## The arm gate
 
