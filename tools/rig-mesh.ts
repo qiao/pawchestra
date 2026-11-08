@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { copyFileSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -25,7 +24,7 @@ import { measureLines, measureRig, triangleLine } from './rig-mesh-check.ts';
 import { FORM_FORMAT, readFormJson } from './rig-form.ts';
 import type { FormJson, PlayerForm } from './rig-form.ts';
 import { setHolds } from './hold-sets.ts';
-import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
+import { checkFormat, formatVersion, runChild, sha256, withProbeTree } from './ref-tree.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
 import { gzipSize } from './studio-budgets.ts';
 import type { ThinRule } from './rig-mesh-check.ts';
@@ -1395,17 +1394,6 @@ function runBlender(args: readonly string[]): Promise<string[]> {
       }
     });
   });
-}
-
-/**
- * Gives the SHA-256 of the bytes of a file, so that a check shows if a rig gives the bytes of the
- * GLB file in the repository.
- *
- * @param bytes The bytes.
- * @returns The hash, as hex.
- */
-function sha256(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 /** The settings of the animal of a rig. */

@@ -31,7 +31,6 @@
  * Usage: pnpm rig-trial <animal> --apply <tag>
  */
 import { execFileSync, spawn } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import {
   copyFileSync,
   existsSync,
@@ -44,8 +43,7 @@ import {
 } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-/** The root of the repository. */
-const ROOT = join(import.meta.dirname, '..');
+import { ROOT, sha256 } from './ref-tree.ts';
 
 /** The headless Blender of the rig tools: the variable `BLENDER`, or `blender` on the path. */
 const BLENDER = process.env['BLENDER'] ?? 'blender';
@@ -189,16 +187,6 @@ function rigBlend(animal: string): string {
  */
 function shown(path: string): string {
   return relative(ROOT, path);
-}
-
-/**
- * Gives the SHA-256 of bytes.
- *
- * @param bytes The bytes.
- * @returns The hash in hexadecimal.
- */
-function sha256(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 /**

@@ -16,7 +16,6 @@
  * it.
  */
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import {
   appendFileSync,
   copyFileSync,
@@ -31,7 +30,15 @@ import { basename, join, relative } from 'node:path';
 import type { JSONReport, JSONReportSuite, JSONReportTest } from '@playwright/test/reporter';
 
 import { e2ePort } from './e2e-port.ts';
-import { ROOT, probeCacheDir, runChildren, shortHash, storeBase, withRefTree } from './ref-tree.ts';
+import {
+  ROOT,
+  probeCacheDir,
+  runChildren,
+  sha256,
+  shortHash,
+  storeBase,
+  withRefTree,
+} from './ref-tree.ts';
 
 /** The usage text of the tool, which `--help` prints. */
 export const USAGE = `Usage: pnpm e2e-base <ref> [--no-cache] [-- <args of playwright test>]
@@ -281,16 +288,6 @@ function git(args: readonly string[]): string {
     throw new Error(`git ${args.join(' ')} failed: ${result.stderr.trim()}`);
   }
   return result.stdout.trimEnd();
-}
-
-/**
- * Gives the SHA-256 of a text or of the bytes of a file.
- *
- * @param data The text or the bytes.
- * @returns The hash, in hex.
- */
-function sha256(data: string | Buffer): string {
-  return createHash('sha256').update(data).digest('hex');
 }
 
 /**

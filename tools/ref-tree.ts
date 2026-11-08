@@ -727,7 +727,7 @@ function baseCacheKey(parts: BaseKeyParts): string {
     parts.node,
     parts.modules,
   ];
-  return createHash('sha256').update(JSON.stringify(fields)).digest('hex');
+  return sha256(JSON.stringify(fields));
 }
 
 /** The environment variable that turns off the cache of {@link baseCacheFile} when it is `1`. */
@@ -749,13 +749,23 @@ function gitText(args: readonly string[]): string {
 }
 
 /**
+ * Gives the SHA-256 of a text or of bytes.
+ *
+ * @param data The text or the bytes.
+ * @returns The hash, in hex.
+ */
+export function sha256(data: string | Uint8Array): string {
+  return createHash('sha256').update(data).digest('hex');
+}
+
+/**
  * Gives the SHA-256 of a file.
  *
  * @param path The path of the file.
  * @returns The hash, in hex.
  */
 function fileHash(path: string): string {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
+  return sha256(readFileSync(path));
 }
 
 /**
@@ -879,7 +889,7 @@ export function treeCacheFile(script: string, args: readonly string[]): string {
     `${process.version} ${process.platform} ${process.arch}`,
     existsSync(lock) ? fileHash(lock) : 'none',
   ];
-  const key = createHash('sha256').update(JSON.stringify(fields)).digest('hex');
+  const key = sha256(JSON.stringify(fields));
   return join(probeCacheDir(), `tree-${key}.json`);
 }
 

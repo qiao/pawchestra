@@ -1,5 +1,4 @@
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -49,6 +48,7 @@ import {
   ROOT,
   optionValue,
   probeCacheDir,
+  sha256,
   shortHash,
   withRefBuild,
 } from './ref-tree.ts';
@@ -3270,7 +3270,7 @@ function jsonCamera(text: string): PlayCamera {
       `The camera "${text}" is not a camera in JSON, such as {"position":[0,3,9],"target":[0,1,0],"fov":40}: a position and a target of 3 numbers each in meters, and a field of view from 1° to 170°.`,
     );
   }
-  const name = `pose-${createHash('sha256').update(text).digest('hex').slice(0, 6)}`;
+  const name = `pose-${sha256(text).slice(0, 6)}`;
   const pose = { position, target, fov, beam: 1, close: false, light: 0, spot: 0 };
   return { name, dx: 0, dy: 0, wheel: 0, pose };
 }
@@ -4766,16 +4766,6 @@ async function writeStrip(
       image,
     );
   }
-}
-
-/**
- * Gives the SHA-256 of a text or of the bytes of a file.
- *
- * @param data The text or the bytes.
- * @returns The hash, in hex.
- */
-function sha256(data: string | Uint8Array): string {
-  return createHash('sha256').update(data).digest('hex');
 }
 
 /**
