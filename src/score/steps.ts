@@ -3,7 +3,7 @@
  * that waits for the GPU, such as a shader program that compiles in parallel. The pure modules
  * yield only `undefined`.
  */
-export type StepYield = undefined | 'wait';
+type StepYield = undefined | 'wait';
 
 /**
  * The step form of a long calculation (design 7.2): a generator that yields between its steps and
