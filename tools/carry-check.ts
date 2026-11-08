@@ -21,9 +21,10 @@
  */
 import { writeFileSync } from 'node:fs';
 
-import { Matrix4, Quaternion, Vector3 } from 'three';
+import { Quaternion, Vector3 } from 'three';
 
 import { MOVE_STEP, demoMoves } from './arm-check.ts';
+import { turnOf } from './bone-turns.ts';
 import { FOLD_ROLES, findRole, isRole, roleBodies, roleScene } from './fold-probe.ts';
 import { setHolds } from './hold-sets.ts';
 import type { DemoFile } from './patch-demos.ts';
@@ -197,18 +198,6 @@ function carryArgs(args: readonly string[]): CarryArgs {
     throw new Error(`The options --base and --json do not go together.\n${USAGE}`);
   }
   return { roles, demos, holds, base, json };
-}
-
-/**
- * Gives the turn of a bone in the world from the matrices of a studio pose.
- *
- * @param matrices The world matrices of the bones, 16 numbers each.
- * @param bone The index of the bone.
- * @returns The turn.
- */
-function turnOf(matrices: ArrayLike<number>, bone: number): Quaternion {
-  const values = Array.from({ length: 16 }, (...[, k]) => matrices[bone * 16 + k] ?? 0);
-  return new Quaternion().setFromRotationMatrix(new Matrix4().fromArray(values));
 }
 
 /**

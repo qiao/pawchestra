@@ -30,7 +30,7 @@
  */
 import { writeFile } from 'node:fs/promises';
 
-import { Matrix4, Quaternion, Vector3 } from 'three';
+import { Quaternion, Vector3 } from 'three';
 
 import { FOLD_ROLES, SAMPLE_SETS, probeFolds, roleAnimal, roleSpecies } from './fold-probe.ts';
 import type { FoldReport, SampleSet } from './fold-probe.ts';
@@ -43,6 +43,7 @@ import { studioBodyOf } from '../src/models/studio-body.ts';
 import type { StudioBodyName } from '../src/models/studio-body.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
+import { matrixOf, turnOf, wrap } from './bone-turns.ts';
 import type { Side, StudioBody, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
 import { UPPER_TWIST_BONES, twistAngle } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
@@ -385,40 +386,6 @@ export function armBinds(rig: StudioRig): Readonly<Record<Side, ArmBind>> {
     binds.set(rig, found);
   }
   return found;
-}
-
-/**
- * Gives the turn of a bone from the skin matrices of a pose.
- *
- * @param matrices The skin matrices.
- * @param bone The index of the bone.
- * @returns The turn.
- */
-function turnOf(matrices: ArrayLike<number>, bone: number): Quaternion {
-  return new Quaternion().setFromRotationMatrix(matrixOf(matrices, bone));
-}
-
-/**
- * Gives the skin matrix of a bone.
- *
- * @param matrices The skin matrices.
- * @param bone The index of the bone.
- * @returns The matrix.
- */
-function matrixOf(matrices: ArrayLike<number>, bone: number): Matrix4 {
-  return new Matrix4().fromArray(
-    Array.from({ length: 16 }, (...[, k]) => matrices[bone * 16 + k] ?? 0),
-  );
-}
-
-/**
- * Wraps an angle into -180° to 180°.
- *
- * @param degrees The angle.
- * @returns The wrapped angle.
- */
-function wrap(degrees: number): number {
-  return ((((degrees + 180) % 360) + 360) % 360) - 180;
 }
 
 /**

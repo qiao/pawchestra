@@ -160,6 +160,7 @@ import {
   withTempFolder,
 } from './ref-tree.ts';
 import { sideSegmentBones } from './arm-segments.ts';
+import { matrixOf, turnOf, wrap } from './bone-turns.ts';
 import { weightOn } from './skin-weight.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { BONE_NAMES } from '../src/models/rig.ts';
@@ -1068,40 +1069,6 @@ export function armBinds(rig: StudioRig): Readonly<Record<Side, ArmBind>> {
  */
 export function armVertices(rig: StudioRig, side: Side): number[] {
   return [...new Set(armBinds(rig)[side].corners)];
-}
-
-/**
- * Gives the turn of a bone from the skin matrices of a pose.
- *
- * @param matrices The skin matrices.
- * @param bone The index of the bone.
- * @returns The turn.
- */
-function turnOf(matrices: ArrayLike<number>, bone: number): Quaternion {
-  return new Quaternion().setFromRotationMatrix(matrixOf(matrices, bone));
-}
-
-/**
- * Gives the skin matrix of a bone.
- *
- * @param matrices The skin matrices.
- * @param bone The index of the bone.
- * @returns The matrix.
- */
-function matrixOf(matrices: ArrayLike<number>, bone: number): Matrix4 {
-  return new Matrix4().fromArray(
-    Array.from({ length: 16 }, (...[, k]) => matrices[bone * 16 + k] ?? 0),
-  );
-}
-
-/**
- * Wraps an angle into -180° to 180°.
- *
- * @param degrees The angle.
- * @returns The wrapped angle.
- */
-function wrap(degrees: number): number {
-  return ((((degrees + 180) % 360) + 360) % 360) - 180;
 }
 
 /**
