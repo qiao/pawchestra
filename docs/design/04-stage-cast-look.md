@@ -45,22 +45,30 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
                           back of the stage
 ┌──────────────────────────────────────────────────────────────────┐
 │                        choir (on risers)                         │
-│ row 4:  percussion  contrabasses  timpani  trombones  tuba       │
-│ row 3:        horns   clarinets | bassoons   trumpets            │
-│ row 2:  keyboard  harp   flutes | oboes                          │
+│ row 4:  percussion  contrabasses  timpani  trombones  tuba  (r)  │
+│ row 3:        horns   clarinets | bassoons   trumpets       (r)  │
+│ row 2:  keyboard  harp   flutes | oboes                     (r)  │
 │ row 1: 1st violins  2nd violins | violas  cellos  (other desks)  │
 │ row 0: 1st violins  2nd violins | violas  cellos  (first desks)  │
 │     soloist (piano)        [bear on the podium]                  │
 └──────────────────────────────────────────────────────────────────┘
                         front of the stage
+   (r): each seat group of the row can stand on its own riser
 ```
 
 - The strings sit in wedges. The first desk of each string seat (its players 0 and 1) sits in
   the front row, and its other desks sit in the row behind it. The rows spread to the side edges,
   as in the reference image (4.5, seat geometry).
 - A keyboard of the orchestra (a celesta, a harpsichord, or an organ that is not the soloist of
-  3.8) sits at the left of the harp, as the celesta of a professional orchestra. With no harp and
-  no woodwinds, it sits in the middle behind the strings, as a continuo harpsichord.
+  3.8) sits at the place of the piano soloist when the score has no soloist, as the piano of
+  `orchestra-latest.png`. In row 2, its case and its open lid hid the conductor from the players
+  behind it at each riser height. With a soloist, it sits at the left of the harp, as the celesta
+  of a professional orchestra. With no harp and no woodwinds, it then sits in the middle behind
+  the strings, as a continuo harpsichord.
+- Each player sees the head and the baton paw of the conductor, as in a real orchestra: the
+  players look through the gaps of the rows in front, and the winds, the brass, and the
+  percussion sit on risers that rise toward the back (4.5, seat geometry). The strings sit on the
+  stage top.
 - The vocal soloists of 3.8 stand in front of the choir, on the lowest level of the risers,
   because a place beside the conductor covers the first violins or the cellos.
 - The soloist of 3.8 stands or sits at the front left of the conductor, as in a concerto. A
@@ -1122,6 +1130,7 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |
 | Stage           | A slab of side `S` with cut corners (`STAGE_CORNER_CUT`), a raised lip (`STAGE_LIP`), and lacquered planks. |
 | Choir risers    | Up to three arc levels behind the orchestra, with three steps in front (`RISER`).                         |
+| Row risers      | One arc block under each raised seat group of rows 2 to 4 (`RowRiser`), with the treads of the choir risers. |
 
 **Stage origin**
 
@@ -1136,7 +1145,8 @@ the audience (the front).
 4. Calculate the depth `D`: `F`, plus the largest distance of a seat behind the podium, plus a
    chair and a margin.
 5. The stage side is `S = max(5, 2 × L, D)`. Any extra depth goes to the back.
-6. Spread the instrumental rows inside the stage. `S` does not change.
+6. Spread the instrumental rows inside the stage, then place them for the sight lines (seat
+   geometry). `S` does not change.
 7. Move all items so that the stage center is the origin.
 
 **Seat geometry**
@@ -1159,6 +1169,29 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
 - After the stage size, each row spreads to the side edges (`SPREAD_LIMITS`), because the packed
   rows left the front corners empty. Then row 1 moves its back desks toward their first desks, as
   the wedges of a professional orchestra.
+- Each row from row 1 reserves the band of its items over the whole arc (`riserReserve()`): from
+  the lip in front of its stands to the back of its chairs. The other rows keep their gaps from
+  the band, so that the players can move along the arc and the seat groups can rise after the
+  spread. Thus the rows stand farther apart, and the stage is deeper.
+- **Sight lines.** After the spread and the wedges, each player sees the head and the baton paw of
+  the conductor (`CONDUCTOR_SIGHT`), against the footprints of the rows in front. A music stand
+  hides only the head, and the own stand of the player counts. The eyes of the bear are only about
+  0.1 m above the heads of the seated strings, so a player behind them sees the conductor only
+  through a gap or from a riser. From the front row to the back row:
+  - A search moves the players of the row along the arc, up to `CONDUCTOR_SIGHT.nudge`, with the
+    fewest blocked players, then the fewest players with no sight of the left paw, then the
+    smallest moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor,
+    and the outer players keep the edges of the spread.
+  - From row 2, each seat group with a blocked player rises in steps of `ROW_RISER`, and the
+    search runs again. A group starts at the height of the risers in front of it, so the rows rise
+    toward the back, and it takes the lowest height with its fewest blocked players. Each group
+    has its own riser, as the modular risers of a real orchestra. A riser keeps `RISER_EDGE` from
+    the outline of the stage.
+  - The choir risers then rise together, up to `CHOIR_LIFT`, until each singer sees the
+    conductor.
+  - `pnpm sight-lines` measures the result on the meshes of all demos. Some back desks of the
+    strings stay blocked, because a desk of two partners does not fit into the gaps of the first
+    row.
 
 ```typescript
 /** The limits of the spread of a row. */
@@ -1185,7 +1218,8 @@ model (`InstrumentPiece.footprint`), so the detail of the model does not move th
 
 **Soloist.** The soloist of 3.8 stands at the front left of the conductor (`SOLOIST_PLACE`) and
 turns to the conductor (`SOLOIST_FACING`), so the default view sees its face. A piano soloist
-sits at `PIANO_CENTER` and faces the conductor, so the lid opens to the audience. A keyboard of
+sits at `PIANO_CENTER` and faces the conductor, so the lid opens to the audience. With no
+soloist, the first keyboard of the orchestra sits there too (4.2). A keyboard of
 the orchestra turns a quarter turn, so that its case lies along row 2.
 
 **Chamber group** (`CHAMBER`). The players of an arc stand in one row around the podium center
