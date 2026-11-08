@@ -90,6 +90,11 @@ play is enabled
   synth does not have. Thus each preset is in memory one time.
 - The decode starts when `sf/index.json` arrives. `splitDecodes()` spreads the files over up to
   four Workers, because one Worker made the decode the slowest part of the load.
+- The `Player` keeps the decode of each bank by the URL of its file until a load sends the bank to
+  the synth. A load that replaces a pending load (6.8) waits for the same decodes, and the Workers
+  decode only the other files. Thus a quick change of the piece decodes each file one time. The
+  progress counts a shared file when its bank is ready. A failed decode leaves the map, so that
+  the next load tries the file again.
 - The app starts the audio output service of the browser when it starts (`warmAudioOutput()`),
   and the `AudioContext` waits for it. In Chrome, the first `AudioContext` of a browser otherwise
   blocks the main thread until the service runs: one long task of the load (7.2).
