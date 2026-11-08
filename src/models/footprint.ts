@@ -205,6 +205,24 @@ export function placeFootprint(footprint: Footprint, position: Vec3, facing: num
 }
 
 /**
+ * Lists the four corners of a placed box in the plane of the stage.
+ *
+ * @param b The box.
+ * @returns The x and the z of each corner.
+ */
+export function boxCorners(b: PlacedBox): (readonly [x: number, z: number])[] {
+  return ([-1, 1] as const).flatMap((sx) =>
+    ([-1, 1] as const).map(
+      (sz) =>
+        [
+          b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin,
+          b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos,
+        ] as const,
+    ),
+  );
+}
+
+/**
  * Calculates half the length of the projection of a placed box on an axis of the plane. The axis
  * (1, 0) gives the half extent of the box along x of the stage, and (0, 1) along z.
  *

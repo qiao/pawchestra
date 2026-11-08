@@ -5,6 +5,7 @@ import { castScore, chamberFormOf, CONDUCTOR } from './cast.ts';
 import type { ChamberForm, PlayerCast, PlayingSection } from './cast.ts';
 import { centeredBox } from './bounds.ts';
 import {
+  boxCorners,
   footprintOf,
   obstacleOf,
   obstaclesTouch,
@@ -1242,24 +1243,6 @@ interface StageSize {
   readonly side: number;
   /** The front distance `F` from the front edge to the podium center, in meters. */
   readonly front: number;
-}
-
-/**
- * Lists the four corners of a placed box in the plane of the stage.
- *
- * @param b The box.
- * @returns The x and the z of each corner.
- */
-function boxCorners(b: PlacedBox): (readonly [x: number, z: number])[] {
-  return ([-1, 1] as const).flatMap((sx) =>
-    ([-1, 1] as const).map(
-      (sz) =>
-        [
-          b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin,
-          b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos,
-        ] as const,
-    ),
-  );
 }
 
 /**
