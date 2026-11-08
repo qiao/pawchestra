@@ -1448,16 +1448,7 @@ function layoutChamber(
     stageSide: stage.side,
     podium: move(CENTER),
     conductor: null,
-    players: placesOfCast(places, cast).map((p): PlayerPlace => ({
-      position: move(p.position),
-      facing: p.facing,
-      cast: p.cast,
-    })),
-    stands: stands.map((stand): StandPlace => ({
-      position: move(stand.place.position),
-      facing: stand.place.facing,
-      deskHeight: stand.place.deskHeight,
-    })),
+    ...onStage(places, cast, stands, move),
     risers: [],
     rowRisers: [],
   };
@@ -2515,6 +2506,36 @@ export function placesOfCast(
 }
 
 /**
+ * Moves the players and the stands of a layout from the podium center onto the stage.
+ *
+ * @param places The place of each player in the order of the cast.
+ * @param cast The cast, for the check of {@link placesOfCast}.
+ * @param stands The placed stands.
+ * @param move The move onto the stage.
+ * @returns The players and the stands of the layout.
+ * @throws {Error} If a player has no place.
+ */
+function onStage(
+  places: readonly (PlayerPlace | undefined)[],
+  cast: readonly PlayerCast[],
+  stands: readonly PlacedStand[],
+  move: (p: Vec3) => Vec3,
+): Pick<SceneLayout, 'players' | 'stands'> {
+  return {
+    players: placesOfCast(places, cast).map((p): PlayerPlace => ({
+      position: move(p.position),
+      facing: p.facing,
+      cast: p.cast,
+    })),
+    stands: stands.map((stand): StandPlace => ({
+      position: move(stand.place.position),
+      facing: stand.place.facing,
+      deskHeight: stand.place.deskHeight,
+    })),
+  };
+}
+
+/**
  * Calculates the positions of the stage, the players, the music stands, and the risers for a
  * score (design 4.5, 5.1). The sections sit in rows around the podium. The footprints of the
  * players, their instruments, their seats, and the stands keep 0.05 m from each other: a seat
@@ -2703,18 +2724,12 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
     stageSide: stage.side,
     podium,
     conductor: conductorOn(podium),
-    players: placesOfCast(places, cast).map((p): PlayerPlace => ({
-      position: move(p.position),
-      facing: p.facing,
-      cast: p.cast,
-    })),
-    stands: final
-      .flatMap((r) => r.placement.stands)
-      .map((stand): StandPlace => ({
-        position: move(stand.place.position),
-        facing: stand.place.facing,
-        deskHeight: stand.place.deskHeight,
-      })),
+    ...onStage(
+      places,
+      cast,
+      final.flatMap((r) => r.placement.stands),
+      move,
+    ),
     risers,
     rowRisers,
   };
