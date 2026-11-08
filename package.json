@@ -39,6 +39,7 @@
     "choir-check": "pnpm build && node tools/choir-check.ts",
     "body-probe": "node tools/body-probe.ts",
     "camera-probe": "node tools/camera-probe.ts",
+    "sight-lines": "node tools/sight-lines.ts",
     "plan-time": "node tools/plan-time.ts",
     "beat-rates": "node tools/beat-rates.ts",
     "clip-probe": "node tools/clip-probe.ts",
