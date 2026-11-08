@@ -56,7 +56,7 @@ function tubeRings(points: readonly Vec3[], radius: readonly number[], segments:
 
 /**
  * Adds a round tube along a path: one smooth solid in place of a rod for each step, so that a
- * bent brass tube shows no seams at its bends (design 4.6).
+ * bent brass tube shows no seams at its bends (design 4.6). The tube has the metal finish.
  *
  * @param piece The piece.
  * @param points The points of the path. At least 2, with no two equal neighbors.
@@ -64,7 +64,6 @@ function tubeRings(points: readonly Vec3[], radius: readonly number[], segments:
  *   points.
  * @param segments The number of faces around the tube.
  * @param color The color.
- * @param finish The finish.
  */
 export function tubeAlong(
   piece: PieceBuilder,
@@ -72,9 +71,8 @@ export function tubeAlong(
   radius: readonly number[],
   segments: number,
   color: Rgb,
-  finish: Finish = 'metal',
 ): void {
-  piece.add(sweep(tubeRings(points, radius, segments)), color, transform(), finish);
+  piece.add(sweep(tubeRings(points, radius, segments)), color, transform(), 'metal');
 }
 
 /**
