@@ -374,9 +374,10 @@ const BEAM_MARGIN = 0.3;
 
 /**
  * A close camera stays nearer to the stage center than this part of the default distance. Free
- * mode fades the beam from 0.45 on (4.5), so a change to Free mode keeps the beam of the shot.
+ * mode starts to fade the beam at 0.45 (4.5), so a change from a close shot to Free mode never
+ * gives the full beam.
  */
-export const CLOSE_DISTANCE_SHARE = FREE_BEAM_FADE[0] - 0.01;
+export const CLOSE_DISTANCE_SHARE = FREE_BEAM_FADE[1] - 0.01;
 
 /**
  * Tells on which side of the cone of the visible beam a camera is (design 4.5, 5.6).
@@ -462,8 +463,8 @@ const WIDE_FOV =
  */
 const SHOT_KEYS = {
   /**
-   * The push-in keeps the wide camera farther than 0.5 of the default distance, the end of the
-   * beam fade of Free mode (design 4.5).
+   * The push-in keeps the wide camera farther than 0.5 of the default distance, out of the beam
+   * fade of Free mode (design 4.5).
    */
   wide: { fov: WIDE_FOV, pushIn: 0.92, arc: 6 },
   /**

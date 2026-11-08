@@ -91,7 +91,7 @@ describe('freeBeamOpacity (design 2.5, 4.5)', () => {
 
   it('fades the beam for a camera near the stage', () => {
     for (const aspect of [1440 / 900, 390 / 844]) {
-      expect(freeBeamOpacity(SIDE, aspect, cameraAtRatio(0.3, aspect))).toBe(CLOSE_BEAM_OPACITY);
+      expect(freeBeamOpacity(SIDE, aspect, cameraAtRatio(0.15, aspect))).toBe(CLOSE_BEAM_OPACITY);
       expect(freeBeamOpacity(SIDE, aspect, [0, 2, 0])).toBe(CLOSE_BEAM_OPACITY);
     }
   });
@@ -102,7 +102,7 @@ describe('freeBeamOpacity (design 2.5, 4.5)', () => {
     const far = defaultDistance(SIDE, phone) * 0.6;
     expect(freeBeamOpacity(SIDE, phone, [0, 0, far])).toBe(1);
     expect(freeBeamOpacity(SIDE, 1, [0, 0, far])).toBe(1);
-    const near = defaultDistance(SIDE, 1) * 0.6;
+    const near = defaultDistance(SIDE, 1) * 0.4;
     expect(freeBeamOpacity(SIDE, phone, [0, 0, near])).toBe(CLOSE_BEAM_OPACITY);
   });
 
@@ -144,17 +144,21 @@ describe('cameraAt and the beam (design 5.6)', () => {
     }
   });
 
-  it.each(SCENES)('gives the beam of Free mode at each camera of $file, with no jump', (s) => {
-    // A change from Cinematic to Free mode keeps the camera, so it must keep the beam.
+  it.each(SCENES)('gives the full beam of Free mode only at the wide cameras of $file', (s) => {
+    // A change from Cinematic to Free mode keeps the camera. The blend of the mode change moves
+    // the beam from the value of the shot to the value of Free mode (design 2.5).
     const { plan, score } = s;
     for (const aspect of [1440 / 900, 1, 0.46]) {
       const view: CameraView = { aspect, still: false };
       for (let t = 0; t < score.durationSec + 5; t += 0.25) {
         const camera = cameraAt(plan, t, PLAYING, view, createCameraPose());
-        expect(freeBeamOpacity(plan.stageSide, aspect, camera.position), `${t} s`).toBeCloseTo(
-          camera.beam,
-          9,
-        );
+        const free = freeBeamOpacity(plan.stageSide, aspect, camera.position);
+        if (camera.beam === 1) {
+          expect(free, `${t} s`).toBe(1);
+        } else {
+          expect(free, `${t} s`).toBeLessThan(1);
+          expect(free, `${t} s`).toBeGreaterThanOrEqual(camera.beam);
+        }
       }
     }
   });

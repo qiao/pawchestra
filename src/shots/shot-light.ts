@@ -37,8 +37,7 @@ export const SHOT_SPOT = {
  * from the camera to the stage center, as a factor of the default distance. The section and the
  * solo shots of the planner stand at 0.25 or less, so a change from Cinematic to Free mode keeps
  * their light. The default view stands at about 0.56, and a view of the whole stage at about
- * 0.43. The fade of the beam (`FREE_BEAM_FADE`, 0.45 to 0.5) gave such a view half of the close
- * light.
+ * 0.43. A fade from 0.45 to 0.5 gave such a view half of the close light.
  */
 export const FREE_LIGHT_FADE = [0.25, 0.4] as const;
 

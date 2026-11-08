@@ -24,16 +24,22 @@ export const SHOT_BEAM_OPACITY = {
  * The range of the fade of the beam in Free mode (design 2.5, 4.5): the distance from the camera
  * to the stage center, as a factor of the default distance. At the first value and nearer, the
  * beam has {@link CLOSE_BEAM_OPACITY}. At the second value and farther, it has the full opacity.
- * The planner keeps each close camera at 0.44 or less (design 5.6), the high shots are at 0.74,
- * and the wide shots at 0.51 or more (0.62 or more in portrait, design 4.5), so a change from
- * Cinematic to Free mode keeps the opacity.
+ *
+ * The default view stands at about 0.55, so a zoom keeps the full beam for about 4 wheel steps.
+ * The fade takes about 16 wheel steps, so each step changes the opacity by 0.08 or less. With the
+ * range 0.45 to 0.5, 2 wheel steps removed most of the beam. The wide shots stand at 0.51 or more
+ * and the high shots at 0.74 (design 4.5), so they keep the full beam. The planner keeps each
+ * close camera nearer than the second value (design 5.6), so a change from a close shot to Free
+ * mode never gives the full beam. The blend of the mode change (design 2.5) moves the opacity
+ * from the value of the shot to the value of Free mode with no jump.
  */
-export const FREE_BEAM_FADE = [0.45, 0.5] as const;
+export const FREE_BEAM_FADE = [0.2, 0.45] as const;
 
 /**
  * Calculates the factor of the opacity of the visible beam for a camera in Free mode (design
- * 2.5, 4.5). The factor follows the distance to the stage center with a smoothstep, so an orbit
- * or a zoom changes it with no jump.
+ * 2.5, 4.5). The factor follows the logarithm of the distance to the stage center with a
+ * smoothstep. A wheel step multiplies the distance by a constant factor, so each step changes the
+ * factor by about the same amount, and an orbit or a zoom changes it with no jump.
  *
  * @param stageSide The stage side `S`, in meters.
  * @param aspect The width of the viewport divided by its height.
@@ -43,6 +49,6 @@ export const FREE_BEAM_FADE = [0.45, 0.5] as const;
 export function freeBeamOpacity(stageSide: number, aspect: number, position: Vec3): number {
   const ratio = Math.hypot(...position) / defaultDistance(stageSide, aspect);
   const [near, far] = FREE_BEAM_FADE;
-  const w = smoothstep((ratio - near) / (far - near));
+  const w = smoothstep(Math.log(ratio / near) / Math.log(far / near));
   return CLOSE_BEAM_OPACITY + (1 - CLOSE_BEAM_OPACITY) * w;
 }
