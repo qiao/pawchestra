@@ -221,7 +221,8 @@ export class StageCamera {
   /**
    * Creates the camera and its orbit controls.
    *
-   * @param canvas The element that gets the pointer events, or `null` with no events (a test).
+   * @param canvas The element that gets the pointer events, or `null` with no events until
+   *   {@link StageCamera.connect}.
    * @param stageSide The stage side `S`, in meters.
    * @param reducedMotion True if the user prefers reduced motion. Then the controls have no
    *   inertia (design 2.5).
@@ -636,6 +637,16 @@ export class StageCamera {
       this.#fitGlide = null;
     }
     this.#applyFrame();
+  }
+
+  /**
+   * Connects the orbit controls to the element that gets the pointer events. A camera that comes
+   * with no element gets the events only after this call.
+   *
+   * @param element The canvas of the page.
+   */
+  connect(element: HTMLElement): void {
+    this.#controls.connect(element);
   }
 
   /** Removes the event listeners of the orbit controls from the canvas. */
