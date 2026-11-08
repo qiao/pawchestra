@@ -217,7 +217,9 @@ The app follows these facts:
   at the note start, and rebounds (`STRIKE_MOTION`). A louder note lifts higher
   (`MalletAcross.peak`). The arm moves little. A strike within 0.75 s of the strike before it is a
   legato stroke: the head lifts at once after the strike before, as a real player lifts the
-  mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`).
+  mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
+  longer rest, the head lifts one beat before the note, at most 1 s before it
+  (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
 
 The app does not follow these facts:
 

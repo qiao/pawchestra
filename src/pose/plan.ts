@@ -458,7 +458,7 @@ function* noteLayerSteps(
     return {
       family: 'percussion',
       rig,
-      ...percussionTracks(rig, notes, loudness, amplitude),
+      ...percussionTracks(rig, notes, loudness, amplitude, beats),
     };
   }
   throw new Error(`The ${instrument} is not the instrument of a player.`);

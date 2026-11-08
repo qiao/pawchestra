@@ -44,6 +44,7 @@ interface PercussionTracks {
  * @param notes The notes of the player, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
  * @param amplitude The seeded amplitude of the player.
+ * @param beats The times of the conducted beats, sorted: the lift before an entry follows them.
  * @returns The strike data of each hand.
  */
 export function percussionTracks(
@@ -51,6 +52,7 @@ export function percussionTracks(
   notes: readonly PlayerNote[],
   loudness: readonly number[],
   amplitude: number,
+  beats: Float64Array = new Float64Array(),
 ): PercussionTracks {
   const { hold, instrument } = rig;
   const kettles = instrument === 'timpani' ? rig.targets.size : 4;
@@ -112,6 +114,7 @@ export function percussionTracks(
       strikes[0] && !waits ? offsetTarget(strikes[0], offset) : rest,
       hold.sizes,
       amplitude,
+      beats,
     );
   if (hold.hands === 'alternate' || hold.hands === 'sides') {
     const [left, right] = alternateHands(groups, {

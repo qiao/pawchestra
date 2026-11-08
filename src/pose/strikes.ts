@@ -8,10 +8,18 @@ import { smoothstep } from './rest.ts';
  * the lift come from the hold of each instrument.
  */
 export const STRIKE_MOTION = {
-  /** The lift before a strike starts at most this time before the note. */
+  /**
+   * The shortest lift from rest before a strike, and the longest move to a new target before the
+   * note. A lift of this time or more reaches the full height.
+   */
   upSec: 0.25,
   /** The lift takes at most this part of the time from the strike before of the same hand. */
   upShare: 0.6,
+  /**
+   * A lift from rest starts one beat before the note, as a real player brings the mallets up a
+   * beat before an entry, but at most this time before it.
+   */
+  leadSec: 1,
   /** The down stroke of a strike takes at most this time before the note. */
   downSec: 0.125,
   /**
@@ -266,6 +274,22 @@ export function alternateHands(
   return [left, right];
 }
 
+/**
+ * Gives the length of the beat at a song time: the time between the two conducted beats around
+ * it, or the last such time after the last beat.
+ *
+ * @param beats The times of the conducted beats, sorted.
+ * @param time The song time.
+ * @returns The length of the beat, in seconds, or 0 with fewer than two beats.
+ */
+export function beatSecAt(beats: Float64Array, time: number): number {
+  if (beats.length < 2) {
+    return 0;
+  }
+  const i = Math.min(Math.max(lastAtOrBefore(beats, time), 0), beats.length - 2);
+  return (beats[i + 1] ?? 0) - (beats[i] ?? 0);
+}
+
 /** The strike data of one hand that the pose looks up at each frame. */
 export interface StrikeTrack {
   /** The note start of each strike, sorted. */
@@ -295,8 +319,8 @@ export interface StrikeTrack {
 /**
  * Calculates the strike data of one hand (design 5.3). A strike within `legatoSec` of the strike
  * before it is a legato stroke: the mallet lifts at once after the strike before and waits at its
- * top. Another strike lifts from the rest height, at most 0.25 s before the note and in at most
- * 0.6 of the time from the strike before. The height of the top follows the gesture size of the
+ * top. Another strike lifts from the rest height, one beat before the note, at least 0.25 s and
+ * at most 1 s before it, and in at most 0.6 of the time from the strike before. The height of the top follows the gesture size of the
  * note, and a short lift is lower in proportion. The down stroke takes at most 0.125 s, and at most
  * half of the lift. After a strike with no legato stroke after it, the mallet rebounds to its rest
  * height in at most 0.1 s, and in at most 0.4 of the time to the next strike.
@@ -305,6 +329,8 @@ export interface StrikeTrack {
  * @param first The target of the hand before its first strike.
  * @param sizes The sizes of the motion of the instrument.
  * @param amplitude The seeded amplitude of the player.
+ * @param beats The times of the conducted beats, sorted. With fewer than two beats, a lift from
+ *   rest starts at most 0.25 s before the note.
  * @returns The strike data.
  */
 export function buildStrikeTrack(
@@ -312,6 +338,7 @@ export function buildStrikeTrack(
   first: StrikeTarget,
   sizes: StrikeSizes,
   amplitude: number,
+  beats: Float64Array = new Float64Array(),
 ): StrikeTrack {
   const m = STRIKE_MOTION;
   const gapBefore = (i: number): number => {
@@ -320,8 +347,11 @@ export function buildStrikeTrack(
     return before && strike ? strike.start - before.start : Infinity;
   };
   const legato = strikes.map((_, i) => gapBefore(i) <= m.legatoSec);
-  const ups = strikes.map((_, i) =>
-    legato[i] ? gapBefore(i) : Math.min(m.upSec, m.upShare * gapBefore(i)),
+  // A lift from rest starts one beat before the note, within its limits.
+  const lead = (start: number): number =>
+    Math.min(m.leadSec, Math.max(m.upSec, beatSecAt(beats, start)));
+  const ups = strikes.map((s, i) =>
+    legato[i] ? gapBefore(i) : Math.min(lead(s.start), m.upShare * gapBefore(i)),
   );
   return {
     starts: Float64Array.from(strikes, (s) => s.start),

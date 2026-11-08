@@ -473,7 +473,10 @@ The rest of each family:
   legato stroke: the mallet lifts at once after the strike before, to the top of the new strike,
   and waits there. Reason: a real player lifts the mallet at once after the attack (percussion 3,
   4), and with a rebound to the low rest height, the mallets stood still near the heads between
-  the notes of a passage. A chord takes both hands, a fast repeat takes the other hand, and a hand
+  the notes of a passage. Another strike lifts from the rest height one beat before the note
+  (`leadSec`), at least `upSec` before it and in at most `upShare` of the gap. Reason: a real
+  player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
+  no preparation. A chord takes both hands, a fast repeat takes the other hand, and a hand
   does not cross the other.
 - The paws of the elephant rest above the near rims, as in the reference images, so its mallets
   strike further in than a real timpanist (`PercussionHold.rim`). The short arms of the badger
