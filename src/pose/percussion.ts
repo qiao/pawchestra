@@ -147,13 +147,10 @@ export function setWeightAt(rests: Float64Array, time: number): number {
 
 /**
  * Calculates the strike data of the two hands of a percussion player (design 5.3). The notes that
- * start within 50 ms of each other strike together. A fast roll strikes only on some of its notes
- * ({@link thinRolls}). A drum player strikes its own instrument for
- * each of its notes, also for the notes of another key group (design 3.8). Of a chord of the
- * small percussion player, the triangle sounds unless all notes are the tambourine. A timpani
- * hold with a pair of front kettles (`PercussionHold.pair`) plays each note on one of them. A
- * hold with a side move (`PercussionHold.side`) moves the body toward the mean side place of the
- * targets of each strike group.
+ * start within 50 ms of each other strike together ({@link chordStrikes}). A fast roll strikes
+ * only on some of its notes ({@link thinRolls}). A hold with a side move
+ * (`PercussionHold.side`) moves the body toward the mean side place of the targets of each strike
+ * group.
  *
  * @param rig The points of the player.
  * @param notes The notes of the player, sorted by start.
@@ -171,37 +168,8 @@ export function percussionTracks(
   beats: Float64Array,
 ): PercussionTracks {
   const { hold, instrument } = rig;
-  const kettles = instrument === 'timpani' ? rig.targets.size : 4;
-  // With a pair of front kettles, a note below the middle key of the part plays on the left one.
-  const pair = instrument === 'timpani' && hold.pair;
-  const [frontL, frontR] = frontKettles(kettles);
-  let lowest = Infinity;
-  let highest = -Infinity;
-  for (const note of notes) {
-    lowest = Math.min(lowest, note.pitch);
-    highest = Math.max(highest, note.pitch);
-  }
-  const middle = (lowest + highest) / 2;
-  const shift = instrument === 'xylophone' ? xylophoneShift(lowest, highest) : 0;
-  const keyOf = (pitch: number): number =>
-    pair ? (pitch < middle ? frontL : frontR) : targetKeyOf(instrument, pitch, kettles, shift);
   const noteGroups = groupChords(notes, loudness);
-  const chords = noteGroups.map((group): StrikeGroup => {
-    const keys = new Set<number>();
-    for (const note of notes.slice(group.first, group.first + group.count)) {
-      keys.add(keyOf(note.pitch));
-    }
-    // The triangle (key 0) sounds over the tambourine (key 1).
-    const chosen = instrument === 'small-percussion' ? [Math.min(...keys)] : [...keys];
-    const targets: StrikeTarget[] = [];
-    for (const key of chosen) {
-      const target = rig.targets.get(key) ?? nearestTarget(rig, key);
-      if (target) {
-        targets.push(target);
-      }
-    }
-    return { start: group.start, loudness: group.loudness, targets };
-  });
+  const chords = chordStrikes(rig, notes, noteGroups);
   // A fast roll keeps the strikes of a rate that reads as a roll: two hands in turn, or one hand.
   const kept = thinRolls(
     chords,
@@ -223,57 +191,7 @@ export function percussionTracks(
         ),
       )
     : null;
-  // With a gap, a hand waits at its rest target before its first strike, and the other hand keeps
-  // the gap from that place.
-  const waits = hold.gap > 0;
-  const track = (strikes: readonly Strike[], offset: Vec3, rest: StrikeTarget): StrikeTrack =>
-    buildStrikeTrack(
-      strikes.map((s) => ({ ...s, point: offsetTarget(s, offset).point })),
-      strikes[0] && !waits ? offsetTarget(strikes[0], offset) : rest,
-      hold.sizes,
-      amplitude,
-      beats,
-    );
-  let left: StrikeTrack | null;
-  let right: StrikeTrack | null;
-  if (hold.hands === 'alternate' || hold.hands === 'sides') {
-    const [strikesL, strikesR] = alternateHands(groups, {
-      alternateSec: hold.hands === 'sides' ? 0 : STRIKE_MOTION.alternateSec,
-      gap: hold.gap,
-      pass: hold.pass,
-      places: waits ? [rig.restL.point[0], rig.restR.point[0]] : [-Infinity, Infinity],
-      reach: hold.reach,
-      shoulders: [
-        [rig.left.arm.bind.shoulder[0], rig.left.arm.bind.shoulder[2]],
-        [rig.right.arm.bind.shoulder[0], rig.right.arm.bind.shoulder[2]],
-      ],
-      // The hips and the lean of the spine move the shoulders toward the notes.
-      shift: (start) =>
-        side && hold.side
-          ? sideMoveAt(side, start) * (hold.side.hips + Math.sin(hold.side.spine) * rig.lever)
-          : 0,
-    });
-    left = track(strikesL, hold.offsetL, rig.restL);
-    right = track(strikesR, hold.offsetR, rig.restR);
-  } else {
-    const strikes = groups.flatMap((g): Strike[] => {
-      const target = g.targets[0];
-      if (!target) {
-        return [];
-      }
-      // A louder crash of the hand cymbals meets higher.
-      const raise = hold.hands === 'pair' ? CRASH_MOTION.raise * rig.headHeight * g.loudness : 0;
-      return [
-        {
-          ...offsetTarget(target, [0, raise, 0]),
-          start: g.start,
-          loudness: g.loudness,
-        },
-      ];
-    });
-    right = track(strikes, hold.offsetR, rig.restR);
-    left = hold.hands === 'pair' ? right : null;
-  }
+  const [left, right] = handTracks(rig, groups, side, amplitude, beats);
   const damp = hold.damp && right ? dampTrackOf(hold.damp, noteGroups, right) : null;
   const ring =
     hold.hands === 'pair' && right
@@ -293,14 +211,121 @@ export function percussionTracks(
           hold.hands === 'pair' ? afterEnds(groups, [damp, ring]) : [],
         )
       : null;
-  return {
-    left,
-    right,
-    side,
-    rests,
-    damp,
-    ring,
-  };
+  return { left, right, side, rests, damp, ring };
+}
+
+/**
+ * Gives the targets of each note group of a percussion player (design 5.3). A drum player strikes
+ * its own instrument for each of its notes, also for the notes of another key group (design 3.8).
+ * Of a chord of the small percussion player, the triangle sounds unless all notes are the
+ * tambourine. A timpani hold with a pair of front kettles (`PercussionHold.pair`) plays each note
+ * on one of them.
+ *
+ * @param rig The points of the player.
+ * @param notes The notes of the player, sorted by start.
+ * @param noteGroups The note groups of the notes, sorted by start.
+ * @returns One strike group for each note group.
+ */
+function chordStrikes(
+  rig: PercussionRig,
+  notes: readonly PlayerNote[],
+  noteGroups: readonly NoteGroup[],
+): StrikeGroup[] {
+  const { hold, instrument } = rig;
+  const kettles = instrument === 'timpani' ? rig.targets.size : 4;
+  // With a pair of front kettles, a note below the middle key of the part plays on the left one.
+  const pair = instrument === 'timpani' && hold.pair;
+  const [frontL, frontR] = frontKettles(kettles);
+  let lowest = Infinity;
+  let highest = -Infinity;
+  for (const note of notes) {
+    lowest = Math.min(lowest, note.pitch);
+    highest = Math.max(highest, note.pitch);
+  }
+  const middle = (lowest + highest) / 2;
+  const shift = instrument === 'xylophone' ? xylophoneShift(lowest, highest) : 0;
+  const keyOf = (pitch: number): number =>
+    pair ? (pitch < middle ? frontL : frontR) : targetKeyOf(instrument, pitch, kettles, shift);
+  return noteGroups.map((group): StrikeGroup => {
+    const keys = new Set<number>();
+    for (const note of notes.slice(group.first, group.first + group.count)) {
+      keys.add(keyOf(note.pitch));
+    }
+    // The triangle (key 0) sounds over the tambourine (key 1).
+    const chosen = instrument === 'small-percussion' ? [Math.min(...keys)] : [...keys];
+    const targets: StrikeTarget[] = [];
+    for (const key of chosen) {
+      const target = rig.targets.get(key) ?? nearestTarget(rig, key);
+      if (target) {
+        targets.push(target);
+      }
+    }
+    return { start: group.start, loudness: group.loudness, targets };
+  });
+}
+
+/**
+ * Gives the strikes of a percussion player to its hands and calculates the strike data of each
+ * hand (design 5.3). An alternate hold or a hold of two sides shares the strikes between the two
+ * hands ({@link alternateHands}). The pair of hand cymbals strikes each note with both hands, and
+ * a louder crash meets higher. Another hold strikes with the right hand alone.
+ *
+ * @param rig The points of the player.
+ * @param groups The strike groups of the player, sorted by start.
+ * @param side The side move of the body behind the notes, or `null`.
+ * @param amplitude The seeded amplitude of the player.
+ * @param beats The times of the conducted beats, sorted.
+ * @returns The strike data of the left and the right hand, `null` for a hand with no strikes.
+ */
+function handTracks(
+  rig: PercussionRig,
+  groups: readonly StrikeGroup[],
+  side: SideTrack | null,
+  amplitude: number,
+  beats: Float64Array,
+): readonly [left: StrikeTrack | null, right: StrikeTrack | null] {
+  const { hold } = rig;
+  // With a gap, a hand waits at its rest target before its first strike, and the other hand keeps
+  // the gap from that place.
+  const waits = hold.gap > 0;
+  const track = (strikes: readonly Strike[], offset: Vec3, rest: StrikeTarget): StrikeTrack =>
+    buildStrikeTrack(
+      strikes.map((s) => ({ ...s, point: offsetTarget(s, offset).point })),
+      strikes[0] && !waits ? offsetTarget(strikes[0], offset) : rest,
+      hold.sizes,
+      amplitude,
+      beats,
+    );
+  if (hold.hands === 'alternate' || hold.hands === 'sides') {
+    const [strikesL, strikesR] = alternateHands(groups, {
+      alternateSec: hold.hands === 'sides' ? 0 : STRIKE_MOTION.alternateSec,
+      gap: hold.gap,
+      pass: hold.pass,
+      places: waits ? [rig.restL.point[0], rig.restR.point[0]] : [-Infinity, Infinity],
+      reach: hold.reach,
+      shoulders: [
+        [rig.left.arm.bind.shoulder[0], rig.left.arm.bind.shoulder[2]],
+        [rig.right.arm.bind.shoulder[0], rig.right.arm.bind.shoulder[2]],
+      ],
+      // The hips and the lean of the spine move the shoulders toward the notes.
+      shift: (start) =>
+        side && hold.side
+          ? sideMoveAt(side, start) * (hold.side.hips + Math.sin(hold.side.spine) * rig.lever)
+          : 0,
+    });
+    return [track(strikesL, hold.offsetL, rig.restL), track(strikesR, hold.offsetR, rig.restR)];
+  }
+  const strikes = groups.flatMap((g): Strike[] => {
+    const target = g.targets[0];
+    if (!target) {
+      return [];
+    }
+    // A louder crash of the hand cymbals meets higher.
+    const raise = hold.hands === 'pair' ? CRASH_MOTION.raise * rig.headHeight * g.loudness : 0;
+    return [{ ...offsetTarget(target, [0, raise, 0]), start: g.start, loudness: g.loudness }];
+  });
+  const right = track(strikes, hold.offsetR, rig.restR);
+  return [hold.hands === 'pair' ? right : null, right];
 }
 
 /**
