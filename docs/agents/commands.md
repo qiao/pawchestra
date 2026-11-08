@@ -38,7 +38,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm prepare-site` | Writes the SF3 presets into `public/sf/` and the changed demos into `public/demos/` (design 8.3). `pnpm dev`, `build`, `smoke`, `frame`, and `frozen` run it first. |
 | `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html` (design 7.1), and a demo at `/#demo=<id>`. |
 | `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). `PAWCHESTRA_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). `pnpm vite preview` serves `dist/`. |
-| `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). `--base` also builds the commit, and prints the difference. |
+| `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, with the bodies of the default demo, and fails above 1 MB (design 7.2). `--base` also builds the commit, and prints the difference. |
 | `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `pawchestra` (design 9.2). Code: `tools/deploy-vercel.sh`. About 2 minutes. |
 | `pnpm load-probe [--phone] [--repeat] [--base <ref>]` | Measures the load of the default demo after `pnpm build`: FCP, LCP, the first frame, the time until play is ready, and the bytes. About 10 s. |
 | `pnpm lighthouse [--quick] [--desktop] [--url <url>]` | Audits the page with the pinned Lighthouse after `pnpm build`. About 15 s for each run. |
@@ -126,7 +126,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | `pnpm mixamo-import <file.fbx\|file.glb> --out <dir>` | Converts a Mixamo file into `<dir>/<name>.glb` in meters, with one animation for each take (design 4.4). The folder must be one that git ignores (design 8.1). About 3 s. |
 | `pnpm mixamo-model <file.fbx\|file.glb> --out <dir>` | Writes the inputs of `rig-mesh` from a Mixamo-rigged mesh (design 4.4) into a folder that git ignores. About 6 s. |
 | `pnpm glb-point-edits <edits.json> [--out <file.glb>]` | Writes the point edits of an edit file into the rig GLB file of its base commit, which `git show` reads (design 4.4): each move moves the vertices at one stored place, `keepTargets` takes the moves back from those morph targets, and `weights` sets the bones of a place. It stops at another SHA-256 of the base. `--out` writes a trial file for `--glb`. Less than 1 s. |
-| `pnpm studio-body <animal> [--inspect [--glb <file>]]` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender. `--inspect` prints the joints, the clips, and the arm lengths. |
+| `pnpm studio-body <animal> [--inspect [--glb <file>]]`, or `--heights` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender, and then `src/models/studio-heights.ts`. `--heights` writes only the heights file from the body modules. `--inspect` prints the joints, the clips, and the arm lengths. |
 | `pnpm view-point [<x>,<y>,<z>]... [--pixel <u>,<v>,<y>]...` | Projects each point into the default view with no render, and prints its pixel and its depth. About 1 s. |
 
 ## Tests and scripts
