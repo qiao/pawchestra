@@ -593,8 +593,8 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
  * meet a little offset, as a glancing blow, and slide on past each other: the right plate down and
  * the left plate up (`StrikeState.slide`). After a crash, the plates part, turn their inner faces
  * out to the front and up, and rise, so that the sound rings to the hall. At the end of a note
- * before a rest, they go against the chest (`DampRule` `chest`). A louder crash meets higher. The
- * lengths are in head heights `H`.
+ * before a rest, they go against the chest (`PercussionHold.damp`). A louder crash meets higher.
+ * The lengths are in head heights `H`.
  */
 export const CRASH_MOTION = {
   /**
@@ -950,7 +950,7 @@ interface PlatePair {
 /**
  * Gives the two hands of a pair of hand cymbals, and sets the crash target (design 5.3): the rims
  * meet at the crash point, along the crash normal of the tilt of `CRASH_MOTION`. It also gives the
- * crash point of the damp against the chest (`DampRule` `chest`): lower by the drop, and as far
+ * crash point of the damp against the chest (`PercussionHold.damp`): lower by the drop, and as far
  * forward as the room between the rims and the front of the trunk needs.
  *
  * @param model The player with the hand cymbals.
