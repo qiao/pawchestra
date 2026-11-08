@@ -845,6 +845,15 @@ const CELL = { width: 360, height: 450 } as const;
 const CLOSE_FILL_LUX = 2;
 
 /**
+ * The flag that renders each close view with no fill light, in the light of the app (design
+ * 9.8): the fill of {@link CLOSE_FILL_LUX} goes to 0.
+ */
+const NO_FILL_FLAG = '--no-fill';
+
+/** The fill light of the close views of this run, in lux ({@link NO_FILL_FLAG}). */
+let fillLux: number = CLOSE_FILL_LUX;
+
+/**
  * Gives the path of the gallery page of a view and a moment: the animal of a role alone with its
  * instrument, close, at the camera of the view.
  *
@@ -892,7 +901,7 @@ export function closeViewPath(
   if (probe) {
     query.set('probe', probe);
   }
-  query.set('fill', String(CLOSE_FILL_LUX));
+  query.set('fill', String(fillLux));
   return `/gallery.html?${query.toString()}`;
 }
 
@@ -5471,7 +5480,11 @@ const USAGE = [
  * `package.json` stops before the build on a wrong command line.
  */
 async function main(): Promise<void> {
-  const all = process.argv.slice(2);
+  const given = process.argv.slice(2);
+  if (given.includes(NO_FILL_FLAG)) {
+    fillLux = 0;
+  }
+  const all = given.filter((arg) => arg !== NO_FILL_FLAG);
   const check = all[0] === CHECK_FLAG;
   let mode: CloseMode | null = null;
   try {
