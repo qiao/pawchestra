@@ -258,7 +258,7 @@ export interface PreparedLayout {
 /** The parts of a build that a later build frees if the build does not show. */
 interface PendingBuild {
   readonly scene: Scene;
-  /** The camera, with the listeners of its orbit controls, or `null` before it exists. */
+  /** The camera, or `null` before it exists. Its orbit controls connect only in `show()`. */
   camera: StageCamera | null;
   /** The targets of the bake and of the capture. */
   readonly targets: WebGLRenderTarget[];
@@ -530,8 +530,10 @@ export class StageScene {
     const culled = yield* cullPlayersSteps(players);
     const playerGroup = new Group().add(...players);
     scene.add(playerGroup);
+    // The camera gets the pointer events only in `show()`. A drag during the build thus moves
+    // only the shown camera, and the new stage starts at its default view.
     const camera = new StageCamera(
-      this.#canvas,
+      null,
       layout.stageSide,
       this.#reducedMotion,
       playersTop(layout, models),
@@ -599,6 +601,9 @@ export class StageScene {
     setRimLights(this.#rim, view.lights);
     this.#variants.useScene(view.scene);
     this.#disposeView();
+    // The controls connect after the old controls disconnect, because a disconnect clears the
+    // `touch-action` of the canvas.
+    view.camera.connect(this.#canvas);
     this.#focusDistance = null;
     // The lights of a new layout start at the aim with no solo, with no ease from the old stage.
     this.#soloFlags = null;
