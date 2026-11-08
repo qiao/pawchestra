@@ -194,14 +194,13 @@ Design 4.4 gives the rule and the reason of each config key.
 ### Holds and reach
 
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist, where
-  `twistAngle()` flips. Use `pnpm bind-supination <species>` (design 4.4), or lower the twist of
-  the hold.
-- The `palm` of a rig config sets the roll of the arm bones. Read it from the curl of the claws,
-  on the real palm of the source.
+  `twistAngle()` flips. Use `pnpm bind-supination` (design 4.4), or lower the twist of the hold.
+- The `palm` of a rig config sets the roll of the arm bones. Read it from the claw curl on the real
+  palm of the source.
 - Short arms do not reach the instruments. Size the instrument by the rule of real players, then
   fit the arm factor to the reach.
-- A hold trades folds against clearance. Check each hold change with `pnpm hold-fit --set`,
-  `pnpm pose-depth --set`, and `pnpm arm-check --variant`.
+- A hold trades folds against clearance. Check each hold change with `hold-fit`, `pose-depth`, and
+  `arm-check`.
 - The arm gate and the depths pass while a paw misses its instrument. Measure each grip with
   `pnpm wind-grip`, and look at the thumb. A paw that points at its tube cannot face it with the
   palm: put the grip beside the tube.
@@ -213,26 +212,24 @@ Design 4.4 gives the rule and the reason of each config key.
   move the mouthpiece under the muzzle (`lipShift`).
 - A turned paw moves on an arc around the wrist: put the bow stick along it. A forearm turn
   against the bow slides the paw on the stick: turn the hand around a mid-paw grip
-  (`stickTurnR`). A direct mix from an upright rest bow turns the tip through the head: use a via
-  (`BowVia`).
+  (`stickTurnR`). A direct mix from an upright rest bow turns the tip through the head: use a via (`BowVia`).
 
 ### Clearance and probes
 
 - The sweep measures triangle corners, so the middle of a long box can go into the body unseen
-  (`bowPoints()`). It measures closed parts (`closedPart()`), because the depth of an open part
-  is false near its edge.
+  (`bowPoints()`). The depth of an open part is false near its edge, so the sweep measures closed
+  parts (`closedPart()`).
 - The pair "instrument in body" gives the deepest corner. Measure the visible top plate alone.
 - `armGaps()` of `pose/test-arm-clearance.ts` gives false depths for an arm in front of the
   chest. Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
 - The sweep counts the hidden root of a free arm in the trunk as a clip. Move only its deep
   vertices toward the wall, or toward the joint when they also come out (`pig_root.py`).
-- Split a recast fold count by the main bones of `pnpm fold-probe --faces` before a root fix:
-  paws and inner elbows at rest can hold most of it.
-- `--views` of `pnpm arm-check` takes no conductor. Aim `pnpm close-views conductor --aim` at a
-  wrist.
+- Before a root fix, split a recast fold count by bone with `pnpm fold-probe --faces`. Paws and
+  inner elbows at rest can hold most of it.
+- `arm-check --views` takes no conductor. Aim `pnpm close-views conductor --aim` at a wrist.
 - The bow values (`src/pose/bowed-rig.ts`, `src/pose/strokes.ts`), `HAND_MOTION`, the percussion
-  `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits stay in meters. Compare a new body size
-  in `H` first.
+  `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits are in meters. Compare a new body size in
+  `H` first.
 
 ### Weights, folds, and shapes
 
