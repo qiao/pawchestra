@@ -56,26 +56,15 @@ These rules hold for each route:
 
 ## The asset chain
 
-Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each one:
+Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each one. Design 4.4
+("Models") gives the chain in a diagram.
 
-- **Mesh rig.** `pnpm rig-mesh` makes each body of the table except the polar bear. A mesh whose
-  arms join the trunk takes this route.
+- **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
+  each body of the table except the polar bear. A mesh whose arms join the trunk takes this route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
-- **Hand rig.** A person or an agent makes the `.blend` in Blender.
-
-```text
- assets/models/<s>/<s>.glb (source mesh, unchanged)
-   | tools/blender/arm_rebuild.py, or <a>_arms.py (rebuilt arms or legs)
-   v
- <s>-arms.glb + <s>-weights.json (a copy with quad tubes and Blender weights)
-   | pnpm rig-mesh <a>   (tools/mesh-rigs/<a>.json, Blender)
-   v                              <s>.blend (hand rig or simple route)
- <s>.rig.glb  <------------------------ pnpm rig-export <s>
-   | pnpm studio-body <a> (ANIMALS of tools/studio-body.ts, no Blender)
-   v
- src/models/studio/<a>.ts --> STUDIO_BODIES --> SPECIES[<s>].body
-```
+- **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
+  it.
 
 A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
 `pnpm glb-point-edits <file>` writes it into the rig file of its base commit (the cat). Test a
