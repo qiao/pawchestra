@@ -1822,9 +1822,10 @@ interface SightMemo {
  * hidden conductor.
  *
  * @param search The row and the items around it.
+ * @param fit True to skip each angle at which a player does not fit ({@link fitsAt}).
  * @returns The steps, which return the angle of each player.
  */
-function* sightSweepSteps(search: RowSearch): Steps<number[]> {
+function* sightSweepSteps(search: RowSearch, fit = false): Steps<number[]> {
   const { row, arcs, blockers, view, inner: innerLimit, memo } = search;
   const { targets } = search.pass;
   const { members, radius, angles } = row;
@@ -1870,7 +1871,7 @@ function* sightSweepSteps(search: RowSearch): Steps<number[]> {
           out < side * limit - 1e-12 ||
           Math.abs(angle) > SPREAD_LIMITS.maxAngle + 1e-9 ||
           (k === order.length - 1 && out > side * base + 1e-12) ||
-          !fitsAt(members[i], angle, search)
+          (fit && !fitsAt(members[i], angle, search))
         ) {
           continue;
         }
@@ -2210,9 +2211,16 @@ function* trySteps(search: RowSearch, gap = false): Steps<SightTry> {
   const sweep = gap
     ? { ...search, row: { ...row, split: false }, view: stage.side, inner: null, memo: null }
     : search;
+  const fits = (a: readonly number[], p: RowPlacement): boolean =>
+    withinSpread(a) && rowFits(p, search.clearance, stage);
   let angles = yield* sightSweepSteps(sweep);
   let placement = placeRow(row.members, angles, row.radius);
-  if (!withinSpread(angles) || !rowFits(placement, search.clearance, stage)) {
+  // Only a sweep that does not fit checks the fit of each player, because the check is slow.
+  if (!fits(angles, placement)) {
+    angles = yield* sightSweepSteps(sweep, true);
+    placement = placeRow(row.members, angles, row.radius);
+  }
+  if (!fits(angles, placement)) {
     angles = [...row.angles];
     placement = placeRow(row.members, angles, row.radius);
   }
