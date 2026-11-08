@@ -469,7 +469,11 @@ The rest of each family:
 - Each paw holds its mallet in the closed fingers, with the head out of the front of the fist,
   and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`).
 - A mallet lifts before a strike, comes down at full speed at the note start, and rebounds
-  (`STRIKE_MOTION`). A chord takes both hands, a fast repeat takes the other hand, and a hand
+  (`STRIKE_MOTION`). A strike within `legatoSec` of the strike before it of the same hand is a
+  legato stroke: the mallet lifts at once after the strike before, to the top of the new strike,
+  and waits there. Reason: a real player lifts the mallet at once after the attack (percussion 3,
+  4), and with a rebound to the low rest height, the mallets stood still near the heads between
+  the notes of a passage. A chord takes both hands, a fast repeat takes the other hand, and a hand
   does not cross the other.
 - The paws of the elephant rest above the near rims, as in the reference images, so its mallets
   strike further in than a real timpanist (`PercussionHold.rim`). The short arms of the badger

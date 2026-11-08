@@ -12,6 +12,14 @@ export const STRIKE_MOTION = {
   upSec: 0.25,
   /** The lift takes at most this part of the time from the strike before of the same hand. */
   upShare: 0.6,
+  /** The down stroke of a strike takes at most this time before the note. */
+  downSec: 0.125,
+  /**
+   * A strike within this time of the strike before it of the same hand is a legato stroke: the
+   * mallet lifts at once after the strike before, up to the top of this strike, and waits there,
+   * as a real player lifts the mallet at once after the attack (design 5.3).
+   */
+  legatoSec: 0.75,
   /** After a strike, the mallet rebounds to its rest height in at most this time. */
   reboundSec: 0.1,
   /** The rebound takes at most this part of the time to the next strike of the same hand. */
@@ -262,14 +270,21 @@ export function alternateHands(
 export interface StrikeTrack {
   /** The note start of each strike, sorted. */
   readonly starts: Float64Array;
-  /** The start of the lift before each strike. */
+  /**
+   * The start of the lift before each strike. A legato stroke lifts from the strike before
+   * (`STRIKE_MOTION.legatoSec`), so its lift starts at that strike.
+   */
   readonly upStarts: Float64Array;
+  /** The time of the down stroke of each strike, from the top to the target, in seconds. */
+  readonly downs: Float64Array;
+  /** 1 for a legato stroke, which lifts at once from the strike before, and 0 for a lift from rest. */
+  readonly legato: Uint8Array;
   /** The end of the rebound after each strike. */
   readonly reboundEnds: Float64Array;
   /** The point and the normal of each target, in the model axes: three numbers for each. */
   readonly points: Float64Array;
   readonly normals: Float64Array;
-  /** The highest lift before each strike, in meters. */
+  /** The top of the lift before each strike, in meters. */
   readonly peaks: Float64Array;
   /** The height above the target between two strikes, in meters. */
   readonly rest: number;
@@ -278,11 +293,13 @@ export interface StrikeTrack {
 }
 
 /**
- * Calculates the strike data of one hand (design 5.3). The lift before a strike starts at most
- * 0.25 s before the note, and in at most 0.6 of the time from the strike before. Its height
- * follows the gesture size of the note, and a short lift is lower in proportion. After the strike,
- * the mallet rebounds to its rest height in at most 0.1 s, and in at most 0.4 of the time to the
- * next strike.
+ * Calculates the strike data of one hand (design 5.3). A strike within `legatoSec` of the strike
+ * before it is a legato stroke: the mallet lifts at once after the strike before and waits at its
+ * top. Another strike lifts from the rest height, at most 0.25 s before the note and in at most
+ * 0.6 of the time from the strike before. The height of the top follows the gesture size of the
+ * note, and a short lift is lower in proportion. The down stroke takes at most 0.125 s, and at most
+ * half of the lift. After a strike with no legato stroke after it, the mallet rebounds to its rest
+ * height in at most 0.1 s, and in at most 0.4 of the time to the next strike.
  *
  * @param strikes The strikes of the hand, sorted by start.
  * @param first The target of the hand before its first strike.
@@ -302,10 +319,15 @@ export function buildStrikeTrack(
     const strike = strikes[i];
     return before && strike ? strike.start - before.start : Infinity;
   };
-  const ups = strikes.map((_, i) => Math.min(m.upSec, m.upShare * gapBefore(i)));
+  const legato = strikes.map((_, i) => gapBefore(i) <= m.legatoSec);
+  const ups = strikes.map((_, i) =>
+    legato[i] ? gapBefore(i) : Math.min(m.upSec, m.upShare * gapBefore(i)),
+  );
   return {
     starts: Float64Array.from(strikes, (s) => s.start),
     upStarts: Float64Array.from(strikes, (s, i) => s.start - (ups[i] ?? 0)),
+    downs: Float64Array.from(ups, (up) => Math.min(m.downSec, up / 2)),
+    legato: Uint8Array.from(legato, (l) => (l ? 1 : 0)),
     reboundEnds: Float64Array.from(
       strikes,
       (s, i) => s.start + Math.min(m.reboundSec, m.reboundShare * gapBefore(i + 1)),
@@ -314,7 +336,8 @@ export function buildStrikeTrack(
     normals: Float64Array.from(strikes.flatMap((s) => s.normal)),
     peaks: Float64Array.from(
       strikes,
-      (s, i) => sizes.lift * gestureSize(s.loudness, amplitude) * ((ups[i] ?? 0) / m.upSec),
+      (s, i) =>
+        sizes.lift * gestureSize(s.loudness, amplitude) * Math.min(1, (ups[i] ?? 0) / m.upSec),
     ),
     rest: sizes.rest,
     first,
@@ -380,9 +403,10 @@ function writeTarget(track: StrikeTrack, i: number, t: number, out: StrikeState)
 
 /**
  * Calculates the motion of one hand at a song time (design 5.3). Between two strikes, the mallet
- * rests above its last target. Before a strike, it moves to the new target, lifts, and comes down
- * with its full speed: it reaches the target at the note start. Then it rebounds to its rest
- * height.
+ * rests above its last target. Before a strike, it moves to the new target and lifts to the top,
+ * from the rest height or, in a legato stroke, at once from the strike before. Then it comes down
+ * with its full speed and reaches the target at the note start. After a strike with no legato
+ * stroke after it, it rebounds to its rest height.
  *
  * @param track The strike data of the hand.
  * @param time The song time of the note layer.
@@ -398,11 +422,24 @@ export function strikeStateAt(track: StrikeTrack, time: number, out: StrikeState
     return;
   }
   if (time < start) {
-    const progress = (time - upStart) / (start - upStart);
-    writeTarget(track, i, smoothstep(progress), out);
-    // The lift ends at the target with its full speed: the mallet strikes at the note start.
-    const peak = track.peaks[i] ?? 0;
-    out.height = track.rest * (1 - progress) + peak * Math.sin(Math.PI * progress);
+    // The mallet moves to the new target in the last part of the lift, also in a legato stroke.
+    const moveStart = Math.max(upStart, start - STRIKE_MOTION.upSec);
+    writeTarget(track, i, smoothstep((time - moveStart) / (start - moveStart)), out);
+    const top = track.peaks[i] ?? 0;
+    const down = track.downs[i] ?? 0;
+    const downStart = start - down;
+    if (time >= downStart) {
+      // The down stroke ends at the target with its full speed: the mallet strikes at the note
+      // start.
+      out.height = top * Math.sin((Math.PI / 2) * ((start - time) / (down || 1)));
+      return;
+    }
+    const rise = (time - upStart) / (downStart - upStart || 1);
+    // A legato stroke leaves the strike before with its full speed, as a rebound. A lift from
+    // rest starts and ends slowly.
+    out.height = track.legato[i]
+      ? top * Math.sin((Math.PI / 2) * rise)
+      : track.rest + (top - track.rest) * smoothstep(rise);
     return;
   }
   writeTarget(track, i, 1, out);
