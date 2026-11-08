@@ -217,14 +217,12 @@ export function startPlay(
 }
 
 /**
- * Gives the play state after a seek of the user (design 5.2, 6.5). A seek during play ends the
- * count-in, and the sound starts at the seek point. The seek point becomes the start point, so
- * that a later pause before the old start point keeps the hold of 3 s. A seek while paused does
- * not change the transport: the next play starts from the seek point.
- *
- * The pose gives a count-in from the song start a ready gesture (5.4). A seek to the song start
- * has no count-in, so its start point is the smallest number above 0. Else the left hand of the
- * conductor jumps up at the seek (the Home key).
+ * Gives the play state after a seek of the user (design 5.2, 5.4, 6.5). A seek during play ends
+ * the count-in, and the sound starts at the seek point. The seek point becomes the start point, so
+ * that a later pause before the old start point keeps the hold of 3 s. The transport marks this
+ * start point with `seekStart`, so the pose gives it no count-in: the leader does not nod, and the
+ * baton does not lift. A seek while paused does not change the transport: the next play starts
+ * from the seek point with a count-in.
  *
  * @param state The play state before the seek.
  * @param songSec The seek point, in song seconds.
@@ -234,6 +232,8 @@ export function seekPlayState(state: PlayState, songSec: number): PlayState {
   if (!state.transport.playing) {
     return state;
   }
-  const startSec = Math.max(songSec, Number.MIN_VALUE);
-  return { transport: { ...state.transport, startSec }, endPending: state.endPending };
+  return {
+    transport: { ...state.transport, startSec: songSec, seekStart: true },
+    endPending: state.endPending,
+  };
 }
