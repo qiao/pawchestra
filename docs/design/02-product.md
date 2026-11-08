@@ -351,10 +351,10 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   controls, so the tooltip of the link to GitHub stays while the link has the focus. A screen
   reader skips it, because `aria-label` and `aria-keyshortcuts` give the name and the key.
 - **Icons**: inline SVG, 20 × 20, stroke width 1.75, round caps and joins, `currentColor`
-  (`ui/icons.ts`). "Cinematic camera" shows an open clapperboard. In a lineup of the bar at 1x
-  and 2x, it read as film at 20 px, with the stroke weight of the other icons. A movie camera
-  with two reels was too busy at 20 px, a frame with filled letterbox bars read as a card, and a
-  film strip read as a media file. A still camera looks like a button that takes a photo.
+  (`ui/icons.ts`). "Cinematic camera" shows an open clapperboard. It reads as film at 20 px,
+  with the stroke weight of the other icons. A movie camera with two reels is too busy at 20 px,
+  a frame with filled letterbox bars reads as a card, a film strip reads as a media file, and a
+  still camera looks like a button that takes a photo.
 
 **Seat texts**
 
