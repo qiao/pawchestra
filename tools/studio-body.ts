@@ -350,6 +350,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_PANDA',
       crease: 35,
+      // The deepest point of the crease between the lips under the black nose, on a cut of the head
+      // with the middle plane. The rule of the nose drop put the mouth 2.4 cm higher and 2.1 cm in
+      // front of the face.
+      mouthHeight: 0.764,
       glb: 'assets/models/panda/panda.rig.glb',
     },
   ],
