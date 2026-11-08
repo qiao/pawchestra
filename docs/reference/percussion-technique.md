@@ -270,7 +270,9 @@ The app follows these facts:
 - **The suspended cymbal (section 7).** The badger plays the cymbal parts on a suspended cymbal
   (`SpeciesParams.cymbalForm`, `SUSPENDED_CYMBAL`). Its short arms cannot hold hand cymbals of the
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
-  other.
+  other. Between strikes, each ball stays about 3.5 cm above the plate, with the shaft almost
+  level, as the ready position of the snare drum. Before a strike, it lifts higher for a louder
+  note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`).
 - **The triangle (section 8).** The clip lies in the palm under the curled fingers, and the
   triangle hangs from it in a loop of cord (`TRIANGLE_CLIP`).
 - **The xylophone (section 9).** The body moves from side to side behind the notes with the feet

@@ -485,9 +485,10 @@ The rest of each family:
   each note. Reason: a hand that struck each note of a roll of 20 notes each second moved as a
   buzz, and a real roll of 32nd notes at 80 beats each minute has about 11 strokes each second
   (percussion 4).
-- **Snare sticks between strikes.** Each stick keeps its strike direction, and the wrist holds
-  the tip a few cm above the head with the stick almost level (`MalletAcross.pitch`), as the
-  ready position of a real player (percussion 6). Before a strike, the wrist lifts the tip
+- **Sticks and mallets between strikes.** Each snare stick and each mallet of the suspended
+  cymbal keeps its strike direction, and the wrist holds the tip a few cm above the head with the
+  stick almost level (`MalletAcross.pitch`), as the ready position of a real player (percussion
+  6). Before a strike, the wrist lifts the tip
   higher by the loudness of the note (`StrikeSizes.lift`, `MalletAcross.peak`), and the tip comes
   back to the ready height after the rebound. Reason: with a large pitch and no higher lift, the
   tips stood high above the head between strikes, and the stroke did not grow with the loudness.

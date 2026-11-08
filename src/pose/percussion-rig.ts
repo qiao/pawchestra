@@ -516,8 +516,12 @@ export const PERCUSSION_HOLDS = {
  * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand further out than
  * for the snare drum, so that the mallets point in to the spots, and the upper arms of the badger
  * mesh fold less and stay within their accepted depth. Between strikes, each mallet keeps its
- * strike direction, and the wrist lifts the head over its spot (`across.pitch`). With the rest
- * direction across the forearm, the heads swing out past the rim.
+ * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
+ * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
+ * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
+ * With a pitch of 0.7 rad and a peak of 1, each ball stood 15 cm above the plate between strikes,
+ * the shaft 29° up, and the stroke did not grow with the loudness. With the rest direction across
+ * the forearm, the heads swing out past the rim.
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
@@ -529,7 +533,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   rim: 0,
   home: [0.6, -0.3, -0.5],
   top: 'up',
-  across: { rest: -0.6, lift: 0.3, pitch: 0.7, peak: 1 },
+  across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
   ready: false,
   set: { raise: 0.06, rise: [0, 0.15] },
