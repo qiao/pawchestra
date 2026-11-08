@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { Box3, MathUtils, Matrix4, Quaternion, Ray, Triangle, Vector3 } from 'three';
 
@@ -3626,6 +3627,89 @@ export async function writeStudioModule(
   }
 }
 
+/** The module of the head height and the seat height of each studio body (design 7.2). */
+const HEIGHTS_MODULE = join(ROOT, 'src', 'models', 'studio-heights.ts');
+
+/**
+ * Writes the TypeScript module of the head height and the seat height of each studio body. The
+ * app reads these two values for the layout of a piece before it loads the bodies (design 7.2).
+ *
+ * @param bodies The body of each animal, by the id of the animal.
+ * @returns The source text.
+ */
+export function studioHeightsModule(bodies: ReadonlyMap<string, StudioBody>): string {
+  const entries = [...bodies]
+    .toSorted(([a], [b]) => (a < b ? -1 : 1))
+    .map(
+      ([animal, body]) =>
+        `  ${JSON.stringify(`studio-${animal}`)}: { headHeight: ${JSON.stringify(body.headHeight)}, seatHeight: ${JSON.stringify(body.seatHeight)} },`,
+    );
+  return [
+    `import type { StudioBody } from './studio-format.ts';`,
+    '',
+    '/**',
+    ' * The head height and the seat height of each studio body (design 4.4), in meters, by the value',
+    ' * of `SpeciesParams.body`: the values of the module of each body in `src/models/studio/`. The',
+    ' * layout reads them before the app loads the bodies of a piece (design 7.2). The command',
+    ' * `pnpm studio-body` writes this file. Do not change it by hand.',
+    ' */',
+    'export const STUDIO_HEIGHTS = {',
+    ...entries,
+    `} as const satisfies Readonly<Record<string, Pick<StudioBody, 'headHeight' | 'seatHeight'>>>;`,
+    '',
+  ].join('\n');
+}
+
+/**
+ * Reads the module of the studio body of each animal of `ANIMALS` that has a module.
+ *
+ * @param written The body that the command wrote just now, which replaces the module of its
+ *   animal.
+ * @returns The body of each animal, by the id of the animal.
+ */
+async function readStudioBodies(written?: {
+  readonly animal: string;
+  readonly body: StudioBody;
+}): Promise<Map<string, StudioBody>> {
+  const loads = [...ANIMALS].map(async ([animal, settings]): Promise<[string, StudioBody] | null> => {
+    if (animal === written?.animal) {
+      return [animal, written.body];
+    }
+    const file = join(STUDIO_DIR, `${animal}.ts`);
+    if (!existsSync(file)) {
+      return null;
+    }
+    const module: Readonly<Record<string, StudioBody>> = await import(pathToFileURL(file).href);
+    const body = module[settings.constant];
+    if (!body) {
+      throw new Error(`${relative(ROOT, file)} has no export ${settings.constant}.`);
+    }
+    return [animal, body];
+  });
+  return new Map((await Promise.all(loads)).filter((entry) => entry !== null));
+}
+
+/**
+ * Writes the module of the head height and the seat height of each studio body
+ * ({@link studioHeightsModule}), in the form of the formatter of the repository.
+ *
+ * @param written The body that the command wrote just now, which replaces the module of its
+ *   animal.
+ * @throws Error if the formatter fails.
+ */
+async function writeStudioHeights(written?: {
+  readonly animal: string;
+  readonly body: StudioBody;
+}): Promise<void> {
+  await writeFile(HEIGHTS_MODULE, studioHeightsModule(await readStudioBodies(written)));
+  const format = spawnSync(join(ROOT, 'node_modules', '.bin', 'oxfmt'), [HEIGHTS_MODULE], {
+    stdio: 'inherit',
+  });
+  if (format.status !== 0) {
+    throw new Error(`oxfmt failed with the status ${String(format.status)}.`);
+  }
+}
+
 /**
  * Gives the GLB file of an animal: the file of its settings.
  *
@@ -3662,13 +3746,20 @@ async function readStudioGlb(file: string, animal: string): Promise<Buffer> {
 
 /**
  * Writes the module of a studio body from its GLB file: `node tools/studio-body.ts <animal>`
- * (design 4.4). The GLB file is `glb` of the settings of the animal. With `--inspect`, it writes
- * no file, and it prints the facts of the GLB file that a new studio body needs.
- * `--inspect --glb <file>` inspects another file with the settings of the animal. An animal that
- * is not in `ANIMALS` needs `--glb`, and gets an assumed scale.
+ * (design 4.4). The GLB file is `glb` of the settings of the animal. Then it writes the module of
+ * the heights of all bodies ({@link studioHeightsModule}). With `--heights`, it writes only the
+ * module of the heights, from the modules of the bodies. With `--inspect`, it writes no file, and
+ * it prints the facts of the GLB file that a new studio body needs. `--inspect --glb <file>`
+ * inspects another file with the settings of the animal. An animal that is not in `ANIMALS`
+ * needs `--glb`, and gets an assumed scale.
  */
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
+  if (args.length === 1 && args[0] === '--heights') {
+    await writeStudioHeights();
+    console.log(`Wrote ${relative(ROOT, HEIGHTS_MODULE)} from the modules of the bodies.`);
+    return;
+  }
   const inspect = args.includes('--inspect');
   const glbAt = args.indexOf('--glb');
   const glb = glbAt >= 0 ? args[glbAt + 1] : undefined;
@@ -3689,7 +3780,7 @@ async function main(): Promise<void> {
   }
   if (!settings) {
     throw new Error(
-      `Usage: node tools/studio-body.ts <animal> [--inspect [--glb <file>]], with an animal of: ${[...ANIMALS.keys()].join(', ')}. --inspect --glb <file> also takes another animal.`,
+      `Usage: node tools/studio-body.ts <animal> [--inspect [--glb <file>]] or --heights, with an animal of: ${[...ANIMALS.keys()].join(', ')}. --inspect --glb <file> also takes another animal.`,
     );
   }
 
@@ -3703,7 +3794,9 @@ async function main(): Promise<void> {
   await mkdir(STUDIO_DIR, { recursive: true });
   const out = join(STUDIO_DIR, `${animal}.ts`);
   await writeStudioModule(out, animal, settings.constant, body);
+  await writeStudioHeights({ animal, body });
   console.log(`Wrote ${relative(ROOT, out)} from ${source} (sha256 ${body.sha256.slice(0, 12)}).`);
+  console.log(`Wrote ${relative(ROOT, HEIGHTS_MODULE)}.`);
   console.log(`Scale ${body.scale} m for each unit, head height ${body.headHeight} m.`);
   console.log(`Corrective weights of the sheet pose: ${sheetWeights.join(', ')}.`);
   if (eyeShifts) {
