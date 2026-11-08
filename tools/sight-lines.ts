@@ -23,6 +23,7 @@ import type { Bounds } from '../src/models/bounds.ts';
 import { CONDUCTOR } from '../src/models/cast.ts';
 import { boundsAround, cornerBounds } from '../src/models/footprint.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
+import type { MeshData } from '../src/models/mesh.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
 import type { PlayerModel } from '../src/models/player.ts';
@@ -130,24 +131,25 @@ function blockerOf(
 }
 
 /**
- * Gives the triangles of a model in the stage axes, split by a test of the bone of each triangle.
+ * Gives the triangles of a mesh in the stage axes, split by a test of the bone of each triangle.
  *
- * @param model The model.
+ * @param mesh The mesh.
  * @param position The place.
  * @param facing The turn.
- * @param keep Tells if a triangle with this bone goes into the list.
+ * @param keep Tells if a triangle with this bone goes into the list. By default, each triangle
+ *   goes into it.
  * @returns 9 numbers for each triangle.
  */
-function modelCorners(
-  model: PlayerModel,
+function meshCorners(
+  mesh: MeshData,
   position: Vec3,
   facing: number,
-  keep: (bone: number) => boolean,
+  keep: (bone: number) => boolean = () => true,
 ): number[] {
-  const p = model.mesh.positions;
+  const p = mesh.positions;
   const out: number[] = [];
   for (let t = 0; t < p.length / 9; t++) {
-    if (!keep(model.mesh.bones[t * 3] ?? 0)) {
+    if (!keep(mesh.bones[t * 3] ?? 0)) {
       continue;
     }
     for (let k = 0; k < 3; k++) {
@@ -175,15 +177,22 @@ function playerLabel(layout: SceneLayout, i: number): string {
  */
 function blockersOf(layout: SceneLayout, models: ModelCache, withConductor: boolean): Blocker[] {
   const out: Blocker[] = [];
+  const add = (b: Blocker | null): void => {
+    if (b) {
+      out.push(b);
+    }
+  };
   layout.players.forEach((p, i) => {
     const { species, instrument, kettles, support } = p.cast;
     const model = models.get(species, instrument, kettles, support);
     const label = playerLabel(layout, i);
-    const body = blockerOf(
-      label,
-      'body',
-      i,
-      modelCorners(model, p.position, p.facing, (b) => b < FIRST_INSTRUMENT_BONE),
+    add(
+      blockerOf(
+        label,
+        'body',
+        i,
+        meshCorners(model.mesh, p.position, p.facing, (b) => b < FIRST_INSTRUMENT_BONE),
+      ),
     );
     let kind: BlockerKind = 'instrument';
     if (instrument === 'piano') {
@@ -191,48 +200,25 @@ function blockersOf(layout: SceneLayout, models: ModelCache, withConductor: bool
     } else if (instrument === 'harp') {
       kind = 'harp';
     }
-    const tool = blockerOf(
-      `${label} (${instrument})`,
-      kind,
-      i,
-      modelCorners(model, p.position, p.facing, (b) => b >= FIRST_INSTRUMENT_BONE),
+    add(
+      blockerOf(
+        `${label} (${instrument})`,
+        kind,
+        i,
+        meshCorners(model.mesh, p.position, p.facing, (b) => b >= FIRST_INSTRUMENT_BONE),
+      ),
     );
-    for (const b of [body, tool]) {
-      if (b) {
-        out.push(b);
-      }
-    }
   });
-  const stands = new Map<number, Float32Array>();
+  const stands = new Map<number, MeshData>();
   layout.stands.forEach((stand, i) => {
-    const mesh = stands.get(stand.deskHeight) ?? buildMusicStand(stand.deskHeight).positions;
+    const mesh = stands.get(stand.deskHeight) ?? buildMusicStand(stand.deskHeight);
     stands.set(stand.deskHeight, mesh);
-    const corners: number[] = [];
-    for (let k = 0; k < mesh.length; k += 3) {
-      corners.push(
-        ...pointOnStage(
-          [mesh[k] ?? 0, mesh[k + 1] ?? 0, mesh[k + 2] ?? 0],
-          stand.position,
-          stand.facing,
-        ),
-      );
-    }
-    const b = blockerOf(`stand ${i}`, 'stand', -1, corners);
-    if (b) {
-      out.push(b);
-    }
+    add(blockerOf(`stand ${i}`, 'stand', -1, meshCorners(mesh, stand.position, stand.facing)));
   });
   if (withConductor && layout.conductor) {
-    const model = models.get(CONDUCTOR.species, CONDUCTOR.instrument);
-    const b = blockerOf(
-      'conductor',
-      'conductor',
-      -1,
-      modelCorners(model, layout.conductor.position, layout.conductor.facing, () => true),
-    );
-    if (b) {
-      out.push(b);
-    }
+    const { mesh } = models.get(CONDUCTOR.species, CONDUCTOR.instrument);
+    const { position, facing } = layout.conductor;
+    add(blockerOf('conductor', 'conductor', -1, meshCorners(mesh, position, facing)));
   }
   return out;
 }
