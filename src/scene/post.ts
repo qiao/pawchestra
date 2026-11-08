@@ -29,7 +29,7 @@ import { LENS } from './focus.ts';
 import { cropTarget } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
 import { gradeLut } from './grade.ts';
-import { compileInto, setUniform } from './programs.ts';
+import { compileInto, programsReadySteps, setUniform } from './programs.ts';
 import type { UniformValue } from './programs.ts';
 import type { Focus } from './focus.ts';
 import {
@@ -406,6 +406,19 @@ interface TierPasses {
   readonly final: ShaderMaterial;
 }
 
+/** A pass material and its target for a compile, or `null` for the canvas. */
+type PassCompile = readonly [ShaderMaterial, WebGLRenderTarget | null];
+
+/** A change of the quality tier whose pass programs still compile. */
+interface TierChange {
+  /** The new tier. */
+  readonly tier: QualityTier;
+  /** The pass materials of the new tier. No frame uses them before the steps end. */
+  readonly passes: TierPasses;
+  /** The steps that compile the programs of the passes and wait until the GPU links them. */
+  readonly steps: Steps<undefined>;
+}
+
 /**
  * The post effects of the stage (design 2.6, 4.5). The scene renders with MSAA into a target of
  * floats, then the bloom, the depth of field, and one final pass make the image of the canvas.
@@ -433,6 +446,8 @@ export class PostPipeline {
   readonly #surfaceRows: ShaderMaterial;
   #surfaceBlur: ShaderMaterial;
   #final: ShaderMaterial;
+  /** The change of the tier that waits for its programs, or `null` (design 2.6). */
+  #change: TierChange | null = null;
   /**
    * The draw of the depth pass of the depth of field with the depth materials of the meshes. The
    * resolve of the depth of the multisample target cost 2.1 ms on the development Mac, and a
@@ -516,26 +531,65 @@ export class PostPipeline {
   }
 
   /**
-   * Changes the quality tier: the bloom levels and the samples of the blur.
+   * Changes the quality tier: the bloom levels and the samples of the blur. The new passes compile
+   * in the next frames, one step in each frame, and the frames use the old tier until the GPU
+   * links their programs (design 2.6). No frame thus waits for a link on the main thread.
    *
    * @param tier The new tier.
+   * @param target A render target for the compile of the passes into a target.
    */
-  setTier(tier: QualityTier): void {
+  setTier(tier: QualityTier, target: WebGLRenderTarget): void {
+    if (tier === (this.#change?.tier ?? this.#tier)) {
+      return;
+    }
+    this.#dropChange();
     if (tier === this.#tier) {
       return;
     }
-    this.#tier = tier;
+    const passes = createTierPasses(tier);
+    const steps = this.#compilePassSteps([
+      [passes.blurGather, target],
+      [passes.surface, target],
+      [passes.surfaceBlur, target],
+      [passes.final, null],
+    ]);
+    this.#change = { tier, passes, steps };
+  }
+
+  /**
+   * Runs one step of the change of the tier, and uses the new passes and their targets after the
+   * last step.
+   */
+  #followChange(): void {
+    const change = this.#change;
+    if (!change || !change.steps.next().done) {
+      return;
+    }
+    this.#change = null;
+    this.#tier = change.tier;
     this.#blurGather.dispose();
     this.#surface.dispose();
     this.#surfaceBlur.dispose();
     this.#final.dispose();
-    const passes = createTierPasses(tier);
-    this.#blurGather = passes.blurGather;
-    this.#surface = passes.surface;
-    this.#surfaceBlur = passes.surfaceBlur;
-    this.#final = passes.final;
+    this.#blurGather = change.passes.blurGather;
+    this.#surface = change.passes.surface;
+    this.#surfaceBlur = change.passes.surfaceBlur;
+    this.#final = change.passes.final;
     this.#disposeTargets();
     this.#targets = this.#createTargets();
+  }
+
+  /** Stops the change of the tier that waits for its programs, and frees its passes. */
+  #dropChange(): void {
+    const change = this.#change;
+    if (!change) {
+      return;
+    }
+    this.#change = null;
+    change.steps.return(undefined);
+    for (const material of Object.values(change.passes)) {
+      material.dispose();
+    }
   }
 
   /**
@@ -557,6 +611,7 @@ export class PostPipeline {
     timeSec: number,
     frame: PostFrame,
   ): void {
+    this.#followChange();
     const targets = this.#targets;
     if (!targets) {
       return;
@@ -626,8 +681,7 @@ export class PostPipeline {
    * @returns The steps.
    */
   *compileSteps(target: WebGLRenderTarget): Steps<undefined> {
-    const renderer = this.#renderer;
-    const passes: readonly (readonly [ShaderMaterial, WebGLRenderTarget | null])[] = [
+    yield* this.#compileEachSteps([
       [this.#bloomPrefilter, target],
       [this.#bloomDown, target],
       [this.#bloomUp, target],
@@ -637,7 +691,31 @@ export class PostPipeline {
       [this.#surfaceRows, target],
       [this.#surfaceBlur, target],
       [this.#final, null],
-    ];
+    ]);
+    return undefined;
+  }
+
+  /**
+   * Compiles the programs of the passes of a change of the tier, one pass in each step, and then
+   * waits until the GPU links them.
+   *
+   * @param passes Each material with its target, or `null` for the canvas.
+   * @returns The steps.
+   */
+  *#compilePassSteps(passes: readonly PassCompile[]): Steps<undefined> {
+    yield* this.#compileEachSteps(passes);
+    yield* programsReadySteps(this.#renderer);
+    return undefined;
+  }
+
+  /**
+   * Compiles the program of each pass, one pass in each step.
+   *
+   * @param passes Each material with its target, or `null` for the canvas.
+   * @returns The steps.
+   */
+  *#compileEachSteps(passes: readonly PassCompile[]): Steps<undefined> {
+    const renderer = this.#renderer;
     for (const [material, into] of passes) {
       this.#quad.material = material;
       compileInto(renderer, into, () => {

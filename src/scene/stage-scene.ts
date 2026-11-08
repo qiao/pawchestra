@@ -917,7 +917,8 @@ export class StageScene {
   /**
    * Changes the quality tier (design 2.6): the pixel ratio of the canvas, the shadow map and the
    * shadow blur of the spotlight, and the haze samples and the dust motes of the beam. The next
-   * layout also uses the new tier.
+   * layout also uses the new tier. The post effects change in a later frame, when the GPU links
+   * the programs of their new passes (`PostPipeline.setTier()`).
    *
    * @param tier The new tier.
    */
@@ -929,7 +930,7 @@ export class StageScene {
     if (this.#view) {
       setLightsTier(this.#view.lights, tier);
     }
-    this.#post?.setTier(tier);
+    this.#post?.setTier(tier, this.#compileTarget);
     this.resize(this.#width, this.#height, this.#devicePixelRatio);
   }
 
