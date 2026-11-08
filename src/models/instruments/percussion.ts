@@ -1,7 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { toQuat, toVec3 } from '../tuples.ts';
-import type { Vec3 } from '../tuples.ts';
+import type { Quat, Vec3 } from '../tuples.ts';
 import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
 import { ball, box, cylinder, icosphere, lathe, sweep } from '../primitives.ts';
@@ -349,9 +349,9 @@ export const TRIANGLE_CLIP = {
  * thumb down (`PERCUSSION_PLACES.triangleHand`).
  */
 const TRIANGLE_PINCH = {
-  at: [0.03, -0.06, -0.15] as Vec3,
+  at: [0.03, -0.06, -0.15],
   turn: toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 90 * MathUtils.DEG2RAD)),
-};
+} satisfies { readonly at: Vec3; readonly turn: Quat };
 
 /** The faces around the axis of a kettle. */
 const KETTLE_SEGMENTS = 16;
