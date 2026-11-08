@@ -2862,10 +2862,10 @@ function* sightRowsSteps(
     // the new places of its players is not valid.
     const rises = groups.map(() => row.row >= ROW_RISER.firstRow);
 
-    // With `open`, the back desks can also pass 0° into the gap of the conductor.
-    const attempt = function* (levels: readonly number[], open = false): Steps<SightTry> {
+    // With `gap`, the back desks can also pass 0° into the gap of the conductor.
+    const attempt = function* (levels: readonly number[], gap = false): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = open
+      let angles = gap
         ? yield* sightSweepSteps(
             { ...row, split: false },
             heights,
