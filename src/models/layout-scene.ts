@@ -2265,6 +2265,12 @@ function audienceShare(
   return hidden / (AUDIENCE.cameras.length * points.length);
 }
 
+/** The known sights of the players of a row at their angles, for the moves of the row in front. */
+interface SightMemo {
+  readonly get: (i: number, angle: number) => SightResult | undefined;
+  readonly set: (i: number, angle: number, result: SightResult) => void;
+}
+
 /**
  * Gives the cost of a sight in the searches of the layout. A blocked player outweighs all partial
  * sights, and a partial sight outweighs all moves of 1° steps. Among the blocked places, a place
@@ -2297,6 +2303,7 @@ function sightCost(result: SightResult): number {
  * @param view The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or
  *   `null`. A hidden head then costs as much as a hidden conductor.
  * @param inner The smallest angle of a player of a split row from 0°, in radians, or `null`.
+ * @param memo The known sights of the players at their angles, or `null`.
  * @returns The steps, which return the angle of each player.
  */
 function* sightSweepSteps(
@@ -2307,10 +2314,20 @@ function* sightSweepSteps(
   blockers: SightBlockers,
   view: number | null,
   inner: number | null = null,
+  memo: SightMemo | null = null,
 ): Steps<number[]> {
   const { members, radius, angles } = row;
   const next = [...angles];
   const sight = (i: number, angle: number): SightResult => {
+    const known = memo?.get(i, angle);
+    if (known) {
+      return known;
+    }
+    const result = freshSight(i, angle);
+    memo?.set(i, angle, result);
+    return result;
+  };
+  const freshSight = (i: number, angle: number): SightResult => {
     const member = members[i];
     if (!member) {
       return { sight: 0, hidden: 0 };
@@ -2654,8 +2671,36 @@ function riserContact(
   return { lifts, contact };
 }
 
+/** A row after its sight pass, with its cost and its blocked players. */
+interface RowSight {
+  readonly seen: SeenRow;
+  /** The sum of the costs of the sights of the players ({@link sightCost}). */
+  readonly cost: number;
+  /** The indices of the blocked players. */
+  readonly blind: readonly number[];
+}
+
+/**
+ * The moves of row 0 for the sight of the back desks ({@link sightRowsSteps}).
+ */
+const FRONT_MOVES = {
+  /** The largest number of rounds of the greedy search. */
+  rounds: 4,
+  /** The largest move of a run of players in one try, in steps of 1°. */
+  shift: 6,
+  /**
+   * The largest angle between a front player and a back player at which the front player can
+   * hide a target of the back player, in radians: 0.45, about 26°.
+   */
+  reach: 0.45,
+} as const;
+
 /** One try of the heights of the seat groups of a row. */
 interface SightTry {
+  /** The sum of the costs of the sights of the players ({@link sightCost}). */
+  readonly cost: number;
+  /** The indices of the blocked players. */
+  readonly blind: readonly number[];
   /** The height of the floor under each player. */
   readonly heights: readonly number[];
   readonly angles: readonly number[];
@@ -2716,6 +2761,7 @@ function chosenHeights(
  * @param soloPianos The obstacles of the piano soloists. They are also in `fixed`.
  * @param stage The stage side and the front distance.
  * @param targets The points of the conductor.
+ * @param packed The rows before the spread. Row 0 keeps the packed gap of the conductor.
  * @returns The steps, which return the rows with their risers.
  */
 function* sightRowsSteps(
@@ -2725,9 +2771,23 @@ function* sightRowsSteps(
   soloPianos: readonly Obstacle[],
   stage: StageSize,
   targets: SightTargets,
+  packed: readonly FittedRow[],
 ): Steps<SeenRow[]> {
-  const done: SeenRow[] = [];
-  for (const [n, row] of rows.entries()) {
+  /**
+   * Places one row behind the rows that are done.
+   *
+   * @param row The row after the spread.
+   * @param n The index of the row in `rows`.
+   * @param done The rows in front, after their sight pass.
+   * @param memo The known sights of the players of the row, or `null`.
+   * @returns The steps, which return the row with its risers, its cost, and its blocked players.
+   */
+  const seeRow = function* (
+    row: FittedRow,
+    n: number,
+    done: readonly SeenRow[],
+    memo: SightMemo | null,
+  ): Steps<RowSight> {
     const behind = rows.slice(n + 1);
     const placedRows = done.map((d) => d.row.placement);
     const doneRisers = done.flatMap((d) => d.risers.map((r) => rowRiserObstacle(r, CENTER)));
@@ -2765,7 +2825,7 @@ function* sightRowsSteps(
 
     const attempt = function* (levels: readonly number[]): Steps<SightTry> {
       const heights = groupIndex.map((k) => levels[k] ?? 0);
-      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner);
+      let angles = yield* sightSweepSteps(row, heights, arcs, targets, blockers, view, inner, memo);
       let placement = placeRow(row.members, angles, row.radius, heights);
       if (
         angles.some((a) => Math.abs(a) > SPREAD_LIMITS.maxAngle + 1e-9) ||
@@ -2779,6 +2839,7 @@ function* sightRowsSteps(
       const stands = [...blockers.stands, ...placement.stands.map((p) => p.obstacle)];
       // A player of a raised row that the audience does not see counts as blocked, so that its
       // group rises.
+      let cost = 0;
       const blind = row.members.map((member, i) => {
         const place = placement.players[i]?.place;
         if (place === undefined) {
@@ -2788,10 +2849,10 @@ function* sightRowsSteps(
           solid: [...blockers.solid, ...bodies.filter((_, j) => j !== i)],
           stands,
         };
-        return (
-          sightOf(member, place, targets, others).sight === 2 ||
-          (view !== null && audienceShare(member, place, others.solid, view) >= AUDIENCE.hidden)
-        );
+        const seen = sightOf(member, place, targets, others);
+        const hidden = view === null ? 0 : audienceShare(member, place, others.solid, view);
+        cost += sightCost(seen) + 300 * hidden;
+        return seen.sight === 2 || hidden >= AUDIENCE.hidden;
       });
       // A row with no raised group has no riser to check.
       const raised = levels.some((h) => h > 0);
@@ -2811,6 +2872,8 @@ function* sightRowsSteps(
           ]
         : [];
       return {
+        cost,
+        blind: blind.flatMap((b, i) => (b ? [i] : [])),
         heights,
         angles,
         placement,
@@ -2866,10 +2929,168 @@ function* sightRowsSteps(
             total(b) < total(a) || (total(b) === total(a) && lift(b) < lift(a)) ? b : a,
           )
         : yield* attempt(groups.map(() => 0));
-    done.push({
-      row: { ...row, angles: pick.angles, placement: pick.placement },
-      risers: pick.risers,
+    return {
+      seen: {
+        row: { ...row, angles: pick.angles, placement: pick.placement },
+        risers: pick.risers,
+      },
+      cost: pick.cost,
+      blind: pick.blind,
+    };
+  };
+
+  /**
+   * Moves the players of row 0 so that the back desks of row 1 see the conductor (design 4.5,
+   * seat geometry). The spread gives each gap of row 0 the same arc, but a desk of two partners
+   * fits into a gap only when the gap is a little larger. A greedy search tries runs of neighbors
+   * of one side next to each blocked back desk player: the player alone, the player with one
+   * neighbor, and the player with all players to the inside or to the outside. Each run moves by
+   * 1° steps up to {@link FRONT_MOVES}.shift, and the move with the lowest cost of row 1 wins, for
+   * up to {@link FRONT_MOVES}.rounds rounds. A move keeps the packed arcs, the packed gap of the
+   * conductor, the stage, the gaps to the other items, and the sight of row 0 past the soloists.
+   *
+   * @param front Row 0 after its sight pass.
+   * @param at The index of row 0 in `rows`.
+   * @param back Row 1 after the spread.
+   * @param n The index of row 1 in `rows`.
+   * @param first Row 1 behind the spread row 0.
+   * @returns The steps, which return row 0 and row 1.
+   */
+  const moveFrontSteps = function* (
+    front: FittedRow,
+    at: number,
+    back: FittedRow,
+    n: number,
+    first: RowSight,
+  ): Steps<{ front: FittedRow; back: RowSight }> {
+    const packedFront = packed.find((r) => r.row === front.row);
+    const arcs = front.members.map((m, i) => {
+      const right = front.members[i + 1];
+      return right ? runAll(spacingSteps(m, right, front.radius)) / front.radius : 0;
     });
+    const clearance = clearanceOf(fixed, soloPianos, [], rows.slice(at + 1));
+    const frontBlind = (placement: RowPlacement): number => {
+      const bodies = placement.players.map((p) => p.obstacle);
+      const stands = placement.stands.map((p) => p.obstacle);
+      return front.members.filter((member, i) => {
+        const place = placement.players[i]?.place;
+        const solid = [...soloists, ...bodies.filter((_, j) => j !== i)];
+        return (
+          place !== undefined && sightOf(member, place, targets, { solid, stands }).sight === 2
+        );
+      }).length;
+    };
+    const blindBefore = frontBlind(front.placement);
+    // The sights of the back row for each move of the front row. A front player hides no target
+    // of a back player more than {@link FRONT_MOVES}.reach away in angle, so the key holds only
+    // the moves of the front players near the angle.
+    const known = new Map<string, SightResult>();
+    let best = first;
+    let angles = [...front.angles];
+    for (let round = 0; round < FRONT_MOVES.rounds && best.blind.length > 0; round++) {
+      const runs: number[][] = [];
+      for (const i of best.blind) {
+        const a = best.seen.row.angles[i] ?? 0;
+        const nearest = angles
+          .map((b, j) => ({ d: Math.abs(b - a), j }))
+          .toSorted((x, y) => x.d - y.d)
+          .slice(0, 2);
+        for (const { j } of nearest) {
+          const same = (k: number): boolean =>
+            Math.sign(angles[k] ?? 0) === Math.sign(angles[j] ?? 0);
+          let inside = j;
+          let outside = j;
+          while (inside > 0 && same(inside - 1)) {
+            inside--;
+          }
+          while (outside < angles.length - 1 && same(outside + 1)) {
+            outside++;
+          }
+          const span = (from: number, to: number): number[] =>
+            Array.from({ length: to - from + 1 }, (_, q) => from + q);
+          runs.push([j], span(inside, j), span(j, outside));
+          if (j > inside) {
+            runs.push([j - 1, j]);
+          }
+          if (j < outside) {
+            runs.push([j, j + 1]);
+          }
+        }
+      }
+      let chosen: { angles: number[]; back: RowSight } | null = null;
+      for (const run of runs) {
+        for (let k = -FRONT_MOVES.shift; k <= FRONT_MOVES.shift; k++) {
+          if (k === 0) {
+            continue;
+          }
+          yield;
+          const next = angles.map((b, i) =>
+            run.includes(i) ? b + k * CONDUCTOR_SIGHT.nudgeStep : b,
+          );
+          const valid = next.every(
+            (a, i) =>
+              Math.abs(a) <= SPREAD_LIMITS.maxAngle + 1e-9 &&
+              Math.sign(a) === Math.sign(angles[i] ?? 0) &&
+              Math.abs(a) >= Math.abs(packedFront?.angles[i] ?? 0) - 1e-9 &&
+              (i === next.length - 1 || (next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9),
+          );
+          if (!valid) {
+            continue;
+          }
+          const placement = placeRow(front.members, next, front.radius);
+          if (
+            !rowOnStage(placement, stage) ||
+            !rowClear(placement, clearance) ||
+            frontBlind(placement) > blindBefore
+          ) {
+            continue;
+          }
+          const steps = next.map((b, i) =>
+            Math.round((b - (front.angles[i] ?? 0)) / CONDUCTOR_SIGHT.nudgeStep),
+          );
+          const key = (i: number, angle: number): string => {
+            let text = `${i}:${Math.round(angle * 1e4)}`;
+            next.forEach((b, j) => {
+              if (Math.abs(b - angle) < FRONT_MOVES.reach) {
+                text += `:${j}=${steps[j]}`;
+              }
+            });
+            return text;
+          };
+          const memo: SightMemo = {
+            get: (i, angle) => known.get(key(i, angle)),
+            set: (i, angle, result) => {
+              known.set(key(i, angle), result);
+            },
+          };
+          const moved: SeenRow = { row: { ...front, angles: next, placement }, risers: [] };
+          const result = yield* seeRow(back, n, [moved], memo);
+          if (result.cost < (chosen?.back.cost ?? best.cost) - 1e-6) {
+            chosen = { angles: next, back: result };
+          }
+        }
+      }
+      if (!chosen) {
+        break;
+      }
+      angles = chosen.angles;
+      best = chosen.back;
+    }
+    const placement = placeRow(front.members, angles, front.radius);
+    return { front: { ...front, angles, placement }, back: best };
+  };
+
+  const done: SeenRow[] = [];
+  for (const [n, row] of rows.entries()) {
+    let result = yield* seeRow(row, n, done, null);
+    const at = done.findIndex((d) => d.row.row === 0);
+    const front = done[at];
+    if (row.row === BACK_DESK_ROW && result.blind.length > 0 && front) {
+      const moved = yield* moveFrontSteps(front.row, at, row, n, result);
+      done[at] = { row: moved.front, risers: [] };
+      result = moved.back;
+    }
+    done.push(result.seen);
   }
   return done;
 }
@@ -3140,7 +3361,7 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin).
   const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage);
   yield;
-  const seen = yield* sightRowsSteps(spread, still, soloists, soloPianos, stage, targets);
+  const seen = yield* sightRowsSteps(spread, still, soloists, soloPianos, stage, targets, rows);
   const final = seen.map((r) => r.row);
   const rowRisers = seen.flatMap((r) => r.risers);
   const lift = choirLift(choir, members, seen, soloists, targets);
