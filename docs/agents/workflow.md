@@ -29,7 +29,8 @@ branches, or compatibility aliases.
 ## Commits
 
 Make one logical change in each commit, and keep every commit green: each commit passes
-`pnpm lint`, `pnpm typecheck`, and `pnpm format:check`.
+`pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. While the gates are paused (`AGENTS.md`),
+the checks of this module run only when the user or the manager asks.
 
 - Commit each verified change. Leave no verified work in the working tree.
 - Write the subject as a Conventional Commit: `type(scope): subject`, in the imperative mood, in
@@ -51,8 +52,7 @@ Make one logical change in each commit, and keep every commit green: each commit
   the merge gets a `hit` for each commit.
 - Run it in the background, because a run with no cache can take more than 10 minutes. A new commit
   during the run gives the exit code 4: run it again.
-- Wait for the exit notice of the background run. Do not wait in a loop on
-  `pgrep -f "check-commits.sh"`, because the loop shell matches itself.
+- Wait for the exit notice of the background run ("Probes and the shell").
 - After a commit that moves code between files, run `tools/check-commits.sh HEAD~1` before the next
   commit.
 
@@ -94,11 +94,9 @@ In both cases:
 
 ## Tests
 
-All tests are paused, because they took too long while the project changes fast. `pnpm test` runs
-no test, and no check runs a test. Until the pause ends:
+All tests are paused (`AGENTS.md`), because they took too long while the project changes fast.
+`pnpm test` runs no test. Until the pause ends:
 
-- A change adds no test and runs no break test.
-- A change that needs a check runs one file with `pnpm test:paused <path>`.
 - A change that breaks the typecheck or the lint of a test file fixes that file, because both
   checks still read it.
 - Remove the tests and the test helpers of a body or a part that no species uses.
@@ -128,8 +126,7 @@ These rules hold for each test:
 - Start each long job in the background: a render, a measure, a sweep, or a check script. Wait for
   its exit notice, and write the docs during the wait.
 - Never wait in a loop such as `until ! pgrep -f '<name>'`. The shell of the loop has `<name>` in
-  its own command line, so `pgrep` always finds it, and the loop never ends. A round left six such
-  loops of `frame-compare.ts` running after its end.
+  its own command line, so `pgrep` always finds it, and the loop never ends.
 - A sweep, such as `pnpm pose-depth` or `pnpm fold-probe`, reads the modules at its start. Do not
   edit or commit a module that it reads while it runs.
 - The probe cache keys each result by the tree. A commit during a run that you will read again
@@ -149,14 +146,12 @@ These rules hold for each test:
 - Run a long `pnpm loudness` fit through `tools/measure-lock.sh run --owner <name> -- <cmd>` when
   another agent measures. Two runs at the same time make each run about 3 times slower.
 - Run a headless Blender build or render through the same lock when another agent measures. A
-  Blender job at about 500% CPU made the gates of `pnpm frame` refuse runs, and it changed a
-  shot of `pnpm frozen`.
+  Blender job takes about 5 CPU cores, so the gates of `pnpm frame` refuse runs, and a shot of
+  `pnpm frozen` can change.
 - A load round measures the times of the app with `pnpm load-probe`, and the scores and the metrics
   of Lighthouse with `pnpm lighthouse`. Use the saved tool, because the Lighthouse of the
   chrome-devtools MCP server has no performance category. `--url https://www.pawchestra.com/` audits
   the live site. Use `--quick` while you change the page, and the default runs for a report.
-- A round runs no frame measure unless the user or the manager asks for one (design 9.7). A speed
-  change still gives its own table in its commit message.
 - An ablation of a GPU cost reads the Metal trace of `pnpm frame`. With no frame cap, the main
   thread limits the frame rate, so the frame time alone does not show a GPU change.
 - A change of the material IDs can change the order of the draws, and thus the pixels. Run
@@ -209,8 +204,8 @@ folder, and the manager reads the images there before the merge. `tools/merge-br
 the folder into the main checkout before it removes the worktree, and the try files of
 `scratch/` into `scratch/merged/<branch>/`. Commit no report image. The hook
 `tools/git-hooks/pre-commit` stops a commit that adds an image or a video outside the folders of
-the product images, such as `src/`, `public/`, and `docs/reference/`. Report images made most of
-the size of the git history.
+the product images, such as `src/`, `public/`, and `docs/reference/`, because report images made
+most of the size of the git history.
 
 ## Images of a mesh
 
