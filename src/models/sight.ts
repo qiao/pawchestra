@@ -421,7 +421,7 @@ function segmentHitsObstacle(from: Vec3, to: Vec3, o: Obstacle): boolean {
 
 /** The items that can hide the conductor from the players of a row. */
 export interface SightBlockers {
-  /** The players with their instruments and seats, and the risers. They hide each point. */
+  /** The players with their instruments and seats. They hide each point. */
   readonly solid: readonly Obstacle[];
   /** The music stands. They hide only the head. */
   readonly stands: readonly Obstacle[];
@@ -485,14 +485,13 @@ export function sightOf(
 }
 
 /**
- * The view of the audience on the raised rows (design 4.5, seat geometry). A row on a riser sits
- * behind the strings, and a small animal there can hide behind them in the low wide shots of
- * Cinematic. The points stand for those shots and the default view, as multiples of the stage
- * side, relative to the podium center: the low and the middle camera at the front, and the two
- * side cameras.
+ * The view of the audience on the rows behind the strings (design 4.5, seat geometry). A small
+ * animal there can hide behind the strings in the low wide shots of Cinematic. The points stand
+ * for those shots and the default view, as multiples of the stage side, relative to the podium
+ * center: the low and the middle camera at the front, and the two side cameras.
  */
 export const AUDIENCE = {
-  /** The first row that keeps its view: row 2, the first row on risers. */
+  /** The first row that keeps its view: row 2, the first row behind the strings. */
   firstRow: 2,
   cameras: [
     [0, 0.36, 1.3],
@@ -507,8 +506,6 @@ export const AUDIENCE = {
     [0.1, 0.05],
     [0, 0.15],
   ],
-  /** The hidden share of the head from which a player of a raised row counts as hidden. */
-  hidden: 0.2,
 } as const;
 
 /**
