@@ -2448,6 +2448,25 @@ export function layoutScene(score: Score, models = new ModelCache()): SceneLayou
 }
 
 /**
+ * Finds if a keyboard of the orchestra takes the place of the piano soloist (design 4.2): the
+ * first keyboard of a score with no soloist. At the front left of the conductor, its case and its
+ * open lid stand in front of the rows, so they hide the conductor from no player, as the piano
+ * of `orchestra-latest.png`. In row 2, the case hid the conductor from the players behind it.
+ *
+ * @param score The score.
+ * @param seat The seat of the player.
+ * @param groups The row groups of the players before it.
+ * @returns True if the player sits at the place of the piano soloist.
+ */
+function takesSoloPlace(
+  score: Score,
+  seat: Seat | undefined,
+  groups: readonly RowGroup[],
+): boolean {
+  return score.soloist === null && seat?.section === 'piano' && !groups.includes('soloist');
+}
+
+/**
  * Calculates the layout of a score as {@link layoutScene} does, in steps (design 7.2). The steps
  * build each player model that the layout needs.
  *
@@ -2472,7 +2491,7 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
       groups.push('piano');
     } else if (form === 'arc') {
       groups.push(seat ? groupOf(seat, c.player) : 'choir');
-    } else if (c.seatIndex === score.soloist) {
+    } else if (c.seatIndex === score.soloist || takesSoloPlace(score, seat, groups)) {
       groups.push('soloist');
     } else if (c.seatIndex === score.vocalSoloists) {
       groups.push('vocal-soloists');
