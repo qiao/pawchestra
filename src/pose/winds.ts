@@ -7,6 +7,7 @@ import { placePoint } from '../models/instruments/hold.ts';
 import type { PiecePoint } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
+import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { InstrumentOf } from './family.ts';
 import { NECK_SHARE, createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
@@ -263,10 +264,6 @@ const WOODWIND = {
   gripCurl: null,
   gripAround: false,
 } as const satisfies WindHold;
-
-const X_AXIS = new Vector3(1, 0, 0);
-const Y_AXIS = new Vector3(0, 1, 0);
-const Z_AXIS = new Vector3(0, 0, 1);
 
 /**
  * Gives a rotation of the `instrument` bone in the rest pose or the playing pose: a turn around x,
@@ -1857,7 +1854,6 @@ const palmNow = new Vector3();
 const palmGoal = new Vector3();
 const palmRoll = new Quaternion();
 const rollCross = new Vector3();
-const NO_ROLL = new Quaternion();
 
 /**
  * The angle between the side of a paw and its tube above which the roll of {@link faceTube} turns
@@ -1960,7 +1956,7 @@ function faceTube(
     );
     palmRoll.setFromAxisAngle(handAxis.normalize(), angle);
   }
-  out.premultiply(palmRoll.slerp(NO_ROLL, 1 - weight));
+  out.premultiply(palmRoll.slerp(NO_TURN, 1 - weight));
 }
 
 /**
