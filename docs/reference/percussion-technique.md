@@ -217,6 +217,8 @@ from the V).
   in the middle of the bar, and the right mallet on the extreme near end [39].
 - Bob Becker plays with the palms down and the hands at most one inch above the keyboard. His
   stroke is two or three inches high at each dynamic, made almost only with the wrist [39].
+- Most teachers set the stick height by the dynamic: a louder note starts higher above the bars
+  [62]. The player moves each hand to its next note as soon as it has played [62].
 
 ## 10. Use in the app
 
@@ -320,8 +322,10 @@ The app follows these facts:
   corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
 - **The xylophone (section 9).** The body moves from side to side behind the notes with the feet
   in place (`PercussionHold.side`), and the head turns back so the eyes stay level. A fast strike
-  takes the other paw (`PercussionHold.pass`, `PercussionHold.gap`), and a wider leap takes a
-  double stroke. A mallet strikes a sharp bar near its edge near the player.
+  takes the other paw, and a strike that would cross the paws takes a double stroke [35]
+  (`PercussionHold.pass`, `PercussionHold.gap`). Between strikes, each head stays about 4 cm over
+  its bar, and before a strike it lifts higher for a louder note [62] (`MalletAcross.peak`). A
+  mallet strikes a sharp bar near its edge near the player.
 - **The hand cymbals of a recast body (section 7).** The plates tilt from vertical, and the right
   plate comes down onto the left plate. The rims meet a little offset and slide on past each
   other, as a glancing blow [21] [60]. A louder crash meets higher. After a crash, the plates turn
@@ -365,11 +369,12 @@ The app does not follow these facts:
   the short arms reach only a narrow band. A part out of the range of the bars moves by octaves to
   the highest octave of the bars (`xylophoneShift()`). No source gives this choice.
 - **The reach (section 9).** A bar out of the reach of a paw goes to the other paw
-  (`PercussionHold.reach`). Thus some fast pairs stay in one paw.
+  (`PercussionHold.reach`). Thus some fast pairs stay in one paw. A chromatic run stays mostly
+  in one paw, because the paws never pass each other, while a real player alternates the hands
+  over the two rows of bars [34].
 - **The two depths (section 9).** The left mallet strikes nearer to the player than the middle of
   a bar, and the right mallet farther (`offsetL`, `offsetR`), because the short left arm misses
-  the far part of the bars. The right head lifts higher (`PercussionHold.pitchR`), so that the two
-  heads pass each other at two heights in a run. No source gives the height between strikes.
+  the far part of the bars. No source gives a numeric height between strikes.
 
 ### The instruments
 

@@ -545,6 +545,12 @@ The rest of each family:
   inside, with a small lift (`triangleRolls()`), as a real player rolls in a closed corner
   (percussion 8). The roll targets lift toward the player, so the beater goes in and out in front
   of the rods.
+- **Xylophone.** The heads stay a few cm over the bars between strikes, and lift higher by the
+  loudness before a strike. A fast strike that would pass the other paw takes a double stroke
+  (`PercussionHold.pass` 0), as a real player puts in a double stroke where alternate strokes cross
+  the hands (percussion 9). Reason: with low heads, a pass of one bar put one shaft on the other
+  head, and a higher passing stroke did not clear it. A run on adjacent bars thus stays in one
+  paw.
 - **Sticks and mallets between strikes.** Each snare stick and each mallet of the suspended
   cymbal keeps its strike direction, and the wrist holds the tip a few cm above the head with the
   stick almost level (`MalletAcross.pitch`), as the ready position of a real player (percussion

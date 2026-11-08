@@ -523,15 +523,20 @@ export const PERCUSSION_HOLDS = {
   },
   // The mallets leave the front of the fists (XYLOPHONE.malletTilt), as the sticks of the snare
   // drum, because a real player holds them in the matched grip of the snare drum. Between
-  // strikes, each mallet keeps its strike direction, and the wrist lifts the head over its bar
-  // (across.pitch), so that the two heads keep apart. The short arms do not reach the bars from an
+  // strikes, each mallet keeps its strike direction, and the wrist holds the head about 4 cm over
+  // its bar (across.pitch), as the low ready height of a real player. Before a strike, the wrist
+  // lifts the head higher by the loudness (sizes.lift, across.peak), about 12 cm in the test
+  // score, as a real player sets the stick height by the dynamic. With a pitch of 0.5 rad and a
+  // peak of 1, the heads stood 13 cm (left) and 27 cm (right) over the bars, and the stroke did
+  // not grow with the loudness. The short arms do not reach the bars from an
   // upright body, so the spine leans over them (lean), and the body moves from side to side
-  // behind the notes with the feet in place (side). A run alternates the paws, as a real player
-  // plays a scale with alternate strokes, and goes on in one paw only where the other paw does not
-  // reach (pass, reach).
+  // behind the notes with the feet in place (side). A run alternates the paws where the paws do
+  // not cross, and else takes a double stroke, as a real player puts in a double stroke where
+  // alternate strokes would cross the hands (pass). The paws keep to their sides of the bars
+  // (gap), and a bar out of the reach of one paw goes to the other paw (reach).
   xylophone: {
     hands: 'alternate',
-    sizes: { lift: 0.08, rest: 0.03 },
+    sizes: { lift: 0.09, rest: 0.03 },
     // The left mallet strikes 2 cm nearer to the player than the middle of the bar, and the right
     // mallet 2 cm farther, so that the heads keep apart on near bars. On the smaller bars, 3 cm
     // bends the left wrist 53° at the lowest bars, and 2 cm 49°.
@@ -547,12 +552,9 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: [0.15, -0.2, -0.75],
     top: 'up',
-    across: { rest: -0.6, lift: 0.3, pitch: 0.5, peak: 1 },
-    // Between strikes, the right head stays higher than the left head, so that the heads pass each
-    // other at two heights in a run. At one height, the heads pass through each other, and the
-    // mallets touch in 7% of the samples of the test score. With the right head lower, the right
-    // wrist bends more.
-    pitchR: 2,
+    across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 6 },
+    // Both heads keep one height between strikes, because the paws do not pass each other.
+    pitchR: 1,
     ready: false,
     set: null,
     pair: false,
@@ -560,9 +562,10 @@ export const PERCUSSION_HOLDS = {
     // under the head of the other mallet, which rests over its bar. With 1 cm, the mallets touch
     // where a run goes over from one paw to the other.
     gap: 0.02,
-    // A fast strike passes the last bar of the other paw by up to about one bar, as a real player
-    // alternates the hands in a scale. A wider leap takes a double stroke.
-    pass: 0.035,
+    // A fast strike does not pass the last bar of the other paw: it takes a double stroke. With
+    // low heads, a pass of one bar put one shaft on the head of the other mallet for 2.8 s of
+    // the test score, and a lift of the passing head over the other head did not clear it.
+    pass: 0,
     reach: 0.53,
     lean: 0.2,
     // The short legs tilt far with a small move of the hips, and the foot skin then sinks into
