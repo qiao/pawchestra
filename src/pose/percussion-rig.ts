@@ -1222,7 +1222,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         ),
       );
       // A roll strikes the two sides of the closed lower corner from inside, in turn
-      // (TRIANGLE_ROLL_KEYS). Each target lies on the inner face of its side, and lifts toward
+      // (`TRIANGLE_ROLL.keys`). Each target lies on the inner face of its side, and lifts toward
       // the inside of the corner and toward the player, so that the beater goes in and out in
       // front of the rods.
       for (const [key, local, inward] of triangleCorner()) {
