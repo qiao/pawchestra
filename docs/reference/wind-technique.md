@@ -2,8 +2,8 @@
 
 This file is the target of the motion of the wind and brass players of the app: the flute, the
 oboe, the clarinet, the bassoon, the horn, the trumpet, the trombone, and the tuba. It describes
-the hold, the angles, the hands, the trombone slide, the breath, the rest pose, and the seated
-posture of professional players, with a source for each fact. The trombone has the most detail,
+the hold, the angles, the hands, the trombone slide, the breath, the rest pose, the seated
+posture, and the fingering (section 7) of professional players, with a source for each fact. The trombone has the most detail,
 because its slide moves the most.
 
 **Upkeep.** This file is current. A change of the wind motion of the app updates section 4 "Use
@@ -756,6 +756,81 @@ Each source opened on 2026-10-18, except where its entry gives another date.
     images of the articles 81 to 87 (opened 2026-11-06).
     https://commons.wikimedia.org/wiki/File:Yamaha_Trumpet_YTR-8335LA_crop.jpg
 
+89. T. Reichard, Woodwind Fingering Guide, "Fingering Scheme for Flute and Piccolo" (opened
+    2026-11-08). https://www.wfg.woodwind.org/flute/fl_fing.html
+90. T. Reichard, Woodwind Fingering Guide, "Basic Fingering Chart for Flute and Piccolo", octaves 1
+    to 3 (opened 2026-11-08). https://www.wfg.woodwind.org/flute/fl_bas_1.html
+91. T. Reichard, Woodwind Fingering Guide, "Fingering Scheme for Oboe" (opened 2026-11-08).
+    https://www.wfg.woodwind.org/oboe/ob_fing.html
+92. T. Reichard, Woodwind Fingering Guide, "Basic Fingering Chart for Oboe" (opened 2026-11-08).
+    https://www.wfg.woodwind.org/oboe/ob_bas_1.html
+93. T. Reichard, Woodwind Fingering Guide, "Fingering Scheme for Clarinet" (opened 2026-11-08).
+    https://www.wfg.woodwind.org/clarinet/cl_fing.html
+94. T. Reichard, Woodwind Fingering Guide, "Basic Fingering Chart for Clarinet" (opened
+    2026-11-08). https://www.wfg.woodwind.org/clarinet/cl_bas_1.html
+95. T. Reichard, Woodwind Fingering Guide, "Fingering Scheme for Bassoon" (opened 2026-11-08).
+    https://www.wfg.woodwind.org/bassoon/basn_fing.html
+96. T. Reichard, Woodwind Fingering Guide, "Basic Fingering Chart for Bassoon" (opened
+    2026-11-08). https://www.wfg.woodwind.org/bassoon/basn_bas_1.html
+97. T. Reichard, Woodwind Fingering Guide, "Alternate Fingering Chart for Heckel-System Bassoon,
+    Third Octave" (opened 2026-11-08). https://www.wfg.woodwind.org/bassoon/basn_alt_3.html
+98. C. Lowe, "The Jointed Bassoon", *A Modern Guide to Teaching and Playing the Bassoon* (opened
+    2026-11-08).
+    https://lowecc.pressbooks.sunycreate.cloud/chapter/the-jointed-bassoon-teaching-and-playing-the-bassoon-a-modern-guide
+99. C. Lowe, "About the Whisper Key" (opened 2026-11-08).
+    https://lowecc.pressbooks.sunycreate.cloud/chapter/about-the-whisper-key/
+100. C. Lowe, "Lesson 17: Flicking" (opened 2026-11-08).
+     https://lowecc.pressbooks.sunycreate.cloud/chapter/lesson-17-flicking/
+101. "The Demons of Hand Position", Flute Talk, The Instrumentalist (December 2020, opened
+     2026-11-08).
+     https://theinstrumentalist.com/december-2020-flute-talk/the-demons-of-hand-position/
+102. Yamaha, Musical Instrument Guide, "Flute: How to Play" (opened 2026-11-08).
+     https://www.yamaha.com/en/musical_instrument_guide/flute/play/
+103. "Clarinet Hand Position", The Instrumentalist (January 2013, opened 2026-11-08).
+     https://theinstrumentalist.com/january-2013/clarinet-hand-position/
+104. B. Pimentel, "Thumb position for oboe, clarinet, and saxophone" (opened 2026-11-08).
+     https://bretpimentel.com/thumb-position-for-oboe-clarinet-and-saxophone/
+105. Wikipedia, "Clarinet" (opened 2026-11-08). https://en.wikipedia.org/wiki/Clarinet
+106. Wikipedia, "Oboe" (opened 2026-11-08). https://en.wikipedia.org/wiki/Oboe
+107. B. N. Weidner, *Brass Techniques and Pedagogy*, chapter 11 "The Trumpet" (opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/chapter/the-trumpet/
+108. B. N. Weidner, "Trumpet Fingering Chart" (PDF, opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/wp-content/uploads/sites/4/2020/08/Trumpet-fingering-chart.pdf
+109. B. N. Weidner, chapter 12 "The Horn" (opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/chapter/the-horn/
+110. B. N. Weidner, "Horn Fingering Chart" (PDF, opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/wp-content/uploads/sites/4/2020/08/Horn-Fingering-Chart-Full-Score.pdf
+111. B. N. Weidner, chapter 13 "The Trombone" (opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/chapter/the-trombone/
+112. B. N. Weidner, "Trombone Position Chart" (PDF, opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/wp-content/uploads/sites/4/2020/08/Trombone-Fingering-Chart-Full-Score.pdf
+113. B. N. Weidner, chapter 15 "The Tuba" (opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/chapter/the-tuba/
+114. B. N. Weidner, "Tuba Fingering Chart" (PDF, opened 2026-11-08).
+     https://pressbooks.palni.org/brasstechniquesandpedagogy/wp-content/uploads/sites/4/2021/08/tuba-fingering-chart.pdf
+115. Thomann, "Tubas: how it works and how it is played" (opened 2026-11-08).
+     https://www.thomannmusic.com/onlineexpert_page_tubas_how_it_works_and_how_it_is_played.html
+116. Horniman Museum, "Tuba in E-flat, Yamaha YEB631, M11-1994" (opened 2026-11-08).
+     https://www.horniman.ac.uk/object/M11-1994/
+117. Wikipedia, "Brass instrument valve" (opened 2026-11-08).
+     https://en.wikipedia.org/wiki/Brass_instrument_valve
+118. A. Almeida, R. Chow, J. Smith, J. Wolfe, "The kinetics and acoustics of fingering and note
+     transitions on the flute", Journal of the Acoustical Society of America 126 (3), 2009
+     (opened 2026-11-08). https://ar5iv.labs.arxiv.org/html/0903.4012
+119. A. Hofmann, W. Goebl, "Finger forces in clarinet playing", Frontiers in Psychology 7, 2016
+     (opened 2026-11-08).
+     https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2016.01140/full
+120. S. Albrecht et al., "Individuality of movements in music: finger and body movements during
+     playing of the flute", Human Movement Science 35, 2014 (abstract, opened 2026-11-08).
+     https://pubmed.ncbi.nlm.nih.gov/24767961/
+121. C. Palmer et al., "Movement-Related Feedback and Temporal Accuracy in Clarinet Performance",
+     Music Perception 26 (5), 2009 (abstract, opened 2026-11-08).
+     https://www.sciencegate.app/document/10.1525/mp.2009.26.5.439
+122. Trumpet Herald forum, threads on the stroke of a piston valve (abstract, opened 2026-11-08).
+     https://www.trumpetherald.com/forum/viewtopic.php?p=1287763
+123. Yamaha, Musical Instrument Guide, "Bassoon: How to Play" (opened 2026-11-08).
+     https://www.yamaha.com/en/musical_instrument_guide/bassoon/play/
+
 ## 6. The parts of the instruments
 
 The models of `src/models/instruments/woodwinds.ts` and `brass.ts` follow these parts (design
@@ -796,3 +871,140 @@ The models of `src/models/instruments/woodwinds.ts` and `brass.ts` follow these 
   It is about 1.34 m tall, of maple, with the Heckel or the Buffet system [87]. On a photograph
   of a Fox bassoon, the wood is a dark red brown with silver rings, and the boot has a silver cap
   [88].
+
+## 7. Fingering
+
+This section gives the fingering of each wind instrument: which digit works which key, valve, or
+slide for each note, and how a professional moves the fingers. The notation "T 123 | 123" gives
+the left thumb, the left fingers 1 to 3, a bar, and the right fingers 1 to 3. Finger 1 is the
+index finger, and "-" is an open hole. C4 is middle C.
+
+### 7.1 The hands of the woodwinds
+
+- **The left hand is above.** On each woodwind, the left hand works the upper joint, nearer to the
+  mouth, and the right hand the lower joint [89] [91] [93] [98].
+- **Flute.** The left thumb works the B lever or the B♭ lever. The left fingers 1 to 3 work the C,
+  A, and G keys, and the left little finger the G♯ key. The right fingers 1 to 3 work the F, E, and
+  D keys, and the right little finger the E♭ key and the keys of the foot joint [89]. The E♭ key is
+  a vent in most fingerings, so the right little finger stays down in almost all notes [89] [90].
+  The flute rests on the chin, the base of the left index finger, and the right thumb [101].
+- **Oboe.** The left thumb works the first octave key, and the left index finger the half-hole
+  plate and the side octave key. The little fingers work the low keys and E♭ [91]. The right thumb
+  stays under the thumb rest [104].
+- **Clarinet.** The left thumb closes the thumb hole and works the register key, which raises a
+  note by a twelfth. The left index finger also works the A key and the G♯ key of the throat. Both
+  little fingers work the low keys [93]. The right thumb carries the weight under the thumb rest
+  [104] [105]. Only the tip of the left thumb moves to the register key [103].
+- **Bassoon.** The left thumb works the whisper key and the flick keys of the high notes, and the
+  low D, C, B, and B♭ keys. The right thumb works the B♭, E, F♯, and G♯ keys [95] [98].
+
+### 7.2 The woodwind charts
+
+The tables give the main fingers of the basic fingering of each note. A number is the count of the
+fingers 1 to 3 of one hand that close a hole or a plate. "½" is a half hole.
+
+```text
+ Flute [90]            Oboe [92]             Clarinet, written [94]  Bassoon [96]
+ note   L R            note   L R            note   L R              note    L    R
+ C4-D#4 3 3            Bb3-Eb4 3 3           E3-G#3 3 3              Bb1-G#2 3    3
+ E4     3 2            E4     3 2            A3     3 2              A2-Bb2  3    2
+ F4     3 1            F4     3 2            Bb3    3 1              B2      3    1
+ F#4    3 1 (--3)      F#4    3 1            B3     3 1 (-2-)        C3-C#3  3    0
+ G4-G#4 3 0            G4-G#4 3 0            C4-C#4 3 0              D3-Eb3  2    0
+ A4     2 0            A4     2 0            D4-Eb4 2 0              E3      1    0
+ Bb4    1 1            Bb4    2 1            E4     1 0              F3      0    0
+ B4     1 0            B4     1 0            F4     0 0 (thumb)      F#3     2¼   3
+ C5     1 0            C5     1 1            F#4    1 0 (no thumb)   G3      2½   3
+ C#5    0 0            C#5-Eb5 3 3 (½ hole)  G4     0 0 (open)       G#3     2¾   3
+ D5-Eb5 2 3            E5     3 2            G#4-Bb4 1 0 (L1 keys)   A3-Bb3  3    2
+ E5-B5  as E4-B4       F5     3 2            B4-C6  as E3-F4,        B3      3    1
+ C6     1 0            F#5    3 1                    plus the        C4-C#4  3    0
+ C#6    0 0            G5-G#5 3 0                    register key    D4      2    0
+ D6     2 0            A5     2 0                                    Eb4-E4  2    3
+ Eb6    3 3            Bb5    2 1                                    F4-F#4  2    2
+ E6     2 2            B5     1 0                                    G4      2½   1
+ F6-F#6 2 1            C6     1 1                                    G#4     2¾   1
+ G6     3 0            C#6    2 1                                    A4      3    1
+ G#6    2 0            D6     3 0                                    Bb4     3    2
+ A6     1 1            Eb6-E6 3 2                                    B4-C#5  2-1  2
+ Bb6    0 1            F6     2 2                                    D5-Eb5  1½-1 1
+ B6     2 0                                                          E5      2½   3
+ C7     3 1
+```
+
+- **Registers.** The second octave of the flute takes the fingering of the first octave, and the
+  player overblows. D5 and E♭5 lift the left index finger [90]. The oboe vents C♯5 to E♭5 with the
+  half hole, E5 to G♯5 with the thumb octave key, and A5 to C6 with the side key [91]. The clarion
+  of the clarinet (B4 to C6) takes the fingering of the chalumeau a twelfth lower, with the
+  register key [93] [94]. The B♭ clarinet sounds one tone below the written note [105]. The
+  bassoon whisper key keeps the notes up to G♯3 in their octave [96] [99]. A flick key starts a
+  slur up to A3 to D4, and the player releases it once the note has begun [100].
+- **Simple alternates.** The flute has the thumb B♭ for passages with no B [90]. A clarinetist
+  picks the left or the right little finger key so that one finger does not slide between two
+  notes [94].
+
+### 7.3 Brass valves and slide
+
+- **Valves.** Valves 1, 2, and 3 lower the pitch by 2, 1, and 3 semitones [117]. Down from an open
+  partial, the combinations are 0, 2, 1, 1-2, 2-3, 1-3, and 1-2-3 [108]. On a trumpet, the right
+  fingers 1 to 3 press the valves 1 to 3 with the finger tips. The right little finger floats or
+  rests on the hook, and the left thumb and the left ring finger move the first and the third
+  valve slides [107].
+- **Tuba.** Valve 4 lowers the pitch a fourth. It replaces 1-3, and 2-4 replaces 1-2-3 [113]. With
+  valve 4, the tuba plays B0 (1-2-3-4), C1 (1-3-4), C♯1 (2-3-4), D1 (1-2-4), and E♭1 (1-4) [114].
+  The right fingers work the valves [115].
+- **Horn.** The left fingers 1 to 3 work the rotary valves 1 to 3, the left thumb works the B♭
+  valve, and the left little finger rests in the hook [109]. The F side plays up to the written
+  G4, and "pitches above g4 utilize the Bb trigger fingerings" [109]. Up the B♭ side, the written
+  G♯4 to C5 take 2-3, 1-2, 1, 2, and 0, and the written C♯5 to C6 take 2-3, 1-2, 1, 2, 0, 2, 0, 2,
+  0, 1, 2, and 0, all with the thumb [110].
+- **Trombone.** The seven positions of each partial follow the chart of Weidner: the second
+  partial B♭2 to E2 in positions 1 to 7, the fourth B♭3 to G♭3 in 1 to 5, the fifth D4 to B3 in 1
+  to 4, and the sixth F4 to E♭4 in 1 to 3 [112]. The F trigger of the left thumb lowers a fourth,
+  and replaces the sixth position with T1 and the seventh with T2 [111] [112]. Section 1.3 gives
+  the alternate positions.
+
+### 7.4 How the fingers move
+
+- **Close to the keys.** The fingers stay close to the keys with a light pressure [101] [103]. The
+  clarinet fingers are arched and point down [103]. Trumpet fingers press with the arched finger
+  tips. Flat fingers move more and change notes more slowly [107].
+- **Quick presses.** On a flute with sensors on 16 keys, a finger moved a key in about 10 ms, and
+  the spring returned a key in about 16 ms. In the changes of several fingers, the fingers moved
+  10 ms to 20 ms apart, and less in professionals: 13 ms against 25 ms for amateurs [118].
+- **A light force.** Clarinetists pressed the keys with a mean force of 0.64 N in a technical
+  exercise, and the professionals with 0.54 N [119]. Faster tempi gave more struck touches [119].
+- **No measured finger height.** No source of this file gives the height of a finger above a key,
+  or the travel of a piston valve (about 15 mm in forum measures [122 (abstract)]).
+
+### 7.5 Use in the app
+
+`windFingering()` of `src/pose/wind-fingering.ts` gives each note its fingering from the charts
+above, a pure function of the note and the notes before it. Design 5.3 gives the motion.
+
+The app follows these facts:
+
+- **The woodwind hands (7.1, 7.2).** Each paw of a woodwind closes by the share of its main fingers
+  that the chart of the note closes (`WOODWIND_CHARTS`). A note out of the chart takes the chart
+  note of its pitch class in the nearest octave.
+- **The valves (7.3).** The trumpet and the horn press the combination of the chart, and the tuba
+  takes valve 4 for 1-3 and 2-4 for 1-2-3 below B♭2, and down to B0. The horn plays the F side up
+  to the written G4, and the B♭ side with the thumb above it (`HORN_B_FLAT`). The valve paw closes
+  by the share of its valves that go down.
+- **The slide (7.3, 1.3).** Each note takes the lowest position of the chart. A short note takes
+  an alternate position on a higher partial when that saves at least two positions of travel from
+  the note before (`SLIDE_ALTERNATE`).
+- **The presses (7.4).** A press and a release end at the note start and take
+  `WIND_MOTION.pressSec` and `releaseSec`, about two times the measured times, so that each move
+  shows in at least one frame at 60 frames each second. The press adds a small curl to the grip
+  of the paw (`WIND_BODY.keyCurl`), so the fingers stay close to the keys.
+
+The app does not follow these facts:
+
+- **Single fingers (7.1).** The paws of the wind bodies have one `fingers` bone, so a paw shows the
+  count of its closed holes or pressed valves, and no single finger. No thumb, little finger,
+  register key, octave key, whisper key, or trigger moves.
+- **The staggered fingers (7.4).** One bone cannot show the 10 ms to 20 ms between the fingers of
+  a change.
+- **Alternates (7.2).** The woodwinds take the basic fingering of each note, with no trill or
+  chromatic alternate.
