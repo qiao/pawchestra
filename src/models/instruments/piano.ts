@@ -50,9 +50,8 @@ export const PIANO = {
   balanceRail: 0.25,
   /** The lowest and the highest key: A0 and C8. */
   keys: [21, 108],
-  /** The width of the case, and its length from the front edge of the keys. */
+  /** The width of the case. */
   caseWidth: 1.4,
-  caseLength: 2.0,
   /** The bottom and the top of the rim of the case. */
   caseBottom: 0.62 + PIANO_LIFT,
   caseTop: 0.95 + PIANO_LIFT,
