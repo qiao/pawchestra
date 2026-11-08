@@ -1668,12 +1668,13 @@ function wedgeSideSteps(
 }
 
 /**
- * The gap of the conductor in row 0 (design 4.5, seat geometry): the angle from 0° to which the
- * inner first desk of each side moves out, in radians: 32°. The rows behind the strings stand on
- * the stage floor, and the heads of the seated strings are about as high as the eyes of the
- * conductor. Thus the winds, the brass, and the percussion see the conductor through this gap.
+ * The gaps of the conductor in row 0 that the layout tries (design 4.5, seat geometry): the angle
+ * from 0° to which the inner first desk of each side moves out, in radians: 28° and 40°. The rows
+ * behind the strings stand on the stage floor, and the heads of the seated strings are about as
+ * high as the eyes of the conductor. Thus the winds, the brass, and the percussion see the
+ * conductor through this gap. The layout keeps the gap with the fewest blocked players.
  */
-const CONDUCTOR_GAP = (32 * Math.PI) / 180;
+const CONDUCTOR_GAPS = [(28 * Math.PI) / 180, (40 * Math.PI) / 180] as const;
 
 /**
  * Calculates the angles of one side of a row with its inner player at an angle from 0° or farther
@@ -1705,13 +1706,14 @@ function gapAngles(row: FittedRow, side: -1 | 1, gap: number): number[] {
 
 /**
  * Widens the gap of the conductor on one side of row 0 (design 4.5, seat geometry), in steps. The
- * inner first desk moves out to {@link CONDUCTOR_GAP}, or to the largest angle in steps of 1° below
- * it that keeps each seat within ±90°, each box 0.3 m from the edges, and each footprint its gaps
+ * inner first desk moves out to an angle of {@link CONDUCTOR_GAPS}, or to the largest angle in steps
+ * of 1° below it that keeps each seat within ±90°, each box 0.3 m from the edges, and each footprint its gaps
  * from the other items ({@link rowFits}). Its outer neighbors move out with it
  * ({@link gapAngles}).
  *
  * @param row Row 0 after the spread.
  * @param side -1 for the players left of 0°, 1 for the players right of 0°.
+ * @param widest The angle of the gap, in radians.
  * @param clearance The other items on the stage.
  * @param stage The stage side and the front distance.
  * @returns The row with the new angles, or the same row if no wider gap fits.
@@ -1719,12 +1721,13 @@ function gapAngles(row: FittedRow, side: -1 | 1, gap: number): number[] {
 function widenGapSteps(
   row: FittedRow,
   side: -1 | 1,
+  widest: number,
   clearance: RowClearance,
   stage: StageSize,
 ): Steps<FittedRow> {
   const inner = Math.min(...row.angles.filter((a) => side * a > 0).map((a) => side * a));
   const tries: number[][] = [];
-  for (let gap = CONDUCTOR_GAP; gap > inner + 1e-9; gap -= CONDUCTOR_SIGHT.nudgeStep) {
+  for (let gap = widest; gap > inner + 1e-9; gap -= CONDUCTOR_SIGHT.nudgeStep) {
     tries.push(gapAngles(row, side, gap));
   }
   return firstFitSteps(row, tries, clearance, stage);
@@ -1743,6 +1746,7 @@ function widenGapSteps(
  *   risers, and the singers.
  * @param soloPianos The obstacles of the piano soloists, which are also in `fixed`.
  * @param stage The stage side and the front distance.
+ * @param gap The angle of the gap of the conductor in row 0, in radians.
  * @returns The rows after the spread.
  */
 function* spreadRowsSteps(
@@ -1750,6 +1754,7 @@ function* spreadRowsSteps(
   fixed: readonly Obstacle[],
   soloPianos: readonly Obstacle[],
   stage: StageSize,
+  gap: number,
 ): Steps<FittedRow[]> {
   const done: FittedRow[] = [];
   for (const [n, row] of rows.entries()) {
@@ -1758,8 +1763,8 @@ function* spreadRowsSteps(
     let next = yield* spreadSideSteps(left, 1, clearance, stage);
     const front = done.find((r) => r.row === 0);
     if (row.row === 0) {
-      next = yield* widenGapSteps(next, -1, clearance, stage);
-      next = yield* widenGapSteps(next, 1, clearance, stage);
+      next = yield* widenGapSteps(next, -1, gap, clearance, stage);
+      next = yield* widenGapSteps(next, 1, gap, clearance, stage);
     }
     if (row.row === BACK_DESK_ROW && front) {
       next = yield* wedgeSideSteps(next, row, front, -1, clearance, stage);
@@ -2466,10 +2471,11 @@ function* moveFrontSteps(
  * this try only when it has fewer blocked players.
  *
  * @param pass The inputs of the pass.
- * @returns The steps, which return the rows.
+ * @returns The steps, which return the rows and the number of blocked players.
  */
-function* sightRowsSteps(pass: SightPass): Steps<FittedRow[]> {
+function* sightRowsSteps(pass: SightPass): Steps<{ rows: FittedRow[]; blind: number }> {
   const done: FittedRow[] = [];
+  const blind: number[] = [];
   for (const [n, row] of pass.rows.entries()) {
     let result = yield* seeRowSteps(pass, row, n, done, null);
     const at = done.findIndex((d) => d.row === 0);
@@ -2483,8 +2489,9 @@ function* sightRowsSteps(pass: SightPass): Steps<FittedRow[]> {
       }
     }
     done.push(result.seen);
+    blind.push(result.blind.length);
   }
-  return done;
+  return { rows: done, blind: blind.reduce((a, b) => a + b, 0) };
 }
 
 /** The lift of the choir risers for the sight of the singers (design 4.5, seat geometry). */
@@ -2755,18 +2762,29 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   const stage = stageOf(draft);
   const still = [...fixed, ...choir.obstacles];
   const targets = sightTargets();
-  // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin).
-  const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage);
-  yield;
-  const final = yield* sightRowsSteps({
-    rows: spread,
-    packed: rows,
-    fixed: still,
-    soloists,
-    soloPianos,
-    stage,
-    targets,
-  });
+  // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin). The
+  // gap of the conductor with the fewest blocked players wins, and the first gap wins a tie.
+  let seen: { rows: FittedRow[]; blind: number } | null = null;
+  for (const gap of CONDUCTOR_GAPS) {
+    const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage, gap);
+    yield;
+    const next = yield* sightRowsSteps({
+      rows: spread,
+      packed: rows,
+      fixed: still,
+      soloists,
+      soloPianos,
+      stage,
+      targets,
+    });
+    if (!seen || next.blind < seen.blind) {
+      seen = next;
+    }
+    if (seen.blind === 0) {
+      break;
+    }
+  }
+  const final = seen?.rows ?? [];
   const lift = choirLift(choir, members, final, soloists, targets);
   const places = withRows(final);
   for (const s of choir.singers) {
