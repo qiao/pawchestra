@@ -30,7 +30,9 @@ import {
   attachSightMesh,
   audienceShare,
   eyesOf,
+  hidersOf,
   sightCost,
+  sightNear,
   sightOf,
   sightTargets,
 } from './sight.ts';
@@ -2494,6 +2496,427 @@ function* sightRowsSteps(pass: SightPass): Steps<{ rows: FittedRow[]; blind: num
   return { rows: done, blind: blind.reduce((a, b) => a + b, 0) };
 }
 
+/** The joint search of the lanes to the conductor ({@link laneSearchSteps}). */
+const LANES = {
+  /** The first row whose blocked players start a search: row 1, the back desks of the strings. */
+  firstRow: 1,
+  /** The largest number of passes over the blocked players. */
+  passes: 2,
+  /** The largest move of a run of players in one try, in steps of 1°. */
+  reach: 20,
+} as const;
+
+/** The cost of the sight of one player in the lane search, and if the player is blocked. */
+interface LaneSight {
+  readonly blind: boolean;
+  readonly cost: number;
+}
+
+/**
+ * Finds the sight of a player in the lane search, past the soloists, the rows in front, and the
+ * other players of its row ({@link rowSightOf}). From row 2, the view of the audience counts in
+ * the cost, as in the sight sweep. Each step of 1° off the angle after the sight pass adds 1.
+ *
+ * @param pass The inputs of the pass.
+ * @param rows The rows, from the front.
+ * @param n The index of the row of the player in `rows`.
+ * @param k The index of the player in its row.
+ * @param start The angles of each row after the sight pass.
+ * @param bound A cost from which the exact cost does not matter: the function then can give a
+ *   lower cost that is still at least the bound. No bound by default.
+ * @returns The sight.
+ */
+function laneSightOf(
+  pass: SightPass,
+  rows: readonly FittedRow[],
+  n: number,
+  k: number,
+  start: readonly (readonly number[])[],
+  bound = Infinity,
+): LaneSight {
+  const row = rows[n];
+  const member = row?.members[k];
+  const place = row?.placement.players[k]?.place;
+  if (!row || !member || !place) {
+    return { blind: false, cost: 0 };
+  }
+  const front = rows.slice(0, n);
+  const solidFront = [
+    ...pass.soloists,
+    ...front.flatMap((r) => r.placement.players.map((p) => p.obstacle)),
+  ];
+  const solid = [
+    ...solidFront,
+    ...row.placement.players.filter((_, j) => j !== k).map((p) => p.obstacle),
+  ];
+  const stands = [...front, row].flatMap((r) => r.placement.stands.map((s) => s.obstacle));
+  const seen = sightOf(member.sight, place, pass.targets, { solid, stands });
+  const moved = Math.abs((row.angles[k] ?? 0) - (start[n]?.[k] ?? 0)) / CONDUCTOR_SIGHT.nudgeStep;
+  const least = sightCost(seen) + moved;
+  // The view of the audience only adds to the cost, so a cost above the bound needs no view.
+  if (row.row < AUDIENCE.firstRow || least >= bound) {
+    return { blind: seen.sight === 2, cost: least };
+  }
+  const view = audienceShare(member.sight, place, solidFront, pass.stage.side);
+  return {
+    blind: seen.sight === 2,
+    cost: sightCost({ sight: seen.sight, hidden: seen.hidden + view }) + moved,
+  };
+}
+
+/** The limits of the moves of one row in the lane search. */
+interface LaneLimits {
+  /** The packed arc from each player to its right neighbor, in radians. */
+  readonly arcs: readonly number[];
+  /** The largest arc from each player to its right neighbor, in radians. */
+  readonly widest: readonly number[];
+  /** The smallest angle of each player from 0°, in radians. */
+  readonly least: readonly number[];
+  /** The largest angle of each player from 0°, in radians. */
+  readonly most: readonly number[];
+}
+
+/**
+ * Gives the limits of the moves of a row in the lane search (design 4.5, seat geometry, lanes).
+ * Neighbors keep their packed arcs, and an arc grows to at most 1.6 m, or its arc after the sight
+ * pass. Each seat stays within ±90°, and the outer player of each side does not pass its spread
+ * angle. In rows 0 and 1, each player stays on its side of 0°. Row 0 keeps the gap of the
+ * conductor, does not pass its packed angles to the inside, and its inner players do not pass the
+ * back desks of row 1 to the outside. A back desk of row 1 outside the gap stays outside it.
+ *
+ * @param row The row after the sight pass.
+ * @param spread The angles of the row after the spread.
+ * @param packed The angles of the row before the spread.
+ * @param gap The smallest angle of a first desk player from 0°, for row 1.
+ * @param back The smallest angle from 0° of a back desk outside the gap on each side, for row 0.
+ * @returns The limits.
+ */
+function laneLimitsOf(
+  row: FittedRow,
+  spread: readonly number[],
+  packed: readonly number[],
+  gap: number,
+  back: (side: number) => number,
+): LaneLimits {
+  const arcs = packedArcs(row);
+  const { angles } = row;
+  const lastLeft = angles.findLastIndex((a) => a < 0);
+  const ends = new Set([angles.findIndex((a) => a < 0), angles.length - 1]);
+  const widest = angles.map((a, i) => {
+    const next = angles[i + 1];
+    if (next === undefined || (row.split && i === lastLeft)) {
+      // The pair at 0° of rows 0 and 1 has no arc limit: it is the gap of the conductor.
+      return Infinity;
+    }
+    return Math.max(SPREAD_LIMITS.maxArc / row.radius, next - a);
+  });
+  const sideGap = (side: number): number =>
+    Math.min(...angles.filter((a) => side * a > 0).map((a) => side * a));
+  const least = angles.map((a, i) => {
+    if (row.row === 0) {
+      return Math.max(Math.abs(packed[i] ?? 0), sideGap(Math.sign(a)));
+    }
+    return row.row === BACK_DESK_ROW && Math.abs(a) >= gap - 1e-9 ? gap : 0;
+  });
+  const most = angles.map((a, i) => {
+    const edge = ends.has(i) ? Math.abs(spread[i] ?? a) : SPREAD_LIMITS.maxAngle;
+    const inner = row.row === 0 && Math.abs(a) <= sideGap(Math.sign(a)) + 1e-9;
+    return inner ? Math.min(edge, back(Math.sign(a))) : edge;
+  });
+  return { arcs, widest, least, most };
+}
+
+/**
+ * Finds if the angles of a row keep the limits of the lane search ({@link laneLimitsOf}).
+ *
+ * @param row The row.
+ * @param angles The new angles.
+ * @param limits The limits of the row.
+ * @returns True if each angle keeps the limits.
+ */
+function keepsLaneLimits(row: FittedRow, angles: readonly number[], limits: LaneLimits): boolean {
+  return angles.every((a, i) => {
+    const before = row.angles[i] ?? 0;
+    const next = angles[i + 1];
+    const arc = next === undefined ? 0 : next - a;
+    return (
+      (!row.split || Math.sign(a) === Math.sign(before) || a === before) &&
+      Math.abs(a) >= (limits.least[i] ?? 0) - 1e-9 &&
+      Math.abs(a) <= (limits.most[i] ?? 0) + 1e-9 &&
+      (next === undefined ||
+        (arc >= (limits.arcs[i] ?? 0) - 1e-9 && arc <= (limits.widest[i] ?? 0) + 1e-9))
+    );
+  });
+}
+
+/**
+ * Lists the runs of players that can move for a blocked player in the lane search: each item that
+ * hides the conductor from it, and the blocked player itself. A run is the player alone, the
+ * player with one neighbor, or the player with all players to the inside or to the outside on its
+ * side of 0°.
+ *
+ * @param rows The rows.
+ * @param movers The row and the index of each player that can move.
+ * @returns The runs: the row, then the indices of the players.
+ */
+function laneRuns(
+  rows: readonly FittedRow[],
+  movers: readonly (readonly [n: number, k: number])[],
+): (readonly [n: number, run: readonly number[]])[] {
+  const runs: (readonly [n: number, run: readonly number[]])[] = [];
+  const seen = new Set<string>();
+  for (const [n, k] of movers) {
+    const size = rows[n]?.members.length ?? 0;
+    const row = rows[n];
+    const side = (j: number): number => (row?.split ? Math.sign(row.angles[j] ?? 0) : 1);
+    let inside = k;
+    let outside = k;
+    while (inside > 0 && side(inside - 1) === side(k)) {
+      inside--;
+    }
+    while (outside < size - 1 && side(outside + 1) === side(k)) {
+      outside++;
+    }
+    const span = (from: number, to: number): number[] =>
+      Array.from({ length: to - from + 1 }, (_, q) => from + q);
+    for (const run of [[k], [k - 1, k], [k, k + 1], span(inside, k), span(k, outside)]) {
+      const key = `${n}:${run.join(',')}`;
+      if (run.every((j) => j >= 0 && j < size) && !seen.has(key)) {
+        seen.add(key);
+        runs.push([n, run]);
+      }
+    }
+  }
+  return runs;
+}
+
+/**
+ * Finds the row and the player of each item of the rows that can hide the conductor: a player,
+ * or a music stand, which goes to its owner or to the nearest reader.
+ *
+ * @param rows The rows.
+ * @returns The row and the index of the player of each item.
+ */
+function laneOwners(rows: readonly FittedRow[]): Map<Obstacle, readonly [n: number, k: number]> {
+  const owners = new Map<Obstacle, readonly [n: number, k: number]>();
+  rows.forEach((row, n) => {
+    row.placement.players.forEach((p, k) => owners.set(p.obstacle, [n, k]));
+    for (const stand of row.placement.stands) {
+      const own = row.members.findIndex((m) => m.index === stand.owner);
+      const [x, , z] = stand.place.position;
+      const angle = Math.atan2(x, -z);
+      const nearest = row.angles.reduce(
+        (best, a, k) =>
+          Math.abs(a - angle) < Math.abs((row.angles[best] ?? 0) - angle) ? k : best,
+        0,
+      );
+      owners.set(stand.obstacle, [n, own >= 0 ? own : nearest]);
+    }
+  });
+  return owners;
+}
+
+/**
+ * Moves the players of all rows together so that the players behind the strings see the
+ * conductor through lanes in the rows in front (design 4.5, seat geometry, lanes), in steps. The
+ * sight pass places one row at a time, so it cannot keep a lane open for a row behind. For each
+ * blocked player from row 1, from the front, the search tries runs of the items that hide the
+ * conductor from it, and of the player itself ({@link laneRuns}). Each run moves by 1° steps up
+ * to {@link LANES}.reach, and keeps the limits of {@link laneLimitsOf}, the stage, and the gaps to
+ * the other items. The move with the lowest total cost of all players wins, if it lowers the cost
+ * of the blocked player and the total cost. The search stops after {@link LANES}.passes passes, or
+ * after a pass with no move.
+ *
+ * @param pass The inputs of the pass.
+ * @param seen The rows after the sight pass, from the front.
+ * @returns The steps, which return the rows and the number of blocked players.
+ */
+function* laneSearchSteps(
+  pass: SightPass,
+  seen: readonly FittedRow[],
+): Steps<{ rows: FittedRow[]; blind: number }> {
+  const rows = [...seen];
+  const start = rows.map((r) => [...r.angles]);
+  const front = rows.find((r) => r.row === 0);
+  const gap = front ? Math.min(...front.angles.map((a) => Math.abs(a))) : 0;
+  const backDesks = rows.find((r) => r.row === BACK_DESK_ROW)?.angles ?? [];
+  const back = (side: number): number =>
+    Math.min(
+      SPREAD_LIMITS.maxAngle,
+      ...backDesks.filter((a) => side * a >= gap - 1e-9).map((a) => side * a),
+    );
+  const limits = rows.map((row, n) =>
+    laneLimitsOf(
+      row,
+      pass.rows[n]?.angles ?? row.angles,
+      pass.packed.find((r) => r.row === row.row)?.angles ?? row.angles,
+      gap,
+      back,
+    ),
+  );
+  const sights = rows.map((row, n) =>
+    row.members.map((_, k) => laneSightOf(pass, rows, n, k, start)),
+  );
+  const blindCount = (): number => sights.flat().filter((s) => s.blind).length;
+  for (let p = 0; p < LANES.passes; p++) {
+    let moved = false;
+    for (const [n, row] of rows.entries()) {
+      if (row.row < LANES.firstRow) {
+        continue;
+      }
+      for (const k of row.members.keys()) {
+        if (!sights[n]?.[k]?.blind) {
+          continue;
+        }
+        yield;
+        const member = row.members[k];
+        const place = rows[n]?.placement.players[k]?.place;
+        if (!member || !place) {
+          continue;
+        }
+        const ahead = rows.slice(0, n);
+        const own = rows[n];
+        const blockers: SightBlockers = {
+          solid: [
+            ...ahead.flatMap((r) => r.placement.players.map((q) => q.obstacle)),
+            ...(own?.placement.players.filter((_, j) => j !== k).map((q) => q.obstacle) ?? []),
+          ],
+          stands: [...ahead, ...(own ? [own] : [])].flatMap((r) =>
+            r.placement.stands.map((s) => s.obstacle),
+          ),
+        };
+        const owners = laneOwners(rows);
+        const movers = hidersOf(member.sight, place, pass.targets, blockers).flatMap((o) => {
+          const owner = owners.get(o);
+          return owner ? [owner] : [];
+        });
+        const best = yield* bestLaneMoveSteps(pass, rows, limits, sights, start, n, k, [
+          ...movers,
+          [n, k],
+        ]);
+        if (best) {
+          rows[best.n] = best.row;
+          for (const [m, j, s] of best.sights) {
+            const known = sights[m];
+            if (known) {
+              known[j] = s;
+            }
+          }
+          moved = true;
+        }
+      }
+    }
+    if (!moved) {
+      break;
+    }
+  }
+  return { rows, blind: blindCount() };
+}
+
+/** The best move of the lane search for one blocked player. */
+interface LaneMove {
+  /** The index of the moved row. */
+  readonly n: number;
+  readonly row: FittedRow;
+  /** The new sights: the row, the player, and the sight. */
+  readonly sights: readonly (readonly [m: number, j: number, sight: LaneSight])[];
+}
+
+/**
+ * Finds the move of the lane search with the lowest total cost for one blocked player, in steps
+ * ({@link laneSearchSteps}).
+ *
+ * @param pass The inputs of the pass.
+ * @param rows The rows.
+ * @param limits The limits of each row.
+ * @param sights The sight of each player at its place.
+ * @param start The angles of each row after the sight pass.
+ * @param n The row of the blocked player.
+ * @param k The index of the blocked player in its row.
+ * @param movers The players that can move.
+ * @returns The steps, which return the move, or `null` if no move lowers the cost.
+ */
+function* bestLaneMoveSteps(
+  pass: SightPass,
+  rows: readonly FittedRow[],
+  limits: readonly LaneLimits[],
+  sights: readonly (readonly LaneSight[])[],
+  start: readonly (readonly number[])[],
+  n: number,
+  k: number,
+  movers: readonly (readonly [n: number, k: number])[],
+): Steps<LaneMove | null> {
+  const target = sights[n]?.[k]?.cost ?? 0;
+  let best: LaneMove | null = null;
+  let bestDelta = -1e-6;
+  for (const [m, run] of laneRuns(rows, movers)) {
+    const row = rows[m];
+    const limit = limits[m];
+    if (!row || !limit) {
+      continue;
+    }
+    const clearance = clearanceOf(pass.fixed, pass.soloPianos, rows.slice(0, m), rows.slice(m + 1));
+    for (let s = -LANES.reach; s <= LANES.reach; s++) {
+      if (s === 0) {
+        continue;
+      }
+      yield;
+      const angles = row.angles.map((a, i) =>
+        run.includes(i) ? a + s * CONDUCTOR_SIGHT.nudgeStep : a,
+      );
+      if (!keepsLaneLimits(row, angles, limit)) {
+        continue;
+      }
+      const placement = placeRow(row.members, angles, row.radius);
+      const next: FittedRow = { ...row, angles, placement };
+      const tried = rows.map((r, i) => (i === m ? next : r));
+      const own = laneSightOf(pass, tried, n, k, start, target - 1e-6);
+      if (own.cost >= target - 1e-6 || !rowFits(placement, clearance, pass.stage)) {
+        continue;
+      }
+      // The items that moved: the old and the new places of the players and the stands.
+      const changed = [
+        ...run.flatMap((i) => [row.placement.players[i], placement.players[i]]),
+        ...placement.stands.flatMap((stand, i) => {
+          const old = row.placement.stands[i];
+          const same =
+            old?.place.position[0] === stand.place.position[0] &&
+            old.place.position[2] === stand.place.position[2];
+          return same ? [] : [old, stand];
+        }),
+      ].flatMap((p) => (p ? [p.obstacle] : []));
+      let delta = 0;
+      const fresh: [number, number, LaneSight][] = [];
+      tried.forEach((r, q) => {
+        if (q < m) {
+          return;
+        }
+        const view = r.row >= AUDIENCE.firstRow ? pass.stage.side : null;
+        r.members.forEach((member, j) => {
+          const at = r.placement.players[j]?.place;
+          if (!at) {
+            return;
+          }
+          const near =
+            (q === m && run.includes(j)) ||
+            changed.some((o) => sightNear(member.sight, at, o, view));
+          if (!near) {
+            return;
+          }
+          const sight = q === n && j === k ? own : laneSightOf(pass, tried, q, j, start);
+          delta += sight.cost - (sights[q]?.[j]?.cost ?? 0);
+          fresh.push([q, j, sight]);
+        });
+      });
+      if (delta < bestDelta) {
+        bestDelta = delta;
+        best = { n: m, row: next, sights: fresh };
+      }
+    }
+  }
+  return best;
+}
+
 /** The lift of the choir risers for the sight of the singers (design 4.5, seat geometry). */
 const CHOIR_LIFT = {
   /** The largest lift, in meters. */
@@ -2764,11 +3187,11 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   const targets = sightTargets();
   // The rows spread inside the stage, and the stage side stays (design 4.5, stage origin). The
   // gap of the conductor with the fewest blocked players wins, and the first gap wins a tie.
-  let seen: { rows: FittedRow[]; blind: number } | null = null;
+  let seen: { pass: SightPass; rows: FittedRow[]; blind: number } | null = null;
   for (const gap of CONDUCTOR_GAPS) {
     const spread = yield* spreadRowsSteps(rows, still, soloPianos, stage, gap);
     yield;
-    const next = yield* sightRowsSteps({
+    const pass: SightPass = {
       rows: spread,
       packed: rows,
       fixed: still,
@@ -2776,15 +3199,18 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
       soloPianos,
       stage,
       targets,
-    });
+    };
+    const next = yield* sightRowsSteps(pass);
     if (!seen || next.blind < seen.blind) {
-      seen = next;
+      seen = { ...next, pass };
     }
     if (seen.blind === 0) {
       break;
     }
   }
-  const final = seen?.rows ?? [];
+  // The joint search of the lanes then opens lanes for the rows behind the strings.
+  const lanes = seen && seen.blind > 0 ? yield* laneSearchSteps(seen.pass, seen.rows) : seen;
+  const final = lanes?.rows ?? [];
   const lift = choirLift(choir, members, final, soloists, targets);
   const places = withRows(final);
   for (const s of choir.singers) {
