@@ -236,6 +236,25 @@ function valveCount(valves: number): number {
 }
 
 /**
+ * Moves an index of a chart by octaves into the chart: a key out of the chart takes the key of its
+ * pitch class in the nearest octave of the chart.
+ *
+ * @param at The index of the key, in semitones from the first key of the chart.
+ * @param length The number of keys of the chart.
+ * @returns The index in the chart.
+ */
+function inOctaves(at: number, length: number): number {
+  let index = at;
+  while (index < 0) {
+    index += 12;
+  }
+  while (index >= length) {
+    index -= 12;
+  }
+  return index;
+}
+
+/**
  * Gives the valves of a brass key and the thumb valve of the horn
  * (`docs/reference/wind-technique.md` 7.3).
  *
@@ -266,10 +285,7 @@ function valvesOf(instrument: Exclude<Brass, 'trombone'>, key: number): ValveCom
         const lower = semitonesBelow(key, BRASS_FUNDAMENTALS.horn, HORN_PARTIALS);
         return { valves: THREE_VALVES[lower] ?? 0, thumb: false };
       }
-      let at = written - HORN_B_FLAT_FIRST;
-      while (at >= HORN_B_FLAT.length) {
-        at -= 12;
-      }
+      const at = inOctaves(written - HORN_B_FLAT_FIRST, HORN_B_FLAT.length);
       return { valves: HORN_B_FLAT[at] ?? 0, thumb: true };
     }
     default: {
@@ -280,8 +296,7 @@ function valvesOf(instrument: Exclude<Brass, 'trombone'>, key: number): ValveCom
 }
 
 /**
- * Gives the closed share of each hand of a woodwind key from its chart. A key out of the chart
- * takes the chart key of its pitch class in the nearest octave.
+ * Gives the closed share of each hand of a woodwind key from its chart ({@link inOctaves}).
  *
  * @param instrument The woodwind.
  * @param key The MIDI key of the sound.
@@ -290,14 +305,7 @@ function valvesOf(instrument: Exclude<Brass, 'trombone'>, key: number): ValveCom
 function holesOf(instrument: Woodwind, key: number): readonly [left: number, right: number] {
   const chart = WOODWIND_CHARTS[instrument];
   const cells = chart.hands.split(' ');
-  let at = key + chart.written - chart.first;
-  while (at < 0) {
-    at += 12;
-  }
-  while (at >= cells.length) {
-    at -= 12;
-  }
-  const cell = cells[at] ?? '00';
+  const cell = cells[inOctaves(key + chart.written - chart.first, cells.length)] ?? '00';
   return [(COUNTS.get(cell[0] ?? '0') ?? 0) / 3, (COUNTS.get(cell[1] ?? '0') ?? 0) / 3];
 }
 
