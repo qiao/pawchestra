@@ -318,6 +318,45 @@ interface RowPlacement {
 const CENTER: Vec3 = [0, 0, 0];
 
 /**
+ * Makes the obstacle of a player with its instrument and its seat.
+ *
+ * @param cast The cast of the player, for the label.
+ * @param footprint The footprint of the player.
+ * @param position The place of the player.
+ * @param facing The facing of the footprint.
+ * @returns The obstacle.
+ */
+function playerObstacle(
+  cast: PlayerCast,
+  footprint: Footprint,
+  position: Vec3,
+  facing: number,
+): Obstacle {
+  const { species, instrument, seatIndex, player } = cast;
+  return obstacleOf(
+    `${species} ${instrument} (seat ${seatIndex}, player ${player})`,
+    placeFootprint(footprint, position, facing),
+  );
+}
+
+/**
+ * Places a player at a point.
+ *
+ * @param member The player.
+ * @param position The place of the player.
+ * @param facing The facing of the player.
+ * @param boxFacing The facing of the footprint, which {@link Member.turn} already turned.
+ * @returns The place and the obstacle.
+ */
+function placeAt(member: Member, position: Vec3, facing: number, boxFacing = facing): PlacedPlayer {
+  return {
+    index: member.index,
+    place: { position, facing, cast: member.cast },
+    obstacle: playerObstacle(member.cast, member.footprint, position, boxFacing),
+  };
+}
+
+/**
  * Places a player at an angle and a radius around the podium center.
  *
  * @param member The player.
@@ -329,19 +368,7 @@ const CENTER: Vec3 = [0, 0, 0];
 function placePlayer(member: Member, angle: number, radius: number, height = 0): PlacedPlayer {
   const spot = seatAt(CENTER, angle, radius);
   const position: Vec3 = [spot.position[0], height, spot.position[2]];
-  const { species, instrument, seatIndex, player } = member.cast;
-  return {
-    index: member.index,
-    place: {
-      position,
-      facing: spot.facing + member.turn,
-      cast: member.cast,
-    },
-    obstacle: obstacleOf(
-      `${species} ${instrument} (seat ${seatIndex}, player ${player})`,
-      placeFootprint(member.footprint, position, spot.facing),
-    ),
-  };
+  return placeAt(member, position, spot.facing + member.turn, spot.facing);
 }
 
 /**
@@ -1057,15 +1084,9 @@ function conductorObstacle(podium: Vec3, models: ModelCache): Obstacle {
  */
 export function layoutObstacles(layout: SceneLayout, models = new ModelCache()): Obstacle[] {
   const players = layout.players.map((place) => {
-    const { species, instrument, kettles, support, seatIndex, player } = place.cast;
-    return obstacleOf(
-      `${species} ${instrument} (seat ${seatIndex}, player ${player})`,
-      placeFootprint(
-        playerFootprint(models.get(species, instrument, kettles, support)),
-        place.position,
-        place.facing,
-      ),
-    );
+    const { species, instrument, kettles, support } = place.cast;
+    const footprint = playerFootprint(models.get(species, instrument, kettles, support));
+    return playerObstacle(place.cast, footprint, place.position, place.facing);
   });
   const stands = layout.stands.map((stand, i) =>
     obstacleOf(
@@ -1271,20 +1292,13 @@ function placeSoloist(member: Member): PlacedPlayer & { readonly front: number }
   if (member.cast.instrument === 'piano') {
     return placePiano(member);
   }
-  const position: Vec3 = [SOLOIST_PLACE[0], 0, SOLOIST_PLACE[1]];
-  const obstacle = obstacleOf(
-    `${member.cast.species} ${member.cast.instrument} (seat ${member.cast.seatIndex}, player ${member.cast.player})`,
-    placeFootprint(member.footprint, position, SOLOIST_FACING),
-  );
+  const soloist = placeAt(member, [SOLOIST_PLACE[0], 0, SOLOIST_PLACE[1]], SOLOIST_FACING);
   const front = Math.max(
-    ...obstacle.boxes.map((b) => b.z + b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos)),
+    ...soloist.obstacle.boxes.map(
+      (b) => b.z + b.halfX * Math.abs(b.sin) + b.halfZ * Math.abs(b.cos),
+    ),
   );
-  return {
-    index: member.index,
-    place: { position, facing: SOLOIST_FACING, cast: member.cast },
-    obstacle,
-    front,
-  };
+  return { ...soloist, front };
 }
 
 /**
@@ -1324,19 +1338,10 @@ function placeInCrook(
   piano: PlacedPlayer,
 ): PlacedPlayer {
   const facing = AUDIENCE_FACING - CHAMBER.turn;
-  const { species, instrument, seatIndex, player } = member.cast;
   for (let z = middle[1]; ; z += CLEAR_STEP) {
-    const position: Vec3 = [middle[0] + CHAMBER.crook, 0, z];
-    const obstacle = obstacleOf(
-      `${species} ${instrument} (seat ${seatIndex}, player ${player})`,
-      placeFootprint(member.footprint, position, facing),
-    );
-    if (!obstaclesTouch(obstacle, piano.obstacle, FOOTPRINT_GAP)) {
-      return {
-        index: member.index,
-        place: { position, facing, cast: member.cast },
-        obstacle,
-      };
+    const partner = placeAt(member, [middle[0] + CHAMBER.crook, 0, z], facing);
+    if (!obstaclesTouch(partner.obstacle, piano.obstacle, FOOTPRINT_GAP)) {
+      return partner;
     }
   }
 }
@@ -1353,20 +1358,7 @@ function placeAlone(member: Member, middle: readonly [x: number, z: number]): Pl
   if (member.cast.instrument === 'piano') {
     return placePiano(member, middle);
   }
-  const position: Vec3 = [middle[0], 0, middle[1]];
-  const { species, instrument, seatIndex, player } = member.cast;
-  return {
-    index: member.index,
-    place: {
-      position,
-      facing: AUDIENCE_FACING,
-      cast: member.cast,
-    },
-    obstacle: obstacleOf(
-      `${species} ${instrument} (seat ${seatIndex}, player ${player})`,
-      placeFootprint(member.footprint, position, AUDIENCE_FACING),
-    ),
-  };
+  return placeAt(member, [middle[0], 0, middle[1]], AUDIENCE_FACING);
 }
 
 /** The stage of a chamber group, and the move of its items onto the stage. */
