@@ -1188,14 +1188,15 @@ const MONKEY_TRUMPET = {
  * The right palm faces the valve tops, and the left palm faces the main branch (`faceTube`,
  * `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as the left hand of a real tubist
  * grips the tubing at the side of a rotary tuba, with the knuckles to the left, while the right
- * hand works the valves (`docs/reference/wind-technique.md` 3). The left grip moves 0.145 H toward
- * the main branch, 0.05 H around it away from the shoulder, and 0.07 H up (`gripShiftL`), so that
+ * hand works the valves (`docs/reference/wind-technique.md` 3). The left grip moves 0.135 H toward
+ * the main branch, 0.03 H around it away from the shoulder, and 0.07 H up (`gripShiftL`), so that
  * the left paw lies on the left side of the branch: its palm faces the branch, the back of the paw
  * faces out to the left, and the fingers point forward and down around the front of the branch.
- * The left fingers curl 92° (`gripCurl`). With the lower left elbow, the grip of 0.16 H puts the
- * left paw 2.3 cm into the branch, and the grips of 0.13 H and less open its finger tips off the
- * branch. At rest, the left grip moves 0.14 H toward the branch (`restGripShiftL`): on the grip of
- * the play, the left forearm goes into the tuba at rest. Both paws keep the aim and the roll of the
+ * The left fingers curl 92° (`gripCurl`). The left paw goes 2.1 cm into the branch (limit 2.2 cm),
+ * and the finger tips stay 1.9 cm from it. With 0.145 H toward and 0.05 H around the branch, the
+ * paw went 2.6 cm into it, and with 0.13 H and less, the finger tips open off the branch. At rest,
+ * the left grip moves 0.13 H toward the branch and 0.03 H around it (`restGripShiftL`): on the grip
+ * of the play, the left forearm goes into the tuba at rest. Both paws keep the aim and the roll of the
  * play at rest (`restAim`): with the roll of the shoulder at rest, the left paw flips in the
  * lowering (the wrist turns 17960° each second). The right fingers curl 80°. The right grip moves
  * 0.15 H along the row of the valves toward the front and 0.1 H toward the right shoulder
@@ -1218,9 +1219,9 @@ const RHINO_TUBA = {
   restPoleL: [-0.75, -1, 0],
   restPoleR: [0.75, -1, 0],
   faceTube: ['palm', 'palm'],
-  gripShiftL: [0.07, 0.145, 0.05],
+  gripShiftL: [0.07, 0.135, 0.03],
   gripShiftR: [-0.15, 0, -0.1],
-  restGripShiftL: [0.07, 0.14, 0.05],
+  restGripShiftL: [0.07, 0.13, 0.03],
   restAim: 1,
   gripCurl: curls(92, 80),
   lipShift: [0, 0.013, 0.022],

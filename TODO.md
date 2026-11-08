@@ -83,10 +83,6 @@ passes.
       hold.
 - [ ] Rhino tubist: with a tuba of about 10 kg, the center of mass lies at the front end of the
       stable range of the soles. A small lean of the trunk back is an option.
-- [ ] Rhino tubist: the mitten paws go up to 2.4 cm into the tuba (limit 2.2 cm), and the right arm
-      folds 6 faces at p95. Try a thinner round stump at the nails, or a grip outside the tube.
-- [ ] Rhino tubist: the left forearm comes 1.5 cm into the main branch of the tuba in the moves and
-      at rest (limit 1.5 cm), because the left elbow is low.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
 - [ ] Deer harpist: ask the user to confirm the length of the arms, the size of the harp, its lean
       back onto the right shoulder, the box under it, and the rebuilt arms.
