@@ -286,10 +286,9 @@ The rest of each family:
   points lie on the line of the swivel, so it does not move them. A shared hold lifts the
   shoulder bones of a round body, and keeps a free paw bent in the moves ("Free round arms in a
   shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm comes
-  from the arm root of the mesh, so the rig fixes it. A larger elbow turn up to the stop of
-  `turnPoleOut()`, a larger lift of the shoulder, an elbow out in the middle of the moves, and a
-  larger forward turn of the shoulder each took only a small part of the depth, and a larger turn
-  moves the grip line of the arm gate past its limit. The root domes of the pig shrink
+  from the arm root of the mesh, so the rig fixes it. A larger elbow turn or shoulder turn clears
+  only a small part of the depth, and it moves the grip line of the arm gate past its limit. The
+  root domes of the pig shrink
   toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
   the joint, and some of them come out of the shoulder in another pose.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
@@ -352,11 +351,10 @@ The rest of each family:
   the mouth, and the trumpet turns down with the head (`bowedPlay()`). Reason: a real player brings
   the instrument to the mouth, the neck flexion follows the downward angle of the instrument, and
   the trumpet keeps its angle to the face (winds 1.4, 2.1). A forward lean of the chest does not
-  help, because the head and the instrument move with the chest. The shared flute has no rule: a
-  bow put the left grip of the wolf and the beaver past the accepted grip, and neither a bow nor a
-  lift moved the left forearm of a heavy body out of its turned head (`TODO.md`). The bow does not
-  clear the snout clips of the trumpet, and the heaviest bodies still miss the valves at
-  `MAX_BOW`.
+  help, because the head and the instrument move with the chest. The shared flute has no rule,
+  because a bow puts the left grip of a slim body past the accepted grip. The bow does not clear
+  the snout clips of the trumpet, and the heaviest bodies still miss the valves at `MAX_BOW`
+  (`TODO.md`).
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
@@ -425,11 +423,8 @@ The rest of each family:
   the path of the grip of the hold (`RigPoints.restCarryPlace`), and the paw slides up the neck
   in the moves. A thinner wrist and the own holds keep their grip. Reason: a real player keeps the
   forearm free of the body of the instrument (strings 1.9), and at the grip of the hold, the thick
-  wrist end goes into the upper bout. With the violin hung from the new grip, the violin went into
-  the belly of the heavy bodies. The play keeps its grip. Reason: a move of the wrist down from the
-  back of the violin or toward the scroll, and a turn of the elbow, did not move the thick wrist
-  end out of the upper bout. A further tilt of the paw over the neck moved the violin into the
-  belly in the moves (`TODO.md`).
+  wrist end goes into the upper bout. The play keeps its grip, because no move of the wrist and no
+  turn of the elbow moves the thick wrist end out of the upper bout (`TODO.md`).
 - **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
   near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
@@ -583,9 +578,8 @@ The rest of each family:
 - The plan lets a paw play a narrow chord a few keys past its reach (`PLAN_REACH_SLACK`), at a
   cost for each key (`PLAN_REACH_COST`). Thus one paw plays a melody near the middle of the keys,
   and the two paws do not trade it note by note. Reason: in such a trade, the paw that came onto
-  the keys went up to 2.4 cm into the other paw (`bach-bwv1050`). A higher lift over the
-  other paw (`HAND_MOTION.over` up to 0.16 m) did not part the paws, because the paw that comes
-  lowers next to the paw that leaves, and it made the palms up to 5 times faster.
+  the keys went into the other paw. A higher lift over the other paw does not part the paws,
+  because the paw that comes lowers next to the paw that leaves.
 - A narrow chord that no paw reaches whole, also with the slack, can split as a wide chord does
   (`wideChordCut()`): the left paw plays its low keys and the right paw its high keys. The plan
   picks the split or the left paw by the cost. Thus the paw of a melody keeps its keys and plays
@@ -621,9 +615,7 @@ The rest of each family:
   other (`bach-bwv1050`).
 - A lifted paw that comes back to its keys after the next note also draws back from the
   fallboard (`HAND_MOTION.overBack`). Reason: it comes down next to the other paw while that paw
-  rises, so the two paws pass at the same height, and they touched there. A draw back of each paw
-  that makes way turned the forearms faster, and a draw back toward the fallboard did not part
-  the paws.
+  rises, so the two paws pass at the same height, and they touch there.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingering()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key
