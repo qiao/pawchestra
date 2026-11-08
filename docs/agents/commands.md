@@ -124,19 +124,19 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | Command | Action |
 |---|---|
 | `pnpm test` | Runs the Vitest project `unit` (design 9.3). During the pause, it runs no test. |
-| `pnpm test:paused [--base <ref>] [<path>]...` | Runs the paused tests, or only the file of each path. `--base <ref>` prints only the failures of the working tree. |
+| `pnpm test:paused [--base <ref>] [<path>]...` | Runs the paused tests, or only the file of each path. `--base` prints only the failures of the working tree. |
 | `pnpm test:perf` | Runs the speed tests (`*-speed.test.ts`) one file at a time. |
-| `pnpm test:e2e [--project=chromium]` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site. Set `PAWCHESTRA_E2E_PORT` to a free port (4182 by default). |
-| `pnpm e2e-base <ref> [--no-cache] [-- <args of playwright test>]` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. About 1.5 minutes. |
+| `pnpm test:e2e` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site, on the port `PAWCHESTRA_E2E_PORT` (4182 by default). |
+| `pnpm e2e-base <ref>` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. |
 | `pnpm smoke` | Runs the smoke test on the Vite dev server: the bow arm of a violin and the camera modes. |
-| `pnpm frame [--demo=<id>] [--free] [--gpu-only] [--keep=<dir>]` | Measures the frame target of design 9.7 in Google Chrome with a Metal System Trace. About 3 minutes. Code: `tools/measure-frame.ts`. |
-| `pnpm frozen [--base <ref>] [--shots <list>] [--out <dir>] [--canvas-only]` | Renders the four frozen shots. `--base` also renders the commit, and exits with 1 when a pixel changed. About 2 minutes. |
-| `pnpm cpu-profile [--demo <id>] [--seek <s>] [--callers <function>[:<line>]]` | Profiles the main thread during play, and prints the top functions for each frame. About 20 s. |
-| `pnpm frame-compare <ref\|patch>... [--runs <n>] [-- <flags of pnpm frame>]` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. About 5 minutes for each run of an item. |
-| `tools/check-commits.sh [--tip] [--no-cache] <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
-| `tools/measure-lock.sh run --owner <name> [--gate <load>] [--max <s>] -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
-| `tools/merge-branch.sh [--check-only] [--no-arm-check] <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs the arm gate, `pnpm build`, and `pnpm size`. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
-| `tools/base-tree.sh <ref> [<path>...]` | Extracts a commit into a temporary folder with a link to `node_modules`, and prints the folder, for a base run of a tool with no `--base`. |
+| `pnpm frame [--demo=<id>]` | Measures the frame target of design 9.7 in Google Chrome with a Metal System Trace (`tools/measure-frame.ts`). About 3 minutes. |
+| `pnpm frozen [--base <ref>]` | Renders the four frozen shots. `--base` also renders the commit, and exits with 1 when a pixel changed. |
+| `pnpm cpu-profile [--demo <id>]` | Profiles the main thread during play, and prints the top functions for each frame. |
+| `pnpm frame-compare <ref\|patch>...` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. |
+| `tools/check-commits.sh <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
+| `tools/measure-lock.sh run --owner <name> -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
+| `tools/merge-branch.sh <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs the arm gate, `pnpm build`, and `pnpm size`. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
+| `tools/base-tree.sh <ref>` | Extracts a commit into a temporary folder with a link to `node_modules`, for a base run of a tool with no `--base`. |
 | `tools/break-test.sh '<perl expr>' <file> <test files>...` | Applies one temporary break to a tracked file, and prints each test that fails. |
 
 ## CI
@@ -150,8 +150,8 @@ Each check compares the working tree with `main`. An equal result proves that th
 behavior.
 
 ```text
-comments or docs only        ->  body-probe --base main equal, dist/ of both builds equal
-dead code removal            ->  + size --base main, camera-probe --base main, smoke, frozen --base main
-asset or rig cleanup         ->  + rig-mesh <a> --check for each animal, studio-body output equal
-performance change           ->  + frame-compare main <patch>, camera-probe --base main, frozen --base main
+comments or docs only  ->  body-probe --base main equal, dist/ of both builds equal
+dead code removal      ->  + size, camera-probe, frozen (each --base main), smoke
+asset or rig cleanup   ->  + rig-mesh <a> --check for each animal, studio-body output equal
+performance change     ->  + frame-compare main <patch>, camera-probe, frozen (--base main)
 ```
