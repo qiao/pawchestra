@@ -97,11 +97,13 @@ export async function runSliced<T>(steps: Steps<T>, live: () => boolean): Promis
     } else if (step.value !== undefined) {
       // A failed load ends the steps, so that their `finally` blocks run, and the run fails.
       const stopped: Generator<unknown, T | null, undefined> = steps;
-      // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
-      await step.value.catch((error: unknown) => {
+      try {
+        // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
+        await step.value;
+      } catch (error) {
         stopped.return(null);
         throw error;
-      });
+      }
       start = performance.now();
     } else if (performance.now() - start >= SLICE_MS) {
       // oxlint-disable-next-line eslint/no-await-in-loop -- see the comment above.
