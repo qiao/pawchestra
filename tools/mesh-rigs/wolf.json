@@ -66,7 +66,7 @@
       0.775
     ]
   },
-  "proportionsNote": "The body below the neck takes 1.2 of the source width and 0.9 of its height, times the body factor 0.9422 on each axis. With keep, the head takes only the factor head (1.235), so that its size is the size of the head of the red fox. The blend zone is the narrow neck. tools/rig/wolf_shape_config.py, wolf_head_config.py, and wolf_size_config.py map the places.",
+  "proportionsNote": "The body below the neck takes 1.2 of the source width and 0.9 of its height, times the body factor 0.9422 on each axis. With keep, the head takes only the factor head (1.235), so that its size is the size of the head of the red fox. The blend zone is the narrow neck.",
   "app": {
     "shoulders": 0.973079,
     "reach": 0.4787,
