@@ -8,6 +8,7 @@ import type { Steps } from '../score/steps.ts';
 import type { Score, SectionSize } from '../score/types.ts';
 import { SHOT_SEED, prepareShotsSteps } from '../shots/prepare.ts';
 import type { ShotPlan } from '../shots/types.ts';
+import { castBodiesSteps } from './body-loads.ts';
 
 /**
  * The seed of the pose. A fixed seed gives each demo the same seeded offsets and idle motion on
@@ -26,12 +27,14 @@ export interface ScoreScene {
 
 /**
  * Calculates the layout, the pose plan, and the shot plan of a score in steps (design 7.2). The
- * layout, the plans, and the scene share one model cache.
+ * first step loads the studio bodies that the score casts. The layout, the plans, and the scene
+ * share one model cache.
  *
  * @param score The score.
  * @returns The steps, which return the layout, the player models, and the plans.
  */
 function* planSceneSteps(score: Score): Steps<ScoreScene> {
+  yield* castBodiesSteps(score);
   const models = new ModelCache();
   const layout = yield* layoutSceneSteps(score, models);
   const plan = yield* preparePosesSteps(score, layout, POSE_SEED, models);
