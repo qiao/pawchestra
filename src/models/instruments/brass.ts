@@ -711,9 +711,10 @@ function horn(): BrassBuild {
  * Builds the tuba, as a top-action piston tuba such as a Yamaha YFB-822
  * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the tuba has the
  * axes of the player: the body stands in front of the player, and the bell opens up at the left
- * of the head. A longer lead pipe moves the body back toward the player and to the left, and the
- * pipe goes down from the mouthpiece before it goes back to the valves, so that it passes under
- * the chin.
+ * of the head. A longer lead pipe moves the body back toward the player and to the left. The lead
+ * pipe starts at the end of the mouthpiece shank, in front of the lips, and goes down in front of
+ * the chin before it goes back to the valves. With its end behind the rim, the pipe went 2.6 cm
+ * into the chin of the rhino.
  *
  * The parts: the bell branch, the bottom bow, the valve branch, four piston valves with pearl
  * buttons, the valve slides at the right of the valves, and the main tuning slide over them.
@@ -782,11 +783,12 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       METAL,
     );
   }
-  // The lead pipe from the last valve over the main tuning slide to the mouthpiece.
+  // The lead pipe from the last valve over the main tuning slide to the end of the mouthpiece
+  // shank. Its bend stays 0.13 m in front of the rim, so that the pipe passes in front of the chin.
   tubeAlong(
     piece,
     rounded(
-      [at([0.1, 0.5, 0.045]), at([0.1, 0.65 - back / 4, 0.08 - back / 2]), [0, 0, 0.05]],
+      [at([0.1, 0.5, 0.045]), at([0.1, 0.65 - back / 4, 0.07 - back]), [0, 0, -0.09]],
       0.08,
       4,
     ),

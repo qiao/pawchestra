@@ -1441,7 +1441,8 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   the B♭ side, and the valve slides.
 - **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, the bottom
   bow joins it to the valves, four piston valves with pearl buttons, and four valve slides at the
-  right of the valves.
+  right of the valves. The lead pipe starts at the end of the mouthpiece shank and goes down in
+  front of the chin, so that no part of it goes into the face.
 
 The mouthpieces, the ferrules, the valve caps, and the levers are nickel silver, as on the real
 instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell
