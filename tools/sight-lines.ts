@@ -14,7 +14,7 @@
  * Usage: pnpm sight-lines [--demo <id>]... [--json <file>] [--all]
  *
  * With no `--all`, the tool prints only the blocked players ({@link isBlocked}) and the players
- * that the audience does not see ({@link BLOCKED}.audience). To probe a commit, run the tool in
+ * that the audience does not see ({@link isHidden}). To probe a commit, run the tool in
  * the folder of `tools/base-tree.sh <ref>`.
  */
 import { writeFile } from 'node:fs/promises';
@@ -465,6 +465,17 @@ export function isBlocked(sight: PlayerSight): boolean {
   return sight.head >= BLOCKED.head || sight.baton >= BLOCKED.baton;
 }
 
+/**
+ * Finds if the audience does not see a player: the items hide at least {@link BLOCKED}.audience
+ * of its head in the default view or in the Cinematic wide shots.
+ *
+ * @param view The view of the audience on the player.
+ * @returns True if the player is hidden.
+ */
+function isHidden(view: PlayerView): boolean {
+  return view.view >= BLOCKED.audience || view.wide >= BLOCKED.audience;
+}
+
 /** Gives a share as a percent with no decimals. */
 function percent(share: number): string {
   return `${(share * 100).toFixed(0)}%`;
@@ -488,8 +499,6 @@ export async function main(): Promise<void> {
     }
     const result = probeSight(id, built.score);
     results.push(result);
-    const isHidden = (v: PlayerView): boolean =>
-      v.view >= BLOCKED.audience || v.wide >= BLOCKED.audience;
     const blocked = result.sights
       .filter((s) => showAll || isBlocked(s))
       .toSorted((a, b) => b.head + b.baton - a.head - a.baton);
@@ -519,11 +528,7 @@ export async function main(): Promise<void> {
   }
   const players = results.reduce((n, r) => n + r.players, 0);
   const blocked = results.reduce((n, r) => n + r.sights.filter(isBlocked).length, 0);
-  const hidden = results.reduce(
-    (n, r) =>
-      n + r.views.filter((v) => v.view >= BLOCKED.audience || v.wide >= BLOCKED.audience).length,
-    0,
-  );
+  const hidden = results.reduce((n, r) => n + r.views.filter(isHidden).length, 0);
   console.log(
     `total: ${blocked} of ${players} players blocked from the conductor, ${hidden} hidden from the audience`,
   );
