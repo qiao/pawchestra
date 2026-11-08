@@ -974,6 +974,13 @@ export function kettleOf(pitch: number, kettles: number): number {
   return best;
 }
 
+/** The two hands of a pair of hand cymbals, and the crash point of the damp at the chest. */
+interface PlatePair {
+  readonly sides: readonly [PercussionSide, PercussionSide];
+  /** The crash point of the damp against the chest, or `null` with no damp. */
+  readonly chest: Vec3 | null;
+}
+
 /**
  * Gives the two hands of a pair of hand cymbals, and sets the crash target (design 5.3): the rims
  * meet at the crash point, along the crash normal of the tilt of `CRASH_MOTION`. It also gives the
@@ -994,7 +1001,7 @@ function pairOfPlates(
   right: ArmRig,
   inH: (v: Vec3) => Vector3,
   targets: Map<number, StrikeTarget>,
-): { readonly sides: readonly [PercussionSide, PercussionSide]; readonly chest: Vec3 | null } {
+): PlatePair {
   const middle = new Vector3(...left.bind.shoulder)
     .add(new Vector3(...right.bind.shoulder))
     .multiplyScalar(0.5);
