@@ -838,12 +838,9 @@ scene of each demo has its seats and stage size with no overlap.
       the thumb and the fingers at eye level (percussion-technique 10).
 - [ ] Snare and cymbal: at rest, the arms hang, so the tips stand 5 cm to 9 cm outside the rim
       (5.2). Ask the user if `ready` keeps the tips over the instrument at rest.
-- [ ] Xylophone: a scale stays in one paw, and one paw does not reach the outer bars. A real player
-      alternates the hands in a scale, with no cross (`alternateHands()`, percussion-technique 9).
-- [ ] Xylophone: where one paw passes the other in a run, the shafts show as an X from above. A real
-      player keeps a V (percussion-technique 9).
-- [ ] Xylophone: between strikes, the heads stand up to 13 cm high. A real player keeps the stroke 2
-      to 3 inches high. A lower head bent the wrist past the gate.
+- [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
+      paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
+      player alternates the hands over the two rows of bars (percussion-technique 9).
 - [ ] Xylophone: in a run up the test score, the right paw misses the two sharp bars in the middle
       of the back row by 8 mm to 26 mm, and rises to the height of the muzzle.
 - [ ] Xylophone: the mallets of 0.30 m look long beside the small bars. A shorter mallet moves the
@@ -859,6 +856,16 @@ scene of each demo has its seats and stage size with no overlap.
       upper arm of the mesh lies on the side of the body.
 - [ ] Elephant timpanist: a roll stays in one hand, and the outer kettles stand out of reach
       (`PercussionHold.pair`). Offer the user longer arms.
+- [ ] Elephant timpanist: no muffle, because the short arms hold the paw a few cm over the head
+      plane and outside the head (5.3). Higher kettles or longer arms let the paw reach the spot.
+- [ ] Bass drum muffle: the left palm stays about 1.5 cm off the left head, and the left arm folds
+      8 faces at p95 there (limit 8). Nearer to the head, it folds 9.
+- [ ] Hand cymbals: the plates stay parallel at the crash, with no angle of a flam between them
+      (percussion-technique 7). Only recast bodies play them.
+- [ ] Triangle: a louder note swings the right paw 35° on the forearm at p95 (base 19°).
+- [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player
+      holds it, strikes with the fingertips, the fingers, or the knuckles by the dynamic, and plays
+      a shake roll or a thumb roll (percussion-technique 8). The left paw holds the triangle.
 - [ ] Polar bear pianist: the claw tips almost touch when the paws play two octaves apart, because
       the paws point in along the forearms (`PAW_TURN`).
 - [ ] Conductor: start `docs/reference/conducting-technique.md` with sources: the beat patterns, the
