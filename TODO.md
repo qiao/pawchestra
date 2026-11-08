@@ -302,22 +302,18 @@ passes.
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
       (87°) to 70°.
-- [ ] Rabbit: at rest, a narrow groove runs between the front of each upper arm and the trunk. It is
-      the gap of the arm copy. Fill the gap in the copy.
-- [ ] Rabbit violinist: the round elbow patch drops the section of the right upper arm of `pnpm
-      arm-look` to 0.60. Find the cause, and keep the round elbow.
-- [ ] Rabbit violinist: a dark lower face of the bow elbow shows from az150 in the moves, and a thin
-      dark line under the forearm near the elbow from the front at the frog.
-- [ ] Rabbit violinist: a small dark sliver stays under the right elbow from the right side at the
-      frog.
+- [ ] Rabbit violinist: the right claws go 2.1 cm into the violin at the bow contact point (main
+      1.3 cm), because the long Tripo P2 paw closes under the stick. `pluckPlace` and `frogHair`
+      do not change it. Try a grip of the stick nearer to the fingertips for the rabbit.
+- [ ] Rabbit: the edge ring between the rings at 0.47 and 0.75 of each upper arm takes no new
+      ring, because 3 source triangles lie on the front of the arm there. Make them quads by a
+      point edit of the FBX mesh, then split the ring (design 4.4, "Simple route").
+- [ ] Rabbit: from the back, a dark band shows at the thin neck of the Tripo P2 mesh, and the tail
+      ball sits low on the front edge of the seat. Check both with the user.
+- [ ] Polar bear: its packed mesh is 47,672 B after gzip, over `STUDIO_MESH_GZIP_BUDGET` (34,000 B,
+      `src/models/studio-size.test.ts`). Give it its own budget with a reason, or reduce the mesh.
 - [ ] Rabbit with the neutral bind: in the cast matrix, the flute recast folds 9 faces of the right
       arm in the play (limit 8), and the cello recast 8. The snare drum recast passes now.
-- [ ] Rabbit: under the raised bow arm, a shallow hollow with a small sharp tip stays in the right
-      armpit. A smoother hollow needs more vertices in the notch.
-- [ ] Rabbit: the narrow axis of each upper arm keeps 0.62 to 0.81 of the bind, so the shoulders
-      look flatter than the source from the back. Try a bind arm nearer to the play.
-- [ ] Rabbit: a flap face with two open edges (3.1 cm) stays under the right armpit. No frame shows
-      it.
 - [ ] Rabbit violinist: the bow goes up to 2.5 cm into the arms in the lowering and 1.0 cm at rest,
       near the grip.
 - [ ] Rabbit violinist: the violin points 50° to the left, 5° more than a real player. A bow arm
@@ -802,8 +798,7 @@ scene of each demo has its seats and stage size with no overlap.
       false stretch (the hippo `FAIL`, the elephant, the snare). Count from the bind.
 - [ ] Seam gate: no measure of the skin separates the flaps, the shards, and the dents at the arm
       seam, so `pnpm arm-check` does not see them. Try a render measure of the audit cells.
-- [ ] Arm root dents, such as the V crease at the front of the rabbit right arm root: the bend from
-      the source arm to the bind arm makes them. Try `studio.bindArms` nearer to the source.
+- [ ] Arm root dents: the bend from the source arm to the bind arm makes them. Try `studio.bindArms` nearer to the source.
 - [ ] Rabbit: gate the branch `rabbit-depth` (`b1e270f02`, the bow grip further out in the lift and
       the lowering), then merge or remove it.
 - [ ] Rabbit soloist: the violin goes 2.3 cm into the body in the lift and the lowering. Check the
