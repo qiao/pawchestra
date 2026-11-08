@@ -296,8 +296,6 @@ Design 4.4 gives the merges of each copy.
 - A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
   bones. A tip bone far off the curl of the mesh pinches the bend (`weights.tail.bend`). A tail
   root can set the seat top: fix it (`sit.top`, `sit.root`).
-- A body with no chair keeps its center of mass over its soles: feet under the hips, and the trunk
-  leaned forward.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there
   in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps the ledge.
 
