@@ -19,8 +19,10 @@ src/models/studio/rabbit.ts               studio body of the app
 
 This is the body that production shows. `docs/agents/rigging.md` gives the steps of the chain.
 
-On the branch `rabbit-simple-rig`, the app shows the trial of the simple route in its place
-("simple/" below), and `ANIMALS` of `tools/studio-body.ts` reads `simple/rabbit.rig.glb`.
+On the branch `rabbit-simple-rig`, the app shows the simple route on the Tripo P2 mesh in its
+place ("tripo-p2/" below), and `ANIMALS` of `tools/studio-body.ts` reads
+`tripo-p2/rabbit.rig.glb`. The two trials of the simple route on the T-pose mesh lie in
+`simple/`.
 
 The folder also holds the files of trials that the app does not use ("Trial files" below): the
 hand rig of 2026-11-04 and 2026-11-05 from a Tripo mesh (`hand-rig/`, `tripo/`), and the T-pose
@@ -45,6 +47,8 @@ The trial files, which the app does not use:
 |---|---|---|
 | `rabbit-tpose.glb` | T-pose source mesh (below) | None |
 | `tripo-p2/rabbit.glb` | The Tripo P2 source mesh with its base color texture (below) | None |
+| `tripo-p2/rabbit.blend` | Output of the simple rig of `tripo-p2/rabbit.glb`. License as the source | `simple_rig.py` with `tools/mesh-rigs/simple/rabbit-tripo.json` (below) |
+| `tripo-p2/rabbit.rig.glb`, `tripo-p2/rabbit.rig.json` | Export of `tripo-p2/rabbit.blend`, and its text summary. License as the source | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-p2/rabbit.blend --out assets/models/rabbit/tripo-p2/rabbit.rig.glb` |
 | `tripo/rabbit.fbx`, `tripo/rabbit.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
 | `hand-rig/rabbit.blend` | Made by hand in Blender from `tripo/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `hand-rig/rabbit.rig.glb` | Export of `hand-rig/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/hand-rig/rabbit.blend --out assets/models/rabbit/hand-rig/rabbit.rig.glb` |
@@ -189,6 +193,48 @@ units high, and it faces -Y.
 ```bash
 shasum -a 256 assets/models/rabbit/tripo-p2/rabbit.glb
 ```
+
+### tripo-p2/ rig
+
+The simple route of "simple/" on `tripo-p2/rabbit.glb` (2026-11-07): weld, plain mesh steps,
+bone heat, a weight smooth. No cut of the outline, no cap, no remesh, no rebuild, and no point
+edit.
+
+```text
+tripo-p2/rabbit.glb + tools/mesh-rigs/simple/rabbit-tripo.json
+   │  blender -b --factory-startup --python tools/blender/simple_rig.py --
+   │      tools/mesh-rigs/simple/rabbit-tripo.json --out assets/models/rabbit/tripo-p2/rabbit.blend
+   v
+tripo-p2/rabbit.blend
+   │  pnpm rig-export rabbit --blend assets/models/rabbit/tripo-p2/rabbit.blend
+   │      --out assets/models/rabbit/tripo-p2/rabbit.rig.glb
+   v
+tripo-p2/rabbit.rig.glb + tripo-p2/rabbit.rig.json
+```
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-p2/rabbit.blend` | 357,906 bytes | `1b269ddb5760498ae13f9931ba9569cc71723b332b03074357ece1918d4469fe` |
+| `tripo-p2/rabbit.rig.glb` | 760,288 bytes | `3e9a449399387968f2183f09b680b687688e65d1cd8facbccaa0a9e2b1ad7378` |
+
+- **Mesh.** The source with each pair of triangles of a source quad joined again (`joinQuads`:
+  2,584 joins, of them about 159 pairs of source triangles), flat faces, and the face colors of
+  `add_surface()` with no tone move.
+- **Limbs.** Each upper arm and forearm 1.14 times as long (`limbs.arm`), for the violin reach of
+  the rabbit of main. The shin band 0.85 times and the thigh band 0.739 times as high
+  (`limbs.leg`), so that the thigh and the seat height are those of main: the source legs are
+  longer than the legs of main at the scale of H.
+- **Joint rings.** One plane cut at each elbow, at +0.3 radii (`rings`), for the 3 elbow rings
+  of design 4.4. The wrists and the knees have their rings in the source. 2 cuts add 44
+  triangles (5,442 in all). The arm rings keep 11 or 12 vertices.
+- **Weights.** Bone heat on each deform bone, 3 smooth passes, the 4 largest weights, and a sum
+  of 1. The eyeballs, the whiskers, and the nose take the head bone alone.
+- **Bind.** The leg turns and the trunk of trial 2, straight arms, and the bind supination of
+  `pnpm bind-supination rabbit` (L 100, R 50).
+- **Facts.** `height` from the shoulder joints at 1.6833 m for each unit (H 0.2985 m, as on the
+  rabbit of main), `crease` 35, `backRoom` 0.04. The seat top is 0.260 m (main 0.262 m).
+
+A run gives the same `rabbit.rig.glb`. The `.blend` differs from run to run.
 
 ### rabbit-tpose.glb
 
