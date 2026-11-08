@@ -45,24 +45,22 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 
 | Command | Action |
 |---|---|
-| `pnpm screenshots <dir> [--sheet] [--play] [--ui] [--drawer] [--load] [--shots]` | Writes the review screenshots of design 9.8: each demo at 1440 × 900 and 390 × 844, the gallery, and the animal views. |
-| `pnpm share-image [--out <file>]` | Writes `public/share.jpg` (design 7.4) from `SHARE_CAMERA`. Run it after a change of the look. About 15 s. |
-| `node tools/wordmark.ts [--write]` | Makes the wordmark of the logo from `APP_NAME` with HarfBuzz (design 2.8). `--write` puts it into `src/ui/icons.ts` and `index.html`. Needs `hb-view`. About 1 s. |
+| `pnpm screenshots <dir> [--sheet] [--play] [--ui]` | Writes the review screenshots of design 9.8: each demo at 1440 × 900 and 390 × 844, the gallery, and the animal views. |
+| `pnpm share-image` | Writes `public/share.jpg` (design 7.4) from `SHARE_CAMERA`. Run it after a change of the look. |
+| `node tools/wordmark.ts [--write]` | Makes the wordmark of the logo from `APP_NAME` with HarfBuzz (design 2.8). `--write` puts it into `src/ui/icons.ts` and `index.html`. Needs `hb-view`. |
 | `pnpm snapshot` | Saves the play frame of the default demo and a close view of each gallery model into `scratch/snapshots/<date>-<hash>/`. |
-| `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). A matte of `tools/sheet-mattes/` adds the silhouette IoU of each view. |
+| `pnpm sheet-check <sheet> <dir>` | Compares a sheet page of `views.html` with its sheet in `docs/reference/` (design 7.1). |
 | `pnpm choir-check <dir>` | Puts the gallery penguin beside a penguin of each of the two newest reference images. |
-| `pnpm close-views <role> <dir> [--moments <list>] [--views <list>] [--lineup] [--base <ref>] [--set <changes>]...` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. `--lineup` puts the base, the tree, and each `--with` role in a row. Only this mode takes `--glb`, `--scale` stops at 3, and `--aim` needs a role with a line camera, such as the conductor. 25 s to 45 s. |
-| `pnpm close-views <mode> <dir> ...` | The other modes: `lineup <species,...>`, `species <species,...>`, `batch` (the image set of a round, 90 s to 260 s), and `play`. `play` renders a demo at chosen times from a chosen camera or seat. |
-| `pnpm close-views audit <dir> [--roles <role,...>] [--base <ref>]` | The audit sheet of the seams: 2x crops of the arms and the upper trunk in each moment of each role, the commit above the tree. All roles: about 27 minutes. |
-| `pnpm clip-views <dir> --clip <file>[:<animation>] [--species <list>] [--aim pawL\|pawR]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), with the depth of each arm part in the body. About 40 s. |
-| `pnpm look-lab <dir> [--url <url>]`, `pnpm look-variants <file> --out <dir>` | Measure frames of `close-views play` against `orchestra-latest.png`: one tree, or each variant. 40 s each. |
+| `pnpm close-views <role> <dir> [--lineup] [--base <ref>] [--set <changes>]...`, or `<mode> <dir>` | Writes the moments and the views of `ROLE_VIEWS` of a role, and a grid. Only the role mode takes `--glb`. The other modes are `lineup`, `species`, `batch` (the image set of a round), and `play` (a demo at chosen times from a chosen camera or seat). The mode `audit` gives 2x crops of the seams of the arms and the upper trunk in each moment, the commit above the tree. |
+| `pnpm clip-views <dir> --clip <file>[:<animation>]` | Shows a clip of `scratch/clips/<file>.glb` on each species from the four sides (design 4.4), with the depth of each arm part in the body. |
+| `pnpm look-lab <dir>`, `pnpm look-variants <file> --out <dir>` | Measure frames of `close-views play` against `orchestra-latest.png`: one tree, or each variant. |
 | `pnpm keyboard` | Checks each control with the keyboard alone at 1440 × 900 and 390 × 844. |
 
 ## Sound
 
 | Command | Action |
 |---|---|
-| `pnpm loudness [--mix <name>] [--demo <id>]... [--fit [--write]] [--check] [--wav <dir>]` | Measures the loudness of each demo at the output of the app (design 6.8). `--fit --write` writes `DEMO_LOUDNESS`, and `--check` fails a demo off `TARGET_LOUDNESS`. About 25 s for each demo. |
+| `pnpm loudness [--demo <id>]... [--fit [--write]] [--check]` | Measures the loudness of each demo at the output of the app (design 6.8). `--fit --write` writes `DEMO_LOUDNESS`, and `--check` fails a demo off `TARGET_LOUDNESS`. |
 
 ## Pose and body probes
 
