@@ -174,6 +174,11 @@ module task ─> probe of WebGL2 ─> renderer ─> app and fetch ─> slices of
   capture render in steps, with a fence wait at the end of each, because an upload waits on the
   main thread while the GPU is busy. One draw of each player geometry on a warm layer uploads its
   buffers and builds its morph texture. The first frame thus compiles and uploads nothing new.
+- **Stopped build.** A build writes the pool and the rim lights of its layout into the shared
+  uniforms, because its capture renders with them. A stopped build calls
+  `StageScene.cancelBuild()`, which frees its scene, its targets, and its camera, and writes the
+  lights of the shown layout again. The orbit controls of a new camera connect to the canvas only
+  in `show()`, so a drag during a build moves only the shown camera.
 - **Restore.** A restored WebGL context makes the environment, the bake, and the capture again
   (`StageScene.restoreSteps()`), in slices after the build before it. WebGL changes the status of
   a fence or of a parallel compile only between two tasks. Thus `runAll()` cannot run a step that
