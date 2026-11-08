@@ -1720,12 +1720,7 @@ function* spreadRowsSteps(
 ): Steps<FittedRow[]> {
   const done: FittedRow[] = [];
   for (const [n, row] of rows.entries()) {
-    const behind = rows.slice(n + 1);
-    const clearance: RowClearance = {
-      placed: [...fixed, ...done.flatMap(rowObstacles), ...behind.flatMap(rowObstacles)],
-      pianosInFront: [...soloPianos, ...done.flatMap((r) => pianosOfRow(r.placement))],
-      playersBehind: behind.flatMap((r) => r.placement.players.map((p) => p.obstacle)),
-    };
+    const clearance = clearanceOf(fixed, soloPianos, done, rows.slice(n + 1));
     const left = yield* spreadSideSteps(row, -1, clearance, stage);
     let next = yield* spreadSideSteps(left, 1, clearance, stage);
     const front = done.find((r) => r.row === 0);
@@ -1747,6 +1742,28 @@ function* spreadRowsSteps(
 function rowObstacles(row: FittedRow): Obstacle[] {
   const own = obstaclesOfRow(row.placement);
   return row.reserve ? [...own, rowRiserObstacle(row.reserve, CENTER)] : own;
+}
+
+/**
+ * Gives the items that a row keeps clear of, with the rows in front and behind it.
+ *
+ * @param fixed The obstacles that do not move.
+ * @param soloPianos The obstacles of the piano soloists, which are also in `fixed`.
+ * @param front The rows in front of the row.
+ * @param behind The rows behind the row.
+ * @returns The clearance of the row.
+ */
+function clearanceOf(
+  fixed: readonly Obstacle[],
+  soloPianos: readonly Obstacle[],
+  front: readonly FittedRow[],
+  behind: readonly FittedRow[],
+): RowClearance {
+  return {
+    placed: [...fixed, ...front.flatMap(rowObstacles), ...behind.flatMap(rowObstacles)],
+    pianosInFront: [...soloPianos, ...front.flatMap((r) => pianosOfRow(r.placement))],
+    playersBehind: behind.flatMap((r) => r.placement.players.map((p) => p.obstacle)),
+  };
 }
 
 /**
@@ -2052,6 +2069,24 @@ interface SeenRow {
 }
 
 /**
+ * Gives the items that can hide the conductor from a player behind the rows.
+ *
+ * @param soloists The obstacles of the soloists.
+ * @param rows The rows in front of the player, after the sight pass.
+ * @returns The players, the risers, and the stands of the rows, with the soloists.
+ */
+function blockersOf(soloists: readonly Obstacle[], rows: readonly SeenRow[]): SightBlockers {
+  return {
+    solid: [
+      ...soloists,
+      ...rows.flatMap((r) => r.row.placement.players.map((p) => p.obstacle)),
+      ...rows.flatMap((r) => r.risers.map((riser) => rowRiserObstacle(riser, CENTER))),
+    ],
+    stands: rows.flatMap((r) => r.row.placement.stands.map((p) => p.obstacle)),
+  };
+}
+
+/**
  * Splits the players of a row into its seat groups: the runs of neighbors of one seat. Each seat
  * group stands on its own riser, as the modular risers of a real orchestra.
  *
@@ -2261,23 +2296,13 @@ function* sightRowsSteps(
     const behind = rows.slice(n + 1);
     const placedRows = done.map((d) => d.row.placement);
     const doneRisers = done.flatMap((d) => d.risers.map((r) => rowRiserObstacle(r, CENTER)));
-    const clearance: RowClearance = {
-      placed: [
-        ...fixed,
-        ...done.flatMap((d) => rowObstacles(d.row)),
-        ...behind.flatMap(rowObstacles),
-      ],
-      pianosInFront: [...soloPianos, ...placedRows.flatMap(pianosOfRow)],
-      playersBehind: behind.flatMap((r) => r.placement.players.map((p) => p.obstacle)),
-    };
-    const blockers: SightBlockers = {
-      solid: [
-        ...soloists,
-        ...placedRows.flatMap((r) => r.players.map((p) => p.obstacle)),
-        ...doneRisers,
-      ],
-      stands: placedRows.flatMap((r) => r.stands.map((p) => p.obstacle)),
-    };
+    const clearance = clearanceOf(
+      fixed,
+      soloPianos,
+      done.map((d) => d.row),
+      behind,
+    );
+    const blockers = blockersOf(soloists, done);
     const arcs = row.members.map((m, i) => {
       const right = row.members[i + 1];
       return right ? runAll(spacingSteps(m, right, row.radius)) / row.radius : 0;
@@ -2441,14 +2466,7 @@ function choirLift(
   soloists: readonly Obstacle[],
   targets: SightTargets,
 ): number {
-  const blockers: SightBlockers = {
-    solid: [
-      ...soloists,
-      ...rows.flatMap((r) => r.row.placement.players.map((p) => p.obstacle)),
-      ...rows.flatMap((r) => r.risers.map((riser) => rowRiserObstacle(riser, CENTER))),
-    ],
-    stands: rows.flatMap((r) => r.row.placement.stands.map((p) => p.obstacle)),
-  };
+  const blockers = blockersOf(soloists, rows);
   let best = { lift: 0, blocked: Infinity };
   for (let k = 0; k * ROW_RISER.step <= CHOIR_LIFT + 1e-9; k++) {
     const lift = Math.round(k * ROW_RISER.step * 1000) / 1000;
@@ -2595,11 +2613,12 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
     if (row.length === 0) {
       continue;
     }
-    const fit = yield* fitRowSteps(row, n, radius + ROW_STEP, {
-      placed: [...fixed, ...rows.flatMap(rowObstacles)],
-      pianosInFront: [...soloPianos, ...rows.flatMap((r) => pianosOfRow(r.placement))],
-      playersBehind: [],
-    });
+    const fit = yield* fitRowSteps(
+      row,
+      n,
+      radius + ROW_STEP,
+      clearanceOf(fixed, soloPianos, rows, []),
+    );
     radius = fit.radius;
     rows.push(fit);
   }
