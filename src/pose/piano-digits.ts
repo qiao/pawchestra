@@ -12,7 +12,7 @@ const DIGIT_COUNT = 5;
  * bend turns a claw around the curl axis of its paw, after the curl of the fingers: + down toward
  * the key, - up. The claw is short (about 3 cm in the app), so the angles stay moderate.
  */
-export const DIGIT_MOTION = {
+const DIGIT_MOTION = {
   /** The bend of a claw on a key at the key bed. */
   press: 20 * MathUtils.DEG2RAD,
   /**

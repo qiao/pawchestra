@@ -373,7 +373,7 @@ export interface BowedHold {
  * girth counts as a share of the length of the fingerboard, so that a smaller instrument of the
  * size rule (design 4.6) counts as a thicker wrist.
  */
-export interface WristFit {
+interface WristFit {
   /**
    * The girth of the wrist end of the left forearm of the body that the hold fits
    * (`wristGirth()`), as a share of the length of the fingerboard. A wrist with this share or

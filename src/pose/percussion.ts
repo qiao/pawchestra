@@ -56,7 +56,7 @@ interface PercussionTracks {
  * goes back to the set position one beat after the end of a passage, and to the playing position
  * two beats before an entrance (`docs/reference/percussion-technique.md` 6).
  */
-export const SET_MOTION = {
+const SET_MOTION = {
   /** A rest between two strikes of at least this length takes the set position. */
   restBeats: 6,
   /** The sticks go down to the set position in this time after the last strike. */
@@ -84,7 +84,7 @@ export const SET_MOTION = {
  * @returns Four times for each rest: the start and the end of the lowering, and the start and the
  *   end of the lift. A rest with no lowering or no lift has infinite times there.
  */
-export function setRests(
+function setRests(
   starts: readonly number[],
   beats: Float64Array,
   after: readonly number[] = [],

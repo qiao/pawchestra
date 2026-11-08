@@ -8,7 +8,7 @@ import { smoothstep } from './rest.ts';
  * The times of the pedal moves of a harpist, in seconds (design 5.3,
  * `docs/reference/harp-technique.md` section 7.7). No source gives the times of one move.
  */
-export const PEDAL_MOTION = {
+const PEDAL_MOTION = {
   /** The time in which the foot moves a pedal into its new notch. */
   pressSec: 0.15,
   /** The time in which the foot goes from its rest to the pedal. */
@@ -30,7 +30,7 @@ export const PEDAL_MOTION = {
 } as const;
 
 /** The foot of each pedal: the left foot moves D, C, and B, and the right foot E, F, G, and A. */
-export const PEDAL_FEET: Readonly<Record<HarpPedal, 'L' | 'R'>> = {
+const PEDAL_FEET: Readonly<Record<HarpPedal, 'L' | 'R'>> = {
   D: 'L',
   C: 'L',
   B: 'L',
@@ -47,7 +47,7 @@ const STRING_NAMES: readonly HarpPedal[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const BLACK_KEYS = new Set([1, 3, 6, 8, 10]);
 
 /** The pedal and the notch that a note needs. */
-export interface PedalNeed {
+interface PedalNeed {
   /** The index of the pedal in `HARP_PEDALS.order`. */
   readonly pedal: number;
   /** The notch: 0 for natural and 1 for sharp. */
@@ -62,7 +62,7 @@ export interface PedalNeed {
  * @returns The index of the pedal in `HARP_PEDALS.order`, and the notch: 0 for natural and 1 for
  *   sharp.
  */
-export function pedalOf(key: number): PedalNeed {
+function pedalOf(key: number): PedalNeed {
   const name = STRING_NAMES[harpString(key) % 7] ?? 'C';
   const pedal = HARP_PEDALS.order.indexOf(name);
   return { pedal, notch: BLACK_KEYS.has(((Math.round(key) % 12) + 12) % 12) ? 1 : 0 };
@@ -193,7 +193,7 @@ export function pedalNotchesAt(plan: PedalPlan, time: number, out: Float32Array)
 }
 
 /** The motion of one foot of a harpist at one time. */
-export interface FootState {
+interface FootState {
   /**
    * The pedal under the foot, as an index of `HARP_PEDALS.order`, or -1 for a foot at rest. In a
    * move from one pedal to another, the pedal of the next change.

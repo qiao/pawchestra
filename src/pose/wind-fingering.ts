@@ -11,7 +11,7 @@ export type Brass = InstrumentOf<'brass'>;
  * side of a double horn, a tube of about 3.7 m, so its written C4 is the fourth partial
  * (`docs/reference/wind-technique.md` 2.2).
  */
-export const BRASS_FUNDAMENTALS = { horn: 29, trumpet: 46, trombone: 34, tuba: 22 } as const;
+const BRASS_FUNDAMENTALS = { horn: 29, trumpet: 46, trombone: 34, tuba: 22 } as const;
 
 /**
  * The partials of the trumpet, the trombone, and the tuba, in semitones above the fundamental:
@@ -175,7 +175,7 @@ interface ValveCombination {
 }
 
 /** The fingering of one note of a wind player. */
-export interface WindFingering {
+interface WindFingering {
   /** The share of the main fingers of the left paw that close, from 0 to 1, or -1 to only hold. */
   readonly left: number;
   /** The share of the main fingers of the right paw that close, from 0 to 1, or -1 to only hold. */
@@ -317,7 +317,7 @@ export function slidePositions(key: number): number[] {
  * that saves at least `saving` positions of slide travel from the position before. Trombonists
  * use alternates to move the slide less in fast passages.
  */
-export const SLIDE_ALTERNATE = { fastSec: 0.3, saving: 2 } as const;
+const SLIDE_ALTERNATE = { fastSec: 0.3, saving: 2 } as const;
 
 /**
  * Gives the trombone position of each note: the lowest position, or an alternate of a fast note

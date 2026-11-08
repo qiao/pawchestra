@@ -8,7 +8,7 @@ import { toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 
 /** The place of a cello from the body, as the move and the turn of a hold (`BowedHold`). */
-export interface CelloPlace {
+interface CelloPlace {
   /** The move of the cello from its bind place, in head heights. */
   readonly playShift: Vec3;
   /** The turn of the cello around its end pin, from its bind place. */

@@ -114,7 +114,7 @@ export interface HandReach {
 }
 
 /** The reach of two hands that cross over to each key: all MIDI keys. */
-export const NO_REACH_LIMIT: HandReach = { leftHighest: 127, rightLowest: 0 };
+const NO_REACH_LIMIT: HandReach = { leftHighest: 127, rightLowest: 0 };
 
 /** How a hand plays: a piano hand strikes the keys, and a harp hand plucks the strings. */
 export type HandAction = 'strike' | 'pluck';
@@ -623,7 +623,7 @@ export interface HandTrack {
 }
 
 /** The wrist kicks of the notes of a piano hand (design 5.3). */
-export interface WristKicks {
+interface WristKicks {
   /** The drop of the wrist at each note, in radians: 0 for a note with no kick. */
   readonly drops: Float64Array;
   /** The release of each note: its end, at the latest at the start of the next note. */

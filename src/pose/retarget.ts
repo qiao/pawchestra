@@ -85,7 +85,7 @@ const SOLE_BONES = [
 const FINGERS = ['Index', 'Middle', 'Ring', 'Pinky'] as const;
 
 /** One point of a sole of the player in the bind pose. */
-export interface SolePoint {
+interface SolePoint {
   /** The foot bone, as an index in `BONE_NAMES`. */
   readonly bone: number;
   /** The point, in the model axes. */
@@ -96,7 +96,7 @@ export interface SolePoint {
  * The body that a clip plays on: the skeleton of the player, its size, its soles, its rest arms,
  * and the parts that its arms keep clear of ({@link clipTarget}).
  */
-export interface ClipTarget {
+interface ClipTarget {
   /** The skeleton of the player in its bind pose (design 4.7). */
   readonly skeleton: Skeleton;
   /** The head height `H` of the body, in meters. */

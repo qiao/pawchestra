@@ -10,7 +10,7 @@ export const HARP_STRING_COUNT = HARP.strings;
  * section 5). A pluck releases the string at once, so the swing starts at its full size at the
  * note start. Then it decays, and a damp at the note end stops it.
  */
-export const STRING_MOTION = {
+const STRING_MOTION = {
   /**
    * The time constant of the decay of the swing of a free string, for the bass string C1 and for
    * the treble string G7, in seconds. The strings between take the geometric mean by their place.

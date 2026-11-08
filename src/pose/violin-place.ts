@@ -35,7 +35,7 @@ export interface ChinFit {
 }
 
 /** The place of a violin or a viola from the body ({@link fitViolinPlace}). */
-export interface ViolinPlace {
+interface ViolinPlace {
   /** The move of the tail end from its bind place, in head heights, in the axes of the chest. */
   readonly playShift: Vec3;
   /** The turn of the head down while the player plays, in radians (`BowedHold.headDrop`). */
@@ -83,7 +83,7 @@ const JAW_RADIUS = 0.1;
  * @param shoulder The left shoulder joint.
  * @returns The z of the front. The player faces -z.
  */
-export function chestFront(model: PlayerModel, shoulder: Vector3): number {
+function chestFront(model: PlayerModel, shoulder: Vector3): number {
   const { positions, bones } = model.mesh;
   const band = CHEST_BAND * model.body.headHeight;
   let front = shoulder.z;

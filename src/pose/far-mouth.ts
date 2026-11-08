@@ -30,7 +30,7 @@ const joint = new Vector3();
  * @param model The player model.
  * @returns The share: 0 or more.
  */
-export function mouthShare(model: PlayerModel): number {
+function mouthShare(model: PlayerModel): number {
   mouth.fromArray(model.body.mouth);
   let sum = 0;
   for (const side of ['L', 'R'] as const) {

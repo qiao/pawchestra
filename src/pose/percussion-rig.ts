@@ -241,7 +241,7 @@ interface PercussionHold {
  * drum only goes up and forward from its bind place, so a body that it fits keeps that place.
  * The values fit the accepted badger: it keeps its place.
  */
-export interface DrumFit {
+interface DrumFit {
   /** The least drop of the head below the elbows of the hanging upper arms, in head heights. */
   readonly drop: number;
   /**

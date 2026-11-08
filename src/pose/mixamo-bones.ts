@@ -85,7 +85,7 @@ export const MIXAMO_BONES = {
 } as const satisfies Readonly<Record<string, BoneName | null>>;
 
 /** The name of a bone of a Mixamo skeleton, with no prefix. */
-export type MixamoBone = keyof typeof MIXAMO_BONES;
+type MixamoBone = keyof typeof MIXAMO_BONES;
 
 /**
  * Tells whether a name is the name of a Mixamo bone.

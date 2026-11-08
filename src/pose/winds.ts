@@ -208,7 +208,7 @@ export interface WindHold {
 }
 
 /** The side of a paw that faces its tube (`WindHold.faceTube`). */
-export type TubeFace = 'palm' | 'back' | 'none';
+type TubeFace = 'palm' | 'back' | 'none';
 
 /** The left paw of a wind hold that leaves its grip in the rest pose (`WindHold.restFreeL`). */
 export interface FreePaw extends LapHand {

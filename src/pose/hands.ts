@@ -548,7 +548,7 @@ function fingeredPalmX(
  * The turns of the wrist of a piano paw (design 5.3). The paw already turns up to about 40° on its
  * forearm in the play, so each turn stays small, and the wrist does not twist.
  */
-export const FINGER_MOTION = {
+const FINGER_MOTION = {
   /**
    * The roll of a paw at a thumb pass under the hand (+) or a finger over the thumb (-), in radians,
    * as the wrist of a pianist turns a little toward the thumb in the pass

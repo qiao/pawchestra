@@ -320,7 +320,7 @@ export interface PawMeets {
 }
 
 /** The share and the wanted distance of a paw from the middle plane of the chest, for one side. */
-export interface PawMeet {
+interface PawMeet {
   /** The share of the rule, from {@link meetShare}. */
   share: number;
   /** The wanted signed distance of the wrist from the middle plane, in meters, along +x of the chest. */
