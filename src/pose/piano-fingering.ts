@@ -1,9 +1,8 @@
 import { PIANO, PIANO_SCALE, isBlack, pianoKeyPosition } from '../models/instruments/piano.ts';
-import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 
 /** The keys and the times of one note of one hand that the fingering plan reads (design 5.3). */
-export interface FingeringNote {
+interface FingeringNote {
   /** The start of the note, in song seconds. */
   readonly start: number;
   /** The latest end of the keys of the note, in song seconds. */
@@ -19,7 +18,7 @@ export interface FingeringNote {
 }
 
 /** The size and the claws of the paw that plays the fingering (design 5.3). */
-export interface PianoPaw {
+interface PianoPaw {
   /** The size of the hand, as a part of a human hand: the spans of the table scale with it. */
   readonly spanScale: number;
   /** The distance between the tips of two claws in a row, in white keys. */
@@ -70,7 +69,7 @@ export interface PianoFingering {
  * The points of the cost of a fingering (design 5.3): the 12 rules of Parncutt et al., with the
  * points of `docs/reference/piano-technique.md` section 9.2, and the rules of a real score.
  */
-export const PIANO_FINGERING_COSTS = {
+const PIANO_FINGERING_COSTS = {
   /** Rule 1: the points for each semitone past MaxComf or below MinComf. */
   stretch: 2,
   /** Rules 2 and 3: the points for each semitone past the relaxed span, for a pair with the thumb. */
@@ -137,9 +136,6 @@ export const PIANO_FINGERING_COSTS = {
   /** After such a rest, rules 4 and 5 cost this part of their points. */
   freeShare: 0.3,
 } as const;
-
-/** The weights of the cost of a fingering ({@link PIANO_FINGERING_COSTS}). */
-export type PianoFingeringCosts = { readonly [K in keyof typeof PIANO_FINGERING_COSTS]: number };
 
 /**
  * The finger spans of the right hand in semitones, from Parncutt et al. table 1 (design 5.3), for
@@ -262,39 +258,19 @@ function choicesOf(keys: Int32Array, black: Uint8Array): readonly Uint8Array[] {
  * Plans the fingering of the notes of one piano hand (design 5.3): the fingering of the lowest
  * cost by the rules of {@link PIANO_FINGERING_COSTS}. A second-order dynamic program keeps a node
  * for each pair of finger choices of two notes in a row, so the rules of three notes are exact.
- * The left hand mirrors the right hand.
+ * The left hand mirrors the right hand. The plan runs in steps (design 7.2).
  *
  * @param notes The notes of the hand, sorted by start.
  * @param side The hand: `L` or `R`.
  * @param paw The size and the claws of the paw.
- * @param costs The points of the rules.
- * @returns The fingering.
- */
-export function planFingering(
-  notes: readonly FingeringNote[],
-  side: 'L' | 'R',
-  paw: PianoPaw,
-  costs: PianoFingeringCosts = PIANO_FINGERING_COSTS,
-): PianoFingering {
-  return runAll(planFingeringSteps(notes, side, paw, costs));
-}
-
-/**
- * Plans the fingering of one piano hand as {@link planFingering} does, in steps (design 7.2).
- *
- * @param notes The notes of the hand, sorted by start.
- * @param side The hand: `L` or `R`.
- * @param paw The size and the claws of the paw.
- * @param costs The points of the rules.
  * @returns The steps, which return the fingering.
  */
 export function* planFingeringSteps(
   notes: readonly FingeringNote[],
   side: 'L' | 'R',
   paw: PianoPaw,
-  costs: PianoFingeringCosts = PIANO_FINGERING_COSTS,
 ): Steps<PianoFingering> {
-  const c = costs;
+  const c = PIANO_FINGERING_COSTS;
   const { spanScale, clawPitch } = paw;
   const limits = spanLimits(spanScale).values;
   const mirror = side === 'R' ? 1 : -1;

@@ -179,7 +179,7 @@ export interface Stroke {
   readonly technique: Technique;
   /**
    * The string of the bow, from 0 (the lowest) to 3. A double stop lies between two strings. The
-   * plan of the left hand chooses it ({@link planHand}).
+   * plan of the left hand chooses it ({@link planHandSteps}).
    */
   readonly string: number;
   /** The plan of the left hand: the position, the hand place, and the finger of the note. */
@@ -602,7 +602,7 @@ function bowInSlur(slur: BowSlur, time: number): number {
 
 /**
  * Builds the bow strokes of one bowed string player (design 5.3). Notes that start together
- * form one stroke, a double stop. The plan of the left hand ({@link planHand}) gives each stroke
+ * form one stroke, a double stop. The plan of the left hand ({@link planHandSteps}) gives each stroke
  * its string, its position, and its finger: the hand keeps its position, and the fingers play
  * the notes. The bow changes direction on each bow: a note, or a slur of short notes in one beat
  * ({@link slurSizes}). A phrase starts with a down-bow at the frog. The length of a bow comes

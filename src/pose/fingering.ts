@@ -1,4 +1,3 @@
-import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { InstrumentOf } from './family.ts';
 
@@ -163,7 +162,7 @@ export const FINGERING_COSTS: FingeringCosts = {
   crossing: 0.2,
 };
 
-/** The pitches and the times of one stroke, the input of {@link planHand}. */
+/** The pitches and the times of one stroke, the input of {@link planHandSteps}. */
 export interface StrokePitch {
   /** The note start, in song seconds. */
   readonly start: number;
@@ -200,7 +199,7 @@ export interface HandStep {
   readonly semitones: number;
 }
 
-/** The bow string and the hand of one stroke, the output of {@link planHand}. */
+/** The bow string and the hand of one stroke, the output of {@link planHandSteps}. */
 interface FingeredStroke {
   /** The string of the bow, from 0 (the lowest) to 3. A double stop lies between two strings. */
   readonly string: number;
@@ -396,6 +395,9 @@ function candidatesOf(
   return out.length > 0 ? out : singles(high);
 }
 
+/** The number of strokes in one step of {@link planHandSteps}. */
+const STROKES_PER_STEP = 200;
+
 /**
  * Plans the left hand of one bowed string player (design 5.3). The hand keeps its position while
  * the fingers reach the notes on all strings, and shifts only when the shift costs less than each
@@ -403,29 +405,7 @@ function candidatesOf(
  * the lowest cost. A shift costs more in a fast passage and less after an open string or a rest,
  * because the hand then has time to move. A high position, an extension, an open string of a long
  * note, and a string crossing also cost. Pure: the same strokes give the same plan, so the pose
- * after a seek is the same.
- *
- * @param strokes The strokes of the player, sorted by start.
- * @param tuning The open strings, low to high, as MIDI keys.
- * @param frame The hand frame of the instrument.
- * @param costs The weights of the cost.
- * @returns The bow string and the hand of each stroke.
- * @throws Error if a stroke has no candidate.
- */
-export function planHand(
-  strokes: readonly StrokePitch[],
-  tuning: readonly number[],
-  frame: HandFrame,
-  costs: FingeringCosts,
-): FingeredStroke[] {
-  return runAll(planHandSteps(strokes, tuning, frame, costs));
-}
-
-/** The number of strokes in one step of {@link planHandSteps}. */
-const STROKES_PER_STEP = 200;
-
-/**
- * Plans the left hand of one bowed string player as {@link planHand} does, in steps (design 7.2).
+ * after a seek is the same. The plan runs in steps (design 7.2).
  *
  * @param strokes The strokes of the player, sorted by start.
  * @param tuning The open strings, low to high, as MIDI keys.
