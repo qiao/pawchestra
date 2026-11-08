@@ -495,19 +495,11 @@ const RISER_FACET = 5 * MathUtils.DEG2RAD;
 /** The width of the dark line between two boards of a tread, as between two planks of the stage. */
 const PLANK_LINE = 0.012;
 
-/** One arc block of the risers: a level or a step, around the podium center. */
-interface RiserBlock {
-  /** The distance of the front face from the podium center, in meters. */
-  readonly inner: number;
-  /** The distance of the back face from the podium center, in meters. */
-  readonly outer: number;
-  /** The height of the top above the stage top, in meters. */
-  readonly height: number;
-  /** The angle of the left end, in radians. 0 points to the back, and the left is negative. */
-  readonly from: number;
-  /** The angle of the right end, in radians. */
-  readonly to: number;
-}
+/**
+ * One arc block of the risers around the podium center: a level, a step, or the riser of a row.
+ * It has the faces and the arc of a row riser.
+ */
+type RiserBlock = RowRiser;
 
 /**
  * Gives the bands of the top of a tread from its front to its back: the lighter edge, then boards
