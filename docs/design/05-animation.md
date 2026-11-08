@@ -126,8 +126,6 @@ interface SceneLayout {
   players: readonly { position: Vec3; facing: number; cast: PlayerCast }[];
   stands: readonly StandPlace[];
   risers: readonly RiserLevel[];
-  /** The risers of the raised seat groups of the instrumental rows (4.5, seat geometry). */
-  rowRisers: readonly RowRiser[];
 }
 
 declare function layoutScene(score: Score, models?: ModelCache): SceneLayout;

@@ -20,7 +20,6 @@ import type {
   ConductorPlace,
   PlayerPlace,
   RiserLevel,
-  RowRiser,
   SceneLayout,
   StandPlace,
 } from './layout.ts';
@@ -668,7 +667,7 @@ interface FittedRow {
    * The space of the riser of a row from row 2 ({@link riserReserve}), or `null` for the rows of
    * the strings. The other items keep their gaps from it, so the row can rise after the spread.
    */
-  readonly reserve: RowRiser | null;
+  readonly reserve: ArcBlock | null;
 }
 
 /**
@@ -765,7 +764,7 @@ function* fitRowSteps(
     const reserve = row > 0 ? riserReserve(placement, row) : null;
     if (
       rowClear(placement, clearance) &&
-      (!reserve || !touchesAny([rowRiserObstacle(reserve, CENTER)], clearance.placed))
+      (!reserve || !touchesAny([arcBlockObstacle(reserve, CENTER)], clearance.placed))
     ) {
       return { members, row, split, radius, angles, placement, reserve };
     }
@@ -819,7 +818,7 @@ function rowExtent(row: RowPlacement): RowExtent {
  * @param n The index of the row in {@link ROWS}.
  * @returns The space, with the largest height of a riser.
  */
-function riserReserve(row: RowPlacement, n: number): RowRiser {
+function riserReserve(row: RowPlacement, n: number): ArcBlock {
   const { inner, outer } = rowExtent(row);
   // A seat at 90° reaches past 90° by half a chair and the lip.
   const end = SPREAD_LIMITS.maxAngle + (CHAIR_ROOM + ROW_RISER.lip) / inner;
@@ -873,25 +872,39 @@ function riserObstacle(level: RiserLevel, podium: Vec3): Obstacle {
   return obstacleOf(`riser level ${level.level}`, boxes);
 }
 
+/** An arc block around the podium center, from the stage top to its height. */
+interface ArcBlock {
+  /** The distance of the front face from the podium center, in meters. */
+  readonly inner: number;
+  /** The distance of the back face from the podium center, in meters. */
+  readonly outer: number;
+  /** The height of the top above the stage top, in meters. */
+  readonly height: number;
+  /** The angle of the left end, in radians. 0 points to the back, and the left is negative. */
+  readonly from: number;
+  /** The angle of the right end, in radians. */
+  readonly to: number;
+}
+
 /**
- * Makes the obstacle of the riser of a row: one box for each part of at most 5° of its arc, from
- * the stage top to its height.
+ * Makes the obstacle of an arc block: one box for each part of at most 5° of its arc, from the
+ * stage top to its height.
  *
- * @param riser The riser.
+ * @param block The block.
  * @param podium The podium center.
  * @returns The obstacle.
  */
-function rowRiserObstacle(riser: RowRiser, podium: Vec3): Obstacle {
-  const parts = Math.max(1, Math.ceil((riser.to - riser.from) / RISER_BOX_ANGLE));
-  const step = (riser.to - riser.from) / parts;
-  const front = riser.inner * Math.cos(step / 2);
-  const size: Vec3 = [2 * riser.outer * Math.sin(step / 2), riser.height, riser.outer - front];
-  const box = footprintOf([centeredBox([0, riser.height / 2, 0], size)]);
+function arcBlockObstacle(block: ArcBlock, podium: Vec3): Obstacle {
+  const parts = Math.max(1, Math.ceil((block.to - block.from) / RISER_BOX_ANGLE));
+  const step = (block.to - block.from) / parts;
+  const front = block.inner * Math.cos(step / 2);
+  const size: Vec3 = [2 * block.outer * Math.sin(step / 2), block.height, block.outer - front];
+  const box = footprintOf([centeredBox([0, block.height / 2, 0], size)]);
   const boxes = Array.from({ length: parts }, (_, i) => {
-    const spot = seatAt(podium, riser.from + (i + 0.5) * step, (front + riser.outer) / 2);
+    const spot = seatAt(podium, block.from + (i + 0.5) * step, (front + block.outer) / 2);
     return placeFootprint(box, spot.position, spot.facing);
   }).flat();
-  return obstacleOf('row riser', boxes);
+  return obstacleOf('arc block', boxes);
 }
 
 /** The singers and the risers for one count of levels. */
@@ -1056,8 +1069,8 @@ function conductorObstacle(podium: Vec3, models: ModelCache): Obstacle {
 
 /**
  * Makes the obstacles of a layout: the podium with the conductor (when the layout has one), each
- * player with its instrument and its seat, each music stand, and the risers: each riser level
- * and the riser of each row. The overlap test and the layout use the same footprints.
+ * player with its instrument and its seat, each music stand, and each level of the choir risers.
+ * The overlap test and the layout use the same footprints.
  *
  * @param layout The layout.
  * @param models The player models of the score. A new cache by default.
@@ -1075,10 +1088,7 @@ export function layoutObstacles(layout: SceneLayout, models = new ModelCache()):
       placeFootprint(standFootprint(stand.deskHeight), stand.position, stand.facing),
     ),
   );
-  const risers = [
-    ...layout.risers.map((level) => riserObstacle(level, layout.podium)),
-    ...layout.rowRisers.map((riser) => rowRiserObstacle(riser, layout.podium)),
-  ];
+  const risers = layout.risers.map((level) => riserObstacle(level, layout.podium));
   // The levels of the risers stand against each other, so they form one obstacle.
   const riserBlock =
     risers.length > 0
@@ -1436,7 +1446,6 @@ function layoutChamber(
     conductor: null,
     ...onStage(places, cast, stands, move),
     risers: [],
-    rowRisers: [],
   };
 }
 
@@ -1726,7 +1735,7 @@ function* spreadRowsSteps(
  */
 function rowObstacles(row: FittedRow): Obstacle[] {
   const own = obstaclesOfRow(row.placement);
-  return row.reserve ? [...own, rowRiserObstacle(row.reserve, CENTER)] : own;
+  return row.reserve ? [...own, arcBlockObstacle(row.reserve, CENTER)] : own;
 }
 
 /**
@@ -2612,7 +2621,7 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
   };
   // The stage holds the items of the rows. The space of a riser is wider than its riser.
   const obstacles = [...fixed, ...rows.flatMap((r) => obstaclesOfRow(r.placement))];
-  const reserves = rows.flatMap((r) => (r.reserve ? [rowRiserObstacle(r.reserve, CENTER)] : []));
+  const reserves = rows.flatMap((r) => (r.reserve ? [arcBlockObstacle(r.reserve, CENTER)] : []));
 
   const empty: ChoirPlacement = { singers: [], risers: [], obstacles: [] };
   let choir = empty;
@@ -2696,6 +2705,5 @@ export function* layoutSceneSteps(score: Score, models: ModelCache): Steps<Scene
       move,
     ),
     risers,
-    rowRisers: [],
   };
 }

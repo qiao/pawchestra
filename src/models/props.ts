@@ -5,7 +5,7 @@ import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
 import { centeredBox } from './bounds.ts';
 import type { Bounds } from './bounds.ts';
-import type { RiserLevel, RowRiser, SceneLayout } from './layout.ts';
+import type { RiserLevel, SceneLayout } from './layout.ts';
 import { MeshBuilder, splitByFacing, srgb, transform } from './mesh.ts';
 import type { MeshData, Rgb, Transform } from './mesh.ts';
 import { box, quad } from './primitives.ts';
@@ -494,11 +494,19 @@ const RISER_FACET = 5 * MathUtils.DEG2RAD;
 /** The width of the dark line between two boards of a tread, as between two planks of the stage. */
 const PLANK_LINE = 0.012;
 
-/**
- * One arc block of the risers around the podium center: a level, a step, or the riser of a row.
- * It has the faces and the arc of a row riser.
- */
-type RiserBlock = RowRiser;
+/** One arc block of the choir risers around the podium center: a level or a step. */
+interface RiserBlock {
+  /** The distance of the front face from the podium center, in meters. */
+  readonly inner: number;
+  /** The distance of the back face from the podium center, in meters. */
+  readonly outer: number;
+  /** The height of the top above the stage top, in meters. */
+  readonly height: number;
+  /** The angle of the left end, in radians. 0 points to the back, and the left is negative. */
+  readonly from: number;
+  /** The angle of the right end, in radians. */
+  readonly to: number;
+}
 
 /**
  * Gives the bands of the top of a tread from its front to its back: the lighter edge, then boards
@@ -622,25 +630,9 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
 }
 
 /**
- * Builds the risers of the instrumental rows (design 4.5, seat geometry): one arc block for each
- * row, with the treads and the faces of the choir risers.
- *
- * @param risers The risers of the rows.
- * @param podium The podium center, the center of the arcs.
- * @returns The mesh data in the stage axes, with all vertices on bone 0.
- */
-function buildRowRisers(risers: readonly RowRiser[], podium: Vec3): MeshData {
-  const builder = new MeshBuilder();
-  for (const riser of risers) {
-    addRiserBlock(builder, riser, podium);
-  }
-  return builder.build();
-}
-
-/**
  * Builds the static props of a layout as one mesh: the seat of each player, each music stand,
- * the choir risers, and the risers of the rows (design 4.4). Each kind of seat at each height and
- * depth and each stand at each desk height is built one time.
+ * and the choir risers (design 4.4). Each kind of seat at each height and depth and each stand at
+ * each desk height is built one time.
  *
  * @param layout The layout of a score.
  * @returns The mesh data in the stage axes, with all vertices on bone 0.
@@ -677,9 +669,6 @@ export function buildSceneProps(layout: SceneLayout): MeshData {
   }
   if (layout.risers.length > 0) {
     builder.addMesh(buildRisers(layout.risers, layout.podium), transform());
-  }
-  if (layout.rowRisers.length > 0) {
-    builder.addMesh(buildRowRisers(layout.rowRisers, layout.podium), transform());
   }
   return builder.build();
 }

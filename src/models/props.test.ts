@@ -275,7 +275,6 @@ describe('buildSceneProps', () => {
     ],
     stands: [{ position: [-1, 0, -1], facing: 0, deskHeight: 1.05 }],
     risers: [{ level: 0, radius: 5, height: 0.25, halfAngle: 0.3 }],
-    rowRisers: [],
   };
 
   it('merges the seats, the stands, and the risers into one mesh (design 4.4)', () => {

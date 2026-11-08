@@ -37,23 +37,6 @@ export interface RiserLevel {
   readonly halfAngle: number;
 }
 
-/**
- * The riser under an instrumental row (design 4.5, seat geometry): an arc block around the podium
- * center, from the stage top to its height. The players and the stands of the row stand on it.
- */
-export interface RowRiser {
-  /** The distance of the front face from the podium center, in meters. */
-  readonly inner: number;
-  /** The distance of the back face from the podium center, in meters. */
-  readonly outer: number;
-  /** The height of the top above the stage top, in meters. */
-  readonly height: number;
-  /** The angle of the left end, in radians. 0 points to the back, and the left is negative. */
-  readonly from: number;
-  /** The angle of the right end, in radians. */
-  readonly to: number;
-}
-
 /** The place of the conductor: the bear on the podium top (design 4.5). */
 export interface ConductorPlace {
   /** The point on the podium top under the middle of the bear. */
@@ -80,8 +63,6 @@ export interface SceneLayout {
   readonly players: readonly PlayerPlace[];
   readonly stands: readonly StandPlace[];
   readonly risers: readonly RiserLevel[];
-  /** The risers of the instrumental rows, so that each player sees the conductor. */
-  readonly rowRisers: readonly RowRiser[];
 }
 
 /**
