@@ -389,6 +389,8 @@ The app follows these facts:
   mouthpiece, and a little toward the left shoulder, so that its finger tips stay on the tubes
   (`restGripShiftL`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
+- **The mouthpiece (1.1).** The rim rests on the lips, with its middle 0.5 cm below the mouth line
+  of the body (`mouthHeight`, design 4.4), and presses the lips 0.25 cm (`lipShift`).
 - **The bell (1.1).** The bell section lies beside the slide, at its left.
 - **The positions (1.2, 1.3).** Each note takes the lowest position on the partials of B♭1, with
   no seventh partial (`slidePosition()`, `PARTIALS`). The steps keep the ratio of the real
@@ -424,7 +426,9 @@ The app follows these facts:
   behind the flute and a little below it, so that the fingers of both paws curl over the top onto
   the keys (`aimSide`, `gripCurl`). At rest, the flute stands on the right thigh in the right paw
   (`rest`, `restShift`, `gripAround`). A standing fox lets the free left arm hang down along the
-  side with a small bend of the elbow (`FOX_HANG`).
+  side with a small bend of the elbow (`FOX_HANG`). The embouchure hole sits at the lower lip, under
+  the long muzzle, and the lip plate presses the lips and the chin about 0.5 cm, as a flutist rests
+  the plate against the chin (`lipShift`).
 - **The shared flute and clarinet (2.4, 3, `WIND_HOLDS`).** Each recast body plays the arm values
   of the tan fox or the wolf, with the lip plate or the mouthpiece at its mouth. At rest, the
   right paw holds the instrument nearly upright at the right side, as a flutist rests the flute
@@ -458,16 +462,19 @@ The app follows these facts:
   lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
   elbows a little out (`poleL`, `poleR`).
 - **The clarinet (3, `WOLF_CLARINET`).** The clarinet is at the middle of the body, and the head
-  does not tilt toward it (`lipShift`). The elbows point down and a little out. At rest, the
-  clarinet stands upright between the knees, with both paws on their grips (`rest`, `restShift`).
+  does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle, at the
+  mouth line of the body (`mouthHeight`, design 4.4, `lipShift`). The elbows point down and a little
+  out. At rest, the clarinet stands upright between the knees, with both paws on their grips
+  (`rest`, `restShift`).
 - **The woodwind palms (2.3, 2.4, 3).** Each paw of the oboe, the clarinet, and the bassoon holds
   its tube from the side of its own shoulder. The palm faces the tube, the fingers curl over the
   front in a C, and the thumb points up the tube (`faceTube`, `aimAcross`, `aimSide`).
 - **The bassoon (3, `BEAVER_BASSOON`).** The bassoon lies diagonal from the right hip up past the
   left shoulder, with the bell above the head (`BEAVER_PLAY`, `bassoonParts()`). The left paw is
   high on the wing joint, and the right paw low on the boot joint. The bocal is near the level at
-  the reed, and the reed is under the front teeth (`lipShift`). The elbows stay a little away from
-  the body (`poleL`, `poleR`), so that the round free arms stay out of the belly (design 5.3).
+  the reed, and the reed goes 0.3 cm between the lips under the tips of the front teeth
+  (`lipShift`). The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
+  free arms stay out of the belly (design 5.3).
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body
   (`fingering`). The horn lies across the body, with the bell at the right of the torso and in
   front of it, off the leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The
@@ -486,12 +493,14 @@ The app follows these facts:
   holds the trumpet around the upright casings (`fingering`, `faceTube`). The right palm lies
   above the valves and faces down. The trumpet points a little down, straight ahead (`trumpet()`
   of `src/models/instruments/brass.ts`, `play`). The valves follow the trumpet fingering
-  (`VALVES`, `semitonesBelowPartial()`).
+  (`VALVES`, `semitonesBelowPartial()`). The rim presses the lips 0.24 cm (`lipShift`).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
-  paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm
-  faces the valve tops, and the left paw grips the main branch at its left side, with the back of
-  the paw out to the left. Both elbows point down and out, away from the rib cage. The bell stands
-  at the left of the head (`play`).
+  paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
+  the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
+  out to the left. Both elbows point down and out, away from the rib cage. The bell stands at the
+  left of the head (`play`). The rim rests on the lips with its top on the upper lip, and the lead
+  pipe starts at the end of the mouthpiece shank, in front of the chin (`lipShift`, `tuba()` of
+  `src/models/instruments/brass.ts`).
 - **The size rule of the winds (2.1, 2.4, 3).** A recast trumpeter, clarinetist, or flutist plays
   a smaller instrument when its arms are short (`windRule()` of `tools/wind-size.ts`, design 4.6).
   The smallest size is the smallest instrument with the same hold and fingering, at the share of
