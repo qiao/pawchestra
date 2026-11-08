@@ -45,7 +45,7 @@ export function barShows(activity: BarActivity): boolean {
 }
 
 /** The inputs of the rule that hides the controls and the panels during play (design 2.3). */
-export interface UiActivity extends BarActivity {
+interface UiActivity extends BarActivity {
   /** True in Cinematic mode (design 2.5). */
   readonly cinematic: boolean;
   /** True while a control of the title or the drawer has the keyboard focus. */
@@ -57,7 +57,7 @@ export interface UiActivity extends BarActivity {
 }
 
 /** The parts of the UI that show in one frame (design 2.3). */
-export interface UiShown {
+interface UiShown {
   /** True if the bar and the pointer over the stage show. */
   readonly bar: boolean;
   /** True if the open drawer and the tooltips show. The title always shows. */

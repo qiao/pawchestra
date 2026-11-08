@@ -4,7 +4,7 @@
  * of a film. The times are song times, so a pause holds the card, and a seek shows the card of the
  * new time.
  */
-export const TITLE_CARD = {
+const TITLE_CARD = {
   /**
    * The song time at which the fade in starts. A play reads the song time 0 for one frame before
    * its count-in, so the card starts later and that frame shows no card.
@@ -30,7 +30,7 @@ function ease(x: number): number {
 }
 
 /** The state of the frame that decides the title card. */
-export interface TitleCardFrame {
+interface TitleCardFrame {
   /** True in Cinematic mode. Free mode shows the title at the top left only. */
   readonly cinematic: boolean;
   /** True after the first play of the piece (`Transport.changedAtWall` is not `null`). */
