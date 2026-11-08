@@ -2152,10 +2152,11 @@ const RISER_EDGE = 0.05;
 /**
  * Gives the riser of a seat group at a height (design 4.5, seat geometry): the reserved space of
  * the row ({@link riserReserve}) over the arc of the group, with {@link ROW_RISER}.lip at each
- * end, up to the middle of the gap to each neighbor group. Near the back edge and the corner cuts
- * of the stage, the ends lose their lip and the back face comes forward in steps of 0.02 m, down
- * to {@link RISER_BACK} behind the seat centers, until each box keeps {@link RISER_EDGE} from the
- * outline of the stage.
+ * end, up to the middle of the gap to each neighbor group. The riser reaches at least
+ * {@link RISER_BACK} behind the seat centers, also when the chairs of the row end in front of that
+ * line. Near the back edge and the corner cuts of the stage, the ends lose their lip and the back
+ * face comes forward in steps of 0.02 m, down to {@link RISER_BACK} behind the seat centers, until
+ * each box keeps {@link RISER_EDGE} from the outline of the stage.
  *
  * @param row The row.
  * @param extents The extent of each seat group.
@@ -2178,8 +2179,10 @@ function groupRiser(
   }
   const left = extents[k - 1];
   const right = extents[k + 1];
+  // A shallow reserve, such as the back row of a small stage, still holds the smallest riser.
+  const deepest = Math.max(reserve.outer, row.radius + RISER_BACK);
   for (const lip of [ROW_RISER.lip, 0]) {
-    for (let outer = reserve.outer; outer >= row.radius + RISER_BACK - 1e-9; outer -= CLEAR_STEP) {
+    for (let outer = deepest; outer >= row.radius + RISER_BACK - 1e-9; outer -= CLEAR_STEP) {
       const riser: RowRiser = {
         inner: reserve.inner,
         outer,
