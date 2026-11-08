@@ -212,7 +212,7 @@ export function windStateAt(track: WindTrack, time: number, out: WindState): voi
   out.fingersL = moveTo(track.fingersL, track.moveL, track.starts, i, time, firstL);
   out.fingersR = moveTo(track.fingersR, track.moveR, track.starts, i, time, firstR);
   out.slide = moveTo(track.slide, track.slideMove, track.starts, i, time, track.slide[0] ?? 0);
-  // The breath in rises in the 0.4 s before a phrase.
+  // The breath in rises in the `inhaleSec` before a phrase.
   out.breath = spanEnvelope(
     track.phraseStarts,
     track.phraseEnds,
