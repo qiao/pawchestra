@@ -51,8 +51,6 @@ export const BEAM_LOOK = {
    * the pool of light.
    */
   strength: 5.6,
-  /** The density at the outline, as a part of the density on the axis. The edge stays soft. */
-  edge: 0,
   /**
    * The part of the radius where the density starts to fade to the outline. The beam of
    * `orchestra-latest.png` is brightest near its axis and has soft edges. With 0.5, the wide fan
