@@ -3,34 +3,27 @@
 Pawchestra is a WebGL MIDI player in which low-poly animals play orchestral music on a small stage.
 It uses Three.js, TypeScript, Vite, and pnpm, and it is a static site on Vercel.
 
-This file holds the rules that each agent needs in each round. The modules in `docs/agents/` hold
-the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core commands.
+This file holds the rules of each round. The modules in `docs/agents/` hold the details.
+[`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core commands.
 
 ## Where the truth lives
 
 - **Design.** `docs/design.md` is the index of the design files `docs/design/01-*.md` to
-  `09-*.md`. The design is the single source of truth for the product. A pointer "design X.Y"
-  names the heading "X.Y" in the file whose number is X. Read the section of an area before you
-  change it.
+  `09-*.md`, the single source of truth for the product. A pointer "design X.Y" names the heading
+  "X.Y" in the file whose number is X. Read the section of an area before you change it.
 - **Conflicts.** When a change conflicts with the design, ask the user when the user is available.
   Else follow the newest request of the user and the reference images, and update the design
-  section in the same commit as the change.
-- **Reference images.** `docs/reference/orchestra-latest.png` and `orchestra-side.png` are the
-  newest target, from two angles. `mockup.png` and `scene.png` are the target of the look,
-  `lowpoly-animals.png` of the forms and the facets, and `animals.webp` of the front, side, and
-  back views. The sheets `*-views.png` and `*-turnaround.png` show single species. The images win
-  over the values that design 4.5 to 4.7 names. Design 1 says which image wins where they differ.
-- **Technique references.** The motion of each player follows a real musician. The target of
-  each family is its reference in `docs/reference/`: `string-technique.md`, `wind-technique.md`,
-  `percussion-technique.md`, `harp-technique.md`, and `piano-technique.md`, with a source for each
-  fact. The cinematic camera follows a concert film: `camera-technique.md`. A change of the motion
-  or of the shots updates the section "Use in the app" of its reference in the same commit.
-- **UI.** `docs/prototype/ui.html` and its screenshots in `docs/prototype/`. Design 2.8 gives the
-  tokens and the exact message texts.
-- **Assets.** `demos/README.md`, `assets/soundfont/README.md`, `assets/hall/README.md`, and the
-  `README.md` of each folder of `assets/models/` give the sources, the licenses, and the checksums.
-- **Bodies.** The table "Bodies and roles" of [`docs/agents/rigging.md`](docs/agents/rigging.md)
-  gives the body and the role of each species.
+  section in the same commit.
+- **Reference images.** The images of `docs/reference/` win over the values that design 4.5 to
+  4.7 names. Design 1 gives the role of each image and which image wins where they differ.
+- **Technique references.** The motion of each player follows a real musician, and the cinematic
+  camera follows a concert film. The `*-technique.md` files of `docs/reference/` give the target of
+  each family, with a source for each fact. A change of the motion or of the shots updates the
+  section "Use in the app" of its reference in the same commit.
+- **UI.** `docs/prototype/ui.html` and its screenshots. Design 2.8 gives the tokens and the exact
+  message texts.
+- **Assets.** The `README.md` files of `demos/` and of each folder of `assets/` give the sources,
+  the licenses, and the checksums.
 - **Tasks.** Take the next task from `TODO.md`, and follow the rules at its top. A step is done
   when its "done" criterion is true and the manager accepts the report and the images (design
   9.8).
@@ -58,8 +51,8 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
 - **Privacy.** Keep the personal data of the user out of each request to an outside service: no
   email address or name in a header, a User-Agent, a URL, or a payload. When an API asks for
   contact data, send a neutral value such as `pawchestra-build/1.0`.
-- **Frame time.** A change does not need a `pnpm frame` run. Run it only when the user or the
-  manager asks, or for a change whose goal is speed, and then give its table (design 9.7).
+- **Frame time.** Run `pnpm frame` only when the user or the manager asks, or for a change whose
+  goal is speed, and then give its table in the commit message (design 9.7).
 - **Work order.** Follow the steps of design 9.5. The largest risks come first.
 
 ## Work rules
@@ -73,25 +66,27 @@ the details. [`CONTRIBUTING.md`](CONTRIBUTING.md) gives the setup and the core c
   gate, clearance sweep, body probe, size check, cast matrix, frame measure, or image set. Run a
   check only when the user or the manager asks. This rule wins over the check rules of the modules.
   A probe that helps you find a cause (`fold-probe`, `arm-look`, `pose-depth`, a render) is a
-  tool, not a gate: use it when it is faster than a guess.
+  tool: use it when it is faster than a guess.
 - **Tests.** All tests are paused. A change adds no test and runs no break test. A change that
   needs a check runs one file with `pnpm test:paused <path>`.
-- **Docs.** A change of behavior updates its design section in the same session. A decision goes
-  into its design section with its reason, and a research result into the design or a technique
-  reference. Write all prose in ASD-STE100 Simplified Technical English, with no em dashes, and run
-  the prose checks of [`writing.md`](docs/agents/writing.md).
-- **Length.** Keep each doc in its limit of [`writing.md`](docs/agents/writing.md). A design
-  section holds no history and no tuned value.
+- **Docs.** A change of behavior updates its design section in the same session. Write all prose
+  in ASD-STE100 Simplified Technical English, keep each doc in its limit, and run the prose checks
+  of [`writing.md`](docs/agents/writing.md).
 - **Processes.** Stop each server and browser that you start, and no other process.
 
 ## Modules
 
-| Module | It holds | Read it |
-|---|---|---|
-| [`workflow.md`](docs/agents/workflow.md) | the docs rules, the commits, the worktrees and the merges, the tests, the probes, the images, and the end of a turn | at the start of each round |
-| [`writing.md`](docs/agents/writing.md) | Simplified Technical English, the tells to avoid, the prose checks, the length limits, and TSDoc | before you write a doc, a comment, or a commit message |
-| [`code.md`](docs/agents/code.md) | the compiler options, the lint rules, and the code style | before you write TypeScript |
-| [`commands.md`](docs/agents/commands.md) | each command with its usage, its main options, its output, and its run time, and the steps of CI | before you run a tool that you do not know |
-| [`rigging.md`](docs/agents/rigging.md) | the bodies and their roles, the asset chain, the arm gate, the rebuild of the arms in Blender, and the traps | before work on a body, a rig, a role, a hold, or a seat |
-| [`rig-rounds.md`](docs/agents/rig-rounds.md) | the brief of a rigging round, its rules, the common rules of the agents, and the docs checklist | before you brief or start a rigging round |
-| [`look-work.md`](docs/agents/look-work.md) | the loop of a round of the light, the colors, or the grade, the look override, and the traps of the look measures | before a round of the light, the colors, or the grade |
+- [`workflow.md`](docs/agents/workflow.md): the docs rules, commits, worktrees, merges, probes,
+  and images. Read it at the start of each round.
+- [`writing.md`](docs/agents/writing.md): Simplified Technical English, the prose checks, and the
+  length limits. Read it before you write prose.
+- [`code.md`](docs/agents/code.md): the compiler options, the lint rules, and the code style.
+  Read it before you write TypeScript.
+- [`commands.md`](docs/agents/commands.md): each command with its options, output, and run time,
+  and CI. Read it before you run a tool that you do not know.
+- [`rigging.md`](docs/agents/rigging.md): the bodies and roles, the routes of a rig, the arm gate,
+  and the traps. Read it before work on a body, a rig, a hold, or a seat.
+- [`rig-rounds.md`](docs/agents/rig-rounds.md): the brief of a rigging round and the docs
+  checklist. Read it before you brief or start a rigging round.
+- [`look-work.md`](docs/agents/look-work.md): the loop of a look round, the look override, and the
+  traps. Read it before a round of the light, the colors, or the grade.
