@@ -734,11 +734,12 @@ const PANDA_PLAY_TURN = toQuat(
  * sample. A turn of 45° or more folded 5 faces of the left shoulder in the play.
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trombonist
- * (`docs/reference/wind-technique.md` 1.1): the mouth of the panda is at its lips (`mouthHeight` of
- * `tools/studio-body.ts`), and the rim moves 0.01 H down and 0.006 H forward from it (`lipShift`),
- * so that its middle lies 0.5 cm below the mouth line and the rim presses the lips 0.25 cm. At the
- * mouth of the rule of the nose drop, the rim stood 0.7 cm in front of the face, 2.1 cm in front
- * of the lips.
+ * (`docs/reference/wind-technique.md` 1.1): it moves 0.057 H down and 0.065 H back from the mouth
+ * of the body (`lipShift`), so that its middle lies 0.5 cm below the crease between the lips and
+ * the rim presses the lips 0.2 cm. At the mouth of the rule of the nose drop, the rim stood 0.7 cm
+ * in front of the face, 2.4 cm above the crease. The body keeps that mouth: a mouth point at the
+ * lips (`mouthHeight`) moves the trombone of the bind pose, and the layout reads that place, so the
+ * seats of the stage moved about 3 cm.
  *
  * In the rest pose, the trombone stands upright in front of the body, below the mouth, with the
  * slide down and 16° forward of the vertical (`rest`, {@link PANDA_PLAY}), as a seated player holds
@@ -782,7 +783,7 @@ const PANDA_TROMBONE = {
   restGripShiftL: [0.075, 0.04, -0.01],
   restAim: 1,
   gripCurl: curls(90, 110),
-  lipShift: [0, -0.01, -0.006],
+  lipShift: [0, -0.057, 0.065],
 } as const satisfies WindHold;
 
 /**
