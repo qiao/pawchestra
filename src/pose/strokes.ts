@@ -1,4 +1,3 @@
-import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { PlayerNote, Technique } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
@@ -600,11 +599,14 @@ function bowInSlur(slur: BowSlur, time: number): number {
   return slur.from + ((slur.to - slur.from) * done) / total;
 }
 
+/** The number of strokes in one step of the bow plan of {@link buildStrokesSteps}. */
+const BOW_STROKES_PER_STEP = 500;
+
 /**
- * Builds the bow strokes of one bowed string player (design 5.3). Notes that start together
- * form one stroke, a double stop. The plan of the left hand ({@link planHandSteps}) gives each stroke
- * its string, its position, and its finger: the hand keeps its position, and the fingers play
- * the notes. The bow changes direction on each bow: a note, or a slur of short notes in one beat
+ * Builds the bow strokes of one bowed string player, in steps (design 5.3, 7.2). Notes that start
+ * together form one stroke, a double stop. The plan of the left hand ({@link planHandSteps})
+ * gives each stroke its string, its position, and its finger: the hand keeps its position, and
+ * the fingers play the notes. The bow changes direction on each bow: a note, or a slur of short notes in one beat
  * ({@link slurSizes}). A phrase starts with a down-bow at the frog. The length of a bow comes
  * from its length in time, and a little from the gesture size, and a fast bow moves toward the
  * balance point ({@link balanceShift}). A stroke of a measured tremolo moves the bow only a short
@@ -621,35 +623,7 @@ function bowInSlur(slur: BowSlur, time: number): number {
  * @param instrument The bowed string of the player.
  * @param vibratoHz The rate of the vibrato of the player, from {@link vibratoRate}.
  * @param beats The times of the conducted beats, sorted. The slur rule reads them.
- * @returns The strokes, sorted by start, with no overlap.
- */
-export function buildStrokes(
-  notes: readonly PlayerNote[],
-  loudness: readonly number[],
-  range: BowRange,
-  amplitude: number,
-  instrument: Bowed,
-  vibratoHz: number,
-  beats: Float64Array,
-): Stroke[] {
-  return runAll(buildStrokesSteps(notes, loudness, range, amplitude, instrument, vibratoHz, beats));
-}
-
-/** The number of strokes in one step of the bow plan of {@link buildStrokesSteps}. */
-const BOW_STROKES_PER_STEP = 500;
-
-/**
- * Builds the strokes of one bowed string player as {@link buildStrokes} does, in steps (design
- * 7.2).
- *
- * @param notes The notes of the player, sorted by start.
- * @param loudness The loudness of each note, from 0 to 1.
- * @param range The bow range of the rig.
- * @param amplitude The amplitude of the player.
- * @param instrument The instrument.
- * @param vibratoHz The rate of the vibrato of the player.
- * @param beats The times of the conducted beats, sorted.
- * @returns The steps, which return the strokes.
+ * @returns The steps, which return the strokes, sorted by start, with no overlap.
  */
 export function* buildStrokesSteps(
   notes: readonly PlayerNote[],
@@ -1012,7 +986,7 @@ function leftHandAt(strokes: readonly Stroke[], index: number, time: number, out
  * lands (`LEFT_HAND.landSec`), and the string crossing of the bow ends `BOW_MOTION.crossLeadSec`
  * before the note.
  *
- * @param strokes The strokes of the player, from {@link buildStrokes}.
+ * @param strokes The strokes of the player, from {@link buildStrokesSteps}.
  * @param starts The starts of the strokes.
  * @param time The song time of the note layer, in seconds.
  * @param out The state to write.

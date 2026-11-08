@@ -6,7 +6,8 @@ import { scoreOf } from '../score/test-score.ts';
 import type { SectionSize } from '../score/types.ts';
 import { fingerboardPlace } from './fingering.ts';
 import { noteLoudness } from './loudness.ts';
-import { BOW_MOTION, bowStateAt, buildStrokes, createBowState } from './strokes.ts';
+import { runAll } from '../score/steps.ts';
+import { BOW_MOTION, bowStateAt, buildStrokesSteps, createBowState } from './strokes.ts';
 import type { BowState, Stroke } from './strokes.ts';
 
 /** The bow range of the tests: a hair of 0.5 m with 0.03 m kept free at each end. */
@@ -28,14 +29,16 @@ function strokesOf(
   const notes = indices.map((i) => score.notes[i]).filter((n) => n !== undefined);
   const section = score.seats[0]?.section;
   const instrument = section === 'cello' ? 'cello' : 'violin';
-  return buildStrokes(
-    notes,
-    indices.map((i) => loudness[i] ?? 0),
-    RANGE,
-    1,
-    instrument,
-    5.5,
-    Float64Array.from(score.beats, (b) => b.timeSec),
+  return runAll(
+    buildStrokesSteps(
+      notes,
+      indices.map((i) => loudness[i] ?? 0),
+      RANGE,
+      1,
+      instrument,
+      5.5,
+      Float64Array.from(score.beats, (b) => b.timeSec),
+    ),
   );
 }
 
@@ -50,7 +53,7 @@ function stateAt(strokes: readonly Stroke[], time: number): BowState {
   return out;
 }
 
-describe('buildStrokes (design 5.3)', () => {
+describe('buildStrokesSteps (design 5.3)', () => {
   it('changes the bow direction on each note, and starts each stroke where the last ended', () => {
     const strokes = strokesOf([...note(0, 0, 67), ...note(480, 0, 69), ...note(960, 0, 71)]);
     expect(strokes).toHaveLength(3);
