@@ -172,8 +172,7 @@ export const MUSIC_STAND = {
   deskHeight: 1.05,
   /**
    * The gap from the lowest eye of the readers of a stand down to the top edge of its desk, in
-   * meters: the gap of the seated red fox to a desk of 1.05 m, from its lower eye bone at 1.325 m
-   * to the top edge at 1.202 m.
+   * meters: the gap of the seated red fox to the highest desk.
    */
   eyeGap: 0.123,
   /**
