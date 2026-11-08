@@ -538,6 +538,12 @@ const RISER_FACET = 5 * MathUtils.DEG2RAD;
 const PLANK_LINE = 0.012;
 
 /**
+ * The width of the groove at each joint of the arc faces of a skirt face of the risers, as the
+ * grooves between the panels of the stage skirt.
+ */
+const RISER_GROOVE = 0.03;
+
+/**
  * Gives a point at a distance and an angle from the podium center, on the arcs of the risers.
  *
  * @param podium The podium center, the center of the arcs.
@@ -625,8 +631,8 @@ function addRailPart(builder: MeshBuilder, from: Vec3, to: Vec3, size: number, p
  * Adds one level of the choir risers (design 4.5): the tread with its boards, the nosing lip at
  * its front, the face under the lip, and the two end panels. The face under the lip of a higher
  * level is a riser face of wood from the tread in front of it. The lowest level has a dark skirt
- * face from the stage top, and only the top level has a back face, because each other face stands
- * against the next level.
+ * face of panels from the stage top, and only the top level has a back face of panels, because
+ * each other back face stands against the next level.
  *
  * @param builder The builder.
  * @param level The level.
@@ -666,12 +672,24 @@ function addRiserLevel(
     addFace(builder, [...lipFront, at(front, a0, height)], lip, STAGE_COLORS.riserNosing);
     const lipUnder = [at(front, a0, under), at(inner, a0, under), at(inner, a1, under)] as const;
     addFace(builder, [...lipUnder, at(front, a1, under)], lip, STAGE_COLORS.riserNosing);
-    const face = [at(inner, a0, below), at(inner, a1, below), at(inner, a1, under)] as const;
-    const faceColor = below > 0 ? STAGE_COLORS.podiumPanel : STAGE_COLORS.skirt;
-    addFace(builder, [...face, at(inner, a0, under)], body, faceColor);
+    // A skirt face of the lowest level or of the back has a groove at the end of each panel.
+    const skirt = (r: number, y: number): void => {
+      const cut = i < segments - 1 ? a1 - RISER_GROOVE / r : a1;
+      const panel = [at(r, a0, 0), at(r, cut, 0), at(r, cut, y)] as const;
+      addFace(builder, [...panel, at(r, a0, y)], body, STAGE_COLORS.skirt);
+      if (cut < a1) {
+        const groove = [at(r, cut, 0), at(r, a1, 0), at(r, a1, y)] as const;
+        addFace(builder, [...groove, at(r, cut, y)], body, STAGE_COLORS.groove);
+      }
+    };
+    if (below > 0) {
+      const face = [at(inner, a0, below), at(inner, a1, below), at(inner, a1, under)] as const;
+      addFace(builder, [...face, at(inner, a0, under)], body, STAGE_COLORS.podiumPanel);
+    } else {
+      skirt(inner, under);
+    }
     if (top) {
-      const back = [at(outer, a0, 0), at(outer, a1, 0), at(outer, a1, height)] as const;
-      addFace(builder, [...back, at(outer, a0, height)], body, STAGE_COLORS.skirt);
+      skirt(outer, height);
     }
   }
   // A point at the angle 0 is on the inner side of each end.
