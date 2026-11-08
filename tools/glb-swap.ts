@@ -437,9 +437,9 @@ function withAnimalEntry(text: string, animal: string, settings: AnimalEntry): s
 /**
  * Adds the scratch entries of an animal with no studio body to a copy ({@link withGlbBody}). An
  * animal with no studio body (`isStudioBodyName()`) gets its entry in `STUDIO_BODIES` and in
- * `STUDIO_HEIGHTS`, and the species of the same id gets the body ({@link withSpeciesBody}). An animal with no entry in
- * `ANIMALS` gets the settings of the export as its entry in `ANIMALS` of the copy. An animal with
- * a studio body, also a test body, and an entry changes nothing.
+ * `STUDIO_HEIGHTS`, and the species of the same id gets the body ({@link withSpeciesBody}). An
+ * animal with no entry in `ANIMALS` gets the settings of the export as its entry in `ANIMALS` of
+ * the copy. An animal with a studio body, also a test body, and an entry changes nothing.
  *
  * @param dir The folder of the copy.
  * @param animal The animal.
