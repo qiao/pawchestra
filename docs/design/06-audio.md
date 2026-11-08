@@ -143,8 +143,9 @@ Main thread                           AudioWorklet thread (our processor)
 - **Count-in.** The conductor gives a count-in before the music (5.4). The song time starts one
   count-in before the start point (the pause point, or 0), in song seconds. `startPlay()` of
   `app/transport.ts` gives both values, so the `Player` and the pose use one count-in.
-- A seek to the song start during play has the start point `Number.MIN_VALUE`, because the pose
-  gives the ready gesture only to a count-in from 0.
+- A seek during play moves the start point to the seek point and sets `Transport.seekStart`
+  (`seekPlayState()`). The pose then gives no count-in (5.4), also for a seek to the song
+  start.
 
 ## 6.6 Mute and solo
 

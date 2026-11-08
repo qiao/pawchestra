@@ -59,7 +59,7 @@ and the seed. The app keeps no state that events change. Thus seek, pause, speed
 changes are always correct, and the animation cannot drift from the audio.
 
 ```typescript
-/** The play state. It changes only on play, pause, and stop. */
+/** The play state. It changes only on play, pause, stop, and a seek during play. */
 interface Transport {
   playing: boolean;
   /** Wall clock seconds of the last change. `null` before the first play. */
@@ -68,6 +68,8 @@ interface Transport {
   before: Transport | null;
   /** The song time of the first sound of the last play: 0, or the pause point (6.5). */
   startSec: number;
+  /** True when a seek during play set `startSec`: no count-in (5.4, 6.5). */
+  seekStart: boolean;
   /** The time that the instruments stay up after a pause (`REST_TIMES.hold`), or 0. */
   holdSec: number;
   /** The wall clock seconds from a play to its first sound. */
@@ -756,6 +758,9 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - **Count-in.** A click on play does not start the music at once: the conductor first signals the
   players to get ready. The transport starts before the start point (6.5), so the count-in is a
   set of poses at those song times (`COUNT_IN`): a ready pause, then one preparatory beat.
+  A seek during play ends the count-in, and the sound starts at once. Thus a start point
+  that a seek sets (`Transport.seekStart`) gets `NO_COUNT_IN`: no ready gesture, no leader
+  nod, and no lift of the baton.
 - **Baton.** The bear holds one baton, in the right paw, with the palm down (`CONDUCTOR_HOLD`).
 - **Bow.** At the song end, the bear bows to the orchestra (`END_BOW`).
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
