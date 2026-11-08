@@ -44,6 +44,7 @@ The trial files, which the app does not use:
 | File | Origin | Rebuild |
 |---|---|---|
 | `rabbit-tpose.glb` | T-pose source mesh (below) | None |
+| `tripo-p2/rabbit.glb` | The Tripo P2 source mesh with its base color texture (below) | None |
 | `tripo/rabbit.fbx`, `tripo/rabbit.fbm/` | Source mesh with quad faces, and its four textures (below) | None |
 | `hand-rig/rabbit.blend` | Made by hand in Blender from `tripo/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `hand-rig/rabbit.rig.glb` | Export of `hand-rig/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/hand-rig/rabbit.blend --out assets/models/rabbit/hand-rig/rabbit.rig.glb` |
@@ -147,6 +148,47 @@ simple/rabbit.rig.glb + simple/rabbit.rig.json
   0.2985 m, as on the rabbit of main), `crease` 35, `backRoom` 0.04.
 
 A run gives the same `rabbit.rig.glb`.
+
+### tripo-p2/rabbit.glb
+
+The rabbit of the turnaround sheet `rabbit.png` of 2026-11-07 (a T-pose, three views), made with
+Tripo P2 (Smart Mesh, quad output, a target of about 2,000 quads). The download is an FBX file
+with a Tripo armature and four textures. This GLB file keeps only the mesh and the base color.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan, and given on 2026-11-07 (`tripo_convert_ba507965-bf17-4167-84e0-276667bc52f2.zip`, SHA-256 `6b17930d68428b8efd86ec129d3680335ca9f8db145d28629f2e0c346ec25a1f`). The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Size | 774,164 bytes |
+| SHA-256 | `251efc381000e5754e6f24c02222ff035fb23087e5ef859a0439bcfb5bf1d43f` |
+| Made by | Headless Blender 5.2: the FBX import, the mesh with no armature, no vertex group, and no transform, one material with the base color texture at 2048 × 2048 pixels (JPEG quality 90), and the glTF export. A second run gives the same bytes |
+| Dropped | The Tripo armature (65 Mixamo bones), the normal map, the roughness map, and the metallic map. At 2048 pixels, the mean face color changes by 0.33 of 255 (10 small faces by more than 4), and at 1024 pixels by 0.59 |
+
+The values below are in the units of the studio: 1 unit from the soles to the ear tips, the soles
+at y = 0, +z forward, and +x the left side of the animal. In the FBX file, the mesh is 0.9995
+units high, and it faces -Y.
+
+- **Faces.** 2,771 vertices and 2,973 faces: 2,425 quads and 548 triangles (5,398 triangles). No
+  vertices merge at 1e-5. No edge has more than two faces. The mesh is symmetric: each vertex has
+  a mirror vertex within 0.0025 units.
+- **Parts.** 11 parts: the body (2,493 vertices), two eyeballs (99 vertices each) in the eye
+  sockets, and 8 thin whisker strips (four on each side).
+- **Open edges.** 124, all on the face: the rim of each eye socket (14 edges), the back of each
+  eyeball inside the head (8 edges), and the edges of the 8 whisker strips (11 or 7 each). The
+  fur has no hole.
+- **Form.** The arms stand out level at y 0.557, free of the trunk from |x| 0.09, with the paw
+  tips at |x| 0.306. The arm rings have 11 or 12 vertices, about 0.9 radii apart. The legs part
+  below the crotch at y 0.235. A large round haunch, a thin neck at y 0.60, a round head from y
+  0.62 to 0.78, and ears from y 0.78 to the top. A round tail ball at y 0.25 to 0.35, out to z
+  -0.144. The joints of the Tripo armature agree with the joints of the rig config within 0.02
+  units.
+- **Colors.** Cream fur (sRGB about 231, 201, 168), a pink nose (about 240, 160, 130), pink
+  inner ears, and pink pads under the paws. The dark eyes are the eyeballs, at y 0.698 to 0.728.
+  The face has a smile line.
+
+```bash
+shasum -a 256 assets/models/rabbit/tripo-p2/rabbit.glb
+```
 
 ### rabbit-tpose.glb
 
