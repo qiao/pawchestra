@@ -235,52 +235,50 @@ Design 4.4 gives the rule and the reason of each config key.
 
 - Bone heat gives the trunk side a part of a hanging arm. Keep the arm weights on the free arm
   (`armSplit`, `armBelow`, `armCrease`).
-- A thin face with corners of different weights turns over at a bent joint. `weights.rigid` gives
-  it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
+- A thin face with corners of different weights turns over at a bent joint, so `weights.rigid`
+  gives it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
 - A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
-  (`rigidPainted`). Two rigid groups that touch fold at their shared edge: join them. A rigid
-  group at the front of a root or across the chest, or a Smooth of the root weights, moves the
-  fold to its edge as a dark notch.
-- A ring next to the trunk loop of a hand rig folds when its trunk share drops to 0 in one row,
-  because the play turns the clavicle forward. Move half of the trunk share of the loop to the
-  clavicle.
+  (`rigidPainted`), and join two rigid groups that touch. A rigid group at the front of a root or
+  across the chest, or a Smooth of the root weights, moves the fold to its edge as a dark notch.
+- In a hand rig, the play turns the clavicle forward, so a ring whose trunk share drops to 0 next
+  to the trunk loop folds. Move half of the trunk share of the loop to the clavicle.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds. A straight bind
   folds a thick inner elbow: put its rings one arm radius from the joint (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
 - Uneven shares around one forearm ring dent a bent elbow and shear the twisted faces into dark
-  spikes. Measure them with `sa.ring_spread()`, and give each ring one mean row.
+  spikes. Measure them with `sa.ring_spread()`.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
   (`paintedLower`).
 - A thigh share in the crotch lifts the lower belly band of a seated bind into a shelf. Move the
   band onto the thigh tops with a key `bind*`, and keep each crease vertex off the line of its
   neighbors.
-- When no weight rule or ring removes a fold, fit a `raise` shape with `pnpm raise-fit`, after the
-  hold. A shape fixes only the poses near its rule, and a body has at most `RAISE_LIMIT` shapes.
-  A shape cannot widen an elbow ring that a straight bind narrows.
+- When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
+  `pnpm raise-fit`. A shape fixes only the poses near its rule, and a body has at most
+  `RAISE_LIMIT` shapes. A shape cannot widen an elbow ring that a straight bind narrows.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
-- On an arm joined to the trunk, start an elbow shape with `below` 0, and read its rig log first:
-  `below` 0.3 also turns over the relaxed faces of the arm root.
+- On an arm joined to the trunk, start an elbow shape with `below` 0, because `below` 0.3 also
+  turns over the relaxed faces of the arm root. Read its rig log first.
 
 ### Seams
 
 Design 4.4 gives the merges of each copy.
 
-- A crease can hold a closed tetrahedron, or a vertex of two surfaces. Remove them before the
-  split (`penguin_edit.py`). A collapse at a cut loop can give a face of a stray color (`spread`).
+- Remove a closed tetrahedron or a vertex of two surfaces in a crease before the split
+  (`penguin_edit.py`). A collapse at a cut loop can give a face of a stray color (`spread`).
 - Free an arm (`cut`) only as far as a raised arm of the played roles needs it, and stop where the
-  root meets the trunk. Give the caps the skin normals, and check the flat rig view (front, below,
-  back). End a cut above the shoulder joint, else a black triangle shows on the back.
+  root meets the trunk. End a cut above the shoulder joint, else a black triangle shows on the
+  back. Give the caps the skin normals, and check the flat rig view (front, below, back).
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
   sheets of `pnpm close-views audit`.
 - A tube that `arm_rebuild.py` wraps onto a freed arm can keep its lowest inner vertices on the
   trunk as fins. Merge each into the next vertex of its ring on the arm.
 - A free arm corner that turns away from a trunk hole leaves a notch beside the cap. Move it toward
-  the trunk with `weightMoves`, and keep it beyond the plane of `armSplit`.
+  the trunk with `weightMoves`, beyond the plane of `armSplit`.
 - After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
   share (`weights.armRoot`), or turn the elbow out (design 5.3).
-- A dark slot at an arm root, an elbow, or a wrist can come from split normals. Render
+- Split normals can make a dark slot at an arm root, an elbow, or a wrist. Render
   `--probe colors,normals`, and try `rootNormals` before a rebuild.
 
 ### Legs, seat, and tail
@@ -291,14 +289,14 @@ Design 4.4 gives the merges of each copy.
 - The linear blend flattens a bent knee. Give the knees `bind.knee`.
 - A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
   bones. A tip bone far off the curl of the mesh pinches the bend (`weights.tail.bend`). A tail
-  root can set the seat top: fix it (`sit.top`, `sit.root`).
+  root can set the seat top: fix it with `sit.top` and `sit.root`.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there
   in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps the ledge.
 
 ### Head and colors
 
-- A big head over a thin neck shows a dark band under the head. Keep this form of the mesh: a fill
-  of the groove makes the neck a thick column.
+- A big head over a thin neck shows a dark band under the head. Keep this form, because a fill of
+  the groove makes the neck a thick column.
 - A horn, a trunk, whiskers, or antlers distort the head measures. Use `noseTop`, `noseFront`,
   `headFloor`, and `headCeiling`.
 - A closed beak cannot open by weights. Split a copy of the source.
@@ -309,7 +307,7 @@ Design 4.4 gives the merges of each copy.
 - The eye box and the nose box of `add_surface()` are in the units of the source. Run it before
   the legs lift the body, or lower the mesh for the run.
 - A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
-  the config, and run `arm_rebuild.py`: it writes the softened places into the weights file.
+  the config, and run `arm_rebuild.py`, which writes the softened places into the weights file.
 
 ### Blender scripts
 
