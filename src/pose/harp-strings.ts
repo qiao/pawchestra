@@ -81,13 +81,12 @@ function levelOf(velocity: number): number {
  * end.
  *
  * @param notes The notes of the player, sorted by start.
- * @param pluckTimes The pluck time of each note, in the order of `notes`, or `null` for the note
- *   starts.
+ * @param pluckTimes The pluck time of each note, in the order of `notes`.
  * @returns The track.
  */
 export function buildStringTrack(
   notes: readonly PlayerNote[],
-  pluckTimes: Float64Array | null = null,
+  pluckTimes: Float64Array,
 ): StringTrack {
   const plucks = Array.from({ length: HARP_STRING_COUNT }, (): Pluck[] => []);
   for (const [k, note] of notes.entries()) {
@@ -99,7 +98,7 @@ export function buildStringTrack(
       last.level = Math.max(last.level, level);
     } else {
       // The plucks of one string stay in order.
-      const start = Math.max(pluckTimes?.[k] ?? note.startSec, last?.start ?? -Infinity);
+      const start = Math.max(pluckTimes[k] ?? note.startSec, last?.start ?? -Infinity);
       own?.push({ start, end: note.endSec, level });
     }
   }

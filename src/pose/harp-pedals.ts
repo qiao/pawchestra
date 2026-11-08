@@ -107,13 +107,10 @@ interface ChangeDraft {
  * at its latest time, just before its note.
  *
  * @param notes The notes of the player, sorted by start.
- * @param plucks The pluck time of each note (`notePlucks()`), or `null` for the note starts.
+ * @param plucks The pluck time of each note (`notePlucks()`).
  * @returns The plan.
  */
-export function planPedals(
-  notes: readonly PlayerNote[],
-  plucks: Float64Array | null = null,
-): PedalPlan {
+export function planPedals(notes: readonly PlayerNote[], plucks: Float64Array): PedalPlan {
   const m = PEDAL_MOTION;
   const count = HARP_PEDALS.order.length;
   const start = new Int8Array(count);
@@ -122,7 +119,7 @@ export function planPedals(
   const lastPluck = new Float64Array(count).fill(-Infinity);
   const drafts: ChangeDraft[] = [];
   for (const [k, note] of notes.entries()) {
-    const time = plucks?.[k] ?? note.startSec;
+    const time = plucks[k] ?? note.startSec;
     const need = pedalOf(note.pitch);
     if (!seen[need.pedal]) {
       seen[need.pedal] = 1;

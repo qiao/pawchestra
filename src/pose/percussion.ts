@@ -167,7 +167,7 @@ export function percussionTracks(
   notes: readonly PlayerNote[],
   loudness: readonly number[],
   amplitude: number,
-  beats: Float64Array = new Float64Array(),
+  beats: Float64Array,
 ): PercussionTracks {
   const { hold, instrument } = rig;
   const kettles = instrument === 'timpani' ? rig.targets.size : 4;
