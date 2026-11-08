@@ -404,33 +404,36 @@ function afterEnds(
 }
 
 /**
- * Finds the damps of the hand cymbals against the chest (`PercussionHold.damp`, design 5.3). A
- * note is damped at its end when the silence to the next note of the player is at least
- * `restSec`. The move starts at the crash of the note and ends before the next lift.
+ * Finds the damps of a player (`PercussionHold.damp`, design 5.3). A note is damped at its end
+ * when the silence to the next note of the player is at least `restSec`. The hand cymbals go to
+ * the chest: the move starts at the crash of the note and ends before the next lift. The free paw
+ * of the bass drum goes to the far head: the move starts after the rebound of the beater and ends
+ * at the next note.
  *
  * @param rule The rule of the damp.
  * @param groups The note groups of the player, sorted by start.
- * @param crashes The crashes of the hand cymbals.
- * @returns The damps of both hands.
+ * @param strikes The strikes of the hand cymbals or of the beater.
+ * @returns The damps.
  */
 function dampTrackOf(
   rule: DampRule,
   groups: readonly NoteGroup[],
-  crashes: StrikeTrack,
+  strikes: StrikeTrack,
 ): DampTrack {
   const m = DAMP_MOTION;
   const wishes: DampWish[] = [];
   for (const [k, g] of groups.entries()) {
     const next = groups[k + 1];
-    // The crash of the note: the last crash at or before its start.
-    const i = lastAtOrBefore(crashes.starts, g.start + 1e-6);
+    // The strike of the note: the last strike at or before its start.
+    const i = lastAtOrBefore(strikes.starts, g.start + 1e-6);
     if ((next && next.start - g.end < rule.restSec) || i < 0) {
       continue;
     }
+    const palm = rule.kind === 'palm';
     wishes.push({
       contact: g.end,
-      earliest: crashes.starts[i] ?? g.start,
-      latest: crashes.upStarts[i + 1] ?? Infinity,
+      earliest: palm ? g.start + STRIKE_MOTION.reboundSec : (strikes.starts[i] ?? g.start),
+      latest: palm ? (next?.start ?? Infinity) : (strikes.upStarts[i + 1] ?? Infinity),
       hold: rule.hold,
       key: 0,
       inSec: m.inSec,
@@ -949,7 +952,10 @@ function poseHand(
   if (side.kind === 'mallet' && rig.hold.set) {
     setHand(side, rig.hold.set, hang.pole, shoulder.position, chest, hanging, restHand);
   }
-  const play = side.kind === 'free' ? 0 : rig.hold.ready ? 1 : weight;
+  // The free paw goes to the far head at a damp (`PalmDamp`) while the player plays, and else
+  // hangs.
+  const free = rig.dampHand ? state.damp.weight * weight : 0;
+  const play = side.kind === 'free' ? free : rig.hold.ready ? 1 : weight;
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
@@ -964,6 +970,9 @@ function poseHand(
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
+  } else if (rig.dampPlace && rig.dampHand) {
+    wrist.fromArray(rig.dampPlace);
+    turn.fromArray(rig.dampHand);
   } else {
     wrist.copy(hanging);
     turn.copy(restHand);
@@ -982,8 +991,10 @@ function poseHand(
     chest.rotation,
     rotations,
   );
-  // A paw with a mallet holds it also at rest and in the lift.
-  writeCurl(arm, side.kind === 'mallet' ? rig.hold.curl : rig.hold.curl * play, rotations);
+  // A paw with a mallet holds it also at rest and in the lift. The free paw keeps its fingers
+  // open, also with the palm on a drum head.
+  const curl = side.kind === 'free' ? 0 : rig.hold.curl;
+  writeCurl(arm, side.kind === 'mallet' ? curl : curl * play, rotations);
 }
 
 /**

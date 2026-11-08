@@ -354,8 +354,6 @@ passes.
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
-- [ ] Badger bass drummer: the left paw hangs and does not muffle the head in the rests
-      (percussion-technique 5).
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -853,10 +851,6 @@ scene of each demo has its seats and stage size with no overlap.
       (`PercussionHold.pair`). Offer the user longer arms.
 - [ ] Elephant timpanist: no muffle, because the short arms hold the paw a few cm over the head
       plane and outside the head (5.3). Higher kettles or longer arms let the paw reach the spot.
-- [ ] Bass drum muffle: no muffle, because the left head stands in front of the middle of the
-      badger: the palm on it put the left upper arm 5.9 cm into the body (base 2.6 cm), and a
-      place further forward left the palm 6 cm to 8 cm off the head. A drum turned or moved left
-      would let the free paw reach.
 - [ ] Hand cymbals: the plates stay parallel at the crash, with no angle of a flam between them
       (percussion-technique 7). Only recast bodies play them.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger

@@ -504,14 +504,18 @@ The rest of each family:
   player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
   no preparation. A chord takes both hands, a fast repeat takes the other hand, and a hand
   does not cross the other.
-- **Damps.** The hand cymbals damp a note at its end against the chest when the silence to the
-  next note is at least `DampRule.restSec`, as a real player stops a short note (percussion 7).
-  The windows come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the
-  contact, stays for at most the hold, and ends before the next lift. The drums do not damp.
-  Reason: the short arms of the elephant held the lowest point of the paw a few cm over the head
-  plane and outside the head in each tried place. The bass drum stands in front of the middle of
-  the badger, so with its free palm on the left head, the left upper arm went into the body, and a
-  place further forward was out of reach.
+- **Damps.** A note is damped at its end when the silence to the next note is at least
+  `DampRule.restSec`, as a real player stops the sound in a rest (percussion 5, 7). The windows
+  come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the contact,
+  stays for at most the hold, and ends before the next lift or note. The hand cymbals go against
+  the chest (`ChestDamp`). The free left paw of the bass drummer lays its palm on the near part of
+  the far head, and the upper body turns 20° to bring the left shoulder forward, with the head
+  turned back (`PalmDamp`). Reason: the near rim of the far head stands out of the reach of the
+  short arm. With no turn, the left upper arm went 4.8 cm into the body. A drum moved 3 cm to
+  6 cm to the left, or turned 15° to 35°, still put the left upper arm 3.3 cm to 4.3 cm into the
+  body, or put the right upper arm into the belly and the beater off its spot. The timpanist does
+  not damp: the short arms of the elephant held the lowest point of the paw a few cm over the
+  head plane and outside the head in each tried place.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
   plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
   plates slide on past each other, the right plate down and the left plate up by a share

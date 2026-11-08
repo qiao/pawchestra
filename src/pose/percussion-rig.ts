@@ -1,9 +1,10 @@
-import { MathUtils, Quaternion, Vector3 } from 'three';
+import { MathUtils, Matrix4, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import {
+  BASS_DRUM,
   SNARE_DRUM,
   TIMPANI,
   TRIANGLE,
@@ -113,12 +114,18 @@ export interface MalletSet {
 }
 
 /**
- * The damp of the hand cymbals after a note (design 5.3), as a real player stops the ring of the
- * plates against the chest after a short note (`docs/reference/percussion-technique.md` 7). A note
- * is damped at its end when the silence from its end to the next note of the player is at least
- * `restSec`.
+ * The damp of the sound after a note (design 5.3), as a real player stops the ring of a drum or a
+ * cymbal at a rest (`docs/reference/percussion-technique.md` 5, 7). A note is damped at its end
+ * when the silence from its end to the next note of the player is at least `restSec`.
+ *
+ * - `chest`: the hand cymbals go against the chest.
+ * - `palm`: the free paw lays its palm on the far head of the bass drum.
  */
-export interface DampRule {
+export type DampRule = ChestDamp | PalmDamp;
+
+/** The damp of the hand cymbals against the chest ({@link DampRule}). */
+export interface ChestDamp {
+  readonly kind: 'chest';
   readonly restSec: number;
   /** The longest contact, in seconds. */
   readonly hold: number;
@@ -126,6 +133,34 @@ export interface DampRule {
   readonly drop: number;
   /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
   readonly room: number;
+}
+
+/** The damp of the free paw on the far head of the bass drum ({@link DampRule}). */
+export interface PalmDamp {
+  readonly kind: 'palm';
+  readonly restSec: number;
+  /** The longest contact, in seconds. */
+  readonly hold: number;
+  /**
+   * The wrist at the damp, from the middle of the far head, in meters, in the axes of the head:
+   * out from the head along its normal, up, and along the head toward the player.
+   */
+  readonly wrist: Vec3;
+  /**
+   * The angle of the fingers down from the line along the head away from the player, in
+   * radians. The palm faces the head.
+   */
+  readonly fingers: number;
+  /**
+   * The turn of the paw around the vertical from flat on the head, in radians, so that the
+   * fingers point into the head and the paw keeps nearer to the line of the forearm.
+   */
+  readonly yaw: number;
+  /**
+   * The turn of the upper body to the right at the damp, in radians, so that the left shoulder
+   * comes forward toward the far head.
+   */
+  readonly turn: number;
 }
 
 /**
@@ -345,10 +380,13 @@ export const PERCUSSION_HOLDS = {
   // over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm, and
   // the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
   // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean also
-  // at rest (ready). The left arm hangs, because a single note often needs no muffling. The left
-  // paw does not muffle the left head (damp): the head stands at the middle of the body, so with
-  // the palm on it the left upper arm went 5.9 cm into the body, and a place further forward left
-  // the palm 6 cm to 8 cm off the head.
+  // at rest (ready). The left arm hangs while the badger plays, because a single note often needs
+  // no muffling. In a rest after a note, the left palm lies on the near part of the far head
+  // (damp), and the upper body turns 20° so that the left shoulder comes forward: with no turn,
+  // the left upper arm went 4.8 cm into the body, and the drum moved or turned to the left put an
+  // upper arm 3.3 cm to 4.3 cm into the body or the beater off its spot. The paw turns 37° from
+  // flat toward the forearm, so that it bends 2° on the forearm at p95 (47° flat), and stands
+  // 7 cm out so that the claws stay at the head.
   'bass-drum': {
     hands: 'right',
     sizes: { lift: 0.13, rest: 0.05 },
@@ -372,7 +410,15 @@ export const PERCUSSION_HOLDS = {
     lean: 0.12,
     side: null,
     fit: null,
-    damp: null,
+    damp: {
+      kind: 'palm',
+      restSec: 0.5,
+      hold: 0.5,
+      wrist: [0.07, 0, 0.25],
+      fingers: 0.5,
+      yaw: 0.65,
+      turn: 0.35,
+    },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -443,7 +489,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
-    damp: { restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
+    damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -786,10 +832,16 @@ export interface PercussionRig {
    */
   readonly place: Vec3;
   /**
-   * The crash point of the hand cymbals at the damp against the chest (`PercussionHold.damp`), in
-   * the model axes, or `null` for another hold.
+   * The place of a damp (`PercussionHold.damp`), in the model axes, or `null` for a hold with no
+   * damp: the crash point of the hand cymbals at the chest, or the wrist of the free paw on the
+   * far head of the bass drum.
    */
   readonly dampPlace: Vec3 | null;
+  /**
+   * The world rotation of the free paw at the damp on the far head of the bass drum, from the
+   * bind pose, or `null` for another hold.
+   */
+  readonly dampHand: Quat | null;
 }
 
 /**
@@ -1143,6 +1195,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   const heads = model.instrument.targets.filter((t) => t.kind === 'head');
   let sides: readonly [PercussionSide, PercussionSide];
   let dampPlace: Vec3 | null = null;
+  let dampHand: Quat | null = null;
   switch (instrument) {
     case 'timpani':
       for (const [i, head] of heads.entries()) {
@@ -1167,7 +1220,20 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         dampPlace = plates.chest;
       }
       break;
-    case 'bass-drum':
+    case 'bass-drum': {
+      const head = bindTarget(
+        model,
+        findTarget(model, (t) => t.kind === 'head'),
+      );
+      targets.set(0, head);
+      sides = [{ kind: 'free', arm: left }, mallet(right, 'malletR')];
+      if (hold.damp?.kind === 'palm') {
+        const palm = palmOnFarHead(head, hold.damp);
+        dampPlace = palm.wrist;
+        dampHand = palm.hand;
+      }
+      break;
+    }
     case 'snare-drum':
       targets.set(
         0,
@@ -1179,10 +1245,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
           place,
         ),
       );
-      sides = [
-        instrument === 'snare-drum' ? mallet(left, 'malletL') : { kind: 'free', arm: left },
-        mallet(right, 'malletR'),
-      ];
+      sides = [mallet(left, 'malletL'), mallet(right, 'malletR')];
       break;
     case 'xylophone': {
       const bars = findTarget(model, (t) => t.kind === 'bars');
@@ -1266,7 +1329,58 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     lever: left.bind.shoulder[1] - (model.skeleton.positions[boneIndex('spine')]?.[1] ?? 0),
     place,
     dampPlace,
+    dampHand,
   };
+}
+
+/**
+ * Gives the axes of a drum head that stands on its side (design 5.3): the normal, up, and the line
+ * along the head toward the player. The player faces -z.
+ *
+ * @param normal The unit normal of the head.
+ * @returns The three unit axes.
+ */
+function headAxes(normal: Vec3): readonly [normal: Vector3, up: Vector3, toward: Vector3] {
+  const n = new Vector3(...normal);
+  const toward = new Vector3().crossVectors(n, Y_AXIS).normalize();
+  if (toward.z < 0) {
+    toward.negate();
+  }
+  return [n, Y_AXIS.clone(), toward];
+}
+
+/**
+ * Gives the wrist and the world rotation of the free paw on the far head of the bass drum at a
+ * damp (`PalmDamp`, design 5.3). The palm faces the head, and the fingers point along the head away
+ * from the player and down. In the bind pose, the palm of the left paw faces +x, the fingers point
+ * down, and the thumb points forward.
+ *
+ * @param near The target on the near head, the head of the beater.
+ * @param rule The rule of the damp.
+ * @returns The wrist and the rotation of the hand from the bind pose.
+ */
+function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): { wrist: Vec3; hand: Quat } {
+  const [n, up, toward] = headAxes(near.normal);
+  const middle = new Vector3(...near.point).addScaledVector(n, -BASS_DRUM.depth);
+  const wrist = middle
+    .addScaledVector(n, -rule.wrist[0])
+    .addScaledVector(up, rule.wrist[1])
+    .addScaledVector(toward, rule.wrist[2]);
+  const fingers = toward
+    .clone()
+    .multiplyScalar(-Math.cos(rule.fingers))
+    .addScaledVector(up, -Math.sin(rule.fingers));
+  const thumb = new Vector3().crossVectors(n, fingers);
+  const target = new Matrix4().makeBasis(n, fingers, thumb);
+  const bind = new Matrix4().makeBasis(
+    new Vector3(1, 0, 0),
+    new Vector3(0, -1, 0),
+    new Vector3(0, 0, -1),
+  );
+  const hand = new Quaternion()
+    .setFromAxisAngle(Y_AXIS, -rule.yaw)
+    .multiply(new Quaternion().setFromRotationMatrix(target.multiply(bind.transpose())));
+  return { wrist: toVec3(wrist), hand: toQuat(hand) };
 }
 
 /**

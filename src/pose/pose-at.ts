@@ -510,8 +510,16 @@ function poseAnimal(
       // the right. The neck and the head turn back by the side lean, so that the eyes stay level
       // over the bars.
       const { legs } = note.rig;
-      body.lean = note.rig.hold.lean * (note.rig.hold.ready ? 1 : weight);
+      const ready = note.rig.hold.ready ? 1 : weight;
+      body.lean = note.rig.hold.lean * ready;
       body.upright = body.lean;
+      // At a damp of the bass drum, the upper body turns the left shoulder toward the far head, and
+      // the head turns back (`PalmDamp.turn`).
+      const palm = note.rig.hold.damp;
+      if (palm?.kind === 'palm') {
+        body.turn = -palm.turn * strikes.damp.weight * ready;
+        body.headTurn = -body.turn;
+      }
       if (note.side && legs) {
         const share = sideMoveAt(note.side, noteTime) * weight;
         body.sway -= share * note.side.move.spine;
