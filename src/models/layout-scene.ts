@@ -1807,32 +1807,13 @@ function* sightSweepSteps(
     if (known) {
       return known;
     }
-    const result = freshSight(i, angle);
-    memo?.set(i, angle, result);
-    return result;
-  };
-  const freshSight = (i: number, angle: number): SightResult => {
     const member = members[i];
     if (!member) {
       return { sight: 0, hidden: 0 };
     }
-    // The own stand of a wind player stands in front of its face.
-    const height = heights[i] ?? 0;
-    const own =
-      member.stand === 'own'
-        ? [placeStand(angle, radius - member.standDistance, i, [member], height).obstacle]
-        : [];
-    const place = placePlayer(member, angle, radius, height).place;
-    const seen = sightOf(member.sight, place, targets, {
-      ...blockers,
-      stands: [...blockers.stands, ...own],
-    });
-    return view === null
-      ? seen
-      : {
-          ...seen,
-          hidden: seen.hidden + audienceShare(member.sight, place, blockers.solid, view),
-        };
+    const result = sightAt(member, angle, radius, heights[i] ?? 0, targets, blockers, view);
+    memo?.set(i, angle, result);
+    return result;
   };
   const steps = Math.round(CONDUCTOR_SIGHT.nudge / CONDUCTOR_SIGHT.nudgeStep);
   const right = angles.flatMap((a, i) => (a >= 0 ? [i] : []));
@@ -1928,6 +1909,42 @@ function* sightSweepSteps(
     }
   }
   return next;
+}
+
+/**
+ * Finds the sight of a player of a row at an angle, with its own stand in front of its face.
+ *
+ * @param member The player.
+ * @param angle The angle of the player.
+ * @param radius The radius of the row.
+ * @param height The height of the floor under the player.
+ * @param targets The points of the conductor.
+ * @param blockers The items in front of the row.
+ * @param view The stage side when the row keeps the view of the audience, or `null`. The hidden
+ *   share of the head then adds to the hidden share of the conductor.
+ * @returns The sight.
+ */
+function sightAt(
+  member: Member,
+  angle: number,
+  radius: number,
+  height: number,
+  targets: SightTargets,
+  blockers: SightBlockers,
+  view: number | null,
+): SightResult {
+  const own =
+    member.stand === 'own'
+      ? [placeStand(angle, radius - member.standDistance, member.index, [member], height).obstacle]
+      : [];
+  const place = placePlayer(member, angle, radius, height).place;
+  const seen = sightOf(member.sight, place, targets, {
+    ...blockers,
+    stands: [...blockers.stands, ...own],
+  });
+  return view === null
+    ? seen
+    : { ...seen, hidden: seen.hidden + audienceShare(member.sight, place, blockers.solid, view) };
 }
 
 /** A row after the sight pass, with the risers under it. */
