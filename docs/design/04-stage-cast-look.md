@@ -68,7 +68,9 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 - Each player sees the head and the baton paw of the conductor, as in a real orchestra: the
   players look through the gaps of the rows in front, and the winds, the brass, and the
   percussion sit on risers that rise toward the back (4.5, seat geometry). The strings sit on the
-  stage top.
+  stage top. A back desk of the strings looks through the gap between the two players of the
+  first desk in front of it, so the first desks move a little to give each such gap the room of a
+  desk. The audience sees each player on a riser.
 - The vocal soloists of 3.8 stand in front of the choir, on the lowest level of the risers,
   because a place beside the conductor covers the first violins or the cellos.
 - The soloist of 3.8 stands or sits at the front left of the conductor, as in a concerto. A
@@ -1149,25 +1151,48 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
   the band, so that the players can move along the arc and the seat groups can rise after the
   spread. Thus the rows stand farther apart, and the stage is deeper.
 - **Sight lines.** After the spread and the wedges, each player sees the head and the baton paw of
-  the conductor (`CONDUCTOR_SIGHT`), against the footprints of the rows in front. A music stand
-  hides only the head, and the own stand of the player counts. The eyes of the bear are only about
-  0.1 m above the heads of the seated strings, so a player behind them sees the conductor only
-  through a gap or from a riser. From the front row to the back row:
+  the conductor (`CONDUCTOR_SIGHT`). The points cover the parts of the posed conductor that the
+  `sight-lines` probe measures: a grid on the head with its front and its back, the baton paw with
+  the baton, and the left paw. The lines go from the eyes of the player to the points, against the
+  triangles of the player meshes of the rows in front (a box tree of each model) and the boxes of
+  the stands and the risers. The boxes of a footprint are too large for this test, because a box
+  of a head band holds the ears and the whole head. A player is blocked when an item hides one
+  head point or one baton point. A music stand hides only the head, and the own stand of the
+  player counts. The eyes of the bear are only about 0.1 m above the heads of the seated strings,
+  so a player behind them sees the conductor only through a gap or from a riser. From the front
+  row to the back row:
   - A search moves the players of the row along the arc, up to `CONDUCTOR_SIGHT.nudge`, with the
     fewest blocked players, then the fewest players with no sight of the left paw, then the
-    smallest moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor,
-    and the outer players keep the edges of the spread.
+    smallest moves (`sightCost()`). Among blocked places, it takes the place with the least
+    hidden. Neighbors keep their packed arcs, and the outer players keep the edges of the spread.
+    The strings keep the gap of the conductor: the back desks of row 1 stay at least as far from
+    0° as the inner first desks.
+  - **First desks.** The spread gives each gap of row 0 the same arc, but a desk of two partners
+    fits into the gap between two first desk players only when the gap is a little larger. When a
+    back desk player stays blocked, a greedy search moves runs of row 0 players next to it (the
+    player alone, with one neighbor, or with all players to the inside or to the outside) by 1°
+    steps (`FRONT_MOVES`), and keeps the move with the lowest cost of row 1. A move keeps the
+    packed arcs, the packed gap of the conductor, the stage, the gaps to the other items, and the
+    sight of row 0 past the soloists. Real back desks also sit behind the gaps of the desks in
+    front.
   - From row 2, each seat group with a blocked player rises in steps of `ROW_RISER`, and the
     search runs again. A group starts at the height of the risers in front of it, so the rows rise
     toward the back, and it takes the lowest height with its fewest blocked players. Each group
-    has its own riser, as the modular risers of a real orchestra. A riser keeps `RISER_EDGE` from
-    the outline of the stage. When a riser goes into an item of a lower neighbor group, that group
-    rises to the same height, and a row keeps no riser that goes into an item.
+    has its own riser, as the modular risers of a real orchestra. A riser reaches at least
+    `RISER_BACK` behind the seat centers and keeps `RISER_EDGE` from the outline of the stage, at
+    the places of the players after the search. When a riser goes into an item of a lower
+    neighbor group, that group rises to the same height, and a row keeps no riser that goes into
+    an item or that does not fit on the stage.
+  - **Audience.** From row 2, the head of each player also faces the audience (`AUDIENCE`): the
+    low and the middle front camera and the two side cameras of the Cinematic wide shots, as
+    multiples of the stage side. A player that loses `AUDIENCE.hidden` of its head counts as
+    blocked, so that its group rises, because a small animal on a low riser hides behind the
+    strings in the low shots.
   - The choir risers then rise together, up to `CHOIR_LIFT`, until each singer sees the
     conductor.
-  - `pnpm sight-lines` measures the result on the meshes of all demos. Some back desks of the
-    strings stay blocked, because a desk of two partners does not fit into the gaps of the first
-    row.
+  - `pnpm sight-lines` measures the result on the meshes of all demos. A few players stay
+    blocked: back desks on a small stage beside a piano soloist, where the row has no free arc,
+    and a player directly behind a tall animal on a full riser.
 
 ```typescript
 /** The limits of the spread of a row. */
