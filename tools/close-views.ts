@@ -297,8 +297,9 @@ const CLOSE_ROLES: readonly CloseRole[] = [
  *   The moments are an open beak in a note, a closed beak between two notes, and the rest pose,
  *   with the default test notes. The flippers hold the folder in each moment.
  * - The badger of the percussion, who stands: one role for each instrument, with the front, both
- *   sides, and the back. The moments are a strike of each hand or a crash, a time between two
- *   strikes, the rest pose, and halfway through the lift and the lowering at the first strike.
+ *   sides, and the back. The moments are a strike of each hand, a time between two strikes, a
+ *   muffle in a rest, the rest pose, and halfway through the lift and the lowering at the first
+ *   strike.
  *   The bass drummer strikes with the beater in the right paw, the snare drummer and the
  *   xylophonist alternate their paws, the percussionist strikes the triangle in its left paw and
  *   then the tambourine, and the xylophonist strikes the lowest and the highest bars.
@@ -747,13 +748,17 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
       { name: 'back', azimuth: 180 },
     ],
     moments: [
-      { name: 'crash', time: 0.5, rest: false },
-      { name: 'open', time: 1.5, rest: false },
+      { name: 'strike', time: 0.5, rest: false },
+      // The cymbal rings after the strike.
+      { name: 'ring', time: 1.2, rest: false },
+      // After the end of the note, a paw stops the ring: the free paw at the rim of a suspended
+      // cymbal (`EdgeDamp`), or the hand cymbals at the chest (`ChestDamp`).
+      { name: 'muffle', time: 1.7, rest: false },
       { name: 'rest', time: 0, rest: true },
       ...halfMoves(0.5),
     ],
     camera: { kind: 'body', zoom: 1, elevation: 20 },
-    // Two crashes of the cymbals (key 49).
+    // Two notes of the cymbals (key 49), each with a rest after it.
     notes: ['0.5 1 49', '2.5 1 49'].join('\n'),
   },
   percussionist: {
