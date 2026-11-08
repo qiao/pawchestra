@@ -15,6 +15,26 @@ export const STUDIO_TRIANGLE_BUDGET = 6200;
 export const STUDIO_MESH_GZIP_BUDGET = 34_000;
 
 /**
+ * The gzip budgets of the bodies that need more than {@link STUDIO_MESH_GZIP_BUDGET}, in bytes,
+ * by the name of the body in `STUDIO_BODIES`.
+ */
+export const STUDIO_MESH_GZIP_BUDGETS: Readonly<Partial<Record<string, number>>> = {
+  // The Tripo P2 rabbit keeps the quads of its source and the arm rings of the simple rig, and a
+  // decimate would break the quad arm rings (design 4.4, "Simple route").
+  'studio-rabbit': 40_000,
+};
+
+/**
+ * Gives the gzip budget of the packed mesh of a studio body.
+ *
+ * @param name The name of the body in `STUDIO_BODIES`, such as `studio-rabbit`.
+ * @returns The budget, in bytes.
+ */
+export function meshGzipBudget(name: string): number {
+  return STUDIO_MESH_GZIP_BUDGETS[name] ?? STUDIO_MESH_GZIP_BUDGET;
+}
+
+/**
  * Gives the gzip size of a text, with the default level of Node zlib, as `pnpm size` measures the
  * first download (design 7.2).
  *
