@@ -558,11 +558,11 @@ export const WIND_HOLDS = {
  * 8° down to the right ({@link FOX_FLUTE_BACK}). The embouchure hole sits at the lower lip, 0.1 H
  * below the mouth of the body and 0.125 H back under the long muzzle (`lipShift`), and the lip
  * plate presses the lips and the chin about 0.5 cm, as a real flutist rests the lip plate against
- * the chin under the lower lip (`docs/reference/wind-technique.md` 2.4). At 0.05 H below the mouth,
- * the hole stood 2.1 cm in front of the face. Further back, the plate goes deeper into the face
- * before the hole reaches the lip. The shoulders stay square and low, with no forward turn of the
- * right shoulder. The left elbow points down and out, and the right elbow down, out, and a little
- * forward, as a seated flutist lets the arms hang (`docs/reference/wind-technique.md` 2.4).
+ * the chin under the lower lip (`docs/reference/wind-technique.md` 2.4). Further back, the plate
+ * goes deeper into the face before the hole reaches the lip. The shoulders stay square and low,
+ * with no forward turn of the right shoulder. The left elbow points down and out, and the right
+ * elbow down, out, and a little forward, as a seated flutist lets the arms hang
+ * (`docs/reference/wind-technique.md` 2.4).
  *
  * Each palm faces the flute, and the fingers curl over it (`faceTube`, `gripCurl`), as a real
  * flutist curves the fingers over the keys (`docs/reference/wind-technique.md` 2.4). The left paw
@@ -635,11 +635,7 @@ const FOX_FLUTE = {
  * points 10° below the level and 45° to the right, forward and a little down, as the pandas of
  * `orchestra-latest.png` hold it and as a trombonist points it toward the audience
  * (`docs/reference/wind-technique.md` 1.1). The right arm reaches 0.120 m of the slide travel
- * (`pnpm hold-reach panda --instrument trombone`). On the body of the older mesh, with the right
- * grip near the mouthpiece side of the brace, it reached 0.17 m: straight ahead and 10° below the
- * level, the travel was 0.5 cm, 30° to the right 10 cm, 60° 26 cm, and 90° 45.5 cm, with the slide
- * further to the side. A turn of 40° to the right, or a slide 5° below the level, reached 0.055 m
- * or 0.080 m.
+ * (`pnpm hold-reach panda --instrument trombone`).
  */
 const PANDA_PLAY = {
   /** The turn of the slide to the right of the panda, around the mouthpiece. */
@@ -693,11 +689,9 @@ const PANDA_PLAY_TURN = toQuat(
  * the slide away from the mouthpiece (`gripShiftR`): the slide points 45° to the right, so the
  * right side of the panda is the far right side of the brace. The paw points 0.8 of the way along
  * the slide (`aimSide`), and the fingers curl 110° around the brace. With the grip 0.08 H along the
- * slide, the middle of the paw lies 5 cm from the brace, and the paw does not grasp it. On the body
- * of the older mesh, with the grip 0.08 H back toward the mouthpiece, the right palm faced the
- * audience and the right thumb pointed down the brace. Both paws keep the aim and the roll of the
- * play at rest (`restAim`): with the roll of the shoulder, the right wrist turns 5,500° to 9,800°
- * each second in the lowering.
+ * slide, the middle of the paw lies 5 cm from the brace, and the paw does not grasp it. Both paws
+ * keep the aim and the roll of the play at rest (`restAim`): with the roll of the shoulder, the
+ * right wrist turns 5,500° to 9,800° each second in the lowering.
  *
  * The elbows stay away from the sides of the body, as a brass player keeps space between the elbows
  * and the sides (`docs/reference/wind-technique.md` 1.8). The arms of the body are round tubes free
@@ -717,26 +711,19 @@ const PANDA_PLAY_TURN = toQuat(
  * The middle of the right paw lies at the far side of the brace, so the right arm reaches 0.155 m
  * of the slide travel of 0.55 m (`pnpm hold-reach panda --instrument trombone`). A real seventh
  * position is 0.57 m from the first position (`docs/reference/wind-technique.md` 1.2), so the slide
- * positions map into the reached travel. On the body of the older mesh, a forward turn of the right
- * shoulder of 55° reached 0.125 m, and flattened the right upper arm to 0.60 (limit 0.55). A
- * forward turn of the right shoulder at the sixth and the seventh positions, as a real player moves
- * the shoulder there, reached 0.195 m on the grip at the mouthpiece side of the brace, but bent the
- * right wrist 74° to 76° to the side.
+ * positions map into the reached travel.
  *
  * The left shoulder turns 35° forward, as the shoulder blade of a real player slides forward when
  * the arm reaches forward, so that the left arm root moves off the front of the chest. With 42°,
  * the left forearm goes 0.4 cm into the slide tubes in the lift and the lowering (0.2 cm with 35°).
- * On the body of the older mesh, with a square left shoulder, the left upper arm turned 68° from
- * its bind direction to the grip, and faces at the front of the left shoulder folded in each
- * sample. A turn of 45° or more folded 5 faces of the left shoulder in the play.
+ * A turn of 45° or more folded 5 faces of the left shoulder in the play.
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trombonist
  * (`docs/reference/wind-technique.md` 1.1): it moves 0.057 H down and 0.065 H back from the mouth
  * of the body (`lipShift`), so that its middle lies 0.5 cm below the crease between the lips and
- * the rim presses the lips 0.2 cm. At the mouth of the rule of the nose drop, the rim stood 0.7 cm
- * in front of the face, 2.4 cm above the crease. The body keeps that mouth: a mouth point at the
- * lips (`mouthHeight`) moves the trombone of the bind pose, and the layout reads that place, so the
- * seats of the stage moved about 3 cm.
+ * the rim presses the lips 0.2 cm. The body keeps the mouth of the rule of the nose drop, because a
+ * mouth point at the lips (`mouthHeight`) moves the trombone of the bind pose and the seats of the
+ * stage.
  *
  * In the rest pose, the trombone stands upright in front of the body, below the mouth, with the
  * slide down and 16° forward of the vertical (`rest`, {@link PANDA_PLAY}), as a seated player holds
@@ -913,10 +900,9 @@ const BEAVER_REST = holdTurn(0, 0);
  * The long muzzle and the front teeth put the tip of the nose far in front of the mouth, so the
  * reed sits 0.33 H lower and 0.27 H further back than the mouth of the bind pose, under the tips of
  * the front teeth, and goes 0.3 cm between the lips, as the reed of a real bassoonist goes straight
- * into the mouth (`docs/reference/wind-technique.md` 3). With 0.25 H back, the reed tip stood
- * 0.4 cm off the lips. With 0.28 H back, the left paw swings 71° on its forearm in the play, over
- * the limit of the arm gate. The beaver keeps its arms, so it plays a smaller bassoon
- * (`SpeciesParams.bassoonScale`), and each shoulder bone turns forward
+ * into the mouth (`docs/reference/wind-technique.md` 3). With 0.28 H back, the left paw swings 71°
+ * on its forearm in the play, over the limit of the arm gate. The beaver keeps its arms, so it
+ * plays a smaller bassoon (`SpeciesParams.bassoonScale`), and each shoulder bone turns forward
  * ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a real player slides forward when the
  * arm reaches forward: with square shoulders, the right paw reaches its grip with 3 cm to spare
  * only on a bassoon of 0.75. The arms are round tubes free of the trunk, as a real bassoonist keeps
@@ -1069,12 +1055,10 @@ const WOLF_CLARINET_FORWARD = 5;
  * The muzzle puts the tip of the nose in front of the mouth, so the mouthpiece sits 0.1 H lower and
  * 0.21 H further back than the mouth of the bind pose (`lipShift`), at the dark lips under the
  * muzzle, and goes 0.6 cm into the mouth, as a real clarinetist takes the mouthpiece between the
- * lips (`docs/reference/wind-technique.md` 3). With 0.18 H lower and 0.4 H back, the mouthpiece
- * stood 1.1 cm below the jaw, 8 cm behind the lips. The body keeps the mouth of the rule of the
- * nose drop: a mouth point at the lips (`mouthHeight`) moves the clarinet of the bind pose, and the
- * layout reads that place, so each seat of the stage moved about 3 cm. Each shoulder bone turns
- * forward, the right 35° and the left 20°. At 45°, the grips move further forward, out of the reach
- * of the arms.
+ * lips (`docs/reference/wind-technique.md` 3). The body keeps the mouth of the rule of the nose
+ * drop, because a mouth point at the lips (`mouthHeight`) moves the clarinet of the bind pose and
+ * the seats of the stage. Each shoulder bone turns forward, the right 35° and the left 20°. At 45°,
+ * the grips move further forward, out of the reach of the arms.
  *
  * Both elbows point down and a little out, as a seated clarinetist lets the arms hang near the
  * body, in the play.
@@ -1143,8 +1127,7 @@ const WOLF_CLARINET = {
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trumpet player
  * (`docs/reference/wind-technique.md` 2.1): it moves 0.012 H back from the mouth of the body
- * (`lipShift`), so that it presses the lips 0.2 cm. At the mouth, the rim stood 0.16 cm in front of
- * the lips.
+ * (`lipShift`), so that it presses the lips 0.2 cm.
  */
 const MONKEY_TRUMPET = {
   ...WIND_HOLDS.trumpet,
@@ -1188,22 +1171,20 @@ const MONKEY_TRUMPET = {
  * hand works the valves (`docs/reference/wind-technique.md` 3). The left grip moves 0.135 H toward
  * the main branch, 0.03 H around it away from the shoulder, and 0.07 H up (`gripShiftL`), so that
  * the left paw lies on the left side of the branch: its palm faces the branch, the back of the paw
- * faces out to the left, and the fingers point forward and down around the front of the branch.
- * The left fingers curl 92° (`gripCurl`). The left paw goes 2.1 cm into the branch (limit 2.2 cm),
- * and the finger tips stay 1.9 cm from it. With 0.145 H toward and 0.05 H around the branch, the
- * paw went 2.6 cm into it, and with 0.13 H and less, the finger tips open off the branch. At rest,
- * the left grip moves 0.13 H toward the branch and 0.03 H around it (`restGripShiftL`): on the grip
- * of the play, the left forearm goes into the tuba at rest. Both paws keep the aim and the roll of the
- * play at rest (`restAim`): with the roll of the shoulder at rest, the left paw flips in the
- * lowering (the wrist turns 17960° each second). The right fingers curl 80°. The right grip moves
- * 0.15 H along the row of the valves toward the front and 0.1 H toward the right shoulder
+ * faces out to the left, and the fingers point forward and down around the front of the branch. The
+ * left fingers curl 92° (`gripCurl`). The left paw goes 2.1 cm into the branch (limit 2.2 cm), and
+ * the finger tips stay 1.9 cm from it. With 0.13 H and less, the finger tips open off the branch.
+ * At rest, the left grip moves 0.13 H toward the branch and 0.03 H around it (`restGripShiftL`): on
+ * the grip of the play, the left forearm goes into the tuba at rest. Both paws keep the aim and the
+ * roll of the play at rest (`restAim`): with the roll of the shoulder at rest, the left paw flips
+ * in the lowering (the wrist turns 17960° each second). The right fingers curl 80°. The right grip
+ * moves 0.15 H along the row of the valves toward the front and 0.1 H toward the right shoulder
  * (`gripShiftR`), so that the right paw lies on the valve tops at the front right of the valve
  * branch, where it shows from the front and from the right front. On the grip of the instrument,
  * the valve branch hides it from both views. A grip further forward is out of the reach of the arm.
  * The mouthpiece rim rests on the lips, as the rim of a real tubist
  * (`docs/reference/wind-technique.md` 3): it moves 0.013 H up and 0.022 H back from the mouth of
  * the body (`lipShift`), so that its top lies on the upper lip and the rim presses the lips 0.2 cm.
- * At the mouth, the rim stood 2.4 cm in front of the lips.
  */
 const RHINO_TUBA = {
   ...WIND_HOLDS.tuba,
