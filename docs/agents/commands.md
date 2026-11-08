@@ -68,33 +68,32 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 
 | Command | Action |
 |---|---|
-| `pnpm pose-probe <sheet> [--time <s>]... [--set <changes>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. About 1 s. |
-| `pnpm pose-preview <role> [--moments <name,...|all>] [--times <s,...>] [--demo <id>] [--set <changes>]... [--skin] [--glb <file>] [--out <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` ([`rigging.md`](rigging.md)) into `scratch/pose-preview/<role>.json`: each bone of the skin and each morph target, at the moments of `ROLE_VIEWS` and the song times of a demo. `--skin` adds the skins of the check below. About 1 s, 2 s with `--glb`. |
-| `pnpm pose-depth <role> [--demo <id>]... [--every <n>] [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. `--where` gives the corners of a bone in the axes of the instrument. 10 s to 5 minutes. |
-| `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]... [--move <axis>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. 0.15 s for each variant. |
-| `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,... [--variant <name>=<changes>]...` | Scores the base and named variants on chosen pairs of parts. About 10 s for each demo and row. |
-| `pnpm trunk-form <role> [--sets <set>,...] [--base <ref>]` | Measures the form of the trunk of the first player in the bind and in the worst pose of each set. 1 s. |
-| `pnpm body-shape <role> [--base <ref>]` | Measures the body form of design 4.4 ("Replacing body") and the rest pose of a role. 2 s. |
-| `pnpm hold-reach <species> [--instrument <id>] [--set <changes>]...` | Measures the reach of the arms to the instrument (design 4.6). `--instrument harp` gives the spare reach of each arm to the pluck point of each string, and the strings of each hand in the demos (`tools/harp-reach.ts`). Less than 1 s, 3 s for the harp. |
-| `pnpm hold-fit <role> [--set <changes>]... [--grid <path>=<a>:<b>:<step>]... [--base <ref>]`, or `--scan` | Fits a hold of a role, one row for each variant: the folds, the depths, the note-target errors, and the play turns of the arms. |
-| `pnpm wind-grip <role>... [--lines]` | Measures each paw on its tube over each sample set, and tells if it grasps the tube. About 3 s each. |
-| `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the studio skin folds. 10 s to 40 s. |
-| `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. About 50 s for each role. |
-| `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. 25 s to 55 s. |
-| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>] [--states <ref>,...] [--json <file>] [--compare <file>]`, or `<role> --trace` or `--explain` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND` (a new bind), or `PASS`. All roles: 5 to 7 minutes cold, 2 s from the cache. |
-| `pnpm arm-check <role>... --world --base <ref> [--set <changes>]... [--glb <file>]` | Prints the largest move of the posed arm joints and the largest turn of the palms against the commit at the samples of the gate, with `SAME` or `MOVED` (exit code 1). One role: about 1 minute. |
-| `pnpm cast-matrix [--roles <list>] [--species <list>] [--out <file>] [--quick] [--set <changes>]... [--variant <name>=<changes>]... [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst arm gate value and the deepest clip. `--base` runs the tools of the commit for its column, and keeps that column in a cache by commit. Six roles: about 3 minutes cold, or 25 s for one role with `--quick`. |
-| `pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--summary <file>]` | Gives the bind supination of each paw by the rule of design 4.4, with the signed paw twists of each cast role and own role. For a hand rig, the value of now comes from the export summary `<file>.json` beside the GLB file (`bindSupination`), and the last line says to key the values in the Action `bind` of its `.blend`. About 12 s. |
-| `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. Three roles: 45 s. |
-| `pnpm raise-fit <role> --faces <list> --side L\|R [--bone forearm\|hand] [--further <degrees>] [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces, also of a recast role. `--further` turns a rule of a bent elbow or a bent wrist further than the mean turn. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. 15 s. |
-| `pnpm body-probe [--out <file>]`, `--compare <base.json> <new.json>`, or `--base <ref>` | Probes the rest joints and a mesh hash of each species, and a hash of the poses of each player of each demo. `--compare` and `--base` fail on a difference. About 6 s. |
-| `pnpm camera-probe [--out <file>]`, `--compare <base.json> <new.json>`, or `--base <ref>` | Prints a hash of the camera of `cameraAt()` for each demo (design 5.6). `--compare` and `--base` print the changed samples. About 8 s. |
-| `pnpm sight-lines [--demo <id>]... [--json <file>] [--all]` | Prints for each demo the players that do not see the head or the baton paw of the conductor (design 4.5, seat geometry), with the share of each part that an item hides and the main blockers, and the players that the default view or the Cinematic wide shots do not see. About 20 s. |
-| `pnpm beat-rates [--demo <id>]... [--limit <bpm>]`, or `--trace <from>-<to>` | Prints the rate of each beat or note motion over a song (design 5.1, 5.4), and fails above the limit. 3 s for each demo. |
-| `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. 6 s for one file. |
-| `pnpm shot-trace <demo> [--from <s>] [--to <s>] [--base <ref>]`, or `--rules [--list] [--base <ref>]` | Prints the choice of the shot planner at each cut (design 5.6). 5 s. |
-| `pnpm plan-time [--base <ref>]... [--demo <id>]... [--no-tree]` | Times `prepareShots()` on each demo (design 5.6) on each tree, in turns. About 1 minute for 3 trees. |
-| `pnpm light-probe [--look <JSON>] [--grid <spec>] [--goal <r>]` | Light on the players by row, and the lux for a goal. 1 s. |
+| `pnpm pose-probe <sheet> [--time <s>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. |
+| `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` into `scratch/pose-preview/<role>.json`: each bone of the skin and each morph target, at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
+| `pnpm pose-depth <role> [--demo <id>]... [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. `--where` gives the corners of a bone in the axes of the instrument. |
+| `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. |
+| `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,...` | Scores the base and named variants on chosen pairs of parts. |
+| `pnpm trunk-form <role> [--base <ref>]` | Measures the form of the trunk of the first player in the bind and in the worst pose of each set. |
+| `pnpm body-shape <role> [--base <ref>]` | Measures the body form of design 4.4 ("Replacing body") and the rest pose of a role. |
+| `pnpm hold-reach <species> [--instrument <id>]` | Measures the reach of the arms to the instrument (design 4.6). `--instrument harp` gives the spare reach of each arm to each string (`tools/harp-reach.ts`). |
+| `pnpm hold-fit <role> [--set <changes>]... [--base <ref>]`, or `--scan` | Fits a hold of a role, one row for each variant: the folds, the depths, the note-target errors, and the play turns of the arms. |
+| `pnpm wind-grip <role>...` | Measures each paw on its tube over each sample set, and tells if it grasps the tube. |
+| `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the studio skin folds. |
+| `pnpm arm-look <role>... \| --all` | Measures the arm skin against the source mesh over the play: a crumpled skin and a flat upper arm. |
+| `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. |
+| `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>]`, or `--world --base <ref>` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `REBIND`, or `PASS`. `--world` gives the largest move of the arm joints and turn of the palms against the commit, with `SAME` or `MOVED` (exit code 1). All roles: 5 to 7 minutes cold. |
+| `pnpm cast-matrix [--roles <list>] [--species <list>] [--quick] [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst arm gate value and the deepest clip. |
+| `pnpm bind-supination <species> [--glb <file>]` | Gives the bind supination of each paw by the rule of design 4.4, with the signed paw twists of each cast role and own role. For a hand rig, it reads the export summary beside the GLB file, and says to key the values in the Action `bind` of its `.blend`. |
+| `pnpm carry-check <role,...> [--base <ref>]` | Measures the turns of the violin or the viola against the left paw over each lift and lowering. |
+| `pnpm raise-fit <role> --faces <list> --side L\|R [--json <file>]` | Fits one `raise` rule of a mesh rig to the folds of the faces, also of a recast role. `--json` writes the entry for `rig-mesh --set 'raise+=@<file>'`. |
+| `pnpm body-probe [--out <file>]`, `--compare <a> <b>`, or `--base <ref>` | Probes the rest joints and a mesh hash of each species, and a hash of the poses of each player of each demo. `--compare` and `--base` fail on a difference. |
+| `pnpm camera-probe [--out <file>]`, `--compare <a> <b>`, or `--base <ref>` | Prints a hash of the camera of `cameraAt()` for each demo (design 5.6). `--compare` and `--base` print the changed samples. |
+| `pnpm sight-lines [--demo <id>]...` | Prints for each demo the players that do not see the head or the baton paw of the conductor (design 4.5), with the main blockers, and the players that the default view or the Cinematic wide shots do not see. |
+| `pnpm beat-rates [--demo <id>]... [--limit <bpm>]` | Prints the rate of each beat or note motion over a song (design 5.1, 5.4), and fails above the limit. |
+| `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. |
+| `pnpm shot-trace <demo> [--from <s>] [--to <s>]`, or `--rules` | Prints the choice of the shot planner at each cut (design 5.6). |
+| `pnpm plan-time [--base <ref>]...` | Times `prepareShots()` on each demo (design 5.6) on each tree, in turns. |
+| `pnpm light-probe [--look <JSON>]` | Prints the light on the players by row, and the lux for a goal. |
 
 ## Rig tools
 
