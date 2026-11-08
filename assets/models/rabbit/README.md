@@ -181,9 +181,8 @@ A run gives the same bytes.
 
 The hand rig of the rabbit (design 4.4, "Hand rig"), made in a live Blender 5.2 from
 `tripo/rabbit.fbx`: the mesh, the colors, the armature, the weights, the pea eyes, the seated bind
-(the Action `bind`), and the facts of the body. Each edit of the mesh is a point edit by hand, or
-one translation, scale, or loop cut of a named part, with its ids and values below. The calls
-name the functions of `tools/blender/studio_armature.py` (`sa`) and `studio_eyes.py` (`se`).
+(the Action `bind`), and the facts of the body. Each edit of the mesh was a point edit by hand, or
+one translation, scale, or loop cut of a named part.
 
 | Item | Value |
 |---|---|
