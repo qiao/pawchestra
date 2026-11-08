@@ -189,9 +189,28 @@ interface WindFingering {
 }
 
 /**
+ * Gives the semitones below each partial at or above a key that a valve combination or a slide
+ * position reaches: from 0 to 6, the smallest first. A key out of the reach of the partials gives
+ * 0 above the highest partial and 6 below.
+ *
+ * @param key The MIDI key.
+ * @param fundamental The MIDI key of the fundamental of the tube.
+ * @param partials The partials of the tube, in semitones above the fundamental, sorted.
+ * @returns The semitones, at least one value.
+ */
+function lowerings(key: number, fundamental: number, partials: readonly number[]): number[] {
+  const out = partials
+    .map((partial) => fundamental + partial - key)
+    .filter((lower) => lower >= 0 && lower <= MAX_LOWER);
+  if (out.length === 0) {
+    out.push(key > fundamental + (partials.at(-1) ?? 0) ? 0 : MAX_LOWER);
+  }
+  return out;
+}
+
+/**
  * Gives the semitones below the nearest partial at or above a key: a valve combination or a slide
- * position lowers that partial by these semitones. A key below the reach of the partials gives
- * the largest value.
+ * position lowers that partial by these semitones ({@link lowerings}).
  *
  * @param key The MIDI key.
  * @param fundamental The MIDI key of the fundamental of the tube.
@@ -199,13 +218,7 @@ interface WindFingering {
  * @returns The semitones, from 0 to 6.
  */
 function semitonesBelow(key: number, fundamental: number, partials: readonly number[]): number {
-  for (const partial of partials) {
-    const lower = fundamental + partial - key;
-    if (lower >= 0 && lower <= MAX_LOWER) {
-      return lower;
-    }
-  }
-  return key > fundamental + (partials.at(-1) ?? 0) ? 0 : MAX_LOWER;
+  return lowerings(key, fundamental, partials)[0] ?? MAX_LOWER;
 }
 
 /**
@@ -298,17 +311,7 @@ function holesOf(instrument: Woodwind, key: number): readonly [left: number, rig
  *   slide gives the seventh position alone.
  */
 export function slidePositions(key: number): number[] {
-  const positions: number[] = [];
-  for (const partial of PARTIALS) {
-    const lower = BRASS_FUNDAMENTALS.trombone + partial - key;
-    if (lower >= 0 && lower <= MAX_LOWER) {
-      positions.push(lower + 1);
-    }
-  }
-  if (positions.length === 0) {
-    positions.push(key > BRASS_FUNDAMENTALS.trombone + (PARTIALS.at(-1) ?? 0) ? 1 : MAX_LOWER + 1);
-  }
-  return positions.toSorted((a, b) => a - b);
+  return lowerings(key, BRASS_FUNDAMENTALS.trombone, PARTIALS).map((lower) => lower + 1);
 }
 
 /**
