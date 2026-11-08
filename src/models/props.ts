@@ -306,11 +306,7 @@ export function chairBack(seatHeight: number, seatWidth: number = CHAIR.seatWidt
  * @param seatWidth The width of the seat, in meters.
  * @returns The box.
  */
-export function chairSeat(
-  seatHeight: number,
-  seatDepth: number = CHAIR.seatDepth,
-  seatWidth: number = CHAIR.seatWidth,
-): Bounds {
+export function chairSeat(seatHeight: number, seatDepth: number, seatWidth: number): Bounds {
   const center = (CHAIR.seatDepth - seatDepth) / 2;
   return centeredBox([0, seatHeight - 0.02, center], [seatWidth, 0.04, seatDepth]);
 }

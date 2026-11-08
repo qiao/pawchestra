@@ -1668,7 +1668,7 @@ export const SUSPENDED_CYMBAL = {
  *   wide.
  * @returns The model.
  */
-export function buildSuspendedCymbal(scale = 1): InstrumentModel {
+export function buildSuspendedCymbal(scale: number): InstrumentModel {
   const c = SUSPENDED_CYMBAL;
   const piece = new PieceBuilder();
   // The bell is up, so the rim hangs below the strap.

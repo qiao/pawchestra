@@ -693,7 +693,7 @@ export function harpPedalEnds(
  * @param scale The scale of the harp of the species (`SpeciesParams.harpScale`).
  * @returns The point.
  */
-export function harpPedalFoot(pedal: HarpPedal, notch: PedalNotch = 'natural', scale = 1): Vec3 {
+export function harpPedalFoot(pedal: HarpPedal, notch: PedalNotch, scale: number): Vec3 {
   const [root, end] = harpPedalEnds(pedal, notch);
   const share = HARP_PEDALS.foot;
   const top = HARP_PEDALS.bar[1] / 2;
