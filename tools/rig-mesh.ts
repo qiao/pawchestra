@@ -10,7 +10,7 @@ import type { Vec3 } from '../src/models/tuples.ts';
 import {
   FOLD_ROLES,
   SAMPLE_SETS,
-  SAME_FACE_DISTANCE,
+  nearestFaces,
   readFaceJson,
   roleAnimal,
   roleSpecies,
@@ -1524,24 +1524,7 @@ export function watchPairs(base: RoleFolds, variant: RoleFolds): WatchPair[] | n
   if (middles.some((middle) => !middle)) {
     return null;
   }
-  const candidates = faces.flatMap((face, k) =>
-    variant.records.flatMap((record) => {
-      const [x, y, z] = middles[k] ?? [0, 0, 0];
-      const [a, b, c] = record.middle;
-      const gap = Math.hypot(a - x, b - y, c - z);
-      return gap <= SAME_FACE_DISTANCE ? [{ face, record, gap }] : [];
-    }),
-  );
-  const pairs = new Map<number, FaceRecord>();
-  const taken = new Set<number>();
-  for (const { face, record } of candidates.toSorted(
-    (p, q) => p.gap - q.gap || p.face - q.face || p.record.face - q.record.face,
-  )) {
-    if (!pairs.has(face) && !taken.has(record.face)) {
-      pairs.set(face, record);
-      taken.add(record.face);
-    }
-  }
+  const pairs = nearestFaces(faces, (...[, k]) => middles[k] ?? [0, 0, 0], variant.records);
   const samples = {
     rest: variant.counts.rest.samples,
     play: variant.counts.play.samples,

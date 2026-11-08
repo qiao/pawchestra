@@ -1979,6 +1979,42 @@ interface BaseFacePair {
 }
 
 /**
+ * Pairs faces with the folded faces of another mesh by the middles in the bind pose: the pairs go
+ * in the order of the distance, the nearest first, up to {@link SAME_FACE_DISTANCE}, and each face
+ * goes into one pair at most.
+ *
+ * @param faces The faces to pair.
+ * @param middleOf Gives the middle of a face to pair.
+ * @param records The folded faces of the other mesh.
+ * @returns The folded face of each paired face.
+ */
+export function nearestFaces(
+  faces: readonly number[],
+  middleOf: (face: number, at: number) => Vec3,
+  records: readonly FaceRecord[],
+): Map<number, FaceRecord> {
+  const candidates = faces.flatMap((face, at) =>
+    records.flatMap((record) => {
+      const [x, y, z] = middleOf(face, at);
+      const [a, b, c] = record.middle;
+      const gap = Math.hypot(a - x, b - y, c - z);
+      return gap <= SAME_FACE_DISTANCE ? [{ face, record, gap }] : [];
+    }),
+  );
+  const pairs = new Map<number, FaceRecord>();
+  const taken = new Set<number>();
+  for (const { face, record } of candidates.toSorted(
+    (p, q) => p.gap - q.gap || p.face - q.face || p.record.face - q.record.face,
+  )) {
+    if (!pairs.has(face) && !taken.has(record.face)) {
+      pairs.set(face, record);
+      taken.add(record.face);
+    }
+  }
+  return pairs;
+}
+
+/**
  * Pairs the faces of `--faces-of`, as the commit numbers them, with the faces of the working tree.
  * Two meshes with the same corners keep the index of each face. Else the pairs go in the order of
  * the distance of the middles in the bind pose, the nearest first, up to
@@ -2010,24 +2046,7 @@ function pairBaseFaces(base: FaceJson, tree: FaceJson, faces: readonly number[])
       `The commit gives no middle of the faces ${missing.join(', ')}: its mesh has fewer faces, or its fold-probe has no --middles.`,
     );
   }
-  const candidates = faces.flatMap((face) =>
-    tree.faces.flatMap((record) => {
-      const [x, y, z] = base.middles[String(face)] ?? [0, 0, 0];
-      const [a, b, c] = record.middle;
-      const gap = Math.hypot(a - x, b - y, c - z);
-      return gap <= SAME_FACE_DISTANCE ? [{ face, record, gap }] : [];
-    }),
-  );
-  const pairs = new Map<number, FaceRecord>();
-  const taken = new Set<number>();
-  for (const { face, record } of candidates.toSorted(
-    (p, q) => p.gap - q.gap || p.face - q.face || p.record.face - q.record.face,
-  )) {
-    if (!pairs.has(face) && !taken.has(record.face)) {
-      pairs.set(face, record);
-      taken.add(record.face);
-    }
-  }
+  const pairs = nearestFaces(faces, (face) => base.middles[String(face)] ?? [0, 0, 0], tree.faces);
   return faces.map((face) => ({
     face,
     base: baseFaces.get(face) ?? null,
