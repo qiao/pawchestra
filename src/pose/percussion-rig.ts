@@ -115,36 +115,17 @@ export interface MalletSet {
 /**
  * The damp of the sound of an instrument after a note (design 5.3), as a real player stops the
  * ring of a drum or a cymbal at a rest or after a short note
- * (`docs/reference/percussion-technique.md` 4, 5, 7). A note is damped at its end when the
- * silence from its end to the next note of the player is at least `restSec`.
+ * (`docs/reference/percussion-technique.md` 5, 7). A note is damped at its end when the silence
+ * from its end to the next note of the player is at least `restSec`.
  *
- * - `mallet`: the paw that struck the head puts its fingers on the head and keeps its mallet, as
- *   a timpanist damps with the fingertips. The mallet target moves toward the player and down,
- *   and the wrist turns the head of the mallet up. With `change`, the paw also damps its kettle
- *   when the next note sounds on another kettle, as a timpanist stops the old pitch at a change.
  * - `palm`: the free paw lays its palm on the other head of the bass drum.
  * - `chest`: the hand cymbals go against the chest.
  */
 export type DampRule =
   | {
-      readonly kind: 'mallet';
-      readonly restSec: number;
-      readonly change: boolean;
-      /** The longest contact, in seconds. */
-      readonly hold: number;
-      /** The move of the mallet target toward the player on the floor plane, in meters. */
-      readonly toward: number;
-      /**
-       * The move of the mallet target down along the normal of the head, in meters, for the left
-       * and the right paw.
-       */
-      readonly drop: readonly [left: number, right: number];
-      /** The share of the pitch of the mallet at the damp (`MalletAcross.pitch`). */
-      readonly share: number;
-    }
-  | {
       readonly kind: 'palm';
       readonly restSec: number;
+      /** The longest contact, in seconds. */
       readonly hold: number;
       /**
        * The wrist at the damp, from the middle of the left head of the drum, in meters in the
@@ -155,6 +136,7 @@ export type DampRule =
   | {
       readonly kind: 'chest';
       readonly restSec: number;
+      /** The longest contact, in seconds. */
       readonly hold: number;
       /** The drop of the crash point at the damp, in head heights. */
       readonly drop: number;
@@ -355,15 +337,9 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
-    damp: {
-      kind: 'mallet',
-      restSec: 0.3,
-      change: true,
-      hold: 0.25,
-      toward: 0.04,
-      drop: [0.3, 0.3],
-      share: 18,
-    },
+    // No damp: in each tried place, the short arms held the lowest point of the paw 2 cm to 10 cm
+    // over the head plane, and outside the head (design 5.3).
+    damp: null,
     // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and malletSpotR).
     curl: 100 * MathUtils.DEG2RAD,
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll

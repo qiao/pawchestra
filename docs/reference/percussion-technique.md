@@ -245,11 +245,6 @@ The app follows these facts:
   mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
   longer rest, the head lifts one beat before the note, at most 1 s before it
   (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
-- **The muffle (section 4).** A note is muffled at its end when a rest follows, and a kettle is
-  muffled when the next note sounds on the other kettle, as one method muffles the last note at
-  the new attack [57] (`DampRule`, `dampTrack()`). The paw that struck keeps its mallet, and the
-  wrist turns the mallet head up, as the mallet stays between the thumb and the index finger
-  [56].
 
 The app does not follow these facts:
 
@@ -258,9 +253,9 @@ The app does not follow these facts:
   a body whose belly needs the drum forward sets it higher. With the head below the elbows of each
   body, the sticks of the thin wolf and deer went into the raised drum in the lowering.
 - **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
-- **The muffle spot (section 4).** The paw goes down onto the near edge of the head, not onto the
-  playing spot, because the short arms reach the head only there. The round paw touches with its
-  end, not with three fingers.
+- **The muffle (section 4).** The elephant does not muffle. Its short arms hold the lowest point
+  of the paw a few cm over the head plane and outside the head, also with the paw down and
+  forward, so the paw cannot reach the playing spot.
 - **The set position (section 3).** Between strikes, the wrist lifts the head above its spot with
   the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
   closed paw. Each paw keeps the roll that has no side bend at the strike

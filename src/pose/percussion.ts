@@ -283,7 +283,9 @@ export function percussionTracks(
     end: g.end,
     key: chordKeys[k] ?? -1,
   }));
-  const damps = hold.damp ? dampTracks(hold.damp, notesOf, left, right, rig) : null;
+  const damps = hold.damp
+    ? dampTracks(hold.damp, notesOf, hold.hands === 'pair' ? right : null)
+    : null;
   const ring =
     hold.hands === 'pair' && right
       ? ringTrack(
@@ -399,101 +401,57 @@ interface DampNote {
 
 /**
  * Finds the damps of the two hands of a player (`PercussionHold.damp`, design 5.3). A note is
- * damped at its end when the silence to the next note of the player is at least `restSec`. With
- * `change`, a note on one kettle is also damped when the next note sounds on another kettle. A
- * paw with a mallet damps the notes that it struck: the move starts after the rebound of its
- * strike and ends before its next lift. The free paw of the bass drum damps each note: its move
- * starts after the rebound of the beater, and ends at the next note. The hand cymbals damp with
- * both hands.
+ * damped at its end when the silence to the next note of the player is at least `restSec`. The
+ * free paw of the bass drum damps each such note: its move starts after the rebound of the beater,
+ * and ends at the next note. The hand cymbals damp with both hands: the move starts at the crash
+ * and ends before the next lift.
  *
  * @param rule The rule of the damp.
  * @param groups The note groups of the player, sorted by start.
- * @param left The strikes of the left hand, or `null`.
- * @param right The strikes of the right hand, or `null`.
- * @param rig The points of the player.
+ * @param crashes The crashes of the hand cymbals, or `null`.
  * @returns The damps of the left and of the right hand.
  */
 function dampTracks(
   rule: DampRule,
   groups: readonly DampNote[],
-  left: StrikeTrack | null,
-  right: StrikeTrack | null,
-  rig: PercussionRig,
+  crashes: StrikeTrack | null,
 ): readonly [DampTrack | null, DampTrack | null] {
   const m = DAMP_MOTION;
-  // The hand of a group: the hand whose last strike at or before the group struck its target.
-  const struck = (hand: StrikeTrack | null, g: DampNote): number => {
-    if (!hand) {
-      return -1;
+  const wishes: DampWish[] = [];
+  for (const [k, g] of groups.entries()) {
+    const next = groups[k + 1];
+    if (next && next.start - g.end < rule.restSec) {
+      continue;
     }
-    const i = lastAtOrBefore(hand.starts, g.start + 1e-6);
-    const at = i >= 0 ? hand.starts[i] : undefined;
-    return at !== undefined && g.start - at < 1 ? i : -1;
-  };
-  // A mallet paw damps only the kettle of its own strike, and the other paw strikes the next note
-  // at a change: the strike of the paw is on the target of the group, with the offset of the paw.
-  const onTarget = (hand: StrikeTrack, i: number, key: number, offset: Vec3): boolean => {
-    const target = rig.targets.get(key);
-    return !!target && Math.abs((hand.points[3 * i] ?? 0) - target.point[0] - offset[0]) < 1e-6;
-  };
-  const wishes = (hand: StrikeTrack | null, offset: Vec3 | null): DampWish[] => {
-    const out: DampWish[] = [];
-    for (const [k, g] of groups.entries()) {
-      const next = groups[k + 1];
-      let contact: number | null = null;
-      if (!next || next.start - g.end >= rule.restSec) {
-        contact = g.end;
-      } else if (rule.kind === 'mallet' && rule.change && next.key !== g.key && g.key >= 0) {
-        contact = next.start;
-      }
-      if (contact === null) {
-        continue;
-      }
-      if (rule.kind === 'palm') {
-        out.push({
-          contact,
-          earliest: g.start + STRIKE_MOTION.reboundSec,
-          latest: next?.start ?? Infinity,
-          hold: rule.hold,
-          key: 0,
-          inSec: m.inSec,
-          outSec: m.outSec,
-        });
-        continue;
-      }
-      const i = struck(hand, g);
-      if (!hand || i < 0 || (offset && !onTarget(hand, i, g.key, offset))) {
-        continue;
-      }
-      out.push({
-        contact,
-        earliest: hand.reboundEnds[i] ?? g.start,
-        latest: hand.upStarts[i + 1] ?? Infinity,
+    if (rule.kind === 'palm') {
+      wishes.push({
+        contact: g.end,
+        earliest: g.start + STRIKE_MOTION.reboundSec,
+        latest: next?.start ?? Infinity,
         hold: rule.hold,
-        key: g.key,
+        key: 0,
         inSec: m.inSec,
         outSec: m.outSec,
       });
+      continue;
     }
-    return out;
-  };
-  switch (rule.kind) {
-    case 'mallet':
-      return [
-        dampTrack(wishes(left, rig.hold.offsetL)),
-        dampTrack(wishes(right, rig.hold.offsetR)),
-      ];
-    case 'palm':
-      return [dampTrack(wishes(null, null)), null];
-    case 'chest': {
-      const both = dampTrack(wishes(right, null));
-      return [both, both];
+    // The crash of the note: the last crash at or before its start.
+    const i = crashes ? lastAtOrBefore(crashes.starts, g.start + 1e-6) : -1;
+    if (!crashes || i < 0) {
+      continue;
     }
-    default: {
-      const unhandled: never = rule;
-      throw new Error(`The damp "${String(unhandled)}" has no hands.`);
-    }
+    wishes.push({
+      contact: g.end,
+      earliest: crashes.starts[i] ?? g.start,
+      latest: crashes.upStarts[i + 1] ?? Infinity,
+      hold: rule.hold,
+      key: 0,
+      inSec: m.inSec,
+      outSec: m.outSec,
+    });
   }
+  const track = dampTrack(wishes);
+  return rule.kind === 'palm' ? [track, null] : [track, track];
 }
 
 /**
@@ -1022,22 +980,9 @@ function poseHand(
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
-  const rule = rig.hold.damp;
   if (side.kind === 'mallet' && side.across) {
     const rest = rig.hold.sizes.rest;
-    let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
-    // A damp moves the mallet target toward the player and down, so that the fingers touch the
-    // head, and the wrist turns the head of the mallet up.
-    if (rule?.kind === 'mallet' && damp.weight > 0) {
-      const [x, , z] = hand.point;
-      const length = Math.hypot(x, z) || 1;
-      along
-        .copy(head)
-        .add(offset.set((-x / length) * rule.toward, 0, (-z / length) * rule.toward))
-        .addScaledVector(offset.fromArray(hand.normal), -rule.drop[side.arm.side === 'L' ? 0 : 1]);
-      head.lerp(along, damp.weight);
-      share += (rule.share - share) * damp.weight;
-    }
+    const share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
     acrossHand(side, head, share, shoulder.position, turnedPole);
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);

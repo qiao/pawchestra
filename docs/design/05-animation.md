@@ -509,14 +509,12 @@ The rest of each family:
   does not cross the other.
 - **Damps.** A note is damped at its end when the silence to the next note of the player is at
   least `DampRule.restSec`, as a real player muffles at a rest or after a short note
-  (percussion 4, 5, 7). The windows come from the score alone (`dampTrack()` of `pose/damps.ts`):
-  the move ends at the contact, stays for at most the hold, and ends before the next lift of the
-  hand. The timpanist damps with the paw that struck, and also damps a kettle when the next note
-  sounds on the other kettle (`change`). Its paw goes down onto the near edge of the head, and the
-  wrist turns the mallet head up (`DampRule` `mallet`). Reason: a real timpanist muffles with the
-  back fingers in the playing spot and keeps the mallet, but the short arms of the elephant reach
-  the head only at its near edge. The bass drummer lays the palm of its free paw on the left head
-  (`palm`). The hand cymbals go against the chest (`chest`).
+  (percussion 5, 7). The windows come from the score alone (`dampTrack()` of `pose/damps.ts`):
+  the move ends at the contact, stays for at most the hold, and ends before the next note or lift.
+  The bass drummer lays the palm of its free paw on the left head (`DampRule` `palm`). The hand
+  cymbals go against the chest (`chest`). The timpanist does not damp. Reason: the short arms of
+  the elephant held the lowest point of the paw a few cm over the head plane and outside the head
+  in each tried place, so a damp read as a paw in the air.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
   plate comes down onto the left plate. The rims meet at the crash point, a little offset, and the
   plates slide on past each other, the right plate down and the left plate up by a share
