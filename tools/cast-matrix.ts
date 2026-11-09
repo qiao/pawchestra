@@ -709,12 +709,15 @@ function matrixCell(pair: PairJson, home: PairJson | null): MatrixCell {
   }
 
   const homeRows = home?.arms ? gateRows(home.name, home.arms, null) : [];
-  const gate = gateRows(pair.name, pair.arms, null).map((row) =>
-    gateItem(
-      row,
-      homeRows.find((h) => h.side === row.side && h.measure === row.measure),
-    ),
-  );
+  // A grip with no accepted entry has no value, and the cell has no item for it.
+  const gate = gateRows(pair.name, pair.arms, null)
+    .filter((row) => Number.isFinite(row.value))
+    .map((row) =>
+      gateItem(
+        row,
+        homeRows.find((h) => h.side === row.side && h.measure === row.measure),
+      ),
+    );
   const clips = pair.clips.map((clip) =>
     clipItem(
       clip,

@@ -25,7 +25,7 @@
  *   ({@link ACCEPTED_GRIPS}). The grip is the twist of the paw in the frame of the posed forearm
  *   ({@link GripFrames}), which no bind moves. The value is the median, so a paw that holds its
  *   prop in another grip fails with no base. For a role with no entry, the tool prints a ready
- *   entry under the table ({@link gripLines}), and the role has no value `grip`.
+ *   entry under the table ({@link gripLines}), and the grip of the role is `OPEN` with no value.
  * - `palm turn`: in place of the grip turn, for a paw that faces its tube in a shared wind hold
  *   with the elbow rule ({@link sharedPaws}): the angle in the play between the palm of the paw
  *   and the palm of the accepted player of the role, both in the axes of the instrument
@@ -424,8 +424,8 @@ const JUMP_ANGLE = 90;
  * keeps each entry, and the entry of a role holds for each body in the role.
  * The entries of the older frame of the bind moved into this frame by the shift of the median of
  * each arm on `27b9fc24`. The value `grip` is the turn of the paw from its accepted grip. A hold
- * change that changes a grip on purpose gives its new median here, with the accepted crops. A role
- * with no entry has no value `grip`.
+ * change that changes a grip on purpose gives its new median here, with the accepted crops. The
+ * grip of a role with no entry is `OPEN` with no value.
  */
 export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>> = new Map<
   string,
@@ -1949,8 +1949,22 @@ export interface GateRow {
   readonly verdict: Verdict;
 }
 
+/** The summary of a sample set with no sample, for the value of a grip with no accepted entry. */
+const NO_STATS: SetStats = {
+  samples: 0,
+  p50: Number.NaN,
+  p95: Number.NaN,
+  p5: Number.NaN,
+  share: 0,
+  worst: Number.NaN,
+  at: '',
+  view: '',
+};
+
 /**
- * Gives the values of the gate of one role.
+ * Gives the values of the gate of one role. An arm with play samples and no grip value or palm
+ * value has no entry in {@link ACCEPTED_GRIPS}: its grip is `OPEN`, with no value, until the
+ * entry is accepted from the crops ({@link gripLines}).
  *
  * @param role The role.
  * @param tree The report of the working tree.
@@ -1967,7 +1981,22 @@ export function gateRows(role: string, tree: RoleReport, base: RoleReport | null
       const found = gateValue(stats, limit);
       const of = found ? stats[found.set] : undefined;
       if (!found || !of) {
-        return [];
+        const noEntry =
+          measure === 'grip' && tree.grips && !gateValue(tree.arms[side].palm, ARM_LIMITS.palm);
+        return noEntry
+          ? [
+              {
+                role,
+                side,
+                measure,
+                set: 'play',
+                stats: NO_STATS,
+                value: Number.NaN,
+                base: null,
+                verdict: 'OPEN',
+              },
+            ]
+          : [];
       }
       // A JSON text of a tool before a measure has no stats of it.
       const baseStats: ArmStats[Measure] | undefined = base?.arms[side][measure];
@@ -2022,7 +2051,9 @@ function summaryLines(rows: readonly GateRow[], base: boolean): string[] {
       return `${show(row.value, measure)}${was}${mark}`;
     });
     const worst =
-      (['FAIL', 'OPEN', 'WORSE', 'REBIND'] as const).find((v) => own.some((r) => r.verdict === v)) ?? 'PASS';
+      (['FAIL', 'OPEN', 'WORSE', 'REBIND'] as const).find((v) =>
+        own.some((r) => r.verdict === v),
+      ) ?? 'PASS';
     const [role = '', side = ''] = key.split(' ');
     lines.push(`| ${role} | ${side} | ${cells.join(' | ')} | ${worst} |`);
   }
