@@ -31,7 +31,8 @@ These product choices apply to each area:
   no blush.
 - **Natural balance.** A body that stands, or that plays with no chair, keeps its center of mass
   over the middle of its soles, where a real stance is most stable (4.4, seat).
-- **No fur shading.** The material has no fur shader, no tufts, and no shells (4.5, materials).
+- **Fur by shading only.** The material has no tufts, no shells, no fins, and no hair cards. A
+  studio body with a color map gets a sheen and strand normals on its fur faces (4.5, materials).
 
 ## 4.2 Layout
 
@@ -1026,6 +1027,29 @@ the instrument keep their colors. The eyes of the mesh take the map with the `ey
 stage lamps and the eye light give them a gloss over the painted eye. Their face color is the eye
 color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
+
+Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
+faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`
+faces keep the shared shading.
+
+- **Sheen.** The shader turns on the sheen lobe of three.js ("Charlie", Estevez and Kulla 2017),
+  as velvet has it. It is strong where the view grazes the surface and weak where the surface
+  faces the view, so the outline gets a soft light and the front keeps its shading. The lights
+  of three.js give it with the pool of the stage lights. The rim lights are no lights of
+  three.js, so the shader adds their sheen on each fur pixel. Thus the rim lights behind the
+  orchestra give a warm light on the outline of the heads and the shoulders. A low roughness
+  keeps the lobe near the outline. A higher roughness also lit the whole side of the body.
+- **Strand normals.** A normal map beside the color map (`<name>-normal.webp`) tilts the normal
+  of each fur pixel. The tangent frame comes from the screen derivatives of the view position and
+  of the texture points, so the skin needs no tangents. The map uses the green of OpenGL, and
+  the texture points have v from the top edge, so the y factor is negative. The web copy holds
+  the tilts times `NORMAL_MAP_GAIN`, because the source tilts are near the step of 8 bits. The
+  shader takes z = 1, because a stored z of 0 at a clipped tilt gave NaN pixels that the bloom
+  spread into black squares. A body with no normal map file keeps the normals of its mesh.
+
+The fur of the candidate rabbit is near the shoulder of the tone curve, so the sheen adds little
+light at the outline. The color map already paints the strands, so the normal map adds little at
+the app view.
 
 The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). A test of its
 shader must not make a line thinner than one pixel inside a face. Reason: MSAA smooths only the
