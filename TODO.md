@@ -345,8 +345,24 @@ passes.
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
 - [ ] Hippo: the nose tip lies on a nostril 2.7 cm from the middle plane, and the rig checks warn.
-- [ ] Mouse: in the front view, the pea eyes lean in at the top, because the surface under them
-      faces more up. Try a direction between the two.
+- [ ] Mouse: the fur covers a notch of the outer side of the left pea eye in the front view, and
+      its light stands 0.22 of the eye width left of the visible middle, against 0.02 right on
+      the other eye. The upright turn cut the lean of the tops from 10° and 12° to 4° and 7°.
+- [ ] Polar bear (hand rig): a gray groove of the mesh at the inner top corner of each pea eye
+      reads as a cross brow, and the fur makes the top of each oval pointed. Fix the faces in
+      `polar-bear.blend` by point edits, in a session that may save that file.
+- [ ] Rhino: the ridge of the horn covers the inner edge of each pea eye. The ovals still lean
+      18° and 14° with the tops in, in the front close view (23° and 21° before the upright turn).
+      Try `eyeShift` out to the side, or move the eyes out of the ridge.
+- [ ] Deer, penguin, polar bear: the upright turn (`uprightRoll()`) leans the ovals 4° to 8° with
+      the tops out in the front close view, where they were within 2° of upright. The linear bend
+      model misses the fur cover. Try a fit of the turn on the real silhouette.
+- [ ] Wolf: a dark lid wedge of the mesh stands out at the outer side of the right pea eye.
+- [ ] Elephant: a thin dark crease stays at the inner edge of each filled eye socket (`eyeFill`).
+- [ ] Penguin: the fur covers a notch at the bottom of the left pea eye.
+- [ ] Pea eye lights: the light of an eye that faces far to the side moves less to the side
+      (`lightAcross()`), so it stands near the middle. The mean gap between the places of the two
+      lights is 0.09 of the eye width in the front close views.
 - [ ] Hippo bassist: at rest, the stick goes through the middle of the round paw, and the frog end
       hides in it. Ask the user for the form of the rest hold, such as the bow on the strings.
 - [ ] Hippo bassist: in the lowering after a pizzicato, the bow turns 79° in the paw. Give the move
