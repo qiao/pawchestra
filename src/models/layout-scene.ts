@@ -20,7 +20,7 @@ import type { ConductorPlace, PlayerPlace, RiserLevel, SceneLayout, StandPlace }
 import type { Vec3 } from './tuples.ts';
 import { ModelCache } from './model-cache.ts';
 import type { PlayerModel } from './player.ts';
-import { RISER, riserStepsDepth, standDeskHeight } from './props.ts';
+import { RISER, riserStair, riserStepsDepth, standDeskHeight } from './props.ts';
 import { boneIndex } from './rig.ts';
 import { CONDUCTOR_STAND, PODIUM_FROM_FRONT, PODIUM_SIZE, keepsStageMargin } from './stage.ts';
 import { pieceBounds } from './instruments/piece.ts';
@@ -825,7 +825,9 @@ export function divideSingers(count: number, levels: number): number[] {
 }
 
 /**
- * Makes the obstacle of one riser level: one box for each part of at most 5° of its arc.
+ * Makes the obstacle of one riser level: one box for each part of at most 5° of its arc. The
+ * lowest level also holds the curved stair at each side end, with one arc block for each step
+ * ({@link riserStair}).
  *
  * @param level The level.
  * @param podium The podium center.
@@ -847,7 +849,20 @@ function riserObstacle(level: RiserLevel, podium: Vec3): Obstacle {
     const spot = seatAt(podium, -level.halfAngle + (i + 0.5) * step, level.radius);
     return placeFootprint(box, spot.position, spot.facing);
   }).flat();
-  return obstacleOf(`riser level ${level.level}`, boxes);
+  const name = `riser level ${level.level}`;
+  if (level.level > 0) {
+    return obstacleOf(name, boxes);
+  }
+
+  const stair = riserStair(level);
+  const band = { inner: stair.inner, outer: stair.outer };
+  const stairs = stair.steps
+    .flatMap(({ from, to, top }): ArcBlock[] => [
+      { ...band, height: top, from, to },
+      { ...band, height: top, from: -to, to: -from },
+    ])
+    .flatMap((block) => arcBlockObstacle(block, podium).boxes);
+  return obstacleOf(name, [...boxes, ...stairs]);
 }
 
 /** An arc block around the podium center, from the stage top to its height. */

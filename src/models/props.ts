@@ -186,6 +186,53 @@ export function riserStepsDepth(): number {
   return RISER.stairs.width;
 }
 
+/** One step of a stair at a side end of the choir risers (design 4.5). */
+export interface StairStep {
+  /** The angle of the end near the risers, in radians from 0°, on the right side. */
+  readonly from: number;
+  /** The angle of the far end, in radians from 0°, on the right side. It is above `from`. */
+  readonly to: number;
+  /** The height of the tread above the stage top, in meters. */
+  readonly top: number;
+}
+
+/**
+ * The curved stair at each side end of the lowest level of the risers (design 4.5). The right
+ * stair has the angles of its steps, and the left stair has the same angles below 0°.
+ */
+export interface RiserStair {
+  /** The distance of the front face from the podium center, in meters. */
+  readonly inner: number;
+  /** The distance of the back face from the podium center, in meters. */
+  readonly outer: number;
+  /** The steps, from the highest step at the end of the level down to the lowest step. */
+  readonly steps: readonly StairStep[];
+}
+
+/**
+ * Gives the curved stair at each side end of the lowest level of the risers (design 4.5). The
+ * stair continues the arc of the level past its end, at the front of the level. Each step is a
+ * wedge of an annulus around the podium center, one rise lower than the step before it, down to
+ * the stage top. The steps divide the height of the level evenly, with the fewest steps of at
+ * most {@link RISER}.stairs.rise each.
+ *
+ * @param level The lowest level.
+ * @returns The stair of the right end.
+ */
+export function riserStair(level: RiserLevel): RiserStair {
+  const { width, rise, tread } = RISER.stairs;
+  const inner = level.radius - RISER.depth / 2;
+  const outer = inner + width;
+  const middle = (inner + outer) / 2;
+  const count = Math.max(1, Math.ceil(level.height / rise - 1e-9));
+  const steps = Array.from({ length: count - 1 }, (_, i) => ({
+    from: level.halfAngle + (i * tread) / middle,
+    to: level.halfAngle + ((i + 1) * tread) / middle,
+    top: (level.height * (count - 1 - i)) / count,
+  }));
+  return { inner, outer, steps };
+}
+
 /** The music stand (design 4.5, props). The reader is at +z and faces -z. */
 export const MUSIC_STAND = {
   deskWidth: 0.5,
