@@ -136,13 +136,11 @@ export const RISER = {
   /** The most levels. */
   levels: 3,
   /**
-   * The two stair units in the zone in front of the lowest level, one at each end of the front.
-   * Each stair starts on the stage top at the end of the risers and goes up along the arc toward
-   * the middle, to a landing at the height of the lowest level. The steps divide that height
-   * evenly. No singer stands on them.
+   * The curved stair at each side end of the lowest level ({@link riserStair}). No singer stands
+   * on it.
    */
   stairs: {
-    /** The depth of the zone and the width of each stair, in meters. */
+    /** The width of each stair from its front face to its back face, in meters. */
     width: 0.6,
     /**
      * The largest rise of one step, in meters: 8 in, the rise of a Wenger Signature choral riser
@@ -150,15 +148,10 @@ export const RISER = {
      */
     rise: 0.2,
     /**
-     * The tread of one step along the arc, in meters: 11 in, the tread of a Wenger stage stairway
-     * and the least tread of IBC 1011.5.2. A narrow choir or a high lift gets shorter treads, so
-     * that the stairs stay in the zone.
+     * The tread of one step along the arc, in meters at the middle of the stair: 11 in, the tread
+     * of a Wenger stage stairway and the least tread of IBC 1011.5.2.
      */
     tread: 0.28,
-    /** The length of the landing at the top along the arc, in meters: at most a third of the run. */
-    landing: 0.6,
-    /** The least free arc between the landings of the two stairs, in meters. */
-    gap: 0.4,
   },
   /** The width of the lighter edge at the front of each tread, in meters. */
   nosing: 0.04,
@@ -621,6 +614,7 @@ function addFace(
  * @param level The level.
  * @param below The height of the level in front of it, or 0 for the lowest level.
  * @param top True for the top level.
+ * @param stair The stair at the side ends of the lowest level, or `null` for the other levels.
  * @param podium The podium center, the center of the arcs.
  */
 function addRiserLevel(
@@ -628,6 +622,7 @@ function addRiserLevel(
   level: RiserLevel,
   below: number,
   top: boolean,
+  stair: RiserStair | null,
   podium: Vec3,
 ): void {
   const { radius, height, halfAngle } = level;
@@ -677,9 +672,17 @@ function addRiserLevel(
   }
   // A point at the angle 0 is on the inner side of each end.
   const body = at(radius, 0, height / 2);
+  // Over the highest step of a stair, the end is a riser face, as the face between two steps.
+  const step = stair?.steps[0];
+  const split = stair && step ? stair.outer : inner;
   for (const end of [-halfAngle, halfAngle]) {
-    const panel = [at(inner, end, 0), at(outer, end, 0), at(outer, end, height)] as const;
-    addFace(builder, [...panel, at(inner, end, height)], body, STAGE_COLORS.skirt);
+    const endFace = (r0: number, r1: number, y0: number, y1: number) =>
+      [at(r0, end, y0), at(r1, end, y0), at(r1, end, y1), at(r0, end, y1)] as const;
+    if (step) {
+      addFace(builder, endFace(inner, split, step.top, under), body, STAGE_COLORS.podiumPanel);
+      addFace(builder, endFace(inner, split, under, height), body, STAGE_COLORS.riserNosing);
+    }
+    addFace(builder, endFace(split, outer, 0, height), body, STAGE_COLORS.skirt);
     const lipEnd = [at(front, end, under), at(inner, end, under), at(inner, end, height)] as const;
     addFace(builder, [...lipEnd, at(front, end, height)], body, STAGE_COLORS.riserNosing);
   }
@@ -710,84 +713,50 @@ function treadBands(inner: number, outer: number): [number, number, Rgb][] {
   return bands;
 }
 
-/** The steps of one stair unit of the risers along the arc (design 4.5). */
-interface StairSteps {
-  /** The number of steps. The last step is the landing, at the height of the lowest level. */
-  readonly count: number;
-  /** The tread of each step below the landing, in meters along the arc at the stair middle. */
-  readonly tread: number;
-  /** The length of the landing, in meters along the arc at the stair middle. */
-  readonly landing: number;
-}
-
 /**
- * Gives the steps of one stair unit in front of the lowest level of the risers: the fewest steps
- * with at most {@link RISER}.stairs.rise each, and the tread of {@link RISER}.stairs, or a shorter
- * tread when the stair does not fit in half the front with the gap in the middle.
- *
- * @param level The lowest level.
- * @returns The steps.
- */
-function stairSteps(level: RiserLevel): StairSteps {
-  const { width, rise, tread, landing, gap } = RISER.stairs;
-  const middle = level.radius - RISER.depth / 2 - width / 2;
-  const room = middle * level.halfAngle - gap / 2;
-  const count = Math.max(1, Math.ceil(level.height / rise - 1e-9));
-  const land = Math.min(landing, room / 3);
-  return { count, tread: Math.min(tread, (room - land) / Math.max(1, count - 1)), landing: land };
-}
-
-/**
- * Adds the two stair units in front of the lowest level of the risers (design 4.5). Each stair
- * starts on the stage top at one end of the risers and goes up along the arc toward the middle,
- * to a landing at the height of the level. Each step has a tread with a lighter nosing, a riser
- * face of wood, and a dark side toward the podium. The landing ends at the nosing lip of the
- * level, so the singers step back onto the level.
+ * Adds the curved stair at each side end of the lowest level of the risers ({@link riserStair},
+ * design 4.5). Each step has a tread with a lighter nosing at its far end, a riser face of wood
+ * with a lighter top edge, and dark skirt faces at the front and the back, as the level.
  *
  * @param builder The builder.
- * @param level The lowest level.
+ * @param stair The stair of the right end.
  * @param podium The podium center, the center of the arcs.
  */
-function addRiserStairs(builder: MeshBuilder, level: RiserLevel, podium: Vec3): void {
-  const { count, tread, landing } = stairSteps(level);
-  const inner = level.radius - RISER.depth / 2;
-  const open = inner - RISER.stairs.width;
-  const middle = (open + inner) / 2;
-  const wall = inner - RISER.lip.overhang;
+function addRiserStairs(builder: MeshBuilder, stair: RiserStair, podium: Vec3): void {
+  const { inner, outer, steps } = stair;
+  const nosing = RISER.nosing / ((inner + outer) / 2);
   for (const side of [-1, 1]) {
-    // `d` is the distance along the arc from the end of the risers, at the stair middle.
-    const at = (r: number, d: number, y: number): Vec3 =>
-      arcPoint(podium, r, side * (level.halfAngle - d / middle), y);
-    for (let j = 1; j <= count; j++) {
-      const last = j === count;
-      const d0 = (j - 1) * tread;
-      const d1 = last ? d0 + landing : d0 + tread;
-      const nosing = d0 + RISER.nosing;
-      const top = (level.height * j) / count;
-      const lower = (level.height * (j - 1)) / count;
+    const at = (r: number, angle: number, y: number): Vec3 => arcPoint(podium, r, side * angle, y);
+    steps.forEach(({ from, to, top }, i) => {
+      const below = steps[i + 1]?.top ?? 0;
       const under = top - RISER.lip.height;
-      const back = last ? wall : inner;
-      const body = at((open + back) / 2, (d0 + d1) / 2, top / 2);
-      const face = (r0: number, r1: number, e0: number, e1: number, y0: number, y1: number) =>
-        [at(r0, e0, y0), at(r1, e1, y0), at(r1, e1, y1), at(r0, e0, y1)] as const;
-      addFace(builder, face(open, back, d0, d0, lower, under), body, STAGE_COLORS.podiumPanel);
-      addFace(builder, face(open, back, d0, d0, under, top), body, STAGE_COLORS.riserNosing);
-      const nose = [at(open, d0, top), at(back, d0, top), at(back, nosing, top)] as const;
-      addFace(builder, [...nose, at(open, nosing, top)], body, STAGE_COLORS.riserNosing);
-      const step = [at(open, nosing, top), at(back, nosing, top), at(back, d1, top)] as const;
-      addFace(builder, [...step, at(open, d1, top)], body, STAGE_COLORS.riserTread);
-      addFace(builder, face(open, open, d0, d1, 0, top), body, STAGE_COLORS.skirt);
-      if (last) {
-        addFace(builder, face(open, wall, d1, d1, 0, top), body, STAGE_COLORS.skirt);
-      }
-    }
+      const edge = to - nosing;
+      const body = at((inner + outer) / 2, (from + to) / 2, top / 2);
+      const across = (a0: number, a1: number, y: number) =>
+        [at(inner, a0, y), at(outer, a0, y), at(outer, a1, y), at(inner, a1, y)] as const;
+      const up = (angle: number, y0: number, y1: number) =>
+        [
+          at(inner, angle, y0),
+          at(outer, angle, y0),
+          at(outer, angle, y1),
+          at(inner, angle, y1),
+        ] as const;
+      const along = (r: number) =>
+        [at(r, from, 0), at(r, to, 0), at(r, to, top), at(r, from, top)] as const;
+      addFace(builder, across(from, edge, top), body, STAGE_COLORS.riserTread);
+      addFace(builder, across(edge, to, top), body, STAGE_COLORS.riserNosing);
+      addFace(builder, up(to, below, under), body, STAGE_COLORS.podiumPanel);
+      addFace(builder, up(to, under, top), body, STAGE_COLORS.riserNosing);
+      addFace(builder, along(inner), body, STAGE_COLORS.skirt);
+      addFace(builder, along(outer), body, STAGE_COLORS.skirt);
+    });
   }
 }
 
 /**
  * Builds the choir risers: one arc block for each level, from the stage top to the height of the
- * level, and a stair unit at each end of the front (design 4.5). Each tread has a lighter nosing
- * lip at its front and boards of a wood a little lighter than the stage top. A riser face of a
+ * level, and a curved stair at each side end of the lowest level (design 4.5). Each tread has a
+ * lighter nosing lip at its front and boards of a wood a little lighter than the stage top. A riser face of a
  * darker wood joins two levels, and the faces down to the stage top have the color of the stage
  * sides, as the wooden risers of `orchestra-latest.png` and `orchestra-side.png`.
  *
@@ -797,13 +766,14 @@ function addRiserStairs(builder: MeshBuilder, level: RiserLevel, podium: Vec3): 
  */
 export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshData {
   const builder = new MeshBuilder();
+  const [lowest] = levels;
+  const stair = lowest ? riserStair(lowest) : null;
   levels.forEach((riser, k) => {
     const below = levels[k - 1]?.height ?? 0;
-    addRiserLevel(builder, riser, below, k === levels.length - 1, podium);
+    addRiserLevel(builder, riser, below, k === levels.length - 1, k === 0 ? stair : null, podium);
   });
-  const [lowest] = levels;
-  if (lowest) {
-    addRiserStairs(builder, lowest, podium);
+  if (stair) {
+    addRiserStairs(builder, stair, podium);
   }
   return builder.build();
 }

@@ -1107,7 +1107,7 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | Podium          | A box with cut corners and framed panels (`PODIUM_SIZE`, `PODIUM_TRIM`), as in `bear-views.png`.          |
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |
 | Stage           | A slab of side `S` with cut corners (`STAGE_CORNER_CUT`), a raised lip (`STAGE_LIP`), and lacquered planks. |
-| Choir risers    | Up to three arc levels behind the orchestra, and a stair at each end of the front (`RISER`).             |
+| Choir risers    | Up to three arc levels behind the orchestra, and a curved stair at each side end (`RISER`).              |
 
 **Choir risers.** The risers follow real choral risers and stage stairs (`buildRisers()`):
 
@@ -1115,14 +1115,17 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
   as the nosing of a stair tread [IBC 1011.5]. A riser face of darker wood joins two levels.
 - The front of the lowest level and the back of the top level are dark skirt faces. A groove at
   each joint of the arc faces copies the panels of the stage skirt, so the risers sit on the stage.
-- A stair unit at each end of the front starts on the stage top at the end of the arc. It goes up
-  along the arc to a landing at the height of the lowest level (`RISER.stairs`). The singers step
-  back from the landing onto the level, and they use the higher levels as steps.
+- A curved stair at each side end of the lowest level wraps around the end of the arc, as the end
+  stair of a curved choral riser (`riserStair()`, `RISER.stairs`). Each step is a wedge of an
+  annulus around the podium center, at the front of the level. The steps continue the arc past
+  the end and go down to the stage top. The singers use the higher levels as steps.
+- Each step has a tread with a lighter nosing, a riser face of darker wood, and dark skirt faces
+  at its front and its back, as the levels.
 - A step rises at most 8 in, as a Wenger Signature riser step [Wenger Signature] and a StageRight
-  stair [StageRight stairs]. The tread is 11 in, as a Wenger stairway [Wenger stairway] and the
-  least tread of [IBC 1011.5].
-- The stairs stay in the zone in front of the lowest level (`riserStepsDepth()`), so the layout
-  does not change. A narrow choir or a high lift gets shorter treads.
+  stair [StageRight stairs]. The steps divide the height of the level evenly. The tread is 11 in,
+  as a Wenger stairway [Wenger stairway] and the least tread of [IBC 1011.5].
+- The obstacle of the lowest level holds one arc block for each step. Thus the fit of the choir,
+  the stage size, and the wing of the risers keep the stairs clear of the other items.
 - The risers and the stairs have no guard rails and no hand rails.
 - The treads keep the wood of the reference images in place of the gray carpet of a Wenger riser.
 
