@@ -898,6 +898,12 @@ interface Gltf {
        */
       readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
       /**
+       * The eyes of the mesh of a hand rig with no eye objects: the middle of the eye faces of
+       * each side (`own_eyes_of()` of `tools/blender/export_rig.py`). The body then has no pea
+       * eyes. A file with pea eyes has none.
+       */
+      readonly ownEyes?: Readonly<Partial<Record<Side, Pick<EyeExtras, 'middle'>>>>;
+      /**
        * The facts of the body of a hand rig ({@link BODY_FACTS}): the custom properties of the
        * armature of its `.blend`. A file of `pnpm rig-mesh` has none.
        */
@@ -1122,6 +1128,33 @@ export function eyesOf(glb: Glb): Record<Side, FileEye> | null {
     throw new Error(`The eyes of the file have two sizes: ${out.L.size} and ${out.R.size}.`);
   }
   return out;
+}
+
+/**
+ * Gives the eyes of the mesh of a hand rig with no pea eyes from the extras of its GLB file (design
+ * 4.4, "Hand rig"): the middle of the eye faces of each side, where the eye bone lies.
+ *
+ * @param glb The file.
+ * @returns The middle of each eye, or `null` for a file with no eyes of the mesh.
+ * @throws Error if the file also holds pea eyes, or if a middle is not three finite numbers.
+ */
+export function ownEyesOf(glb: Glb): Record<Side, Vector3> | null {
+  const extras = glb.json.asset?.extras;
+  const eyes = extras?.ownEyes;
+  if (eyes === undefined) {
+    return null;
+  }
+  if (extras?.eyes !== undefined) {
+    throw new Error('The GLB file holds pea eyes and the eyes of its mesh.');
+  }
+  const middle = (side: Side): Vector3 => {
+    const point = eyes[side]?.middle ?? [];
+    if (point.length !== 3 || !point.every((x) => Number.isFinite(x))) {
+      throw new Error(`The middle of the eye ${side} of the mesh is not three numbers.`);
+    }
+    return new Vector3().fromArray(point);
+  };
+  return { L: middle('L'), R: middle('R') };
 }
 
 /**
@@ -2802,11 +2835,14 @@ interface Export {
   readonly sheetWeights: readonly number[];
   /**
    * The distance of each pea eye bone from the middle of the old eye, in `H` of the eyes, for the
-   * report, or `null` for a hand rig, which holds its eyes ({@link eyesOf}).
+   * report, or `null` for a hand rig, which holds its eyes ({@link eyesOf}, {@link ownEyesOf}).
    */
   readonly eyeShifts: Readonly<Record<Side, number>> | null;
-  /** The move of each pea eye out of the head ({@link eyePush}), in `H` of the eyes. */
-  readonly eyePushes: Readonly<Record<Side, number>>;
+  /**
+   * The move of each pea eye out of the head ({@link eyePush}), in `H` of the eyes, or `null` for
+   * a body with no pea eyes ({@link ownEyesOf}).
+   */
+  readonly eyePushes: Readonly<Record<Side, number>> | null;
   /**
    * The fill of each old eye ({@link fillEye}): the number of moved vertices and the largest move,
    * in `H` of the eyes, or `null` with no `eyeFill`.
@@ -2842,14 +2878,17 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
 
   // The old eyes of the mesh go away, and the app adds the pea eyes at the eye bones (design
   // 4.5). The faces under the gloss fan of a rig of `pnpm rig-mesh` have the color of the fur
-  // around the eye. A hand rig holds its pea eyes, so no rule of the settings places them.
+  // around the eye. A hand rig holds its pea eyes, or shows the eyes of its mesh with no pea eyes,
+  // so no rule of the settings places them.
   const fileEyes = eyesOf(glb);
-  const rule = fileEyes ? EYE_RULES.find((key) => settings[key] !== undefined) : undefined;
+  const ownEyes = ownEyesOf(glb);
+  const handEyes = fileEyes !== null || ownEyes !== null;
+  const rule = handEyes ? EYE_RULES.find((key) => settings[key] !== undefined) : undefined;
   if (rule) {
-    throw new Error(`The GLB file holds its pea eyes, so the settings give no ${rule}.`);
+    throw new Error(`The GLB file holds its eyes, so the settings give no ${rule}.`);
   }
   const eyes = eyeVertices(mesh);
-  if (fileEyes && eyes.L.size + eyes.R.size > 0) {
+  if (handEyes && eyes.L.size + eyes.R.size > 0) {
     throw new Error(
       'The GLB file holds its pea eyes and the gloss fans of old eyes. Remove the fans in Blender, so that Blender shows the eyes of the app.',
     );
@@ -2870,7 +2909,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const heads = Object.fromEntries(
     STUDIO_BONES.flatMap((bone): [StudioBone, Vec3][] => {
       if (bone === 'eye_L' || bone === 'eye_R') {
-        // The pea eyes give the eye bones their places below.
+        // The eyes give the eye bones their places below.
         return [];
       }
       if (!skeleton.binds.has(bone)) {
@@ -3064,15 +3103,27 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     const push = eyePush(near, { point: head, normal: facing }, eyeSize, bend);
     return { head, facing, bend, shift: 0, push: push / eyeSize };
   };
-  const eyeL = fileEyes ? handEye(fileEyes.L, 'L') : eyeAt('L');
-  const eyeR = fileEyes ? handEye(fileEyes.R, 'R') : eyeAt('R');
-  heads['eye_L'] = eyeL.head;
-  heads['eye_R'] = eyeR.head;
-  const peaEyes: StudioEyes = {
-    headHeight: round(eyeSize),
-    directions: { L: eyeL.facing, R: eyeR.facing },
-    bends: { L: eyeL.bend, R: eyeR.bend },
-  };
+  let peaEyes: StudioEyes | null = null;
+  let eyeShifts: Record<Side, number> | null = null;
+  let eyePushes: Record<Side, number> | null = null;
+  if (ownEyes) {
+    // The eye bone of an eye of the mesh lies at the middle of its faces, and the body gets no pea
+    // eyes.
+    heads['eye_L'] = model(ownEyes.L);
+    heads['eye_R'] = model(ownEyes.R);
+  } else {
+    const eyeL = fileEyes ? handEye(fileEyes.L, 'L') : eyeAt('L');
+    const eyeR = fileEyes ? handEye(fileEyes.R, 'R') : eyeAt('R');
+    heads['eye_L'] = eyeL.head;
+    heads['eye_R'] = eyeR.head;
+    peaEyes = {
+      headHeight: round(eyeSize),
+      directions: { L: eyeL.facing, R: eyeR.facing },
+      bends: { L: eyeL.bend, R: eyeR.bend },
+    };
+    eyeShifts = fileEyes ? null : { L: eyeL.shift, R: eyeR.shift };
+    eyePushes = { L: eyeL.push, R: eyeR.push };
+  }
 
   // The studio animal faces +z, so its moves turn as its points do.
   const ordered = orderByFirstUse(withoutEyes);
@@ -3167,8 +3218,8 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   return {
     body,
     sheetWeights: sheet.weights,
-    eyeShifts: fileEyes ? null : { L: eyeL.shift, R: eyeR.shift },
-    eyePushes: { L: eyeL.push, R: eyeR.push },
+    eyeShifts,
+    eyePushes,
     eyeFills,
   };
 }
@@ -3848,13 +3899,17 @@ async function main(): Promise<void> {
   console.log(`Wrote ${relative(ROOT, HEIGHTS_MODULE)}.`);
   console.log(`Scale ${body.scale} m for each unit, head height ${body.headHeight} m.`);
   console.log(`Corrective weights of the sheet pose: ${sheetWeights.join(', ')}.`);
-  if (body.eyes && eyeShifts) {
+  if (body.eyes && eyePushes && eyeShifts) {
     console.log(
       `Pea eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
     );
-  } else if (body.eyes) {
+  } else if (body.eyes && eyePushes) {
     console.log(
       `Pea eyes of the eye objects of the .blend: head height ${body.eyes.headHeight} m. The front of each eye shows with a move of ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head.`,
+    );
+  } else {
+    console.log(
+      'Eyes of the mesh: no pea eyes. Each eye bone lies at the middle of the eye faces of its side.',
     );
   }
   if (eyeFills) {
