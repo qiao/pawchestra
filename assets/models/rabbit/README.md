@@ -222,12 +222,12 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 | Item | Value |
 |---|---|
 | Size | 1,453,503 bytes |
-| SHA-256 | `5e5b9c165c75170ab4bd4db9c5b1c78c63802f9ae18110294fa70317e87ce987` |
+| SHA-256 | `aaa3139ac5d5e95f2ff939ff2cc32a6d0b906697b1be96c91265a82cac2cf565` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with the bind supination L 110 and R 52 (`pnpm bind-supination rabbit` converged) |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist ("Arm twist" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 35, `backRoom` 0.04 |
 | Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
 
@@ -279,3 +279,22 @@ The weights, in the order of the work, in the rest pose:
 The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
 weights. The scripts of the live session are not in the repo. A `bind*` or `arm_raise_*` key is
 not in the file.
+
+**Arm twist.** The violin hold turns the left paw about 220 degrees from the paw of the source,
+which faces down in the T-pose. The rest of the hold needs about -80 degrees, and the lift
+between the two moves the paw continuously, so the 220 degrees cannot wrap to 140. Two values of
+the `.blend` spread the turn:
+
+- **Elbow axes.** The property `hinges` of each arm turned about its bind upper arm, the left 118
+  degrees and the right -68 degrees. The upper arm then takes a roll from the chest, and the
+  forearm takes less twist. The skin of the left upper arm and forearm takes about -110 degrees
+  each in the bows (it was about -6 and -215), and the right arm about 9 and 23 (it was -50 and
+  82). The arm tube is round, so the side of the elbow fold does not show.
+- **Bind supination 0.** The app takes the smooth normals from the bind. A bind supination twists
+  the bind forearm, and the crease angle 35 then gives hard edges on the diagonals of its quads,
+  which turn into a spiral in the play. With 0, the bind forearm is the untwisted tube of the
+  source. `pnpm bind-supination rabbit` gives the violinist twists of -103 to 14 degrees from
+  this bind, far from the flip at 180 degrees.
+
+In flat shading, each left arm part still shows the facets of a 110 degree twist. In the app the
+smooth normals of the untwisted bind hide them.
