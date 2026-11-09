@@ -534,7 +534,9 @@ of the source (the GLB file, or the image file of an FBX source) through the UVs
 the color rules of "Mesh rig" (`face_colors()`, `palette()`). The faces of the old eyes take the
 fur color, and with `eye_fans=False` the mesh gets no gloss fan on them, because the eye objects
 give the eyes. Then a person edits the colors in Blender, and the export reads
-them only from the face attribute `color`. The `.blend` holds the data that a person draws. The
+them only from the face attribute `color`. A hand rig can also show the color map of its source
+in place of the face colors ("Materials" of 4.5): the mesh keeps the UV map of the source, and each
+new face gets UVs that sample the fur next to it. The `.blend` holds the data that a person draws. The
 export calculates only the measures, with the functions of `tools/blender/rig_mesh.py`, so that
 each measure has one definition. It checks each point of the layout below, and stops with the
 name of the first fault.
@@ -567,6 +569,7 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `eyes` | The eye objects `eye_L` and `eye_R` in the bind: the middle, the unit direction, and the size of each eye (`eyes_of()`). |
 | `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
+| `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
 | `headFactor`, `neckFactor`, `headShift`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
 
@@ -668,7 +671,11 @@ app does not use. A hand rig of the same mesh with no arm cut and no limb stretc
 (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main` only
 after an approval of its look in the app. Its mesh has no eyeballs: fur fills each old eye socket
 flush with the face, and a pea eye of 1.2 H covers the old eye area. Reason: the eyeball of the
-source kept the fur color, so a light disc showed around a pea eye of 1 H. An arm that the mesh joins to the trunk needs a
+source kept the fur color, so a light disc showed around a pea eye of 1 H. It shows the color map
+of its Tripo FBX (`rabbit-color.webp`). The faces of each eye fill and of the socket groove take a
+patch of clean head fur of the map, because the map paints a dark lining in each socket. The map
+holds no baked key light: the luma of its cream fur stays within about 7 % of its median on each
+part. An arm that the mesh joins to the trunk needs a
 cut, so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
@@ -951,6 +958,15 @@ lit stage. The fur stays matte with the factor 1.
 
 The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.
+
+A studio body can show a color map of its fur in place of its face colors (`StudioBody.texture`,
+the candidate rabbit). The module holds the image path and the texture point of each fur corner.
+A player of such a body takes a copy of the shared material with the map
+(`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
+shader takes the texel in place of the vertex color of each corner with a point, so the light,
+the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
+the instrument keep their colors. The first draw starts the load of the image (7.2). Until the
+image is on the GPU, the body shows its face colors.
 
 The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). A test of its
 shader must not make a line thinner than one pixel inside a face. Reason: MSAA smooths only the

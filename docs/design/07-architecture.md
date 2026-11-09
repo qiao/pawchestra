@@ -204,6 +204,15 @@ Each packed mesh has a gzip budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-b
 the bodies of the default demo count against the limit. `packStudioMesh()` writes one stream for
 each kind of number, so that gzip finds the repeats.
 
+The texture points of a body with a color map (4.5) are in its module, so they count. An atlas of
+Tripo has about two points for each vertex, so `packStudioUvs()` predicts each new point from two
+known corners of its triangle and the places of the vertices, as the parallelogram rule of a mesh
+codec does, and writes only the miss. The image itself is not in the first download: the first
+draw of the body starts its load in the next animation frame, from a lazy URL chunk of Vite
+(`import.meta.glob` of `scene/body-texture.ts`), and `createImageBitmap()` decodes it off the
+main thread. Its size is the smallest that shows the fur strands in a close view at a device
+pixel ratio of 2.
+
 `index.html` preloads the file of the default demo with a low priority when the hash names no
 demo, so that the score build does not wait for a fetch after the scripts. The preload starts
 after the first contentful paint. The LCP that Lighthouse simulates holds each request that ends
