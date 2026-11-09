@@ -103,7 +103,10 @@ file. Try each scripted edit on a copy with `pnpm rig-trial`, and find thin face
 with `pnpm bind-view`.
 
 1. **Mesh.** Edit the mesh, and keep its UVs. Run `sa.add_surface(mesh, '<s>', <texture>,
-   eye_fans=False)` one time for the face colors and the gloss nose.
+   eye_fans=False)` one time for the face colors and the gloss nose. For the color map of the
+   source (design 4.5), give each new face UVs of the fur next to it, by hand. Set the property
+   `texture` of the mesh object to a web copy `<name>-color.webp`, and the face attribute
+   `plain` on a fur face that keeps its color, such as a whisker.
 2. **Rig.** Put `palm`, `seat`, `hinges`, and the facts of `BODY_FACTS` (at least `height` and
    `crease`) on the armature object. Fit the bones, run `sa.fix_rolls(rig)`, and give Automatic
    Weights (Limit Total 4, Normalize All), then exact rows. Pose the bind, run
