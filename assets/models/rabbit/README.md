@@ -222,15 +222,15 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,398,983 bytes |
-| SHA-256 | `cf25ba1e57b511be38b22608474f52ef9614b7274ad3125d417ad5361e9c1d36` |
+| Size | 1,514,938 bytes |
+| SHA-256 | `b18f8d95e2d32754ed9153d87616132c66b4625913fdcbf38b18bdd7273fcf33` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 218 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey have the face attribute `plain` ("Color map" below) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
+| Mesh | One object `rabbit`: 3,403 vertices and 3,553 faces (3,005 quads and 548 triangles, 6,558 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 218 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey have the face attribute `plain` ("Color map" below) |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below). The property `lids` holds the turn and the hinge axes of the lids ("Lids" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
-| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no pea eyes ("Eyes" below) |
+| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no pea eyes ("Eyes" below). A lid on each eye blinks ("Lids" below) |
 
 The edits, in the order of the work:
 
@@ -371,16 +371,50 @@ a pea eye of 1.2 H on it. These point edits in the live Blender undo it:
 4. Give the 49 socket faces with fur UVs of the texture round ("Color map" below) their source
    UVs again, so that the dark lining of the map shows around each eye.
 5. Give each eyeball vertex the row `head` 1 with `sa.set_weight_row()`. A blink of an eye bone
-   squeezed the ball to a thin disc and opened the socket into the head, so the eyes do not
-   blink.
+   squeezed the ball to a thin disc and opened the socket into the head, so the balls take no
+   blink. A lid on each eye blinks ("Lids" below).
 6. Give the eyeball faces the color `#15110e` (the eye color of the app) for the frames before
    the map loads, and the face attribute `eye`.
 7. Delete the eye objects `eye_L` and `eye_R`.
 
 The mesh is then the mesh of 88afd18bf^ again in each vertex, face, UV, custom normal, and
-weight, except the face colors of the eyeballs. The export writes the middle of each eyeball as
-`ownEyes`. The rim vertices of each socket keep shares of `neck` (at most 0.071) and
+weight, except the face colors of the eyeballs. The export writes the middle of the sphere that
+fits each eyeball as `ownEyes` (left x 0.031451, y -0.06399, z 0.709509 in the rest, radius
+0.02332). The rim vertices of each socket keep shares of `neck` (at most 0.071) and
 `ear_<side>` (at most 0.06), as in the source rig.
+
+**Lids.** A scripted edit in the live Blender adds a lid to each eye, as a separate part. In the
+hinge frame of each eye, g is the unit direction from the middle of the ball to the mean of the
+open socket rim vertices, u is +Z made square to g, and h = u × g is the hinge axis (left
+(0.635749, 0.771896, 0), right (0.63572, -0.77192, 0)). A lid point has the angle psi from g
+toward u and the angle lam toward h: the direction cos(lam) (cos(psi) g + sin(psi) u) + sin(lam) h.
+
+1. Each closed lid spans psi from -60° to 60° in 12 steps and lam from -64° to 64° in 12 steps, at
+   the radius 0.0275 from the middle (the ball reaches at most 0.02398). An extra row at psi -60°
+   and the radius 0.0243 makes a strip at the lower edge that turns in toward the ball. Thus 13 ×
+   14 vertices and 156 quads on each side, with outward normals.
+2. The file holds the open lid: each point turned up by 126° about h (psi + 126°). The property
+   `lids` of the armature holds `angle` 2.199115 (126°) and the axis h of each side. A turn by
+   +126° about h closes the lid.
+3. Each lid face takes the slot `fur`, flat shading, the face colors `color` and `color_base` of a
+   fur face 0.036 to 0.05 units from the middle of the left eye, and the face attribute `lid`.
+4. Each lid corner takes the UV of the planar projection of its closed point on the plane of h
+   and u, at 1.0 UV for each unit (the density of the fur around the eye), about the clean fur
+   patch at UV (0.935, 0.288) of `rabbit-color.webp`. The patch is 150 pixels wide, with the mean
+   sRGB (233.8, 207.8, 174.2) and a deviation of 4: the fur next to each socket is about (233,
+   207, 175).
+5. Each lid vertex takes the row `head` 1 with `sa.set_weight_row()`. `pnpm studio-body` moves it
+   onto the eye bone of its side.
+
+The values come from ray casts from the middle of the ball against the head (with the other
+eyeball). The head surface lies at least 0.0368 units from the middle in each direction 60° or
+more from g, and the socket hole ends near 45° to 55°. In 21 steps of the blink, no sample of the
+open lid, of a side edge, or of the back edge lies outside the head, and the lower edge of the
+closed lid lies under the head. The socket lining has three rings, at about 0.021, 0.025, and
+0.030 units from the middle, and the color map paints the faces between the first two rings dark
+(luma about 50). A lid of the radius 0.0247 left the outer band of these faces in view as a dark
+line around the closed lid. The radius 0.0275 covers them, and the lid then meets the light faces
+between the second and the third ring.
 
 **Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
 colors (design 4.5). The mesh keeps the UV map of the FBX. The edge ring cuts of the arms and the
