@@ -566,7 +566,7 @@ const FINISHES: ReadonlyMap<string, Finish> = new Map([
 ]);
 
 /**
- * The finish of the eyes of the mesh of a hand rig (design 4.4, "Hand rig"): the finish of the pea
+ * The finish of the eyes of the mesh of a hand rig (design 4.4, "Hand rig"): the finish of the bead
  * eyes, so that the lights of the stage give a sharp highlight on each eyeball. The faces keep the
  * slot `fur` and the color map.
  */
@@ -907,7 +907,7 @@ interface Gltf {
       /**
        * The eyes of the mesh of a hand rig with no eye objects: the middle of the sphere that fits
        * the eye faces of each side (`own_eyes_of()` of `tools/blender/export_rig.py`), and the
-       * triangles of each eye. The body then has no pea eyes. A file with pea eyes has none.
+       * triangles of each eye. The body then has no bead eyes. A file with bead eyes has none.
        */
       readonly ownEyes?: Readonly<Partial<Record<Side, OwnEyeExtras>>>;
       /**
