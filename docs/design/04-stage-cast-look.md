@@ -316,7 +316,12 @@ the facts of its body in its `.blend` ("Hand rig").
   a light rim or a gray groove around the pea eye, so the head fills it first (`eyeFill`, the
   elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
   `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
-  app do not move the eye places.
+  app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
+  closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
+- A notch of the fur in a pea eye, or a crease beside it, comes from a few faces of the old eye
+  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the penguin, the
+  rhino), else with a point edit of its rig file (`<s>-edits.json`, the mouse and the elephant) or
+  of its `.blend` (the polar bear).
 - A pea eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
   view. Each oval turns in the plane of its eye so that it is upright in the front view
