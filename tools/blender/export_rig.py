@@ -12,8 +12,10 @@ move of each key `arm_raise_*` is its move in the bind. The bake must match the 
 evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the shapes of the source
 (`correctives()`, `split_shapes()`), the seat top (`seat_masks()`), and the rule of the arm
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
-middle, the direction, and the size of each pea eye in the bind (`eyes_of()`), and the custom
-properties of the armature give the facts of the body (`body_of()`). The bytes depend only on the
+middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). A file with no eye
+objects shows the eyes of its mesh: the faces with the face attribute `eye` give the middle of each
+eye in the bind (`own_eyes_of()`), and the app adds no pea eyes. The custom properties of the
+armature give the facts of the body (`body_of()`). The bytes depend only on the
 `.blend`. A mesh object with the custom property `texture` also gets the texture point of each
 corner (`texture_of()`).
 """
@@ -78,7 +80,8 @@ def need(ok, text):
 
 
 def objects():
-    """Gives the one armature, the one mesh of the body, and the eye object of each side."""
+    """Gives the one armature, the one mesh of the body, and the eye object of each side, or no
+    eye objects for a file that shows the eyes of its mesh."""
     rigs = [o for o in bpy.data.objects if o.type == 'ARMATURE']
     names = set(se.EYE_OBJECTS.values())
     bodies = [o for o in bpy.data.objects if o.type == 'MESH' and o.name not in names]
@@ -89,6 +92,8 @@ def objects():
     for o in rigs + bodies:
         need(np.abs(sa.m64(o.matrix_world) - np.eye(4)).max() < 1e-6, f'{o.name} has a transform.')
     eyes = {side: bpy.data.objects.get(name) for side, name in se.EYE_OBJECTS.items()}
+    if all(eye is None for eye in eyes.values()):
+        return rigs[0], bodies[0], {}
     for side, eye in eyes.items():
         name = se.EYE_OBJECTS[side]
         need(eye is not None and eye.type == 'MESH', f'The file has no mesh object {name}.')
@@ -139,6 +144,7 @@ def check_rig(rig, body, rm, bones, order):
         'cap': 'BOOLEAN',
         'rim': 'BOOLEAN',
         'plain': 'BOOLEAN',
+        'eye': 'BOOLEAN',
     }
     for name, kind in kinds.items():
         a = body.data.attributes.get(name)
@@ -304,6 +310,26 @@ def eyes_of(rig, eyes, bind):
             'direction': [round(float(x), EYE_DECIMALS) + 0.0 for x in sa.TO_STUDIO @ frame[:, 2]],
             'size': round(size, EYE_DECIMALS),
         }
+    return out
+
+
+def own_eyes_of(me, points, head):
+    """Gives the middle of each eye of the mesh in the bind, in the units and the axes of the
+    studio: the mean of the vertices of the faces with the face attribute `eye` on each side. The
+    eye bone of the app lies there. Each vertex of an eye must follow only the head bone (`head`
+    holds the head weight of each vertex), so that the eye keeps its form in a blink."""
+    flags = face_values(me, 'eye', 1, np.zeros(len(me.polygons), bool))
+    corners = {v for p in me.polygons if flags[p.index] for v in p.vertices}
+    out = {}
+    for side, sign in (('L', 1), ('R', -1)):
+        mine = sorted(v for v in corners if points[v][0] * sign > 0)
+        need(mine, f'The file has no eye objects and no eye faces on the side {side}.')
+        need(
+            np.abs(head[mine] - 1).max() <= WEIGHT_LIMIT,
+            f'A vertex of the eye {side} of the mesh does not follow only the head bone.',
+        )
+        middle = points[mine].mean(axis=0)
+        out[side] = {'middle': [round(float(x), EYE_DECIMALS) + 0.0 for x in middle]}
     return out
 
 
@@ -528,7 +554,14 @@ def main():
         source = rm['split_shapes'](found, wn, points)
     shapes = {**source, **{n: moves[n] @ sa.TO_STUDIO.T for n in raises}}
     extras = extras_of(rig, body.data, rm, bones, points, wn, turns, raises)
-    extras['eyes'] = eyes_of(rig, eyes, bind)
+    if eyes:
+        need(
+            not face_values(body.data, 'eye', 1, np.zeros(1, bool)).any(),
+            'The file has eye objects and eye faces. Keep one of them.',
+        )
+        extras['eyes'] = eyes_of(rig, eyes, bind)
+    else:
+        extras['ownEyes'] = own_eyes_of(body.data, points, wn[:, bones.index('head')])
     extras['body'] = body_of(rig)
     corners, kinds, colors, bases, caps, rim = triangles(body.data)
     texture, uvs = texture_of(body, body.data, kinds)
