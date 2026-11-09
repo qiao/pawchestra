@@ -330,7 +330,11 @@ passes.
       (branch `worktree-agent-af5dcad398484b454`, report `2026-11-08-seat-lanes-2`) gave 7 blocked,
       but it left a large empty area between the conductor and the strings. Horns on the right
       gave 11 blocked on top of the wider row 0. A higher podium also keeps 0.35 m: 0.5 m gave 35
-      blocked and 23 hidden, 0.7 m gave 11 blocked and 28 hidden.
+      blocked and 23 hidden, 0.7 m gave 11 blocked and 28 hidden. Seat trials on this layout
+      (report `2026-11-08-seat-levers-3`): the first desk of the second violins in row 1 gave 72
+      blocked and 21 hidden, and with the first desk of the violas also in row 1, 123 and 30.
+      Horns on the right of row 3 gave 48 to 50 blocked and 19 or 20 hidden. Both together gave
+      75 blocked and 23 hidden.
 - [ ] Elephant: a short light sliver stays at the inner root of the right arm, near the tusk, from
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
