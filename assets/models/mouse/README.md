@@ -92,7 +92,7 @@ shasum -a 256 assets/models/mouse/*.glb assets/models/mouse/mouse-weights.json
 
 ## Point edits
 
-`mouse-edits.json` moves 4 fur vertices of the head at the inner side of the right pea eye
+`mouse-edits.json` moves 4 fur vertices of the head at the inner side of the right bead eye
 (`eye_R`) into the head, along the axis of the eye, by 0.01 to 0.025 H. A face of the old eye
 socket covered a notch of the oval in the front view. `pnpm glb-point-edits` reads the base with
 `git show ca86cc819:assets/models/mouse/mouse.rig.glb`, so a second run gives the same bytes. A

@@ -156,7 +156,7 @@ file.
 
 The hand rig of the polar bear (design 4.4, "Hand rig"), made in a live Blender 5.2 from
 `tripo/polar-bear-tpose.fbx` in two steps: the form step (the mesh and its face colors) and the
-rig step (the armature, the weights, the seated bind, the pea eyes, and the facts of the body).
+rig step (the armature, the weights, the seated bind, the bead eyes, and the facts of the body).
 
 | Item | Value |
 |---|---|
@@ -269,7 +269,7 @@ The rows of the knee after the cuts, at four sides of each leg (up, in units). T
 
 ### Rig step
 
-The rig step added the armature, the weights, the seated bind, the pea eyes, and the facts of the
+The rig step added the armature, the weights, the seated bind, the bead eyes, and the facts of the
 body in the live Blender. Each value lives only in the `.blend`, and
 `tools/mesh-rigs/polar-bear.json` keeps the values of the older chain. The places are in the axes
 of Blender (x left, y back, z up), in units.
@@ -520,7 +520,7 @@ nearer the hips puts the seat top on the sloped thighs, 0.6 cm to 4.9 cm lower.
 
 **Eyes.** `se.place_eyes(rig, mesh, {side: (middle, direction, size)})` with the middles
 (±0.0422, -0.1016, 0.9417), the directions (±0.4450, -0.7197, 0.5329), and the size 0.165237
-(0.339993 m, the pea eye of the older body). A first run put each middle where the axis of the eye
+(0.339993 m, the bead eye of the older body). A first run put each middle where the axis of the eye
 of the older body meets the head surface, at (±0.0404, -0.0987, 0.9456). There the brow covered
 the top of each oval, and the eyes read as narrow slits. The second run moved each middle 0.004
 out along its direction and 0.006 down, so the whole oval and its light show. `place_eyes()` runs
