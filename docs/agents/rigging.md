@@ -121,11 +121,11 @@ because `Image.save_render()` changes the colors by the view transform.
 
 ## The arm gate
 
-A fold count does not see a twisted or a flat arm. When the gates run, each round that changes a
-hold, a rig, a pose, an instrument size, or a seat runs `pnpm arm-check <roles> --base <start>
---views <dir>`, and reports its table and crop pairs. A `FAIL`, or a better number with a worse
-look, makes the round not done. Gate only the roles that the body plays. A recast cell is a report
-only. Design 4.4 ("Arm gate") gives the measures.
+A fold count does not see a twisted or a flat arm. On request, each round that changes a hold, a
+rig, a pose, an instrument size, or a seat runs `pnpm arm-check <roles> --base <start> --views
+<dir>`, and reports its table and crop pairs. Then a `FAIL`, or a better number with a worse look,
+makes the round not done. Gate only the roles that the body plays. A recast cell is a report only.
+Design 4.4 ("Arm gate") gives the measures.
 
 - A planned grip change expects a `FAIL` against `ACCEPTED_GRIPS`. Report the new median with 2x
   paw crops at a strike and at rest.
