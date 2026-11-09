@@ -407,13 +407,13 @@ function* rigSmoothNormalsSteps(rig: StudioRig): Steps<SmoothNormals> {
   let normals = rigNormals.get(rig);
   if (!normals) {
     const { positions, correctives } = rig.mesh;
-    const { caps, rim, crease } = rig.body;
-    const corners = studioNormals(rig.mesh, crease, caps, rim);
+    const { caps, rim, eyeballs, crease } = rig.body;
+    const corners = studioNormals(rig.mesh, crease, caps, rim, eyeballs);
     const moves: Float32Array[] = [];
     for (const corrective of correctives) {
       yield;
       const moved = positions.map((p, i) => p + (corrective[i] ?? 0));
-      const after = studioNormals({ ...rig.mesh, positions: moved }, crease, caps, rim);
+      const after = studioNormals({ ...rig.mesh, positions: moved }, crease, caps, rim, eyeballs);
       const move = new Float32Array(corners.length);
       for (let i = 0; i < corners.length; i++) {
         move[i] = (after[i] ?? 0) - (corners[i] ?? 0);

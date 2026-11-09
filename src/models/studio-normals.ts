@@ -23,10 +23,15 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * around them, and a raised arm shows them as a dark crack. So a corner of a rim face gets the
  * mean of the normals of all `matte` faces at its vertex that are no caps, with no crease angle.
  *
+ * The faces of `eyeballs` are the `lacquer` eyes of the mesh of a hand rig. A corner of such a
+ * face gets the mean of the normals of the eyeball faces at its vertex, with no crease angle, so
+ * that the highlight of the gloss moves smoothly over the ball.
+ *
  * @param mesh The places of the welded vertices, the corners, and the finishes of the mesh.
  * @param crease The crease angle in degrees.
  * @param caps The `matte` triangles of the caps of the arms (`StudioBody.caps`).
  * @param rim The `matte` triangles of the rim of the caps of the body (`StudioBody.rim`).
+ * @param eyeballs The triangles of the eyes of the mesh (`StudioBody.eyeballs`).
  * @returns x, y, z of the unit normal of each corner, in the order of `mesh.corners`.
  */
 export function studioNormals(
@@ -34,11 +39,13 @@ export function studioNormals(
   crease: number,
   caps: readonly number[] = [],
   rim: readonly number[] = [],
+  eyeballs: readonly number[] = [],
 ): Float32Array {
   const { corners, finishes } = mesh;
   const cornerCount = corners.length;
   const isCap = faceFlags(cornerCount / 3, caps);
   const isRim = faceFlags(cornerCount / 3, rim);
+  const isBall = faceFlags(cornerCount / 3, eyeballs);
   const { faces, angles, start, around } = meshFrame(mesh);
 
   const limit = Math.cos((crease * Math.PI) / 180) - 1e-6;
@@ -51,7 +58,8 @@ export function studioNormals(
     let sx = ox;
     let sy = oy;
     let sz = oz;
-    if (finishes[own] === MATTE) {
+    const ball = isBall[own] === 1;
+    if (finishes[own] === MATTE || ball) {
       sx = 0;
       sy = 0;
       sz = 0;
@@ -65,7 +73,12 @@ export function studioNormals(
         const fy = faces[face * 3 + 1] ?? 0;
         const fz = faces[face * 3 + 2] ?? 0;
         const skin = finishes[face] === MATTE && isCap[face] !== 1;
-        if (whole ? skin : other === c || (skin && ox * fx + oy * fy + oz * fz >= limit)) {
+        let counts = whole ? skin : other === c || (skin && ox * fx + oy * fy + oz * fz >= limit);
+        // An eyeball face takes the other faces of its ball at the vertex, with no crease angle.
+        if (ball) {
+          counts = isBall[face] === 1;
+        }
+        if (counts) {
           const weight = angles[other] ?? 0;
           sx += fx * weight;
           sy += fy * weight;
