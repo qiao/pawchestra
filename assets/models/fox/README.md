@@ -83,12 +83,17 @@ a supinated bind paw on each side (the role-neutral bind of design 4.4).
 
 ## Candidate hand rig
 
-`tripo-p2/` holds the source of a candidate body: the Tripo P2 mesh `tripo-p2/fox.fbx` with its
-maps.
+`tripo-hand/` holds a candidate body ("tripo-hand/fox.blend" below): a hand rig of the Tripo P2
+mesh `tripo-p2/fox.fbx`, made in a live Blender with no arm cut and no limb stretch. On the
+branch of the candidate, the `ANIMALS` entry of the fox points to `tripo-hand/fox.rig.glb`. The
+red fox and the tan fox share it.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/fox.fbx`, `tripo-p2/fox.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+| `tripo-hand/fox.blend` | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
+| `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
 
 ### tripo-p2/fox.fbx
 
@@ -114,3 +119,91 @@ normal map.
 The color map paints a full eye on each eyeball: a black pupil, an amber iris, two white lights,
 and a dark rim. The paws, the feet, and the forearms below the elbows are dark brown, and the
 nose is black.
+
+### tripo-hand/fox.blend
+
+The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
+through the Blender MCP tools, in a scene `fox` of its own. The arms and the legs keep the form
+and the length of the source: no cut, no split from the trunk, and no stretch.
+
+| Item | Value |
+|---|---|
+| Size | 439,212 bytes |
+| SHA-256 | `297d8ab6f49a5c0e60cce30b7a51a466e089966aab2567a2ad969bd34ae7921d` |
+| Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
+| License | CC BY-NC 4.0, as the FBX file |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `fox`: 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
+| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `seat`, and `hinges` come from `sa.build_armature()` |
+| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 35 (as the fox of main) |
+| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
+
+The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
+assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0, as the FBX file.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/fox.rig.glb` | 958,320 bytes | `957dcb7752076ac603f58fb8a695480433c13564162672f8e16d780437e42d78` |
+| `tripo-hand/fox.rig.json` | 9,903 bytes | `be93d2a780997691af04e240a6bc37bfea772490dd49ce7ba88ac2d28876badf` |
+
+The edits, in the order of the work:
+
+- **Import.** `sa.import_source('assets/models/fox/tripo-p2/fox.fbx', 1e-5)` in the new scene
+  `fox`: no vertex merges, 1 unit from the soles to the ear tips.
+- **Joints.** The FBX has no armature, so each joint comes from cuts of the mesh and from its
+  edge rings (`jointsNote` of the config). Two joints moved off the measure by 2 mm: the hip
+  joint and the knee joint lie at (0.058, 0.29, 0.055) and (0.063, 0.175, 0.043). A thigh that
+  points almost along -y in the frame of the hips gets a rest frame with an error up to 3e-5 in
+  Blender (float32), and the export stops above 1e-5 ("The bone thigh_L scales or shears"). At
+  these joints the error is 1.6e-7.
+- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>,
+  cuts=<n>, use_grid_fill=True)`) of the clean quad edge ring of 10 edges between two arm rings.
+  The bands, by the x of their rings on each arm, and the cuts: 0.0781 to 0.0974 (1), 0.1113 to
+  0.1274 (1), 0.1274 to 0.1458 (1), 0.1458 to 0.1758 (2), 0.1758 to 0.1891 (1), 0.2095 to 0.2358
+  (2), 0.2358 to 0.2675 (3), and 0.2675 to 0.2959 (3). Each arm now has a ring each 0.19 to 0.36
+  arm radii (radius 0.04 at the root to 0.024 at the wrist) from x 0.078 to x 0.296.
+- **Knee rings.** The same call with 1 cut on the clean leg bands of 12 edges at y 0.1737 to
+  0.2037 and 0.2037 to 0.2301 of each leg. The knee joint is at y 0.175, and the knee has rings
+  at y 0.143, 0.158, 0.174, 0.189, 0.204, 0.217, and 0.230.
+- **Rings with no split.** These edge rings stop at a triangle or a pole, so they take no split:
+  the wrist band at x 0.2959 to 0.3096 (4 triangles, 4 poles), the paw bands from x 0.3096
+  (triangles and poles at the thumb and the finger roots), the foot and ankle bands at y 0.0195
+  to 0.0863 (triangles and poles at the heel), the leg band at y 0.2301 to 0.2591 (one triangle),
+  and the haunch bands from y 0.2918 (triangles and poles).
+- **Surface.** `sa.add_surface(fox, 'fox', 'assets/models/fox/tripo-p2/fox.fbm/fox_basecolor.jpg',
+  eye_fans=False, config=<fox-tripo.json>)` on the flat mesh. 58 faces of the black nose are
+  gloss. The faces of the eyeballs took the fur color.
+- **Eyes.** The 120 faces of the two eyeballs get the face attribute `eye` (BOOLEAN, FACE) and
+  the colors `color` and `color_base` `#15110e` (the eye color of the app). The export then
+  gives `ownEyes`, and the app adds no bead eyes. The eyeballs keep the slot `fur`.
+
+The weights, in the order of the work, in the rest pose:
+
+1. Parent with Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh(fox,
+   fox_rig, auto=True)`). 22 whisker vertices took no weight.
+2. Arm rings: each vertex ring of each arm from x 0.085 to x 0.2965 takes one exact row with
+   `sa.set_weight_row()`. A row holds a clavicle share, an elbow helper share, and a wrist helper
+   share, linear between the control rings below (x of the left arm). The rest of the row goes to
+   the 4 roll segments of the upper arm (x below 0.195) or of the forearm, by the place of the
+   middle of the ring along the bone: segment k takes the share at (k + 0.5) / 4 of the part,
+   with a linear ramp between two segments (the roll split of the simple route).
+
+   | x | 0.0896 | 0.0974 | 0.1113 | 0.1274 | 0.1458 | 0.169 | 0.179 | 0.1886 | 0.202 | 0.215 | 0.2315 | 0.278 | 0.2896 | 0.301 |
+   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.40 | 0.30 | 0.15 | 0.05 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 | 0 | 0 |
+   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 |
+
+   The 25 rings of each arm take these rows. The trunk loop around each arm
+   root (x 0.078) keeps the automatic weights.
+3. Paws, by rows across the paw, by the place along the rest forearm axis (as the x of the axis
+   point of the left paw): 0.3035 to 0.33 {`wrist` 0.5, `hand` 0.5}, 0.33 to 0.35 {`hand` 1},
+   the knuckle row 0.35 to 0.374 {`hand` 0.5, `fingers` 0.5}, and from 0.374 {`fingers` 1}: 30,
+   25, 80, and 186 vertices on each paw.
+4. The 170 vertices of the loose parts (eyeballs and whiskers) and the 69 vertices of the gloss
+   nose take {`head` 1}.
+
+The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
+weights. The tail has two bones: `tail` (from the root at y 0.40, z -0.05 to y 0.30, z -0.135)
+and `tail_tip` (to the tip at y 0.11, z -0.2). The bind turns them to the directions of
+`studio.tailBind` of the config. The scripts of the live session are not in the repo.
