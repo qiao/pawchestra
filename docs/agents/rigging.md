@@ -131,6 +131,8 @@ only. Design 4.4 ("Arm gate") gives the measures.
   paw crops at a strike and at rest.
 - A new wind hold whose paw faces its tube adds the `ACCEPTED_PALMS` entry that the tool prints.
 - After a new bind, `--world --base <start>` proves the same bones.
+- A `WORSE` value is inside `NEAR_LIMIT` of its limit and stops nothing. Check its arm in the
+  crops.
 
 ## The rebuild of the arms in Blender
 
