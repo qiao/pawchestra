@@ -222,15 +222,15 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,482,350 bytes |
-| SHA-256 | `363af5ba171d603e43d268a2e47b25db54b852f4211f9a43b869c721f75e8e0b` |
+| Size | 1,398,983 bytes |
+| SHA-256 | `cf25ba1e57b511be38b22608474f52ef9614b7274ad3125d417ad5361e9c1d36` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: 2,853 vertices and 3,047 faces (2,559 quads and 488 triangles, 5,606 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The eye sockets are filled ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey have the face attribute `plain` ("Color map" below) |
+| Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 218 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey have the face attribute `plain` ("Color map" below) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
-| Eyes | `eye_L` and `eye_R` on the filled eye sockets, with the size 1.2 H (0.2128 units) ("Eyes" below) |
+| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no pea eyes ("Eyes" below) |
 
 The edits, in the order of the work:
 
@@ -357,30 +357,37 @@ seat a little behind the knee. Two changes give this seat:
 | Back of the pelvis to the chair back | 0.05 m | 0.02 m | |
 
 **Eyes.** Each eye of the Tripo mesh is a loose ball of 0.265 H in a round socket hole of
-0.178 H by 0.173 H. The ball kept the fur color, so a light disc showed around the black pea eye
-(0.13 H by 0.18 H), most of all in the 3/4 and side views. These edits by hand in the live
-Blender fill each socket with fur and give a larger pea eye:
+0.178 H by 0.173 H. The color map paints a full eye on each ball: a black pupil, an amber iris, a
+white light, and a light rim. The candidate keeps these eyes and has no pea eyes (design 4.4,
+"Hand rig"). An earlier edit (88afd18bf) deleted the balls, filled each socket with fur, and put
+a pea eye of 1.2 H on it. These point edits in the live Blender undo it:
 
-1. Delete the two eyeballs (99 vertices each, `head` 1).
-2. Close each socket hole with Grid Fill (span 3) of its 14 rim vertices: 6 new vertices and 12
-   quads, with the fur color, the slot `fur`, and the mean weight row of the rim (`head` 0.936,
-   `neck` 0.033, `ear_<side>` 0.031).
-3. Move the rim, the fill, and the socket groove (46 vertices on the left, 44 on the right, each
-   nearer than 0.145 H to the eye axis and behind the level below) along the eye axis onto one
-   level, 0.012 H behind the old front of the ball. The largest move is 0.052 H.
-4. Put each eye object on that level with `se.place_eyes()`, with the old direction and the size
-   1.2 H. A larger pea eye covers the old hole in the side views, and the fill keeps the eye from
-   the size of the whole socket (1.37 H for the width of the hole).
+1. Delete the 6 Grid Fill vertices of each eye, with their 12 quads.
+2. Move the 78 groove vertices back to their places of the `.blend` of 88afd18bf^. Each vertex
+   finds its old vertex by its place across the eye axis, and the match agrees with the vertex
+   order of that file for each vertex.
+3. Add the two eyeballs of that file again (99 vertices and 109 faces each), with their UVs and
+   custom normals, on the slot `fur`.
+4. Give the 49 socket faces with fur UVs of the texture round ("Color map" below) their source
+   UVs again, so that the dark lining of the map shows around each eye.
+5. Give each eyeball vertex the row `head` 1 with `sa.set_weight_row()`. A blink of an eye bone
+   squeezed the ball to a thin disc and opened the socket into the head, so the eyes do not
+   blink.
+6. Give the eyeball faces the color `#15110e` (the eye color of the app) for the frames before
+   the map loads, and the face attribute `eye`.
+7. Delete the eye objects `eye_L` and `eye_R`.
 
-| Measure, in H | Before | After | Main rabbit |
-|---|---|---|---|
-| Black oval (width by height) | 0.13 by 0.18 | 0.156 by 0.216 | 0.13 by 0.18 |
-| Light eye area (the socket hole) | 0.178 by 0.173 | None (fur fill) | None |
+The mesh is then the mesh of 88afd18bf^ again in each vertex, face, UV, custom normal, and
+weight, except the face colors of the eyeballs. The export writes the middle of each eyeball as
+`ownEyes`. The rim vertices of each socket keep shares of `neck` (at most 0.071) and
+`ear_<side>` (at most 0.06), as in the source rig.
 
 **Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
 colors (design 4.5). The mesh keeps the UV map of the FBX. The edge ring cuts of the arms and the
 knees interpolate it, and the seams of their faces show the same color steps as the FBX. The eye
-edits left two faults, which these point edits in the live Blender fix:
+fill of that time left two faults, which these point edits in the live Blender fixed. The restore
+of the eyeballs ("Eyes" above) removed the fill and gave the faces of steps 2 and 3 their source
+UVs again:
 
 1. The 12 Grid Fill quads of each eye had mixed UVs of the socket rim: 8 were flipped, and 4 were
    3 to 6 times squeezed.
