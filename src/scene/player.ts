@@ -42,6 +42,7 @@ import type { StudioPose, StudioRig } from '../models/studio-rig.ts';
 import type { Skeleton as PlayerSkeleton } from '../models/rig.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { bodyMapMaterial } from './body-texture.ts';
+import { eyeLightMaterial } from './eye-light.ts';
 import { createGeometry } from './geometry.ts';
 import { createDepthGeometry, shareCorners } from './shared-corners.ts';
 import { createStringBands, updateStringBands } from './harp-strings.ts';
@@ -506,7 +507,8 @@ function stringLinePoints(strings: HarpStrings, bind: Float32Array): Float32Arra
  * so that its keys go down with its notes, and its strings close while their bands show
  * ({@link ownGeometry}). The bands of a harp are a child of the mesh ({@link createStringBands}).
  * A player whose studio body has a color map gets the copy of the shared material with the map
- * (`bodyMapMaterial()`, design 4.5).
+ * (`bodyMapMaterial()`, design 4.5). A player whose studio body has eyeballs gets a copy with
+ * the eye light (`eyeLightMaterial()`, design 4.5).
  *
  * @param model The player model of `models/`.
  * @param geometry The geometry of the model, from {@link createPlayerGeometry}.
@@ -519,12 +521,15 @@ export function createPlayerMesh(
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
   const own = movesCorners(model) ? ownGeometry(geometry) : geometry;
-  const file = model.studio.body.texture?.file;
+  const { body } = model.studio;
+  const file = body.texture?.file;
+  const mapped =
+    file === undefined ? materials : materials.map((shared) => bodyMapMaterial(shared, file));
   const mesh = createStudioMesh(
     model,
     model.studio,
     own,
-    file === undefined ? materials : materials.map((shared) => bodyMapMaterial(shared, file)),
+    body.eyeballs ? mapped.map((base) => eyeLightMaterial(base, body, model.studio.mesh)) : mapped,
   );
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
