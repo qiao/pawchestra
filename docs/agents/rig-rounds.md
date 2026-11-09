@@ -42,8 +42,8 @@ Start commit `<hash>`. <On `main`, or worktree `<path>` on branch `<branch>`>. H
 1. `pnpm studio-body <a>` writes the module, and the species has the body.
 2. <the pose claims: the seat, the feet, the hold>.
 3. The role is in `SWEEP_ROLES`, `FOLD_ROLES`, `ROLE_VIEWS`, and "Bodies and roles".
-4. `pnpm arm-check <role> --base <start> --views <dir>` gives no `FAIL`.
-5. `tools/check-commits.sh --tip <base>` passed, and the docs checklist is true.
+4. On request only: `pnpm arm-check <role> --base <start> --views <dir>` gives no `FAIL`.
+5. The docs checklist is true. On request only: `tools/check-commits.sh --tip <base>` passed.
 
 ## Facts and baseline
 <the output of "Before the brief", and the open form rounds of the body>
@@ -60,6 +60,9 @@ Result. Numbers (| Measure | main | round |, and the gate table). Choices. Commi
 ```
 
 ## Rules of a round
+
+The sweeps, the arm gate, the image sets, and the probes with `--base` below run only when the
+brief asks for them (`AGENTS.md`, "Checks").
 
 - Commit the mechanism first, with values that change nothing. Then tune with `--set`, and commit
   the tuned values. Only the last commit of a rig series writes the GLB file and its module.
