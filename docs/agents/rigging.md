@@ -240,10 +240,12 @@ Design 4.4 gives the rule and the reason of each config key.
 - A thigh share in the crotch lifts the lower belly band of a seated bind into a shelf. Move the
   band onto the thigh tops with a key `bind*`, and keep each crease vertex off the line of its
   neighbors.
-- A hold can turn a paw far from the source paw. On a round arm tube, turn the elbow axis of the
-  hand rig (`hinges`) about the bind upper arm, so that the upper arm roll takes half of the
-  turn. The app takes the smooth normals from the bind, so a bind supination makes hard diagonal
-  edges on the forearm that spiral in play. Keep it near 0 when the twists stay far from 180°.
+- A hold can turn a paw far from the source paw, and a twist of 110° on one arm part still
+  shows as sheared facets. Turn the source paw rigidly about the forearm axis by whole ring steps
+  and join the wrist band again, with a `palm` for each side on the real palm. Then move the rest
+  between the moments with the elbow poles of the hold, and center it with `hinges`. Keep each
+  part within about 45°. The app takes the smooth normals from the bind, so keep the bind
+  supination near 0 when the twists stay far from 180°.
 - When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
   `pnpm raise-fit`. A shape fixes only the poses near its rule, and design 4.4 gives its limits.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
