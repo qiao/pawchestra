@@ -624,8 +624,8 @@ const HANGING_BOW = {
 } as const satisfies NonNullable<BowedHold['standBow']>;
 
 /**
- * The hold of the violin on the left shoulder, for the rabbit and as the base of the holds of the
- * red fox and the wolf (design 4.6, 5.3), as a real
+ * The hold of the violin on the left shoulder, the base of the holds of the rabbit
+ * ({@link RABBIT_HOLD}), the red fox, and the wolf (design 4.6, 5.3), as a real
  * violinist holds it (violinonline.com, "How to hold the violin", and Simon Fischer, "Basics:
  * Holding the violin"): the tail end on the left collarbone against the left side of the neck,
  * under the jaw, the jaw on the violin, the violin about 38° to the left of the front, and the
@@ -1379,6 +1379,22 @@ const HIPPO_HOLD = {
 } as const satisfies BowedHold;
 
 /**
+ * The hold of the violin of the rabbit: the shoulder hold ({@link SHOULDER_HOLD}) with the left
+ * elbow of the Tripo P2 hand rig (design 4.4, 5.3). In the play, the left elbow comes in under
+ * the violin, straight down and forward, (0, -1, -0.5), as a real violinist swings the left elbow
+ * under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
+ * elbow points out, (-1, -0.6, 0). The two elbows move a part of the turn of the left paw from the
+ * forearm to the upper arm: the forearm twists about 22° less in the play and 24° less at rest,
+ * and each part of the left arm then takes at most 41° of roll or twist in the moments of the
+ * violinist. With the elbows of the shoulder hold, the forearm keeps at least about 58°.
+ */
+const RABBIT_HOLD = {
+  ...SHOULDER_HOLD,
+  poleL: [0, -1, -0.5],
+  restPoleL: [-1, -0.6, 0],
+} as const satisfies BowedHold;
+
+/**
  * The holds of the species that hold a bowed string in their own way, in place of
  * {@link BOWED_HOLDS}: the rabbits and the red foxes hold the violin on the left shoulder, as in
  * `rabbit-views.png`, the cat holds the viola with its own hold, and the dog holds the cello
@@ -1389,7 +1405,7 @@ const HIPPO_HOLD = {
 export const SPECIES_HOLDS: Partial<
   Record<SpeciesId, Partial<Record<BowedInstrument, BowedHold>>>
 > = {
-  rabbit: { violin: SHOULDER_HOLD },
+  rabbit: { violin: RABBIT_HOLD },
   'fox-red': { violin: FOX_HOLD },
   cat: { viola: CAT_HOLD },
   dog: { cello: DOG_HOLD },
