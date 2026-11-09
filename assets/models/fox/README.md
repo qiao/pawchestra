@@ -80,3 +80,37 @@ The rig gives the faces near each shoulder joint and each elbow joint the normal
 no crease angle (`rootNormals` of the config). Each hold bends the elbows, and a crease angle
 splits the normals of each inner elbow into a visible notch. The rig binds the arms straight, with
 a supinated bind paw on each side (the role-neutral bind of design 4.4).
+
+## Candidate hand rig
+
+`tripo-p2/` holds the source of a candidate body: the Tripo P2 mesh `tripo-p2/fox.fbx` with its
+maps.
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo-p2/fox.fbx`, `tripo-p2/fox.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+
+### tripo-p2/fox.fbx
+
+A red fox in a T-pose, made with Tripo P2: quad faces, and arm and leg tubes of 10 and 12
+vertices around. The FBX file keeps the quads. The folder `fox.fbm/` holds its color map and its
+normal map.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object, with no armature and no animation. 3,738 vertices and 4,423 faces: 2,963 quads and 1,460 triangles (7,386 triangles), no n-gon. One UV layer |
+| Parts | 9 parts: the body (3,568 vertices), two eyeballs (52 vertices each), and six whisker strips (11 vertices each). No vertices merge at 1e-5. The 66 open edges are the 6 open loops of the whisker strips. No edge has more than two faces |
+| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.4199 (the paw tips) and z ±0.2211 (the snout and the tail). The fox faces -y in Blender. The tail hangs down behind the legs to 0.109 units above the soles |
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `fox.fbx` | 259,292 bytes | | `db116e3197e4f68838268a7a9c2def02427863545d6692c4435f5aaec4ed0845` |
+| `fox.fbm/fox_basecolor.jpg` | 2,631,574 bytes | 4096 × 4096 | `be63ddbab53870f105f307f01ce5ead74d89ab063f4f52a97d5c64ed157e8cb6` |
+| `fox.fbm/fox_normal.jpg` | 884,078 bytes | 4096 × 4096 | `ffb4aa792a25a168738eb4f80ec897683586176de5b64df616e05a352d16ac0f` |
+
+The color map paints a full eye on each eyeball: a black pupil, an amber iris, two white lights,
+and a dark rim. The paws, the feet, and the forearms below the elbows are dark brown, and the
+nose is black.
