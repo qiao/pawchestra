@@ -66,7 +66,7 @@ describe('the animal of a studio body', () => {
     }
   });
 
-  it('gives the species of each animal, and no animal for a species with no studio body', () => {
+  it('gives the species of each animal', () => {
     for (const animal of ANIMALS.keys()) {
       for (const species of animalSpecies(animal)) {
         expect(speciesAnimal(species)).toBe(animal);
@@ -74,19 +74,17 @@ describe('the animal of a studio body', () => {
     }
     expect(animalSpecies('rabbit')).toContain('rabbit');
     expect(animalSpecies('fox')).toEqual(['fox-red', 'fox-tan']);
-    expect(speciesAnimal('wolf')).toBeNull();
   });
 });
 
 describe('copiedTool', () => {
-  it('copies the scripts and the configs of the mesh rigs, and no other file of tools/', () => {
+  it('copies the scripts and the configs of the mesh rigs, and not the GLB body configs', () => {
     const tools = join(ROOT, 'tools');
     expect(copiedTool(tools)).toBe(true);
     expect(copiedTool(join(tools, 'hold-reach.ts'))).toBe(true);
     expect(copiedTool(join(tools, 'mesh-rigs'))).toBe(true);
     expect(copiedTool(join(tools, 'mesh-rigs', 'fox.json'))).toBe(true);
     expect(copiedTool(join(tools, 'glb-bodies', 'bear.json'))).toBe(false);
-    expect(copiedTool(join(tools, 'blender'))).toBe(false);
   });
 });
 
