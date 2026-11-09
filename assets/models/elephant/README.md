@@ -12,7 +12,7 @@ elephant-arms.glb                      `source` of tools/mesh-rigs/elephant.json
   + elephant-weights.json              `paintedWeights` of the same config
    │  pnpm rig-mesh elephant
    v
-elephant.rig.glb                       rigged mesh
+elephant.rig.glb                       rigged mesh with point edits
    │  pnpm studio-body elephant
    v
 src/models/studio/elephant.ts          studio body of the app
@@ -27,7 +27,8 @@ src/models/studio/elephant.ts          studio body of the app
 | `elephant-apose.glb` | Source mesh (below) | None |
 | `elephant-arms.glb` | Copy of `elephant-apose.glb` with rebuilt arms. License as the source | `elephant_arms.py` |
 | `elephant-weights.json` | Weights of the same Blender run. License as the source | `elephant_arms.py` |
-| `elephant.rig.glb` | Output of the rig. License as the source | `pnpm rig-mesh elephant` |
+| `elephant.rig.glb` | Output of the rig with point edits. License as the source | `pnpm glb-point-edits assets/models/elephant/elephant-edits.json` ("Point edits" below) |
+| `elephant-edits.json` | The point edits of the rig of ca86cc819 | None |
 
 ## elephant-apose.glb
 
@@ -79,8 +80,19 @@ shasum -a 256 assets/models/elephant/*.glb assets/models/elephant/elephant-weigh
 
 | Item | Value |
 |---|---|
-| Size | 751,672 bytes |
-| SHA-256 | `d248d687b1ba860d14f45f5f94a8edd310683d79daee77d48d35bf111a15c995` |
+| Size | 751,512 bytes |
+| SHA-256 | `51722834c5f0afe718df3aec96824d00891607112c407608b006eecd27e174da` |
+| Base | The rig of ca86cc819: 751,672 bytes, SHA-256 `d248d687b1ba860d14f45f5f94a8edd310683d79daee77d48d35bf111a15c995` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bent bind (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the timpani is smallest (`studio.bindSupination`). The skin of each forearm and wrist takes the skin normals (`rootNormals.wrist`) |
 
-A run of `pnpm rig-mesh elephant` gives the same bytes.
+A run of `pnpm rig-mesh elephant` gives the base. It drops the point edits.
+
+## Point edits
+
+`elephant-edits.json` moves one fur vertex at the inner side of each eye socket toward the middle
+of the old eye, in the plane of the eye, by 0.02 H (right) and 0.015 H (left). The fill of the
+sockets (`eyeFill` of `tools/studio-body.ts`) put each of these vertices on one line with two
+other corners of its face in the plane of the eye. The face then stood on its edge and showed as
+a thin dark crease beside the pea eye. `pnpm glb-point-edits` reads the base with
+`git show ca86cc819:assets/models/elephant/elephant.rig.glb`, so a second run gives the same
+bytes.
