@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { Connect, Plugin } from 'vite';
+import type { ConfigEnv, Connect, Plugin, UserConfig } from 'vite';
 import { LICENSES_FILE } from './src/app/credits.ts';
 import { DEFAULT_DEMO, DEMOS, demoUrl } from './src/app/demos.ts';
 import {
@@ -172,12 +172,54 @@ const INDEX_VALUES: Plugin = {
 };
 
 /**
+ * The mode of the second pass of `pnpm build`, which builds the test page alone (design 7.1, 7.2).
+ * The test page shares modules with the start page, such as the stage scene. In one build, Rolldown
+ * put these modules into common chunks, and the first download grew by about 1 kB. A build of its
+ * own keeps the chunks of the start page as they are.
+ */
+const TEST_PAGE_MODE = 'test-page';
+
+/**
+ * Tells if a plugin applies: in the first pass of the build, and not in the pass of the test page.
+ *
+ * @param _config The user config.
+ * @param env The command and the mode.
+ * @returns True in the first pass of the build.
+ */
+function mainBuild(_config: UserConfig, env: ConfigEnv): boolean {
+  return env.command === 'build' && env.mode !== TEST_PAGE_MODE;
+}
+
+/**
+ * The plugin of the pass of the test page (`vite build --mode test-page`, design 7.1). The pass
+ * builds only `test.html`, and it adds its files to the `dist/` of the first pass. It keeps the
+ * manifest of the first pass for `pnpm size`, and it copies no file of `public/` again, because
+ * the first pass gzipped the audio files in place.
+ */
+const TEST_PAGE_BUILD: Plugin = {
+  name: 'pawchestra:test-page-build',
+  apply: (_config, env) => env.command === 'build' && env.mode === TEST_PAGE_MODE,
+  config(config) {
+    // The deep merge of a returned config would keep the other entries, so the hook sets them.
+    config.publicDir = false;
+    config.build = {
+      ...config.build,
+      emptyOutDir: false,
+      manifest: false,
+      // The entry chunk of the test page holds three.js and the scene code, about 1.1 MB.
+      chunkSizeWarningLimit: 1200,
+      rolldownOptions: { ...config.build?.rolldownOptions, input: { test: 'test.html' } },
+    };
+  },
+};
+
+/**
  * The plugin that writes the files of `sitePages()` into the build (design 7.4): the Markdown copy
  * of the start page, `llms.txt`, and the other pages for agents and for visitors.
  */
 const SITE_PAGES: Plugin = {
   name: 'pawchestra:site-pages',
-  apply: 'build',
+  apply: mainBuild,
   generateBundle() {
     for (const [fileName, source] of sitePages(BASE)) {
       this.emitFile({ type: 'asset', fileName, source });
@@ -230,7 +272,7 @@ const INLINE_CSS: Plugin = {
  */
 const GZIP_AUDIO: Plugin = {
   name: 'pawchestra:gzip-audio',
-  apply: 'build',
+  apply: mainBuild,
   async writeBundle() {
     const { root, build } = this.environment.config;
     const summary = await gzipSiteAudio(resolve(root, build.outDir));
@@ -325,6 +367,7 @@ export default defineConfig({
     GZIP_AUDIO,
     DEV_LICENSES,
     LOCAL_CLIPS,
+    TEST_PAGE_BUILD,
   ],
   build: {
     // tools/size.ts reads the manifest to find the static imports of the entry chunk.
@@ -336,7 +379,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rolldownOptions: {
       // The gallery and the animal views are separate entries, so they do not add to the first
-      // download (7.1, 7.2).
+      // download (7.1, 7.2). The test page has a pass of its own (`TEST_PAGE_MODE`).
       input: {
         index: 'index.html',
         gallery: 'gallery.html',
