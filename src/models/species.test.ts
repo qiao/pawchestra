@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 
+import { STUDIO_TRIANGLE_BUDGET } from '../../tools/studio-budgets.ts';
 import type { BodyBoneName } from './biped.ts';
 import { seated } from './body-frame.ts';
 import { BONE_NAMES, boneIndex, makeSkeleton } from './rig.ts';
@@ -40,7 +41,9 @@ describe('buildBiped for each species', () => {
       it('stays within its body budget (design 4.5)', () => {
         // A studio body keeps the faces of its GLB file. The budget of the full scene holds the
         // frame (`budget.test.ts`).
-        expect(mesh.positions.length / 9).toBeLessThanOrEqual(studio ? 5600 : 2600);
+        expect(mesh.positions.length / 9).toBeLessThanOrEqual(
+          studio ? STUDIO_TRIANGLE_BUDGET : 2600,
+        );
       });
 
       it.runIf(studio)('keeps the faces and the colors of its GLB file (design 4.4)', () => {
