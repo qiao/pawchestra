@@ -1,4 +1,4 @@
-import { MathUtils, Quaternion, Vector3 } from 'three';
+import { MathUtils, Matrix4, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import { toQuat, toVec3 } from '../tuples.ts';
 import type { Quat, Vec3 } from '../tuples.ts';
@@ -278,15 +278,91 @@ export const BASS_DRUM = {
   ball: 0.0349 * BADGER_SCALE,
 } as const;
 
-/** The tambourine on its stand, in meters (design 4.6). */
+/** The tambourine, in meters (design 4.6). */
 export const TAMBOURINE = {
   /**
-   * The place of the middle of the tambourine on its stand, from the floor under the player: at
-   * the front right of the player, about at the height of the snare drum head, within the reach of
-   * the short arms of the badger mesh.
+   * The place of the middle of the old tambourine on its stand, from the floor under the player:
+   * at the front right of the player. The footprint of the trap table keeps the form of that stand
+   * ({@link TRAP_TABLE}), so that the seats do not move.
    */
   mount: [0.25, 0.45, -0.35],
+  /**
+   * The place of the tambourine in the closed left paw, in the axes of the piece of the left paw
+   * ({@link TRIANGLE_PINCH}): the middle of the frame, from the pinch of the thumb and the fingers
+   * on the frame. In the bind pose, the tambourine lies flat in front of the hanging paw with its
+   * head up, as the triangle does.
+   */
+  grip: [0, -0.106, 0.0225],
 } as const;
+
+/**
+ * The padded trap table of the small percussion player, in meters, in the axes of the player
+ * model with the floor under the player at the origin (design 4.6). A real player lays the
+ * instruments that it does not play on a padded trap table (`docs/reference/percussion-technique.md`
+ * 8). The table stands in front of the belly of the badger, below the triangle, and in the reach of
+ * the short arms.
+ */
+export const TRAP_TABLE = {
+  /** The height of the top of the pad. */
+  top: 0.42,
+  /** The least x and z of the top. */
+  min: [-0.36, -0.44],
+  /** The largest x and z of the top. */
+  max: [0.26, -0.2],
+  /**
+   * The hook of the triangle on its stand at the left of the player, in the axes of the player
+   * model: the clip hangs there, beside the belly and in the reach of the short left arm.
+   */
+  hook: [-0.25, 0.63, -0.12],
+} as const;
+
+/** The place of a switched piece on the trap table (design 4.6, 5.3). */
+export interface TablePlace {
+  /** The origin of the piece on the table, in the axes of the player model. */
+  readonly at: Vec3;
+  /**
+   * The world rotation of the paw that puts the piece on the table, from the bind pose. The piece
+   * keeps its place in the paw, so its axes on the table are this rotation times the rotation of
+   * its hold.
+   */
+  readonly hand: Quat;
+}
+
+/**
+ * The places of the switched pieces on the trap table (design 4.6, 5.3). The triangle hangs from
+ * the hook of its stand with the turn of the left paw that holds it in the play
+ * (`PERCUSSION_PLACES.triangleHand` of `pose/percussion-rig.ts`), so that the paw does not turn to
+ * hang it there. The tambourine lies flat with the turn of the paw that holds it in the play
+ * (`TAMBOURINE_HOLD` of `pose/percussion-rig.ts`), with its head turned up: a turn of -54° around
+ * the vertical from the bind pose. The right paw lays the beater down with
+ * the palm down and the fingers forward, so that the beater lies flat and points forward and in.
+ */
+export const TABLE_PLACES = {
+  tambourine: {
+    at: [-0.15, TRAP_TABLE.top + 0.0225, -0.215],
+    hand: toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), -54 * MathUtils.DEG2RAD)),
+  },
+  triangle: {
+    at: TRAP_TABLE.hook,
+    hand: [-0.664463, 0.241845, 0.241845, 0.664463],
+  },
+  beater: {
+    at: [0.2, TRAP_TABLE.top + 0.008, -0.2],
+    // The bind x axis goes up, the bind y axis back, and the bind z axis to the right.
+    hand: toQuat(
+      new Quaternion().setFromRotationMatrix(
+        new Matrix4().makeBasis(new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0)),
+      ),
+    ),
+  },
+} as const satisfies Readonly<Record<'tambourine' | 'triangle' | 'beater', TablePlace>>;
+
+/**
+ * The switched pieces of the small percussion player, in the order of their copies
+ * (`PieceCopies` of `models/instruments/hold.ts`): copy `2 p` of piece `p` lies on the trap table,
+ * and copy `2 p + 1` is in a paw.
+ */
+export const SWITCHED_PIECES = ['tambourine', 'triangle', 'beater'] as const;
 
 /** The triangle and its beater, which the small percussion player holds (design 4.6). */
 export const TRIANGLE = {
@@ -1889,26 +1965,114 @@ function triangleSpace(sink: PartSink): void {
 }
 
 /**
+ * Adds the padded trap table ({@link TRAP_TABLE}): a black pad on a board, on four legs.
+ *
+ * @param piece The piece of the table.
+ */
+function addTrapTable(piece: PieceBuilder): void {
+  const { top, min, max } = TRAP_TABLE;
+  const width = max[0] - min[0];
+  const depth = max[1] - min[1];
+  const middle = [(min[0] + max[0]) / 2, (min[1] + max[1]) / 2] as const;
+  piece.add(
+    box(width, 0.006, depth),
+    INSTRUMENT_COLORS.timpaniBlack,
+    transform([middle[0], top - 0.003, middle[1]]),
+  );
+  piece.add(
+    box(width, 0.02, depth),
+    INSTRUMENT_COLORS.xylophoneFrame,
+    transform([middle[0], top - 0.016, middle[1]]),
+    'varnish',
+  );
+  for (const x of [min[0] + 0.03, max[0] - 0.03]) {
+    for (const z of [min[1] + 0.03, max[1] - 0.03]) {
+      piece.rod([x, 0, z], [x, top - 0.026, z], 0.01, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
+    }
+  }
+  // The stand of the triangle: a post out from the clip on a round foot, and a short arm to the
+  // clip.
+  const [hx, hy, hz] = TRAP_TABLE.hook;
+  const post: Vec3 = [hx - 0.04, hy + 0.02, hz];
+  piece.add(
+    cylinder(0.06, 0.06, 0.012, 12),
+    INSTRUMENT_COLORS.timpaniBlack,
+    transform([hx - 0.04, 0, hz]),
+    'metal',
+  );
+  piece.rod([hx - 0.04, 0.012, hz], post, 0.006, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
+  piece.rod(post, [hx, hy + 0.02, hz], 0.003, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
+}
+
+/**
+ * Makes the copy of a switched piece on the trap table (design 4.6): the parts of the piece at its
+ * place on the table ({@link TablePlace}), on the `instrument` bone, with no footprint, because
+ * the table keeps the footprint of the old stand.
+ *
+ * @param piece The piece in its paw.
+ * @param place The place on the table.
+ * @param copy The index of the copy.
+ * @returns The copy.
+ */
+function tableCopy(piece: InstrumentPiece, place: TablePlace, copy: number): InstrumentPiece {
+  const turn = new Quaternion(...place.hand).multiply(new Quaternion(...piece.hold.rotation));
+  const at = transform(place.at, toQuat(turn));
+  return {
+    bone: 'instrument',
+    parts: piece.parts.map((part) => ({ ...part, corners: placeCorners(part.corners, at), copy })),
+    hold: hold('floor'),
+    footprint: [],
+  };
+}
+
+/**
+ * Marks each part of a piece in a paw as a copy of a switched piece (design 4.6).
+ *
+ * @param piece The piece in its paw.
+ * @param copy The index of the copy.
+ * @returns The piece with the copy index on each part.
+ */
+function pawCopy(piece: InstrumentPiece, copy: number): InstrumentPiece {
+  return { ...piece, parts: piece.parts.map((part) => ({ ...part, copy })) };
+}
+
+/**
  * Builds the instruments of the small percussion player (design 4.6): the triangle in the left
- * hand, its metal beater in the right hand, and the tambourine on a stand at the front right of
- * the player. The right hand strikes the tambourine for key 54.
+ * hand, its metal beater in the right hand, and the tambourine on a padded trap table in front of
+ * the player. Each of the three pieces has one copy on the table and one copy in its paw
+ * ({@link SWITCHED_PIECES}), and the pose shows one of the two (design 5.3). The right hand strikes
+ * the tambourine for key 54: in the left paw, or on the table with the beater.
  *
  * @returns The model.
  */
 export function buildSmallPercussion(): InstrumentModel {
-  const { mount } = TAMBOURINE;
-  const mountAt = new Vector3(...mount);
-  const stand = new PieceBuilder();
-  // The tambourine leans 30° to the player on its stand.
+  const table = new PieceBuilder();
+  addTrapTable(table);
+  // The footprint keeps the old tambourine, which leaned 30° to the player on its stand.
   const tilt = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 30 * MathUtils.DEG2RAD);
-  const ringAt: Transform = transform(mount, toQuat(tilt));
-  addTambourine(stand, ringAt);
-  const post = toVec3(mountAt.clone().add(new Vector3(0, -0.04, 0)));
-  addStand(stand, [mount[0], 0, mount[2]], post, 0.2);
-  stand.add(box(0.036, 0.03, 0.03), INSTRUMENT_COLORS.timpaniBlack, transform(post));
-  tambourineSpace(stand.space(), tilt);
-  const tambourine = stand.build('instrument', hold('floor'));
-  const tambourineHead = toVec3(new Vector3(0, 0.045, 0).applyQuaternion(tilt).add(mountAt));
+  tambourineSpace(table.space(), tilt);
+  const tablePiece = table.build('instrument', hold('floor'));
+  // The tambourine in the left paw lies in the axes of the piece of the triangle, with its head
+  // along -z of the piece: up in the bind pose.
+  const held = new PieceBuilder();
+  const headTurn = toQuat(
+    new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -90 * MathUtils.DEG2RAD),
+  );
+  addTambourine(held, transform(TAMBOURINE.grip, headTurn));
+  const tambourine = held.build('malletL', hold('palmL', TRIANGLE_PINCH.at, TRIANGLE_PINCH.turn));
+  const headInPaw = toVec3(
+    new Vector3(0, 0.045, 0)
+      .applyQuaternion(new Quaternion(...headTurn))
+      .add(new Vector3(...TAMBOURINE.grip)),
+  );
+  const normalInPaw = toVec3(new Vector3(0, 1, 0).applyQuaternion(new Quaternion(...headTurn)));
+  const onTable = TABLE_PLACES.tambourine;
+  const tableTurn = new Quaternion(...onTable.hand).multiply(
+    new Quaternion(...tambourine.hold.rotation),
+  );
+  const headOnTable = toVec3(
+    new Vector3(...headInPaw).applyQuaternion(tableTurn).add(new Vector3(...onTable.at)),
+  );
 
   // The triangle hangs 0.05 m below the origin of its piece, in the plane x-y. In the bind pose,
   // it points forward from the hanging hand, as a mallet does, so that it stays above the floor.
@@ -1926,22 +2090,38 @@ export function buildSmallPercussion(): InstrumentModel {
     look: TRIANGLE_BEATER,
     space: 0,
   });
+  const trianglePiece = triangle.build(
+    'malletL',
+    hold('palmL', TRIANGLE_PINCH.at, TRIANGLE_PINCH.turn),
+  );
   return {
     id: 'small-percussion',
     parent: 'root',
     pieces: [
-      tambourine,
-      triangle.build('malletL', hold('palmL', TRIANGLE_PINCH.at, TRIANGLE_PINCH.turn)),
-      beater.piece,
+      tablePiece,
+      tableCopy(tambourine, TABLE_PLACES.tambourine, 0),
+      tableCopy(trianglePiece, TABLE_PLACES.triangle, 2),
+      tableCopy(beater.piece, TABLE_PLACES.beater, 4),
+      pawCopy(tambourine, 1),
+      pawCopy(trianglePiece, 3),
+      pawCopy(beater.piece, 5),
     ],
     grips: handGrips(),
     targets: [
       {
         kind: 'head',
         bone: 'instrument',
-        from: tambourineHead,
-        to: tambourineHead,
-        normal: toVec3(new Vector3(0, 1, 0).applyQuaternion(tilt)),
+        from: headOnTable,
+        to: headOnTable,
+        normal: toVec3(new Vector3(...normalInPaw).applyQuaternion(tableTurn)),
+        keys: [54, 54],
+      },
+      {
+        kind: 'head',
+        bone: 'malletL',
+        from: headInPaw,
+        to: headInPaw,
+        normal: normalInPaw,
         keys: [54, 54],
       },
       {
@@ -1960,7 +2140,7 @@ export function buildSmallPercussion(): InstrumentModel {
       },
       beater.target,
     ],
-    size: pieceSize(tambourine),
+    size: pieceSize(tablePiece),
   };
 }
 
