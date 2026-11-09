@@ -12,11 +12,13 @@ export type Rgb = readonly [number, number, number];
  * - `matte`: cloth, raw wood, and the bodies. Each face stays flat, so the animals keep the
  *   facets of the low-poly look.
  * - `varnish`: the varnished wood of the bowed strings, with a soft highlight.
- * - `lacquer`: the black lacquer of the piano and a clarinet, and the wet eyes, with a sharp
- *   highlight.
+ * - `lacquer`: the black lacquer of the piano and a clarinet, and the bead eyes, with a
+ *   sharp highlight.
  * - `metal`: brass, copper, and silver. The vertex color gives the metal its tint.
+ * - `eye`: the wet eyeballs of a hand rig, with a sharp highlight. The eye light of the
+ *   players shines only on this finish (design 4.5).
  */
-export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal';
+export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal' | 'eye';
 
 /**
  * The shading values of a finish: the roughness and the metalness, each 0 to 1 (the values of
@@ -48,6 +50,7 @@ export const FINISHES = {
   varnish: { roughness: 0.3, metalness: 0, reflection: 1.8, crease: 60 },
   lacquer: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
   metal: { roughness: 0.26, metalness: 0.6, reflection: 2.4, crease: 60 },
+  eye: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
 } as const satisfies Readonly<Record<Finish, FinishValues>>;
 
 /**
