@@ -94,30 +94,70 @@ function frontDepth(u: number, v: number): number {
 }
 
 /**
+ * The share of the move of the light to the inner side of each eye, toward the visible middle of
+ * the eye in the front view ({@link lightAcross}). The cheek covers a part of the outer side of an
+ * eye that faces to the side, so the visible middle lies on the inner side. The full move put the
+ * light of one eye of the bear in the middle and the other on the left, and no move did the
+ * opposite on the pig, so the move is half the depth.
+ */
+const EYE_LIGHT_INNER = 0.5;
+
+/** The steps of the scan of {@link lightAcross} on each side of the middle of the oval. */
+const LIGHT_SCAN = 130;
+
+/**
  * Gives the place of the light across an eye: the place at which the light, on the front of the
- * oval, stands {@link EYE_LIGHT_SIDE} to the right of the middle of the eye, seen from the front.
+ * oval, stands {@link EYE_LIGHT_SIDE} to the +x side of the visible middle of the eye, seen from
+ * the front. The other eye of the head is about the mirror image of the eye. When the light of one
+ * of the two eyes cannot go that far and stay on its oval ({@link EYE_LIGHT_ACROSS}), both lights
+ * move less to the side, so that they stand at one place on the two eyes.
  *
  * @param across The axis across the eye.
  * @param n The axis of the eye.
- * @param front The depth of the front of the oval at a place across and up the oval, in `H`.
+ * @param front The depth of the front of the oval at a place across the oval, in `H`, at the
+ *   height of the light.
+ * @param lift The move of the light to +x from its height up the oval, in `H`.
  * @returns The place across the oval, from the middle, in `H`.
  */
-function lightAcross(across: Vector3, n: Vector3, front: (u: number) => number): number {
-  let u = 0;
+function lightAcross(
+  across: Vector3,
+  n: Vector3,
+  front: (u: number) => number,
+  lift: number,
+): number {
   // An eye that faces fully to the side has no place for the light to the right of its middle.
   if (Math.abs(across.x) < 0.2) {
-    return u;
+    return 0;
   }
-  // Seen from the front, the cheek covers the outer side of an eye that faces to the side, so the
-  // visible middle of the eye lies on its inner side, as far from the middle of the oval as the
-  // front of the oval lies on its outer side. The depth changes little with the place, so a few
-  // steps reach the place.
-  const target = -n.x * front(0) + EYE_LIGHT_SIDE;
-  for (let step = 0; step < 4; step++) {
-    u = (target - n.x * front(u)) / across.x;
-    u = Math.min(EYE_LIGHT_ACROSS, Math.max(-EYE_LIGHT_ACROSS, u));
+  // The place for a move to the side, on this eye (1) or on its mirror image (-1). The mirror
+  // image has the same axis across on x, the mirror of the axis of the eye, and the depth of
+  // this eye at the opposite place. The place is the step of a scan across the oval whose light
+  // stands nearest to the target, because the depth can change faster than the place.
+  const place = (side: number, mirror: 1 | -1): number => {
+    const nx = mirror * n.x;
+    const depth = (u: number): number => front(mirror * u);
+    const target = -EYE_LIGHT_INNER * nx * depth(0) + side - mirror * lift;
+    let best = 0;
+    let miss = Infinity;
+    for (let step = -LIGHT_SCAN; step <= LIGHT_SCAN; step++) {
+      const u = (step / LIGHT_SCAN) * 0.5 * EYE[0];
+      const off = Math.abs(u * across.x + nx * depth(u) - target);
+      if (off < miss) {
+        miss = off;
+        best = u;
+      }
+    }
+    return best;
+  };
+  let side = EYE_LIGHT_SIDE;
+  for (
+    let step = 0;
+    step < 10 && Math.max(Math.abs(place(side, 1)), Math.abs(place(side, -1))) > EYE_LIGHT_ACROSS;
+    step++
+  ) {
+    side *= 0.8;
   }
-  return u;
+  return Math.min(EYE_LIGHT_ACROSS, Math.max(-EYE_LIGHT_ACROSS, place(side, 1)));
 }
 
 /**
@@ -348,7 +388,7 @@ export function addEye(
     addBentLight(builder, colors, point, frame, h, bone);
     return;
   }
-  const u = lightAcross(across, n, () => 0.5 * EYE[2]);
+  const u = lightAcross(across, n, () => 0.5 * EYE[2], 0);
   const light = new Vector3(...point)
     .addScaledVector(n, 0.5 * EYE[2] * h)
     .addScaledVector(across, u * h)
@@ -385,7 +425,7 @@ function addBentLight(
   const { across, up, n } = frame;
   const v = EYE_LIGHT_UP;
   const front = (u: number, at: number): number => frontDepth(u, at) + frame.bend(u, at);
-  const u = lightAcross(across, n, (place) => front(place, v));
+  const u = lightAcross(across, n, (place) => front(place, v), v * up.x);
   const d = 1e-4;
   // The slopes of the front of the bent oval at the light, along the axes of the eye.
   const slopeU = (front(u + d, v) - front(u - d, v)) / (2 * d);

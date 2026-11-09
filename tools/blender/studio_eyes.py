@@ -48,6 +48,10 @@ ROLL_LIMIT = math.radians(35)
 #: the visible middle, and the largest place across (`EYE_LIGHT*` of `models/eyes.ts`).
 LIGHT_SIZE, LIGHT_UP, LIGHT_DEPTH, LIGHT_SIDE, LIGHT_ACROSS = 0.04, 0.035, 0.008, 0.02, 0.04
 
+#: The share of the move of the light toward the visible middle, and the steps of the scan of
+#: the place on each side of the middle (`EYE_LIGHT_INNER`, `LIGHT_SCAN` of `models/eyes.ts`).
+LIGHT_INNER, LIGHT_SCAN = 0.5, 130
+
 #: The colors of the oval and of the light, in sRGB (`EYE_COLOR`, `EYE_LIGHT_COLOR` of
 #: `models/species.ts`).
 EYE_COLORS = {'eye': '#15110e', 'eye_light': '#f6f2ea'}
@@ -99,16 +103,25 @@ def front_depth(u, v):
     return 0.5 * EYE[2] * math.sqrt(max(0.0, 1 - across * across - share * share))
 
 
-def light_across(across_x, n_x, front):
+def light_across(across_x, n_x, front, lift):
     """Gives the place of the light across the eye (`lightAcross()`). `across_x` and `n_x` are the
-    x of the axis across the eye and of the axis of the eye in the model axes of the app."""
-    u = 0.0
+    x of the axis across the eye and of the axis of the eye in the model axes of the app, and
+    `lift` is the move of the light to +x from its height up the oval."""
     if abs(across_x) < 0.2:
-        return u
-    target = -n_x * front(0.0) + LIGHT_SIDE
-    for _ in range(4):
-        u = min(LIGHT_ACROSS, max(-LIGHT_ACROSS, (target - n_x * front(u)) / across_x))
-    return u
+        return 0.0
+
+    def place(side, mirror):
+        nx = mirror * n_x
+        target = -LIGHT_INNER * nx * front(0.0) + side - mirror * lift
+        places = [k / LIGHT_SCAN * 0.5 * EYE[0] for k in range(-LIGHT_SCAN, LIGHT_SCAN + 1)]
+        return min(places, key=lambda u: abs(u * across_x + nx * front(mirror * u) - target))
+
+    side = LIGHT_SIDE
+    for _ in range(10):
+        if max(abs(place(side, 1)), abs(place(side, -1))) <= LIGHT_ACROSS:
+            break
+        side *= 0.8
+    return min(LIGHT_ACROSS, max(-LIGHT_ACROSS, place(side, 1)))
 
 
 def front_lean(across, up):
@@ -161,7 +174,8 @@ def eye_parts(bend, app_axes):
 
     across_x = c * app_axes[0][0] + s * app_axes[1][0]
     v, d = LIGHT_UP, 1e-4
-    u = light_across(across_x, app_axes[2][0], lambda place: front(place, v))
+    up_x = c * app_axes[1][0] - s * app_axes[0][0]
+    u = light_across(across_x, app_axes[2][0], lambda place: front(place, v), v * up_x)
     slope_u = (front(u + d, v) - front(u - d, v)) / (2 * d)
     slope_v = (front(u, v + d) - front(u, v - d)) / (2 * d)
     facing = unit(np.array([-slope_u, -slope_v, 1.0]))
