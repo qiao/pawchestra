@@ -1049,10 +1049,10 @@ export interface SwitchRig {
   /** The tip of the middle claw of the right paw in the bind pose, from the bind wrist. */
   readonly tip: Vec3;
   /**
-   * The bind of the left studio paw (`studioForearmTurn()` of `models/studio-rig.ts`): the turn of
-   * the left paw at a switch mixes in the frame of the studio forearm.
+   * The bind of each studio paw (`studioForearmTurn()` of `models/studio-rig.ts`): the turn of a
+   * paw at a switch mixes in the frame of the studio forearm.
    */
-  readonly pawBindL: PawBind;
+  readonly pawBinds: Readonly<Record<'L' | 'R', PawBind>>;
 }
 
 /**
@@ -1611,6 +1611,16 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
 }
 
 /**
+ * Copies the bind of a paw of a studio arm, so that the rig holds plain values only.
+ *
+ * @param arm The studio arm.
+ * @returns The bind of its paw.
+ */
+function pawBindOf(arm: PawBind): PawBind {
+  return { fore: arm.fore, hinge: arm.hinge, paw: arm.paw };
+}
+
+/**
  * Gives the place of a paw that puts a piece on the trap table: the piece keeps its place in the
  * paw, so the paw takes the turn of the place, and the wrist follows the origin of the piece.
  *
@@ -1706,11 +1716,7 @@ function switchRig(
     toRight: toVec3(toRight),
     fingerHand: toQuat(pawTurn('R', face.clone().negate(), fingersTo)),
     tip: toVec3(tip.sub(new Vector3(...right.bind.wrist))),
-    pawBindL: {
-      fore: model.studio.arms.L.fore,
-      hinge: model.studio.arms.L.hinge,
-      paw: model.studio.arms.L.paw,
-    },
+    pawBinds: { L: pawBindOf(model.studio.arms.L), R: pawBindOf(model.studio.arms.R) },
   };
 }
 
