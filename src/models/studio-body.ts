@@ -451,7 +451,7 @@ function* smoothNormalsSteps(rig: StudioRig, total: number): Steps<SmoothNormals
 /**
  * The eye bone of the studio for each eye bone of the player. A part of the mesh of the player on
  * an eye bone of the player follows the eye bone of the studio, so that it closes in a blink
- * (design 5.1): the scene scales only the eye bones of the studio (`poseStudioBones()`).
+ * (design 5.1): the scene scales or turns only the eye bones of the studio (`poseStudioBones()`).
  */
 const STUDIO_EYES: ReadonlyMap<number, number> = new Map([
   [boneIndex('eyeL'), STUDIO_BONES.indexOf('eye_L')],

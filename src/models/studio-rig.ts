@@ -1106,6 +1106,8 @@ const chestInverse = new Quaternion();
 const head = new Vector3();
 const matrix = new Matrix4();
 const scaleY = new Matrix4();
+const lidTurn = new Matrix4();
+const lidAxis = new Vector3();
 const span = new Vector3();
 const current = new Vector3();
 
@@ -1117,7 +1119,7 @@ const CHEST = boneIndex('chest');
 
 /**
  * The smallest y scale of a closed eye. A scale of 0 makes the bone matrix singular, so a closed
- * eye keeps a thin line.
+ * eye keeps a thin line. A lid is closed at this scale (`StudioBody.lids`).
  */
 export const CLOSED_EYE_SCALE = 0.05;
 
@@ -1219,14 +1221,15 @@ function upperRoll(armTurn: Quaternion, chestTurn: Quaternion, armBind: Vector3)
  * the studio. Each shape of a raised arm takes its weight from the turn of its upper arm, each
  * shape of a bent elbow from the turn of its forearm from the upper arm, and each shape of a bent
  * wrist from the turn of its paw from the forearm ({@link raiseWeight}). The eyes
- * scale on y for a blink. The bones of the player follow, for the instrument, with the offsets of
+ * scale on y for a blink, or the lids of a body with lids turn down over the eyes. The bones of the player follow, for the instrument, with the offsets of
  * the instrument and of the slide, as the scene moves them (design 5.1).
  *
  * @param rig The studio rig.
  * @param skeleton The skeleton of the player, with the positions of {@link StudioRig.positions}.
  * @param pose The local rotations of the bones of the player, four numbers for each bone.
  * @param offsets The offsets of the root, the instrument, and the slide.
- * @param eyeScale The scale of the eyes on y: 1 is open.
+ * @param eyeScale The scale of the eyes on y: 1 is open. A lid turns by the share of the way from
+ *   1 to {@link CLOSED_EYE_SCALE}, so that it closes when a bead eye closes.
  * @param out The pose to write.
  * @returns `out`.
  */
@@ -1275,11 +1278,19 @@ export function poseStudioBones(
       (studioCount + (rig.follows[s] ?? 0) + 1) * 16,
     );
   }
+  const lids = rig.body.lids;
   for (const s of EYE_BONES) {
     const a = rig.follows[s] ?? 0;
-    // T(place) R S T(-bind): the eye scales on y around its bone.
-    scaleY.makeScale(1, eyeScale, 1);
-    matrix.makeRotationFromQuaternion(rotations[a] ?? new Quaternion()).multiply(scaleY);
+    matrix.makeRotationFromQuaternion(rotations[a] ?? new Quaternion());
+    if (lids) {
+      // T(place) R L T(-bind): the lid turns about its hinge axis through the middle of the eye.
+      const shut = Math.min(1, (1 - eyeScale) / (1 - CLOSED_EYE_SCALE));
+      lidAxis.fromArray(s === EYE_BONES[0] ? lids.axes.L : lids.axes.R);
+      matrix.multiply(lidTurn.makeRotationAxis(lidAxis, shut * lids.angle));
+    } else {
+      // T(place) R S T(-bind): the eye scales on y around its bone.
+      matrix.multiply(scaleY.makeScale(1, eyeScale, 1));
+    }
     bind.fromArray(skeleton.positions[a] ?? [0, 0, 0]).applyMatrix4(matrix);
     const p = places[a] ?? new Vector3();
     matrix.setPosition(p.x - bind.x, p.y - bind.y, p.z - bind.z);

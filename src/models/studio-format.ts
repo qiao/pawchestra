@@ -415,6 +415,24 @@ export interface StudioEyes {
 }
 
 /**
+ * The lids of a studio body that shows the eyes of its mesh (design 4.4, 5.1). Each lid is a part
+ * of a sphere around the middle of its eyeball, a little larger than the ball, and follows the eye
+ * bone of its side. In the bind pose, the lid lies open: turned up into the head, under the head
+ * surface. A blink turns each eye bone about the axis of its lid, through the middle of the
+ * eyeball, so that the lid closes down over the eye (`poseStudioBones()` of
+ * `models/studio-rig.ts`).
+ */
+export interface StudioLids {
+  /** The turn of each lid from open to closed, in radians. */
+  readonly angle: number;
+  /**
+   * The unit hinge axis of each lid in the bind pose. A turn by a positive angle about it moves
+   * the lid down over the eye.
+   */
+  readonly axes: Readonly<Record<Side, Vec3>>;
+}
+
+/**
  * The color map of a studio body (design 4.5): an image of the fur, and the texture point of each
  * corner of the fur triangles. The pure core holds only the path and the points. The scene loads
  * the image after the first frame (`scene/body-texture.ts`), and the body shows the colors of its
@@ -476,10 +494,15 @@ export interface StudioBody {
   /**
    * The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. It is `null`
    * for a body that shows the eyes of its mesh (design 4.5): a hand rig with eye faces and no eye
-   * objects. Each eye bone then lies at the middle of an eye of the mesh and carries no vertex, so
-   * these eyes do not blink.
+   * objects. Each eye bone then lies at the middle of an eye of the mesh, and these eyes blink with
+   * the lids of the body ({@link StudioBody.lids}).
    */
   readonly eyes: StudioEyes | null;
+  /**
+   * The lids of a body that shows the eyes of its mesh. Their faces follow the eye bones. A body
+   * with no lids blinks with its bead eyes, or keeps the eyes of its mesh open.
+   */
+  readonly lids?: StudioLids;
   /**
    * The point on the floor under the middle of the body: the origin of the studio. A seated body
    * sits in front of the center of its seat, so that the seat of the studio (a bench or a chair)

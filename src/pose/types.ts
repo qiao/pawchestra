@@ -44,7 +44,10 @@ export interface AnimalPose {
    * the turn of its paw or of the fingers.
    */
   readonly digits?: Float32Array | null;
-  /** 0 is open eyes, 1 is closed eyes. The eye bones scale on y by `max(0.05, 1 - blink)`. */
+  /**
+   * 0 is open eyes, 1 is closed eyes. The eye bones scale on y by `max(0.05, 1 - blink)`, or turn
+   * the lids of a body with lids (`StudioBody.lids`).
+   */
   readonly blink: number;
   /**
    * The press level of each piano key from A0 to C8 (`keyLevelsAt()`), times the weight of the
