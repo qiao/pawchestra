@@ -345,20 +345,20 @@ passes.
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
 - [ ] Hippo: the nose tip lies on a nostril 2.7 cm from the middle plane, and the rig checks warn.
-- [ ] Mouse: the light of the left pea eye in the front view stands 0.25 of the eye width left of
+- [ ] Mouse: the light of the left bead eye in the front view stands 0.25 of the eye width left of
       the visible middle, against 0.02 right on the other eye. `EYE_LIGHT_INNER` 1.0 moved it only
       to 0.17. The ovals lean 7° with the tops in.
-- [ ] Rhino, polar bear: the lights of the two pea eyes stand at mirror places in the front close
+- [ ] Rhino, polar bear: the lights of the two bead eyes stand at mirror places in the front close
       view (light x 0.09 / -0.10 and 0.08 / -0.13 of the eye width), so they point toward each
       other. The rhino gap was 0.05 before its eyes moved up (`eyeShift`).
-- [ ] Rhino: thin dark lines of the old lower lid show under the right pea eye in the front close
+- [ ] Rhino: thin dark lines of the old lower lid show under the right bead eye in the front close
       view. The app view does not show them. Polar bear: a faint light facet stays at the inner
-      side of each pea eye. Penguin: the fur makes small dents at the inner side of the left eye.
+      side of each bead eye. Penguin: the fur makes small dents at the inner side of the left eye.
 - [ ] Deer, penguin, polar bear: the upright turn (`uprightRoll()`) leans the ovals 4° to 8° with
       the tops out in the front close view, where they were within 2° of upright. The linear bend
       model misses the fur cover. Try a fit of the turn on the real silhouette.
-- [ ] Wolf: a dark lid wedge of the mesh stands out at the outer side of the right pea eye.
-- [ ] Pea eye lights: the light of an eye that faces far to the side moves less to the side
+- [ ] Wolf: a dark lid wedge of the mesh stands out at the outer side of the right bead eye.
+- [ ] Bead eye lights: the light of an eye that faces far to the side moves less to the side
       (`lightAcross()`), so it stands near the middle. The mean gap between the places of the two
       lights is 0.09 of the eye width in the front close views.
 - [ ] Hippo bassist: at rest, the stick goes through the middle of the round paw, and the frog end
@@ -690,7 +690,7 @@ passes.
       middles of the old eyes as a start.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
-      change of the pea eye of the app must change both, or the preview must come from the app.
+      change of the bead eye of the app must change both, or the preview must come from the app.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
@@ -783,7 +783,7 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Wolf clarinetist: the mouthpiece goes 1.3 cm into the head under the long muzzle.
 - [ ] Wolf: the seated wolf is 1.01 times the dog cellist, below the range of the orchestra images.
       Ask the user to confirm the shape of the body.
-- [ ] Wolf: ask the user to confirm the face (level brows, level pea eyes, a thin smile line).
+- [ ] Wolf: ask the user to confirm the face (level brows, level bead eyes, a thin smile line).
 - [ ] Wolf: in the warm stage light, the fur shows a warm gray, but the wolf of the orchestra images
       is a cool gray with no cream chest. Show the user the face and a play frame.
 - [ ] Wolf: at rest, the root of the tail goes 0.6 cm into the back of the seat.
