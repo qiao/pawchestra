@@ -1,5 +1,5 @@
 {
- "sha256": "8413fbf277952f6e51c28167b53698c06b10b295c1cfafd5bd82e465a99ad6fb",
+ "sha256": "36fb915289c8b4782f77ccc64215294272e6dca250844c9a21df00491f40d969",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -513,7 +513,7 @@
   },
   "body": {
    "height": 0.939281,
-   "crease": 35,
+   "crease": 55,
    "backRoom": 0.04
   }
  }
