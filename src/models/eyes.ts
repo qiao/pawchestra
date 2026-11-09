@@ -16,8 +16,20 @@ export interface SurfacePoint {
 /** The size of an eye on x, y, and z, in H (design 4.5). */
 export const EYE = [0.13, 0.18, 0.06] as const;
 
-/** The number of faces around the axis of an eye. */
-const EYE_SEGMENTS = 8;
+/**
+ * The number of faces around the long axis of an eye. The lathe of `ball()` turns around the long
+ * axis, so these faces give the shading steps across the front of the oval.
+ */
+const EYE_SEGMENTS = 16;
+
+/**
+ * The number of steps of an eye from its bottom point to its top point. These steps give the
+ * outline of the oval in the front view: 4 steps showed the corners of an octagon in a close view.
+ */
+const EYE_RINGS = 8;
+
+/** The number of faces around the axis of the light, and the steps of its outline. */
+const LIGHT_BALL = [12, 6] as const;
 
 /** The diameter of the white light on an eye, in H. */
 const EYE_LIGHT = 0.04;
@@ -231,7 +243,7 @@ export function addEye(
   // The oval lies on the face: its thin axis is the normal of the surface, and its long axis
   // points up along the surface.
   const { across, n } = eyeAxes(normal);
-  const oval = ball(0.5, EYE_SEGMENTS, 4);
+  const oval = ball(0.5, EYE_SEGMENTS, EYE_RINGS);
   builder.add(bend ? bentBall(oval, bend) : oval, {
     color: colors.eye,
     bone,
@@ -248,7 +260,7 @@ export function addEye(
     .addScaledVector(n, 0.5 * EYE[2] * h)
     .addScaledVector(across, u * h)
     .add(new Vector3(0, EYE_LIGHT_UP * h, 0));
-  builder.add(ball(0.5, 6, 3), {
+  builder.add(ball(0.5, ...LIGHT_BALL), {
     color: colors.eyeLight,
     bone,
     at: transform(toVec3(light), undefined, [EYE_LIGHT * h, EYE_LIGHT * h, 0.5 * EYE_LIGHT * h]),
@@ -299,7 +311,7 @@ function addBentLight(
     .addScaledVector(up, v * h)
     .addScaledVector(across, u * h)
     .addScaledVector(n, front(u, v) * h);
-  builder.add(ball(0.5, 6, 3), {
+  builder.add(ball(0.5, ...LIGHT_BALL), {
     color: colors.eyeLight,
     bone,
     at: transform(toVec3(light), onOval, [EYE_LIGHT * h, EYE_LIGHT * h, EYE_LIGHT_DEPTH * h]),

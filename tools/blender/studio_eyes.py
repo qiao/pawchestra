@@ -39,7 +39,7 @@ EYE_BONE = 'head'
 EYE = np.array([0.13, 0.18, 0.06])
 
 #: The faces around the axis and the rings of the oval and of the light (`addEye()`).
-OVAL_BALL, LIGHT_BALL = (8, 4), (6, 3)
+OVAL_BALL, LIGHT_BALL = (16, 8), (12, 6)
 
 #: The light in H: the diameter, the place above the middle, the depth, the place to the right of
 #: the visible middle, and the largest place across (`EYE_LIGHT*` of `models/eyes.ts`).
