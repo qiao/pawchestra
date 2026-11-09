@@ -221,15 +221,15 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,500,199 bytes |
-| SHA-256 | `9fe2dc7418f5632c20ef752bcffa5e0cfcbe94d5295a015271aaf0af2431305a` |
+| Size | 1,521,205 bytes |
+| SHA-256 | `a956b2adbe722cd789b60c16013af91231c3e13090f54d45d26474812dcbe168` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
+| Mesh | One object `rabbit`: 2,853 vertices and 3,047 faces (2,559 quads and 488 triangles, 5,606 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The eye sockets are filled ("Eyes" below) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
-| Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
+| Eyes | `eye_L` and `eye_R` on the filled eye sockets, with the size 1.2 H (0.2128 units) ("Eyes" below) |
 
 The edits, in the order of the work:
 
@@ -354,3 +354,24 @@ seat a little behind the knee. Two changes give this seat:
 | Thigh (hip joint to knee joint) over the seat | 0 % | 64 % | |
 | Front edge of the seat behind the knee joint | 0.25 m | 0.08 m | |
 | Back of the pelvis to the chair back | 0.05 m | 0.02 m | |
+
+**Eyes.** Each eye of the Tripo mesh is a loose ball of 0.265 H in a round socket hole of
+0.178 H by 0.173 H. The ball kept the fur color, so a light disc showed around the black pea eye
+(0.13 H by 0.18 H), most of all in the 3/4 and side views. These edits by hand in the live
+Blender fill each socket with fur and give a larger pea eye:
+
+1. Delete the two eyeballs (99 vertices each, `head` 1).
+2. Close each socket hole with Grid Fill (span 3) of its 14 rim vertices: 6 new vertices and 12
+   quads, with the fur color, the slot `fur`, and the mean weight row of the rim (`head` 0.936,
+   `neck` 0.033, `ear_<side>` 0.031).
+3. Move the rim, the fill, and the socket groove (46 vertices on the left, 44 on the right, each
+   nearer than 0.145 H to the eye axis and behind the level below) along the eye axis onto one
+   level, 0.012 H behind the old front of the ball. The largest move is 0.052 H.
+4. Put each eye object on that level with `se.place_eyes()`, with the old direction and the size
+   1.2 H. A larger pea eye covers the old hole in the side views, and the fill keeps the eye from
+   the size of the whole socket (1.37 H for the width of the hole).
+
+| Measure, in H | Before | After | Main rabbit |
+|---|---|---|---|
+| Black oval (width by height) | 0.13 by 0.18 | 0.156 by 0.216 | 0.13 by 0.18 |
+| Light eye area (the socket hole) | 0.178 by 0.173 | None (fur fill) | None |
