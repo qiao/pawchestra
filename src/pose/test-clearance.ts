@@ -15,7 +15,7 @@ import { scoreOf } from '../score/test-score.ts';
 import { headOf, lookAngles } from './plan.ts';
 import type { PosePlan } from './plan.ts';
 import { createScenePose, poseAt } from './pose-at.ts';
-import { poseSkeleton } from './test-kinematics.ts';
+import { cornerShown, poseSkeleton } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 import { posedCorner } from './test-skin.ts';
 import { PLAYING } from './test-scene.ts';
@@ -176,7 +176,7 @@ export function posedPart(
           positions[(v + k) * 3 + 2] ?? 0,
         ),
     );
-    if (keep(corners)) {
+    if (keep(corners) && cornerShown(posed, v)) {
       firsts.push(v);
     }
   }

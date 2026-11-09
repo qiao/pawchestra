@@ -7,7 +7,7 @@ import type { BoneName } from '../models/rig.ts';
 import type { Score } from '../score/types.ts';
 import { HEAD_BONES, closedDepth, surfaceGap, surfaceNearest } from './test-clearance.ts';
 import type { ClosedSurface } from './test-clearance.ts';
-import { poseSkeleton, posedPiecePoint } from './test-kinematics.ts';
+import { cornerShown, poseSkeleton, posedPiecePoint } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 import type { Recast, TestScene } from './test-scene.ts';
 import { posedCorner } from './test-skin.ts';
@@ -414,7 +414,11 @@ export function sweepDepths(
       surface: obstacle.surface(posed),
     }));
     visit?.(posed, sample, new Map(surfaces.map(({ name, surface }) => [name, surface])));
-    for (const { part, points } of parts) {
+    for (const { part, points: all } of parts) {
+      // A hidden copy of a switched piece is not a part of the pose (`cornerShown()`).
+      const points = player.model.copies
+        ? { corners: all.corners.filter((c) => cornerShown(posed, c)) }
+        : all;
       const placed = points.corners.map((c) => new Vector3(...posedCorner(posed, c)));
       for (const { name, surface } of surfaces.filter((s) => enters(part, s.name))) {
         const key = `${part.name} ${name}`;

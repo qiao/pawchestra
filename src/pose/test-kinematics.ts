@@ -77,6 +77,28 @@ export function poseSkeleton(model: PlayerModel, pose: AnimalPose): PosedSkeleto
 }
 
 /**
+ * Tells if a pose shows a corner of the mesh of a player: each corner but the corners of a hidden
+ * copy of a switched piece (`PieceCopies`, `AnimalPose.held`), as the scene draws it.
+ *
+ * @param posed The posed skeleton.
+ * @param corner The index of the corner in the mesh.
+ * @returns False for a corner of a hidden copy.
+ */
+export function cornerShown(posed: PosedSkeleton, corner: number): boolean {
+  const { copies } = posed.model;
+  if (!copies) {
+    return true;
+  }
+  for (let c = 0; c < copies.starts.length; c++) {
+    if (corner >= (copies.starts[c] ?? 0) && corner < (copies.ends[c] ?? 0)) {
+      const inPaw = (posed.pose.held?.[c >> 1] ?? 0) >= 0.5;
+      return (c % 2 === 1) === inPaw;
+    }
+  }
+  return true;
+}
+
+/**
  * Moves a bind point of a bone to its posed place.
  *
  * @param posed The posed skeleton.
