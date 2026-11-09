@@ -313,8 +313,9 @@ the facts of its body in its `.blend` ("Hand rig").
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
   `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
   with no rule. A hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each
-  eye bone lies at the middle of the eye faces of its side (`ownEyesOf()`), and the app adds no pea
-  eyes. Such eyes follow the head bone and do not blink. An old eye that stands out as a ball in a
+  eye bone lies at the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`),
+  and the app adds no pea eyes. Such eyes follow the head bone. A lid on each eye blinks over them
+  (`StudioBody.lids`, "Hand rig"). An old eye that stands out as a ball in a
   groove, or sits in a deep socket, shows a light rim or a gray groove around the pea eye, so the
   head fills it first (`eyeFill`, the
   elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
@@ -571,7 +572,8 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `raise` | The custom property of the mesh that has the name of each key `arm_raise_*`. |
 | `hinges` | The custom property `hinges` of the armature. |
 | `eyes` | The eye objects `eye_L` and `eye_R` in the bind: the middle, the unit direction, and the size of each eye (`eyes_of()`). |
-| `ownEyes` | With no eye objects: the middle of the faces with the boolean face attribute `eye` on each side, in the bind (`own_eyes_of()`). Each eye vertex follows only `head`. |
+| `ownEyes` | With no eye objects: the middle of the sphere that fits the faces with the boolean face attribute `eye` on each side, in the bind (`own_eyes_of()`). Each eye vertex follows only `head`. |
+| `lids` | With eye faces and the custom property `lids` of the armature: the turn from open to closed, the hinge axis of each side turned by the head into the bind, and the triangles with the boolean face attribute `lid` of each side (`lids_of()`). Each lid vertex follows only `head`, and lies farther from the middle of its eye than each vertex of the ball. |
 | `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
@@ -617,6 +619,17 @@ The layout of the `.blend`:
   attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
   weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
   the head. The export refuses eye objects and eye faces in one file.
+- **Lids.** Such a mesh can have a lid on each eye: a part of a sphere around the middle of the
+  ball, a little larger than the ball, with the face attribute `lid`, the fur slot, the face
+  colors of the fur next to the eye, and UVs of a clean fur patch of the color map. The file
+  holds the open lid, turned up into the head about its hinge axis, and each lid vertex has the
+  weight row `head` 1, so that Blender shows the head of the app. `pnpm studio-body` moves each
+  lid vertex onto the eye bone of its side, and the blink turns the eye bone about the hinge axis
+  by up to the angle of `lids` (5.1). Reason: a turn about the middle keeps the lid outside the
+  ball, so the ball keeps its form and the socket stays closed. The lid reaches past the dark
+  inner lining of the socket, so that the closed lid shows no dark ring, and each edge stays
+  under the head surface when the lid is open or closed. A strip at the lower edge turns in
+  toward the ball, so the moving edge shows no gap.
 - **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
   bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
   `arm_raise_<side>2`, is a corrective shape of "Mesh rig", at most `STUDIO_RAISES`, in the order
@@ -636,6 +649,11 @@ interface HandRigArmature {
   readonly height: number;
   /** The crease angle of the fur, in degrees. */
   readonly crease: number;
+  /**
+   * The lids of the eyes of the mesh: the turn from open to closed in radians, and the hinge axis
+   * of each side in Blender axes, in the rest. A positive turn closes the lid.
+   */
+  readonly lids?: { readonly angle: number; readonly L: Vec3; readonly R: Vec3 };
   /** The width of the seat of the chair, in meters. Each other fact of `BODY_FACTS` is optional. */
   readonly seatWidth?: number;
   /** The room behind the back on the chair, in meters. */
@@ -646,8 +664,18 @@ interface HandRigArmature {
 
 /** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the studio. */
 interface OwnEyeExtras {
-  /** The mean of the vertices of the eye faces of the side: the head of its eye bone. */
+  /** The middle of the sphere that fits the eye faces of the side: the head of its eye bone. */
   readonly middle: Vec3;
+}
+
+/** The extras `lids`, in the bind, in the axes of the studio (`StudioLids` of the module). */
+interface LidExtras {
+  /** The turn of each lid from open to closed, in radians. */
+  readonly angle: number;
+  /** The unit hinge axis of each lid. A positive turn closes the lid. */
+  readonly axes: Readonly<Record<Side, Vec3>>;
+  /** The triangles of each lid, as indices of the triangles of the primitive `fur`. */
+  readonly faces: Readonly<Record<Side, readonly number[]>>;
 }
 
 /** An entry of the extras `eyes`, in the bind, in the units and the axes of the studio. */
@@ -689,7 +717,7 @@ after an approval of its look in the app. It shows the color map of its Tripo FB
 (`rabbit-color.webp`), and it keeps the eyeballs of the source in their round sockets, with no pea
 eyes. Reason: the map paints a full eye on each eyeball (a black pupil, an amber iris, and a white
 light), and the socket faces keep their source UVs, so the dark lining of the map shows around
-it. These eyes do not blink. The map holds no baked key light: the luma of its cream fur stays
+it. A lid on each eye blinks over it ("Hand rig"). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. An arm that the mesh joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
@@ -1661,7 +1689,7 @@ type BoneName =
   | 'root' | 'hips' | 'spine' | 'chest' | 'neck' | 'head'
   /** Opens for the choir. */
   | 'jaw'
-  /** Scale on Y for blinks. */
+  /** Scale on Y for blinks, or turn the lids of a studio body with lids. */
   | 'eyeL' | 'eyeR' | 'earL' | 'earR'
   /** Only if the species has a tail. */
   | 'tail1' | 'tail2'
@@ -1679,7 +1707,7 @@ type BoneName =
 ```
 
 - **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
-  eye bones for the pea eyes (with no vertex for a body with the eyes of its mesh), and the
+  eye bones for the pea eyes (for the lids of a body with the eyes of its mesh), and the
   optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
   the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),
   and the thumbs of a fist (`THUMB_BONES`). The optional bones come after the other bones, so

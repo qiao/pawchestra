@@ -164,6 +164,11 @@ demo shows the same motion on each visit.
   stops. Its motions come at seeded times in windows of the wall clock, so they need no state
   (`IDLE_MOTION`). Hanging ears do not twitch, as a real hanging ear does not
   (`SpeciesParams.hangingEars`).
+- **Blink.** A blink rises from 0 to 1 and falls back in `blinkSec`. A bead eye scales on y by
+  `max(CLOSED_EYE_SCALE, 1 - blink)` about its eye bone. A body with lids (4.4, "Hand rig") turns
+  each eye bone about the hinge axis of its lid, through the middle of the eyeball, by the share
+  of the way of a bead eye from open to closed, times the angle of the lids
+  (`poseStudioBones()`). So the lid closes when a bead eye closes, at the same seeded times.
 
 ## 5.2 Rest pose
 
