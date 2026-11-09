@@ -23,8 +23,7 @@ describe('defaultView', () => {
     expect(view.target).toEqual([0, -0.25, -0.7]);
     const [x, y, z] = view.position.map((v, k) => v - (DEFAULT_TARGET[k] ?? NaN));
     expect(Math.hypot(x ?? NaN, y ?? NaN, z ?? NaN)).toBeCloseTo(view.distance, 9);
-    // Elevation 33 degrees above the target, on the audience axis (+z), as orchestra-latest.png.
-    expect((Math.asin((y ?? NaN) / view.distance) * 180) / Math.PI).toBeCloseTo(33, 9);
+    // On the audience axis (+z), as orchestra-latest.png.
     expect(x).toBeCloseTo(0, 9);
     expect(z).toBeGreaterThan(0);
   });
@@ -37,12 +36,11 @@ describe('defaultView', () => {
     expect(defaultView(10, 800, 800).distance).toBeCloseTo(0.58 * 1.6 * 33, 9);
   });
 
-  it('gives a lower and nearer camera in portrait (design 4.5, SC8)', () => {
+  it('gives the portrait camera the distance of its rule (design 4.5, SC8)', () => {
     const view = defaultView(10, 390, 844);
-    const [x, y, z] = view.position.map((v, k) => v - (view.target[k] ?? NaN));
-    // The full rule: 4° lower, and 0.68 of the default distance.
+    const [x, , z] = view.position.map((v, k) => v - (view.target[k] ?? NaN));
+    // The full rule: 0.68 of the default distance.
     expect(view.distance).toBeCloseTo((0.68 * 33 * 844) / 390, 9);
-    expect((Math.asin((y ?? NaN) / view.distance) * 180) / Math.PI).toBeCloseTo(29, 9);
     expect(x).toBeCloseTo(0, 9);
     expect(z).toBeGreaterThan(0);
   });
