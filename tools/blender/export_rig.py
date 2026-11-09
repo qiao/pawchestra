@@ -14,7 +14,8 @@ evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the s
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
 middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). A file with no eye
 objects shows the eyes of its mesh: the faces with the face attribute `eye` give the middle of each
-eye in the bind (`own_eyes_of()`), and the app adds no pea eyes. Such a file can have lids: the
+eye in the bind (`own_eyes_of()`) and the triangles of each eye, and the app adds no pea eyes. Such
+a file can have lids: the
 faces with the face attribute `lid` and the custom property `lids` of the armature give the lid
 triangles, the turn from open to closed, and the hinge axis of each side (`lids_of()`). The
 custom properties of the armature give the facts of the body (`body_of()`). The bytes depend only
@@ -450,18 +451,19 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
 
 def triangles(me):
     """Gives the corners, the material, the color, the base color, the cap flag, the rim flag,
-    and the lid flag of each triangle, as Blender divides the faces, in the order of the faces."""
+    the lid flag, and the eye flag of each triangle, as Blender divides the faces, in the order of
+    the faces."""
     me.calc_loop_triangles()
     owner = np.array([t.polygon_index for t in me.loop_triangles])
     slots = [m.name for m in me.materials]
     kinds = np.array([slots[p.material_index] for p in me.polygons])[owner]
     color = face_values(me, 'color', 4)[:, :3]
     base = face_values(me, 'color_base', 4, face_values(me, 'color', 4))[:, :3]
-    names = ('cap', 'rim', 'lid')
+    names = ('cap', 'rim', 'lid', 'eye')
     flags = [face_values(me, n, 1, np.zeros(len(me.polygons), bool))[owner] for n in names]
-    need(not ((flags[0] | flags[1] | flags[2]) & (kinds != 'fur')).any(), 'A flag face is not fur.')
+    need(not (np.any(flags, axis=0) & (kinds != 'fur')).any(), 'A flag face is not fur.')
     corners = np.array([t.vertices[:] for t in me.loop_triangles])
-    return corners, kinds, color[owner], base[owner], flags[0], flags[1], flags[2]
+    return corners, kinds, color[owner], base[owner], *flags
 
 
 def texture_of(body, me, kinds):
@@ -621,7 +623,7 @@ def main():
         if lids:
             extras['lids'] = lids
     extras['body'] = body_of(rig)
-    corners, kinds, colors, bases, caps, rim, lid = triangles(body.data)
+    corners, kinds, colors, bases, caps, rim, lid, eye = triangles(body.data)
     texture, uvs = texture_of(body, body.data, kinds)
     if texture:
         extras['texture'] = texture
@@ -630,8 +632,12 @@ def main():
         extras['caps'] = sorted(int(fur[t]) for t in np.nonzero(caps)[0])
     if rim.any():
         extras['rim'] = sorted(int(fur[t]) for t in np.nonzero(rim)[0])
+    left = points[corners].mean(axis=1)[:, 0] > 0
+    if 'ownEyes' in extras:
+        for s in 'LR':
+            mine = eye & (left == (s == 'L'))
+            extras['ownEyes'][s]['faces'] = sorted(int(fur[t]) for t in np.nonzero(mine)[0])
     if 'lids' in extras:
-        left = points[corners].mean(axis=1)[:, 0] > 0
         extras['lids']['faces'] = {
             s: sorted(int(fur[t]) for t in np.nonzero(lid & (left == (s == 'L')))[0]) for s in 'LR'
         }
