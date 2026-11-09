@@ -312,8 +312,11 @@ the facts of its body in its `.blend` ("Hand rig").
 - It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
   `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
-  with no rule. An old eye that stands out as a ball in a groove, or sits in a deep socket, shows
-  a light rim or a gray groove around the pea eye, so the head fills it first (`eyeFill`, the
+  with no rule. A hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each
+  eye bone lies at the middle of the eye faces of its side (`ownEyesOf()`), and the app adds no pea
+  eyes. Such eyes follow the head bone and do not blink. An old eye that stands out as a ball in a
+  groove, or sits in a deep socket, shows a light rim or a gray groove around the pea eye, so the
+  head fills it first (`eyeFill`, the
   elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
   `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
@@ -523,7 +526,7 @@ that no tool takes it for the body of the app (`pnpm rig-export <s> --blend <fil
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
   ->  add_surface(..., eye_fans=False) of tools/blender/studio_armature.py (face colors, gloss nose)
   ->  armature, weights, bind, and shape keys by hand (studio_armature.py can start them)
-  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py)
+  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py), or eye faces of the mesh
   ->  pnpm rig-export <s>  ->  <s>.rig.glb + <s>.rig.json (a text summary for diffs)
   ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
 ```
@@ -533,7 +536,7 @@ The mesh of the `.blend` is the source of truth, and no tool makes it again from
 of the source (the GLB file, or the image file of an FBX source) through the UVs of the mesh, by
 the color rules of "Mesh rig" (`face_colors()`, `palette()`). The faces of the old eyes take the
 fur color, and with `eye_fans=False` the mesh gets no gloss fan on them, because the eye objects
-give the eyes. Then a person edits the colors in Blender, and the export reads
+or the eye faces give the eyes. Then a person edits the colors in Blender, and the export reads
 them only from the face attribute `color`. A hand rig can also show the color map of its source
 in place of the face colors ("Materials" of 4.5): the mesh keeps the UV map of the source, and each
 new face gets UVs that sample the fur next to it. The `.blend` holds the data that a person draws. The
@@ -543,7 +546,8 @@ name of the first fault.
 
 Each value of a hand rig, such as the bind, the joints, the weights, the keys, the pea eyes, and
 the facts of the body, lives only in its `.blend`. The pea eyes are objects of the `.blend`, so
-that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves or sizes them. The
+that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves or sizes them. A
+`.blend` with no eye objects shows the eyes of its mesh, which the color map paints. The
 facts of the body (`BODY_FACTS` of `tools/studio-body.ts`), such as the scale, the crease angle,
 and the width of the chair, are custom properties of the armature, so that each fact has one
 place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the landmark,
@@ -567,6 +571,7 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `raise` | The custom property of the mesh that has the name of each key `arm_raise_*`. |
 | `hinges` | The custom property `hinges` of the armature. |
 | `eyes` | The eye objects `eye_L` and `eye_R` in the bind: the middle, the unit direction, and the size of each eye (`eyes_of()`). |
+| `ownEyes` | With no eye objects: the middle of the faces with the boolean face attribute `eye` on each side, in the bind (`own_eyes_of()`). Each eye vertex follows only `head`. |
 | `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
@@ -579,7 +584,8 @@ The layout of the `.blend`:
   the soles to the top (`load_mesh()`), with the soles at z = 0. The animal faces -Y, with its left
   side at +X. A form change in the mesh, such as longer legs, keeps the units, so that the facts
   in units, such as `headFloor`, keep their meaning. The mesh and the armature have no transform.
-- **Objects.** One mesh, one armature, and the eye objects `eye_L` and `eye_R`. The export skips
+- **Objects.** One mesh, one armature, and the eye objects `eye_L` and `eye_R`, or no eye objects
+  for a mesh with eye faces. The export skips
   the objects of other types. The custom properties of the armature are on the armature object,
   and the export also reads them from the armature data.
 - **Armature.** The rest is the T-pose of the source. The bones are the bones of `STUDIO_BONES`
@@ -606,7 +612,11 @@ The layout of the `.blend`:
   upright by the rule of `uprightRoll()`. The export
   reads only the transform. `pnpm studio-body` measures the bend where the axis of the eye meets
   the head surface, so that an eye can stand in front of the surface, and it reports a front of
-  an eye that the head covers (`eyePush()`).
+  an eye that the head covers (`eyePush()`). A mesh whose color map paints its eyes, such as the
+  eyeballs of a Tripo mesh, keeps them in place of the eye objects: their faces have the face
+  attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
+  weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
+  the head. The export refuses eye objects and eye faces in one file.
 - **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
   bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
   `arm_raise_<side>2`, is a corrective shape of "Mesh rig", at most `STUDIO_RAISES`, in the order
@@ -632,6 +642,12 @@ interface HandRigArmature {
   readonly backRoom?: number;
   /** The lowest height of the head measures, in units. */
   readonly headFloor?: number;
+}
+
+/** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the studio. */
+interface OwnEyeExtras {
+  /** The mean of the vertices of the eye faces of the side: the head of its eye bone. */
+  readonly middle: Vec3;
 }
 
 /** An entry of the extras `eyes`, in the bind, in the units and the axes of the studio. */
@@ -669,14 +685,13 @@ writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` 
 rig"). The Tripo P2 rabbit of `assets/models/rabbit/tripo-p2/` is a trial of this route that the
 app does not use. A hand rig of the same mesh with no arm cut and no limb stretch
 (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main` only
-after an approval of its look in the app. Its mesh has no eyeballs: fur fills each old eye socket
-flush with the face, and a pea eye of 1.2 H covers the old eye area. Reason: the eyeball of the
-source kept the fur color, so a light disc showed around a pea eye of 1 H. It shows the color map
-of its Tripo FBX (`rabbit-color.webp`). The faces of each eye fill and of the socket groove take a
-patch of clean head fur of the map, because the map paints a dark lining in each socket. The map
-holds no baked key light: the luma of its cream fur stays within about 7 % of its median on each
-part. An arm that the mesh joins to the trunk needs a
-cut, so such a mesh takes the mesh rig ("Mesh rig").
+after an approval of its look in the app. It shows the color map of its Tripo FBX
+(`rabbit-color.webp`), and it keeps the eyeballs of the source in their round sockets, with no pea
+eyes. Reason: the map paints a full eye on each eyeball (a black pupil, an amber iris, and a white
+light), and the socket faces keep their source UVs, so the dark lining of the map shows around
+it. These eyes do not blink. The map holds no baked key light: the luma of its cream fur stays
+within about 7 % of its median on each part. An arm that the mesh joins to the trunk needs a cut,
+so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
 source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
@@ -919,7 +934,8 @@ when no light value can match the lit pixels of the reference.
   black with a warm gray desk, because black desks were the largest shapes of some close shots.
 - **Species colors.** `SPECIES_COLORS` gives each species the fur, the belly, and the accent color.
   A studio body keeps the face colors of its rig (4.4). The UI seat dots read the fur color, and a
-  color rule of a rig can move the fur toward it. All eyes are black with a light.
+  color rule of a rig can move the fur toward it. All pea eyes are black with a light. A body that
+  shows the eyes of its mesh takes the eye colors of its color map (4.4, "Hand rig").
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
   top and darker edges. The clarinet and the oboe are black lacquer with silver keys, the
   bassoon is a dark red maple, the flutes are silver, the brass is gold with lit bells and nickel
@@ -965,7 +981,9 @@ A player of such a body takes a copy of the shared material with the map
 (`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
 shader takes the texel in place of the vertex color of each corner with a point, so the light,
 the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
-the instrument keep their colors. The first draw starts the load of the image (7.2). Until the
+the instrument keep their colors. The eyes of the mesh take the map with the matte fur finish, so
+their only light is the light of the map. Their face color is the eye color, for the frames
+before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
 The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). A test of its
@@ -1661,13 +1679,13 @@ type BoneName =
 ```
 
 - **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
-  eye bones for the pea eyes, and the optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip
-  (`tail_tip`), the jaw of a beak (`jaw`), the arm segments and helpers
-  (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`), and the thumbs of a fist
-  (`THUMB_BONES`). The optional bones come after the other bones, so that a new one keeps
-  each other index. The scene gives the mesh the studio bones and the bones of the player, and
-  `poseStudioBones()` writes their matrices from the pose of the player. A pose also holds the
-  twist bones of the upper arms (`UPPER_TWIST_BONES`).
+  eye bones for the pea eyes (with no vertex for a body with the eyes of its mesh), and the
+  optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
+  the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),
+  and the thumbs of a fist (`THUMB_BONES`). The optional bones come after the other bones, so
+  that a new one keeps each other index. The scene gives the mesh the studio bones and the bones
+  of the player, and `poseStudioBones()` writes their matrices from the pose of the player. A
+  pose also holds the twist bones of the upper arms (`UPPER_TWIST_BONES`).
 - **Arm segments.** `poseArm()` writes each segment from the turns of its arm, around the joint at
   the start of its part. The readers of the bind mesh read the upper arm or the forearm of the
   player for them (`STUDIO_FOLLOWS`).
