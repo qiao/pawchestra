@@ -351,6 +351,9 @@ passes.
 - [ ] Rhino, polar bear: the lights of the two pea eyes stand at mirror places in the front close
       view (light x 0.09 / -0.10 and 0.08 / -0.13 of the eye width), so they point toward each
       other. The rhino gap was 0.05 before its eyes moved up (`eyeShift`).
+- [ ] Rhino: thin dark lines of the old lower lid show under the right pea eye in the front close
+      view. The app view does not show them. Polar bear: a faint light facet stays at the inner
+      side of each pea eye. Penguin: the fur makes small dents at the inner side of the left eye.
 - [ ] Deer, penguin, polar bear: the upright turn (`uprightRoll()`) leans the ovals 4° to 8° with
       the tops out in the front close view, where they were within 2° of upright. The linear bend
       model misses the fur cover. Try a fit of the turn on the real silhouette.
