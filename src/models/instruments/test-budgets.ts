@@ -24,7 +24,7 @@ export const INSTRUMENT_BUDGETS = {
   'bass-drum': 800,
   'snare-drum': 1000,
   cymbals: 1000,
-  'small-percussion': 800,
+  'small-percussion': 1200,
   xylophone: 1000,
   baton: 800,
 } as const satisfies Readonly<Record<InstrumentId, number>>;
