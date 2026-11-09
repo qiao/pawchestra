@@ -222,15 +222,15 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,611,332 bytes |
-| SHA-256 | `4f3571e84d93decd1c2b558504ddf0fad021fd45cbf6ab83c8d3ae3df6c2fa74` |
+| Size | 1,594,778 bytes |
+| SHA-256 | `668dbf801d9015e53de49a12f7d1d1d8312768423bba743b125535561ddeb285` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: 3,477 vertices and 3,625 faces (3,053 quads and 572 triangles, 6,678 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 218 faces have the face attribute `eye` ("Eyes" below). A catchlight lens on each eyeball: 36 faces with the face attributes `eye` and `plain` ("Catchlight" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey also have the face attribute `plain` ("Color map" below) |
+| Mesh | One object `rabbit`: 3,403 vertices and 3,553 faces (3,005 quads and 548 triangles, 6,558 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 218 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey also have the face attribute `plain` ("Color map" below) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below). The property `lids` holds the turn and the hinge axes of the lids ("Lids" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
-| Eyes | The eyeballs of the mesh, with the `lacquer` finish in the app and a catchlight on each ball. No eye objects, so the app adds no bead eyes ("Eyes" below). A lid on each eye blinks ("Lids" below) |
+| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app ("Eye light" below). No eye objects, so the app adds no bead eyes ("Eyes" below). A lid on each eye blinks ("Lids" below) |
 
 The edits, in the order of the work:
 
@@ -438,30 +438,11 @@ closed lid lies under the head. The socket lining has three rings, at about 0.02
 line around the closed lid. The radius 0.0275 covers them, and the lid then meets the light faces
 between the second and the third ring.
 
-**Catchlight.** `pnpm studio-body` gives the eye faces the `lacquer` finish of the bead eyes. From
-the app camera and from the front, this gloss shows no clear light, so a scripted edit in the live
-Blender adds a catchlight lens on each eyeball. H is 0.176914 units (the head height of the module,
-0.297799 m, at 1.683299 m for each unit). Each value is in the rest, in Blender axes:
-
-1. A grid of rays along +y, 0.0004 units apart, finds the visible middle of each eye in the front
-   view: the mean (x, z) of the hits on eye faces (x ±0.0432, z 0.7118).
-2. The middle of the lens is the hit of the ray along +y at 0.02 H to -x (the left of the front
-   view) and 0.035 H up from that middle: (0.03965, -0.08359, 0.71798) and (-0.04673, -0.07891,
-   0.71801). Each ray from the middle of the ball to a lens point hits the ball.
-3. Each lens has a middle point and 3 rings of 12 points at 0.5, 0.8, and 1.0 of the radius 0.02 H,
-   around the direction from the middle of the ball to the lens middle. Each point lies on the ray
-   from the middle of the ball, 0.0003 units over the ball surface, plus 0.004 H times 1, 0.866,
-   0.6, and 0 (a half ellipsoid). Thus 37 vertices, 12 triangles, and 24 quads on each side, with
-   outward normals.
-4. Each lens face takes the slot `fur`, flat shading, the face attributes `eye` and `plain`, and the
-   colors `color` and `color_base` `#f6f2ea` (the catchlight of a bead eye) in linear values.
-5. Each lens vertex takes the row `head` 1 with `sa.set_weight_row()`, and the same place in the
-   key `bind_belly`.
-
-The lens reaches at most 0.02401 units from the middle of its ball, and the lid starts at 0.0243,
-so the closed lid covers it. The export fits the eye middles on the eye faces with no `plain`, so
-they do not move. A flat lens 0.0003 units over the ball was dimmer: the brightest pixels of the
-eye cameras were 4 % to 7 % darker.
+**Eye light.** `pnpm studio-body` gives the eye faces the wet finish `eye`. The eye light of the
+app (design 4.5) gives each ball a soft highlight that moves a little with the view. The ball has
+no catchlight mesh: a white lens of 36 faces on each ball was an opaque disc with a hard edge, and
+a point edit in the live Blender deleted it again (36 faces and 37 vertices on each side). The
+export and the module are then byte-identical to the state before the lens (b8a06f408).
 
 **Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
 colors (design 4.5). The mesh keeps the UV map of the FBX. The edge ring cuts of the arms and the
