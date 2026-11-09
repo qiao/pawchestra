@@ -19,9 +19,9 @@ export const SWITCH_MOTION = {
   /** The paws leave the play place this time after the end of the last note, in seconds. */
   afterSec: 0.2,
   /** The move of the paws from the play place to the table, and back, in seconds. */
-  reachSec: 0.6,
+  reachSec: 0.45,
   /** The time at the table, in which the paws put down one instrument and take the other. */
-  stillSec: 0.3,
+  stillSec: 0.6,
 } as const;
 
 /**
