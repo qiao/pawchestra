@@ -2,8 +2,9 @@
 # Stops a commit that adds or changes an image or a video outside the folders that keep the images
 # of the product. The images of a report go into the folder `reports/`, which git ignores (design
 # 9.8), because report images made most of the size of the git history. The texture folder of an
-# FBX source mesh (`assets/models/<s>/**/<name>.fbm/`) is a source file. The web color map of a
-# studio body (`assets/models/<s>/**/<name>-color.webp`, design 4.5) is an image of the product.
+# FBX source mesh (`assets/models/<s>/**/<name>.fbm/`) is a source file. The web color map and the
+# web normal map of a studio body (`assets/models/<s>/**/<name>-color.webp` and `-normal.webp`,
+# design 4.5) are images of the product.
 # `pnpm install` sets `core.hooksPath` to this folder.
 set -euo pipefail
 
@@ -11,7 +12,7 @@ media='\.(webp|png|jpe?g|gif|webm|mp4|mov)$'
 kept='^(src|public|docs/reference|docs/prototype|tools/sheet-mattes)/'
 kept+='|^docs/[^/]+$'
 kept+='|^assets/models/.+\.fbm/'
-kept+='|^assets/models/.+-color\.webp$'
+kept+='|^assets/models/.+-(color|normal)\.webp$'
 
 blocked="$(git diff --cached --name-only --diff-filter=AM -z | tr '\0' '\n' |
   grep -iE "$media" | grep -vE "$kept" || true)"
