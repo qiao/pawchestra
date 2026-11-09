@@ -1,12 +1,11 @@
-import { Mesh, MeshBasicMaterial, MeshDepthMaterial, SkinnedMesh } from 'three';
-import type {
-  BufferGeometry,
-  Material,
-  MaterialEventMap,
+import {
+  Mesh,
+  MeshBasicMaterial,
+  MeshDepthMaterial,
   MeshStandardMaterial,
-  Object3D,
-  RenderItem,
+  SkinnedMesh,
 } from 'three';
+import type { BufferGeometry, Material, MaterialEventMap, Object3D, RenderItem } from 'three';
 
 import { depthGeometryOf } from './shared-corners.ts';
 
@@ -167,25 +166,32 @@ export class VariantMaterials {
   }
 
   /**
-   * Gives each player mesh the copy of the shared material of its variant, and the depth material
-   * of its variant for the shadow maps (`customDepthMaterial`). The shadow pass of three.js copies
+   * Gives each player mesh the copy of its material for its variant, and the depth material of
+   * its variant for the shadow maps (`customDepthMaterial`). The shadow pass of three.js copies
    * the side and the other values of the material of each draw to it, as to its own depth
    * material.
    *
-   * @param meshes The player meshes. Each one has the shared material.
+   * @param meshes The player meshes. Each one has the shared material, or its copy with the color
+   *   map of the body (`bodyMapMaterial()`).
    */
   assign(meshes: readonly Mesh[]): void {
     for (const mesh of meshes) {
-      const variant = programVariant(mesh);
+      const own = this.#ownOf(mesh);
+      const variant = `${programVariant(mesh)}:${own.map((material) => material.id).join(',')}`;
       let copies = this.#copies.get(variant);
       if (!copies) {
-        copies = this.#shared.map((material) => {
+        copies = own.map((material) => {
           const copy = material.clone();
           // The patch of `createMaterials()` is an arrow function that reads no `this`. The copy
           // keeps the same function, so its program key (the source text of the patch) is the key
-          // of the shared material, and it takes the compiled program of the shared material.
+          // of the shared material, and it takes the compiled program of the shared material. The
+          // copy also keeps the program key and the draw hook of a material with a color map.
           // oxlint-disable-next-line typescript/unbound-method -- see the comment above.
           copy.onBeforeCompile = material.onBeforeCompile;
+          // oxlint-disable-next-line typescript/unbound-method -- see the comment above.
+          copy.customProgramCacheKey = material.customProgramCacheKey;
+          // oxlint-disable-next-line typescript/unbound-method -- see the comment above.
+          copy.onBeforeRender = material.onBeforeRender;
           this.#sharedIds.set(copy, material.id);
           return copy;
         });
@@ -199,6 +205,19 @@ export class VariantMaterials {
       }
       mesh.customDepthMaterial = shadow;
     }
+  }
+
+  /**
+   * Gives the materials of a player mesh: its own materials, or the shared material when one of
+   * them is not a standard material.
+   *
+   * @param mesh The player mesh.
+   * @returns The materials.
+   */
+  #ownOf(mesh: Mesh): readonly MeshStandardMaterial[] {
+    const own: readonly Material[] = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    const standard = own.filter((material) => material instanceof MeshStandardMaterial);
+    return standard.length === own.length ? standard : this.#shared;
   }
 
   /**
