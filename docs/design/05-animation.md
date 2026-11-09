@@ -556,7 +556,12 @@ The rest of each family:
   around it, the paws go to the trap table: the left paw hangs the triangle on its stand and takes
   the tambourine, and the right paw puts down the beater, and the reverse after the run. The pose
   shows one copy of each switched piece, on the table or in a paw (`AnimalPose.held`), from the
-  score alone. The right paw strikes the held head with the fingers, nearer to the rim and with
+  score alone. The turn of each paw on its forearm mixes in the frame of the studio forearm
+  (`tablePaw()`): the twist goes on a straight line between the places, and the bend of the wrist
+  mixes on its own. The left paw also gives the turn in the plane of its palm (`pawTurnL`), so the
+  studio paw takes exactly the mixed turn. The right wrist goes on an arc in front of the belly
+  (`TAMBOURINE_HOLD.beaterArc`). Reason: a mix in the frame of `acrossAxes()` twisted the left paw
+  through 180° in 0.05 s, and on a straight line the beater went into the belly. The right paw strikes the held head with the fingers, nearer to the rim and with
   less curl for a softer note. A roll of the held tambourine is a shake of the left forearm when
   it is loud, and a thumb along the rim when it is soft. A shorter rest keeps the triangle in the
   left paw, and the beater strikes the tambourine on the table. Reason: a real player holds the
