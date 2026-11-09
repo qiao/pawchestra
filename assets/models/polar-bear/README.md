@@ -160,8 +160,8 @@ rig step (the armature, the weights, the seated bind, the pea eyes, and the fact
 
 | Item | Value |
 |---|---|
-| Size | 340,372 bytes |
-| SHA-256 | `5a0c6a59999016e7bff927c37c38105d0aa80afd6bd12f2bc7a98dc21acef18a` |
+| Size | 345,504 bytes |
+| SHA-256 | `248702e0a7b8d8df9135af141ae976318a18ecddc122a60006baacaf027575ee` |
 | Origin | Made by hand in Blender 5.2 from `tripo/polar-bear-tpose.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Objects | The mesh `polar_bear`, the armature `polar_bear_rig`, and the eye objects `eye_L` and `eye_R`. No object has a transform |
@@ -526,6 +526,14 @@ the top of each oval, and the eyes read as narrow slits. The second run moved ea
 out along its direction and 0.006 down, so the whole oval and its light show. `place_eyes()` runs
 `fit_eyes()`.
 
+**Eye point edits.** Around each eye, 5 head vertices of the old eye socket moved by hand along
+the axis of the eye, in `H` of the eye (0.165237 units), on the left side and on its mirror: 853
+(2241) out 0.035, 852 (2396) in 0.02, 1528 (2442) in 0.015, 851 (2443) in 0.012, and 2130 (1119)
+in 0.01. Each move went into `Basis` and each key `bind*`, so that the keys keep their offsets.
+Before, the lid faces 286 and 1834 (left side) and their mirrors at the inner top corner of
+each eye faced down into the old socket and showed as a gray groove, a cross brow, and the fur
+above each oval made its top pointed. `fit_eyes()` ran after the edit.
+
 **Colors.** `color` is `color_base` with the move of `colors.shift` of
 `tools/mesh-rigs/polar-bear.json` (`shift_colors()` of `tools/blender/rig_mesh.py`): 2,606 fur
 faces take 1.045 of their lightness and 0.3 of their chroma, toward the white of the older body.
@@ -541,8 +549,8 @@ the same bytes.
 | Item | Value |
 |---|---|
 | Size | 724,120 bytes |
-| SHA-256 | `12669782062478b7f7af157291711b470c4d637c791972a025bdda7386a0a0c1` |
-| Summary | `polar-bear.rig.json`: 8,964 bytes, SHA-256 `8b18dc336c3b8da2da0d872f383afe45930a7ccd38fde4006329ce3c32633dbc` |
+| SHA-256 | `5d5c4800d483e784219d108f968d4a2a6c6bd31c049fef3e03041ea16418a1d8` |
+| Summary | `polar-bear.rig.json`: 8,964 bytes, SHA-256 `a82d5f8ecd596c8e9a940750912cca7162c5b81c2e3beb1c82400970c9adf819` |
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
