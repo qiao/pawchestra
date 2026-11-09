@@ -211,7 +211,8 @@ codec does, and writes only the miss. The image itself is not in the first downl
 draw of the body starts its load in the next animation frame, from a lazy URL chunk of Vite
 (`import.meta.glob` of `scene/body-texture.ts`), and `createImageBitmap()` decodes it off the
 main thread. Its size is the smallest that shows the fur strands in a close view at a device
-pixel ratio of 2.
+pixel ratio of 2. The normal map of the fur (`<name>-normal.webp`) loads in the same way and in
+the same frame.
 
 `index.html` preloads the file of the default demo with a low priority when the hash names no
 demo, so that the score build does not wait for a fetch after the scripts. The preload starts
