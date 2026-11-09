@@ -323,7 +323,7 @@ function median(values: readonly number[]): number {
 
 /**
  * Reads the JSON text of the corners of the rig script, with no face of an eye shell: the export
- * drops these faces for the pea eyes, so the other faces keep their order in the module.
+ * drops these faces for the bead eyes, so the other faces keep their order in the module.
  *
  * @param text The text.
  * @returns The source face of each face, or null.

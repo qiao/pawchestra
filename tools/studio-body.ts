@@ -131,7 +131,7 @@ export interface AnimalSettings {
    * The lowest height of the head measures in the bind pose of the GLB file, in its units, for a
    * long nose that follows the head below the chin, as the trunk of the elephant (`noseFront` of
    * the rig config), or for a throat that bone heat gives to the head, as on the rhino. The head
-   * height, the head center, the box of the pea eyes, and the tip of
+   * height, the head center, the box of the bead eyes, and the tip of
    * the nose then leave out the vertices below it. With no value, each vertex of the head counts.
    */
   readonly headFloor?: number;
@@ -155,26 +155,26 @@ export interface AnimalSettings {
   /**
    * The highest height of the head measures in the bind pose of the GLB file, in its units, for
    * antlers or horns that rise from the skull top and follow the head, as the antlers of the deer.
-   * The head height, the head center, the box of the pea eyes, and the tip of the nose then leave
+   * The head height, the head center, the box of the bead eyes, and the tip of the nose then leave
    * out the vertices above it. With no value, each vertex of the head counts.
    */
   readonly headCeiling?: number;
   /**
-   * True when each pea eye faces level: the direction of the eye keeps only its turn to the side
+   * True when each bead eye faces level: the direction of the eye keeps only its turn to the side
    * and forward, with no turn up or down. A large head box behind the eyes, such as the ruff of
    * the wolf, turns the eyes up, and the eyes then read as eyes that look up (design 4.5). With no
    * value, each eye faces out from the middle of the head that shows.
    */
   readonly eyeLevel?: boolean;
   /**
-   * The share of the turn of each pea eye from its direction toward the mean normal of the head
+   * The share of the turn of each bead eye from its direction toward the mean normal of the head
    * faces within 0.09 H of its place, from 0 to 1. The bear takes 0.5: its eyes then face halfway
    * between their direction and its face, which faces about 29° up at the eyes. With no value,
    * each eye keeps its direction.
    */
   readonly eyeNormal?: number;
   /**
-   * The move of the place of each pea eye from the middle of the old eye of the mesh, in `H` of
+   * The move of the place of each bead eye from the middle of the old eye of the mesh, in `H` of
    * the eyes: out to the side, away from the middle plane, and up. The moved place then goes to
    * the nearest point of the head surface, as the old place does ({@link eyeOnHead}). A body
    * takes it when the face under the old eye is too curved for a clean oval. With no value, each
@@ -182,7 +182,7 @@ export interface AnimalSettings {
    */
   readonly eyeShift?: readonly [out: number, up: number];
   /**
-   * The factor of the size of each pea eye. A pea eye is a share of the head height that shows
+   * The factor of the size of each bead eye. A bead eye is a share of the head height that shows
    * (`EYE` of `models/eyes.ts`), so a large head, such as the head of the elephant with its ears,
    * gets large eyes. With no value, the factor is 1.
    */
@@ -190,7 +190,7 @@ export interface AnimalSettings {
   /**
    * The radius of the filled area around each old eye and the outer radius of the ring of its fit,
    * in `H` of the eyes ({@link fillEye}). A body takes it when the old eye of the mesh stands out
-   * of the head as a ball in a groove, which shows as a light rim around the pea eye. With no
+   * of the head as a ball in a groove, which shows as a light rim around the bead eye. With no
    * value, the head keeps the form of the old eye.
    */
   readonly eyeFill?: readonly [inner: number, outer: number];
@@ -219,7 +219,7 @@ const BODY_FACTS = [
 /** A setting of an animal that is a fact of its body ({@link BODY_FACTS}). */
 type BodyFact = (typeof BODY_FACTS)[number];
 
-/** A setting of the rules of the pea eyes of a body of `pnpm rig-mesh` ({@link EYE_RULES}). */
+/** A setting of the rules of the bead eyes of a body of `pnpm rig-mesh` ({@link EYE_RULES}). */
 type EyeRule = (typeof EYE_RULES)[number];
 
 /**
@@ -354,7 +354,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The contrabass hippo (design 4.4). It stands at its contrabass, so the export keeps the
-  // standing pose of the rig. The pea eyes are 0.8 of their size, because at the full size they
+  // standing pose of the rig. The bead eyes are 0.8 of their size, because at the full size they
   // look too big.
   [
     'hippo',
@@ -384,9 +384,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   ],
   // The timpani elephant (design 4.4). It stands at its timpani, so the
   // export keeps the standing pose of the rig. Its trunk follows the head below the chin. Its eyes
-  // are 0.6 of the pea eyes of its head, because the large head with its ears made them large.
+  // are 0.6 of the bead eyes of its head, because the large head with its ears made them large.
   // The old eyes of the mesh sit in deep sockets with lids, which showed as a gray groove around
-  // each pea eye, so the head fills them (`eyeFill`).
+  // each bead eye, so the head fills them (`eyeFill`).
   [
     'elephant',
     {
@@ -506,7 +506,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/rhino/rhino.rig.glb',
       noseTop: 0.8,
       headFloor: 0.7,
-      // At the old eyes, the ridge of the horn covered the inner edge of each pea eye, and the
+      // At the old eyes, the ridge of the horn covered the inner edge of each bead eye, and the
       // slope of the cheek leaned the tops of the ovals 18° and 14° toward each other, a sad look.
       // Eyes 0.05 H higher sit on a flatter face: the full ovals show and stand within 3° of
       // upright.
@@ -547,7 +547,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       crease: 60,
       colorBlend: 0.7,
       glb: 'assets/models/penguin/penguin.rig.glb',
-      // At the old eyes, the fur covered a notch at the bottom of the right pea eye in the front
+      // At the old eyes, the fur covered a notch at the bottom of the right bead eye in the front
       // view. Eyes 0.02 H higher show the full ovals.
       eyeShift: [0, 0.02],
     },
@@ -888,7 +888,7 @@ interface Gltf {
        */
       readonly seat?: SeatExtras;
       /**
-       * The pea eyes of a hand rig: the eye objects of its `.blend` (`eyes_of()` of
+       * The bead eyes of a hand rig: the eye objects of its `.blend` (`eyes_of()` of
        * `tools/blender/export_rig.py`). A file of `pnpm rig-mesh` has none.
        */
       readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
@@ -902,7 +902,7 @@ interface Gltf {
 }
 
 /**
- * A pea eye of a hand rig in the extras of its GLB file (design 4.4, "Hand rig"): the eye object of
+ * A bead eye of a hand rig in the extras of its GLB file (design 4.4, "Hand rig"): the eye object of
  * its `.blend` in the bind pose, in the axes and the units of the studio.
  */
 interface EyeExtras {
@@ -914,7 +914,7 @@ interface EyeExtras {
   readonly size?: number;
 }
 
-/** A pea eye of a hand rig ({@link eyesOf}), in the bind pose, in the axes and the units of the studio. */
+/** A bead eye of a hand rig ({@link eyesOf}), in the bind pose, in the axes and the units of the studio. */
 interface FileEye {
   /** The middle of the eye. */
   readonly middle: Vector3;
@@ -925,7 +925,7 @@ interface FileEye {
 }
 
 /**
- * The settings of the rules that place the pea eyes of a body of `pnpm rig-mesh` from the old eyes
+ * The settings of the rules that place the bead eyes of a body of `pnpm rig-mesh` from the old eyes
  * of its mesh. A hand rig holds its eyes ({@link eyesOf}), so its settings give none of them.
  */
 const EYE_RULES = ['eyeLevel', 'eyeNormal', 'eyeShift', 'eyeSize', 'eyeFill'] as const;
@@ -934,7 +934,7 @@ const EYE_RULES = ['eyeLevel', 'eyeNormal', 'eyeShift', 'eyeSize', 'eyeFill'] as
 const EYE_SIZE_GAP = 1e-5;
 
 /**
- * The reach of the head faces around a pea eye of a hand rig, in `H` of the eyes: the faces that
+ * The reach of the head faces around a bead eye of a hand rig, in `H` of the eyes: the faces that
  * the bend and the push of the eye measure ({@link eyeBend}, {@link eyePush}).
  */
 const EYE_REACH = 0.3;
@@ -1080,7 +1080,7 @@ function sideAxes(
 }
 
 /**
- * Gives the pea eyes of a hand rig from the extras of its GLB file (design 4.4, "Hand rig").
+ * Gives the bead eyes of a hand rig from the extras of its GLB file (design 4.4, "Hand rig").
  *
  * @param glb The file.
  * @returns The eye of each side, or `null` for a file with no eyes, such as a file of
@@ -1889,7 +1889,7 @@ function axisOf(skeleton: SourceSkeleton, bone: string, axis: number): Vector3 {
  * Finds the parts of the eyes of the mesh: the shells of the gloss material on the head that are
  * out of the middle plane. Each eye of the studio is a few nested shells and a light, and each eye
  * of a rig of `pnpm rig-mesh` is one gloss fan over the dark faces of the eye. The export drops
- * them, and the app adds the pea eyes at their places (design 4.5).
+ * them, and the app adds the bead eyes at their places (design 4.5).
  *
  * @param mesh The welded mesh.
  * @returns The vertices of the eye of each side.
@@ -1938,7 +1938,7 @@ export function eyeVertices(mesh: SourceMesh): Readonly<Record<Side, ReadonlySet
 }
 
 /**
- * Finds the place of a pea eye on the head (design 4.5): the nearest point of the fur faces of the
+ * Finds the place of a bead eye on the head (design 4.5): the nearest point of the fur faces of the
  * head to the middle of the old eye. A fur face of the head has each corner more than half on the
  * head bone.
  *
@@ -2067,7 +2067,7 @@ function fillEye(mesh: SourceMesh, middle: Vector3, inner: number, outer: number
   return { count, largest };
 }
 
-/** The number of samples of the head surface on each half axis of a pea eye ({@link eyeBend}). */
+/** The number of samples of the head surface on each half axis of a bead eye ({@link eyeBend}). */
 const BEND_SAMPLES = 6;
 
 /**
@@ -2149,7 +2149,7 @@ function solveLinear(a: number[][]): number[] {
 }
 
 /**
- * Finds the bend of a pea eye (design 4.5): a least squares fit of the heights of the head surface
+ * Finds the bend of a bead eye (design 4.5): a least squares fit of the heights of the head surface
  * along the axis of the eye, from the plane through the surface point under the middle, over the
  * oval and a margin around it ({@link BEND_REACH}). Each corner of the bent oval then keeps its
  * depth from the head surface, as on a flat face of a parametric head: the rim lies at the fur,
@@ -2199,7 +2199,7 @@ export function eyeBend(
     }
   }
   if (count < BEND_LEAST_SAMPLES) {
-    throw new Error(`Only ${count} samples of the head surface lie under the pea eye.`);
+    throw new Error(`Only ${count} samples of the head surface lie under the bead eye.`);
   }
   const [k0 = 0, k1 = 0, k2 = 0, k3 = 0, k4 = 0] = solveLinear(sums).map(round);
   return [k0, k1, k2, k3, k4];
@@ -2216,14 +2216,14 @@ export function eyeBend(
  */
 const PUSH_OVAL: OvalFaces = [8, 4];
 
-/** The step of the move of a pea eye out of the head, in `H` of the eyes ({@link eyePush}). */
+/** The step of the move of a bead eye out of the head, in `H` of the eyes ({@link eyePush}). */
 const EYE_PUSH_STEP = 0.001;
 
-/** The largest move of a pea eye out of the head, in `H` of the eyes ({@link eyePush}). */
+/** The largest move of a bead eye out of the head, in `H` of the eyes ({@link eyePush}). */
 const EYE_PUSH_LIMIT = 0.1;
 
 /**
- * Finds how far a pea eye moves out along its direction, so that its front face shows (design
+ * Finds how far a bead eye moves out along its direction, so that its front face shows (design
  * 4.5): the smallest move, in steps of {@link EYE_PUSH_STEP}, that puts each corner of the oval
  * more than a quarter of its depth in front of its middle outside the head. A corner is outside
  * when it lies on the outer side of the nearest face of the head. The rim of the oval stays in the
@@ -2769,11 +2769,11 @@ interface Export {
   /** The weights of the corrective shapes in the pose of the sheet, for the report. */
   readonly sheetWeights: readonly number[];
   /**
-   * The distance of each pea eye bone from the middle of the old eye, in `H` of the eyes, for the
+   * The distance of each bead eye bone from the middle of the old eye, in `H` of the eyes, for the
    * report, or `null` for a hand rig, which holds its eyes ({@link eyesOf}).
    */
   readonly eyeShifts: Readonly<Record<Side, number>> | null;
-  /** The move of each pea eye out of the head ({@link eyePush}), in `H` of the eyes. */
+  /** The move of each bead eye out of the head ({@link eyePush}), in `H` of the eyes. */
   readonly eyePushes: Readonly<Record<Side, number>>;
   /**
    * The fill of each old eye ({@link fillEye}): the number of moved vertices and the largest move,
@@ -2808,18 +2808,18 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const model = (p: Vector3): Vec3 => toModelAxes(p.clone().add(frame.offset), scale);
   const direction = (d: Vector3): Vec3 => toModelAxes(d.clone().normalize(), 1);
 
-  // The old eyes of the mesh go away, and the app adds the pea eyes at the eye bones (design
+  // The old eyes of the mesh go away, and the app adds the bead eyes at the eye bones (design
   // 4.5). The faces under the gloss fan of a rig of `pnpm rig-mesh` have the color of the fur
-  // around the eye. A hand rig holds its pea eyes, so no rule of the settings places them.
+  // around the eye. A hand rig holds its bead eyes, so no rule of the settings places them.
   const fileEyes = eyesOf(glb);
   const rule = fileEyes ? EYE_RULES.find((key) => settings[key] !== undefined) : undefined;
   if (rule) {
-    throw new Error(`The GLB file holds its pea eyes, so the settings give no ${rule}.`);
+    throw new Error(`The GLB file holds its bead eyes, so the settings give no ${rule}.`);
   }
   const eyes = eyeVertices(mesh);
   if (fileEyes && eyes.L.size + eyes.R.size > 0) {
     throw new Error(
-      'The GLB file holds its pea eyes and the gloss fans of old eyes. Remove the fans in Blender, so that Blender shows the eyes of the app.',
+      'The GLB file holds its bead eyes and the gloss fans of old eyes. Remove the fans in Blender, so that Blender shows the eyes of the app.',
     );
   }
   const eyeCenter = (side: Side): Vector3 => {
@@ -2838,7 +2838,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const heads = Object.fromEntries(
     STUDIO_BONES.flatMap((bone): [StudioBone, Vec3][] => {
       if (bone === 'eye_L' || bone === 'eye_R') {
-        // The pea eyes give the eye bones their places below.
+        // The bead eyes give the eye bones their places below.
         return [];
       }
       if (!skeleton.binds.has(bone)) {
@@ -2869,8 +2869,8 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   // A rig with a reclined trunk turns the neck and the head by different shares in the seated
   // bind pose, and the vertices of the chin with a part of the neck weight move against the head.
   // The head then takes its measures in the clip `reference`, the form of the source
-  // (`clipHead()`), and the head center and the middle of the pea eyes move back onto the head
-  // bone of the bind pose, so that the head height and the pea eyes keep their sizes.
+  // (`clipHead()`), and the head center and the middle of the bead eyes move back onto the head
+  // bone of the bind pose, so that the head height and the bead eyes keep their sizes.
   const clip = reclines(glb) ? clipHead(glb, skeleton, mesh, kept) : null;
   const rig = headRig(
     clip?.neck ?? headOf(skeleton, 'neck'),
@@ -2881,7 +2881,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const toBind = (p: Vector3): Vector3 => (clip ? p.applyMatrix4(clip.back) : p);
   let top = -Infinity;
   let chin = Infinity;
-  // The box of the head that shows, after the growth, which sizes and turns the pea eyes.
+  // The box of the head that shows, after the growth, which sizes and turns the bead eyes.
   const shown = new Box3();
   const box = {
     min: new Vector3(Infinity, Infinity, Infinity),
@@ -2943,7 +2943,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     .add(headShiftOf(glb))
     .setX(0);
 
-  // Each pea eye bone lies on the head surface under the middle of the old eye, or under that
+  // Each bead eye bone lies on the head surface under the middle of the old eye, or under that
   // middle moved by `eyeShift`. Each eye faces out from the middle of the head that shows, as an
   // eye on the round head of a parametric body does, or level with `eyeLevel`, and it can turn
   // toward the normal of the head surface (`eyeNormal`). Its oval bends to the head surface
@@ -2955,7 +2955,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     : eyeHeight * (settings.eyeSize ?? 1);
   const middle = toBind(shown.getCenter(new Vector3()));
   // An old eye that stands out of the head as a ball in a groove goes first (`eyeFill`), so that
-  // the pea eye lies on a smooth face.
+  // the bead eye lies on a smooth face.
   const fill = (side: Side) => {
     const [inner, outer] = settings.eyeFill ?? [0, 0];
     const units = eyeSize / scale;
@@ -2963,7 +2963,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     return { count, largest: largest / units };
   };
   const eyeFills = settings.eyeFill ? { L: fill('L'), R: fill('R') } : null;
-  // The faces of the head near a pea eye, in the model axes.
+  // The faces of the head near a bead eye, in the model axes.
   const facesNear = (at: Vector3, reach: number): Triangle[] =>
     withoutEyes.faces.flatMap((face) => {
       const [a, b, c] = face.corners.map((k) => mesh.vertices[k]?.position ?? new Vector3());
@@ -3809,11 +3809,11 @@ async function main(): Promise<void> {
   console.log(`Corrective weights of the sheet pose: ${sheetWeights.join(', ')}.`);
   if (eyeShifts) {
     console.log(
-      `Pea eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
+      `Bead eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
     );
   } else {
     console.log(
-      `Pea eyes of the eye objects of the .blend: head height ${body.eyes.headHeight} m. The front of each eye shows with a move of ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head.`,
+      `Bead eyes of the eye objects of the .blend: head height ${body.eyes.headHeight} m. The front of each eye shows with a move of ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head.`,
     );
   }
   if (eyeFills) {

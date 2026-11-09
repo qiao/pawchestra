@@ -27,7 +27,7 @@ The steps:
     the head bone alone (`loose_parts()`): bone heat gives a loose part no sure weights. With
     `rollSplit` in the config, the 4 roll segments of each upper arm and forearm share the weight
     of their arm part by the place of the vertex along the bone (`roll_split()`).
- 6. Put a pea eye on each old eye, write the facts of the body, and save the file.
+ 6. Put a bead eye on each old eye, write the facts of the body, and save the file.
 """
 
 import json

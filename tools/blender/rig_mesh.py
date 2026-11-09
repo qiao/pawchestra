@@ -98,7 +98,7 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    back is then faired along the vertex normals (`calf_fair()`).
 7. Put a gloss shell over each eye: a fan from the middle of the eye to the edge of its dark
    faces, a little out of the surface. `pnpm studio-body` finds each eye by its fan, drops the
-   fan, and puts the pea eye of the app at its place (design 4.5). The faces of the nose become
+   fan, and puts the bead eye of the app at its place (design 4.5). The faces of the nose become
    gloss. A mesh with no nose of its own, such as the hippo with its two nostrils, has no
    `noseBox`, and its faces keep the fur. The log gives each dark patch that an eye box takes only in part, and warns when the
    box takes more than half of it (`eye_patches()`). Each face takes the nearest color of a
@@ -2954,7 +2954,7 @@ def face_sources(verts, source_tris, count, order, materials):
     that the face of the rig comes from. A face of the rig keeps the index of its source face, and a
     face that a ring splits keeps it for its first part. The other parts of a split face have no
     source face, and give None. A face of an eye shell gives 'eye', because the export drops the
-    eye shells for the pea eyes. `count` is the number of faces of the rig before the eye shells,
+    eye shells for the bead eyes. `count` is the number of faces of the rig before the eye shells,
     `order` the walk order, and `materials` the material of each face in the walk order."""
     index = module_faces(order, materials)
     out = [None] * len(order)
@@ -4434,7 +4434,7 @@ def corner_patches(tris, faces):
 
 def recolor_old_eyes(colors, tris, points, old):
     """Gives each face of an old eye, or of a patch of dark faces near it (`dark_faces_near()`),
-    the color of the fur around it, so that no outline of the old eye shows around the pea eye of
+    the color of the fur around it, so that no outline of the old eye shows around the bead eye of
     the app (design 4.5): the color with the largest area in the ring of faces that share a corner
     with the faces. A single color keeps the lid shading of the ring, such as the brown faces above
     the right eye of the fox, out of the old eye. Gives the new colors and the share of the area of
@@ -4460,7 +4460,7 @@ def add_eye_shells(verts, bind, tris, colors, dark, eyes, rule):
     points of the edge of the dark faces, lifted along the normal of the eye in the bind mesh. The
     fan needs fewer faces than a copy of the faces of the eye. The faces under it take the mean
     fur color of their neighbors, as an input of the palette. `pnpm studio-body` finds the eye by
-    its fan, drops the fan, and the app puts the pea eye at its place (design 4.5). Gives the new
+    its fan, drops the fan, and the app puts the bead eye at its place (design 4.5). Gives the new
     vertices of the source and of the bind mesh, the triangles, the colors, the materials, the
     faces of each old eye (`old_eye_faces()`), and the patches of the dark faces near each old eye
     (`dark_faces_near()`)."""

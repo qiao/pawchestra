@@ -1226,7 +1226,7 @@ const RIG_SCRIPT = join(import.meta.dirname, 'blender', 'rig_mesh.py');
 
 /**
  * Reads the JSON text of the source middles of the rig script, with no face of an eye shell: the
- * export drops these faces for the pea eyes, so the other faces keep their order in the module.
+ * export drops these faces for the bead eyes, so the other faces keep their order in the module.
  *
  * @param text The text.
  * @returns The middle of each face, or `null` for a face with no source face, or `null` when the
