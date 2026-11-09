@@ -4,7 +4,7 @@ import type { Group, WebGLProgramParametersWithUniforms } from 'three';
 import { LIGHT_NAMES, RIM_LIGHT } from './lights.ts';
 
 /** The most rim lights that the shaders take (`RIM_PLACE.count` of `models/beam.ts`). */
-const MAX_RIM_LIGHTS = 3;
+export const MAX_RIM_LIGHTS = 3;
 
 /**
  * The uniforms of the rim lights in the materials of the players, the props, and the stage
