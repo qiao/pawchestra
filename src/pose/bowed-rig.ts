@@ -1,6 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
+import { pawBindOf } from '../models/studio-rig.ts';
 import type { PawBind } from '../models/studio-rig.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { SpeciesId } from '../models/species.ts';
@@ -1990,16 +1991,6 @@ function liftShoulders(model: PlayerModel, rig: RigPoints): RigPoints {
     ...rig,
     shoulderLift: [shoulderLift(model, rig.armL, fit), shoulderLift(model, rig.armR, fit)],
   };
-}
-
-/**
- * Copies the bind of a paw of a studio arm, so that the rig holds plain values only.
- *
- * @param arm The studio arm.
- * @returns The bind of its paw.
- */
-function pawBindOf(arm: PawBind): PawBind {
-  return { fore: arm.fore, hinge: arm.hinge, paw: arm.paw };
 }
 
 /**

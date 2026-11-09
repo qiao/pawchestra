@@ -15,6 +15,7 @@ import {
 } from '../models/instruments/percussion.ts';
 import type { TablePlace } from '../models/instruments/percussion.ts';
 import type { PlayTarget } from '../models/instruments/types.ts';
+import { pawBindOf } from '../models/studio-rig.ts';
 import type { PawBind } from '../models/studio-rig.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
@@ -1608,16 +1609,6 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     dampHands,
     switch: instrument === 'small-percussion' ? switchRig(model, left, right, inH) : null,
   };
-}
-
-/**
- * Copies the bind of a paw of a studio arm, so that the rig holds plain values only.
- *
- * @param arm The studio arm.
- * @returns The bind of its paw.
- */
-function pawBindOf(arm: PawBind): PawBind {
-  return { fore: arm.fore, hinge: arm.hinge, paw: arm.paw };
 }
 
 /**

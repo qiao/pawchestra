@@ -1369,6 +1369,16 @@ export function palmTurnAngle(side: Side, hand: Quaternion, forearm: Vector3): n
 /** The bind of the paw of one studio arm that the twist of the paw counts from. */
 export type PawBind = Pick<StudioArm, 'fore' | 'hinge' | 'paw'>;
 
+/**
+ * Copies the bind of a paw of a studio arm, so that a pose rig holds plain values only.
+ *
+ * @param arm The studio arm.
+ * @returns The bind of its paw.
+ */
+export function pawBindOf(arm: PawBind): PawBind {
+  return { fore: arm.fore, hinge: arm.hinge, paw: arm.paw };
+}
+
 const twistUpper = new Vector3();
 const twistFore = new Vector3();
 const twistHinge = new Vector3();
