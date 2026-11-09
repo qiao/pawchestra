@@ -294,18 +294,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/rabbit/tripo-hand/rabbit.rig.glb',
     },
   ],
-  // The red and the tan foxes (design 4.4). The wide haunch of the fox sits on a wider chair.
+  // The red and the tan foxes (design 4.4): the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/fox/tripo-hand/fox.blend`), with no arm cut and no limb stretch. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the fox of `fox.rig.glb`, the crease
+  // angle 35°, and the wider chair of the wide haunch. The tan fox takes the same rig with the tan
+  // palette.
   [
     'fox',
     {
       landmark: 'shoulders',
-      height: 1.108536,
       seated: true,
       soloist: true,
-      seatWidth: 0.48,
       constant: 'STUDIO_FOX',
-      crease: 35,
-      glb: 'assets/models/fox/fox.rig.glb',
+      glb: 'assets/models/fox/tripo-hand/fox.rig.glb',
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
