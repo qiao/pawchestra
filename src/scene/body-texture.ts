@@ -133,9 +133,13 @@ function addBodyMap(shader: WebGLProgramParametersWithUniforms, on: { value: num
     .replace(
       '#include <color_fragment>',
       [
-        '#if defined( USE_COLOR ) && defined( USE_MAP )',
+        '#if defined( USE_MAP ) && ( defined( USE_COLOR ) || defined( USE_COLOR_ALPHA ) )',
         '\tvec3 bodyTexel = texture2D( map, vMapUv ).rgb;',
-        '\tdiffuseColor.rgb *= vMapUv.x >= 0.0 && bodyMapOn > 0.5 ? bodyTexel : vColor;',
+        '\tbool bodyMapped = vMapUv.x >= 0.0 && bodyMapOn > 0.5;',
+        '\tdiffuseColor.rgb *= bodyMapped ? bodyTexel : vColor.rgb;',
+        '\t#ifdef USE_COLOR_ALPHA',
+        '\t\tdiffuseColor.a *= vColor.a;',
+        '\t#endif',
         '#else',
         '\t#include <color_fragment>',
         '#endif',
