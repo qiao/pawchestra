@@ -11,7 +11,7 @@ mouse.glb                               source mesh
 mouse-arms.glb + mouse-weights.json     `source` and `paintedWeights` of tools/mesh-rigs/mouse.json
    │  pnpm rig-mesh mouse
    v
-mouse.rig.glb                           rigged mesh
+mouse.rig.glb                           rigged mesh with point edits
    │  pnpm studio-body mouse
    v
 src/models/studio/mouse.ts              studio body of the app
@@ -26,7 +26,8 @@ src/models/studio/mouse.ts              studio body of the app
 | `mouse.glb` | Source mesh (below) | None |
 | `mouse-arms.glb` | Copy of `mouse.glb` with rebuilt arms. License as `mouse.glb` | `wind_arms.py mouse` |
 | `mouse-weights.json` | Weights of the same Blender run. License as `mouse.glb` | `wind_arms.py mouse` |
-| `mouse.rig.glb` | Output of the rig. License as `mouse.glb` | `pnpm rig-mesh mouse` |
+| `mouse.rig.glb` | Output of the rig with point edits. License as `mouse.glb` | `pnpm glb-point-edits assets/models/mouse/mouse-edits.json` ("Point edits" below) |
+| `mouse-edits.json` | The point edits of the rig of ca86cc819 | None |
 
 ## mouse.glb
 
@@ -84,6 +85,15 @@ shasum -a 256 assets/models/mouse/*.glb assets/models/mouse/mouse-weights.json
 
 | Item | Value |
 |---|---|
-| Size | 577,884 bytes |
-| SHA-256 | `2de3ca18ed1ef9c9a1cfec45463d7c03c61f6969808f41baa7483e1a82bff61f` |
+| Size | 577,740 bytes |
+| SHA-256 | `5272766ff4130fb35f5c10fdf6760e5ced1eca4a1be50460bb343a9faafa964a` |
+| Base | The rig of ca86cc819: 577,884 bytes, SHA-256 `2de3ca18ed1ef9c9a1cfec45463d7c03c61f6969808f41baa7483e1a82bff61f` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the bent bind of the oboe hold (`studio.bindArms`), and the bind paws supinated so that the largest paw twist of the roles of the cast matrix and the oboe is smallest (`studio.bindSupination`) |
+
+## Point edits
+
+`mouse-edits.json` moves 4 fur vertices of the head at the inner side of the right pea eye
+(`eye_R`) into the head, along the axis of the eye, by 0.01 to 0.025 H. A face of the old eye
+socket covered a notch of the oval in the front view. `pnpm glb-point-edits` reads the base with
+`git show ca86cc819:assets/models/mouse/mouse.rig.glb`, so a second run gives the same bytes. A
+run of `pnpm rig-mesh mouse` into this folder drops the point edits.
