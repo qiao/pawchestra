@@ -26,6 +26,7 @@ import {
   STUDIO_TRUNK_BONES,
   packStudioMesh,
   packStudioPalette,
+  packStudioUvs,
 } from '../src/models/studio-format.ts';
 import type {
   Side,
@@ -37,6 +38,7 @@ import type {
   StudioRaise,
   StudioStanding,
   StudioTriangle,
+  StudioTriangleUvs,
   StudioVertex,
 } from '../src/models/studio-format.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
@@ -899,6 +901,11 @@ interface Gltf {
        * armature of its `.blend`. A file of `pnpm rig-mesh` has none.
        */
       readonly body?: Readonly<Record<string, number>>;
+      /**
+       * The web copy of the color map of a hand rig, relative to the repository (`texture_of()`
+       * of `tools/blender/export_rig.py`). The primitives then hold `TEXCOORD_0`.
+       */
+      readonly texture?: string;
     };
   };
 }
@@ -1667,6 +1674,11 @@ interface SourceMesh {
     readonly cap?: boolean;
     /** True for a face of the rim of the caps of the body of the cut ({@link cutFacesOf}). */
     readonly rim?: boolean;
+    /**
+     * The texture point of each corner (`TEXCOORD_0` of a hand rig with a color map), or `null`
+     * for a face with no texture, such as the gloss nose or a whisker.
+     */
+    readonly uvs?: StudioTriangleUvs;
   }[];
 }
 
@@ -1710,6 +1722,22 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
     const weights = at('WEIGHTS_0');
     const colors = at('COLOR_0');
     const bases = primitive.attributes['COLOR_1'] === undefined ? null : at('COLOR_1');
+    const texcoords = primitive.attributes['TEXCOORD_0'] === undefined ? null : at('TEXCOORD_0');
+    // The export gives (-1, -1) to each corner of a face with no texture.
+    const uvsOf = (corners: readonly number[]): StudioTriangleUvs => {
+      if (!texcoords) {
+        return null;
+      }
+      const [a, b, c] = corners.map((k) => [texcoords[k * 2] ?? -1, texcoords[k * 2 + 1] ?? -1]);
+      if (!a || !b || !c || [a, b, c].some(([u]) => (u ?? -1) < 0)) {
+        return null;
+      }
+      return [
+        [a[0] ?? 0, a[1] ?? 0],
+        [b[0] ?? 0, b[1] ?? 0],
+        [c[0] ?? 0, c[1] ?? 0],
+      ];
+    };
     const colorSize = colors.length / (positions.length / 3);
     const moves = targets.map((t) => readAccessor(glb, primitive.targets?.[t]?.['POSITION'] ?? -1));
     const indices = readAccessor(glb, primitive.indices);
@@ -1764,6 +1792,7 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
         finish,
         cap: material === 'fur' && caps.has(t / 3),
         rim: material === 'fur' && rim.has(t / 3),
+        uvs: uvsOf([a, b, c]),
       });
     }
   }
@@ -3117,6 +3146,14 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   }
   if (frame.bench !== null) {
     body = { ...body, benchDepth: round(frame.bench.ahead + frame.bench.behind) };
+  }
+  const texture = glb.json.asset?.extras?.texture;
+  if (texture !== undefined) {
+    const uvs = withoutEyes.faces.map((face) => face.uvs ?? null);
+    if (!uvs.some((face) => face !== null)) {
+      throw new Error(`The file names the color map ${texture}, and no face has texture points.`);
+    }
+    body = { ...body, texture: { file: texture, uvs: packStudioUvs(uvs) } };
   }
   if (settings.palettes) {
     const bases = baseTriangles(ordered.faces, withoutEyes.faces);
