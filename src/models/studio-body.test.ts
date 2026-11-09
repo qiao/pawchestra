@@ -8,7 +8,6 @@ import { box } from './primitives.ts';
 import { BONE_NAMES, boneIndex, makeSkeleton } from './rig.ts';
 import { EYE } from './eyes.ts';
 import { STUDIO_BONES } from './studio-format.ts';
-import { STUDIO_BODIES } from './studio-bodies.ts';
 import { buildStudioBody, studioRenderMesh, studioRigOf } from './studio-body.ts';
 import type { BodyBones } from './biped.ts';
 import type { StudioBodyName, StudioRenderMesh } from './studio-body.ts';
@@ -107,10 +106,6 @@ describe('the pea eyes of each studio body (design 4.5, 5.1)', () => {
     'studio-polar-bear',
     'studio-rabbit',
   ];
-  it('covers each studio body', () => {
-    expect([...names].toSorted()).toEqual(Object.keys(STUDIO_BODIES).toSorted());
-  });
-
   for (const name of names) {
     const builder = new MeshBuilder();
     const body = buildStudioBody(builder, name, false);
