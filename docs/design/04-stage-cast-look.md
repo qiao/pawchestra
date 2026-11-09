@@ -1230,6 +1230,9 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     pass chose, because a search for each gap takes too much time.
   - The choir risers then rise together, up to `CHOIR_LIFT.highest`, until each singer sees the
     conductor.
+  - The count of blocked players is a report. No round has a goal count. A seat fix adds no
+    riser under an instrument row, opens no empty center, and keeps the stage size and the
+    podium height. Show the overview of the stage before a merge of a seat change.
   - `pnpm sight-lines` measures the result on the meshes of all demos. A few players behind the
     strings stay blocked, most of them horns and percussion on the left of rows 3 and 4. Four
     first desk players on each side of row 0 at their packed arcs keep the gap of the conductor
