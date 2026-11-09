@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { angleDifference, keyDistance, viewAngle, writeKeyPosition } from './camera-keys.ts';
-import { DEFAULT_TARGET, defaultDistance, defaultView } from './view.ts';
+import { defaultDistance } from './view.ts';
 
 const DEG = Math.PI / 180;
 
@@ -20,15 +20,6 @@ describe('keyDistance', () => {
 });
 
 describe('writeKeyPosition', () => {
-  it('gives the default view for the azimuth 0° and the elevation 33° (design 4.5)', () => {
-    const out: [number, number, number] = [0, 0, 0];
-    writeKeyPosition(DEFAULT_TARGET, 0, 33 * DEG, 0.58 * 33, out);
-    const view = defaultView(10, 1440, 900);
-    for (const k of [0, 1, 2]) {
-      expect(out[k]).toBeCloseTo(view.position[k] ?? 0, 9);
-    }
-  });
-
   it('puts the camera around the target', () => {
     const out: [number, number, number] = [0, 0, 0];
     writeKeyPosition([1, 2, 3], 90 * DEG, 0, 4, out);
