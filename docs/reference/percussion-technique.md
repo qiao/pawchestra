@@ -376,7 +376,7 @@ The app does not follow these facts:
   the long snout: a clip 2 cm higher twisted the arm past the margin of the arm gate in a lift.
   No source gives the turn of the hand.
 - **The change of the instrument (section 8).** A switch takes 2.7 s of rest: 0.2 s after the
-  note, two moves of 0.6 s, 0.3 s at the table, and the lift of 1 s before the next note
+  note, two moves of 0.45 s, 0.6 s at the table, and the lift of 1 s before the next note
   (`switchRestSec()`). No source gives the time [67]. With a shorter rest, the left paw keeps the
   triangle, and the tip of the beater strikes the tambourine on the table near its rim, as a soft
   fast passage plays on the table [65] [66]. No demo has a rest that long between the triangle and
@@ -387,8 +387,9 @@ The app does not follow these facts:
   stays out of the belly.
 - **The triangle stand (section 8).** The triangle hangs from a stand at the left of the player,
   not on the table, so that the left paw hangs it with the turn of its hold. A turn to lay it
-  flat on the table twisted the paw 150° in 0.05 s. The move from the stand to the tambourine on
-  the table still twists the paw through 180°.
+  flat on the table twisted the paw 150° in 0.05 s. Between the stand and the tambourine on the
+  table, the paw bends about 110° on its forearm in the 0.6 s at the table, with a twist of about
+  20° (`tablePaw()`). No source gives the turn of the hand in a change.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
 - **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand
