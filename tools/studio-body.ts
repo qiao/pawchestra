@@ -385,6 +385,8 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // The timpani elephant (design 4.4). It stands at its timpani, so the
   // export keeps the standing pose of the rig. Its trunk follows the head below the chin. Its eyes
   // are 0.6 of the pea eyes of its head, because the large head with its ears made them large.
+  // The old eyes of the mesh sit in deep sockets with lids, which showed as a gray groove around
+  // each pea eye, so the head fills them (`eyeFill`).
   [
     'elephant',
     {
@@ -397,6 +399,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/elephant/elephant.rig.glb',
       headFloor: 0.69,
       eyeSize: 0.6,
+      eyeFill: [0.2, 0.5],
     },
   ],
   // The bassoon beaver (design 4.4). A bassoon soloist keeps its seat,
