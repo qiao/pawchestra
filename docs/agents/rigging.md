@@ -245,7 +245,9 @@ Design 4.4 gives the rule and the reason of each config key.
   (`paintedLower`).
 - A thigh share in the crotch lifts the lower belly band of a seated bind into a shelf. Move the
   band onto the thigh tops with a key `bind*`, and keep each crease vertex off the line of its
-  neighbors.
+  neighbors. A lower thigh share only moves the shelf down, because the belly then hangs over the
+  thigh tops. A relax along the normal toward the vertices above and below keeps each girth
+  (`bind_belly` of the rabbit candidate).
 - A hold can turn a paw far from the source paw, and a twist of 110° on one arm part still
   shows as sheared facets. Turn the source paw rigidly about the forearm axis by whole ring steps
   and join the wrist band again, with a `palm` for each side on the real palm. Then move the rest
