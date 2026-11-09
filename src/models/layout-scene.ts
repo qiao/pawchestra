@@ -2485,6 +2485,9 @@ function* moveFrontSteps(
  * its inner players can pass 0°, and the view of the audience counts in the cost. The row keeps
  * this try only when it has fewer blocked players.
  *
+ * The count of blocked players is a report. A seat fix adds no riser under an instrument row,
+ * opens no empty center, and keeps the stage size and the podium height.
+ *
  * @param pass The inputs of the pass.
  * @returns The steps, which return the rows and the number of blocked players.
  */
