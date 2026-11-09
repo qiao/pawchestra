@@ -19,7 +19,13 @@ import type { StudioRig } from './studio-rig.ts';
 import type { SpeciesId, SpeciesParams } from './species.ts';
 import { buildInstrument } from './instruments/catalog.ts';
 import { attachInstrument } from './instruments/hold.ts';
-import type { HarpPedals, HarpStrings, PianoKeys, PlacedPiece } from './instruments/hold.ts';
+import type {
+  HarpPedals,
+  HarpStrings,
+  PianoKeys,
+  PieceCopies,
+  PlacedPiece,
+} from './instruments/hold.ts';
 import type { KettleCount } from './instruments/percussion.ts';
 import type { InstrumentBone, InstrumentId, InstrumentModel } from './instruments/types.ts';
 
@@ -180,6 +186,11 @@ export interface PlayerModel {
    */
   readonly pedals: HarpPedals | null;
   /**
+   * The copies of the switched pieces in {@link PlayerModel.mesh}, of which the pose shows one on
+   * the trap table or one in a paw (design 4.6, 5.3), or `null` for each other instrument.
+   */
+  readonly copies: PieceCopies | null;
+  /**
    * The rig of the studio body (design 4.4). The scene draws the body with the skin of the
    * studio, and `mesh` holds the body in the bind pose of the player.
    */
@@ -278,6 +289,7 @@ export function* buildPlayerSteps(
     keys: placed.keys,
     strings: placed.strings,
     pedals: placed.pedals,
+    copies: placed.copies,
     studio: studioRigOf(params.body, stance.kind === 'standing'),
   };
 }

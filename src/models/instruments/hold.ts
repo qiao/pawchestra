@@ -101,6 +101,24 @@ export interface HarpPedals {
   readonly turns: readonly PedalTurn[];
 }
 
+/**
+ * The copies of the switched pieces in the mesh of one player (design 4.6, 5.3): the small
+ * percussion player has one copy of the tambourine, the triangle, and the beater on the trap table,
+ * and one in a paw. Copy `2 p` of the piece `p` lies on the table, and copy `2 p + 1` is in the
+ * paw. The scene draws the copy that the pose shows (`AnimalPose.held`), and moves the corners of
+ * the other copy to one point.
+ */
+export interface PieceCopies {
+  /** The first corner of each copy in the mesh, and the end of its corners, excluded. */
+  readonly starts: Uint32Array;
+  readonly ends: Uint32Array;
+  /**
+   * The point of each copy, three numbers for each, in the model axes of the bind pose, to which
+   * the corners of the copy go when the pose does not show it: the bind position of its bone.
+   */
+  readonly hides: Float32Array;
+}
+
 /** An instrument at its place in the bind pose of one player. */
 interface PlacedInstrument {
   readonly pieces: readonly PlacedPiece[];
@@ -112,6 +130,8 @@ interface PlacedInstrument {
   readonly strings: HarpStrings | null;
   /** The pedals of a harp, or `null` for an instrument with no pedal parts. */
   readonly pedals: HarpPedals | null;
+  /** The copies of the switched pieces, or `null` for an instrument with no copy parts. */
+  readonly copies: PieceCopies | null;
 }
 
 /** One string part in the mesh of a player. */
@@ -221,6 +241,7 @@ export function attachInstrument(
   const keyed: KeyCorners[] = [];
   const strung: StringCorners[] = [];
   const pedaled: KeyCorners[] = [];
+  const copied: { index: number; start: number; end: number; hide: Vec3 }[] = [];
   for (const placed of pieces) {
     const { piece, at } = placed;
     const bone = boneIndex(piece.bone);
@@ -228,6 +249,9 @@ export function attachInstrument(
       const start = builder.triangleCount * 3;
       builder.add(part.corners, { color: part.color, finish: part.finish, bone, at });
       const end = builder.triangleCount * 3;
+      if (part.copy !== undefined) {
+        copied.push({ index: part.copy, start, end, hide: at.position });
+      }
       if (part.key !== undefined) {
         keyed.push({ key: part.key, start, end, at });
       }
@@ -246,7 +270,44 @@ export function attachInstrument(
     keys: keyed.length > 0 ? pianoKeys(model, keyed) : null,
     strings: strung.length > 0 ? harpStrings(model, strung) : null,
     pedals: pedaled.length > 0 ? harpPedals(model, pedaled) : null,
+    copies: copied.length > 0 ? pieceCopies(model, copied) : null,
   };
+}
+
+/**
+ * Collects the copy parts of the switched pieces in the mesh of a player (design 4.6). The parts
+ * of each copy must be one run in the mesh.
+ *
+ * @param model The instrument.
+ * @param copied The copy parts in the order of the mesh, with the bind position of the bone of
+ *   each.
+ * @returns The copies.
+ * @throws Error if the parts of a copy are not one run, or if an index has no copy.
+ */
+function pieceCopies(
+  model: InstrumentModel,
+  copied: readonly { index: number; start: number; end: number; hide: Vec3 }[],
+): PieceCopies {
+  const count = Math.max(...copied.map((c) => c.index)) + 1;
+  const starts = new Uint32Array(count);
+  const ends = new Uint32Array(count);
+  const hides = new Float32Array(3 * count);
+  const seen = new Set<number>();
+  for (const { index, start, end, hide } of copied) {
+    if (seen.has(index) && ends[index] !== start) {
+      throw new Error(`The parts of copy ${index} of the ${model.id} are not one run.`);
+    }
+    if (!seen.has(index)) {
+      starts[index] = start;
+      hides.set(hide, 3 * index);
+    }
+    ends[index] = end;
+    seen.add(index);
+  }
+  if (seen.size !== count) {
+    throw new Error(`The ${model.id} has no part for each copy index.`);
+  }
+  return { starts, ends, hides };
 }
 
 /**

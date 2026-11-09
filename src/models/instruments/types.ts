@@ -96,6 +96,12 @@ export interface InstrumentPart {
    * 4.6). The pedal turns into its notch (5.3). A part with no pedal index does not turn.
    */
   readonly pedal?: number;
+  /**
+   * The index of the copy of a switched piece that the part belongs to (design 4.6,
+   * `PieceCopies`): one copy lies on the trap table, and one copy is in a paw. The pose shows one
+   * of the two (5.3). A part with no copy index always shows.
+   */
+  readonly copy?: number;
 }
 
 /**
