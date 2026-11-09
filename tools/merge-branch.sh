@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: tools/merge-branch.sh [--check-only] [--no-arm-check] <branch> [worktree]
+# Usage: tools/merge-branch.sh [--check-only] [--arm-check] <branch> [worktree]
 #
 # Rebases <branch> onto main, checks each commit, and fast-forwards main to it.
 # <worktree> is the worktree that holds <branch>. With no <worktree>, the script
@@ -16,13 +16,11 @@
 # branch onto main, but it does not change main, and it keeps the branch and the
 # worktree.
 #
-# A branch that changes a file of src/pose/, src/models/, or tools/blender/ can twist
-# or deform an arm, so after the unit suite the script runs the arm gate
-# `pnpm arm-check --all --base main` (docs/agents/rigging.md, "The arm gate"), prints
-# its table, and stops on a value that fails. The gate takes about 3 minutes with the
-# base in the cache, so it runs all roles. --no-arm-check skips the gate. Use it only
-# for a change that moves no arm, such as a color or a face, and give the reason in
-# the merge report.
+# The arm gate runs only on request (AGENTS.md, "Checks"). With --arm-check, a branch
+# that changes a file of src/pose/, src/models/, or tools/blender/ runs the arm gate
+# `pnpm arm-check --all --base main` (docs/agents/rigging.md, "The arm gate") after the
+# unit suite. The script prints its table and stops on a value that fails. The gate
+# takes about 3 minutes with the base in the cache.
 #
 # The end-to-end tests are paused with all tests (design 9.3), so the script does
 # not run them. MERGE_E2E=1 runs them.
@@ -42,17 +40,17 @@
 set -euo pipefail
 
 CHECK_ONLY=0
-ARM_CHECK=1
-while [ "${1:-}" = --check-only ] || [ "${1:-}" = --no-arm-check ]; do
+ARM_CHECK=0
+while [ "${1:-}" = --check-only ] || [ "${1:-}" = --arm-check ]; do
   if [ "$1" = --check-only ]; then
     CHECK_ONLY=1
   else
-    ARM_CHECK=0
+    ARM_CHECK=1
   fi
   shift
 done
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-  echo "Usage: tools/merge-branch.sh [--check-only] [--no-arm-check] <branch> [worktree]" >&2
+  echo "Usage: tools/merge-branch.sh [--check-only] [--arm-check] <branch> [worktree]" >&2
   exit 1
 fi
 
@@ -194,10 +192,10 @@ pnpm -s test >"$MERGE_TMP/test-full.log" 2>&1 || {
 echo "Ran the full unit suite with no cache at ${SECONDS}s."
 
 ARM_FILES=$(git diff --name-only main HEAD | grep -E '^(src/pose|src/models|tools/blender)/' || true)
-if [ -z "$ARM_FILES" ]; then
+if [ "$ARM_CHECK" = 0 ]; then
+  echo "The arm gate runs only with --arm-check."
+elif [ -z "$ARM_FILES" ]; then
   echo "The branch changes no file of src/pose/, src/models/, or tools/blender/, so the arm gate does not run."
-elif [ "$ARM_CHECK" = 0 ]; then
-  echo "The arm gate does not run (--no-arm-check). Give the reason in the merge report."
 else
   ARM_STATUS=0
   pnpm -s arm-check --all --base main >"$MERGE_TMP/arm-check.log" 2>&1 || ARM_STATUS=$?
