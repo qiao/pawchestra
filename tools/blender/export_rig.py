@@ -326,8 +326,8 @@ def ball_middle(points):
 def own_eyes_of(me, points, head):
     """Gives the middle of each eye of the mesh in the bind, in the units and the axes of the
     studio: the middle of the sphere that fits the vertices of the eyeball faces on each side. An
-    eyeball face has the face attribute `eye` and no `plain`. An eye face with `plain` is a
-    catchlight on the ball, with its face color and no texture. The eye bone of the app lies at
+    eyeball face has the face attribute `eye` and no `plain`. An eye face with `plain` keeps
+    its face color and no texture, and the fit skips it. The eye bone of the app lies at
     the middle, and a lid turns about it. Each vertex of an eye must follow only the head bone
     (`head` holds the head weight of each vertex), so that the eye keeps its form in a blink."""
     flags = face_values(me, 'eye', 1, np.zeros(len(me.polygons), bool))
