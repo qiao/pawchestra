@@ -419,8 +419,8 @@ supination can dent the side of the forearm near the wrist, or push the forearm 
 deeper into an instrument.
 
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
-arm measures of each arm against one table of limits (`ARM_LIMITS`), and each change of a pose,
-a hold, or a body runs it. The paw twist, the paw swing, and the flat share measure the skin, so
+arm measures of each arm against one table of limits (`ARM_LIMITS`). A change of a pose, a hold,
+or a body runs it on request (9.8). The paw twist, the paw swing, and the flat share measure the skin, so
 they count from the bind. The grip turn asks if the paw holds its prop in the accepted way of the
 role (`ACCEPTED_GRIPS`), which is a question of the pose. So it reads the twist of the paw in the
 frame of the posed forearm (`GripFrames`): the axis from the elbow to the wrist, and the elbow
