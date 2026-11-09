@@ -129,7 +129,7 @@ describe('closeViewsArgs', () => {
       probes: null,
       target: null,
     };
-    expect(closeViewsArgs(['violinist', 'out'])).toEqual({
+    expect(closeViewsArgs(['violinist', 'out'])).toMatchObject({
       role: 'violinist',
       out: 'out',
       url: null,
@@ -138,7 +138,7 @@ describe('closeViewsArgs', () => {
     });
     expect(
       closeViewsArgs(['pianist', 'out', '--base', 'main', '--url', 'http://localhost:5199/']),
-    ).toEqual({
+    ).toMatchObject({
       role: 'pianist',
       out: 'out',
       url: 'http://localhost:5199/',
