@@ -20,7 +20,7 @@ import type { ConductorPlace, PlayerPlace, RiserLevel, SceneLayout, StandPlace }
 import type { Vec3 } from './tuples.ts';
 import { ModelCache } from './model-cache.ts';
 import type { PlayerModel } from './player.ts';
-import { RISER, riserStair, riserStepsDepth, standDeskHeight } from './props.ts';
+import { RISER, riserStair, standDeskHeight } from './props.ts';
 import { boneIndex } from './rig.ts';
 import { CONDUCTOR_STAND, PODIUM_FROM_FRONT, PODIUM_SIZE, keepsStageMargin } from './stage.ts';
 import { pieceBounds } from './instruments/piece.ts';
@@ -837,14 +837,12 @@ function riserObstacle(level: RiserLevel, podium: Vec3): Obstacle {
   const parts = Math.max(1, Math.ceil((2 * level.halfAngle) / RISER_BOX_ANGLE));
   const step = (2 * level.halfAngle) / parts;
   const outer = level.radius + RISER.depth / 2;
-  // The lowest level holds the steps in front of it, toward the podium (-z of a seat).
-  const front = level.level === 0 ? riserStepsDepth() : 0;
   const size: Vec3 = [
     2 * outer * Math.sin(step / 2),
     level.height,
-    RISER.depth + front + outer * (1 - Math.cos(step / 2)),
+    RISER.depth + outer * (1 - Math.cos(step / 2)),
   ];
-  const box = footprintOf([centeredBox([0, level.height / 2, -front / 2], size)]);
+  const box = footprintOf([centeredBox([0, level.height / 2, 0], size)]);
   const boxes = Array.from({ length: parts }, (_, i) => {
     const spot = seatAt(podium, -level.halfAngle + (i + 0.5) * step, level.radius);
     return placeFootprint(box, spot.position, spot.facing);

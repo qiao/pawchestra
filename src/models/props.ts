@@ -169,16 +169,6 @@ export const RISER = {
   wing: 1.0,
 } as const;
 
-/**
- * Gives the depth of the zone of the stairs in front of the lowest level of the risers (design
- * 4.5).
- *
- * @returns The depth, in meters.
- */
-export function riserStepsDepth(): number {
-  return RISER.stairs.width;
-}
-
 /** One step of a stair at a side end of the choir risers (design 4.5). */
 export interface StairStep {
   /** The angle of the end near the risers, in radians from 0°, on the right side. */
