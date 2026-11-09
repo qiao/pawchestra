@@ -619,17 +619,13 @@ The layout of the `.blend`:
   attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
   weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
   the head. The export refuses eye objects and eye faces in one file. `pnpm studio-body` gives
-  the eye faces the `lacquer` finish of the bead eyes (`EYEBALL_FINISH`), and lists them as
+  the eye faces the wet finish `eye` (`EYEBALL_FINISH`), and lists them as
   `StudioBody.eyeballs`. A corner of such a face takes the mean normal of the eye faces at its
   vertex with no crease angle (`studioNormals()`), so each ball shades smooth. Reason: the matte
-  fur gives a painted eye no gloss, and a flat lacquer face shows its facets.
-- **Catchlight.** The gloss alone gives no clear light from the front or from the app camera,
-  so each eyeball carries a catchlight: a small lens of eye faces with `plain` and the color of
-  the catchlight of a bead eye. It has the diameter `EYE_LIGHT` and the place of the catchlight
-  of a bead eye: up and to the left of the visible middle of the eye in the front view. The lens
-  stands out of the ball as far as the catchlight of a bent bead eye, so its normals spread and
-  its middle catches the lamps. It stays inside the lid, so a blink covers it. The sphere fit of
-  the eye middle skips the `plain` faces, so the eye bone does not move.
+  fur gives a painted eye no gloss, and a flat gloss face shows its facets.
+- **Eye highlight.** The eye light of the players (4.5) gives each eyeball its highlight, so the
+  ball carries no catchlight mesh. A white lens on the ball was an opaque disc with a hard edge,
+  the same from each angle. The sphere fit of the eye middle skips the eye faces with `plain`.
 - **Lids.** Such a mesh can have a lid on each eye: a part of a sphere around the middle of the
   ball, a little larger than the ball, with the face attribute `lid`, the fur slot, the face
   colors of the fur next to the eye, and UVs of a clean fur patch of the color map. The file
@@ -677,7 +673,7 @@ interface HandRigArmature {
 interface OwnEyeExtras {
   /** The middle of the sphere that fits the eyeball faces: the head of the eye bone of the side. */
   readonly middle: Vec3;
-  /** The eye faces of the side, catchlight included, as triangles of the primitive `fur`. */
+  /** The eye faces of the side, as triangles of the primitive `fur`. */
   readonly faces: readonly number[];
 }
 
@@ -1006,8 +1002,9 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
 | `varnish` | The varnished wood of the bowed strings, the harp, the bassoon, the drums, and the xylophone. | A soft gloss.                                                         |
-| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, the bead eyes, and the eyeballs of a hand rig. | A sharp gloss.                                                        |
+| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, and the bead eyes. | A sharp gloss.                                                        |
 | `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
+| `eye`     | The eyeballs of a hand rig.                               | The gloss of `lacquer`, and the only finish that the eye light reaches. |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
@@ -1025,9 +1022,9 @@ A player of such a body takes a copy of the shared material with the map
 (`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
 shader takes the texel in place of the vertex color of each corner with a point, so the light,
 the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
-the instrument keep their colors. The eyes of the mesh take the map with the matte fur finish, so
-their only light is the light of the map. Their face color is the eye color, for the frames
-before the map loads. The first draw starts the load of the image (7.2). Until the
+the instrument keep their colors. The eyes of the mesh take the map with the `eye` finish, so the
+stage lamps and the eye light give them a gloss over the painted eye. Their face color is the eye
+color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
 The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). A test of its
@@ -1076,6 +1073,22 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
 - **Pool** (`LIGHT_POOL`, `addLightPool()`). A factor in the shaders makes a pool on the
   conductor and the middle of the orchestra, because a separate light costs GPU time. A hot spot
   holds only the podium on the players, so the white fur of the front rows does not clip.
+- **Eye light** (`EYE_LIGHT_LOOK`, `scene/eye-light.ts`). As the eye light of a film set, a lamp
+  up and to the left of the camera gives each eyeball of a hand rig (the finish `eye`) a soft
+  highlight. Only these pixels see it, and it follows the camera in each camera mode. The key light
+  comes from the back, so the stage lamps give such an eye no clear highlight from the front or
+  from the app camera.
+  - The highlight is a GGX lobe scaled to 1 at its middle, so `strength` gives its light and
+    `roughness` its size and its soft edge. It reads the normal of the true sphere of the ball,
+    so it stays round on the few faces of a low-poly ball.
+  - Its middle turns from the mirror direction toward the eye axis by `pull`. The eyes of a
+    rabbit face about 50° to the side, and the mirror point of a front camera lies behind the
+    socket rim. Thus the highlight moves a little with the view and stays in the open eye.
+  - It fades from `fade[0]` to `fade[1]` off the eye axis, before the socket rim cuts it, and the
+    pool scales it. The skin of the head moves the axis and the middle of each ball, which come
+    from the eyeball triangles (`eyeBallsOf()`).
+  - It adds only a highlight: the ball keeps the dark of the bead eyes. Each other body keeps its
+    material (`eyeLightMaterial()` of `scene/player.ts`).
 - **Beam** (`BEAM_LOOK`). The haze cone leans toward its rim light, which stands at the x of the
   beam, so the beam has a visible source and stands upright. The camera dims it in a close shot,
   because a near camera sees the additive haze as a veil over the image (5.6).
