@@ -137,21 +137,6 @@ function bentBall(corners: readonly number[], bend: EyeBend): number[] {
   return out;
 }
 
-/**
- * Adds one eye on an eye bone: a black upright oval of 0.13 × 0.18 H, with a wet finish and a
- * small white light above the middle, as the eyes of the polished images. The thin axis of the
- * oval is the normal of the head surface, and its long axis points up along the surface. The light
- * follows the eye bone, so it closes with the eye. A bend moves each point of the oval along the
- * axis, so that the oval follows a curved or a sloped head surface, and the light of a bent eye
- * lies on the front of the oval.
- *
- * @param builder The mesh that gets the parts.
- * @param colors The colors of the eye.
- * @param eye The middle of the eye and the normal of the head surface there.
- * @param h The head height that sizes the eye, in meters.
- * @param bone The eye bone.
- * @param bend The bend of the oval, or none for a flat face.
- */
 /** The axes of an eye, in the axes of the head. */
 export interface EyeAxes {
   /** The axis across the oval: its short axis. */
@@ -231,6 +216,21 @@ export function ovalCorners(
   return corners;
 }
 
+/**
+ * Adds one eye on an eye bone: a black upright oval of 0.13 × 0.18 H, with a wet finish and a
+ * small white light above the middle, as the eyes of the polished images. The thin axis of the
+ * oval is the normal of the head surface, and its long axis points up along the surface. The light
+ * follows the eye bone, so it closes with the eye. A bend moves each point of the oval along the
+ * axis, so that the oval follows a curved or a sloped head surface, and the light of a bent eye
+ * lies on the front of the oval.
+ *
+ * @param builder The mesh that gets the parts.
+ * @param colors The colors of the eye.
+ * @param eye The middle of the eye and the normal of the head surface there.
+ * @param h The head height that sizes the eye, in meters.
+ * @param bone The eye bone.
+ * @param bend The bend of the oval, or none for a flat face.
+ */
 export function addEye(
   builder: MeshBuilder,
   colors: EyeColors,
