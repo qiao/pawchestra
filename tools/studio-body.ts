@@ -542,6 +542,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       crease: 60,
       colorBlend: 0.7,
       glb: 'assets/models/penguin/penguin.rig.glb',
+      // At the old eyes, the fur covered a notch at the bottom of the right pea eye in the front
+      // view. Eyes 0.02 H higher show the full ovals.
+      eyeShift: [0, 0.02],
     },
   ],
 ]);
