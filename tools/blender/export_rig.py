@@ -14,10 +14,12 @@ evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the s
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
 middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). A file with no eye
 objects shows the eyes of its mesh: the faces with the face attribute `eye` give the middle of each
-eye in the bind (`own_eyes_of()`), and the app adds no pea eyes. The custom properties of the
-armature give the facts of the body (`body_of()`). The bytes depend only on the
-`.blend`. A mesh object with the custom property `texture` also gets the texture point of each
-corner (`texture_of()`).
+eye in the bind (`own_eyes_of()`), and the app adds no pea eyes. Such a file can have lids: the
+faces with the face attribute `lid` and the custom property `lids` of the armature give the lid
+triangles, the turn from open to closed, and the hinge axis of each side (`lids_of()`). The
+custom properties of the armature give the facts of the body (`body_of()`). The bytes depend only
+on the `.blend`. A mesh object with the custom property `texture` also gets the texture point of
+each corner (`texture_of()`).
 """
 
 import hashlib
@@ -145,6 +147,7 @@ def check_rig(rig, body, rm, bones, order):
         'rim': 'BOOLEAN',
         'plain': 'BOOLEAN',
         'eye': 'BOOLEAN',
+        'lid': 'BOOLEAN',
     }
     for name, kind in kinds.items():
         a = body.data.attributes.get(name)
@@ -313,11 +316,18 @@ def eyes_of(rig, eyes, bind):
     return out
 
 
+def ball_middle(points):
+    """Gives the middle of the sphere that fits the points best (least squares)."""
+    a = np.c_[2 * points, np.ones(len(points))]
+    return np.linalg.lstsq(a, (points**2).sum(axis=1), rcond=None)[0][:3]
+
+
 def own_eyes_of(me, points, head):
     """Gives the middle of each eye of the mesh in the bind, in the units and the axes of the
-    studio: the mean of the vertices of the faces with the face attribute `eye` on each side. The
-    eye bone of the app lies there. Each vertex of an eye must follow only the head bone (`head`
-    holds the head weight of each vertex), so that the eye keeps its form in a blink."""
+    studio: the middle of the sphere that fits the vertices of the faces with the face attribute
+    `eye` on each side. The eye bone of the app lies there, and a lid turns about it. Each vertex
+    of an eye must follow only the head bone (`head` holds the head weight of each vertex), so
+    that the eye keeps its form in a blink."""
     flags = face_values(me, 'eye', 1, np.zeros(len(me.polygons), bool))
     corners = {v for p in me.polygons if flags[p.index] for v in p.vertices}
     out = {}
@@ -328,8 +338,50 @@ def own_eyes_of(me, points, head):
             np.abs(head[mine] - 1).max() <= WEIGHT_LIMIT,
             f'A vertex of the eye {side} of the mesh does not follow only the head bone.',
         )
-        middle = points[mine].mean(axis=0)
+        middle = ball_middle(points[mine])
         out[side] = {'middle': [round(float(x), EYE_DECIMALS) + 0.0 for x in middle]}
+    return out
+
+
+def lids_of(rig, me, points, head, eyes, turn):
+    """Gives the lids of the eyes of the mesh in the bind, in the axes of the studio: the turn from
+    open to closed (radians) and the unit hinge axis of each side. The custom property `lids` of
+    the armature holds the angle and the axis of each side in the rest of the file: {'angle', 'L',
+    'R'}. `turn` is the turn of the head bone from the rest to the bind. Each vertex of a face with
+    the face attribute `lid` must follow only the head bone, and lie farther from the middle of
+    its eye (`eyes`, of `own_eyes_of()`) than each vertex of the ball, so that a turn about the
+    middle never moves the lid into the ball. A file with no property has no lids: None."""
+    lids = sa.rig_property(rig, 'lids')
+    flags = face_values(me, 'lid', 1, np.zeros(len(me.polygons), bool))
+    if lids is None:
+        need(not flags.any(), 'The mesh has lid faces, and the armature has no property lids.')
+        return None
+    angle = lids.get('angle')
+    need(
+        isinstance(angle, (int, float)) and 0 < angle < 2 * math.pi,
+        'The angle of the property lids is not from 0 to 2 pi.',
+    )
+    balls = face_values(me, 'eye', 1, np.zeros(len(me.polygons), bool))
+    ball = {v for p in me.polygons if balls[p.index] for v in p.vertices}
+    lid = {v for p in me.polygons if flags[p.index] for v in p.vertices}
+    need(lid and not lid & ball, 'The property lids needs lid faces apart from the eye faces.')
+    need(
+        np.abs(head[sorted(lid)] - 1).max() <= WEIGHT_LIMIT,
+        'A vertex of a lid does not follow only the head bone.',
+    )
+    out = {'angle': round(float(angle), 6), 'axes': {}}
+    for side, sign in (('L', 1), ('R', -1)):
+        mine = sorted(v for v in lid if points[v][0] * sign > 0)
+        need(mine, f'The file has no lid on the side {side}.')
+        middle = np.array(eyes[side]['middle'])
+        near = np.linalg.norm(points[mine] - middle, axis=1).min()
+        far = np.linalg.norm(
+            points[sorted(v for v in ball if points[v][0] * sign > 0)] - middle, axis=1
+        )
+        need(near > far.max(), f'The lid {side} comes nearer to the middle than its eyeball.')
+        axis = sa.TO_STUDIO @ (turn @ np.array(lids[side], float))
+        need(abs(np.linalg.norm(axis) - 1) < 1e-3, f'The lid axis {side} is not a unit vector.')
+        out['axes'][side] = [round(float(x), 6) + 0.0 for x in axis / np.linalg.norm(axis)]
     return out
 
 
@@ -397,18 +449,19 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
 
 
 def triangles(me):
-    """Gives the corners, the material, the color, the base color, the cap flag, and the rim
-    flag of each triangle, as Blender divides the faces, in the order of the faces."""
+    """Gives the corners, the material, the color, the base color, the cap flag, the rim flag,
+    and the lid flag of each triangle, as Blender divides the faces, in the order of the faces."""
     me.calc_loop_triangles()
     owner = np.array([t.polygon_index for t in me.loop_triangles])
     slots = [m.name for m in me.materials]
     kinds = np.array([slots[p.material_index] for p in me.polygons])[owner]
     color = face_values(me, 'color', 4)[:, :3]
     base = face_values(me, 'color_base', 4, face_values(me, 'color', 4))[:, :3]
-    flags = [face_values(me, n, 1, np.zeros(len(me.polygons), bool))[owner] for n in ('cap', 'rim')]
-    need(not ((flags[0] | flags[1]) & (kinds != 'fur')).any(), 'A cap or rim face is not fur.')
+    names = ('cap', 'rim', 'lid')
+    flags = [face_values(me, n, 1, np.zeros(len(me.polygons), bool))[owner] for n in names]
+    need(not ((flags[0] | flags[1] | flags[2]) & (kinds != 'fur')).any(), 'A flag face is not fur.')
     corners = np.array([t.vertices[:] for t in me.loop_triangles])
-    return corners, kinds, color[owner], base[owner], flags[0], flags[1]
+    return corners, kinds, color[owner], base[owner], flags[0], flags[1], flags[2]
 
 
 def texture_of(body, me, kinds):
@@ -561,9 +614,14 @@ def main():
         )
         extras['eyes'] = eyes_of(rig, eyes, bind)
     else:
-        extras['ownEyes'] = own_eyes_of(body.data, points, wn[:, bones.index('head')])
+        head = wn[:, bones.index('head')]
+        extras['ownEyes'] = own_eyes_of(body.data, points, head)
+        turn = to_bind[bones.index('head')][:3, :3]
+        lids = lids_of(rig, body.data, points, head, extras['ownEyes'], turn)
+        if lids:
+            extras['lids'] = lids
     extras['body'] = body_of(rig)
-    corners, kinds, colors, bases, caps, rim = triangles(body.data)
+    corners, kinds, colors, bases, caps, rim, lid = triangles(body.data)
     texture, uvs = texture_of(body, body.data, kinds)
     if texture:
         extras['texture'] = texture
@@ -572,6 +630,11 @@ def main():
         extras['caps'] = sorted(int(fur[t]) for t in np.nonzero(caps)[0])
     if rim.any():
         extras['rim'] = sorted(int(fur[t]) for t in np.nonzero(rim)[0])
+    if 'lids' in extras:
+        left = points[corners].mean(axis=1)[:, 0] > 0
+        extras['lids']['faces'] = {
+            s: sorted(int(fur[t]) for t in np.nonzero(lid & (left == (s == 'L')))[0]) for s in 'LR'
+        }
     rm['write_glb'](
         out, {'name': body.name}, points, corners, srgb(colors), kinds, w, shapes,
         {b: f for b, (f, _) in frames.items()}, heads,

@@ -904,6 +904,11 @@ interface Gltf {
        */
       readonly ownEyes?: Readonly<Partial<Record<Side, Pick<EyeExtras, 'middle'>>>>;
       /**
+       * The lids of the eyes of the mesh of a hand rig (`lids_of()` of
+       * `tools/blender/export_rig.py`). A file with no lids has none.
+       */
+      readonly lids?: LidExtras;
+      /**
        * The facts of the body of a hand rig ({@link BODY_FACTS}): the custom properties of the
        * armature of its `.blend`. A file of `pnpm rig-mesh` has none.
        */
@@ -915,6 +920,29 @@ interface Gltf {
       readonly texture?: string;
     };
   };
+}
+
+/**
+ * The lids of the eyes of the mesh of a hand rig in the extras of its GLB file (design 4.4, "Hand
+ * rig"), in the axes of the studio.
+ */
+interface LidExtras {
+  /** The turn of each lid from open to closed, in radians. */
+  readonly angle?: number;
+  /** The unit hinge axis of each lid in the bind pose. A positive turn closes the lid. */
+  readonly axes?: Readonly<Record<Side, readonly number[]>>;
+  /** The triangles of each lid, as indices of the triangles of the primitive `fur`. */
+  readonly faces?: Readonly<Partial<Record<Side, readonly number[]>>>;
+}
+
+/** The lids of the eyes of the mesh of a hand rig ({@link lidsOf}). */
+interface FileLids {
+  /** The turn of each lid from open to closed, in radians. */
+  readonly angle: number;
+  /** The unit hinge axis of each lid, in the axes of the studio. */
+  readonly axes: Record<Side, Vector3>;
+  /** The side of each lid triangle, by its index in the triangles of the primitive `fur`. */
+  readonly faces: ReadonlyMap<number, Side>;
 }
 
 /**
@@ -1155,6 +1183,45 @@ export function ownEyesOf(glb: Glb): Record<Side, Vector3> | null {
     return new Vector3().fromArray(point);
   };
   return { L: middle('L'), R: middle('R') };
+}
+
+/**
+ * Gives the lids of the eyes of the mesh of a hand rig from the extras of its GLB file (design 4.4,
+ * "Hand rig"): the turn from open to closed, the hinge axis of each side, and the lid triangles.
+ *
+ * @param glb The file.
+ * @returns The lids, or `null` for a file with no lids.
+ * @throws Error if the file has no eyes of the mesh, if the angle is not from 0 to 2π, if an axis
+ *   is not a unit vector, or if a side has no triangles or a triangle is on two sides.
+ */
+export function lidsOf(glb: Glb): FileLids | null {
+  const extras = glb.json.asset?.extras;
+  const lids = extras?.lids;
+  if (lids === undefined) {
+    return null;
+  }
+  if (extras?.ownEyes === undefined) {
+    throw new Error('The GLB file holds lids and no eyes of its mesh.');
+  }
+  const { angle = NaN, axes, faces = {} } = lids;
+  if (!(angle > 0 && angle < 2 * Math.PI)) {
+    throw new Error(`The angle ${angle} of the lids is not from 0 to 2π.`);
+  }
+  const hinges = sideAxes(axes, 'lid axis');
+  if (!hinges) {
+    throw new Error('The lids of the file have no axes.');
+  }
+  const sides = new Map<number, Side>();
+  for (const side of ['L', 'R'] as const) {
+    const list = faces[side] ?? [];
+    if (list.length === 0 || list.some((t) => !Number.isInteger(t) || t < 0 || sides.has(t))) {
+      throw new Error(`The lid triangles ${side} of the file are empty or not triangle indices.`);
+    }
+    for (const t of list) {
+      sides.set(t, side);
+    }
+  }
+  return { angle, axes: hinges, faces: sides };
 }
 
 /**
@@ -1708,6 +1775,8 @@ interface SourceMesh {
     readonly cap?: boolean;
     /** True for a face of the rim of the caps of the body of the cut ({@link cutFacesOf}). */
     readonly rim?: boolean;
+    /** The side of a face of a lid ({@link lidsOf}), or `null` for each other face. */
+    readonly lid?: Side | null;
     /**
      * The texture point of each corner (`TEXCOORD_0` of a hand rig with a color map), or `null`
      * for a face with no texture, such as the gloss nose or a whisker.
@@ -1742,6 +1811,7 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
   const jointNames = skin.joints.map((j) => ownBone(glb.json.nodes[j]?.name ?? ''));
   const caps = cutFacesOf(glb, 'caps');
   const rim = cutFacesOf(glb, 'rim');
+  const lids = lidsOf(glb)?.faces ?? new Map<number, Side>();
   const vertices: SourceVertex[] = [];
   const faces: SourceMesh['faces'] = [];
   for (const primitive of mesh.primitives) {
@@ -1826,6 +1896,7 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
         finish,
         cap: material === 'fur' && caps.has(t / 3),
         rim: material === 'fur' && rim.has(t / 3),
+        lid: material === 'fur' ? (lids.get(t / 3) ?? null) : null,
         uvs: uvsOf([a, b, c]),
       });
     }
@@ -1837,6 +1908,12 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
   const rimCount = faces.filter((face) => face.rim === true).length;
   if (rimCount !== rim.size) {
     throw new Error(`The file names ${rim.size} rim faces, and the primitive fur has ${rimCount}.`);
+  }
+  const lidCount = faces.filter((face) => face.lid).length;
+  if (lidCount !== lids.size) {
+    throw new Error(
+      `The file names ${lids.size} lid faces, and the primitive fur has ${lidCount}.`,
+    );
   }
   return { vertices, faces };
 }
@@ -3127,10 +3204,36 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
 
   // The studio animal faces +z, so its moves turn as its points do.
   const ordered = orderByFirstUse(withoutEyes);
-  const vertices: StudioVertex[] = ordered.vertices.map((v) => ({
-    position: model(v.position),
-    skin: v.skin.map(([bone, w]) => [boneIndexOf(bone), w] as const),
-  }));
+  // Each vertex of a lid follows the eye bone of its side, which turns the lid in a blink. The
+  // `.blend` gives it the row `head` 1, so that Blender shows the open lid on the head.
+  const lidSides = new Map<number, Side>();
+  const others = new Set<number>();
+  for (const [t, triangle] of ordered.faces.entries()) {
+    const side = withoutEyes.faces[t]?.lid;
+    for (const v of triangle.corners) {
+      if (side) {
+        lidSides.set(v, side);
+      } else {
+        others.add(v);
+      }
+    }
+  }
+  if ([...lidSides.keys()].some((v) => others.has(v))) {
+    throw new Error('A vertex of a lid also belongs to a face that is not a lid.');
+  }
+  const vertices: StudioVertex[] = ordered.vertices.map((v, k) => {
+    const side = lidSides.get(k);
+    if (side === undefined) {
+      return {
+        position: model(v.position),
+        skin: v.skin.map(([bone, w]) => [boneIndexOf(bone), w] as const),
+      };
+    }
+    if (v.skin.some(([bone, w]) => bone !== 'head' && w > 0)) {
+      throw new Error(`A vertex of the lid ${side} does not follow only the head bone.`);
+    }
+    return { position: model(v.position), skin: [[STUDIO_BONES.indexOf(`eye_${side}`), 1]] };
+  });
   const correctives = kept.map((_, s) =>
     ordered.vertices.map((v) => toModelAxes(v.moves[s] ?? new Vector3(), scale)),
   );
@@ -3160,6 +3263,16 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     crease: settings.crease,
     mesh: packStudioMesh(vertices, ordered.faces, correctives),
   };
+  const lids = lidsOf(glb);
+  if (lids) {
+    body = {
+      ...body,
+      lids: {
+        angle: round(lids.angle),
+        axes: { L: direction(lids.axes.L), R: direction(lids.axes.R) },
+      },
+    };
+  }
   if (raises.length > 0) {
     body = { ...body, raises: raises.map((raise) => raise.pose) };
   }
@@ -3909,7 +4022,7 @@ async function main(): Promise<void> {
     );
   } else {
     console.log(
-      'Eyes of the mesh: no pea eyes. Each eye bone lies at the middle of the eye faces of its side.',
+      `Eyes of the mesh: no bead eyes. Each eye bone lies at the middle of the eyeball of its side${body.lids ? ', and its lid turns about it' : ''}.`,
     );
   }
   if (eyeFills) {
