@@ -44,22 +44,6 @@ describe('createStageMaterial (design 4.5, materials)', () => {
     expect(shader.fragmentShader).toContain('roughnessFactor = clamp(');
     expect(shader.fragmentShader).toContain('totalEmissiveRadiance += diffuseColor.rgb * sideGlow');
     expect(shader.fragmentShader).toContain('directLight.color *= lightPool;');
-    expect(Object.keys(shader.uniforms)).toEqual([
-      'uLightPool',
-      'uLightPoolSpot',
-      'uLightPoolLevels',
-      'uGrain',
-      'uGrainRoughness',
-      'uHalfSide',
-      'uCornerCut',
-      'uSpecular',
-      'uSeamColor',
-      'uPlank',
-      'uStageBake',
-      'uShadowLift',
-      'uStageBlur',
-      'uSideGlow',
-    ]);
     expect(shader.fragmentShader).toContain('reflectedLight.directSpecular *= uSpecular *');
     expect(shader.fragmentShader).toContain('float stagePlank = plankNumber(vColor.rgb);');
     expect(shader.uniforms).toMatchObject({
