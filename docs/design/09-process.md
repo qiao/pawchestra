@@ -145,13 +145,15 @@ The development Mac is an Apple M1 Max with Chrome.
 No round gets a review agent. The manager reviews each round from the report and the images, and
 the project owner judges the look from the images. The implementation agent or a fix agent makes
 each requested change as a commit on the same branch. `tools/merge-branch.sh` runs the checks of
-each commit, and the arm gate (`pnpm arm-check`, 4.4) for a change of `src/pose/`, `src/models/`,
+each commit, the build, and the size. `AGENTS.md` ("Checks") lists the gates that stay on. Each
+other gate, such as the arm gate (`pnpm arm-check`, 4.4), runs on request. Then
+`tools/merge-branch.sh --arm-check` runs the arm gate for a change of `src/pose/`, `src/models/`,
 or `tools/blender/`.
 
-At the end of a step or a round of the look, take the images at 1440 × 900 and at 390 × 844
-(`pnpm screenshots`, `pnpm close-views`, `docs/agents/commands.md`). Each close view has a fill
-light from the camera, so that the dark side shows. The images of a mesh, a hold, or a clip show
-the front, the back, and each side, in the playing pose and in the rest pose. Give the images to
-the manager with the report and the results of the targets of the step. The images stay in the
-folder `reports/`, which git ignores, because report images made most of the size of the git
-history. The hook `tools/git-hooks/pre-commit` stops a commit that adds one.
+When the manager asks at the end of a step or a round of the look, take the images at 1440 × 900
+and at 390 × 844 (`pnpm screenshots`, `pnpm close-views`, `docs/agents/commands.md`). Each close
+view has a fill light from the camera, so that the dark side shows. The images of a mesh, a hold,
+or a clip show the front, the back, and each side, in the playing pose and in the rest pose. Give
+the images to the manager with the report and the results of the targets of the step. The images
+stay in the folder `reports/`, which git ignores, because report images made most of the size of
+the git history. The hook `tools/git-hooks/pre-commit` stops a commit that adds one.
