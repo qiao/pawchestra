@@ -13,7 +13,12 @@ import type { Matrix4Tuple, MeshStandardMaterial, Object3D } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { MeshData } from '../models/mesh.ts';
-import type { HarpPedals, HarpStrings, PianoKeys } from '../models/instruments/hold.ts';
+import type {
+  HarpPedals,
+  HarpStrings,
+  PianoKeys,
+  PieceCopies,
+} from '../models/instruments/hold.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { Support } from '../models/props.ts';
@@ -80,16 +85,28 @@ function* createPlayerGeometrySteps(model: PlayerModel): Steps<BufferGeometry> {
   );
   // The moves add to the bind places, as in a glTF file.
   geometry.morphTargetsRelative = true;
-  // The keys of a keyboard and the strings of a harp move by their ranges of corners
-  // (`PianoKeys.corners`, `HarpStrings.corners`), so such a geometry keeps one vertex for each
-  // corner, and each such player gets its own depth geometry ({@link ownGeometry}).
-  if (!model.keys && !model.strings && !model.pedals) {
+  // The keys of a keyboard, the strings of a harp, and the switched pieces move by their ranges of
+  // corners (`PianoKeys.corners`, `HarpStrings.corners`, `PieceCopies`), so such a geometry keeps
+  // one vertex for each corner, and each such player gets its own depth geometry
+  // ({@link ownGeometry}).
+  if (!movesCorners(model)) {
     yield;
     createDepthGeometry(geometry);
     yield;
     shareCorners(geometry);
   }
   return geometry;
+}
+
+/**
+ * Tells if a player model moves ranges of its corners: the keys of a keyboard, the strings and
+ * the pedals of a harp, or the copies of the switched pieces.
+ *
+ * @param model The player model.
+ * @returns True for a model whose players need their own positions ({@link ownGeometry}).
+ */
+function movesCorners(model: PlayerModel): boolean {
+  return !!(model.keys || model.strings || model.pedals || model.copies);
 }
 
 /** The parts of a player mesh with a studio body that a pose needs. */
@@ -371,6 +388,23 @@ interface PedalMesh {
 const pedalMeshes = new WeakMap<SkinnedMesh, PedalMesh>();
 
 /**
+ * The copies of the switched pieces of a player mesh, which {@link applyPose} shows or hides
+ * (design 4.6, 5.3).
+ */
+interface CopyMesh {
+  readonly copies: PieceCopies;
+  /** The bind places of the corners. */
+  readonly bind: Float32Array;
+  /** The positions of the mesh, with the hidden copies at one point. */
+  readonly position: BufferAttribute;
+  /** 1 for each copy that {@link CopyMesh.position} shows, and 0 for a hidden copy. */
+  readonly shown: Uint8Array;
+}
+
+/** The player meshes with switched pieces. */
+const copyMeshes = new WeakMap<SkinnedMesh, CopyMesh>();
+
+/**
  * The strings of a player mesh with a harp, which {@link applyPose} moves (design 4.6, 5.3): the
  * bands of the swinging strings, and the parts of the strings, which close onto their lines while
  * their bands show.
@@ -481,7 +515,7 @@ export function createPlayerMesh(
   geometry: BufferGeometry,
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
-  const own = model.keys || model.strings || model.pedals ? ownGeometry(geometry) : geometry;
+  const own = movesCorners(model) ? ownGeometry(geometry) : geometry;
   const mesh = createStudioMesh(model, model.studio, own, materials);
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
@@ -503,6 +537,14 @@ export function createPlayerMesh(
       bind,
       position,
       notches: new Float32Array(model.pedals.turns.length),
+    });
+  }
+  if (model.copies) {
+    copyMeshes.set(mesh, {
+      copies: model.copies,
+      bind,
+      position,
+      shown: new Uint8Array(model.copies.starts.length).fill(1),
     });
   }
   const material = materials[0];
@@ -662,6 +704,7 @@ export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
 export function applyPose(mesh: SkinnedMesh, pose: AnimalPose): void {
   applyKeys(mesh, pose.keys);
   applyPedals(mesh, pose.pedals);
+  applyCopies(mesh, pose.held);
   applyStudioPose(mesh, pose);
   applyStrings(mesh, pose.strings);
 }
@@ -851,6 +894,51 @@ function applyPedals(mesh: SkinnedMesh, notches: Float32Array | null | undefined
     const start = own.pedals.corners[p] ?? 0;
     const end = own.pedals.corners[p + 1] ?? start;
     turnCorners(own.bind, out, start, end, turn, notch * (notch > 0 ? turn.sharp : -turn.flat));
+    from = Math.min(from, start);
+    to = Math.max(to, end);
+  }
+  if (from < to) {
+    uploadCorners(own.position, from, to);
+  }
+}
+
+/**
+ * Shows the copies of the switched pieces of a player mesh that a pose holds (design 4.6, 5.3):
+ * copy `2 p` of piece `p` on the trap table when its value is 0, and copy `2 p + 1` in a paw when
+ * it is 1. The corners of a hidden copy go to its point (`PieceCopies.hides`), so its triangles
+ * draw nothing. Only the copies that changed since the last frame move.
+ *
+ * @param mesh A mesh of {@link createPlayerMesh}. A mesh with no copies does not change.
+ * @param held The value of each switched piece, from `AnimalPose.held`. With none, the pieces lie
+ *   on the table.
+ */
+function applyCopies(mesh: SkinnedMesh, held: Float32Array | null | undefined): void {
+  const own = copyMeshes.get(mesh);
+  const out = own?.position.array;
+  if (!own || !(out instanceof Float32Array)) {
+    return;
+  }
+  const { copies, bind, shown } = own;
+  let from = Infinity;
+  let to = -Infinity;
+  for (let c = 0; c < shown.length; c++) {
+    const inPaw = (held?.[c >> 1] ?? 0) >= 0.5;
+    const show = (c % 2 === 1) === inPaw ? 1 : 0;
+    if (show === shown[c]) {
+      continue;
+    }
+    shown[c] = show;
+    const start = copies.starts[c] ?? 0;
+    const end = copies.ends[c] ?? start;
+    if (show) {
+      out.set(bind.subarray(start * 3, end * 3), start * 3);
+    } else {
+      for (let i = start * 3; i < end * 3; i += 3) {
+        out[i] = copies.hides[c * 3] ?? 0;
+        out[i + 1] = copies.hides[c * 3 + 1] ?? 0;
+        out[i + 2] = copies.hides[c * 3 + 2] ?? 0;
+      }
+    }
     from = Math.min(from, start);
     to = Math.max(to, end);
   }

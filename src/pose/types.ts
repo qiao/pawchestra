@@ -65,6 +65,13 @@ export interface AnimalPose {
    * pedal into its notch (4.6). It is `null` or absent for each player that is not a harp player.
    */
   readonly pedals?: Float32Array | null;
+  /**
+   * The place of each switched piece of the small percussion player, in the order of
+   * `SWITCHED_PIECES` (`models/instruments/percussion.ts`): 1 in its paw, and 0 on the trap table
+   * (4.6, 5.3). The scene shows the copy of each piece at its place. It is `null` or absent for
+   * each other player.
+   */
+  readonly held?: Float32Array | null;
 }
 
 /** The poses of the scene for one frame (design 5.1). */
