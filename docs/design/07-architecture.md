@@ -35,6 +35,7 @@ first download                                lazy, after the first frame
 | `audio/` | The `Player`, the Worker, and the worklet processor. | no (the block scheduler is pure) | lazy |
 | `app/`, `ui/` | Load flow, transport, seat list, URL hash, settings. | no | first download |
 | `gallery/` | The development pages `gallery.html` and `views.html`. | no | own entry |
+| `test-page/` | The development page `test.html`, at `/test`. | no | own build pass |
 | `tools/` | The build scripts, the tools of a studio body (4.4), the probes, and the image tools (`docs/agents/commands.md`). | no | build only |
 
 ### Pure modules
@@ -107,10 +108,62 @@ head. The bear sheet has a soft light with no cast shadow, so its page has a lig
 (`ViewSheet.light`, `ViewSheet.shadows`). The key `matte` shows the silhouette of the body, which
 `pnpm sheet-check` compares with the matte of the sheet in `tools/sheet-mattes/`.
 
+### Test page
+
+`test.html`, at `/test`, shows one animal of the cast on the stage of the app: the hall, the
+stage floor, the pool light, the beam, and the post effects of `StageScene`. The animal plays
+the test phrase of its role in a loop, with the sound of the app. Thus a person can check the
+real motion and the sound of one role with no MIDI file.
+
+- **Roles.** The list holds each species with each instrument of its section, the standing
+  soloist of each instrument whose soloist stands (4.5), and the recast roles of the instruments
+  of the cast matrix (4.4). `testRoles()` of `test-page/roles.ts` makes it.
+- **Phrase.** `phraseOf()` of `test-page/phrases.ts` gives each instrument a test note list of
+  about 8 s: long notes, fast notes, string crossings or changes of the register, and rests.
+  `phraseFile()` writes it as a MIDI file, and the score rules read it. Thus the sound and the
+  motion come from one `Score`.
+- **Place.** The layout of the app puts the one player at the stage center (4.2). A role with
+  another species or another support takes that place, as a recast role of the role tools does
+  (`soloLayoutSteps()`). The page loads only the bodies of the role, of the seat species of the
+  score, and of the bear, because the layout builds their models.
+- **Time.** The pose comes from `preparePosesSteps()` and `poseAt()` of the app. The first play
+  has the count-in and the lift of the app (5.2). At the end of the phrase, the page seeks to 0.
+  A pause holds the pose at its song time, so the time slider shows each moment of the play.
+  Until the samples of the `Player` are ready, a song clock with no sound runs the loop
+  (`SilentClock`). The button "Start the sound" makes the `Player` in its click, and the
+  `Player` then plays on from the song time of the clock.
+- **Camera.** The orbit controls of Free mode turn the camera (2.5). The presets Front, Side,
+  Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. So each
+  preset target stays less than 1 m from the default target, and each camera stays outside the
+  near limit (`viewCamera()` of `test-page/views.ts`). The frame moves down by half the bar,
+  because the page has no bar.
+- **Link.** The URL hash names the role, such as `/test#rabbit-violin`, so a reload or a shared
+  link shows the same role.
+
+`pnpm build` builds the test page in a second pass (`TEST_PAGE_MODE` of `vite.config.ts`). As a
+fourth entry of one build, it put the modules that it shares with the start page into common
+chunks, and the first download grew. The pass adds its files to `dist/` and keeps the manifest of
+the first pass. `vercel.json` routes `/test` to `test.html`, and the html fallback of Vite serves
+it in dev and in preview.
+
+```typescript
+/** One role of the test page: a species with an instrument and a support. */
+export interface TestRole {
+  /** The name in the URL hash: `<species>-<instrument>`, and `-standing` for a soloist. */
+  readonly id: string;
+  readonly group: 'section' | 'soloist' | 'recast';
+  readonly species: SpeciesId;
+  /** The species that the score rules cast in the seat. The layout builds its model first. */
+  readonly seatSpecies: SpeciesId;
+  readonly instrument: PlayedInstrument;
+  readonly support: Support;
+}
+```
+
 ### Development pages on the site
 
-The site holds `gallery.html` and `views.html`, because the screenshot script and the review
-checks open them on the built site. No page links them, and each one has
+The site holds `gallery.html`, `views.html`, and `test.html`, because the screenshot script and
+the review checks open the first two on the built site, and a person opens the test page. No page links them, and each one has
 `<meta name="robots" content="noindex" />`, so that search engines leave them out.
 
 ## 7.2 First download
