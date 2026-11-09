@@ -664,7 +664,9 @@ the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rig
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
 rig"). The Tripo P2 rabbit of `assets/models/rabbit/tripo-p2/` is a trial of this route that the
-app does not use: the app keeps the A-pose rabbit. An arm that the mesh joins to the trunk needs a
+app does not use. A hand rig of the same mesh with no arm cut and no limb stretch
+(`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main` only
+after an approval of its look in the app. An arm that the mesh joins to the trunk needs a
 cut, so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
