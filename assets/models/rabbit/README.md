@@ -57,6 +57,7 @@ The candidate hand rig:
 | `tripo-hand/rabbit.blend` | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `tripo-hand/rabbit.rig.glb` | Export of `tripo-hand/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend --out assets/models/rabbit/tripo-hand/rabbit.rig.glb` |
 | `tripo-hand/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
+| `tripo-hand/rabbit-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
 
 ## rabbit-apose.glb
 
@@ -221,12 +222,12 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,521,205 bytes |
-| SHA-256 | `a956b2adbe722cd789b60c16013af91231c3e13090f54d45d26474812dcbe168` |
+| Size | 1,482,350 bytes |
+| SHA-256 | `363af5ba171d603e43d268a2e47b25db54b852f4211f9a43b869c721f75e8e0b` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`: 2,853 vertices and 3,047 faces (2,559 quads and 488 triangles, 5,606 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The eye sockets are filled ("Eyes" below) |
+| Mesh | One object `rabbit`: 2,853 vertices and 3,047 faces (2,559 quads and 488 triangles, 5,606 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose). The eye sockets are filled ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`). The 34 faces of the whisker grey have the face attribute `plain` ("Color map" below) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
 | Eyes | `eye_L` and `eye_R` on the filled eye sockets, with the size 1.2 H (0.2128 units) ("Eyes" below) |
@@ -375,3 +376,32 @@ Blender fill each socket with fur and give a larger pea eye:
 |---|---|---|---|
 | Black oval (width by height) | 0.13 by 0.18 | 0.156 by 0.216 | 0.13 by 0.18 |
 | Light eye area (the socket hole) | 0.178 by 0.173 | None (fur fill) | None |
+
+**Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
+colors (design 4.5). The mesh keeps the UV map of the FBX. The edge ring cuts of the arms and the
+knees interpolate it, and the seams of their faces show the same color steps as the FBX. The eye
+edits left two faults, which these point edits in the live Blender fix:
+
+1. The 12 Grid Fill quads of each eye had mixed UVs of the socket rim: 8 were flipped, and 4 were
+   3 to 6 times squeezed.
+2. The socket groove faces sampled the dark lining that the map paints in each socket (luma 53 to
+   150, against about 210 for the fur), a brown ring around each pea eye.
+3. Each fur face nearer than 0.0215 units to the middle of the fill of its eye (36 faces on each
+   side), and face 2101 under the left eye, take the planar projection of their corners on the
+   plane of the eye, at the texel density of the faces around them, into one clean fur area of
+   the head at UV (0.9053, 0.2549). No other UV changes.
+4. The faces of the whisker grey get the face attribute `plain`, so that the whiskers keep their
+   color. The gloss nose keeps its color too.
+
+| Item | Value |
+|---|---|
+| Source | `tripo_rgb_c4acb3c5-787a-40aa-b5ec-b0a42565a62d.jpg` in the `.fbm` folder of the Tripo export `tripo_convert_ba507965-bf17-4167-84e0-276667bc52f2` (FBX identical to `tripo-p2/rabbit.fbx`): 4096 × 4096, 2,738,253 bytes, SHA-256 `2ff05842ef4b57bae3a98a2f63c4675766f0e5ebdd057a696c4b090fa55c9447` |
+| `rabbit-color.webp` | Lanczos scale to 2048 × 2048, WebP quality 60 (Pillow, method 6): 121,414 bytes, SHA-256 `94e60d2ac1cb2b3d28f4316fdba0113f1aabe1d1f151247006471e86f815ccb1` |
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+
+A copy of 1024 pixels blurs the fur strands in a close head view at a device pixel ratio of 2,
+and 2048 shows them. The qualities 60 and 75 look the same there. The map holds no baked key
+light: the luma of the cream fur faces is 193 to 220 (5th to 95th percentile, median 206, the
+face color 206.5), with the same mean on the head, the trunk, the arms, and the legs. The darkest
+faces are a painted mouth line and a little occlusion at the crotch and the ear roots.
