@@ -913,6 +913,12 @@ export const TAMBOURINE_HOLD = {
   tableLean: 0.15,
   /** The direction to which the right elbow points at the held tambourine. */
   poleR: [1.5, -0.5, 0.3],
+  /**
+   * The move of the right wrist forward in the middle of its move between the play place and the
+   * trap table, in meters: the beater passes in front of the belly. On a straight line, the beater
+   * went 4 cm into the belly.
+   */
+  beaterArc: 0.05,
 } as const;
 
 /**

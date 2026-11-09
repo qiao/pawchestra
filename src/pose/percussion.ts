@@ -1330,7 +1330,9 @@ function poseHand(
       localFrom.invert().multiply(turn);
       forearmFrame(arm, shoulder.position, grip, tablePole, localTo);
       localTo.invert().multiply(strikeHand);
+      // The wrist goes on an arc in front of the belly (`TAMBOURINE_HOLD.beaterArc`).
       wrist.lerp(grip, swap.table);
+      wrist.z -= TAMBOURINE_HOLD.beaterArc * Math.sin(Math.PI * swap.table);
       forearmFrame(arm, shoulder.position, wrist, poleAt(swap.table, playPole), turn);
       turn.multiply(mixOnForearm(localFrom, localTo, swap.table));
     }
