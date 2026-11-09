@@ -898,8 +898,8 @@ interface Gltf {
        */
       readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
       /**
-       * The eyes of the mesh of a hand rig with no eye objects: the middle of the eye faces of
-       * each side (`own_eyes_of()` of `tools/blender/export_rig.py`). The body then has no pea
+       * The eyes of the mesh of a hand rig with no eye objects: the middle of the sphere that fits
+       * the eye faces of each side (`own_eyes_of()` of `tools/blender/export_rig.py`). The body then has no pea
        * eyes. A file with pea eyes has none.
        */
       readonly ownEyes?: Readonly<Partial<Record<Side, Pick<EyeExtras, 'middle'>>>>;
@@ -1160,7 +1160,8 @@ export function eyesOf(glb: Glb): Record<Side, FileEye> | null {
 
 /**
  * Gives the eyes of the mesh of a hand rig with no pea eyes from the extras of its GLB file (design
- * 4.4, "Hand rig"): the middle of the eye faces of each side, where the eye bone lies.
+ * 4.4, "Hand rig"): the middle of the sphere that fits the eye faces of each side, where the
+ * eye bone lies.
  *
  * @param glb The file.
  * @returns The middle of each eye, or `null` for a file with no eyes of the mesh.
