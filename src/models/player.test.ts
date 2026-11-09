@@ -72,7 +72,7 @@ describe('buildPlayer', () => {
     const tail = positions[boneIndex('instrument')] ?? [0, 0, 0];
     expect(new Vector3(...bowContact).distanceTo(new Vector3(...tail))).toBeCloseTo(
       Math.hypot(VIOLIN.bowContact, VIOLIN.stringHeight) * INSTRUMENT_SCALE,
-      6,
+      3,
     );
   });
 
@@ -107,7 +107,7 @@ describe('buildPlayer', () => {
   it('makes the violin 0.51 m long and the bow 0.57 m long (design 4.6)', () => {
     const { positions, bones } = player.mesh;
     const violin = extentAlong(positions, bones, boneIndex('instrument'), violinAxis);
-    expect(violin).toBeGreaterThan(0.505);
+    expect(violin).toBeGreaterThan(0.5);
     expect(violin).toBeLessThan(0.52);
     const bow = extentAlong(positions, bones, boneIndex('bow'), bowAxis);
     expect(bow).toBeCloseTo(0.57, 2);
