@@ -415,6 +415,19 @@ export interface StudioEyes {
 }
 
 /**
+ * The color map of a studio body (design 4.5): an image of the fur, and the texture point of each
+ * corner of the fur triangles. The pure core holds only the path and the points. The scene loads
+ * the image after the first frame (`scene/body-texture.ts`), and the body shows the colors of its
+ * faces until then.
+ */
+export interface StudioTexture {
+  /** The web copy of the color map, relative to the repository. */
+  readonly file: string;
+  /** The packed texture points ({@link packStudioUvs}). */
+  readonly uvs: string;
+}
+
+/**
  * A studio body (design 4.4): the mesh of a rig of `pnpm rig-mesh` in its bind pose, with its own
  * skeleton, its skin of up to four bones for each vertex, and its corrective shapes.
  * `pnpm studio-body <animal>` writes the module of an animal. The axes are the axes of the model:
@@ -533,6 +546,11 @@ export interface StudioBody {
   /** The packed mesh ({@link packStudioMesh}). */
   readonly mesh: string;
   /**
+   * The color map of the fur (design 4.5), from the custom property `texture` of a hand rig. A
+   * body with no map shows the colors of its faces.
+   */
+  readonly texture?: StudioTexture;
+  /**
    * The other palettes of the faces of the mesh, by name ({@link packStudioPalette}). A species
    * selects one with its `palette` (`models/species.ts`). A body with one palette has none.
    */
@@ -570,6 +588,24 @@ export const CORRECTIVE_STEP = 1e-4;
 
 /** The number of steps of a packed color channel from 0 to 1. */
 export const COLOR_STEPS = 65535;
+
+/**
+ * The number of steps of a packed texture coordinate from 0 to 1: a quarter texel of a map of
+ * 2048 pixels.
+ */
+export const UV_STEPS = 8192;
+
+/**
+ * The texture coordinate of a corner with no texture, such as a corner of the gloss nose or of a
+ * whisker ({@link unpackStudioUvs}).
+ */
+export const NO_UV = -1;
+
+/** The texture point of a corner: u from the left edge, v from the top edge, each from 0 to 1. */
+export type StudioUv = readonly [u: number, v: number];
+
+/** The texture points of the three corners of a triangle, or `null` for no texture. */
+export type StudioTriangleUvs = readonly [StudioUv, StudioUv, StudioUv] | null;
 
 /** One vertex of a studio mesh for {@link packStudioMesh}. */
 export interface StudioVertex {
@@ -1013,4 +1049,114 @@ export function unpackStudioMesh(packed: string, palette?: string): StudioMesh {
     }
   }
   return { positions, joints, weights, corners, colors, finishes, correctives };
+}
+
+/**
+ * Packs the texture points of the triangles of a studio mesh as base64 text, in the order of the
+ * triangles of {@link packStudioMesh}. The packed bytes, each count and each number of the LEB128
+ * kind unless the list says else:
+ *
+ * 1. The triangle count, then one byte for each triangle: 1 with a texture, 0 with none.
+ * 2. The count of the distinct points, in steps of {@link UV_STEPS}, in the order of their first
+ *    use. Then u of each point, then v of each point: the difference from the point before, as a
+ *    zigzag number in two byte planes ({@link writePlanes}).
+ * 3. The code of the point of each corner of each triangle with a texture ({@link packCorners}).
+ *
+ * @param uvs The texture points of each triangle.
+ * @returns The packed points as base64.
+ * @throws Error if a coordinate is out of the range from 0 to 1.
+ */
+export function packStudioUvs(uvs: readonly StudioTriangleUvs[]): string {
+  const out: number[] = [];
+  const keys = new Map<string, number>();
+  const points: (readonly [number, number])[] = [];
+  const corners: number[] = [];
+  for (const triangle of uvs) {
+    for (const [u, v] of triangle ?? []) {
+      if (!(u >= 0 && u <= 1 && v >= 0 && v <= 1)) {
+        throw new Error(`The texture point (${u}, ${v}) is out of the range from 0 to 1.`);
+      }
+      const steps = [Math.round(u * UV_STEPS), Math.round(v * UV_STEPS)] as const;
+      const key = `${steps[0]} ${steps[1]}`;
+      let index = keys.get(key);
+      if (index === undefined) {
+        index = points.length;
+        keys.set(key, index);
+        points.push(steps);
+      }
+      corners.push(index);
+    }
+  }
+
+  writeVarint(out, uvs.length);
+  out.push(...uvs.map((triangle) => (triangle ? 1 : 0)));
+  writeVarint(out, points.length);
+  for (let axis = 0; axis < 2; axis++) {
+    let last = 0;
+    writePlanes(
+      out,
+      points.map((point) => {
+        const value = point[axis] ?? 0;
+        const delta = zigzag(value - last);
+        last = value;
+        return delta;
+      }),
+    );
+  }
+  for (const code of packCorners(corners)) {
+    writeVarint(out, code);
+  }
+  return toBase64(out);
+}
+
+/**
+ * Reads the texture points of {@link packStudioUvs} back.
+ *
+ * @param packed The packed points as base64.
+ * @returns u and v of each corner of each triangle, in the order of the corners of the packed
+ *   mesh. A corner of a triangle with no texture has {@link NO_UV} in both.
+ * @throws Error if the bytes end early, or if a corner names a point that does not exist.
+ */
+export function unpackStudioUvs(packed: string): Float32Array {
+  const reader = byteReader(packed);
+  const triangleCount = readVarint(reader);
+  const textured = Array.from({ length: triangleCount }, () => readByte(reader) === 1);
+  const pointCount = readVarint(reader);
+  const axes = [0, 1].map(() => {
+    const deltas = readPlanes(reader, pointCount);
+    const values = new Float32Array(pointCount);
+    let last = 0;
+    for (let p = 0; p < pointCount; p++) {
+      last += unzigzag(deltas[p] ?? 0);
+      values[p] = last / UV_STEPS;
+    }
+    return values;
+  });
+
+  const out = new Float32Array(triangleCount * 6).fill(NO_UV);
+  const state: CornerState = { recent: [], high: -1, previous: 0 };
+  for (const [t, has] of textured.entries()) {
+    if (!has) {
+      continue;
+    }
+    for (let k = 0; k < 3; k++) {
+      const code = readVarint(reader);
+      const place = code < RECENT_CORNERS ? code : -1;
+      let point: number;
+      if (place >= 0) {
+        point = state.recent[place] ?? -1;
+      } else if (code === RECENT_CORNERS) {
+        point = state.high + 1;
+      } else {
+        point = state.previous + unzigzag(code - RECENT_CORNERS - 1);
+      }
+      if (point < 0 || point >= pointCount) {
+        throw new Error(`A corner names the texture point ${point}, which does not exist.`);
+      }
+      out[(t * 3 + k) * 2] = axes[0]?.[point] ?? NO_UV;
+      out[(t * 3 + k) * 2 + 1] = axes[1]?.[point] ?? NO_UV;
+      noteCorner(state, point, place);
+    }
+  }
+  return out;
 }
