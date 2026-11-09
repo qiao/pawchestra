@@ -326,7 +326,7 @@ passes.
 - [ ] Layout sight lines (4.5): with no row risers and the lane search, 49 of 453 players stay
       blocked and 18 are hidden from the audience (`pnpm sight-lines`). Most are horns and
       percussion on the left of rows 3 and 4: row 0 keeps the gap of the conductor at about ±30°,
-      and row 1 fills the other gaps of row 0 on the left. The user keeps this layout. A wider row 0
+      and row 1 fills the other gaps of row 0 on the left. The user keeps this layout and accepts this count. A wider row 0
       (branch `worktree-agent-af5dcad398484b454`, report `2026-11-08-seat-lanes-2`) gave 7 blocked,
       but it left a large empty area between the conductor and the strings. Horns on the right
       gave 11 blocked on top of the wider row 0. A higher podium also keeps 0.35 m: 0.5 m gave 35
