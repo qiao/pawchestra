@@ -1107,7 +1107,7 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | Podium          | A box with cut corners and framed panels (`PODIUM_SIZE`, `PODIUM_TRIM`), as in `bear-views.png`.          |
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |
 | Stage           | A slab of side `S` with cut corners (`STAGE_CORNER_CUT`), a raised lip (`STAGE_LIP`), and lacquered planks. |
-| Choir risers    | Up to three arc levels behind the orchestra, a stair at each end of the front, and guard rails (`RISER`). |
+| Choir risers    | Up to three arc levels behind the orchestra, and a stair at each end of the front (`RISER`).             |
 
 **Choir risers.** The risers follow real choral risers and stage stairs (`buildRisers()`):
 
@@ -1123,22 +1123,13 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
   least tread of [IBC 1011.5].
 - The stairs stay in the zone in front of the lowest level (`riserStepsDepth()`), so the layout
   does not change. A narrow choir or a high lift gets shorter treads.
-- The top level has a back rail that turns at each end to its front, as the back rail of a Wenger
-  Signature riser and the side rails of a Wenger Tourmaster riser [Wenger Tourmaster]. Each lower
-  level has an end rail, and each stair has a hand rail on its open side (`RISER.rail`).
-- Real guard rails are 42 in high [Wenger Signature] [StageRight rails], and hand rails 34 in to
-  38 in [IBC 1014.2]. The penguins are about 0.6 of the height of a person, so the rails are about
-  0.6 of these heights, as the low rail behind the choir in `orchestra-latest.png`.
-- The rails have the dark metal of the music stands. The treads keep the wood of the reference
-  images in place of the gray carpet of a Wenger riser.
+- The risers and the stairs have no guard rails and no hand rails.
+- The treads keep the wood of the reference images in place of the gray carpet of a Wenger riser.
 
 Sources: [Wenger Signature](https://www.wengercorp.com/Lit/Wenger_Signature%20Choral%20Riser_TS.pdf),
-[Wenger Tourmaster](https://www.wengercorp.com/Lit/Wenger_Tourmaster%20Risers_TS.pdf),
 [Wenger stairway](https://shop.wengercorp.com/education/fixed-height-stairway.html),
 [StageRight stairs](https://performance.stageright.com/products/accessories/stairs/basic-stairs/),
-[StageRight rails](https://performance.stageright.com/products/accessories/guardrails/),
-[IBC 1011.5](https://codes.iccsafe.org/s/IBC2018/chapter-10-means-of-egress/IBC2018-Ch10-Sec1011.5.2),
-[IBC 1014.2](https://codes.iccsafe.org/s/IBC2018/chapter-10-means-of-egress).
+[IBC 1011.5](https://codes.iccsafe.org/s/IBC2018/chapter-10-means-of-egress/IBC2018-Ch10-Sec1011.5.2).
 
 **Stage origin**
 

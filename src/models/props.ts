@@ -167,24 +167,6 @@ export const RISER = {
    * the nosing of a stair tread (IBC 1011.5.5 asks for 3/4 in to 1 1/4 in), in meters.
    */
   lip: { overhang: 0.025, height: 0.04 },
-  /**
-   * The rails of the risers, of square posts and bars in the dark metal of the music stands. Real
-   * riser back rails and stage guard rails are 42 in (1.07 m) high, and stair hand rails 34 in to
-   * 38 in. The penguins are about 0.6 of the height of a person, so the rails here are about 0.6 of
-   * these heights, as the low rail behind the choir in `orchestra-latest.png`.
-   */
-  rail: {
-    /** The height of the top bar above the tread, in meters. */
-    height: 0.65,
-    /** The height of the hand rail of a stair above its treads, in meters. */
-    hand: 0.55,
-    /** The side of a post, in meters. */
-    post: 0.04,
-    /** The side of a bar, in meters. */
-    bar: 0.03,
-    /** The distance of the middle of a post from the edge of its tread, in meters. */
-    inset: 0.04,
-  },
   /** The widest board of a tread, in meters. A dark line divides a deeper tread into boards. */
   board: 0.4,
   /**
@@ -582,52 +564,6 @@ function addFace(
 }
 
 /**
- * Adds one straight rail part of the risers between two points: a post or a bar with a square
- * section, in the dark metal of the music stands. A post turns one side to the podium center,
- * and a bar keeps two sides level.
- *
- * @param builder The builder.
- * @param from The middle of one end.
- * @param to The middle of the other end.
- * @param size The side of the square section, in meters.
- * @param podium The podium center.
- */
-function addRailPart(builder: MeshBuilder, from: Vec3, to: Vec3, size: number, podium: Vec3): void {
-  const start = new Vector3(...from);
-  const end = new Vector3(...to);
-  const along = end.clone().sub(start).normalize();
-  const across =
-    Math.abs(along.y) > 0.99
-      ? new Vector3(from[0] - podium[0], 0, from[2] - podium[2])
-      : new Vector3(0, 1, 0).cross(along);
-  across.normalize();
-  const up = along.clone().cross(across);
-  const corner = (p: Vector3, s: number, u: number): Vec3 =>
-    toVec3(
-      p
-        .clone()
-        .addScaledVector(across, (s * size) / 2)
-        .addScaledVector(up, (u * size) / 2),
-    );
-  const ring = (p: Vector3) =>
-    [corner(p, 1, 1), corner(p, -1, 1), corner(p, -1, -1), corner(p, 1, -1)] as const;
-  const [a0, b0, c0, d0] = ring(start);
-  const [a1, b1, c1, d1] = ring(end);
-  const inside = toVec3(start.clone().add(end).multiplyScalar(0.5));
-  const color = SCENE_COLORS.stand;
-  for (const face of [
-    [a0, b0, b1, a1],
-    [b0, c0, c1, b1],
-    [c0, d0, d1, c1],
-    [d0, a0, a1, d1],
-    [a0, b0, c0, d0],
-    [a1, b1, c1, d1],
-  ] as const) {
-    addFace(builder, face, inside, color);
-  }
-}
-
-/**
  * Adds one level of the choir risers (design 4.5): the tread with its boards, the nosing lip at
  * its front, the face under the lip, and the two end panels. The face under the lip of a higher
  * level is a riser face of wood from the tread in front of it. The lowest level has a dark skirt
@@ -727,59 +663,6 @@ function treadBands(inner: number, outer: number): [number, number, Rgb][] {
   return bands;
 }
 
-/**
- * Adds a guard rail of the risers on posts: a top bar and a middle bar between each two posts.
- *
- * @param builder The builder.
- * @param posts The foot of each post on its tread, in order along the rail.
- * @param podium The podium center.
- */
-function addGuardRail(builder: MeshBuilder, posts: readonly Vec3[], podium: Vec3): void {
-  const { height, post, bar } = RISER.rail;
-  const lift = (p: Vec3, y: number): Vec3 => [p[0], p[1] + y, p[2]];
-  posts.forEach((foot, i) => {
-    addRailPart(builder, foot, lift(foot, height + bar / 2), post, podium);
-    const next = posts[i + 1];
-    if (next) {
-      addRailPart(builder, lift(foot, height), lift(next, height), bar, podium);
-      addRailPart(builder, lift(foot, height / 2), lift(next, height / 2), bar, podium);
-    }
-  });
-}
-
-/**
- * Adds the guard rails of the risers (design 4.5): on the top level, a rail along the back edge
- * with a post at each joint of its arc faces, as the back rail of a choral riser, that turns at
- * each end to the front of the level. Each lower level has an end rail at each end, from its
- * front to the nosing lip of the next level, as the side rails of a choral riser.
- *
- * @param builder The builder.
- * @param levels The levels, from the lowest level.
- * @param podium The podium center, the center of the arcs.
- */
-function addRiserRails(builder: MeshBuilder, levels: readonly RiserLevel[], podium: Vec3): void {
-  const { inset } = RISER.rail;
-  levels.forEach((level, k) => {
-    const { radius, height, halfAngle } = level;
-    const top = k === levels.length - 1;
-    const front = radius - RISER.depth / 2 + inset;
-    const back = radius + RISER.depth / 2 - inset - (top ? 0 : RISER.lip.overhang);
-    const at = (r: number, side: number): Vec3 =>
-      arcPoint(podium, r, side * (halfAngle - inset / r), height);
-    if (!top) {
-      addGuardRail(builder, [at(front, -1), at(back, -1)], podium);
-      addGuardRail(builder, [at(back, 1), at(front, 1)], podium);
-      return;
-    }
-    const segments = Math.max(1, Math.ceil((2 * halfAngle) / RISER_FACET));
-    const end = halfAngle - inset / back;
-    const arc = Array.from({ length: segments + 1 }, (_, i) =>
-      arcPoint(podium, back, -end + (2 * end * i) / segments, height),
-    );
-    addGuardRail(builder, [at(front, -1), ...arc, at(front, 1)], podium);
-  });
-}
-
 /** The steps of one stair unit of the risers along the arc (design 4.5). */
 interface StairSteps {
   /** The number of steps. The last step is the landing, at the height of the lowest level. */
@@ -851,34 +734,15 @@ function addRiserStairs(builder: MeshBuilder, level: RiserLevel, podium: Vec3): 
         addFace(builder, face(open, wall, d1, d1, 0, top), body, STAGE_COLORS.skirt);
       }
     }
-    // The hand rail on the open side: a post on the first step, a post at each end of the
-    // landing, and a bar on them that follows the nosings, then the landing.
-    const { hand, post, bar, inset } = RISER.rail;
-    const r = open + inset;
-    const turn = (count - 1) * tread;
-    const posts = [
-      at(r, tread / 2, level.height / count),
-      at(r, turn + inset, level.height),
-      at(r, turn + landing - inset, level.height),
-    ];
-    let previous: Vec3 | null = null;
-    for (const [x, y, z] of posts) {
-      addRailPart(builder, [x, y, z], [x, y + hand + bar / 2, z], post, podium);
-      if (previous) {
-        addRailPart(builder, previous, [x, y + hand, z], bar, podium);
-      }
-      previous = [x, y + hand, z];
-    }
   }
 }
 
 /**
  * Builds the choir risers: one arc block for each level, from the stage top to the height of the
- * level, a stair unit at each end of the front, and the guard rails (design 4.5). Each tread has
- * a lighter nosing lip at its front and boards of a wood a little lighter than the stage top. A
- * riser face of a darker wood joins two levels, and the faces down to the stage top have the
- * color of the stage sides, as the wooden risers of `orchestra-latest.png` and
- * `orchestra-side.png`.
+ * level, and a stair unit at each end of the front (design 4.5). Each tread has a lighter nosing
+ * lip at its front and boards of a wood a little lighter than the stage top. A riser face of a
+ * darker wood joins two levels, and the faces down to the stage top have the color of the stage
+ * sides, as the wooden risers of `orchestra-latest.png` and `orchestra-side.png`.
  *
  * @param levels The levels of the layout, from the lowest level.
  * @param podium The podium center, the center of the arcs.
@@ -894,7 +758,6 @@ export function buildRisers(levels: readonly RiserLevel[], podium: Vec3): MeshDa
   if (lowest) {
     addRiserStairs(builder, lowest, podium);
   }
-  addRiserRails(builder, levels, podium);
   return builder.build();
 }
 
