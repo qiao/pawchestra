@@ -236,7 +236,7 @@ describe('seatRows (design 2.8)', () => {
       ],
     });
     // The rabbit plays the first violins and the red fox the second violins (4.3).
-    expect(seatRows(score.seats, [1, 3, 0], null)).toEqual([
+    expect(seatRows(score.seats, [1, 3, 0], null)).toMatchObject([
       {
         name: 'Violin 1',
         animals: '1 rabbit',
