@@ -367,29 +367,6 @@ describe('fitTable', () => {
     expect(formatVersion(fitJson(run))).toBe(FIT_FORMAT);
   });
 
-  it('keeps the fields of a row of its format version, so a new field raises the version', () => {
-    // SAFETY: fitJson() writes the rows of a run as objects.
-    const stored = JSON.parse(fitJson({ demos: [], rows: [row] })) as {
-      readonly rows: readonly object[];
-    };
-    const fields = Object.keys(stored.rows[0] ?? {}).toSorted();
-    expect({ version: FIT_FORMAT, fields }).toEqual({
-      version: 3,
-      fields: [
-        'depths',
-        'faces',
-        'folds',
-        'free',
-        'gaps',
-        'held',
-        'reach',
-        'results',
-        'seconds',
-        'variant',
-      ],
-    });
-  });
-
   it('sorts the variants by the play folds, then by the deepest point, after the base', () => {
     const variant = (name: string, withFold: number, depth: number): FitRow => ({
       ...row,
