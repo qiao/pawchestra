@@ -104,13 +104,19 @@ def rig_property(rig, name):
 
 
 def hint(rig, name):
-    """Gives the roll hint of a bone in Blender axes: up, the palm of its side, or forward."""
+    """Gives the roll hint of a bone in Blender axes: up, the palm of its side, or forward. The
+    property `palm` is the palm of the left paw, which the right paw mirrors, or a palm for each
+    side ({'L': ..., 'R': ...}) when a hand rig turns one paw of its source."""
     if name in UP_BONES:
         return np.array([0.0, 0, 1])
     stem = name[:-2].split('_seg')[0] if name[-2:] in ('_L', '_R') else name
     if stem in PALM_STEMS:
-        palm = np.array(rig_property(rig, 'palm'), float)
-        return palm * [-1, 1, 1] if name.endswith('_R') else palm
+        palm = rig_property(rig, 'palm')
+        side = 'R' if name.endswith('_R') else 'L'
+        if isinstance(palm, dict):
+            return np.array(palm[side], float)
+        palm = np.array(palm, float)
+        return palm * [-1, 1, 1] if side == 'R' else palm
     return np.array([0.0, -1, 0])
 
 
