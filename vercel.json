@@ -44,6 +44,7 @@
       "dest": "/$1.md"
     },
     { "src": "/(about|contact|privacy)", "dest": "/$1.html" },
+    { "src": "/test", "dest": "/test.html" },
     { "handle": "filesystem" },
     {
       "src": "/.*",
