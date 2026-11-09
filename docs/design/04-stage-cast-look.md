@@ -445,6 +445,12 @@ round that keeps the binds stays as strict as before. A rebind must keep the pos
 `pnpm arm-check --world --base` compares the posed arm joints and palms of the two trees at the
 samples of the gate.
 
+A value over its limit fails when the base is within the limit. A value that is worse than the
+base by its margin fails only past `NEAR_LIMIT` of its limit. Inside that share, it is `WORSE`
+with exit code 0, because such values stopped rounds with no fault in the crops. The move twist
+is the value of one worst sample, so it takes only its limit. A role with no entry in
+`ACCEPTED_GRIPS` has an `OPEN` grip until an entry comes from accepted crops.
+
 ```typescript
 /** The bind frames of the grip of one arm (`tools/arm-check.ts`). */
 interface GripFrames {
