@@ -222,8 +222,8 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,514,938 bytes |
-| SHA-256 | `b18f8d95e2d32754ed9153d87616132c66b4625913fdcbf38b18bdd7273fcf33` |
+| Size | 1,594,778 bytes |
+| SHA-256 | `d0732db50a136473b970cda3190583d3356b2615f7f6378778fd1cadec298979` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
@@ -279,8 +279,8 @@ The weights, in the order of the work, in the rest pose:
    the gloss nose take {`head` 1}.
 
 The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
-weights. The scripts of the live session are not in the repo. A `bind*` or `arm_raise_*` key is
-not in the file.
+weights. The scripts of the live session are not in the repo. The key `bind_belly` ("Belly"
+below) is the only key `bind*`. The file has no key `arm_raise_*`.
 
 **Arm twist.** The violin hold turns the left paw about 220 degrees from the paw of the source,
 which faces down in the T-pose. The rest of the hold needs about -80 degrees, and the lift
@@ -355,6 +355,28 @@ seat a little behind the knee. Two changes give this seat:
 | Thigh (hip joint to knee joint) over the seat | 0 % | 64 % | |
 | Front edge of the seat behind the knee joint | 0.25 m | 0.08 m | |
 | Back of the pelvis to the chair back | 0.05 m | 0.02 m | |
+
+**Belly.** The thighs of the bind give the lower belly rings (rest z 0.39 and 0.36) a thigh
+share of about 0.3 at the middle. These rings move about 3 cm back and 2 cm up in the bind, and
+the ring at z 0.42 stays forward. This made a ledge above the thighs: its faces pointed down by
+up to 32 degrees and showed a dark band from the front. Lower thigh shares only move the ledge
+down, because the belly then hangs over the thigh tops. The key `bind_belly` relaxes the posed
+bind of 25 chosen vertices, with this call in the live Blender:
+
+```python
+import bind_edit as be  # tools/blender/
+# S: the vertices of the rings at rest z 0.42, 0.39, and 0.36 (each +-0.008), with
+# atan2(|x|, -y) at most 60 degrees and a distance from the z axis below 0.2.
+# Each round: P[i] += 0.5 * ((mid - P[i]) . n[i]) * n[i] for each i in S at the same time.
+# mid: the middle of the mean of the edge neighbors above and the mean of those below (rest z
+# more than 0.01 apart). n: the vertex normal of the bind before the key.
+be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
+```
+
+The largest move is 0.0066 units, and the mean is 0.0032. The move goes along the normal only,
+so the girth of each ring stays. In the front view, no face of the belly points down by more
+than 10 degrees, and the side of the belly loses its dark band
+(`reports/2026-11-09-tripo-rabbit-belly/`, which git ignores).
 
 **Eyes.** Each eye of the Tripo mesh is a loose ball of 0.265 H in a round socket hole of
 0.178 H by 0.173 H. The color map paints a full eye on each ball: a black pupil, an amber iris, a
