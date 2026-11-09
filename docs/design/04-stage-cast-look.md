@@ -572,7 +572,7 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `raise` | The custom property of the mesh that has the name of each key `arm_raise_*`. |
 | `hinges` | The custom property `hinges` of the armature. |
 | `eyes` | The eye objects `eye_L` and `eye_R` in the bind: the middle, the unit direction, and the size of each eye (`eyes_of()`). |
-| `ownEyes` | With no eye objects: the middle of the sphere that fits the faces with the boolean face attribute `eye` on each side, in the bind (`own_eyes_of()`). Each eye vertex follows only `head`. |
+| `ownEyes` | With no eye objects: the middle of the sphere that fits the faces with the boolean face attribute `eye` and no `plain` on each side, in the bind (`own_eyes_of()`), and the triangles of all eye faces of the side (`faces`). Each eye vertex follows only `head`. |
 | `lids` | With eye faces and the custom property `lids` of the armature: the turn from open to closed, the hinge axis of each side turned by the head into the bind, and the triangles with the boolean face attribute `lid` of each side (`lids_of()`). Each lid vertex follows only `head`, and lies farther from the middle of its eye than each vertex of the ball. |
 | `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
@@ -618,7 +618,18 @@ The layout of the `.blend`:
   eyeballs of a Tripo mesh, keeps them in place of the eye objects: their faces have the face
   attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
   weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
-  the head. The export refuses eye objects and eye faces in one file.
+  the head. The export refuses eye objects and eye faces in one file. `pnpm studio-body` gives
+  the eye faces the `lacquer` finish of the bead eyes (`EYEBALL_FINISH`), and lists them as
+  `StudioBody.eyeballs`. A corner of such a face takes the mean normal of the eye faces at its
+  vertex with no crease angle (`studioNormals()`), so each ball shades smooth. Reason: the matte
+  fur gives a painted eye no gloss, and a flat lacquer face shows its facets.
+- **Catchlight.** The gloss alone gives no clear light from the front or from the app camera,
+  so each eyeball carries a catchlight: a small lens of eye faces with `plain` and the color of
+  the catchlight of a bead eye. It has the diameter `EYE_LIGHT` and the place of the catchlight
+  of a bead eye: up and to the left of the visible middle of the eye in the front view. The lens
+  stands out of the ball as far as the catchlight of a bent bead eye, so its normals spread and
+  its middle catches the lamps. It stays inside the lid, so a blink covers it. The sphere fit of
+  the eye middle skips the `plain` faces, so the eye bone does not move.
 - **Lids.** Such a mesh can have a lid on each eye: a part of a sphere around the middle of the
   ball, a little larger than the ball, with the face attribute `lid`, the fur slot, the face
   colors of the fur next to the eye, and UVs of a clean fur patch of the color map. The file
@@ -664,8 +675,10 @@ interface HandRigArmature {
 
 /** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the studio. */
 interface OwnEyeExtras {
-  /** The middle of the sphere that fits the eye faces of the side: the head of its eye bone. */
+  /** The middle of the sphere that fits the eyeball faces: the head of the eye bone of the side. */
   readonly middle: Vec3;
+  /** The eye faces of the side, catchlight included, as triangles of the primitive `fur`. */
+  readonly faces: readonly number[];
 }
 
 /** The extras `lids`, in the bind, in the axes of the studio (`StudioLids` of the module). */
@@ -993,7 +1006,7 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
 | `varnish` | The varnished wood of the bowed strings, the harp, the bassoon, the drums, and the xylophone. | A soft gloss.                                                         |
-| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, the eyes. | A sharp gloss.                                                        |
+| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, the bead eyes, and the eyeballs of a hand rig. | A sharp gloss.                                                        |
 | `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
