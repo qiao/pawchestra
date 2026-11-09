@@ -135,7 +135,7 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | `pnpm frame-compare <ref\|patch>...` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. |
 | `tools/check-commits.sh <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
 | `tools/measure-lock.sh run --owner <name> -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
-| `tools/merge-branch.sh <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs the arm gate, `pnpm build`, and `pnpm size`. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
+| `tools/merge-branch.sh <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs `pnpm build` and `pnpm size`. `--arm-check` also runs the arm gate. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
 | `tools/base-tree.sh <ref>` | Extracts a commit into a temporary folder with a link to `node_modules`, for a base run of a tool with no `--base`. |
 | `tools/break-test.sh '<perl expr>' <file> <test files>...` | Applies one temporary break to a tracked file, and prints each test that fails. |
 
