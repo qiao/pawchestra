@@ -48,7 +48,7 @@ describe('buildBiped for each species', () => {
 
       it.runIf(studio)('keeps the faces and the colors of its GLB file (design 4.4)', () => {
         const faces = studio?.mesh.colors ?? new Float32Array();
-        // The pea eyes follow the faces of the file (design 4.5).
+        // The bead eyes follow the faces of the file (design 4.5).
         expect(mesh.positions.length / 9).toBeGreaterThan(faces.length / 3);
         for (let t = 0; t < faces.length / 3; t++) {
           for (let k = 0; k < 3; k++) {

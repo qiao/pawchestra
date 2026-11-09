@@ -66,7 +66,7 @@ describe('buildStudioBody (design 4.4)', () => {
   const mesh = builder.build();
   const rig = studioRigOf('studio-bear', true);
 
-  it('adds one triangle for each face of the studio with its color, then the pea eyes', () => {
+  it('adds one triangle for each face of the studio with its color, then the bead eyes', () => {
     const faces = rig.mesh.corners.length / 3;
     expect(mesh.colors[0]).toBeCloseTo(rig.mesh.colors[0] ?? -1, 6);
     expect(mesh.finishes.length).toBeGreaterThan(faces);
@@ -99,7 +99,7 @@ describe('buildStudioBody (design 4.4)', () => {
   });
 });
 
-describe('the pea eyes of each studio body (design 4.5, 5.1)', () => {
+describe('the bead eyes of each studio body (design 4.5, 5.1)', () => {
   const names: readonly StudioBodyName[] = [
     'studio-bear',
     'studio-fox',
@@ -114,7 +114,7 @@ describe('the pea eyes of each studio body (design 4.5, 5.1)', () => {
     const first = rig.mesh.corners.length;
     const h = rig.body.eyes.headHeight;
 
-    it(`${name}: puts each pea eye at its eye bone, with the size of the head that shows`, () => {
+    it(`${name}: puts each bead eye at its eye bone, with the size of the head that shows`, () => {
       for (const side of ['L', 'R'] as const) {
         const bone = boneIndex(`eye${side}`);
         const eye = new Vector3(...rig.body.heads[`eye_${side}`]);
@@ -132,7 +132,7 @@ describe('the pea eyes of each studio body (design 4.5, 5.1)', () => {
       }
     });
 
-    it(`${name}: closes each pea eye on y around its eye bone in a blink`, () => {
+    it(`${name}: closes each bead eye on y around its eye bone in a blink`, () => {
       let count = 0;
       for (let c = first; c < render.data.bones.length; c++) {
         const side = render.data.bones[c] === boneIndex('eyeL') ? 'L' : 'R';

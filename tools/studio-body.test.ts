@@ -62,7 +62,7 @@ describe('pnpm studio-body with a tail of two bones (design 4.4)', async () => {
   const tip = STUDIO_BONES.indexOf('tail_tip');
   const root = STUDIO_BONES.indexOf('tail');
 
-  it('turns both pea eyes of the uneven mesh out from one point (design 4.5)', () => {
+  it('turns both bead eyes of the uneven mesh out from one point (design 4.5)', () => {
     const h = body.eyes.headHeight;
     const line = (side: 'L' | 'R') => {
       const facing = new Vector3(...body.eyes.directions[side]);
