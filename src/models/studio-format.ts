@@ -1051,59 +1051,168 @@ export function unpackStudioMesh(packed: string, palette?: string): StudioMesh {
   return { positions, joints, weights, corners, colors, finishes, correctives };
 }
 
+/** The places and the corners of a packed studio mesh, which predict its texture points. */
+type UvFrame = Pick<StudioMesh, 'positions' | 'corners'>;
+
+/** A texture point in whole steps of {@link UV_STEPS}. */
+type UvSteps = readonly [u: number, v: number];
+
+/**
+ * Predicts the texture point of a new corner of a triangle from the points of two other corners
+ * of the triangle and the places of the three vertices, as the parallelogram rule of a mesh codec
+ * does. The map from the surface to the image keeps the angles in each triangle, so the new
+ * corner lies at the same place against the known edge in the image as on the surface. The
+ * texture points have v from the top edge, so the corners of a triangle in its order go clockwise
+ * in the image.
+ *
+ * @param frame The places and the corners of the mesh.
+ * @param t The triangle.
+ * @param known The corners with points, as 0, 1, or 2 in the triangle, and their points. With
+ *   one, the prediction is its point.
+ * @param k The new corner, as 0, 1, or 2 in the triangle.
+ * @param last The last new point, the prediction for a triangle with no known corner.
+ * @returns The predicted point, in steps, in the range of the image.
+ */
+function predictUv(
+  frame: UvFrame,
+  t: number,
+  known: readonly (readonly [corner: number, point: UvSteps])[],
+  k: number,
+  last: UvSteps,
+): UvSteps {
+  const [first, second] = known;
+  if (!first) {
+    return last;
+  }
+  if (!second) {
+    return first[1];
+  }
+  const place = (corner: number): Vec3 => {
+    const v = frame.corners[t * 3 + corner] ?? 0;
+    return [
+      frame.positions[v * 3] ?? 0,
+      frame.positions[v * 3 + 1] ?? 0,
+      frame.positions[v * 3 + 2] ?? 0,
+    ];
+  };
+  const [a, b, c] = [place(first[0]), place(second[0]), place(k)];
+  const e = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const d = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+  const ee = (e[0] ?? 0) ** 2 + (e[1] ?? 0) ** 2 + (e[2] ?? 0) ** 2;
+  if (ee === 0) {
+    return first[1];
+  }
+  const s =
+    ((d[0] ?? 0) * (e[0] ?? 0) + (d[1] ?? 0) * (e[1] ?? 0) + (d[2] ?? 0) * (e[2] ?? 0)) / ee;
+  const w = [0, 1, 2].map((i) => (d[i] ?? 0) - s * (e[i] ?? 0));
+  const h = Math.sqrt(((w[0] ?? 0) ** 2 + (w[1] ?? 0) ** 2 + (w[2] ?? 0) ** 2) / ee);
+  const [ua, va] = first[1];
+  const [fu, fv] = [second[1][0] - ua, second[1][1] - va];
+  // The second known corner follows the first in the order of the triangle, or comes before it.
+  const side = (second[0] - first[0] + 3) % 3 === 1 ? 1 : -1;
+  const clamp = (x: number): number => Math.min(UV_STEPS, Math.max(0, Math.round(x)));
+  return [clamp(ua + s * fu + side * h * fv), clamp(va + s * fv - side * h * fu)];
+}
+
+/**
+ * The state of the code of the texture points, the same in the pack and the read: the points of
+ * each vertex, the most recent first, and the last new point.
+ */
+interface UvState {
+  /** The points of each vertex, the most recent first. A vertex on a UV seam has more than one. */
+  readonly byVertex: Map<number, UvSteps[]>;
+  /** The last new point. */
+  last: UvSteps;
+}
+
+/**
+ * Records the point of a corner in the state of the code.
+ *
+ * @param state The state. The call changes it.
+ * @param vertex The vertex of the corner.
+ * @param place The place of the point in the points of the vertex, or -1 for a new point.
+ * @param point The point.
+ */
+function noteUv(state: UvState, vertex: number, place: number, point: UvSteps): void {
+  let list = state.byVertex.get(vertex);
+  if (!list) {
+    list = [];
+    state.byVertex.set(vertex, list);
+  }
+  if (place >= 0) {
+    list.splice(place, 1);
+  } else {
+    state.last = point;
+  }
+  list.unshift(point);
+}
+
 /**
  * Packs the texture points of the triangles of a studio mesh as base64 text, in the order of the
- * triangles of {@link packStudioMesh}. The packed bytes, each count and each number of the LEB128
- * kind unless the list says else:
+ * triangles of {@link packStudioMesh}. A corner takes a point of its vertex again, or a new
+ * point, which {@link predictUv} predicts from the corners of the triangle with points. The
+ * packed bytes, each count and each number of the LEB128 kind unless the list says else:
  *
  * 1. The triangle count, then one byte for each triangle: 1 with a texture, 0 with none.
- * 2. The count of the distinct points, in steps of {@link UV_STEPS}, in the order of their first
- *    use. Then u of each point, then v of each point: the difference from the point before, as a
- *    zigzag number in two byte planes ({@link writePlanes}).
- * 3. The code of the point of each corner of each triangle with a texture ({@link packCorners}).
+ * 2. The count of the new points. Then u, then v, of each new point: the difference from its
+ *    prediction, in steps of {@link UV_STEPS}, as a zigzag number in two byte planes
+ *    ({@link writePlanes}).
+ * 3. The code of each corner of each triangle with a texture: the place of its point in the
+ *    points of its vertex, the most recent first, or the count of these points for a new point.
  *
  * @param uvs The texture points of each triangle.
+ * @param frame The places and the corners of the packed mesh ({@link unpackStudioMesh}).
  * @returns The packed points as base64.
- * @throws Error if a coordinate is out of the range from 0 to 1.
+ * @throws Error if a coordinate is out of the range from 0 to 1, or the triangle counts differ.
  */
-export function packStudioUvs(uvs: readonly StudioTriangleUvs[]): string {
-  const out: number[] = [];
-  const keys = new Map<string, number>();
-  const points: (readonly [number, number])[] = [];
-  const corners: number[] = [];
-  for (const triangle of uvs) {
-    for (const [u, v] of triangle ?? []) {
+export function packStudioUvs(uvs: readonly StudioTriangleUvs[], frame: UvFrame): string {
+  if (uvs.length * 3 !== frame.corners.length) {
+    throw new Error(`The mesh has ${frame.corners.length / 3} triangles, and ${uvs.length} UVs.`);
+  }
+  const state: UvState = { byVertex: new Map(), last: [0, 0] };
+  const codes: number[] = [];
+  const misses: [number[], number[]] = [[], []];
+  for (const [t, triangle] of uvs.entries()) {
+    if (!triangle) {
+      continue;
+    }
+    const points = triangle.map(([u, v]): UvSteps => {
       if (!(u >= 0 && u <= 1 && v >= 0 && v <= 1)) {
         throw new Error(`The texture point (${u}, ${v}) is out of the range from 0 to 1.`);
       }
-      const steps = [Math.round(u * UV_STEPS), Math.round(v * UV_STEPS)] as const;
-      const key = `${steps[0]} ${steps[1]}`;
-      let index = keys.get(key);
-      if (index === undefined) {
-        index = points.length;
-        keys.set(key, index);
-        points.push(steps);
+      return [Math.round(u * UV_STEPS), Math.round(v * UV_STEPS)];
+    });
+    const places = points.map((point, k) => {
+      const list = state.byVertex.get(frame.corners[t * 3 + k] ?? 0) ?? [];
+      const place = list.findIndex(([u, v]) => u === point[0] && v === point[1]);
+      codes.push(place >= 0 ? place : list.length);
+      return place;
+    });
+    const known: (readonly [number, UvSteps])[] = [];
+    for (const [k, point] of points.entries()) {
+      if ((places[k] ?? -1) >= 0) {
+        known.push([k, point]);
       }
-      corners.push(index);
+    }
+    for (const [k, point] of points.entries()) {
+      const place = places[k] ?? -1;
+      if (place < 0) {
+        const guess = predictUv(frame, t, known, k, state.last);
+        misses[0].push(zigzag(point[0] - guess[0]));
+        misses[1].push(zigzag(point[1] - guess[1]));
+        known.push([k, point]);
+      }
+      noteUv(state, frame.corners[t * 3 + k] ?? 0, place, point);
     }
   }
 
+  const out: number[] = [];
   writeVarint(out, uvs.length);
   out.push(...uvs.map((triangle) => (triangle ? 1 : 0)));
-  writeVarint(out, points.length);
-  for (let axis = 0; axis < 2; axis++) {
-    let last = 0;
-    writePlanes(
-      out,
-      points.map((point) => {
-        const value = point[axis] ?? 0;
-        const delta = zigzag(value - last);
-        last = value;
-        return delta;
-      }),
-    );
-  }
-  for (const code of packCorners(corners)) {
+  writeVarint(out, misses[0].length);
+  writePlanes(out, misses[0]);
+  writePlanes(out, misses[1]);
+  for (const code of codes) {
     writeVarint(out, code);
   }
   return toBase64(out);
@@ -1113,49 +1222,63 @@ export function packStudioUvs(uvs: readonly StudioTriangleUvs[]): string {
  * Reads the texture points of {@link packStudioUvs} back.
  *
  * @param packed The packed points as base64.
+ * @param frame The places and the corners of the packed mesh ({@link unpackStudioMesh}).
  * @returns u and v of each corner of each triangle, in the order of the corners of the packed
  *   mesh. A corner of a triangle with no texture has {@link NO_UV} in both.
- * @throws Error if the bytes end early, or if a corner names a point that does not exist.
+ * @throws Error if the bytes end early, the triangle counts differ, or a corner names a point
+ *   that does not exist.
  */
-export function unpackStudioUvs(packed: string): Float32Array {
+export function unpackStudioUvs(packed: string, frame: UvFrame): Float32Array {
   const reader = byteReader(packed);
   const triangleCount = readVarint(reader);
+  if (triangleCount * 3 !== frame.corners.length) {
+    throw new Error(
+      `The mesh has ${frame.corners.length / 3} triangles, and ${triangleCount} UVs.`,
+    );
+  }
   const textured = Array.from({ length: triangleCount }, () => readByte(reader) === 1);
-  const pointCount = readVarint(reader);
-  const axes = [0, 1].map(() => {
-    const deltas = readPlanes(reader, pointCount);
-    const values = new Float32Array(pointCount);
-    let last = 0;
-    for (let p = 0; p < pointCount; p++) {
-      last += unzigzag(deltas[p] ?? 0);
-      values[p] = last / UV_STEPS;
-    }
-    return values;
-  });
+  const missCount = readVarint(reader);
+  const missU = readPlanes(reader, missCount);
+  const missV = readPlanes(reader, missCount);
 
   const out = new Float32Array(triangleCount * 6).fill(NO_UV);
-  const state: CornerState = { recent: [], high: -1, previous: 0 };
+  const state: UvState = { byVertex: new Map(), last: [0, 0] };
+  let miss = 0;
   for (const [t, has] of textured.entries()) {
     if (!has) {
       continue;
     }
-    for (let k = 0; k < 3; k++) {
+    const lists = [0, 1, 2].map((k) => state.byVertex.get(frame.corners[t * 3 + k] ?? 0) ?? []);
+    const places = lists.map((list) => {
       const code = readVarint(reader);
-      const place = code < RECENT_CORNERS ? code : -1;
-      let point: number;
-      if (place >= 0) {
-        point = state.recent[place] ?? -1;
-      } else if (code === RECENT_CORNERS) {
-        point = state.high + 1;
-      } else {
-        point = state.previous + unzigzag(code - RECENT_CORNERS - 1);
+      if (code > list.length) {
+        throw new Error(
+          `A corner names the texture point ${code} of its vertex, which does not exist.`,
+        );
       }
-      if (point < 0 || point >= pointCount) {
-        throw new Error(`A corner names the texture point ${point}, which does not exist.`);
+      return code < list.length ? code : -1;
+    });
+    const points: (UvSteps | null)[] = places.map((place, k) =>
+      place >= 0 ? (lists[k]?.[place] ?? null) : null,
+    );
+    const known: (readonly [number, UvSteps])[] = [];
+    for (const [k, point] of points.entries()) {
+      if (point) {
+        known.push([k, point]);
       }
-      out[(t * 3 + k) * 2] = axes[0]?.[point] ?? NO_UV;
-      out[(t * 3 + k) * 2 + 1] = axes[1]?.[point] ?? NO_UV;
-      noteCorner(state, point, place);
+    }
+    for (let k = 0; k < 3; k++) {
+      const place = places[k] ?? -1;
+      let point = points[k] ?? null;
+      if (!point) {
+        const guess = predictUv(frame, t, known, k, state.last);
+        point = [guess[0] + unzigzag(missU[miss] ?? 0), guess[1] + unzigzag(missV[miss] ?? 0)];
+        miss += 1;
+        known.push([k, point]);
+      }
+      noteUv(state, frame.corners[t * 3 + k] ?? 0, place, point);
+      out[(t * 3 + k) * 2] = point[0] / UV_STEPS;
+      out[(t * 3 + k) * 2 + 1] = point[1] / UV_STEPS;
     }
   }
   return out;

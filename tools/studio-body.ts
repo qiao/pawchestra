@@ -27,6 +27,7 @@ import {
   packStudioMesh,
   packStudioPalette,
   packStudioUvs,
+  unpackStudioMesh,
 } from '../src/models/studio-format.ts';
 import type {
   Side,
@@ -3153,7 +3154,8 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     if (!uvs.some((face) => face !== null)) {
       throw new Error(`The file names the color map ${texture}, and no face has texture points.`);
     }
-    body = { ...body, texture: { file: texture, uvs: packStudioUvs(uvs) } };
+    const packed = unpackStudioMesh(body.mesh);
+    body = { ...body, texture: { file: texture, uvs: packStudioUvs(uvs, packed) } };
   }
   if (settings.palettes) {
     const bases = baseTriangles(ordered.faces, withoutEyes.faces);

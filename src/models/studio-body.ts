@@ -367,7 +367,7 @@ function bodyTextureOf(body: StudioBody, total: number): BodyTexture | null {
   }
   let corners = bodyUvs.get(body);
   if (!corners) {
-    corners = unpackStudioUvs(body.texture.uvs);
+    corners = unpackStudioUvs(body.texture.uvs, unpackStudioMesh(body.mesh));
     bodyUvs.set(body, corners);
   }
   const uvs = new Float32Array(total * 2).fill(NO_UV);
