@@ -15,6 +15,7 @@ import {
 } from '../models/instruments/percussion.ts';
 import type { TablePlace } from '../models/instruments/percussion.ts';
 import type { PlayTarget } from '../models/instruments/types.ts';
+import type { PawBind } from '../models/studio-rig.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import { Y_AXIS, Z_AXIS } from './axes.ts';
@@ -1041,6 +1042,11 @@ export interface SwitchRig {
   readonly fingerHand: Quat;
   /** The tip of the middle claw of the right paw in the bind pose, from the bind wrist. */
   readonly tip: Vec3;
+  /**
+   * The bind of the left studio paw (`studioForearmTurn()` of `models/studio-rig.ts`): the turn of
+   * the left paw at a switch mixes in the frame of the studio forearm.
+   */
+  readonly pawBindL: PawBind;
 }
 
 /**
@@ -1694,6 +1700,11 @@ function switchRig(
     toRight: toVec3(toRight),
     fingerHand: toQuat(pawTurn('R', face.clone().negate(), fingersTo)),
     tip: toVec3(tip.sub(new Vector3(...right.bind.wrist))),
+    pawBindL: {
+      fore: model.studio.arms.L.fore,
+      hinge: model.studio.arms.L.hinge,
+      paw: model.studio.arms.L.paw,
+    },
   };
 }
 

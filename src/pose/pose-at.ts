@@ -562,7 +562,13 @@ function poseAnimal(
       writeBody(pose, player, scratch);
       // In a long rest of the music, the sticks go to their set position (`setRests()`).
       const set = note.rests ? setWeightAt(note.rests, noteTime) : 1;
-      posePercussion(note.rig, scratch.torso, strikes, weight * set, pose.rotations);
+      pose.pawTurnL = posePercussion(
+        note.rig,
+        scratch.torso,
+        strikes,
+        weight * set,
+        pose.rotations,
+      );
       if (note.side && legs) {
         plantFeet(legs, pose.rootOffset, pose.rotations);
       }

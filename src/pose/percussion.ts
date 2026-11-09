@@ -1,5 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
+import { palmTurnAngle, studioForearmTurn, twistAngle } from '../models/studio-rig.ts';
+import type { PawBind } from '../models/studio-rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
@@ -8,6 +10,7 @@ import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingHand, hangingWrist } from './hang.ts';
 import { limitReach, poseShoulder, solveTwoBone, writeArm, writeCurl } from './ik.ts';
+import type { ArmRig } from './ik.ts';
 import { groupChords } from './note-groups.ts';
 import type { NoteGroup } from './note-groups.ts';
 import {
@@ -774,6 +777,7 @@ const localTo = new Quaternion();
 const straight = new Quaternion();
 const tablePole = new Vector3();
 const playPole = new Vector3();
+const nowPole = new Vector3();
 const corner = new Vector3();
 const level = new Vector3();
 const swing = new Quaternion();
@@ -1205,6 +1209,8 @@ function lowestPoint(paw: Float32Array, at: Vector3, hand: Quaternion): number {
  * @param chest The posed frame of the chest.
  * @param weight The eased weight of the playing pose.
  * @param rotations The rotations of the pose to write.
+ * @returns The turn of the left paw in the plane of its palm at a switch (`pawTurnL` of
+ *   `AnimalPose`), or `null` for the turn of the studio body.
  */
 function poseHand(
   rig: PercussionRig,
@@ -1213,7 +1219,7 @@ function poseHand(
   chest: Frame,
   weight: number,
   rotations: Float32Array,
-): void {
+): number | null {
   const left = which === 'L';
   const side = left ? rig.left : rig.right;
   const hang = left ? rig.hangL : rig.hangR;
@@ -1298,6 +1304,7 @@ function poseHand(
   // At a switch, the paws go to the trap table: the left paw from the place of the instrument that
   // it puts down to the place of the instrument that it takes, and the right paw to the beater.
   const swap = state.swap;
+  let pawTurn: number | null = null;
   if (rig.switch && swap.table > 0) {
     const s = rig.switch;
     // The elbow points as on the hanging arm at the table (`writeArm()` below).
@@ -1305,31 +1312,28 @@ function poseHand(
       out.fromArray(mixPole(hang.pole, pole, 1 - share)).applyQuaternion(chest.rotation);
     poleAt(1, tablePole);
     if (left) {
-      const [from, to] = swap.toTambourine
-        ? [s.tableTriangle, s.tableTambourine]
-        : [s.tableTambourine, s.tableTriangle];
-      // The paw turns on its forearm from one place to the other ({@link forearmFrame}).
-      forearmFrame(arm, shoulder.position, grip.fromArray(from.wrist), tablePole, localFrom);
-      localFrom.invert().multiply(strikeHand.fromArray(from.hand));
-      forearmFrame(arm, shoulder.position, grip.fromArray(to.wrist), tablePole, localTo);
-      localTo.invert().multiply(strikeHand.fromArray(to.hand));
-      grip.fromArray(from.wrist).lerp(offset.fromArray(to.wrist), swap.across);
-      forearmFrame(arm, shoulder.position, grip, tablePole, strikeHand);
-      strikeHand.multiply(mixOnForearm(localFrom, localTo, swap.across));
+      pawTurn = tablePawL(
+        s,
+        arm,
+        shoulder.position,
+        swap,
+        poleAt(0, playPole),
+        tablePole,
+        poleAt(swap.table, nowPole),
+      );
     } else {
       grip.fromArray(s.tableBeater.wrist);
       strikeHand.fromArray(s.tableBeater.hand);
+      // The turn of the paw on the forearm mixes from the play place to the table, so that the
+      // paw does not pass a flip of its twist while the forearm turns.
+      forearmFrame(arm, shoulder.position, wrist, poleAt(0, playPole), localFrom);
+      localFrom.invert().multiply(turn);
+      forearmFrame(arm, shoulder.position, grip, tablePole, localTo);
+      localTo.invert().multiply(strikeHand);
+      wrist.lerp(grip, swap.table);
+      forearmFrame(arm, shoulder.position, wrist, poleAt(swap.table, playPole), turn);
+      turn.multiply(mixOnForearm(localFrom, localTo, swap.table));
     }
-    // The turn of the paw on the forearm mixes from the play place to the table, so that the
-    // paw does not pass a flip of its twist while the forearm turns. A mix of the world turns
-    // passed 180° of twist in the left paw.
-    forearmFrame(arm, shoulder.position, wrist, poleAt(0, playPole), localFrom);
-    localFrom.invert().multiply(turn);
-    forearmFrame(arm, shoulder.position, grip, tablePole, localTo);
-    localTo.invert().multiply(strikeHand);
-    wrist.lerp(grip, swap.table);
-    forearmFrame(arm, shoulder.position, wrist, poleAt(swap.table, playPole), turn);
-    turn.multiply(mixOnForearm(localFrom, localTo, swap.table));
   }
   limitReach(arm, shoulder.position, wrist);
 
@@ -1349,6 +1353,157 @@ function poseHand(
   // open, also with the palm on a drum head.
   const curl = side.kind === 'free' ? 0 : fingers ? fingerCurl(state.small) : rig.hold.curl;
   writeCurl(arm, side.kind === 'mallet' ? curl : curl * play, rotations);
+  return pawTurn;
+}
+
+/** The turn of the left studio paw at one place of a switch (design 5.3). */
+interface PawKey {
+  /** The turn of the studio paw on its forearm from its bind (`studioForearmTurn()`). */
+  readonly paw: Quaternion;
+  /** The turn of the paw in the plane of its palm, in radians (`palmTurnAngle()`). */
+  palm: number;
+}
+
+const keyPlay: PawKey = { paw: new Quaternion(), palm: 0 };
+const keyFrom: PawKey = { paw: new Quaternion(), palm: 0 };
+const keyTo: PawKey = { paw: new Quaternion(), palm: 0 };
+const keyTable: PawKey = { paw: new Quaternion(), palm: 0 };
+const keyNow: PawKey = { paw: new Quaternion(), palm: 0 };
+const keyTurn = new Quaternion();
+const swingA = new Quaternion();
+const swingB = new Quaternion();
+const twistAxis = new Vector3();
+
+/**
+ * Writes the left wrist and hand at a switch (design 5.3): the paw goes from the play place to the
+ * place of the instrument that it puts down, then to the place of the instrument that it takes,
+ * and back to the play place. The turn of the paw mixes in the frame of the studio forearm
+ * ({@link mixPawKeys}), as the arm gate measures it, so that the twist of the paw changes on a
+ * straight line between its places and the twist bones do not turn over. The turn in the plane of
+ * the palm mixes too, so that the studio paw takes exactly the mixed turn.
+ *
+ * @param s The switch rig.
+ * @param arm The left arm.
+ * @param joint The posed shoulder joint.
+ * @param swap The switch state.
+ * @param playPole The pole of the elbow at the play place, in the model axes.
+ * @param tablePole The pole of the elbow at the table, in the model axes.
+ * @param nowPole The pole of the elbow at this time, in the model axes.
+ * @returns The turn of the paw in the plane of its palm, in radians (`pawTurnL` of `AnimalPose`).
+ */
+function tablePawL(
+  s: NonNullable<PercussionRig['switch']>,
+  arm: ArmRig,
+  joint: Vector3,
+  swap: SwitchState,
+  playPole: Vector3,
+  tablePole: Vector3,
+  nowPole: Vector3,
+): number {
+  const [from, to] = swap.toTambourine
+    ? [s.tableTriangle, s.tableTambourine]
+    : [s.tableTambourine, s.tableTriangle];
+  const bind = s.pawBindL;
+  twistAxis.fromArray(bind.fore).normalize();
+  pawKey(bind, arm, joint, wrist, playPole, turn, keyPlay);
+  pawKey(
+    bind,
+    arm,
+    joint,
+    grip.fromArray(from.wrist),
+    tablePole,
+    strikeHand.fromArray(from.hand),
+    keyFrom,
+  );
+  pawKey(
+    bind,
+    arm,
+    joint,
+    grip.fromArray(to.wrist),
+    tablePole,
+    strikeHand.fromArray(to.hand),
+    keyTo,
+  );
+  mixPawKeys(keyFrom, keyTo, swap.across, keyTable);
+  mixPawKeys(keyPlay, keyTable, swap.table, keyNow);
+  grip.fromArray(from.wrist).lerp(offset.fromArray(to.wrist), swap.across);
+  limitReach(arm, joint, wrist.lerp(grip, swap.table));
+  armJoints(arm, joint, wrist, nowPole);
+  // The hand of the player that gives the mixed studio paw: the studio paw is the hand times the
+  // turn in the plane of the palm times the bind of the paw (`poseStudioBones()`).
+  studioForearmTurn(bind, joint, joints.elbow, joints.wrist, turn)
+    .multiply(keyNow.paw)
+    .multiply(keyTurn.fromArray(bind.paw).invert())
+    .multiply(keyTurn.setFromAxisAngle(X_AXIS, -keyNow.palm));
+  return keyNow.palm;
+}
+
+/**
+ * Solves the joints of an arm into the module value `joints`.
+ *
+ * @param arm The arm.
+ * @param joint The posed shoulder joint.
+ * @param at The wrist.
+ * @param pole The direction to which the elbow points, in the model axes.
+ */
+function armJoints(arm: ArmRig, joint: Vector3, at: Vector3, pole: Vector3): void {
+  shoulderBind.fromArray(arm.bind.shoulder);
+  elbowBind.fromArray(arm.bind.elbow);
+  const upper = elbowBind.distanceTo(shoulderBind);
+  const lower = wristBind.fromArray(arm.bind.wrist).distanceTo(elbowBind);
+  solveTwoBone(joint, corner.copy(at), upper, lower, pole, joints);
+}
+
+/**
+ * Finds the turn of the left studio paw on its forearm for a wrist and a hand of the player.
+ *
+ * @param bind The bind of the left studio paw.
+ * @param arm The left arm.
+ * @param joint The posed shoulder joint.
+ * @param at The wrist. A wrist out of reach comes in ({@link limitReach}).
+ * @param pole The direction to which the elbow points, in the model axes.
+ * @param hand The world rotation of the hand of the player.
+ * @param out The key to write.
+ */
+function pawKey(
+  bind: PawBind,
+  arm: ArmRig,
+  joint: Vector3,
+  at: Vector3,
+  pole: Vector3,
+  hand: Quaternion,
+  out: PawKey,
+): void {
+  armJoints(arm, joint, limitReach(arm, joint, along.copy(at)), pole);
+  forearm.subVectors(joints.wrist, joints.elbow).normalize();
+  out.palm = palmTurnAngle('L', hand, forearm);
+  studioForearmTurn(bind, joint, joints.elbow, joints.wrist, out.paw)
+    .invert()
+    .multiply(hand)
+    .multiply(keyTurn.setFromAxisAngle(X_AXIS, out.palm))
+    .multiply(keyTurn.fromArray(bind.paw));
+}
+
+/**
+ * Mixes two turns of the studio paw: the twist around the bind forearm goes on a straight line
+ * from its first angle to its second angle, between -π and π, and the bend of the wrist mixes on
+ * its own. The twist of the mix around the bind forearm is then exactly the mixed angle, because a
+ * mix of two bends has no twist.
+ *
+ * @param a The turn at the share 0.
+ * @param b The turn at the share 1.
+ * @param share The share of `b`, from 0 to 1.
+ * @param out The key to write. It must not be `a` or `b`.
+ */
+function mixPawKeys(a: PawKey, b: PawKey, share: number, out: PawKey): void {
+  const twistA = twistAngle(a.paw, twistAxis);
+  const twistB = twistAngle(b.paw, twistAxis);
+  swingA.copy(a.paw).multiply(keyTurn.setFromAxisAngle(twistAxis, -twistA));
+  swingB.copy(b.paw).multiply(keyTurn.setFromAxisAngle(twistAxis, -twistB));
+  out.paw
+    .slerpQuaternions(swingA, swingB, share)
+    .multiply(keyTurn.setFromAxisAngle(twistAxis, twistA + (twistB - twistA) * share));
+  out.palm = a.palm + (b.palm - a.palm) * share;
 }
 
 /**
@@ -1470,6 +1625,8 @@ function fingerHand(rig: PercussionRig, hand: StrikeState, small: SmallState): v
  * @param state The motion of the hands at the song time of the note layer.
  * @param weight The eased weight of the playing pose: 0 is the rest pose (5.2, 5.5).
  * @param rotations The rotations of the pose to write.
+ * @returns The turn of the left paw in the plane of its palm at a switch of the small percussion
+ *   (`pawTurnL` of `AnimalPose`), or `null` for the turn of the studio body.
  */
 export function posePercussion(
   rig: PercussionRig,
@@ -1477,7 +1634,8 @@ export function posePercussion(
   state: PercussionState,
   weight: number,
   rotations: Float32Array,
-): void {
-  poseHand(rig, 'L', state, frames.chest, weight, rotations);
+): number | null {
+  const pawTurnL = poseHand(rig, 'L', state, frames.chest, weight, rotations);
   poseHand(rig, 'R', state, frames.chest, weight, rotations);
+  return pawTurnL;
 }
