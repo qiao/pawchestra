@@ -630,7 +630,12 @@ function gateItem(row: GateRow, home: GateRow | undefined): CellItem {
   const ratio = limit.up ? row.value / limit.limit : limit.limit / Math.max(1e-6, row.value);
   const digits = limit.stat === 'share' ? 3 : limit.digits;
   return {
-    verdict: cellVerdict(over(row.value), home ? over(home.value) : false, worse, limit.margin),
+    verdict: cellVerdict(
+      over(row.value),
+      home ? over(home.value) : false,
+      worse,
+      limit.margin ?? Infinity,
+    ),
     text: `${SHORT[row.measure]} ${row.side} ${row.value.toFixed(digits)}/${limit.limit}`,
     ratio,
   };

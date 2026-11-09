@@ -173,7 +173,7 @@ function worstFrame(tree: RoleReport, rows: readonly GateRow[], parts: GateParts
   const ratio = (row: GateRow): number => {
     const limit = parts.limits[row.measure];
     const worse = limit.up ? row.value - (row.base ?? 0) : (row.base ?? 0) - row.value;
-    if (row.base !== null) {
+    if (row.base !== null && limit.margin !== null) {
       return worse / limit.margin;
     }
     return limit.up ? row.value / limit.limit : limit.limit / Math.max(1e-6, row.value);

@@ -284,8 +284,11 @@ interface ArmLimit {
   readonly limit: number;
   /** True when a larger value is worse, false when a smaller value is worse. */
   readonly up: boolean;
-  /** The change from the base above which a value over its limit is worse than the base. */
-  readonly margin: number;
+  /**
+   * The change from the base above which a value is worse than the base, or `null` for a measure
+   * that takes only its limit, such as a value of one worst sample.
+   */
+  readonly margin: number | null;
   /** The number of digits of the value in the tables. */
   readonly digits: number;
   /** The source of the limit. */
@@ -394,7 +397,7 @@ export const ARM_LIMITS: Readonly<Record<Measure, ArmLimit>> = {
     stat: 'worst',
     limit: 176,
     up: true,
-    margin: 3,
+    margin: null,
     digits: 0,
     source:
       'the largest paw twist of the rest and the play of a good arm, 175° (hippo left arm); at 180° the twist bone takes -90° or 90°',
@@ -1907,7 +1910,10 @@ export function verdictOf(
 ): Verdict {
   const over = (v: number): boolean => (limit.up ? v > limit.limit : v < limit.limit);
   const near = limit.up ? value > NEAR_LIMIT * limit.limit : value < limit.limit / NEAR_LIMIT;
-  const worse = base !== null && (limit.up ? value - base : base - value) > limit.margin;
+  const worse =
+    base !== null &&
+    limit.margin !== null &&
+    (limit.up ? value - base : base - value) > limit.margin;
   if (rebind) {
     if (over(value)) {
       return 'FAIL';
