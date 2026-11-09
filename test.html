@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- A page for development only: search engines leave it out (design 7.1). -->
+    <meta name="robots" content="noindex" />
+    <title>Pawchestra test page</title>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <form id="panel" aria-label="Test controls">
+      <label for="role">Animal and role</label>
+      <select id="role"></select>
+      <div class="buttons">
+        <button id="play" type="button">Pause</button>
+        <button id="sound" type="button">Start the sound</button>
+      </div>
+      <label for="time">Time <output id="time-value" for="time">0.00 s</output></label>
+      <input id="time" type="range" min="0" max="8" step="0.01" value="0" />
+      <fieldset id="speed">
+        <legend>Speed</legend>
+        <label><input type="radio" name="speed" value="0.25" />0.25x</label>
+        <label><input type="radio" name="speed" value="0.5" />0.5x</label>
+        <label><input type="radio" name="speed" value="1" checked />1x</label>
+      </fieldset>
+      <fieldset id="views">
+        <legend>Camera</legend>
+        <button type="button" data-view="front">Front</button>
+        <button type="button" data-view="side">Side</button>
+        <button type="button" data-view="back">Back</button>
+        <button type="button" data-view="close">Close</button>
+      </fieldset>
+      <a id="link" href="#rabbit-violin">Link to this role</a>
+      <details>
+        <summary>Test notes: start (s), length (s), key</summary>
+        <pre id="notes"></pre>
+      </details>
+      <p id="status" role="status"></p>
+    </form>
+    <script type="module" src="/src/test-page/main.ts"></script>
+  </body>
+</html>
