@@ -44,9 +44,9 @@ export function parseTestFile(file: TestFile): MidiFile {
 }
 
 /**
- * Writes the bytes of a Standard MIDI File. Only tests use this function, so it does not enter
- * the first download. Each track gets an end of track event at its last tick, unless its last
- * event is one.
+ * Writes the bytes of a Standard MIDI File. Only the tests and the test page (design 7.1) use this
+ * function, so it does not enter the first download. Each track gets an end of track event at its
+ * last tick, unless its last event is one.
  *
  * @param file The file as events.
  * @returns The bytes of the file.
