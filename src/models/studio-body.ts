@@ -141,7 +141,7 @@ function colorsWith(name: StudioBodyName, palette: StudioPalette): Float32Array 
  */
 const MOUTH_DROP = 0.08;
 
-/** The colors of the pea eyes: the eyes of all species (design 4.5). */
+/** The colors of the bead eyes: the eyes of all species (design 4.5). */
 const EYE_COLORS: EyeColors = { eye: srgb(EYE_COLOR), eyeLight: srgb(EYE_LIGHT_COLOR) };
 
 /**
@@ -182,7 +182,7 @@ function playerSkins(rig: StudioRig): CornerSkin[] {
  * 4.4). The arms of the studio come down from their bind pose to hang straight, with the skin and
  * the corrective shapes of the studio, as the GPU poses them. The trunk, the head, and the legs
  * keep the bind pose of the studio. Each corner follows the two bones of the player with the
- * largest weights, for the readers of the bind mesh. The pea eyes (`addEye()`) follow
+ * largest weights, for the readers of the bind mesh. The bead eyes (`addEye()`) follow
  * the triangles of the body, each on its eye bone (`StudioBody.eyes`, design 4.5). The scene draws
  * the body with the skin of the studio (`StudioRig`). A studio body keeps the stance of its role
  * on each support: the bear conductor stands, and the polar bear pianist sits on its bench
@@ -263,7 +263,7 @@ export function* buildStudioBodySteps(
     return skin ?? { bone: 0, blendBone: 0, blendWeight: 0 };
   });
   yield;
-  // The head keeps the bind pose of the studio, so each pea eye goes to the bind place of its eye
+  // The head keeps the bind pose of the studio, so each bead eye goes to the bind place of its eye
   // bone, bent to the head surface when the body has bends. The eyes blink with the eye bones of
   // the studio (`studioRenderMesh()`).
   for (const side of ['L', 'R'] as const) {

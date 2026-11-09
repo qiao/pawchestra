@@ -381,7 +381,7 @@ export interface StudioRaise {
 }
 
 /**
- * The pea eyes of a studio body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
+ * The bead eyes of a studio body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
  * which replace the eyes of the mesh. Each eye lies at the bind place of its eye bone and faces out
  * from the middle of the head. Each oval bends to the form of the head surface under it, so that
  * its rim lies at the fur, and its bone lies on the head surface. Each bone moves further out when
@@ -460,7 +460,7 @@ export interface StudioBody {
    * `MOUTH_DROP` H below the tip of the nose (`models/studio-body.ts`).
    */
   readonly mouth?: Vec3;
-  /** The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. */
+  /** The bead eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. */
   readonly eyes: StudioEyes;
   /**
    * The point on the floor under the middle of the body: the origin of the studio. A seated body

@@ -71,7 +71,7 @@ const BODY_LOOPS = 2;
 /**
  * The open loops of {@link BODY_BONES} of the foxes, the bodies of the meshes
  * (`pnpm rig-mesh <animal>`): the cuts to the two upper arms, and two open edges of each mesh. The
- * export drops the gloss fan over each eye of the rig, and the pea eyes of the app are not in the
+ * export drops the gloss fan over each eye of the rig, and the bead eyes of the app are not in the
  * skin of the studio (design 4.5).
  */
 const MESH_BODY_LOOPS = 4;

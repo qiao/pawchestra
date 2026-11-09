@@ -399,7 +399,7 @@ export const SPECIES = {
    * has the studio body of the T-pose mesh `assets/models/panda/panda-tpose.glb`, which `pnpm
    * rig-mesh panda` rigs (design 4.4), with the head height of the red fox, arms 1.05 times the arms
    * of the mesh, and the legs of the mesh. Its round haunch sits on the seat behind the short
-   * thighs, and its round tail stands out through the chair back. The pea eyes sit in the black
+   * thighs, and its round tail stands out through the chair back. The bead eyes sit in the black
    * patches. Its head height is the head of the studio body, and its chair fits its legs: the seat
    * height is the seat of the studio body, in H.
    */
