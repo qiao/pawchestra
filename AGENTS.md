@@ -61,12 +61,17 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
   beside another agent works in its own worktree and branch. Push nothing.
 - **Commits.** Make very fine-grained commits: one logical change in each, with a Conventional
   Commit subject. Stage each path by its name, never with `git add -A` or `git add .`.
-- **Checks.** All gates are paused. The user verifies each result by hand in the app. Run no check
-  before a commit, a report, or a merge: no lint, typecheck, format check, `check-commits.sh`, arm
-  gate, clearance sweep, body probe, size check, cast matrix, frame measure, or image set. Run a
-  check only when the user or the manager asks. This rule wins over the check rules of the modules.
-  A probe that helps you find a cause (`fold-probe`, `arm-look`, `pose-depth`, a render) is a
-  tool: use it when it is faster than a guess.
+- **Checks.** The user verifies each result by hand in the app. Gates that stay on:
+  - At the end of a round: `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm size`,
+    and `pnpm smoke` after an app or UI change.
+  - The pre-commit hook.
+  - The fast loop (`loop`) of the skill `pawchestra-body`, in a body round.
+
+  Each other gate runs only when the user or the manager asks: `check-commits.sh`, the arm gate,
+  the clearance sweep, the body probe, the cast matrix, the frame measure, and the image sets.
+  This rule wins over the check rules of the modules. A probe that helps you find a cause
+  (`fold-probe`, `arm-look`, `pose-depth`, a render) is a tool: use it when it is faster than a
+  guess.
 - **Tests.** All tests are paused. A change adds no test and runs no break test. A change that
   needs a check runs one file with `pnpm test:paused <path>`.
 - **Docs.** A change of behavior updates its design section in the same session. Write all prose
