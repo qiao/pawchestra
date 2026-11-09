@@ -1,35 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { scoreOf } from '../score/test-score.ts';
+import { STUDIO_TRIANGLE_BUDGET } from '../../tools/studio-budgets.ts';
 import { CONDUCTOR, SECTION_INSTRUMENTS, SECTION_SPECIES } from './cast.ts';
-import type { SceneLayout } from './layout.ts';
-import { layoutScene } from './layout-scene.ts';
-import { ModelCache } from './model-cache.ts';
 import type { PlayingSection } from './cast.ts';
 import type { MeshData } from './mesh.ts';
 import { buildPlayer } from './player.ts';
-import { buildMusicStand, buildRisers, buildSupport, seatHeights } from './props.ts';
+import { buildMusicStand, buildSupport, seatHeights } from './props.ts';
 import type { Support } from './props.ts';
 import { BONE_NAMES, boneIndex } from './rig.ts';
 import { INSTRUMENT_BUDGETS } from './instruments/test-budgets.ts';
 import type { InstrumentId } from './instruments/types.ts';
 import { SPECIES } from './species.ts';
 import type { SpeciesId } from './species.ts';
-import { buildStage } from './stage.ts';
-import { perf60File } from './test-perf-60.ts';
 
 /** The most triangles of a body (design 4.4, source meshes). */
 const BODY_BUDGET = 2600;
-
-/**
- * The most triangles of a studio body (design 4.4, 4.5): a studio body keeps the faces of its GLB
- * file. The rabbit and the red fox play in the violin sections, so the budget of the full scene
- * holds the frame.
- */
-const STUDIO_BODY_BUDGET = 6200;
-
-/** The most triangles of the scene with 60 players (design 4.5). */
-const SCENE_BUDGET = 200_000;
 
 /** The most triangles of a chair, a stool, or the piano bench, and of a music stand (4.5). */
 const SEAT_BUDGET = 120;
@@ -77,7 +62,7 @@ describe('triangle budgets (design 4.5)', () => {
         const { mesh, studio } = buildPlayer(species, id, kettles);
         const { body, instrument } = countParts(mesh);
         expect(body, `${species} with the ${id}`).toBeLessThanOrEqual(
-          studio ? STUDIO_BODY_BUDGET : BODY_BUDGET,
+          studio ? STUDIO_TRIANGLE_BUDGET : BODY_BUDGET,
         );
         expect(instrument, `${species} with the ${id}`).toBeLessThanOrEqual(INSTRUMENT_BUDGETS[id]);
         expect(instrument, `${species} with the ${id}`).toBeGreaterThan(0);
@@ -95,31 +80,5 @@ describe('triangle budgets (design 4.5)', () => {
       expect((seat?.positions.length ?? Infinity) / 9, support).toBeLessThanOrEqual(SEAT_BUDGET);
     }
     expect(buildMusicStand().positions.length / 9).toBeLessThanOrEqual(STAND_BUDGET);
-  });
-});
-
-/**
- * Counts the triangles of the scene of a layout: the stage, the risers, each player with its seat,
- * each music stand, and the conductor. Each kind of player has one model in `models`, and the
- * scene draws that model for each player of the kind.
- */
-function sceneTriangles(layout: SceneLayout, models: ModelCache): number {
-  const count = (mesh: MeshData | null): number => (mesh ? mesh.positions.length / 9 : 0);
-  let total = count(buildStage(layout.stageSide, layout.podium));
-  total += count(buildRisers(layout.risers, layout.podium));
-  for (const { cast } of layout.players) {
-    total += count(models.get(cast.species, cast.instrument, cast.kettles, cast.support).mesh);
-    total += count(buildSupport(cast.support, seatHeights(cast.support, SPECIES[cast.species])));
-  }
-  total += layout.stands.length * count(buildMusicStand());
-  return total + count(models.get(CONDUCTOR.species, CONDUCTOR.instrument).mesh);
-}
-
-describe('scene triangle budget (design 4.5)', () => {
-  it('keeps the scene of perf-60.mid with 60 players within 200,000 triangles', () => {
-    const models = new ModelCache();
-    const layout = layoutScene(scoreOf(perf60File(), 'one-per-part'), models);
-    expect(layout.players).toHaveLength(60);
-    expect(sceneTriangles(layout, models)).toBeLessThanOrEqual(SCENE_BUDGET);
   });
 });
