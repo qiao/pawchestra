@@ -566,6 +566,13 @@ const FINISHES: ReadonlyMap<string, Finish> = new Map([
 ]);
 
 /**
+ * The finish of the eyes of the mesh of a hand rig (design 4.4, "Hand rig"): the finish of the pea
+ * eyes, so that the lights of the stage give a sharp highlight on each eyeball. The faces keep the
+ * slot `fur` and the color map.
+ */
+const EYEBALL_FINISH: Finish = 'lacquer';
+
+/**
  * The bones of the studio that the app drops: the hand props. The app has its own baton, violin,
  * and bow. The faces of a held prop are a material of their own, which the export drops too
  * ({@link FINISHES}).
@@ -899,10 +906,10 @@ interface Gltf {
       readonly eyes?: Readonly<Partial<Record<Side, EyeExtras>>>;
       /**
        * The eyes of the mesh of a hand rig with no eye objects: the middle of the sphere that fits
-       * the eye faces of each side (`own_eyes_of()` of `tools/blender/export_rig.py`). The body then has no pea
-       * eyes. A file with pea eyes has none.
+       * the eye faces of each side (`own_eyes_of()` of `tools/blender/export_rig.py`), and the
+       * triangles of each eye. The body then has no pea eyes. A file with pea eyes has none.
        */
-      readonly ownEyes?: Readonly<Partial<Record<Side, Pick<EyeExtras, 'middle'>>>>;
+      readonly ownEyes?: Readonly<Partial<Record<Side, OwnEyeExtras>>>;
       /**
        * The lids of the eyes of the mesh of a hand rig (`lids_of()` of
        * `tools/blender/export_rig.py`). A file with no lids has none.
@@ -956,6 +963,17 @@ interface EyeExtras {
   readonly direction?: readonly number[];
   /** The head height `H` of the eye, which sizes the oval (`EYE` of `models/eyes.ts`). */
   readonly size?: number;
+}
+
+/**
+ * An eye of the mesh of a hand rig in the extras of its GLB file (design 4.4, "Hand rig"): an
+ * eyeball whose color map paints the eye, in the bind pose, in the axes and the units of the studio.
+ */
+interface OwnEyeExtras {
+  /** The middle of the sphere that fits the eye faces of the side: the head of its eye bone. */
+  readonly middle?: readonly number[];
+  /** The triangles of the eye, as indices of the triangles of the primitive `fur`. */
+  readonly faces?: readonly number[];
 }
 
 /** A pea eye of a hand rig ({@link eyesOf}), in the bind pose, in the axes and the units of the studio. */
@@ -1184,6 +1202,33 @@ export function ownEyesOf(glb: Glb): Record<Side, Vector3> | null {
     return new Vector3().fromArray(point);
   };
   return { L: middle('L'), R: middle('R') };
+}
+
+/**
+ * Gives the triangles of the eyes of the mesh of a hand rig from the extras of its GLB file (design
+ * 4.4, "Hand rig"). They take the finish {@link EYEBALL_FINISH}.
+ *
+ * @param glb The file.
+ * @returns The indices of the triangles of the primitive `fur`, or none for a file with no eyes of
+ *   the mesh.
+ * @throws Error if a side has no triangles, or if an index is not a whole number of at least 0.
+ */
+function ownEyeFacesOf(glb: Glb): ReadonlySet<number> {
+  const eyes = glb.json.asset?.extras?.ownEyes;
+  if (eyes === undefined) {
+    return new Set();
+  }
+  const out = new Set<number>();
+  for (const side of ['L', 'R'] as const) {
+    const list = eyes[side]?.faces ?? [];
+    if (list.length === 0 || list.some((t) => !Number.isInteger(t) || t < 0)) {
+      throw new Error(`The eye triangles ${side} of the file are empty or not triangle indices.`);
+    }
+    for (const t of list) {
+      out.add(t);
+    }
+  }
+  return out;
 }
 
 /**
@@ -1778,6 +1823,8 @@ interface SourceMesh {
     readonly rim?: boolean;
     /** The side of a face of a lid ({@link lidsOf}), or `null` for each other face. */
     readonly lid?: Side | null;
+    /** True for a face of an eye of the mesh ({@link ownEyeFacesOf}). */
+    readonly eyeball?: boolean;
     /**
      * The texture point of each corner (`TEXCOORD_0` of a hand rig with a color map), or `null`
      * for a face with no texture, such as the gloss nose or a whisker.
@@ -1813,6 +1860,7 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
   const caps = cutFacesOf(glb, 'caps');
   const rim = cutFacesOf(glb, 'rim');
   const lids = lidsOf(glb)?.faces ?? new Map<number, Side>();
+  const eyeballs = ownEyeFacesOf(glb);
   const vertices: SourceVertex[] = [];
   const faces: SourceMesh['faces'] = [];
   for (const primitive of mesh.primitives) {
@@ -1890,11 +1938,13 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
         }
       }
       const base = bases?.subarray(a * colorSize, a * colorSize + 3) ?? color;
+      const eyeball = material === 'fur' && eyeballs.has(t / 3);
       faces.push({
         corners: [vertexOf(a), vertexOf(b), vertexOf(c)],
         color: [color[0] ?? 0, color[1] ?? 0, color[2] ?? 0],
         base: [base[0] ?? 0, base[1] ?? 0, base[2] ?? 0],
-        finish,
+        finish: eyeball ? EYEBALL_FINISH : finish,
+        eyeball,
         cap: material === 'fur' && caps.has(t / 3),
         rim: material === 'fur' && rim.has(t / 3),
         lid: material === 'fur' ? (lids.get(t / 3) ?? null) : null,
@@ -1914,6 +1964,12 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
   if (lidCount !== lids.size) {
     throw new Error(
       `The file names ${lids.size} lid faces, and the primitive fur has ${lidCount}.`,
+    );
+  }
+  const eyeCount = faces.filter((face) => face.eyeball === true).length;
+  if (eyeCount !== eyeballs.size) {
+    throw new Error(
+      `The file names ${eyeballs.size} eye faces, and the primitive fur has ${eyeCount}.`,
     );
   }
   return { vertices, faces };
@@ -3294,6 +3350,10 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const rim = withoutEyes.faces.flatMap((face, t) => (face.rim === true ? [t] : []));
   if (rim.length > 0) {
     body = { ...body, rim };
+  }
+  const eyeballs = withoutEyes.faces.flatMap((face, t) => (face.eyeball === true ? [t] : []));
+  if (eyeballs.length > 0) {
+    body = { ...body, eyeballs };
   }
   const upperTwist = upperTwistOf(glb);
   if (upperTwist !== null) {
