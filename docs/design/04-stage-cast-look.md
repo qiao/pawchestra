@@ -265,7 +265,8 @@ traps of the rig.
   fixes the meshes that exist.
 - **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
   each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`).
-  The first download of 1 MB and the frame time of 9.7 stay the limits.
+  The first download of 1 MB and the frame time of 9.7 stay the limits. The whole scene has no
+  triangle limit of its own.
 - **Licenses.** The project author made the meshes with Meshy or Tripo on a paid plan, and holds
   their rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
   `README.md` of the repository), with no entry in the third-party license file (7.3).
