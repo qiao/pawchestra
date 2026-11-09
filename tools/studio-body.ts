@@ -506,6 +506,11 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/rhino/rhino.rig.glb',
       noseTop: 0.8,
       headFloor: 0.7,
+      // At the old eyes, the ridge of the horn covered the inner edge of each pea eye, and the
+      // slope of the cheek leaned the tops of the ovals 18° and 14° toward each other, a sad look.
+      // Eyes 0.05 H higher sit on a flatter face: the full ovals show and stand within 3° of
+      // upright.
+      eyeShift: [0, 0.05],
     },
   ],
   // The harp deer (design 4.4). It sits on the stool of the harp, and the
