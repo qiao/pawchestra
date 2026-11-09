@@ -27,6 +27,7 @@ export function createClipPose(): WritablePose {
     strings: null,
     pedals: null,
     digits: null,
+    held: null,
   };
 }
 

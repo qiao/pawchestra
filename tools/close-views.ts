@@ -778,7 +778,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
       ...halfMoves(0.5),
     ],
     camera: { kind: 'body', zoom: 1, elevation: 20 },
-    // The triangle (key 81) in the left paw, then the tambourine (key 54) on its stand.
+    // The triangle (key 81) in the left paw, then the tambourine (key 54) on the trap table.
     notes: ['0.5 0.5 81', '1.5 0.5 54', '2.5 0.5 81'].join('\n'),
   },
   xylophonist: {

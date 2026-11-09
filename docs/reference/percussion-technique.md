@@ -195,6 +195,8 @@ from the V).
   1 to 2 inches from the edge [63]. A louder passage holds the tambourine higher [66].
 - A long note is a shake roll: a turn of the forearm, as a door knob [65] [66]. A soft roll is a
   thumb roll or a finger roll [65].
+- A common mistake of an orchestrator is too little time for a player to change the instrument or
+  to take new beaters [67]. No source of this file gives a time for a change.
 
 ## 9. The xylophone
 
@@ -325,6 +327,15 @@ The app follows these facts:
   least 0.5 s after it, the paw that did not strike goes to the near rim, its fingers touch the
   edge, and the spine leans 9° over the cymbal, as a player stops the ring of a short note
   [15] [20] [22] (`EdgeDamp`).
+- **The tambourine (section 8).** A run of tambourine notes with a rest of at least 2.7 s
+  before it and after it is held in the left paw by its frame, in front of the chest, and the
+  right paw strikes the head with the palm to the head (`TAMBOURINE_HOLD`). A soft note strikes
+  near the rim with open fingertips, a middle note with bunched fingers, and a loud note with a
+  loose fist, nearer to the middle [65]. A run of notes faster than eight each second is a roll:
+  a loud roll turns the left forearm to and fro, as a door knob, and a soft roll moves the right
+  paw along the rim on the head, as a thumb roll [65] [66]. Between uses, the tambourine and the
+  beater lie on a padded trap table [65] [66], and the triangle hangs from the hook of a stand.
+  In the rest, the paws put down one instrument and take the other (`SWITCH_MOTION`).
 - **The triangle (section 8).** The left paw holds the upper end of the clip between the tip of
   the thumb and the curled fingers, with the thumb down, and the clip and the triangle hang below
   the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). A single note strikes the side
@@ -364,9 +375,20 @@ The app does not follow these facts:
   level (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of
   the long snout: a clip 2 cm higher twisted the arm past the margin of the arm gate in a lift.
   No source gives the turn of the hand.
-- **The tambourine (section 8).** The tambourine stands on a stand at the front right
-  (`TAMBOURINE`), because the left paw holds the triangle through the whole part. The tip of the
-  beater strikes it, with no shake roll and no thumb roll.
+- **The change of the instrument (section 8).** A switch takes 2.7 s of rest: 0.2 s after the
+  note, two moves of 0.6 s, 0.3 s at the table, and the lift of 1 s before the next note
+  (`switchRestSec()`). No source gives the time [67]. With a shorter rest, the left paw keeps the
+  triangle, and the tip of the beater strikes the tambourine on the table near its rim, as a soft
+  fast passage plays on the table [65] [66]. No demo has a rest that long between the triangle and
+  the tambourine, so each demo plays the tambourine on the table.
+- **The tilt of the held tambourine (section 8).** The head tilts about 23° from level, not 45°:
+  a steeper tambourine went into the round belly, and the short right arm did not reach a
+  tambourine farther out. The fingers point forward and to the left, so that the right wrist
+  stays out of the belly.
+- **The triangle stand (section 8).** The triangle hangs from a stand at the left of the player,
+  not on the table, so that the left paw hangs it with the turn of its hold. A turn to lay it
+  flat on the table twisted the paw 150° in 0.05 s. The move from the stand to the tambourine on
+  the table still twists the paw through 180°.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
 - **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand
@@ -420,7 +442,7 @@ The models of `percussion.ts` follow these facts of real concert instruments (de
 ## 11. Sources
 
 Sources 1 to 12 opened on 2026-10-19, sources 13 to 33 on 2026-10-20, sources 36 to 42 on
-2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 66
+2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 67
 on 2026-11-08, except where a source says "a search summary only".
 
 1. "3 Timpani Grips", The Instrumentalist, December 2014.
@@ -555,3 +577,5 @@ on 2026-11-08, except where a source says "a search summary only".
     https://groverpro.com/docs/Tech-Talk/Tambourine_Essentials_Ben_Stiers.pdf
 66. G. Hicken and M. Lortz, "Tambourine Technique", The Instrumentalist, October/November 2020.
     https://theinstrumentalist.com/october-november-2020/tambourine-technique/
+67. A. Hugill, "The Orchestra: A User's Manual", Percussion Section.
+    https://andrewhugill.com/OrchestraManual/section_percussion.html

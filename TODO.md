@@ -850,15 +850,16 @@ scene of each demo has its seats and stage size with no overlap.
       (`PercussionHold.pair`). Offer the user longer arms.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
-- [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player
-      holds it, strikes with the fingertips, the fingers, or the knuckles by the dynamic, and plays
-      a shake roll or a thumb roll (percussion-technique 8). The left paw holds the triangle.
-      Blocked: each piece follows one bone, and only the `instrument` bone and the `slide` bone
-      move apart from a paw. A switch at the rests needs three pieces that move apart (the
-      tambourine, the triangle, and a fixed trap table), and the beater must leave the right paw.
-      Two of the three demos with this player play both instruments (boulanger-matin, with a
-      switch in 0.4 s at 62 s, and the percussion test score). A new bone for a prop changes the
-      pose of each player. Ask the user for the route.
+- [ ] Small percussion: at a switch, the left paw twists through 180° in 0.05 s while it moves
+      on the trap table from the triangle stand to the tambourine, and back (`pnpm arm-check
+      percussionist --trace tambourine-test:7.5-8 --midi
+      reports/2026-11-08-perc-pro-4/tambourine-test.mid`: a jump of 100° at 7.75 s). The paw turns
+      of the two places lie 122° apart. A mix in the frame of the forearm, through the straight paw,
+      did not remove it.
+- [ ] Small percussion: no demo has a rest of 2.7 s between the triangle and the tambourine
+      (`switchRestSec()`), so each demo plays the tambourine on the trap table with the beater.
+      `boulanger-matin` changes the instrument in 0 s to 2.1 s. Ask the user for a demo or a
+      shorter switch.
 - [ ] Polar bear pianist: the claw tips almost touch when the paws play two octaves apart, because
       the paws point in along the forearms (`PAW_TURN`).
 - [ ] Conductor: start `docs/reference/conducting-technique.md` with sources: the beat patterns, the

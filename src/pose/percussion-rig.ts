@@ -6,12 +6,14 @@ import { placePoint } from '../models/instruments/hold.ts';
 import {
   BASS_DRUM,
   SNARE_DRUM,
+  TABLE_PLACES,
   TIMPANI,
   TRIANGLE,
   XYLOPHONE,
   kettleHeadRadius,
   xylophoneBarPosition,
 } from '../models/instruments/percussion.ts';
+import type { TablePlace } from '../models/instruments/percussion.ts';
 import type { PlayTarget } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
@@ -22,6 +24,7 @@ import type { HangingArm } from './hang.ts';
 import { trunkFront } from './cello-place.ts';
 import { armRig } from './ik.ts';
 import type { ArmRig } from './ik.ts';
+import { TAMBOURINE_KEY } from './percussion-switch.ts';
 import { plantedLegs } from './side-move.ts';
 import type { PlantedLegs, SideMove } from './side-move.ts';
 import type { StrikeSizes, StrikeTarget } from './strikes.ts';
@@ -854,8 +857,62 @@ function triangleCorner(): readonly (readonly [number, Vec3, Vec3])[] {
   ];
 }
 
-/** The MIDI key of the tambourine (design 4.6). The other keys of the player strike the triangle. */
-const TAMBOURINE_KEY = 54;
+/**
+ * The key of the target of the head of the tambourine in the left paw (`SwitchRig`). Key 1 is the
+ * head of the tambourine on the trap table, and keys 2 and 3 are the roll targets of the triangle.
+ */
+export const HELD_TAMBOURINE_KEY = 4;
+
+/**
+ * The hold of the tambourine in the left paw and the strikes of the right paw on it (design 5.3),
+ * as a real player holds the tambourine by its frame at or a little below the chest, tilted in,
+ * and strikes it with the fingertips, the fingers, or the knuckles by the dynamic
+ * (`docs/reference/percussion-technique.md` 8). The places are in head heights `H`.
+ */
+export const TAMBOURINE_HOLD = {
+  /** The middle of the head of the held tambourine, from the left shoulder joint. */
+  head: [0.7, -0.19, -1.23],
+  /** The direction out of the head: up, toward the player, and toward the right paw. */
+  face: [0.15, 0.9, 0.35],
+  /** The direction on the head from its middle to the grip of the left paw on the frame. */
+  grip: [-0.8, 0, 0.6],
+  /**
+   * The distance of the spot of a soft note from the middle of the head, toward the right paw,
+   * in meters: the fingertips strike near the rim for pp to mp.
+   */
+  rimSpot: 0.07,
+  /**
+   * The distance of the spot of a louder note from the middle of the head, toward the right paw,
+   * in meters: the fingers and the knuckles strike near the middle, as far in as the short right
+   * arm reaches.
+   */
+  middleSpot: 0.035,
+  /** A note below this loudness is soft: the fingertips strike near the rim. */
+  soft: 0.4,
+  /** A note above this loudness is loud: the knuckles of a loose fist strike the middle. */
+  loud: 0.75,
+  /** The curl of the right fingers for a soft, a middle, and a loud note, in radians. */
+  curls: [0.3, 0.9, 1.5],
+  /** The distance of the thumb roll from the middle of the head, in meters. */
+  thumbRadius: 0.085,
+  /** The arc of the thumb along the rim in a thumb roll, in radians. */
+  thumbArc: 0.8,
+  /**
+   * The middle of the arc of a thumb roll, as a turn around the head from the direction to the
+   * right paw, in radians: away from the belly.
+   */
+  thumbAt: 0.5,
+  /** The turn of the left forearm to each side in a shake roll, in radians. */
+  shake: 12 * MathUtils.DEG2RAD,
+  /** The turns of a shake roll each second, as a fast turn of a door knob. */
+  shakeRate: 7,
+  /** A roll at or above this loudness is a shake roll, and a softer roll is a thumb roll. */
+  shakeLoud: 0.5,
+  /** The forward lean of the spine at the trap table, in radians. */
+  tableLean: 0.15,
+  /** The direction to which the right elbow points at the held tambourine. */
+  poleR: [1.5, -0.5, 0.3],
+} as const;
 
 /**
  * One hand of a percussion player.
@@ -950,6 +1007,40 @@ export interface PercussionRig {
    * with no such damp.
    */
   readonly dampHands: readonly [left: DampHand | null, right: DampHand | null];
+  /** The held tambourine and the trap table of the small percussion player, or `null`. */
+  readonly switch: SwitchRig | null;
+}
+
+/** A wrist and the world rotation of its hand from the bind pose. */
+export interface PawPlace {
+  readonly wrist: Vec3;
+  readonly hand: Quat;
+}
+
+/**
+ * The places of the paws of the small percussion player with the held tambourine and at the trap
+ * table (design 5.3).
+ */
+export interface SwitchRig {
+  /** The left paw that holds the tambourine by its frame. */
+  readonly tambourine: PawPlace;
+  /** The left paw at the places of the tambourine and of the triangle on the table. */
+  readonly tableTambourine: PawPlace;
+  readonly tableTriangle: PawPlace;
+  /** The right paw at the place of the beater on the table. */
+  readonly tableBeater: PawPlace;
+  /** The middle of the head of the held tambourine, and the unit normal out of it. */
+  readonly head: StrikeTarget;
+  /** The unit direction on the head from its middle toward the right paw. */
+  readonly toRight: Vec3;
+  /**
+   * The world rotation of the right hand that strikes the head: the palm faces the head, and the
+   * fingers point forward and to the left, between the left side and the line from the right
+   * shoulder, so that the wrist stays out of the belly and in the reach of the short arm.
+   */
+  readonly fingerHand: Quat;
+  /** The tip of the middle claw of the right paw in the bind pose, from the bind wrist. */
+  readonly tip: Vec3;
 }
 
 /**
@@ -1414,13 +1505,13 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         point: toVec3(held(bar.point).add(new Vector3(...wrist))),
         normal: toVec3(new Vector3(...bar.normal).applyQuaternion(hand)),
       });
-      targets.set(
-        1,
-        bindTarget(
-          model,
-          findTarget(model, (t) => t.kind === 'head'),
-        ),
+      // The tambourine on the table, which the tip of the beater strikes ({@link TABLE_PLACES}):
+      // one inch or two in from its rim toward the right paw.
+      const onTable = bindTarget(
+        model,
+        findTarget(model, (t) => t.kind === 'head' && t.bone === 'instrument'),
       );
+      targets.set(1, offsetTarget(onTable, [TAMBOURINE_HOLD.rimSpot, 0, 0]));
       // A roll strikes the two sides of the closed lower corner from inside, in turn
       // (`TRIANGLE_ROLL.keys`). Each target lies on the inner face of its side, and lifts toward
       // the inside of the corner and toward the player, so that the beater goes in and out in
@@ -1503,6 +1594,106 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     place,
     dampPlace,
     dampHands,
+    switch: instrument === 'small-percussion' ? switchRig(model, left, right, inH) : null,
+  };
+}
+
+/**
+ * Gives the place of a paw that puts a piece on the trap table: the piece keeps its place in the
+ * paw, so the paw takes the turn of the place, and the wrist follows the origin of the piece.
+ *
+ * @param model The player model.
+ * @param arm The arm.
+ * @param bone The bone of the piece.
+ * @param place The place of the piece on the table.
+ * @returns The wrist and the turn of the hand.
+ */
+function tablePaw(
+  model: PlayerModel,
+  arm: ArmRig,
+  bone: 'malletL' | 'malletR',
+  place: TablePlace,
+): PawPlace {
+  const hand = new Quaternion(...place.hand);
+  const origin = new Vector3(...(model.skeleton.positions[boneIndex(bone)] ?? arm.bind.wrist));
+  const wrist = new Vector3(...place.at).sub(
+    origin.sub(new Vector3(...arm.bind.wrist)).applyQuaternion(hand),
+  );
+  return { wrist: toVec3(wrist), hand: toQuat(hand) };
+}
+
+/**
+ * Gives the rotation that turns two bind directions to two target directions: the first exactly,
+ * and the second as near as the first permits.
+ *
+ * @param fromA The first bind direction.
+ * @param fromB The second bind direction.
+ * @param toA The first target direction.
+ * @param toB The second target direction.
+ * @returns The rotation.
+ */
+export function turnOfPair(fromA: Vector3, fromB: Vector3, toA: Vector3, toB: Vector3): Quaternion {
+  const basis = (a: Vector3, b: Vector3): Matrix4 => {
+    const x = a.clone().normalize();
+    const y = b.clone().projectOnPlane(x).normalize();
+    return new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y));
+  };
+  const target = basis(toA, toB);
+  return new Quaternion().setFromRotationMatrix(target.multiply(basis(fromA, fromB).transpose()));
+}
+
+/**
+ * Finds the places of the paws of the small percussion player with the held tambourine and at the
+ * trap table (`SwitchRig`, design 5.3).
+ *
+ * @param model The player model with the small percussion.
+ * @param left The left arm.
+ * @param right The right arm.
+ * @param inH Gives a vector in head heights in meters.
+ * @returns The places.
+ */
+function switchRig(
+  model: PlayerModel,
+  left: ArmRig,
+  right: ArmRig,
+  inH: (v: Vec3) => Vector3,
+): SwitchRig {
+  const t = TAMBOURINE_HOLD;
+  const held = bindTarget(
+    model,
+    findTarget(model, (target) => target.kind === 'head' && target.bone === 'malletL'),
+  );
+  const middle = inH(t.head).add(new Vector3(...left.bind.shoulder));
+  const face = new Vector3(...t.face).normalize();
+  const toGrip = new Vector3(...t.grip).projectOnPlane(face).normalize();
+  // In the bind pose, the grip of the left paw on the frame lies behind the middle of the head.
+  const pinch = new Vector3(...(model.skeleton.positions[boneIndex('malletL')] ?? left.bind.wrist));
+  const bindHead = new Vector3(...held.point);
+  const hand = turnOfPair(new Vector3(...held.normal), pinch.sub(bindHead), face, toGrip);
+  const wrist = middle
+    .clone()
+    .sub(bindHead.sub(new Vector3(...left.bind.wrist)).applyQuaternion(hand));
+  const toRight = new Vector3(...right.bind.shoulder).sub(middle).projectOnPlane(face).normalize();
+  const fingersTo = new Vector3(-1, 0, 0).sub(toRight).projectOnPlane(face).normalize();
+  // The tip of the middle claw: the lowest corner of the fingers of the right paw in the bind pose.
+  const { positions, bones } = model.mesh;
+  const fingers = boneIndex('fingersR');
+  let tip = new Vector3(...right.bind.wrist);
+  for (let c = 0; c < bones.length; c++) {
+    const y = positions[c * 3 + 1] ?? Infinity;
+    if (bones[c] === fingers && y < tip.y) {
+      tip = new Vector3(positions[c * 3] ?? 0, y, positions[c * 3 + 2] ?? 0);
+    }
+  }
+  return {
+    tambourine: { wrist: toVec3(wrist), hand: toQuat(hand) },
+    tableTambourine: tablePaw(model, left, 'malletL', TABLE_PLACES.tambourine),
+    tableTriangle: tablePaw(model, left, 'malletL', TABLE_PLACES.triangle),
+    tableBeater: tablePaw(model, right, 'malletR', TABLE_PLACES.beater),
+    head: { point: toVec3(middle), normal: toVec3(face) },
+    toRight: toVec3(toRight),
+    fingerHand: toQuat(pawTurn('R', face.clone().negate(), fingersTo)),
+    tip: toVec3(tip.sub(new Vector3(...right.bind.wrist))),
   };
 }
 

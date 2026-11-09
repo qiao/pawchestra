@@ -551,6 +551,17 @@ The rest of each family:
   inside, with a small lift (`triangleRolls()`), as a real player rolls in a closed corner
   (percussion 8). The roll targets lift toward the player, so the beater goes in and out in front
   of the rods.
+- **Tambourine** (`percussion-switch.ts`, `TAMBOURINE_HOLD`). A run of tambourine notes with a
+  rest of at least `switchRestSec()` before and after it is held in the left paw. In the rests
+  around it, the paws go to the trap table: the left paw hangs the triangle on its stand and takes
+  the tambourine, and the right paw puts down the beater, and the reverse after the run. The pose
+  shows one copy of each switched piece, on the table or in a paw (`AnimalPose.held`), from the
+  score alone. The right paw strikes the held head with the fingers, nearer to the rim and with
+  less curl for a softer note. A roll of the held tambourine is a shake of the left forearm when
+  it is loud, and a thumb along the rim when it is soft. A shorter rest keeps the triangle in the
+  left paw, and the beater strikes the tambourine on the table. Reason: a real player holds the
+  tambourine and lays the other instruments on a trap table (percussion 8), and each piece follows
+  one bone, so a piece that moves between a paw and the table has a copy at each place.
 - **Xylophone.** The heads stay a few cm over the bars between strikes, and lift higher by the
   loudness before a strike. A fast strike that would pass the other paw takes a double stroke
   (`PercussionHold.pass` 0), as a real player puts in a double stroke where alternate strokes cross

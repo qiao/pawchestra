@@ -2,7 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
-import { NO_TURN, Y_AXIS, Z_AXIS } from './axes.ts';
+import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore, mixPole, mixRotation } from './blend.ts';
 import { createFrame, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
@@ -12,6 +12,7 @@ import { groupChords } from './note-groups.ts';
 import type { NoteGroup } from './note-groups.ts';
 import {
   CRASH_MOTION,
+  TAMBOURINE_HOLD,
   TRIANGLE_ROLL,
   acrossAxes,
   frontKettles,
@@ -20,6 +21,13 @@ import {
   xylophoneShift,
 } from './percussion-rig.ts';
 import type { DampRule, MalletSet, PercussionRig, PercussionSide } from './percussion-rig.ts';
+import {
+  buildSwitchTrack,
+  instrumentRuns,
+  onlyTambourine,
+  switchStateAt,
+} from './percussion-switch.ts';
+import type { InstrumentRun, SwitchState, SwitchTrack } from './percussion-switch.ts';
 import { DAMP_MOTION, dampTrack } from './damps.ts';
 import type { DampState, DampTrack, DampWish } from './damps.ts';
 import { buildSideTrack, sideMoveAt } from './side-move.ts';
@@ -49,6 +57,23 @@ interface PercussionTracks {
   readonly damp: DampTrack | null;
   /** The follow move of the hand cymbals after a crash ({@link CRASH_MOTION}), or `null`. */
   readonly ring: DampTrack | null;
+  /** The switches and the rolls of the small percussion player, or `null`. */
+  readonly small: SmallTracks | null;
+}
+
+/** The motion of the small percussion player with the held tambourine (design 5.3). */
+export interface SmallTracks {
+  /** The switches between the triangle and the held tambourine. */
+  readonly switches: SwitchTrack;
+  /**
+   * The rolls of the held tambourine, three numbers for each, sorted: the start, the end, and 1
+   * for a shake roll or 0 for a thumb roll (`TAMBOURINE_HOLD.shakeLoud`).
+   */
+  readonly rolls: Float64Array;
+  /** The loudness of each strike of the right paw, in the order of its strikes. */
+  readonly loudness: Float64Array;
+  /** 1 for each strike of the right paw on the held tambourine, in the order of its strikes. */
+  readonly held: Uint8Array;
 }
 
 /**
@@ -168,13 +193,16 @@ export function percussionTracks(
 ): PercussionTracks {
   const { hold, instrument } = rig;
   const noteGroups = groupChords(notes, loudness);
-  const chords = chordStrikes(rig, notes, noteGroups);
+  const runs = rig.switch ? instrumentRuns(noteGroups) : null;
+  const chords = chordStrikes(rig, notes, noteGroups, runs);
   // A fast roll keeps the strikes of a rate that reads as a roll: two hands in turn, or one hand.
   const kept = thinRolls(
     chords,
     hold.hands === 'alternate' ? STRIKE_MOTION.rollSec : STRIKE_MOTION.handRollSec,
   );
-  const groups = instrument === 'small-percussion' ? triangleRolls(rig, chords, kept) : kept;
+  const rolled = instrument === 'small-percussion' ? triangleRolls(rig, chords, kept) : kept;
+  const held = runs ? tambourineRolls(chords, rolled, runs) : null;
+  const groups = held ? held.groups : rolled;
   const side = hold.side
     ? buildSideTrack(
         hold.side,
@@ -211,7 +239,90 @@ export function percussionTracks(
           afterEnds(groups, [damp, ring]),
         )
       : null;
-  return { left, right, side, rests, damp, ring };
+  const small =
+    runs && held
+      ? {
+          switches: buildSwitchTrack(runs),
+          rolls: held.rolls,
+          loudness: Float64Array.from(
+            groups.flatMap((g) => (g.targets.length > 0 ? [g.loudness] : [])),
+          ),
+          held: Uint8Array.from(
+            groups.flatMap((g) => (g.targets.length > 0 ? [inHeldRun(runs, g) ? 1 : 0] : [])),
+          ),
+        }
+      : null;
+  return { left, right, side, rests, damp, ring, small };
+}
+
+/**
+ * Tells if a note group is a note of a run of the tambourine that the left paw holds.
+ *
+ * @param runs The runs of the player ({@link instrumentRuns}).
+ * @param group The note group.
+ * @returns True for a held tambourine note.
+ */
+function inHeldRun(runs: readonly InstrumentRun[], group: StrikeGroup | NoteGroup): boolean {
+  return runs.some(
+    (run) => run.held && group.start >= run.start - 1e-9 && group.start <= run.end + 1e-9,
+  );
+}
+
+/** The strikes of the small percussion player with the rolls of the held tambourine. */
+interface TambourineRolls {
+  /** The kept strike groups, with no target in a roll. */
+  readonly groups: StrikeGroup[];
+  /** The rolls (`SmallTracks.rolls`). */
+  readonly rolls: Float64Array;
+}
+
+/**
+ * Finds the rolls of the held tambourine (design 5.3): a run of notes of the held tambourine,
+ * each within `TRIANGLE_ROLL.rollSec` of the note before it. A loud roll is a shake roll of the
+ * left forearm, and a soft roll is a thumb roll along the rim, as a real player plays a long note
+ * (`docs/reference/percussion-technique.md` 8). The right paw does not strike the notes of a roll.
+ *
+ * @param chords All strike groups of the player, sorted by start.
+ * @param groups The kept strike groups, sorted by start.
+ * @param runs The runs of the player.
+ * @returns The kept groups with no target in a roll, and the rolls.
+ */
+function tambourineRolls(
+  chords: readonly StrikeGroup[],
+  groups: readonly StrikeGroup[],
+  runs: readonly InstrumentRun[],
+): TambourineRolls {
+  const spans: [number, number, number][] = [];
+  for (const [i, g] of chords.entries()) {
+    const before = chords[i - 1];
+    if (
+      !before ||
+      !inHeldRun(runs, g) ||
+      !inHeldRun(runs, before) ||
+      g.start - before.start >= TRIANGLE_ROLL.rollSec
+    ) {
+      continue;
+    }
+    const last = spans.at(-1);
+    if (last && last[1] === before.start) {
+      last[1] = g.start;
+      last[2] = Math.max(last[2], g.loudness);
+    } else {
+      spans.push([before.start, g.start, Math.max(before.loudness, g.loudness)]);
+    }
+  }
+  const inRoll = (g: StrikeGroup): boolean =>
+    spans.some(([from, to]) => g.start >= from - 1e-9 && g.start <= to + 1e-9);
+  return {
+    groups: groups.map((g) => (inRoll(g) ? { ...g, targets: [] } : g)),
+    rolls: Float64Array.from(
+      spans.flatMap(([from, to, loud]) => [
+        from,
+        to + STRIKE_MOTION.reboundSec,
+        loud >= TAMBOURINE_HOLD.shakeLoud ? 1 : 0,
+      ]),
+    ),
+  };
 }
 
 /**
@@ -230,6 +341,7 @@ function chordStrikes(
   rig: PercussionRig,
   notes: readonly PlayerNote[],
   noteGroups: readonly NoteGroup[],
+  runs: readonly InstrumentRun[] | null,
 ): StrikeGroup[] {
   const { hold, instrument } = rig;
   const kettles = instrument === 'timpani' ? rig.targets.size : 4;
@@ -247,6 +359,21 @@ function chordStrikes(
   const keyOf = (pitch: number): number =>
     pair ? (pitch < middle ? frontL : frontR) : targetKeyOf(instrument, pitch, kettles, shift);
   return noteGroups.map((group): StrikeGroup => {
+    // The right paw strikes the held tambourine near the rim for a soft note, and nearer to the
+    // middle for a louder note (`TAMBOURINE_HOLD`).
+    if (rig.switch && runs && onlyTambourine(group) && inHeldRun(runs, group)) {
+      const { head, toRight } = rig.switch;
+      const t = TAMBOURINE_HOLD;
+      const point = new Vector3(...head.point).addScaledVector(
+        new Vector3(...toRight),
+        group.loudness < t.soft ? t.rimSpot : t.middleSpot,
+      );
+      return {
+        start: group.start,
+        loudness: group.loudness,
+        targets: [{ point: [point.x, point.y, point.z], normal: head.normal }],
+      };
+    }
     const keys = new Set<number>();
     for (const note of notes.slice(group.first, group.first + group.count)) {
       keys.add(keyOf(note.pitch));
@@ -541,6 +668,93 @@ export interface PercussionState {
   readonly damp: DampState;
   /** The follow move of the hand cymbals after a crash ({@link CRASH_MOTION}). */
   readonly ring: DampState;
+  /** The switch of the small percussion player between the triangle and the tambourine. */
+  readonly swap: SwitchState;
+  /** The small percussion player at the held tambourine ({@link smallStateAt}). */
+  readonly small: SmallState;
+}
+
+/** The roll and the strike of the small percussion player at one time (design 5.3). */
+export interface SmallState {
+  /** The roll of the held tambourine: -1 for no roll, 0 for a thumb roll, 1 for a shake roll. */
+  roll: number;
+  /** The share of the time of the roll, from 0 to 1. */
+  rollShare: number;
+  /** The time since the start of the roll, in seconds. */
+  rollSec: number;
+  /** The loudness of the last or the next strike of the right paw, from 0 to 1. */
+  loudness: number;
+  /** True when the last or the next strike of the right paw is on the held tambourine. */
+  onHead: boolean;
+  /** True when the strike before it is on the held tambourine too. */
+  fromHead: boolean;
+  /** The target of the last or the next strike of the right paw. */
+  readonly point: [number, number, number];
+}
+
+/**
+ * Makes a state with no roll and no loudness.
+ *
+ * @returns The state.
+ */
+export function createSmallState(): SmallState {
+  return {
+    roll: -1,
+    rollShare: 0,
+    rollSec: 0,
+    loudness: 0,
+    onHead: false,
+    fromHead: false,
+    point: [0, 0, 0],
+  };
+}
+
+/**
+ * Calculates the switch, the roll, and the loudness of the strike of the right paw of the small
+ * percussion player at a song time (design 5.3).
+ *
+ * @param small The tracks of the player, or `null` for another player.
+ * @param right The strikes of the right paw, or `null`.
+ * @param time The song time of the note layer.
+ * @param swap Gets the switch.
+ * @param out Gets the roll and the loudness.
+ */
+export function smallStateAt(
+  small: SmallTracks | null,
+  right: StrikeTrack | null,
+  time: number,
+  swap: SwitchState,
+  out: SmallState,
+): void {
+  out.roll = -1;
+  out.rollShare = 0;
+  out.rollSec = 0;
+  out.loudness = 0;
+  out.onHead = false;
+  out.fromHead = false;
+  if (!small) {
+    return;
+  }
+  switchStateAt(small.switches, time, swap);
+  const { rolls } = small;
+  for (let k = 0; k + 2 < rolls.length; k += 3) {
+    const start = rolls[k] ?? 0;
+    const end = rolls[k + 1] ?? 0;
+    if (time >= start && time < end) {
+      out.roll = rolls[k + 2] ?? 0;
+      out.rollShare = (time - start) / (end - start || 1);
+      out.rollSec = time - start;
+    }
+  }
+  const i = right ? lastAtOrBefore(right.upStarts, time) : -1;
+  if (right && i >= 0) {
+    out.loudness = small.loudness[i] ?? 0;
+    out.onHead = small.held[i] === 1;
+    out.fromHead = small.held[i - 1] === 1;
+    out.point[0] = right.points[3 * i] ?? 0;
+    out.point[1] = right.points[3 * i + 1] ?? 0;
+    out.point[2] = right.points[3 * i + 2] ?? 0;
+  }
 }
 
 const shoulder = createFrame();
@@ -555,6 +769,11 @@ const offset = new Vector3();
 const wristBind = new Vector3();
 const grip = new Vector3();
 const homeShift = new Vector3();
+const localFrom = new Quaternion();
+const localTo = new Quaternion();
+const straight = new Quaternion();
+const tablePole = new Vector3();
+const playPole = new Vector3();
 const corner = new Vector3();
 const level = new Vector3();
 const swing = new Quaternion();
@@ -999,8 +1218,11 @@ function poseHand(
   const side = left ? rig.left : rig.right;
   const hang = left ? rig.hangL : rig.hangR;
   const hand = left ? state.left : state.right;
-  // The direction to which the elbow points while the player plays.
-  const pole = left ? rig.hold.poleL : rig.hold.poleR;
+  // With no beater in the right paw, the fingers strike the held tambourine.
+  const fingers = !left && rig.switch !== null && state.swap.held[2] === 0;
+  // The direction to which the elbow points while the player plays. The right elbow points
+  // further out at the held tambourine, so that the forearm stays out of the belly.
+  const pole = left ? rig.hold.poleL : fingers ? TAMBOURINE_HOLD.poleR : rig.hold.poleR;
   const { arm } = side;
   poseShoulder(arm, chest, rig.chestBind, NO_TURN, shoulder);
   hangingWrist(hang, shoulder, hanging);
@@ -1021,7 +1243,7 @@ function poseHand(
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
-  if (side.kind === 'mallet' && side.across) {
+  if (side.kind === 'mallet' && side.across && !fingers) {
     const rest = rig.hold.sizes.rest;
     let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
     // At a damp, the grip goes to its place, and the wrist lifts the head of the mallet.
@@ -1044,10 +1266,25 @@ function poseHand(
     if (damped?.kind === 'grip' && damped.touch !== null && muffle > 0) {
       wrist.y += (damped.touch - lowestPoint(damped.paw, wrist, turn)) * muffle;
     }
+  } else if (side.kind === 'mallet' && fingers) {
+    fingerHand(rig, hand, state.small);
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);
   } else if (side.kind === 'plate') {
     plateHand(rig, side, hand, state.damp, state.ring);
+  } else if (side.kind === 'hold' && rig.switch && state.swap.held[0] === 1) {
+    // The left paw holds the tambourine, and turns the forearm to and fro in a shake roll.
+    wrist.fromArray(rig.switch.tambourine.wrist);
+    turn.fromArray(rig.switch.tambourine.hand);
+    if (state.small.roll === 1) {
+      const t = TAMBOURINE_HOLD;
+      along.copy(wrist).sub(shoulder.position).normalize();
+      swing.setFromAxisAngle(
+        along,
+        t.shake * Math.sin(2 * Math.PI * t.shakeRate * state.small.rollSec),
+      );
+      turn.premultiply(swing);
+    }
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
@@ -1058,6 +1295,42 @@ function poseHand(
     wrist.copy(hanging);
     turn.copy(restHand);
   }
+  // At a switch, the paws go to the trap table: the left paw from the place of the instrument that
+  // it puts down to the place of the instrument that it takes, and the right paw to the beater.
+  const swap = state.swap;
+  if (rig.switch && swap.table > 0) {
+    const s = rig.switch;
+    // The elbow points as on the hanging arm at the table (`writeArm()` below).
+    const poleAt = (share: number, out: Vector3): Vector3 =>
+      out.fromArray(mixPole(hang.pole, pole, 1 - share)).applyQuaternion(chest.rotation);
+    poleAt(1, tablePole);
+    if (left) {
+      const [from, to] = swap.toTambourine
+        ? [s.tableTriangle, s.tableTambourine]
+        : [s.tableTambourine, s.tableTriangle];
+      // The paw turns on its forearm from one place to the other ({@link forearmFrame}).
+      forearmFrame(arm, shoulder.position, grip.fromArray(from.wrist), tablePole, localFrom);
+      localFrom.invert().multiply(strikeHand.fromArray(from.hand));
+      forearmFrame(arm, shoulder.position, grip.fromArray(to.wrist), tablePole, localTo);
+      localTo.invert().multiply(strikeHand.fromArray(to.hand));
+      grip.fromArray(from.wrist).lerp(offset.fromArray(to.wrist), swap.across);
+      forearmFrame(arm, shoulder.position, grip, tablePole, strikeHand);
+      strikeHand.multiply(mixOnForearm(localFrom, localTo, swap.across));
+    } else {
+      grip.fromArray(s.tableBeater.wrist);
+      strikeHand.fromArray(s.tableBeater.hand);
+    }
+    // The turn of the paw on the forearm mixes from the play place to the table, so that the
+    // paw does not pass a flip of its twist while the forearm turns. A mix of the world turns
+    // passed 180° of twist in the left paw.
+    forearmFrame(arm, shoulder.position, wrist, poleAt(0, playPole), localFrom);
+    localFrom.invert().multiply(turn);
+    forearmFrame(arm, shoulder.position, grip, tablePole, localTo);
+    localTo.invert().multiply(strikeHand);
+    wrist.lerp(grip, swap.table);
+    forearmFrame(arm, shoulder.position, wrist, poleAt(swap.table, playPole), turn);
+    turn.multiply(mixOnForearm(localFrom, localTo, swap.table));
+  }
   limitReach(arm, shoulder.position, wrist);
 
   writeArm(
@@ -1066,16 +1339,124 @@ function poseHand(
       shoulder,
       wrist: wrist.lerpVectors(hanging, wrist, play),
       hand: mixRotation(restHand, turn, play, turn),
-      // The elbow of the hanging arm points back and out.
-      pole: mixPole(hang.pole, pole, play),
+      // The elbow of the hanging arm points back and out, also at the trap table.
+      pole: mixPole(hang.pole, pole, rig.switch ? play * (1 - state.swap.table) : play),
     },
     chest.rotation,
     rotations,
   );
   // A paw with a mallet holds it also at rest and in the lift. The free paw keeps its fingers
   // open, also with the palm on a drum head.
-  const curl = side.kind === 'free' ? 0 : rig.hold.curl;
+  const curl = side.kind === 'free' ? 0 : fingers ? fingerCurl(state.small) : rig.hold.curl;
   writeCurl(arm, side.kind === 'mallet' ? curl : curl * play, rotations);
+}
+
+/**
+ * Writes the frame of the forearm of an arm whose wrist goes to a place: the forearm along x, and
+ * the direction of no twist of a mallet (`acrossAxes()`) along y.
+ *
+ * @param arm The arm.
+ * @param joint The posed shoulder joint.
+ * @param at The wrist.
+ * @param pole The direction to which the elbow points, in the model axes.
+ * @param out Gets the frame as a world rotation.
+ */
+function forearmFrame(
+  arm: Extract<PercussionSide, { kind: 'mallet' }>['arm'],
+  joint: Vector3,
+  at: Vector3,
+  pole: Vector3,
+  out: Quaternion,
+): void {
+  shoulderBind.fromArray(arm.bind.shoulder);
+  elbowBind.fromArray(arm.bind.elbow);
+  const upper = elbowBind.distanceTo(shoulderBind);
+  const lower = wristBind.fromArray(arm.bind.wrist).distanceTo(elbowBind);
+  solveTwoBone(joint, corner.copy(at), upper, lower, pole, joints);
+  forearm.subVectors(joints.wrist, joints.elbow).normalize();
+  acrossAxes(forearm, upperArm.subVectors(joints.elbow, joint), arm.side, acrossUp, acrossOut);
+  setFromBasis(out, forearm, acrossUp);
+}
+
+/**
+ * Mixes two turns of a paw in the frame of its forearm ({@link forearmFrame}) through the straight
+ * paw: the bend goes out in the first half and comes in in the second half, and the twist around
+ * the forearm mixes on the way. A direct mix of two paws bent to two sides bent the paw 174° on
+ * its way.
+ *
+ * @param from The first turn, in the frame of the forearm. It gets the mix.
+ * @param to The second turn, in the frame of the forearm.
+ * @param share The share of the second turn, from 0 to 1.
+ * @returns `from`, with the mix.
+ */
+function mixOnForearm(from: Quaternion, to: Quaternion, share: number): Quaternion {
+  const twist = (q: Quaternion): number => 2 * Math.atan2(q.x, q.w);
+  const a = twist(from);
+  const b = twist(to);
+  const turnBy = Math.atan2(Math.sin(b - a), Math.cos(b - a));
+  straight.setFromAxisAngle(X_AXIS, a + turnBy / 2);
+  if (share < 0.5) {
+    return from.slerp(straight, 2 * share);
+  }
+  return from.copy(straight).slerp(to, 2 * share - 1);
+}
+
+/**
+ * Gives the curl of the right fingers on the held tambourine by the loudness
+ * (`TAMBOURINE_HOLD.curls`): open fingertips for a soft note, bunched fingers for a middle note,
+ * and a loose fist for a loud note.
+ *
+ * @param small The state of the small percussion player.
+ * @returns The curl, in radians.
+ */
+function fingerCurl(small: SmallState): number {
+  const t = TAMBOURINE_HOLD;
+  if (small.roll === 0 || small.loudness < t.soft) {
+    return t.curls[0];
+  }
+  return small.loudness < t.loud ? t.curls[1] : t.curls[2];
+}
+
+/**
+ * Writes the wrist and the world rotation of the right paw that strikes the held tambourine
+ * (design 5.3). The palm faces the head, and the fingers point away from the right shoulder. The tip
+ * of the middle claw goes to the height of the strike state over its spot. In a thumb roll, the tip
+ * moves along the rim on the side of the right paw, on the head. In a shake roll, it rests over the
+ * spot of a soft note. The function writes the module vectors `wrist` and `turn`.
+ *
+ * @param rig The points of the player, with the held tambourine.
+ * @param hand The strike state of the right paw.
+ * @param small The state of the small percussion player.
+ */
+function fingerHand(rig: PercussionRig, hand: StrikeState, small: SmallState): void {
+  const s = rig.switch;
+  if (!s) {
+    return;
+  }
+  const t = TAMBOURINE_HOLD;
+  turn.fromArray(s.fingerHand);
+  level.fromArray(s.head.normal);
+  let height = hand.height;
+  if (small.roll === 0) {
+    swing.setFromAxisAngle(level, t.thumbAt + (small.rollShare - 0.5) * t.thumbArc);
+    head
+      .fromArray(s.toRight)
+      .applyQuaternion(swing)
+      .multiplyScalar(t.thumbRadius)
+      .add(top.fromArray(s.head.point));
+    height = 0;
+  } else if (small.roll === 1 || !small.onHead) {
+    // In a shake roll and before the first strike on the head, the paw rests over the spot of a
+    // soft note.
+    head.fromArray(s.toRight).multiplyScalar(t.rimSpot).add(top.fromArray(s.head.point));
+    height = rig.hold.sizes.rest;
+  } else {
+    // The first strike on the head comes from its own spot, not from the target of the beater
+    // before it.
+    head.fromArray(small.fromHead ? hand.point : small.point);
+  }
+  head.addScaledVector(level, height);
+  wrist.copy(head).sub(offset.fromArray(s.tip).applyQuaternion(turn));
 }
 
 /**

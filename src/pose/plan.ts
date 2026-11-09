@@ -53,6 +53,7 @@ import type { HarpFingering } from './harp-fingering.ts';
 import type { StringTrack } from './harp-strings.ts';
 import type { DampTrack } from './damps.ts';
 import { percussionTracks } from './percussion.ts';
+import type { SmallTracks } from './percussion.ts';
 import { percussionRig } from './percussion-rig.ts';
 import type { PercussionRig } from './percussion-rig.ts';
 import { hashUnit, mixHash, mulberry32 } from './random.ts';
@@ -139,6 +140,8 @@ export interface PercussionLayer {
   readonly damp: DampTrack | null;
   /** The follow move of the hand cymbals after a crash (`CRASH_MOTION`), or `null`. */
   readonly ring: DampTrack | null;
+  /** The switches and the rolls of the small percussion player, or `null`. */
+  readonly small: SmallTracks | null;
 }
 
 /** The note layer of the conductor: the baton, the cues, and the left hand (design 5.4). */

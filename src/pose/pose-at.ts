@@ -31,7 +31,9 @@ import { HARP_STRING_COUNT, stringSwingsAt } from './harp-strings.ts';
 import { poseHarpFeet } from './harp-feet.ts';
 import { pedalNotchesAt } from './harp-pedals.ts';
 import { HARP_PEDALS } from '../models/instruments/harp.ts';
-import { posePercussion, setWeightAt } from './percussion.ts';
+import { createSmallState, posePercussion, setWeightAt, smallStateAt } from './percussion.ts';
+import { TAMBOURINE_HOLD } from './percussion-rig.ts';
+import { createSwitchState } from './percussion-switch.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
 import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
@@ -59,6 +61,7 @@ export interface WritablePose extends AnimalPose {
   readonly strings: Float32Array | null;
   readonly pedals: Float32Array | null;
   readonly digits: Float32Array | null;
+  readonly held?: Float32Array | null;
 }
 
 /** The poses of a scene that `poseAt()` writes in place. */
@@ -121,6 +124,7 @@ function createPose(player: PlayerPlan): WritablePose {
       (note.family === 'keyboard' && note.digits) || note.family === 'harp'
         ? new Float32Array(2 * DIGITS)
         : null,
+    held: note.family === 'percussion' && note.small ? Float32Array.from([0, 1, 1]) : null,
   };
 }
 
@@ -503,6 +507,11 @@ function poseAnimal(
       }
       dampStateAt(note.damp, noteTime, strikes.damp);
       dampStateAt(note.ring, noteTime, strikes.ring);
+      // The switch between the triangle and the held tambourine (`SmallTracks`).
+      smallStateAt(note.small, note.right, noteTime, strikes.swap, strikes.small);
+      if (note.small && pose.held) {
+        pose.held.set(strikes.swap.held);
+      }
       // The spine leans over the instrument (`PercussionHold.lean`), also in the rest pose of a
       // player that stays ready at its instrument (`PercussionHold.ready`). The body moves to the
       // side behind the notes, and the instrument and the feet stay in place
@@ -529,6 +538,10 @@ function poseAnimal(
         // The shoulder of the paw of the damp comes forward: the right shoulder at key 1.
         body.turn = (strikes.damp.key === 1 ? 1 : -1) * damp.turn * strikes.damp.weight * ready;
         body.headTurn = -body.turn;
+      }
+      // At the trap table, the spine leans over the table (`TAMBOURINE_HOLD.tableLean`).
+      if (note.small) {
+        body.lean += TAMBOURINE_HOLD.tableLean * strikes.swap.table * ready;
       }
       body.upright = body.lean;
       if (note.side && legs) {
@@ -665,6 +678,8 @@ export function poseAt(
       right: createStrikeState(),
       damp: createDampState(),
       ring: createDampState(),
+      swap: createSwitchState(),
+      small: createSmallState(),
     },
     conductor: {
       baton: { x: 0, y: 0 },
