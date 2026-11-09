@@ -1379,6 +1379,40 @@ const twistHand = new Quaternion();
 const twistPaw = new Quaternion();
 
 /**
+ * Gives the turn of the forearm bone of a studio arm from its bind, as {@link poseStudioBones}
+ * gives it: the bind forearm goes to the posed forearm, and the bind elbow hinge to the posed
+ * hinge. The turn of a paw on its forearm counts in this frame.
+ *
+ * @param pawBind The bind of the paw of the arm ({@link StudioRig.arms}).
+ * @param shoulderAt The posed shoulder joint.
+ * @param elbowAt The posed elbow joint.
+ * @param wristAt The posed wrist joint.
+ * @param out The quaternion to write.
+ * @returns `out`.
+ */
+export function studioForearmTurn(
+  pawBind: PawBind,
+  shoulderAt: Vector3,
+  elbowAt: Vector3,
+  wristAt: Vector3,
+  out: Quaternion,
+): Quaternion {
+  twistUpper.subVectors(elbowAt, shoulderAt).normalize();
+  twistFore.subVectors(wristAt, elbowAt).normalize();
+  twistHinge.crossVectors(twistUpper, twistFore);
+  if (twistHinge.lengthSq() < 1e-8) {
+    twistHinge.set(1, 0, 0);
+  }
+  return alignFrames(
+    twistForeBind.fromArray(pawBind.fore),
+    twistHingeBind.fromArray(pawBind.hinge),
+    twistFore,
+    twistHinge,
+    out,
+  );
+}
+
+/**
  * Gives the twist of a paw of a studio arm on its forearm from the bind of the studio, as the
  * twist bone of the arm takes it (design 4.4, 5.2). A pose that moves a paw through a large turn
  * reads it, so that the twist stays between -π and π on the way and the twist bone does not turn
@@ -1400,20 +1434,8 @@ export function studioPawTwist(
   hand: Quaternion,
   turn: number,
 ): number {
-  twistUpper.subVectors(elbowAt, shoulderAt).normalize();
-  twistFore.subVectors(wristAt, elbowAt).normalize();
-  twistHinge.crossVectors(twistUpper, twistFore);
-  if (twistHinge.lengthSq() < 1e-8) {
-    twistHinge.set(1, 0, 0);
-  }
+  studioForearmTurn(pawBind, shoulderAt, elbowAt, wristAt, twistFrame);
   twistForeBind.fromArray(pawBind.fore);
-  alignFrames(
-    twistForeBind,
-    twistHingeBind.fromArray(pawBind.hinge),
-    twistFore,
-    twistHinge,
-    twistFrame,
-  );
   twistHand
     .copy(hand)
     .multiply(twistPaw.setFromAxisAngle(X_AXIS, turn))
