@@ -40,6 +40,7 @@ import {
 import type { StudioPose, StudioRig } from '../models/studio-rig.ts';
 import type { Skeleton as PlayerSkeleton } from '../models/rig.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
+import { bodyMapMaterial } from './body-texture.ts';
 import { createGeometry } from './geometry.ts';
 import { createDepthGeometry, shareCorners } from './shared-corners.ts';
 import { createStringBands, updateStringBands } from './harp-strings.ts';
@@ -51,7 +52,8 @@ import type { StringBands } from './harp-strings.ts';
  * targets, and the instrument on the bones of the player. The colors of the studio hold its
  * baked occlusion, so the geometry adds none. The body gets its smooth normals, with their changes
  * for the corrective shapes as morph normals (design 4.5). The instrument keeps the crease normals
- * of its finishes. All players of one model share the geometry.
+ * of its finishes. A body with a color map gets its texture points as the attribute `uv1`. All
+ * players of one model share the geometry.
  *
  * @param model The player model of `models/`.
  * @returns The geometry. Its skin indices point at the bones of {@link createPlayerMesh}.
@@ -83,6 +85,10 @@ function* createPlayerGeometrySteps(model: PlayerModel): Steps<BufferGeometry> {
   geometry.morphAttributes['normal'] = render.normals.moves.map(
     (move) => new BufferAttribute(move, 3),
   );
+  if (render.texture) {
+    // The texture points of the color map of the body (design 4.5), on the channel of the map.
+    geometry.setAttribute('uv1', new BufferAttribute(render.texture.uvs, 2));
+  }
   // The moves add to the bind places, as in a glTF file.
   geometry.morphTargetsRelative = true;
   // The keys of a keyboard, the strings of a harp, and the switched pieces move by their ranges of
@@ -504,6 +510,8 @@ function stringLinePoints(strings: HarpStrings, bind: Float32Array): Float32Arra
  * each player gets its own pose. A player with a keyboard or a harp also gets its own positions,
  * so that its keys go down with its notes, and its strings close while their bands show
  * ({@link ownGeometry}). The bands of a harp are a child of the mesh ({@link createStringBands}).
+ * A player whose studio body has a color map gets the copy of the shared material with the map
+ * (`bodyMapMaterial()`, design 4.5).
  *
  * @param model The player model of `models/`.
  * @param geometry The geometry of the model, from {@link createPlayerGeometry}.
@@ -516,7 +524,13 @@ export function createPlayerMesh(
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
   const own = movesCorners(model) ? ownGeometry(geometry) : geometry;
-  const mesh = createStudioMesh(model, model.studio, own, materials);
+  const file = model.studio.body.texture?.file;
+  const mesh = createStudioMesh(
+    model,
+    model.studio,
+    own,
+    file === undefined ? materials : materials.map((shared) => bodyMapMaterial(shared, file)),
+  );
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
   if (!(position instanceof BufferAttribute) || !(bind instanceof Float32Array)) {
