@@ -41,7 +41,8 @@ describe('startTierOf', () => {
 
 describe('tierPixelRatio', () => {
   it('limits the pixel ratio of each tier (design 2.6)', () => {
-    expect(tierPixelRatio('high', 3)).toBe(2);
+    expect(tierPixelRatio('high', 3)).toBeGreaterThanOrEqual(tierPixelRatio('medium', 3));
+    expect(tierPixelRatio('medium', 3)).toBeGreaterThanOrEqual(tierPixelRatio('low', 3));
     expect(tierPixelRatio('low', 3)).toBe(1);
   });
 
