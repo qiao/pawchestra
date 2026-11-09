@@ -312,9 +312,17 @@ the facts of its body in its `.blend` ("Hand rig").
 - It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
   `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
-  with no rule. An old eye that stands out as a ball in a groove shows a light rim
-  around the pea eye, so the head fills it first (`eyeFill`). Each eye bends to the head surface
-  (`eyeBend()`), so its rim lies at the fur. Both eye lights show on the upper left, as the reflection of one lamp does.
+  with no rule. An old eye that stands out as a ball in a groove, or sits in a deep socket, shows
+  a light rim or a gray groove around the pea eye, so the head fills it first (`eyeFill`, the
+  elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
+  `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
+  app do not move the eye places.
+- A pea eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
+  its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
+  view. Each oval turns in the plane of its eye so that it is upright in the front view
+  (`uprightRoll()` of `models/eyes.ts`), because a bend on a sloped cheek leaned the tops of the two
+  eyes toward each other, a sad look. Both lights stand at one place on the two eyes, to the upper
+  left in the front view, as the reflection of one lamp does (`lightAcross()`).
 - The tip of the nose comes from the vertices near the middle plane (`NOSE_PLANE`), or below a
   horn (`noseTop`). The head measures leave out a long nose, the whiskers, and the antlers
   (`headFloor`, `headCeiling`), because the holds in `H` start at the head.
@@ -586,7 +594,8 @@ The layout of the `.blend`:
   is the middle of the eye, its Z axis the direction in which the eye faces, its Y axis up along
   the plane of the eye (the turn of `addEye()`), and its even scale the head height `H` of the
   eye. Both eyes have one size. The mesh of the object is a preview of the eye of the app: the
-  oval of `EYE` and its light, bent to the head surface by the rule of `eyeBend()`. The export
+  oval of `EYE` and its light, bent to the head surface by the rule of `eyeBend()` and turned
+  upright by the rule of `uprightRoll()`. The export
   reads only the transform. `pnpm studio-body` measures the bend where the axis of the eye meets
   the head surface, so that an eye can stand in front of the surface, and it reports a front of
   an eye that the head covers (`eyePush()`).
