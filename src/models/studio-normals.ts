@@ -23,7 +23,7 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * around them, and a raised arm shows them as a dark crack. So a corner of a rim face gets the
  * mean of the normals of all `matte` faces at its vertex that are no caps, with no crease angle.
  *
- * The faces of `eyeballs` are the `lacquer` eyes of the mesh of a hand rig. A corner of such a
+ * The faces of `eyeballs` are the `eye` faces of the mesh of a hand rig. A corner of such a
  * face gets the mean of the normals of the eyeball faces at its vertex, with no crease angle, so
  * that the highlight of the gloss moves smoothly over the ball.
  *

@@ -566,11 +566,11 @@ const FINISHES: ReadonlyMap<string, Finish> = new Map([
 ]);
 
 /**
- * The finish of the eyes of the mesh of a hand rig (design 4.4, "Hand rig"): the finish of the bead
- * eyes, so that the lights of the stage give a sharp highlight on each eyeball. The faces keep the
- * slot `fur` and the color map.
+ * The finish of the eyes of the mesh of a hand rig (design 4.4, "Hand rig"): the wet finish `eye`,
+ * so that the lights of the stage and the eye light of the players (design 4.5) give a highlight
+ * on each eyeball. The faces keep the slot `fur` and the color map.
  */
-const EYEBALL_FINISH: Finish = 'lacquer';
+const EYEBALL_FINISH: Finish = 'eye';
 
 /**
  * The bones of the studio that the app drops: the hand props. The app has its own baton, violin,
