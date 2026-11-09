@@ -325,18 +325,22 @@ def ball_middle(points):
 
 def own_eyes_of(me, points, head):
     """Gives the middle of each eye of the mesh in the bind, in the units and the axes of the
-    studio: the middle of the sphere that fits the vertices of the faces with the face attribute
-    `eye` on each side. The eye bone of the app lies there, and a lid turns about it. Each vertex
-    of an eye must follow only the head bone (`head` holds the head weight of each vertex), so
-    that the eye keeps its form in a blink."""
+    studio: the middle of the sphere that fits the vertices of the eyeball faces on each side. An
+    eyeball face has the face attribute `eye` and no `plain`. An eye face with `plain` is a
+    catchlight on the ball, with its face color and no texture. The eye bone of the app lies at
+    the middle, and a lid turns about it. Each vertex of an eye must follow only the head bone
+    (`head` holds the head weight of each vertex), so that the eye keeps its form in a blink."""
     flags = face_values(me, 'eye', 1, np.zeros(len(me.polygons), bool))
-    corners = {v for p in me.polygons if flags[p.index] for v in p.vertices}
+    plain = face_values(me, 'plain', 1, np.zeros(len(me.polygons), bool))
+    head_rows = {v for p in me.polygons if flags[p.index] for v in p.vertices}
+    corners = {v for p in me.polygons if flags[p.index] and not plain[p.index] for v in p.vertices}
     out = {}
     for side, sign in (('L', 1), ('R', -1)):
         mine = sorted(v for v in corners if points[v][0] * sign > 0)
         need(mine, f'The file has no eye objects and no eye faces on the side {side}.')
+        every = sorted(v for v in head_rows if points[v][0] * sign > 0)
         need(
-            np.abs(head[mine] - 1).max() <= WEIGHT_LIMIT,
+            np.abs(head[every] - 1).max() <= WEIGHT_LIMIT,
             f'A vertex of the eye {side} of the mesh does not follow only the head bone.',
         )
         middle = ball_middle(points[mine])
