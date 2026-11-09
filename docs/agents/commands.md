@@ -70,7 +70,7 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 |---|---|
 | `pnpm pose-probe <sheet> [--time <s>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. |
 | `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` into `scratch/pose-preview/<role>.json` at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
-| `pnpm pose-depth <role> [--demo <id>]... [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. `--where` gives the corners of a bone in the axes of the instrument. |
+| `pnpm pose-depth <role> [--demo <id>]... [--every <n>] [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. In the work loop, sweep one demo with `--every 4`, and run one full sweep at the end of a round. The row `tree` is the working tree. `--where` gives the corners of a bone in the axes of the instrument. |
 | `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. |
 | `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,...` | Scores the base and named variants on chosen pairs of parts. |
 | `pnpm trunk-form <role> [--base <ref>]` | Measures the form of the trunk of the first player in the bind and in the worst pose of each set. |
