@@ -15,6 +15,7 @@ import { BEAM_LOOK } from './beam.ts';
 import { CAPTURE, ENVIRONMENT } from './environment.ts';
 import { EYE_LIGHT_LOOK } from './eye-light.ts';
 import { CONTACT_SHADE, FLOOR_GLOSS } from './surface.ts';
+import { FUR_LOOK } from './fur.ts';
 import { FREE_LENS, LENS } from './focus.ts';
 import { GRADE } from './grade.ts';
 import { GLOW_LIGHT, HALL_COLORS, HALL_FLOOR, HALL_LIGHT } from './hall.ts';
@@ -62,6 +63,7 @@ const LOOK_ROOTS = {
   FREE_BEAM_FADE,
   FREE_LENS,
   FREE_LIGHT_FADE,
+  FUR_LOOK,
   GLOW_LIGHT,
   GRADE,
   HALL_COLORS,
