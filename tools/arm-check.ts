@@ -48,10 +48,11 @@
  * ({@link GATE_SCRIPTS}), so that both trees have the same measures. The JSON of the commit goes
  * into the cache by tree.
  * Each value then has a verdict ({@link verdictOf}): `FAIL` when it is over its limit and the base
- * is not, or when it is worse than the base by more than its margin; `OPEN` when it is over its
- * limit and not worse than the base (a known open item); else `PASS`. With no `--base`, each value
- * over its limit fails. A role that the commit does not have has no base. The
- * exit code is 1 when a value fails.
+ * is not, or when it is worse than the base by more than its margin and past {@link NEAR_LIMIT}
+ * of its limit; `WORSE` when it is worse than the base by more than its margin and inside that
+ * share; `OPEN` when it is over its limit and not worse than the base (a known open item); else
+ * `PASS`. With no `--base`, each value over its limit fails. A role that the commit does not have
+ * has no base. The exit code is 1 when a value fails.
  *
  * A body whose bind differs from the bind of the base ({@link bindKey}) is a rebind. Each value of
  * {@link BIND_MEASURES} of a rebind counts from another zero than its base, so it takes only its
@@ -1873,14 +1874,22 @@ function gateValue(
 }
 
 /** The verdict of one value of the gate. */
-export type Verdict = 'PASS' | 'OPEN' | 'REBIND' | 'FAIL';
+export type Verdict = 'PASS' | 'OPEN' | 'WORSE' | 'REBIND' | 'FAIL';
+
+/**
+ * The share of its limit past which a value that is worse than the base fails. Inside this share,
+ * such a value is `WORSE` with exit code 0. For a measure whose smaller values are worse, the
+ * value fails below the limit divided by this share.
+ */
+export const NEAR_LIMIT = 0.8;
 
 /**
  * Gives the verdict of one value against its limit and the base. A value that is worse than the
- * base by more than the margin fails, also within its limit, because a goal on one measure can
- * move a twist to a joint that no goal measures. A value over its limit fails when the base has no
- * value or is within the limit, and else it is open: a known item that the change does not make
- * worse. Each other value passes. A value that counts from another bind than its base
+ * base by more than the margin fails past {@link NEAR_LIMIT} of its limit, because a goal on one
+ * measure can move a twist to a joint that no goal measures. Inside that share, it is `WORSE`,
+ * which stops nothing. A value over its limit fails when the base has no value or is within the
+ * limit, and else it is open: a known item that the change does not make worse. Each other value
+ * passes. A value that counts from another bind than its base
  * (`rebind`) takes only its limit: it fails over the limit, and is `REBIND` when the margin alone
  * would fail it.
  *
@@ -1897,6 +1906,7 @@ export function verdictOf(
   rebind = false,
 ): Verdict {
   const over = (v: number): boolean => (limit.up ? v > limit.limit : v < limit.limit);
+  const near = limit.up ? value > NEAR_LIMIT * limit.limit : value < limit.limit / NEAR_LIMIT;
   const worse = base !== null && (limit.up ? value - base : base - value) > limit.margin;
   if (rebind) {
     if (over(value)) {
@@ -1904,10 +1914,13 @@ export function verdictOf(
     }
     return worse ? 'REBIND' : 'PASS';
   }
-  if (worse || (over(value) && (base === null || !over(base)))) {
+  if ((worse && near) || (over(value) && (base === null || !over(base)))) {
     return 'FAIL';
   }
-  return over(value) ? 'OPEN' : 'PASS';
+  if (over(value)) {
+    return 'OPEN';
+  }
+  return worse ? 'WORSE' : 'PASS';
 }
 
 /** One value of the gate: one measure of one arm of one role. */
@@ -2003,7 +2016,7 @@ function summaryLines(rows: readonly GateRow[], base: boolean): string[] {
       return `${show(row.value, measure)}${was}${mark}`;
     });
     const worst =
-      (['FAIL', 'OPEN', 'REBIND'] as const).find((v) => own.some((r) => r.verdict === v)) ?? 'PASS';
+      (['FAIL', 'OPEN', 'WORSE', 'REBIND'] as const).find((v) => own.some((r) => r.verdict === v)) ?? 'PASS';
     const [role = '', side = ''] = key.split(' ');
     lines.push(`| ${role} | ${side} | ${cells.join(' | ')} | ${worst} |`);
   }
@@ -2093,7 +2106,7 @@ interface GateFile {
 const GATE_FILE_FORMAT = 1;
 
 /** The verdicts from the worst to the best, for the verdict of a line. */
-const VERDICT_ORDER: readonly Verdict[] = ['FAIL', 'OPEN', 'REBIND', 'PASS'];
+const VERDICT_ORDER: readonly Verdict[] = ['FAIL', 'OPEN', 'WORSE', 'REBIND', 'PASS'];
 
 /**
  * Gives the lines of the gate of a run for the file of `--json`.
