@@ -62,6 +62,9 @@ check runs goes out of date. A change that needs a check runs one file with
   and the instrument does not go into the body (`INSTRUMENT_CONTACT`). `pnpm pose-depth <role>`
   prints the same depths, with the region of the body and the part of a bowed string at each
   deepest point (`BODY_REGIONS`, `bowedPlace()`), so that a hold fit sees the cause of a clip.
+  The work loop of a round sweeps one demo with `--every 4`, which keeps each fourth play sample.
+  One full sweep runs at the end of the round, because a full sweep of all demos takes minutes.
+  The row `tree` of its tables is the working tree, and the commit of `--base` has its own row.
 - The Playwright smoke test (`e2e/smoke.e2e.ts`) plays the default demo on the built site, so that
   it tests the files that deploy. The built site has no dev hook, so `App` writes the song time
   into the attribute `data-song-time` of the stage canvas.
