@@ -666,7 +666,9 @@ writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` 
 rig"). The Tripo P2 rabbit of `assets/models/rabbit/tripo-p2/` is a trial of this route that the
 app does not use. A hand rig of the same mesh with no arm cut and no limb stretch
 (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main` only
-after an approval of its look in the app. An arm that the mesh joins to the trunk needs a
+after an approval of its look in the app. Its mesh has no eyeballs: fur fills each old eye socket
+flush with the face, and a pea eye of 1.2 H covers the old eye area. Reason: the eyeball of the
+source kept the fur color, so a light disc showed around a pea eye of 1 H. An arm that the mesh joins to the trunk needs a
 cut, so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
