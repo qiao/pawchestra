@@ -9,10 +9,9 @@ import { Box3, MathUtils, Matrix4, Quaternion, Ray, Triangle, Vector3 } from 'th
 
 import { SPECIES_COLORS } from '../src/models/colors.ts';
 import type { SpeciesColors } from '../src/models/colors.ts';
-import { EYE, addEye } from '../src/models/eyes.ts';
-import type { EyeBend, SurfacePoint } from '../src/models/eyes.ts';
+import { EYE, eyeAxes, ovalCorners } from '../src/models/eyes.ts';
+import type { EyeBend, OvalFaces, SurfacePoint } from '../src/models/eyes.ts';
 import { PIANO_BENCH } from '../src/models/instruments/piano.ts';
-import { MeshBuilder } from '../src/models/mesh.ts';
 import type { Finish } from '../src/models/mesh.ts';
 import { CHAIR_BACK_CLEARANCE } from '../src/models/player.ts';
 import { CHAIR, CHAIR_LEG } from '../src/models/props.ts';
@@ -2159,9 +2158,7 @@ export function eyeBend(
   axis: Vec3,
   h: number,
 ): EyeBend {
-  const n = new Vector3(...axis);
-  const up = new Vector3(0, 1, 0).projectOnPlane(n).normalize();
-  const across = new Vector3().crossVectors(up, n);
+  const { across, up, n } = eyeAxes(axis);
   const sums = Array.from({ length: 5 }, () => [0, 0, 0, 0, 0, 0]);
   let count = 0;
   for (let i = -BEND_SAMPLES; i <= BEND_SAMPLES; i++) {
@@ -2197,6 +2194,14 @@ export function eyeBend(
   return [k0, k1, k2, k3, k4];
 }
 
+/**
+ * The faces around the long axis and the steps up the oval whose front corners {@link eyePush}
+ * tests: the oval of the fit of the eye places, which can have fewer faces than the oval of the
+ * app. A finer oval has more corners near the rim. A test of these corners moved single eyes out
+ * of the head by up to 0.03 H, so the two eyes of the pig stood out by different amounts.
+ */
+const PUSH_OVAL: OvalFaces = [8, 4];
+
 /** The step of the move of a pea eye out of the head, in `H` of the eyes ({@link eyePush}). */
 const EYE_PUSH_STEP = 0.001;
 
@@ -2224,26 +2229,11 @@ export function eyePush(
   h: number,
   bend?: EyeBend,
 ): number {
-  const builder = new MeshBuilder();
-  addEye(builder, { eye: [0, 0, 0], eyeLight: [1, 1, 1] }, eye, h, 0, bend);
-  const oval = builder.build();
-  const middle = new Vector3(...eye.point);
   const facing = new Vector3(...eye.normal);
-  const front: Vector3[] = [];
-  const flat = new MeshBuilder();
-  addEye(flat, { eye: [0, 0, 0], eyeLight: [1, 1, 1] }, eye, h, 0);
-  const unbent = flat.build();
-  for (let c = 0; c < oval.bones.length; c++) {
-    const p = new Vector3().fromArray(oval.positions, c * 3);
-    // A corner of the front face has its depth in front of the middle before the bend.
-    const depth = new Vector3()
-      .fromArray(unbent.positions, c * 3)
-      .sub(middle)
-      .dot(facing);
-    if (oval.colors[c * 3] === 0 && depth > 0.25 * EYE[2] * h) {
-      front.push(p);
-    }
-  }
+  // A corner of the front face has its depth in front of the middle before the bend.
+  const front = ovalCorners(eye, h, bend, PUSH_OVAL)
+    .filter((corner) => corner.depth > 0.25 * EYE[2] * h)
+    .map((corner) => new Vector3(...corner.point));
 
   const near = new Vector3();
   const normal = new Vector3();

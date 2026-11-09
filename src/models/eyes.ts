@@ -1,8 +1,8 @@
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
-import { transform } from './mesh.ts';
-import type { MeshBuilder, Rgb } from './mesh.ts';
+import { applyTransform, transform } from './mesh.ts';
+import type { MeshBuilder, Rgb, Transform } from './mesh.ts';
 import { ball } from './primitives.ts';
 
 /** A point on the surface of the head, and the unit normal of the surface there. */
@@ -140,6 +140,85 @@ function bentBall(corners: readonly number[], bend: EyeBend): number[] {
  * @param bone The eye bone.
  * @param bend The bend of the oval, or none for a flat face.
  */
+/** The axes of an eye, in the axes of the head. */
+export interface EyeAxes {
+  /** The axis across the oval: its short axis. */
+  readonly across: Vector3;
+  /** The axis up the oval: its long axis. */
+  readonly up: Vector3;
+  /** The axis of the eye: the thin axis of the oval, the direction in which the eye faces. */
+  readonly n: Vector3;
+}
+
+/**
+ * Gives the axes of an eye that faces a direction: its long axis points up along the plane of the
+ * eye.
+ *
+ * @param normal The unit direction in which the eye faces.
+ * @returns The axes.
+ */
+export function eyeAxes(normal: Vec3): EyeAxes {
+  const n = new Vector3(...normal);
+  const up = new Vector3(0, 1, 0).projectOnPlane(n).normalize();
+  const across = new Vector3().crossVectors(up, n);
+  return { across, up, n };
+}
+
+/**
+ * Gives the transform of the unit ball of an eye: the scale to the size of the oval, the turn
+ * onto the axes of the eye, and the move to its middle.
+ *
+ * @param eye The middle of the eye and the direction in which it faces.
+ * @param h The head height that sizes the eye, in meters.
+ * @returns The transform.
+ */
+function ovalTransform(eye: SurfacePoint, h: number): Transform {
+  const { across, up, n } = eyeAxes(eye.normal);
+  const onFace = toQuat(
+    new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(across, up, n)),
+  );
+  return transform(eye.point, onFace, [EYE[0] * h, EYE[1] * h, EYE[2] * h]);
+}
+
+/** The number of faces around the long axis and of steps up an oval, for {@link ovalCorners}. */
+export type OvalFaces = readonly [segments: number, rings: number];
+
+/** A corner of the oval of an eye, in the axes of the head. */
+export interface OvalCorner {
+  /** The corner, with the bend of the oval. */
+  readonly point: Vec3;
+  /** The depth of the corner in front of the middle of the eye before the bend, in meters. */
+  readonly depth: number;
+}
+
+/**
+ * Gives the corners of the oval of an eye, 3 for each triangle, as {@link addEye} places them.
+ *
+ * @param eye The middle of the eye and the direction in which it faces.
+ * @param h The head height that sizes the eye, in meters.
+ * @param bend The bend of the oval, or none for a flat face.
+ * @param faces The faces around the long axis and the steps up the oval.
+ * @returns The corners.
+ */
+export function ovalCorners(
+  eye: SurfacePoint,
+  h: number,
+  bend: EyeBend | undefined,
+  faces: OvalFaces,
+): OvalCorner[] {
+  const at = ovalTransform(eye, h);
+  const oval = ball(0.5, ...faces);
+  const bent = bend ? bentBall(oval, bend) : oval;
+  const corners: OvalCorner[] = [];
+  for (let c = 0; c < oval.length; c += 3) {
+    corners.push({
+      point: applyTransform(at, [bent[c] ?? 0, bent[c + 1] ?? 0, bent[c + 2] ?? 0]),
+      depth: (oval[c + 2] ?? 0) * EYE[2] * h,
+    });
+  }
+  return corners;
+}
+
 export function addEye(
   builder: MeshBuilder,
   colors: EyeColors,
@@ -151,17 +230,12 @@ export function addEye(
   const { point, normal } = eye;
   // The oval lies on the face: its thin axis is the normal of the surface, and its long axis
   // points up along the surface.
-  const n = new Vector3(...normal);
-  const up = new Vector3(0, 1, 0).projectOnPlane(n).normalize();
-  const across = new Vector3().crossVectors(up, n);
-  const onFace = toQuat(
-    new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(across, up, n)),
-  );
+  const { across, n } = eyeAxes(normal);
   const oval = ball(0.5, EYE_SEGMENTS, 4);
   builder.add(bend ? bentBall(oval, bend) : oval, {
     color: colors.eye,
     bone,
-    at: transform(point, onFace, [EYE[0] * h, EYE[1] * h, EYE[2] * h]),
+    at: ovalTransform(eye, h),
     finish: 'lacquer',
   });
 
@@ -203,9 +277,7 @@ function addBentLight(
   bone: number,
   bend: EyeBend,
 ): void {
-  const n = new Vector3(...eye.normal);
-  const up = new Vector3(0, 1, 0).projectOnPlane(n).normalize();
-  const across = new Vector3().crossVectors(up, n);
+  const { across, up, n } = eyeAxes(eye.normal);
   const v = EYE_LIGHT_UP;
   const front = (u: number, at: number): number => frontDepth(u, at) + bendAt(bend, u, at);
   const u = lightAcross(across, n, (place) => front(place, v));
