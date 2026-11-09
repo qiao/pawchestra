@@ -41,6 +41,9 @@ EYE = np.array([0.13, 0.18, 0.06])
 #: The faces around the axis and the rings of the oval and of the light (`addEye()`).
 OVAL_BALL, LIGHT_BALL = (16, 8), (12, 6)
 
+#: The largest turn of an oval in its plane, in radians (`EYE_ROLL_LIMIT`).
+ROLL_LIMIT = math.radians(35)
+
 #: The light in H: the diameter, the place above the middle, the depth, the place to the right of
 #: the visible middle, and the largest place across (`EYE_LIGHT*` of `models/eyes.ts`).
 LIGHT_SIZE, LIGHT_UP, LIGHT_DEPTH, LIGHT_SIDE, LIGHT_ACROSS = 0.04, 0.035, 0.008, 0.02, 0.04
@@ -108,26 +111,66 @@ def light_across(across_x, n_x, front):
     return u
 
 
-def eye_parts(bend, across_x, n_x):
+def front_lean(across, up):
+    """Gives the lean of the long axis of an oval in the front view of the app (`frontLean()`).
+    `across` and `up` are the x and the y of the app of the axes of the oval, with the bend."""
+    a2, b2 = (0.5 * EYE[0]) ** 2, (0.5 * EYE[1]) ** 2
+    xx = across[0] ** 2 * a2 + up[0] ** 2 * b2
+    yy = across[1] ** 2 * a2 + up[1] ** 2 * b2
+    xy = across[0] * across[1] * a2 + up[0] * up[1] * b2
+    return 0.5 * math.atan2(2 * xy, yy - xx)
+
+
+def upright_roll(across, up, n, bend):
+    """Gives the turn of an oval in its plane that makes it upright in the front view of the app
+    (`uprightRoll()`). `across`, `up`, and `n` are the x and the y of the app of the axes."""
+    a = np.asarray(across) + bend[0] * np.asarray(n)
+    b = np.asarray(up) + bend[1] * np.asarray(n)
+
+    def lean(roll):
+        c, s = math.cos(roll), math.sin(roll)
+        return front_lean(c * a + s * b, c * b - s * a)
+
+    roll, d = 0.0, 1e-4
+    for _ in range(6):
+        slope = (lean(roll + d) - lean(roll - d)) / (2 * d)
+        if abs(slope) < 1e-6:
+            break
+        roll = min(ROLL_LIMIT, max(-ROLL_LIMIT, roll - lean(roll) / slope))
+    return roll
+
+
+def eye_parts(bend, app_axes):
     """Gives the triangles of the oval and of the light of an eye in its own axes, in H, as
-    `addEye()` and `addBentLight()` make them: x across, y up, and z the axis of the eye."""
+    `addEye()` and `addBentLight()` make them: x across, y up, and z the axis of the eye. The oval
+    and the light turn in the plane of the eye by `upright_roll()`. `app_axes` holds the x and the
+    y of the app of the axes across, up, and of the eye."""
+    roll = upright_roll(*app_axes, bend)
+    c, s = math.cos(roll), math.sin(roll)
+    # The turn from the axes of the oval to the axes of the eye object.
+    turn = np.array([[c, -s, 0], [s, c, 0], [0, 0, 1.0]])
+
+    def bend_of(u, v):
+        return bend_at(bend, u * c - v * s, u * s + v * c)
+
     oval = ball(0.5, *OVAL_BALL) * EYE
-    oval[..., 2] += bend_at(bend, oval[..., 0], oval[..., 1])
+    oval[..., 2] += bend_of(oval[..., 0], oval[..., 1])
 
     def front(u, at):
-        return front_depth(u, at) + bend_at(bend, u, at)
+        return front_depth(u, at) + bend_of(u, at)
 
+    across_x = c * app_axes[0][0] + s * app_axes[1][0]
     v, d = LIGHT_UP, 1e-4
-    u = light_across(across_x, n_x, lambda place: front(place, v))
+    u = light_across(across_x, app_axes[2][0], lambda place: front(place, v))
     slope_u = (front(u + d, v) - front(u - d, v)) / (2 * d)
     slope_v = (front(u, v + d) - front(u, v - d)) / (2 * d)
     facing = unit(np.array([-slope_u, -slope_v, 1.0]))
     up = np.array([0.0, 1, 0])
     up = unit(up - (up @ facing) * facing)
-    turn = np.column_stack([np.cross(up, facing), up, facing])
+    disc = np.column_stack([np.cross(up, facing), up, facing])
     light = ball(0.5, *LIGHT_BALL) * [LIGHT_SIZE, LIGHT_SIZE, LIGHT_DEPTH]
-    light = light @ turn.T + [u, v, front(u, v)]
-    return oval, light
+    light = light @ disc.T + [u, v, front(u, v)]
+    return oval @ turn.T, light @ turn.T
 
 
 def eye_frame(direction):
@@ -255,10 +298,11 @@ def preview(rig, body, eye, worlds):
     frame, middle = world[:3, :3] / size, world[:3, 3]
     tris, normals = head_faces(body, middle, 2 * EYE_REACH * size)
     bend = eye_bend(tris, normals, middle, frame, size)
-    # The light goes to the right of the visible middle in the bind, seen from the front: the app
-    # has the left side of the animal at -x.
+    # The front view of the app looks along -Y of Blender, with the left side of the animal at -x
+    # and up at +Z: the x of the app is -X, and its y is Z.
     axes = eye_world(rig, eye, worlds)[:3, :3] / size
-    oval, light = eye_parts(bend, -axes[0, 0], -axes[0, 2])
+    app_axes = [(-axes[0, k], axes[2, k]) for k in range(3)]
+    oval, light = eye_parts(bend, app_axes)
     me = eye.data
     me.clear_geometry()
     parts = np.concatenate([oval, light])

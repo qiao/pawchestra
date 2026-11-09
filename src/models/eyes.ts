@@ -124,15 +124,15 @@ function lightAcross(across: Vector3, n: Vector3, front: (u: number) => number):
  * Bends the corners of the unit ball of an eye along its z axis, the axis of the eye.
  *
  * @param corners The corners of the ball of radius 0.5, 9 numbers for each triangle.
- * @param bend The bend.
+ * @param bend The move along the axis at a place across and up the oval, in `H`.
  * @returns The bent corners, in the units of the ball before its scale to the size of the eye.
  */
-function bentBall(corners: readonly number[], bend: EyeBend): number[] {
+function bentBall(corners: readonly number[], bend: (u: number, v: number) => number): number[] {
   const out = [...corners];
   for (let c = 0; c < out.length; c += 3) {
     const u = (out[c] ?? 0) * EYE[0];
     const v = (out[c + 1] ?? 0) * EYE[1];
-    out[c + 2] = (out[c + 2] ?? 0) + bendAt(bend, u, v) / EYE[2];
+    out[c + 2] = (out[c + 2] ?? 0) + bend(u, v) / EYE[2];
   }
   return out;
 }
@@ -161,20 +161,107 @@ export function eyeAxes(normal: Vec3): EyeAxes {
   return { across, up, n };
 }
 
+/** The largest turn of an oval in its plane by {@link uprightRoll}, in radians (35°). */
+const EYE_ROLL_LIMIT = (35 * Math.PI) / 180;
+
+/**
+ * Gives the lean of the long axis of an oval in the front view, from the vertical, in radians: the
+ * axis of the image of the oval under the linear part of its bend. A positive lean puts the top on
+ * the +x side.
+ *
+ * @param across The axis across the oval, with the bend along the eye axis for each unit across.
+ * @param up The axis up the oval, with the bend along the eye axis for each unit up.
+ * @returns The lean.
+ */
+function frontLean(across: Vector3, up: Vector3): number {
+  const a2 = (0.5 * EYE[0]) ** 2;
+  const b2 = (0.5 * EYE[1]) ** 2;
+  const xx = across.x * across.x * a2 + up.x * up.x * b2;
+  const yy = across.y * across.y * a2 + up.y * up.y * b2;
+  const xy = across.x * across.y * a2 + up.x * up.y * b2;
+  return 0.5 * Math.atan2(2 * xy, yy - xx);
+}
+
+/**
+ * Finds the turn of an oval in its plane that makes it upright in the front view. An eye that
+ * faces up and to the side, or a bend on a sloped cheek, leans the long axis of the oval: the tops
+ * of the two ovals of the rhino leaned 22° toward each other, a sad look. The turn cancels the lean
+ * of the linear part of the bend ({@link frontLean}), up to {@link EYE_ROLL_LIMIT}.
+ *
+ * @param axes The axes of the eye.
+ * @param bend The bend of the oval in these axes.
+ * @returns The turn from `up` toward `-across`, in radians.
+ */
+function uprightRoll(axes: EyeAxes, bend: EyeBend): number {
+  const across = axes.across.clone().addScaledVector(axes.n, bend[0]);
+  const up = axes.up.clone().addScaledVector(axes.n, bend[1]);
+  const lean = (roll: number): number => {
+    const c = Math.cos(roll);
+    const s = Math.sin(roll);
+    return frontLean(
+      across.clone().multiplyScalar(c).addScaledVector(up, s),
+      up.clone().multiplyScalar(c).addScaledVector(across, -s),
+    );
+  };
+  // The lean changes about as fast as the turn, so a few Newton steps reach the root.
+  let roll = 0;
+  const d = 1e-4;
+  for (let step = 0; step < 6; step++) {
+    const slope = (lean(roll + d) - lean(roll - d)) / (2 * d);
+    if (Math.abs(slope) < 1e-6) {
+      break;
+    }
+    roll = Math.min(EYE_ROLL_LIMIT, Math.max(-EYE_ROLL_LIMIT, roll - lean(roll) / slope));
+  }
+  return roll;
+}
+
+/** The axes of an upright oval on the head, and its bend in these axes. */
+interface OvalFrame extends EyeAxes {
+  /** The move of the oval along its axis at a place across and up the oval, in `H`. */
+  readonly bend: (u: number, v: number) => number;
+}
+
+/**
+ * Gives the axes of the oval of an eye: the axes of the eye ({@link eyeAxes}), turned in the plane
+ * of the eye so that the oval is upright in the front view ({@link uprightRoll}). The bend keeps
+ * its fit in the axes of the eye.
+ *
+ * @param normal The unit direction in which the eye faces.
+ * @param bend The bend of the oval, or none for a flat face.
+ * @param upright False for no turn.
+ * @returns The axes and the bend in these axes.
+ */
+function ovalFrame(normal: Vec3, bend: EyeBend | undefined, upright = true): OvalFrame {
+  const axes = eyeAxes(normal);
+  const k = bend ?? [0, 0, 0, 0, 0];
+  const roll = upright ? uprightRoll(axes, k) : 0;
+  const c = Math.cos(roll);
+  const s = Math.sin(roll);
+  return {
+    across: axes.across.clone().multiplyScalar(c).addScaledVector(axes.up, s),
+    up: axes.up.clone().multiplyScalar(c).addScaledVector(axes.across, -s),
+    n: axes.n,
+    bend: (u, v) => bendAt(k, u * c - v * s, u * s + v * c),
+  };
+}
+
 /**
  * Gives the transform of the unit ball of an eye: the scale to the size of the oval, the turn
- * onto the axes of the eye, and the move to its middle.
+ * onto the axes of the oval, and the move to its middle.
  *
- * @param eye The middle of the eye and the direction in which it faces.
+ * @param point The middle of the eye.
+ * @param frame The axes of the oval.
  * @param h The head height that sizes the eye, in meters.
  * @returns The transform.
  */
-function ovalTransform(eye: SurfacePoint, h: number): Transform {
-  const { across, up, n } = eyeAxes(eye.normal);
+function ovalTransform(point: Vec3, frame: OvalFrame, h: number): Transform {
   const onFace = toQuat(
-    new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(across, up, n)),
+    new Quaternion().setFromRotationMatrix(
+      new Matrix4().makeBasis(frame.across, frame.up, frame.n),
+    ),
   );
-  return transform(eye.point, onFace, [EYE[0] * h, EYE[1] * h, EYE[2] * h]);
+  return transform(point, onFace, [EYE[0] * h, EYE[1] * h, EYE[2] * h]);
 }
 
 /** The number of faces around the long axis and of steps up an oval, for {@link ovalCorners}. */
@@ -195,6 +282,8 @@ export interface OvalCorner {
  * @param h The head height that sizes the eye, in meters.
  * @param bend The bend of the oval, or none for a flat face.
  * @param faces The faces around the long axis and the steps up the oval.
+ * @param upright True for the oval of the app, upright in the front view ({@link uprightRoll}).
+ *   False keeps the long axis on the up axis of the eye ({@link eyeAxes}).
  * @returns The corners.
  */
 export function ovalCorners(
@@ -202,10 +291,12 @@ export function ovalCorners(
   h: number,
   bend: EyeBend | undefined,
   faces: OvalFaces,
+  upright: boolean,
 ): OvalCorner[] {
-  const at = ovalTransform(eye, h);
+  const frame = ovalFrame(eye.normal, bend, upright);
+  const at = ovalTransform(eye.point, frame, h);
   const oval = ball(0.5, ...faces);
-  const bent = bend ? bentBall(oval, bend) : oval;
+  const bent = bend ? bentBall(oval, frame.bend) : oval;
   const corners: OvalCorner[] = [];
   for (let c = 0; c < oval.length; c += 3) {
     corners.push({
@@ -219,7 +310,8 @@ export function ovalCorners(
 /**
  * Adds one eye on an eye bone: a black upright oval of 0.13 × 0.18 H, with a wet finish and a
  * small white light above the middle, as the eyes of the polished images. The thin axis of the
- * oval is the normal of the head surface, and its long axis points up along the surface. The light
+ * oval is the normal of the head surface, and its long axis points up along the surface, turned in
+ * the plane of the eye so that the oval is upright in the front view ({@link ovalFrame}). The light
  * follows the eye bone, so it closes with the eye. A bend moves each point of the oval along the
  * axis, so that the oval follows a curved or a sloped head surface, and the light of a bent eye
  * lies on the front of the oval.
@@ -241,18 +333,19 @@ export function addEye(
 ): void {
   const { point, normal } = eye;
   // The oval lies on the face: its thin axis is the normal of the surface, and its long axis
-  // points up along the surface.
-  const { across, n } = eyeAxes(normal);
+  // points up along the surface, upright in the front view.
+  const frame = ovalFrame(normal, bend);
+  const { across, n } = frame;
   const oval = ball(0.5, EYE_SEGMENTS, EYE_RINGS);
-  builder.add(bend ? bentBall(oval, bend) : oval, {
+  builder.add(bend ? bentBall(oval, frame.bend) : oval, {
     color: colors.eye,
     bone,
-    at: ovalTransform(eye, h),
+    at: ovalTransform(point, frame, h),
     finish: 'lacquer',
   });
 
   if (bend) {
-    addBentLight(builder, colors, { point, normal }, h, bone, bend);
+    addBentLight(builder, colors, point, frame, h, bone);
     return;
   }
   const u = lightAcross(across, n, () => 0.5 * EYE[2]);
@@ -276,22 +369,22 @@ export function addEye(
  *
  * @param builder The mesh that gets the light.
  * @param colors The colors of the eye.
- * @param eye The middle of the eye and the axis of the eye.
+ * @param point The middle of the eye.
+ * @param frame The axes of the oval and its bend.
  * @param h The head height that sizes the eye, in meters.
  * @param bone The eye bone.
- * @param bend The bend of the oval.
  */
 function addBentLight(
   builder: MeshBuilder,
   colors: EyeColors,
-  eye: SurfacePoint,
+  point: Vec3,
+  frame: OvalFrame,
   h: number,
   bone: number,
-  bend: EyeBend,
 ): void {
-  const { across, up, n } = eyeAxes(eye.normal);
+  const { across, up, n } = frame;
   const v = EYE_LIGHT_UP;
-  const front = (u: number, at: number): number => frontDepth(u, at) + bendAt(bend, u, at);
+  const front = (u: number, at: number): number => frontDepth(u, at) + frame.bend(u, at);
   const u = lightAcross(across, n, (place) => front(place, v));
   const d = 1e-4;
   // The slopes of the front of the bent oval at the light, along the axes of the eye.
@@ -307,7 +400,7 @@ function addBentLight(
   const onOval = toQuat(
     new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(discAcross, discUp, facing)),
   );
-  const light = new Vector3(...eye.point)
+  const light = new Vector3(...point)
     .addScaledVector(up, v * h)
     .addScaledVector(across, u * h)
     .addScaledVector(n, front(u, v) * h);

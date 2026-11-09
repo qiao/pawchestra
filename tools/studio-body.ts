@@ -2196,9 +2196,10 @@ export function eyeBend(
 
 /**
  * The faces around the long axis and the steps up the oval whose front corners {@link eyePush}
- * tests: the oval of the fit of the eye places, which can have fewer faces than the oval of the
- * app. A finer oval has more corners near the rim. A test of these corners moved single eyes out
- * of the head by up to 0.03 H, so the two eyes of the pig stood out by different amounts.
+ * tests: the oval of the fit of the eye places, with fewer faces than the oval of the app and with
+ * no upright turn (`ovalCorners()` of `models/eyes.ts`). A finer or a turned oval has other corners
+ * near the rim. A test of these corners moved single eyes out of the head by up to 0.03 H, so the
+ * two eyes of the pig and of the panda stood out by different amounts.
  */
 const PUSH_OVAL: OvalFaces = [8, 4];
 
@@ -2231,7 +2232,7 @@ export function eyePush(
 ): number {
   const facing = new Vector3(...eye.normal);
   // A corner of the front face has its depth in front of the middle before the bend.
-  const front = ovalCorners(eye, h, bend, PUSH_OVAL)
+  const front = ovalCorners(eye, h, bend, PUSH_OVAL, false)
     .filter((corner) => corner.depth > 0.25 * EYE[2] * h)
     .map((corner) => new Vector3(...corner.point));
 
