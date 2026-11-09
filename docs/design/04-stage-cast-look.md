@@ -1237,6 +1237,11 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     Thus a player on the left behind the strings sees the conductor only through the gap of the
     conductor. A larger radius of row 0 would widen the gap, but the stages of these demos fill
     their depth, so it would make the stage larger.
+  - Two other seatings clear no more sight lines, so the rows keep the order of the table. A
+    first desk of row 0 in row 1 opens row 0, but row 1 then fills the left side and one back
+    desk moves into the gap of the conductor. Horns on the right of row 3, with the other brass
+    and the percussion moved to keep the sections together, only move the block from the horns
+    to the trumpets. They also hide more bassoons from the wide shots.
 
 ```typescript
 /** The limits of the spread of a row. */
