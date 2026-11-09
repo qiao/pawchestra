@@ -429,6 +429,12 @@ The rest of each family:
   near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
   most recast bodies goes into the upper bout at rest and in the moves.
+- **Violin left elbow of the rabbit.** In the play, the left elbow of the rabbit comes in under
+  the violin, straight down and forward (`RABBIT_HOLD.poleL`), as a violinist swings the elbow
+  under the instrument (strings 1.10). At rest, it points out (`RABBIT_HOLD.restPoleL`). Reason:
+  the paw of the Tripo P2 hand rig turns far from its source paw in this hold, and the two
+  elbows move a part of that turn from the forearm into the upper arm, so that no arm part shows
+  a twist of its skin (design 4.4).
 - **Cello left elbow of the dog.** In the play, the left elbow of the dog points out to the side
   and a little down (`DOG_HOLD.poleL`), so that the forearm rises from the elbow to the neck. It
   goes up for each lower string (`elbowPerString`), as a cellist raises the elbow for the lower
