@@ -319,8 +319,6 @@ passes.
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
 - [ ] Cat violist: ask the user to confirm the 1/2 viola. A 3/4 viola reaches the nut at about 55°.
-- [ ] When the tests come back, run `pnpm test:paused src/shots/` and
-      `src/models/layout-scene.test.ts`. The harp, the viola, and the piano gap moved seats.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
 - [ ] Layout sight lines (4.5): with no row risers and the lane search, 49 of 453 players stay
@@ -1128,6 +1126,31 @@ passes, and the quality tiers of 2.6 keep 60 fps on a laptop.
       the UI and the scene.
 - [ ] Let the contrast checks of `e2e/title-shade.e2e.ts` print the place of the worst pixel, not
       only the ratio. An outline of the GitHub pill needed a probe to find.
+- [ ] Red paused test files (9.3). On 2026-11-08, 59 of 231 files stay red after the removal of
+      the dead tests and the tuned pins. Each one is a behavior test that a deliberate change
+      broke. Fix the test or the code of each file before the pause ends:
+      - Bodies and rigs: `src/models/footprint`, `player`, `studio-body`, `studio-rig`,
+        `species`, and `mesh` tests, and `src/scene/player.test.ts`. The hand rigs and the
+        corrective shapes changed the joints, the palettes, the eyes, and the morph count (4).
+      - `src/models/studio-size.test.ts`: the packed polar bear is 47,672 B, above
+        `STUDIO_MESH_GZIP_BUDGET` (34,000 B, design 7.2).
+      - Instruments: `catalog`, `percussion`, and `piano` tests of `src/models/instruments/`. The
+        trap table, the switch copies, the contrabass, and the piano scale moved.
+      - `src/models/layout-scene.test.ts` (10 tests): the lane search and the first desk moves
+        change the rows, the back desks, and the arcs. The choir risers reach 0.12 m into the
+        side margin, the polar bear piano 7 mm into a corner cut, and the solo violin of
+        BWV 1047 sits right of 0°.
+      - Shots: `camera-at`, `choir-theme`, `opening-drawer`, `prepare`, `trace`, and the four
+        `shot-frames` tests of `src/shots/`. The layout and the lower default view moved them.
+      - Poses: 25 files of `src/pose/` and `src/gallery/sheet-poses.test.ts`. The new holds and
+        bodies move the depths, the note targets, the gestures, and the rest places.
+      - App and audio: `src/app/transport.test.ts` (the seek state), and
+        `src/audio/player.test.ts` (the fake Worker gets no message in 18 tests).
+      - Scene: `geometry` and `light-pool` tests of `src/scene/`. `addPlayerFill()` finds no
+        light chunk in the test shader.
+      - Tools: `close-views`, `hold-fit`, `hold-reach`, `hold-sets`, `rig-mesh`,
+        `rig-mesh-check`, `studio-body`, and `studio-palette` tests of `tools/`. The rig configs
+        have no `app.shoulders`.
 - [ ] Remove the audit and review labels from the `it()` and `describe()` names of the paused
       tests, and the dated notes that the `_arms.py` scripts write into the weights files of
       `assets/models/`.
