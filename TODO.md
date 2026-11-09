@@ -850,12 +850,6 @@ scene of each demo has its seats and stage size with no overlap.
       (`PercussionHold.pair`). Offer the user longer arms.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
-- [ ] Small percussion: at a switch, the left paw twists through 180° in 0.05 s while it moves
-      on the trap table from the triangle stand to the tambourine, and back (`pnpm arm-check
-      percussionist --trace tambourine-test:7.5-8 --midi
-      reports/2026-11-08-perc-pro-4/tambourine-test.mid`: a jump of 100° at 7.75 s). The paw turns
-      of the two places lie 122° apart. A mix in the frame of the forearm, through the straight paw,
-      did not remove it.
 - [ ] Small percussion: no demo has a rest of 2.7 s between the triangle and the tambourine
       (`switchRestSec()`), so each demo plays the tambourine on the trap table with the beater.
       `boulanger-matin` changes the instrument in 0 s to 2.1 s. Ask the user for a demo or a
