@@ -221,13 +221,13 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,453,503 bytes |
-| SHA-256 | `aaa3139ac5d5e95f2ff939ff2cc32a6d0b906697b1be96c91265a82cac2cf565` |
+| Size | 1,453,895 bytes |
+| SHA-256 | `3a62551f4be5009431a25f40f2d908b758b79db153d34dd5aabe9ab770edc0e1` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist ("Arm twist" below) |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
 | Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 35, `backRoom` 0.04 |
 | Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
 
@@ -282,19 +282,39 @@ not in the file.
 
 **Arm twist.** The violin hold turns the left paw about 220 degrees from the paw of the source,
 which faces down in the T-pose. The rest of the hold needs about -80 degrees, and the lift
-between the two moves the paw continuously, so the 220 degrees cannot wrap to 140. Two values of
-the `.blend` spread the turn:
+between the two moves the paw continuously, so the 220 degrees cannot wrap to 140. Four changes
+make the turn that each arm part takes at most about 45 degrees:
 
-- **Elbow axes.** The property `hinges` of each arm turned about its bind upper arm, the left 118
-  degrees and the right -68 degrees. The upper arm then takes a roll from the chest, and the
-  forearm takes less twist. The skin of the left upper arm and forearm takes about -110 degrees
-  each in the bows (it was about -6 and -215), and the right arm about 9 and 23 (it was -50 and
-  82). The arm tube is round, so the side of the elbow fold does not show.
+- **Left paw turned.** Each vertex beyond the wrist ring at x 0.2287 turns rigidly about the rest
+  forearm axis (from the forearm head to the paw head) by 5 ring steps of 360/11 degrees
+  (-163.6 degrees). The 11 quads of the band between that ring and the paw go, and new quads
+  join the ring to the turned paw with the same step offset, with the colors and the UVs of the
+  old quads. The faces stay quads, the rest forearm has no twist, and each joined vertex lies
+  within a few thousandths of a unit of its old place. The bone `fingers_L` turns with the paw.
+  The property `palm` holds a palm for each side: the left palm is the source palm turned by the
+  same angle, so that it is the real palm of the turned paw (the pink pads face up). The right
+  palm stays the source palm. The rolls and the bind follow the new palm.
+- **Elbow axes.** The property `hinges` of the left arm is the axis of the config. The right one
+  is turned -68 degrees about its bind upper arm, so that its upper arm and forearm take about
+  9 and 23 degrees in the bows (they took -50 and 82).
 - **Bind supination 0.** The app takes the smooth normals from the bind. A bind supination twists
-  the bind forearm, and the crease angle 35 then gives hard edges on the diagonals of its quads,
-  which turn into a spiral in the play. With 0, the bind forearm is the untwisted tube of the
-  source. `pnpm bind-supination rabbit` gives the violinist twists of -103 to 14 degrees from
-  this bind, far from the flip at 180 degrees.
+  the bind forearm, and the crease angle 35 then gives hard edges on the diagonals of its quads.
+- **Rabbit hold.** The left elbow comes in under the violin in the play and points out at rest
+  (`RABBIT_HOLD` of `src/pose/bowed-rig.ts`). The two elbows move a part of the turn from the
+  forearm into the upper arm in each moment.
 
-In flat shading, each left arm part still shows the facets of a 110 degree twist. In the app the
-smooth normals of the untwisted bind hide them.
+The roll of each upper arm skin (from the clavicle) and the twist of each forearm skin (from the
+upper arm), in degrees, in the moments of the violinist:
+
+| Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
+|---|---|---|---|---|
+| frog | -28.4 | -26.2 | 9.4 | 22.9 |
+| tip | -28.5 | -26.3 | 8.3 | -1.7 |
+| crossing | -24.1 | -27.0 | 4.9 | 27.3 |
+| rest | 41.0 | 38.6 | 38.6 | 26.0 |
+| lift50 | 31.9 | 6.6 | 34.2 | 40.9 |
+| lower50 | 27.8 | -2.3 | 28.2 | 39.4 |
+| stand | -28.7 | -28.6 | 9.9 | 24.8 |
+
+In 18 samples of `mendelssohn-op61.mid` from 0 s to 60 s, each value stays within 28 degrees on
+the left and 43 degrees on the right.
