@@ -25,6 +25,10 @@ mesh of an earlier body (`rabbit-tpose.glb`). The hand rig is rejected: it gave 
 arm root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool finds it beside the
 GLB file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh rabbit` runs.
 
+`tripo-hand/` holds a candidate body ("tripo-hand/rabbit.blend" below): a hand rig of the Tripo P2
+mesh `tripo-p2/rabbit.fbx`, made in a live Blender with no arm cut and no limb stretch. On the
+branch of the candidate, the `ANIMALS` entry of the rabbit points to `tripo-hand/rabbit.rig.glb`.
+
 ## Files
 
 The app chain:
@@ -45,6 +49,14 @@ The trial files, which the app does not use:
 | `hand-rig/rabbit.blend` | Made by hand in Blender from `tripo/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `hand-rig/rabbit.rig.glb` | Export of `hand-rig/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/hand-rig/rabbit.blend --out assets/models/rabbit/hand-rig/rabbit.rig.glb` |
 | `hand-rig/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
+
+The candidate hand rig:
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo-hand/rabbit.blend` | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `tripo-hand/rabbit.rig.glb` | Export of `tripo-hand/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend --out assets/models/rabbit/tripo-hand/rabbit.rig.glb` |
+| `tripo-hand/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
 
 ## rabbit-apose.glb
 
@@ -200,3 +212,70 @@ one translation, scale, or loop cut of a named part.
 
 The rig is a rejected trial, so this file keeps no steps. The steps of each edit, the
 bind, the weights, and the keys are in the git history of this `README.md`, at e40c077df.
+
+### tripo-hand/rabbit.blend
+
+The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
+through the Blender MCP tools, in a scene of its own. The arms keep the form of the source: no
+cut, no split from the trunk, and no stretch. The legs keep the length of the source too.
+
+| Item | Value |
+|---|---|
+| Size | 1,453,503 bytes |
+| SHA-256 | `5e5b9c165c75170ab4bd4db9c5b1c78c63802f9ae18110294fa70317e87ce987` |
+| Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
+| License | CC BY-NC 4.0, as the FBX file |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with the bind supination L 110 and R 52 (`pnpm bind-supination rabbit` converged) |
+| Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 35, `backRoom` 0.04 |
+| Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
+
+The edits, in the order of the work:
+
+- **Import.** `sa.import_source()` of the FBX with a weld at 1e-5: no vertex merges. The mesh
+  has 2,771 vertices, 2,425 quads, and 548 triangles, no edge with more than two faces, and 11
+  parts: the body, the 2 eyeballs, the 6 whisker strips, and 2 small parts at the mouth.
+- **Arm rings.** Edge ring Subdivide (1 cut, grid fill) of clean quad edge rings of 11 or 12
+  edges. The first pass split the bands at x 0.097, 0.145, 0.1665, 0.194, and 0.222 of each arm.
+  The second pass split the five forearm bands at x 0.1727, 0.1864, 0.2013, 0.2154, and 0.2287,
+  so that the twist of the violin hold spreads over more rings. Each arm now has a ring each 0.25
+  to 0.35 arm radii (radius 0.027 u) from x 0.136 to the wrist.
+- **Knee rings.** Edge ring Subdivide (1 cut) of the clean leg bands at z 0.170 and 0.207 of each
+  leg. The knee joint is at z 0.20.
+- **Rings with no split.** These edge rings stop at a triangle or a pole, so they take no split:
+  the arm root (x 0.065 to 0.09, poles at the back of the root), the front of the upper arm at x
+  0.105 to 0.13 (3 triangles, poles 1786, 2057, 2059 on the left), the paw side of the wrist at x
+  0.23 to 0.26 (2 triangles), and the leg bands at z 0.074, 0.095, 0.126, 0.156, 0.187, and
+  0.230 (one triangle each).
+- **Surface.** `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg',
+  eye_fans=False, config=<rabbit-tripo.json>)`, with the materials made under their own names
+  (the live session held other `fur` and `gloss` materials). The faces of the old eyes take the
+  fur color, and 29 faces of the nose are gloss.
+
+The weights, in the order of the work, in the rest pose:
+
+1. Parent with Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh()`).
+2. Arm rings: each vertex ring of each arm takes one exact row. A row holds a clavicle share, an
+   elbow helper share, and a wrist helper share, linear between the control rings below (x of
+   the left arm). The rest of the row goes to the 4 roll segments of the upper arm (x below
+   0.16) or of the forearm: segment k takes the share at (k + 0.5) / 4 of the part, with a linear
+   ramp between two segments (the roll split of the simple route).
+
+   | x | 0.068 | 0.085 | 0.097 | 0.109 | 0.136 | 0.145 | 0.154 | 0.1665 | 0.179 | 0.194 | 0.209 | 0.222 | 0.235 |
+   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.45 | 0.30 | 0.15 | 0.05 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 | 0 | 0 |
+   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 |
+
+   The rings at x 0.068, 0.085, 0.109, and 0.136 are the vertex groups of their x range,
+   because poles cut them. The trunk loop around each arm root keeps the automatic weights.
+3. Paws, by rows across the paw (x of the left paw): 0.2435 to 0.2565 {`wrist` 0.5, `hand`
+   0.5}, 0.2565 to 0.268 {`hand` 1}, the knuckle row 0.268 to 0.282 {`hand` 0.5, `fingers` 0.5},
+   and from 0.282 {`fingers` 1}.
+4. The 278 vertices of the loose parts (eyeballs, whiskers, mouth parts) and the 33 vertices of
+   the gloss nose take {`head` 1}.
+
+The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
+weights. The scripts of the live session are not in the repo. A `bind*` or `arm_raise_*` key is
+not in the file.
