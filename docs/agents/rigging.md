@@ -112,7 +112,9 @@ with `pnpm bind-view`.
    Weights (Limit Total 4, Normalize All), then exact rows. Pose the bind, run
    `sa.drive_segments(rig, key_frame=1)`, and sculpt the keys `bind*` and `arm_raise_*`.
 3. **Eyes.** Run `se.place_eyes()` with each middle on the head surface in the bind, and delete
-   the eye fans. After an edit of an eye or of the face, run `se.fit_eyes(rig, mesh)`.
+   the eye fans. After an edit of an eye or of the face, run `se.fit_eyes(rig, mesh)`. When the
+   color map paints a full eye on the eyeballs of the source, keep the eyeballs in place of the
+   eye objects: the face attribute `eye`, the slot `fur`, the source UVs, and the row `head` 1.
 4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment.
    `sp.load_preview()` shows it beside the rig, `sp.refresh_preview()` shows the open file, and
    `sp.fold_colors(True)` marks the folds. Check each weight edit in the bind and the app pose.
@@ -296,7 +298,8 @@ Design 4.4 gives the merges of each copy.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye.
   Fill it (`eyeFill`), or move the dome and groove vertices along the eye axis onto the face
-  surface, and put the eye object on that surface.
+  surface, and put the eye object on that surface. A ball with a painted eye
+  stays (step 3 of "Steps of a hand rig").
 - The eye box and the nose box of `add_surface()` are in the units of the source. Run it before
   the legs lift the body, or lower the mesh for the run.
 - A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
