@@ -74,7 +74,10 @@ export interface Options {
   readonly demos: readonly string[];
   /** The absolute paths of the MIDI files of the user of `--midi` (`userDemos()`). */
   readonly midi: readonly string[];
-  /** The variants: each is a list of changes of the holds. The first is the base, with none. */
+  /**
+   * The variants: each is a list of changes of the holds. The first is the working tree, with no
+   * change.
+   */
   readonly variants: readonly string[];
   /** The bones of the moving parts, one part for each bone, or `null` for the parts of the role. */
   readonly bones: readonly BoneName[] | null;
@@ -955,14 +958,14 @@ function rowTime(
 
 /**
  * Writes the plan of a run before its first row: the demos with the role, the rows to sweep, and
- * the estimated time. The time of one row comes from the base row of the cache
- * ({@link baseRowCache}), or from the times of the last rows of the same sweep
+ * the estimated time. The time of one row comes from the tree row of the cache
+ * ({@link treeRowCache}), or from the times of the last rows of the same sweep
  * ({@link rowTime}).
  *
  * @param options The options.
  * @param ids The ids of the demos of the run.
- * @param cached The time of the base row in the cache, in seconds, or `null` when the run sweeps
- *   the base row.
+ * @param cached The time of the tree row in the cache, in seconds, or `null` when the run sweeps
+ *   the tree row.
  * @param known The time of each demo of the last rows of the sweep, in seconds.
  * @returns The lines.
  */
@@ -977,9 +980,9 @@ function planLines(
     ? 'the scene of the soloist'
     : `${ids.length} demo${ids.length === 1 ? '' : 's'} with the role (${ids.join(', ')})`;
   const rows = options.variants.length - (cached === null ? 0 : 1);
-  const base = cached === null ? '' : ', and the base row comes from the cache';
+  const fromCache = cached === null ? '' : ', and the tree row comes from the cache';
   const count = `${rows} row${rows === 1 ? '' : 's'}`;
-  const lines = [`Sweep of the ${options.role.role}: ${scene}, ${count} to sweep${base}.`];
+  const lines = [`Sweep of the ${options.role.role}: ${scene}, ${count} to sweep${fromCache}.`];
   const last = rowTime(demos, known);
   const row = cached ?? last?.seconds ?? null;
   if (row === null) {
@@ -989,7 +992,7 @@ function planLines(
   const source =
     cached === null
       ? `from the last rows of this sweep, with a time for ${last?.known ?? 0} of ${demos.length} demos`
-      : 'from the base row of the cache';
+      : 'from the tree row of the cache';
   const seconds = rows * row;
   const total = seconds < 120 ? `${seconds.toFixed(0)} s` : `${(seconds / 60).toFixed(1)} minutes`;
   lines.push(`Estimated time: about ${total}: ${count} of ${row.toFixed(1)} s, ${source}.`);
@@ -1133,7 +1136,7 @@ function printTable(rows: readonly SweepRow[]): void {
   console.log(`|${header.map(() => '---').join('|')}|`);
   for (const [row, { variant }] of rows.entries()) {
     const cells = [...columns.values()].map((values) => (values[row] ?? 0).toFixed(1));
-    console.log(`| ${variant || 'base'} | ${cells.join(' | ')} |`);
+    console.log(`| ${variant || 'tree'} | ${cells.join(' | ')} |`);
   }
   const placed = [...columns.keys()].filter((column) => places.has(column));
   if (placed.length > 0) {
@@ -1142,7 +1145,7 @@ function printTable(rows: readonly SweepRow[]): void {
     console.log(`|---|${placed.map(() => '---').join('|')}|`);
     for (const [row, { variant }] of rows.entries()) {
       const cells = placed.map((column) => places.get(column)?.[row] ?? '-');
-      console.log(`| ${variant || 'base'} | ${cells.join(' | ')} |`);
+      console.log(`| ${variant || 'tree'} | ${cells.join(' | ')} |`);
     }
   }
   printOverTable(rows);
@@ -1213,7 +1216,7 @@ function printOverTable(rows: readonly SweepRow[]): void {
       const cell = values[row];
       return cell && cell.samples > 0 ? ((100 * cell.over) / cell.samples).toFixed(1) : '-';
     });
-    console.log(`| ${variant || 'base'} | ${cells.join(' | ')} |`);
+    console.log(`| ${variant || 'tree'} | ${cells.join(' | ')} |`);
   }
 }
 
@@ -1293,7 +1296,7 @@ function roleOf(options: Options): RoleSweep {
 
 /** The rows of one run: the deepest points of each variant. */
 interface SweepRow {
-  /** The text of the changes of the variant, or empty for the base. */
+  /** The text of the changes of the variant, or empty for the working tree with no change. */
   readonly variant: string;
   /** The time of the sweep of the variant, in seconds. */
   readonly seconds: number;
@@ -1331,7 +1334,7 @@ export type StoredResult = Omit<DemoResult, 'sets' | 'reached'> & {
 
 /** The JSON text of {@link rowsJson}. */
 interface StoredRows {
-  /** The rows, the base first. */
+  /** The rows, the tree row first. */
   readonly rows: readonly (Omit<SweepRow, 'results'> & {
     /** The results of each demo and player. */
     readonly results: readonly StoredResult[];
@@ -1556,14 +1559,14 @@ export function compareDepths(
 }
 
 /**
- * Gives the cache file of the base row of a run with `--set` ({@link treeCacheFile}): the tree of
+ * Gives the cache file of the tree row of a run with `--set` ({@link treeCacheFile}): the tree of
  * the working tree and the arguments with no `--set`, `--json`, and `--base`. A run with no
  * `--set`, or with {@link PROBE_NO_CACHE} set to `1`, has none.
  *
  * @param options The options.
  * @returns The file, or `null`.
  */
-function baseRowCache(options: Options): string | null {
+function treeRowCache(options: Options): string | null {
   if (options.variants.length < 2 || process.env[PROBE_NO_CACHE] === '1') {
     return null;
   }
@@ -1595,17 +1598,17 @@ function setRoleHolds(role: RoleSweep, variant: string): ReturnType<typeof setHo
 
 /**
  * Sweeps each variant of the options with the holds of now, and writes the details of each
- * variant after its sweep. A run with `--set` takes the base row from its cache when the working
- * tree and the other arguments did not change ({@link baseRowCache}), and prints
- * `base: cached`. The sweep of the base fills the cache.
+ * variant after its sweep. A run with `--set` takes the tree row from its cache when the working
+ * tree and the other arguments did not change ({@link treeRowCache}), and prints
+ * `tree: cached`. The sweep of the tree row fills the cache.
  *
  * @param options The options.
  * @param role The role of the options.
- * @returns The rows, the base first.
+ * @returns The rows, the tree row first.
  */
 async function sweepRows(options: Options, role: RoleSweep): Promise<SweepRow[]> {
   const rows: SweepRow[] = [];
-  const cache = baseRowCache(options);
+  const cache = treeRowCache(options);
   const cached = cache && existsSync(cache) ? readRows(readFileSync(cache, 'utf8'))[0] : undefined;
   const ids = options.soloist
     ? []
@@ -1613,8 +1616,8 @@ async function sweepRows(options: Options, role: RoleSweep): Promise<SweepRow[]>
   for (const variant of options.variants) {
     if (variant === '' && cached) {
       rows.push(cached);
-      console.log(`base: cached (tree, ${basename(cache ?? '', '.json').slice(5, 17)})`);
-      console.log(`base (${cached.seconds.toFixed(1)} s when swept):`);
+      console.log(`tree: cached (${basename(cache ?? '', '.json').slice(5, 17)})`);
+      console.log(`tree (${cached.seconds.toFixed(1)} s when swept):`);
       printDetails(role, cached.results, options.goal);
       continue;
     }
@@ -1633,7 +1636,7 @@ async function sweepRows(options: Options, role: RoleSweep): Promise<SweepRow[]>
     if (variant === '' && cache) {
       storeBase(cache, rowsJson([{ variant: text, seconds, results }]));
     }
-    console.log(`${text || 'base'} (${seconds.toFixed(1)} s):`);
+    console.log(`${text || 'tree'} (${seconds.toFixed(1)} s):`);
     printDetails(role, results, options.goal);
   }
   return rows;
@@ -1686,7 +1689,7 @@ async function compareRef(
     `Sweeps of ${label} and of the working tree: ${((performance.now() - started) / 1000).toFixed(1)} s.`,
   );
   for (const { variant, seconds, results } of rows) {
-    console.log(`${variant || 'base'} (${seconds.toFixed(1)} s):`);
+    console.log(`${variant || 'tree'} (${seconds.toFixed(1)} s):`);
     printDetails(role, results, goal);
   }
   printTable(rows);
@@ -1706,7 +1709,7 @@ async function printPlan(options: Options, role: RoleSweep): Promise<void> {
   const ids = options.soloist
     ? []
     : (await roleDemos(options.demos, options.midi, role)).map(demoId);
-  const cache = options.base === null ? baseRowCache(options) : null;
+  const cache = options.base === null ? treeRowCache(options) : null;
   const cached = cache && existsSync(cache) ? readRows(readFileSync(cache, 'utf8'))[0] : undefined;
   const known = readTimes()[timeKey(options)] ?? {};
   console.log(planLines(options, ids, cached ? cached.seconds : null, known).join('\n'));
@@ -1716,7 +1719,7 @@ async function printPlan(options: Options, role: RoleSweep): Promise<void> {
  * Sweeps the role on the studio body that the export makes from another GLB file (`--glb <file>`),
  * such as a GLB file of `pnpm rig-mesh --check --keep`. The tool runs again in a child process, in
  * a copy of `src/` with the module of the file (`withGlbBody()` of `tools/glb-swap.ts`). The files
- * of `assets/` and `src/` do not change, also after a stop or a failure. The child sweeps the base
+ * of `assets/` and `src/` do not change, also after a stop or a failure. The child sweeps the tree
  * row each time, because a cache by tree does not know the file ({@link PROBE_NO_CACHE}). With
  * `--base`, the child of the working tree of {@link compareRef} runs this sweep.
  *
