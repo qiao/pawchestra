@@ -221,14 +221,14 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 
 | Item | Value |
 |---|---|
-| Size | 1,453,895 bytes |
-| SHA-256 | `68c0c8defb197bb1cca29d44f8f25f7233b55fde1828cb3ab29ec23b76122a53` |
+| Size | 1,500,199 bytes |
+| SHA-256 | `9fe2dc7418f5632c20ef752bcffa5e0cfcbe94d5295a015271aaf0af2431305a` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
-| Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.04 |
+| Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.01 ("Seat" below) |
 | Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
 
 The edits, in the order of the work:
@@ -335,3 +335,22 @@ the left and 43 degrees on the right.
   units (mean 0.0017). The eyeballs, the whiskers, the mouth parts, the open edges of the eye
   sockets, and the gloss nose stay. The mean fold between neighbor faces goes from 14.5° to
   12.4° on the trunk and from 21.3° to 16.8° on the paws. The bones and the weights stay.
+
+**Seat.** A seated violinist sits with most of each thigh on the seat, and the front edge of the
+seat a little behind the knee. Two changes give this seat:
+
+- **Legs of the bind.** The keys of the Action `bind` turn each thigh to a slope of 15 degrees
+  below the horizontal (29 degrees before) and each shin to 78 degrees (81 degrees before). Each
+  foot keeps its turn in the world, so the sole stays flat. The bones keep their lengths, and the
+  mesh keeps its form.
+- **Seat of the rig.** The property `seat` reaches from z -0.08 to z 0.09 (studio axes, +z
+  forward). At z 0.09 the calf starts to go below the thigh, so a seat further forward rests on
+  the calves. `backRoom` is 0.01.
+
+| Measure | Before | After | Main rabbit |
+|---|---|---|---|
+| Chair depth | 0.179 m | 0.337 m | 0.265 m |
+| Seat top | 0.350 m | 0.249 m | 0.262 m |
+| Thigh (hip joint to knee joint) over the seat | 0 % | 64 % | |
+| Front edge of the seat behind the knee joint | 0.25 m | 0.08 m | |
+| Back of the pelvis to the chair back | 0.05 m | 0.02 m | |
