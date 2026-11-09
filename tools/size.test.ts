@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Manifest } from 'vite';
 
+import { DEFAULT_DEMO } from '../src/app/demos.ts';
 import {
   baseLines,
   defaultDemoFile,
@@ -61,15 +62,15 @@ describe('htmlAssetFiles', () => {
 });
 
 describe('defaultDemoFile', () => {
-  it('counts the built file of the Boulanger demo, the default demo (design 7.2)', () => {
+  it('counts the built file of the default demo (design 7.2)', () => {
     expect(defaultDemoFile('/r/dist', '/r/demos', () => true)).toBe(
-      '/r/dist/demos/boulanger-matin.mid',
+      `/r/dist/demos/${DEFAULT_DEMO}.mid`,
     );
   });
 
   it('counts the source file when the build has no demo file', () => {
     expect(defaultDemoFile('/r/dist', '/r/demos', () => false)).toBe(
-      '/r/demos/src/boulanger-matin.mid',
+      `/r/demos/src/${DEFAULT_DEMO}.mid`,
     );
   });
 });
