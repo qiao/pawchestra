@@ -410,8 +410,9 @@ function afterEnds(
  * the chest: the move starts at the crash of the note and ends before the next lift. The free paw
  * of the bass drum goes to the far head, and the paw that did not strike a note of the suspended
  * cymbal grips its rim: the move starts after the rebound of the strike, and ends at the next note
- * or before the next lift of a paw. The key of each window is the hand: 0 for the left hand,
- * and 1 for the right hand.
+ * or before the next lift of a paw. The paw of the timpani that struck the note lays its end on the
+ * head, until the next note or the next lift of that paw. The key of each window is the hand: 0
+ * for the left hand, and 1 for the right hand.
  *
  * @param rule The rule of the damp.
  * @param groups The note groups of the player, sorted by start.
@@ -446,16 +447,22 @@ function dampTrackOf(
       });
       continue;
     }
-    // The free paw: the left paw of the bass drum, or the paw whose last strike is older.
+    // The paw of the damp: the free left paw of the bass drum, the paw whose last strike is older
+    // at the suspended cymbal, or the paw that struck the note at the timpani.
     const j = lastOf(left, g.start);
+    const rightLater = (right.starts[i] ?? -Infinity) > (left?.starts[j] ?? -Infinity);
     const free =
-      rule.kind === 'palm' || (right.starts[i] ?? -Infinity) > (left?.starts[j] ?? -Infinity)
-        ? left
-        : right;
+      rule.kind === 'palm' || (rule.kind === 'edge' ? rightLater : !rightLater) ? left : right;
     // The next lift of a paw with a mallet.
     const liftOf = (track: StrikeTrack | null): number =>
       track ? (track.upStarts[lastOf(track, g.start) + 1] ?? Infinity) : Infinity;
-    const lift = rule.kind === 'palm' ? Infinity : Math.min(liftOf(left), liftOf(right));
+    // A paw of the timpani muffles its own kettle, so only its own next lift ends the muffle.
+    const lift =
+      rule.kind === 'palm'
+        ? Infinity
+        : rule.kind === 'fingers'
+          ? liftOf(free)
+          : Math.min(liftOf(left), liftOf(right));
     wishes.push({
       ...after,
       earliest: g.start + STRIKE_MOTION.reboundSec,
@@ -547,6 +554,8 @@ const top = new Vector3();
 const offset = new Vector3();
 const wristBind = new Vector3();
 const grip = new Vector3();
+const homeShift = new Vector3();
+const corner = new Vector3();
 const level = new Vector3();
 const swing = new Quaternion();
 const inverse = new Quaternion();
@@ -730,6 +739,8 @@ const GRIP_FADE = [30 * MathUtils.DEG2RAD, 10 * MathUtils.DEG2RAD] as const;
  *   pitch, a share above 1 lifts the head higher than between strikes (`MalletAcross.peak`).
  * @param joint The posed shoulder joint of the side.
  * @param pole The direction to which the elbow points, in the model axes.
+ * @param shift The move of the home of the mallet, in meters: the move of the paw at a damp that
+ *   keeps the direction of the mallet (`DampHand.keep`).
  */
 function acrossHand(
   side: Extract<PercussionSide, { kind: 'mallet' }>,
@@ -737,12 +748,13 @@ function acrossHand(
   share: number,
   joint: Vector3,
   pole: Vector3,
+  shift: Vector3,
 ): void {
   const { across, arm } = side;
   if (!across) {
     return;
   }
-  strikeAlong.copy(point).sub(offset.fromArray(side.home)).normalize();
+  strikeAlong.copy(point).sub(offset.fromArray(side.home).add(shift)).normalize();
   grip.copy(point).addScaledVector(strikeAlong, -side.length);
   shoulderBind.fromArray(arm.bind.shoulder);
   elbowBind.fromArray(arm.bind.elbow);
@@ -949,6 +961,23 @@ function plateHand(
 }
 
 /**
+ * Gives the height of the lowest corner of a posed paw.
+ *
+ * @param paw The corners of the paw in the bind pose, from the bind wrist.
+ * @param at The posed wrist.
+ * @param hand The world rotation of the hand from the bind pose.
+ * @returns The height, in meters.
+ */
+function lowestPoint(paw: Float32Array, at: Vector3, hand: Quaternion): number {
+  let low = Infinity;
+  for (let i = 0; i + 2 < paw.length; i += 3) {
+    corner.set(paw[i] ?? 0, paw[i + 1] ?? 0, paw[i + 2] ?? 0).applyQuaternion(hand);
+    low = Math.min(low, corner.y);
+  }
+  return Number.isFinite(low) ? at.y + low : at.y;
+}
+
+/**
  * Writes one arm and its fingers. An arm with no instrument hangs, also while the player plays.
  *
  * @param rig The points of the player.
@@ -984,7 +1013,10 @@ function poseHand(
   // plays. The free paw else hangs.
   const index = left ? 0 : 1;
   const damped = rig.dampHands[index];
-  const muffle = damped && state.damp.key === index ? state.damp.weight * weight : 0;
+  // The muffle of the timpani does not follow the lift and the lowering: the paws of the ready
+  // hold stay at the kettles, and a muffle that grew with the lift turned a paw 540° each second.
+  const steady = rig.hold.damp?.kind === 'fingers' ? 1 : weight;
+  const muffle = damped && state.damp.key === index ? state.damp.weight * steady : 0;
   const play = side.kind === 'free' ? muffle : rig.hold.ready ? 1 : weight;
 
   head.fromArray(hand.point);
@@ -992,14 +1024,26 @@ function poseHand(
   if (side.kind === 'mallet' && side.across) {
     const rest = rig.hold.sizes.rest;
     let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
-    // At a damp, the grip goes to the rim, and the wrist lifts the head of the mallet.
-    if (damped?.kind === 'edge' && muffle > 0) {
+    // At a damp, the grip goes to its place, and the wrist lifts the head of the mallet.
+    homeShift.set(0, 0, 0);
+    if (damped?.kind === 'grip' && muffle > 0) {
       grip.fromArray(damped.grip);
-      along.copy(grip).sub(offset.fromArray(side.home)).normalize();
-      head.lerp(grip.addScaledVector(along, side.length), muffle);
+      if (damped.keep) {
+        // The paw moves to the grip and keeps the direction of the mallet at its target.
+        along.copy(head).sub(offset.fromArray(side.home)).normalize();
+        homeShift.copy(grip).addScaledVector(along, side.length).sub(head).multiplyScalar(muffle);
+        head.add(homeShift);
+      } else {
+        along.copy(grip).sub(offset.fromArray(side.home)).normalize();
+        head.lerp(grip.addScaledVector(along, side.length), muffle);
+      }
       share += (damped.share - share) * muffle;
     }
-    acrossHand(side, head, share, shoulder.position, turnedPole);
+    acrossHand(side, head, share, shoulder.position, turnedPole, homeShift);
+    // At a muffle of the timpani, the lowest point of the paw goes to the head.
+    if (damped?.kind === 'grip' && damped.touch !== null && muffle > 0) {
+      wrist.y += (damped.touch - lowestPoint(damped.paw, wrist, turn)) * muffle;
+    }
   } else if (side.kind === 'mallet') {
     malletHand(side, head, hand, shoulder.position, turnedPole);
   } else if (side.kind === 'plate') {

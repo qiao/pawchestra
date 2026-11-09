@@ -245,6 +245,11 @@ The app follows these facts:
   mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
   longer rest, the head lifts one beat before the note, at most 1 s before it
   (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
+- **The muffle (section 4).** After a note with a rest of at least 0.5 s after it, the paw that
+  struck the note lays the end of the closed paw lightly on its head, for at most 0.3 s, and goes
+  back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The mallet
+  keeps its strike direction, and the wrist lifts its head off the drum, so the mallet stays in
+  the paw [55] [56]. A pause in a muffle keeps the paw on the head.
 
 The app does not follow these facts:
 
@@ -253,9 +258,14 @@ The app does not follow these facts:
   a body whose belly needs the drum forward sets it higher. With the head below the elbows of each
   body, the sticks of the thin wolf and deer went into the raised drum in the lowering.
 - **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
-- **The muffle (section 4).** The elephant does not muffle. Its short arms hold the lowest point
-  of the paw a few cm over the head plane and outside the head, also with the paw down and
-  forward, so the paw cannot reach the playing spot.
+- **The place of the muffle (section 4).** The paw touches the head between the playing spot and
+  the near rim, at least 5 cm in from the rim, as far toward the spot as the short arm reaches
+  (`FingersDamp.reach`). The spine leans 15° over the kettles, and the upper body turns 17° to
+  bring the shoulder of the paw forward. No source gives a lean or a turn. From an upright body,
+  the lowest point of the paw stayed 11 cm to 15 cm over the head. Kettles of 0.92 m, in the
+  0.84 m to 0.94 m of an adjustable kettle, and 6 cm nearer, let the paw reach the head, but they
+  moved the left arm past the margins of the arm gate (paw twist p95 170° against 136°). A lean
+  of 17° put the forearms up to 1.8 cm into the belly.
 - **The set position (section 3).** Between strikes, the wrist lifts the head above its spot with
   the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
   closed paw. Each paw keeps the roll that has no side bend at the strike

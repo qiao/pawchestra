@@ -848,13 +848,6 @@ scene of each demo has its seats and stage size with no overlap.
       upper arm of the mesh lies on the side of the body.
 - [ ] Elephant timpanist: a roll stays in one hand, and the outer kettles stand out of reach
       (`PercussionHold.pair`). Offer the user longer arms.
-- [ ] Elephant timpanist: no muffle, because the short arms hold the paw a few cm over the head
-      plane and outside the head (5.3). With the heads at 0.76 m, the lowest point of the paw at a
-      muffle stayed 11 cm to 15 cm over the head plane, and at 0.88 m 5 cm to 8 cm. Heads at
-      0.92 m (a real kettle of adjustable height: 0.84 m to 0.94 m) and 6 cm nearer let the paw
-      reach the head (0 cm to 2 cm in, 3 cm to 13 cm in from the rim), but the play then put the
-      paws 6.0 cm and the forearms 5.0 cm into the kettles (main 0 cm). Refit the timpani hold for
-      the higher kettles first (`reports/2026-11-08-perc-pro-3/try/timpani-muffle.patch`).
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
 - [ ] Tambourine: it stands on a stand and the tip of the triangle beater strikes it. A real player

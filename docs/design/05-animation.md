@@ -515,9 +515,13 @@ The rest of each family:
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
   the note takes its grip to the near rim, so that its fingers touch the edge, and the spine leans
   further over the cymbal (`EdgeDamp`). The window ends before the next lift of each paw. Reason
-  of the lean: with no lean, the arm stretched past the margin of the arm gate. The timpanist does
-  not damp: the short arms of the elephant held the lowest point of the paw a few cm over the
-  head plane and outside the head in each tried place.
+  of the lean: with no lean, the arm stretched past the margin of the arm gate. The paw of the
+  timpanist that struck the note moves toward the player with its mallet in the strike direction,
+  as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to
+  the head, while the spine leans and the upper body turns the shoulder of the paw forward
+  (`FingersDamp`). The muffle does not follow the lift and the lowering. Reason: from an upright
+  body, the paw stayed over the head, and higher, nearer kettles that the paw reached moved the
+  left arm past the margins of the arm gate. A muffle that grew with a lift turned a paw too fast.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
   plate comes down onto the left plate at the angle of a flam (`CRASH_MOTION.flam`), so that the
   top rims meet first. The rims meet at the crash point, a little offset, and the

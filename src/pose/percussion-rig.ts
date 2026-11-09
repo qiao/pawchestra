@@ -121,8 +121,9 @@ export interface MalletSet {
  * - `chest`: the hand cymbals go against the chest.
  * - `palm`: the free paw lays its palm on the far head of the bass drum.
  * - `edge`: the paw that did not strike the note grips the rim of the suspended cymbal.
+ * - `fingers`: the paw that struck the note lays its fingers on the head of the timpani.
  */
-export type DampRule = ChestDamp | PalmDamp | EdgeDamp;
+export type DampRule = ChestDamp | PalmDamp | EdgeDamp | FingersDamp;
 
 /** The damp of the hand cymbals against the chest ({@link DampRule}). */
 export interface ChestDamp {
@@ -162,6 +163,48 @@ export interface EdgeDamp {
   readonly share: number;
   /** The forward lean of the spine at the damp, in radians, on top of `PercussionHold.lean`. */
   readonly lean: number;
+}
+
+/**
+ * The damp of the timpani ({@link DampRule}): the paw that struck the note moves its grip toward
+ * the player and keeps the direction of its mallet, and the wrist lifts the head of the mallet, so
+ * that the end of the closed paw touches the head, as a real timpanist muffles with the back
+ * fingers and keeps the mallet between the thumb and the index finger
+ * (`docs/reference/percussion-technique.md` 4). The spine leans over the kettles, and the upper
+ * body turns the shoulder of the paw forward. The muffle and the lean do not follow the lift and
+ * the lowering, so that a pause in a muffle keeps the paw on the head.
+ */
+export interface FingersDamp {
+  readonly kind: 'fingers';
+  readonly restSec: number;
+  /** The longest contact, in seconds. */
+  readonly hold: number;
+  /**
+   * The distance on the floor plane from the shoulder joint of the left and of the right hand to
+   * the grip of the mallet at the damp, in meters. The grip lies on the line from the playing spot
+   * of the hand to the player, as far toward the spot as this reach permits, so that the short arm
+   * reaches the head.
+   */
+  readonly reach: readonly [left: number, right: number];
+  /** The least distance of the grip in from the near rim of the head, in meters. */
+  readonly rim: number;
+  /** The height of the grip over the head, in meters. */
+  readonly up: number;
+  /**
+   * The depth of the lowest point of the rigid paw under the head, in meters
+   * (`DampHand.touch`). The skin of the studio body lies about 1.2 cm over that point, so the end
+   * of the paw presses the head lightly.
+   */
+  readonly press: number;
+  /** The share of the pitch of the mallet at the damp (`MalletAcross.pitch`). */
+  readonly share: number;
+  /** The forward lean of the spine at the damp, in radians. */
+  readonly lean: number;
+  /**
+   * The turn of the upper body at the damp, in radians, so that the shoulder of the paw of the
+   * damp comes forward toward its kettle.
+   */
+  readonly turn: number;
 }
 
 /** The damp of the free paw on the far head of the bass drum ({@link DampRule}). */
@@ -382,9 +425,24 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
-    // No damp: in each tried place, the short arms held the lowest point of the paw 2 cm to 10 cm
-    // over the head plane, and outside the head (design 5.3).
-    damp: null,
+    // After a note before a rest, the paw that struck it muffles its head (damp). The left front
+    // kettle stands nearer than the right one, so each side has its own reach. The spine leans
+    // 15° and the upper body turns 17°: from an upright body, the lowest point of the paw stayed
+    // 11 cm to 15 cm over the head. A lean of 17° put the forearms up to 1.8 cm into the belly,
+    // and a lean of 20° twisted the other paw 5° more in a lowering, past the margin of 3° of the
+    // arm gate. A muffle of 0.5 s folded 9 faces of the left paw at p95 (main 5, margin 2).
+    damp: {
+      kind: 'fingers',
+      restSec: 0.5,
+      hold: 0.3,
+      reach: [0.46, 0.45],
+      rim: 0.05,
+      up: -0.02,
+      press: 0.017,
+      share: 9,
+      lean: 0.27,
+      turn: 0.3,
+    },
     // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and
     // malletSpotR).
     curl: 100 * MathUtils.DEG2RAD,
@@ -896,7 +954,7 @@ export interface PercussionRig {
 
 /**
  * The place of a paw at a damp: the wrist and the turn of the free paw (`PalmDamp`), or the grip
- * of a mallet (`EdgeDamp`), whose paw keeps the turn of its hold.
+ * of a mallet (`EdgeDamp`, `FingersDamp`), whose paw keeps the turn of its hold.
  */
 export type DampHand =
   | {
@@ -907,11 +965,26 @@ export type DampHand =
       readonly hand: Quat;
     }
   | {
-      readonly kind: 'edge';
+      readonly kind: 'grip';
       /** The grip of the mallet, in the model axes. */
       readonly grip: Vec3;
       /** The share of the pitch of the mallet. */
       readonly share: number;
+      /**
+       * True: the paw moves to the grip and keeps the direction of the mallet at its target
+       * (`FingersDamp`). False: the mallet points from its home to the grip (`EdgeDamp`).
+       */
+      readonly keep: boolean;
+      /**
+       * The height that the lowest point of the paw goes to at the damp, in meters, or `null` for
+       * no fit: the paw lays its fingers on the head of a kettle (`FingersDamp`).
+       */
+      readonly touch: number | null;
+      /**
+       * The corners of the paw in the bind pose, from the bind wrist, three numbers for each, for
+       * the lowest point of the paw (`touch`). Empty with no fit.
+       */
+      readonly paw: Float32Array;
     };
 
 /**
@@ -1382,6 +1455,37 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   const pair = instrument === 'timpani' && hold.pair;
   const restL = (pair ? targets.get(frontL) : undefined) ?? ordered[0] ?? fallback;
   const restR = (pair ? targets.get(frontR) : undefined) ?? ordered.at(-1) ?? fallback;
+  // The paw that struck a kettle muffles it near the playing spot of the hand.
+  if (hold.damp?.kind === 'fingers') {
+    const { damp } = hold;
+    const spot = (rest: StrikeTarget, offset: Vec3, arm: ArmRig): DampHand => {
+      const target = offsetTarget(rest, offset);
+      // The move toward the player at which the grip is the reach from the shoulder joint, at
+      // most to the least distance from the near rim.
+      const [x, , z] = target.point;
+      const length = Math.hypot(x, z) || 1;
+      const [sx, , sz] = arm.bind.shoulder;
+      const ux = -x / length;
+      const uz = -z / length;
+      const dx = x - sx;
+      const dz = z - sz;
+      const b = dx * ux + dz * uz;
+      const reach = damp.reach[arm.side === 'L' ? 0 : 1];
+      const c = dx * dx + dz * dz - reach * reach;
+      const ahead = -b - Math.sqrt(Math.max(0, b * b - c));
+      const move = MathUtils.clamp(c > 0 ? ahead : 0, 0, hold.rim - damp.rim);
+      const point = towardPlayer(target, move).point;
+      return {
+        kind: 'grip',
+        grip: [point[0], point[1] + damp.up, point[2]],
+        share: damp.share,
+        keep: true,
+        touch: target.point[1] - damp.press,
+        paw: pawCorners(model, arm),
+      };
+    };
+    dampHands = [spot(restL, hold.offsetL, left), spot(restR, hold.offsetR, right)];
+  }
   return {
     instrument,
     hold,
@@ -1469,9 +1573,46 @@ function pawsOnRim(
     const grip = center
       .addScaledVector(out, rule.rim + rule.grip[0])
       .add(new Vector3(0, rule.grip[1], 0));
-    return { kind: 'edge', grip: toVec3(grip), share: rule.share };
+    return {
+      kind: 'grip',
+      grip: toVec3(grip),
+      share: rule.share,
+      keep: false,
+      touch: null,
+      paw: new Float32Array(),
+    };
   };
   return [paw(arms[0]), paw(arms[1])];
+}
+
+/**
+ * Gives the corners of the hand bone of an arm in the bind pose, from the bind wrist, with no two
+ * equal corners (`DampHand.paw`).
+ *
+ * @param model The player model.
+ * @param arm The arm.
+ * @returns Three numbers for each corner.
+ */
+function pawCorners(model: PlayerModel, arm: ArmRig): Float32Array {
+  const { positions, bones } = model.mesh;
+  const hand = boneIndex(arm.side === 'L' ? 'handL' : 'handR');
+  const [wx, wy, wz] = arm.bind.wrist;
+  const seen = new Set<string>();
+  const out: number[] = [];
+  for (let c = 0; c < bones.length; c++) {
+    if (bones[c] !== hand) {
+      continue;
+    }
+    const x = positions[c * 3] ?? 0;
+    const y = positions[c * 3 + 1] ?? 0;
+    const z = positions[c * 3 + 2] ?? 0;
+    const key = `${x} ${y} ${z}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(x - wx, y - wy, z - wz);
+    }
+  }
+  return Float32Array.from(out);
 }
 
 /**

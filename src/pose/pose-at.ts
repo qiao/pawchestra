@@ -519,9 +519,16 @@ function poseAnimal(
         body.turn = -damp.turn * strikes.damp.weight * ready;
         body.headTurn = -body.turn;
       }
-      // At a damp of the suspended cymbal, the spine leans further over the cymbal (`EdgeDamp`).
+      // At a damp of the suspended cymbal, the spine leans further over the cymbal (`EdgeDamp`),
+      // and at a muffle of the timpani over the kettle (`FingersDamp`), also at rest.
       if (damp?.kind === 'edge') {
         body.lean += damp.lean * strikes.damp.weight * weight;
+      }
+      if (damp?.kind === 'fingers') {
+        body.lean += damp.lean * strikes.damp.weight * ready;
+        // The shoulder of the paw of the damp comes forward: the right shoulder at key 1.
+        body.turn = (strikes.damp.key === 1 ? 1 : -1) * damp.turn * strikes.damp.weight * ready;
+        body.headTurn = -body.turn;
       }
       body.upright = body.lean;
       if (note.side && legs) {
