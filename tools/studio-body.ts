@@ -2209,8 +2209,10 @@ export function eyeBend(
  * The faces around the long axis and the steps up the oval whose front corners {@link eyePush}
  * tests: the oval of the fit of the eye places, with fewer faces than the oval of the app and with
  * no upright turn (`ovalCorners()` of `models/eyes.ts`). A finer or a turned oval has other corners
- * near the rim. A test of these corners moved single eyes out of the head by up to 0.03 H, so the
- * two eyes of the pig and of the panda stood out by different amounts.
+ * near the rim. A test of the oval of the app moved one eye of the hippo out by 0.038 H and one
+ * eye of the panda by 0.028 H, so the two eyes of each stood out by different amounts, and a dark
+ * slit showed beside the hippo eye. It closed no notch of the fur: the notches lie at the rim,
+ * which this test leaves in the head.
  */
 const PUSH_OVAL: OvalFaces = [8, 4];
 
