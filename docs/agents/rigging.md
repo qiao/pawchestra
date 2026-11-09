@@ -115,6 +115,7 @@ with `pnpm bind-view`.
    the eye fans. After an edit of an eye or of the face, run `se.fit_eyes(rig, mesh)`. When the
    color map paints a full eye on the eyeballs of the source, keep the eyeballs in place of the
    eye objects: the face attribute `eye`, the slot `fur`, the source UVs, and the row `head` 1.
+   Give each such eye a lid (design 4.4, "Hand rig"), and check its edges with ray casts.
 4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment.
    `sp.load_preview()` shows it beside the rig, `sp.refresh_preview()` shows the open file, and
    `sp.fold_colors(True)` marks the folds. Check each weight edit in the bind and the app pose.
