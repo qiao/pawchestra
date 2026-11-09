@@ -222,13 +222,13 @@ cut, no split from the trunk, and no stretch. The legs keep the length of the so
 | Item | Value |
 |---|---|
 | Size | 1,453,895 bytes |
-| SHA-256 | `3a62551f4be5009431a25f40f2d908b758b79db153d34dd5aabe9ab770edc0e1` |
+| SHA-256 | `68c0c8defb197bb1cca29d44f8f25f7233b55fde1828cb3ab29ec23b76122a53` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,039 vertices and 3,241 faces (2,693 quads and 548 triangles, 5,934 triangles), flat faces, and the surface of `sa.add_surface()`. 29 faces are gloss (the nose) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (shoulder x 0.065, elbow 0.16, wrist 0.245, fingers 0.275). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination, so the bind forearms have no twist. The property `palm` holds a palm for each side ("Arm twist" below) |
-| Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 35, `backRoom` 0.04 |
+| Facts | `height` 0.939281 (the shoulder joints at 0.558 u, 1.6833 m for each unit, so that H stays 0.2985 m), `crease` 55 ("Smooth surface" below), `backRoom` 0.04 |
 | Eyes | `eye_L` and `eye_R` on the old eyes of the source, with the size H |
 
 The edits, in the order of the work:
@@ -318,3 +318,20 @@ upper arm), in degrees, in the moments of the violinist:
 
 In 18 samples of `mendelssohn-op61.mid` from 0 s to 60 s, each value stays within 28 degrees on
 the left and 43 degrees on the right.
+
+**Smooth surface.** Three changes make the candidate as smooth as the A-pose rabbit or smoother
+(`reports/2026-11-08-tripo-rabbit-hand/smooth/`, which git ignores):
+
+- **One color for each region.** The face colors of `add_surface()` took the shade that the
+  Tripo texture bakes, so the fur showed 9 to 11 tones on each part. Each face now takes the
+  color of its region: the cream fur (sRGB 232, 204, 171), the pink inner ears (223, 177, 144,
+  faces above z 0.74), the pink pads of the paws and the feet (226, 183, 150), the gloss nose
+  (239, 163, 132), and the grey whiskers (174, 167, 163). A face is pink when the hue of its
+  old color is below 26.5°. Each region takes the color of its face at 0.6 of its luma range.
+- **Crease 55.** The limb rings have 11 vertices, 33° apart. With the crease 35, 62 % to 82 % of
+  the faces of the arms, the legs, and the paws had a corner that left out a neighbor face
+  (`studioNormals()`), and shaded as a facet. With 55, 6 % to 18 %.
+- **Relax.** Ten Taubin rounds (0.5, then -0.53) on the body move each vertex at most 0.0095
+  units (mean 0.0017). The eyeballs, the whiskers, the mouth parts, the open edges of the eye
+  sockets, and the gloss nose stay. The mean fold between neighbor faces goes from 14.5° to
+  12.4° on the trunk and from 21.3° to 16.8° on the paws. The bones and the weights stay.
