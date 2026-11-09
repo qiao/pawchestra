@@ -4993,18 +4993,21 @@ class GlbWriter:
         return self.add(np.asarray(array, np.float32), 5126, kind, minmax)
 
 
-def primitive_arrays(points, tris, colors, materials, weights, shapes, name, base=None):
+def primitive_arrays(points, tris, colors, materials, weights, shapes, name, base=None, uvs=None):
     """Gives the vertex arrays of the faces of one material: each corner with its face color is
     one vertex, so that each face keeps one color. With `base`, the colors before
-    `colors.shift`, each vertex also has the base color of its face."""
+    `colors.shift`, each vertex also has the base color of its face. With `uvs` (triangles × 3 ×
+    2, in the axes of glTF), each corner also has its texture point, so that a UV seam splits
+    the vertex."""
     faces = np.nonzero(materials == name)[0]
     keys, index, corners = {}, [], []
     for f in faces:
         c = tuple(np.round(linear(colors[f]), 7))
         b = c if base is None else tuple(np.round(linear(base[f]), 7))
         row = []
-        for v in tris[f]:
-            key = (int(v), c, b)
+        for k, v in enumerate(tris[f]):
+            uv = () if uvs is None else tuple(float(x) for x in uvs[f, k])
+            key = (int(v), c, b, uv)
             if key not in keys:
                 keys[key] = len(index)
                 index.append(key)
@@ -5013,6 +5016,7 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
     vertex = np.array([k[0] for k in index])
     color = np.array([k[1] for k in index])
     base_color = np.array([k[2] for k in index])
+    texcoord = np.array([k[3] for k in index], np.float32) if uvs is not None else None
     joints = np.zeros((len(vertex), 4), np.uint8)
     values = np.zeros((len(vertex), 4), np.float32)
     for i, v in enumerate(vertex):
@@ -5022,7 +5026,7 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
             values[i, j] = weights[v, k]
     return {
         'position': points[vertex], 'color': color, 'base': base_color, 'joints': joints,
-        'weights': values,
+        'weights': values, 'uv': texcoord,
         'shapes': [shape[vertex] for shape in shapes.values()],
         'indices': np.array(corners, np.uint32),
     }
@@ -5030,12 +5034,13 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
 
 def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
               bind_heads, src_frames, src_heads, extras, base=None,
-              generator='pawchestra tools/blender/rig_mesh.py'):
+              generator='pawchestra tools/blender/rig_mesh.py', uvs=None):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
     for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
-    before `colors.shift`, the attribute `COLOR_1` holds them. `generator` names the script that writes the file: `export_rig.py` also writes with
-    this function."""
+    before `colors.shift`, the attribute `COLOR_1` holds them. With `uvs`, the texture point of
+    each corner (`primitive_arrays()`), the attribute `TEXCOORD_0` holds them. `generator` names
+    the script that writes the file: `export_rig.py` also writes with this function."""
     w = GlbWriter()
     shape_names = list(shapes)
     mats = [{'name': name, 'doubleSided': True,
@@ -5044,13 +5049,15 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
 
     primitives = []
     for k, (name, _) in enumerate(MATERIALS):
-        arrays = primitive_arrays(bind, tris, colors, materials, weights, shapes, name, base)
+        arrays = primitive_arrays(bind, tris, colors, materials, weights, shapes, name, base, uvs)
         attributes = {
             'POSITION': w.floats(arrays['position'], 'VEC3', minmax=True),
             'COLOR_0': w.floats(arrays['color'], 'VEC3'),
         }
         if base is not None:
             attributes['COLOR_1'] = w.floats(arrays['base'], 'VEC3')
+        if uvs is not None:
+            attributes['TEXCOORD_0'] = w.floats(arrays['uv'], 'VEC2')
         attributes['JOINTS_0'] = w.add(arrays['joints'], 5121, 'VEC4')
         attributes['WEIGHTS_0'] = w.floats(arrays['weights'], 'VEC4')
         primitives.append({

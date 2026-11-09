@@ -14,7 +14,8 @@ evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the s
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
 middle, the direction, and the size of each pea eye in the bind (`eyes_of()`), and the custom
 properties of the armature give the facts of the body (`body_of()`). The bytes depend only on the
-`.blend`.
+`.blend`. A mesh object with the custom property `texture` also gets the texture point of each
+corner (`texture_of()`).
 """
 
 import hashlib
@@ -137,6 +138,7 @@ def check_rig(rig, body, rm, bones, order):
         'color_base': 'FLOAT_COLOR',
         'cap': 'BOOLEAN',
         'rim': 'BOOLEAN',
+        'plain': 'BOOLEAN',
     }
     for name, kind in kinds.items():
         a = body.data.attributes.get(name)
@@ -383,6 +385,34 @@ def triangles(me):
     return corners, kinds, color[owner], base[owner], flags[0], flags[1]
 
 
+def texture_of(body, me, kinds):
+    """Gives the color map of the body and the texture point of each corner of each triangle, in
+    the axes of glTF (v down), in the order of `triangles()`. The custom property `texture` of
+    the mesh object names the web copy of the color map, relative to the repository. Each fur
+    triangle takes the points of the active UV map. A gloss triangle and a fur face with the face
+    attribute `plain`, such as a whisker, take (-1, -1) and keep their face colors. A body with no
+    property has no texture: (None, None)."""
+    path = body.get('texture')
+    if path is None:
+        return None, None
+    need(
+        isinstance(path, str) and os.path.isfile(os.path.join(sa.ROOT, path)),
+        f'The texture {path} of the mesh is no file of the repository.',
+    )
+    need(me.uv_layers.active is not None, 'The mesh with a texture has no UV map.')
+    me.calc_loop_triangles()
+    owner = np.array([t.polygon_index for t in me.loop_triangles])
+    loops = np.array([t.loops[:] for t in me.loop_triangles])
+    points = np.zeros(len(me.loops) * 2, np.float32)
+    me.uv_layers.active.data.foreach_get('uv', points)
+    points = points.reshape(-1, 2).astype(float)
+    uvs = points[loops]
+    uvs[..., 1] = 1.0 - uvs[..., 1]
+    plain = face_values(me, 'plain', 1, np.zeros(len(me.polygons), bool))[owner]
+    uvs[(kinds != 'fur') | plain] = -1.0
+    return path, uvs
+
+
 def srgb(linear):
     """Gives the sRGB values of linear colors, the inverse of `linear()` of `rig_mesh.py`."""
     c = np.clip(linear, 0.0, 1.0)
@@ -501,6 +531,9 @@ def main():
     extras['eyes'] = eyes_of(rig, eyes, bind)
     extras['body'] = body_of(rig)
     corners, kinds, colors, bases, caps, rim = triangles(body.data)
+    texture, uvs = texture_of(body, body.data, kinds)
+    if texture:
+        extras['texture'] = texture
     fur = np.cumsum(kinds == 'fur') - 1
     if caps.any():
         extras['caps'] = sorted(int(fur[t]) for t in np.nonzero(caps)[0])
@@ -511,7 +544,7 @@ def main():
         {b: f for b, (f, _) in frames.items()}, heads,
         {b: f for b, (f, _) in sheet_frames.items()}, {b: h for b, (_, h) in sheet_frames.items()},
         extras, None if (bases == colors).all() else srgb(bases),
-        generator='pawchestra tools/blender/export_rig.py')  # fmt: skip
+        generator='pawchestra tools/blender/export_rig.py', uvs=uvs)  # fmt: skip
     with open(out, 'rb') as f:
         glb = f.read()
     with open(os.path.splitext(out)[0] + '.json', 'w') as f:
