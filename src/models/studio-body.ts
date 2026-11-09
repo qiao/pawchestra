@@ -7,7 +7,13 @@ import { srgb } from './mesh.ts';
 import type { CornerSkin, MeshBuilder, MeshData } from './mesh.ts';
 import { BONE_NAMES, boneIndex } from './rig.ts';
 import { makeSkeleton } from './rig.ts';
-import { STUDIO_BONES, STUDIO_INFLUENCES, unpackStudioMesh } from './studio-format.ts';
+import {
+  NO_UV,
+  STUDIO_BONES,
+  STUDIO_INFLUENCES,
+  unpackStudioMesh,
+  unpackStudioUvs,
+} from './studio-format.ts';
 import type { StudioBody, StudioPalette } from './studio-format.ts';
 import { studioCornerColorsSteps, studioNormals } from './studio-normals.ts';
 import {
@@ -325,6 +331,48 @@ export interface StudioRenderMesh {
   readonly correctives: readonly Float32Array[];
   /** The smooth normals of the body, with its crease angle (`StudioBody.crease`, design 4.5). */
   readonly normals: SmoothNormals;
+  /**
+   * The color map of the fur (`StudioBody.texture`, design 4.5), or `null` for a body that shows
+   * the colors of its faces.
+   */
+  readonly texture: BodyTexture | null;
+}
+
+/** The color map of a studio body as the GPU draws it (design 4.5). */
+export interface BodyTexture {
+  /** The web copy of the image, relative to the repository (`StudioTexture.file`). */
+  readonly file: string;
+  /**
+   * u and v of each corner of the mesh of the player, with v from the top edge. A corner with no
+   * texture, such as a corner of the gloss nose, a whisker, a pea eye, or the instrument, has
+   * `NO_UV` in both.
+   */
+  readonly uvs: Float32Array;
+}
+
+/** The texture points of the body corners of each studio body with a color map, made once. */
+const bodyUvs = new WeakMap<StudioBody, Float32Array>();
+
+/**
+ * Gives the color map of a studio body for the mesh of a player: the texture points of the body
+ * corners, which come first, and {@link NO_UV} for the other corners.
+ *
+ * @param body The studio body.
+ * @param total The number of corners of the mesh of the player, with the instrument.
+ * @returns The color map, or `null` for a body with none.
+ */
+function bodyTextureOf(body: StudioBody, total: number): BodyTexture | null {
+  if (!body.texture) {
+    return null;
+  }
+  let corners = bodyUvs.get(body);
+  if (!corners) {
+    corners = unpackStudioUvs(body.texture.uvs);
+    bodyUvs.set(body, corners);
+  }
+  const uvs = new Float32Array(total * 2).fill(NO_UV);
+  uvs.set(corners.subarray(0, Math.min(corners.length, uvs.length)));
+  return { file: body.texture.file, uvs };
 }
 
 /** The smooth normals of a studio body as the GPU draws them (design 4.5). */
@@ -476,5 +524,6 @@ export function* studioRenderMeshSteps(rig: StudioRig, mesh: MeshData): Steps<St
     weights: cornerWeights,
     correctives: moves,
     normals,
+    texture: bodyTextureOf(rig.body, total),
   };
 }
