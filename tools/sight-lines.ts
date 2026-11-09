@@ -11,6 +11,8 @@
  * - Audience: a segment goes from the camera of the default view and of each Cinematic wide shot
  *   to points on the head of each player. The probe gives the share of the points that hide.
  *
+ * The count of blocked players is a report. A round has no goal count (design 4.5, sight lines).
+ *
  * Usage: pnpm sight-lines [--demo <id>]... [--json <file>] [--all]
  *
  * With no `--all`, the tool prints only the blocked players ({@link isBlocked}) and the players
