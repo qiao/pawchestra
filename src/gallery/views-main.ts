@@ -19,6 +19,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { buildMusicStand, buildSupport } from '../models/props.ts';
 import { PODIUM_SIZE, buildPodium } from '../models/stage.ts';
 import type { AnimalPose } from '../pose/types.ts';
+import { bodyMapsSettled } from '../scene/body-texture.ts';
 import { createMaterials } from '../scene/geometry.ts';
 import {
   applyPose,
@@ -328,8 +329,11 @@ camera.lookAt(halfWidth, -halfHeight, 0);
 
 function frame(): void {
   renderer.render(scene, camera);
-  // The screenshot script (tools/screenshots.ts) waits for this attribute.
-  canvas.dataset['ready'] = 'views';
+  // The screenshot script (tools/screenshots.ts) waits for this attribute, and thus for the
+  // color map of each body whose load the render started (design 4.5).
+  if (bodyMapsSettled()) {
+    canvas.dataset['ready'] = 'views';
+  }
   requestAnimationFrame(frame);
 }
 

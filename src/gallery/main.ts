@@ -32,6 +32,7 @@ import { clipTarget, retargetClip } from '../pose/retarget.ts';
 import type { PlayerClip } from '../pose/retarget.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
+import { bodyMapsSettled } from '../scene/body-texture.ts';
 import { createMaterials } from '../scene/geometry.ts';
 import { createLights } from '../scene/lights.ts';
 import {
@@ -660,8 +661,11 @@ function frame(): void {
     const y = ((1 - projected.y) / 2) * height;
     label.style.transform = `translate(${x}px, ${y}px) translate(-50%, 0)`;
   }
-  // The screenshot script (tools/screenshots.ts) waits for this attribute.
-  canvas.dataset['ready'] = page;
+  // The screenshot script (tools/screenshots.ts) waits for this attribute, and thus for the
+  // color map of each body whose load the render started (design 4.5).
+  if (bodyMapsSettled()) {
+    canvas.dataset['ready'] = page;
+  }
   requestAnimationFrame(frame);
 }
 
