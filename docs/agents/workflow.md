@@ -29,8 +29,8 @@ branches, or compatibility aliases.
 ## Commits
 
 Make one logical change in each commit, and keep every commit green: each commit passes
-`pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. While the gates are paused (`AGENTS.md`),
-the checks of this module run only when the user or the manager asks.
+`pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. `AGENTS.md` ("Checks") lists the gates
+that stay on. Each other check of this module runs on request.
 
 - Commit each verified change. Leave no verified work in the working tree.
 - Write the subject as a Conventional Commit: `type(scope): subject`, in the imperative mood, in
@@ -46,15 +46,16 @@ the checks of this module run only when the user or the manager asks.
 
 ### The check script
 
-- Before your report, run `tools/check-commits.sh --tip <base>` one time, with a clean tree.
-  `<base>` is `main` on a branch. On `main`, `<base>` is the parent of your first commit.
+- The script runs on request. Then, before your report, run `tools/check-commits.sh --tip <base>`
+  one time, with a clean tree. `<base>` is `main` on a branch. On `main`, `<base>` is the parent
+  of your first commit.
 - The script checks each commit in a temporary worktree, and caches each passed result by tree, so
   the merge gets a `hit` for each commit.
 - Run it in the background, because a run with no cache can take more than 10 minutes. A new commit
   during the run gives the exit code 4: run it again.
 - Wait for the exit notice of the background run ("Probes and the shell").
-- After a commit that moves code between files, run `tools/check-commits.sh HEAD~1` before the next
-  commit.
+- When the script runs on request, also run `tools/check-commits.sh HEAD~1` after each commit
+  that moves code between files, before the next commit.
 
 ## Where to work
 
@@ -70,8 +71,9 @@ worktree only when another agent works on the repository at the same time. Then 
 - Stage each path by its name: `git add <path>`. `git add -A` and `git add .` also stage the files
   of the other agents.
 - Merge a branch with `tools/merge-branch.sh <branch> [worktree]`. It rebases, checks each commit,
-  and stops at the first failure. Run `git merge --ff-only` only in a script with
-  `set -euo pipefail`, because a pipe such as `| tail` hides a failed merge.
+  and stops at the first failure. The arm gate runs only with `--arm-check`. Run
+  `git merge --ff-only` only in a script with `set -euo pipefail`, because a pipe such as `| tail`
+  hides a failed merge.
 - A rebase is finished when the folder `$(git rev-parse --git-path rebase-merge)` does not exist.
 - Let the agent that wrote a branch do a long rebase, because it knows the intent of each commit.
 - A rebase with `--exec` runs in the tree of each commit, which has an old copy of a script or
@@ -83,9 +85,9 @@ worktree only when another agent works on the repository at the same time. Then 
 
 In both cases:
 
-- Run `pnpm test:e2e e2e/smoke.e2e.ts --project=chromium` with `PAWCHESTRA_E2E_PORT` set to a free
-  port, because the merge script and other agents use port 4182. A change of `src/ui/` runs
-  `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
+- After an app or UI change, run `pnpm test:e2e e2e/smoke.e2e.ts --project=chromium` with
+  `PAWCHESTRA_E2E_PORT` set to a free port, because the merge script and other agents use port
+  4182. On request, a change of `src/ui/` runs `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
   tree that pass on the base. It runs Firefox and WebKit too only when it changes code that one
   browser alone uses, because the three browsers gave the same result for the other UI changes. A
   failure is a fault of the change only when the same test passes on the base.
@@ -209,10 +211,11 @@ most of the size of the git history.
 
 ## Images of a mesh
 
-Each image set that checks a mesh, a hold, or a clip shows the front, the back, the left side, and
-the right side (azimuth 0, 180, -90, and 90). This rule applies to a lineup, a crop set, and the
-crop pairs of a report. Add other views only after these four. A clip, a fold, or a dark line that
-shows only from one direction is a fail.
+An image set runs on request (`AGENTS.md`, "Checks"). Each image set that checks a mesh, a hold,
+or a clip shows the front, the back, the left side, and the right side (azimuth 0, 180, -90, and
+90). This rule applies to a lineup, a crop set, and the crop pairs of a report. Add other views
+only after these four. A clip, a fold, or a dark line that shows only from one direction is a
+fail.
 
 Render each moment of the role (`--moments` with each name of `ROLE_VIEWS`) at `--elevation 20`
 and `--elevation 40`, and add az150 and az-150. The stage camera looks from behind and above, so a
