@@ -23,13 +23,13 @@ import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import type { StudioMesh } from '../src/models/studio-format.ts';
 import {
+  CLOSED_EYE_SCALE,
   createStudioPose,
   poseStudioBones,
   skinStudioMesh,
   studioOffsets,
 } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
-import { CLOSED_EYE_SCALE } from '../src/scene/player.ts';
 import { poseSkeleton } from '../src/pose/test-kinematics.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';
 import type { RoleSweep, SweepPlayer, SweepSample } from '../src/pose/test-sweep.ts';

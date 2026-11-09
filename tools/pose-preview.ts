@@ -72,6 +72,7 @@ import { studioBodyOf } from '../src/models/studio-body.ts';
 import { STUDIO_BONES, STUDIO_PARENTS, unpackStudioMesh } from '../src/models/studio-format.ts';
 import type { StudioBody, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
 import {
+  CLOSED_EYE_SCALE,
   createStudioPose,
   poseStudioBones,
   skinStudioMesh,
@@ -86,7 +87,6 @@ import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 import type { TestScene } from '../src/pose/test-scene.ts';
 import type { PosePlan } from '../src/pose/plan.ts';
 import type { AnimalPose } from '../src/pose/types.ts';
-import { CLOSED_EYE_SCALE } from '../src/scene/player.ts';
 
 /** The text of the usage. */
 const USAGE =

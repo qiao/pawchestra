@@ -1115,6 +1115,12 @@ const raiseTurn: [number, number, number, number] = [0, 0, 0, 0];
 /** The index of the `chest` bone of the player. */
 const CHEST = boneIndex('chest');
 
+/**
+ * The smallest y scale of a closed eye. A scale of 0 makes the bone matrix singular, so a closed
+ * eye keeps a thin line.
+ */
+export const CLOSED_EYE_SCALE = 0.05;
+
 /** The indices of the eye bones of the studio, and of the bones of the player that they follow. */
 const EYE_BONES = [STUDIO_BONES.indexOf('eye_L'), STUDIO_BONES.indexOf('eye_R')] as const;
 

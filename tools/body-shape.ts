@@ -38,6 +38,7 @@ import type { BoneName } from '../src/models/rig.ts';
 import { STUDIO_BONES } from '../src/models/studio-format.ts';
 import type { StudioMesh } from '../src/models/studio-format.ts';
 import {
+  CLOSED_EYE_SCALE,
   createStudioPose,
   poseStudioBones,
   skinStudioMesh,
@@ -45,7 +46,6 @@ import {
 } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
-import { CLOSED_EYE_SCALE } from '../src/scene/player.ts';
 import { poseSkeleton, posedPoint } from '../src/pose/test-kinematics.ts';
 import type { PosedSkeleton } from '../src/pose/test-kinematics.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';

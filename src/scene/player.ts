@@ -32,6 +32,7 @@ import { studioRenderMeshSteps } from '../models/studio-body.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import {
+  CLOSED_EYE_SCALE,
   STUDIO_POSE_BONES,
   createStudioPose,
   poseStudioBones,
@@ -356,12 +357,6 @@ function createBoneGroup(): Group {
 
 /** The player meshes with a studio body. */
 const studioPlayers = new WeakMap<SkinnedMesh, StudioPlayer>();
-
-/**
- * The smallest y scale of a closed eye. A scale of 0 makes the bone matrix singular, so a closed
- * eye keeps a thin line.
- */
-export const CLOSED_EYE_SCALE = 0.05;
 
 /** The keys of a player mesh with a keyboard, which {@link applyPose} turns (design 4.6, 5.3). */
 interface KeyMesh {

@@ -2,6 +2,7 @@ import { Vector3 } from 'three';
 
 import { STUDIO_BONES } from '../models/studio-format.ts';
 import {
+  CLOSED_EYE_SCALE,
   createStudioPose,
   poseStudioBones,
   skinStudioMesh,
@@ -10,7 +11,6 @@ import {
 import type { StudioRig } from '../models/studio-rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { CLOSED_EYE_SCALE } from '../scene/player.ts';
 import { posePoint } from './frames.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 

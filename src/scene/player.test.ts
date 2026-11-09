@@ -8,6 +8,7 @@ import { boneIndex } from '../models/rig.ts';
 import type { BoneName } from '../models/rig.ts';
 import { STUDIO_BONES } from '../models/studio-format.ts';
 import { studioNormals } from '../models/studio-normals.ts';
+import { CLOSED_EYE_SCALE } from '../models/studio-rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { BIND_ROTATIONS } from '../pose/frames.ts';
 import { poseSkeleton } from '../pose/test-kinematics.ts';
@@ -18,7 +19,6 @@ import type { AnimalPose } from '../pose/types.ts';
 import { runAll } from '../score/steps.ts';
 import { createMaterials } from './geometry.ts';
 import {
-  CLOSED_EYE_SCALE,
   applyPose,
   applyScenePose,
   createPlayerGeometry,
