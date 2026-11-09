@@ -785,7 +785,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
-  the steep thighs of the bind rules, only the haunch could sit on the seat.
+  the steep thighs of the bind rules, only the haunch could sit on the seat. The thigh shares of
+  the lower belly pull it back into a ledge in this bind, so the key `bind_belly` relaxes the
+  belly band along the vertical lines of the mesh. Reason: the ledge showed as a dark band above
+  the thighs.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
