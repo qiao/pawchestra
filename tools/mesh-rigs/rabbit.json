@@ -418,7 +418,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its bead eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.16,
