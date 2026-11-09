@@ -112,6 +112,10 @@ describe('the pea eyes of each studio body (design 4.5, 5.1)', () => {
     const rig = studioRigOf(name, false);
     const render = studioRenderMesh(rig, builder.build());
     const first = rig.mesh.corners.length;
+    if (!rig.body.eyes) {
+      // A body that shows the eyes of its mesh has no pea eyes.
+      continue;
+    }
     const h = rig.body.eyes.headHeight;
 
     it(`${name}: puts each pea eye at its eye bone, with the size of the head that shows`, () => {

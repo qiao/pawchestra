@@ -63,9 +63,13 @@ describe('pnpm studio-body with a tail of two bones (design 4.4)', async () => {
   const root = STUDIO_BONES.indexOf('tail');
 
   it('turns both pea eyes of the uneven mesh out from one point (design 4.5)', () => {
-    const h = body.eyes.headHeight;
+    const { eyes } = body;
+    if (!eyes) {
+      throw new Error('The fox has no pea eyes.');
+    }
+    const h = eyes.headHeight;
     const line = (side: 'L' | 'R') => {
-      const facing = new Vector3(...body.eyes.directions[side]);
+      const facing = new Vector3(...eyes.directions[side]);
       const eye = new Vector3(...body.heads[`eye_${side}`]).addScaledVector(facing, 0.01 * h);
       return { eye, facing };
     };

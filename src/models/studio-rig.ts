@@ -830,13 +830,15 @@ function stancePlaces(
     },
     headCenter: moved('head', body.headCenter),
     nose: moved('head', body.nose),
-    eyes: {
-      ...body.eyes,
-      directions: {
-        L: turned('eye_L', body.eyes.directions.L),
-        R: turned('eye_R', body.eyes.directions.R),
-      },
-    },
+    eyes: body.eyes
+      ? {
+          ...body.eyes,
+          directions: {
+            L: turned('eye_L', body.eyes.directions.L),
+            R: turned('eye_R', body.eyes.directions.R),
+          },
+        }
+      : null,
   };
 }
 

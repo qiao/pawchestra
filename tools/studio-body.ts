@@ -3848,11 +3848,11 @@ async function main(): Promise<void> {
   console.log(`Wrote ${relative(ROOT, HEIGHTS_MODULE)}.`);
   console.log(`Scale ${body.scale} m for each unit, head height ${body.headHeight} m.`);
   console.log(`Corrective weights of the sheet pose: ${sheetWeights.join(', ')}.`);
-  if (eyeShifts) {
+  if (body.eyes && eyeShifts) {
     console.log(
       `Pea eyes: head height ${body.eyes.headHeight} m. Each eye moves ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head, and its bone lies ${eyeShifts.L.toFixed(3)} H (left) and ${eyeShifts.R.toFixed(3)} H (right) from the middle of the old eye.`,
     );
-  } else {
+  } else if (body.eyes) {
     console.log(
       `Pea eyes of the eye objects of the .blend: head height ${body.eyes.headHeight} m. The front of each eye shows with a move of ${eyePushes.L.toFixed(3)} H (left) and ${eyePushes.R.toFixed(3)} H (right) out of the head.`,
     );

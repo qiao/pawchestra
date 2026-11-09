@@ -271,16 +271,19 @@ export function* buildStudioBodySteps(
   yield;
   // The head keeps the bind pose of the studio, so each pea eye goes to the bind place of its eye
   // bone, bent to the head surface when the body has bends. The eyes blink with the eye bones of
-  // the studio (`studioRenderMesh()`).
-  for (const side of ['L', 'R'] as const) {
-    addEye(
-      builder,
-      EYE_COLORS,
-      { point: body.heads[`eye_${side}`], normal: body.eyes.directions[side] },
-      body.eyes.headHeight,
-      boneIndex(`eye${side}`),
-      body.eyes.bends?.[side],
-    );
+  // the studio (`studioRenderMesh()`). A body that shows the eyes of its mesh gets no pea eyes.
+  const { eyes } = body;
+  if (eyes) {
+    for (const side of ['L', 'R'] as const) {
+      addEye(
+        builder,
+        EYE_COLORS,
+        { point: body.heads[`eye_${side}`], normal: eyes.directions[side] },
+        eyes.headHeight,
+        boneIndex(`eye${side}`),
+        eyes.bends?.[side],
+      );
+    }
   }
 
   const midpoint = (a: Vec3, b: Vec3): Vec3 => [

@@ -473,8 +473,13 @@ export interface StudioBody {
    * `MOUTH_DROP` H below the tip of the nose (`models/studio-body.ts`).
    */
   readonly mouth?: Vec3;
-  /** The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. */
-  readonly eyes: StudioEyes;
+  /**
+   * The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. It is `null`
+   * for a body that shows the eyes of its mesh (design 4.5): a hand rig with eye faces and no eye
+   * objects. Each eye bone then lies at the middle of an eye of the mesh and carries no vertex, so
+   * these eyes do not blink.
+   */
+  readonly eyes: StudioEyes | null;
   /**
    * The point on the floor under the middle of the body: the origin of the studio. A seated body
    * sits in front of the center of its seat, so that the seat of the studio (a bench or a chair)
