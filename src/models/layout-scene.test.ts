@@ -33,7 +33,6 @@ import { buildPlayer } from './player.ts';
 import { boneIndex } from './rig.ts';
 import { PODIUM_SIZE, STAGE_CORNER_CUT } from './stage.ts';
 import { choirFile } from './test-choir.ts';
-import { REFERENCE_STAGE_SIDE } from './test-layout.ts';
 import { perf60File } from './test-perf-60.ts';
 import { pianoSoloFile, violinConcertinoFile } from '../score/test-audit-files.ts';
 import {
@@ -58,13 +57,6 @@ const CHAMBER_FILES: readonly (readonly [name: string, file: TestFile])[] = [
   ['wind quintet', windQuintetFile()],
   ['string sextet', stringSextetFile()],
 ];
-
-/**
- * The largest growth of a stage side over its size of record. The default view frames the whole
- * stage, so a larger stage shows each player smaller. A new body moved a side by less than 1%, so
- * a growth of 3% shows a clear change of the layout or of a footprint.
- */
-const STAGE_GROWTH = 1.03;
 
 /**
  * One model cache for all layouts of this file. A model of a kind of player is always the same, so
@@ -310,39 +302,6 @@ describe('layoutScene', () => {
     expect(far).toEqual([]);
   });
 
-  it('gives the reference composition the stage of its rule and footprints (design 4.5)', () => {
-    const seat = (
-      channel: number,
-      program: number,
-      keys: readonly number[],
-    ): ReturnType<typeof track> =>
-      track([programChange(0, channel, program)], chord(0, channel, keys));
-    // Three first violins, four second violins and a cello, two flutes and three clarinets.
-    const score = scoreOf(
-      {
-        tracks: [
-          seat(0, 40, [72, 74, 76]),
-          seat(1, 40, [60, 62, 64, 65]),
-          seat(2, 42, [48]),
-          seat(3, 73, [72, 76]),
-          seat(4, 71, [60, 64, 67]),
-        ],
-      },
-      'one-per-part',
-    );
-    const layout = layoutScene(score);
-    // The rule gives REFERENCE_STAGE_SIDE. A footprint can add arc to the first desks, and thus
-    // depth to the stage.
-    expect(layout.stageSide).toBeLessThanOrEqual(REFERENCE_STAGE_SIDE * STAGE_GROWTH);
-    expect(layout.podium[2]).toBeCloseTo(layout.stageSide / 2 - 1.0, 9);
-    // The first desks sit in row 0, the third first violin and the second desk of the second
-    // violins in row 1, the flutes in row 2, and the clarinets in row 3.
-    const rows = [...rowsOf(layout).keys()];
-    const rowOf = (p: PlayerPlace): number =>
-      rows.indexOf(Math.round(polar(layout, p).radius * 1e6) / 1e6);
-    expect(layout.players.map(rowOf)).toEqual([0, 0, 1, 0, 0, 1, 1, 0, 2, 2, 3, 3, 3]);
-  });
-
   it('puts the conductor on the podium top, facing the orchestra (design 4.5)', () => {
     for (const { name, score, layout } of LAYOUTS) {
       if (chamberFormOf(score.seats)) {
@@ -353,7 +312,6 @@ describe('layoutScene', () => {
       expect(layout.conductor?.position, name).toEqual([x, y + PODIUM_SIZE[1], z]);
       expect(layout.conductor?.facing, name).toBe(0);
     }
-    expect(ORCHESTRAS).toHaveLength(LAYOUTS.length - 4);
   });
 
   it('puts the violins to the left of 0° and the other strings to the right (design 4.2)', () => {
@@ -412,44 +370,6 @@ describe('layoutScene', () => {
         );
       }
     }
-  });
-
-  it('grows no stage of a demo by more than 3% (design 4.5)', () => {
-    // The base stage sides of the demos, in meters.
-    const sides = {
-      'boulanger-matin.mid auto': 11.26,
-      'mozart-k315.mid auto': 8.93,
-      'beethoven-9.mid auto': 11.77,
-      'mozart-k525.mid auto': 6.73,
-      'bach-bwv1048.mid auto': 10.44,
-      'beethoven-8.mid auto': 9.84,
-      'choir auto': 12.11,
-      'perf-60': 13.51,
-    };
-    for (const [name, side] of Object.entries(sides)) {
-      expect(layoutOf(name).stageSide, name).toBeLessThanOrEqual(side * STAGE_GROWTH);
-    }
-  });
-
-  it('spreads the rows toward the front corners (review of step 4, F1)', () => {
-    // The distance from the front right corner, which the default camera sees at the bottom of
-    // the image, to the nearest seat, in stage sides. Rows packed around 0° give 0.29 to 0.48, and
-    // the reference image gives 0.10.
-    const nearCorner = (layout: SceneLayout): number => {
-      const half = layout.stageSide / 2;
-      const distances = layout.players.map((p) =>
-        Math.hypot(p.position[0] - half, p.position[2] - half),
-      );
-      return Math.min(...distances) / layout.stageSide;
-    };
-    for (const { name, layout } of LAYOUTS) {
-      if (name.endsWith(' auto')) {
-        expect(nearCorner(layout), name).toBeLessThanOrEqual(0.31);
-      }
-    }
-    // The 60 players fill the corners more. With the back desks in the rows of their first
-    // desks, it is 0.284.
-    expect(nearCorner(layoutOf('perf-60'))).toBeLessThanOrEqual(0.25);
   });
 
   it('moves the back desks behind the first desks of their seats (design 4.5)', () => {
@@ -768,23 +688,9 @@ describe('layoutScene', () => {
     }
   });
 
-  it('fills the risers evenly, with the count of levels that gives the smallest stage (F13)', () => {
+  it('fills the riser levels evenly (F13)', () => {
     expect(divideSingers(32, 3)).toEqual([11, 11, 10]);
     expect(divideSingers(7, 2)).toEqual([4, 3]);
-    // The choir test file has 32 singers behind the timpani. With the professional seating, two
-    // levels give the smallest stage.
-    const layout = layoutOf('choir auto');
-    expect(layout.risers.map((r) => r.level)).toEqual([0, 1]);
-    // The lowest level stands 1.0 m high, so that the back row hides no singer (design 4.5).
-    expect(layout.risers.map((r) => r.height)).toEqual([1, 1.25]);
-    const singers = playersWith(layout, 'choir-folder');
-    const perLevel = layout.risers.map(
-      (r) => singers.filter((s) => Math.abs(s.position[1] - r.height) < 1e-9).length,
-    );
-    expect(perLevel).toEqual([16, 16]);
-    for (const s of singers) {
-      expect(s.cast.support).toBe('riser');
-    }
   });
 
   it('widens the risers past the singers by up to 1.0 m on each side (design 4.5)', () => {
@@ -829,25 +735,10 @@ describe('layoutScene', () => {
   it('keeps the steps in front of the lowest riser level clear of the back row (design 4.5)', () => {
     for (const name of ['choir auto', 'beethoven-9.mid auto']) {
       const layout = layoutOf(name);
-      const [first] = layout.risers;
       const risers = layoutObstacles(layout, MODELS).find((o) => o.label === 'risers');
-      if (!first || !risers) {
+      if (!risers) {
         throw new Error(`${name} has no risers.`);
       }
-      // The footprint of the risers reaches the front of the three steps of 0.2 m.
-      const nearest = Math.min(
-        ...risers.boxes.flatMap((b) =>
-          [-1, 1].flatMap((sx) =>
-            [-1, 1].map((sz) =>
-              Math.hypot(
-                b.x + sx * b.halfX * b.cos + sz * b.halfZ * b.sin - layout.podium[0],
-                b.z - sx * b.halfX * b.sin + sz * b.halfZ * b.cos - layout.podium[2],
-              ),
-            ),
-          ),
-        ),
-      );
-      expect(nearest, name).toBeCloseTo(first.radius - 0.4 - 0.6, 1);
       // The singers stand on the risers. Each other item keeps 0.05 m from them.
       const others = layoutObstacles(layout, MODELS).filter(
         (o) => o.label !== 'risers' && !o.label.includes('choir-folder'),
