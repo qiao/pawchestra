@@ -270,7 +270,8 @@ The weights, in the order of the work, in the rest pose:
 
    The rings at x 0.068, 0.085, 0.109, and 0.136 are the vertex groups of their x range,
    because poles cut them. The trunk loop around each arm root keeps the automatic weights.
-3. Paws, by rows across the paw (x of the left paw): 0.2435 to 0.2565 {`wrist` 0.5, `hand`
+3. Paws, by rows across the paw, by the place along the rest forearm axis (as the x of the axis
+   point of the left paw), so that a turn of the paw keeps its rows: 0.2435 to 0.2565 {`wrist` 0.5, `hand`
    0.5}, 0.2565 to 0.268 {`hand` 1}, the knuckle row 0.268 to 0.282 {`hand` 0.5, `fingers` 0.5},
    and from 0.282 {`fingers` 1}.
 4. The 278 vertices of the loose parts (eyeballs, whiskers, mouth parts) and the 33 vertices of
@@ -289,8 +290,7 @@ make the turn that each arm part takes at most about 45 degrees:
   forearm axis (from the forearm head to the paw head) by 5 ring steps of 360/11 degrees
   (-163.6 degrees). The 11 quads of the band between that ring and the paw go, and new quads
   join the ring to the turned paw with the same step offset, with the colors and the UVs of the
-  old quads. The faces stay quads, the rest forearm has no twist, and each joined vertex lies
-  within a few thousandths of a unit of its old place. The bone `fingers_L` turns with the paw.
+  old quads. The faces stay quads, and the rest forearm has no twist. The bone `fingers_L` turns with the paw.
   The property `palm` holds a palm for each side: the left palm is the source palm turned by the
   same angle, so that it is the real palm of the turned paw (the pink pads face up). The right
   palm stays the source palm. The rolls and the bind follow the new palm.
