@@ -58,6 +58,7 @@ The candidate hand rig:
 | `tripo-hand/rabbit.rig.glb` | Export of `tripo-hand/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend --out assets/models/rabbit/tripo-hand/rabbit.rig.glb` |
 | `tripo-hand/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/rabbit-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
+| `tripo-hand/rabbit-normal.webp` | Web copy of the normal map of the Tripo FBX ("Normal map" below). License as the FBX file | None: made one time from the source image |
 
 ## rabbit-apose.glb
 
@@ -474,3 +475,26 @@ and 2048 shows them. The qualities 60 and 75 look the same there. The map holds 
 light: the luma of the cream fur faces is 193 to 220 (5th to 95th percentile, median 206, the
 face color 206.5), with the same mean on the head, the trunk, the arms, and the legs. The darkest
 faces are a painted mouth line and a little occlusion at the crotch and the ear roots.
+
+**Normal map.** The app tilts the normals of the fur faces of the candidate with the normal map of
+the Tripo FBX (design 4.5, fur shading). The map uses the UV map of the FBX, as the color map
+does: the eye socket and the pink inner ear sit at the same points in both images, and the light
+and shade of the strands follow the strokes of the color map. The checks of the source:
+
+- Tangent space: the mean normal is (0.00, 0.00, 0.99), and no texel has z < 0.
+- Green of OpenGL (+y up in the image): the x and y tilts with this sign give a field with 55 %
+  of its energy free of curl, against 48 % with the other sign, and the eye rim reads as raised.
+  No UV island is mirrored (99.95 % of the fur area has u to the right and v up).
+- The eye fill faces of "Color map" sample a fur area of the head, so they get fur strands.
+
+| Item | Value |
+|---|---|
+| Source | `extracted_normal_fcf1cc20_a403_482b_8c2b_92fe8b9fa040.png` in the `.fbm` folder of the Tripo export `tripo_convert_ba507965-bf17-4167-84e0-276667bc52f2`: 2048 × 2048 RGBA, 2,682,785 bytes, SHA-256 `cfbb5e1022cd207b2469858343262c60916b175b1b68c645e5c97342772561d6` |
+| Steps | Limit each x, y tilt to the length 0.2 (0.24 % of the texels: the baked eye rims and nose of the source mesh). Box scale to 1024 × 1024. Store x and y times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`) in red and green, and 255 in blue, which the shader does not read |
+| `rabbit-normal.webp` | `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0): 35,548 bytes, SHA-256 `33a95ad845c21ba91abe97973a8aa2708cc107de34353a31e39c999e37828355` |
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+
+The tilts of the source are small (median 0.012, 99th percentile 0.06), so the gain keeps them
+above the step of 8 bits. At the close view of the test page, a lossless copy of 2048 pixels, the
+qualities 60 and 75 at 2048 pixels, and the qualities 60 to 85 at 1024 pixels look the same.
