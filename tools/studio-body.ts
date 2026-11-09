@@ -280,7 +280,8 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // The violinist rabbit (design 4.4): the candidate hand rig of the Tripo P2 mesh
   // (`assets/models/rabbit/tripo-hand/rabbit.blend`), with no arm cut and no limb stretch. Its
   // `.blend` holds the facts of the body: the scale that keeps H of the A-pose rabbit, the crease
-  // angle 35°, and a seat 4 cm deeper, so that its back keeps off the chair back.
+  // angle 55°, and a seat 4 cm deeper, so that its back keeps off the chair back. Its limb rings
+  // have 11 vertices, 33° apart, so the crease 35° cut most corners of the limbs into facets.
   [
     'rabbit',
     {
