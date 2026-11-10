@@ -849,8 +849,8 @@ const HARPIST_SWEEP: RoleSweep = {
 
 /**
  * The sweep of the conductor (design 5.4): the arms and the baton against the body, in a full
- * play, and in the lift of the arms at the play start and the bow and the lowering after the song
- * end.
+ * play, in the lift of the arms at the play start and the bow and the lowering after the song
+ * end (`arms`), and in the rest pose before the play (`rest`, which `pnpm body-shape` reads).
  */
 export const CONDUCTOR_SWEEP: RoleSweep = {
   role: 'conductor',
@@ -858,13 +858,15 @@ export const CONDUCTOR_SWEEP: RoleSweep = {
   obstacles: [{ name: 'body', surface: bodySurface }],
   contact: CONTACT,
   accepted: [
-    ...['forearms', 'upper arms'].map((part) => ({
-      part,
-      into: 'body',
-      samples: 'arms',
-      depth: 0.04,
-      reason: 'The hanging arm of the rest pose touches the side of the round body (design 5.2).',
-    })),
+    ...['forearms', 'upper arms'].flatMap((part) =>
+      ['arms', 'rest'].map((samples) => ({
+        part,
+        into: 'body',
+        samples,
+        depth: 0.04,
+        reason: 'The hanging arm of the rest pose touches the side of the round body (design 5.2).',
+      })),
+    ),
     ...['paws', 'claws'].flatMap((part) =>
       ['arms', 'play'].map((samples) => ({
         part,
@@ -907,6 +909,7 @@ export const CONDUCTOR_SWEEP: RoleSweep = {
     return [
       { name: 'play', samples: playSamples(scene) },
       { name: 'arms', samples: arms },
+      { name: 'rest', samples: [[start, 10, NOT_STARTED]] },
     ];
   },
 };
