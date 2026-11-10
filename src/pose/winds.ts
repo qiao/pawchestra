@@ -582,7 +582,7 @@ export const WIND_HOLDS = {
  * In the rest pose, the flute stands nearly upright at the right side with the foot joint down on
  * the top of the right thigh, as a real flutist rests it vertically on the right leg with the right
  * hand on the right-hand keys (George, `docs/reference/wind-technique.md` 2.4). The closed right
- * paw holds it 0.45 H nearer to the lip plate than in the play, about 0.2 m below the lip plate on
+ * paw holds it 0.376 H nearer to the lip plate than in the play, about 0.2 m below the lip plate on
  * the upper body of the flute, with its fingers on the tube (`restGripShiftR`, `restAim` 0). The
  * lift moves the right grip around the flute (`gripAround`): on a straight line, the grip crosses
  * the axis of the tube, and the paw turns 180° in one frame. With the roll of the play at rest, the
@@ -595,8 +595,8 @@ export const WIND_HOLDS = {
  * 0.582 m from the shoulder joint, and the arm is 0.545 m. So the left arm hangs near the side with
  * a soft bend, as a seated flutist lets the free arm hang. The paw hangs out from the outer side of
  * the haunch, with the palm to the front and a little toward the body. The lap place takes the top
- * of the belly over the thigh at 0.45 of the way to the knee, and the paw hangs 0.5 H out, 0.55 H
- * down, and 0.12 H forward from it. At 0.45 H out, the left upper arm goes 1.8 cm into the side of
+ * of the belly over the thigh at 0.45 of the way to the knee, and the paw hangs 0.418 H out, 0.459 H
+ * down, and 0.1 H forward from it. At 0.376 H out, the left upper arm goes 1.8 cm into the side of
  * the body (limit 1.5 cm). With the paw nearer to the haunch or the elbow more bent, the inner
  * elbow goes further into the side of the trunk.
  *
@@ -610,6 +610,11 @@ export const WIND_HOLDS = {
  * elbows point further back, (-0.3, -1, 0.7) and (0.6, -1, 0.8), so that each upper arm takes
  * about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left upper arm
  * rolls 45° and the right forearm twists 55°.
+ *
+ * The rest values in H (`restShift`, `restGripShiftR`, and the lap offset of `restFreeL`) keep the
+ * rest of the arms in meters when the head of the body grows. They are the values of the head
+ * height 0.323 m times 0.835, for the head height 0.387 m of the larger head. With the old values,
+ * the rest moved the flute 20 % further out, and the right forearm twisted 47°.
  */
 const FOX_FLUTE = {
   ...WOODWIND,
@@ -619,11 +624,11 @@ const FOX_FLUTE = {
   poleL: [-1, -1, -0.3],
   poleR: [1, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
-  restShift: [0.8, -0.908, 0.375],
+  restShift: [0.668, -0.758, 0.313],
   restPoleL: [-0.3, -1, 0.7],
   restPoleR: [0.6, -1, 0.8],
   restFreeL: {
-    lap: { along: 0.45, offset: [-0.5, -0.55, -0.12] },
+    lap: { along: 0.45, offset: [-0.418, -0.459, -0.1] },
     palm: [0.484, 0.251, -0.838],
     fingers: [0, -1, -0.3],
     arc: [0.57, 0.04, 0.31],
@@ -637,7 +642,7 @@ const FOX_FLUTE = {
   aimSide: [0.5, -0.85],
   gripShiftL: [-0.04, 0, 0.04],
   gripShiftR: [0, 0, -0.14],
-  restGripShiftR: [-0.45, -0.13, -0.08],
+  restGripShiftR: [-0.376, -0.109, -0.067],
   gripCurl: curls(115, 106),
   gripAround: true,
 } as const satisfies WindHold;
