@@ -249,18 +249,15 @@ The color map paints a full eye on each eyeball (a black pupil, an amber iris, a
 thin brown brows on the brow strips, a pink nose, pink inner ears and paw pads, a painted smile,
 and white whiskers.
 
-**Pupils.** The map paints each iris toward the inner side of its ball, and each ball sits in a
-socket that opens out. In the front view, each pupil thus sat at the inner edge of its eye opening,
-and the rabbit looked cross-eyed and down at its nose. The fault is in the source: the front view
-of the source mesh with the source map shows it, before any edit of the hand rig. The point edits
-keep each eye direction (the eye size scales the ball about its middle, and the relax holds the
-eyeballs). `center_pupils()` of `tools/rabbit-maps.py` turns the iris and the pupil of each ball
-in the map: rays from the front find the ball points that show, the dark points (luma below 50)
-give the pupil, and a turn of the ball texels about the middle of the ball moves the pupil to the
-middle of the opening, 0.1 opening radii up for the drop of the head in the play. In opening radii
-(x, y, +x the left side of the rabbit), the middle of the left pupil goes from (-0.302, -0.070) to
-(0.008, 0.117) with a turn of 12.2 degrees, and the middle of the right pupil from (0.189, 0.004) to
-(0.031, 0.086) with a turn of 15.5 degrees.
+**Eyes.** The map paints a large dark iris and pupil low on each ball, toward the inner side, and
+each ball sits in a socket that opens out. A turn of the whole ball to the middle of the opening
+kept the large dark pupil, a ring of bright white, and the low gaze, and in the app each eye read as
+a dark glassy ball that looked down at the nose. `paint_eyes()` of `tools/rabbit-maps.py` (the method
+of the Tripo fox, `assets/models/fox/README.md`, "Eyes") paints each ball again: the gaze at half
+the angle across of the opening (17 degrees out) and at the middle of its height, a brown iris of
+0.95 of half the opening height (33.4 and 33.8 degrees) with the radial texture of the source iris
+by rings, a pupil of 0.45 of the iris radius, soft edges, and an off-white sclera shaded under the
+upper lid. The ball has no painted light, so the eye light of the app gives the one highlight.
 
 ### tripo-hand/rabbit.blend
 
@@ -448,7 +445,7 @@ uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/ra
 ```
 
 It moves the cream fur from sRGB (222, 189, 155) to Oklab L 0.87, C 0.045, h 70 (`FUR`), keeps the
-pink, the white, the black, and the eyeballs, and turns the pupils ("Pupils" above). The median
+pink, the white, the black, and the eyeballs, and paints the eyes ("Eyes" above). The median
 Oklab L, C, and h of the cream fur in the seated front view with no fill light at the frog are L
 0.849, C 0.062, h 75.2 with the fur L 0.90, against L 0.747, C 0.055, h 71.1 on the rabbit of main,
 and in the hall view (`close-views play --at rabbit --no-fill --pause --time 6`) the fur of the
@@ -457,7 +454,7 @@ pose and light differ). The target lies between the two views.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 78,046 bytes | `cb32ee69b22c9e030afd0a3e23473291215fe2a5960b1ec263aa9fd6b9cc63bd` |
+| `tripo-hand/rabbit-color.webp` | 78,988 bytes | `946bbbeb30ab79e6fbfe541e8b8b28fe5831c16dffcf2475501d845f4a6488a9` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
