@@ -128,13 +128,16 @@ The color map paints a full eye on each eyeball (a black pupil, an amber iris, a
 dark brows, dark brown socks up to the knees and over the forearms from 0.28 of the way from the
 elbows, dark ear tips, a cream bib, cheeks, muzzle, and tail tip, and a dark brown nose.
 
-**Pupils.** The map paints each iris at the inner edge of the white of its ball, and the rest of the
-ball dark brown. In the front view, the pupils lay 0.24 and 0.17 opening radii toward the nose, and
-the fox looked a little cross-eyed. `center_pupils()` of `tools/fox-maps.py` moves only the iris and
-the pupil of each ball, as a decal, to the middle of the eye opening of the front view: the left
-pupil goes from (-0.236, 0.06) to (-0.053, -0.008) opening radii (x, y), and the right pupil from
-(0.169, 0.092) to (0.025, 0.037). The old place of each iris and the brown of the opening take the
-white of the ball. A turn of the whole ball, as on the rabbit, showed the dark brown in the opening.
+**Eyes.** The map paints each iris at the inner edge of the white of its ball, a pupil that fills
+most of the iris with a dark ring around it, and the rest of the ball dark brown. In the app the
+eyes read as glass doll eyes that looked past the viewer. `paint_eyes()` of `tools/fox-maps.py`
+paints each ball again, from the ball points that show in the front view: the gaze at half the
+angle across of the opening (13.1 degrees out, so the eyes are nearly parallel) and at the middle
+of its height, an iris of 26.3 degrees (1.12 of half the opening height) with the radial texture
+of the source iris by rings, a pupil of 0.45 of the iris radius, soft edges, and an off-white
+sclera shaded under the upper lid. The ball has no painted light, so the eye light of the app gives
+the one highlight. The dark shade over the left eye in the front view of the violinist is the
+light of the stage: the fox of main shows it too.
 
 ### tripo-hand/fox.blend
 
@@ -279,7 +282,7 @@ map and the rig file:
 uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 ```
 
-It moves the irises ("Pupils" above), moves the orange fur to `RED_FUR` or `TAN_FUR` and the socks
+It paints the eyes ("Eyes" above), moves the orange fur to `RED_FUR` or `TAN_FUR` and the socks
 to sRGB (34, 20, 11) or (118, 80, 48), and gives the legs and the forearms sharp sock edges. The
 median Oklab L, C, and h of the fur in the hall view (a fixed camera at the first seated red fox of
 `mozart-k191` and the tan fox of `mozart-k315`, `close-views play --pause --no-fill --time 6`):
@@ -291,8 +294,8 @@ median Oklab L, C, and h of the fur in the hall view (a fixed camera at the firs
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox-color.webp` | 121,546 bytes | `f6f4eb4dff18fdd23d5b2b6b82dc9a3b42fed485514edcb440c0e66cf8b14675` |
-| `tripo-hand/fox-tan-color.webp` | 110,136 bytes | `5ecb84ffdc44dbadcb88667a6e12371b57d0fabde0726406b27c6bfd45893dc8` |
+| `tripo-hand/fox-color.webp` | 128,260 bytes | `3b58ee7bff7499180e5bf2472c5aded50407f72f35fb60803b98301fca59c3c9` |
+| `tripo-hand/fox-tan-color.webp` | 118,458 bytes | `e685ca622984ca82470d4931d59022e0016be403b574cf3c3ffc08a0462f6ad7` |
 
 **Normal map.** The same run writes `fox-normal.webp` from the normal map of the FBX: each x, y tilt
 limited to 0.2 (0.87 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red and
