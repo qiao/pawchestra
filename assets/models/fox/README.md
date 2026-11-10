@@ -128,8 +128,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 434,905 bytes |
-| SHA-256 | `7078e11fbdedece927b2dcdf1abe2e13b36ae9cd0b0b6f91a4dd3210e1766886` |
+| Size | 437,649 bytes |
+| SHA-256 | `3412c495b41155bf15d027ddd63b1ffbc9a638dda08ba262b3ba0090acb54122` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 960,304 bytes | `98da99c92aff6c3af07799b6b0e263e68883404a9dbf7ab0c09affaf4976823d` |
-| `tripo-hand/fox.rig.json` | 9,926 bytes | `485dae6fba9f86b4b3c096e5b70c76ee9ac10590b24d9e155efc5ad81f06f92b` |
+| `tripo-hand/fox.rig.glb` | 570,492 bytes | `6a3230725d6140ddfedf26622dc972e2f5747d20e6df88c1f197fa85f0be1175` |
+| `tripo-hand/fox.rig.json` | 9,926 bytes | `51a98061a2e77db92fc8f88ff999274907d677b528d19e6b8c2a67e8b646b686` |
 
 The edits, in the order of the work:
 
@@ -270,3 +270,23 @@ The roll of the upper arm and the twist of the forearm, in degrees, before and a
 In 18 samples of `mozart-k191.mid` (1 s to 70 s) and 15 samples of `mendelssohn-op61.mid` (2 s
 to 58 s), each value of the violinist stays within 44°, and in 18 samples of `mozart-k315.mid`
 each value of the flutist stays within 41°.
+
+**Smooth surface.** These changes make the candidate smoother than the fox of main
+(`reports/2026-11-09-fox-hand-r5/`, which git ignores):
+
+- **One color for each region.** The face colors of `add_surface()` took the shade that the
+  Tripo texture bakes, so the fur showed 16 to 41 tones on each part. Each face now takes the
+  color of its region, by the lightness L and the saturation S of its old color (HLS, sRGB): the
+  socks, the ear backs, and the paws (L below 0.31, 1,679 faces, sRGB 73, 37, 17), the orange fur
+  (1,891 faces, 220, 98, 12), the cream belly, chest, and cheeks (L at least 0.65, 688 faces,
+  244, 215, 191), the muzzle and the inner ears (S below 0.5 above z 0.72, 129 faces, 206, 168,
+  143), and the tail tip (58 faces, 247, 224, 203). Each region takes the color of its face at 0.6
+  of its luma range. The gloss nose, the eyeballs, the whiskers, and the 96 white faces of the eye
+  rims keep their colors.
+- **Tail tip.** The tail tip is the tail faces (y above 0.06, z below 0.42, |x| below 0.12) whose
+  middle lies more than 0.02 units along the bone `tail_tip` from its head, so that its edge
+  follows one ring of the tail. The pale patch at the tail root in the back view of the app came
+  from two causes: the bind turns the tail back, so the lower third of the tail, which the color
+  map paints white, faces the camera behind the chair, and the face colors baked the orange to
+  white blend of the map into four cream steps (sRGB 235, 176, 135 to 247, 224, 203) at the
+  middle of the tail. The tail now shows orange fur down to the white tip, with no cream step.
