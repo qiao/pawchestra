@@ -381,8 +381,8 @@
   "chair": {
     "halfWidth": 0.13,
     "front": 0.1714,
-    "back": -0.09,
-    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch (x -0.125 to 0.125). The front edge (z 0.1714) lies 0.045 units behind the knee joint of the bind, so that 70 % of the thigh lies on the seat and the seat height of the app is 0.305 m, near the 0.298 m of the cat of main. The back edge lies 0.06 units behind the haunch, so that the root of the tail lies on the seat."
+    "back": -0.072,
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch (x -0.125 to 0.125). The front edge (z 0.1714) lies 0.045 units behind the knee joint of the bind, so that 70 % of the thigh lies on the seat and the seat height of the app is 0.305 m, near the 0.298 m of the cat of main. The back edge lies 0.005 units behind the tail tube (z -0.0657), which goes down from the back and around the left side of the haunch on the seat."
   },
   "armSegments": {
     "helper": 0.03,

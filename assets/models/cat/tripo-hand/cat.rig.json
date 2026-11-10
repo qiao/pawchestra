@@ -1,5 +1,5 @@
 {
- "sha256": "63fdb8c48b02c180dbb07eee1a5ac9aedaeac279c03b485c8a215846a27c1dd7",
+ "sha256": "a1bbe193bf5485d5c85e0780cab28a12c020f713accd5e8bd13b8b9c8edaaec7",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -476,7 +476,7 @@
    "prop": "chair",
    "top": 0.2952200174331665,
    "front": 0.17139999568462372,
-   "back": -0.09000000357627869,
+   "back": -0.07199999690055847,
    "halfWidth": 0.12999999523162842
   },
   "hinges": {
