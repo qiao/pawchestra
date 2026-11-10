@@ -261,7 +261,10 @@ The rest of each family:
   a pianist before a performance (`restLean`). The paws rest on the front of the belly with the
   palms back, because the belly covers the thighs and the thighs lie out of the reach of the arms.
   The right paw turns in the plane of its palm only toward a baton, so its rest fingers take the
-  turn that the left paw gets: else the right wrist bends far from its bind and folds.
+  turn that the left paw gets: else the right wrist bends far from its bind and folds. On the
+  Tripo polar bear, the belly does not cover the thighs, so the rest paws lie 1 H above the top of
+  the thigh: lower paws are out of the reach of the short arms, and the straight arms go into the
+  belly.
   The deer sits up with each hand near a string.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
