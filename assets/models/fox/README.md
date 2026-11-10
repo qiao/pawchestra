@@ -84,19 +84,19 @@ a supinated bind paw on each side (the role-neutral bind of design 4.4).
 ## Candidate hand rig
 
 `tripo-hand/` holds a candidate body ("tripo-hand/fox.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/fox.fbx`, made in a live Blender with no arm cut and no arm stretch. On the
+mesh `tripo-p2/fox.fbx`, made in headless Blender with no arm cut and no arm stretch. On the
 branch of the candidate, the `ANIMALS` entry of the fox points to `tripo-hand/fox.rig.glb`. The
 red fox and the tan fox share it.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/fox.fbx`, `tripo-p2/fox.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/fox.blend` | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `tripo-hand/fox.blend` | Made in headless Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | The scripted edits below |
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/fox-color.webp` | Color map of the red fox, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `tools/fox-maps.py` |
-| `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Tan color map" below). License as the FBX file | `tools/fox-maps.py` |
-| `tripo-hand/fox-normal.webp` | Web copy of the normal map of the Tripo FBX, for the red fox and the tan fox ("Normal map" below). License as the FBX file | None: made one time from the source image |
+| `tripo-hand/fox-color.webp` | Color map of the red fox, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py` |
+| `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Color map" below). License as the FBX file | The same run |
+| `tripo-hand/fox-normal.webp` | Normal map of the fur of the red fox and the tan fox ("Normal map" below). License as the FBX file | The same run (cwebp 1.5.0) |
 
 ### tripo-p2/fox.fbx
 
@@ -132,760 +132,248 @@ muzzle, and tail tip, and a black nose. It paints no light spot over the eyes.
 
 ### tripo-hand/fox.blend
 
-The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
-through the Blender MCP tools, in a scene `fox` of its own. The arms and the legs keep the form
-and the length of the source: no cut, no split from the trunk, and no stretch, with one
-exception: the legs are longer for the seat height of the fox of main ("Longer legs" below).
+The candidate hand rig of the new Tripo P2 mesh (design 4.4, "Hand rig"), made in headless
+Blender 5.2 (`blender -b --factory-startup`) by scripted point edits, in the order below. The arms
+keep the form and the length of the source: no cut, no split from the trunk, and no stretch. The
+legs are longer for the seat height of the fox of main ("Longer legs" below).
 
 | Item | Value |
 |---|---|
-| Size | 463,901 bytes |
-| SHA-256 | `3c97fd9e0f02be8df6e16e70af770565689418f245ceb6bf62dec66d2b0e9fbe` |
-| Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
+| Size | 413,291 bytes |
+| SHA-256 | `202756bba0eba6009e46b4b12030685ce66055f10fda1d3404bd1fe08518ee45` |
+| Origin | Made in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,524 vertices and 5,143 faces (3,695 quads and 1,448 triangles, 8,838 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 104 faces have the face attribute `eye` ("Eyes" and "Eye light" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). The 30 faces of the whiskers have the face attribute `plain` ("Color map" below) |
-| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below. The property `lids` holds the turn and the hinge axes of the lids ("Lids" and "Calm eyes" below) |
-| Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H was 0.322998 m, the H of the fox of `fox.rig.glb`, before "Head size": H is now 0.386694 m), `crease` 55 ("Smooth surface" below), `headCeiling` 1.0154 ("Ear weights", "Longer legs", and "Head size" below) |
-| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app ("Eye light" below). No eye objects, so the app adds no bead eyes. A lid on each eye blinks ("Lids" below) |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the edits, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 3,880 vertices and 4,342 faces (3,220 quads and 1,122 triangles, 7,562 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
+| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Facts | `height` 1.149623 (the shoulder joints at 1.58176 m for each unit, so that H was 0.322998 m, the H of the fox of `fox.rig.glb`, before the relax and the head size: H is now 0.380254 m), `crease` 55, `seatWidth` 0.5 |
+| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
 assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,131,140 bytes | `d6bdd8c4a0f19c8fcf0c8a2329ee61c3d069b3f9de4ac22a924c6ae27e6f11df` |
-| `tripo-hand/fox.rig.json` | 16,871 bytes | `133e8c26c05d8e35de9cb95ce995de45d6c60f4c1dddbe777a28f5bcd3121cf1` |
+| `tripo-hand/fox.rig.glb` | 944,528 bytes | `9c5b138c427f5661774bb22b5ff41ffb76eb32ddf937f048040ce0f593500190` |
+| `tripo-hand/fox.rig.json` | 17,249 bytes | `8cdea1d9ad42a11473ae747fb6053dc1061214bd7d68bb4ec3ee07f1cebc8e0c` |
 
-The edits, in the order of the work:
+The scripts of the session (`scratch/fox2/` of the worktree, which git ignores: `build.py`,
+`foxedits.py`, `make_config.py`, `rings.py`, and `params.json`) are not in the repo. They follow the
+scripts of the Tripo cat (`assets/models/cat/README.md`). The edits, in the order of the work (`sa`
+is `tools/blender/studio_armature.py`):
 
-- **Import.** `sa.import_source('assets/models/fox/tripo-p2/fox.fbx', 1e-5)` in the new scene
-  `fox`: no vertex merges, 1 unit from the soles to the ear tips.
-- **Joints.** The FBX has no armature, so each joint comes from cuts of the mesh and from its
-  edge rings (`jointsNote` of the config). Two joints moved off the measure by 2 mm: the hip
-  joint and the knee joint lie at (0.058, 0.29, 0.055) and (0.063, 0.175, 0.043). A thigh that
-  points almost along -y in the frame of the hips gets a rest frame with an error up to 3e-5 in
-  Blender (float32), and the export stops above 1e-5 ("The bone thigh_L scales or shears"). At
-  these joints the error is 1.6e-7.
-- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>,
-  cuts=<n>, use_grid_fill=True)`) of the clean quad edge ring of 10 edges between two arm rings.
-  The bands, by the x of their rings on each arm, and the cuts: 0.0781 to 0.0974 (1), 0.1113 to
-  0.1274 (1), 0.1274 to 0.1458 (1), 0.1458 to 0.1758 (2), 0.1758 to 0.1891 (1), 0.2095 to 0.2358
-  (2), 0.2358 to 0.2675 (3), and 0.2675 to 0.2959 (3). Each arm now has a ring each 0.19 to 0.36
-  arm radii (radius 0.04 at the root to 0.024 at the wrist) from x 0.078 to x 0.296.
-- **Knee rings.** The same call with 1 cut on the clean leg bands of 12 edges at y 0.1737 to
-  0.2037 and 0.2037 to 0.2301 of each leg. The knee joint is at y 0.175, and the knee has rings
-  at y 0.143, 0.158, 0.174, 0.189, 0.204, 0.217, and 0.230.
-- **Rings with no split.** These edge rings stop at a triangle or a pole, so they take no split:
-  the wrist band at x 0.2959 to 0.3096 (4 triangles, 4 poles), the paw bands from x 0.3096
-  (triangles and poles at the thumb and the finger roots), the foot and ankle bands at y 0.0195
-  to 0.0863 (triangles and poles at the heel), the leg band at y 0.2301 to 0.2591 (one triangle),
-  and the haunch bands from y 0.2918 (triangles and poles).
+- **Import.** `sa.import_source('assets/models/fox/tripo-p2/fox.fbx', 1e-5)`: no vertex merges,
+  1 unit from the soles to the ear tips. Each face is flat.
+- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=<n>,
+  use_grid_fill=True)`) of the clean quad edge rings between two closed arm loops, by the x of the
+  loops: 0.137 to 0.157 (1 cut), 0.157 to 0.185 (1), 0.185 to 0.209 (1), 0.258 to 0.317 (5), and
+  0.317 to 0.343 (2). Each arm now has a ring each 0.009 to 0.014 units (0.25 to 0.35 arm radii)
+  from x 0.119 to x 0.209 and from x 0.258 to x 0.343.
+- **Knee rings.** The same call with 1 cut on the clean leg bands of 11 edges at y 0.133 to 0.155,
+  0.155 to 0.177, and 0.177 to 0.199 of each leg. The knee joint is at y 0.145.
+- **Rings with no split.** These bands stop at a triangle or a pole, so they take no split: the
+  arm root from x 0.077 to x 0.119 (the ruff spikes and many poles), the elbow band from x 0.209
+  to x 0.258 (the triangle 2402, 2403, 2404 and the pole 2404, where the ring goes from 10 to 9
+  vertices), the paw from x 0.343 (the digits), the ankle and the foot below y 0.118, and the
+  haunch from y 0.222.
+- **Paws turned.** Each vertex past the arm ring at x 0.343 turns rigidly about the rest forearm
+  axis by whole ring steps of 40° (rings of 9 edges): -160° on the left (4 steps) and 80° on the
+  right (2 steps), 319 vertices on each side. The 9 quads of the band from the ring at x 0.334 go,
+  and new quads join the two rings with the same step offset. A turned vertex of the far ring
+  lies at most 0.0092 units from the old place of its vertex. The new quads take the planar UVs
+  of the clean dark patch at UV (0.4557, 0.6165) ("Color map" below).
+- **Point edits.** Before the surface, in this order, as maps of the rest points ("Head size",
+  "Paw size", "Longer legs" below).
 - **Surface.** `sa.add_surface(fox, 'fox', 'assets/models/fox/tripo-p2/fox.fbm/fox_basecolor.jpg',
-  eye_fans=False, config=<fox-tripo.json>)` on the flat mesh. 58 faces of the black nose are
-  gloss. The faces of the eyeballs took the fur color.
-- **Eyes.** The 120 faces of the two eyeballs get the face attribute `eye` (BOOLEAN, FACE) and
-  the colors `color` and `color_base` `#15110e` (the eye color of the app). The export then
-  gives `ownEyes`, and the app adds no bead eyes. The eyeballs keep the slot `fur`.
+  eye_fans=False, config=<fox-tripo.json>)`. 26 faces of the black nose are gloss.
+- **Eyes.** The 120 faces of the two eyeballs get the face attribute `eye` and the eye color of
+  the app. The export then gives `ownEyes`, and the app adds no bead eyes.
+- **Armature.** The armature of the config with a palm for each side: the true palm of the
+  source, (-0.113, -0.986, -0.12) in the studio axes with x mirrored on the right, turned by the
+  paw turn. The property `hinges` holds the elbow axis of the config of each side, turned about
+  its bind upper arm by 26.5° on the left and -44° on the right.
 
 The weights, in the order of the work, in the rest pose:
 
-1. Parent with Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh(fox,
-   fox_rig, auto=True)`). 22 whisker vertices took no weight.
-2. Arm rings: each vertex ring of each arm from x 0.085 to x 0.2965 takes one exact row with
-   `sa.set_weight_row()`. A row holds a clavicle share, an elbow helper share, and a wrist helper
-   share, linear between the control rings below (x of the left arm). The rest of the row goes to
-   the 4 roll segments of the upper arm (x below 0.195) or of the forearm, by the place of the
-   middle of the ring along the bone: segment k takes the share at (k + 0.5) / 4 of the part,
-   with a linear ramp between two segments (the roll split of the simple route).
+1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no small
+   loose part, no tail, and no face on an edge of three faces (20 faces at the front of the arm
+   roots, where a ruff spike folds into the arm). Each vertex takes the row of its copy. The 2
+   vertices with no row take the mean row of their edge neighbors.
+2. Arm rows: each vertex of a side with |x| from 0.105, within 0.07 units of the line of the rest
+   arm, takes one exact row with `sa.set_weight_row()`: a clavicle share and an elbow helper share,
+   linear between the control rows below, and the rest on the 4 roll segments of the upper arm or
+   the forearm (the roll split of the simple route). The elbow bend spreads over 5 rings, from x
+   0.165 to x 0.24.
 
-   | x | 0.0896 | 0.0974 | 0.1113 | 0.1274 | 0.1458 | 0.169 | 0.179 | 0.1886 | 0.202 | 0.215 | 0.2315 | 0.278 | 0.2896 | 0.301 |
-   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-   | Clavicle | 0.40 | 0.30 | 0.15 | 0.05 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 | 0 | 0 |
-   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 |
+   | x | 0.105 | 0.119 | 0.128 | 0.137 | 0.147 | 0.165 | 0.18 | 0.195 | 0.21 | 0.225 | 0.24 |
+   |---|---|---|---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.40 | 0.25 | 0.12 | 0.04 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 |
 
-   The 25 rings of each arm take these rows. The trunk loop around each arm
-   root (x 0.078) keeps the automatic weights.
-3. Paws, by rows across the paw, by the place along the rest forearm axis (as the x of the axis
-   point of the left paw): 0.3035 to 0.33 {`wrist` 0.5, `hand` 0.5}, 0.33 to 0.35 {`hand` 1},
-   the knuckle row 0.35 to 0.374 {`hand` 0.5, `fingers` 0.5}, and from 0.374 {`fingers` 1}: 30,
-   25, 80, and 186 vertices on each paw.
-4. The 170 vertices of the loose parts (eyeballs and whiskers) and the 69 vertices of the gloss
-   nose take {`head` 1}.
+3. Wrist rows: with d the place along the rest forearm axis past the head of `hand_<side>`, the
+   bend share b of the paw (half the wrist helper, plus the paw bones) grows in 12 equal steps,
+   one in each band of 0.005 from d -0.065. A row with b of 0.5 or less is {`wrist` 2b, the arm
+   row the rest}, above 0.5 {`wrist` 2 (1 - b), `hand` 2b - 1}. The paw is short (0.387 H), so the
+   bend of the wrist spreads over the end of the forearm: with 11 steps of 0.005 from d -0.03, the
+   flute paws folded 18 to 24 faces in each play sample.
+4. Knuckle rows: from d -0.035 past the head of `fingers_<side>`, the `hand` share of each row
+   splits into `hand` and `fingers` by a fingers share that grows in 12 equal steps of 0.005. A
+   knuckle blend that starts at the knuckles folded 48 to 57 faces on each flute paw.
+5. The vertices of the small loose parts (the eyeballs and the inner mouth) and of the gloss nose
+   take {`head` 1}: 201 vertices.
+6. Ear rows: a plane across the base of each ear, through four points of the left ear base of the
+   source, (0.07, 0.862, 0.074), (0.07, 0.885, -0.004), (0.02, 0.90, 0.035), and (0.124, 0.847,
+   0.035) (studio axes, x mirrored on the right), mapped by the point edits. Each head vertex above
+   the plane by 0.008 or more and with |x| above 0.025 takes {`ear_<side>` 1}, one from 0 to 0.008
+   {`ear_<side>` 0.5, `head` 0.5}, and each other vertex gives its ear share to `head` (247 ear,
+   45 base, and 605 head rows). The automatic weights gave the ears shares down to the eyes.
+7. Tail rows: the tail is a loose part, with no automatic weights. Each tail vertex takes {`hips`
+   1 - a, `tail` a (1 - c), `tail_tip` a c}, with a = smoothstep(-0.01, 0.03) of its place along
+   the bone `tail` from its head, and c = smoothstep(-0.04, 0.04) of its place along `tail_tip`
+   from its head.
 
-The trunk, the neck, the head, the hips, the legs, and the tail keep the automatic
-weights. The tail has two bones: `tail` (from the root at y 0.40, z -0.05 to y 0.30, z -0.135)
-and `tail_tip` (to the tip at y 0.11, z -0.2). The bind turns them to the directions of
-`studio.tailBind` of the config. The scripts of the live session are not in the repo.
+The trunk, the neck, the head, the hips, and the legs keep the automatic weights.
 
-**Ear weights.** The automatic weights gave the ear bones shares of up to 0.69 down to the level
-of the eyes, and a turn of 12° of an ear moved the cheek ruff up to 0.007 units. A plane across
-the base of each ear splits the head: the unit normal (0.53, 0.35, 0.79) / 1.0167 (x mirrored on
-the right) and the offset 0.711, through four points of the left ear base, (0.035, -0.03, 0.89),
-(0.11, -0.03, 0.84), (0.07, -0.05, 0.875), and (0.07, 0.04, 0.835). With d the height of a vertex
-over the plane and x its distance from the middle plane, each vertex of the side above z 0.7
-takes an exact row with `sa.set_weight_row()`:
-
-| Vertices | Row | Left | Right |
-|---|---|---|---|
-| d at least 0.008 and x above 0.03 (the ear) | {`ear_<side>` 1} | 214 | 214 |
-| d from 0 to 0.008 and x above 0.03 (the ear base) | {`ear_<side>` 0.5, `head` 0.5} | 16 | 16 |
-| Each other vertex with an ear share (the cheeks, the eyes, the top of the head) | its automatic row, with the ear share added to `head` | 416 | 381 |
-
-No vertex below an ear base now has an ear share, so a turn of an ear moves no cheek vertex. The
-head height H of `pnpm studio-body` comes from the fur vertices with a `head` share above 0.5, and
-the new rows gave it the top of the head between the ears too (H 0.335679 m). The fact
-`headCeiling` 0.929 keeps the vertices above it out of the measure, so that H stays 0.322998 m.
-
-**Arm twist.** In the moments of the violinist and the flutist, the roll of each upper arm skin
-(from the clavicle) and the twist of each forearm skin (from the upper arm) reached 168° (the
-right forearm of the flutist), and the left forearm of the violinist turned 237° from the rest to
-the play. Four changes make each
-part take 44° or less:
-
-- **Paws turned.** Each vertex beyond the arm ring at x 0.2888 turns rigidly about the rest
-  forearm axis (from the head of `forearm_<side>` to the head of `hand_<side>`), by whole ring
-  steps of 36°: -144° on the left (4 steps) and 72° on the right (2 steps), 331 vertices on each
-  side. The 10 quads of the band from that ring to the ring at x 0.2959 go, and new quads join the
-  ring to the turned paw with the same step offset, with the colors and the UVs of the old quads.
-  A turned vertex of the far ring lies at most 0.005 units from the old place of its vertex. The
-  bone `fingers_<side>` turns with the paw.
-- **Palms.** The property `palm` holds the source palm of each side, (0, 0.059892, -0.998205)
-  with x mirrored on the right, turned by the same angle about the same axis: left (0.052195,
-  -0.634545, 0.771122), right (-0.025106, -0.930323, -0.365880). Then `sa.fix_rolls()` and the
-  bind of the config again (supination 0).
-- **Elbow axes.** The property `hinges` holds the axis of the config of each side, turned about
-  its bind upper arm: 26.5° on the left and -44° on the right. Left (-0.481554, -0.515997,
-  -0.708416), right (-0.361494, 0.298027, 0.883461).
-- **Holds.** `FOX_HOLD` of `src/pose/bowed-rig.ts` and `FOX_FLUTE` of `src/pose/winds.ts` give
-  the turn of each paw to the two parts of the arm (their comments give the values).
-
-The roll of the upper arm and the twist of the forearm, in degrees, before and after:
+**Arm twist.** The roll of each upper arm (from the clavicle) and the twist of each forearm (the
+paw from the upper arm), in degrees, in each moment of the final hold (`FOX_HOLD` of
+`src/pose/bowed-rig.ts` and `FOX_FLUTE` of `src/pose/winds.ts`, whose comments give the values):
 
 | Role | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|---|
-| Violinist | frog | -12.2 / -38.9 | 143.0 / -30.6 | -31.9 / 5.7 | 72.6 / -35.3 |
-| Violinist | tip | -12.3 / -39.1 | 142.9 / -30.7 | -60.3 / -27.4 | 67.9 / -32.5 |
-| Violinist | crossing | -10.6 / -37.6 | 143.9 / -29.8 | -41.2 / -3.8 | 74.7 / -32.8 |
-| Violinist | rest | 44.1 / 27.9 | -93.8 / 37.0 | -81.3 / -42.8 | 139.1 / 28.1 |
-| Violinist | lift50 | 18.9 / 2.6 | -0.9 / -6.5 | -69.3 / -32.4 | 126.0 / 16.9 |
-| Violinist | lower50 | 9.6 / -5.8 | 34.8 / -19.2 | -70.8 / -34.1 | 120.6 / 11.6 |
-| Violinist | stand | -12.4 / -39.1 | 141.1 / -32.4 | -31.7 / 5.9 | 74.4 / -33.5 |
-| Flutist | note | 33.1 / 10.0 | -163.7 / 7.8 | -8.4 / 32.7 | 165.6 / 39.5 |
-| Flutist | rest | 69.6 / 34.8 | -54.4 / 35.7 | -93.1 / -41.3 | 84.8 / -42.5 |
-| Flutist | lift50 | 61.7 / 32.0 | -76.2 / 29.7 | -77.6 / -31.8 | 123.6 / 6.5 |
-| Flutist | lower50 | 60.6 / 32.2 | -88.2 / 26.1 | -64.4 / -19.8 | 136.8 / 25.3 |
-| Flutist | stand | 32.4 / 9.2 | -165.6 / 5.9 | -8.0 / 33.1 | 167.6 / 41.1 |
+| Violinist | frog | -36.8 | -17.9 | -11.8 | -26.5 |
+| Violinist | tip | -36.9 | -18.0 | -31.3 | -21.8 |
+| Violinist | crossing | -34.7 | -17.8 | -17.9 | -19.6 |
+| Violinist | rest | 5.1 | 34.1 | 0.0 | -7.6 |
+| Violinist | lift50 | -9.4 | 8.4 | -5.6 | 4.6 |
+| Violinist | lower50 | -15.8 | -0.4 | -12.0 | 2.9 |
+| Violinist | stand | -36.2 | -19.6 | -11.8 | -24.8 |
+| Flutist | note | 6.0 | 8.2 | 14.7 | -41.1 |
+| Flutist | rest | 8.9 | 25.2 | -13.7 | -31.0 |
+| Flutist | lift50 | 8.4 | 33.4 | -8.0 | 3.4 |
+| Flutist | lower50 | 8.8 | 34.8 | -3.7 | 8.2 |
+| Flutist | stand | 6.1 | 6.2 | 14.7 | -41.0 |
 
-In 18 samples of `mozart-k191.mid` (1 s to 70 s) and 15 samples of `mendelssohn-op61.mid` (2 s
-to 58 s), each value of the violinist stays within 44°, and in 18 samples of `mozart-k315.mid`
-each value of the flutist stays within 41°.
+With the holds of the first Tripo fox, the left forearm twisted 50° at the violin rest and 48° at
+the flute rest, and the right flute paw bent 94° on its forearm.
 
-**Smooth surface.** These changes make the candidate smoother than the fox of main
-(`reports/2026-11-09-fox-hand-r5/`, which git ignores):
+**Smooth surface.** Each face takes the color of its region by the lightness L of its old color
+(HLS, sRGB): dark below 0.25 (the socks, the paws, the ear tips, and the brows, 1,648 faces, sRGB
+68, 40, 20), cream from 0.62 (the bib, the cheeks, the muzzle, and the tail tip, 620 faces, 238,
+195, 151), and the orange fur (1,578 faces, 222, 102, 12). The gloss nose and the loose parts keep
+their colors. Then ten Taubin rounds (0.5, then -0.53) on the body, with each move clipped to 0.01
+units (mean 0.0028, 172 clipped). The eyeballs, the inner mouth, the gloss nose, and the vertices
+of the open and the shared edges stay. The relax moves the chin and the top of the head a little,
+so H goes from 0.322998 m to 0.317 m before the head size.
 
-- **One color for each region.** The face colors of `add_surface()` took the shade that the
-  Tripo texture bakes, so the fur showed 8 to 41 tones on each part. Each face now takes the
-  color of its region, by the lightness L and the saturation S of its old color (HLS, sRGB): the
-  socks, the ear backs, and the paws (L below 0.31, 1,679 faces, sRGB 73, 37, 17), the orange fur
-  (1,891 faces, 220, 98, 12), the cream belly, chest, and cheeks (L at least 0.65, 688 faces,
-  244, 215, 191), the muzzle and the inner ears (S below 0.5 above z 0.72, 129 faces, 206, 168,
-  143), and the tail tip (58 faces, 247, 224, 203). Each region takes the color of its face at 0.6
-  of its luma range. The gloss nose, the eyeballs, the whiskers, and the 96 white faces of the eye
-  rims keep their colors.
-- **Tail tip.** The tail tip is the tail faces (y above 0.06, z below 0.42, |x| below 0.12) whose
-  middle lies more than 0.02 units along the bone `tail_tip` from its head, so that its edge
-  follows one ring of the tail. The pale patch at the tail root in the back view of the app came
-  from two causes: the bind turns the tail back, so the lower third of the tail, which the color
-  map paints white, faces the camera behind the chair, and the face colors baked the orange to
-  white blend of the map into four cream steps (sRGB 235, 176, 135 to 247, 224, 203) at the
-  middle of the tail. The tail now shows orange fur down to the white tip, with no cream step.
-- **Relax.** Ten Taubin rounds (0.5, then -0.53) on the body, with each move clipped to 0.01
-  units, move the vertices at most 0.01 units (mean 0.0018, 15 clipped). The eyeballs, the
-  whiskers, the open edges of the eye sockets, the gloss nose, and the eye faces stay. The tips
-  of the ruff spikes (each vertex with only triangle faces, 275 vertices) stay too, so that the
-  ruff keeps its form: free, they moved up to 0.027 units. The four top vertices of the head
-  (1648, 2988, 1654, 2994) and the four lowest vertices of the chin (3644, 1732, 3645, 2411) stay,
-  so that the head height H stays 0.322998 m: free, H went to 0.320865 m. The mean fold between
-  neighbor faces goes from 29.4° to 24.6° on the head, from 25.6° to 21.8° on the trunk, from
-  15.4° to 14.4° on the arms, from 20.4° to 18.7° on the paws, and from 18.0° to 14.3° on the
-  feet. The bones and the weights stay. The seat height of the export goes from 0.2907 m to
-  0.2927 m.
-- **Crease 55.** The limb rings have 10 vertices, 36° apart, so the crease 35 of the fox of main
-  leaves out a neighbor face at most limb corners (`studioNormals()`), and each such face shades
-  as a facet. The share of the faces with such a corner, by the crease, against the fox of main
-  at its crease 35:
+**Head size.** The head of the fox of main grows in its rig: its eyes take the shown head height
+0.382 m, against H 0.323 m. A point edit scales the head about the head joint (0, 0.725, 0.05) of
+the source by 1.17, with a share that goes from 0 at y 0.68 to 1 at y 0.72 (a smoothstep), so that
+the neck fades. A lineup of 1.0, 1.1, and 1.2 in the hall view (H 0.323, 0.365, and 0.394 m) put
+the new head between 1.1 and 1.2, and 1.17 gives H 0.380 m, near the 0.382 m of main.
 
-  | Part | Main fox (35) | Before (35) | After the relax (35) | After (45) | After (55) |
-  |---|---|---|---|---|---|
-  | Head | 86.7 % | 76.6 % | 65.5 % | 48.7 % | 38.9 % |
-  | Ears | 99.0 % | 72.9 % | 58.2 % | 39.9 % | 21.6 % |
-  | Trunk and tail | 59.8 % | 70.1 % | 62.4 % | 44.2 % | 38.4 % |
-  | Arms | 64.8 % | 89.6 % | 87.1 % | 10.1 % | 4.0 % |
-  | Paws | 87.4 % | 86.6 % | 86.6 % | 63.1 % | 18.0 % |
-  | Legs | 88.4 % | 64.0 % | 53.5 % | 23.2 % | 18.2 % |
-  | Feet | 95.6 % | 66.1 % | 66.1 % | 30.1 % | 8.0 % |
+**Paw size.** From the wrist joint to the finger tips, as a share of H before the head size: 0.587
+long, 0.453 wide, and 0.264 thick in the source, against 0.387, 0.328, and 0.240 on the fox of
+main. A point edit maps each point past the wrist joint in the frame of its paw (the edit `paw` of
+the cat, with the length 0.66, the width 0.71, the thickness 1, and a ramp of 0.02 units): 0.387,
+0.337, and 0.259 after.
 
-  45 is the smallest crease at or below main on each part. 55 also takes the paws below 20 %, as
-  the rabbit candidate does with 55 for its rings of 11 vertices. The ruff spikes fold by more
-  than 55°, so they stay sharp.
+**Longer legs.** With the seat of the fox of main, the seat height of the app was 0.148 m, against
+0.270 m on the fox of main: the shins of the new mesh are short, and the thick thighs put their
+underside low. A point edit makes the legs 1.88 times longer from the ankle to above the knee (the
+edit `legs` of the cat: g(y) = y + 0.88 G(y), G the integral of a band that goes from 0 at y 0.05
+to 1 at y 0.07, stays 1 to y 0.15, and goes to 0 at y 0.19). Each point above the band and the
+whole tail move up by 0.097 units. The shins first take 1.1 times their girth in x and z (the edit
+`shin` of the cat, band 0.05, 0.07, 0.12, 0.15), so that they stay thick (1.21 H, 1.18 H on main).
+The x and z of each leg point stay. The hip joint lies at (0.08, 0.291, 0.069) in the source, so
+that the rest frame of each thigh in the frame of the hips has an error below 1e-5 in Blender.
 
-**Seat.** A seated violinist sits with most of each thigh on the seat, and the front edge of the
-seat a little behind the knee. Two changes give this seat:
+**Seat.** The thighs slope 15° down and 8° out in the bind, and the shins lean 12° forward
+(`legTurns` of the config). The front of the seat lies 0.06 units behind the knee joint of the
+bind (0.045 put the calf over the seat). 63 % of the thigh lies on the seat, and the seat height
+of the app is 0.270 m (0.270 m on the fox of main). The tail root goes down and back (`tailBind`
+(0, -0.45, -1) and (0, -1.6, -0.5)), so that the large tail hangs down behind the chair.
 
-- **Legs of the bind.** The leg turns of the config (`studio.legTurns`, `uv run --no-project
-  --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12`) turn each thigh to a slope of
-  15° below the horizontal (25° before) and 8° out, and each shin 12° forward of the vertical (0°
-  before), so that the knee angle from the side is 117°. Each foot keeps its turn in the world, so
-  the sole stays flat. The bind of the config (`rebind()` of the live session: the functions
-  `joints_of()`, `trunk_turn()`, and `bind_turns()` of `rig_mesh.py` and `sa.set_world_turns()`)
-  keys the Action `bind` again: only the leg bones move. The bones keep their lengths, and the
-  mesh keeps its form.
-- **Seat of the rig.** The property `seat` reaches from z -0.06 to z 0.13 (studio axes, +z
-  forward; the front was 0.03). At z 0.13 the calf starts to go below the thigh, so a seat
-  further forward rests on the calves. The config `chair` holds the same values.
+**Trunk.** Sections of the rest across the trunk, as a share of H before the head size, at shares of
+the height from the hip joint to the shoulder joint (width × depth): the belly at 0.3 was 1.34 ×
+1.53, wider and deeper than the fox of main (0.89 to 1.16 × 1.13 to 1.43). A point edit scales
+each horizontal section about its middle by its weight on the trunk bones, with the width 0.87 and
+the depth 0.96 at the belly, linear to 1 at the hips and at the waist. The belly is now 1.27 ×
+1.47: the haunch, which follows the thighs, keeps the form of the source.
 
-| Measure | Before | After | Main fox |
-|---|---|---|---|
-| Thigh slope | 25° | 15° | |
-| Seat top | 0.293 m | 0.236 m | 0.270 m |
-| Chair depth | 0.142 m | 0.293 m | 0.287 m |
-| Thigh (hip joint to knee joint) over the seat | 0 % | 67 % | |
-| Front edge of the seat behind the knee joint | 0.199 m | 0.056 m | |
+**Belly.** In the bind, the raised thighs turned the faces under the round belly down by up to
+65°. The key `bind_belly` relaxes the posed bind of the 33 vertices with a rest height (Blender z)
+from 0.44 to 0.56, rest y below 0, and atan2(|x|, -y) at most 60°, in 3 rounds of P += 0.5 ((mid -
+P) . n) n (the rule of the first fox, "Belly" of its history). No belly face points down by more
+than 30° (largest 29.7°). With 6 or 20 rounds, the center of the lower belly sank and showed a dark
+smudge in the app.
 
-The seat top is the lowest point of the body over the seat, so a seat under most of the thigh
-lies near the knee: the knee joint of the Tripo fox is 0.262 m above the floor, and the underside
-of the thigh near the knee 0.236 m. With the front edge at z 0.11 the top is 0.241 m, and with a
-vertical shin 0.240 m. The trunk bones stay upright: the line from the hips to the neck leans
-about 1° back in the bind and in each moment of the violinist. The arm twists stay within 44° in the
-moments and the samples of "Arm twist" (the violin rest on the thigh moves a little).
-
-**Belly.** The thighs of the bind give the lower belly vertices (rest z 0.34 to 0.42) thigh
-shares of 0.14 to 0.71. The raised thighs moved them, and the faces of the lower belly pointed
-down by up to 43° in the bind (39° with the thighs at 25°): a dark crease at the top of each
-thigh in the front view of the app. The key `bind_belly` relaxes the posed bind of 22 chosen
-vertices, with this call in the live Blender:
-
-```python
-import bind_edit as be  # tools/blender/
-# S: each vertex with rest z from 0.34 to 0.42, y below 0, atan2(|x|, -y) at most 60 degrees,
-# and a distance from the z axis below 0.2.
-# Each round: P[i] += 0.5 * ((mid - P[i]) . n[i]) * n[i] for each i in S at the same time.
-# mid: the middle of the mean of the edge neighbors above and the mean of those below (rest z
-# more than 0.01 apart). n: the vertex normal of the bind before the key. Four rounds.
-be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
-```
-
-The largest move is 0.0087 units, and the mean is 0.0042. The move goes along the normal only,
-so the girth of each ring stays. The faces of the lower belly point down by at most 32° (43°
-before), and 6 of its 44 faces by more than 30° (12 before). The key `bind_belly` is the only key
-`bind*`.
-
-**Longer legs.** With the seat of "Seat", the seat height of the app was 0.236 m, against 0.270 m
-on the fox of main: the knee of the Tripo fox is low. The legs of the mesh are now longer, and the
-feet, the paws, the hips, the trunk, the tail, the arms, and the head keep their form and size.
-One scripted point edit in the rest pose (`stretch_legs()` of the live session) moves each vertex
-only along z, by the height z of its rest place:
-
-```text
-g(z) = z + (k - 1) G(z),  k = 1.24,  G(z) = the integral from 0 to z of b
-b(z) = 0 below z 0.07, a smoothstep up to 1 at z 0.10, 1 to z 0.25,
-       a smoothstep down to 0 at z 0.30, 0 above z 0.30
-vertex: z += (1 - t) (g(z) - z) + t * 0.0456,  t = its weight of tail + tail_tip (at most 1)
-```
-
-The scale along each leg thus goes smoothly from 1 at the ankle to 1.24 and back to 1 at the hip,
-so no ring spacing jumps. The x and the y of each vertex stay, so the girth of each leg stays.
-Each point above z 0.30 and the whole tail move up by 0.0456 units (the rigid part of the body).
-The bones take the same map (the tail bones +0.0456), with the roll of their hint on the thighs
-and the shins. The shape key `bind_belly` takes the same moves as the basis, so its moves stay.
-
-| Measure | Before | After |
-|---|---|---|
-| Thigh, hip joint to knee joint | 0.1157 units | 0.1398 units (+20.8 %) |
-| Shin, knee joint to ankle joint | 0.1151 units | 0.1367 units (+18.8 %) |
-| Knee joint (rest) | y 0.175 | y 0.1966 |
-| Hip joint (rest) | (0.058, 0.29, 0.055) | (0.058, 0.335514, 0.058) |
-| Shoulder joints (rest) | y 0.638 | y 0.6836 |
-
-The values in the paragraphs above are in the rest places before this edit: add 0.0456 to each
-height above z 0.30 (y in the config). The hip joint lies 0.003 units forward of its old place: at
-the mapped place, the rest frame of each thigh in the frame of the hips had an error of 4e-5 in
-Blender (float32), and the export stops above 1e-5 ("The bone thigh_L scales or shears"). A search
-of the nearest hip joint in steps of 0.0005 units gives the error 1.8e-6 in the rest and in the
-bind. The config `tools/mesh-rigs/simple/fox-tripo.json` holds the new joints and the leg turns
-of `leg_turns.py <config> 15 8 12` for them. The armature facts follow: `height` 1.043834 (the
-shoulder joints at 0.6836 units, the same 1.526966 m for each unit) and `headCeiling` 0.9746 (0.929
-+ 0.0456), so H stays 0.322998 m. The weights stay: each vertex keeps its row, and the 20 vertices
-of the ear rows that the relax moved across the ear plane are the same before and after.
-
-**Knee rings.** The longer legs widened the bands at the knee to 0.44 to 0.69 leg radii. Edge ring
-Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1, use_grid_fill=True)`) of the four
-clean bands of 12 edges from y 0.1407 to 0.2029 of each leg (rest places before the edit) adds a
-ring in each band: 96 vertices and 96 quads. Each new vertex takes the mean of the rows of its two
-ring neighbors (at most 2 bones), its UV, and the key moves of its edge. The bands from the knee
-joint (y 0.1966) down to y 0.154 and up to y 0.231 are now 0.25 to 0.36 leg radii (radius 0.031 to
-0.036 units).
-
-**Seat after the longer legs.** The front edge of the seat moves forward with the knee:
-
-| Measure | Before | After | Main fox |
-|---|---|---|---|
-| Seat front (`seat`, config `chair`) | z 0.13 | z 0.145 | |
-| Seat height of the app | 0.236 m | 0.271 m (0.270826) | 0.270 m |
-| Thigh (hip joint to knee joint) over the seat | 67 % | 64 % | |
-| Front edge of the seat behind the knee joint | 0.056 m | 0.073 m | |
-| Hips in the bind | 0.310 units (0.473 m) | 0.356 units (0.543 m) | |
-| H | 0.322998 m | 0.322998 m | 0.322998 m |
-
-With the front edge at z 0.15, 68 % of the thigh lies on the seat, and a new knee ring under the
-thigh sets the seat height 0.268 m. The thighs keep the slope of 15°, the shins lean 12° forward,
-and the soles stay flat. The standing flutist stands on its soles. In the moments of "Arm twist",
-each part of each arm takes 42.5° or less (the largest: the right forearm of the flutist at rest).
-
-**Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
-colors (design 4.5). The mesh object has the custom property `texture`
-(`assets/models/fox/tripo-hand/fox-color.webp`), and the mesh keeps the UV map of the FBX. The
-edge ring cuts of the arms and the knees interpolate it inside each face. The eyeballs take the
-map: it paints a full eye on each ball. The eye-rim faces take the map too, because the map paints
-them white, as the face colors are.
-
-| Item | Value |
-|---|---|
-| Source | `tripo-p2/fox.fbm/fox_basecolor.jpg` (above) |
-| `fox-color.webp` | Lanczos scale to 2048 × 2048, the brow fill, the sock edges, and the red-orange step below ("Brow spots", "Sock edges", "Hall fur"), WebP quality 60 (Pillow 13.0.0, method 6): 139,048 bytes, SHA-256 `3fa16b1a185c6a55d6a1059f83a79c06bd6d2e9e2bfae951890fd92fd3925f33` |
-| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
-| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-
-**Red-orange of the red map.** In the seated 3/4 app view (`close-views play --demo mozart-k191
---at fox-red --azimuth 35 --zoom 1.3 --time 6`), the orange fur of the candidate read pale peach.
-The median Oklab L, C, and h of the orange fur at the chest side, the upper arm, the thigh, and
-the head top:
-
-| Step | L | C | h |
-|---|---|---|---|
-| `fox_basecolor.jpg` (by UV faces of the four parts) | 0.638 | 0.172 | 46.9 |
-| `fox-color.webp`, the plain copy | 0.638 | 0.172 | 47.0 |
-| App render, candidate | 0.731 | 0.137 | 45.1 |
-| App render, candidate, no sheen | 0.730 | 0.139 | 44.4 |
-| App render, candidate, no normal map | 0.731 | 0.137 | 45.1 |
-| App render, candidate, face colors and no map | 0.743 | 0.140 | 44.4 |
-| App render, fox of main | 0.521 | 0.131 | 38.7 |
-
-The source and its WebP copy hold the full chroma, and the sheen and the normal map change the
-render by 0.001 in L. The tone curve lowers the chroma of both foxes by the same share (0.80 and
-0.77). The difference is the map color: the fox of main shifts its fur to L 0.557, C 0.171, h 43.7
-(`colors.shift` of `tools/mesh-rigs/fox.json`), and its faces take less light than the smooth
-body. `tools/fox-maps.py` now moves the orange fur of the red map to Oklab L 0.42, C 0.15, h 52°
-(`RED_FUR`), with the same anchor blend as the tan map. The socks, the paws, the ear tips, the
-cream and white fur, the black nose, and the eyeball texels keep their colors. The same view then
-gives L 0.523, C 0.130, h 37.2. Targets of L 0.47 and 0.43 gave L 0.567 and 0.532.
-
-The tan fox takes its own target ("Tan fur lightness" below).
-
-**Paw size.** From the wrist joint to the finger tips, along the rest forearm axis, and across it
-on the two axes of the paw (`paw.py` of the session, both rig files in their rest pose):
-
-| Paw | Length | Width | Thickness |
-|---|---|---|---|
-| Candidate before | 0.168 m (0.521 H) | 0.152 m (0.472 H) | 0.078 m (0.241 H) |
-| Fox of main | 0.125 m (0.387 H) | 0.106 m (0.328 H) | 0.078 m (0.240 H) |
-| Candidate after | 0.126 m (0.391 H) | 0.107 m (0.331 H) | 0.078 m (0.240 H) |
-
-The forearms differ (0.176 m on the candidate, 0.258 m on the fox of main), so H is the measure.
-A point edit in the live Blender (`paw_scale.py` of the session) maps each vertex past the wrist
-joint in the frame of its paw: origin the head of `hand_<side>`, a the rest forearm axis, w the
-width axis (the first principal axis of the paw across a), and n = a × w. With d the distance
-along a and s = smoothstep(0, 0.025, d), the point c + 0.75 d a + (1 - 0.30 s)(v · w) w + (v · n) n
-takes its place (623 vertices). The vertices up to the wrist joint stay, so the wrist band keeps
-its girth and shows no step. The basis and the key `bind_belly` take the same map. The heads and
-the lengths of `hand_<side>` and `fingers_<side>` take the map, and each keeps its direction and
-roll, so the keys of the Action `bind` keep their turns. The weights, the palm hints, and the paw
-turns stay. Each paw still closes on the bow, the violin neck, and the flute. In the moments of
-"Arm twist", each part of each arm takes 41.6° or less (the right forearm of the flutist at rest).
-
-**Body thickness.** The trunk, the neck base, and the legs were much thinner than on the fox of
-main. Sections of the mesh across each part (`bmesh.ops.bisect_plane()`), as a share of H: the
-candidate in the standing rest of its file, and the fox of main in its standing mesh `fox.glb`, at
-the same shares of the height from the hip joint to the shoulders. Width × depth, or the girth:
-
-| Part | Candidate before | Candidate after | Fox of main |
-|---|---|---|---|
-| Belly | 0.88 × 0.79 | 1.00 × 1.18 | 0.89 to 1.16 × 1.13 to 1.43 |
-| Waist | 0.72 × 0.66 | 0.89 × 1.10 | 0.89 × 1.13 |
-| Chest | 0.69 × 0.70 | 0.82 × 0.94 | 1.09 × 0.94 |
-| Neck base | 0.76 × 0.59 | 0.77 × 0.82 | 0.81 × 0.93 |
-| Thigh, girth | 1.25 | 1.83 | 2.26 |
-| Shin, girth | 0.85 | 0.94 | 1.18 |
-| Upper arm, girth (seated bind) | 1.14 | 1.14 | 2.13 |
-
-A point edit in the live Blender (`body_scale.py` of the session) scales each ring about its own
-center in the plane of the ring. A trunk ring is a horizontal section of the rest. Its center
-lies on a quadratic fit of the middles of the trunk sections, so the centers change smoothly
-from ring to ring. Its width and depth take the ratio of main at its height (table `TRUNK`, linear
-between the rows), with the chest width at most 1.25, so the chest does not grow over the arm
-roots. A leg ring scales about its own inner edge and back edge, so the thighs do not meet and
-the underside of the seated thigh stays. The shin ratio of main (1.32 wide, 1.45 deep) grows from 1
-at the ankle to the knee, the thigh ratio (1.75, 1.84) from the shin ratio at the knee to 0.6 of
-the thigh, and the ratio of the haunch (1.25, 1.15) at the top. Each vertex moves by the move of
-each region times its weight on the bones of that region, so the joins to the arms, the head, the
-tail, and the feet fade with the weights. The basis and the key `bind_belly` take the same moves.
-The trunk takes the full gap to main. The legs take 0.6 of it: at 0.8 and 1.0, the thighs of the
-standing flutist ended in a wide flare at the knee. The cream faces stretch their texels by at
-most 1.23 (the bib keeps its place). The seat height goes from 0.271 m to 0.276 m, and the front
-edge of the seat stays. No instrument and no arm goes into the trunk in the moments of the
-violinist and the flutist. In the moments of "Arm twist", each part of each arm takes 41.6° or
-less. This edit gave the thighs a flare below the hip ("Thigh taper") and the lower belly an
-overhang ("Lap").
-
-**Thigh taper.** After "Body thickness", each seated thigh was widest at 0.2 of its length, with a
-sharp outer corner, and from the front it read as a flat flare like a skirt. Each leg ring scaled
-out from its inner edge, and the weight fade at the hip held the haunch back, so the full move of
-the rings below the hip stood out. Sections of the left thigh across its axis in the seated bind
-(`thigh2.py` of the session), from the hip joint (u 0) to the knee joint (u 1): the outer half
-width from the axis, as a share of H.
-
-| u | 0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Before "Body thickness" | 0.265 | 0.250 | 0.236 | 0.220 | 0.205 | 0.190 | 0.176 | 0.166 | 0.161 | 0.158 | 0.156 |
-| Before | 0.420 | 0.468 | 0.499 | 0.444 | 0.388 | 0.341 | 0.303 | 0.270 | 0.244 | 0.224 | 0.213 |
-| After | 0.372 | 0.372 | 0.366 | 0.347 | 0.327 | 0.307 | 0.287 | 0.265 | 0.244 | 0.224 | 0.213 |
-| Fox of main | 0.360 | 0.342 | 0.318 | 0.296 | 0.281 | 0.263 | 0.242 | 0.223 | 0.206 | 0.189 | 0.172 |
-
-A point edit in the live Blender (`knee_taper.py` of the session), in the rest of the file:
-
-```text
-for each side and each vertex with a share on thigh_<side> or shin_<side>, on its side of x = 0:
-  axis: from the head of thigh_<side> (u 0) to the head of shin_<side> (u 1), rest
-  u = (P - hip) . axis / |knee - hip|,  o = sign * (x - x_axis(u))   (the offset out)
-  if o > 0: x += min(1, w) * sign * (g(u) - 1) * o,  w = its thigh + shin share
-  g: 1 at u 0, 0.83 at 0.1, 0.72 at 0.2, 0.78 at 0.3, 0.853 at 0.4, 0.915 at 0.5,
-     0.957 at 0.6, 0.996 at 0.7, 1 from 0.8, linear between
-```
-
-66 vertices move, at most 0.0295 units, along x only. The basis and the key `bind_belly` take the
-same moves. The weights, the bones, and the UVs stay. The outer edge now falls from the hip to the
-knee, and the knee is round. The standing flutist shows no flare. The seat height is 0.275948 m,
-and the front edge of the seat stays.
-
-**Lap.** After "Body thickness", the deeper belly made an overhang above the crotch. In the seated
-bind the faces of the lower belly pointed down by 34° to 42° (27° to 29° before), and they took
-almost no light: a dark brown patch between the thighs from the front, on both foxes. Renders with
-a flat color map, a flat normal map, no cast shadow (`--probe noshadow`), and no contact shade keep
-the patch, and the face colors (`--probe colors`) hold no dark, so the normals are the cause. A
-point edit in the live Blender (`belly_lap.py` of the session) adds bind moves to the key
-`bind_belly`:
-
-```python
-import bind_edit as be  # tools/blender/
-# S: each vertex with rest z from 0.30 to 0.52, rest y below 0, and
-# theta = atan2(|x|, -y) of the rest at most 60 degrees.
-# Move of each vertex of S, in the bind, along -y (forward), with zb its bind z:
-# 0.03 * ss(0.33, 0.38, zb) * (1 - ss(0.42, 0.50, zb)) * (1 + cos(pi * theta / 60 deg)) / 2
-# ss: a smoothstep.
-be.add_bind_move(body, rig, moves, 'bind_belly')
-```
-
-72 vertices move, at most 0.03 units. The faces of the lower belly (rest z 0.33 to 0.50, 38 faces)
-in the bind:
-
-| Measure | Before "Body thickness" | Before | After |
-|---|---|---|---|
-| Mean turn down, rest z 0.39 to 0.48 | 27° to 29° | 34° to 42° | 25° to 29° |
-| Faces down by more than 30° | 3 of 40 | 17 of 38 | 4 of 38 |
-
-The weights, the bones, the UVs, and the seat height stay. In the moments of "Arm twist", each
-part of each arm takes 41.6° or less.
-
-**Eye size.** In the front head view, the eye opening was 0.206 of the head width and 0.140 high,
-against 0.198 and 0.170 in a level render of the source mesh, 0.171 and 0.150 on the reference
-sheet (`fox-front.png`), and 0.091 and 0.143 for the bead eyes of the fox of main. The reference
-is about 0.85 of the source size. The size made the eyes look glassy, together with the two painted
-lights and the soft light of the eye light, which reads as a third light. A point edit in the live
-Blender (`eye_scale.py` of the session) scales each eyeball about the middle of its sphere by 0.85
-(radius 0.02176). Each other vertex of its side within 0.060 units of the middle, except the
-whiskers and the nose, moves toward the middle by the factor 0.85 up to 0.030 units and a
-smoothstep back to 1 at 0.060 units. The socket and its lining shrink with the ball, so no gap or
-dark ring shows. The lids of "Lids" are made again with the same steps at the radii 0.0255 and
-0.022525 (0.030 and 0.0265 times 0.85), with the angle 126° and the same hinge axes. In the 21
-steps of the blink, no lid point leaves the head, the open lid lies at least 0.0158 units under the
-skin, and the lower strip of the closed lid lies under the head. The eye axis stays (2.3° and 2.6°
-from the open eye axis), and the eye light gives the same soft highlight. The eye opening is now
-0.173 of the head width.
-
-**Longer legs and texels.** The edit of "Longer legs" kept the UVs, so the texels of the legs
-stretch along the leg by the scale of that edit: at most 1.24 (24 %), in the band from the ankle
-to the hip. Of the 447 faces that changed form, 111 stretch by more than 1.2 and 140 by more than
-1.1. The leg faces have a median stretch of 1.20. Across the leg, the scale stays 1.0 (0.986 to
-1.0).
-
-**Whiskers.** The 30 faces of the 6 whisker strips have the face attribute `plain`, so that the
-whiskers keep their face colors. The gloss nose keeps its color too.
-
-**Wrist bands.** The paw turn of "Arm twist" joined each turned paw to the forearm with 10 new
-quads that kept the UVs of the old band (faces 4034, 4035, 4038, 4046, 4163, 4170, 4536, 4542,
-4545, 4554 on the left, and 2082, 2084, 2092, 2120, 2125, 2126, 4679, 4688, 4694, 4700 on the
-right). The UVs of the far ring then met the UVs of the turned paw, 4 and 2 ring steps away: a UV
-gap of 0.30 on average at that ring. A point edit in the live Blender gives each band face the
-planar projection of its corners on its own plane (u along the rest forearm axis, v along the
-normal × the axis), at 0.91 UV for each unit (the median density of the faces next to the bands),
-about the clean dark patch at UV (0.3164, 0.3633). The patch is 128 pixels wide in the 4096
-source, with the mean sRGB (71, 35, 16) and a deviation of 1.5: the faces next to the bands are
-about (70, 34, 15). No band face is flipped in UV. The seams of the map, as the mean sRGB
-difference of the texels just inside the two faces of an edge, in steps of 255:
-
-| Edges | Mean | Largest |
-|---|---|---|
-| UV seams of the FBX on the forearms and the paws | 2.2 | 25 |
-| Wrist bands, the old UVs (left, right) | 3.9, 3.1 | 18, 20 |
-| Wrist bands, the patch (left, right) | 4.0, 4.0 | 15, 17 |
-
-A UV seam stays at each end of a band: no UV map can join the forearm and a turned paw, because
-the paw turns its UV island with it. The patch takes the band off the islands of the FBX and the
-orange edges of the socks, and the color step at each end is at the level of the seams of the FBX.
-
-**Tan color map.** The tan fox (the flutes) shares the body and shows its own map,
-`tripo-hand/fox-tan-color.webp` (`paletteMaps` of the `ANIMALS` entry of the fox,
-`StudioTexture.palettes`). The script `tools/fox-maps.py` makes it from the source image and
-the rig file:
+**Color map.** `tools/fox-maps.py` writes `fox-color.webp` and `fox-tan-color.webp` from the
+source map and the rig file:
 
 ```text
 uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 ```
 
-It scales the source as `fox-color.webp`, and moves each texel in Oklab: the orange fur (sRGB 220,
-98, 12) to `TAN_FUR` (Oklab L 0.80, C 0.10, h 75), and the dark socks (73, 37, 17) to (143, 102,
-62). The sock target has the Oklab hue and chroma of the tan accent `#9a7148` of
-`SPECIES_COLORS['fox-tan']`, and the Oklab lightness that the tan palette of the faces gives the
-socks (`paletteMap()`: 153, 97, 49). The cream, the muzzle, the white, and the black keep their
-colors.
-Each texel takes a mix of the steps of these anchors and of the anchors at 1/3 and 2/3 of each
-blend of the map (orange to cream, socks, white, and muzzle, and socks to black), by its nearness
-to each (Gaussian, 0.06 in Oklab). The hue step of an anchor shrinks with the chroma of the texel,
-so a gray texel does not turn blue. The texels of the eyeball triangles (`ownEyes` of the rig
-file) and 4 texels around them keep their colors. Run it again after each export that changes the
-UVs or the eyes.
+It moves the orange fur of the red map to Oklab L 0.44, C 0.16, h 54 (`RED_FUR`), and the socks
+from sRGB (76, 46, 23) to (34, 20, 11), and the tan fur to L 0.68, C 0.11, h 68 (`TAN_FUR`) and the
+tan socks to (143, 102, 62). The anchors are the median colors of the regions of the source map.
+Only the texels of the limbs and of the head take the step of the socks: the map shades the middle
+of the belly with a brown near the socks. The sock edges stay where the map paints them, now
+sharp: on the thigh at 0.86 of the way from the hip to the knee, and on the forearm at 0.35 of the
+way from the elbow. The map paints no light brow spot, so no brow fill. The median Oklab L, C, and h
+of the fur in the hall view (the key light from the back, no fill light, a fixed camera at the
+first seated red fox of `mozart-k191` and the tan fox of `mozart-k315`, `--pause --no-fill
+--time 6`):
 
-| Item | Value |
-|---|---|
-| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 111,852 bytes, SHA-256 `a1b6c20d56db15790c31fdfe221b899c17d6db85a731166db35fa5e96363244f` |
-| Origin, license | As `fox-color.webp` |
-
-Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
-
-**Tan fur lightness.** The light of the app makes the smooth body darker and warmer than its map.
-The median Oklab L, C, and h of the tan fur in the 3/4 app view (`close-views play --demo
-mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6 --size 2880x1800`), at the chest side,
-the upper arm, the thigh, and the head top:
-
-| Fur target of the map (Oklab L, C, h) | App L | App C | App h |
+| Fur | Before | After | Fox of main |
 |---|---|---|---|
-| 0.628, 0.077, 71.7 (sRGB 166, 129, 83, the lightness of the tan palette) | 0.517 | 0.094 | 52.8 |
-| 0.76, 0.077, 71.7 | 0.605 | 0.096 | 54.7 |
-| 0.805, 0.082, 75 | 0.637 | 0.098 | 55.9 |
-| 0.80, 0.088, 77 | 0.634 | 0.099 | 56.5 |
-| 0.80, 0.10, 75 (`TAN_FUR`) | 0.636 | 0.102 | 56.0 |
-| Tan fox of main | 0.634 | 0.102 | 57.1 |
+| Red fur (L, C, h) | 0.558, 0.127, 43.0 | 0.533, 0.131, 39.1 | 0.519, 0.129, 39.7 |
+| Red socks (median sRGB) | 114, 60, 31 | 65, 35, 20 | 24, 9, 5 |
+| Tan fur (L, C, h) | 0.725, 0.109, 56.6 | 0.681, 0.111, 54.2 | 0.593, 0.102, 54.7 |
 
-The red map stays byte-identical.
+The red before is the target of the first fox (L 0.485, C 0.155, h 58). The tan before is its
+target (L 0.75, C 0.105, h 72).
 
-**Normal map.** The app tilts the normals of the fur faces of the candidate with the normal map of
-the Tripo FBX (design 4.5, fur shading). The map uses the UV map of the FBX, as the color map does.
-The red fox and the tan fox share it: the tan map has the same UVs and strands. The checks of the
-source:
-
-- Tangent space: the mean normal is (0.00, 0.00, 1.00), and 2 texels of 16.8 million have z < 0.
-- Green of OpenGL (+y up in the image): on the UV seams of the FBX mesh, the two faces of an edge
-  decode normals with a median gap of 37.7° with this sign, and 41.6° with the other sign (2,077
-  samples with a tilt of 0.03 or more). The same test gives 27.9° and 29.6° on the rabbit, whose
-  map is OpenGL.
-
-| Item | Value |
-|---|---|
-| Source | `tripo-p2/fox.fbm/fox_normal.jpg` (above) |
-| Steps | Limit each x, y tilt to the length 0.2 (1.14 % of the texels: the baked eye rims, the nose, and the ruff spikes of the source mesh). Box scale to 1024 × 1024. Store x and y times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`) in red and green, and 255 in blue, which the shader does not read. No stored value clips |
-| `fox-normal.webp` | `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0): 23,746 bytes, a7fd95740cab76b4f579daf3719b6b2afb997634292d68e58cf1cbaea997d079-256 `a7fd95740cab76b4f579daf3719b6b2afb997634292d68e58cf1cbaea997d079` |
-| Origin, license | As `fox-color.webp` |
-
-The tilts of the source are small (median 0.0055, 99th percentile 0.24).
-
-**Fur sheen.** The sheen of the fur falls with the linear luma of the fur color below
-`FUR_LOOK.sheen.fullLuma` (design 4.5). The map paints the orange fur at a linear luma of 0.24,
-the same as the orange of the reference sheet (sRGB 208, 107, 43). With the full sheen on all fur,
-the dark socks of the red fox read cream: their median luma in the rest views at zoom 1 is 90 in
-the front view and 56 in the left view, against 59 and 23 with no sheen. With the scale they are
-63 and 25, and the orange fur keeps a sheen of 7 to 9 levels. The scale changes 0.2 % of the pixels
-of the rest views of the rabbit candidate by 8 levels or more (at most 0.66 %, in the 3/4 view), at
-the outline and the inner ears. Thus the scale stays.
-
-**Lids.** A scripted edit in the live Blender adds a lid to each eye, as a separate part, as the
-rabbit candidate has them. The mesh has no open socket: the head surface cuts each ball at about
-45° from its axis. In the hinge frame of each eye, g is the mean direction of the ball points that
-a ray from outside the head reaches (the open eye, left (0.4106, -0.9117, 0.0136)), u is +Z made
-square to g, and h = u × g is the hinge axis (left (0.911803, 0.410628, 0), right (0.913696,
--0.406399, 0)). A lid point has the angle psi from g toward u and the angle lam toward h: the
-direction cos(lam) (cos(psi) g + sin(psi) u) + sin(lam) h, from the middle of the sphere of the
-ball (left (0.039081, -0.112353, 0.865869), radius 0.025605; the ball reaches at most 0.02579).
-
-1. Each closed lid spans psi from -60° to 60° in 12 steps and lam from -64° to 64° in 12 steps, at
-   the radius 0.030. An extra row at psi -60° and the radius 0.0265 makes a strip at the lower edge
-   that turns in toward the ball. Thus 14 × 13 vertices and 156 quads on each side, with outward
-   normals.
-2. The file holds the open lid: each point turned up by 126° about h. The property `lids` of the
-   armature holds `angle` 2.199115 (126°) and the axis h of each side. A turn by +126° about h
-   closes the lid.
-3. Each lid face takes the slot `fur`, flat shading, the face colors `color` and `color_base` of
-   the orange fur (sRGB 220, 98, 12), and the face attribute `lid`.
-4. Each lid corner takes the UV of the planar projection of its closed point on the plane of h and
-   u, at 0.88 UV for each unit (the median density of the fur faces 0.036 to 0.05 units from the
-   middle), about the clean fur patch at UV (0.2227, 0.8477) of `fox-color.webp`, above and out
-   from the right eye. The patch is 96 pixels wide at 2048, with the mean sRGB (220.1, 99.5, 12.4)
-   and a deviation of 2: the fur next to each socket is about (222, 101, 13).
-5. Each lid vertex takes the row `head` 1 with `sa.set_weight_row()`. `pnpm studio-body` moves it
-   onto the eye bone of its side.
-
-The values come from ray casts from the middle of the ball against the head. In 21 steps of the
-blink, no sample of the open lid, of a side edge, or of the back edge lies outside the head, and
-the lower strip of the closed lid lies under the head. The open lid lies at least 0.0147 units
-under the head surface. The radius 0.030 covers the dark lining faces of the socket (0.024 to 0.028
-units from the middle).
-
-**Eye corners.** The color map paints a pale wet line on three socket lining faces (3626, 2628,
-2507) and a pale wedge on two eyeball faces (2510, 2551) at the eye corners. In the app light they
-showed as a light streak under each eye, which can read as a tear. A point edit gives these five
-faces the planar projection of their corners on their own plane, at 0.73 UV for each unit, about
-the dark lining patch at UV (0.9848, 0.8009) (sRGB about 20, 10, 5), which the upper lining faces
-use. No other UV changes.
-
-**Eye light.** `eyeBallsOf()` takes the axis of each eye from the vector area of its eyeball
-triangles. Each eyeball of the source is a closed ball, so the vector area was zero, and the axis
-pointed to the side (left) or up and back (right): the eye light gave no highlight (the same
-pixels with the eye light off). A point edit deletes the 8 faces of each ball whose corners all lie
-more than 135° from g (faces 1164 to 1171, 3746, 3754 and 607 to 614, 2675, 2685, and one vertex on
-each side): they lie deep in the head. The axis is now 2.3° (left) and 2.6° (right) from g, and the
-middle of the sphere moves by less than 1e-5 units. Each ball keeps 52 faces and 51 vertices.
-
-**Arm girth.** In the hall view the arms read thin. Sections across the upper arm and the forearm
-of the seated bind of each rig file (`arm_girth.py` of the session, `bmesh.ops.bisect_plane()` at
-shares t of each bone from its head), the girth as a share of H:
-
-| Part, t | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 |
-|---|---|---|---|---|---|---|---|
-| Upper arm, before | 1.10 | 1.06 | 1.03 | 1.00 | 0.95 | 0.89 | 0.85 |
-| Upper arm, after | 1.43 | 1.43 | 1.41 | 1.38 | 1.34 | 1.29 | 1.22 |
-| Upper arm, fox of main | trunk | trunk | 1.47 | 1.38 | 1.37 | 1.33 | 1.27 |
-| Forearm, before | 0.91 | 0.89 | 0.84 | 0.80 | 0.76 | 0.73 | 0.70 |
-| Forearm, after | 1.03 | 0.99 | 0.94 | 0.89 | 0.83 | 0.75 | 0.70 |
-| Forearm, fox of main | 1.05 | 1.00 | 0.95 | 0.90 | 0.86 | 0.82 | 0.79 |
-
-A point edit in the live Blender (`foxr12.arm_scales()` and `arm_moves()` of the session) scales
-each of the 26 edge rings of 10 vertices of each arm (x 0.0813 to 0.2976) about its center, in the
-plane of the ring (the in-plane part of each vertex from the center times s). The trunk loop at
-x 0.073 and the paws stay. s is the ratio of the girth of main to the girth of the ring, smoothed
-three times by (1/4, 1/2, 1/4) over the rings, then faded to 1 by a smoothstep into the shoulder
-(x 0.073 to 0.10) and into the wrist (x 0.268 to 0.2976). The left values serve both sides. From
-the shoulder to the wrist:
-
-```text
-1.022 1.118 1.241 1.295 1.335 1.36 1.373 1.386 1.408 1.436 1.454 1.442 1.386
-1.3 1.221 1.17 1.141 1.123 1.112 1.108 1.108 1.109 1.096 1.064 1.028 1.0
-```
-
-500 vertices move, at most 0.0143 units. The basis and the key `bind_belly` take the same moves.
-The bones, the weights, the palm hints, and the paw turns stay. In the moments of "Arm twist",
-each part of each arm takes 41.6° or less, and each paw still closes on the bow, the violin neck,
-and the flute.
-
-**Head size.** In the hall view the head read small against the body. The fox of main grows its
-head in its rig: its eyes take the shown head height 0.382 m (`StudioEyes.headHeight`), against
-H 0.323 m of the candidate. A point edit in the live Blender (`foxr12.head_scale(1.2)` of the
-session) scales the head about the head joint (0, -0.05, 0.7706):
-
-```text
-vertex: P += w (s - 1) (P - joint),  s = 1.2,  w = its share of head + ear_L + ear_R (at most 1)
-bones head (tail), ear_L, ear_R (head and tail): p = joint + s (p - joint), with the same roll
-headCeiling: 0.7706 + s (0.9746 - 0.7706) = 1.0154
-```
-
-2,080 vertices move (1,327 with w 1, 753 with a share), at most 0.0595 units. The basis and the key
-`bind_belly` take the same moves. The ears, the eyeballs, the lids, the whiskers, and the muzzle
-scale with the head, and the neck fades with the weights. The lid turn and the lid axes stay,
-because a scale keeps each direction. A lineup of 1.0, 1.1, and 1.2 in the hall view put 1.2 nearest
-to the head of main. The close views of both roles of the final file (front, left, right, and 3/4 of each
-moment, and the back of the violinist, with `PROBE_NO_CACHE=1`) show no clip at the chin rest, the bow, or the flute.
-
-| Scale | H of `pnpm studio-body` |
-|---|---|
-| 1.0 | 0.322998 m |
-| 1.1 | 0.354846 m |
-| 1.2 (the file) | 0.386694 m |
-
-The ray casts of the blink give the same counts as before: no open lid point outside the head.
-With the larger H, the rest values of `FOX_FLUTE` (`src/pose/winds.ts`) in H take 0.835 times
-their values, so the rest stays in meters: with the old values, the right forearm of the flutist
-twisted 47° at rest. In the moments of "Arm twist", each part of each arm of the violinist takes
-40.2° or less, and of the flutist 44.3° or less (the right forearm of the standing flutist).
-
-**Calm eyes.** In the 2x face crops of the hall light (`reports/2026-11-09-fox-hand-r12/`, which git
-ignores), four parts of the face read worried: the light spots above the eyes as raised inner brows
-("Brow spots" below), the dark upper eye line that slopes down at the outer end, the pupil high in
-the opening, as in a look up, and the large eye. A point edit in the live Blender
-(`foxr12.apply_face(roll_deg=12, iris_deg=10, eye_f=0.75 / 0.85, r_in=0.036, r_out=0.072)` of the
-session), about the middle c of each eyeball (a sphere fit, (±0.0469, -0.12483, 0.88492)), in this
-order:
-
-1. Size: the eyeball and the lid scale about c by 0.882 (the eye 0.75 of the source size, 0.85
-   before). Each other vertex of the side, except the whiskers and the gloss nose, moves toward c by
-   the same factor up to 0.036 units from c, and by a smoothstep back to 1 at 0.072 units.
-2. Iris: the eyeball alone turns 10° down about the lid hinge axis h, through c.
-3. Roll: the eyeball, the lid, and the skin turn 12° about the eye axis g (h × +z), through c, so
-   that the outer end of the upper eye line goes up. The skin takes the full turn up to 0.036 units
-   from c and a smoothstep to 0 at 0.072 units.
-
-885 vertices move, at most 0.0085 units. The basis and the key `bind_belly` take the same moves. The
-property `lids` keeps the angle 2.199115 and takes the turned axes: left (0.891878, 0.401655,
-0.207912), right (0.893729, -0.397519, -0.207912). The ball radius is now 0.02304. In the 21 steps
-of the blink the ray casts give the same counts as before the edit, with no open lid point outside
-the head, and the blink and the soft highlight of the eye light show in the app. A lineup in the
-hall light (`lineup-face.png` of the report): the brows painted, then the roll 12° and the iris
-10°, then the eye 0.75 and 0.65, and the roll 20° with the iris 6°. The eye 0.75 read the most calm
-and happy: the pupil looks forward, the upper line is level, and the eye is nearer the bead eyes
-of the fox of main. At 0.65 the eye read small and squinted.
-
-**Brow spots.** The source map paints a light peach spot (sRGB about 200, 140, 90) above each eye,
-with a small dark dot. In the hall light the two spots read as raised inner brows. `tools/fox-maps.py`
-(`brow_fill()`) takes the triangles of the rig file whose middle lies near each spot: the spot
-middle is c + d (-0.205, 0.872, 0.836) in the axes of the rig file (x toward the middle plane), d the
-distance of the eye from the middle plane. In the inner sphere (radius 0.5 d) each texel more than
-0.04 from the source orange in Oklab, and in the outer sphere (0.7 d, grown by 2 texels) each such
-texel lighter than the orange, takes the median color of the other texels of its part of the map.
-About 5,200 texels move, before the color steps of each map.
-
-**Sock edges.** The source map fades the dark socks up over most of each leg and each forearm. In
-the hall light the legs read dirty. `tools/fox-maps.py` (`sock_edges()`) makes a place map of the
-seated bind from the triangles of the rig file, and gives each texel within 0.075 units of a limb
-bone a target: the fur (thigh, upper arm), the sock (foot, paw), or on the shin and the forearm a
-step at 0.45 of the shin from the knee and at 0.4 of the forearm from the elbow, 0.04 of the bone
-wide. The fox of main has its forearm edge at the same place (sections of the colors of
-`fox.rig.glb`). Each texel on the Oklab line from the orange (220, 98, 12) to the sock (73, 37, 17),
-within 0.05 of it, takes its target end of the line and keeps its small step along the line (up to
-0.12, by tanh) and its step off the line. Cream, white, and black texels keep their colors. Both
-maps take the edges.
-
-**Hall fur.** The real hall view of the app has the key light from the back and no fill light. In
-that view (a fixed camera at a seated red fox of `mozart-k191`, `--no-fill --pause`) the orange fur
-read brown. The median Oklab L, C, and h of the orange fur at the chest side, the upper arm, the
-thigh, and the head top (`furmeasure.py` of the session):
-
-| Red fur target (Oklab L, C, h) | Hall view | 3/4 view (`--azimuth 35 --zoom 1.3`, fill light) |
+| File | Size | SHA-256 |
 |---|---|---|
-| 0.42, 0.15, 52 (round 11) | 0.512, 0.130, 37.4 | 0.513, 0.128, 37.7 |
-| 0.47, 0.155, 57 | 0.549, 0.128, 40.5 | 0.555, 0.128, 40.6 |
-| 0.485, 0.155, 58 (`RED_FUR`) | 0.562, 0.128, 41.5 | 0.568, 0.127, 41.7 |
-| Fox of main | 0.561, 0.134, 40.0 | 0.555, 0.131, 40.3 |
+| `tripo-hand/fox-color.webp` | 129,072 bytes | `0ff7b981ad3cce6e2efb2f3d87ad5a3ebc60ffbd9e95785d2af46787b47ead63` |
+| `tripo-hand/fox-tan-color.webp` | 136,216 bytes | `60454e6f5235bee86ce05b93361da812642072d8af491ba27f63bfb6ec837468` |
 
-The two views move together, so one target serves both, and the hall view sets it. A larger
-chroma has no effect: the target lies just outside the sRGB gamut. The tan map takes `TAN_FUR`
-(0.75, 0.105, 72), because L 0.80 read near white in the hall view: the tan hall view goes from L
-0.649, C 0.101, h 56.5 to L 0.638, C 0.103, h 55.5.
+**Eyes.** The eye opening in the front head view is about 0.15 of the head width, against 0.14 on
+the reference sheet, so the eyes keep their size. With the full ring of white over the iris, the
+face read startled. A point edit turns the skin of each upper lid down about the hinge axis h of
+the lid through the middle c of the ball (the frames of the lids below): each head vertex of the
+side in front of the ball turns by 11° times ss(12°, 28°, psi) (1 - ss(60°, 85°, psi)) (1 -
+ss(1.5, 2.4, |P - c| / r)) (1 - ss(35°, 65°, |lam|)), with psi the angle up from the eye axis, lam
+the angle toward h, and r the ball radius. 67 vertices of each side move, at most 0.0091 units.
+The upper lid line now covers the top of the iris, as on the sheet, and the face reads calm and
+happy. A turn of 14° read sleepy.
+
+**Lids.** A lid on each eye, as the first fox has them: 14 × 13 points from psi -60° to 60° and lam
+-64° to 64° at 1.17 ball radii (r 0.0314), and a lower strip at 1.035 radii, 156 quads on each
+side, held turned up 126° into the head. The property `lids` holds the angle 2.199115 and the
+hinge axes, left (0.930453, 0.36641, 0) and right (0.946739, -0.322002, 0). The lid faces take the
+UVs of the clean fur patch at UV (0.8, 0.0701) at 0.88 UV for each unit, and the row `head` 1. In
+the 21 steps of the blink no open lid point, side edge, or back edge leaves the head, and the
+lower strip of the closed lid lies under the head. The eyeballs of the source are open at the
+back, so their vector area gives the eye axis of the eye light with no deleted face.
+
+**Normal map.** `tools/fox-maps.py` also writes `fox-normal.webp` from the normal map of the FBX:
+each x, y tilt limited to 0.2 (1.51 % of the texels), a box scale to 1024 pixels, the tilts times
+4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`) in red and green, 255 in blue, and `cwebp -q 60
+-sharp_yuv -m 6` (libwebp 1.5.0). The mean normal of the source is (0, -0.005, 0.991), and 4 texels
+have z below 0. The red fox and the tan fox share it.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/fox-normal.webp` | 25,336 bytes | `d7d5e8d96be5dbc79c71ff3b58591792f454093b3d111c565f479d43127ff45a` |
+
+### History
+
+The first Tripo P2 fox (FBX SHA-256 `db116e3197e4f68838268a7a9c2def02427863545d6692c4435f5aaec4ed0845`)
+took 12 rounds of edits in a live Blender: longer legs (1.24), smaller paws, a thicker trunk and
+arms, a head 1.2 times larger, calm eyes 0.75 of their size, and the hall colors. In the hall view
+it still read with a worried face, muddy brown fur, thin arms, a small head, too large paws and
+eyes, and a skinny body. The new mesh comes from a new, rounder turnaround sheet, and the steps
+above repeat that work on it in headless Blender. The old files are in the git history of this
+folder.
