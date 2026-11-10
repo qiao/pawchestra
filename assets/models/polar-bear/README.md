@@ -21,6 +21,10 @@ src/models/studio/polar-bear.ts            studio body of the app
 the app, so the tools take it for a hand rig (`handRigOf()` of `tools/glb-swap.ts`), and
 `pnpm rig-mesh polar-bear` stops.
 
+`tripo-hand/` holds a candidate body from a new Tripo P2 mesh (`tripo-p2/`, "Candidate hand rig"
+below). On the branch of the candidate, the `ANIMALS` entry of the polar bear points to
+`tripo-hand/polar-bear.rig.glb`.
+
 The older chain made `polar-bear-tpose.rig.glb` from `polar-bear-tpose.glb` with
 `tools/blender/polar_bear_arms.py`, `tools/blender/polar_bear_legs.py`, and
 `pnpm rig-mesh polar-bear`. Its files stay in the folder as unused files.
@@ -554,3 +558,223 @@ the same bytes.
 | Form | The mesh of `polar-bear.blend` in its seated bind. In the app, the seat top is 0.268 m high, and the fit of the bench is 0.244 m deep (`benchFitOf()`) |
 | Faces | 5,504 triangles, of them 76 gloss (the nose) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side, which the export calculates |
+
+## Candidate hand rig
+
+`tripo-hand/` holds a candidate body ("tripo-hand/polar-bear.blend" below): a hand rig of the
+Tripo P2 mesh `tripo-p2/polar-bear.fbx`, made by scripted point edits in a headless Blender 5.2.
+The arms keep the form of the source: no cut, no split from the trunk, and no stretch. On the
+branch of the candidate, the `ANIMALS` entry of the polar bear points to
+`tripo-hand/polar-bear.rig.glb`. The folder `tripo/` holds the source of the body of main and does
+not change.
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo-p2/polar-bear.fbx`, `tripo-p2/polar-bear.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+| `tripo-hand/polar-bear.blend` | Made from `tripo-p2/polar-bear.fbx` by the scripted edits below. License as the FBX file | None: edit it in Blender |
+| `tripo-hand/polar-bear.rig.glb` | Export of `tripo-hand/polar-bear.blend`. License as the FBX file | `pnpm rig-export polar-bear --blend assets/models/polar-bear/tripo-hand/polar-bear.blend --out assets/models/polar-bear/tripo-hand/polar-bear.rig.glb` |
+| `tripo-hand/polar-bear.rig.json` | Text summary of the export, for diffs | The same run |
+
+### tripo-p2/polar-bear.fbx
+
+A polar bear in a T-pose, made with Tripo P2: quad faces, and arm and leg tubes of 12 and 13
+vertices around. The FBX file keeps the quads.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan, and given on 2026-11-10. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object, with no armature and no animation. 3,124 vertices and 3,303 faces: 2,633 quads and 670 triangles (5,936 triangles), no n-gon. One UV layer |
+| Parts | 28 parts: the body (2,356 vertices, with the left eyeball joined to the head), the right eyeball (81 vertices), 10 claws of the paws (33 vertices each), 8 claws of the feet (6 of 33 and 2 of 32 vertices), and 8 small parts in the mouth (12 or 11 vertices). No vertices merge at 1e-5. The 258 open edges are 24 open loops: the 2 eye sockets (16 edges), the backs of the 2 eyeballs and 2 loops in the mouth (12 edges), and the bases of the 18 claws (8 edges). No edge has more than two faces |
+| Box | In the studio units (1 unit from the soles to the top of the skull): x ±0.5 (the claw tips) and depth ±0.1937. The bear faces -y in Blender. The left and right sides differ by up to 0.0174 units |
+
+The FBX file links its maps by the names of the zip file (`tripo_convert_<id>.fbm/<name>`). The
+folder `polar-bear.fbm/` keeps two of them under new names. The tools read the color map by its
+path (`texture` of `tools/mesh-rigs/simple/polar-bear-tripo.json`), so the import needs no map.
+
+| File | Name in the zip file | Size | Pixels | SHA-256 |
+|---|---|---|---|---|
+| `polar-bear.fbx` | `tripo_convert_32792d9d-b1a1-487a-bdf0-dd2f8864db79.fbx` | 209,916 bytes | | `1b829726961c32a7492f038191ea0aa7ce2cdb01473877c8bd42f0147f825482` |
+| `polar-bear.fbm/polar-bear_basecolor.jpg` | `tripo_rgb_39f82518-ff57-48f6-952a-e5fd6b722a43.jpg` | 3,474,466 bytes | 4096 × 4096 | `ed1e66c01e69c39d3fc563eac66d1f65e951505ab2e6882926842381ed1dd5cd` |
+| `polar-bear.fbm/polar-bear_normal.jpg` | `tripo_normal_4dbe5462-ccc8-4c1f-b543-8b5f1db1f917.jpg` | 1,637,842 bytes | 4096 × 4096 | `4ad49dc673365793f5ef42843703bece954babe2e5afaaaddbf09d91d9f6046a` |
+| Not kept | `polar-bear_metallic.JPEG` | 2,030,898 bytes | 4096 × 4096 | `bc85309489284514be6899a3c789dc0809ec5ca4669a791ea7260c51cd8fbfc6` |
+| Not kept | `polar-bear_roughness.JPEG` | 2,209,038 bytes | 4096 × 4096 | `5301d0dc4de1f7674fb7c27619a7fc760d69d70f73e32af8287032e0483e2ef6` |
+
+The color map paints a full eye on each eyeball: a dark brown ball, a black rim, and one white
+light. The fur is cream, the nose and the claws are near black, and the mouth is a dark line.
+
+### tripo-hand/polar-bear.blend
+
+The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"). Each edit is a script of a
+headless Blender 5.2 (`blender -b`) that opens the file of the step before it and saves a new
+file. The scripts lie in `scratch/polar-bear/` of the candidate worktree, which git ignores. Each
+item below gives the call and the values.
+
+| Item | Value |
+|---|---|
+| Size | 377,098 bytes |
+| SHA-256 | `0dfa8cbb18dbade48555f2630e3bebcaa6b2b40113c26b5c854a7fd8a46e16f0` |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the skull, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,320 vertices and 3,499 faces (2,829 quads and 670 triangles, 6,328 triangles), flat faces, and the surface of `sa.add_surface()`. 86 faces are gloss (the nose). The two eyeballs of the source (160 faces) have the face attribute `eye`. The UV map of the FBX |
+| Armature | `polar_bear_rig`: the 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, -y, to `digit5_<side>`), at the joints of `tools/mesh-rigs/simple/polar-bear-tripo.json`. The Action `bind` holds the seated bind of that config. The properties `palm` (0, 0, -1), `seat`, and `hinges` come from `sa.build_armature()` and the seat step |
+| Facts | `height` 1.487531 (the shoulder joints at 0.693 u, 2.14651 m for each unit, so that H is 0.422795 m, the H of the main polar bear), `crease` 55 |
+| Eyes | The eyeballs of the mesh, with no eye objects, so the app adds no bead eyes. The eyeballs have the color `#15110e` until the color map loads |
+
+The edits, in the order of the work:
+
+1. **Import.** `sa.import_source('assets/models/polar-bear/tripo-p2/polar-bear.fbx', 1e-5)`: no
+   vertex merges, 1 unit from the soles to the top of the skull, and flat faces (`a_rings.py`).
+2. **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
+   use_grid_fill=True)`) of the clean quad edge ring of 12 edges between each two of the 7 clean
+   arm loops at |x| 0.1662, 0.1981, 0.2292, 0.2574, 0.2911, 0.3263, and 0.3567 (`a_rings.py`).
+   Each arm now has 13 rings from x 0.166 to x 0.357, 0.016 units apart: 0.22 to 0.31 arm radii
+   (radius 0.074 at the root to 0.052 at the wrist).
+3. **Knee rings.** The same call on the clean leg bands of 13 edges between the leg loops at z
+   0.1267, 0.1640, and 0.1990. The knee joint is at z 0.164, with rings at z 0.127, 0.146, 0.164,
+   0.182, and 0.199.
+4. **Rings with no split.** These bands have no closed edge loop at their ends, at triangles and
+   poles, so they take no split: the arm root from the trunk to x 0.166, the wrist and the paw
+   from x 0.357, the leg bands below z 0.127 and above z 0.199, and the feet.
+5. **Surface.** `sa.add_surface(polar_bear, 'polar-bear',
+   'assets/models/polar-bear/tripo-p2/polar-bear.fbm/polar-bear_basecolor.jpg', eye_fans=False,
+   config=<polar-bear-tripo.json>)` (`b_rig.py`). 86 faces of the nose are gloss.
+6. **Eyes.** The right eyeball is a loose part of 81 vertices. Its mirror on the left side matches
+   81 vertices of the head exactly (largest distance 0). The 160 faces of the two balls take the
+   face attribute `eye` and the colors `color` and `color_base` `#15110e`.
+7. **Armature.** `sa.build_armature(config, rm)` and `sa.skin_mesh(polar_bear, rig, auto=True)`
+   (Automatic Weights, Limit Total 4, Normalize All). The hip joint lies at x 0.092 and the knee
+   at x 0.104: at x 0.10 and 0.101, the export stopped with "The bone thigh_L scales or shears".
+8. **Digits.** One bone for each claw of each paw, from the middle of the open base of the claw to
+   its farthest vertex, with the parent `fingers_<side>` and the roll of the palm (`sa.hint()`).
+   Each claw vertex takes the row {`digit<k>_<side>` 1}.
+
+The weights, in the rest pose, after the automatic weights:
+
+1. Arm rings: each of the 13 rings of each arm takes one exact row (`sa.set_weight_row()`). The
+   clavicle share is linear between (x, share) (0.146, 0.45), (0.166, 0.35), (0.182, 0.25),
+   (0.198, 0.17), (0.214, 0.07), (0.229, 0.02), and (0.243, 0). The elbow helper share is
+   0.75 (1 - |x - 0.258| / 0.07), at least 0. The wrist helper share is linear between (0.326, 0),
+   (0.341, 0.25), (0.357, 0.6), and (0.372, 0.75). The rest goes to the 4 roll segments of the
+   upper arm (x below the elbow joint at 0.258) or of the forearm: segment k takes the share at
+   (k + 0.5) / 4 of the part, with a linear ramp between two segments.
+2. Paws, by the place along the rest forearm axis (as the x of the axis point of the left paw):
+   0.362 to 0.38 {`wrist` 0.6, `hand` 0.4} (16 vertices on each paw), 0.38 to 0.425 {`hand` 1}
+   (82), 0.425 to 0.45 {`hand` 0.5, `fingers` 0.5} (100), and from 0.45 {`fingers` 1} (197).
+3. The claws of the feet take {`toes_<side>` 1}. The mouth parts and the eyeballs take {`head` 1}.
+
+The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
+weights. The trunk loop around each arm root keeps them too.
+
+**Form toward the main polar bear.** At the same H, the arms and the legs of the Tripo mesh were
+thicker than on the main polar bear, the paws longer and wider, and the eyes larger. `c_form.py`
+makes three point edits on the rest mesh, with the values (paw a, w, n) = (0.55, 0.6, 0.8), arm 0.87,
+thigh 0.93, shin 0.91, and eye 0.85:
+
+- Paws: each vertex past the wrist joint maps in the frame of its paw (origin the head of
+  `hand_<side>`, a the rest forearm axis, w the first principal axis of the paw across a, n =
+  a × w): P = c + 0.55 d a + (1 - 0.4 s)(v · w) w + (1 - 0.2 s)(v · n) n, with d = (P - c) · a and
+  s = smoothstep(0, 0.025, d). Each claw moves with the map of the middle of its base and scales
+  by 0.64 (the cube root of 0.55 × 0.6 × 0.8) about it. The bones `fingers_<side>` and
+  `digit<k>_<side>` take the map, and each paw bone keeps its turn in the bind
+  (`sa.set_world_turns()` after `align_roll()` to its hint).
+- Limb girth: each arm vertex moves toward the center line of the arm (a curve through the
+  middles of the arm loops) by the factor 1 - 0.13 f w, where w is its share of the arm segments
+  and the helpers, and f fades in from x 0.13 to 0.17 and out from x 0.36 to 0.40. Each leg vertex
+  moves toward the center line of the leg by 1 - 0.07 w_thigh - 0.09 w_shin, with the shin share
+  faded to 0 from z 0.09 to 0.06, so the feet keep their form. This is about 0.6 of the gap to
+  main, as for the legs of the Tripo fox.
+- Eyes: each eyeball scales by 0.85 about the middle of its fitted sphere ((±0.0343, -0.0913,
+  0.9243), radius 0.0117). Each head vertex within 0.03 units of the middle moves toward it by
+  0.85, with a smoothstep back to 1 at 0.06, so the socket shrinks with the ball.
+
+1,797 vertices move, at most 0.0595 units (the claw tips). The measures of the rest T-pose, as a
+share of H (sections across the bone at its middle, the thigh at 0.6 from the hip):
+
+| Measure | Before | After | Main polar bear |
+|---|---|---|---|
+| Upper arm girth | 2.25 | 2.00 | 1.79 |
+| Forearm girth | 1.85 | 1.61 | 1.46 |
+| Thigh girth | 2.94 | 2.75 | 2.58 |
+| Shin girth | 2.20 | 2.02 | 1.87 |
+| Paw length (wrist joint to claw tip), width, height | 0.66, 0.81, 0.43 | 0.37, 0.55, 0.37 | 0.33, 0.47, 0.34 |
+| Eye diameter (eyeball, or the bead eye of main) | 0.120 | 0.101 | 0.088 |
+| Head width, depth | 1.03, 1.59 | 1.03, 1.57 | 0.91, 1.42 |
+| Chest, waist, belly, hips width | 1.41, 1.39, 1.34, 1.35 | 1.40, 1.37, 1.34, 1.34 | 1.38, 1.36, 1.40, 1.41 |
+| Chest, waist, belly, hips depth | 1.33, 1.53, 1.72, 1.75 | 1.35, 1.54, 1.70, 1.72 | 1.36, 1.58, 1.65, 1.56 |
+
+The trunk agrees with main within 12 %, so it takes no edit. The head is 13 % wider than on main
+and stays: its height is H, and the head of the fox read too small at the H of main.
+
+**Smooth surface** (`d_smooth.py`):
+
+- One color for each region. The face colors of `add_surface()` took the shade that the color
+  map bakes. Each face now takes the color of its region, by the sRGB luma Y of its old color:
+  the fur (2,476 faces, sRGB 196, 164, 120, the face at 0.6 of the luma range), the dark mouth
+  line and socket lining (Y below 0.35, 124 faces, 43, 34, 26), the gloss nose (86 faces, 34, 25,
+  17), the claws (580 faces, 74, 61, 48), each at 0.2 of the luma range, and the mouth parts (73
+  faces, 228, 214, 188). The eyeballs keep `#15110e`. The color map of round 7 replaces these
+  colors after it loads.
+- Relax: ten Taubin rounds (0.5, then -0.53) of the uniform Laplacian over the edges of the body
+  part, with each move clipped to 0.01 units, move the vertices at most 0.01 units (mean 0.0022,
+  4 clipped). The eyeballs, the loose parts, the gloss nose, and the vertices of an open edge (the
+  eye sockets) stay.
+- Crease 55: the limb rings have 12 or 13 vertices, about 30° apart.
+
+**Seat** (`e_seat.py`, `f_height.py`). The leg turns of the config (`uv run --no-project --with
+numpy python -I tools/rig/leg_turns.py <config> 20 12 5`) turn each thigh to a slope of 20° below
+the horizontal and 12° out, and each shin 5° forward of the vertical, so that the knee angle from
+the side is 115°. Each foot keeps its turn in the world, so the sole stays flat. The leg bones
+take the world turns of `bind_turns()` of `rig_mesh.py` (`sa.set_world_turns()`, frame 1). The
+property `seat` is {`prop` `bench`, `front` -0.05, `back` -0.2, `halfWidth` 0.25}, as on the main
+polar bear. The relax moved the head top and the chin, so the fact `height` went from 1.499398 to
+1.487531 to keep H 0.422795 m.
+
+| Measure | Thighs 25° | Thighs 20° | Main polar bear |
+|---|---|---|---|
+| Seat top | 0.292 m | 0.267 m | 0.268 m |
+| Bench fit (`benchFitOf()`) | 0.188 m | 0.289 m | 0.244 m |
+
+The shin of the Tripo mesh is 22.3 cm, against 16.7 cm on main, so the thighs at 25° put the seat
+2.4 cm too high.
+
+**Bind supination.** The config turns the bind paw of the right arm 52° toward supination (the
+value of `pnpm bind-supination polar-bear` for the right arm), and the left paw 0°. The pianist
+paw twist p95 of the right arm goes from 72° to 23°. The left value of the tool (119°) is for the
+recast roles: for the pianist alone it makes the left paw twist larger (69° to 93°).
+
+**Belly** (`g_belly.py`). The thighs of the bind give the lower belly faces a slope down of up to
+43°. The key `bind_belly` relaxes the posed bind of 39 chosen vertices:
+
+```python
+import bind_edit as be  # tools/blender/
+# S: each vertex with rest z from 0.21 to 0.42, y below 0, atan2(|x|, -y) at most 60 degrees,
+# and a distance from the z axis below 0.2.
+# Each round: P[i] += 0.5 * ((mid - P[i]) . n[i]) * n[i] for each i in S at the same time.
+# mid: the middle of the mean of the edge neighbors above and the mean of those below (rest z
+# more than 0.01 apart). n: the vertex normal of the bind before the key. Four rounds.
+be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
+```
+
+The largest move is 0.0090 units, and the mean is 0.0036. The front faces of the lower belly
+point down by at most 37° (43° before): the 4 faces above 35° lie in the crotch between the
+thighs. No face points down by more than 45° (22 faces on the main polar bear).
+
+**Arm gate** (`pnpm arm-check pianist --base main`), the value and main in parentheses:
+
+| Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
+|---|---|---|---|---|---|---|
+| Left | 9 (9) | 41° (39°) | 34° (58°) | 69° (88°) | 37° (30°) | 7° (6°) |
+| Right | 17 (8) FAIL | 41° (38°) | 20° (27°) | 23° (37°) | 65° (40°) | 4° (4°) |
+
+Each skin twist of each arm part stays at 41° or less. The right folds come in the rest pose: the
+paw swing of 65° folds the inner right wrist, and thin triangles at the back of the right knee
+fold in the pedal pose. The elbow helper reach of 0.07 units (0.035 before) took the left folds
+from 13 to 9.
+
+The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/polar-bear.rig.glb` | 451,816 bytes | `2707612c1ba323bceaacf97d86b550131ee67ebebbac7f8b9840628856a4a078` |
+| `tripo-hand/polar-bear.rig.json` | 12,052 bytes | `b70045136035a028cb029ed91bd984e59c8d47dbc067b8af21004cb0a7276aab` |
