@@ -809,7 +809,10 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
   pose the arms hang nearly straight beside the round belly, with the elbows down and back
   (`restArm`, `restPoleL`, `restPoleR`). The elbow of a nearly straight hanging arm is ill defined,
-  so the conductor gives it a fixed direction.
+  so the conductor gives it a fixed direction. The search of the swing out to the side sees the
+  body only along x, so the rest arm starts the search at a larger swing and adds a small extra
+  swing (`restArm.minOut`, `restArm.extraOut`). Reason: with the swing of a standing player, the
+  search stops one upper arm early beside the round belly, and both elbows go into it.
 - **Bow.** At the song end, the bear bows to the orchestra (`END_BOW`).
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
   breath and a nod, as in a string quartet (`leaderOf()`, `LEADER_NOD`).
