@@ -1062,7 +1062,9 @@ Tripo map paints a tan bear with light claws, and the hall view sets the target,
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox, which `tools/fox-tan-map.py` makes from the map of the red fox. A species shows the
 map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus the
-tan fox never shows the red map.
+tan fox never shows the red map. The tan map takes the hue of the tan colors at the lightness of
+the tan palette of the faces: the lighter tan of the species colors read cream at the shoulder of
+the tone curve.
 
 Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
 faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`
@@ -1083,7 +1085,9 @@ faces keep the shared shading.
   the texture points have v from the top edge, so the y factor is negative. The web copy holds
   the tilts times `NORMAL_MAP_GAIN`, because the source tilts are near the step of 8 bits. The
   shader takes z = 1, because a stored z of 0 at a clipped tilt gave NaN pixels that the bloom
-  spread into black squares. A body with no normal map file keeps the normals of its mesh.
+  spread into black squares. A body with no normal map file keeps the normals of its mesh. A map
+  of a palette takes the normal map of the map of its body, because both have the same UVs and
+  strands.
 
 The fur of the candidate rabbit is near the shoulder of the tone curve, so the sheen adds little
 light at the outline. The color map already paints the strands, so the normal map adds little at
