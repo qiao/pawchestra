@@ -805,13 +805,11 @@ const SHOULDER_HOLD = {
  *
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
- * about 45° in each moment of the violinist and the flutist, so that the skin does not twist into a
- * thin neck. Thus the left paw tilts 20° over the neck (`tiltL`, 30° in the chin hold): with 30°,
- * the left arm turns 85° from its rest in the play, and each part takes about 43°. The left paw
- * turns -30° around the normal of the top plate at rest (`restYawL`): with no turn, the left arm
- * turns 94° from its rest at rest, and the forearm takes 50°. The right elbow points further out
- * at the frog, (2.4, -0.7, -1), and less down at the tip, (1, -0.5, -1): with (1.8, -0.7, -1) and
- * (1, -0.85, -1), the right forearm twists 46° to 54° in the play.
+ * 42° in each moment of the violinist and the flutist, so that the skin does not twist into a thin
+ * neck. The left paw tilts 20° over the neck (`tiltL`, 30° in the chin hold). The right elbow
+ * points further out at the frog, (2.4, -0.7, -1), and less down at the tip, (1, -0.5, -1). The
+ * left paw turns -45° around the normal of the top plate at rest (`restYawL`): with -30°, the left
+ * forearm twists 50° at rest, and with -45°, 34°.
  *
  * The string planes of the red fox stay 9° apart, and the stick leans 15°. A larger turn or tilt
  * folds the skin of the right arm of the fox mesh: the play folds in 21.7% of the samples at 17°
@@ -838,7 +836,7 @@ const FOX_HOLD = {
   rest: { ...LAP_VIOLIN, lap: { along: 0.8, offset: [0, -0.18, -0.2] } },
   liftReach: [-0.1, 0, -0.15],
   restPawTurnL: 25 * MathUtils.DEG2RAD,
-  restYawL: -30 * MathUtils.DEG2RAD,
+  restYawL: -45 * MathUtils.DEG2RAD,
   restGapL: -0.005,
   liftPoleL: null,
   restBow: {

@@ -601,15 +601,18 @@ export const WIND_HOLDS = {
  * elbow goes further into the side of the trunk.
  *
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
- * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
- * about 45° in each moment of the flutist and the violinist, so that the skin does not twist into
- * a thin neck. Thus the right paw points further up past the back of the flute (`aimSide` -0.85):
- * with -0.5, the right arm turns 14° further from its rest in the play, and the right forearm
- * twists 47°. The free left paw hangs with its palm to the front: with the palm toward the body,
- * the left arm turns 90° further from its rest at rest, and the forearm twists 90°. The rest
- * elbows point further back, (-0.3, -1, 0.7) and (0.6, -1, 0.8), so that each upper arm takes
- * about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left upper arm
- * rolls 45° and the right forearm twists 55°.
+ * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 42°
+ * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
+ * thin neck. The right paw points up past the back of the flute (`aimSide` -0.6), and the right
+ * elbow points a little further out in the play, (1.2, -1.4, -0.3), so that the paw bends 68° on
+ * the forearm and the forearm twists 41°: with -0.85 and (1, -1.4, -0.3), the paw bends 94°, and
+ * with -0.5, the forearm twists 56°. The fingers curl 90° and 85° around the flute (`gripCurl`):
+ * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The free
+ * left paw hangs with its palm to the front and a little toward the body, (0.1, 0.25, -0.96): with
+ * (0.484, 0.251, -0.838), the left forearm twists 48° at rest, and with the palm toward the body,
+ * 90°. The rest elbows point further back, (-0.3, -1, 0.7) and (0.6, -1, 0.8), so that each upper
+ * arm takes about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left
+ * upper arm rolls 45° and the right forearm twists 55°.
  *
  * The rest values in H (`restShift`, `restGripShiftR`, and the lap offset of `restFreeL`) keep the
  * rest of the arms in meters when the head of the body grows. They are the values of the head
@@ -622,14 +625,14 @@ const FOX_FLUTE = {
   lipShift: [0, -0.1, 0.125],
   play: fluteTurn(FOX_HEAD_TURN - FOX_FLUTE_BACK, 8),
   poleL: [-1, -1, -0.3],
-  poleR: [1, -1.4, -0.3],
+  poleR: [1.2, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
   restShift: [0.668, -0.758, 0.313],
   restPoleL: [-0.3, -1, 0.7],
   restPoleR: [0.6, -1, 0.8],
   restFreeL: {
     lap: { along: 0.45, offset: [-0.418, -0.459, -0.1] },
-    palm: [0.484, 0.251, -0.838],
+    palm: [0.1, 0.25, -0.96],
     fingers: [0, -1, -0.3],
     arc: [0.57, 0.04, 0.31],
     hang: {
@@ -639,11 +642,11 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.85],
+  aimSide: [0.5, -0.6],
   gripShiftL: [-0.04, 0, 0.04],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.376, -0.109, -0.067],
-  gripCurl: curls(115, 106),
+  gripCurl: curls(90, 85),
   gripAround: true,
 } as const satisfies WindHold;
 
