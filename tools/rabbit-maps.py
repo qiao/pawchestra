@@ -5,8 +5,9 @@
 # white, and the black keep their colors. Each texel takes a mix of the steps of the colors, by its
 # nearness to each color, so the blend between two colors stays smooth. The texels of the eyeballs
 # take the paint of a calm, natural eye: a sized iris with the radial texture of the source, a
-# small pupil, and an off-white sclera, looking at the viewer ("Pupils" of the README). The script reads the triangles,
-# the places, and the texture points of the eyeballs from the rig file (`ownEyes` of the export).
+# small pupil, and an off-white sclera, looking at the viewer ("Eyes" of the README). The script
+# reads the triangles, the places, and the texture points of the eyeballs from the rig file
+# (`ownEyes` of the export).
 # The normal map `rabbit-normal.webp` holds the tilts of the fur. The output depends only on the
 # input files and on cwebp 1.5.0.
 #
