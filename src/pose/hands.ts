@@ -257,7 +257,12 @@ export const HANDS_HOLDS = {
     // keys, in the air. The rest elbows point out and a little back: elbows that point out, 0.3
     // down, and 0.4 back put the forearms 3.5 cm and the upper arms 0.4 cm into the belly. At rest,
     // the right shoulder folds no face (13 before), and the left paw swings 57° from the straight
-    // paw of the source (73° before, `pnpm arm-check pianist`, limit 70°).
+    // paw of the source (73° before, `pnpm arm-check pianist`, limit 70°). The right paw turns in the
+    // plane of its palm only toward a baton (`palmTurnAngle()` of `models/studio-rig.ts`), so its
+    // rest fingers take the turn that the left paw gets there: they point down and back, 70° from
+    // the mirror of the left fingers in the plane of the palm. With the mirror, the right paw of the
+    // Tripo polar bear swings 65° from its bind and folds 17 faces of the inner wrist at rest, and
+    // with the turn 36° and 8 faces (`pnpm arm-check pianist`).
     restL: {
       kind: 'lap',
       lap: { along: 0.85, offset: [0.14, -0.05, -0.42] },
@@ -269,7 +274,7 @@ export const HANDS_HOLDS = {
       kind: 'lap',
       lap: { along: 0.85, offset: [-0.14, -0.05, -0.42] },
       palm: [-0.3, -0.6, 1],
-      fingers: [-1, -0.3, 0],
+      fingers: [-0.08, -0.84, -0.53],
       pole: [1, 0, 0.3],
     },
   },
