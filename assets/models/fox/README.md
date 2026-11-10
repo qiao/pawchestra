@@ -84,7 +84,7 @@ a supinated bind paw on each side (the role-neutral bind of design 4.4).
 ## Candidate hand rig
 
 `tripo-hand/` holds a candidate body ("tripo-hand/fox.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/fox.fbx`, made in a live Blender with no arm cut and no limb stretch. On the
+mesh `tripo-p2/fox.fbx`, made in a live Blender with no arm cut and no arm stretch. On the
 branch of the candidate, the `ANIMALS` entry of the fox points to `tripo-hand/fox.rig.glb`. The
 red fox and the tan fox share it.
 
@@ -124,18 +124,19 @@ nose is black.
 
 The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
 through the Blender MCP tools, in a scene `fox` of its own. The arms and the legs keep the form
-and the length of the source: no cut, no split from the trunk, and no stretch.
+and the length of the source: no cut, no split from the trunk, and no stretch, with one
+exception: the legs are longer for the seat height of the fox of main ("Longer legs" below).
 
 | Item | Value |
 |---|---|
-| Size | 441,781 bytes |
-| SHA-256 | `8ccf5065ff92735a9de5f5fbf795398f61e562fc94cad7b35a2aa3ce9f77fb8f` |
+| Size | 435,244 bytes |
+| SHA-256 | `df26df1d1721a67b8a1b22fbed4fcf206b97d91baf32e2f6fb3b6bd1606d7b14` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
-| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.929 ("Ear weights" below) |
+| Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
@@ -143,8 +144,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,488 bytes | `702682788eec6faf9dbc4d7588058755cc83ca66c627d6ecc6a440a53fa2b3b5` |
-| `tripo-hand/fox.rig.json` | 9,926 bytes | `a978126d4e303091c5b3534c2cc4c00c936c859f71949217f17e04ded7b11fd0` |
+| `tripo-hand/fox.rig.glb` | 570,504 bytes | `1e5f876cbe33641a710cb11884bd0a2d7eb469c61c05ce55ad9be40d5d2a983c` |
+| `tripo-hand/fox.rig.json` | 9,922 bytes | `d03ddcf3e5ed2bf28d6079d8c73b8a4b2177d40e9ef5f539984bdbb956d2af2c` |
 
 The edits, in the order of the work:
 
@@ -370,3 +371,55 @@ The largest move is 0.0087 units, and the mean is 0.0042. The move goes along th
 so the girth of each ring stays. The faces of the lower belly point down by at most 32° (43°
 before), and 6 of its 44 faces by more than 30° (12 before). The key `bind_belly` is the only key
 `bind*`.
+
+**Longer legs.** With the seat of "Seat", the seat height of the app was 0.236 m, against 0.270 m
+on the fox of main: the knee of the Tripo fox is low. The legs of the mesh are now longer, and the
+feet, the paws, the hips, the trunk, the tail, the arms, and the head keep their form and size.
+One scripted point edit in the rest pose (`stretch_legs()` of the live session) moves each vertex
+only along z, by the height z of its rest place:
+
+```text
+g(z) = z + (k - 1) G(z),  k = 1.24,  G(z) = the integral from 0 to z of b
+b(z) = 0 below z 0.07, a smoothstep up to 1 at z 0.10, 1 to z 0.25,
+       a smoothstep down to 0 at z 0.30, 0 above z 0.30
+vertex: z += (1 - t) (g(z) - z) + t * 0.0456,  t = its weight of tail + tail_tip (at most 1)
+```
+
+The scale along each leg thus goes smoothly from 1 at the ankle to 1.24 and back to 1 at the hip,
+so no ring spacing jumps. The x and the y of each vertex stay, so the girth of each leg stays.
+Each point above z 0.30 and the whole tail move up by 0.0456 units (the rigid part of the body).
+The bones take the same map (the tail bones +0.0456), with the roll of their hint on the thighs
+and the shins. The shape key `bind_belly` takes the same moves as the basis, so its moves stay.
+
+| Measure | Before | After |
+|---|---|---|
+| Thigh, hip joint to knee joint | 0.1157 units | 0.1398 units (+20.8 %) |
+| Shin, knee joint to ankle joint | 0.1151 units | 0.1367 units (+18.8 %) |
+| Knee joint (rest) | y 0.175 | y 0.1966 |
+| Hip joint (rest) | (0.058, 0.29, 0.055) | (0.058, 0.335514, 0.058) |
+| Shoulder joints (rest) | y 0.638 | y 0.6836 |
+
+The values in the paragraphs above are in the rest places before this edit: add 0.0456 to each
+height above z 0.30 (y in the config). The hip joint lies 0.003 units forward of its old place: at
+the mapped place, the rest frame of each thigh in the frame of the hips had an error of 4e-5 in
+Blender (float32), and the export stops above 1e-5 ("The bone thigh_L scales or shears"). A search
+of the nearest hip joint in steps of 0.0005 units gives the error 1.8e-6 in the rest and in the
+bind. The config `tools/mesh-rigs/simple/fox-tripo.json` holds the new joints and the leg turns
+of `leg_turns.py <config> 15 8 12` for them. The armature facts follow: `height` 1.043834 (the
+shoulder joints at 0.6836 units, the same 1.526966 m for each unit) and `headCeiling` 0.9746 (0.929
++ 0.0456), so H stays 0.322998 m. The weights stay: each vertex keeps its row, and the 20 vertices
+of the ear rows that the relax moved across the ear plane are the same before and after.
+
+**Seat after the longer legs.** The front edge of the seat moves forward with the knee:
+
+| Measure | Before | After | Main fox |
+|---|---|---|---|
+| Seat front (`seat`, config `chair`) | z 0.13 | z 0.145 | |
+| Seat height of the app | 0.236 m | 0.271 m (0.270826) | 0.270 m |
+| Thigh (hip joint to knee joint) over the seat | 67 % | 64 % | |
+| Front edge of the seat behind the knee joint | 0.056 m | 0.073 m | |
+| Hips in the bind | 0.310 units (0.473 m) | 0.356 units (0.543 m) | |
+| H | 0.322998 m | 0.322998 m | 0.322998 m |
+
+The thighs keep the slope of 15°, the shins lean 12° forward,
+and the soles stay flat. The standing flutist stands on its soles.
