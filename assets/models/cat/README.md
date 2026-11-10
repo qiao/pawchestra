@@ -595,3 +595,35 @@ leg radii.
 The values in the paragraphs above "Longer legs" are in the rest places before this edit: add
 0.03705 to each height above y 0.175 (studio y, Blender z), except the belly key, whose heights are
 after it.
+
+**Body thickness.** The trunk was much thinner than on the cat of main. `pnpm body-shape violist
+--base 3702dd30c` gives the width W and the depth D of the trunk of the seated bind at 10 heights
+from the seat top (0) to the neck joint (9), in cm (main / candidate):
+
+| Level | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|
+| W, main | 46.5 | 44.9 | 41.4 | 37.8 | 33.5 | 29.6 | 29.1 | 34.8 |
+| W, before | 39.8 | 35.4 | 31.9 | 29.2 | 27.1 | 26.2 | 30.3 | 32.1 |
+| W, after | 41.9 | 40.7 | 39.7 | 37.6 | 33.7 | 28.9 | 30.4 | 32.2 |
+| D, main | 35.0 | 34.9 | 34.1 | 32.3 | 31.2 | 30.5 | 30.4 | 27.8 |
+| D, before | 25.8 | | 25.8 | 25.6 | 25.9 | 28.1 | 29.9 | 23.0 |
+| D, after | 27.1 | 34.5 | 32.8 | 33.9 | 32.5 | 32.0 | 30.7 | 24.2 |
+
+(The probe finds no trunk loop at levels 0 and 1, and the tail joins the loop of D3 before the
+edit.) A point edit after the weights (`thicken_trunk()` of the session) scales each horizontal
+section of the rest about its middle: x by fw and z by fd, by the place u from the hips joint (0)
+to the neck joint (1), linear between the rows below. The middle z of a section lies on a
+quadratic fit in y of the middles of the trunk sections (z = 0.1008 y² + 0.0561 y + 0.0313), and
+the middle x is 0. Each vertex moves by its summed weight on `hips`, `spine`, `spine1`, `chest`,
+and `neck` (at most 1) times the move, so the joins to the arms, the head, the tail, and the legs
+fade with the weights.
+
+| u | -0.2 | 0 | 0.15 | 0.25 | 0.35 | 0.45 | 0.55 | 0.65 | 0.75 | 0.85 | 0.95 | 1.1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| fw | 1 | 1.15 | 1.2 | 1.27 | 1.32 | 1.3 | 1.27 | 1.22 | 1.12 | 1.0 | 1.1 | 1 |
+| fd | 1 | 1.25 | 1.3 | 1.4 | 1.35 | 1.3 | 1.26 | 1.2 | 1.09 | 1.02 | 1.2 | 1 |
+
+359 vertices move, at most 0.0312 units. The trunk takes the gap to main as the upper bound: the
+levels 3 to 8 are now within 6 % of main. The lower levels stay up to 1.3 times thinner in depth,
+because the lower belly carries thigh weights. The bones and the weights stay. The relax and the
+key `bind_belly` come after this edit.

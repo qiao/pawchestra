@@ -1,5 +1,5 @@
 {
- "sha256": "d1cb1cfb1e45cc63e04deac0a965ae8cb4679f526369c96b7c60f72d49e42674",
+ "sha256": "1496d4208cb51bb04cb0db3c5f1179cfbfe3cd5b71fc11252cb47402667787d9",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -466,15 +466,15 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.00376,
-  "arm_down_R": 0.00376,
-  "legs_straight_L": 0.052919,
-  "legs_straight_R": 0.049834
+  "arm_down_L": 0.003757,
+  "arm_down_R": 0.003754,
+  "legs_straight_L": 0.058597,
+  "legs_straight_R": 0.05362
  },
  "extras": {
   "seat": {
    "prop": "chair",
-   "top": 0.295305073261261,
+   "top": 0.29509782791137695,
    "front": 0.17139999568462372,
    "back": -0.09000000357627869,
    "halfWidth": 0.12999999523162842
