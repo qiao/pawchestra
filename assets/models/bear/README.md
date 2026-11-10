@@ -142,8 +142,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 361,103 bytes |
-| SHA-256 | `995a0d7b554c12c2ee1de147bbb6bf7c69cbccef4a2b0f01703437d183060662` |
+| Size | 361,101 bytes |
+| SHA-256 | `0a48cb52705abb10865857b3f6423b6df1ba63d3f39169b47515070b1bbf5cbc` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
@@ -156,8 +156,8 @@ The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 711,660 bytes | `4fcea8740d6c9b07c458031c5042a51027dcfdb8ede4c9ff2a24038feb7adb47` |
-| `tripo-hand/bear.rig.json` | 16,084 bytes | `9dccc5e529e3a40fed775cc0e570ade638d5c224a173cc897f704fcf46caee07` |
+| `tripo-hand/bear.rig.glb` | 711,660 bytes | `d3770e0b39a3963fa714cce28c0c143b680fb8bc9f1791cdb657796cc043b469` |
+| `tripo-hand/bear.rig.json` | 16,084 bytes | `1dc76c955a6ca532eb2dd89cd9aa33706670fd33f9fde2d06564c481063bbb27` |
 
 The edits, in the order of the work:
 
@@ -317,13 +317,14 @@ each arm part still takes 36.3° or less.
 
 **Color map.** The app shows the color map of the FBX on the candidate, in place of the face
 colors (design 4.5). `tools/bear-maps.py` writes it: a Lanczos scale of `bear_basecolor.jpg` to
-2048 pixels, then a move in Oklab of each texel of the fur triangles and of the muzzle triangles
-of the rig file (the region of a triangle is its face color). The lightness and the chroma scale
+2048 pixels, then a move in Oklab of each texel of the fur, the muzzle, and the claw triangles of
+the rig file (the region of a triangle is its face color). The lightness and the chroma scale
 by the ratios of the median source color of the region to its target, and the hue turns by their
 hue step, so each strand keeps its contrast. The gutters of the atlas take the fur step. The fur
 goes from sRGB (160, 87, 36) to the fur face color of the bear of main, (95, 60, 32), and the
-muzzle from (232, 152, 89) to the light muzzle of main, (234, 192, 148). The mouth line and the
-claws keep their colors. The eyes take the eye color of the app ("Eyes" below).
+muzzle from (232, 152, 89) to the light muzzle of main, (234, 192, 148), and the claws from
+(87, 58, 32) to the dark grey claw face color of main, (48, 46, 44), as the claws of the bear of
+main. The mouth line keeps its colors. The eyes take the eye color of the app ("Eyes" below).
 
 An offset step (the anchors of `tools/fox-maps.py`) did not work for the bear: the source belly
 and back are lighter than its sides, those texels took a part of the muzzle step, and the back
@@ -342,7 +343,7 @@ back), the median Oklab L, C, and h:
 | Bear of main | 0.477 | 0.090 | 49 |
 
 The face colors before the map loads take the median of the map in each region: fur (123, 72,
-31), muzzle (230, 184, 139), mouth (161, 83, 67), claws (80, 54, 32). The gloss nose takes the
+31), muzzle (230, 184, 139), mouth (161, 83, 67), claws (49, 46, 44). The gloss nose takes the
 near black of the nose of main, (24, 20, 18). 14 faces at the edge of the gloss nose (source luma
 100 or more, most on its right side) take the slot fur and the muzzle color, so the map paints
 them light and no dark wedge shows under the nose. The scale step needs the fur sheen of the
@@ -353,7 +354,7 @@ more. The images load after the first frame.
 | Item | Value |
 |---|---|
 | Source | `tripo-p2/bear.fbm/bear_basecolor.jpg` (above) |
-| `bear-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 109,396 bytes, SHA-256 `5cfc2618dba18691e8c36608409f34f9ab7a6178da8ecf3c9ff160acda927531` |
+| `bear-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 105,576 bytes, SHA-256 `b4fc7bddaae7fb10cdea19cdbae97941f9afd7880ae2c084425edf870e5f2ea9` |
 | Origin, license | As the FBX file |
 
 **Eyes.** The source paints a white ball with a black pupil and a white light on each eyeball.
