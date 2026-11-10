@@ -1062,11 +1062,14 @@ Tripo map paints a tan bear with light claws, and the hall view sets the target,
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
 the map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus
-the tan fox never shows the red map. Each map moves the orange fur of the source to a target color,
-so that the median fur of the 3/4 app view matches the fox of main: the red map to a darker
-red-orange (`RED_FUR`), and the tan map to a light tan (`TAN_FUR`). The source orange read pale
-peach, because the smooth body takes more light than flat faces. The tan socks keep the lightness
-of the tan palette of the faces.
+the tan fox never shows the red map. Each map moves the orange fur of the source to a target color
+for the hall view of the app, with the key light from the back and no fill light: the red map to
+a bright red-orange (`RED_FUR`) near the fox of main, and the tan map to a light tan (`TAN_FUR`).
+A darker red read brown in that light. The 3/4 view with the fill light stays near main. The tan
+socks keep the lightness of the tan palette of the faces. Both maps paint the light spots above
+the eyes over with the fur around them (`BROW_SPOT`), because they read as raised inner brows. Each
+leg and forearm gets a sharp edge between the fur and the dark sock (`SOCK_EDGES`), because the
+long fade of the source made the legs read dirty.
 
 Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
 faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`
