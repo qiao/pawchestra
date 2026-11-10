@@ -1182,6 +1182,16 @@ export const BOWED_HOLDS = {
  * In the rest pose, the top plate of the viola faces the front and 30° to the left, toward the
  * audience, as the bridge of a resting violin faces out (`docs/reference/string-technique.md`,
  * section 2.9). Thus the back of the viola does not face the audience.
+ *
+ * The arms of the hand rig of the Tripo P2 cat (design 4.4, "Hand rig") take each turn of the paw
+ * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
+ * about 45° in each moment of the violist, so that the skin does not twist into a thin neck. Thus
+ * the left paw tilts 55° over the neck (`tiltL`): with 45°, the left arm turns 3° further in the
+ * play. The left elbow points further out in the play, (-2, -0.8, -0.71), so that the upper arm
+ * takes 44° of the turn: with (-1, -1, -0.75), it takes 15°, and the forearm 90°. At rest, the
+ * left elbow points down and in, (0, -1, -0.6), so that the upper arm rolls the other way (-34°),
+ * and the left paw turns 45° around the normal of the top plate (`restYawL`): with the rest
+ * elbow and the turn of the mesh cat, the left forearm twists 117° at rest.
  */
 const CAT_HOLD = {
   ...BOWED_HOLDS.viola,
@@ -1191,8 +1201,8 @@ const CAT_HOLD = {
   reachL: 20 * MathUtils.DEG2RAD,
   headDrop: -15 * MathUtils.DEG2RAD,
   slant: 0,
-  tiltL: 45 * MathUtils.DEG2RAD,
-  poleL: [-1, -1, -0.75],
+  tiltL: 55 * MathUtils.DEG2RAD,
+  poleL: [-2, -0.8, -0.71],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   highTilt: 20 * MathUtils.DEG2RAD,
   poleR: [2, -0.3, -0.7],
@@ -1201,7 +1211,7 @@ const CAT_HOLD = {
   pluckSide: 0.1,
   reach: 36 * MathUtils.DEG2RAD,
   restPoleR: [0.9, -1, 0.2],
-  restPoleL: [-0.55, -1, -0.3],
+  restPoleL: [0, -1, -0.6],
   restPlace: 0.55,
   rest: {
     axis: LAP_VIOLIN.axis,
@@ -1211,7 +1221,7 @@ const CAT_HOLD = {
   liftReach: [-0.14, 0.29, -0.19],
   restCurlL: 115 * MathUtils.DEG2RAD,
   restPawTurnL: 42 * MathUtils.DEG2RAD,
-  restYawL: 10 * MathUtils.DEG2RAD,
+  restYawL: 45 * MathUtils.DEG2RAD,
   liftPoleL: [-1.2, -0.6, 0],
   restBow: {
     lap: { along: 0.6, offset: [0.4, 0.6, -0.05] },
