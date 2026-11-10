@@ -1,5 +1,5 @@
 {
- "sha256": "4ade5970430f377a990f290c431b910d784fe0b3a506ef010e2232114c97633e",
+ "sha256": "00b507fd7e243126034a58c0ed13536be53f315baf339a3854ea2d4efadbf943",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -57,7 +57,7 @@
     -0.045
    ],
    "vertices": 529,
-   "weights": "e387c2eeaedcb305"
+   "weights": "fc03d89d0c40d381"
   },
   "head": {
    "head": [
@@ -66,7 +66,7 @@
     -0.02
    ],
    "vertices": 1214,
-   "weights": "3362e6860d4fba4a"
+   "weights": "8c72047bd1249213"
   },
   "ear_L": {
    "head": [
@@ -74,8 +74,8 @@
     0.935,
     0.005
    ],
-   "vertices": 492,
-   "weights": "c1a5abc3f11e1c29"
+   "vertices": 378,
+   "weights": "1077c379d90aa435"
   },
   "ear_R": {
    "head": [
@@ -83,8 +83,8 @@
     0.935,
     0.005
    ],
-   "vertices": 495,
-   "weights": "a0da485aa1761484"
+   "vertices": 379,
+   "weights": "28de1f7e0db49eae"
   },
   "clavicle_L": {
    "head": [
@@ -92,8 +92,8 @@
     0.665,
     -0.02
    ],
-   "vertices": 306,
-   "weights": "fa5007fddb091df2"
+   "vertices": 253,
+   "weights": "b42ed63b94917e14"
   },
   "upper_arm_L": {
    "head": [
@@ -146,8 +146,8 @@
     0.665,
     -0.02
    ],
-   "vertices": 311,
-   "weights": "eaf0b585d0c57530"
+   "vertices": 255,
+   "weights": "da09cb5a33dfb1d4"
   },
   "upper_arm_R": {
    "head": [
@@ -282,7 +282,7 @@
     0.0
    ],
    "vertices": 59,
-   "weights": "3e3ac19312413b57"
+   "weights": "4f336e367fb50e70"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -372,7 +372,7 @@
     0.0
    ],
    "vertices": 57,
-   "weights": "8d1814666ec041c4"
+   "weights": "5e469cac8c22b458"
   },
   "upper_arm_seg1_R": {
    "head": [

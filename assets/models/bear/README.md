@@ -142,8 +142,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 369,807 bytes |
-| SHA-256 | `377884a4bdf402e2d91d915f2a1110b1f1774a0aed621c8cbae2a6a65d4e463c` |
+| Size | 367,357 bytes |
+| SHA-256 | `043568e5c32b8ffd9bfadade643280248d5d21e82f38c78bfa6c2730c5ac9afa` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
@@ -156,8 +156,8 @@ The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 712,416 bytes | `4ade5970430f377a990f290c431b910d784fe0b3a506ef010e2232114c97633e` |
-| `tripo-hand/bear.rig.json` | 16,157 bytes | `50be1a621a68403f716eff97e2343bb75450e47e13a0e4bfa057977bed41ef9d` |
+| `tripo-hand/bear.rig.glb` | 712,416 bytes | `00b507fd7e243126034a58c0ed13536be53f315baf339a3854ea2d4efadbf943` |
+| `tripo-hand/bear.rig.json` | 16,157 bytes | `27d425b5c3f78813e100aea570565b7cbc473a497950f3e93321e6e20faf5f49` |
 
 The edits, in the order of the work:
 
@@ -236,10 +236,30 @@ The weights, in the order of the work, in the rest pose:
      `fingers` share is 0.05 in the first band of 0.007, then 0.1 more in each band, and 1 from
      t 0.450.
    - Claws. Each paw claw takes one rigid row: the row of the skin vertex nearest to its root.
+6. Round 13 gives the throat under the muzzle exact rows {`head`, `neck`}
+   (`scratch/bear/r13_throat_rows.py`). The automatic rows of these thin faces had about 0.08
+   each of `ear_L`, `ear_R`, and `clavicle_*`, so they stayed behind the head in a large head
+   turn, and up to 14 faces folded in the lift. Each vertex with an ear or a clavicle share and
+   a head and neck share of 0.6 or more takes the row (1 - f) old + f {`head` 1 - n, `neck` n}
+   (267 vertices, the largest change 0.30):
+   - n is the neck share of the old head and neck ratio, times ss(0, 0.03, d), with d the
+     distance to the nearest of the 46 mouth vertices under the muzzle that follow only `head`
+     (|x| below 0.1, y below -0.12, z 0.79 to 0.87). With no fade, the faces between the mouth
+     and the throat took a step from {`head` 0.84, `neck` 0.16} to {`head` 1}, and 3 of them
+     folded in 1.4 % of the play.
+   - f = ss(0.745, 0.785, z) (1 - ss(0.85, 0.89, z)) (1 - ss(0.07, 0.10, |x|))
+     (1 - ss(-0.09, -0.06, y)), in the rest (Blender axes), so the chest, the cheeks, the sides
+     of the neck, and the back of the throat keep their rows.
 
-The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights. The
-lids take the row `head` 1 ("Lids" below). The file has no shape key, no key `bind*`, and no key
-`arm_raise_*`.
+   `pnpm fold-probe conductor` gives 30 folded head faces over all samples (4,473 before), and
+   no throat face folds: face 3774 folded in 5.5 % of the play and 15.1 % of the lift before.
+   The one head face left, 3548, lies at the left side of the neck near the clavicle (0.1 % of
+   the play), outside the rows. `sp.fold_faces(60)` on the lift of `bach-bwv1047` (wall 1.0 s
+   to 2.5 s) gives 0 throat faces, against 14 before.
+
+The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights,
+except the throat rows of step 6. The lids take the row `head` 1 ("Lids" below). The file has no
+shape key, no key `bind*`, and no key `arm_raise_*`.
 
 **Arm twist.** In the moments of the conductor, the roll of each upper arm skin (from the
 clavicle) and the twist of each forearm skin (from the upper arm) reached 108.7° (the right
