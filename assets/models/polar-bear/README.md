@@ -664,7 +664,8 @@ The weights, in the rest pose, after the automatic weights:
 3. The claws of the feet take {`toes_<side>` 1}. The mouth parts and the eyeballs take {`head` 1}.
 
 The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
-weights. The trunk loop around each arm root keeps them too.
+weights, except the back of each knee ("Knee rows" below). The trunk loop around each arm root
+keeps them too.
 
 **Form toward the main polar bear.** At the same H, the arms and the legs of the Tripo mesh were
 thicker than on the main polar bear, the paws longer and wider, and the eyes larger. `c_form.py`
@@ -759,6 +760,23 @@ be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
 The largest move is 0.0090 units, and the mean is 0.0036. The front faces of the lower belly
 point down by at most 37° (43° before): the 4 faces above 35° lie in the crotch between the
 thighs. No face points down by more than 45° (22 faces on the main polar bear).
+
+**Knee rows** (`h_knee.py`, after the belly key). At the back of each knee, the shin share of the
+automatic weights went from 0.38 to 0.63 between two rings 0.018 units apart. The pedal leg of the
+pianist bends the knee past the bind, and the faces between these rings turned over: 3 faces at
+the back of the right knee folded in each play sample of `pnpm fold-probe pianist`. Each vertex of
+a leg with a thigh + shin share T above 0.5 and a rest z from 0.13 to 0.207 takes an exact row
+(`sa.set_weight_row()`, 56 vertices):
+
+```text
+theta: the angle around the leg center line (the middles of the leg loops) from +y (the back)
+b = 1 - smoothstep(60, 100, theta) in degrees
+s = shin / T of the automatic row,  s_lin(z) linear from 0.80 at z 0.13 to 0.19 at z 0.207
+    (the mean s of the back vertices, theta below 30, at the two rings)
+row: thigh T (1 - s'), shin T s', s' = s + b (s_lin(z) - s); the other bones keep their shares
+```
+
+No knee face folds now in `pnpm fold-probe pianist`.
 
 **Arm gate** (`pnpm arm-check pianist --base main`), the value and main in parentheses:
 
