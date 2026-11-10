@@ -1,5 +1,5 @@
 {
- "sha256": "795b5f512f459d78afa4952cce4b0e3b722d22cee101920648ff89ad884a0618",
+ "sha256": "f13a0dcc2f4a0552473b1cca2d5fcc16c03f19cee1924f6cd64e24257516a41c",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -20,8 +20,8 @@
     0.35,
     0.065
    ],
-   "vertices": 192,
-   "weights": "cc798ada85a14b24"
+   "vertices": 194,
+   "weights": "1e7cf96eaa291820"
   },
   "spine": {
    "head": [
@@ -29,8 +29,8 @@
     0.430025,
     0.062777
    ],
-   "vertices": 136,
-   "weights": "6d51c5b61f315833"
+   "vertices": 135,
+   "weights": "1045fb54f0e85181"
   },
   "spine1": {
    "head": [
@@ -39,7 +39,7 @@
     0.061553
    ],
    "vertices": 160,
-   "weights": "e6a970e503f55283"
+   "weights": "6f2f27366a957a35"
   },
   "chest": {
    "head": [
@@ -48,7 +48,7 @@
     0.059637
    ],
    "vertices": 175,
-   "weights": "ee8bddcc9b6a10f8"
+   "weights": "ef075e009ed5f8e1"
   },
   "neck": {
    "head": [
@@ -57,7 +57,7 @@
     0.044055
    ],
    "vertices": 558,
-   "weights": "00e32e4f39572a02"
+   "weights": "bb353ed306bf48f0"
   },
   "head": {
    "head": [
@@ -93,7 +93,7 @@
     0.053519
    ],
    "vertices": 188,
-   "weights": "4d366d9c70cb452c"
+   "weights": "e9a2184fe0640e21"
   },
   "upper_arm_L": {
    "head": [
@@ -147,7 +147,7 @@
     0.053519
    ],
    "vertices": 195,
-   "weights": "9c35c3870acba555"
+   "weights": "a3c4455d28e27398"
   },
   "upper_arm_R": {
    "head": [
@@ -200,8 +200,8 @@
     0.320064,
     0.066956
    ],
-   "vertices": 209,
-   "weights": "64f8107de1aefd5f"
+   "vertices": 207,
+   "weights": "1ce2692e5f658e9f"
   },
   "shin_L": {
    "head": [
@@ -210,7 +210,7 @@
     0.215923
    ],
    "vertices": 178,
-   "weights": "6965adb5f637fa12"
+   "weights": "5585832f88b360b8"
   },
   "foot_L": {
    "head": [
@@ -236,8 +236,8 @@
     0.320064,
     0.066956
    ],
-   "vertices": 207,
-   "weights": "b4afa53f100195b8"
+   "vertices": 208,
+   "weights": "a52a7ba58ed46faf"
   },
   "shin_R": {
    "head": [
@@ -246,7 +246,7 @@
     0.215923
    ],
    "vertices": 178,
-   "weights": "d4a06abef1ab3750"
+   "weights": "0899245b0d6ac607"
   },
   "foot_R": {
    "head": [
@@ -272,17 +272,17 @@
     0.424418,
     -0.02304
    ],
-   "vertices": 170,
-   "weights": "54cca7bedd3daf05"
+   "vertices": 125,
+   "weights": "671fcf9a3e8375fb"
   },
   "tail_tip": {
    "head": [
-    0.052391,
-    0.392984,
-    -0.232601
+    0.021737,
+    0.33747,
+    -0.075208
    ],
-   "vertices": 176,
-   "weights": "b74524a4d6549895"
+   "vertices": 218,
+   "weights": "e5736f97bb8e57bc"
   },
   "upper_arm_seg0_L": {
    "head": [
@@ -291,7 +291,7 @@
     0.051683
    ],
    "vertices": 84,
-   "weights": "cdd1d58920d42be9"
+   "weights": "ed941be00b4a3ccb"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -300,7 +300,7 @@
     0.06581
    ],
    "vertices": 77,
-   "weights": "a294a088a5693085"
+   "weights": "c8361363137bd0bb"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -381,7 +381,7 @@
     0.051683
    ],
    "vertices": 85,
-   "weights": "0257fd287aa8c513"
+   "weights": "81c20ed6f9672626"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -390,7 +390,7 @@
     0.06581
    ],
    "vertices": 77,
-   "weights": "e2b1a3bd8d8641fb"
+   "weights": "b3162d2f7b1649eb"
   },
   "upper_arm_seg2_R": {
    "head": [
@@ -468,15 +468,15 @@
  "shapes": {
   "arm_down_L": 0.00376,
   "arm_down_R": 0.00376,
-  "legs_straight_L": 0.096064,
-  "legs_straight_R": 0.086099
+  "legs_straight_L": 0.052685,
+  "legs_straight_R": 0.049858
  },
  "extras": {
   "seat": {
    "prop": "chair",
-   "top": 0.25846293568611145,
-   "front": 0.17000000178813934,
-   "back": -0.05000000074505806,
+   "top": 0.25825783610343933,
+   "front": 0.17090000212192535,
+   "back": -0.09000000357627869,
    "halfWidth": 0.12999999523162842
   },
   "hinges": {

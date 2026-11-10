@@ -203,9 +203,9 @@
     },
     "tail_tip": {
       "head": [
-        0.02,
-        0.215,
-        -0.05
+        0.005,
+        0.33,
+        -0.045
       ],
       "tail": [
         0.03,
@@ -274,13 +274,13 @@
     "tailBind": {
       "tail": [
         0.25,
-        -0.15,
-        -1
+        -1,
+        -0.6
       ],
       "tail_tip": [
-        1,
-        -0.1,
-        0.6
+        0.85,
+        -0.15,
+        0.5
       ]
     },
     "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes back and a little to the left over the seat, and the tip curls forward along the left side of the haunch on the seat, as the tail of the cat of main curls on the seat.",
@@ -381,7 +381,7 @@
   "chair": {
     "halfWidth": 0.13,
     "front": 0.17,
-    "back": -0.05,
+    "back": -0.09,
     "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch (x -0.125 to 0.125). The seat round sets the front edge."
   },
   "armSegments": {

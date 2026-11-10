@@ -526,3 +526,41 @@ round:
   units, move the vertices at most 0.01 units (mean 0.0018, 26 clipped). The eyeballs, the loose
   parts, the gloss nose, the open edges (the eye sockets), and the vertices of the edges of more
   than two faces (the lip and lid lines) stay. The bones and the weights stay.
+
+**Seat.** A seated violist sits with most of each thigh on the seat, and the front edge of the
+seat a little behind the knee. The tail curls on the seat beside the haunch. Three changes give
+this seat:
+
+- **Legs of the bind.** The leg turns of the config (`studio.legTurns`, `uv run --no-project
+  --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12`) turn each thigh to a slope of
+  15° below the horizontal and 8° out, and each shin 12° forward of the vertical, so that the knee
+  angle from the side is 117°. Each foot keeps its turn in the world, so the sole stays flat.
+- **Seat of the rig.** The property `seat` reaches from z -0.09 to z 0.1714 (studio axes, +z
+  forward): the front edge lies 0.045 units (7.7 cm) behind the knee joint of the bind, so that
+  70 % of the thigh (hip joint to knee joint) lies on the seat. The back edge lies 0.06 units
+  behind the haunch, so that the root of the tail lies on the seat.
+- **Tail.** The tail has two bones: `tail` from the root at y 0.43 (source) to the bend at
+  (0.005, 0.33, -0.045), and `tail_tip` to the tip (0.03, 0.17, -0.205). The bend lies 0.1 units
+  below the root, so that the root bone goes down the back of the haunch to the seat. The bind
+  turns them to the directions of `studio.tailBind` of the config: the root down, back, and a
+  little to the left, (0.25, -1, -0.6), and the tip forward and to the left, (0.85, -0.15, 0.5), so
+  that the tail lies on the back of the seat and its curl turns over the left side of the seat.
+
+**Belly.** The raised thighs pull the lower belly back in the bind, and its faces pointed down by
+up to 58° (12 of 32 faces of the lower belly by more than 30°): a dark crease above the thighs
+from the front. The key `bind_belly` moves the bind of 40 chosen vertices, with this call:
+
+```python
+import bind_edit as be  # tools/blender/
+# S: each vertex with rest z (Blender) from 0.38 to 0.52, rest y below 0, theta = atan2(|x|, -y)
+# at most 60 degrees, and a distance from the z axis below 0.2.
+# Four rounds: P[i] += 0.5 * ((mid - P[i]) . n[i]) * n[i] for each i in S at the same time.
+# mid: the middle of the mean of the edge neighbors above and the mean of those below (rest z
+# more than 0.01 apart). n: the vertex normal of the bind before the key.
+# Then each vertex of S moves along -y (forward) in the bind, with zb its bind z, by
+# 0.02 * ss(0.33, 0.37, zb) * (1 - ss(0.42, 0.47, zb)) * (1 + cos(pi * theta / 60 deg)) / 2.
+be.add_bind_move(body, rig, P_after - P_bind, 'bind_belly')
+```
+
+The largest move is 0.0179 units, and the mean is 0.0070. No face of the lower belly points down
+by more than 30° (largest 29.1°, mean 13.8°). The key `bind_belly` is the only key `bind*`.
