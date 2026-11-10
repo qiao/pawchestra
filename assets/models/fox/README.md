@@ -128,13 +128,13 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 439,212 bytes |
-| SHA-256 | `297d8ab6f49a5c0e60cce30b7a51a466e089966aab2567a2ad969bd34ae7921d` |
+| Size | 443,807 bytes |
+| SHA-256 | `d8d5cdf1f3314cb19369ba7b853dc6b56e6982baa1e09ea695a610cc920281db` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
-| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `seat`, and `hinges` come from `sa.build_armature()` |
+| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
 | Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 35 (as the fox of main) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
 
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 958,320 bytes | `957dcb7752076ac603f58fb8a695480433c13564162672f8e16d780437e42d78` |
-| `tripo-hand/fox.rig.json` | 9,903 bytes | `be93d2a780997691af04e240a6bc37bfea772490dd49ce7ba88ac2d28876badf` |
+| `tripo-hand/fox.rig.glb` | 960,284 bytes | `cd19dd3c5d5c53854fcc6d0ff608869a163115fc62cbbd0bc6e425dc7dd2ccca` |
+| `tripo-hand/fox.rig.json` | 9,901 bytes | `9921a02d07a126eac86811694e3ac50a12176fd2e024bc3b540c465970f20f44` |
 
 The edits, in the order of the work:
 
@@ -207,3 +207,47 @@ The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep t
 weights. The tail has two bones: `tail` (from the root at y 0.40, z -0.05 to y 0.30, z -0.135)
 and `tail_tip` (to the tip at y 0.11, z -0.2). The bind turns them to the directions of
 `studio.tailBind` of the config. The scripts of the live session are not in the repo.
+
+**Arm twist.** In the moments of the violinist and the flutist, the roll of each upper arm skin
+(from the clavicle) and the twist of each forearm skin (from the upper arm) reached 168° (the
+right forearm of the flutist), and the left forearm of the violinist turned 237° from the rest to
+the play. Four changes make each
+part take 44° or less:
+
+- **Paws turned.** Each vertex beyond the arm ring at x 0.2888 turns rigidly about the rest
+  forearm axis (from the head of `forearm_<side>` to the head of `hand_<side>`), by whole ring
+  steps of 36°: -144° on the left (4 steps) and 72° on the right (2 steps), 331 vertices on each
+  side. The 10 quads of the band from that ring to the ring at x 0.2959 go, and new quads join the
+  ring to the turned paw with the same step offset, with the colors and the UVs of the old quads.
+  A turned vertex of the far ring lies at most 0.005 units from the old place of its vertex. The
+  bone `fingers_<side>` turns with the paw.
+- **Palms.** The property `palm` holds the source palm of each side, (0, 0.059892, -0.998205)
+  with x mirrored on the right, turned by the same angle about the same axis: left (0.052195,
+  -0.634545, 0.771122), right (-0.025106, -0.930323, -0.365880). Then `sa.fix_rolls()` and the
+  bind of the config again (supination 0).
+- **Elbow axes.** The property `hinges` holds the axis of the config of each side, turned about
+  its bind upper arm: 26.5° on the left and -44° on the right. Left (-0.481554, -0.515997,
+  -0.708416), right (-0.361494, 0.298027, 0.883461).
+- **Holds.** `FOX_HOLD` of `src/pose/bowed-rig.ts` and `FOX_FLUTE` of `src/pose/winds.ts` give
+  the turn of each paw to the two parts of the arm (their comments give the values).
+
+The roll of the upper arm and the twist of the forearm, in degrees, before and after:
+
+| Role | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
+|---|---|---|---|---|---|
+| Violinist | frog | -12.2 / -38.9 | 143.0 / -30.6 | -31.9 / 5.7 | 72.6 / -35.3 |
+| Violinist | tip | -12.3 / -39.1 | 142.9 / -30.7 | -60.3 / -27.4 | 67.9 / -32.5 |
+| Violinist | crossing | -10.6 / -37.6 | 143.9 / -29.8 | -41.2 / -3.8 | 74.7 / -32.8 |
+| Violinist | rest | 44.1 / 27.9 | -93.8 / 37.0 | -81.3 / -42.8 | 139.1 / 28.1 |
+| Violinist | lift50 | 18.9 / 2.6 | -0.9 / -6.5 | -69.3 / -32.4 | 126.0 / 16.9 |
+| Violinist | lower50 | 9.6 / -5.8 | 34.8 / -19.2 | -70.8 / -34.1 | 120.6 / 11.6 |
+| Violinist | stand | -12.4 / -39.1 | 141.1 / -32.4 | -31.7 / 5.9 | 74.4 / -33.5 |
+| Flutist | note | 33.1 / 10.0 | -163.7 / 7.8 | -8.4 / 32.7 | 165.6 / 39.5 |
+| Flutist | rest | 69.6 / 34.8 | -54.4 / 35.7 | -93.1 / -41.3 | 84.8 / -42.5 |
+| Flutist | lift50 | 61.7 / 32.0 | -76.2 / 29.7 | -77.6 / -31.8 | 123.6 / 6.5 |
+| Flutist | lower50 | 60.6 / 32.2 | -88.2 / 26.1 | -64.4 / -19.8 | 136.8 / 25.3 |
+| Flutist | stand | 32.4 / 9.2 | -165.6 / 5.9 | -8.0 / 33.1 | 167.6 / 41.1 |
+
+In 18 samples of `mozart-k191.mid` (1 s to 70 s) and 15 samples of `mendelssohn-op61.mid` (2 s
+to 58 s), each value of the violinist stays within 44°, and in 18 samples of `mozart-k315.mid`
+each value of the flutist stays within 41°.
