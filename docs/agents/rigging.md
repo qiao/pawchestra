@@ -12,7 +12,7 @@ model folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
-| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
+| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `conductor` |
 | polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): loop cuts at the elbows, the wrists, and the knees, weights by hand (its `README.md`), a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
 | rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
