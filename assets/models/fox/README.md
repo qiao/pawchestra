@@ -95,6 +95,7 @@ red fox and the tan fox share it.
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/fox-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
+| `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Tan color map" below). License as the FBX file | `tools/fox-tan-map.py` |
 
 ### tripo-p2/fox.fbx
 
@@ -478,3 +479,29 @@ difference of the texels just inside the two faces of an edge, in steps of 255:
 A UV seam stays at each end of a band: no UV map can join the forearm and a turned paw, because
 the paw turns its UV island with it. The patch takes the band off the islands of the FBX and the
 orange edges of the socks, and the color step at each end is at the level of the seams of the FBX.
+
+**Tan color map.** The tan fox (the flutes) shares the body and shows its own map,
+`tripo-hand/fox-tan-color.webp` (`paletteMaps` of the `ANIMALS` entry of the fox,
+`StudioTexture.palettes`). The script `tools/fox-tan-map.py` makes it from the source image and
+the rig file:
+
+```text
+uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-tan-map.py
+```
+
+It scales the source as `fox-color.webp`, and moves each texel in Oklab: the orange fur (sRGB 220,
+98, 12) to the tan fur `#c9a273`, and the dark socks (73, 37, 17) to the tan accent `#9a7148` of
+`SPECIES_COLORS['fox-tan']`. The cream, the muzzle, the white, and the black keep their colors.
+Each texel takes a mix of the steps of these anchors and of the anchors at 1/3 and 2/3 of each
+blend of the map (orange to cream, socks, white, and muzzle, and socks to black), by its nearness
+to each (Gaussian, 0.06 in Oklab). The hue step of an anchor shrinks with the chroma of the texel,
+so a gray texel does not turn blue. The texels of the eyeball triangles (`ownEyes` of the rig
+file) and 4 texels around them keep their colors. Run it again after each export that changes the
+UVs or the eyes.
+
+| Item | Value |
+|---|---|
+| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 102,506 bytes, SHA-256 `3013d9870aab2a257a36d48be69e433ab6935f0d5e6c107390400df0b6143f3c` |
+| Origin, license | As `fox-color.webp` |
+
+Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
