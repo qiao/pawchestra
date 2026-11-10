@@ -564,3 +564,34 @@ be.add_bind_move(body, rig, P_after - P_bind, 'bind_belly')
 
 The largest move is 0.0179 units, and the mean is 0.0070. No face of the lower belly points down
 by more than 30° (largest 29.1°, mean 13.8°). The key `bind_belly` is the only key `bind*`.
+
+**Longer legs.** With the seat of "Seat", the seat height of the app was 0.244 m, against 0.298 m
+on the cat of main: the knee of the Tripo cat is low. The shins of the mesh are now longer, and
+the feet, the thighs, the hips, the trunk, the tail, the arms, and the head keep their form and
+size. One scripted point edit in the rest pose, after the paw turn, moves each vertex only along
+the height y (studio axes) by its height y in the source:
+
+```text
+g(y) = y + (k - 1) G(y),  k = 1.38,  G(y) = the integral from 0 to y of b
+b(y) = 0 below y 0.055, a smoothstep up to 1 at y 0.075, 1 to y 0.15,
+       a smoothstep down to 0 at y 0.175, 0 above y 0.175
+vertex: y += (1 - t) (g(y) - y) + t * rise,  rise = (k - 1) G(1) = 0.0361
+t: the tail share, ss(-0.003, -0.012, z) * (1 - ss(0.42, 0.46, y))
+```
+
+The scale along each leg thus goes smoothly from 1 at the ankle to 1.38 on the shin and back to 1
+at the knee, so no loop spacing jumps. Each point above y 0.175 and the whole tail move up by
+0.0361 units (the rigid part of the body). The joints of the config take the same map. Before the
+edit, an edge ring Subdivide with 1 cut splits each of the two shin bands of 11 edges, y 0.0674 to
+0.0958 and 0.0958 to 0.1287 of each leg, so that the longer shin keeps a loop each 0.3 to 0.45
+leg radii.
+
+| Measure | Before | After | Main cat |
+|---|---|---|---|
+| Shin, knee joint to ankle joint | 0.115 units (19.8 cm) | 0.152 units (26.2 cm) | 22.3 cm |
+| Thigh, hip joint to knee joint | 26.9 cm | 26.9 cm | 24.0 cm |
+| Seat height of the app | 0.244 m | 0.305 m | 0.298 m |
+
+The values in the paragraphs above "Longer legs" are in the rest places before this edit: add
+0.0361 to each height above y 0.175 (studio y, Blender z), except the belly key, whose heights are
+after it.
