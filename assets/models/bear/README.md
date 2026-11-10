@@ -254,7 +254,7 @@ The weights, in the order of the work, in the rest pose:
    With the cue facts of "Cue facts", `pnpm fold-probe conductor` gives no folded head face
    over all samples (4,473 before): face 3774 folded in 5.5 % of the play and 15.1 % of the
    lift before. `sp.fold_faces(60)` on the lift of `bach-bwv1047` (wall 1.0 s to 2.5 s) gives 0
-   throat faces, against 14 before.
+   throat faces, against 9 with the old rows and the same pose.
 
 The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights,
 except the throat rows of step 6. The lids take the row `head` 1 ("Lids" below). The file has no
