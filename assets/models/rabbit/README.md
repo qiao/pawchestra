@@ -54,6 +54,7 @@ The candidate hand rig:
 
 | File | Origin | Rebuild |
 |---|---|---|
+| `tripo-p2/rabbit.fbx`, `tripo-p2/rabbit.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
 | `tripo-hand/rabbit.blend` | Made by hand in Blender 5.2 from `tripo-p2/rabbit.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `tripo-hand/rabbit.rig.glb` | Export of `tripo-hand/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend --out assets/models/rabbit/tripo-hand/rabbit.rig.glb` |
 | `tripo-hand/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
@@ -113,11 +114,11 @@ T-pose body of `pnpm rig-mesh rabbit` at 77b9d9d3, and the hand rig of the Tripo
 does not use them. The text below gives the trials as they were: "the last rig" is the T-pose rig
 of 77b9d9d3, and `rabbit.json` is its config at that commit.
 
-`tripo-p2/` holds the trial of 2026-11-07: a Tripo P2 quad mesh (`rabbit.fbx`, its base color in
-`rabbit.fbm/`) rigged by the simple route (design 4.4, "Simple route") with the config
-`tools/mesh-rigs/simple/rabbit-tripo.json`, and its rig (`rabbit.blend`, `rabbit.rig.glb`,
-`rabbit.rig.json`). It was the app rabbit from bf942d8b until 3e06a62a, which gave the app the
-A-pose rabbit again. The report is in `reports/2026-11-07-tripo-rabbit/` (git ignores it).
+`tripo-p2/` held the trial of 2026-11-07: the first Tripo P2 quad mesh rigged by the simple route
+(design 4.4, "Simple route"). It was the app rabbit from bf942d8b until 3e06a62a, which gave the
+app the A-pose rabbit again. The second Tripo rabbit ("tripo-p2/rabbit.fbx" below) replaces its
+mesh. The rig files of that trial (`rabbit.blend`, `rabbit.rig.glb`, and `rabbit.rig.json`) went
+with the old mesh. They are in the git history of this folder.
 
 ### rabbit-tpose.glb
 
@@ -214,6 +215,38 @@ one translation, scale, or loop cut of a named part.
 
 The rig is a rejected trial, so this file keeps no steps. The steps of each edit, the
 bind, the weights, and the keys are in the git history of this `README.md`, at e40c077df.
+
+### tripo-p2/rabbit.fbx
+
+The second Tripo rabbit: a cream rabbit in a T-pose with quad faces, made with the Tripo CLI from a
+new turnaround sheet with a cuter form. Its arm tubes have 10 vertices around, and its leg tubes
+12. It replaces the first Tripo P2 rabbit (FBX SHA-256
+`6ee4f87a767c16e80576e976244b013391857b53ef33e4a59996a6f120a85c44`).
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Task | `24ce6e89-724f-47a7-ae86-bb0d2a2646b8`, type `multiview_to_model`, from three views of the sheet (front, side, and back) |
+| Parameters | `model_version` P2-20260801, `quad` true, `face_limit` 3000, `texture` true, `texture_quality` detailed, `texture_version` v3.5-20260815, `delight` true, `pbr` true, `export_uv` true |
+| Writer | Tripo, FBX 7.4 binary. The four maps lie packed in the FBX file |
+| Contents | One mesh object, with no armature and no animation. 3,288 vertices and 3,479 faces: 2,941 quads and 538 triangles (6,420 triangles), no n-gon. One UV layer |
+| Parts | 13 parts: the body (2,988 vertices), two eyeballs (71 vertices each, open at the back), two brow strips (47 vertices each), and eight whisker strips (four of 9 and four of 7 vertices). No vertices merge at 1e-5. 128 open edges, and no edge with more than two faces |
+| Axes | The rabbit faces +x of Blender. The import turns the mesh -90 degrees about Z, so that it faces -y. Then 1 unit from the soles to the ear tips, x ±0.3105 (the paw tips), and z ±0.1302 |
+
+The folder `rabbit.fbm/` holds the base color map and the normal map, saved from the packed maps
+of the FBX file as PNG files of 4096 × 4096 pixels and then as JPEG quality 95 (Pillow). The
+roughness and the metallic maps are not kept.
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `rabbit.fbx` | 5,622,716 bytes | | `1d10fbd9b41f91df1776bc15da13df13398d9c23c740a77e85469e8d287eb249` |
+| `rabbit.fbm/rabbit_basecolor.jpg` | 1,264,615 bytes | 4096 × 4096 | `83786eda88e3a0f7f222d0a902e6545d43df671cc2e9b75eb4bef44a03071080` |
+| `rabbit.fbm/rabbit_normal.jpg` | 995,060 bytes | 4096 × 4096 | `6f96f7505bb3bba89b251a58127d64d10f178e190e14db95d6b3827f8e51ce24` |
+
+The color map paints a full eye on each eyeball (a black pupil, an amber iris, and a white light),
+thin brown brows on the brow strips, a pink nose, pink inner ears and paw pads, a painted smile,
+and white whiskers.
 
 ### tripo-hand/rabbit.blend
 
