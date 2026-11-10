@@ -2,9 +2,9 @@
 # assets/models/fox/README.md, "Color map" and "Tan color map"): `fox-color.webp` for the red fox
 # and `fox-tan-color.webp` for the tan fox. Each map scales the source image to 2048 pixels and
 # moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the
-# main fox in the app light. In the tan map, the orange fur and the dark socks go to the tan fur and
-# the tan accent of SPECIES_COLORS of src/models/colors.ts at the lightness of the tan palette of
-# the faces. In both maps the cream belly, the white, and the black keep their colors. Each texel
+# main fox in the app light. In the tan map, the orange fur goes to the tan fur of the main fox in
+# the app light, and the dark socks go to the tan accent of SPECIES_COLORS of src/models/colors.ts
+# at the lightness of the tan palette of the faces. In both maps the cream belly, the white, and the black keep their colors. Each texel
 # takes a mix of the steps of the colors, by its nearness to each color, so the blend between two
 # colors of the fur stays smooth. The texels of the eyeballs keep their colors: the script reads
 # their triangles and texture points from the rig file (`ownEyes` of the export). The output
@@ -30,14 +30,18 @@ QUALITY = 60
 #: seated 3/4 app view (`close-views play --at fox-red --azimuth 35`), this target gives the median
 #: fur L 0.522, C 0.130, h 37.2, against L 0.521, C 0.131, h 38.7 on the fox of main.
 RED_FUR = (0.42, 0.15, 52.0)
+#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. The light of
+#: the app makes the fur darker and warmer than the map. In the 3/4 app view of the tan fox
+#: (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6`), this
+#: target gives the median fur L 0.634, C 0.099, h 56.5, against L 0.634, C 0.102, h 57.1 on the
+#: fox of main. The lightness of the tan palette of the faces (L 0.63) gave L 0.517.
+TAN_FUR = (0.80, 0.088, 77.0)
 #: The colors of the red fox in the map (sRGB) and the colors that take their place, for each map:
 #: the region colors of the face colors of the hand rig (assets/models/fox/README.md, "Smooth
 #: surface"), and the white, the black, and the cream of the map, which keep their colors. A target
-#: is an sRGB color, or ('oklch', L, C, h). The tan fur and socks take the Oklab hue and chroma of
-#: the fur and the accent of SPECIES_COLORS['fox-tan'] and the Oklab lightness that the tan palette
-#: of the faces gives them (paletteMap() of tools/studio-palette.ts): sRGB (186, 118, 73) and
-#: (153, 97, 49). The colors of SPECIES_COLORS themselves are lighter, and the tan fur then read
-#: cream in the light of the app.
+#: is an sRGB color, or ('oklch', L, C, h). The tan fur takes TAN_FUR. The tan socks take the Oklab
+#: hue and chroma of the accent of SPECIES_COLORS['fox-tan'] and the Oklab lightness that the tan
+#: palette of the faces gives them (paletteMap() of tools/studio-palette.ts): sRGB (153, 97, 49).
 MAPS = {
     'fox-color.webp': (
         ((220, 98, 12), ('oklch', *RED_FUR)),  # the orange fur to the red-orange of main
@@ -48,7 +52,7 @@ MAPS = {
         ((8, 6, 5), (8, 6, 5)),  # the black nose and lips
     ),
     'fox-tan-color.webp': (
-        ((220, 98, 12), (166, 129, 83)),  # the orange fur to the tan fur
+        ((220, 98, 12), ('oklch', *TAN_FUR)),  # the orange fur to the tan fur
         ((73, 37, 17), (143, 102, 62)),  # the dark socks to the tan accent
         ((244, 215, 191), (244, 215, 191)),  # the cream belly and cheeks
         ((206, 168, 143), (206, 168, 143)),  # the muzzle and the inner ears
