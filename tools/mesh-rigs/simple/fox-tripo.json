@@ -24,145 +24,145 @@
     "hips": {
       "head": [
         0.0,
-        0.3968,
-        0.035
+        0.317,
+        0.07
       ],
       "tail": "spine"
     },
     "spine": {
       "head": [
         0.0,
-        0.4868,
-        0.035
+        0.397,
+        0.07
       ],
       "tail": "spine1"
     },
     "spine1": {
       "head": [
         0.0,
-        0.5768,
-        0.05
+        0.477,
+        0.075
       ],
       "tail": "chest"
     },
     "chest": {
       "head": [
         0.0,
-        0.6668,
-        0.06
+        0.557,
+        0.075
       ],
       "tail": "neck"
     },
     "neck": {
       "head": [
         0.0,
-        0.7718,
-        0.055
+        0.657,
+        0.065
       ],
       "tail": "head"
     },
     "head": {
       "head": [
         0.0,
-        0.8218,
-        0.05
+        0.697,
+        0.065
       ],
       "tail": [
         0.0,
-        1.0441,
-        0.0617
+        0.907,
+        0.07
       ]
     },
     "ear_L": {
       "head": [
-        0.08775,
-        0.97975,
-        0.05585
+        0.07,
+        0.887,
+        0.04
       ],
       "tail": [
-        0.1287,
-        1.14355,
-        0.09212
+        0.109,
+        1.007,
+        0.047
       ]
     },
     "clavicle_L": {
       "head": [
-        0.02,
-        0.7368,
-        0.065
+        0.015,
+        0.612,
+        0.072
       ],
       "tail": "upper_arm_L"
     },
     "upper_arm_L": {
       "head": [
-        0.085,
-        0.7268,
-        0.068
+        0.082,
+        0.608,
+        0.073
       ],
       "tail": "forearm_L",
       "roll": "palm"
     },
     "forearm_L": {
       "head": [
-        0.2,
-        0.718,
-        0.0693
+        0.18602,
+        0.605292,
+        0.072707
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.2725,
-        0.7169,
-        0.0721
+        0.238002,
+        0.601529,
+        0.074456
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.345,
-        0.7158,
-        0.0773
+        0.29,
+        0.598,
+        0.077
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.381167,
-        0.728413,
-        0.072924
+        0.32671,
+        0.597973,
+        0.078335
       ],
       "tail": [
-        0.423092,
-        0.732343,
-        0.080325
+        0.35987,
+        0.597635,
+        0.07922
       ],
       "roll": "palm"
     },
     "thigh_L": {
       "head": [
-        0.08,
-        0.3878,
-        0.069
+        0.06,
+        0.297,
+        0.06
       ],
       "tail": "shin_L"
     },
     "shin_L": {
       "head": [
-        0.088,
-        0.2198,
-        0.052
+        0.054,
+        0.179,
+        0.046
       ],
       "tail": "foot_L"
     },
     "foot_L": {
       "head": [
-        0.092,
-        0.06165,
-        0.045
+        0.054,
+        0.065369,
+        0.038
       ],
       "tail": "toes_L",
       "roll": [
@@ -173,12 +173,12 @@
     },
     "toes_L": {
       "head": [
-        0.105,
+        0.068,
         0.022,
         0.12
       ],
       "tail": [
-        0.108,
+        0.07,
         0.01,
         0.165
       ],
@@ -191,8 +191,8 @@
     "tail": {
       "head": [
         0.0,
-        0.4968,
-        -0.06
+        0.417,
+        -0.01
       ],
       "tail": "tail_tip",
       "roll": [
@@ -204,13 +204,13 @@
     "tail_tip": {
       "head": [
         0.0,
-        0.3368,
-        -0.15
+        0.277,
+        -0.13
       ],
       "tail": [
         0.0,
-        0.1368,
-        -0.24
+        0.127,
+        -0.18
       ],
       "roll": [
         0,
@@ -220,22 +220,22 @@
     },
     "fingers_R": {
       "head": [
-        -0.380095,
-        0.723808,
-        0.091105
+        -0.326532,
+        0.596621,
+        0.080593
       ],
       "tail": [
-        -0.42187,
-        0.71896,
-        0.0988
+        -0.359567,
+        0.595535,
+        0.08342
       ],
       "roll": "palm"
     }
   },
   "palm": [
-    -0.113,
-    -0.986,
-    -0.12
+    -0.196,
+    -0.98,
+    -0.028
   ],
   "studio": {
     "trunk": {
@@ -274,28 +274,28 @@
     "tailBind": {
       "tail": [
         0,
-        -0.45,
+        -0.7,
         -1
       ],
       "tail_tip": [
         0,
-        -1.6,
-        -0.5
+        -1,
+        -0.1
       ]
     },
-    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py), as on the fox of main: the root goes back over the back edge of the seat, and the tip hangs down behind the chair. In the source, the tail hangs down behind the legs.",
+    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes back and down over the back edge of the seat, and the tip hangs down behind the chair. In the source, the tail hangs down behind the legs. With the root (0, -0.45, -1) of the first Tripo fox, the large tail stood straight back from the chair.",
     "legTurns": {
       "thigh": [
-        0.639156,
-        0.038472,
-        -0.079418,
-        0.763998
+        0.649184,
+        -0.021495,
+        -0.097053,
+        0.754108
       ],
       "shin": [
-        0.126466,
-        0.002647,
-        0.012455,
-        0.991889
+        0.139408,
+        0.0,
+        0.0,
+        0.990235
       ],
       "foot": [
         0.0,
@@ -318,26 +318,26 @@
     "eyeShare": 0.34,
     "eyeBox": [
       [
-        0.00585,
-        0.8686,
-        0.13775
+        0.0,
+        0.752,
+        0.08
       ],
       [
-        0.0936,
-        0.9505,
-        0.19976
+        0.074788,
+        0.832795,
+        0.159794
       ]
     ],
     "noseBox": [
       [
-        -0.0351,
-        0.8452,
-        0.284
+        -0.025,
+        0.727,
+        0.195
       ],
       [
-        0.0351,
-        0.89785,
-        0.3308
+        0.025,
+        0.772,
+        0.235
       ]
     ],
     "nose": [
@@ -369,7 +369,7 @@
       "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
     },
     "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
-    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.008 to 0.073, y 0.772 to 0.826, z 0.134 to 0.168 in the source, mapped by the point edits). The nose box holds the black nose tip."
+    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.003 to 0.069, y 0.75 to 0.821, z 0.084 to 0.155 in the source, mapped by the point edits). The nose box holds the dark nose tip."
   },
   "eyeShell": {
     "lift": 0.002,
@@ -379,25 +379,24 @@
     "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
-    "halfWidth": 0.15,
+    "halfWidth": 0.13,
     "front": 0.12,
-    "back": -0.07,
-    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch. The front edge lies 0.06 units behind the knee joint of the bind (the property seat of the armature), so that the calf does not reach over the seat."
+    "back": -0.03,
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The front edge lies seatGap units behind the knee joint of the bind (the property seat of the armature), so that the calf does not reach over the seat."
   },
   "armSegments": {
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are the places of the source, mapped by the paw turns and the point edits of the hand rig (assets/models/fox/README.md: the head size, the paw size, the thicker shins, and the longer legs). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (axis y 0.632 to 0.619, z 0.068 to 0.077, radius 0.05 to 0.026, closed rings of 10 vertices to x 0.209 and of 9 vertices from x 0.258): the shoulder joint at x 0.085, inside the trunk side (x 0.098), the elbow at x 0.200, between the rings at x 0.185 and 0.209, at the middle of the arm from the shoulder to the wrist, the wrist at x 0.345, the narrowest place of the arm where the paw starts, the knuckles at x 0.398, where the digits part, the tip at x 0.462. Leg: the hip joint at y 0.291 in the haunch, the knee at y 0.145, at the top of the narrow shin and the base of the thick thigh (rings at y 0.133 and 0.155), the ankle at y 0.06, at the top of the foot, the ball of the foot at z 0.12, and the toe tips at z 0.165. Trunk: the waist is narrowest at y 0.52 (x 0.099), the haunch widest at y 0.27 (x 0.163), and the neck narrowest at y 0.70. Ears: the root at y 0.86, the tips at (0.11, 1.0, 0.086). Tail: a loose part of the source, from its root at (0, 0.40, -0.06) back and down to its tip at (0, 0.04, -0.24). The palm is the true palm of the source: the normal of the plane of the paw vertices (x above 0.36) is (-0.113, -0.986, -0.12). It faces down, and the digits curl down toward it. The hip joint lies within 1 mm of the measure, so that the rest frame of the thigh in the frame of the hips has an error below 1e-5 in Blender, which the export checks.",
+  "jointsNote": "The places are the places of the source, mapped by the paw turns and the point edits of the hand rig (assets/models/fox/README.md: the eye size, the paw size, the arm girth, the thinner shins, and the longer shins). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (axis y 0.601 to 0.591, z 0.073 to 0.077, radius 0.043 to 0.024, closed rings of 11 vertices from x 0.082 to x 0.295): the shoulder joint at x 0.082, inside the trunk side (x 0.097), the elbow at x 0.186, at the middle of the arm from the shoulder to the wrist, the wrist at x 0.29, the narrowest place of the arm where the paw starts, the knuckles at x 0.342, where the digits part, the tip at x 0.389. Leg: the hip joint at y 0.29 in the haunch, the knee at y 0.172, at the top of the narrow shin (rings at y 0.166 and 0.18), the ankle at y 0.065, the ball of the foot at z 0.12, and the toe tips at z 0.165. Trunk: the waist is narrowest at y 0.50 (x 0.073), the haunch widest at y 0.28 (x 0.123), and the neck narrowest at y 0.67. Head: the chin at y 0.69 and the top of the skull at y 0.90. Ears: the root at y 0.88, the tips at (0.109, 1.0, 0.047). Tail: a loose part of the source, from its root at (0, 0.41, -0.01) back and down to its tip at (0, 0.12, -0.18). The palm is the true palm of the source: the normal of the plane of the paw vertices (x above 0.30) is (-0.196, -0.98, -0.028). It faces down.",
   "body": {
-    "crease": 55,
-    "seatWidth": 0.5
+    "crease": 55
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 55, because the arm rings of the source have 9 and 10 vertices, 36 to 40 degrees apart, and the seat width 0.5 m, because the haunch is 0.33 units (0.52 m) wide, more than the chair of design 4.5 (0.42 m).",
-  "eyeSize": 0.2042,
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 55, because the arm rings of the source have 11 vertices, 33 degrees apart.",
+  "eyeSize": 0.21526,
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
-  "metersPerUnit": 1.58176,
-  "metersPerUnitNote": "The scale of the app: H (0.2042 units before the head size) is 0.322998 m, the H of the fox of assets/models/fox/fox.rig.glb. The fact height of the armature is the shoulder joints at this scale. The head size makes H about 0.38 m, the shown head of the fox of main (0.382 m).",
+  "metersPerUnit": 1.7653,
+  "metersPerUnitNote": "The scale of the app: H (0.21526 units) is 0.380 m, near the shown head of the fox of main (0.382 m, a head that its rig grows from H 0.323 m). The head of the new mesh is large, so the hand rig takes no head size. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/fox.blend holds it.",
   "texture": "assets/models/fox/tripo-p2/fox.fbm/fox_basecolor.jpg",
   "rollSplit": true,
