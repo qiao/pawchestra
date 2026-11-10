@@ -1,5 +1,5 @@
 {
- "sha256": "09cb241a0074d393934b583462cd84f0b413e87a90192fcf8d9d7f9a129d1165",
+ "sha256": "b36a5eb28a28c5e941d4f703d33cdc706cf4d6907be62430115952059af97d70",
  "bindSupination": {
   "L": 0.0,
   "R": 52.0
@@ -201,7 +201,7 @@
     -5e-06
    ],
    "vertices": 211,
-   "weights": "1b7b10bf65a3e9fe"
+   "weights": "16522b3827f2d7d3"
   },
   "shin_L": {
    "head": [
@@ -210,7 +210,7 @@
     0.116854
    ],
    "vertices": 206,
-   "weights": "de76302e640b7c6f"
+   "weights": "cd65d99dd6c39079"
   },
   "foot_L": {
    "head": [
@@ -237,7 +237,7 @@
     -5e-06
    ],
    "vertices": 207,
-   "weights": "163f126eac2326c4"
+   "weights": "47048c8e08060e39"
   },
   "shin_R": {
    "head": [
@@ -246,7 +246,7 @@
     0.116855
    ],
    "vertices": 201,
-   "weights": "c09f2ed74b7cad1f"
+   "weights": "1f8691802752d191"
   },
   "foot_R": {
    "head": [
@@ -547,16 +547,16 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.004987,
-  "arm_down_R": 0.005485,
-  "legs_straight_L": 0.05712,
-  "legs_straight_R": 0.057221
+  "arm_down_L": 0.004857,
+  "arm_down_R": 0.005407,
+  "legs_straight_L": 0.056897,
+  "legs_straight_R": 0.056997
  },
  "extras": {
   "seat": {
    "prop": "bench",
-   "top": 0.2043210119009018,
-   "front": -0.05000000074505806,
+   "top": 0.2058815062046051,
+   "front": -0.04500000178813934,
    "back": -0.20000000298023224,
    "halfWidth": 0.25
   },
