@@ -132,8 +132,8 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 462,914 bytes |
-| SHA-256 | `bcb09db9f07fbcfec4557f9ab3d8bb9845cc6182fd9ddedd32213ff970cb726f` |
+| Size | 463,486 bytes |
+| SHA-256 | `54a91553ff237e026cce3655b42a03df60ad606532f0bf9f1988d90c9887bd90` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -147,8 +147,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `a3c1e7f2478ac65c6ddc0e039cc4f311f1af05fb34dbc65c006d518cd608b81d` |
-| `tripo-hand/fox.rig.json` | 16,857 bytes | `af6e2db423baa6a5f4591568fd865f34a80551725fd1df5bf64f752351b490db` |
+| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `676ddcbe2d47fedc28ad39351a5f6c54f388a680f77ddb215984e0cd61d38d00` |
+| `tripo-hand/fox.rig.json` | 16,858 bytes | `eab4726d79438fcc9d1234d0fefb2354fc2f2219fa6ca85a86e0af135c60320f` |
 
 The edits, in the order of the work:
 
@@ -529,7 +529,67 @@ standing flutist ended in a wide flare at the knee. The cream faces stretch thei
 most 1.23 (the bib keeps its place). The seat height goes from 0.271 m to 0.276 m, and the front
 edge of the seat stays. No instrument and no arm goes into the trunk in the moments of the
 violinist and the flutist. In the moments of "Arm twist", each part of each arm takes 41.6° or
-less.
+less. This edit gave the thighs a flare below the hip ("Thigh taper") and the lower belly an
+overhang ("Lap").
+
+**Thigh taper.** After "Body thickness", each seated thigh was widest at 0.2 of its length, with a
+sharp outer corner, and from the front it read as a flat flare like a skirt. Each leg ring scaled
+out from its inner edge, and the weight fade at the hip held the haunch back, so the full move of
+the rings below the hip stood out. Sections of the left thigh across its axis in the seated bind
+(`thigh2.py` of the session), from the hip joint (u 0) to the knee joint (u 1): the outer half
+width from the axis, as a share of H.
+
+| u | 0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Before "Body thickness" | 0.265 | 0.250 | 0.236 | 0.220 | 0.205 | 0.190 | 0.176 | 0.166 | 0.161 | 0.158 | 0.156 |
+| Before | 0.420 | 0.468 | 0.499 | 0.444 | 0.388 | 0.341 | 0.303 | 0.270 | 0.244 | 0.224 | 0.213 |
+| After | 0.372 | 0.372 | 0.366 | 0.347 | 0.327 | 0.307 | 0.287 | 0.265 | 0.244 | 0.224 | 0.213 |
+| Fox of main | 0.360 | 0.342 | 0.318 | 0.296 | 0.281 | 0.263 | 0.242 | 0.223 | 0.206 | 0.189 | 0.172 |
+
+A point edit in the live Blender (`knee_taper.py` of the session), in the rest of the file:
+
+```text
+for each side and each vertex with a share on thigh_<side> or shin_<side>, on its side of x = 0:
+  axis: from the head of thigh_<side> (u 0) to the head of shin_<side> (u 1), rest
+  u = (P - hip) . axis / |knee - hip|,  o = sign * (x - x_axis(u))   (the offset out)
+  if o > 0: x += min(1, w) * sign * (g(u) - 1) * o,  w = its thigh + shin share
+  g: 1 at u 0, 0.83 at 0.1, 0.72 at 0.2, 0.78 at 0.3, 0.853 at 0.4, 0.915 at 0.5,
+     0.957 at 0.6, 0.996 at 0.7, 1 from 0.8, linear between
+```
+
+66 vertices move, at most 0.0295 units, along x only. The basis and the key `bind_belly` take the
+same moves. The weights, the bones, and the UVs stay. The outer edge now falls from the hip to the
+knee, and the knee is round. The standing flutist shows no flare. The seat height is 0.275948 m,
+and the front edge of the seat stays.
+
+**Lap.** After "Body thickness", the deeper belly made an overhang above the crotch. In the seated
+bind the faces of the lower belly pointed down by 34° to 42° (27° to 29° before), and they took
+almost no light: a dark brown patch between the thighs from the front, on both foxes. Renders with
+a flat color map, a flat normal map, no cast shadow (`--probe noshadow`), and no contact shade keep
+the patch, and the face colors (`--probe colors`) hold no dark, so the normals are the cause. A
+point edit in the live Blender (`belly_lap.py` of the session) adds bind moves to the key
+`bind_belly`:
+
+```python
+import bind_edit as be  # tools/blender/
+# S: each vertex with rest z from 0.30 to 0.52, rest y below 0, and
+# theta = atan2(|x|, -y) of the rest at most 60 degrees.
+# Move of each vertex of S, in the bind, along -y (forward), with zb its bind z:
+# 0.03 * ss(0.33, 0.38, zb) * (1 - ss(0.42, 0.50, zb)) * (1 + cos(pi * theta / 60 deg)) / 2
+# ss: a smoothstep.
+be.add_bind_move(body, rig, moves, 'bind_belly')
+```
+
+72 vertices move, at most 0.03 units. The faces of the lower belly (rest z 0.33 to 0.50, 38 faces)
+in the bind:
+
+| Measure | Before "Body thickness" | Before | After |
+|---|---|---|---|
+| Mean turn down, rest z 0.39 to 0.48 | 27° to 29° | 34° to 42° | 25° to 29° |
+| Faces down by more than 30° | 3 of 40 | 17 of 38 | 4 of 38 |
+
+The weights, the bones, the UVs, and the seat height stay. In the moments of "Arm twist", each
+part of each arm takes 41.6° or less.
 
 **Eye size.** In the front head view, the eye opening was 0.206 of the head width and 0.140 high,
 against 0.198 and 0.170 in a level render of the source mesh, 0.171 and 0.150 on the reference
