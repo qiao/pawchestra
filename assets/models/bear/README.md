@@ -88,3 +88,42 @@ shasum -a 256 assets/models/bear/*.glb assets/models/bear/bear-weights.json
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow |
 
 A run of `pnpm rig-mesh bear` gives the same bytes.
+
+## Candidate hand rig
+
+`tripo-p2/` holds the source of a candidate body: the Tripo P2 mesh `tripo-p2/bear.fbx` with its
+maps.
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo-p2/bear.fbx`, `tripo-p2/bear.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+
+### tripo-p2/bear.fbx
+
+A brown bear in a T-pose, made with Tripo P2: quad faces, and arm and leg tubes of 18 vertices
+around. The FBX file keeps the quads. The folder `bear.fbm/` holds its color map and its normal
+map.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object, with no armature and no animation. 2,717 vertices and 2,900 faces: 2,336 quads and 564 triangles (5,236 triangles), no n-gon. One UV layer |
+| Parts | 22 parts: the body (2,088 vertices), two eyeballs (41 vertices each), the tail ball (51 vertices), five claws on each paw (28 vertices each), and four claws on each foot (27 vertices each). No vertices merge at 1e-5. The 156 open edges are the open root loops of the claws, the tail ball, and the eyeballs. No edge has more than two faces |
+| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.4966 (the claw tips of the paws), and z -0.2303 (the tail ball) to 0.2303 (the belly). The bear faces -y in Blender |
+
+The Tripo download names the maps by their job. The copy gives them the names of the species,
+and leaves out the roughness map (`bear_roughness.JPEG`) and the metallic map
+(`bear_metallic.JPEG`). The FBX file still names the maps of the download. No step reads the
+material of the FBX file: `sa.import_source()` keeps only the mesh and its UVs.
+
+| File | Name in the download | Size | Pixels | SHA-256 |
+|---|---|---|---|---|
+| `bear.fbx` | `tripo_convert_8ef16b57-d21b-4b3f-9cbf-02d63e935668.fbx` | 187,036 bytes | | `0eaaf5e5a4afcfdc3daf43031433c96558482c9e5f1f7f40c37e8856688a1dbc` |
+| `bear.fbm/bear_basecolor.jpg` | `tripo_rgb_78a1f9d0-753e-4381-90e8-663ab5ba5049.jpg` | 3,396,472 bytes | 4096 × 4096 | `84f0807f254aaa366d32796545a35b7a1c5eb5ba79316d94f13494131ab57be7` |
+| `bear.fbm/bear_normal.jpg` | `tripo_normal_b737a6d9-0904-4602-a807-ec24bf9e02f9.jpg` | 1,772,996 bytes | 4096 × 4096 | `fdae5918b0d09a6c76110d5a6e4da4955fad2794e283a3ab80ff8c792937cf1f` |
+
+The color map paints a full eye on each eyeball: a black pupil, a dark iris, a white light, and
+a light rim. The fur is orange brown, the muzzle is light tan, and the nose and the claws are
+dark brown. The map paints no pads on the paws.
