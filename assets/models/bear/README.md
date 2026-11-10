@@ -91,12 +91,16 @@ A run of `pnpm rig-mesh bear` gives the same bytes.
 
 ## Candidate hand rig
 
-`tripo-p2/` holds the source of a candidate body: the Tripo P2 mesh `tripo-p2/bear.fbx` with its
-maps.
+`tripo-hand/` holds a candidate body ("tripo-hand/bear.blend" below): a hand rig of the Tripo P2
+mesh `tripo-p2/bear.fbx`, made in a live Blender with no arm cut and no limb stretch. On the
+branch of the candidate, the `ANIMALS` entry of the bear points to `tripo-hand/bear.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/bear.fbx`, `tripo-p2/bear.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+| `tripo-hand/bear.blend` | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `tripo-hand/bear.rig.glb` | Export of `tripo-hand/bear.blend`. License as the FBX file | `pnpm rig-export bear --blend assets/models/bear/tripo-hand/bear.blend --out assets/models/bear/tripo-hand/bear.rig.glb` |
+| `tripo-hand/bear.rig.json` | Text summary of the export, for diffs | The same run |
 
 ### tripo-p2/bear.fbx
 
@@ -127,3 +131,91 @@ material of the FBX file: `sa.import_source()` keeps only the mesh and its UVs.
 The color map paints a full eye on each eyeball: a black pupil, a dark iris, a white light, and
 a light rim. The fur is orange brown, the muzzle is light tan, and the nose and the claws are
 dark brown. The map paints no pads on the paws.
+
+### tripo-hand/bear.blend
+
+The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
+through the Blender MCP tools, in a scene `bear` of its own. The arms and the legs keep the form
+and the length of the source: no cut, no split from the trunk, and no stretch.
+
+| Item | Value |
+|---|---|
+| Size | 341,198 bytes |
+| SHA-256 | `2b0e7cf4b549e999be39c28869003122956b69153fd70fb25435329f0f5b2537` |
+| Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
+| License | CC BY-NC 4.0, as the FBX file |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `bear`: 2,897 vertices and 3,080 faces (2,516 quads and 564 triangles, 5,596 triangles), flat faces, and the surface of `sa.add_surface()`. 60 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye`. The UV map of the FBX |
+| Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/bear-tripo.json` (shoulder x 0.15, elbow 0.27, wrist 0.365, knuckles 0.43). The Action `bind` holds the standing bind of that config: no leg turn, no trunk recline, straight arms, and no bind supination. The properties `palm`, `seat`, and `hinges` come from `sa.build_armature()` |
+| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear) |
+| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
+
+The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/bear.rig.glb` | 690,756 bytes | `32bb6dc2e55299f437d64b40ecc5dc444a8b34e593bcef563b14f5661927c1de` |
+| `tripo-hand/bear.rig.json` | 8,931 bytes | `4d539628817a41f7044d47e3e17f490f01d1ad5bcd5367c8ac753185e24a79f1` |
+
+The edits, in the order of the work:
+
+- **Import.** `sa.import_source('assets/models/bear/tripo-p2/bear.fbx', 1e-5)` in the new scene
+  `bear`: no vertex merges, 1 unit from the soles to the ear tips.
+- **Joints.** The FBX has no armature, so each joint comes from cuts of the mesh and from its
+  edge loops (`jointsNote` of the config).
+- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
+  use_grid_fill=True)`) of the clean quad edge ring of 18 edges between two arm rings. The bands,
+  by the x of their rings on the left arm: 0.2504 to 0.2773, 0.2773 to 0.3029, and 0.3029 to
+  0.3403 (the right arm at 0.2518 to 0.2776, 0.2776 to 0.303, and 0.303 to 0.3405). The new rings
+  lie at x 0.264, 0.290, and 0.322. Each arm now has rings at x 0.1756, 0.2053, 0.2504, 0.264,
+  0.2773, 0.2902, 0.3029, 0.3217, and 0.3403: from x 0.25 to the wrist, a ring each 0.19 to 0.31
+  arm radii (radius 0.073 to 0.063).
+- **Knee rings.** The same call with 2 cuts on the clean leg band of 18 edges at y 0.1037 to
+  0.1611 of each leg. The knee joint is at y 0.13, and the knee has rings at y 0.104, 0.123,
+  0.142, and 0.161.
+- **Rings with no split.** These edge rings stop at a triangle or a pole, so they take no split:
+  the arm root bands at x 0.1756 to 0.2053 (3 triangles, poles 1741, 1744, 1746 on the left) and
+  0.2053 to 0.2504 (1 triangle, poles 1741, 1746, 2158), the wrist band at x 0.3403 to 0.3779
+  (poles 2181, 2661), the paw bands from x 0.3779 (triangles and poles at the claw roots), the
+  leg band at y 0.1611 to 0.1963 (one triangle), and the foot bands below y 0.04 (triangles and
+  poles at the toes). The upper arm thus has 0.41 and 0.62 arm radii between its root rings. The
+  clean ankle band at y 0.069 to 0.104 lies at no knee, so it takes no split.
+- **Surface.** `sa.add_surface(bear, 'bear', 'assets/models/bear/tripo-p2/bear.fbm/bear_basecolor.jpg',
+  eye_fans=False, config=<bear-tripo.json>)` on the flat mesh. 60 faces of the dark brown nose
+  are gloss. The faces of the eyeballs took the fur color.
+- **Eyes.** The 80 faces of the two eyeballs get the face attribute `eye` (BOOLEAN, FACE) and the
+  colors `color` and `color_base` `#15110e` (the eye color of the app). The export then gives
+  `ownEyes`, and the app adds no bead eyes. The eyeballs keep the slot `fur`. The color map
+  paints a full eye on each eyeball ("tripo-p2/bear.fbx"), so the body keeps its own eyes.
+
+The weights, in the order of the work, in the rest pose:
+
+1. Parent with Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh(bear,
+   bear_rig, auto=True)`). No vertex took no weight.
+2. Arm rings: each vertex ring of each arm from x 0.1756 to x 0.3403 takes one exact row with
+   `sa.set_weight_row()`. A row holds a clavicle share, an elbow helper share, and a wrist helper
+   share, linear between the control rings below (x of the left arm). The rest of the row goes to
+   the 4 roll segments of the upper arm (x below 0.27) or of the forearm, by the x of the ring
+   along the bone: segment k takes the share at (k + 0.5) / 4 of the part, with a linear ramp
+   between two segments (the roll split of the simple route).
+
+   | x | 0.1756 | 0.2053 | 0.2504 | 0.264 | 0.2773 | 0.2902 | 0.3029 | 0.3403 |
+   |---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.40 | 0.20 | 0.05 | 0 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 |
+   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 |
+
+   The ring at x 0.3217 takes the linear values between its neighbors: the wrist helper 0.126.
+   The trunk loop
+   around each arm root keeps the automatic weights.
+3. Paws, by rows across the paw, by the place along the rest forearm axis (from the forearm head
+   to the paw head, as the x of the axis point of the left paw): 0.352 to 0.372 {`wrist` 0.75,
+   `forearm_seg3` 0.25}, 0.372 to 0.392 {`wrist` 0.5, `hand` 0.5}, 0.392 to 0.42 {`hand` 1}, the
+   knuckle row 0.42 to 0.44 {`hand` 0.5, `fingers` 0.5}, and from 0.44 {`fingers` 1}.
+4. The loose parts follow one bone each: the 82 vertices of the eyeballs {`head` 1}, the 51
+   vertices of the tail ball {`tail` 1}, the 10 paw claws (280 vertices) {`fingers` 1} of their
+   side, and the 8 foot claws (216 vertices) {`toes` 1} of their side. A claw on the head bone
+   would stay behind when the paw moves.
+
+The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights. The
+file has no shape key, no key `bind*`, and no key `arm_raise_*`.
