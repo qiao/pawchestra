@@ -132,8 +132,8 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 463,016 bytes |
-| SHA-256 | `0b381607cc2a049f0a24fa482f93b086c04a15886d7382434db15cf518f70d0a` |
+| Size | 462,914 bytes |
+| SHA-256 | `bcb09db9f07fbcfec4557f9ab3d8bb9845cc6182fd9ddedd32213ff970cb726f` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -147,8 +147,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `8e8786449150de53d9b3be5d4e717762caaf74d2f10d3354c91399af9bc11caa` |
-| `tripo-hand/fox.rig.json` | 16,856 bytes | `1db747cfd6fe12117d4aa7fdb81cc96d2fd1708a570df814916c96fc55d4004f` |
+| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `a3c1e7f2478ac65c6ddc0e039cc4f311f1af05fb34dbc65c006d518cd608b81d` |
+| `tripo-hand/fox.rig.json` | 16,857 bytes | `af6e2db423baa6a5f4591568fd865f34a80551725fd1df5bf64f752351b490db` |
 
 The edits, in the order of the work:
 
@@ -499,6 +499,55 @@ the lengths of `hand_<side>` and `fingers_<side>` take the map, and each keeps i
 roll, so the keys of the Action `bind` keep their turns. The weights, the palm hints, and the paw
 turns stay. Each paw still closes on the bow, the violin neck, and the flute. In the moments of
 "Arm twist", each part of each arm takes 41.6° or less (the right forearm of the flutist at rest).
+
+**Body thickness.** The trunk, the neck base, and the legs were much thinner than on the fox of
+main. Sections of the mesh across each part (`bmesh.ops.bisect_plane()`), as a share of H: the
+candidate in the standing rest of its file, and the fox of main in its standing mesh `fox.glb`, at
+the same shares of the height from the hip joint to the shoulders. Width × depth, or the girth:
+
+| Part | Candidate before | Candidate after | Fox of main |
+|---|---|---|---|
+| Belly | 0.88 × 0.79 | 1.00 × 1.18 | 0.89 to 1.16 × 1.13 to 1.43 |
+| Waist | 0.72 × 0.66 | 0.89 × 1.10 | 0.89 × 1.13 |
+| Chest | 0.69 × 0.70 | 0.82 × 0.94 | 1.09 × 0.94 |
+| Neck base | 0.76 × 0.59 | 0.77 × 0.82 | 0.81 × 0.93 |
+| Thigh, girth | 1.25 | 1.83 | 2.26 |
+| Shin, girth | 0.85 | 0.94 | 1.18 |
+| Upper arm, girth (seated bind) | 1.14 | 1.14 | 2.13 |
+
+A point edit in the live Blender (`body_scale.py` of the session) scales each ring about its own
+center in the plane of the ring. A trunk ring is a horizontal section of the rest. Its center
+lies on a quadratic fit of the middles of the trunk sections, so the centers change smoothly
+from ring to ring. Its width and depth take the ratio of main at its height (table `TRUNK`, linear
+between the rows), with the chest width at most 1.25, so the chest does not grow over the arm
+roots. A leg ring scales about its own inner edge and back edge, so the thighs do not meet and
+the underside of the seated thigh stays. The shin ratio of main (1.32 wide, 1.45 deep) grows from 1
+at the ankle to the knee, the thigh ratio (1.75, 1.84) from the shin ratio at the knee to 0.6 of
+the thigh, and the ratio of the haunch (1.25, 1.15) at the top. Each vertex moves by the move of
+each region times its weight on the bones of that region, so the joins to the arms, the head, the
+tail, and the feet fade with the weights. The basis and the key `bind_belly` take the same moves.
+The trunk takes the full gap to main. The legs take 0.6 of it: at 0.8 and 1.0, the thighs of the
+standing flutist ended in a wide flare at the knee. The cream faces stretch their texels by at
+most 1.23 (the bib keeps its place). The seat height goes from 0.271 m to 0.276 m, and the front
+edge of the seat stays. No instrument and no arm goes into the trunk in the moments of the
+violinist and the flutist. In the moments of "Arm twist", each part of each arm takes 41.6° or
+less.
+
+**Eye size.** In the front head view, the eye opening was 0.206 of the head width and 0.140 high,
+against 0.198 and 0.170 in a level render of the source mesh, 0.171 and 0.150 on the reference
+sheet (`fox-front.png`), and 0.091 and 0.143 for the bead eyes of the fox of main. The reference
+is about 0.85 of the source size. The size made the eyes look glassy, together with the two painted
+lights and the soft light of the eye light, which reads as a third light. A point edit in the live
+Blender (`eye_scale.py` of the session) scales each eyeball about the middle of its sphere by 0.85
+(radius 0.02176). Each other vertex of its side within 0.060 units of the middle, except the
+whiskers and the nose, moves toward the middle by the factor 0.85 up to 0.030 units and a
+smoothstep back to 1 at 0.060 units. The socket and its lining shrink with the ball, so no gap or
+dark ring shows. The lids of "Lids" are made again with the same steps at the radii 0.0255 and
+0.022525 (0.030 and 0.0265 times 0.85), with the angle 126° and the same hinge axes. In the 21
+steps of the blink, no lid point leaves the head, the open lid lies at least 0.0158 units under the
+skin, and the lower strip of the closed lid lies under the head. The eye axis stays (2.3° and 2.6°
+from the open eye axis), and the eye light gives the same soft highlight. The eye opening is now
+0.173 of the head width.
 
 **Longer legs and texels.** The edit of "Longer legs" kept the UVs, so the texels of the legs
 stretch along the leg by the scale of that edit: at most 1.24 (24 %), in the band from the ankle
