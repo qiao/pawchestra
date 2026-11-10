@@ -1,5 +1,5 @@
 {
- "sha256": "ebe266769dc27f27f264e111844ac32c3a26569bfa70983815eb6daef2667c38",
+ "sha256": "b291b1d51165ca3a50f207caa3cf3931959448a397299a54f981a4664f11085e",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -684,6 +684,7 @@
    "height": 1.181424,
    "crease": 55,
    "seatWidth": 0.46
-  }
+  },
+  "texture": "assets/models/cat/tripo-hand/cat-color.webp"
  }
 }
