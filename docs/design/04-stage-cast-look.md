@@ -728,7 +728,10 @@ after an approval of its look in the app. It shows the color map of its Tripo FB
 eyes. Reason: the map paints a full eye on each eyeball (a black pupil, an amber iris, and a white
 light), and the socket faces keep their source UVs, so the dark lining of the map shows around
 it. A lid on each eye blinks over it ("Hand rig"). The map holds no baked key light: the luma of its cream fur stays
-within about 7 % of its median on each part. An arm that the mesh joins to the trunk needs a cut,
+within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
+(`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It
+stands with the bind of the bear of main, keeps the eyeballs of its mesh, because the map paints a
+full eye on each, and keeps H of the bear of main. An arm that the mesh joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
