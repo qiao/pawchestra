@@ -304,7 +304,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/fox/tripo-hand/fox.blend`), with no arm cut and no limb stretch. Its `.blend`
   // holds the facts of the body: the scale that keeps H of the fox of `fox.rig.glb`, the crease
   // angle 35°, and the wider chair of the wide haunch. The tan fox takes the same rig with the tan
-  // palette, and the color map of `tools/fox-tan-map.py`.
+  // palette, and the color maps of `tools/fox-maps.py`.
   [
     'fox',
     {
