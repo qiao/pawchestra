@@ -142,8 +142,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 365,703 bytes |
-| SHA-256 | `78dd28836fe3c16c14f38b530ef753c0056491464d520f06caaea3656ea3bd6a` |
+| Size | 368,834 bytes |
+| SHA-256 | `6c2e7f6355d1eaa28d768b4e0c67d2eeb9a29bb0d37bd1063bbc23d50c53b12f` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
@@ -156,8 +156,8 @@ The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 712,360 bytes | `ef3f3a1b7d8bbdd7c89fd7db5fb0e380fda03728c71076ba7871083caaea9949` |
-| `tripo-hand/bear.rig.json` | 16,084 bytes | `d08d9b3979f04aca0995e6a74ac20663a4c36faccb8845a59942c5a46af4d5f6` |
+| `tripo-hand/bear.rig.glb` | 712,360 bytes | `e97270dba9593794842182e1f21ad9d342bbf72b5f0c256ccc0776799f106cb8` |
+| `tripo-hand/bear.rig.json` | 16,088 bytes | `94c3a6511797002f7fe48af712ae1e7912dbeb4a9b2acf895e2b610cd7a6e91b` |
 
 The edits, in the order of the work:
 
@@ -218,6 +218,24 @@ The weights, in the order of the work, in the rest pose:
    vertices of the tail ball {`tail` 1}, the 10 paw claws (280 vertices) {`fingers` 1} of their
    side, and the 8 foot claws (216 vertices) {`toes` 1} of their side. A claw on the head bone
    would stay behind when the paw moves.
+5. Round 12 replaces the rows of steps 2 and 3 from the ring at x 0.2504, and the paw claw rows
+   of step 4, on both arms (`scratch/bear/r12_rows.py`: `elbow_rows()`, `wrist_rows()`, then
+   `knuckle_rows()`). The old rows turned the bend of a joint in steps that were too short for
+   the arm radius, so the skin on the inner side of the bend turned over: 25 faces of the left
+   inner elbow in the lift (elbow 87°), and 20 faces of each knuckle crease (curl 60° to 80°). A
+   bend of angle a stays clean when its blend is longer than a times the distance of the inner
+   skin from the bone (0.07 at the elbow, 0.036 at the palm).
+   - Elbow. The bend share (half the elbow helper, plus the forearm) of each ring: 0.2504 0.25,
+     0.264 0.375, 0.2773 0.5, 0.2902 0.625, 0.3029 0.75, and 0.3217 0.875. A ring before the
+     joint takes {`elbow` 2b, upper arm segments the rest}, a ring after it {`elbow` 2(1 - b),
+     forearm segments the rest}. The clavicle and the wrist shares stay.
+   - Wrist. The bend share of the paw (half the wrist helper, plus the paw bones): the ring at x
+     0.3403 0.25, then by the place t along the rest forearm axis: below 0.365 0.45, 0.365 to
+     0.378 0.65, 0.378 to 0.39 0.85, and from 0.39 1.
+   - Knuckles. The paw skin from t 0.380 splits its paw share into `hand` and `fingers`: the
+     `fingers` share is 0.05 in the first band of 0.007, then 0.1 more in each band, and 1 from
+     t 0.450.
+   - Claws. Each paw claw takes one rigid row: the row of the skin vertex nearest to its root.
 
 The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights. The
 lids take the row `head` 1 ("Lids" below). The file has no shape key, no key `bind*`, and no key
