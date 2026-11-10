@@ -574,6 +574,7 @@ not change.
 | `tripo-hand/polar-bear.blend` | Made from `tripo-p2/polar-bear.fbx` by the scripted edits below. License as the FBX file | None: edit it in Blender |
 | `tripo-hand/polar-bear.rig.glb` | Export of `tripo-hand/polar-bear.blend`. License as the FBX file | `pnpm rig-export polar-bear --blend assets/models/polar-bear/tripo-hand/polar-bear.blend --out assets/models/polar-bear/tripo-hand/polar-bear.rig.glb` |
 | `tripo-hand/polar-bear.rig.json` | Text summary of the export, for diffs | The same run |
+| `tripo-hand/polar-bear-color.webp`, `tripo-hand/polar-bear-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `tools/polar-bear-maps.py` after the export |
 
 ### tripo-p2/polar-bear.fbx
 
@@ -613,13 +614,13 @@ item below gives the call and the values.
 
 | Item | Value |
 |---|---|
-| Size | 377,098 bytes |
-| SHA-256 | `0dfa8cbb18dbade48555f2630e3bebcaa6b2b40113c26b5c854a7fd8a46e16f0` |
+| Size | 391,599 bytes |
+| SHA-256 | `f9a04539c0d94a61b0a7d63c0a957d5cda24970563732b4b3f978d2e65d214ed` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the skull, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,320 vertices and 3,499 faces (2,829 quads and 670 triangles, 6,328 triangles), flat faces, and the surface of `sa.add_surface()`. 86 faces are gloss (the nose). The two eyeballs of the source (160 faces) have the face attribute `eye`. The UV map of the FBX |
-| Armature | `polar_bear_rig`: the 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, -y, to `digit5_<side>`), at the joints of `tools/mesh-rigs/simple/polar-bear-tripo.json`. The Action `bind` holds the seated bind of that config. The properties `palm` (0, 0, -1), `seat`, and `hinges` come from `sa.build_armature()` and the seat step |
+| Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,673 vertices and 3,798 faces (3,128 quads and 670 triangles, 6,926 triangles), flat faces, and the surface of `sa.add_surface()`. 86 faces are gloss (the nose). The two eyeballs of the source (147 faces after "Eye axis") have the face attribute `eye`. A lid on each eye: 312 quads with the face attribute `lid`. The UV map of the FBX, and the property `texture` |
+| Armature | `polar_bear_rig`: the 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, -y, to `digit5_<side>`), at the joints of `tools/mesh-rigs/simple/polar-bear-tripo.json`. The Action `bind` holds the seated bind of that config. The properties `palm` (0, 0, -1), `seat`, and `hinges` come from `sa.build_armature()` and the seat step. The property `lids` holds the turn and the hinge axes of the lids |
 | Facts | `height` 1.487531 (the shoulder joints at 0.693 u, 2.14651 m for each unit, so that H is 0.422795 m, the H of the main polar bear), `crease` 55 |
-| Eyes | The eyeballs of the mesh, with no eye objects, so the app adds no bead eyes. The eyeballs have the color `#15110e` until the color map loads |
+| Eyes | The eyeballs of the mesh, with no eye objects, so the app adds no bead eyes, with the `eye` finish and the eye light of the app. A lid on each eye blinks. The eyeballs have the color `#15110e` until the color map loads |
 
 The edits, in the order of the work:
 
@@ -905,9 +906,11 @@ The elbow helper reach of 0.07 units (0.035 before) took the left folds from 13 
 triangles at the back of the right knee in the pedal pose had no arm weight, so they never counted
 here ("Knee rows").
 
-The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
+The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/polar-bear.rig.glb` | 451,816 bytes | `2707612c1ba323bceaacf97d86b550131ee67ebebbac7f8b9840628856a4a078` |
-| `tripo-hand/polar-bear.rig.json` | 12,052 bytes | `b70045136035a028cb029ed91bd984e59c8d47dbc067b8af21004cb0a7276aab` |
+| `tripo-hand/polar-bear.rig.glb` | 823,196 bytes | `09cb241a0074d393934b583462cd84f0b413e87a90192fcf8d9d7f9a129d1165` |
+| `tripo-hand/polar-bear.rig.json` | 18,926 bytes | `73395d5e54e4c9ef3613f952ab8ca9f86993bfd3a815f266b1356449006edcb3` |
+| `tripo-hand/polar-bear-color.webp` | 137,702 bytes, 2048 × 2048 | `39c8557a78e7ab0bde27fdaf0a9302c391a6f6a5d583a9990829829e207d948e` |
+| `tripo-hand/polar-bear-normal.webp` | 85,786 bytes, 1024 × 1024 | `0d63c3d4096327a710aeb16f3a98e27ec0e774514d2e03c5abd76bd511718ae5` |
