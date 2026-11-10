@@ -219,13 +219,16 @@ export function instrumentScale(params: SpeciesParams, instrument: InstrumentId)
 /** The parameters of each species (design 4.3, 4.5). */
 export const SPECIES = {
   /**
-   * Rabbit, the first violins (reference image). It has the studio body of the A-pose mesh
-   * `assets/models/rabbit/rabbit-apose.glb`, which `pnpm rig-mesh rabbit` rigs with no split
-   * (design 4.4), seated with the bind pose of the studio rabbit, and standing as a soloist. Its
-   * head height is the head of the studio body, and its chair fits its legs: the seat height is the
-   * seat of the studio body, in H. The rabbit has short arms that bend less to play, so the arms
-   * reach 0.36 m, and the violin is 0.83 of the violin of the app. With the full violin of 0.958,
-   * the arms must stretch 1.62 times, and their long faces fold.
+   * Rabbit, the first violins (reference image). It has the studio body of the hand rig of the
+   * second Tripo P2 rabbit (`assets/models/rabbit/tripo-hand/rabbit.blend`, design 4.4), seated
+   * with the bind pose of that rig, and standing as a soloist. Its head height is the head of the
+   * studio body, and its chair fits its legs: the seat height is the seat of the studio body, in
+   * H. The hand rig keeps the short arms of the mesh with no stretch, so the arms reach 0.252 m
+   * from the shoulder joint to the middle of the palm, and the violin fits them: it is 0.6 of the
+   * violin of the app (0.304 m). The left paw then reaches the fingerboard from 0.2 of its length
+   * from the nut, and the bow paw reaches 0.244 m of the hair (`pnpm hold-reach rabbit
+   * --instrument violin`). With 0.83, the violin of the first rabbit, the left paw reached the
+   * fingerboard only from 0.75, and the bow paw 0.17 m of the hair.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
    * stick lies 40° from square toward the wrist, near the line of the middles of the turned paw, so
@@ -238,7 +241,7 @@ export const SPECIES = {
   rabbit: {
     body: 'studio-rabbit',
     colors: SPECIES_COLORS.rabbit,
-    violinScale: 0.83,
+    violinScale: 0.6,
     bowGrip: { at: [-0.0084, -0.04, 0.0553], turn: 40 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-rabbit'].headHeight,
     seatHeight:
