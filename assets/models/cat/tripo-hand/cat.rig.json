@@ -1,5 +1,5 @@
 {
- "sha256": "ba988ef208ccfb527455a9ba4c4317f9f33a5dc68452e7448eb65936198e0e59",
+ "sha256": "c772106b0b9d11bd3acbca484b7cf88b3eee7f6fdbaad6dbe424dd07e8012e02",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -128,8 +128,8 @@
     0.664256,
     0.160741
    ],
-   "vertices": 106,
-   "weights": "3f0c1caed91545d0"
+   "vertices": 304,
+   "weights": "cdf03f9c59dee6eb"
   },
   "fingers_L": {
    "head": [
@@ -137,8 +137,8 @@
     0.653635,
     0.187786
    ],
-   "vertices": 258,
-   "weights": "ed0ce66bce14d16a"
+   "vertices": 301,
+   "weights": "c7e14b01f76c5709"
   },
   "clavicle_R": {
    "head": [
@@ -182,8 +182,8 @@
     0.664256,
     0.160741
    ],
-   "vertices": 106,
-   "weights": "5d1d0c2c7bfd0697"
+   "vertices": 304,
+   "weights": "011a3cc44dfa1119"
   },
   "fingers_R": {
    "head": [
@@ -191,8 +191,8 @@
     0.666141,
     0.189563
    ],
-   "vertices": 258,
-   "weights": "2652f959e943a4f3"
+   "vertices": 302,
+   "weights": "f95339f16f0716b3"
   },
   "thigh_L": {
    "head": [
@@ -336,7 +336,7 @@
     0.121328
    ],
    "vertices": 37,
-   "weights": "30a9486ae66e17bb"
+   "weights": "ceff46561925fb7e"
   },
   "forearm_seg2_L": {
    "head": [
@@ -345,7 +345,7 @@
     0.134466
    ],
    "vertices": 32,
-   "weights": "d936a2a009ac14df"
+   "weights": "22a9f8ed26c41e9a"
   },
   "forearm_seg3_L": {
    "head": [
@@ -354,7 +354,7 @@
     0.147603
    ],
    "vertices": 15,
-   "weights": "8dd96c7852c684cc"
+   "weights": "4f20cee1e5c6694d"
   },
   "elbow_L": {
    "head": [
@@ -371,8 +371,8 @@
     0.664256,
     0.160741
    ],
-   "vertices": 42,
-   "weights": "34667117fd790fde"
+   "vertices": 75,
+   "weights": "ae614017e8e4f029"
   },
   "upper_arm_seg0_R": {
    "head": [
@@ -426,7 +426,7 @@
     0.121328
    ],
    "vertices": 37,
-   "weights": "f62a38a130ab8ff6"
+   "weights": "4c991d628844e7af"
   },
   "forearm_seg2_R": {
    "head": [
@@ -434,8 +434,8 @@
     0.668422,
     0.134466
    ],
-   "vertices": 33,
-   "weights": "aea6e6655fd78513"
+   "vertices": 32,
+   "weights": "4a2c10daa1395cfd"
   },
   "forearm_seg3_R": {
    "head": [
@@ -444,7 +444,7 @@
     0.147603
    ],
    "vertices": 15,
-   "weights": "547b5f3622a025c7"
+   "weights": "bcfdc92881e4a27a"
   },
   "elbow_R": {
    "head": [
@@ -461,8 +461,8 @@
     0.664256,
     0.160741
    ],
-   "vertices": 42,
-   "weights": "7e806b691f50ecb4"
+   "vertices": 75,
+   "weights": "8fd27f44c0759ce8"
   }
  },
  "shapes": {
