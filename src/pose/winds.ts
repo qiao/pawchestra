@@ -586,18 +586,30 @@ export const WIND_HOLDS = {
  * the upper body of the flute, with its fingers on the tube (`restGripShiftR`, `restAim` 0). The
  * lift moves the right grip around the flute (`gripAround`): on a straight line, the grip crosses
  * the axis of the tube, and the paw turns 180° in one frame. With the roll of the play at rest, the
- * paw passes through the tube at the end of the lift and turns 175°. The elbows point down and out
- * at rest. The left paw leaves its grip ({@link WindHold.restFreeL}), and the left arm hangs down
- * along the side. A standing fox hangs it with a small bend of the elbow ({@link FOX_HANG}).
+ * paw passes through the tube at the end of the lift and turns 175°. The elbows point down, a
+ * little out, and back at rest. The left paw leaves its grip ({@link WindHold.restFreeL}), and the
+ * left arm hangs down along the side. A standing fox hangs it with a small bend of the elbow
+ * ({@link FOX_HANG}).
  *
  * The top of the left thigh is out of reach of the left arm: the nearest place of the palm on it is
  * 0.582 m from the shoulder joint, and the arm is 0.545 m. So the left arm hangs near the side with
  * a soft bend, as a seated flutist lets the free arm hang. The paw hangs out from the outer side of
- * the haunch, with the palm toward the body. The lap place takes the top of the belly over the
- * thigh at 0.45 of the way to the knee, and the paw hangs 0.5 H out, 0.55 H down, and 0.12 H
- * forward from it. At 0.45 H out, the left upper arm goes 1.8 cm into the side of the body (limit
- * 1.5 cm). With the paw nearer to the haunch or the elbow more bent, the inner elbow goes further
- * into the side of the trunk.
+ * the haunch, with the palm to the front and a little toward the body. The lap place takes the top
+ * of the belly over the thigh at 0.45 of the way to the knee, and the paw hangs 0.5 H out, 0.55 H
+ * down, and 0.12 H forward from it. At 0.45 H out, the left upper arm goes 1.8 cm into the side of
+ * the body (limit 1.5 cm). With the paw nearer to the haunch or the elbow more bent, the inner
+ * elbow goes further into the side of the trunk.
+ *
+ * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
+ * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
+ * about 45° in each moment of the flutist and the violinist, so that the skin does not twist into
+ * a thin neck. Thus the right paw points further up past the back of the flute (`aimSide` -0.85):
+ * with -0.5, the right arm turns 14° further from its rest in the play, and the right forearm
+ * twists 47°. The free left paw hangs with its palm to the front: with the palm toward the body,
+ * the left arm turns 90° further from its rest at rest, and the forearm twists 90°. The rest
+ * elbows point further back, (-0.3, -1, 0.7) and (0.6, -1, 0.8), so that each upper arm takes
+ * about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left upper arm
+ * rolls 45° and the right forearm twists 55°.
  */
 const FOX_FLUTE = {
   ...WOODWIND,
@@ -608,11 +620,11 @@ const FOX_FLUTE = {
   poleR: [1, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
   restShift: [0.8, -0.908, 0.375],
-  restPoleL: [-0.4, -1, 0.38],
-  restPoleR: [0.8, -1, 0.6],
+  restPoleL: [-0.3, -1, 0.7],
+  restPoleR: [0.6, -1, 0.8],
   restFreeL: {
     lap: { along: 0.45, offset: [-0.5, -0.55, -0.12] },
-    palm: [0.85, -0.37, 0.38],
+    palm: [0.484, 0.251, -0.838],
     fingers: [0, -1, -0.3],
     arc: [0.57, 0.04, 0.31],
     hang: {
@@ -622,7 +634,7 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.5],
+  aimSide: [0.5, -0.85],
   gripShiftL: [-0.04, 0, 0.04],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.45, -0.13, -0.08],
