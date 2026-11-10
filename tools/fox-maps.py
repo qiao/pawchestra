@@ -1,15 +1,14 @@
 # Writes the two color maps of the Tripo fox from the color map of its FBX (design 4.5,
 # assets/models/fox/README.md, "Color map" and "Tan color map"): `fox-color.webp` for the red fox
 # and `fox-tan-color.webp` for the tan fox, and the normal map of the fur, `fox-normal.webp`, which
-# both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels, moves
-# the iris and the pupil of each eyeball to the middle of its eye opening ("Pupils"), and moves
-# each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
+# both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels, paints
+# each eyeball as a calm, natural eye ("Eyes"), and moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
 # fox in the hall light, and the socks get darker. In the tan map, the orange fur goes to the tan
 # fur of the main fox in the hall light, and the dark socks go to a dark tan. In both maps the cream,
 # the white, and the black keep their colors, and each leg and forearm gets a sharp sock edge.
 # Each texel takes a mix of the steps of the colors, by its nearness to each color, so the blend
 # between two colors of the fur stays smooth. Only the texels of the limbs and the head take the
-# step of the socks. The texels of the eyeballs keep their moved colors: the script reads their
+# step of the socks. The texels of the eyeballs keep their painted colors: the script reads their
 # triangles, texture points, and the joints from the rig file (`ownEyes` of the export). The
 # output depends only on the input files and on cwebp 1.5.0.
 #
