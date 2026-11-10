@@ -68,16 +68,34 @@ const BODY_BONES = [
 /** The open loops of {@link BODY_BONES}: the cuts to the two upper arms. */
 const BODY_LOOPS = 2;
 
-/** The rig file of the hand rig of the Tripo polar bear (`assets/models/polar-bear/README.md`). */
-const TRIPO_POLAR_BEAR = 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb';
+/**
+ * The open loops of {@link BODY_BONES} of each Tripo hand rig, by its rig file (the `README.md` of
+ * each model folder):
+ *
+ * - The polar bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet, the
+ *   2 eye sockets, the open backs of the 2 eyeballs, the edges of the 2 lids, and 10 small open
+ *   loops of the mouth and its parts, which the source mesh has.
+ * - The bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet and of the
+ *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
+ * - The cat: the cuts to the two upper arms, the 2 eye sockets, the edges of the 2 lids, and 19
+ *   open ends of the whisker strips and of the strips over the eyes, which the source mesh has.
+ */
+const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
+  ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 26],
+  ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
+  ['assets/models/cat/tripo-hand/cat.rig.glb', 25],
+]);
 
 /**
- * The open loops of {@link BODY_BONES} of the Tripo polar bear: the cuts to the two upper arms,
- * the open bases of the 8 claws of the feet, the 2 eye sockets, the open backs of the 2 eyeballs,
- * the edges of the 2 lids, and 10 small open loops of the mouth and its parts, which the source
- * mesh has.
+ * Gives the open loops of {@link BODY_BONES} of the body of a player.
+ *
+ * @param posed The posed skeleton.
+ * @param loops The open loops of the body of the species when it is no Tripo hand rig.
+ * @returns The loops of {@link TRIPO_BODY_LOOPS} for a Tripo hand rig, else `loops`.
  */
-const TRIPO_POLAR_BEAR_LOOPS = 26;
+function bodyLoops(posed: PosedSkeleton, loops: number): number {
+  return TRIPO_BODY_LOOPS.get(posed.model.studio.body.source) ?? loops;
+}
 
 /**
  * The open loops of {@link BODY_BONES} of the foxes, the bodies of the meshes
@@ -248,14 +266,13 @@ function* playSamples(scene: TestScene): Generator<SweepSample> {
 
 /**
  * The closed surface of the body of an animal: {@link BODY_BONES} with a cap on each cut, or on
- * each open loop of the Tripo polar bear ({@link TRIPO_POLAR_BEAR_LOOPS}).
+ * each open loop of a Tripo hand rig ({@link TRIPO_BODY_LOOPS}).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function bodySurface(posed: PosedSkeleton): ClosedSurface {
-  const tripo = posed.model.studio.body.source === TRIPO_POLAR_BEAR;
-  return closedPart(posed, BODY_BONES, tripo ? TRIPO_POLAR_BEAR_LOOPS : BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, BODY_LOOPS));
 }
 
 /**
@@ -271,14 +288,14 @@ function meshBodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of the cat mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link CAT_BODY_LOOPS}).
+ * The closed surface of the body of the cat: {@link BODY_BONES} with a cap on each open loop
+ * ({@link CAT_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function catBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, CAT_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, CAT_BODY_LOOPS));
 }
 
 /**
