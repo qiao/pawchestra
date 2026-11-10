@@ -196,9 +196,15 @@ function addBodyMap(shader: WebGLProgramParametersWithUniforms, on: { value: num
  *
  * @param shared The shared material (`createMaterials()`).
  * @param file The image, relative to the repository (`StudioTexture.file`).
+ * @param normalOf The color map whose normal map the fur takes: the map of the body for a map of a
+ *   palette (`StudioTexture.palettes`), because the UVs and the strands of both maps are the same.
  * @returns The material.
  */
-export function bodyMapMaterial(shared: MeshStandardMaterial, file: string): MeshStandardMaterial {
+export function bodyMapMaterial(
+  shared: MeshStandardMaterial,
+  file: string,
+  normalOf: string = file,
+): MeshStandardMaterial {
   let byFile = materials.get(shared);
   if (!byFile) {
     byFile = new Map();
@@ -207,7 +213,7 @@ export function bodyMapMaterial(shared: MeshStandardMaterial, file: string): Mes
   let material = byFile.get(file);
   if (!material) {
     const map = bodyMapOf(file, 'color');
-    const normalFile = normalFileOf(file);
+    const normalFile = normalFileOf(normalOf);
     const normalMap = bodyMapOf(normalFile, 'normal');
     const fur = createFurUniforms(normalMap.on);
     const copy = shared.clone();

@@ -525,7 +525,9 @@ export function createPlayerMesh(
   const { body } = model.studio;
   const file = model.bodyMap;
   const mapped =
-    file === null ? materials : materials.map((shared) => bodyMapMaterial(shared, file));
+    file === null
+      ? materials
+      : materials.map((shared) => bodyMapMaterial(shared, file, body.texture?.file));
   const mesh = createStudioMesh(
     model,
     model.studio,
