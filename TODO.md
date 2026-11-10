@@ -713,12 +713,16 @@ passes.
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
 - [ ] Cat candidate (`tripo-hand/`): the left upper arm takes 44.5° and the forearm 43.7° in the
       play, with no margin. The two parts take 88° together, so a margin needs a left paw that
-      turns about 8° less on the viola neck (a new viola place) or a second ring step of the
-      paw turn with a new rest hold (`assets/models/cat/README.md`, "Arm twist after the form
-      edits").
-- [ ] Cat candidate: at the frog, two small dark slits lie at the crease of the lower belly and
-      the thighs, and flat facets show on the white lower belly
-      (`reports/2026-11-10-cat-hand-r9/crotch/`). Find the faces and relax them in the bind key.
+      turns about 8° less on the viola neck (a new viola place). A second paw ring step with the
+      left elbow axis turned 20° gives 24.5° and 19.7° in the play, but -55° and -63° at rest,
+      and no `restPawTurnL` or `restPoleL` brings both rest parts to 45°.
+- [ ] Cat candidate: a soft star of facets stays on the white crotch at the frog
+      (`reports/2026-11-10-cat-hand-r10/panel.png`). The normals are smooth, so it comes from the
+      rim lights that the app calculates at the vertices of the large crotch faces.
+- [ ] Cat candidate: at the rest moment, a dark dent shows over the inner end of the left eye. The
+      source brow on that side is steeper (a column of faces that turn away from the light).
+- [ ] Cat candidate: `pnpm body-shape` gives D2 7.5 cm (33.5 cm before the crotch smooth). The cut
+      of level 2 lies in the crotch, and the probe now finds a small loop there. W2 stays 41.9 cm.
 - [ ] Cat candidate: the tail root needs the chair 0.419 m deep (main 0.343 m). A tail root
       that leaves the back lower, or a thinner root, gives a shorter chair.
 - [ ] Cat candidate: the shin texels stretch 1.38 times along the leg, so the strands read 1.23
