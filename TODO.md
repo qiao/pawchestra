@@ -151,8 +151,6 @@ passes.
       the user in a close play frame of the stage.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
-- [ ] Tripo polar bear: in the lowering after a stop, the arms go 5.8 cm (forearms) and 6.2 cm
-      (upper arms) into the belly, against 2.4 cm and 2.1 cm on main (`pnpm pose-depth pianist`).
 - [ ] Tripo polar bear: the left grip turn p50 is 13° in the play, against 6° on main (limit 45°).
 - [ ] Tripo polar bear: the closed lid stands out from the face as a cap (1.25 ball radii). Check
       the blink with the user in a close play frame
@@ -702,13 +700,15 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the pea eye of the app must change both, or the preview must come from the app.
-- [ ] Tripo bear candidate (`assets/models/bear/tripo-hand/`): in the face crop at 60°, the side
-      of the gloss nose shows a fan of small light triangles, and a brown wedge of fur faces at
-      its root (`reports/2026-11-10-bear-hand-r10/`). The front and the hall views do not show
-      them. Flat facets on the nose sides, as on its top (README, "Nose facets"), can fix them.
-- [ ] Tripo bear candidate: `pnpm pose-depth conductor` and `pnpm body-shape conductor` stop at
-      the open loops of the claws, the eyeballs, and the tail ball, so no clearance sweep covers
-      this body. The views show the forearms clear of the belly.
+- [ ] Tripo bear candidate (`assets/models/bear/tripo-hand/`): in the play, the forearms go up to
+      3.6 cm and the paws up to 5.6 cm into the head, against 0.0 cm and 0.3 cm on main
+      (`pnpm pose-depth conductor`, Brahms 2 285.38 s and 127.88 s, 0.3% of the samples). The
+      raised right forearm meets the cheek when the head turns to a section on the right. The head
+      of this body sits 11 cm higher and its muzzle 4 cm further forward than on main. A change of
+      the turn of the head in a cue (`CUE_MOTION`) or of the form of the head is next.
+- [ ] Tripo bear candidate: the arm gate fails the folds against main (`pnpm arm-check conductor
+      --base main`): L 50 (main 7) in the lift, most at the left inner elbow (`elbow_L`), and R 29
+      (main 9), most in the baton fist (`hand_R`, `fingers_R`). The round start gave the same.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
 - [ ] Cat candidate (`tripo-hand/`): the left upper arm takes 44.5° and the forearm 43.7° in the
@@ -716,6 +716,10 @@ passes.
       turns about 8° less on the viola neck (a new viola place). A second paw ring step with the
       left elbow axis turned 20° gives 24.5° and 19.7° in the play, but -55° and -63° at rest,
       and no `restPawTurnL` or `restPoleL` brings both rest parts to 45°.
+- [ ] Cat candidate: the arm gate fails the folds against main (`pnpm arm-check violist --base
+      main`): L 41 (main 2) at rest and R 18 (main 2) in the play. Most folded faces lie in the
+      curled claws and the paw heel (`fingers_R`, `fingers_L`, `hand_L`, `hand_R`). The round
+      start gave the same.
 - [ ] Cat candidate: a soft star of facets stays on the white crotch at the frog
       (`reports/2026-11-10-cat-hand-r10/panel.png`). The normals are smooth, so it comes from the
       rim lights that the app calculates at the vertices of the large crotch faces.
