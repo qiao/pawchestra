@@ -33,12 +33,13 @@ QUALITY = 60
 #: --azimuth 35 --zoom 1.3`), it is L 0.568, C 0.127, h 41.7, against L 0.555, C 0.131, h 40.3.
 #: The target lies a little outside the sRGB gamut, so a larger chroma moves no texel further.
 RED_FUR = (0.485, 0.155, 58.0)
-#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. The light of
-#: the app makes the fur darker and warmer than the map. In the 3/4 app view of the tan fox
-#: (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6`), this
-#: target gives the median fur L 0.636, C 0.102, h 56.0, against L 0.634, C 0.102, h 57.1 on the
-#: fox of main. The lightness of the tan palette of the faces (L 0.63) gave L 0.517.
-TAN_FUR = (0.80, 0.10, 75.0)
+#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. In the hall
+#: view (the key light from the back, no fill light), the target L 0.80 made the fur read near
+#: white beside the tan fox of main. This target gives the median fur L 0.638, C 0.103, h 55.5 in
+#: that view (L 0.649, C 0.101, h 56.5 before), and L 0.663, C 0.103, h 55.6 in the 3/4 view
+#: with the fill light (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3
+#: --time 6`), against L 0.612, C 0.103, h 55.3 on the tan fox of main.
+TAN_FUR = (0.75, 0.105, 72.0)
 #: The colors of the red fox in the map (sRGB) and the colors that take their place, for each map:
 #: the region colors of the face colors of the hand rig (assets/models/fox/README.md, "Smooth
 #: surface"), and the white, the black, and the cream of the map, which keep their colors. A target
