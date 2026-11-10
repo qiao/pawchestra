@@ -575,13 +575,13 @@ the height y (studio axes) by its height y in the source:
 g(y) = y + (k - 1) G(y),  k = 1.38,  G(y) = the integral from 0 to y of b
 b(y) = 0 below y 0.055, a smoothstep up to 1 at y 0.075, 1 to y 0.15,
        a smoothstep down to 0 at y 0.175, 0 above y 0.175
-vertex: y += (1 - t) (g(y) - y) + t * rise,  rise = (k - 1) G(1) = 0.0361
+vertex: y += (1 - t) (g(y) - y) + t * rise,  rise = (k - 1) G(1) = 0.03705
 t: the tail share, ss(-0.003, -0.012, z) * (1 - ss(0.42, 0.46, y))
 ```
 
 The scale along each leg thus goes smoothly from 1 at the ankle to 1.38 on the shin and back to 1
 at the knee, so no loop spacing jumps. Each point above y 0.175 and the whole tail move up by
-0.0361 units (the rigid part of the body). The joints of the config take the same map. Before the
+0.03705 units (the rigid part of the body). The joints of the config take the same map. Before the
 edit, an edge ring Subdivide with 1 cut splits each of the two shin bands of 11 edges, y 0.0674 to
 0.0958 and 0.0958 to 0.1287 of each leg, so that the longer shin keeps a loop each 0.3 to 0.45
 leg radii.
@@ -593,5 +593,5 @@ leg radii.
 | Seat height of the app | 0.244 m | 0.305 m | 0.298 m |
 
 The values in the paragraphs above "Longer legs" are in the rest places before this edit: add
-0.0361 to each height above y 0.175 (studio y, Blender z), except the belly key, whose heights are
+0.03705 to each height above y 0.175 (studio y, Blender z), except the belly key, whose heights are
 after it.
