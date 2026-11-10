@@ -96,6 +96,7 @@ red fox and the tan fox share it.
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/fox-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
 | `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Tan color map" below). License as the FBX file | `tools/fox-tan-map.py` |
+| `tripo-hand/fox-normal.webp` | Web copy of the normal map of the Tripo FBX, for the red fox and the tan fox ("Normal map" below). License as the FBX file | None: made one time from the source image |
 
 ### tripo-p2/fox.fbx
 
@@ -491,8 +492,11 @@ uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fo
 ```
 
 It scales the source as `fox-color.webp`, and moves each texel in Oklab: the orange fur (sRGB 220,
-98, 12) to the tan fur `#c9a273`, and the dark socks (73, 37, 17) to the tan accent `#9a7148` of
-`SPECIES_COLORS['fox-tan']`. The cream, the muzzle, the white, and the black keep their colors.
+98, 12) to (166, 129, 83), and the dark socks (73, 37, 17) to (143, 102, 62). These targets have
+the Oklab hue and chroma of the tan fur `#c9a273` and the tan accent `#9a7148` of
+`SPECIES_COLORS['fox-tan']`, and the Oklab lightness that the tan palette of the faces gives the
+fur and the socks (`paletteMap()`: 186, 118, 73 and 153, 97, 49). The cream, the muzzle, the
+white, and the black keep their colors.
 Each texel takes a mix of the steps of these anchors and of the anchors at 1/3 and 2/3 of each
 blend of the map (orange to cream, socks, white, and muzzle, and socks to black), by its nearness
 to each (Gaussian, 0.06 in Oklab). The hue step of an anchor shrinks with the chroma of the texel,
@@ -502,10 +506,45 @@ UVs or the eyes.
 
 | Item | Value |
 |---|---|
-| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 102,310 bytes, SHA-256 `ae820e3a97d856b3ed7cfed2553254874e79c62bde902b302bbc191e3c059e99` |
+| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 104,558 bytes, SHA-256 `0f36f9aa91750ccfd02ae65ff25236c831fe6fbca82e9d242d7fd73fc41daad0` |
 | Origin, license | As `fox-color.webp` |
 
 Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
+
+The targets `#c9a273` and `#9a7148` themselves made the tan fox read cream in the app. Their
+fur is lighter than the tan palette (Oklab L 0.74 against 0.63). A smooth body facing the front
+light reaches the shoulder of the tone curve, where the chroma falls. The median fur of the 3/4 view
+at zoom 2 was sRGB (238, 199, 146), against (190, 137, 100) on the tan fox of main. With the targets
+above it is (228, 175, 111). The palette colors themselves gave (237, 169, 104), which read orange.
+
+**Normal map.** The app tilts the normals of the fur faces of the candidate with the normal map of
+the Tripo FBX (design 4.5, fur shading). The map uses the UV map of the FBX, as the color map does.
+The red fox and the tan fox share it: the tan map has the same UVs and strands. The checks of the
+source:
+
+- Tangent space: the mean normal is (0.00, 0.00, 1.00), and 2 texels of 16.8 million have z < 0.
+- Green of OpenGL (+y up in the image): on the UV seams of the FBX mesh, the two faces of an edge
+  decode normals with a median gap of 37.7° with this sign, and 41.6° with the other sign (2,077
+  samples with a tilt of 0.03 or more). The same test gives 27.9° and 29.6° on the rabbit, whose
+  map is OpenGL.
+
+| Item | Value |
+|---|---|
+| Source | `tripo-p2/fox.fbm/fox_normal.jpg` (above) |
+| Steps | Limit each x, y tilt to the length 0.2 (1.14 % of the texels: the baked eye rims, the nose, and the ruff spikes of the source mesh). Box scale to 1024 × 1024. Store x and y times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`) in red and green, and 255 in blue, which the shader does not read. No stored value clips |
+| `fox-normal.webp` | `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0): 23,746 bytes, a7fd95740cab76b4f579daf3719b6b2afb997634292d68e58cf1cbaea997d079-256 `a7fd95740cab76b4f579daf3719b6b2afb997634292d68e58cf1cbaea997d079` |
+| Origin, license | As `fox-color.webp` |
+
+The tilts of the source are small (median 0.0055, 99th percentile 0.24).
+
+**Fur sheen.** The sheen of the fur falls with the linear luma of the fur color below
+`FUR_LOOK.sheen.fullLuma` (design 4.5). The map paints the orange fur at a linear luma of 0.24,
+the same as the orange of the reference sheet (sRGB 208, 107, 43). With the full sheen on all fur,
+the dark socks of the red fox read cream: their median luma in the rest views at zoom 1 is 90 in
+the front view and 56 in the left view, against 59 and 23 with no sheen. With the scale they are
+63 and 25, and the orange fur keeps a sheen of 7 to 9 levels. The scale changes 0.2 % of the pixels
+of the rest views of the rabbit candidate by 8 levels or more (at most 0.66 %, in the 3/4 view), at
+the outline and the inner ears. Thus the scale stays.
 
 **Lids.** A scripted edit in the live Blender adds a lid to each eye, as a separate part, as the
 rabbit candidate has them. The mesh has no open socket: the head surface cuts each ball at about
