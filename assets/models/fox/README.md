@@ -818,3 +818,29 @@ With the larger H, the rest values of `FOX_FLUTE` (`src/pose/winds.ts`) in H tak
 their values, so the rest stays in meters: with the old values, the right forearm of the flutist
 twisted 47° at rest. In the moments of "Arm twist", each part of each arm of the violinist takes
 40.2° or less, and of the flutist 44.3° or less (the right forearm of the standing flutist).
+
+**Calm eyes.** In the 2x face crops of the hall light (`reports/2026-11-09-fox-hand-r12/`, which git
+ignores), four parts of the face read worried: the light spots above the eyes as raised inner brows
+("Brow spots" below), the dark upper eye line that slopes down at the outer end, the pupil high in
+the opening, as in a look up, and the large eye. A point edit in the live Blender
+(`foxr12.apply_face(roll_deg=12, iris_deg=10, eye_f=0.75 / 0.85, r_in=0.036, r_out=0.072)` of the
+session), about the middle c of each eyeball (a sphere fit, (±0.0469, -0.12483, 0.88492)), in this
+order:
+
+1. Size: the eyeball and the lid scale about c by 0.882 (the eye 0.75 of the source size, 0.85
+   before). Each other vertex of the side, except the whiskers and the gloss nose, moves toward c by
+   the same factor up to 0.036 units from c, and by a smoothstep back to 1 at 0.072 units.
+2. Iris: the eyeball alone turns 10° down about the lid hinge axis h, through c.
+3. Roll: the eyeball, the lid, and the skin turn 12° about the eye axis g (h × +z), through c, so
+   that the outer end of the upper eye line goes up. The skin takes the full turn up to 0.036 units
+   from c and a smoothstep to 0 at 0.072 units.
+
+885 vertices move, at most 0.0085 units. The basis and the key `bind_belly` take the same moves. The
+property `lids` keeps the angle 2.199115 and takes the turned axes: left (0.891878, 0.401655,
+0.207912), right (0.893729, -0.397519, -0.207912). The ball radius is now 0.02304. In the 21 steps
+of the blink the ray casts give the same counts as before the edit, with no open lid point outside
+the head, and the blink and the soft highlight of the eye light show in the app. A lineup in the
+hall light (`lineup-face.png` of the report): the brows painted, then the roll 12° and the iris
+10°, then the eye 0.75 and 0.65, and the roll 20° with the iris 6°. The eye 0.75 read the most calm
+and happy: the pupil looks forward, the upper line is level, and the eye is nearer the bead eyes
+of the fox of main. At 0.65 the eye read small and squinted.
