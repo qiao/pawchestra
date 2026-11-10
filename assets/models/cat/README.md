@@ -509,3 +509,20 @@ violist (`CAT_HOLD` of `src/pose/bowed-rig.ts`) make each part take 45° or less
 - **Elbow axis.** The property `hinges` of the right arm is the axis of the config turned -30°
   about its bind upper arm: (-0.460806, 0.475631, 0.749288). With +30°, the right upper arm rolls
   -81° at the frog.
+
+**Smooth surface.** Two changes make the candidate smooth (`reports/2026-11-10-cat-hand-r6/`,
+which git ignores). With the crease 55 (the facts), the arm loops of 8 vertices, 45° apart, shade
+round:
+
+- **One color for each region.** The face colors of `add_surface()` took the shade that the
+  Tripo texture bakes, so the fur showed many tones on each part. Each face now takes the color
+  of its region, by the lightness L, the saturation S, and the hue h of its old color (HLS, sRGB):
+  pink (h below 16° or above 340°, S at least 0.38, and L above 0.35: the inner ears, the pads,
+  and the mouth, 416 faces, sRGB 198, 140, 122), white (L at least 0.6: the bib, the muzzle, and
+  the paws, 1,144 faces, 218, 184, 164), and the grey fur (1,826 faces, 135, 115, 106). Each region
+  takes the color of its face at 0.6 of its luma range. The gloss nose, the eyeballs, and the faces
+  of the loose parts keep their colors. The color map of round 7 replaces the face colors.
+- **Relax.** Ten Taubin rounds (0.5, then -0.53) on the body, with each move clipped to 0.01
+  units, move the vertices at most 0.01 units (mean 0.0018, 26 clipped). The eyeballs, the loose
+  parts, the gloss nose, the open edges (the eye sockets), and the vertices of the edges of more
+  than two faces (the lip and lid lines) stay. The bones and the weights stay.
