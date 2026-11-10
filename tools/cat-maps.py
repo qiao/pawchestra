@@ -7,13 +7,18 @@
 # eyes and the mouth (the armpits, the neck under the chin) take the fur around them too. Each
 # texel takes a mix of the steps of the colors, by its nearness to each color, so the blend
 # between two colors stays smooth. The texels of the eyeballs keep their colors: the script reads
-# their triangles and texture points from the rig file (`ownEyes` of the export). The output
-# depends only on the input files.
+# their triangles and texture points from the rig file (`ownEyes` of the export). The script also
+# writes the normal map of the fur, `cat-normal.webp`, from the normal map of the FBX ("Normal
+# map" of the README), with no tilt on the brow spots and the skin over the eyes. The output depends only on
+# the input files and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py
 import json
+import os
 import struct
+import subprocess
 import sys
+import tempfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -23,6 +28,14 @@ RIG = 'assets/models/cat/tripo-hand/cat.rig.glb'
 OUT = 'assets/models/cat/tripo-hand/cat-color.webp'
 SIZE = 2048
 QUALITY = 60
+#: The normal map of the source and the web copy of the normal map of the fur.
+NORMAL_SOURCE = 'assets/models/cat/tripo-p2/cat.fbm/cat_normal.jpg'
+NORMAL_OUT = 'assets/models/cat/tripo-hand/cat-normal.webp'
+#: The size of the normal map, its largest tilt (x, y), and the gain of the stored tilts
+#: (`NORMAL_MAP_GAIN` of src/scene/fur.ts).
+NORMAL_SIZE = 1024
+NORMAL_LIMIT = 0.2
+NORMAL_GAIN = 4
 
 #: The Oklab lightness, chroma, and hue (degrees) of the gray fur of the map. The hall view of the
 #: app (the key light from the back, no fill light) is the target: see assets/models/cat/README.md,
@@ -59,6 +72,19 @@ BROW_SPOT = ((-0.3, 1.15), 0.55)
 BROW_FAR = 0.05
 #: The texels around the brow triangles that a light spot texel can also take.
 BROW_GROW = 2
+#: The dark shade that the source map paints under each light brow spot: its middle from the
+#: middle of the eyeball and its radius, in the units of BROW_SPOT. In the hall light the two
+#: shades read as knit brows, which give a worried face. Each texel of the front triangles with
+#: its middle in the shade that is darker than the fur by more than BROW_DARK takes the median of
+#: the other texels of its part of the map.
+BROW_SHADE = ((-0.05, 0.8), 0.4)
+#: The Oklab lightness below the gray fur under which a texel of a shade triangle is a shade
+#: texel.
+BROW_DARK = 0.025
+#: The skin over each eye where the normal map has no tilt: the middle and the radius in the
+#: units of BROW_SPOT. The source paints the brow tufts and the upper lids as strong tilts, which
+#: show as dark strands over the eyes in the hall light.
+BROW_FLAT = ((-0.1, 0.75), 0.6)
 #: The Oklab lightness below which a texel is dark. The source paints dark patches on the armpits
 #: and under the chin, which show as black bands under the arms and the head.
 DARK_L = 0.42
@@ -264,14 +290,14 @@ def fill_parts(lab, spot, around):
     return out
 
 
-def brow_fill(rig, lab):
-    """Paints the light brow spots over with the fur around them (see BROW_SPOT). Gives the moved
-    Oklab image and the count of the painted texels."""
+def brow_triangles(rig, spot_rule):
+    """Gives the mask of the texels of the front triangles with their middle within the radius of
+    the spot of a rule (BROW_SPOT or BROW_SHADE) over each eye, grown by BROW_GROW texels."""
     triangles, positions, points, eyes, _ = rig
     middles, unit = eye_frame(rig)
     face_middles = positions[triangles].mean(axis=1)
     own = {t for side in ('L', 'R') for t in eyes[side]['faces']}
-    (ox, oy), radius = BROW_SPOT
+    (ox, oy), radius = spot_rule
     inner = []
     for side, sign in (('L', 1), ('R', -1)):
         c = middles[side]
@@ -280,10 +306,19 @@ def brow_fill(rig, lab):
         front = face_middles[:, 2] > c[2]
         inner += [t for t in np.flatnonzero((d < radius) & front) if t not in own]
     region = np.asarray(draw_triangles(triangles, points, inner, SIZE)) > 0
-    grown = np.asarray(Image.fromarray(region).filter(ImageFilter.MaxFilter(2 * BROW_GROW + 1))) > 0
+    return np.asarray(Image.fromarray(region).filter(ImageFilter.MaxFilter(2 * BROW_GROW + 1))) > 0
+
+
+def brow_fill(rig, lab):
+    """Paints the light brow spots (see BROW_SPOT) and the dark shades under them (see BROW_SHADE)
+    over with the fur around them. Gives the moved Oklab image and the counts of the painted
+    texels."""
     fur = oklab(linear(ANCHORS[0][0]))
+    grown = brow_triangles(rig, BROW_SPOT)
     spot = grown & (np.linalg.norm(lab - fur, axis=-1) > BROW_FAR) & (lab[..., 0] > fur[0])
-    return fill_parts(lab, spot, BROW_GROW + 2), int(spot.sum())
+    lab = fill_parts(lab, spot, BROW_GROW + 2)
+    shade = brow_triangles(rig, BROW_SHADE) & (lab[..., 0] < fur[0] - BROW_DARK)
+    return fill_parts(lab, shade, BROW_GROW + 2), int(spot.sum()), int(shade.sum())
 
 
 def dark_fill(rig, lab, eyes):
@@ -332,15 +367,46 @@ def write_map(image, lab, eyes):
           f'{changed.mean() * 100:.1f} % of the texels moved')
 
 
+def write_normal_map(rig):
+    """Writes the normal map of the fur: each x, y tilt of the source limited to the length
+    NORMAL_LIMIT, a box scale to NORMAL_SIZE, no tilt on the triangles of the brow spots and of
+    BROW_FLAT (a soft edge of 4 texels), then the tilts times NORMAL_GAIN in red and green, 255 in
+    blue, and cwebp -q 60 -sharp_yuv -m 6."""
+    a = np.asarray(Image.open(NORMAL_SOURCE).convert('RGB')).astype(np.float64) / 255 * 2 - 1
+    t = a[..., :2].copy()
+    length = np.linalg.norm(t, axis=-1)
+    over = length > NORMAL_LIMIT
+    t[over] *= (NORMAL_LIMIT / length[over])[:, None]
+    k = t.shape[0] // NORMAL_SIZE
+    small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
+    brows = brow_triangles(rig, BROW_SPOT) | brow_triangles(rig, BROW_FLAT)
+    flat = Image.fromarray((brows * 255).astype(np.uint8)).resize((NORMAL_SIZE, NORMAL_SIZE), Image.BOX)
+    flat = np.asarray(flat.filter(ImageFilter.GaussianBlur(2))).astype(np.float64) / 255
+    small *= (1 - flat)[..., None]
+    v = np.clip(small * NORMAL_GAIN, -1, 1)
+    rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
+    rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
+    rgb[..., 2] = 255
+    with tempfile.TemporaryDirectory() as folder:
+        png = os.path.join(folder, 'normal.png')
+        Image.fromarray(rgb).save(png)
+        subprocess.run(['cwebp', '-quiet', '-q', '60', '-sharp_yuv', '-m', '6', png, '-o', NORMAL_OUT],
+                       check=True)
+    print(f'{NORMAL_OUT}: {NORMAL_SIZE} x {NORMAL_SIZE}, {over.mean() * 100:.2f} % of the source '
+          f'tilts limited, {int((flat > 0.5).sum())} brow texels with no tilt')
+
+
 def main():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
     eyes, count = eye_mask(rig, SIZE)
-    lab, painted = brow_fill(rig, oklab(linear(np.asarray(image))))
-    print(f'{painted} texels of the brow spots take the fur around them')
+    lab, painted, shaded = brow_fill(rig, oklab(linear(np.asarray(image))))
+    print(f'{painted} texels of the brow spots and {shaded} texels of their shades take the fur '
+          'around them')
     lab, dark = dark_fill(rig, lab, eyes)
     print(f'{dark} dark texels away from the eyes and the mouth take the fur around them')
     write_map(image, lab, eyes)
+    write_normal_map(rig)
 
 
 if __name__ == '__main__':
