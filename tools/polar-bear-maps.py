@@ -2,9 +2,10 @@
 # (design 4.5, assets/models/polar-bear/README.md, "Color map" and "Normal map"). The color map
 # scales the source image to 2048 pixels and moves each texel in Oklab. The cream fur of the
 # source goes to the white of the main polar bear in the hall light, and it keeps its strands as
-# small steps of the lightness. The dark nose, claws, pads, and mouth line keep their lightness.
-# The texels of the eyeballs keep their colors: the script reads their triangles and texture
-# points from the rig file (`ownEyes` of the export). The normal map limits each tilt of the
+# small steps of the lightness. The dark nose, pads, and mouth line keep their lightness, and the
+# claws turn as dark as the black claws of the main polar bear. The texels of the eyeballs keep
+# their colors. The script reads the triangles of the eyeballs (`ownEyes` of the export) and of the
+# claws (the loose parts of CLAW_PARTS positions) and their texture points from the rig file. The normal map limits each tilt of the
 # source, scales it to 1024 pixels, and stores the tilts times NORMAL_MAP_GAIN of src/scene/fur.ts.
 # The output depends only on the input files.
 #
@@ -47,6 +48,18 @@ DARK = (0.55, 0.72)
 DARK_CHROMA = 0.6
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
+#: The Oklab lightness, chroma, and hue (degrees) of the claws. The source paints the claws brown
+#: with light tips (median L 0.635), which read pale gray beside the black claws of the main polar
+#: bear (SPECIES_COLORS accent #1a1715).
+CLAW = (0.25, 0.012, 60.0)
+#: The share of the lightness steps of the claw texels around their median that the claws keep.
+CLAW_STEPS = 0.25
+#: The smallest and the largest count of positions of a loose part that is a claw: the claws of
+#: the Tripo mesh have 32 or 33 vertices, the mouth parts 11 or 12, and the eyeballs and the lids
+#: more than 70.
+CLAW_PARTS = (25, 40)
+#: The texels around the claw triangles that take the claw color too.
+CLAW_MARGIN = 2
 #: The largest length of the x, y tilt of a normal of the source. A larger tilt is a baked eye
 #: rim, nose, or claw edge of the source mesh, which the edited mesh does not have.
 TILT_LIMIT = 0.2
@@ -137,6 +150,33 @@ def eye_mask(rig, size):
     return np.asarray(mask) > 0, len(faces)
 
 
+def claw_mask(rig, size):
+    """Gives the texels of the claw triangles of the rig file (the loose parts with a count of
+    positions in CLAW_PARTS), grown by CLAW_MARGIN texels, and the count of claws."""
+    triangles, positions, points, _ = rig
+    _, weld = np.unique(np.round(positions.astype(np.float64), 6), axis=0, return_inverse=True)
+    weld = weld.ravel()
+    parent = np.arange(weld.max() + 1)
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for t in triangles:
+        a, b, c = (find(weld[i]) for i in t)
+        parent[b] = a
+        parent[find(c)] = a
+    roots = np.array([find(i) for i in range(len(parent))])
+    sizes = np.bincount(roots)
+    part = roots[weld[triangles[:, 0]]]
+    claws = (sizes[part] >= CLAW_PARTS[0]) & (sizes[part] <= CLAW_PARTS[1])
+    mask = draw_triangles(triangles, points, np.flatnonzero(claws), size)
+    mask = mask.filter(ImageFilter.MaxFilter(2 * CLAW_MARGIN + 1))
+    return np.asarray(mask) > 0, len(set(part[claws].tolist()))
+
+
 def lch(lightness, chroma, hue):
     h = np.radians(hue)
     return np.array([lightness, chroma * np.cos(h), chroma * np.sin(h)])
@@ -167,12 +207,16 @@ def color_map(rig):
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     lab = oklab(linear(np.asarray(image)))
     moved = white_fur(lab)
+    claws, claw_count = claw_mask(rig, SIZE)
+    median = np.median(lab[claws][:, 0])
+    moved[claws] = lch(*CLAW)
+    moved[claws, 0] += CLAW_STEPS * (lab[claws][:, 0] - median)
     eyes, count = eye_mask(rig, SIZE)
     moved[eyes] = lab[eyes]
     out = srgb8(linear_of_oklab(moved))
     Image.fromarray(out).save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
     print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {count} eye triangles kept ({int(eyes.sum())} texels), '
-          f'{os.path.getsize(COLOR_OUT)} bytes')
+          f'{claw_count} claws ({int(claws.sum())} texels), {os.path.getsize(COLOR_OUT)} bytes')
 
 
 def normal_map():
