@@ -627,3 +627,22 @@ fade with the weights.
 levels 3 to 8 are now within 6 % of main. The lower levels stay up to 1.3 times thinner in depth,
 because the lower belly carries thigh weights. The bones and the weights stay. The relax and the
 key `bind_belly` come after this edit.
+
+**Paw size.** From the wrist joint to the finger tips along the rest forearm axis, and across it on
+the two axes of the paw (`measure_glb.py` of the session, both rig files in their bind, the
+vertices with more than 0.5 of `wrist`, `hand`, and `fingers`):
+
+| Paw | Length | Width | Thickness |
+|---|---|---|---|
+| Candidate before | 0.166 m (0.488 H) | 0.173 m (0.511 H) | 0.098 m (0.287 H) |
+| Cat of main | 0.108 m (0.318 H) | 0.130 m (0.383 H) | 0.080 m (0.236 H) |
+| Candidate after | 0.116 m (0.343 H) | 0.131 m (0.385 H) | 0.090 m (0.266 H) |
+
+H is 0.339375 m, the H of main. A point edit in the rest, after the paw turn and before the longer
+shins, maps each vertex past the wrist joint in the frame of its paw (as the fox, "Paw size" of
+`assets/models/fox/README.md`): origin the wrist joint c (x 0.245), a the rest forearm axis, w
+the width axis (the source width axis (0, 0, 1) in the studio axes, turned with the paw of the
+side), and n = a × w. With d the distance along a and s = smoothstep(0, 0.02, d), the point
+c + (1 - 0.30 s) d a + (1 - 0.25 s)(v · w) w + (1 - 0.15 s)(v · n) n takes its place. The vertices
+up to the wrist joint stay, so the wrist loops keep their girth and show no step. The joints of
+`fingers_<side>` take the same map, and the paw rows of the weights take the places of the map.
