@@ -866,6 +866,20 @@ and the painted dark ball, with no catchlight mesh. The face reads calm: no ligh
 above the eyes, the painted iris sits in the middle of the opening, the eye corners show no light wedge, and the mouth line curves up into a
 small smile.
 
+**Normal map.** The app tilts the normals of the fur faces with the normal map of the FBX (design
+4.5, fur shading). The map uses the UV map of the FBX, as the color map does. It takes the green of
+OpenGL, as the normal maps of the rabbit and the fox from the same Tripo export. The source:
+tangent space, mean normal (-0.001, -0.004, 0.991), 2 texels with z below 0, median tilt 0.020,
+99th percentile 0.306. `tools/polar-bear-maps.py` limits each x, y tilt to the length 0.2 (1.36 %
+of the texels: the baked eye rims, nose, and claw edges of the source mesh), takes the box mean to
+1024 × 1024, and stores the tilts times 4 (`NORMAL_MAP_GAIN`) in red and green and 255 in blue.
+No stored value clips. `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0) writes the web copy.
+
+**Fur sheen.** The fur of the map has the linear luma 0.78 (sRGB 233, 228, 218), near the
+shoulder of the tone curve. In the hall view the normal map moves the median fur L by 0.002
+(0.680 with no normal map, 0.682 with it, at 30 s) and shows the strands as a soft relief in the
+close views. The sheen adds a warm light at the outline, and at most 0.6 % of the bear pixels clip.
+
 **Arm gate** (`pnpm arm-check pianist --base main`), the value and main in parentheses:
 
 | Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
