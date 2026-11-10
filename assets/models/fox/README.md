@@ -844,3 +844,40 @@ hall light (`lineup-face.png` of the report): the brows painted, then the roll 1
 10°, then the eye 0.75 and 0.65, and the roll 20° with the iris 6°. The eye 0.75 read the most calm
 and happy: the pupil looks forward, the upper line is level, and the eye is nearer the bead eyes
 of the fox of main. At 0.65 the eye read small and squinted.
+
+**Brow spots.** The source map paints a light peach spot (sRGB about 200, 140, 90) above each eye,
+with a small dark dot. In the hall light the two spots read as raised inner brows. `tools/fox-maps.py`
+(`brow_fill()`) takes the triangles of the rig file whose middle lies near each spot: the spot
+middle is c + d (-0.205, 0.872, 0.836) in the axes of the rig file (x toward the middle plane), d the
+distance of the eye from the middle plane. In the inner sphere (radius 0.5 d) each texel more than
+0.04 from the source orange in Oklab, and in the outer sphere (0.7 d, grown by 2 texels) each such
+texel lighter than the orange, takes the median color of the other texels of its part of the map.
+About 5,200 texels move, before the color steps of each map.
+
+**Sock edges.** The source map fades the dark socks up over most of each leg and each forearm. In
+the hall light the legs read dirty. `tools/fox-maps.py` (`sock_edges()`) makes a place map of the
+seated bind from the triangles of the rig file, and gives each texel within 0.075 units of a limb
+bone a target: the fur (thigh, upper arm), the sock (foot, paw), or on the shin and the forearm a
+step at 0.45 of the shin from the knee and at 0.4 of the forearm from the elbow, 0.04 of the bone
+wide. The fox of main has its forearm edge at the same place (sections of the colors of
+`fox.rig.glb`). Each texel on the Oklab line from the orange (220, 98, 12) to the sock (73, 37, 17),
+within 0.05 of it, takes its target end of the line and keeps its small step along the line (up to
+0.12, by tanh) and its step off the line. Cream, white, and black texels keep their colors. Both
+maps take the edges.
+
+**Hall fur.** The real hall view of the app has the key light from the back and no fill light. In
+that view (a fixed camera at a seated red fox of `mozart-k191`, `--no-fill --pause`) the orange fur
+read brown. The median Oklab L, C, and h of the orange fur at the chest side, the upper arm, the
+thigh, and the head top (`furmeasure.py` of the session):
+
+| Red fur target (Oklab L, C, h) | Hall view | 3/4 view (`--azimuth 35 --zoom 1.3`, fill light) |
+|---|---|---|
+| 0.42, 0.15, 52 (round 11) | 0.512, 0.130, 37.4 | 0.513, 0.128, 37.7 |
+| 0.47, 0.155, 57 | 0.549, 0.128, 40.5 | 0.555, 0.128, 40.6 |
+| 0.485, 0.155, 58 (`RED_FUR`) | 0.562, 0.128, 41.5 | 0.568, 0.127, 41.7 |
+| Fox of main | 0.561, 0.134, 40.0 | 0.555, 0.131, 40.3 |
+
+The two views move together, so one target serves both, and the hall view sets it. A larger
+chroma has no effect: the target lies just outside the sRGB gamut. The tan map takes `TAN_FUR`
+(0.75, 0.105, 72), because L 0.80 read near white in the hall view: the tan hall view goes from L
+0.649, C 0.101, h 56.5 to L 0.638, C 0.103, h 55.5.
