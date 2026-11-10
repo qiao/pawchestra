@@ -83,6 +83,26 @@ BROW_SPOT = ((-0.205, 0.872, 0.836), 0.5, 0.7)
 BROW_GROW = 2
 #: The Oklab distance from the orange fur above which a texel of a brow triangle is a spot texel.
 BROW_FAR = 0.04
+#: The chains of joints of the sharp sock edges, each with the place of its edge along its middle
+#: bone, from the joint at the top of that bone (0) to the joint at its end (1). The source map
+#: fades the dark socks up over most of each leg and forearm, so that the legs read dirty in the
+#: hall light. Above the edge each texel takes the orange fur, below it the dark sock, and the
+#: bone above the middle bone takes the fur, the bone below it the sock.
+SOCK_EDGES = (
+    (('thigh', 'shin', 'foot', 'toes'), 0.45),
+    (('upper_arm', 'forearm', 'hand', 'fingers'), 0.4),
+)
+#: The distance of a texel from its bone in the seated bind, in units of the rig file, within which
+#: the texel belongs to the limb.
+SOCK_RADIUS = 0.075
+#: The width of the soft step of the sock edge, as a share of the middle bone.
+SOCK_BAND = 0.04
+#: The largest Oklab distance of a texel from the line between the orange fur and the socks for
+#: a texel that the sock edge moves: cream, white, and black texels keep their colors.
+SOCK_LINE = 0.05
+#: The largest step along the line from the orange fur toward the socks (or back) that a texel keeps
+#: on its side of the sock edge, as a share of the line.
+SOCK_KEEP = 0.12
 
 
 def linear(srgb):
@@ -118,7 +138,7 @@ def linear_of_oklab(lab):
 
 def read_rig(path):
     """Gives the triangles, the positions, the texture points, and the eyes (`ownEyes`) of the fur
-    primitive of the rig file, in the seated bind of the file."""
+    primitive of the rig file, in the seated bind of the file, and the place of each joint."""
     data = open(path, 'rb').read()
     length = struct.unpack('<I', data[12:16])[0]
     gltf = json.loads(data[20:20 + length])
@@ -141,7 +161,30 @@ def read_rig(path):
     eyes = gltf['asset']['extras'].get('ownEyes')
     if not eyes:
         sys.exit(f'{path} has no eyes of the mesh.')
-    return triangles.reshape(-1, 3), positions, points, eyes
+    return triangles.reshape(-1, 3), positions, points, eyes, joint_places(gltf)
+
+
+def joint_places(gltf):
+    """Gives the place of each node of the file by its name: the translation of its world matrix."""
+    nodes = gltf['nodes']
+    parent = {c: i for i, node in enumerate(nodes) for c in node.get('children', [])}
+    worlds = {}
+
+    def world(i):
+        if i not in worlds:
+            node = nodes[i]
+            x, y, z, w = node.get('rotation', [0, 0, 0, 1])
+            m = np.eye(4)
+            m[:3, :3] = np.array([
+                [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)],
+            ]) * np.array(node.get('scale', [1, 1, 1]))
+            m[:3, 3] = node.get('translation', [0, 0, 0])
+            worlds[i] = world(parent[i]) @ m if i in parent else m
+        return worlds[i]
+
+    return {node.get('name'): world(i)[:3, 3] for i, node in enumerate(nodes)}
 
 
 def draw_triangles(triangles, points, faces, size):
@@ -156,7 +199,7 @@ def draw_triangles(triangles, points, faces, size):
 
 def eye_mask(rig, size):
     """Gives the texels of the eyeball triangles of the rig file, grown by EYE_MARGIN texels."""
-    triangles, _, points, eyes = rig
+    triangles, _, points, eyes, _ = rig
     faces = [t for side in ('L', 'R') for t in eyes[side]['faces']]
     mask = draw_triangles(triangles, points, faces, size)
     mask = mask.filter(ImageFilter.MaxFilter(2 * EYE_MARGIN + 1))
@@ -165,7 +208,7 @@ def eye_mask(rig, size):
 
 def eye_middles(rig):
     """Gives the middle of the sphere of each eyeball (a least-squares fit of its corners)."""
-    triangles, positions, _, eyes = rig
+    triangles, positions, _, eyes, _ = rig
     middles = {}
     for side in ('L', 'R'):
         p = positions[triangles[eyes[side]['faces']].ravel()].astype(np.float64)
@@ -177,7 +220,7 @@ def eye_middles(rig):
 def brow_fill(rig, lab):
     """Paints the light brow spots over with the fur around them (see BROW_SPOT). Gives the moved
     Oklab image and the count of the painted texels."""
-    triangles, positions, points, eyes = rig
+    triangles, positions, points, eyes, _ = rig
     middles = eye_middles(rig)
     unit = abs(middles['L'][0])
     face_middles = positions[triangles].mean(axis=1)
@@ -207,6 +250,85 @@ def brow_fill(rig, lab):
         color = np.median(lab[fill], axis=0) if fill.sum() >= 4 else fur
         out[part & spot] = color
     return out, int(spot.sum())
+
+
+def place_map(rig):
+    """Gives the place in the seated bind of each texel of the fur triangles (NaN elsewhere), by
+    the barycentric mix of the corners of its triangle."""
+    triangles, positions, points, _, _ = rig
+    places = np.full((SIZE, SIZE, 3), np.nan)
+    for tri in triangles:
+        uv = points[tri].astype(np.float64) * SIZE - 0.5
+        x0, y0 = np.floor(uv.min(axis=0)).astype(int)
+        x1, y1 = np.ceil(uv.max(axis=0)).astype(int)
+        x0, y0, x1, y1 = max(x0, 0), max(y0, 0), min(x1, SIZE - 1), min(y1, SIZE - 1)
+        if x1 < x0 or y1 < y0:
+            continue
+        ys, xs = np.mgrid[y0:y1 + 1, x0:x1 + 1]
+        (ax, ay), (bx, by), (cx, cy) = uv
+        area = (bx - ax) * (cy - ay) - (cx - ax) * (by - ay)
+        if abs(area) < 1e-12:
+            continue
+        wb = ((xs - ax) * (cy - ay) - (cx - ax) * (ys - ay)) / area
+        wc = ((bx - ax) * (ys - ay) - (xs - ax) * (by - ay)) / area
+        wa = 1 - wb - wc
+        inside = (wa >= -0.02) & (wb >= -0.02) & (wc >= -0.02)
+        corners = positions[tri].astype(np.float64)
+        place = wa[..., None] * corners[0] + wb[..., None] * corners[1] + wc[..., None] * corners[2]
+        places[ys[inside], xs[inside]] = place[inside]
+    return places
+
+
+def segment_param(places, a, b):
+    """Gives the place t of each texel along the segment from a (0) to b (1), and its distance
+    from the segment."""
+    d = b - a
+    t = ((places - a) @ d) / (d @ d)
+    near = a + np.clip(t, 0, 1)[..., None] * d
+    return t, np.linalg.norm(places - near, axis=-1)
+
+
+def sock_edges(rig, lab):
+    """Gives each leg and each forearm a sharp edge between the orange fur and the dark sock (see
+    SOCK_EDGES). Each texel on the line from the orange fur to the socks in Oklab takes the full
+    orange above the edge and the full sock below it, with its own small steps along and off the line."""
+    joints = rig[4]
+    places = place_map(rig)
+    orange = oklab(linear(MAPS['fox-color.webp'][0][0]))
+    sock = oklab(linear(MAPS['fox-color.webp'][1][0]))
+    line = sock - orange
+    share = ((lab - orange) @ line) / (line @ line)
+    off = lab - orange - share[..., None] * line
+    on_line = (np.linalg.norm(off, axis=-1) < SOCK_LINE) & (share > -0.3) & (share < 1.3)
+    target = np.full(share.shape, np.nan)
+    best = np.full(share.shape, np.inf)
+    for side in ('L', 'R'):
+        for chain, edge in SOCK_EDGES:
+            j = [joints[f'{name}_{side}'] for name in chain]
+            for k in range(len(j) - 1):
+                t, distance = segment_param(places, j[k], j[k + 1])
+                # The middle segment holds the edge; the segment above it is fur, below it sock.
+                if k == 0:
+                    want = np.zeros_like(t)
+                elif k == 1:
+                    want = np.clip((t - edge) / SOCK_BAND + 0.5, 0, 1)
+                else:
+                    want = np.ones_like(t)
+                take = (distance < SOCK_RADIUS) & (distance < best) & np.isfinite(distance)
+                target[take] = want[take]
+                best[take] = distance[take]
+    move = on_line & np.isfinite(target)
+    s = share[move]
+    w = target[move]
+    # The fur side keeps the small steps of the fur toward the socks (up to SOCK_KEEP of the
+    # line), and the sock side the small steps toward the fur, so the strands of the map stay.
+    fur_side = SOCK_KEEP * np.tanh(s / SOCK_KEEP)
+    sock_side = 1 - SOCK_KEEP * np.tanh((1 - s) / SOCK_KEEP)
+    new = (1 - w) * np.where(s > 0, fur_side, s) + w * np.where(s < 1, sock_side, s)
+    out = lab.copy()
+    out[move] = orange + new[:, None] * line + off[move]
+    moved = np.abs(new - s) > 0.02
+    return out, int(moved.sum())
 
 
 def parts(mask):
@@ -277,6 +399,8 @@ def main():
     rig = read_rig(RIG)
     lab, painted = brow_fill(rig, oklab(linear(np.asarray(image))))
     print(f'{painted} texels of the brow spots take the fur around them')
+    lab, socks = sock_edges(rig, lab)
+    print(f'{socks} texels of the legs and the forearms take the sharp sock edge')
     eyes, count = eye_mask(rig, SIZE)
     for name, anchors in MAPS.items():
         write_map(name, anchors, image, lab, eyes, count)
