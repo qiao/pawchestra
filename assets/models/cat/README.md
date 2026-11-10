@@ -387,6 +387,9 @@ mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm str
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/cat.fbx`, `tripo-p2/cat.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+| `tripo-hand/cat.blend` | Made in headless Blender 5.2 from `tripo-p2/cat.fbx` (below). License as the FBX file | The scripted edits below |
+| `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
+| `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
 
 ### tripo-p2/cat.fbx
 
@@ -416,3 +419,73 @@ of the map. The roughness and metallic maps of the download are not kept.
 The color map paints a full eye on each eyeball: a black slit pupil, a green iris with an amber
 ring, a white light, and a dark rim. It paints a light spot over the inner end of each eye, a
 white muzzle, a pink nose, and pink inner ears.
+
+### tripo-hand/cat.blend
+
+The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in headless Blender 5.2
+(`blender -b --factory-startup`) by scripted point edits, in the order below. The arms and the
+legs keep the form and the length of the source: no cut, no split from the trunk, and no stretch.
+
+| Item | Value |
+|---|---|
+| Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
+| License | CC BY-NC 4.0, as the FBX file |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `cat`: 3,423 vertices and 3,727 faces (3,060 quads and 667 triangles, 6,787 triangles), flat faces, and the surface of `sa.add_surface()`. 89 faces are gloss (the pink nose). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The UV map of the FBX |
+| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245, fingers 0.295, tip 0.337). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side), `hinges`, and `seat` |
+| Facts | `height` 1.117714 (the shoulder joints at 0.65 u, 1.71956 m for each unit, so that H is 0.339375 m, the H of the cat of `cat.rig.glb`), `crease` 55, `seatWidth` 0.46 |
+| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
+
+The edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`):
+
+- **Import.** `sa.import_source('assets/models/cat/tripo-p2/cat.fbx', 1e-5)`: no vertex merges,
+  1 unit from the soles to the ear tips. Each face is flat.
+- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
+  use_grid_fill=True)`) of the clean quad edge ring of 8 edges between two closed arm loops. The
+  bands, by the x of their loops on each arm: 0.1388 to 0.1572, 0.1787 to 0.1951, 0.1951 to
+  0.2122, and 0.2122 to 0.2295. Each arm now has a loop each 0.25 to 0.36 arm radii (radius 0.033
+  to 0.029) from x 0.139 to x 0.2295, and 4 loops within one radius of the elbow.
+- **Knee rings.** The same call on the clean leg bands of 11 edges: y 0.1287 to 0.1498 (1 cut) and
+  0.1498 to 0.179 (2 cuts) of each leg. The knee joint is at y 0.165, and the knee has loops at y
+  0.129, 0.139, 0.150, 0.160, 0.169, and 0.179.
+- **Rings with no split.** These bands stop at a triangle or a pole, so they take no split: the
+  upper arm root from x 0.092 to x 0.139 (poles 2088, 2103, 2104, 2152, and 2168 on the left), the
+  wrist and the paw from x 0.2295 (poles and triangles at the digit roots), the leg band at y 0.179
+  to 0.242 (pole 1914), and the haunch from y 0.297 (poles).
+- **Surface.** `sa.add_surface(cat, 'cat', 'assets/models/cat/tripo-p2/cat.fbm/cat_basecolor.jpg',
+  eye_fans=False, config=<cat-tripo.json>)`. 89 faces of the pink nose are gloss.
+- **Eyes.** The 100 faces of the two eyeballs (the loose parts in the eye box of the config) get
+  the face attribute `eye` (BOOLEAN, FACE) and the colors `color` and `color_base` `#15110e` (the
+  eye color of the app). The export then gives `ownEyes`, and the app adds no bead eyes.
+- **Armature.** The armature of the config, as `sa.build_armature()` makes it, with a palm for each
+  side: the palm of the config, (-0.3949, -0.9151, 0.0815), and its mirror on the right.
+
+The weights, in the order of the work, in the rest pose:
+
+1. Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh(copy, cat_rig,
+   auto=True)`), on a copy of the mesh with no loose part and with no face on an edge of more than
+   two faces (135 faces). On the full mesh, bone heat finds no solution. Each vertex takes the row
+   of its copy with `sa.set_weight_row()`. 24 vertices of the face that the copy does not hold
+   take {`head` 1}.
+2. Arm rows: each vertex of each arm from x 0.088 to the wrist takes one exact row with
+   `sa.set_weight_row()`, by its x (left arm). A row holds a clavicle share, an elbow helper share,
+   and a wrist helper share, linear between the control rows below. The rest of the row goes to
+   the 4 roll segments of the upper arm (x below 0.172) or of the forearm: segment k takes the
+   share at (k + 0.5) / 4 of the part, with a linear ramp between two segments (the roll split of
+   the simple route). The arm root loops at x 0.082 and 0.087 keep the automatic weights.
+
+   | x | 0.088 | 0.10 | 0.11 | 0.125 | 0.14 | 0.145 | 0.16 | 0.18 | 0.195 | 0.21 | 0.222 | 0.235 |
+   |---|---|---|---|---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.40 | 0.25 | 0.12 | 0.04 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 | 0 |
+   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 |
+
+3. Paws, by rows across the paw, by the place along the rest forearm axis (as the x of the axis
+   point of the left paw): 0.24 to 0.255 {`wrist` 0.5, `hand` 0.5}, 0.255 to 0.278 {`hand` 1}, the
+   knuckle row 0.278 to 0.30 {`hand` 0.5, `fingers` 0.5}, and from 0.30 {`fingers` 1}.
+4. The vertices of the loose parts (eyeballs and whisker strips), of the gloss nose, and of the
+   eyeballs take {`head` 1}: 396 vertices.
+
+The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
+weights. The scripts of the session (`scratch/cat/` of the worktree, which git ignores) are not in
+the repo.
