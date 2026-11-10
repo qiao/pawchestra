@@ -128,8 +128,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 446,680 bytes |
-| SHA-256 | `6b4ae85fbb4af3d90a72d184172da0151561abc964b12e67c0f7de47a12ffe51` |
+| Size | 441,333 bytes |
+| SHA-256 | `3cd72a557008b725706198b58ffdc7ef642523649486a735d664783062902ef5` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,496 bytes | `2fb6c6c6ce355a6f1f1422d415672351a8dce5c510497a531c61e93a97ddbd2b` |
-| `tripo-hand/fox.rig.json` | 9,927 bytes | `304ab2d52f4762af0edd73675eea61a0aafd88ad6b999d1727f365da51ea5756` |
+| `tripo-hand/fox.rig.glb` | 570,496 bytes | `a3fc9a64c164707287b33c47402443c201f8707237bd34ef3e961b69fd9bf8e3` |
+| `tripo-hand/fox.rig.json` | 9,925 bytes | `6286e0e08acc540376901333659f037009f895446e0e4144b5bddddab0bce50c` |
 
 The edits, in the order of the work:
 
@@ -319,3 +319,33 @@ each value of the flutist stays within 41°.
   45 is the smallest crease at or below main on each part. 55 also takes the paws below 20 %, as
   the rabbit candidate does with 55 for its rings of 11 vertices. The ruff spikes fold by more
   than 55°, so they stay sharp.
+
+**Seat.** A seated violinist sits with most of each thigh on the seat, and the front edge of the
+seat a little behind the knee. Two changes give this seat:
+
+- **Legs of the bind.** The leg turns of the config (`studio.legTurns`, `uv run --no-project
+  --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12`) turn each thigh to a slope of
+  15° below the horizontal (25° before) and 8° out, and each shin 12° forward of the vertical (0°
+  before), so that the knee angle from the side is 117°. Each foot keeps its turn in the world, so
+  the sole stays flat. The bind of the config (`rebind()` of the live session: the functions
+  `joints_of()`, `trunk_turn()`, and `bind_turns()` of `rig_mesh.py` and `sa.set_world_turns()`)
+  keys the Action `bind` again: only the leg bones move. The bones keep their lengths, and the
+  mesh keeps its form.
+- **Seat of the rig.** The property `seat` reaches from z -0.06 to z 0.13 (studio axes, +z
+  forward; the front was 0.03). At z 0.13 the calf starts to go below the thigh, so a seat
+  further forward rests on the calves. The config `chair` holds the same values.
+
+| Measure | Before | After | Main fox |
+|---|---|---|---|
+| Thigh slope | 25° | 15° | |
+| Seat top | 0.293 m | 0.236 m | 0.270 m |
+| Chair depth | 0.142 m | 0.293 m | 0.287 m |
+| Thigh (hip joint to knee joint) over the seat | 0 % | 67 % | |
+| Front edge of the seat behind the knee joint | 0.199 m | 0.056 m | |
+
+The seat top is the lowest point of the body over the seat, so a seat under most of the thigh
+lies near the knee: the knee joint of the Tripo fox is 0.262 m above the floor, and the underside
+of the thigh near the knee 0.236 m. With the front edge at z 0.11 the top is 0.241 m, and with a
+vertical shin 0.240 m. The trunk bones stay upright: the line from the hips to the neck leans
+0.5° back in the bind and in each moment of the violinist. The arm twists stay within 44° in the
+moments and the samples of "Arm twist" (the violin rest on the thigh moves a little).

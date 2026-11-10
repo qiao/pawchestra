@@ -227,16 +227,16 @@
   "studio": {
     "legTurns": {
       "thigh": [
-        0.573167,
-        0.031765,
-        -0.065596,
-        0.816191
+        0.640583,
+        0.036223,
+        -0.080227,
+        0.762827
       ],
       "shin": [
-        0.013037,
-        0.0,
-        0.013037,
-        0.99983
+        0.117458,
+        0.002729,
+        0.01284,
+        0.992991
       ],
       "foot": [
         0,
@@ -283,7 +283,7 @@
       "R": 0
     },
     "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 8 degrees out, and the shin is vertical, as on the fox of main (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 25 8 0).",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 15 degrees down and 8 degrees out, and the shin leans 12 degrees forward of vertical, so that most of the thigh lies on the seat, as on the rabbit candidate (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12).",
     "tailBind": {
       "tail": [
         0,
@@ -367,9 +367,9 @@
   },
   "chair": {
     "halfWidth": 0.13,
-    "front": 0.03,
+    "front": 0.13,
     "back": -0.06,
-    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch (x -0.12 to 0.12). The front edge lies 0.025 units behind the hip joint, and the back edge behind the back of the haunch (z -0.04). The seat round sets the seat again."
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The half width holds the haunch (x -0.12 to 0.12). The front edge lies where the calf starts to go below the thigh in the bind (z 0.13), 0.037 units behind the knee joint, and the back edge behind the back of the haunch (z -0.04)."
   },
   "armSegments": {
     "helper": 0.03,
@@ -384,7 +384,7 @@
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye. The simple route reads this value.",
   "metersPerUnit": 1.526966,
   "metersPerUnitNote": "The scale of the app: H (0.211529 units) stays 0.322998 m, the H of the fox of assets/models/fox/fox.rig.glb. The fact height of the armature is the shoulder joints (0.638 units) at this scale: 0.974204 m.",
-  "chairNote": "The seat of the rig in units of this body. The seat round sets it again from the seated pose: with these values the haunch sits on the front edge of the chair.",
+  "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/fox.blend holds it.",
   "texture": "assets/models/fox/tripo-p2/fox.fbm/fox_basecolor.jpg",
   "rollSplit": true,
   "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/fox/README.md, \"tripo-hand/fox.blend\")."
