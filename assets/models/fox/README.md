@@ -804,8 +804,9 @@ headCeiling: 0.7706 + s (0.9746 - 0.7706) = 1.0154
 2,080 vertices move (1,327 with w 1, 753 with a share), at most 0.0595 units. The basis and the key
 `bind_belly` take the same moves. The ears, the eyeballs, the lids, the whiskers, and the muzzle
 scale with the head, and the neck fades with the weights. The lid turn and the lid axes stay,
-because a scale keeps each direction. A lineup of 1.0, 1.1, and 1.2 in the hall view and the close
-views of both roles showed no clip at the chin rest, the bow, or the flute at 1.2.
+because a scale keeps each direction. A lineup of 1.0, 1.1, and 1.2 in the hall view put 1.2 nearest
+to the head of main. The close views of both roles of the final file (each moment, front, left,
+right, back, and 3/4, with `PROBE_NO_CACHE=1`) show no clip at the chin rest, the bow, or the flute.
 
 | Scale | H of `pnpm studio-body` |
 |---|---|
