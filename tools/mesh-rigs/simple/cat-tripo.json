@@ -283,7 +283,7 @@
         0.5
       ]
     },
-    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes back and a little to the left over the seat, and the tip curls forward along the left side of the haunch on the seat, as the tail of the cat of main curls on the seat.",
+    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes down and back, and the tip forward along the left side of the haunch. The key bind_tail of tripo-hand/cat.blend lays the tail tube on the seat around the left side of the haunch, as the tail of the cat of main curls on the seat (assets/models/cat/README.md, \"Tail on the seat\").",
     "legTurns": {
       "thigh": [
         0.639295,
