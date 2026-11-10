@@ -4,11 +4,12 @@
 # moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the
 # main fox in the app light. In the tan map, the orange fur goes to the tan fur of the main fox in
 # the app light, and the dark socks go to the tan accent of SPECIES_COLORS of src/models/colors.ts
-# at the lightness of the tan palette of the faces. In both maps the cream belly, the white, and the black keep their colors. Each texel
-# takes a mix of the steps of the colors, by its nearness to each color, so the blend between two
-# colors of the fur stays smooth. The texels of the eyeballs keep their colors: the script reads
-# their triangles and texture points from the rig file (`ownEyes` of the export). The output
-# depends only on the input files.
+# at the lightness of the tan palette of the faces. In both maps the cream belly, the white, and
+# the black keep their colors, the brow spots take the fur around them, and each leg and forearm
+# gets a sharp sock edge. Each texel takes a mix of the steps of the colors, by its nearness to
+# each color, so the blend between two colors of the fur stays smooth. The texels of the eyeballs
+# keep their colors: the script reads their triangles and texture points from the rig file
+# (`ownEyes` of the export). The output depends only on the input files.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 import json
@@ -24,12 +25,14 @@ FOLDER = 'assets/models/fox/tripo-hand/'
 SIZE = 2048
 QUALITY = 60
 
-#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the red map. The source
-#: orange (L 0.638, C 0.172, h 47) is lighter than the shifted fur of the fox of main (L 0.557,
-#: C 0.171, h 43.7), and the smooth body takes more light than the faces of the main fox. In the
-#: seated 3/4 app view (`close-views play --at fox-red --azimuth 35`), this target gives the median
-#: fur L 0.522, C 0.130, h 37.2, against L 0.521, C 0.131, h 38.7 on the fox of main.
-RED_FUR = (0.42, 0.15, 52.0)
+#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the red map. The hall view
+#: of the app (the key light from the back, no fill light) is the target, because there the fur
+#: read brown with a darker target. The median fur of the chest side, the upper arm, the thigh,
+#: and the head top in that view is L 0.562, C 0.128, h 41.5, against L 0.561, C 0.134, h 40.0 on
+#: the fox of main. In the seated 3/4 view with the fill light (`close-views play --at fox-red
+#: --azimuth 35 --zoom 1.3`), it is L 0.568, C 0.127, h 41.7, against L 0.555, C 0.131, h 40.3.
+#: The target lies a little outside the sRGB gamut, so a larger chroma moves no texel further.
+RED_FUR = (0.485, 0.155, 58.0)
 #: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. The light of
 #: the app makes the fur darker and warmer than the map. In the 3/4 app view of the tan fox
 #: (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6`), this
