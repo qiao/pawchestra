@@ -1,5 +1,5 @@
 {
- "sha256": "a3c1e7f2478ac65c6ddc0e039cc4f311f1af05fb34dbc65c006d518cd608b81d",
+ "sha256": "b489df10275be4786275cef300aa7fee37db5e4ffb4202db84fc1745fcf1fbff",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -474,7 +474,7 @@
  "extras": {
   "seat": {
    "prop": "chair",
-   "top": 0.2875997722148895,
+   "top": 0.28759562969207764,
    "front": 0.14499999582767487,
    "back": -0.05999999865889549,
    "halfWidth": 0.12999999523162842
