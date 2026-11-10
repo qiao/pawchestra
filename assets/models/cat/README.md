@@ -391,6 +391,14 @@ mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm str
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
 
+The files of the candidate, after the last edit:
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/cat.blend` | 390,247 bytes | `e16d7508a445d54380bdb95be4e7baa0638bfa4465e6f75259b230b4ccb42261` |
+| `tripo-hand/cat.rig.glb` | 515,528 bytes | `d6187fcb660a384d07f86474fe53aaeb6061c6172e326282b6f5dcfdfba80e7e` |
+| `tripo-hand/cat.rig.json` | 9,562 bytes | `b3fc2db666ad6f76d3b85fbc3f7a13e10b9583bf72e560782c0cb89a55d926af` |
+
 ### tripo-p2/cat.fbx
 
 A grey cat with a white bib and white paws in a T-pose, made with Tripo P2: quad faces, arm tubes
@@ -431,9 +439,9 @@ legs keep the form and the length of the source: no cut, no split from the trunk
 | Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`: 3,423 vertices and 3,727 faces (3,060 quads and 667 triangles, 6,787 triangles), flat faces, and the surface of `sa.add_surface()`. 89 faces are gloss (the pink nose). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The UV map of the FBX |
-| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245, fingers 0.295, tip 0.337). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side), `hinges`, and `seat` |
-| Facts | `height` 1.117714 (the shoulder joints at 0.65 u, 1.71956 m for each unit, so that H is 0.339375 m, the H of the cat of `cat.rig.glb`), `crease` 55, `seatWidth` 0.46 |
+| Mesh | One object `cat`, with the shape key `bind_belly` ("Belly" below): 3,467 vertices and 3,771 faces (3,104 quads and 667 triangles, 6,875 triangles), flat faces, and the surface of `sa.add_surface()`. 89 faces are gloss (the pink nose). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The UV map of the FBX |
+| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245; the fingers joints turn with the paws). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side) and `hinges` come from "Arm twist", and `seat` from "Seat" below |
+| Facts | `height` 1.181424 (the shoulder joints at 0.68705 u after "Longer legs", 1.71956 m for each unit, so that H was 0.339375 m, the H of the cat of `cat.rig.glb`, before "Head size": H is now 0.374868 m), `crease` 55, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`):
@@ -670,3 +678,24 @@ this head.
 | 1.0 | 0.339376 m |
 | 1.1 (the file) | 0.373515 m before the relax, 0.374868 m after |
 | 1.2 | 0.405133 m |
+
+**Arm twist after the form edits.** The roll of each upper arm (from the clavicle) and the twist
+of each forearm (the paw from the upper arm), in degrees from the bind, in the moments of `pnpm
+pose-preview violist` (`twist.py` of the session: the twist of the turn of the bone chain about
+the bind axis of the part):
+
+| Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
+|---|---|---|---|---|
+| frog | 44.5 | 43.7 | -23.0 | -9.5 |
+| tip | 44.5 | 43.4 | -37.1 | -36.8 |
+| crossing | 44.5 | 43.7 | -23.4 | -17.7 |
+| rest | -34.0 | -41.2 | -24.7 | -9.4 |
+| lift50 | 26.9 | 12.5 | -10.2 | -16.9 |
+| lower50 | 40.7 | 26.9 | -10.8 | -9.4 |
+| stand | 44.6 | 42.9 | -23.2 | -8.3 |
+
+Before the paw turns and the hold, the left forearm took 125.2° at the frog and -69.3° at rest,
+and the right forearm 113.2° at rest. `pnpm arm-shape violist` over the 17 demos of the violist
+gives the largest roll step of the arm skin (p95) 21° on the left and 15° on the right in the
+play (38° on the right for the cat of main), the collapse p5 0.96 and 0.88 (0.95 and 0.80), and
+no spike.
