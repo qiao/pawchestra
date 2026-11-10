@@ -3,8 +3,8 @@
 # Each texel of a fur triangle of the rig file moves in Oklab: its lightness and its chroma scale,
 # and its hue turns, so that the median fur of the source goes to the brown of the bear of main and
 # each strand keeps its contrast to the fur around it. Each texel of a muzzle triangle moves the
-# same way to the light muzzle of the bear of main. The mouth line, the claws, and the eyes keep
-# their colors. The region of a triangle is its face color in the rig file (README, "Smooth
+# same way to the light muzzle of the bear of main. The mouth line and the claws keep their colors,
+# and the eyes take the dark color of the bead eyes of main. The region of a triangle is its face color in the rig file (README, "Smooth
 # surface"). The output depends only on the input files.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py
@@ -36,8 +36,20 @@ REGIONS = {
 #: The texels around the triangles of a region that the region also takes, so that no texel of
 #: the edge of a triangle keeps the source color.
 GROW = 2
-#: The texels of the eyeballs and this many texels around them keep their colors.
+#: The texels of the eyeballs and this many texels around them take the dark eye color.
 EYE_MARGIN = 4
+#: The color of the eyes (sRGB): the eye color of the app (#15110e), as the bead eyes of the bear
+#: of main. The source paints a white ball with a black pupil and a white light. The ball sits in
+#: its socket, so a white crescent of the ball shows beside the pupil, and in the hall light the
+#: eyes read startled. Each eye texel lighter than EYE_DARK (Oklab L) takes this color, and the
+#: black pupil keeps its color. The eye light of the app gives each eye its light (design 4.5).
+EYE_COLOR = (21, 17, 14)
+#: The Oklab lightness below which an eye texel keeps its color: the black pupil.
+EYE_DARK = 0.3
+#: The region of the texels outside each triangle (the gutters of the atlas). The mip levels of
+#: the map mix the gutter into the edge of each island, so the gutter takes the fur step, and no
+#: orange line shows at a seam in a far view.
+GUTTER = 'fur'
 
 
 def linear(srgb):
@@ -147,6 +159,10 @@ def main():
     triangles, points, face, _ = rig
     lab = oklab(linear(np.asarray(image)))
     out = lab.copy()
+    inside = np.asarray(draw_triangles(triangles, points, range(len(triangles)), SIZE)) > 0
+    _, source, target = REGIONS[GUTTER]
+    out[~inside] = region_step(lab[~inside], source, target)
+    print(f'gutter: {int((~inside).sum())} texels take the {GUTTER} step')
     for name, (key, source, target) in REGIONS.items():
         faces = np.flatnonzero((np.abs(face - key) <= 1).all(axis=1))
         if target is None:
@@ -157,9 +173,10 @@ def main():
         out[mask] = region_step(lab[mask], source, target)
         print(f'{name}: {len(faces)} triangles, {int(mask.sum())} texels move')
     eyes, count = eye_mask(rig, SIZE)
-    out[eyes] = lab[eyes]
+    dark = oklab(linear(EYE_COLOR))
+    out[eyes] = np.where((lab[eyes][:, 0] < EYE_DARK)[:, None], lab[eyes], dark)
     Image.fromarray(srgb8(linear_of_oklab(out))).save(OUT, 'WEBP', quality=QUALITY, method=6)
-    print(f'{OUT}: {SIZE} x {SIZE}, {count} eye triangles keep their colors ({int(eyes.sum())} texels)')
+    print(f'{OUT}: {SIZE} x {SIZE}, {count} eye triangles take the eye color ({int(eyes.sum())} texels)')
 
 
 if __name__ == '__main__':
