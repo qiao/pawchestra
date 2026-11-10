@@ -218,8 +218,15 @@ export const HANDS_HOLDS = {
     lean: 6 * MathUtils.DEG2RAD,
     restLean: 8 * MathUtils.DEG2RAD,
     restHeadLift: 8 * MathUtils.DEG2RAD,
-    sideLean: 60 * MathUtils.DEG2RAD,
-    sideLeanMax: 10 * MathUtils.DEG2RAD,
+    // The trunk leans 80° for each meter of the mean side offset of the palms, and at most 18°, as
+    // a pianist leans toward the far keys. In the hold of 3 s after a stop at the outermost key,
+    // the breath turns the chest about 2°, so the arm of the Tripo polar bear goes further into the
+    // belly than in the play. With 60° and 10° at most, the forearm went 5.8 cm and the upper arm
+    // 6.2 cm in (main 2.4 cm and 2.1 cm), and with 80° and 18° 4.0 cm and 3.9 cm (Bach BWV 1050,
+    // `pnpm pose-depth pianist`). Elbows 0.1 up in place of the side lean give 4.1 cm and 4.5 cm,
+    // and they fold 10 faces of each arm in the play (p95, limit 8, `pnpm arm-check pianist`).
+    sideLean: 80 * MathUtils.DEG2RAD,
+    sideLeanMax: 18 * MathUtils.DEG2RAD,
     shoulderDrop: 4 * MathUtils.DEG2RAD,
     reach: { leftHighest: 65, rightLowest: 63 },
     span: HAND_MOTION.span,
