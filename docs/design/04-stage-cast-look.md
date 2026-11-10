@@ -736,7 +736,12 @@ muzzle, and the claws of the source to the colors of the bear of main in the hal
 claws dark grey), and paints the eyes dark, as the bead eyes of main: the white ball of the
 source read startled. A hand rig of the Tripo P2 cat
 (`assets/models/cat/tripo-hand/`) is a candidate body of the cat violist, in the same way. It
-keeps the eyeballs of its mesh, because the map paints a full eye on each, with a lid on each eye.
+keeps the eyeballs of its mesh, because the map paints a full eye on each, with a lid on each eye. Its upper lids open
+5° past the source and its mouth corners turn up, and its maps carry no dark brow shade or brow
+tilt. Reason: the covered iris tops and the dark brows gave a sleepy, worried face. Its brow
+follows only the head bone, so an ear twitch does not pull the lids. The faces of its seated
+crotch have the face attribute `rim`, so they shade with no crease angle. Reason: the raised
+thighs fold the crotch, and its faces showed as flat facets and dark slits.
 Its color map (`tools/cat-maps.py`) moves the warm gray and the cream of the source to the gray and
 the white of the cat of main in the hall light. Its tail has two bones, and the key `bind_tail`
 lays the tail tube on the seat around the left side of the haunch, as the cat of main curls its
