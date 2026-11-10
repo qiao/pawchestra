@@ -346,7 +346,9 @@ The face colors before the map loads take the median of the map in each region: 
 near black of the nose of main, (24, 20, 18). 14 faces at the edge of the gloss nose (source luma
 100 or more, most on its right side) take the slot fur and the muzzle color, so the map paints
 them light and no dark wedge shows under the nose. The scale step needs the fur sheen of the
-luma (`fullLuma` of `FUR_LOOK`, design 4.5).
+luma (`fullLuma` of `FUR_LOOK`, design 4.5). The texture points of the studio module add 18.0 KB
+to the first download (655,887 to 673,885 bytes after gzip, `pnpm size`), and the lids 1.9 KB
+more. The images load after the first frame.
 
 | Item | Value |
 |---|---|
