@@ -128,14 +128,14 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 443,807 bytes |
-| SHA-256 | `d8d5cdf1f3314cb19369ba7b853dc6b56e6982baa1e09ea695a610cc920281db` |
+| Size | 434,905 bytes |
+| SHA-256 | `7078e11fbdedece927b2dcdf1abe2e13b36ae9cd0b0b6f91a4dd3210e1766886` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
-| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 35 (as the fox of main) |
+| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 35 (as the fox of main), `headCeiling` 0.929 ("Ear weights" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 960,284 bytes | `cd19dd3c5d5c53854fcc6d0ff608869a163115fc62cbbd0bc6e425dc7dd2ccca` |
-| `tripo-hand/fox.rig.json` | 9,901 bytes | `9921a02d07a126eac86811694e3ac50a12176fd2e024bc3b540c465970f20f44` |
+| `tripo-hand/fox.rig.glb` | 960,304 bytes | `98da99c92aff6c3af07799b6b0e263e68883404a9dbf7ab0c09affaf4976823d` |
+| `tripo-hand/fox.rig.json` | 9,926 bytes | `485dae6fba9f86b4b3c096e5b70c76ee9ac10590b24d9e155efc5ad81f06f92b` |
 
 The edits, in the order of the work:
 
@@ -203,10 +203,29 @@ The weights, in the order of the work, in the rest pose:
 4. The 170 vertices of the loose parts (eyeballs and whiskers) and the 69 vertices of the gloss
    nose take {`head` 1}.
 
-The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
+The trunk, the neck, the head, the hips, the legs, and the tail keep the automatic
 weights. The tail has two bones: `tail` (from the root at y 0.40, z -0.05 to y 0.30, z -0.135)
 and `tail_tip` (to the tip at y 0.11, z -0.2). The bind turns them to the directions of
 `studio.tailBind` of the config. The scripts of the live session are not in the repo.
+
+**Ear weights.** The automatic weights gave the ear bones shares of up to 0.69 down to the level
+of the eyes, and a turn of 12° of an ear moved the cheek ruff up to 0.007 units. A plane across
+the base of each ear splits the head: the unit normal (0.53, 0.35, 0.79) / 1.0167 (x mirrored on
+the right) and the offset 0.711, through four points of the left ear base, (0.035, -0.03, 0.89),
+(0.11, -0.03, 0.84), (0.07, -0.05, 0.875), and (0.07, 0.04, 0.835). With d the height of a vertex
+over the plane and x its distance from the middle plane, each vertex of the side above z 0.7
+takes an exact row with `sa.set_weight_row()`:
+
+| Vertices | Row | Left | Right |
+|---|---|---|---|
+| d at least 0.008 and x above 0.03 (the ear) | {`ear_<side>` 1} | 214 | 214 |
+| d from 0 to 0.008 and x above 0.03 (the ear base) | {`ear_<side>` 0.5, `head` 0.5} | 16 | 16 |
+| Each other vertex with an ear share (the cheeks, the eyes, the top of the head) | its automatic row, with the ear share added to `head` | 416 | 381 |
+
+No vertex below an ear base now has an ear share, so a turn of an ear moves no cheek vertex. The
+head height H of `pnpm studio-body` comes from the fur vertices with a `head` share above 0.5, and
+the new rows gave it the top of the head between the ears too (H 0.335679 m). The fact
+`headCeiling` 0.929 keeps the vertices above it out of the measure, so that H stays 0.322998 m.
 
 **Arm twist.** In the moments of the violinist and the flutist, the roll of each upper arm skin
 (from the clavicle) and the twist of each forearm skin (from the upper arm) reached 168° (the
