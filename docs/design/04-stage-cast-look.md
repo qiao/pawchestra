@@ -758,7 +758,11 @@ arm at most about 45° of roll or twist in the moments of the violist. Reason: w
 hold of the cat of main, the left forearm twisted 125° in the play and -69° at rest. A hand rig of
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
-and its tail has two bones. Its paws turn about the forearms by whole ring steps, and the holds of
+and its tail has two bones. Its map tool and the map tool of the rabbit paint each eyeball again as
+a calm, natural eye (`paint_eyes()`): an iris that fills most of the opening, a small pupil, an
+off-white sclera, and both eyes nearly parallel. Reason: the source maps paint large dark pupils
+off the middle of the opening, and the eyes read as glassy balls that looked past the viewer. The
+ball takes no painted light, so the eye light gives the one highlight. Its paws turn about the forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
 with the paws and the holds of the fox of main, a forearm twisted up to 168°. An arm that the mesh
@@ -1075,7 +1079,10 @@ the tan fox never shows the red map. Each map moves the orange fur of the source
 for the hall view of the app, with the key light from the back and no fill light: the red map to
 a bright red-orange (`RED_FUR`) near the fox of main, and the tan map to a light tan (`TAN_FUR`).
 A darker red read brown in that light. The 3/4 view with the fill light stays near main. The tan
-socks keep the lightness of the tan palette of the faces. Both maps paint the light spots above
+socks are darker than the tan palette of the faces. Reason: with that lightness, the socks of the
+round mesh read near the tan fur in the hall light. Only the dark texels of the head (the ear tips
+and the brows) take the step of the socks, and the padding around each limb island takes it too,
+so no dark patch and no dark seam shows. Both maps paint the light spots above
 the eyes over with the fur around them (`BROW_SPOT`), because they read as raised inner brows. Each
 leg and forearm gets a sharp edge between the fur and the dark sock (`SOCK_EDGES`), because the
 long fade of the source made the legs read dirty.
