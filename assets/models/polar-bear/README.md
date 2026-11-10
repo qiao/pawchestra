@@ -822,6 +822,50 @@ piano, so close views of the hall light check it too (`--at polar-bear`, 31 s): 
 0.712 on main from the azimuth 35, and 0.682 against 0.692 from the azimuth -60. The white does
 not clip to flat white: at most 0.6 % of the bear pixels have a channel at 253 or more.
 
+**Eye axis** (`j_eyes.py ... axis`). The eye light takes the axis of each eye from the vector area
+of its eyeball triangles. The back of each Tripo eyeball is open and points straight back, so the
+axis pointed straight forward, 20.7° (left) and 18.2° (right) from g, the mean unit direction from
+the middle of the ball to the ball vertices that a ray from outside reaches. The ball faces whose
+corners all lie more than 90° from g go (6 and 7 faces, deep in the head): the axis is now 6.0°
+and 3.1° from g, and the middle of the sphere fit moves less than 0.00015 units. Left g (0.3268,
+-0.9443, -0.0381), right g (-0.3085, -0.9501, -0.0469).
+
+**Lids** (`j_eyes.py`). A lid on each eye, as on the rabbit and the fox candidates. The socket
+opens out from g: from outside, the ball shows from -50° to 60° up and over 120° to the side,
+centered 10° out. So the lid frame gl is g turned 10° about +z, out to the side of the eye. u is +z
+made square to gl, and h = u × gl is the hinge axis: left (0.873852, 0.486192, 0), right
+(0.883057, -0.469265, 0). A lid point at the angles psi (up) and lam (to the side) has the
+direction cos(lam) (cos(psi) gl + sin(psi) u) + sin(lam) h from the middle c of the ball:
+
+1. The closed lid spans psi from -70° to 70° and lam from -72° to 72°, each in 12 steps, at 1.25
+   ball radii (left 0.01278, right 0.01243). An extra row at psi -70° at 1.02 times the reach of the
+   ball (left 0.01167, right 0.01044) makes a strip that turns in toward the ball. 14 × 13
+   vertices and 156 quads on each side, with outward normals.
+2. The file holds the open lid: each point turned by -150° about h through c. The property `lids`
+   of the armature holds `angle` 2.617994 (150°) and h of each side.
+3. Each lid face takes the slot `fur`, flat shading, the face colors of the white fur, and the face
+   attribute `lid`. Each corner takes the planar projection of its closed point on the plane of h
+   and u, at the median UV density of the fur faces 0.03 to 0.045 units from c (left 0.710, right
+   0.732 UV for each unit), about the cleanest fur patch among those faces: UV (0.0215, 0.9091),
+   luma 0.945, deviation 0.0035 (left), and UV (0.639, 0.706), luma 0.940, deviation 0.0053 (right).
+4. Each lid vertex takes the row `head` 1 (`sa.set_weight_row()`, 364 vertices).
+
+Ray casts against the head (the faces with no `eye` and no `lid` flag) check each step: a point
+lies under the head when a ray from it, away from c, meets the head. In 21 steps of the blink, no
+vertex of the open lid, of a side edge, or of the back edge lies outside the head, and the lower
+strip of the closed lid lies under the head. The open lid lies at least 0.0085 (left) and 0.0069
+(right) units under the head. Rays from outside toward c over the hinge frame meet no ball behind
+the closed lid. 1 and 3 rays meet a dark lining face just above the top edge of the closed lid: a
+thin lash line. The trials with a turn of 140° or 145°, radii of 1.17
+or 1.22, or psi up to 66° left 1 to 4 vertices of the back edge or of the open lid outside the
+head, or 5 to 6 dark rays. The app blinks the lid at 30 s of `bach-bwv1050`, as the main polar bear.
+
+**Eye light.** The eye faces take the finish `eye` and the eye light of the app (design 4.5). In
+the 2x face crops of the hall light and of the close views, each eye shows a soft round highlight
+and the painted dark ball, with no catchlight mesh. The face reads calm: no light spot shows
+above the eyes, the painted iris sits in the middle of the opening, the eye corners show no light wedge, and the mouth line curves up into a
+small smile.
+
 **Arm gate** (`pnpm arm-check pianist --base main`), the value and main in parentheses:
 
 | Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
