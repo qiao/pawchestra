@@ -736,8 +736,11 @@ muzzle, and the claws of the source to the colors of the bear of main in the hal
 claws dark grey), and paints the eyes dark, as the bead eyes of main: the white ball of the
 source read startled. A hand rig of the Tripo P2 cat
 (`assets/models/cat/tripo-hand/`) is a candidate body of the cat violist, in the same way. It
-keeps the eyeballs of its mesh, because the map paints a full eye on each, and its tail has two
-bones. Its paws turn about the forearms by whole ring steps, and its hold (`CAT_HOLD`) gives each
+keeps the eyeballs of its mesh, because the map paints a full eye on each, with a lid on each eye.
+Its color map (`tools/cat-maps.py`) moves the warm gray and the cream of the source to the gray and
+the white of the cat of main in the hall light. Its tail has two bones, and the key `bind_tail`
+lays the tail tube on the seat around the left side of the haunch, as the cat of main curls its
+tail. Reason: the two rigid bones held the hook of the tail over the side of the seat. Its paws turn about the forearms by whole ring steps, and its hold (`CAT_HOLD`) gives each
 part of each arm at most about 45° of roll or twist in the moments of the violist. Reason: with
 the paws and the hold of the cat of main, the left forearm twisted 125° in the play and -69° at
 rest. An arm that the mesh joins to the trunk needs a cut,
