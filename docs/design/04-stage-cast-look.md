@@ -668,6 +668,11 @@ interface HandRigArmature {
   readonly backRoom?: number;
   /** The lowest height of the head measures, in units. */
   readonly headFloor?: number;
+  /** The largest turn of the head to each side in a cue of the conductor, in degrees (5.4). */
+  readonly cueHeadLeft?: number;
+  readonly cueHeadRight?: number;
+  /** The angle up of the left hand at the cue point of the conductor, in degrees (5.4). */
+  readonly cueLift?: number;
 }
 
 /** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the studio. */

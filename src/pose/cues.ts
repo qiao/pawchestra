@@ -112,8 +112,20 @@ export interface CueSeat {
   readonly center: Vec3;
 }
 
+/** The limits of a cue that a body gives (`StudioBody.cueHeadLeft` and the others), in radians. */
+export interface CueFacts {
+  /**
+   * The largest turn of the head to the left and to the right in a cue. With no value, the head
+   * turns at most `headMax` to that side.
+   */
+  headLeft?: number;
+  headRight?: number;
+  /** The angle up of the left hand at the cue point. With no value, the hand points `cueLift` up. */
+  cueLift?: number;
+}
+
 /** The inputs of {@link findCues}. */
-interface CueInputs {
+interface CueInputs extends CueFacts {
   /** The conducted beats, sorted by time. */
   readonly beats: readonly Beat[];
   /** All notes, sorted by start. */
@@ -157,6 +169,8 @@ export interface CueTrack {
   /** The landing of each cue, sorted. */
   readonly lands: Float64Array;
   readonly cues: readonly Cue[];
+  /** The angle up of the left hand at the cue point, in radians, in place of `cueLift`. */
+  readonly cueLift?: number;
 }
 
 /** The cue motion at one time (design 5.4). Turns are around +y, positive to the left. */
@@ -356,7 +370,11 @@ function turnsTo(inputs: CueInputs, target: Vec3): Turns {
   const toSection = Math.atan2(-dx, -dz);
   const total = clampTo(toSection, m.maxTurn);
   const torsoYaw = clampTo(m.torsoPart * total, m.torsoMax);
-  const headYaw = clampTo(total - torsoYaw, m.headMax);
+  // A positive turn turns to the left, so the limit of a turn to the right is a lower bound.
+  const headYaw = Math.min(
+    inputs.headLeft ?? m.headMax,
+    Math.max(-(inputs.headRight ?? m.headMax), total - torsoYaw),
+  );
   const pitch = Math.atan2(target[1] - inputs.eyes[1], Math.hypot(dx, dz));
   const fromShoulder = Math.atan2(inputs.shoulder[0] - target[0], inputs.shoulder[2] - target[2]);
   return {
@@ -471,7 +489,8 @@ export function findCues(inputs: CueInputs): CueTrack {
     }
   }
   const cues = kept.toSorted((a, b) => a.landSec - b.landSec);
-  return { lands: Float64Array.from(cues, (c) => c.landSec), cues };
+  const lands = Float64Array.from(cues, (c) => c.landSec);
+  return inputs.cueLift === undefined ? { lands, cues } : { lands, cues, cueLift: inputs.cueLift };
 }
 
 /**
@@ -695,7 +714,7 @@ export function cueStateAt(
   out.hand = hand;
   out.handYaw = hands > 0 ? handYaw / hands : 0;
   const prep = hands > 0 ? bend / hands : 0;
-  out.handLift = m.cueLift + m.prepLift * prep;
+  out.handLift = (track.cueLift ?? m.cueLift) + m.prepLift * prep;
   out.handReach = m.cueReach - m.prepPull * prep;
   out.batonLift = baton;
 }

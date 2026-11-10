@@ -169,6 +169,23 @@ export interface AnimalSettings {
    */
   readonly headCeiling?: number;
   /**
+   * The largest turn of the head to the left in a cue of the conductor, in degrees
+   * (`StudioBody.cueHeadLeft`, design 5.4). With no value, the head turns as far as
+   * `CUE_MOTION.headMax`.
+   */
+  readonly cueHeadLeft?: number;
+  /**
+   * The largest turn of the head to the right in a cue of the conductor, in degrees
+   * (`StudioBody.cueHeadRight`, design 5.4). With no value, the head turns as far as
+   * `CUE_MOTION.headMax`.
+   */
+  readonly cueHeadRight?: number;
+  /**
+   * The angle up of the left hand at the cue point of the conductor, in degrees
+   * (`StudioBody.cueLift`, design 5.4). With no value, the hand points `CUE_MOTION.cueLift` up.
+   */
+  readonly cueLift?: number;
+  /**
    * True when each pea eye faces level: the direction of the eye keeps only its turn to the side
    * and forward, with no turn up or down. A large head box behind the eyes, such as the ruff of
    * the wolf, turns the eyes up, and the eyes then read as eyes that look up (design 4.5). With no
@@ -223,6 +240,9 @@ const BODY_FACTS = [
   'noseTop',
   'mouthHeight',
   'headCeiling',
+  'cueHeadLeft',
+  'cueHeadRight',
+  'cueLift',
 ] as const satisfies readonly (keyof AnimalSettings)[];
 
 /** A setting of an animal that is a fact of its body ({@link BODY_FACTS}). */
@@ -3337,6 +3357,15 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   }
   if (settings.colorBlend !== undefined) {
     body = { ...body, colorBlend: settings.colorBlend };
+  }
+  if (settings.cueHeadLeft !== undefined) {
+    body = { ...body, cueHeadLeft: settings.cueHeadLeft };
+  }
+  if (settings.cueHeadRight !== undefined) {
+    body = { ...body, cueHeadRight: settings.cueHeadRight };
+  }
+  if (settings.cueLift !== undefined) {
+    body = { ...body, cueLift: settings.cueLift };
   }
   if (settings.mouthHeight !== undefined) {
     const band = MOUTH_LIP * (top - chin);

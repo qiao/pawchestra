@@ -564,6 +564,26 @@ export interface StudioBody {
    */
   readonly colorBlend?: number;
   /**
+   * The largest turn of the head to the left in a cue of the conductor, toward the raised left
+   * hand, in degrees (design 5.4), from the facts of the body. A head that sits high and has a long
+   * muzzle meets the left paw of a cue in a full turn. A body with no value takes `headMax` of
+   * `CUE_MOTION`.
+   */
+  readonly cueHeadLeft?: number;
+  /**
+   * The largest turn of the head to the right in a cue of the conductor, toward the raised baton
+   * arm, in degrees (design 5.4), from the facts of the body. A head that sits high and has a long
+   * muzzle meets the raised right forearm in a full turn. A body with no value takes `headMax` of
+   * `CUE_MOTION`.
+   */
+  readonly cueHeadRight?: number;
+  /**
+   * The angle up of the left hand at the cue point of the conductor, in degrees (design 5.4), from
+   * the facts of the body. A high, wide head meets a left hand that points `cueLift` of
+   * `CUE_MOTION` up. A body with no value takes that angle.
+   */
+  readonly cueLift?: number;
+  /**
    * The caps of the arms that the cut of a mesh rig makes (design 4.4), as indices of the
    * triangles of the packed mesh. With `cut.bodyNormals` of the config of the rig, they also hold
    * the caps of the body and the two faces at the top of each cut. Each corner of a cap takes the

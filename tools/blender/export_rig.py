@@ -64,6 +64,9 @@ BODY_FACTS = (
     'noseTop',
     'mouthHeight',
     'headCeiling',
+    'cueHeadLeft',
+    'cueHeadRight',
+    'cueLift',
 )
 
 #: The trunk bones whose turn from the pose of the sheet to the bind gives `trunk` of the extras.

@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { MathUtils, Vector3 } from 'three';
 
 import { CONDUCTOR } from '../models/cast.ts';
 import type { ConductorPlace, PlayerPlace, SceneLayout } from '../models/layout.ts';
@@ -27,7 +27,7 @@ import type { LeftHandTrack } from './conductor-left.ts';
 import { buildBatonTrack } from './conductor-notes.ts';
 import type { BatonTrack } from './conductor-notes.ts';
 import { CUE_MOTION, findCues } from './cues.ts';
-import type { CueSeat, CueTrack } from './cues.ts';
+import type { CueFacts, CueSeat, CueTrack } from './cues.ts';
 import type { ChoirRig } from './choir.ts';
 import { buildChoirTrack } from './choir-notes.ts';
 import type { ChoirTrack } from './choir-notes.ts';
@@ -656,6 +656,29 @@ export function pulseTimes(beats: readonly Beat[]): Float64Array {
 }
 
 /**
+ * Gives the facts of the body of the conductor that limit a cue (design 5.4): the largest turn of
+ * the head to each side and the angle up of the left hand, from degrees to radians. A body with no
+ * such fact takes the values of `CUE_MOTION`.
+ *
+ * @param model The model of the conductor.
+ * @returns The limits that the body gives.
+ */
+function cueFacts(model: PlayerModel): CueFacts {
+  const { cueHeadLeft, cueHeadRight, cueLift } = model.studio.body;
+  const facts: CueFacts = {};
+  if (cueHeadLeft !== undefined) {
+    facts.headLeft = cueHeadLeft * MathUtils.DEG2RAD;
+  }
+  if (cueHeadRight !== undefined) {
+    facts.headRight = cueHeadRight * MathUtils.DEG2RAD;
+  }
+  if (cueLift !== undefined) {
+    facts.cueLift = cueLift * MathUtils.DEG2RAD;
+  }
+  return facts;
+}
+
+/**
  * Calculates the data of the conductor that the pose needs at each frame (design 5.4): the beats
  * of the baton, the cues with the turns to the cued seats, and the levels, the trends, and the
  * held chords for the left hand. The conductor has no timing offset, no look, and a rest motion
@@ -690,6 +713,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
     eyes: model.skeleton.positions[boneIndex('head')] ?? [0, 0, 0],
     shoulder: rig.left.bind.shoulder,
     baton,
+    ...cueFacts(model),
   });
   yield;
   const left = buildLeftHandTrack(baton.beats, notes, loudness);
