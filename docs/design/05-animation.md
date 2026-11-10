@@ -797,7 +797,14 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   A seek during play ends the count-in, and the sound starts at once. Thus a start point
   that a seek sets (`Transport.seekStart`) gets `NO_COUNT_IN`: no ready gesture, no leader
   nod, and no lift of the baton.
-- **Baton.** The bear holds one baton, in the right paw, with the palm down (`CONDUCTOR_HOLD`).
+- **Baton.** The bear holds one baton, in the right paw, with the palm down and tilted a little
+  in, as a conductor holds it between the thumb and the fingers (`CONDUCTOR_HOLD.batonRoll`). The
+  roll is right for a body whose `palm` is the true palm of its paw.
+- **Paws of the arm gate.** In the ready gesture the left palm faces in and down, as in the quiet
+  place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
+  pose the arms hang nearly straight beside the round belly, with the elbows down and back
+  (`restArm`, `restPoleL`, `restPoleR`). The elbow of a nearly straight hanging arm is ill defined,
+  so the conductor gives it a fixed direction.
 - **Bow.** At the song end, the bear bows to the orchestra (`END_BOW`).
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
   breath and a nod, as in a string quartet (`leaderOf()`, `LEADER_NOD`).
