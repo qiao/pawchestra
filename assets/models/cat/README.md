@@ -391,17 +391,17 @@ mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm str
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/cat-color.webp` | The color map of the candidate ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
-| `tripo-hand/cat-normal.webp` | The normal map of the fur ("Normal map" below). License as the FBX file | None: made one time from the source image |
+| `tripo-hand/cat-normal.webp` | The normal map of the fur ("Normal map" below). License as the FBX file | The run of `tools/cat-maps.py` above (cwebp 1.5.0) |
 
 The files of the candidate, after the last edit:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.blend` | 408,061 bytes | `fafa627d9d16c6c473491158a283ae54f827bf435ecec82f02480164eadfc67a` |
-| `tripo-hand/cat.rig.glb` | 856,128 bytes | `df4a1924facae67cf7c89af5a6e216ccf116303887bb50108841812e6c907f0e` |
-| `tripo-hand/cat.rig.json` | 16,710 bytes | `a67996e3102ed5f8056fe50888112f9be7f9bbb56638f7ef23e307df73c42795` |
-| `tripo-hand/cat-color.webp` | 143,216 bytes | `faf2610ff58a32aeec9b600363bc31842b9ec19138ce3c5e80d7017f90425b9f` |
-| `tripo-hand/cat-normal.webp` | 75,400 bytes | `1c5d9d5521b0845cce72cb6616655d76b9b5849f71b23784e471ee8af4a221fa` |
+| `tripo-hand/cat.blend` | 405,567 bytes | `39283e6cf7f99484a997c0aab7a8fc7753a22556b14051baf9ab251953e2c5bf` |
+| `tripo-hand/cat.rig.glb` | 856,388 bytes | `8060cdf5d1074330227f3022ce8dc9b55a6d42b22a17b56777e1ba2f8de2a4f0` |
+| `tripo-hand/cat.rig.json` | 17,186 bytes | `7dd000544891ee853df217de2b2f41ba8fd7ba758e22e356aa52d6ad0f50cd35` |
+| `tripo-hand/cat-color.webp` | 143,090 bytes | `2cfdb0d9e6bdac299e8eafbcdf6c563b979891d22e1e219796e75bd1723ca4c3` |
+| `tripo-hand/cat-normal.webp` | 73,312 bytes | `6ba7573360b488d434b50165550930865eb5ba20a106b014b72a7f4effd4e7c6` |
 
 ### tripo-p2/cat.fbx
 
@@ -443,7 +443,7 @@ legs keep the form and the length of the source: no cut, no split from the trunk
 | Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly" below) and `bind_tail` ("Tail on the seat" below): 3,831 vertices and 4,083 faces (3,416 quads and 667 triangles, 7,499 triangles), flat faces, and the surface of `sa.add_surface()`. 55 faces are gloss (the pink nose, "Nose bridge"). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid` ("Lids"), and the 196 faces of the whisker strips have `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly" below) and `bind_tail` ("Tail on the seat" below): 3,831 vertices and 4,083 faces (3,416 quads and 667 triangles, 7,499 triangles), flat faces, and the surface of `sa.add_surface()`. 55 faces are gloss (the pink nose, "Nose bridge"). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid` ("Lids"), and the 196 faces of the whisker strips have `plain`. The 28 faces of the crotch have `rim` ("Crotch"). The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245; the fingers joints turn with the paws). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side) and `hinges` come from "Arm twist", `seat` from "Seat" and "Seat back", and `lids` from "Lids" below |
 | Facts | `height` 1.181424 (the shoulder joints at 0.68705 u after "Longer legs", 1.71956 m for each unit, so that H was 0.339375 m, the H of the cat of `cat.rig.glb`, before "Head size": H is now 0.374861 m), `crease` 55, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh, 0.75 of their source size ("Eye size"), with a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -693,7 +693,7 @@ the bind axis of the part):
 | frog | 44.5 | 43.7 | -23.0 | -9.5 |
 | tip | 44.5 | 43.4 | -37.1 | -36.8 |
 | crossing | 44.5 | 43.7 | -23.4 | -17.7 |
-| rest | -34.0 | -41.2 | -24.7 | -9.4 |
+| rest | -34.0 | -41.1 | -24.8 | -9.3 |
 | lift50 | 26.9 | 12.5 | -10.2 | -16.9 |
 | lower50 | 40.7 | 26.9 | -10.8 | -9.4 |
 | stand | 44.6 | 42.9 | -23.2 | -8.3 |
@@ -760,7 +760,7 @@ foot, so a longer UV span would sample the paw.
 
 **Lap.** The lower belly was thinner than on the cat of main (D2 of `pnpm body-shape` 27.1 cm
 against 35.0 cm). The key `bind_belly` now takes each vertex of rest z 0.34 to 0.52 (Blender), and
-moves it forward by 0.045 ss(0.355, 0.385, zb) (1 - ss(0.425, 0.465, zb)) with the cosine
+moves it forward by 0.045 ss(0.33, 0.385, zb) (0.355 before "Crotch") (1 - ss(0.425, 0.465, zb)) with the cosine
 fade of "Belly". D2 is now 33.5 cm, D3 36.6 cm (main 34.9), and no face of the lower belly points
 down by more than 30° (largest 15.8°, before 29.1°).
 
@@ -842,6 +842,62 @@ hold the tilts times 4 (`NORMAL_MAP_GAIN`), blue 255. `cwebp -q 60 -sharp_yuv -m
 1.5.0). The tilts are small (median 0.0124). The gray fur of the color map has the linear luma
 0.157 and the white 0.589, against 0.131 for the gray thigh of `cat-front.png`, so the gray fur
 takes about 0.31 of the sheen, and its strands show.
+
+**Crotch.** The raised thighs folded the faces of the crotch in the bind: 31 edges of the lower
+belly turned by more than the crease angle 55° (largest 175°), so the faces shaded as flat facets,
+and the folded faces at the thigh crease read as dark slits. The key `bind_belly` now smooths the
+crotch in the bind before and after the moves of "Belly" and "Lap":
+
+```python
+# C: each vertex with rest z (Blender) from 0.29 to 0.40, |x| below 0.1, and rest y below -0.02.
+# Before the moves: 30 rounds of X[i] += 0.5 * (mean(X[neighbors]) - X[i]) for each i of C at the
+# same time. The lap move takes the vertices of S and C, with the band ss(0.33, 0.385, zb).
+# After the moves: 20 more rounds on the vertices of C with rest z 0.29 to 0.345 (under the lap).
+```
+
+The 28 faces with each vertex in C take the face attribute `rim`, so the app gives each corner the
+mean normal of the fur faces at its vertex with no crease angle. Now 4 edges of the lower belly
+turn more than 55°, each on a `rim` face, and the largest turn of a vertex normal of the crotch
+from the mean of its neighbors is 24° (before 138°). The lap keeps its depth (D3 36.5 cm, before
+36.6 cm), and the thigh girth stays 57.0 cm. A region from rest z 0.27 smooths more (largest turn
+14°), but it moves the inner side of each thigh, and the thigh girth falls to 49.2 cm.
+
+**Brow rows.** The automatic weights gave `ear_L` and `ear_R` up to 0.87 of the brow and of the
+skin between the eyes and the ears. The ear twitch of the app (12°) thus pulled the brow and the
+lid line. Each vertex with an ear weight e now takes the exact row with e * ss(0.905, 0.95, z) on
+its ear and the rest of e on `head`, with z its rest height (Blender, the ear roots at z 0.939):
+545 vertices give up to 0.82 to the head.
+
+**Open lids.** The upper lid line (the edges of three faces at each socket) covered the top of
+the iris, and the eyes read sleepy. Before the lids, each head vertex near an eye turns up about
+the hinge h through the middle c of the ball (the frame of "Lids") by w * 5°, with d = P - c, lam
+= atan2(d.h, d.g), psi = asin(d.u / |d|), psi_l the psi of the lid line at lam, and s the place
+from the inner end (0) to the outer end (1) of the lid line:
+
+```text
+w = ss(psi_l - 10, psi_l - 2, psi) (1 - ss(psi_l + 25, psi_l + 60, psi))
+    (1 - ss(1.8, 2.6, |d| / r)) ss(-0.1, 0.25, s) (1 - ss(0.9, 1.3, s))
+```
+
+The outer end turns with most of the angle, so the outer eye line rises a little. A lineup of 0°,
+3°, 5°, and 8° (`reports/2026-11-10-cat-hand-r10/lineup-face/`, which git ignores) showed the
+iris top under the lid at 0° and 3°, and a light band of the ball over the iris at 8°, which reads
+startled. 5° shows the whole iris with the lid line on its top. In each of the 21 steps of the
+blink, no lid point leaves the head (the ray casts of "Lids").
+
+**Mouth corners.** The lip line (the edges of four faces below the nose) dipped at |x| 0.025 and
+rose only 2 mm to the corners, so the mouth read neutral. Each head vertex (no loose part) moves up
+by 0.006 ss(0.012, 0.0346, |x|) (1 - ss(0.037, 0.055, |x|)) (1 - ss(0.004, 0.016, e)), with e its
+distance in y and z from the lip line at min(|x|, 0.0346): 50 vertices. The lineup put 0.006 over
+0.003 and 0: the corners then turn up at the frog.
+
+**Brow shades and normal map.** Under each light brow spot, the source map paints a dark shade
+(Oklab L 0.48 against 0.54 for the fur), and its normal map paints the brow tufts and the upper
+lids as strong tilts. In the hall light they read as knit brows. `tools/cat-maps.py` now paints
+the shade texels (`BROW_SHADE`, darker than the fur by more than `BROW_DARK`) over with the fur
+around them (1,662 texels), and it writes `cat-normal.webp` with no tilt on the triangles of the
+brow spots and of `BROW_FLAT` (11,960 texels). With no flat region, the tool writes the earlier
+normal map byte for byte.
 
 The scripts of the session (`scratch/cat/` of the worktree, which git ignores: `build.py`,
 `catedits.py`, `tail.py`, and `make_config.py`, with `params.json`) hold these steps.
