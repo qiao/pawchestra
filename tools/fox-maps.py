@@ -295,7 +295,8 @@ def segment_param(places, a, b):
 def sock_edges(rig, lab):
     """Gives each leg and each forearm a sharp edge between the orange fur and the dark sock (see
     SOCK_EDGES). Each texel on the line from the orange fur to the socks in Oklab takes the full
-    orange above the edge and the full sock below it, with its own small steps along and off the line."""
+    orange above the edge and the full sock below it, with its own small steps along and off the
+    line."""
     joints = rig[4]
     places = place_map(rig)
     orange = oklab(linear(MAPS['fox-color.webp'][0][0]))
@@ -311,7 +312,8 @@ def sock_edges(rig, lab):
             j = [joints[f'{name}_{side}'] for name in chain]
             for k in range(len(j) - 1):
                 t, distance = segment_param(places, j[k], j[k + 1])
-                # The middle segment holds the edge; the segment above it is fur, below it sock.
+                # The middle bone holds the edge. The bone above it takes the fur, and the
+                # bone below it the sock.
                 if k == 0:
                     want = np.zeros_like(t)
                 elif k == 1:
