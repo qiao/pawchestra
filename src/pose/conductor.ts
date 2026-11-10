@@ -134,13 +134,17 @@ export const CONDUCTOR_HOLD = {
    * the sides of the belly, as on the bear of main. With the angles of a standing player (20° and
    * 60°), the forearms of the Tripo bear lie on the top of its belly, and the paws point at the
    * players. The search of the swing out to the side starts at `minOut`, and each part then
-   * swings out by `extraOut` more.
+   * swings out by `extraOut` more. From the 16° of `HANG`, the search stops the right upper arm
+   * at 18° (the left at 31°), the right forearm then needs the largest swing of 50°, and the
+   * elbows go 4.1 cm (forearms) and 4.6 cm (upper arms) into the belly at rest. From 22° with 3°
+   * more, the upper arms stand 31° and 34° out, and the arms go 1.3 cm and 1.6 cm into the belly
+   * at rest, and 1.6 cm and 2.7 cm in the lift and the lowering (`pnpm pose-depth conductor`).
    */
   restArm: {
     forward: 20 * MathUtils.DEG2RAD,
     bend: 11.5 * MathUtils.DEG2RAD,
-    minOut: 16 * MathUtils.DEG2RAD,
-    extraOut: 0,
+    minOut: 22 * MathUtils.DEG2RAD,
+    extraOut: 3 * MathUtils.DEG2RAD,
   },
   /**
    * The left elbow of the rest pose points down and back. The elbow of the hanging arm is the
