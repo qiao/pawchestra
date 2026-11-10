@@ -130,8 +130,8 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 449,008 bytes |
-| SHA-256 | `a2deb297f3e1c03cf873ca9c2b3574a466f0c56bb697c99b4c8df36bfea5300b` |
+| Size | 449,622 bytes |
+| SHA-256 | `767176e7c300f7d30ea60648a87c3d5938fd15025e21c0719bd81720bffc5c71` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -145,8 +145,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,079,748 bytes | `c208caf25f69e0690785ab01d3ceb2a6ea8880c74876ae38800b378dbf6c4882` |
-| `tripo-hand/fox.rig.json` | 9,982 bytes | `c78a1924c6e644419e28fd42bee4e62fdf05e8f1bfa276d1439b50e5e982f420` |
+| `tripo-hand/fox.rig.glb` | 1,084,348 bytes | `78102b3ebf5bf5e925f2cffa598d3ce95c9c2d7cdcc694e1972a296743829159` |
+| `tripo-hand/fox.rig.json` | 9,982 bytes | `5c93f157a5f77969b08188452f215dbf15fbebf86317955118b768abfe075dba` |
 
 The edits, in the order of the work:
 
@@ -456,3 +456,25 @@ to the hip. Of the 447 faces that changed form, 111 stretch by more than 1.2 and
 
 **Whiskers.** The 30 faces of the 6 whisker strips have the face attribute `plain`, so that the
 whiskers keep their face colors. The gloss nose keeps its color too.
+
+**Wrist bands.** The paw turn of "Arm twist" joined each turned paw to the forearm with 10 new
+quads that kept the UVs of the old band (faces 4034, 4035, 4038, 4046, 4163, 4170, 4536, 4542,
+4545, 4554 on the left, and 2082, 2084, 2092, 2120, 2125, 2126, 4679, 4688, 4694, 4700 on the
+right). The UVs of the far ring then met the UVs of the turned paw, 4 and 2 ring steps away: a UV
+gap of 0.30 on average at that ring. A point edit in the live Blender gives each band face the
+planar projection of its corners on its own plane (u along the rest forearm axis, v along the
+normal × the axis), at 0.91 UV for each unit (the median density of the faces next to the bands),
+about the clean dark patch at UV (0.3164, 0.3633). The patch is 128 pixels wide in the 4096
+source, with the mean sRGB (71, 35, 16) and a deviation of 1.5: the faces next to the bands are
+about (70, 34, 15). No band face is flipped in UV. The seams of the map, as the mean sRGB
+difference of the texels just inside the two faces of an edge, in steps of 255:
+
+| Edges | Mean | Largest |
+|---|---|---|
+| UV seams of the FBX on the forearms and the paws | 2.2 | 25 |
+| Wrist bands, the old UVs (left, right) | 3.9, 3.1 | 18, 20 |
+| Wrist bands, the patch (left, right) | 4.0, 4.0 | 15, 17 |
+
+A UV seam stays at each end of a band: no UV map can join the forearm and a turned paw, because
+the paw turns its UV island with it. The patch takes the band off the islands of the FBX and the
+orange edges of the socks, and the color step at each end is at the level of the seams of the FBX.
