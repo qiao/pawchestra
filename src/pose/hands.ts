@@ -230,8 +230,13 @@ export const HANDS_HOLDS = {
     // At 25 and more, the right paw turns more than 15° further from its accepted grip
     // (`pnpm arm-check pianist`).
     apart: 24,
-    poleL: [-1, -0.3, 0.2],
-    poleR: [1, -0.3, 0.2],
+    // The elbows point out, a little back, and 0.15 down. With the elbows 0.3 down, the right arm
+    // of the Tripo polar bear goes 6.2 cm (forearm) and 7.5 cm (upper arm) into the belly in the
+    // play, 0.15 down 5.3 cm and 6.8 cm, and level 4.5 cm and 5.8 cm (`pnpm pose-depth pianist`).
+    // Level elbows fold 9 faces (p95) of each arm in the play, and 0.15 down 8 and 6 (`pnpm
+    // arm-check pianist`).
+    poleL: [-1, -0.15, 0.2],
+    poleR: [1, -0.15, 0.2],
     curl: 30 * MathUtils.DEG2RAD,
     curlClosed: 30 * MathUtils.DEG2RAD,
     thumbClosed: 0,
