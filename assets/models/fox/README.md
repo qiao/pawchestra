@@ -100,28 +100,35 @@ red fox and the tan fox share it.
 
 ### tripo-p2/fox.fbx
 
-A red fox in a T-pose, made with Tripo P2: quad faces, and arm and leg tubes of 10 and 12
-vertices around. The FBX file keeps the quads. The folder `fox.fbm/` holds its color map and its
-normal map.
+A red fox in a T-pose, made with Tripo P2 from a new turnaround sheet with a rounder, cuter form:
+quad faces, arm tubes of 10 vertices around (9 at the wrist), and leg tubes of 11 vertices around.
+The FBX file keeps the quads. The folder `fox.fbm/` holds its color map and its normal map. The
+Tripo download names them `tripo_rgb_f033bd5d-5522-441d-b412-e2d3d40ecedd.jpg` (now
+`fox_basecolor.jpg`) and `tripo_normal_3aa50a50-b638-4a37-bf3f-fcd2c33c91e5.jpg` (now
+`fox_normal.jpg`), and the FBX file is `tripo_convert_6d644bdd-89a1-4ee8-95be-a7952dfc6008.fbx`.
+The FBX file links the maps by the folder of the download, so the import finds no map, and each
+tool takes the path of the map. The roughness and metallic maps of the download are not kept.
+This mesh replaces the first Tripo P2 fox ("History" below).
 
 | Item | Value |
 |---|---|
 | Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
 | Writer | Tripo, FBX 7.4 binary |
-| Contents | One mesh object, with no armature and no animation. 3,738 vertices and 4,423 faces: 2,963 quads and 1,460 triangles (7,386 triangles), no n-gon. One UV layer |
-| Parts | 9 parts: the body (3,568 vertices), two eyeballs (52 vertices each), and six whisker strips (11 vertices each). No vertices merge at 1e-5. The 66 open edges are the 6 open loops of the whisker strips. No edge has more than two faces |
-| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.4199 (the paw tips) and z ±0.2211 (the snout and the tail). The fox faces -y in Blender. The tail hangs down behind the legs to 0.109 units above the soles |
+| Contents | One mesh object, with no armature and no animation. 3,264 vertices and 3,778 faces: 2,656 quads and 1,122 triangles (6,434 triangles), no n-gon. One UV layer |
+| Parts | 5 parts: the body (2,943 vertices), the tail (152 vertices, a closed part that touches the back of the haunch), two eyeballs (61 vertices each, open at the back), and the inner mouth (47 vertices). No vertices merge at 1e-5. 92 open edges: the backs of the eyeballs, the mouth, the brow strips over the eyes, the top of the tail, and two small slits at the front of each armpit. 10 edges have three faces: a ruff spike that folds into the front of each arm root |
+| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.4638 (the paw tips) and z ±0.286 (the snout and the tail). The fox faces -y in Blender. The mesh is not quite symmetric: the face lies up to 0.024 units off the mirror of the other side |
 
 | File | Size | Pixels | SHA-256 |
 |---|---|---|---|
-| `fox.fbx` | 259,292 bytes | | `db116e3197e4f68838268a7a9c2def02427863545d6692c4435f5aaec4ed0845` |
-| `fox.fbm/fox_basecolor.jpg` | 2,631,574 bytes | 4096 × 4096 | `be63ddbab53870f105f307f01ce5ead74d89ab063f4f52a97d5c64ed157e8cb6` |
-| `fox.fbm/fox_normal.jpg` | 884,078 bytes | 4096 × 4096 | `ffb4aa792a25a168738eb4f80ec897683586176de5b64df616e05a352d16ac0f` |
+| `fox.fbx` | 228,188 bytes | | `598c8e8d989d30c04548aa0b0da8967cd44311c3d69fe1b59fc3acf7265cd795` |
+| `fox.fbm/fox_basecolor.jpg` | 2,481,446 bytes | 4096 × 4096 | `ff4fadeda9bde188dd4d5093021366c8c729a57d69b0e9bb543a707fa5ad5740` |
+| `fox.fbm/fox_normal.jpg` | 971,512 bytes | 4096 × 4096 | `4814b8610ff5e27e37799a794c979d86644da0b0bd45625f6e4d0e624d52f317` |
 
-The color map paints a full eye on each eyeball: a black pupil, an amber iris, two white lights,
-and a dark rim. The paws, the feet, and the forearms below the elbows are dark brown, and the
-nose is black.
+The color map paints a full eye on each eyeball: a black pupil, a brown iris, white lights, and a
+dark rim. It paints dark brown brows on the brow strips, dark brown socks up to just above the
+knees, forearms from a third of the way past the elbows, dark ear tips, a cream bib, cheeks,
+muzzle, and tail tip, and a black nose. It paints no light spot over the eyes.
 
 ### tripo-hand/fox.blend
 
