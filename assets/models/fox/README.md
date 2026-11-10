@@ -789,3 +789,32 @@ the shoulder to the wrist:
 The bones, the weights, the palm hints, and the paw turns stay. In the moments of "Arm twist",
 each part of each arm takes 41.6° or less, and each paw still closes on the bow, the violin neck,
 and the flute.
+
+**Head size.** In the hall view the head read small against the body. The fox of main grows its
+head in its rig: its eyes take the shown head height 0.382 m (`StudioEyes.headHeight`), against
+H 0.323 m of the candidate. A point edit in the live Blender (`foxr12.head_scale(1.2)` of the
+session) scales the head about the head joint (0, -0.05, 0.7706):
+
+```text
+vertex: P += w (s - 1) (P - joint),  s = 1.2,  w = its share of head + ear_L + ear_R (at most 1)
+bones head (tail), ear_L, ear_R (head and tail): p = joint + s (p - joint), with the same roll
+headCeiling: 0.7706 + s (0.9746 - 0.7706) = 1.0154
+```
+
+2,080 vertices move (1,327 with w 1, 753 with a share), at most 0.0595 units. The basis and the key
+`bind_belly` take the same moves. The ears, the eyeballs, the lids, the whiskers, and the muzzle
+scale with the head, and the neck fades with the weights. The lid turn and the lid axes stay,
+because a scale keeps each direction. A lineup of 1.0, 1.1, and 1.2 in the hall view and the close
+views of both roles showed no clip at the chin rest, the bow, or the flute at 1.2.
+
+| Scale | H of `pnpm studio-body` |
+|---|---|
+| 1.0 | 0.322998 m |
+| 1.1 | 0.354846 m |
+| 1.2 (the file) | 0.386694 m |
+
+The ray casts of the blink give the same counts as before: no open lid point outside the head.
+With the larger H, the rest values of `FOX_FLUTE` (`src/pose/winds.ts`) in H take 0.835 times
+their values, so the rest stays in meters: with the old values, the right forearm of the flutist
+twisted 47° at rest. In the moments of "Arm twist", each part of each arm of the violinist takes
+40.2° or less, and of the flutist 44.3° or less (the right forearm of the standing flutist).
