@@ -70,6 +70,19 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
+#: The light spot that the source map paints above each eye: its middle from the middle of the
+#: eyeball, in the axes of the rig file (+x the left side, +y up, +z forward), with x toward the
+#: middle plane, and two radii, all in units of the distance of the eye from the middle plane.
+#: In the hall light the two spots read as raised inner brows, which give a worried face. In the
+#: triangles of the rig file with their middle in the inner sphere, each texel far from the orange
+#: fur takes the fur around it. In the outer sphere, only the light texels do, so that the dark
+#: lining of the eye keeps its color.
+BROW_SPOT = ((-0.205, 0.872, 0.836), 0.5, 0.7)
+#: The texels around the brow triangles that a light spot texel can also take, so that no light
+#: edge stays where a texel of the spot lies just outside its triangles.
+BROW_GROW = 2
+#: The Oklab distance from the orange fur above which a texel of a brow triangle is a spot texel.
+BROW_FAR = 0.04
 
 
 def linear(srgb):
@@ -103,8 +116,9 @@ def linear_of_oklab(lab):
     return ((lab @ m1.T) ** 3) @ m2.T
 
 
-def eye_mask(path, size):
-    """Gives the texels of the eyeball triangles of the rig file, grown by EYE_MARGIN texels."""
+def read_rig(path):
+    """Gives the triangles, the positions, the texture points, and the eyes (`ownEyes`) of the fur
+    primitive of the rig file, in the seated bind of the file."""
     data = open(path, 'rb').read()
     length = struct.unpack('<I', data[12:16])[0]
     gltf = json.loads(data[20:20 + length])
@@ -121,21 +135,98 @@ def eye_mask(path, size):
         return np.frombuffer(binary, dtype, count, start).reshape(-1, width)
 
     kinds = {5121: np.uint8, 5123: np.uint16, 5125: np.uint32}
-    triangles = read(fur['indices'], kinds[gltf['accessors'][fur['indices']]['componentType']], 3)
+    triangles = read(fur['indices'], kinds[gltf['accessors'][fur['indices']]['componentType']], 1)
+    positions = read(fur['attributes']['POSITION'], np.float32, 3)
     points = read(fur['attributes']['TEXCOORD_0'], np.float32, 2)
     eyes = gltf['asset']['extras'].get('ownEyes')
     if not eyes:
         sys.exit(f'{path} has no eyes of the mesh.')
+    return triangles.reshape(-1, 3), positions, points, eyes
+
+
+def draw_triangles(triangles, points, faces, size):
+    """Gives the texels of a list of triangles."""
     mask = Image.new('L', (size, size), 0)
     draw = ImageDraw.Draw(mask)
-    count = 0
-    for side in ('L', 'R'):
-        for t in eyes[side]['faces']:
-            corners = points[triangles[t]] * size
-            draw.polygon([(float(u), float(v)) for u, v in corners], fill=255)
-            count += 1
+    for t in faces:
+        corners = points[triangles[t]] * size
+        draw.polygon([(float(u), float(v)) for u, v in corners], fill=255)
+    return mask
+
+
+def eye_mask(rig, size):
+    """Gives the texels of the eyeball triangles of the rig file, grown by EYE_MARGIN texels."""
+    triangles, _, points, eyes = rig
+    faces = [t for side in ('L', 'R') for t in eyes[side]['faces']]
+    mask = draw_triangles(triangles, points, faces, size)
     mask = mask.filter(ImageFilter.MaxFilter(2 * EYE_MARGIN + 1))
-    return np.asarray(mask) > 0, count
+    return np.asarray(mask) > 0, len(faces)
+
+
+def eye_middles(rig):
+    """Gives the middle of the sphere of each eyeball (a least-squares fit of its corners)."""
+    triangles, positions, _, eyes = rig
+    middles = {}
+    for side in ('L', 'R'):
+        p = positions[triangles[eyes[side]['faces']].ravel()].astype(np.float64)
+        fit = np.linalg.lstsq(np.c_[2 * p, np.ones(len(p))], (p ** 2).sum(1), rcond=None)[0]
+        middles[side] = fit[:3]
+    return middles
+
+
+def brow_fill(rig, lab):
+    """Paints the light brow spots over with the fur around them (see BROW_SPOT). Gives the moved
+    Oklab image and the count of the painted texels."""
+    triangles, positions, points, eyes = rig
+    middles = eye_middles(rig)
+    unit = abs(middles['L'][0])
+    face_middles = positions[triangles].mean(axis=1)
+    own = {t for side in ('L', 'R') for t in eyes[side]['faces']}
+    offset = np.array(BROW_SPOT[0])
+    inner, outer = [], []
+    for side, sign in (('L', 1), ('R', -1)):
+        spot = middles[side] + unit * offset * [sign, 1, 1]
+        distance = np.linalg.norm(face_middles - spot, axis=1) / unit
+        inner += [t for t in np.flatnonzero(distance < BROW_SPOT[1]) if t not in own]
+        outer += [t for t in np.flatnonzero(distance < BROW_SPOT[2]) if t not in own]
+    region = np.asarray(draw_triangles(triangles, points, inner, SIZE)) > 0
+    wide = np.asarray(draw_triangles(triangles, points, outer, SIZE)) > 0
+    grown = np.asarray(Image.fromarray(wide).filter(ImageFilter.MaxFilter(2 * BROW_GROW + 1))) > 0
+    fur = oklab(linear(MAPS['fox-color.webp'][0][0]))
+    far = np.linalg.norm(lab - fur, axis=-1) > BROW_FAR
+    light = lab[..., 0] > fur[0]
+    spot = (region & far) | (grown & far & light)
+    keep = grown & ~spot
+    out = lab.copy()
+    labels, count = parts(grown)
+    for k in range(1, count + 1):
+        part = labels == k
+        fill = part & keep
+        if not (part & spot).any():
+            continue
+        color = np.median(lab[fill], axis=0) if fill.sum() >= 4 else fur
+        out[part & spot] = color
+    return out, int(spot.sum())
+
+
+def parts(mask):
+    """Gives the connected parts of a mask (4 neighbors) as a label image, and their count."""
+    labels = np.zeros(mask.shape, np.int32)
+    count = 0
+    for y, x in zip(*np.nonzero(mask)):
+        if labels[y, x]:
+            continue
+        count += 1
+        stack = [(y, x)]
+        labels[y, x] = count
+        while stack:
+            cy, cx = stack.pop()
+            for ny, nx in ((cy + 1, cx), (cy - 1, cx), (cy, cx + 1), (cy, cx - 1)):
+                if 0 <= ny < mask.shape[0] and 0 <= nx < mask.shape[1] and mask[ny, nx] \
+                        and not labels[ny, nx]:
+                    labels[ny, nx] = count
+                    stack.append((ny, nx))
+    return labels, count
 
 
 def target_lab(target):
@@ -183,8 +274,10 @@ def write_map(name, anchors, image, lab, eyes, count):
 
 def main():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
-    lab = oklab(linear(np.asarray(image)))
-    eyes, count = eye_mask(RIG, SIZE)
+    rig = read_rig(RIG)
+    lab, painted = brow_fill(rig, oklab(linear(np.asarray(image))))
+    print(f'{painted} texels of the brow spots take the fur around them')
+    eyes, count = eye_mask(rig, SIZE)
     for name, anchors in MAPS.items():
         write_map(name, anchors, image, lab, eyes, count)
 
