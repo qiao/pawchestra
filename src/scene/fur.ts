@@ -24,6 +24,13 @@ export const FUR_LOOK = {
     strength: 1,
     /** The roughness of the sheen lobe: a larger value spreads the rim farther over the body. */
     roughness: 0.35,
+    /**
+     * The linear luma of the fur color at and above which the sheen has its full strength. Below
+     * it, the sheen falls with the luma, so that dark fur, such as the socks of a fox, stays dark,
+     * as dark fur tips pass less light. The cream fur of the rabbit (luma 0.53 and more) keeps the
+     * full sheen.
+     */
+    fullLuma: 0.5,
   },
   /**
    * The factor of the tilts of the normal map, in the tilts of the source map: 1 gives the strand
@@ -115,10 +122,11 @@ if ( bodyNormalOn > 0.5 && furFace > 0.5 ) {
 `;
 
 /**
- * The GLSL that keeps the sheen to the fur faces, after the material setup of three.js.
+ * The GLSL that keeps the sheen to the fur faces, after the material setup of three.js, with the
+ * strength of the luma of the fur color ({@link FUR_LOOK}).
  */
 const FUR_SHEEN_MASK = /* glsl */ `
-material.sheenColor *= furFace;
+material.sheenColor *= furFace * saturate( dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) ) / ${FUR_LOOK.sheen.fullLuma.toFixed(3)} );
 `;
 
 /**

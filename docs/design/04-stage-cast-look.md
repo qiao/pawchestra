@@ -1041,7 +1041,9 @@ faces keep the shared shading.
   of three.js give it with the pool of the stage lights. The rim lights are no lights of
   three.js, so the shader adds their sheen on each fur pixel. Thus the rim lights behind the
   orchestra give a warm light on the outline of the heads and the shoulders. A low roughness
-  keeps the lobe near the outline. A higher roughness also lit the whole side of the body.
+  keeps the lobe near the outline. A higher roughness also lit the whole side of the body. The
+  sheen falls with the luma of the fur below `fullLuma`, because dark fur passes less light. With
+  the full sheen on all fur, the dark socks of the fox looked cream.
 - **Strand normals.** A normal map beside the color map (`<name>-normal.webp`) tilts the normal
   of each fur pixel. The tangent frame comes from the screen derivatives of the view position and
   of the texture points, so the skin needs no tangents. The map uses the green of OpenGL, and
