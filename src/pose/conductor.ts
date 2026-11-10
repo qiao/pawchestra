@@ -84,16 +84,14 @@ export const CONDUCTOR_HOLD = {
   liftBaton: [1, -0.3, 0],
   /**
    * The roll of the right paw around the baton from the top up, in radians, positive by the right
-   * hand around the direction of the baton. The palm of the paw of the bear mesh lies about 48° from
-   * the palm of the player, so with no roll the paw faces the players with the pads out and the
-   * claws up, the baton stands up from it, and the bear does not hold the baton in a natural way.
-   * With the roll, the claws curl around the baton, and the back of the paw faces up, as a
-   * conductor holds the baton between the thumb and the fingers with the palm down. A true palm
-   * hint of the mesh (`palm` of `tools/mesh-rigs/bear.json`) turns the left paw too, and the left
-   * arm fails the gate. The full roll of 48° (0.84) twists the right forearm more in the lift (p95
-   * 28° against 12°), with no change that the eye sees.
+   * hand around the direction of the baton. The `palm` of the Tripo bear is the true palm of its
+   * paw, so with no roll the back of the paw faces up, and the claws curl around the baton under
+   * it, as a conductor holds the baton between the thumb and the fingers with the palm down. The
+   * small roll tilts the palm in to the body, so that the palm faces 45° down and in. The roll of
+   * 40° of the bear of main (its palm hint lay 48° from its true palm) turns the palm of the Tripo
+   * bear to the side, and the right forearm then twists 66° to 109° from the bind.
    */
-  batonRoll: 0.7,
+  batonRoll: 11.5 * MathUtils.DEG2RAD,
   /** The curl of the fingers of the open left hand of a cue. */
   cueCurl: 10 * MathUtils.DEG2RAD,
   /**
@@ -123,6 +121,29 @@ export const CONDUCTOR_HOLD = {
    * forearm comes 0.8 cm from the head.
    */
   readyOut: 44 * MathUtils.DEG2RAD,
+  /**
+   * In the ready gesture, the left paw turns this far around its fingers, by the right hand rule,
+   * so that the palm faces in and down, as in the quiet place. With no turn, the palm faces the
+   * players, and the left forearm of the Tripo bear twists 94° more from the ready gesture to the
+   * quiet place than the arm gate permits (45° on each side of the bind).
+   */
+  readyRoll: -46 * MathUtils.DEG2RAD,
+  /**
+   * The forward swing of the upper arm and the forward bend of the elbow of the hanging arms of
+   * the rest pose (design 5.2). The arms hang beside the round belly, and the paws hang down at
+   * the sides of the belly, as on the bear of main. With the angles of a standing player (20° and
+   * 60°), the forearms of the Tripo bear lie on the top of its belly, and the paws point at the
+   * players.
+   */
+  restArm: { forward: 20 * MathUtils.DEG2RAD, bend: 11.5 * MathUtils.DEG2RAD },
+  /**
+   * The left elbow of the rest pose points down and back. The elbow of the hanging arm is the
+   * bend of a nearly straight arm, so a change of 1° of the swing out to the side turns the upper
+   * arm by up to 60°.
+   */
+  restPoleL: [0, -1, 1],
+  /** The right elbow of the rest pose, as the left elbow. */
+  restPoleR: [0, -1, 1],
 } as const;
 
 /** One place of the left hand between its cues (design 5.4). */
@@ -267,8 +288,8 @@ export function conductorRig(model: PlayerModel): ConductorRig {
     spineBind: model.skeleton.positions[boneIndex('spine')] ?? [0, 0, 0],
     left,
     right,
-    hangL: hangingArm(model, left),
-    hangR: hangingArm(model, right),
+    hangL: hangingArm(model, left, CONDUCTOR_HOLD.restArm),
+    hangR: hangingArm(model, right, CONDUCTOR_HOLD.restArm),
     tip: placePoint(model.pieces, { bone: tip.bone, at: tip.from }),
     beatPoint,
     pivot,
@@ -335,6 +356,7 @@ const hanging = new Vector3();
 const restHand = new Quaternion();
 const direction = new Vector3();
 const toCue = new Vector3();
+const readyTurn = new Quaternion();
 const pivot = new Vector3();
 const place = new Vector3();
 const fingers = new Vector3();
@@ -484,7 +506,7 @@ export function poseConductor(
       shoulder: right,
       wrist: wrist.lerpVectors(hanging, wrist, weight),
       hand,
-      pole: mixPole(rig.hangR.pole, hold.poleR, weight),
+      pole: mixPole(hold.restPoleR, hold.poleR, weight),
     },
     chest.rotation,
     rotations,
@@ -596,6 +618,9 @@ function poseLeftHand(
   }
   limitReach(rig.left, left.position, wrist);
   handToward(left, place.copy(left.position).add(direction.normalize()), hand);
+  if (ready > 0) {
+    hand.premultiply(readyTurn.setFromAxisAngle(direction, CONDUCTOR_HOLD.readyRoll * ready));
+  }
   const up = weight * (1 - state.bow);
   levelOf(left, frames.root);
   hangingWrist(rig.hangL, hangFrame, hanging);
@@ -605,7 +630,7 @@ function poseLeftHand(
       shoulder: left,
       wrist: wrist.lerpVectors(hanging, wrist, up),
       hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, up, hand),
-      pole: mixPole(rig.hangL.pole, CONDUCTOR_HOLD.poleL, up),
+      pole: mixPole(CONDUCTOR_HOLD.restPoleL, CONDUCTOR_HOLD.poleL, up),
     },
     chest.rotation,
     rotations,
