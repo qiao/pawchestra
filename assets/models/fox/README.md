@@ -129,12 +129,12 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 435,244 bytes |
-| SHA-256 | `df26df1d1721a67b8a1b22fbed4fcf206b97d91baf32e2f6fb3b6bd1606d7b14` |
+| Size | 448,588 bytes |
+| SHA-256 | `52e093c0990d6c0b0f368b0c41aa4bbf734265a41c4b1756f435bee89694ec45` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
 | Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
@@ -144,8 +144,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,504 bytes | `1e5f876cbe33641a710cb11884bd0a2d7eb469c61c05ce55ad9be40d5d2a983c` |
-| `tripo-hand/fox.rig.json` | 9,922 bytes | `d03ddcf3e5ed2bf28d6079d8c73b8a4b2177d40e9ef5f539984bdbb956d2af2c` |
+| `tripo-hand/fox.rig.glb` | 581,640 bytes | `e16617c75a0ee5898eb7fcf710880264ae1861b6d248628a0ab30ca7f5fa378d` |
+| `tripo-hand/fox.rig.json` | 9,922 bytes | `3534390cb9b42ee23720802d49fc0b1f24ff4eca9f6e71512a7fe8497241cc69` |
 
 The edits, in the order of the work:
 
@@ -410,6 +410,14 @@ shoulder joints at 0.6836 units, the same 1.526966 m for each unit) and `headCei
 + 0.0456), so H stays 0.322998 m. The weights stay: each vertex keeps its row, and the 20 vertices
 of the ear rows that the relax moved across the ear plane are the same before and after.
 
+**Knee rings.** The longer legs widened the bands at the knee to 0.44 to 0.69 leg radii. Edge ring
+Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1, use_grid_fill=True)`) of the four
+clean bands of 12 edges from y 0.1407 to 0.2029 of each leg (rest places before the edit) adds a
+ring in each band: 96 vertices and 96 quads. Each new vertex takes the mean of the rows of its two
+ring neighbors (at most 2 bones), its UV, and the key moves of its edge. The bands from the knee
+joint (y 0.1966) down to y 0.154 and up to y 0.231 are now 0.25 to 0.36 leg radii (radius 0.031 to
+0.036 units).
+
 **Seat after the longer legs.** The front edge of the seat moves forward with the knee:
 
 | Measure | Before | After | Main fox |
@@ -421,5 +429,6 @@ of the ear rows that the relax moved across the ear plane are the same before an
 | Hips in the bind | 0.310 units (0.473 m) | 0.356 units (0.543 m) | |
 | H | 0.322998 m | 0.322998 m | 0.322998 m |
 
-The thighs keep the slope of 15°, the shins lean 12° forward,
+With the front edge at z 0.15, 68 % of the thigh lies on the seat, and a new knee ring under the
+thigh sets the seat height 0.268 m. The thighs keep the slope of 15°, the shins lean 12° forward,
 and the soles stay flat. The standing flutist stands on its soles.
