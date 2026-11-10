@@ -303,13 +303,13 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb',
     },
   ],
-  // The violinist rabbit (design 4.4): the candidate hand rig of the Tripo P2 mesh
-  // (`assets/models/rabbit/tripo-hand/rabbit.blend`), with no arm cut and no limb stretch. Its
-  // `.blend` holds the facts of the body: the scale that keeps H of the A-pose rabbit, the crease
-  // angle 55°, and a seat 1 cm deeper, so that its back keeps off the chair back. The thighs of
-  // its bind slope 15° down, and the seat of the rig reaches to the calves, so that the seat
-  // carries most of each thigh, as for a seated violinist. Its limb rings
-  // have 11 vertices, 33° apart, so the crease 35° cut most corners of the limbs into facets.
+  // The violinist rabbit (design 4.4): the candidate hand rig of the second Tripo P2 mesh
+  // (`assets/models/rabbit/tripo-hand/rabbit.blend`), with no arm cut and no arm stretch, and
+  // longer shins for the seat of the A-pose rabbit. Its `.blend` holds the facts of the body: the
+  // scale that keeps H of the A-pose rabbit, the crease angle 55°, and a seat 1 cm deeper, so
+  // that its back keeps off the chair back. The thighs of its bind slope 15° down, and most of
+  // each thigh lies on the seat, as for a seated violinist. Its arm rings have 10 vertices, 36°
+  // apart, so the crease 35° would cut most corners of the arms into facets.
   [
     'rabbit',
     {
