@@ -142,8 +142,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 361,272 bytes |
-| SHA-256 | `0df46ecdb4b2eb33cf66677ec075d8a3ba20bcc786b8234f0b4074b0b86513f7` |
+| Size | 361,103 bytes |
+| SHA-256 | `995a0d7b554c12c2ee1de147bbb6bf7c69cbccef4a2b0f01703437d183060662` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
@@ -156,8 +156,8 @@ The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 711,660 bytes | `915bee769926963018668b3bb05f3c0f5551ce06e0f4963bec6129e3ef72fc53` |
-| `tripo-hand/bear.rig.json` | 16,084 bytes | `35d20130c06f720e1274c31047ac40a820d3c4f08487fea653db8e59c2ef1a89` |
+| `tripo-hand/bear.rig.glb` | 711,660 bytes | `4fcea8740d6c9b07c458031c5042a51027dcfdb8ede4c9ff2a24038feb7adb47` |
+| `tripo-hand/bear.rig.json` | 16,084 bytes | `9dccc5e529e3a40fed775cc0e570ade638d5c224a173cc897f704fcf46caee07` |
 
 The edits, in the order of the work:
 
@@ -417,3 +417,22 @@ linear), so the sheen is weak and the strands show.
 
 The tilts of the source are larger than on the rabbit and the fox (median 0.023, 99th percentile
 0.18).
+
+**Nose facets.** The gloss faces keep a flat normal each (`studioNormals()`), with the sharp
+highlight of `lacquer`. The 46 gloss faces of the source nose turn a median 19° (at most 46°)
+from their neighbors. Thus in the 2x face crops each small face caught the light or not, and the
+top of the nose showed a mosaic of light squares. The map is not the
+cause: the gloss corners have no texture points. A point edit in the live Blender makes two
+flat facets on the top of the nose, as the large facets of the nose of main:
+
+- Facet A, the faces 1304, 1306, 1307, 2245, 1210, 1211, 1213, 2159 (the top rows), and facet B,
+  the faces 1202, 1209, 1212, 2158 (the row below, which faces the camera and the light).
+- Each facet plane has x = 0 in its normal (a mirror plane), and fits its vertices by least
+  squares. Each of the 20 vertices goes to the least-squares point of the planes of its facets,
+  with the weight 0.05 to its old place, in 10 rounds: A normal (0, -0.2938, 0.9559), B normal
+  (0, -0.8004, 0.5994). The largest move is 0.0042 units, and no vertex is more than 0.0003 units
+  from its planes.
+
+Now the top of the nose shows one even band of light in place of the squares. A fit of all 46
+faces to 7 facets moved the edge of the nose by up to 0.0064 units and made it angular, and the
+same fit with the edge held turned some triangles over.
