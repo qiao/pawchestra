@@ -1,5 +1,5 @@
 {
- "sha256": "c3ea1ab23c43443bc3f24d39eb1cafa537c1a2add149a8935ec8aa762036f229",
+ "sha256": "9c149866e47ca847f5c7d0be5ecde12a7ef23947a312dba598b09ca1197ab23f",
  "bindSupination": {
   "L": 0.0,
   "R": 52.0
@@ -884,6 +884,7 @@
   "body": {
    "height": 1.487531,
    "crease": 55
-  }
+  },
+  "texture": "assets/models/polar-bear/tripo-hand/polar-bear-color.webp"
  }
 }
