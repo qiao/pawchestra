@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_BEAR = {
   source: 'assets/models/bear/tripo-hand/bear.rig.glb',
-  sha256: 'e97270dba9593794842182e1f21ad9d342bbf72b5f0c256ccc0776799f106cb8',
+  sha256: '4ade5970430f377a990f290c431b910d784fe0b3a506ef010e2232114c97633e',
   scale: 1.656871,
   heads: {
     root: [0, 0, 0],
@@ -94,6 +94,9 @@ export const STUDIO_BEAR = {
     },
   },
   colorBlend: 0.05,
+  cueHeadLeft: 45,
+  cueHeadRight: 30,
+  cueLift: 15,
   eyeballs: [
     217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 410, 411, 412, 413, 414, 415, 416, 417, 418,
     419, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2020, 2021, 2022, 2023, 2028,

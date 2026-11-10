@@ -142,22 +142,22 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 368,834 bytes |
-| SHA-256 | `6c2e7f6355d1eaa28d768b4e0c67d2eeb9a29bb0d37bd1063bbc23d50c53b12f` |
+| Size | 369,807 bytes |
+| SHA-256 | `377884a4bdf402e2d91d915f2a1110b1f1774a0aed621c8cbae2a6a65d4e463c` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `bear`: 3,261 vertices and 3,392 faces (2,828 quads and 564 triangles, 6,220 triangles), flat faces, and the surface of `sa.add_surface()` with one color for each region ("Smooth surface" below). 47 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
 | Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/bear-tripo.json` (shoulder x 0.15, elbow 0.27, wrist 0.365, knuckles 0.43). The Action `bind` holds the standing bind of that config: no leg turn, no trunk recline, straight arms, and no bind supination. The property `palm` holds a palm for each side ("Arm twist" below), and the property `lids` the turn and the hinge axes of the lids. The properties `seat` and `hinges` come from `sa.build_armature()` |
-| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear) |
+| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear), and the cue facts `cueHeadLeft` 45, `cueHeadRight` 30, and `cueLift` 15 ("Cue facts" below) |
 | Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app. No eye objects, so the app adds no bead eyes. A lid on each eye blinks |
 
 The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 712,360 bytes | `e97270dba9593794842182e1f21ad9d342bbf72b5f0c256ccc0776799f106cb8` |
-| `tripo-hand/bear.rig.json` | 16,088 bytes | `94c3a6511797002f7fe48af712ae1e7912dbeb4a9b2acf895e2b610cd7a6e91b` |
+| `tripo-hand/bear.rig.glb` | 712,416 bytes | `4ade5970430f377a990f290c431b910d784fe0b3a506ef010e2232114c97633e` |
+| `tripo-hand/bear.rig.json` | 16,157 bytes | `50be1a621a68403f716eff97e2343bb75450e47e13a0e4bfa057977bed41ef9d` |
 
 The edits, in the order of the work:
 
@@ -477,3 +477,23 @@ the same fit:
 
 Now each side shows a few even facets and no brown wedge, and from the front the nose reads as
 the rounded triangle of the nose of main.
+
+**Cue facts.** The head of this body sits 11 cm higher and its muzzle 4 cm further forward than
+on the bear of main. In a cue, the head turned up to 50° on the upper body, and the left hand
+pointed 30° up. Thus the raised right forearm went 3.3 cm into the right cheek in a turn to the
+right (`brahms-2` 285.38 s), and the left paw went 5.6 cm into the left side of the head in a cue
+to the left (`brahms-2` 127.88 s). A change of the beat point or of the right elbow had no
+effect. `scratch/bear/r13_cue_facts.py` gives the armature three facts of the body (design 5.4):
+`cueHeadLeft` 45 and `cueHeadRight` 30 (the largest head turn in degrees) and `cueLift` 15 (the
+angle up of the left hand at the cue point). A sweep of the play samples of the 17 demos (every
+fourth sample) gave the paws in the head:
+
+| Facts (left, right, lift) | Paws | Forearms |
+|---|---|---|
+| 50, 50, 30 (none) | 4.8 cm | 3.3 cm |
+| 50, 30, 15 | 1.9 cm | 0.6 cm |
+| 40, 30, 20 | 2.1 cm | 0.0 cm |
+| 45, 30, 15 (the file) | 1.1 cm | 0.0 cm |
+
+`pnpm pose-depth conductor --base main` now gives in the play 1.2 cm (paws) and 0.4 cm (forearms),
+against 0.3 cm and 0.0 cm on main and 5.6 cm and 3.3 cm before.
