@@ -142,22 +142,22 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 367,357 bytes |
-| SHA-256 | `043568e5c32b8ffd9bfadade643280248d5d21e82f38c78bfa6c2730c5ac9afa` |
+| Size | 367,371 bytes |
+| SHA-256 | `5a57ad9d8f70f9fa699de6eb6a4939d1d64de2a85fd167c830060460ede6863b` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `bear`: 3,261 vertices and 3,392 faces (2,828 quads and 564 triangles, 6,220 triangles), flat faces, and the surface of `sa.add_surface()` with one color for each region ("Smooth surface" below). 47 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
 | Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/bear-tripo.json` (shoulder x 0.15, elbow 0.27, wrist 0.365, knuckles 0.43). The Action `bind` holds the standing bind of that config: no leg turn, no trunk recline, straight arms, and no bind supination. The property `palm` holds a palm for each side ("Arm twist" below), and the property `lids` the turn and the hinge axes of the lids. The properties `seat` and `hinges` come from `sa.build_armature()` |
-| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear), and the cue facts `cueHeadLeft` 45, `cueHeadRight` 30, and `cueLift` 15 ("Cue facts" below) |
+| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear), and the cue facts `cueHeadLeft` 35, `cueHeadRight` 30, and `cueLift` 12 ("Cue facts" below) |
 | Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app. No eye objects, so the app adds no bead eyes. A lid on each eye blinks |
 
 The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 712,416 bytes | `00b507fd7e243126034a58c0ed13536be53f315baf339a3854ea2d4efadbf943` |
-| `tripo-hand/bear.rig.json` | 16,157 bytes | `27d425b5c3f78813e100aea570565b7cbc473a497950f3e93321e6e20faf5f49` |
+| `tripo-hand/bear.rig.glb` | 712,416 bytes | `b2da3ca16e6612503173981d09aaaa1869bdf0cfcf2803348be71b22ea79b0a0` |
+| `tripo-hand/bear.rig.json` | 16,157 bytes | `7a2eedb869d6fd23a7954139dbb4878a528efc4bd685209f293c975cdeddaecf` |
 
 The edits, in the order of the work:
 
@@ -251,11 +251,10 @@ The weights, in the order of the work, in the rest pose:
      (1 - ss(-0.09, -0.06, y)), in the rest (Blender axes), so the chest, the cheeks, the sides
      of the neck, and the back of the throat keep their rows.
 
-   `pnpm fold-probe conductor` gives 30 folded head faces over all samples (4,473 before), and
-   no throat face folds: face 3774 folded in 5.5 % of the play and 15.1 % of the lift before.
-   The one head face left, 3548, lies at the left side of the neck near the clavicle (0.1 % of
-   the play), outside the rows. `sp.fold_faces(60)` on the lift of `bach-bwv1047` (wall 1.0 s
-   to 2.5 s) gives 0 throat faces, against 14 before.
+   With the cue facts of "Cue facts", `pnpm fold-probe conductor` gives no folded head face
+   over all samples (4,473 before): face 3774 folded in 5.5 % of the play and 15.1 % of the
+   lift before. `sp.fold_faces(60)` on the lift of `bach-bwv1047` (wall 1.0 s to 2.5 s) gives 0
+   throat faces, against 14 before.
 
 The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights,
 except the throat rows of step 6. The lids take the row `head` 1 ("Lids" below). The file has no
@@ -504,16 +503,22 @@ pointed 30° up. Thus the raised right forearm went 3.3 cm into the right cheek 
 right (`brahms-2` 285.38 s), and the left paw went 5.6 cm into the left side of the head in a cue
 to the left (`brahms-2` 127.88 s). A change of the beat point or of the right elbow had no
 effect. `scratch/bear/r13_cue_facts.py` gives the armature three facts of the body (design 5.4):
-`cueHeadLeft` 45 and `cueHeadRight` 30 (the largest head turn in degrees) and `cueLift` 15 (the
-angle up of the left hand at the cue point). A sweep of the play samples of the 17 demos (every
-fourth sample) gave the paws in the head:
+`cueHeadLeft` 35 and `cueHeadRight` 30 (the largest head turn in degrees) and `cueLift` 12 (the
+angle up of the left hand at the cue point). A sweep of the play samples of the 17 demos
+(`scratch/r13/headsweep.ts`, every fourth sample with the old throat rows, every second sample
+with the throat rows of step 6 of the weights) gave the depth in the head:
 
-| Facts (left, right, lift) | Paws | Forearms |
-|---|---|---|
-| 50, 50, 30 (none) | 4.8 cm | 3.3 cm |
-| 50, 30, 15 | 1.9 cm | 0.6 cm |
-| 40, 30, 20 | 2.1 cm | 0.0 cm |
-| 45, 30, 15 (the file) | 1.1 cm | 0.0 cm |
+| Facts (left, right, lift) | Throat rows | Paws | Forearms |
+|---|---|---|---|
+| 50, 50, 30 (none) | old | 4.8 cm | 3.3 cm |
+| 50, 30, 15 | old | 1.9 cm | 0.6 cm |
+| 40, 30, 20 | old | 2.1 cm | 0.0 cm |
+| 45, 30, 15 | old | 1.1 cm | 0.0 cm |
+| 45, 30, 15 | step 6 | 2.1 cm | 1.1 cm |
+| 40, 30, 12 | step 6 | 1.3 cm | 1.1 cm |
+| 30, 30, 15 | step 6 | 1.1 cm | 0.0 cm |
+| 35, 30, 12 (the file) | step 6 | 0.9 cm | 0.0 cm |
 
-`pnpm pose-depth conductor --base main` now gives in the play 1.2 cm (paws) and 0.4 cm (forearms),
-against 0.3 cm and 0.0 cm on main and 5.6 cm and 3.3 cm before.
+The throat rows make the chin follow the head fully, so it sweeps further toward the left paw in
+a turn to the left. `pnpm pose-depth conductor --base main` now gives in the play 1.0 cm (paws)
+and 0.0 cm (forearms), against 0.3 cm and 0.0 cm on main and 5.6 cm and 3.3 cm before.

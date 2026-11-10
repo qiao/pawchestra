@@ -820,7 +820,7 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   `cueStateAt()`). A strong entry gets the baton, and each other entry the left hand. A cue to
   silent seats does not show (5.5). A body with a high head and a long muzzle gives the facts
   `cueHeadLeft`, `cueHeadRight`, and `cueLift` (4.4, "Hand rig"): the head turns less to each
-  side, and the left hand rises less at the cue point. The Tripo bear takes 45°, 30°, and 15°.
+  side, and the left hand rises less at the cue point. The Tripo bear takes 35°, 30°, and 12°.
   Reason: with the head turn of 50° and the hand 30° up, its right forearm went 3.3 cm into the
   cheek in a turn to the right, and its left paw 5.6 cm into the head in a cue to the left.
 

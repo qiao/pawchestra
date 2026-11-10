@@ -1,5 +1,5 @@
 {
- "sha256": "00b507fd7e243126034a58c0ed13536be53f315baf339a3854ea2d4efadbf943",
+ "sha256": "b2da3ca16e6612503173981d09aaaa1869bdf0cfcf2803348be71b22ea79b0a0",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -1291,9 +1291,9 @@
    "height": 1.108447,
    "crease": 40,
    "colorBlend": 0.05,
-   "cueHeadLeft": 45.0,
+   "cueHeadLeft": 35.0,
    "cueHeadRight": 30.0,
-   "cueLift": 15.0
+   "cueLift": 12.0
   },
   "texture": "assets/models/bear/tripo-hand/bear-color.webp"
  }

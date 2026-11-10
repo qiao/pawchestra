@@ -700,10 +700,8 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the pea eye of the app must change both, or the preview must come from the app.
-- [ ] Tripo bear candidate: face 3548 at the left side of the neck near the clavicle folds in 0.1 %
-      of the play (`pnpm fold-probe conductor`). Its automatic row holds 0.31 `clavicle_L`.
-- [ ] Tripo bear candidate: with the cue facts (`cueHeadLeft` 45, `cueHeadRight` 30, `cueLift` 15),
-      the paws still go up to 1.2 cm into the head in the play (main 0.3 cm). Check the lower cue
+- [ ] Tripo bear candidate: with the cue facts (`cueHeadLeft` 35, `cueHeadRight` 30, `cueLift` 12),
+      the paws still go up to 1.0 cm into the head in the play (main 0.3 cm). Check the lower cue
       hand and the smaller head turn in the hall view.
 - [ ] Tripo bear candidate: the longer elbow blend of round 12 moves the left flat p5 of the
       conductor from 0.88 to 0.86 (main 0.83, limit 0.55) and the left move turn max from 448 to
