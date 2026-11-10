@@ -130,12 +130,12 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 449,003 bytes |
-| SHA-256 | `c796b0c8f09def7752a036437123ebb148dce163802d10e85f352fa6d7bdb101` |
+| Size | 449,008 bytes |
+| SHA-256 | `a2deb297f3e1c03cf873ca9c2b3574a466f0c56bb697c99b4c8df36bfea5300b` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). The 30 faces of the whiskers have the face attribute `plain` ("Color map" below) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
 | Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
@@ -145,8 +145,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,079,748 bytes | `fe551fa9eee4c3eb4b5c3978532f8714019d6cbed9081f623a8ab604c029c802` |
-| `tripo-hand/fox.rig.json` | 9,982 bytes | `1476001b724aa05d02dd8b6bfd4845ca1d5807f0723e4428e12020c63cf50a73` |
+| `tripo-hand/fox.rig.glb` | 1,079,748 bytes | `c208caf25f69e0690785ab01d3ceb2a6ea8880c74876ae38800b378dbf6c4882` |
+| `tripo-hand/fox.rig.json` | 9,982 bytes | `c78a1924c6e644419e28fd42bee4e62fdf05e8f1bfa276d1439b50e5e982f420` |
 
 The edits, in the order of the work:
 
@@ -453,3 +453,6 @@ stretch along the leg by the scale of that edit: at most 1.24 (24 %), in the ban
 to the hip. Of the 447 faces that changed form, 111 stretch by more than 1.2 and 140 by more than
 1.1. The leg faces have a median stretch of 1.20. Across the leg, the scale stays 1.0 (0.986 to
 1.0).
+
+**Whiskers.** The 30 faces of the 6 whisker strips have the face attribute `plain`, so that the
+whiskers keep their face colors. The gloss nose keeps its color too.
