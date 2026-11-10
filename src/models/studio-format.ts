@@ -443,6 +443,12 @@ export interface StudioTexture {
   readonly file: string;
   /** The packed texture points ({@link packStudioUvs}). */
   readonly uvs: string;
+  /**
+   * The web copy of the color map of each other palette of the faces ({@link StudioBody.palettes}),
+   * relative to the repository, such as the map of the tan fox. A species with a palette that has
+   * no map shows the colors of its faces.
+   */
+  readonly palettes?: Readonly<Partial<Record<StudioPalette, string>>>;
 }
 
 /**

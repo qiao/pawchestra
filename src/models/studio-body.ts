@@ -92,6 +92,23 @@ export function studioBodyOf(name: StudioBodyName): StudioBody {
   return body;
 }
 
+/**
+ * Gives the color map that a species shows on its studio body (design 4.5): the map of the body,
+ * or the map of the palette of the faces that the species takes, such as the tan map of the tan
+ * fox. A body with no map, or a palette with no map, shows the colors of its faces.
+ *
+ * @param name The studio body.
+ * @param palette The palette of the faces of the species, or `undefined` for the colors of the mesh.
+ * @returns The web copy of the map, relative to the repository, or `null` for no map.
+ */
+export function studioBodyMap(name: StudioBodyName, palette?: StudioPalette): string | null {
+  const texture = studioBodyOf(name).texture;
+  if (!texture) {
+    return null;
+  }
+  return palette === undefined ? texture.file : (texture.palettes?.[palette] ?? null);
+}
+
 /** The rig of each studio body and stance, made on its first use. */
 const rigs = new Map<string, StudioRig>();
 

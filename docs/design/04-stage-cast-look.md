@@ -126,7 +126,7 @@ studio body of its own (4.4). The table gives the species of each section.
 
 - The fox plays in two sections, in the two colors of the reference image (`fox-red` and
   `fox-tan`). The two foxes share one mesh and one rig, and the tan fox takes another palette of
-  the same faces (`palette`).
+  the same faces (`palette`) and, on a body with a color map, the color map of that palette.
 - The polar bear plays the piano and each keyboard seat of 3.8. The wolf is the gray clarinet
   player of `animals.webp`. The penguins look like a choir in robes.
 - The mouse, the beaver, and the monkey play with no chair (`noChair`), as a real mouse, beaver,
@@ -1058,6 +1058,11 @@ The candidate polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map th
 `tools/polar-bear-maps.py` makes from the map of its Tripo FBX. The cream fur goes to the white
 of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
 Tripo map paints a tan bear with light claws, and the hall view sets the target, as for the fox.
+
+A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
+the tan fox, which `tools/fox-tan-map.py` makes from the map of the red fox. A species shows the
+map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus the
+tan fox never shows the red map.
 
 Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
 faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`

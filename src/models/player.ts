@@ -14,7 +14,7 @@ import { boneIndex, makeSkeleton } from './rig.ts';
 import type { BoneName, Skeleton } from './rig.ts';
 import { SPECIES, instrumentScale } from './species.ts';
 import { celloPinOf } from './instruments/cello-fit.ts';
-import { studioRigOf } from './studio-body.ts';
+import { studioBodyMap, studioRigOf } from './studio-body.ts';
 import type { StudioRig } from './studio-rig.ts';
 import type { SpeciesId, SpeciesParams } from './species.ts';
 import { buildInstrument } from './instruments/catalog.ts';
@@ -195,6 +195,11 @@ export interface PlayerModel {
    * studio, and `mesh` holds the body in the bind pose of the player.
    */
   readonly studio: StudioRig;
+  /**
+   * The color map of the studio body for the palette of the species (`studioBodyMap()`, design
+   * 4.5), or `null` for a body that shows the colors of its faces.
+   */
+  readonly bodyMap: string | null;
 }
 
 /**
@@ -291,5 +296,6 @@ export function* buildPlayerSteps(
     pedals: placed.pedals,
     copies: placed.copies,
     studio: studioRigOf(params.body, stance.kind === 'standing'),
+    bodyMap: studioBodyMap(params.body, params.palette),
   };
 }

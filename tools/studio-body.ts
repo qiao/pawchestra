@@ -131,6 +131,12 @@ export interface AnimalSettings {
    */
   readonly palettes?: Readonly<Partial<Record<StudioPalette, PaletteMap>>>;
   /**
+   * The web copy of the color map of each other palette, relative to the repository
+   * (`StudioTexture.palettes`, design 4.5), for a hand rig with a color map, such as the map of
+   * the tan fox. A palette with no map shows the colors of its faces.
+   */
+  readonly paletteMaps?: Readonly<Partial<Record<StudioPalette, string>>>;
+  /**
    * The lowest height of the head measures in the bind pose of the GLB file, in its units, for a
    * long nose that follows the head below the chin, as the trunk of the elephant (`noseFront` of
    * the rig config), or for a throat that bone heat gives to the head, as on the rhino. The head
@@ -298,7 +304,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/fox/tripo-hand/fox.blend`), with no arm cut and no limb stretch. Its `.blend`
   // holds the facts of the body: the scale that keeps H of the fox of `fox.rig.glb`, the crease
   // angle 35°, and the wider chair of the wide haunch. The tan fox takes the same rig with the tan
-  // palette.
+  // palette, and the color map of `tools/fox-tan-map.py`.
   [
     'fox',
     {
@@ -308,6 +314,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       constant: 'STUDIO_FOX',
       glb: 'assets/models/fox/tripo-hand/fox.rig.glb',
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
+      paletteMaps: { tan: 'assets/models/fox/tripo-hand/fox-tan-color.webp' },
     },
   ],
   // The viola cat (design 4.4): the candidate hand rig of the Tripo P2 mesh
@@ -3375,7 +3382,16 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
       throw new Error(`The file names the color map ${texture}, and no face has texture points.`);
     }
     const packed = unpackStudioMesh(body.mesh);
-    body = { ...body, texture: { file: texture, uvs: packStudioUvs(uvs, packed) } };
+    const maps = settings.paletteMaps;
+    for (const file of Object.values(maps ?? {})) {
+      if (!existsSync(file)) {
+        throw new Error(`The color map ${file} of a palette is no file of the repository.`);
+      }
+    }
+    body = {
+      ...body,
+      texture: { file: texture, uvs: packStudioUvs(uvs, packed), ...(maps && { palettes: maps }) },
+    };
   }
   if (settings.palettes) {
     const bases = baseTriangles(ordered.faces, withoutEyes.faces);

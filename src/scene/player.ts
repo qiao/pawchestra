@@ -506,8 +506,9 @@ function stringLinePoints(strings: HarpStrings, bind: Float32Array): Float32Arra
  * each player gets its own pose. A player with a keyboard or a harp also gets its own positions,
  * so that its keys go down with its notes, and its strings close while their bands show
  * ({@link ownGeometry}). The bands of a harp are a child of the mesh ({@link createStringBands}).
- * A player whose studio body has a color map gets the copy of the shared material with the map
- * (`bodyMapMaterial()`, design 4.5). A player whose studio body has eyeballs gets a copy with
+ * A player whose studio body has a color map for the palette of its species
+ * (`PlayerModel.bodyMap`) gets the copy of the shared material with the map (`bodyMapMaterial()`,
+ * design 4.5). A player whose studio body has eyeballs gets a copy with
  * the eye light (`eyeLightMaterial()`, design 4.5).
  *
  * @param model The player model of `models/`.
@@ -522,9 +523,9 @@ export function createPlayerMesh(
 ): SkinnedMesh {
   const own = movesCorners(model) ? ownGeometry(geometry) : geometry;
   const { body } = model.studio;
-  const file = body.texture?.file;
+  const file = model.bodyMap;
   const mapped =
-    file === undefined ? materials : materials.map((shared) => bodyMapMaterial(shared, file));
+    file === null ? materials : materials.map((shared) => bodyMapMaterial(shared, file));
   const mesh = createStudioMesh(
     model,
     model.studio,
