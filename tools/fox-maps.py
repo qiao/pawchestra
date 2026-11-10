@@ -92,19 +92,33 @@ PUPIL_LUMA = 50
 #: The largest red over blue of a pupil texel: the dark brown that the map leaves on the rest of
 #: the ball has more.
 PUPIL_WARM = 15
-#: The place of the middle of each pupil above the middle of the eye opening of the front view,
-#: in opening radii. The head of the violinist drops 10 degrees in the play, and the camera of the
-#: hall looks down at the stage, so a pupil at the middle reads as a look down there.
-PUPIL_LIFT = 0.1
+#: The share of the middle angle across of the eye opening that the gaze takes: 0 gives
+#: parallel eyes that look straight ahead, 1 an iris in the middle of each opening. The openings
+#: face about 11 degrees out, so the middle value keeps the eyes nearly parallel and the irises
+#: nearly in the middle.
+GAZE_ACROSS = 0.5
+#: The angle in degrees of the gaze above the middle of the opening.
+GAZE_UP = 0.0
+#: The iris radius as a share of half the height of the eye opening of the front view.
+IRIS_FILL = 1.05
+#: The pupil radius as a share of the iris radius.
+PUPIL_SHARE = 0.45
+#: The width of the soft edge of the iris to the sclera, as a share of the iris radius.
+IRIS_SOFT = 0.06
+#: The rings of the radial profile of the iris, and the largest share by which the luma of a
+#: texel of the iris differs from its ring (`paint_eyes()`).
+IRIS_STEPS = 8
+IRIS_STREAK = 0.18
+#: The sRGB colors of the pupil and of the off-white sclera, and the darkest share of the shade of
+#: the sclera under the upper lid.
+PUPIL_COLOR = (14, 10, 9)
+SCLERA = (226, 220, 208)
+SCLERA_SHADE = 0.3
 #: The largest share of the texels of an eyeball that can also lie in the other eyeball.
 EYE_OVERLAP = 0.01
 #: The angle in degrees from the pupil of the front view within which the pupil texels and the
 #: amber texels of the iris of a ball lie.
 IRIS_SEARCH = 40.0
-#: The share of white texels from which a step of 1 degree out from the pupil lies past the iris.
-IRIS_WHITE = 0.05
-#: The angle in degrees added to the iris radius, so that the dark edge of the iris moves with it.
-IRIS_EDGE = 3.0
 #: The rounds of the fill of the texels around the eyeball triangles before the turned ball samples
 #: the map, so that a sample at the edge of a texture island takes no color from outside it.
 EYE_FILL = 4
@@ -137,6 +151,8 @@ SOCK_EDGES = (
     (('thigh', 'shin', 'foot', 'toes'), 0, 0.95),
     (('upper_arm', 'forearm', 'hand', 'fingers'), 1, 0.28),
 )
+#: The largest Oklab lightness of a texel of the head that takes the step of the socks.
+HEAD_DARK = 0.42
 #: The padding texels within this many texels of a texel of the limbs take the step of the socks.
 PAD_GROW = 6
 #: The distance of a texel from its bone in the seated bind, in units of the rig file, within which
@@ -378,10 +394,12 @@ def sock_edges(rig, lab):
     out[move] = orange + new[:, None] * line + off[move]
     moved = np.abs(new - s) > 0.02
     # The texels that can take the step of the dark socks: the limbs, and the head above the neck
-    # joint (the ear tips and the brows). The padding texels around each texture island (outside
+    # joint (the ear tips and the brows) with an Oklab lightness below HEAD_DARK. The source map
+    # shades the orange fur over the left eye darker, and with the step of the socks that shade
+    # showed as a dark brown patch over the eye. The padding texels around each texture island (outside
     # each triangle) take the step of the island next to them: else the dark padding of a sock
     # island of the tan map shows as dark lines along the seams.
-    dark = np.isfinite(target) | (places[..., 1] > joints['neck'][1])
+    dark = np.isfinite(target) | ((places[..., 1] > joints['neck'][1]) & (lab[..., 0] < HEAD_DARK))
     outside = ~np.isfinite(places).all(axis=-1)
     grown = np.asarray(Image.fromarray(dark).filter(ImageFilter.MaxFilter(2 * PAD_GROW + 1))) > 0
     dark |= outside & grown
@@ -600,113 +618,164 @@ def angle_to(a, b):
     return np.degrees(np.arccos(np.clip(a @ b, -1, 1)))
 
 
-def center_pupils(rig, image):
-    """Moves the iris and the pupil of each eyeball to the middle of the eye opening of the front
-    view, and gives the new image. The source map paints each iris at the inner edge of the white
-    of its ball, so in the front view each pupil sat toward the nose, and the fox looked a little
-    cross-eyed. The map paints only a band of the ball around the opening, and the rest of the
-    ball is dark brown, so a turn of the whole ball (the second Tripo rabbit) shows the dark brown
-    in the opening. Thus only the iris moves, as a decal on the ball. For each side: c is the
-    middle of the sphere of the ball. Rays from the front (along -z: the head of the seated bind
-    faces +z) over a grid find the ball points that show. Their mean in x and y is the middle of
-    the opening, and the ball point there, PUPIL_LIFT opening radii up, gives the target direction
-    t from c. The pupil direction p is the mean direction of the black pupil texels of the whole
-    ball within IRIS_SEARCH degrees of the pupil of the front view, and the iris radius a is the angle
-    from p at which the share of white texels first reaches IRIS_WHITE, plus IRIS_EDGE. With R the turn that
-    takes p to t, each ball texel at the direction d within a of R p takes the source color at
-    R^-1 d (the moved iris). Each other texel within a of p (the old iris), and each texel of the
-    opening with an amber, orange, or dark brown color, takes the median white of the sclera of the
-    opening."""
-    triangles, positions, points, eyes = rig[:4]
-    out = np.asarray(image).astype(np.float64)
+def smooth(a, b, x):
+    """Gives the smoothstep from 0 at a to 1 at b."""
+    t = np.clip((x - a) / (b - a), 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
+def ball_frame(rig, faces):
+    """Gives the middle c and the radius r of the sphere of a ball, the ball directions that show
+    in the front view (rays along -z: the head of the seated bind faces +z), and the axes of the
+    front: t (+z), u (+y), and e (+x)."""
+    triangles, positions = rig[0], rig[1]
     corners = positions[triangles]
     middles = corners.mean(axis=1)
+    ball = positions[triangles[faces].ravel()]
+    fit = np.linalg.lstsq(np.c_[2 * ball, np.ones(len(ball))], (ball ** 2).sum(1), rcond=None)[0]
+    c = fit[:3]
+    r = float(np.sqrt(fit[3] + c @ c))
+    near = np.flatnonzero(np.linalg.norm(middles - c, axis=1) < 3 * r)
+    gx, gy = np.meshgrid(np.arange(c[0] - 1.6 * r, c[0] + 1.6 * r, RAY_STEP),
+                         np.arange(c[1] - 1.6 * r, c[1] + 1.6 * r, RAY_STEP))
+    origins = np.c_[gx.ravel(), gy.ravel(), np.full(gx.size, c[2] + 1.0)]
+    down = np.tile([0.0, 0.0, -1.0], (len(origins), 1))
+    t_hit, hit, _ = ray_hits(origins, down, corners[near])
+    on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
+    shown = origins[on_ball] + t_hit[on_ball, None] * down[on_ball] - c
+    shown /= np.linalg.norm(shown, axis=1)[:, None]
+    return c, r, shown
+
+
+def angles(d, t, u, e):
+    """Gives the angles in degrees of the unit directions d up from t (toward u) and across from
+    t (toward e)."""
+    return np.degrees(np.arctan2(d @ u, d @ t)), np.degrees(np.arctan2(d @ e, d @ t))
+
+
+def iris_profile(colors, d, p):
+    """Gives the angles in degrees from the pupil direction p of the source iris of a ball: the
+    edge of the black pupil (the first step of 1 degree with less than half pupil texels), and the
+    end of the iris (2 degrees before the first step after it with 15 % or more white texels among
+    the painted texels, and at least 6 degrees past the pupil edge)."""
+    pupil, _, white, brown = classes(colors)
+    a = angle_to(d, p)
+    steps = np.arange(int(IRIS_SEARCH))
+
+    def share(mask, k):
+        band = (a >= k) & (a < k + 1) & ~brown
+        return mask[band].mean() if band.any() else 0.0
+
+    pupil_share = np.array([share(pupil, k) for k in steps])
+    white_share = np.array([share(white, k) for k in steps])
+    edge = int(np.argmax(pupil_share < 0.5))
+    end = max(edge + 6, edge + int(np.argmax(white_share[edge:] >= 0.15)) - 2)
+    return float(edge), float(end)
+
+
+def paint_eyes(rig, image):
+    """Paints each eyeball as a calm, natural eye, and gives the new image. The source map paints
+    each iris at the inner edge of the white of its ball, with a pupil that fills most of the iris
+    and a dark ring around it, and the rest of the ball dark brown. In the app the eyes read as
+    glass doll eyes that look past the viewer. For each side (c, r, and the front axes t, u, e of
+    `ball_frame()`), from the ball points that show in the front view:
+    - The gaze g: the middle of the opening (psi, lam of `angles()`) at GAZE_ACROSS of its
+      angle across and GAZE_UP degrees up, so that both eyes look at the viewer nearly parallel.
+    - The iris radius a: IRIS_FILL of half the height of the opening, so that the iris fills
+      most of the opening and its top lies a little under the upper lid.
+    - A texel at the angle b from g and the turn phi about g: a pupil of PUPIL_SHARE of the iris
+      radius with a soft edge, the iris from there to a, and a soft edge of IRIS_SOFT of a to the
+      sclera. The iris takes the source color of the same ball at the same phi about the source
+      pupil, at the angle from the end of the source pupil to the end of its iris, by the share
+      across the new iris. A dark texel of it takes the dark amber. Then each texel takes the
+      median color of its ring of the iris, with its own streak of light or shade.
+    - The sclera: SCLERA, shaded by SCLERA_SHADE under the upper edge of the opening.
+    The ball takes no painted light: the eye light of the app gives one highlight in both eyes."""
+    triangles, positions, points, eyes = rig[:4]
+    out = np.asarray(image).astype(np.float64)
     taken = np.zeros((SIZE, SIZE), bool)
     texels = {}
     for side in ('L', 'R'):
         ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
-        # The islands of the two balls of the fox touch at 43 edge texels. A larger overlap
-        # would move the iris of one ball with the other.
         if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
-            sys.exit('The texels of the two eyeballs overlap, so no pupil can move alone.')
+            sys.exit('The texels of the two eyeballs overlap, so no eye can take its own paint.')
         taken[ys, xs] = True
         texels[side] = (ys, xs, places)
     src = fill_around(out, taken)
+    sclera = np.array(SCLERA, float)
     for side in ('L', 'R'):
         faces = np.array(eyes[side]['faces'])
-        ball = positions[triangles[faces].ravel()]
-        fit = np.linalg.lstsq(np.c_[2 * ball, np.ones(len(ball))], (ball ** 2).sum(1), rcond=None)[0]
-        c = fit[:3]
-        r = float(np.sqrt(fit[3] + c @ c))
-        near = np.flatnonzero(np.linalg.norm(middles - c, axis=1) < 3 * r)
-        gx, gy = np.meshgrid(np.arange(c[0] - 1.6 * r, c[0] + 1.6 * r, RAY_STEP),
-                             np.arange(c[1] - 1.6 * r, c[1] + 1.6 * r, RAY_STEP))
-        origins = np.c_[gx.ravel(), gy.ravel(), np.full(gx.size, c[2] + 1.0)]
-        down = np.tile([0.0, 0.0, -1.0], (len(origins), 1))
-        t_hit, hit, _ = ray_hits(origins, down, corners[near])
-        on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
-        shown = origins[on_ball] + t_hit[on_ball, None] * down[on_ball]
-        middle = shown[:, :2].mean(axis=0)
-        radius = np.sqrt(len(shown) * RAY_STEP ** 2 / np.pi)
-        seen = shown - c
-        seen /= np.linalg.norm(seen, axis=1)[:, None]
-        goal = middle + [0.0, PUPIL_LIFT * radius]
-        target = seen[np.argmin(np.linalg.norm(shown[:, :2] - goal, axis=1))]
-        seen_colors, _ = ball_colors(rig, faces, c, seen, src)
-        seen_pupil, _, seen_white, _ = classes(seen_colors)
-        front = seen[seen_pupil].mean(axis=0)
-        front /= np.linalg.norm(front)
-        sclera = np.median(seen_colors[seen_white], axis=0)
+        c, r, shown = ball_frame(rig, faces)
+        t, u, e = np.array([0.0, 0, 1]), np.array([0.0, 1, 0]), np.array([1.0, 0, 0])
+        psi, lam = angles(shown, t, u, e)
+        mid_psi = (psi.min() + psi.max()) / 2
+        mid_lam = (lam.min() + lam.max()) / 2
+        gp, gl = np.radians(mid_psi + GAZE_UP), np.radians(GAZE_ACROSS * mid_lam)
+        g = np.array([np.sin(gl) * np.cos(gp), np.sin(gp), np.cos(gl) * np.cos(gp)])
+        gu = u - (u @ g) * g
+        gu /= np.linalg.norm(gu)
+        ge = np.cross(gu, g)
+        a = IRIS_FILL * (psi.max() - psi.min()) / 2
         ys, xs, places = texels[side]
         d = places - c
         d /= np.linalg.norm(d, axis=1)[:, None]
-        colors = src[ys, xs]
-        pupil, _, white, brown = classes(colors)
-        pupil &= angle_to(d, front) < IRIS_SEARCH
-        p = d[pupil].mean(axis=0)
+        old = src[ys, xs]
+        # The source pupil: the mean of the black texels near the pupil of the front view, by a
+        # mean shift, as the dark lines around the painted eye are black too.
+        pupil, amber, _, _ = classes(old)
+        seen_colors, _ = ball_colors(rig, faces, c, shown, src)
+        p = shown[classes(seen_colors)[0]].mean(axis=0)
         p /= np.linalg.norm(p)
-        # The iris edge: going out from p in steps of 1 degree, the first step in which at least
-        # IRIS_WHITE of the painted texels are white. The iris lies on the inner side of the white,
-        # so the steps hold white only on their outer side.
-        out_angle = angle_to(d, p)
-        painted = ~brown
-
-        def white_share(k):
-            band = (out_angle >= k) & (out_angle < k + 1) & painted
-            return white[band].mean() if band.any() else 0.0
-
-        steps = np.arange(int(IRIS_SEARCH))
-        a = float(np.argmax(np.array([white_share(k) for k in steps]) >= IRIS_WHITE)) + IRIS_EDGE
-        turn = turn_matrix(p, target)
-        moved = angle_to(d, turn @ p) < a
-        source, found = ball_colors(rig, faces, c, d[moved] @ turn, src)
-        new = colors.copy()
-        idx = np.flatnonzero(moved)[found]
-        new[idx] = source[found]
-        # The opening: the texels within 3 degrees of a ball direction of the front view.
-        opening = np.zeros(len(d), bool)
-        for start in range(0, len(d), 4096):
-            opening[start:start + 4096] = (d[start:start + 4096] @ seen.T).max(axis=1) > np.cos(np.radians(3))
-        _, warm, _, _ = classes(colors)
-        orange = warm | ((colors[:, 0] > colors[:, 2] + 60) & (colors[:, 0] > 90))
-        clear = ~moved & ((angle_to(d, p) < a) | (opening & (orange | brown)))
-        new[clear] = sclera
-        out[ys, xs] = new
-
-        before = shown[seen_pupil, :2].mean(axis=0)
-        after_colors, _ = ball_colors(rig, faces, c, seen, fill_around(out, taken))
-        after = shown[classes(after_colors)[0], :2].mean(axis=0)
-        show = lambda q: np.round((q - middle) / radius, 3).tolist()
-        print(f'pupil {side}: in the front view, the middle of the pupil lay {show(before)} opening '
-              f'radii (x, y) from the middle of the opening, now {show(after)}; the iris of '
-              f'{a:.1f} degrees moves {angle_to(p[None], target)[0]:.1f} degrees, '
-              f'{int(clear.sum())} texels take the white {np.round(sclera).astype(int).tolist()}')
-    # The padding texels around the ball islands, outside each triangle of the mesh, take the
-    # new colors of the ball, so that a sample at the edge of an island shows no old pupil.
+        for _ in range(8):
+            near = pupil & (angle_to(d, p) < 15)
+            p = d[near].mean(axis=0)
+            p /= np.linalg.norm(p)
+        edge, end = iris_profile(old, d, p)
+        pu = u - (u @ p) * p
+        pu /= np.linalg.norm(pu)
+        pe = np.cross(pu, p)
+        dark_amber = np.median(old[amber & (angle_to(d, p) < end)], axis=0) * 0.6
+        b = angle_to(d, g)
+        phi = np.arctan2(d @ gu, d @ ge)
+        share = np.clip((b / a - PUPIL_SHARE) / (1 - PUPIL_SHARE), 0, 1)
+        src_angle = np.radians(edge + 1 + share * (end - edge - 1))
+        look = (np.cos(src_angle)[:, None] * p + np.sin(src_angle)[:, None]
+                * (np.cos(phi)[:, None] * pe + np.sin(phi)[:, None] * pu))
+        iris, found = ball_colors(rig, faces, c, look, src)
+        luma = iris @ [0.2126, 0.7152, 0.0722]
+        iris[~found | (luma < 60)] = dark_amber
+        # The radial texture: the median color of each of IRIS_STEPS rings of the new iris, times
+        # the luma of each texel over the luma of its ring, held to 1 +- IRIS_STREAK. Thus the
+        # streaks of the source stay, and a dark smear or a seam of the source does not.
+        ring = np.minimum((share * IRIS_STEPS).astype(int), IRIS_STEPS - 1)
+        inner = b < a * (1 + IRIS_SOFT)
+        profile = np.array([np.median(iris[inner & (ring == k)], axis=0) if (inner & (ring == k)).any()
+                            else dark_amber for k in range(IRIS_STEPS)])
+        luma = iris @ [0.2126, 0.7152, 0.0722]
+        base = profile[ring]
+        ratio = np.clip(luma / np.maximum(base @ [0.2126, 0.7152, 0.0722], 1), 1 - IRIS_STREAK,
+                        1 + IRIS_STREAK)
+        iris = base * ratio[:, None]
+        pupil_w = 1 - smooth(PUPIL_SHARE - 0.05, PUPIL_SHARE + 0.03, b / a)
+        color = iris * (1 - pupil_w[:, None]) + np.array(PUPIL_COLOR, float) * pupil_w[:, None]
+        # A slightly darker rim of the iris, then a soft step to the sclera.
+        rim = smooth(1 - 2 * IRIS_SOFT, 1, b / a)
+        color = color * (1 - 0.25 * rim[:, None])
+        psi_d, _ = angles(d, t, u, e)
+        shade = 1 - SCLERA_SHADE * smooth(psi.max() - 14, psi.max(), psi_d)
+        white = sclera * shade[:, None]
+        to_white = smooth(1 - IRIS_SOFT, 1 + IRIS_SOFT, b / a)
+        color = color * (1 - to_white[:, None]) + white * to_white[:, None]
+        out[ys, xs] = color
+        print(f'eye {side}: opening psi {psi.min():.1f} to {psi.max():.1f}, lam {lam.min():.1f} to '
+              f'{lam.max():.1f} degrees; gaze psi {mid_psi + GAZE_UP:.1f}, lam '
+              f'{GAZE_ACROSS * mid_lam:.1f}; iris radius {a:.1f} degrees; source pupil edge {edge:.0f}, '
+              f'amber end {end:.0f} degrees')
+    # The padding texels around the ball islands take the new colors of the ball next to them.
     mask = Image.new('L', (SIZE, SIZE), 0)
     draw = ImageDraw.Draw(mask)
     for tri in triangles:
-        draw.polygon([(float(u) * SIZE, float(v) * SIZE) for u, v in points[tri]], fill=255)
+        draw.polygon([(float(x) * SIZE, float(y) * SIZE) for x, y in points[tri]], fill=255)
     padding = ~(np.asarray(mask) > 0) & ~taken
     filled = fill_around(out, taken)
     out[padding] = filled[padding]
@@ -742,7 +811,7 @@ def write_normal_map():
 def main():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
-    image = center_pupils(rig, image)
+    image = paint_eyes(rig, image)
     lab = oklab(linear(np.asarray(image)))
     if BROW_SPOT is not None:
         lab, painted = brow_fill(rig, lab)
