@@ -264,7 +264,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // holds the facts of the body: the landmark is its standing shoulder joints (0.725 u at 2.0576 m
   // for each unit, 1.3 times the height of 1.1475 m, so that the polar bear is the largest
   // player), and the crease angle and the blend of the bear. The body keeps the legs of the mesh
-  // and sits on a bench that fits them, with the thighs 25° down.
+  // and sits on a bench that fits them, with the thighs 25° down. The candidate branch gives it the
+  // hand rig of the Tripo P2 mesh (`assets/models/polar-bear/tripo-hand/polar-bear.blend`): its
+  // facts keep H of the main polar bear, and its thighs slope 20° down for the longer shins.
   [
     'polar-bear',
     {
@@ -272,7 +274,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       seated: true,
       soloist: false,
       constant: 'STUDIO_POLAR_BEAR',
-      glb: 'assets/models/polar-bear/polar-bear.rig.glb',
+      glb: 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb',
     },
   ],
   // The violinist rabbit (design 4.4): the candidate hand rig of the Tripo P2 mesh
