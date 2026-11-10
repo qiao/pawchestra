@@ -603,16 +603,20 @@ export const WIND_HOLDS = {
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 42°
  * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
- * thin neck. The right paw points up past the back of the flute (`aimSide` -0.6), and the right
- * elbow points a little further out in the play, (1.2, -1.4, -0.3), so that the paw bends 68° on
- * the forearm and the forearm twists 41°: with -0.85 and (1, -1.4, -0.3), the paw bends 94°, and
- * with -0.5, the forearm twists 56°. The fingers curl 90° and 85° around the flute (`gripCurl`):
+ * thin neck. The right paw points up past the back of the flute (`aimSide` -0.8), and the right
+ * elbow points a little further out in the play, (1.2, -1.4, -0.3). On the new Tripo fox, the
+ * right upper arm then rolls 32° and the forearm twists 17° in the play: with -0.6, the right arm
+ * of the new fox takes 58° on the two parts, against 49°. On the first Tripo fox, -0.85 bent the
+ * paw 94° on the forearm, and -0.5 twisted the forearm 56°. The fingers curl 90° and 85° around the flute (`gripCurl`):
  * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The free
  * left paw hangs with its palm to the front and a little toward the body, (0.1, 0.25, -0.96): with
  * (0.484, 0.251, -0.838), the left forearm twists 48° at rest, and with the palm toward the body,
- * 90°. The rest elbows point further back, (-0.3, -1, 0.7) and (0.6, -1, 0.8), so that each upper
- * arm takes about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left
- * upper arm rolls 45° and the right forearm twists 55°.
+ * 90°. The rest elbows point back, (-0.3, -1, 0.7) and (0.8, -1, 0.3), so that each upper arm takes
+ * about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left upper arm
+ * rolled 45° and the right forearm twisted 55° on the first Tripo fox. The rest grip of the right
+ * paw lies 0.209 H further toward and past the axis of the tube than on the first Tripo fox
+ * (`restGripShiftR`): with the old grip, the right arm of the new fox took 92° on its two parts at
+ * rest, more than two parts of 42°, and now 76°, 38° on each part.
  *
  * The rest values in H (`restShift`, `restGripShiftR`, and the lap offset of `restFreeL`) keep the
  * rest of the arms in meters when the head of the body grows. They are the values of the head
@@ -629,7 +633,7 @@ const FOX_FLUTE = {
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
   restShift: [0.668, -0.758, 0.313],
   restPoleL: [-0.3, -1, 0.7],
-  restPoleR: [0.6, -1, 0.8],
+  restPoleR: [0.8, -1, 0.3],
   restFreeL: {
     lap: { along: 0.45, offset: [-0.418, -0.459, -0.1] },
     palm: [0.1, 0.25, -0.96],
@@ -642,10 +646,10 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.6],
+  aimSide: [0.5, -0.8],
   gripShiftL: [-0.04, 0, 0.04],
   gripShiftR: [0, 0, -0.14],
-  restGripShiftR: [-0.376, -0.109, -0.067],
+  restGripShiftR: [-0.376, 0.1, -0.067],
   gripCurl: curls(90, 85),
   gripAround: true,
 } as const satisfies WindHold;
