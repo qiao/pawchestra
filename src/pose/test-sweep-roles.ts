@@ -79,11 +79,18 @@ const BODY_LOOPS = 2;
  *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
  * - The cat: the cuts to the two upper arms, the 2 eye sockets, the edges of the 2 lids, and 19
  *   open ends of the whisker strips and of the strips over the eyes, which the source mesh has.
+ * - The fox: 11 open loops, the cuts to the two upper arms and the open loops of the source mesh
+ *   (the edges of the lids, the brow strips, the mouth, and the small slits at the front of the
+ *   armpits).
+ * - The rabbit: 16 open loops, the cuts to the two upper arms and the open loops of the source mesh
+ *   and of its lids.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 26],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 25],
+  ['assets/models/fox/tripo-hand/fox.rig.glb', 11],
+  ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
 ]);
 
 /**
@@ -277,14 +284,19 @@ function bodySurface(posed: PosedSkeleton): ClosedSurface {
 
 /**
  * The closed surface of the body of a mesh, the rabbit or a fox: {@link BODY_BONES}
- * with a cap on each open loop ({@link RABBIT_BODY_LOOPS} or {@link MESH_BODY_LOOPS}).
+ * with a cap on each open loop ({@link RABBIT_BODY_LOOPS} or {@link MESH_BODY_LOOPS}, or
+ * {@link TRIPO_BODY_LOOPS} for a Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function meshBodySurface(posed: PosedSkeleton): ClosedSurface {
   const rabbit = posed.model.studio.body.source === STUDIO_RABBIT.source;
-  return closedPart(posed, BODY_BONES, rabbit ? RABBIT_BODY_LOOPS : MESH_BODY_LOOPS);
+  return closedPart(
+    posed,
+    BODY_BONES,
+    bodyLoops(posed, rabbit ? RABBIT_BODY_LOOPS : MESH_BODY_LOOPS),
+  );
 }
 
 /**
