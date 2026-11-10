@@ -1148,7 +1148,8 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
     socket rim. Thus the highlight moves a little with the view and stays in the open eye.
   - It fades from `fade[0]` to `fade[1]` off the eye axis, before the socket rim cuts it, and the
     pool scales it. The skin of the head moves the axis and the middle of each ball, which come
-    from the eyeball triangles (`eyeBallsOf()`).
+    from the eyeball triangles (`eyeBallsOf()`). The axis is their vector area, which is zero on
+    a closed ball. Thus a hand rig deletes the back faces of a closed ball, deep in the head.
   - It adds only a highlight: the ball keeps the dark of the bead eyes. Each other body keeps its
     material (`eyeLightMaterial()` of `scene/player.ts`).
 - **Beam** (`BEAM_LOOK`). The haze cone leans toward its rim light, which stands at the x of the
