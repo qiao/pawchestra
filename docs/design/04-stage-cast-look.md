@@ -734,7 +734,10 @@ stands with the bind of the bear of main, keeps the eyeballs of its mesh with li
 the bear of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the
 muzzle, and the claws of the source to the colors of the bear of main in the hall light (the
 claws dark grey), and paints the eyes dark, as the bead eyes of main: the white ball of the
-source read startled. An arm that the mesh
+source read startled. A hand rig of the Tripo P2 cat
+(`assets/models/cat/tripo-hand/`) is a candidate body of the cat violist, in the same way. It
+keeps the eyeballs of its mesh, because the map paints a full eye on each, and its tail has two
+bones. An arm that the mesh
 joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
