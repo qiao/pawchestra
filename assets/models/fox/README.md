@@ -94,6 +94,7 @@ red fox and the tan fox share it.
 | `tripo-hand/fox.blend` | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
+| `tripo-hand/fox-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
 
 ### tripo-p2/fox.fbx
 
@@ -129,12 +130,12 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 448,588 bytes |
-| SHA-256 | `52e093c0990d6c0b0f368b0c41aa4bbf734265a41c4b1756f435bee89694ec45` |
+| Size | 449,003 bytes |
+| SHA-256 | `c796b0c8f09def7752a036437123ebb148dce163802d10e85f352fa6d7bdb101` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
 | Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
@@ -144,8 +145,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 581,640 bytes | `e16617c75a0ee5898eb7fcf710880264ae1861b6d248628a0ab30ca7f5fa378d` |
-| `tripo-hand/fox.rig.json` | 9,922 bytes | `3534390cb9b42ee23720802d49fc0b1f24ff4eca9f6e71512a7fe8497241cc69` |
+| `tripo-hand/fox.rig.glb` | 1,079,748 bytes | `fe551fa9eee4c3eb4b5c3978532f8714019d6cbed9081f623a8ab604c029c802` |
+| `tripo-hand/fox.rig.json` | 9,982 bytes | `1476001b724aa05d02dd8b6bfd4845ca1d5807f0723e4428e12020c63cf50a73` |
 
 The edits, in the order of the work:
 
@@ -432,3 +433,23 @@ joint (y 0.1966) down to y 0.154 and up to y 0.231 are now 0.25 to 0.36 leg radi
 With the front edge at z 0.15, 68 % of the thigh lies on the seat, and a new knee ring under the
 thigh sets the seat height 0.268 m. The thighs keep the slope of 15°, the shins lean 12° forward,
 and the soles stay flat. The standing flutist stands on its soles.
+
+**Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
+colors (design 4.5). The mesh object has the custom property `texture`
+(`assets/models/fox/tripo-hand/fox-color.webp`), and the mesh keeps the UV map of the FBX. The
+edge ring cuts of the arms and the knees interpolate it inside each face. The eyeballs take the
+map: it paints a full eye on each ball. The eye-rim faces take the map too, because the map paints
+them white, as the face colors are.
+
+| Item | Value |
+|---|---|
+| Source | `tripo-p2/fox.fbm/fox_basecolor.jpg` (above) |
+| `fox-color.webp` | Lanczos scale to 2048 × 2048, WebP quality 60 (Pillow 12.1.1, method 6): 140,632 bytes, SHA-256 `34f7ccfeac8445870a84e088e7fd08467695909620b54d8901d319e96e6f601f` |
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+
+**Longer legs and texels.** The edit of "Longer legs" kept the UVs, so the texels of the legs
+stretch along the leg by the scale of that edit: at most 1.24 (24 %), in the band from the ankle
+to the hip. Of the 447 faces that changed form, 111 stretch by more than 1.2 and 140 by more than
+1.1. The leg faces have a median stretch of 1.20. Across the leg, the scale stays 1.0 (0.986 to
+1.0).

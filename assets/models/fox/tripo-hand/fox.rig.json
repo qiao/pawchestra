@@ -1,5 +1,5 @@
 {
- "sha256": "e16617c75a0ee5898eb7fcf710880264ae1861b6d248628a0ab30ca7f5fa378d",
+ "sha256": "fe551fa9eee4c3eb4b5c3978532f8714019d6cbed9081f623a8ab604c029c802",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -716,6 +716,7 @@
    "height": 1.043834,
    "crease": 55,
    "headCeiling": 0.9746
-  }
+  },
+  "texture": "assets/models/fox/tripo-hand/fox-color.webp"
  }
 }
