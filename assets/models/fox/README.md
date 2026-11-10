@@ -758,3 +758,34 @@ pixels with the eye light off). A point edit deletes the 8 faces of each ball wh
 more than 135° from g (faces 1164 to 1171, 3746, 3754 and 607 to 614, 2675, 2685, and one vertex on
 each side): they lie deep in the head. The axis is now 2.3° (left) and 2.6° (right) from g, and the
 middle of the sphere moves by less than 1e-5 units. Each ball keeps 52 faces and 51 vertices.
+
+**Arm girth.** In the hall view the arms read thin. Sections across the upper arm and the forearm
+of the seated bind of each rig file (`arm_girth.py` of the session, `bmesh.ops.bisect_plane()` at
+shares t of each bone from its head), the girth as a share of H:
+
+| Part, t | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 |
+|---|---|---|---|---|---|---|---|
+| Upper arm, before | 1.10 | 1.06 | 1.03 | 1.00 | 0.95 | 0.89 | 0.85 |
+| Upper arm, after | 1.43 | 1.43 | 1.41 | 1.38 | 1.34 | 1.29 | 1.22 |
+| Upper arm, fox of main | trunk | trunk | 1.47 | 1.38 | 1.37 | 1.33 | 1.27 |
+| Forearm, before | 0.91 | 0.89 | 0.84 | 0.80 | 0.76 | 0.73 | 0.70 |
+| Forearm, after | 1.03 | 0.99 | 0.94 | 0.89 | 0.83 | 0.75 | 0.70 |
+| Forearm, fox of main | 1.05 | 1.00 | 0.95 | 0.90 | 0.86 | 0.82 | 0.79 |
+
+A point edit in the live Blender (`foxr12.arm_scales()` and `arm_moves()` of the session) scales
+each of the 26 edge rings of 10 vertices of each arm (x 0.0813 to 0.2976) about its center, in the
+plane of the ring (the in-plane part of each vertex from the center times s). The trunk loop at
+x 0.073 and the paws stay. s is the ratio of the girth of main to the girth of the ring, smoothed
+three times by (1/4, 1/2, 1/4) over the rings, then faded to 1 by a smoothstep into the shoulder
+(x 0.073 to 0.10) and into the wrist (x 0.268 to 0.2976). The left values serve both sides. From
+the shoulder to the wrist:
+
+```text
+1.022 1.118 1.241 1.295 1.335 1.36 1.373 1.386 1.408 1.436 1.454 1.442 1.386
+1.3 1.221 1.17 1.141 1.123 1.112 1.108 1.108 1.109 1.096 1.064 1.028 1.0
+```
+
+500 vertices move, at most 0.0143 units. The basis and the key `bind_belly` take the same moves.
+The bones, the weights, the palm hints, and the paw turns stay. In the moments of "Arm twist",
+each part of each arm takes 41.6° or less, and each paw still closes on the bow, the violin neck,
+and the flute.
