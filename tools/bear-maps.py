@@ -3,8 +3,9 @@
 # Each texel of a fur triangle of the rig file moves in Oklab: its lightness and its chroma scale,
 # and its hue turns, so that the median fur of the source goes to the brown of the bear of main and
 # each strand keeps its contrast to the fur around it. Each texel of a muzzle triangle moves the
-# same way to the light muzzle of the bear of main. The mouth line and the claws keep their colors,
-# and the eyes take the dark color of the bead eyes of main. The region of a triangle is its face color in the rig file (README, "Smooth
+# same way to the light muzzle of the bear of main, and each texel of a claw triangle to the dark
+# grey claws of main. The mouth line keeps its colors, and the eyes take the dark color of the bead
+# eyes of main. The region of a triangle is its face color in the rig file (README, "Smooth
 # surface"). The output depends only on the input files.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py
@@ -31,7 +32,8 @@ REGIONS = {
     #: The tan muzzle goes to the light muzzle of the bear of main.
     'muzzle': ((230, 184, 139), (232, 152, 89), (234, 192, 148)),
     'mouth': ((161, 83, 67), (183, 90, 69), None),
-    'claws': ((80, 54, 32), (87, 58, 32), None),
+    #: The brown claws go to the dark grey claws of the bear of main (its claw face color).
+    'claws': ((49, 46, 44), (87, 58, 32), (48, 46, 44)),
 }
 #: The texels around the triangles of a region that the region also takes, so that no texel of
 #: the edge of a triangle keeps the source color.
