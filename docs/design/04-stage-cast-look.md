@@ -725,14 +725,17 @@ A clean quad mesh with the arms apart from the trunk, such as a Tripo mesh in a 
 the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rigs/simple/`. It
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
-rig"). The Tripo P2 rabbit of `assets/models/rabbit/tripo-p2/` is a trial of this route that the
-app does not use. A hand rig of the same mesh with no arm cut and no limb stretch
-(`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main` only
-after an approval of its look in the app. It shows the color map of its Tripo FBX
-(`rabbit-color.webp`), and it keeps the eyeballs of the source in their round sockets, with no pea
-eyes. Reason: the map paints a full eye on each eyeball (a black pupil, an amber iris, and a white
-light), and the socket faces keep their source UVs, so the dark lining of the map shows around
-it. A lid on each eye blinks over it ("Hand rig"). The map holds no baked key light: the luma of its cream fur stays
+rig"). The first Tripo P2 rabbit was a trial of this route that the app does not use. A hand rig
+of the second Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
+stretch (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main`
+only after an approval of its look in the app. It shows the color map of its Tripo FBX
+(`rabbit-color.webp`, `tools/rabbit-maps.py`), and it keeps the eyeballs of the source in their
+round sockets, with no pea eyes. Reason: the map paints a full eye on each eyeball (a black pupil,
+an amber iris, and a white light), and the socket faces keep their source UVs, so the dark lining
+of the map shows around it. The map paints each iris toward the inner side of its ball, so the map
+tool turns each iris on its ball to the middle of the eye opening of the front view. Else the
+rabbit looks cross-eyed. A lid on each eye blinks over it ("Hand rig"). Its arms are short, so its
+violin is smaller (4.6, `violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It stands
 with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of the bear
@@ -822,7 +825,8 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   flat, crumpled sheet and the long legs looked thin. They also flatten the belly of the left
   forearm, which showed as a bump on the top of the arm in the play pose. The rabbit sits with more room behind the
   back (`backRoom`), so that its back keeps off the chair back.
-- The candidate rabbit of `tripo-hand/` keeps the long legs of its mesh. It sits as a real
+- The candidate rabbit of `tripo-hand/` has longer shins than its mesh, for the seat height of the
+  A-pose rabbit. It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
