@@ -128,14 +128,14 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 446,379 bytes |
-| SHA-256 | `0533dcf39917bc1a2f9aa5dd98698d868b592c929d6730fa237ce5ac8f2fbf4d` |
+| Size | 446,680 bytes |
+| SHA-256 | `6b4ae85fbb4af3d90a72d184172da0151561abc964b12e67c0f7de47a12ffe51` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
-| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 35 (as the fox of main), `headCeiling` 0.929 ("Ear weights" below) |
+| Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.929 ("Ear weights" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,496 bytes | `1f9137eab11b6886c28fc8d1e3d93062ce4142199cf989edda9ad817bb3d519a` |
-| `tripo-hand/fox.rig.json` | 9,927 bytes | `b9ea5a209f444536c277ad1236c0e4c38997461b96b70da946217864fd5391f6` |
+| `tripo-hand/fox.rig.glb` | 570,496 bytes | `2fb6c6c6ce355a6f1f1422d415672351a8dce5c510497a531c61e93a97ddbd2b` |
+| `tripo-hand/fox.rig.json` | 9,927 bytes | `304ab2d52f4762af0edd73675eea61a0aafd88ad6b999d1727f365da51ea5756` |
 
 The edits, in the order of the work:
 
@@ -301,3 +301,21 @@ each value of the flutist stays within 41°.
   15.4° to 14.4° on the arms, from 20.4° to 18.7° on the paws, and from 18.0° to 14.3° on the
   feet. The bones and the weights stay. The seat height of the export goes from 0.2907 m to
   0.2927 m.
+- **Crease 55.** The limb rings have 10 vertices, 36° apart, so the crease 35 of the fox of main
+  leaves out a neighbor face at most limb corners (`studioNormals()`), and each such face shades
+  as a facet. The share of the faces with such a corner, by the crease, against the fox of main
+  at its crease 35:
+
+  | Part | Main fox (35) | Before (35) | After the relax (35) | After (45) | After (55) |
+  |---|---|---|---|---|---|
+  | Head | 86.7 % | 76.6 % | 65.5 % | 48.7 % | 38.9 % |
+  | Ears | 99.0 % | 72.9 % | 58.2 % | 39.9 % | 21.6 % |
+  | Trunk and tail | 59.8 % | 70.1 % | 62.4 % | 44.2 % | 38.4 % |
+  | Arms | 64.8 % | 89.6 % | 87.1 % | 10.1 % | 4.0 % |
+  | Paws | 87.4 % | 86.6 % | 86.6 % | 63.1 % | 18.0 % |
+  | Legs | 88.4 % | 64.0 % | 53.5 % | 23.2 % | 18.2 % |
+  | Feet | 95.6 % | 66.1 % | 66.1 % | 30.1 % | 8.0 % |
+
+  45 is the smallest crease at or below main on each part. 55 also takes the paws below 20 %, as
+  the rabbit candidate does with 55 for its rings of 11 vertices. The ruff spikes fold by more
+  than 55°, so they stay sharp.
