@@ -132,14 +132,14 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 463,486 bytes |
-| SHA-256 | `54a91553ff237e026cce3655b42a03df60ad606532f0bf9f1988d90c9887bd90` |
+| Size | 463,901 bytes |
+| SHA-256 | `3c97fd9e0f02be8df6e16e70af770565689418f245ceb6bf62dec66d2b0e9fbe` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,524 vertices and 5,143 faces (3,695 quads and 1,448 triangles, 8,838 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 104 faces have the face attribute `eye` ("Eyes" and "Eye light" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). The 30 faces of the whiskers have the face attribute `plain` ("Color map" below) |
-| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below. The property `lids` holds the turn and the hinge axes of the lids ("Lids" below) |
-| Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
+| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below. The property `lids` holds the turn and the hinge axes of the lids ("Lids" and "Calm eyes" below) |
+| Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H was 0.322998 m, the H of the fox of `fox.rig.glb`, before "Head size": H is now 0.386694 m), `crease` 55 ("Smooth surface" below), `headCeiling` 1.0154 ("Ear weights", "Longer legs", and "Head size" below) |
 | Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app ("Eye light" below). No eye objects, so the app adds no bead eyes. A lid on each eye blinks ("Lids" below) |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
@@ -147,8 +147,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `676ddcbe2d47fedc28ad39351a5f6c54f388a680f77ddb215984e0cd61d38d00` |
-| `tripo-hand/fox.rig.json` | 16,858 bytes | `eab4726d79438fcc9d1234d0fefb2354fc2f2219fa6ca85a86e0af135c60320f` |
+| `tripo-hand/fox.rig.glb` | 1,131,140 bytes | `d6bdd8c4a0f19c8fcf0c8a2329ee61c3d069b3f9de4ac22a924c6ae27e6f11df` |
+| `tripo-hand/fox.rig.json` | 16,871 bytes | `133e8c26c05d8e35de9cb95ce995de45d6c60f4c1dddbe777a28f5bcd3121cf1` |
 
 The edits, in the order of the work:
 
@@ -447,7 +447,7 @@ them white, as the face colors are.
 | Item | Value |
 |---|---|
 | Source | `tripo-p2/fox.fbm/fox_basecolor.jpg` (above) |
-| `fox-color.webp` | Lanczos scale to 2048 × 2048, the red-orange step below, WebP quality 60 (Pillow 13.0.0, method 6): 135,312 bytes, SHA-256 `812a1c7caa116b6834cb44d462fdc0fbb3bdb8e13f4c95c737bc9f0f0c7d9dd7` |
+| `fox-color.webp` | Lanczos scale to 2048 × 2048, the brow fill, the sock edges, and the red-orange step below ("Brow spots", "Sock edges", "Hall fur"), WebP quality 60 (Pillow 13.0.0, method 6): 139,048 bytes, SHA-256 `3fa16b1a185c6a55d6a1059f83a79c06bd6d2e9e2bfae951890fd92fd3925f33` |
 | Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
 
@@ -662,7 +662,7 @@ UVs or the eyes.
 
 | Item | Value |
 |---|---|
-| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 109,332 bytes, SHA-256 `4967bd1e1674ed33cae6d00aafc8f56fbd3fad20a034a14209a56833f832ab98` |
+| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 111,852 bytes, SHA-256 `a1b6c20d56db15790c31fdfe221b899c17d6db85a731166db35fa5e96363244f` |
 | Origin, license | As `fox-color.webp` |
 
 Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
