@@ -750,7 +750,11 @@ arm at most about 45° of roll or twist in the moments of the violist. Reason: w
 hold of the cat of main, the left forearm twisted 125° in the play and -69° at rest. A hand rig of
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
-and its tail has two bones. An arm that the mesh joins to the trunk needs a cut,
+and its tail has two bones. Its paws turn about the forearms by whole ring steps, and the holds of
+the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
+of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
+with the paws and the holds of the fox of main, a forearm twisted up to 168°. An arm that the mesh
+joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
