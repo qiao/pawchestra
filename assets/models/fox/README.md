@@ -433,7 +433,8 @@ joint (y 0.1966) down to y 0.154 and up to y 0.231 are now 0.25 to 0.36 leg radi
 
 With the front edge at z 0.15, 68 % of the thigh lies on the seat, and a new knee ring under the
 thigh sets the seat height 0.268 m. The thighs keep the slope of 15°, the shins lean 12° forward,
-and the soles stay flat. The standing flutist stands on its soles.
+and the soles stay flat. The standing flutist stands on its soles. In the moments of "Arm twist",
+each part of each arm takes 42.5° or less (the largest: the right forearm of the flutist at rest).
 
 **Color map.** The app shows the color map of the Tripo FBX on the candidate, in place of the face
 colors (design 4.5). The mesh object has the custom property `texture`
