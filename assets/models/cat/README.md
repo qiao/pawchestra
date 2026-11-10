@@ -646,3 +646,27 @@ side), and n = a × w. With d the distance along a and s = smoothstep(0, 0.02, d
 c + (1 - 0.30 s) d a + (1 - 0.25 s)(v · w) w + (1 - 0.15 s)(v · n) n takes its place. The vertices
 up to the wrist joint stay, so the wrist loops keep their girth and show no step. The joints of
 `fingers_<side>` take the same map, and the paw rows of the weights take the places of the map.
+
+**Head size.** In the hall view the head read small against the long body. The head of the cat of
+main is much wider: the half width of its head vertices (more than 0.5 of `head`, the 90th
+percentile of |x|) is 0.62 H, and on the candidate 0.39 H. Its height H is the same 0.339 m. A
+point edit in the rest, before the paw size, scales the head about the head joint (0, 0.745,
+0.055) of the source:
+
+```text
+vertex: P += w (s - 1) (P - joint),  s = 1.1,  w = smoothstep(0.715, 0.76, y)
+```
+
+The ears, the eyeballs, the whiskers, and the muzzle scale with the head, and the neck fades by
+the height. The joints of the head and the ears take the same map. A lineup of 1.0, 1.1, and 1.2
+in the app view at the cat and in the hall view (`reports/2026-11-10-cat-hand-r6/lineup-head/`,
+which git ignores) showed 1.2 nearest to the head of main in width, but its H is 0.405 m, 1.19
+times the H of main. With 1.1, H is 0.374868 m (1.10 times main) and the half width 0.42 H of
+main: the head reads nearer to main and stays near its height. The values in "Arm twist" are with
+this head.
+
+| Scale | H of `pnpm studio-body` |
+|---|---|
+| 1.0 | 0.339376 m |
+| 1.1 (the file) | 0.373515 m before the relax, 0.374868 m after |
+| 1.2 | 0.405133 m |
