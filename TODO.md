@@ -151,6 +151,17 @@ passes.
       the user in a close play frame of the stage.
 - [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
       current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
+- [ ] Tripo polar bear (`tripo-hand/`): at rest and in the lift, the arms go 13.1 cm (forearms)
+      and 14.5 cm (upper arms) into the deep belly, against 1.0 cm and 0.0 cm on main, and 7.4 cm and
+      8.8 cm in the play (3.5 cm and 5.2 cm on main, `pnpm pose-depth pianist --demo bach-bwv1050`).
+      Rest paws 0.6 H in front or other elbow poles take off at most 2.6 cm. Ask the user: a
+      slimmer lower trunk toward main (belly and hips depth 1.70 and 1.72 H, main 1.65 and 1.56), or
+      a new rest hold for this body.
+- [ ] Tripo polar bear: the left arm folds 9 faces (p95) in the play, at main and over the limit 8.
+- [ ] Tripo polar bear: the closed lid is a white cap at 1.25 ball radii, and a thin dark lash line
+      stays at its top edge. Check the blink with the user in a close play frame.
+- [ ] Tripo polar bear: the green sign of `polar-bear-normal.webp` follows the rabbit and the fox
+      maps of the same Tripo export, with no seam test on this mesh.
 - [ ] Polar bear pianist: in the play, the arms go up to 6.3 cm (forearms) and 7.4 cm (upper arms)
       into the trunk. In the lowering, 6.7 cm and 6.5 cm.
 - [ ] Polar bear hand rig: a pocket stays at the front of each armpit in the chord and the far-left
