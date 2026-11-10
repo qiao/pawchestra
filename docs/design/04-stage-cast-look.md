@@ -737,8 +737,10 @@ claws dark grey), and paints the eyes dark, as the bead eyes of main: the white 
 source read startled. A hand rig of the Tripo P2 cat
 (`assets/models/cat/tripo-hand/`) is a candidate body of the cat violist, in the same way. It
 keeps the eyeballs of its mesh, because the map paints a full eye on each, and its tail has two
-bones. An arm that the mesh
-joins to the trunk needs a cut,
+bones. Its paws turn about the forearms by whole ring steps, and its hold (`CAT_HOLD`) gives each
+part of each arm at most about 45° of roll or twist in the moments of the violist. Reason: with
+the paws and the hold of the cat of main, the left forearm twisted 125° in the play and -69° at
+rest. An arm that the mesh joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
