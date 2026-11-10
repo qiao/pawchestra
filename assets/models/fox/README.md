@@ -128,8 +128,8 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 437,649 bytes |
-| SHA-256 | `3412c495b41155bf15d027ddd63b1ffbc9a638dda08ba262b3ba0090acb54122` |
+| Size | 446,379 bytes |
+| SHA-256 | `0533dcf39917bc1a2f9aa5dd98698d868b592c929d6730fa237ce5ac8f2fbf4d` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,492 bytes | `6a3230725d6140ddfedf26622dc972e2f5747d20e6df88c1f197fa85f0be1175` |
-| `tripo-hand/fox.rig.json` | 9,926 bytes | `51a98061a2e77db92fc8f88ff999274907d677b528d19e6b8c2a67e8b646b686` |
+| `tripo-hand/fox.rig.glb` | 570,496 bytes | `1f9137eab11b6886c28fc8d1e3d93062ce4142199cf989edda9ad817bb3d519a` |
+| `tripo-hand/fox.rig.json` | 9,927 bytes | `b9ea5a209f444536c277ad1236c0e4c38997461b96b70da946217864fd5391f6` |
 
 The edits, in the order of the work:
 
@@ -275,7 +275,7 @@ each value of the flutist stays within 41°.
 (`reports/2026-11-09-fox-hand-r5/`, which git ignores):
 
 - **One color for each region.** The face colors of `add_surface()` took the shade that the
-  Tripo texture bakes, so the fur showed 16 to 41 tones on each part. Each face now takes the
+  Tripo texture bakes, so the fur showed 8 to 41 tones on each part. Each face now takes the
   color of its region, by the lightness L and the saturation S of its old color (HLS, sRGB): the
   socks, the ear backs, and the paws (L below 0.31, 1,679 faces, sRGB 73, 37, 17), the orange fur
   (1,891 faces, 220, 98, 12), the cream belly, chest, and cheeks (L at least 0.65, 688 faces,
@@ -290,3 +290,14 @@ each value of the flutist stays within 41°.
   map paints white, faces the camera behind the chair, and the face colors baked the orange to
   white blend of the map into four cream steps (sRGB 235, 176, 135 to 247, 224, 203) at the
   middle of the tail. The tail now shows orange fur down to the white tip, with no cream step.
+- **Relax.** Ten Taubin rounds (0.5, then -0.53) on the body, with each move clipped to 0.01
+  units, move the vertices at most 0.01 units (mean 0.0018, 15 clipped). The eyeballs, the
+  whiskers, the open edges of the eye sockets, the gloss nose, and the eye faces stay. The tips
+  of the ruff spikes (each vertex with only triangle faces, 275 vertices) stay too, so that the
+  ruff keeps its form: free, they moved up to 0.027 units. The four top vertices of the head
+  (1648, 2988, 1654, 2994) and the four lowest vertices of the chin (3644, 1732, 3645, 2411) stay,
+  so that the head height H stays 0.322998 m: free, H went to 0.320865 m. The mean fold between
+  neighbor faces goes from 29.4° to 24.6° on the head, from 25.6° to 21.8° on the trunk, from
+  15.4° to 14.4° on the arms, from 20.4° to 18.7° on the paws, and from 18.0° to 14.3° on the
+  feet. The bones and the weights stay. The seat height of the export goes from 0.2907 m to
+  0.2927 m.
