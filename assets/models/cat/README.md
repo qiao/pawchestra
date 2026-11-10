@@ -397,9 +397,9 @@ The files of the candidate, after the last edit:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.blend` | 405,567 bytes | `39283e6cf7f99484a997c0aab7a8fc7753a22556b14051baf9ab251953e2c5bf` |
-| `tripo-hand/cat.rig.glb` | 856,388 bytes | `8060cdf5d1074330227f3022ce8dc9b55a6d42b22a17b56777e1ba2f8de2a4f0` |
-| `tripo-hand/cat.rig.json` | 17,186 bytes | `7dd000544891ee853df217de2b2f41ba8fd7ba758e22e356aa52d6ad0f50cd35` |
+| `tripo-hand/cat.blend` | 411,272 bytes | `5af2ce724c89f2d84002c4a09b9a945f4ae3e38a49f4eaa633374ecd7e0c5b2c` |
+| `tripo-hand/cat.rig.glb` | 856,388 bytes | `ba988ef208ccfb527455a9ba4c4317f9f33a5dc68452e7448eb65936198e0e59` |
+| `tripo-hand/cat.rig.json` | 17,186 bytes | `7d187f5d54e08fd5fb4f97052d123123e7009cb34ba7512721d14d2eccc3947f` |
 | `tripo-hand/cat-color.webp` | 143,090 bytes | `2cfdb0d9e6bdac299e8eafbcdf6c563b979891d22e1e219796e75bd1723ca4c3` |
 | `tripo-hand/cat-normal.webp` | 73,312 bytes | `6ba7573360b488d434b50165550930865eb5ba20a106b014b72a7f4effd4e7c6` |
 
@@ -443,7 +443,7 @@ legs keep the form and the length of the source: no cut, no split from the trunk
 | Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly" below) and `bind_tail` ("Tail on the seat" below): 3,831 vertices and 4,083 faces (3,416 quads and 667 triangles, 7,499 triangles), flat faces, and the surface of `sa.add_surface()`. 55 faces are gloss (the pink nose, "Nose bridge"). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid` ("Lids"), and the 196 faces of the whisker strips have `plain`. The 28 faces of the crotch have `rim` ("Crotch"). The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly" below) and `bind_tail` ("Tail on the seat" below): 3,828 vertices ("Slits") and 4,083 faces (3,416 quads and 667 triangles, 7,499 triangles), flat faces, and the surface of `sa.add_surface()`. 55 faces are gloss (the pink nose, "Nose bridge"). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid` ("Lids"), and the 196 faces of the whisker strips have `plain`. The 28 faces of the crotch have `rim` ("Crotch"). The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245; the fingers joints turn with the paws). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side) and `hinges` come from "Arm twist", `seat` from "Seat" and "Seat back", and `lids` from "Lids" below |
 | Facts | `height` 1.181424 (the shoulder joints at 0.68705 u after "Longer legs", 1.71956 m for each unit, so that H was 0.339375 m, the H of the cat of `cat.rig.glb`, before "Head size": H is now 0.374861 m), `crease` 55, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh, 0.75 of their source size ("Eye size"), with a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -861,6 +861,16 @@ turn more than 55°, each on a `rim` face, and the largest turn of a vertex norm
 from the mean of its neighbors is 24° (before 138°). The lap keeps its depth (D3 36.5 cm, before
 36.6 cm), and the thigh girth stays 57.0 cm. A region from rest z 0.27 smooths more (largest turn
 14°), but it moves the inner side of each thigh, and the thigh girth falls to 49.2 cm.
+
+**Slits.** Two seams had a vertex pair that was not one vertex: 386 and 387 in the right crotch
+(2 mm apart), and 3124 with 3125 and 3130 with 3131 on the tail (0.5 mm apart). The keys
+`bind_belly` and `bind_tail` moved the two vertices of each pair apart, so the seated bind opened
+a slit of about 3 cm in the crotch and of 1.5 cm on the tail, and the clearance sweep found two
+more open loops. A point edit in the live Blender puts each pair at the middle of its two
+vertices, in the basis and in each key, with the mean weight row, and welds the second vertex
+into the first (`bmesh.ops.weld_verts`). The mesh has 25 open loops in place of 27 and 3,828
+vertices in place of 3,831, so the vertex ids above 387 move down by 1, above 3125 by 2, and
+above 3131 by 3. The ids in the other rows of this file are the ids before the weld.
 
 **Brow rows.** The automatic weights gave `ear_L` and `ear_R` up to 0.87 of the brow and of the
 skin between the eyes and the ears. The ear twitch of the app (12°) thus pulled the brow and the
