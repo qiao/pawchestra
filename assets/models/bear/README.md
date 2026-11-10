@@ -142,12 +142,12 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 361,101 bytes |
-| SHA-256 | `0a48cb52705abb10865857b3f6423b6df1ba63d3f39169b47515070b1bbf5cbc` |
+| Size | 365,703 bytes |
+| SHA-256 | `78dd28836fe3c16c14f38b530ef753c0056491464d520f06caaea3656ea3bd6a` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `bear`: 3,261 vertices and 3,392 faces (2,828 quads and 564 triangles, 6,220 triangles), flat faces, and the surface of `sa.add_surface()` with one color for each region ("Smooth surface" below). 46 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
+| Mesh | One object `bear`: 3,261 vertices and 3,392 faces (2,828 quads and 564 triangles, 6,220 triangles), flat faces, and the surface of `sa.add_surface()` with one color for each region ("Smooth surface" below). 47 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
 | Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/bear-tripo.json` (shoulder x 0.15, elbow 0.27, wrist 0.365, knuckles 0.43). The Action `bind` holds the standing bind of that config: no leg turn, no trunk recline, straight arms, and no bind supination. The property `palm` holds a palm for each side ("Arm twist" below), and the property `lids` the turn and the hinge axes of the lids. The properties `seat` and `hinges` come from `sa.build_armature()` |
 | Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb`), `crease` 40 and `colorBlend` 0.05 (the values of that bear) |
 | Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app. No eye objects, so the app adds no bead eyes. A lid on each eye blinks |
@@ -156,8 +156,8 @@ The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 711,660 bytes | `d3770e0b39a3963fa714cce28c0c143b680fb8bc9f1791cdb657796cc043b469` |
-| `tripo-hand/bear.rig.json` | 16,084 bytes | `1dc76c955a6ca532eb2dd89cd9aa33706670fd33f9fde2d06564c481063bbb27` |
+| `tripo-hand/bear.rig.glb` | 712,360 bytes | `ef3f3a1b7d8bbdd7c89fd7db5fb0e380fda03728c71076ba7871083caaea9949` |
+| `tripo-hand/bear.rig.json` | 16,084 bytes | `d08d9b3979f04aca0995e6a74ac20663a4c36faccb8845a59942c5a46af4d5f6` |
 
 The edits, in the order of the work:
 
@@ -344,8 +344,8 @@ back), the median Oklab L, C, and h:
 
 The face colors before the map loads take the median of the map in each region: fur (123, 72,
 31), muzzle (230, 184, 139), mouth (161, 83, 67), claws (49, 46, 44). The gloss nose takes the
-near black of the nose of main, (24, 20, 18). 14 faces at the edge of the gloss nose (source luma
-100 or more, most on its right side) take the slot fur and the muzzle color, so the map paints
+near black of the nose of main, (24, 20, 18). 13 faces at the edge of the gloss nose (source luma
+100 or more, most on its right side) take the slot fur ("Nose sides" gives the 14th) and the muzzle color, so the map paints
 them light and no dark wedge shows under the nose. The scale step needs the fur sheen of the
 luma (`fullLuma` of `FUR_LOOK`, design 4.5). The texture points of the studio module add 18.0 KB
 to the first download (655,887 to 673,885 bytes after gzip, `pnpm size`), and the lids 1.9 KB
@@ -437,3 +437,25 @@ flat facets on the top of the nose, as the large facets of the nose of main:
 Now the top of the nose shows one even band of light in place of the squares. A fit of all 46
 faces to 7 facets moved the edge of the nose by up to 0.0064 units and made it angular, and the
 same fit with the edge held turned some triangles over.
+
+**Nose sides.** In the face crop at 60°, each side of the nose showed a fan of small triangles
+that each caught the light or not, and a brown wedge of fur faces at its root. A point edit in
+the live Blender (`run(obj, apply=True)` and `root_faces(obj)` of `scratch/bear/nose_sides.py`,
+which git ignores) makes four flat facets on each side, with the facets A and B of the top in
+the same fit:
+
+- Left side (x < 0): upper side 199, 1196; middle side 196, 197; lower side 198, 203, 1234,
+  1220, 1219; lower front 201, 202, 204, 1201. The right side takes the mirror face of each
+  (x to -x): 399, 2160; 396, 398; 395, 397, 2163, 2167, 2172; 205, 2156, 2157.
+- Each facet plane fits its vertices by least squares. Each vertex goes to the least-squares point
+  of the planes of its facets, with the weight 0.05 to its old place, in 10 rounds: 46 vertices,
+  the largest move 0.0027 units, and no vertex more than 0.0002 units from its planes. The
+  largest turn of a face next to the moved vertices is 23° (1201, a facet face).
+- The face 2172 takes the slot gloss and the face colors of 1234, its mirror face.
+- The fur faces 1197, 1198, 1235 and 2173, 2174, 2175 at the upper root of each side take a small
+  UV patch (0.25 of their own spread) at the middle of the UVs of a light muzzle face: 1194, 200,
+  2169, and 400. Their map color goes from about (157, 129, 97) to (245, 202, 154). The lower root
+  faces 1218, 1221, 2164, and 2168 keep their UVs.
+
+Now each side shows a few even facets and no brown wedge, and from the front the nose reads as
+the rounded triangle of the nose of main.
