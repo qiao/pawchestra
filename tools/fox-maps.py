@@ -33,9 +33,9 @@ RED_FUR = (0.42, 0.15, 52.0)
 #: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. The light of
 #: the app makes the fur darker and warmer than the map. In the 3/4 app view of the tan fox
 #: (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6`), this
-#: target gives the median fur L 0.634, C 0.099, h 56.5, against L 0.634, C 0.102, h 57.1 on the
+#: target gives the median fur L 0.636, C 0.102, h 56.0, against L 0.634, C 0.102, h 57.1 on the
 #: fox of main. The lightness of the tan palette of the faces (L 0.63) gave L 0.517.
-TAN_FUR = (0.80, 0.088, 77.0)
+TAN_FUR = (0.80, 0.10, 75.0)
 #: The colors of the red fox in the map (sRGB) and the colors that take their place, for each map:
 #: the region colors of the face colors of the hand rig (assets/models/fox/README.md, "Smooth
 #: surface"), and the white, the black, and the cream of the map, which keep their colors. A target
