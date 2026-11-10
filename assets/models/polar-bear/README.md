@@ -614,8 +614,8 @@ item below gives the call and the values.
 
 | Item | Value |
 |---|---|
-| Size | 391,599 bytes |
-| SHA-256 | `f9a04539c0d94a61b0a7d63c0a957d5cda24970563732b4b3f978d2e65d214ed` |
+| Size | 391,636 bytes |
+| SHA-256 | `e63cf73b4aff8b148d079b22d3b827f7646b1640b64b7d04da438ba1f69255c3` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the skull, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,673 vertices and 3,798 faces (3,128 quads and 670 triangles, 6,926 triangles), flat faces, and the surface of `sa.add_surface()`. 86 faces are gloss (the nose). The two eyeballs of the source (147 faces after "Eye axis") have the face attribute `eye`. A lid on each eye: 312 quads with the face attribute `lid`. The UV map of the FBX, and the property `texture` |
 | Armature | `polar_bear_rig`: the 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, -y, to `digit5_<side>`), at the joints of `tools/mesh-rigs/simple/polar-bear-tripo.json`. The Action `bind` holds the seated bind of that config. The properties `palm` (0, 0, -1), `seat`, and `hinges` come from `sa.build_armature()` and the seat step. The property `lids` holds the turn and the hinge axes of the lids |
@@ -705,8 +705,33 @@ share of H (sections across the bone at its middle, the thigh at 0.6 from the hi
 | Chest, waist, belly, hips width | 1.41, 1.39, 1.34, 1.35 | 1.40, 1.37, 1.34, 1.34 | 1.38, 1.36, 1.40, 1.41 |
 | Chest, waist, belly, hips depth | 1.33, 1.53, 1.72, 1.75 | 1.35, 1.54, 1.70, 1.72 | 1.36, 1.58, 1.65, 1.56 |
 
-The trunk agrees with main within 12 %, so it takes no edit. The head is 13 % wider than on main
-and stays: its height is H, and the head of the fox read too small at the H of main.
+The head is 13 % wider than on main and stays: its height is H, and the head of the fox read
+too small at the H of main.
+
+**Form to main** (round 10, `c_form.py` with the values arm 0.755, thigh 0.86, shin 0.83, eye
+0.85, forearm 0.79, belly 0.99, hips 0.86, and seat z 0.25, in place of the values above). Main
+is the upper bound of each girth and each depth:
+
+- Arm girth: the factor of the arm goes from 0.755 (upper arm) to 0.79 (forearm) with a
+  smoothstep from x 0.24 to 0.28, across the elbow joint at 0.258. The fades into the arm root
+  and the wrist stay.
+- Lower trunk depth: each trunk vertex (no arm and no head share, rest z below 0.56) moves on y
+  toward yc(z), the middle of the y range of the z section at |x| < 0.03, by the factor
+  k = 1 - (1 - g(z)) (1 - L), with L its thigh, shin, foot, and toe share. g is 0.86 at z 0.32
+  (the hips + 0.03), goes to 0.99 at z 0.39 (the spine) and to 1 at z 0.49 (spine1), each with a
+  smoothstep, and goes back to 1 at z 0.25 and below, so that the haunch on the bench keeps its
+  form. 139 vertices move, at most 0.0235 units (the back of the rump). The width is below main,
+  so it takes no edit.
+
+| Measure | Round 9 | Round 10 | Main polar bear |
+|---|---|---|---|
+| Upper arm, forearm girth | 2.00, 1.61 | 1.79, 1.46 | 1.79, 1.46 |
+| Thigh, shin girth | 2.75, 2.02 | 2.57, 1.87 | 2.58, 1.87 |
+| Belly, hips depth | 1.70, 1.72 | 1.65, 1.55 | 1.65, 1.56 |
+| Belly, hips width | 1.34, 1.34 | 1.33, 1.32 | 1.40, 1.41 |
+
+Each face of the rest mesh stretches its texels by at most 1.11 against round 9 (a face of the
+crotch), and most faces get denser texels.
 
 **Smooth surface** (`d_smooth.py`):
 
@@ -728,14 +753,15 @@ numpy python -I tools/rig/leg_turns.py <config> 20 12 5`) turn each thigh to a s
 the horizontal and 12° out, and each shin 5° forward of the vertical, so that the knee angle from
 the side is 115°. Each foot keeps its turn in the world, so the sole stays flat. The leg bones
 take the world turns of `bind_turns()` of `rig_mesh.py` (`sa.set_world_turns()`, frame 1). The
-property `seat` is {`prop` `bench`, `front` -0.05, `back` -0.2, `halfWidth` 0.25}, as on the main
-polar bear. The relax moved the head top and the chin, so the fact `height` went from 1.499398 to
+property `seat` is {`prop` `bench`, `front` -0.045, `back` -0.2, `halfWidth` 0.25}. The front
+edge was -0.05, as on the main polar bear: after the form of round 10 the lowest point of the
+haunch lay 4 mm in front of it, the seat top went to 0.298 m, and the bench fit to 0.118 m. The relax moved the head top and the chin, so the fact `height` went from 1.499398 to
 1.487531 to keep H 0.422795 m.
 
 | Measure | Thighs 25° | Thighs 20° | Main polar bear |
 |---|---|---|---|
-| Seat top | 0.292 m | 0.267 m | 0.268 m |
-| Bench fit (`benchFitOf()`) | 0.188 m | 0.289 m | 0.244 m |
+| Seat top | 0.292 m | 0.267 m (round 10: 0.271 m) | 0.268 m |
+| Bench fit (`benchFitOf()`) | 0.188 m | 0.289 m (round 10: 0.289 m) | 0.244 m |
 
 The shin of the Tripo mesh is 22.3 cm, against 16.7 cm on main, so the thighs at 25° put the seat
 2.4 cm too high.
@@ -760,7 +786,9 @@ be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
 
 The largest move is 0.0090 units, and the mean is 0.0036. The front faces of the lower belly
 point down by at most 37° (43° before): the 4 faces above 35° lie in the crotch between the
-thighs. No face points down by more than 45° (22 faces on the main polar bear).
+thighs. No face points down by more than 45° (22 faces on the main polar bear). After round 10,
+in the measure of `belly_slope.py` (48 faces of the lower front): at most 35.1°, 10 faces above
+30° (10 in round 9), and 2 above 35° (4), the 2 in the crotch.
 
 **Knee rows** (`h_knee.py`, after the belly key). At the back of each knee, the shin share of the
 automatic weights went from 0.38 to 0.63 between two rings 0.018 units apart. The pedal leg of the
@@ -850,6 +878,12 @@ direction cos(lam) (cos(psi) gl + sin(psi) u) + sin(lam) h from the middle c of 
    0.732 UV for each unit), about the cleanest fur patch among those faces: UV (0.0215, 0.9091),
    luma 0.945, deviation 0.0035 (left), and UV (0.639, 0.706), luma 0.940, deviation 0.0053 (right).
 4. Each lid vertex takes the row `head` 1 (`sa.set_weight_row()`, 364 vertices).
+5. Lash line (round 10, `LASH=-6,-5,50 blender ... j_eyes.py ...`): the 8 lid faces of each eye
+   with the middle at psi -5.8° and |lam| at most 42° take the UV of the darkest head face within
+   0.025 units of c (the socket lining: luma 0.174 at UV (0.2745, 0.3451) left, 0.12 at (0.5781,
+   0.1307) right) on each corner, and its face colors. The closed lid was a white cap with a thin
+   dark edge at the front, which read as a white patch. Now the closed eye shows a dark line
+   across the middle of the cap, and the open lid stays under the head.
 
 Ray casts against the head (the faces with no `eye` and no `lid` flag) check each step: a point
 lies under the head when a ray from it, away from c, meets the head. In 21 steps of the blink, no
@@ -885,11 +919,12 @@ close views. The sheen adds a warm light at the outline, and at most 0.6 % of th
 
 | Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
 |---|---|---|---|---|---|---|
-| Left | 9 (9) | 41° (39°) | 34° (58°) | 69° (88°) | 37° (30°) | 7° (6°) |
-| Right | 6 (8) | 40° (38°) | 20° (27°) | 22° (37°) | 36° (40°) | 4° (4°) |
+| Left | 8 (9) | 42° (39°) | 42° (58°) | 88° (88°) | 39° (30°) | 13° (6°) |
+| Right | 6 (8) | 43° (38°) | 17° (27°) | 35° (37°) | 38° (40°) | 4° (4°) |
 
-Each skin twist of each arm part stays at 41° or less, and the gate passes (exit code 0). The left
-folds are at main (`OPEN` at the limit 8). Two changes took the right folds from 17 to 6:
+These are the values of round 10: the form to main, the higher rest paws, and the playing elbows
+0.15 down (`src/pose/hands.ts`). Each skin twist of each arm part stays at 43° or less, and the
+gate passes (exit code 0). In round 9, the left folds were 9, at main (`OPEN` at the limit 8). Two changes took the right folds from 17 to 6:
 
 - **Right rest paw.** The right folds came in the rest pose: the right paw swung 65° off its bind
   and folded 17 faces of the inner wrist, the left paw 37°. A paw turns in the plane of its palm
@@ -910,7 +945,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/polar-bear.rig.glb` | 823,196 bytes | `09cb241a0074d393934b583462cd84f0b413e87a90192fcf8d9d7f9a129d1165` |
-| `tripo-hand/polar-bear.rig.json` | 18,926 bytes | `73395d5e54e4c9ef3613f952ab8ca9f86993bfd3a815f266b1356449006edcb3` |
+| `tripo-hand/polar-bear.rig.glb` | 826,796 bytes | `f4b7f49ce3c5fc4929a0595bf8be3c2385b5808b233530c070fb711a963933d8` |
+| `tripo-hand/polar-bear.rig.json` | 18,927 bytes | `bd6cc6c30988ba8c8ab09583c200adc88dd20550ea46a4243cc051faea64e547` |
 | `tripo-hand/polar-bear-color.webp` | 137,702 bytes, 2048 × 2048 | `39c8557a78e7ab0bde27fdaf0a9302c391a6f6a5d583a9990829829e207d948e` |
 | `tripo-hand/polar-bear-normal.webp` | 85,786 bytes, 1024 × 1024 | `0d63c3d4096327a710aeb16f3a98e27ec0e774514d2e03c5abd76bd511718ae5` |
