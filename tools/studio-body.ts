@@ -246,23 +246,18 @@ const FOX_TEXTURE_COLORS: SpeciesColors = {
 
 /** The animals that the app shows, by their ids. */
 export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalEntry>([
-  // The bear conductor: the T-pose mesh (design 4.4), with the size of the studio bear.
+  // The bear conductor: the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/bear/tripo-hand/bear.blend`), with no arm cut and no limb stretch. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the bear of `bear-tpose.rig.glb`, and
+  // the crease angle 40° and the color blend 0.05 of that bear. It stands on the podium.
   [
     'bear',
     {
       landmark: 'shoulders',
-      height: 1.0,
       seated: false,
       soloist: false,
       constant: 'STUDIO_BEAR',
-      // The crease 40° with the blend 0.05 gives slightly faceted fur. The blend fades the steps
-      // of the fur colors, and keeps the edge of the muzzle.
-      crease: 40,
-      colorBlend: 0.05,
-      eyeNormal: 0.5,
-      glb: 'assets/models/bear/bear-tpose.rig.glb',
-      // The eyes of the T-pose mesh are 0.7 of the size 1.15 of the studio bear.
-      eyeSize: 0.805,
+      glb: 'assets/models/bear/tripo-hand/bear.rig.glb',
     },
   ],
   // The polar bear pianist: the hand rig of the Tripo mesh (design 4.4, "Hand rig"). Its `.blend`
