@@ -1,0 +1,361 @@
+{
+  "source": "assets/models/bear/tripo-p2/bear.fbx",
+  "sourceNote": "The Tripo P2 bear mesh with its quads (assets/models/bear/README.md). The hand rig assets/models/bear/tripo-hand/bear.blend starts from it in a live Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "name": "Bear",
+  "weld": 1e-05,
+  "joints": {
+    "root": {
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.1
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "hips": {
+      "head": [
+        0,
+        0.22,
+        -0.03
+      ],
+      "tail": "spine"
+    },
+    "spine": {
+      "head": [
+        0,
+        0.33,
+        -0.04
+      ],
+      "tail": "spine1"
+    },
+    "spine1": {
+      "head": [
+        0,
+        0.44,
+        -0.04
+      ],
+      "tail": "chest"
+    },
+    "chest": {
+      "head": [
+        0,
+        0.55,
+        -0.04
+      ],
+      "tail": "neck"
+    },
+    "neck": {
+      "head": [
+        0,
+        0.72,
+        -0.045
+      ],
+      "tail": "head"
+    },
+    "head": {
+      "head": [
+        0,
+        0.78,
+        -0.02
+      ],
+      "tail": [
+        0,
+        0.97,
+        0.0
+      ]
+    },
+    "ear_L": {
+      "head": [
+        0.085,
+        0.935,
+        0.005
+      ],
+      "tail": [
+        0.1,
+        1.0,
+        0.01
+      ]
+    },
+    "clavicle_L": {
+      "head": [
+        0.04,
+        0.665,
+        -0.02
+      ],
+      "tail": "upper_arm_L"
+    },
+    "upper_arm_L": {
+      "head": [
+        0.15,
+        0.669,
+        0.0
+      ],
+      "tail": "forearm_L",
+      "roll": "palm"
+    },
+    "forearm_L": {
+      "head": [
+        0.27,
+        0.667,
+        0.009
+      ],
+      "tail": "forearm_twist_L",
+      "roll": "palm"
+    },
+    "forearm_twist_L": {
+      "head": [
+        0.3175,
+        0.6665,
+        0.015
+      ],
+      "tail": "hand_L",
+      "roll": "palm"
+    },
+    "hand_L": {
+      "head": [
+        0.365,
+        0.666,
+        0.021
+      ],
+      "tail": "fingers_L",
+      "roll": "palm"
+    },
+    "fingers_L": {
+      "head": [
+        0.43,
+        0.664,
+        0.035
+      ],
+      "tail": [
+        0.478,
+        0.66,
+        0.035
+      ],
+      "roll": "palm"
+    },
+    "thigh_L": {
+      "head": [
+        0.112,
+        0.225,
+        -0.005
+      ],
+      "tail": "shin_L"
+    },
+    "shin_L": {
+      "head": [
+        0.118,
+        0.13,
+        -0.014
+      ],
+      "tail": "foot_L"
+    },
+    "foot_L": {
+      "head": [
+        0.119,
+        0.065,
+        -0.03
+      ],
+      "tail": "toes_L",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "toes_L": {
+      "head": [
+        0.125,
+        0.025,
+        0.07
+      ],
+      "tail": [
+        0.13,
+        0.012,
+        0.135
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail": {
+      "head": [
+        0,
+        0.31,
+        -0.15
+      ],
+      "tail": [
+        0,
+        0.31,
+        -0.225
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    }
+  },
+  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from cuts of the mesh and from its edge loops. Arm (axis y 0.669 to 0.664, z 0 to 0.035, radius 0.08 at the armpit to 0.055 at the wrist): the arm leaves the trunk at x 0.19 (the trunk is 0.187 units wide at the armpit), so the shoulder joint lies at x 0.15 inside the arm root. The outline has no elbow step, so the elbow lies at x 0.27, at the clean ring at x 0.277, and the upper arm (0.12) is a little longer than the forearm (0.095), as on the bear of main. The wrist lies at x 0.365, where the arm is thinnest and the paw starts to widen to the front. The knuckles lie at x 0.43, where the five claws start (x 0.41 to 0.46), and the tip of the paw at x 0.478. Leg: the crotch is at y 0.19, so the thigh lies in the haunch. The hip joint at y 0.225 in the middle of the leg (x 0.115); the knee at y 0.13, between the leg rings at y 0.104 and 0.161; the ankle at y 0.065, at the closed ring at y 0.069; the ball of the foot at z 0.07, and the toe tips at z 0.135. The thigh leans 6 degrees from the vertical, so that its rest frame in the frame of the hips stays exact. Trunk: the belly is deepest at y 0.35 to 0.41 (z -0.188 to 0.23), the trunk is narrowest at y 0.57 (x 0.187), and the neck at y 0.77 to 0.79 (x 0.133). The spine bones lie at about 0.35 of the depth from the back. The chin is at y 0.78, and the skull top at y 0.97. Ears: the root at y 0.935, the tips at (0.1, 1.0, 0.01). Tail: a loose ball at y 0.26 to 0.363 and z -0.145 to -0.23, with its open root loop at (0, 0.315, -0.15). The palm is the true palm of the source: the paw pads are not painted, the claws curl down, and the mean normal of the lower faces of the paw is (0.31, -0.95, -0.05).",
+  "palm": [
+    0,
+    -1,
+    0.1
+  ],
+  "studio": {
+    "legTurns": {
+      "thigh": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "shin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "foot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "toes": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "trunk": {
+      "open": 0,
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
+    },
+    "bindArms": {
+      "upper_arm": [
+        0.813873,
+        -0.143043,
+        0.563161
+      ],
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
+    },
+    "note": "The bear stands on its podium in the app, so the bind keeps the legs of the source: each leg turn is the identity. The trunk does not recline (open 0). The values are those of the bear of main (tools/mesh-rigs/bear.json).",
+    "straightArms": true,
+    "bindSupination": {
+      "L": 0,
+      "R": 0
+    },
+    "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the bear of main (tools/mesh-rigs/bear.json), so that the elbow axes and the zero of the roll of the upper arm stay."
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.05,
+    "eyeShare": 0.34,
+    "eyeBox": [
+      [
+        0.015,
+        0.87,
+        0.1
+      ],
+      [
+        0.06,
+        0.915,
+        0.14
+      ]
+    ],
+    "noseBox": [
+      [
+        -0.04,
+        0.828,
+        0.185
+      ],
+      [
+        0.04,
+        0.885,
+        0.235
+      ]
+    ],
+    "nose": [
+      0.33,
+      0.19,
+      0.09
+    ],
+    "tone": {
+      "chroma": 0.2,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          0,
+          0,
+          0
+        ],
+        [
+          0.97,
+          0,
+          0,
+          0
+        ]
+      ],
+      "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
+    },
+    "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
+    "eyeBoxNote": "The dark faces of the separate eyeballs of the source lie at x 0.034 to 0.052, y 0.886 to 0.905, and z 0.118 to 0.13. The nose box holds the dark brown faces of the nose (sRGB about 0.33, 0.19, 0.09) at x -0.035 to 0.035, y 0.83 to 0.88, and z 0.2 to 0.226."
+  },
+  "eyeShell": {
+    "lift": 0.002,
+    "points": 12,
+    "reach": 1,
+    "darkReach": 2,
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+  },
+  "chair": {
+    "halfWidth": 0.24,
+    "front": -0.13,
+    "back": -0.19,
+    "backHeight": 0.15,
+    "note": "The chair of the rig sets the seat top of the seated bind. The bear stands in the app, so no player sits on this seat."
+  },
+  "armSegments": {
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
+  },
+  "body": {
+    "crease": 40,
+    "colorBlend": 0.05
+  },
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle and the color blend of the bear of main.",
+  "texture": "assets/models/bear/tripo-p2/bear.fbm/bear_basecolor.jpg",
+  "rollSplit": true,
+  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/bear/README.md, \"tripo-hand/bear.blend\")."
+}
