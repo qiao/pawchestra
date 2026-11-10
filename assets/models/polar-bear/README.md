@@ -778,6 +778,50 @@ row: thigh T (1 - s'), shin T s', s' = s + b (s_lin(z) - s); the other bones kee
 
 No knee face folds now in `pnpm fold-probe pianist`.
 
+**Color map** (`i_texture.py`). The mesh object has the property `texture`
+(`assets/models/polar-bear/tripo-hand/polar-bear-color.webp`), and the mesh keeps the UV map of
+the FBX. The edge ring cuts of the arms and the knees interpolate it inside each face, so they add
+no seam. The paw, arm, and leg edits of the form step move no UV: they make the texels of those
+faces denser, and no face stretches its texels. No face is `plain`: the mesh has no whiskers, and
+the gloss nose keeps its color. The fur faces take sRGB (233, 228, 218), the color of `FUR` below,
+in place of the cream region color, for the frames before the map loads.
+
+The Tripo map paints a tan bear: the median of its fur texels (Oklab L above 0.72) is Oklab L
+0.818, C 0.072, h 76. `tools/polar-bear-maps.py` writes the map from the source image and the rig
+file, and it is deterministic:
+
+```text
+uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/polar-bear-maps.py
+```
+
+It scales the source to 2048 pixels (Lanczos) and moves each texel in Oklab. A fur texel takes
+`FUR` (L 0.92, C 0.015, h 85) plus 0.7 of its own lightness step and 0.3 of its own chroma step
+from the source fur, so the strands stay as small light changes in the white. A dark texel (L
+below 0.55: the nose, the pads, and the mouth line) keeps its lightness and 0.6 of its chroma.
+Between L 0.55 and 0.72 a texel takes a smoothstep mix of the two moves. The texels of the 18
+claws (the loose parts of 25 to 40 positions in the rig file, 86,525 texels) take `CLAW` (L 0.25,
+C 0.012, h 60) plus 0.25 of their own lightness step: the source paints the claws brown with light
+tips (median L 0.635), and they read pale gray beside the black claws of main. The texels of the
+eyeballs (`ownEyes`, 262 triangles, 12,348 texels with a margin of 4) keep their colors. WebP
+quality 60, method 6 (Pillow 13.0.0). Run it again after each export that changes the UVs, the
+claws, or the eyes.
+
+The hall view of the app sets the target: `close-views play --demo bach-bwv1050 --time 31
+--no-fill --size 2880x1800` (the normal camera, the key light from the back, no fill light). The
+median Oklab L, C, and h of the bear pixels (the box 0.1 to 0.3 by 0.5 to 0.75 of the image,
+pixels with L above 0.5 and C below 0.14):
+
+| Body | L | C | h | Clipped pixels |
+|---|---|---|---|---|
+| Before (the cream face colors) | 0.582 | 0.083 | 60.3 | 0.2 % |
+| After (`polar-bear-color.webp`) | 0.646 | 0.069 | 61.0 | 0.1 % |
+| Main polar bear | 0.633 | 0.067 | 59.8 | 0.0 % |
+
+With C below 0.08 the fur alone gives L 0.664 against 0.651 on main. The pianist sits behind the
+piano, so close views of the hall light check it too (`--at polar-bear`, 31 s): L 0.682 against
+0.712 on main from the azimuth 35, and 0.682 against 0.692 from the azimuth -60. The white does
+not clip to flat white: at most 0.6 % of the bear pixels have a channel at 253 or more.
+
 **Arm gate** (`pnpm arm-check pianist --base main`), the value and main in parentheses:
 
 | Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
