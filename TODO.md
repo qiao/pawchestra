@@ -706,9 +706,13 @@ passes.
       raised right forearm meets the cheek when the head turns to a section on the right. The head
       of this body sits 11 cm higher and its muzzle 4 cm further forward than on main. A change of
       the turn of the head in a cue (`CUE_MOTION`) or of the form of the head is next.
-- [ ] Tripo bear candidate: the arm gate fails the folds against main (`pnpm arm-check conductor
-      --base main`): L 50 (main 7) in the lift, most at the left inner elbow (`elbow_L`), and R 29
-      (main 9), most in the baton fist (`hand_R`, `fingers_R`). The round start gave the same.
+- [ ] Tripo bear candidate: up to 8 faces of the throat under the muzzle fold in the lift and in
+      2% to 5% of the play (`pnpm fold-probe conductor`: faces 3774, 3767, 3684, 1783, main bone
+      `head`). Their vertices keep automatic rows with about 0.08 `ear_L`, `ear_R`, and
+      `clavicle_*`. Try exact rows {`head`, `neck`} there. The arm gate does not count them.
+- [ ] Tripo bear candidate: the longer elbow blend of round 12 moves the left flat p5 of the
+      conductor from 0.88 to 0.86 (main 0.83, limit 0.55) and the left move turn max from 448 to
+      450 (main 484). Check the bent left elbow in the hall view.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
 - [ ] Cat candidate (`tripo-hand/`): the left upper arm takes 44.5° and the forearm 43.7° in the
@@ -716,10 +720,9 @@ passes.
       turns about 8° less on the viola neck (a new viola place). A second paw ring step with the
       left elbow axis turned 20° gives 24.5° and 19.7° in the play, but -55° and -63° at rest,
       and no `restPawTurnL` or `restPoleL` brings both rest parts to 45°.
-- [ ] Cat candidate: the arm gate fails the folds against main (`pnpm arm-check violist --base
-      main`): L 41 (main 2) at rest and R 18 (main 2) in the play. Most folded faces lie in the
-      curled claws and the paw heel (`fingers_R`, `fingers_L`, `hand_L`, `hand_R`). The round
-      start gave the same.
+- [ ] Cat candidate: the violist folds p95 are L 6 and R 6 (main 2 and 2, limit 8). At rest, the
+      pads of the left palm still fold where the paw curls 117°, and the armpits (`clavicle_*`)
+      fold 2 to 4 faces.
 - [ ] Cat candidate: a soft star of facets stays on the white crotch at the frog
       (`reports/2026-11-10-cat-hand-r10/panel.png`). The normals are smooth, so it comes from the
       rim lights that the app calculates at the vertices of the large crotch faces.
