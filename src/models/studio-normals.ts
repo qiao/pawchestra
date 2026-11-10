@@ -22,6 +22,7 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * where it joins the hanging arm, so these faces turn more than the crease angle from the skin
  * around them, and a raised arm shows them as a dark crack. So a corner of a rim face gets the
  * mean of the normals of all `matte` faces at its vertex that are no caps, with no crease angle.
+ * A hand rig also marks the faces of a fold of its bind, such as a seated crotch, as `rim`.
  *
  * The faces of `eyeballs` are the `eye` faces of the mesh of a hand rig. A corner of such a
  * face gets the mean of the normals of the eyeball faces at its vertex, with no crease angle, so
@@ -30,7 +31,8 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * @param mesh The places of the welded vertices, the corners, and the finishes of the mesh.
  * @param crease The crease angle in degrees.
  * @param caps The `matte` triangles of the caps of the arms (`StudioBody.caps`).
- * @param rim The `matte` triangles of the rim of the caps of the body (`StudioBody.rim`).
+ * @param rim The `matte` triangles of the rim of the caps and of the folds of the body
+ *   (`StudioBody.rim`).
  * @param eyeballs The triangles of the eyes of the mesh (`StudioBody.eyeballs`).
  * @returns x, y, z of the unit normal of each corner, in the order of `mesh.corners`.
  */
