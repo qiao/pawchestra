@@ -1,20 +1,25 @@
 # Writes the two color maps of the Tripo fox from the color map of its FBX (design 4.5,
 # assets/models/fox/README.md, "Color map" and "Tan color map"): `fox-color.webp` for the red fox
-# and `fox-tan-color.webp` for the tan fox. Each map scales the source image to 2048 pixels and
-# moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the
-# main fox in the app light. In the tan map, the orange fur goes to the tan fur of the main fox in
-# the app light, and the dark socks go to the tan accent of SPECIES_COLORS of src/models/colors.ts
-# at the lightness of the tan palette of the faces. In both maps the cream belly, the white, and
-# the black keep their colors, the brow spots take the fur around them, and each leg and forearm
-# gets a sharp sock edge. Each texel takes a mix of the steps of the colors, by its nearness to
-# each color, so the blend between two colors of the fur stays smooth. The texels of the eyeballs
-# keep their colors: the script reads their triangles and texture points from the rig file
-# (`ownEyes` of the export). The output depends only on the input files.
+# and `fox-tan-color.webp` for the tan fox, and the normal map of the fur, `fox-normal.webp`, which
+# both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels and moves
+# each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
+# fox in the hall light, and the socks get darker. In the tan map, the orange fur goes to the tan
+# fur of the main fox in the hall light, and the dark socks go to the tan accent of SPECIES_COLORS
+# of src/models/colors.ts at the lightness of the tan palette of the faces. In both maps the cream,
+# the white, and the black keep their colors, and each leg and forearm gets a sharp sock edge.
+# Each texel takes a mix of the steps of the colors, by its nearness to each color, so the blend
+# between two colors of the fur stays smooth. Only the texels of the limbs and the head take the
+# step of the socks. The texels of the eyeballs keep their colors: the script reads their
+# triangles, texture points, and the joints from the rig file (`ownEyes` of the export). The
+# output depends only on the input files and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 import json
+import os
 import struct
+import subprocess
 import sys
+import tempfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -24,6 +29,15 @@ RIG = 'assets/models/fox/tripo-hand/fox.rig.glb'
 FOLDER = 'assets/models/fox/tripo-hand/'
 SIZE = 2048
 QUALITY = 60
+#: The normal map of the source and the web copy of the normal map of the fur, which the red fox
+#: and the tan fox share.
+NORMAL_SOURCE = 'assets/models/fox/tripo-p2/fox.fbm/fox_normal.jpg'
+NORMAL_OUT = FOLDER + 'fox-normal.webp'
+#: The size of the normal map, its largest tilt (x, y), and the gain of the stored tilts
+#: (`NORMAL_MAP_GAIN` of src/scene/fur.ts).
+NORMAL_SIZE = 1024
+NORMAL_LIMIT = 0.2
+NORMAL_GAIN = 4
 
 #: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the red map. The hall view
 #: of the app (the key light from the back, no fill light) is the target, because there the fur
@@ -32,35 +46,35 @@ QUALITY = 60
 #: the fox of main. In the seated 3/4 view with the fill light (`close-views play --at fox-red
 #: --azimuth 35 --zoom 1.3`), it is L 0.568, C 0.127, h 41.7, against L 0.555, C 0.131, h 40.3.
 #: The target lies a little outside the sRGB gamut, so a larger chroma moves no texel further.
-RED_FUR = (0.485, 0.155, 58.0)
+RED_FUR = (0.44, 0.16, 54.0)
 #: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. In the hall
 #: view (the key light from the back, no fill light), the target L 0.80 made the fur read near
 #: white beside the tan fox of main. This target gives the median fur L 0.638, C 0.103, h 55.5 in
 #: that view (L 0.649, C 0.101, h 56.5 before), and L 0.663, C 0.103, h 55.6 in the 3/4 view
 #: with the fill light (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3
 #: --time 6`), against L 0.612, C 0.103, h 55.3 on the tan fox of main.
-TAN_FUR = (0.75, 0.105, 72.0)
-#: The colors of the red fox in the map (sRGB) and the colors that take their place, for each map:
-#: the region colors of the face colors of the hand rig (assets/models/fox/README.md, "Smooth
-#: surface"), and the white, the black, and the cream of the map, which keep their colors. A target
-#: is an sRGB color, or ('oklch', L, C, h). The tan fur takes TAN_FUR. The tan socks take the Oklab
-#: hue and chroma of the accent of SPECIES_COLORS['fox-tan'] and the Oklab lightness that the tan
-#: palette of the faces gives them (paletteMap() of tools/studio-palette.ts): sRGB (153, 97, 49).
+TAN_FUR = (0.68, 0.11, 68.0)
+#: The colors of the red fox in the map (sRGB, the median texel of each region of the faces) and
+#: the colors that take their place, for each map: the orange fur, the dark socks, the cream, the
+#: low muzzle and inner ear tone, the white, and the black. A target is an sRGB color, or ('oklch',
+#: L, C, h). The tan fur takes TAN_FUR. The tan socks take the Oklab hue and chroma of the accent
+#: of SPECIES_COLORS['fox-tan'] and the Oklab lightness that the tan palette of the faces gives
+#: them (paletteMap() of tools/studio-palette.ts): sRGB (143, 102, 62).
 MAPS = {
     'fox-color.webp': (
-        ((220, 98, 12), ('oklch', *RED_FUR)),  # the orange fur to the red-orange of main
-        ((73, 37, 17), (73, 37, 17)),  # the dark socks, the paws, and the ear tips
-        ((244, 215, 191), (244, 215, 191)),  # the cream belly and cheeks
-        ((206, 168, 143), (206, 168, 143)),  # the muzzle and the inner ears
-        ((255, 255, 255), (255, 255, 255)),  # the white lights and the tail tip
+        ((230, 108, 11), ('oklch', *RED_FUR)),  # the orange fur to the red-orange of main
+        ((76, 46, 23), (34, 20, 11)),  # the dark socks, the paws, the ear tips, and the brows
+        ((240, 201, 158), (240, 201, 158)),  # the cream bib, cheeks, muzzle, and tail tip
+        ((176, 131, 106), (176, 131, 106)),  # the inner ears and the shade of the cream
+        ((255, 255, 255), (255, 255, 255)),  # the white lights
         ((8, 6, 5), (8, 6, 5)),  # the black nose and lips
     ),
     'fox-tan-color.webp': (
-        ((220, 98, 12), ('oklch', *TAN_FUR)),  # the orange fur to the tan fur
-        ((73, 37, 17), (143, 102, 62)),  # the dark socks to the tan accent
-        ((244, 215, 191), (244, 215, 191)),  # the cream belly and cheeks
-        ((206, 168, 143), (206, 168, 143)),  # the muzzle and the inner ears
-        ((255, 255, 255), (255, 255, 255)),  # the white lights and the tail tip
+        ((230, 108, 11), ('oklch', *TAN_FUR)),  # the orange fur to the tan fur
+        ((76, 46, 23), (143, 102, 62)),  # the dark socks to the tan accent
+        ((240, 201, 158), (240, 201, 158)),  # the cream bib, cheeks, muzzle, and tail tip
+        ((176, 131, 106), (176, 131, 106)),  # the inner ears and the shade of the cream
+        ((255, 255, 255), (255, 255, 255)),  # the white lights
         ((8, 6, 5), (8, 6, 5)),  # the black nose and lips
     ),
 }
@@ -74,31 +88,32 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
-#: The light spot that the source map paints above each eye: its middle from the middle of the
+#: The light spot over each eye of a source map that paints one: its middle from the middle of the
 #: eyeball, in the axes of the rig file (+x the left side, +y up, +z forward), with x toward the
-#: middle plane, and two radii, all in units of the distance of the eye from the middle plane.
-#: In the hall light the two spots read as raised inner brows, which give a worried face. In the
-#: triangles of the rig file with their middle in the inner sphere, each texel far from the orange
-#: fur takes the fur around it. In the outer sphere, only the light texels do, so that the dark
-#: lining of the eye keeps its color.
-BROW_SPOT = ((-0.205, 0.872, 0.836), 0.5, 0.7)
+#: middle plane, and two radii, all in units of the distance of the eye from the middle plane, as
+#: ((-0.205, 0.872, 0.836), 0.5, 0.7) for the first Tripo fox. In the hall light such spots read as
+#: raised inner brows, which give a worried face. The map of the new fox paints dark brows and no
+#: light spot, so the value is None.
+BROW_SPOT = None
 #: The texels around the brow triangles that a light spot texel can also take, so that no light
 #: edge stays where a texel of the spot lies just outside its triangles.
 BROW_GROW = 2
 #: The Oklab distance from the orange fur above which a texel of a brow triangle is a spot texel.
 BROW_FAR = 0.04
-#: The chains of joints of the sharp sock edges, each with the place of its edge along its middle
-#: bone, from the joint at the top of that bone (0) to the joint at its end (1). The source map
-#: fades the dark socks up over most of each leg and forearm, so that the legs read dirty in the
-#: hall light. Above the edge each texel takes the orange fur, below it the dark sock, and the
-#: bone above the middle bone takes the fur, the bone below it the sock.
+#: The chains of joints of the sharp sock edges, each with the index of the bone that holds the
+#: edge and the place of the edge along that bone, from the joint at its top (0) to the joint at
+#: its end (1). The source map fades the dark socks up over a band of each leg and forearm, so
+#: that the limbs read dirty in the hall light. Above the edge each texel takes the orange fur,
+#: below it the dark sock. The bones above the edge bone take the fur, the bones below it the
+#: sock. The source map ends the leg sock on the thigh just above the knee, and the arm sock on
+#: the forearm at a third of the way from the elbow.
 SOCK_EDGES = (
-    (('thigh', 'shin', 'foot', 'toes'), 0.45),
-    (('upper_arm', 'forearm', 'hand', 'fingers'), 0.4),
+    (('thigh', 'shin', 'foot', 'toes'), 0, 0.86),
+    (('upper_arm', 'forearm', 'hand', 'fingers'), 1, 0.35),
 )
 #: The distance of a texel from its bone in the seated bind, in units of the rig file, within which
 #: the texel belongs to the limb.
-SOCK_RADIUS = 0.075
+SOCK_RADIUS = 0.09
 #: The width of the soft step of the sock edge, as a share of the middle bone.
 SOCK_BAND = 0.04
 #: The largest Oklab distance of a texel from the line between the orange fur and the socks for
@@ -308,15 +323,15 @@ def sock_edges(rig, lab):
     target = np.full(share.shape, np.nan)
     best = np.full(share.shape, np.inf)
     for side in ('L', 'R'):
-        for chain, edge in SOCK_EDGES:
+        for chain, held, edge in SOCK_EDGES:
             j = [joints[f'{name}_{side}'] for name in chain]
             for k in range(len(j) - 1):
                 t, distance = segment_param(places, j[k], j[k + 1])
-                # The middle bone holds the edge. The bone above it takes the fur, and the
-                # bone below it the sock.
-                if k == 0:
+                # The edge bone holds the edge. The bones above it take the fur, and the bones
+                # below it the sock.
+                if k < held:
                     want = np.zeros_like(t)
-                elif k == 1:
+                elif k == held:
                     want = np.clip((t - edge) / SOCK_BAND + 0.5, 0, 1)
                 else:
                     want = np.ones_like(t)
@@ -334,7 +349,10 @@ def sock_edges(rig, lab):
     out = lab.copy()
     out[move] = orange + new[:, None] * line + off[move]
     moved = np.abs(new - s) > 0.02
-    return out, int(moved.sum())
+    # The texels that can take the step of the dark socks: the limbs, and the head above the neck
+    # joint (the ear tips and the brows).
+    dark = np.isfinite(target) | (places[..., 1] > joints['neck'][1])
+    return out, int(moved.sum()), dark
 
 
 def parts(mask):
@@ -366,8 +384,24 @@ def target_lab(target):
     return oklab(linear(target))
 
 
-def write_map(name, anchors, image, lab, eyes, count):
-    """Moves the texels of the scaled source by the steps of the anchors, and writes the map."""
+def write_map(name, anchors, image, lab, eyes, count, dark):
+    """Moves the texels of the scaled source by the steps of the anchors, and writes the map. Only
+    the texels of `dark` take the step of the dark socks: the source map shades the middle of the
+    belly with a brown that lies near the socks, and the step of the socks made a dark smudge
+    there."""
+    moved = move_texels(anchors, lab)
+    plain = move_texels([anchors[0], (anchors[1][0], anchors[1][0]), *anchors[2:]], lab)
+    moved = np.where(dark[..., None], moved, plain)
+    moved[eyes] = lab[eyes]
+    out = srgb8(linear_of_oklab(moved))
+    Image.fromarray(out).save(FOLDER + name, 'WEBP', quality=QUALITY, method=6)
+    changed = np.abs(out.astype(int) - np.asarray(image).astype(int)).max(axis=-1) > 2
+    print(f'{FOLDER}{name}: {SIZE} x {SIZE}, {count} eye triangles kept ({int(eyes.sum())} '
+          f'texels), {changed.mean() * 100:.1f} % of the texels moved')
+
+
+def move_texels(anchors, lab):
+    """Gives the Oklab image with each texel moved by the steps of the anchors (see MAPS)."""
     pairs = [(oklab(linear(source)), target_lab(target)) for source, target in anchors]
     for i, j in BLENDS:
         for f in (1 / 3, 2 / 3):
@@ -392,24 +426,48 @@ def write_map(name, anchors, image, lab, eyes, count):
         moved[..., 0] += shares[..., k] * step[0]
         moved[..., 1] += shares[..., k] * hue * step[1]
         moved[..., 2] += shares[..., k] * hue * step[2]
-    moved[eyes] = lab[eyes]
-    out = srgb8(linear_of_oklab(moved))
-    Image.fromarray(out).save(FOLDER + name, 'WEBP', quality=QUALITY, method=6)
-    changed = np.abs(out.astype(int) - np.asarray(image).astype(int)).max(axis=-1) > 2
-    print(f'{FOLDER}{name}: {SIZE} x {SIZE}, {count} eye triangles kept ({int(eyes.sum())} '
-          f'texels), {changed.mean() * 100:.1f} % of the texels moved')
+    return moved
+
+
+def write_normal_map():
+    """Writes the normal map of the fur: each x, y tilt of the source limited to the length
+    NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
+    255 in blue (the shader does not read it), and cwebp -q 60 -sharp_yuv -m 6. The limit comes
+    before the gain, so that no stored value clips."""
+    a = np.asarray(Image.open(NORMAL_SOURCE).convert('RGB')).astype(np.float64) / 255 * 2 - 1
+    t = a[..., :2].copy()
+    length = np.linalg.norm(t, axis=-1)
+    over = length > NORMAL_LIMIT
+    t[over] *= (NORMAL_LIMIT / length[over])[:, None]
+    k = t.shape[0] // NORMAL_SIZE
+    small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
+    v = np.clip(small * NORMAL_GAIN, -1, 1)
+    rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
+    rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
+    rgb[..., 2] = 255
+    with tempfile.TemporaryDirectory() as folder:
+        png = os.path.join(folder, 'normal.png')
+        Image.fromarray(rgb).save(png)
+        subprocess.run(['cwebp', '-quiet', '-q', '60', '-sharp_yuv', '-m', '6', png, '-o', NORMAL_OUT],
+                       check=True)
+    print(f'{NORMAL_OUT}: {NORMAL_SIZE} x {NORMAL_SIZE}, {over.mean() * 100:.2f} % of the source '
+          f'tilts limited, mean normal {np.round(a.reshape(-1, 3).mean(axis=0), 3).tolist()}, '
+          f'{int((a[..., 2] < 0).sum())} texels with z below 0')
 
 
 def main():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
-    lab, painted = brow_fill(rig, oklab(linear(np.asarray(image))))
-    print(f'{painted} texels of the brow spots take the fur around them')
-    lab, socks = sock_edges(rig, lab)
+    lab = oklab(linear(np.asarray(image)))
+    if BROW_SPOT is not None:
+        lab, painted = brow_fill(rig, lab)
+        print(f'{painted} texels of the brow spots take the fur around them')
+    lab, socks, dark = sock_edges(rig, lab)
     print(f'{socks} texels of the legs and the forearms take the sharp sock edge')
     eyes, count = eye_mask(rig, SIZE)
     for name, anchors in MAPS.items():
-        write_map(name, anchors, image, lab, eyes, count)
+        write_map(name, anchors, image, lab, eyes, count, dark)
+    write_normal_map()
 
 
 if __name__ == '__main__':
