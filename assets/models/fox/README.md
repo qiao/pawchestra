@@ -128,12 +128,12 @@ and the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 441,333 bytes |
-| SHA-256 | `3cd72a557008b725706198b58ffdc7ef642523649486a735d664783062902ef5` |
+| Size | 441,781 bytes |
+| SHA-256 | `8ccf5065ff92735a9de5f5fbf795398f61e562fc94cad7b35a2aa3ce9f77fb8f` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`: 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,066 vertices and 4,751 faces (3,291 quads and 1,460 triangles, 8,042 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
 | Facts | `height` 0.974204 (the shoulder joints at 0.638 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.929 ("Ear weights" below) |
 | Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
@@ -143,8 +143,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 570,496 bytes | `a3fc9a64c164707287b33c47402443c201f8707237bd34ef3e961b69fd9bf8e3` |
-| `tripo-hand/fox.rig.json` | 9,925 bytes | `6286e0e08acc540376901333659f037009f895446e0e4144b5bddddab0bce50c` |
+| `tripo-hand/fox.rig.glb` | 570,488 bytes | `702682788eec6faf9dbc4d7588058755cc83ca66c627d6ecc6a440a53fa2b3b5` |
+| `tripo-hand/fox.rig.json` | 9,926 bytes | `a978126d4e303091c5b3534c2cc4c00c936c859f71949217f17e04ded7b11fd0` |
 
 The edits, in the order of the work:
 
@@ -347,5 +347,26 @@ The seat top is the lowest point of the body over the seat, so a seat under most
 lies near the knee: the knee joint of the Tripo fox is 0.262 m above the floor, and the underside
 of the thigh near the knee 0.236 m. With the front edge at z 0.11 the top is 0.241 m, and with a
 vertical shin 0.240 m. The trunk bones stay upright: the line from the hips to the neck leans
-0.5° back in the bind and in each moment of the violinist. The arm twists stay within 44° in the
+about 1° back in the bind and in each moment of the violinist. The arm twists stay within 44° in the
 moments and the samples of "Arm twist" (the violin rest on the thigh moves a little).
+
+**Belly.** The thighs of the bind give the lower belly vertices (rest z 0.34 to 0.42) thigh
+shares of 0.14 to 0.71. The raised thighs moved them, and the faces of the lower belly pointed
+down by up to 43° in the bind (39° with the thighs at 25°): a dark crease at the top of each
+thigh in the front view of the app. The key `bind_belly` relaxes the posed bind of 22 chosen
+vertices, with this call in the live Blender:
+
+```python
+import bind_edit as be  # tools/blender/
+# S: each vertex with rest z from 0.34 to 0.42, y below 0, atan2(|x|, -y) at most 60 degrees,
+# and a distance from the z axis below 0.2.
+# Each round: P[i] += 0.5 * ((mid - P[i]) . n[i]) * n[i] for each i in S at the same time.
+# mid: the middle of the mean of the edge neighbors above and the mean of those below (rest z
+# more than 0.01 apart). n: the vertex normal of the bind before the key. Four rounds.
+be.add_bind_move(body, rig, P_after_4_rounds - P_bind, 'bind_belly')
+```
+
+The largest move is 0.0087 units, and the mean is 0.0042. The move goes along the normal only,
+so the girth of each ring stays. The faces of the lower belly point down by at most 32° (43°
+before), and 6 of its 44 faces by more than 30° (12 before). The key `bind_belly` is the only key
+`bind*`.
