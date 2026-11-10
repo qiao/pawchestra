@@ -97,10 +97,13 @@ PUPIL_WARM = 15
 #: face about 11 degrees out, so the middle value keeps the eyes nearly parallel and the irises
 #: nearly in the middle.
 GAZE_ACROSS = 0.5
+#: The half width in degrees of the band across the opening about the gaze in which the height
+#: of the opening counts.
+GAZE_BAND = 8.0
 #: The angle in degrees of the gaze above the middle of the opening.
 GAZE_UP = 0.0
 #: The iris radius as a share of half the height of the eye opening of the front view.
-IRIS_FILL = 1.05
+IRIS_FILL = 1.12
 #: The pupil radius as a share of the iris radius.
 PUPIL_SHARE = 0.45
 #: The width of the soft edge of the iris to the sclera, as a share of the iris radius.
@@ -648,9 +651,9 @@ def ball_frame(rig, faces):
 
 
 def angles(d, t, u, e):
-    """Gives the angles in degrees of the unit directions d up from t (toward u) and across from
-    t (toward e)."""
-    return np.degrees(np.arctan2(d @ u, d @ t)), np.degrees(np.arctan2(d @ e, d @ t))
+    """Gives the angles in degrees of the unit directions d: the elevation above the plane of t and
+    e (toward u), and the turn across from t (toward e) about u."""
+    return np.degrees(np.arcsin(np.clip(d @ u, -1, 1))), np.degrees(np.arctan2(d @ e, d @ t))
 
 
 def iris_profile(colors, d, p):
@@ -679,10 +682,11 @@ def paint_eyes(rig, image):
     and a dark ring around it, and the rest of the ball dark brown. In the app the eyes read as
     glass doll eyes that look past the viewer. For each side (c, r, and the front axes t, u, e of
     `ball_frame()`), from the ball points that show in the front view:
-    - The gaze g: the middle of the opening (psi, lam of `angles()`) at GAZE_ACROSS of its
-      angle across and GAZE_UP degrees up, so that both eyes look at the viewer nearly parallel.
-    - The iris radius a: IRIS_FILL of half the height of the opening, so that the iris fills
-      most of the opening and its top lies a little under the upper lid.
+    - The gaze g: GAZE_ACROSS of the middle angle across of the opening (lam of `angles()`), and
+      the middle elevation of the opening within GAZE_BAND degrees of that angle, GAZE_UP degrees
+      up, so that both eyes look at the viewer nearly parallel.
+    - The iris radius a: IRIS_FILL of half the height of the opening there, so that the iris
+      fills most of the opening and its top lies a little under the upper lid.
     - A texel at the angle b from g and the turn phi about g: a pupil of PUPIL_SHARE of the iris
       radius with a soft edge, the iris from there to a, and a soft edge of IRIS_SOFT of a to the
       sclera. The iris takes the source color of the same ball at the same phi about the source
@@ -708,8 +712,11 @@ def paint_eyes(rig, image):
         c, r, shown = ball_frame(rig, faces)
         t, u, e = np.array([0.0, 0, 1]), np.array([0.0, 1, 0]), np.array([1.0, 0, 0])
         psi, lam = angles(shown, t, u, e)
-        mid_psi = (psi.min() + psi.max()) / 2
         mid_lam = (lam.min() + lam.max()) / 2
+        # The height of the opening where the gaze crosses it.
+        band = np.abs(lam - GAZE_ACROSS * mid_lam) < GAZE_BAND
+        psi = psi[band]
+        mid_psi = (psi.min() + psi.max()) / 2
         gp, gl = np.radians(mid_psi + GAZE_UP), np.radians(GAZE_ACROSS * mid_lam)
         g = np.array([np.sin(gl) * np.cos(gp), np.sin(gp), np.cos(gl) * np.cos(gp)])
         gu = u - (u @ g) * g
@@ -767,7 +774,7 @@ def paint_eyes(rig, image):
         to_white = smooth(1 - IRIS_SOFT, 1 + IRIS_SOFT, b / a)
         color = color * (1 - to_white[:, None]) + white * to_white[:, None]
         out[ys, xs] = color
-        print(f'eye {side}: opening psi {psi.min():.1f} to {psi.max():.1f}, lam {lam.min():.1f} to '
+        print(f'eye {side}: opening elevation {psi.min():.1f} to {psi.max():.1f} at the gaze, across {lam.min():.1f} to '
               f'{lam.max():.1f} degrees; gaze psi {mid_psi + GAZE_UP:.1f}, lam '
               f'{GAZE_ACROSS * mid_lam:.1f}; iris radius {a:.1f} degrees; source pupil edge {edge:.0f}, '
               f'amber end {end:.0f} degrees')
