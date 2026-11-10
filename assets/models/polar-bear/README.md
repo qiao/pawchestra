@@ -783,12 +783,25 @@ No knee face folds now in `pnpm fold-probe pianist`.
 | Arm | Folds p95 | Twist p95 | Forearm twist p95 | Paw twist p95 | Paw swing p95 | Grip turn p50 |
 |---|---|---|---|---|---|---|
 | Left | 9 (9) | 41° (39°) | 34° (58°) | 69° (88°) | 37° (30°) | 7° (6°) |
-| Right | 17 (8) FAIL | 41° (38°) | 20° (27°) | 23° (37°) | 65° (40°) | 4° (4°) |
+| Right | 6 (8) | 40° (38°) | 20° (27°) | 22° (37°) | 36° (40°) | 4° (4°) |
 
-Each skin twist of each arm part stays at 41° or less. The right folds come in the rest pose: the
-paw swing of 65° folds the inner right wrist, and thin triangles at the back of the right knee
-fold in the pedal pose. The elbow helper reach of 0.07 units (0.035 before) took the left folds
-from 13 to 9.
+Each skin twist of each arm part stays at 41° or less, and the gate passes (exit code 0). The left
+folds are at main (`OPEN` at the limit 8). Two changes took the right folds from 17 to 6:
+
+- **Right rest paw.** The right folds came in the rest pose: the right paw swung 65° off its bind
+  and folded 17 faces of the inner wrist, the left paw 37°. A paw turns in the plane of its palm
+  toward its forearm (`palmTurnAngle()` of `src/models/studio-rig.ts`), but the right paw turns
+  only by positive angles, toward a baton. The mirror of the left rest fingers needs a negative
+  turn on the right, so the right paw kept the full bend. `restR.fingers` of the piano hold
+  (`src/pose/hands.ts`) now points 70° from that mirror in the plane of the palm, the turn that
+  the left paw gets: the right paw swing p95 is 36°, and the folds p95 at rest are 8. The
+  supination of the bind does not change the swing (17 folds and 65° with the right supination at
+  0° and at 52°), and the elbow axis turns only the forearm twist.
+- **Smaller paws** ("Form toward the main polar bear"): 8 to 6.
+
+The elbow helper reach of 0.07 units (0.035 before) took the left folds from 13 to 9. The thin
+triangles at the back of the right knee in the pedal pose had no arm weight, so they never counted
+here ("Knee rows").
 
 The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
 
