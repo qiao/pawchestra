@@ -1,9 +1,9 @@
 # Writes the color map of the tan fox, `assets/models/fox/tripo-hand/fox-tan-color.webp`, from the
 # color map of the Tripo fox (design 4.5, assets/models/fox/README.md, "Tan color map"). It scales
 # the source image to 2048 pixels as the red copy `fox-color.webp`, and moves each texel in Oklab
-# by a step: the orange fur goes to the tan fur and the dark socks to the tan accent of
-# SPECIES_COLORS of src/models/colors.ts, and the cream belly, the white, and the black keep their
-# colors. Each texel takes a mix of the steps of the colors, by its nearness to each color, so the
+# by a step: the orange fur and the dark socks go to the tan fur and the tan accent of
+# SPECIES_COLORS of src/models/colors.ts at the lightness of the tan palette of the faces, and the
+# cream belly, the white, and the black keep their colors. Each texel takes a mix of the steps of the colors, by its nearness to each color, so the
 # blend between two colors of the fur stays smooth. The texels of the eyeballs keep their colors:
 # the script reads their triangles and texture points from the rig file (`ownEyes` of the
 # export). The output depends only on the input files.
@@ -24,10 +24,14 @@ QUALITY = 60
 
 #: The colors of the red fox in the map (sRGB) and the colors that take their place: the region
 #: colors of the face colors of the hand rig (assets/models/fox/README.md, "Smooth surface"), and
-#: the white, the black, and the cream of the map, which keep their colors.
+#: the white, the black, and the cream of the map, which keep their colors. The fur and the socks
+#: take the Oklab hue and chroma of the fur and the accent of SPECIES_COLORS['fox-tan'] and the
+#: Oklab lightness that the tan palette of the faces gives them (paletteMap() of
+#: tools/studio-palette.ts): sRGB (186, 118, 73) and (153, 97, 49). The colors of SPECIES_COLORS
+#: themselves are lighter, and the tan fur then read cream in the light of the app.
 ANCHORS = (
-    ((220, 98, 12), (0xC9, 0xA2, 0x73)),  # the orange fur to the tan fur
-    ((73, 37, 17), (0x9A, 0x71, 0x48)),  # the dark socks to the tan accent
+    ((220, 98, 12), (166, 129, 83)),  # the orange fur to the tan fur
+    ((73, 37, 17), (143, 102, 62)),  # the dark socks to the tan accent
     ((244, 215, 191), (244, 215, 191)),  # the cream belly and cheeks
     ((206, 168, 143), (206, 168, 143)),  # the muzzle and the inner ears
     ((255, 255, 255), (255, 255, 255)),  # the white lights and the tail tip
