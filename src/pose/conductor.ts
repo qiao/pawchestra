@@ -133,9 +133,15 @@ export const CONDUCTOR_HOLD = {
    * the rest pose (design 5.2). The arms hang beside the round belly, and the paws hang down at
    * the sides of the belly, as on the bear of main. With the angles of a standing player (20° and
    * 60°), the forearms of the Tripo bear lie on the top of its belly, and the paws point at the
-   * players.
+   * players. The search of the swing out to the side starts at `minOut`, and each part then
+   * swings out by `extraOut` more.
    */
-  restArm: { forward: 20 * MathUtils.DEG2RAD, bend: 11.5 * MathUtils.DEG2RAD },
+  restArm: {
+    forward: 20 * MathUtils.DEG2RAD,
+    bend: 11.5 * MathUtils.DEG2RAD,
+    minOut: 16 * MathUtils.DEG2RAD,
+    extraOut: 0,
+  },
   /**
    * The left elbow of the rest pose points down and back. The elbow of the hanging arm is the
    * bend of a nearly straight arm, so a change of 1° of the swing out to the side turns the upper

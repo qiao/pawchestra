@@ -28,6 +28,13 @@ export interface HangAngles {
   readonly forward: number;
   /** The forward bend of the elbow. */
   readonly bend: number;
+  /** The smallest swing out to the side of the search. `HANG.minOut` when absent. */
+  readonly minOut?: number;
+  /**
+   * A swing out to the side that each part adds to the swing of the search, so that the arm keeps
+   * clear of a round belly in 3D. The search sees the body only along x. 0 when absent.
+   */
+  readonly extraOut?: number;
 }
 
 /** The angles of the hanging arm. */
@@ -279,12 +286,13 @@ function hangOut(model: PlayerModel, arm: ArmRig, angles: HangAngles, minOut: nu
 /**
  * Finds the hanging arm of a standing player for the rest pose (design 5.2). The arm swings out
  * to the side by the smallest angle at which each part touches the side of the torso and the legs
- * of the bind pose, seen along x ({@link hangOut}).
+ * of the bind pose, seen along x ({@link hangOut}), from the smallest swing of the angles, and then
+ * by their extra swing.
  *
  * @param model The player model.
  * @param arm The arm.
- * @param angles The forward swing of the upper arm and the forward bend of the elbow, in radians.
- *   The angles of {@link HANG} by default.
+ * @param angles The forward swing of the upper arm, the forward bend of the elbow, and the swings
+ *   out to the side, in radians. The angles of {@link HANG} by default.
  * @returns The hanging arm.
  */
 export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles = HANG): HangingArm {
@@ -294,9 +302,10 @@ export function hangingArm(model: PlayerModel, arm: ArmRig, angles: HangAngles =
   const elbow = new Vector3(...arm.bind.elbow);
   const upperLength = elbow.distanceTo(shoulder);
   const lowerLength = new Vector3(...arm.bind.wrist).distanceTo(elbow);
-  const out = hangOut(model, arm, angles, HANG.minOut);
-  const upper = downward(out.upper, forward, side, new Vector3());
-  const lower = downward(out.lower, forward + bend, side, new Vector3());
+  const out = hangOut(model, arm, angles, angles.minOut ?? HANG.minOut);
+  const extra = angles.extraOut ?? 0;
+  const upper = downward(out.upper + extra, forward, side, new Vector3());
+  const lower = downward(out.lower + extra, forward + bend, side, new Vector3());
   const hangWrist = upper.clone().multiplyScalar(upperLength).addScaledVector(lower, lowerLength);
   const along = hangWrist.clone().normalize();
   const pole = upper.clone().addScaledVector(along, -upper.dot(along)).normalize();
