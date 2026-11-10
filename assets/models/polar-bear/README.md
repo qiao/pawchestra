@@ -668,14 +668,14 @@ weights. The trunk loop around each arm root keeps them too.
 
 **Form toward the main polar bear.** At the same H, the arms and the legs of the Tripo mesh were
 thicker than on the main polar bear, the paws longer and wider, and the eyes larger. `c_form.py`
-makes three point edits on the rest mesh, with the values (paw a, w, n) = (0.55, 0.6, 0.8), arm 0.87,
+makes three point edits on the rest mesh, with the values (paw a, w, n) = (0.49, 0.47, 0.72), arm 0.87,
 thigh 0.93, shin 0.91, and eye 0.85:
 
 - Paws: each vertex past the wrist joint maps in the frame of its paw (origin the head of
   `hand_<side>`, a the rest forearm axis, w the first principal axis of the paw across a, n =
-  a × w): P = c + 0.55 d a + (1 - 0.4 s)(v · w) w + (1 - 0.2 s)(v · n) n, with d = (P - c) · a and
+  a × w): P = c + 0.49 d a + (1 - 0.53 s)(v · w) w + (1 - 0.28 s)(v · n) n, with d = (P - c) · a and
   s = smoothstep(0, 0.025, d). Each claw moves with the map of the middle of its base and scales
-  by 0.64 (the cube root of 0.55 × 0.6 × 0.8) about it. The bones `fingers_<side>` and
+  by 0.55 (the cube root of 0.49 × 0.47 × 0.72) about it. The bones `fingers_<side>` and
   `digit<k>_<side>` take the map, and each paw bone keeps its turn in the bind
   (`sa.set_world_turns()` after `align_roll()` to its hint).
 - Limb girth: each arm vertex moves toward the center line of the arm (a curve through the
@@ -688,7 +688,7 @@ thigh 0.93, shin 0.91, and eye 0.85:
   0.9243), radius 0.0117). Each head vertex within 0.03 units of the middle moves toward it by
   0.85, with a smoothstep back to 1 at 0.06, so the socket shrinks with the ball.
 
-1,797 vertices move, at most 0.0595 units (the claw tips). The measures of the rest T-pose, as a
+1,797 vertices move, at most 0.0696 units (the claw tips). The measures of the rest T-pose, as a
 share of H (sections across the bone at its middle, the thigh at 0.6 from the hip):
 
 | Measure | Before | After | Main polar bear |
@@ -697,7 +697,7 @@ share of H (sections across the bone at its middle, the thigh at 0.6 from the hi
 | Forearm girth | 1.85 | 1.61 | 1.46 |
 | Thigh girth | 2.94 | 2.75 | 2.58 |
 | Shin girth | 2.20 | 2.02 | 1.87 |
-| Paw length (wrist joint to claw tip), width, height | 0.66, 0.81, 0.43 | 0.37, 0.55, 0.37 | 0.33, 0.47, 0.34 |
+| Paw length (wrist joint to claw tip), width, height | 0.66, 0.81, 0.43 | 0.325, 0.475, 0.353 | 0.329, 0.467, 0.343 |
 | Eye diameter (eyeball, or the bead eye of main) | 0.120 | 0.101 | 0.088 |
 | Head width, depth | 1.03, 1.59 | 1.03, 1.57 | 0.91, 1.42 |
 | Chest, waist, belly, hips width | 1.41, 1.39, 1.34, 1.35 | 1.40, 1.37, 1.34, 1.34 | 1.38, 1.36, 1.40, 1.41 |
