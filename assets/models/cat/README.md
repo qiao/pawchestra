@@ -31,6 +31,9 @@ root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool finds i
 file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh cat` runs. Never
 export the trial to `cat.rig.glb` of this folder: that file is the rig of the app.
 
+`tripo-hand/` holds a candidate body ("Candidate hand rig" below): a hand rig of the Tripo P2 mesh
+`tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm stretch.
+
 ## Files
 
 The app chain:
@@ -375,3 +378,41 @@ the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (
 
 The rig is a rejected trial, so this file keeps no steps. The steps of each edit, the
 bind, the weights, and the keys are in the git history of this `README.md`, at 0cd1a4e94.
+
+## Candidate hand rig
+
+`tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the Tripo P2
+mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm stretch.
+
+| File | Origin | Rebuild |
+|---|---|---|
+| `tripo-p2/cat.fbx`, `tripo-p2/cat.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
+
+### tripo-p2/cat.fbx
+
+A grey cat with a white bib and white paws in a T-pose, made with Tripo P2: quad faces, arm tubes
+of 8 vertices around, and leg tubes of 11 and 12 vertices around. The FBX file keeps the quads.
+The folder `cat.fbm/` holds its color map and its normal map. The Tripo download names them
+`tripo_rgb_a77bbd2f-f3f2-4b78-b59e-8a3f5a0b090d.jpg` (now `cat_basecolor.jpg`) and
+`tripo_normal_8eea86d6-e999-412c-bf36-703abd06872e.jpg` (now `cat_normal.jpg`). The FBX file links
+the maps by the folder of the download, so the import finds no map, and each tool takes the path
+of the map. The roughness and metallic maps of the download are not kept.
+
+| Item | Value |
+|---|---|
+| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+| Writer | Tripo, FBX 7.4 binary |
+| Contents | One mesh object, with no armature and no animation. 3,293 vertices and 3,597 faces: 2,930 quads and 667 triangles (6,527 triangles), no n-gon. One UV layer |
+| Parts | 15 parts: the body (2,989 vertices), two eyeballs (49 and 47 vertices), eight whisker strips at the muzzle (17 to 19 vertices each), two brow whisker strips (16 vertices each), and two small strips over the eyes (15 vertices each). No vertices merge at 1e-5. 86 open edges in 23 loops: the 2 eye sockets and the open ends of the strips. 47 edges have more than two faces: the lip lines and the lid lines around the eyes |
+| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.3373 (the paw tips) and z -0.228 to 0.228 (the tail curl and the whisker tips). The cat faces -y in Blender. The tail hangs down behind the legs, and its tip curls back and to the left (a mirror gap of 0.076 units) |
+
+| File | Size | Pixels | SHA-256 |
+|---|---|---|---|
+| `cat.fbx` | 223,084 bytes | | `d9b38bf098e744e96da28e94abdb00f19b459654e67531b97072d58ad2ac57ff` |
+| `cat.fbm/cat_basecolor.jpg` | 2,733,041 bytes | 4096 × 4096 | `e525e433ca2b227e40bd496da79523417cb99d18e3b00433cdc53322bfd1959b` |
+| `cat.fbm/cat_normal.jpg` | 1,424,367 bytes | 4096 × 4096 | `22219eb8d6e48d50cf7cfb5ef50a47d94a6b53f922420ffb2c86908166035ae2` |
+
+The color map paints a full eye on each eyeball: a black slit pupil, a green iris with an amber
+ring, a white light, and a dark rim. It paints a light spot over the inner end of each eye, a
+white muzzle, a pink nose, and pink inner ears.
