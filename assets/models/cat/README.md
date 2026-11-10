@@ -390,14 +390,18 @@ mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm str
 | `tripo-hand/cat.blend` | Made in headless Blender 5.2 from `tripo-p2/cat.fbx` (below). License as the FBX file | The scripted edits below |
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
+| `tripo-hand/cat-color.webp` | The color map of the candidate ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
+| `tripo-hand/cat-normal.webp` | The normal map of the fur ("Normal map" below). License as the FBX file | None: made one time from the source image |
 
 The files of the candidate, after the last edit:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.blend` | 390,247 bytes | `e16d7508a445d54380bdb95be4e7baa0638bfa4465e6f75259b230b4ccb42261` |
-| `tripo-hand/cat.rig.glb` | 515,528 bytes | `d6187fcb660a384d07f86474fe53aaeb6061c6172e326282b6f5dcfdfba80e7e` |
-| `tripo-hand/cat.rig.json` | 9,562 bytes | `b3fc2db666ad6f76d3b85fbc3f7a13e10b9583bf72e560782c0cb89a55d926af` |
+| `tripo-hand/cat.blend` | 408,061 bytes | `fafa627d9d16c6c473491158a283ae54f827bf435ecec82f02480164eadfc67a` |
+| `tripo-hand/cat.rig.glb` | 856,128 bytes | `df4a1924facae67cf7c89af5a6e216ccf116303887bb50108841812e6c907f0e` |
+| `tripo-hand/cat.rig.json` | 16,710 bytes | `a67996e3102ed5f8056fe50888112f9be7f9bbb56638f7ef23e307df73c42795` |
+| `tripo-hand/cat-color.webp` | 143,216 bytes | `faf2610ff58a32aeec9b600363bc31842b9ec19138ce3c5e80d7017f90425b9f` |
+| `tripo-hand/cat-normal.webp` | 75,400 bytes | `1c5d9d5521b0845cce72cb6616655d76b9b5849f71b23784e471ee8af4a221fa` |
 
 ### tripo-p2/cat.fbx
 
@@ -439,10 +443,10 @@ legs keep the form and the length of the source: no cut, no split from the trunk
 | Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`, with the shape key `bind_belly` ("Belly" below): 3,467 vertices and 3,771 faces (3,104 quads and 667 triangles, 6,875 triangles), flat faces, and the surface of `sa.add_surface()`. 89 faces are gloss (the pink nose). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The UV map of the FBX |
-| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245; the fingers joints turn with the paws). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side) and `hinges` come from "Arm twist", and `seat` from "Seat" below |
-| Facts | `height` 1.181424 (the shoulder joints at 0.68705 u after "Longer legs", 1.71956 m for each unit, so that H was 0.339375 m, the H of the cat of `cat.rig.glb`, before "Head size": H is now 0.374868 m), `crease` 55, `seatWidth` 0.46 |
-| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
+| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly" below) and `bind_tail` ("Tail on the seat" below): 3,831 vertices and 4,083 faces (3,416 quads and 667 triangles, 7,499 triangles), flat faces, and the surface of `sa.add_surface()`. 55 faces are gloss (the pink nose, "Nose bridge"). The two eyeballs of the source sit in their sockets, and their 100 faces have the face attribute `eye`. The 312 faces of the two lids have the face attribute `lid` ("Lids"), and the 196 faces of the whisker strips have `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (shoulder x 0.072, elbow 0.172, wrist 0.245; the fingers joints turn with the paws). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm` (a palm for each side) and `hinges` come from "Arm twist", `seat` from "Seat" and "Seat back", and `lids` from "Lids" below |
+| Facts | `height` 1.181424 (the shoulder joints at 0.68705 u after "Longer legs", 1.71956 m for each unit, so that H was 0.339375 m, the H of the cat of `cat.rig.glb`, before "Head size": H is now 0.374861 m), `crease` 55, `seatWidth` 0.46 |
+| Eyes | The eyeballs of the mesh, 0.75 of their source size ("Eye size"), with a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`):
 
@@ -571,7 +575,7 @@ be.add_bind_move(body, rig, P_after - P_bind, 'bind_belly')
 ```
 
 The largest move is 0.0179 units, and the mean is 0.0070. No face of the lower belly points down
-by more than 30° (largest 29.1°, mean 13.8°). The key `bind_belly` is the only key `bind*`.
+by more than 30° (largest 29.1°, mean 13.8°). The keys `bind*` are `bind_belly` and `bind_tail` ("Tail on the seat").
 
 **Longer legs.** With the seat of "Seat", the seat height of the app was 0.244 m, against 0.298 m
 on the cat of main: the knee of the Tripo cat is low. The shins of the mesh are now longer, and
@@ -699,3 +703,145 @@ and the right forearm 113.2° at rest. `pnpm arm-shape violist` over the 17 demo
 gives the largest roll step of the arm skin (p95) 21° on the left and 15° on the right in the
 play (38° on the right for the cat of main), the collapse p5 0.96 and 0.88 (0.95 and 0.80), and
 no spike.
+
+No hold change gives a margin on the left arm. In the play the left upper arm and forearm take
+88° together, and two parts of 40° or less take at most 80°. A turn of the left elbow axis
+moves the turn from one part to the other by its angle (±20° gives 24.5° and 64.7°, or 64.5° and
+22.1°), the paw tilt `tiltL` 55° gives the least sum (45° and 65° give 3° more), and the elbow
+poles of the earlier trials move only the split.
+
+**Tail on the seat.** With two rigid bones, the hook of the tail lay over the left side of the
+seat: in the seated bind, the tail reached x 0.241 units against the seat half width 0.13, and 128
+of its 232 vertices lay outside the seat. A third bone needs a new bone of the app, so the tail
+takes exact rows and a bind key, as the cat of main curls its tail on the seat
+(`studio.tailCurl` of `tools/mesh-rigs/cat.json`):
+
+- **Middle line.** In the rest, the edge distance from the end of the hook (the vertex with the
+  smallest z below y 0.35) gives rings of the tube in bands 0.02 units wide, up to 0.42 units. The
+  middles of the bands, smoothed twice by (1/4, 1/2, 1/4), give the line from the root at
+  (0.004, 0.406, -0.017) to the tip at (0.012, 0.215, -0.226), 0.373 units long. The tube is each
+  vertex within 0.45 units of edge distance and 0.075 units of the line: 233 vertices.
+- **Rows.** After "Body thickness", each tube vertex takes {`hips` 1 - a, `tail` a (1 - b),
+  `tail_tip` a b}, with p its place along the line (below 0 above the root), a = smoothstep(-0.04,
+  -0.005, p), and b = smoothstep(0.008, 0.088, p) about the head of `tail_tip` at p 0.048. The 51
+  vertices of the haunch with a share of the tail bones give it to `hips`, so the root bulge of
+  the tail is on the tail bones and the haunch on the pelvis.
+- **Key.** The key `bind_tail` moves each tube vertex of the bind to the same place along a path
+  and the same offset in the moving frames (double reflection) of the line and of the path. The
+  path is a Catmull-Rom curve from the bind root of the line through the points below (units,
+  relative to the root, studio axes): down the back, around the left side of the haunch, and
+  forward on the seat. The first frame of the path is the first frame of the line turned by the
+  bind turn of the hips. Each vertex moves by smoothstep(0, 0.03, p), then 3 Taubin rounds with
+  the same share.
+
+```text
+(0.04, -0.04, -0.012) (0.095, -0.078, 0) (0.14, -0.085, 0.04) (0.155, -0.085, 0.1)
+(0.14, -0.075, 0.16) (0.11, -0.055, 0.19)
+```
+
+The tube of the bind now lies from x -0.045 to 0.172 and from y 0.291 (the seat top 0.295) to
+0.480, with its lowest points on the seat beside the left thigh. The two tail bones keep the
+directions of `tailBind`, so the tail sway of the app turns the laid tail about its root.
+
+**Seat back.** The back edge of the property `seat` goes from z -0.09 to z -0.072, 0.005 units
+behind the tail tube of the bind. With the root bulge on the tail bones, the chair of the app is
+0.419 m deep, against 0.449 m before and 0.343 m on the cat of main. The tail root needs the rest
+of the depth: the back of the body at the tail root lies at z -0.033, and the open back of the
+chair lets the tail pass.
+
+**Shin girth.** The shins were thinner than on the cat of main (body-shape 33.3 cm against 37.4
+cm). A point edit before "Longer legs" scales each leg ring in its plane about the line from the
+ankle joint to the knee joint by 1 + 0.12 b(y), with b a smoothstep from 0 at y 0.06 to 1 at
+y 0.085, 1 to y 0.13, and a smoothstep to 0 at y 0.16 (source heights), within 0.07 units of the
+line. The joints lie on the line, so they stay. The shin girth is now 37.4 cm, and the knee shows
+no flare. With the longer legs, the texels of the shin stretch 1.38 times along the leg and 1.12
+times across it, so the strands read 1.23 times longer. The leg islands of the map run on into the
+foot, so a longer UV span would sample the paw.
+
+**Lap.** The lower belly was thinner than on the cat of main (D2 of `pnpm body-shape` 27.1 cm
+against 35.0 cm). The key `bind_belly` now takes each vertex of rest z 0.34 to 0.52 (Blender), and
+moves it forward by 0.045 ss(0.355, 0.385, zb) (1 - ss(0.425, 0.465, zb)) with the cosine
+fade of "Belly". D2 is now 33.5 cm, D3 36.6 cm (main 34.9), and no face of the lower belly points
+down by more than 30° (largest 15.8°, before 29.1°).
+
+**Color map.** The mesh object has the property `texture`, and the export gives the UVs of the
+FBX. The whisker strips keep their face colors (face attribute `plain`). The source map paints a
+warm gray fur (sRGB 125, 106, 97) and a cream white (239, 210, 187). In the hall view of the app
+(`close-views play --at cat --azimuth 35 --zoom 1.3 --time 6 --no-fill --pause`), the fur read
+tan. `tools/cat-maps.py` scales the source to 2048 px (Lanczos) and, in this order:
+
+1. Paints the light brow spots over with the fur around them: in the front triangles of the rig
+   file with their middle within 0.55 d of the point 0.3 d toward the middle plane and 1.15 d up
+   from each eye (d the distance of the eyes from the middle plane), each texel more than 0.05
+   from the fur in Oklab and lighter than it takes the median of the other texels of its part.
+2. Paints the dark patches (Oklab L below 0.42) away from the eyes (1.25 d) and the mouth (0.95 d
+   around the point 1.35 d below and 0.6 d in front of the eyes) over in the same way. The source
+   paints them on the armpits and under the chin, where they showed as black bands.
+3. Moves each texel by the steps of the anchors, with blends at 1/3 and 2/3 of each pair: the
+   fur to Oklab L 0.55, C 0.0435, h 268, the white to L 0.88, C 0.02, h 262, and the pink and the
+   dark lines stay. The eye texels keep their colors. WebP quality 60, method 6.
+
+**Hall fur.** The median Oklab L, C, and h of the fur at the upper arm, the thigh, the chest
+side, and the head top, and of the white bib, in the hall view above:
+
+| Body | Fur | White |
+|---|---|---|
+| Candidate, face colors (round 6) | 0.633, 0.076, 53.2 | 0.824, 0.086, 56.8 |
+| Candidate, the plain source map | 0.580, 0.047, 53.1 | 0.824, 0.073, 61.8 |
+| Candidate, `cat-color.webp` | 0.607, 0.043, 48.1 | 0.820, 0.061, 61.0 |
+| Cat of main | 0.614, 0.041, 46.3 | 0.820, 0.056, 58.1 |
+
+The scale of the fur sheen by the luma of the fur (design 4.5, from the fox candidate) keeps the
+gray fur dark: with the full sheen, it read cream.
+
+**Wrist bands.** The paw turn kept the UVs of the old band on the 8 new quads of each wrist band
+(face attribute `band` until this step). Each band face takes the planar projection of its
+corners on its own plane (u along the rest forearm axis, v along the normal × the axis), at
+0.897 UV for each unit (the median of the faces next to the bands), about the clean gray patch
+at UV (0.5938, 0.6719). The faces next to the bands are about sRGB (124, 104, 94), and the patch
+is 96 px wide with a mean 1.2 from it and a deviation of 3.6.
+
+**Nose bridge.** The gloss nose held the faces of the nose box: the pink nose and the light bridge
+above it, which showed as a flat light square. The 34 gloss faces that are not pink by their old
+color (the test of "Smooth surface") go back to the slot `fur` and take the map.
+
+**Brow whiskers.** The 62 faces of the brow whisker strips and the small strips over the eyes
+(the loose parts above y 0.9) take sRGB (235, 236, 242). With the dark colors of the source, the
+thin strips read as stern brows.
+
+**Eye size.** In the front head view, the eye opening was 0.234 of the head width, against 0.172
+on the reference `cat-front.png`. A point edit before "Head size" scales each eyeball and its
+socket about the middle of the sphere of its ball by 0.75. The middles are (0.04905, 0.82718,
+0.13067) on the left and (-0.04072, 0.82733, 0.13239) on the right (source, radius 0.034): the
+source eyes are 8 mm apart from a mirror. Each point of the side moves by the share
+(1 - ss(0.04, 0.075, r)) (1 - m), with m = (1 - ss(0, 0.02, |x|)) ss(0.035, 0.04, r), so that
+the skin between the eyes does not part and the ball keeps its form. The whiskers and the nose
+(z above 0.19) stay. The eye opening is now 0.167 of the head width. A lineup of 1.0, 0.85, and
+0.75 (`reports/2026-11-10-cat-hand-r8/lineup-eye/`, which git ignores) put 0.75 nearest to the
+reference, with a calm look.
+
+**Lids.** Each eye takes a lid as a separate part, as on the fox ("Lids" of
+`assets/models/fox/README.md`). The balls of the source are open at the back, so the eye axis of
+the app needs no change. For each eye: c and r the sphere of the ball, g the mean direction of
+the ball points that a ray from outside the head reaches, u = +Z made square to g, and h = u × g
+(left (0.992145, 0.125095, 0), right (0.959727, -0.280934, 0)). The closed lid spans psi from
+-60° to 60° (toward u) and lam from -64° to 64° (toward h) in 12 steps each, at 1.17 r, with a row
+at psi -60° and 1.035 r. The file holds the open lid, turned by -126° about h through c. Each lid
+face takes the slot `fur`, the face attribute `lid`, the face colors sRGB (110, 112, 130), the UVs
+of the planar projection of its closed corners on the plane of h and u at 0.88 UV for each unit
+about the patch of "Wrist bands", and the row `head` 1. The property `lids` holds the angle
+2.199115 and the axes. In 21 steps of the blink, no point of the open lid, of a side edge, or of
+the back edge leaves the head, the lower strip of the closed lid lies under the head, and the
+open lid lies at least 0.0082 units under the skin. A Workbench render of the steps 0, 0.5, 0.8,
+and 1 shows the lid close over the eye with no gap.
+
+**Normal map.** `cat-normal.webp` comes from `tripo-p2/cat.fbm/cat_normal.jpg`: the mean normal
+is (0.00, -0.01, 1.00), and 13 texels of 16.8 million have z < 0. Each x, y tilt is limited to
+the length 0.2 (2.09 % of the texels), the image takes a box scale to 1024 px, and red and green
+hold the tilts times 4 (`NORMAL_MAP_GAIN`), blue 255. `cwebp -q 60 -sharp_yuv -m 6` (libwebp
+1.5.0). The tilts are small (median 0.0124). The gray fur of the color map has the linear luma
+0.157 and the white 0.589, against 0.131 for the gray thigh of `cat-front.png`, so the gray fur
+takes about 0.31 of the sheen, and its strands show.
+
+The scripts of the session (`scratch/cat/` of the worktree, which git ignores: `build.py`,
+`catedits.py`, `tail.py`, and `make_config.py`, with `params.json`) hold these steps.
