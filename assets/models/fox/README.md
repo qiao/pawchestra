@@ -131,23 +131,23 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 449,622 bytes |
-| SHA-256 | `767176e7c300f7d30ea60648a87c3d5938fd15025e21c0719bd81720bffc5c71` |
+| Size | 463,014 bytes |
+| SHA-256 | `e8a49277bcb3d8462d1cedfcf29d155b5bd1d883c137ab1b3e40d0f142dd7c15` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,162 vertices and 4,847 faces (3,387 quads and 1,460 triangles, 8,234 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 120 faces have the face attribute `eye` ("Eyes" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). The 30 faces of the whiskers have the face attribute `plain` ("Color map" below) |
-| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below |
+| Mesh | One object `fox`, with the shape key `bind_belly` ("Belly" below): 4,524 vertices and 5,143 faces (3,695 quads and 1,448 triangles, 8,838 triangles), flat faces, and the surface of `sa.add_surface()`. 58 faces are gloss (the black nose). The two eyeballs of the source sit in their sockets, and their 104 faces have the face attribute `eye` ("Eyes" and "Eye light" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`). The 30 faces of the whiskers have the face attribute `plain` ("Color map" below) |
+| Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (shoulder x 0.072, elbow 0.195, wrist 0.31, fingers 0.362, tip 0.42). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The property `seat` comes from `sa.build_armature()`. The properties `palm` (one palm for each side) and `hinges` come from "Arm twist" below. The property `lids` holds the turn and the hinge axes of the lids ("Lids" below) |
 | Facts | `height` 1.043834 (the shoulder joints at 0.6836 u, 1.526966 m for each unit, so that H stays 0.322998 m, the H of the fox of `fox.rig.glb`), `crease` 55 ("Smooth surface" below), `headCeiling` 0.9746 ("Ear weights" and "Longer legs" below) |
-| Eyes | The eyeballs of the mesh. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app ("Eye light" below). No eye objects, so the app adds no bead eyes. A lid on each eye blinks ("Lids" below) |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
 assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,084,348 bytes | `78102b3ebf5bf5e925f2cffa598d3ce95c9c2d7cdcc694e1972a296743829159` |
-| `tripo-hand/fox.rig.json` | 9,982 bytes | `5c93f157a5f77969b08188452f215dbf15fbebf86317955118b768abfe075dba` |
+| `tripo-hand/fox.rig.glb` | 1,131,236 bytes | `1f5a21e154435e87dfa5c9eb5414677e8c3af37a1db3146f18df9f96f42f2dc7` |
+| `tripo-hand/fox.rig.json` | 16,854 bytes | `860d750a722249fb5a69c6748c42077c6522ce916ecca20fbed9dff6cfe3f650` |
 
 The edits, in the order of the work:
 
@@ -502,7 +502,54 @@ UVs or the eyes.
 
 | Item | Value |
 |---|---|
-| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 102,506 bytes, SHA-256 `3013d9870aab2a257a36d48be69e433ab6935f0d5e6c107390400df0b6143f3c` |
+| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 102,310 bytes, SHA-256 `ae820e3a97d856b3ed7cfed2553254874e79c62bde902b302bbc191e3c059e99` |
 | Origin, license | As `fox-color.webp` |
 
 Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
+
+**Lids.** A scripted edit in the live Blender adds a lid to each eye, as a separate part, as the
+rabbit candidate has them. The mesh has no open socket: the head surface cuts each ball at about
+45° from its axis. In the hinge frame of each eye, g is the mean direction of the ball points that
+a ray from outside the head reaches (the open eye, left (0.4106, -0.9117, 0.0136)), u is +Z made
+square to g, and h = u × g is the hinge axis (left (0.911803, 0.410628, 0), right (0.913696,
+-0.406399, 0)). A lid point has the angle psi from g toward u and the angle lam toward h: the
+direction cos(lam) (cos(psi) g + sin(psi) u) + sin(lam) h, from the middle of the sphere of the
+ball (left (0.039081, -0.112353, 0.865869), radius 0.025605; the ball reaches at most 0.02579).
+
+1. Each closed lid spans psi from -60° to 60° in 12 steps and lam from -64° to 64° in 12 steps, at
+   the radius 0.030. An extra row at psi -60° and the radius 0.0265 makes a strip at the lower edge
+   that turns in toward the ball. Thus 14 × 13 vertices and 156 quads on each side, with outward
+   normals.
+2. The file holds the open lid: each point turned up by 126° about h. The property `lids` of the
+   armature holds `angle` 2.199115 (126°) and the axis h of each side. A turn by +126° about h
+   closes the lid.
+3. Each lid face takes the slot `fur`, flat shading, the face colors `color` and `color_base` of
+   the orange fur (sRGB 220, 98, 12), and the face attribute `lid`.
+4. Each lid corner takes the UV of the planar projection of its closed point on the plane of h and
+   u, at 0.88 UV for each unit (the median density of the fur faces 0.036 to 0.05 units from the
+   middle), about the clean fur patch at UV (0.2227, 0.8477) of `fox-color.webp`, above and out
+   from the right eye. The patch is 96 pixels wide at 2048, with the mean sRGB (220.1, 99.5, 12.4)
+   and a deviation of 2: the fur next to each socket is about (222, 101, 13).
+5. Each lid vertex takes the row `head` 1 with `sa.set_weight_row()`. `pnpm studio-body` moves it
+   onto the eye bone of its side.
+
+The values come from ray casts from the middle of the ball against the head. In 21 steps of the
+blink, no sample of the open lid, of a side edge, or of the back edge lies outside the head, and
+the lower strip of the closed lid lies under the head. The open lid lies at least 0.0147 units
+under the head surface. The radius 0.030 covers the dark lining faces of the socket (0.024 to 0.028
+units from the middle).
+
+**Eye corners.** The color map paints a pale wet line on three socket lining faces (3626, 2628,
+2507) and a pale wedge on two eyeball faces (2510, 2551) at the eye corners. In the app light they
+showed as a light streak under each eye, which can read as a tear. A point edit gives these five
+faces the planar projection of their corners on their own plane, at 0.73 UV for each unit, about
+the dark lining patch at UV (0.9848, 0.8009) (sRGB about 20, 10, 5), which the upper lining faces
+use. No other UV changes.
+
+**Eye light.** `eyeBallsOf()` takes the axis of each eye from the vector area of its eyeball
+triangles. Each eyeball of the source is a closed ball, so the vector area was zero, and the axis
+pointed to the side (left) or up and back (right): the eye light gave no highlight (the same
+pixels with the eye light off). A point edit deletes the 8 faces of each ball whose corners all lie
+more than 135° from g (faces 1164 to 1171, 3746, 3754 and 607 to 614, 2675, 2685, and one vertex on
+each side): they lie deep in the head. The axis is now 2.3° (left) and 2.6° (right) from g, and the
+middle of the sphere moves by less than 1e-5 units. Each ball keeps 52 faces and 51 vertices.
