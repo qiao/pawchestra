@@ -4,9 +4,11 @@
 # goes to the fur of the rabbit of main in the hall light, and the pink, the brown brows, the
 # white, and the black keep their colors. Each texel takes a mix of the steps of the colors, by its
 # nearness to each color, so the blend between two colors stays smooth. The texels of the eyeballs
-# keep their colors: the script reads their triangles and texture points from the rig file
-# (`ownEyes` of the export). The normal map `rabbit-normal.webp` holds the tilts of the fur. The
-# output depends only on the input files and on cwebp 1.5.0.
+# keep their colors, except the iris and the pupil, which turn on each ball to the middle of the
+# eye opening that the front view shows ("Pupils" of the README). The script reads the triangles,
+# the places, and the texture points of the eyeballs from the rig file (`ownEyes` of the export).
+# The normal map `rabbit-normal.webp` holds the tilts of the fur. The output depends only on the
+# input files and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py
 import json
@@ -55,6 +57,21 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
+#: The ball points of the front view with a luma below this value make the pupil.
+PUPIL_LUMA = 50
+#: The place of the middle of each pupil above the middle of the eye opening of the front view,
+#: in opening radii. The head of the violinist drops 10 degrees in the play, and the camera of the
+#: hall looks down at the stage, so a pupil at the middle reads as a look down there.
+PUPIL_LIFT = 0.1
+#: The rounds of the fill of the texels around the eyeball triangles before the turned ball samples
+#: the map, so that a sample at the edge of a texture island takes no color from outside it.
+EYE_FILL = 4
+#: The barycentric slack of a ray hit, so that a ray on the edge of two triangles hits one.
+EDGE = 1e-4
+#: The barycentric slack of a second try for a ray that hits no ball triangle.
+WIDE_EDGE = 0.05
+#: The step of the grid of the front rays over each eye, in units of the rig file.
+RAY_STEP = 0.0005
 
 
 def linear(srgb):
@@ -89,8 +106,8 @@ def linear_of_oklab(lab):
 
 
 def read_rig(path):
-    """Gives the triangles, the texture points, and the eyes (`ownEyes`) of the fur primitive of
-    the rig file."""
+    """Gives the triangles, the places in the seated bind, the texture points, and the eyes
+    (`ownEyes`) of the fur primitive of the rig file."""
     data = open(path, 'rb').read()
     length = struct.unpack('<I', data[12:16])[0]
     gltf = json.loads(data[20:20 + length])
@@ -108,16 +125,17 @@ def read_rig(path):
 
     kinds = {5121: np.uint8, 5123: np.uint16, 5125: np.uint32}
     triangles = read(fur['indices'], kinds[gltf['accessors'][fur['indices']]['componentType']], 1)
+    positions = read(fur['attributes']['POSITION'], np.float32, 3)
     points = read(fur['attributes']['TEXCOORD_0'], np.float32, 2)
     eyes = gltf['asset']['extras'].get('ownEyes')
     if not eyes:
         sys.exit(f'{path} has no eyes of the mesh.')
-    return triangles.reshape(-1, 3), points, eyes
+    return triangles.reshape(-1, 3), positions.astype(np.float64), points.astype(np.float64), eyes
 
 
 def eye_mask(rig, size):
     """Gives the texels of the eyeball triangles of the rig file, grown by EYE_MARGIN texels."""
-    triangles, points, eyes = rig
+    triangles, _, points, eyes = rig
     faces = [t for side in ('L', 'R') for t in eyes[side]['faces']]
     mask = Image.new('L', (size, size), 0)
     draw = ImageDraw.Draw(mask)
@@ -166,10 +184,209 @@ def move_texels(lab):
     return moved
 
 
+def ray_hits(origins, directions, corners, edge=None):
+    """Gives, for each ray, the distance to the nearest triangle that it hits (inf for none), the
+    index of that triangle, and the barycentric weights (u, v) of the hit (Moller-Trumbore)."""
+    edge = EDGE if edge is None else edge
+    a, e1, e2 = corners[:, 0], corners[:, 1] - corners[:, 0], corners[:, 2] - corners[:, 0]
+    best = np.full(len(origins), np.inf)
+    index = np.full(len(origins), -1)
+    bary = np.zeros((len(origins), 2))
+    for start in range(0, len(origins), 512):
+        o = origins[start:start + 512, None, :]
+        d = directions[start:start + 512, None, :]
+        p = np.cross(d, e2[None])
+        det = (e1[None] * p).sum(-1)
+        ok = np.abs(det) > 1e-12
+        inv = np.where(ok, 1 / np.where(ok, det, 1), 0)
+        t0 = o - a[None]
+        u = (t0 * p).sum(-1) * inv
+        q = np.cross(t0, e1[None])
+        v = (d * q).sum(-1) * inv
+        t = (e2[None] * q).sum(-1) * inv
+        hit = ok & (u >= -edge) & (v >= -edge) & (u + v <= 1 + edge) & (t > 1e-6)
+        t = np.where(hit, t, np.inf)
+        k = t.argmin(axis=1)
+        rows = np.arange(len(k))
+        best[start:start + 512] = t[rows, k]
+        index[start:start + 512] = np.where(np.isfinite(t[rows, k]), k, -1)
+        bary[start:start + 512] = np.c_[u[rows, k], v[rows, k]]
+    return best, index, bary
+
+
+def eye_texels(rig, faces):
+    """Gives the texels of the triangles `faces` (rows and columns), and the place of each in the
+    seated bind, by the barycentric mix of the corners of its triangle."""
+    triangles, positions, points, _ = rig
+    ys, xs, places = [], [], []
+    for f in faces:
+        tri = triangles[f]
+        uv = points[tri] * SIZE - 0.5
+        x0, y0 = np.maximum(np.floor(uv.min(axis=0)).astype(int), 0)
+        x1, y1 = np.minimum(np.ceil(uv.max(axis=0)).astype(int), SIZE - 1)
+        if x1 < x0 or y1 < y0:
+            continue
+        gy, gx = np.mgrid[y0:y1 + 1, x0:x1 + 1]
+        (ax, ay), (bx, by), (cx, cy) = uv
+        area = (bx - ax) * (cy - ay) - (cx - ax) * (by - ay)
+        if abs(area) < 1e-12:
+            continue
+        wb = ((gx - ax) * (cy - ay) - (cx - ax) * (gy - ay)) / area
+        wc = ((bx - ax) * (gy - ay) - (gx - ax) * (by - ay)) / area
+        wa = 1 - wb - wc
+        inside = (wa >= -0.01) & (wb >= -0.01) & (wc >= -0.01)
+        corners = positions[tri]
+        place = wa[..., None] * corners[0] + wb[..., None] * corners[1] + wc[..., None] * corners[2]
+        ys.append(gy[inside])
+        xs.append(gx[inside])
+        places.append(place[inside])
+    return np.concatenate(ys), np.concatenate(xs), np.concatenate(places)
+
+
+def sample(image, points):
+    """Gives the bilinear colors of an image (float, H x W x 3) at texture points."""
+    x = np.clip(points[:, 0] * SIZE - 0.5, 0, SIZE - 1.001)
+    y = np.clip(points[:, 1] * SIZE - 0.5, 0, SIZE - 1.001)
+    x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+    fx, fy = (x - x0)[:, None], (y - y0)[:, None]
+    return ((1 - fx) * (1 - fy) * image[y0, x0] + fx * (1 - fy) * image[y0, x0 + 1]
+            + (1 - fx) * fy * image[y0 + 1, x0] + fx * fy * image[y0 + 1, x0 + 1])
+
+
+def turn_matrix(a, b):
+    """Gives the matrix of the shortest turn that takes the unit vector a to the unit vector b."""
+    axis = np.cross(a, b)
+    s = np.linalg.norm(axis)
+    if s < 1e-9:
+        return np.eye(3)
+    k = axis / s
+    K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    angle = np.arctan2(s, a @ b)
+    return np.eye(3) + np.sin(angle) * K + (1 - np.cos(angle)) * K @ K
+
+
+def fill_around(image, inside):
+    """Gives a copy of the image in which EYE_FILL rings of texels around the texels `inside` take
+    the mean color of their neighbors inside, ring by ring."""
+    out = image.copy()
+    have = inside.copy()
+    for _ in range(EYE_FILL):
+        total = np.zeros_like(out)
+        count = np.zeros(have.shape)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            total += np.roll(out * have[..., None], (dy, dx), axis=(0, 1))
+            count += np.roll(have, (dy, dx), axis=(0, 1))
+        ring = ~have & (count > 0)
+        out[ring] = total[ring] / count[ring, None]
+        have |= ring
+    return out
+
+
+def ball_colors(rig, faces, c, directions, src):
+    """Gives the source color of the ball at each direction from its middle c (a ray from c to the
+    ball triangles), and a mask of the directions that hit the ball."""
+    triangles, positions, points, _ = rig
+    ball = positions[triangles[faces]]
+    _, k, bary = ray_hits(np.tile(c, (len(directions), 1)), directions, ball)
+    # A ray through a small crack between two ball triangles takes the nearer triangle.
+    miss = np.flatnonzero(k < 0)
+    _, k2, bary2 = ray_hits(np.tile(c, (len(miss), 1)), directions[miss], ball, WIDE_EDGE)
+    k[miss], bary[miss] = k2, bary2
+    found = k >= 0
+    tri = triangles[faces[k[found]]]
+    u, v = bary[found, 0], bary[found, 1]
+    uv = ((1 - u - v)[:, None] * points[tri[:, 0]] + u[:, None] * points[tri[:, 1]]
+          + v[:, None] * points[tri[:, 2]])
+    colors = np.zeros((len(directions), 3))
+    colors[found] = sample(src, uv)
+    return colors, found
+
+
+def center_pupils(rig, image):
+    """Turns the iris and the pupil of each eyeball to the middle of the eye opening of the front
+    view, and gives the new image. The source map paints each iris toward the inner side of its
+    ball, so in the front view each pupil sat at the inner edge of its eye opening, and the rabbit
+    looked cross-eyed. For each side: c is the middle of the sphere of the ball. Rays from the front
+    (along -z: the head of the seated bind faces +z) over a grid find the ball points that show.
+    Their mean in x and y is the middle of the opening, and the ball point there gives the target
+    direction t from c. The ball points that show with a luma below PUPIL_LUMA make the pupil, and
+    the ball point at their mean gives the pupil direction p. The turn R takes p to t, and three
+    rounds of the measure on the turned ball refine it. Each ball texel at the direction d then
+    takes the color of the source ball at the direction R^-1 d."""
+    triangles, positions, points, eyes = rig
+    out = np.asarray(image).astype(np.float64)
+    corners = positions[triangles]
+    middles = corners.mean(axis=1)
+    taken = np.zeros((SIZE, SIZE), bool)
+    texels = {}
+    for side in ('L', 'R'):
+        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
+        if (taken[ys, xs]).any():
+            sys.exit('The texels of the two eyeballs overlap, so no pupil can turn alone.')
+        taken[ys, xs] = True
+        texels[side] = (ys, xs, places)
+    src = fill_around(out, taken)
+    for side in ('L', 'R'):
+        faces = np.array(eyes[side]['faces'])
+        ball = positions[triangles[faces].ravel()]
+        fit = np.linalg.lstsq(np.c_[2 * ball, np.ones(len(ball))], (ball ** 2).sum(1), rcond=None)[0]
+        c = fit[:3]
+        r = float(np.sqrt(fit[3] + c @ c))
+        near = np.flatnonzero(np.linalg.norm(middles - c, axis=1) < 3 * r)
+        gx, gy = np.meshgrid(np.arange(c[0] - 1.6 * r, c[0] + 1.6 * r, RAY_STEP),
+                             np.arange(c[1] - 1.6 * r, c[1] + 1.6 * r, RAY_STEP))
+        origins = np.c_[gx.ravel(), gy.ravel(), np.full(gx.size, c[2] + 1.0)]
+        down = np.tile([0.0, 0.0, -1.0], (len(origins), 1))
+        t_hit, hit, _ = ray_hits(origins, down, corners[near])
+        on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
+        shown = origins[on_ball] + t_hit[on_ball, None] * down[on_ball]
+        middle = shown[:, :2].mean(axis=0)
+        radius = np.sqrt(len(shown) * RAY_STEP ** 2 / np.pi)
+        seen = shown - c
+        seen /= np.linalg.norm(seen, axis=1)[:, None]
+        goal = middle + [0.0, PUPIL_LIFT * radius]
+        target = seen[np.argmin(np.linalg.norm(shown[:, :2] - goal, axis=1))]
+
+        def pupil_of(turn):
+            colors, found = ball_colors(rig, faces, c, seen @ turn, src)
+            dark = found & (colors @ [0.2126, 0.7152, 0.0722] < PUPIL_LUMA)
+            spot = shown[dark, :2].mean(axis=0)
+            return seen[np.argmin(np.linalg.norm(shown[:, :2] - spot, axis=1))], spot
+
+        turn = np.eye(3)
+        first = pupil_of(turn)[1]
+        for _ in range(3):
+            pupil, _ = pupil_of(turn)
+            turn = turn_matrix(pupil, target) @ turn
+        last = pupil_of(turn)[1]
+        ys, xs, places = texels[side]
+        directions = places - c
+        directions /= np.linalg.norm(directions, axis=1)[:, None]
+        colors, found = ball_colors(rig, faces, c, directions @ turn, src)
+        out[ys[found], xs[found]] = colors[found]
+        angle = np.degrees(np.arccos(np.clip((np.trace(turn) - 1) / 2, -1, 1)))
+        show = lambda p: np.round((p - middle) / radius, 3).tolist()
+        print(f'pupil {side}: in the front view, the middle of the pupil lay {show(first)} opening '
+              f'radii (x, y) from the middle of the opening, now {show(last)}; the iris turns '
+              f'{angle:.1f} degrees ({int(found.sum())} of {len(ys)} ball texels)')
+    # The padding texels around the ball islands, outside each triangle of the mesh, take the
+    # turned colors of the ball, so that a sample at the edge of an island shows no old pupil.
+    mask = Image.new('L', (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(mask)
+    for tri in triangles:
+        draw.polygon([(float(u) * SIZE, float(v) * SIZE) for u, v in points[tri]], fill=255)
+    padding = ~(np.asarray(mask) > 0) & ~taken
+    filled = fill_around(out, taken)
+    out[padding] = filled[padding]
+    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+
+
 def write_color_map():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
+    rig = read_rig(RIG)
+    image = center_pupils(rig, image)
     lab = oklab(linear(np.asarray(image)))
-    eyes, count = eye_mask(read_rig(RIG), SIZE)
+    eyes, count = eye_mask(rig, SIZE)
     moved = move_texels(lab)
     moved[eyes] = lab[eyes]
     out = srgb8(linear_of_oklab(moved))

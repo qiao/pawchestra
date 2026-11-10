@@ -248,6 +248,19 @@ The color map paints a full eye on each eyeball (a black pupil, an amber iris, a
 thin brown brows on the brow strips, a pink nose, pink inner ears and paw pads, a painted smile,
 and white whiskers.
 
+**Pupils.** The map paints each iris toward the inner side of its ball, and each ball sits in a
+socket that opens out. In the front view, each pupil thus sat at the inner edge of its eye opening,
+and the rabbit looked cross-eyed and down at its nose. The fault is in the source: the front view
+of the source mesh with the source map shows it, before any edit of the hand rig. The point edits
+keep each eye direction (the eye size scales the ball about its middle, and the relax holds the
+eyeballs). `center_pupils()` of `tools/rabbit-maps.py` turns the iris and the pupil of each ball
+in the map: rays from the front find the ball points that show, the dark points (luma below 50)
+give the pupil, and a turn of the ball texels about the middle of the ball moves the pupil to the
+middle of the opening, 0.1 opening radii up for the drop of the head in the play. In opening radii
+(x, y, +x the left side of the rabbit), the middle of the left pupil goes from (-0.302, -0.070) to
+(0.008, 0.117) with a turn of 12.2 degrees, and the middle of the right pupil from (0.189, 0.004) to
+(0.031, 0.086) with a turn of 15.5 degrees.
+
 ### tripo-hand/rabbit.blend
 
 The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
