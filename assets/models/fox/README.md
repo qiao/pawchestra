@@ -475,9 +475,7 @@ body. `tools/fox-maps.py` now moves the orange fur of the red map to Oklab L 0.4
 cream and white fur, the black nose, and the eyeball texels keep their colors. The same view then
 gives L 0.523, C 0.130, h 37.2. Targets of L 0.47 and 0.43 gave L 0.567 and 0.532.
 
-The tan fox in the same view (`mozart-k315 --at fox-tan`): L 0.516, C 0.093, h 52.9, against L
-0.634, C 0.102, h 57.1 on the fox of main. At the head top, where both foxes take the same light,
-the values are L 0.637, C 0.096, h 57.9 against L 0.607, C 0.093, h 57.8. The tan map stays.
+The tan fox takes its own target ("Tan fur lightness" below).
 
 **Paw size.** From the wrist joint to the finger tips, along the rest forearm axis, and across it
 on the two axes of the paw (`paw.py` of the session, both rig files in their rest pose):
@@ -590,11 +588,11 @@ uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fo
 ```
 
 It scales the source as `fox-color.webp`, and moves each texel in Oklab: the orange fur (sRGB 220,
-98, 12) to (166, 129, 83), and the dark socks (73, 37, 17) to (143, 102, 62). These targets have
-the Oklab hue and chroma of the tan fur `#c9a273` and the tan accent `#9a7148` of
+98, 12) to `TAN_FUR` (Oklab L 0.80, C 0.10, h 75), and the dark socks (73, 37, 17) to (143, 102,
+62). The sock target has the Oklab hue and chroma of the tan accent `#9a7148` of
 `SPECIES_COLORS['fox-tan']`, and the Oklab lightness that the tan palette of the faces gives the
-fur and the socks (`paletteMap()`: 186, 118, 73 and 153, 97, 49). The cream, the muzzle, the
-white, and the black keep their colors.
+socks (`paletteMap()`: 153, 97, 49). The cream, the muzzle, the white, and the black keep their
+colors.
 Each texel takes a mix of the steps of these anchors and of the anchors at 1/3 and 2/3 of each
 blend of the map (orange to cream, socks, white, and muzzle, and socks to black), by its nearness
 to each (Gaussian, 0.06 in Oklab). The hue step of an anchor shrinks with the chroma of the texel,
@@ -604,16 +602,26 @@ UVs or the eyes.
 
 | Item | Value |
 |---|---|
-| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 104,558 bytes, SHA-256 `0f36f9aa91750ccfd02ae65ff25236c831fe6fbca82e9d242d7fd73fc41daad0` |
+| `fox-tan-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 109,332 bytes, SHA-256 `4967bd1e1674ed33cae6d00aafc8f56fbd3fad20a034a14209a56833f832ab98` |
 | Origin, license | As `fox-color.webp` |
 
 Until the map of the tan fox loads, the tan fox shows the tan palette of its faces.
 
-The targets `#c9a273` and `#9a7148` themselves made the tan fox read cream in the app. Their
-fur is lighter than the tan palette (Oklab L 0.74 against 0.63). A smooth body facing the front
-light reaches the shoulder of the tone curve, where the chroma falls. The median fur of the 3/4 view
-at zoom 2 was sRGB (238, 199, 146), against (190, 137, 100) on the tan fox of main. With the targets
-above it is (228, 175, 111). The palette colors themselves gave (237, 169, 104), which read orange.
+**Tan fur lightness.** The light of the app makes the smooth body darker and warmer than its map.
+The median Oklab L, C, and h of the tan fur in the 3/4 app view (`close-views play --demo
+mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3 --time 6 --size 2880x1800`), at the chest side,
+the upper arm, the thigh, and the head top:
+
+| Fur target of the map (Oklab L, C, h) | App L | App C | App h |
+|---|---|---|---|
+| 0.628, 0.077, 71.7 (sRGB 166, 129, 83, the lightness of the tan palette) | 0.517 | 0.094 | 52.8 |
+| 0.76, 0.077, 71.7 | 0.605 | 0.096 | 54.7 |
+| 0.805, 0.082, 75 | 0.637 | 0.098 | 55.9 |
+| 0.80, 0.088, 77 | 0.634 | 0.099 | 56.5 |
+| 0.80, 0.10, 75 (`TAN_FUR`) | 0.636 | 0.102 | 56.0 |
+| Tan fox of main | 0.634 | 0.102 | 57.1 |
+
+The red map stays byte-identical.
 
 **Normal map.** The app tilts the normals of the fur faces of the candidate with the normal map of
 the Tripo FBX (design 4.5, fur shading). The map uses the UV map of the FBX, as the color map does.
