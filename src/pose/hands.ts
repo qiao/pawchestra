@@ -262,17 +262,23 @@ export const HANDS_HOLDS = {
     // rest fingers take the turn that the left paw gets there: they point down and back, 70° from
     // the mirror of the left fingers in the plane of the palm. With the mirror, the right paw of the
     // Tripo polar bear swings 65° from its bind and folds 17 faces of the inner wrist at rest, and
-    // with the turn 36° and 8 faces (`pnpm arm-check pianist`).
+    // with the turn 36° and 8 faces (`pnpm arm-check pianist`). The belly of the Tripo polar bear
+    // does not cover its thighs, so the vertical line through the lap place finds the top of the
+    // thigh, 0.77 m below the shoulders. Its arms are 0.54 m long, so with the old offset (0.05 H
+    // down, 0.42 H forward) the arms were straight and went 12 cm into the belly. The offset 1.0 H
+    // up and 0.45 H forward puts the paws on the front of the belly, 0.30 m to 0.33 m below the
+    // shoulders, with the elbows bent at the sides: the forearms go 2.0 cm and the upper arms 0 cm
+    // into the belly at rest (`pnpm pose-depth pianist`).
     restL: {
       kind: 'lap',
-      lap: { along: 0.85, offset: [0.14, -0.05, -0.42] },
+      lap: { along: 0.85, offset: [0.14, 1, -0.45] },
       palm: [0.3, -0.6, 1],
       fingers: [1, -0.3, 0],
       pole: [-1, 0, 0.3],
     },
     restR: {
       kind: 'lap',
-      lap: { along: 0.85, offset: [-0.14, -0.05, -0.42] },
+      lap: { along: 0.85, offset: [-0.14, 1, -0.45] },
       palm: [-0.3, -0.6, 1],
       fingers: [-0.08, -0.84, -0.53],
       pole: [1, 0, 0.3],
