@@ -730,8 +730,11 @@ light), and the socket faces keep their source UVs, so the dark lining of the ma
 it. A lid on each eye blinks over it ("Hand rig"). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It
-stands with the bind of the bear of main, keeps the eyeballs of its mesh, because the map paints a
-full eye on each, and keeps H of the bear of main. An arm that the mesh joins to the trunk needs a cut,
+stands with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of
+the bear of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur and
+the muzzle of the source to the colors of the bear of main in the hall light, and paints the eyes
+dark, as the bead eyes of main: the white ball of the source read startled. An arm that the mesh
+joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
 ```text
