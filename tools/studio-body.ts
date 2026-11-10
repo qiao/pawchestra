@@ -309,21 +309,18 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
     },
   ],
-  // The viola cat (design 4.4). The wider haunch of the cat sits on a wider chair. The tips of the
-  // lower whiskers hang below the chin and follow the head (`noseFront` of the rig config), so
-  // the head measures start at the chin.
+  // The viola cat (design 4.4): the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the cat of `cat.rig.glb`, and the
+  // crease angle 55°, because its limb rings have 8 to 12 vertices.
   [
     'cat',
     {
       landmark: 'shoulders',
-      height: 1.042897,
       seated: true,
       soloist: true,
-      seatWidth: 0.46,
       constant: 'STUDIO_CAT',
-      crease: 35,
-      glb: 'assets/models/cat/cat.rig.glb',
-      headFloor: 0.6885,
+      glb: 'assets/models/cat/tripo-hand/cat.rig.glb',
     },
   ],
   // The cello dog (design 4.4).
