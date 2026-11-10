@@ -489,3 +489,23 @@ The weights, in the order of the work, in the rest pose:
 The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
 weights. The scripts of the session (`scratch/cat/` of the worktree, which git ignores) are not in
 the repo.
+
+**Arm twist.** In the moments of the violist, the roll of each upper arm (from the clavicle) and
+the twist of each forearm (the paw from the upper arm) reached 125° on the left forearm in the
+play and -69° at rest, and 113° on the right forearm. Three changes of the rig and the hold of the
+violist (`CAT_HOLD` of `src/pose/bowed-rig.ts`) make each part take 45° or less:
+
+- **Paws turned.** Before the surface, each vertex past the arm loop at x 0.2295 turns rigidly
+  about the rest forearm axis (from the forearm joint to the wrist joint), by whole ring steps of
+  45°: 45° on the left (1 step) and 90° on the right (2 steps), 318 vertices on each side. The 8
+  quads of the band from the loop at x 0.2209 to the loop at x 0.2295 go, and new quads join the
+  two loops with the same step offset, with the UVs of the old quads. A turned vertex of the far
+  loop lies at most 0.0052 units (left) and 0.0081 units (right) from the old place of its
+  vertex. The joints of `fingers_L` and `fingers_R` of the config turn with the paws.
+- **Palms.** The property `palm` holds the palm of the config, (-0.3949, -0.9151, 0.0815) in the
+  studio axes with x mirrored on the right, turned by the same angle about the same axis: left
+  (-0.241408, 0.611609, -0.75343), right (0.479657, -0.858879, 0.179598) in Blender axes. The
+  rolls of the arm bones follow these palms.
+- **Elbow axis.** The property `hinges` of the right arm is the axis of the config turned -30°
+  about its bind upper arm: (-0.460806, 0.475631, 0.749288). With +30°, the right upper arm rolls
+  -81° at the frog.

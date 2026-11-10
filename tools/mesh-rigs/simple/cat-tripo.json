@@ -131,14 +131,14 @@
     },
     "fingers_L": {
       "head": [
-        0.295,
-        0.629,
-        0.103
+        0.295816,
+        0.624964,
+        0.097684
       ],
       "tail": [
-        0.337,
-        0.618,
-        0.104
+        0.339048,
+        0.621636,
+        0.095247
       ],
       "roll": "palm"
     },
@@ -217,6 +217,19 @@
         1,
         0
       ]
+    },
+    "fingers_R": {
+      "head": [
+        -0.296414,
+        0.641002,
+        0.100119
+      ],
+      "tail": [
+        -0.335306,
+        0.630734,
+        0.11649
+      ],
+      "roll": "palm"
     }
   },
   "palm": [
@@ -356,7 +369,7 @@
       "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
     },
     "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
-    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.007 to 0.082, y 0.794 to 0.861, z 0.117 to 0.165). The nose box holds the pink nose tip."
+    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.007 to 0.082, y 0.794 to 0.861, z 0.117 to 0.165 in the source, mapped by the point edits). The nose box holds the pink nose tip."
   },
   "eyeShell": {
     "lift": 0.002,
