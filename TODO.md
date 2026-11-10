@@ -711,6 +711,20 @@ passes.
       this body. The views show the forearms clear of the belly.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
+- [ ] Cat candidate (`tripo-hand/`): the left upper arm takes 44.5° and the forearm 43.7° in the
+      play, with no margin. The two parts take 88° together, so a margin needs a left paw that
+      turns about 8° less on the viola neck (a new viola place) or a second ring step of the
+      paw turn with a new rest hold (`assets/models/cat/README.md`, "Arm twist after the form
+      edits").
+- [ ] Cat candidate: at the frog, two small dark slits lie at the crease of the lower belly and
+      the thighs, and flat facets show on the white lower belly
+      (`reports/2026-11-10-cat-hand-r9/crotch/`). Find the faces and relax them in the bind key.
+- [ ] Cat candidate: the tail root needs the chair 0.419 m deep (main 0.343 m). A tail root
+      that leaves the back lower, or a thinner root, gives a shorter chair.
+- [ ] Cat candidate: the shin texels stretch 1.38 times along the leg, so the strands read 1.23
+      times longer. A repaint of the shin islands in `tools/cat-maps.py` can shorten them.
+- [ ] Cat candidate: the eyes of the source lie 8 mm apart from a mirror (left x 0.049, right
+      x -0.041). Ask whether the eyes move to a mirror.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
