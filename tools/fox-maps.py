@@ -1,15 +1,15 @@
 # Writes the two color maps of the Tripo fox from the color map of its FBX (design 4.5,
 # assets/models/fox/README.md, "Color map" and "Tan color map"): `fox-color.webp` for the red fox
 # and `fox-tan-color.webp` for the tan fox, and the normal map of the fur, `fox-normal.webp`, which
-# both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels and moves
+# both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels, moves
+# the iris and the pupil of each eyeball to the middle of its eye opening ("Pupils"), and moves
 # each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
 # fox in the hall light, and the socks get darker. In the tan map, the orange fur goes to the tan
-# fur of the main fox in the hall light, and the dark socks go to the tan accent of SPECIES_COLORS
-# of src/models/colors.ts at the lightness of the tan palette of the faces. In both maps the cream,
+# fur of the main fox in the hall light, and the dark socks go to a dark tan. In both maps the cream,
 # the white, and the black keep their colors, and each leg and forearm gets a sharp sock edge.
 # Each texel takes a mix of the steps of the colors, by its nearness to each color, so the blend
 # between two colors of the fur stays smooth. Only the texels of the limbs and the head take the
-# step of the socks. The texels of the eyeballs keep their colors: the script reads their
+# step of the socks. The texels of the eyeballs keep their moved colors: the script reads their
 # triangles, texture points, and the joints from the rig file (`ownEyes` of the export). The
 # output depends only on the input files and on cwebp 1.5.0.
 #
@@ -41,41 +41,40 @@ NORMAL_GAIN = 4
 
 #: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the red map. The hall view
 #: of the app (the key light from the back, no fill light) is the target, because there the fur
-#: read brown with a darker target. The median fur of the chest side, the upper arm, the thigh,
-#: and the head top in that view is L 0.562, C 0.128, h 41.5, against L 0.561, C 0.134, h 40.0 on
-#: the fox of main. In the seated 3/4 view with the fill light (`close-views play --at fox-red
-#: --azimuth 35 --zoom 1.3`), it is L 0.568, C 0.127, h 41.7, against L 0.555, C 0.131, h 40.3.
-#: The target lies a little outside the sRGB gamut, so a larger chroma moves no texel further.
-RED_FUR = (0.44, 0.16, 54.0)
-#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. In the hall
-#: view (the key light from the back, no fill light), the target L 0.80 made the fur read near
-#: white beside the tan fox of main. This target gives the median fur L 0.638, C 0.103, h 55.5 in
-#: that view (L 0.649, C 0.101, h 56.5 before), and L 0.663, C 0.103, h 55.6 in the 3/4 view
-#: with the fill light (`close-views play --demo mozart-k315 --at fox-tan --azimuth 35 --zoom 1.3
-#: --time 6`), against L 0.612, C 0.103, h 55.3 on the tan fox of main.
-TAN_FUR = (0.68, 0.11, 68.0)
-#: The colors of the red fox in the map (sRGB, the median texel of each region of the faces) and
-#: the colors that take their place, for each map: the orange fur, the dark socks, the cream, the
-#: low muzzle and inner ear tone, the white, and the black. A target is an sRGB color, or ('oklch',
-#: L, C, h). The tan fur takes TAN_FUR. The tan socks take the Oklab hue and chroma of the accent
-#: of SPECIES_COLORS['fox-tan'] and the Oklab lightness that the tan palette of the faces gives
-#: them (paletteMap() of tools/studio-palette.ts): sRGB (143, 102, 62).
+#: read brown with a darker target. The median fur of the head top, the chest side, the upper arm,
+#: and the thigh in that view (a fixed camera at the first seated red fox of `mozart-k191`,
+#: `close-views play --pause --no-fill --time 6`) is L 0.533, C 0.130, h 38.9, against L 0.546,
+#: C 0.132, h 39.4 on the fox of main (L 0.523, C 0.131, h 37.8 with L 0.44 and h 54). The target
+#: lies a little outside the sRGB gamut, so a larger chroma moves no texel further.
+RED_FUR = (0.455, 0.16, 56.0)
+#: The Oklab lightness, chroma, and hue (degrees) of the orange fur of the tan map. The same median
+#: in the hall view of the first tan fox of `mozart-k315` is L 0.585, C 0.103, h 53.3, against L
+#: 0.601, C 0.102, h 55.6 on the tan fox of main (L 0.566, C 0.103, h 51.8 with L 0.68 and h 68).
+#: The head top is lighter than on main and the chest darker, because the round trunk of the new
+#: mesh shades more.
+TAN_FUR = (0.71, 0.11, 72.0)
+#: The colors of the red fox in the map (sRGB, the median texel of each region of the source map)
+#: and the colors that take their place, for each map: the orange fur, the dark socks, the cream,
+#: the brown shade, the white, and the black. A target is an sRGB color, or ('oklch', L, C, h).
+#: The tan fur takes TAN_FUR. The tan socks take a dark tan, sRGB (118, 80, 48): with the tan
+#: accent at the lightness of the tan palette of the faces, (143, 102, 62), the socks of the round
+#: new mesh read near the tan fur in the hall light, and the sock edges did not show.
 MAPS = {
     'fox-color.webp': (
-        ((230, 108, 11), ('oklch', *RED_FUR)),  # the orange fur to the red-orange of main
-        ((76, 46, 23), (34, 20, 11)),  # the dark socks, the paws, the ear tips, and the brows
-        ((240, 201, 158), (240, 201, 158)),  # the cream bib, cheeks, muzzle, and tail tip
-        ((176, 131, 106), (176, 131, 106)),  # the inner ears and the shade of the cream
-        ((255, 255, 255), (255, 255, 255)),  # the white lights
-        ((8, 6, 5), (8, 6, 5)),  # the black nose and lips
+        ((214, 102, 16), ('oklch', *RED_FUR)),  # the orange fur to the red-orange of main
+        ((72, 42, 24), (34, 20, 11)),  # the dark socks, the paws, the ear tips, and the nose
+        ((241, 194, 149), (241, 194, 149)),  # the cream bib, cheeks, muzzle, and tail tip
+        ((132, 93, 64), (132, 93, 64)),  # the brown shade between the cream and the socks
+        ((243, 246, 244), (243, 246, 244)),  # the white lights
+        ((13, 8, 4), (13, 8, 4)),  # the black lines
     ),
     'fox-tan-color.webp': (
-        ((230, 108, 11), ('oklch', *TAN_FUR)),  # the orange fur to the tan fur
-        ((76, 46, 23), (143, 102, 62)),  # the dark socks to the tan accent
-        ((240, 201, 158), (240, 201, 158)),  # the cream bib, cheeks, muzzle, and tail tip
-        ((176, 131, 106), (176, 131, 106)),  # the inner ears and the shade of the cream
-        ((255, 255, 255), (255, 255, 255)),  # the white lights
-        ((8, 6, 5), (8, 6, 5)),  # the black nose and lips
+        ((214, 102, 16), ('oklch', *TAN_FUR)),  # the orange fur to the tan fur
+        ((72, 42, 24), (118, 80, 48)),  # the dark socks to a dark tan
+        ((241, 194, 149), (241, 194, 149)),  # the cream bib, cheeks, muzzle, and tail tip
+        ((132, 93, 64), (132, 93, 64)),  # the brown shade between the cream and the socks
+        ((243, 246, 244), (243, 246, 244)),  # the white lights
+        ((13, 8, 4), (13, 8, 4)),  # the black lines
     ),
 }
 #: The pairs of anchors of each map with a blend between them in the map: the orange fur to the cream, the
@@ -88,6 +87,33 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
+#: The ball points of the front view with a luma below this value make the pupil.
+PUPIL_LUMA = 50
+#: The largest red over blue of a pupil texel: the dark brown that the map leaves on the rest of
+#: the ball has more.
+PUPIL_WARM = 15
+#: The place of the middle of each pupil above the middle of the eye opening of the front view,
+#: in opening radii. The head of the violinist drops 10 degrees in the play, and the camera of the
+#: hall looks down at the stage, so a pupil at the middle reads as a look down there.
+PUPIL_LIFT = 0.1
+#: The largest share of the texels of an eyeball that can also lie in the other eyeball.
+EYE_OVERLAP = 0.01
+#: The angle in degrees from the pupil of the front view within which the pupil texels and the
+#: amber texels of the iris of a ball lie.
+IRIS_SEARCH = 40.0
+#: The share of white texels from which a step of 1 degree out from the pupil lies past the iris.
+IRIS_WHITE = 0.05
+#: The angle in degrees added to the iris radius, so that the dark edge of the iris moves with it.
+IRIS_EDGE = 3.0
+#: The rounds of the fill of the texels around the eyeball triangles before the turned ball samples
+#: the map, so that a sample at the edge of a texture island takes no color from outside it.
+EYE_FILL = 4
+#: The barycentric slack of a ray hit, so that a ray on the edge of two triangles hits one.
+EDGE = 1e-4
+#: The barycentric slack of a second try for a ray that hits no ball triangle.
+WIDE_EDGE = 0.05
+#: The step of the grid of the front rays over each eye, in units of the rig file.
+RAY_STEP = 0.0005
 #: The light spot over each eye of a source map that paints one: its middle from the middle of the
 #: eyeball, in the axes of the rig file (+x the left side, +y up, +z forward), with x toward the
 #: middle plane, and two radii, all in units of the distance of the eye from the middle plane, as
@@ -106,11 +132,13 @@ BROW_FAR = 0.04
 #: that the limbs read dirty in the hall light. Above the edge each texel takes the orange fur,
 #: below it the dark sock. The bones above the edge bone take the fur, the bones below it the
 #: sock. The source map ends the leg sock on the thigh just above the knee, and the arm sock on
-#: the forearm at a third of the way from the elbow.
+#: the forearm at 0.28 of the way from the elbow.
 SOCK_EDGES = (
-    (('thigh', 'shin', 'foot', 'toes'), 0, 0.86),
-    (('upper_arm', 'forearm', 'hand', 'fingers'), 1, 0.35),
+    (('thigh', 'shin', 'foot', 'toes'), 0, 0.95),
+    (('upper_arm', 'forearm', 'hand', 'fingers'), 1, 0.28),
 )
+#: The padding texels within this many texels of a texel of the limbs take the step of the socks.
+PAD_GROW = 6
 #: The distance of a texel from its bone in the seated bind, in units of the rig file, within which
 #: the texel belongs to the limb.
 SOCK_RADIUS = 0.09
@@ -350,8 +378,13 @@ def sock_edges(rig, lab):
     out[move] = orange + new[:, None] * line + off[move]
     moved = np.abs(new - s) > 0.02
     # The texels that can take the step of the dark socks: the limbs, and the head above the neck
-    # joint (the ear tips and the brows).
+    # joint (the ear tips and the brows). The padding texels around each texture island (outside
+    # each triangle) take the step of the island next to them: else the dark padding of a sock
+    # island of the tan map shows as dark lines along the seams.
     dark = np.isfinite(target) | (places[..., 1] > joints['neck'][1])
+    outside = ~np.isfinite(places).all(axis=-1)
+    grown = np.asarray(Image.fromarray(dark).filter(ImageFilter.MaxFilter(2 * PAD_GROW + 1))) > 0
+    dark |= outside & grown
     return out, int(moved.sum()), dark
 
 
@@ -429,6 +462,257 @@ def move_texels(anchors, lab):
     return moved
 
 
+def ray_hits(origins, directions, corners, edge=None):
+    """Gives, for each ray, the distance to the nearest triangle that it hits (inf for none), the
+    index of that triangle, and the barycentric weights (u, v) of the hit (Moller-Trumbore)."""
+    edge = EDGE if edge is None else edge
+    a, e1, e2 = corners[:, 0], corners[:, 1] - corners[:, 0], corners[:, 2] - corners[:, 0]
+    best = np.full(len(origins), np.inf)
+    index = np.full(len(origins), -1)
+    bary = np.zeros((len(origins), 2))
+    for start in range(0, len(origins), 512):
+        o = origins[start:start + 512, None, :]
+        d = directions[start:start + 512, None, :]
+        p = np.cross(d, e2[None])
+        det = (e1[None] * p).sum(-1)
+        ok = np.abs(det) > 1e-12
+        inv = np.where(ok, 1 / np.where(ok, det, 1), 0)
+        t0 = o - a[None]
+        u = (t0 * p).sum(-1) * inv
+        q = np.cross(t0, e1[None])
+        v = (d * q).sum(-1) * inv
+        t = (e2[None] * q).sum(-1) * inv
+        hit = ok & (u >= -edge) & (v >= -edge) & (u + v <= 1 + edge) & (t > 1e-6)
+        t = np.where(hit, t, np.inf)
+        k = t.argmin(axis=1)
+        rows = np.arange(len(k))
+        best[start:start + 512] = t[rows, k]
+        index[start:start + 512] = np.where(np.isfinite(t[rows, k]), k, -1)
+        bary[start:start + 512] = np.c_[u[rows, k], v[rows, k]]
+    return best, index, bary
+
+
+def eye_texels(rig, faces):
+    """Gives the texels of the triangles `faces` (rows and columns), and the place of each in the
+    seated bind, by the barycentric mix of the corners of its triangle."""
+    triangles, positions, points = rig[:3]
+    ys, xs, places = [], [], []
+    for f in faces:
+        tri = triangles[f]
+        uv = points[tri] * SIZE - 0.5
+        x0, y0 = np.maximum(np.floor(uv.min(axis=0)).astype(int), 0)
+        x1, y1 = np.minimum(np.ceil(uv.max(axis=0)).astype(int), SIZE - 1)
+        if x1 < x0 or y1 < y0:
+            continue
+        gy, gx = np.mgrid[y0:y1 + 1, x0:x1 + 1]
+        (ax, ay), (bx, by), (cx, cy) = uv
+        area = (bx - ax) * (cy - ay) - (cx - ax) * (by - ay)
+        if abs(area) < 1e-12:
+            continue
+        wb = ((gx - ax) * (cy - ay) - (cx - ax) * (gy - ay)) / area
+        wc = ((bx - ax) * (gy - ay) - (gx - ax) * (by - ay)) / area
+        wa = 1 - wb - wc
+        inside = (wa >= -0.01) & (wb >= -0.01) & (wc >= -0.01)
+        corners = positions[tri]
+        place = wa[..., None] * corners[0] + wb[..., None] * corners[1] + wc[..., None] * corners[2]
+        ys.append(gy[inside])
+        xs.append(gx[inside])
+        places.append(place[inside])
+    return np.concatenate(ys), np.concatenate(xs), np.concatenate(places)
+
+
+def sample(image, points):
+    """Gives the bilinear colors of an image (float, H x W x 3) at texture points."""
+    x = np.clip(points[:, 0] * SIZE - 0.5, 0, SIZE - 1.001)
+    y = np.clip(points[:, 1] * SIZE - 0.5, 0, SIZE - 1.001)
+    x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+    fx, fy = (x - x0)[:, None], (y - y0)[:, None]
+    return ((1 - fx) * (1 - fy) * image[y0, x0] + fx * (1 - fy) * image[y0, x0 + 1]
+            + (1 - fx) * fy * image[y0 + 1, x0] + fx * fy * image[y0 + 1, x0 + 1])
+
+
+def turn_matrix(a, b):
+    """Gives the matrix of the shortest turn that takes the unit vector a to the unit vector b."""
+    axis = np.cross(a, b)
+    s = np.linalg.norm(axis)
+    if s < 1e-9:
+        return np.eye(3)
+    k = axis / s
+    K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    angle = np.arctan2(s, a @ b)
+    return np.eye(3) + np.sin(angle) * K + (1 - np.cos(angle)) * K @ K
+
+
+def fill_around(image, inside):
+    """Gives a copy of the image in which EYE_FILL rings of texels around the texels `inside` take
+    the mean color of their neighbors inside, ring by ring."""
+    out = image.copy()
+    have = inside.copy()
+    for _ in range(EYE_FILL):
+        total = np.zeros_like(out)
+        count = np.zeros(have.shape)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            total += np.roll(out * have[..., None], (dy, dx), axis=(0, 1))
+            count += np.roll(have, (dy, dx), axis=(0, 1))
+        ring = ~have & (count > 0)
+        out[ring] = total[ring] / count[ring, None]
+        have |= ring
+    return out
+
+
+def ball_colors(rig, faces, c, directions, src):
+    """Gives the source color of the ball at each direction from its middle c (a ray from c to the
+    ball triangles), and a mask of the directions that hit the ball."""
+    triangles, positions, points = rig[:3]
+    ball = positions[triangles[faces]]
+    _, k, bary = ray_hits(np.tile(c, (len(directions), 1)), directions, ball)
+    # A ray through a small crack between two ball triangles takes the nearer triangle.
+    miss = np.flatnonzero(k < 0)
+    _, k2, bary2 = ray_hits(np.tile(c, (len(miss), 1)), directions[miss], ball, WIDE_EDGE)
+    k[miss], bary[miss] = k2, bary2
+    found = k >= 0
+    tri = triangles[faces[k[found]]]
+    u, v = bary[found, 0], bary[found, 1]
+    uv = ((1 - u - v)[:, None] * points[tri[:, 0]] + u[:, None] * points[tri[:, 1]]
+          + v[:, None] * points[tri[:, 2]])
+    colors = np.zeros((len(directions), 3))
+    colors[found] = sample(src, uv)
+    return colors, found
+
+
+def classes(colors):
+    """Gives the masks of the black pupil (luma below PUPIL_LUMA, and red less than PUPIL_WARM over
+    blue), the amber iris, the white sclera, and the dark brown of the ball that the map leaves
+    unpainted, of a list of sRGB colors."""
+    luma = colors @ [0.2126, 0.7152, 0.0722]
+    warmth = colors[:, 0] - colors[:, 2]
+    top, low = colors.max(axis=1), colors.min(axis=1)
+    sat = (top - low) / np.maximum(top, 1)
+    red, green, blue = colors.T
+    amber = (sat > 0.5) & (top > 120) & (red >= green) & (green > blue)
+    white = (low > 170) & (sat < 0.25)
+    brown = (luma < PUPIL_LUMA) & (warmth >= PUPIL_WARM)
+    return (luma < PUPIL_LUMA) & (warmth < PUPIL_WARM), amber, white, brown
+
+
+def angle_to(a, b):
+    """Gives the angle in degrees between each unit vector of a and the unit vector b."""
+    return np.degrees(np.arccos(np.clip(a @ b, -1, 1)))
+
+
+def center_pupils(rig, image):
+    """Moves the iris and the pupil of each eyeball to the middle of the eye opening of the front
+    view, and gives the new image. The source map paints each iris at the inner edge of the white
+    of its ball, so in the front view each pupil sat toward the nose, and the fox looked a little
+    cross-eyed. The map paints only a band of the ball around the opening, and the rest of the
+    ball is dark brown, so a turn of the whole ball (the second Tripo rabbit) shows the dark brown
+    in the opening. Thus only the iris moves, as a decal on the ball. For each side: c is the
+    middle of the sphere of the ball. Rays from the front (along -z: the head of the seated bind
+    faces +z) over a grid find the ball points that show. Their mean in x and y is the middle of
+    the opening, and the ball point there, PUPIL_LIFT opening radii up, gives the target direction
+    t from c. The pupil direction p is the mean direction of the black pupil texels of the whole
+    ball within IRIS_SEARCH degrees of the pupil of the front view, and the iris radius a is the angle
+    from p at which the share of white texels first reaches IRIS_WHITE, plus IRIS_EDGE. With R the turn that
+    takes p to t, each ball texel at the direction d within a of R p takes the source color at
+    R^-1 d (the moved iris). Each other texel within a of p (the old iris), and each texel of the
+    opening with an amber, orange, or dark brown color, takes the median white of the sclera of the
+    opening."""
+    triangles, positions, points, eyes = rig[:4]
+    out = np.asarray(image).astype(np.float64)
+    corners = positions[triangles]
+    middles = corners.mean(axis=1)
+    taken = np.zeros((SIZE, SIZE), bool)
+    texels = {}
+    for side in ('L', 'R'):
+        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
+        # The islands of the two balls of the fox touch at 43 edge texels. A larger overlap
+        # would move the iris of one ball with the other.
+        if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
+            sys.exit('The texels of the two eyeballs overlap, so no pupil can move alone.')
+        taken[ys, xs] = True
+        texels[side] = (ys, xs, places)
+    src = fill_around(out, taken)
+    for side in ('L', 'R'):
+        faces = np.array(eyes[side]['faces'])
+        ball = positions[triangles[faces].ravel()]
+        fit = np.linalg.lstsq(np.c_[2 * ball, np.ones(len(ball))], (ball ** 2).sum(1), rcond=None)[0]
+        c = fit[:3]
+        r = float(np.sqrt(fit[3] + c @ c))
+        near = np.flatnonzero(np.linalg.norm(middles - c, axis=1) < 3 * r)
+        gx, gy = np.meshgrid(np.arange(c[0] - 1.6 * r, c[0] + 1.6 * r, RAY_STEP),
+                             np.arange(c[1] - 1.6 * r, c[1] + 1.6 * r, RAY_STEP))
+        origins = np.c_[gx.ravel(), gy.ravel(), np.full(gx.size, c[2] + 1.0)]
+        down = np.tile([0.0, 0.0, -1.0], (len(origins), 1))
+        t_hit, hit, _ = ray_hits(origins, down, corners[near])
+        on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
+        shown = origins[on_ball] + t_hit[on_ball, None] * down[on_ball]
+        middle = shown[:, :2].mean(axis=0)
+        radius = np.sqrt(len(shown) * RAY_STEP ** 2 / np.pi)
+        seen = shown - c
+        seen /= np.linalg.norm(seen, axis=1)[:, None]
+        goal = middle + [0.0, PUPIL_LIFT * radius]
+        target = seen[np.argmin(np.linalg.norm(shown[:, :2] - goal, axis=1))]
+        seen_colors, _ = ball_colors(rig, faces, c, seen, src)
+        seen_pupil, _, seen_white, _ = classes(seen_colors)
+        front = seen[seen_pupil].mean(axis=0)
+        front /= np.linalg.norm(front)
+        sclera = np.median(seen_colors[seen_white], axis=0)
+        ys, xs, places = texels[side]
+        d = places - c
+        d /= np.linalg.norm(d, axis=1)[:, None]
+        colors = src[ys, xs]
+        pupil, _, white, brown = classes(colors)
+        pupil &= angle_to(d, front) < IRIS_SEARCH
+        p = d[pupil].mean(axis=0)
+        p /= np.linalg.norm(p)
+        # The iris edge: going out from p in steps of 1 degree, the first step in which at least
+        # IRIS_WHITE of the painted texels are white. The iris lies on the inner side of the white,
+        # so the steps hold white only on their outer side.
+        out_angle = angle_to(d, p)
+        painted = ~brown
+
+        def white_share(k):
+            band = (out_angle >= k) & (out_angle < k + 1) & painted
+            return white[band].mean() if band.any() else 0.0
+
+        steps = np.arange(int(IRIS_SEARCH))
+        a = float(np.argmax(np.array([white_share(k) for k in steps]) >= IRIS_WHITE)) + IRIS_EDGE
+        turn = turn_matrix(p, target)
+        moved = angle_to(d, turn @ p) < a
+        source, found = ball_colors(rig, faces, c, d[moved] @ turn, src)
+        new = colors.copy()
+        idx = np.flatnonzero(moved)[found]
+        new[idx] = source[found]
+        # The opening: the texels within 3 degrees of a ball direction of the front view.
+        opening = np.zeros(len(d), bool)
+        for start in range(0, len(d), 4096):
+            opening[start:start + 4096] = (d[start:start + 4096] @ seen.T).max(axis=1) > np.cos(np.radians(3))
+        _, warm, _, _ = classes(colors)
+        orange = warm | ((colors[:, 0] > colors[:, 2] + 60) & (colors[:, 0] > 90))
+        clear = ~moved & ((angle_to(d, p) < a) | (opening & (orange | brown)))
+        new[clear] = sclera
+        out[ys, xs] = new
+
+        before = shown[seen_pupil, :2].mean(axis=0)
+        after_colors, _ = ball_colors(rig, faces, c, seen, fill_around(out, taken))
+        after = shown[classes(after_colors)[0], :2].mean(axis=0)
+        show = lambda q: np.round((q - middle) / radius, 3).tolist()
+        print(f'pupil {side}: in the front view, the middle of the pupil lay {show(before)} opening '
+              f'radii (x, y) from the middle of the opening, now {show(after)}; the iris of '
+              f'{a:.1f} degrees moves {angle_to(p[None], target)[0]:.1f} degrees, '
+              f'{int(clear.sum())} texels take the white {np.round(sclera).astype(int).tolist()}')
+    # The padding texels around the ball islands, outside each triangle of the mesh, take the
+    # new colors of the ball, so that a sample at the edge of an island shows no old pupil.
+    mask = Image.new('L', (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(mask)
+    for tri in triangles:
+        draw.polygon([(float(u) * SIZE, float(v) * SIZE) for u, v in points[tri]], fill=255)
+    padding = ~(np.asarray(mask) > 0) & ~taken
+    filled = fill_around(out, taken)
+    out[padding] = filled[padding]
+    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+
+
 def write_normal_map():
     """Writes the normal map of the fur: each x, y tilt of the source limited to the length
     NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
@@ -458,6 +742,7 @@ def write_normal_map():
 def main():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
+    image = center_pupils(rig, image)
     lab = oklab(linear(np.asarray(image)))
     if BROW_SPOT is not None:
         lab, painted = brow_fill(rig, lab)
