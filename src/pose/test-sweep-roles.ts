@@ -68,6 +68,17 @@ const BODY_BONES = [
 /** The open loops of {@link BODY_BONES}: the cuts to the two upper arms. */
 const BODY_LOOPS = 2;
 
+/** The rig file of the hand rig of the Tripo polar bear (`assets/models/polar-bear/README.md`). */
+const TRIPO_POLAR_BEAR = 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb';
+
+/**
+ * The open loops of {@link BODY_BONES} of the Tripo polar bear: the cuts to the two upper arms,
+ * the open bases of the 8 claws of the feet, the 2 eye sockets, the open backs of the 2 eyeballs,
+ * the edges of the 2 lids, and 10 small open loops of the mouth and its parts, which the source
+ * mesh has.
+ */
+const TRIPO_POLAR_BEAR_LOOPS = 26;
+
 /**
  * The open loops of {@link BODY_BONES} of the foxes, the bodies of the meshes
  * (`pnpm rig-mesh <animal>`): the cuts to the two upper arms, and two open edges of each mesh. The
@@ -236,13 +247,15 @@ function* playSamples(scene: TestScene): Generator<SweepSample> {
 }
 
 /**
- * The closed surface of the body of an animal: {@link BODY_BONES} with a cap on each cut.
+ * The closed surface of the body of an animal: {@link BODY_BONES} with a cap on each cut, or on
+ * each open loop of the Tripo polar bear ({@link TRIPO_POLAR_BEAR_LOOPS}).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function bodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, BODY_LOOPS);
+  const tripo = posed.model.studio.body.source === TRIPO_POLAR_BEAR;
+  return closedPart(posed, BODY_BONES, tripo ? TRIPO_POLAR_BEAR_LOOPS : BODY_LOOPS);
 }
 
 /**
