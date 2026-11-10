@@ -94,8 +94,8 @@ red fox and the tan fox share it.
 | `tripo-hand/fox.blend` | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | None: edit it in Blender |
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/fox-color.webp` | Web copy of the color map of the Tripo FBX ("Color map" below). License as the FBX file | None: made one time from the source image |
-| `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Tan color map" below). License as the FBX file | `tools/fox-tan-map.py` |
+| `tripo-hand/fox-color.webp` | Color map of the red fox, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `tools/fox-maps.py` |
+| `tripo-hand/fox-tan-color.webp` | Color map of the tan fox ("Tan color map" below). License as the FBX file | `tools/fox-maps.py` |
 | `tripo-hand/fox-normal.webp` | Web copy of the normal map of the Tripo FBX, for the red fox and the tan fox ("Normal map" below). License as the FBX file | None: made one time from the source image |
 
 ### tripo-p2/fox.fbx
@@ -132,8 +132,8 @@ exception: the legs are longer for the seat height of the fox of main ("Longer l
 
 | Item | Value |
 |---|---|
-| Size | 463,014 bytes |
-| SHA-256 | `e8a49277bcb3d8462d1cedfcf29d155b5bd1d883c137ab1b3e40d0f142dd7c15` |
+| Size | 463,016 bytes |
+| SHA-256 | `0b381607cc2a049f0a24fa482f93b086c04a15886d7382434db15cf518f70d0a` |
 | Origin | Made by hand in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the longer legs (1.0456 units after), the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
@@ -147,8 +147,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,131,236 bytes | `1f5a21e154435e87dfa5c9eb5414677e8c3af37a1db3146f18df9f96f42f2dc7` |
-| `tripo-hand/fox.rig.json` | 16,854 bytes | `860d750a722249fb5a69c6748c42077c6522ce916ecca20fbed9dff6cfe3f650` |
+| `tripo-hand/fox.rig.glb` | 1,131,240 bytes | `8e8786449150de53d9b3be5d4e717762caaf74d2f10d3354c91399af9bc11caa` |
+| `tripo-hand/fox.rig.json` | 16,856 bytes | `1db747cfd6fe12117d4aa7fdb81cc96d2fd1708a570df814916c96fc55d4004f` |
 
 The edits, in the order of the work:
 
@@ -447,9 +447,58 @@ them white, as the face colors are.
 | Item | Value |
 |---|---|
 | Source | `tripo-p2/fox.fbm/fox_basecolor.jpg` (above) |
-| `fox-color.webp` | Lanczos scale to 2048 × 2048, WebP quality 60 (Pillow 12.1.1, method 6): 140,632 bytes, SHA-256 `34f7ccfeac8445870a84e088e7fd08467695909620b54d8901d319e96e6f601f` |
+| `fox-color.webp` | Lanczos scale to 2048 × 2048, the red-orange step below, WebP quality 60 (Pillow 13.0.0, method 6): 135,312 bytes, SHA-256 `812a1c7caa116b6834cb44d462fdc0fbb3bdb8e13f4c95c737bc9f0f0c7d9dd7` |
 | Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
+
+**Red-orange of the red map.** In the seated 3/4 app view (`close-views play --demo mozart-k191
+--at fox-red --azimuth 35 --zoom 1.3 --time 6`), the orange fur of the candidate read pale peach.
+The median Oklab L, C, and h of the orange fur at the chest side, the upper arm, the thigh, and
+the head top:
+
+| Step | L | C | h |
+|---|---|---|---|
+| `fox_basecolor.jpg` (by UV faces of the four parts) | 0.638 | 0.172 | 46.9 |
+| `fox-color.webp`, the plain copy | 0.638 | 0.172 | 47.0 |
+| App render, candidate | 0.731 | 0.137 | 45.1 |
+| App render, candidate, no sheen | 0.730 | 0.139 | 44.4 |
+| App render, candidate, no normal map | 0.731 | 0.137 | 45.1 |
+| App render, candidate, face colors and no map | 0.743 | 0.140 | 44.4 |
+| App render, fox of main | 0.521 | 0.131 | 38.7 |
+
+The source and its WebP copy hold the full chroma, and the sheen and the normal map change the
+render by 0.001 in L. The tone curve lowers the chroma of both foxes by the same share (0.80 and
+0.77). The difference is the map color: the fox of main shifts its fur to L 0.557, C 0.171, h 43.7
+(`colors.shift` of `tools/mesh-rigs/fox.json`), and its faces take less light than the smooth
+body. `tools/fox-maps.py` now moves the orange fur of the red map to Oklab L 0.42, C 0.15, h 52°
+(`RED_FUR`), with the same anchor blend as the tan map. The socks, the paws, the ear tips, the
+cream and white fur, the black nose, and the eyeball texels keep their colors. The same view then
+gives L 0.523, C 0.130, h 37.2. Targets of L 0.47 and 0.43 gave L 0.567 and 0.532.
+
+The tan fox in the same view (`mozart-k315 --at fox-tan`): L 0.516, C 0.093, h 52.9, against L
+0.634, C 0.102, h 57.1 on the fox of main. At the head top, where both foxes take the same light,
+the values are L 0.637, C 0.096, h 57.9 against L 0.607, C 0.093, h 57.8. The tan map stays.
+
+**Paw size.** From the wrist joint to the finger tips, along the rest forearm axis, and across it
+on the two axes of the paw (`paw.py` of the session, both rig files in their rest pose):
+
+| Paw | Length | Width | Thickness |
+|---|---|---|---|
+| Candidate before | 0.168 m (0.521 H) | 0.152 m (0.472 H) | 0.078 m (0.241 H) |
+| Fox of main | 0.125 m (0.387 H) | 0.106 m (0.328 H) | 0.078 m (0.240 H) |
+| Candidate after | 0.126 m (0.391 H) | 0.107 m (0.331 H) | 0.078 m (0.240 H) |
+
+The forearms differ (0.176 m on the candidate, 0.258 m on the fox of main), so H is the measure.
+A point edit in the live Blender (`paw_scale.py` of the session) maps each vertex past the wrist
+joint in the frame of its paw: origin the head of `hand_<side>`, a the rest forearm axis, w the
+width axis (the first principal axis of the paw across a), and n = a × w. With d the distance
+along a and s = smoothstep(0, 0.025, d), the point c + 0.75 d a + (1 - 0.30 s)(v · w) w + (v · n) n
+takes its place (623 vertices). The vertices up to the wrist joint stay, so the wrist band keeps
+its girth and shows no step. The basis and the key `bind_belly` take the same map. The heads and
+the lengths of `hand_<side>` and `fingers_<side>` take the map, and each keeps its direction and
+roll, so the keys of the Action `bind` keep their turns. The weights, the palm hints, and the paw
+turns stay. Each paw still closes on the bow, the violin neck, and the flute. In the moments of
+"Arm twist", each part of each arm takes 41.6° or less (the right forearm of the flutist at rest).
 
 **Longer legs and texels.** The edit of "Longer legs" kept the UVs, so the texels of the legs
 stretch along the leg by the scale of that edit: at most 1.24 (24 %), in the band from the ankle
@@ -484,11 +533,11 @@ orange edges of the socks, and the color step at each end is at the level of the
 
 **Tan color map.** The tan fox (the flutes) shares the body and shows its own map,
 `tripo-hand/fox-tan-color.webp` (`paletteMaps` of the `ANIMALS` entry of the fox,
-`StudioTexture.palettes`). The script `tools/fox-tan-map.py` makes it from the source image and
+`StudioTexture.palettes`). The script `tools/fox-maps.py` makes it from the source image and
 the rig file:
 
 ```text
-uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-tan-map.py
+uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 ```
 
 It scales the source as `fox-color.webp`, and moves each texel in Oklab: the orange fur (sRGB 220,
