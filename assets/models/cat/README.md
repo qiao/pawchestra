@@ -397,9 +397,9 @@ The files of the candidate, after the last edit:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.blend` | 411,272 bytes | `5af2ce724c89f2d84002c4a09b9a945f4ae3e38a49f4eaa633374ecd7e0c5b2c` |
-| `tripo-hand/cat.rig.glb` | 856,388 bytes | `ba988ef208ccfb527455a9ba4c4317f9f33a5dc68452e7448eb65936198e0e59` |
-| `tripo-hand/cat.rig.json` | 17,186 bytes | `7d187f5d54e08fd5fb4f97052d123123e7009cb34ba7512721d14d2eccc3947f` |
+| `tripo-hand/cat.blend` | 415,828 bytes | `d74639afc64f693609678dd3b0ba450a6c0e201fcee151944fc9ca4d60cca54f` |
+| `tripo-hand/cat.rig.glb` | 856,388 bytes | `c772106b0b9d11bd3acbca484b7cf88b3eee7f6fdbaad6dbe424dd07e8012e02` |
+| `tripo-hand/cat.rig.json` | 17,186 bytes | `4e8c79cfcf23d8155f4ec644d8ab492f05874e34bef569b7aac19f7ee3bfc76f` |
 | `tripo-hand/cat-color.webp` | 143,090 bytes | `2cfdb0d9e6bdac299e8eafbcdf6c563b979891d22e1e219796e75bd1723ca4c3` |
 | `tripo-hand/cat-normal.webp` | 73,312 bytes | `6ba7573360b488d434b50165550930865eb5ba20a106b014b72a7f4effd4e7c6` |
 
@@ -497,6 +497,20 @@ The weights, in the order of the work, in the rest pose:
    knuckle row 0.278 to 0.30 {`hand` 0.5, `fingers` 0.5}, and from 0.30 {`fingers` 1}.
 4. The vertices of the loose parts (eyeballs and whisker strips), of the gloss nose, and of the
    eyeballs take {`head` 1}: 396 vertices.
+5. Round 12 replaces the wrist and paw rows of steps 2 and 3 from t 0.215 on both arms, by the
+   place t along the rest forearm axis (`scratch/cat/r12_rows.py`: `wrist_rows()`, then
+   `knuckle_rows()`). The knuckle row of step 3 turned the curl in a step too short for the
+   paw, so the palm skin and the pads turned over: 41 faces of the left paw at rest (curl 117°,
+   wrist 64°) and 18 of the right paw (bow curl 52°). A bend of angle a stays clean when its
+   blend is longer than a times the distance of the inner skin from the bone (0.018 at the
+   palm, up to 0.038 at the wrist).
+   - Wrist. The bend share of the paw (half the wrist helper, plus the paw bones) grows in 11
+     equal steps, one in each band of 0.005 from t 0.215 to t 0.27. A row with a share b of 0.5
+     or less is {`wrist` 2b, forearm segments the rest, in their old ratio}; above 0.5 it is
+     {`wrist` 2(1 - b), paw 2b - 1}. Only vertices with no elbow share take a row.
+   - Knuckles. From t 0.247, the paw share of each row splits into `hand` and `fingers`: the
+     `fingers` share grows in 13 equal steps, one in each band of 0.005, to t 0.312. The wrist
+     share stays.
 
 The trunk, the neck, the head, the ears, the hips, the legs, and the tail keep the automatic
 weights. The scripts of the session (`scratch/cat/` of the worktree, which git ignores) are not in
