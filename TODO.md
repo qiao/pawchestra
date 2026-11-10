@@ -700,16 +700,11 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the pea eye of the app must change both, or the preview must come from the app.
-- [ ] Tripo bear candidate (`assets/models/bear/tripo-hand/`): in the play, the forearms go up to
-      3.6 cm and the paws up to 5.6 cm into the head, against 0.0 cm and 0.3 cm on main
-      (`pnpm pose-depth conductor`, Brahms 2 285.38 s and 127.88 s, 0.3% of the samples). The
-      raised right forearm meets the cheek when the head turns to a section on the right. The head
-      of this body sits 11 cm higher and its muzzle 4 cm further forward than on main. A change of
-      the turn of the head in a cue (`CUE_MOTION`) or of the form of the head is next.
-- [ ] Tripo bear candidate: up to 8 faces of the throat under the muzzle fold in the lift and in
-      2% to 5% of the play (`pnpm fold-probe conductor`: faces 3774, 3767, 3684, 1783, main bone
-      `head`). Their vertices keep automatic rows with about 0.08 `ear_L`, `ear_R`, and
-      `clavicle_*`. Try exact rows {`head`, `neck`} there. The arm gate does not count them.
+- [ ] Tripo bear candidate: face 3548 at the left side of the neck near the clavicle folds in 0.1 %
+      of the play (`pnpm fold-probe conductor`). Its automatic row holds 0.31 `clavicle_L`.
+- [ ] Tripo bear candidate: with the cue facts (`cueHeadLeft` 45, `cueHeadRight` 30, `cueLift` 15),
+      the paws still go up to 1.2 cm into the head in the play (main 0.3 cm). Check the lower cue
+      hand and the smaller head turn in the hall view.
 - [ ] Tripo bear candidate: the longer elbow blend of round 12 moves the left flat p5 of the
       conductor from 0.88 to 0.86 (main 0.83, limit 0.55) and the left move turn max from 448 to
       450 (main 484). Check the bent left elbow in the hall view.
