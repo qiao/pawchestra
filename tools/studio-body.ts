@@ -320,12 +320,11 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/rabbit/tripo-hand/rabbit.rig.glb',
     },
   ],
-  // The red and the tan foxes (design 4.4): the candidate hand rig of the new Tripo P2 mesh
-  // (`assets/models/fox/tripo-hand/fox.blend`), with no arm cut and no arm stretch, and longer
-  // legs for the seat of the main fox. Its `.blend` holds the facts of the body: the scale that
-  // keeps H of the fox of `fox.rig.glb` before the larger head, the crease angle 55°, and the seat
-  // width 0.5 m of the wide haunch. The tan fox takes the same rig with the tan palette, and the
-  // color maps of `tools/fox-maps.py`.
+  // The red and the tan foxes (design 4.4): the candidate hand rig of the Tripo CLI fox
+  // (`assets/models/fox/tripo-hand/fox.blend`), with no arm cut and no arm stretch, and shins 1.07
+  // times longer for the seat of the main fox. Its `.blend` holds the facts of the body: the scale
+  // that gives H 0.380 m, near the shown head of the main fox, and the crease angle 55°. The tan
+  // fox takes the same rig with the tan palette, and the color maps of `tools/fox-maps.py`.
   [
     'fox',
     {
