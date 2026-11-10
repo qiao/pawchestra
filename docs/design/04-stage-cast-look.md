@@ -1035,6 +1035,11 @@ stage lamps and the eye light give them a gloss over the painted eye. Their face
 color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
+The candidate polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map that
+`tools/polar-bear-maps.py` makes from the map of its Tripo FBX. The cream fur goes to the white
+of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
+Tripo map paints a tan bear with light claws, and the hall view sets the target, as for the fox.
+
 Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
 faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`
 faces keep the shared shading.
