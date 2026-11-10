@@ -691,6 +691,19 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the pea eye of the app must change both, or the preview must come from the app.
+- [ ] Tripo bear candidate (`assets/models/bear/tripo-hand/`): at rest the paws turn the palm to
+      the front, so the claws face the camera, and the forearms lie on the belly. Fit the palm and
+      the twist of the conductor hold (`reports/2026-11-10-bear-hand-r3/panel.png`).
+- [ ] Tripo bear candidate: in shares of H, the forearms are 15 % and the upper arms 13 % thicker
+      than on the bear of main, the paws 21 % longer and 33 % deeper, the shins 13 % thicker, and
+      the body 9 % taller. Bring the form toward the bear of main.
+- [ ] Tripo bear candidate: the fur of the map is lighter and more colorful than the bear of main
+      (Oklab L 0.555 and C 0.117 against 0.391 and 0.064). Give the map the brown of main.
+- [ ] Tripo bear candidate: the two root bands of each upper arm take no split (a triangle and
+      poles), so the rings stand 0.41 and 0.62 arm radii apart there. Check the arm root folds
+      at the beat.
+- [ ] Tripo bear candidate: give it the color map, the lids, the eye light, and the fur shading,
+      and check that its center of mass stays over the feet in each moment.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
