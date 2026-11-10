@@ -736,6 +736,13 @@ passes.
       times longer. A repaint of the shin islands in `tools/cat-maps.py` can shorten them.
 - [ ] Cat candidate: the eyes of the source lie 8 mm apart from a mirror (left x 0.049, right
       x -0.041). Ask whether the eyes move to a mirror.
+- [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
+      expects 4"), so the clearance of the thicker arms and the larger head has only renders.
+- [ ] Tripo fox candidate: a dark wedge of the socket lining shows at a lower eye corner in the
+      face crops, and can read as a tear (`assets/models/fox/README.md`, "Eye corners").
+- [ ] Tripo fox candidate: the violin holds keep their values in H after the head scale 1.2 (H
+      0.323 m to 0.387 m). The twists stay within 41°, but the chin rest and the bow place moved
+      with H. Check them against the violin of main in the close views.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
