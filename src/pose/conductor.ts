@@ -131,21 +131,20 @@ export const CONDUCTOR_HOLD = {
   readyRoll: -46 * MathUtils.DEG2RAD,
   /**
    * The forward swing of the upper arm and the forward bend of the elbow of the hanging arms of
-   * the rest pose (design 5.2). The arms hang beside the round belly, and the paws hang down at
-   * the sides of the belly, as on the bear of main. With the angles of a standing player (20° and
-   * 60°), the forearms of the Tripo bear lie on the top of its belly, and the paws point at the
-   * players. The search of the swing out to the side starts at `minOut`, and each part then
-   * swings out by `extraOut` more. From the 16° of `HANG`, the search stops the right upper arm
-   * at 18° (the left at 31°), the right forearm then needs the largest swing of 50°, and the
-   * elbows go 4.1 cm (forearms) and 4.6 cm (upper arms) into the belly at rest. From 22° with 3°
-   * more, the upper arms stand 31° and 34° out, and the arms go 1.3 cm and 1.6 cm into the belly
-   * at rest, and 1.6 cm and 2.7 cm in the lift and the lowering (`pnpm pose-depth conductor`).
+   * the rest pose (design 5.2). The arms hang relaxed beside the round belly, and the forearms
+   * follow its side to the front, so that the paws hang at the front of its sides. The search of
+   * the swing out to the side starts at `minOut`, and each part then swings out by `extraOut`
+   * more. With the angles of a standing player (20° and 60°), the forearms of the Tripo bear lie
+   * on the top of its belly, and the paws point at the players. With 20° and 11.5°, and the
+   * search from 22° with 3° more, the upper arms stand 31° and 34° out, as in the bind A-pose.
+   * With no extra swing, the right elbow goes 4.2 cm into the belly at rest, past the limit of
+   * 4 cm (`pnpm pose-depth conductor`). With 4°, it goes 3.2 cm into it.
    */
   restArm: {
-    forward: 20 * MathUtils.DEG2RAD,
-    bend: 11.5 * MathUtils.DEG2RAD,
-    minOut: 22 * MathUtils.DEG2RAD,
-    extraOut: 3 * MathUtils.DEG2RAD,
+    forward: 30 * MathUtils.DEG2RAD,
+    bend: 20 * MathUtils.DEG2RAD,
+    minOut: 16 * MathUtils.DEG2RAD,
+    extraOut: 4 * MathUtils.DEG2RAD,
   },
   /**
    * The left elbow of the rest pose points down and back. The elbow of the hanging arm is the
