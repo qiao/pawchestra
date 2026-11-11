@@ -39,8 +39,12 @@ export const PIANO = {
   blackKeyLength: 0.09,
   /** The gap between two white keys. The key bed shows through it. */
   whiteKeyGap: 0.001,
-  /** The distance of the front of the white keys in front of the key bed under them. */
-  keyOverhang: 0.005,
+  /**
+   * The distance of the front of the white keys in front of the key bed under them. The key slip
+   * in front of the keys then lies 2 cm in front of the key bed, so the front face of the key bed
+   * behind it does not flash through it in the far views.
+   */
+  keyOverhang: 0.017,
   /** The key dip: the drop of the front of a white key at the key bottom. */
   keyDip: 0.01,
   /**
@@ -967,8 +971,13 @@ export const PIANO_FRONT = {
   fallboardFront: -0.14,
   /** The key slip: its height, its thickness, and the drop of its top below the key top. */
   keySlip: { height: 0.04, thickness: 0.012, drop: 0.024 },
-  /** A cheek block: its width, its height, and its rise over the key top. */
-  cheek: { width: 0.08, height: 0.1, rise: 0.05 },
+  /**
+   * The key bed under the keys, between the cheek blocks: its height, and the drop of its top
+   * below the key top.
+   */
+  keyBed: { height: 0.06, drop: 0.02 },
+  /** A cheek block: its width, and its rise over the key top. It reaches down to the key bed bottom. */
+  cheek: { width: 0.08, rise: 0.05 },
   /** The rail of the desk on the rim top: its z, its depth, and its height. */
   rail: { z: -0.27, depth: 0.05, height: 0.03 },
   /** The desk: its width, its height, its thickness, and its lean back from vertical. */
@@ -1050,9 +1059,9 @@ function addFront(piece: PieceBuilder): void {
   // pressed key does not lie on it.
   const bedFront = -p.keyOverhang;
   piece.add(
-    box(2 * CASE_PLAN.side, 0.06, bedFront - front),
+    box(p.keyboardWidth, f.keyBed.height, bedFront - front),
     dark,
-    transform([0, p.keyTop - 0.05, (front + bedFront) / 2]),
+    transform([0, p.keyTop - f.keyBed.drop - f.keyBed.height / 2, (front + bedFront) / 2]),
     'polish',
   );
   const slip = f.keySlip;
@@ -1063,13 +1072,14 @@ function addFront(piece: PieceBuilder): void {
     'polish',
   );
   const cheek = f.cheek;
+  const cheekHeight = cheek.rise + f.keyBed.drop + f.keyBed.height;
   for (const side of [-1, 1]) {
     piece.add(
-      box(cheek.width, cheek.height, -front),
+      box(cheek.width, cheekHeight, -front),
       dark,
       transform([
         side * (half + cheek.width / 2),
-        p.keyTop + cheek.rise - cheek.height / 2,
+        p.keyTop + cheek.rise - cheekHeight / 2,
         front / 2,
       ]),
       'polish',
@@ -1085,7 +1095,7 @@ function addFront(piece: PieceBuilder): void {
 
   const rail = f.rail;
   piece.add(
-    box(2 * CASE_PLAN.side - PIANO_INSIDE.rim, rail.height, rail.depth),
+    box(2 * (CASE_PLAN.side - PIANO_INSIDE.rim), rail.height, rail.depth),
     dark,
     transform([0, p.caseTop - rail.height / 2, rail.z]),
     'polish',
@@ -1096,30 +1106,52 @@ function addFront(piece: PieceBuilder): void {
   const edge = new Vector3(0, p.caseTop, f.deskFront);
   const onDesk = (x: number, up: number, out: number): Vec3 =>
     toVec3(new Vector3(x, up, out).applyQuaternion(lean).add(edge));
+  // The sheet lies in the face of the desk, in a frame of the desk, so no face of the desk lies
+  // under it. A sheet on the face of the desk flashed through it in the far views.
+  const ledge = f.ledge;
+  const sheet = f.sheet;
+  const t = desk.thickness;
+  const sheetTop = ledge.height + sheet.height;
+  const side = (desk.width - sheet.width) / 2;
+  const deskPart = (width: number, height: number, x: number, up: number): number[] =>
+    placeCorners(box(width, height, t), transform(onDesk(x, up, -t / 2), toQuat(lean)));
+  // The sheet is one face to the player, and the back of the desk behind it is one face to the
+  // audience. The sides of the frame close the edges between them.
+  const sheetFace = (out: number, toward: Vec3): number[] => {
+    const [x0, x1] = [-sheet.width / 2, sheet.width / 2];
+    return quadToward(
+      onDesk(x0, ledge.height, out),
+      onDesk(x1, ledge.height, out),
+      onDesk(x1, sheetTop, out),
+      onDesk(x0, sheetTop, out),
+      toVec3(new Vector3(...toward).applyQuaternion(lean)),
+    );
+  };
   piece.add(
-    box(desk.width, desk.height, desk.thickness),
+    [
+      ...deskPart(side, desk.height, -(sheet.width + side) / 2, desk.height / 2),
+      ...deskPart(side, desk.height, (sheet.width + side) / 2, desk.height / 2),
+      ...deskPart(sheet.width, ledge.height, 0, ledge.height / 2),
+      ...deskPart(sheet.width, desk.height - sheetTop, 0, (sheetTop + desk.height) / 2),
+      ...sheetFace(-t, [0, 0, -1]),
+    ],
     dark,
-    transform(onDesk(0, desk.height / 2, -desk.thickness / 2), toQuat(lean)),
+    transform(),
     'polish',
   );
-  const ledge = f.ledge;
+  piece.add(sheetFace(0, [0, 0, 1]), INSTRUMENT_COLORS.sheet);
   piece.add(
     box(desk.width, ledge.height, ledge.depth),
     dark,
     transform([0, p.caseTop + ledge.height / 2, f.deskFront + ledge.depth / 2]),
     'polish',
   );
-  const sheet = f.sheet;
-  piece.add(
-    box(sheet.width, sheet.height, 0.002),
-    INSTRUMENT_COLORS.sheet,
-    transform(onDesk(0, ledge.height + sheet.height / 2, 0.001), toQuat(lean)),
-  );
 }
 
 /**
  * Adds the lid ({@link PIANO_LID}): the lid in the outline of the rim, open on its hinges at the
- * bass side with its front flap folded back, the hinges, and the prop stick on the rim of the bent side under the edge of the lid.
+ * bass side with its front flap folded back, the hinges, and the prop stick on the rim of the bent
+ * side under the edge of the lid.
  *
  * @param piece The piece of the piano.
  */
