@@ -472,18 +472,20 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/pig/pig.rig.glb',
     },
   ],
-  // The clarinet wolf (design 4.4). It stands as a soloist.
+  // The clarinet wolf (design 4.4): the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/wolf/tripo-hand/wolf.blend`), with no arm cut and no arm stretch. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the wolf of `wolf.rig.glb`, and the
+  // crease angle 55°. The map paints each eye on faces of the head with a light, so the eyes take
+  // the finish `varnish` and no eye light.
   [
     'wolf',
     {
       landmark: 'shoulders',
-      height: 0.973079,
       seated: true,
       soloist: true,
       constant: 'STUDIO_WOLF',
-      crease: 35,
-      eyeLevel: true,
-      glb: 'assets/models/wolf/wolf.rig.glb',
+      glb: 'assets/models/wolf/tripo-hand/wolf.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The test mannequin (design 4.4, "Test mannequin"): the animal preset of

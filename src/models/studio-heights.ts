@@ -25,5 +25,5 @@ export const STUDIO_HEIGHTS = {
   'studio-polar-bear': { headHeight: 0.422794, seatHeight: 0.267538 },
   'studio-rabbit': { headHeight: 0.298557, seatHeight: 0.266084 },
   'studio-rhino': { headHeight: 0.388183, seatHeight: 0.100036 },
-  'studio-wolf': { headHeight: 0.36924, seatHeight: 0.288455 },
+  'studio-wolf': { headHeight: 0.369244, seatHeight: 0.276308 },
 } as const satisfies Readonly<Record<string, Pick<StudioBody, 'headHeight' | 'seatHeight'>>>;
