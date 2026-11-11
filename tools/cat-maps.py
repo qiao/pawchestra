@@ -1,15 +1,13 @@
 # Writes the color map and the normal map of the third Tripo cat from the maps of its FBX (design
-# 4.5, assets/models/cat/README.md, "Color map" and "Normal map"). The color map `cat-color.webp`
-# scales the source image to 2048 pixels and moves each texel in Oklab by a step: the gray fur
-# goes to the gray of the cat of main in the hall light, the cream white to the white of the cat
-# of main, and the pink and the black keep their colors. Each texel takes a mix of the steps of the
-# colors, by its nearness to each color, so the blend between two colors stays smooth. The texels
-# of the eyeballs keep the eye paint of the source, with each iris moved to the middle of its
-# opening in the play view ("Eyes" of the README, `EYE_PAINT`), and then a round iris about a
-# middle pupil and a softer white for the far view of the hall (`far_eyes()`). The dark brow arcs
-# over the eyes keep half of their contrast to the fur (`soften_brows()`). The script reads
-# the triangles, the places, and the texture points of the eyeballs from the rig file (`ownEyes`
-# of the export).
+# 4.5, assets/models/cat/README.md, "Color map" and "Normal map"). The source FBX is the target of
+# the look, so the color map `cat-color.webp` keeps the colors of the source, scaled to 2048
+# pixels, but for a small step of the gray fur that keeps it gray in the warm light of the stage
+# (`GRAY_FUR`). The eyes change too: each iris with its pupil and its painted light moves to the
+# middle of its opening in the play view (`center_irises()`), and `far_eyes()` makes the moved
+# iris round about its pupil from the clean directions of the source iris, at the sizes of the
+# source. The switches SOFTEN and MOUTH_CONTRAST, and the shades of `far_eyes()`, can soften the
+# brows and the mouth line and darken the eyes for the far view. The script reads the triangles,
+# the places, and the texture points of the eyeballs from the rig file (`ownEyes` of the export).
 # The normal map `cat-normal.webp` holds the tilts of the fur. The output depends only on the
 # input files and on cwebp 1.5.0.
 #
@@ -39,16 +37,19 @@ NORMAL_SIZE = 1024
 NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
 
-#: The Oklab lightness, chroma, and hue (degrees) of the gray fur and of the white fur of the map.
-#: The hall view of the app (the key light from the back, no fill light) is the target: the cool
-#: gray of the cat of main reads warm in the warm light of the stage ("Color map" of the README).
-GRAY_FUR = (0.53, 0.065, 262.0)
-WHITE_FUR = (0.85, 0.03, 262.0)
+#: The Oklab lightness, chroma, and hue (degrees) of the gray fur of the map. The source FBX in an
+#: even gray light is the target: there the gray fur is Oklab L 0.48 with almost no chroma. With
+#: the source map, the warm light of the stage and the fill light of the views made the gray fur
+#: L 0.62, C 0.051, h 55: a light tan. So the gray goes a little darker and a little cool, and the
+#: cream white keeps its color.
+GRAY_FUR = (0.44, 0.03, 260.0)
+#: True moves the gray fur of the map by ANCHORS. False keeps the colors of the source FBX.
+FUR_SHIFT = True
 #: The colors of the map (sRGB, the median texel of each region) and the colors that take their
 #: place. A target is an sRGB color, or ('oklch', L, C, h).
 ANCHORS = (
     ((113, 104, 104), ('oklch', *GRAY_FUR)),  # the gray fur
-    ((223, 202, 193), ('oklch', *WHITE_FUR)),  # the cream white bib, muzzle, paws, and tail tip
+    ((223, 202, 193), (223, 202, 193)),  # the cream white bib, muzzle, paws, and tail tip
     ((203, 153, 143), (203, 153, 143)),  # the pink inner ears, nose, and paw pads
     ((22, 14, 16), (22, 14, 16)),  # the black lines
 )
@@ -93,30 +94,30 @@ PUPIL_EDGE = 2.0
 #: SCLERA_WARM: the Oklab (a, b) step of the white to a warm ivory. IRIS_SHADE: the scale of the
 #: Oklab lightness of the iris. RING_SHADE and RING_WIDTH: the scale of the lightness of the outer
 #: ring of the iris, and its width as a share of the iris radius.
-IRIS_SCALE = 1.2
-PUPIL_RATIO = 0.55
+IRIS_SCALE = 1.0
+#: None keeps the pupil of the source in each direction (its radius over the iris radius).
+PUPIL_RATIO = None
 #: The turn in degrees of the middle of the new iris out from the target of `center_irises()`.
 #: The target of the cat already lies in the middle of the opening of the play view, turned
 #: out by GAZE_OUT. The turn is at most the growth of the iris radius, so that the new iris covers
 #: the old iris.
 FAR_GAZE_OUT = 0.0
-#: The turn in degrees of the middle of the new iris up from the target. The opening of the cat
-#: reaches 28.5 degrees up and 30.5 degrees down from the target, so with the turn and
-#: FAR_IRIS_RADIUS the top of the iris lies under the upper lid by about 12 % of the iris height,
-#: its bottom lies under the lower edge, and the white shows only at the sides.
-FAR_GAZE_UP = 1.5
-#: The radius in degrees of the new iris of both eyes, in place of IRIS_SCALE times the iris edge of
-#: the source of each eye (27.5 and 29.0 degrees), so that the two irises are the same size. With
-#: 33 and 35 degrees, a white crescent showed under each iris at the inner corner in the rest front
-#: view. None keeps IRIS_SCALE.
-FAR_IRIS_RADIUS = 36.0
-#: False paints each pupil in its median color with no light: the soft gray light of the source
-#: read dull, and the eye light of the app gives one crisp light at the same place in both eyes.
-PAINTED_LIGHT = False
-SCLERA_SHADE = 0.85
-SCLERA_WARM = (0.008, 0.03)
-IRIS_SHADE = 0.9
-RING_SHADE = 0.75
+#: The turn in degrees of the middle of the new iris up from the target.
+FAR_GAZE_UP = 0.0
+#: The radius in degrees of the new iris of both eyes, in place of IRIS_SCALE times the iris edge
+#: of the source of each eye. None keeps IRIS_SCALE.
+FAR_IRIS_RADIUS = None
+#: True keeps the soft light that the source paints in each pupil. False paints each pupil in its
+#: median color with no light.
+PAINTED_LIGHT = True
+#: The eyes keep the colors of the source: the source FBX is the target of the look.
+SCLERA_SHADE = 1.0
+SCLERA_WARM = (0.0, 0.0)
+IRIS_SHADE = 1.0
+RING_SHADE = 1.0
+#: The Oklab lightness, chroma, and hue (degrees) of the median iris after a step. None keeps the
+#: iris of the source.
+IRIS_COLOR = None
 RING_WIDTH = 0.15
 #: The luma (sRGB) and the saturation at which a texel goes from no white to white for the tone of
 #: the sclera, each as a soft step (start, end). So the white keeps its shade under the lid.
@@ -159,12 +160,23 @@ GAZE_UP = 5.0
 #: The share of the contrast to the fur that the dark brow arcs keep (`soften_brows()`): 1 keeps
 #: the paint of the source, 0 paints them as the fur. SOFTEN False keeps the source brows.
 BROW_CONTRAST = 0.5
-SOFTEN = True
+SOFTEN = False
 #: The brow faces of a side: from BROW_LOW to BROW_HIGH ball radii above the middle of its ball,
 #: and within BROW_WIDE ball radii of it across.
 BROW_LOW = 0.6
 BROW_HIGH = 2.2
 BROW_WIDE = 1.4
+#: The mouth of `soften_mouth()`, in units of the half distance d of the eye middles: its middle
+#: below (y) and in front of (z) the middle of the eyes, the half size of its box (x, y, z), the
+#: share of the contrast that the middle of the line keeps, the place across at which the line
+#: fades out, and the lightness range of the soft edge of the line. None keeps the source mouth.
+MOUTH_PLACE = (-1.87, 1.9)
+MOUTH_BOX = (2.4, 0.6, 1.2)
+MOUTH_CONTRAST = None
+MOUTH_WIDE = (0.5, 1.5)
+MOUTH_CORE = (0.15, 0.4)
+#: The largest Oklab lightness of a texel of the mouth line: the gray fur (about 0.55) stays.
+MOUTH_DARK = 0.42
 #: The texels around the brow triangles that also soften, so that the bilinear
 #: texture sample at the edge of a triangle takes no old dark color.
 SOFT_MARGIN = 2
@@ -805,7 +817,7 @@ def far_eyes(rig, image, source, pupils):
 
         # The new iris about n.
         big = FAR_IRIS_RADIUS if FAR_IRIS_RADIUS else IRIS_SCALE * float(mid_edge)
-        small = PUPIL_RATIO * big
+        small = PUPIL_RATIO * big if PUPIL_RATIO else float(mid_rho) * big / float(mid_edge)
         if FAR_GAZE_OUT > big - mid_edge:
             sys.exit(f'FAR_GAZE_OUT is more than the growth of the iris radius, '
                      f'{big - mid_edge:.1f} degrees.')
@@ -861,6 +873,15 @@ def far_eyes(rig, image, source, pupils):
                      * (1 - smooth(*WHITE_SATURATION, (top - low) / np.maximum(top, 1))))
         inside = theta < big
         lab = oklab(linear(new))
+        if IRIS_COLOR:
+            # The iris of the source is ochre, and the iris of the sheet is a light yellow green.
+            # Each iris texel moves by the step from the median iris color to IRIS_COLOR, by its
+            # share of no white, so its texture stays.
+            iris = inside & (theta >= small) & (whiteness < 0.5)
+            target = np.array([IRIS_COLOR[0], IRIS_COLOR[1] * np.cos(np.radians(IRIS_COLOR[2])),
+                               IRIS_COLOR[1] * np.sin(np.radians(IRIS_COLOR[2]))])
+            step = target - np.median(lab[iris], axis=0)
+            lab[iris] += (1 - whiteness[iris])[:, None] * step
         sclera = whiteness * ~inside
         lab[:, 0] *= 1 - sclera * (1 - SCLERA_SHADE)
         lab[:, 1] += sclera * SCLERA_WARM[0]
@@ -942,6 +963,59 @@ def soften_brows(rig, image):
     return Image.fromarray(out)
 
 
+def soften_mouth(rig, image):
+    """Makes the painted mouth line thinner and shorter, and gives the new image. The source paints
+    a thick, wide, dark smile line, and the sheet a small, gentle smile. With d the half distance of
+    the two eye middles, the mouth faces are the body faces with each corner within MOUTH_BOX of the
+    middle of the mouth (MOUTH_PLACE from the middle of the eyes, in units of d). The muzzle color
+    is the median of the texels of these faces with at least the median lightness. Each texel of
+    these faces and of the inside of the mouth (the loose part of 50 to 79 vertices near it), and
+    SOFT_MARGIN texels around them, with a lightness below MOUTH_DARK takes in Oklab
+    the muzzle color plus a share of its step from it: MOUTH_CONTRAST at the middle, a smoothstep
+    to 0 from MOUTH_WIDE[0] d to MOUTH_WIDE[1] d out from the middle plane (a shorter line), times
+    1 - smoothstep(MOUTH_CORE[0], MOUTH_CORE[1], L) of its lightness L (a thinner line: the dark
+    core keeps more of its step than the soft edge)."""
+    triangles, positions, points, eyes = rig[:4]
+    part = loose_parts(rig)
+    ids, counts = np.unique(part, return_counts=True)
+    body = part[triangles[:, 0]] == ids[np.argmax(counts)]
+    c = {side: ball_frame(rig, np.array(eyes[side]['faces']))[0] for side in ('L', 'R')}
+    d = np.linalg.norm(c['L'] - c['R']) / 2
+    mouth = (c['L'] + c['R']) / 2 + d * np.array([0.0, MOUTH_PLACE[0], MOUTH_PLACE[1]])
+    corners = positions[triangles]
+    off = np.abs(corners - mouth) / d
+    near = np.all((off[..., 0] < MOUTH_BOX[0]) & (off[..., 1] < MOUTH_BOX[1])
+                  & (off[..., 2] < MOUTH_BOX[2]), axis=1)
+    # The inside of the mouth is a loose part of the source (69 vertices) behind the lip line. Its
+    # dark paint shows through the slit of the lips as the thick line.
+    inner = [k for k in ids if 50 < np.sum(part == k) < 80
+             and np.linalg.norm(positions[part == k].mean(axis=0) - mouth) < 2.5 * d]
+    face_part = part[triangles[:, 0]]
+    faces = np.flatnonzero((body & near) | np.isin(face_part, inner))
+    mask = np.asarray(draw_triangles(triangles, points, faces, SIZE)
+                      .filter(ImageFilter.MaxFilter(2 * SOFT_MARGIN + 1))) > 0
+    out = np.asarray(image).copy()
+    lab = oklab(linear(out))
+    light = lab[mask][:, 0]
+    muzzle = np.median(lab[mask][light >= np.median(light)], axis=0)
+    # The place across of each texel: the x of its place on the faces, as eye_texels() gives it.
+    ys, xs, places = eye_texels(rig, faces)
+    across = np.full((SIZE, SIZE, 3), 0.0)
+    across[ys, xs] = np.abs(places[:, 0:1] - mouth[0]) / d
+    raster = np.zeros((SIZE, SIZE), bool)
+    raster[ys, xs] = True
+    across = fill_around(across, raster)[..., 0]
+    dark = mask & (lab[..., 0] < MOUTH_DARK)
+    keep = (MOUTH_CONTRAST * (1 - smooth(MOUTH_WIDE[0], MOUTH_WIDE[1], across[dark]))
+            * (1 - smooth(MOUTH_CORE[0], MOUTH_CORE[1], lab[dark][:, 0])))
+    step = muzzle[0] - lab[dark][:, 0]
+    out[dark] = srgb8(linear_of_oklab(muzzle + keep[:, None] * (lab[dark] - muzzle)))
+    print(f'mouth: {len(faces)} faces, {int(dark.sum())} dark texels; muzzle Oklab L {muzzle[0]:.3f}; '
+          f'the mean lightness step to the muzzle goes from {step.mean():.3f} to '
+          f'{(keep * step).mean():.3f}')
+    return Image.fromarray(out)
+
+
 def write_color_map():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
@@ -950,9 +1024,11 @@ def write_color_map():
         image = far_eyes(rig, centered, image, pupils)
     if SOFTEN:
         image = soften_brows(rig, image)
+    if MOUTH_CONTRAST is not None:
+        image = soften_mouth(rig, image)
     lab = oklab(linear(np.asarray(image)))
     eyes, count = eye_mask(rig, SIZE)
-    moved = move_texels(lab)
+    moved = move_texels(lab) if FUR_SHIFT else lab.copy()
     moved[eyes] = lab[eyes]
     out = srgb8(linear_of_oklab(moved))
     Image.fromarray(out).save(OUT, 'WEBP', quality=QUALITY, method=6)
