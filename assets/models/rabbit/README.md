@@ -285,17 +285,21 @@ after `center_irises()`, about the target of the play view:
 
 - The pupil edge and the iris edge about the source pupil have the medians 23.5 and 36.0 degrees
   on the left and 23.0 and 35.5 on the right, from 44 and 36 clean directions of 120.
-- The new iris is round, with the pupil in its middle. Its radius is 1.1 times the source
-  (`IRIS_SCALE`, 39.6 and 39.1 degrees), so that it fills nearly all of the opening of the play
-  view, and the pupil is 0.55 of it (`PUPIL_RATIO`), so more of the brown iris shows. The target
-  already turns out by `GAZE_OUT`, so `FAR_GAZE_OUT` is 0.
+- The new iris is round, with the pupil in its middle. Its radius is the radius of the source
+  (`IRIS_SCALE` 1, 36.0 and 35.5 degrees), and the pupil is 0.5 of it (`PUPIL_RATIO`), so more of
+  the brown iris shows. The middle turns 3 degrees down from the target (`FAR_GAZE_UP` -3), so
+  that the pupil middle lies near the middle of the opening and the top of the iris just under
+  the upper lid. With an iris 1.1 times the source at the target, the upper lid came near the top
+  of the pupil in the test page on a phone, and the rabbit read as sleepy. At 6 degrees down, the
+  rabbit read as looking down. The target already turns out by `GAZE_OUT`, so `FAR_GAZE_OUT` is
+  0.
 - In Oklab, the white takes 0.85 of its lightness and a warm step (`SCLERA_SHADE`, `SCLERA_WARM`),
   and the iris 0.9 of its lightness, and 0.75 more in its outer ring (`IRIS_SHADE`, `RING_SHADE`).
 
 The source map paints no light on the eyes. `EYE_PAINT = 'cartoon'` of the tool paints the
 cartoon eye of the sheet again (`paint_eyes()`). The eyeballs keep the `eye` finish and the eye
 light of the app, because the source paints no light. The eye light gives the one light of each
-eye. The fox takes `varnish` and no eye light, because its source paints a light.
+eye. The fox takes the same finish and light.
 
 **Brows.** The source paints thick, dark, high brows on the brow strips and a dark band in each
 eye socket over the eye, and in the play they read as a strong frown. `soften_brows()` of the tool
@@ -515,7 +519,7 @@ pose and light differ). The target lies between the two views.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 78,370 bytes | `df66ff0c8d4782827a4705e7e8ff0824f1b633c69c0da6dd033e66b11f1ecb3e` |
+| `tripo-hand/rabbit-color.webp` | 79,054 bytes | `f5adc3f3beba125d1a22afd4341f34560b198f409603bd7a95fb50d0e17621b6` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
