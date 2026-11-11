@@ -620,9 +620,9 @@ The layout of the `.blend`:
   attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
   weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
   the head. The export refuses eye objects and eye faces in one file. `pnpm studio-body` gives
-  the eye faces the wet finish `eye` (`EYEBALL_FINISH`), and lists them as
-  `StudioBody.eyeballs`. A corner of such a face takes the mean normal of the eye faces at its
-  vertex with no crease angle (`studioNormals()`), so each ball shades smooth. Reason: the matte
+  the eye faces the wet finish `eye` (`EYEBALL_FINISH`), or the `eyeFinish` of the body, and lists
+  them as `StudioBody.eyeballs`. A corner of such a face takes the mean normal of the eye faces at
+  its vertex with no crease angle (`studioNormals()`), so each ball shades smooth. Reason: the matte
   fur gives a painted eye no gloss, and a flat gloss face shows its facets.
 - **Eye highlight.** The eye light of the players (4.5) gives each eyeball its highlight, so the
   ball carries no catchlight mesh. A white lens on the ball was an opaque disc with a hard edge,
@@ -758,14 +758,18 @@ arm at most about 45° of roll or twist in the moments of the violist. Reason: w
 hold of the cat of main, the left forearm twisted 125° in the play and -69° at rest. A hand rig of
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
-and its tail has two bones. Its map tool and the map tool of the rabbit paint each eyeball again as
-the cartoon eye of the sheet (`paint_eyes()`): a dark brown iris that fills almost the whole
-opening, a pupil of 0.65 of the iris, almost no white, and both eyes nearly parallel. Reason: the
-source eyes read as glassy balls that looked past the viewer, and a half real eye read uncanny on
-the toy-like face. The ball takes no painted light, so the eye light gives the one highlight. The
-faces of the fox and the rabbit are baby faces: eyes 1.2 times larger with their sockets, upper
-lids that do not cover the iris, rounder cheeks, and on the fox a shorter muzzle. Reason: lids
-over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
+and its tail has two bones. The map tool of the rabbit paints each eyeball again as the cartoon
+eye of the sheet (`paint_eyes()`): a dark brown iris that fills almost the whole opening, a pupil
+of 0.65 of the iris, almost no white, and both eyes nearly parallel. Reason: the source eyes read
+as glassy balls that looked past the viewer. The ball takes no painted light, so the eye light
+gives the one highlight. The map tool of the fox keeps the eye paint of the source (an amber iris,
+a black pupil, a painted light, white, and a lash line) at the size of the source ball, and moves
+each iris as one decal to the middle of its opening (`center_irises()`). Reason: the source paints
+each iris at the inner corner, and the fox looked cross-eyed from the front. Its eyes take the
+finish `varnish` and no eye light (`eyeFinish`), so the painted light is the only light. The faces
+of the fox and the rabbit are baby faces: upper lids that do not cover the iris, rounder cheeks,
+on the rabbit eyes 1.2 times larger with their sockets, and on the fox a shorter muzzle. Reason:
+lids over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1067,7 +1071,8 @@ A player of such a body takes a copy of the shared material with the map
 shader takes the texel in place of the vertex color of each corner with a point, so the light,
 the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
 the instrument keep their colors. The eyes of the mesh take the map with the `eye` finish, so the
-stage lamps and the eye light give them a gloss over the painted eye. Their face color is the eye
+stage lamps and the eye light give them a gloss over the painted eye. An eye with a painted light,
+as on the fox, takes `varnish` and no eye light. Their face color is the eye
 color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
