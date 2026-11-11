@@ -122,6 +122,12 @@ EYE_FILL = 4
 EDGE = 1e-4
 #: The step of the grid of the front rays over each eye, in units of the rig file.
 RAY_STEP = 0.0005
+#: A front ray on a ball counts only when at least SHOWN_NEIGHBORS other rays within SHOWN_NEAR
+#: units of it (in the front view) also hit the ball. The nose is not in the fur primitive, so a
+#: few rays go through its place to the inner side of a larger ball, and with them the gaze turned
+#: in.
+SHOWN_NEAR = 0.0013
+SHOWN_NEIGHBORS = 8
 #: The light spot over each eye of a source map that paints one: its middle from the middle of the
 #: eyeball, in the axes of the rig file (+x the left side, +y up, +z forward), with x toward the
 #: middle plane, and two radii, all in units of the distance of the eye from the middle plane, as
@@ -575,6 +581,13 @@ def ball_frame(rig, faces):
     t_hit, hit, _ = ray_hits(origins, down, corners[near])
     on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
     shown = origins[on_ball] + t_hit[on_ball, None] * down[on_ball] - c
+    # A ray keeps only with enough neighbor rays on the ball, so that a few stray hits do not count.
+    front = origins[on_ball, :2]
+    count = np.zeros(len(front), int)
+    for start in range(0, len(front), 512):
+        part = front[start:start + 512]
+        count[start:start + 512] = (np.linalg.norm(part[:, None] - front[None], axis=2) < SHOWN_NEAR).sum(1) - 1
+    shown = shown[count >= SHOWN_NEIGHBORS]
     shown /= np.linalg.norm(shown, axis=1)[:, None]
     return c, r, shown
 
