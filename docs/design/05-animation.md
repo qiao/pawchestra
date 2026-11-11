@@ -252,8 +252,10 @@ The rest of each family:
   twists the left forearm in the moves.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
-  but the round bellies of the mouse, the wolf, the beaver, and the pig cover their thighs. So
-  these instruments stay in front of the belly. A shared hold with rest arms
+  but the round bellies of the mouse, the beaver, and the pig cover their thighs. So these
+  instruments stay in front of the belly. The wolf sets the clarinet bell on the front of its
+  right knee, with the right paw on the upper joint (`restGripShiftR`), as a seated clarinetist
+  rests the bell on the knee (winds 3). A shared hold with rest arms
   (`WindHold.restArms`, `armRest()` of `pose/winds.ts`) rests from the hanging arms of the body:
   the right paw holds the flute or the clarinet nearly upright at its side, at the hanging palm,
   as a flutist rests the flute vertically on the right leg (winds 2.4), and the free left paw

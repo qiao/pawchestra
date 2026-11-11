@@ -1094,25 +1094,36 @@ const WOLF_CLARINET_FORWARD = 5;
  * 20°. At 45°, the grips move further forward, out of the reach of the arms. Both elbows point
  * down and a little out, as a seated clarinetist lets the arms hang near the body, in the play.
  *
- * At rest, the right paw holds the clarinet upright at the right side, at the hanging right palm
- * with the upper arm 30° forward and the elbow bent 60° (`restArms`), as a seated clarinetist
- * holds it with the right thumb on the thumb rest. The left paw leaves its grip and hangs beside
- * the left haunch with the upper arm 20° forward and the elbow bent 30° (`restFreeL`). The round
- * belly of the Tripo wolf reaches the seat front, so a clarinet in front of the belly between the
- * knees with both paws on it put the left forearm 10.6 cm and the right upper arm 9.9 cm into the
- * belly. A left paw on the top of the left thigh goes 14 cm into the belly.
+ * At rest, the bell stands on the front of the right knee, as a seated clarinetist puts the bell
+ * on the knee (`docs/reference/wind-technique.md` 3). The right paw holds the upper joint, 0.4 H
+ * along the tube toward the mouthpiece from the grip of the play (`restGripShiftR`), at the
+ * hanging right palm with the upper arm 25° forward and the elbow bent 45° (`restArms`). The
+ * clarinet turns its lower end 5° back of the vertical and 10° to the left (`rest`), so that the
+ * bell comes in over the knee and the top leans out to the right. It moves 0.17 H down and 0.05 H
+ * back (`restShift`), so that the bell presses the skin of the knee 0.5 cm. With the clarinet
+ * upright at the side, the bell stood 26 cm above the thigh. With the upper arm straight down
+ * and the elbow bent 70°, the bell stood on the top of the thigh, but the right forearm went
+ * 3.8 cm into the belly at the start of the lift (1.0 cm with these values, limit 1.5 cm). The
+ * left paw leaves its grip and hangs beside the left haunch with the upper arm 20° forward and
+ * the elbow bent 30° (`restFreeL`). The round belly of the Tripo wolf reaches the seat front, so
+ * a clarinet in front of the belly between the knees with both paws on it put the left forearm
+ * 10.6 cm and the right upper arm 9.9 cm into the belly. A left paw on the top of the left thigh
+ * goes 14 cm into the belly.
  */
 const WOLF_CLARINET = {
   ...WIND_HOLDS.clarinet,
   roundArms: null,
+  rest: holdTurn(-30, -10),
   restArms: {
     L: { forward: 20 * MathUtils.DEG2RAD, bend: 30 * MathUtils.DEG2RAD },
-    R: { forward: 30 * MathUtils.DEG2RAD, bend: 60 * MathUtils.DEG2RAD },
+    R: { forward: 25 * MathUtils.DEG2RAD, bend: 45 * MathUtils.DEG2RAD },
   },
+  restShift: [0, -0.17, 0.05],
   aimSigns: null,
   aimSide: [0.5, 0.5],
   gripShiftL: [0.15, 0.06, -0.11],
   gripShiftR: [0.05, 0.11, -0.11],
+  restGripShiftR: [-0.4, 0.11, -0.11],
   lipShift: [0, -0.1, 0.21],
   play: holdTurn(WOLF_CLARINET_FORWARD, 0),
 } as const satisfies WindHold;
