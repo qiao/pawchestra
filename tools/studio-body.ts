@@ -348,11 +348,11 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The viola cat (design 4.4): the candidate hand rig of the third Tripo P2 mesh
-  // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch, and longer
-  // shins for the seat of the cat of `cat.rig.glb`. Its `.blend` holds the facts of the body: the
+  // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch, and the legs
+  // of the source, so its chair is lower. Its `.blend` holds the facts of the body: the
   // scale that keeps H of that cat, and the crease angle 55°, because its arm rings have 8
-  // vertices. The color map of `tools/cat-maps.py` paints the pupils with no light, so the eye
-  // light of the app gives the one light of each eye.
+  // vertices. The color map of `tools/cat-maps.py` keeps the eye paint of the source with its
+  // painted light, so the eyes take the softer finish `varnish` and no eye light.
   [
     'cat',
     {
@@ -361,6 +361,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_CAT',
       glb: 'assets/models/cat/tripo-hand/cat.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The cello dog (design 4.4).
