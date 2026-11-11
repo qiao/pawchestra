@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from 'three';
+import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
@@ -226,33 +226,58 @@ interface ArmTask {
    * radians. A larger twist turns the hand back to it around that axis. No limit by default.
    */
   readonly maxTwist?: number;
+  /**
+   * A twist of the hand on its forearm, around the bind axis of the forearm, in radians, toward
+   * which the hand turns by {@link ArmTask.twistWeight}. The turn changes the twist of `hand` with
+   * no wrap at ±180°, so a twist that moves smoothly gives a hand that moves smoothly.
+   */
+  readonly twist?: number;
+  /** The weight of {@link ArmTask.twist}, from 0 to 1. 0 by default. */
+  readonly twistWeight?: number;
 }
 
 const twistAxis = new Vector3();
-const twistUndo = new Quaternion();
+const twistTurn = new Quaternion();
 
 /**
- * Limits the twist of a local rotation around an axis, in place: the swing stays, and the twist
- * turns back to the limit.
+ * Gives the twist of a local rotation around an axis, from -π to π.
  *
  * @param q The local rotation.
  * @param axis The unit axis of the twist.
- * @param limit The largest twist, in radians, 0 or more.
+ * @returns The twist, in radians.
+ */
+function twistOf(q: Quaternion, axis: Vector3): number {
+  const along = q.x * axis.x + q.y * axis.y + q.z * axis.z;
+  const twist = 2 * Math.atan2(along, q.w);
+  if (twist > Math.PI) {
+    return twist - 2 * Math.PI;
+  }
+  return twist < -Math.PI ? twist + 2 * Math.PI : twist;
+}
+
+/**
+ * Turns the twist of the local rotation of a hand toward the twist of its task and limits it, in
+ * place: the swing stays. The turn goes from the twist of the rotation to the twist of the task
+ * with no wrap, so the hand moves smoothly while the twist of the rotation stays away from ±180°.
+ * Reason: a limit on a twist near 180° turned the hand 90° in one frame, from one limit to the
+ * other.
+ *
+ * @param q The local rotation of the hand on its forearm.
+ * @param axis The unit axis of the twist.
+ * @param task The arm, with its twist and its limit.
  * @returns `q`.
  */
-function limitTwist(q: Quaternion, axis: Vector3, limit: number): Quaternion {
-  const along = q.x * axis.x + q.y * axis.y + q.z * axis.z;
-  let twist = 2 * Math.atan2(along, q.w);
-  if (twist > Math.PI) {
-    twist -= 2 * Math.PI;
-  } else if (twist < -Math.PI) {
-    twist += 2 * Math.PI;
+function turnTwist(q: Quaternion, axis: Vector3, task: ArmTask): Quaternion {
+  const now = twistOf(q, axis);
+  const weight = task.twistWeight ?? 0;
+  let goal = task.twist === undefined ? now : now + (task.twist - now) * weight;
+  if (task.maxTwist !== undefined) {
+    goal = MathUtils.clamp(goal, -task.maxTwist, task.maxTwist);
   }
-  const over = Math.sign(twist) * Math.max(0, Math.abs(twist) - limit);
-  if (over === 0) {
+  if (goal === now) {
     return q;
   }
-  return q.multiply(twistUndo.setFromAxisAngle(axis, -over));
+  return q.multiply(twistTurn.setFromAxisAngle(axis, goal - now));
 }
 
 const solved = createArmPose();
@@ -282,9 +307,9 @@ export function writeArm(task: ArmTask, chest: Quaternion, rotations: Float32Arr
     local.copy(solved.upper).invert().multiply(solved.lower),
   );
   local.copy(solved.lower).invert().multiply(task.hand);
-  if (task.maxTwist !== undefined) {
+  if (task.maxTwist !== undefined || task.twist !== undefined) {
     twistAxis.fromArray(arm.bind.wrist).sub(from.fromArray(arm.bind.elbow)).normalize();
-    limitTwist(local, twistAxis, task.maxTwist);
+    turnTwist(local, twistAxis, task);
   }
   setBoneRotation(rotations, arm.bones.hand, local);
 }
