@@ -5049,6 +5049,10 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
 
     primitives = []
     for k, (name, _) in enumerate(MATERIALS):
+        # A mesh with no face of a material, such as a hand rig whose nose takes the color map,
+        # writes no primitive of it.
+        if not np.any(materials == name):
+            continue
         arrays = primitive_arrays(bind, tris, colors, materials, weights, shapes, name, base, uvs)
         attributes = {
             'POSITION': w.floats(arrays['position'], 'VEC3', minmax=True),
