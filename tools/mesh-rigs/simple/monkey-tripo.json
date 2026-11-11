@@ -239,7 +239,7 @@
   ],
   "studio": {
     "trunk": {
-      "open": -14,
+      "open": -2,
       "shares": {
         "hips": 1,
         "spine": 1,
@@ -249,7 +249,7 @@
         "head": 0
       }
     },
-    "trunkNote": "The trunk of the bind leans forward (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns forward until the hip angle closes by 14 degrees, and each trunk bone takes its share, so that the center of mass stays over the soles. The values are those of the monkey of main (tools/mesh-rigs/monkey.json).",
+    "trunkNote": "The trunk of the bind leans forward a little (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns forward until the hip angle closes by 2 degrees, and each trunk bone takes its share. Thus the shoulders stay over the hips, as a brass player stands erect (docs/reference/wind-technique.md, 1.8), and the center of mass stays over the middle of the soles with the leg turns of studio.legTurns. The recline keeps the scale: the clip reference holds the upright source, so the shoulder landmark stays the shoulder of the source.",
     "bindArms": {
       "upper_arm": [
         0.813873,
@@ -285,16 +285,16 @@
     "tailBindNote": "The tail bones keep the directions of the source in the bind, so that the tail keeps its curl behind the haunch, clear of the legs.",
     "legTurns": {
       "thigh": [
-        0.227444,
-        0.008607,
-        -0.041834,
-        0.972854
+        0.019213,
+        0.0,
+        0.015371,
+        0.999697
       ],
       "shin": [
-        -0.109459,
-        -0.001483,
-        0.004076,
-        0.993982
+        -0.126789,
+        -0.001628,
+        0.00403,
+        0.99192
       ],
       "foot": [
         0.0,
@@ -309,7 +309,7 @@
         1.0
       ]
     },
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 65 degrees down and 15 degrees out, and the shin leans -20 degrees forward of vertical (a back slant for a negative value), so that the feet stand under the hips, as on the monkey of main (tools/mesh-rigs/monkey.json). The monkey has no chair and stands in this pose (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 65 15 -20)."
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 90 degrees down and 15 degrees out, and the shin leans -22 degrees forward of vertical (a back slant for a negative value). The thigh hangs straight down, and the knee bends a little forward, so that the hips and the center of mass stand over the middle of the soles (design 4.1, natural balance). The monkey has no chair and stands in this pose (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 90 15 -22)."
   },
   "colors": {
     "samples": 6,
@@ -380,8 +380,8 @@
   },
   "chair": {
     "halfWidth": 0.15,
-    "front": 0.0,
-    "back": -0.07,
+    "front": -0.04,
+    "back": -0.11,
     "note": "The app builds no chair under the monkey (SpeciesParams.noChair), but the export needs a seat for the seat height. The seat is level, and its top is the lowest point of the bind body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the back of the haunch."
   },
   "armSegments": {
