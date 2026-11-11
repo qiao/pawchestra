@@ -144,12 +144,12 @@ split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 409,064 bytes |
-| SHA-256 | `970e63d69b0d6fd42e4345a04540a5abf453d8c472ec61fe1fe70472ac2c037c` |
+| Size | 411,405 bytes |
+| SHA-256 | `72d35d2fc2d086db9aec49730491b5aaf38bb0f8c12cd5e225da59d5fbfacf3a` |
 | Origin | Made in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`: 3,886 vertices and 4,198 faces (3,406 quads and 792 triangles, 7,604 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
+| Mesh | One object `fox`: 3,886 vertices and 4,198 faces (3,406 quads and 792 triangles, 7,604 triangles), flat faces, the surface of `sa.add_surface()`, and the shape key `bind_belly` ("Belly"). 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.082161 (the shoulder joints at 1.8006 m for each unit, so that H is 0.380 m, near the shown head of the fox of main, 0.382 m), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `eye` and the eye light ("Eyes" above), the gaze shift of the color map ("Color map" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -159,8 +159,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,185,932 bytes | `c766b980a9ca198b620a3f3776f510b52d868fd6501792f8e3e14da3e8920073` |
-| `tripo-hand/fox.rig.json` | 17,517 bytes | `8fca71d0c453fbdefbae93bad1d2827411ef8ec6d2d26d1b964e34fb253b8a2a` |
+| `tripo-hand/fox.rig.glb` | 1,185,928 bytes | `fd1b47842545c2d8370c45a5702e6743315ee4937353b33195ce0914ed063edd` |
+| `tripo-hand/fox.rig.json` | 17,516 bytes | `1151086c62941880e81bbd12ab3f43535acb88e4da07bf4a1dfbccd90947ded6` |
 
 The scripts of the session (`scratch/fox3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
@@ -188,7 +188,8 @@ x is the x of the left arm). Each edit is a need of the rig, the seat, or the in
   the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units), and the new
   quads take the planar UVs of the clean dark patch at UV (0.044, 0.3673) ("Arm twist").
 - **Point edits.** None. The head, the eyes, the muzzle, the trunk, the paws, the legs, and the tail
-  keep the form of the source.
+  keep the form of the source. Only the key `bind_belly` ("Belly" below) changes the seated bind
+  of the front of the trunk.
 - **Ball trim.** The balls reach over the middle plane, deep in the head. The 24 ball faces with a
   corner less than 0.002 units from the middle plane on the side of their ball go, so that the
   sign of x gives the side of each ball face. No face that shows goes.
@@ -213,9 +214,31 @@ The weights, in the rest pose:
    c), `tail_tip` a c}, with a = smoothstep(-0.01, 0.03) along `tail` and c = smoothstep(-0.04,
    0.04) along `tail_tip`.
 
-**Smooth surface.** No relax, no region colors, no trunk scale, and no belly key: the form stays
-the form of the source. The crease angle 180 gives each corner the mean normal of the faces at its
-vertex, as the smooth shading of an FBX viewer.
+**Smooth surface.** No relax, no region colors, and no trunk scale: the basis keeps the form of
+the source. The crease angle 180 gives each corner the mean normal of the faces at its vertex, as
+the smooth shading of an FBX viewer.
+
+**Belly.** The source has shallow grooves on the front of the trunk: a V-shaped dent at the top of
+the chest and about four horizontal grooves on the chest and the belly, up to 0.0048 units deep.
+An FBX viewer shows them as thin lines in even light. The seated bind adds a fold where the raised
+thighs meet the belly: the rest band from z 0.29 to 0.33 collapses, with triangles of 1 degree and
+edges of 92 to 104 degrees. In the light of the app, these showed as dark dents, wavy bands, and a
+dark slit on the cream belly. The color map, the normal map, and the sheen do not cause them: with
+the normal map off or the sheen off, the dents stay, and the color map has no dark band. The key
+`bind_belly` (value 1, `be.add_bind_move()`) changes only the seated bind, in this order:
+
+1. Crotch: the 55 vertices with a rest z from 0.26 to 0.345, |x| below 0.125, and a rest y below
+   -0.06 take 4 rounds of P += 0.5 (mean of the edge neighbors - P), all at the same time.
+2. Front: each vertex with a rest z from 0.26 to 0.67, |x| at most 0.08, a rest y below -0.06,
+   and atan2(|x|, -y) at most 60 degrees takes 10 Taubin rounds along its bind normal n: P += f
+   ((mean of the edge neighbors - P) . n) n, with f 0.5 and then -0.53. The move along n only
+   keeps the UVs on the surface, and the second step keeps the girth.
+
+210 vertices move, at most 0.0156 units and 0.0033 on average. The front of the trunk at the
+middle plane moves back at most 0.0065 units (at a bind z of 0.35). In the bind, the deepest
+groove of the front (the depth of a vertex along its normal under the middle of its upper and
+lower neighbors) goes from 0.0059 to 0.0031 units, and no vertex normal of the front points down
+more than 30 degrees (3 before).
 
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, and the shins lean 12
 degrees forward. The front of the seat lies 0.06 units behind the knee joint of the bind, and 47 %
