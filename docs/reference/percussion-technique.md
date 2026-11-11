@@ -241,8 +241,9 @@ The app follows these facts:
   little out (`poleL`, `poleR`). The mallet slopes down along the forearm, so the wrist stays
   nearly straight. Elbows farther out show a gap between the arm and the body from the back.
 - **The stroke (sections 3 and 4).** The head lifts before the note, comes down at its full speed
-  at the note start, and rebounds (`STRIKE_MOTION`). A louder note lifts higher
-  (`MalletAcross.peak`). The arm moves little. A strike within 0.75 s of the strike before it is a
+  at the note start, and rebounds (`STRIKE_MOTION`). The wrist turns the head up by 35° to 70°,
+  and a louder note lifts higher (`MalletAcross.peak`), as louder notes fall from a greater
+  height [42]. The arm moves little. A strike within 0.75 s of the strike before it is a
   legato stroke: the head lifts at once after the strike before, as a real player lifts the
   mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
   longer rest, the head lifts one beat before the note, at most 1 s before it

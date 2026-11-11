@@ -394,10 +394,12 @@ export const PERCUSSION_HOLDS = {
   // forward and 24° to 32° in at a strike, a V of about 55° as in the American grip. Between
   // strikes and at rest, each mallet keeps its strike direction, and the wrist lifts the head
   // 2 cm to 7 cm above the playing spot (across.pitch), as the set position of a real timpanist.
-  // Before a strike, the wrist lifts the head 10 cm to 15 cm higher (sizes.lift, across.peak) and
-  // brings it down at the note start, as the full stroke of a real player. A turn of the mallet
-  // across the forearm between strikes lays the right mallet level across the belly, and a
-  // larger pitch moves the shaft out of the closed paw. The elbows point down and a little out
+  // Before a strike, the wrist turns the head up by 0.6 to 1.2 rad, by the loudness (sizes.lift,
+  // across.peak), and brings it down at the note start, as the full stroke of a real player. The
+  // mallet points in, nearly along the level axis of the turn, so a turn of 0.4 to 0.8 rad (lift
+  // 0.2, peak 8) lifted the head only a few cm, and the close views showed no lift. A turn of the
+  // mallet across the forearm between strikes lays the right mallet level across the belly, and
+  // a larger pitch moves the shaft out of the closed paw. The elbows point down and a little out
   // from the body, so that the upper arms roll less, the skin does not twist at the shoulder, no
   // gap shows between each upper arm and the trunk from the back, and the thick upper arms of the
   // quad tubes go less far into the round belly near the elbows. The homes stand 0.25 H below the
@@ -409,7 +411,7 @@ export const PERCUSSION_HOLDS = {
   // in the rest pose, because the hanging paws reach into the large kettles (ready).
   timpani: {
     hands: 'sides',
-    sizes: { lift: 0.2, rest: 0.03 },
+    sizes: { lift: 0.3, rest: 0.03 },
     // The left mallet strikes 8 cm toward the middle, so that it points in as far as the right
     // mallet: with no offset, the left mallet points 17° in and the right mallet 22°.
     offsetL: [0.08, 0, 0],
@@ -419,7 +421,7 @@ export const PERCUSSION_HOLDS = {
     rim: 0.25,
     home: [0.48, -0.25, -0.2],
     top: 'shoulder',
-    across: { rest: -1.2, lift: 0.65, pitch: 0.1, peak: 8 },
+    across: { rest: -1.2, lift: 0.65, pitch: 0.1, peak: 12 },
     pitchR: 1,
     ready: true,
     set: null,
