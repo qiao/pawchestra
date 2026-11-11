@@ -764,7 +764,12 @@ move each iris as one decal to the middle of its opening (`center_irises()`). Re
 paints each iris at the inner corner, and both animals looked cross-eyed from the front. The
 rabbit irises take the middle of the opening in the view of the play, with the head turn of the
 play and the camera of the test page, a little out and up (`gaze_targets()`). Reason: with the
-middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. The map
+middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. A last
+eye step of each map tool (`far_eyes()`) makes each iris round with the pupil in its middle,
+makes it larger (`IRIS_SCALE`), turns the fox iris a little out (`FAR_GAZE_OUT`), and gives the
+white a darker, warm tone and the iris a darker tone. Reason: the source paints each pupil off the
+middle of its iris, as an eye that looks to the side. In the far view of the hall, a wide white
+field around that iris made the eyes read as startled or as a side glance. The map
 tool of the rabbit also gives its brows and the dark band of its eye sockets half of their
 contrast to the fur, and shorter brows (`soften_brows()`). Reason: the dark, high brows of the
 source read as a frown. The fox
