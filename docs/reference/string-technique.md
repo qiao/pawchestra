@@ -567,9 +567,12 @@ The app follows these facts:
   (`CELLO_PLACE`, `fitCelloPlace()`): the endpin on the floor right of the middle, the top of the
   back at the height of the chest, and the neck at the left of the head, above the left shoulder.
   The end pin of each body fits its chest (`celloPinOf()`), as a cellist sets the end pin. The
-  dog keeps a fixed place of its own (`DOG_HOLD`).
+  dog takes its place from its body too, with a closer back and a lean of 20° to the left
+  (`DOG_HOLD.fit`), so that the scroll of its small cello stands beside the left ear [59] and
+  not in front of its long muzzle.
 - **The angle (2.7).** The cello leans back 25.7° and 14° to the left, 28° from the vertical, in
-  the range of the handout [65]. The trunk leans 3° forward [66].
+  the range of the handout [65]. The cello of the dog leans 20° to the left, 31° from the
+  vertical, also in that range. The trunk leans 3° forward [66].
 - **The size (2.7).** The cello rule (`celloRule()` of `tools/cello-size.ts`) takes the largest
   cello at which the left paw reaches the first position with the elbow bent, the end pin fits
   the chest, and the lower bout is not below the knees. It clamps the size from a 1/10 [84] to a

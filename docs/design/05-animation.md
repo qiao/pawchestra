@@ -396,8 +396,10 @@ The rest of each family:
   the rest elbow stays near the play elbow on each body. In the high positions, the left paw tilts
   further over the neck (`highTilt`), so the wrist comes up beside the upper bout. Reason: a hold
   with fixed values fits one body only. With the old shared hold, the elbow pointed out and up, and the bow paw of
-  12 recast bodies flipped through 180° (cast matrix, 4.4). The dog keeps its own place
-  (`DOG_HOLD`). The other instruments can take this pattern: a place from the landmarks, and the
+  12 recast bodies flipped through 180° (cast matrix, 4.4). The dog takes its place from its body
+  too, with its own gap and a larger lean to the left (`DOG_HOLD.fit`), so that the scroll stands
+  beside the left ear and not in front of the long muzzle, and the short bow arm reaches the
+  strings. The other instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
 - **Violin hold from the body.** The shared violin hold (`BOWED_HOLDS.violin`) takes the arm
   values of the accepted rabbit violinist, as directions and in `H`, and its place from the
@@ -440,7 +442,7 @@ The rest of each family:
   wrist end goes into the upper bout. The play keeps its grip, because no move of the wrist and no
   turn of the elbow moves the thick wrist end out of the upper bout (`TODO.md`).
 - **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
-  near the nut (`restPlace`), and the dog keeps its own place. Reason: at the place of the dog,
+  near the nut (`restPlace`), and the dog keeps its own rest grip. Reason: at the place of the dog,
   the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
   most recast bodies goes into the upper bout at rest and in the moves.
 - **Violin left elbow of the rabbit.** In the play, the left elbow of the rabbit comes in under
