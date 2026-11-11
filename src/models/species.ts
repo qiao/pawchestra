@@ -224,11 +224,14 @@ export const SPECIES = {
    * with the bind pose of that rig, and standing as a soloist. Its head height is the head of the
    * studio body, and its chair fits its legs: the seat height is the seat of the studio body, in
    * H. The hand rig keeps the short arms and the paws of the mesh with no stretch, so the arms
-   * reach 0.262 m from the shoulder joint to the middle of the palm, and the violin fits them: it
-   * is 0.6 of the violin of the app (0.304 m). The left paw then reaches the fingerboard from 0.25
-   * of its length from the nut, and the bow paw reaches 0.244 m of the hair (`pnpm hold-reach
-   * rabbit --instrument violin`). With 0.83, the violin of the first rabbit, the left paw reached the
-   * fingerboard only from 0.75, and the bow paw 0.17 m of the hair.
+   * reach 0.262 m from the shoulder joint to the middle of the palm. The violin is 0.75 of the
+   * violin of the app (0.380 m), a real small size (a 1/32 violin is 0.33 m), so that it reads at
+   * its size beside the body. The arms do not grow, so the hold uses the reach of the arms: the left paw stops the
+   * strings from 0.63 of the fingerboard from the nut, as a player in a high position, and the
+   * scroll stands out past the paw. The bow paw reaches 0.10 m of the hair, from 0.11 m to 0.21 m
+   * from the frog (`pnpm hold-reach rabbit --instrument violin`). With 0.6 (0.304 m), the violin
+   * was smaller than the smallest real violin and read as a toy. With 0.85, the bow paw reaches
+   * only 0.04 m of the hair.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
    * stick lies 40° from square toward the wrist, near the line of the middles of the turned paw, so
@@ -241,7 +244,7 @@ export const SPECIES = {
   rabbit: {
     body: 'studio-rabbit',
     colors: SPECIES_COLORS.rabbit,
-    violinScale: 0.6,
+    violinScale: 0.75,
     bowGrip: { at: [-0.0084, -0.04, 0.0553], turn: 40 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-rabbit'].headHeight,
     seatHeight:

@@ -1442,8 +1442,8 @@ const HIPPO_HOLD = {
  * only 25° down toward the right. With the 50° of the chin hold, the violin read as upright on the
  * chest, and the bow at the frog stood up beside the face. The violin sits 0.03 H higher than in
  * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
- * (`reachL`), so that the left paw reaches the fingerboard from 0.25 of its length, as before the
- * level turn (0.35 with 15.5°).
+ * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.75
+ * (`SpeciesParams.violinScale`) from 0.63 of its length (0.25 with the violin of 0.6).
  *
  * At rest, the arms take the rest of the shared violin hold (`restArms` of {@link VIOLIN_HOLD}):
  * they hang out to the sides until they clear the body, and the elbows bend forward, so that the
