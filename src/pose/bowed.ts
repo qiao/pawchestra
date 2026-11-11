@@ -1394,6 +1394,172 @@ function restCurlOf(hold: BowedHold): number {
   return hold.restPawTurnL === null ? 0 : hold.restCurlL;
 }
 
+/** The bow arm of one hold: the bow on the strings, or pizzicato ({@link holdArm}). */
+interface HoldArm {
+  /** The wrist, in the model axes. */
+  readonly wrist: Vector3;
+  /** The world rotation of the hand. */
+  readonly rotation: Quaternion;
+  /** The direction of the elbow, in the model axes. */
+  readonly pole: Vector3;
+  /** The world rotation of the forearm of the last solve. */
+  readonly forearm: Quaternion;
+  /** The roll of the hand around the stick, in radians. */
+  angle: number;
+  /** The turn of the hand on the stick (`BowedHold.stickTurnR`), in radians. */
+  onStick: number;
+}
+
+/**
+ * Makes a bow arm with no pose.
+ *
+ * @returns The arm.
+ */
+function createHoldArm(): HoldArm {
+  return {
+    wrist: new Vector3(),
+    rotation: new Quaternion(),
+    pole: new Vector3(),
+    forearm: new Quaternion(),
+    angle: 0,
+    onStick: 0,
+  };
+}
+
+const bowArm = createHoldArm();
+const pluckArm = createHoldArm();
+const meanForearm = new Quaternion();
+const basePole = new Vector3();
+
+/** The parts of the pose that {@link holdArm} reads. */
+interface HoldArmInput {
+  readonly rig: BowedRig;
+  readonly chest: { readonly rotation: Quaternion };
+  readonly shoulder: { readonly position: Vector3; readonly rotation: Quaternion };
+  readonly strings: StringsPlace;
+  readonly state: BowState;
+  /** The eased weight of the playing pose. */
+  readonly weight: number;
+}
+
+/**
+ * Places the bow hand of one hold: the bow on the strings (`pizzicato` 0) or pizzicato
+ * (`pizzicato` 1). The caller places the playing bow (`places.bow`), the rest bow, the plucking
+ * bow, the plucking palm, and the pole of the hold without pizzicato (`basePole`) first.
+ *
+ * First the hand keeps the hold of the bind pose, and the elbow the direction of the hold. Then
+ * the hand rolls so that its back points to the elbow, three times. Each hold of the bow has its
+ * own roll. In the lift and the lowering, the roll of the hand stays near the mix of the rolls of
+ * the rest and of the play. The plucking palm is above the strings: the grip of the plucking bow
+ * follows the palm. Last, the hand turns on the stick, so that the paw keeps its place on the
+ * stick.
+ *
+ * @param input The parts of the pose.
+ * @param pizzicato 0 for the bow on the strings, 1 for pizzicato.
+ * @param out The arm to write.
+ * @returns `out`.
+ */
+function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm {
+  const { rig, chest, shoulder, strings, state, weight } = input;
+  const bow = places.bow;
+  const heldHand = places.hand;
+  pluckBow.grip.copy(pluckPalm);
+  liftMix(restBow.rotation, bow.rotation, weight, held.rotation);
+  held.grip.lerpVectors(restBow.grip, bow.grip, weight);
+  gripHand(rig, held, 0, heldHand);
+  wristR.lerpVectors(heldHand.wrist, pluckPalm, pizzicato * weight);
+  // The elbow turns to the direction of pizzicato.
+  holdPole.copy(basePole);
+  if (pizzicato * weight > 0) {
+    mixDirection(
+      holdPole,
+      tipPole.fromArray(rig.hold.polePizzicato).applyQuaternion(chest.rotation),
+      pizzicato * weight,
+      holdPole,
+    );
+  }
+  // In a fast run across two strings, the elbow keeps the mean string of the run. In the lift and
+  // the lowering, the rule fades in over the second half of the move, because the arm then comes
+  // from the rest pose and not from the bow of the mean string.
+  const crossShare = smoothstep(2 * weight - 1) * (1 - pizzicato);
+  if (state.crossMean !== state.string && crossShare > 0) {
+    mixDirection(
+      holdPole,
+      crossPole(rig, strings, state, shoulder, holdPole, tipPole),
+      crossShare,
+      holdPole,
+    );
+  }
+  pole.copy(holdPole);
+  aim.copy(
+    solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, wristR, pole, solved).elbow,
+  );
+
+  let angle = 0;
+  const steady = weight === 1 && pizzicato === 0;
+  const follow = weight * rig.hold.followChange * Math.sin(Math.PI * pizzicato);
+  for (let pass = 0; pass < ROLL_PASSES; pass++) {
+    const bowRoll = rollToward(rig, bow, aim);
+    if (steady) {
+      // The bow plays: the hand holds it with its own roll.
+      angle = bowRoll;
+      gripHand(rig, bow, angle, heldHand);
+    } else {
+      let pluckRoll = 0;
+      if (pizzicato > 0) {
+        pluckRoll = rollToward(rig, pluckBow, aim);
+        gripHand(rig, pluckBow, pluckRoll, pluckHand);
+        pluckHand.wrist
+          .copy(pluckPalm)
+          .sub(palmOffset.fromArray(rig.armR.palm).applyQuaternion(pluckHand.rotation));
+        pluckBow.grip.fromArray(rig.grip).applyQuaternion(pluckHand.rotation).add(pluckHand.wrist);
+      }
+      const playRoll = bowRoll + (pluckRoll - bowRoll) * pizzicato;
+      gripHand(rig, bow, bowRoll, heldHand);
+      if (pizzicato > 0) {
+        // In pizzicato, the hand is the plucking hand.
+        mixRotationNear(
+          heldHand.rotation,
+          pluckHand.rotation,
+          pizzicato,
+          solved.lower,
+          heldHand.rotation,
+        );
+        heldHand.wrist.lerpVectors(heldHand.wrist, pluckHand.wrist, pizzicato);
+      }
+      held.rotation
+        .copy(heldHand.rotation)
+        .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playRoll));
+      held.grip.fromArray(rig.grip).applyQuaternion(heldHand.rotation).add(heldHand.wrist);
+      const restRoll = weight < 1 ? rollToward(rig, restBow, aim) : 0;
+      liftMix(restBow.rotation, held.rotation, weight, held.rotation);
+      held.grip.lerpVectors(restBow.grip, held.grip, weight);
+      const mixed = restRoll + (playRoll - restRoll) * weight;
+      const own = rollToward(rig, held, aim);
+      angle = MathUtils.clamp(own, mixed - ROLL_SPREAD, mixed + ROLL_SPREAD);
+      gripHand(rig, held, angle, heldHand);
+    }
+    if (follow > 0) {
+      elbowPole(rig, shoulder.position, heldHand, holdPole, follow, pole);
+    }
+    aim.copy(
+      solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved)
+        .elbow,
+    );
+  }
+  const keep = rig.hold.stickTurnR;
+  out.onStick =
+    keep === null
+      ? 0
+      : turnOnStick(rig, keep, shoulder.position, shoulder.rotation, pole, heldHand);
+  out.wrist.copy(heldHand.wrist);
+  out.rotation.copy(heldHand.rotation);
+  out.pole.copy(pole);
+  out.forearm.copy(solved.lower);
+  out.angle = angle;
+  return out;
+}
+
 /**
  * Writes the arms and the instrument of a bowed string player (design 5.3, 4.7). The bow plays
  * on the strings at the place of the bow state, on the string of the stroke, and lifts in a rest.
@@ -1476,14 +1642,8 @@ export function poseBowed(
   posePoint(frames.root, ORIGIN, rig.restBow.grip, restBow.grip);
   liftVia(rig, frames, weight, restBow);
 
-  // First the hand keeps the hold of the bind pose, and the elbow the direction of the hold.
-  liftMix(restBow.rotation, bow.rotation, weight, held.rotation);
-  held.grip.lerpVectors(restBow.grip, bow.grip, weight);
-  gripHand(rig, held, 0, heldHand);
-  wristR.lerpVectors(heldHand.wrist, pluckPalm, pizzicato * weight);
   // The right elbow points out to the side in the rest pose. While the player plays, it turns
-  // from the direction of the frog to the direction of the tip with the place of the bow, and to
-  // the direction of pizzicato in a change.
+  // from the direction of the frog to the direction of the tip with the place of the bow.
   // Each mix runs only when it changes the direction, to keep the time of a frame.
   const [bowLow, bowHigh] = rig.bowRange;
   const tipShare = MathUtils.clamp((state.bow - bowLow) / (bowHigh - bowLow), 0, 1);
@@ -1494,107 +1654,51 @@ export function poseBowed(
   restPole.applyQuaternion(chest.rotation);
   if (weight < 1) {
     // Below the full play, the elbow turns from the rest pole to the playing pole (design 5.2).
-    holdPole.fromArray(rig.restPoleR).applyQuaternion(frames.root.rotation);
-    mixDirection(holdPole, restPole, weight, holdPole);
+    basePole.fromArray(rig.restPoleR).applyQuaternion(frames.root.rotation);
+    mixDirection(basePole, restPole, weight, basePole);
   } else {
-    holdPole.copy(restPole);
+    basePole.copy(restPole);
   }
-  if (pizzicato * weight > 0) {
-    mixDirection(
-      holdPole,
-      tipPole.fromArray(rig.hold.polePizzicato).applyQuaternion(chest.rotation),
-      pizzicato * weight,
-      holdPole,
-    );
-  }
-  // In a fast run across two strings, the elbow keeps the mean string of the run. In the lift and
-  // the lowering, the rule fades in over the second half of the move, because the arm then comes
-  // from the rest pose and not from the bow of the mean string.
-  const crossShare = smoothstep(2 * weight - 1) * (1 - pizzicato);
-  if (state.crossMean !== state.string && crossShare > 0) {
-    mixDirection(
-      holdPole,
-      crossPole(rig, strings, state, shoulder, holdPole, tipPole),
-      crossShare,
-      holdPole,
-    );
-  }
-  pole.copy(holdPole);
-  aim.copy(
-    solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, wristR, pole, solved).elbow,
-  );
-
-  // Then the hand rolls so that its back points to the elbow, three times. In the middle of a
-  // change, the elbow also turns a part of the way to the back of the hand. Each hold of the bow has its own roll. A change moves the bow, and the
-  // roll of the hand stays near the mix of the rolls of the two holds: the roll of the moving bow
-  // alone can pass the far side of the stick. The plucking palm is above the strings: the grip of
-  // the plucking bow follows the palm.
-  let angle = 0;
-  const steady = weight === 1 && pizzicato === 0;
-  const follow = weight * rig.hold.followChange * Math.sin(Math.PI * pizzicato);
-  for (let pass = 0; pass < ROLL_PASSES; pass++) {
-    const bowRoll = rollToward(rig, bow, aim);
-    if (steady) {
-      // The bow plays: the hand holds it with its own roll.
-      angle = bowRoll;
-      gripHand(rig, bow, angle, heldHand);
-    } else {
-      let pluckRoll = 0;
-      if (pizzicato > 0) {
-        pluckRoll = rollToward(rig, pluckBow, aim);
-        gripHand(rig, pluckBow, pluckRoll, pluckHand);
-        pluckHand.wrist
-          .copy(pluckPalm)
-          .sub(palmOffset.fromArray(rig.armR.palm).applyQuaternion(pluckHand.rotation));
-        pluckBow.grip.fromArray(rig.grip).applyQuaternion(pluckHand.rotation).add(pluckHand.wrist);
-      }
-      const playRoll = bowRoll + (pluckRoll - bowRoll) * pizzicato;
-
-      // A change to pizzicato turns the hand in its own axes, and the bow turns in the hand. The
-      // two hands of the contrabass are near 180° apart, so the turn takes the side on which
-      // the hand stays nearer the forearm of the last solve.
-      gripHand(rig, bow, bowRoll, heldHand);
-      if (pizzicato > 0) {
-        mixRotationNear(
-          heldHand.rotation,
-          pluckHand.rotation,
-          pizzicato,
-          solved.lower,
-          heldHand.rotation,
-        );
-        heldHand.wrist.lerpVectors(heldHand.wrist, pluckHand.wrist, pizzicato);
-      }
-      held.rotation
-        .copy(heldHand.rotation)
-        .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playRoll));
-      held.grip.fromArray(rig.grip).applyQuaternion(heldHand.rotation).add(heldHand.wrist);
-      const restRoll = weight < 1 ? rollToward(rig, restBow, aim) : 0;
-      liftMix(restBow.rotation, held.rotation, weight, held.rotation);
-      held.grip.lerpVectors(restBow.grip, held.grip, weight);
-      const mixed = restRoll + (playRoll - restRoll) * weight;
-      const own = rollToward(rig, held, aim);
-      angle = MathUtils.clamp(own, mixed - ROLL_SPREAD, mixed + ROLL_SPREAD);
-      gripHand(rig, held, angle, heldHand);
-    }
+  const arm = { rig, chest, shoulder, strings, state, weight };
+  let angle: number;
+  let onStick: number;
+  if (pizzicato <= 0 || pizzicato >= 1) {
+    holdArm(arm, pizzicato, bowArm);
+    heldHand.wrist.copy(bowArm.wrist);
+    heldHand.rotation.copy(bowArm.rotation);
+    pole.copy(bowArm.pole);
+    angle = bowArm.angle;
+    onStick = bowArm.onStick;
+  } else {
+    // A change between the bow and pizzicato mixes the two holds of the arm at the same time,
+    // each with its own elbow. A roll toward the elbow of the moving arm swung the hand of the
+    // cello by 68° in 1/240 s near the start of a change. The turn of the hand takes the side
+    // on which it stays nearer the mean of the two forearms, as the two hands of the
+    // contrabass are near 180° apart.
+    holdArm(arm, 0, bowArm);
+    holdArm(arm, 1, pluckArm);
+    mixRotation(bowArm.forearm, pluckArm.forearm, 0.5, meanForearm);
+    mixRotationNear(bowArm.rotation, pluckArm.rotation, pizzicato, meanForearm, heldHand.rotation);
+    heldHand.wrist.lerpVectors(bowArm.wrist, pluckArm.wrist, pizzicato);
+    angle = bowArm.angle + (pluckArm.angle - bowArm.angle) * pizzicato;
+    onStick = bowArm.onStick + (pluckArm.onStick - bowArm.onStick) * pizzicato;
+    mixDirection(bowArm.pole, pluckArm.pole, pizzicato, pole);
+    // In the middle of a change, the elbow also turns a part of the way to the back of the hand.
+    const follow = weight * rig.hold.followChange * Math.sin(Math.PI * pizzicato);
     if (follow > 0) {
-      elbowPole(rig, shoulder.position, heldHand, holdPole, follow, pole);
+      elbowPole(rig, shoulder.position, heldHand, pole, follow, pole);
     }
-    aim.copy(
-      solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved)
-        .elbow,
-    );
   }
-
-  // The hand turns on the stick, so that the paw keeps its place on the stick.
-  const keep = rig.hold.stickTurnR;
-  const onStick =
-    keep === null
-      ? 0
-      : turnOnStick(rig, keep, shoulder.position, shoulder.rotation, pole, heldHand);
 
   poleR.copy(pole).applyQuaternion(chestInverse.copy(chest.rotation).invert()).toArray(poleTuple);
   writeArm(
-    { arm: rig.armR, shoulder, wrist: heldHand.wrist, hand: heldHand.rotation, pole: poleTuple },
+    {
+      arm: rig.armR,
+      shoulder,
+      wrist: heldHand.wrist,
+      hand: heldHand.rotation,
+      pole: poleTuple,
+    },
     chest.rotation,
     rotations,
   );
