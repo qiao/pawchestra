@@ -436,10 +436,10 @@ the joints of the source, mapped by the paw turns and the eye edit.
 
 | Item | Value |
 |---|---|
-| Size | 382,815 bytes |
-| SHA-256 | `134ea5c151dbee5e42cdfaa6cbdfe408e9d215478b81511f577060f865d182a6` |
+| Size | 379,847 bytes |
+| SHA-256 | `e4ec9831998c7657c1ecfc7eaca663899fedbdad309650a3a15d85235c3436fe` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). 45 faces are gloss (the pink nose). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.942613 (the shoulder joints at 1.48443 m for each unit, so that H is 0.339381 m, the H of the cat of `cat.rig.glb`), `crease` 180, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh at 0.90 of their size ("Eye size"), with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -506,6 +506,15 @@ The weights, in the rest pose:
 **Smooth surface.** No relax and no region colors: the form stays the form of the source. The
 crease angle 180 gives each corner the mean normal of the faces at its vertex, as the smooth
 shading of an FBX viewer.
+
+**Nose.** At the end of the build, the 45 gloss faces of the pink nose go to the slot `fur`
+(`noseFur` of the params). Thus the nose takes the color map, with its painted nostrils, and the
+smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
+The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
+`headShift` (0, 0, -0.000732941) moves the head center of the holds back to the head center of the
+gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
+the map tool does not change it.
 
 **Seat.** The thighs slope 20 degrees down and 20 degrees out in the bind, and the shins lean 12
 degrees forward (`legTurns` of the config). The front of the seat lies 0.06 units behind the knee
@@ -580,16 +589,15 @@ and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The stage light is warm and the close views add a fill light, so
 the gray fur reads light tan in the close views, and gray in the play view and the hall view. The
-nose is a gloss face group of one pink color with flat normals, so it shows facets and no painted
-nostrils. The eyes are 0.90 of their size, a little deeper, and the upper lids a little lower
-("Eyes"). The thighs of the seated bind spread 20 degrees ("Rest").
+eyes are 0.90 of their size, a little deeper, and the upper lids a little lower ("Eyes"). The thighs
+of the seated bind spread 20 degrees ("Rest").
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,190,264 bytes | `3c00c0d7a185d11356bf3d8bc1297b96a2afe3d2d743e1b68b81632193df4436` |
-| `tripo-hand/cat.rig.json` | 18,412 bytes | `e1321284d5f4bde434e7808527df4ac10c478f5a1557c0a8b3e06e2fa6dbb6f7` |
+| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `0883badc18b96811ac814c9463029338df030b2443059ab0ffa8a0336eec681d` |
+| `tripo-hand/cat.rig.json` | 18,466 bytes | `51e12bbbe0fcfc251dd93bd2bbe0d1e38521182c4d2024afc2d4d7dde70b9880` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
