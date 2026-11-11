@@ -1135,7 +1135,7 @@ export const BOWED_HOLDS = {
  *
  * The rest pose is the upright rest of the rabbit and the red fox, as a seated violinist rests:
  * the viola stands upright on the outer side of the left thigh, 0.6 of the way from the hip to the
- * knee, and 0.22 H out from it, 0.05 H up, and 0.06 H to the front, in the reach of the short
+ * knee, and 0.14 H out from it, 0.15 H down, and 0.06 H to the front, in the reach of the short
  * arms, and the bow rests in the right paw at the front of the lap. The left paw holds the viola at
  * 0.55 of the fingerboard from the nut (`restPlace`), and the left elbow points down, a little out,
  * and a little forward, (-0.55, -1, -0.3), so that the left elbow bends near the side of the round
@@ -1163,10 +1163,10 @@ export const BOWED_HOLDS = {
  * neck as a fist and does not hold the viola. With a turn of 12° around the normal, the wrist skin
  * flattens in the lift (flat p5 0.70 against 0.75).
  *
- * The grip of the bow rests at the front of the lap, 0.4 H out, 0.6 H up, and 0.05 H to the front
+ * The grip of the bow rests at the front of the lap, 0.3 H out, 0.3 H up, and 0.2 H to the front
  * at 0.6 of the way to the knee, with the tip a little forward, (0.15, 1, -0.45): 0.4 H up, the
  * shorter right forearm goes 1.2 cm into the belly at rest. The right elbow hangs down, out, and a
- * little back, (0.9, -1, 0.2): the elbow bends near the side of the round belly with a straight
+ * little back, (0.6, -1, 0.1): the elbow bends near the side of the round belly with a straight
  * wrist, and the paw rests low near the hip. With (0.8, -1, 0.3), the right upper arm goes 1.4 cm
  * into the belly at rest (0.8 cm with this elbow), and with (0.7, -1, 0.3), 1.7 cm. With the paw
  * high at the chest, the elbow bends to 76° as a wing. The round belly keeps the upper arm 35°
@@ -1181,7 +1181,7 @@ export const BOWED_HOLDS = {
  * 0.19 H to the front in the middle (`liftReach`), so that the viola near the jaw goes at most
  * 2.0 cm into the body in a lowering: with 0.25 H up and 0.2 H to the front, it goes 2.1 cm in.
  * With 0.2 H to the front, the right claws go deeper into the viola, and with 0.23 H, 2.4 cm. In
- * the middle of the moves, the left elbow points up, back, and a little in, (0.6, 1, 1)
+ * the middle of the moves, the left elbow points up, back, and a little in, (0.6, 1, 0.5)
  * (`liftPoleL`), so that the viola turns the short way: the scroll stays up, and the body swings
  * in and up to the jaw, as a violist lifts the instrument by the neck. The left forearm supinates
  * from the rest grip to the playing grip (`carryLift()`), and with the elbow out and a little down,
@@ -1245,9 +1245,22 @@ export const BOWED_HOLDS = {
  * the left paw tilts 55° over the neck (`tiltL`): with 45°, the left arm turns 3° further in the
  * play. The left elbow points further out in the play, (-2, -0.8, -0.71), so that the upper arm
  * takes 44° of the turn: with (-1, -1, -0.75), it takes 15°, and the forearm 90°. At rest, the
- * left elbow points down and in, (0, -1, -0.6), so that the upper arm rolls the other way (-34°),
+ * left elbow points down and a little forward, (0, -1, -0.3), so that the upper arm rolls the other way,
  * and the left paw turns 45° around the normal of the top plate (`restYawL`): with the rest
  * elbow and the turn of the mesh cat, the left forearm twists 117° at rest.
+ *
+ * The thighs of the Tripo cat are thinner than the thighs of the mesh cat. With the viola 0.22 H
+ * out and 0.05 H up, its lower end stood 8.8 cm off the skin beside the hip, and the left paw held
+ * it at the height of the shoulder (`pnpm hold-fit violist`). With 0.14 H out and 0.15 H down, the
+ * lower end stands 0.2 cm off the outer side of the thigh. With the bow grip 0.4 H out and 0.6 H
+ * up, the right upper arm stood 55° from the vertical at rest, as a wing, and with this grip and
+ * elbow, 31°. The left rest elbow points less forward, so that the paw bends less on the wrist:
+ * the paw swing of the arm gate at rest drops from 84° to 72°, and with the elbow (-0.1, -1,
+ * -0.2), to 67°, but the viola then turns 52° off the short arc in the moves. The elbow in the
+ * middle of the moves points less back, (0.6, 1, 0.5): with (0.6, 1, 1) and the new rest place,
+ * the viola turned 60° off the short arc. With this elbow, the viola turns 36° off it, no fast
+ * step of the viola turns against the paw (310 of 9,393 before), the largest turn is 35° (154°
+ * before), and the skin of the left arm twists 55° in the lift (60° before).
  */
 const CAT_HOLD = {
   ...BOWED_HOLDS.viola,
@@ -1266,21 +1279,21 @@ const CAT_HOLD = {
   polePizzicato: [1.2, -0.5, -1],
   pluckSide: 0.1,
   reach: 36 * MathUtils.DEG2RAD,
-  restPoleR: [0.9, -1, 0.2],
-  restPoleL: [0, -1, -0.6],
+  restPoleR: [0.6, -1, 0.1],
+  restPoleL: [0, -1, -0.3],
   restPlace: 0.55,
   rest: {
     axis: LAP_VIOLIN.axis,
     top: [-0.5, 0, -0.87],
-    lap: { along: 0.6, offset: [-0.22, 0.05, -0.06] },
+    lap: { along: 0.6, offset: [-0.14, -0.15, -0.06] },
   },
   liftReach: [-0.14, 0.29, -0.19],
   restCurlL: 115 * MathUtils.DEG2RAD,
   restPawTurnL: 42 * MathUtils.DEG2RAD,
   restYawL: 45 * MathUtils.DEG2RAD,
-  liftPoleL: [0.6, 1, 1],
+  liftPoleL: [0.6, 1, 0.5],
   restBow: {
-    lap: { along: 0.6, offset: [0.4, 0.6, -0.05] },
+    lap: { along: 0.6, offset: [0.3, 0.3, -0.2] },
     tip: [0.15, 1, -0.45],
     hair: [0, 0, -1],
     via: { tip: [0.4, 0.3, -1], hair: [0, 0, -1], reach: [0.5, 0.45, -0.15] },
