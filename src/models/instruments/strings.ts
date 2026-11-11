@@ -72,11 +72,15 @@ const CELLO_END_PIN = 0.2;
 
 /**
  * The length of the end pin of the contrabass below the tail end, in meters, at each size (design
- * 4.6): a real end pin stands out about 0.15 m to 0.25 m. The hold of the contrabass moves it to
- * the body of the player, so a smaller contrabass needs no longer end pin. With the cello rule, the
- * smaller contrabass of the hippo had an end pin of 0.55 m.
+ * 4.6). A real end pin stands out about 0.15 m to 0.25 m, and a bassist sets it so that the nut
+ * stands near the eyebrows (`docs/reference/string-technique.md`, section 2.8). The hippo has low
+ * shoulders under a large head, so its end pin is short: the upper bout then stands below the left
+ * shoulder, and the left arm passes over it to the neck. With 0.2 m, the left upper arm and
+ * forearm went up to 7 cm into the upper bout in each sample of the play. The hold of the
+ * contrabass moves it to the body of the player, so a smaller contrabass needs no longer end pin.
+ * With the cello rule, the smaller contrabass of the hippo had an end pin of 0.55 m.
  */
-const BASS_END_PIN = 0.2;
+const BASS_END_PIN = 0.05;
 
 /**
  * Gives the length of the end pin of an upright bowed string below the tail end, in meters

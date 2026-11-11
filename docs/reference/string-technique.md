@@ -662,12 +662,13 @@ The app follows these facts:
 
 - **The size (1.1).** The hippo plays a smaller contrabass (`SpeciesParams.bassScale`), as a child
   plays a fractional size, with a short end pin (`BASS_END_PIN` of
-  `src/models/instruments/strings.ts`). Its strings are 0.92 m long.
+  `src/models/instruments/strings.ts`). Its strings are 0.81 m long.
 - **The contacts (2.8).** The hippo stands, as many orchestral bassists do, with `HIPPO_HOLD`. The
   end pin stands on the floor in front of it and to the left, and the contrabass stands nearly
-  upright at its left side, tilted a little back, with its back 5 cm in front of the belly. The
-  place comes from the body (`BowedHold.fit`).
-- **The height (2.8).** The nut stands at the height of the eyes, near the level of the eyebrows.
+  upright at its left side, tilted a little back, and the lower bout rests against the left
+  thigh. The place comes from the body (`BowedHold.fit`).
+- **The left arm (2.8).** The upper bout stands below the left shoulder, so that the left arm
+  passes over the shoulder of the bass to the neck.
 - **The turn (2.8).** The top plate turns a little to the right (`HIPPO_HOLD.fit`).
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings
   (`BowedHold.pluckSide`). No source gives the place of the bow in the hand in pizzicato. The bow
@@ -677,8 +678,12 @@ The app does not follow these facts:
 
 - **The left elbow (2.8).** A real bassist keeps the left elbow relaxed and not high. The hippo
   points the left elbow out to the side (`BowedHold.poleL`), because its short left arm comes up
-  to the neck from below the shoulder line, and the elbow then clears the upper bout. The upper
-  arm still touches the back of the upper bout.
+  to the neck from below the shoulder line, and the elbow then clears the upper bout.
+- **The height (2.8).** The nut stands about 0.17 m above the left shoulder joint along the
+  strings, as on a player with the nut near the eyebrows. On the large head of the hippo, it then
+  stands below the eyes.
+- **The sounding point (2.4).** The bow plays near the end of the fingerboard
+  (`BowedHold.soundingPoint`), so that the bow arm keeps its height over the round belly.
 - **The left hand (2.8).** The thick left paw tilts over the neck, so that the left arm keeps off
   the body. The paw lies a little off the strings along the normal of its palm
   (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a

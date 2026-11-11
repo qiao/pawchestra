@@ -437,9 +437,10 @@ The rest of each family:
   strings. The contrabass of the hippo takes its place from the body by the same rule, with its
   own lean back, lean to the left, turn of the top plate, end pin place, and gap
   (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
-  small tilt back and a small turn to the right, as a standing bassist holds it. The nut stands at
-  the height of the eyes, and the scroll beside the head. The left elbow points out to the side,
-  and the bow plays near level in front of the belly. Reason: with a place that leaned the bass far
+  small tilt back and a small turn to the right, as a standing bassist holds it. The lower bout
+  rests against the left thigh, the upper bout stands below the left shoulder, and the scroll
+  stands beside the head. The left elbow points out to the side, and the bow plays near level in
+  front of the belly, near the end of the fingerboard (`HIPPO_HOLD.soundingPoint`). Reason: with a place that leaned the bass far
   across the body, the hippo hugged it as a cello. The other
   instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
