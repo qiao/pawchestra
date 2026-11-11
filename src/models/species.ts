@@ -360,10 +360,13 @@ export const SPECIES = {
    * Hippo, the contrabasses: a round gray-pink hippo with small ears, two small teeth, pale toes,
    * and a short tail. It has the studio body of the hand rig of the Tripo P2 mesh
    * `assets/models/hippo/tripo-p2/hippo.fbx` (design 4.4), with the head height of the hippo of the
-   * T-pose mesh and the arms of the source. It stands at its contrabass, as the hippos of
-   * `orchestra-latest.png`. Its head height is the head of the studio body, and the seat height is
-   * the seat of the studio body, in H. It plays a contrabass of 0.65, a size at which its short
-   * arms reach the strings and the neck over its round belly (`HIPPO_HOLD` of `pose/bowed-rig.ts`).
+   * T-pose mesh and arms 1.2 times longer than the arms of the source. It stands at its
+   * contrabass, as the hippos of `orchestra-latest.png`. Its head height is the head of the studio
+   * body, and the seat height is the seat of the studio body, in H. It plays a contrabass of 0.8,
+   * with a string length of 0.92 m: the nut stands at the height of its eyes, the scroll beside
+   * its head, and the upper bout at the height of its shoulders (`HIPPO_HOLD` of
+   * `pose/bowed-rig.ts`). A larger bass puts the upper bout higher than the shoulders, and the
+   * left arm then goes through it to the neck.
    *
    * The bow grip (`bowGrip`) comes from the mesh body of the old hippo: the stick passes through
    * the closed right paw, 23° from square toward the wrist. The bow hand turns around the grip on
@@ -371,7 +374,7 @@ export const SPECIES = {
    */
   hippo: {
     body: 'studio-hippo',
-    bassScale: 0.65,
+    bassScale: 0.8,
     bowGrip: { at: [0.0139, 0.0037, -0.0894], turn: 23 * (Math.PI / 180) },
     colors: SPECIES_COLORS.hippo,
     headHeight: STUDIO_HEIGHTS['studio-hippo'].headHeight,

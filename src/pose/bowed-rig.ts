@@ -1344,103 +1344,84 @@ const DOG_HOLD = {
 } as const satisfies BowedHold;
 
 /**
- * The hold of the contrabass of the hippo, which stands (design 4.6, 5.3). A real bassist leans
- * the contrabass on the body, and the contrabass does not go in
- * (`docs/reference/string-technique.md`, section 2.8). The body is the hand rig of the Tripo P2
- * hippo (`assets/models/hippo/README.md`): its arms keep the length of the source, so each arm
- * reaches only 0.32 m from the shoulder joint to the wrist, and its round belly stands 0.39 m in
- * front of the shoulder joints.
+ * The hold of the contrabass of the hippo, which stands (design 4.6, 5.3), as a real standing
+ * bassist holds the bass (`docs/reference/string-technique.md`, section 2.8): the bass stands
+ * upright at the left side of the body, tilted a little back, and turned a little to the right.
+ * The body is the hand rig of the Tripo P2 hippo (`assets/models/hippo/README.md`), with arms 1.2
+ * times longer than the arms of the source: each arm reaches 0.38 m from the shoulder joint to the
+ * wrist, and the round belly stands 0.39 m in front of the shoulder joints.
  *
- * The place of the contrabass comes from the body (`fit`, `fitCelloPlace()`), as the cello of the
- * dog. The end pin stands on the floor 0.5 H right of the middle. The contrabass leans 25° back
- * and 36° to the left, and its top plate turns 40° to the right, so that the strings face the bow
- * arm. It moves back until the middle line of its back touches the belly. The hippo plays a
- * contrabass of 0.65 of the contrabass of the app (`SpeciesParams.bassScale`), 1.25 m from the end
- * pin to the scroll. The trunk leans 20° forward, and both shoulders turn forward (`reach`,
- * `reachL`), also in the rest, so that the short arms reach the strings over the belly. Thus the
- * nut lies beside the left jowl, 18 cm from the head, the scroll stands beside the left cheek, the
- * bow reaches 0.12 m to 0.33 m of its 0.36 m of hair, and the left paw reaches the fingerboard
- * from 0.19 of its length. With the fixed place of the old hippo and a contrabass of 0.8, the end
- * pin stood 0.58 m in front of the body, the bow reached no hair and stayed still, and the left
- * paw reached the fingerboard only at 0.58. With no lean to the left, the nut stood in front of
- * the snout. With a turn of 60°, the bow paw went about 14 cm into the belly at the end of the
- * hair, and with a turn of 30°, the left paw reached only one place of the fingerboard.
+ * The place of the contrabass comes from the body (`fit`, `fitCelloPlace()`). The end pin stands
+ * on the floor in front of the hippo, 0.3 H left of the middle. The contrabass leans 24° back and
+ * 12° to the left, its top plate turns 8° to the right, and it moves back until the middle line
+ * of its back stands 0.1 H in front of the belly. The hippo plays a contrabass of 0.8 of the
+ * contrabass of the app (`SpeciesParams.bassScale`). Thus the nut stands at the height of the
+ * eyes, the scroll stands beside the head on the left, 12 cm from it, the left paw stops the
+ * strings from 0.48 of the fingerboard on, and the bow plays 0.23 m to 0.42 m of its 0.45 m of
+ * hair. With no move from the belly, the bass went up to 15 cm into the belly, and the bow paw
+ * up to 3 cm. Further left (0.55 H), the back of the bass missed the belly, and the bow went into
+ * it. The trunk leans 8° forward, and both shoulders turn forward (`reach`, `reachL`).
  *
- * The string planes are 6° apart, below the 25° of a real contrabass, as on the cello of the dog.
- * The bow plays no hair in the first 0.12 m from the frog (`frogHair`). The left elbow points out
- * to the left, a little down, and forward, and turns up 2° for each lower string, as on the cello
- * of the dog.
+ * The left elbow points out to the left, (-1, -0.3, 0), in the play and at rest, so that the left
+ * arm goes up to the neck from the side, as a bassist raises the left elbow. The left paw tilts
+ * 40° over the neck (`tiltL`): at 60° and 80°, the twist of the left forearm jumped by up to 100°
+ * between two notes. The right elbow points out and down, (1, -0.7, 0.2), so that the bow arm
+ * bows near level in front of the belly: with the elbow down and back, the forearm lay on the
+ * belly at the tip. The string planes are 6° apart, below the 25° of a real contrabass, as on the
+ * cello of the dog. The left paw lies 1.5 cm off the strings along the normal of its palm
+ * (`gapL`), and stops the strings only up to 0.9 of the fingerboard (`stopEnd`).
  *
- * The left paw lies 1.5 cm off the strings along the normal of its palm (`gapL`): a real bassist
- * touches the neck with the thumb and the fingers only, and the wrist stays off it.
+ * In the rest pose, the contrabass stays at its playing place, and the left paw holds the neck at
+ * 0.6 of the fingerboard (`restPlace`). The right arm hangs at the side of the belly with the bow
+ * tip down and a little forward. In the lift and the lowering, the tip turns through the front.
  *
- * The elbows, the paw turns, and the elbow axes of the hand rig keep each part of each arm at most
- * 44° of roll or twist in the moments of the bassist (`assets/models/hippo/README.md`, "Arm
- * twist"). In the play, the right elbow points down and back, (0, -1, 1), and at the tip also a
- * little out, (0.5, -1, 1), so that the bow forearm comes down to the strings over the belly: with
- * the elbow out and forward of the old hippo, (2, 0, -1), the right upper arm rolled 94° to 120°.
- * The left elbow points down and a little out, (-0.5, -1, 0), and the left paw tilts 70° over the
- * neck (`tiltL`), the tilt at which the twist of the left forearm spreads least over the moments.
- * At rest, the left paw holds the neck at 0.75 of the fingerboard (`restPlace`), near the body of
- * the contrabass, with the elbow down and back, (0, -1, -0.8), and the right elbow points down, a
- * little out, and back, (0.3, -1, 0.5): at 0.3 of the fingerboard with the elbow out to the left,
- * as on the old hippo, the left forearm twisted 170° to 180° at rest and in the moves.
+ * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), and
+ * the bow tip points down and forward (`pizzicatoTip`): with the tip down, the bow went 17.6 cm
+ * into the belly, and with the tip up, the right forearm twisted 96°.
  *
- * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), as a
- * real bassist rests the thumb on the edge of the fingerboard
- * (`docs/reference/string-technique.md`, section 2.8). The bow tip points up, square to the
- * strings, so that the forearm comes to the hand at about 45° in the plane of the palm, as in the
- * play. The left paw stops the strings only up to 0.7 of the fingerboard from the nut (`stopEnd`).
- * The far side of the stick for the roll of the bow hand lies at 30° (`farSideR`), so the roll
- * stays at one end of its range.
- *
- * In the rest pose, the contrabass stays at its playing place. The right paw hangs out from the
- * side of the belly with the bow tip down (`HANGING_BOW`), so that the round right upper arm stays
- * off the trunk. In the lift and the lowering, the tip turns through the front, as the upright bow
- * of the violinists, with the grip moved up and far to the front, so that the bow paw does not
- * turn fast.
- *
- * The bow paw bends 24.94° off the forearm (`pawBendR`), as a bassist holds the French bow "as
- * if the hand is resting by the side" (`docs/reference/string-technique.md`, section 2.1). The
- * bow hand turns in the plane of its palm around the grip on the stick, so that the forearm keeps
- * 26° in that plane (`stickTurnR`), and the paw keeps one turn on the hand. The turn goes up to
- * 90°, because the lowering after a pizzicato turns the forearm far past it.
+ * The paw turns and the elbow axis turns of the hand rig keep each part of each arm at most 40°
+ * of roll or twist in the bowing, the rest, and the moves (`assets/models/hippo/README.md`, "Arm
+ * twist"). In pizzicato, the right upper arm and forearm each take about 62°. The bow paw bends 24.94° off the forearm (`pawBendR`), as a bassist holds the French
+ * bow "as if the hand is resting by the side" (`docs/reference/string-technique.md`, section 2.1).
+ * The bow hand turns in the plane of its palm around the grip on the stick, so that the forearm
+ * keeps 26° in that plane (`stickTurnR`). The far side of the stick for the roll of the bow hand
+ * lies at 30° (`farSideR`).
  */
 const HIPPO_HOLD = {
   ...BOWED_HOLDS.contrabass,
-  lean: 20 * MathUtils.DEG2RAD,
+  lean: 8 * MathUtils.DEG2RAD,
   reach: 48 * MathUtils.DEG2RAD,
   reachL: 34 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
   frogHair: 0.12,
-  tiltL: 70 * MathUtils.DEG2RAD,
+  tiltL: 40 * MathUtils.DEG2RAD,
   gapL: 0.015,
-  restPlace: 0.75,
-  poleL: [-0.5, -1, 0],
+  restPlace: 0.6,
+  poleL: [-1, -0.3, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
-  poleR: [0, -1, 1],
-  poleTipR: [0.5, -1, 1],
-  polePizzicato: [3, 0.9, -1],
-  pizzicatoTip: [0, 1, 0],
+  poleR: [1, -0.7, 0.2],
+  poleTipR: [1, -0.7, 0.2],
+  polePizzicato: [1.5, 0.4, -0.75],
+  pizzicatoTip: [0.5, -1, -0.6],
   pluckSide: 0.24,
-  stopEnd: 0.7,
+  stopEnd: 0.9,
   farSideR: 30 * MathUtils.DEG2RAD,
   pawBendR: 24.94 * MathUtils.DEG2RAD,
   stickTurnR: { forearm: 26 * MathUtils.DEG2RAD, most: 90 * MathUtils.DEG2RAD },
   restPoleR: [0.3, -1, 0.5],
-  restPoleL: [0, -1, -0.8],
+  restPoleL: [-1, -0.3, 0],
   restBow: {
-    lap: { along: 1, offset: [1, 1, -0.4] },
-    tip: HANGING_BOW.tip,
+    lap: { along: 1, offset: [0.65, 0.5, -0.2] },
+    tip: [0.2, -1, -0.5],
     hair: HANGING_BOW.hair,
-    via: { ...UPRIGHT_BOW.via, reach: [0.1, 0.5, -0.9] },
+    via: { ...UPRIGHT_BOW.via, tip: [0.3, 0, -1], reach: [0.1, 0.5, -0.9] },
   },
   fit: {
-    gap: 0,
-    left: 36 * MathUtils.DEG2RAD,
-    back: 25 * MathUtils.DEG2RAD,
-    turn: 40 * MathUtils.DEG2RAD,
-    side: 0.5,
+    gap: 0.1,
+    left: 12 * MathUtils.DEG2RAD,
+    back: 24 * MathUtils.DEG2RAD,
+    turn: 8 * MathUtils.DEG2RAD,
+    side: -0.3,
   },
 } as const satisfies BowedHold;
 
