@@ -223,11 +223,11 @@ export const SPECIES = {
    * second Tripo P2 rabbit (`assets/models/rabbit/tripo-hand/rabbit.blend`, design 4.4), seated
    * with the bind pose of that rig, and standing as a soloist. Its head height is the head of the
    * studio body, and its chair fits its legs: the seat height is the seat of the studio body, in
-   * H. The hand rig keeps the short arms of the mesh with no stretch, so the arms reach 0.252 m
-   * from the shoulder joint to the middle of the palm, and the violin fits them: it is 0.6 of the
-   * violin of the app (0.304 m). The left paw then reaches the fingerboard from 0.2 of its length
-   * from the nut, and the bow paw reaches 0.244 m of the hair (`pnpm hold-reach rabbit
-   * --instrument violin`). With 0.83, the violin of the first rabbit, the left paw reached the
+   * H. The hand rig keeps the short arms and the paws of the mesh with no stretch, so the arms
+   * reach 0.262 m from the shoulder joint to the middle of the palm, and the violin fits them: it
+   * is 0.6 of the violin of the app (0.304 m). The left paw then reaches the fingerboard from 0.25
+   * of its length from the nut, and the bow paw reaches 0.244 m of the hair (`pnpm hold-reach
+   * rabbit --instrument violin`). With 0.83, the violin of the first rabbit, the left paw reached the
    * fingerboard only from 0.75, and the bow paw 0.17 m of the hair.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
