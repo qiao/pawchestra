@@ -188,9 +188,9 @@ left side):
   at x 0.31, the knuckles at x 0.375, where the fingers part, the hip at (0.09, 0.30, 0.06), the
   knee at (0.094, 0.17, 0.055), and the ankle at (0.095, 0.055, 0.04). The palm is the true palm of
   the source, the mean normal of the hand faces that face down, (-0.066, -0.998, 0), turned by the
-  hand turn. The bind arms (`bindArms`), the leg turns (the thigh 65 degrees down and 15 degrees
-  out, the shin 20 degrees back), and the forward lean of the trunk (`open` -14) are those of the
-  monkey of main. The tail bones keep the directions of the source in the bind.
+  hand turn. The bind arms (`bindArms`) are those of the monkey of main. The leg turns put the
+  thigh 90 degrees down and 15 degrees out, and the shin 22 degrees back, and the trunk leans
+  forward a little (`open` -2). The tail bones keep the directions of the source in the bind.
 
 The weights, in the rest pose:
 
@@ -220,10 +220,26 @@ The weights, in the rest pose:
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
 **Stance.** The monkey has no chair (`noChair` of `src/models/species.ts`). The property `seat` is
-{`prop` `chair`, `front` 0, `back` -0.07, `halfWidth` 0.15}: a seat under the back of the haunch,
-which only sets the seat height of the export. The seat height is 0.305 m (0.292 m on the monkey of
-main), so the soles stay on the floor in the app. The legs keep the length of the source. The feet
-stand under the hips, and the trunk leans forward, so the center of mass stays over the soles.
+{`prop` `chair`, `front` -0.04, `back` -0.11, `halfWidth` 0.15}: a seat under the back of the
+haunch, behind the heels, which only sets the seat height of the export. The seat height is
+0.335 m (0.292 m on the monkey of main), so the soles stay on the floor in the app. The legs keep
+the length of the source. The thighs hang straight down, the knees bend 22 degrees, and the
+shoulders stay over the hips, as a brass player stands erect (`docs/reference/wind-technique.md`,
+1.8). The soloist keeps this stance (`soloist` false in `ANIMALS` of `tools/studio-body.ts`).
+Reason: the straight legs of the sheet put the center of mass 2.1 to 2.8 cm behind the middle of
+the soles. With the leg turns and the trunk lean of the monkey of main, the large head and the
+chest leaned far forward of the haunch.
+
+The center of mass (the volume of the skin and a trumpet of 0.27 kg) from the middle of the soles
+(the corners within 1.2 cm of the floor, 22 cm long), in each moment of the trumpeter:
+
+| Moment | Before | After |
+|---|---|---|
+| rest | 0.8 cm in front | 0.3 cm in front |
+| note | 0.9 cm in front | 0.3 cm in front |
+| between | 1.6 cm in front | 1.0 cm in front |
+| lift50, lower50 | 0.9 cm in front | 0.4 cm in front |
+| stand (soloist) | 2.8 cm behind | 0.3 cm in front |
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -55 to 45 degrees and lam from -50 to 62
 degrees on the left (the mirror on the right), with the lower strip as the first row, at 1.17 ball
@@ -238,11 +254,15 @@ of `MONKEY_TRUMPET` of `src/pose/winds.ts` (`pnpm pose-preview trumpeter`):
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| note | 24.2 | 15.3 | -25.7 | -16.5 |
-| rest | 30.9 | 4.6 | -19.6 | 21.6 |
-| lift50 | 28.1 | 11.9 | -21.2 | 5.6 |
-| lower50 | 27.1 | 13.7 | -21.9 | 0.3 |
-| stand | 20.9 | 22.4 | -24.8 | -22.2 |
+| note | 24.1 | 22.8 | -25.7 | -22.7 |
+| rest | 70.6 | -2.6 | -50.6 | 5.3 |
+| lift50 | 43.7 | 15.5 | -29.9 | -14.4 |
+| lower50 | 37.6 | 19.0 | -26.7 | -17.8 |
+| stand | 24.1 | 22.8 | -25.7 | -22.7 |
+
+The rest row comes from the rest place in front of the belly (`restShift` of `MONKEY_TRUMPET`).
+Its upper arm rolls are larger than 45 degrees (67.0 and -49.4 with the old stance). The skin
+twist of the arm gate (`pnpm arm-check trumpeter`) stays at 29 and 25 degrees.
 
 With the hands of the source, the forearms twisted -130 and 112 degrees at rest. The hold keeps the
 constants of the trumpet hold of the monkey of main. The right hand closes under the valves, the
@@ -267,7 +287,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/monkey.rig.glb` | 1,240,632 bytes | `0cdd51a978ac07ec82e5ac3b38f201e9e2b0246cd3122d3e8bf1925b359d5e12` |
-| `tripo-hand/monkey.rig.json` | 16,677 bytes | `61a5043c321e975629a28f9b61e17587b7f7823dd02bea6e56a7f5985878d197` |
+| `tripo-hand/monkey.rig.glb` | 1,240,684 bytes | `220605cf1570c4ff8de3b86e3cd18f70b8cc375afb4efdeb68edd5b0047d532c` |
+| `tripo-hand/monkey.rig.json` | 16,672 bytes | `09138d06e401dce46b9949e524c94dd21c617b99409ee25ebb8ecda57c5a3d04` |
 | `tripo-hand/monkey-color.webp` | 178,300 bytes, 2048 × 2048 | `5b9920243e479862e07e602f19b82b5eebdfe1f1ddd6d019c524f619cb34d117` |
 | `tripo-hand/monkey-normal.webp` | 111,326 bytes, 1024 × 1024 | `e81b285a48619d696b4ae23557ee2d203934d8a2be29739b2a7cfd2c88f83dca` |
