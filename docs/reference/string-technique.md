@@ -568,8 +568,11 @@ The app does not follow these facts:
   run of the other technique when the notes of its technique come back within
   `BOW_MOTION.techniqueHoldSec` (`handTechniques()`). Thus fast alternations, often two parts on
   one MIDI channel, show one hand and no turn on each note. A change starts
-  `BOW_MOTION.techniqueLeadSec` before the note and can start in the notes before it. The pose
-  solves the bow hold and the pizzicato hold each with its own elbow, and mixes the two hands.
+  `BOW_MOTION.techniqueLeadSec` before the note and can start in the notes before it. A change
+  from the bow starts at the end of the last bowed note, so that the bow stays on the string
+  while the note sounds, but not later than `BOW_MOTION.techniqueLeastSec` before the pizzicato
+  note. No source gives the least time of the change. The pose solves the bow hold and the
+  pizzicato hold each with its own elbow, and mixes the two hands.
 - **The lift and the lowering.** No source gives the path of the violin or the viola from the lap
   to the chin. The left paw carries the instrument by its neck, and the instrument turns with the
   paw (`carryLift()`). The paw supinates on its forearm on the way, as a real forearm turns. The

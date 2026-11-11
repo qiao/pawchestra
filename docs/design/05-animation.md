@@ -397,6 +397,10 @@ The rest of each family:
   `BOW_MOTION.techniqueHoldSec`), and a change can start in the notes before the new technique.
   Reason: merged parts alternate the bow and pizzicato each 0.1 s to 0.2 s, and each change
   turned the paw by up to 175° in a few frames.
+- A change from the bow to pizzicato starts at the end of the last bowed note, but not later
+  than `BOW_MOTION.techniqueLeastSec` before the pizzicato note. Reason: a change that started
+  `BOW_MOTION.techniqueLeadSec` before the note took the bow off the string while the last
+  bowed note sounded, and a shorter change turned the bow arm at up to 3000°/s.
 - In a change between the bow and pizzicato, the pose solves the bow hold and the pizzicato hold
   each with its own elbow (`holdArm()`). The hand turns at an even speed on the side on which it
   stays nearer the mean of the two forearms (`turnNear()`). The elbow moves on a straight line

@@ -91,6 +91,13 @@ export const BOW_MOTION = {
    */
   techniqueLeadSec: 0.3,
   /**
+   * A change from the bow to pizzicato starts at the end of the last bowed note, so that the bow
+   * stays on the string while that note sounds, but not later than this before the first
+   * pizzicato note (`docs/reference/string-technique.md`, section 2.10). Thus a pizzicato note
+   * right after a bowed note takes the shortest change.
+   */
+  techniqueLeastSec: 0.2,
+  /**
    * A run of notes of the other technique keeps the technique of the right hand before it when the
    * notes of that technique come back less than this time after the start of the run
    * (`docs/reference/string-technique.md`, section 2.10). Two parts on one channel can change
@@ -492,12 +499,18 @@ interface HandTechniques {
  * `BOW_MOTION.techniqueHoldSec` of the start of the run. A change starts
  * `BOW_MOTION.techniqueLeadSec` before the first stroke of the new technique, but not before the
  * first stroke of the old technique, and it ends `BOW_MOTION.techniqueEndSec` before that stroke.
+ * A change from the bow to pizzicato also starts not before the end of the last bowed stroke,
+ * unless that end is less than `BOW_MOTION.techniqueLeastSec` before the new stroke.
  *
- * @param strokes The start and the technique of each stroke, sorted by start.
+ * @param strokes The start, the end, and the technique of each stroke, sorted by start.
  * @returns The technique of the hand and the changes.
  */
 function handTechniques(
-  strokes: readonly { readonly start: number; readonly technique: Technique }[],
+  strokes: readonly {
+    readonly start: number;
+    readonly end: number;
+    readonly technique: Technique;
+  }[],
 ): HandTechniques {
   const m = BOW_MOTION;
   const plucks = (k: number): boolean => strokes[k]?.technique === 'pizzicato';
@@ -527,7 +540,16 @@ function handTechniques(
     }
     const target = strokes[next]?.start ?? Infinity;
     const start = strokes[runStart]?.start ?? 0;
-    const a = target === Infinity ? Infinity : Math.max(start, target - m.techniqueLeadSec);
+    // The bow leaves the string after its last note, as late as the shortest change allows.
+    const bowEnd = plucked[k] === true ? -Infinity : (strokes[next - 1]?.end ?? -Infinity);
+    const a =
+      target === Infinity
+        ? Infinity
+        : Math.max(
+            start,
+            target - m.techniqueLeadSec,
+            Math.min(bowEnd, target - m.techniqueLeastSec),
+          );
     const b = target === Infinity ? Infinity : Math.max(a + 1e-3, target - m.techniqueEndSec);
     for (; k < next; k++) {
       from.push(a);
