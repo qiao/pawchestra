@@ -31,8 +31,9 @@ root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool finds i
 file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh cat` runs. Never
 export the trial to `cat.rig.glb` of this folder: that file is the rig of the app.
 
-`tripo-hand/` holds a candidate body ("Candidate hand rig" below): a hand rig of the third Tripo
-P2 mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm stretch.
+`tripo-hand/` holds a candidate body ("Candidate hand rig" below): a hand rig of the fourth Tripo
+P2 mesh `tripo-p2/cat.fbx`, made in headless Blender by the route of the Tripo wolf, with no arm
+cut and no arm stretch.
 
 ## Files
 
@@ -381,158 +382,175 @@ bind, the weights, and the keys are in the git history of this `README.md`, at 0
 
 ## Candidate hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the third Tripo
-P2 mesh `tripo-p2/cat.fbx`, made in headless Blender with no arm cut and no arm stretch.
+`tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the fourth Tripo
+P2 mesh `tripo-p2/cat.fbx`, made by one build script in headless Blender 5.2, by the route of the
+Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form and the colors of
+the source: no point edit changes the head, the trunk, the paws, the legs, or the tail. The arms
+keep the length of the source: no cut, no split from the trunk, and no stretch. The edits are only
+those that the rig, the seat, the viola, and the eyes need.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/cat.fbx`, `tripo-p2/cat.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/cat.blend` | Made in headless Blender 5.2 from `tripo-p2/cat.fbx` (below). License as the FBX file | The scripted edits below |
+| `tripo-hand/cat.blend` | Made from `tripo-p2/cat.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/cat-color.webp` | The color map of the candidate ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
-| `tripo-hand/cat-normal.webp` | The normal map of the fur ("Normal map" below). License as the FBX file | The run of `tools/cat-maps.py` above (cwebp 1.5.0) |
-
-The files of the candidate, after the last edit:
-
-| File | Size | SHA-256 |
-|---|---|---|
-| `tripo-hand/cat.blend` | 380,547 bytes | `11bd91361a3a8d08bd18e8bc3207226aa059c8e4fd59b8176aa2c05d63f1169a` |
-| `tripo-hand/cat.rig.glb` | 839,724 bytes | `2ebd2829af9cc630a83ce85e00d9b270d931be6e4db666816c970874b639719e` |
-| `tripo-hand/cat.rig.json` | 21,224 bytes | `bd64603e3bc5b6719716f1bd12ac702cb5fc628e97115aa3bc92f16df4f0e6e5` |
-| `tripo-hand/cat-color.webp` | 233,814 bytes | `175bfe51f79cfbc799cafbbf44592a2509315bcfe401ad55f04234f238bb44e5` |
-| `tripo-hand/cat-normal.webp` | 78,584 bytes | `9e2d4f98ba34240894ef3f0eff106065825aa0339e38ea2b5e4ddb09537d9b2e` |
+| `tripo-hand/cat-color.webp`, `tripo-hand/cat-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
 
 ### tripo-p2/cat.fbx
 
-The third Tripo cat: a gray and white tabby with green eyes, a white chest, white paws, and a
-white tail tip, in a T-pose with quad faces, made with Tripo P2 from the turnaround sheet
-`cat-tabby3.png` of the project author. Its arm tubes have 8 vertices around, and its leg tubes 12.
-It replaces the second Tripo cat (FBX SHA-256
-`d9b38bf098e744e96da28e94abdb00f19b459654e67531b97072d58ad2ac57ff`). The folder `cat.fbm/` holds
-its color map and its normal map. The Tripo download names them
-`tripo_rgb_c56b7b9d-bee2-42f9-8813-38855b2b411a.jpg` (now `cat_basecolor.jpg`) and
-`tripo_normal_f60dbe84-0314-4a91-b849-bf22ccd352af.jpg` (now `cat_normal.jpg`). The FBX file links
-the maps by the folder of the download, so each tool takes the path of the map. The roughness and
-metallic maps of the download are not kept.
+The fourth Tripo cat: a gray tabby with a white chest and muzzle, white paws, brown eyes, and a
+round head, in a T-pose with quad faces, made with Tripo P2 from the sheet `cat-tabby4.png` of the
+project author. Its arm tubes and its leg tubes have 12 vertices around. It replaces the third
+Tripo cat (FBX SHA-256 `f6225744655b117ad547b426e0237ace0a86218817e12a3f8bba7c7a430fa980`).
 
 | Item | Value |
 |---|---|
-| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| Origin | Made with Tripo by the project author on a paid plan, and given on 2026-11-11. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Writer | Tripo, FBX 7.4 binary |
-| Contents | One mesh object, with no armature and no animation. 3,192 vertices and 3,325 faces: 2,765 quads and 560 triangles (6,090 triangles), no n-gon. One UV layer |
-| Parts | 28 parts: the body with the tail (2,731 vertices), two eyeballs (86 vertices each, closed spheres of radius 0.049 that reach over the middle plane into the head), the inside of the mouth (69 vertices), and 23 strips: the whiskers, the brow whiskers, and the tufts in the ears. No vertices merge at 1e-5. 232 open edges, and no edge with more than two faces |
-| Axes | The cat faces -y of Blender, so the import takes no turn. 1 unit from the soles to the ear tips, x ±0.3974 (the paw tips), and z ±0.2557 (the whisker tips and the tail curl) |
+| Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
+| Contents | One mesh object, with no armature and no animation. 3,237 vertices and 3,435 faces: 2,878 quads and 557 triangles, no n-gon. One UV layer |
+| Parts | 13 parts: the body with the tail (2,975 vertices), two eyeballs (90 vertices each, closed spheres of radius 0.0335 at (±0.0461, 0.828, 0.143)), and 10 whisker strips of 7 or 9 vertices. 135 open edges, and no edge with more than two faces |
+| Axes | The cat faces -y of Blender, so the import takes no turn. 1 unit from the soles to the ear tips, x ±0.4096 (the paw tips), and z ±0.228 (the whisker tips and the tail) |
 
-| File | Size | Pixels | SHA-256 |
-|---|---|---|---|
-| `cat.fbx` | 212,556 bytes | | `f6225744655b117ad547b426e0237ace0a86218817e12a3f8bba7c7a430fa980` |
-| `cat.fbm/cat_basecolor.jpg` | 3,563,226 bytes | 4096 × 4096 | `28c19cdc2750fb5ec412ae3158920eede4d99cf99a51c5f0fdd5150d63b39668` |
-| `cat.fbm/cat_normal.jpg` | 1,412,871 bytes | 4096 × 4096 | `d0675e1a9bab7b6947437122886976130da064348691884c3719eba83935cdbd` |
+The folder `cat.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
+the metallic maps are not kept.
 
-The color map paints a full eye on each eyeball: a large black pupil with a soft gray light, a
-yellow-green iris, white, and a dark lash line around the opening. It paints each iris at the
-inner lower corner of its opening. It also paints a dark brow arc over each eye, the tabby stripes,
-a white blaze, muzzle, chest, and paws, a pink nose, and pink inner ears and pads.
+| File | Name in the zip file | Size | Pixels | SHA-256 |
+|---|---|---|---|---|
+| `cat.fbx` | `tripo_convert_4075efce-789c-4617-bc4a-71e318a5dc61.fbx` | 215,068 bytes | | `4f2b51f5ba00a91598ac87d054ded6cbea2a219ef919d59b4d6864c01a51353b` |
+| `cat.fbm/cat_basecolor.jpg` | `tripo_rgb_1bfadb32-b887-4794-884d-d695d3ee99d3.jpg` | 4,554,310 bytes | 4096 × 4096 | `e0659294bb5a33d17cc79d412043a32ed425f87edb8c081d1594a5cda0eb71bc` |
+| `cat.fbm/cat_normal.jpg` | `tripo_normal_37966b9b-e6d8-48b5-8177-a94cd66425b6.jpg` | 1,906,505 bytes | 4096 × 4096 | `34f4509cf4ca9cb50401284719966472df586c54083a4ce2fbb5bcc1f06c87c3` |
+
+The color map paints a full eye on each eyeball: an orange brown iris, a black pupil with a soft
+gray light, white, and a dark lash line. It also paints the gray tabby stripes, a cream chest and
+muzzle, white paws, a pink nose, pink inner ears, and a thin mouth line.
 
 ### tripo-hand/cat.blend
 
-The candidate hand rig of the third Tripo P2 cat (design 4.4, "Hand rig"), made in headless
-Blender 5.2 (`blender -b --factory-startup`) by scripted edits, in the order below. The source FBX
-is the target of the look: the head, the girths, the trunk, the paws, and the legs keep the form
-of the source, with no cut, no split, and no stretch. The edits are only those that the rig, the
-seat, the eyes, and the tail need. The chair fits the body (`StudioBody.seatHeight`), so the seat
-is lower than the seat of the cat of main.
+The candidate hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/cat4/` of
+the worktree, which git ignores: `build.py`, `redits.py`, `rings.py`, `tail.py`, `make_config.py`,
+`params.json`, and `chain-here.sh`) are not in the repo. They follow the scripts of the third
+Tripo cat and of the Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/cat-tripo.json`:
+the joints of the source, mapped by the paw turns and the eye edit.
 
 | Item | Value |
 |---|---|
-| Origin | Made in Blender 5.2 from `tripo-p2/cat.fbx` |
-| License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the edits, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). The eyeballs keep their front (the back faces go, "Lids"), with the face attribute `eye`. The two lids have the face attribute `lid`, and the 98 faces of the strips of fewer than 30 vertices (whiskers, brow whiskers, ear tufts) have `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
-| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.863456 (the shoulder joints at 1.4272 m for each unit, so that H is 0.339357 m, near the H 0.339375 m of the cat of main), `crease` 55, `seatWidth` 0.46 |
-| Eyes | The eyeballs of the mesh at 0.85 of the size of the source, a little deeper in their sockets ("Eye size"), with the `eye` finish and the eye light ("Eyes"), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Size | 382,815 bytes |
+| SHA-256 | `134ea5c151dbee5e42cdfaa6cbdfe408e9d215478b81511f577060f865d182a6` |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). 45 faces are gloss (the pink nose). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Facts | `height` 0.942613 (the shoulder joints at 1.48443 m for each unit, so that H is 0.339381 m, the H of the cat of `cat.rig.glb`), `crease` 180, `seatWidth` 0.46 |
+| Eyes | The eyeballs of the mesh at 0.90 of their size ("Eye size"), with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The scripts of the session (`scratch/cat3/` of the worktree, which git ignores: `build.py`,
-`redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are not
-in the repo. They follow the scripts of the second Tripo rabbit (`assets/models/rabbit/README.md`).
-The edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`, x is the x of the
-left arm, y the height, in the source):
+The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+left side, y the height, in the source):
 
-- **Import.** `sa.import_source('assets/models/cat/tripo-p2/cat.fbx', 1e-5)`. No vertex merges.
-  Each face is flat.
-- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=2,
-  use_grid_fill=True)`) of the clean quad bands of 8 edges between the closed arm loops at x 0.122,
-  0.146, and 0.176.
-- **Knee and shin rings.** The same call with 1 cut on the clean leg bands of 12 edges at y 0.062
-  to 0.089 and 0.183 to 0.215.
-- **Rings with no split.** These bands stop at a triangle or a pole: the arm root to x 0.122, the
-  elbow from x 0.176 to x 0.225 (partial loops at x 0.194 and 0.207 carry the bend), the forearm
-  from x 0.225 (8 vertices) to x 0.275 (9 vertices), the paw, and the leg band from y 0.089 to
-  0.183 (the knee joint lies at y 0.16).
-- **Paws turned.** Each vertex past the arm loop at x 0.166 (a loop of the split) turns rigidly
-  about the rest forearm axis by whole ring steps of 45 degrees: 45 degrees on the left (1 step)
-  and 90 degrees on the right (2 steps), 307 vertices on each side. The 8 quads of the band from
-  the loop at x 0.166 to the loop at x 0.176 go, and new quads join the two loops with the same
-  step offset. The far loop moves back to its place before the turn, with a fade to 0 at 0.02
-  units along the arm. The new quads take the planar UVs of the clean gray patch at UV (0.0409,
-  0.7373). The tabby stripes go around the forearm, so the turn does not show.
-- **Point edits.** Only "Eye size" below: the other form of the source stays.
-- **Eye size.** The edit `eyes` of the session scripts scales each eyeball and its socket about
-  the middle of the sphere of the ball by 0.85. The middles are (±0.03353, 0.79064, 0.15615), r
-  0.0487 (source). Each ball scales as one piece. Each other point of the side within 0.054 of
-  the middle scales fully, and the share falls by a smoothstep to 0 at 0.085, and also to 0 near
-  the middle plane (|x| below 0.02) past 0.046, so that the skin between the eyes does not part.
-  Points in front of z 0.205 (the nose) stay, and points below y 0.745 fade out to y 0.70, so
-  that the muzzle and the mouth stay. Each ball then moves 0.0015 units back along its eye axis
-  (0.35, 0, 0.94), x mirrored on the right, so that the skin edge meets the ball. The whisker
-  strips near the eyes move as one piece. The largest skin move is 0.0083 units. With the
-  source size, each eye bulged out of the face with a rim of white.
-- **Surface.** `sa.add_surface(cat, 'cat', 'assets/models/cat/tripo-p2/cat.fbm/cat_basecolor.jpg',
-  eye_fans=False, config=<cat-tripo.json>)`. The faces of the two eyeballs (the loose parts of 81
-  to 99 vertices in the eye box) get the face attribute `eye`. The export then gives `ownEyes`.
-- **Round balls.** The Tripo balls are not round: the back reaches 1.09 times the radius of the
-  fitted sphere. Each ball vertex more than 45 degrees from the eye axis (0.35, 0, 0.94), x
-  mirrored on the right, and outside the sphere moves in to the sphere (66 vertices). The front
-  is not round either: the pole stands out to 1.01 r and the ring 15 to 30 degrees about it lies
-  at 0.95 r, so the hall showed on it as a wide glossy band. Each ball vertex then moves onto the
-  sphere of 0.97 r (0.04015 units) about its middle (`ballSphere`).
-- **Armature.** The armature of the config with a palm for each side: the palm of the pads of
-  the source, (-0.03, -0.998, -0.05) in the studio axes with x mirrored on the right, turned by
-  the paw turn. The property `hinges` holds the elbow axis of the config of each side, turned
-  about its bind upper arm by 13 degrees on the left and -44 degrees on the right ("Arm twist").
+- **Import.** `sa.import_source('assets/models/cat/tripo-p2/cat.fbx', 1e-5)`. No vertex merges,
+  and each face is flat.
+- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
+  use_grid_fill=True)`) of the clean quad bands of 12 edges between the closed arm loops at x
+  0.111, 0.131, and 0.157, and from 0.258 to 0.284. Partial loops at x 0.187, 0.208, and 0.228
+  carry the bend of the elbow.
+- **Knee rings.** The same call with 1 cut on the leg band of 12 edges from y 0.157 to 0.189. The
+  knee joint is at y 0.165.
+- **Paws turned.** Each vertex past the arm loop at x 0.284 turns rigidly about the rest forearm
+  axis by whole ring steps of 30 degrees: 30 degrees on the left (1 step) and 90 degrees on the
+  right (3 steps), 403 and 404 vertices. New quads join the two loops with the step offset, and
+  the far loop takes the form of the loop before the turn (a fade to 0 at 0.02 units). The new
+  quads keep the UVs of the old band. The paws keep their form ("Arm twist").
+- **Eye size.** The edit `eyes` scales each eyeball and its socket by 0.90 about the middle of
+  the ball, (±0.04606, 0.82771, 0.14292). Each ball scales as one piece. Each other point within
+  0.037 of the middle scales fully, the share falls by a smoothstep to 0 at 0.059, and also to 0
+  near the middle plane (|x| below 0.015) past 0.032. Points in front of z 0.20 stay, and points
+  below y 0.79 fade out to y 0.75, so that the nose and the muzzle stay. Each ball then moves
+  0.004 units back along its eye axis (0.30, 0, 0.954), x mirrored on the right. The largest skin
+  move is 0.0038 units ("Eyes").
+- **Other point edits.** None. The head, the muzzle, the trunk, the paws, the legs, and the tail
+  keep the form of the source.
+- **Surface.** `sa.add_surface(cat, 'cat', <base color>, eye_fans=False, config=<cat-tripo.json>)`.
+  The gloss nose is the pink nose in the nose box of the config. 31 light gloss faces over the
+  nose go back to the fur. The faces of the two eyeballs get the face attribute `eye`, and the
+  export then gives `ownEyes`.
+- **Upper lids.** The skin of each upper lid turns down 10 degrees about the hinge through the
+  middle of the ball: each head vertex with psi from 12 to 85 degrees above the eye axis, within
+  2.4 ball radii, and less than 65 degrees to the side (smoothstep ends 12, 28, 60, 85 degrees,
+  1.5 and 2.4 radii, 35 and 65 degrees), 37 vertices on each side, at most 0.0081 units ("Eyes").
+- **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.20, the wrist
+  at x 0.31, the knuckles at x 0.36, the hip at (0.075, 0.29, 0.045), and the knee at (0.0715,
+  0.165, 0.045). The palm is the true palm of the source, the mean normal of the paw faces that
+  face down, (0.047, -0.998, -0.039), turned by the paw turn. The bind upper arm points down and
+  forward, (0.5014, -0.6017, 0.6217) in the studio axes (`studio.bindArms.upper_arm`), and the
+  property `hinges` holds the elbow axis of each side, turned about its bind upper arm by 11
+  degrees on the left and -48 degrees on the right ("Arm twist").
 
-The weights, in the order of the work, in the rest pose:
+The weights, in the rest pose:
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
-   part. Each vertex takes the row of its copy. The tail is a part of the body ("Tail on the
-   seat" gives its rows).
-2. Arm rows: each vertex of a side with |x| from 0.085, within 0.05 units of the line of the rest
-   arm, takes one exact row with `sa.set_weight_row()`: a clavicle share and an elbow helper
-   share, linear between the control rows below, and the rest on the 4 roll segments of the upper
-   arm or the forearm. The elbow joint lies at x 0.19.
+   part. The tail is a part of the body ("Tail on the seat" gives its rows).
+2. Arm rows: each vertex of a side with |x| from 0.095, within 0.06 units of the line of the rest
+   arm, takes one exact row with `sa.set_weight_row()`: a clavicle share from 0.4 at x 0.095 to 0
+   at x 0.135, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.178, 0.193, 0.208, and
+   0.223, and the rest on the 4 roll segments.
+3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
+   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.003 from
+   0.02 units before the head of `fingers_<side>`.
+4. The eyeballs, the whisker strips, and the gloss nose take {`head` 1}.
+5. Ear rows: a plane across the base of each ear, through (0.045, 0.925, 0.06), (0.135, 0.86,
+   0.06), (0.09, 0.893, 0), and (0.09, 0.893, 0.12) (x mirrored on the right). Each head vertex
+   above the plane by 0.008 or more takes {`ear_<side>` 1}, one from 0 to 0.008 {`ear_<side>` 0.5,
+   `head` 0.5}, and each other vertex gives its ear share to `head` (194 ear, 16 base, and 487
+   head rows).
 
-   | x | 0.085 | 0.097 | 0.108 | 0.12 | 0.13 | 0.155 | 0.167 | 0.182 | 0.198 | 0.213 | 0.225 |
-   |---|---|---|---|---|---|---|---|---|---|---|---|
-   | Clavicle | 0.40 | 0.25 | 0.12 | 0.04 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 |
+**Smooth surface.** No relax and no region colors: the form stays the form of the source. The
+crease angle 180 gives each corner the mean normal of the faces at its vertex, as the smooth
+shading of an FBX viewer.
 
-3. Wrist rows: with d the place along the rest forearm axis past the head of `hand_<side>`, the
-   bend share b of the paw grows in 12 equal steps, one in each band of 0.004 from d -0.03. A row
-   with b of 0.5 or less is {`wrist` 2b, the arm row the rest}, above 0.5 {`wrist` 2 (1 - b),
-   `hand` 2b - 1}.
-4. Knuckle rows: from d -0.02 past the head of `fingers_<side>`, the `hand` share of each row
-   splits into `hand` and `fingers` by a fingers share that grows in 12 equal steps of 0.003.
-5. The vertices of the loose parts (the eyeballs, the mouth, and the strips) and of the gloss nose
-   take {`head` 1}: 509 vertices.
-6. Ear rows: a plane across the base of each ear, through four points of the left ear base of the
-   source, (0.04, 0.905, 0.09), (0.13, 0.845, 0.09), (0.085, 0.88, 0.03), and (0.085, 0.875,
-   0.13) (studio axes, x mirrored on the right), mapped by the point edits. Each head vertex above
-   the plane by 0.008 or more and with |x| above 0.002 takes {`ear_<side>` 1}, one from 0 to 0.008
-   {`ear_<side>` 0.5, `head` 0.5}, and each other vertex gives its ear share to `head` (166 ear, 6
-   base, and 695 head rows).
+**Seat.** The thighs slope 20 degrees down and 20 degrees out in the bind, and the shins lean 12
+degrees forward (`legTurns` of the config). The front of the seat lies 0.06 units behind the knee
+joint of the bind, and 46 % of the thigh lies on the seat. The seat height of the app is 0.201 m,
+with the legs of the source (`StudioBody.seatHeight`).
+
+**Rest.** At rest the viola stands on the left thigh and the bow hangs from the right paw, as on
+the third cat. `lapPoint()` of `src/pose/lap.ts` takes the top of the highest triangle of the hips,
+the spine, and the legs over a point of the thigh. The source belly is round and reaches z 0.199.
+With the thighs 8 degrees out, a belly triangle covered that point 0.06 units over the thigh,
+and the rest lifted the viola and the bow to the chest. With the thighs 20 degrees out, the top
+of the lap is the thigh.
+
+**Belly.** The key `bind_belly` relaxes the posed bind of the 24 vertices with a rest height
+(Blender z) from 0.33 to 0.42, rest y below 0, and atan2(|x|, -y) at most 60 degrees, in 3 rounds
+of P += 0.5 ((mid - P) . n) n (the rule of the rabbit).
+
+**Tail on the seat.** The tail has two bones, `tail` from the root at (0, 0.36, -0.065) and
+`tail_tip` from (0, 0.22, -0.12) to (0, 0.10, -0.20), with the `studio.tailBind` of the third cat.
+The tube vertices take exact rows along a middle line from (0, 0.335, -0.029) to (0, 0.119,
+-0.225), and the key `bind_tail` lays the tube along the path of the third cat (the git history of
+this README at c6f979952): down the back, onto the seat behind the haunch, and to the left back
+corner of the seat. 140 tube vertices take tail rows, and 126 move in the key. The tube of the
+bind lies from y 0.137 to 0.344 (the seat top 0.135).
+
+**Lids.** A lid on each eye: 14 × 13 points from psi -60 to 60 degrees and lam -60 to 65 degrees
+(the right lid mirrors the range) at 1.15 ball radii, and a lower strip at 1.12 radii, 156 quads
+on each side, held turned up 110 degrees into the head. The back ball faces with each corner more
+than 135 degrees from the open eye go, and the middle and the radius of each ball come again from
+the ball vertices that stay. In the 21 steps of the blink no open lid point, side edge, or back
+edge leaves the head (ray casts), and the lower strip of the closed lid lies under the head. The
+lid faces take the gray fur patch at UV (0.8474, 0.9198) at 0.3 UV for each unit, and the row
+`head` 1.
+
+**Eyes.** At the size of the source, each eye opening was 0.153 of the head width at the eye line
+(front view of the bind), the ball stood 0.20 ball radii over the skin edge, and in the play view
+of a phone white showed above each iris. These are the faults of the eyes of the third cat, so
+the build repeats its fix, in smaller steps: the ball and its socket at 0.90, the ball 0.004
+units deeper, and the upper lids 10 degrees lower. Now the opening is 0.132 of the head width (at
+0.85 it was 0.129), the ball stands 0.10 radii over the skin edge, and the top of each iris lies
+under the upper lid in the play view, the 3/4 view, and the default hall camera. White shows only
+at the sides. The eyes keep the iris place and the iris paint of the source, and the gaze needs no
+move. The map paints a soft light in each pupil, so the eyes take the finish `varnish` and no
+eye light, which gives one light in each eye. With the finish `eye` and the eye light, each pupil
+showed two lights.
 
 **Arm twist.** The roll of each upper arm (from the clavicle) and the twist of each forearm (the
 paw from the upper arm), in degrees, in the moments of `pnpm pose-preview violist` with the hold
@@ -540,152 +558,48 @@ paw from the upper arm), in degrees, in the moments of `pnpm pose-preview violis
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| frog | 39.6 | 12.9 | -7.2 | -1.8 |
-| tip | 39.5 | 12.7 | -37.2 | -36.9 |
-| crossing | 39.6 | 12.9 | -9.9 | -14.3 |
-| rest | -42.1 | -40.8 | -15.3 | -17.4 |
-| lift50 | 8.5 | -4.8 | 15.4 | -30.0 |
-| lower50 | 24.3 | 10.7 | 15.3 | -16.4 |
-| stand | 39.4 | 11.6 | -7.5 | -0.9 |
+| frog | 42.5 | 33.2 | -13.6 | -11.3 |
+| tip | 42.5 | 32.9 | -34.9 | -42.9 |
+| crossing | 42.5 | 33.2 | -14.0 | -23.5 |
+| rest | -42.0 | -6.1 | -4.2 | -24.3 |
+| lift50 | 16.5 | 24.3 | 30.6 | -42.5 |
+| lower50 | 33.3 | 34.1 | 29.5 | -31.8 |
+| stand | 41.8 | 32.6 | -13.1 | -10.7 |
 
-With no paw turn and no hinge turn, the right forearm twisted 95 to 127 degrees and the right
-upper arm rolled -53 to -81 degrees.
+With no paw turn, no hinge turn, and the bind upper arm of the third cat, the right forearm twisted
+68 to 118 degrees, and the left upper arm rolled from -38 degrees at rest to 57 degrees in the
+stroke. A bind upper arm that points more down and forward cut that range from 95 to 84 degrees.
 
-**Form.** The values of `pnpm body-shape violist --base main`, in cm, at the same H of 33.9 cm.
-The body keeps the form of the source. A head 1.1 times wider, a trunk up to 1.6 times wider and
-deeper, thicker limbs, smaller paws, and shins 1.75 times longer toward the cat of main read as a
-different cat from the source.
+**Color map** (`tools/cat-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
+WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the tabby fur, the brows,
+and the eye paint stay.
 
-| Measure | Cat of main | This rig |
+**Normal map.** The same run writes `cat-normal.webp` from the normal map of the FBX: each x, y
+tilt limited to 0.2 (2.84 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red
+and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+
+**Differences from the source.** The stage light is warm and the close views add a fill light, so
+the gray fur reads light tan in the close views, and gray in the play view and the hall view. The
+nose is a gloss face group of one pink color with flat normals, so it shows facets and no painted
+nostrils. The eyes are 0.90 of their size, a little deeper, and the upper lids a little lower
+("Eyes"). The thighs of the seated bind spread 20 degrees ("Rest").
+
+The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
+
+| File | Size | SHA-256 |
 |---|---|---|
-| Trunk width W3, W5, W7, W8 | 44.9, 37.8, 29.6, 29.1 | 32.8, 25.6, 25.9, 24.8 |
-| Trunk depth D3, D4, D6, D8 | 34.9, 34.1, 31.2, 30.4 | 27.0, 26.1, 20.8, 24.0 |
-| Upper arm girth | 33.0 | 31.4 |
-| Forearm girth | 30.3 | 26.2 |
-| Thigh girth | 55.5 | 52.8 |
-| Shin girth | 37.4 | 33.1 |
-| Seat height | 29.8 | 19.3 |
-
-**Smooth surface.** Each face takes the color of its region (pink by a hue below 16 or above 340
-degrees, a saturation of 0.38 or more, and a lightness above 0.35, white by a lightness of 0.6 or
-more, else the gray fur), and ten Taubin rounds (0.5, then -0.53) relax the body, with each move
-clipped to 0.01 units. The loose parts and the gloss nose stay. 13 light gloss faces over the nose
-go back to the fur.
-
-**Seat.** The thighs slope 20 degrees down and 8 degrees out in the bind, and the shins lean 12
-degrees forward (`legTurns` of the config). The front of the seat lies 0.06 units behind the knee
-joint of the bind (0.045 put the calf over the seat), and 54 % of the thigh lies on the seat. The
-seat height of the app is 0.193 m.
-
-**Rest.** At rest the viola and the bow lie on the lap: `lapPoint()` of `src/pose/lap.ts` takes
-the top of the highest triangle of the hips, the spine, and the legs over a point of the thigh.
-With a trunk 1.5 times deeper at the belly, a belly triangle covered that point, and the rest
-lifted the bow and the viola to the chest. With the trunk of the source, the top of the lap is the
-thigh.
-
-**Mouth.** The source mouth is a deep slit, and it shaded as a thick, wide, dark line. The fur faces
-of the slit take the face attribute `rim`, so that they shade as the lips around them: each fur
-face of the body in the box |x| below 0.055, y 0.70 to 0.746 (mapped by the point edits), and z
-0.14 to 0.27 of the source, with a corner more than 0.006 units behind the front skin (the largest
-z of the points within 0.008 units in x and y), 219 faces.
-
-**Belly.** The key `bind_belly` relaxes the posed bind of the 24 vertices with a rest height
-(Blender z) from 0.33 to 0.42, rest y below 0, and atan2(|x|, -y) at most 60 degrees, in 3 rounds
-of P += 0.5 ((mid - P) . n) n (the rule of the rabbit).
-
-**Tail on the seat.** The tail has two bones, `tail` from the root at y 0.36 to the bend at (0,
-0.15, -0.10), and `tail_tip` to (0, 0.14, -0.25), with `studio.tailBind` of the second cat. The
-tail takes exact rows and a bind key, as the tail of the second Tripo cat (the old rows of this
-README in the git history):
-
-- **Middle line.** In the rest, the edge distance from the end of the hook gives rings of the tube
-  in bands 0.02 units wide, up to 0.4 units. The middles of the bands, smoothed twice by (1/4,
-  1/2, 1/4), give the line from the root at (0, 0.344, -0.012) to the tip at (0, 0.128, -0.251),
-  0.359 units long. The tube is each vertex within 0.43 units of edge distance and 0.075 units of
-  the line: 183 vertices.
-- **Rows.** Each tube vertex takes {`hips` 1 - a, `tail` a (1 - b), `tail_tip` a b}, with p its
-  place along the line, a = smoothstep(-0.04, -0.005, p), and b = smoothstep(p_b - 0.04, p_b +
-  0.04, p) about the head of `tail_tip` at p_b 0.211. The 44 other vertices with a share of the
-  tail bones give it to `hips`.
-- **Key.** The key `bind_tail` moves each tube vertex of the bind to the same place along a path
-  and the same offset in the moving frames of the line and of the path. The path is a
-  Catmull-Rom curve from the bind root of the line through the points below (units, relative to
-  the root, studio axes): down the back, onto the seat behind the haunch, and to the left back
-  corner of the seat. Each vertex moves by smoothstep(0, 0.03, p), then 3 Taubin rounds with the
-  same share.
-
-```text
-(0, -0.07, -0.02) (0.01, -0.134, -0.04) (0.05, -0.147, -0.055) (0.09, -0.148, -0.05)
-(0.12, -0.148, -0.015) (0.125, -0.146, 0.035)
-```
-
-The tube of the bind lies from x -0.038 to 0.147, from y 0.134 to 0.401 (the seat top 0.135), and
-from z -0.091 to 0.064, so it lies on the seat (back edge -0.1) behind the haunch. With the two
-rigid bones only, the tail hung behind the seat.
-
-**Lids.** A lid on each eye: 13 × 13 points from psi -60 to 60 degrees and lam -38 to 60 degrees
-(38 degrees in and 60 out, the right lid mirrors the range) at 1.15 ball radii, and a lower strip
-at 1.12 radii, 156 quads on each side, held turned up 110 degrees into the head. Before the lids,
-the ball faces with each corner more than 135 degrees from the open eye, or with a corner across
-the middle plane by more than 0.003 units, go, and the middle and the radius of each ball come
-again from the ball vertices that stay (the middle of the export). The eyes lie close to the
-middle plane, so 13 points of the left open lid and 15 of the right reach over it: each moves onto
-the plane x = ±0.002 on its own side at the same distance from the middle of its ball. In the 21
-steps of the blink, no open lid point, side edge, or back edge leaves the head, and the lower
-strip of the closed lid lies under the head. The lid faces take the UVs of the gray patch at UV
-(0.0409, 0.7373) at 0.3 UV for each unit, and the row `head` 1.
-
-**Eyes.** The eyes keep the iris colors of the source ("Color map" below). In the front view of
-the bind, each eye opening is 0.131 of the head width at the eye line (0.159 at the size of the
-source), and the front of the ball stands 0.11 r over the skin edge along the eye axis (0.14 r
-at the size of the source). The map paints no light in the pupils, so the eyes take the `eye`
-finish and the eye light of the app, which gives one small crisp light in each eye. A smaller
-light beside it is the reflection of the hall on the `eye` finish, as on the rabbit. With the
-`varnish` finish and the painted light, the large dark ball showed a wide glossy band and a soft
-gray light, and the eyes read as glass eyes.
-
-**Color map.** `tools/cat-maps.py` writes `cat-color.webp` and `cat-normal.webp` from the source
-maps and the rig file:
-
-```text
-uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py
-```
-
-It keeps the colors of the source, but for a small step of the gray fur from sRGB (113, 104, 104)
-to Oklab L 0.44, C 0.03, h 260 (`GRAY_FUR`). In an even gray light (Eevee), the gray fur of the
-source FBX is Oklab L 0.48 with almost no chroma. With the source map, the warm light of the stage
-and the fill light of the close views made it L 0.62, C 0.051, h 55, a light tan, and with the
-step it is L 0.60, C 0.039, h 54 in the close view, and L 0.50, C 0.052, h 55 in the hall view
-(`close-views play --at cat --no-fill --pause --time 6`). The cream white, the pink, the black,
-the brows, and the mouth line keep the paint of the source.
-
-- **Iris move.** `center_irises()` moves each iris to the middle of the opening in the view of
-  the play: in the play moments of the violist the head turns up 15.7 degrees, and the front
-  camera of the test page looks down 7.4 degrees at the eyes (`gaze_targets()`). The target then
-  turns 6 degrees out and 7.5 degrees up. The iris of the cat is large, and its inner side lies
-  under the lash line, so a mirror of the iris paint left seams. The tool paints the iris as the
-  median source color of each ring of 1 degree about the pupil, and copies the pupil with its
-  light from the source. The old place of the iris takes the median white of its row of the
-  front picture. The left iris moves 14.0 degrees and the right 12.4 degrees on the ball.
-- **Round iris.** `far_eyes()` of the fox and the rabbit then makes the moved iris round about its
-  pupil from the clean directions of the source iris, with no shade of the iris, the ring, or the
-  white. The iris radius is 35 degrees on both eyes (`FAR_IRIS_RADIUS`; the source has 27.0 and
-  16.5 degrees on the left, 29.0 and 18.5 on the right), and the pupil is 0.52 of it, 18.2
-  degrees (`PUPIL_RATIO`). In the view of `gaze_targets()` the opening of the deeper ball is 57
-  degrees high, so the source iris left white above and below it. Now 13 % of the iris height
-  lies under the upper lid and 4 % under the lower lid, and white shows only at the sides. Each
-  pupil takes its median color (`PAINTED_LIGHT` False), so the eye light gives the only light.
-
-**Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (1.23 % of the
-texels), a box scale to 1024 pixels, the tilts times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`)
-in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+| `tripo-hand/cat.rig.glb` | 1,190,264 bytes | `3c00c0d7a185d11356bf3d8bc1297b96a2afe3d2d743e1b68b81632193df4436` |
+| `tripo-hand/cat.rig.json` | 18,412 bytes | `e1321284d5f4bde434e7808527df4ac10c478f5a1557c0a8b3e06e2fa6dbb6f7` |
+| `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
+| `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
 ### History
 
 The second Tripo P2 cat (FBX SHA-256
-`d9b38bf098e744e96da28e94abdb00f19b459654e67531b97072d58ad2ac57ff`) had a hand rig made in
-headless Blender: arm and knee rings, paw turns, the crease 55, a Taubin relax, longer legs, a
-thicker trunk, a larger head, a tail on the seat (the key `bind_tail`), its own eyes at 0.75 of
-their size with blink lids, and the color map and normal map of its FBX. The third mesh comes from
-a new sheet, and the steps above repeat that work on it. The old files and the steps of each edit
-are in the git history of this folder, at 53a440d56.
+`d9b38bf098e744e96da28e94abdb00f19b459654e67531b97072d58ad2ac57ff`) and the third (FBX SHA-256
+`f6225744655b117ad547b426e0237ace0a86218817e12a3f8bba7c7a430fa980`) each had a hand rig made in
+headless Blender, with a Taubin relax, region colors, the crease 55, a tail on the seat, smaller
+own eyes with blink lids, and an edited color map (an iris move, a round iris, and a gray fur
+step). The fourth mesh comes from a new sheet and takes the route of the Tripo wolf. The old files
+and the steps of each edit are in the git history of this folder: the second cat at 53a440d56,
+the third at c6f979952.
