@@ -875,8 +875,16 @@ scene of each demo has its seats and stage size with no overlap.
       shorter switch.
 - [ ] Polar bear pianist: the claw tips almost touch when the paws play two octaves apart, because
       the paws point in along the forearms (`PAW_TURN`).
-- [ ] Conductor: start `docs/reference/conducting-technique.md` with sources: the beat patterns, the
-      tempo of a beat in 2 or in 1, and the sway. The fold limit of 168 BPM has no source.
+- [ ] Conductor: add to `docs/reference/conductor-technique.md` the beat patterns, the tempo of a
+      beat in 2 or in 1, and the sway, with sources. The fold limit of 168 BPM has no source.
+- [ ] Conductor: the left palm turns only with the direction of the hand. Give the swell a palm up
+      and the fade and the soft passage a palm down with a roll of the paw (conductor technique 2),
+      and check the twist of the left forearm.
+- [ ] Conductor: the rules of the expression (`EXPRESSION_RULES`) come from one file,
+      `the-ember-crown.mid`. Check the breaths, the accents, the climaxes, and the final chord on
+      the demos, and show a lineup.
+- [ ] Film: the Cinematic film shows the conductor in few shots. Give `pawchestra-film` a camera
+      that keeps the bear in the frame, so that a film can show the expression of the conductor.
 - [ ] Conductor: the sway of four demos takes 2 beats a side. Show the user, and check a lower
       `PULSE_TEMPO`.
 - [ ] Conductor: the last bar of 7/8 of `bach-bwv1048` is beaten at 200 BPM, and the count-in beat
