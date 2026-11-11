@@ -1463,6 +1463,41 @@ function softReach(arm: ArmRig, shoulder: Vector3, weight: number, wrist: Vector
   return wrist.lerp(softWrist, share);
 }
 
+const wristFrom = new Vector3();
+const wristTo = new Vector3();
+
+/**
+ * Mixes the wrists of the bow hold and of the pizzicato hold ({@link bowArm}, {@link pluckArm})
+ * in a change: the bend of the elbow mixes on a straight line, and the direction from the shoulder
+ * to the wrist turns between the two directions. Each hold gives the wrist that the arm reaches.
+ * The plucking palm of the red fox lies out of the reach of its arm: with a straight line between
+ * the two wrists, the upper arm turned at 5,000°/s near the end of a change, and with a straight
+ * line between the reached wrists, it stopped from 1,000°/s at the end.
+ *
+ * @param arm The arm.
+ * @param shoulder The posed shoulder joint.
+ * @param share The share of pizzicato.
+ * @param out The wrist to write.
+ * @returns `out`.
+ */
+function mixWrist(arm: ArmRig, shoulder: Vector3, share: number, out: Vector3): Vector3 {
+  const upper = wristFrom
+    .fromArray(arm.bind.elbow)
+    .distanceTo(wristTo.fromArray(arm.bind.shoulder));
+  const lower = wristFrom.fromArray(arm.bind.wrist).distanceTo(wristTo.fromArray(arm.bind.elbow));
+  const bendOf = (distance: number): number =>
+    Math.acos(
+      MathUtils.clamp((upper ** 2 + lower ** 2 - distance ** 2) / (2 * upper * lower), -1, 1),
+    );
+  wristFrom.subVectors(bowArm.reached, shoulder);
+  wristTo.subVectors(pluckArm.reached, shoulder);
+  const from = bendOf(wristFrom.length());
+  const bend = from + (bendOf(wristTo.length()) - from) * share;
+  const distance = Math.sqrt(upper ** 2 + lower ** 2 - 2 * upper * lower * Math.cos(bend));
+  mixDirection(wristFrom, wristTo, share, out);
+  return out.multiplyScalar(distance).add(shoulder);
+}
+
 /** The parts of the pose that {@link holdArm} reads. */
 interface HoldArmInput {
   readonly rig: BowedRig;
@@ -1726,10 +1761,7 @@ export function poseBowed(
     holdArm(arm, 1, pluckArm);
     mixRotation(bowArm.forearm, pluckArm.forearm, 0.5, meanForearm);
     turnNear(bowArm.rotation, pluckArm.rotation, pizzicato, meanForearm, heldHand.rotation);
-    // The wrist moves between the wrists that the arm reaches. The plucking palm of the red fox
-    // lies out of the reach of its arm, so the arm went straight before the end of a change, and
-    // the upper arm turned at 5,000°/s just before it.
-    heldHand.wrist.lerpVectors(bowArm.reached, pluckArm.reached, pizzicato);
+    mixWrist(rig.armR, shoulder.position, pizzicato, heldHand.wrist);
     angle = bowArm.angle + (pluckArm.angle - bowArm.angle) * pizzicato;
     onStick = bowArm.onStick + (pluckArm.onStick - bowArm.onStick) * pizzicato;
     // The elbow moves on a straight line between the elbows of the two holds. A mix of the two

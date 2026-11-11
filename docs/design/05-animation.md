@@ -395,10 +395,11 @@ The rest of each family:
   turned the paw by up to 175° in a few frames.
 - In a change between the bow and pizzicato, the pose solves the bow hold and the pizzicato hold
   each with its own elbow (`holdArm()`). The hand turns at an even speed on the side on which it
-  stays nearer the mean of the two forearms (`turnNear()`), and the elbow and the wrist move on
-  straight lines between the two holds, in the reach of the arm. Reason: a roll toward the elbow
-  of the moving arm swung the cello paw by 68° in 1/240 s, the bow hand and the pluck hand of the
-  contrabass are near 180° apart, and the pluck palm of the red fox is out of reach.
+  stays nearer the mean of the two forearms (`turnNear()`). The elbow moves on a straight line
+  between the two holds, and the bend of the elbow mixes evenly (`mixWrist()`). Reason: a roll
+  toward the elbow of the moving arm swung the cello paw by 68° in 1/240 s, the bow hand and the
+  pluck hand of the contrabass are near 180° apart, and the pluck palm of the red fox is out of
+  reach.
 - In the lift and the lowering, the bow hand mixes the rest bow with the bow of the steady hold
   of the play (`holdArm()`), and the bow wrist has a smooth reach limit up to
   `SOFT_REACH_UNTIL` of the move (`softReach()`). Reason: the roll toward the elbow of the moving
