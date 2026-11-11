@@ -571,14 +571,18 @@ const FLOOR_HOLD = {
  * Makes the play turn of a violin on the shoulder: first a turn around the vertical axis, then a
  * tilt of the scroll. The violin of the chin hold points 70° to the left of the front, so a turn of
  * -20° gives 50° and a turn of -25° gives 45°, the angle of a real player
- * (`docs/reference/string-technique.md`, section 1.10).
+ * (`docs/reference/string-technique.md`, section 1.10). Last, a turn around the axis of the
+ * violin lifts the top plate toward up. The top plate of the chin hold turns 50° from up to the
+ * right, so a turn of 25° gives 25°: the violin tilts a little down toward the right and stays
+ * about level, as a real player holds it.
  *
  * @param yawDeg The turn around the vertical axis, in degrees. A negative turn moves the scroll
  *   from the left toward the front.
  * @param tiltDeg The tilt of the scroll up, in degrees, after the turn. A negative tilt lowers it.
+ * @param levelDeg The turn of the top plate toward up around the axis of the violin, in degrees.
  * @returns The turn, in the axes of the chest.
  */
-export function violinTurn(yawDeg: number, tiltDeg: number): Quat {
+export function violinTurn(yawDeg: number, tiltDeg: number, levelDeg = 0): Quat {
   const yaw = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), yawDeg * MathUtils.DEG2RAD);
   // The axis of the violin after the turn, and the level axis across it.
   const axis = new Vector3(-1, 0, 0)
@@ -586,7 +590,12 @@ export function violinTurn(yawDeg: number, tiltDeg: number): Quat {
     .normalize();
   const across = new Vector3().crossVectors(axis, new Vector3(0, 1, 0)).normalize();
   const tilt = new Quaternion().setFromAxisAngle(across, tiltDeg * MathUtils.DEG2RAD);
-  return toQuat(tilt.multiply(yaw));
+  // A turn around the axis toward the scroll turns the top plate down to the right.
+  const level = new Quaternion().setFromAxisAngle(
+    axis.applyQuaternion(tilt),
+    -levelDeg * MathUtils.DEG2RAD,
+  );
+  return toQuat(level.multiply(tilt).multiply(yaw));
 }
 
 /**
