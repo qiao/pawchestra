@@ -443,11 +443,18 @@ The app follows these facts:
   (`SHOULDER_REST`). Its high end is on the side of the E string, over the left shoulder and the
   upper arm of the animal.
 - **The size of the viola (1.10).** The cat plays a smaller viola (`SpeciesParams.violaScale`),
-  the smallest size of the chart of [81]. The chin rest lies under the long jaw, further from the
-  shoulder along the viola than on a person.
+  near 13 inches of the chart of [81], and the rabbit a small violin of 0.38 m
+  (`SpeciesParams.violinScale`). The chin rest lies under the long jaw, further from the shoulder
+  along the viola than on a person.
 
 The app does not follow these facts:
 
+- **The size for the arm (1.10).** The chart of [81] pairs a 10 inch viola with an arm of 36 cm,
+  the arm of the cat. The cat plays a larger viola, and the rabbit a violin larger than its arm
+  fits, so that the instrument reads at its size beside the body. Thus the left paw does not reach
+  the nut: it stops the strings only on the part of the fingerboard that it reaches
+  (`BowedRig.stopRange`), as a player in a high position, and the bow plays a shorter part of the
+  hair (`BowedRig.bowRange`).
 - **The guide finger (1.5).** No finger slides on the string, because the four fingers are one
   block. The press lifts to a light contact.
 - **The fingers down and the next finger (1.6).** The fingers do not stay down for the lower

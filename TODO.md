@@ -347,7 +347,6 @@ passes.
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
-- [ ] Cat violist: ask the user to confirm the 1/2 viola. A 3/4 viola reaches the nut at about 55°.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
 - [ ] Layout sight lines (4.5): with no row risers and the lane search, 49 of 453 players stay

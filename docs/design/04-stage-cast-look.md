@@ -1607,7 +1607,12 @@ length, and a species with short arms plays a smaller instrument (`SCALED_INSTRU
 fields of `SpeciesParams`), as a child plays a fractional violin or a small lever harp. A smaller
 instrument shrinks toward the mouth or the base, so the mouth keeps its place. A violin shop
 sizes a violin so that, with the left arm extended, the scroll lies in the middle of the palm
-(`pnpm hold-reach`). The cello rule (`celloRule()` of `tools/cello-size.ts`) sizes a cello as a
+(`pnpm hold-reach`). The rabbit violin and the cat viola are larger than this rule gives, near the
+smallest real sizes, and the arms keep their length. The left paw then stops the strings only on
+the part of the fingerboard that it reaches (`BowedRig.stopRange`), as a player in a high
+position, the scroll stands out past the paw, and the bow plays only the part of the hair that
+the right arm reaches (`BowedRig.bowRange`). Reason: at the size of the rule, the instrument read
+as a toy under the paws in the hall view. The cello rule (`celloRule()` of `tools/cello-size.ts`) sizes a cello as a
 cellist does: the largest cello at which the left paw reaches the first position with the elbow
 bent to at most `CELLO_ELBOW`, the end pin fits the chest, and the lower bout is not below the
 knees, clamped to the real sizes (`REAL_CELLOS`, from a 1/10 to a 4/4). The cast matrix gives

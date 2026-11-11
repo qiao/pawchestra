@@ -339,9 +339,12 @@ export const SPECIES = {
    * reach, and the leg factor of the red fox. It sits with its tail curled on the seat around the
    * left side of the haunch, and stands as a soloist. Its head height is the head of the studio
    * body, and its chair fits its legs: the seat height is the seat of the studio body, in H. It
-   * plays a viola of about 10 inches, with a body of 259 mm, 0.74 of the viola of the app
-   * (`violaScale`), as a violin shop sizes a viola for its arm, so that its left paw reaches the
-   * nut and its bow paw the tip of the hair.
+   * plays a viola of about 13 inches, with a body of 324 mm, 0.925 of the viola of the app
+   * (`violaScale`), so that the viola reads at its size beside the body. The arms do not grow, so
+   * the hold uses the reach of the arms: the left paw stops the strings from 0.51 of the
+   * fingerboard from the nut, as a player in a high position, and the scroll stands out past the
+   * paw. The bow paw reaches 0.285 m of the hair (`pnpm hold-reach cat --instrument viola`). With
+   * 0.74, the size that a violin shop gives for the arm, the viola read as a toy under the paws.
    *
    * The stick of the bow passes through the middle of the closed right paw. The paw of the studio
    * turns in the plane of its palm toward the forearm by 0° to 70° (`PAW_TURN` of `studio-rig.ts`),
@@ -354,7 +357,7 @@ export const SPECIES = {
     body: 'studio-cat',
     colors: SPECIES_COLORS.cat,
     seatedTail: 'curl',
-    violaScale: 0.74,
+    violaScale: 0.925,
     bowGrip: { at: [-0.002, 0.007, -0.079], turn: 50 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-cat'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-cat'].seatHeight / STUDIO_HEIGHTS['studio-cat'].headHeight,
