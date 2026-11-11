@@ -150,9 +150,11 @@ export const PIANO_PEDALS = {
   bar: { width: 0.305, height: 0.05, depth: 0.06 },
   /**
    * The flat posts of the lyre: the x of the middle of each post at the box and at the bar, the
-   * width and the depth of a post, and the radius of the pedal rod over each pedal.
+   * width and the depth of a post, the radius of the pedal rod between them, and the gap of a post
+   * over the box. The rods of the
+   * soft pedal and the damper pedal run inside the posts, as on a real lyre, so they are not drawn.
    */
-  post: { boxX: 0.085, barX: 0.12, width: 0.045, depth: 0.03, rodRadius: 0.005 },
+  post: { boxX: 0.085, barX: 0.12, width: 0.045, depth: 0.03, rodRadius: 0.005, lift: 0.002 },
   /** The braces from the back of the box to the case: their x, their reach back, their radius. */
   brace: { x: 0.06, back: 0.45, radius: 0.008 },
 } as const;
@@ -803,9 +805,9 @@ function addInside(piece: PieceBuilder, boardY: number): void {
 }
 
 /**
- * Adds the pedal lyre ({@link PIANO_PEDALS}): the bar under the case, two flat posts that spread a
- * little toward the bar, a thin pedal rod over each pedal between them, the box just above the
- * floor, and two braces from the back of the box to the bottom of the case.
+ * Adds the pedal lyre ({@link PIANO_PEDALS}): the bar under the case, two flat posts, the thin
+ * rod of the sostenuto pedal between them, the box just above the floor, and two braces from the
+ * back of the box to the bottom of the case.
  *
  * @param piece The piece of the piano.
  */
@@ -827,8 +829,9 @@ function addLyre(piece: PieceBuilder): void {
     'polish',
   );
   for (const side of [-1, 1]) {
+    // The tilted post starts a little over the box, so that no corner of it goes into the box.
     piece.bar(
-      [side * post.boxX, base.top, z],
+      [side * post.boxX, base.top + post.lift, z],
       [side * post.barX, barBottom, z],
       post.width,
       post.depth,
@@ -844,9 +847,8 @@ function addLyre(piece: PieceBuilder): void {
       'polish',
     );
   }
-  for (const x of Object.values(PIANO_PEDALS.x)) {
-    piece.rod([x, base.top, z], [x, barBottom, z], post.rodRadius, 4, dark, 'polish');
-  }
+  const rodX = PIANO_PEDALS.x.sostenuto;
+  piece.rod([rodX, base.top, z], [rodX, barBottom, z], post.rodRadius, 4, dark, 'polish');
 }
 
 /**
@@ -1011,7 +1013,11 @@ export const PIANO_LID = {
   propRadius: 0.011,
   /** The z of each hinge on the bass side, and the length of a hinge. */
   hinges: [-0.35, -0.95, -1.55],
-  hingeLength: 0.07,
+  /**
+   * A hinge knuckle: its length, its radius, and the distance of its axis outside the rim and
+   * below the rim top.
+   */
+  hinge: { length: 0.07, radius: 0.007, out: 0.009, down: 0.008 },
 } as const;
 
 /**
@@ -1181,11 +1187,17 @@ function addLid(piece: PieceBuilder): void {
     ),
     'polish',
   );
+  // Each hinge is a knuckle just outside the rim, under the hinge line, so that no flat face of
+  // it lies on the rim.
+  const knuckle = l.hinge;
   for (const z of l.hinges) {
-    piece.add(
-      box(0.014, 0.012, l.hingeLength),
+    const at: Vec3 = [hingeX - knuckle.out, p.caseTop - knuckle.down, z];
+    piece.rod(
+      [at[0], at[1], z - knuckle.length / 2],
+      [at[0], at[1], z + knuckle.length / 2],
+      knuckle.radius,
+      6,
       INSTRUMENT_COLORS.brass,
-      transform([hingeX, p.caseTop, z]),
       'metal',
     );
   }
