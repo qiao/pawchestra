@@ -396,20 +396,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/panda/panda.rig.glb',
     },
   ],
-  // The contrabass hippo (design 4.4). It stands at its contrabass, so the export keeps the
-  // standing pose of the rig. The bead eyes are 0.8 of their size, because at the full size they
-  // look too big.
+  // The contrabass hippo (design 4.4): the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/hippo/tripo-hand/hippo.blend`), with no arm cut and no arm stretch. It stands
+  // at its contrabass in the pose of the source. Its `.blend` holds the facts of the body: the
+  // scale that keeps H of the hippo of `hippo.rig.glb`, and the crease angle 180°. The map paints
+  // the iris and a light on each eyeball of the source, so the eyes take the finish `varnish` and
+  // no eye light.
   [
     'hippo',
     {
       landmark: 'shoulders',
-      height: 1.008489,
       seated: true,
       soloist: true,
       constant: 'STUDIO_HIPPO',
-      crease: 35,
-      glb: 'assets/models/hippo/hippo.rig.glb',
-      eyeSize: 0.8,
+      glb: 'assets/models/hippo/tripo-hand/hippo.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The oboe mouse (design 4.4). It stands as a soloist.
