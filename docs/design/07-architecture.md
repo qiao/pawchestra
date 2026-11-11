@@ -137,6 +137,9 @@ real motion and the sound of one role with no MIDI file.
   preset target stays less than 1 m from the default target, and each camera stays outside the
   near limit (`viewCamera()` of `test-page/views.ts`). The frame moves down by half the bar,
   because the page has no bar.
+- **Panel.** A button at the top of the panel folds and unfolds the controls. On a screen of
+  600 px or less, the panel goes to the bottom, over the floor, and starts folded, so that it does
+  not cover the animal.
 - **Link.** The URL hash names the role, such as `/test#rabbit-violin`, so a reload or a shared
   link shows the same role.
 
