@@ -368,14 +368,17 @@ export const SPECIES = {
    * `pose/bowed-rig.ts`). A larger bass puts the upper bout higher than the shoulders, and the
    * left arm then goes through it to the neck.
    *
-   * The bow grip (`bowGrip`) comes from the mesh body of the old hippo: the stick passes through
-   * the closed right paw, 23° from square toward the wrist. The bow hand turns around the grip on
-   * the stick (`stickTurnR` of the hold), so the paw keeps one turn on the hand.
+   * The bow grip (`bowGrip`) puts the stick through the middle of the closed right paw of the hand
+   * rig, 23° from square toward the wrist: the middle of the paw lies at most 0.2 cm from the
+   * stick in the play, the rest, and the moves (`pnpm wind-grip bassist`). With the grip of the
+   * old hippo, it lay 1.2 cm to 1.3 cm from the stick, more than the 1 cm of a fist. The bow hand
+   * turns around the grip on the stick (`stickTurnR` of the hold), so the paw keeps one turn on
+   * the hand.
    */
   hippo: {
     body: 'studio-hippo',
     bassScale: 0.8,
-    bowGrip: { at: [0.0139, 0.0037, -0.0894], turn: 23 * (Math.PI / 180) },
+    bowGrip: { at: [-0.0061, 0.0257, -0.0894], turn: 23 * (Math.PI / 180) },
     colors: SPECIES_COLORS.hippo,
     headHeight: STUDIO_HEIGHTS['studio-hippo'].headHeight,
     seatHeight:
