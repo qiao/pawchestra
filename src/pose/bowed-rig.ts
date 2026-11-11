@@ -1417,7 +1417,9 @@ const DOG_HOLD = {
  *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), and
  * the bow tip points down and forward (`pizzicatoTip`): with the tip down, the bow went 17.6 cm
- * into the belly, and with the tip up, the right forearm twisted 96°.
+ * into the belly, and with the tip up, the right forearm twisted 96°. The tip points as far
+ * forward as down, (0.2, -1, -1): with the tip (0.5, -1, -0.6), the stick swept up through the
+ * mouth in a change to pizzicato of `boulanger-matin` at 231.88 s, up to 15.8 cm deep.
  *
  * The paw turns and the elbow axis turns of the hand rig keep each part of each arm at most 40°
  * of roll or twist in the bowing, the rest, and the moves (`assets/models/hippo/README.md`, "Arm
@@ -1442,7 +1444,7 @@ const HIPPO_HOLD = {
   poleR: [1, -0.7, 0.2],
   poleTipR: [1, -0.7, 0.2],
   polePizzicato: [1.5, 0.4, -0.75],
-  pizzicatoTip: [0.5, -1, -0.6],
+  pizzicatoTip: [0.2, -1, -1],
   pluckSide: 0.24,
   stopEnd: 0.9,
   farSideR: 30 * MathUtils.DEG2RAD,
