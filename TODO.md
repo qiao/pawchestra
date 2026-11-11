@@ -79,8 +79,9 @@ passes.
       each reader of the seat height of a body with no chair.
 - [ ] Hornist pig: with the bell open to the back (`PIG_TURNS`), three faces of the right arm (332,
       19, 287) fold in 98% of the play samples. Check them in a 2x crop of the right elbow.
-- [ ] Trombonist panda: the deeper chair (`backRoom` of the panda) gives brahms-2 another layout,
-      and its seats move up to 1.55 m. Check the stage of brahms-2.
+- [ ] Trombonist panda: the rump stands 1.2 cm to 1.7 cm behind the back posts of its chair. A
+      deeper chair (`seatWidth` 0.6, `backRoom` 0.025 of the panda) fixes it, but gives brahms-2
+      another layout, and its seats move up to 1.55 m. Not applied: find a fix that keeps the seats.
 - [ ] Trombonist panda: the slide comes 3 cm to 5 cm from its music desk in boulanger-matin. A
       longer slide reach or a lower slide puts it into the desk.
 - [ ] Trumpeter monkey: `pnpm hold-fit trumpeter` stops, because the body bones of the Tripo monkey
