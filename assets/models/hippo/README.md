@@ -106,8 +106,9 @@ move back by 0.004 units. `pnpm glb-point-edits` reads the base with
 `tripo-hand/` holds the body of the app: a hand rig of the Tripo P2 mesh `tripo-p2/hippo.fbx`, made
 by one build script in a headless Blender 5.2, as the Tripo wolf (`../wolf/README.md`). The body
 keeps the form, the colors, the eyeballs, and the teeth of the source: no point edit changes the
-head, the trunk, the paws, the legs, or the tail. The arms keep the length of the source: no cut,
-no split from the trunk, and no stretch. The `ANIMALS` entry of the hippo points to
+head, the trunk, the paws, the legs, or the tail. The arms have no cut and no split from the
+trunk. The upper arms and the forearms are 1.2 times longer than in the source ("Arm stretch"
+below), and the paws keep their size. The `ANIMALS` entry of the hippo points to
 `tripo-hand/hippo.rig.glb`. The files of the old hippo above do not change.
 
 | File | Origin | Rebuild |
@@ -149,14 +150,14 @@ pupil, white at the corners, and a white light.
 ### tripo-hand/hippo.blend
 
 The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/hippo/` of the
-worktree, which git ignores: `build.py`, `rings.py`, `make_config.py`, `params.json`, and
-`chain-here.sh`) are not in the repo. They are the scripts of the Tripo beagle with the values of
-the hippo. `make_config.py` writes `tools/mesh-rigs/simple/hippo-tripo.json`: the joints of the
-source.
+main checkout, which git ignores: `build.py`, `rings.py`, `redits.py`, `make_config.py`,
+`params.json`, and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo beagle
+with the values of the hippo. `make_config.py` writes `tools/mesh-rigs/simple/hippo-tripo.json`:
+the joints of the source, moved by the point edits of `redits.py`.
 
 | Item | Value |
 |---|---|
-| Size | 410,478 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 412,179 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the hippo faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `hippo`: 3,887 vertices and 4,107 faces (3,475 quads and 632 triangles, 7,582 triangles), flat faces, and the surface of `sa.add_surface()` with no gloss face. The 84 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/hippo/tripo-hand/hippo-color.webp`) |
 | Armature | `hippo_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -175,24 +176,37 @@ left side):
 - **Rings with no split.** The arm root to x 0.188 and the paw from x 0.353 stop at triangles or
   poles. The legs have no closed loop, so they take no ring.
 - **Paws turned.** Each vertex past the arm ring at x 0.3307 turns rigidly about the rest forearm
-  axis by whole ring steps of 360/18 degrees: 40 degrees on the left (2 steps) and -40 degrees on
-  the right, 248 vertices on each side. New quads join the two rings with the step offset, and the
+  axis by whole ring steps of 360/18 degrees: 160 degrees on the left (8 steps) and -60 degrees on
+  the right (3 steps), 248 vertices on each side. New quads join the two rings with the step offset, and the
   far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new quads
   keep the UVs of the old band. The paws keep their form ("Arm twist").
-- **Point edits.** None.
+- **Arm stretch.** The point edit `armStretch` (`scratch/hippo/redits.py`, params `{"kind":
+  "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.095, 0.115]}`), after the paw turns. Each
+  vertex of a side with |x| over the shoulder joint moves along the line u of the rest arm, from
+  the shoulder joint to the wrist joint (0.2135 units), from its place t on the line to
+  t + 0.2 G(t). G is the integral of a band from 0 to t: a smoothstep from 0 at t -0.01 to 1 at
+  0.01, 1 to the wrist, and a smoothstep to 0 from 0.01 before the wrist to 0.01 after it. Thus the
+  upper arm and the forearm grow by 1.2, and the paw moves out by 0.0427 units as one piece. The
+  move fades from 1 at 0.095 units from the line to 0 at 0.115 units, so that the jowls and the
+  belly stay. The joints move with the same map: the elbow to x 0.2704, the wrist to x 0.3963,
+  and the knuckles to x 0.4466. The arm rows of the weights read the x of the source. Reason: with
+  the arms of the source, each arm reached 0.32 m from the shoulder joint to the wrist, and the
+  round belly stands 0.39 m in front of the shoulders, so no upright hold of the contrabass
+  reached the strings and the neck. Each arm now reaches 0.38 m.
+- **Point edits.** None other.
 - **Surface.** `sa.add_surface(hippo, 'hippo', <base color>, eye_fans=False,
   config=<hippo-tripo.json>)`. The 28 nose faces go back to the fur slot, and the gloss slot goes
   (`noGloss`): the map paints the two nostrils, so the snout keeps the color map.
 - **Eyes.** The faces of the two eyeballs (the loose parts of 30 to 99 vertices in the eye box)
   take the face attribute `eye`, and keep the color map.
-- **Armature.** The joints of the config: the shoulder at x 0.145, the elbow at x 0.25, the wrist
-  at x 0.355, the knuckles at x 0.405, the hip at (0.115, 0.21, 0.01), the knee at (0.12, 0.11,
+- **Armature.** The joints of the config: the shoulder at x 0.145, the elbow at x 0.2704, the
+  wrist at x 0.3963, the knuckles at x 0.4466, the hip at (0.115, 0.21, 0.01), the knee at (0.12, 0.11,
   -0.018), and the ankle at (0.125, 0.045, -0.025). The palm is the true palm of the source, the
   mean normal of the paw faces that face down from x 0.33, (0.182, -0.98, -0.075), turned by the
   paw turn. The bind arms (`bindArms`) and the trunk (`open` 1) are those of the old hippo. The
   bind keeps the legs of the source ("Stance"). The tail bones keep the directions of the source.
-  The elbow axis of the left side turns 5.5 degrees about its bind upper arm (`hingeTurn`, "Arm
-  twist").
+  The elbow axis of the left side turns 5.5 degrees about its bind upper arm, and the elbow axis
+  of the right side -20 degrees (`hingeTurn`, "Arm twist").
 
 The weights, in the rest pose:
 
@@ -203,7 +217,9 @@ The weights, in the rest pose:
    (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.145 to 0 at x 0.185, an elbow helper
    share of 0.25, 0.75, 0.75, and 0.25 at x 0.2275, 0.2425, 0.2575, and 0.2725, and the rest on the
    4 roll segments. The 46 vertices of the jowls and the belly side in that reach, which the
-   automatic weights give mostly to the head, the neck, or the trunk, keep their rows.
+   automatic weights give mostly to the head, the neck, or the trunk, keep their rows. The x of a
+   control row and of a reach is the x of the source: the build maps the x of each vertex back
+   through the arm stretch.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.04 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035
    from 0.02 units before the head of `fingers_<side>`.
@@ -244,16 +260,18 @@ of the bassist (`pnpm pose-preview bassist`, `HIPPO_HOLD` of `src/pose/bowed-rig
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| frog | -9.6 | 42.4 | 10.3 | -28.0 |
-| tip | -9.6 | 37.4 | -5.6 | -40.9 |
-| crossing | -9.5 | 37.9 | 6.2 | -27.6 |
-| rest | -40.4 | -9.0 | -11.0 | -16.1 |
-| lift50 | -21.8 | -31.3 | -6.8 | 43.6 |
-| lower50 | -18.4 | -42.7 | -5.4 | 35.9 |
+| frog | 7.9 | 9.0 | -17.7 | 3.0 |
+| tip | 6.9 | 0.2 | -15.3 | 1.0 |
+| crossing | 6.5 | 1.5 | -18.4 | 3.4 |
+| rest | 20.2 | 17.7 | -2.8 | -21.0 |
+| lift50 | 15.2 | 14.5 | 1.2 | 28.5 |
+| lower50 | 13.5 | 13.3 | -1.5 | 25.0 |
 
-The paw turn and the elbow axis turn add the same angle to each moment of a forearm, so the spread
-over the moments comes from the hold. The left forearm spreads 85 degrees and the right forearm 85
-degrees, so both stay within 45 degrees only near the middle of their spread.
+The paw turn adds the same angle to each moment of a forearm, and the elbow axis turn moves a part
+of the roll of the upper arm into the forearm, so the spread over the moments comes from the hold.
+Over the bowing of five demos (`--times` every 5 s), each part takes at most 40 degrees. In the
+pizzicato of `brahms-2`, the right upper arm and the right forearm each take about 62 degrees. The
+old hold twisted them about 100 degrees there.
 
 **Maps** (`tools/hippo-maps.py`). The tool scales the color map to 2048 pixels (Lanczos) and
 writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The same run writes
@@ -263,14 +281,14 @@ texels), a box scale to 1024 pixels, the tilts times 4 in red and green, 255 in 
 
 **Differences from the source.** The app light is warm and comes from above, so the gray-pink
 skin reads as a light peach in the app, and the snout casts a dark band over the mouth line. The
-trunk leans 20 degrees forward in the play and at rest, and the teeth show less than in the front
-view of the source.
+trunk leans 8 degrees forward in the play and at rest, and the teeth show less than in the front
+view of the source. The upper arms and the forearms are 1.2 times longer ("Arm stretch").
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/hippo.rig.glb` | 1,130,460 bytes | `b39cc1f3966a6bae034fc8f00c3f59ed88c5fcf9d4566e827ca81515f84c2878` |
-| `tripo-hand/hippo.rig.json` | 16,403 bytes | `0d6bfc7f7aa9da75565d821045aef4263916a1ceaa364ad044600b2877af0809` |
+| `tripo-hand/hippo.rig.glb` | 1,130,772 bytes | `312eee3d85f28f8c332678a60e55cdbf6c9a4003ed50160f54b4ceb4c9305f3b` |
+| `tripo-hand/hippo.rig.json` | 16,400 bytes | `a291137a0ce0d05320f176c509cc435330de81f47a1c604152ee381f0d11ed26` |
 | `tripo-hand/hippo-color.webp` | 66,764 bytes, 2048 × 2048 | `475803ad0c7ff15b5e375da9d97e4d350ac5f024cb7eb7380fa47c845d0473cb` |
 | `tripo-hand/hippo-normal.webp` | 37,300 bytes, 1024 × 1024 | `22136ba7d9c0141efc91d9e0c782ff23c17bd364221bdd73518552b033d0741f` |
