@@ -810,8 +810,10 @@ Its paws and elbow axes turn so that each part of each arm takes at most 45° in
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
 candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
 Its source has eyeballs, so the faces of each ball take the face attribute `eye`, the finish
-`varnish`, and a blink lid. It has no chair, as the monkey of main: its bind takes the leg turns
-and the forward lean of the trunk of that monkey, so the feet stand under the hips. Its tail keeps
+`varnish`, and a blink lid. It has no chair, as the monkey of main. Its bind has its own leg turns
+and a small trunk lean: the thighs hang straight down, the knees bend a little, and the shoulders
+stay over the hips. Reason: with the leg turns and the trunk lean of the monkey of main, the large
+head and the chest leaned far forward of the haunch. Its tail keeps
 the curl of the source and follows the root bone of the tail alone. Reason: a second tail bone bent
 the curl in the bind. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
@@ -896,9 +898,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   The smaller head moves the mouth back, so the trombone hold of the panda puts the
   right elbow further out and the rest place further forward (5.2, 5.3).
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
-  the seat height of its legs, with its feet on the floor. The monkey has short legs under a
-  large head, so its feet stand under its hips and its trunk leans forward with the head level.
-  Its center of mass thus stays over its soles.
+  the seat height of its legs, with its feet on the floor. The monkey stands erect, as a brass
+  player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
+  its hips. Its center of mass thus stays over the middle of its soles. As a soloist, it keeps
+  this stance, because the straight legs of its sheet put the center of mass behind the middle.
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
   pose of their meshes. The rhino stands as a real tubist on a strap does.
 - A seated body that also stands as a soloist (`soloist` of `ANIMALS`) keeps the leg shapes of
