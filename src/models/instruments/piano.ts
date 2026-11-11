@@ -607,7 +607,7 @@ function addInside(piece: PieceBuilder, boardY: number): void {
     box(2 * inner, plateY - boardY, CASE_PLAN.front - inside.pinBlockBack),
     INSTRUMENT_COLORS.pianoCase,
     transform([0, (boardY + plateY) / 2, (CASE_PLAN.front + inside.pinBlockBack) / 2]),
-    'lacquer',
+    'polish',
   );
   piece.add(
     prism(PLATE_OUTLINE, plateY - inside.plateThickness, plateY),
@@ -663,7 +663,7 @@ function addInside(piece: PieceBuilder, boardY: number): void {
   }
   piece.add(steelWire, INSTRUMENT_COLORS.pianoStrings, transform(), 'metal');
   piece.add(bassWire, INSTRUMENT_COLORS.pianoBassStrings, transform(), 'metal');
-  piece.add(dampers, INSTRUMENT_COLORS.pianoCase, transform(), 'lacquer');
+  piece.add(dampers, INSTRUMENT_COLORS.pianoCase, transform(), 'polish');
 }
 
 /**
@@ -682,13 +682,13 @@ function addLyre(piece: PieceBuilder): void {
     box(base.width, base.top - base.bottom, base.depth),
     dark,
     transform([0, (base.top + base.bottom) / 2, z]),
-    'lacquer',
+    'polish',
   );
   piece.add(
     box(bar.width, bar.height, bar.depth),
     dark,
     transform([0, barBottom + bar.height / 2, z]),
-    'lacquer',
+    'polish',
   );
   for (const side of [-1, 1]) {
     piece.bar(
@@ -697,7 +697,7 @@ function addLyre(piece: PieceBuilder): void {
       post.width,
       post.depth,
       dark,
-      'lacquer',
+      'polish',
     );
     piece.rod(
       [side * brace.x, base.top - brace.radius, z - base.depth / 2],
@@ -705,11 +705,11 @@ function addLyre(piece: PieceBuilder): void {
       brace.radius,
       6,
       dark,
-      'lacquer',
+      'polish',
     );
   }
   for (const x of Object.values(PIANO_PEDALS.x)) {
-    piece.rod([x, base.top, z], [x, barBottom, z], post.rodRadius, 4, dark, 'lacquer');
+    piece.rod([x, base.top, z], [x, barBottom, z], post.rodRadius, 4, dark, 'polish');
   }
 }
 
@@ -921,14 +921,14 @@ function addFront(piece: PieceBuilder): void {
     box(2 * CASE_PLAN.side, 0.06, bedFront - front),
     dark,
     transform([0, p.keyTop - 0.05, (front + bedFront) / 2]),
-    'lacquer',
+    'polish',
   );
   const slip = f.keySlip;
   piece.add(
     box(p.keyboardWidth, slip.height, slip.thickness),
     dark,
     transform([0, p.keyTop - slip.drop - slip.height / 2, slip.thickness / 2]),
-    'lacquer',
+    'polish',
   );
   const cheek = f.cheek;
   for (const side of [-1, 1]) {
@@ -940,7 +940,7 @@ function addFront(piece: PieceBuilder): void {
         p.keyTop + cheek.rise - cheek.height / 2,
         front / 2,
       ]),
-      'lacquer',
+      'polish',
     );
   }
   const fall = f.fallboard;
@@ -948,7 +948,7 @@ function addFront(piece: PieceBuilder): void {
     box(p.keyboardWidth, fall.height, fall.thickness),
     dark,
     transform([0, p.keyTop + fall.gap + fall.height / 2, f.fallboardFront - fall.thickness / 2]),
-    'lacquer',
+    'polish',
   );
 
   const rail = f.rail;
@@ -956,7 +956,7 @@ function addFront(piece: PieceBuilder): void {
     box(2 * CASE_PLAN.side - PIANO_INSIDE.rim, rail.height, rail.depth),
     dark,
     transform([0, p.caseTop - rail.height / 2, rail.z]),
-    'lacquer',
+    'polish',
   );
   // The desk turns back around its bottom front edge, which stands on the rail.
   const desk = f.desk;
@@ -968,14 +968,14 @@ function addFront(piece: PieceBuilder): void {
     box(desk.width, desk.height, desk.thickness),
     dark,
     transform(onDesk(0, desk.height / 2, -desk.thickness / 2), toQuat(lean)),
-    'lacquer',
+    'polish',
   );
   const ledge = f.ledge;
   piece.add(
     box(desk.width, ledge.height, ledge.depth),
     dark,
     transform([0, p.caseTop + ledge.height / 2, f.deskFront + ledge.depth / 2]),
-    'lacquer',
+    'polish',
   );
   const sheet = f.sheet;
   piece.add(
@@ -1015,7 +1015,7 @@ function addLid(piece: PieceBuilder): void {
       [hingeX, p.caseTop, CASE_CENTER[1]],
       toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), p.lidAngle)),
     ),
-    'lacquer',
+    'polish',
   );
   for (const z of l.hinges) {
     piece.add(
@@ -1034,7 +1034,7 @@ function addLid(piece: PieceBuilder): void {
     p.caseTop + reach * Math.sin(p.lidAngle),
     l.propZ,
   ];
-  piece.rod(foot, head, l.propRadius, 6, dark, 'lacquer');
+  piece.rod(foot, head, l.propRadius, 6, dark, 'polish');
 }
 
 /**
@@ -1053,8 +1053,8 @@ export function buildPiano(): InstrumentModel {
   // shows the inside, as the piano of `mockup.png`.
   const rimAt = transform([CASE_CENTER[0], 0, CASE_CENTER[1]]);
   const boardY = p.caseTop - PIANO_INSIDE.soundboardDepth;
-  piece.add(prism(CASE_OUTLINE, p.caseBottom, boardY), dark, rimAt, 'lacquer');
-  piece.add(rimWall(CASE_OUTLINE, RIM_INNER, boardY, p.caseTop), dark, rimAt, 'lacquer');
+  piece.add(prism(CASE_OUTLINE, p.caseBottom, boardY), dark, rimAt, 'polish');
+  piece.add(rimWall(CASE_OUTLINE, RIM_INNER, boardY, p.caseTop), dark, rimAt, 'polish');
   addInside(piece, boardY);
   addLid(piece);
   addFront(piece);
@@ -1062,7 +1062,7 @@ export function buildPiano(): InstrumentModel {
 
   // Three legs, and the lyre with the pedals.
   for (const [x, z] of PIANO_LEGS) {
-    piece.add(lathe(legProfile(p.caseBottom), 8), dark, transform([x, 0, z]), 'lacquer');
+    piece.add(lathe(legProfile(p.caseBottom), 8), dark, transform([x, 0, z]), 'polish');
   }
   addLyre(piece);
   addPedal(piece, 'soft');
