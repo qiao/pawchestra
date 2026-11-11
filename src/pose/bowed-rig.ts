@@ -771,13 +771,7 @@ const SHOULDER_HOLD = {
 /**
  * The hold of the violin on the left shoulder, for the red fox (design 4.6, 5.3): the hold of the
  * rabbit, with the tail end against the left side of the short neck of the fox, under its long jaw.
- * On the collarbone, 0.087 H further forward and 0.035 H lower, the violin keeps 2.4 cm from the
- * neck. The violin sits 0.07 H further back and 0.016 H further left, so that the left paw reaches
- * the nut. Straight back by 0.06 H, the violin goes 1.3 cm into the neck. It sits 0.01 H higher,
- * and goes 1.0 cm into the trunk and the neck. The head lifts 5° (`headDrop`), because the long jaw
- * already lies on the violin: level, the jaw goes 2.4 cm into the rim of the chin rest, and lifted
- * 5°, 1.5 cm. The short neck brings the head and the violin 1.7 cm down, so the violin sits a
- * further 0.01 H higher: 0.01 H lower, it goes 2.4 cm into the body in the play. The middle line of
+ * The last paragraph gives the place of the violin and the turn of the head. The middle line of
  * the violin points 45° to the left of the front, as a real player holds it
  * (`docs/reference/string-technique.md`, section 1.10), and the left shoulder bone turns forward
  * in the play (`reachL`, below). The left elbow keeps the pole of the chin hold: further in, under the violin, the left paw
@@ -842,6 +836,18 @@ const SHOULDER_HOLD = {
  * The string planes of the red fox stay 9° apart, and the stick leans 15°. A larger turn or tilt
  * folds the skin of the right arm of the fox mesh: the play folds in 21.7% of the samples at 17°
  * and 30°, 7.0% at 9° and 30°, 6.1% at 9° and 15°, and 6.0% at 10° and no tilt.
+ *
+ * The long snout of the Tripo fox lies over the violin and over the bow paw at the frog. So the
+ * violin sits further left and lower on the collarbone, 0.16 H left of the bone, at its height,
+ * and 0.22 H back (`playShift`). The head turns 20° to the left in the play (`headTurn`), as a
+ * violinist turns the head over the chin rest (`docs/reference/string-technique.md`, section
+ * 1.10), and lifts 9° (`headDrop`), so that the jaw lies on the lower violin. The snout then points
+ * over the neck of the violin, above the bow paw. The bow plays no hair within 0.16 m of the frog
+ * (`frogHair`). With the violin 0.07 H left, 0.05 H up, and 0.25 H back, a square head lifted 5°,
+ * and the 0.12 m of free hair, the bow paw went 5.0 cm into the head at the frog in 12.7% of the
+ * play samples of `boulanger-matin`, the right forearm 4.7 cm in 17.0%, and the violin 3.9 cm
+ * into the jaw in each sample. With this hold, the paw and the violin stay out of the head, and
+ * the right forearm goes at most 0.8 cm in. With the violin 0.05 H up, the paw went 1.8 cm in.
  */
 const FOX_HOLD = {
   ...SHOULDER_HOLD,
@@ -851,8 +857,10 @@ const FOX_HOLD = {
   reachL: 20 * MathUtils.DEG2RAD,
   elbowPerString: 2 * MathUtils.DEG2RAD,
   poleR: [3, -0.3, -0.6],
-  playShift: [-0.07, 0.05, 0.25],
-  headDrop: -5 * MathUtils.DEG2RAD,
+  playShift: [-0.16, 0, 0.22],
+  headDrop: -9 * MathUtils.DEG2RAD,
+  headTurn: 20 * MathUtils.DEG2RAD,
+  frogHair: 0.16,
   slant: -12 * MathUtils.DEG2RAD,
   stringTurn: 9 * MathUtils.DEG2RAD,
   bowTilt: 15 * MathUtils.DEG2RAD,

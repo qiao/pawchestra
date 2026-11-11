@@ -443,7 +443,9 @@ The app follows these facts:
   on the left collarbone from the body (`fitViolinPlace()`): beside the neck, above the base of the
   neck, and behind the front of the upper chest. Then the head turns until the jaw touches the chin
   rest, and the violin moves up or down for the rest of the gap, so that the head stays near
-  straight.
+  straight. The red fox turns the head to the left over the chin rest
+  (`BowedHold.headTurn`), so that the left side of its long jaw lies on the chin rest and the snout
+  points over the neck, above the bow paw at the frog. No source gives the angle.
 - **The thick wrist at rest (1.9).** A real player keeps the forearm free of the body of the
   instrument. At rest, the left paw of a thick wrist holds the neck of the violin nearer to the
   nut (`BowedHold.wristFit`, design 5.3), so that the wrist end of the forearm stays out of the
