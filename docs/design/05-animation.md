@@ -685,6 +685,14 @@ The rest of each family:
 - A lifted paw that comes back to its keys after the next note also draws back from the
   fallboard (`HAND_MOTION.overBack`). Reason: it comes down next to the other paw while that paw
   rises, so the two paws pass at the same height, and they touch there.
+- A paw plays the white keys near a black key at the depth of the black key, between the black
+  keys (`keyDepths()` of `pose/hands.ts`): at the depth of each black key of the paw within
+  `KEY_DEPTH.holdSec` of the note, and past that time, it comes out at most `KEY_DEPTH.outSpeed`
+  fast. A note that only makes way takes the depth of the near notes, and the place before the
+  first note takes the depth of the first note. Thus the paw stays at one depth for a group of
+  notes, as a pianist plays a passage of black and white keys close to the fallboard (piano 5).
+  Reason: in a fast alternation of two chords a semitone apart, the paw went 12 cm in and out at
+  each note, and the upper arm swung 32°.
 - Each paw plays a fingering: the fingers of the lowest cost by the rules of Parncutt et al.
   (piano 9.2, `planFingeringSteps()` of `pose/piano-fingering.ts`), with the spans scaled for the paw
   (`POLAR_BEAR_PAW`). The palm stands so that the claw of each key is over the key

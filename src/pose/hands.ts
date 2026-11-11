@@ -474,6 +474,8 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
  * @param high The highest key.
  * @param fingered The place of the palm along the keys for the fingers of the note, in the axes
  *   of the instrument, or `null` for the middle of the keys.
+ * @param depth The place of the palm in toward the keys for the note, in the axes of the
+ *   instrument ({@link keyDepths}), or `null` for the middle of the keys.
  * @returns The place of the palm.
  */
 function palmPoint(
@@ -482,6 +484,7 @@ function palmPoint(
   low: number,
   high: number,
   fingered: number | null = null,
+  depth: number | null = null,
 ): Vec3 {
   const { keyPoint } = rig.hold;
   const offset = side === 'L' ? rig.hold.palmL : rig.hold.palmR;
@@ -492,6 +495,9 @@ function palmPoint(
   const at = middle(low, high);
   if (fingered !== null) {
     at.x = fingered;
+  }
+  if (depth !== null) {
+    at.z = depth;
   }
   at.add(new Vector3(...offset));
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
@@ -526,6 +532,61 @@ function fingeredPalmX(
     sum += rig.hold.keyPoint(key, rig.scale)[0] - clawOffset(finger, side, POLAR_BEAR_PAW);
   }
   return sum / (to - from);
+}
+
+/** The depth of the keys of a piano paw (design 5.3, {@link keyDepths}). */
+const KEY_DEPTH = {
+  /**
+   * A piano paw plays the white keys of a note at the depth of a black key of the paw that starts
+   * within this time before or after the note, in seconds.
+   */
+  holdSec: 0.3,
+  /** Past {@link KEY_DEPTH.holdSec}, the paw moves out from a black key at most this fast, in m/s. */
+  outSpeed: 0.3,
+} as const;
+
+/**
+ * Gives the place of the palm in toward the keys for each note of a piano paw (design 5.3). The
+ * paw plays the white keys near a black key further in, between the black keys: at the depth of
+ * each black key of the paw that starts within {@link KEY_DEPTH.holdSec} of the note, and past that
+ * time, it comes out at most {@link KEY_DEPTH.outSpeed} fast. Thus the paw stays at one depth for
+ * a group of notes, as the hand of a pianist stays in one position for a group of notes
+ * (`docs/reference/piano-technique.md` section 5). Reason: a paw that went in for each black key
+ * and out for each white key shook 12 cm in and out at each note of a fast alternation of two
+ * chords a semitone apart.
+ *
+ * @param rig The points of the player.
+ * @param notes The notes of the hand, sorted by start.
+ * @returns The place of the palm in toward the keys of each note, in the axes of the instrument,
+ *   or `null` for a note with no keys and no near note with keys. A note with no keys, which only
+ *   makes way for the other paw, takes the depth of the near notes.
+ */
+function keyDepths(rig: HandsRig, notes: readonly HandNote[]): (number | null)[] {
+  const { holdSec, outSpeed } = KEY_DEPTH;
+  const own = notes.map((note) =>
+    note.keys.length === 0
+      ? null
+      : Math.min(...note.keys.map((key) => rig.hold.keyPoint(key, rig.scale)[2])),
+  );
+  const known = own.filter((depth) => depth !== null);
+  // The depth of the white keys, and the time past which a note cannot move the depth of a note.
+  const front = Math.max(...known);
+  const most = holdSec + (front - Math.min(...known)) / outSpeed;
+  const depthFrom = (start: number, j: number, depth: number): number => {
+    const other = own[j] ?? null;
+    const away = Math.max(0, Math.abs((notes[j]?.start ?? 0) - start) - holdSec);
+    return other === null ? depth : Math.min(depth, other + outSpeed * away);
+  };
+  return notes.map((note, i) => {
+    let depth = own[i] ?? Infinity;
+    for (let j = i - 1; j >= 0 && note.start - (notes[j]?.start ?? 0) <= most; j--) {
+      depth = depthFrom(note.start, j, depth);
+    }
+    for (let j = i + 1; j < notes.length && (notes[j]?.start ?? 0) - note.start <= most; j++) {
+      depth = depthFrom(note.start, j, depth);
+    }
+    return Number.isFinite(depth) ? Math.min(depth, front) : null;
+  });
 }
 
 /**
@@ -633,8 +694,9 @@ export function* handTracksSteps(
     fingering: PianoFingering | null,
     strings: HarpFingering | null,
     firstKey: number,
-  ): HandTrack =>
-    buildHandTrack(
+  ): HandTrack => {
+    const depths = fingering ? keyDepths(rig, hand) : null;
+    return buildHandTrack(
       hand,
       action,
       (l, h, i) => {
@@ -649,6 +711,8 @@ export function* handTracksSteps(
           l,
           h,
           fingering && i >= 0 ? fingeredPalmX(rig, side, fingering, i) : null,
+          // The place before the first note stands at the depth of the first note.
+          depths?.[Math.max(i, 0)] ?? null,
         );
       },
       amplitude,
@@ -657,6 +721,7 @@ export function* handTracksSteps(
       fingering && handTurns(hand, fingering, side),
       strings,
     );
+  };
   return {
     left: track('L', left, fingeringL, harp?.[0] ?? null, firstL),
     right: track('R', right, fingeringR, harp?.[1] ?? null, firstR),

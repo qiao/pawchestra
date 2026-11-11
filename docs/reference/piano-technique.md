@@ -109,6 +109,9 @@ front of the trunk, and the trunk upright over the sit bones.
 - The hand moves in toward the fallboard to play a black key and out to play a white key. The arm
   and the elbow move it, so the fingers do not curl or twist to reach the black key
   (a search summary only) [30][31].
+- A thumb on a black key keeps the hand close to the fallboard. In a passage of black and white
+  keys, the fingers play the black keys flatter and the white keys more curled, so the hand does
+  not move in and out for each key [46] (a search summary only).
 
 ## 6. The feet
 
@@ -283,7 +286,9 @@ The app follows these facts:
   (`faceL`, `faceR`). The claws curl (`curl`), and their tips lie on the key tops at each strike.
   The paw is longer than a white key, so the palm stands in front of the front edge of the keys
   (`palmL`, `palmR`). For a black key, the whole paw moves in, so the claws lie on the black key
-  (`pianoKeyFront()`, `BLACK_KEY_INSET`). At a few far keys, the paw stops at the full reach of
+  (`pianoKeyFront()`, `BLACK_KEY_INSET`). Near a black key, the paw plays the white keys further
+  in, between the black keys, and it stays at one depth (`keyDepths()`, `KEY_DEPTH`), as the hand
+  of section 5 keeps close to the fallboard. At a few far keys, the paw stops at the full reach of
   the arm, up to 6 cm short.
 - **The motion (section 7).** The trunk leans to the side toward the keys of the two paws
   (`sideLeanAt()`, `sideLean`, `sideLeanMax`). The lean follows the mean place of the paws over
@@ -487,6 +492,8 @@ Sources 1 to 20 opened on 2026-10-24, source 21 on 2026-10-25, and sources 23 to
     https://www.livingpianos.com/articles/how-to-play-repeated-notes-on-the-piano-piano-techniques/
 45. C. C. Chang. "Practicing Jumps" (III.7.f). Fundamentals of Piano Practice.
     https://fundamentals-of-piano-practice.readthedocs.io/chapter1/ch1_topics/III.7.html
+46. C. C. Chang. "Playing with Flat Fingers" (1.III.4.2). Fundamentals of Piano Practice.
+    https://mail.pianofundamentals.com/book/en/1.III.4.2
 
 **Conflicts.** The sources put the elbow from a little below the keys [5][8] to about 2.5 cm
 above them [4][5]. Most sources put the pianist on the front half of the bench, and one on the
