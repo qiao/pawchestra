@@ -89,6 +89,19 @@ LASH_LINE = False
 #: The barycentric slack of a second try for a ray from the middle of a ball that hits no ball
 #: triangle.
 WIDE_EDGE = 0.05
+#: The view of the play, in which each iris lies in the middle of its opening
+#: (`gaze_targets()`): the head of the violinist turns down by PLAY_HEAD_PITCH degrees in the
+#: play moments (`pnpm pose-preview violinist`: frog, tip, crossing), and the front camera of the
+#: test page looks down at the eyes by PLAY_CAMERA_ELEVATION degrees (12 degrees at the middle of
+#: the player, `viewCamera()` of `src/test-page/views.ts`). So the camera lies above the forward
+#: axis of the head by the sum. In the front view of the bind, the iris in the middle of the
+#: opening looked down in the play.
+PLAY_HEAD_PITCH = 9.3
+PLAY_CAMERA_ELEVATION = 7.4
+#: The turn in degrees of each iris target out and up from the middle of the opening in the play
+#: view. A small turn out stops a cross-eyed look.
+GAZE_OUT = 6.0
+GAZE_UP = 5.0
 #: The share of the middle angle across of the eye opening that the gaze takes: 0 gives
 #: parallel eyes that look straight ahead, 1 an eye in the middle of each opening.
 GAZE_ACROSS = 0.5
@@ -517,17 +530,68 @@ def front_cells(d):
     return row, col
 
 
+def gaze_targets(rig):
+    """Gives the target t of the iris of each side: the ball direction in the middle of the eye
+    opening that the camera of the play sees (PLAY_HEAD_PITCH and PLAY_CAMERA_ELEVATION), turned
+    out by GAZE_OUT and up by GAZE_UP degrees. The rays of the view come from the camera direction
+    v, parallel. The middle of the opening is the mean place of the ball points that the rays hit,
+    across the view, and t is the hit nearest to it. The two targets are mirror images (the mean
+    of the two sides), so the eyes stay parallel."""
+    triangles, positions, eyes = rig[0], rig[1], rig[3]
+    corners = positions[triangles]
+    middles = corners.mean(axis=1)
+    up = np.radians(PLAY_HEAD_PITCH + PLAY_CAMERA_ELEVATION)
+    v = np.array([0.0, np.sin(up), np.cos(up)])
+    across = np.array([1.0, 0.0, 0.0])
+    tilt = np.cross(v, across)
+    found = {}
+    for side in ('L', 'R'):
+        faces = np.array(eyes[side]['faces'])
+        c, r, _ = ball_frame(rig, faces)
+        near = np.flatnonzero(np.linalg.norm(middles - c, axis=1) < 3 * r)
+        steps = np.arange(-1.6 * r, 1.6 * r, RAY_STEP)
+        gx, gy = np.meshgrid(steps, steps)
+        origins = c + gx.ravel()[:, None] * across + gy.ravel()[:, None] * tilt + v
+        rays = np.tile(-v, (len(origins), 1))
+        t_hit, hit, _ = ray_hits(origins, rays, corners[near])
+        on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
+        flat = np.c_[gx.ravel(), gy.ravel()][on_ball]
+        shown = origins[on_ball] + t_hit[on_ball, None] * rays[on_ball] - c
+        shown /= np.linalg.norm(shown, axis=1)[:, None]
+        middle = flat.mean(axis=0)
+        found[side] = (shown[np.argmin(np.linalg.norm(flat - middle, axis=1))], c, r, middle,
+                       np.sqrt(len(flat) / np.pi) * RAY_STEP)
+    x = (found['L'][0][0] - found['R'][0][0]) / 2
+    y = (found['L'][0][1] + found['R'][0][1]) / 2
+    targets = {}
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        psi = np.arcsin(y) + np.radians(GAZE_UP)
+        lam = np.arcsin(x / np.cos(np.arcsin(y))) + np.radians(GAZE_OUT)
+        targets[side] = np.array([sign * np.cos(psi) * np.sin(lam), np.sin(psi),
+                                  np.cos(psi) * np.cos(lam)])
+        middle_t, c, r, middle, radius = found[side]
+        # The place of the iris middle in the play view against the middle of the opening.
+        place = (r * targets[side]) @ np.c_[across, tilt]
+        offset = (place - middle) / radius * [sign, 1]
+        print(f'gaze {side}: the play view looks down {PLAY_HEAD_PITCH + PLAY_CAMERA_ELEVATION:.1f} '
+              f'degrees; the middle of its opening at x {middle_t[0]:+.3f}, y {middle_t[1]:+.3f} of '
+              f'the ball radius, the target at x {targets[side][0]:+.3f}, y {targets[side][1]:+.3f} '
+              f'({GAZE_OUT:.1f} degrees out, {GAZE_UP:.1f} up): {offset[0]:+.2f} out and '
+              f'{offset[1]:+.2f} up of the middle in the play view, in opening radii')
+    return targets
+
+
 def center_irises(rig, image):
     """Moves the iris of each eyeball, with its pupil and its painted light, as one decal to the
-    middle of the eye opening of the front view, and gives the new image. The source map paints
+    middle of the eye opening of the play view (`gaze_targets()`), and gives the new image. The source map paints
     each iris at the inner corner of its opening, so in the front view the rabbit looked
     cross-eyed. The map paints only a band of the ball around the opening, so a turn of the whole
     ball would show the dark rest of the ball in the opening. The source map of the rabbit paints
     no light on the eye, so no light moves. For each side, with c, r, and the
     ball directions of the front view of `ball_frame()`:
     - The opening: the cells of the front picture (`front_cells()`) that the front directions
-      fill. The middle of the opening is the mean x and y of the front directions, and the target
-      t is the front direction nearest to it.
+      fill. The target t of the iris is the middle of the opening in the play view, a little out
+      and up (`gaze_targets()`).
     - The core of the opening: the opening less EDGE_CELLS cells at its edge, where a dark lash
       line can lie.
     - The pupil p: the middle of the cells of the core with a texel of luma below PUPIL_LUMA in
@@ -558,6 +622,7 @@ def center_irises(rig, image):
         taken[ys, xs] = True
         texels[side] = (ys, xs, places)
     src = fill_around(out, taken)
+    targets = gaze_targets(rig)
     for side in ('L', 'R'):
         faces = np.array(eyes[side]['faces'])
         c, r, shown = ball_frame(rig, faces)
@@ -616,8 +681,7 @@ def center_irises(rig, image):
 
         shares = np.array([white_share(k) for k in range(IRIS_SEARCH)])
         a = float(np.argmax(shares >= IRIS_WHITE)) + IRIS_EDGE
-        middle = shown[:, :2].mean(axis=0)
-        t = shown[np.argmin(np.linalg.norm(shown[:, :2] - middle, axis=1))]
+        t = targets[side]
         turn = turn_matrix(p, t)
 
         def is_iris(q, cells=core):
@@ -648,7 +712,7 @@ def center_irises(rig, image):
         out[ys, xs] = new
         unit = np.sqrt(len(shown) / np.pi) * RAY_STEP / r
         shift = (t[:2] - p[:2]) / unit
-        print(f'iris {side}: pupil at x {p[0]:.3f}, y {p[1]:.3f} of the ball radius, opening middle '
+        print(f'iris {side}: pupil at x {p[0]:.3f}, y {p[1]:.3f} of the ball radius, target '
               f'at x {t[0]:.3f}, y {t[1]:.3f}; the iris of {a:.1f} degrees moves '
               f'{angle_to(p[None], t)[0]:.1f} degrees ({shift[0]:+.2f}, {shift[1]:+.2f} opening '
               f'radii in x, y); {int(flip.sum())} iris texels mirror, {len(left)} texels '
