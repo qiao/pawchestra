@@ -733,8 +733,8 @@ only after an approval of its look in the app. It shows the color map of its Tri
 round sockets, with no pea eyes. Reason: the map paints a full eye on each eyeball (a black pupil,
 an amber iris, and white), and the socket faces keep their source UVs, so the dark lining
 of the map shows around it. The map paints each iris toward the inner side of its ball, so the map
-tool moves each iris on its ball to the middle of the eye opening of the front view. Else the
-rabbit looks cross-eyed. A lid on each eye blinks over it ("Hand rig"). Its arms are short, so its
+tool moves each iris on its ball to the middle of the eye opening of a view from above the head
+(`tools/gaze_shift.py`). Else the rabbit looks cross-eyed. A lid on each eye blinks over it ("Hand rig"). Its arms are short, so its
 violin is smaller (4.6, `violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It stands
@@ -768,44 +768,31 @@ lower. Its map tool moves each iris with its pupil as one decal on its ball, to 
 eye opening in a view from above the head, a little out (`tools/gaze_shift.py`). Each moved texel
 is a copy of a texel of the same ball. Reason: the source paints each iris at the inner side of
 its opening, and the foxes looked to the side and down in the play view and from the default
-camera. The map tool of the rabbit keeps the eye paint of the source (an amber iris, a black
-pupil, and white), and moves each iris as one decal to the middle of its opening
-(`center_irises()`). Reason: the source paints each iris at the inner corner, and the rabbit
-looked cross-eyed from the front. The
-rabbit irises take the middle of the opening in the view of the play, with the head turn of the
-play and the camera of the test page, a little out and up (`gaze_targets()`). Reason: with the
-middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. A last
-eye step of the map tool of the rabbit (`far_eyes()`) makes each iris round with the pupil in its middle,
-sets its size (`IRIS_SCALE`), turns it out and up (`FAR_GAZE_OUT`, `FAR_GAZE_UP`), and gives the
-white a darker, warm tone and the iris a darker tone. Reason: the source paints each pupil off the
-middle of its iris, as an eye that looks to the side. In the far view of the hall, a wide white
-field around that iris made the eyes read as startled or as a side glance. The rabbit pupil lies near the middle of the opening, with the top
-of the iris just under the upper lid. Reason: with a larger iris higher in the opening, the upper
-lid came near the pupil and the rabbit read as sleepy. The map
-tool of the rabbit also gives its brows and the dark band of its eye sockets half of their
-contrast to the fur, and shorter brows (`soften_brows()`). Reason: the dark, high brows of the
-source read as a frown. The fox
-eyes keep the size of the source ball. The rabbit eyes are smaller than the source ball. Reason:
-with the large dark pupil of the source, the rabbit eyes at the size of the cute step read too
-large. Neither source paints a light in the eyes, so the fox and the rabbit eyes take the `eye`
-finish, and the eye light gives one small light in the upper part of each eye. Reason: with the
-finish `varnish` and no eye light, the fox eyes read as a dead stare. The candidate Tripo polar bear
+camera. The candidate rabbit takes the same route: the eyeballs, the cheeks, the paws, the limbs,
+and the trunk keep the form of the source, its map keeps the colors and the brows of the source,
+and its legs keep the length of the source, so its chair is lower. Its map tool moves each iris in
+the same way (`tools/gaze_shift.py`). Reason: the source paints each iris at the inner corner, and
+the rabbit looked cross-eyed from the front and down in the play view. The view of the shift lies
+above the head, so that the iris shows below the upper lid from the default camera. Reason: the
+head of a seated player turns down and the default camera is high, and with the iris in the middle
+of the front view the rabbits read as sleepy from that camera. Neither source paints a light in
+the eyes, so the fox and the rabbit eyes take the `eye` finish, and the eye light gives one small
+light in the upper part of each eye. Reason: with the finish `varnish` and no eye light, the fox
+eyes read as a dead stare. The candidate Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
 its eyes keep the size of the source ball. Its map also gives each eye a darker iris and a softer
-warm white (`far_tone()`), with the values of a dark iris of `far_eyes()`. Reason: in the hall view
+warm white (`far_tone()`), with the values of the dark iris of the earlier fox map tool. Reason: in the hall view
 each eye is a few pixels across, and the bright white read dim. Its source paints white only at the
-outer corner, so the round iris of `far_eyes()` does not apply. Its arm, leg, and trunk girths and
+outer corner, so it takes no round iris. Its arm, leg, and trunk girths and
 its paws are those of the main polar bear, and its head keeps the round form of the sheet. The
 candidate Tripo wolf (`assets/models/wolf/tripo-hand/`) has no point edit of its form and no
 change of its map colors, and it scales only to H of the wolf of main. Reason: the look target of
 this body is its source FBX in an FBX viewer. Its source has no eyeball, so the head faces of each
 painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
-steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
-face of the rabbit is a baby face: upper lids that do not cover the iris, and rounder cheeks.
-Reason: lids over the top of the iris made the rabbit read sleepy. The paws of the fox turn about the
+steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -873,15 +860,12 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   flat, crumpled sheet and the long legs looked thin. They also flatten the belly of the left
   forearm, which showed as a bump on the top of the arm in the play pose. The rabbit sits with more room behind the
   back (`backRoom`), so that its back keeps off the chair back.
-- The candidate rabbit of `tripo-hand/` has longer shins than its mesh, for the seat height of the
-  A-pose rabbit. It sits as a real
+- The candidate rabbit of `tripo-hand/` keeps the legs of its mesh, so its chair is lower than
+  the chair of the A-pose rabbit. It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
-  the steep thighs of the bind rules, only the haunch could sit on the seat. The thigh shares of
-  the lower belly pull it back into a ledge in this bind, so the key `bind_belly` relaxes the
-  belly band along the vertical lines of the mesh. Reason: the ledge showed as a dark band above
-  the thighs.
+  the steep thighs of the bind rules, only the haunch could sit on the seat.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
