@@ -1493,6 +1493,14 @@ const HIPPO_HOLD = {
  * at the knees of the new body, both arms reached nearly straight forward. The left paw then turns
  * 65° in the plane of its palm (`restPawTurnL`), so that the left forearm twists 43° at rest (45°
  * with 55°, 47° with 40°).
+ *
+ * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
+ * front (`liftReach`), so that the violin passes over the belly: with the move of the shoulder
+ * hold, 0.15 H in, 0.15 H up, and 0.15 H to the front, the violin went 5.2 cm into the belly in a
+ * lowering of `bach-bwv1050`, and with this move, 2.7 cm, the depth of the rest. At rest, the bow
+ * tip points up, out, and forward, (0.7, 0.8, -0.6), so that the bow lies beside the right knee:
+ * with the upright tip of the shoulder hold, (0.2, 1, -0.1), the stick crossed the face in the
+ * view from the front right. The right paw then twists 27° on its forearm at rest.
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
@@ -1503,6 +1511,8 @@ const RABBIT_HOLD = {
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 65 * MathUtils.DEG2RAD,
+  liftReach: [0, 0.3, -0.15],
+  restBow: { ...SHOULDER_HOLD.restBow, tip: [0.7, 0.8, -0.6] },
 } as const satisfies BowedHold;
 
 /**
