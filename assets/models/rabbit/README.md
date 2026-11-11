@@ -26,7 +26,8 @@ arm root and other faults. Its `.blend` lies in `hand-rig/`, so that no tool fin
 GLB file of the app (`handRigOf()` of `tools/glb-swap.ts`), and `pnpm rig-mesh rabbit` runs.
 
 `tripo-hand/` holds a candidate body ("tripo-hand/rabbit.blend" below): a hand rig of the second
-Tripo P2 mesh `tripo-p2/rabbit.fbx`, made in headless Blender with no arm cut and no arm stretch.
+Tripo P2 mesh `tripo-p2/rabbit.fbx`, made in headless Blender by the route of the Tripo wolf: the
+form, the colors, and the eye paint of the source, with no arm cut and no stretch.
 On the branch of the candidate, the `ANIMALS` entry of the rabbit points to
 `tripo-hand/rabbit.rig.glb`.
 
@@ -245,96 +246,34 @@ roughness and the metallic maps are not kept.
 | `rabbit.fbm/rabbit_basecolor.jpg` | 1,264,615 bytes | 4096 × 4096 | `83786eda88e3a0f7f222d0a902e6545d43df671cc2e9b75eb4bef44a03071080` |
 | `rabbit.fbm/rabbit_normal.jpg` | 995,060 bytes | 4096 × 4096 | `6f96f7505bb3bba89b251a58127d64d10f178e190e14db95d6b3827f8e51ce24` |
 
-The color map paints a full eye on each eyeball (a black pupil, an amber iris, and a white light),
+The color map paints a full eye on each eyeball (a black pupil, an amber iris, and white),
 thin brown brows on the brow strips, a pink nose, pink inner ears and paw pads, a painted smile,
 and white whiskers.
 
-**Eyes.** The eyes keep the eye paint of the source map: a large black pupil in an amber iris
-with a dark ring, and white around it. The source map paints each iris at the inner corner of its
-opening, so in the front view the rabbit looked cross-eyed. `center_irises()` of
-`tools/rabbit-maps.py` (a copy of the method of the Tripo fox, `assets/models/fox/README.md`,
-"Eyes") moves each iris with its pupil as one decal on the ball to the middle of the opening in
-the view of the play (`gaze_targets()`):
-
-- The play view looks down 16.7 degrees at the eyes: in the play moments the head turns down 9.3
-  degrees (`pnpm pose-preview violinist`), and the front camera of the test page looks down 7.4
-  degrees at the eyes. With the target in the middle of the opening of the front view, the rabbit
-  looked down and cross-eyed in the play.
-- Parallel rays from that view find the middle of the opening. The target then turns 6 degrees
-  out and 5 degrees up (`GAZE_OUT`, `GAZE_UP`): the turn out stops a cross-eyed look, and the
-  shaded lower white of the stage light made a centered iris read low. The iris middle lies 0.14
-  opening radii out and 0.17 up of the middle of the opening in the play view. The two targets
-  are mirror images, so the eyes stay parallel. In the rest front view the irises lie a little up
-  and out.
-
-- The pupil is the middle of the dark texels of the opening after an erosion, and the iris radius
-  is the first ring of 1 degree about it with 5 % white, plus 2 degrees (34 degrees on each side).
-- The left iris moves 21.7 degrees and the right iris 21.3 degrees on the ball (0.45 and 0.43
-  opening radii out, 0.41 opening radii up, in the front picture of the ball).
-- The iris paint of the source stops at the inner corner, so the hidden part of the moved iris
-  takes the mirror of the other side of the same iris. The old place of the iris takes the white
-  of the other side of the opening. The source map paints no lash line, and its iris reaches the
-  lower edge of the opening, so the white goes up to the edge (`LASH_LINE = False`). Each new
-  texel is a copy of a texel of the same ball.
-
-**Far view.** The source paints each pupil off the middle of its iris, as an eye that looks to the
-side, as on the fox. In the far view of the hall (a rabbit head about 70 pixels high), the eyes
-read as small dark dots that look to the side, with an off-white near the cream fur around them.
-`far_eyes()` of the tool (the step of the fox, `assets/models/fox/README.md`, "Far view") runs
-after `center_irises()`, about the target of the play view:
-
-- The pupil edge and the iris edge about the source pupil have the medians 23.5 and 36.0 degrees
-  on the left and 23.0 and 35.5 on the right, from 44 and 36 clean directions of 120.
-- The new iris is round, with the pupil in its middle. Its radius is the radius of the source
-  (`IRIS_SCALE` 1, 36.0 and 35.5 degrees), and the pupil is 0.5 of it (`PUPIL_RATIO`), so more of
-  the brown iris shows. The middle turns 3 degrees down from the target (`FAR_GAZE_UP` -3), so
-  that the pupil middle lies near the middle of the opening and the top of the iris just under
-  the upper lid. With an iris 1.1 times the source at the target, the upper lid came near the top
-  of the pupil in the test page on a phone, and the rabbit read as sleepy. At 6 degrees down, the
-  rabbit read as looking down. The target already turns out by `GAZE_OUT`, so `FAR_GAZE_OUT` is
-  0.
-- In Oklab, the white takes 0.85 of its lightness and a warm step (`SCLERA_SHADE`, `SCLERA_WARM`),
-  and the iris 0.9 of its lightness, and 0.75 more in its outer ring (`IRIS_SHADE`, `RING_SHADE`).
-
-The source map paints no light on the eyes. `EYE_PAINT = 'cartoon'` of the tool paints the
-cartoon eye of the sheet again (`paint_eyes()`). The eyeballs keep the `eye` finish and the eye
-light of the app, because the source paints no light. The eye light gives the one light of each
-eye. The fox takes the same finish and light.
-
-**Brows.** The source paints thick, dark, high brows on the brow strips and a dark band in each
-eye socket over the eye, and in the play they read as a strong frown. `soften_brows()` of the tool
-moves the texels of the brow strips and of the socket faces (the body faces within 1.6 ball radii
-of a ball middle) toward the fur around them in Oklab. Each keeps half of its step from the fur
-color (`BROW_CONTRAST`, `SOCKET_CONTRAST`), and the brow contrast fades to 0 in the first and the
-last quarter of each brow (`BROW_FADE`), so the brow paint is also shorter. The fur color of a side
-is the median texel of the body faces from 1.6 to 2.6 ball radii. The mean lightness step of the
-brow texels to the fur goes from 0.139 to 0.056 (left) and from 0.130 to 0.053 (right), and of the
-socket texels from 0.21 to 0.10. The brow strips keep their form, so the light of the stage still
-shows a soft brow.
-
-**Cute face.** The face is a baby face, as a moderate first step: open lids and rounder cheeks
-("Cheeks" and "Lids" below). The muzzle keeps its length. The eyes keep the size from before the
-cute step, so that the painted eye of the source does not read too large ("Eye size"). The head
-height H, the ears, the body, and the colors stay.
+**Eyes.** The eyes keep the eye paint of the source map: a large black pupil in an amber iris with
+a dark ring, and white around it. The source paints no light in the eyes, so the eyeballs take the
+finish `eye` and the eye light of the app, which gives one small light in the upper part of each
+eye.
 
 ### tripo-hand/rabbit.blend
 
 The candidate hand rig of the second Tripo P2 rabbit (design 4.4, "Hand rig"), made in headless
-Blender 5.2 (`blender -b --factory-startup`) by scripted point edits, in the order below. The arms
-keep the length of the source: no cut, no split from the trunk, and no stretch. The shins are
-longer for the seat height of the rabbit of main ("Longer shins" below).
+Blender 5.2 (`blender -b --factory-startup`) by one build script, as the Tripo wolf
+(`../wolf/README.md`). The body keeps the form, the colors, the eyeball size, and the eye paint of
+the source: no point edit changes the head, the eyes, the trunk, the paws, or the legs. The arms
+and the legs keep the length of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 390,238 bytes |
-| SHA-256 | `7522bba02dc54c2848cf32dd0879bee1933909b79b75f6b1aaa246dc312c4334` |
+| Size | 383,084 bytes |
+| SHA-256 | `6ec29a4b5ea9bd2048e5fc9ebbfc849c1eaf0175131b6e107388eab18dbd07c5` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the edits, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `rabbit`, with the shape key `bind_belly` ("Belly" below): 3,760 vertices and 3,899 faces (3,361 quads and 538 triangles, 7,260 triangles), flat faces, and the surface of `sa.add_surface()`. 18 faces are gloss (the pink nose). The 148 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.861111 (the shoulder joints at 1.474 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 55, `backRoom` 0.01 |
-| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light ("Eyes" above), a round iris for the far view ("Far view" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `rabbit`: 3,760 vertices and 3,899 faces (3,361 quads and 538 triangles, 7,260 triangles), flat faces, and the surface of `sa.add_surface()`. 18 faces are gloss (the pink nose). The 148 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Facts | `height` 0.806623 (the shoulder joints at 1.4795 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 180, `backRoom` 0.01 |
+| Eyes | The eyeballs of the mesh at the size of the source, with the `eye` finish and the eye light ("Eyes" above), the gaze shift of the color map ("Color map" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend
 --out assets/models/rabbit/tripo-hand/rabbit.rig.glb`). License of both files: CC BY-NC 4.0, as the
@@ -342,13 +281,14 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 847,100 bytes | `7462376dc96bf5ca9ca682d13936e508403bb1f4941fe00813155962af37c996` |
-| `tripo-hand/rabbit.rig.json` | 17,549 bytes | `487f93620377b70ab22c13b87c200ca1cdb061151ba5884abbc64e73d32c9331` |
+| `tripo-hand/rabbit.rig.glb` | 1,038,444 bytes | `fc251d75e88a4f8fe5b00e5bc4d95b62bb3ddcc26c84b28f5f694824e13a4970` |
+| `tripo-hand/rabbit.rig.json` | 17,548 bytes | `15af1a7c52a2c8385122c8c6381ad0160c35daa4288b1db3e640833f07610cab` |
 
 The scripts of the session (`scratch/rabbit2/` of the worktree, which git ignores: `build.py`,
-`redits.py`, `rimport.py`, `rings.py`, `make_config.py`, and `params.json`) are not in the repo.
-They follow the scripts of the new Tripo fox (`assets/models/fox/README.md`). The edits, in the
-order of the work (`sa` is `tools/blender/studio_armature.py`, x is the x of the left arm):
+`redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
+not in the repo. They follow the scripts of the Tripo fox (`assets/models/fox/README.md`). The
+edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`, x is the x of the left
+arm). Each edit is a need of the rig, the seat, or the instrument:
 
 - **Import.** `sa.import_source('assets/models/rabbit/tripo-p2/rabbit.fbx', 1e-5)`, then a turn of
   -90 degrees about Z, because the FBX faces +x. No vertex merges. Each face is flat.
@@ -362,20 +302,23 @@ order of the work (`sa` is `tools/blender/studio_armature.py`, x is the x of the
   rings there carry the bend), the wrist and the paw from x 0.207, and the leg below y 0.157.
 - **Paws turned.** Each vertex past the arm ring at x 0.199 turns rigidly about the rest forearm
   axis by whole ring steps of 36 degrees: -180 degrees on the left (5 steps) and 72 degrees on the
-  right (2 steps), 267 vertices on each side. The 10 quads of the band from the ring at x 0.199
-  go, and new quads join the two rings with the same step offset. The arm rings are flat ovals, so
-  each turned vertex of the far ring then moves back to the place of the ring before the turn, and
-  the move fades to 0 at 0.02 units along the paw. The join has no step. The new quads take the
-  planar UVs of the clean fur patch at UV (0.8693, 0.8285).
-- **Point edits.** Before the surface, in this order, as maps of the rest points: "Eye size",
-  "Paw size", "Arm girth", "Leg girth", and "Longer shins" below.
+  right (2 steps), 267 vertices on each side. New quads join the two rings with the same step
+  offset. Each turned vertex of the far ring moves back to the place of the ring before the turn,
+  and the move fades to 0 at 0.02 units along the paw. The new quads take the planar UVs of the
+  clean fur patch at UV (0.8693, 0.8285) ("Arm twist").
+- **Point edits.** None. The head, the eyes, the cheeks, the trunk, the paws, and the legs keep the
+  form of the source.
 - **Surface.** `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg',
   eye_fans=False, config=<rabbit-tripo.json>)`. The faces of the two eyeballs get the face
-  attribute `eye` and the eye color of the app. The export then gives `ownEyes`.
+  attribute `eye`. The export then gives `ownEyes`. 37 light faces over the nose of the nose box
+  leave the gloss nose, so that they show the color map and no flat light square shows.
 - **Armature.** The armature of the config with a palm for each side: the true palm of the
   source, (-0.035, -0.997, -0.063) in the studio axes with x mirrored on the right, turned by the
   paw turn. The property `hinges` holds the elbow axis of the config of each side, turned about
   its bind upper arm by 6 degrees on the left and -37 degrees on the right ("Arm twist" below).
+  The hip joint lies at (0.0595, 0.287, 0.004): with z 0.0035, the thigh points almost opposite to
+  the hips bone, and the rest frames of the leg bones in Blender scaled by 3e-5, above the limit of
+  `pnpm rig-export`.
 
 The weights, in the order of the work, in the rest pose:
 
@@ -401,104 +344,56 @@ The weights, in the order of the work, in the rest pose:
    the gloss nose take {`head` 1}: 357 vertices.
 6. Ear rows: a plane across the base of each ear, through four points of the left ear base of the
    source, (0.05, 0.785, 0), (0.05, 0.775, -0.07), (0.022, 0.795, -0.035), and (0.078, 0.765,
-   -0.035) (studio axes, x mirrored on the right), mapped by the point edits. Each head vertex above
-   the plane by 0.008 or more and with |x| above 0.002 takes {`ear_<side>` 1}, one from 0 to 0.008
-   {`ear_<side>` 0.5, `head` 0.5}, and each other vertex gives its ear share to `head` (403 ear, 20
-   base, and 329 head rows). With the automatic weights, the inner ear bases near the middle
-   plane counted as head, and the measured H was 0.281 units in place of 0.2025.
+   -0.035) (studio axes, x mirrored on the right). Each head vertex above the plane by 0.008 or
+   more and with |x| above 0.002 takes {`ear_<side>` 1}, one from 0 to 0.008 {`ear_<side>` 0.5,
+   `head` 0.5}, and each other vertex gives its ear share to `head` (403 ear, 20 base, and 339
+   head rows). With the automatic weights, the inner ear bases near the middle plane counted as
+   head, and the measured H was too large.
 
 The trunk, the neck, the head, the hips, the legs, and the tail keep the automatic weights.
 
+**Smooth surface.** No relax, no region colors, no trunk scale, and no belly key: the form stays
+the form of the source. The crease angle 180 gives each corner the mean normal of the faces at its
+vertex, as the smooth shading of an FBX viewer.
+
 **Arm twist.** The roll of each upper arm (from the clavicle) and the twist of each forearm (the
 paw from the upper arm), in degrees, in each moment of the hold `RABBIT_HOLD` of
-`src/pose/bowed-rig.ts` (its comment gives the rest elbow and the rest paw turn):
+`src/pose/bowed-rig.ts` (`pnpm pose-preview violinist`):
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| frog | -40.5 | -13.4 | -27.6 | -3.7 |
-| tip | -40.6 | -13.5 | -24.6 | -28.2 |
-| crossing | -36.1 | -15.1 | -31.1 | 0.5 |
-| rest | 41.3 | 39.7 | 22.7 | -7.2 |
-| lift50 | 38.1 | 13.2 | 6.9 | 6.2 |
-| lower50 | 35.5 | 5.1 | -1.1 | 6.4 |
-| stand | -39.8 | -15.7 | -27.8 | -1.7 |
+| frog | -41.4 | -16.2 | -26.2 | -3.5 |
+| tip | -41.5 | -16.2 | -23.9 | -28.4 |
+| crossing | -36.9 | -18.9 | -29.5 | 1.4 |
+| rest | 38.4 | 39.0 | 23.5 | -7.1 |
+| lift50 | 38.4 | 9.2 | 7.9 | 6.2 |
+| lower50 | 36.3 | 0.7 | 0.0 | 6.1 |
+| stand | -40.5 | -18.5 | -26.5 | -1.5 |
 
 With no paw turn, the right forearm twisted 78 to 115 degrees in each moment.
 
-**Short arms and the violin.** The arms reach 0.252 m from the shoulder joint to the middle of
+**Short arms and the violin.** The arms reach 0.262 m from the shoulder joint to the middle of
 the palm (0.36 m on the rabbit of main), so the violin of the rabbit is 0.6 of the violin of the
-app (`violinScale` of `src/models/species.ts`). The left paw then reaches the fingerboard from 0.24
+app (`violinScale` of `src/models/species.ts`). The source arms cannot reach a larger violin: the
+rule of a violin shop gives 0.477 for these arms. The left paw reaches the fingerboard from 0.25
 of its length from the nut, and the bow paw 0.244 m of the hair (`pnpm hold-reach rabbit
---instrument violin`). With the violin of 0.83 of the first Tripo rabbit, the left paw held the
-violin body and the bow paw moved only 6 cm along the hair.
-
-**Form against the rabbit of main.** The values of `pnpm body-shape violinist --base main`, in
-cm, at the same H of 29.9 cm (main, then this rig):
-
-| Measure | Main | This rig | Source |
-|---|---|---|---|
-| Trunk width W1 to W9 | 41.1 to 24.5 | 33.4 to 21.8 | 34.8 to 21.4 |
-| Trunk depth D3 to D9 | 36.0 to 22.3 | 29.2 to 15.1 | 27.2 to 13.2 |
-| Upper arm girth | 32.1 | 30.8 | 27.5 |
-| Forearm girth | 23.8 | 23.0 | 23.4 |
-| Thigh girth | 47.7 | 49.5 | 54.3 |
-| Shin girth | 29.9 | 30.6 | 34.3 |
-| Seat height | 26.2 | 26.6 | 16.6 |
-
-- **Eye size.** Each eyeball and its socket scale about the middle of the ball by 0.85 (the edit
-  `eyes` of the fox, with the ball middles (±0.0336, 0.7016, 0.0535), rBall 0.033, rIn 0.04, rOut
-  0.07, mid 0.02, and zKeep 0.11). The ball is 0.27 H across (0.32 H in the source). In the front
-  view each ball shows 0.164 of the head width at the eye line. The cute step scaled the balls by
-  1.02 (0.33 H across, 0.20 of the head width), and with the painted eye of the source the eyes
-  read too large.
-- **Cheeks.** The edit `cheeks` of the fox: each point near the cheek point (±0.075, 0.66, 0.08)
-  under each eye moves by up to 0.006 units (2.8 % of the head width) along (±0.8, -0.2, 0.55),
-  the full move to 0.012 units and a smoothstep to 0 at 0.045. The move is 0 within 0.044 units of
-  the middle of a ball, and full from 0.056. Each whisker strip moves as one piece.
-- **Paw size.** From the wrist joint to the finger tips, 0.42 H long in the source against 0.29 H
-  on the rabbit of main. The edit `paw` of the fox (length 0.72, width 0.8, thickness 0.9, ramp
-  0.015 units) makes it 0.30 H.
-- **Arm girth.** Each arm point moves away from the line from the shoulder joint to the wrist
-  joint, square to the line, by a factor of 1 at x 0.07, 1.1 at x 0.085, 1.12 from x 0.1 to 0.13,
-  1.05 at x 0.15, and 1 from x 0.165. The share fades from 1 at 0.032 units from the line to 0 at
-  0.045, so the trunk and the head stay.
-- **Leg girth.** The edit `shin` of the fox with the factor 0.89 on the band y 0.05, 0.07, 0.24,
-  0.27, so that the thighs and the shins come near the girths of main.
-- **Longer shins.** The knee joint lies at y 0.178, high on the leg: the thigh is then 16.1 cm
-  (16.9 cm on main), and the seat height was 20.7 cm. The edit `legs` of the fox makes the band y
-  0.05, 0.07, 0.15, 0.17 (from the ankle to below the knee) 1.39 times longer, and the seat height
-  is 26.6 cm. The thighs keep their length.
-- **Trunk.** Each horizontal section of the trunk scales about its middle by its weight on the
-  trunk bones, with the width and the depth factors 1.12 and 1.18 at the hips, 1.25 and 1.35 at
-  the belly and the waist, 1.12 and 1.22 at the chest, and 1.08 and 1.25 at the neck joint. The
-  trunk then lies between the source and main.
-
-**Smooth surface.** Each face takes the color of its region (pink by a hue below 26.5 degrees and
-a saturation of 0.25 or more, else fur), and ten Taubin rounds (0.5, then -0.53) relax the body,
-with each move clipped to 0.01 units. The loose parts and the gloss nose stay. 37 light gloss
-faces over the nose go back to the fur, so that no flat light square shows.
+--instrument violin`).
 
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, and the shins lean 12
 degrees forward (`legTurns` of the config). The front of the seat lies 0.05 units behind the knee
-joint of the bind. 52 % of the thigh lies on the seat, and the seat height of the app is 0.266 m
-(0.262 m on the rabbit of main).
+joint of the bind, and 52 % of the thigh lies on the seat. The legs keep the length of the source,
+so the seat height of the app is 0.207 m (`seatHeight` of `src/models/studio/rabbit.ts`, 0.262 m on
+the rabbit of main). The chair of the app fits it.
 
-**Belly.** The key `bind_belly` relaxes the posed bind of the 19 vertices with a rest height
-(Blender z) from 0.33 to 0.42, rest y below 0, and atan2(|x|, -y) at most 60 degrees, in 3 rounds
-of P += 0.5 ((mid - P) . n) n (the rule of the first fox). No belly face points down by more than
-30 degrees (largest 28.8, 62.5 before).
-
-**Lids.** A lid on each eye: 14 × 13 points from psi -60 to 60 degrees and lam -40 to 70 degrees
-(40 degrees in and 70 out, the right lid mirrors the range) at 1.17 ball radii, and a lower strip
+**Lids.** A lid on each eye: 14 × 13 points from psi -60 to 60 degrees and lam -48 to 70 degrees
+(48 degrees in and 70 out, the right lid mirrors the range) at 1.14 ball radii, and a lower strip
 at 1.07 radii (the ball reaches 1.051 radii), 156 quads on each side, held turned up 126 degrees
 into the head. The property `lids` holds the angle 2.199115 and the hinge axes, left (0.942765,
-0.333458, 0) and right (0.944886, -0.327399, 0). The lid faces take the UVs of the clean fur patch
+0.333458, 0) and right (0.949856, -0.312687, 0). The lid faces take the UVs of the clean fur patch
 at UV (0.8693, 0.8285) at 0.99 UV for each unit, and the row `head` 1. In the 21 steps of the blink
-no open lid point, side edge, or back edge leaves the head. With lam from -64 to 64 degrees, up to
-6 points of the outer side edge left the head, because the head lies close over the outer side of
-each ball. With the larger eyes of the cute step and 70 degrees in, the open lid reached over the
-middle plane to the other eye. The skin of the upper lid takes no turn, so the opening in the front view reaches 48.5
-degrees up. With a turn of 8 degrees down, the lid line covered the top of the iris.
+no open lid point, side edge, or back edge leaves the head (ray casts). The balls have the size of
+the source, and with the earlier rule (lam -40 to 70 degrees at 1.17 radii) 3 points of the right
+lid left the head at the closed step.
 
 **Color map.** `tools/rabbit-maps.py` writes `rabbit-color.webp` and `rabbit-normal.webp` from the
 source maps and the rig file:
@@ -507,25 +402,34 @@ source maps and the rig file:
 uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py
 ```
 
-It moves the cream fur from sRGB (222, 189, 155) to Oklab L 0.87, C 0.045, h 70 (`FUR`), keeps the
-pink, the white, the black, and the eyeballs, keeps the eye paint of the source with each iris
-moved to the middle of its opening, round, and larger ("Eyes" and "Far view" above), and softens the brows and the sockets
-("Brows" above). The median
-Oklab L, C, and h of the cream fur in the seated front view with no fill light at the frog are L
-0.849, C 0.062, h 75.2 with the fur L 0.90, against L 0.747, C 0.055, h 71.1 on the rabbit of main,
-and in the hall view (`close-views play --at rabbit --no-fill --pause --time 6`) the fur of the
-chest, belly, and thigh is L 0.60, C 0.078, h 57 (the rabbit of main stands at that time, so its
-pose and light differ). The target lies between the two views.
+The color map is the source scaled to 2048 pixels (Lanczos), WebP quality 60, method 6 (Pillow
+13.0.0). No texel changes its color: the cream fur, the pink, the brows, the whiskers, and the eye
+paint stay. The only change is the gaze shift of `tools/gaze_shift.py`. The source paints each
+iris at the inner corner of its eye opening, and with the source place the rabbit looked
+cross-eyed in the front view and down in the play view on a phone. The shift moves each iris, with
+its pupil, as one decal on the ball. Each moved texel is a copy of a texel of the same ball, and no
+texel gets darker:
+
+- The target of each iris is the middle of the eye opening in a view 30 degrees above the forward
+  axis of the head of the seated bind (`VIEW_DOWN`), turned 6 degrees out (`GAZE_OUT`). The
+  default camera looks down 29 degrees at the stage, and the head of the violinist turns down 9
+  degrees in the play. From that camera, the iris of each rabbit shows below the upper lid.
+- The left iris moves 21.1 degrees and the right iris 20.7 degrees on the ball. The source paints
+  no lash line, so the old place of each iris takes white up to the edge (`LASH_LINE`).
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 79,054 bytes | `f5adc3f3beba125d1a22afd4341f34560b198f409603bd7a95fb50d0e17621b6` |
+| `tripo-hand/rabbit-color.webp` | 69,624 bytes | `fa5308f91e6b5208d5d64f298b147dc570e86c906771a4b54ebfb1d404593940` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
 texels), a box scale to 1024 pixels, the tilts times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`)
 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0). The mean
 normal of the source is (0.001, -0.003, 0.993), and 12 texels have z below 0.
+
+**Differences from the source.** The app light is warm and comes from above, so the tan fur reads
+lighter and more cream than in the even gray light of an FBX viewer. The irises lie nearer the
+middle of the eye openings than in the source. Each eye has a blink lid.
 
 ### History
 
@@ -536,4 +440,7 @@ Blender through the Blender MCP tools: arm and knee rings, the left paw turned 5
 the thigh on it, the key `bind_belly`, its own eyes with blink lids, and the color map and normal
 map of its FBX. The new mesh comes from a new turnaround sheet with a cuter form, and the steps
 above repeat that work on it in headless Blender. The old files and the steps of each edit are in
-the git history of this folder, at a385ad8ba^.
+the git history of this folder, at a385ad8ba^. The hand rig of the second mesh at c6f979952 had
+point edits of the look (eyeballs 0.85 of the source, rounder cheeks, smaller paws, thicker arms,
+thinner legs, shins 1.39 times longer, a thicker trunk, a Taubin relax, and a belly key), a crease
+angle of 55, and a color map with a fur shift, a round iris, and softer brows.
