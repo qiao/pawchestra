@@ -393,10 +393,12 @@ The rest of each family:
   `BOW_MOTION.techniqueHoldSec`), and a change can start in the notes before the new technique.
   Reason: merged parts alternate the bow and pizzicato each 0.1 s to 0.2 s, and each change
   turned the paw by up to 175° in a few frames.
-- In a change between the bow and pizzicato, the right hand turns on the side on which it stays
-  nearer the forearm (`mixRotationNear()`). Reason: the bow hand and the pluck hand of the
-  contrabass are near 180° apart, and the shorter path went to the other side in the middle of
-  the change, a turn of up to 140° in one frame.
+- In a change between the bow and pizzicato, the pose solves the bow hold and the pizzicato hold
+  each with its own elbow (`holdArm()`). The hand turns at an even speed on the side on which it
+  stays nearer the mean of the two forearms (`turnNear()`), and the elbow and the wrist move on
+  straight lines between the two holds, in the reach of the arm. Reason: a roll toward the elbow
+  of the moving arm swung the cello paw by 68° in 1/240 s, the bow hand and the pluck hand of the
+  contrabass are near 180° apart, and the pluck palm of the red fox is out of reach.
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
 - **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of

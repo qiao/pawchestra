@@ -630,49 +630,6 @@ export function restHandAt(
 }
 
 /**
- * Gives the direction of the right elbow: to the back of the hand, so that the forearm comes to
- * the wrist from there. A back of the hand along the line from the shoulder to the wrist gives no
- * clear side, so the direction of the hold takes its place, with a smooth change between them.
- *
- * @param rig The points of the player.
- * @param shoulder The posed shoulder joint.
- * @param hand The right hand.
- * @param hold The direction of the hold, in the model axes.
- * @param follow The share of the turn to the back of the hand, from 0 to 1.
- * @param out The vector to write. It must not be `hold`.
- * @returns `out`, with the direction in the model axes.
- */
-function elbowPole(
-  rig: RigPoints,
-  shoulder: Vector3,
-  hand: BowHand,
-  hold: Vector3,
-  follow: number,
-  out: Vector3,
-): Vector3 {
-  armLine.subVectors(hand.wrist, shoulder).normalize();
-  out.copy(hold);
-  out.addScaledVector(armLine, -out.dot(armLine)).normalize();
-
-  // The point that the elbow takes with a straight wrist, seen from the line of the arm.
-  backOfHand
-    .set(0, 1, 0)
-    .applyQuaternion(hand.rotation)
-    .multiplyScalar(rig.forearm)
-    .add(hand.wrist)
-    .sub(shoulder)
-    .normalize();
-  backOfHand.addScaledVector(armLine, -backOfHand.dot(armLine));
-  const side = backOfHand.length();
-  if (side < 1e-9) {
-    return out;
-  }
-
-  const share = smoothstep(Math.min(1, side / CLEAR_AIM)) * follow;
-  return out.multiplyScalar(1 - share).addScaledVector(backOfHand, share / side);
-}
-
-/**
  * Moves the contact point of the bow along the strings to the sounding point of the loudness
  * (design 5.3): from `BowedHold.soundingPoint[0]` of the string length from the bridge in piano to
  * `BowedHold.soundingPoint[1]` in forte. A louder note plays nearer to the bridge
@@ -797,8 +754,6 @@ const stickBind = new Vector3();
 const pluckPalm = new Vector3();
 const bowLocal = new Quaternion();
 const bowBack = new Quaternion();
-const backOfHand = new Vector3();
-const armLine = new Vector3();
 const aim = new Vector3();
 const wristR = new Vector3();
 const solved = createArmPose();
@@ -1402,6 +1357,10 @@ interface HoldArm {
   readonly rotation: Quaternion;
   /** The direction of the elbow, in the model axes. */
   readonly pole: Vector3;
+  /** The elbow of the last solve, in the model axes. */
+  readonly elbow: Vector3;
+  /** The wrist of the last solve, in the reach of the arm, in the model axes. */
+  readonly reached: Vector3;
   /** The world rotation of the forearm of the last solve. */
   readonly forearm: Quaternion;
   /** The roll of the hand around the stick, in radians. */
@@ -1420,6 +1379,8 @@ function createHoldArm(): HoldArm {
     wrist: new Vector3(),
     rotation: new Quaternion(),
     pole: new Vector3(),
+    elbow: new Vector3(),
+    reached: new Vector3(),
     forearm: new Quaternion(),
     angle: 0,
     onStick: 0,
@@ -1430,6 +1391,38 @@ const bowArm = createHoldArm();
 const pluckArm = createHoldArm();
 const meanForearm = new Quaternion();
 const basePole = new Vector3();
+
+/**
+ * Turns from one rotation to another at an even speed, on the side of {@link mixRotationNear}:
+ * the side on which the middle stays nearer a reference rotation. On the long side, a normalized
+ * linear mix turns fastest in the middle: the contrabass paw turned at 2,300°/s there.
+ *
+ * @param a The rotation at the weight 0.
+ * @param b The rotation at the weight 1.
+ * @param t The weight.
+ * @param near The reference rotation.
+ * @param out The quaternion to write. It must not be `a` or `b`.
+ * @returns `out`, a unit quaternion.
+ */
+function turnNear(
+  a: Quaternion,
+  b: Quaternion,
+  t: number,
+  near: Quaternion,
+  out: Quaternion,
+): Quaternion {
+  const sign = a.dot(near) * b.dot(near) < 0 ? -1 : 1;
+  const half = Math.acos(MathUtils.clamp(sign * a.dot(b), -1, 1));
+  const sin = Math.sin(half);
+  if (sin < 1e-6) {
+    return mixRotationNear(a, b, t, near, out);
+  }
+  const wa = Math.sin((1 - t) * half) / sin;
+  const wb = (sign * Math.sin(t * half)) / sin;
+  return out
+    .set(wa * a.x + wb * b.x, wa * a.y + wb * b.y, wa * a.z + wb * b.z, wa * a.w + wb * b.w)
+    .normalize();
+}
 
 /** The parts of the pose that {@link holdArm} reads. */
 interface HoldArmInput {
@@ -1497,7 +1490,6 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
 
   let angle = 0;
   const steady = weight === 1 && pizzicato === 0;
-  const follow = weight * rig.hold.followChange * Math.sin(Math.PI * pizzicato);
   for (let pass = 0; pass < ROLL_PASSES; pass++) {
     const bowRoll = rollToward(rig, bow, aim);
     if (steady) {
@@ -1539,22 +1531,22 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
       angle = MathUtils.clamp(own, mixed - ROLL_SPREAD, mixed + ROLL_SPREAD);
       gripHand(rig, held, angle, heldHand);
     }
-    if (follow > 0) {
-      elbowPole(rig, shoulder.position, heldHand, holdPole, follow, pole);
-    }
     aim.copy(
       solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved)
         .elbow,
     );
   }
   const keep = rig.hold.stickTurnR;
-  out.onStick =
-    keep === null
-      ? 0
-      : turnOnStick(rig, keep, shoulder.position, shoulder.rotation, pole, heldHand);
+  out.onStick = 0;
+  if (keep !== null) {
+    out.onStick = turnOnStick(rig, keep, shoulder.position, shoulder.rotation, pole, heldHand);
+    solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved);
+  }
   out.wrist.copy(heldHand.wrist);
   out.rotation.copy(heldHand.rotation);
   out.pole.copy(pole);
+  out.elbow.copy(solved.elbow);
+  out.reached.copy(solved.wrist);
   out.forearm.copy(solved.lower);
   out.angle = angle;
   return out;
@@ -1572,9 +1564,9 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
  * the bow on the right thigh.
  *
  * The right elbow points to the directions of the hold, so that the arms stay out of the body.
- * The right hand rolls around the stick so that the back of the hand points to the elbow. In the
- * middle of a change between the bow and pizzicato, the elbow turns a part of the way to the back
- * of the hand. The `bow` bone turns back by the roll, so that the hair stays on the strings.
+ * The right hand rolls around the stick so that the back of the hand points to the elbow. A change
+ * between the bow and pizzicato mixes the bow hold and the pizzicato hold ({@link holdArm}). The
+ * `bow` bone turns back by the roll, so that the hair stays on the strings.
  *
  * The caller writes the lean of the hold into the spine before it calculates the frames.
  *
@@ -1672,22 +1664,23 @@ export function poseBowed(
   } else {
     // A change between the bow and pizzicato mixes the two holds of the arm at the same time,
     // each with its own elbow. A roll toward the elbow of the moving arm swung the hand of the
-    // cello by 68° in 1/240 s near the start of a change. The turn of the hand takes the side
-    // on which it stays nearer the mean of the two forearms, as the two hands of the
+    // cello by 68° in 1/240 s near the start of a change. The hand turns at an even speed on the
+    // side on which it stays nearer the mean of the two forearms, as the two hands of the
     // contrabass are near 180° apart.
     holdArm(arm, 0, bowArm);
     holdArm(arm, 1, pluckArm);
     mixRotation(bowArm.forearm, pluckArm.forearm, 0.5, meanForearm);
-    mixRotationNear(bowArm.rotation, pluckArm.rotation, pizzicato, meanForearm, heldHand.rotation);
-    heldHand.wrist.lerpVectors(bowArm.wrist, pluckArm.wrist, pizzicato);
+    turnNear(bowArm.rotation, pluckArm.rotation, pizzicato, meanForearm, heldHand.rotation);
+    // The wrist moves between the wrists that the arm reaches. The plucking palm of the red fox
+    // lies out of the reach of its arm, so the arm went straight before the end of a change, and
+    // the upper arm turned at 5,000°/s just before it.
+    heldHand.wrist.lerpVectors(bowArm.reached, pluckArm.reached, pizzicato);
     angle = bowArm.angle + (pluckArm.angle - bowArm.angle) * pizzicato;
     onStick = bowArm.onStick + (pluckArm.onStick - bowArm.onStick) * pizzicato;
-    mixDirection(bowArm.pole, pluckArm.pole, pizzicato, pole);
-    // In the middle of a change, the elbow also turns a part of the way to the back of the hand.
-    const follow = weight * rig.hold.followChange * Math.sin(Math.PI * pizzicato);
-    if (follow > 0) {
-      elbowPole(rig, shoulder.position, heldHand, pole, follow, pole);
-    }
+    // The elbow moves on a straight line between the elbows of the two holds. A mix of the two
+    // directions of the elbow passed near the line from the shoulder to the wrist, and the upper
+    // arm of the red fox turned at 4,300°/s there.
+    pole.lerpVectors(bowArm.elbow, pluckArm.elbow, pizzicato).sub(shoulder.position);
   }
 
   poleR.copy(pole).applyQuaternion(chestInverse.copy(chest.rotation).invert()).toArray(poleTuple);
