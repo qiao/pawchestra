@@ -759,10 +759,14 @@ hold of the cat of main, the left forearm twisted 125° in the play and -69° at
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
 and its tail has two bones. Its map tool and the map tool of the rabbit paint each eyeball again as
-a calm, natural eye (`paint_eyes()`): an iris that fills most of the opening, a small pupil, an
-off-white sclera, and both eyes nearly parallel. Reason: the source maps paint large dark pupils
-off the middle of the opening, and the eyes read as glassy balls that looked past the viewer. The
-ball takes no painted light, so the eye light gives the one highlight. Its paws turn about the forearms by whole ring steps, and the holds of
+the cartoon eye of the sheet (`paint_eyes()`): a dark brown iris that fills almost the whole
+opening, a pupil of 0.65 of the iris, almost no white, and both eyes nearly parallel. Reason: the
+source eyes read as glassy balls that looked past the viewer, and a half real eye read uncanny on
+the toy-like face. The ball takes no painted light, so the eye light gives the one highlight. The
+faces of the fox and the rabbit are baby faces: eyes 1.2 times larger with their sockets, upper
+lids that do not cover the iris, rounder cheeks, and on the fox a shorter muzzle. Reason: lids
+over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
+forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
 with the paws and the holds of the fox of main, a forearm twisted up to 168°. An arm that the mesh
