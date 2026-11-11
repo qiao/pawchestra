@@ -759,25 +759,29 @@ hold of the cat of main, the left forearm twisted 125° in the play and -69° at
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
 and its tail has two bones. The map tools of the fox and the rabbit keep the eye paint of the
-source (an amber iris, a black pupil, white, and on the fox a painted light and a lash line), and
+source (an amber iris, a black pupil, white, and on the fox a lash line), and
 move each iris as one decal to the middle of its opening (`center_irises()`). Reason: the source
 paints each iris at the inner corner, and both animals looked cross-eyed from the front. The
 rabbit irises take the middle of the opening in the view of the play, with the head turn of the
 play and the camera of the test page, a little out and up (`gaze_targets()`). Reason: with the
 middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. A last
 eye step of each map tool (`far_eyes()`) makes each iris round with the pupil in its middle,
-makes it larger (`IRIS_SCALE`), turns the fox iris a little out (`FAR_GAZE_OUT`), and gives the
+sets its size (`IRIS_SCALE`), turns it out and up (`FAR_GAZE_OUT`, `FAR_GAZE_UP`), and gives the
 white a darker, warm tone and the iris a darker tone. Reason: the source paints each pupil off the
 middle of its iris, as an eye that looks to the side. In the far view of the hall, a wide white
-field around that iris made the eyes read as startled or as a side glance. The map
+field around that iris made the eyes read as startled or as a side glance. The top of the fox
+iris lies under the upper lid, with white only at the sides and a little below. Reason: white
+above the iris read as scared. The rabbit pupil lies near the middle of the opening, with the top
+of the iris just under the upper lid. Reason: with a larger iris higher in the opening, the upper
+lid came near the pupil and the rabbit read as sleepy. The map
 tool of the rabbit also gives its brows and the dark band of its eye sockets half of their
 contrast to the fur, and shorter brows (`soften_brows()`). Reason: the dark, high brows of the
 source read as a frown. The fox
 eyes keep the size of the source ball. The rabbit eyes are smaller than the source ball. Reason:
 with the large dark pupil of the source, the rabbit eyes at the size of the cute step read too
-large. The fox eyes take the finish `varnish` and no eye light (`eyeFinish`), so the painted light
-is the only light of a fox eye. The rabbit source paints no light, so the rabbit eyes keep the
-`eye` finish and the eye light gives their one light. The candidate Tripo polar bear
+large. Neither source paints a light in the eyes, so the fox and the rabbit eyes take the `eye`
+finish, and the eye light gives one small light in the upper part of each eye. Reason: with the
+finish `varnish` and no eye light, the fox eyes read as a dead stare. The candidate Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
@@ -1091,7 +1095,7 @@ shader takes the texel in place of the vertex color of each corner with a point,
 the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
 the instrument keep their colors. The eyes of the mesh take the map with the `eye` finish, so the
 stage lamps and the eye light give them a gloss over the painted eye. An eye with the paint of its
-source and a painted light, as on the fox, takes `varnish` and no eye light. Their face color is the eye
+source and a painted light, as on the polar bear, takes `varnish` and no eye light. Their face color is the eye
 color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
