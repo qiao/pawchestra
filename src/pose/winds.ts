@@ -964,7 +964,10 @@ const BEAVER_BASSOON = {
 
 /** The turns of the horn of the pig around the mouthpiece, relative to the chest (design 5.3). */
 interface HornTurns {
-  /** The turn of the right side, with the bell, forward around the vertical, in degrees. */
+  /**
+   * The turn of the right side, with the bell, forward around the vertical, in degrees. A value
+   * below 0 turns the bell back.
+   */
   readonly right: number;
   /** The turn of the lower end back toward the body, after `right`, in degrees. */
   readonly back: number;
@@ -975,10 +978,11 @@ interface HornTurns {
 /** The turns of the horn of the pig in the playing pose and in the rest pose. */
 const PIG_TURNS = {
   /**
-   * The playing pose: the bell at the right of the torso and in front of it, and the coil in front
-   * of the round belly.
+   * The playing pose: the bell at the right of the torso, open to the back, and the coil in front of
+   * the round belly. With the bell 10° forward, it opened to the side and forward, and the right
+   * paw lay at its rim.
    */
-  play: { right: 10, back: 20, left: 0 },
+  play: { right: -15, back: 20, left: 0 },
   /** The rest pose: the horn lower and further forward, in front of the belly over the lap. */
   rest: { right: 10, back: 30, left: 15 },
 } as const satisfies Readonly<Record<'play' | 'rest', HornTurns>>;
@@ -1001,14 +1005,16 @@ function pigTurn(turns: HornTurns): Quat {
  * The horn hold of the pig (design 5.3), the hold of a real hornist
  * (`docs/reference/wind-technique.md` 2.2): the left paw on the valves at
  * the middle of the body, the right paw in the bell, and the horn across the body from the mouth to
- * the bell at the right of the torso and in front of it. The mouthpiece rests on the lips under
- * the snout disc (`StudioBody.mouth`), and the long snout puts it far in front of the shoulder
- * joints. The horn turns its lower end 20° back toward the body and its right side 10° forward
- * ({@link PIG_TURNS}), so that the coil stands in front of the round belly. With 40° and 20°, the
- * coil went 6.0 cm into the belly. With 15° back and 20° right, or with 25° right, the right paw
- * missed the bell. The left shoulder turns 36° forward, as the shoulder blade of a real player
- * slides forward. The left paw then has 7.6 cm to spare, and the right paw 6.6 cm
- * (`pnpm hold-reach pig --instrument horn`).
+ * the bell at the right of the torso. The mouthpiece rests on the lips under the snout disc
+ * (`StudioBody.mouth`), and the long snout puts it far in front of the shoulder joints. The horn
+ * turns its lower end 20° back toward the body ({@link PIG_TURNS}), so that the coil stands in
+ * front of the round belly, and its right side 15° back, so that the bell opens to the back and the
+ * right paw comes down into it from above, as the bell of a real horn points past the right side
+ * of the body (`docs/reference/wind-technique.md` 2.2). With the right side 10° forward, the bell
+ * opened to the side and forward, and the right paw lay at its rim. With 25° back, the bell went
+ * 3.4 cm into the belly in the lift. With 40° and 20°, the coil went 6.0 cm into the belly. The
+ * left shoulder turns 36° forward, as the shoulder blade of a real player slides forward. The left
+ * paw then has 7.0 cm to spare, and the right paw 18.0 cm (`pnpm hold-fit hornist`).
  *
  * The left elbow points out and a little forward, and the right elbow out and down. The arms of
  * the body are round tubes free of the trunk, so the left elbow stays away from the side, as a horn

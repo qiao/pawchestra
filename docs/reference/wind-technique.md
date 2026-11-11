@@ -480,8 +480,9 @@ The app follows these facts:
   head. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
   free arms stay out of the belly (design 5.3).
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body. The
-  horn lies across the body, with the bell at the right of the torso and in front of it, off the
-  leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The mouthpiece rests on the lips
+  horn lies across the body, with the bell at the right of the torso, open to the back, off the
+  leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The right paw comes down into
+  the bell from above. The mouthpiece rests on the lips
   under the snout disc, at the mouth line of the body (`mouthHeight`, design 4.4), and its rim
   presses the upper lip most. The coil stands in front of the round belly, with a gap. The valves
   follow the double horn chart, with the B♭ side above the written G4 (7.3, `HORN_B_FLAT`).
