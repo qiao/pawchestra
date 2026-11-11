@@ -2,14 +2,14 @@
 # (design 4.5, assets/models/polar-bear/README.md, "Color map" and "Normal map"). The color map
 # scales the source image to 2048 pixels and moves each texel in Oklab. The tan fur of the source
 # goes to the white of the main polar bear in the hall light, and it keeps its strands as small
-# steps of the lightness. The dark nose, pads, and mouth line keep their lightness, and the claws
-# turn as dark as the black claws of the main polar bear. The texels of the eyeballs keep the eye
-# paint of the source, with each iris moved to the middle of its opening in the view of the play
-# (`EYE_PAINT`, "Eyes" of the README). The script reads the triangles, the places, and the texture
-# points of the eyeballs (`ownEyes` of the export) and of the claws (the loose parts of CLAW_PARTS
-# positions) from the rig file. The normal map limits each tilt of the source, scales it to 1024
-# pixels, and stores the tilts times NORMAL_MAP_GAIN of src/scene/fur.ts. The output depends only
-# on the input files and on cwebp 1.5.0.
+# steps of the lightness. The dark pads and mouth line keep their lightness, and the nose and the
+# claws turn as dark as the nose and the black claws of the main polar bear. The texels of the
+# eyeballs keep the eye paint of the source, with each iris moved to the middle of its opening in
+# the view of the play (`EYE_PAINT`, "Eyes" of the README). The script reads the triangles, the
+# places, and the texture points of the eyeballs (`ownEyes` of the export) and of the claws (the
+# loose parts of CLAW_PARTS positions) from the rig file. The normal map limits each tilt of the
+# source, scales it to 1024 pixels, and stores the tilts times NORMAL_MAP_GAIN of src/scene/fur.ts.
+# The output depends only on the input files and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I
 #   tools/polar-bear-maps.py
@@ -61,6 +61,16 @@ CLAW_STEPS = 0.25
 CLAW_PARTS = (25, 40)
 #: The texels around the claw triangles that take the claw color too.
 CLAW_MARGIN = 2
+#: The box of the nose in the places of the rig file (the seated bind): a triangle with its three
+#: corners in the box is a nose triangle. The nose takes the color map with the smooth normals of
+#: the fur. As flat gloss faces, it showed a light square in the key light.
+NOSE_BOX = ((-0.03, 0.834, 0.187), (0.03, 0.887, 0.217))
+#: The Oklab lightness, chroma, and hue (degrees) of the nose. The painted nose of the source
+#: (median Oklab L 0.336 of its dark texels) read brown in the hall light beside the near black nose of the main polar bear.
+NOSE = (0.22, 0.012, 55.0)
+#: The share of the lightness steps of the nose texels around their median that the nose keeps,
+#: so that the nostrils of the source still show.
+NOSE_STEPS = 0.5
 #: The largest length of the x, y tilt of a normal of the source, and the gain of the stored tilts
 #: (`NORMAL_MAP_GAIN` of src/scene/fur.ts). A larger tilt is a baked eye rim, nose, or claw edge of
 #: the source mesh, which the edited mesh does not have.
@@ -255,6 +265,18 @@ def claw_mask(rig, size):
     mask = draw_triangles(triangles, points, np.flatnonzero(claws), size)
     mask = mask.filter(ImageFilter.MaxFilter(2 * CLAW_MARGIN + 1))
     return np.asarray(mask) > 0, len(set(part[claws].tolist()))
+
+
+def nose_mask(rig, size):
+    """Gives the texels of the nose triangles of the rig file (NOSE_BOX), grown by CLAW_MARGIN
+    texels, and the count of the triangles."""
+    triangles, positions, points, _ = rig
+    low, high = (np.array(corner) for corner in NOSE_BOX)
+    inside = np.all((positions >= low) & (positions <= high), axis=1)
+    faces = np.flatnonzero(inside[triangles].all(axis=1))
+    mask = draw_triangles(triangles, points, faces, size)
+    mask = mask.filter(ImageFilter.MaxFilter(2 * CLAW_MARGIN + 1))
+    return np.asarray(mask) > 0, len(faces)
 
 
 def lch(lightness, chroma, hue):
@@ -755,12 +777,20 @@ def color_map(rig):
     median = np.median(lab[claws][:, 0])
     moved[claws] = lch(*CLAW)
     moved[claws, 0] += CLAW_STEPS * (lab[claws][:, 0] - median)
+    # The dark texels of the nose take the nose color, and a texel between dark and fur takes a
+    # smooth mix, so that the fur of the muzzle around the nose stays.
+    nose, nose_count = nose_mask(rig, SIZE)
+    dark = 1 - smoothstep(lab[nose][:, 0], *DARK)
+    tone = np.tile(lch(*NOSE), (int(nose.sum()), 1))
+    tone[:, 0] += NOSE_STEPS * (lab[nose][:, 0] - np.median(lab[nose][dark > 0.5][:, 0]))
+    moved[nose] += dark[:, None] * (tone - moved[nose])
     eyes, count = eye_mask(rig, SIZE)
     moved[eyes] = lab[eyes]
     out = srgb8(linear_of_oklab(moved))
     Image.fromarray(out).save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
     print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {count} eye triangles kept ({int(eyes.sum())} texels), '
-          f'{claw_count} claws ({int(claws.sum())} texels), {os.path.getsize(COLOR_OUT)} bytes')
+          f'{claw_count} claws ({int(claws.sum())} texels), {nose_count} nose triangles '
+          f'({int(nose.sum())} texels), {os.path.getsize(COLOR_OUT)} bytes')
 
 
 def normal_map():

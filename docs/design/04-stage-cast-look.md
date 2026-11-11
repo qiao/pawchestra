@@ -603,7 +603,9 @@ The layout of the `.blend`:
   checks them.
 - **Mesh.** The material slots are `fur` and `gloss`. The mesh has no gloss faces of an eye, and
   `pnpm studio-body` stops for a file with eye fans. The nose has gloss faces on the head bone
-  alone ("Export"). The face attribute `color` gives one color to each face. Each vertex has 1 to
+  alone ("Export"), or fur faces with the color map, as on the Tripo polar bear, whose flat gloss
+  facets showed a light square in the key light. A mesh with no gloss face writes no gloss
+  primitive. The face attribute `color` gives one color to each face. Each vertex has 1 to
   `STUDIO_INFLUENCES` weights that add up to 1. The mesh has one Armature modifier, with no
   envelopes and no preserve volume, and no other modifier. A face can have more than three
   corners, and the export divides it as Blender does.

@@ -617,10 +617,10 @@ the joints of the source, mapped by the point edits.
 
 | Item | Value |
 |---|---|
-| Size | 405,429 bytes |
-| SHA-256 | `73221294d2e564c2c44b4c54d7790e838e48e51a9c7e36209fcd60be0011455a` |
+| Size | 404,801 bytes |
+| SHA-256 | `49c0171a16fa980cc00feb2da2b9d6d96b617925b4433bfb6f852bd6f5afd9ff` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head before the edits, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,772 vertices and 3,950 faces (3,210 quads and 740 triangles, 7,160 triangles), flat faces, and the surface of `sa.add_surface()`. 97 faces are gloss (the nose, sRGB 30, 24, 20). The 128 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/polar-bear/tripo-hand/polar-bear-color.webp`) |
+| Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,772 vertices and 3,950 faces (3,210 quads and 740 triangles, 7,160 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 97 faces of the nose box take the slot `fur` and the color map, with the smooth normals of the fur. The 128 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/polar-bear/tripo-hand/polar-bear-color.webp`) |
 | Armature | `polar_bear_rig`: 60 bones. The 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, +z, to `digit5_<side>`), at the joints of the config. The Action `bind` holds the seated bind. The properties `palm` (0, 0, -1), `seat`, `hinges`, and `lids` come from the steps below |
 | Facts | `height` 1.346171 (the shoulder joints at 0.672 u at 2.003231 m for each unit, so that H is 0.4228 m, the H of the main polar bear), `crease` 55 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -683,6 +683,10 @@ Then, on the rest mesh after the weights:
 - **Smooth surface.** Each face takes one color of its region, and ten Taubin rounds (0.5, then
   -0.53) relax the body, with each move clipped to 0.01 units. The eyeballs, the claws, the gloss
   nose, and the open edges stay.
+- **Nose.** The gloss faces of the nose go to the slot `fur` (`noseFur` of the params), so the
+  nose takes the color map and the smooth normals of the fur. As flat gloss faces in one dark
+  color, its facets showed a light square in the key light. The export then writes no gloss
+  primitive (`write_glb()` of `tools/blender/rig_mesh.py`).
 - **Lids.** A lid on each eye: 14 × 13 points from psi -55 to 60 degrees and lam from -60 to 62
   degrees at 1.2 ball radii, and a lower strip pushed out past the farthest ball point. 156 quads
   on each side, held turned up 126 degrees into the head. The property `lids` holds the angle
@@ -738,8 +742,10 @@ their length, so they are shorter than on main.
    to 0.015).
 4. **Fur.** Each texel moves in Oklab to `FUR` (L 0.92, C 0.015, h 85) plus 0.7 of its lightness
    step and 0.3 of its chroma step from the source fur. A dark texel keeps its lightness and 0.6 of
-   its chroma. The texels of the 18 claws take `CLAW` (L 0.25). The eyeball texels keep the colors
-   of steps 1 and 2. WebP quality 60, method 6 (Pillow 13.0.0).
+   its chroma. The texels of the 18 claws take `CLAW` (L 0.25). The dark texels of the 192 nose
+   triangles (`NOSE_BOX`) take `NOSE` (L 0.22) plus 0.5 of their lightness step from their median
+   (Oklab L 0.336), so that the nostrils still show. The eyeball texels keep the colors of steps 1
+   and 2. WebP quality 60, method 6 (Pillow 13.0.0).
 
 The hall view of the app (`close-views play --demo bach-bwv1050 --time 31 --no-fill --size
 2880x1800`), the median Oklab of the bear pixels (the box 0.1 to 0.3 by 0.5 to 0.75 of the
@@ -758,7 +764,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/polar-bear.rig.glb` | 875,948 bytes | `d18ce7ebd88721665a352dc4f6cd1b925e214ab4b83c0a4917c167853775b3f8` |
-| `tripo-hand/polar-bear.rig.json` | 18,509 bytes | `a385d93ca6998d4931aeef17e8bb3cabf3b29cd5cc1b100f96918d0026614684` |
-| `tripo-hand/polar-bear-color.webp` | 177,224 bytes, 2048 × 2048 | `c8c18c24d8d66754eca06c453ce28b06dc0434640b3cbe3b12aff80a96bcdc7c` |
+| `tripo-hand/polar-bear.rig.glb` | 883,040 bytes | `6531ce1bfc3873d6327a9f274d084a59abd5035e3c70ae2f275918f082e385a1` |
+| `tripo-hand/polar-bear.rig.json` | 18,509 bytes | `6b204497b2b4589bf88b0c5f0bb3d6c737bb4bfa8aad484750efdbbc6bf7ca08` |
+| `tripo-hand/polar-bear-color.webp` | 177,576 bytes, 2048 × 2048 | `3445636300eb5ca1b2d3213048b8de71ae63f2cb7edc34989184015e11396757` |
 | `tripo-hand/polar-bear-normal.webp` | 119,866 bytes, 1024 × 1024 | `a7c97420957c9ba890474f5e429ed9e3740e87616b82b98f1fcbf444711b4e68` |
