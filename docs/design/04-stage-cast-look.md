@@ -744,12 +744,17 @@ the claws of the source to the colors of the bear of main in the hall light (the
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
 hand rig of the third Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the
 cat violist, in the same way. The source FBX is the target of its look: the head, the trunk, the
-limbs, the paws, the legs, the eye paint, and the colors stay as in the source, and its chair fits
-its shorter legs. Reason: the edits toward the form and the colors of the cat of main read as a
-different cat. Its map tool (`tools/cat-maps.py`) only moves each iris to the middle of its
-opening in the play view of the violist and makes it round at the source sizes, and gives the
-gray fur a small cool step, so that it stays gray in the warm stage light. The source paints a
-light in each pupil, so the eyes take the finish `varnish` and no eye light. Its paws turn about
+limbs, the paws, the legs, the iris colors, and the colors stay as in the source, and its chair
+fits its shorter legs. Reason: the edits toward the form and the colors of the cat of main read as
+a different cat. Its eyeballs and sockets are smaller than in the source, each ball sits a little
+deeper, and its front is round (`assets/models/cat/README.md`, "Eye size"). Its map tool
+(`tools/cat-maps.py`) moves each iris to the middle of its opening in the play view of the
+violist, makes it round and large enough to fill the opening with a smaller pupil share
+(`FAR_IRIS_RADIUS`, `PUPIL_RATIO`), turns it up under the upper lid (`GAZE_UP`), and gives the
+gray fur a small cool step, so that it stays gray in the warm stage light. The map paints no light in the pupils,
+so the eyes take the finish `eye` and the eye light. Reason: at the source size, the eyes bulged
+with white above the iris, and the finish `varnish` gave the large dark pupil a glassy band, so
+the eyes read as glass eyes. Its paws turn about
 the forearms by whole ring steps and its elbow axes turn, so that each part of each arm takes at
 most about 45° of roll or twist in the moments of the violist. Reason: with no turn, the right
 forearm twisted up to 127°. Its tail lies on the seat (the key `bind_tail`), and the faces of its
