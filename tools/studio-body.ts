@@ -332,8 +332,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // times longer for the seat of the main fox. Its `.blend` holds the facts of the body: the scale
   // that gives H 0.380 m, near the shown head of the main fox, and the crease angle 55°. The tan
   // fox takes the same rig with the tan palette, and the color maps of `tools/fox-maps.py`. The
-  // maps keep the eye paint of the source with its painted light, so the eyes take the softer
-  // finish `varnish` and no eye light: the painted light is the only light of each eye.
+  // source paints no light in the eyes, so the eyes take the finish `eye` and the eye light, which
+  // gives one small light in the upper part of each eye. With the finish `varnish` and no eye
+  // light, the eyes had no clear light and read as a dead stare.
   [
     'fox',
     {
@@ -344,7 +345,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/fox/tripo-hand/fox.rig.glb',
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
       paletteMaps: { tan: 'assets/models/fox/tripo-hand/fox-tan-color.webp' },
-      eyeFinish: 'varnish',
     },
   ],
   // The viola cat (design 4.4): the candidate hand rig of the Tripo P2 mesh
