@@ -201,9 +201,9 @@ beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joi
 
 | Item | Value |
 |---|---|
-| Size | 393,352 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 393,864 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. 115 faces are gloss (the nose). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
+| Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 115 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
 | Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.977184 (the shoulder joints at 1.508 m for each unit, so that H is 0.41623 m, 1.27 times the H of the dog of main: "Size" below), `crease` 180 |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -257,6 +257,15 @@ The weights, in the rest pose:
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
+
+**Nose.** At the end of the build, the 115 gloss faces of the dark nose go to the slot `fur`
+(`noseFur` of the params). Thus the nose takes the color map, with its painted nostrils, and the
+smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
+The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
+`headShift` (0, 0, -0.007327586) moves the head center of the holds back to the head center of the
+gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
+the map tool does not change it.
 
 **Seat.** The thighs slope 25 degrees down and turn 30 degrees out in the bind, and the shins are
 vertical, as on the dog of main, so that the knees spread around the lower bout of the cello. The
@@ -323,17 +332,15 @@ the viewer, so no iris moves. The same run writes `dog-normal.webp` from the nor
 each x, y tilt limited to 0.2 (1.21 % of the texels), a box scale to 1024 pixels, the tilts times 4
 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
-**Differences from the source.** The app light is warm and comes from above, so the orange fur
-reads more saturated and the cream reads warmer than in the even gray light of an FBX viewer. The
-nose is a gloss face group of one dark color with flat normals, so it shows facets and no painted
-nostrils: the export fails with no gloss face. The front of each elbow has one long quad band, so
-the inner elbow folds in straight lines.
+**Differences from the source.** The app light is warm and comes from above, so the orange fur reads
+more saturated and the cream reads warmer than in the even gray light of an FBX viewer. The front of
+each elbow has one long quad band, so the inner elbow folds in straight lines.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,079,012 bytes | `220c4f1cc220f384d94f0e2e673cb08a6a4efafeef1c5e5a42bc68f96dd3a5a3` |
-| `tripo-hand/dog.rig.json` | 16,130 bytes | `82ac189cb390b70cbadc2302216b6f0f9b9df1afd8bfe86c6cfa99335612e9d3` |
+| `tripo-hand/dog.rig.glb` | 1,084,064 bytes | `6b5687f08957cf142ca53400d22bc0342c8960e5b9697fa708889782bb7a0066` |
+| `tripo-hand/dog.rig.json` | 16,184 bytes | `712be77001139e11263872c715c88a4fb2347cedad39c5557b11b831b61447bf` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |
