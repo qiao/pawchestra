@@ -253,13 +253,24 @@ and white whiskers.
 with a dark ring, and white around it. The source map paints each iris at the inner corner of its
 opening, so in the front view the rabbit looked cross-eyed. `center_irises()` of
 `tools/rabbit-maps.py` (a copy of the method of the Tripo fox, `assets/models/fox/README.md`,
-"Eyes") moves each iris with its pupil as one decal on the ball to the middle of the opening of
-the front view:
+"Eyes") moves each iris with its pupil as one decal on the ball to the middle of the opening in
+the view of the play (`gaze_targets()`):
+
+- The play view looks down 16.7 degrees at the eyes: in the play moments the head turns down 9.3
+  degrees (`pnpm pose-preview violinist`), and the front camera of the test page looks down 7.4
+  degrees at the eyes. With the target in the middle of the opening of the front view, the rabbit
+  looked down and cross-eyed in the play.
+- Parallel rays from that view find the middle of the opening. The target then turns 6 degrees
+  out and 5 degrees up (`GAZE_OUT`, `GAZE_UP`): the turn out stops a cross-eyed look, and the
+  shaded lower white of the stage light made a centered iris read low. The iris middle lies 0.14
+  opening radii out and 0.17 up of the middle of the opening in the play view. The two targets
+  are mirror images, so the eyes stay parallel. In the rest front view the irises lie a little up
+  and out.
 
 - The pupil is the middle of the dark texels of the opening after an erosion, and the iris radius
   is the first ring of 1 degree about it with 5 % white, plus 2 degrees (34 degrees on each side).
-- The left iris moves 11.8 degrees and the right iris 10.8 degrees on the ball (0.31 and 0.28
-  opening radii out, 0.14 and 0.13 opening radii up).
+- The left iris moves 21.7 degrees and the right iris 21.3 degrees on the ball (0.45 and 0.43
+  opening radii out, 0.41 opening radii up, in the front picture of the ball).
 - The iris paint of the source stops at the inner corner, so the hidden part of the moved iris
   takes the mirror of the other side of the same iris. The old place of the iris takes the white
   of the other side of the opening. The source map paints no lash line, and its iris reaches the
@@ -270,6 +281,17 @@ The source map paints no light on the eyes. `EYE_PAINT = 'cartoon'` of the tool 
 cartoon eye of the sheet again (`paint_eyes()`). The eyeballs keep the `eye` finish and the eye
 light of the app, because the source paints no light. The eye light gives the one light of each
 eye. The fox takes `varnish` and no eye light, because its source paints a light.
+
+**Brows.** The source paints thick, dark, high brows on the brow strips and a dark band in each
+eye socket over the eye, and in the play they read as a strong frown. `soften_brows()` of the tool
+moves the texels of the brow strips and of the socket faces (the body faces within 1.6 ball radii
+of a ball middle) toward the fur around them in Oklab. Each keeps half of its step from the fur
+color (`BROW_CONTRAST`, `SOCKET_CONTRAST`), and the brow contrast fades to 0 in the first and the
+last quarter of each brow (`BROW_FADE`), so the brow paint is also shorter. The fur color of a side
+is the median texel of the body faces from 1.6 to 2.6 ball radii. The mean lightness step of the
+brow texels to the fur goes from 0.139 to 0.056 (left) and from 0.130 to 0.053 (right), and of the
+socket texels from 0.21 to 0.10. The brow strips keep their form, so the light of the stage still
+shows a soft brow.
 
 **Cute face.** The face is a baby face, as a moderate first step: open lids and rounder cheeks
 ("Cheeks" and "Lids" below). The muzzle keeps its length. The eyes keep the size from before the
@@ -467,8 +489,9 @@ uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/ra
 ```
 
 It moves the cream fur from sRGB (222, 189, 155) to Oklab L 0.87, C 0.045, h 70 (`FUR`), keeps the
-pink, the white, the black, and the eyeballs, and keeps the eye paint of the source with each
-iris moved to the middle of its opening ("Eyes" above). The median
+pink, the white, the black, and the eyeballs, keeps the eye paint of the source with each iris
+moved to the middle of its opening ("Eyes" above), and softens the brows and the sockets
+("Brows" above). The median
 Oklab L, C, and h of the cream fur in the seated front view with no fill light at the frog are L
 0.849, C 0.062, h 75.2 with the fur L 0.90, against L 0.747, C 0.055, h 71.1 on the rabbit of main,
 and in the hall view (`close-views play --at rabbit --no-fill --pause --time 6`) the fur of the
@@ -477,7 +500,7 @@ pose and light differ). The target lies between the two views.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 77,990 bytes | `1c929460082c595e4b22947c3cddd8bb6fac88124df115595a26743e565d9983` |
+| `tripo-hand/rabbit-color.webp` | 79,436 bytes | `40ecd485e088bbc3ee2377a59d460bf75c27fa393b3052c167b3075506863544` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
