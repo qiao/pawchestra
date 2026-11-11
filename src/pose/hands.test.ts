@@ -26,14 +26,7 @@ import {
   signedDistance,
   surfaceGap,
 } from './test-clearance.ts';
-import {
-  armLengthErrors,
-  createFrames,
-  posedAt,
-  posedPiecePoint,
-  posedPoint,
-  turnOf,
-} from './test-kinematics.ts';
+import { armLengthErrors, createFrames, posedAt, posedPoint, turnOf } from './test-kinematics.ts';
 import type { PosedSkeleton } from './test-kinematics.ts';
 import { NOT_STARTED, PLAYING, allAudible, firstPlayers, sceneOf } from './test-scene.ts';
 import type { ScenePlayer } from './test-scene.ts';
@@ -216,43 +209,35 @@ describe('poseHands (design 5.3, 4.7)', () => {
     expect(curl(0.5 + HAND_MOTION.pluckSec + 0.01)).toBeCloseTo(60 * MathUtils.DEG2RAD, 4);
   });
 
-  it('rests the palms in the lap or on a string before the first play (user reports of 2026-10-06 and 2026-10-13)', () => {
+  it('rests the palms in the lap or beside the knees before the first play (user reports of 2026-10-06 and 2026-10-13)', () => {
     for (const player of players) {
       const posed = posedAt(scene, player, 1, 0, NOT_STARTED);
       const h = player.model.body.headHeight;
       for (const side of ['L', 'R'] as const) {
         const label = `${player.instrument} ${side}`;
-        const rest = HANDS_HOLDS[player.instrument][`rest${side}`];
         const palm = new Vector3(
           ...posedPoint(posed, `hand${side}`, player.model.body[`palm${side}`]),
         );
-        if (rest.kind === 'string') {
-          // The right hand of the harp player rests on its string, as it plays.
-          const offset = new Vector3(...HANDS_HOLDS.harp.palmR);
-          const at = new Vector3(...harpStringPosition(rest.key)).add(offset);
-          const string = new Vector3(
-            ...posedPiecePoint(posed, { bone: 'instrument', at: toVec3(at) }),
-          );
-          expect(Math.abs(palm.distanceTo(string) - rest.away) / h, label).toBeLessThan(1e-6);
+        const knee = posed.frames[boneIndex(`shin${side}`)]?.position ?? new Vector3();
+        if (player.instrument === 'harp') {
+          // The arms of the harpist hang at the sides, and the paws stand beside the knees.
+          expect(Math.abs(palm.x), label).toBeGreaterThan(Math.abs(knee.x));
+        } else if (player.model.studio) {
+          // The skin of a studio body blends the thighs into the hips and the belly, and the
+          // body is one closed shell with the arms. The paw of the round polar bear rests on
+          // the low front of the belly over its thigh, as the hands of a pianist rest in the lap
+          // before a performance. It touches the lap, and the test of the pianist clearance
+          // keeps it and the forearm out of the body (`test-pianist-clearance.ts`). The palm is
+          // nearer to the middle line than the knee.
+          const paw = posedPart(posed, [`hand${side}`, `fingers${side}`]);
+          const lap = posedPart(posed, ['hips', 'spine', `thigh${side}`, `shin${side}`]);
+          expect(partDistance(paw, lap, 0.5 * h), label).toBeLessThanOrEqual(0.015);
+          expect(Math.abs(palm.x), label).toBeLessThan(Math.abs(knee.x));
         } else {
-          if (player.model.studio) {
-            // The skin of a studio body blends the thighs into the hips and the belly, and the
-            // body is one closed shell with the arms. The paw of the round polar bear rests on
-            // the low front of the belly over its thigh, as the hands of a pianist rest in the lap
-            // before a performance. It touches the lap, and the test of the pianist clearance
-            // keeps it and the forearm out of the body (`test-pianist-clearance.ts`). The palm is
-            // nearer to the middle line than the knee.
-            const paw = posedPart(posed, [`hand${side}`, `fingers${side}`]);
-            const lap = posedPart(posed, ['hips', 'spine', `thigh${side}`, `shin${side}`]);
-            expect(partDistance(paw, lap, 0.5 * h), label).toBeLessThanOrEqual(0.015);
-            const knee = posed.frames[boneIndex(`shin${side}`)]?.position ?? new Vector3();
-            expect(Math.abs(palm.x), label).toBeLessThan(Math.abs(knee.x));
-          } else {
-            // The palm is on the thigh.
-            const gap = signedDistance(posedPart(posed, [`thigh${side}`]), palm) / h;
-            expect(gap, label).toBeGreaterThan(0);
-            expect(gap, label).toBeLessThan(0.2);
-          }
+          // The palm is on the thigh.
+          const gap = signedDistance(posedPart(posed, [`thigh${side}`]), palm) / h;
+          expect(gap, label).toBeGreaterThan(0);
+          expect(gap, label).toBeLessThan(0.2);
         }
 
         // The elbow bends: a hanging arm is straight (180°).

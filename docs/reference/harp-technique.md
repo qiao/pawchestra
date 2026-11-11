@@ -184,8 +184,11 @@ The app does not follow these facts:
   decay, so the treble time constant is an estimate.
 - **The lowest strings (section 5).** The band shows the whole envelope also below G1, where a
   real film frame sees only a part of the swing.
-- **The rest on the soundboard (section 5).** Each hand rests on a string, a little away from it
-  (`restL`, `restR`). A left palm on the thigh folds the left shoulder of the deer mesh.
+- **The rest (section 5).** In the rest pose, the arms hang at the sides and both paws stand beside
+  the knees (`restL`, `restR`), as a pianist rests the arms before a performance
+  (`piano-technique.md`, section 8). The sources give the rest of one hand on the edge of the
+  soundboard only while the other hand plays. With each hand on a string, the rest pose looked the
+  same as the play.
 - **The fingers (section 7.1).** The deer paw is a fist: a free thumb and three fingers joined into
   the palm. Thus fingers 2 to 4 close as one group, after the last of their plucks in a group.
 

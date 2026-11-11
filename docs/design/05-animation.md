@@ -266,7 +266,9 @@ The rest of each family:
   Tripo polar bear, the belly does not cover the thighs, so the rest paws lie 1 H above the top of
   the thigh: lower paws are out of the reach of the short arms, and the straight arms go into the
   belly.
-  The deer sits up with each hand near a string.
+  The deer sits up with the arms at its sides and the paws beside the knees, as a pianist rests
+  before a performance. Reason: with each hand near a string, the rest looked the same as
+  the play.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
   rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). A hold

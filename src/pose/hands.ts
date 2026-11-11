@@ -6,7 +6,7 @@ import { harpStringPosition } from '../models/instruments/harp.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import type { PlacedPiece } from '../models/instruments/hold.ts';
 import { pianoKeyFront } from '../models/instruments/piano.ts';
-import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
+import { IDENTITY, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import type { Steps } from '../score/steps.ts';
 import type { PlayerNote } from '../score/types.ts';
@@ -135,25 +135,11 @@ interface HandsHold {
   readonly restR: RestingHand;
 }
 
-/**
- * A hand in the rest pose: in its lap (`lap`), or on a string of the harp, as
- * in the playing pose (`string`).
- */
-type RestingHand =
-  | (LapHand & {
-      readonly kind: 'lap';
-      /** The direction to which the elbow points, out to the side of the body. */
-      readonly pole: Vec3;
-    })
-  | {
-      readonly kind: 'string';
-      /** The key of the string. */
-      readonly key: number;
-      /** The distance of the palm from the strings, in meters, more than in the playing pose. */
-      readonly away: number;
-      /** The direction to which the elbow points. */
-      readonly pole: Vec3;
-    };
+/** A hand in the rest pose, in its lap (design 5.3). */
+type RestingHand = LapHand & {
+  /** The direction to which the elbow points, out to the side of the body. */
+  readonly pole: Vec3;
+};
 
 /** The holds of the piano and the harp. */
 export const HANDS_HOLDS = {
@@ -282,14 +268,12 @@ export const HANDS_HOLDS = {
     // shoulders, with the elbows bent at the sides: the forearms go 2.0 cm and the upper arms 0 cm
     // into the belly at rest (`pnpm pose-depth pianist`).
     restL: {
-      kind: 'lap',
       lap: { along: 0.85, offset: [0.14, 1, -0.45] },
       palm: [0.3, -0.6, 1],
       fingers: [1, -0.3, 0],
       pole: [-1, 0, 0.3],
     },
     restR: {
-      kind: 'lap',
       lap: { along: 0.85, offset: [-0.14, 1, -0.45] },
       palm: [-0.3, -0.6, 1],
       fingers: [-0.08, -0.84, -0.53],
@@ -359,12 +343,27 @@ export const HANDS_HOLDS = {
     // the right thumb shows a thin crease, so the bend stays at 50°.
     thumbClosed: 50 * MathUtils.DEG2RAD,
     restArc: [0, 0, 0],
-    // Both hands rest on a string, a little away from it, as in the play. The right hand rests on
-    // G4: on C4, a face of the right arm folds at rest (`pnpm hold-fit harpist`). A left palm on
-    // the left thigh folds the left shoulder of the deer and flattens its upper arm (flat p5 0.39,
-    // limit 0.55), and the lift twists the upper arm by 170°.
-    restL: { kind: 'string', key: 48, away: 0.02, pole: [-1, -1, 0] },
-    restR: { kind: 'string', key: 67, away: 0.02, pole: [1, -1, 0] },
+    // The arms hang at the sides with the elbows a little bent, and the paws stand beside the
+    // knees, as a pianist rests before a performance (`docs/reference/piano-technique.md`, section
+    // 8). With the hands on their strings, the rest pose looked the same as the play. The fingers
+    // point down and forward along the forearm, and the palm faces down and back: with the palm
+    // down and the fingers forward, the paw swing p95 was 106° to 108° (limit 70°), and with this
+    // paw 68° and 41° (`pnpm arm-check harpist`). The paws stand 0.35 H out from the top of each
+    // thigh and 0.5 H above it: on the top of the thigh, the elbows went 4.2 cm into the belly at
+    // rest, and 0.1 H above it the arms were straight (180°). A palm near the hip (`along` 0.7) put
+    // the paws on the hips with the elbows out (`pnpm pose-depth harpist`).
+    restL: {
+      lap: { along: 1, offset: [-0.35, 0.5, -0.25] },
+      palm: [0, -0.8, 1],
+      fingers: [0.2, -1, -0.8],
+      pole: [-0.4, -1, 0.3],
+    },
+    restR: {
+      lap: { along: 1, offset: [0.35, 0.5, -0.25] },
+      palm: [0, -0.8, 1],
+      fingers: [-0.2, -1, -0.8],
+      pole: [0.4, -1, 0.3],
+    },
   },
 } as const satisfies Readonly<Record<HandsInstrument, HandsHold>>;
 
@@ -398,47 +397,6 @@ interface HandSide {
      */
     readonly arc: Vec3;
   };
-}
-
-/**
- * Gives a hand that rests on its lap: the palm faces the side of the rest hand, and the fingers
- * point in the plane of the palm.
- *
- * @param model The player model.
- * @param hold The hold of the instrument.
- * @param scale The scale of the instrument of the species.
- * @param arm The arm.
- * @param face The side of the palm, in the model axes.
- * @param rest The place of the palm and the direction of the fingers.
- * @returns The place and the world rotation of the `hand` bone.
- */
-function restingHand(
-  model: PlayerModel,
-  hold: HandsHold,
-  scale: number,
-  arm: ArmRig,
-  face: Vec3,
-  rest: RestingHand,
-): Omit<HandSide['rest'], 'arc'> {
-  if (rest.kind === 'string') {
-    // The hand rests on its string as it plays: the fingers point from the shoulder to the palm.
-    const offset = arm.side === 'L' ? hold.palmL : hold.palmR;
-    const at = new Vector3(...hold.keyPoint(rest.key, scale)).add(new Vector3(...offset));
-    const side = new Vector3(...face);
-    const palm = new Vector3(...placePoint(model.pieces, { bone: 'instrument', at: toVec3(at) }));
-    palm.addScaledVector(side, -rest.away);
-    const fingers = palm.clone().sub(new Vector3(...arm.bind.shoulder));
-    fingers.addScaledVector(side, -fingers.dot(side)).normalize().negate();
-    side.multiplyScalar(arm.side === 'L' ? 1 : -1);
-    const rotation = setFromBasis(new Quaternion(), side, fingers);
-    return {
-      wrist: toVec3(palm.sub(new Vector3(...arm.palm).applyQuaternion(rotation))),
-      rotation: toQuat(rotation),
-      pole: rest.pole,
-    };
-  }
-
-  return { ...lapHand(model, arm, rest), pole: rest.pole };
 }
 
 /** The points of a piano or harp player in the bind pose that the pose needs. */
@@ -483,7 +441,7 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
     const h = model.body.headHeight;
     const [out, up, forward] = hold.restArc;
     const arc: Vec3 = [(s === 'L' ? -out : out) * h, up * h, -forward * h];
-    const resting = restingHand(model, hold, scale, arm, turned, rest);
+    const resting = { ...lapHand(model, arm, rest), pole: rest.pole };
     return { arm, face: turned, aim: aim && faceOf(aim), rest: { ...resting, arc } };
   };
 
