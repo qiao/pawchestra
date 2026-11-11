@@ -9,7 +9,12 @@
  *   which the two turn axes are more than {@link OPPOSED_ANGLE} apart (opposite senses);
  * - the largest angle between the two turn axes in a fast step, with its move;
  * - the turn of the instrument in the paw over one move, as the largest path (the sum of the step
- *   turns) and the largest net turn (from the first to the last step).
+ *   turns) and the largest net turn (from the first to the last step);
+ * - the largest detour of the instrument in the stage over one move, with its move: the largest
+ *   sum of the turn from the first step to a step and the turn from that step to the last step,
+ *   less the turn from the first step to the last step. A turn on the short arc has a detour near
+ *   0°. A turn the long way round, such as a viola that swings upside down on its way to the jaw,
+ *   has a large detour.
  *
  * With `--base <ref>`, the commit and the working tree run at the same time, each in a child
  * process (`probeBeside()` of `tools/ref-tree.ts`), and each value of the commit follows in
@@ -57,7 +62,13 @@ const FAST_TURN = 20;
 const OPPOSED_ANGLE = 90;
 
 /** The format version of the JSON text of `--json` (`probeFormat()` of `tools/ref-tree.ts`). */
-const CARRY_FORMAT = 1;
+const CARRY_FORMAT = 2;
+
+/**
+ * The oldest format version whose fields {@link CARRY_FORMAT} keeps: the version 2 only adds the
+ * turn of the instrument in the stage.
+ */
+const CARRY_SINCE = 1;
 
 /** The values of one lift or one lowering of one body. */
 interface MoveCarry {
@@ -77,6 +88,16 @@ interface MoveCarry {
   readonly path: number;
   /** The turn of the instrument in the paw from the first to the last step, in degrees. */
   readonly net: number;
+  /**
+   * The turn of the instrument in the stage from the first to the last step, in degrees. A text of
+   * the format version 1 does not have it.
+   */
+  readonly turn?: number;
+  /**
+   * The largest detour of the instrument in the stage from the short arc of the move, in degrees
+   * ({@link detourOf}). A text of the format version 1 does not have it.
+   */
+  readonly detour?: number;
 }
 
 /** The moves of one role, as the JSON text of `--json` holds them. */
@@ -103,6 +124,11 @@ interface CarrySummary {
   readonly path: number;
   /** The largest net turn of the instrument in the paw over one move, in degrees. */
   readonly net: number;
+  /**
+   * The move of the largest detour of the instrument in the stage, or `null` when no move has a
+   * detour (a text of the format version 1).
+   */
+  readonly detour: MoveCarry | null;
 }
 
 /** The command line of `pnpm carry-check`. */
@@ -245,6 +271,24 @@ interface CarryStep {
 type StepValues = Omit<MoveCarry, 'demo' | 'kind' | 'at'>;
 
 /**
+ * Gives the largest detour of a turn path from its short arc: the largest sum of the turn from the
+ * first turn to a turn and the turn from that turn to the last turn, less the turn from the first
+ * turn to the last turn.
+ *
+ * @param turns The turns, in their order.
+ * @returns The detour, in degrees, or 0 with fewer than two turns.
+ */
+function detourOf(turns: readonly Quaternion[]): number {
+  const [first] = turns;
+  const last = turns.at(-1);
+  if (!first || !last) {
+    return 0;
+  }
+  const direct = turnDegrees(first, last);
+  return Math.max(0, ...turns.map((q) => turnDegrees(first, q) + turnDegrees(q, last) - direct));
+}
+
+/**
  * Measures the carry over the steps of one move.
  *
  * @param steps The turns of each step, in their order, at steps of {@link MOVE_STEP}.
@@ -277,7 +321,18 @@ function stepsCarry(steps: readonly CarryStep[]): StepValues {
 
   const [first] = inPaw;
   const last = inPaw.at(-1);
-  return { fast, opposed, angle, path, net: first && last ? turnDegrees(first, last) : 0 };
+  const carried = steps.map((step) => step.carried);
+  const [start] = carried;
+  const end = carried.at(-1);
+  return {
+    fast,
+    opposed,
+    angle,
+    path,
+    net: first && last ? turnDegrees(first, last) : 0,
+    turn: start && end ? turnDegrees(start, end) : 0,
+    detour: detourOf(carried),
+  };
 }
 
 /**
@@ -348,9 +403,13 @@ function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
  */
 function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
   let worst: MoveCarry | null = null;
+  let detour: MoveCarry | null = null;
   for (const move of moves) {
     if (!worst || move.angle > worst.angle) {
       worst = move;
+    }
+    if (move.detour !== undefined && (!detour || move.detour > (detour.detour ?? 0))) {
+      detour = move;
     }
   }
   return {
@@ -361,6 +420,7 @@ function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
     worst,
     path: Math.max(0, ...moves.map((move) => move.path)),
     net: Math.max(0, ...moves.map((move) => move.net)),
+    detour,
   };
 }
 
@@ -374,17 +434,19 @@ function carrySummary(moves: readonly MoveCarry[]): CarrySummary {
 function carryLines(tree: readonly RoleCarry[], base: readonly RoleCarry[] | null): string[] {
   const degrees = (value: number): string => `${value.toFixed(0)}°`;
   const lines = [
-    `| Role | Moves | Steps >${OPPOSED_ANGLE}° of the fast steps | Largest angle | Turn in the paw: path | Turn in the paw: net | Move of the largest angle |`,
-    '|---|---|---|---|---|---|---|',
+    `| Role | Moves | Steps >${OPPOSED_ANGLE}° of the fast steps | Largest angle | Turn in the paw: path | Turn in the paw: net | Move of the largest angle | Detour in the stage | Move of the largest detour |`,
+    '|---|---|---|---|---|---|---|---|---|',
   ];
   for (const own of tree) {
     const now = carrySummary(own.moves);
     const old = base ? carrySummary(base.find((b) => b.role === own.role)?.moves ?? []) : null;
     const pair = (text: (s: CarrySummary) => string): string =>
       old ? `${text(now)} (${text(old)})` : text(now);
-    const worst = now.worst
-      ? `${now.worst.demo.replace(/\.mid$/, '')} ${now.worst.kind} ${now.worst.at.toFixed(1)} s`
-      : '-';
+    const moveName = (move: MoveCarry | null): string =>
+      move ? `${move.demo.replace(/\.mid$/, '')} ${move.kind} ${move.at.toFixed(1)} s` : '-';
+    // The detour of a move, with the turn of its short arc: `-` for a text of the version 1.
+    const detour = (s: CarrySummary): string =>
+      s.detour ? `${degrees(s.detour.detour ?? 0)} of ${degrees(s.detour.turn ?? 0)}` : '-';
     const cells = [
       own.role,
       pair((s) => String(s.moves)),
@@ -392,7 +454,9 @@ function carryLines(tree: readonly RoleCarry[], base: readonly RoleCarry[] | nul
       pair((s) => degrees(s.angle)),
       pair((s) => degrees(s.path)),
       pair((s) => degrees(s.net)),
-      worst,
+      moveName(now.worst),
+      pair(detour),
+      moveName(now.detour),
     ];
     lines.push(`| ${cells.join(' | ')} |`);
   }
@@ -469,7 +533,7 @@ async function main(): Promise<void> {
   const started = performance.now();
   const roles = await measureRoles(args);
   if (args.json !== null) {
-    writeFileSync(args.json, JSON.stringify({ version: CARRY_FORMAT, roles }));
+    writeFileSync(args.json, JSON.stringify({ version: CARRY_FORMAT, since: CARRY_SINCE, roles }));
     return;
   }
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
