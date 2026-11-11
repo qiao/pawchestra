@@ -806,29 +806,33 @@ passes.
 - [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
       valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
       technique (`docs/reference/wind-technique.md` 2.1).
-- [ ] Tripo hippo: the upper bout of the upright contrabass reaches the shoulders, so the left
-      upper arm goes up to 6.6 cm into its back in the play (`pnpm pose-depth bassist`). Show the
-      user the hold (`reports/2026-11-11-hippo-play/`), and try a smaller bass if it shows.
 - [ ] Tripo hippo: in the pizzicato of `brahms-2` (108 s to 114 s), the right upper arm and the
       right forearm each twist about 62°. A bow tip down keeps both near 47°, but the bow then
       goes 17.6 cm into the belly.
 - [ ] Tripo hippo: at rest, the hanging right arm presses the side of the round belly (the paw
-      4.9 cm, the upper arm 6.6 cm), and the back of the contrabass goes up to 9 cm into the
-      belly. Check both in 2x crops.
-- [ ] Tripo hippo: the larger contrabass widens the footprint of the hippo, so its seats move up
-      to 22 cm, and the rows of `beethoven-1` and `boulanger-matin` move other players up to
-      1.2 m. Check the two hall views.
+      4.9 cm, the upper arm 6.6 cm). Check it in 2x crops.
+- [ ] Tripo hippo: the contrabass of 0.7 on the short end pin, 0.22 H in front of the belly,
+      changes the footprint of the hippo and its seats. Check the hall views of `beethoven-1` and
+      `boulanger-matin`.
 - [ ] Tripo hippo: the gray-pink skin of the FBX reads as a light peach in the app light, and the
       snout casts a dark band over the mouth line. Ask the user before any change of the light.
-- [ ] Tripo hippo bassist: the left upper arm (4 cm to 7 cm) and forearm (about 6 cm) go through
-      the upper bout of the bass in each sample, and the bass goes 9 cm into the body. The left
-      shoulder joint lies 0.26 m behind the strings. No place of the bass in 20 hold variants
-      fixed it within the twist limit. A smaller bass (`bassScale`) or a shorter end pin may fix it.
+- [ ] Tripo hippo bassist: the left forearm goes 3.3 cm into the neck heel of the lower bass in
+      each play sample, and the left claws touch the pegbox (2.8 cm) in the first position.
+      With a left paw tilt of 30°, the claws went 4.2 cm into the upper bout.
+- [ ] Tripo hippo bassist: the bow plays near the end of the fingerboard (`soundingPoint` 0.3 to
+      0.25), because the cello sounding point on the lower bass flips the bow paw on the lowest
+      string. Show the user the frog and tip views (`reports/2026-11-11-cont/hippo/`).
+- [ ] Tripo hippo bassist: the right upper arm goes up to 5.0 cm into the right shoulder in 64% of
+      the play samples of `boulanger-matin` (24% with the higher bass, the same depth).
 - [ ] Tripo cat violist: the left arm twists 55° in the lift (target 45°), the left paw swings
       72° at rest (limit 70), and the play grip turn is 64°. Each elbow that cut the swing turned
-      the viola off its short arc.
+      the viola off its short arc. Lift elbows (`liftPoleL`, arm-check twist p95 / carry-check
+      detour, base 55° / 36°): (0.6, 0.7, 0.5) 54° / 45°, (0.6, 0.4, 0.5) 48° / 58°,
+      (0.6, 0.4, 0.3) 59° / 43°, (0.6, 0.2, 0.5) 38° / 63°, each with 0 opposed steps.
 - [ ] Tripo red fox violinist: with the lower, left violin of the head turn, the bow paw goes
-      2.4 cm into the violin body in 53 % of the lowering samples (17 % before).
+      2.4 cm into the violin body in 53 % of the lowering samples (17 % before). The rest bow via
+      (`restBow.via.reach`) takes it to 2.0 cm at most, and the violin path (`liftReach`) does
+      not help.
 - [ ] Tripo beagle cellist: the clearance sweep puts the cello 12.3 cm into the chest at the bass
       side of the upper back, behind the left upper arm. No view shows it; the fit measures only
       the middle line of the back.
@@ -862,6 +866,11 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Red fox: the bow grip is 2.2 cm from the middle of the paw for the standing soloist.
 - [ ] Bowed strings: the change to pizzicato takes the bow hair 28.5 mm off the strings at one
       stroke of `boulanger-matin` (18.96 s).
+- [ ] Bowed strings: a pizzicato note right after a bowed note (21 of 199 changes of
+      `boulanger-matin`) still takes the bow off 0.2 s before the bowed note ends
+      (`BOW_MOTION.techniqueLeastSec`). A change of 0.1 s turned the bow arm at 3,000°/s.
+- [ ] Rabbit violinist: at the start of the lowering at the end of `boulanger-matin` (280.7 s),
+      the bow turns at 7,124°/s and the bow paw at 5,920°/s for one step (1/240 s).
 - [ ] Bow plan: ask the user to check the slurs that the bow plan infers from the MIDI files (21% to
       38% of the notes).
 - [ ] When the test pause ends, fix the paused tests: the choir shot test, the shot test of the 2 cm
