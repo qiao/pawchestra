@@ -1,6 +1,6 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
-import { toQuat } from '../tuples.ts';
+import { toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
 import { MeshBuilder, transform } from '../mesh.ts';
 import type { MeshData } from '../mesh.ts';
@@ -806,6 +806,117 @@ const PIANO_KEY_TURN: KeyTurn = {
 };
 
 /**
+ * The front of the case and the music desk of the grand piano (design 4.6), in meters before
+ * {@link PIANO_SCALE}. The fallboard stands open behind the keys, the key slip runs in front of
+ * them, and a cheek block closes each end of the keys. The music desk stands on a rail across the
+ * front of the case, just behind the fallboard, and leans back, as the desk of a real grand.
+ */
+export const PIANO_FRONT = {
+  /** The fallboard: its gap over the top of the keys, its height, and its thickness. */
+  fallboard: { gap: 0.014, height: 0.105, thickness: 0.03 },
+  /** The z of the front face of the fallboard. It reaches 1 cm over the back of the keys. */
+  fallboardFront: -0.14,
+  /** The key slip: its height, its thickness, and the drop of its top below the key top. */
+  keySlip: { height: 0.04, thickness: 0.012, drop: 0.024 },
+  /** A cheek block: its width, its height, and its rise over the key top. */
+  cheek: { width: 0.08, height: 0.1, rise: 0.05 },
+  /** The rail of the desk on the rim top: its z, its depth, and its height. */
+  rail: { z: -0.27, depth: 0.05, height: 0.03 },
+  /** The desk: its width, its height, its thickness, and its lean back from vertical. */
+  desk: { width: 0.76, height: 0.27, thickness: 0.016, lean: 18 * MathUtils.DEG2RAD },
+  /** The z of the bottom front edge of the desk. */
+  deskFront: -0.255,
+  /** The ledge at the bottom of the desk: its height and its depth. */
+  ledge: { height: 0.018, depth: 0.035 },
+  /** The sheet music on the desk: its width and its height. */
+  sheet: { width: 0.44, height: 0.21 },
+} as const;
+
+/**
+ * Adds the front of the case ({@link PIANO_FRONT}): the key bed, the key slip, the cheek blocks,
+ * the fallboard, the rail of the desk, the desk with its ledge, and the sheet music.
+ *
+ * @param piece The piece of the piano.
+ */
+function addFront(piece: PieceBuilder): void {
+  const p = PIANO;
+  const f = PIANO_FRONT;
+  const dark = INSTRUMENT_COLORS.pianoCase;
+  const front = CASE_PLAN.front;
+  const half = p.keyboardWidth / 2;
+
+  // The front of the key bed stands back from the front of the keys, so that the front face of a
+  // pressed key does not lie on it.
+  const bedFront = -p.keyOverhang;
+  piece.add(
+    box(2 * CASE_PLAN.side, 0.06, bedFront - front),
+    dark,
+    transform([0, p.keyTop - 0.05, (front + bedFront) / 2]),
+    'lacquer',
+  );
+  const slip = f.keySlip;
+  piece.add(
+    box(p.keyboardWidth, slip.height, slip.thickness),
+    dark,
+    transform([0, p.keyTop - slip.drop - slip.height / 2, slip.thickness / 2]),
+    'lacquer',
+  );
+  const cheek = f.cheek;
+  for (const side of [-1, 1]) {
+    piece.add(
+      box(cheek.width, cheek.height, -front),
+      dark,
+      transform([
+        side * (half + cheek.width / 2),
+        p.keyTop + cheek.rise - cheek.height / 2,
+        front / 2,
+      ]),
+      'lacquer',
+    );
+  }
+  const fall = f.fallboard;
+  piece.add(
+    box(p.keyboardWidth, fall.height, fall.thickness),
+    dark,
+    transform([0, p.keyTop + fall.gap + fall.height / 2, f.fallboardFront - fall.thickness / 2]),
+    'lacquer',
+  );
+
+  const rail = f.rail;
+  piece.add(
+    box(2 * CASE_PLAN.side - PIANO_INSIDE.rim, rail.height, rail.depth),
+    dark,
+    transform([0, p.caseTop - rail.height / 2, rail.z]),
+    'lacquer',
+  );
+  // The desk turns back around its bottom front edge, which stands on the rail.
+  const desk = f.desk;
+  const lean = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -desk.lean);
+  const edge = new Vector3(0, p.caseTop, f.deskFront);
+  const onDesk = (x: number, up: number, out: number): Vec3 =>
+    toVec3(new Vector3(x, up, out).applyQuaternion(lean).add(edge));
+  piece.add(
+    box(desk.width, desk.height, desk.thickness),
+    dark,
+    transform(onDesk(0, desk.height / 2, -desk.thickness / 2), toQuat(lean)),
+    'lacquer',
+  );
+  const ledge = f.ledge;
+  piece.add(
+    box(desk.width, ledge.height, ledge.depth),
+    dark,
+    transform([0, p.caseTop + ledge.height / 2, f.deskFront + ledge.depth / 2]),
+    'lacquer',
+  );
+  const sheet = f.sheet;
+  piece.add(
+    box(sheet.width, sheet.height, 0.002),
+    INSTRUMENT_COLORS.sheet,
+    transform(onDesk(0, ledge.height + sheet.height / 2, 0.001), toQuat(lean)),
+  );
+}
+
+/**
  * Builds the grand piano (design 4.6). It stands on the floor in front of the player, with the
  * lid open to the right of the player. The celesta and the organs use it too.
  *
@@ -841,51 +952,11 @@ export function buildPiano(): InstrumentModel {
   const propX = 0.33;
   const lidHeight = p.caseTop + (propX - hingeX) * Math.tan(p.lidAngle);
   piece.rod([propX, p.caseTop, -0.95], [propX, lidHeight, -0.95], 0.012, 4, dark, 'lacquer');
-  // The key bed, the cheek blocks, the keys, the fallboard, and the music desk. The front of the
-  // key bed stands back from the front of the keys, so that the front face of a pressed key does
-  // not lie on it.
-  const half = p.keyboardWidth / 2;
-  const front = CASE_PLAN.front;
-  const bedFront = -p.keyOverhang;
-  piece.add(
-    box(p.caseWidth, 0.06, bedFront - front),
-    dark,
-    transform([0, p.keyTop - 0.05, (front + bedFront) / 2]),
-    'lacquer',
-  );
-  for (const side of [-1, 1]) {
-    piece.add(
-      box(0.08, 0.1, -front),
-      dark,
-      transform([side * (half + 0.04), p.keyTop, front / 2]),
-      'lacquer',
-    );
-  }
+  addFront(piece);
   addKeys(piece);
-  piece.add(
-    box(p.keyboardWidth, 0.07, 0.02),
-    dark,
-    transform([0, p.keyTop + 0.025, front + 0.01]),
-    'lacquer',
-  );
-  const deskTilt = toQuat(
-    new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -15 * MathUtils.DEG2RAD),
-  );
-  piece.add(
-    box(0.7, 0.26, 0.015),
-    dark,
-    transform([0, p.caseTop + 0.12, -0.38], deskTilt),
-    'lacquer',
-  );
-  // The open sheet music on the desk, on its side to the player.
-  const sheetAt = new Vector3(0, 0.01, 0.0085).applyQuaternion(new Quaternion(...deskTilt));
-  piece.add(
-    box(0.42, 0.2, 0.002),
-    INSTRUMENT_COLORS.sheet,
-    transform([0, p.caseTop + 0.12 + sheetAt.y, -0.38 + sheetAt.z], deskTilt),
-  );
 
   // Three legs, and the lyre with the pedals.
+  const half = p.keyboardWidth / 2;
   for (const [x, z] of [
     [-half, -0.3],
     [half, -0.3],
