@@ -249,17 +249,16 @@ The color map paints a full eye on each eyeball (a black pupil, an amber iris, a
 thin brown brows on the brow strips, a pink nose, pink inner ears and paw pads, a painted smile,
 and white whiskers.
 
-**Eyes.** The eyes are the cartoon eyes of the sheet. The source map paints a large dark iris and
-pupil low on each ball, toward the inner side, and in the app each eye read as a dark glassy ball
-that looked down at the nose. `paint_eyes()` of `tools/rabbit-maps.py` (the method of the Tripo
-fox, `assets/models/fox/README.md`, "Eyes") paints each ball again: the gaze at half the angle
-across of the opening (17.1 degrees out) and at the middle of its height, a dark brown oval iris
-that fills almost the whole opening (1.25 of half the opening height up and down), a black pupil of
-0.65 of the iris radius, and a thin off-white edge only at the outer corner. The ball has no
-painted light, so the eye light of the app gives the one highlight.
+**Eyes.** Each eye is one round, dark, glossy bead, as the bead eyes of main. `paint_eyes()` of
+`tools/rabbit-maps.py` (the method of the Tripo fox, `assets/models/fox/README.md`, "Eyes") gives
+each eye texel the eye color of the app (#15110e), with no iris, no pupil, no white, and no painted
+light. The eye light of the app gives the one soft light. The source map paints a large dark iris
+and pupil low on each ball, and in the app each eye read as a dark glassy ball that looked down at
+the nose. A cartoon eye at 1.2 times the size read too large.
 
-**Cute face.** The face is a baby face, as a moderate first step: eyes 1.2 times larger, open lids,
-and rounder cheeks ("Eye size", "Cheeks", and "Lids" below). The muzzle keeps its length. The
+**Cute face.** The face is a baby face: small round bead eyes, open lids, and rounder cheeks ("Eye
+size", "Cheeks", and "Lids" below). Each bead shows 0.0253 units wide and 0.0287 units high in the
+front view, 0.13 of the head width at the eye line (0.1943 units). The muzzle keeps its length. The
 head height H, the ears, the body, and the colors stay.
 
 ### tripo-hand/rabbit.blend
@@ -271,8 +270,8 @@ longer for the seat height of the rabbit of main ("Longer shins" below).
 
 | Item | Value |
 |---|---|
-| Size | 389,707 bytes |
-| SHA-256 | `cc50e61baa01ce542a0c9d08529c3392babe3b9cbe33f12f7ebadc350bc1bdbe` |
+| Size | 390,247 bytes |
+| SHA-256 | `a8312da9512a4a7e9e6bde6e2607a91745e436e5c6db370917a6bb92c4d63c2a` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the edits, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
@@ -287,8 +286,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 847,104 bytes | `5f079de5ddc5d5e1faffa54738cf9e291edaf4f0e65cac2d82b162469626e9f3` |
-| `tripo-hand/rabbit.rig.json` | 17,549 bytes | `7e967a6aea903c5d94622923a273c1f89f3adc83b72dcfbd9ea61be25010c90d` |
+| `tripo-hand/rabbit.rig.glb` | 847,100 bytes | `789fdb35b47c2dbbf0c82c99c4fa98600f1ba0048bf397e82cc587897d21e2df` |
+| `tripo-hand/rabbit.rig.json` | 17,549 bytes | `b7481ad2aec86b741cf114735638f07f89f1240165e245e8652b7f19a3e28d67` |
 
 The scripts of the session (`scratch/rabbit2/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, and `params.json`) are not in the repo.
@@ -390,10 +389,10 @@ cm, at the same H of 29.9 cm (main, then this rig):
 | Shin girth | 29.9 | 30.6 | 34.3 |
 | Seat height | 26.2 | 26.6 | 16.6 |
 
-- **Eye size.** Each eyeball and its socket scale about the middle of the ball by 1.02 (the edit
+- **Eye size.** Each eyeball and its socket scale about the middle of the ball by 0.72 (the edit
   `eyes` of the fox, with the ball middles (±0.0336, 0.7016, 0.0535), rBall 0.033, rIn 0.04, rOut
-  0.07, mid 0.02, and zKeep 0.11). The ball is now 0.33 H across, 1.2 times the 0.27 H of the
-  scale 0.85 before (0.32 H in the source).
+  0.07, mid 0.02, and zKeep 0.11). The ball is now 0.24 H across (0.32 H in the source). The scale
+  1.02 (0.33 H) gave beads of 0.185 of the head width, too large.
 - **Cheeks.** The edit `cheeks` of the fox: each point near the cheek point (±0.075, 0.66, 0.08)
   under each eye moves by up to 0.006 units (2.8 % of the head width) along (±0.8, -0.2, 0.55),
   the full move to 0.012 units and a smoothstep to 0 at 0.045. The move is 0 within 0.044 units of
@@ -440,8 +439,8 @@ at UV (0.8693, 0.8285) at 0.99 UV for each unit, and the row `head` 1. In the 21
 no open lid point, side edge, or back edge leaves the head. With lam from -64 to 64 degrees, up to
 6 points of the outer side edge left the head, because the head lies close over the outer side of
 each ball. With the larger eyes and 70 degrees in, the open lid reached over the middle plane to the
-other eye. The skin of the upper lid takes no turn, so the opening in the front view reaches 48.5
-degrees up. With a turn of 8 degrees down, the lid line covered the top of the iris.
+other eye. The skin of the upper lid takes no turn. With a turn of 8 degrees down, the lid line
+covered the top of the eye. The opening is a little taller than wide, so no lid turn rounds it.
 
 **Color map.** `tools/rabbit-maps.py` writes `rabbit-color.webp` and `rabbit-normal.webp` from the
 source maps and the rig file:
@@ -460,7 +459,7 @@ pose and light differ). The target lies between the two views.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 79,730 bytes | `74bf1dd90c678d138a2a22ae3da03b6699fad5ba051a30e0b11501439f924246` |
+| `tripo-hand/rabbit-color.webp` | 79,216 bytes | `71e83070ba78166bad87999303601bd6f618fc7df817cd092fef8c99c5fffe7d` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
