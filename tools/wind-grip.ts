@@ -67,6 +67,7 @@ import type { WoodwindId } from '../src/models/instruments/woodwinds.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import type { BoneName } from '../src/models/rig.ts';
+import type { Vec3 } from '../src/models/tuples.ts';
 import { scoreOf } from '../src/score/test-score.ts';
 import {
   closeSurface,
@@ -193,6 +194,19 @@ const ROLES = {
     places: {},
     placeAxes: 'chest',
     parts: { L: ['instrument'], R: ['instrument'] },
+    shafts: [],
+  },
+  // The right paw of the hippo around the stick of the bow, as a bassist holds the French bow
+  // (string-technique 2.1).
+  bassist: {
+    sweep: 'bassist',
+    species: 'hippo',
+    instrument: 'contrabass',
+    tube: stickOf,
+    paws: ['R'],
+    places: {},
+    placeAxes: 'chest',
+    parts: { L: ['instrument'], R: ['bow'] },
     shafts: [],
   },
 } as const satisfies Readonly<Record<string, RoleGrip>>;
@@ -490,6 +504,27 @@ function neckOf(posed: PosedSkeleton): Tube {
   }
   const start = new Vector3(...posedPiecePoint(posed, { bone: board.bone, at: board.from }));
   const end = new Vector3(...posedPiecePoint(posed, { bone: board.bone, at: board.to }));
+  const length = end.distanceTo(start);
+  return { start, axis: end.sub(start).normalize(), length };
+}
+
+/**
+ * Gives the posed stick of a bow: the line of its target `bow-hair`, moved from the hair onto the
+ * stick, from the frog end to the tip end.
+ *
+ * @param posed The posed skeleton.
+ * @returns The stick.
+ * @throws Error if the instrument has no target `bow-hair`.
+ */
+function stickOf(posed: PosedSkeleton): Tube {
+  const hair = posed.model.instrument.targets.find((t) => t.kind === 'bow-hair');
+  if (!hair) {
+    throw new Error(`The ${posed.model.instrument.id} has no target "bow-hair".`);
+  }
+  const onStick = (p: Vec3): Vector3 =>
+    new Vector3(...posedPiecePoint(posed, { bone: hair.bone, at: [p[0], 0, p[2]] }));
+  const start = onStick(hair.from);
+  const end = onStick(hair.to);
   const length = end.distanceTo(start);
   return { start, axis: end.sub(start).normalize(), length };
 }
