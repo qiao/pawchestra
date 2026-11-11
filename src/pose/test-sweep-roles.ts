@@ -78,6 +78,7 @@ const BODY_LOOPS = 2;
  *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
  * - The cat: 20 open loops, the cuts to the two upper arms and 18 open loops of the fourth Tripo
  *   cat and of its eyes and lids.
+ * - The dog: 7 open loops, the cuts to the two upper arms and 5 open loops of the Tripo beagle.
  * - The fox: 6 open loops, the cuts to the two upper arms and the open loops of the source mesh
  *   (the edges of the lids, the brow strips, and the mouth). The build fills the 4 small holes of
  *   the source.
@@ -90,6 +91,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 20],
+  ['assets/models/dog/tripo-hand/dog.rig.glb', 7],
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
@@ -314,13 +316,13 @@ function catBodySurface(posed: PosedSkeleton): ClosedSurface {
 
 /**
  * The closed surface of the body of the dog mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link DOG_BODY_LOOPS}).
+ * ({@link DOG_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function dogBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, DOG_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, DOG_BODY_LOOPS));
 }
 
 /**
