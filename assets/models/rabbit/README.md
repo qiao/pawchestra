@@ -373,11 +373,11 @@ paw from the upper arm), in degrees, in each moment of the hold `RABBIT_HOLD` of
 With no paw turn, the right forearm twisted 78 to 115 degrees in each moment.
 
 **Short arms and the violin.** The arms reach 0.262 m from the shoulder joint to the middle of
-the palm (0.36 m on the rabbit of main), so the violin of the rabbit is 0.6 of the violin of the
-app (`violinScale` of `src/models/species.ts`). The source arms cannot reach a larger violin: the
-rule of a violin shop gives 0.477 for these arms. The left paw reaches the fingerboard from 0.25
-of its length from the nut, and the bow paw 0.244 m of the hair (`pnpm hold-reach rabbit
---instrument violin`).
+the palm (0.36 m on the rabbit of main). The rule of a violin shop gives 0.477 of the violin of
+the app for these arms, but the rabbit plays 0.75 (`violinScale` of `src/models/species.ts`), so
+that the violin reads at its size. The arms keep their length: the left paw reaches the
+fingerboard from 0.63 of its length from the nut, and the bow paw 0.10 m of the hair (`pnpm
+hold-reach rabbit --instrument violin`).
 
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, and the shins lean 12
 degrees forward (`legTurns` of the config). The front of the seat lies 0.05 units behind the knee
