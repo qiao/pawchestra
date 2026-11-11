@@ -759,9 +759,6 @@ passes.
       stops. A thigh that points almost opposite to the hips bone loses precision in the parent
       space of Blender. A tolerance or a fix of the frames in `tools/blender/export_rig.py` would
       allow the measured place.
-- [ ] Tripo wolf candidate: the gloss nose shows flat facets and no painted nostrils. The export
-      (`primitive_arrays()` of `tools/blender/rig_mesh.py`) fails with no gloss face, so the nose
-      cannot keep the color map and the smooth normals of the source.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
@@ -773,8 +770,6 @@ passes.
       wrist at rest and that lowering in the app.
 - [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
       12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
-- [ ] Tripo beagle candidate: the gloss nose shows flat facets and no painted nostrils, as on the
-      wolf.
 - [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
       no ring split. Check the inner elbow fold of the bow arm in the app.
 - [ ] Tripo beagle candidate: the doc comment of `dog` in `src/models/species.ts` still names the
