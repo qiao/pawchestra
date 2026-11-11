@@ -33,6 +33,15 @@ export const BRASS = {
  */
 const TUBA_BELL_LEAN = { bend: 0.55, angle: 15 } as const;
 
+/**
+ * The length of the bell section of the trombone behind the mouthpiece, in meters: the tuning
+ * slide ends beside the cheek. The big head of the panda puts its cheeks beside the mouthpiece, so
+ * with the slide toward the audience, the tuning slide of a real trombone, 0.25 m back over the
+ * left shoulder, went 11 cm to 14 cm into the head, and at rest it stood in front of the eye. The
+ * space of the layout keeps the real length (`BRASS.trombone.length`), so that no seat moves.
+ */
+const TROMBONE_BACK = 0.08;
+
 /** The lacquered brass of the tubes and the bells. */
 const METAL = INSTRUMENT_COLORS.brass;
 
@@ -413,8 +422,8 @@ function trumpet(scale: number): BrassBuild {
  * Builds the trombone with its slide, as a Bach 42 or a Yamaha YSL-891Z
  * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the slide runs
  * along +x. The two slide tubes lie one above the other. The bell section lies at the left of the
- * slide (-z), and its tuning slide goes back over the left shoulder, with a counterweight on its
- * bow.
+ * slide (-z), and its short tuning slide ends beside the cheek ({@link TROMBONE_BACK}), with a
+ * counterweight on its bow.
  *
  * The slide is a second piece on the `slide` bone. Its origin is the slide brace in the first
  * position, and it moves along +x by `travel` to the seventh position.
@@ -435,9 +444,9 @@ function trombone(): BrassBuild {
   }
   main.rod([0.08, 0, 0], [0.08, low, 0], 0.0042, TUBE_SEGMENTS, TRIM, 'metal');
   main.rod([0.08, low / 2, 0], [0.08, low / 2, side], 0.0038, TUBE_SEGMENTS, TRIM, 'metal');
-  // The bell section: the bell pipe from the bell back to the tuning slide over the shoulder,
+  // The bell section: the bell pipe from the bell back to the tuning slide beside the cheek,
   // and the return to the lower inner slide tube. The bell pipe widens toward the bell.
-  const back = t.length - 0.7;
+  const back = TROMBONE_BACK;
   const bellStart = 0.42;
   tubeAlong(
     main,

@@ -404,9 +404,12 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The slide angle (1.1, 1.4).** The slide points a little below the level and to the right
-  (`PANDA_PLAY`). Straight ahead, the short arm of the panda reaches almost none of the slide
-  travel.
+- **The slide angle (1.1, 1.4).** The slide points toward the audience, a little below the level
+  and a little to the right (`PANDA_PLAY`). Straight ahead, the short arm of the panda reaches
+  almost none of the slide travel.
+- **The tuning slide (1.1).** The bell section ends beside the cheek (`TROMBONE_BACK`), in place of
+  over the left shoulder. The big head of the panda puts the cheeks beside the mouthpiece, and a
+  real bell section went into the head.
 - **The slide reach (1.2).** The slide travel is a small part of the real travel, with the right
   arm straight at the seventh position (`slideReachOf()`). The paw at the far side of the brace
   keeps the palm off the audience, and costs a part of the reach. The right grip lies high on the

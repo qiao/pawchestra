@@ -1808,8 +1808,9 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   the valve tops, so the bell lies above the lead pipe, as on a real trumpet. Three piston valves
   with pearl buttons, the saddle of the first valve slide, and the ring of the third valve slide.
 - **Trombone.** The inner slide and its stockings are nickel silver. The outer slide is one bent
-  tube with a ferrule at each open end and a dark bumper on its bow. The bell section has a
-  tuning slide behind the shoulder with a counterweight on its bow.
+  tube with a ferrule at each open end and a dark bumper on its bow. The bell section has a short
+  tuning slide that ends beside the cheek (`TROMBONE_BACK`), with a counterweight on its bow, so
+  that it stays out of the big head of the panda with the slide toward the audience.
 - **Horn.** A double horn: the outer hoop widens in one spiral turn into the bell tail. Four
   rotary valves with silver caps and the levers of the left fingers, the loops of the F side and
   the B♭ side, and the valve slides.

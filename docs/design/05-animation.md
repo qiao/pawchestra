@@ -514,7 +514,9 @@ The rest of each family:
 - The trombone slide takes the position of the chart, the lowest one, or an alternate of a fast
   note that saves two positions of travel (`planSlide()`, `SLIDE_ALTERNATE`). The positions map
   into the travel that the arm reaches, with the ratios of the real distances (`slideTravel()`).
-  The arms do not grow for the slide.
+  The arms do not grow for the slide. The panda points the slide a little to the right of straight
+  ahead and a little down, toward the audience (`PANDA_PLAY`). Reason: at 45° to the right, the
+  slide pointed at the next panda, and straight ahead the arm reaches almost none of the travel.
 
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 

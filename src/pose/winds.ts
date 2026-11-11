@@ -656,19 +656,19 @@ const FOX_FLUTE = {
 
 /**
  * The turns of the trombone hold of the panda while it plays, in degrees (design 5.3). The slide
- * points 10° below the level and 45° to the right, forward and a little down, as the pandas of
- * `orchestra-latest.png` hold it and as a trombonist points it toward the audience
- * (`docs/reference/wind-technique.md` 1.1). The right arm reaches 0.120 m of the slide travel
- * (`pnpm hold-reach panda --instrument trombone`).
+ * points 15° to the right of straight ahead and 20° below the level, toward the audience, as a
+ * trombonist points it (`docs/reference/wind-technique.md` 1.1). The right arm reaches 0.105 m of
+ * the slide travel (`pnpm hold-reach panda --instrument trombone`). With 45° to the right, the
+ * slide pointed at the next panda, and straight ahead the arm reaches 0.03 m to 0.06 m.
  */
 const PANDA_PLAY = {
   /** The turn of the slide to the right of the panda, around the mouthpiece. */
-  right: 45,
+  right: 15,
   /**
-   * The turn of the slide down around the mouthpiece, after the turn right. The value below 0
-   * turns it up from the 15° below the level of the bind pose.
+   * The turn of the slide down around the mouthpiece, after the turn right, from the 15° below
+   * the level of the bind pose.
    */
-  down: -5,
+  down: 5,
   /** The forward turn of the left shoulder. */
   shoulderL: 35,
   /**
@@ -688,14 +688,14 @@ const PANDA_PLAY_TURN = toQuat(
 /**
  * The trombone hold of the panda (design 5.3), the hold of a real trombonist: the left paw holds
  * the trombone at its grip near the mouthpiece, and the right paw moves the slide. The big round
- * head puts the mouth of the panda 0.40 m in front of its shoulder joints, so with the slide of
- * {@link WIND_HOLDS} straight ahead and 15° down, the grip of the first position is 0.588 m from
- * the right shoulder joint, beyond the reach of the arm, and the slide reach is 0. While the panda
- * plays, the slide turns 45° to its right around the mouthpiece, toward the right shoulder, and
- * stays 10° below the level ({@link PANDA_PLAY}), so that the right arm reaches a part of the
- * travel. A real trombonist points the slide toward the audience, and never down to the floor
- * (`docs/reference/wind-technique.md` 1.1). For the same reach, a slide nearer to the level must
- * turn further to the right: the angle from the front stays about 45°.
+ * head puts the mouth of the panda 0.40 m in front of its shoulder joints, so with the slide
+ * straight ahead, the right arm reaches only a few cm of the travel. While the panda plays, the
+ * slide turns 15° to its right around the mouthpiece and points 20° below the level
+ * ({@link PANDA_PLAY}), so that the right arm reaches a part of the travel and the slide points
+ * toward the audience, as a real trombonist points it, never down to the floor
+ * (`docs/reference/wind-technique.md` 1.1). The short tuning slide (`TROMBONE_BACK` of
+ * `models/instruments/brass.ts`) keeps the bell section out of the head. A right shoulder turn of
+ * 50° adds 1.5 cm of reach, and folds two new faces of the right shoulder in each play sample.
  *
  * The left palm faces the inner slide tubes near the mouthpiece brace, and the right palm the
  * upright slide brace (`faceTube`, `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as
@@ -710,8 +710,7 @@ const PANDA_PLAY_TURN = toQuat(
  * the left and its thumb up the brace, as a real trombonist puts the thumb on the top of the brace
  * and the fingers below it, with the wrist "sideways in relation to the face"
  * (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.1 H down the brace and 0.03 H along
- * the slide away from the mouthpiece (`gripShiftR`): the slide points 45° to the right, so the
- * right side of the panda is the far right side of the brace. The paw points 0.8 of the way along
+ * the slide away from the mouthpiece (`gripShiftR`), to the right side of the brace. The paw points 0.8 of the way along
  * the slide (`aimSide`), and the fingers curl 110° around the brace. With the grip 0.08 H along the
  * slide, the middle of the paw lies 5 cm from the brace, and the paw does not grasp it. Both paws
  * keep the aim and the roll of the play at rest (`restAim`): with the roll of the shoulder, the
@@ -722,17 +721,16 @@ const PANDA_PLAY_TURN = toQuat(
  * of the trunk, about 12 cm from the bone to the inner side, so the elbows of the joined arm, down
  * near the trunk, put the inner side of each upper arm 6 cm to 8 cm into the trunk. The left elbow
  * turns 22° out about the line from the shoulder joint to the grip, from the elbows down and
- * forward of {@link WIND_HOLDS}, and the right elbow points 0.8 out for each 1 down (`poleR`). The
- * smaller head (`headFactor` of the rig) puts the mouthpiece and the grips 3 cm further back, so
- * the right elbow bends more. With the right elbow 0.6 out for each 1 down, two faces of the inner
- * right elbow fold in 69% and 37% of the play samples, and the arm gate fails. A turn of the elbow
+ * forward of {@link WIND_HOLDS}, and the right elbow points down and 0.2 out for each 1 down
+ * (`poleR`), below the slide that points toward the audience. The right paw then twists 42° on
+ * its forearm in the play: with the elbow 0.8 out, it twisted 67°. A turn of the elbow
  * turns the frame of the forearm, and the grip turn of the arm gate counts from that frame: the
- * left elbow 48° out turns the left grip 41°, and the right elbow 31° out turns the right grip 28°.
+ * left elbow 48° out turns the left grip 41°.
  * The left grip near the mouthpiece bends the left elbow, so that each degree of the turn moves the
  * upper arm further from the trunk. The right grip 0.05 H higher on the brace lifts the right upper
  * arm off the belly, and costs 1 cm of the slide reach.
  *
- * The middle of the right paw lies at the far side of the brace, so the right arm reaches 0.155 m
+ * The middle of the right paw lies at the right side of the brace, so the right arm reaches 0.105 m
  * of the slide travel of 0.55 m (`pnpm hold-reach panda --instrument trombone`). A real seventh
  * position is 0.57 m from the first position (`docs/reference/wind-technique.md` 1.2), so the slide
  * positions map into the reached travel.
@@ -780,7 +778,7 @@ const PANDA_TROMBONE = {
   rest: holdTurn(-PANDA_PLAY.restDown, 0),
   restShift: [0, -0.048, -0.425],
   poleL: [-0.6, -0.4, -0.7],
-  poleR: [0.8, -1, -0.25],
+  poleR: [0.2, -1, 0],
   restPoleL: [-1.4, -1, -0.3],
   restPoleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
