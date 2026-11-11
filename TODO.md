@@ -717,6 +717,11 @@ passes.
       with the rim faces. A smaller slit needs a point edit that does not open the mouth.
 - [ ] Cat candidate: in the hall light the gray fur is Oklab h 55 (warm), against a neutral gray
       of the source FBX in an even light. A cooler GRAY_FUR step can move it further.
+- [ ] Cat candidate: each eye shows a second, smaller light beside the eye light: the
+      reflection of the hall on the finish `eye`, as on the rabbit. It reads more on the dark
+      pupil of the cat. Check it on a phone in the front view of the test page.
+- [ ] Cat candidate: the smaller eyes have only ray checks of the lids (no lid point leaves the
+      head in a blink step). Check a blink in the app.
 - [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
       expects 4"), so the clearance of the thicker arms and the larger head has only renders.
 - [ ] Tripo fox candidate: a dark wedge of the socket lining shows at a lower eye corner in the
