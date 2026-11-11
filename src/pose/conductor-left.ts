@@ -125,7 +125,7 @@ export function beatLevels(
  * @param to The end of the window.
  * @returns The mean, or `null` if no beat is in the window.
  */
-function meanIn(
+export function meanIn(
   beats: Float64Array,
   values: Float32Array,
   from: number,
@@ -182,15 +182,19 @@ export function findHolds(notes: readonly PlayerNote[]): Hold[] {
 
 /**
  * Limits the change of a weight from one beat to the next, so that a gesture takes at least
- * `1 / maxRate` seconds. A forward pass limits each rise, and a backward pass limits each fall.
+ * `1 / rate` seconds. A forward pass limits each rise, and a backward pass limits each fall.
  * Both only lower a weight, so a short peak gives a smaller gesture.
  *
  * @param beats The times of the beats, sorted.
  * @param weights The weight at each beat. The function changes it in place.
+ * @param rate The largest change in 1 s. `LEFT_HAND_RULES.maxRate` by default.
  * @returns `weights`.
  */
-function limitRate(beats: Float64Array, weights: Float32Array): Float32Array {
-  const rate = LEFT_HAND_RULES.maxRate;
+export function limitRate(
+  beats: Float64Array,
+  weights: Float32Array,
+  rate: number = LEFT_HAND_RULES.maxRate,
+): Float32Array {
   for (let k = 1; k < weights.length; k++) {
     const step = rate * ((beats[k] ?? 0) - (beats[k - 1] ?? 0));
     weights[k] = Math.min(weights[k] ?? 0, (weights[k - 1] ?? 0) + step);
@@ -210,7 +214,7 @@ function limitRate(beats: Float64Array, weights: Float32Array): Float32Array {
  * @param to The value of the weight 1.
  * @returns The weight, from 0 to 1.
  */
-function rampOf(value: number, from: number, to: number): number {
+export function rampOf(value: number, from: number, to: number): number {
   return smoothstep((value - from) / (to - from));
 }
 
@@ -264,7 +268,7 @@ export function buildLeftHandTrack(
  * @param time The song time.
  * @returns The value. Before the first beat and after the last beat, the value of that beat.
  */
-function valueAt(beats: Float64Array, values: Float32Array, time: number): number {
+export function valueAt(beats: Float64Array, values: Float32Array, time: number): number {
   const k = lastAtOrBefore(beats, time);
   if (k < 0) {
     return values[0] ?? 0;

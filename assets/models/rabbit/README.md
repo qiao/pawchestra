@@ -197,7 +197,7 @@ A run gives the same bytes.
 ### hand-rig/rabbit.blend
 
 The hand rig of the rabbit (design 4.4, "Hand rig"), made in a live Blender 5.2 from
-`tripo/rabbit.fbx`: the mesh, the colors, the armature, the weights, the pea eyes, the seated bind
+`tripo/rabbit.fbx`: the mesh, the colors, the armature, the weights, the bead eyes, the seated bind
 (the Action `bind`), and the facts of the body. Each edit of the mesh was a point edit by hand, or
 one translation, scale, or loop cut of a named part.
 

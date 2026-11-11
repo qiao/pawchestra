@@ -20,7 +20,7 @@ model folder gives the files of each step.
 | cat | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor`), arm roots moved to the trunk (`dog-arms-clip.glb`, `weightMoves`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor`), color edges cut (`panda_edge.py`), a right elbow `raise`, rigid root faces (`rigidPainted`), the old form of the rig config. | `trombonist` |
-| hippo | T-pose mesh, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller pea eyes, point edits that fill the furrow between the brows (`hippo-edits.json`). Stands at the contrabass. | `bassist` |
+| hippo | T-pose mesh, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller bead eyes, point edits that fill the furrow between the brows (`hippo-edits.json`). Stands at the contrabass. | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
 | elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
 | beaver | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor`), rigid crease faces (`rigidPainted`), root skin normals, a tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
@@ -300,7 +300,7 @@ Design 4.4 gives the merges of each copy.
   the groove makes the neck a thick column.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
-- An old eye that is a ball in a groove shows a light rim or a dark almond around the pea eye.
+- An old eye that is a ball in a groove shows a light rim or a dark almond around the bead eye.
   Fill it (`eyeFill`), or move the dome and groove vertices along the eye axis onto the face
   surface, and put the eye object on that surface. A ball with a painted eye
   stays (step 3 of "Steps of a hand rig").

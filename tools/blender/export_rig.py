@@ -12,7 +12,7 @@ move of each key `arm_raise_*` is its move in the bind. The bake must match the 
 evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the shapes of the source
 (`correctives()`, `split_shapes()`), the seat top (`seat_masks()`), and the rule of the arm
 segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
-middle, the direction, and the size of each pea eye in the bind (`eyes_of()`). A file with no eye
+middle, the direction, and the size of each bead eye in the bind (`eyes_of()`). A file with no eye
 objects shows the eyes of its mesh: the faces with the face attribute `eye` give the middle of each
 eye in the bind (`own_eyes_of()`) and the triangles of each eye, and the app adds no bead eyes. Such
 a file can have lids: the

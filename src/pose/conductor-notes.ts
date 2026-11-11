@@ -1,5 +1,7 @@
 import type { Beat, PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
+import { EXPRESSION_MOTION } from './conductor-expression.ts';
+import type { ExpressionTrack } from './conductor-expression.ts';
 import { COUNT_IN, inCountIn } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { gestureSize } from './loudness.ts';
@@ -63,6 +65,13 @@ export const CONDUCTOR_MOTION = {
    * 0.4 units, it was 0.17 H higher.
    */
   readyLift: 0.22,
+  /**
+   * A staccato stroke rebounds to the top of its arc in this part of the beat, stops there, and
+   * falls into the next beat from `strokeFall` with its full speed (`strokeOf()`). A legato stroke
+   * moves with no stop, as a change of direction with no click (`conductor-technique.md`).
+   */
+  strokeRebound: 0.3,
+  strokeFall: 0.7,
 } as const;
 
 /** The baton data that the pose looks up at each frame. */
@@ -73,6 +82,10 @@ export interface BatonTrack {
   readonly points: Float64Array;
   /** The height of the arc of the baton before each beat, in meters. */
   readonly arcs: Float64Array;
+  /** The staccato weight of the stroke from each beat to the next: 0 legato, 1 staccato. */
+  readonly snaps: Float32Array;
+  /** The energy of the stroke from each beat to the next: the loud weight, from 0 to 1. */
+  readonly energies: Float32Array;
   /**
    * The point of the baton before the first beat and after the last beat: the point of the last
    * beat of the first bar, in meters.
@@ -115,22 +128,34 @@ function beatLoudness(
 
 /**
  * Calculates the baton data of a score (design 5.4). Each beat has the point of its pattern,
- * scaled by the gesture size of the loudness of the beat.
+ * scaled by the gesture size of the loudness of the beat. A loud passage makes the pattern larger
+ * and higher, and a soft passage makes it smaller and lower (`EXPRESSION_MOTION`). Each stroke
+ * takes the staccato weight of its beat.
  *
  * @param beats The conducted beats of the score, sorted by time.
  * @param notes The notes of the score, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
+ * @param expression The expression data of the score, with the same beats.
  * @returns The baton data.
  */
 export function buildBatonTrack(
   beats: readonly Beat[],
   notes: readonly PlayerNote[],
   loudness: ArrayLike<number>,
+  expression: ExpressionTrack,
 ): BatonTrack {
   const m = CONDUCTOR_MOTION;
+  const e = EXPRESSION_MOTION;
   const times = Float64Array.from(beats, (b) => b.timeSec);
   const loud = beatLoudness(times, notes, loudness);
-  const sizes = Array.from(loud, (l) => m.scale * gestureSize(l, 1));
+  const sizes = Array.from(loud, (l, k) => {
+    const dynamics =
+      1 +
+      e.loudSize * (expression.loud[k] ?? 0) -
+      e.softSize * (expression.soft[k] ?? 0) +
+      e.riseSize * (expression.rise[k] ?? 0);
+    return m.scale * gestureSize(l, 1) * dynamics;
+  });
   const points = new Float64Array(2 * beats.length);
   const arcs = new Float64Array(beats.length);
   for (const [k, beat] of beats.entries()) {
@@ -138,7 +163,8 @@ export function buildBatonTrack(
     const [x, y] = pattern[beat.indexInBar % pattern.length] ?? [0, 0];
     const size = sizes[k] ?? 0;
     points[2 * k] = x * size;
-    points[2 * k + 1] = y * size;
+    points[2 * k + 1] =
+      y * size + e.loudLift * (expression.loud[k] ?? 0) - e.softDrop * (expression.soft[k] ?? 0);
     arcs[k] = (beat.indexInBar === 0 ? m.downbeatArc : m.beatArc) * size;
   }
   const first = beats[0];
@@ -149,6 +175,8 @@ export function buildBatonTrack(
     beats: times,
     points,
     arcs,
+    snaps: expression.snap,
+    energies: expression.loud,
     rest: [x * size, y * size],
     ready: [0, (y + m.readyLift) * size],
   };
@@ -161,6 +189,29 @@ export interface BatonState {
 }
 
 /**
+ * Gives the part of the path of a stroke at a part of its time (design 5.4). A legato stroke
+ * moves at an even pace. A staccato stroke rebounds fast to the top of its arc, stops there, and
+ * falls into the next beat with its full speed, as a click of the wrist.
+ *
+ * @param progress The part of the time of the stroke, from 0 to 1.
+ * @param snap The staccato weight: 0 legato, 1 staccato.
+ * @param energy The energy of the stroke, from 0 to 1: a loud stroke rebounds sooner and falls
+ *   later and faster (`EXPRESSION_MOTION.loudEnergy`).
+ * @returns The part of the path, from 0 to 1.
+ */
+function strokeOf(progress: number, snap: number, energy: number): number {
+  const rebound = CONDUCTOR_MOTION.strokeRebound - EXPRESSION_MOTION.loudEnergy * energy;
+  const fall = CONDUCTOR_MOTION.strokeFall + EXPRESSION_MOTION.loudEnergy * energy;
+  let stopped = 0.5;
+  if (progress < rebound) {
+    stopped = 0.5 * (1 - (1 - progress / rebound) ** 2);
+  } else if (progress > fall) {
+    stopped = 0.5 + 0.5 * ((progress - fall) / (1 - fall)) ** 2;
+  }
+  return progress + (stopped - progress) * snap;
+}
+
+/**
  * Writes the point of the baton on its path from one point to the next. The baton leaves a point
  * upward and comes down into the next point, so that each beat is the low point of a bounce.
  *
@@ -168,7 +219,9 @@ export interface BatonState {
  * @param from The start point.
  * @param to The end point.
  * @param arc The height of the arc.
- * @param progress The part of the path, from 0 to 1.
+ * @param progress The part of the time of the path, from 0 to 1.
+ * @param snap The staccato weight of the stroke ({@link strokeOf}).
+ * @param energy The energy of the stroke ({@link strokeOf}).
  */
 function onArc(
   out: BatonState,
@@ -176,10 +229,13 @@ function onArc(
   to: PatternPoint,
   arc: number,
   progress: number,
+  snap = 0,
+  energy = 0,
 ): void {
-  const along = smoothstep(progress);
+  const part = strokeOf(Math.min(1, Math.max(0, progress)), snap, energy);
+  const along = smoothstep(part);
   out.x = from[0] + (to[0] - from[0]) * along;
-  out.y = from[1] + (to[1] - from[1]) * along + arc * Math.sin(Math.PI * progress);
+  out.y = from[1] + (to[1] - from[1]) * along + arc * Math.sin(Math.PI * part);
 }
 
 /**
@@ -227,7 +283,9 @@ export function batonAt(track: BatonTrack, time: number, out: BatonState, ready 
     onArc(out, pointOf(k), rest, arcs[k] ?? 0, progress);
     return;
   }
-  onArc(out, pointOf(k), pointOf(k + 1), arcs[k + 1] ?? 0, (time - start) / (end - start));
+  const progress = (time - start) / (end - start);
+  const snap = track.snaps[k] ?? 0;
+  onArc(out, pointOf(k), pointOf(k + 1), arcs[k + 1] ?? 0, progress, snap, track.energies[k] ?? 0);
 }
 
 /**

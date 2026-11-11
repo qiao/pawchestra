@@ -10,7 +10,8 @@ The code holds the values of each hold. These product rules apply to each pose:
   references give the source of each fact, and their section "Use in the app" gives the rules of
   the app and where the app differs: [strings](../reference/string-technique.md),
   [winds](../reference/wind-technique.md), [percussion](../reference/percussion-technique.md),
-  [harp](../reference/harp-technique.md), and [piano](../reference/piano-technique.md).
+  [harp](../reference/harp-technique.md), [piano](../reference/piano-technique.md), and
+  [conductor](../reference/conductor-technique.md).
 - **Bodies stay.** The app keeps the mesh of each animal with no stretch of a limb. When a short
   arm does not reach, the app prefers a smaller instrument, a nearer place, or a hold of its own
   to longer arms.
@@ -806,7 +807,8 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 | others, such as 5/4 | `generic`: one down-up motion for each beat unit |
 
 - At each beat, the baton tip is at the point of the beat (`BEAT_PATTERNS`). Between two beats,
-  the tip rises in an arc and comes down at full speed. The size follows the loudness.
+  the tip rises in an arc and comes down at full speed. The size follows the loudness and the
+  level of the passage (Expression).
 - **Count-in.** A click on play does not start the music at once: the conductor first signals the
   players to get ready. The transport starts before the start point (6.5), so the count-in is a
   set of poses at those song times (`COUNT_IN`): a ready pause, then one preparatory beat.
@@ -858,13 +860,54 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   }
   ```
 
+- **Expression** (`pose/conductor-expression.ts`, [conductor
+  technique](../reference/conductor-technique.md)). The bear shows the music with the whole body,
+  as a real conductor does. `buildExpressionTrack()` reads the score before the play, and
+  `expressionAt()` looks it up at each frame, so the pose keeps no state (`EXPRESSION_RULES`,
+  `EXPRESSION_MOTION`).
+
+  ```text
+  score -> level (mean of 1 s) -> soft, loud --> beat size and height, lean, head, crouch, palm
+        -> trend of 2 s -> crescendo ----------> beat grows, chest opens, shoulders rise, palm up
+        -> note lengths per beat -> stroke ----> legato arc, or staccato rebound, stop, and click
+        -> onsets vs the 2 s before -> accent -> head and shoulder jolt, knee dip, breath before
+        -> phrase starts, first beat ---------> breath: chest, head, and shoulders rise
+        -> loud downbeat after a rise --------> climax: both arms open wide and high for one bar
+        -> last tutti chord ------------------> final: held (hold, rise, circle) or short (stop)
+  ```
+
+  - A forte is more energetic more than larger. A loud stroke stops longer at the top of its
+    rebound and falls faster into the ictus (`loudEnergy`), and the body and the head come up.
+    The beat stays below the chin, except at a climax.
+  - A soft passage makes the beat small and low, leans the body toward the players, lowers the
+    head, bends the knees, and puts the left palm down. A left cue takes away a part of the lean
+    (`cueUpright`), so the body comes up for the cue and the head stays clear of the paw.
+  - A legato stroke has no stop. A staccato or accented stroke rebounds to the top of its arc,
+    stops, and falls into the ictus at full speed (`strokeOf()`, `strokeRebound`, `strokeFall`).
+  - The knees dip only on accents, because knees that bob with each beat are a fault of a
+    conductor. Two accents are at least `accentGapSec` apart.
+  - The upper body sways with the bar, more in a legato passage, and the hips move against the
+    sway (`shift`), so the weight stays over the feet. The chest twists further toward a cued
+    section (`cueTwist`), and the head keeps its aim.
+  - A climax is rare: it needs `climaxStartSec` of music before it, and only the largest rises
+    stay, one for each `climaxEverySec`, at least `climaxGapSec` apart.
+  - The left paw rolls its palm up or down with the dynamics (`LEFT_HAND_PLACES`, `palm`). Its
+    twist on the forearm stops at `MAX_TWIST_L` (`maxTwist` of `writeArm()`).
+  - The places of the hands lean, sway, move, and drop with the body (`followBody()`), so the
+    paws keep their clearance to the head.
+  - On a held final chord, the baton leaves the beat, holds, makes one circle before the end of
+    the sound, and stops a little lower. The left palm holds the chord and closes at the end. On a
+    short final chord, the baton stops at its beat with no rebound. The bow follows.
+
 - **Left hand between the cues** (`pose/conductor-left.ts`). A real conductor uses the left hand
-  for the dynamics, for held notes, and for a mirror of the beat (`LEFT_HAND_PLACES`). The places
+  for the dynamics, for held notes, and for a mirror of the beat (`LEFT_HAND_PLACES`). The mirror
+  stays outside of the torso (`MIRROR_IN`). The places
   stand at the left of the head, so the hand shows from behind.
 
   ```text
-  quiet place --mirror--> --swell--> --fade--> --hold--> --cue or ready--> wrist and fingers
-   (always)    (level)    (trend>0)  (trend<0)  (chord)    (5.4 cues)
+  quiet --mirror--> --swell--> --fade--> --hold--> --open--> --cue or ready--> wrist, fingers
+  (always) (level)   (trend>0)  (trend<0,  (chord,   (climax)  (5.4 cues)
+                                 soft)      final)
   each arrow mixes the next place in by its weight, from 0 to 1. A later place wins.
   the playing pose (5.2) then mixes the hanging arm into the result.
   ```

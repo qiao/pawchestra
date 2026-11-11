@@ -360,7 +360,7 @@ gives the same bytes.
 ### hand-rig/cat.blend
 
 The hand rig of the cat (design 4.4, "Hand rig"), made in Blender 5.2 from `tripo/cat-tpose.fbx`:
-the mesh, the colors, the armature, the weights, the pea eyes, the seated bind (the Action
+the mesh, the colors, the armature, the weights, the bead eyes, the seated bind (the Action
 `bind`), its keys, and the facts of the body.
 
 | Item | Value |

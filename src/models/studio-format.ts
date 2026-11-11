@@ -381,7 +381,7 @@ export interface StudioRaise {
 }
 
 /**
- * The pea eyes of a studio body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
+ * The bead eyes of a studio body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
  * which replace the eyes of the mesh. Each eye lies at the bind place of its eye bone and faces out
  * from the middle of the head. Each oval bends to the form of the head surface under it, so that
  * its rim lies at the fur, and its bone lies on the head surface. Each bone moves further out when
@@ -498,7 +498,7 @@ export interface StudioBody {
    */
   readonly mouth?: Vec3;
   /**
-   * The pea eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. It is `null`
+   * The bead eyes, at the eye bones `eye_L` and `eye_R` of {@link StudioBody.heads}. It is `null`
    * for a body that shows the eyes of its mesh (design 4.5): a hand rig with eye faces and no eye
    * objects. Each eye bone then lies at the middle of an eye of the mesh, and these eyes blink with
    * the lids of the body ({@link StudioBody.lids}).

@@ -24,6 +24,8 @@ import { conductorRig } from './conductor.ts';
 import type { ConductorRig } from './conductor.ts';
 import { buildLeftHandTrack } from './conductor-left.ts';
 import type { LeftHandTrack } from './conductor-left.ts';
+import { buildExpressionTrack } from './conductor-expression.ts';
+import type { ExpressionTrack } from './conductor-expression.ts';
 import { buildBatonTrack } from './conductor-notes.ts';
 import type { BatonTrack } from './conductor-notes.ts';
 import { CUE_MOTION, findCues } from './cues.ts';
@@ -144,13 +146,17 @@ export interface PercussionLayer {
   readonly small: SmallTracks | null;
 }
 
-/** The note layer of the conductor: the baton, the cues, and the left hand (design 5.4). */
+/**
+ * The note layer of the conductor: the baton, the cues, the left hand, and the expression of the
+ * body (design 5.4).
+ */
 export interface ConductorLayer {
   readonly family: 'conductor';
   readonly rig: ConductorRig;
   readonly baton: BatonTrack;
   readonly cues: CueTrack;
   readonly left: LeftHandTrack;
+  readonly expression: ExpressionTrack;
 }
 
 /**
@@ -680,8 +686,8 @@ function cueFacts(model: PlayerModel): CueFacts {
 
 /**
  * Calculates the data of the conductor that the pose needs at each frame (design 5.4): the beats
- * of the baton, the cues with the turns to the cued seats, and the levels, the trends, and the
- * held chords for the left hand. The conductor has no timing offset, no look, and a rest motion
+ * of the baton, the cues with the turns to the cued seats, the levels, the trends, and the held
+ * chords for the left hand, and the expression of the body. The conductor has no timing offset, no look, and a rest motion
  * that does not vary. Pure: the same inputs give the same plan.
  *
  * @param inputs The model, the place, the beats, and the notes of the score.
@@ -703,7 +709,8 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
   const { model, place, beats, notes, loudness, players } = inputs;
   const rig = conductorRig(model);
   yield;
-  const baton = buildBatonTrack(beats, notes, loudness);
+  const expression = buildExpressionTrack(beats, notes, loudness, inputs.seatCount);
+  const baton = buildBatonTrack(beats, notes, loudness, expression);
   yield;
   const cues = findCues({
     beats,
@@ -736,6 +743,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
       baton,
       cues,
       left,
+      expression,
     },
   };
 }

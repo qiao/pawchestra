@@ -310,24 +310,24 @@ the facts of its body in its `.blend` ("Hand rig").
 
 - It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
-- It drops the eyes of the mesh, and puts the pea eyes of the app on eye bones of their own, so
+- It drops the eyes of the mesh, and puts the bead eyes of the app on eye bones of their own, so
   that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
   `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
   with no rule. A hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each
   eye bone lies at the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`),
-  and the app adds no pea eyes. Such eyes follow the head bone. A lid on each eye blinks over them
+  and the app adds no bead eyes. Such eyes follow the head bone. A lid on each eye blinks over them
   (`StudioBody.lids`, "Hand rig"). An old eye that stands out as a ball in a
-  groove, or sits in a deep socket, shows a light rim or a gray groove around the pea eye, so the
+  groove, or sits in a deep socket, shows a light rim or a gray groove around the bead eye, so the
   head fills it first (`eyeFill`, the
   elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
   `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
-- A notch of the fur in a pea eye, or a crease beside it, comes from a few faces of the old eye
+- A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
   socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the penguin, the
   rhino), else with a point edit of its rig file (`<s>-edits.json`, the mouse and the elephant) or
   of its `.blend` (the polar bear).
-- A pea eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
+- A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
   view. Each oval turns in the plane of its eye so that it is upright in the front view
   (`uprightRoll()` of `models/eyes.ts`), because a bend on a sloped cheek leaned the tops of the two
@@ -546,8 +546,8 @@ export calculates only the measures, with the functions of `tools/blender/rig_me
 each measure has one definition. It checks each point of the layout below, and stops with the
 name of the first fault.
 
-Each value of a hand rig, such as the bind, the joints, the weights, the keys, the pea eyes, and
-the facts of the body, lives only in its `.blend`. The pea eyes are objects of the `.blend`, so
+Each value of a hand rig, such as the bind, the joints, the weights, the keys, the bead eyes, and
+the facts of the body, lives only in its `.blend`. The bead eyes are objects of the `.blend`, so
 that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves or sizes them. A
 `.blend` with no eye objects shows the eyes of its mesh, which the color map paints. The
 facts of the body (`BODY_FACTS` of `tools/studio-body.ts`), such as the scale, the crease angle,
@@ -732,7 +732,7 @@ of the second Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut
 stretch (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main`
 only after an approval of its look in the app. It shows the color map of its Tripo FBX
 (`rabbit-color.webp`, `tools/rabbit-maps.py`), and it keeps the eyeballs of the source in their
-round sockets, with no pea eyes. Reason: the map paints a full eye on each eyeball (a black pupil,
+round sockets, with no bead eyes. Reason: the map paints a full eye on each eyeball (a black pupil,
 an amber iris, and white), and the socket faces keep their source UVs, so the dark lining
 of the map shows around it. The map paints each iris toward the inner side of its ball, so the map
 tool moves each iris on its ball to the middle of the eye opening of a view from above the head
@@ -818,7 +818,7 @@ so such a mesh takes the mesh rig ("Mesh rig").
 source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
   ->  limb factors (limbs)  ->  edge ring splits on the arms (rings.subdivide)
   ->  armature and seated bind of the config  ->  bone heat, weight smooth, roll split
-  ->  pea eyes and facts  ->  <a>.blend  ->  pnpm rig-export  ->  pnpm studio-body
+  ->  bead eyes and facts  ->  <a>.blend  ->  pnpm rig-export  ->  pnpm studio-body
 ```
 
 - **Quads.** An FBX source keeps its quads, and a GLB source holds only triangles. The join of a
@@ -1056,7 +1056,7 @@ when no light value can match the lit pixels of the reference.
   black with a warm gray desk, because black desks were the largest shapes of some close shots.
 - **Species colors.** `SPECIES_COLORS` gives each species the fur, the belly, and the accent color.
   A studio body keeps the face colors of its rig (4.4). The UI seat dots read the fur color, and a
-  color rule of a rig can move the fur toward it. All pea eyes are black with a light. A body that
+  color rule of a rig can move the fur toward it. All bead eyes are black with a light. A body that
   shows the eyes of its mesh takes the eye colors of its color map (4.4, "Hand rig").
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
   top and darker edges. The clarinet and the oboe are black lacquer with silver keys, the
@@ -1104,7 +1104,7 @@ the candidate rabbit). The module holds the image path and the texture point of 
 A player of such a body takes a copy of the shared material with the map
 (`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
 shader takes the texel in place of the vertex color of each corner with a point, so the light,
-the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the pea eyes, and
+the finish table, the fill, and the grade stay. The gloss nose, the whiskers, the bead eyes, and
 the instrument keep their colors. The eyes of the mesh take the map with the `eye` finish, so the
 stage lamps and the eye light give them a gloss over the painted eye. An eye with the paint of its
 source and a painted light, as on the polar bear, takes `varnish` and no eye light. Their face color is the eye
@@ -1895,7 +1895,7 @@ type BoneName =
 ```
 
 - **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
-  eye bones for the pea eyes (for the lids of a body with the eyes of its mesh), and the
+  eye bones for the bead eyes (for the lids of a body with the eyes of its mesh), and the
   optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
   the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),
   and the thumbs of a fist (`THUMB_BONES`). The optional bones come after the other bones, so

@@ -350,7 +350,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its bead eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
@@ -369,7 +369,7 @@
   },
   "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and a seat 1 cm deeper, so that the back keeps off the chair back.",
   "eyeSize": 0.2018,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no bead eye.",
   "metersPerUnit": 1.4795,
   "metersPerUnitNote": "The scale of the app: H (0.2018 units of the source form) is 0.2985 m, the H of the rabbit of main. The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/rabbit.blend holds it.",

@@ -93,6 +93,6 @@ A run of `pnpm rig-mesh elephant` gives the base. It drops the point edits.
 of the old eye, in the plane of the eye, by 0.02 H (right) and 0.015 H (left). The fill of the
 sockets (`eyeFill` of `tools/studio-body.ts`) put each of these vertices on one line with two
 other corners of its face in the plane of the eye. The face then stood on its edge and showed as
-a thin dark crease beside the pea eye. `pnpm glb-point-edits` reads the base with
+a thin dark crease beside the bead eye. `pnpm glb-point-edits` reads the base with
 `git show ca86cc819:assets/models/elephant/elephant.rig.glb`, so a second run gives the same
 bytes.

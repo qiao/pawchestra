@@ -1,4 +1,4 @@
-"""Holds the pea eyes of a hand rig in its `.blend` (design 4.4, "Hand rig"), in a live Blender.
+"""Holds the bead eyes of a hand rig in its `.blend` (design 4.4, "Hand rig"), in a live Blender.
 
     import studio_eyes as se
     se.place_eyes(rig, body, {'L': (middle, direction, size), 'R': (...)})
