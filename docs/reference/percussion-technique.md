@@ -289,17 +289,16 @@ The app follows these facts:
 - **The grip (section 1).** The curled claws (`GRIP_CURL`) hold the shaft on the palm side, and
   the head leaves the front of the fist at the thumb side (`PAW_SPOT`, `PAW_TILT`). The butt end
   sticks out behind the paw (`malletButt()`, `MALLET_BUTT`).
-- **The bass drum (section 5).** The drum and the beater have the size of real ones [43] [44] at
-  the scale of the badger, its head top over the mean height of an adult [45] (`BASS_DRUM`). The
-  badger stands behind the drum, and the right paw holds the beater at the near rim, one third up
-  from the butt. At the strike, the beater lies along the head, as the photos of [13] show, and
-  strikes about one third in from the rim [16]. The left arm hangs while the badger plays,
-  because a single note often needs no muffling and a march muffles in the rests, not at the
-  strikes [13]. After a note with a rest of at least 0.5 s after it, the free left paw lays its
-  open palm and fingers on the far head and goes back before the next note, as a player muffles
-  the back head with the free hand [13] [58] (`PalmDamp`). The right upper arm hangs beside the
-  body with the elbow down and back (section 3, `poleR`), so that the round rebuilt arm stays out
-  of the belly.
+- **The bass drum (section 5).** The beater has the size of a real one [44], and the drum the depth
+  of a real one [43], at the scale of the badger, its head top over the mean height of an adult [45]
+  (`BASS_DRUM`). The badger stands behind the drum, and the right paw holds the beater at the near
+  rim, one third up from the butt. At the strike, the beater lies along the head, as the photos of
+  [13] show, and strikes near one third in from the rim [16]. The left arm hangs while the badger
+  plays, because a single note often needs no muffling and a march muffles in the rests, not at the
+  strikes [13]. After a note with a rest of at least 0.5 s after it, the free left paw lays its open
+  palm and fingers on the far head and goes back before the next note, as a player muffles the back
+  head with the free hand [13] [58] (`PalmDamp`). The right upper arm hangs beside the body with the
+  elbow down and back (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
   The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
   4 cm above the head, with the stick almost level, as in the ready position
@@ -365,6 +364,11 @@ The app does not follow these facts:
   times from a soft note to a loud note (`gestureSize()`), and a soft note must stay low.
 - **The lean over the bass drum (section 5).** The spine leans over the drum
   (`PercussionHold.lean`), so that the short arm can bend.
+- **The width of the bass drum (section 5).** The drum is 32 inches wide (`BASS_DRUM.radius`),
+  less than the 36 inches of [43] and the 40 inches of [28], and its middle stands lower. With
+  the drum of 36 inches, the snout of the leaning badger touched the top hoop, and a drum further
+  forward or lower put the beater off its spot, because the short arm reaches no farther. No
+  source of this list gives a drum of 32 inches.
 - **The muffle of the bass drum (section 5).** The palm touches the far head near its near rim,
   not near the middle, and the upper body turns 20° to the right for the muffle, because the
   short left arm reaches no farther. The drum keeps its place: a drum moved or turned to the left

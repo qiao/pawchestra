@@ -462,7 +462,7 @@ export const PERCUSSION_HOLDS = {
   // The badger stands behind the drum, and the right paw holds the beater at the near rim of the
   // right head, with the beater along the head, 10° down from the level, as a real player holds it
   // parallel to the head (docs/reference/percussion-technique.md 5). The beater strikes 18 cm from
-  // the middle of the head, 3 cm below it and toward the player, about one third in from the rim.
+  // the middle of the head toward the player, at its height, 7 cm in from the rim, near one third.
   // The beater points from its home, near the elbow, so the head of the beater leaves the drum head
   // along its normal, and the paw and the forearm turn with it, as the stroke of the wrist and the
   // forearm of a real player. The head rests 5 cm off the drum head between strikes, and lifts up
@@ -487,7 +487,7 @@ export const PERCUSSION_HOLDS = {
     offsetL: [0, 0, 0],
     // The middle of the head of the beater one radius of its head off the drum head, so that it
     // touches the head at the note start.
-    offsetR: [0.0215, -0.03, 0.18],
+    offsetR: [0.0215, 0, 0.18],
     poleL: POLE_L,
     poleR: [0, -0.5, 0.4],
     rim: 0,

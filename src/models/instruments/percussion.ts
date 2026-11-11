@@ -234,14 +234,17 @@ export const BASS_DRUM = {
    * right of the middle of the player, so that the right paw holds the beater at its near rim, out
    * from the trunk, and the shell stands in front of the belly, about 4 cm from it in the lean of
    * the play. With the head 0.21 m to the right, the elbow pointed in to keep the shaft out of the
-   * fingers, and the upper arm went 4.7 cm into the body.
+   * fingers, and the upper arm went 4.7 cm into the body. The middle stands 0.45 m high, so that
+   * the top hoop stays below the snout of the leaning badger: at 0.48 m with the larger drum of 36
+   * inches, the snout touched the top hoop. A drum 4 cm further forward or 5 cm lower put the
+   * beater 3.0 cm or 2.0 cm from its strike targets, because the short arm reaches no further.
    */
-  center: [0.1347, 0.48, -0.49],
+  center: [0.1347, 0.45, -0.49],
   /**
-   * The radius of the heads: a concert bass drum of 36 by 16 inches (Yamaha CB-7036) at the
-   * {@link BADGER_SCALE}. Real concert bass drums are 32 to 40 inches wide.
+   * The radius of the heads: a concert bass drum of 32 by 16 inches at the {@link BADGER_SCALE},
+   * the smallest of the real concert bass drums (32 to 40 inches wide).
    */
-  radius: 0.4572 * BADGER_SCALE,
+  radius: 0.4064 * BADGER_SCALE,
   /** The depth of the shell, from the same drum at the {@link BADGER_SCALE}. */
   depth: 0.4064 * BADGER_SCALE,
   /**
@@ -1227,8 +1230,8 @@ function tripodSpace(piece: PartSink, base: Vec3, top: Vec3, spread: number): vo
 }
 
 /**
- * The look of the bass drum (design 4.6), as a concert bass drum of 36 by 16 inches (Yamaha
- * CB-7036): a lacquered shell, wood hoops, and 12 chrome lugs.
+ * The look of the bass drum (design 4.6), as a Yamaha CB-7036 concert bass drum: a lacquered
+ * shell, wood hoops, and 12 chrome lugs.
  */
 const BASS_DRUM_LOOK: DrumLook = {
   shell: INSTRUMENT_COLORS.drumShell,
