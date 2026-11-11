@@ -605,16 +605,7 @@ export function poseConductor(
     // The turn is at its full size in the middle of the motion. The tip leaves the width of the
     // desk early, while the hand is still high.
     along.set(0, 0, -1).applyQuaternion(hand);
-    liftTurn.setFromUnitVectors(along, liftBaton.fromArray(rig.liftBaton));
-    // The turn in the axes of the hand, with no twist around the line of the forearm (+y). The
-    // full twist of about 130° turns the paw past 180° on its forearm, and its twist bone jumps by
-    // 180°.
-    liftTurn.premultiply(handInverse.copy(hand).invert()).multiply(hand);
-    liftTwist.set(0, liftTurn.y, 0, liftTurn.w).normalize();
-    if (liftTwist.w < 0) {
-      liftTwist.set(0, -liftTwist.y, 0, -liftTwist.w);
-    }
-    liftTurn.multiply(liftTwist.invert());
+    swingOf(hand, along, liftBaton.fromArray(rig.liftBaton));
     hand.multiply(mixRotation(NO_TURN, liftTurn, Math.sin(Math.PI * weight), liftTurn));
   }
   writeArm(
@@ -631,6 +622,27 @@ export function poseConductor(
   writeCurl(rig.right, hold.batonCurl * weight, rotations);
 
   poseLeftHand(rig, frames, state, weight, rotations);
+}
+
+/**
+ * Writes the module rotation `liftTurn`: the turn of a paw that turns a direction of the paw
+ * toward another direction, in the axes of the paw, with no twist around the line of the forearm
+ * (+y). A full twist of about 130° turns the paw past 180° on its forearm, and its twist bone
+ * jumps by 180°. Thus the direction comes only near to the target.
+ *
+ * @param paw The world rotation of the paw.
+ * @param from The unit direction of the paw to turn, in the model axes.
+ * @param to The unit target direction, in the model axes.
+ * @returns `liftTurn`, to multiply onto the rotation of the paw.
+ */
+function swingOf(paw: Quaternion, from: Vector3, to: Vector3): Quaternion {
+  liftTurn.setFromUnitVectors(from, to);
+  liftTurn.premultiply(handInverse.copy(paw).invert()).multiply(paw);
+  liftTwist.set(0, liftTurn.y, 0, liftTurn.w).normalize();
+  if (liftTwist.w < 0) {
+    liftTwist.set(0, -liftTwist.y, 0, -liftTwist.w);
+  }
+  return liftTurn.multiply(liftTwist.invert());
 }
 
 /**
