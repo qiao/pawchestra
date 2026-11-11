@@ -95,8 +95,11 @@ PUPIL_EDGE = 2.0
 #: Oklab lightness of the iris. RING_SHADE and RING_WIDTH: the scale of the lightness of the outer
 #: ring of the iris, and its width as a share of the iris radius.
 IRIS_SCALE = 1.0
-#: None keeps the pupil of the source in each direction (its radius over the iris radius).
-PUPIL_RATIO = None
+#: None keeps the pupil of the source in each direction (its radius over the iris radius). The
+#: source pupil is 0.60 of the iris on the left and 0.64 on the right, and with the larger iris it
+#: read as a large dark ball. 0.52 keeps the pupil at 18.2 degrees, near the 16.5 and 18.5 degrees
+#: of the source.
+PUPIL_RATIO = 0.52
 #: The turn in degrees of the middle of the new iris out from the target of `center_irises()`.
 #: The target of the cat already lies in the middle of the opening of the play view, turned
 #: out by GAZE_OUT. The turn is at most the growth of the iris radius, so that the new iris covers
@@ -105,11 +108,15 @@ FAR_GAZE_OUT = 0.0
 #: The turn in degrees of the middle of the new iris up from the target.
 FAR_GAZE_UP = 0.0
 #: The radius in degrees of the new iris of both eyes, in place of IRIS_SCALE times the iris edge
-#: of the source of each eye. None keeps IRIS_SCALE.
-FAR_IRIS_RADIUS = None
+#: of the source of each eye. None keeps IRIS_SCALE. The source iris (27.0 and 29.0 degrees) is
+#: smaller than the opening of the deeper ball (57 degrees high in the play view), so white showed
+#: above and below it. The iris of 35 degrees fills the opening from the upper lid to the lower lid,
+#: and white shows only at the sides.
+FAR_IRIS_RADIUS = 35.0
 #: True keeps the soft light that the source paints in each pupil. False paints each pupil in its
-#: median color with no light.
-PAINTED_LIGHT = True
+#: median color with no light. The eyes of the cat take the finish `eye` and the eye light of the
+#: app, so the painted light would be a second light.
+PAINTED_LIGHT = False
 #: The eyes keep the colors of the source: the source FBX is the target of the look.
 SCLERA_SHADE = 1.0
 SCLERA_WARM = (0.0, 0.0)
@@ -154,9 +161,11 @@ WIDE_EDGE = 0.05
 PLAY_HEAD_PITCH = -15.7
 PLAY_CAMERA_ELEVATION = 7.4
 #: The turn in degrees of each iris target out and up from the middle of the opening in the play
-#: view. A small turn out stops a cross-eyed look.
+#: view. A small turn out stops a cross-eyed look. The turn up puts the top of the iris under the
+#: upper lid by 13 % of the iris height in the view of `gaze_targets()`, so that no white shows
+#: above the iris.
 GAZE_OUT = 6.0
-GAZE_UP = 5.0
+GAZE_UP = 7.5
 #: The share of the contrast to the fur that the dark brow arcs keep (`soften_brows()`): 1 keeps
 #: the paint of the source, 0 paints them as the fur. SOFTEN False keeps the source brows.
 BROW_CONTRAST = 0.5
