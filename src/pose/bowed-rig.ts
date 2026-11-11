@@ -815,10 +815,12 @@ const SHOULDER_HOLD = {
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
  * 42° in each moment of the violinist and the flutist, so that the skin does not twist into a thin
  * neck. The arms of the new Tripo fox are short: 0.40 m from the shoulder joint to the middle of
- * the palm (`pnpm hold-reach fox-red --instrument violin`). So the left shoulder bone turns 15°
+ * the palm (`pnpm hold-reach fox-red --instrument violin`). So the left shoulder bone turns 20°
  * forward in the play (`reachL`), and the left paw reaches the fingerboard of the full violin from
- * 0.18 of its length from the nut. With 8°, it reached it from 0.22, and a violin of the rule of a
- * violin shop for this arm is 0.76 of the violin of the app. The bow paw reaches 0.27 m of the
+ * 0.10 of its length from the nut (0.14 with 15°). A violin of the rule of a violin shop for this
+ * arm is 0.76 of the violin of the app. The top plate turns 25° toward up
+ * (`violinTurn(-25, 5, 25)`), so that the violin lies about level and only a little down toward
+ * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The bow paw reaches 0.27 m of the
  * hair. The left paw tilts 20° over the neck (`tiltL`, 30° in the chin hold). The right elbow
  * points out, forward, and a little down at the frog, (3, -0.3, -0.6), and nearly level at the
  * tip, (1, -0.15, -1): with (2.4, -0.7, -1) and (1, -0.5, -1), the right forearm twisted 52° at the
@@ -833,8 +835,8 @@ const FOX_HOLD = {
   ...SHOULDER_HOLD,
   tiltL: 20 * MathUtils.DEG2RAD,
   poleL: CHIN_HOLD.poleL,
-  playTurn: violinTurn(-25, 5),
-  reachL: 15 * MathUtils.DEG2RAD,
+  playTurn: violinTurn(-25, 5, 25),
+  reachL: 20 * MathUtils.DEG2RAD,
   elbowPerString: 2 * MathUtils.DEG2RAD,
   poleR: [3, -0.3, -0.6],
   playShift: [-0.07, 0.05, 0.25],
@@ -1062,17 +1064,17 @@ export const BOWED_HOLDS = {
  * of the viola lies about 0.14 m in front of the left shoulder joint. Thus the cat plays a viola
  * of about 10 inches, 0.74 of the viola of the app (`SpeciesParams.violaScale`), as a violin shop
  * sizes a viola for the arm less the muzzle, and holds it nearer to the body than the viola hold
- * of {@link BOWED_HOLDS}: 0.05 H further right, 0.14 H higher, and 0.23 H further back
- * (`playShift`), turned 10° further to the left than 45°, near the angle of a real player
- * (`docs/reference/string-technique.md`, section 1.10), and tilted 11° forward, so that it falls
- * 10° to the scroll (`playTurn`). The left paw then reaches the fingerboard from the nut to its
- * end, and the bow paw the hair from the frog to the end of the free hair at the tip
- * (`pnpm hold-reach cat --instrument viola`). The head lifts 15° in the play (`headDrop` below
- * 0), so that the jaw lies on the chin rest of the higher viola: with the head level, the jaw goes
- * 2.0 cm into the viola. The left shoulder bone turns 20° forward in the play (`reachL`), near the
- * forward move of the shoulder of real violinists: with 35° and the viola tilted 5°, the back of
- * the left arm root sinks into pits of 14.5 cm³ in the play (4.8 cm³ with this hold), and with 20°
- * and that tilt, the paw reaches the fingerboard only from 0.03. With the 1/2 viola (0.87) at the
+ * of {@link BOWED_HOLDS}: 0.05 H further right, 0.1 H higher, and 0.23 H further back
+ * (`playShift`). The viola points about 48° to the left of the front, near the angle of a real
+ * player (`docs/reference/string-technique.md`, section 1.10), with the scroll a little up and
+ * the top plate 25° down toward the right (`violinTurn(-15, 5, 25)`), so that it lies about
+ * level. With the old turn, the viola fell 10° to the scroll and its top plate turned 60° to the
+ * front: it read as upright on the chest, and the bow at the frog stood up across the eye. The
+ * head lifts 5° in the play (`headDrop` below 0), so that the jaw lies on the chin rest and the
+ * head stays near straight: with a lift of 15°, the cat looked up over the viola. The left
+ * shoulder bone turns 25° forward in the play (`reachL`), so that the left paw reaches the
+ * fingerboard from 0.07 of its length (0.11 with 20°): with 35° and the viola tilted 5°, the back
+ * of the left arm root sinks into pits of 14.5 cm³ in the play. With the 1/2 viola (0.87) at the
  * place for longer arms, the arm reaches the fingerboard from 0.69, and the bow 0.26 m of 0.44 m.
  * With the viola 4 cm back, the bow reaches the tip, but the viola goes 2.7 cm into the jaw and
  * the chest (1.2 cm with this hold, limit 2.0). The bow lies square across the strings (`slant`
@@ -1220,10 +1222,10 @@ export const BOWED_HOLDS = {
 const CAT_HOLD = {
   ...BOWED_HOLDS.viola,
   stringTurn: 7 * MathUtils.DEG2RAD,
-  playShift: [0.05, 0.0869, 0.1937],
-  playTurn: [-0.0934, -0.1295, 0.0199, 0.987],
-  reachL: 20 * MathUtils.DEG2RAD,
-  headDrop: -15 * MathUtils.DEG2RAD,
+  playShift: [0.05, 0.05, 0.1937],
+  playTurn: violinTurn(-15, 5, 25),
+  reachL: 25 * MathUtils.DEG2RAD,
+  headDrop: -5 * MathUtils.DEG2RAD,
   slant: 0,
   tiltL: 55 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],
@@ -1423,9 +1425,20 @@ const HIPPO_HOLD = {
  * the second Tripo rabbit and the rest elbow (-1, -0.6, 0) of the first, the left upper arm
  * rolled 53° at rest. Each part of each arm now takes at most 42° of roll or twist in the moments
  * of the violinist (assets/models/rabbit/README.md, "Arm twist").
+ *
+ * The violin lies about level, as a real player holds it (`docs/reference/string-technique.md`,
+ * section 1.10): the top plate turns 25° toward up (`violinTurn(-20, 5, 25)`), so that it tilts
+ * only 25° down toward the right. With the 50° of the chin hold, the violin read as upright on the
+ * chest, and the bow at the frog stood up beside the face. The violin sits 0.03 H higher than in
+ * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
+ * (`reachL`), so that the left paw reaches the fingerboard from 0.25 of its length, as before the
+ * level turn (0.35 with 15.5°).
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
+  playShift: [-0.054, -0.06, 0.185],
+  playTurn: violinTurn(-20, 5, 25),
+  reachL: 25 * MathUtils.DEG2RAD,
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 55 * MathUtils.DEG2RAD,
