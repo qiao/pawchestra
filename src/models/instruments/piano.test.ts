@@ -31,12 +31,12 @@ describe('pianoKeyPosition', () => {
 });
 
 describe('buildPiano', () => {
-  it('gives the case the black lacquer, and shows sheet music', () => {
+  it('gives the case the black polish, and shows sheet music', () => {
     const parts = buildPiano().pieces[0]?.parts ?? [];
     const of = (color: Rgb) => parts.filter((part) => part.color === color);
-    const lacquered = of(INSTRUMENT_COLORS.pianoCase).filter((part) => part.finish === 'lacquer');
+    const polished = of(INSTRUMENT_COLORS.pianoCase).filter((part) => part.finish === 'polish');
     // The rim, the lid, the prop, the key bed, the cheeks, the fallboard, the desk, and the legs.
-    expect(lacquered.length).toBeGreaterThanOrEqual(10);
+    expect(polished.length).toBeGreaterThanOrEqual(10);
     expect(of(INSTRUMENT_COLORS.sheet)).toHaveLength(1);
   });
 
