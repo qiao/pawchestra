@@ -1756,13 +1756,14 @@ grips keep their places, so the holds and the strikes do not change with the det
   the straight bow of the layout form, so that a mallet at the edge strikes it at the same height.
   A hand cymbal has a leather strap, and the suspended cymbal sits between felt washers under a
   wing nut.
-- **Small percussion.** A padded trap table stands in front of the player, and a stand with a
-  hook for the triangle at its left (`TRAP_TABLE`). The tambourine, the triangle, and the beater
-  each have a copy on the table or the stand and a copy in a paw (`TABLE_PLACES`, `PieceCopies`).
-  The scene moves the corners of the copy that the pose does not show to one point. The table keeps
-  the footprint of the old tambourine stand, so the seats do not move.
-  The tambourine has a wood frame, a head, and five pairs of jingles in
-  slots. The triangle is one rod with round corners and one open corner (`TRIANGLE`).
+- **Small percussion.** A padded trap table stands in front of the player, and a stand with a hook
+  for the triangle at its left (`TRAP_TABLE`). The post of the stand is out to the left of the hook
+  (`TRAP_TABLE.post`), so that it stays clear of the left arm. The tambourine, the triangle, and the
+  beater each have a copy on the table or the stand and a copy in a paw (`TABLE_PLACES`,
+  `PieceCopies`). The scene moves the corners of the copy that the pose does not show to one point.
+  The table keeps the footprint of the old tambourine stand, so the seats do not move. The
+  tambourine has a wood frame, a head, and five pairs of jingles in slots. The triangle is one rod
+  with round corners and one open corner (`TRIANGLE`).
 - **Xylophone.** Rosewood bars in the layout of a keyboard, at the small sizes of `XYLOPHONE`.
   Under each bar hangs an aluminum tube a quarter of the wavelength of its note long, and a rail
   runs under each node line of the bars, where a free bar does not move (`XYLOPHONE_FRAME`).

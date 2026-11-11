@@ -317,6 +317,12 @@ export const TRAP_TABLE = {
    * model: the clip hangs there, beside the belly and in the reach of the short left arm.
    */
   hook: [-0.25, 0.63, -0.12],
+  /**
+   * The distance of the post of the stand out to the left of the hook. A short arm on the post
+   * holds the clip. With 0.04 m, the empty post stood close beside the left arm while the left paw
+   * held the triangle.
+   */
+  post: 0.12,
 } as const;
 
 /** The place of a switched piece on the trap table (design 4.6, 5.3). */
@@ -1996,14 +2002,15 @@ function addTrapTable(piece: PieceBuilder): void {
   // The stand of the triangle: a post out from the clip on a round foot, and a short arm to the
   // clip.
   const [hx, hy, hz] = TRAP_TABLE.hook;
-  const post: Vec3 = [hx - 0.04, hy + 0.02, hz];
+  const px = hx - TRAP_TABLE.post;
+  const post: Vec3 = [px, hy + 0.02, hz];
   piece.add(
     cylinder(0.06, 0.06, 0.012, 12),
     INSTRUMENT_COLORS.timpaniBlack,
-    transform([hx - 0.04, 0, hz]),
+    transform([px, 0, hz]),
     'metal',
   );
-  piece.rod([hx - 0.04, 0.012, hz], post, 0.006, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
+  piece.rod([px, 0.012, hz], post, 0.006, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
   piece.rod(post, [hx, hy + 0.02, hz], 0.003, 6, INSTRUMENT_COLORS.timpaniBlack, 'metal');
 }
 
