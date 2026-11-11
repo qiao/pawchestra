@@ -86,6 +86,9 @@ passes.
       longer slide reach or a lower slide puts it into the desk.
 - [ ] Trumpeter monkey: `pnpm hold-fit trumpeter` stops, because the body bones of the Tripo monkey
       have 6 open loops, and the sweep expects 5.
+- [ ] Trumpeter monkey: at rest, with the trumpet in front of the belly (`restShift`), the upper
+      arms roll 70.6° and -50.6° from the clavicles (`pose-preview`), more than 45°. The skin twist
+      of the arm gate stays 29° and 25°. Check the arms at rest in a 2x crop.
 - [ ] Conductor bear: the quiet place of the left hand and the cue point stay at the height of the
       head, as `mockup.png` and design 5.4 give them. Check them against a real conductor, whose
       gestures stay below the chin (`conductor-technique.md`, section 1).
