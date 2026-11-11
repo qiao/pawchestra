@@ -708,27 +708,16 @@ passes.
       450 (main 484). Check the bent left elbow in the hall view.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
-- [ ] Cat candidate (`tripo-hand/`): the left upper arm takes 44.5° and the forearm 43.7° in the
-      play, with no margin. The two parts take 88° together, so a margin needs a left paw that
-      turns about 8° less on the viola neck (a new viola place). A second paw ring step with the
-      left elbow axis turned 20° gives 24.5° and 19.7° in the play, but -55° and -63° at rest,
-      and no `restPawTurnL` or `restPoleL` brings both rest parts to 45°.
-- [ ] Cat candidate: the violist folds p95 are L 6 and R 6 (main 2 and 2, limit 8). At rest, the
-      pads of the left palm still fold where the paw curls 117°, and the armpits (`clavicle_*`)
-      fold 2 to 4 faces.
-- [ ] Cat candidate: a soft star of facets stays on the white crotch at the frog
-      (`reports/2026-11-10-cat-hand-r10/panel.png`). The normals are smooth, so it comes from the
-      rim lights that the app calculates at the vertices of the large crotch faces.
-- [ ] Cat candidate: at the rest moment, a dark dent shows over the inner end of the left eye. The
-      source brow on that side is steeper (a column of faces that turn away from the light).
-- [ ] Cat candidate: `pnpm body-shape` gives D2 7.5 cm (33.5 cm before the crotch smooth). The cut
-      of level 2 lies in the crotch, and the probe now finds a small loop there. W2 stays 41.9 cm.
-- [ ] Cat candidate: the tail root needs the chair 0.419 m deep (main 0.343 m). A tail root
-      that leaves the back lower, or a thinner root, gives a shorter chair.
-- [ ] Cat candidate: the shin texels stretch 1.38 times along the leg, so the strands read 1.23
-      times longer. A repaint of the shin islands in `tools/cat-maps.py` can shorten them.
-- [ ] Cat candidate: the eyes of the source lie 8 mm apart from a mirror (left x 0.049, right
-      x -0.041). Ask whether the eyes move to a mirror.
+- [ ] Cat candidate (third Tripo cat, `tripo-hand/`): the tail hangs behind the seat with the two
+      rigid tail bones, and its tip lies near the back legs of the chair. The cat of main curls its
+      tail on the seat. A key `bind_tail` as on the second Tripo cat can lay it on the seat.
+- [ ] Cat candidate: at the rest moment, the bow paw lifts the bow and the viola stands upright, and
+      the old cat and the cat of main hold the bow down. Check the rest hold with the turned elbow
+      axes (`hinges` 13° and -44°) in the app.
+- [ ] Cat candidate: the seat is 28.0 cm (main 29.8 cm) with shins 1.75 times longer, and the chair
+      is 0.380 m deep (main 0.343 m). A longer shin stretches the shin texels more.
+- [ ] Cat candidate: the eyes keep the size of the source (each opening 0.153 of the head width).
+      In the rest front view the round irises read wide. Ask the user for the eye size.
 - [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
       expects 4"), so the clearance of the thicker arms and the larger head has only renders.
 - [ ] Tripo fox candidate: a dark wedge of the socket lining shows at a lower eye corner in the
