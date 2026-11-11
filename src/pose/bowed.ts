@@ -8,7 +8,8 @@ import type { BowedHold, BowedRig, RigPoints } from './bowed-rig.ts';
 import { createFrame, posePoint, setBoneRotation, setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
 import { HAND_FRAMES, handPlaceOf } from './fingering.ts';
-import { createArmPose, poseShoulder, solveArm, writeArm, writeCurl } from './ik.ts';
+import { ARM_REACH, createArmPose, poseShoulder, solveArm, writeArm, writeCurl } from './ik.ts';
+import type { ArmRig } from './ik.ts';
 import { liftShoulder } from './round-arms.ts';
 import { smoothstep } from './rest.ts';
 import type { BowState } from './strokes.ts';
@@ -1389,6 +1390,8 @@ function createHoldArm(): HoldArm {
 
 const bowArm = createHoldArm();
 const pluckArm = createHoldArm();
+const playArm = createHoldArm();
+const steadyBow: BowPlace = { grip: new Vector3(), rotation: new Quaternion() };
 const meanForearm = new Quaternion();
 const basePole = new Vector3();
 
@@ -1424,6 +1427,42 @@ function turnNear(
     .normalize();
 }
 
+/**
+ * The weight of the playing pose up to which the bow wrist takes the full smooth reach limit
+ * ({@link softReach}). From it to the play, the limit fades out, so the play keeps its targets.
+ */
+const SOFT_REACH_UNTIL = 0.9;
+const softWrist = new Vector3();
+
+/**
+ * Moves the right wrist target toward the shoulder past `arm.reach` with a smooth limit in the
+ * lift and the lowering ({@link ARM_REACH}): the distance comes nearer the full length of the
+ * arm, and never reaches it. A target out of reach straightened the arm, and the elbow stopped
+ * from 1,000°/s in one step, as the rest bow of the rabbit moved on its path in the lift. A target
+ * in `arm.reach` does not move, and the limit fades out from {@link SOFT_REACH_UNTIL} to the play.
+ *
+ * @param arm The arm.
+ * @param shoulder The posed shoulder joint.
+ * @param weight The eased weight of the playing pose: 0 is the rest pose.
+ * @param wrist The wrist target. The function moves it in place.
+ * @returns `wrist`.
+ */
+function softReach(arm: ArmRig, shoulder: Vector3, weight: number, wrist: Vector3): Vector3 {
+  const share = 1 - smoothstep((weight - SOFT_REACH_UNTIL) / (1 - SOFT_REACH_UNTIL));
+  const distance = wrist.distanceTo(shoulder);
+  if (share <= 0 || distance <= arm.reach) {
+    return wrist;
+  }
+  const spare = arm.reach / ARM_REACH - arm.reach;
+  const limited = arm.reach + spare * Math.tanh((distance - arm.reach) / spare);
+  softWrist
+    .copy(wrist)
+    .sub(shoulder)
+    .multiplyScalar(limited / distance)
+    .add(shoulder);
+  return wrist.lerp(softWrist, share);
+}
+
 /** The parts of the pose that {@link holdArm} reads. */
 interface HoldArmInput {
   readonly rig: BowedRig;
@@ -1456,6 +1495,17 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
   const { rig, chest, shoulder, strings, state, weight } = input;
   const bow = places.bow;
   const heldHand = places.hand;
+  if (weight < 1) {
+    // In the lift and the lowering, the hand mixes the rest bow with the bow of the steady hold
+    // of the play, with its own roll. The roll toward the elbow of the moving arm passed the far
+    // side of the stick and turned the bow paw of the hippo by 50° in 12 ms.
+    holdArm({ ...input, weight: 1 }, pizzicato, playArm);
+    steadyBow.rotation
+      .copy(playArm.rotation)
+      .multiply(bowBack.setFromAxisAngle(X_AXIS, -playArm.onStick))
+      .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playArm.angle));
+    steadyBow.grip.fromArray(rig.grip).applyQuaternion(playArm.rotation).add(playArm.wrist);
+  }
   pluckBow.grip.copy(pluckPalm);
   liftMix(restBow.rotation, bow.rotation, weight, held.rotation);
   held.grip.lerpVectors(restBow.grip, bow.grip, weight);
@@ -1498,7 +1548,7 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
       gripHand(rig, bow, angle, heldHand);
     } else {
       let pluckRoll = 0;
-      if (pizzicato > 0) {
+      if (pizzicato > 0 && weight === 1) {
         pluckRoll = rollToward(rig, pluckBow, aim);
         gripHand(rig, pluckBow, pluckRoll, pluckHand);
         pluckHand.wrist
@@ -1506,9 +1556,9 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
           .sub(palmOffset.fromArray(rig.armR.palm).applyQuaternion(pluckHand.rotation));
         pluckBow.grip.fromArray(rig.grip).applyQuaternion(pluckHand.rotation).add(pluckHand.wrist);
       }
-      const playRoll = bowRoll + (pluckRoll - bowRoll) * pizzicato;
+      const playRoll = weight < 1 ? playArm.angle : bowRoll + (pluckRoll - bowRoll) * pizzicato;
       gripHand(rig, bow, bowRoll, heldHand);
-      if (pizzicato > 0) {
+      if (pizzicato > 0 && weight === 1) {
         // In pizzicato, the hand is the plucking hand.
         mixRotationNear(
           heldHand.rotation,
@@ -1519,10 +1569,15 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
         );
         heldHand.wrist.lerpVectors(heldHand.wrist, pluckHand.wrist, pizzicato);
       }
-      held.rotation
-        .copy(heldHand.rotation)
-        .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playRoll));
-      held.grip.fromArray(rig.grip).applyQuaternion(heldHand.rotation).add(heldHand.wrist);
+      if (weight < 1) {
+        held.rotation.copy(steadyBow.rotation);
+        held.grip.copy(steadyBow.grip);
+      } else {
+        held.rotation
+          .copy(heldHand.rotation)
+          .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playRoll));
+        held.grip.fromArray(rig.grip).applyQuaternion(heldHand.rotation).add(heldHand.wrist);
+      }
       const restRoll = weight < 1 ? rollToward(rig, restBow, aim) : 0;
       liftMix(restBow.rotation, held.rotation, weight, held.rotation);
       held.grip.lerpVectors(restBow.grip, held.grip, weight);
@@ -1683,6 +1738,7 @@ export function poseBowed(
     pole.lerpVectors(bowArm.elbow, pluckArm.elbow, pizzicato).sub(shoulder.position);
   }
 
+  softReach(rig.armR, shoulder.position, weight, heldHand.wrist);
   poleR.copy(pole).applyQuaternion(chestInverse.copy(chest.rotation).invert()).toArray(poleTuple);
   writeArm(
     {

@@ -399,6 +399,11 @@ The rest of each family:
   straight lines between the two holds, in the reach of the arm. Reason: a roll toward the elbow
   of the moving arm swung the cello paw by 68° in 1/240 s, the bow hand and the pluck hand of the
   contrabass are near 180° apart, and the pluck palm of the red fox is out of reach.
+- In the lift and the lowering, the bow hand mixes the rest bow with the bow of the steady hold
+  of the play (`holdArm()`), and the bow wrist has a smooth reach limit up to
+  `SOFT_REACH_UNTIL` of the move (`softReach()`). Reason: the roll toward the elbow of the moving
+  arm passed the far side of the stick and flicked the hippo paw by 50° in 12 ms, and the rest bow
+  path went out of reach, so the arm went straight and the elbow stopped in one step.
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
 - **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of
