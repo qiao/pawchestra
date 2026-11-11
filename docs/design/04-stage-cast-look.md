@@ -777,7 +777,15 @@ eyes keep the size of the source ball. The rabbit eyes are smaller than the sour
 with the large dark pupil of the source, the rabbit eyes at the size of the cute step read too
 large. The fox eyes take the finish `varnish` and no eye light (`eyeFinish`), so the painted light
 is the only light of a fox eye. The rabbit source paints no light, so the rabbit eyes keep the
-`eye` finish and the eye light gives their one light. The
+`eye` finish and the eye light gives their one light. The candidate Tripo polar bear
+(`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
+middle of the opening in the view of the play of the pianist (`gaze_targets()` of
+`tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
+its eyes keep the size of the source ball. Its map also gives each eye a darker iris and a softer
+warm white (`far_tone()`), with the values of a dark iris of `far_eyes()`. Reason: in the hall view
+each eye is a few pixels across, and the bright white read dim. Its source paints white only at the
+outer corner, so the round iris of `far_eyes()` does not apply. Its arm, leg, and trunk girths and
+its paws are those of the main polar bear, and its head keeps the round form of the sheet. The
 faces of the fox and the rabbit are baby faces: upper lids that do not cover the iris, rounder
 cheeks, and on the fox a shorter muzzle. Reason:
 lids over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
@@ -1090,7 +1098,8 @@ image is on the GPU, the body shows its face colors.
 The candidate polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map that
 `tools/polar-bear-maps.py` makes from the map of its Tripo FBX. The cream fur goes to the white
 of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
-Tripo map paints a tan bear with light claws, and the hall view sets the target, as for the fox.
+Tripo map paints a tan bear with brown claws, and the hall view sets the target, as for the fox.
+The painted brows keep half of their contrast to the fur (`soften_brows()`).
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
