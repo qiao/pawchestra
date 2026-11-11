@@ -39,13 +39,19 @@ interface CelloAxes {
 }
 
 /**
- * Gives the axes of a cello at the place of {@link CELLO_PLACE}.
+ * Gives the axes of a cello at the place of {@link CELLO_PLACE}, or of a contrabass at the place of
+ * its own lean and turn.
  *
  * @param left The lean of the axis to the left, from the vertical, in radians.
+ * @param back The lean of the axis back toward the body, from the vertical, in radians.
+ * @param turn The turn of the top plate to the right of the front, in radians.
  * @returns The axis and the normal of the top plate.
  */
-export function celloAxes(left: number = CELLO_PLACE.left): CelloAxes {
-  const { back, turn } = CELLO_PLACE;
+export function celloAxes(
+  left: number = CELLO_PLACE.left,
+  back: number = CELLO_PLACE.back,
+  turn: number = CELLO_PLACE.turn,
+): CelloAxes {
   const axis = new Vector3(-Math.tan(left), 1, Math.tan(back)).normalize();
   const front = new Vector3(Math.sin(turn), 0, -Math.cos(turn));
   const top = front.addScaledVector(axis, -front.dot(axis)).normalize();

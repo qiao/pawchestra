@@ -15,7 +15,10 @@ interface CelloPlace {
   readonly playTurn: Quat;
 }
 
-/** The rule of the place of a cello at a body (`BowedHold.fit`, design 5.3). */
+/**
+ * The rule of the place of a cello or a contrabass at a body (`BowedHold.fit`, design 5.3). The
+ * values that a cello leaves out come from `CELLO_PLACE`.
+ */
 export interface CelloFit {
   /**
    * The room between the middle line of the back and the front of the body, in head heights.
@@ -24,6 +27,12 @@ export interface CelloFit {
   readonly gap: number;
   /** The lean of the axis to the left, from the vertical, in radians (`CELLO_PLACE.left`). */
   readonly left: number;
+  /** The lean of the axis back toward the body, in radians (`CELLO_PLACE.back`). */
+  readonly back?: number;
+  /** The turn of the top plate to the right of the front, in radians (`CELLO_PLACE.turn`). */
+  readonly turn?: number;
+  /** The place of the end pin to the right of the middle, in head heights (`CELLO_PLACE.side`). */
+  readonly side?: number;
 }
 
 /** The number of points on the middle line of the back that the contact tests. */
@@ -86,19 +95,22 @@ export function trunkFront(model: PlayerModel, x: number, y: number): number | n
  * the left, and it moves back until the middle line of its back stands `gap` in front of the
  * trunk or the thighs, as the cello of a real player leans back onto the chest
  * (`docs/reference/string-technique.md`, section 2.7). The end pin of the model fits the chest
- * (`celloPinOf()`), so the top of the back stands at the height of the chest.
+ * (`celloPinOf()`), so the top of the back stands at the height of the chest. A contrabass takes
+ * the same rule with its own lean, turn, and end pin place (`CelloFit`), as a real bassist leans
+ * the contrabass on the body (section 2.8). Its end pin keeps the length of its model.
  *
- * @param model A player with a cello.
- * @param fit The room in front of the body and the lean of the cello to the left.
- * @returns The move and the turn of the cello from its bind place.
- * @throws Error if the model has no cello piece or no cello targets.
+ * @param model A player with a cello or a contrabass.
+ * @param fit The room in front of the body, the leans and the turn, and the end pin place.
+ * @returns The move and the turn of the instrument from its bind place.
+ * @throws Error if the model has no cello or contrabass piece, or no targets.
  */
 export function fitCelloPlace(model: PlayerModel, fit: CelloFit): CelloPlace {
   const piece = model.pieces.find((p) => p.piece.bone === 'instrument');
   const nut = model.instrument.targets.find((t) => t.kind === 'fingerboard');
   const contact = model.instrument.targets.find((t) => t.kind === 'bow-contact');
-  if (model.instrument.id !== 'cello' || !piece || !nut || !contact) {
-    throw new Error(`The ${model.instrument.id} is no cello with its targets.`);
+  const upright = model.instrument.id === 'cello' || model.instrument.id === 'contrabass';
+  if (!upright || !piece || !nut || !contact) {
+    throw new Error(`The ${model.instrument.id} is no cello or contrabass with its targets.`);
   }
 
   // The size and the end pin of the model, from the targets in the axes of the piece.
@@ -106,13 +118,13 @@ export function fitCelloPlace(model: PlayerModel, fit: CelloFit): CelloPlace {
   const pin = contact.from[1] - VIOLIN.bowContact * size;
   const half = (VIOLIN.bodyThickness / 2) * size;
 
-  const { axis, top } = celloAxes(fit.left);
+  const { axis, top } = celloAxes(fit.left, fit.back, fit.turn);
   const along = new Vector3(...axis);
   const back = new Vector3(...top).negate();
   const turn = playRotation(along, back);
 
   const h = model.body.headHeight;
-  const tip = new Vector3(model.body.floor[0] + CELLO_PLACE.side * h, 0, 0);
+  const tip = new Vector3(model.body.floor[0] + (fit.side ?? CELLO_PLACE.side) * h, 0, 0);
   // The back moves only along z with the end pin, so one pass finds the place.
   let deepest = -Infinity;
   const point = new Vector3();

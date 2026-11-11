@@ -348,10 +348,11 @@ export interface BowedHold {
     readonly via: BowVia | null;
   } | null;
   /**
-   * The place of a cello from the body (`fitCelloPlace()` of `pose/cello-place.ts`, design 5.3),
-   * in place of {@link BowedHold.playShift} and {@link BowedHold.playTurn}: the cello leans back
-   * until the middle line of its back stands `gap` head heights in front of the body, and it leans
-   * `left` to the left. `null` keeps the fixed place of the hold.
+   * The place of a cello or a contrabass from the body (`fitCelloPlace()` of
+   * `pose/cello-place.ts`, design 5.3), in place of {@link BowedHold.playShift} and
+   * {@link BowedHold.playTurn}: the instrument leans back until the middle line of its back stands
+   * `gap` head heights in front of the body, and it leans `left` to the left. `null` keeps the
+   * fixed place of the hold.
    */
   readonly fit: CelloFit | null;
   /**
