@@ -288,10 +288,13 @@ The app follows these facts:
 - **The motion (section 7).** The trunk leans to the side toward the keys of the two paws
   (`sideLeanAt()`, `sideLean`, `sideLeanMax`). The lean follows the mean place of the paws over
   `SIDE_LEAN_WINDOW` before and after the song time. Thus the trunk moves smoothly toward the
-  register of a passage, and the weight shifts come at the leaps. A wider window lets the trunk
-  lag, and the arms cross further into the belly. The lean goes up to 18°, so that an arm at the
-  far keys keeps clear of a round belly, also in the breath of the hold after a stop. The whole paw lifts for each note, but less
-  for a near note (`HAND_MOTION.liftGapSec`). Thus the motion gets smaller in a fast passage.
+  register of a passage, and the weight shifts come at the leaps. A wider window lets the trunk lag,
+  and the arms cross further into the belly. The lean goes up to 18°, so that an arm at the far keys
+  keeps clear of a round belly, also in the breath of the hold after a stop. The neck and the head
+  turn back by the lean, so that the eyes stay level and the muzzle stays over the chest: on the
+  leaned spine, the muzzle came down onto the left forearm at the lowest keys. The whole paw lifts
+  for each note, but less for a near note (`HAND_MOTION.liftGapSec`). Thus the motion gets smaller
+  in a fast passage.
 - **The fingering (section 9).** Each paw plays the fingering of the lowest cost by the 12 rules
   of section 9.2 (`planFingeringSteps()` of `src/pose/piano-fingering.ts`). A dynamic program over
   pairs of notes keeps the rules of three notes exact. The spans scale with the paw

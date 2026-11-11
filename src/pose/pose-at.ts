@@ -208,7 +208,8 @@ interface BodyAngles {
   /**
    * The side turn of the neck and the head around z, in radians, on top of the side sway of the
    * spine: a positive roll turns the head to the left, as a positive sway does. A side move behind
-   * the notes turns the head back by the side lean of the spine, so that the eyes stay level.
+   * the notes and the side lean of a pianist turn the head back by the side lean of the spine, so
+   * that the eyes stay level.
    */
   roll: number;
   /**
@@ -430,7 +431,12 @@ function poseAnimal(
       const { lean, restLean, restHeadLift } = note.rig.hold;
       body.lean = restLean + (lean - restLean) * weight;
       body.lift = restHeadLift * (1 - weight);
-      body.sway += sideLeanAt(note.rig, note.left, note.right, noteTime) * weight;
+      // The head turns back by the side lean toward the far keys, so that the eyes stay level and
+      // the muzzle stays over the chest. With the head on the leaned spine, the muzzle of the
+      // polar bear came down onto the left forearm at the lowest keys.
+      const side = sideLeanAt(note.rig, note.left, note.right, noteTime) * weight;
+      body.sway += side;
+      body.roll = -side;
       writeBody(pose, player, scratch);
       poseHands(note.rig, scratch.torso, hands, weight, pose.rotations);
       // The damper pedal follows the `slide` bone down, under the right foot of a pianist.

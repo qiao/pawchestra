@@ -713,7 +713,8 @@ The rest of each family:
   level with the keys (piano 1). Reason: elbows that hang far down by the wide belly put the arms
   deep into the trunk, and elbows that point up slope the forearms down to the keys.
 - The trunk leans toward the keys of the paws over a window of song time (`sideLeanAt()`), so it
-  moves smoothly toward the register of a passage, as a real pianist.
+  moves smoothly toward the register of a passage, as a real pianist. The neck and the head turn
+  back by the lean (`BodyAngles.roll`), so that the eyes stay level.
 - The right foot presses the damper pedal with the sustain pedal of the score (CC 64,
   `pedalLevelAt()`), and the synth reads the same events.
 
