@@ -72,9 +72,8 @@ const BODY_LOOPS = 2;
  * The open loops of {@link BODY_BONES} of each Tripo hand rig, by its rig file (the `README.md` of
  * each model folder):
  *
- * - The polar bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet, the
- *   2 eye sockets, the open backs of the 2 eyeballs, the edges of the 2 lids, and 10 small open
- *   loops of the mouth and its parts, which the source mesh has.
+ * - The polar bear: 16 open loops, the cuts to the two upper arms and the open loops of the source
+ *   mesh and of its lids.
  * - The bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet and of the
  *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
  * - The cat: the cuts to the two upper arms, the 2 eye sockets, the edges of the 2 lids, and 19
@@ -86,7 +85,7 @@ const BODY_LOOPS = 2;
  *   and of its lids.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
-  ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 26],
+  ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 25],
   ['assets/models/fox/tripo-hand/fox.rig.glb', 11],
