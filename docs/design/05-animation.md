@@ -827,25 +827,36 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 
   ```text
   score -> level (mean of 1 s) -> soft, loud --> beat size and height, lean, head, crouch, palm
+        -> trend of 2 s -> crescendo ----------> beat grows, chest opens, shoulders rise, palm up
         -> note lengths per beat -> stroke ----> legato arc, or staccato rebound, stop, and click
-        -> onsets vs the 2 s before -> accent -> head jolt, knee dip, breath before it
-        -> phrase starts, first beat ---------> breath: chest and head rise in the preparation
+        -> onsets vs the 2 s before -> accent -> head and shoulder jolt, knee dip, breath before
+        -> phrase starts, first beat ---------> breath: chest, head, and shoulders rise
         -> loud downbeat after a rise --------> climax: both arms open wide and high for one bar
-        -> last chord held to the end --------> final: hold, slow rise, one circle, close
+        -> last tutti chord ------------------> final: held (hold, rise, circle) or short (stop)
   ```
 
+  - A forte is more energetic more than larger. A loud stroke stops longer at the top of its
+    rebound and falls faster into the ictus (`loudEnergy`), and the body and the head come up.
+    The beat stays below the chin, except at a climax.
   - A soft passage makes the beat small and low, leans the body toward the players, lowers the
-    head, bends the knees a little, and puts the left palm down. A loud passage makes the beat
-    larger and higher and raises the body and the head.
+    head, bends the knees, and puts the left palm down. A left cue takes away a part of the lean
+    (`cueUpright`), so the body comes up for the cue and the head stays clear of the paw.
   - A legato stroke has no stop. A staccato or accented stroke rebounds to the top of its arc,
     stops, and falls into the ictus at full speed (`strokeOf()`, `strokeRebound`, `strokeFall`).
   - The knees dip only on accents, because knees that bob with each beat are a fault of a
-    conductor. The upper body sways with the bar, more in a legato passage.
-  - The places of the hands lean, sway, and drop with the body (`followBody()`), so the paws
-    keep their clearance to the head.
-  - On the final chord, the baton leaves the beat, holds, makes one circle before the end of the
-    sound, and stops a little lower. The left palm holds the chord and closes at the end. The bow
-    follows.
+    conductor. Two accents are at least `accentGapSec` apart.
+  - The upper body sways with the bar, more in a legato passage, and the hips move against the
+    sway (`shift`), so the weight stays over the feet. The chest twists further toward a cued
+    section (`cueTwist`), and the head keeps its aim.
+  - A climax is rare: it needs `climaxStartSec` of music before it, and only the largest rises
+    stay, one for each `climaxEverySec`, at least `climaxGapSec` apart.
+  - The left paw rolls its palm up or down with the dynamics (`LEFT_HAND_PLACES`, `palm`). Its
+    twist on the forearm stops at `MAX_TWIST_L` (`maxTwist` of `writeArm()`).
+  - The places of the hands lean, sway, move, and drop with the body (`followBody()`), so the
+    paws keep their clearance to the head.
+  - On a held final chord, the baton leaves the beat, holds, makes one circle before the end of
+    the sound, and stops a little lower. The left palm holds the chord and closes at the end. On a
+    short final chord, the baton stops at its beat with no rebound. The bow follows.
 
 - **Left hand between the cues** (`pose/conductor-left.ts`). A real conductor uses the left hand
   for the dynamics, for held notes, and for a mirror of the beat (`LEFT_HAND_PLACES`). The mirror
