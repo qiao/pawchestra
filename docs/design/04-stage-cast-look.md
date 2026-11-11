@@ -742,20 +742,20 @@ with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and
 of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
 the claws of the source to the colors of the bear of main in the hall light (the claws dark grey),
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
-hand rig of the Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the cat
-violist, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on
-each, with a lid on each eye. Its upper lids open 5° past the source and its mouth corners turn up,
-and its maps carry no dark brow shade or brow tilt. Reason: the covered iris tops and the dark brows
-gave a sleepy, worried face. Its brow follows only the head bone, so an ear twitch does not pull the
-lids. The faces of its seated crotch have the face attribute `rim`, so they shade with no crease
-angle. Reason: the raised thighs fold the crotch, and its faces showed as flat facets and dark
-slits. Its color map (`tools/cat-maps.py`) moves the warm gray and the cream of the source to the
-gray and the white of the cat of main in the hall light. Its tail has two bones, and the key
-`bind_tail` lays the tail tube on the seat around the left side of the haunch, as the cat of main
-curls its tail. Reason: the two rigid bones held the hook of the tail over the side of the seat. Its
-paws turn about the forearms by whole ring steps, and its hold (`CAT_HOLD`) gives each part of each
-arm at most about 45° of roll or twist in the moments of the violist. Reason: with the paws and the
-hold of the cat of main, the left forearm twisted 125° in the play and -69° at rest. A hand rig of
+hand rig of the third Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the
+cat violist, in the same way. It keeps the eyeballs of its mesh at the size of the source, because
+the map paints a full eye on each, with a lid on each eye. The source paints a light in each pupil,
+so the eyes take the finish `varnish` and no eye light. Its map tool (`tools/cat-maps.py`) moves
+each iris to the middle of its opening in the play view of the violist, paints the large iris from
+the median color of each ring about the pupil, and makes a round iris and a softer white for the
+far view (`far_eyes()`). Reason: the source paints each iris at the inner lower corner under the
+lash line, and a mirror of the iris paint left seams. The map also gives the dark brow arcs half
+of their contrast to the fur, and moves the gray and the cream of the source to the gray and the
+white of the cat of main in the hall light. Its head is 1.1 times wider, its trunk and limbs are
+thicker, and its shins longer, toward the form and the seat of the cat of main. Its paws turn about
+the forearms by whole ring steps and its elbow axes turn, so that each part of each arm takes at
+most about 45° of roll or twist in the moments of the violist. Reason: with no turn, the right
+forearm twisted up to 127°. A hand rig of
 the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
 and its tail has two bones. The map tools of the fox and the rabbit keep the eye paint of the
