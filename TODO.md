@@ -743,6 +743,18 @@ passes.
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
       limit of 45°. Check the shoulder skin at rest in the app.
+- [ ] Tripo beagle candidate: the right forearm twists 91.9° at rest, and the paw turn cannot
+      lower it with the play within 45°. The rest bow grip of `DOG_HOLD` sets it (105° on the dog
+      of main). Check the bow wrist at rest in the app, and if it shows, move the rest elbow
+      (`restPoleR`) for the beagle.
+- [ ] Tripo beagle candidate: the gloss nose shows flat facets and no painted nostrils, as on the
+      wolf.
+- [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
+      no ring split. Check the inner elbow fold of the bow arm in the app.
+- [ ] Tripo beagle candidate: the doc comment of `dog` in `src/models/species.ts` still names the
+      mesh `dog.glb` of the dog of main and its longer legs. Update it when the candidate merges.
+- [ ] Tripo beagle candidate: the seat is 0.150 m high (0.265 m on the dog of main), and the cello
+      keeps the place of `DOG_HOLD`. Check the cello size and place against the smaller body.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
