@@ -723,12 +723,19 @@ passes.
 - [ ] Cat candidate: the smaller eyes have only ray checks of the lids (no lid point leaves the
       head in a blink step). Check a blink in the app.
 - [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
-      expects 4"), so the clearance of the thicker arms and the larger head has only renders.
-- [ ] Tripo fox candidate: a dark wedge of the socket lining shows at a lower eye corner in the
-      face crops, and can read as a tear (`assets/models/fox/README.md`, "Eye corners").
-- [ ] Tripo fox candidate: the violin holds keep their values in H after the head scale 1.2 (H
-      0.323 m to 0.387 m). The twists stay within 41°, but the chin rest and the bow place moved
-      with H. Check them against the violin of main in the close views.
+      expects 4"), so the clearance of the arms and the head has only renders.
+- [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
+      (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
+      golden. A chroma step would read nearer the pale tan of the reference image.
+- [ ] Tripo fox and rabbit candidates: one gaze view (`VIEW_DOWN` 30° of the map tools) serves the
+      play view and the default camera. Check the gaze of both on a phone.
+- [ ] Tripo rabbit candidate: with the source legs the seat is 0.207 m high (0.262 m on the rabbit
+      of main). Check the chair height in the row of the first violins.
+- [ ] Tripo rabbit candidate: the hip joint lies 0.5 mm forward of its measured place, because at
+      that place the rest frames of the leg bones in Blender scale by 3e-5 and `pnpm rig-export`
+      stops. A thigh that points almost opposite to the hips bone loses precision in the parent
+      space of Blender. A tolerance or a fix of the frames in `tools/blender/export_rig.py` would
+      allow the measured place.
 - [ ] Tripo wolf candidate: the gloss nose shows flat facets and no painted nostrils. The export
       (`primitive_arrays()` of `tools/blender/rig_mesh.py`) fails with no gloss face, so the nose
       cannot keep the color map and the smooth normals of the source.
