@@ -107,14 +107,17 @@ PLAY_CAMERA_ELEVATION = 0.3
 #: view. A small turn out stops a cross-eyed look.
 GAZE_OUT = 6.0
 GAZE_UP = 5.0
-#: The tone of the eyes for the far view of the hall (`far_tone()`), the values of the Tripo fox.
-#: There each eye is a few pixels across, and the light brown iris with the bright white around it
-#: read dim and as a side glance. IRIS_SHADE scales the Oklab lightness of the iris, SCLERA_SHADE
-#: the lightness of the white, and SCLERA_WARM is the Oklab (a, b) step of the white to a warm
+#: The tone of the eyes for the far view of the hall (`far_tone()`), with the values of
+#: `far_eyes()` of the Tripo fox and rabbit for a dark iris (the brown iris of the bear has the
+#: median Oklab L 0.39). There each eye is a few pixels across, and the bright white around the
+#: iris read dim and as a side glance. The source paints white only at the outer corner, so the
+#: round iris of `far_eyes()` finds both edges of the iris in too few directions, and this step
+#: only tones the paint. IRIS_SHADE scales the Oklab lightness of the iris, SCLERA_SHADE the
+#: lightness of the white, and SCLERA_WARM is the Oklab (a, b) step of the white to a warm
 #: ivory. A texel goes from iris to white by a soft step of its luma (WHITE_LUMA, sRGB) and of its
 #: saturation (WHITE_SATURATION). The painted light is a gray white (luma 180 to 226, as the
 #: white), so it takes the tone of the white.
-IRIS_SHADE = 0.72
+IRIS_SHADE = 0.9
 SCLERA_SHADE = 0.85
 SCLERA_WARM = (0.008, 0.03)
 WHITE_LUMA = (90.0, 170.0)
