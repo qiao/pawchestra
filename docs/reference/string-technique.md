@@ -446,6 +446,10 @@ The app follows these facts:
   near 13 inches of the chart of [81], and the rabbit a small violin of 0.38 m
   (`SpeciesParams.violinScale`). The chin rest lies under the long jaw, further from the shoulder
   along the viola than on a person.
+- **The seated rest and the lift (2.9).** The instrument stands upright on the left thigh, and the
+  left paw holds the neck. In the lift, the instrument turns with the paw the short way: the
+  scroll stays up, and the body swings in and up to the jaw (`carryLift()`,
+  `BowedHold.liftPoleL`).
 
 The app does not follow these facts:
 

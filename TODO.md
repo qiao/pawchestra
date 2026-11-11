@@ -786,8 +786,9 @@ passes.
       hand. Fit `CELLO_ELBOW` or the reach test to the hold of the dog (`DOG_HOLD`).
 - [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
       place from the body, `DOG_HOLD.fit`).
-- [ ] Violist grip turn: with the level viola, the left paw of the cat turns 49° from its
-      accepted grip (p50, limit 45, `ACCEPTED_GRIPS` of `tools/arm-check.ts`). Check the left
+- [ ] Violist grip turn: with the level viola of 0.925, the left paw of the cat turns 64° from its
+      accepted grip (p50, limit 45, 49° with the viola of 0.74, `ACCEPTED_GRIPS` of
+      `tools/arm-check.ts`). Check the left
       paw in 2x crops, and give the new median to `ACCEPTED_GRIPS` if it is good.
 - [ ] Tripo monkey candidate: the eye whites read smaller, and the pupils larger and darker, in the
       app than in the FBX viewer (`reports/2026-11-11-monkey/panel.png`, face rows). Find whether
@@ -834,6 +835,11 @@ scene of each demo has its seats and stage size with no overlap.
       edge.
 - [ ] Dog: a soft star dent shows on the chest below the right arm root from the right side, and a
       thin dark line at the right root from az150 at rest. Try a fair of the body caps.
+- [ ] Cat violist: the left elbow up in the middle of the lift (`liftPoleL`, 5.2) rolls the left
+      upper arm, and its skin twists 60° in the lift (p95, limit 55, 19° with the elbow out,
+      `pnpm arm-check violist`). Each elbow that turns the viola the short way twists 60° to 64°.
+- [ ] `pnpm pose-depth violist` stops on the working tree and on c03179672: the bones of the cat
+      have 20 open loops, and the caller expects 25.
 - [ ] Cat violist: in the 5th position, the left wrist under the neck keeps a twisted band.
 - [ ] Cat violist: the left wrist bends about 30° from the forearm in the low positions, but a real
       violist keeps it straight (string-technique).

@@ -1164,11 +1164,20 @@ export const BOWED_HOLDS = {
  * 0.19 H to the front in the middle (`liftReach`), so that the viola near the jaw goes at most
  * 2.0 cm into the body in a lowering: with 0.25 H up and 0.2 H to the front, it goes 2.1 cm in.
  * With 0.2 H to the front, the right claws go deeper into the viola, and with 0.23 H, 2.4 cm. In
- * the middle of the moves, the left elbow points out and a little down, as at rest (`liftPoleL`).
- * With (-0.45, -1, -0.6), the left upper arm goes 1.7 cm into the body in the lift. In the middle,
- * the bow points forward and a little out and up, (0.4, 0.3, -1), and the grip moves 0.5 H out,
- * 0.45 H up, and 0.15 H to the front, so that the bow arm passes outside the round belly and the
- * viola. With 0.45 H out, 0.35 H up, and 0.1 H to the front, the right claws go 2.1 cm into the
+ * the middle of the moves, the left elbow points up, back, and a little in, (0.6, 1, 1)
+ * (`liftPoleL`), so that the viola turns the short way: the scroll stays up, and the body swings
+ * in and up to the jaw, as a violist lifts the instrument by the neck. The left forearm supinates
+ * from the rest grip to the playing grip (`carryLift()`), and with the elbow out and a little down,
+ * (-1.2, -0.6, 0), the arm frame turned the other way around, so the supination took the viola the
+ * long way: the body swung out to the left, over the paw, and upside down before it came to the
+ * jaw. The detour of the viola from the short arc was 84° (`pnpm carry-check violist`), and with
+ * this elbow it is 29°, near the rabbit (36°) and the red fox (22°). The elbow up rolls the left
+ * upper arm: its skin twists 60° in the lift (p95, `pnpm arm-check violist`), against 19° with
+ * the elbow out. With the elbow up and out, (-0.5, 1, 0), the viola turns the long way again. With
+ * the elbow (1, 0.6, 1), the skin twists less in the demos, but the viola of the gallery lift turns
+ * the long way. In the middle, the bow points forward and a little out and up, (0.4, 0.3, -1),
+ * and the grip moves 0.5 H out, 0.45 H up, and 0.15 H to the front, so that the bow arm passes
+ * outside the round belly and the viola. With 0.45 H out, 0.35 H up, and 0.1 H to the front, the right claws go 2.1 cm into the
  * carried viola at the start of a lowering, and with 0.45 H out, 0.5 H up, and 0.2 H to the
  * front, the right upper arm goes flat in the lift. With 0.05 H to the front, the bow goes 0.7 cm
  * into the viola in a lowering of `beethoven-9`. With 0.3 H out and 0.15 H to the front, the right
@@ -1252,7 +1261,7 @@ const CAT_HOLD = {
   restCurlL: 115 * MathUtils.DEG2RAD,
   restPawTurnL: 42 * MathUtils.DEG2RAD,
   restYawL: 45 * MathUtils.DEG2RAD,
-  liftPoleL: [-1.2, -0.6, 0],
+  liftPoleL: [0.6, 1, 1],
   restBow: {
     lap: { along: 0.6, offset: [0.4, 0.6, -0.05] },
     tip: [0.15, 1, -0.45],

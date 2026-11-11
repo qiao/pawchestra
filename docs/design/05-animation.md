@@ -225,7 +225,13 @@ The rest of each family:
 - **Violin and viola.** A seated player rests as a seated violinist (strings 2.9): the instrument
   upright on the left thigh, the neck through the closed left paw, and the bow upright at the
   right side (`restHandAt()`, `UPRIGHT_BOW`). In a move, the instrument turns with the left paw as
-  one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). A
+  one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). The
+  instrument turns the short way from the rest to the play: the scroll stays up, and the body
+  swings in and up to the jaw. The elbow in the middle of the move (`BowedHold.liftPoleL`) sets
+  the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. On
+  the cat, the elbow points up, back, and a little in. Reason: with the elbow out and down, the
+  supination took the viola the long way, upside down past the paw. `pnpm carry-check` gives the
+  detour of each move from the short arc. A
   standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold and
   the hold of the rabbit, the arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
