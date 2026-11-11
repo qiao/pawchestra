@@ -365,17 +365,20 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/cat/tripo-hand/cat.rig.glb',
     },
   ],
-  // The cello dog (design 4.4).
+  // The cello dog (design 4.4): the candidate hand rig of the Tripo P2 beagle
+  // (`assets/models/dog/tripo-hand/dog.blend`), with no arm cut and no arm stretch. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the dog of `dog.rig.glb`, and the
+  // crease angle 180°. The map paints the iris and a light on each eyeball of the source, so the
+  // eyes take the finish `varnish` and no eye light.
   [
     'dog',
     {
       landmark: 'shoulders',
-      height: 1.00078,
       seated: true,
       soloist: false,
       constant: 'STUDIO_DOG',
-      crease: 35,
-      glb: 'assets/models/dog/dog.rig.glb',
+      glb: 'assets/models/dog/tripo-hand/dog.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The trombone panda (design 4.4). It stands as a soloist. The standing shoulder joints are
