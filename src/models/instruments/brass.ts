@@ -24,6 +24,15 @@ export const BRASS = {
   tuba: { height: 0.95, bellRadius: 0.21 },
 } as const;
 
+/**
+ * The lean of the upper bell branch of the tuba out to the left. `bend` is the height of the bend
+ * above the bottom bow, in meters, above the grip of the left paw, and `angle` is the lean from the
+ * vertical, in degrees. A straight branch put the inner rim of the bell into the left cheek and the
+ * left eye of the rhino. A turn of the whole tuba moved the left grip out of the reach of the left
+ * arm.
+ */
+const TUBA_BELL_LEAN = { bend: 0.55, angle: 15 } as const;
+
 /** The lacquered brass of the tubes and the bells. */
 const METAL = INSTRUMENT_COLORS.brass;
 
@@ -733,6 +742,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const bottom = new Vector3(-0.06 - left, -0.72, back - 0.2);
   const at = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(bottom));
   // The bell branch rises from the bottom bow to the bell, and widens more and more toward it.
+  // Above the grip of the left paw, it leans out to the left (TUBA_BELL_LEAN).
   const rise = 0.13;
   turned(
     piece,
@@ -740,12 +750,26 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
     [0, 1, 0],
     [
       [0.068, 0],
-      [0.085, 0.42],
-      [0.108, t.height - rise - 0.28],
-      [0.135, t.height - rise - 0.15],
-      [t.bellRadius * 0.82, t.height - rise - 0.05],
-      [t.bellRadius * 1.02, t.height - rise],
-      ...openBell(t.bellRadius, t.height - rise),
+      [0.085, TUBA_BELL_LEAN.bend - rise],
+    ],
+    TUBA_SEGMENTS,
+    METAL,
+  );
+  const lean = TUBA_BELL_LEAN.angle * MathUtils.DEG2RAD;
+  const bellAxis = new Vector3(-Math.sin(lean), Math.cos(lean), 0);
+  const bend = at([-0.06, TUBA_BELL_LEAN.bend, 0]);
+  const top = t.height - TUBA_BELL_LEAN.bend;
+  turned(
+    piece,
+    bend,
+    toVec3(bellAxis),
+    [
+      [0.085, 0],
+      [0.108, top - 0.28],
+      [0.135, top - 0.15],
+      [t.bellRadius * 0.82, top - 0.05],
+      [t.bellRadius * 1.02, top],
+      ...openBell(t.bellRadius, top),
     ],
     TUBA_SEGMENTS,
     METAL,
@@ -797,12 +821,13 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
     METAL,
   );
   tubaSpace(piece, at, back, t.height, t.bellRadius);
+  const bellMouth = toVec3(new Vector3(...bend).addScaledVector(bellAxis, top));
   const bellTarget: PlayTarget = {
     kind: 'bell',
     bone: 'instrument',
-    from: at([-0.06, t.height, 0]),
-    to: at([-0.06, t.height, 0]),
-    normal: [0, 1, 0],
+    from: bellMouth,
+    to: bellMouth,
+    normal: toVec3(bellAxis),
     keys: null,
   };
   return {

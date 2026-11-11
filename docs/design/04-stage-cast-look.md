@@ -1813,10 +1813,12 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
 - **Horn.** A double horn: the outer hoop widens in one spiral turn into the bell tail. Four
   rotary valves with silver caps and the levers of the left fingers, the loops of the F side and
   the B♭ side, and the valve slides.
-- **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, the bottom
-  bow joins it to the valves, four piston valves with pearl buttons, and four valve slides at the
-  right of the valves. The lead pipe starts at the end of the mouthpiece shank and goes down in
-  front of the chin, so that no part of it goes into the face.
+- **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, and above the
+  grip of the left paw it leans out to the left (`TUBA_BELL_LEAN`), so that the rim of the bell
+  stays off the cheek and the eye of the rhino. The bottom bow joins it to the valves, four piston
+  valves with pearl buttons, and four valve slides at the right of the valves. The lead pipe
+  starts at the end of the mouthpiece shank and goes down in front of the chin, so that no part of
+  it goes into the face.
 
 The mouthpieces, the ferrules, the valve caps, and the levers are nickel silver, as on the real
 instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell

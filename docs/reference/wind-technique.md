@@ -497,7 +497,7 @@ The app follows these facts:
   paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
   the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
   out to the left. Both elbows point down and out, away from the rib cage. The bell stands at the
-  left of the head (`play`). The rim rests on the lips with its top on the upper lip, and the lead
+  left of the head, with the eye and the cheek free (`play`, `TUBA_BELL_LEAN`). The rim rests on the lips with its top on the upper lip, and the lead
   pipe starts at the end of the mouthpiece shank, in front of the chin (`lipShift`, `tuba()` of
   `src/models/instruments/brass.ts`).
 - **The size rule of the winds (2.1, 2.4, 3).** A recast trumpeter, clarinetist, or flutist plays
