@@ -351,8 +351,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch, and the legs
   // of the source, so its chair is lower. Its `.blend` holds the facts of the body: the
   // scale that keeps H of that cat, and the crease angle 55°, because its arm rings have 8
-  // vertices. The color map of `tools/cat-maps.py` keeps the eye paint of the source with its
-  // painted light, so the eyes take the softer finish `varnish` and no eye light.
+  // vertices. The color map of `tools/cat-maps.py` keeps the iris colors of the source and paints
+  // no light in the pupils, so the eyes take the finish `eye` and the eye light, which gives one
+  // small light in each eye. With the finish `varnish`, the large dark ball showed a wide glossy
+  // band, and the eyes read as glass eyes.
   [
     'cat',
     {
@@ -361,7 +363,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_CAT',
       glb: 'assets/models/cat/tripo-hand/cat.rig.glb',
-      eyeFinish: 'varnish',
     },
   ],
   // The cello dog (design 4.4).
