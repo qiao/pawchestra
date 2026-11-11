@@ -708,16 +708,15 @@ passes.
       450 (main 484). Check the bent left elbow in the hall view.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
-- [ ] Cat candidate (third Tripo cat, `tripo-hand/`): the tail hangs behind the seat with the two
-      rigid tail bones, and its tip lies near the back legs of the chair. The cat of main curls its
-      tail on the seat. A key `bind_tail` as on the second Tripo cat can lay it on the seat.
-- [ ] Cat candidate: at the rest moment, the bow paw lifts the bow and the viola stands upright, and
-      the old cat and the cat of main hold the bow down. Check the rest hold with the turned elbow
-      axes (`hinges` 13° and -44°) in the app.
-- [ ] Cat candidate: the seat is 28.0 cm (main 29.8 cm) with shins 1.75 times longer, and the chair
-      is 0.380 m deep (main 0.343 m). A longer shin stretches the shin texels more.
-- [ ] Cat candidate: the eyes keep the size of the source (each opening 0.153 of the head width).
-      In the rest front view the round irises read wide. Ask the user for the eye size.
+- [ ] Cat candidate (third Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so
+      its seat is 19.3 cm (the cat of main 29.8 cm), and its chair is lower than the chairs
+      around it. Check the string rows in the hall view.
+- [ ] Cat candidate: `pnpm pose-depth violist` stops on the body ("33 open loops, and the caller
+      expects 25"), so the clearance of the arms and the viola has only renders.
+- [ ] Cat candidate: the mouth slit still shows a dark smile line, wider than in the source FBX,
+      with the rim faces. A smaller slit needs a point edit that does not open the mouth.
+- [ ] Cat candidate: in the hall light the gray fur is Oklab h 55 (warm), against a neutral gray
+      of the source FBX in an even light. A cooler GRAY_FUR step can move it further.
 - [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
       expects 4"), so the clearance of the thicker arms and the larger head has only renders.
 - [ ] Tripo fox candidate: a dark wedge of the socket lining shows at a lower eye corner in the
