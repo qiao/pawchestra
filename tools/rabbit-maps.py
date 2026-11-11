@@ -5,8 +5,9 @@
 # white, and the black keep their colors. Each texel takes a mix of the steps of the colors, by its
 # nearness to each color, so the blend between two colors stays smooth. The texels of the eyeballs
 # keep the eye paint of the source, with each iris moved to the middle of its opening ("Eyes" of
-# the README, `EYE_PAINT`). The script reads the triangles, the places, and the texture points of
-# the eyeballs from the rig file (`ownEyes` of the export).
+# the README, `EYE_PAINT`). The brows and the dark band of each eye socket keep half of their
+# contrast to the fur ("Brows"). The script reads the triangles, the places, and the texture points
+# of the eyeballs from the rig file (`ownEyes` of the export).
 # The normal map `rabbit-normal.webp` holds the tilts of the fur. The output depends only on the
 # input files and on cwebp 1.5.0.
 #
@@ -102,6 +103,23 @@ PLAY_CAMERA_ELEVATION = 7.4
 #: view. A small turn out stops a cross-eyed look.
 GAZE_OUT = 6.0
 GAZE_UP = 5.0
+#: The share of the contrast to the fur around them that the brows and the eye sockets keep
+#: (`soften_brows()`): 1 keeps the paint of the source, 0 paints them as the fur. The source
+#: paints thick, dark, high brows and a dark band in each socket over the eye, and in the play
+#: they read as a strong frown.
+BROW_CONTRAST = 0.5
+SOCKET_CONTRAST = 0.5
+#: The share of the length of each brow at each end in which its contrast fades to 0, so that the
+#: brow paint is shorter.
+BROW_FADE = 0.25
+#: The socket faces: the faces of the body with each corner within SOCKET_REACH ball radii of the
+#: middle of a ball. The fur color of a side is the median texel of the body faces from
+#: SOCKET_REACH to FUR_REACH ball radii.
+SOCKET_REACH = 1.6
+FUR_REACH = 2.6
+#: The texels around the brow and the socket triangles that also soften, so that the bilinear
+#: texture sample at the edge of a triangle takes no old dark color.
+SOFT_MARGIN = 2
 #: The share of the middle angle across of the eye opening that the gaze takes: 0 gives
 #: parallel eyes that look straight ahead, 1 an eye in the middle of each opening.
 GAZE_ACROSS = 0.5
@@ -733,6 +751,88 @@ def center_irises(rig, image):
     return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
 
 
+def loose_parts(rig):
+    """Gives the part of each vertex of the fur primitive: the vertices of one triangle, and the
+    vertices at the same place (the two sides of a UV seam), are in one part. The part ids are
+    the smallest vertex of each part."""
+    triangles, positions = rig[0], rig[1]
+    parent = np.arange(len(positions))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    def join(a, b):
+        a, b = find(a), find(b)
+        parent[max(a, b)] = min(a, b)
+
+    for a, b, c in triangles:
+        join(a, b)
+        join(a, c)
+    _, first, same = np.unique(np.round(positions, 6), axis=0, return_index=True,
+                               return_inverse=True)
+    for i, k in enumerate(same.ravel()):
+        join(i, first[k])
+    return np.array([find(i) for i in range(len(positions))])
+
+
+def soften_brows(rig, image):
+    """Moves the brows and the eye sockets toward the fur around them, and gives the new image.
+    The brows are the two loose parts with each vertex above the top of the eyeballs. The sockets
+    are the faces of the body near each ball (SOCKET_REACH). Each texel of their triangles, and
+    SOFT_MARGIN texels around them but no eyeball texel, takes in Oklab the fur color of its side
+    plus BROW_CONTRAST or SOCKET_CONTRAST of its step from that color. On a brow, the share fades
+    to 0 in BROW_FADE of the length at each end, so the brow paint is also shorter. The fur color of a side is
+    the median texel of the body faces from SOCKET_REACH to FUR_REACH ball radii of its ball."""
+    triangles, positions, points, eyes = rig[:4]
+    part = loose_parts(rig)
+    ids, counts = np.unique(part, return_counts=True)
+    body = ids[np.argmax(counts)]
+    ball_faces = [f for side in ('L', 'R') for f in eyes[side]['faces']]
+    ball_top = positions[triangles[ball_faces].ravel(), 1].max()
+    face_part = part[triangles[:, 0]]
+    out = np.asarray(image).copy()
+    lab = oklab(linear(out))
+    balls = np.asarray(draw_triangles(triangles, points, ball_faces, SIZE)) > 0
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        c, r, _ = ball_frame(rig, np.array(eyes[side]['faces']))
+        reach = np.linalg.norm(positions[triangles] - c, axis=2).max(axis=1) / r
+        body_faces = face_part == body
+        sockets = np.flatnonzero(body_faces & (reach < SOCKET_REACH))
+        ring = np.flatnonzero(body_faces & (reach >= SOCKET_REACH) & (reach < FUR_REACH))
+        ring_texels = np.asarray(draw_triangles(triangles, points, ring, SIZE)) > 0
+        fur = np.median(lab[ring_texels & ~balls], axis=0)
+        brows = [k for k in ids if k != body and (positions[part == k, 1] > ball_top).all()
+                 and sign * positions[part == k, 0].mean() > 0]
+        if len(brows) != 1:
+            sys.exit(f'The {side} side has {len(brows)} brow parts in place of 1.')
+        brow_faces = np.flatnonzero(face_part == brows[0])
+        # The place of each brow texel along the brow, from 0 at its inner end to 1 at its outer
+        # end, gives the fade of its contrast at the two ends.
+        ys, xs, places = eye_texels(rig, brow_faces)
+        ends = np.abs(positions[part == brows[0], 0])
+        along = (np.abs(places[:, 0]) - ends.min()) / (ends.max() - ends.min())
+        fade = np.zeros((SIZE, SIZE, 3))
+        fade[ys, xs] = (smooth(0, BROW_FADE, along) * smooth(0, BROW_FADE, 1 - along))[:, None]
+        raster = np.zeros((SIZE, SIZE), bool)
+        raster[ys, xs] = True
+        fade = fill_around(fade, raster)[..., 0]
+        for name, faces, keep in (('brow', brow_faces, BROW_CONTRAST * fade),
+                                  ('socket', sockets, np.full((SIZE, SIZE), SOCKET_CONTRAST))):
+            mask = np.asarray(draw_triangles(triangles, points, faces, SIZE)
+                              .filter(ImageFilter.MaxFilter(2 * SOFT_MARGIN + 1))) > 0
+            mask &= ~balls
+            share = keep[mask][:, None]
+            step = np.abs(lab[mask][:, 0] - fur[0])
+            out[mask] = srgb8(linear_of_oklab(fur + share * (lab[mask] - fur)))
+            print(f'{name} {side}: {len(faces)} faces, {int(mask.sum())} texels; fur Oklab L '
+                  f'{fur[0]:.3f}; the mean lightness step to the fur goes from {step.mean():.3f} to '
+                  f'{(share[:, 0] * step).mean():.3f}')
+    return Image.fromarray(out)
+
+
 def write_color_map():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
@@ -740,6 +840,7 @@ def write_color_map():
         image = paint_eyes(rig, image)
     elif EYE_PAINT == 'centered':
         image = center_irises(rig, image)
+    image = soften_brows(rig, image)
     lab = oklab(linear(np.asarray(image)))
     eyes, count = eye_mask(rig, SIZE)
     moved = move_texels(lab)
