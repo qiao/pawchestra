@@ -477,10 +477,10 @@ export const SPECIES = {
    * feet, a small tuft of hair, and a long tail that ends in a curl. It has the studio body of the
    * mesh `assets/models/monkey/monkey.glb`, which `pnpm rig-mesh monkey` rigs (design 4.4), with
    * arms 1.2 times the arms of the mesh. It plays a smaller trumpet, 0.65 of the trumpet of the
-   * app. It has no chair, so it stands on its hind legs with bent knees, in the seated pose at the
-   * seat height of its legs. Its feet stand under its hips, and its trunk leans forward with the
-   * head level, so that its center of mass is over the middle of its soles. Its long tail goes back
-   * and down, and its curl stands on the floor behind it. It stands upright as a soloist. Its head
+   * app. It has no chair, so it stands on its hind legs, in the seated pose at the seat height of
+   * its legs. Its hips stand over its feet, its knees bend a little, and its shoulders stay over
+   * its hips, so that its center of mass is over the middle of its soles. Its long tail goes back
+   * and down. It keeps this stance as a soloist. Its head
    * height is the head of the studio body, and the seat height is the seat of the studio body, in
    * H.
    */
