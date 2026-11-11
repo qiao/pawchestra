@@ -221,6 +221,38 @@ interface ArmTask {
   readonly wrist: Vector3;
   readonly hand: Quaternion;
   readonly pole: Vec3;
+  /**
+   * The largest twist of the hand on its forearm, around the bind axis of the forearm, in
+   * radians. A larger twist turns the hand back to it around that axis. No limit by default.
+   */
+  readonly maxTwist?: number;
+}
+
+const twistAxis = new Vector3();
+const twistUndo = new Quaternion();
+
+/**
+ * Limits the twist of a local rotation around an axis, in place: the swing stays, and the twist
+ * turns back to the limit.
+ *
+ * @param q The local rotation.
+ * @param axis The unit axis of the twist.
+ * @param limit The largest twist, in radians, 0 or more.
+ * @returns `q`.
+ */
+function limitTwist(q: Quaternion, axis: Vector3, limit: number): Quaternion {
+  const along = q.x * axis.x + q.y * axis.y + q.z * axis.z;
+  let twist = 2 * Math.atan2(along, q.w);
+  if (twist > Math.PI) {
+    twist -= 2 * Math.PI;
+  } else if (twist < -Math.PI) {
+    twist += 2 * Math.PI;
+  }
+  const over = Math.sign(twist) * Math.max(0, Math.abs(twist) - limit);
+  if (over === 0) {
+    return q;
+  }
+  return q.multiply(twistUndo.setFromAxisAngle(axis, -over));
 }
 
 const solved = createArmPose();
@@ -249,7 +281,12 @@ export function writeArm(task: ArmTask, chest: Quaternion, rotations: Float32Arr
     arm.bones.forearm,
     local.copy(solved.upper).invert().multiply(solved.lower),
   );
-  setBoneRotation(rotations, arm.bones.hand, local.copy(solved.lower).invert().multiply(task.hand));
+  local.copy(solved.lower).invert().multiply(task.hand);
+  if (task.maxTwist !== undefined) {
+    twistAxis.fromArray(arm.bind.wrist).sub(from.fromArray(arm.bind.elbow)).normalize();
+    limitTwist(local, twistAxis, task.maxTwist);
+  }
+  setBoneRotation(rotations, arm.bones.hand, local);
 }
 
 /**
