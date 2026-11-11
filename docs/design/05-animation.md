@@ -225,13 +225,14 @@ The rest of each family:
   upright on the left thigh, the neck through the closed left paw, and the bow upright at the
   right side (`restHandAt()`, `UPRIGHT_BOW`). In a move, the instrument turns with the left paw as
   one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). A
-  standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold, the
-  arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
+  standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold and
+  the hold of the rabbit, the arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
-  arm root. The cat and the rabbit rest the instrument upright on the left thigh or knee, with
-  the elbows near the sides, as a seated violinist does. The cat rests the viola at the outer side
+  arm root. On the new rabbit body, the lap places at the knees made both arms reach nearly
+  straight forward. The cat rests the instrument upright on the left thigh, with the elbows near
+  the sides, as a seated violinist does. The cat rests the viola at the outer side
   of the left thigh. Reason: with the viola on the top of the thigh, the elbow had to point out to
   clear the round belly, and the left upper arm then turned far about its axis from the bind and
   read as bent.

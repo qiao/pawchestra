@@ -514,8 +514,8 @@ The app follows these facts:
 - **The rest (2.9).** The violin and the viola rest upright on the left knee or thigh. The left paw
   holds the neck in a rest grip near the grip of the play (`restHandAt()`,
   `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). In
-  the shared violin hold, both arms hang out to the sides until they clear the body, and the
-  elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
+  the shared violin hold and the hold of the rabbit, both arms hang out to the sides until they
+  clear the body, and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The cat rests the viola nearer to the
   hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
   side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
