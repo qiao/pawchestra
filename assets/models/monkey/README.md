@@ -153,10 +153,10 @@ below. `make_config.py` writes `tools/mesh-rigs/simple/monkey-tripo.json`: the j
 
 | Item | Value |
 |---|---|
-| Size | 399,190 bytes |
-| SHA-256 | `d46510b2ee4acab35a9d89d223bd80cff1a269d3ee947d15bd17e504ffd43f50` |
+| Size | 398,678 bytes |
+| SHA-256 | `a6b8e7f3821939e235d6375412d6598fd9daf08c13946476686f3ad25391cf26` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the tuft, the soles at z = 0, the monkey faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `monkey`: 3,721 vertices and 3,983 faces (3,323 quads and 660 triangles, 7,306 triangles), flat faces, and the surface of `sa.add_surface()`. 20 faces are gloss (the nose). The 96 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/monkey/tripo-hand/monkey-color.webp`) |
+| Mesh | One object `monkey`: 3,721 vertices and 3,983 faces (3,323 quads and 660 triangles, 7,306 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 20 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 96 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/monkey/tripo-hand/monkey-color.webp`) |
 | Armature | `monkey_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.714598 (the shoulder joints at 1.130693 m for each unit, so that H is 0.333629 m, the H of the monkey of main), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -219,6 +219,13 @@ The weights, in the rest pose:
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
+**Nose.** At the end of the build, the 20 gloss faces of the pink nose go to the slot `fur`
+(`noseFur` of the params). Thus the nose takes the color map, with its painted nostrils, and the
+smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
+The weights do not change: the nose vertices keep the row {`head` 1}. The head center of the holds
+does not move, so the armature has no `headShift`. The nose keeps the colors of the source map. In
+the hall light it reads as the nose of the FBX file, so the map tool does not change it.
+
 **Stance.** The monkey has no chair (`noChair` of `src/models/species.ts`). The property `seat` is
 {`prop` `chair`, `front` -0.04, `back` -0.11, `halfWidth` 0.15}: a seat under the back of the
 haunch, behind the heels, which only sets the seat height of the export. The seat height is
@@ -279,15 +286,15 @@ times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libweb
 
 **Differences from the source.** The app light is warm and comes from above, so the brown fur reads
 lighter and more orange than in the even gray light of an FBX viewer. The eye whites read smaller,
-and the pupils larger and darker, than in the FBX viewer. The nose is a gloss face group with flat
-normals. The source has small notches at the back of the knees and under the haunch, which the app
-light shows as dark marks. The arm tubes have 8 vertices around, so the arm outline shows corners.
+and the pupils larger and darker, than in the FBX viewer. The source has small notches at the back
+of the knees and under the haunch, which the app light shows as dark marks. The arm tubes have 8
+vertices around, so the arm outline shows corners.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/monkey.rig.glb` | 1,240,684 bytes | `220605cf1570c4ff8de3b86e3cd18f70b8cc375afb4efdeb68edd5b0047d532c` |
-| `tripo-hand/monkey.rig.json` | 16,672 bytes | `09138d06e401dce46b9949e524c94dd21c617b99409ee25ebb8ecda57c5a3d04` |
+| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `c2571ddd46f1c28432633fc765f14670bb5546981ad9b20f9b7e4897a341c1f6` |
+| `tripo-hand/monkey.rig.json` | 16,672 bytes | `de0aaf7331eddd31b603e0eb00438c4c32e8cfdd7c822390eea2b8527294f35e` |
 | `tripo-hand/monkey-color.webp` | 178,300 bytes, 2048 × 2048 | `5b9920243e479862e07e602f19b82b5eebdfe1f1ddd6d019c524f619cb34d117` |
 | `tripo-hand/monkey-normal.webp` | 111,326 bytes, 1024 × 1024 | `e81b285a48619d696b4ae23557ee2d203934d8a2be29739b2a7cfd2c88f83dca` |
