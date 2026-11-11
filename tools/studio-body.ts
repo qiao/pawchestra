@@ -120,6 +120,13 @@ export interface AnimalSettings {
    */
   readonly colorBlend?: number;
   /**
+   * The finish of the eyes of the mesh of a hand rig (design 4.5). The eye light of the players
+   * shines only on the finish `eye`, so another finish gives the eyes no light of the app. A body
+   * whose color map paints a light on each eye takes a less glossy finish, so that the painted
+   * light is the only light. With no value, the eyes take {@link EYEBALL_FINISH}.
+   */
+  readonly eyeFinish?: Finish;
+  /**
    * The GLB file of the body, relative to the repository: the rig that `pnpm rig-mesh` writes from
    * a source mesh (`docs/agents/rigging.md`, "The asset chain"). Each animal of `ANIMALS` has one.
    * The scratch settings of a probe or of `--inspect` can have none.
@@ -3026,7 +3033,17 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     settings,
     raises.map((raise) => raise.target),
   );
-  const mesh = weldMesh(glb, kept);
+  const welded = weldMesh(glb, kept);
+  const { eyeFinish } = settings;
+  const mesh =
+    eyeFinish === undefined
+      ? welded
+      : {
+          ...welded,
+          faces: welded.faces.map((face) =>
+            face.eyeball === true ? { ...face, finish: eyeFinish } : face,
+          ),
+        };
   const frame = sceneFrame(glb, skeleton, mesh, settings);
   const scale = frame.scale;
   const model = (p: Vector3): Vec3 => toModelAxes(p.clone().add(frame.offset), scale);

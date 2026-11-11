@@ -599,8 +599,8 @@ export interface StudioBody {
   readonly rim?: readonly number[];
   /**
    * The faces of the eyes of the mesh of a hand rig with no bead eyes (design 4.4, "Hand rig"), as
-   * indices of the triangles of the packed mesh. They have the `eye` finish, and each corner
-   * takes the mean normal of the eyeball faces at its vertex (`studioNormals()`), so that each
+   * indices of the triangles of the packed mesh. They have the `eye` finish, or the `eyeFinish`
+   * of the body in `ANIMALS` of `tools/studio-body.ts`, and each corner takes the mean normal of the eyeball faces at its vertex (`studioNormals()`), so that each
    * eyeball shades as a smooth ball. A body with bead eyes has none.
    */
   readonly eyeballs?: readonly number[];
