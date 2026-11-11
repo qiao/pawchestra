@@ -1160,10 +1160,13 @@ const WOLF_CLARINET = {
  * along the casings toward the bell (`restGripShiftL`), so that the left finger tips stay on the
  * casings of the upright trumpet.
  *
- * At rest, the trumpet moves 0.45 H down, 0.1 H to the right, and 0.25 H back from the mouth
- * (`restShift`), so that it turns down in front of the belly with the elbows bent, as a player
- * rests the trumpet in front of the body. With 0.05 H back, the arms are almost straight in front
- * of the body at rest.
+ * At rest, the trumpet moves 0.5 H down, 0.1 H to the right, and 0.12 H back from the mouth
+ * (`restShift`), so that it turns down in front of the belly with the elbows a little bent, as a
+ * player rests the trumpet in front of the body. With 0.25 H back, the bent elbows folded 57
+ * faces of the arms in the rest sample (`pnpm hold-fit trumpeter --scan`), and the inner elbows
+ * showed a soft crease. With 0.12 H back, 37 faces fold, and the left upper arm twists 39° in
+ * place of 43°. The center of mass stays 0.3 cm behind the middle of the soles. With 0.05 H back,
+ * the arms are almost straight in front of the body at rest.
  *
  * Both elbows point down and out, as a real player lets the elbows hang. The mouthpiece rim rests
  * on the lips, as the rim of a real trumpet player (`docs/reference/wind-technique.md` 2.1): it
@@ -1181,7 +1184,7 @@ const MONKEY_TRUMPET = {
   faceTube: ['palm', 'palm'],
   aimSide: [0, 0.8],
   gripShiftR: [-0.1, 0, 0],
-  restShift: [0.1, -0.45, 0.25],
+  restShift: [0.1, -0.5, 0.12],
   restGripShiftL: [0, 0, 0.04],
   restAim: 1,
   gripCurl: curls(130, 92),

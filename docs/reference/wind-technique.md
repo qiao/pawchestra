@@ -505,8 +505,8 @@ The app follows these facts:
   `src/models/instruments/brass.ts`, `play`). The big head puts the mouth of the Tripo monkey
   farther than its arm from the shoulders. Thus the head bows, and the trumpet turns down with it
   (`farMouth`), so that the trumpet keeps its angle to the face [22]. Both shoulders turn forward
-  (`reach`, `reachL`). At rest, the trumpet stays in front of the belly with the elbows bent
-  (`restShift`). The valves follow the trumpet chart (7.3). The rim presses the lips 0.24 cm
+  (`reach`, `reachL`). At rest, the trumpet stays in front of the belly with the elbows a little
+  bent (`restShift`). The valves follow the trumpet chart (7.3). The rim presses the lips 0.24 cm
   (`lipShift`). The monkey stands erect with the shoulders over the hips (1.8), and its center of
   mass stays over the soles (the bind of `assets/models/monkey/tripo-hand/`).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
