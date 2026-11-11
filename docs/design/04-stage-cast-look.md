@@ -742,23 +742,22 @@ with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and
 of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
 the claws of the source to the colors of the bear of main in the hall light (the claws dark grey),
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
-hand rig of the third Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the
-cat violist, in the same way. The source FBX is the target of its look: the head, the trunk, the
-limbs, the paws, the legs, the iris colors, and the colors stay as in the source, and its chair
-fits its shorter legs. Reason: the edits toward the form and the colors of the cat of main read as
-a different cat. Its eyeballs and sockets are smaller than in the source, each ball sits a little
-deeper, and its front is round (`assets/models/cat/README.md`, "Eye size"). Its map tool
-(`tools/cat-maps.py`) moves each iris to the middle of its opening in the play view of the
-violist, makes it round and large enough to fill the opening with a smaller pupil share
-(`FAR_IRIS_RADIUS`, `PUPIL_RATIO`), turns it up under the upper lid (`GAZE_UP`), and gives the
-gray fur a small cool step, so that it stays gray in the warm stage light. The map paints no light in the pupils,
-so the eyes take the finish `eye` and the eye light. Reason: at the source size, the eyes bulged
-with white above the iris, and the finish `varnish` gave the large dark pupil a glassy band, so
-the eyes read as glass eyes. Its paws turn about
-the forearms by whole ring steps and its elbow axes turn, so that each part of each arm takes at
-most about 45° of roll or twist in the moments of the violist. Reason: with no turn, the right
-forearm twisted up to 127°. Its tail lies on the seat (the key `bind_tail`), and the faces of its
-deep mouth slit have the face attribute `rim`. Reason: the slit shaded as a thick dark line.
+hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the
+cat violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point
+edit changes its head, trunk, limbs, paws, legs, or tail, its map keeps the colors of the source
+(`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
+chair fits its legs. The only form edits are those of the eyes. Its eyeballs and sockets are
+smaller than in the source, each ball sits a little deeper, and the skin of each upper lid turns
+down a little over the top of the iris (`assets/models/cat/README.md`, "Eyes"). Reason: at the
+source size, each eye opening was about 0.15 of the head width, the ball bulged out of the face,
+and white showed above the iris in the play view. These faults made the eyes of the third cat
+read uncanny. The map paints a soft light in each pupil, so the eyes take the finish `varnish`
+and no eye light, with one light in each eye. Its paws turn about the forearms by whole ring
+steps, its elbow axes turn, and its bind upper arm points down and forward, so that each part of
+each arm takes at most about 45° of roll or twist in the moments of the violist, the rest
+included. Its thighs spread 20° in the seated bind. Reason: with less spread, its round belly
+covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail lies on
+the seat (the key `bind_tail`).
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox. It follows the route of the Tripo wolf (below): no point edit of its form, the colors and the
 eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of
