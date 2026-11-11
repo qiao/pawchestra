@@ -1,5 +1,5 @@
 {
- "sha256": "5baa550e24cff213546ffc58cc89852ac360c5da92c70571c2be71e17c59e8ef",
+ "sha256": "3e28f86bed16d78b71ff07d55d140cc0fe4c957d54ef2784f150da2c2917cfaf",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -20,8 +20,8 @@
     0.363,
     0.09
    ],
-   "vertices": 170,
-   "weights": "e163c731b3ac75e3"
+   "vertices": 163,
+   "weights": "6cd67ec93877a087"
   },
   "spine": {
    "head": [
@@ -29,8 +29,8 @@
     0.443155,
     0.089684
    ],
-   "vertices": 111,
-   "weights": "706759576b5f3467"
+   "vertices": 104,
+   "weights": "5f72c2b1cce38efd"
   },
   "spine1": {
    "head": [
@@ -38,8 +38,8 @@
     0.524306,
     0.104335
    ],
-   "vertices": 110,
-   "weights": "fed02c09e09bc8f8"
+   "vertices": 109,
+   "weights": "d3263b92c53062cf"
   },
   "chest": {
    "head": [
@@ -200,8 +200,8 @@
     0.363332,
     0.094989
    ],
-   "vertices": 185,
-   "weights": "7f48d2b171126049"
+   "vertices": 173,
+   "weights": "c0777fd7f2b08ade"
   },
   "shin_L": {
    "head": [
@@ -236,8 +236,8 @@
     0.363332,
     0.094989
    ],
-   "vertices": 182,
-   "weights": "9a0bc60d141bf0d1"
+   "vertices": 171,
+   "weights": "e73d0bbdfbd5bb4c"
   },
   "shin_R": {
    "head": [
@@ -272,8 +272,8 @@
     0.415905,
     -0.018748
    ],
-   "vertices": 115,
-   "weights": "48e27d2e2458ced6"
+   "vertices": 63,
+   "weights": "c98558dc07534580"
   },
   "tail_tip": {
    "head": [
@@ -281,8 +281,8 @@
     0.225956,
     -0.132717
    ],
-   "vertices": 141,
-   "weights": "435ddc9cdccc50e2"
+   "vertices": 136,
+   "weights": "8eabe63f43e40a73"
   },
   "upper_arm_seg0_L": {
    "head": [
@@ -466,15 +466,15 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.003262,
-  "arm_down_R": 0.003264,
-  "legs_straight_L": 0.049088,
-  "legs_straight_R": 0.049021
+  "arm_down_L": 0.003306,
+  "arm_down_R": 0.00331,
+  "legs_straight_L": 0.120866,
+  "legs_straight_R": 0.047509
  },
  "extras": {
   "seat": {
    "prop": "chair",
-   "top": 0.2912853956222534,
+   "top": 0.29125839471817017,
    "front": 0.16619999706745148,
    "back": -0.10000000149011612,
    "halfWidth": 0.14000000059604645
