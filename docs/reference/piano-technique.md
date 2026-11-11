@@ -364,8 +364,9 @@ The app does not follow these facts:
 - **The hands in the lap (section 8).** The round belly covers the thighs to the knees, and the
   thighs lie out of the reach of the short arms. So the paws rest on the front of the belly, at its
   widest, with the palms back and down on it (`restL`, `restR`), as a hand rests on a round belly.
-  The belly of the Tripo polar bear does not cover its thighs, so the paws lie 1 H above the top
-  of the thigh, 0.30 m to 0.33 m below the shoulders, with the elbows bent at the sides.
+  The belly of the Tripo polar bear does not cover its thighs, and its short arms do not reach the
+  thigh tops. So its arms hang at the sides of the belly, with the paws beside the thighs, as the
+  arms of a pianist hang at the sides before the hands find their place [6] [17].
 
 ## 11. Sources
 

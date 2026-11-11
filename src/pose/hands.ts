@@ -263,18 +263,22 @@ export const HANDS_HOLDS = {
     // with the turn 36° and 8 faces (`pnpm arm-check pianist`). The belly of the Tripo polar bear
     // does not cover its thighs, so the vertical line through the lap place finds the top of the
     // thigh, 0.77 m below the shoulders. Its arms are 0.54 m long, so with the old offset (0.05 H
-    // down, 0.42 H forward) the arms were straight and went 12 cm into the belly. The offset 1.0 H
-    // up and 0.45 H forward puts the paws on the front of the belly, 0.30 m to 0.33 m below the
-    // shoulders, with the elbows bent at the sides: the forearms go 2.0 cm and the upper arms 0 cm
-    // into the belly at rest (`pnpm pose-depth pianist`).
+    // down, 0.42 H forward) the arms were straight and went 12 cm into the belly. The offset 0.4 H
+    // out, 0.5 H up, and 0.2 H forward lets the arms hang at the sides of the belly, with the paws
+    // beside the thighs, as the arms of a pianist hang at the sides before a performance. The
+    // forearms go 0 cm and the upper arms 2.5 cm into the belly at rest, and the twist p95 at rest
+    // is 42° (`pnpm pose-depth pianist`, `pnpm arm-check pianist`). With the offset 1.0 H up and
+    // 0.45 H forward, the paws lay on the front of the belly, 0.30 m to 0.33 m below the
+    // shoulders, and the side views showed them held at the chest. Offsets 0.5 H to 0.7 H up
+    // nearer to the middle put the forearms 1.0 cm to 5.5 cm into the belly.
     restL: {
-      lap: { along: 0.85, offset: [0.14, 1, -0.45] },
+      lap: { along: 0.85, offset: [-0.4, 0.5, -0.2] },
       palm: [0.3, -0.6, 1],
       fingers: [1, -0.3, 0],
       pole: [-1, 0, 0.3],
     },
     restR: {
-      lap: { along: 0.85, offset: [-0.14, 1, -0.45] },
+      lap: { along: 0.85, offset: [0.4, 0.5, -0.2] },
       palm: [-0.3, -0.6, 1],
       fingers: [-0.08, -0.84, -0.53],
       pole: [1, 0, 0.3],
