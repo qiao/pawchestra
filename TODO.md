@@ -789,6 +789,8 @@ passes.
       fallback of 4 cm), so the bow stays still in the frog, tip, and crossing moments. The
       pegbox stands 21.7 cm from the head, beside and in front of the snout, so the view from
       az -90 shows it over the snout with no contact.
+- [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
+      place from the body, `DOG_HOLD.fit`).
 - [ ] Violist grip turn: with the level viola, the left paw of the cat turns 49° from its
       accepted grip (p50, limit 45, `ACCEPTED_GRIPS` of `tools/arm-check.ts`). Check the left
       paw in 2x crops, and give the new median to `ACCEPTED_GRIPS` if it is good.
@@ -804,6 +806,20 @@ passes.
 - [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
       valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
       technique (`docs/reference/wind-technique.md` 2.1).
+- [ ] Tripo hippo: each forearm spreads about 85° over the moments of the bassist, so the frog
+      (42.4°, left), the lift (43.6°, right), and the lowering (-42.7°, left) stay within 45° by
+      only 1° to 3°. The pizzicato and the high notes on the neck have no twist measure yet.
+- [ ] Tripo hippo: the contrabass is small (0.65, 1.25 m), leans 36° to the left, and turns its
+      top plate 40° to the right, far from the slight turn of a real bassist. The short arms of
+      the source reach the strings only so. Show the user the hold (`reports/2026-11-11-hippo/`).
+- [ ] Tripo hippo: at the tip, the bow forearm lies on the front of the belly. Check the forearm
+      and the belly in close views from az60 in the app.
+- [ ] Tripo hippo: at rest, the right arm stands out level from the side with the bow tip down
+      (`restBow` of the old hold). Offer the user a lower rest of the bow arm.
+- [ ] Tripo hippo: the bow grip (`bowGrip` of `src/models/species.ts`) comes from the paw of the
+      old hippo. Check the stick in the new paw in 2x crops.
+- [ ] Tripo hippo: the gray-pink skin of the FBX reads as a light peach in the app light, and the
+      snout casts a dark band over the mouth line. Ask the user before any change of the light.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
