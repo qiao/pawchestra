@@ -409,7 +409,10 @@ The rest of each family:
   (strings 1.10). Reason: a place in `H` from the head fits one body only. With the chin hold, the
   arms of each recast body went into the body, and with the head turn of the rabbit, the jaw went
   into the violin of six bodies. The rabbit and the red fox keep their own holds (`SHOULDER_HOLD`,
-  `FOX_HOLD`).
+  `FOX_HOLD`). Their holds and the viola hold of the cat turn the top plate 25° back toward up
+  (`violinTurn()`), so that the instrument lies about level and tilts only a little down to the
+  right (strings 1.10). Reason: with the 50° of the chin hold, the instrument read as upright on
+  the chest, and the bow at the frog stood up across the face.
 - **Thick wrist on a floor neck.** The left paw of a floor instrument puts the middle of its finger
   block on the strings. The rebuilt round wrist of the hippo then goes into the back of the neck,
   so its paw lies a little off the strings along the normal of its palm (`BowedHold.gapL`), as a

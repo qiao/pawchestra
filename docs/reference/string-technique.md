@@ -424,7 +424,10 @@ The app follows these facts:
   tilts the left hand further over the neck (`BowedHold.highTilt`), and the wrist comes up beside
   the upper bout.
 - **The violin under the jaw (1.10).** The instrument lies about level and points to the left of
-  the front of the chest, and the jaw lies on the chin rest. The chin rest is at the left of the
+  the front of the chest, and the jaw lies on the chin rest. The rabbit, the red fox, and the cat
+  tilt the top plate only 25° down toward the right (`violinTurn()`), as the instrument is
+  "slightly tilted down toward the right" [78]. With a tilt of 50°, the instrument read as upright
+  on the chest, and the bow at the frog stood up across the face. The chin rest is at the left of the
   tailpiece, on the side of the G string (`CHIN_REST`). The left shoulder bone turns forward
   in the play (`BowedHold.reachL`, `shoulderTurnL()`), as the left shoulder of a violinist moves
   forward, so that the short left arm reaches the nut. The shared violin hold places the tail end
@@ -464,11 +467,9 @@ The app does not follow these facts:
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm.
-- **The head (1.10).** The head of the cat lifts, so that the jaw lies on the chin rest near the
-  neck, and its viola falls to the scroll. A larger shoulder turn sinks the back of the left arm
-  root into the body. The rabbit lowers its head a little (`BowedHold.headDrop`), so that its
-  violin sits higher out of the chest. The red fox lifts its head a little, because its long jaw
-  already lies on the chin rest.
+- **The head (1.10).** The head of the cat and of the red fox lifts a little, because the long
+  jaw already lies on the chin rest. The rabbit lowers its head a little (`BowedHold.headDrop`),
+  so that its violin sits higher out of the chest.
 
 ### 3.2 The bow arm
 
