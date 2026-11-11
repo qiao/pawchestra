@@ -744,18 +744,28 @@ passes.
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
       limit of 45°. Check the shoulder skin at rest in the app.
-- [ ] Tripo beagle candidate: the right forearm twists 91.9° at rest, and the paw turn cannot
-      lower it with the play within 45°. The rest bow grip of `DOG_HOLD` sets it (105° on the dog
-      of main). Check the bow wrist at rest in the app, and if it shows, move the rest elbow
-      (`restPoleR`) for the beagle.
+- [ ] Tripo beagle candidate: the right paw twists 65° on its forearm at rest (`pnpm arm-check
+      cellist`, paw twist p95), 92° before the rest grip of `f5031198e`. No rest grip, rest
+      elbow, or bow turn of the scan took it to 45° or less. In one lowering at the end of
+      `boulanger-matin` (280.67 s), the right paw turns 3,818°/s (limit 3,000). Check the bow
+      wrist at rest and that lowering in the app.
+- [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
+      12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
 - [ ] Tripo beagle candidate: the gloss nose shows flat facets and no painted nostrils, as on the
       wolf.
 - [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
       no ring split. Check the inner elbow fold of the bow arm in the app.
 - [ ] Tripo beagle candidate: the doc comment of `dog` in `src/models/species.ts` still names the
       mesh `dog.glb` of the dog of main and its longer legs. Update it when the candidate merges.
-- [ ] Tripo beagle candidate: the seat is 0.150 m high (0.265 m on the dog of main), and the cello
-      keeps the place of `DOG_HOLD`. Check the cello size and place against the smaller body.
+- [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
+      place from the body, `DOG_HOLD.fit`).
+- [ ] Hippo bassist bow: the bow arm reaches no part of the hair (`bowRangeOf()` gives its
+      fallback of 4 cm), so the bow stays still in the frog, tip, and crossing moments. The
+      pegbox stands 21.7 cm from the head, beside and in front of the snout, so the view from
+      az -90 shows it over the snout with no contact.
+- [ ] Violist grip turn: with the level viola, the left paw of the cat turns 49° from its
+      accepted grip (p50, limit 45, `ACCEPTED_GRIPS` of `tools/arm-check.ts`). Check the left
+      paw in 2x crops, and give the new median to `ACCEPTED_GRIPS` if it is good.
 - [ ] Tripo monkey candidate: the eye whites read smaller, and the pupils larger and darker, in the
       app than in the FBX viewer (`reports/2026-11-11-monkey/panel.png`, face rows). Find whether
       the map scale, the finish `varnish`, or the light makes the change.
