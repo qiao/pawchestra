@@ -293,13 +293,12 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/bear/tripo-hand/bear.rig.glb',
     },
   ],
-  // The polar bear pianist: the hand rig of the Tripo mesh (design 4.4, "Hand rig"). Its `.blend`
-  // holds the facts of the body: the landmark is its standing shoulder joints (0.725 u at 2.0576 m
-  // for each unit, 1.3 times the height of 1.1475 m, so that the polar bear is the largest
-  // player), and the crease angle and the blend of the bear. The body keeps the legs of the mesh
-  // and sits on a bench that fits them, with the thighs 25° down. The candidate branch gives it the
-  // hand rig of the Tripo P2 mesh (`assets/models/polar-bear/tripo-hand/polar-bear.blend`): its
-  // facts keep H of the main polar bear, and its thighs slope 20° down for the longer shins.
+  // The polar bear pianist: the candidate hand rig of the Tripo P2 mesh
+  // (`assets/models/polar-bear/tripo-hand/polar-bear.blend`), with no arm cut and no arm stretch.
+  // Its `.blend` holds the facts of the body: the scale that keeps H of the main polar bear, and
+  // the crease angle 55°. The body sits on a bench, with the thighs 22° down for the longer shins.
+  // The maps keep the eye paint of the source with its painted light, so the eyes take the finish
+  // `varnish` and no eye light.
   [
     'polar-bear',
     {
@@ -308,6 +307,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: false,
       constant: 'STUDIO_POLAR_BEAR',
       glb: 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The violinist rabbit (design 4.4): the candidate hand rig of the second Tripo P2 mesh
