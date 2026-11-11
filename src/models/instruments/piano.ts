@@ -833,6 +833,30 @@ export const PIANO_FRONT = {
 } as const;
 
 /**
+ * The lid, the prop stick, and the hinges of the grand piano (design 4.6), in meters
+ * before {@link PIANO_SCALE}. The lid hinges on the straight bass side and opens toward the bent
+ * side, and the prop stick stands on the rim of the bent side near the front, as on a real grand.
+ */
+export const PIANO_LID = {
+  /** The thickness of the lid. */
+  thickness: 0.025,
+  /**
+   * The z of the hinge of the front flap of the lid. The open lid has the flap folded back onto
+   * it, so the music desk stands in front of the lid.
+   */
+  flapZ: -0.4,
+  /** The z of the prop stick, at the end of the straight treble side. */
+  propZ: -0.42,
+  /** The distance of the top of the prop stick from the edge of the lid. */
+  propInset: 0.06,
+  /** The radius of the prop stick. */
+  propRadius: 0.011,
+  /** The z of each hinge on the bass side, and the length of a hinge. */
+  hinges: [-0.35, -0.95, -1.55],
+  hingeLength: 0.07,
+} as const;
+
+/**
  * Adds the front of the case ({@link PIANO_FRONT}): the key bed, the key slip, the cheek blocks,
  * the fallboard, the rail of the desk, the desk with its ledge, and the sheet music.
  *
@@ -917,8 +941,61 @@ function addFront(piece: PieceBuilder): void {
 }
 
 /**
+ * Adds the lid ({@link PIANO_LID}): the lid in the outline of the rim, open on its hinges at the
+ * bass side with its front flap folded back, the hinges, and the prop stick on the rim of the bent side under the edge of the lid.
+ *
+ * @param piece The piece of the piano.
+ */
+function addLid(piece: PieceBuilder): void {
+  const p = PIANO;
+  const l = PIANO_LID;
+  const dark = INSTRUMENT_COLORS.pianoCase;
+  const hingeX = -CASE_PLAN.side;
+  // The main lid behind the flap hinge, and the flap folded back onto it. The lid axes have the
+  // hinge line on their z axis and their origin at the z of the center of the case.
+  const flapZ = l.flapZ - CASE_CENTER[1];
+  const main = CASE_OUTLINE.map(([x, z]): OutlinePoint => [x, Math.min(z, flapZ)]);
+  const flapDepth = l.flapZ - CASE_PLAN.front;
+  const lid = [
+    ...placeCorners(prism(main, 0, l.thickness), transform([CASE_CENTER[0] - hingeX, 0, 0])),
+    ...placeCorners(
+      box(2 * CASE_PLAN.side, l.thickness, -flapDepth),
+      transform([CASE_PLAN.side, 1.5 * l.thickness, flapZ + flapDepth / 2]),
+    ),
+  ];
+  piece.add(
+    lid,
+    dark,
+    transform(
+      [hingeX, p.caseTop, CASE_CENTER[1]],
+      toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), p.lidAngle)),
+    ),
+    'lacquer',
+  );
+  for (const z of l.hinges) {
+    piece.add(
+      box(0.014, 0.012, l.hingeLength),
+      INSTRUMENT_COLORS.brass,
+      transform([hingeX, p.caseTop, z]),
+      'metal',
+    );
+  }
+
+  // The prop stick stands in the middle of the rim top and holds the lid near its edge.
+  const reach = 2 * CASE_PLAN.side - l.propInset;
+  const foot: Vec3 = [CASE_PLAN.side - PIANO_INSIDE.rim / 2, p.caseTop, l.propZ];
+  const head: Vec3 = [
+    hingeX + reach * Math.cos(p.lidAngle),
+    p.caseTop + reach * Math.sin(p.lidAngle),
+    l.propZ,
+  ];
+  piece.rod(foot, head, l.propRadius, 6, dark, 'lacquer');
+}
+
+/**
  * Builds the grand piano (design 4.6). It stands on the floor in front of the player, with the
- * lid open to the right of the player. The celesta and the organs use it too.
+ * lid open to the right of the player, toward the bent side. The celesta and the organs use it
+ * too.
  *
  * @returns The model.
  */
@@ -934,24 +1011,7 @@ export function buildPiano(): InstrumentModel {
   piece.add(prism(CASE_OUTLINE, p.caseBottom, boardY), dark, rimAt, 'lacquer');
   piece.add(rimWall(CASE_OUTLINE, RIM_INNER, boardY, p.caseTop), dark, rimAt, 'lacquer');
   addInside(piece, boardY);
-  const hingeX = -p.caseWidth / 2;
-  const lid = placeCorners(
-    prism(CASE_OUTLINE, 0, 0.02),
-    transform([CASE_CENTER[0] - hingeX, 0, 0]),
-  );
-  piece.add(
-    lid,
-    dark,
-    transform(
-      [hingeX, p.caseTop, CASE_CENTER[1]],
-      toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), p.lidAngle)),
-    ),
-    'lacquer',
-  );
-  // The prop stick stands on the right side of the rim and holds the lid.
-  const propX = 0.33;
-  const lidHeight = p.caseTop + (propX - hingeX) * Math.tan(p.lidAngle);
-  piece.rod([propX, p.caseTop, -0.95], [propX, lidHeight, -0.95], 0.012, 4, dark, 'lacquer');
+  addLid(piece);
   addFront(piece);
   addKeys(piece);
 
