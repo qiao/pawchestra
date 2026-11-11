@@ -277,6 +277,21 @@ the view of the play (`gaze_targets()`):
   lower edge of the opening, so the white goes up to the edge (`LASH_LINE = False`). Each new
   texel is a copy of a texel of the same ball.
 
+**Far view.** The source paints each pupil off the middle of its iris, as an eye that looks to the
+side, as on the fox. In the far view of the hall (a rabbit head about 70 pixels high), the eyes
+read as small dark dots that look to the side, with an off-white near the cream fur around them.
+`far_eyes()` of the tool (the step of the fox, `assets/models/fox/README.md`, "Far view") runs
+after `center_irises()`, about the target of the play view:
+
+- The pupil edge and the iris edge about the source pupil have the medians 23.5 and 36.0 degrees
+  on the left and 23.0 and 35.5 on the right, from 44 and 36 clean directions of 120.
+- The new iris is round, with the pupil in its middle. Its radius is 1.1 times the source
+  (`IRIS_SCALE`, 39.6 and 39.1 degrees), so that it fills nearly all of the opening of the play
+  view, and the pupil is 0.55 of it (`PUPIL_RATIO`), so more of the brown iris shows. The target
+  already turns out by `GAZE_OUT`, so `FAR_GAZE_OUT` is 0.
+- In Oklab, the white takes 0.85 of its lightness and a warm step (`SCLERA_SHADE`, `SCLERA_WARM`),
+  and the iris 0.9 of its lightness, and 0.75 more in its outer ring (`IRIS_SHADE`, `RING_SHADE`).
+
 The source map paints no light on the eyes. `EYE_PAINT = 'cartoon'` of the tool paints the
 cartoon eye of the sheet again (`paint_eyes()`). The eyeballs keep the `eye` finish and the eye
 light of the app, because the source paints no light. The eye light gives the one light of each
@@ -315,7 +330,7 @@ longer for the seat height of the rabbit of main ("Longer shins" below).
 | Mesh | One object `rabbit`, with the shape key `bind_belly` ("Belly" below): 3,760 vertices and 3,899 faces (3,361 quads and 538 triangles, 7,260 triangles), flat faces, and the surface of `sa.add_surface()`. 18 faces are gloss (the pink nose). The 148 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.861111 (the shoulder joints at 1.474 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 55, `backRoom` 0.01 |
-| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light ("Eyes" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light ("Eyes" above), a round iris for the far view ("Far view" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend
 --out assets/models/rabbit/tripo-hand/rabbit.rig.glb`). License of both files: CC BY-NC 4.0, as the
@@ -490,7 +505,7 @@ uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/ra
 
 It moves the cream fur from sRGB (222, 189, 155) to Oklab L 0.87, C 0.045, h 70 (`FUR`), keeps the
 pink, the white, the black, and the eyeballs, keeps the eye paint of the source with each iris
-moved to the middle of its opening ("Eyes" above), and softens the brows and the sockets
+moved to the middle of its opening, round, and larger ("Eyes" and "Far view" above), and softens the brows and the sockets
 ("Brows" above). The median
 Oklab L, C, and h of the cream fur in the seated front view with no fill light at the frog are L
 0.849, C 0.062, h 75.2 with the fur L 0.90, against L 0.747, C 0.055, h 71.1 on the rabbit of main,
@@ -500,7 +515,7 @@ pose and light differ). The target lies between the two views.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 79,436 bytes | `40ecd485e088bbc3ee2377a59d460bf75c27fa393b3052c167b3075506863544` |
+| `tripo-hand/rabbit-color.webp` | 78,370 bytes | `df66ff0c8d4782827a4705e7e8ff0824f1b633c69c0da6dd033e66b11f1ecb3e` |
 | `tripo-hand/rabbit-normal.webp` | 24,694 bytes | `71551c8613a7f9908945d492d34da22209dca1a54f043a22bf77397799c4e749` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (0.61 % of the
