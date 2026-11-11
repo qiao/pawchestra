@@ -96,12 +96,14 @@ export const INSTRUMENT_COLORS = {
    */
   harpWire: srgb('#a9aaa8'),
   pianoCase: srgb('#15120f'),
-  /** The iron plate inside the piano: a dark gold, as in `mockup.png`. */
-  pianoPlate: srgb('#6b5226'),
+  /** The iron plate inside the piano: the gold paint of a concert grand. */
+  pianoPlate: srgb('#9c7a36'),
   /** The soundboard at the bottom of the inside of the piano: a warm spruce. */
   soundboard: srgb('#5a3c22'),
-  /** The strings of the piano. */
-  pianoStrings: srgb('#a89064'),
+  /** The steel strings and the tuning pins of the piano. */
+  pianoStrings: srgb('#d4d0c8'),
+  /** The bass strings of the piano: a copper winding. */
+  pianoBassStrings: srgb('#a8703f'),
   /** The sheet music on the piano desk: the sheet color of the stands. */
   sheet: srgb('#ece6d6'),
   whiteKeys: srgb('#f2eee6'),
