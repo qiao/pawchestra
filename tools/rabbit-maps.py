@@ -372,6 +372,41 @@ def fill_around(image, inside):
     return out
 
 
+def ball_texels(rig):
+    """Gives the texels of each eyeball (rows, columns, and the place of each in the seated bind,
+    by side), and a mask of the texels of the two balls. It stops when the two balls share more
+    than EYE_OVERLAP of their texels, because then no ball can take its own paint."""
+    eyes = rig[3]
+    taken = np.zeros((SIZE, SIZE), bool)
+    texels = {}
+    for side in ('L', 'R'):
+        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
+        if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
+            sys.exit('The texels of the two eyeballs overlap, so no ball can take its own paint.')
+        taken[ys, xs] = True
+        texels[side] = (ys, xs, places)
+    return texels, taken
+
+
+def ball_image(rig, out, taken):
+    """Gives the image of the float colors `out`, in which the padding texels around the ball
+    islands, and the texels of the thin gaps between two ball triangles that the raster of
+    eye_texels() leaves, take the new colors of the ball next to them (the texels `taken`). So no
+    old color shows as a line on a seam."""
+    triangles, points, eyes = rig[0], rig[2], rig[3]
+    mask = Image.new('L', (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(mask)
+    for tri in triangles:
+        draw.polygon([(float(x) * SIZE, float(y) * SIZE) for x, y in points[tri]], fill=255)
+    ball_faces = [f for side in ('L', 'R') for f in eyes[side]['faces']]
+    island = np.asarray(draw_triangles(triangles, points, ball_faces, SIZE)
+                        .filter(ImageFilter.MaxFilter(3))) > 0
+    padding = (~(np.asarray(mask) > 0) | island) & ~taken
+    filled = fill_around(out, taken)
+    out[padding] = filled[padding]
+    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+
+
 def smooth(a, b, x):
     """Gives the smoothstep from 0 at a to 1 at b."""
     t = np.clip((x - a) / (b - a), 0.0, 1.0)
@@ -426,16 +461,9 @@ def paint_eyes(rig, image):
     - The sclera: SCLERA.
     The ball takes no painted light: the eye light of the app gives the one big soft light in the
     upper part of both eyes."""
-    triangles, positions, points, eyes = rig[:4]
+    eyes = rig[3]
     out = np.asarray(image).astype(np.float64)
-    taken = np.zeros((SIZE, SIZE), bool)
-    texels = {}
-    for side in ('L', 'R'):
-        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
-        if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
-            sys.exit('The texels of the two eyeballs overlap, so no eye can take its own paint.')
-        taken[ys, xs] = True
-        texels[side] = (ys, xs, places)
+    texels, taken = ball_texels(rig)
     t, u, e = np.array([0.0, 0, 1]), np.array([0.0, 1, 0]), np.array([1.0, 0, 0])
     dark, light = np.array(IRIS_DARK, float), np.array(IRIS_LIGHT, float)
     for side, sign in (('L', 1.0), ('R', -1.0)):
@@ -469,20 +497,7 @@ def paint_eyes(rig, image):
               f'gaze, across {lam.min():.1f} to {lam.max():.1f} degrees; gaze psi {g_psi:.1f}, lam '
               f'{g_lam:.1f}; iris radii {a_y:.1f} up, {inner:.1f} in, {outer:.1f} out; pupil radius '
               f'{PUPIL_SHARE * a_y:.1f} degrees')
-    # The padding texels around the ball islands, and the texels of the thin gaps between two ball
-    # triangles that the raster of eye_texels() leaves, take the new colors of the ball next to
-    # them, so that no old color shows as a light line on a seam.
-    mask = Image.new('L', (SIZE, SIZE), 0)
-    draw = ImageDraw.Draw(mask)
-    for tri in triangles:
-        draw.polygon([(float(x) * SIZE, float(y) * SIZE) for x, y in points[tri]], fill=255)
-    ball_faces = [f for side in ('L', 'R') for f in eyes[side]['faces']]
-    island = np.asarray(draw_triangles(triangles, points, ball_faces, SIZE)
-                        .filter(ImageFilter.MaxFilter(3))) > 0
-    padding = (~(np.asarray(mask) > 0) | island) & ~taken
-    filled = fill_around(out, taken)
-    out[padding] = filled[padding]
-    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+    return ball_image(rig, out, taken)
 
 
 def sample(image, points):
@@ -629,16 +644,9 @@ def center_irises(rig, image):
       iris paint takes the median white of the opening. With no LASH_LINE, a mirror point within a
       of p at the edge of the opening also takes the median white.
     No texel takes a new color: each one is a copy of a texel of the same ball."""
-    triangles, points, eyes = rig[0], rig[2], rig[3]
+    eyes = rig[3]
     out = np.asarray(image).astype(np.float64)
-    taken = np.zeros((SIZE, SIZE), bool)
-    texels = {}
-    for side in ('L', 'R'):
-        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
-        if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
-            sys.exit('The texels of the two eyeballs overlap, so no iris can move alone.')
-        taken[ys, xs] = True
-        texels[side] = (ys, xs, places)
+    texels, taken = ball_texels(rig)
     src = fill_around(out, taken)
     targets = gaze_targets(rig)
     for side in ('L', 'R'):
@@ -736,19 +744,7 @@ def center_irises(rig, image):
               f'radii in x, y); {int(flip.sum())} iris texels mirror, {len(left)} texels '
               f'take the white across, {int(in_old.sum())} of them the median white '
               f'{np.round(sclera).astype(int).tolist()}')
-    # The padding texels around the ball islands, and the thin gaps between two ball triangles,
-    # take the new colors of the ball next to them, so that no old iris shows on a seam.
-    mask = Image.new('L', (SIZE, SIZE), 0)
-    draw = ImageDraw.Draw(mask)
-    for tri in triangles:
-        draw.polygon([(float(x) * SIZE, float(y) * SIZE) for x, y in points[tri]], fill=255)
-    ball_faces = [f for side in ('L', 'R') for f in eyes[side]['faces']]
-    island = np.asarray(draw_triangles(triangles, points, ball_faces, SIZE)
-                        .filter(ImageFilter.MaxFilter(3))) > 0
-    padding = (~(np.asarray(mask) > 0) | island) & ~taken
-    filled = fill_around(out, taken)
-    out[padding] = filled[padding]
-    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+    return ball_image(rig, out, taken)
 
 
 def loose_parts(rig):
