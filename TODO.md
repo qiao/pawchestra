@@ -755,6 +755,18 @@ passes.
       mesh `dog.glb` of the dog of main and its longer legs. Update it when the candidate merges.
 - [ ] Tripo beagle candidate: the seat is 0.150 m high (0.265 m on the dog of main), and the cello
       keeps the place of `DOG_HOLD`. Check the cello size and place against the smaller body.
+- [ ] Tripo monkey candidate: the eye whites read smaller, and the pupils larger and darker, in the
+      app than in the FBX viewer (`reports/2026-11-11-monkey/panel.png`, face rows). Find whether
+      the map scale, the finish `varnish`, or the light makes the change.
+- [ ] Tripo monkey candidate: the source has small notches at the back of the knees and under the
+      haunch, which show as dark marks in the back views. The look rule allows no point edit of
+      the legs, so ask before any fix.
+- [ ] Tripo monkey candidate: the doc comment of `monkey` in `src/models/species.ts` still names the
+      mesh `monkey.glb` of the monkey of main and its longer arms. Update it when the candidate
+      merges.
+- [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
+      valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
+      technique (`docs/reference/wind-technique.md` 2.1).
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
