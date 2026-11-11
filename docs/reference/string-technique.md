@@ -671,11 +671,11 @@ The app does not follow these facts:
   keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over a stroke, as the fingers of a
   player let the bow turn.
 - **The rest.** No source gives the rest of an orchestral bassist. The contrabass stays at its
-  playing place, and the left paw holds the neck nearer to the nut than in the floor hold
-  (`BowedHold.restPlace`), so that the idle sway does not take the left forearm into the neck.
-  The right paw hangs out from the side of the belly with the bow tip down, because the knee is
-  under the belly, and the round upper arm stays off the trunk. The right elbow points down and a
-  little out (`BowedHold.restPoleR`), so that the skin of the hanging upper arm twists less.
+  playing place, and the left paw holds the neck near the body of the contrabass
+  (`BowedHold.restPlace`), so that the short left forearm twists little at rest. The right paw
+  hangs out from the side of the belly with the bow tip down, because the knee is under the belly,
+  and the round upper arm stays off the trunk. The right elbow points down, a little out, and back
+  (`BowedHold.restPoleR`), so that the skin of the hanging upper arm twists less.
 
 ## 4. Sources
 

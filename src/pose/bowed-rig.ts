@@ -1374,6 +1374,18 @@ const DOG_HOLD = {
  * The left paw lies 1.5 cm off the strings along the normal of its palm (`gapL`): a real bassist
  * touches the neck with the thumb and the fingers only, and the wrist stays off it.
  *
+ * The elbows, the paw turns, and the elbow axes of the hand rig keep each part of each arm at most
+ * 44° of roll or twist in the moments of the bassist (`assets/models/hippo/README.md`, "Arm
+ * twist"). In the play, the right elbow points down and back, (0, -1, 1), and at the tip also a
+ * little out, (0.5, -1, 1), so that the bow forearm comes down to the strings over the belly: with
+ * the elbow out and forward of the old hippo, (2, 0, -1), the right upper arm rolled 94° to 120°.
+ * The left elbow points down and a little out, (-0.5, -1, 0), and the left paw tilts 70° over the
+ * neck (`tiltL`), the tilt at which the twist of the left forearm spreads least over the moments.
+ * At rest, the left paw holds the neck at 0.75 of the fingerboard (`restPlace`), near the body of
+ * the contrabass, with the elbow down and back, (0, -1, -0.8), and the right elbow points down, a
+ * little out, and back, (0.3, -1, 0.5): at 0.3 of the fingerboard with the elbow out to the left,
+ * as on the old hippo, the left forearm twisted 170° to 180° at rest and in the moves.
+ *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), as a
  * real bassist rests the thumb on the edge of the fingerboard
  * (`docs/reference/string-technique.md`, section 2.8). The bow tip points up, square to the
@@ -1401,13 +1413,13 @@ const HIPPO_HOLD = {
   reachL: 34 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
   frogHair: 0.12,
-  tiltL: 65 * MathUtils.DEG2RAD,
+  tiltL: 70 * MathUtils.DEG2RAD,
   gapL: 0.015,
-  restPlace: 0.3,
-  poleL: [-1, -0.3, -0.7],
+  restPlace: 0.75,
+  poleL: [-0.5, -1, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
-  poleR: [2, 0, -1],
-  poleTipR: [2, 0.15, -1],
+  poleR: [0, -1, 1],
+  poleTipR: [0.5, -1, 1],
   polePizzicato: [3, 0.9, -1],
   pizzicatoTip: [0, 1, 0],
   pluckSide: 0.24,
@@ -1415,8 +1427,8 @@ const HIPPO_HOLD = {
   farSideR: 30 * MathUtils.DEG2RAD,
   pawBendR: 24.94 * MathUtils.DEG2RAD,
   stickTurnR: { forearm: 26 * MathUtils.DEG2RAD, most: 90 * MathUtils.DEG2RAD },
-  restPoleR: [0.6, -1, 0],
-  restPoleL: [-1, -0.3, 0],
+  restPoleR: [0.3, -1, 0.5],
+  restPoleL: [0, -1, -0.8],
   restBow: {
     lap: { along: 1, offset: [1, 1, -0.4] },
     tip: HANGING_BOW.tip,

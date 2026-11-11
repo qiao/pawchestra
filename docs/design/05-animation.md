@@ -241,9 +241,9 @@ The rest of each family:
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
   hangs the bow out from the side of the belly, because its short knee is under the belly, and the
-  round upper arm then stays off the trunk. Its left paw holds the neck nearer to the nut
-  (`restPlace`), because the idle sway of the rest takes the thick left forearm into the neck lower
-  down.
+  round upper arm then stays off the trunk. Its left paw holds the neck near the body of the
+  contrabass (`restPlace`), with the elbow down and back. Reason: a grip nearer to the nut twists
+  the short left forearm far from its play twist at rest and in the moves.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the round bellies of the mouse, the wolf, the beaver, and the pig cover their thighs. So
