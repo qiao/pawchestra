@@ -1050,8 +1050,8 @@ when no light value can match the lit pixels of the reference.
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
   top and darker edges. The clarinet and the oboe are black lacquer with silver keys, the
   bassoon is a dark red maple, the flutes are silver, the brass is gold with lit bells and nickel
-  silver trim, and the timpani are copper. The piano is black lacquer with a dark
-  well and a dark gold plate in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
+  silver trim, and the timpani are copper. The piano is a black polish with a gold
+  plate, light steel strings, and copper bass strings in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
   lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are
   copper in a black frame with chrome lugs. The drums are a red lacquered wood with chrome or wood
   hoops, the cymbals are bronze with darker lathe rings, and the xylophone is rosewood over
@@ -1073,16 +1073,17 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
 | `varnish` | The varnished wood of the bowed strings, the harp, the bassoon, the drums, and the xylophone. | A soft gloss.                                                         |
-| `lacquer` | The black lacquer of the piano, the woodwinds, and the timpani frame, and the bead eyes. | A sharp gloss.                                                        |
+| `lacquer` | The black lacquer of the piano bench, the woodwinds, and the timpani frame, and the bead eyes. | A sharp gloss.                                                        |
 | `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
 | `eye`     | The eyeballs of a hand rig.                               | The gloss of `lacquer`, and the only finish that the eye light reaches. |
+| `polish`  | The case, the lid, the desk, the legs, and the lyre of the grand piano. | A mirror gloss with a weak reflection. With the reflection of `lacquer`, the warm lamps turned the black case brown. |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
 (`addFinishReflection()` of `scene/geometry.ts`). The hall is dark, so the physical reflection
 of a polished finish showed almost nothing, and a full metalness looked black. With the factor,
-the brass, the copper, the piano lacquer, and the string varnish show the warm lamps and the
-lit stage. The fur stays matte with the factor 1.
+the brass, the copper, the lacquer, and the string varnish show the warm lamps and the lit
+stage. The fur stays matte with the factor 1.
 
 The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.
@@ -1632,10 +1633,32 @@ lie under that side in the hold. The strings of the violin and the viola have a 
 the triangle budget. The layout reads a simple box of each bowed string (`addLayoutSpace()`), so a
 change of the detail does not move the seats.
 
-**Piano** (`models/instruments/piano.ts`). 88 separate keys, a lyre, and three brass pedals in the
-sizes of a real grand piano (`PIANO_PEDALS`). The lift raises the case, the keys, the lid, and the
-bar of the lyre, and the pedals stay on the floor. Each key turns down with its notes
-(`PIANO.keyDip`), and the damper pedal goes down under the right foot (5.3).
+**Piano** (`models/instruments/piano.ts`). A concert grand: 88 separate keys, a lyre, and three
+brass pedals in the sizes of a real grand piano (`PIANO_PEDALS`). The lift raises the case, the
+keys, the lid, and the bar of the lyre, and the pedals stay on the floor. Each key turns down with
+its notes (`PIANO.keyDip`), and the damper pedal goes down under the right foot (5.3). The parts
+follow a real grand:
+
+- **Case.** The plan has a straight bass side at the left of the player, a short straight treble
+  side, a bent side in an S curve, and a round tail (`CASE_PLAN`). A smooth curve through its
+  points gives a round rim with no facets. The rim wall has one thickness (`PIANO_INSIDE.rim`) and
+  is open at the front between its two arms.
+- **Inside.** A gold plate covers the soundboard to a narrow band at the rim, with a row of round
+  holes. Two rows of tuning pins stand on its front. Thin steel strings run from the pins back to
+  the edge of the plate, and the copper bass strings fan out over them to the tail, as the
+  overstrung bass. A row of dampers lies on the strings behind the desk, and the highest strings
+  have none (`PIANO_INSIDE`).
+- **Front.** A cheek block closes each end of the keys, a key slip runs in front of them, and the
+  open fallboard stands over their back ends. The music desk stands on a rail on the front of the
+  rim, just behind the fallboard, and leans back with a ledge for the music (`PIANO_FRONT`).
+- **Lid.** The lid has the outline of the rim and closes onto it. It hinges on the bass side, and
+  its front flap lies folded back on it, so the desk stands in front of the lid. The prop stick
+  stands on the rim of the bent side near the front and holds the lid near its edge (`PIANO_LID`).
+- **Legs and lyre.** Three legs taper down to a wider foot (`PIANO_LEGS`). The lyre has two flat
+  posts, a pedal rod over each pedal, and two braces back to the case.
+
+The layout reads the parts of the piano, so a change of the case or the lid moves the seats near
+it by a few centimeters.
 
 **Harp** (`models/instruments/harp.ts`). A concert pedal harp in the varnished maple of
 `harpFrame`, with gilded parts, as a natural Lyon & Healy Style 23. The parts follow a real
