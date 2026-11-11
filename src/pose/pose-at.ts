@@ -621,10 +621,21 @@ function poseAnimal(
       cue.headPitch *= weight;
       body.turn = cue.torsoYaw;
       body.headTurn = cue.headYaw;
-      conductor.lean = expression.lean * weight;
+      // The body comes up from a forward lean for a cue of the left hand.
+      const upright = 1 - EXPRESSION_MOTION.cueUpright * cue.hand;
+      conductor.lean = expression.lean * weight * (expression.lean > 0 ? upright : 1);
       conductor.sway = expression.sway * weight;
-      conductor.drop = expression.drop * weight;
       conductor.climax = expression.climax * weight;
+      conductor.shrug = expression.shrug * weight;
+      // The upper body twists further toward a cued section, and the head keeps its aim.
+      body.twist = EXPRESSION_MOTION.cueTwist * cue.torsoYaw;
+      body.headTurn -= body.twist;
+      cue.handYaw += body.twist;
+      // The hips move against the side lean of the sway and drop with the knees. The feet stay.
+      hipsOffset(note.rig.legs, expression.shift * weight, pose.rootOffset);
+      pose.rootOffset[1] -= expression.drop * weight;
+      conductor.shift = pose.rootOffset[0];
+      conductor.drop = -pose.rootOffset[1];
       // The bow at the song end bends the spine and the head forward (design 5.4).
       const bend = endBowAt(scratch.endElapsed);
       body.lean = bend + conductor.lean;
@@ -634,10 +645,8 @@ function poseAnimal(
         ? 0
         : smoothstep((scratch.endElapsed - END_BOW.startSec) / END_BOW.downSec);
       body.lift = cue.headPitch - bend * END_BOW.head + expression.head * weight;
-      // The knees bend, and the feet stay on the podium.
-      pose.rootOffset[1] = -conductor.drop;
       writeBody(pose, player, scratch);
-      if (conductor.drop > 0) {
+      if (conductor.drop > 0 || conductor.shift !== 0) {
         plantFeet(note.rig.legs, pose.rootOffset, pose.rotations);
       }
       poseConductor(note.rig, scratch.torso, conductor, weight, pose.rotations);
@@ -740,6 +749,8 @@ export function poseAt(
       sway: 0,
       drop: 0,
       climax: 0,
+      shrug: 0,
+      shift: 0,
     },
     expression: createExpressionState(),
     chordPoint: { x: 0, y: 0 },

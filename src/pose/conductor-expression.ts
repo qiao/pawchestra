@@ -20,7 +20,14 @@ export const EXPRESSION_RULES = {
   /** The loud weight is 0 at this level and 1 at `loudTo`. */
   loudFrom: 0.6,
   loudTo: 0.9,
-  /** The soft and the loud weights change by at most this much in 1 s. */
+  /**
+   * The trend at a beat compares the mean level of this time after it with this time before it.
+   * A crescendo starts to show at the trend `riseFrom`, and shows fully at `riseTo`.
+   */
+  trendSec: 2,
+  riseFrom: 0.06,
+  riseTo: 0.2,
+  /** The soft, the loud, and the crescendo weights change by at most this much in 1 s. */
   maxRate: 1,
   /**
    * The legato index of a beat is the mean length of the notes that start in it, as a part of the
@@ -87,36 +94,53 @@ export const EXPRESSION_RULES = {
 
 /**
  * The sizes and the times of the expression of the conductor (design 5.4). Angles are in
- * radians, lengths in meters, times in seconds. Each value is a moderate first step: about 1.25
- * times the motion of the conductor without the expression.
+ * radians, lengths in meters, times in seconds. A forte is "more energetic" more than larger
+ * (`conductor-technique.md`), so the loud passage changes the speed of the stroke and the body
+ * more than the size of the beat. The beat stays below the chin, except at a climax.
  */
 export const EXPRESSION_MOTION = {
   /** The gesture size of the baton grows by this part in a loud passage. */
   loudSize: 0.2,
   /** The gesture size of the baton shrinks by this part in a soft passage. */
-  softSize: 0.2,
+  softSize: 0.3,
+  /**
+   * In a crescendo, the gesture size grows by this part at the full trend, so that the beat grows
+   * over the build.
+   */
+  riseSize: 0.25,
+  /**
+   * In a loud passage, a stroke rebounds this part of the beat sooner and falls this part later,
+   * so that the stop is longer and the fall into the ictus is faster (`strokeOf()`).
+   */
+  loudEnergy: 0.1,
   /** The beat of a loud passage is this much higher in the beat plane. */
   loudLift: 0.04,
   /** The beat of a soft passage is this much lower in the beat plane. */
-  softDrop: 0.03,
+  softDrop: 0.045,
   /** The forward lean of the upper body in a soft passage: smaller, toward the players. */
-  softLean: 5 * MathUtils.DEG2RAD,
+  softLean: 7.5 * MathUtils.DEG2RAD,
   /** The head turns down this far in a soft passage. */
-  softHead: 4 * MathUtils.DEG2RAD,
+  softHead: 6 * MathUtils.DEG2RAD,
   /**
    * In a soft passage, the left hand takes this weight of the lowered open palm of a diminuendo
    * (`LEFT_HAND_PLACES.fade`), as a conductor keeps the sound down with the palm.
    */
   softPalm: 0.8,
   /** The knees bend so far that the hips drop this much in a soft passage. */
-  softCrouch: 0.012,
+  softCrouch: 0.018,
   /** The upper body comes up by this angle in a loud passage, with the chest open. */
-  loudLean: 1.5 * MathUtils.DEG2RAD,
+  loudLean: 2.25 * MathUtils.DEG2RAD,
   /** The head comes up this far in a loud passage. */
-  loudHead: 2 * MathUtils.DEG2RAD,
+  loudHead: 3 * MathUtils.DEG2RAD,
+  /** In a crescendo, the chest opens back by this angle, the head comes up, and the shoulders rise. */
+  riseLean: 1.5 * MathUtils.DEG2RAD,
+  riseHead: 3 * MathUtils.DEG2RAD,
+  riseShrug: 5 * MathUtils.DEG2RAD,
   /** The breath lifts the chest by this angle back and the head by `breathHead`. */
-  breathLean: 2.5 * MathUtils.DEG2RAD,
-  breathHead: 4 * MathUtils.DEG2RAD,
+  breathLean: 3.75 * MathUtils.DEG2RAD,
+  breathHead: 6 * MathUtils.DEG2RAD,
+  /** The breath raises the shoulders by this turn of each clavicle. */
+  breathShrug: 4 * MathUtils.DEG2RAD,
   /** The breath takes this part of the preparation before the entry: it starts earlier. */
   breathStart: 1.5,
   /** The preparation of a breath is the beat before the entry, within these limits. */
@@ -125,31 +149,47 @@ export const EXPRESSION_MOTION = {
   /** The chest comes down in this time after the entry. */
   breathReleaseSec: 0.4,
   /** The side sway of the upper body with the phrase, in a legato passage. */
-  sway: 2.5 * MathUtils.DEG2RAD,
+  sway: 3.75 * MathUtils.DEG2RAD,
   /** A staccato passage keeps this part of the sway. */
   swayStaccato: 0.3,
   /** One side of the sway is at least this long, in whole bars. */
   swaySideSec: 2,
+  /** The hips move this far to the side of the weight with the sway, and the feet stay. */
+  shift: 0.03,
+  /**
+   * The chest turns this part of the turn of a cue further, so that the upper body twists toward
+   * the cued section.
+   */
+  cueTwist: 0.3,
+  /**
+   * A cue of the left hand takes away this part of a forward lean, so that the body comes up for
+   * the cue and the head stays clear of the raised paw.
+   */
+  cueUpright: 0.6,
   /** An accent turns the head down by this angle and the upper body forward by `joltLean`. */
-  joltHead: 6 * MathUtils.DEG2RAD,
-  joltLean: 2 * MathUtils.DEG2RAD,
+  joltHead: 9 * MathUtils.DEG2RAD,
+  joltLean: 3 * MathUtils.DEG2RAD,
+  /** An accent also raises the shoulders by this turn of each clavicle. */
+  joltShrug: 4 * MathUtils.DEG2RAD,
   /** The jolt starts this long before the beat, is at its peak this long after it, and decays. */
   joltLeadSec: 0.1,
-  joltPeakSec: 0.04,
-  joltDecaySec: 0.3,
+  joltPeakSec: 0.03,
+  joltDecaySec: 0.22,
   /** The knees dip so far that the hips drop this much on an accented downbeat. */
-  dip: 0.02,
+  dip: 0.03,
   /** An accent on another beat dips this part of the dip. */
   offbeatDip: 0.5,
   dipLeadSec: 0.15,
   dipPeakSec: 0.06,
   dipDecaySec: 0.4,
   /** At a climax, the upper body comes up by this angle and the head by `climaxHead`. */
-  climaxLean: 3 * MathUtils.DEG2RAD,
-  climaxHead: 7 * MathUtils.DEG2RAD,
+  climaxLean: 4.5 * MathUtils.DEG2RAD,
+  climaxHead: 10.5 * MathUtils.DEG2RAD,
+  /** At a climax, the shoulders rise by this turn of each clavicle, with the chest open. */
+  climaxShrug: 8 * MathUtils.DEG2RAD,
   /** At a climax, the tip of the baton goes this far out and up in the beat plane. */
-  climaxOut: 0.3,
-  climaxUp: 0.22,
+  climaxOut: 0.45,
+  climaxUp: 0.33,
   /** The beat pattern keeps this part of its motion at the peak of a climax. */
   climaxBeat: 0.2,
   /** The arms open over a preparation within these limits, and stay open for one bar. */
@@ -194,6 +234,8 @@ export interface ExpressionTrack {
   readonly soft: Float32Array;
   /** The weight of a loud passage at each beat, from 0 to 1. */
   readonly loud: Float32Array;
+  /** The weight of a crescendo at each beat, from 0 to 1. */
+  readonly rise: Float32Array;
   /** The staccato weight of the stroke from each beat to the next: 0 legato, 1 staccato. */
   readonly snap: Float32Array;
   /** The accent of each beat, from 0 to 1. */
@@ -238,6 +280,17 @@ export interface ExpressionState {
   close: number;
   /** The weight of a soft passage, from 0 to 1: the left palm keeps the sound down. */
   soft: number;
+  /** The weight of a crescendo, from 0 to 1: the left palm rises up. */
+  rise: number;
+  /** The weight of a loud passage, from 0 to 1. */
+  loud: number;
+  /** The rise of the shoulders: the turn of each clavicle, in radians. */
+  shrug: number;
+  /**
+   * The move of the hips along +x, in meters. The hips move against the side lean of the sway,
+   * so that the weight stays over the feet.
+   */
+  shift: number;
 }
 
 /**
@@ -246,7 +299,21 @@ export interface ExpressionState {
  * @returns The state.
  */
 export function createExpressionState(): ExpressionState {
-  return { lean: 0, head: 0, sway: 0, drop: 0, climax: 0, final: 0, hold: 0, close: 0, soft: 0 };
+  return {
+    lean: 0,
+    head: 0,
+    sway: 0,
+    drop: 0,
+    climax: 0,
+    final: 0,
+    hold: 0,
+    close: 0,
+    soft: 0,
+    rise: 0,
+    loud: 0,
+    shrug: 0,
+    shift: 0,
+  };
 }
 
 /**
@@ -585,6 +652,11 @@ export function buildExpressionTrack(
   );
   const soft = Float32Array.from(levels, (l) => rampOf(l, r.softFrom, r.softTo));
   const loud = Float32Array.from(levels, (l) => rampOf(l, r.loudFrom, r.loudTo));
+  const rise = Float32Array.from(times, (time) => {
+    const before = meanIn(times, raw, time - r.trendSec, time);
+    const after = meanIn(times, raw, time + 1e-9, time + r.trendSec);
+    return before === null || after === null ? 0 : rampOf(after - before, r.riseFrom, r.riseTo);
+  });
   const onsets = onsetsOf(times, notes, loudness);
   const accent = accentsOf(times, onsets);
   const strokes = snapsOf(times, notes, loudness);
@@ -607,6 +679,7 @@ export function buildExpressionTrack(
     beats: times,
     soft: limitRate(times, soft, r.maxRate),
     loud: limitRate(times, loud, r.maxRate),
+    rise: limitRate(times, rise, r.maxRate),
     snap,
     accent,
     dip,
@@ -738,7 +811,10 @@ export function expressionAt(track: ExpressionTrack, time: number, out: Expressi
   const breath = breathAt(track, time);
   const jolt = beatPulse(beats, track.accent, time, m.joltLeadSec, m.joltPeakSec, m.joltDecaySec);
   const dip = beatPulse(beats, track.dip, time, m.dipLeadSec, m.dipPeakSec, m.dipDecaySec);
+  const rise = valueAt(beats, track.rise, time);
   out.soft = soft;
+  out.rise = rise;
+  out.loud = loud;
   out.final = finalAt(track, time);
   out.hold = track.final?.held ? out.final : 0;
   out.climax = Math.max(climaxAt(track, time), m.finalBody * out.hold);
@@ -751,18 +827,28 @@ export function expressionAt(track: ExpressionTrack, time: number, out: Expressi
   out.lean =
     m.softLean * soft -
     m.loudLean * loud -
+    m.riseLean * rise -
     m.climaxLean * out.climax -
     m.breathLean * breath +
     m.joltLean * jolt;
   out.head =
     -m.softHead * soft +
     m.loudHead * loud +
+    m.riseHead * rise +
     m.climaxHead * out.climax +
     m.breathHead * breath -
     m.joltHead * jolt;
+  out.shrug = Math.max(
+    m.riseShrug * rise,
+    m.climaxShrug * out.climax,
+    m.breathShrug * breath,
+    m.joltShrug * jolt,
+  );
   const phase = valueAt(beats, track.sway, time);
   const legato = 1 - (1 - m.swayStaccato) * snap;
-  out.sway = m.sway * legato * (1 - out.climax) * Math.cos(Math.PI * phase);
+  const side = legato * (1 - out.climax) * Math.cos(Math.PI * phase);
+  out.sway = m.sway * side;
+  out.shift = m.shift * side;
   out.drop = m.softCrouch * soft + m.dip * dip;
 }
 

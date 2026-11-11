@@ -84,6 +84,8 @@ export interface BatonTrack {
   readonly arcs: Float64Array;
   /** The staccato weight of the stroke from each beat to the next: 0 legato, 1 staccato. */
   readonly snaps: Float32Array;
+  /** The energy of the stroke from each beat to the next: the loud weight, from 0 to 1. */
+  readonly energies: Float32Array;
   /**
    * The point of the baton before the first beat and after the last beat: the point of the last
    * beat of the first bar, in meters.
@@ -148,7 +150,10 @@ export function buildBatonTrack(
   const loud = beatLoudness(times, notes, loudness);
   const sizes = Array.from(loud, (l, k) => {
     const dynamics =
-      1 + e.loudSize * (expression.loud[k] ?? 0) - e.softSize * (expression.soft[k] ?? 0);
+      1 +
+      e.loudSize * (expression.loud[k] ?? 0) -
+      e.softSize * (expression.soft[k] ?? 0) +
+      e.riseSize * (expression.rise[k] ?? 0);
     return m.scale * gestureSize(l, 1) * dynamics;
   });
   const points = new Float64Array(2 * beats.length);
@@ -171,6 +176,7 @@ export function buildBatonTrack(
     points,
     arcs,
     snaps: expression.snap,
+    energies: expression.loud,
     rest: [x * size, y * size],
     ready: [0, (y + m.readyLift) * size],
   };
@@ -189,10 +195,13 @@ export interface BatonState {
  *
  * @param progress The part of the time of the stroke, from 0 to 1.
  * @param snap The staccato weight: 0 legato, 1 staccato.
+ * @param energy The energy of the stroke, from 0 to 1: a loud stroke rebounds sooner and falls
+ *   later and faster (`EXPRESSION_MOTION.loudEnergy`).
  * @returns The part of the path, from 0 to 1.
  */
-function strokeOf(progress: number, snap: number): number {
-  const { strokeRebound: rebound, strokeFall: fall } = CONDUCTOR_MOTION;
+function strokeOf(progress: number, snap: number, energy: number): number {
+  const rebound = CONDUCTOR_MOTION.strokeRebound - EXPRESSION_MOTION.loudEnergy * energy;
+  const fall = CONDUCTOR_MOTION.strokeFall + EXPRESSION_MOTION.loudEnergy * energy;
   let stopped = 0.5;
   if (progress < rebound) {
     stopped = 0.5 * (1 - (1 - progress / rebound) ** 2);
@@ -212,6 +221,7 @@ function strokeOf(progress: number, snap: number): number {
  * @param arc The height of the arc.
  * @param progress The part of the time of the path, from 0 to 1.
  * @param snap The staccato weight of the stroke ({@link strokeOf}).
+ * @param energy The energy of the stroke ({@link strokeOf}).
  */
 function onArc(
   out: BatonState,
@@ -220,8 +230,9 @@ function onArc(
   arc: number,
   progress: number,
   snap = 0,
+  energy = 0,
 ): void {
-  const part = strokeOf(Math.min(1, Math.max(0, progress)), snap);
+  const part = strokeOf(Math.min(1, Math.max(0, progress)), snap, energy);
   const along = smoothstep(part);
   out.x = from[0] + (to[0] - from[0]) * along;
   out.y = from[1] + (to[1] - from[1]) * along + arc * Math.sin(Math.PI * part);
@@ -273,7 +284,8 @@ export function batonAt(track: BatonTrack, time: number, out: BatonState, ready 
     return;
   }
   const progress = (time - start) / (end - start);
-  onArc(out, pointOf(k), pointOf(k + 1), arcs[k + 1] ?? 0, progress, track.snaps[k] ?? 0);
+  const snap = track.snaps[k] ?? 0;
+  onArc(out, pointOf(k), pointOf(k + 1), arcs[k + 1] ?? 0, progress, snap, track.energies[k] ?? 0);
 }
 
 /**

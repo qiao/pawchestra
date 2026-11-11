@@ -11,7 +11,7 @@ import { mixPole, mixRotation } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import type { CueState } from './cues.ts';
 import type { LeftHandState } from './conductor-left.ts';
-import { createFrame, setFromBasis } from './frames.ts';
+import { createFrame, setBoneRotation, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingArm, hangingHand, hangingWrist } from './hang.ts';
 import type { HangingArm } from './hang.ts';
@@ -165,7 +165,7 @@ export const LEFT_HAND_PLACES = {
    * the fingers open, out, and up, as the arms of a conductor open wide at a climax
    * (`conductor-technique.md`).
    */
-  open: { wrist: [-0.95, 0.75, -0.55], fingers: [-0.5, 0.7, -0.6], curl: 5 * MathUtils.DEG2RAD },
+  open: { wrist: [-1.1, 0.95, -0.45], fingers: [-0.5, 0.8, -0.5], curl: 5 * MathUtils.DEG2RAD },
 } as const satisfies Readonly<Record<string, LeftHandPlace>>;
 
 /**
@@ -331,6 +331,10 @@ export interface ConductorState {
   drop: number;
   /** The weight of the open arms of a climax, from 0 to 1. */
   climax: number;
+  /** The rise of the shoulders of the expression: the turn of each clavicle, in radians. */
+  shrug: number;
+  /** The move of the hips along +x of the expression, in meters. */
+  shift: number;
 }
 
 const right = createFrame();
@@ -372,12 +376,14 @@ const toPlace = new Vector3();
 /** The direction of the baton in the middle of a lift or a lowering. Each call writes it first. */
 const liftBaton = new Vector3();
 const bodyTurn = new Quaternion();
+/** The turn of a clavicle in the rise of the shoulders. Each call writes it first. */
+const shrugTurn = new Quaternion();
 const bodySway = new Quaternion();
 
 /**
  * Moves a point of the model axes with the expression of the body (design 5.4): the sway and the
- * lean of the spine around the `spine` bone, and the drop of the hips. Thus the hands keep their
- * places to the head and the chest.
+ * lean of the spine around the `spine` bone, and the move and the drop of the hips. Thus the hands
+ * keep their places to the head and the chest.
  *
  * @param rig The points of the conductor.
  * @param point The point to move in place.
@@ -385,7 +391,7 @@ const bodySway = new Quaternion();
  * @returns `point`.
  */
 function followBody(rig: ConductorRig, point: Vector3, state: ConductorState): Vector3 {
-  if (state.lean === 0 && state.sway === 0 && state.drop === 0) {
+  if (state.lean === 0 && state.sway === 0 && state.drop === 0 && state.shift === 0) {
     return point;
   }
   const [x, y, z] = rig.spineBind;
@@ -395,7 +401,7 @@ function followBody(rig: ConductorRig, point: Vector3, state: ConductorState): V
   point.y -= y;
   point.z -= z;
   point.applyQuaternion(bodyTurn);
-  point.x += x;
+  point.x += x + state.shift;
   point.y += y - state.drop;
   point.z += z;
   return point;
@@ -510,7 +516,9 @@ export function poseConductor(
   const chest = frames.chest;
   const { cue } = state;
 
-  poseShoulder(rig.right, chest, rig.chestBind, NO_TURN, right);
+  shrugTurn.setFromAxisAngle(Z_AXIS, state.shrug);
+  poseShoulder(rig.right, chest, rig.chestBind, shrugTurn, right);
+  setBoneRotation(rotations, rig.right.bones.shoulder, shrugTurn);
   lifted.x = state.baton.x;
   lifted.y = state.baton.y + cue.batonLift;
   batonPoint(rig, state, tip);
@@ -615,7 +623,9 @@ function poseLeftHand(
   const { cue, left: weights } = state;
   const { chest } = frames;
   const places = LEFT_HAND_PLACES;
-  poseShoulder(rig.left, chest, rig.chestBind, NO_TURN, left);
+  shrugTurn.setFromAxisAngle(Z_AXIS, -state.shrug);
+  poseShoulder(rig.left, chest, rig.chestBind, shrugTurn, left);
+  setBoneRotation(rotations, rig.left.bones.shoulder, shrugTurn);
   // The places turn with the upper body to the left. In a turn to the right, they stay, so that
   // the hand does not come over the desk of the stand.
   const turn = Math.max(0, cue.torsoYaw);
@@ -623,13 +633,13 @@ function poseLeftHand(
   wrist.copy(place);
   direction.copy(fingers);
   let curl: number = places.quiet.curl;
-  const steps = [
+  const steps: readonly (readonly [LeftHandPlace, number])[] = [
     [places.mirror, weights.mirror],
     [places.swell, weights.swell],
     [places.fade, weights.fade],
     [places.hold, weights.hold],
     [places.open, state.climax],
-  ] as const;
+  ];
   for (const [of, w] of steps) {
     if (w > 0) {
       placeOf(rig, of, state, turn, of === places.mirror ? state.baton : null);
