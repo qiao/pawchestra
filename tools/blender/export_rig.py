@@ -445,6 +445,18 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
             s: [round(float(x), 6) + 0.0 for x in sa.TO_STUDIO @ np.array(hinges[s], float)]
             for s in 'LR'
         }
+    shift = sa.rig_property(rig, 'headShift')
+    if shift is not None:
+        # `pnpm studio-body` adds the shift to the head center of the holds
+        # (`StudioBody.headCenter`). A rig sets it when a change of the surface moves the head box
+        # but not the head, for example a nose that goes from the slot gloss to the slot fur.
+        need(
+            isinstance(shift, list)
+            and len(shift) == 3
+            and all(isinstance(x, (int, float)) and math.isfinite(x) for x in shift),
+            'The property headShift of the armature is not three numbers in the studio axes.',
+        )
+        extras['headShift'] = [float(x) + 0.0 for x in shift]
     angle, sign = 0.0, 1.0
     for b in TRUNK_BONES:
         x, y, z, q = rm['matrix_quat'](turns[b])

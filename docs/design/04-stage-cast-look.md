@@ -579,7 +579,8 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
-| `headFactor`, `neckFactor`, `headShift`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
+| `headShift` | The custom property `headShift` of the armature, in the studio axes. `pnpm studio-body` adds it to the head center of the holds. A nose that goes from the slot `gloss` to the slot `fur` moves the head box forward, so the Tripo wolf, beagle, and cat set it, and no hold moves. |
+| `headFactor`, `neckFactor`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
 
 The layout of the `.blend`:
 
