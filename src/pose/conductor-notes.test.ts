@@ -5,6 +5,7 @@ import type { TestEvent } from '../midi/test-smf.ts';
 import { scoreOf } from '../score/test-score.ts';
 import type { Beat, Score } from '../score/types.ts';
 import { gestureSize, noteLoudness } from './loudness.ts';
+import { buildExpressionTrack } from './conductor-expression.ts';
 import { BEAT_PATTERNS, CONDUCTOR_MOTION, batonAt, buildBatonTrack } from './conductor-notes.ts';
 import type { BatonState, BatonTrack, PatternPoint } from './conductor-notes.ts';
 
@@ -31,7 +32,9 @@ function scoreIn(numerator: number, denominator: number, bpm: number, velocity =
 }
 
 function trackOf(score: Score): BatonTrack {
-  return buildBatonTrack(score.beats, score.notes, noteLoudness(score));
+  const loudness = noteLoudness(score);
+  const expression = buildExpressionTrack(score.beats, score.notes, loudness, score.seats.length);
+  return buildBatonTrack(score.beats, score.notes, loudness, expression);
 }
 
 function at(baton: BatonTrack, time: number): BatonState {
