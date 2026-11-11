@@ -525,13 +525,16 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/monkey/tripo-hand/monkey.blend`), with no arm cut and no arm stretch. It
   // stands as a soloist. Its `.blend` holds the facts of the body: the scale that keeps H of the
   // monkey of `monkey.rig.glb`, and the crease angle 180°. The map paints a full eye with a light
-  // on each eyeball, so the eyes take the finish `varnish` and no eye light.
+  // on each eyeball, so the eyes take the finish `varnish` and no eye light. It has no chair, and
+  // its bind stands with the center of mass over the middle of the soles. So the soloist keeps
+  // the bind stance. Reason: the straight legs of the sheet put the center of mass 2.8 cm behind
+  // the middle of the soles.
   [
     'monkey',
     {
       landmark: 'shoulders',
       seated: true,
-      soloist: true,
+      soloist: false,
       constant: 'STUDIO_MONKEY',
       glb: 'assets/models/monkey/tripo-hand/monkey.rig.glb',
       eyeFinish: 'varnish',
