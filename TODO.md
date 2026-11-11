@@ -724,6 +724,13 @@ passes.
 - [ ] Tripo fox candidate: the violin holds keep their values in H after the head scale 1.2 (H
       0.323 m to 0.387 m). The twists stay within 41°, but the chin rest and the bow place moved
       with H. Check them against the violin of main in the close views.
+- [ ] Tripo wolf candidate: the gloss nose shows flat facets and no painted nostrils. The export
+      (`primitive_arrays()` of `tools/blender/rig_mesh.py`) fails with no gloss face, so the nose
+      cannot keep the color map and the smooth normals of the source.
+- [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
+      mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
+- [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
+      limit of 45°. Check the shoulder skin at rest in the app.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
