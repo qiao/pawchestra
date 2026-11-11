@@ -1146,7 +1146,10 @@ const WOLF_CLARINET = {
  * right fingers stay on the valves: with the roll of the shoulder at rest, the right finger tips
  * stand 3.3 cm off. At rest, the left grip moves 0.04 H along the casings toward the bell
  * (`restGripShiftL`), so that the left finger tips stay on the casings of the upright trumpet: on
- * the grip of the play, they stand 1.1 cm off.
+ * the grip of the play, they stand 1.1 cm off. At rest, the trumpet moves 0.45 H down, 0.1 H to
+ * the right, and 0.05 H back from the mouth (`restShift`), so that it turns down in front of the
+ * belly with the elbows bent: 0.03 H up, at the rest place of {@link WIND_HOLDS}, the trumpet
+ * stayed at the face.
  *
  * The big head puts the mouthpiece 0.23 m above the shoulder joints, so the grips are 0.17 m to
  * 0.18 m above the shoulders at the size 1.1, and the forearms rise steeply. Both elbows point
@@ -1169,6 +1172,7 @@ const MONKEY_TRUMPET = {
   poleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
   aimSide: [0, 0.8],
+  restShift: [0.1, -0.45, 0.05],
   restGripShiftL: [0, 0, 0.04],
   restAim: 1,
   gripCurl: curls(130, 92),

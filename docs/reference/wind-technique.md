@@ -482,10 +482,10 @@ The app follows these facts:
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body. The
   horn lies across the body, with the bell at the right of the torso, open to the back, off the
   leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The right paw comes down into
-  the bell from above. The mouthpiece rests on the lips
-  under the snout disc, at the mouth line of the body (`mouthHeight`, design 4.4), and its rim
-  presses the upper lip most. The coil stands in front of the round belly, with a gap. The valves
-  follow the double horn chart, with the B♭ side above the written G4 (7.3, `HORN_B_FLAT`).
+  the bell from above. The mouthpiece rests on the lips under the snout disc, at the mouth line of
+  the body (`mouthHeight`, design 4.4), and its rim presses the upper lip most. The coil stands in
+  front of the round belly, with a gap. The valves follow the double horn chart, with the B♭ side
+  above the written G4 (7.3, `HORN_B_FLAT`).
 - **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
   them. The left elbow points out to the side, and the left shoulder turns forward (`poleL`,
   `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
@@ -565,7 +565,7 @@ The app does not follow these facts:
   trumpet player in degrees, so the bow stays small (`MAX_BOW`).
 - **The trumpet size and rest (2.1).** The monkey plays a smaller trumpet
   (`SpeciesParams.trumpetScale`). No source gives its size or the rest. At rest, the trumpet turns
-  down in front of the chest, and both paws keep the hold of the play (`restAim`,
+  down in front of the belly (`restShift`), and both paws keep the hold of the play (`restAim`,
   `restGripShiftL`).
 - **The tuba (3).** The app draws no strap. The lead pipe is longer (`SpeciesParams.tubaPipe`),
   because the long muzzle puts the mouthpiece far in front of the shoulder joints. No source gives
