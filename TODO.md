@@ -877,12 +877,11 @@ scene of each demo has its seats and stage size with no overlap.
       the paws point in along the forearms (`PAW_TURN`).
 - [ ] Conductor: add to `docs/reference/conductor-technique.md` the beat patterns, the tempo of a
       beat in 2 or in 1, and the sway, with sources. The fold limit of 168 BPM has no source.
-- [ ] Conductor: the left palm turns only with the direction of the hand. Give the swell a palm up
-      and the fade and the soft passage a palm down with a roll of the paw (conductor technique 2),
-      and check the twist of the left forearm.
-- [ ] Conductor: the rules of the expression (`EXPRESSION_RULES`) come from one file,
-      `the-ember-crown.mid`. Check the breaths, the accents, the climaxes, and the final chord on
-      the demos, and show a lineup.
+- [ ] Conductor: the left palm turns only a part of the way up or down, because the twist of the
+      paw stops at `MAX_TWIST_L` (45°). A full palm up needs a forearm that points nearer to its
+      bind direction, or a supinated bind of the left arm.
+- [ ] Conductor: the crescendo weight reads a trend of 2 s, so a long build, such as 115 s to
+      126 s of `the-ember-crown.mid`, shows only in its last seconds. Try a trend over the phrase.
 - [ ] Film: the Cinematic film shows the conductor in few shots. Give `pawchestra-film` a camera
       that keeps the bear in the frame, so that a film can show the expression of the conductor.
 - [ ] Conductor: the sway of four demos takes 2 beats a side. Show the user, and check a lower
