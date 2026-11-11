@@ -108,41 +108,56 @@ expression from the score before the play (`buildExpressionTrack()`), and the po
 each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESSION_MOTION`.
 
 - **Dynamics (sections 1, 6).** The level of each beat is the mean level of the time around it.
-  A loud passage makes the beat pattern larger and higher (`loudSize`, `loudLift`), and the body
-  comes up with the head (`loudLean`, `loudHead`). A soft passage makes the pattern smaller and
-  lower (`softSize`, `softDrop`). The body leans toward the players, the head goes down, and the
-  knees bend a little (`softLean`, `softHead`, `softCrouch`), as the smaller body of section 6.
-  The app keeps the beat below the chin, except at a climax (section 1).
+  A loud passage makes the beat pattern a little larger and higher (`loudSize`, `loudLift`), and
+  its staccato stroke more energetic: a longer stop at the top and a faster fall into the ictus
+  (`loudEnergy`), as the forte of section 1 is "more energetic" more than larger. The body comes
+  up with the head (`loudLean`, `loudHead`). A crescendo grows the beat over the build
+  (`riseSize`), opens the chest, and raises the head and the shoulders (`riseLean`, `riseHead`,
+  `riseShrug`), as the open arms and the rising shoulders of section 2. A soft passage makes the
+  pattern smaller and lower (`softSize`, `softDrop`). The body leans toward the players, the head
+  goes down, and the knees bend (`softLean`, `softHead`, `softCrouch`), as the smaller body of
+  section 6. The app keeps the beat below the chin, except at a climax (section 1).
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
-  passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm (`softPalm`), as the palms down of
-  section 2. It holds the palm up on a held chord.
+  passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm
+  (`softPalm`). The paw rolls its palm up in a crescendo, on a held chord, and at a climax, and
+  down in a diminuendo and a soft passage (`LEFT_HAND_PLACES`, `palm`), as the palms of section 2.
+  The twist of the paw on its forearm stops at `MAX_TWIST_L`, so the palm turns only a part of
+  the way when the forearm points far from the bind pose.
 - **The breath (section 3).** The chest and the head rise in the preparation before the first
   beat, before each phrase start after a time with no note start, and before each accent
-  (`breathLean`, `breathHead`). They come down after the entry (`breathReleaseSec`).
+  (`breathLean`, `breathHead`), and the shoulders rise (`breathShrug`). They come down after the
+  entry (`breathReleaseSec`). Two breaths are at least `breathGapSec` apart.
 - **Legato and staccato (section 4).** Each stroke reads the mean length of its notes against the
   beat. A legato stroke moves with no stop, as a change of direction. A staccato or accented
   stroke rebounds fast to the top of its arc, stops there, and falls into the next ictus with its
   full speed (`strokeOf()` of `conductor-notes.ts`): the click of section 4. The app makes the
   click with the whole stroke, because the wrist of the bear follows the baton.
-- **Accents (section 5).** An accent is a strong onset well above the onsets of the 2 s before
-  it. The head and the upper body jolt on it (`joltHead`, `joltLean`), and the knees dip a little
-  on an accented downbeat (`dip`). The breath before it is the gesture of the beat before. The
-  knees do not bob on each beat, because section 6 names that as a fault.
+- **Accents (section 5).** An accent is a strong onset well above the onsets of the 2 s before it.
+  The head, the upper body, and the shoulders jolt on it in a short pulse (`joltHead`, `joltLean`,
+  `joltShrug`), and the knees dip on an accented downbeat (`dip`). Of two accents within
+  `accentGapSec`, the larger stays, so the head does not jolt on each chord of a run. The breath
+  before it is the gesture of the beat before. The knees do not bob on each beat, because section 6
+  names that as a fault.
 - **The sway.** The upper body sways to the side with the bar, and a legato passage sways more
   than a staccato passage (`sway`, `swayStaccato`) (derived from the fluid piano gestures of
-  section 1).
-- **The climax (sections 1, 2, 6).** A climax is a loud downbeat after a rise of the level. Both
-  arms open wide and high for one bar: the baton goes out and up (`climaxOut`, `climaxUp`) and
-  keeps a part of its beat, and the left hand opens (`LEFT_HAND_PLACES.open`). The body comes up
-  and the head lifts (`climaxLean`, `climaxHead`).
-- **The final chord (section 7).** The app finds the last chord that sounds to the end of the
-  sound. The baton leaves the beat and holds above the beat of the chord, and it rises slowly to
-  sustain the sound. The left palm holds the chord up. Before the end, the baton makes one
-  counterclockwise circle that starts and ends at its bottom, and the left hand closes at the end.
-  Then the baton stops a little lower (`finalCircle`, `finalClose`). The right hand moves in the
-  release of the app too, because the release of the last chord of a piece ends the piece, and
-  the bow follows it.
+  section 1). The hips move against the sway (`shift`), so the weight stays over the feet, as the
+  grounded stance of section 6. For a cue, the chest twists further toward the section
+  (`cueTwist`), and a left cue takes away a part of a forward lean (`cueUpright`).
+- **The climax (sections 1, 2, 6).** A climax is a loud downbeat after a rise of the level, at
+  least `climaxStartSec` into the piece. Only the largest rises stay: one for each
+  `climaxEverySec`, at least `climaxGapSec` apart. Both arms open wide and high for one bar: the
+  baton goes out and up (`climaxOut`, `climaxUp`) and keeps a part of its beat, and the left hand
+  opens with the palm up (`LEFT_HAND_PLACES.open`). The chest opens, the head lifts, and the
+  shoulders rise (`climaxLean`, `climaxHead`, `climaxShrug`).
+- **The final chord (section 7).** The app finds the last chord of at least `finalShare` of the
+  seats that sounds to the end of the sound. A chord shorter than `finalMinSec` gets no hold: the
+  baton stops at its beat with no rebound, and the left hand closes. The baton leaves the beat and
+  holds above the beat of the chord, and it rises slowly to sustain the sound. The left palm holds
+  the chord up. Before the end, the baton makes one counterclockwise circle that starts and ends at
+  its bottom, and the left hand closes at the end. Then the baton stops a little lower
+  (`finalCircle`, `finalClose`). The right hand moves in the release of the app too, because the
+  release of the last chord of a piece ends the piece, and the bow follows it.
 - **Where the app differs.** The app shows an accent with the jolt, the dip, and the stroke, and
   the left hand does not close to a fist for a sforzato (section 5). The left hand does not turn in
   wider rounds for a crescendo (section 2). It rises open.
