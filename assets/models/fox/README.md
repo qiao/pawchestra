@@ -128,16 +128,27 @@ The color map paints a full eye on each eyeball (a black pupil, an amber iris, a
 dark brows, dark brown socks up to the knees and over the forearms from 0.28 of the way from the
 elbows, dark ear tips, a cream bib, cheeks, muzzle, and tail tip, and a dark brown nose.
 
-**Eyes.** The map paints each iris at the inner edge of the white of its ball, a pupil that fills
-most of the iris with a dark ring around it, and the rest of the ball dark brown. In the app the
-eyes read as glass doll eyes that looked past the viewer. `paint_eyes()` of `tools/fox-maps.py`
-paints each ball again, from the ball points that show in the front view: the gaze at half the
-angle across of the opening (13.1 degrees out, so the eyes are nearly parallel) and at the middle
-of its height, an iris of 26.3 degrees (1.12 of half the opening height) with the radial texture
-of the source iris by rings, a pupil of 0.45 of the iris radius, soft edges, and an off-white
-sclera shaded under the upper lid. The ball has no painted light, so the eye light of the app gives
-the one highlight. The dark shade over the left eye in the front view of the violinist is the
-light of the stage: the fox of main shows it too.
+**Eyes.** The eyes are the cartoon eyes of the sheet. In the source map, each eye read as a glass
+doll eye that looked past the viewer, and a half real eye (a small pupil in an amber iris) read
+uncanny on the toy-like face. `paint_eyes()` of `tools/fox-maps.py` paints each ball again, from
+the ball points that show in the front view:
+
+- The gaze is at half the angle across of the opening (13.2 degrees out) and at the middle of its
+  height, so the eyes are nearly parallel.
+- A dark brown oval iris fills almost the whole opening: 1.25 of half the opening height up and
+  down, 4 degrees past the inner corner, and to 7 degrees before the outer corner. It is lighter
+  brown toward its lower edge.
+- A black pupil of 0.65 of the iris radius, and a thin off-white edge only at the outer corner.
+- A front ray counts only when 8 other rays within 0.0013 units also hit the ball. The nose is not
+  in the fur primitive, so a few rays go through its place to the inner side of a large ball.
+
+The ball has no painted light, so the eye light of the app gives the one highlight. The dark shade
+over the left eye in the front view of the violinist is the light of the stage. The fox of main
+shows it too.
+
+**Cute face.** The face is a baby face, as a moderate first step: eyes 1.2 times larger, open lids,
+a muzzle 0.9 times as long, and rounder cheeks ("Eye size", "Cheeks", "Shorter muzzle", and "Lids"
+below). The head height H, the ears, the body, and the colors stay.
 
 ### tripo-hand/fox.blend
 
@@ -147,12 +158,12 @@ source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 416,689 bytes |
-| SHA-256 | `9a769a759651c92eeaa8e16eb0e62647d2715c6163bcd1484da8f3a6baabfb83` |
+| Size | 415,610 bytes |
+| SHA-256 | `2a7c05893e378a0949206f84ac137c34297fde0c35cf4a01d360904b307b0a92` |
 | Origin | Made in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips before the edits, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`, with the shape key `bind_belly`: 3,900 vertices and 4,220 faces (3,428 quads and 792 triangles, 7,648 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 162 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
+| Mesh | One object `fox`, with the shape key `bind_belly`: 3,886 vertices and 4,194 faces (3,402 quads and 792 triangles, 7,596 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.073302 (the shoulder joints at 1.7653 m for each unit, so that H is 0.380 m, near the shown head of the fox of main, 0.382 m), `crease` 55 |
 | Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app, and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -162,8 +173,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 937,292 bytes | `b78c1322e3eff3fa533c9d8e6e33a921a72660859a37592a23c0b268f28faf88` |
-| `tripo-hand/fox.rig.json` | 18,084 bytes | `82d9d5edd40ea3318e5ba73c2998583c3255686d648b45e094899ba0a408426e` |
+| `tripo-hand/fox.rig.glb` | 932,016 bytes | `3ba18d26b2760b32ada085275597441e2c4d8bf4ac3abbc2bb13967d3f5241ce` |
+| `tripo-hand/fox.rig.json` | 17,514 bytes | `996de1dcb7dfdf9f1d616f4782d7cad621bf6e56dae1bfa9cee81dbd88fd67cf` |
 
 The scripts of the session (`scratch/fox3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain.sh`, and `params.json`) are not in
@@ -187,8 +198,11 @@ arm):
   on the right (3 steps), 292 and 293 vertices. New quads join the two rings with the step offset,
   the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units), and the new
   quads take the planar UVs of the clean dark patch at UV (0.044, 0.3673).
-- **Point edits.** As maps of the rest points, in this order: "Eye size", "Paw size", "Arm girth",
-  "Shin girth", and "Longer shins" below.
+- **Point edits.** As maps of the rest points, in this order: "Eye size", "Cheeks", "Shorter
+  muzzle", "Paw size", "Arm girth", "Shin girth", and "Longer shins" below.
+- **Ball trim.** The larger balls reach over the middle plane, deep in the head. The 24 ball faces
+  with a corner less than 0.002 units from the middle plane on the side of their ball go, so that
+  the sign of x gives the side of each ball face. No face that shows goes.
 - **Surface.** `sa.add_surface(fox, 'fox', <base color>, eye_fans=False, config=<fox-tripo.json>)`.
 - **Armature.** The armature of the config with the true palm of the source, (-0.196, -0.98,
   -0.028) in the studio axes with x mirrored on the right, turned by the paw turn. The property
@@ -217,9 +231,20 @@ forearm girth 31.5 and 30.8, thigh girth 50.5 and 56.7, shin girth 31.1 and 33.0
 and 27.0. The arms are short: 18.4 cm for each part against 24.8 and 25.8 cm on main.
 
 - **Eye size.** Each eyeball and its socket scale about the middle of the ball, (±0.0332, 0.7856,
-  0.1194), by 0.88 (rBall 0.0359, rIn 0.042, rOut 0.075, mid 0.02, zKeep 0.175). Each eyeball point
-  takes the side of its ball, because the balls reach over the middle plane. The ball is 0.29 H
-  across. At 0.87 and below, the socket skin hides the whole ball.
+  0.1194), by 1.056 (rBall 0.0359, rIn 0.042, rOut 0.075, mid 0.02, zKeep 0.175). Each eyeball
+  point takes the side of its ball, because the balls reach over the middle plane. The ball is
+  0.35 H across, 1.2 times the 0.29 H of the scale 0.88 before. At 0.87 and below, the socket skin
+  hides the whole ball.
+- **Cheeks.** Each point near the cheek point (±0.07, 0.74, 0.145) under each eye moves by up to
+  0.008 units (2.9 % of the head width) along (±0.8, -0.2, 0.55): the full move to 0.015 units,
+  and a smoothstep to 0 at 0.05. The move is 0 within 0.048 units of the middle of a ball, and
+  full from 0.06, so the sockets keep their form.
+- **Shorter muzzle.** Each point moves back (-z) by 0.223 G(z), G the integral of a band that is
+  0 below z 0.145, a smoothstep to 1 at 0.165, 1 to 0.195, and a smoothstep to 0 at 0.21. The nose
+  in front of z 0.21 moves back 0.0106 units as one piece, and the length from the eye line to the
+  nose tip is 0.90 of its length. The share is 1 from y 0.66 to 0.77, with a smoothstep to 0 at y
+  0.62 and y 0.80, so the forehead stays. It is 0 within 0.046 units of the middle of a ball, and
+  full from 0.056.
 - **Paw size.** From the wrist joint to the finger tips, 0.46 H long in the source. The edit `paw`
   (length 0.70, width 0.76, thickness 0.93, ramp 0.015 units) makes it 12.2 cm, against 12.5 cm on
   main.
@@ -252,11 +277,11 @@ before).
 -34 to 64 degrees on the left and the mirror on the right, so that no lid reaches over the middle
 plane, and a lower strip pushed out past the farthest ball point of the fit of the export. 156 quads
 on each side, held turned up 126 degrees into the head. The property `lids` holds the angle 2.199115
-and the hinge axes (±0.97451, 0.224343, 0). The lid faces take the UVs of the fur patch at UV
+and the hinge axes (0.977737, ±0.209833, 0). The lid faces take the UVs of the fur patch at UV
 (0.9229, 0.8918) at 0.88 UV for each unit, and the row `head` 1. In the 21 steps of the blink no
-open lid point, side edge, or back edge leaves the head. The skin of each upper lid turns 8 degrees
-down (psi 12, 28, 60, 85 degrees, reach 1.5 to 2.4 ball radii, lam 35 to 65 degrees), so that the
-lid line covers the top of the iris and the face reads calm.
+open lid point, side edge, or back edge leaves the head. The skin of the upper lid takes no turn,
+so the opening in the front view reaches 26.9 degrees up. With a turn of 8 degrees down, the lid
+line covered the top of the iris, and the red fox read sleepy.
 
 **Arm twist.** The roll of each upper arm and the twist of each forearm, in degrees, in each moment
 of `FOX_HOLD` of `src/pose/bowed-rig.ts` and `FOX_FLUTE` of `src/pose/winds.ts`:
@@ -294,8 +319,8 @@ median Oklab L, C, and h of the fur in the hall view (a fixed camera at the firs
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox-color.webp` | 128,260 bytes | `3b58ee7bff7499180e5bf2472c5aded50407f72f35fb60803b98301fca59c3c9` |
-| `tripo-hand/fox-tan-color.webp` | 118,458 bytes | `e685ca622984ca82470d4931d59022e0016be403b574cf3c3ffc08a0462f6ad7` |
+| `tripo-hand/fox-color.webp` | 121,768 bytes | `fb32431780fb5f32df925ad66be6ac9eca3e771fd72153c95f4c4fe7275d0fef` |
+| `tripo-hand/fox-tan-color.webp` | 112,006 bytes | `5e023e7fe0fa6c8a8fa6fd3909c62331d6fc8af66ec77ab0c54a47b8a66c4df7` |
 
 **Normal map.** The same run writes `fox-normal.webp` from the normal map of the FBX: each x, y tilt
 limited to 0.2 (0.87 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red and
