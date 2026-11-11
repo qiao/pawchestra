@@ -154,13 +154,15 @@ SCLERA = (226, 220, 208)
 #: SCLERA_WARM: the Oklab (a, b) step of the white to a warm ivory. IRIS_SHADE: the scale of the
 #: Oklab lightness of the iris. RING_SHADE and RING_WIDTH: the scale of the lightness of the outer
 #: ring of the iris, and its width as a share of the iris radius.
-IRIS_SCALE = 1.1
-PUPIL_RATIO = 0.55
-#: The turn in degrees of the middle of the new iris out from the target of `center_irises()`.
-#: The target of the rabbit already lies in the middle of the opening of the play view, turned
-#: out by GAZE_OUT. The turn is at most the growth of the iris radius, so that the new iris covers
-#: the old iris.
+IRIS_SCALE = 1.0
+PUPIL_RATIO = 0.5
+#: The turns in degrees of the middle of the new iris out and up from the target of
+#: `center_irises()`. The target of the rabbit already lies in the middle of the opening of the
+#: play view, turned out by GAZE_OUT and up by GAZE_UP. With the iris middle there, the upper lid
+#: came near the top of the pupil in the views of the test page, and the rabbit read as sleepy.
+#: The turn down puts the pupil middle near the middle of the opening.
 FAR_GAZE_OUT = 0.0
+FAR_GAZE_UP = -3.0
 SCLERA_SHADE = 0.85
 SCLERA_WARM = (0.008, 0.03)
 IRIS_SHADE = 0.9
@@ -800,14 +802,16 @@ def far_eyes(rig, image, source, pupils):
       within FAR_CLEAN of their medians. In the other directions the lash line or the paint of
       the lid joins the iris. Each edge of the clean directions takes the circular median of
       FAR_SMOOTH clean directions.
-    - The new iris: its middle n is the target t of the play view (`gaze_targets()`) turned out
-      by FAR_GAZE_OUT degrees, its radius A is IRIS_SCALE times the median of R, and its pupil
-      radius P is PUPIL_RATIO of A. Each ball texel at the angle theta and the direction phi about
-      n within A, but a dark lash line at the edge of the opening (LASH_LINE), takes the mix of
-      the source colors of the two clean directions g on the two sides of phi, by its angle
-      between them. In a direction g, the source color is at the angle theta / P * rho(g) from p
-      in the pupil, or rho(g) + (theta - P) / (A - P) * (R(g) - rho(g)) in the iris. So the pupil
-      lies in the middle of a round iris, and the dark ring and the texture of the iris stay.
+    - The new iris: its middle n is the target t of the play view (`gaze_targets()`) turned out by
+      FAR_GAZE_OUT and up by FAR_GAZE_UP degrees. Its radius A is IRIS_SCALE times the median of R,
+      and its pupil radius P is PUPIL_RATIO of A. Each ball texel at the angle theta and the
+      direction phi about n within A, but a dark lash line at the edge of the opening (LASH_LINE),
+      takes the mix of the source colors of the two clean directions g on the two sides of phi, by
+      its angle between them. In a direction g, the source color is at the angle theta / P * rho(g)
+      from p in the pupil, or rho(g) + (theta - P) / (A - P) * (R(g) - rho(g)) in the iris. So the
+      pupil lies in the middle of a round iris, and the dark ring and the texture of the iris stay.
+      Each texel of the old iris of `center_irises()` out of the new iris takes the median white of
+      the opening.
     - In Oklab, each white texel outside the new iris takes SCLERA_SHADE of its lightness and the
       step SCLERA_WARM, by its share of white (WHITE_LUMA, WHITE_SATURATION). Each other texel in
       the new iris takes IRIS_SHADE of its lightness, and in the outer RING_WIDTH of the iris also
@@ -882,13 +886,11 @@ def far_eyes(rig, image, source, pupils):
         # The new iris about n.
         big = IRIS_SCALE * float(mid_edge)
         small = PUPIL_RATIO * big
-        if FAR_GAZE_OUT > big - mid_edge:
-            sys.exit(f'FAR_GAZE_OUT is more than the growth of the iris radius, '
-                     f'{big - mid_edge:.1f} degrees.')
+        # The new middle n: t turned out (away from the middle plane) and up.
         sign = 1.0 if side == 'L' else -1.0
-        turn = np.radians(sign * FAR_GAZE_OUT)
-        n = np.array([t[0] * np.cos(turn) + t[2] * np.sin(turn), t[1],
-                      t[2] * np.cos(turn) - t[0] * np.sin(turn)])
+        psi = np.arcsin(np.clip(t[1], -1, 1)) + np.radians(FAR_GAZE_UP)
+        lam = np.arctan2(t[0], t[2]) + np.radians(sign * FAR_GAZE_OUT)
+        n = np.array([np.cos(psi) * np.sin(lam), np.sin(psi), np.cos(psi) * np.cos(lam)])
         e_n = np.cross(up, n)
         e_n /= np.linalg.norm(e_n)
         u_n = np.cross(n, e_n)
@@ -918,6 +920,15 @@ def far_eyes(rig, image, source, pupils):
             got += weight[:, None] * part
             found &= hit
         new = colors.copy()
+        # The texels of the old iris of center_irises() (about t) out of the new iris take the
+        # median white of the opening.
+        top, low = colors.max(axis=1), colors.min(axis=1)
+        white = (low > WHITE_LOW) & ((top - low) / np.maximum(top, 1) < WHITE_SAT)
+        theta_t = angle_to(d, t)
+        reach = mid_edge + IRIS_EDGE
+        in_opening = (d[:, 2] > 0) & core[row, col]
+        old_iris = (theta_t < reach) & (theta >= big) & in_opening & ~lash
+        new[old_iris] = np.median(colors[white & in_opening & (theta_t >= reach)], axis=0)
         new[sel[found]] = got[found]
 
         new_luma = new @ [0.2126, 0.7152, 0.0722]
