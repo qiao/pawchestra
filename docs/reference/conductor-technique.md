@@ -118,6 +118,9 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   goes down, and the knees bend (`softLean`, `softHead`, `softCrouch`), as the smaller body of
   section 6. The app keeps the beat below the chin, except at a climax (section 1). At beat 1,
   the right wrist is at the chest, a little below the shoulder joint (`CONDUCTOR_HOLD.beatPoint`).
+- **The rest pose.** Before the start and after the bow, the arms hang relaxed beside the body,
+  and the baton points down, a little forward, and a little in (`CONDUCTOR_HOLD.restBaton`). No
+  source of section 9 gives the rest place.
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
   passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm

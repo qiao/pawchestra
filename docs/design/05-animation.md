@@ -828,11 +828,13 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - **Paws of the arm gate.** In the ready gesture the left palm faces in and down, as in the quiet
   place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
   pose the arms hang relaxed beside the round belly, a little forward, with a small bend of the
-  elbows and the elbows down and back (`restArm`, `restPoleL`, `restPoleR`). The elbow of a
-  nearly straight hanging arm is ill defined, so the conductor gives it a fixed direction. The
-  search of the swing out to the side sees the body only along x, so the rest arm adds a small
-  extra swing (`restArm.extraOut`). Reason: with the swing of the search alone, both elbows go
-  into the round belly.
+  elbows and the elbows down and back (`restArm`, `restPoleL`, `restPoleR`). The baton of the
+  hanging paw points down, a little forward, and a little in (`restBaton`), as a conductor holds
+  it before the start. The paw turns with no twist on its forearm. The elbow of a nearly
+  straight hanging arm is ill defined, so the conductor gives it a fixed direction. The search of
+  the swing out to the side sees the body only along x, so the rest arm adds a small extra swing
+  (`restArm.extraOut`). Reason: with the swing of the search alone, both elbows go into the round
+  belly.
 - **Bow.** At the song end, the bear bows to the orchestra (`END_BOW`).
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
   breath and a nod, as in a string quartet (`leaderOf()`, `LEADER_NOD`).

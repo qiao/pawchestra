@@ -84,6 +84,14 @@ export const CONDUCTOR_HOLD = {
    */
   liftBaton: [1, -0.3, 0],
   /**
+   * In the rest pose (5.2), the baton of the hanging right paw turns toward this direction, in the
+   * model axes: down, a little forward, and a little in, as a conductor holds the baton before the
+   * start. The turn keeps no twist of the paw on its forearm. With no turn, the baton follows the
+   * fingers of the hanging paw, and it points out to the side and forward, past the width of the
+   * belly.
+   */
+  restBaton: [-0.2, -1, -0.3],
+  /**
    * The roll of the right paw around the baton from the top up, in radians, positive by the right
    * hand around the direction of the baton. The `palm` of the Tripo bear is the true palm of its
    * paw, so with no roll the back of the paw faces up, and the claws curl around the baton under
@@ -295,6 +303,8 @@ export interface ConductorRig {
    * ({@link CONDUCTOR_HOLD.liftBaton}).
    */
   readonly liftBaton: Vec3;
+  /** The unit direction of the baton in the rest pose ({@link CONDUCTOR_HOLD.restBaton}). */
+  readonly restBaton: Vec3;
   /** The unit direction of the left hand in the ready gesture: up and a little outward. */
   readonly readyDirection: Vec3;
   /** The legs, which bend so that the feet stay on the podium when the hips drop. */
@@ -360,6 +370,7 @@ export function conductorRig(model: PlayerModel): ConductorRig {
     beatUp: toVec3(beatUp),
     headHeight: h,
     liftBaton: toVec3(new Vector3(...CONDUCTOR_HOLD.liftBaton).normalize()),
+    restBaton: toVec3(new Vector3(...CONDUCTOR_HOLD.restBaton).normalize()),
     readyDirection: [
       -Math.sin(CONDUCTOR_HOLD.readyOut) * Math.cos(CONDUCTOR_HOLD.readyLift),
       Math.sin(CONDUCTOR_HOLD.readyLift),
@@ -443,6 +454,8 @@ const toPlace = new Vector3();
 
 /** The direction of the baton in the middle of a lift or a lowering. Each call writes it first. */
 const liftBaton = new Vector3();
+/** The direction of the baton in the rest pose. Each call writes it first. */
+const restBaton = new Vector3();
 const bodyTurn = new Quaternion();
 /** The turn of a clavicle in the rise of the shoulders. Each call writes it first. */
 const shrugTurn = new Quaternion();
@@ -598,7 +611,14 @@ export function poseConductor(
   levelOf(right, frames.root);
   hangingWrist(rig.hangR, hangFrame, hanging);
   limitReach(rig.right, right.position, wrist);
-  mixRotation(hangingHand(rig.hangR, hangFrame, restHand), hand, weight, hand);
+  hangingHand(rig.hangR, hangFrame, restHand);
+  if (weight < 1) {
+    // The baton of the hanging paw points down and a little forward and in.
+    along.fromArray(BATON_ALONG).applyQuaternion(restHand);
+    restBaton.fromArray(rig.restBaton).applyQuaternion(hangFrame.rotation);
+    restHand.multiply(swingOf(restHand, along, restBaton));
+  }
+  mixRotation(restHand, hand, weight, hand);
   if (weight > 0 && weight < 1) {
     // The turn is at its full size in the middle of the motion. The tip leaves the width of the
     // desk early, while the hand is still high.
