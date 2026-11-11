@@ -81,6 +81,8 @@ const BODY_LOOPS = 2;
  * - The fox: 6 open loops, the cuts to the two upper arms and the open loops of the source mesh
  *   (the edges of the lids, the brow strips, and the mouth). The build fills the 4 small holes of
  *   the source.
+ * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
+ *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The rabbit: 16 open loops, the cuts to the two upper arms and the open loops of the source mesh
  *   and of its lids.
  */
@@ -89,6 +91,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 25],
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
+  ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
 ]);
 
@@ -328,7 +331,7 @@ function dogBodySurface(posed: PosedSkeleton): ClosedSurface {
  * @returns The surface.
  */
 function hippoBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, HIPPO_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, HIPPO_BODY_LOOPS));
 }
 
 /**
