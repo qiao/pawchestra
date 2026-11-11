@@ -1288,11 +1288,15 @@ const CAT_HOLD = {
  * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
  *   out and a little down, (2.5, -0.5, -0.3): with the pluck of {@link CELLO_HOLD}, the right upper
  *   arm goes 3.0 cm into the chest.
- * - At rest, the bow grip lies 0.5 H out, 0.35 H up, and 0.2 H forward from the thigh at 0.9 of the
- *   way to the knee, lower and further out than {@link LAP_CELLO_BOW}, with the elbow out, back,
- *   and down, (1.2, -1, 0.75): with the grip and the elbow of {@link LAP_CELLO_BOW}, the right
- *   upper arm goes 3.1 cm into the chest at rest. An elbow further out, (2, -1, 0.3), also clears
- *   the arm, but twists the bow paw 147° on its forearm at rest (105° with this hold).
+ * - At rest, the bow grip lies 0.35 H out, 0.5 H up, and 0.1 H forward from the thigh at 0.9 of
+ *   the way to the knee, with the tip up and a little forward, (0.2, 1, -0.6), and the elbow out,
+ *   down, and a little back, (0.8, -1, 0.4). The paw of the Tripo beagle then twists 81° on its
+ *   forearm at rest (`pnpm arm-check cellist`): with the grip 0.5 H out and the tip of
+ *   {@link LAP_CELLO_BOW}, 92°. A grip at the end of the forearm (`restBow.forearm`) twists it 94°
+ *   to 105°.
+ * - The bow lies 5° slanted in the plane of the strings (`slant`), nearly square, as a real bow:
+ *   with the -20° of {@link CELLO_HOLD}, the right arm of the Tripo beagle folds 22 faces in the
+ *   play (11 with -5°).
  * - In the play, the left elbow points out to the left and a little down, (-1, -0.25, 0), so
  *   that the upper arm goes about 11° down from the shoulder in the mean of the play and the
  *   forearm rises from the elbow to the neck, as a cellist holds the left elbow out from the body
@@ -1310,6 +1314,8 @@ const CAT_HOLD = {
  *   into the cello.
  * - At rest, the left paw holds the cello at 0.6 of the fingerboard (`restPlace`), the place at
  *   which the dog was accepted.
+ * - The left paw tilts 45° over the neck (`tiltL`): with the 55° of {@link CELLO_HOLD}, the left
+ *   forearm of the Tripo beagle twists 46° in the play (43° with 45°).
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
@@ -1318,14 +1324,20 @@ const DOG_HOLD = {
   poleTipR: [1.5, -0.5, -0.5],
   polePizzicato: [2.5, -0.5, -0.3],
   pluckSide: 0.25,
-  restPoleR: [1.2, -1, 0.75],
+  restPoleR: [0.8, -1, 0.4],
+  slant: -5 * MathUtils.DEG2RAD,
+  tiltL: 45 * MathUtils.DEG2RAD,
   poleL: [-1, -0.25, 0],
   highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
   roundArms: null,
   girthFit: null,
   restPlace: 0.6,
-  restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
+  restBow: {
+    ...LAP_CELLO_BOW,
+    tip: [0.2, 1, -0.6],
+    lap: { along: 0.9, offset: [0.35, 0.5, -0.1] },
+  },
   fit: { gap: 0.1, left: 20 * MathUtils.DEG2RAD },
 } as const satisfies BowedHold;
 
