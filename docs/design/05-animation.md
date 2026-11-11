@@ -535,8 +535,9 @@ The rest of each family:
   back (`PalmDamp`). Reason: the far head stands out of the reach of the short arm. With no turn,
   the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
-  the note takes its grip to the near rim, so that its fingers touch the edge, and the spine leans
-  further over the cymbal (`EdgeDamp`). The window ends before the next lift of each paw. Reason
+  the note takes its grip to the near rim, so that the closed paw rests on the edge, and the spine
+  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that its ball stays
+  off the plate (`EdgeDamp.share`). The window ends before the next lift of each paw. Reason
   of the lean: with no lean, the arm stretched past the margin of the arm gate. The paw of the
   timpanist that struck the note moves toward the player with its mallet in the strike direction,
   as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to

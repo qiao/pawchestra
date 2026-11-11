@@ -397,10 +397,10 @@ The app does not follow these facts:
   20° (`tablePaw()`). No source gives the turn of the hand in a change.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
-- **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand
-  cymbals at the chest, and no grip of a suspended cymbal. The paw keeps its mallet at the rim,
-  and the rule of the rest is the rule of the hand cymbals. A MIDI drum note has no written
-  length, so each note before a rest of 0.5 s stops.
+- **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand cymbals
+  at the chest, and no grip of a suspended cymbal. The closed paw rests on the edge, with the mallet
+  lifted off the plate, and the rule of the rest is the rule of the hand cymbals. A MIDI drum note
+  has no written length, so each note before a rest of 0.5 s stops.
 - **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than
   the 35° to 45° of [60]: a small angle that keeps the plates not parallel [61]. The plates tilt 15° from vertical [16]. No concert source gives the rest place: in a long
   rest, the arms hang with the plates at the sides, as a marching method holds them [24].
