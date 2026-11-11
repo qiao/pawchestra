@@ -760,21 +760,26 @@ most about 45° of roll or twist in the moments of the violist. Reason: with no 
 forearm twisted up to 127°. Its tail lies on the seat (the key `bind_tail`), and the faces of its
 deep mouth slit have the face attribute `rim`. Reason: the slit shaded as a thick dark line.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
-fox, in the same way. It keeps the eyeballs of its mesh, because the map paints a full eye on each,
-and its tail has two bones. The map tools of the fox and the rabbit keep the eye paint of the
-source (an amber iris, a black pupil, white, and on the fox a lash line), and
-move each iris as one decal to the middle of its opening (`center_irises()`). Reason: the source
-paints each iris at the inner corner, and both animals looked cross-eyed from the front. The
+fox. It follows the route of the Tripo wolf (below): no point edit of its form, the colors and the
+eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of
+this body is its source FBX. It keeps the eyeballs of its mesh, because the map paints a full eye
+on each, and its tail has two bones. Its legs keep the length of the source, so its chair is
+lower. Its map tool moves each iris with its pupil as one decal on its ball, to the middle of the
+eye opening in a view from above the head, a little out (`tools/gaze_shift.py`). Each moved texel
+is a copy of a texel of the same ball. Reason: the source paints each iris at the inner side of
+its opening, and the foxes looked to the side and down in the play view and from the default
+camera. The map tool of the rabbit keeps the eye paint of the source (an amber iris, a black
+pupil, and white), and moves each iris as one decal to the middle of its opening
+(`center_irises()`). Reason: the source paints each iris at the inner corner, and the rabbit
+looked cross-eyed from the front. The
 rabbit irises take the middle of the opening in the view of the play, with the head turn of the
 play and the camera of the test page, a little out and up (`gaze_targets()`). Reason: with the
 middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. A last
-eye step of each map tool (`far_eyes()`) makes each iris round with the pupil in its middle,
+eye step of the map tool of the rabbit (`far_eyes()`) makes each iris round with the pupil in its middle,
 sets its size (`IRIS_SCALE`), turns it out and up (`FAR_GAZE_OUT`, `FAR_GAZE_UP`), and gives the
 white a darker, warm tone and the iris a darker tone. Reason: the source paints each pupil off the
 middle of its iris, as an eye that looks to the side. In the far view of the hall, a wide white
-field around that iris made the eyes read as startled or as a side glance. The top of the fox
-iris lies under the upper lid, with white only at the sides and a little below. Reason: white
-above the iris read as scared. The rabbit pupil lies near the middle of the opening, with the top
+field around that iris made the eyes read as startled or as a side glance. The rabbit pupil lies near the middle of the opening, with the top
 of the iris just under the upper lid. Reason: with a larger iris higher in the opening, the upper
 lid came near the pupil and the rabbit read as sleepy. The map
 tool of the rabbit also gives its brows and the dark band of its eye sockets half of their
@@ -799,9 +804,8 @@ this body is its source FBX in an FBX viewer. Its source has no eyeball, so the 
 painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
 steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
-faces of the fox and the rabbit are baby faces: upper lids that do not cover the iris, rounder
-cheeks, and on the fox a shorter muzzle. Reason:
-lids over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
+face of the rabbit is a baby face: upper lids that do not cover the iris, and rounder cheeks.
+Reason: lids over the top of the iris made the rabbit read sleepy. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1121,17 +1125,10 @@ source FBX.
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
 the map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus
-the tan fox never shows the red map. Each map moves the orange fur of the source to a target color
-for the hall view of the app, with the key light from the back and no fill light: the red map to
-a bright red-orange (`RED_FUR`) near the fox of main, and the tan map to a light tan (`TAN_FUR`).
-A darker red read brown in that light. The 3/4 view with the fill light stays near main. The tan
-socks are darker than the tan palette of the faces. Reason: with that lightness, the socks of the
-round mesh read near the tan fur in the hall light. Only the dark texels of the head (the ear tips
-and the brows) take the step of the socks, and the padding around each limb island takes it too,
-so no dark patch and no dark seam shows. Both maps paint the light spots above
-the eyes over with the fur around them (`BROW_SPOT`), because they read as raised inner brows. Each
-leg and forearm gets a sharp edge between the fur and the dark sock (`SOCK_EDGES`), because the
-long fade of the source made the legs read dirty.
+the tan fox never shows the red map. The red map keeps the colors of the source. The tan map
+moves only the orange fur of the source, by one step of the lightness and the hue (`TAN_STEP`), and
+the cream, the dark socks, the lines, and the eyes keep the colors of the source. Reason: the
+source FBX is the look target, and the tan fox needs the smallest change that reads as tan.
 
 Such a body also gets the fur shading of `scene/fur.ts` (`FUR_LOOK`), only on its fur faces: the
 faces with texture points and the finish `matte`. The eyeballs, the gloss nose, and the `plain`
