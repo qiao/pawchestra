@@ -4,8 +4,8 @@ import { toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
 import { MeshBuilder, transform } from '../mesh.ts';
 import type { MeshData } from '../mesh.ts';
-import { box, cylinder, plate, prism, quad } from '../primitives.ts';
-import type { OutlinePoint } from '../primitives.ts';
+import { box, lathe, plate, prism, quad } from '../primitives.ts';
+import type { OutlinePoint, ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, placeCorners } from './piece.ts';
 import type { InstrumentModel, KeyTurn } from './types.ts';
 
@@ -144,8 +144,13 @@ export const PIANO_PEDALS = {
   box: { width: 0.216, depth: 0.079, bottom: 0.015, top: 0.105 },
   /** The bar at the top of the lyre, under the case. */
   bar: { width: 0.305, height: 0.05, depth: 0.06 },
-  /** The x of the middle of each post at the box and at the bar, and the radius of a post. */
-  post: { boxX: 0.08, barX: 0.12, radius: 0.017 },
+  /**
+   * The flat posts of the lyre: the x of the middle of each post at the box and at the bar, the
+   * width and the depth of a post, and the radius of the pedal rod over each pedal.
+   */
+  post: { boxX: 0.085, barX: 0.12, width: 0.045, depth: 0.03, rodRadius: 0.005 },
+  /** The braces from the back of the box to the case: their x, their reach back, their radius. */
+  brace: { x: 0.06, back: 0.45, radius: 0.008 },
 } as const;
 
 /** The pitch classes of the black keys. */
@@ -662,13 +667,14 @@ function addInside(piece: PieceBuilder, boardY: number): void {
 }
 
 /**
- * Adds the pedal lyre ({@link PIANO_PEDALS}): the bar under the case, two posts that spread a
- * little toward the bar, and the box just above the floor.
+ * Adds the pedal lyre ({@link PIANO_PEDALS}): the bar under the case, two flat posts that spread a
+ * little toward the bar, a thin pedal rod over each pedal between them, the box just above the
+ * floor, and two braces from the back of the box to the bottom of the case.
  *
  * @param piece The piece of the piano.
  */
 function addLyre(piece: PieceBuilder): void {
-  const { box: base, bar, post } = PIANO_PEDALS;
+  const { box: base, bar, post, brace } = PIANO_PEDALS;
   const dark = INSTRUMENT_COLORS.pianoCase;
   const z = PIANO_PEDALS.tipZ - PIANO_PEDALS.length - base.depth / 2;
   const barBottom = PIANO.caseBottom - bar.height;
@@ -685,14 +691,25 @@ function addLyre(piece: PieceBuilder): void {
     'lacquer',
   );
   for (const side of [-1, 1]) {
-    piece.rod(
+    piece.bar(
       [side * post.boxX, base.top, z],
       [side * post.barX, barBottom, z],
-      post.radius,
+      post.width,
+      post.depth,
+      dark,
+      'lacquer',
+    );
+    piece.rod(
+      [side * brace.x, base.top - brace.radius, z - base.depth / 2],
+      [side * brace.x, PIANO.caseBottom, z - brace.back],
+      brace.radius,
       6,
       dark,
       'lacquer',
     );
+  }
+  for (const x of Object.values(PIANO_PEDALS.x)) {
+    piece.rod([x, base.top, z], [x, barBottom, z], post.rodRadius, 4, dark, 'lacquer');
   }
 }
 
@@ -857,6 +874,34 @@ export const PIANO_LID = {
 } as const;
 
 /**
+ * The x and the z of each leg of the grand piano, in meters before {@link PIANO_SCALE}: two under
+ * the front corners of the case, and one under the tail (design 4.6).
+ */
+const PIANO_LEGS: readonly OutlinePoint[] = [
+  [-0.62, -0.3],
+  [0.62, -0.3],
+  [-0.15, -1.8],
+];
+
+/**
+ * Gives the profile of a leg of the grand piano: a wide foot on the floor, a shaft that tapers
+ * down from a block under the case.
+ *
+ * @param height The height of the leg, to the bottom of the case.
+ * @returns The profile, from the floor to the top.
+ */
+function legProfile(height: number): ProfilePoint[] {
+  return [
+    [0.05, 0],
+    [0.05, 0.03],
+    [0.034, 0.07],
+    [0.046, height - 0.08],
+    [0.062, height - 0.07],
+    [0.062, height],
+  ];
+}
+
+/**
  * Adds the front of the case ({@link PIANO_FRONT}): the key bed, the key slip, the cheek blocks,
  * the fallboard, the rail of the desk, the desk with its ledge, and the sheet music.
  *
@@ -1016,13 +1061,8 @@ export function buildPiano(): InstrumentModel {
   addKeys(piece);
 
   // Three legs, and the lyre with the pedals.
-  const half = p.keyboardWidth / 2;
-  for (const [x, z] of [
-    [-half, -0.3],
-    [half, -0.3],
-    [-0.15, -1.8],
-  ] as const) {
-    piece.add(cylinder(0.045, 0.035, p.caseBottom, 8), dark, transform([x, 0, z]), 'lacquer');
+  for (const [x, z] of PIANO_LEGS) {
+    piece.add(lathe(legProfile(p.caseBottom), 8), dark, transform([x, 0, z]), 'lacquer');
   }
   addLyre(piece);
   addPedal(piece, 'soft');
