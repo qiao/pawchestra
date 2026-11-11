@@ -542,6 +542,27 @@ function isViewName(text: string): text is ViewName {
   return text === 'front' || text === 'side' || text === 'back' || text === 'close';
 }
 
+/** A screen at or below this width starts with the panel folded (`style.css`). */
+const NARROW_SCREEN = '(max-width: 600px)';
+
+/**
+ * Lets the button at the top of the panel fold and unfold the controls. On a narrow screen, such
+ * as a phone, the panel covers the animal, so it starts folded.
+ */
+function foldPanel(): void {
+  const toggle = element('#panel-toggle', HTMLButtonElement);
+  const body = element('#panel-body', HTMLDivElement);
+  const show = (open: boolean): void => {
+    body.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Hide the controls' : 'Show the controls';
+  };
+  toggle.addEventListener('click', () => {
+    show(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  show(!window.matchMedia(NARROW_SCREEN).matches);
+}
+
 /**
  * Makes the 3D scene of the stage with the settings of the app, and runs the frames of the page.
  *
@@ -573,4 +594,5 @@ function start(canvas: HTMLCanvasElement): void {
   requestAnimationFrame(frame);
 }
 
+foldPanel();
 start(element('#stage', HTMLCanvasElement));

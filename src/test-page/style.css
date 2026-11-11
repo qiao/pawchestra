@@ -56,6 +56,32 @@ body {
   font-size: 13px;
 }
 
+#panel-body {
+  display: grid;
+  gap: 8px;
+}
+
+#panel-body[hidden] {
+  display: none;
+}
+
+/* A narrow screen puts the panel at the bottom, over the floor, so that it does not cover the
+   animal. The panel starts folded there (`foldPanel()` of `test-page/main.ts`). */
+@media (max-width: 600px) {
+  #panel {
+    top: auto;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    width: auto;
+    max-height: 45%;
+  }
+
+  #panel:has(#panel-body[hidden]) {
+    right: auto;
+  }
+}
+
 #panel label,
 #panel legend,
 #panel summary {

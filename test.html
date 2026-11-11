@@ -10,6 +10,10 @@
   <body>
     <canvas id="stage"></canvas>
     <form id="panel" aria-label="Test controls">
+      <button id="panel-toggle" type="button" aria-expanded="true" aria-controls="panel-body">
+        Hide the controls
+      </button>
+      <div id="panel-body">
       <label for="role">Animal and role</label>
       <select id="role"></select>
       <div class="buttons">
@@ -36,6 +40,7 @@
         <summary>Test notes: start (s), length (s), key</summary>
         <pre id="notes"></pre>
       </details>
+      </div>
       <p id="status" role="status"></p>
     </form>
     <script type="module" src="/src/test-page/main.ts"></script>
