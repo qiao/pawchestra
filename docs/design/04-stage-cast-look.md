@@ -818,9 +818,12 @@ the curl of the source and follows the root bone of the tail alone. Reason: a se
 the curl in the bind. The Tripo hippo (`assets/models/hippo/tripo-hand/`) follows the same rules
 for the contrabass. Its eyeballs and its two loose teeth stay. It stands in the pose of the
 source, and its bind keeps the legs of the source. Reason: seated thighs push into the round belly
-in the bind, and the normals of the export then show the dents in the standing pose. Its paws and
-its left elbow axis turn so that each part of each arm takes at most 45° in the moments of the
-bassist. The paws of the fox turn about the
+in the bind, and the normals of the export then show the dents in the standing pose. Its upper
+arms and forearms are longer than in the source (the point edit `armStretch` of its build,
+`assets/models/hippo/README.md`), and the paws keep their size. Reason: with the arms of the
+source, no upright hold of the contrabass reached the strings and the neck over the round belly.
+Its paws and its elbow axes turn so that each part of each arm takes at most 45° in the moments of
+the bassist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1632,7 +1635,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Instrument | Model and hold |
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
-| Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and leans on the belly of the standing hippo, at a place from the body (5.3). |
+| Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`): the largest at which the upper bout stays at the height of its shoulders. |
 | Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright and diagonal (`HARP_PLACE`): the largest harp at which its short arms reach the strings of the demos, its legs reach each pedal with the heel down, and the neck of the harp stays off its head. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |

@@ -240,10 +240,10 @@ The rest of each family:
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
-  hangs the bow out from the side of the belly, because its short knee is under the belly, and the
-  round upper arm then stays off the trunk. Its left paw holds the neck near the body of the
-  contrabass (`restPlace`), with the elbow down and back. Reason: a grip nearer to the nut twists
-  the short left forearm far from its play twist at rest and in the moves.
+  hangs the right arm at the side of the belly, with the bow tip down and a little forward. Its
+  left paw holds the neck (`restPlace`) with the elbow out to the side, as in the play. Reason:
+  with the arm out to the side, the hippo read as stiff, and a rest elbow far from the play elbow
+  twists the left forearm in the moves.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the round bellies of the mouse, the wolf, the beaver, and the pig cover their thighs. So
@@ -404,10 +404,12 @@ The rest of each family:
   too, with its own gap and a larger lean to the left (`DOG_HOLD.fit`), so that the scroll stands
   beside the left ear and not in front of the long muzzle, and the short bow arm reaches the
   strings. The contrabass of the hippo takes its place from the body by the same rule, with its
-  own lean back, lean to the left, turn of the top plate, and end pin place (`HIPPO_HOLD.fit`):
-  the back leans on the belly, the strings turn toward the bow arm, and the scroll stands beside
-  the left cheek. Reason: the short arms of the hippo reach the strings only over the top of its
-  round belly, and with no lean to the left the nut stood in front of the snout. The other
+  own lean back, lean to the left, turn of the top plate, end pin place, and gap
+  (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
+  small tilt back and a small turn to the right, as a standing bassist holds it. The nut stands at
+  the height of the eyes, and the scroll beside the head. The left elbow points out to the side,
+  and the bow plays near level in front of the belly. Reason: with a place that leaned the bass far
+  across the body, the hippo hugged it as a cello. The other
   instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
 - **Violin hold from the body.** The shared violin hold (`BOWED_HOLDS.violin`) takes the arm
