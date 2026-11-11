@@ -17,8 +17,10 @@ export type Rgb = readonly [number, number, number];
  * - `metal`: brass, copper, and silver. The vertex color gives the metal its tint.
  * - `eye`: the wet eyeballs of a hand rig, with a sharp highlight. The eye light of the
  *   players shines only on this finish (design 4.5).
+ * - `polish`: the black polish of the grand piano, with a mirror highlight and a weaker
+ *   reflection of the hall, so the case reads black (design 4.5).
  */
-export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal' | 'eye';
+export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal' | 'eye' | 'polish';
 
 /**
  * The shading values of a finish: the roughness and the metalness, each 0 to 1 (the values of
@@ -51,6 +53,7 @@ export const FINISHES = {
   lacquer: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
   metal: { roughness: 0.26, metalness: 0.6, reflection: 2.4, crease: 60 },
   eye: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
+  polish: { roughness: 0.08, metalness: 0, reflection: 1.1, crease: 60 },
 } as const satisfies Readonly<Record<Finish, FinishValues>>;
 
 /**
