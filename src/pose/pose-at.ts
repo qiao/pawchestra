@@ -614,7 +614,7 @@ function poseAnimal(
         conductor.left.fade,
         EXPRESSION_MOTION.softPalm * expression.soft,
       );
-      conductor.left.hold = Math.max(conductor.left.hold, expression.final);
+      conductor.left.hold = Math.max(conductor.left.hold, expression.hold);
       conductor.left.close = Math.max(conductor.left.close, expression.close * expression.final);
       cue.torsoYaw *= weight;
       cue.headYaw *= weight;

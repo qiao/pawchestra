@@ -45,6 +45,8 @@ export const EXPRESSION_RULES = {
    */
   accentTopFrom: 0.3,
   accentTopTo: 0.6,
+  /** Two accents are at least this far apart. The larger stays. */
+  accentGapSec: 0.75,
   /**
    * A phrase starts after a time with no note start of at least this part of a beat, and of at
    * least `phraseGapMinSec`.
@@ -56,7 +58,7 @@ export const EXPRESSION_RULES = {
   /** A smaller breath does not show. */
   minBreath: 0.15,
   /** Two breaths are at least this far apart. The larger breath stays. */
-  breathGapSec: 2,
+  breathGapSec: 4,
   /**
    * A climax is a downbeat with a level of at least `climaxLevel` that is at least `climaxRise`
    * above the lowest level of the time from `climaxBackSec` to 1 s before it.
@@ -66,8 +68,12 @@ export const EXPRESSION_RULES = {
   climaxBackSec: 6,
   /** Of the climax downbeats within this time, the downbeat with the largest rise wins. */
   climaxGroupSec: 4,
+  /** A climax comes at least this long after the first beat. */
+  climaxStartSec: 15,
+  /** A piece has one climax for each this time of music, and at least one. */
+  climaxEverySec: 80,
   /** Two climaxes are at least this far apart, and the last one is this far before the final chord. */
-  climaxGapSec: 10,
+  climaxGapSec: 20,
   /**
    * The final chord: the last start of notes in at least this part of the seats that sound until
    * the end of the sound, within `finalEndSec`, at least `finalMinSec` before the end.
@@ -151,6 +157,8 @@ export const EXPRESSION_MOTION = {
   /** On the final chord, the baton rises to its hold this much above its beat, in this time. */
   finalRise: 0.12,
   finalRiseSec: 0.5,
+  /** On a short final chord, the baton stops at the beat of the chord in this time. */
+  finalStopSec: 0.12,
   /** During the hold, the baton rises slowly by this much more, to sustain the sound. */
   finalSustain: 0.04,
   /** The cut-off: one circle of this radius, in this time before the end of the sound. */
@@ -171,6 +179,11 @@ export interface FinalChord {
   readonly endSec: number;
   /** The conducted beat at the start of the chord, in seconds. */
   readonly beatSec: number;
+  /**
+   * True for a chord held at least `finalMinSec`: the baton holds it and makes the circle of the
+   * release. A short final chord stops the baton at its beat, with no hold.
+   */
+  readonly held: boolean;
 }
 
 /** The expression data of the conductor that the pose looks up at each frame (design 5.4). */
@@ -217,8 +230,10 @@ export interface ExpressionState {
   drop: number;
   /** The weight of the open arms of a climax, from 0 to 1. */
   climax: number;
-  /** The weight of the held final chord, from 0 to 1. */
+  /** The weight of the final chord, from 0 to 1. */
   final: number;
+  /** The weight of a held final chord, from 0 to 1: 0 for a short final chord. */
+  hold: number;
   /** The close of the left hand at the final cut-off, from 0 to 1. */
   close: number;
   /** The weight of a soft passage, from 0 to 1: the left palm keeps the sound down. */
@@ -231,7 +246,7 @@ export interface ExpressionState {
  * @returns The state.
  */
 export function createExpressionState(): ExpressionState {
-  return { lean: 0, head: 0, sway: 0, drop: 0, climax: 0, final: 0, close: 0, soft: 0 };
+  return { lean: 0, head: 0, sway: 0, drop: 0, climax: 0, final: 0, hold: 0, close: 0, soft: 0 };
 }
 
 /**
@@ -273,7 +288,7 @@ function accentsOf(beats: Float64Array, onsets: Float32Array): Float32Array {
     .filter((o) => o > 0)
     .toSorted((a, b) => a - b);
   const top = strong[Math.floor((strong.length - 1) * 0.95)] ?? Infinity;
-  return Float32Array.from(beats, (time, k) => {
+  const accents = Float32Array.from(beats, (time, k) => {
     const onset = onsets[k] ?? 0;
     const before = meanIn(beats, onsets, time - r.accentWindowSec, time - 1e-6);
     if (before === null) {
@@ -284,6 +299,31 @@ function accentsOf(beats: Float64Array, onsets: Float32Array): Float32Array {
       rampOf(ratio, r.accentFrom, r.accentTo) * rampOf(onset / top, r.accentTopFrom, r.accentTopTo)
     );
   });
+  // Of two accents within `accentGapSec`, the larger stays, so that the head does not jolt on
+  // each beat of a run of strong chords.
+  for (const k of Array.from(accents.keys()).toSorted(
+    (a, b) => (accents[b] ?? 0) - (accents[a] ?? 0),
+  )) {
+    const value = accents[k] ?? 0;
+    if (value <= 0) {
+      continue;
+    }
+    for (
+      let j = k + 1;
+      j < beats.length && (beats[j] ?? 0) - (beats[k] ?? 0) < r.accentGapSec;
+      j++
+    ) {
+      if ((accents[j] ?? 0) <= value) {
+        accents[j] = 0;
+      }
+    }
+    for (let j = k - 1; j >= 0 && (beats[k] ?? 0) - (beats[j] ?? 0) < r.accentGapSec; j--) {
+      if ((accents[j] ?? 0) < value) {
+        accents[j] = 0;
+      }
+    }
+  }
+  return accents;
 }
 
 /**
@@ -411,9 +451,10 @@ function findBreaths(
 }
 
 /**
- * Finds the climaxes of a score (design 5.4): a loud downbeat after a rise of the level. Of the
- * climax downbeats within `climaxGroupSec`, the downbeat with the largest rise from the downbeat
- * before it wins.
+ * Finds the climaxes of a score (design 5.4): a loud downbeat after a rise of the level within the
+ * music. Of the climax downbeats within `climaxGroupSec`, the downbeat with the largest rise wins.
+ * The largest rises stay: one for each `climaxEverySec` of the piece, at least `climaxGapSec`
+ * apart, so that a climax is a rare moment.
  *
  * @param beats The conducted beats, sorted by time.
  * @param times The times of the beats.
@@ -428,30 +469,17 @@ function findClimaxes(
   finalSec: number,
 ): number[] {
   const r = EXPRESSION_RULES;
-  const found: number[] = [];
-  let group: { k: number; gain: number } | null = null;
-  let lastDownbeat = -1;
-  const close = (): void => {
-    if (!group) {
-      return;
-    }
-    const time = times[group.k] ?? 0;
-    const last = found.at(-1);
-    if (
-      (last === undefined || time - (times[last] ?? 0) >= r.climaxGapSec) &&
-      time <= finalSec - r.climaxGapSec
-    ) {
-      found.push(group.k);
-    }
-    group = null;
-  };
+  const first = times[0] ?? 0;
+  const groups: { k: number; gain: number }[] = [];
   for (const [k, beat] of beats.entries()) {
-    if (beat.indexInBar !== 0) {
-      continue;
-    }
     const time = beat.timeSec;
-    if (group && time - (times[group.k] ?? 0) > r.climaxGroupSec) {
-      close();
+    // A climax needs a build, so the first part of a piece has none.
+    if (
+      beat.indexInBar !== 0 ||
+      time - first < r.climaxStartSec ||
+      time > finalSec - r.climaxGapSec
+    ) {
+      continue;
     }
     const level = levels[k] ?? 0;
     let low = Infinity;
@@ -462,16 +490,31 @@ function findClimaxes(
     ) {
       low = Math.min(low, levels[j] ?? 0);
     }
-    if (level >= r.climaxLevel && level - low >= r.climaxRise) {
-      const gain = level - (lastDownbeat >= 0 ? (levels[lastDownbeat] ?? 0) : 0);
-      if (!group || gain > group.gain) {
-        group = { k, gain };
-      }
+    const gain = level - low;
+    if (level < r.climaxLevel || gain < r.climaxRise) {
+      continue;
     }
-    lastDownbeat = k;
+    const last = groups.at(-1);
+    if (last && time - (times[last.k] ?? 0) <= r.climaxGroupSec) {
+      if (gain > last.gain) {
+        groups[groups.length - 1] = { k, gain };
+      }
+      continue;
+    }
+    groups.push({ k, gain });
   }
-  close();
-  return found;
+  const count = Math.max(1, Math.round(((times.at(-1) ?? first) - first) / r.climaxEverySec));
+  const found: number[] = [];
+  for (const group of groups.toSorted((a, b) => b.gain - a.gain)) {
+    const time = times[group.k] ?? 0;
+    if (
+      found.length < count &&
+      found.every((k) => Math.abs((times[k] ?? 0) - time) >= r.climaxGapSec)
+    ) {
+      found.push(group.k);
+    }
+  }
+  return found.toSorted((a, b) => a - b);
 }
 
 /**
@@ -507,10 +550,10 @@ function findFinal(
       }
       i--;
     }
-    if (end - start >= r.finalMinSec && seats.size >= r.finalShare * seatCount) {
+    if (seats.size >= r.finalShare * seatCount) {
       const k = Math.max(0, lastAtOrBefore(times, start + r.onBeatBeforeSec));
       const beatSec = (times[k + 1] ?? end) - (times[k] ?? start);
-      return { startSec: start, endSec: end, beatSec };
+      return { startSec: start, endSec: end, beatSec, held: end - start >= r.finalMinSec };
     }
   }
   return null;
@@ -697,7 +740,8 @@ export function expressionAt(track: ExpressionTrack, time: number, out: Expressi
   const dip = beatPulse(beats, track.dip, time, m.dipLeadSec, m.dipPeakSec, m.dipDecaySec);
   out.soft = soft;
   out.final = finalAt(track, time);
-  out.climax = Math.max(climaxAt(track, time), m.finalBody * out.final);
+  out.hold = track.final?.held ? out.final : 0;
+  out.climax = Math.max(climaxAt(track, time), m.finalBody * out.hold);
   out.close = 0;
   if (track.final) {
     const { endSec } = track.final;
@@ -734,7 +778,9 @@ function finalAt(track: ExpressionTrack, time: number): number {
   if (!track.final) {
     return 0;
   }
-  return smoothstep((time - track.final.startSec) / EXPRESSION_MOTION.finalRiseSec);
+  const { startSec, held } = track.final;
+  const m = EXPRESSION_MOTION;
+  return smoothstep((time - startSec) / (held ? m.finalRiseSec : m.finalStopSec));
 }
 
 /**
@@ -765,6 +811,13 @@ export function expressBaton(
 
   const final = track.final;
   if (!final || !chordPoint || state.final <= 0) {
+    return;
+  }
+  if (!final.held) {
+    // A short final chord: the baton stops at the beat of the chord, with no rebound.
+    const y = chordPoint.y - m.finalClose * smoothstep((time - final.endSec) / m.finalCloseSec);
+    baton.x += (chordPoint.x - baton.x) * state.final;
+    baton.y += (y - baton.y) * state.final;
     return;
   }
   const holdSec = Math.max(0, final.endSec - m.finalCircleSec - final.startSec);
