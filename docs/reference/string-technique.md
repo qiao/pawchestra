@@ -631,51 +631,45 @@ The app follows these facts:
 
 - **The size (1.1).** The hippo plays a smaller contrabass (`SpeciesParams.bassScale`), as a child
   plays a fractional size, with a short end pin (`BASS_END_PIN` of
-  `src/models/instruments/strings.ts`).
+  `src/models/instruments/strings.ts`). Its strings are 0.92 m long.
 - **The contacts (2.8).** The hippo stands, as many orchestral bassists do, with `HIPPO_HOLD`. The
-  end pin stands on the floor in front of it, the contrabass leans to the left and back, and the
-  nut is beside the head. The back of the contrabass leans on the belly, as a real bassist rests
-  the bass against the stomach [69]. The place comes from the body (`BowedHold.fit`).
+  end pin stands on the floor in front of it and to the left, and the contrabass stands nearly
+  upright at its left side, tilted a little back, with its back 5 cm in front of the belly. The
+  place comes from the body (`BowedHold.fit`).
+- **The height (2.8).** The nut stands at the height of the eyes, near the level of the eyebrows.
+- **The turn (2.8).** The top plate turns a little to the right (`HIPPO_HOLD.fit`).
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings
-  (`BowedHold.pluckSide`). The right elbow points out to the right, so that the straight arm
-  passes outside the rim of the upper bout. The bow tip points up, square to the strings
-  (`BowedHold.pizzicatoTip`), so that the forearm meets the paw as in the play. No source gives
-  the place of the bow in the hand in pizzicato.
+  (`BowedHold.pluckSide`). No source gives the place of the bow in the hand in pizzicato. The bow
+  tip points down and forward (`BowedHold.pizzicatoTip`), so that the bow stays out of the belly.
 
 The app does not follow these facts:
 
-- **The hip and the knee (2.8).** The knee of the hippo lies under its belly, so the contrabass
-  stands in front of the belly. Both shoulders turn forward (`BowedHold.reach`,
-  `BowedHold.reachL`), and the trunk leans forward, so that the short arms reach the strings.
-- **The turn and the lean (2.8).** A real bassist turns the bass slightly to the right. The
-  contrabass of the hippo turns its top plate far to the right and leans far to the left
-  (`HIPPO_HOLD.fit`), because the short arms reach the strings only over the top of the round
-  belly, and the scroll then stands beside the head and not in front of the snout.
-- **The left hand (2.8).** The thick left paw tilts far over the neck, so that the left arm keeps
-  off the body. The paw lies a little off the strings along the normal of its palm
+- **The left elbow (2.8).** A real bassist keeps the left elbow relaxed and not high. The hippo
+  points the left elbow out to the side (`BowedHold.poleL`), because its short left arm comes up
+  to the neck from below the shoulder line, and the elbow then clears the upper bout. The upper
+  arm still touches the back of the upper bout.
+- **The left hand (2.8).** The thick left paw tilts over the neck, so that the left arm keeps off
+  the body. The paw lies a little off the strings along the normal of its palm
   (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a
   real bassist does. The paw has no single fingers, so no finger presses a string.
-- **The high positions (2.8).** The left shoulder lies behind the upper bout, and the short arm
-  does not reach over it. Thus the left paw stops the strings only up to `BowedHold.stopEnd`, and
-  the high notes take places lower on the neck.
-- **The pizzicato place (2.8).** The paw lies further right than a real hand, because the right
-  shoulder is behind the back of the contrabass.
-- **The hair near the frog (2.5).** The short bow arm reaches the frog only straight, and then it
-  crosses the rim of the upper bout. Thus the hippo plays no hair near the frog
-  (`BowedHold.frogHair`).
+- **The positions (2.8).** The short left arm does not reach the nut. Thus the left paw stops the
+  strings only from the middle of the fingerboard to `BowedHold.stopEnd`, and the notes take
+  places lower on the neck.
+- **The trunk.** The trunk leans a little forward, and both shoulders turn forward
+  (`BowedHold.reach`, `BowedHold.reachL`), so that the short arms reach the strings in front of
+  the round belly.
+- **The hair near the frog (2.5).** The bow arm reaches only a part of the hair over the round
+  belly. Thus the hippo plays no hair near the frog (`BowedHold.frogHair` and the reach).
 - **The bow hand (2.1).** `rollToward()` rolls the paw around the stick, so that the back of the
   paw points to the elbow, and `BowedHold.farSideR` keeps the roll at one end of its range on the
   low strings. The paw bends about 25° off the forearm in the plane of its palm
   (`BowedHold.pawBendR`), as the French bow is held "as if the hand is resting by the side". The
   hand turns in the plane of its palm around the grip (`BowedHold.stickTurnR`), so that the paw
-  keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over a stroke, as the fingers of a
-  player let the bow turn.
+  keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over
+  a stroke, as the fingers of a player let the bow turn.
 - **The rest.** No source gives the rest of an orchestral bassist. The contrabass stays at its
-  playing place, and the left paw holds the neck near the body of the contrabass
-  (`BowedHold.restPlace`), so that the short left forearm twists little at rest. The right paw
-  hangs out from the side of the belly with the bow tip down, because the knee is under the belly,
-  and the round upper arm stays off the trunk. The right elbow points down, a little out, and back
-  (`BowedHold.restPoleR`), so that the skin of the hanging upper arm twists less.
+  playing place, and the left paw holds the neck with the elbow out, as in the play. The right
+  arm hangs at the side of the round belly with the bow tip down and a little forward.
 
 ## 4. Sources
 
