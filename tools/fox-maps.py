@@ -2,7 +2,7 @@
 # assets/models/fox/README.md, "Color map" and "Tan color map"): `fox-color.webp` for the red fox
 # and `fox-tan-color.webp` for the tan fox, and the normal map of the fur, `fox-normal.webp`, which
 # both foxes share ("Normal map"). Each color map scales the source image to 2048 pixels, paints
-# each eyeball as a dark bead eye ("Eyes"), and moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
+# each eyeball as a calm, natural eye ("Eyes"), and moves each texel in Oklab by a step. In the red map, the orange fur goes to the red-orange of the main
 # fox in the hall light, and the socks get darker. In the tan map, the orange fur goes to the tan
 # fur of the main fox in the hall light, and the dark socks go to a dark tan. In both maps the cream,
 # the white, and the black keep their colors, and each leg and forearm gets a sharp sock edge.
@@ -86,9 +86,33 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
-#: The sRGB color of each eye texel: the eye color of the app (`EYE_COLOR`), as on the bead eyes
-#: of main.
-BEAD = (0x15, 0x11, 0x0E)
+#: The share of the middle angle across of the eye opening that the gaze takes: 0 gives
+#: parallel eyes that look straight ahead, 1 an eye in the middle of each opening. The openings
+#: face about 11 degrees out, so the middle value keeps the eyes nearly parallel and in the
+#: middle.
+GAZE_ACROSS = 0.5
+#: The half width in degrees of the band across the opening about the gaze in which the height
+#: of the opening counts.
+GAZE_BAND = 8.0
+#: The vertical radius of the oval iris as a share of half the height of the eye opening: above 1,
+#: the lids cover its top and its bottom.
+IRIS_HEIGHT = 1.25
+#: The angle in degrees before the outer corner of the opening at which the iris ends, so that a
+#: thin off-white edge shows there.
+OUTER_WHITE = 7.0
+#: The angle in degrees by which the iris reaches past the inner corner of the opening, so that no
+#: white shows there.
+INNER_REACH = 4.0
+#: The pupil radius as a share of the vertical iris radius.
+PUPIL_SHARE = 0.65
+#: The width of the soft edge of the iris to the sclera, as a share of the iris radii.
+IRIS_SOFT = 0.06
+#: The sRGB colors of the iris (dark, and lighter at its lower edge), of the pupil, and of the
+#: off-white sclera. The iris is near the dark brown of the eyes of the sheets.
+IRIS_DARK = (62, 36, 20)
+IRIS_LIGHT = (112, 68, 36)
+PUPIL_COLOR = (16, 10, 7)
+SCLERA = (226, 220, 208)
 #: The largest share of the texels of an eyeball that can also lie in the other eyeball.
 EYE_OVERLAP = 0.01
 #: The rounds of the fill of the texels around the eyeball triangles before the turned ball samples
@@ -532,6 +556,12 @@ def fill_around(image, inside):
     return out
 
 
+def smooth(a, b, x):
+    """Gives the smoothstep from 0 at a to 1 at b."""
+    t = np.clip((x - a) / (b - a), 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
 def ball_frame(rig, faces):
     """Gives the middle c and the radius r of the sphere of a ball, the ball directions that show
     in the front view (rays along -z: the head of the seated bind faces +z), and the axes of the
@@ -562,27 +592,74 @@ def ball_frame(rig, faces):
     return c, r, shown
 
 
+def angles(d, t, u, e):
+    """Gives the angles in degrees of the unit directions d: the elevation above the plane of t and
+    e (toward u), and the turn across from t (toward e) about u."""
+    return np.degrees(np.arcsin(np.clip(d @ u, -1, 1))), np.degrees(np.arctan2(d @ e, d @ t))
+
+
 def paint_eyes(rig, image):
-    """Paints each eyeball as a bead eye, and gives the new image. Each eye texel takes BEAD, the
-    eye color of the app, with no iris, no pupil, no white, and no painted light. So each eye reads
-    as one round, dark, glossy bead, as the bead eyes of main, and the eye light of the app gives
-    the one soft light. A cartoon eye with a dark brown iris, a black pupil, and a white edge read
-    too large and too busy on the small face. The run prints the width and the height of the part
-    of each ball that shows in the front view (`ball_frame()`)."""
-    triangles, _, points, eyes = rig[:4]
+    """Paints each eyeball as the cartoon eye of the sheet, and gives the new image. The sheet gives
+    the fox and the rabbit large dark eyes with one big soft light. A half real eye (a small pupil
+    in an amber iris with white around it) read uncanny on the toy-like face. For each side (c, r,
+    and the front axes t, u, e of `ball_frame()`), from the ball points that show in the front
+    view, with psi the elevation and lam the angle across of `angles()`:
+    - The gaze g: GAZE_ACROSS of the middle angle across of the opening, and the middle
+      elevation of the opening within GAZE_BAND degrees of that angle, so that both eyes look at
+      the viewer nearly parallel.
+    - The iris: an oval about g in (lam, psi), IRIS_HEIGHT of half the height of the opening up
+      and down, to the inner corner of the opening, and to OUTER_WHITE degrees before its outer
+      corner. So the iris fills almost the whole opening, and only a thin off-white edge shows at
+      the outer corner. Its color goes from IRIS_DARK to IRIS_LIGHT toward its lower edge, with no
+      texture.
+    - The pupil: a round black disc about g of PUPIL_SHARE of the vertical iris radius, with a
+      soft edge.
+    - The sclera: SCLERA.
+    The ball takes no painted light: the eye light of the app gives the one big soft light in the
+    upper part of both eyes."""
+    triangles, positions, points, eyes = rig[:4]
     out = np.asarray(image).astype(np.float64)
     taken = np.zeros((SIZE, SIZE), bool)
+    texels = {}
     for side in ('L', 'R'):
-        faces = np.array(eyes[side]['faces'])
-        ys, xs, _ = eye_texels(rig, faces)
+        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
         if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
             sys.exit('The texels of the two eyeballs overlap, so no eye can take its own paint.')
         taken[ys, xs] = True
-        out[ys, xs] = BEAD
+        texels[side] = (ys, xs, places)
+    t, u, e = np.array([0.0, 0, 1]), np.array([0.0, 1, 0]), np.array([1.0, 0, 0])
+    dark, light = np.array(IRIS_DARK, float), np.array(IRIS_LIGHT, float)
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        faces = np.array(eyes[side]['faces'])
         c, r, shown = ball_frame(rig, faces)
-        seen = c + r * shown
-        print(f'eye {side}: the bead shows {np.ptp(seen[:, 0]):.4f} units wide and '
-              f'{np.ptp(seen[:, 1]):.4f} units high in the front view')
+        psi, lam = angles(shown, t, u, e)
+        mid_lam = (lam.min() + lam.max()) / 2
+        g_lam = GAZE_ACROSS * mid_lam
+        band = np.abs(lam - g_lam) < GAZE_BAND
+        g_psi = (psi[band].min() + psi[band].max()) / 2
+        a_y = IRIS_HEIGHT * (psi[band].max() - psi[band].min()) / 2
+        # +lam is +x: the outer side of the left eye and the inner side of the right eye.
+        outer = (lam.max() - g_lam if sign > 0 else g_lam - lam.min()) - OUTER_WHITE
+        inner = (g_lam - lam.min() if sign > 0 else lam.max() - g_lam) + INNER_REACH
+        ys, xs, places = texels[side]
+        d = places - c
+        d /= np.linalg.norm(d, axis=1)[:, None]
+        p_d, l_d = angles(d, t, u, e)
+        dl = (l_d - g_lam) * sign
+        dp = p_d - g_psi
+        a_x = np.where(dl > 0, outer, inner)
+        rho = np.hypot(dl / a_x, dp / a_y)
+        low = smooth(-0.2, 1.0, -dp / a_y)
+        iris = dark * (1 - low[:, None]) + light * low[:, None]
+        pupil = 1 - smooth(PUPIL_SHARE - 0.05, PUPIL_SHARE + 0.03, np.hypot(dl, dp) / a_y)
+        color = iris * (1 - pupil[:, None]) + np.array(PUPIL_COLOR, float) * pupil[:, None]
+        to_white = smooth(1 - IRIS_SOFT, 1 + IRIS_SOFT, rho)
+        color = color * (1 - to_white[:, None]) + np.array(SCLERA, float) * to_white[:, None]
+        out[ys, xs] = color
+        print(f'eye {side}: opening elevation {psi[band].min():.1f} to {psi[band].max():.1f} at the '
+              f'gaze, across {lam.min():.1f} to {lam.max():.1f} degrees; gaze psi {g_psi:.1f}, lam '
+              f'{g_lam:.1f}; iris radii {a_y:.1f} up, {inner:.1f} in, {outer:.1f} out; pupil radius '
+              f'{PUPIL_SHARE * a_y:.1f} degrees')
     # The padding texels around the ball islands, and the texels of the thin gaps between two ball
     # triangles that the raster of eye_texels() leaves, take the new colors of the ball next to
     # them, so that no old color shows as a light line on a seam.
