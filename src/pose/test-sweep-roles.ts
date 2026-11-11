@@ -84,6 +84,7 @@ const BODY_LOOPS = 2;
  *   the source.
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
+ * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
  * - The rabbit: 16 open loops, the cuts to the two upper arms and the open loops of the source mesh
  *   and of its lids.
  */
@@ -94,6 +95,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/dog/tripo-hand/dog.rig.glb', 7],
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
+  ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
 ]);
 
@@ -393,13 +395,13 @@ function badgerBodySurface(posed: PosedSkeleton): ClosedSurface {
 
 /**
  * The closed surface of the body of the monkey mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link MONKEY_BODY_LOOPS}).
+ * loop ({@link MONKEY_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function monkeyBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, MONKEY_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, MONKEY_BODY_LOOPS));
 }
 
 /**
