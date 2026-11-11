@@ -1419,7 +1419,7 @@ const HIPPO_HOLD = {
  * elbow of the Tripo P2 hand rig (design 4.4, 5.3). In the play, the left elbow comes in under
  * the violin, straight down and forward, (0, -1, -0.5), as a real violinist swings the left elbow
  * under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
- * elbow points out, down, and a little back, (-1, -0.9, -0.2), and the left paw turns 55° about
+ * elbow points out, down, and a little back, (-1, -0.9, -0.2), and the left paw turns 65° about
  * the forearm, in place of the 20° of the shoulder hold. The two elbows and the rest turn move a
  * part of the turn of the left paw from the forearm to the upper arm. With the small violin of
  * the second Tripo rabbit and the rest elbow (-1, -0.6, 0) of the first, the left upper arm
@@ -1433,15 +1433,23 @@ const HIPPO_HOLD = {
  * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
  * (`reachL`), so that the left paw reaches the fingerboard from 0.25 of its length, as before the
  * level turn (0.35 with 15.5°).
+ *
+ * At rest, the arms take the rest of the shared violin hold (`restArms` of {@link VIOLIN_HOLD}):
+ * they hang out to the sides until they clear the body, and the elbows bend forward, so that the
+ * paws hold the upright violin and the bow near the body. With the lap places of the shoulder hold
+ * at the knees of the new body, both arms reached nearly straight forward. The left paw then turns
+ * 65° in the plane of its palm (`restPawTurnL`), so that the left forearm twists 43° at rest (45°
+ * with 55°, 47° with 40°).
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
   playShift: [-0.054, -0.06, 0.185],
   playTurn: violinTurn(-20, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
+  restArms: VIOLIN_HOLD.restArms,
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
-  restPawTurnL: 55 * MathUtils.DEG2RAD,
+  restPawTurnL: 65 * MathUtils.DEG2RAD,
 } as const satisfies BowedHold;
 
 /**
