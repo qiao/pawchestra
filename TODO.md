@@ -72,7 +72,9 @@ passes.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
 - [ ] Monkey trumpeter: from the front at the elevation 20, the right paw on the valve tops hides
-      the mouth. Try a lower right grip or a smaller curl.
+      the mouth. A right curl of 69° (92° now) and a side aim of 0.5 or 1 (0.8 now) leave the
+      paw and the forearm in front of the mouth. The right arm has 1.5 cm of spare reach, so the
+      grip cannot move further toward the bell.
 - [ ] Monkey trumpeter: the right thumb points back to the mouthpiece. A real player puts it under
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
