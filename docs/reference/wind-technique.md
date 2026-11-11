@@ -497,7 +497,9 @@ The app follows these facts:
   holds the trumpet around the upright casings (`faceTube`). The right palm lies
   above the valves and faces down. The trumpet points a little down, straight ahead (`trumpet()`
   of `src/models/instruments/brass.ts`, `play`). The valves follow the trumpet chart (7.3). The
-  rim presses the lips 0.24 cm (`lipShift`).
+  rim presses the lips 0.24 cm (`lipShift`). The monkey stands erect with the shoulders over the
+  hips (1.8), and its center of mass stays over the middle of the soles (the bind of
+  `assets/models/monkey/tripo-hand/`).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
   paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
   the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
