@@ -29,9 +29,19 @@ export const WOODWINDS = {
 
 /**
  * The tip of the bassoon reed in the axes of its drawing: the bottom of the boot is at the origin,
- * and the tube runs along +y.
+ * and the tube runs along +y. The reed lies 0.07 m behind the long joint, toward the player. The
+ * long muzzle of the beaver puts its mouth far in front of its eyes, so with the reed 0.155 m
+ * behind the tube, the long joint stood in front of the face, and from the front left it crossed
+ * the left eye.
  */
-const BASSOON_REED: Vec3 = [0.16, 0.7, 0.155];
+const BASSOON_REED: Vec3 = [0.16, 0.7, 0.07];
+
+/**
+ * The tip of the bassoon reed in the axes of the space of the bassoon (`bassoonSpace()`): the reed
+ * of the space stays 0.155 m behind the tube, so that the seats of the layout do not move. The
+ * space lies 8.5 cm further forward than the bassoon.
+ */
+const BASSOON_SPACE_REED: Vec3 = [0.16, 0.7, 0.155];
 
 /** The faces around the axis of a tube. A face angle of 60° shades as a round tube. */
 const TUBE_SEGMENTS = 6;
@@ -465,18 +475,18 @@ function bassoonParts(piece: PieceBuilder): void {
   }
   // The bocal rises from the wing joint, bends over, and turns into the reed. The tube of a
   // player leans, so the end of the bocal brings the reed to the mouth at a nearly level angle,
-  // as on a real bassoon (`docs/reference/wind-technique.md` 3): 1.7° above the level with the
-  // turn of the beaver (`BEAVER_PLAY` of `pose/winds.ts`). With the top at 0.78, the end pointed
-  // 15.7° down into the mouth.
+  // as on a real bassoon (`docs/reference/wind-technique.md` 3), with the turn of the beaver
+  // (`BEAVER_PLAY` of `pose/winds.ts`). With the top at 0.78, the end pointed 15.7° down into the
+  // mouth.
   tubeAlong(
     piece,
     rounded(
       [
         at([0, 0.62, wing]),
         at([0, 0.665, wing]),
-        at([0.08, 0.74, 0.09]),
-        at([0.16, 0.7, 0.108]),
-        at([0.16, 0.7, 0.124]),
+        at([0.08, 0.74, (wing + reed[2] - 0.047) / 2]),
+        at([0.16, 0.7, reed[2] - 0.047]),
+        at([0.16, 0.7, reed[2] - 0.031]),
       ],
       0.025,
       1,
@@ -487,13 +497,17 @@ function bassoonParts(piece: PieceBuilder): void {
   );
   // The reed: the thread around its tube, and the blade of cane up to the tip at the origin.
   piece.rod(
-    at([0.16, 0.7, 0.124]),
-    at([0.16, 0.7, 0.136]),
+    at([0.16, 0.7, reed[2] - 0.031]),
+    at([0.16, 0.7, reed[2] - 0.019]),
     0.0042,
     TUBE_SEGMENTS,
     INSTRUMENT_COLORS.reedThread,
   );
-  piece.add(box(0.009, 0.0022, 0.02), INSTRUMENT_COLORS.reed, transform(at([0.16, 0.7, 0.145])));
+  piece.add(
+    box(0.009, 0.0022, 0.02),
+    INSTRUMENT_COLORS.reed,
+    transform(at([0.16, 0.7, reed[2] - 0.01])),
+  );
 }
 
 /**
@@ -597,7 +611,7 @@ const WOODWIND_SPACE = {
   flute: (piece) => fluteSpace(piece, WOODWINDS.flute.length),
   oboe: (piece) => oboeSpace(piece, WOODWINDS.oboe.length),
   clarinet: (piece) => clarinetSpace(piece, WOODWINDS.clarinet.length),
-  bassoon: (piece) => bassoonSpace(piece, WOODWINDS.bassoon.length, BASSOON_REED),
+  bassoon: (piece) => bassoonSpace(piece, WOODWINDS.bassoon.length, BASSOON_SPACE_REED),
 } as const satisfies Readonly<Record<WoodwindId, (piece: PieceBuilder) => void>>;
 
 /**

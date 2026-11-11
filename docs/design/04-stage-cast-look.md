@@ -1802,7 +1802,8 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
 - **Bassoon.** A dark red stained maple (`bassoonStain`): the boot joint as an oval around both
   bores with the silver cap of its U-tube, the wing joint, the long joint, and the bell joint, with
   silver rings, key rods, and cups. The silver bocal bends over and turns into the reed, a blade
-  of cane bound with thread.
+  of cane bound with thread. The reed lies near the long joint (`BASSOON_REED`), so that the long
+  joint passes beside the long muzzle of the beaver, clear of its eye.
 - **Trumpet** (`TRUMPET`). The lead pipe passes the valves at their left to the main tuning slide
   in front of them. The bell bow behind the valves brings the bell pipe forward at the height of
   the valve tops, so the bell lies above the lead pipe, as on a real trumpet. Three piston valves
