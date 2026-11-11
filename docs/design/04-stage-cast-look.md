@@ -1644,18 +1644,23 @@ follow a real grand:
   points gives a round rim with no facets. The rim wall has one thickness (`PIANO_INSIDE.rim`) and
   is open at the front between its two arms.
 - **Inside.** A gold plate covers the soundboard to a narrow band at the rim, with a row of round
-  holes. Two rows of tuning pins stand on its front. Thin steel strings run from the pins back to
+  holes through it. Two rows of tuning pins stand on its front. Thin steel strings run from the pins back to
   the edge of the plate, and the copper bass strings fan out over them to the tail, as the
   overstrung bass. A row of dampers lies on the strings behind the desk, and the highest strings
   have none (`PIANO_INSIDE`).
 - **Front.** A cheek block closes each end of the keys, a key slip runs in front of them, and the
   open fallboard stands over their back ends. The music desk stands on a rail on the front of the
-  rim, just behind the fallboard, and leans back with a ledge for the music (`PIANO_FRONT`).
+  rim, just behind the fallboard, and leans back with a ledge for the music (`PIANO_FRONT`). The
+  sheet music lies in a frame of the desk.
 - **Lid.** The lid has the outline of the rim and closes onto it. It hinges on the bass side, and
   its front flap lies folded back on it, so the desk stands in front of the lid. The prop stick
   stands on the rim of the bent side near the front and holds the lid near its edge (`PIANO_LID`).
 - **Legs and lyre.** Three legs taper down to a wider foot (`PIANO_LEGS`). The lyre has two flat
-  posts, a pedal rod over each pedal, and two braces back to the case.
+  posts, the rod of the sostenuto pedal between them, and two braces back to the case.
+- **Depth.** Two faces that face the same way and cover each other lie at least 2 cm apart, or
+  the hidden face is not there (`PIANO_INSIDE`). Reason: the far hall camera has a near plane of
+  0.1 m and a 24-bit depth buffer, so its depth steps are some millimeters. Faces nearer than that
+  flashed, such as the pin block in the plane of the plate.
 
 The layout reads the parts of the piano, so a change of the case or the lid moves the seats near
 it by a few centimeters.
