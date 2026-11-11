@@ -761,7 +761,13 @@ fox, in the same way. It keeps the eyeballs of its mesh, because the map paints 
 and its tail has two bones. The map tools of the fox and the rabbit keep the eye paint of the
 source (an amber iris, a black pupil, white, and on the fox a painted light and a lash line), and
 move each iris as one decal to the middle of its opening (`center_irises()`). Reason: the source
-paints each iris at the inner corner, and both animals looked cross-eyed from the front. The fox
+paints each iris at the inner corner, and both animals looked cross-eyed from the front. The
+rabbit irises take the middle of the opening in the view of the play, with the head turn of the
+play and the camera of the test page, a little out and up (`gaze_targets()`). Reason: with the
+middle of the front view of the bind, the rabbit looked down and cross-eyed in the play. The map
+tool of the rabbit also gives its brows and the dark band of its eye sockets half of their
+contrast to the fur, and shorter brows (`soften_brows()`). Reason: the dark, high brows of the
+source read as a frown. The fox
 eyes keep the size of the source ball. The rabbit eyes are smaller than the source ball. Reason:
 with the large dark pupil of the source, the rabbit eyes at the size of the cute step read too
 large. The fox eyes take the finish `varnish` and no eye light (`eyeFinish`), so the painted light
