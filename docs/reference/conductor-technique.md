@@ -1,0 +1,180 @@
+# Conductor technique: how a conductor shows the music with the body
+
+This file is the target of the expression of the bear conductor of the app. It describes how a
+real conductor shows the dynamics, the articulation, the breath before an entry, the accents, the
+climax, and the end of a held chord, with the baton, the left hand, and the body. Each fact has a
+source.
+
+**Upkeep.** This file is current. A change of the motion of the conductor updates section 8 "Use
+in the app" and each fact that it finds wrong, in the same commit. Each new fact gets its source.
+
+**Source marks.** Each fact names its source by a number of section 9. "(abstract)" marks a fact
+from an abstract only. "(a search summary only)" marks a fact from a search summary, because the
+page or the book did not open. "(derived)" marks a rule that this file makes from the facts of its
+sources. A fact with no mark comes from the text of the source.
+
+## Terms
+
+- **Ictus.** The point of a beat: the place and the time at which the baton marks the beat.
+- **Preparation.** The gesture in the beat before an entry. It gives the tempo, the dynamics, and
+  the character of the entry.
+- **Click.** A short, sharp stop of the baton at the ictus, made in the wrist.
+- **Release.** The gesture that stops the sound. Other names are "cut-off" and "cutoff".
+- **Fermata.** A note or a rest that the conductor holds longer than its value.
+- **Mirror.** The left hand moves as the image of the baton hand in a mirror.
+
+## 1. Dynamics and the size of the gesture
+
+- "A big gesture is loud and a small one is quiet and that can often be the case" [2].
+- A generous beat can also fit quiet music that flows and is positive [2].
+- A crescendo and a "poco più forte" get "a slightly larger beat" [1].
+- At a change to forte, the beat becomes "more energetic (and not that much bigger)" [1].
+- A fast beat travels a shorter distance than a slow beat [1].
+- A conductor conducts "very softly in the beginning of a crescendo and loudly in the start of a
+  diminuendo", because the players change too soon [2].
+- A forte gesture moves toward the players, with jerky motion, high tension, wide motion ("wide
+  open arms"), much motion, and an upward direction [6].
+- A piano gesture is fluid, with low tension, small amplitude, little motion, and a downward
+  direction [6].
+- Most gestures stay below the chin. A beat above the head makes the conductor "a moving
+  target" [4].
+
+## 2. The left hand
+
+- The left hand mirrors the baton, gives cues, and shapes a crescendo or a diminuendo [5].
+- "Most textbooks will tell you not to mirror – but all the great conductors do it" [5].
+- Palms up ask for forte, and palms down ask for piano [6].
+- For piano, both open hands with the palms down move a little down, as if they keep a surface
+  down [6].
+- For a crescendo, the arms with open hands curve out while the shoulders rise [6]. The open left
+  hand also turns forward in wider and wider rounds [6].
+- For a diminuendo, the left arm with an open hand, palm down, moves back [6].
+- A raised palm up shows a sustained sound. A palm up is for a hand that stays still [7].
+- "The left hand smoothly descending" helps to lower the intensity [7].
+- The left hand mirrors outside of the torso while the right hand beats [7].
+
+## 3. The breath and the preparation
+
+- One preparatory gesture is enough for an entry [1].
+- The breath of the conductor "should not be audible ... but it should be visible" [1].
+- The preparation shows the ensemble "how to breathe for the entrance" [8].
+- When the conductor breathes with the ensemble, an accurate entrance is more probable [8].
+- Breathing gives confidence to the players when the hands do very little [2].
+- A sudden change of the dynamics shows in the beat before the change [2].
+
+## 4. Legato and staccato
+
+- A legato beat has "no 'click' in the beat, just a change of direction" [1].
+- For staccato, "the beat takes place in the wrist to give a short click for each beat" [1].
+- The Grammar of Conducting has separate beat types for legato, light staccato, full staccato,
+  and marcato, and a section on the change from legato to staccato (a search summary only) [10].
+- A forte can be a jerky motion "with its sudden blocked impact", as the fists of Bernstein in a
+  rehearsal of The Rite of Spring [6].
+
+## 5. Accents and sudden changes
+
+- For a sforzato, the conductor suddenly closes the fist [6].
+- A conductor does not show a forte or an sfp with an extra gesture on its own beat. The gesture
+  of the beat before shows it, and it is "more energetic rather than bigger" [2].
+
+## 6. The body
+
+- For a softer sound, the conductor makes the body smaller: "Bust forward, shoulders closed, head
+  forward downward" [6].
+- For a crescendo, the shoulders rise with the open arms [6].
+- Conductors sometimes bend the knees and drop a little to ask for a softer sound. The reverse
+  motion asks for a louder sound (a search summary only) [11].
+- Knees that bob with the metre were "the biggest obstacle to sustaining the note" [9].
+- Knees that bend too much make the beats "start and finish in different places" [4].
+- A crouch is a deliberate gesture for a special moment [4].
+- "We should aim to be as grounded as possible" (Mark Elder) [4].
+- Observers see the expression of a conductor in the kinematics of the beat, and the amplitude of
+  the motion can show the size of the expression (abstract) [12].
+
+## 7. The fermata and the release
+
+- On a fermata, "the conductor just waits on the fermata" [3].
+- The left hand cuts off the sound, and "the right hand does nothing" [3].
+- A circle can release the sound: clockwise for the left hand and counterclockwise for the right
+  hand. The circle "begins and ends at 6:00, or the bottom of the circle" [8].
+- A close of the fingers of the left hand can also release the sound. The release needs "a clear
+  point of cessation of the music" [8].
+- The release gives "the character required of the final note" [8].
+
+## 8. Use in the app
+
+The bear conductor follows these rules (design 5.4). `pose/conductor-expression.ts` reads the
+expression from the score before the play (`buildExpressionTrack()`), and the pose looks it up at
+each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESSION_MOTION`.
+
+- **Dynamics (sections 1, 6).** The level of each beat is the mean level of the time around it.
+  A loud passage makes the beat pattern larger and higher (`loudSize`, `loudLift`), and the body
+  comes up with the head (`loudLean`, `loudHead`). A soft passage makes the pattern smaller and
+  lower (`softSize`, `softDrop`). The body leans toward the players, the head goes down, and the
+  knees bend a little (`softLean`, `softHead`, `softCrouch`), as the smaller body of section 6.
+  The app keeps the beat below the chin, except at a climax (section 1).
+- **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
+  diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
+  passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm (`softPalm`), as the palms down of
+  section 2. It holds the palm up on a held chord.
+- **The breath (section 3).** The chest and the head rise in the preparation before the first
+  beat, before each phrase start after a time with no note start, and before each accent
+  (`breathLean`, `breathHead`). They come down after the entry (`breathReleaseSec`).
+- **Legato and staccato (section 4).** Each stroke reads the mean length of its notes against the
+  beat. A legato stroke moves with no stop, as a change of direction. A staccato or accented
+  stroke rebounds fast to the top of its arc, stops there, and falls into the next ictus with its
+  full speed (`strokeOf()` of `conductor-notes.ts`): the click of section 4. The app makes the
+  click with the whole stroke, because the wrist of the bear follows the baton.
+- **Accents (section 5).** An accent is a strong onset well above the onsets of the 2 s before
+  it. The head and the upper body jolt on it (`joltHead`, `joltLean`), and the knees dip a little
+  on an accented downbeat (`dip`). The breath before it is the gesture of the beat before. The
+  knees do not bob on each beat, because section 6 names that as a fault.
+- **The sway.** The upper body sways to the side with the bar, and a legato passage sways more
+  than a staccato passage (`sway`, `swayStaccato`) (derived from the fluid piano gestures of
+  section 1).
+- **The climax (sections 1, 2, 6).** A climax is a loud downbeat after a rise of the level. Both
+  arms open wide and high for one bar: the baton goes out and up (`climaxOut`, `climaxUp`) and
+  keeps a part of its beat, and the left hand opens (`LEFT_HAND_PLACES.open`). The body comes up
+  and the head lifts (`climaxLean`, `climaxHead`).
+- **The final chord (section 7).** The app finds the last chord that sounds to the end of the
+  sound. The baton leaves the beat and holds above the beat of the chord, and it rises slowly to
+  sustain the sound. The left palm holds the chord up. Before the end, the baton makes one
+  counterclockwise circle that starts and ends at its bottom, and the left hand closes at the end.
+  Then the baton stops a little lower (`finalCircle`, `finalClose`). The right hand moves in the
+  release of the app too, because the release of the last chord of a piece ends the piece, and
+  the bow follows it.
+- **Where the app differs.** The app shows an accent with the jolt, the dip, and the stroke, and
+  the left hand does not close to a fist for a sforzato (section 5). The left hand does not turn in
+  wider rounds for a crescendo (section 2). It rises open.
+
+## 9. Sources
+
+All sources opened on 2026-11-10, except the search summaries 10 and 11 and the abstract 12.
+
+1. ConductIT. "1.7 Workbook Exercises." Module 1, Technique.
+   https://mooc.conductit.eu/module-1-technique/1-7-workbook-exercises/
+2. ConductIT. "3.3 Dynamics." Study room, Technique 3.
+   https://conductit.eu/study-room/technique/technique-3/3-3-dynamics/
+3. ConductIT. "3.2 Fermatas." Study room, Technique 3.
+   https://conductit.eu/study-room/technique/technique-3/3-2-fermatas/
+4. ConductIT. "3.1 More posture and taking care of your body." Study room, Technique 3.
+   https://conductit.eu/study-room/technique/technique-3/3-1-more-posture-and-taking-care-of-your-body/
+5. ConductIT. "1.8 The Non-Baton Hand." Module 1, Technique.
+   https://mooc.conductit.eu/module-1-technique/1-8-the-non-baton-hand/
+6. I. Poggi and A. Ansani. "Forte, piano, crescendo, diminuendo. Gestures of intensity in
+   orchestra and choir conduction." Proceedings of the 4th European and 7th Nordic Symposium on
+   Multimodal Communication (MMSYM 2016), pp. 111 to 119.
+   https://iris.uniroma1.it/bitstream/11573/1201634/1/Ansani_Orchestra-and-choir-conduction.pdf
+7. B. Shelton. "Conductors Clinic: The Misunderstood Left Hand." The Instrumentalist, April-May
+   2022. https://theinstrumentalist.com/april-may-2022/conductors-clinicthe-misunderstood-left-hand/
+8. B. Anderson. "Precise Entrances and Releases." The Instrumentalist, June 2017.
+   https://theinstrumentalist.com/june-2017/precise-entrances-and-releases/
+9. L. Garnett. "The Conductor's Body Parts." Helping You Harmonise.
+   https://helpingyouharmonise.com/bodyparts
+10. M. Rudolf. The Grammar of Conducting: A Comprehensive Guide to Baton Technique and
+    Interpretation. Schirmer Books. Table of contents in library catalog records.
+11. A catalogue of the body language of conductors. SBO Magazine. https://sbomagazine.com/?p=1791
+    (the page did not open on 2026-11-10).
+12. G. Luck, P. Toiviainen, and M. R. Thompson. "Perception of Expression in Conductors' Gestures:
+    A Continuous Response Study." Music Perception 28(1), 2010, pp. 47 to 57.
+    doi:10.1525/mp.2010.28.1.47
