@@ -788,8 +788,8 @@ passes.
       place from the body, `DOG_HOLD.fit`).
 - [ ] Violist grip turn: with the level viola of 0.925, the left paw of the cat turns 64° from its
       accepted grip (p50, limit 45, 49° with the viola of 0.74, `ACCEPTED_GRIPS` of
-      `tools/arm-check.ts`). Check the left
-      paw in 2x crops, and give the new median to `ACCEPTED_GRIPS` if it is good.
+      `tools/arm-check.ts`). Check the left paw in 2x crops, and give the new median to
+      `ACCEPTED_GRIPS` if it is good.
 - [ ] Tripo monkey candidate: the eye whites read smaller, and the pupils larger and darker, in the
       app than in the FBX viewer (`reports/2026-11-11-monkey/panel.png`, face rows). Find whether
       the map scale, the finish `varnish`, or the light makes the change.
