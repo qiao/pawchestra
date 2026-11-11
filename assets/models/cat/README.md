@@ -453,7 +453,7 @@ is lower than the seat of the cat of main.
 | Mesh | One object `cat`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). The eyeballs keep their front (the back faces go, "Lids"), with the face attribute `eye`. The two lids have the face attribute `lid`, and the 98 faces of the strips of fewer than 30 vertices (whiskers, brow whiskers, ear tufts) have `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/cat-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.863456 (the shoulder joints at 1.4272 m for each unit, so that H is 0.339357 m, near the H 0.339375 m of the cat of main), `crease` 55, `seatWidth` 0.46 |
-| Eyes | The eyeballs of the mesh at the size of the source, with the `varnish` finish (`eyeFinish` of the entry in `tools/studio-body.ts`) and no eye light ("Eyes"), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh at 0.85 of the size of the source, a little deeper in their sockets ("Eye size"), with the `eye` finish and the eye light ("Eyes"), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The scripts of the session (`scratch/cat3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are not
@@ -479,14 +479,26 @@ left arm, y the height, in the source):
   step offset. The far loop moves back to its place before the turn, with a fade to 0 at 0.02
   units along the arm. The new quads take the planar UVs of the clean gray patch at UV (0.0409,
   0.7373). The tabby stripes go around the forearm, so the turn does not show.
-- **Point edits.** None: the form of the source stays.
+- **Point edits.** Only "Eye size" below: the other form of the source stays.
+- **Eye size.** The edit `eyes` of the session scripts scales each eyeball and its socket about
+  the middle of the sphere of the ball by 0.85. The middles are (±0.03353, 0.79064, 0.15615), r
+  0.0487 (source). Each ball scales as one piece. Each other point of the side within 0.054 of
+  the middle scales fully, and the share falls by a smoothstep to 0 at 0.085, and also to 0 near
+  the middle plane (|x| below 0.02) past 0.046, so that the skin between the eyes does not part.
+  Points in front of z 0.205 (the nose) stay, and points below y 0.745 fade out to y 0.70, so
+  that the muzzle and the mouth stay. Each ball then moves 0.0015 units back along its eye axis
+  (0.35, 0, 0.94), x mirrored on the right, so that the skin edge meets the ball. The whisker
+  strips near the eyes move as one piece. The largest skin move is 0.0083 units. With the
+  source size, each eye bulged out of the face with a rim of white.
 - **Surface.** `sa.add_surface(cat, 'cat', 'assets/models/cat/tripo-p2/cat.fbm/cat_basecolor.jpg',
   eye_fans=False, config=<cat-tripo.json>)`. The faces of the two eyeballs (the loose parts of 81
   to 99 vertices in the eye box) get the face attribute `eye`. The export then gives `ownEyes`.
 - **Round balls.** The Tripo balls are not round: the back reaches 1.09 times the radius of the
   fitted sphere. Each ball vertex more than 45 degrees from the eye axis (0.35, 0, 0.94), x
   mirrored on the right, and outside the sphere moves in to the sphere (66 vertices). The front
-  of the ball, which shows, stays.
+  is not round either: the pole stands out to 1.01 r and the ring 15 to 30 degrees about it lies
+  at 0.95 r, so the hall showed on it as a wide glossy band. Each ball vertex then moves onto the
+  sphere of 0.97 r (0.04015 units) about its middle (`ballSphere`).
 - **Armature.** The armature of the config with a palm for each side: the palm of the pads of
   the source, (-0.03, -0.998, -0.05) in the studio axes with x mirrored on the right, turned by
   the paw turn. The property `hinges` holds the elbow axis of the config of each side, turned
@@ -617,16 +629,20 @@ at 1.12 radii, 156 quads on each side, held turned up 110 degrees into the head.
 the ball faces with each corner more than 135 degrees from the open eye, or with a corner across
 the middle plane by more than 0.003 units, go, and the middle and the radius of each ball come
 again from the ball vertices that stay (the middle of the export). The eyes lie close to the
-middle plane, so 14 points of the left open lid and 15 of the right reach over it: each moves onto
+middle plane, so 13 points of the left open lid and 15 of the right reach over it: each moves onto
 the plane x = ±0.002 on its own side at the same distance from the middle of its ball. In the 21
 steps of the blink, no open lid point, side edge, or back edge leaves the head, and the lower
 strip of the closed lid lies under the head. The lid faces take the UVs of the gray patch at UV
 (0.0409, 0.7373) at 0.3 UV for each unit, and the row `head` 1.
 
-**Eyes.** The eyes keep the eye paint of the source ("Color map" below) at the size of the
-source: in the front view each eye opening is 0.160 of the head width at the eye line. The
-source paints a light in each pupil, so the eyes take the `varnish` finish and no eye light: with
-the `eye` finish, each eye showed two lights.
+**Eyes.** The eyes keep the iris colors of the source ("Color map" below). In the front view of
+the bind, each eye opening is 0.131 of the head width at the eye line (0.159 at the size of the
+source), and the front of the ball stands 0.11 r over the skin edge along the eye axis (0.14 r
+at the size of the source). The map paints no light in the pupils, so the eyes take the `eye`
+finish and the eye light of the app, which gives one small crisp light in each eye. A smaller
+light beside it is the reflection of the hall on the `eye` finish, as on the rabbit. With the
+`varnish` finish and the painted light, the large dark ball showed a wide glossy band and a soft
+gray light, and the eyes read as glass eyes.
 
 **Color map.** `tools/cat-maps.py` writes `cat-color.webp` and `cat-normal.webp` from the source
 maps and the rig file:
@@ -646,15 +662,19 @@ the brows, and the mouth line keep the paint of the source.
 - **Iris move.** `center_irises()` moves each iris to the middle of the opening in the view of
   the play: in the play moments of the violist the head turns up 15.7 degrees, and the front
   camera of the test page looks down 7.4 degrees at the eyes (`gaze_targets()`). The target then
-  turns 6 degrees out and 5 degrees up. The iris of the cat is large, and its inner side lies
+  turns 6 degrees out and 7.5 degrees up. The iris of the cat is large, and its inner side lies
   under the lash line, so a mirror of the iris paint left seams. The tool paints the iris as the
   median source color of each ring of 1 degree about the pupil, and copies the pupil with its
   light from the source. The old place of the iris takes the median white of its row of the
-  front picture. The left iris moves 11.9 degrees and the right 11.0 degrees on the ball.
+  front picture. The left iris moves 14.0 degrees and the right 12.4 degrees on the ball.
 - **Round iris.** `far_eyes()` of the fox and the rabbit then makes the moved iris round about its
-  pupil from the clean directions of the source iris, at the iris and pupil radii of the source
-  (27.5 and 16.5 degrees on the left, 29.5 and 18.5 on the right), with no shade of the iris,
-  the ring, or the white. Each pupil keeps its painted light (`PAINTED_LIGHT`).
+  pupil from the clean directions of the source iris, with no shade of the iris, the ring, or the
+  white. The iris radius is 35 degrees on both eyes (`FAR_IRIS_RADIUS`; the source has 27.0 and
+  16.5 degrees on the left, 29.0 and 18.5 on the right), and the pupil is 0.52 of it, 18.2
+  degrees (`PUPIL_RATIO`). In the view of `gaze_targets()` the opening of the deeper ball is 57
+  degrees high, so the source iris left white above and below it. Now 13 % of the iris height
+  lies under the upper lid and 4 % under the lower lid, and white shows only at the sides. Each
+  pupil takes its median color (`PAINTED_LIGHT` False), so the eye light gives the only light.
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (1.23 % of the
 texels), a box scale to 1024 pixels, the tilts times 4 (`NORMAL_MAP_GAIN` of `src/scene/fur.ts`)
