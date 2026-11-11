@@ -9,9 +9,9 @@ hippo-tpose.glb                      source mesh (`armSource` of tools/mesh-rigs
    │  tools/blender/arm_rebuild.py   rebuilt arms and painted weights
    v
 hippo-arms.glb + hippo-weights.json  `source` and `paintedWeights` of tools/mesh-rigs/hippo.json
-   │  pnpm rig-mesh hippo
+   │  pnpm rig-mesh hippo, then pnpm glb-point-edits hippo-edits.json
    v
-hippo.rig.glb                        rigged mesh
+hippo.rig.glb                        rigged mesh with point edits
    │  pnpm studio-body hippo
    v
 src/models/studio/hippo.ts           studio body of the app
@@ -26,7 +26,8 @@ src/models/studio/hippo.ts           studio body of the app
 | `hippo-tpose.glb` | Source mesh (below) | None |
 | `hippo-arms.glb` | Copy of `hippo-tpose.glb` with rebuilt arms. License as `hippo-tpose.glb` | `arm_rebuild.py` (below) |
 | `hippo-weights.json` | Weights of the same Blender run. License as `hippo-tpose.glb` | The same run |
-| `hippo.rig.glb` | Output of the rig. License as `hippo-tpose.glb` | `pnpm rig-mesh hippo` |
+| `hippo.rig.glb` | Output of the rig with point edits. License as `hippo-tpose.glb` | `pnpm glb-point-edits assets/models/hippo/hippo-edits.json` ("Point edits" below) |
+| `hippo-edits.json` | The point edits of the rig of 187ec0a72 | None |
 
 ## hippo-tpose.glb
 
@@ -82,9 +83,19 @@ blender -b --factory-startup -P tools/blender/arm_rebuild.py -- hippo --spec '{"
 
 | Item | Value |
 |---|---|
-| Size | 590,984 bytes |
-| SHA-256 | `f0d68c1a6bc5e58190b6404c1e95525924876711af432116f3e0f4a74f7e1ab8` |
+| Size | 590,796 bytes |
+| SHA-256 | `4c4855bfcff7a94058680749809d0431ad5d21ffc06599ee256719530388f614` |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms`), with the elbow axes of the bent bind of `studio.bindArms`, and the bind supination L 20 and R 0 (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm and the straight legs of each side. No `raise` shape |
 
-A run of `pnpm rig-mesh hippo` gives the same bytes.
+A run of `pnpm rig-mesh hippo` gives the base (590,984 bytes, SHA-256
+`f0d68c1a6bc5e58190b6404c1e95525924876711af432116f3e0f4a74f7e1ab8`). It drops the point edits.
+
+## Point edits
+
+`hippo-edits.json` fills the furrow between the brows. The middle line between the brows stood
+0.012 to 0.016 units (1.9 cm to 2.6 cm) behind the inner brows, so the two inner slopes of the
+furrow shaded dark beside the eyes, and the face read as a frown. The two vertices on each side of
+the middle line move forward by 0.01 and 0.005 units, and the two inner brow vertices over each eye
+move back by 0.004 units. `pnpm glb-point-edits` reads the base with
+`git show 187ec0a72:assets/models/hippo/hippo.rig.glb`, so a second run gives the same bytes.
