@@ -76,8 +76,8 @@ const BODY_LOOPS = 2;
  *   mesh and of its lids.
  * - The bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet and of the
  *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
- * - The cat: the cuts to the two upper arms, the 2 eye sockets, the edges of the 2 lids, and 19
- *   open ends of the whisker strips and of the strips over the eyes, which the source mesh has.
+ * - The cat: 20 open loops, the cuts to the two upper arms and 18 open loops of the fourth Tripo
+ *   cat and of its eyes and lids.
  * - The fox: 6 open loops, the cuts to the two upper arms and the open loops of the source mesh
  *   (the edges of the lids, the brow strips, and the mouth). The build fills the 4 small holes of
  *   the source.
@@ -89,7 +89,7 @@ const BODY_LOOPS = 2;
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
-  ['assets/models/cat/tripo-hand/cat.rig.glb', 25],
+  ['assets/models/cat/tripo-hand/cat.rig.glb', 20],
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
