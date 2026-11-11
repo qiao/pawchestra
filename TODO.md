@@ -774,8 +774,14 @@ passes.
       no ring split. Check the inner elbow fold of the bow arm in the app.
 - [ ] Tripo beagle candidate: the doc comment of `dog` in `src/models/species.ts` still names the
       mesh `dog.glb` of the dog of main and its longer legs. Update it when the candidate merges.
-- [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
-      place from the body, `DOG_HOLD.fit`).
+- [ ] Tripo beagle seats (4.5): the larger beagle and its 1/2 cello make the footprint of the
+      cellist larger, so the layout moves the seats. In 12 of the 18 demos the stage side grows by
+      about 0.23 m. In `mozart-k191` each seat moves 12 cm to 28 cm, and in some demos the
+      sections take other places, with moves up to 1.8 m. Check the rows in the app, and decide if
+      the layout must keep the old places.
+- [ ] Tripo beagle cello size (4.6): the reach of the left arm fails the cello rule at each size,
+      so the rule gives the clamp of a 1/10, and the 1/2 of the dog comes from the body scale by
+      hand. Fit `CELLO_ELBOW` or the reach test to the hold of the dog (`DOG_HOLD`).
 - [ ] Hippo bassist bow: the bow arm reaches no part of the hair (`bowRangeOf()` gives its
       fallback of 4 cm), so the bow stays still in the frog, tip, and crossing moments. The
       pegbox stands 21.7 cm from the head, beside and in front of the snout, so the view from
