@@ -234,9 +234,10 @@ const UPPER_ARM_GOAL = 35;
 
 /**
  * The wind holds whose rest stands the instrument on a leg, by the root of `--set`: the flute of
- * the tan fox stands upright on the right leg. Each other wind role has no lap rest.
+ * the tan fox stands upright on the right leg, and the clarinet bell of the wolf on the right
+ * knee. Each other wind role has no lap rest.
  */
-const LEG_RESTS: ReadonlySet<string> = new Set(['flute@fox-tan']);
+const LEG_RESTS: ReadonlySet<string> = new Set(['flute@fox-tan', 'clarinet@wolf']);
 
 /** The usage text of `pnpm hold-fit`. */
 const USAGE = `Usage: pnpm hold-fit <${[...FOLD_ROLES.keys()].join(' | ')} | <role>@<species>> [--set <path>=<value>[;<path>=<value>]...]... [--grid <path>=<a>:<b>:<step>]... [--sets <${FIT_SETS.join(' | ')}>[,<set>]...] [--demo <id>|all]... [--midi <path>]... [--step <seconds>] [--faces <n>] [--faces-of <face>[,<face>]...] [--technique <normal | pizzicato | tremolo>] [--base <ref>] [--json <file>] [--glb <file>]
