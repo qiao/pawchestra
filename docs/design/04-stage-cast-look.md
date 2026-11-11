@@ -759,7 +759,9 @@ steps, its elbow axes turn, and its bind upper arm points down and forward, so t
 each arm takes at most about 45° of roll or twist in the moments of the violist, the rest
 included. Its thighs spread 20° in the seated bind. Reason: with less spread, its round belly
 covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail lies on
-the seat (the key `bind_tail`).
+the seat (the key `bind_tail`). The large tail of the Tripo fox hangs down to the floor behind the
+chair (`studio.tailBind`), and its build fills the 4 small holes of the source. Reason: the tail
+stood out stiffly in the air, and a hole on the waist showed the floor through the body.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox. It follows the route of the Tripo wolf (below): no point edit of its form, the colors and the
 eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of

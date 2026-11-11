@@ -144,12 +144,12 @@ split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 408,856 bytes |
-| SHA-256 | `5982024c1cd8c8a9c0acd7f5b875da9e8929b656e8f68cf25df0d354475eebea` |
+| Size | 409,064 bytes |
+| SHA-256 | `970e63d69b0d6fd42e4345a04540a5abf453d8c472ec61fe1fe70472ac2c037c` |
 | Origin | Made in Blender 5.2 from `tripo-p2/fox.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `fox`: 3,886 vertices and 4,194 faces (3,402 quads and 792 triangles, 7,596 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
+| Mesh | One object `fox`: 3,886 vertices and 4,198 faces (3,406 quads and 792 triangles, 7,604 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.082161 (the shoulder joints at 1.8006 m for each unit, so that H is 0.380 m, near the shown head of the fox of main, 0.382 m), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `eye` and the eye light ("Eyes" above), the gaze shift of the color map ("Color map" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -159,8 +159,8 @@ assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0,
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,181,836 bytes | `bd4777cc6ad3bb8bb69660ac48433fe403c6f2e011877d379a3e8c8acc12c734` |
-| `tripo-hand/fox.rig.json` | 17,517 bytes | `ef5cae2479f2efaef4d3ef3f54a4b78a737130b728d0c126da141cf1c6e1fe09` |
+| `tripo-hand/fox.rig.glb` | 1,185,932 bytes | `c766b980a9ca198b620a3f3776f510b52d868fd6501792f8e3e14da3e8920073` |
+| `tripo-hand/fox.rig.json` | 17,517 bytes | `8fca71d0c453fbdefbae93bad1d2827411ef8ec6d2d26d1b964e34fb253b8a2a` |
 
 The scripts of the session (`scratch/fox3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
@@ -169,6 +169,10 @@ x is the x of the left arm). Each edit is a need of the rig, the seat, or the in
 
 - **Import.** `sa.import_source('assets/models/fox/tripo-p2/fox.fbx', 1e-5)`, then a turn of -90
   degrees about Z. No vertex merges. Each face is flat.
+- **Holes.** Each open loop of 4 edges takes one quad (`bmesh.ops.edgeloop_fill()`) with the UV
+  of a face of the same vertex at each corner: one on the right side of the waist, a slit at the
+  front of the left armpit, and two on the tail. The hole on the waist showed the floor through the
+  body as a light triangle.
 - **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=<n>,
   use_grid_fill=True)`) of the clean quad bands of 11 edges between two closed arm loops: x 0.098
   to 0.124 (1 cut), 0.124 to 0.155 (1), 0.155 to 0.182 (2), 0.182 to 0.205 (2), 0.205 to 0.228
@@ -217,8 +221,9 @@ vertex, as the smooth shading of an FBX viewer.
 degrees forward. The front of the seat lies 0.06 units behind the knee joint of the bind, and 47 %
 of the thigh lies on the seat. The legs keep the length of the source, so the seat height of the
 app is 0.258 m (`seatHeight` of `src/models/studio/fox.ts`, 0.270 m on the fox of main). The tail
-bones point (0, -0.7, -1) and (0, -1, -0.1) in the bind, so that the large tail hangs down behind
-the chair.
+bones point (0, -1, -0.55) and (0, -1, 0.15) in the bind, so that the large tail hangs down to the
+floor behind the chair. With (0, -0.7, -1) and (0, -1, -0.1), it stood out stiffly in the air
+behind the chair.
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -60 to 60 degrees at 1.17 ball radii, lam from
 -34 to 64 degrees on the left and the mirror on the right, so that no lid reaches over the middle
