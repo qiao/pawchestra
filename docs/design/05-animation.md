@@ -913,8 +913,11 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
     section (`cueTwist`), and the head keeps its aim.
   - A climax is rare: it needs `climaxStartSec` of music before it, and only the largest rises
     stay, one for each `climaxEverySec`, at least `climaxGapSec` apart.
-  - The left paw rolls its palm up or down with the dynamics (`LEFT_HAND_PLACES`, `palm`). Its
-    twist on the forearm stops at `MAX_TWIST_L` (`maxTwist` of `writeArm()`).
+  - The left paw turns its palm up or down with the dynamics (`LEFT_HAND_PLACES`, `palm`): it
+    twists on the forearm toward the twist of the side (`PALM_TWIST`), by the weights of the
+    places, and the twist stops at `MAX_TWIST_L` (`twist` and `maxTwist` of `writeArm()`). The
+    turn goes from the twist of the paw with no wrap. Reason: a roll toward the palm of the place
+    asked for a twist near 180°, and the limit turned the paw 90° in one frame, from +45° to -45°.
   - The places of the hands lean, sway, move, and drop with the body (`followBody()`), so the
     paws keep their clearance to the head.
   - On a held final chord, the baton leaves the beat, holds, makes one circle before the end of

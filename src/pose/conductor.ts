@@ -173,10 +173,10 @@ interface LeftHandPlace {
   /** The curl of the fingers. */
   readonly curl: number;
   /**
-   * The direction of the palm, in the model axes, or none for the palm of the hand direction
-   * alone. The paw rolls around its fingers toward it.
+   * The side to which the palm turns, or none for the palm of the hand direction alone. The paw
+   * twists on its forearm toward the twist of the side ({@link PALM_TWIST}).
    */
-  readonly palm?: Vec3;
+  readonly palm?: keyof typeof PALM_TWIST;
 }
 
 /**
@@ -198,7 +198,7 @@ export const LEFT_HAND_PLACES = {
     wrist: [-0.44, 0.88, -0.78],
     fingers: [0, 0.6, -1],
     curl: 5 * MathUtils.DEG2RAD,
-    palm: [0, 1, 0.3],
+    palm: 'up',
   },
   /**
    * The lowered hand of a diminuendo and of a soft passage, open with the palm down, out at the
@@ -208,14 +208,14 @@ export const LEFT_HAND_PLACES = {
     wrist: [-0.59, 0.06, -0.78],
     fingers: [0, -0.6, -1],
     curl: 5 * MathUtils.DEG2RAD,
-    palm: [0, -1, -0.3],
+    palm: 'down',
   },
   /** The held palm of a held chord, up and out to the players above the shoulder. */
   hold: {
     wrist: [-0.44, 0.53, -1.0],
     fingers: [0, 0.3, -1],
     curl: 5 * MathUtils.DEG2RAD,
-    palm: [0, 1, 0.3],
+    palm: 'up',
   },
   /**
    * The open arm of a climax: wide out to the left and high, above the shoulder and forward, with
@@ -226,7 +226,7 @@ export const LEFT_HAND_PLACES = {
     wrist: [-1.1, 0.95, -0.45],
     fingers: [-0.5, 0.8, -0.5],
     curl: 5 * MathUtils.DEG2RAD,
-    palm: [0.3, 1, 0],
+    palm: 'up',
   },
 } as const satisfies Readonly<Record<string, LeftHandPlace>>;
 
@@ -244,17 +244,18 @@ const MIRROR_SCALE = 0.45;
 const MIRROR_IN = 0.12;
 
 /**
- * The direction of the palm of the left paw in the bind pose, in the model axes: inward, down, and
- * a little forward. The palm of the source mesh faces down and forward in its T-pose
- * (`tools/mesh-rigs/bear.json`), and the arm of the bind hangs down from it.
- */
-const PALM_BIND_L: Vec3 = [0.7, -0.6, -0.4];
-
-/**
- * The largest twist of the left paw on its forearm. The roll of the palm stops at it, so that the
- * wrist does not twist far from the bind pose.
+ * The largest twist of the left paw on its forearm, so that the wrist does not twist far from the
+ * bind pose.
  */
 const MAX_TWIST_L = 45 * MathUtils.DEG2RAD;
+
+/**
+ * The twist of the left paw on its forearm for a palm up and a palm down (design 5.4). A negative
+ * twist turns the palm up, as the forearm of a real conductor supinates. Each twist is the limit
+ * {@link MAX_TWIST_L}: the turn of the palm all the way up asked for 95° to 165° of twist, and the
+ * turn all the way down for 65° to 90° (`boulanger-matin`, `mozart-k525`, `beethoven-9`).
+ */
+const PALM_TWIST = { up: -MAX_TWIST_L, down: MAX_TWIST_L } as const;
 
 /** The curl of the closed left hand of a cut-off. */
 const CLOSE_CURL = 80 * MathUtils.DEG2RAD;
@@ -459,9 +460,6 @@ const restBaton = new Vector3();
 const bodyTurn = new Quaternion();
 /** The turn of a clavicle in the rise of the shoulders. Each call writes it first. */
 const shrugTurn = new Quaternion();
-const palm = new Vector3();
-const palmNow = new Vector3();
-const palmRoll = new Quaternion();
 const bodySway = new Quaternion();
 
 /**
@@ -703,28 +701,6 @@ function placeOf(
 }
 
 /**
- * Rolls the module rotation `hand` of the left paw around its fingers, so that its palm turns
- * toward the module vector `palm` by a weight (design 5.4): up in a crescendo and on a held
- * chord, down in a diminuendo and a soft passage.
- *
- * @param axis The unit direction of the fingers.
- * @param weight The weight of the roll, from 0 to 1.
- */
-function rollPalm(axis: Vector3, weight: number): void {
-  palmNow.fromArray(PALM_BIND_L).normalize().applyQuaternion(hand);
-  palmNow.addScaledVector(axis, -palmNow.dot(axis));
-  palm.addScaledVector(axis, -palm.dot(axis));
-  if (palmNow.lengthSq() < 1e-8 || palm.lengthSq() < 1e-8) {
-    return;
-  }
-  palmNow.normalize();
-  palm.normalize();
-  const cos = palmNow.dot(palm);
-  const angle = Math.atan2(palmNow.cross(palm).dot(axis), cos);
-  hand.premultiply(palmRoll.setFromAxisAngle(axis, angle * weight));
-}
-
-/**
  * Writes the left arm and its fingers (design 5.4). Between its cues, the hand rests at the quiet
  * place, mirrors the beat in a loud passage, rises in a crescendo, comes down in a diminuendo or
  * a soft passage, holds the palm out on a held chord, and opens wide and high at a climax, by the
@@ -758,6 +734,7 @@ function poseLeftHand(
   wrist.copy(place);
   direction.copy(fingers);
   let curl: number = places.quiet.curl;
+  let palmTwist = 0;
   let palmWeight = 0;
   const steps: readonly (readonly [LeftHandPlace, number])[] = [
     [places.mirror, weights.mirror],
@@ -773,9 +750,11 @@ function poseLeftHand(
       direction.lerp(fingers, w);
       curl += (of.curl - curl) * w;
       if (of.palm) {
-        toPlace.fromArray(of.palm).normalize().applyAxisAngle(Y_AXIS, turn);
-        palm.copy(palmWeight > 0 ? palm : toPlace).lerp(toPlace, w);
-        palmWeight += (1 - palmWeight) * w;
+        // The twist is the mean of the twists of the places by their weights, so a place that
+        // starts with a small weight changes it only a little.
+        const kept = palmWeight * (1 - w);
+        palmTwist = (palmTwist * kept + PALM_TWIST[of.palm] * w) / (kept + w);
+        palmWeight = kept + w;
       } else {
         palmWeight *= 1 - w;
       }
@@ -804,9 +783,6 @@ function poseLeftHand(
   }
   limitReach(rig.left, left.position, wrist);
   handToward(left, place.copy(left.position).add(direction.normalize()), hand);
-  if (palmWeight > 0) {
-    rollPalm(direction, palmWeight);
-  }
   if (ready > 0) {
     hand.premultiply(readyTurn.setFromAxisAngle(direction, CONDUCTOR_HOLD.readyRoll * ready));
   }
@@ -821,6 +797,8 @@ function poseLeftHand(
       hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, up, hand),
       pole: mixPole(CONDUCTOR_HOLD.restPoleL, CONDUCTOR_HOLD.poleL, up),
       maxTwist: MAX_TWIST_L,
+      twist: palmTwist,
+      twistWeight: palmWeight * up,
     },
     chest.rotation,
     rotations,

@@ -124,10 +124,10 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
   passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm
-  (`softPalm`). The paw rolls its palm up in a crescendo, on a held chord, and at a climax, and
+  (`softPalm`). The paw turns its palm up in a crescendo, on a held chord, and at a climax, and
   down in a diminuendo and a soft passage (`LEFT_HAND_PLACES`, `palm`), as the palms of section 2.
-  The twist of the paw on its forearm stops at `MAX_TWIST_L`, so the palm turns only a part of
-  the way when the forearm points far from the bind pose.
+  The paw twists on its forearm for this turn (`PALM_TWIST`), as the forearm of a conductor
+  turns the palm. The twist stops at `MAX_TWIST_L`, so the palm turns only a part of the way.
 - **The breath (section 3).** The chest and the head rise in the preparation before the first
   beat, before each phrase start after a time with no note start, and before each accent
   (`breathLean`, `breathHead`), and the shoulders rise (`breathShrug`). They come down after the
