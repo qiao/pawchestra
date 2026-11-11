@@ -93,13 +93,26 @@ PUPIL_EDGE = 2.0
 #: SCLERA_WARM: the Oklab (a, b) step of the white to a warm ivory. IRIS_SHADE: the scale of the
 #: Oklab lightness of the iris. RING_SHADE and RING_WIDTH: the scale of the lightness of the outer
 #: ring of the iris, and its width as a share of the iris radius.
-IRIS_SCALE = 1.1
+IRIS_SCALE = 1.2
 PUPIL_RATIO = 0.55
 #: The turn in degrees of the middle of the new iris out from the target of `center_irises()`.
 #: The target of the cat already lies in the middle of the opening of the play view, turned
 #: out by GAZE_OUT. The turn is at most the growth of the iris radius, so that the new iris covers
 #: the old iris.
 FAR_GAZE_OUT = 0.0
+#: The turn in degrees of the middle of the new iris up from the target. The opening of the cat
+#: reaches 28.5 degrees up and 30.5 degrees down from the target, so with the turn and
+#: FAR_IRIS_RADIUS the top of the iris lies under the upper lid by about 12 % of the iris height,
+#: its bottom lies under the lower edge, and the white shows only at the sides.
+FAR_GAZE_UP = 1.5
+#: The radius in degrees of the new iris of both eyes, in place of IRIS_SCALE times the iris edge of
+#: the source of each eye (27.5 and 29.0 degrees), so that the two irises are the same size. With
+#: 33 and 35 degrees, a white crescent showed under each iris at the inner corner in the rest front
+#: view. None keeps IRIS_SCALE.
+FAR_IRIS_RADIUS = 36.0
+#: False paints each pupil in its median color with no light: the soft gray light of the source
+#: read dull, and the eye light of the app gives one crisp light at the same place in both eyes.
+PAINTED_LIGHT = False
 SCLERA_SHADE = 0.85
 SCLERA_WARM = (0.008, 0.03)
 IRIS_SHADE = 0.9
@@ -791,7 +804,7 @@ def far_eyes(rig, image, source, pupils):
             values[:] = [np.median(ring[k:k + FAR_SMOOTH]) for k in range(len(good))]
 
         # The new iris about n.
-        big = IRIS_SCALE * float(mid_edge)
+        big = FAR_IRIS_RADIUS if FAR_IRIS_RADIUS else IRIS_SCALE * float(mid_edge)
         small = PUPIL_RATIO * big
         if FAR_GAZE_OUT > big - mid_edge:
             sys.exit(f'FAR_GAZE_OUT is more than the growth of the iris radius, '
@@ -800,6 +813,12 @@ def far_eyes(rig, image, source, pupils):
         turn = np.radians(sign * FAR_GAZE_OUT)
         n = np.array([t[0] * np.cos(turn) + t[2] * np.sin(turn), t[1],
                       t[2] * np.cos(turn) - t[0] * np.sin(turn)])
+        # The turn up of the iris middle: the top of the larger iris goes under the upper lid,
+        # and its bottom reaches the lower edge of the opening.
+        lift = np.radians(FAR_GAZE_UP)
+        e_up = np.cross(n, np.cross(up, n))
+        e_up /= np.linalg.norm(e_up)
+        n = np.cos(lift) * n + np.sin(lift) * e_up
         e_n = np.cross(up, n)
         e_n /= np.linalg.norm(e_n)
         u_n = np.cross(n, e_n)
@@ -830,6 +849,11 @@ def far_eyes(rig, image, source, pupils):
             found &= hit
         new = colors.copy()
         new[sel[found]] = got[found]
+        if not PAINTED_LIGHT:
+            # The pupil takes its median color, so the soft light that the source paints in it
+            # goes, and the eye light of the app gives the only light of the eye.
+            pupil = sel[found][th[found] < small]
+            new[pupil] = np.median(new[pupil], axis=0)
 
         new_luma = new @ [0.2126, 0.7152, 0.0722]
         top, low = new.max(axis=1), new.min(axis=1)
