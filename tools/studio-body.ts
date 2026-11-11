@@ -347,14 +347,12 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       paletteMaps: { tan: 'assets/models/fox/tripo-hand/fox-tan-color.webp' },
     },
   ],
-  // The viola cat (design 4.4): the candidate hand rig of the third Tripo P2 mesh
+  // The viola cat (design 4.4): the candidate hand rig of the fourth Tripo P2 mesh
   // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch, and the legs
-  // of the source, so its chair is lower. Its `.blend` holds the facts of the body: the
-  // scale that keeps H of that cat, and the crease angle 55°, because its arm rings have 8
-  // vertices. The color map of `tools/cat-maps.py` keeps the iris colors of the source and paints
-  // no light in the pupils, so the eyes take the finish `eye` and the eye light, which gives one
-  // small light in each eye. With the finish `varnish`, the large dark ball showed a wide glossy
-  // band, and the eyes read as glass eyes.
+  // of the source, so its chair is lower. Its `.blend` holds the facts of the body: the scale that
+  // keeps H of the cat of main, and the crease angle 180°. The color map of `tools/cat-maps.py`
+  // keeps the colors of the source, and it paints a light on each eye, so the eyes take the finish
+  // `varnish` and no eye light.
   [
     'cat',
     {
@@ -363,6 +361,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_CAT',
       glb: 'assets/models/cat/tripo-hand/cat.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The cello dog (design 4.4): the candidate hand rig of the Tripo P2 beagle
