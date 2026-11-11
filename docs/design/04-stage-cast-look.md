@@ -767,7 +767,10 @@ fox. It follows the route of the Tripo wolf (below): no point edit of its form, 
 eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of
 this body is its source FBX. It keeps the eyeballs of its mesh, because the map paints a full eye
 on each, and its tail has two bones. Its legs keep the length of the source, so its chair is
-lower. Its map tool moves each iris with its pupil as one decal on its ball, to the middle of the
+lower. Its key `bind_belly` smooths the front of the trunk in the seated bind along the normals
+only, and unfolds the band where the raised thighs meet the belly. Reason: the source has shallow
+grooves on the chest and the belly, and the fold of the seat made a dark slit. The light of the
+app showed them as dark dents and bands on the cream belly. Its map tool moves each iris with its pupil as one decal on its ball, to the middle of the
 eye opening in a view from above the head, a little out (`tools/gaze_shift.py`). Each moved texel
 is a copy of a texel of the same ball. Reason: the source paints each iris at the inner side of
 its opening, and the foxes looked to the side and down in the play view and from the default
