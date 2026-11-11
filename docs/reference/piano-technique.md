@@ -314,11 +314,11 @@ The app follows these facts:
   has no legato limit and no rules of three notes, because the arm moves the hand from chord to
   chord.
 - **The jumps (section 9.3).** A long move starts early enough for its length
-  (`HAND_MOTION.leapSpeed`), at the earliest at the strike of the note before, so the paw gets to
-  its keys ahead of time. At a loud note after the paw leaves the keys, the wrist drops a few
-  degrees at the strike, around the claw tips, and rises a little at the release
-  (`HAND_MOTION.kickDrop`, `wristKickAt()`), as the take-off of a jump starts with a small down
-  kick of the wrist. The drop grows with the loudness.
+  (`HAND_MOTION.leapSpeed`), with the drop from over the other paw in its length, at the earliest
+  at the strike of the note before, so the paw gets to its keys ahead of time. At a loud note
+  after the paw leaves the keys, the wrist drops a few degrees at the strike, around the claw
+  tips, and rises a little at the release (`HAND_MOTION.kickDrop`, `wristKickAt()`), as the
+  take-off of a jump starts with a small down kick of the wrist. The drop grows with the loudness.
 - **The claws (section 9.3).** Each paw has a digit bone for each claw. The claw of each key
   drops to the key bed at the note start and stays down while the key is held
   (`digitBendsAt()` of `src/pose/piano-digits.ts`). Before its strike, the next claw lifts

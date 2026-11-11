@@ -32,7 +32,11 @@ export const HAND_MOTION = {
    * hand gets to its keys ahead of time (`docs/reference/piano-technique.md` section 9.3). With
    * no early start, the right forearm of the polar bear turned faster than 1,000° per second in
    * 384 frames of `bach-bwv1050` at 120 frames per second, with 1.5 m/s in 55, and with 1.0 m/s
-   * in 54 (`scratch/piano-jumps.ts`).
+   * in 54 (`scratch/piano-jumps.ts`). The length of a move counts the change of the height over
+   * the other hand (`HandTrack.hovers`): with the place alone, a left paw that came down 8 cm from
+   * over the right paw and 8 cm in toward the fallboard got 66 ms, and the left forearm snapped 25°
+   * in one frame at 30 frames per second. At 0.75 m/s, the snaps over 15° in one frame of
+   * `bach-bwv1050` went from 14 to 11, and in `boulanger-matin` from 0 to 2.
    */
   leapSpeed: 1.5,
   /**
@@ -691,7 +695,11 @@ export function buildHandTrack(
     // A pass moves the hand from the strike of the note before, so the hand moves smoothly. A
     // leap starts early enough for its length, as a pianist gets to the keys ahead of time.
     const pass = passes?.[i] ? m.passSec : 0;
-    const leap = moveLength(points, first, i) / (yields(i) ? m.yieldSpeed : m.leapSpeed);
+    // A hand that comes down from over the other hand, or goes up over it, also travels the
+    // change of its height.
+    const rise = hovers ? Math.abs((hovers[i] ?? 0) - (hovers[i - 1] ?? 0)) : 0;
+    const length = Math.hypot(moveLength(points, first, i), rise);
+    const leap = length / (yields(i) ? m.yieldSpeed : m.leapSpeed);
     return Math.min(late, Math.max(before.start, end - Math.max(pass, leap)));
   });
   // A piano hand lifts less for a near note. A harp hand pulls less inside a group.

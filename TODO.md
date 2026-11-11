@@ -233,6 +233,12 @@ passes.
       side two times each second. Find a calmer side lean that keeps the reach of the far paw.
 - [ ] Polar bear keys: with the gaps between the white keys, the soft shadow of the paws on the keys
       is weaker. The claws stay at the key top and do not follow a pressed key down.
+- [ ] Polar bear pianist: in `bach-bwv1050`, the left forearm still snaps up to 23° in one frame at
+      30 frames per second (8 snaps over 20°, `scratch/tripo-audit/motion.ts`). At 61.42 s, a
+      thumb pass moves the palm 11 cm in 84 ms, the whole gap after the note before. At 164.30 s,
+      the left elbow jumps 2.5 cm in 8 ms while the palm moves 1.4 cm, near the full reach of the
+      arm. A glide of the palm through the strikes of a run took off 1 snap, and a leap speed of
+      0.75 m/s gave 2 new snaps in `boulanger-matin`.
 - [ ] Polar bear pianist: at 1% of the notes of the demos, the arm is at its full reach, and the
       palm stops up to 3.2 cm short of the key (the note target check of the pianist clearance).
       A lean toward the keys for a far black key can give the reach.

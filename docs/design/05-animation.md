@@ -683,8 +683,10 @@ The rest of each family:
   pianist gets smaller as the speed rises (piano 7).
 - A long move of a paw starts early enough for its length (`HAND_MOTION.leapSpeed`), at the
   earliest at the strike of the note before, as a pianist gets to the keys of a jump ahead of time
-  (piano 9.3). Reason: a move that fit only in a part of a short gap turned the forearm faster
-  than 1,000° per second.
+  (piano 9.3). The length of a move counts the change of the height over the other paw
+  (`HandTrack.hovers`). Reason: a move that fit only in a part of a short gap turned the forearm
+  faster than 1,000° per second, and a paw that came down 8 cm from over the other paw in 66 ms
+  snapped the left forearm 25° in one frame at 30 frames per second.
 - At a loud note after the paw leaves the keys, the wrist drops a few degrees at the strike and
   rises a little at the release (`HAND_MOTION.kickDrop`, `wristKickAt()`), as the take-off of a
   jump starts with a small down kick of the wrist (piano 9.3). The paw turns around its claw tips
