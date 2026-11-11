@@ -47,3 +47,4 @@ assets/models/penguin/penguin-free.glb
 
 # The backup copies that Blender writes beside a .blend file at each save.
 *.blend1
+/node_modules
