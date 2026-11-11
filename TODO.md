@@ -708,20 +708,21 @@ passes.
       450 (main 484). Check the bent left elbow in the hall view.
 - [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
       same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
-- [ ] Cat candidate (third Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so
-      its seat is 19.3 cm (the cat of main 29.8 cm), and its chair is lower than the chairs
+- [ ] Cat candidate (fourth Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so
+      its seat is 20.1 cm (the cat of main 29.8 cm), and its chair is lower than the chairs
       around it. Check the string rows in the hall view.
-- [ ] Cat candidate: `pnpm pose-depth violist` stops on the body ("33 open loops, and the caller
-      expects 25"), so the clearance of the arms and the viola has only renders.
-- [ ] Cat candidate: the mouth slit still shows a dark smile line, wider than in the source FBX,
-      with the rim faces. A smaller slit needs a point edit that does not open the mouth.
-- [ ] Cat candidate: in the hall light the gray fur is Oklab h 55 (warm), against a neutral gray
-      of the source FBX in an even light. A cooler GRAY_FUR step can move it further.
-- [ ] Cat candidate: each eye shows a second, smaller light beside the eye light: the
-      reflection of the hall on the finish `eye`, as on the rabbit. It reads more on the dark
-      pupil of the cat. Check it on a phone in the front view of the test page.
-- [ ] Cat candidate: the smaller eyes have only ray checks of the lids (no lid point leaves the
-      head in a blink step). Check a blink in the app.
+- [ ] Cat candidate: the thighs of the seated bind spread 20° so that the belly does not cover the
+      lap point. Check the knees against the music stand and the next seat in the hall view.
+- [ ] Cat candidate: the arms are near the limit of 45°: the left upper arm rolls 42.5° in the
+      stroke and -42.0° at rest, and the right forearm twists -42.9° at the tip. Check the
+      shoulder and the wrist skin in the app.
+- [ ] Cat candidate: the map keeps the gray of the source, and the fur reads light tan in the close
+      views with the fill light (gray in the play view and the hall view). Check the look in the
+      app.
+- [ ] Cat candidate: the clearance of the arms and the viola has only renders. `pnpm pose-depth
+      violist` did not run on the fourth mesh.
+- [ ] Cat candidate: the smaller eyes and the lower upper lids have only ray checks of the lids (no
+      lid point leaves the head in a blink step). Check a blink in the app.
 - [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
       expects 4"), so the clearance of the arms and the head has only renders.
 - [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
