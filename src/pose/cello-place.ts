@@ -15,6 +15,17 @@ interface CelloPlace {
   readonly playTurn: Quat;
 }
 
+/** The rule of the place of a cello at a body (`BowedHold.fit`, design 5.3). */
+export interface CelloFit {
+  /**
+   * The room between the middle line of the back and the front of the body, in head heights.
+   * Below 0, the back presses the front.
+   */
+  readonly gap: number;
+  /** The lean of the axis to the left, from the vertical, in radians (`CELLO_PLACE.left`). */
+  readonly left: number;
+}
+
 /** The number of points on the middle line of the back that the contact tests. */
 const BACK_POINTS = 16;
 
@@ -78,12 +89,11 @@ export function trunkFront(model: PlayerModel, x: number, y: number): number | n
  * (`celloPinOf()`), so the top of the back stands at the height of the chest.
  *
  * @param model A player with a cello.
- * @param gap The room between the middle line of the back and the front of the body, in head
- *   heights. Below 0, the back presses the front.
+ * @param fit The room in front of the body and the lean of the cello to the left.
  * @returns The move and the turn of the cello from its bind place.
  * @throws Error if the model has no cello piece or no cello targets.
  */
-export function fitCelloPlace(model: PlayerModel, gap: number): CelloPlace {
+export function fitCelloPlace(model: PlayerModel, fit: CelloFit): CelloPlace {
   const piece = model.pieces.find((p) => p.piece.bone === 'instrument');
   const nut = model.instrument.targets.find((t) => t.kind === 'fingerboard');
   const contact = model.instrument.targets.find((t) => t.kind === 'bow-contact');
@@ -96,7 +106,7 @@ export function fitCelloPlace(model: PlayerModel, gap: number): CelloPlace {
   const pin = contact.from[1] - VIOLIN.bowContact * size;
   const half = (VIOLIN.bodyThickness / 2) * size;
 
-  const { axis, top } = celloAxes();
+  const { axis, top } = celloAxes(fit.left);
   const along = new Vector3(...axis);
   const back = new Vector3(...top).negate();
   const turn = playRotation(along, back);
@@ -115,7 +125,7 @@ export function fitCelloPlace(model: PlayerModel, gap: number): CelloPlace {
     }
   }
   if (Number.isFinite(deepest)) {
-    tip.z -= deepest + gap * h;
+    tip.z -= deepest + fit.gap * h;
   }
   const bindTurn = new Quaternion(...piece.at.rotation);
   return {

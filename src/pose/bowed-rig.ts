@@ -31,7 +31,9 @@ import type { InstrumentOf } from './family.ts';
 import { setFromBasis } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
 import { armRig, poseShoulder, solveArm } from './ik.ts';
+import { CELLO_PLACE } from '../models/instruments/cello-fit.ts';
 import { fitCelloPlace } from './cello-place.ts';
+import type { CelloFit } from './cello-place.ts';
 import { fitViolinPlace } from './violin-place.ts';
 import type { ChinFit } from './violin-place.ts';
 import { lapPoint } from './lap.ts';
@@ -348,10 +350,10 @@ export interface BowedHold {
   /**
    * The place of a cello from the body (`fitCelloPlace()` of `pose/cello-place.ts`, design 5.3),
    * in place of {@link BowedHold.playShift} and {@link BowedHold.playTurn}: the cello leans back
-   * until the middle line of its back stands `gap` head heights in front of the body. `null` keeps
-   * the fixed place of the hold.
+   * until the middle line of its back stands `gap` head heights in front of the body, and it leans
+   * `left` to the left. `null` keeps the fixed place of the hold.
    */
-  readonly fit: { readonly gap: number } | null;
+  readonly fit: CelloFit | null;
   /**
    * The place of a violin or a viola under the jaw from the body (`fitViolinPlace()` of
    * `pose/violin-place.ts`, design 5.3), in place of {@link BowedHold.playShift}: the tail end on
@@ -1036,7 +1038,7 @@ const CELLO_HOLD = {
   restPoleL: [-0.5, -1, 0],
   restPoleR: [0.6, -1, 0.75],
   restBow: { ...LAP_CELLO_BOW, forearm: [0.3, 0.3, -1] },
-  fit: { gap: 0.28 },
+  fit: { gap: 0.28, left: CELLO_PLACE.left },
 } as const satisfies BowedHold;
 
 /** The holds of the bowed strings. */
@@ -1260,14 +1262,18 @@ const CAT_HOLD = {
 
 /**
  * The hold of the cello between the knees, for the dog mesh (design 4.6, 5.3): the arm values of
- * {@link CELLO_HOLD} with a fixed place. The cello leans back 25° from the vertical, with the back
- * of the upper bout at the chest, the neck at the left of the head, and the endpin on the floor
- * 0.06 m right of the middle and 0.66 m in front of the floor point of the seat. It leans 14° to
- * the left, and its top plate turns 6° to the right. It keeps this place in the rest pose
- * (`BowedHold.rest` null). The short thighs end far behind the lower bout, so the knees do not
- * touch the cello. In the high positions, the left paw tilts further over the neck, as in
- * {@link CELLO_HOLD}: with the tilt of the low positions, the round left forearm goes 3.3 cm into
- * the body of the cello.
+ * {@link CELLO_HOLD} with the place from the body (`fit`, `fitCelloPlace()`). The Tripo beagle
+ * sits on a seat of 0.15 m, and its right arm reaches only 0.24 m from the shoulder joint. So it
+ * plays a 1/10 cello, the size of the cello rule (`SpeciesParams.celloScale`), with the middle
+ * line of the back 0.1 H in front of the body, and the cello leans 20° to the left, so that the
+ * neck passes over the left shoulder and the scroll stands beside the left ear, as on a real
+ * cellist (`docs/reference/string-technique.md`, section 2.7). With the old fixed place and the
+ * 1/2 cello, the end pin stood 0.66 m in front of the seat, the pegbox stood in front of the muzzle
+ * and the eye, the bow arm reached no part of the hair, and the bow went behind the strings
+ * through the waist of the cello. With the 14° of `CELLO_PLACE`, the nut stays 18 cm in front of
+ * the head at the side of the muzzle. With the gap of 0.28 H, the left paw reaches the fingerboard
+ * only to 0.74 of its length. The cello keeps the place in the rest pose (`BowedHold.rest` null).
+ * In the high positions, the left paw tilts further over the neck, as in {@link CELLO_HOLD}.
  *
  * The rebuilt arms of the dog are round tubes with their full inner half width (design 5.3, "Free
  * round arms"), so the elbows keep away from the sides, as a cellist starts a stroke open at the
@@ -1307,8 +1313,6 @@ const CAT_HOLD = {
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
-  playShift: [-0.076, 0, -0.34],
-  playTurn: [-0.0371, 0.1049, -0.0435, 0.9928],
   reach: 20 * MathUtils.DEG2RAD,
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
@@ -1322,7 +1326,7 @@ const DOG_HOLD = {
   girthFit: null,
   restPlace: 0.6,
   restBow: { ...LAP_CELLO_BOW, lap: { along: 0.9, offset: [0.5, 0.35, -0.2] } },
-  fit: null,
+  fit: { gap: 0.1, left: 20 * MathUtils.DEG2RAD },
 } as const satisfies BowedHold;
 
 /**
@@ -1832,7 +1836,7 @@ export function bowedRig(
   instrument: BowedInstrument,
   given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
-  const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit.gap) } : given;
+  const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit) } : given;
   const placedHold = girthGaps(
     model,
     floor.chinFit ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) } : floor,
