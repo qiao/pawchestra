@@ -819,6 +819,18 @@ passes.
       1.2 m. Check the two hall views.
 - [ ] Tripo hippo: the gray-pink skin of the FBX reads as a light peach in the app light, and the
       snout casts a dark band over the mouth line. Ask the user before any change of the light.
+- [ ] Tripo hippo bassist: the left upper arm (4 cm to 7 cm) and forearm (about 6 cm) go through
+      the upper bout of the bass in each sample, and the bass goes 9 cm into the body. The left
+      shoulder joint lies 0.26 m behind the strings. No place of the bass in 20 hold variants
+      fixed it within the twist limit. A smaller bass (`bassScale`) or a shorter end pin may fix it.
+- [ ] Tripo cat violist: the left arm twists 55° in the lift (target 45°), the left paw swings
+      72° at rest (limit 70), and the play grip turn is 64°. Each elbow that cut the swing turned
+      the viola off its short arc.
+- [ ] Tripo red fox violinist: with the lower, left violin of the head turn, the bow paw goes
+      2.4 cm into the violin body in 53 % of the lowering samples (17 % before).
+- [ ] Tripo beagle cellist: the clearance sweep puts the cello 12.3 cm into the chest at the bass
+      side of the upper back, behind the left upper arm. No view shows it; the fit measures only
+      the middle line of the back.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
