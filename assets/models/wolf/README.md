@@ -140,10 +140,10 @@ of the source.
 
 | Item | Value |
 |---|---|
-| Size | 395,622 bytes |
-| SHA-256 | `f6c302c9bebcaccb234b69dcd2e9a250e90dcef17d0589447405384c4f23e2d1` |
+| Size | 395,747 bytes |
+| SHA-256 | `96a93e5eb3b115cb84117a4e05f25bddec7903985e927759c4fa7ffcc3ef89f0` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the wolf faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `wolf`: 3,656 vertices and 4,066 faces (3,124 quads and 942 triangles, 7,190 triangles), flat faces, and the surface of `sa.add_surface()`. 82 faces are gloss (the nose). The 48 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/wolf/tripo-hand/wolf-color.webp`) |
+| Mesh | One object `wolf`: 3,656 vertices and 4,066 faces (3,124 quads and 942 triangles, 7,190 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 82 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 48 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/wolf/tripo-hand/wolf-color.webp`) |
 | Armature | `wolf_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.121345 (the shoulder joints at 1.77428 m for each unit, so that H is 0.369244 m, the H of the wolf of main), `crease` 180 |
 | Eyes | The painted eye faces of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -199,6 +199,15 @@ The weights, in the rest pose:
 angle 180 gives each corner the mean normal of the faces at its vertex, as the smooth shading of an
 FBX viewer.
 
+**Nose.** At the end of the build, the 82 gloss faces of the dark nose go to the slot `fur`
+(`noseFur` of the params). Thus the nose takes the color map, with its painted nostrils, and the
+smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
+The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
+`headShift` (0, 0, -0.006106139) moves the head center of the holds back to the head center of the
+gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
+the map tool does not change it.
+
 **Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, and the shins are vertical,
 as on the wolf of main. The property `seat` is {`prop` `chair`, `front` 0.1186, `back` -0.08,
 `halfWidth` 0.15}: the front lies 0.05 units behind the knee joint of the bind, and 56 % of the
@@ -239,15 +248,13 @@ green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the gray fur reads
 lighter and warmer than in the even gray light of an FBX viewer, and the chin shades darker. The
-nose is a gloss face group of one dark color with flat normals, so it shows facets and no painted
-nostrils. The source has no eyeball, so the eyes take the finish of the eye faces and blink with
-lids.
+source has no eyeball, so the eyes take the finish of the eye faces and blink with lids.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/wolf.rig.glb` | 1,305,240 bytes | `0b647ef7a1b515809af4e789b84ba7166112be5c2ba56b38992603e01e27dd91` |
-| `tripo-hand/wolf.rig.json` | 15,633 bytes | `569f994bffd3ebe22afd99efafb6e74638628cfc5417ef78976ac313af2caadc` |
+| `tripo-hand/wolf.rig.glb` | 1,308,872 bytes | `4e4bcb50d667662db0e2090865878269aaa8e95fd23e6fbbe6c18e8c8ca4c278` |
+| `tripo-hand/wolf.rig.json` | 15,687 bytes | `8722bf07140b1e6590610882507ccd8f652ebd0e490d0c9981056a18cf91b97a` |
 | `tripo-hand/wolf-color.webp` | 205,090 bytes, 2048 × 2048 | `eef1e480bcb8dd099b54c0793699999fa8ae82a835f7291e0284c6d538f67b83` |
 | `tripo-hand/wolf-normal.webp` | 121,396 bytes, 1024 × 1024 | `64f71fe8916ac5600d15d9c70caba053f3cfab412a892cc505796f5f14f6dc1d` |
