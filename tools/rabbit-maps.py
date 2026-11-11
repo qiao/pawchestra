@@ -4,10 +4,9 @@
 # goes to the fur of the rabbit of main in the hall light, and the pink, the brown brows, the
 # white, and the black keep their colors. Each texel takes a mix of the steps of the colors, by its
 # nearness to each color, so the blend between two colors stays smooth. The texels of the eyeballs
-# take the paint of the cartoon eye of the sheet: a large dark brown iris, a big black pupil, and
-# almost no white, looking at the viewer ("Eyes" of the README). The script
-# reads the triangles, the places, and the texture points of the eyeballs from the rig file
-# (`ownEyes` of the export).
+# keep the eye paint of the source, with each iris moved to the middle of its opening ("Eyes" of
+# the README, `EYE_PAINT`). The script reads the triangles, the places, and the texture points of
+# the eyeballs from the rig file (`ownEyes` of the export).
 # The normal map `rabbit-normal.webp` holds the tilts of the fur. The output depends only on the
 # input files and on cwebp 1.5.0.
 #
@@ -58,6 +57,38 @@ SPREAD = 0.06
 MIN_CHROMA = 0.02
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
+#: The paint of the eyeballs. 'source' keeps the eye of the source map: a large black pupil in an
+#: amber iris with a dark ring, and white around it. 'centered' keeps the same paint, and moves the
+#: iris with its pupil to the middle of the eye opening of the front view (`center_irises()`).
+#: 'cartoon' paints each ball again as the cartoon eye of the sheet (`paint_eyes()`).
+EYE_PAINT = 'centered'
+#: The cells across the front picture of a ball (`front_cells()`), in which the iris move finds
+#: the opening and the pupil.
+FRONT_GRID = 120
+#: The largest luma of a pupil texel, and the smallest channel and the largest saturation of a
+#: white texel (sRGB).
+PUPIL_LUMA = 50
+WHITE_LOW = 170
+WHITE_SAT = 0.25
+#: The largest iris radius in degrees that the search tries.
+IRIS_SEARCH = 40
+#: The share of white texels of the opening from which a ring of 1 degree about the pupil lies past
+#: the iris.
+IRIS_WHITE = 0.05
+#: The angle in degrees added to the iris radius, so that the soft edge of the iris moves with it.
+IRIS_EDGE = 2.0
+#: The cells of the front picture at the edge of the opening that the pupil search and the iris
+#: move do not use.
+EDGE_CELLS = 2
+#: True when the source map paints a dark lash line in the EDGE_CELLS cells at the edge of the
+#: opening: then the dark texels of these cells stay at the old place of the iris. The source map
+#: of the rabbit paints no lash line, and its iris reaches the lower edge of the opening. So with
+#: False, the old place of the iris takes white up to the edge, and no dark ring of the iris stays
+#: at the lower edge.
+LASH_LINE = False
+#: The barycentric slack of a second try for a ray from the middle of a ball that hits no ball
+#: triangle.
+WIDE_EDGE = 0.05
 #: The share of the middle angle across of the eye opening that the gaze takes: 0 gives
 #: parallel eyes that look straight ahead, 1 an eye in the middle of each opening.
 GAZE_ACROSS = 0.5
@@ -174,6 +205,26 @@ def eye_mask(rig, size):
         draw.polygon([(float(u), float(v)) for u, v in corners], fill=255)
     mask = mask.filter(ImageFilter.MaxFilter(2 * EYE_MARGIN + 1))
     return np.asarray(mask) > 0, len(faces)
+
+
+def parts(mask):
+    """Gives the connected parts of a mask (4 neighbors) as a label image, and their count."""
+    labels = np.zeros(mask.shape, np.int32)
+    count = 0
+    for y, x in zip(*np.nonzero(mask)):
+        if labels[y, x]:
+            continue
+        count += 1
+        stack = [(y, x)]
+        labels[y, x] = count
+        while stack:
+            cy, cx = stack.pop()
+            for ny, nx in ((cy + 1, cx), (cy - 1, cx), (cy, cx + 1), (cy, cx - 1)):
+                if 0 <= ny < mask.shape[0] and 0 <= nx < mask.shape[1] and mask[ny, nx] \
+                        and not labels[ny, nx]:
+                    labels[ny, nx] = count
+                    stack.append((ny, nx))
+    return labels, count
 
 
 def target_lab(target):
@@ -403,10 +454,228 @@ def paint_eyes(rig, image):
     return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
 
 
+def sample(image, points):
+    """Gives the bilinear colors of an image (float, H x W x 3) at texture points."""
+    x = np.clip(points[:, 0] * SIZE - 0.5, 0, SIZE - 1.001)
+    y = np.clip(points[:, 1] * SIZE - 0.5, 0, SIZE - 1.001)
+    x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+    fx, fy = (x - x0)[:, None], (y - y0)[:, None]
+    return ((1 - fx) * (1 - fy) * image[y0, x0] + fx * (1 - fy) * image[y0, x0 + 1]
+            + (1 - fx) * fy * image[y0 + 1, x0] + fx * fy * image[y0 + 1, x0 + 1])
+
+
+def turn_matrix(a, b):
+    """Gives the matrix of the shortest turn that takes the unit vector a to the unit vector b."""
+    axis = np.cross(a, b)
+    s = np.linalg.norm(axis)
+    if s < 1e-9:
+        return np.eye(3)
+    k = axis / s
+    K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    angle = np.arctan2(s, a @ b)
+    return np.eye(3) + np.sin(angle) * K + (1 - np.cos(angle)) * K @ K
+
+
+def angle_to(a, b):
+    """Gives the angle in degrees between each unit vector of a and the unit vector b."""
+    return np.degrees(np.arccos(np.clip(a @ b, -1, 1)))
+
+
+def mirror(d, axis):
+    """Gives the unit directions d mirrored about the vertical plane (the plane of +y) through the
+    unit direction axis."""
+    across = np.cross([0.0, 1.0, 0.0], axis)
+    across /= np.linalg.norm(across)
+    return d - 2 * (d @ across)[:, None] * across
+
+
+def ball_colors(rig, faces, c, directions, src):
+    """Gives the color of the image src on the ball at each direction from its middle c (a ray from
+    c to the ball triangles), and a mask of the directions that hit the ball."""
+    triangles, positions, points = rig[:3]
+    ball = positions[triangles[faces]]
+    _, k, bary = ray_hits(np.tile(c, (len(directions), 1)), directions, ball)
+    # A ray through a small crack between two ball triangles takes the nearer triangle.
+    miss = np.flatnonzero(k < 0)
+    _, k2, bary2 = ray_hits(np.tile(c, (len(miss), 1)), directions[miss], ball, WIDE_EDGE)
+    k[miss], bary[miss] = k2, bary2
+    found = k >= 0
+    tri = triangles[faces[k[found]]]
+    u, v = bary[found, 0], bary[found, 1]
+    uv = ((1 - u - v)[:, None] * points[tri[:, 0]] + u[:, None] * points[tri[:, 1]]
+          + v[:, None] * points[tri[:, 2]])
+    colors = np.zeros((len(directions), 3))
+    colors[found] = sample(src, uv)
+    return colors, found
+
+
+def front_cells(d):
+    """Gives the cell (row, column) of each unit direction d in the front picture of a ball: the
+    x and y of d over FRONT_GRID cells from -1 to 1."""
+    col = np.clip(((d[:, 0] + 1) / 2 * FRONT_GRID).astype(int), 0, FRONT_GRID - 1)
+    row = np.clip(((1 - d[:, 1]) / 2 * FRONT_GRID).astype(int), 0, FRONT_GRID - 1)
+    return row, col
+
+
+def center_irises(rig, image):
+    """Moves the iris of each eyeball, with its pupil and its painted light, as one decal to the
+    middle of the eye opening of the front view, and gives the new image. The source map paints
+    each iris at the inner corner of its opening, so in the front view the rabbit looked
+    cross-eyed. The map paints only a band of the ball around the opening, so a turn of the whole
+    ball would show the dark rest of the ball in the opening. The source map of the rabbit paints
+    no light on the eye, so no light moves. For each side, with c, r, and the
+    ball directions of the front view of `ball_frame()`:
+    - The opening: the cells of the front picture (`front_cells()`) that the front directions
+      fill. The middle of the opening is the mean x and y of the front directions, and the target
+      t is the front direction nearest to it.
+    - The core of the opening: the opening less EDGE_CELLS cells at its edge, where a dark lash
+      line can lie.
+    - The pupil p: the middle of the cells of the core with a texel of luma below PUPIL_LUMA in
+      front, after an erosion to the last cells. The thin lash line and the dark ring of the iris
+      go first, so the last cells lie in the middle of the pupil.
+    - The iris radius a: the angle from p of the first ring of 1 degree in which at least
+      IRIS_WHITE of the texels of the opening are white, plus IRIS_EDGE.
+    - The iris paint: the ball directions within a of p in the core.
+    - With R the turn that takes p to t, each ball texel at the direction d within a of t takes
+      the source color at R^-1 d when that point is iris paint (the moved iris). The source map
+      stops the iris at the inner corner of the opening, so a point outside the iris paint takes
+      the mirror of R^-1 d about the vertical plane through p, on the other side of the same iris.
+      When the mirror is no iris paint too, the texel keeps its color.
+    - Each other texel within a of p (the old place of the iris) in the opening, but a dark lash
+      line at its edge (LASH_LINE), takes the source color at its mirror about the vertical plane
+      through t: the white of the other side, with its shade under the lid. A mirror point in the
+      iris paint takes the median white of the opening. With no LASH_LINE, a mirror point within a
+      of p at the edge of the opening also takes the median white.
+    No texel takes a new color: each one is a copy of a texel of the same ball."""
+    triangles, points, eyes = rig[0], rig[2], rig[3]
+    out = np.asarray(image).astype(np.float64)
+    taken = np.zeros((SIZE, SIZE), bool)
+    texels = {}
+    for side in ('L', 'R'):
+        ys, xs, places = eye_texels(rig, np.array(eyes[side]['faces']))
+        if taken[ys, xs].sum() > EYE_OVERLAP * len(ys):
+            sys.exit('The texels of the two eyeballs overlap, so no iris can move alone.')
+        taken[ys, xs] = True
+        texels[side] = (ys, xs, places)
+    src = fill_around(out, taken)
+    for side in ('L', 'R'):
+        faces = np.array(eyes[side]['faces'])
+        c, r, shown = ball_frame(rig, faces)
+        ys, xs, places = texels[side]
+        d = places - c
+        d /= np.linalg.norm(d, axis=1)[:, None]
+        colors = src[ys, xs]
+        luma = colors @ [0.2126, 0.7152, 0.0722]
+        top, low = colors.max(axis=1), colors.min(axis=1)
+        white = (low > WHITE_LOW) & ((top - low) / np.maximum(top, 1) < WHITE_SAT)
+
+        # The opening, its core, and the front texel of each cell.
+        grid = np.zeros((FRONT_GRID, FRONT_GRID), bool)
+        grid[front_cells(shown)] = True
+        grid = np.asarray(Image.fromarray(grid).filter(ImageFilter.MaxFilter(3))
+                          .filter(ImageFilter.MinFilter(3))) > 0
+        core = np.asarray(Image.fromarray(grid).filter(ImageFilter.MinFilter(2 * EDGE_CELLS + 1))) > 0
+        row, col = front_cells(d)
+        front = d[:, 2] > 0
+        in_opening = front & grid[row, col]
+        order = np.lexsort((-d[:, 2], row * FRONT_GRID + col))
+        order = order[front[order]]
+        cell = (row * FRONT_GRID + col)[order]
+        first = order[np.r_[True, cell[1:] != cell[:-1]]]
+        dark = np.zeros((FRONT_GRID, FRONT_GRID), bool)
+        seen = np.zeros((FRONT_GRID, FRONT_GRID), bool)
+        seen[row[first], col[first]] = True
+        dark[row[first], col[first]] = luma[first] < PUPIL_LUMA
+        # A cell with no texel takes the dark of its neighbors.
+        near = np.asarray(Image.fromarray(dark).filter(ImageFilter.MaxFilter(3))) > 0
+        dark = (dark | (~seen & near)) & core
+        print(f'eye {side}: {int(seen[grid].mean() * 100)} % of the opening cells hold a texel, '
+              f'{int(dark.sum())} dark cells')
+        # The thin lash line and the dark ring of the iris go first in the erosion, so the last
+        # cells hold the middle of the pupil.
+        while True:
+            less = np.asarray(Image.fromarray(dark).filter(ImageFilter.MinFilter(3))) > 0
+            if not less.any():
+                break
+            dark = less
+        if not dark.any():
+            sys.exit(f'The eye {side} shows no pupil in the front view.')
+        labels, _ = parts(dark)
+        sizes = np.bincount(labels.ravel())[1:]
+        rows, cols = np.nonzero(labels == 1 + int(np.argmax(sizes)))
+        x = (cols.mean() + 0.5) / FRONT_GRID * 2 - 1
+        y = 1 - (rows.mean() + 0.5) / FRONT_GRID * 2
+        p = np.array([x, y, np.sqrt(max(0.0, 1 - x * x - y * y))])
+
+        # The iris radius: the first ring with white in the opening.
+        rings = angle_to(d, p)
+
+        def white_share(k):
+            band = (rings >= k) & (rings < k + 1) & in_opening
+            return white[band].mean() if band.any() else 0.0
+
+        shares = np.array([white_share(k) for k in range(IRIS_SEARCH)])
+        a = float(np.argmax(shares >= IRIS_WHITE)) + IRIS_EDGE
+        middle = shown[:, :2].mean(axis=0)
+        t = shown[np.argmin(np.linalg.norm(shown[:, :2] - middle, axis=1))]
+        turn = turn_matrix(p, t)
+
+        def is_iris(q, cells=core):
+            q_row, q_col = front_cells(q)
+            return (angle_to(q, p) < a) & (q[:, 2] > 0) & cells[q_row, q_col]
+
+        new = colors.copy()
+        target = np.flatnonzero(angle_to(d, t) < a)
+        source = d[target] @ turn
+        own = is_iris(source)
+        flip = ~own & is_iris(mirror(source, p))
+        source[flip] = mirror(source[flip], p)
+        use = own | flip
+        got, found = ball_colors(rig, faces, c, source[use], src)
+        written = np.zeros(len(d), bool)
+        written[target[use][found]] = True
+        new[target[use][found]] = got[found]
+        # The old place of the iris takes the white across, but a lash line at the edge of the
+        # opening stays.
+        sclera = np.median(colors[in_opening & white], axis=0)
+        lash = ~core[row, col] & (luma < PUPIL_LUMA) & LASH_LINE
+        left = np.flatnonzero((rings < a) & in_opening & ~written & ~lash)
+        across = mirror(d[left], t)
+        got, found = ball_colors(rig, faces, c, across, src)
+        in_old = is_iris(across, core if LASH_LINE else grid)
+        got[in_old | ~found] = sclera
+        new[left] = got
+        out[ys, xs] = new
+        unit = np.sqrt(len(shown) / np.pi) * RAY_STEP / r
+        shift = (t[:2] - p[:2]) / unit
+        print(f'iris {side}: pupil at x {p[0]:.3f}, y {p[1]:.3f} of the ball radius, opening middle '
+              f'at x {t[0]:.3f}, y {t[1]:.3f}; the iris of {a:.1f} degrees moves '
+              f'{angle_to(p[None], t)[0]:.1f} degrees ({shift[0]:+.2f}, {shift[1]:+.2f} opening '
+              f'radii in x, y); {int(flip.sum())} iris texels mirror, {len(left)} texels '
+              f'take the white across, {int(in_old.sum())} of them the median white '
+              f'{np.round(sclera).astype(int).tolist()}')
+    # The padding texels around the ball islands, and the thin gaps between two ball triangles,
+    # take the new colors of the ball next to them, so that no old iris shows on a seam.
+    mask = Image.new('L', (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(mask)
+    for tri in triangles:
+        draw.polygon([(float(x) * SIZE, float(y) * SIZE) for x, y in points[tri]], fill=255)
+    ball_faces = [f for side in ('L', 'R') for f in eyes[side]['faces']]
+    island = np.asarray(draw_triangles(triangles, points, ball_faces, SIZE)
+                        .filter(ImageFilter.MaxFilter(3))) > 0
+    padding = (~(np.asarray(mask) > 0) | island) & ~taken
+    filled = fill_around(out, taken)
+    out[padding] = filled[padding]
+    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+
+
 def write_color_map():
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = read_rig(RIG)
-    image = paint_eyes(rig, image)
+    if EYE_PAINT == 'cartoon':
+        image = paint_eyes(rig, image)
+    elif EYE_PAINT == 'centered':
+        image = center_irises(rig, image)
     lab = oklab(linear(np.asarray(image)))
     eyes, count = eye_mask(rig, SIZE)
     moved = move_texels(lab)
