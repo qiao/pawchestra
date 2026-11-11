@@ -797,7 +797,13 @@ candidate Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the 
 scales only to H of the dog of main. Its source has eyeballs with painted irises and lights, so
 the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs give a lower chair.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
-cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The paws of the fox turn about the
+cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
+candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
+Its source has eyeballs, so the faces of each ball take the face attribute `eye`, the finish
+`varnish`, and a blink lid. It has no chair, as the monkey of main: its bind takes the leg turns
+and the forward lean of the trunk of that monkey, so the feet stand under the hips. Its tail keeps
+the curl of the source and follows the root bone of the tail alone. Reason: a second tail bone bent
+the curl in the bind. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1110,7 +1116,8 @@ The painted brows keep half of their contrast to the fur (`soften_brows()`).
 The candidate wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
 with no change of a color (`tools/wolf-maps.py`). Reason: the look target of this body is its
 source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
-`tools/dog-maps.py`, for the same reason.
+`tools/dog-maps.py`, and the candidate monkey (`assets/models/monkey/tripo-hand/`) with
+`tools/monkey-maps.py`, for the same reason.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
