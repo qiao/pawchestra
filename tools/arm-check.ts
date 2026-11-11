@@ -468,10 +468,13 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   // the fault. The left elbow points down, so that the left arm does not read as a raised wing.
   ['oboist', { L: -11, R: -18 }],
   // The paws of the woodwinds of the tan fox face its tube (faceTube of pose/winds.ts). The left
-  // paw holds the flute from its front, with its fingers over the top, and faces it in the play,
-  // from accepted 2x paw crops. It turns -10° on its forearm below the flute.
-  ['flutist', { L: -122, R: 46 }],
-  ['trumpeter', { L: -23, R: -40 }],
+  // paw holds the flute from its front, with its fingers over the top, and the right paw lies
+  // behind the flute with its fingers over the top, on the hand rig of the Tripo fox, from
+  // accepted 2x paw crops.
+  ['flutist', { L: -98, R: -169 }],
+  // The Tripo monkey with the head bowed and the right paw over the valves, palm down, from
+  // accepted 2x paw crops.
+  ['trumpeter', { L: -43, R: 5 }],
   // The rhino with the rebuilt arms, the bind elbow bent forward, and the tuba elbows down and out
   // (from accepted 2x paw crops).
   ['tubist', { L: -80, R: -29 }],
