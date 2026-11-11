@@ -792,7 +792,12 @@ change of its map colors, and it scales only to H of the wolf of main. Reason: t
 this body is its source FBX in an FBX viewer. Its source has no eyeball, so the head faces of each
 painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
-steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The paws of the fox turn about the
+steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
+candidate Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the same rules, and it
+scales only to H of the dog of main. Its source has eyeballs with painted irises and lights, so
+the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs give a lower chair.
+Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
+cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1104,7 +1109,8 @@ Tripo map paints a tan bear with brown claws, and the hall view sets the target,
 The painted brows keep half of their contrast to the fur (`soften_brows()`).
 The candidate wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
 with no change of a color (`tools/wolf-maps.py`). Reason: the look target of this body is its
-source FBX.
+source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
+`tools/dog-maps.py`, for the same reason.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
