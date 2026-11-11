@@ -365,17 +365,19 @@ The rest of each family:
 - **Far mouth in a shared hold.** A long snout or a big head puts the mouth far in front of the
   shoulder joints, so the paws of a heavy body miss the valves of the trumpet, also at the smallest
   size. The shared trumpet hold takes the rule of the far mouth (`WindHold.farMouth`): the mouth
-  share of a body is the mean distance from the bind shoulder joints to the mouth, as a share of
-  the arm (`mouthShare()`). A body with a larger share than the accepted monkey (`FAR_MOUTH_FIT`)
-  bows the head in the play by `BOW_PER_SHARE` times the difference, up to `MAX_BOW`
-  (`headBow()`). The neck and the head share the bow as they share a look, the mouthpiece follows
-  the mouth, and the trumpet turns down with the head (`bowedPlay()`). Reason: a real player brings
-  the instrument to the mouth, the neck flexion follows the downward angle of the instrument, and
-  the trumpet keeps its angle to the face (winds 1.4, 2.1). A forward lean of the chest does not
-  help, because the head and the instrument move with the chest. The shared flute has no rule,
-  because a bow puts the left grip of a slim body past the accepted grip. The bow does not clear
-  the snout clips of the trumpet, and the heaviest bodies still miss the valves at `MAX_BOW`
-  (`TODO.md`).
+  share of a body is the mean distance from the bind shoulder joints to the mouth, as a share of the
+  arm (`mouthShare()`). A body with a larger share than `FAR_MOUTH_FIT` bows the head in the play by
+  `BOW_PER_SHARE` times the difference, up to `MAX_BOW` (`headBow()`). The neck and the head share
+  the bow as they share a look, the mouthpiece follows the mouth, and the trumpet turns down with
+  the head (`bowedPlay()`). Reason: a real player brings the instrument to the mouth, the neck
+  flexion follows the downward angle of the instrument, and the trumpet keeps its angle to the face
+  (winds 1.4, 2.1). A forward lean of the chest does not help, because the head and the instrument
+  move with the chest. The shared flute has no rule, because a bow puts the left grip of a slim body
+  past the accepted grip. The bow does not clear the snout clips of the trumpet, and the heaviest
+  bodies still miss the valves at `MAX_BOW` (`TODO.md`). The own trumpet hold of the monkey
+  (`MONKEY_TRUMPET`) takes the rule with an own fit: the big head of the Tripo monkey puts its mouth
+  farther than its arm from the shoulders, and with the head up, the straight arms stop short of the
+  valves.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
