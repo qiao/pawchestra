@@ -785,10 +785,6 @@ passes.
 - [ ] Tripo beagle cello size (4.6): the reach of the left arm fails the cello rule at each size,
       so the rule gives the clamp of a 1/10, and the 1/2 of the dog comes from the body scale by
       hand. Fit `CELLO_ELBOW` or the reach test to the hold of the dog (`DOG_HOLD`).
-- [ ] Hippo bassist bow: the bow arm reaches no part of the hair (`bowRangeOf()` gives its
-      fallback of 4 cm), so the bow stays still in the frog, tip, and crossing moments. The
-      pegbox stands 21.7 cm from the head, beside and in front of the snout, so the view from
-      az -90 shows it over the snout with no contact.
 - [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
       place from the body, `DOG_HOLD.fit`).
 - [ ] Violist grip turn: with the level viola, the left paw of the cat turns 49° from its
@@ -806,18 +802,18 @@ passes.
 - [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
       valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
       technique (`docs/reference/wind-technique.md` 2.1).
-- [ ] Tripo hippo: each forearm spreads about 85° over the moments of the bassist, so the frog
-      (42.4°, left), the lift (43.6°, right), and the lowering (-42.7°, left) stay within 45° by
-      only 1° to 3°. The pizzicato and the high notes on the neck have no twist measure yet.
-- [ ] Tripo hippo: the contrabass is small (0.65, 1.25 m), leans 36° to the left, and turns its
-      top plate 40° to the right, far from the slight turn of a real bassist. The short arms of
-      the source reach the strings only so. Show the user the hold (`reports/2026-11-11-hippo/`).
-- [ ] Tripo hippo: at the tip, the bow forearm lies on the front of the belly. Check the forearm
-      and the belly in close views from az60 in the app.
-- [ ] Tripo hippo: at rest, the right arm stands out level from the side with the bow tip down
-      (`restBow` of the old hold). Offer the user a lower rest of the bow arm.
-- [ ] Tripo hippo: the bow grip (`bowGrip` of `src/models/species.ts`) comes from the paw of the
-      old hippo. Check the stick in the new paw in 2x crops.
+- [ ] Tripo hippo: the upper bout of the upright contrabass reaches the shoulders, so the left
+      upper arm goes up to 6.6 cm into its back in the play (`pnpm pose-depth bassist`). Show the
+      user the hold (`reports/2026-11-11-hippo-play/`), and try a smaller bass if it shows.
+- [ ] Tripo hippo: in the pizzicato of `brahms-2` (108 s to 114 s), the right upper arm and the
+      right forearm each twist about 62°. A bow tip down keeps both near 47°, but the bow then
+      goes 17.6 cm into the belly.
+- [ ] Tripo hippo: at rest, the hanging right arm presses the side of the round belly (the paw
+      4.9 cm, the upper arm 6.6 cm), and the back of the contrabass goes up to 9 cm into the
+      belly. Check both in 2x crops.
+- [ ] Tripo hippo: the larger contrabass widens the footprint of the hippo, so its seats move up
+      to 22 cm, and the rows of `beethoven-1` and `boulanger-matin` move other players up to
+      1.2 m. Check the two hall views.
 - [ ] Tripo hippo: the gray-pink skin of the FBX reads as a light peach in the app light, and the
       snout casts a dark band over the mouth line. Ask the user before any change of the light.
 
@@ -887,12 +883,6 @@ scene of each demo has its seats and stage size with no overlap.
       touch to `bach-bwv1050` and `beethoven-9` (3.0 cm and 3.4 cm).
 - [ ] Hippo bassist: check the texture under the right arm from az150 on the T-pose body. The old
       mesh showed a light face there.
-- [ ] Hippo bassist: the left paw stops only up to 0.7 of the fingerboard, so the high notes take
-      lower places on the neck. Show the user a high passage of `bach-bwv1050`.
-- [ ] Hippo bassist: the bow plays only a part of the hair, so the strokes are short. Offer the user
-      longer arms or a smaller contrabass.
-- [ ] Hippo bassist: the top edge of the upper bout touches the chest under the chin, and a few
-      teeth of the skin show over it in a close view from the front.
 - [ ] Held instruments over 2 cm in the body: the pig hornist, the rhino tubist, the red fox, the
       rabbit, and the cat. Fit each hold, or accept the depth with its reason.
 - [ ] Merge gate: it runs no clearance sweep. Add the pair "instrument in body" of each held role to
