@@ -788,6 +788,12 @@ warm white (`far_tone()`), with the values of a dark iris of `far_eyes()`. Reaso
 each eye is a few pixels across, and the bright white read dim. Its source paints white only at the
 outer corner, so the round iris of `far_eyes()` does not apply. Its arm, leg, and trunk girths and
 its paws are those of the main polar bear, and its head keeps the round form of the sheet. The
+candidate Tripo wolf (`assets/models/wolf/tripo-hand/`) has no point edit of its form and no
+change of its map colors, and it scales only to H of the wolf of main. Reason: the look target of
+this body is its source FBX in an FBX viewer. Its source has no eyeball, so the head faces of each
+painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
+is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
+steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
 faces of the fox and the rabbit are baby faces: upper lids that do not cover the iris, rounder
 cheeks, and on the fox a shorter muzzle. Reason:
 lids over the top of the iris made the red fox read sleepy. The paws of the fox turn about the
@@ -1103,6 +1109,9 @@ The candidate polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map th
 of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
 Tripo map paints a tan bear with brown claws, and the hall view sets the target, as for the fox.
 The painted brows keep half of their contrast to the fur (`soften_brows()`).
+The candidate wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
+with no change of a color (`tools/wolf-maps.py`). Reason: the look target of this body is its
+source FBX.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
