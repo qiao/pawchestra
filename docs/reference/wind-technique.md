@@ -424,15 +424,16 @@ The app does not follow these facts:
 
 The app follows these facts:
 
-- **The flute (2.4, `FOX_FLUTE`).** The head turns to the left, and the shoulders stay square and
-  low. The flute lies about square to the face and slopes down to the right (`FOX_FLUTE_BACK`,
-  `play`). The left paw holds the flute near the lip plate from its front, and the right paw lies
-  behind the flute and a little below it, so that the fingers of both paws curl over the top onto
-  the keys (`aimSide`, `gripCurl`). At rest, the flute stands on the right thigh in the right paw
-  (`rest`, `restShift`, `gripAround`). A standing fox lets the free left arm hang down along the
-  side with a small bend of the elbow (`FOX_HANG`). The embouchure hole sits at the lower lip, under
-  the long muzzle, and the lip plate presses the lips and the chin about 0.5 cm, as a flutist rests
-  the plate against the chin (`lipShift`).
+- **The flute (2.4, `FOX_FLUTE`).** The head turns to the left, and the shoulders stay low. The left
+  shoulder turns forward a little (`reachL`), as the shoulder blade slides forward when the left arm
+  reaches across the body. The flute lies about square to the face and slopes down to the right
+  (`FOX_FLUTE_BACK`, `play`). The left paw holds the flute near the lip plate from its front
+  (`gripShiftL`), and the right paw lies behind the flute and a little below it, so that the fingers
+  of both paws curl over the top onto the keys (`aimSide`, `gripCurl`). At rest, the flute stands on
+  the right thigh in the right paw (`rest`, `restShift`, `gripAround`). A standing fox lets the free
+  left arm hang down along the side with a small bend of the elbow (`FOX_HANG`). The embouchure hole
+  sits at the lower lip, under the long muzzle, and the lip plate presses the lips and the chin
+  about 0.5 cm, as a flutist rests the plate against the chin (`lipShift`).
 - **The shared flute and clarinet (2.4, 3, `WIND_HOLDS`).** Each recast body plays the arm values
   of the tan fox or the wolf, with the lip plate or the mouthpiece at its mouth. At rest, the
   right paw holds the instrument nearly upright at the right side, as a flutist rests the flute

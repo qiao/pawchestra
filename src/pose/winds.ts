@@ -559,25 +559,29 @@ export const WIND_HOLDS = {
  * below the mouth of the body and 0.125 H back under the long muzzle (`lipShift`), and the lip
  * plate presses the lips and the chin about 0.5 cm, as a real flutist rests the lip plate against
  * the chin under the lower lip (`docs/reference/wind-technique.md` 2.4). Further back, the plate
- * goes deeper into the face before the hole reaches the lip. The shoulders stay square and low,
- * with no forward turn of the right shoulder. The left elbow points down and out, and the right
- * elbow down, out, and a little forward, as a seated flutist lets the arms hang
+ * goes deeper into the face before the hole reaches the lip. The shoulders stay low, with no
+ * forward turn of the right shoulder. The left shoulder bone turns 20° forward (`reachL`), as the
+ * shoulder blade of a real player slides forward when the left arm reaches across the body: with a
+ * square left shoulder, the root of the left upper arm of the Tripo fox goes 2.4 cm into the
+ * shoulder in each play sample, and with 10°, 1.6 cm. The left elbow points down and out, and the
+ * right elbow down, out, and a little forward, as a seated flutist lets the arms hang
  * (`docs/reference/wind-technique.md` 2.4).
  *
  * Each palm faces the flute, and the fingers curl over it (`faceTube`, `gripCurl`), as a real
  * flutist curves the fingers over the keys (`docs/reference/wind-technique.md` 2.4). The left paw
  * holds the flute near the lip plate from its front and a little below, with the back of the paw to
- * the audience: its grip moves from the grip of the instrument, 2.5 cm below the axis, to the front
- * of the tube (`gripShiftL`), and the paw points half up across the flute (`aimSide`), so that its
- * fingers come over the top onto the keys. It also faces the flute in the play, although it leaves
- * its grip at rest. The right paw holds the body of the flute as the right hand of a flutist: its
- * middle lies behind the flute and a little below, its palm faces the flute, and it points up past
- * the back of the flute (`aimSide` below 0), so that the curled fingers come over the top onto the
- * keys, and the thumb side lies under the flute (`gripShiftR`). With the paw below the flute and
- * the side aim to the front, the flute lies in the palm as in a left hand, and the paw turns 180°
- * on its forearm in the lift and the lowering. With the right elbow out to the side, the paw swing
- * reaches 45°, and with the elbow a little back, the right upper arm goes 1.5 cm into the body in
- * the moves.
+ * the audience: its grip moves from the grip of the instrument, 2.5 cm below the axis, 0.12 H
+ * across the tube to its front (`gripShiftL`): with 0.04 H, the middle of the paw lies below the
+ * flute, 75° from its front, and the finger tips stand 1.3 cm off. The paw points half up across
+ * the flute (`aimSide`), so that its fingers come over the top onto the keys. It also faces the
+ * flute in the play, although it leaves its grip at rest. The right paw holds the body of the flute
+ * as the right hand of a flutist: its middle lies behind the flute and a little below, its palm
+ * faces the flute, and it points up past the back of the flute (`aimSide` below 0), so that the
+ * curled fingers come over the top onto the keys, and the thumb side lies under the flute
+ * (`gripShiftR`). With the paw below the flute and the side aim to the front, the flute lies in the
+ * palm as in a left hand, and the paw turns 180° on its forearm in the lift and the lowering. With
+ * the right elbow out to the side, the paw swing reaches 45°, and with the elbow a little back, the
+ * right upper arm goes 1.5 cm into the body in the moves.
  *
  * In the rest pose, the flute stands nearly upright at the right side with the foot joint down on
  * the top of the right thigh, as a real flutist rests it vertically on the right leg with the right
@@ -626,6 +630,7 @@ export const WIND_HOLDS = {
 const FOX_FLUTE = {
   ...WOODWIND,
   headTurn: FOX_HEAD_TURN * MathUtils.DEG2RAD,
+  reachL: 20 * MathUtils.DEG2RAD,
   lipShift: [0, -0.1, 0.125],
   play: fluteTurn(FOX_HEAD_TURN - FOX_FLUTE_BACK, 8),
   poleL: [-1, -1, -0.3],
@@ -647,7 +652,7 @@ const FOX_FLUTE = {
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.5, -0.8],
-  gripShiftL: [-0.04, 0, 0.04],
+  gripShiftL: [-0.04, 0, 0.12],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.376, 0.1, -0.067],
   gripCurl: curls(90, 85),
