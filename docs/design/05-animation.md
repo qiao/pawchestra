@@ -413,6 +413,11 @@ The rest of each family:
   `SOFT_REACH_UNTIL` of the move (`softReach()`). Reason: the roll toward the elbow of the moving
   arm passed the far side of the stick and flicked the hippo paw by 50° in 12 ms, and the rest bow
   path went out of reach, so the arm went straight and the elbow stopped in one step.
+- In the lift and the lowering, the roll of the bow hand toward the elbow has a soft limit
+  around the mix of the rolls (`ROLL_SPREAD`), and it fades out near the play, so that the roll
+  meets the roll of the play. Reason: the hard limit stopped and started the roll, and the play
+  roll of a pizzicato hand lies at its limit, so the bow paw of the dog turned at up to 4,350°/s
+  at the start of a lowering.
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
 - **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of

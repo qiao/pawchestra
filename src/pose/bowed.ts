@@ -766,7 +766,8 @@ const ROLL_PASSES = 3;
 
 /**
  * The largest difference between the roll of the hand around a moving bow and the mix of the
- * rolls of the two holds, in radians.
+ * rolls of the two holds, in radians. In the lift and the lowering, it is the scale of a soft
+ * limit ({@link holdArm}).
  */
 const ROLL_SPREAD = 30 * MathUtils.DEG2RAD;
 const pole = new Vector3();
@@ -1618,7 +1619,13 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
       held.grip.lerpVectors(restBow.grip, held.grip, weight);
       const mixed = restRoll + (playRoll - restRoll) * weight;
       const own = rollToward(rig, held, aim);
-      angle = MathUtils.clamp(own, mixed - ROLL_SPREAD, mixed + ROLL_SPREAD);
+      // In the lift and the lowering, the limit is soft, and the roll toward the elbow fades out
+      // near the play, so that the roll meets the roll of the play at the weight 1. A hard limit
+      // turned the bow paw of the dog at up to 4,350°/s at the start of a lowering.
+      angle =
+        weight < 1
+          ? mixed + (1 - weight ** 3) * ROLL_SPREAD * Math.tanh((own - mixed) / ROLL_SPREAD)
+          : MathUtils.clamp(own, mixed - ROLL_SPREAD, mixed + ROLL_SPREAD);
       gripHand(rig, held, angle, heldHand);
     }
     aim.copy(
