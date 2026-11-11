@@ -209,6 +209,13 @@ export interface BowedHold {
    */
   readonly headDrop: number;
   /**
+   * The turn of the head to the left around the neck while the player plays, in radians, as a
+   * violinist turns the head to the left over the chin rest (`docs/reference/string-technique.md`,
+   * section 1.10). A long snout then points over the neck of the violin and away from the bow paw
+   * at the frog. 0 keeps the head square to the chest.
+   */
+  readonly headTurn: number;
+  /**
    * The place of the left fingers on the target `fingerboard` in the rest pose: 0 at the nut, 1
    * at the end of the fingerboard.
    */
@@ -466,6 +473,7 @@ const CHIN_HOLD = {
   frogHair: 0,
   lean: 0,
   headDrop: 0,
+  headTurn: 0,
   restPlace: 0.4,
   pluckPlace: 0.9,
   pluckSide: 0,
@@ -544,6 +552,7 @@ const FLOOR_HOLD = {
   frogHair: 0,
   lean: 10 * MathUtils.DEG2RAD,
   headDrop: 0,
+  headTurn: 0,
   restPlace: 0.4,
   pluckPlace: 0.3,
   pluckSide: 0,

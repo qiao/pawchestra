@@ -407,6 +407,7 @@ function poseAnimal(
       body.lean = hold.lean * weight;
       // A violinist rests the jaw on the chin rest while it plays (`BowedHold.headDrop`).
       body.lift = -hold.headDrop * weight;
+      body.headTurn = hold.headTurn * weight;
       writeBody(pose, player, scratch);
       bowStateAt(note.strokes, note.starts, noteTime, bow);
       pose.pawBendR = hold.pawBendR;
