@@ -129,7 +129,7 @@ dark brows, dark brown socks up to the knees and over the forearms from 0.28 of 
 elbows, dark ear tips, a cream bib, cheeks, muzzle, and tail tip, and a dark brown nose.
 
 **Eyes.** The eyes keep the eye paint of the source map: an amber iris with a dark ring, a black
-pupil, a painted light, white, and a dark lash line. The source map paints each iris at the inner
+pupil, white, and a dark lash line. The source map paints each iris at the inner
 corner of its opening, so in the front view the fox looked cross-eyed. `center_irises()` of
 `tools/fox-maps.py` moves each iris, with its pupil and its light, as one decal on the ball to the
 middle of the opening of the front view:
@@ -155,21 +155,24 @@ foxes read as startled or as a side glance. `far_eyes()` of the tool runs after 
 - Each texel of the new iris takes the mix of the two clean directions on its sides, so the pupil
   lies in the middle of a round iris. The iris radius is 1.2 times the source (`IRIS_SCALE`, 35.4
   degrees), and the pupil 0.55 of it (`PUPIL_RATIO`). The middle turns 5 degrees out
-  (`FAR_GAZE_OUT`), because in the play view a white crescent showed at the outer corner.
+  (`FAR_GAZE_OUT`), because in the play view a white crescent showed at the outer corner. It also
+  turns 5 degrees up (`FAR_GAZE_UP`), so that the top of the iris lies under the upper lid and
+  the white shows only at the sides and a little below. With white above the iris, the fox read
+  as scared in the test page on a phone. At 8 degrees up, too much white showed below.
 - In Oklab, the white takes 0.85 of its lightness and a warm step (`SCLERA_SHADE`, `SCLERA_WARM`),
   and the iris takes 0.72 of its lightness, and 0.65 more in its outer ring (`IRIS_SHADE`,
   `RING_SHADE`), so the amber is darker than the orange fur.
 
 Each new texel is a copy of a texel of the same ball, or a darker or warmer tone of it. Close up,
-the eyes keep the amber iris, the dark ring, and the lash line of the source. The source has no
-light texel in the pupil: within 20 degrees of each pupil middle no texel has a luma above 200. So
-the light that shows in each eye in the app comes from the finish `varnish`.
+the eyes keep the amber iris, the dark ring, and the lash line of the source. The source paints
+no light in the eyes: within 20 degrees of each pupil middle no texel has a luma above 200.
 
 `EYE_PAINT = 'cartoon'` of the tool paints the cartoon eye of the sheet again (`paint_eyes()`).
-The eyeballs take the finish `varnish` and no eye light (`eyeFinish` of the fox entry of
-`tools/studio-body.ts`), so the painted light is the only light of each eye. With the finish
-`eye`, the eye light gave each eye a second light. With the finish `matte`, the broad sheen of the
-rough finish turned the black pupils gray.
+The eyeballs take the finish `eye` and the eye light of the app (no `eyeFinish` in the fox entry
+of `tools/studio-body.ts`), as on the rabbit. The eye light gives one small light in the upper part
+of each eye, at the same place in both eyes. With the finish `varnish` and no eye light, the eyes
+had no clear light and read as a dead stare. With the finish `matte`, the broad sheen of the rough
+finish turned the black pupils gray.
 
 **Cute face.** The face is a baby face, as a moderate first step: open lids, a muzzle 0.9 times as
 long, and rounder cheeks ("Cheeks", "Shorter muzzle", and "Lids" below). The eyes keep the size of
@@ -192,7 +195,7 @@ source: no cut, no split from the trunk, and no stretch.
 | Mesh | One object `fox`, with the shape key `bind_belly`: 3,886 vertices and 4,194 faces (3,402 quads and 792 triangles, 7,596 triangles), flat faces, and the surface of `sa.add_surface()`. 26 faces are gloss (the nose). The 136 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/fox-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.073302 (the shoulder joints at 1.7653 m for each unit, so that H is 0.380 m, near the shown head of the fox of main, 0.382 m), `crease` 55 |
-| Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light ("Eyes" above), a round iris for the far view ("Far view" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh, with the finish `eye` and the eye light ("Eyes" above), a round iris for the far view ("Far view" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out
 assets/models/fox/tripo-hand/fox.rig.glb`). License of both files: CC BY-NC 4.0, as the FBX file.
@@ -345,8 +348,8 @@ median Oklab L, C, and h of the fur in the hall view (a fixed camera at the firs
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox-color.webp` | 117,030 bytes | `9e0510825b8d2b1162a60883c53400c856e7bf1bcb294bf7f06c6702f17b2f50` |
-| `tripo-hand/fox-tan-color.webp` | 109,094 bytes | `3395ac56f55880311764b131d7bf8e6940f718f1ffd46baebcd32fed18e19bc7` |
+| `tripo-hand/fox-color.webp` | 118,048 bytes | `4a55cd1d91f296ae5bb1301f59e144b3f971dfd785b6ece5226eb9afe5729cb9` |
+| `tripo-hand/fox-tan-color.webp` | 108,060 bytes | `481692f56504bd590ad41e955feb66e72d708acbefbd0341148d07d8ddab7f31` |
 
 **Normal map.** The same run writes `fox-normal.webp` from the normal map of the FBX: each x, y tilt
 limited to 0.2 (0.87 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red and
