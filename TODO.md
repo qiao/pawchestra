@@ -86,6 +86,14 @@ passes.
       longer slide reach or a lower slide puts it into the desk.
 - [ ] Trumpeter monkey: `pnpm hold-fit trumpeter` stops, because the body bones of the Tripo monkey
       have 6 open loops, and the sweep expects 5.
+- [ ] Conductor bear: the quiet place of the left hand and the cue point stay at the height of the
+      head, as `mockup.png` and design 5.4 give them. Check them against a real conductor, whose
+      gestures stay below the chin (`conductor-technique.md`, section 1).
+- [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
+      relaxed arms and the turned rest baton. Check the right wrist in a 2x crop.
+- [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
+      in the view from the front right (The Ember Crown 172 s, Mozart K. 525 30.9 s). The sweep
+      finds no depth, so measure the gap of the baton to the head.
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
 - [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
