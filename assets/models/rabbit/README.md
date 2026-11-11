@@ -267,9 +267,9 @@ the front view:
   texel is a copy of a texel of the same ball.
 
 The source map paints no light on the eyes. `EYE_PAINT = 'cartoon'` of the tool paints the
-cartoon eye of the sheet again (`paint_eyes()`). The eyeballs take the finish `varnish` and no eye
-light (`eyeFinish` of the rabbit entry of `tools/studio-body.ts`), as the eyes of the fox, so each
-eye shows only the sheen of the finish.
+cartoon eye of the sheet again (`paint_eyes()`). The eyeballs keep the `eye` finish and the eye
+light of the app, because the source paints no light. The eye light gives the one light of each
+eye. The fox takes `varnish` and no eye light, because its source paints a light.
 
 **Cute face.** The face is a baby face, as a moderate first step: open lids and rounder cheeks
 ("Cheeks" and "Lids" below). The muzzle keeps its length. The eyes keep the size from before the
@@ -293,7 +293,7 @@ longer for the seat height of the rabbit of main ("Longer shins" below).
 | Mesh | One object `rabbit`, with the shape key `bind_belly` ("Belly" below): 3,760 vertices and 3,899 faces (3,361 quads and 538 triangles, 7,260 triangles), flat faces, and the surface of `sa.add_surface()`. 18 faces are gloss (the pink nose). The 148 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.861111 (the shoulder joints at 1.474 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 55, `backRoom` 0.01 |
-| Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light ("Eyes" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light ("Eyes" above), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend
 --out assets/models/rabbit/tripo-hand/rabbit.rig.glb`). License of both files: CC BY-NC 4.0, as the
