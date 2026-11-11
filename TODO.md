@@ -393,8 +393,8 @@ passes.
       hides in it. Ask the user for the form of the rest hold, such as the bow on the strings.
 - [ ] Hippo bassist: in the lowering after a pizzicato, the bow turns 79° in the paw. Give the move
       a bow path that keeps the forearm near 45° (`BowVia` of `pose/bowed.ts`).
-- [ ] Wolf clarinetist: at rest, the bell of the clarinet rests on nothing. Offer the user the bell
-      on the right knee and the left paw on the left thigh (`restFreeL`).
+- [ ] Wolf clarinetist: at rest, the right paw holds the clarinet upright at the right side, and the
+      bell rests on nothing. Offer the user the bell on the right knee.
 - [ ] Wolf clarinetist: the clarinet turns up to 14° in the closed left paw over a lift. Read the 2x
       crops of the lift, and scan the left rest elbow if it shows.
 - [ ] Badger bass drummer: from the front, the drum hides the right arm and the beater, as a real
