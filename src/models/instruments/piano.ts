@@ -152,53 +152,190 @@ export const PIANO_PEDALS = {
 const BLACK_KEYS: ReadonlySet<number> = new Set([1, 3, 6, 8, 10]);
 
 /**
- * The outline of the rim around the point (-0.1, -1.0), counterclockwise from +y: the front edge,
- * the curved right side, the tail, and the straight left side.
+ * The plan of the case of a concert grand (design 4.6), in the piano axes: the front edge behind
+ * the keys, a short straight treble side at +x, the bent side that swings in and out in an S
+ * curve, the round tail, and the long straight bass side at -x. A smooth curve through the points
+ * of the bent side and the tail gives the rim ({@link CASE_OUTLINE}). The plan keeps the box of
+ * the case: 1.4 m wide and 2.0 m long from the front of the keys.
  */
+const CASE_PLAN = {
+  /** The z of the front edge of the case, behind the keys. */
+  front: -0.17,
+  /** The x of the bass side and of the straight treble side. */
+  side: PIANO.caseWidth / 2,
+  /** The z of the end of the straight part of the treble side, where the bent side starts. */
+  trebleEnd: -0.42,
+  /** The z of the end of the straight part of the bass side, where the tail starts. */
+  bassEnd: -1.5,
+  /** The points of the bent side and the tail, from the treble side to the bass side. */
+  curve: [
+    [0.7, -0.42],
+    [0.66, -0.62],
+    [0.55, -0.82],
+    [0.42, -1.02],
+    [0.33, -1.22],
+    [0.27, -1.42],
+    [0.22, -1.62],
+    [0.15, -1.8],
+    [0.02, -1.93],
+    [-0.2, -2.0],
+    [-0.44, -1.97],
+    [-0.61, -1.85],
+    [-0.69, -1.68],
+    [-0.7, -1.5],
+  ],
+  /** The steps of the curve between two points of {@link CASE_PLAN.curve}. */
+  steps: 3,
+} as const;
+
+/** The point of the piano axes around which the outlines of the case are star-shaped. */
 const CASE_CENTER: OutlinePoint = [-0.1, -1.0];
 
 /**
- * The inside of the open case (design 4.5, 4.6), as the piano of `mockup.png`: a dark well with
- * the soundboard at its bottom, the iron plate at the keys, and the strings above them. A gold
- * plate on the top of the rim reads as a flat gold tray. The depths are below the top of the rim,
- * in meters.
+ * Calculates the points of a smooth curve through points (a uniform Catmull-Rom curve).
+ *
+ * @param points The points that the curve passes through, at least 2.
+ * @param before The point before the first point, which sets the direction at the first point.
+ * @param after The point after the last point, which sets the direction at the last point.
+ * @param steps The steps between two points.
+ * @returns The points of the curve, from the first point to the last point.
+ */
+function smoothCurve(
+  points: readonly OutlinePoint[],
+  before: OutlinePoint,
+  after: OutlinePoint,
+  steps: number,
+): OutlinePoint[] {
+  const all = [before, ...points, after];
+  const out: OutlinePoint[] = [];
+  for (let i = 1; i + 2 < all.length; i++) {
+    const p0 = all[i - 1] ?? [0, 0];
+    const p1 = all[i] ?? [0, 0];
+    const p2 = all[i + 1] ?? [0, 0];
+    const p3 = all[i + 2] ?? [0, 0];
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps;
+      const at = (k: 0 | 1): number =>
+        0.5 *
+        (2 * p1[k] +
+          (p2[k] - p0[k]) * t +
+          (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t * t +
+          (3 * p1[k] - p0[k] - 3 * p2[k] + p3[k]) * t * t * t);
+      out.push([at(0), at(1)]);
+    }
+  }
+  const last = points.at(-1);
+  if (last) {
+    out.push(last);
+  }
+  return out;
+}
+
+/**
+ * The outline of the rim around {@link CASE_CENTER}, counterclockwise from +y: the front corner
+ * at the treble side, the straight treble side, the bent side, the tail, the straight bass side,
+ * and the front corner at the bass side. The last edge is the front edge.
+ */
+const CASE_OUTLINE: readonly OutlinePoint[] = (() => {
+  const plan = CASE_PLAN;
+  // The points before and after the curve lie on the straight sides, a short step from its ends,
+  // so the curve meets each side with no kink and with even steps.
+  const curve = smoothCurve(
+    plan.curve,
+    [plan.side, plan.trebleEnd + 0.2],
+    [-plan.side, plan.bassEnd + 0.2],
+    plan.steps,
+  );
+  const points: OutlinePoint[] = [[plan.side, plan.front], ...curve, [-plan.side, plan.front]];
+  return points.map(([x, z]): OutlinePoint => [x - CASE_CENTER[0], z - CASE_CENTER[1]]);
+})();
+
+/**
+ * Moves each edge of a closed outline inward by a distance, and gives the outline of the new
+ * edges.
+ *
+ * @param outline The outline, in the order of {@link CASE_OUTLINE}.
+ * @param distance The distance of each edge but the last one.
+ * @param lastDistance The distance of the last edge: the front edge of a case outline.
+ * @returns The inner outline, with one point for each point of the outline.
+ */
+function insetOutline(
+  outline: readonly OutlinePoint[],
+  distance: number,
+  lastDistance: number,
+): OutlinePoint[] {
+  const n = outline.length;
+  const edge = (i: number) => {
+    const [x0, z0] = outline[(i + n) % n] ?? [0, 0];
+    const [x1, z1] = outline[(i + 1 + n) % n] ?? [0, 0];
+    const length = Math.hypot(x1 - x0, z1 - z0);
+    const normal: OutlinePoint = [(z1 - z0) / length, -(x1 - x0) / length];
+    return { normal, distance: (i + n) % n === n - 1 ? lastDistance : distance };
+  };
+  return outline.map(([x, z], i): OutlinePoint => {
+    // The move of the point lies at the distance of each of its two edges from the edge.
+    const a = edge(i - 1);
+    const b = edge(i);
+    const det = a.normal[0] * b.normal[1] - a.normal[1] * b.normal[0];
+    if (Math.abs(det) < 1e-6) {
+      return [x + a.normal[0] * a.distance, z + a.normal[1] * a.distance];
+    }
+    const dx = (a.distance * b.normal[1] - b.distance * a.normal[1]) / det;
+    const dz = (a.normal[0] * b.distance - b.normal[0] * a.distance) / det;
+    return [x + dx, z + dz];
+  });
+}
+
+/**
+ * The rim and the inside of the open case (design 4.5, 4.6), as a concert grand: a deep rim of
+ * black lacquer, a spruce soundboard at the bottom of the well, a gold iron plate over it with a
+ * row of round holes, the tuning pins on the front of the plate, the strings from the tuning pins
+ * to the tail, and the row of dampers behind the music desk. The bass strings cross over the
+ * other strings toward the tail, as the overstrung bass of a real grand. The depths are below the
+ * top of the rim, and the sizes are in meters.
  */
 export const PIANO_INSIDE = {
-  /** The scale of the inner outline of the rim wall, around the center of the rim. */
-  scale: 0.92,
+  /** The thickness of the rim wall. */
+  rim: 0.05,
   /** The depth of the top of the soundboard. */
   soundboardDepth: 0.14,
   /** The depth of the top of the iron plate. */
   plateDepth: 0.08,
-  /** The length of the iron plate from the front of the inside toward the tail. */
-  plateLength: 0.22,
-  /** The depth of the strings. */
+  /** The thickness of the iron plate. */
+  plateThickness: 0.012,
+  /** The band of the soundboard between the rim wall and the plate. */
+  plateInset: 0.035,
+  /** The z of the back of the pin block under the front of the plate. */
+  pinBlockBack: -0.3,
+  /** The z of each row of tuning pins, the pins in each row, and the size of a pin. */
+  pins: { rows: [-0.205, -0.235], perRow: 40, width: 0.007, height: 0.018 },
+  /** The depth of the strings. The bass strings lie higher, over the other strings. */
   stringDepth: 0.06,
-  /** The number of strings. Each one stands for a group of strings of the real piano. */
-  strings: 16,
-  /** The width of a string. */
-  stringWidth: 0.016,
-  /** The gap from each end of a string to the rim wall. */
-  stringGap: 0.06,
+  /** The z of the front end of the strings, behind the tuning pins. */
+  stringFront: -0.26,
+  /**
+   * The strings: each one stands for a group of strings of the real piano. Each group has its x
+   * at the front from `from` to `to`, its width, and its angle to -z toward +x at the first and
+   * the last string, in degrees.
+   */
+  bass: { count: 20, from: -0.6, to: -0.36, width: 0.007, lift: 0.012, angle: [17, 11] },
+  treble: { count: 48, from: -0.3, to: 0.6, width: 0.004, angle: [-3, -3] },
+  /** The gap from the back end of a string to the edge of the plate: the hitch pins. */
+  hitchGap: 0.04,
+  /**
+   * The dampers: a block on every second string, at `along` behind the front end of the string,
+   * up to the front x of the highest damper. The highest keys of a real grand have no damper.
+   */
+  dampers: { along: 0.15, width: 0.018, height: 0.028, depth: 0.03, highestX: 0.36 },
+  /** The round holes in the plate: their x, their z, and their radius. */
+  holes: { x: [-0.44, -0.22, 0, 0.22], z: -0.58, radius: 0.035 },
 } as const;
 
-const CASE_OUTLINE: readonly OutlinePoint[] = (
-  [
-    [0.7, -0.17],
-    [0.7, -0.55],
-    [0.62, -0.85],
-    [0.45, -1.1],
-    [0.32, -1.35],
-    [0.26, -1.6],
-    [0.18, -1.82],
-    [0.02, -1.98],
-    [-0.25, -2.0],
-    [-0.5, -1.93],
-    [-0.66, -1.75],
-    [-0.7, -1.5],
-    [-0.7, -0.17],
-  ] as const
-).map(([x, z]): OutlinePoint => [x - CASE_CENTER[0], z - CASE_CENTER[1]]);
+/** The inner outline of the rim wall, around {@link CASE_CENTER}. It is open at the front. */
+const RIM_INNER = insetOutline(CASE_OUTLINE, PIANO_INSIDE.rim, 0);
+
+/** The outline of the iron plate, around {@link CASE_CENTER}. Its front is at the front edge. */
+const PLATE_OUTLINE = insetOutline(RIM_INNER, PIANO_INSIDE.plateInset, 0);
 
 /**
  * Tells whether a MIDI key is a black key.
@@ -267,61 +404,187 @@ function unscaledKeyPosition(key: number): Vec3 {
 }
 
 /**
- * Makes the wall of the rim around the open inside: the outer faces, the inner faces, and the
- * top edge, between the outline and the outline scaled around the origin.
+ * Makes the wall of the rim around the open inside, open at the front edge: the outer faces, the
+ * inner faces, the top edge, and the end face of each arm at the front.
  *
- * @param outline The outline, counterclockwise when seen from +y, star-shaped around the origin.
- * @param scale The scale of the inner outline.
+ * @param outer The outline of the rim, in the order of {@link CASE_OUTLINE}.
+ * @param inner The inner outline, with one point for each point of the outline.
  * @param bottom The height of the bottom of the wall.
  * @param top The height of the top of the wall.
- * @returns 6 triangles for each point of the outline.
+ * @returns 6 triangles for each edge but the front edge, and 4 for the ends.
  */
 function rimWall(
-  outline: readonly OutlinePoint[],
-  scale: number,
+  outer: readonly OutlinePoint[],
+  inner: readonly OutlinePoint[],
   bottom: number,
   top: number,
 ): number[] {
   const out: number[] = [];
+  const corner = (points: readonly OutlinePoint[], i: number, y: number): Vec3 => {
+    const [x, z] = points[i] ?? [0, 0];
+    return [x, y, z];
+  };
+  const last = outer.length - 1;
+  for (let i = 0; i < last; i++) {
+    const [o0, o1, i0, i1] = [
+      (y: number) => corner(outer, i, y),
+      (y: number) => corner(outer, i + 1, y),
+      (y: number) => corner(inner, i, y),
+      (y: number) => corner(inner, i + 1, y),
+    ];
+    out.push(...quad(o0(bottom), o1(bottom), o1(top), o0(top)));
+    out.push(...quad(i1(bottom), i0(bottom), i0(top), i1(top)));
+    out.push(...quad(i0(top), o0(top), o1(top), i1(top)));
+  }
+  out.push(
+    ...quad(
+      corner(inner, 0, bottom),
+      corner(outer, 0, bottom),
+      corner(outer, 0, top),
+      corner(inner, 0, top),
+    ),
+  );
+  out.push(
+    ...quad(
+      corner(outer, last, bottom),
+      corner(inner, last, bottom),
+      corner(inner, last, top),
+      corner(outer, last, top),
+    ),
+  );
+  return out;
+}
+
+/**
+ * Finds how far a ray goes inside an outline before it leaves it.
+ *
+ * @param outline The outline.
+ * @param from The start of the ray, inside the outline.
+ * @param direction The unit direction of the ray.
+ * @returns The distance to the nearest edge of the outline along the ray, or 0 if no edge
+ *   crosses the ray.
+ */
+function exitDistance(
+  outline: readonly OutlinePoint[],
+  from: OutlinePoint,
+  direction: OutlinePoint,
+): number {
+  let nearest = Infinity;
   for (let i = 0; i < outline.length; i++) {
     const [x0, z0] = outline[i] ?? [0, 0];
     const [x1, z1] = outline[(i + 1) % outline.length] ?? [0, 0];
-    const [u0, w0, u1, w1] = [x0 * scale, z0 * scale, x1 * scale, z1 * scale];
-    out.push(...quad([x0, bottom, z0], [x1, bottom, z1], [x1, top, z1], [x0, top, z0]));
-    out.push(...quad([u1, bottom, w1], [u0, bottom, w0], [u0, top, w0], [u1, top, w1]));
-    out.push(...quad([u0, top, w0], [x0, top, z0], [x1, top, z1], [u1, top, w1]));
+    const [ex, ez] = [x1 - x0, z1 - z0];
+    const det = direction[0] * -ez + direction[1] * ex;
+    if (Math.abs(det) < 1e-9) {
+      continue;
+    }
+    const [rx, rz] = [x0 - from[0], z0 - from[1]];
+    const t = (rx * -ez + rz * ex) / det;
+    const s = (direction[0] * rz - direction[1] * rx) / det;
+    if (t > 1e-6 && s >= 0 && s <= 1) {
+      nearest = Math.min(nearest, t);
+    }
+  }
+  return Number.isFinite(nearest) ? nearest : 0;
+}
+
+/**
+ * Makes a flat strip that faces up, from one point to another.
+ *
+ * @param from The start, in the x-z plane.
+ * @param to The end, in the x-z plane.
+ * @param width The width.
+ * @param y The height.
+ * @returns 2 triangles.
+ */
+function flatStrip(from: OutlinePoint, to: OutlinePoint, width: number, y: number): number[] {
+  const length = Math.hypot(to[0] - from[0], to[1] - from[1]);
+  const [sx, sz] = [
+    (-(to[1] - from[1]) / length) * (width / 2),
+    ((to[0] - from[0]) / length) * (width / 2),
+  ];
+  return quad(
+    [from[0] - sx, y, from[1] - sz],
+    [from[0] + sx, y, from[1] + sz],
+    [to[0] + sx, y, to[1] + sz],
+    [to[0] - sx, y, to[1] - sz],
+  );
+}
+
+/**
+ * Makes a flat disc that faces up.
+ *
+ * @param x The x of the center.
+ * @param z The z of the center.
+ * @param radius The radius.
+ * @param y The height.
+ * @param segments The number of triangles.
+ * @returns The triangles.
+ */
+function flatDisc(x: number, z: number, radius: number, y: number, segments: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < segments; i++) {
+    const a0 = (i / segments) * 2 * Math.PI;
+    const a1 = ((i + 1) / segments) * 2 * Math.PI;
+    out.push(x, y, z);
+    out.push(x + radius * Math.sin(a0), y, z + radius * Math.cos(a0));
+    out.push(x + radius * Math.sin(a1), y, z + radius * Math.cos(a1));
+  }
+  return out;
+}
+
+/** One string of the piano in the piano axes: its front end, its back end, its width and height. */
+interface PianoString {
+  /** The front end, behind the tuning pins. */
+  readonly front: OutlinePoint;
+  /** The back end, at the hitch pins. */
+  readonly back: OutlinePoint;
+  /** The width of the strip. */
+  readonly width: number;
+  /** The height of the string. */
+  readonly y: number;
+  /** Whether the string is a wound bass string. */
+  readonly bass: boolean;
+}
+
+/**
+ * Calculates the strings of the piano ({@link PIANO_INSIDE}): the bass strings, which fan out to
+ * the tail over the other strings, and the other strings, which run back to the edge of the plate.
+ *
+ * @returns The strings, from the lowest to the highest.
+ */
+function pianoStrings(): PianoString[] {
+  const inside = PIANO_INSIDE;
+  const [cx, cz] = CASE_CENTER;
+  const edge = PLATE_OUTLINE.map(([x, z]): OutlinePoint => [x + cx, z + cz]);
+  const stringY = PIANO.caseTop - inside.stringDepth;
+  const out: PianoString[] = [];
+  for (const group of [inside.bass, inside.treble]) {
+    const bass = group === inside.bass;
+    for (let i = 0; i < group.count; i++) {
+      const share = i / (group.count - 1);
+      const x = group.from + (group.to - group.from) * share;
+      const angle =
+        (group.angle[0] + (group.angle[1] - group.angle[0]) * share) * MathUtils.DEG2RAD;
+      const direction: OutlinePoint = [Math.sin(angle), -Math.cos(angle)];
+      const front: OutlinePoint = [x, inside.stringFront];
+      const length = exitDistance(edge, front, direction) - inside.hitchGap;
+      out.push({
+        front,
+        back: [x + direction[0] * length, inside.stringFront + direction[1] * length],
+        width: group.width,
+        y: stringY + (bass ? inside.bass.lift : 0),
+        bass,
+      });
+    }
   }
   return out;
 }
 
 /**
- * Finds the nearest point of an outline behind a point, on the line along -z.
- *
- * @param outline The outline.
- * @param x The x of the line.
- * @param z The z of the point.
- * @returns The z of the nearest edge of the outline below `z`, or `z` if no edge crosses the line
- *   there.
- */
-function outlineBehind(outline: readonly OutlinePoint[], x: number, z: number): number {
-  let nearest = -Infinity;
-  for (let i = 0; i < outline.length; i++) {
-    const [x0, z0] = outline[i] ?? [0, 0];
-    const [x1, z1] = outline[(i + 1) % outline.length] ?? [0, 0];
-    if (x0 === x1 || x < Math.min(x0, x1) || x > Math.max(x0, x1)) {
-      continue;
-    }
-    const at = z0 + ((z1 - z0) * (x - x0)) / (x1 - x0);
-    if (at < z) {
-      nearest = Math.max(nearest, at);
-    }
-  }
-  return Number.isFinite(nearest) ? nearest : z;
-}
-
-/**
  * Adds the inside of the open case ({@link PIANO_INSIDE}): the soundboard at the bottom of the
- * well, the iron plate at the keys, and the strings from the plate to the rim wall at the tail.
+ * well, the pin block under the front of the plate, the iron plate with its holes, the tuning
+ * pins, the strings, and the dampers.
  *
  * @param piece The piece of the piano.
  * @param boardY The height of the bottom of the well.
@@ -330,45 +593,72 @@ function addInside(piece: PieceBuilder, boardY: number): void {
   const inside = PIANO_INSIDE;
   const [cx, cz] = CASE_CENTER;
   const rimAt = transform([cx, 0, cz]);
-  const outline = CASE_OUTLINE.map(([x, z]): OutlinePoint => [x * inside.scale, z * inside.scale]);
   const top = PIANO.caseTop;
-
-  piece.add(prism(outline, boardY, boardY + 0.005), INSTRUMENT_COLORS.soundboard, rimAt);
-
-  // The front of the inside is the straight front edge of the inner outline.
-  const xs = outline.map(([x]) => x);
-  const left = Math.min(...xs);
-  const right = Math.max(...xs);
-  const front = Math.max(...outline.map(([, z]) => z));
   const plateY = top - inside.plateDepth;
+  const inner = CASE_PLAN.side - inside.rim;
+
+  piece.add(prism(RIM_INNER, boardY, boardY + 0.005), INSTRUMENT_COLORS.soundboard, rimAt);
   piece.add(
-    box(right - left, 0.012, inside.plateLength),
+    box(2 * inner, plateY - boardY, CASE_PLAN.front - inside.pinBlockBack),
+    INSTRUMENT_COLORS.pianoCase,
+    transform([0, (boardY + plateY) / 2, (CASE_PLAN.front + inside.pinBlockBack) / 2]),
+    'lacquer',
+  );
+  piece.add(
+    prism(PLATE_OUTLINE, plateY - inside.plateThickness, plateY),
     INSTRUMENT_COLORS.pianoPlate,
-    transform([cx + (left + right) / 2, plateY - 0.006, cz + front - inside.plateLength / 2]),
+    rimAt,
     'metal',
   );
+  const holes: number[] = [];
+  for (const x of inside.holes.x) {
+    holes.push(...flatDisc(x, inside.holes.z, inside.holes.radius, plateY + 0.001, 10));
+  }
+  piece.add(holes, INSTRUMENT_COLORS.soundboard);
 
-  const stringY = top - inside.stringDepth;
-  const start = front - inside.stringGap;
-  const step = (right - left - 2 * inside.stringGap) / (inside.strings - 1);
-  const half = inside.stringWidth / 2;
-  for (let i = 0; i < inside.strings; i++) {
-    const x = left + inside.stringGap + i * step;
-    const end = outlineBehind(outline, x, start) + inside.stringGap;
-    if (end >= start) {
+  const pins: number[] = [];
+  const { pins: pin } = inside;
+  for (const [row, z] of pin.rows.entries()) {
+    for (let i = 0; i < pin.perRow; i++) {
+      const x = -inner + 0.04 + ((i + row / 2) / pin.perRow) * (2 * inner - 0.08);
+      pins.push(
+        ...placeCorners(
+          box(pin.width, pin.height, pin.width),
+          transform([x, plateY + pin.height / 2, z]),
+        ),
+      );
+    }
+  }
+  piece.add(pins, INSTRUMENT_COLORS.pianoStrings, transform(), 'metal');
+
+  const strings = pianoStrings();
+  const bassWire: number[] = [];
+  const steelWire: number[] = [];
+  const dampers: number[] = [];
+  const d = inside.dampers;
+  for (const [i, string] of strings.entries()) {
+    (string.bass ? bassWire : steelWire).push(
+      ...flatStrip(string.front, string.back, string.width, string.y),
+    );
+    if (i % 2 === 1 || string.front[0] > d.highestX) {
       continue;
     }
-    piece.add(
-      quad(
-        [x - half, stringY, start],
-        [x + half, stringY, start],
-        [x + half, stringY, end],
-        [x - half, stringY, end],
+    const [dx, dz] = [string.back[0] - string.front[0], string.back[1] - string.front[1]];
+    const share = d.along / Math.hypot(dx, dz);
+    dampers.push(
+      ...placeCorners(
+        box(d.width, d.height, d.depth),
+        transform([
+          string.front[0] + dx * share,
+          string.y + 0.002 + d.height / 2,
+          string.front[1] + dz * share,
+        ]),
       ),
-      INSTRUMENT_COLORS.pianoStrings,
-      rimAt,
     );
   }
+  piece.add(steelWire, INSTRUMENT_COLORS.pianoStrings, transform(), 'metal');
+  piece.add(bassWire, INSTRUMENT_COLORS.pianoBassStrings, transform(), 'metal');
+  piece.add(dampers, INSTRUMENT_COLORS.pianoCase, transform(), 'lacquer');
 }
 
 /**
@@ -525,16 +815,13 @@ export function buildPiano(): InstrumentModel {
   const p = PIANO;
   const dark = INSTRUMENT_COLORS.pianoCase;
   const piece = new PieceBuilder(PIANO_SCALE);
-  const half = p.keyboardWidth / 2;
-  const front = -0.17;
 
   // The rim: the case below the soundboard, and the wall around the open inside. The open lid
   // shows the inside, as the piano of `mockup.png`.
   const rimAt = transform([CASE_CENTER[0], 0, CASE_CENTER[1]]);
-  const inside = PIANO_INSIDE;
-  const boardY = p.caseTop - inside.soundboardDepth;
+  const boardY = p.caseTop - PIANO_INSIDE.soundboardDepth;
   piece.add(prism(CASE_OUTLINE, p.caseBottom, boardY), dark, rimAt, 'lacquer');
-  piece.add(rimWall(CASE_OUTLINE, inside.scale, boardY, p.caseTop), dark, rimAt, 'lacquer');
+  piece.add(rimWall(CASE_OUTLINE, RIM_INNER, boardY, p.caseTop), dark, rimAt, 'lacquer');
   addInside(piece, boardY);
   const hingeX = -p.caseWidth / 2;
   const lid = placeCorners(
@@ -554,10 +841,11 @@ export function buildPiano(): InstrumentModel {
   const propX = 0.33;
   const lidHeight = p.caseTop + (propX - hingeX) * Math.tan(p.lidAngle);
   piece.rod([propX, p.caseTop, -0.95], [propX, lidHeight, -0.95], 0.012, 4, dark, 'lacquer');
-
   // The key bed, the cheek blocks, the keys, the fallboard, and the music desk. The front of the
   // key bed stands back from the front of the keys, so that the front face of a pressed key does
   // not lie on it.
+  const half = p.keyboardWidth / 2;
+  const front = CASE_PLAN.front;
   const bedFront = -p.keyOverhang;
   piece.add(
     box(p.caseWidth, 0.06, bedFront - front),

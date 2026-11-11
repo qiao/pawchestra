@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { INSTRUMENT_COLORS } from '../colors.ts';
 import type { Rgb } from '../mesh.ts';
-import { PIANO, PIANO_INSIDE, buildPiano, buildPianoBench, pianoKeyPosition } from './piano.ts';
+import { PIANO, buildPiano, buildPianoBench, pianoKeyPosition } from './piano.ts';
 
 describe('pianoKeyPosition', () => {
   const width = PIANO.keyboardWidth / 52;
@@ -50,16 +50,14 @@ describe('buildPiano', () => {
     const plate = heights(INSTRUMENT_COLORS.pianoPlate);
     const strings = heights(INSTRUMENT_COLORS.pianoStrings);
 
-    // A gold plate on the top of the rim reads as a flat gold tray. Each part lies in the well,
-    // below the top of the rim.
+    // Each part lies in the well, below the top of the rim.
     expect(board.length * plate.length * strings.length).toBeGreaterThan(0);
     expect(Math.max(...board)).toBeLessThan(PIANO.caseTop - 0.1);
     expect(Math.min(...plate)).toBeGreaterThan(Math.max(...board));
-    expect(Math.min(...strings)).toBeGreaterThan(Math.max(...plate));
+    expect(Math.min(...strings)).toBeGreaterThanOrEqual(Math.max(...plate));
     expect(Math.max(...strings)).toBeLessThan(PIANO.caseTop - 0.03);
-    expect(parts.filter((part) => part.color === INSTRUMENT_COLORS.pianoStrings)).toHaveLength(
-      PIANO_INSIDE.strings,
-    );
+    // The tuning pins and the steel strings.
+    expect(parts.filter((part) => part.color === INSTRUMENT_COLORS.pianoStrings)).toHaveLength(2);
   });
 });
 
