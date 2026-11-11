@@ -1,5 +1,5 @@
 {
- "sha256": "569c37ca071a6b92add994b18ce28c5457e66acc9d16691c0da8f8f0a31d6832",
+ "sha256": "220c4f1cc220f384d94f0e2e673cb08a6a4efafeef1c5e5a42bc68f96dd3a5a3",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -1278,7 +1278,7 @@
    }
   },
   "body": {
-   "height": 0.769416,
+   "height": 0.977184,
    "crease": 180
   },
   "texture": "assets/models/dog/tripo-hand/dog-color.webp"

@@ -201,11 +201,11 @@ beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joi
 
 | Item | Value |
 |---|---|
-| Size | 393,348 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 393,352 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. 115 faces are gloss (the nose). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
 | Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.769416 (the shoulder joints at 1.18737 m for each unit, so that H is 0.32773 m, the H of the dog of main), `crease` 180 |
+| Facts | `height` 0.977184 (the shoulder joints at 1.508 m for each unit, so that H is 0.41623 m, 1.27 times the H of the dog of main: "Size" below), `crease` 180 |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
@@ -262,9 +262,28 @@ normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 vertical, as on the dog of main, so that the knees spread around the lower bout of the cello. The
 property `seat` is {`prop` `chair`, `front` 0.0785, `back` -0.1, `halfWidth` 0.17}: the front lies
 0.055 units behind the knee joint of the bind, the nearest place that keeps the back of each knee
-off the seat, and 44 % of the thigh lies on the seat. The seat height is 0.150 m (0.265 m on the
+off the seat, and 44 % of the thigh lies on the seat. The seat height is 0.191 m (0.265 m on the
 dog of main), with the short legs of the source. The tail keeps its form: it goes back over the
 back edge of the seat, and its tip turns up behind the seat (`tailBind`).
+
+**Size.** The body scales to 1.27 times H of the dog of main (`metersPerUnit` 1.508 of
+`tools/mesh-rigs/simple/dog-tripo.json`), so that the beagle reads a little larger than the Tripo
+cat of the violas beside it. The scale changes only the fact `height` of the armature: the mesh,
+the bones, and the weights of the export stay. The seat height follows the legs. The measures in
+the app, in meters, with the seated values from the bind of each player:
+
+| Measure | Tripo cat | Beagle at H of main | Beagle now | Now / cat |
+|---|---|---|---|---|
+| Standing, to the top of the head | 1.384 | 1.187 | 1.508 | 1.09 |
+| Standing, to the ear tips | 1.484 | 1.187 | 1.508 | 1.02 |
+| Seated, top of the head above the floor | 1.260 | 1.108 | 1.407 | 1.12 |
+| Seated, ear tips above the floor | 1.360 | 1.108 | 1.407 | 1.03 |
+| Distance of the shoulder joints | 0.282 | 0.238 | 0.302 | 1.07 |
+| Head height H | 0.339 | 0.328 | 0.416 | 1.23 |
+| Seat height | 0.201 | 0.150 | 0.191 | 0.95 |
+
+The ears of the beagle hang, so the step compares the top of the head with no ear. A step to 1.1
+times the ear tips of the cat makes the head of the beagle about 1.3 times the head of the cat.
 
 **Ears.** The long ears hang to the top of each shoulder in the source. They follow the head and
 their ear bones, and in the moments of the cellist they lie on the shoulders with no visible cut
@@ -314,7 +333,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,079,012 bytes | `569c37ca071a6b92add994b18ce28c5457e66acc9d16691c0da8f8f0a31d6832` |
-| `tripo-hand/dog.rig.json` | 16,130 bytes | `ea9a9a80796e697d11833d5165ddecabe2091fa6ed8515d42832e80393ce73ad` |
+| `tripo-hand/dog.rig.glb` | 1,079,012 bytes | `220c4f1cc220f384d94f0e2e673cb08a6a4efafeef1c5e5a42bc68f96dd3a5a3` |
+| `tripo-hand/dog.rig.json` | 16,130 bytes | `82ac189cb390b70cbadc2302216b6f0f9b9df1afd8bfe86c6cfa99335612e9d3` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |

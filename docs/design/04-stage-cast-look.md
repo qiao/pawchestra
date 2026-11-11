@@ -800,8 +800,12 @@ painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
 steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
 candidate Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the same rules, and it
-scales only to H of the dog of main. Its source has eyeballs with painted irises and lights, so
-the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs give a lower chair.
+scales to a larger H than the dog of main (`metersPerUnit` of its config). Reason: the beagle sits
+beside the Tripo cat of the violas, and it must read a little larger. The top of its head stands
+about 1.1 times as high as the top of the head of the cat, seated and standing (the ears of the
+cat do not count, because the ears of the beagle hang). Its source has eyeballs with painted
+irises and lights, so the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs
+give a lower chair.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
 candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
