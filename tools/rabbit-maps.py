@@ -145,6 +145,41 @@ IRIS_DARK = (62, 36, 20)
 IRIS_LIGHT = (112, 68, 36)
 PUPIL_COLOR = (16, 10, 7)
 SCLERA = (226, 220, 208)
+#: The finish of the eyes for the far view of the hall (`far_eyes()`). There each eye is a few
+#: pixels across. With the source paint, a wide white field around the iris showed, and the eyes
+#: read as startled or as a side glance. IRIS_SCALE 1 keeps the iris radius of the source, and
+#: each shade 1 and SCLERA_WARM (0, 0) keep its colors.
+#: IRIS_SCALE: the scale of the iris radius about its middle. PUPIL_RATIO: the pupil radius as a
+#: share of the new iris radius. SCLERA_SHADE: the scale of the Oklab lightness of the white.
+#: SCLERA_WARM: the Oklab (a, b) step of the white to a warm ivory. IRIS_SHADE: the scale of the
+#: Oklab lightness of the iris. RING_SHADE and RING_WIDTH: the scale of the lightness of the outer
+#: ring of the iris, and its width as a share of the iris radius.
+IRIS_SCALE = 1.1
+PUPIL_RATIO = 0.55
+#: The turn in degrees of the middle of the new iris out from the target of `center_irises()`.
+#: The target of the rabbit already lies in the middle of the opening of the play view, turned
+#: out by GAZE_OUT. The turn is at most the growth of the iris radius, so that the new iris covers
+#: the old iris.
+FAR_GAZE_OUT = 0.0
+SCLERA_SHADE = 0.85
+SCLERA_WARM = (0.008, 0.03)
+IRIS_SHADE = 0.9
+RING_SHADE = 0.75
+RING_WIDTH = 0.15
+#: The luma (sRGB) and the saturation at which a texel goes from no white to white for the tone of
+#: the sclera, each as a soft step (start, end). So the white keeps its shade under the lid.
+WHITE_LUMA = (90.0, 170.0)
+WHITE_SATURATION = (0.2, 0.4)
+#: The steps in degrees of the directions about the source pupil and of the angles from it, and
+#: the largest angle, at which far_eyes() reads the pupil edge and the iris edge, and the count of
+#: directions in the circular median of each edge.
+FAR_PHI_STEP = 3.0
+FAR_THETA_STEP = 0.5
+FAR_REACH = 45.0
+FAR_SMOOTH = 5
+#: The largest step of the pupil edge and of the iris edge of a clean direction from the median of
+#: each edge, as a share of the median.
+FAR_CLEAN = (0.15, 0.08)
 #: The largest share of the texels of an eyeball that can also lie in the other eyeball.
 EYE_OVERLAP = 0.01
 #: The rounds of the fill of the texels around the eyeball triangles before the turned ball samples
@@ -616,7 +651,8 @@ def gaze_targets(rig):
 
 def center_irises(rig, image):
     """Moves the iris of each eyeball, with its pupil and its painted light, as one decal to the
-    middle of the eye opening of the play view (`gaze_targets()`), and gives the new image. The source map paints
+    middle of the eye opening of the play view (`gaze_targets()`), and gives the new image and the
+    middle p of the pupil of each side in the source (`far_eyes()`). The source map paints
     each iris at the inner corner of its opening, so in the front view the rabbit looked
     cross-eyed. The map paints only a band of the ball around the opening, so a turn of the whole
     ball would show the dark rest of the ball in the opening. The source map of the rabbit paints
@@ -649,6 +685,7 @@ def center_irises(rig, image):
     texels, taken = ball_texels(rig)
     src = fill_around(out, taken)
     targets = gaze_targets(rig)
+    pupils = {}
     for side in ('L', 'R'):
         faces = np.array(eyes[side]['faces'])
         c, r, shown = ball_frame(rig, faces)
@@ -697,6 +734,7 @@ def center_irises(rig, image):
         x = (cols.mean() + 0.5) / FRONT_GRID * 2 - 1
         y = 1 - (rows.mean() + 0.5) / FRONT_GRID * 2
         p = np.array([x, y, np.sqrt(max(0.0, 1 - x * x - y * y))])
+        pupils[side] = p
 
         # The iris radius: the first ring with white in the opening.
         rings = angle_to(d, p)
@@ -744,6 +782,162 @@ def center_irises(rig, image):
               f'radii in x, y); {int(flip.sum())} iris texels mirror, {len(left)} texels '
               f'take the white across, {int(in_old.sum())} of them the median white '
               f'{np.round(sclera).astype(int).tolist()}')
+    return ball_image(rig, out, taken), pupils
+
+
+def far_eyes(rig, image, source, pupils):
+    """Gives the image with the eyes finished for the far view of the hall. `image` is the image of
+    `center_irises()`, `source` the image before it, and `pupils` the middle p of each pupil in
+    the source. The source paints each pupil off the middle of its iris, as an eye that looks to
+    the side: the iris is a thick crescent on one side of the pupil and thin on the other. After
+    the move of `center_irises()` the iris kept that shape, and a mirror of it showed as a second
+    dark crescent. At the far view, a wide white field around the iris also showed. So the eyes
+    read as startled or as a side glance. For each side:
+    - The edges about p, for each direction phi about p in steps of FAR_PHI_STEP degrees, from the
+      source colors on the ball at steps of FAR_THETA_STEP degrees from p: the pupil edge rho(phi)
+      is the first step above PUPIL_LUMA, and the iris edge R(phi) the first white step after it
+      (WHITE_LOW, WHITE_SAT), before FAR_REACH degrees. A clean direction shows both edges
+      within FAR_CLEAN of their medians. In the other directions the lash line or the paint of
+      the lid joins the iris. Each edge of the clean directions takes the circular median of
+      FAR_SMOOTH clean directions.
+    - The new iris: its middle n is the target t of the play view (`gaze_targets()`) turned out
+      by FAR_GAZE_OUT degrees, its radius A is IRIS_SCALE times the median of R, and its pupil
+      radius P is PUPIL_RATIO of A. Each ball texel at the angle theta and the direction phi about
+      n within A, but a dark lash line at the edge of the opening (LASH_LINE), takes the mix of
+      the source colors of the two clean directions g on the two sides of phi, by its angle
+      between them. In a direction g, the source color is at the angle theta / P * rho(g) from p
+      in the pupil, or rho(g) + (theta - P) / (A - P) * (R(g) - rho(g)) in the iris. So the pupil
+      lies in the middle of a round iris, and the dark ring and the texture of the iris stay.
+    - In Oklab, each white texel outside the new iris takes SCLERA_SHADE of its lightness and the
+      step SCLERA_WARM, by its share of white (WHITE_LUMA, WHITE_SATURATION). Each other texel in
+      the new iris takes IRIS_SHADE of its lightness, and in the outer RING_WIDTH of the iris also
+      RING_SHADE. A white texel in the iris keeps its lightness.
+    Each texel is a copy of a texel of the same ball, or a darker or warmer tone of it."""
+    eyes = rig[3]
+    out = np.asarray(image).astype(np.float64)
+    texels, taken = ball_texels(rig)
+    src = fill_around(np.asarray(source).astype(np.float64), taken)
+    up = np.array([0.0, 1.0, 0.0])
+    targets = gaze_targets(rig)
+    for side in ('L', 'R'):
+        faces = np.array(eyes[side]['faces'])
+        c, r, shown = ball_frame(rig, faces)
+        ys, xs, places = texels[side]
+        d = places - c
+        d /= np.linalg.norm(d, axis=1)[:, None]
+        colors = out[ys, xs]
+        luma = colors @ [0.2126, 0.7152, 0.0722]
+        grid = np.zeros((FRONT_GRID, FRONT_GRID), bool)
+        grid[front_cells(shown)] = True
+        grid = np.asarray(Image.fromarray(grid).filter(ImageFilter.MaxFilter(3))
+                          .filter(ImageFilter.MinFilter(3))) > 0
+        core = np.asarray(Image.fromarray(grid).filter(ImageFilter.MinFilter(2 * EDGE_CELLS + 1))) > 0
+        row, col = front_cells(d)
+        t = targets[side]
+
+        # The pupil edge and the iris edge about p in each direction, in the source.
+        p = pupils[side]
+        e_p = np.cross(up, p)
+        e_p /= np.linalg.norm(e_p)
+        u_p = np.cross(p, e_p)
+        phi = np.radians(np.arange(0.0, 360.0, FAR_PHI_STEP))
+        steps = np.arange(0.0, FAR_REACH, FAR_THETA_STEP)
+        th, ph = np.meshgrid(np.radians(steps), phi)
+        q = (np.cos(th).ravel()[:, None] * p + (np.sin(th) * np.cos(ph)).ravel()[:, None] * e_p
+             + (np.sin(th) * np.sin(ph)).ravel()[:, None] * u_p)
+        got, found = ball_colors(rig, faces, c, q, src)
+        got = got.reshape(len(phi), len(steps), 3)
+        found = found.reshape(len(phi), len(steps))
+        top, low = got.max(axis=2), got.min(axis=2)
+        white = found & (low > WHITE_LOW) & ((top - low) / np.maximum(top, 1) < WHITE_SAT)
+        light = found & (got @ [0.2126, 0.7152, 0.0722] > PUPIL_LUMA)
+        rho = np.full(len(phi), np.nan)
+        edge = np.full(len(phi), np.nan)
+        for k in range(len(phi)):
+            out_of_pupil = np.flatnonzero(light[k])
+            if not len(out_of_pupil):
+                continue
+            rho[k] = steps[out_of_pupil[0]]
+            past = np.flatnonzero(white[k, out_of_pupil[0]:])
+            if len(past):
+                edge[k] = steps[out_of_pupil[0] + past[0]]
+        # A clean direction shows both edges near their medians. In the other directions the lash
+        # line or the paint of the lid joins the iris, so each of them takes the nearest clean
+        # direction.
+        clean = ~np.isnan(rho) & ~np.isnan(edge)
+        if clean.sum() < len(phi) // 4:
+            sys.exit(f'The eye {side} shows both edges in only {int(clean.sum())} directions.')
+        mid_rho, mid_edge = np.median(rho[clean]), np.median(edge[clean])
+        clean &= (np.abs(rho - mid_rho) < FAR_CLEAN[0] * mid_rho)
+        clean &= (np.abs(edge - mid_edge) < FAR_CLEAN[1] * mid_edge)
+        good = np.flatnonzero(clean)
+        if len(good) < len(phi) // 4:
+            sys.exit(f'The eye {side} has only {len(good)} clean directions.')
+        rho, edge = rho[good], edge[good]
+        half = FAR_SMOOTH // 2
+        for values in (rho, edge):
+            ring = np.r_[values[-half:], values, values[:half]]
+            values[:] = [np.median(ring[k:k + FAR_SMOOTH]) for k in range(len(good))]
+
+        # The new iris about n.
+        big = IRIS_SCALE * float(mid_edge)
+        small = PUPIL_RATIO * big
+        if FAR_GAZE_OUT > big - mid_edge:
+            sys.exit(f'FAR_GAZE_OUT is more than the growth of the iris radius, '
+                     f'{big - mid_edge:.1f} degrees.')
+        sign = 1.0 if side == 'L' else -1.0
+        turn = np.radians(sign * FAR_GAZE_OUT)
+        n = np.array([t[0] * np.cos(turn) + t[2] * np.sin(turn), t[1],
+                      t[2] * np.cos(turn) - t[0] * np.sin(turn)])
+        e_n = np.cross(up, n)
+        e_n /= np.linalg.norm(e_n)
+        u_n = np.cross(n, e_n)
+        theta = angle_to(d, n)
+        lash = ~core[row, col] & (luma < PUPIL_LUMA) & LASH_LINE
+        sel = np.flatnonzero((theta < big) & ~lash)
+        th = theta[sel]
+        # Each texel takes the mix of the two clean directions on its two sides, by its angle
+        # between them.
+        x = np.mod(np.degrees(np.arctan2(d[sel] @ u_n, d[sel] @ e_n)), 360.0) / FAR_PHI_STEP
+        after = np.searchsorted(good, x) % len(good)
+        before = (after - 1) % len(good)
+        span = np.mod(good[after] - good[before], len(phi))
+        span = np.where(span == 0, len(phi), span)
+        share = np.mod(x - good[before], len(phi)) / span
+        got = np.zeros((len(sel), 3))
+        found = np.ones(len(sel), bool)
+        for g, weight in ((before, 1 - share), (after, share)):
+            rho_k, edge_k = rho[g], edge[g]
+            old = np.where(th < small, th / small * rho_k,
+                           rho_k + (th - small) / (big - small) * (edge_k - rho_k))
+            a = phi[good[g]]
+            o = np.radians(old)
+            q = (np.cos(o)[:, None] * p + (np.sin(o) * np.cos(a))[:, None] * e_p
+                 + (np.sin(o) * np.sin(a))[:, None] * u_p)
+            part, hit = ball_colors(rig, faces, c, q, src)
+            got += weight[:, None] * part
+            found &= hit
+        new = colors.copy()
+        new[sel[found]] = got[found]
+
+        new_luma = new @ [0.2126, 0.7152, 0.0722]
+        top, low = new.max(axis=1), new.min(axis=1)
+        whiteness = (smooth(*WHITE_LUMA, new_luma)
+                     * (1 - smooth(*WHITE_SATURATION, (top - low) / np.maximum(top, 1))))
+        inside = theta < big
+        lab = oklab(linear(new))
+        sclera = whiteness * ~inside
+        lab[:, 0] *= 1 - sclera * (1 - SCLERA_SHADE)
+        lab[:, 1] += sclera * SCLERA_WARM[0]
+        lab[:, 2] += sclera * SCLERA_WARM[1]
+        ring = smooth(big * (1 - RING_WIDTH) - 1, big * (1 - RING_WIDTH) + 1, theta)
+        shade = IRIS_SHADE * (1 - ring * (1 - RING_SHADE))
+        lab[:, 0] *= 1 - (1 - whiteness) * inside * (1 - shade)
+        out[ys, xs] = srgb8(linear_of_oklab(lab))
+        print(f'far eye {side}: {len(good)} of {len(phi)} directions clean, pupil edge '
+              f'{mid_rho:.1f} and iris edge {mid_edge:.1f} degrees about the pupil; new pupil '
+              f'{small:.1f}, new iris {big:.1f} degrees; {len(sel)} texels take the round iris, '
+              f'{int((sclera > 0.5).sum())} white texels take the tone of the sclera')
     return ball_image(rig, out, taken)
 
 
@@ -835,7 +1029,8 @@ def write_color_map():
     if EYE_PAINT == 'cartoon':
         image = paint_eyes(rig, image)
     elif EYE_PAINT == 'centered':
-        image = center_irises(rig, image)
+        centered, pupils = center_irises(rig, image)
+        image = far_eyes(rig, centered, image, pupils)
     image = soften_brows(rig, image)
     lab = oklab(linear(np.asarray(image)))
     eyes, count = eye_mask(rig, SIZE)
