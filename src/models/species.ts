@@ -357,22 +357,21 @@ export const SPECIES = {
     seatHeight: STUDIO_HEIGHTS['studio-cat'].seatHeight / STUDIO_HEIGHTS['studio-cat'].headHeight,
   },
   /**
-   * Hippo, the contrabasses: a round mauve-gray hippo with a pale belly and muzzle. It has the
-   * studio body of the T-pose mesh `assets/models/hippo/hippo-tpose.glb`, which `pnpm rig-mesh
-   * hippo` rigs (design 4.4), with the head height of the red fox and the arms of the mesh. It
-   * stands at its contrabass, as the hippos of `orchestra-latest.png`. Its legs are so short that
-   * it stands about as high as it sits on a chair that fits them. Its head height is the head of
-   * the studio body, and the seat height is the seat of the studio body, in H.
+   * Hippo, the contrabasses: a round gray-pink hippo with small ears, two small teeth, pale toes,
+   * and a short tail. It has the studio body of the hand rig of the Tripo P2 mesh
+   * `assets/models/hippo/tripo-p2/hippo.fbx` (design 4.4), with the head height of the hippo of the
+   * T-pose mesh and the arms of the source. It stands at its contrabass, as the hippos of
+   * `orchestra-latest.png`. Its head height is the head of the studio body, and the seat height is
+   * the seat of the studio body, in H. It plays a contrabass of 0.65, a size at which its short
+   * arms reach the strings and the neck over its round belly (`HIPPO_HOLD` of `pose/bowed-rig.ts`).
    *
-   * The stick of the bow passes through the closed right paw, 23° from square toward the wrist,
-   * and the frog lies in the paw at the frog, at the tip, and at rest (2x crops). With the grip of
-   * `BOW_GRIP`, the stick passes under the paw, and the claws point down past it. The bow hand
-   * turns around the grip on the stick (`stickTurnR` of the hold), so the paw keeps one turn on
-   * the hand. A move of the grip by 0.04 H in any direction changes the look of the paw little.
+   * The bow grip (`bowGrip`) comes from the mesh body of the old hippo: the stick passes through
+   * the closed right paw, 23° from square toward the wrist. The bow hand turns around the grip on
+   * the stick (`stickTurnR` of the hold), so the paw keeps one turn on the hand.
    */
   hippo: {
     body: 'studio-hippo',
-    bassScale: 0.8,
+    bassScale: 0.65,
     bowGrip: { at: [0.0139, 0.0037, -0.0894], turn: 23 * (Math.PI / 180) },
     colors: SPECIES_COLORS.hippo,
     headHeight: STUDIO_HEIGHTS['studio-hippo'].headHeight,

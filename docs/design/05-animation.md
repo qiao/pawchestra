@@ -403,7 +403,12 @@ The rest of each family:
   12 recast bodies flipped through 180° (cast matrix, 4.4). The dog takes its place from its body
   too, with its own gap and a larger lean to the left (`DOG_HOLD.fit`), so that the scroll stands
   beside the left ear and not in front of the long muzzle, and the short bow arm reaches the
-  strings. The other instruments can take this pattern: a place from the landmarks, and the
+  strings. The contrabass of the hippo takes its place from the body by the same rule, with its
+  own lean back, lean to the left, turn of the top plate, and end pin place (`HIPPO_HOLD.fit`):
+  the back leans on the belly, the strings turn toward the bow arm, and the scroll stands beside
+  the left cheek. Reason: the short arms of the hippo reach the strings only over the top of its
+  round belly, and with no lean to the left the nut stood in front of the snout. The other
+  instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
 - **Violin hold from the body.** The shared violin hold (`BOWED_HOLDS.violin`) takes the arm
   values of the accepted rabbit violinist, as directions and in `H`, and its place from the

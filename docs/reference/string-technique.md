@@ -634,8 +634,8 @@ The app follows these facts:
   `src/models/instruments/strings.ts`).
 - **The contacts (2.8).** The hippo stands, as many orchestral bassists do, with `HIPPO_HOLD`. The
   end pin stands on the floor in front of it, the contrabass leans to the left and back, and the
-  nut is beside the head. The back of the contrabass touches the front of the belly, as a real
-  bassist rests the bass against the stomach [69].
+  nut is beside the head. The back of the contrabass leans on the belly, as a real bassist rests
+  the bass against the stomach [69]. The place comes from the body (`BowedHold.fit`).
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings
   (`BowedHold.pluckSide`). The right elbow points out to the right, so that the straight arm
   passes outside the rim of the upper bout. The bow tip points up, square to the strings
@@ -646,7 +646,11 @@ The app does not follow these facts:
 
 - **The hip and the knee (2.8).** The knee of the hippo lies under its belly, so the contrabass
   stands in front of the belly. Both shoulders turn forward (`BowedHold.reach`,
-  `BowedHold.reachL`), so that the short arms reach the strings.
+  `BowedHold.reachL`), and the trunk leans forward, so that the short arms reach the strings.
+- **The turn and the lean (2.8).** A real bassist turns the bass slightly to the right. The
+  contrabass of the hippo turns its top plate far to the right and leans far to the left
+  (`HIPPO_HOLD.fit`), because the short arms reach the strings only over the top of the round
+  belly, and the scroll then stands beside the head and not in front of the snout.
 - **The left hand (2.8).** The thick left paw tilts far over the neck, so that the left arm keeps
   off the body. The paw lies a little off the strings along the normal of its palm
   (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a
