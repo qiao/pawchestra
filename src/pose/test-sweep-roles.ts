@@ -1013,7 +1013,7 @@ function bowedTargets(scene: TestScene, index: number): NoteTarget[] {
   const scale = instrumentScale(params, cast.instrument);
   const halfWidth = (VIOLIN.stringsWidth / 2) * STRING_SCALES[cast.instrument] * scale;
   return layer.strokes.flatMap((stroke): NoteTarget[] =>
-    stroke.technique === 'pizzicato'
+    stroke.plucked
       ? []
       : [
           {

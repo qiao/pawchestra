@@ -85,8 +85,18 @@ export const BOW_MOTION = {
   balance: { place: 0.45, share: 0.2 },
   /** The time constant of the loudness that the sounding point follows, in seconds. */
   loudnessSec: 0.2,
-  /** The change between the bow and pizzicato starts this long before the note. */
+  /**
+   * The change between the bow and pizzicato starts this long before the note, and not before the
+   * first note of the technique before it.
+   */
   techniqueLeadSec: 0.3,
+  /**
+   * A run of notes of the other technique keeps the technique of the right hand before it when the
+   * notes of that technique come back less than this time after the start of the run
+   * (`docs/reference/string-technique.md`, section 2.10). Two parts on one channel can change
+   * the technique each 0.1 s to 0.2 s.
+   */
+  techniqueHoldSec: 0.6,
   /** The change between the bow and pizzicato ends this long before the note. */
   techniqueEndSec: 0.05,
   /** The time of the pluck of a pizzicato note. */
@@ -213,6 +223,18 @@ export interface Stroke {
   readonly tremolo: number;
   /** Whether the bow moves to `bowFrom` in the rest before the stroke, off the strings. */
   readonly retake: boolean;
+  /**
+   * Whether the right hand plucks in the stroke: the technique of the hand, which keeps its
+   * technique over a short run of the other technique ({@link handTechniques}).
+   */
+  readonly plucked: boolean;
+  /**
+   * The start of the change of the right hand to the other technique after the stroke, in song
+   * seconds. `Infinity` when the hand keeps its technique to the end.
+   */
+  readonly turnFrom: number;
+  /** The end of that change, in song seconds. `Infinity` with no change. */
+  readonly turnTo: number;
 }
 
 /** The bow and the hands of a bowed string player at one time. The pose reads it. */
@@ -452,6 +474,70 @@ function slurSizes(strokes: readonly SlurNote[], beats: Float64Array): number[] 
   return sizes;
 }
 
+/** The technique of the right hand in each stroke, and the times of its changes. */
+interface HandTechniques {
+  /** Whether the right hand plucks in each stroke. */
+  readonly plucked: boolean[];
+  /** The start of the next change of the right hand after each stroke, in song seconds. */
+  readonly from: number[];
+  /** The end of the next change of the right hand after each stroke, in song seconds. */
+  readonly to: number[];
+}
+
+/**
+ * Gives the technique of the right hand in each stroke and the times of its changes (design 5.3,
+ * `docs/reference/string-technique.md`, section 2.10). A player who alternates the bow and
+ * pizzicato fast keeps the hand of one technique, so a run of strokes of the other technique keeps
+ * the technique before it when the strokes of that technique come back within
+ * `BOW_MOTION.techniqueHoldSec` of the start of the run. A change starts
+ * `BOW_MOTION.techniqueLeadSec` before the first stroke of the new technique, but not before the
+ * first stroke of the old technique, and it ends `BOW_MOTION.techniqueEndSec` before that stroke.
+ *
+ * @param strokes The start and the technique of each stroke, sorted by start.
+ * @returns The technique of the hand and the changes.
+ */
+function handTechniques(
+  strokes: readonly { readonly start: number; readonly technique: Technique }[],
+): HandTechniques {
+  const m = BOW_MOTION;
+  const plucks = (k: number): boolean => strokes[k]?.technique === 'pizzicato';
+  const plucked: boolean[] = [];
+  let hand = plucks(0);
+  for (const [k, stroke] of strokes.entries()) {
+    if (plucks(k) !== hand) {
+      let back = k + 1;
+      while (back < strokes.length && plucks(back) !== hand) {
+        back += 1;
+      }
+      if ((strokes[back]?.start ?? Infinity) - stroke.start >= m.techniqueHoldSec) {
+        hand = !hand;
+      }
+    }
+    plucked.push(hand);
+  }
+
+  const from: number[] = [];
+  const to: number[] = [];
+  let runStart = 0;
+  let k = 0;
+  while (k < strokes.length) {
+    let next = k + 1;
+    while (next < strokes.length && plucked[next] === plucked[k]) {
+      next += 1;
+    }
+    const target = strokes[next]?.start ?? Infinity;
+    const start = strokes[runStart]?.start ?? 0;
+    const a = target === Infinity ? Infinity : Math.max(start, target - m.techniqueLeadSec);
+    const b = target === Infinity ? Infinity : Math.max(a + 1e-3, target - m.techniqueEndSec);
+    for (; k < next; k++) {
+      from.push(a);
+      to.push(b);
+    }
+    runStart = next;
+  }
+  return { plucked, from, to };
+}
+
 /** The start, the technique, and the string of the bow of a stroke, for the crossing rule. */
 interface CrossNote {
   readonly start: number;
@@ -652,6 +738,7 @@ export function* buildStrokesSteps(
       string: plan[k]?.string ?? 0,
     })),
   );
+  const hands = handTechniques(pitches);
 
   // The loudness that the sounding point follows, at the start of each stroke.
   const levels = pitches.map((p) => clamp01(p.loudness));
@@ -762,6 +849,9 @@ export function* buildStrokesSteps(
         loudnessFrom: levelsFrom[j] ?? 0,
         tremolo,
         retake: retake && j === k,
+        plucked: hands.plucked[j] ?? technique === 'pizzicato',
+        turnFrom: hands.from[j] ?? Infinity,
+        turnTo: hands.to[j] ?? Infinity,
       });
     }
     bow = to;
@@ -788,13 +878,13 @@ function bowInStroke(stroke: Stroke, time: number): number {
 }
 
 /**
- * Gives 1 for a pizzicato stroke and 0 for a bowed stroke.
+ * Gives 1 for a stroke in which the right hand plucks and 0 for a stroke in which it bows.
  *
  * @param stroke The stroke.
  * @returns The weight of pizzicato.
  */
 function pizzicatoOf(stroke: Stroke): number {
-  return stroke.technique === 'pizzicato' ? 1 : 0;
+  return stroke.plucked ? 1 : 0;
 }
 
 /**
@@ -1081,23 +1171,22 @@ export function bowStateAt(
 
   // The change between the bow and pizzicato.
   out.pizzicato = pizzicatoOf(current);
-  if (next && pizzicatoOf(next) !== out.pizzicato) {
-    const a = Math.max(current.start, next.start - m.techniqueLeadSec);
-    const b = Math.max(a + 1e-3, next.start - m.techniqueEndSec);
-    out.pizzicato += (pizzicatoOf(next) - out.pizzicato) * clamp01((time - a) / (b - a));
+  if (time > current.turnFrom) {
+    const x = clamp01((time - current.turnFrom) / (current.turnTo - current.turnFrom));
+    out.pizzicato += (1 - 2 * out.pizzicato) * x;
   }
 
   // The pluck: the finger crosses the strings at the note start, then goes back before the
   // next pluck and rests on the string.
   out.pluck = -1;
-  if (current.technique === 'pizzicato') {
+  if (current.plucked) {
     const interval = next ? next.start - current.start : Infinity;
     const flick = Math.min(m.flickSec, 0.4 * interval);
     const dt = time - current.start;
     if (dt < flick) {
       const x = dt / flick;
       out.pluck = -1 + 2 * (1 - (1 - x) * (1 - x));
-    } else if (next && next.technique === 'pizzicato') {
+    } else if (next?.plucked === true) {
       const hold = Math.min(m.pluckHoldSec, 0.2 * interval);
       const back = Math.max(current.start + flick, next.start - m.pluckReturnSec);
       out.pluck = 1 - 2 * smoothstep((time - back) / (next.start - hold - back));

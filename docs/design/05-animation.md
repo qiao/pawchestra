@@ -389,6 +389,10 @@ The rest of each family:
 - The bow changes direction on each note, and short notes in one beat join into one slur
   (`slurSizes()`), because the MIDI files have no slurs. Pizzicato plucks the string, and tremolo
   makes short fast strokes (`BOW_MOTION`).
+- A short run of the other technique keeps the technique of the right hand (`handTechniques()`,
+  `BOW_MOTION.techniqueHoldSec`), and a change can start in the notes before the new technique.
+  Reason: merged parts alternate the bow and pizzicato each 0.1 s to 0.2 s, and each change
+  turned the paw by up to 175° in a few frames.
 - In a change between the bow and pizzicato, the right hand turns on the side on which it stays
   nearer the forearm (`mixRotationNear()`). Reason: the bow hand and the pluck hand of the
   contrabass are near 180° apart, and the shorter path went to the other side in the middle of

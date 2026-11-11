@@ -386,6 +386,15 @@ and at the highest rates the wrist and the elbow move in phase [56 (abstract)].
   put the instrument on his lap and let the left arm hang free [74]. No source of this file gives
   a rest with the scroll to the side.
 
+### 2.10 The change between the bow and pizzicato
+
+- **The bow stays in the hand.** The player holds the bow while plucking, unless there is enough
+  time to put it down and pick it up again. A classical bassist plucks with one finger and holds
+  the bow in the hand [83].
+- **No time for the right hand.** The left fingers can pluck "in places where there would not
+  normally be time to bring the right hand", and also while bowed notes are held [83]. No source
+  of this file gives the least time of a change of the right hand.
+
 ## 3. Use in the app
 
 Each species plays with a `BowedHold` of `src/pose/bowed-rig.ts` (`DOG_HOLD`, `HIPPO_HOLD`, and
@@ -553,6 +562,12 @@ The app does not follow these facts:
   the bow puts the right forearm into the body. The cat plucks from the side of the frog
   (`BowedHold.pluckSide`), as a bass hand comes up from the side. Its short arm goes into its
   round chest with the palm over the strings.
+- **The change between the bow and pizzicato (2.10).** The right hand keeps its technique over a
+  run of the other technique when the notes of its technique come back within
+  `BOW_MOTION.techniqueHoldSec` (`handTechniques()`). Thus fast alternations, often two parts on
+  one MIDI channel, show one hand and no turn on each note. A change starts
+  `BOW_MOTION.techniqueLeadSec` before the note and can start in the notes before it. The pose
+  solves the bow hold and the pizzicato hold each with its own elbow, and mixes the two hands.
 - **The lift and the lowering.** No source gives the path of the violin or the viola from the lap
   to the chin. The left paw carries the instrument by its neck, and the instrument turns with the
   paw (`carryLift()`). The paw supinates on its forearm on the way, as a real forearm turns. The
