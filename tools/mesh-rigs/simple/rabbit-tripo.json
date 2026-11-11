@@ -24,7 +24,7 @@
     "hips": {
       "head": [
         0.0,
-        0.349,
+        0.31,
         0.0
       ],
       "tail": "spine"
@@ -32,7 +32,7 @@
     "spine": {
       "head": [
         0.0,
-        0.419,
+        0.38,
         0.01
       ],
       "tail": "spine1"
@@ -40,7 +40,7 @@
     "spine1": {
       "head": [
         0.0,
-        0.489,
+        0.45,
         0.02
       ],
       "tail": "chest"
@@ -48,7 +48,7 @@
     "chest": {
       "head": [
         0.0,
-        0.549,
+        0.51,
         0.012
       ],
       "tail": "neck"
@@ -56,7 +56,7 @@
     "neck": {
       "head": [
         0.0,
-        0.624,
+        0.585,
         -0.004
       ],
       "tail": "head"
@@ -64,31 +64,31 @@
     "head": {
       "head": [
         0.0,
-        0.654,
+        0.615,
         0.0
       ],
       "tail": [
         0.0,
-        0.839,
+        0.8,
         0.0
       ]
     },
     "ear_L": {
       "head": [
         0.045,
-        0.824,
+        0.785,
         -0.03
       ],
       "tail": [
         0.1,
-        1.039,
+        1.0,
         -0.065
       ]
     },
     "clavicle_L": {
       "head": [
         0.015,
-        0.589,
+        0.55,
         0.005
       ],
       "tail": "upper_arm_L"
@@ -96,7 +96,7 @@
     "upper_arm_L": {
       "head": [
         0.07,
-        0.5842,
+        0.5452,
         0.001
       ],
       "tail": "forearm_L",
@@ -104,9 +104,9 @@
     },
     "forearm_L": {
       "head": [
-        0.147509,
-        0.584182,
-        0.004883
+        0.1475,
+        0.5452,
+        0.005
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
@@ -114,7 +114,7 @@
     "forearm_twist_L": {
       "head": [
         0.186,
-        0.5847,
+        0.5457,
         0.009
       ],
       "tail": "hand_L",
@@ -123,7 +123,7 @@
     "hand_L": {
       "head": [
         0.225,
-        0.5848,
+        0.5458,
         0.013
       ],
       "tail": "fingers_L",
@@ -131,29 +131,29 @@
     },
     "fingers_L": {
       "head": [
-        0.256331,
-        0.586962,
-        0.014185
+        0.268491,
+        0.54827,
+        0.014928
       ],
       "tail": [
-        0.284627,
-        0.589274,
-        0.026975
+        0.307935,
+        0.5509,
+        0.031335
       ],
       "roll": "palm"
     },
     "thigh_L": {
       "head": [
         0.0595,
-        0.326,
-        0.0035
+        0.287,
+        0.004
       ],
       "tail": "shin_L"
     },
     "shin_L": {
       "head": [
         0.0555,
-        0.217,
+        0.178,
         0.0
       ],
       "tail": "foot_L"
@@ -161,7 +161,7 @@
     "foot_L": {
       "head": [
         0.056,
-        0.055107,
+        0.055,
         -0.012
       ],
       "tail": "toes_L",
@@ -191,12 +191,12 @@
     "tail": {
       "head": [
         0.0,
-        0.369,
+        0.33,
         -0.08
       ],
       "tail": [
         0.0,
-        0.369,
+        0.33,
         -0.13
       ],
       "roll": [
@@ -207,14 +207,14 @@
     },
     "fingers_R": {
       "head": [
-        -0.255874,
-        0.586386,
-        0.018657
+        -0.267942,
+        0.547898,
+        0.020265
       ],
       "tail": [
-        -0.285378,
-        0.576633,
-        0.020646
+        -0.308923,
+        0.535829,
+        0.022897
       ],
       "roll": "palm"
     }
@@ -260,16 +260,16 @@
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 15 degrees down and 8 degrees out, and the shin leans 12 degrees forward of vertical, so that most of the thigh lies on the seat (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12).",
     "legTurns": {
       "thigh": [
-        0.616206,
-        -0.019661,
-        -0.091922,
-        0.781955
+        0.617985,
+        -0.019299,
+        -0.092074,
+        0.780541
       ],
       "shin": [
-        0.141239,
-        0.000323,
-        0.001522,
-        0.989974
+        0.152745,
+        0.000426,
+        0.002002,
+        0.988263
       ],
       "foot": [
         0.0,
@@ -293,24 +293,24 @@
     "eyeBox": [
       [
         0.0,
-        0.704,
+        0.665,
         0.04
       ],
       [
-        0.06948,
-        0.778451,
-        0.089479
+        0.07,
+        0.74,
+        0.09
       ]
     ],
     "noseBox": [
       [
         -0.02,
-        0.689,
+        0.65,
         0.11
       ],
       [
         0.02,
-        0.729,
+        0.69,
         0.14
       ]
     ],
@@ -362,16 +362,16 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies. Bone heat gives them their weights."
   },
-  "jointsNote": "TODO",
+  "jointsNote": "The places are the places of the source, mapped by the paw turns of the hand rig (assets/models/rabbit/README.md). The hand rig makes no point edit. The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 10 vertices): the shoulder joint at x 0.07, the elbow at x 0.1475, the wrist at x 0.225, the knuckles at x 0.268, and the tip at x 0.31. Leg (closed rings of 12 vertices): the hip joint at (0.0595, 0.287, 0.004) in the haunch, the knee at y 0.178, the ankle at y 0.055, the ball of the foot at z 0.055, and the toe tips at z 0.095. Trunk: the hips at y 0.31, the neck at y 0.585, and the head from y 0.615 to 0.80. Ears: the root at y 0.785, the tips at (0.10, 1.0, -0.065). Tail: a short bone from (0, 0.33, -0.08) back. The hip joint lies 0.5 mm forward of the measured place (z 0.0035), because with z 0.0035 the rest frames of the leg bones in Blender scale by 3e-5 (the thigh points nearly opposite to its parent), above the limit of pnpm rig-export.",
   "body": {
-    "crease": 55,
+    "crease": 180,
     "backRoom": 0.01
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 55, because the arm rings of the source have 10 vertices, 36 degrees apart, and the back room 0.01 m of the first Tripo rabbit.",
-  "eyeSize": 0.19,
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and a seat 1 cm deeper, so that the back keeps off the chair back.",
+  "eyeSize": 0.2018,
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
-  "metersPerUnit": 1.474,
-  "metersPerUnitNote": "The scale of the app: H keeps the H of the rabbit of main (0.2985 m).",
+  "metersPerUnit": 1.4795,
+  "metersPerUnitNote": "The scale of the app: H (0.2018 units of the source form) is 0.2985 m, the H of the rabbit of main. The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/rabbit.blend holds it.",
   "texture": "assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg",
   "rollSplit": true,
