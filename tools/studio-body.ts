@@ -1871,11 +1871,16 @@ interface SourceMesh {
  *
  * @param glb The file.
  * @param kept The corrective shapes that the export keeps: the first morph targets.
+ * @param eyeFinish The finish of the eyes of the mesh (`AnimalSettings.eyeFinish`).
  * @returns The welded mesh. The primitive of a dropped bone, such as the baton, is not in it.
  * @throws Error if the file has no skinned mesh, if its first morph targets are not these shapes,
  *   or if a face has corners of different colors.
  */
-export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
+export function weldMesh(
+  glb: Glb,
+  kept: readonly string[],
+  eyeFinish: Finish = EYEBALL_FINISH,
+): SourceMesh {
   const node = glb.json.nodes.find((n) => n.mesh !== undefined && n.skin !== undefined);
   const mesh = node?.mesh === undefined ? undefined : glb.json.meshes[node.mesh];
   const skin = node?.skin === undefined ? undefined : glb.json.skins[node.skin];
@@ -1975,7 +1980,7 @@ export function weldMesh(glb: Glb, kept: readonly string[]): SourceMesh {
         corners: [vertexOf(a), vertexOf(b), vertexOf(c)],
         color: [color[0] ?? 0, color[1] ?? 0, color[2] ?? 0],
         base: [base[0] ?? 0, base[1] ?? 0, base[2] ?? 0],
-        finish: eyeball ? EYEBALL_FINISH : finish,
+        finish: eyeball ? eyeFinish : finish,
         eyeball,
         cap: material === 'fur' && caps.has(t / 3),
         rim: material === 'fur' && rim.has(t / 3),
@@ -3036,17 +3041,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     settings,
     raises.map((raise) => raise.target),
   );
-  const welded = weldMesh(glb, kept);
-  const { eyeFinish } = settings;
-  const mesh =
-    eyeFinish === undefined
-      ? welded
-      : {
-          ...welded,
-          faces: welded.faces.map((face) =>
-            face.eyeball === true ? { ...face, finish: eyeFinish } : face,
-          ),
-        };
+  const mesh = weldMesh(glb, kept, settings.eyeFinish);
   const frame = sceneFrame(glb, skeleton, mesh, settings);
   const scale = frame.scale;
   const model = (p: Vector3): Vec3 => toModelAxes(p.clone().add(frame.offset), scale);
