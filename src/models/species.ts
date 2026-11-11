@@ -458,12 +458,15 @@ export const SPECIES = {
    * of the red fox and longer legs. It sits with the knees apart around the lower bout of the
    * cello, and its thin tail hangs down behind the seat between the back posts of the chair. Its
    * ears hang, so they do not twitch. Its head height is the head of the studio body, and its chair
-   * fits its legs: the seat height is the seat of the studio body, in H. It plays a 1/10 cello,
-   * the size of the cello rule for its short arms (`pnpm cello-size dog`).
+   * fits its legs: the seat height is the seat of the studio body, in H. It plays a 1/2 cello
+   * (a back of 23 in to 26 in, 0.77 to 0.87 of a 4/4). The reach limit of the cello rule fails at
+   * each size for its short arms, so the rule gives the clamp of a 1/10 (`pnpm cello-size dog`).
+   * A 1/10 fits the body at the H of the dog of main, and the cello keeps that share of the body
+   * at the larger H of the Tripo beagle: 0.65 times 1.27, to two places.
    */
   dog: {
     body: 'studio-dog',
-    celloScale: 0.65,
+    celloScale: 0.83,
     colors: SPECIES_COLORS.dog,
     hangingEars: true,
     headHeight: STUDIO_HEIGHTS['studio-dog'].headHeight,

@@ -576,7 +576,11 @@ The app follows these facts:
 - **The size (2.7).** The cello rule (`celloRule()` of `tools/cello-size.ts`) takes the largest
   cello at which the left paw reaches the first position with the elbow bent, the end pin fits
   the chest, and the lower bout is not below the knees. It clamps the size from a 1/10 [84] to a
-  4/4 [63].
+  4/4 [63]. The reach of the short arms of the Tripo beagle fails at each size, so the rule gives
+  it the 1/10. The beagle stands 1.51 m high, and its cello scales with its body to 0.83 of a 4/4,
+  in the range of a 1/2 (a back of 23 in to 26 in [63]). A size guide gives a 1/2 to a player of
+  4 ft 0 in to 4 ft 6 in and a 4/4 from 5 ft 0 in [64]. The beagle (4 ft 11 in, derived) lies
+  between the two, and its short arms take the smaller size.
 - **The rest (2.7).** The cello stays between the knees, and the left paw holds it. The right paw
   holds the bow with the tip up, as in the first lesson of [61]. The right upper arm hangs as in
   the bind pose, and the forearm points forward (`forearmGrip()`). The dog holds the bow over the

@@ -1599,7 +1599,10 @@ sizes a violin so that, with the left arm extended, the scroll lies in the middl
 cellist does: the largest cello at which the left paw reaches the first position with the elbow
 bent to at most `CELLO_ELBOW`, the end pin fits the chest, and the lower bout is not below the
 knees, clamped to the real sizes (`REAL_CELLOS`, from a 1/10 to a 4/4). The cast matrix gives
-this size to a recast cellist, and a new cellist species takes it as its `celloScale`. Each cello
+this size to a recast cellist, and a new cellist species takes it as its `celloScale`. The reach
+limit of the Tripo beagle fails at each size, so the rule gives it the clamp. Its cello keeps the
+share of the body that the clamp has at the H of the dog of main, because the body scales to a
+larger H (4.4), and the scroll must stay beside the left ear (`celloScale` of the dog). Each cello
 gets the end pin of its body (`celloPinOf()`), so that the top of its back rests on the chest at
 the lean of `CELLO_PLACE`, as a cellist sets the end pin.
 

@@ -1263,17 +1263,18 @@ const CAT_HOLD = {
 /**
  * The hold of the cello between the knees, for the dog mesh (design 4.6, 5.3): the arm values of
  * {@link CELLO_HOLD} with the place from the body (`fit`, `fitCelloPlace()`). The Tripo beagle
- * sits on a seat of 0.15 m, and its right arm reaches only 0.24 m from the shoulder joint. So it
- * plays a 1/10 cello, the size of the cello rule (`SpeciesParams.celloScale`), with the middle
- * line of the back 0.1 H in front of the body, and the cello leans 20° to the left, so that the
- * neck passes over the left shoulder and the scroll stands beside the left ear, as on a real
- * cellist (`docs/reference/string-technique.md`, section 2.7). With the old fixed place and the
- * 1/2 cello, the end pin stood 0.66 m in front of the seat, the pegbox stood in front of the muzzle
- * and the eye, the bow arm reached no part of the hair, and the bow went behind the strings
- * through the waist of the cello. With the 14° of `CELLO_PLACE`, the nut stays 18 cm in front of
- * the head at the side of the muzzle. With the gap of 0.28 H, the left paw reaches the fingerboard
- * only to 0.74 of its length. The cello keeps the place in the rest pose (`BowedHold.rest` null).
- * In the high positions, the left paw tilts further over the neck, as in {@link CELLO_HOLD}.
+ * sits on a seat of 0.19 m, and its right arm reaches only 0.30 m from the shoulder joint. So it
+ * plays a 1/2 cello, the 1/10 of the cello rule times the scale of its body
+ * (`SpeciesParams.celloScale`), with the middle line of the back 0.1 H in front of the body, and
+ * the cello leans 20° to the left, so that the neck passes over the left shoulder and the scroll
+ * stands beside the left ear, as on a real cellist (`docs/reference/string-technique.md`, section
+ * 2.7). With the fixed place of the dog of main, the end pin stood far in front of the seat, the
+ * pegbox stood in front of the muzzle and the eye, the bow arm reached no part of the hair, and
+ * the bow went behind the strings through the waist of the cello. With the 14° of `CELLO_PLACE`,
+ * the nut stays 0.55 H in front of the head at the side of the muzzle. With the gap of 0.28 H,
+ * the left paw reaches the fingerboard only to 0.74 of its length. The cello keeps the place in
+ * the rest pose (`BowedHold.rest` null). In the high positions, the left paw tilts further over
+ * the neck, as in {@link CELLO_HOLD}.
  *
  * The rebuilt arms of the dog are round tubes with their full inner half width (design 5.3, "Free
  * round arms"), so the elbows keep away from the sides, as a cellist starts a stroke open at the
