@@ -135,6 +135,11 @@ interface LeftHandPlace {
   readonly fingers: Vec3;
   /** The curl of the fingers. */
   readonly curl: number;
+  /**
+   * The direction of the palm, in the model axes, or none for the palm of the hand direction
+   * alone. The paw rolls around its fingers toward it.
+   */
+  readonly palm?: Vec3;
 }
 
 /**
@@ -151,21 +156,41 @@ export const LEFT_HAND_PLACES = {
   quiet: { wrist: [-0.5, 0.28, -0.81], fingers: [0.2, -0.1, -1], curl: 25 * MathUtils.DEG2RAD },
   /** The mirror of the beat in a loud passage: the wrist at beat 1, above the shoulder. */
   mirror: { wrist: [-0.5, 0.41, -0.72], fingers: [0.1, 0, -1], curl: 15 * MathUtils.DEG2RAD },
-  /** The raised hand of a crescendo, open and up. */
-  swell: { wrist: [-0.44, 0.88, -0.78], fingers: [0, 0.6, -1], curl: 5 * MathUtils.DEG2RAD },
+  /** The raised hand of a crescendo, open, with the palm up. */
+  swell: {
+    wrist: [-0.44, 0.88, -0.78],
+    fingers: [0, 0.6, -1],
+    curl: 5 * MathUtils.DEG2RAD,
+    palm: [0, 1, 0.3],
+  },
   /**
-   * The lowered hand of a diminuendo, open and down, out at the left at the height of the
-   * shoulder.
+   * The lowered hand of a diminuendo and of a soft passage, open with the palm down, out at the
+   * left at the height of the shoulder.
    */
-  fade: { wrist: [-0.59, 0.06, -0.78], fingers: [0, -0.6, -1], curl: 5 * MathUtils.DEG2RAD },
-  /** The held palm of a held chord, out to the players above the shoulder. */
-  hold: { wrist: [-0.44, 0.53, -1.0], fingers: [0, 0.3, -1], curl: 5 * MathUtils.DEG2RAD },
+  fade: {
+    wrist: [-0.59, 0.06, -0.78],
+    fingers: [0, -0.6, -1],
+    curl: 5 * MathUtils.DEG2RAD,
+    palm: [0, -1, -0.3],
+  },
+  /** The held palm of a held chord, up and out to the players above the shoulder. */
+  hold: {
+    wrist: [-0.44, 0.53, -1.0],
+    fingers: [0, 0.3, -1],
+    curl: 5 * MathUtils.DEG2RAD,
+    palm: [0, 1, 0.3],
+  },
   /**
    * The open arm of a climax: wide out to the left and high, above the shoulder and forward, with
    * the fingers open, out, and up, as the arms of a conductor open wide at a climax
    * (`conductor-technique.md`).
    */
-  open: { wrist: [-1.1, 0.95, -0.45], fingers: [-0.5, 0.8, -0.5], curl: 5 * MathUtils.DEG2RAD },
+  open: {
+    wrist: [-1.1, 0.95, -0.45],
+    fingers: [-0.5, 0.8, -0.5],
+    curl: 5 * MathUtils.DEG2RAD,
+    palm: [0.3, 1, 0],
+  },
 } as const satisfies Readonly<Record<string, LeftHandPlace>>;
 
 /**
@@ -180,6 +205,19 @@ const MIRROR_SCALE = 0.45;
  * left upper arm 1.6 cm into the shoulder with no limit.
  */
 const MIRROR_IN = 0.12;
+
+/**
+ * The direction of the palm of the left paw in the bind pose, in the model axes: inward, down, and
+ * a little forward. The palm of the source mesh faces down and forward in its T-pose
+ * (`tools/mesh-rigs/bear.json`), and the arm of the bind hangs down from it.
+ */
+const PALM_BIND_L: Vec3 = [0.7, -0.6, -0.4];
+
+/**
+ * The largest twist of the left paw on its forearm. The roll of the palm stops at it, so that the
+ * wrist does not twist far from the bind pose.
+ */
+const MAX_TWIST_L = 45 * MathUtils.DEG2RAD;
 
 /** The curl of the closed left hand of a cut-off. */
 const CLOSE_CURL = 80 * MathUtils.DEG2RAD;
@@ -378,6 +416,9 @@ const liftBaton = new Vector3();
 const bodyTurn = new Quaternion();
 /** The turn of a clavicle in the rise of the shoulders. Each call writes it first. */
 const shrugTurn = new Quaternion();
+const palm = new Vector3();
+const palmNow = new Vector3();
+const palmRoll = new Quaternion();
 const bodySway = new Quaternion();
 
 /**
@@ -600,6 +641,28 @@ function placeOf(
 }
 
 /**
+ * Rolls the module rotation `hand` of the left paw around its fingers, so that its palm turns
+ * toward the module vector `palm` by a weight (design 5.4): up in a crescendo and on a held
+ * chord, down in a diminuendo and a soft passage.
+ *
+ * @param axis The unit direction of the fingers.
+ * @param weight The weight of the roll, from 0 to 1.
+ */
+function rollPalm(axis: Vector3, weight: number): void {
+  palmNow.fromArray(PALM_BIND_L).normalize().applyQuaternion(hand);
+  palmNow.addScaledVector(axis, -palmNow.dot(axis));
+  palm.addScaledVector(axis, -palm.dot(axis));
+  if (palmNow.lengthSq() < 1e-8 || palm.lengthSq() < 1e-8) {
+    return;
+  }
+  palmNow.normalize();
+  palm.normalize();
+  const cos = palmNow.dot(palm);
+  const angle = Math.atan2(palmNow.cross(palm).dot(axis), cos);
+  hand.premultiply(palmRoll.setFromAxisAngle(axis, angle * weight));
+}
+
+/**
  * Writes the left arm and its fingers (design 5.4). Between its cues, the hand rests at the quiet
  * place, mirrors the beat in a loud passage, rises in a crescendo, comes down in a diminuendo or
  * a soft passage, holds the palm out on a held chord, and opens wide and high at a climax, by the
@@ -633,6 +696,7 @@ function poseLeftHand(
   wrist.copy(place);
   direction.copy(fingers);
   let curl: number = places.quiet.curl;
+  let palmWeight = 0;
   const steps: readonly (readonly [LeftHandPlace, number])[] = [
     [places.mirror, weights.mirror],
     [places.swell, weights.swell],
@@ -646,6 +710,13 @@ function poseLeftHand(
       wrist.lerp(place, w);
       direction.lerp(fingers, w);
       curl += (of.curl - curl) * w;
+      if (of.palm) {
+        toPlace.fromArray(of.palm).normalize().applyAxisAngle(Y_AXIS, turn);
+        palm.copy(palmWeight > 0 ? palm : toPlace).lerp(toPlace, w);
+        palmWeight += (1 - palmWeight) * w;
+      } else {
+        palmWeight *= 1 - w;
+      }
     }
   }
   curl += (CLOSE_CURL - curl) * weights.close;
@@ -667,9 +738,13 @@ function poseLeftHand(
     const liftCurl =
       (ready * CONDUCTOR_HOLD.readyCurl + cue.hand * CONDUCTOR_HOLD.cueCurl) / (ready + cue.hand);
     curl += (liftCurl - curl) * lift;
+    palmWeight *= 1 - lift;
   }
   limitReach(rig.left, left.position, wrist);
   handToward(left, place.copy(left.position).add(direction.normalize()), hand);
+  if (palmWeight > 0) {
+    rollPalm(direction, palmWeight);
+  }
   const up = weight * (1 - state.bow);
   levelOf(left, frames.root);
   hangingWrist(rig.hangL, hangFrame, hanging);
@@ -680,6 +755,7 @@ function poseLeftHand(
       wrist: wrist.lerpVectors(hanging, wrist, up),
       hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, up, hand),
       pole: mixPole(rig.hangL.pole, CONDUCTOR_HOLD.poleL, up),
+      maxTwist: MAX_TWIST_L,
     },
     chest.rotation,
     rotations,
