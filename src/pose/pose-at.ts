@@ -10,7 +10,15 @@ import { createIdleState, idleAt } from './idle.ts';
 import { poseConductor } from './conductor.ts';
 import type { ConductorState } from './conductor.ts';
 import { createLeftHandState, leftHandAt } from './conductor-left.ts';
+import {
+  EXPRESSION_MOTION,
+  createExpressionState,
+  expressBaton,
+  expressionAt,
+} from './conductor-expression.ts';
+import type { ExpressionState } from './conductor-expression.ts';
 import { batonAt, resumeLift } from './conductor-notes.ts';
+import type { BatonState } from './conductor-notes.ts';
 import { createCueState, cueStateAt } from './cues.ts';
 import { NO_COUNT_IN, countInAt, leaderNodAt, noteLayerTime, readyAt } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
@@ -328,6 +336,10 @@ interface FrameScratch {
   readonly choir: ChoirState;
   readonly strikes: PercussionState;
   readonly conductor: ConductorState;
+  /** The expression of the conductor at the song time (design 5.4). */
+  readonly expression: ExpressionState;
+  /** The point of the baton at the start of the final chord (design 5.4). */
+  readonly chordPoint: BatonState;
   /** The audibility of the seats and the wall clock time, for the cues of the conductor. */
   readonly audibility: readonly (SeatAudibility | undefined)[];
   readonly wallTime: number;
@@ -368,7 +380,7 @@ function poseAnimal(
   pose.pawTurnL = null;
   pose.pawBendR = 0;
   const note = player.note;
-  // The conductor does not sway with the beat (design 5.4).
+  // The conductor does not sway with the beat. It sways with the phrase (design 5.4).
   const body = scratch.body;
   body.sway = note.family === 'conductor' ? 0 : swayOf(plan, player, noteTime, weight);
   body.lean = 0;
@@ -575,28 +587,59 @@ function poseAnimal(
       break;
     }
     case 'conductor': {
-      const { conductor } = scratch;
+      const { conductor, expression, chordPoint } = scratch;
       conductor.ready = readyAt(scratch.countIn, noteTime);
       batonAt(note.baton, noteTime, conductor.baton, conductor.ready);
+      // The expression changes the beat at a climax and on the final chord (design 5.4).
+      expressionAt(note.expression, noteTime, expression);
+      const { final } = note.expression;
+      if (final) {
+        batonAt(note.baton, final.startSec, chordPoint);
+      }
+      expressBaton(
+        note.expression,
+        expression,
+        noteTime,
+        final ? chordPoint : null,
+        conductor.baton,
+      );
       conductor.baton.y += resumeLift(note.baton, scratch.countIn, scratch.songTime);
       // The head and the upper body turn to a cued section, only in the playing pose.
       const { cue } = conductor;
       cueStateAt(note.cues, noteTime, scratch.audibility, scratch.wallTime, cue);
       leftHandAt(note.left, noteTime, conductor.left);
+      // The left palm keeps a soft passage down, holds the final chord up, and closes at the
+      // cut-off.
+      conductor.left.fade = Math.max(
+        conductor.left.fade,
+        EXPRESSION_MOTION.softPalm * expression.soft,
+      );
+      conductor.left.hold = Math.max(conductor.left.hold, expression.final);
+      conductor.left.close = Math.max(conductor.left.close, expression.close * expression.final);
       cue.torsoYaw *= weight;
       cue.headYaw *= weight;
       cue.headPitch *= weight;
       body.turn = cue.torsoYaw;
       body.headTurn = cue.headYaw;
+      conductor.lean = expression.lean * weight;
+      conductor.sway = expression.sway * weight;
+      conductor.drop = expression.drop * weight;
+      conductor.climax = expression.climax * weight;
       // The bow at the song end bends the spine and the head forward (design 5.4).
       const bend = endBowAt(scratch.endElapsed);
-      body.lean = bend;
+      body.lean = bend + conductor.lean;
+      body.sway = conductor.sway;
       // The left hand comes down to the side as the bow starts, and stays down.
       conductor.bow = Number.isNaN(scratch.endElapsed)
         ? 0
         : smoothstep((scratch.endElapsed - END_BOW.startSec) / END_BOW.downSec);
-      body.lift = cue.headPitch - bend * END_BOW.head;
+      body.lift = cue.headPitch - bend * END_BOW.head + expression.head * weight;
+      // The knees bend, and the feet stay on the podium.
+      pose.rootOffset[1] = -conductor.drop;
       writeBody(pose, player, scratch);
+      if (conductor.drop > 0) {
+        plantFeet(note.rig.legs, pose.rootOffset, pose.rotations);
+      }
       poseConductor(note.rig, scratch.torso, conductor, weight, pose.rotations);
       break;
     }
@@ -693,7 +736,13 @@ export function poseAt(
       ready: 0,
       left: createLeftHandState(),
       bow: 0,
+      lean: 0,
+      sway: 0,
+      drop: 0,
+      climax: 0,
     },
+    expression: createExpressionState(),
+    chordPoint: { x: 0, y: 0 },
     audibility,
     wallTime,
     countIn: transport.seekStart ? NO_COUNT_IN : countInAt(plan.beats, transport.startSec),

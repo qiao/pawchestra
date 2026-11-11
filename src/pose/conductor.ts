@@ -6,7 +6,7 @@ import { BATON_ALONG, BATON_TOP } from '../models/instruments/baton.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { NO_TURN, Y_AXIS } from './axes.ts';
+import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import type { CueState } from './cues.ts';
@@ -17,6 +17,8 @@ import { hangingArm, hangingHand, hangingWrist } from './hang.ts';
 import type { HangingArm } from './hang.ts';
 import { armRig, handToward, limitReach, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
+import { plantedLegs } from './side-move.ts';
+import type { PlantedLegs } from './side-move.ts';
 
 /**
  * The hold of the baton and of the left hand of the conductor (design 5.4). The places are in
@@ -158,6 +160,12 @@ export const LEFT_HAND_PLACES = {
   fade: { wrist: [-0.59, 0.06, -0.78], fingers: [0, -0.6, -1], curl: 5 * MathUtils.DEG2RAD },
   /** The held palm of a held chord, out to the players above the shoulder. */
   hold: { wrist: [-0.44, 0.53, -1.0], fingers: [0, 0.3, -1], curl: 5 * MathUtils.DEG2RAD },
+  /**
+   * The open arm of a climax: wide out to the left and high, above the shoulder and forward, with
+   * the fingers open, out, and up, as the arms of a conductor open wide at a climax
+   * (`conductor-technique.md`).
+   */
+  open: { wrist: [-0.95, 0.75, -0.55], fingers: [-0.5, 0.7, -0.6], curl: 5 * MathUtils.DEG2RAD },
 } as const satisfies Readonly<Record<string, LeftHandPlace>>;
 
 /**
@@ -165,6 +173,13 @@ export const LEFT_HAND_PLACES = {
  * the part that the right wrist follows.
  */
 const MIRROR_SCALE = 0.45;
+
+/**
+ * The mirror moves the left hand at most this far inward, in meters, so that the hand mirrors
+ * outside of the torso (`conductor-technique.md`). The larger beat of a loud passage moved the
+ * left upper arm 1.6 cm into the shoulder with no limit.
+ */
+const MIRROR_IN = 0.12;
 
 /** The curl of the closed left hand of a cut-off. */
 const CLOSE_CURL = 80 * MathUtils.DEG2RAD;
@@ -215,6 +230,8 @@ export interface ConductorRig {
   readonly liftBaton: Vec3;
   /** The unit direction of the left hand in the ready gesture: up and a little outward. */
   readonly readyDirection: Vec3;
+  /** The legs, which bend so that the feet stay on the podium when the hips drop. */
+  readonly legs: PlantedLegs;
 }
 
 /**
@@ -281,6 +298,7 @@ export function conductorRig(model: PlayerModel): ConductorRig {
       Math.sin(CONDUCTOR_HOLD.readyLift),
       -Math.cos(CONDUCTOR_HOLD.readyOut) * Math.cos(CONDUCTOR_HOLD.readyLift),
     ],
+    legs: plantedLegs(model),
   };
 }
 
@@ -302,6 +320,17 @@ export interface ConductorState {
    * to the side by this weight, so that the head does not bow into it.
    */
   bow: number;
+  /**
+   * The lean of the expression (design 5.4), in radians: the forward lean of the spine, scaled by
+   * the playing pose. The places of the hands lean with it.
+   */
+  lean: number;
+  /** The side sway of the expression, in radians, scaled by the playing pose. */
+  sway: number;
+  /** The drop of the hips of the expression, in meters, scaled by the playing pose. */
+  drop: number;
+  /** The weight of the open arms of a climax, from 0 to 1. */
+  climax: number;
 }
 
 const right = createFrame();
@@ -342,6 +371,35 @@ const toPlace = new Vector3();
 
 /** The direction of the baton in the middle of a lift or a lowering. Each call writes it first. */
 const liftBaton = new Vector3();
+const bodyTurn = new Quaternion();
+const bodySway = new Quaternion();
+
+/**
+ * Moves a point of the model axes with the expression of the body (design 5.4): the sway and the
+ * lean of the spine around the `spine` bone, and the drop of the hips. Thus the hands keep their
+ * places to the head and the chest.
+ *
+ * @param rig The points of the conductor.
+ * @param point The point to move in place.
+ * @param state The motion at the song time.
+ * @returns `point`.
+ */
+function followBody(rig: ConductorRig, point: Vector3, state: ConductorState): Vector3 {
+  if (state.lean === 0 && state.sway === 0 && state.drop === 0) {
+    return point;
+  }
+  const [x, y, z] = rig.spineBind;
+  bodyTurn.setFromAxisAngle(Z_AXIS, state.sway);
+  bodyTurn.multiply(bodySway.setFromAxisAngle(X_AXIS, -state.lean));
+  point.x -= x;
+  point.y -= y;
+  point.z -= z;
+  point.applyQuaternion(bodyTurn);
+  point.x += x;
+  point.y += y - state.drop;
+  point.z += z;
+  return point;
+}
 
 /**
  * Turns a point of the model axes around the vertical through the `spine` bone.
@@ -363,21 +421,21 @@ function turnWithTorso(rig: ConductorRig, point: Vector3, yaw: number): Vector3 
 
 /**
  * Writes the point of the tip of the baton in the model axes (design 5.4): the point of beat 1
- * plus the point in the beat plane. The beat plane turns by {@link CONDUCTOR_HOLD.beatTurn} of the
- * turn of the upper body toward a cued section.
+ * plus the point `lifted` in the beat plane. The beat plane moves with the expression of the body
+ * ({@link followBody}) and turns by {@link CONDUCTOR_HOLD.beatTurn} of the turn of the upper body
+ * toward a cued section.
  *
  * @param rig The points of the conductor.
- * @param baton The point in the beat plane.
- * @param torsoYaw The turn of the upper body around +y, positive to the left.
+ * @param state The motion at the song time.
  * @param out The vector to write.
  * @returns `out`.
  */
-function batonPoint(rig: ConductorRig, baton: BatonState, torsoYaw: number, out: Vector3): Vector3 {
+function batonPoint(rig: ConductorRig, state: ConductorState, out: Vector3): Vector3 {
   out
     .fromArray(rig.beatPoint)
-    .addScaledVector(offset.fromArray(rig.beatRight), baton.x)
-    .addScaledVector(offset.fromArray(rig.beatUp), baton.y);
-  return turnWithTorso(rig, out, beatTurnOf(torsoYaw));
+    .addScaledVector(offset.fromArray(rig.beatRight), lifted.x)
+    .addScaledVector(offset.fromArray(rig.beatUp), lifted.y);
+  return turnWithTorso(rig, followBody(rig, out, state), beatTurnOf(state.cue.torsoYaw));
 }
 
 /**
@@ -455,8 +513,8 @@ export function poseConductor(
   poseShoulder(rig.right, chest, rig.chestBind, NO_TURN, right);
   lifted.x = state.baton.x;
   lifted.y = state.baton.y + cue.batonLift;
-  batonPoint(rig, lifted, cue.torsoYaw, tip);
-  turnWithTorso(rig, pivot.fromArray(rig.pivot), beatTurnOf(cue.torsoYaw));
+  batonPoint(rig, state, tip);
+  turnWithTorso(rig, followBody(rig, pivot.fromArray(rig.pivot), state), beatTurnOf(cue.torsoYaw));
   batonHand(rig, tip, pivot);
   levelOf(right, frames.root);
   hangingWrist(rig.hangR, hangFrame, hanging);
@@ -511,28 +569,33 @@ function levelOf(shoulder: Frame, root: Frame): void {
  *
  * @param rig The points of the conductor.
  * @param of The place.
+ * @param state The motion at the song time, for the expression of the body.
  * @param torsoYaw The turn of the place around the `spine` bone, positive to the left.
  * @param baton The motion of the baton to mirror, in meters, or `null` for no motion.
  */
 function placeOf(
   rig: ConductorRig,
   of: LeftHandPlace,
+  state: ConductorState,
   torsoYaw: number,
   baton: BatonState | null,
 ): void {
   place.fromArray(of.wrist).multiplyScalar(rig.headHeight);
   if (baton) {
-    place.x -= MIRROR_SCALE * baton.x;
+    // A move to +x is a move inward, toward the middle of the body.
+    place.x += Math.min(MIRROR_IN, -MIRROR_SCALE * baton.x);
     place.y += MIRROR_SCALE * baton.y;
   }
-  turnWithTorso(rig, place.add(toPlace.fromArray(rig.left.bind.shoulder)), torsoYaw);
+  place.add(toPlace.fromArray(rig.left.bind.shoulder));
+  turnWithTorso(rig, followBody(rig, place, state), torsoYaw);
   fingers.fromArray(of.fingers).normalize().applyAxisAngle(Y_AXIS, torsoYaw);
 }
 
 /**
  * Writes the left arm and its fingers (design 5.4). Between its cues, the hand rests at the quiet
- * place, mirrors the beat in a loud passage, rises in a crescendo, comes down in a diminuendo,
- * and holds the palm out on a held chord, by the weights from the score. A cue and the ready
+ * place, mirrors the beat in a loud passage, rises in a crescendo, comes down in a diminuendo or
+ * a soft passage, holds the palm out on a held chord, and opens wide and high at a climax, by the
+ * weights from the score. The places move with the expression of the body. A cue and the ready
  * gesture of a count-in win over these places by their weights. In the rest pose and in the bow
  * at the song end, the arm hangs.
  *
@@ -556,7 +619,7 @@ function poseLeftHand(
   // The places turn with the upper body to the left. In a turn to the right, they stay, so that
   // the hand does not come over the desk of the stand.
   const turn = Math.max(0, cue.torsoYaw);
-  placeOf(rig, places.quiet, turn, null);
+  placeOf(rig, places.quiet, state, turn, null);
   wrist.copy(place);
   direction.copy(fingers);
   let curl: number = places.quiet.curl;
@@ -565,10 +628,11 @@ function poseLeftHand(
     [places.swell, weights.swell],
     [places.fade, weights.fade],
     [places.hold, weights.hold],
+    [places.open, state.climax],
   ] as const;
   for (const [of, w] of steps) {
     if (w > 0) {
-      placeOf(rig, of, turn, of === places.mirror ? state.baton : null);
+      placeOf(rig, of, state, turn, of === places.mirror ? state.baton : null);
       wrist.lerp(place, w);
       direction.lerp(fingers, w);
       curl += (of.curl - curl) * w;

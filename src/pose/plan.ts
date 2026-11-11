@@ -663,8 +663,8 @@ export function pulseTimes(beats: readonly Beat[]): Float64Array {
 
 /**
  * Calculates the data of the conductor that the pose needs at each frame (design 5.4): the beats
- * of the baton, the cues with the turns to the cued seats, and the levels, the trends, and the
- * held chords for the left hand. The conductor has no timing offset, no look, and a rest motion
+ * of the baton, the cues with the turns to the cued seats, the levels, the trends, and the held
+ * chords for the left hand, and the expression of the body. The conductor has no timing offset, no look, and a rest motion
  * that does not vary. Pure: the same inputs give the same plan.
  *
  * @param inputs The model, the place, the beats, and the notes of the score.
