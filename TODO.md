@@ -77,6 +77,14 @@ passes.
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
+- [ ] Hornist pig: with the bell open to the back (`PIG_TURNS`), three faces of the right arm (332,
+      19, 287) fold in 98% of the play samples. Check them in a 2x crop of the right elbow.
+- [ ] Trombonist panda: the deeper chair (`backRoom` of the panda) gives brahms-2 another layout,
+      and its seats move up to 1.55 m. Check the stage of brahms-2.
+- [ ] Trombonist panda: the slide comes 3 cm to 5 cm from its music desk in boulanger-matin. A
+      longer slide reach or a lower slide puts it into the desk.
+- [ ] Trumpeter monkey: `pnpm hold-fit trumpeter` stops, because the body bones of the Tripo monkey
+      have 6 open loops, and the sweep expects 5.
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
 - [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
