@@ -31,30 +31,29 @@ import type { PlantedLegs } from './side-move.ts';
 export const CONDUCTOR_HOLD = {
   /**
    * The point of the tip of the baton at beat 1 of each pattern, from the right shoulder joint.
-   * With the pivot, it puts the wrist of a soft beat 1 about 0.35 H up, 0.7 H forward, and 0.35 H
-   * out: a little below the chin, in front of the shoulder, and beside the head from behind, as in
-   * `mockup.png`. The tip is in front of the shoulder, so that the baton points in. The tip is
-   * 0.3 H further out than the hold of the mesh bear at 0.93 of its meters, because with that tip
-   * the claws go 7 cm into the muzzle when the head turns to a section on the right
-   * (`pnpm pose-depth conductor`, Mozart K. 525). With the point (0.39, 1.48, -2.0) of a baton
-   * across the fist, the baton along the index finger points up 55°, and the arm stands out to
-   * the side. The values of the mesh bear in `H` put the wrist at the chest, and the paw turns
-   * 3,735° per second in a lowering of the arms, past the limit of the arm gate. At the full
-   * meters of the mesh bear, the paw stands beside the eyes. A wrist 0.15 H further in puts the
-   * claws 2 cm into the long muzzle when the head turns to a section on the right (Mozart
-   * K. 525).
+   * With the pivot, it puts the wrist of a soft beat 1 about 0.15 H below the shoulder joint,
+   * 0.7 H forward, and 0.35 H out: at the chest, in front of the shoulder, so that the beat stays
+   * below the chin (`conductor-technique.md`). The tip is in front of the shoulder, so that the
+   * baton points in. With the wrist 0.35 H above the shoulder joint, the right paw of the Tripo
+   * bear went to its chin, and the baton crossed its long muzzle in the views from the front
+   * right. The tip is 0.3 H further out than the hold of the mesh bear at 0.93 of its meters,
+   * because with that tip the claws went 7 cm into the muzzle when the head turned to a section
+   * on the right (`pnpm pose-depth conductor`, Mozart K. 525). With the point (0.39, 1.48, -2.0)
+   * of a baton across the fist, the baton along the index finger points up 55°, and the arm
+   * stands out to the side.
    */
-  beatPoint: [0.28, 1.235, -2.177],
+  beatPoint: [0.28, 0.735, -2.177],
   /**
    * The baton points from this place to its tip, from the right shoulder joint: forward, up 18°,
-   * and 20° inward at beat 1, as a conductor points it at the players. With 25° up, the baton
-   * rises past the face in the views from the front. The pivot is about 0.9 m from the tip, about
-   * twice as far as the wrist, so that the wrist follows about half of the motion of the tip in
-   * the beat plane, and the arm beats with the baton. With 15° up, the right forearm twists more
-   * in the lift (p95 28° against 12°), and with 10° inward, the baton stands straight up from the
-   * front.
+   * and 20° inward at beat 1, as a conductor points it at the players. The pivot is as far below
+   * the shoulder joint as the tip of {@link CONDUCTOR_HOLD.beatPoint}, so that the baton keeps its
+   * angle. With 25° up, the baton rises past the face in the views from the front. The pivot is
+   * about 0.9 m from the tip, about twice as far as the wrist, so that the wrist follows about
+   * half of the motion of the tip in the beat plane, and the arm beats with the baton. With 15°
+   * up, the right forearm twists more in the lift (p95 28° against 12°), and with 10° inward, the
+   * baton stands straight up from the front.
    */
-  batonPivot: [1.233, 0.33, 0.442],
+  batonPivot: [1.233, -0.17, 0.442],
   /**
    * The beat plane turns this part of the turn of the upper body to a cued section on the left.
    * Thus the arm opens to the right in a turn to the left, and the hand stays beside the head from

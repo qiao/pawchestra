@@ -116,7 +116,8 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   `riseShrug`), as the open arms and the rising shoulders of section 2. A soft passage makes the
   pattern smaller and lower (`softSize`, `softDrop`). The body leans toward the players, the head
   goes down, and the knees bend (`softLean`, `softHead`, `softCrouch`), as the smaller body of
-  section 6. The app keeps the beat below the chin, except at a climax (section 1).
+  section 6. The app keeps the beat below the chin, except at a climax (section 1). At beat 1,
+  the right wrist is at the chest, a little below the shoulder joint (`CONDUCTOR_HOLD.beatPoint`).
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
   passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm

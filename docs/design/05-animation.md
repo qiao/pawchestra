@@ -811,6 +811,11 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - At each beat, the baton tip is at the point of the beat (`BEAT_PATTERNS`). Between two beats,
   the tip rises in an arc and comes down at full speed. The size follows the loudness and the
   level of the passage (Expression).
+- **Beat height.** At beat 1 the right wrist is at the chest, a little below the shoulder joint,
+  in front of the shoulder (`CONDUCTOR_HOLD.beatPoint`, `batonPivot`). Thus the beat stays below
+  the chin, and the baton passes under the long muzzle of the Tripo bear. Reason: real
+  conductors keep most gestures below the chin. With the wrist above the shoulder joint, the
+  paw went to the chin, and the baton crossed the muzzle in the views from the front right.
 - **Count-in.** A click on play does not start the music at once: the conductor first signals the
   players to get ready. The transport starts before the start point (6.5), so the count-in is a
   set of poses at those song times (`COUNT_IN`): a ready pause, then one preparatory beat.
