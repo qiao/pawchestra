@@ -30,6 +30,15 @@ const SOLE = 0.015;
  */
 const HEEL_PITCH = 45 * (Math.PI / 180);
 
+/**
+ * The lift of the heel for a pedal behind the rest place of the toe: the hoof turns down around
+ * its toe by up to `pitch` radians, in full when the toe goes `back` meters behind its rest. The
+ * pedals of the near harp of the Tripo fawn lie under its knees. With the heel on the floor there,
+ * the right shin went 2.0 cm into the front edge of the stool, and with this lift 0 cm (`pnpm
+ * pose-depth harpist`). With 40° in full at 0.2 m, it still went 2.0 cm.
+ */
+const HEEL_LIFT = { pitch: 60 * (Math.PI / 180), back: 0.15 };
+
 /** One leg of a harpist and the harp pedals in front of it, in the model axes. */
 interface HarpFoot {
   /** The bind joints of the leg: the hip (`thigh`), the knee (`shin`), the ankle (`foot`). */
@@ -201,7 +210,11 @@ export function poseHarpFeet(
     sole.fromArray(foot.toe).sub(press.fromArray(foot.heel));
     const length = sole.length();
     const rise = Math.min(Math.max((toeAt.y - (foot.toe[1] ?? 0)) / length, 0), 1);
-    pitch.setFromAxisAngle(PITCH_AXIS, Math.min(Math.asin(rise), HEEL_PITCH));
+    const back = Math.min(Math.max((toeAt.z - (foot.toe[2] ?? 0)) / HEEL_LIFT.back, 0), 1);
+    pitch.setFromAxisAngle(
+      PITCH_AXIS,
+      Math.min(Math.asin(rise), HEEL_PITCH) - HEEL_LIFT.pitch * back,
+    );
     heelAt.copy(toeAt).sub(sole.applyQuaternion(pitch));
     ankleAt.fromArray(foot.bind.wrist).sub(press).applyQuaternion(pitch).add(heelAt);
     hipAt.fromArray(foot.bind.shoulder);
