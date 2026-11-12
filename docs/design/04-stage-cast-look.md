@@ -899,9 +899,10 @@ finish `varnish` and a blink lid. Its front paws are smaller than in the source 
 large. Its round tail is a bump of the haunch, and it moves with the hips. Reason: the bone heat
 gave the tail bones shares of the lower back, and the bump swayed into the chair back. Each paw
 turns by whole ring steps, so that each part of each arm takes at most 45° in the moments of the
-trombonist. Its mouth lies far in front of its short arms, so it plays a smaller trombone
-(`tromboneScale`): a smaller trombone brings the slide brace nearer to the right shoulder, and
-the right arm reaches a longer part of the slide travel. The Tripo fawn (`assets/models/deer/tripo-hand/`) is the body of the harpist, by the same rules. Its source
+trombonist. Its mouth lies far in front of its short arms, so its upper arms and forearms are
+longer than in the source (the point edit `armStretch`, as on the hippo), and it plays the
+trombone of the app. Reason: with the arms of the source, the right arm reached almost none of
+the slide travel of the trombone of the app, and a smaller trombone of 0.75 read as a toy. The Tripo fawn (`assets/models/deer/tripo-hand/`) is the body of the harpist, by the same rules. Its source
 paints a full eye with a light on each eyeball, so the eyeballs take the finish `varnish`, no eye
 light, and a blink lid. Its eyeballs and their sockets are smaller than in the source, because the
 eye opening was about 0.18 of the head width in the play view, above the limit of about 0.14 of
@@ -1971,7 +1972,9 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   bores with the silver cap of its U-tube, the wing joint, the long joint, and the bell joint, with
   silver rings, key rods, and cups. The silver bocal bends over and turns into the reed, a blade
   of cane bound with thread. The reed lies near the long joint (`BASSOON_REED`), so that the long
-  joint passes beside the long muzzle of the beaver, clear of its eye.
+  joint passes beside the long muzzle of the beaver. The beaver turns the left side of the bassoon
+  forward (`BEAVER_PLAY_TURN`), so that from the front left the long joint crosses the muzzle in
+  front of the eye, in place of the cheek next to the eye.
 - **Trumpet** (`TRUMPET`). The lead pipe passes the valves at their left to the main tuning slide
   in front of them. The bell bow behind the valves brings the bell pipe forward at the height of
   the valve tops, so the bell lies above the lead pipe, as on a real trumpet. Three piston valves
