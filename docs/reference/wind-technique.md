@@ -468,13 +468,16 @@ The app follows these facts:
   elbows a little out (`poleL`, `poleR`).
 - **The clarinet (3, `WOLF_CLARINET`).** The clarinet is at the middle of the body, and the head
   does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle
-  (`lipShift`). The elbows point down and a little out. Each paw closes around the body of the
-  clarinet from the side of its own shoulder, with the palm on the tube (`gripShiftL`,
-  `gripShiftR`, `aimSide`). At rest, the bell stands on the front of the right knee, and the
-  clarinet leans with its top out to the right and a little forward (`rest`, `restShift`), as a
-  seated player puts the bell on the knee [60]. The right paw holds the upper joint
-  (`restGripShiftR`), and the left paw hangs free beside the left haunch (`restArms`,
-  `restFreeL`). The round belly leaves no room for the clarinet between the knees.
+  (`lipShift`). The elbows point down and out, a little away from the body (`poleL`, `poleR`), as
+  the elbows of a seated player stay away from the sides (1.8). Each paw closes around the body of
+  the clarinet from the side of its own shoulder, with the palm on the tube and the fingers curled
+  over the front (`gripShiftL`, `gripShiftR`, `aimSide`, `gripCurl`): the left paw on the upper
+  joint and the right paw on the lower joint, as the fingering chart puts the left hand above the
+  right hand [93], with the right paw below the thumb rest [49] [50]. At rest, the bell stands on
+  the front of the right knee, and the clarinet leans with its top out to the right and a little
+  forward (`rest`, `restShift`), as a seated player puts the bell on the knee [60]. The right paw
+  holds the upper joint (`restGripShiftR`), and the left paw hangs free beside the left haunch
+  (`restArms`, `restFreeL`). The round belly leaves no room for the clarinet between the knees.
 - **The woodwind palms (2.3, 2.4, 3).** Each paw of the oboe, the clarinet, and the bassoon holds
   its tube from the side of its own shoulder. The palm faces the tube, the fingers curl over the
   front in a C, and the thumb points up the tube (`faceTube`, `aimAcross`, `aimSide`).
@@ -546,9 +549,10 @@ The app does not follow these facts:
 - **The oboe rest (2.3).** The mouse stands, and its round belly covers the thighs. Thus the oboe
   stands upright in front of the belly, with both paws on their grips (`rest`, `restShift`).
 - **The oboe breath (2.3).** The app has no breath out of the stale air.
-- **The clarinet angle (3).** The clarinet hangs nearer to the vertical than 45° (`hanging()`,
-  `play`), as the wolf of `orchestra-latest.png` and `orchestra-side.png` holds it. The long muzzle
-  puts the mouthpiece far in front of the chest, so at 45° the bell is far in front of the knees.
+- **The clarinet angle (3).** The clarinet hangs 35° from the vertical, nearer to it than 45°
+  (`hanging()`, `play`). The long muzzle puts the mouthpiece far in front of the chest, so at 45°
+  the bell is far in front of the knees, and the arms do not reach the grips. The bell does not
+  reach between the knees: the clarinet is shorter than the line from the mouth to the knees.
 - **The shared clarinet rest (3).** The clarinet stands at the right side in the right paw, with
   the bell on nothing, and the left paw leaves its grip. A seated player keeps the right thumb on
   the thumb rest with the bell on the chair or the knee.
