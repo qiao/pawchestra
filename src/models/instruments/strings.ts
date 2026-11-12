@@ -404,9 +404,11 @@ const RIB_TOP = 0.76;
 /**
  * The break of the flat back of the contrabass: from this place along the body (from its
  * center), the back slopes toward the top by this rise for each meter, up to the neck. The ribs
- * keep their top edge.
+ * keep their top edge. The break starts a little before the earlier start of 0.06, because a point
+ * of the smooth outline just before 0.06 lay 1.3 mm under the earlier back, which was one straight
+ * face across the start, and the left paw of the hippo went 1 mm deeper there in the lift.
  */
-const BASS_BREAK = { from: 0.06, slope: 0.27 } as const;
+const BASS_BREAK = { from: 0.058, slope: 0.27 } as const;
 
 /**
  * Gives the rise of the back of a body at a place along it.
