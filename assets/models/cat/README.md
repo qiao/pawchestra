@@ -440,7 +440,7 @@ the joints of the source, mapped by the paw turns and the eye edit.
 | Size | 379,933 bytes |
 | SHA-256 | `f8e26ac8a8ca696ea2050ea3bf7077e3fa382359ce4b9091398309f0f681c331` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail behind the chair"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.942613 (the shoulder joints at 1.48443 m for each unit, so that H is 0.339381 m, the H of the cat of `cat.rig.glb`), `crease` 180, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh at 0.90 of their size ("Eye size"), with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -512,7 +512,7 @@ left side, y the height, in the source):
 The weights, in the rest pose:
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
-   part. The tail is a part of the body ("Tail on the seat" gives its rows).
+   part. The tail is a part of the body ("Tail behind the chair" gives its rows).
 2. Arm rows: each vertex of a side with |x| from 0.095, within 0.06 units of the line of the rest
    arm, takes one exact row with `sa.set_weight_row()`: a clavicle share from 0.4 at x 0.095 to 0
    at x 0.135, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.178, 0.193, 0.208, and
@@ -563,13 +563,24 @@ of the lap is the thigh.
 (Blender z) from 0.33 to 0.42, rest y below 0, and atan2(|x|, -y) at most 60 degrees, in 3 rounds
 of P += 0.5 ((mid - P) . n) n (the rule of the rabbit).
 
-**Tail on the seat.** The tail has two bones, `tail` from the root at (0, 0.36, -0.065) and
+**Tail behind the chair.** The tail has two bones, `tail` from the root at (0, 0.36, -0.065) and
 `tail_tip` from (0, 0.22, -0.12) to (0, 0.10, -0.20), with the `studio.tailBind` of the third cat.
 The tube vertices take exact rows along a middle line from (0, 0.335, -0.029) to (0, 0.119,
--0.225), and the key `bind_tail` lays the tube along the path of the third cat (the git history of
-this README at c6f979952): down the back, onto the seat behind the haunch, and to the left back
-corner of the seat. 140 tube vertices take tail rows, and 126 move in the key. The tube of the
-bind lies from y 0.137 to 0.344 (the seat top 0.135).
+-0.225), and the key `bind_tail` lays the tube along the path `tailLay.path` of `params.json`:
+back from the root (0, 0.333, -0.031) of the bind, over the back edge of the seat, and down behind
+the chair between the back posts, with the tip a little to the left. 140 tube vertices take tail
+rows, and 126 move in the key. The tube of the bind lies from y 0.095 to 0.384 and back to z
+-0.228. In the axes of the bind the soles are 0.073 units up and the seat top (the lowest point
+of the body over the seat) is at y 0.223, so the tube keeps 5.4 cm from the seat, 8.6 cm from
+each back post, 6.7 cm from the top rail, and 3.3 cm from the floor in the app, in the rest and
+the play of the violist (`tools/tail-gap.ts` with samples of the play). The tail does not sway
+(`seatedTail` of the species).
+
+The key of the first build laid the tube along the path of the third cat (the git history of this
+README at c6f979952): down the back, onto the seat, and to the left back corner of the seat. Its
+seat top of 0.135 was in the axes with the soles on the floor, and the bind has the soles 0.087
+units up. Thus the tube lay 13 cm too low in the app: it went 1.8 cm into the seat, and hung
+under the seat to 7.4 cm over the floor at the left back post.
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -60 to 60 degrees and lam -60 to 65 degrees
 (the right lid mirrors the range) at 1.15 ball radii, and a lower strip at 1.12 radii, 156 quads
