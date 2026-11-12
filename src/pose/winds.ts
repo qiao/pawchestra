@@ -615,11 +615,13 @@ export const WIND_HOLDS = {
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 39°
  * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
- * thin neck. The right paw points up past the back of the flute (`aimSide` -0.8), and the right
- * elbow points a little further out in the play, (1.2, -1.4, -0.3). On the new Tripo fox, the
- * right upper arm then rolls 26° and the forearm twists 30° in the play: with -0.6, the right arm
- * of the new fox takes 58° on the two parts, against 49°. On the first Tripo fox, -0.85 bent the
- * paw 94° on the forearm, and -0.5 twisted the forearm 56°. The fingers curl 90° and 85° around the flute (`gripCurl`):
+ * thin neck. The right paw points a part of the way up past the back of the flute (`aimSide`
+ * -0.45), and the right elbow points a little further out in the play, (1.2, -1.4, -0.3). The
+ * right paw then bends 67° on its forearm (paw swing p95, limit 70°), and its finger tips touch the
+ * flute in each play sample. With -0.8, the paw bent 103°, and the finger tips stood 0.7 cm off the
+ * flute in 69 % of the play samples. With -0.4, the palm turned 57° from the flute, and 5 % of the
+ * samples lost the grasp. An elbow further out bends the paw less, but twists the forearm more.
+ * The fingers curl 90° and 85° around the flute (`gripCurl`):
  * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The free
  * left paw hangs with its palm to the front and a little toward the body, (0.1, 0.25, -0.96): with
  * (0.484, 0.251, -0.838), the left forearm twists 48° at rest, and with the palm toward the body,
@@ -659,7 +661,7 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.8],
+  aimSide: [0.5, -0.45],
   gripShiftL: [-0.04, 0, 0.12],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.376, 0.1, -0.067],
