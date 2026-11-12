@@ -807,7 +807,11 @@ beside the Tripo cat of the violas, and it must read a little larger. The top of
 about 1.1 times as high as the top of the head of the cat, seated and standing (the ears of the
 cat do not count, because the ears of the beagle hang). Its source has eyeballs with painted
 irises and lights, so the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs
-give a lower chair.
+give a lower chair. Its front paws are the one exception to the form of the source: the point edit
+`paw` of its build makes each paw shorter and narrower past the wrist joint (the values are in its
+README). Reason: the arms are short and the head is large, so the paws of the source read too large
+in the app, and against the width of the trunk they were much larger than the paws of the dog of
+main.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
 candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
