@@ -547,6 +547,8 @@ The app follows these facts:
   from the music desk and the face (`RABBIT_HOLD`, [86]). The cat rests the viola nearer to the
   hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
   side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
+  The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
+  and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
 
 The app does not follow these facts:
 
@@ -565,11 +567,12 @@ The app does not follow these facts:
 - **The measured tremolo (2.5).** No source gives its stroke length. `measuredTremolo()` moves
   the bow a short way and back on each note of a fast run of one pitch (`BOW_MOTION.measured`), so
   the arm stays nearly still and only the hand moves.
-- **The pizzicato of the violin and the viola (2.8).** No source gives its place. The rabbit and
-  the red fox pluck over the end of the fingerboard (`BowedHold.pluckPlace`), because a pluck near
-  the bow puts the right forearm into the body. The cat plucks from the side of the frog
+- **The pizzicato of the violin and the viola (2.8).** No source gives its place. The rabbit
+  plucks over the end of the fingerboard (`BowedHold.pluckPlace`), because a pluck near the bow
+  puts the right forearm into the body. The cat plucks from the side of the frog
   (`BowedHold.pluckSide`), as a bass hand comes up from the side. Its short arm goes into its
-  round chest with the palm over the strings.
+  round chest with the palm over the strings. The red fox plucks at the bow contact, from the side,
+  because its short straight arm reached across the chest to the end of the fingerboard.
 - **The change between the bow and pizzicato (2.10).** The right hand keeps its technique over a
   run of the other technique when the notes of its technique come back within
   `BOW_MOTION.techniqueHoldSec` (`handTechniques()`). Thus fast alternations, often two parts on
@@ -597,7 +600,9 @@ The app does not follow these facts:
   wrist.
 - **The bow at rest (2.9).** The source gives the bow up with a fist around the frog [86], and
   no place of the right hand. The short arms of the rabbit do not reach the top of the thigh in
-  front of the hip, so its frog end stands beside the thigh and not on it.
+  front of the hip, so its frog end stands beside the thigh and not on it. The frog end of the
+  red fox stays 16 cm above the thigh. In a move, the bow tip of the red fox turns to the left
+  below the snout (`restBow.via`).
 
 ### 3.3 The cello on the chair and at rest
 
