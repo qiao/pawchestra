@@ -83,16 +83,17 @@ a supinated bind paw on each side (the role-neutral bind of design 4.4).
 
 ## Candidate hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/fox.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/fox.fbx`, made in headless Blender by the route of the Tripo wolf: the form, the
-colors, and the eye paint of the source, with no arm cut and no stretch. On the
-branch of the candidate, the `ANIMALS` entry of the fox points to `tripo-hand/fox.rig.glb`. The
-red fox and the tan fox share it.
+`tripo-hand/` holds the body of the red fox and the tan fox ("tripo-hand/fox.blend" below): a hand
+rig of the Tripo P2 mesh `tripo-p2/fox.fbx` with four digits on each front paw
+(`tripo-p2/fox-paws.fbx`), made in headless Blender by the route of the Tripo wolf: the form, the
+colors, and the eye paint of the source, with no arm cut and no stretch. The `ANIMALS` entry of the
+fox points to `tripo-hand/fox.rig.glb`. The red fox and the tan fox share it.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/fox.fbx`, `tripo-p2/fox.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/fox.blend` | Made in headless Blender 5.2 from `tripo-p2/fox.fbx` (below). License as the FBX file | The scripted edits below |
+| `tripo-p2/fox-paws.fbx` | The source mesh with four-digit front paws ("Four-digit paws" below). License as the FBX file | `blender -b --factory-startup --python-exit-code 1 -P tools/blender/fox_paws.py -- assets/models/fox/tripo-p2/fox.fbx assets/models/fox/tripo-p2/fox-paws.fbx` |
+| `tripo-hand/fox.blend` | Made in headless Blender 5.2 from `tripo-p2/fox-paws.fbx` (below). License as the FBX file | The scripted edits below |
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/fox-color.webp` | Color map of the red fox, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py` |
@@ -101,38 +102,89 @@ red fox and the tan fox share it.
 
 ### tripo-p2/fox.fbx
 
-A red fox in a T-pose with quad faces, made with the Tripo CLI from the turnaround sheet of the fox
-(`assets/images2/fox.png` of the main checkout at the time). Its arm tubes have 11 vertices around,
-and its leg tubes 10. The folder `fox.fbm/` holds the base color map and the normal map, saved from
-the packed maps of the FBX file as PNG files of 4096 × 4096 pixels and then as JPEG quality 95
-(Pillow). The roughness and the metallic maps are not kept. This mesh replaces the Tripo fox of
-`f033bd5d` ("History" below).
+A furry red fox in a T-pose with quad faces, made with Tripo P2 from the sheet `fox3.png` of the
+project author: dark socks and paws, a cream chest and tail tip, a soft brow, and a smile. Its arm
+tubes have 11 vertices around, and its leg tubes 10. It replaces the Tripo fox of 204632d8d
+("History" below).
 
 | Item | Value |
 |---|---|
-| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| Origin | Made with Tripo by the project author on a paid plan, and given on 2026-11-12. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Task | `a4f84f84-0533-4be9-9ec7-c734527b7e66`, type `multiview_to_model`, from three views of the sheet (front, side, and back) |
-| Parameters | `model_version` P2-20260801, `quad` true, `face_limit` 3000, `texture` true, `texture_quality` detailed, `texture_version` v3.5-20260815, `delight` true, `pbr` true, `export_uv` true |
-| Writer | Tripo, FBX 7.4 binary. The four maps lie packed in the FBX file |
-| Contents | One mesh object, with no armature and no animation. 3,262 vertices and 3,658 faces: 2,842 quads and 816 triangles, no n-gon. One UV layer |
-| Parts | 4 parts: the body (2,871 vertices), the tail (219 vertices, a closed part at the back of the haunch), and two eyeballs (86 vertices each). The eyeballs reach 0.003 units over the middle plane. No vertices merge at 1e-5. 16 open edges, and no edge with more than two faces |
-| Axes | The fox faces +x of Blender. The import turns the mesh -90 degrees about Z, so that it faces -y. Then 1 unit from the soles to the ear tips, x ±0.3886 (the paw tips), and z ±0.225 (the snout and the tail) |
+| Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
+| Contents | One mesh object, with no armature and no animation. 3,239 vertices and 3,681 faces: 2,783 quads and 898 triangles, no n-gon. One UV layer |
+| Parts | 3 parts: the body with the tail (3,115 vertices), and two eyeballs of 62 vertices each, which reach the middle plane. No vertices merge at 1e-5. 4 open edges (a slit of 2 edges on each foot), and 2 edges with more than two faces |
+| Axes | The fox faces -y of Blender, so the import takes no turn. 1 unit from the soles to the ear tips, x ±0.3925 (the paw tips), and z ±0.237 (the snout and the tail) |
 
-| File | Size | Pixels | SHA-256 |
-|---|---|---|---|
-| `fox.fbx` | 4,705,196 bytes | | `8b25bab74212f40292eaf9b3fbbb09519a961000f2ef73b1ba6c610b46e3f3c7` |
-| `fox.fbm/fox_basecolor.jpg` | 1,309,253 bytes | 4096 × 4096 | `801cbc3c19fb7f077585356a50895a2b75f662f695396d33a8b212bbe86d5176` |
-| `fox.fbm/fox_normal.jpg` | 822,805 bytes | 4096 × 4096 | `37b77306094e3dd3dee21840d45e8f9341f3d0f66745f31c0d8f38085bef8bdf` |
+The folder `fox.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
+the metallic maps are not kept.
 
-The color map paints a full eye on each eyeball (a black pupil, an amber iris, and white), thin
-dark brows, dark brown socks up to the knees and over the forearms from 0.28 of the way from the
-elbows, dark ear tips, a cream bib, cheeks, muzzle, and tail tip, and a dark brown nose.
+| File | Name in the zip file | Size | Pixels | SHA-256 |
+|---|---|---|---|---|
+| `fox.fbx` | `tripo_convert_f4a46474-daff-496e-b8bc-b2a3aee59b96.fbx` | 221,916 bytes | | `8a73a54ad78571d82e0e9dfe755d7eaa436f248b21c789bf1def8585cdffeda7` |
+| `fox.fbm/fox_basecolor.jpg` | `tripo_rgb_7728173b-67c9-44a5-8321-bb37350c8f5d.jpg` | 2,218,034 bytes | 4096 × 4096 | `17078e2ad629fb31e8529b0ffde23921b431ca2224618b3d8f9a0e804a6a4bc4` |
+| `fox.fbm/fox_normal.jpg` | `tripo_normal_42949653-dcf1-40c4-814b-42e7624127f2.jpg` | 863,434 bytes | 4096 × 4096 | `e2564cab8a122fb793e914eec3b73008b3a63d95d086c05fd1d03758b425b2ec` |
 
-**Eyes.** The eyes keep the eye paint of the source map: an amber iris with a dark ring, a black
-pupil, white, and a dark lash line. The source paints no light in the eyes, so the eyeballs take
-the finish `eye` and the eye light of the app (no `eyeFinish` in the fox entry of
-`tools/studio-body.ts`), which gives one small light in the upper part of each eye.
+The color map paints on each eyeball an amber iris with a dark ring, a black pupil with a white
+light, white, and a dark lash line. It also paints soft brows, a dark brown nose, a smile line,
+dark socks up to the knees and over the forearms, dark ear tips, and a cream bib, cheeks, muzzle,
+and tail tip.
+
+### tripo-p2/fox-paws.fbx
+
+**Four-digit paws.** Each front paw of the source has three long digits that spread 47° apart, as
+a hand. `tools/blender/fox_paws.py` (headless Blender 5.2) removes each front paw past the closed
+wrist ring of 11 vertices at x 0.2765 (275 vertices on each side) and builds a new paw of quad faces
+on the ring. The rest of the mesh does not change. The right paw is the mirror of the left paw.
+
+- **Frame.** The middle of the wrist ring, the paw axis a = (0.996, -0.009, -0.086) of Blender
+  (out and a little down, as the source paw), the up axis u, and the width axis w (forward).
+- **Wrist.** A band of 11 quads and 3 triangles joins the wrist ring to the first palm ring of 14
+  vertices (an alignment of the two rings by angle). A closed quad surface on a ring of 11 edges
+  must hold an odd face, so the paw has these 3 triangles and no other.
+- **Palm.** Four rings of 14 vertices (4 edges on the top, 4 on the bottom, 3 on each side) on a
+  super ellipse (exponent 2.4), at 0.009, 0.021, 0.034, and 0.048 units past the wrist ring, with
+  the half widths 0.029, 0.034, 0.0368, and 0.0372. The top gets lower to the front (half heights
+  0.020 to 0.0098), and the bottom bulges into a palm pad (0.0205 to 0.0215, then 0.016).
+- **Digits.** The front palm ring and 6 inner vertices (0.004 units back, the web) are the bases of
+  four tubes of 8 vertices: the 4 columns of the palm. Each digit has an ellipse section of 0.0186 ×
+  0.0196 units, rings at 0.006 units and at 1, 0.55, and 0.2 tip radii before the tip, and a round
+  tip of 4 quads about a tip vertex. The middle digits are 0.031 units long past the palm, the outer
+  digits 0.027. They spread 1° and 3° from the paw axis, so they lie close together, and each digit
+  curls down by 2 × 5.5 t (19° at the tip of a middle digit).
+- **UVs.** Each new face takes the box projection of its main normal onto one of four squares of
+  even dark paw fur in the color map (UV (0.6797, 0.8730) on the top, (0.5493, 0.8755) on the
+  bottom, (0.9194, 0.3032) on the sides, and (0.5654, 0.1719) on the front), at 0.66 UV for each
+  unit. The source paw has 0.86 UV for each unit and the same dark brown (sRGB about 70, 40, 24).
+
+Each side has 200 new faces, and the mesh has 3,077 vertices and 3,505 faces (2,635 quads and 870
+triangles). The open edges and the edges of more than two faces are those of the source, and each
+edge of two faces has one winding. The FBX holds the mesh in the studio units with the UV map, smooth
+faces, and no material. A run gives the same mesh. The bytes differ only by the time stamp of the
+FBX header.
+
+The left paw before and after, in the units of the source, from the wrist joint (x 0.281) to the
+tip, with the shoulder joints at x ±0.085 (`paw_compare.py` and `paw_measure.py` of the session).
+The other bodies are the values of their READMEs after their paw edits:
+
+| Measure | Source fox | Fox now | Tripo wolf | Tripo cat | Tripo beagle | Tripo rabbit |
+|---|---|---|---|---|---|---|
+| Digits | 3, 47° apart | 4, 2° to 6° apart | - | - | - | - |
+| Length, wrist joint to tip | 0.1115 | 0.0742 | - | - | - | - |
+| Width | 0.0992 | 0.0752 | - | - | - | - |
+| Height | 0.048 | 0.0425 | - | - | - | - |
+| Length / shoulder distance | 0.656 | 0.437 | 0.451 | 0.432 | 0.489 | 0.514 |
+| Width / shoulder distance | 0.584 | 0.442 | 0.462 | 0.510 | 0.486 | 0.579 |
+| Length / arm (shoulder to wrist joint) | 0.568 | 0.378 | 0.449 | 0.377 | 0.465 | 0.406 |
+| Width / arm | 0.506 | 0.383 | 0.460 | 0.445 | 0.461 | 0.457 |
+
+The palm is 0.039 units long from the wrist joint to the web (0.071 in the source), and 0.074 wide
+at its front (0.083 at x 0.33 in the source). Each digit is 0.019 units wide (0.040 in the source), and
+the gaps between the digits grow from 0 at the web to about 0.001 at the tips. In the app the paw is
+0.132 m long and 0.134 m wide (0.35 H), against 0.179 m and 0.146 m on the fox before. Reason: the
+source paw was 0.66 of the shoulder distance long, and its three thick digits read as a hand. A
+fox paw has a palm pad and four short digits of near equal length close together, with the middle
+two a little longer.
 
 ### tripo-hand/fox.blend
 
