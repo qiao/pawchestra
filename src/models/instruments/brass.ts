@@ -42,6 +42,14 @@ const TUBA_BELL_LEAN = { bend: 0.55, angle: 15 } as const;
  */
 const TROMBONE_BACK = 0.08;
 
+/**
+ * The distance from the back of the bow of the tuning slide of the trombone to the axis of its
+ * counterweight, in meters: the radius of the tube (6.8 mm) and the largest radius of the
+ * counterweight (11 mm), less 3 mm, so that the counterweight touches the bow. At 32 mm, at the
+ * height of the upper leg, it floated about 2 cm off the bow.
+ */
+const COUNTERWEIGHT_OFF = 0.0148;
+
 /** The lacquered brass of the tubes and the bells. */
 const METAL = INSTRUMENT_COLORS.brass;
 
@@ -465,13 +473,15 @@ function trombone(): BrassBuild {
     TUBE_SEGMENTS,
     METAL,
   );
-  // The tuning slide: two ferrules on its legs and the counterweight on its bow.
+  // The tuning slide: two ferrules on its legs and the counterweight on its bow. The bow is
+  // farthest back at the middle between its legs, at x = -back, and the counterweight lies on its
+  // outer side there: its round side goes 3 mm into the tube, so it is attached to the bow.
   for (const y of [low / 2, low - 0.006]) {
     ferrule(main, [0.03 - back, y, side], [0.08 - back, y, side], 0.0085);
   }
   turned(
     main,
-    [-back - 0.032, low * 0.53, side],
+    [-back - COUNTERWEIGHT_OFF, (low / 2 + low - 0.006) / 2, side],
     [0, 0, -1],
     [
       [0.009, -0.015],
