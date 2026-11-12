@@ -273,7 +273,12 @@ The rest of each family:
   as a flutist rests the flute vertically on the right leg (winds 2.4), and the free left paw
   hangs with the roll of its grip (`freeRoll()`). Reason: a rest place in `H` from the mouth fits
   one body only, and with both paws on the clarinet at the middle of the hanging palms, the arms
-  went into the body. The panda holds the trombone upright in front of the body, below the mouth,
+  went into the body. The seated tan fox holds the flute upright at its right side in the right
+  paw, and rests the free left paw on the top of the left haunch near the hip (`FOX_FLUTE`). Each
+  rest place of a free paw lies in the reach of its arm. Reason: the top of the thigh is out of
+  reach of the short arm, and with a place out of reach, the arm stayed straight in the lift until
+  the paw came into reach, and then the elbow folded in a few frames.
+  The panda holds the trombone upright in front of the body, below the mouth,
   with the slide down and a little forward (`PANDA_TROMBONE`), as a seated player holds the slide
   vertical in front of the knee (winds 1.7). Both paws keep the grip of the play on the instrument
   (`restAim`), and the left paw slides down its tubes (`restGripShiftL`). Reason: with a rest grip
