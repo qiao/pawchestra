@@ -385,9 +385,10 @@ bind, the weights, and the keys are in the git history of this `README.md`, at 0
 `tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the fourth Tripo
 P2 mesh `tripo-p2/cat.fbx`, made by one build script in headless Blender 5.2, by the route of the
 Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form and the colors of
-the source: no point edit changes the head, the trunk, the paws, the legs, or the tail. The arms
-keep the length of the source: no cut, no split from the trunk, and no stretch. The edits are only
-those that the rig, the seat, the viola, and the eyes need.
+the source: no point edit changes the trunk, the paws, the legs, or the tail, and on the head only
+the eyes and the mouth corners change. The arms keep the length of the source: no cut, no split
+from the trunk, and no stretch. The edits are only those that the rig, the seat, the viola, the
+eyes, and a slight smile need.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -436,8 +437,8 @@ the joints of the source, mapped by the paw turns and the eye edit.
 
 | Item | Value |
 |---|---|
-| Size | 379,847 bytes |
-| SHA-256 | `e4ec9831998c7657c1ecfc7eaca663899fedbdad309650a3a15d85235c3436fe` |
+| Size | 379,933 bytes |
+| SHA-256 | `f8e26ac8a8ca696ea2050ea3bf7077e3fa382359ce4b9091398309f0f681c331` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail on the seat"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -467,8 +468,27 @@ left side, y the height, in the source):
   below y 0.79 fade out to y 0.75, so that the nose and the muzzle stay. Each ball then moves
   0.004 units back along its eye axis (0.30, 0, 0.954), x mirrored on the right. The largest skin
   move is 0.0038 units ("Eyes").
-- **Other point edits.** None. The head, the muzzle, the trunk, the paws, the legs, and the tail
-  keep the form of the source.
+- **Smile.** The map `smile` of `scratch/cat4/redits.py` (the values in `smile` of
+  `params.json`) lifts the corners of the mouth into a slight smile ("Smile"). The step runs after
+  the weights (after the ear rows, step 5 below), so the automatic weights stay those of the mesh
+  with no smile, and no arm skin changes. As a point edit before the weights, it changed the
+  automatic weights of each arm bone a little. Each point moves by lift × a(|x|) × b(y − m(|x|)) × f(z) × c along
+  (0, 1, −0.4): up, and a little back. The lift is 0.007 units (10 mm in the app). m is the mouth
+  line of the source, the slit under the muzzle pads, linear between the [|x|, y] rows [0,
+  0.7587], [0.0164, 0.7538], [0.0276, 0.7518], [0.0374, 0.7518], [0.0447, 0.7543], and [0.051,
+  0.7587]. a is a smoothstep from 0 at |x| 0.006 to 1 at 0.036, 1 to 0.05, and a smoothstep to 0
+  at 0.085. b is 1 from 0.004 below the line to 0.005 above it, and a smoothstep to 0 at 0.02
+  below (the chin) and 0.022 above (the pads). f is a smoothstep from 0 at z 0.13 to 1 at 0.16. c
+  is a smoothstep from 0 at 0.003 to 1 at 0.012 of the distance from the nose box of the config.
+  Each whisker strip moves as one piece with the move of its root, its point nearest the middle
+  plane. 90 skin vertices and the 64 points of 8 whisker strips move. The corners (for example
+  2333, 2334, 2142, and 2364 on the left, at |x| 0.037 to 0.045) move 0.007 up and 0.0028 back,
+  the lower curve of each side of the W (2302, 2309, and 2311, at |x| 0.028 to 0.030) 0.0057 to
+  0.0063 up, and the cheek and pad points over the corners (2337, 2339, and 2369) 0.0035 to
+  0.0048 up. The middle of the W, the nose, the eyes, and the underside of the jaw stay, so the
+  viola place under the jaw (`fitViolinPlace()` of `src/pose/violin-place.ts`) does not move.
+- **Other point edits.** None. The muzzle (except the mouth corners), the trunk, the paws, the legs,
+  and the tail keep the form of the source.
 - **Surface.** `sa.add_surface(cat, 'cat', <base color>, eye_fans=False, config=<cat-tripo.json>)`.
   The gloss nose is the pink nose in the nose box of the config. 31 light gloss faces over the
   nose go back to the fur. The faces of the two eyeballs get the face attribute `eye`, and the
@@ -587,17 +607,29 @@ and the eye paint stay.
 tilt limited to 0.2 (2.84 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red
 and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
+**Smile.** In the stage light, the slit under the muzzle pads shades as a dark line. In the
+source, that line falls from the middle of the W to its lowest point at |x| 0.03 to 0.037, near
+the corners, so the mouth read flat to sad from the front and the 3/4 view. The edit `smile` moves
+the lowest point of each side in toward the middle and lifts the corners, so the line bends up at
+its ends: a soft, slight smile. The color map paints only a thin, level line, so the edit is in
+the geometry only, and `tools/cat-maps.py` does not change. The weights, the joints, the seat,
+and the viola place do not change, so the rows of the viola, the bow, and the paws in the viola of
+`pnpm pose-depth violist` stay. In the lift and the lower of `beethoven-6-1`, a point of the right
+forearm lies in the body under the jaw, and its nearest skin is the lifted mouth corner: its depth
+goes from 1.2 to 1.7 cm (lift) and from 2.4 to 2.6 cm (lower).
+
 **Differences from the source.** The stage light is warm and the close views add a fill light, so
 the gray fur reads light tan in the close views, and gray in the play view and the hall view. The
-eyes are 0.90 of their size, a little deeper, and the upper lids a little lower ("Eyes"). The thighs
-of the seated bind spread 20 degrees ("Rest").
+eyes are 0.90 of their size, a little deeper, and the upper lids a little lower ("Eyes"). The mouth
+corners are 0.007 units higher ("Smile"). The thighs of the seated bind spread 20 degrees
+("Rest").
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `0883badc18b96811ac814c9463029338df030b2443059ab0ffa8a0336eec681d` |
-| `tripo-hand/cat.rig.json` | 18,466 bytes | `51e12bbbe0fcfc251dd93bd2bbe0d1e38521182c4d2024afc2d4d7dde70b9880` |
+| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `280de55fefdea412005faf1ca80af300c4c14b4eeb8e8fa23ee67b80bb2334ac` |
+| `tripo-hand/cat.rig.json` | 18,466 bytes | `ca532c61d2ce1b5e1daa4e19c43c584ddf777885003f19d31d275e205d47be79` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
