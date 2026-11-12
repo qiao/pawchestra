@@ -540,10 +540,17 @@ gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus 
 nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
 the map tool does not change it.
 
-**Seat.** The thighs slope 20 degrees down and 20 degrees out in the bind, and the shins lean 12
-degrees forward (`legTurns` of the config). The front of the seat lies 0.06 units behind the knee
-joint of the bind, and 46 % of the thigh lies on the seat. The seat height of the app is 0.201 m,
-with the legs of the source (`StudioBody.seatHeight`).
+**Seat.** The thighs slope 20 degrees down and 20 degrees out in the bind, the shins lean 8
+degrees forward, and each foot turns 12 degrees with the heel up, the toes flat on the floor
+(`legTurns` of the config, `tools/rig/leg_turns.py <config> 20 20 8 12`). The front of the seat
+lies 0.06 units behind the knee joint of the bind, and 46 % of the thigh lies on the seat. The
+seat height of the app is 0.222 m, with the legs of the source (`StudioBody.seatHeight`). The
+lowest point of each foot is on the floor, and the toe pads touch it over 7.7 cm.
+
+With the shins 12 degrees forward and flat feet, the seat was 0.201 m, and the chair read low. The
+higher eyes change the sight pass of the layout (design 4.5). Each seat from 0.214 m to 0.222 m
+moves the same 22 players in 5 demos, by 0.10 to 0.52 m. A seat of 0.211 m moves 12 players, and
+a seat of 0.204 m moves 2. Thus the seat takes the top of that range.
 
 **Rest.** At rest the viola stands on the left thigh and the bow hangs from the right paw, as on
 the third cat. `lapPoint()` of `src/pose/lap.ts` takes the top of the highest triangle of the hips,
