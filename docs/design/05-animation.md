@@ -882,7 +882,9 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   to the pedal, lifted, presses the pedal into the notch, and goes back (`poseHarpFeet()` of
   `pose/harp-feet.ts`). The pedals stand on the floor (4.6), so the hoof turns up around its
   heel until the front of its sole is on the pedal, as a harpist keeps the heel on the floor and
-  presses with the ball of the foot (harp 7.7). Above `HEEL_PITCH`, the whole hoof lifts. The
+  presses with the ball of the foot (harp 7.7). Above `HEEL_PITCH`, the whole hoof lifts. For a
+  pedal behind the rest place of the toe, the heel lifts (`HEEL_LIFT`). Reason: the pedals of the
+  near harp lie under the knees, and a heel on the floor there puts the shin into the stool. The
   two-bone IK of the leg places the knee. The pedal turns into its notch with the press
   (`pedalNotchesAt()`, 4.6).
 
