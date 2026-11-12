@@ -847,6 +847,8 @@ of the Tripo cat.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
 candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
+It scales to 1.2 times H of the monkey of main (`metersPerUnit` of its config). Reason: at H of
+the monkey of main, it was one of the smallest bodies of the lineup, and its trumpet read small.
 Its source has eyeballs, so the faces of each ball take the face attribute `eye`, the finish
 `varnish`, and a blink lid. It has no chair, as the monkey of main. Its bind has its own leg turns
 and a small trunk lean: the thighs hang straight down, the knees bend a little, and the shoulders
@@ -1021,10 +1023,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
   its hips. Its center of mass thus stays over the middle of its soles. As a soloist, it keeps
   this stance, because the straight legs of its sheet put the center of mass off the middle.
-  It plays a trumpet of 0.85 (`trumpetScale`), and in the play its spine turns 7° back and its
-  head stays upright (5.3), so the head stays over the chest and the hips. Reason: the trumpet of
-  0.65 read small beside the big head and paws, and a larger trumpet puts the valves out of the
-  reach of the short arms (0.91 and up).
+  It plays the trumpet of the app, and in the play its spine turns 7° back and its head stays
+  upright (5.3), so the head stays over the chest and the hips. Reason: a smaller trumpet read
+  small beside the big head and paws. At the body size of 4.4, the arms reach the valves of the
+  trumpet of the app with 1.4 cm to spare.
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
   pose of their meshes. The rhino stands as a real tubist on a strap does. The Tripo elephant
   binds standing on the straight legs of its source, as the Tripo monkey, and keeps this stance
