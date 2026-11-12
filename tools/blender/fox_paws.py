@@ -11,8 +11,9 @@ paw of quad faces in its place:
    palm gets wider to the front, and its lower side bulges into a palm pad.
 3. Four digits on the front of the palm. The front ring of the palm and 6 inner vertices are the
    bases of four tubes of 8 vertices each (the 4 columns of the palm). Each digit has 4 rings and
-   a round tip of 4 quads about a tip vertex. The middle two digits are a little longer. The digits
-   spread a little, close together, and curl down to the tips.
+   a round tip of 4 quads about a tip vertex. As on a real fore paw, the middle two digits are the
+   longest, the inner digit is shorter, and the outer digit is the shortest. The digits spread a
+   little, close together, and curl down to the tips.
 4. UVs: each new face takes the box projection of its main normal onto one of four clean patches
    of the dark paw fur in the color map (the top, the bottom, the sides, and the front), at
    `UV_SCALE` UV for each unit. The source paw has 0.86 UV for each unit.
@@ -45,19 +46,21 @@ WRIST_X = 0.2765
 #: The palm rings: the distance past the middle of the wrist ring along the paw axis, the half
 #: width, the half height over and under the middle, and the shift of the middle along the up axis.
 PALM = (
-    (0.009, 0.0290, 0.0200, 0.0205, 0.0),
-    (0.021, 0.0340, 0.0190, 0.0215, -0.0005),
-    (0.034, 0.0368, 0.0150, 0.0205, -0.0015),
-    (0.048, 0.0372, 0.0098, 0.0160, -0.0028),
+    (0.008, 0.0270, 0.0190, 0.0195, 0.0),
+    (0.018, 0.0300, 0.0170, 0.0195, -0.0005),
+    (0.029, 0.0312, 0.0135, 0.0180, -0.0013),
+    (0.040, 0.0310, 0.0085, 0.0140, -0.0024),
 )
 #: The angle of each vertex of a palm ring in degrees, from the width axis to the up axis: the right
 #: side (2), the top (5), the left side (2), and the bottom (5).
 PALM_ANGLES = (12, 35, 62, 90, 118, 145, 168, 192, 215, 242, 270, 298, 325, 348)
-#: Each digit: the length from the front palm ring, and the spread from the paw axis in degrees.
-DIGITS = ((0.027, -3.0), (0.031, -1.0), (0.031, 1.0), (0.027, 3.0))
+#: Each digit: the length from the front palm ring, and the spread from the paw axis in degrees,
+#: from the back of the paw (the outer digit) to the front (the inner digit, on the side of the
+#: thumb of a hand). The outer digit is the shortest, and the middle two are the longest.
+DIGITS = ((0.016, -4.0), (0.024, -1.2), (0.025, 1.2), (0.018, 4.0))
 #: The half width and the half height of a digit, the drop of the digit middle under the palm
 #: middle at the base, and the curl of each digit: the tangent turns down by 2 CURL t.
-DIGIT_HW, DIGIT_HH, DIGIT_DROP, CURL = 0.0093, 0.0098, 0.0018, 5.5
+DIGIT_HW, DIGIT_HH, DIGIT_DROP, CURL = 0.0077, 0.0082, 0.0015, 5.5
 #: The angles of the 8 vertices of a digit ring, in the order of the base ring of the digit.
 DIGIT_ANGLES = (20, 60, 120, 160, 200, 240, 300, 340)
 #: The inner vertices of the front palm ring lie this far back (the web between the digits).
