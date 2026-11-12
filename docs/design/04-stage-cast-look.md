@@ -873,9 +873,10 @@ because the bone heat of the hanging head gave the snout shares of the shoulders
 penguin (`assets/models/penguin/tripo-hand/`) is the body of the singer, by the same rules. Its
 eyeballs stay, with the finish `varnish` and a blink lid. The flat flippers are its arms: each
 flipper takes edge-ring rings at the shoulder, the elbow, and the wrist, and the paw bones take the
-flipper tip. Its beak opens: the build cuts the closed beak of the source along the mouth plane
-from one mouth corner around the tip to the other corner, a dark cap closes each part, and the
-lower beak follows the jaw bone (`jaw`). It stands in the pose of the source, with its legs and its
+flipper tip. Its beak opens: the build cuts the whole closed beak of the source along the mouth
+plane, back to the mouth slit of the source at the end of the orange mouth line, and a dark cap
+closes each part. The lower beak and the chin in front of the slit follow the jaw bone (`jaw`),
+which turns at the back of the slit, as the jaw of a real bird turns at the back of the gape. It stands in the pose of the source, with its legs and its
 upright trunk, and its center of mass lies over the back of the soles, as on a real penguin. Its
 flippers start at the back half of the sides, so the choir folder is nearer to the chest than for
 the earlier penguin (`CHOIR_FOLDER`, 5.3). The Tripo elephant
