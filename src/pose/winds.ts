@@ -1091,8 +1091,10 @@ const WOLF_CLARINET_FORWARD = 10;
  * drop, because a mouth point at the lips (`mouthHeight`) moves the clarinet of the bind pose and
  * the seats of the stage. Each shoulder bone turns forward in the play, the right 45° and the left
  * 30° (`reach`, `reachL`), as the shoulder blades of a real player slide forward: with the 35° and
- * 20° of {@link WIND_HOLDS}, the right paw missed its grip by 2.0 cm. Both elbows point down and a
- * little out, as a seated clarinetist lets the arms hang near the body, in the play.
+ * 20° of {@link WIND_HOLDS}, the right paw missed its grip by 2.0 cm. Both elbows point down and
+ * out (`poleL`, `poleR`), further out than in {@link WIND_HOLDS}, so that the elbows stay a little
+ * away from the body, as the elbows of a real player stay away from the sides
+ * (`docs/reference/wind-technique.md` 1.8).
  *
  * At rest, the bell stands on the front of the right knee, as a seated clarinetist puts the bell
  * on the knee (`docs/reference/wind-technique.md` 3). The right paw holds the upper joint, 0.4 H
@@ -1115,6 +1117,8 @@ const WOLF_CLARINET = {
   roundArms: null,
   reach: 45 * MathUtils.DEG2RAD,
   reachL: 30 * MathUtils.DEG2RAD,
+  poleL: [-0.6, -1, 0],
+  poleR: [0.6, -1, 0],
   rest: holdTurn(-30, -10),
   restArms: {
     L: { forward: 20 * MathUtils.DEG2RAD, bend: 30 * MathUtils.DEG2RAD },
