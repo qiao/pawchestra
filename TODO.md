@@ -79,14 +79,21 @@ passes.
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
-- [ ] Trombonist panda: the haunch is 63 cm wide on a chair of 42 cm, so from the back it sticks
-      out past both back posts. No body corner goes into the posts or the top rail at rest or in
-      120 s of play of `boulanger-matin` and `brahms-2` (`scratch/rump-play.ts`), and the middle of
-      the back keeps the 1 cm of `CHAIR_BACK_CLEARANCE`. A wider chair (`seatWidth` 0.6,
-      `backRoom` 0.025) changes the footprint of the seat, and the seats of `brahms-2` move up to
-      1.55 m. Ask the user if the wide haunch on the narrow chair is a fault.
-- [ ] Trombonist panda: the slide comes 3 cm to 5 cm from its music desk in boulanger-matin. A
-      longer slide reach or a lower slide puts it into the desk.
+- [ ] Trombonist panda (Tripo body): the right upper arm goes 1.6 cm to 1.7 cm into the round
+      belly at rest and in the lift and the lowering (limit 1.5 cm, `pnpm pose-depth
+      trombonist`). A right rest elbow further out clears it, and rolls the upper arm 47° (limit
+      45°).
+- [ ] Trombonist panda (Tripo body): the right arm reaches 5.5 cm of the slide travel (10.5 cm on
+      the old body), so the worst note target misses by 103 mm. The slide points 35° below the
+      level for that reach. A grip lower on the brace leaves the brace out of the paw.
+- [ ] Trombonist panda (Tripo body): the arm gate folds p95 are 61 (left) and 73 (right), at the
+      finger crease of the paws that curl 130° and 120° around the tubes (the curls of 90° and 110°
+      gave 33 and 42, and the paws did not grasp). Check the paws in 2x crops.
+- [ ] Panda (Tripo body): the body is larger than the old body at the same H, and the seat is
+      0.171 m high (0.277 m before). The players of the four demos with trombones move in the
+      layout, by a median of 7 cm to 12 cm, and 17 players more than 0.2 m (the monkeys of
+      beethoven-9 1.39 m and 1.28 m, a red fox of boulanger-matin 1.36 m). The seat height and the
+      chair size move no player. Check the low chair and the moves with the user.
 - [ ] Trumpeter monkey: with the trumpet of 0.85 and the play stance (`MONKEY_TRUMPET`), the right
       paw reaches its grip with 0.9 cm to spare (1.5 cm before), and a trumpet of 0.91 is out of
       reach. A larger trumpet needs another reach gain, such as a small turn of the bell to the right.
@@ -151,31 +158,6 @@ passes.
       `raise` shapes of the earlier penguin ("Penguin recast folds") do not apply to it.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
-- [ ] Panda: at rest, the app view (front left, 30° up) shows a white wedge of the chest between
-      the raised left arm and the band. It is the top of the white belly of the texture, and its
-      edge is now a clean curve. The reference images show a white chest up to a thin collar, so the
-      rig keeps it. Ask the user if the band must cover the upper chest
-      (`reports/2026-11-03-panda-edges/crops.png`).
-- [ ] Panda: the lower edge of the band keeps a small step on each side under the arm root, and
-      the outer top corner of the right eye patch keeps a short point (also in the texture).
-- [ ] Panda: the eye margin of `panda_edge.py` (0.004) is near a limit. With 0, the cut faces in
-      the left eye box grow the old eye of the rig, and its ring color makes a white hole in the
-      patch. A change of the eye box or of the eye rules checks both patches.
-- [ ] Panda: the side under each arm root (the shoulder band, 0.8 to 0.9 of the trunk line) has
-      more clavicle and arm weight than trunk weight, so `pnpm trunk-form trombonist --to 0.9`
-      gives a gap of 8.9 and 10.4 cm in the play and 8.2 and 6.7 cm at rest (old panda 3.0 and 1.6
-      cm). The best try, `weights.paintedBelow` [0.6, 0.68] / 0.12 with a left `raise` shape of
-      the rest (`pnpm raise-fit trombonist --faces 1598,1602,1603 --side L --sets rest,lift`),
-      gives 4.8 and 5.5 cm in the play and 4.6 and 4.1 cm at rest, near half. It passes the arm
-      gate (left folds 3, base 5), but the right arm folds 3 faces (base 2): face 689 at the front
-      of the right arm root. A rigid face there gave 6 folds. With the rule, the bind itself has
-      a gap of 4.7 and 5.0 cm, so no weight rule makes the gap smaller than that: a form change
-      of the bind at the shoulder band is next. A rule above 0.62 u leaves faces of the right
-      elbow `raise` shape turned over, and an inner limit of 0.10 or 0.14 makes the left side
-      worse (`reports/2026-11-03-panda-head/`, try files in `scratch/merged/panda-head/`).
-- [ ] Panda: the trunk from the hips to the neck is 1.41 H long (old panda 1.52 H), and the sit
-      lifts the lowest haunch up to 11 cm onto the seat top of the old chair. Check the haunch from
-      behind in the app view.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
       the user in a close play frame of the stage.
 - [ ] Tripo polar bear: the left grip turn p50 is 13° in the play, against 6° on main (limit 45°).
@@ -930,27 +912,6 @@ scene of each demo has its seats and stage size with no overlap.
       horn. The B♭ side needs a thumb valve and a second fundamental, B♭1 (wind-technique 2.2).
 - [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view. Show the
       user the front view.
-- [ ] Panda trombonist: the arm reaches 0.155 m of the slide, 27% of a real seventh position. A
-      larger right shoulder turn puts the right upper arm into the belly, and the grip 0.05 H up the
-      brace keeps it off the belly. Show the user slide angles of 45° and 60°.
-- [ ] Panda trombonist: the left elbow out uses most of the margin of the grip turn (left 16,
-      margin 15 over 2). Show the user the 2x paw crops of the play and the rest, and ask to accept
-      the new medians in `ACCEPTED_GRIPS`, so that a later hold change has room.
-- [ ] Panda trombonist rest: the top of the upright trombone crosses the left eye in the front
-      view. A place beside the head (rest turn 20° to the left, `restShift` [-0.4, -0.16, -0.3])
-      turned the right arm across the belly: the arm gate failed (right folds 5, flat 0.73), and
-      the upper arms went 5.9 cm into the body. A lower place with the slide 25° forward
-      (`restDown` 50, `restShift` [0, -0.28, -0.38]) cleared the face and passed the gate, but the
-      upper arms went 0.5 cm deeper and the left paw left its rest grip
-      (`reports/2026-11-03-panda-look/rest-tries.png`). Ask the user for the rest place.
-- [ ] Panda trombonist rest: in the middle of the lift and the lowering, the left finger tips
-      leave the tubes (`pnpm wind-grip`: lift 94%, lowering 83%). A left rest grip 0.02 H toward
-      the left shoulder gave 94% and 90%, but flattened the left upper arm at rest (arm gate flat
-      0.81, base 0.87).
-- [ ] Panda: the upper chest width at 0.75 of the seat to neck span (W7 of `pnpm body-shape
-      trombonist --base 7cf41074`) is 0.86 of the old panda, near the limit of 15%. The old trunk
-      is about 8% narrower at all heights, so the black band of the back still reads a little wider
-      (`reports/2026-11-03-panda-chest/`).
 - [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
       on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the right elbow goes 0.6 cm into the back of the contrabass at 197.40 s of
