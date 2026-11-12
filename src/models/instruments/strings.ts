@@ -1120,8 +1120,20 @@ const F_HOLE = {
   ],
   upperEye: [0.1235, 0.0142, 0.0025],
   lowerEye: [0.0745, 0.0305, 0.0031],
-  /** The height of the f-hole above the arch, so that it does not sink into the facets. */
-  lift: 0.0006,
+  /** The number of steps of the smooth stem between two points of `stem`. */
+  steps: 3,
+  /** The number of faces around each eye. */
+  eyeSegments: 10,
+  /**
+   * The two notches at the middle of the stem, at the bridge: the index of the point of the
+   * smooth stem, and how far each notch stands out from the edge of the stem.
+   */
+  notch: [8, 0.0016],
+  /**
+   * The height of the f-hole above the arch: 2.7 mm on the cello of the app, so that the arch
+   * does not flash through it in the far views (design 4.6).
+   */
+  lift: 0.0009,
 } as const;
 
 /**
@@ -1172,7 +1184,8 @@ function faceUp(corners: readonly number[]): number[] {
 }
 
 /**
- * Makes the two f-holes on the arch of the top: an S-shaped stem and two round eyes each.
+ * Makes the two f-holes on the arch of the top: an S-shaped stem with two notches and two round
+ * eyes each.
  *
  * @param arch The faces of the body in the violin axes, which give the height of the arch.
  * @returns The corner list.
@@ -1181,14 +1194,39 @@ function fHoles(arch: readonly number[]): number[] {
   const f = F_HOLE;
   const out: number[] = [];
   const on = (x: number, z: number): Vec3 => [x, heightAt(arch, x, z) + f.lift, z];
+  // The smooth line of the stem through its points, with the width along it.
+  const stem: [number, number, number][] = [];
+  const point = (i: number): OutlinePoint => {
+    const last = f.stem.length - 1;
+    const [x, z] = f.stem[Math.max(0, Math.min(last, i))] ?? [0, 0];
+    if (i >= 0 && i <= last) {
+      return [x, z];
+    }
+    // A straight extension past each end.
+    const [nx, nz] = f.stem[i < 0 ? 1 : last - 1] ?? [0, 0];
+    return [2 * x - nx, 2 * z - nz];
+  };
+  for (let i = 0; i + 1 < f.stem.length; i++) {
+    const w0 = f.stem[i]?.[2] ?? 0;
+    const w1 = f.stem[i + 1]?.[2] ?? 0;
+    for (let k = 0; k < f.steps; k++) {
+      const t = k / f.steps;
+      const [x, z] = catmullRom(point(i - 1), point(i), point(i + 1), point(i + 2), t);
+      stem.push([x, z, w0 + t * (w1 - w0)]);
+    }
+  }
+  const [endX = 0, endZ = 0, endW = 0] = f.stem.at(-1) ?? [];
+  stem.push([endX, endZ, endW]);
   // The two edges of the stem, with the normal of each point between the lines of its two
   // neighbors, so that the quads of the stem share their corners.
-  const edges = f.stem.map(([x, z, w], i): readonly [OutlinePoint, OutlinePoint] => {
-    const [px = x, pz = z] = f.stem[i - 1] ?? [];
-    const [qx = x, qz = z] = f.stem[i + 1] ?? [];
+  const normals: OutlinePoint[] = [];
+  const edges = stem.map(([x, z, w], i): readonly [OutlinePoint, OutlinePoint] => {
+    const [px = x, pz = z] = stem[i - 1] ?? [];
+    const [qx = x, qz = z] = stem[i + 1] ?? [];
     const length = Math.hypot(qx - px, qz - pz);
     const nx = -(qz - pz) / length;
     const nz = (qx - px) / length;
+    normals.push([nx, nz]);
     return [
       [x + (nx * w) / 2, z + (nz * w) / 2],
       [x - (nx * w) / 2, z - (nz * w) / 2],
@@ -1200,14 +1238,29 @@ function fHoles(arch: readonly number[]): number[] {
       const [[cx, cz] = [0, 0], [dx, dz] = [0, 0]] = edges[i + 1] ?? [];
       out.push(...quad(on(ax, side * az), on(bx, side * bz), on(dx, side * dz), on(cx, side * cz)));
     }
-    for (const [x, z, r] of [f.upperEye, f.lowerEye]) {
-      for (let k = 0; k < 6; k++) {
-        const a0 = (k / 6) * 2 * Math.PI;
-        const a1 = ((k + 1) / 6) * 2 * Math.PI;
+    // The notches: a small triangle out of each edge of the stem.
+    const [index, stickOut] = f.notch;
+    const [x, z, w] = stem[index] ?? [0, 0, 0];
+    const [nx, nz] = normals[index] ?? [0, 0];
+    const [px, pz] = stem[index - 1] ?? [x, z];
+    const [qx, qz] = stem[index + 1] ?? [x, z];
+    for (const edge of [-1, 1]) {
+      const reach = edge * (w / 2 + stickOut);
+      const base = edge * (w / 2) * 0.5;
+      out.push(
+        ...on(x + nx * reach, side * (z + nz * reach)),
+        ...on((x + px) / 2 + nx * base, side * ((z + pz) / 2 + nz * base)),
+        ...on((x + qx) / 2 + nx * base, side * ((z + qz) / 2 + nz * base)),
+      );
+    }
+    for (const [ex, ez, r] of [f.upperEye, f.lowerEye]) {
+      for (let k = 0; k < f.eyeSegments; k++) {
+        const a0 = (k / f.eyeSegments) * 2 * Math.PI;
+        const a1 = ((k + 1) / f.eyeSegments) * 2 * Math.PI;
         out.push(
-          ...on(x, side * z),
-          ...on(x + r * Math.cos(a0), side * (z + r * Math.sin(a0))),
-          ...on(x + r * Math.cos(a1), side * (z + r * Math.sin(a1))),
+          ...on(ex, side * ez),
+          ...on(ex + r * Math.cos(a0), side * (ez + r * Math.sin(a0))),
+          ...on(ex + r * Math.cos(a1), side * (ez + r * Math.sin(a1))),
         );
       }
     }
