@@ -1,0 +1,329 @@
+{
+ "edits": [
+  {
+   "kind": "eyes",
+   "scale": 0.93,
+   "sink": 0.002,
+   "axis": [
+    0.38,
+    0.0,
+    0.925
+   ],
+   "centers": {
+    "L": [
+     0.0369,
+     0.7878,
+     0.1024
+    ],
+    "R": [
+     -0.0369,
+     0.7878,
+     0.1024
+    ]
+   },
+   "rBall": 0.0366,
+   "rIn": 0.041,
+   "rOut": 0.064,
+   "mid": 0.012,
+   "zKeep": 0.2,
+   "yKeep": [
+    0.72,
+    0.75
+   ]
+  }
+ ],
+ "sourceTexture": "assets/models/fox/tripo-p2/fox.fbm/fox_basecolor.jpg",
+ "palm": [
+  -0.086,
+  -0.996,
+  -0.001
+ ],
+ "ringEdges": 11,
+ "legTurns": [
+  15,
+  8,
+  12
+ ],
+ "chair": {
+  "halfWidth": 0.13,
+  "front": 0.12,
+  "back": -0.03,
+  "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The front edge lies seatGap units behind the knee joint of the bind (the property seat of the armature), so that the calf does not reach over the seat."
+ },
+ "eyeBox": [
+  [
+   0.0,
+   0.745,
+   0.08
+  ],
+  [
+   0.08,
+   0.83,
+   0.165
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.025,
+   0.715,
+   0.205
+  ],
+  [
+   0.025,
+   0.76,
+   0.245
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0 to 0.074 on the left, y 0.752 to 0.823, z 0.085 to 0.157). The nose box holds the dark nose tip (0, 0.736, 0.237).",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.77592,
+ "metersPerUnitNote": "The scale of the app: H (0.21397 units) is 0.380 m, the H of the fox before the four-digit paws. The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
+ "eyeSize": 0.21397,
+ "jointsNote": "The places are the places of the source (tripo-p2/fox-paws.fbx), mapped by the paw turns and the eye edit of the hand rig (assets/models/fox/README.md). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed loops of 11 vertices from x 0.128 to 0.2765, axis y 0.598 to 0.591, z 0.07 to 0.068): the shoulder at x 0.085, inside the arm root loop of 13 vertices at x 0.088, the elbow at x 0.185, at the middle of the arm, the wrist at x 0.281, the narrowest place of the arm where the new paw starts, the knuckles at x 0.316, at the base of the four digits, the tip at x 0.341. Leg: the hip joint at y 0.29 in the haunch, the knee at y 0.165, over the closed leg loops of 10 vertices at y 0.061 to 0.137, the ankle at y 0.065, the ball of the foot at z 0.115, and the toe tips at z 0.16. Trunk: the waist is narrowest at y 0.50 (x 0.075), the haunch widest at y 0.28 to 0.32 (x 0.124), and the neck narrowest at y 0.66. Ears: the root at y 0.88, the tips at (0.105, 1.0, 0.045). Tail: a part of the body, from its root loop of 12 vertices at (0, 0.358, -0.023) back and down to its tip at (0, 0.124, -0.177). The palm is the true palm of the new paw: the down normal of its palm rings, (-0.086, -0.996, -0.001).",
+ "rings": {
+  "arm": [
+   [
+    0.128,
+    0.153,
+    1
+   ],
+   [
+    0.153,
+    0.173,
+    1
+   ],
+   [
+    0.173,
+    0.199,
+    2
+   ],
+   [
+    0.199,
+    0.229,
+    2
+   ],
+   [
+    0.229,
+    0.255,
+    1
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.085,
+  "reach": 0.05,
+  "control": [
+   [
+    0.085,
+    0.55,
+    0
+   ],
+   [
+    0.095,
+    0.4,
+    0
+   ],
+   [
+    0.105,
+    0.27,
+    0
+   ],
+   [
+    0.115,
+    0.15,
+    0
+   ],
+   [
+    0.125,
+    0.06,
+    0
+   ],
+   [
+    0.135,
+    0,
+    0
+   ],
+   [
+    0.15,
+    0,
+    0
+   ],
+   [
+    0.163,
+    0,
+    0.25
+   ],
+   [
+    0.178,
+    0,
+    0.75
+   ],
+   [
+    0.194,
+    0,
+    0.75
+   ],
+   [
+    0.209,
+    0,
+    0.25
+   ],
+   [
+    0.222,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.003,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.017,
+   "band": 0.003,
+   "count": 12
+  }
+ },
+ "pawTurn": {
+  "L": -5,
+  "R": 3
+ },
+ "turnRings": [
+  0.242,
+  0.255
+ ],
+ "seatGap": 0.06,
+ "hipJoint": [
+  [
+   0.06,
+   0.29,
+   0.06
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/fox/tripo-hand/fox-color.webp"
+ },
+ "smooth": false,
+ "bandPatch": {
+  "uv": [
+   0.6797,
+   0.873
+  ]
+ },
+ "lids": {
+  "back": 135,
+  "psi": [
+   -60,
+   60
+  ],
+  "lam": [
+   -40,
+   75
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 126,
+  "srgb": [
+   213,
+   98,
+   16
+  ],
+  "uv": [
+   0.4121,
+   0.4268
+  ],
+  "density": 0.88,
+  "midClear": 0.003,
+  "lidClear": 0.002,
+  "refit": true
+ },
+ "turnFit": 0.02,
+ "hingeTurn": {
+  "L": 15.0,
+  "R": -40.0
+ },
+ "earPlane": {
+  "points": [
+   [
+    0.035,
+    0.895,
+    0.05
+   ],
+   [
+    0.135,
+    0.85,
+    0.05
+   ],
+   [
+    0.085,
+    0.875,
+    0.0
+   ],
+   [
+    0.085,
+    0.875,
+    0.1
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "tailLay": {
+  "band": 0.02,
+  "junction": 0.29,
+  "reach": 0.03,
+  "radius": 0.11,
+  "rowRoot": [
+   -0.01,
+   0.03
+  ],
+  "rowBend": 0.04,
+  "ramp": [
+   0.0,
+   0.03
+  ],
+  "smooth": 3,
+  "rootRing": 0.358,
+  "ringVerts": 12
+ },
+ "noseFur": true,
+ "tailBind": {
+  "tail": [
+   0,
+   -0.5,
+   -1
+  ],
+  "tail_tip": [
+   0,
+   -1,
+   -0.1
+  ]
+ },
+ "lidLower": {
+  "angle": 4.0,
+  "psi": [
+   12,
+   28,
+   60,
+   85
+  ],
+  "reach": [
+   1.5,
+   2.4
+  ],
+  "lam": [
+   35,
+   65
+  ]
+ }
+}
