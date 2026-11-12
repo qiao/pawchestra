@@ -176,7 +176,7 @@ export interface EdgeDamp {
  * that the end of the closed paw touches the head, as a real timpanist muffles with the back
  * fingers and keeps the mallet between the thumb and the index finger
  * (`docs/reference/percussion-technique.md` 4). The spine leans over the kettles, and the upper
- * body turns the shoulder of the paw forward. The muffle and the lean do not follow the lift and
+ * body can turn the shoulder of the paw forward. The muffle and the lean do not follow the lift and
  * the lowering, so that a pause in a muffle keeps the paw on the head. The paw keeps the roll of
  * the mallet of its place before the muffle, and a long move to the muffle takes more time
  * (`speed`).
@@ -441,7 +441,7 @@ export const PERCUSSION_HOLDS = {
     fit: null,
     // After a note before a rest, the paw that struck it muffles its head (damp). The left front
     // kettle stands nearer than the right one, so each side has its own reach. The spine leans 3°,
-    // and the upper body turns 17°.
+    // and the upper body does not turn: a turn of 17° twisted the chest 13° in 0.06 s at a muffle.
     // The stump paw of the Tripo elephant reaches 0.52 m and 0.51 m, and its rigid low point stays
     // 1.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
     // out of the kettles). The grip stays level with the head, and the mallet keeps 0.5 rad of
@@ -460,7 +460,7 @@ export const PERCUSSION_HOLDS = {
       press: -0.015,
       share: 1.67,
       lean: 0.05,
-      turn: 0.3,
+      turn: 0,
       speed: 1.2,
     },
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
