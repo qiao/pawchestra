@@ -69,6 +69,20 @@ passes.
 
 ## Step 4. Models and gallery (4.3 to 4.7)
 
+- [ ] Hand chains (4.4): merge the 14 copies of `build.py` in `tools/blender/hand/<s>/` into one
+      shared `tools/blender/hand/build.py`. Each copy differs from the wolf copy (1,789 lines)
+      by these diff lines: dog 115, hippo 134, monkey 161, pig 275, polar bear 304, deer 320,
+      elephant 365, penguin 377, rabbit 458, cat 701, fox 731, panda 733, beaver 825. The
+      differences are code, with few values: other versions of `lids`, `own_eyes`, `tail_rows`,
+      `tail_vertices`, `thicken_trunk`, and `main` (cat, fox, panda, beaver, rabbit), and functions
+      of one species, such as `turn_hooves` (deer, elephant, pig), `split_beak` (penguin), and
+      `digits` (polar bear). Plan: (1) move the 6 equal `redits.py`, the 11 equal `rings.py`, and
+      the 8 equal `rimport.py` into one shared copy each; (2) merge the near copies first (dog,
+      hippo, monkey into the wolf copy), with each code difference behind a key of `params.json`;
+      (3) then the hoof group (deer, elephant, pig) and the penguin; (4) then the tail and lid group
+      (cat, fox, panda, beaver, rabbit) and the polar bear. After each species, `pnpm hand-chain
+      <s>` must give the rig.glb, the rig.json, the studio module, and the config of `HEAD` byte
+      for byte.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
 - [ ] Monkey trumpeter: from the front at the elevation 20, the right paw on the valve tops hides
