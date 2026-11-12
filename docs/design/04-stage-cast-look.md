@@ -762,9 +762,13 @@ the claws of the source to the colors of the bear of main in the hall light (the
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
 hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the cat
 violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
-changes its trunk, limbs, paws, legs, or tail, its map keeps the colors of the source
+changes its trunk, limbs, legs, or tail, its map keeps the colors of the source
 (`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
-chair fits its legs. The only form edits are those of the eyes and of the mouth corners. Its
+chair fits its legs. The only form edits are those of the eyes, of the mouth corners, and of the
+front paws. The point edit `paw` makes each front paw shorter and narrower past the wrist joint,
+and the digits a little shorter again past the knuckles (the values are in its README). Reason:
+the paws and the digits of the source read too large in the app. Against the arm, the paw now has
+the length and the width of the paw of the cat of main. Its
 eyeballs and sockets are smaller than in the source, each ball sits a little deeper, and the skin of
 each upper lid turns down a little over the top of the iris (`assets/models/cat/README.md`, "Eyes").
 Reason: at the source size, each eye opening was about 0.15 of the head width, the ball bulged out
