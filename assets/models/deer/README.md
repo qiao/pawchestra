@@ -338,51 +338,60 @@ short tail hangs behind the back edge of the seat: no tail corner lies in the st
 (`pnpm pose-depth harpist --where tail1`).
 
 **Arm twist.** The roll of each upper arm and the twist of each forearm, in degrees, in each moment
-of the harp hold (`HANDS_HOLDS.harp` of `src/pose/hands.ts`, `pnpm pose-preview harpist`):
+of the harp hold (`HANDS_HOLDS.harp` of `src/pose/hands.ts`, `pnpm pose-preview harpist`, with
+`PROBE_NO_CACHE=1`):
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| chord | -10.3 | -34.5 | -24.4 | 44.7 |
-| pluck | -12.9 | -44.3 | -19.1 | 40.6 |
-| rest | -30.1 | 42.5 | 11.7 | -41.5 |
-| lift50 | -14.6 | 22.7 | -8.2 | -11.0 |
-| lower50 | -9.1 | 12.6 | -16.9 | -0.1 |
+| chord | -3.2 | -16.4 | -38.1 | 42.1 |
+| pluck | -3.6 | -28.8 | -33.4 | 40.1 |
+| rest | -16.1 | 42.4 | -58.9 | 41.5 |
+| lift50 | -7.1 | 36.9 | -47.1 | 33.4 |
+| lower50 | -5.2 | 31.0 | -44.6 | 33.5 |
 
 With the hooves and the elbow axes of the source, the upper arms rolled 51 to 66 degrees and the
 forearms twisted up to -67 and 96 degrees. The elbow axis turns move the roll from the upper arms
-to the forearms, the left hoof turn centers the left forearm, and the right rest palm turns a
-little to the right (`restR` of the harp hold). The spread of each forearm from the chord to the
-rest is about 86 degrees, so no hoof step of 32.7 degrees centers it better.
+to the forearms, the left hoof turn centers the left forearm, and the right palm turns a little
+back to the player in the play (`faceR`) and a little to the right at rest (`restR`). The
+forward right rest elbow (`restR.pole`) rolls the right upper arm 58 to 59 degrees at rest, with
+the arms of 1.2 and of 1.3 times the source. The left forearm spreads 59 degrees from the chord
+to the rest, so no hoof step of 32.7 degrees centers it better.
 
-**Harp fit.** The harp is 0.75 of the concert harp of the app (`harpScale`, 0.98 m high), and its
-base stands 0.15 m in front of the floor point at the scale 1, turned 45 degrees (`HARP_PLACE`).
-The left hand plays up to D4 (`reach.leftHighest` 62 of the harp hold), and the spine stays
-erect (`lean` 0). Against the old deer (`pnpm pose-depth harpist --gaps --base 204632d8d`,
-`pnpm hold-fit harpist --base 204632d8d`, `pnpm arm-check harpist --base 204632d8d`), and against
-the first fawn (H of the old deer, no arm stretch, harp scale 1.3):
+**Harp fit.** The harp is 0.75 of the concert harp of the app (`harpScale`, 0.98 m high). Its base
+stands 0.15 m in front of the floor point at the scale 1 and 0.22 H to the right of it, turned 46
+degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim (`SOUNDBOX`,
+`NECK` of `src/models/instruments/harp.ts`). The left hand plays up to D4 (`reach.leftHighest` 62
+of the harp hold), and the spine stays erect (`lean` 0). Against the old deer and the first fawn
+(H of the old deer, no arm stretch, harp scale 1.3), from `pnpm pose-depth harpist --gaps`,
+`pnpm hold-fit harpist`, and `pnpm arm-check harpist` (columns 2 to 4, with the base
+`204632d8d`), and from `pnpm pose-depth harpist` and `pnpm hold-fit harpist` (column 5, the
+arms of 1.3 times the source and the harp of 2026-11-13; the arm gate did not run):
 
-| Measure | Old deer | First fawn | Fawn |
-|---|---|---|---|
-| Palm targets within 5 mm | 100 % | 48 % | 98 % |
-| Worst palm target | 0 cm | 31 cm | 1.5 cm |
-| Paws in the body in the play | 1.0 cm | 0.9 cm | 3.4 cm |
-| Forearms in the body in the play | 0.8 cm | 4.4 cm | 2.5 cm |
-| Upper arms in the body in the play | 1.6 cm | 4.9 cm | 3.0 cm |
-| Upper arms in the harp in the play | 2.4 cm | 4.0 cm | 2.0 cm |
-| Upper arms in the body at rest | 0.8 cm | 3.3 cm | 2.2 cm |
-| Gap of the head to the harp in the play | | 2.3 cm | 2.8 cm |
-| Folds p95, left and right (limit 8) | 2, 6 | 1, 8 | 6, 8 |
-| Twist p95, left and right (limit 55) | 28, 30 | 6, 9 | 12, 12 |
-| Paw swing p95, left and right (limit 70) | 68, 41 | 68, 33 | 66, 32 |
-| Stretch p95, left and right (limit 0.35) | 0.04, 0.06 | 0.11, 0.10 | 0.09, 0.12 |
+| Measure | Old deer | First fawn | Fawn, arms 1.2 | Fawn, arms 1.3 |
+| --- | --- | --- | --- | --- |
+| Palm targets within 5 mm | 100 % | 48 % | 98 % | 100 % |
+| Worst palm target | 0 cm | 31 cm | 1.5 cm | 0 cm |
+| Paws in the body in the play | 1.0 cm | 0.9 cm | 3.4 cm | 1.4 cm |
+| Forearms in the body in the play | 0.8 cm | 4.4 cm | 2.5 cm | 0.2 cm |
+| Upper arms in the body in the play | 1.6 cm | 4.9 cm | 3.0 cm | 2.4 cm |
+| Upper arms in the harp in the play | 2.4 cm | 4.0 cm | 2.0 cm | 1.0 cm |
+| Upper arms in the body at rest | 0.8 cm | 3.3 cm | 2.2 cm | 1.7 cm |
+| Gap of the head to the harp in the play | | 2.3 cm | 2.8 cm | |
+| Folds p95, left and right (limit 8) | 2, 6 | 1, 8 | 6, 8 | |
+| Twist p95, left and right (limit 55) | 28, 30 | 6, 9 | 12, 12 | |
+| Paw swing p95, left and right (limit 70) | 68, 41 | 68, 33 | 66, 32 | |
+| Stretch p95, left and right (limit 0.35) | 0.04, 0.06 | 0.11, 0.10 | 0.09, 0.12 | |
 
-The left paw goes 3.4 cm into the chest at a high note of the left hand, and the right upper arm
-goes 2.2 cm to 3.0 cm into the root of the arm, also at rest. With the base 0.12 m away, each
-target was within 5 mm, but the left paw went 5.8 cm into the chest. A harp of 0.8 touched the
-chin. With the harp scale 0.8 and the limit G4 for the left hand, the left paw went 6.2 cm into
-the chest. Each hoof
-meets its string with its toe tips, and no hoof goes more than 0.6 cm into the strings or the
-column. The long ears and the neck stay off the harp.
+Each body vertex in each closed harp part, every 0.1 s of `boulanger-matin`
+(`scratch/deerclip/depth.ts`): with the arms of 1.3 and the harp of 2026-11-13, no region goes
+more than 1.0 cm into the soundbox, the column, the neck, the base, the pedals, or the stool in
+more than 1 % of the samples of the play, the lift, the rest, or the lowering. The right upper
+arm goes up to 1.1 cm into the top of the soundbox (0.5 % of the play) and 1.0 cm into the neck
+(0.2 %), the left shin 1.8 cm into the stool (0.7 %), and the right hoof 1.9 cm into the base
+(0.8 %), both in pedal moves. With the arms of 1.2 and the old harp, the right side of the chest
+went 2.4 to 2.7 cm into the soundbox in each sample. The long ears and the neck stay off the
+harp, and no hoof goes more than 0.6 cm into the frame of the harp (`claws in harp` of
+`pnpm pose-depth harpist`).
 
 **Color map** (`tools/deer-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color.
