@@ -52,9 +52,10 @@ EDGE_BAND = 3
 #: The angle in degrees added to the iris radius, so that the soft edge of the iris moves with it.
 IRIS_EDGE = 2.0
 #: The view of the gaze target, in degrees down from the forward axis of the head, and the turn of
-#: each target out from the middle of the painted eye in that view.
+#: each target out from the middle of the painted eye in that view. With a turn of 4 degrees, the
+#: right eye looked a little out, past the viewer, from the front.
 VIEW_DOWN = 15.0
-GAZE_OUT = 4.0
+GAZE_OUT = 0.0
 #: The part of the full turn of each iris toward its target that the map applies. The full turn
 #: (about 8 degrees) read wall-eyed from the front, so the iris moves only a small part of the way
 #: from the source paint.
