@@ -3,8 +3,8 @@ and the species scripts reuse. Each species script puts its settings into `ANIMA
 
 The rebuild uses loop edges, retopology, and extra bones to fix the twist of the arms and the
 wrists. The session makes these steps in the live Blender through MCP, with an image after each
-step, and this script repeats them in the same order, as `polar_bear_arms.py` does for the polar
-bear:
+step, and this script repeats them in the same order, as `polar_bear_arms.py` at cbc8db5e4 did
+for the polar bear:
 
 1. Import the mesh and Merge by Distance.
 2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube: Bisect at

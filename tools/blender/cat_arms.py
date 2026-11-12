@@ -2,7 +2,8 @@
 
 The upper arm of such a mesh joins the side of the trunk, so a cut at a right angle to the
 bone finds no closed loop around the arm. These steps give the arm a real armpit, and
-`fox_arms.py` and `deer_arms.py` run them with the settings of their animal (`STEPS`):
+`fox_arms.py` and `deer_arms.py` (at cbc8db5e4) run them with the settings of their animal
+(`STEPS`):
 
 1. Import the mesh and Merge by Distance (`violin_arms.import_mesh()`).
 2. Cut each arm along the seam where it meets the trunk, not at a right angle to the bone: Bisect
@@ -45,8 +46,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import violin_arms as va  # noqa: E402
 
 #: The keys of the settings of an animal of these steps, in the units of the studio (1 unit
-#: from the soles to the top), as `fox_arms.py` and `deer_arms.py` give them. `seam`: the cut
-#: along the seam and the armpit:
+#: from the soles to the top), as `fox_arms.py` and `deer_arms.py` (at cbc8db5e4) give them.
+#: `seam`: the cut along the seam and the armpit:
 #:
 #: - `x`, `lean`: the plane of the seam, |x| from the middle plane at the height `armpit`, and its
 #:   lean out for each unit of height down, as the side of the trunk widens below the armpit.

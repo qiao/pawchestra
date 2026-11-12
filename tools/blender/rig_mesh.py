@@ -1158,7 +1158,7 @@ def painted_weights(verts, path):
     the painted vertex at its place.
 
     The arm rebuild of the polar bear paints its weights with the tools of Blender
-    (`tools/blender/polar_bear_arms.py`).
+    (`tools/blender/polar_bear_arms.py` at cbc8db5e4).
     """
     with open(path) as f:
         data = json.load(f)
@@ -3027,9 +3027,9 @@ def placed_weights(verts, old_verts, old_tris, old_weights):
     """Gives each vertex the weights of its place on an old mesh (`weightSource` of the config): a
     vertex at the place of an old vertex takes its weights, and each other vertex the mix of the
     weights of the corners of the old face on which it lies, by its place on the face. A planar
-    split of the faces, such as `tools/blender/panda_edge.py`, puts each new vertex on an old face,
-    so the old vertices keep their weights and the skin of the old surface stays. Gives the
-    weights and the count of the vertices at old places."""
+    split of the faces, such as `tools/blender/panda_edge.py` at cbc8db5e4, puts each new vertex
+    on an old face, so the old vertices keep their weights and the skin of the old surface stays.
+    Gives the weights and the count of the vertices at old places."""
     weights = np.zeros((len(verts), old_weights.shape[1]))
     kept = 0
     for v, point in enumerate(verts):

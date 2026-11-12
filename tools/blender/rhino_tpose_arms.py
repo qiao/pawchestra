@@ -133,9 +133,9 @@ def step_wrap(s):
 
 def step_clean_cut(s):
     """Collapses the thin faces at the cut loops (Collapse Edges), after the cuts and before the
-    wrap, as `clean_wrist_cut()` of `polar_bear_arms.py` does: while a face at a loop has a corner
-    below the angle of `wind_arms.py` and its shortest edge lies along the loop, that edge
-    collapses to its middle.
+    wrap, as `clean_wrist_cut()` of `polar_bear_arms.py` at cbc8db5e4 does: while a face at a
+    loop has a corner below the angle of `wind_arms.py` and its shortest edge lies along the loop,
+    that edge collapses to its middle.
 
     The clean of `wind_arms.py` collapses the shortest loop edge of each thin face at a loop. The
     arms of the rhino mesh have many long thin faces, so each collapse made new thin faces, the

@@ -58,10 +58,10 @@ va = ea.va
 
 #: The settings of the bear, with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`,
 #: in the units of the studio (1 unit from the soles to the top). They are the settings of the
-#: polar bear (`polar_bear_arms.py`), moved to the arm root of the bear: the arm is free of the
-#: trunk beyond |x| 0.18, from y 0.58 to 0.75. The shoulder cut stands at 0.2 of the upper arm,
-#: and the zone has the radius 0.12: nearer the trunk, or with a smaller radius, the cut found no
-#: closed loop around the arm. The forearm is 0.09 units long, so it has 4 inner rings. `flatten`
+#: polar bear (`polar_bear_arms.py` at cbc8db5e4), moved to the arm root of the bear: the arm is
+#: free of the trunk beyond |x| 0.18, from y 0.58 to 0.75. The shoulder cut stands at 0.2 of the
+#: upper arm, and the zone has the radius 0.12: nearer the trunk, or with a smaller radius, the cut
+#: found no closed loop around the arm. The forearm is 0.09 units long, so it has 4 inner rings. `flatten`
 #: moves the inner side of each upper arm toward its axis, along the mean direction of the corners
 #: that go into the belly.
 BEAR = {
@@ -104,7 +104,8 @@ WRIST_SMOOTH = (4, 0.5)
 
 def cut_planes(s, line, side):
     """Gives the cut planes of `violin_arms.cut_planes()`, with the wrist plane at a right angle to
-    the axis of the last ring of the tube, as `cut_planes()` of `polar_bear_arms.py` does.
+    the axis of the last ring of the tube, as `cut_planes()` of `polar_bear_arms.py` at cbc8db5e4
+    does.
 
     The last ring stands at the wrist joint at a right angle to the line halfway between the
     forearm and the paw (`violin_arms.arm_stations()`). The wrist plane of `violin_arms.py` stands
@@ -141,7 +142,8 @@ def wrist_band(bm, part):
 def step_smooth_wrist(s):
     """Smooths the band of each wrist (Smooth Vertices, `WRIST_SMOOTH`) after the clean of the
     bridge, then puts it back on the surface of the source arm (Shrinkwrap, Nearest Surface
-    Point), as `smooth_wrists()` and `retopo_snap_wrists()` of `polar_bear_arms.py` do. The ring
+    Point), as `smooth_wrists()` and `retopo_snap_wrists()` of `polar_bear_arms.py` at cbc8db5e4
+    do. The ring
     is round and the cut loop has the form of the paw, so the bridge keeps small steps. The smooth
     alone pulls the band in, and the snap gives it the form of the source mesh. Gives the
     number of the band vertices."""
