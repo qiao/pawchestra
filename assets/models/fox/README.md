@@ -143,15 +143,16 @@ on the ring. The rest of the mesh does not change. The right paw is the mirror o
   vertices (an alignment of the two rings by angle). A closed quad surface on a ring of 11 edges
   must hold an odd face, so the paw has these 3 triangles and no other.
 - **Palm.** Four rings of 14 vertices (4 edges on the top, 4 on the bottom, 3 on each side) on a
-  super ellipse (exponent 2.4), at 0.009, 0.021, 0.034, and 0.048 units past the wrist ring, with
-  the half widths 0.029, 0.034, 0.0368, and 0.0372. The top gets lower to the front (half heights
-  0.020 to 0.0098), and the bottom bulges into a palm pad (0.0205 to 0.0215, then 0.016).
+  super ellipse (exponent 2.4), at 0.008, 0.018, 0.029, and 0.040 units past the wrist ring, with
+  the half widths 0.027, 0.030, 0.0312, and 0.031. The top gets lower to the front (half heights
+  0.019 to 0.0085), and the bottom bulges into a palm pad (0.0195, then 0.018 and 0.014).
 - **Digits.** The front palm ring and 6 inner vertices (0.004 units back, the web) are the bases of
-  four tubes of 8 vertices: the 4 columns of the palm. Each digit has an ellipse section of 0.0186 ×
-  0.0196 units, rings at 0.006 units and at 1, 0.55, and 0.2 tip radii before the tip, and a round
-  tip of 4 quads about a tip vertex. The middle digits are 0.031 units long past the palm, the outer
-  digits 0.027. They spread 1° and 3° from the paw axis, so they lie close together, and each digit
-  curls down by 2 × 5.5 t (19° at the tip of a middle digit).
+  four tubes of 8 vertices: the 4 columns of the palm. Each digit has an ellipse section of 0.0154 ×
+  0.0164 units, rings at 0.006 units and at 1, 0.55, and 0.2 tip radii before the tip, and a round
+  tip of 4 quads about a tip vertex. Past the palm, the middle digits are 0.024 and 0.025 units
+  long, the inner digit (to the front, the side of the thumb of a hand) 0.018, and the outer digit
+  0.016, as on a real fore paw. They spread 1.2° and 4° from the paw axis, so they lie close
+  together, and each digit curls down by 2 × 5.5 t (16° at the tip of a middle digit).
 - **UVs.** Each new face takes the box projection of its main normal onto one of four squares of
   even dark paw fur in the color map (UV (0.6797, 0.8730) on the top, (0.5493, 0.8755) on the
   bottom, (0.9194, 0.3032) on the sides, and (0.5654, 0.1719) on the front), at 0.66 UV for each
@@ -165,26 +166,29 @@ FBX header.
 
 The left paw before and after, in the units of the source, from the wrist joint (x 0.281) to the
 tip, with the shoulder joints at x ±0.085 (`paw_compare.py` and `paw_measure.py` of the session).
-The other bodies are the values of their READMEs after their paw edits:
+The other bodies are the values of their READMEs after their paw edits. The last row comes from
+`paw_measure.py` on the rig file of each body:
 
 | Measure | Source fox | Fox now | Tripo wolf | Tripo cat | Tripo beagle | Tripo rabbit |
 |---|---|---|---|---|---|---|
 | Digits | 3, 47° apart | 4, 2° to 6° apart | - | - | - | - |
-| Length, wrist joint to tip | 0.1115 | 0.0742 | - | - | - | - |
-| Width | 0.0992 | 0.0752 | - | - | - | - |
-| Height | 0.048 | 0.0425 | - | - | - | - |
-| Length / shoulder distance | 0.656 | 0.437 | 0.451 | 0.432 | 0.489 | 0.514 |
-| Width / shoulder distance | 0.584 | 0.442 | 0.462 | 0.510 | 0.486 | 0.579 |
-| Length / arm (shoulder to wrist joint) | 0.568 | 0.378 | 0.449 | 0.377 | 0.465 | 0.406 |
-| Width / arm | 0.506 | 0.383 | 0.460 | 0.445 | 0.461 | 0.457 |
+| Length, wrist joint to tip | 0.1115 | 0.0603 | - | - | - | - |
+| Width | 0.0992 | 0.0623 | - | - | - | - |
+| Height | 0.048 | 0.0392 | - | - | - | - |
+| Length / shoulder distance | 0.656 | 0.355 | 0.451 | 0.432 | 0.489 | 0.514 |
+| Width / shoulder distance | 0.584 | 0.366 | 0.462 | 0.510 | 0.486 | 0.579 |
+| Length / arm (shoulder to wrist joint) | 0.568 | 0.307 | 0.449 | 0.377 | 0.465 | 0.406 |
+| Width / arm | 0.506 | 0.317 | 0.460 | 0.445 | 0.461 | 0.457 |
+| Width / wrist diameter (girth / π) | - | 1.29 | 1.30 | 1.44 | - | 1.49 |
 
-The palm is 0.039 units long from the wrist joint to the web (0.071 in the source), and 0.074 wide
-at its front (0.083 at x 0.33 in the source). Each digit is 0.019 units wide (0.040 in the source), and
-the gaps between the digits grow from 0 at the web to about 0.001 at the tips. In the app the paw is
-0.132 m long and 0.134 m wide (0.35 H), against 0.179 m and 0.146 m on the fox before. Reason: the
-source paw was 0.66 of the shoulder distance long, and its three thick digits read as a hand. A
-fox paw has a palm pad and four short digits of near equal length close together, with the middle
-two a little longer.
+The palm is 0.035 units long from the wrist joint to the knuckle joint (0.071 in the source), and
+0.062 wide at its front (0.083 at x 0.33 in the source). Each digit is 0.015 units wide (0.040 in
+the source), and the gaps between the digits grow from 0 at the web to about 0.001 at the tips. In
+the app the paw is 0.107 m long and 0.111 m wide (0.29 H). Reason: the source paw was 0.66 of the
+shoulder distance long, and its three thick digits read as a hand. The first four-digit paw (0.132
+m long and 0.134 m wide, 1.48 wrist diameters, four digits of 0.027 to 0.031 units) still read as a
+large hand with digits of one length. A fox paw has a palm pad and four short digits close
+together: the middle two are the longest, and the outer two are shorter.
 
 ### tripo-hand/fox.blend
 
@@ -240,7 +244,7 @@ instruments:
   radii, and less than 65 degrees to the side (smoothstep ends 12, 28, 60, 85 degrees, 1.5 and 2.4
   radii, 35 and 65 degrees), about 50 vertices on each side, at most 0.0036 units ("Eyes").
 - **Armature.** The joints of the config: the shoulder at x 0.085, the elbow at x 0.185, the wrist
-  at x 0.281, the knuckles at x 0.324 (the base of the digits), the hip at (0.06, 0.29, 0.06), and
+  at x 0.281, the knuckles at x 0.316 (the base of the digits), the hip at (0.06, 0.29, 0.06), and
   the knee at (0.055, 0.165, 0.042). The palm is the true palm of the new paw, the down normal of its
   palm rings, (-0.086, -0.996, -0.001) in the studio axes with x mirrored on the right, turned by
   the paw turn. The property `hinges` holds the elbow axis of each side, turned about its bind upper
@@ -256,8 +260,8 @@ The weights, in the rest pose:
    (`rows.control` of `params.json`), an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x
    0.163, 0.178, 0.194, and 0.209, and the rest on the 4 roll segments ("Arm roots").
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
-   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
-   0.02 units before the head of `fingers_<side>`, so the four digits and the front of the palm
+   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.003 from
+   0.017 units before the head of `fingers_<side>`, so the four digits and the front of the palm
    take `fingers_<side>`.
 4. The eyeballs and the nose take {`head` 1}.
 5. Ear rows: a plane across the base of each ear, through (0.035, 0.895, 0.05), (0.135, 0.85,
@@ -399,9 +403,9 @@ and the lowering of the violinist keep the left upper arm 3.4 cm in the belly (u
 uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py
 ```
 
-The red map is the source scaled to 2048 pixels (Lanczos), WebP quality 60, method 6 (Pillow
-13.0.0). No texel changes its color: the fur, the socks, the brows, and the eye paint stay. The
-gaze shift of `tools/gaze_shift.py` is off (`GAZE_SHIFT`), because the irises of the source read
+The red map is the source scaled to 2048 pixels (Lanczos) with fur strands ("Fur strands"),
+WebP quality 60, method 6 (Pillow 13.0.0). The hue of each texel stays, and the eyeballs keep their
+colors. The gaze shift of `tools/gaze_shift.py` is off (`GAZE_SHIFT`), because the irises of the source read
 as a look at the viewer ("Eyes").
 
 **Tan color map.** The tan map is the red map with one Oklab step of the orange fur only
@@ -410,29 +414,57 @@ chroma step. A texel that leaves the sRGB gamut takes the largest chroma in the 
 lightness and hue. The share of the step of a texel falls to 0 for a chroma below 0.09, a lightness
 above 0.82, or a hue more than 25 degrees from 50 degrees, so the cream, the dark socks, the lines,
 and the white keep the colors of the source. The eyeballs keep their colors. The texels of the fur
-(54.2 % of the map) go from the median Oklab L 0.629, C 0.165, h 48.2 to L 0.689, C 0.151, h 66.2.
+(53.9 % of the map) go from the median Oklab L 0.626, C 0.163, h 48.2 to L 0.686, C 0.150, h 66.2.
 Each fur texel keeps its step from the other fur texels, so the strands stay.
 
 **Normal map.** The same run writes `fox-normal.webp` from the normal map of the FBX: each x, y tilt
-limited to 0.2 (1.25 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red and
-green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0). The red fox and the tan fox
-share it.
+limited to 0.2 (1.25 % of the texels), a box scale to 1024 pixels, plus the tilts of the strands
+("Fur strands"), each sum limited to 0.2, the tilts times 4 in red and green, 255 in blue, and
+`cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0). The red fox and the tan fox share it.
+
+**Fur strands.** The source maps paint the fur smooth, so the fox fur showed no strands in the app
+beside the cat, the wolf, and the rabbit. The measures of the source maps (`nstats.py` and
+`cstats.py` of the session, the strand contrast as the RMS of the linear luma in 16-texel blocks
+over the block mean, in the blocks with no island edge):
+
+| Map | Fox | Tripo cat | Tripo wolf | Tripo rabbit |
+|---|---|---|---|---|
+| Color: strand contrast, median | 0.017 | 0.170 | 0.089 | 0.087 |
+| Color: fur luma (linear), median | 0.231 | 0.182 | 0.239 | 0.578 |
+| Normal: tilt, median | 0.006 | 0.028 | 0.028 | 0.028 |
+| Normal: tilt, mean | 0.019 | 0.047 | 0.054 | 0.063 |
+
+The fur luma of the fox is near that of the wolf, and 97 % of its triangles have the finish
+`matte` of the fur, so neither the tone curve nor the fur mask was the cause. `strands()` of
+`tools/fox-maps.py` (`STRANDS`) makes a strand height at 2048 pixels: the direction of least change
+of the structure tensor of the source maps (blur sigma 24 texels), seeded white noise (seed 7,
+blur sigma 1.4 texels) summed along that direction over 22 texels on each side with a Hann weight,
+a high pass (sigma 10 texels), and one standard deviation, clipped at 2.5. Each linear color of the
+red map takes the factor 1 + 0.16 times the height. The normal map adds the slope of the height,
+with an RMS tilt of 0.06. The web maps after the edit (8-texel blocks):
+
+| Web map | Fox before | Fox now | Tripo cat | Tripo wolf | Tripo rabbit |
+|---|---|---|---|---|---|
+| Color: strand contrast, median | 0.011 | 0.088 | 0.140 | 0.075 | 0.072 |
+| Normal: tilt, mean | 0.013 | 0.046 | 0.037 | 0.040 | 0.042 |
+| Normal: tilt high pass, RMS | 0.017 | 0.052 | 0.046 | 0.052 | 0.060 |
+| Normal: strand wavelength at 1024 pixels | 26 | 8.0 | 8.5 | 9.8 | 7.5 |
 
 **Differences from the source.** The app light is warm and comes from above, so the orange fur
 reads lighter and warmer than in the even gray light of an FBX viewer. The front paws have four
-digits ("Four-digit paws"). The eyes are 0.93 of their size and a little deeper, and the upper lids
-a little lower ("Eyes"). Each eye has a blink lid.
+digits ("Four-digit paws"). The maps add fur strands ("Fur strands"). The eyes are 0.93 of their
+size and a little deeper, and the upper lids a little lower ("Eyes"). Each eye has a blink lid.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-p2/fox-paws.fbx` | 202,556 bytes (one run) | `2331d6371a1aacc742f2bda62a75afd4e93eee3eb87ddea24f796bd635ef1c12` |
-| `tripo-hand/fox.rig.glb` | 1,059,996 bytes | `3a66fad9dd96c9dabbf28fceabbe9f12dc0b9beaa365a94760a618a6b1a30632` |
-| `tripo-hand/fox.rig.json` | 16,978 bytes | `124cefc2111d5a56d8ea1afda2b2a2659da9def90dcfa4e9606327f0dbe950d0` |
-| `tripo-hand/fox-color.webp` | 108,956 bytes, 2048 × 2048 | `27b992ec80f30629163e2b001623ef8ec071099d6a46facfbc48603ce81267f5` |
-| `tripo-hand/fox-tan-color.webp` | 115,370 bytes, 2048 × 2048 | `fc14932af3aa0afa4a3077acedecf50c7ccc5ec5944f5baf62c3cdb7c686f06e` |
-| `tripo-hand/fox-normal.webp` | 21,804 bytes, 1024 × 1024 | `0bf03b7b4f6251d4c07346e8cb1af9c2c7f986d9b07a7af92285f5bd5f1fb559` |
+| `tripo-p2/fox-paws.fbx` | 203,084 bytes (one run) | `c24479e9963f1edc635923db310229609828a66caf4f58208739f44773384d73` |
+| `tripo-hand/fox.rig.glb` | 1,053,592 bytes | `ae28e65d513f9f3f924f752fb9359b402f10803de68fcd6f7ff2c3eb03dbea91` |
+| `tripo-hand/fox.rig.json` | 16,978 bytes | `e6cde95987a3431e25397741997b68ed77c1e190f029cac1d5e2bddfb9821286` |
+| `tripo-hand/fox-color.webp` | 241,484 bytes, 2048 × 2048 | `5f1242c5f0a1c17e5f3d62934a168a1efe7882b3066f3a45ca5c9c76043daedf` |
+| `tripo-hand/fox-tan-color.webp` | 250,614 bytes, 2048 × 2048 | `cd53b99716829001f0f6dd9612700951d46ed57a64cb3a021b2da90be11f7e23` |
+| `tripo-hand/fox-normal.webp` | 180,566 bytes, 1024 × 1024 | `bf1e788187919e2796a37d599c2c990e4ee29c2b2882c2fac1ea8095965a3797` |
 
 ### History
 
