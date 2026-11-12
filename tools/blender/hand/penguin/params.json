@@ -1,0 +1,316 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/penguin/tripo-p2/penguin.fbm/penguin_basecolor.jpg",
+ "palm": [
+  -0.035,
+  -0.444,
+  0.895
+ ],
+ "ringEdges": 16,
+ "legTurns": null,
+ "tailBind": {
+  "tail": [
+   0,
+   -0.8375,
+   -0.5464
+  ],
+  "tail_tip": [
+   0,
+   -0.7071,
+   -0.7071
+  ]
+ },
+ "tailBindNote": "The tail bones keep the directions of the source in the bind: the pointed tail feathers go down and back from the lower back to the floor behind the heels.",
+ "chair": {
+  "halfWidth": 0.24,
+  "front": -0.11,
+  "back": -0.165,
+  "backHeight": 0.15,
+  "note": "The chair of the rig sets the seat top of the bind, but the penguin stands on its riser in the app, so no player sits on this seat. The front edge lies behind the heels (z -0.08), and the back edge in front of the tail."
+ },
+ "eyeBox": [
+  [
+   0.03,
+   0.89,
+   0.0
+  ],
+  [
+   0.085,
+   0.955,
+   0.07
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.012,
+   0.875,
+   0.225
+  ],
+  [
+   0.012,
+   0.892,
+   0.245
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.042 to 0.073, y 0.902 to 0.944, z 0.016 to 0.055). The nose box holds the tip of the beak; the nose step gives its faces back to the fur slot.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.050235,
+ "metersPerUnitNote": "The scale of the app: H of the body is the H of the penguin of main (assets/models/penguin/penguin.rig.glb), 0.217537 m. The fact height of the armature is the shoulder joints at this scale.",
+ "eyeSize": 0.21,
+ "jointsNote": "The places are the places of the source, in the studio units and axes: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Flipper (closed rings of 16 vertices from x 0.200 to x 0.458, axis y 0.642 to 0.620, z -0.101 to -0.084): the shoulder joint at x 0.16, where the flipper leaves the side of the trunk, the elbow at x 0.265, the wrist at x 0.365, and the tip at x 0.468. The flipper is a flat blade: its wide axis is (0, 0.88, 0.48), and its front face (the white under face) faces (-0.035, -0.444, 0.895), the palm. Feet: the soles from z -0.079 (heels) to 0.12 (toe tips), x 0.04 to 0.165. Tail: the pointed tail feathers go from the lower back (y 0.12, z -0.19) down to the tip at (0, 0.04, -0.242).",
+ "rings": {
+  "arm": [
+   [
+    0.1998,
+    0.24,
+    1
+   ],
+   [
+    0.24,
+    0.2908,
+    2
+   ],
+   [
+    0.3518,
+    0.3934,
+    1
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.16,
+  "reach": 0.075,
+  "handReach": 0.075,
+  "control": [
+   [
+    0.16,
+    0.4,
+    0
+   ],
+   [
+    0.17,
+    0.25,
+    0
+   ],
+   [
+    0.18,
+    0.12,
+    0
+   ],
+   [
+    0.19,
+    0.04,
+    0
+   ],
+   [
+    0.2,
+    0,
+    0
+   ],
+   [
+    0.235,
+    0,
+    0
+   ],
+   [
+    0.25,
+    0,
+    0.25
+   ],
+   [
+    0.26,
+    0,
+    0.75
+   ],
+   [
+    0.27,
+    0,
+    0.75
+   ],
+   [
+    0.28,
+    0,
+    0.25
+   ],
+   [
+    0.295,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.04,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   0.0,
+   0.03
+  ],
+  "bend": 0.04,
+  "tip": false
+ },
+ "hipJoint": [
+  [
+   0.085,
+   0.18,
+   -0.04
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/penguin/tripo-hand/penguin-color.webp"
+ },
+ "smooth": false,
+ "dropSmall": 30,
+ "pawTurn": {
+  "L": 0,
+  "R": 0
+ },
+ "turnRings": [
+  0.3518,
+  0.3934
+ ],
+ "turnFit": 0.02,
+ "lids": {
+  "back": 135,
+  "psi": [
+   -55,
+   45
+  ],
+  "lam": [
+   -50,
+   62
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 126,
+  "srgb": [
+   42,
+   37,
+   35
+  ],
+  "uv": [
+   0.1779,
+   0.9067
+  ],
+  "density": 0.2
+ },
+ "noGloss": false,
+ "tailFlood": {
+  "z": -0.16,
+  "yMax": 0.12
+ },
+ "noseFur": true,
+ "studio": {
+  "bindArms": {
+   "upper_arm": [
+    0.639602,
+    -0.639602,
+    0.426401
+   ],
+   "forearm": [
+    0.316246,
+    0.757051,
+    0.571719
+   ]
+  },
+  "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the penguin of main (tools/mesh-rigs/penguin.json), so that the elbow axes of the singer hold stay.",
+  "bindSupination": {
+   "L": 0,
+   "R": 0
+  },
+  "bindSupinationNote": "The bind flippers take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist."
+ },
+ "trunkNote": "The trunk of the bind keeps the upright trunk of the source (open 0).",
+ "legNote": "The penguin stands on its riser, and its short legs hide in the egg, so each leg turn is the identity: the feet keep the place of the source.",
+ "trunkBind": {
+  "open": 0,
+  "shares": {
+   "hips": 1,
+   "spine": 1,
+   "spine1": 0.75,
+   "chest": 0.5,
+   "neck": 0.25,
+   "head": 0
+  }
+ },
+ "beak": {
+  "a": [
+   0,
+   0.8905,
+   0.112
+  ],
+  "b": [
+   0,
+   0.8745,
+   0.242
+  ],
+  "box": [
+   [
+    -0.034,
+    0.855,
+    0.105
+   ],
+   [
+    0.034,
+    0.91,
+    0.25
+   ]
+  ],
+  "gap": 0.0004,
+  "capUv": [
+   0.1779,
+   0.9067
+  ],
+  "ramp": [
+   0.0,
+   0.03
+  ],
+  "corner": [
+   0.0217,
+   0.8894,
+   0.1224
+  ],
+  "jawBox": [
+   [
+    -0.07,
+    0.85,
+    0.085
+   ],
+   [
+    0.07,
+    0.905,
+    0.25
+   ]
+  ],
+  "loop": true
+ },
+ "jaw": [
+  [
+   0,
+   0.8935,
+   0.09
+  ],
+  [
+   0,
+   0.8775,
+   0.242
+  ]
+ ]
+}
