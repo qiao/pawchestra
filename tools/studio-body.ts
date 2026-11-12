@@ -566,21 +566,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeShift: [0, 0.05],
     },
   ],
-  // The harp deer (design 4.4). It sits on the stool of the harp, and the
-  // harp soloist keeps the stool, so it does not stand. The antlers stay out of the head measures.
-  // The haunch of the deer of 1.2 times the size is 0.39 m wide, so the stool is 0.44 m wide.
+  // The harp deer (design 4.4): the hand rig of the Tripo P2 fawn
+  // (`assets/models/deer/tripo-hand/deer.blend`), by the route of the Tripo wolf, with no arm cut
+  // and no arm stretch. It sits on the stool of the harp, and the harp soloist keeps the stool, so
+  // it does not stand. Its `.blend` holds the facts of the body: the scale that keeps H of the deer
+  // of `deer.rig.glb`, the crease angle 180°, and the width of the stool. The map paints a full eye
+  // with a light on each eyeball, so the eyes take the finish `varnish` and no eye light.
   [
     'deer',
     {
       landmark: 'shoulders',
-      height: 0.897127,
       seated: true,
       soloist: false,
       constant: 'STUDIO_DEER',
-      crease: 35,
-      headCeiling: 0.87,
-      seatWidth: 0.44,
-      glb: 'assets/models/deer/deer.rig.glb',
+      glb: 'assets/models/deer/tripo-hand/deer.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The choir penguin (design 4.4): the hand rig of the Tripo P2 penguin
