@@ -43,12 +43,26 @@ def head(X, e, params):
     return X + w * (s - 1) * (X - c)
 
 
+def past_knuckle(d, params, side, c, a, ramp):
+    """The length past the knuckle joint of each distance d along the paw axis a from the wrist
+    joint c: the integral of smoothstep(k - ramp, k + ramp, x) from the wrist up to d, with k the
+    knuckle joint along a. It is d - k past k + ramp, so the digits take the factor `fingers` in
+    full there, and the scale has no step at the knuckle."""
+    m = np.array([1.0 if side == 'L' else -1.0, 1, 1])
+    k = (np.array(params['sourceJoints']['fingers_L']['head'], float) * m - c) @ a
+    u = np.clip((d - (k - ramp)) / (2 * ramp), 0, 1)
+    return np.where(d > k + ramp, d - k, 2 * ramp * (u**3 - u**4 / 2))
+
+
 def paw(X, e, params):
     """Scales each paw past the wrist in the frame of the paw (assets/models/fox/README.md, "Paw
     size"): origin the wrist joint c, a the rest forearm axis, w the width axis (the left width
     axis of the source, turned with the paw of the side), n = a x w. With d the distance along a
     and s = smoothstep(0, ramp, d), the point c + (1 - (1 - L) s) d a + (1 - (1 - W) s) (v . w) w +
-    (1 - (1 - T) s) (v . n) n takes its place. The points up to the wrist joint stay."""
+    (1 - (1 - T) s) (v . n) n takes its place. The points up to the wrist joint stay. With
+    `fingers` F, the length term is (1 - (1 - L) s) (d - (1 - F) past_knuckle(d)) a, so the
+    digits past the knuckle joint take the factor F more (assets/models/cat/README.md, "Paw
+    size")."""
     Y = X.copy()
     for side, sign in (('L', 1.0), ('R', -1.0)):
         m = np.array([sign, 1, 1])
@@ -65,7 +79,10 @@ def paw(X, e, params):
         L = 1 - (1 - e['length']) * s
         W = 1 - (1 - e['wide']) * s
         T = 1 - (1 - e.get('thick', 1.0)) * s
-        new = c + (L * d)[:, None] * a + (W * (v @ w))[:, None] * w + (T * (v @ n))[:, None] * n
+        along = L * d
+        if 'fingers' in e:
+            along = L * (d - (1 - e['fingers']) * past_knuckle(d, params, side, c, a, e['fingerRamp']))
+        new = c + along[:, None] * a + (W * (v @ w))[:, None] * w + (T * (v @ n))[:, None] * n
         Y[on] = new[on]
     return Y
 
