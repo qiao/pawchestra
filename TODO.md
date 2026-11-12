@@ -134,8 +134,19 @@ passes.
 - [ ] Deer harpist: in the fast run near 112 s of boulanger-matin, the right forearm turns 15° in
       one 1/30 s step (`scratch/tripo-audit/motion.ts`). The turn speed is lower than before the
       harp of 2026-11-13 (459 deg/s against 538), but the neighbor steps are slower now.
-- [ ] Deer harpist: the right paw goes 1.4 cm into the chest at 245.1 s of boulanger-matin
-      (`pnpm pose-depth harpist`, limit 1.5 cm). Check it in a 2x crop.
+- [ ] Deer harpist: the right paw goes 1.8 cm into the chest at 245.1 s of boulanger-matin, and
+      its claws 2.3 cm at 245.4 s (`pnpm pose-depth harpist`, limit 1.5 cm, 1.0 % of the samples
+      over it). The deer of 1.3 times the size scales the depth of 1.4 cm of the fit. Check it in
+      a 2x crop.
+- [ ] Deer harpist: at 1.3 times the size, the fit of the harp and the hold is the fit of the
+      smaller deer, so each depth is 1.3 times larger. In the absolute limit of 1.0 cm
+      (`scratch/deerclip/depth.ts`), the right upper arm goes 1.4 cm into the neck of the harp in
+      24 % of the play and the soundbox in 3 %, and the right thigh 1.2 cm into the stool in 8 %.
+      With the limit at 1.3 cm, each region is under 1 % of the samples. The turn, the side, the
+      front, the scale, and the tilt of the harp, the right elbow, the right palm, the shoulder
+      drop, and a higher neck hump did not bring the right arm under 1.0 cm in 1 % of the play
+      (`reports/2026-11-13-deer-size/search2.log`). Ask the user if the limit grows with the
+      body, or refit the neck end of the harp and the right arm.
 - [ ] Harp: no source of `docs/reference/harp-technique.md` gives the width and the depth of the
       soundbox of a concert harp at its top. Find one, and check `SOUNDBOX` against it.
 - [ ] Deer harpist: the left paw swing p95 is 69 (limit 70).
@@ -147,8 +158,8 @@ passes.
       boulanger-matin), where the music gives a move less than 0.2 s.
 - [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
       close snaps 31° to 45° in one step.
-- [ ] Deer harpist: in pedal moves, the left shin goes 1.8 cm into the stool edge (0.7 % of the
-      samples) and the right hoof 1.9 cm into the harp base (0.8 %).
+- [ ] Deer harpist: in pedal moves, the left shin goes 1.9 cm into the stool edge (0.6 % of the
+      samples) and the right hoof 2.4 cm into the harp base (0.4 %).
 - [ ] Deer: dark facet patches on the tail tip and the back of the left shoulder in the hall light.
       The color map has no dark texel there (`reports/2026-11-12-afix/deer/m4-patches/`), so the
       cause is the shading of flat faces that face away from the key. Four tail faces are flipped.
@@ -824,8 +835,10 @@ passes.
 - [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
-- [ ] Tripo fawn: ask the user to confirm the size (the standing shoulders of the old deer, with a
-      smaller head than the old deer: H 0.22 m against 0.36 m) and the arms 1.3 times longer.
+- [ ] Tripo fawn: ask the user to confirm the size: 1.3 times the scale of the standing shoulders
+      of the old deer, so that the seated crown with no ears (1.53 m) is at the seated crown of the
+      Tripo wolf (1.54 m), H 0.287 m against 0.369 m of the wolf, the ears above the wolf ears,
+      and the trunk slimmer (chest 0.30 m against 0.38 m). Also confirm the arms 1.3 times longer.
 - [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
       is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
