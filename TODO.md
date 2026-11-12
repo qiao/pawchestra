@@ -784,14 +784,15 @@ passes.
       move of `shift_eyes()`, the pupils sit 0.09 to 0.12 of the half width of the opening out in
       the front view of the test page, and 0.11 to 0.14 toward the nose in the 3/4 views. A small
       dark lash corner stays at the inner bottom of each eye. Check the gaze in the app.
-- [ ] Tripo pig: faces fold at the front of both shoulders and in the crook of the right elbow
-      (`pnpm arm-check hornist`, folds p95 8 left and 23 right, limit 8, 1 and 12 on the old pig).
-      Check the shoulders and the right elbow in the app.
-- [ ] Tripo pig: in each sample the upper arms go 2.6 cm to 3.7 cm into the cap of the arm root
-      (`pnpm pose-depth hornist`, limit 1.5 cm). Check the shoulders in 2x crops, or accept the
-      depth with its reason in the sweep of the hornist.
-- [ ] Tripo pig: the round shins put the front of the seat 0.07 units behind the knee, so only 28 %
-      of the thigh lies on the seat. Check the seat from the side in the app.
+- [ ] Tripo pig: at rest and in the moves, the right upper arm goes 2.4 cm into the cap of the arm
+      root (`pnpm pose-depth hornist`, limit 1.5 cm; 0.8 cm in the play). Check the right shoulder
+      at rest in 2x crops, or accept the depth with its reason in the sweep of the hornist.
+- [ ] Pig hornist: the right grip moves 0.11 H out of the horn bell (`gripShiftR`), so the note
+      target of the right palm is 4.5 cm from the grip of the horn (`pnpm hold-fit hornist`, within
+      5 mm). Move the grip of the horn to the mouth of the bell (`HORN_PALM_DEPTH`), or let the
+      target count the grip shift.
+- [ ] Pig hornist: the right hoof is long and thick, so only about a third of it lies inside the
+      flare of the bell, at the mouth. Check the hoof in the bell in the app.
 - [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
