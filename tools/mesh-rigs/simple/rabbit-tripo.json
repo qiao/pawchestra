@@ -131,14 +131,14 @@
     },
     "fingers_L": {
       "head": [
-        0.287488,
-        0.529949,
-        0.055088
+        0.278981,
+        0.529854,
+        0.05367
       ],
       "tail": [
-        0.327488,
-        0.534949,
-        0.086088
+        0.310971,
+        0.534764,
+        0.07847
       ],
       "roll": "palm"
     },
@@ -207,14 +207,14 @@
     },
     "fingers_R": {
       "head": [
-        -0.286516,
-        0.522722,
-        0.060298
+        -0.278117,
+        0.522453,
+        0.058354
       ],
       "tail": [
-        -0.334275,
-        0.506383,
-        0.054121
+        -0.316226,
+        0.508645,
+        0.053937
       ],
       "roll": "palm"
     }
@@ -362,7 +362,7 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies. Bone heat gives them their weights."
   },
-  "jointsNote": "The places are the places of the source, mapped by the paw turns of the hand rig (assets/models/rabbit/README.md). The hand rig makes no point edit. The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 10 vertices): the shoulder joint at x 0.07, the elbow at x 0.1475, the wrist at x 0.225, the knuckles at x 0.268, and the tip at x 0.31. Leg (closed rings of 12 vertices): the hip joint at (0.0595, 0.287, 0.004) in the haunch, the knee at y 0.178, the ankle at y 0.055, the ball of the foot at z 0.055, and the toe tips at z 0.095. Trunk: the hips at y 0.31, the neck at y 0.585, and the head from y 0.615 to 0.80. Ears: the root at y 0.785, the tips at (0.10, 1.0, -0.065). Tail: a short bone from (0, 0.33, -0.08) back. The hip joint lies 0.5 mm forward of the measured place (z 0.0035), because with z 0.0035 the rest frames of the leg bones in Blender scale by 3e-5 (the thigh points nearly opposite to its parent), above the limit of pnpm rig-export.",
+  "jointsNote": "The places are the places of the source, mapped by the paw turns and the point edits of the hand rig (assets/models/rabbit/README.md): the edit of the paw size moves the knuckle joint and the tip of each fingers bone. The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 10 vertices): the shoulder joint at x 0.07, the elbow at x 0.1475, the wrist at x 0.225, the knuckles at x 0.268, and the tip at x 0.31. Leg (closed rings of 12 vertices): the hip joint at (0.0595, 0.287, 0.004) in the haunch, the knee at y 0.178, the ankle at y 0.055, the ball of the foot at z 0.055, and the toe tips at z 0.095. Trunk: the hips at y 0.31, the neck at y 0.585, and the head from y 0.615 to 0.80. Ears: the root at y 0.785, the tips at (0.10, 1.0, -0.065). Tail: a short bone from (0, 0.33, -0.08) back. The hip joint lies 0.5 mm forward of the measured place (z 0.0035), because with z 0.0035 the rest frames of the leg bones in Blender scale by 3e-5 (the thigh points nearly opposite to its parent), above the limit of pnpm rig-export.",
   "body": {
     "crease": 180,
     "backRoom": 0.01
