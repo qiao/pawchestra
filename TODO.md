@@ -1327,6 +1327,18 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Camera: the default view and the shots of `scene.png`.
 - [ ] Cast: the faceted animals and the instruments of `scene.png`.
 - [ ] UI: the title, the panel, the demo rows, the seat rows, and the bar of `mockup.png`.
+- [ ] Do the hall of the scene look task before the color tasks. Wide film shots show the stage in
+      a black space, with no wall and no seats. Also do the bow of the conductor to the audience
+      early: the end of a piece now has no reward (2.4, 5.4).
+- [ ] Try a fixed gradient from the top edge with the text shadow in place of the title shade. In
+      play the shade shows as a dark smudge on the light beam. Check 4.5:1 with
+      `e2e/title-shade.e2e.ts`. If it passes, remove `src/app/backdrop-probe.ts` and its cost
+      (2.8).
+- [ ] Draw staff lines and note heads into one small canvas texture at start (no file), and use it
+      on each stand sheet and on the score of the conductor desk. The sheets are blank white quads
+      (`src/models/props.ts`), and the close shots show them (4.6).
+- [ ] The mouse is a faceted body beside fur bodies in one frame. Check that a Tripo hand body of
+      the mouse is in the body plan (4.3).
 - [ ] Give the cello and the contrabass the deeper ribs of the real instruments (about 0.16 of the
       body length), and check the holds of the dog and the hippo.
 - [ ] Slope the strings of the bowed strings down about 5° from the bridge to the nut, as on a real
