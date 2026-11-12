@@ -951,17 +951,19 @@ const BEAVER_REST = holdTurn(0, 20);
  * short arms do not reach a rest lower than 0.15 H below the mouth with the bassoon in front of
  * the belly. With the right paw alone on the bassoon upright at its side and the left arm
  * hanging, the bassoon went through the head in the lift and 13.6 cm into the right thigh in the
- * lowering. The left paw holds the wing joint high, and the right grip moves 0.25 H up the boot
+ * lowering. The left paw holds the wing joint high, and the right grip moves 0.3 H up the boot
  * joint (`gripShiftR`): with 0.15 H, the right arm did not reach the boot of the bassoon of
  * 0.7. At rest, the left grip moves 0.02 H further across the tube toward the left shoulder
  * (`restGripShiftL`): with the grip of the play, the left finger tips stood 0.6 cm off the wing
  * joint at rest, and the left paw grasped it in no rest sample. Each grip moves toward the axis and to the side of its own shoulder, the left
  * grip 0.1 H toward the axis and 0.1 H across it toward the left shoulder, and the right grip
- * 0.15 H toward the axis and 0.08 H across it toward the right shoulder. Each palm then faces the
+ * 0.15 H toward the axis and 0.14 H across it toward the right shoulder. The boot joint holds
+ * both bores, so it is wider than the wing joint: with the right grip 0.25 H up and 0.08 H
+ * across, the right claws went 1.5 cm to 1.6 cm into the boot at rest, in the lift, and in the
+ * lowering, and now they go 1.1 cm (`pnpm pose-depth bassoonist`). Each palm then faces the
  * tube from its own side (`faceTube`), each paw aims a quarter toward the side across the tube
  * (`aimSide`), the fingers curl over its front (`gripCurl`), and the thumbs point up the bassoon,
- * so that both paws grasp it in each sample (`pnpm wind-grip bassoonist`). With the right grip
- * 0.2 H toward the axis and 0.14 H across it, the right paw grasped in 67 % of the play samples.
+ * so that both paws grasp it in each sample (`pnpm wind-grip bassoonist`).
  *
  * The big front teeth hang in front of the lower lip, so the reed sits 0.2 H lower and 0.28 H
  * further back than the mouth of the bind pose (`lipShift`): behind the teeth at the height of
@@ -990,7 +992,7 @@ const BEAVER_BASSOON = {
   aimSide: [0.25, 0.25],
   gripShiftL: [0, 0.1, -0.1],
   restGripShiftL: [0, 0.1, -0.12],
-  gripShiftR: [0.25, 0.15, -0.08],
+  gripShiftR: [0.3, 0.15, -0.14],
   restAim: 1,
   gripCurl: curls(110, 120),
 } as const satisfies WindHold;
