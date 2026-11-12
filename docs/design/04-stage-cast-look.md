@@ -1767,7 +1767,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin of a thin steel rod and a round rubber tip (`celloPinOf()`, `endPinLength()`, `END_PIN`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
-| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, and near the stool (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its short arms need to reach the strings. |
+| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, near the stool, and to the right of its chest (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its arms need to reach the strings, and the soundbox off the chest. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
@@ -1858,13 +1858,16 @@ pedal harp (`docs/reference/harp-technique.md`):
 - **Column.** A fluted shaft between a gilded foot and a gilded crown (`COLUMN`). The crown is
   low, so that it stands below the muzzle of the deer in a side view.
 - **Neck.** An S curve (`HARP.neck`): it falls from the crown, rises in a hump over the middle
-  strings, and falls onto the top of the soundbox. A brass plate covers the bottom of each side
+  strings, and falls onto the top of the soundbox. It is thinner and lower toward the soundbox
+  (`NECK`), so that its slim end fits on the narrow top of the soundbox and stays off the right
+  shoulder of the player. A brass plate covers the bottom of each side
   over the strings (`NECK`), as the plates of the action. The crown and the neck near it stand
   lower than on a concert harp (`HARP.column`). Reason: the long muzzle of the deer reaches over
   the neck near the crown, and the head of a harpist does not rest on the harp.
-- **Soundbox.** A round back of five staves and a flat spruce soundboard, wide at the base and
-  narrow at the top (`SOUNDBOX`). The strings start in a center strip of the soundboard, and the
-  middle stave of the back has four holes.
+- **Soundbox.** A round back of five staves and a flat spruce soundboard, wide and deep at the
+  base and narrow and shallow at the top (`SOUNDBOX`). The strings start in a center strip of the
+  soundboard, and the middle stave of the back has four holes. Reason for the narrow top: it rests
+  at the right shoulder of the player, and a wider and deeper top went into the chest of the deer.
 - **Base.** A bevelled pedestal with seven brass pedals in a fan at the end of the player: D, C,
   and B at the left, and E, F, G, and A at the right, as the harpist sees them (`HARP_PEDALS`).
   Each pedal is one part, in the order of `HARP_PEDALS.order`, so that a pose can move it. A pedal
