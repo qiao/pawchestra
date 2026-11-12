@@ -850,6 +850,12 @@ strings at the knuckles, so the left palm stays further from the strings (`palmL
 knuckles stay out of the neck of the harp.
 The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
 the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
+The highest strings of the right hand lie near the right shoulder, so for them the right palm
+moves down the strings and a little away from them (`highR`), as the right wrist of a harpist
+comes near the soundboard in the upper register (harp 4). Reason: at the neck of the harp, the
+right elbow folded and the right forearm twisted. The right elbow points out and a little down
+(`poleR`), as the elbows of a harpist rise, so the right upper arm only touches the soundbox. The
+right palm faces a little down (`faceR`), so that the right paw twists at most 45° on its forearm.
 
 Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 `pose/harp-fingering.ts`), a pure function of the notes of the hands:
@@ -866,7 +872,11 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 - **Placing.** The palm stands at the middle of the strings of its group, so the hand moves once
   for each group and stays still in the group. It places the next group right after the last
   pluck of the group before (`HarpFingering.places`), and rests on the strings until the pluck,
-  as a harpist places the fingers before they sound (harp 7.2).
+  as a harpist places the fingers before they sound (harp 7.2). A move takes the time of its
+  length at `HAND_MOTION.placeSpeed`, on a smooth path (harp 7.8). The first group of a hand
+  places that time before its first pluck. A move with too little time after the pluck before
+  starts at that pluck. Each move ends before the first pluck of its note. Reason: a move in
+  0.15 s turned the forearm more than 30° in one frame at 30 frames per second.
 - **Pluck.** The last pluck of a group pulls the palm away from the strings, and a pluck inside a
   group pulls it only a little (`HAND_MOTION.groupPull`), because the hand stays still and the
   fingers move (harp 7.3). The thumb closes on its own after its pluck (`thumbClosed`, digit 1 of
