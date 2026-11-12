@@ -457,6 +457,15 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
             'The property headShift of the armature is not three numbers in the studio axes.',
         )
         extras['headShift'] = [float(x) + 0.0 for x in shift]
+    factor = sa.rig_property(rig, 'headFactor')
+    if factor is not None:
+        # A hand rig that scales the head about the neck joint by the head weights, as `pnpm
+        # rig-mesh` grows it. `pnpm studio-body` measures H and the head center before the factor.
+        need(
+            isinstance(factor, (int, float)) and math.isfinite(factor) and factor > 0,
+            'The property headFactor of the armature is not a positive number.',
+        )
+        extras['headFactor'] = float(factor)
     angle, sign = 0.0, 1.0
     for b in TRUNK_BONES:
         x, y, z, q = rm['matrix_quat'](turns[b])
