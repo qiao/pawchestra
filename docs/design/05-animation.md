@@ -891,10 +891,13 @@ swing. A paused song keeps the swing of its time, as a film camera sees a string
 - The swing takes the weight of the playing pose, so a resting or a muted harpist shows still
   strings (5.5).
 
-**Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it to half
-between two notes, so that each note shows (`CHOIR_MOTION`). Neighbor voices sway to opposite
-sides, so that the choir does not move as one block. The flippers hold the outer edges of the
-folder with the elbows down and out (`CHOIR_HOLD`), on a wide folder (`CHOIR_FOLDER`). Reason:
+**Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it a part of
+the way between two notes, so that each note shows (`CHOIR_MOTION`). The jaw turns at most at
+`jawRate`, so a short time between two notes gives a small dip. The head lifts a little over each
+phrase and keeps still on each note, as a real choir singer opens the mouth and keeps the head
+still. Neighbor voices sway to opposite sides, so that the choir does not move as one block. The
+flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`), on a wide
+folder (`CHOIR_FOLDER`). Reason:
 the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
 went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
 
