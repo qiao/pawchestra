@@ -398,13 +398,13 @@ export const SPECIES = {
    * P2 fawn `assets/models/deer/tripo-hand/deer.blend` (design 4.4). It sits fully on the stool of
    * the harp, which fits its legs, with no chair back, and the harp soloist keeps the stool. Its
    * head height is the head of the studio body, and the seat height is the seat of the studio
-   * body, in H. It plays a harp of 1.69 m with its base on the floor, and the soundbox rests on its
-   * right shoulder (`docs/reference/harp-technique.md`). At the scale 1.37, the neck of the harp
-   * goes 3 cm into the muzzle, and below 1.2, the short arms reach fewer of the strings.
+   * body, in H. It plays a harp of 0.98 m with its base on the floor, and the soundbox rests on its
+   * right shoulder (`docs/reference/harp-technique.md`). At the scale 0.8, the neck of the harp
+   * touches the chin of the deer, and at 0.7, its short arms reach fewer of the strings.
    */
   deer: {
     body: 'studio-deer',
-    harpScale: 1.3,
+    harpScale: 0.75,
     colors: SPECIES_COLORS.deer,
     headHeight: STUDIO_HEIGHTS['studio-deer'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-deer'].seatHeight / STUDIO_HEIGHTS['studio-deer'].headHeight,
