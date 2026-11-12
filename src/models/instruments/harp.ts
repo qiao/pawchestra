@@ -105,21 +105,30 @@ export const HARP_PLACE = {
 
 /**
  * The section of the soundbox (design 4.6): a flat soundboard on the side of the strings and a
- * round back of five flat staves on the side of the player. The soundbox is wide at the base and
- * narrow at the top, as the soundboard of a concert harp.
+ * round back of five flat staves on the side of the player. The soundbox is wide and deep at the
+ * base and narrow and shallow at the top, as the soundbox of a concert harp.
  */
 const SOUNDBOX = {
   /** The distance of the soundboard from the axis, toward the strings. */
   board: 0.019,
-  /** The half width of the soundboard at the bottom and at the top of the axis. */
-  width: [0.14, 0.05],
   /**
-   * The exponent of the narrowing of the width along the axis. Above 1, the soundbox narrows fast
-   * near the base and slowly near the top, as the pear outline of a soundboard.
+   * The half width of the soundboard at the bottom and at the top of the axis. The top rests at
+   * the right shoulder of the player. With the half width 0.05 and the depth 0.059 at the top, the
+   * right side of the chest of the Tripo fawn went 1.4 cm into the soundbox in 91 % of the play
+   * (`scratch/deerclip/depth.ts`), and with this top, it stays out.
+   */
+  width: [0.14, 0.03],
+  /**
+   * The exponent of the narrowing of the width and the depth along the axis. Above 1, the
+   * soundbox narrows fast near the base and slowly near the top, as the pear outline of a
+   * soundboard.
    */
   narrowing: 1.4,
-  /** The depth of the back below the soundboard at the bottom and at the top of the axis. */
-  depth: [0.12, 0.059],
+  /**
+   * The depth of the back below the soundboard at the bottom and at the top of the axis. The top
+   * is shallow, so that the back stays off the chest of the player.
+   */
+  depth: [0.12, 0.035],
   /** The places of the rings of the soundbox along its axis, from 0 (bottom) to 1 (top). */
   rings: [0, 0.3, 0.65, 1],
   /** The height of the center strip above the soundboard. The strings start on its top. */
@@ -144,10 +153,16 @@ const SOUNDBOX = {
  * of a pedal harp.
  */
 const NECK = {
-  /** The height of the section at the column and at the top of the soundbox. */
-  height: [0.1, 0.065],
-  /** The half thickness of the neck on x. */
-  thickness: 0.024,
+  /**
+   * The height of the section at the column and at the top of the soundbox. The end at the
+   * soundbox is slim, as on a concert harp, so that it fits on the narrow top of the soundbox and
+   * stays off the right shoulder of the player. With the height 0.065 and the half thickness
+   * 0.024 at the end, the right upper arm of the Tripo fawn went 1.8 cm into the neck in 93 % of
+   * the play, and with this end, more than 1.0 cm in 0.2 %.
+   */
+  height: [0.1, 0.04],
+  /** The half thickness of the neck on x, at the column and at the top of the soundbox. */
+  thickness: [0.024, 0.012],
   /** The height of each brass plate above the bottom of the neck. */
   plate: 0.03,
 } as const;
@@ -377,7 +392,18 @@ function neckTangents(): PlanePoint[] {
  * @returns One height for each point of `HARP.neck`.
  */
 function neckHeights(): number[] {
-  const [first, last] = NECK.height;
+  return neckRamp(NECK.height);
+}
+
+/**
+ * Gives a size of the neck section at each point of its middle line, in equal steps from the
+ * column to the top of the soundbox.
+ *
+ * @param ends The size at the column and at the top of the soundbox.
+ * @returns One size for each point of `HARP.neck`.
+ */
+function neckRamp(ends: readonly [first: number, last: number]): number[] {
+  const [first, last] = ends;
   const count = HARP.neck.length;
   return HARP.neck.map((_, i) => first + ((last - first) * i) / (count - 1));
 }
@@ -512,8 +538,8 @@ function soundboxPoint(t: number, x: number, v: number): Vec3 {
 function soundboxSection(t: number): readonly [width: number, depth: number] {
   const [bottomWidth, topWidth] = SOUNDBOX.width;
   const [bottomDepth, topDepth] = SOUNDBOX.depth;
-  const width = topWidth + (bottomWidth - topWidth) * (1 - t) ** SOUNDBOX.narrowing;
-  return [width, bottomDepth + (topDepth - bottomDepth) * t];
+  const share = (1 - t) ** SOUNDBOX.narrowing;
+  return [topWidth + (bottomWidth - topWidth) * share, topDepth + (bottomDepth - topDepth) * share];
 }
 
 /**
@@ -630,10 +656,11 @@ function addColumn(piece: PieceBuilder): void {
 function addNeck(piece: PieceBuilder): void {
   const tangents = neckTangents();
   const heights = neckHeights();
-  const tx = NECK.thickness;
+  const thickness = neckRamp(NECK.thickness);
   const rings = HARP.neck.map(([y, z], i): Vec3[] => {
     const [ty, tz] = tangents[i] ?? [0, 1];
     const h = heights[i] ?? 0;
+    const tx = thickness[i] ?? 0;
     const at = (x: number, v: number): Vec3 => [x, y + tz * v, z - ty * v];
     return [
       at(tx, -h / 2),
@@ -650,8 +677,8 @@ function addNeck(piece: PieceBuilder): void {
   const [first, last] = STRINGS.ends;
   const over = HARP.neck.flatMap(([, z], i) => (z > first - 0.05 && z < last + 0.06 ? [i] : []));
   for (const side of [-1, 1]) {
-    const x = side * (tx + 0.0015);
     const edge = (i: number, v: number): Vec3 => {
+      const x = side * ((thickness[i] ?? 0) + 0.0015);
       const [y, z] = HARP.neck[i] ?? [0, 0];
       const [ty, tz] = tangents[i] ?? [0, 1];
       const lowest = -(heights[i] ?? 0) / 2 + v;
