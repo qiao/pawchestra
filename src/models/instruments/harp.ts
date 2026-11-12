@@ -63,10 +63,12 @@ export const HARP = {
  * The place of the harp at the player (design 4.6). As a harpist sits, the base stands on the
  * floor in front of the player, between the knees, with the pedals at the feet, and the soundbox
  * rests on the right shoulder, near the neck of the player (`docs/reference/harp-technique.md`,
- * sections 2 and 7.7). The deer is the only harp player, and its body sets the place: the top of
- * the soundbox axis stands 7 cm in front of the right shoulder joint and 3 cm below it, so the
- * soundbox rests on the front of the shoulder. The right hoof reaches the A pedal only with the
- * harp this near: 1 cm further away, the pedal is at the end of the reach of the stretched leg.
+ * sections 2 and 7.7). The deer is the only harp player, and its body sets the place. The arms of
+ * the Tripo fawn are short for its height: each palm is about 0.4 m from its shoulder joint, and
+ * the shoulder joints are 1.34 m high on the stool. So the base stands near the stool, and the
+ * left paw reaches more of the bass strings (`pnpm pose-depth harpist`): with the base 0.32 m
+ * away at the scale 1 and the turn 35°, 31 % of the palm targets were within 5 mm, and with this
+ * place 48 %. Nearer, the paws go into the chest, and the muzzle goes into the neck of the harp.
  * `pnpm hold-fit --set` and the other probes change it as `harpPlace`.
  */
 export const HARP_PLACE = {
@@ -75,23 +77,22 @@ export const HARP_PLACE = {
   /** The move of the base up, in meters, at the scale 1 of the harp: 0, on the floor. */
   lift: 0,
   /** The distance of the base in front of the floor point, in meters, at the scale 1. */
-  front: 0.3184,
+  front: 0.22,
   /**
    * The tilt of the harp back to the player. A concert harp leans back onto the shoulder, but the
-   * soundbox of the model already leans 33° toward the player, and the short legs of the deer
-   * reach the pedals only when the base stands near the feet: at 6°, the right hoof misses the A
-   * pedal by 4.3 cm, and at 12°, by 9.7 cm. So the harp stands upright, as some smaller harps do
-   * (section 1).
+   * soundbox of the model already leans 33° toward the player, and with a tilt of 8.6°, the
+   * forearms of the deer go 10.5 cm into the body. So the harp stands upright, as some smaller
+   * harps do (section 1).
    */
   tilt: 0,
   /**
    * The turn of the harp around the vertical, seen from above, so that the column goes to the
    * front left: the harp is diagonal to the player. The left hand plays the bass strings at the
    * front left, and the right hand the treble strings near the right shoulder. A larger turn
-   * brings the pedals of the right foot nearer to the right hoof, and the strings nearer to the
-   * chest: at 60°, the left paw goes 10 cm into the chest to play C5.
+   * brings the bass strings nearer to the left paw, and the strings nearer to the chest: at 65°,
+   * the paws of the deer go 14 cm to 17 cm into the chest.
    */
-  turn: 35 * MathUtils.DEG2RAD,
+  turn: 40 * MathUtils.DEG2RAD,
 };
 
 /**

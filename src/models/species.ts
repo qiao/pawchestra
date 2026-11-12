@@ -393,19 +393,18 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-hippo'].seatHeight / STUDIO_HEIGHTS['studio-hippo'].headHeight,
   },
   /**
-   * Deer, the harp: a brown deer with a cream chest, belly, and muzzle, large ears, dark brown
-   * antlers, dark hooves, and a puff tail with a white underside. It has the studio body of the
-   * mesh `assets/models/deer/deer.glb`, which `pnpm rig-mesh deer` rigs (design 4.4). It sits fully
-   * on the stool of the harp, which fits its legs, with no chair back, and the harp soloist keeps
-   * the stool. Its head height is the head of the studio body without the antlers, and the seat
-   * height is the seat of the studio body, in H. It plays a harp of 1.12 m with its base on the
-   * floor, so that its hooves reach the pedals, and the soundbox rests on its right shoulder
-   * (`docs/reference/harp-technique.md`). At the scale 0.85, the neck of the harp touches the
-   * head of the deer.
+   * Deer, the harp: a slim spotted fawn with a cream chest, belly, and muzzle, large ears, a long
+   * neck, dark hooves, and a short white tail. It has the studio body of the hand rig of the Tripo
+   * P2 fawn `assets/models/deer/tripo-hand/deer.blend` (design 4.4). It sits fully on the stool of
+   * the harp, which fits its legs, with no chair back, and the harp soloist keeps the stool. Its
+   * head height is the head of the studio body, and the seat height is the seat of the studio
+   * body, in H. It plays a harp of 1.69 m with its base on the floor, and the soundbox rests on its
+   * right shoulder (`docs/reference/harp-technique.md`). At the scale 1.37, the neck of the harp
+   * goes 3 cm into the muzzle, and below 1.2, the short arms reach fewer of the strings.
    */
   deer: {
     body: 'studio-deer',
-    harpScale: 0.8,
+    harpScale: 1.3,
     colors: SPECIES_COLORS.deer,
     headHeight: STUDIO_HEIGHTS['studio-deer'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-deer'].seatHeight / STUDIO_HEIGHTS['studio-deer'].headHeight,
