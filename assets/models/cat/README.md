@@ -385,10 +385,10 @@ bind, the weights, and the keys are in the git history of this `README.md`, at 0
 `tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the fourth Tripo
 P2 mesh `tripo-p2/cat.fbx`, made by one build script in headless Blender 5.2, by the route of the
 Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form and the colors of
-the source: no point edit changes the trunk, the paws, the legs, or the tail, and on the head only
-the eyes and the mouth corners change. The arms keep the length of the source: no cut, no split
+the source: no point edit changes the trunk, the legs, or the tail, on the head only the eyes and
+the mouth corners change, and the front paws are smaller ("Paw size"). The arms keep the length of the source: no cut, no split
 from the trunk, and no stretch. The edits are only those that the rig, the seat, the viola, the
-eyes, and a slight smile need.
+eyes, a slight smile, and smaller front paws need.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -487,8 +487,12 @@ left side, y the height, in the source):
   0.0063 up, and the cheek and pad points over the corners (2337, 2339, and 2369) 0.0035 to
   0.0048 up. The middle of the W, the nose, the eyes, and the underside of the jaw stay, so the
   viola place under the jaw (`fitViolinPlace()` of `src/pose/violin-place.ts`) does not move.
-- **Other point edits.** None. The muzzle (except the mouth corners), the trunk, the paws, the legs,
-  and the tail keep the form of the source.
+- **Paw size.** The edit `paw` of `redits.py` (in `params.json`: `{"kind": "paw", "length": 0.84,
+  "fingers": 0.9, "fingerRamp": 0.01, "wide": 0.87, "thick": 1.0, "ramp": 0.02, "width": [0, 0,
+  1]}`) makes each front paw smaller past the wrist joint ("Paw size" below). The step runs after
+  the automatic weights (step 1 below) and before the exact rows (steps 2 and 3).
+- **Other point edits.** None. The muzzle (except the mouth corners), the trunk, the legs, the
+  feet, and the tail keep the form of the source.
 - **Surface.** `sa.add_surface(cat, 'cat', <base color>, eye_fans=False, config=<cat-tripo.json>)`.
   The gloss nose is the pink nose in the nose box of the config. 31 light gloss faces over the
   nose go back to the fur. The faces of the two eyeballs get the face attribute `eye`, and the
@@ -498,7 +502,7 @@ left side, y the height, in the source):
   2.4 ball radii, and less than 65 degrees to the side (smoothstep ends 12, 28, 60, 85 degrees,
   1.5 and 2.4 radii, 35 and 65 degrees), 37 vertices on each side, at most 0.0081 units ("Eyes").
 - **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.20, the wrist
-  at x 0.31, the knuckles at x 0.36, the hip at (0.075, 0.29, 0.045), and the knee at (0.0715,
+  at x 0.31, the knuckles at x 0.353 (x 0.36 in the source, moved by the paw edit), the hip at (0.075, 0.29, 0.045), and the knee at (0.0715,
   0.165, 0.045). The palm is the true palm of the source, the mean normal of the paw faces that
   face down, (0.047, -0.998, -0.039), turned by the paw turn. The bind upper arm points down and
   forward, (0.5014, -0.6017, 0.6217) in the studio axes (`studio.bindArms.upper_arm`), and the
@@ -514,8 +518,8 @@ The weights, in the rest pose:
    at x 0.135, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.178, 0.193, 0.208, and
    0.223, and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
-   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.003 from
-   0.02 units before the head of `fingers_<side>`.
+   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
+   0.024 units before the head of `fingers_<side>`.
 4. The eyeballs, the whisker strips, and the gloss nose take {`head` 1}.
 5. Ear rows: a plane across the base of each ear, through (0.045, 0.925, 0.06), (0.135, 0.86,
    0.06), (0.09, 0.893, 0), and (0.09, 0.893, 0.12) (x mirrored on the right). Each head vertex
@@ -618,10 +622,43 @@ and the viola place do not change, so the rows of the viola, the bow, and the pa
 forearm lies in the body under the jaw, and its nearest skin is the lifted mouth corner: its depth
 goes from 1.2 to 1.7 cm (lift) and from 2.4 to 2.6 cm (lower).
 
+**Paw size.** In the app, the front paws and the digits of the source read too large. The
+point edit `paw` (above) scales each front paw past the wrist joint of its side (x 0.31) about
+that joint, in the frame of the paw: the rest forearm axis, the width axis +z of the source turned
+with the paw turn, and the height axis square to the two. A point at the distance d past the wrist
+joint takes the share smoothstep(0, 0.02, d) of the scale, so the wrist has no step. Past the
+knuckle joint (x 0.36 of the source), the digits take the factor 0.9 more in length, with a fade
+of 0.01 units on each side of the knuckle, so the length scale goes from 0.84 to 0.756 with no
+step. Reason: the digits of the source are half of the paw length (0.38 on the paw of the cat of
+main), so they read long on their own. The paw height, the arm, the bones of the arm, and the feet
+do not change. `make_config.py` moves the knuckle joint and the tip of `fingers_<side>` with the
+same edit. The left paw in the rest of each export (`paw_measure.py` of the session), in meters
+and in H:
+
+| Measure | Source cat | Cat now | Cat of main (`cat.rig.glb`) |
+|---|---|---|---|
+| Length, wrist joint to tip | 0.153 (0.450) | 0.122 (0.359) | 0.066 (0.194) |
+| Knuckle joint from the wrist joint | 0.077 (0.226) | 0.064 (0.189) | 0.041 (0.121) |
+| Width | 0.166 (0.488) | 0.144 (0.424) | 0.079 (0.233) |
+| Height | 0.082 (0.243) | 0.082 (0.243) | 0.049 (0.144) |
+| Length / shoulder distance | 0.541 | 0.432 | 0.509 |
+| Width / shoulder distance | 0.587 | 0.510 | 0.610 |
+| Length / arm (shoulder to wrist joint) | 0.472 | 0.377 | 0.372 |
+| Width / arm | 0.512 | 0.445 | 0.446 |
+
+The paw is 0.80 as long and 0.87 as wide as in the source. Against the arm, these are the shares
+of the paw of the cat of main, and the paw is not smaller than that paw. In shares of H, the paw
+of main is much smaller, because its head is large. The trunk of the cat of main is narrow, so
+the shares of the shoulder distance do not give a limit. Thus the scales stop at the arm shares.
+With the paw edit before the weights, the automatic weights of the arm changed a little, so the
+step runs after them. With the knuckle rows of the source (12 steps of 0.003), the shorter paw put
+more faces in the crease of the curled digits at rest: 50 faces of the left paw folded (41 before
+the edit, `pnpm fold-probe violist`). With steps of 0.0035, 43 fold.
+
 **Differences from the source.** The stage light is warm and the close views add a fill light, so
 the gray fur reads light tan in the close views, and gray in the play view and the hall view. The
 eyes are 0.90 of their size, a little deeper, and the upper lids a little lower ("Eyes"). The mouth
-corners are 0.007 units higher ("Smile"). The thighs of the seated bind spread 20 degrees
+corners are 0.007 units higher ("Smile"). The front paws are smaller ("Paw size"). The thighs of the seated bind spread 20 degrees
 ("Rest").
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
