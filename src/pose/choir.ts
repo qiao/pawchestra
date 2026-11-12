@@ -4,7 +4,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { NO_TURN } from './axes.ts';
+import { NO_TURN, Z_AXIS } from './axes.ts';
 import { createFrame, posePoint } from './frames.ts';
 import type { TorsoFrames } from './frames.ts';
 import { armRig, handToward, poseShoulder, writeArm, writeCurl } from './ik.ts';
@@ -20,8 +20,18 @@ export const CHOIR_HOLD = {
    */
   poleL: [-1, -1, 0.1],
   poleR: [1, -1, 0.1],
-  /** The curl of the fingers around the edges of the folder. */
-  curl: 35 * MathUtils.DEG2RAD,
+  /**
+   * The curl of the fingers around the outer edges of the folder. With {@link CHOIR_HOLD.flex},
+   * the outer third of each flipper of the Tripo penguin curls about 40° toward the front of the
+   * cover. The curl of 35° alone bent only the last 3 cm, and the flipper looked flat.
+   */
+  curl: 15 * MathUtils.DEG2RAD,
+  /**
+   * The bend of each paw toward the palm at the wrist. The palm keeps its grip, and the arm
+   * follows. The wrist of the Tripo penguin is at two thirds of the flipper, so the bend starts
+   * the curl of the outer third.
+   */
+  flex: 30 * MathUtils.DEG2RAD,
 } as const;
 
 /** One hand of a singer in the bind pose: its arm and its grip on the folder. */
@@ -75,11 +85,13 @@ const shoulder = createFrame();
 const grip = new Vector3();
 const hand = new Quaternion();
 const palm = new Vector3();
+const flex = new Quaternion();
 
 /**
  * Writes the arms and the fingers of a singer (design 5.3, 4.7). The folder follows the chest,
  * and the palms keep their grips on it, also in the rest pose. The hand points from the
- * shoulder to the grip, and the two-bone IK places each arm.
+ * shoulder to the grip, then bends toward the palm by `CHOIR_HOLD.flex`, and the two-bone IK
+ * places each arm.
  *
  * The caller writes the jaw, and the sway of the phrase into the chest, before it calculates
  * the frames.
@@ -95,6 +107,8 @@ export function poseChoir(rig: ChoirRig, frames: TorsoFrames, rotations: Float32
     poseShoulder(arm, chest, rig.chestBind, NO_TURN, shoulder);
     posePoint(chest, rig.chestBind, side.grip, grip);
     handToward(shoulder, grip, hand);
+    const bend = arm.side === 'L' ? CHOIR_HOLD.flex : -CHOIR_HOLD.flex;
+    hand.multiply(flex.setFromAxisAngle(Z_AXIS, bend));
     const wrist = grip.sub(palm.fromArray(arm.palm).applyQuaternion(hand));
     writeArm({ arm, shoulder, wrist, hand, pole: side.pole }, chest.rotation, rotations);
     writeCurl(arm, CHOIR_HOLD.curl, rotations);
