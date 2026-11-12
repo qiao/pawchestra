@@ -238,7 +238,12 @@ The rest of each family:
   its hanging wrist, and the right paw the upright bow. Reason: a rest place on the thigh puts the
   upper arms of the recast bodies into the trunk, and the bind elbow keeps the bind overlap of the
   arm root. On the new rabbit body, the lap places at the knees made both arms reach nearly
-  straight forward. The cat rests the instrument upright on the left thigh, with the elbows near
+  straight forward. The rabbit holds its violin upright on the lap with the left elbow near the
+  side, and its right arm hangs at the side with the bow tip down and forward to the right foot
+  (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns through the front and a
+  little down (`restBow.via`). Reason: the upright bow and the forward arms of its first rest
+  pointed the bow at the music desk, and a bow tip straight down twists the forearm by about 180°,
+  because the paw grips the stick across the palm. The cat rests the instrument upright on the left thigh, with the elbows near
   the sides, as a seated violinist does. The cat rests the viola at the outer side
   of the left thigh. Reason: with the viola on the top of the thigh, the elbow had to point out to
   clear the round belly, and the left upper arm then turned far about its axis from the bind and
