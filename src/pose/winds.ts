@@ -612,8 +612,9 @@ export const WIND_HOLDS = {
  * reach of the arm. At a rest place out of reach, the arm stays straight in the lift until the paw
  * comes into reach. The elbow then folds in a few frames, and the forearm turned 2219° each second.
  * Now each bone of the left arm turns at most 465° each second in the lift. The wrist passes in
- * front of the belly (`arc`). The rest elbow points out and a little back, (-0.6, -1, 0.4): with
- * (-0.3, -1, 0.7), the left upper arm went 1.8 cm into the body at rest and 2.5 cm in the lift.
+ * front of the belly (`arc`). The rest elbow points out and back, (-0.5, -1, 0.6): with (-0.3, -1,
+ * 0.7), the left upper arm went 1.8 cm into the body at rest and 2.5 cm in the lift. With
+ * (-0.6, -1, 0.4), the upper arm rolled 34° at rest, against 28°.
  *
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 39°
@@ -649,7 +650,7 @@ const FOX_FLUTE = {
   poleR: [1.2, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
   restShift: [0.668, -0.758, 0.313],
-  restPoleL: [-0.6, -1, 0.4],
+  restPoleL: [-0.5, -1, 0.6],
   restPoleR: [0.8, -1, 0.3],
   restFreeL: {
     lap: { along: 0.45, offset: [-0.158, 0.336, 0.07] },
