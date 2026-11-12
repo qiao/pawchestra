@@ -386,7 +386,11 @@ The rest of each family:
   bodies still miss the valves at `MAX_BOW` (`TODO.md`). The own trumpet hold of the monkey
   (`MONKEY_TRUMPET`) takes the rule with an own fit: the big head of the Tripo monkey puts its mouth
   farther than its arm from the shoulders, and with the head up, the straight arms stop short of the
-  valves.
+  valves. Its spine also turns back in the play (`WindHold.lean`), and the trumpet turns further
+  down on the face (`play`), so the head bows only 4° to 6° from the vertical. Reason: the arms
+  reach the valves of a larger trumpet (0.85), while the head stays over the chest and the hips and
+  the center of mass over the middle of the soles. With the head bowed 14° to 16° from the vertical,
+  the head center stood 6 cm to 8 cm in front of the soles, and the body read as if it fell forward.
 - Version 1 has no extra effects, for example no music-note particles.
 
 **Bowed strings** (`pose/fingering.ts`, `pose/strokes.ts`, `pose/bowed.ts`, strings 3):
