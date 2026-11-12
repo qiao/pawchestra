@@ -230,8 +230,8 @@ monkey (`../monkey/README.md`) with the eye faces of the Tripo wolf and the chan
 
 | Item | Value |
 |---|---|
-| Size | 383,830 bytes |
-| SHA-256 | `5ad3851000147df9b5c43498835d81c6110bf0707272a51999cfc6a3fa631a75` |
+| Size | 384,093 bytes |
+| SHA-256 | `1d752944202b92beedcdf3941e6d52d980063aadba474e3d4749f74e43082efc` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the pig faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `pig`: 3,642 vertices and 3,968 faces (3,203 quads and 765 triangles, 7,171 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the snout disc takes the slot `fur` and the color map. The 93 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/pig/tripo-hand/pig-color.webp`) |
 | Armature | `pig_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -271,9 +271,10 @@ left side):
   is the true palm of the source: the mean normal of the hoof faces that face down (x from 0.36),
   (0.243, -0.968, -0.067), turned by the hoof turn. The bind arms (`bindArms`) are those of the pig
   of main, and each elbow axis turns about the bind upper arm (`hingeTurn`): 80 degrees on the left
-  and -90 degrees on the right ("Arm twist"). The leg turns put the thigh 25 degrees down and 15
-  degrees out, and the shin vertical, as on the pig of main. The tail bones keep the directions of
-  the source in the bind.
+  and -110 degrees on the right ("Arm twist"). The leg turns put the thigh 25 degrees down and 15
+  degrees out, and the shin vertical, as on the pig of main, and turn each foot 30 degrees with the
+  heel up, the hoof tips flat on the floor ("Seat"). The tail bones keep the directions of the
+  source in the bind.
 
 The weights, in the rest pose:
 
@@ -306,12 +307,18 @@ mouth line (`mouthHeight` 0.75, a fact of the armature, design 4.4). On a cut of
 the middle plane, the front of the lower lip lies at y 0.745 and z 0.214, and the crease under the
 disc at y 0.753. The mouth of the studio body is 6.1 cm behind the tip of the nose.
 
-**Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, and the shins are
-vertical. The property `seat` is {`prop` `chair`, `front` 0.0181, `back` -0.17, `halfWidth` 0.2}:
-the front lies 0.07 units behind the knee joint of the bind, and 28 % of the thigh lies on the seat.
-With the front 0.05 or 0.06 units behind the knee, the round back of the shin lay over the seat, and
-`pnpm rig-export` stopped. The seat height is 0.126 m (0.128 m on the pig of main), with the legs of
-the source. The curly tail stays behind the haunch, over the back edge of the seat.
+**Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, the shins are vertical,
+and each foot turns 30 degrees about x with the heel up (`tools/rig/leg_turns.py <config> 25 15 0
+30`), so that the hoof tips stay flat on the floor, as a pig stands on its hoof tips. The property
+`seat` is {`prop` `chair`, `front` 0.0281, `back` -0.17, `halfWidth` 0.2}: the front lies 0.06
+units behind the knee joint of the bind, and 39 % of the thigh lies on the seat (28 % with the
+front 0.07 units behind the knee). With the front 0.05 units behind the knee, the round back of the
+shin lay over the seat, and `pnpm rig-export` stopped. The seat height is 0.152 m (0.126 m with
+flat feet), with the legs of the source: a heel angle of 15, 25, 30, 35, and 40 degrees gives
+0.140, 0.148, 0.152, 0.154, and 0.156 m. The layout of the demos does not change with 30 or 32
+degrees. With 34 degrees, 9 players of `boulanger-matin` move in the sight pass of the layout
+(design 4.5), and with 40 degrees, 3 players of two demos move. The curly tail stays behind the
+haunch, over the back edge of the seat.
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -50 to 40 degrees and lam from -75 to 80
 degrees on the left (the mirror on the right), with the lower strip as the first row. Each row lies
@@ -329,19 +336,24 @@ of `PIG_HORN` of `src/pose/winds.ts` (`pnpm pose-preview hornist`):
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| note | 2.5 | 28.5 | 3.5 | -17.4 |
-| rest | 28.2 | 15.3 | -42.4 | 35.8 |
-| lift50 | 17.7 | 21.7 | -33.8 | 17.8 |
-| lower50 | 14.2 | 23.6 | -29.5 | 13.0 |
-| stand | 4.0 | 37.3 | 21.7 | -27.6 |
+| note | 2.4 | 29.4 | -23.7 | -2.4 |
+| rest | 28.2 | 15.3 | -40.5 | 28.9 |
+| lift50 | 17.7 | 22.0 | -34.6 | 16.4 |
+| lower50 | 14.3 | 23.9 | -32.4 | 12.0 |
+| stand | 2.9 | 37.8 | -5.5 | -1.1 |
 
 With the hooves and the elbow axes of the source, the upper arms rolled up to 112 and -115 degrees
 and the forearms twisted up to -177 and 167 degrees. A hoof turn alone moves only the forearm
-twist, and an elbow axis turn moves the twist from the upper arm to the forearm. The skin twist of the arm gate (`pnpm arm-check hornist --base
-38d7cd457`) is 16 and 17 degrees on the upper arms and 16 and 24 degrees on the forearms (p95),
-against 34 to 36 and 22 to 33 degrees on the pig of main. The gate fails on the folds: 8 faces of
-the left arm (1 on main) and 23 of the right arm (12 on main) fold, at the front of the shoulders and
-in the crook of the right elbow (TODO.md).
+twist, and an elbow axis turn moves the twist from the upper arm to the forearm. The horn hold
+points the right elbow out to the side, so that the hoof lies across the mouth of the bell
+(`PIG_HORN`, design 5.3): with the right elbow axis at -90 degrees, the right upper arm then rolled
+up to -60 degrees, and at -110 degrees it rolls at most -40.5 degrees. A turn of the right hoof by
+whole ring steps did not keep the hoof out of the wall of the bell in the play: the hoof is about 6
+cm thick, and at each step some part of it went 5 cm to 10 cm deep into the narrow throat.
+
+The arm gate (`pnpm arm-check hornist --base 34d140d5c`) passes: folds p95 6 on the left and 5 on
+the right (8 and 23 before the new hold), skin twist p95 16 on each upper arm, and 17 and 14 on the
+forearms. The grip of the right arm takes the new median (`ACCEPTED_GRIPS`).
 
 **Color map** (`tools/pig-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the iris place
@@ -361,7 +373,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `094f99005812e06a67b9c2d31cce1d6b33d525d27854d679609a41802e603c31` |
-| `tripo-hand/pig.rig.json` | 16,378 bytes | `126e8fa060f59acec4e4714653953be6e102f43bfe6a2a0d6026b8cfd4992e52` |
+| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `57976132fef40d00fbebb06edb1151cd094c5a85121511682dd3935367ae60db` |
+| `tripo-hand/pig.rig.json` | 16,376 bytes | `0c86abd9e12c158be1c473f91cfd6c91bf6d67f444f157a89b36c80d8749af35` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |
