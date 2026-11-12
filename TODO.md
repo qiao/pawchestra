@@ -120,15 +120,15 @@ passes.
 - [ ] Rhino tubist: with a tuba of about 10 kg, the center of mass lies at the front end of the
       stable range of the soles. A small lean of the trunk back is an option.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
-- [ ] Deer harpist: ask the user to confirm the length of the arms, the size of the harp, its lean
-      back onto the right shoulder, the box under it, and the rebuilt arms.
-- [ ] Deer harpist: the left palm is 0.14 m above the middle of the strings, but a harpist holds
-      both hands at almost one level. A lower palm needs room in the paw swing from the straight
-      bind paw (59°, and 67° at 0.10 m, limit 70°).
-- [ ] Deer harpist: the forearms rise about 30° from the elbow to the wrist, but a harpist holds
-      them level. The elbows of the short arms hang below the strings (harp-technique).
-- [ ] Deer harpist: the knees lie under the round belly, so the base of the harp stands in front of
-      them. From the front, the crown of the column stands just below the muzzle.
+- [ ] Deer harpist: the short arms of the Tripo fawn do not reach all strings of the harp. Only
+      48 % of the palm targets lie within 5 mm (worst 31 cm on the low bass strings, 18 cm for the
+      right palm, `pnpm pose-depth harpist`). Ask the user to pick a route: longer arms, a smaller
+      harp on a stand, or fewer bass notes for the left hand.
+- [ ] Deer harpist: the left forearm goes 4.4 cm into the chest on a high note of the left hand,
+      and the right upper arm 4.9 cm into the body at the soundbox (`pnpm pose-depth harpist`,
+      limits 2.5 cm and 3.5 cm). Check both in 2x crops in the app.
+- [ ] Deer harpist: the left stretch p95 of the arm gate is 0.11 (base 0.04, limit 0.35), and the
+      right folds p95 8 (base 6, limit 8). Check the left elbow and the right inner elbow in 2x crops.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
       0 cm now. Trim the entry when the tests come back.
 - [ ] Harp strings: ask the user to pick the strength and the density of the bands of the swinging
@@ -137,7 +137,6 @@ passes.
       with the depth behind the strings. Check a close shot with a far background.
 - [ ] Harp strings: no source gives the decay of the treble strings, so the treble value of
       `STRING_MOTION.ringSec` is an estimate (harp-technique, section 5).
-- [ ] Deer: a small cream fold of the haunch lies on the seat under the puff tail.
 - [ ] Add the chair as an obstacle to the sweeps of the seated roles, with the legs and the haunch
       as parts (`SEATED_PARTS`, `seatSurface()` of `pose/test-sweep-roles.ts`).
 - [ ] Penguin singer: ask the user to confirm the Tripo penguin
@@ -455,14 +454,6 @@ passes.
       drum folds move to the left arm (L 13, base R 10). The rhino flute forearms go deeper into
       the body in the lift (5.3 cm, base 4.5 cm), and the rhino cello left arm is flatter (flat
       p5 0.65, limit 0.55). Most other fold counts fall.
-- [ ] Deer with the neutral bind: the right forearm goes 0.24 cm deeper into the soundbox in the
-      lowering (2.22 cm, base 1.98, accepted 4 cm). A right supination of 0 or 30 gives the same
-      depth, so the straight bind causes it. With its `raise` shape, the right inner elbow still
-      folds 2 faces at p95 in the play (494 and 495, base 0). The bent elbow rings of the harp hold
-      are narrower (p5 L 2.32 cm against 2.86, R 2.15 against 2.94). The 2x crops show no pinch.
-- [ ] Deer cast matrix with the neutral bind: the snare drum recast fails on the left forearm
-      twist (80°, limit 80°), and the flute recast on the left paw swing (73°, limit 70°) in place
-      of a flip of the left paw (move turn 17,993°/s on `14ef3d67`).
 - [ ] Polar bear with the neutral bind: in `pnpm arm-check pianist --world`, the fingers joints move
       0.013 cm (left) and 0.016 cm (right) against the bent bind (SAME up to 0.01 cm), with no turn
       of the palms. The straight bind puts the forearms 0.1 cm to 0.2 cm deeper into the case, and
@@ -795,6 +786,11 @@ passes.
 - [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
+- [ ] Tripo fawn: the scale that keeps H of the old deer makes the fawn tall (the standing shoulder
+      joints at 1.45 m, 0.90 m on the old deer), so its stool is 0.51 m high, and the larger body and
+      harp move each player of `boulanger-matin` in the layout. Ask the user to confirm the size.
+- [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
+      is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo beagle candidate: the right paw twists 66° on its forearm at rest (`pnpm arm-check
