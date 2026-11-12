@@ -161,7 +161,7 @@ interface SpeciesParams {
   noChair?: true;
   /** The place and the turn of the bow stick in the right paw (4.6). */
   bowGrip?: BowGrip;
-  /** A seated tail that lies on the seat, and does not sway (5.1): the cat. */
+  /** A seated tail that does not sway (5.1): the cat, whose tail hangs behind its chair. */
   seatedTail?: 'curl';
   /** Ears that hang beside the head, and do not twitch (5.1): the dog. */
   hangingEars?: true;
@@ -783,8 +783,10 @@ finish `varnish` and no eye light, with one light in each eye. Its paws turn abo
 whole ring steps, its elbow axes turn, and its bind upper arm points down and forward, so that each
 part of each arm takes at most about 45° of roll or twist in the moments of the violist, the rest
 included. Its thighs spread 20° in the seated bind. Reason: with less spread, its round belly
-covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail lies on the
-seat (the key `bind_tail`). The large tail of the Tripo fox hangs down to the floor behind the chair
+covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail goes back
+over the back edge of the seat and hangs down behind the chair between the back posts (the key
+`bind_tail`), and it does not sway. Reason: a tail on the seat beside the haunch went through the
+seat or near a back post. The large tail of the Tripo fox hangs down to the floor behind the chair
 (`studio.tailBind`), and its build fills the 4 small holes of the source. Reason: the tail stood out
 stiffly in the air, and a hole on the waist showed the floor through the body.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
