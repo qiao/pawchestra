@@ -232,9 +232,10 @@ and the instruments in `src/models/instruments/percussion.ts`. The strokes come 
 
 The app follows these facts:
 
-- **The grip (section 1).** The round paw curls onto the shaft, the head leaves the front of the
-  fist at the thumb side (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`), and the butt end
-  sticks out behind the paw (`TIMPANI.malletButt`).
+- **The grip (section 1).** The end of the stump paw of the Tripo elephant closes 20° onto the
+  shaft (`PercussionHold.curl`), the head leaves the front of the fist at the thumb side
+  (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`), and the butt end sticks out behind the
+  paw (`TIMPANI.malletButt`).
 - **The V (section 2).** Each mallet points forward and in, in the V of the American grip
   (`PercussionHold.home`). The wider V of the German grip turns the paw further on its forearm.
 - **The elbows (section 3).** Each upper arm hangs near the side, and the elbow points down and a
@@ -250,9 +251,10 @@ The app follows these facts:
   (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
 - **The muffle (section 4).** After a note with a rest of at least 0.5 s after it, the paw that
   struck the note lays the end of the closed paw lightly on its head, for at most 0.3 s, and goes
-  back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The mallet
-  keeps its strike direction, and the wrist lifts its head off the drum, so the mallet stays in
-  the paw [55] [56]. A pause in a muffle keeps the paw on the head.
+  back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The spine
+  leans only 3°, so that the trunk stays out of the kettles and the body stays over its feet.
+  The mallet keeps its strike direction, and the wrist lifts its head off the drum, so the mallet
+  stays in the paw [55] [56]. A pause in a muffle keeps the paw on the head.
 
 The app does not follow these facts:
 

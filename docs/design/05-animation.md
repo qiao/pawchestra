@@ -628,6 +628,10 @@ The rest of each family:
   (`FingersDamp`). The muffle does not follow the lift and the lowering. Reason: from an upright
   body, the paw stayed over the head, and higher, nearer kettles that the paw reached moved the
   left arm past the margins of the arm gate. A muffle that grew with a lift turned a paw too fast.
+  The stump paws of the Tripo elephant reach farther, so its spine leans less at the muffle, and
+  the rigid low point of the paw stays over the head, so that only the skin touches it. Reason:
+  with the lean of the old elephant, the stump and the forearm went into the kettles, the trunk
+  into a head, and the center of mass far in front of the middle of the soles.
 - **Hand cymbals** (`CRASH_MOTION`, `plateHand()`). The plates tilt from vertical, so the right
   plate comes down onto the left plate at the angle of a flam (`CRASH_MOTION.flam`), so that the
   top rims meet first. The rims meet at the crash point, a little offset, and the
