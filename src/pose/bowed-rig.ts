@@ -820,8 +820,13 @@ const SHOULDER_HOLD = {
  * the forearm goes 0.2 cm into the violin at rest. In the lift and the lowering, the violin hangs
  * from the left paw, as on the rabbit, and the wrist moves 0.1 H out and 0.15 H to the front in the
  * middle (`liftReach`), so that the violin near the jaw goes 1.9 cm into the body: with 0.1 H to
- * the front, it goes 2.1 cm in, and with 0.1 H up and 0.2 H to the front, 2.6 cm. The bow takes the
- * via of the rabbit: with the hair down, the right paw turns 17,038°/s in a lowering.
+ * the front, it goes 2.1 cm in, and with 0.1 H up and 0.2 H to the front, 2.6 cm. In the middle of the
+ * move, the bow tip points to the left, down, and to the front, (-1, -0.6, -0.5), with the hair
+ * down, and the grip moves 0.4 H out and 0.5 H to the front (`restBow.via`), so that the tip
+ * passes below the snout, in front of the belly, and to the left of the violin. With the tip
+ * forward and a little up, (0.4, 0.3, -1), the bow stood up across the snout and the mouth in the
+ * middle of each move. With the tip (-1, -0.2, -0.8) and the grip 0.3 H to the front, the bow went
+ * 1.6 cm into the violin in a lowering.
  *
  * The left elbow turns toward the body by 2° for each lower string of the finger: with the 5° of
  * the chin hold, the left forearm goes 2.4 cm into the violin in the middle of the lift and of the
@@ -890,7 +895,7 @@ const FOX_HOLD = {
     lap: { along: 0.5, offset: [0.2, 0, -0.3] },
     tip: [0.1, 1, -0.2],
     hair: [0, 0, -1],
-    via: { tip: [0.4, 0.3, -1], hair: [0, 0, -1], reach: [0.3, 0.1, -0.3] },
+    via: { tip: [-1, -0.6, -0.5], hair: [0, -1, 0], reach: [0.4, 0, -0.5] },
   },
 } as const satisfies BowedHold;
 
