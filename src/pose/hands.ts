@@ -318,19 +318,21 @@ export const HANDS_HOLDS = {
   // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
   // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
   // paw. With the group places of the fingering, the paw swing p95 is 57° at 45° down, 61° at
-  // 39°, and 59° at 42° (`pnpm arm-check`). The right palm faces the strings and 14° down
-  // (`faceR`), as the wrists of a harpist go a little down: with the right elbow at [2, -1, 0],
-  // the right paw twists up to 45° on its forearm at 9° down, and up to 42° at 14° down
-  // (`scratch/harp2/burst.ts`). At 17° down, the right paw went 2.1 cm into the chest. The knuckles
+  // 39°, and 59° at 42° (`pnpm arm-check`). The right palm faces the strings and 27° down
+  // (`faceR`), as the wrists of a harpist go a little down: on the Tripo fawn with the higher
+  // right elbow and the harp place of 2026-11-13, the right paw twists 48° on its forearm at 14°
+  // down, and 34° at 27° down (p95 of `pnpm hold-fit harpist`). The knuckles
   // of the turned paw come nearer to the strings, so the left palm lies 7 cm from the strings:
   // with 3 cm, the knuckles go 1.5 cm into the neck of the harp, and with 6 cm, the left paw goes
   // 0.7 cm into the harp at rest (`pnpm pose-depth harpist`). The right palm lies 3 cm above
   // the pluck point and 5.5 cm right of the strings: at 5 cm, the right paw went 1.6 cm into the
-  // chest. The right elbow points out and 27° down (`poleR`), as the elbows of a harpist rise to
-  // the side (section 4). The shoulder of a harpist holds the harp, so the right upper arm touches
-  // the soundbox: with the elbow 45° down, it went 2.0 cm into the soundbox in the play, 37% of
-  // the samples over 1.5 cm, and with this elbow 1.4 cm, none over 1.5 cm (`pnpm pose-depth
-  // harpist`). An elbow forward, at [0.5, -1, -1.5], kept the upper arm out of the soundbox, but
+  // chest. The right elbow points out and 9° down (`poleR`), as the elbows of a harpist rise to
+  // the side (section 4). The shoulder of a harpist holds the harp, so the right upper arm only
+  // touches the top of the soundbox: on the Tripo fawn with the elbow 27° down, the right upper
+  // arm went more than 1.0 cm into the soundbox in 16% of the play and 61% of the lift, and with
+  // this elbow in 0.2% of the play and none of the lift (`scratch/deerclip/depth.ts`). With
+  // the old deer, the elbow 45° down put the upper arm 2.0 cm into the soundbox. An elbow
+  // forward, at [0.5, -1, -1.5], kept the upper arm out of the soundbox, but
   // the right paw twisted up to 74° on its forearm, against 35° with this elbow (`pnpm hold-fit
   // harpist`). On the larger harp on the floor, with the palm 3 cm right of the strings and the
   // elbow at [0.7, -1, 0], the right arm folds (folds p95 9 of `pnpm arm-check`, limit 8), and with
@@ -360,7 +362,7 @@ export const HANDS_HOLDS = {
     // (`scratch/harp2/burst.ts`). The note targets do not change (`pnpm pose-depth harpist`).
     highR: { from: 79, to: 96, offset: [0.02, -0.08, 0] },
     faceL: [1, -1, 0],
-    faceR: [-1, -0.25, 0],
+    faceR: [-1, -0.5, 0],
     aimL: [0, 1, 0.5],
     aimR: null,
     lean: 0,
@@ -380,7 +382,7 @@ export const HANDS_HOLDS = {
     most: HARP_FINGERING.fingers,
     apart: 0,
     poleL: [-0.85, -1, 0],
-    poleR: [2, -1, 0],
+    poleR: [3, -0.5, 0],
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
     // After its pluck, the thumb bends over finger 2 (`docs/reference/harp-technique.md`, section
