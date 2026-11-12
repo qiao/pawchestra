@@ -887,10 +887,11 @@ const BEAVER_SHOULDER_TURN = {
 const BEAVER_PLAY = holdTurn(18, 0);
 
 /**
- * The turn of the bassoon of the beaver at rest, relative to the chest: the bind pose of
- * `woodwindRotation()`, the lower end 18° back toward the body of {@link BEAVER_PLAY}.
+ * The turn of the bassoon of the beaver at rest, relative to the chest: the lower end 20° to the
+ * right from the bind pose of `woodwindRotation()`, so that the bassoon lies 56° from the vertical
+ * across the belly, 21° flatter than in the play ({@link BEAVER_PLAY}).
  */
-const BEAVER_REST = holdTurn(0, 0);
+const BEAVER_REST = holdTurn(0, 20);
 
 /**
  * The bassoon hold of the beaver (design 5.3), the hold of a real bassoonist
@@ -912,12 +913,14 @@ const BEAVER_REST = holdTurn(0, 0);
  * points further out, and the right elbow out and a little down. With the left elbow less far out,
  * the left paw twists 23° on its forearm in the play, against 8° now.
  *
- * At rest, the bassoon moves 0.1 H forward and 0.1 H lower, so that its top comes down below the
- * mouth, and takes its bind turn ({@link BEAVER_REST}), so that the boot joint comes back toward
- * the right thigh and both paws keep their grips. With 0.2 H lower and 0.25 H forward, each paw
- * missed its rest grip by 6.5 cm. A real bassoonist carries the boot at the right thigh with the
- * boot joint in the right palm, and no source gives the rest (`docs/reference/wind-technique.md`
- * 3). The left paw holds the wing joint high, and the right grip moves 0.25 H up the boot
+ * At rest, the bassoon moves 0.3 H to the left, 0.2 H forward, and 0.1 H lower (`restShift`),
+ * and it turns flatter across the belly ({@link BEAVER_REST}), so that the reed leaves the mouth
+ * by 0.37 H, to the left below the chin, and both paws keep their grips. A real bassoonist takes
+ * the bocal out of the mouth and lowers the bassoon (`docs/reference/wind-technique.md` 3). The
+ * short arms do not reach a rest lower than 0.15 H below the mouth with the bassoon in front of
+ * the belly. With the right paw alone on the bassoon upright at its side and the left arm
+ * hanging, the bassoon went through the head in the lift and 13.6 cm into the right thigh in the
+ * lowering. The left paw holds the wing joint high, and the right grip moves 0.25 H up the boot
  * joint (`gripShiftR`): with 0.15 H, the right arm does not reach the boot of the bassoon of
  * 0.7. Each grip moves toward the axis and to the side of its own shoulder, the left
  * grip 0.1 H toward the axis and 0.1 H across it toward the left shoulder, and the right grip
@@ -944,7 +947,7 @@ const BEAVER_BASSOON = {
   lipShift: [0, -0.2, 0.28],
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
-  restShift: [0, -0.1, -0.1],
+  restShift: [-0.3, -0.1, -0.2],
   poleL: [-1.2, -1, 0.2],
   poleR: [1, -1, -0.5],
   restPoleL: [-1.6, -1, 0],
