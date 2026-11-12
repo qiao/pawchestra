@@ -64,25 +64,25 @@
     "head": {
       "head": [
         0.0,
-        0.71,
-        0.03
+        0.704,
+        0.029
       ],
       "tail": [
         0.0,
-        0.98,
-        0.04
+        0.947,
+        0.038
       ]
     },
     "ear_L": {
       "head": [
-        0.11,
-        0.91,
-        0.0
+        0.099,
+        0.884,
+        0.002
       ],
       "tail": [
-        0.165,
-        0.73,
-        0.04
+        0.1485,
+        0.722,
+        0.038
       ]
     },
     "clavicle_L": {
@@ -400,5 +400,9 @@
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/dog.blend holds it.",
   "texture": "assets/models/dog/tripo-p2/dog.fbm/dog_basecolor.jpg",
   "rollSplit": true,
-  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/dog/README.md, \"tripo-hand/dog.blend\")."
+  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/dog/README.md, \"tripo-hand/dog.blend\").",
+  "headScale": {
+    "factor": 0.9,
+    "note": "The build scales the head, the ears, the eyeballs, the nose, and the muzzle about the neck joint by the factor, with the head weight as the share (scale_head() of build.py)."
+  }
 }
