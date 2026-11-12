@@ -874,7 +874,14 @@ from one mouth corner around the tip to the other corner, a dark cap closes each
 lower beak follows the jaw bone (`jaw`). It stands in the pose of the source, with its legs and its
 upright trunk, and its center of mass lies over the back of the soles, as on a real penguin. Its
 flippers start at the back half of the sides, so the choir folder is nearer to the chest than for
-the earlier penguin (`CHOIR_FOLDER`, 5.3). The paws of the fox turn about the
+the earlier penguin (`CHOIR_FOLDER`, 5.3). The Tripo elephant
+(`assets/models/elephant/tripo-hand/`) is the body of the timpanist, by the same rules. Its source
+paints each eye on faces of the head with no light, so it takes the eyes of the pig. Its stump
+paws turn by whole steps of one closed wrist ring, as the hooves of the pig, and each elbow axis
+turns, so that each part of each arm takes at most 45° in the moments of the timpanist. Its
+trunk, tusks, and lips take the head bone and a share of the neck bone toward the tip of the
+trunk, and its large ears take the ear bones and the head bone alone. Reason: bone heat gave the
+trunk shares of the chest, and the low ear lobes shares of the shoulders. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -975,7 +982,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   0.65 read small beside the big head and paws, and a larger trumpet puts the valves out of the
   reach of the short arms (0.91 and up).
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
-  pose of their meshes. The rhino stands as a real tubist on a strap does.
+  pose of their meshes. The rhino stands as a real tubist on a strap does. The Tripo elephant
+  binds standing on the straight legs of its source, as the Tripo monkey, and keeps this stance
+  at its timpani. Its center of mass then lies over the middle of its soles. Its seat height is
+  the height of the back of its haunch over the floor, and the app builds no chair under it.
 - A seated body that also stands as a soloist (`soloist` of `ANIMALS`) keeps the leg shapes of
   its sheet pose (`standingBody()` of `models/studio-rig.ts`).
 
@@ -1204,8 +1214,9 @@ source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) do
 `tools/dog-maps.py`, and the candidate monkey (`assets/models/monkey/tripo-hand/`) with
 `tools/monkey-maps.py`, for the same reason. The Tripo hippo (`assets/models/hippo/tripo-hand/`)
 does the same with `tools/hippo-maps.py`, the Tripo pig (`assets/models/pig/tripo-hand/`) with
-`tools/pig-maps.py`, and the Tripo penguin (`assets/models/penguin/tripo-hand/`) with
-`tools/penguin-maps.py`.
+`tools/pig-maps.py`, the Tripo penguin (`assets/models/penguin/tripo-hand/`) with
+`tools/penguin-maps.py`, and the Tripo elephant (`assets/models/elephant/tripo-hand/`) with
+`tools/elephant-maps.py`.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
