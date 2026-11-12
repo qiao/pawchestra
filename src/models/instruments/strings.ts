@@ -701,15 +701,24 @@ const PEGS: readonly (readonly [x: number, side: 1 | -1])[] = [
 
 /**
  * The profile of a peg along its shaft, from the end that stands out of the far wall of the
- * pegbox to the tip of the head. The head is flat (`PEG_FLAT`), so that its wide faces show from
- * the front and from the back.
+ * pegbox to the tip of the head, as a real ebony peg: the shaft through the slot, a collar at the
+ * outer face of the wall, a thin neck, and the round thumb piece. The head is flat (`PEG_FLAT`), so
+ * that its wide faces show from the front and from the back.
  */
 const PEG_PROFILE: readonly ProfilePoint[] = [
   [0.0012, 0],
   [0.0016, 0.0205],
+  [0.0025, 0.0207],
+  [0.0025, 0.022],
+  [0.0018, 0.0225],
+  [0.0036, 0.0243],
   [0.0048, 0.027],
+  [0.0038, 0.0297],
   [0, 0.0315],
 ];
+
+/** The number of faces around a peg and a key of a machine head. */
+const PEG_SEGMENTS = 6;
 
 /** The scale of the head of a peg across its wide faces. */
 const PEG_FLAT = 0.45;
@@ -717,22 +726,32 @@ const PEG_FLAT = 0.45;
 /**
  * The machine heads of the contrabass, in meters in the violin axes: a brass plate on each side
  * of the pegbox, and two keys on each plate that point to the back and out, as on a real double
- * bass.
+ * bass. The shaft of each key turns a brass roller across the slot of the pegbox, and the strings
+ * wind on the rollers. The keys of the two sides take turns along the pegbox, so that the four
+ * rollers do not touch.
  */
 const MACHINES = {
   /** The middle of each plate along the violin, and its length, height, and thickness. */
   plate: [0.354, 0.03, 0.016, 0.0012],
-  /** The places of the keys along the violin. */
-  keys: [0.346, 0.362],
+  /** The places of the keys along the violin on the -z side and on the +z side. */
+  keys: [
+    [0.343, 0.357],
+    [0.35, 0.364],
+  ],
   /** The direction of a key at the +z side: to the back (-y) and out. */
   keyDirection: [0, -0.8, 0.6],
-  /** The profile of a key from the plate to the tip of its head. */
+  /** The profile of a key from the plate to the tip of its head: a shaft and an oval paddle. */
   profile: [
     [0.001, 0],
-    [0.001, 0.006],
-    [0.0045, 0.009],
+    [0.001, 0.0058],
+    [0.0022, 0.0066],
+    [0.0042, 0.0085],
+    [0.0047, 0.0105],
+    [0.0036, 0.0125],
     [0, 0.0135],
   ] satisfies readonly ProfilePoint[],
+  /** The radius of a roller. */
+  roller: 0.0016,
 } as const;
 
 /**
@@ -1444,11 +1463,25 @@ function addMachines(piece: PieceBuilder, frame: Transform, y: number): void {
         new Vector3(dx, dy, side * dz).normalize(),
       ),
     );
-    for (const x of m.keys) {
+    for (const x of m.keys[side < 0 ? 0 : 1]) {
       piece.add(
-        lathe(m.profile, 4),
+        lathe(m.profile, PEG_SEGMENTS),
         INSTRUMENT_COLORS.brass,
         inFrame(frame, transform([x, y, side * (wall + thick / 2)], turn, [1, 1, PEG_FLAT])),
+        'metal',
+      );
+      // The roller across the slot, with its ends in the middle of the two walls.
+      const across = 2 * (SCROLL.nutRing[0] - PEGBOX.wall / 2);
+      piece.add(
+        cylinder(m.roller, m.roller, across, PEG_SEGMENTS),
+        INSTRUMENT_COLORS.brass,
+        inFrame(
+          frame,
+          transform(
+            [x, y, -across / 2],
+            toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), Math.PI / 2)),
+          ),
+        ),
         'metal',
       );
     }
@@ -1529,7 +1562,7 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
       new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), (side * Math.PI) / 2),
     );
     piece.add(
-      lathe(PEG_PROFILE, 4),
+      lathe(PEG_PROFILE, PEG_SEGMENTS),
       dark,
       inFrame(frame, transform([x, pegY, -side * (sc.nutRing[0] + 0.001)], turn, [1, 1, PEG_FLAT])),
       'varnish',
