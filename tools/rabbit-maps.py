@@ -1,11 +1,9 @@
 # Writes the web color map and the web normal map of the Tripo rabbit from the maps of its FBX
 # (design 4.5, assets/models/rabbit/README.md, "Color map" and "Normal map"). The color map is the
 # source image at 2048 pixels, with no change of a color: the fur, the brows, and the eye paint
-# stay as the FBX shows them, as on the Tripo wolf (tools/wolf-maps.py). The only change is the
-# gaze shift of tools/gaze_shift.py, which moves each painted iris with its pupil as one decal on
-# its ball. The normal map limits each tilt of the source, scales it to 1024 pixels, and stores the
-# tilts times NORMAL_MAP_GAIN of src/scene/fur.ts. The output depends only on the input files and on
-# cwebp 1.5.0.
+# stay as the FBX shows them. The normal map limits each tilt of the source, scales it to 1024
+# pixels, and stores the tilts times NORMAL_MAP_GAIN of src/scene/fur.ts. The output depends only on
+# the input files and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py
 import os
@@ -16,12 +14,8 @@ import tempfile
 import numpy as np
 from PIL import Image
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import gaze_shift  # noqa: E402
-
 SOURCE = 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg'
 NORMAL_SOURCE = 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_normal.jpg'
-RIG = 'assets/models/rabbit/tripo-hand/rabbit.rig.glb'
 COLOR_OUT = 'assets/models/rabbit/tripo-hand/rabbit-color.webp'
 NORMAL_OUT = 'assets/models/rabbit/tripo-hand/rabbit-normal.webp'
 SIZE = 2048
@@ -31,22 +25,11 @@ QUALITY = 60
 #: (`NORMAL_MAP_GAIN` of src/scene/fur.ts). A larger tilt is a baked edge of the source mesh.
 NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
-#: The gaze shift of the eyes (tools/gaze_shift.py): the view in degrees above the forward axis of
-#: the head of the seated bind in which each iris lies in the middle of its eye opening, and the
-#: turn of each target out and up from that middle, in degrees. The source paints no lash line, so
-#: the old place of each iris takes white up to the edge of the opening.
-VIEW_DOWN = 30.0
-GAZE_OUT = 6.0
-GAZE_UP = 0.0
-LASH_LINE = False
 
 
 def color_map():
-    """Writes the color map: the source scaled to SIZE (Lanczos) with the gaze shift, WebP quality
-    QUALITY, method 6."""
+    """Writes the color map: the source scaled to SIZE (Lanczos), WebP quality QUALITY, method 6."""
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
-    rig = gaze_shift.read_rig(RIG)
-    image = gaze_shift.shift_gaze(rig, image, VIEW_DOWN, GAZE_OUT, GAZE_UP, LASH_LINE)
     image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
     print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
 
