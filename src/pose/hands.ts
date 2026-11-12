@@ -287,8 +287,10 @@ export const HANDS_HOLDS = {
   // The pose follows a harpist (`docs/reference/harp-technique.md`): the left hand plays the bass
   // strings from the left side and the right hand the treble strings from the right side, the
   // trunk sits erect, and the elbows rise out to the sides. The short arms of the deer set the
-  // values. The spine leans 3° forward: at 8°, the muzzle comes to 1.0 cm of the neck of the
-  // leaned harp. The pluck points lie at 0.37 of each string (`PLUCK.share`), so the bass strings
+  // values. The measures below come from the deer of the old mesh, except where a sentence names
+  // the Tripo fawn. The spine of the Tripo fawn stays erect (`lean` 0): with a lean of 3°, its
+  // muzzle touched the neck of the harp (`pnpm pose-depth harpist --gaps`), and erect, the gap is
+  // at least 2.3 cm. The pluck points lie at 0.37 of each string (`PLUCK.share`), so the bass strings
   // are plucked low. The left palm lies 0.22 m above the pluck point, nearer to the shoulder, and
   // 2 cm toward the player: at 0.14 m and 2 cm toward the column, the left paw misses the bass
   // strings C2 to A2 by up to 4.5 cm, and at 0.14 m and 4 cm toward the player, the left paw bends
@@ -323,7 +325,7 @@ export const HANDS_HOLDS = {
     faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
     aimR: null,
-    lean: 3 * MathUtils.DEG2RAD,
+    lean: 0,
     restLean: 0,
     restHeadLift: 0,
     sideLean: 0,
@@ -355,7 +357,10 @@ export const HANDS_HOLDS = {
     // paw 68° and 41° (`pnpm arm-check harpist`). The paws stand 0.35 H out from the top of each
     // thigh and 0.5 H above it: on the top of the thigh, the elbows went 4.2 cm into the belly at
     // rest, and 0.1 H above it the arms were straight (180°). A palm near the hip (`along` 0.7) put
-    // the paws on the hips with the elbows out (`pnpm pose-depth harpist`).
+    // the paws on the hips with the elbows out (`pnpm pose-depth harpist`). The right palm of the
+    // rest turns a little to the right (x -0.3), so that the right forearm of the Tripo fawn
+    // twists at most 45° from the bind: -40° at rest and 39° in a chord. With x 0, it twisted -47°
+    // at rest (`pnpm pose-preview harpist`).
     restL: {
       lap: { along: 1, offset: [-0.35, 0.5, -0.25] },
       palm: [0, -0.8, 1],
@@ -364,7 +369,7 @@ export const HANDS_HOLDS = {
     },
     restR: {
       lap: { along: 1, offset: [0.35, 0.5, -0.25] },
-      palm: [0, -0.8, 1],
+      palm: [-0.3, -0.8, 1],
       fingers: [-0.2, -1, -0.8],
       pole: [0.4, -1, 0.3],
     },
