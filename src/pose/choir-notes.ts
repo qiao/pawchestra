@@ -16,11 +16,14 @@ export const CHOIR_MOTION = {
    */
   jaw: 50 * MathUtils.DEG2RAD,
   /**
-   * The neck and the head lift this far at the full opening of the jaw, so that each sung note
-   * also shows from the default view, where the beak is a few pixels long. The lift follows the
-   * opening of the jaw. The beak of the penguin mesh opens, so a lift of 15° is enough.
+   * The neck and the head lift this far in a phrase, as a real choir singer lifts the head a
+   * little to sing and keeps it still on each note. The lift rises in {@link liftRiseSec} before
+   * the phrase and falls in {@link liftFadeSec} after it. A lift of 15° that followed the jaw
+   * turned the head 17° in 0.09 s at each note.
    */
-  headLift: 15 * MathUtils.DEG2RAD,
+  headLift: 4 * MathUtils.DEG2RAD,
+  liftRiseSec: 0.8,
+  liftFadeSec: 1.5,
   /**
    * The spine leans back by this angle at the top of the breath in before a phrase, at an
    * amplitude of 1, and the chest rises with it. The breath in takes 0.4 s and ends at the first
@@ -172,6 +175,8 @@ export interface ChoirState {
   sway: number;
   /** The breath: 1 at the start of a phrase, after the breath in. */
   breath: number;
+  /** The lift of the head in a phrase, from 0 to 1 (`CHOIR_MOTION.headLift`). */
+  lift: number;
 }
 
 /**
@@ -180,7 +185,7 @@ export interface ChoirState {
  * @returns The state.
  */
 export function createChoirState(): ChoirState {
-  return { jaw: 0, sway: 0, breath: 0 };
+  return { jaw: 0, sway: 0, breath: 0, lift: 0 };
 }
 
 /**
@@ -196,6 +201,18 @@ function swayFade(time: number, end: number): number {
 }
 
 /**
+ * Gives the lift of the head in a phrase from its start on: full in the phrase, then 0 in
+ * {@link CHOIR_MOTION.liftFadeSec}.
+ *
+ * @param time The song time.
+ * @param end The end of the phrase.
+ * @returns The weight, from 0 to 1.
+ */
+function liftFade(time: number, end: number): number {
+  return 1 - smoothstep((time - end) / CHOIR_MOTION.liftFadeSec);
+}
+
+/**
  * Gives the breath of a phrase from its start on: it falls over the phrase, in at least 1 s.
  *
  * @param time The song time.
@@ -208,11 +225,11 @@ function exhale(time: number, end: number, start: number): number {
 }
 
 /**
- * Calculates the jaw, the sway, and the breath of a singer at a song time (design
+ * Calculates the jaw, the sway, the breath, and the head lift of a singer at a song time (design
  * 5.3). The jaw opens before each note, and it is open at the note start. It stays open while the
  * note sounds, and closes after it. Between two notes, it closes a part of the way and opens
- * again, so that each note shows. The jaw turns at most at `CHOIR_MOTION.jawRate`. The sway
- * rises before each phrase and fades after it. The breath in rises in the 0.4 s
+ * again, so that each note shows. The jaw turns at most at `CHOIR_MOTION.jawRate`. The sway and
+ * the head lift rise before each phrase and fade after it. The breath in rises in the 0.4 s
  * before each phrase.
  *
  * @param track The note data of the singer.
@@ -243,6 +260,13 @@ export function choirStateAt(track: ChoirTrack, time: number, out: ChoirState): 
     swayFade,
   );
   out.sway = phrase.weight * (track.phraseGestures[phrase.index] ?? 0);
+  out.lift = spanEnvelope(
+    track.phraseStarts,
+    track.phraseEnds,
+    time,
+    CHOIR_MOTION.liftRiseSec,
+    liftFade,
+  ).weight;
   out.breath = spanEnvelope(
     track.phraseStarts,
     track.phraseEnds,

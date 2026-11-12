@@ -497,15 +497,15 @@ function poseAnimal(
       const { choir } = scratch;
       choirStateAt(note.track, noteTime, choir);
       // The chest turns from side to side with the phrase, and neighbor voices turn to opposite
-      // sides. The neck and the head lift with the opening of the jaw. The spine leans back with
-      // the breath in before a phrase.
+      // sides. The neck and the head lift a little in each phrase and keep still on each note. The
+      // spine leans back with the breath in before a phrase.
       body.twist =
         CHOIR_MOTION.sway *
         choir.sway *
         weight *
         (player.seatIndex % 2 === 0 ? 1 : -1) *
         beatSway(plan.beats, noteTime, CHOIR_MOTION.swayBeats);
-      body.lift = (CHOIR_MOTION.headLift * choir.jaw * weight) / CHOIR_MOTION.jaw;
+      body.lift = CHOIR_MOTION.headLift * choir.lift * weight;
       body.lean = -choir.breath * CHOIR_MOTION.breath * player.amplitude * weight;
       writeBody(pose, player, scratch);
       setBoneRotation(
