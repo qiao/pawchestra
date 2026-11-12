@@ -424,11 +424,15 @@ export const SPECIES = {
    * of the old mesh, and the arms, the legs, and the eyes of the source. Its round haunch sits on a
    * low, wide chair behind the short thighs, and its round tail lies in front of the chair back. Its
    * head height is the head of the studio body, and its chair fits its legs: the seat height is the
-   * seat of the studio body, in H.
+   * seat of the studio body, in H. Its arms are short for its big head: the mouth is 0.21 m in front
+   * of the right shoulder joint, and the arm reaches 0.417 m. So it plays a smaller trombone of
+   * 0.75, at which the right arm reaches 0.1 m of the slide travel (`pnpm hold-reach panda
+   * --instrument trombone`). With the trombone of the app, it reached 0.055 m.
    */
   panda: {
     body: 'studio-panda',
     colors: SPECIES_COLORS.panda,
+    tromboneScale: 0.75,
     headHeight: STUDIO_HEIGHTS['studio-panda'].headHeight,
     seatHeight:
       STUDIO_HEIGHTS['studio-panda'].seatHeight / STUDIO_HEIGHTS['studio-panda'].headHeight,
