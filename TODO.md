@@ -79,8 +79,6 @@ passes.
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
-- [ ] Hornist pig: with the bell open to the back (`PIG_TURNS`), three faces of the right arm (332,
-      19, 287) fold in 98% of the play samples. Check them in a 2x crop of the right elbow.
 - [ ] Trombonist panda: the haunch is 63 cm wide on a chair of 42 cm, so from the back it sticks
       out past both back posts. No body corner goes into the posts or the top rail at rest or in
       120 s of play of `boulanger-matin` and `brahms-2` (`scratch/rump-play.ts`), and the middle of
@@ -174,8 +172,6 @@ passes.
       behind in the app view.
 - [ ] Panda face: from 30° above, the mouthpiece and the paws hide the smile. Check the smile with
       the user in a close play frame of the stage.
-- [ ] Pig: a T-pose mesh gave a flat slab, a flap, and 9 to 14 folded faces at the shoulders, so the
-      current mesh stays. Ask the user: a ring at each shoulder, or another mesh.
 - [ ] Tripo polar bear: the left grip turn p50 is 13° in the play, against 6° on main (limit 45°).
 - [ ] Tripo polar bear: the closed lid stands out from the face as a cap (1.25 ball radii). Check
       the blink with the user in a close play frame
@@ -376,10 +372,6 @@ passes.
       the front.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
       shafts down. A real timpanist holds them one inch above the head with a level shaft.
-- [ ] Pig hornist: fix the dark facets on the shoulders.
-- [ ] Pig in the cast matrix: the moved root vertices of `pig_root.py` come up to 1.5 cm out of the
-      shoulder in the snare drum (0.5 cm in before), and up to 1.2 cm in the other recast roles.
-      Check them in 2x crops of the recast roles.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
@@ -421,12 +413,6 @@ passes.
       play (limit 1.5 cm), and the bow plays no hair within 0.18 m of the 0.38 m bow at the frog.
       The paw of the wolf is large for its smaller violin. In `pachelbel-p37` at 210.9 s, the bow
       goes 5.9 cm into the body in 2% of the samples.
-- [ ] Pig hornist with rebuilt arms: at rest, the round right forearm goes 0.4 cm into the rim of
-      the bell near the wrist (0.1 cm on the old arm, target 0.3 cm), with the rest
-      right elbow (1, -0.5, -0.6) and the bind supination R 64 (0.3 cm on R 51). The left paw goes
-      0.4 cm into the horn at rest (0.6 cm on the old hold): of 16 rest variants of the left elbow
-      and the left rest grip, none kept the left paw at 0.1 cm and the left wrist at 0.3 cm or
-      less. Try a rest grip on the far side of the valves, or accept the depths.
 - [ ] Hanging arms: make `hangingHand()` of `pose/hang.ts` independent of the bind paw (shared pose
       code). It turns the bind paw by the shortest arc from straight down, so a straight bind turns
       the hanging paw: the hanging left paw of the badger bass drummer has the grip -44° (-22° on
@@ -579,11 +565,6 @@ passes.
       and its module, and check that only the seated bear changes and the conductor stays
       (`pnpm body-probe`). Its violin and cello cells then fail on the arms only: the upper arms
       go 5 cm to 10 cm into the body, as on the standing bear.
-- [ ] Inner upper arm of the pig in the shared holds (5.3): with the root domes shrunk
-      (`pig_root.py`), the round tube of `pig-upper.glb` still goes into the trunk at 0.36 to 0.47
-      of the upper arm: violin play 2.3 cm, cello lowering 4.0 cm (left arm). The same vertices
-      come up to 9 cm out of the trunk in other holds, so they are not a hidden root. Next: the
-      elbow out in these holds, or a flatter inner side of the tube.
 - [ ] Right fingers of the shared trumpet (5.3, winds 2.1): the right paw faces the valve tops
       and points 0.4 of the way across them, but its fingers stay nearly straight (no
       `gripCurl`), so they do not arch down onto the valve caps as the monkey's do. A grip curl
@@ -791,6 +772,17 @@ passes.
       move of `shift_eyes()`, the pupils sit 0.09 to 0.12 of the half width of the opening out in
       the front view of the test page, and 0.11 to 0.14 toward the nose in the 3/4 views. A small
       dark lash corner stays at the inner bottom of each eye. Check the gaze in the app.
+- [ ] Tripo pig: faces fold at the front of both shoulders and in the crook of the right elbow
+      (`pnpm arm-check hornist`, folds p95 8 left and 23 right, limit 8, 1 and 12 on the old pig).
+      Check the shoulders and the right elbow in the app.
+- [ ] Tripo pig: in each sample the upper arms go 2.6 cm to 3.7 cm into the cap of the arm root
+      (`pnpm pose-depth hornist`, limit 1.5 cm). Check the shoulders in 2x crops, or accept the
+      depth with its reason in the sweep of the hornist.
+- [ ] Tripo pig: the round shins put the front of the seat 0.07 units behind the knee, so only 28 %
+      of the thigh lies on the seat. Check the seat from the side in the app.
+- [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
+      lid lie just out of the head. Check a blink in a close play frame.
+- [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
