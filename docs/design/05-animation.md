@@ -302,7 +302,10 @@ The rest of each family:
   it meets the thighs, as a pianist rests the hands on the lap before a performance. Reason: with
   each hand near a string, the rest looked the same as the play, and the thighs lie out of the
   reach of the short arms. Paws beside the knees lie out of reach, so the arms lock straight and
-  the elbows snap where the lift leaves the reach limit.
+  the elbows snap where the lift leaves the reach limit. The right rest elbow points down and
+  forward (`restR.pole`), so the right arm lies in front of the soundbox. Reason: with the elbow
+  back, the right forearm lay behind the soundbox and crossed it at rest, in the lift, and in the
+  lowering.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
   rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). A hold
