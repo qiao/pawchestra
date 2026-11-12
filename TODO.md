@@ -763,20 +763,25 @@ passes.
 - [ ] Third Tripo rabbit: the hip joint lies 1.5 mm from its measured place, because at that place
       the rest frames of the leg bones in Blender scale and `pnpm rig-export` stops. A tolerance or
       a fix of the frames in `tools/blender/export_rig.py` would allow the measured place.
-- [ ] Third Tripo rabbit: in the lift and the lowering the violin of 0.9 goes up to 6.2 cm into
-      the belly (`pnpm pose-depth violinist`, 2.7 cm with the violin of 0.75 on the second rabbit).
-      Other `liftReach` vias and rest arms gave 5.3 cm to 8.0 cm, or a pass through the head. At
-      rest the violin keeps out of the body (2.6 cm in on the second rabbit).
+- [ ] Third Tripo rabbit: in the lift the violin of 0.9 goes up to 4.7 cm into the belly, and in
+      the lowering up to 5.7 cm into the head (`pnpm pose-depth violinist`, 6.2 cm with the first rest of
+      this body, 2.7 cm with the violin of 0.75 on the second rabbit). A `liftReach`
+      further to the left took the head depth to 4.3 cm, but the violin left the short arc by up
+      to 57° (`pnpm carry-check`). At rest the violin keeps out of the body.
+- [ ] Third Tripo rabbit: near the end of one lowering of `beethoven-6-1` (467.27 s) the bow goes
+      2.1 cm into the violin in 2 of 30 samples (limit 1.5, 0.3 cm with the upright rest bow).
+      Other `restBow.via` turns and grip moves gave 1.6 cm to 2.3 cm.
+- [ ] Third Tripo rabbit: the rest bow points down and forward, 38° below the level, in place of
+      straight down: the bow paw grips the stick across the palm, so a tip straight down twists
+      the right forearm by about 175°. A rest grip at the frog, with the stick along the fingers,
+      would let the bow hang straight down.
 - [ ] Third Tripo rabbit: in the play the depths of the arms grow against the second rabbit
       (`pnpm pose-depth violinist --base 12edbabec`): the upper arms 3.8 cm into the body (2.4)
       and 2.1 cm into the violin (0.2), the forearms 2.9 cm into the body (2.3). No ear meets the
       violin or the bow.
 - [ ] Third Tripo rabbit: faces of the knuckle creases of the curled paws fold in each sample
-      (`pnpm arm-check violinist`, folds p95 27 left and 11 right at rest, limit 8). Wider knuckle
+      (`pnpm arm-check violinist`, folds p95 29 left and 12 right at rest, limit 8). Wider knuckle
       rows took the count only from 38 to 37. Check the curled paws in the app.
-- [ ] Third Tripo rabbit: in one lowering of `beethoven-6-1` (311.51 s) the right paw turns
-      2,576°/s (limit 3,000, 1,253 on the second rabbit), so `pnpm arm-check` marks it worse than
-      the base.
 - [ ] Third Tripo rabbit: the right knee has no clean quad strip, so it takes no ring, and the
       left elbow has partial rings from x 0.144 to 0.192. Check the knees and the elbows in the
       seated bind.
