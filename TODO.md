@@ -782,6 +782,10 @@ passes.
       seated bind.
 - [ ] Third Tripo rabbit: the stern look of the source eyes (painted lash lines over the upper
       iris) stays. Check that the face reads happy enough in the hall.
+- [ ] Third Tripo rabbit eyes: one painted iris cannot sit in the middle from each view. After the
+      move of `shift_eyes()`, the pupils sit 0.09 to 0.12 of the half width of the opening out in
+      the front view of the test page, and 0.11 to 0.14 toward the nose in the 3/4 views. A small
+      dark lash corner stays at the inner bottom of each eye. Check the gaze in the app.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
