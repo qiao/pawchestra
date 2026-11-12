@@ -450,7 +450,12 @@ The rest of each family:
   trunk leans further forward and its right shoulder turns further, so that the bow paw reaches
   the strings in front of the chest, and its bow paw turns on the stick (`stickTurnR`), so that it
   does not flip. Reason: the chest of the beagle is round, and with the middle line alone, the
-  upper bout stood deep in the chest in each sample. The contrabass of the hippo takes its
+  upper bout stood deep in the chest in each sample. The short paw of the beagle holds the stick
+  under its curled finger tips at the frog end, across the fingers (`SpeciesParams.bowGrip` of the
+  dog), and curls the fingers further than the other holds (`BowedHold.curlR`). Its turn on the
+  stick keeps the forearm on the line of the palm. Reason: with the shared grip, the stick lay
+  under the palm and the finger tips stayed off it. A larger curl folds the knuckles, and a turn
+  that keeps the forearm at an angle bends the bow elbow until its skin folds. The contrabass of the hippo takes its
   place from the body by the same rule, with its own lean back, lean to the left, turn of the top
   plate, end pin place, and gap (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
   small tilt back and a small turn to the right, as a standing bassist holds it. The lower bout
