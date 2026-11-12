@@ -298,6 +298,8 @@ The rest of each family:
   no concert source gives a rest place, and a marching method holds the plates at the sides
   (percussion 7).
 - **Choir.** The penguin keeps the folder in front of the chest, as a choir between two pieces.
+  The flat flippers of the Tripo penguin start at the back half of the sides, so the folder hangs
+  within their reach (`CHOIR_FOLDER.forward`), and the flipper tips curl over its outer edges.
 
 ## 5.3 Instrument motion
 
@@ -322,7 +324,7 @@ The rest of each family:
   toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
   the joint, and some of them come out of the shoulder in another pose.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
-  the beaver, the badger, the penguin) is a round tube with its full inner half width. With the
+  the beaver, the badger) is a round tube with its full inner half width. With the
   bone pose of a thinner arm, the inner side of the upper arm goes into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
   does (winds 1.8). A violinist keeps the left elbow under the instrument and the bow arm free of
   the body (strings 1.8, 2.3), and a cellist starts a stroke open at the shoulder (strings 2.2). At
