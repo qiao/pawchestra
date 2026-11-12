@@ -1,0 +1,226 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/elephant/tripo-p2/elephant.fbm/elephant_basecolor.jpg",
+ "palm": [
+  0.343,
+  -0.931,
+  -0.125
+ ],
+ "ringEdges": 13,
+ "legTurns": [
+  90,
+  0,
+  0,
+  0
+ ],
+ "tailBind": null,
+ "tailBindNote": "The tail bones keep the directions of the source in the bind: the tail hangs down the rump.",
+ "chair": {
+  "halfWidth": 0.2,
+  "front": -0.15,
+  "back": -0.27,
+  "note": "The app builds no chair under the timpanist, but the export needs a seat for the seat height. The seat is level, and its top is the lowest point of the bind body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the back of the haunch, behind the heels, so that the soles stay on the floor."
+ },
+ "eyeBox": [
+  [
+   0.05,
+   0.835,
+   0.06
+  ],
+  [
+   0.105,
+   0.895,
+   0.115
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.001,
+   -0.001,
+   -0.001
+  ],
+  [
+   0.001,
+   0.001,
+   0.001
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the painted eye of each side (x 0.063 to 0.092, y 0.848 to 0.882, z 0.075 to 0.101 in the source). The eyes are faces of the head surface, with no eyeball. The trunk has no dark nose pad, so the nose box holds no face.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.914859,
+ "metersPerUnitNote": "The scale of the app: H of the body is 0.411693 m, the H of the pig of main (assets/models/elephant/pig.rig.glb). The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the hooves, and the legs keep the form of the source.",
+ "eyeSize": 0.309722,
+ "jointsNote": "The places are the places of the source, in the studio units and axes of the source pose: 1 unit from the soles to the top of the head, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh. Arm (axis y 0.607, z -0.005, radius 0.067 where it leaves the trunk at x 0.165, 0.036 at x 0.34): the shoulder joint at x 0.13, in the trunk side, the elbow at x 0.24, in the middle from the shoulder to the wrist, the wrist at x 0.345, the thinnest place before the hoof, the knuckles at x 0.39, where the toes of the hoof part, the tip at x 0.427. Leg (the crotch at y 0.19): the hip joint at (0.095, 0.24, -0.01) in the haunch, the knee at (0.098, 0.13, -0.03), the ankle at (0.103, 0.045, -0.013), where the hoof starts, and the hoof tips at z 0.056. Trunk: the spine bones lie at about 0.35 of the depth from the back. The neck is narrowest at y 0.64 to 0.66, and the chin is at y 0.68. Ears: the root at (0.13, 0.93, 0), the tips at (0.25, 0.905, 0). Tail: the curl behind the rump (z below -0.19), from its root at (0, 0.355, -0.18) to (0, 0.35, -0.263). The palm is the true palm of the source: the mean normal of the hoof faces that face down (x from 0.36) is (0.243, -0.968, -0.067). The hoof turn of the build turns it with the hoof.",
+ "rings": {
+  "arm": [],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.13,
+  "reach": 0.075,
+  "handReach": 0.075,
+  "control": [
+   [
+    0.13,
+    0.8,
+    0
+   ],
+   [
+    0.15,
+    0.6,
+    0
+   ],
+   [
+    0.17,
+    0.4,
+    0
+   ],
+   [
+    0.19,
+    0.2,
+    0
+   ],
+   [
+    0.21,
+    0.05,
+    0
+   ],
+   [
+    0.22,
+    0,
+    0
+   ],
+   [
+    0.2325,
+    0,
+    0.25
+   ],
+   [
+    0.2475,
+    0,
+    0.75
+   ],
+   [
+    0.2625,
+    0,
+    0.75
+   ],
+   [
+    0.2775,
+    0,
+    0.25
+   ],
+   [
+    0.29,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.003,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.015,
+   "band": 0.0025,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   0.0,
+   0.02
+  ],
+  "bend": 0.04,
+  "tip": true
+ },
+ "hipJoint": [
+  [
+   0.105,
+   0.25,
+   -0.045
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/elephant/tripo-hand/elephant-color.webp"
+ },
+ "smooth": false,
+ "pawTurn": {
+  "L": 1,
+  "R": -1
+ },
+ "lids": {
+  "back": 135,
+  "psi": [
+   -40,
+   36
+  ],
+  "lam": [
+   -38,
+   50
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 110,
+  "srgb": [
+   153,
+   135,
+   125
+  ],
+  "uv": [
+   0.4382,
+   0.5777
+  ],
+  "density": 0.63
+ },
+ "noGloss": true,
+ "tailFlood": {
+  "z": -0.22,
+  "yMax": 0.37,
+  "startBack": true
+ },
+ "kneeRows": {
+  "reach": 0.04,
+  "radius": 0.09,
+  "band": 0.025
+ },
+ "noseFur": false,
+ "eyeFaces": "tools/blender/hand/elephant/eye-centers.json",
+ "rigFacts": {
+  "headFloor": 0.69
+ },
+ "faceRows": {
+  "y": 0.7
+ },
+ "hoofTurn": {
+  "ring": 0.344,
+  "steps": {
+   "L": 1,
+   "R": -1
+  }
+ },
+ "trunkRows": {
+  "y": 0.74,
+  "z": 0.11,
+  "tip": 0.6,
+  "full": 0.66
+ },
+ "earFlood": {
+  "x": 0.17,
+  "y": 0.655,
+  "full": 0.215
+ },
+ "hingeTurn": {
+  "L": 20,
+  "R": -20
+ }
+}
