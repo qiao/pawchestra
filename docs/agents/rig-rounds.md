@@ -34,7 +34,7 @@ references of `docs/reference/`.
 ```markdown
 # Brief: the <species> as the <role> of the app
 
-Start commit `<hash>`. <On `main`, or worktree `<path>` on branch `<branch>`>. Handoff
+Start commit `<hash>`. <Alone on `main`, or detached worktree `.claude/worktrees/<name>`>. Handoff
 `scratch/handoff-<round>.md`. Time box <minutes>. Read `<scratch>/rules-common.md`.
 
 ## Goal
@@ -55,8 +55,7 @@ Start commit `<hash>`. <On `main`, or worktree `<path>` on branch `<branch>`>. H
 <the range of each fallback result. Outside it, stop, and report the measures.>
 
 ## Report format
-Result. Numbers (| Measure | main | round |, and the gate table). Choices. Commits. Images
-(with the crop pairs). Open problems and the next step.
+The report of the common rules, with the gate table and the crop pairs.
 ```
 
 ## Rules of a round
@@ -85,17 +84,28 @@ brief asks for them (`AGENTS.md`, "Checks").
 
 ## Common rules of the agents
 
-Copy this list into `<scratch>/rules-common.md`.
+Each brief of a round needs these rules. Copy this list into `<scratch>/rules-common.md`.
 
-- Work where the brief says. Read `AGENTS.md` first. On `main`, give the start commit to each
+- Work where the brief says: alone on `main` in the main checkout, or in the detached worktree
+  `.claude/worktrees/<name>` from `main`. Read `AGENTS.md` first. Give the start commit to each
   `--base`.
-- Make very fine-grained Conventional Commits, and stage each path by its name.
+- Run each command in the foreground with a Bash timeout of 600000. A background command of a
+  subagent can fail to start.
+- Make very fine-grained Conventional Commits, and stage each path by its name. Add no
+  attribution line, such as `Co-Authored-By`.
+- Remove only named files. Never run `rm -rf`.
 - Use `perl -0pi -e` for a temporary edit, and the Edit tool for a lasting edit of code.
 - Never take ports 5173, 5190, or 4182. Stop each process that you start by its PID.
 - Do not edit the working tree while a tool builds the site.
 - No merge and no push. End with a clean tree and no rebase in progress.
+- At the end, run `tools/round-checks.sh scratch/<round>/checks`, with `--fast` when the app and
+  the UI do not change. Read the exit code of each line.
 - Ask no questions when the user is not available. Report each open choice.
-- Write all prose in ASD-STE100 Simplified Technical English. Keep the handoff file current.
+- Write all prose in ASD-STE100 Simplified Technical English, with no em dashes. Keep the handoff
+  file current.
+- The report gives the result, the numbers (| Measure | main | round |), the choices, the commit
+  hashes, the image paths, the lines of `round-checks.sh`, and the open problems with the next
+  step.
 
 ## Docs checklist
 
