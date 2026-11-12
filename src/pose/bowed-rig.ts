@@ -1499,37 +1499,62 @@ const HIPPO_HOLD = {
  * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.9
  * (`SpeciesParams.violinScale`) from 0.67 of its length.
  *
- * At rest, the right arm takes the rest of the shared violin hold (`restArms` of
- * {@link VIOLIN_HOLD}): it hangs out to the side until it clears the body, and the elbow bends
- * forward. The left upper arm hangs 49° forward and the left elbow bends 63°, so that the paw
- * holds the upright violin of 0.9 over the lap: with the 20° and 80° of the shared hold, the
- * lower end of the violin went 5.6 cm into the lap (`pnpm hold-fit violinist --scan`). The left
- * paw then turns 95° in the plane of its palm (`restPawTurnL`), so that the left forearm twists
- * 42° at rest (58° with 65°).
+ * At rest, the rabbit sits as a seated orchestra violinist (`docs/reference/string-technique.md`,
+ * section 2.9): the violin stands upright on the lap (`rest.axis` (0, 1, 0)), the left paw holds
+ * its neck, and the bow hangs from the right paw with the tip down. The left upper arm hangs 35°
+ * forward and the left elbow bends 80° (`restArms`), so that the elbow stays near the side: with
+ * the 49° and 63° of the first hold of this body, the arm reached forward and held the violin up
+ * in front of the chest. The left paw holds the neck at 0.5 of the fingerboard (`restPlace`), so
+ * that the lower end of the violin stands 1.1 cm above the lap: at 0.4, the lower end went into
+ * the lap, and at 0.6, it stood 3 cm above it (`pnpm hold-fit violinist --scan`). The paw lies
+ * 1.5 cm off the neck (`restGapL`), so that the violin stands nearer to the lap (1.4 cm above it
+ * with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the left
+ * forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over the
+ * 70° of the arm gate, and with 80°, the twist was 48°.
+ *
+ * The right upper arm hangs straight down at the side and the elbow bends 35° (`restArms`). The
+ * bow tip points down, forward, and a little out, (0.3, -0.8, -1), so that the tip rests near the
+ * right foot, 16 cm above the floor, and 37 cm from the music desk. The hair faces in and back,
+ * (-1, 0, 1), so that the right forearm twists 5° at rest and the paw bends 47° on it. The bow
+ * paw grips the stick across the palm, so a bow tip straight down twisted the right forearm by
+ * about 175°, and a tip more down, (0.2, -1, -0.7), put the frog end 2.8 cm into the forearm. With
+ * the first rest bow of this body, the tip pointed up, out, and forward, (0.7, 0.8, -0.6), and the
+ * bow stood up toward the desk like a pointer. In the lift and the lowering, the bow tip turns
+ * through the front and a little down, (0, -0.3, -1), with the hair down, and the grip moves 0.3 H
+ * out and 0.1 H to the front (`restBow.via`), so that the bow keeps at least 5 cm from the desk:
+ * with the via of the shoulder hold, the tip went into the desk. Each part of each arm then turns
+ * at most 42° in the moments of the violinist (assets/models/rabbit/README.md, "Arm twist").
  *
  * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
- * front (`liftReach`), so that the violin passes over the belly: with the move of the shoulder
- * hold, 0.15 H in, 0.15 H up, and 0.15 H to the front, the violin went 5.2 cm into the belly in a
- * lowering of `bach-bwv1050`. At rest, the bow tip points up, out, and forward, (0.7, 0.8, -0.6),
- * so that the bow lies beside the right knee: with the upright tip of the shoulder hold, (0.2, 1,
- * -0.1), the stick crossed the face in the view from the front right. The hair faces down and a
- * little out, (0.3, -0.1, -1), so that the right paw twists 42° on its forearm at rest and bends
- * 49° on it: with the hair of the shoulder hold, (0, 0, -1), the twist was 50°.
+ * front (`liftReach`), and the left elbow points out and down, (-1, -1.2, 0) (`liftPoleL`), so
+ * that the violin turns the short way: with the elbow of the shoulder hold, the violin left the
+ * short arc by 43° (`pnpm carry-check violinist`), and with this elbow by 29°. A move of the wrist
+ * further out to the left took the violin less deep into the head at the start of the lowering,
+ * but it left the short arc by up to 57°.
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
   playShift: [-0.054, -0.06, 0.185],
   playTurn: violinTurn(-20, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
+  rest: { ...SHOULDER_HOLD.rest, axis: [0, 1, 0] },
+  restPlace: 0.5,
   restArms: {
-    L: { forward: 49 * MathUtils.DEG2RAD, bend: 63 * MathUtils.DEG2RAD },
-    R: VIOLIN_HOLD.restArms.R,
+    L: { forward: 35 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
+    R: { forward: 0, bend: 35 * MathUtils.DEG2RAD },
   },
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
-  restPawTurnL: 95 * MathUtils.DEG2RAD,
+  restPawTurnL: 90 * MathUtils.DEG2RAD,
+  restGapL: 0.015,
   liftReach: [0, 0.3, -0.15],
-  restBow: { ...SHOULDER_HOLD.restBow, tip: [0.7, 0.8, -0.6], hair: [0.3, -0.1, -1] },
+  liftPoleL: [-1, -1.2, 0],
+  restBow: {
+    ...SHOULDER_HOLD.restBow,
+    tip: [0.3, -0.8, -1],
+    hair: [-1, 0, 1],
+    via: { tip: [0, -0.3, -1], hair: [0, -1, 0], reach: [0.3, 0, -0.1] },
+  },
 } as const satisfies BowedHold;
 
 /**
