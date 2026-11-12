@@ -209,6 +209,19 @@ const ROLES = {
     parts: { L: ['instrument'], R: ['bow'] },
     shafts: [],
   },
+  // The right paw of the dog around the stick of the bow at the frog, as a cellist holds the bow
+  // (string-technique 2.1).
+  cellist: {
+    sweep: 'cellist',
+    species: 'dog',
+    instrument: 'cello',
+    tube: stickOf,
+    paws: ['R'],
+    places: {},
+    placeAxes: 'chest',
+    parts: { L: ['instrument'], R: ['bow'] },
+    shafts: [],
+  },
 } as const satisfies Readonly<Record<string, RoleGrip>>;
 
 type GripRole = keyof typeof ROLES;
