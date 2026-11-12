@@ -74,6 +74,9 @@ const BODY_LOOPS = 2;
  *
  * - The polar bear: 16 open loops, the cuts to the two upper arms and the open loops of the source
  *   mesh and of its lids.
+ * - The beaver: 23 open loops, the cuts to the two upper arms, the 19 open loops of the Tripo
+ *   beaver (the 2 eye sockets, the top of the teeth, and the 16 whisker strips), and the edges of
+ *   the 2 lids.
  * - The bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet and of the
  *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
  * - The cat: 20 open loops, the cuts to the two upper arms and 18 open loops of the fourth Tripo
@@ -97,6 +100,7 @@ const BODY_LOOPS = 2;
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
+  ['assets/models/beaver/tripo-hand/beaver.rig.glb', 23],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 20],
   ['assets/models/dog/tripo-hand/dog.rig.glb', 7],
   ['assets/models/elephant/tripo-hand/elephant.rig.glb', 4],
@@ -360,14 +364,15 @@ function mouseBodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of the beaver mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link BEAVER_BODY_LOOPS}).
+ * The closed surface of the body of the beaver: {@link BODY_BONES} with a cap on each open loop
+ * ({@link BEAVER_BODY_LOOPS} of the beaver mesh, or the loops of {@link TRIPO_BODY_LOOPS} of the
+ * Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function beaverBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, BEAVER_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, BEAVER_BODY_LOOPS));
 }
 
 /**
