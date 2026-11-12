@@ -786,26 +786,29 @@ included. Its thighs spread 20° in the seated bind. Reason: with less spread, i
 covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail goes back
 over the back edge of the seat and hangs down behind the chair between the back posts (the key
 `bind_tail`), and it does not sway. Reason: a tail on the seat beside the haunch went through the
-seat or near a back post. The large tail of the Tripo fox hangs down to the floor behind the chair
-(`studio.tailBind`), and its build fills the 4 small holes of the source. Reason: the tail stood out
-stiffly in the air, and a hole on the waist showed the floor through the body.
-A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
-fox. It follows the route of the Tripo wolf (below): no point edit of its form, the colors and the
-eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of
-this body is its source FBX. It keeps the eyeballs of its mesh, because the map paints a full eye
-on each, and its tail has two bones. Its legs keep the length of the source, so its chair is
-lower. Its key `bind_belly` smooths the front of the trunk in the seated bind along the normals
-only, and unfolds the band where the raised thighs meet the belly. Reason: the source has shallow
-grooves on the chest and the belly, and the fold of the seat made a dark slit. The light of the
-app showed them as dark dents and bands on the cream belly. Its map tool moves each iris with its pupil as one decal on its ball, to the middle of the
-eye opening in a view from above the head, a little out (`tools/gaze_shift.py`). Each moved texel
-is a copy of a texel of the same ball. Reason: the source paints each iris at the inner side of
-its opening, and the foxes looked to the side and down in the play view and from the default
-camera. The candidate rabbit of the second Tripo mesh took the same route. Its successor keeps
-the iris place of its source ("Simple route"). Neither source paints a light in
-the eyes, so the fox eyes and the eyes of the second rabbit take the `eye` finish, and the eye light gives one small
-light in the upper part of each eye. Reason: with the finish `varnish` and no eye light, the fox
-eyes read as a dead stare. The candidate Tripo polar bear
+seat or near a back post. The large tail of the Tripo fox goes back over the back edge of the
+seat and hangs down behind the chair (`studio.tailBind`), and its rows start at the root loop of the
+tail on the back. Reason: with rows from the bone heat, the root of the tail counted as the body, the chair grew
+deeper, and the tail went into the seat.
+A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is the body of the red fox and the
+tan fox. It follows the route of the Tripo wolf (below): the colors and the eye paint of its source,
+the crease angle 180°, and only a scale to H. Reason: the look target of this body is its source
+FBX. Its source is the Tripo mesh with new front paws (`tools/blender/fox_paws.py`): each paw of
+three long digits goes past the wrist ring, and a palm with a pad and four short digits close
+together takes its place, in quad faces with the UVs of the dark paw fur. Reason: the three thick
+digits spread as a hand, and the paw was about two thirds of the shoulder distance long. A fox paw
+has four short digits of near equal length, with the middle two a little longer. It keeps the
+eyeballs of its mesh, because the map paints a full eye on each, with a light in each pupil. So the
+eyes take the finish `varnish` and no eye light, and the irises keep the place of the source. Its
+eyeballs and sockets are a little smaller and deeper than in the source, and the upper lids turn
+down a little. Reason: at the source size, the eye openings read too wide for the head
+(`assets/models/fox/README.md`, "Eyes"). A larger step made the eyes read sleepy. Its legs keep
+the length of the source, and its feet stay flat in the bind. Reason: a higher seat by a heel turn changes the sight pass of
+the layout (4.5) and moves most players of the demos. The candidate rabbit of the second Tripo mesh
+moves each iris to the middle of its opening (`tools/gaze_shift.py`), because its source paints the
+irises at the inner side, and the rabbit looked to the side and down. Its source paints no light in
+the eyes, so its eyes take the `eye` finish and the eye light. Its successor keeps the iris place of
+its source ("Simple route"). The candidate Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
