@@ -748,7 +748,8 @@ const PANDA_PLAY_TURN = toQuat(
  *
  * The middle of the right paw lies at the right side of the brace, so the right arm reaches a small
  * part of the slide travel of 0.41 m. A real seventh position is 0.57 m from the first position
- * (`docs/reference/wind-technique.md` 1.2), so the slide positions map into the reached travel.
+ * (`docs/reference/wind-technique.md` 1.2), so the slide positions map into the reached travel
+ * ({@link reachedShare}).
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trombonist
  * (`docs/reference/wind-technique.md` 1.1): it moves 0.057 H down and 0.065 H back from the mouth
@@ -1415,7 +1416,8 @@ export interface WindRig {
   readonly slideAxis: Vec3;
   /**
    * The part of the slide travel that the right arm reaches, in meters. The seventh position is
-   * out of reach of any probable arm, so the slide positions map into this travel (design 5.3).
+   * out of reach of any probable arm, so the slide positions map into this travel by a curve
+   * that spreads the near positions ({@link reachedShare}, design 5.3).
    */
   readonly slideReach: number;
 }
@@ -2276,6 +2278,21 @@ function turnedMouth(rig: Omit<WindRig, 'slideReach'>, yaw: number, bow: number)
   return mouth.add(turned).toArray(mouthTuple);
 }
 
+/**
+ * Gives the share of the reached slide travel ({@link WindRig.slideReach}) for a share of the
+ * full slide travel (design 5.3): `x (2 - x)`. The right arm reaches only a part of the travel, so
+ * with the share itself, the second position of the panda moved the slide 1.4 cm of 10 cm, and the
+ * slide did not show the notes. The curve keeps the first and the seventh positions and the order
+ * of all positions, and it doubles the move of the near positions: the second position then moves
+ * the slide 2.7 cm, the fourth 7.0 cm, and the fifth 8.6 cm.
+ *
+ * @param share The share of the full travel: 0 at the first position, 1 at the seventh.
+ * @returns The share of the reached travel, from 0 to 1.
+ */
+function reachedShare(share: number): number {
+  return share * (2 - share);
+}
+
 /** The posed place of each grip of a wind instrument and of the shoulder joint that reaches it. */
 interface WindGrip {
   /** The shoulder joint, at the start of the upper arm. */
@@ -2344,7 +2361,7 @@ export function poseWind(
 ): void {
   const chest = frames.chest;
   placeWind(rig, chest, weight);
-  slide.fromArray(rig.slideAxis).multiplyScalar(state.slide * rig.slideReach * weight);
+  slide.fromArray(rig.slideAxis).multiplyScalar(reachedShare(state.slide) * rig.slideReach * weight);
   const { hold } = rig;
   const { freeL } = rig;
   const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
