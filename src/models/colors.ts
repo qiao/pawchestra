@@ -69,6 +69,8 @@ export const INSTRUMENT_COLORS = {
   celloWood: srgb('#7e3f1f'),
   celloTop: srgb('#b8622e'),
   bridge: srgb('#e3c99a'),
+  /** The black rubber tip of the end pin of the cello and the contrabass. */
+  endPinRubber: srgb('#151312'),
   fingerboard: srgb('#1b1714'),
   bowStick: srgb('#3b2a20'),
   bowHair: srgb('#e8e2d4'),

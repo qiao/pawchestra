@@ -1092,6 +1092,85 @@ function inFrame(frame: Transform, local: Transform): Transform {
 }
 
 /**
+ * The end pin of the cello and the contrabass, in meters before the scale of the instrument, as a
+ * real end pin: a thin steel rod that ends in a round rubber tip, and the ebony end pin holder with
+ * a silver ring where the rod leaves the tail end. The tip touches the floor at the origin of the
+ * piece. At each ring of the tip, the height is at least 0.65 of the radius, so that no point of
+ * the tip goes below the floor at a lean of up to 33° from the vertical. The cello leans about 28°.
+ */
+const END_PIN = {
+  /** The radius of the rod: 4.5 mm on the cello of the app. */
+  rod: 0.0015,
+  /** The radius of the rubber tip: a ball of about 2.4 cm on the cello of the app. */
+  tip: 0.004,
+  /**
+   * The profile of the rubber tip along the rod, as (radius, height) in tip radii, from the point
+   * on the floor to the top of the tip.
+   */
+  tipProfile: [
+    [0, 0],
+    [0.5, 0.33],
+    [0.85, 0.62],
+    [1, 0.95],
+    [1, 1.3],
+    [0.72, 1.5],
+  ] satisfies readonly ProfilePoint[],
+  /** The radius of the holder at the ring and at the tail end, and its length outside the body. */
+  holder: [0.0036, 0.0052, 0.008],
+  /** The part of the end pin that the holder takes at most, for a short end pin. */
+  holderShare: 0.3,
+  /** The height of the silver ring at the bottom of the holder, and how far it stands out. */
+  ring: [0.0009, 0.0003],
+  /** The length of the holder inside the body, so that it has no gap to the tail end. */
+  inside: 0.004,
+} as const;
+
+/**
+ * Adds the end pin of a cello or a contrabass to a piece ({@link END_PIN}). The end pin runs along
+ * +y from its tip on the floor at the origin to the tail end. Each part has its own height band,
+ * so no two faces lie close together and face the same way.
+ *
+ * @param piece The piece that gets the parts.
+ * @param length The length of the end pin below the tail end, before the scale of the piece.
+ */
+function addEndPin(piece: PieceBuilder, length: number): void {
+  const e = END_PIN;
+  const tip = e.tipProfile.map(([r, y]): ProfilePoint => [r * e.tip, y * e.tip]);
+  const tipTop = tip.at(-1)?.[1] ?? 0;
+  const [ringRadius, bodyRadius, longest] = e.holder;
+  const holder = Math.min(longest, e.holderShare * length);
+  const [ringHeight, ringOut] = e.ring;
+  const ringBottom = length - holder;
+  const ringTop = ringBottom + ringHeight;
+  piece.add(lathe(tip, 8), INSTRUMENT_COLORS.endPinRubber, transform(), 'varnish');
+  piece.add(
+    cylinder(e.rod, e.rod, ringBottom + 0.001 - tipTop * 0.8, 6),
+    INSTRUMENT_COLORS.silver,
+    transform([0, tipTop * 0.8, 0]),
+    'metal',
+  );
+  piece.add(
+    cylinder(ringRadius + ringOut, ringRadius + ringOut, ringHeight, 8),
+    INSTRUMENT_COLORS.silver,
+    transform([0, ringBottom, 0]),
+    'metal',
+  );
+  piece.add(
+    lathe(
+      [
+        [ringRadius, ringTop],
+        [bodyRadius, length],
+        [bodyRadius, length + e.inside],
+      ],
+      8,
+    ),
+    INSTRUMENT_COLORS.fingerboard,
+    transform(),
+    'varnish',
+  );
+}
+
+/**
  * Adds the machine heads of the contrabass to a piece: a brass plate on each side of the pegbox,
  * with two keys.
  *
@@ -1575,9 +1654,7 @@ export function buildBowedString(
   addViolinParts(piece, frame, id === 'viola' ? 'violin' : id);
   addLayoutSpace(piece, frame, upright);
   if (upright) {
-    // The end pin, from its sharp tip on the floor up to the tail end. A blunt tip on the slanted
-    // pin went 4 mm into the floor.
-    piece.add(cylinder(0, 0.003, pin / s, 5), INSTRUMENT_COLORS.fingerboard, transform([0, 0, 0]));
+    addEndPin(piece, pin / s);
     piece.footprint(cylinder(0, 0.003, pin / s, 5), transform([0, 0, 0]));
   }
   const at = (p: Vec3): Vec3 => toVec3(new Vector3(...applyTransform(frame, p)).multiplyScalar(s));
