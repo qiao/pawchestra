@@ -134,6 +134,9 @@ The app follows these facts:
 - **The place (section 2).** The base stands in front of the deer, and the top of the soundbox
   rests on the front of the right shoulder, near the neck. The harp is diagonal to the deer, with
   the column at the front left (`HARP_PLACE.turn`).
+- **The knees (section 2).** The harp stands between the knees. The left hoof rests to the left of
+  the base, behind the foot of the soundbox, with the knee out and forward (`LEG_RESTS` of
+  `src/pose/harp-feet.ts`).
 - **The trunk (section 2).** The spine stays erect (`HANDS_HOLDS.harp.lean`). A lean forward
   brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
@@ -177,8 +180,6 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The knees (section 2).** The base stands in front of the knees, and between them only in the
-  front view.
 - **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
   model leans toward the player, and a tilt back puts the forearms of the deer into its body.
 - **The reach (section 3).** The arms of the deer are short, so the base stands near the stool,
