@@ -60,34 +60,32 @@ that stay on. Each other check of this module runs on request.
 ## Where to work
 
 An agent that works alone commits on `main` in the main checkout, so that each commit shows at once
-in the running app. It needs no merge, and it pushes nothing. An agent uses its own branch and
-worktree only when another agent works on the repository at the same time. Then these rules hold:
+in the running app. It needs no merge, and it pushes nothing. An agent uses its own worktree only
+when another agent works on the repository at the same time. Then these rules hold:
 
-- At the start, check the base of your worktree. A new worktree can start at an old `origin/main`.
-  When `git merge-base HEAD main` differs from `git rev-parse main`, run `git reset --hard main`
-  before your first change.
-- Give the start commit of your branch to each `--base` option. The other agent commits on `main`
+- The manager makes the worktree with `git worktree add --detach .claude/worktrees/<name> main`.
+  At the start, check its base. When `git merge-base HEAD main` differs from `git rev-parse main`,
+  run `git reset --hard main` before your first change.
+- Give the start commit of your worktree to each `--base` option. The other agent commits on `main`
   during your round, so `--base main` also shows its changes as false differences.
 - Stage each path by its name: `git add <path>`. `git add -A` and `git add .` also stage the files
   of the other agents.
-- Merge a branch with `tools/merge-branch.sh <branch> [worktree]`. It rebases, checks each commit,
-  and stops at the first failure. The arm gate runs only with `--arm-check`. Run
-  `git merge --ff-only` only in a script with `set -euo pipefail`, because a pipe such as `| tail`
-  hides a failed merge.
-- A rebase is finished when the folder `$(git rev-parse --git-path rebase-merge)` does not exist.
-- Let the agent that wrote a branch do a long rebase, because it knows the intent of each commit.
-- A rebase with `--exec` runs in the tree of each commit, which has an old copy of a script or
-  none. Copy a script of the branch to a temporary path first.
-- After a merge or a rebase, make each generated file again with its tool. Do not merge its
-  conflict lines by hand. A fitted table, such as `DEMO_LOUDNESS` (`pnpm loudness --fit --write`),
-  is such a file. Make its commit the last code commit of the branch, after a rebase on `main`,
-  because a new demo on `main` needs a fit too.
+- The manager merges a round with `tools/merge-worktree.sh <name>` from the main checkout. Its head
+  comment gives the steps. It stops before the cherry-pick when the main checkout has an
+  uncommitted edit of a file that the commits touch: wait, and run it again.
+- Never merge a conflict in a generated file by hand. The merge script writes a studio module or
+  `src/models/studio-heights.ts` again. Write a fitted table, such as `DEMO_LOUDNESS`
+  (`pnpm loudness --fit --write`), again with its tool after the merge.
+- Merge a conflict in `TODO.md` by hand, because `git checkout --theirs TODO.md` drops the newer
+  lines of `main`. Then finish the cherry-pick, and run the merge script with `--resume`.
+- Git ignores `scratch/` and `reports/`, so `git worktree remove --force` deletes them. The merge
+  script copies them first. Do the same before a remove by hand.
 
 In both cases:
 
-- After an app or UI change, run `pnpm test:e2e e2e/smoke.e2e.ts --project=chromium` with
-  `PAWCHESTRA_E2E_PORT` set to a free port, because the merge script and other agents use port
-  4182. On request, a change of `src/ui/` runs `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
+- At the end of a round, run `tools/round-checks.sh`, with `--fast` when the app and the UI do not
+  change, and read the exit code of each line. On request, a change of `src/ui/` runs
+  `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
   tree that pass on the base. It runs Firefox and WebKit too only when it changes code that one
   browser alone uses, because the three browsers gave the same result for the other UI changes. A
   failure is a fault of the change only when the same test passes on the base.
@@ -205,9 +203,9 @@ These traps make a task of the main thread long:
 ## Report images
 
 Write the images of a report into `reports/<date>-<topic>/` of your checkout. Git ignores this
-folder, and the manager reads the images there before the merge. `tools/merge-branch.sh` copies
-the folder into the main checkout before it removes the worktree, and the try files of
-`scratch/` into `scratch/merged/<branch>/`. Commit no report image. The hook
+folder, and the manager reads the images there before the merge. `tools/merge-worktree.sh` copies
+the folder and `scratch/` into the main checkout before it removes the worktree. Commit no report
+image. The hook
 `tools/git-hooks/pre-commit` stops a commit that adds an image or a video outside the folders of
 the product images, such as `src/`, `public/`, and `docs/reference/`, because report images made
 most of the size of the git history.

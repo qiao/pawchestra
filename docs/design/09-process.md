@@ -29,8 +29,8 @@ GitHub Actions runs these checks:
   SwiftShader make the keyboard check fail, and the frame target needs the GPU of the development
   Mac, so both checks stay local.
 - While all tests are paused (9.3), the step `pnpm test:perf` and the job `playwright` have
-  `if: false`. To end the pause, set `ALL_TESTS_PAUSED` of `vite.config.ts` to false, set the
-  default of `MERGE_E2E` in `tools/merge-branch.sh` to 1, and remove each `if: false`. Then run
+  `if: false`. To end the pause, set `ALL_TESTS_PAUSED` of `vite.config.ts` to false, add
+  `pnpm test` and `pnpm test:e2e` to `tools/round-checks.sh`, and remove each `if: false`. Then run
   `pnpm test`, `pnpm test:perf`, and `pnpm test:e2e` before the next merge.
 
 `pnpm deploy:vercel` builds the site at the base path `/` with Vercel Web Analytics (2.7), and
@@ -147,11 +147,9 @@ The development Mac is an Apple M1 Max with Chrome.
 
 No round gets a review agent. The manager reviews each round from the report and the images, and
 the project owner judges the look from the images. The implementation agent or a fix agent makes
-each requested change as a commit on the same branch. `tools/merge-branch.sh` runs the checks of
-each commit, the build, and the size. `AGENTS.md` ("Checks") lists the gates that stay on. Each
-other gate, such as the arm gate (`pnpm arm-check`, 4.4), runs on request. Then
-`tools/merge-branch.sh --arm-check` runs the arm gate for a change of `src/pose/`, `src/models/`,
-or `tools/blender/`.
+each requested change as a commit in the same worktree. `tools/merge-worktree.sh` merges the
+round and runs the end checks of `tools/round-checks.sh`. `AGENTS.md` ("Checks") lists the gates
+that stay on. Each other gate, such as the arm gate (`pnpm arm-check`, 4.4), runs on request.
 
 When the manager asks at the end of a step or a round of the look, take the images at 1440 × 900
 and at 390 × 844 (`pnpm screenshots`, `pnpm close-views`, `docs/agents/commands.md`). Each close
