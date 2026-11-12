@@ -924,7 +924,9 @@ swing. A paused song keeps the swing of its time, as a film camera sees a string
   strings (5.5).
 
 **Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it after the
-note (`CHOIR_MOTION`). As a real singer opens the mouth for the vowel, the beak starts to open just
+note (`CHOIR_MOTION`). The lower beak turns at the back of the gape, so a small angle
+(`CHOIR_MOTION.jaw`) opens a long gape, as a singing bird does. A wide angle hung the long lower
+beak down as a hinge. As a real singer opens the mouth for the vowel, the beak starts to open just
 before the voice, and the opening goes on a little after the note start (`openShare`). The jaw opens
 at most at `openRate` and closes at most at the faster `closeRate`, so no frame step snaps. In a
 rest, the beak closes fully when the rest gives the time, and else as far as it can before it opens
