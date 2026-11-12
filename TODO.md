@@ -120,11 +120,18 @@ passes.
 - [ ] Rhino tubist: with a tuba of about 10 kg, the center of mass lies at the front end of the
       stable range of the soles. A small lean of the trunk back is an option.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
-- [ ] Deer harpist: the left paw goes 3.4 cm into the chest at a high note of the left hand, and
-      the forearms 2.5 cm into the body (old deer: 1.0 cm and 0.8 cm, `pnpm pose-depth harpist`).
-      Check both in 2x crops in the app.
-- [ ] Deer harpist: the right upper arm goes 2.2 cm to 3.0 cm into the root of the arm, also at
-      rest (old deer: 0.8 cm to 1.6 cm). Check the right shoulder in 2x crops.
+- [ ] Deer harpist: the high left palm (`highL`) and the damp with no press of 2026-11-12 keep each
+      paw at most 1.4 cm in the body. Check the high left notes in 2x crops in the app.
+- [ ] Deer harpist: the right upper arm rests on the soundbox in 39 % of the play samples (at most
+      2.1 cm, 1.6 cm at rest). The left paw swing p95 is 69 (limit 70).
+- [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
+      close snaps 31° to 45° in one step.
+- [ ] Deer harpist: the left hoof goes 2.8 cm into the harp base at rest and 3.7 cm in a pedal
+      move, and the left shin 2.0 cm into the stool edge (1.5 % of the samples). The heel lift
+      fixed the right side only.
+- [ ] Deer: dark facet patches on the tail tip and the back of the left shoulder in the hall light.
+      The color map has no dark texel there (`reports/2026-11-12-afix/deer/m4-patches/`), so the
+      cause is the shading of flat faces that face away from the key. Four tail faces are flipped.
 - [ ] Deer harpist: the left hand plays only up to D4 (`reach.leftHighest`), because the near harp
       puts the higher strings near the chest. A harpist plays up to about C5 with the left hand.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
