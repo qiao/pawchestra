@@ -797,11 +797,15 @@ passes.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
-- [ ] Tripo beagle candidate: the right paw twists 65° on its forearm at rest (`pnpm arm-check
+- [ ] Tripo beagle candidate: the right paw twists 66° on its forearm at rest (`pnpm arm-check
       cellist`, paw twist p95), 92° before the rest grip of `f5031198e`. No rest grip, rest
       elbow, or bow turn of the scan took it to 45° or less. In one lowering at the end of
       `boulanger-matin` (280.67 s), the right paw turns 3,818°/s (limit 3,000). Check the bow
       wrist at rest and that lowering in the app.
+- [ ] Tripo beagle bow hand (4.4, 5.3): the stick lies under the curled finger tips, 5 cm from
+      the middle of the closed paw (`pnpm wind-grip cellist`). A curl of 105° puts it through
+      the middle of the paw, but 20 faces of the right knuckles fold. Weights or a ring at the
+      knuckles of `tools/mesh-rigs/dog.json` that bend without a fold allow that curl.
 - [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
       12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
 - [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
