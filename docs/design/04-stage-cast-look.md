@@ -881,7 +881,16 @@ paws turn by whole steps of one closed wrist ring, as the hooves of the pig, and
 turns, so that each part of each arm takes at most 45° in the moments of the timpanist. Its
 trunk, tusks, and lips take the head bone and a share of the neck bone toward the tip of the
 trunk, and its large ears take the ear bones and the head bone alone. Reason: bone heat gave the
-trunk shares of the chest, and the low ear lobes shares of the shoulders. The paws of the fox turn about the
+trunk shares of the chest, and the low ear lobes shares of the shoulders. The Tripo beaver (`assets/models/beaver/tripo-hand/`) is the body of the bassoonist, by the same rules. Its
+eyeballs, its teeth, and its whisker strips stay, and the eyes take the finish `varnish` and a
+blink lid. It has no chair, and its bind keeps the legs, the trunk, and the flat tail of the source,
+so it stands on its short legs with the tail on the floor behind it. Its one form edit relaxes the
+small folds of the source surface (`fold_relax()` of its build). Reason: the FBX viewer shades
+them with the custom normals of the file, but the app makes its normals from the form, and the
+folds showed as dark triangles on the back and the cheeks. Its paws and elbow axes turn so that
+each part of each arm takes at most 45° in the moments of the bassoonist. Its arms are short, so
+it plays a smaller bassoon, and its hold turns both shoulders forward and the boot joint up toward
+the right shoulder (`BEAVER_BASSOON`, 5.3). The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
