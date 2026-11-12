@@ -580,7 +580,8 @@ for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
 | `headShift` | The custom property `headShift` of the armature, in the studio axes. `pnpm studio-body` adds it to the head center of the holds. A nose that goes from the slot `gloss` to the slot `fur` moves the head box forward, so the Tripo wolf, beagle, and cat set it, and no hold moves. |
-| `headFactor`, `neckFactor`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
+| `headFactor` | The custom property `headFactor` of the armature. A hand rig that scales the head about the neck joint by the head weights, as the Tripo beagle, sets it, and `pnpm studio-body` measures H and the head center before the factor, so no hold moves. |
+| `neckFactor`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
 
 The layout of the `.blend`:
 
@@ -809,14 +810,18 @@ steps, so that each part of each arm takes at most about 45° in the moments of 
 candidate Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the same rules, and it
 scales to a larger H than the dog of main (`metersPerUnit` of its config). Reason: the beagle sits
 beside the Tripo cat of the violas, and it must read a little larger. The top of its head stands
-about 1.1 times as high as the top of the head of the cat, seated and standing (the ears of the
+a little higher than the top of the head of the cat, seated and standing (the ears of the
 cat do not count, because the ears of the beagle hang). Its source has eyeballs with painted
 irises and lights, so the eyeballs stay, with the finish `varnish` and a blink lid. Its short legs
-give a lower chair. Its front paws are the one exception to the form of the source: the point edit
+give a lower chair. Its front paws are the first exception to the form of the source: the point edit
 `paw` of its build makes each paw shorter and narrower past the wrist joint (the values are in its
 README). Reason: the arms are short and the head is large, so the paws of the source read too large
 in the app, and against the width of the trunk they were much larger than the paws of the dog of
-main.
+main. Its head is the second exception: after the weights, its build makes the head, the ears, the
+eyes, and the muzzle smaller about the neck joint, with the head weight as the share, and its lids
+fit the scaled eyes. The armature keeps the factor (`headFactor`), so H and the holds do not
+change. Reason: against the width of the trunk, the head read too large, and larger than the head
+of the Tripo cat.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
 candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
