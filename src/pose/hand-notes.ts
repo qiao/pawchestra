@@ -9,7 +9,10 @@ import type { FingerCloses, HarpFingering } from './harp-fingering.ts';
 
 /** The times and the sizes of the hand motion of the piano and the harp (design 5.3). */
 export const HAND_MOTION = {
-  /** A hand moves to its next key or string in at most this time. */
+  /**
+   * A hand moves to its next key or string in at most this time. A harp hand takes more time for a
+   * long move ({@link HAND_MOTION.placeSpeed}).
+   */
   moveSec: 0.15,
   /** A piano hand moves in at most this part of the gap, and stays on its keys for the rest. */
   strikeMove: 0.6,
@@ -97,6 +100,17 @@ export const HAND_MOTION = {
    * its next pluck, in seconds: the flat palm goes onto the strings (section 7.6).
    */
   dampRestSec: 1.2,
+  /**
+   * The mean speed of the palm of a harp hand in a move to a new group, in meters per second. A
+   * longer move takes more time than {@link HAND_MOTION.moveSec}, as the hand of a harpist travels
+   * on a smooth, bell-shaped path between two places (`docs/reference/harp-technique.md` section
+   * 7.8). A move that has less time after the pluck before starts at that pluck. With 0.15 s for
+   * each move, the right paw of the fawn went 11.6 cm from its first place to B5 and B6 in 0.08 s,
+   * and the right forearm turned 34° in one frame at 30 frames per second. Over
+   * `boulanger-matin`, 32 frames turned an arm more than 15°, and with this speed 14
+   * (`scratch/harp2/burst.ts`).
+   */
+  placeSpeed: 0.5,
   /** The time that the flat palm stays on the strings in a damp, in seconds. */
   dampSec: 0.5,
   /** The time in which the palm goes onto the strings, and off them, in seconds. */
@@ -708,7 +722,15 @@ export function buildHandTrack(
     return Math.min(late, Math.max(before.start, end - Math.max(pass, leap)));
   });
   // A piano hand lifts less for a near note. A harp hand pulls less inside a group.
-  const harp = fingering ? harpPlacing(notes, fingering, rests, pluckTimes) : null;
+  const harp = fingering
+    ? harpPlacing(
+        notes,
+        fingering,
+        rests,
+        pluckTimes,
+        notes.map((_, i) => moveLength(points, first, i)),
+      )
+    : null;
   const share = (i: number): number =>
     harp ? (harp.pulls[i] ?? 1) : plucks ? 1 : Math.min(1, gapBefore(i) / m.liftGapSec);
   return {
@@ -747,11 +769,15 @@ interface HarpPlacing {
  * not change, so the hand stays still, and each pluck pulls it only a little
  * ({@link HAND_MOTION.groupPull}). After the last note before a long rest, the flat palm damps the
  * strings ({@link HAND_MOTION.dampRestSec}), and the hand places the next group after the damp.
+ * A move to a new group takes the time of its length at {@link HAND_MOTION.placeSpeed}. The first
+ * group places that time before its first pluck. A move with less time after the pluck before
+ * starts at the last pluck of the note before, so the hand arrives before the first pluck.
  *
  * @param notes The notes of the hand, sorted by start.
  * @param fingering The fingering of the hand.
  * @param rests The rest of the finger on its string before each pluck, in seconds.
  * @param pluckTimes The time of the pluck of each note, in seconds.
+ * @param lengths The length of the move of the palm to each note, in meters.
  * @returns The moves, the pulls, the rolls, and the damps.
  */
 function harpPlacing(
@@ -759,6 +785,7 @@ function harpPlacing(
   fingering: HarpFingering,
   rests: readonly number[],
   pluckTimes: Float64Array,
+  lengths: readonly number[],
 ): HarpPlacing {
   const m = HAND_MOTION;
   const { first, plucks, groups, places } = fingering;
@@ -804,9 +831,14 @@ function harpPlacing(
     const dampTo = i > 0 ? (damps[2 * i - 1] ?? 0) : 0;
     const damped = dampTo > dampFrom ? dampTo + m.dampMoveSec : -Infinity;
     const place = startsGroup ? (places[group] ?? end) : before;
-    const start = Math.min(end, Math.max(place, damped, lastStart));
+    // A long move takes more time. With too little time after the place, it starts earlier, at
+    // the earliest at the last pluck of the note before, which is its start.
+    const time = Math.max(m.moveSec, (lengths[i] ?? 0) / m.placeSpeed);
+    const earliest = i > 0 ? (notes[i - 1]?.start ?? 0) : -Infinity;
+    const early = startsGroup ? Math.max(earliest, Math.min(place, end - time)) : place;
+    const start = Math.min(end, Math.max(early, damped, lastStart));
     moveStarts[i] = start;
-    moveEnds[i] = Math.max(start, Math.min(start + m.moveSec, end));
+    moveEnds[i] = Math.max(start, Math.min(start + time, end));
     lastStart = start;
     pulls[i] = groups[i + 1] === group ? m.groupPull : 1;
   }
