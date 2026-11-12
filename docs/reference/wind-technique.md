@@ -489,9 +489,10 @@ The app follows these facts:
   head. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
   free arms stay out of the belly (design 5.3).
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body. The
-  horn lies across the body, with the bell at the right of the torso, open to the back, off the
-  leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The right paw comes down into
-  the bell from above. The mouthpiece rests on the lips under the snout disc, at the mouth line of
+  horn lies across the body, with the bell at the right of the torso, open to the back and to the
+  right, past the side of the body, off the leg, and the mouthpiece slopes down (`HORN_TURN`,
+  `PIG_TURNS`). The right hoof comes down into the mouth of the bell from the side, and lies across
+  the mouth inside the rim (`gripShiftR`). The mouthpiece rests on the lips under the snout disc, at the mouth line of
   the body (`mouthHeight`, design 4.4), and its rim presses the upper lip most. The coil stands in
   front of the round belly, with a gap. The Tripo pig has short arms, so the coil turns 30° back
   toward the body, and at rest the horn stays near the belly over the lap, in reach of both
@@ -500,10 +501,11 @@ The app follows these facts:
 - **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
   them. The left elbow points out to the side, and the left shoulder turns 46° forward (`poleL`,
   `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
-  5.3). The left paw holds the valves at the grip of the horn. At rest, the left grip moves a
+  5.3). The right elbow points out to the side and a little up (`poleR`), and the upper part of
+  the right arm stays near the side of the torso, as Weidner describes. The left paw holds the valves at the grip of the horn. At rest, the left grip moves a
   little toward the mouthpiece and away from the left shoulder (`restGripShiftL`), and the right
-  elbow points out, down, and forward (`restPoleR`), so that the left wrist and the round right
-  forearm stay off the horn.
+  elbow points out and forward (`restPoleR`), so that the left wrist and the round right forearm
+  stay off the horn.
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
   holds the trumpet around the upright casings (`faceTube`). The right palm lies above the valves
   and faces down. The trumpet points down, straight ahead (`trumpet()` of
@@ -564,9 +566,10 @@ The app does not follow these facts:
   elbows: each elbow points as far out as the paw keeps its grip. No source gives the rest: the
   bassoon moves down off the mouth, with its top below the mouth and both paws on their grips
   (`BEAVER_REST`, `restShift`).
-- **The right hand in the horn (2.2).** The right paw stays on the axis of the bell, inside its
-  opening (`HORN_PALM_DEPTH`), in place of against the bell wall at 2 o'clock. A deeper paw puts
-  the wrist through the bell wall.
+- **The right hand in the horn (2.2).** The right hoof lies across the mouth of the bell, near its
+  axis and inside the rim (`HORN_PALM_DEPTH`, `gripShiftR`), in place of deep in the bell against
+  the wall at 2 o'clock. The hoof is long and thick, and the throat is narrow: a deeper hoof goes
+  through the wall of the throat.
 - **The horn elbows (2.2).** Tuckwell keeps the elbows near the body. The long snout puts the
   valves far in front of the chest, and with the left elbow down and in, the round left arm goes
   into the belly.
