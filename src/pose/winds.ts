@@ -1068,16 +1068,21 @@ const WOLF_CLARINET_FORWARD = 10;
  * image, and a render of the app from the camera of the images shows 30° as 25°.
  *
  * Each paw closes around the body of the clarinet from the side of its own shoulder, as a
- * clarinetist curves the fingers over the tube with the thumb behind it. Each palm faces the tube
- * (`faceTube`), the fingers curl 115° over its front (`gripCurl`), and each paw aims across the
- * tube (`aimAcross`) and half toward the side across it (`aimSide`). Each grip moves toward the
- * axis and to the side of its own shoulder (`gripShiftL`, `gripShiftR`): the left grip 0.06 H
- * toward the axis and 0.11 H across it, the right grip 0.11 H toward the axis and 0.11 H across
- * it. On the Tripo wolf, the grips 0.14 H and 0.19 H toward the axis and a side aim of a quarter
- * put each paw half behind the tube, 45° from the palm to the tube, with the finger tips 2.2 cm
- * to 2.6 cm off it, so no paw grasps the tube. The left grip moves 0.15 H down the tube, because
- * 8.5 cm above the shoulder joint, the forearm rises steeply and the retarget turns the paw up
- * along the tube (`PAW_TURN` of `models/studio-rig.ts`).
+ * clarinetist curves the fingers over the tube with the thumb behind it: the left paw on the upper
+ * joint and the right paw on the lower joint, below the thumb rest. Each palm faces the tube
+ * (`faceTube`), the left fingers curl 115° and the right fingers 105° over its front (`gripCurl`),
+ * and each paw aims across the tube (`aimAcross`) and half toward the side across it (`aimSide`).
+ * With the smaller paws of the Tripo wolf (`assets/models/wolf/README.md`, "Paw size") and a curl
+ * of 115°, the right finger tips stood 0.8 cm off the tube in the notes that open the right keys,
+ * so the right paw grasped the tube in 79% of the play samples (`pnpm wind-grip clarinetist`). With
+ * 105°, it grasps in each sample, and with 125° and more, the tips curl past the tube. Each grip
+ * moves toward the axis and to the side of its own shoulder (`gripShiftL`, `gripShiftR`): the left
+ * grip 0.06 H toward the axis and 0.11 H across it, the right grip 0.11 H toward the axis and 0.11
+ * H across it. On the Tripo wolf, the grips 0.14 H and 0.19 H toward the axis and a side aim of a
+ * quarter put each paw half behind the tube, 45° from the palm to the tube, with the finger tips
+ * 2.2 cm to 2.6 cm off it, so no paw grasps the tube. The left grip moves 0.15 H down the tube,
+ * because 8.5 cm above the shoulder joint, the forearm rises steeply and the retarget turns the paw
+ * up along the tube (`PAW_TURN` of `models/studio-rig.ts`).
  *
  * The muzzle puts the tip of the nose in front of the mouth, so the mouthpiece sits 0.1 H lower and
  * 0.21 H further back than the mouth of the bind pose (`lipShift`), at the dark lips under the
@@ -1122,6 +1127,7 @@ const WOLF_CLARINET = {
   gripShiftR: [0.05, 0.11, -0.11],
   restGripShiftR: [-0.4, 0.11, -0.11],
   lipShift: [0, -0.1, 0.21],
+  gripCurl: curls(115, 105),
   play: holdTurn(WOLF_CLARINET_FORWARD, 0),
 } as const satisfies WindHold;
 
