@@ -1,177 +1,27 @@
 # Pig model
 
-This folder holds the source mesh of the old pig, a copy with new upper arms, a copy with rebuilt
-arms and its weights, a copy with moved arm roots and its weights, a copy with no folds at the arm
-roots, and the rigged copy. The app does not serve these files. It loads the module
-`src/models/studio/pig.ts`, which the hand rig of the Tripo pig now writes ("Tripo hand rig"
-below). Before that hand rig, this chain wrote it:
+This folder holds the Tripo P2 source mesh of the pig (`tripo-p2/`) and its hand rig
+(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/studio/pig.ts`,
+which this chain writes:
 
 ```text
-pig.glb                           source mesh
-   │  tools/blender/pig_arms.py   new upper arms
+tripo-p2/pig.fbx             source mesh with quad faces
+   │  pnpm hand-chain pig    chain tools/blender/hand/pig/
    v
-pig-upper.glb                     `armSource` of tools/mesh-rigs/pig.json
-   │  tools/blender/arm_rebuild.py rebuilt arms and painted weights
+tripo-hand/pig.blend         hand rig (design 4.4, "Hand rig")
+   │  pnpm rig-export pig    the same run
    v
-pig-arms.glb + pig-weights.json
-   │  tools/blender/pig_root.py   hidden arm roots moved toward the trunk wall or the joint
+tripo-hand/pig.rig.glb       rigged mesh, with its summary pig.rig.json
+   │  pnpm studio-body pig   the same run
    v
-pig-root.glb + pig-root-weights.json   `paintedWeights` of tools/mesh-rigs/pig.json
-   │  point edits in Blender      no folds at the arm roots (pig-root-pit.json)
-   v
-pig-root-pit.glb                  `source` of tools/mesh-rigs/pig.json
-   │  pnpm rig-mesh pig
-   v
-pig.rig.glb                       rigged mesh
-   │  pnpm studio-body pig
-   v
-src/models/studio/pig.ts          studio body of the app
+src/models/studio/pig.ts     studio body of the app
 ```
 
-`docs/agents/rigging.md` gives the steps of the chain.
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
+gives the files, their sources, their licenses, and their checksums.
 
-## Files
-
-| File | Origin | Rebuild |
-|---|---|---|
-| `pig.glb` | Source mesh (below) | None |
-| `pig-upper.glb` | Copy of `pig.glb` with new upper arms. License as `pig.glb` | `pig_arms.py` (below) |
-| `pig-arms.glb` | `pig-upper.glb` with rebuilt arms 1.5 times as long. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/arm_rebuild.py -- pig --factor 1.5` |
-| `pig-weights.json` | Weights of the same Blender run. License as `pig.glb` | The same run |
-| `pig-root.glb` | `pig-arms.glb` with moved vertices of the hidden arm roots. License as `pig.glb` | `blender -b --factory-startup -P tools/blender/pig_root.py` |
-| `pig-root-weights.json` | `pig-weights.json` at the places of `pig-root.glb`. License as `pig.glb` | The same run |
-| `pig-root-pit.glb` | Copy of `pig-root.glb` with no folds at the arm roots. License as `pig.glb` | None: point edits in Blender (below) |
-| `pig-root-pit.json` | The list of the edits of `pig-root-pit.glb`. License as `pig.glb` | None |
-| `pig.rig.glb` | Output of the rig. License as `pig.glb` | `pnpm rig-mesh pig` |
-
-## pig.glb
-
-| Item | Value |
-|---|---|
-| Size | 16,013,332 bytes |
-| SHA-256 | `29f481d42e3f4ac0f188449dca42d49302b724e2c28271bd6cbc27bcd11cf1ae` |
-| Origin | Generated with Meshy by the project author on a paid plan. The author holds the rights |
-| License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Writer | Khronos glTF Blender I/O v4.3.47 |
-| Contents | One node `output_unwrapped` with one mesh of one primitive: 3,118 triangles and 4,226 vertices with POSITION, NORMAL, TEXCOORD_0, and indices. No skin and no animation |
-| Material | One material `BakedMaterial`, double-sided, with a base color texture and a metallic-roughness texture, each a PNG |
-
-The values below are in the units of the studio: 1 unit from the soles to the tips of the ears,
-the soles at y = 0, +z forward, and +x the left side of the animal. The mesh faces +z. The weld is
-at 1e-5.
-
-- The weld gives 1,559 vertices in one closed part, with no open edge and no edge with more than
-  two faces. 230 faces have a corner angle below 10°.
-- The box is x -0.300 to 0.298, y 0 to 1, and z -0.256 to 0.255. The pig is 1.9027 units of the
-  file high from the soles to the tips of the ears. The top of the skull is at y 0.948.
-- The pig stands upright on short legs, with the crotch at y 0.145 and dark hooves. The round
-  belly goes forward to z 0.246.
-- The short arms hang down, out, and forward. They are apart from the body from x 0.17 out, with
-  the dark hooves at y 0.35 to 0.40.
-- The pink snout disc is at the front of the head (z 0.255 at y 0.79). The eyes are dark faces of
-  the head surface at y 0.83 to 0.86 and z 0.12 to 0.15, with no shells.
-- The ears go from y 0.87 to 1.0 at x ±0.08 to ±0.23, with the tips folded forward. The small
-  curled tail is at y 0.26 to 0.33 and z -0.19 to -0.26.
-
-## pig-upper.glb
-
-| Item | Value |
-|---|---|
-| Size | 16,002,492 bytes |
-| SHA-256 | `6ab329a042084d08ab779d14aae359dc41e1e02512dfb80a95a255f7075942be` |
-| Writer | Khronos glTF Blender I/O of Blender 5.2.2, from an import of `pig.glb` |
-| Contents | One mesh of 3,162 triangles in one closed part, with the texture of `pig.glb` |
-
-The source has no upper arm of its own. Above the elbow, the arm is a bulge of the trunk wall, and
-the arm is a separate loop only from the elbow down. For each side, the script does these steps:
-
-1. It cuts the arm at a plane just below the elbow.
-2. It removes the 93 to 95 faces of the bulge and fills the wall with a fan.
-3. It builds a round tube of two rings of 10 edges from the loop of the cut to a closed dome around
-   the shoulder joint.
-4. It moves the middle of the fan, the rim of the hole, and two rings of the trunk around the rim
-   toward the mean of their neighbors, in 12 rounds. Thus the wall is smooth, with no star of
-   spikes at the top of the shoulder.
-
-The dome of the right tube stands 1.2 times its radius above the shoulder joint (0.6 on the left),
-so that no gap shows between the top of the tube and the wall at the back. The tube and the
-forearm have no face that joins them to the trunk. The tube takes the fur color of the forearm.
-
-The script runs in the live Blender or in a batch run:
-
-```bash
-blender -b --python tools/blender/pig_arms.py -- assets/models/pig/pig.glb assets/models/pig/pig-upper.glb
-shasum -a 256 assets/models/pig/*.glb
-```
-
-## pig-arms.glb and pig-weights.json
-
-`tools/blender/arm_rebuild.py` rebuilds the arms of `pig-upper.glb` with quad tubes, 1.5 times as
-long as the mesh (`--factor 1.5`), and writes the Blender weights of the arms. The shoulder line
-lies at 0.55 of the upper arm. Each arm has 9 rings of 16 vertices, with 1 ring on the upper arm
-and 3 on the forearm between the joint rings. A run gives the same bytes. With the bone pose of the
-old horn hold, the round left forearm goes 2.7 cm into the belly (1.2 cm on the old arm), so the
-horn hold keeps the left elbow away from the belly (design 5.3).
-
-| File | Size | SHA-256 |
-|---|---|---|
-| `pig-arms.glb` | 965,548 bytes | `13450e613415d8bbcf3e2c4eaa9c9584019b7b2967f0a147fd44808758ebf4f6` |
-| `pig-weights.json` | 410,080 bytes | `9bea1248d22906b422644507a73a0426fd3742b7afe4d372b803ab19173f7f75` |
-
-## pig-root.glb and pig-root-weights.json
-
-Each free arm is a closed part. The inner side of the top ring and of the dome of its tube lies
-inside the trunk, so that no gap shows at the shoulder. In the hornist, the turns of the arm moved
-this hidden root up to 3.9 cm into the shoulder, in each sample, and the sweep measured it as a
-clip of the upper arm (design 9.3). The bind pose alone put it 3.4 cm to 4.7 cm deep.
-`tools/blender/pig_root.py` moves the 7 vertices of `tools/arm-roots/pig-moves.json` out along the
-line to the nearest point of the trunk surface, by 0.3 cm to 2.8 cm.
-
-In the recast violin, clarinet, cello, flute, and trumpet holds, 12 vertices of the domes went
-1.0 cm to 3.2 cm into the trunk, and some of them came up to 3 cm out of the shoulder in another
-pose. So no move toward the wall fits each role. The `shrinks` of the move file move these
-vertices 0.4 of the way to the shoulder joint of their side, by 1.8 cm to 3.7 cm. They then go at
-most 1.5 cm into the trunk. The move file gives the rule of the values. The other vertices, the
-faces, the UV, and the weights stay. A run gives the same bytes.
-
-| File | Size | SHA-256 |
-|---|---|---|
-| `pig-root.glb` | 965,548 bytes | `66e99d5bb0dc1119e4c205559c35957ac2190b4799a39e6035ddaecdd092624a` |
-| `pig-root-weights.json` | 410,182 bytes | `0cb9c6f98b43d17f4949b33d251964c0a6efaf32caa16b8947fb90cc3631828a` |
-
-## pig-root-pit.glb
-
-| Item | Value |
-|---|---|
-| Size | 965,332 bytes |
-| SHA-256 | `8f802f369c5ee40a7a387f4a2d72f260924cdf4cb8c23f4b63e9dd4cd12bec0a` |
-| Writer | Khronos glTF Blender I/O v5.2.40 |
-
-The trunk wall under each arm of `pig-root.glb` is the fan that `pig_arms.py` put into the hole of
-the old bulge. The hanging arm hides it in the source, and the bind and the play show it. These
-faults showed:
-
-- On the right, a trunk vertex 0.03 units out of the wall at the front of the fan: a thin fin
-  under the front of the root in the bind and at the top front of the root in the play.
-- On each side, a sliver of the fan, with its three corners nearly on one line: the sliver turned
-  over into a fin and a dark back face under the root (the left one at a note of the horn, the
-  right one at the back of the root in each pose).
-- On the left, the next fan triangle toward the shoulder turned over in the rest and the lift.
-- On the right, two near twin vertices: a trunk vertex 0.006 units from its neighbor, and a dome
-  vertex 0.002 units from the top ring of the tube, with other weights. Each made a notch at the
-  front of the root.
-- On the right, a trunk vertex 0.01 units out of the wall at the top front of the root, which
-  showed as a small fin in the play.
-
-The copy removes them with point edits in the live Blender on the welded mesh. Each edit merges one
-vertex into a neighbor vertex at the place of that neighbor, so that no vertex goes to a new place.
-`pig-root-pit.json` lists the 7 merges in their order. Each merge moves a corner at most
-0.034 units. The copy has 1,838 vertices and 3,668 triangles after the weld (1,845 and 3,682
-before): 14 faces go, and each other face keeps the UVs of its own corners. Each merged corner
-takes the weight row of its new vertex in `pig-root-weights.json`.
-
-The flat back face of the right dome and the step where the left tube meets its dome stay: they
-are the forms of the dome of `pig_arms.py` and of the rebuilt tube, with no fold.
+The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
+these files and the sections of this file about them.
 
 ## Tripo hand rig
 
