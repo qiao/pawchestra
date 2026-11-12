@@ -9,7 +9,7 @@ import { smoothstep } from './rest.ts';
 export const DAMP_MOTION = {
   /** The move of a hand to the place of a damp takes this time, and ends at the contact. */
   inSec: 0.12,
-  /** The shortest move to the place, when the strike before is near. */
+  /** The shortest move to the place, when the strike before is near (`DampWish.minInSec`). */
   minInSec: 0.06,
   /** The shortest time at the place. A shorter window has no move. */
   minHoldSec: 0.08,
@@ -30,6 +30,11 @@ export interface DampWish {
   /** The time of the move to the place and of the move back, in seconds. */
   readonly inSec: number;
   readonly outSec: number;
+  /**
+   * The shortest move to the place, in seconds, when the strike before is near. A long move takes
+   * more time, so that the hand moves no faster than a real player's hand.
+   */
+  readonly minInSec: number;
   /** A number that the pose reads for the move, such as the kettle of a damp. */
   readonly key: number;
 }
@@ -49,7 +54,7 @@ export interface DampTrack {
 /**
  * Makes the windows of the moves of one hand after its strikes (design 5.3). A move starts at most
  * its `inSec` before its contact and not before the end of the rebound, and reaches the place at
- * least `minInSec` after its start. It stays at the place for at most its hold, and goes back in
+ * least its `minInSec` after its start. It stays at the place for at most its hold, and goes back in
  * its `outSec`, so that it ends before the next lift of the hand. A window with less than
  * `minHoldSec` at the place, or one that starts before the end of the window before it, has no
  * move.
@@ -63,7 +68,7 @@ export function dampTrack(wishes: readonly DampWish[]): DampTrack {
   let free = -Infinity;
   for (const wish of wishes) {
     const start = Math.max(wish.earliest, free, wish.contact - wish.inSec);
-    const contact = Math.max(wish.contact, start + m.minInSec);
+    const contact = Math.max(wish.contact, start + wish.minInSec);
     const end = Math.min(wish.latest, contact + wish.hold + wish.outSec);
     const release = end - wish.outSec;
     if (release - contact < m.minHoldSec) {

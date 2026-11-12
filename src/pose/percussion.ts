@@ -24,6 +24,7 @@ import {
   xylophoneShift,
 } from './percussion-rig.ts';
 import type {
+  DampHand,
   DampRule,
   MalletSet,
   PawPlace,
@@ -228,7 +229,14 @@ export function percussionTracks(
       )
     : null;
   const [left, right] = handTracks(rig, groups, side, amplitude, beats);
-  const damp = hold.damp && right ? dampTrackOf(hold.damp, noteGroups, left, right) : null;
+  const moveOf = (hand: DampHand | null): number => (hand?.kind === 'grip' ? hand.moveSec : 0);
+  const damp =
+    hold.damp && right
+      ? dampTrackOf(hold.damp, noteGroups, left, right, [
+          moveOf(rig.dampHands[0]),
+          moveOf(rig.dampHands[1]),
+        ])
+      : null;
   const ring =
     hold.hands === 'pair' && right
       ? ringTrack(
@@ -561,6 +569,7 @@ function dampTrackOf(
   groups: readonly NoteGroup[],
   left: StrikeTrack | null,
   right: StrikeTrack,
+  moves: readonly [left: number, right: number],
 ): DampTrack {
   const m = DAMP_MOTION;
   const wishes: DampWish[] = [];
@@ -573,7 +582,13 @@ function dampTrackOf(
     if ((next && next.start - g.end < rule.restSec) || (i < 0 && lastOf(left, g.start) < 0)) {
       continue;
     }
-    const after = { contact: g.end, hold: rule.hold, inSec: m.inSec, outSec: m.outSec };
+    const after = {
+      contact: g.end,
+      hold: rule.hold,
+      inSec: m.inSec,
+      outSec: m.outSec,
+      minInSec: m.minInSec,
+    };
     if (rule.kind === 'chest') {
       wishes.push({
         ...after,
@@ -599,8 +614,14 @@ function dampTrackOf(
         : rule.kind === 'fingers'
           ? liftOf(free)
           : Math.min(liftOf(left), liftOf(right));
+    // A long move of a paw takes the time that keeps it at the speed of a real player
+    // (`DampHand.moveSec`).
+    const move = moves[free === right ? 1 : 0];
     wishes.push({
       ...after,
+      inSec: Math.max(m.inSec, move),
+      outSec: Math.max(m.outSec, move),
+      minInSec: Math.max(m.minInSec, move),
       earliest: g.start + STRIKE_MOTION.reboundSec,
       latest: Math.min(next?.start ?? Infinity, lift),
       key: free === right ? 1 : 0,
@@ -645,6 +666,7 @@ function ringTrack(
       key: loudness[i] ?? 0,
       inSec: c.ringInSec,
       outSec: c.ringOutSec,
+      minInSec: DAMP_MOTION.minInSec,
     });
   }
   return dampTrack(wishes);

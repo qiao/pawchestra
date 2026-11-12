@@ -178,7 +178,8 @@ export interface EdgeDamp {
  * (`docs/reference/percussion-technique.md` 4). The spine leans over the kettles, and the upper
  * body turns the shoulder of the paw forward. The muffle and the lean do not follow the lift and
  * the lowering, so that a pause in a muffle keeps the paw on the head. The paw keeps the roll of
- * the mallet of its place before the muffle.
+ * the mallet of its place before the muffle, and a long move to the muffle takes more time
+ * (`speed`).
  */
 export interface FingersDamp {
   readonly kind: 'fingers';
@@ -211,6 +212,11 @@ export interface FingersDamp {
    * damp comes forward toward its kettle.
    */
   readonly turn: number;
+  /**
+   * The highest speed of the grip in the move to the muffle and back, in meters each second
+   * (`DampHand.moveSec`).
+   */
+  readonly speed: number;
 }
 
 /** The damp of the free paw on the far head of the bass drum ({@link DampRule}). */
@@ -439,7 +445,8 @@ export const PERCUSSION_HOLDS = {
     // The stump paw of the Tripo elephant reaches 0.52 m and 0.51 m, and its rigid low point stays
     // 1.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
     // out of the kettles). The grip stays level with the head, and the mallet keeps 0.5 rad of
-    // the pitch (share), so that the mallet head stays out of the head. With the lean of
+    // the pitch (share), so that the mallet head stays out of the head. The paw moves about 25 cm
+    // to the muffle, at most at 1.2 m/s (speed). In 0.06 s, it moved 6.7 m/s. With the lean of
     // 15°, the reach of 0.46 m, and a press of 1.7 cm of the old paw, the stump went 5.7 cm and
     // the forearm 6.4 cm into the kettles, the trunk 2.2 cm into a head, and the center of mass
     // moved 10 cm forward of the middle of the soles.
@@ -454,6 +461,7 @@ export const PERCUSSION_HOLDS = {
       share: 1.67,
       lean: 0.05,
       turn: 0.3,
+      speed: 1.2,
     },
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
     // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
@@ -1100,6 +1108,11 @@ export type DampHand =
        * the lowest point of the paw (`touch`). Empty with no fit.
        */
       readonly paw: Float32Array;
+      /**
+       * The shortest time of the move of the paw to the grip and back, in seconds
+       * (`DampWish.minInSec`), or 0 for the times of `DAMP_MOTION`.
+       */
+      readonly moveSec: number;
     };
 
 /**
@@ -1573,7 +1586,8 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
   // The paw that struck a kettle muffles it near the playing spot of the hand.
   if (hold.damp?.kind === 'fingers') {
     const { damp } = hold;
-    const spot = (rest: StrikeTarget, offset: Vec3, arm: ArmRig): DampHand => {
+    const spot = (rest: StrikeTarget, offset: Vec3, side: PercussionSide): DampHand => {
+      const { arm } = side;
       const target = offsetTarget(rest, offset);
       // The move toward the player at which the grip is the reach from the shoulder joint, at
       // most to the least distance from the near rim.
@@ -1590,16 +1604,29 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       const ahead = -b - Math.sqrt(Math.max(0, b * b - c));
       const move = MathUtils.clamp(c > 0 ? ahead : 0, 0, hold.rim - damp.rim);
       const point = towardPlayer(target, move).point;
+      const grip = new Vector3(point[0], point[1] + damp.up, point[2]);
+      // The grip at a strike lies the length of the mallet back from the target, on the line
+      // from the home. The smooth step of the move is 1.5 times faster than its mean speed at its
+      // middle.
+      const struck = new Vector3(...target.point);
+      if (side.kind === 'mallet') {
+        const along = struck
+          .clone()
+          .sub(new Vector3(...side.home))
+          .normalize();
+        struck.addScaledVector(along, -side.length);
+      }
       return {
         kind: 'grip',
-        grip: [point[0], point[1] + damp.up, point[2]],
+        grip: toVec3(grip),
         share: damp.share,
         keep: true,
         touch: target.point[1] - damp.press,
         paw: pawCorners(model, arm),
+        moveSec: (1.5 * grip.distanceTo(struck)) / damp.speed,
       };
     };
-    dampHands = [spot(restL, hold.offsetL, left), spot(restR, hold.offsetR, right)];
+    dampHands = [spot(restL, hold.offsetL, sides[0]), spot(restR, hold.offsetR, sides[1])];
   }
   return {
     instrument,
@@ -1796,6 +1823,7 @@ function pawsOnRim(
       keep: false,
       touch: null,
       paw: new Float32Array(),
+      moveSec: 0,
     };
   };
   return [paw(arms[0]), paw(arms[1])];
