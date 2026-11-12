@@ -126,14 +126,15 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 
 The app follows these facts:
 
-- **The size (section 1).** The deer plays a harp of 0.8 of the concert harp of the app
-  (`SpeciesParams.harpScale`), 1.12 m high. Its base stands on the floor, so the pedals lie at the
-  hooves. A larger harp brings its neck to the head of the deer.
+- **The size (section 1).** The deer plays a harp of 1.3 times the concert harp of the app
+  (`SpeciesParams.harpScale`), 1.69 m high, near the 1.8 m of a concert harp. Its base stands on
+  the floor, so the pedals lie at the hooves. A larger harp brings its neck to the muzzle of the
+  deer.
 - **The place (section 2).** The base stands in front of the deer, and the top of the soundbox
   rests on the front of the right shoulder, near the neck. The harp is diagonal to the deer, with
   the column at the front left (`HARP_PLACE.turn`).
-- **The trunk (section 2).** The spine leans a little forward (`HANDS_HOLDS.harp.lean`), near the
-  erect seat. A larger lean brings the long muzzle to the neck of the harp.
+- **The trunk (section 2).** The spine stays erect (`HANDS_HOLDS.harp.lean`). A lean forward
+  brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
   right hand the treble strings from the right side (`faceL`, `faceR`).
 - **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`).
@@ -165,11 +166,13 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The knees (section 2).** The short knees of the deer lie under its round belly. Thus the base
-  stands in front of the knees, and between them only in the front view.
+- **The knees (section 2).** The base stands in front of the knees, and between them only in the
+  front view.
 - **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
-  model leans toward the player, and the short legs of the deer reach the pedals only when the
-  base stands near the hooves. A tilt back moves the base away from the deer.
+  model leans toward the player, and a tilt back puts the forearms of the deer into its body.
+- **The reach (section 3).** The arms of the deer are short for its height, so the base stands
+  near the stool, and the left paw does not reach the lowest bass strings. A harpist reaches the
+  column with the stretched left arm.
 - **The level forearms (section 4).** The forearms rise from the elbow to the wrist, because the
   elbows of the short arms hang below the strings.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
