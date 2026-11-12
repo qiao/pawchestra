@@ -582,26 +582,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/deer/deer.rig.glb',
     },
   ],
-  // The choir penguin (design 4.4). It stands on its riser, so the
-  // export keeps the standing pose of the rig.
+  // The choir penguin (design 4.4): the hand rig of the Tripo P2 penguin
+  // (`assets/models/penguin/tripo-hand/penguin.blend`), with no flipper cut and no flipper
+  // stretch. It stands on its riser, so the export keeps the standing pose of the rig. Its `.blend`
+  // holds the facts of the body: the scale that keeps H of the penguin of `penguin.rig.glb`, and
+  // the crease angle 180°. The map paints a full eye with a light on each eyeball, so the eyes
+  // take the finish `varnish` and no eye light.
   [
     'penguin',
     {
       landmark: 'shoulders',
-      height: 0.6258,
       seated: true,
       soloist: true,
       constant: 'STUDIO_PENGUIN',
-      // The penguin looks round. With the crease 35°, the sides show hard facets. The crease 60°
-      // smooths the shading. Each fur face is black or white (`colors.twoTone` of the rig), and
-      // the two differ by more than the blend, so their edge stays sharp. The blend 0.7 fades the
-      // steps of the orange of the beak and the feet. With 1.0, the beak blurs into the head.
-      crease: 60,
-      colorBlend: 0.7,
-      glb: 'assets/models/penguin/penguin.rig.glb',
-      // At the old eyes, the fur covered a notch at the bottom of the right bead eye in the front
-      // view. Eyes 0.02 H higher show the full ovals.
-      eyeShift: [0, 0.02],
+      glb: 'assets/models/penguin/tripo-hand/penguin.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
 ]);
