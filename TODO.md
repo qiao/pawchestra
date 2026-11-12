@@ -728,6 +728,11 @@ passes.
       short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
       At rest the left upper arm goes 3.4 cm into the belly (upperArmL 0.50), and in mozart-k525
       also in 26 % of the lift and 57 % of the lowering.
+- [ ] Tripo red fox violinist: the last lowering of boulanger-matin starts from the pizzicato pose
+      (tip up and to the right), and the bow passes 15 cm to 20 cm in front of the face for 0.41 s
+      (0.22 s before the via reach of 2026-11-12). The cause is the pizzicato tip
+      (`pizzicatoTip`); each via that keeps 0.22 s brings the mozart-k525 lift to 4 cm to 6 cm from
+      the mouth.
 - [ ] Tripo tan fox flutist: the free left paw rests on the haunch beside the hip, because the
       arm does not reach the top of the thigh or the flute at rest. In the lowering the right rest
       grip grasps the flute in only 37 % of the samples.
