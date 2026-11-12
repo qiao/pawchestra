@@ -112,11 +112,14 @@ dirty_files() {
 # Writes the named studio modules (each one a path of src/models/studio/) and the heights module
 # again in the target. Returns the status of tools/regen-studio.sh.
 regen_modules() {
-  local animals=() path
+  local animals=(--heights) path
+  if [ $# -gt 0 ]; then
+    animals=()
+  fi
   for path in "$@"; do
     animals+=("$(basename "$path" .ts)")
   done
-  "$SCRIPT_DIR/regen-studio.sh" ${animals[@]+"${animals[@]}"}
+  "$SCRIPT_DIR/regen-studio.sh" "${animals[@]}"
 }
 
 # Prints the studio modules among the paths of the arguments that exist in the target.
