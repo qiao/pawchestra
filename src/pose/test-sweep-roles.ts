@@ -85,6 +85,8 @@ const BODY_LOOPS = 2;
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
+ * - The pig: 7 open loops, the cuts to the two upper arms, 3 small open loops of the Tripo pig at
+ *   the roots of the ears, and the edges of the 2 lids.
  * - The rabbit: 14 open loops, the cuts to the two upper arms and the open loops of the third Tripo
  *   rabbit (the whisker strips, the eyeballs, and two of the body) and of its lids.
  */
@@ -96,6 +98,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
+  ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
 ]);
 
@@ -196,9 +199,10 @@ const RHINO_BODY_LOOPS = 3;
 const DEER_BODY_LOOPS = 3;
 
 /**
- * The open loops of {@link BODY_BONES} of the pig mesh: none. Each arm of the pig is a closed part
- * of its own with no face that joins it to the trunk (`pig-upper.glb`, `pig-arms.glb`), and the
- * trunk wall under each arm is closed.
+ * The open loops of {@link BODY_BONES} of the pig mesh of `pig.rig.glb`: none. Each arm of the pig
+ * is a closed part of its own with no face that joins it to the trunk (`pig-upper.glb`,
+ * `pig-arms.glb`), and the trunk wall under each arm is closed. The Tripo pig takes its loops from
+ * {@link TRIPO_BODY_LOOPS}.
  */
 const PIG_BODY_LOOPS = 0;
 
@@ -427,14 +431,15 @@ function deerBodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of the pig mesh: {@link BODY_BONES}, which need no cap
- * ({@link PIG_BODY_LOOPS}).
+ * The closed surface of the body of the pig: {@link BODY_BONES}, which need no cap on the pig mesh
+ * ({@link PIG_BODY_LOOPS}), and a cap on each open loop of the Tripo pig
+ * ({@link TRIPO_BODY_LOOPS}).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function pigBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, PIG_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, PIG_BODY_LOOPS));
 }
 
 /**
@@ -1891,9 +1896,8 @@ function sweptHornist(scene: TestScene, index: number): boolean {
  * The sweep of the hornist (design 5.3): the sweep of the trombonist with the horn and the pig.
  * The first seated pig of each demo with horns, and each standing pig soloist, play it. The left
  * palm is on its grip at the valves at the start of each phrase, and the right palm on its grip in
- * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide). Each arm
- * of the pig mesh is a closed part of its own, so the body is closed with no cap
- * ({@link pigBodySurface}).
+ * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide). The body
+ * takes a cap on each open loop of the Tripo pig ({@link pigBodySurface}).
  */
 const HORNIST_SWEEP: RoleSweep = {
   ...TROMBONIST_SWEEP,
