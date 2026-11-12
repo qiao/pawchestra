@@ -125,17 +125,28 @@ passes.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
 - [ ] Deer harpist: the high left palm (`highL`) and the damp with no press of 2026-11-12 keep each
       paw at most 1.4 cm in the body. Check the high left notes in 2x crops in the app.
-- [ ] Deer harpist: with the higher right elbow of 2026-11-12, the right upper arm goes at most
-      1.4 cm into the soundbox in the play, but the cap of the soundbox still shows in front of the
-      arm from the right side (az 90). In the lift it goes 2.3 cm in (23 % of the samples), in the
-      lowering 2.3 cm (53 %), and at rest 1.6 cm. The left paw swing p95 is 69 (limit 70).
+- [ ] Deer harpist: the top of the soundbox lies at the outer side of the right shoulder, and the
+      end of the harp neck crosses the front of the right shoulder. Each vertex of the body in each
+      closed harp part, every 0.1 s of boulanger-matin: the right upper arm goes 1.9 cm into the
+      soundbox (82 % of the play samples over 1.0 cm) and 1.8 cm into the harp neck (56 %), the
+      right side of the chest 2.7 cm into the soundbox (100 %), and the deer neck 1.4 cm into the
+      harp neck (3.9 %). The cap of the soundbox shows in front of the arm from the right side.
+      A move of the harp in its +x (4.5 cm) with a tilt back of 4° clears the chest and the deer
+      neck, but puts the left paw 4.8 cm into the chest. A move away from the chest drops the
+      note targets under 95 %. The forward rest elbow of 2026-11-13 clears the rest and the lift.
+      Ask the user for a route: a smaller left hand range, longer deer arms, or another form of
+      the soundbox top and the neck end.
+- [ ] Deer harpist: the left paw swing p95 is 69 (limit 70).
+- [ ] Deer harpist: the role sweep (`HARPIST_SWEEP`) and `pnpm clip-probe` do not measure the harp
+      in the trunk or the legs in the harp, so they missed the clips above. Save
+      `scratch/deerclip/depth.ts` (each body region in each closed harp part) as a tool, or add
+      the pairs to the sweep.
 - [ ] Deer harpist: 4 left-arm frames turn 15° to 17° in one 1/30 s step (127.5 s and 280.1 s of
       boulanger-matin), where the music gives a move less than 0.2 s.
 - [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
       close snaps 31° to 45° in one step.
-- [ ] Deer harpist: the left hoof goes 2.8 cm into the harp base at rest and 3.7 cm in a pedal
-      move, and the left shin 2.0 cm into the stool edge (1.5 % of the samples). The heel lift
-      fixed the right side only.
+- [ ] Deer harpist: in pedal moves, the left shin goes 1.9 cm into the stool edge (0.8 % of the
+      samples) and the right hoof 1.9 cm into the harp base (0.9 %).
 - [ ] Deer: dark facet patches on the tail tip and the back of the left shoulder in the hall light.
       The color map has no dark texel there (`reports/2026-11-12-afix/deer/m4-patches/`), so the
       cause is the shading of flat faces that face away from the key. Four tail faces are flipped.
