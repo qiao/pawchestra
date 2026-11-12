@@ -13,14 +13,13 @@ import type { ArmRig } from './ik.ts';
 /** The hold of the choir folder (design 5.3). */
 export const CHOIR_HOLD = {
   /**
-   * The elbows point down and out, so that the upper arms stay near the sides of the body, as in
-   * the reference images. The rebuilt flippers are round tubes with their full inner half width
-   * (design 5.3, "Free round arms"). With these elbows and the wider folder of `CHOIR_FOLDER`, the
-   * upper arms go 1.3 cm into the chest. Out and down, (1, -0.6, 0), they stand 49° out from the side, and with
-   * (2.5, -1, 0.1), the grips turn 28° from the accepted grip.
+   * The elbows point down and out, so that the upper flippers stay near the sides of the body, as
+   * in the reference images. The flippers of the Tripo penguin are flat blades from the back half
+   * of the sides. With these elbows, the flipper tips turn 28° about the flipper (40° with
+   * (1.4, -1, 0.1)), and the roots of the upper flippers go 2.0 cm into the sides in each pose.
    */
-  poleL: [-1.4, -1, 0.1],
-  poleR: [1.4, -1, 0.1],
+  poleL: [-1, -1, 0.1],
+  poleR: [1, -1, 0.1],
   /** The curl of the fingers around the edges of the folder. */
   curl: 35 * MathUtils.DEG2RAD,
 } as const;

@@ -32,9 +32,12 @@ export const CHOIR_FOLDER = {
   drop: 1.25,
   /**
    * The distance of the middle of the spine in front of the head center, in head heights H, so
-   * that the folder keeps off the belly and the throat.
+   * that the folder keeps off the belly and the throat. The flippers of the Tripo penguin start at
+   * the back half of the sides, so their tips reach the grips with the folder only this near: at
+   * 1.1 H, the palms stay up to 74 mm from the grips, and at 0.74 H up to 1.0 mm, with the folder
+   * 0.7 cm into the belly.
    */
-  forward: 1.1,
+  forward: 0.74,
   /** The angle by which the folder leans back, so that the pages face the eyes. */
   tilt: 35 * MathUtils.DEG2RAD,
 };
