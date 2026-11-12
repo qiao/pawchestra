@@ -481,7 +481,10 @@ The rest of each family:
   into the violin of six bodies. The rabbit and the red fox keep their own holds (`SHOULDER_HOLD`,
   `FOX_HOLD`). The red fox turns the head to the left in the play (`BowedHold.headTurn`), so that
   its long snout points over the neck of the violin and above the bow paw at the frog. Reason:
-  with a square head, the bow paw at the frog went into the snout. Their holds and the viola hold of the cat turn the top plate 25° back toward up
+  with a square head, the bow paw at the frog went into the snout. The bow elbow of the red fox
+  points a little up at the frog and at the tip, and its left paw tilts less over the neck than in
+  the chin hold. Reason: one fox body plays the violin and the flute, and with a lower bow elbow
+  and more tilt, a part of an arm of the fox with four-digit paws turned more than 45°. Their holds and the viola hold of the cat turn the top plate 25° back toward up
   (`violinTurn()`), so that the instrument lies about level and tilts only a little down to the
   right (strings 1.10). Reason: with the 50° of the chin hold, the instrument read as upright on
   the chest, and the bow at the frog stood up across the face.

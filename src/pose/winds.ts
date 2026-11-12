@@ -613,11 +613,11 @@ export const WIND_HOLDS = {
  * elbow goes further into the side of the trunk.
  *
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
- * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 42°
+ * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 39°
  * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
  * thin neck. The right paw points up past the back of the flute (`aimSide` -0.8), and the right
  * elbow points a little further out in the play, (1.2, -1.4, -0.3). On the new Tripo fox, the
- * right upper arm then rolls 32° and the forearm twists 17° in the play: with -0.6, the right arm
+ * right upper arm then rolls 26° and the forearm twists 30° in the play: with -0.6, the right arm
  * of the new fox takes 58° on the two parts, against 49°. On the first Tripo fox, -0.85 bent the
  * paw 94° on the forearm, and -0.5 twisted the forearm 56°. The fingers curl 90° and 85° around the flute (`gripCurl`):
  * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The free

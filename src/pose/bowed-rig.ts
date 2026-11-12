@@ -827,7 +827,7 @@ const SHOULDER_HOLD = {
  *
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
- * 42° in each moment of the violinist and the flutist, so that the skin does not twist into a thin
+ * 39° in each moment of the violinist and the flutist, so that the skin does not twist into a thin
  * neck. The arms of the new Tripo fox are short: 0.40 m from the shoulder joint to the middle of
  * the palm (`pnpm hold-reach fox-red --instrument violin`). So the left shoulder bone turns 20°
  * forward in the play (`reachL`), and the left paw reaches the fingerboard of the full violin from
@@ -835,10 +835,11 @@ const SHOULDER_HOLD = {
  * arm is 0.76 of the violin of the app. The top plate turns 25° toward up
  * (`violinTurn(-25, 5, 25)`), so that the violin lies about level and only a little down toward
  * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The bow paw reaches 0.27 m of the
- * hair. The left paw tilts 20° over the neck (`tiltL`, 30° in the chin hold). The right elbow
- * points out, forward, and a little down at the frog, (3, -0.3, -0.6), and nearly level at the
- * tip, (1, -0.15, -1): with (2.4, -0.7, -1) and (1, -0.5, -1), the right forearm twisted 52° at the
- * frog and the tip. The left paw turns -45° around the normal of the top plate at rest (`restYawL`): with -30°, the left
+ * hair. The left paw tilts 10° over the neck (`tiltL`, 30° in the chin hold): with 20°, the left
+ * arm of the fox with four-digit paws took 85° on its two parts in the play. The right elbow
+ * points out, forward, and a little up at the frog, (3, 0.8, -0.6), and at the tip, (1, 0.6, -1):
+ * with (3, -0.3, -0.6) and (1, -0.15, -1), the right forearm of that fox twisted 59° at the frog
+ * and 69° at the tip. The left paw turns -45° around the normal of the top plate at rest (`restYawL`): with -30°, the left
  * forearm twists 50° at rest, and with -45°, 34°.
  *
  * The string planes of the red fox stay 9° apart, and the stick leans 15°. A larger turn or tilt
@@ -859,12 +860,12 @@ const SHOULDER_HOLD = {
  */
 const FOX_HOLD = {
   ...SHOULDER_HOLD,
-  tiltL: 20 * MathUtils.DEG2RAD,
+  tiltL: 10 * MathUtils.DEG2RAD,
   poleL: CHIN_HOLD.poleL,
   playTurn: violinTurn(-25, 5, 25),
   reachL: 20 * MathUtils.DEG2RAD,
   elbowPerString: 2 * MathUtils.DEG2RAD,
-  poleR: [3, -0.3, -0.6],
+  poleR: [3, 0.8, -0.6],
   playShift: [-0.16, 0, 0.22],
   headDrop: -9 * MathUtils.DEG2RAD,
   headTurn: 20 * MathUtils.DEG2RAD,
@@ -873,7 +874,7 @@ const FOX_HOLD = {
   stringTurn: 9 * MathUtils.DEG2RAD,
   bowTilt: 15 * MathUtils.DEG2RAD,
   reach: 15 * MathUtils.DEG2RAD,
-  poleTipR: [1, -0.15, -1],
+  poleTipR: [1, 0.6, -1],
   freeHair: 0.12,
   restPoleR: [0.5, -1, -0.2],
   restPlace: 0.37,
