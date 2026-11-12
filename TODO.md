@@ -756,15 +756,32 @@ passes.
 - [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
       (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
       golden. A chroma step would read nearer the pale tan of the reference image.
-- [ ] Tripo fox and rabbit candidates: one gaze view (`VIEW_DOWN` 30° of the map tools) serves the
-      play view and the default camera. Check the gaze of both on a phone.
-- [ ] Tripo rabbit candidate: with the source legs the seat is 0.207 m high (0.262 m on the rabbit
-      of main). Check the chair height in the row of the first violins.
-- [ ] Tripo rabbit candidate: the hip joint lies 0.5 mm forward of its measured place, because at
-      that place the rest frames of the leg bones in Blender scale by 3e-5 and `pnpm rig-export`
-      stops. A thigh that points almost opposite to the hips bone loses precision in the parent
-      space of Blender. A tolerance or a fix of the frames in `tools/blender/export_rig.py` would
-      allow the measured place.
+- [ ] Tripo fox candidate: one gaze view (`VIEW_DOWN` 30° of the map tools) serves the play view
+      and the default camera. Check the gaze on a phone.
+- [ ] Third Tripo rabbit: with the source legs the seat is 0.167 m high (0.207 m on the second
+      Tripo rabbit). Check the chair height in the row of the first violins.
+- [ ] Third Tripo rabbit: the hip joint lies 1.5 mm from its measured place, because at that place
+      the rest frames of the leg bones in Blender scale and `pnpm rig-export` stops. A tolerance or
+      a fix of the frames in `tools/blender/export_rig.py` would allow the measured place.
+- [ ] Third Tripo rabbit: in the lift and the lowering the violin of 0.9 goes up to 6.2 cm into
+      the belly (`pnpm pose-depth violinist`, 2.7 cm with the violin of 0.75 on the second rabbit).
+      Other `liftReach` vias and rest arms gave 5.3 cm to 8.0 cm, or a pass through the head. At
+      rest the violin keeps out of the body (2.6 cm in on the second rabbit).
+- [ ] Third Tripo rabbit: in the play the depths of the arms grow against the second rabbit
+      (`pnpm pose-depth violinist --base 12edbabec`): the upper arms 3.8 cm into the body (2.4)
+      and 2.1 cm into the violin (0.2), the forearms 2.9 cm into the body (2.3). No ear meets the
+      violin or the bow.
+- [ ] Third Tripo rabbit: faces of the knuckle creases of the curled paws fold in each sample
+      (`pnpm arm-check violinist`, folds p95 27 left and 11 right at rest, limit 8). Wider knuckle
+      rows took the count only from 38 to 37. Check the curled paws in the app.
+- [ ] Third Tripo rabbit: in one lowering of `beethoven-6-1` (311.51 s) the right paw turns
+      2,576°/s (limit 3,000, 1,253 on the second rabbit), so `pnpm arm-check` marks it worse than
+      the base.
+- [ ] Third Tripo rabbit: the right knee has no clean quad strip, so it takes no ring, and the
+      left elbow has partial rings from x 0.144 to 0.192. Check the knees and the elbows in the
+      seated bind.
+- [ ] Third Tripo rabbit: the stern look of the source eyes (painted lash lines over the upper
+      iris) stays. Check that the face reads happy enough in the hall.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
