@@ -639,9 +639,19 @@ The app follows these facts:
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings,
   near the end of the fingerboard (`BowedHold.pluckSide`, `pluckPlace`), with the elbow out and
   down, as a bassist. No source of this file gives the cello pizzicato.
+- **The bow hand of the dog (2.1).** The paw holds the bow at the frog end. The stick lies across
+  the fingers under the curled finger tips, and the tips close over it (`bowGrip` of the dog in
+  `src/models/species.ts`, `DOG_HOLD.curlR`). The paw stays above the stick, with the palm toward
+  it. The bow keeps the frog end in the paw from the frog to the tip and at rest
+  (`pnpm wind-grip cellist`).
 
 The app does not follow these facts:
 
+- **The bow hand of the dog.** A cellist holds the bow with the thumb bent under the stick at the
+  frog, the fingers over the stick, and the little finger on top. No source of this file gives
+  this hold yet. The paw has no thumb bone and one finger bone, so one curl closes all the
+  fingers over the stick. A curl of more than 65° folds the skin of the knuckles. Thus the stick
+  lies under the tips, 5 cm from the middle of the closed paw.
 - **The chest (2.7).** The middle line of the back stands 0.28 H in front of the trunk, the room
   of the arms in the accepted dog hold. Pressed onto the chest, the cello went 5 cm to 12 cm into
   the bodies of the cast matrix.
