@@ -858,8 +858,10 @@ The highest strings of the right hand lie near the right shoulder, so for them t
 moves down the strings and a little away from them (`highR`), as the right wrist of a harpist
 comes near the soundboard in the upper register (harp 4). Reason: at the neck of the harp, the
 right elbow folded and the right forearm twisted. The right elbow points out and a little down
-(`poleR`), as the elbows of a harpist rise, so the right upper arm only touches the soundbox. The
-right palm faces a little down (`faceR`), so that the right paw twists at most 45° on its forearm.
+(`poleR`), as the elbows of a harpist rise, so the right upper arm only touches the top of the
+soundbox. Reason: with the elbow lower, the right upper arm went into the top of the soundbox in
+the play and the lift. The right palm faces a little down and a little back to the player
+(`faceR`), so that the right forearm twists at most 45° in the chord and the pluck.
 
 Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 `pose/harp-fingering.ts`), a pure function of the notes of the hands:
