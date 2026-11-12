@@ -138,11 +138,21 @@ The app follows these facts:
   brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
   right hand the treble strings from the right side (`faceL`, `faceR`).
-- **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`).
+- **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`). The right elbow
+  points out more than down, as the elbows of a harpist rise, so the right upper arm only touches
+  the soundbox.
 - **The wrists (section 4).** The left palm faces the strings and a little down (`faceL`), so
   that the left wrist bends only a little, as the wrists of a harpist go a little down. A palm
   square to the strings bends the left wrist of the short arm far back, because the left forearm
-  points into the strings.
+  points into the strings. The right palm also faces a little down (`faceR`).
+- **The right hand in the upper register (section 4).** The right wrist can come near the
+  soundboard there. For its highest strings, near the right shoulder, the right palm moves down
+  the strings and a little away from them (`highR`), so the right elbow does not fold and the
+  forearm does not twist at the neck of the harp.
+- **The arm between notes (section 7.8).** The hand moves to a new group on a smooth path, in the
+  time of its length (`HAND_MOTION.placeSpeed` of `src/pose/hand-notes.ts`). The first group of a
+  hand places that time before its first pluck, and a short move between two near notes starts
+  at the pluck before, so each hand arrives before its note.
 - **The pluck (sections 5, 7.3).** After its pluck, the thumb bends over the palm (`thumbClosed`),
   and fingers 2 to 4 close into the palm (`curlClosed`). The last pluck of a group pulls the palm
   away from the strings, and a pluck inside a group pulls it only a little (`HAND_MOTION` of
