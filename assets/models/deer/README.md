@@ -153,7 +153,7 @@ about the close axis moves the thumb tip back across the inner face of the paw.
 made by one build script in a headless Blender 5.2, by the route of the Tripo wolf
 (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form, the colors, and the eye paint
 of the source. Two point edits change the form: the eyeballs and their sockets are smaller
-("Eyes"), and the upper arms and the forearms are 1.2 times longer ("Arm stretch"). No point edit
+("Eyes"), and the upper arms and the forearms are 1.3 times longer ("Arm stretch"). No point edit
 changes the head, the ears, the trunk, the hooves, the legs, or the tail. The arms have no cut and
 no split from the trunk. The `ANIMALS` entry of the deer
 points to `tripo-hand/deer.rig.glb`. The files of the old deer above do not change.
@@ -205,8 +205,8 @@ with the eyeballs of the Tripo monkey (`../monkey/README.md`). `make_config.py` 
 
 | Item | Value |
 |---|---|
-| Size | 393,881 bytes |
-| SHA-256 | `77db728824be65a63117923a22c11364caa0514c1f3c5016358729eb9b69d37e` |
+| Size | 393,383 bytes |
+| SHA-256 | `2a5f72e6de46b2916b0d14c2671ac9b44e4ce337af8afe02b1feba4da9079dc0` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fawn faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `deer`: 3,746 vertices and 3,923 faces (3,425 quads and 498 triangles, 7,348 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 48 faces of the nose take the slot `fur` and the color map ("Nose"). The 225 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/deer/tripo-hand/deer-color.webp`) |
 | Armature | `deer_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -238,8 +238,8 @@ left side):
   config=<deer-tripo.json>)`. The 48 gloss faces are the dark nose in the nose box of the config.
 - **Eyes.** The faces of the two eyeballs (the loose parts of 30 to 199 vertices in the eye box)
   take the face attribute `eye`, and keep the color map.
-- **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.1906, the
-  wrist at x 0.2803, where the pastern widens, the knuckles at x 0.3464, where the two toes part
+- **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.1984, the
+  wrist at x 0.2954, where the pastern widens, the knuckles at x 0.3617, where the two toes part
   (x 0.175, 0.25, and 0.315 in the source, moved by the arm stretch), the hip
   at (0.055, 0.33, -0.03), the knee at (0.054, 0.245, -0.052), and the ankle at (0.064, 0.055,
   -0.045). The palm is the true palm of the source, the mean normal of the hoof faces that face
@@ -274,16 +274,21 @@ The weights, in the rest pose:
    smoothstep(0, 0.02) of the length of the shortest edge path from the root of the tail.
 
 **Arm stretch.** The point edit `armStretch` (`redits.py` of the session, from the Tripo hippo,
-`../hippo/README.md`; params `{"kind": "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.05,
+`../hippo/README.md`; params `{"kind": "armStretch", "k": 1.3, "ramp": 0.01, "reach": [0.05,
 0.07]}`), after the hoof turn. Each vertex of a side with |x| over the shoulder joint moves along
 the line u of the rest arm, from the shoulder joint to the wrist joint (0.155 units), from its
-place t on the line to t + 0.2 G(t). G is the integral of a band from 0 to t: a smoothstep from 0
+place t on the line to t + 0.3 G(t). G is the integral of a band from 0 to t: a smoothstep from 0
 at t -0.01 to 1 at 0.01, 1 to the wrist, and a smoothstep to 0 from 0.01 before the wrist to 0.01
-after it. Thus the upper arm and the forearm grow by 1.2, and the hoof moves out by 0.031 units
+after it. Thus the upper arm and the forearm grow by 1.3, and the hoof moves out by 0.047 units
 as one piece, with its size. The move fades from 1 at 0.05 units from the line to 0 at 0.07
-units, so that the chest stays. This is the smallest factor of 1.1, 1.15, and 1.2 that puts 95 %
-of the palm targets of the harp within 5 mm, with the harp scale 0.8 and vertical shins: 87 % with
-1.1, 92 % with 1.15, and 96 % with 1.2.
+units, so that the chest stays. With the harp scale 0.8 and vertical shins, 87 % of the palm
+targets of the harp lay within 5 mm with 1.1, 92 % with 1.15, and 96 % with 1.2. The longer arms
+let the harp stand to the right of the chest (`HARP_PLACE`), so that the soundbox stays off the
+chest. At that place, with the hold of 2026-11-13 (`scratch/deerclip/depth.ts`, each body vertex
+in each closed harp part, every 0.1 s of `boulanger-matin`): with 1.2, 98.2 % of the targets lay
+within 5 mm (worst 8.9 mm), and the right upper arm went more than 1.0 cm into the neck of the
+harp in 2.1 % of the play. With 1.3, 100 % lay within 5 mm, and the upper arm went into the neck
+in 0.2 %.
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
@@ -387,7 +392,7 @@ wolf: each x, y tilt limited to 0.2 (3.59 % of the texels), a box scale to 1024 
 times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The eyeballs and their sockets are at 0.8 of the source, and the
-upper arms and the forearms are 1.2 times longer. The app
+upper arms and the forearms are 1.3 times longer. The app
 light is warm and comes from above, so the brown coat reads lighter and more orange than in the
 even gray light of an FBX viewer, and the long neck shades darker under the chin. The seated bind
 and the hold bend the arms and the legs.
@@ -396,7 +401,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/deer.rig.glb` | 1,245,320 bytes | `6a0aa5f0ae7e5c4e7cb0eaa2f4bba7a236520d487e41e2a93ca3b95ca99b6f4a` |
-| `tripo-hand/deer.rig.json` | 19,353 bytes | `5992271577e278da0ab3a224af3e942febf8c862efe74503334818e5fca86af6` |
+| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `0d7b2623e817d60d359645a873fdf0ce1ec2986f8758e2d9d3073c3a7b2cd658` |
+| `tripo-hand/deer.rig.json` | 19,351 bytes | `9053ccd978036ffbd175020ea83950d092fc4334619cc3a507b9478db5eb6c11` |
 | `tripo-hand/deer-color.webp` | 133,838 bytes, 2048 × 2048 | `9f40f146e7a1f5ea11a8139d90682db82a8ace321451b96b30200236b9cb6876` |
 | `tripo-hand/deer-normal.webp` | 75,080 bytes, 1024 × 1024 | `3607beb00dcf3ec1e5d061d975efd4a221ef12dc63c378ab6e7058439928e538` |
