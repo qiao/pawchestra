@@ -539,6 +539,13 @@ The rest of each family:
   to 2.4 cm off the lips.
 - Each paw closes around its tube (`WindHold.faceTube`, `gripShiftL`). `pnpm wind-grip` measures
   the grasp in each phase.
+- **Clarinet of the wolf.** The left paw holds the upper joint and the right paw the lower joint,
+  with the fingers curled over the front of the tube (`WOLF_CLARINET`). The clarinet hangs from the
+  mouth forward over the knees, at less than the 45° of a real player. Both shoulder bones turn
+  forward, and the elbows point down and out, a little away from the body. Reason: a real
+  clarinetist holds the clarinet at about 45° with the elbows away from the sides (winds 3, 1.8),
+  but the long muzzle of the wolf puts the mouthpiece far in front of the chest, and at 45° the
+  arms do not reach the grips.
 - **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)
   take the arm values of the accepted tan fox and wolf, as directions and in `H`, with the lip
   plate or the mouthpiece at the mouth landmark of the body. Each paw keeps the side sign of its
