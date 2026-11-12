@@ -869,9 +869,10 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   to the highest, with the last pluck on the note start (`HARP_FINGERING.rollSec`). A chord of two
   strings, such as an octave, does not roll. Each string swings from the pluck of its finger
   (`notePlucks()`), and the sound keeps one start.
-- **Damping.** After the last note before a rest of at least `HAND_MOTION.dampRestSec`, the flat
-  palm goes onto the strings, with the fingers open, and leaves before the hand places the next
-  group (harp 7.6).
+- **Damping.** After the last note before a rest of at least `HAND_MOTION.dampRestSec`, the palm
+  opens flat at the place of its group, with the fingers open, and leaves before the hand places
+  the next group (harp 7.6). The palm does not move in toward the strings (`dampPress`), because
+  the treble strings of the near harp lie near the chest of the deer.
 - **Pedals.** Each note needs the pedal of its string in its notch (`planPedals()` of
   `pose/harp-pedals.ts`): natural for a white key, and sharp for a black key, which the app plays
   on the string of the natural below it (`harpString()`). Each pedal starts in the notch of its
