@@ -220,18 +220,18 @@ export function instrumentScale(params: SpeciesParams, instrument: InstrumentId)
 export const SPECIES = {
   /**
    * Rabbit, the first violins (reference image). It has the studio body of the hand rig of the
-   * second Tripo P2 rabbit (`assets/models/rabbit/tripo-hand/rabbit.blend`, design 4.4), seated
+   * third Tripo P2 rabbit (`assets/models/rabbit/tripo-hand/rabbit.blend`, design 4.4), seated
    * with the bind pose of that rig, and standing as a soloist. Its head height is the head of the
    * studio body, and its chair fits its legs: the seat height is the seat of the studio body, in
-   * H. The hand rig keeps the short arms and the paws of the mesh with no stretch, so the arms
-   * reach 0.262 m from the shoulder joint to the middle of the palm. The violin is 0.75 of the
-   * violin of the app (0.380 m), a real small size (a 1/32 violin is 0.33 m), so that it reads at
-   * its size beside the body. The arms do not grow, so the hold uses the reach of the arms: the left paw stops the
-   * strings from 0.63 of the fingerboard from the nut, as a player in a high position, and the
-   * scroll stands out past the paw. The bow paw reaches 0.10 m of the hair, from 0.11 m to 0.21 m
-   * from the frog (`pnpm hold-reach rabbit --instrument violin`). With 0.6 (0.304 m), the violin
-   * was smaller than the smallest real violin and read as a toy. With 0.85, the bow paw reaches
-   * only 0.04 m of the hair.
+   * H. The hand rig keeps the arms and the paws of the mesh with no stretch, so the arms reach
+   * 0.297 m from the shoulder joint to the middle of the palm. The violin is 0.9 of the violin of
+   * the app (0.456 m), near a real 1/8 violin, so that it reads at its size beside the body. The
+   * arms do not grow, so the hold uses the reach of the arms: the left paw stops the strings from
+   * 0.67 of the fingerboard from the nut, as a player in a high position, and the scroll stands
+   * out past the paw. The bow paw reaches 0.14 m of the hair, from 0.11 m to 0.25 m from the frog
+   * (`pnpm hold-reach rabbit --instrument violin`). With 0.75 (0.380 m), the violin of the second
+   * Tripo rabbit, the violin read small. With 0.95, the left paw reaches only 0.75 of the
+   * fingerboard and the bow paw 0.12 m of the hair.
    *
    * The stick of the bow passes through the middle of the closed right paw, as for the cat. The
    * stick lies 40° from square toward the wrist, near the line of the middles of the turned paw, so
@@ -244,7 +244,7 @@ export const SPECIES = {
   rabbit: {
     body: 'studio-rabbit',
     colors: SPECIES_COLORS.rabbit,
-    violinScale: 0.75,
+    violinScale: 0.9,
     bowGrip: { at: [-0.0084, -0.04, 0.0553], turn: 40 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-rabbit'].headHeight,
     seatHeight:
