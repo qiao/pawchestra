@@ -1,0 +1,241 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/monkey/tripo-p2/monkey.fbm/monkey_basecolor.jpg",
+ "palm": [
+  -0.066,
+  -0.998,
+  0.0
+ ],
+ "ringEdges": 8,
+ "legTurns": [
+  90,
+  15,
+  -22
+ ],
+ "tailBind": null,
+ "tailBindNote": "The tail bones keep the directions of the source in the bind, so that the tail keeps its curl behind the haunch, clear of the legs.",
+ "chair": {
+  "halfWidth": 0.15,
+  "front": -0.04,
+  "back": -0.11,
+  "note": "The app builds no chair under the monkey (SpeciesParams.noChair), but the export needs a seat for the seat height. The seat is level, and its top is the lowest point of the bind body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the back of the haunch."
+ },
+ "eyeBox": [
+  [
+   0.0,
+   0.8,
+   0.16
+  ],
+  [
+   0.08,
+   0.88,
+   0.235
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.02,
+   0.78,
+   0.26
+  ],
+  [
+   0.02,
+   0.81,
+   0.285
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.009 to 0.074, y 0.807 to 0.872, z 0.192 to 0.229; spheres of radius 0.0327 about (0.041, 0.839, 0.197)). The nose box holds the small pink nose.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.356832,
+ "metersPerUnitNote": "The scale of the app: 1.2 times the scale 1.130693 that kept H of the monkey of main (assets/models/monkey/monkey.rig.glb), so that H (0.295066 units) is 0.400355 m. The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the paws, and the legs keep the form of the source.",
+ "eyeSize": 0.295066,
+ "jointsNote": "The places are the places of the source, in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 11 vertices from x 0.124 to x 0.290, axis y 0.638 to 0.627, radius 0.057 to 0.035): the shoulder joint at x 0.10, at the trunk side (x 0.099 at y 0.62), the elbow at x 0.20, at the middle from the shoulder to the wrist, the wrist at x 0.30, where the paw widens, the knuckles at x 0.355, where the digits part, the tip at x 0.409. Leg (closed rings of 11 vertices from y 0.061 to y 0.255): the hip joint at (0.067, 0.29, 0.055) in the haunch, the knee at y 0.165, between the rings at y 0.150 and 0.172, the ankle at y 0.06, the ball of the foot at z 0.09, and the toe tips at z 0.142. Trunk: the spine bones lie at about 0.35 of the depth from the back. The neck is narrowest at y 0.68 to 0.72, and the chin is at y 0.74. Ears: the root at y 0.90, the tips at (0.077, 1.0, 0.088). Tail: a loose part of the source, from its root at (0, 0.42, -0.04) back and down to its tip at (0, 0.11, -0.19). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.31) is (0.107, -0.994, 0.016). The paw turn of the build turns it with the paw.",
+ "rings": {
+  "arm": [
+   [
+    0.165,
+    0.185,
+    1
+   ],
+   [
+    0.185,
+    0.199,
+    1
+   ],
+   [
+    0.199,
+    0.213,
+    1
+   ],
+   [
+    0.213,
+    0.234,
+    1
+   ],
+   [
+    0.234,
+    0.261,
+    1
+   ],
+   [
+    0.261,
+    0.285,
+    1
+   ],
+   [
+    0.285,
+    0.305,
+    1
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.1,
+  "reach": 0.07,
+  "handReach": 0.11,
+  "control": [
+   [
+    0.1,
+    0.4,
+    0
+   ],
+   [
+    0.11,
+    0.25,
+    0
+   ],
+   [
+    0.12,
+    0.12,
+    0
+   ],
+   [
+    0.13,
+    0.04,
+    0
+   ],
+   [
+    0.14,
+    0,
+    0
+   ],
+   [
+    0.17,
+    0,
+    0
+   ],
+   [
+    0.185,
+    0,
+    0.25
+   ],
+   [
+    0.199,
+    0,
+    0.75
+   ],
+   [
+    0.213,
+    0,
+    0.75
+   ],
+   [
+    0.227,
+    0,
+    0.25
+   ],
+   [
+    0.24,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.04,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   0.0,
+   0.03
+  ],
+  "bend": 0.04,
+  "tip": false
+ },
+ "hipJoint": [
+  [
+   0.09,
+   0.3,
+   0.06
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/monkey/tripo-hand/monkey-color.webp"
+ },
+ "smooth": false,
+ "dropSmall": 30,
+ "pawTurn": {
+  "L": -3,
+  "R": 2
+ },
+ "turnRings": [
+  0.295,
+  0.305
+ ],
+ "turnFit": 0.02,
+ "lids": {
+  "back": 135,
+  "psi": [
+   -55,
+   45
+  ],
+  "lam": [
+   -50,
+   62
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 126,
+  "srgb": [
+   214,
+   142,
+   100
+  ],
+  "uv": [
+   0.868,
+   0.352
+  ],
+  "density": 0.25
+ },
+ "noGloss": false,
+ "tailFlood": {
+  "z": -0.07,
+  "yMax": 0.6,
+  "curl": [
+   0.42,
+   -0.04
+  ]
+ },
+ "kneeRows": {
+  "reach": 0.07,
+  "radius": 0.08,
+  "band": 0.04
+ },
+ "noseFur": true
+}
