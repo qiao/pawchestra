@@ -271,7 +271,7 @@ of the source: no cut, no split from the trunk, and no stretch.
 | Mesh | One object `rabbit`: 3,790 vertices and 4,012 faces (3,388 quads and 624 triangles, 7,400 triangles), flat faces, and the surface of `sa.add_surface()`. 27 faces are gloss (the pink nose). The 80 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the paw edit). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.795385 (the shoulder joints at 1.4867 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 180, `backRoom` 0.01 |
-| Eyes | The eyeballs of the mesh at 0.93 of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), the irises of the source map moved out ("Eyes" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
+| Eyes | The eyeballs of the mesh at 0.93 of the source, with the finish `eye` and the eye light (no `eyeFinish` in the entry), the irises of the source map moved a little out and the lash lines of the upper lids lighter ("Eyes" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The export of the file (`pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend
 --out assets/models/rabbit/tripo-hand/rabbit.rig.glb`). License of both files: CC BY-NC 4.0, as the
@@ -460,15 +460,38 @@ sat 0.31 of the half width of the opening toward the nose in the 3/4 view of the
 Close view of the test page, and 0.07 and 0.15 in its front view. `shift_eyes()` of
 `tools/rabbit-maps.py` moves the iris of each eye on its own, with its pupil and its painted light,
 as one decal on the ball. The target is the middle of the painted eye in a view 15 degrees above
-the forward axis of the head, turned 4 degrees out, at the mean height of the two pupils. Each
-iris moves only 0.35 of the way to that target (`SHIFT_SHARE`), because the full turn read
-wall-eyed from the front: the left iris turns 2.8 degrees and the right iris 2.7 degrees. The
+the forward axis of the head, turned out by `GAZE_OUT` (0 degrees, below), at the mean height of
+the two pupils. Each iris moves only 0.35 of the way to that target (`SHIFT_SHARE`), because the
+full turn read wall-eyed from the front: the left iris turns 1.4 degrees and the right iris 1.3
+degrees. The
 white of the same eye, row by row, fills the place that the iris leaves, and the clean outer rim
 of each iris fills its nose rim, so no mirror of one eye goes into the other and no seam shows.
 So the eyes stay near the source paint, with a small move out. From the default camera the iris
-shows below the upper lid. The
-map paints a light in each pupil, so the eyes take the finish `varnish` and no eye light, which
-gives one light in each eye.
+shows below the upper lid.
+
+The target first turned 4 degrees out (`GAZE_OUT` 4). In a front view of the bind (rays along the
+head axis, `scratch/rabbit-face/eyeview.py` of the worktree), the pupil middle of the right eye
+then lay 0.03 of the half width of the open ball out of the middle, and its iris middle 0.12: the
+right eye looked a little out, past the viewer, while the left pupil lay 0.04 toward the nose. With
+`GAZE_OUT` 0 the decals turn 1.4 and 1.3 degrees, and the pupils lie 0.07 (left) and 0.00
+(right) toward the nose in the front view, 0.09 and 0.02 in a view 10 degrees above, and 0.19 to
+0.20 in the 3/4 views (0.22 in the source). No eye looks out, and neither eye crosses.
+
+The source paints a dark lash line on the rim of each socket, over the top of the iris. In the
+stage light it read as a hard dark wedge, and the upper lid read stern. `soft_lash()` moves the
+skin texels of the rim within 1.08 ball radii of the ball middle toward the fur color above the eye
+(the median of the skin from 1.2 to 1.5 radii): the share is 0.8 up to 40 degrees from straight up
+about the moved iris middle, and falls to 0 at 75 degrees, so a thin line stays and the outer
+corner and the lower lid keep their paint. The mean luma of the changed texels goes from 123 to 168.
+The rim faces of the upper lid face down into the socket (their normals point 0.84 to 0.96 down),
+so the shade of the rim itself still shows as a thin dark line under the lid in the stage light.
+
+The painted light of the source lies at the top of each pupil, under the upper lid, so with the
+finish `varnish` the eyes showed no clear light from the front and the face read blank. The eyes
+take the finish `eye` and the eye light of the app, which gives one clear light at the top left of
+each pupil in the front view, the Close view, and the hall view. The pupils keep the size of the
+source: each fills 0.44 to 0.57 of the open ball in the front view, so a larger pupil would hide
+the brown ring of the iris.
 
 **Color map.** `tools/rabbit-maps.py` writes `rabbit-color.webp` and `rabbit-normal.webp` from the
 source maps, as `tools/wolf-maps.py`:
@@ -477,13 +500,15 @@ source maps, as `tools/wolf-maps.py`:
 uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py
 ```
 
-The color map is the source scaled to 2048 pixels (Lanczos), with the irises moved ("Eyes"
-above), WebP quality 60, method 6 (Pillow 13.0.0). Before the WebP step, 10,347 texels change:
-7,231 eyeball texels and 3,116 texels of the padding next to them. No other texel changes.
+The color map is the source scaled to 2048 pixels (Lanczos), with the irises moved and the lash
+lines of the upper lids lighter ("Eyes" above), WebP quality 60, method 6 (Pillow 13.0.0). Before
+the WebP step, 11,382 texels change: 6,500 eyeball texels and 2,724 texels of the padding next to
+them (the move of the irises), and 2,158 skin texels of the rims of the sockets (the lash lines). No
+other texel changes.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 252,458 bytes | `778b41387ae64891340ec158e3206b0f874377a2aaf70794184ce0a889fb7075` |
+| `tripo-hand/rabbit-color.webp` | 248,098 bytes | `d0814584d451d0c97777826b09b612092b4e7c97c20279e93d0c74e9af6f442e` |
 | `tripo-hand/rabbit-normal.webp` | 142,378 bytes | `c18a8ae6ddbee8ad2b0d188376150e0dcb0dd9ecc393ba3fd06b91d13c3811b9` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (7.30 % of the
@@ -493,7 +518,8 @@ normal of the source is (-0.002, -0.005, 0.986).
 
 **Differences from the source.** The app light is warm and comes from above, so the cream fur
 reads warmer than in the even gray light of an FBX viewer. The eyes are 0.93 of the source, and
-each iris sits about 8 degrees farther out on its ball. Each eye has a blink lid. The mouth corners
+each iris sits 1.3 to 1.4 degrees farther out on its ball. The lash lines of the upper lids are
+lighter, and the eyes take the eye light of the app. Each eye has a blink lid. The mouth corners
 are 0.007 units higher ("Smile"). The front paws are 0.8 of the source in length and width. The paw turns move the seam of each wrist band.
 
 ### History
