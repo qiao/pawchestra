@@ -1663,7 +1663,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Instrument | Model and hold |
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
-| Cello, contrabass | The violin form with an end pin (`celloPinOf()`, `endPinLength()`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
+| Cello, contrabass | The violin form with an end pin of a thin steel rod and a round rubber tip (`celloPinOf()`, `endPinLength()`, `END_PIN`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
 | Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright and diagonal (`HARP_PLACE`): the largest harp at which its short arms reach the strings of the demos, its legs reach each pedal with the heel down, and the neck of the harp stays off its head. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
@@ -1690,7 +1690,31 @@ rest. Its high end is on the side of the E string, because the left shoulder and
 lie under that side in the hold. The strings of the violin and the viola have a triangle section
 (`STRING_SECTION`), because they are about 1 mm thick on the stage, so the shoulder rest fits in
 the triangle budget. The layout reads a simple box of each bowed string (`addLayoutSpace()`), so a
-change of the detail does not move the seats.
+change of the detail does not move the seats. The parts follow a real instrument, and the points
+that the holds read stay: the nut, the bridge, the strings, the bow contact, and the end pin.
+
+- **Body.** A smooth curve through the points of the outline gives the upper bout, the C-bouts,
+  and the lower bout (`VIOLIN_OUTLINE`, `BASS_OUTLINE`, `smoothHalf()`). The tip of each corner
+  stays sharp. The cello and the contrabass have more points than the violin (`OUTLINE_POINTS`),
+  because they are large in the close shots. The top and the back rise in an arch of several
+  levels to a flat middle under the bridge (`TOP_LEVELS`). The contrabass has a flat back with a
+  break near the neck (`BASS_BREAK`). The curve and the arches stay inside the earlier outline of
+  straight segments, except near the two ends of the outline. Reason: a curve through the points
+  of the earlier outline put the paws of the hippo deeper into the contrabass.
+- **Head.** The pegbox is hollow, with a dark open slot (`PEGBOX`). The ebony pegs cross the slot,
+  with a collar and a round thumb piece (`PEG_PROFILE`). The contrabass has brass machine heads: a
+  plate on each side, keys with an oval paddle, and a roller across the slot for each string
+  (`MACHINES`).
+- **Tail end.** The ebony tailpiece has a round top end (`TAILPIECE`), and an ebony saddle lies on
+  the edge of the top. On the cello and the contrabass, a tailgut goes over the saddle to the end
+  pin holder (`TAIL_END`). The cello has four silver fine tuners (`FINE_TUNERS`). The cello and
+  the contrabass have light metal strings.
+- **End pin.** A thin steel rod with a round black rubber tip, and an ebony holder with a silver
+  ring at the tail end (`END_PIN`). Each ring of the tip stands high enough over the floor point,
+  so that no point of the tip goes below the floor at the lean of the cello.
+- **Depth.** No two faces that face the same way lie close over each other, as on the piano. The
+  slot of the pegbox is a hollow with its floor far below the walls. The f-holes are the only
+  marks on a face, and they lie `F_HOLE.lift` above the arch.
 
 **Piano** (`models/instruments/piano.ts`). A concert grand: 88 separate keys, a lyre, and three
 brass pedals in the sizes of a real grand piano (`PIANO_PEDALS`). The lift raises the case, the
