@@ -754,24 +754,27 @@ with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and
 of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
 the claws of the source to the colors of the bear of main in the hall light (the claws dark grey),
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
-hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the
-cat violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point
-edit changes its head, trunk, limbs, paws, legs, or tail, its map keeps the colors of the source
+hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the cat
+violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
+changes its trunk, limbs, paws, legs, or tail, its map keeps the colors of the source
 (`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
-chair fits its legs. The only form edits are those of the eyes. Its eyeballs and sockets are
-smaller than in the source, each ball sits a little deeper, and the skin of each upper lid turns
-down a little over the top of the iris (`assets/models/cat/README.md`, "Eyes"). Reason: at the
-source size, each eye opening was about 0.15 of the head width, the ball bulged out of the face,
-and white showed above the iris in the play view. These faults made the eyes of the third cat
-read uncanny. The map paints a soft light in each pupil, so the eyes take the finish `varnish`
-and no eye light, with one light in each eye. Its paws turn about the forearms by whole ring
-steps, its elbow axes turn, and its bind upper arm points down and forward, so that each part of
-each arm takes at most about 45° of roll or twist in the moments of the violist, the rest
+chair fits its legs. The only form edits are those of the eyes and of the mouth corners. Its
+eyeballs and sockets are smaller than in the source, each ball sits a little deeper, and the skin of
+each upper lid turns down a little over the top of the iris (`assets/models/cat/README.md`, "Eyes").
+Reason: at the source size, each eye opening was about 0.15 of the head width, the ball bulged out
+of the face, and white showed above the iris in the play view. These faults made the eyes of the
+third cat read uncanny. The corners of its mouth lift a little up and back, with the cheeks and the
+pads over them, so the mouth reads as a slight smile (`assets/models/cat/README.md`, "Smile").
+Reason: in the stage light, the slit under the muzzle pads shades as a dark line that fell to the
+corners, and the mouth read sad. The map paints a soft light in each pupil, so the eyes take the
+finish `varnish` and no eye light, with one light in each eye. Its paws turn about the forearms by
+whole ring steps, its elbow axes turn, and its bind upper arm points down and forward, so that each
+part of each arm takes at most about 45° of roll or twist in the moments of the violist, the rest
 included. Its thighs spread 20° in the seated bind. Reason: with less spread, its round belly
-covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail lies on
-the seat (the key `bind_tail`). The large tail of the Tripo fox hangs down to the floor behind the
-chair (`studio.tailBind`), and its build fills the 4 small holes of the source. Reason: the tail
-stood out stiffly in the air, and a hole on the waist showed the floor through the body.
+covered the lap point, and the rest lifted the viola and the bow to the chest. Its tail lies on the
+seat (the key `bind_tail`). The large tail of the Tripo fox hangs down to the floor behind the chair
+(`studio.tailBind`), and its build fills the 4 small holes of the source. Reason: the tail stood out
+stiffly in the air, and a hole on the waist showed the floor through the body.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is a candidate body of the red fox and the tan
 fox. It follows the route of the Tripo wolf (below): no point edit of its form, the colors and the
 eye paint of its source, the crease angle 180°, and only a scale to H. Reason: the look target of
