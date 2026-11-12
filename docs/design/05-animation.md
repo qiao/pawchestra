@@ -331,6 +331,12 @@ The rest of each family:
   events.
 - **Chords.** Notes of a player that start within `CHORD_SEC` form one stroke, strike, or chord
   (3.8).
+- **Units.** A hold value that follows the body is in head heights `H` (4.3): a palm offset, a
+  paw gap, a grip shift, a rest offset, an arc, or a reach. A value on the instrument is in meters
+  of the instrument at its scale: a target offset, a rim distance, or a part of the bow hair. The
+  motion sizes (`HAND_MOTION`, `BOW_MOTION`, the percussion `sizes`, `CONDUCTOR_MOTION`) and a
+  measured girth (`girthFit`) are in meters. The rig of a hold gives each value in meters for the
+  pose. Reason: a body size change then keeps the hold with no edit.
 - **Arms in the body.** A turn of the elbow about the line from the shoulder joint to the wrist
   (a swivel) keeps the paw on its target, but it cannot clear an arm that the cast matrix puts
   into the body. Reason: at the deepest moment, the arm is straight because the paw target of
@@ -851,8 +857,8 @@ cannot bring the left elbow near the plane of the strings, so the left forearm p
 strings. With the palm square to the strings, the left wrist bent back past the paw swing limit of
 the arm gate in the rest, in the lift, and in the play. The turned paw comes nearer to the
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
-knuckles stay out of the neck of the harp. The offsets of the palms are in meters, so they fit
-one size of the deer and its harp. When both grow by a factor (4.4), the offsets grow by it too.
+knuckles stay out of the neck of the harp. The offsets of the palms are in `H`, so they grow with
+the deer (4.4).
 The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
 the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
 The highest strings of the right hand lie near the right shoulder, so for them the right palm
