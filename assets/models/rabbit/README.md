@@ -257,14 +257,14 @@ The hand rig of the third Tripo P2 rabbit (design 4.4, "Hand rig"), made in head
 (`blender -b --factory-startup`) by one build script, by the route of the Tripo wolf
 (`../wolf/README.md`). The source FBX is the target of the look: the body keeps the form, the
 colors, and the eye paint of the source, with a crease angle of 180 and one scale of the whole
-body. Two form edits change the source: the size of the eyeballs and their sockets ("Eyes"
-below), and the size of the front paws ("Paw size" below). The arms and the legs keep the length
+body. Three form edits change the source: the size of the eyeballs and their sockets ("Eyes"
+below), the size of the front paws ("Paw size" below), and the mouth corners ("Smile" below). The arms and the legs keep the length
 of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 394,249 bytes |
-| SHA-256 | `d883667d069a9f16c98eaea08375fa9284e3cab47a79d9a92e00334bd78c2999` |
+| Size | 394,263 bytes |
+| SHA-256 | `c53f231ae6b6f46c9f3122a4279a9ac61f510c2a2c8b172b42be11d086e4d9aa` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
@@ -279,8 +279,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 1,218,828 bytes | `2843d794e408b73bbc9c7eac12425b1964f006a3abf4723b3011421552324af1` |
-| `tripo-hand/rabbit.rig.json` | 16,320 bytes | `c31833b26783d519def23dc81eb1ec29a3aba7c47540fbd0a64cfa69bca374c2` |
+| `tripo-hand/rabbit.rig.glb` | 1,218,828 bytes | `524098bc05131464a9d46f260e1d319efc74d90d680f0898d4918c313603bfd1` |
+| `tripo-hand/rabbit.rig.json` | 16,320 bytes | `e9606923f20d3f5d05a0b50a7c42501d2c20dc18aaec17b1037d023997778b35` |
 
 The scripts of the session (`scratch/rabbit3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
@@ -348,8 +348,29 @@ The weights, in the order of the work, in the rest pose:
    vertex above the plane by 0.008 or more and with |x| above 0.002 takes {`ear_<side>` 1}, and
    each other vertex gives its ear share to `head` (460 ear and 282 head rows). No vertex lies in
    the band of 0.008 at the plane.
+6. Smile: the map `smile` of `redits.py` (the values in `smile` of `params.json`) moves the mouth
+   corners ("Smile" below). The step comes after the weights, so the automatic weights stay those
+   of the mesh with no smile.
 
 The trunk, the neck, the head, the hips, the legs, and the tail keep the automatic weights.
+
+**Smile.** In the stage light, the slit under the muzzle pads shades as a dark line, and the chin
+under it is in shade. The line of the source falls from the middle of the W to its lowest point at
+|x| 0.02 to 0.028 and rises only 0.0045 units to the corner at |x| 0.043, so the mouth read flat
+from the front and the 3/4 view. The map `smile`, the method of the Tripo cat (`../cat/README.md`,
+"Smile"), moves each point by lift × a(|x|) × b(y − m(|x|)) × f(z) × c along (0, 1, −0.4): up,
+and a little back. The lift is 0.007 units (10 mm in the app). m is the mouth line of the source,
+linear between the [|x|, y] rows [0, 0.6336], [0.0071, 0.6315], [0.0144, 0.6302], [0.0205, 0.6295],
+[0.028, 0.6295], [0.033, 0.632], [0.043, 0.6341], and [0.05, 0.636]. a is a smoothstep from 0 at |x|
+0.006 to 1 at 0.032, 1 to 0.046, and a smoothstep to 0 at 0.078, so the middle of the W stays, the
+lower curve rounds, the corner lifts fully, and the cheek fades. b is 1 from 0.004 below the line to
+0.005 above it, and a smoothstep to 0 at 0.018 below (the chin) and 0.016 above (the pads and the
+cheeks over the corner). f is a smoothstep from 0 at z 0.06 to 1 at 0.09, and c a smoothstep from
+0 at 0.003 to 1 at 0.012 units from the nose box of `params.json`. The eyeballs stay. Each whisker
+strip moves as one piece with the move of its root (its point nearest the middle plane). 100
+vertices move, 20 of them of the whisker strips, by at most 0.0075 units. A lift of 0.005 read
+too weak in the 3/4 view. The color map paints only a thin line there, so the edit is in the form
+only.
 
 **Smooth surface.** No relax, no region colors, no trunk scale, and no belly key: the form stays
 the form of the source. In the seated bind the belly shows no dent and no dark fold from the front.
@@ -472,8 +493,8 @@ normal of the source is (-0.002, -0.005, 0.986).
 
 **Differences from the source.** The app light is warm and comes from above, so the cream fur
 reads warmer than in the even gray light of an FBX viewer. The eyes are 0.93 of the source, and
-each iris sits about 8 degrees farther out on its ball. Each eye has a blink lid. The front
-paws are 0.8 of the source in length and width. The paw turns move the seam of each wrist band.
+each iris sits about 8 degrees farther out on its ball. Each eye has a blink lid. The mouth corners
+are 0.007 units higher ("Smile"). The front paws are 0.8 of the source in length and width. The paw turns move the seam of each wrist band.
 
 ### History
 
