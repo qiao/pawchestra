@@ -131,10 +131,11 @@ export interface SpeciesParams {
    */
   readonly palette?: StudioPalette;
   /**
-   * The seated tail of a studio body: `curl` when it lies on the seat (`studio.tailCurl` or
-   * `studio.tailBind` of the rig config), so that it does not sway in the idle motion on a seat
-   * into the haunch or the back posts of the chair (design 5.1). A tail that hangs behind the
-   * chair sways when it is not given.
+   * The seated tail of a studio body: `curl` when its bind lays it on the seat or behind the chair
+   * (`studio.tailCurl` or `studio.tailBind` of the rig config, or the key `bind_tail` of a hand
+   * rig), so that it does not sway in the idle motion on a seat into the haunch, the seat, or the
+   * back posts of the chair (design 5.1). Another tail that hangs behind the chair sways when it is
+   * not given.
    */
   readonly seatedTail?: 'curl';
   /**
