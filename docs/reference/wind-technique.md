@@ -505,12 +505,14 @@ The app follows these facts:
   holds the trumpet around the upright casings (`faceTube`). The right palm lies above the valves
   and faces down. The trumpet points down, straight ahead (`trumpet()` of
   `src/models/instruments/brass.ts`, `play`). The big head puts the mouth of the Tripo monkey
-  farther than its arm from the shoulders. Thus the head bows, and the trumpet turns down with it
-  (`farMouth`), so that the trumpet keeps its angle to the face [22]. Both shoulders turn forward
-  (`reach`, `reachL`). At rest, the trumpet stays in front of the belly with the elbows a little
-  bent (`restShift`). The valves follow the trumpet chart (7.3). The rim presses the lips 0.24 cm
-  (`lipShift`). The monkey stands erect with the shoulders over the hips (1.8), and its center of
-  mass stays over the soles (the bind of `assets/models/monkey/tripo-hand/`).
+  farther than its arm from the shoulders. Thus the head bows on the chest, and the trumpet turns
+  down with it (`farMouth`), so that the trumpet keeps its angle to the face [22]. The spine turns
+  7° back in the play (`lean`), so the head stays upright, 4° to 6° from the vertical, as a player
+  stands erect with the head up (1.8). Both shoulders turn forward (`reach`, `reachL`). At rest,
+  the trumpet stays in front of the belly with the elbows a little bent (`restShift`). The valves
+  follow the trumpet chart (7.3). The rim presses the lips 0.24 cm (`lipShift`). The monkey stands
+  erect with the shoulders over the hips (1.8), and its center of mass stays over the soles (the
+  bind of `assets/models/monkey/tripo-hand/`, and `lean` in the play).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
   paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
   the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
@@ -575,9 +577,11 @@ The app does not follow these facts:
   and level, the right upper arm goes flat.
 - **The trumpet angle of a far mouth (2.1).** With the bowed head of a far mouth, the trumpet
   points more than "slightly down" [19]. No source gives the range of the neck flexion of a
-  trumpet player in degrees, so the bow stays small (`MAX_BOW`).
-- **The trumpet size and rest (2.1).** The monkey plays a smaller trumpet
-  (`SpeciesParams.trumpetScale`). No source gives its size or the rest. At rest, the trumpet turns
+  trumpet player in degrees, so the bow stays small (`MAX_BOW`). The bell of the monkey points 20°
+  to 22° below the level. A higher bell puts the valves out of the reach of its short arms.
+- **The trumpet size and rest (2.1).** The monkey plays a smaller trumpet of 0.85
+  (`SpeciesParams.trumpetScale`), the largest size at which its paws reach the valves with the head
+  upright. No source gives its size or the rest. At rest, the trumpet turns
   down in front of the belly (`restShift`), and both paws keep the hold of the play (`restAim`,
   `restGripShiftL`).
 - **The tuba (3).** The app draws no strap. The lead pipe is longer (`SpeciesParams.tubaPipe`),
