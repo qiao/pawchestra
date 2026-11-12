@@ -328,14 +328,13 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/rabbit/tripo-hand/rabbit.rig.glb',
     },
   ],
-  // The red and the tan foxes (design 4.4): the candidate hand rig of the Tripo CLI fox
-  // (`assets/models/fox/tripo-hand/fox.blend`), with the form of the source and no arm cut and no
-  // stretch, so its chair fits the legs of the source. Its `.blend` holds the facts of the body:
-  // the scale that gives H 0.380 m, near the shown head of the main fox, and the crease angle 180°.
-  // The tan fox takes the same rig with the tan palette, and the color maps of `tools/fox-maps.py`.
-  // The source paints no light in the eyes, so the eyes take the finish `eye` and the eye light,
-  // which gives one small light in the upper part of each eye. With the finish `varnish` and no eye
-  // light, the eyes had no clear light and read as a dead stare.
+  // The red and the tan foxes (design 4.4): the hand rig of the Tripo P2 fox with four-digit front
+  // paws (`assets/models/fox/tripo-hand/fox.blend`), with the form of the source and no arm cut and
+  // no stretch, so its chair fits the legs of the source. Its `.blend` holds the facts of the body:
+  // the scale that gives H 0.380 m, the H of the fox before, and the crease angle 180°. The tan fox
+  // takes the same rig with the tan palette, and the color maps of `tools/fox-maps.py`. The source
+  // paints a light in each pupil, so the eyes take the finish `varnish` and no eye light, which
+  // gives one light in each eye.
   [
     'fox',
     {
@@ -344,6 +343,7 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_FOX',
       glb: 'assets/models/fox/tripo-hand/fox.rig.glb',
+      eyeFinish: 'varnish',
       palettes: { tan: { from: FOX_TEXTURE_COLORS, to: SPECIES_COLORS['fox-tan'] } },
       paletteMaps: { tan: 'assets/models/fox/tripo-hand/fox-tan-color.webp' },
     },
