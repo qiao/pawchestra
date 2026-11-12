@@ -987,9 +987,9 @@ const PIG_TURNS = {
    * the round belly. With the bell 10° forward, it opened to the side and forward, and the right
    * paw lay at its rim.
    */
-  play: { right: -15, back: 20, left: 0 },
-  /** The rest pose: the horn lower and further forward, in front of the belly over the lap. */
-  rest: { right: 10, back: 30, left: 15 },
+  play: { right: -15, back: 30, left: 0 },
+  /** The rest pose: the horn lower and a little forward, in front of the belly over the lap. */
+  rest: { right: 0, back: 30, left: 15 },
 } as const satisfies Readonly<Record<'play' | 'rest', HornTurns>>;
 
 /**
@@ -1008,50 +1008,36 @@ function pigTurn(turns: HornTurns): Quat {
 
 /**
  * The horn hold of the pig (design 5.3), the hold of a real hornist
- * (`docs/reference/wind-technique.md` 2.2): the left paw on the valves at
- * the middle of the body, the right paw in the bell, and the horn across the body from the mouth to
- * the bell at the right of the torso. The mouthpiece rests on the lips under the snout disc
- * (`StudioBody.mouth`), and the long snout puts it far in front of the shoulder joints. The horn
- * turns its lower end 20° back toward the body ({@link PIG_TURNS}), so that the coil stands in
- * front of the round belly, and its right side 15° back, so that the bell opens to the back and the
- * right paw comes down into it from above, as the bell of a real horn points past the right side
- * of the body (`docs/reference/wind-technique.md` 2.2). With the right side 10° forward, the bell
- * opened to the side and forward, and the right paw lay at its rim. With 25° back, the bell went
- * 3.4 cm into the belly in the lift. With 40° and 20°, the coil went 6.0 cm into the belly. The
- * left shoulder turns 36° forward, as the shoulder blade of a real player slides forward. The left
- * paw then has 7.0 cm to spare, and the right paw 18.0 cm (`pnpm hold-fit hornist`).
+ * (`docs/reference/wind-technique.md` 2.2): the left hoof on the valves at the middle of the body,
+ * the right hoof in the bell, and the horn across the body from the mouth to the bell at the right
+ * of the torso. The mouthpiece rests on the lips under the snout disc (`StudioBody.mouth`), and the
+ * snout puts it far in front of the shoulder joints. The horn turns its lower end 30° back toward
+ * the body ({@link PIG_TURNS}), so that the coil stands in front of the round belly, and its right
+ * side 15° back, so that the bell opens to the back and the right hoof comes down into it from
+ * above, as the bell of a real horn points past the right side of the body
+ * (`docs/reference/wind-technique.md` 2.2). The left shoulder turns 46° forward, as the shoulder
+ * blade of a real player slides forward. The Tripo pig has the short arms of its source: with the
+ * coil 20° back and the shoulder 36° forward, the left hoof missed the valves by 2.3 cm. The left
+ * hoof now has 4.5 cm to spare, and the right hoof 12.7 cm (`pnpm hold-fit hornist`).
  *
- * The left elbow points out and a little forward, and the right elbow out and down. The arms of
- * the body are round tubes free of the trunk, so the left elbow stays away from the side, as a horn
- * player keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The left
- * elbow turns out about the line from the shoulder joint to the valves, from (-1, -0.5, -1) to
- * (-1, 0.05, -0.5), and the left shoulder turns 36° forward in place of 26°: with the old elbow,
- * the left forearm went 2.7 cm and the left upper arm 2.7 cm into the belly. The rest elbow points
- * higher, (-1, 0.6, -0.7), because the left upper arm then lies on the side of the belly: with
- * (-1, 0.2, -0.7), it went 1.6 cm into the belly. The grip turn of the arm gate counts from the
- * posed forearm, and the two turns move it in opposite directions: the shoulder alone at 40° turns
- * the left grip 19°, the elbow alone 21°, and both 5°. On the rig with the raise shapes of the old
- * hold, a forward turn of the shoulder of 40° or more folds 7 to 9 faces of the left arm, so the
- * shoulder turns 36°. The left paw holds the valves at the grip of the horn, and the left forearm
- * stays off the belly.
- *
- * At rest, the horn comes down 0.2 H and 0.25 H forward, in front of the round belly, which covers
- * the short thighs, with the bell at the right of the belly beside the right haunch. The coil
- * touches the belly at most 0.2 cm. With 0.2 H forward, the coil went 2.2 cm into the belly, and
- * with 20° back, the right paw missed the bell. At rest, the left grip moves 0.015 H toward the
- * mouthpiece and 0.015 H away from the left shoulder (`restGripShiftL`), so that the left paw and
- * forearm go at most 0.5 cm into the horn. The right elbow points out, down, and forward
- * (`restPoleR`), so that the round right forearm stays off the rim of the bell, with the bind
- * supination of the right paw that this elbow gives.
+ * The left elbow points out and a little forward, and the right elbow out and down, as a horn
+ * player keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The rest
+ * elbow of the left arm points higher, (-1, 0.6, -0.7), so that the left upper arm lies on the side
+ * of the belly. At rest, the horn comes down 0.1 H and 0.1 H forward, in front of the round belly
+ * over the lap, with its right side square to the chest and its lower end 15° to the left. With
+ * the rest horn 0.2 H down and 0.25 H forward, both hooves missed it by about 8 cm. At rest, the
+ * left grip moves 0.015 H toward the mouthpiece and 0.015 H away from the left shoulder
+ * (`restGripShiftL`), and the right elbow points out, down, and forward (`restPoleR`), so that the
+ * left wrist and the right forearm stay off the horn.
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
-  reachL: 36 * MathUtils.DEG2RAD,
+  reachL: 46 * MathUtils.DEG2RAD,
   play: pigTurn(PIG_TURNS.play),
   poleL: [-1, 0.05, -0.5],
   poleR: [1, -1, 0],
   rest: pigTurn(PIG_TURNS.rest),
-  restShift: [0.05, -0.2, -0.25],
+  restShift: [0.05, -0.1, -0.1],
   restPoleL: [-1, 0.6, -0.7],
   restPoleR: [1, -0.5, -0.6],
   restGripShiftL: [-0.015, 0, 0.015],

@@ -490,10 +490,12 @@ The app follows these facts:
   leg, and the mouthpiece slopes down (`HORN_TURN`, `PIG_TURNS`). The right paw comes down into
   the bell from above. The mouthpiece rests on the lips under the snout disc, at the mouth line of
   the body (`mouthHeight`, design 4.4), and its rim presses the upper lip most. The coil stands in
-  front of the round belly, with a gap. The valves follow the double horn chart, with the B♭ side
+  front of the round belly, with a gap. The Tripo pig has short arms, so the coil turns 30° back
+  toward the body, and at rest the horn stays near the belly over the lap, in reach of both
+  hooves. The valves follow the double horn chart, with the B♭ side
   above the written G4 (7.3, `HORN_B_FLAT`).
 - **The horn arms (2.2, `PIG_HORN`).** Both arms stay away from the rib cage, as Weidner keeps
-  them. The left elbow points out to the side, and the left shoulder turns forward (`poleL`,
+  them. The left elbow points out to the side, and the left shoulder turns 46° forward (`poleL`,
   `restPoleL`, `reachL`), so that the free round arms of the pig stay out of the belly (design
   5.3). The left paw holds the valves at the grip of the horn. At rest, the left grip moves a
   little toward the mouthpiece and away from the left shoulder (`restGripShiftL`), and the right
