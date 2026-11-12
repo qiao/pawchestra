@@ -84,30 +84,33 @@ export const TIMPANI = {
   front: 0.12,
   /**
    * The angle of each mallet below the level in the bind pose, toward the fingers of the hanging
-   * paw, in radians: the shaft runs 45° from the fingers toward the thumb. A real timpanist holds
-   * the shaft along the thumb, with the head out of the front of the fist
+   * paw, in radians: the shaft runs 30° from the thumb toward the fingers. A real timpanist holds
+   * the shaft across the palm, with the head out of the front of the fist
    * (`docs/reference/percussion-technique.md` 1). The paw of the app has no side bend on the
-   * forearm (`PercussionHold.flex`), so the forearm stands at least this angle from the shaft. At
-   * the strikes of the elephant, the forearm stands 20° to 44° from the shaft.
+   * forearm (`PercussionHold.strikeRoll`), so the forearm stands at least 60° from the shaft for a
+   * straight paw. At the strikes of the elephant, the forearm stands 54° to 60° from the shaft, and
+   * the shaft crosses the closed stump. At 45°, the forearm stood 20° to 44° from the shaft, and
+   * the shaft ran along the stump and left its end.
    */
-  malletTilt: 45 * MathUtils.DEG2RAD,
+  malletTilt: 30 * MathUtils.DEG2RAD,
   /**
-   * The grip of the mallet in the closed left paw of the elephant (`MalletSpot`). The values come
-   * from the old elephant mesh, whose paws were not symmetric. The stump paws of the Tripo
-   * elephant keep them: the end of the stump closes 20° on the shaft, and the shaft leaves the
-   * front of the stump.
+   * The grip of the mallet in the closed left paw of the elephant (`MalletSpot`): 7 cm toward the
+   * palm, at the middle of the palm along the fingers, and 3 cm toward the thumb. The palm of the
+   * stump paw faces down at the kettles, so the shaft runs across the lower side of the stump,
+   * as through a fist, and the paw stays over the head of the kettle. A grip 5 cm along the
+   * fingers put the shaft out of the end of the stump.
    */
-  malletSpotL: [0.045, 0.05, 0.035],
-  /** The grip of the mallet in the closed right paw of the elephant mesh. */
-  malletSpotR: [0.06, 0.035, 0.0238],
+  malletSpotL: [0.07, 0, 0.03],
+  /** The grip of the mallet in the closed right paw: the paws of the Tripo elephant are symmetric. */
+  malletSpotR: [0.07, 0, 0.03],
   /**
    * The length of each shaft behind its grip, in meters ({@link MALLET_BUTT}). The shaft goes
-   * about 8 cm through the large paw of the elephant, so the butt end sticks out 2.3 cm (left)
-   * and 1.8 cm (right) behind the paw, as a real player holds 13 mm to 25 mm behind the hand
-   * (`docs/reference/percussion-technique.md` 1). With 4 cm, the right butt stays in the paw.
+   * about 14 cm back through the stump and the wrist, so the butt end sticks out 2 cm to 3 cm
+   * behind the paw, as a real player holds 13 mm to 25 mm behind the hand
+   * (`docs/reference/percussion-technique.md` 1).
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletButt: 0.06 as number,
+  malletButt: 0.165 as number,
 } as const;
 
 /**

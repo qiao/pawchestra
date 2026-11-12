@@ -388,30 +388,30 @@ export const PERCUSSION_HOLDS = {
   // The elephant mesh has short arms behind a deep belly, and its trunk hangs between the two
   // front kettles: each hand strikes the front kettle of its side, and the outer kettles stand
   // beyond its reach (pair). The paw rests above the near rim, and the mallet strikes 0.25 m in
-  // from the rim, for the look of the reference images. As a real timpanist,
-  // the paw holds the head out of the front of the fist (TIMPANI.malletTilt), and each mallet
-  // points forward and in. The homes stand out from the shoulders, so that the mallets point
-  // forward and 24° to 32° in at a strike, a V of about 55° as in the American grip. Between
-  // strikes and at rest, each mallet keeps its strike direction, and the wrist lifts the head
-  // 2 cm to 7 cm above the playing spot (across.pitch), as the set position of a real timpanist.
-  // Before a strike, the wrist turns the head up by 0.6 to 1.2 rad, by the loudness (sizes.lift,
-  // across.peak), and brings it down at the note start, as the full stroke of a real player. The
-  // mallet points in, nearly along the level axis of the turn, so a turn of 0.4 to 0.8 rad (lift
-  // 0.2, peak 8) lifted the head only a few cm, and the close views showed no lift. A turn of the
-  // mallet across the forearm between strikes lays the right mallet level across the belly, and
-  // a larger pitch moves the shaft out of the closed paw. The elbows point down and a little out
-  // from the body, so that the upper arms roll less, the skin does not twist at the shoulder, no
-  // gap shows between each upper arm and the trunk from the back, and the thick upper arms of the
-  // quad tubes go less far into the round belly near the elbows. The homes stand 0.25 H below the
-  // shoulders and 0.2 H forward, so that each mallet slopes down along the line of its forearm and
-  // the paw, as a real timpanist holds it. With the homes 0.37 H down, the forearm hangs down, the
-  // mallet leaves the bottom of the paw nearly at a right angle, and the wrists twist in an
-  // unnatural way at a strike. Homes higher than 0.25 H, or elbows that point back, fold more
-  // faces of the paws and turn the paws faster in the lowering. The mallets stay over the kettles
-  // in the rest pose, because the hanging paws reach into the large kettles (ready).
+  // from the rim, for the look of the reference images. As a real timpanist with the German grip,
+  // the palm of each paw faces down, the shaft crosses the lower side of the closed stump, and the
+  // head leaves the front of the fist (TIMPANI.malletTilt, malletSpotL). The homes stand 0.66 H
+  // out from the shoulders, so that the mallets point forward and 27° to 34° in, a V of about 60°,
+  // and each forearm stands 54° to 60° from its shaft at a strike. With the homes 0.48 H out, the
+  // shaft ran along the forearm and left the end of the stump. With 0.7 H, a right strike missed
+  // its target by 7 mm. Between strikes and at rest, each mallet keeps its strike direction, and
+  // the wrist lifts the head 0.3 rad (across.pitch): the mallet then slopes 13° to 17° down, and
+  // its felt ball is about one inch over the head, as in the set position of a real timpanist.
+  // The rest height of the lift (sizes.rest) and the peak share go with the pitch, so the full
+  // stroke keeps its turn of up to 1.2 rad by the loudness (sizes.lift). With the pitch of 0.1,
+  // the mallets sloped 21° to 24° down and the balls lay on the heads. The mallet points in, nearly
+  // along the level axis of the turn, so a turn of 0.4 to 0.8 rad (lift 0.2, peak 8) lifted the
+  // head only a few cm, and the close views showed no lift. A turn of the mallet across the
+  // forearm between strikes lays the right mallet level across the belly. The elbows point down
+  // and a little out from the body, so that the upper arms roll less, the skin does not twist at
+  // the shoulder, no gap shows between each upper arm and the trunk from the back, and the thick
+  // upper arms of the quad tubes go less far into the round belly near the elbows. The homes stand
+  // 0.25 H below the shoulders and 0.2 H forward. Lower homes put the stump paws into the kettles,
+  // because the paws stand over the heads. The mallets stay over the kettles in the rest pose,
+  // because the hanging paws reach into the large kettles (ready).
   timpani: {
     hands: 'sides',
-    sizes: { lift: 0.3, rest: 0.03 },
+    sizes: { lift: 0.3, rest: 0.09 },
     // The left mallet strikes 8 cm toward the middle, so that it points in as far as the right
     // mallet: with no offset, the left mallet points 17° in and the right mallet 22°.
     offsetL: [0.08, 0, 0],
@@ -419,9 +419,9 @@ export const PERCUSSION_HOLDS = {
     poleL: [-0.8, -1, 0.2],
     poleR: [0.8, -1, 0.2],
     rim: 0.25,
-    home: [0.48, -0.25, -0.2],
+    home: [0.66, -0.25, -0.2],
     top: 'shoulder',
-    across: { rest: -1.2, lift: 0.65, pitch: 0.1, peak: 12 },
+    across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
     ready: true,
     set: null,
@@ -433,15 +433,15 @@ export const PERCUSSION_HOLDS = {
     side: null,
     fit: null,
     // After a note before a rest, the paw that struck it muffles its head (damp). The left front
-    // kettle stands nearer than the right one, so each side has its own reach. The spine leans
-    // 3° and the upper body turns 17°. The stump paw of the Tripo elephant reaches 0.52 m and
-    // 0.51 m, and its rigid low point stays 1.5 cm over the head, so that its skin touches the head
-    // (sweep: paws, forearms, and the trunk out of the kettles). The grip stays level with the
-    // head, and the mallet keeps 5 of the pitch, so that the left forearm twists at most 43° at
-    // the damp and the mallet head stays out of the head. With the lean of 15°, the reach
-    // of 0.46 m, and a press of 1.7 cm of the old paw, the stump went 5.7 cm and the forearm
-    // 6.4 cm into the kettles, the trunk 2.2 cm into a head, and the center of mass moved 10 cm
-    // forward of the middle of the soles.
+    // kettle stands nearer than the right one, so each side has its own reach. The spine leans 3°,
+    // and the upper body turns 17°.
+    // The stump paw of the Tripo elephant reaches 0.52 m and 0.51 m, and its rigid low point stays
+    // 1.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
+    // out of the kettles). The grip stays level with the head, and the mallet keeps 0.5 rad of
+    // the pitch (share), so that the mallet head stays out of the head. With the lean of
+    // 15°, the reach of 0.46 m, and a press of 1.7 cm of the old paw, the stump went 5.7 cm and
+    // the forearm 6.4 cm into the kettles, the trunk 2.2 cm into a head, and the center of mass
+    // moved 10 cm forward of the middle of the soles.
     damp: {
       kind: 'fingers',
       restSec: 0.5,
@@ -450,7 +450,7 @@ export const PERCUSSION_HOLDS = {
       rim: 0.05,
       up: 0,
       press: -0.015,
-      share: 5,
+      share: 1.67,
       lean: 0.05,
       turn: 0.3,
     },
