@@ -27,7 +27,7 @@ model folder gives the files of each step.
 | pig | A copy with round upper arms (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor`), arm roots at the trunk wall (`pig_root.py`), two left `raise` shapes, forearm skin normals. | `hornist` |
 | wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | Arms freed in a copy (`badger_edit.py`), rebuilt arms, rigid shoulder faces (`rigidPainted`), triangle and recast `raise` shapes, a tail ball, a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
-| monkey | Longer rebuilt arms (`arm_rebuild.py --factor`), a long tail curled on the floor, a smaller trumpet, no chair. | `trumpeter` |
+| monkey | Longer rebuilt arms (`arm_rebuild.py --factor`), a long tail curled on the floor, no chair. The Tripo hand rig at 1.2 times H of this body, with the trumpet of the app. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Longer rebuilt arms (`deer_arms.py`), a right elbow `raise`, a thumb bone on each fist (`thumbs`). Sits on the harp stool, with a smaller harp (`harpScale`). | `harpist` |
 | penguin | Flippers freed in a copy (`penguin_edit.py`) and rebuilt, a split beak with a jaw bone, point edits of the flipper seams, two colors only (`colors.twoTone`), a color blend, left flipper `raise` shapes. Stands on its riser. | `singer` |
