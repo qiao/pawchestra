@@ -538,7 +538,10 @@ The app follows these facts:
   `BowedHold.restPawTurnL`), and the left elbow hangs near the side (`BowedHold.restPoleL`). In
   the shared violin hold and the hold of the rabbit, both arms hang out to the sides until they
   clear the body, and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
-  front of the thigh, and the upright bow at the right paw. The cat rests the viola nearer to the
+  front of the thigh, and the upright bow at the right paw. The rabbit holds its violin upright on
+  the lap with the left elbow near the side, and hangs the bow from the right paw at its side, with
+  the tip down and forward to the right foot, away from the music desk and the face
+  (`RABBIT_HOLD`). The cat rests the viola nearer to the
   hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
   side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
 
@@ -589,6 +592,9 @@ The app does not follow these facts:
   because with the top to the front the bow paw of the cat turns too fast in a lowering. The bow
   paw rests low at the front of the lap or the lower belly, with the elbow hanging and a straight
   wrist.
+- **The bow at rest (2.9).** No source of this file gives the bow of a seated violinist at rest.
+  The rabbit points the tip down and forward, and not straight down, because its paw grips the
+  stick across the palm: a tip straight down twists the forearm by about 180°.
 
 ### 3.3 The cello on the chair and at rest
 
