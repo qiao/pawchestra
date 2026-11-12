@@ -360,11 +360,6 @@ passes.
       blocked and 21 hidden, and with the first desk of the violas also in row 1, 123 and 30.
       Horns on the right of row 3 gave 48 to 50 blocked and 19 or 20 hidden. Both together gave
       75 blocked and 23 hidden.
-- [ ] Tripo elephant timpanist: the arm gate folds p95 are 12 (left) and 11 (right), over the
-      limit of 8 (main 6 and 3). The faces fold at the inner elbows and at the root of each upper
-      arm (`pnpm fold-probe timpanist`). The arm has no clean quad band, so no ring takes a split.
-- [ ] Tripo elephant: the inner side of each upper arm root lies 4.7 cm in the trunk in each
-      sample of the sweep, also at rest (`pnpm pose-depth timpanist`).
 - [ ] Tripo elephant: its seat height is 0.489 m (0.288 m on the old elephant), the back of the
       haunch of the standing bind. Check the recast seated roles of the cast matrix.
 - [ ] Elephant timpanist: the stump grip of 2026-11-12 holds the mallets 13° to 17° down between
@@ -726,17 +721,13 @@ passes.
       violist` did not run on the fourth mesh.
 - [ ] Cat candidate: the smaller eyes and the lower upper lids have only ray checks of the lids (no
       lid point leaves the head in a blink step). Check a blink in the app.
-- [ ] Tripo fox with four-digit paws: the pizzicato fix of `FOX_HOLD` (2026-11-12) brought the
-      right upper arm of the red fox from 7.6 cm to 2.3 cm in the shoulder. In mozart-k525 the
-      root of the arm still goes 2.2 cm in (96 % of the samples, limit 1.5 cm), and the right folds
-      p95 stay 11 (limit 8). Four elbow poles did not change it: it needs a weight row.
 - [ ] Tripo red fox violinist: the rest frog of the bow is 16 cm over the right thigh, because the
       short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
-      At rest the left upper arm goes 3.4 cm into the belly.
+      At rest the left upper arm goes 3.4 cm into the belly (upperArmL 0.50), and in mozart-k525
+      also in 26 % of the lift and 57 % of the lowering.
 - [ ] Tripo tan fox flutist: the free left paw rests on the haunch beside the hip, because the
-      arm does not reach the top of the thigh or the flute at rest. The root of the left upper
-      arm goes 2.0 cm into the body in the play, the lift, and the lowering (limit 1.5 cm). In the
-      lowering the right rest grip grasps the flute in only 37 % of the samples.
+      arm does not reach the top of the thigh or the flute at rest. In the lowering the right rest
+      grip grasps the flute in only 37 % of the samples.
 - [ ] Tripo fox with four-digit paws: the seat is 0.249 m with flat feet. A heel turn for a taller
       chair moves 318 to 421 of the 459 players of the demos (sight pass, 4.5), so it waits for a
       layout rule that keeps the seats.
