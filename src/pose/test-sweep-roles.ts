@@ -209,16 +209,16 @@ const MONKEY_BODY_LOOPS = 5;
 const RHINO_BODY_LOOPS = 3;
 
 /**
- * The open loops of {@link BODY_BONES} of the deer mesh: the roots of the two rebuilt upper arms
- * (`deer-arms.glb`), and one open edge pair of 1.5 cm at the left hoof.
+ * The open loops of {@link BODY_BONES} of the old deer mesh: the roots of the two rebuilt upper
+ * arms (`deer-arms.glb` at cbc8db5e4), and one open edge pair of 1.5 cm at the left hoof.
  */
 const DEER_BODY_LOOPS = 3;
 
 /**
- * The open loops of {@link BODY_BONES} of the pig mesh of `pig.rig.glb`: none. Each arm of the pig
- * is a closed part of its own with no face that joins it to the trunk (`pig-upper.glb`,
- * `pig-arms.glb`), and the trunk wall under each arm is closed. The Tripo pig takes its loops from
- * {@link TRIPO_BODY_LOOPS}.
+ * The open loops of {@link BODY_BONES} of the old pig mesh of `pig.rig.glb` at cbc8db5e4: none.
+ * Each arm of that pig is a closed part of its own with no face that joins it to the trunk
+ * (`pig-upper.glb` and `pig-arms.glb` at cbc8db5e4), and the trunk wall under each arm is closed.
+ * The Tripo pig takes its loops from {@link TRIPO_BODY_LOOPS}.
  */
 const PIG_BODY_LOOPS = 0;
 
