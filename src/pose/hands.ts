@@ -64,11 +64,12 @@ interface HandsHold {
   readonly palmL: Vec3;
   readonly palmR: Vec3;
   /**
-   * The move of the left palm for its highest keys, in the axes of the instrument piece, or `null`
+   * The move of each palm for its highest keys, in the axes of the instrument piece, or `null`
    * for none. The move grows from 0 at the key `from` to the full `offset` at the key `to`, by the
    * middle of the keys of the note.
    */
-  readonly highL: { readonly from: number; readonly to: number; readonly offset: Vec3 } | null;
+  readonly highL: HighPalm | null;
+  readonly highR: HighPalm | null;
   /**
    * The side of the palm of each hand: down to the keys of the piano, and to the strings of the
    * harp. In the axes of the instrument piece.
@@ -148,6 +149,13 @@ type RestingHand = LapHand & {
   readonly pole: Vec3;
 };
 
+/** The move of a palm for its highest keys ({@link HandsHold.highL}). */
+interface HighPalm {
+  readonly from: number;
+  readonly to: number;
+  readonly offset: Vec3;
+}
+
 /** The holds of the piano and the harp. */
 export const HANDS_HOLDS = {
   // The paw of the studio polar bear is longer than a white key, so the palm is 0.039 m in front of
@@ -205,6 +213,7 @@ export const HANDS_HOLDS = {
     palmL: [0, 0.0572, 0.039],
     palmR: [0, 0.0657, 0.039],
     highL: null,
+    highR: null,
     faceL: [0, -1, 0],
     faceR: [0, -1, 0],
     aimL: null,
@@ -336,6 +345,7 @@ export const HANDS_HOLDS = {
     // G3 and 4 cm down, it went 1.6 cm at B3 on the harp turned to 47°. The note targets do not
     // change (`pnpm hold-fit harpist`).
     highL: { from: 53, to: 62, offset: [0.04, -0.06, -0.04] },
+    highR: null,
     faceL: [1, -1, 0],
     faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
@@ -521,10 +531,10 @@ function palmPoint(
     at.z = depth;
   }
   at.add(new Vector3(...offset));
-  const { highL } = rig.hold;
-  if (side === 'L' && highL) {
-    const share = clamp01(((low + high) / 2 - highL.from) / (highL.to - highL.from));
-    at.addScaledVector(new Vector3(...highL.offset), share);
+  const highPalm = side === 'L' ? rig.hold.highL : rig.hold.highR;
+  if (highPalm) {
+    const share = clamp01(((low + high) / 2 - highPalm.from) / (highPalm.to - highPalm.from));
+    at.addScaledVector(new Vector3(...highPalm.offset), share);
   }
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
 }
