@@ -925,11 +925,12 @@ const BEAVER_REST = holdTurn(0, 0);
  * so that both paws grasp it in each sample (`pnpm wind-grip bassoonist`). With the right grip
  * 0.2 H toward the axis and 0.14 H across it, the right paw grasped in 67 % of the play samples.
  *
- * The big front teeth hang in front of the lower lip, so the reed sits 0.25 H lower and 0.24 H
- * further back than the mouth of the bind pose (`lipShift`): at the lower lip, just behind the
- * teeth, as the reed of a real bassoonist goes straight into the mouth
- * (`docs/reference/wind-technique.md` 3). With 0.3 H lower and 0.31 H back, the reed ended at the
- * lower tips of the teeth.
+ * The big front teeth hang in front of the lower lip, so the reed sits 0.2 H lower and 0.28 H
+ * further back than the mouth of the bind pose (`lipShift`): behind the teeth at the height of
+ * their roots, between the lips, as the reed of a real bassoonist goes straight into the mouth
+ * (`docs/reference/wind-technique.md` 3). The bocal then rises beside the right tooth into the
+ * mouth, and the reed goes 1.4 cm into the head. With 0.25 H lower and 0.24 H back, the reed
+ * ended at the lower tips of the teeth.
  *
  * The right fingers curl 120° around the boot joint, and the left fingers 110° around the wing
  * joint. With 100°, the left paw grasped in no rest sample.
@@ -938,7 +939,7 @@ const BEAVER_BASSOON = {
   ...WIND_HOLDS.bassoon,
   reach: BEAVER_SHOULDER_TURN.right * MathUtils.DEG2RAD,
   reachL: BEAVER_SHOULDER_TURN.left * MathUtils.DEG2RAD,
-  lipShift: [0, -0.25, 0.24],
+  lipShift: [0, -0.2, 0.28],
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
   restShift: [0, -0.1, -0.1],
