@@ -57,7 +57,7 @@
  },
  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
  "metersPerUnit": 1.01029,
- "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb).",
+ "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb at cbc8db5e4).",
  "eyeSize": 0.30728,
  "jointsNote": "TBD",
  "rings": {

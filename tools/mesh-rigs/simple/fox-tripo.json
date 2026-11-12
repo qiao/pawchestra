@@ -249,7 +249,7 @@
         "head": 0
       }
     },
-    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py), as seated string players sit tall. The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the fox of main (tools/mesh-rigs/fox.json).",
+    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py), as seated string players sit tall. The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the fox of main (tools/mesh-rigs/fox.json at cbc8db5e4).",
     "bindArms": {
       "upper_arm": [
         0.813873,

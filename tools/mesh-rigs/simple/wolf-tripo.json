@@ -249,7 +249,7 @@
         "head": 0
       }
     },
-    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the wolf of main (tools/mesh-rigs/wolf.json).",
+    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the wolf of main (tools/mesh-rigs/wolf.json at cbc8db5e4).",
     "bindArms": {
       "upper_arm": [
         0.813873,
@@ -262,7 +262,7 @@
         0.949632
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the wolf of main (tools/mesh-rigs/wolf.json), so that the elbow axes of the clarinet hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the wolf of main (tools/mesh-rigs/wolf.json at cbc8db5e4), so that the elbow axes of the clarinet hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -396,7 +396,7 @@
   "eyeSize": 0.208109,
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.77428,
-  "metersPerUnitNote": "The scale of the app: H (0.208109 units) is 0.369244 m, the H of the wolf of main (assets/models/wolf/wolf.rig.glb). The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the arms, and the legs keep the form of the source. The front paws are smaller than in the source (the edit paw of the build: 0.8 times as long and 0.8 times as wide past the wrist joint).",
+  "metersPerUnitNote": "The scale of the app: H (0.208109 units) is 0.369244 m, the H of the wolf of main (assets/models/wolf/wolf.rig.glb at cbc8db5e4). The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the arms, and the legs keep the form of the source. The front paws are smaller than in the source (the edit paw of the build: 0.8 times as long and 0.8 times as wide past the wrist joint).",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/wolf.blend holds it.",
   "texture": "assets/models/wolf/tripo-p2/wolf.fbm/wolf_basecolor.jpg",
   "rollSplit": true,

@@ -262,7 +262,7 @@
     "head": 0
    }
   },
-  "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the deer of main (tools/mesh-rigs/deer.json).",
+  "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the deer of main (tools/mesh-rigs/deer.json at cbc8db5e4).",
   "bindArms": {
    "upper_arm": [
     0.702,
@@ -275,7 +275,7 @@
     0.571719
    ]
   },
-  "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the deer of main (tools/mesh-rigs/deer.json), so that the elbow axes of the harp hold stay.",
+  "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the deer of main (tools/mesh-rigs/deer.json at cbc8db5e4), so that the elbow axes of the harp hold stay.",
   "straightArms": true,
   "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
   "bindSupination": {
@@ -369,7 +369,7 @@
  "eyeSize": 0.211529,
  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye. The simple route reads this value.",
  "metersPerUnit": 1.526966,
- "metersPerUnitNote": "The scale of the app: H (0.211529 units) stays 0.322998 m, the H of the fox of assets/models/fox/fox.rig.glb. The fact height of the armature is the shoulder joints (0.6836 units, 0.638 before the longer legs of assets/models/fox/README.md) at this scale: 1.043834 m.",
+ "metersPerUnitNote": "The scale of the app: H (0.211529 units) stays 0.322998 m, the H of the fox of assets/models/fox/fox.rig.glb at cbc8db5e4. The fact height of the armature is the shoulder joints (0.6836 units, 0.638 before the longer legs of assets/models/fox/README.md) at this scale: 1.043834 m.",
  "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/fox.blend holds it.",
  "texture": "assets/models/deer/tripo-p2/deer.fbm/deer_basecolor.jpg",
  "rollSplit": true,

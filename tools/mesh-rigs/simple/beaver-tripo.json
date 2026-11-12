@@ -396,7 +396,7 @@
   "eyeSize": 0.30728,
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.01029,
-  "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb).",
+  "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb at cbc8db5e4).",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/beaver.blend holds it.",
   "texture": "assets/models/beaver/tripo-p2/beaver.fbm/beaver_basecolor.jpg",
   "rollSplit": true,

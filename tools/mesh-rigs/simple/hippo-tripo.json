@@ -249,7 +249,7 @@
         "head": 0
       }
     },
-    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the dog of main (tools/mesh-rigs/dog.json).",
+    "trunkNote": "The trunk of the seated bind sits upright (trunk_turn() of tools/blender/rig_mesh.py). The pelvis turns back until the hip angle opens by open degrees, and each trunk bone takes its share. The values are those of the dog of main (tools/mesh-rigs/dog.json at cbc8db5e4).",
     "bindArms": {
       "upper_arm": [
         0.813873,
@@ -262,7 +262,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the dog of main (tools/mesh-rigs/dog.json), so that the elbow axes of the cello hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the dog of main (tools/mesh-rigs/dog.json at cbc8db5e4), so that the elbow axes of the cello hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {

@@ -262,7 +262,7 @@
         0.571719
       ]
     },
-    "note": "The bear stands on its podium in the app, so the bind keeps the legs of the source: each leg turn is the identity. The trunk does not recline (open 0). The values are those of the bear of main (tools/mesh-rigs/bear.json).",
+    "note": "The bear stands on its podium in the app, so the bind keeps the legs of the source: each leg turn is the identity. The trunk does not recline (open 0). The values are those of the bear of main (tools/mesh-rigs/bear.json at cbc8db5e4).",
     "straightArms": true,
     "bindSupination": {
       "L": 0,
@@ -270,7 +270,7 @@
     },
     "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the bear of main (tools/mesh-rigs/bear.json), so that the elbow axes and the zero of the roll of the upper arm stay."
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the bear of main (tools/mesh-rigs/bear.json at cbc8db5e4), so that the elbow axes and the zero of the roll of the upper arm stay."
   },
   "colors": {
     "samples": 6,
