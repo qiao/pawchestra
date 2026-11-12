@@ -173,8 +173,9 @@ upper arm twists into a zigzag band at rest.
 `tripo-hand/` holds the body of the app: a hand rig of the Tripo P2 mesh `tripo-p2/panda.fbx`,
 made by one build script in headless Blender 5.2, by the route of the Tripo wolf
 (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form, the colors, and the eye paint
-of the source. The only point edit makes the front paws smaller ("Paw size"). The arms keep the
-length of the source: no cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the
+of the source. Two point edits change the form: the upper arms and the forearms are 1.2 times
+longer ("Arm stretch"), and the front paws are smaller ("Paw size"). The arms have no cut and no
+split from the trunk. The `ANIMALS` entry of the
 panda in `tools/studio-body.ts` points to `tripo-hand/panda.rig.glb`. The files of the old panda
 above do not change.
 
@@ -222,8 +223,8 @@ on the wolf).
 
 | Item | Value |
 |---|---|
-| Size | 400,899 bytes |
-| SHA-256 | `fb8a82c363b78df5ae98ee2668ada5b6dff4dbccb35a91ef6ede88ae521771e7` |
+| Size | 401,592 bytes |
+| SHA-256 | `622f298c5798acd2c2adfc452b0e39ec0fba04543dedda942baafad4f314a6d2` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the panda faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `panda`: 3,767 vertices and 4,047 faces (3,343 quads and 704 triangles, 7,390 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the color map. The 91 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids `lid`. The UV map of the FBX, and the property `texture` (`assets/models/panda/tripo-hand/panda-color.webp`) |
 | Armature | `panda_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -233,8 +234,8 @@ on the wolf).
 The scripts of the session (`scratch/panda/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rings.py`, `make_config.py`, `params.json`, and `chain-here.sh`) are not in the repo.
 They follow the scripts of the Tripo cat and of the Tripo wolf. `make_config.py` writes
-`tools/mesh-rigs/simple/panda-tripo.json`: the joints of the source, mapped by the paw turns and
-the paw edit. The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x
+`tools/mesh-rigs/simple/panda-tripo.json`: the joints of the source, mapped by the paw turns, the
+arm stretch, and the paw edit. The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x
 is the x of the left side, y the height, in the source):
 
 - **Import.** `sa.import_source('assets/models/panda/tripo-p2/panda.fbx', 1e-5)`. No vertex merges,
@@ -249,14 +250,17 @@ is the x of the left side, y the height, in the source):
   the right (5 steps), 427 and 426 vertices. New quads join the two rings with the step offset, and
   the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new
   quads keep the UVs of the old band ("Arm twist").
-- **Paw size.** The point edit `paw` ("Paw size" below), after the automatic weights.
+- **Arm stretch.** The point edit `armStretch` ("Arm stretch" below), before the automatic weights.
+- **Paw size.** The point edit `paw` ("Paw size" below), after the automatic weights. Its paw frame
+  moves with the forearm joint and the wrist joint of the arm stretch.
 - **Other point edits.** None. The head, the eyes, the muzzle, the trunk, the legs, the feet, and
   the tail keep the form of the source.
 - **Surface.** `sa.add_surface(panda, 'panda', <base color>, eye_fans=False,
   config=<panda-tripo.json>)`. The 40 faces in the nose box are no dark gloss faces, so they go back
   to the fur: the nose takes the color map with its painted nostrils.
-- **Armature.** The joints of the config: the shoulder at x 0.13, the elbow at x 0.235, the wrist at
-  x 0.33, the knuckles at x 0.40 (moved by the paw edit), the hip at (0.105, 0.24, -0.01), the knee
+- **Armature.** The joints of the config: the shoulder at x 0.13, the elbow at x 0.2555, the wrist
+  at x 0.3693, the knuckles at x 0.4271 (x 0.235, 0.33, and 0.40 in the source, moved by the arm
+  stretch and the paw edit), the hip at (0.105, 0.24, -0.01), the knee
   at (0.116, 0.13, -0.007), and the ankle at y 0.045. The palm is the true palm of the source, the
   mean normal of the paw faces that face down (x from 0.36), (0.127, -0.992, -0.016), turned by the
   paw turn. The bind arms and the trunk are those of the panda of main.
@@ -268,7 +272,8 @@ The weights, in the rest pose:
 2. Arm rows: each vertex of a side with |x| from 0.13, within 0.085 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.13 to 0 at x
    0.17, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2125, 0.2275, 0.2425, and 0.2575,
-   and the rest on the 4 roll segments.
+   and the rest on the 4 roll segments. These x are places of the source: a vertex of the
+   stretched arm takes the row of its place before the stretch.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
    0.024 units before the head of `fingers_<side>`.
@@ -283,6 +288,23 @@ The weights, in the rest pose:
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
+
+**Arm stretch.** The point edit `armStretch` of `redits.py` (in `params.json`: `{"kind":
+"armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.1, 0.12]}`), the edit of the hippo and the deer
+(`../hippo/README.md`, "Arm stretch"). Each vertex of a side with |x| over the shoulder joint moves
+along the line u of the rest arm, from the shoulder joint to the wrist joint (0.2003 units), from
+its place t on the line to t + 0.2 G(t). G is the integral of a band from 0 to t: a smoothstep from
+0 at t -0.01 to 1 at 0.01, 1 to the wrist, and a smoothstep to 0 from 0.01 before the wrist to 0.01
+after it. Thus the upper arm and the forearm grow by 1.2, and the paw moves out by 0.04 units as one
+piece. The move fades from 1 at 0.1 units from the line to 0 at 0.12 units, so that the belly and
+the head stay: the arm and the paw lie within 0.095 units of the line, and the trunk and the head
+0.12 units or more from it. Reason: the big round head puts the mouth 0.21 m in front of the right
+shoulder joint, and with the arms of the source, each arm reached 0.417 m from the shoulder joint
+to the middle of the palm. The right arm then reached 0.03 m of the slide travel of the trombone
+of the app, so the panda played a trombone of 0.75, which read as a toy. Each arm now reaches
+0.488 m, and the right arm reaches 0.135 m of the slide travel of the trombone of the app
+(`pnpm hold-reach panda --instrument trombone`). The seat height (0.171 m), the head height, and the
+layout do not change: each seat of a demo moves 0.04 cm or less.
 
 **Paw size.** In the app, the front paws of the source read too large against the short arms: the
 paw is 0.66 of the arm long and 0.70 of the arm wide (the source wolf 0.56 and 0.58, the panda of
@@ -338,12 +360,12 @@ hold `PANDA_TROMBONE` of `src/pose/winds.ts`:
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| first | 33.7 | 7.8 | -34.8 | 20.0 |
-| seventh | 33.7 | 7.8 | -36.2 | 20.8 |
-| rest | 38.1 | 9.5 | -43.5 | 22.4 |
-| lift50 | 37.9 | 6.2 | -41.6 | 24.1 |
-| lower50 | 37.4 | 5.9 | -40.1 | 23.2 |
-| stand | 33.7 | 7.3 | -34.7 | 20.4 |
+| first | 35.7 | 6.2 | -30.3 | 23.3 |
+| seventh | 35.7 | 6.2 | -34.4 | 19.2 |
+| rest | 37.3 | 7.9 | -39.1 | 20.4 |
+| lift50 | 37.6 | 4.4 | -36.1 | 22.7 |
+| lower50 | 37.5 | 4.1 | -34.8 | 23.1 |
+| stand | 35.6 | 5.8 | -30.1 | 23.7 |
 
 With no paw turn, the forearms twisted -127 degrees on the left and 96 to 149 degrees on the right.
 
@@ -354,15 +376,15 @@ scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and `cweb
 -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the cream fur reads
-lighter and the dark parts read browner than in the even gray light of an FBX viewer. The front
-paws are smaller (0.8). The eyeballs blink with lids. In the bind, the thighs slope forward and the
+lighter and the dark parts read browner than in the even gray light of an FBX viewer. The upper
+arms and the forearms are 1.2 times longer, and the front paws are smaller (0.8). The eyeballs blink with lids. In the bind, the thighs slope forward and the
 arms bend at the elbows.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/panda.rig.glb` | 1,152,580 bytes | `7191c6d47721d18e50a08be326b7940904486723339bea9df192dde8e50ef797` |
-| `tripo-hand/panda.rig.json` | 16,262 bytes | `20cfd4f65ce9f85f18807079fe4deb73e061b7dc89ef70a26c7ca118c56e132e` |
+| `tripo-hand/panda.rig.glb` | 1,152,580 bytes | `801e793b73d167db144c585a74c6c1ac63694c7065040df2a35c0b730f12e101` |
+| `tripo-hand/panda.rig.json` | 16,255 bytes | `86ea4c868d0b9b25b9371e9c58524e3daede6e7e3a702c83c6de05249b2e36b6` |
 | `tripo-hand/panda-color.webp` | 259,152 bytes, 2048 × 2048 | `f630fa99d34ef0f4be8b5c8bafcdf90602ca1488d0f5946fc11420e66165909c` |
 | `tripo-hand/panda-normal.webp` | 52,722 bytes, 1024 × 1024 | `aa537e7099c209fab0f402754cc48d6d45b930806cc567942ab1c56d31e551bb` |
