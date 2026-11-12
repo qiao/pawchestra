@@ -315,8 +315,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // and no stretch, so its chair fits the legs of the source. Its `.blend` holds the facts of the
   // body: the scale that keeps H of the A-pose rabbit, the crease angle 180°, and a seat 1 cm
   // deeper, so that its back keeps off the chair back. The thighs of its bind slope 15° down, and
-  // most of each thigh lies on the seat, as for a seated violinist. The source paints a light in
-  // each pupil, so the eyes take the finish `varnish` and no eye light.
+  // most of each thigh lies on the seat, as for a seated violinist. The eyes take the finish `eye`
+  // and the eye light: the painted light of the source lies under the upper lid, so with the
+  // finish `varnish` the eyes showed no clear light from the front.
   [
     'rabbit',
     {
@@ -325,7 +326,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       soloist: true,
       constant: 'STUDIO_RABBIT',
       glb: 'assets/models/rabbit/tripo-hand/rabbit.rig.glb',
-      eyeFinish: 'varnish',
     },
   ],
   // The red and the tan foxes (design 4.4): the candidate hand rig of the Tripo CLI fox
