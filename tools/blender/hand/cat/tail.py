@@ -6,6 +6,7 @@ vertices in each band of the distance form a ring of the tube, and the middle of
 point of the line. build.py gives the tube exact rows along the line (tail_rows()) and lays it on
 the seat with the key `bind_tail` (tail_key()).
 """
+
 import heapq
 
 import numpy as np
@@ -96,10 +97,17 @@ def curve(points, steps=40):
     ext = np.vstack([2 * p[0] - p[1], p, 2 * p[-1] - p[-2]])
     out = []
     for i in range(len(p) - 1):
-        p0, p1, p2, p3 = ext[i:i + 4]
+        p0, p1, p2, p3 = ext[i : i + 4]
         for t in np.linspace(0.0, 1.0, steps + 1)[:-1]:
-            out.append(0.5 * (2 * p1 + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t
-                              + (3 * p1 - p0 - 3 * p2 + p3) * t ** 3))
+            out.append(
+                0.5
+                * (
+                    2 * p1
+                    + (p2 - p0) * t
+                    + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t
+                    + (3 * p1 - p0 - 3 * p2 + p3) * t**3
+                )
+            )
     out.append(p[-1])
     out = np.asarray(out)
     return out, np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(out, axis=0), axis=1))])
@@ -153,6 +161,15 @@ def lay(points, place, line, turn, root, path, roll=0.0):
     near = s_pts[s_at] + s_tan[s_at] * (place - s_len[s_at])[:, None]
     offset = np.einsum('nji,nj->ni', s_frm[s_at], points - near)
     c, s = np.cos(roll), np.sin(roll)
-    offset = np.c_[c * offset[:, 0] - s * offset[:, 1], s * offset[:, 0] + c * offset[:, 1], offset[:, 2]]
-    return (c_pts[c_at] + c_tan[c_at] * (place - c_len[c_at])[:, None]
-            + np.einsum('nij,nj->ni', c_frm[c_at], offset)), float(s_len[-1]), float(c_len[-1])
+    offset = np.c_[
+        c * offset[:, 0] - s * offset[:, 1], s * offset[:, 0] + c * offset[:, 1], offset[:, 2]
+    ]
+    return (
+        (
+            c_pts[c_at]
+            + c_tan[c_at] * (place - c_len[c_at])[:, None]
+            + np.einsum('nij,nj->ni', c_frm[c_at], offset)
+        ),
+        float(s_len[-1]),
+        float(c_len[-1]),
+    )

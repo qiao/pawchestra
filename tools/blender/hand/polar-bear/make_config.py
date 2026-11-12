@@ -5,6 +5,7 @@ holds the joints of the edited mesh.
 
     uv run --no-project --with numpy python -I tools/blender/hand/polar-bear/make_config.py
 """
+
 import json
 import os
 import subprocess
@@ -44,9 +45,14 @@ SOURCE = {
 }
 ROLLS = {
     'root': [0, 1, 0],
-    'upper_arm_L': 'palm', 'forearm_L': 'palm', 'forearm_twist_L': 'palm', 'hand_L': 'palm',
+    'upper_arm_L': 'palm',
+    'forearm_L': 'palm',
+    'forearm_twist_L': 'palm',
+    'hand_L': 'palm',
     'fingers_L': 'palm',
-    'foot_L': [0, 1, 0], 'toes_L': [0, 1, 0], 'tail': [0, 1, 0],
+    'foot_L': [0, 1, 0],
+    'toes_L': [0, 1, 0],
+    'tail': [0, 1, 0],
 }
 TAIL_JOINTS = set()
 
@@ -77,7 +83,9 @@ def mapped_joints():
             head, tail = turned(head, side), turned(tail, side)
         else:
             head, tail = SOURCE[name]
-        pts = [np.array(head, float)] + ([np.array(tail, float)] if not isinstance(tail, str) else [])
+        pts = [np.array(head, float)] + (
+            [np.array(tail, float)] if not isinstance(tail, str) else []
+        )
         pts = np.array(pts)
         tail_mask = np.full(len(pts), name in TAIL_JOINTS)
         pts = ce.map_points(pts, P, tail_mask)
@@ -106,10 +114,14 @@ def main():
     st = cfg['studio']
     st.pop('legTurns', None)
     cfg['chair'] = P['chair']
-    cfg['chairNote'] = ('The seat of the rig in units of this body, as the property seat of the '
-                        'armature of tripo-hand/polar-bear.blend holds it.')
+    cfg['chairNote'] = (
+        'The seat of the rig in units of this body, as the property seat of the '
+        'armature of tripo-hand/polar-bear.blend holds it.'
+    )
     c = cfg['colors']
-    box = lambda lo, hi: [[round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)]
+    box = lambda lo, hi: [
+        [round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)
+    ]
     c['eyeBox'] = box(*P['eyeBox'])
     c['noseBox'] = box(*P['noseBox'])
     c['eyeBoxNote'] = P['eyeBoxNote']
@@ -127,11 +139,28 @@ def main():
     with open(path, 'w') as f:
         json.dump(cfg, f, indent=2)
         f.write('\n')
-    turns = subprocess.run(
-        ['uv', 'run', '-q', '--no-project', '--with', 'numpy', 'python', '-I',
-         os.path.join(ROOT, 'tools/rig/leg_turns.py'), path, *map(str, P['legTurns'])],
-        capture_output=True, text=True, check=True,
-    ).stdout.strip().splitlines()
+    turns = (
+        subprocess.run(
+            [
+                'uv',
+                'run',
+                '-q',
+                '--no-project',
+                '--with',
+                'numpy',
+                'python',
+                '-I',
+                os.path.join(ROOT, 'tools/rig/leg_turns.py'),
+                path,
+                *map(str, P['legTurns']),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.strip()
+        .splitlines()
+    )
     print(turns[0])
     st['legTurns'] = json.loads(turns[-1])
     st['note'] = (
@@ -140,7 +169,9 @@ def main():
         'of vertical, so that most of the thigh lies on the seat (uv run --no-project --with numpy '
         'python -I tools/rig/leg_turns.py <config> {} {} {}). The bind arms are those of the main '
         'polar bear. The bind paw of each arm turns about its bind forearm toward supination by '
-        'bindSupination degrees (paw_supination() of tools/blender/rig_mesh.py).'.format(*P['legTurns'], *P['legTurns'])
+        'bindSupination degrees (paw_supination() of tools/blender/rig_mesh.py).'.format(
+            *P['legTurns'], *P['legTurns']
+        )
     )
     with open(path, 'w') as f:
         json.dump(cfg, f, indent=2)

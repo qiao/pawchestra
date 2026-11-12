@@ -1,4 +1,5 @@
 """Finds the closed edge loops around a limb and the quad bands between them (studio axes)."""
+
 import bmesh
 import numpy as np
 
@@ -10,9 +11,11 @@ def studio(co):
 def loops_around(bm, inside, axis, steep=0.5):
     """Closed edge loops of the edges in `inside` (a bool per vertex) that stand across `axis`.
     Gives a list of (mean along, vertex indices, closed, reason)."""
-    bm.verts.ensure_lookup_table(); bm.edges.ensure_lookup_table()
+    bm.verts.ensure_lookup_table()
+    bm.edges.ensure_lookup_table()
     P = np.array([studio(v.co) for v in bm.verts])
-    ax = np.asarray(axis, float); ax /= np.linalg.norm(ax)
+    ax = np.asarray(axis, float)
+    ax /= np.linalg.norm(ax)
     seen, out = set(), []
     for e in bm.edges:
         a, b = e.verts
@@ -91,8 +94,11 @@ def band_next(bm, loop_a, axis, direction):
     edges, far = [], []
     for i in loop_a:
         v = bm.verts[i]
-        cand = [e for e in v.link_edges if e.other_vert(v).index not in sa_
-                and direction * (P(e.other_vert(v)) - P(v)) > -0.003]
+        cand = [
+            e
+            for e in v.link_edges
+            if e.other_vert(v).index not in sa_ and direction * (P(e.other_vert(v)) - P(v)) > -0.003
+        ]
         if len(cand) != 1:
             return None
         edges.append(cand[0])

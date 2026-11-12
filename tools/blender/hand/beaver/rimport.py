@@ -1,5 +1,6 @@
 """Import of the new Tripo cat: sa.import_source(). The FBX faces -y of Blender, so it takes no
 turn: +x is its left side."""
+
 import studio_armature as sa
 
 

@@ -5,6 +5,7 @@ holds the joints of the edited mesh.
 
     uv run --no-project --with numpy python -I tools/blender/hand/beaver/make_config.py
 """
+
 import json
 import os
 import subprocess
@@ -45,9 +46,15 @@ SOURCE = {
 }
 ROLLS = {
     'root': [0, 1, 0],
-    'upper_arm_L': 'palm', 'forearm_L': 'palm', 'forearm_twist_L': 'palm', 'hand_L': 'palm',
+    'upper_arm_L': 'palm',
+    'forearm_L': 'palm',
+    'forearm_twist_L': 'palm',
+    'hand_L': 'palm',
     'fingers_L': 'palm',
-    'foot_L': [0, 1, 0], 'toes_L': [0, 1, 0], 'tail': [0, 1, 0], 'tail_tip': [0, 1, 0],
+    'foot_L': [0, 1, 0],
+    'toes_L': [0, 1, 0],
+    'tail': [0, 1, 0],
+    'tail_tip': [0, 1, 0],
 }
 TAIL_JOINTS = {'tail', 'tail_tip'}
 
@@ -78,7 +85,9 @@ def mapped_joints():
             head, tail = turned(head, side), turned(tail, side)
         else:
             head, tail = SOURCE[name]
-        pts = [np.array(head, float)] + ([np.array(tail, float)] if not isinstance(tail, str) else [])
+        pts = [np.array(head, float)] + (
+            [np.array(tail, float)] if not isinstance(tail, str) else []
+        )
         pts = np.array(pts)
         tail_mask = np.full(len(pts), name in TAIL_JOINTS)
         pts = ce.map_points(pts, P, tail_mask)
@@ -111,10 +120,14 @@ def main():
     if 'bindUpper' in P:
         st['bindArms']['upper_arm'] = P['bindUpper']
     cfg['chair'] = P['chair']
-    cfg['chairNote'] = ('The seat of the rig in units of this body, as the property seat of the '
-                        'armature of tripo-hand/beaver.blend holds it.')
+    cfg['chairNote'] = (
+        'The seat of the rig in units of this body, as the property seat of the '
+        'armature of tripo-hand/beaver.blend holds it.'
+    )
     c = cfg['colors']
-    box = lambda lo, hi: [[round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)]
+    box = lambda lo, hi: [
+        [round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)
+    ]
     c['eyeBox'] = box(*P['eyeBox'])
     c['noseBox'] = box(*P['noseBox'])
     c['eyeBoxNote'] = P['eyeBoxNote']
@@ -134,20 +147,26 @@ def main():
         f.write('\n')
     if P.get('legTurnsIdentity'):
         st['legTurns'] = {b: [0.0, 0.0, 0.0, 1.0] for b in ('thigh', 'shin', 'foot', 'toes')}
-        st['note'] = ('legTurns gives the world turn of each left leg bone from the seated bind to the '
-                      'source: no turn. The beaver has no chair and stands on its short legs in the '
-                      'pose of the source, with the feet flat on the floor.')
+        st['note'] = (
+            'legTurns gives the world turn of each left leg bone from the seated bind to the '
+            'source: no turn. The beaver has no chair and stands on its short legs in the '
+            'pose of the source, with the feet flat on the floor.'
+        )
     else:
         raise SystemExit('legTurns: only the identity')
     if 'trunkOpen' in P:
         st['trunk']['open'] = P['trunkOpen']
-        st['trunkNote'] = ('The trunk of the bind keeps the pose of the source (open 0: no recline, '
-                           'trunk_turn() of tools/blender/rig_mesh.py).')
+        st['trunkNote'] = (
+            'The trunk of the bind keeps the pose of the source (open 0: no recline, '
+            'trunk_turn() of tools/blender/rig_mesh.py).'
+        )
     if 'tailBind' in P:
         st['tailBind'] = P['tailBind']
-        st['tailBindNote'] = ('The direction of each tail bone in the seated bind (bind_turns() of '
-                              'tools/blender/rig_mesh.py): the directions of the source, so that the flat '
-                              'tail lies on the floor behind the body as in the source.')
+        st['tailBindNote'] = (
+            'The direction of each tail bone in the seated bind (bind_turns() of '
+            'tools/blender/rig_mesh.py): the directions of the source, so that the flat '
+            'tail lies on the floor behind the body as in the source.'
+        )
     with open(path, 'w') as f:
         json.dump(cfg, f, indent=2)
         f.write('\n')

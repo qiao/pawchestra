@@ -1,6 +1,7 @@
 """Point edits of the rest mesh of the new Tripo fox, as pure maps of points in the studio axes (y up,
 +z forward, +x the left side). The build (build.py) moves the mesh with them, and
 make_config.py moves the joints with the same maps, so that the bones fit the edited mesh."""
+
 import numpy as np
 
 
@@ -88,7 +89,9 @@ def eyes(X, e, params):
     for side, sign in (('L', 1.0), ('R', -1.0)):
         c = np.array(e['centers'][side], float)
         dist = np.linalg.norm(X - c, axis=1)
-        near_mid = (1 - smoothstep(0.0, e['mid'], sign * X[:, 0])) * smoothstep(e['rBall'], e['rIn'], dist)
+        near_mid = (1 - smoothstep(0.0, e['mid'], sign * X[:, 0])) * smoothstep(
+            e['rBall'], e['rIn'], dist
+        )
         w = (1 - smoothstep(e['rIn'], e['rOut'], dist)) * (1 - near_mid)
         w[(side_of != sign) | (X[:, 2] > e['zKeep'])] = 0
         Y += w[:, None] * (e['scale'] - 1) * (X - c)
@@ -139,7 +142,12 @@ def arm_girth(X, e, params):
         dist = np.linalg.norm(off, axis=1)
         x = sign * X[:, 0]
         k = np.interp(x, tab[:, 0], tab[:, 1])
-        w = (1 - smoothstep(r0, r1, dist)) * (sign * X[:, 0] > 0) * (X[:, 1] > e['y'][0]) * (X[:, 1] < e['y'][1])
+        w = (
+            (1 - smoothstep(r0, r1, dist))
+            * (sign * X[:, 0] > 0)
+            * (X[:, 1] > e['y'][0])
+            * (X[:, 1] < e['y'][1])
+        )
         Y += (w * (k - 1))[:, None] * off
     return Y
 
@@ -173,8 +181,11 @@ def cheeks(X, e, params):
     moves as one piece."""
     D = np.zeros_like(X)
     clear = eye_clear(X, e, params)
-    eye = np.asarray((params or {}).get('_eyeSide') if (params or {}).get('_eyeSide') is not None
-                     else np.zeros(len(X)))
+    eye = np.asarray(
+        (params or {}).get('_eyeSide')
+        if (params or {}).get('_eyeSide') is not None
+        else np.zeros(len(X))
+    )
     for sign in (1.0, -1.0):
         m = np.array([sign, 1, 1])
         c = np.array(e['center'], float) * m
@@ -209,8 +220,16 @@ def muzzle(X, e, params):
     return X + rigid_parts(X, D, params)
 
 
-EDITS = {'legs': legs, 'shin': shin, 'head': head, 'paw': paw, 'eyes': eyes, 'armGirth': arm_girth,
-         'cheeks': cheeks, 'muzzle': muzzle}
+EDITS = {
+    'legs': legs,
+    'shin': shin,
+    'head': head,
+    'paw': paw,
+    'eyes': eyes,
+    'armGirth': arm_girth,
+    'cheeks': cheeks,
+    'muzzle': muzzle,
+}
 
 
 def map_points(X, params, tail=None, eye_side=None, part=None):

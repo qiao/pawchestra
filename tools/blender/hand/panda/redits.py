@@ -1,6 +1,7 @@
 """Point edits of the rest mesh of the new Tripo rabbit, as pure maps of points in the studio axes (y up,
 +z forward, +x the left side). The build (build.py) moves the mesh with them, and
 make_config.py moves the joints with the same maps, so that the bones fit the edited mesh."""
+
 import numpy as np
 
 
@@ -88,7 +89,9 @@ def eyes(X, e, params):
     for side, sign in (('L', 1.0), ('R', -1.0)):
         c = np.array(e['centers'][side], float)
         dist = np.linalg.norm(X - c, axis=1)
-        near_mid = (1 - smoothstep(0.0, e['mid'], sign * X[:, 0])) * smoothstep(e['rBall'], e['rIn'], dist)
+        near_mid = (1 - smoothstep(0.0, e['mid'], sign * X[:, 0])) * smoothstep(
+            e['rBall'], e['rIn'], dist
+        )
         w = (1 - smoothstep(e['rIn'], e['rOut'], dist)) * (1 - near_mid)
         w[(sign * X[:, 0] <= 0) | (X[:, 2] > e['zKeep'])] = 0
         # The eyeballs of the cat reach over the middle plane into the head, so each ball scales
@@ -108,11 +111,20 @@ def eyes(X, e, params):
         if 'yKeep' in e:
             # The points below the eyes fade out of the edit (a smoothstep from 0 at yKeep[0] to
             # 1 at yKeep[1]), so that the muzzle and the mouth stay.
-            D *= smoothstep(e['yKeep'][0], e['yKeep'][1], X[:, 1])[:, None] if ball is None else \
-                np.where(ball[:, None] != 0, 1.0, smoothstep(e['yKeep'][0], e['yKeep'][1], X[:, 1])[:, None])
+            D *= (
+                smoothstep(e['yKeep'][0], e['yKeep'][1], X[:, 1])[:, None]
+                if ball is None
+                else np.where(
+                    ball[:, None] != 0,
+                    1.0,
+                    smoothstep(e['yKeep'][0], e['yKeep'][1], X[:, 1])[:, None],
+                )
+            )
         if ball is not None:
             keep = ball == 0
-            D[keep] = rigid_parts(X[keep], D[keep], dict(params, _part=np.asarray(params['_part'])[keep]))
+            D[keep] = rigid_parts(
+                X[keep], D[keep], dict(params, _part=np.asarray(params['_part'])[keep])
+            )
         Y += D
     return Y
 
@@ -176,7 +188,12 @@ def arm_girth(X, e, params):
         dist = np.linalg.norm(off, axis=1)
         x = sign * X[:, 0]
         k = np.interp(x, tab[:, 0], tab[:, 1])
-        w = (1 - smoothstep(r0, r1, dist)) * (sign * X[:, 0] > 0) * (X[:, 1] > e['y'][0]) * (X[:, 1] < e['y'][1])
+        w = (
+            (1 - smoothstep(r0, r1, dist))
+            * (sign * X[:, 0] > 0)
+            * (X[:, 1] > e['y'][0])
+            * (X[:, 1] < e['y'][1])
+        )
         Y += (w * (k - 1))[:, None] * off
     return Y
 
@@ -210,8 +227,11 @@ def cheeks(X, e, params):
     moves as one piece."""
     D = np.zeros_like(X)
     clear = eye_clear(X, e, params)
-    eye = np.asarray((params or {}).get('_eyeSide') if (params or {}).get('_eyeSide') is not None
-                     else np.zeros(len(X)))
+    eye = np.asarray(
+        (params or {}).get('_eyeSide')
+        if (params or {}).get('_eyeSide') is not None
+        else np.zeros(len(X))
+    )
     for sign in (1.0, -1.0):
         m = np.array([sign, 1, 1])
         c = np.array(e['center'], float) * m
@@ -264,7 +284,9 @@ def mouth_fill(X, e, params):
     wide[0]), so the line fades to the corners. The loose parts stay."""
     Y = X.copy()
     (hx, y0, y1, z0, z1) = e['box']
-    inside = (np.abs(X[:, 0]) < hx) & (X[:, 1] > y0) & (X[:, 1] < y1) & (X[:, 2] > z0) & (X[:, 2] < z1)
+    inside = (
+        (np.abs(X[:, 0]) < hx) & (X[:, 1] > y0) & (X[:, 1] < y1) & (X[:, 2] > z0) & (X[:, 2] < z1)
+    )
     part = (params or {}).get('_part')
     if part is not None:
         # The loose parts stay: the eyeballs, and the inside of the mouth, which would show
@@ -274,9 +296,15 @@ def mouth_fill(X, e, params):
     if not len(ids):
         return Y
     Q = X[ids]
-    front = np.array([Q[(np.abs(Q[:, 0] - q[0]) < e['near']) & (np.abs(Q[:, 1] - q[1]) < e['near']), 2].max()
-                      for q in Q])
-    keep = e['keep'][0] + (e['keep'][1] - e['keep'][0]) * smoothstep(e['wide'][0], e['wide'][1], np.abs(Q[:, 0]))
+    front = np.array(
+        [
+            Q[(np.abs(Q[:, 0] - q[0]) < e['near']) & (np.abs(Q[:, 1] - q[1]) < e['near']), 2].max()
+            for q in Q
+        ]
+    )
+    keep = e['keep'][0] + (e['keep'][1] - e['keep'][0]) * smoothstep(
+        e['wide'][0], e['wide'][1], np.abs(Q[:, 0])
+    )
     D = np.zeros_like(X)
     D[ids, 2] = np.maximum(front - keep - Q[:, 2], 0)
     return X + D
@@ -320,7 +348,6 @@ def smile(X, e, params):
             ids = np.flatnonzero(part == p)
             D[ids] = 0 if e.get('whiskers') == 'stay' else D[ids[np.argmin(u[ids])]]
     return X + D
-
 
 
 def arm_stretch_parts(params, side):
@@ -377,9 +404,20 @@ def arm_source_x(x, params):
     return a[0] + np.interp(t, arm_stretch_g(ts, e, t_w), ts) * u[0]
 
 
-EDITS = {'mouthFill': mouth_fill, 'headWide': head_wide, 'legs': legs, 'shin': shin, 'head': head, 'paw': paw, 'eyes': eyes, 'armGirth': arm_girth,
-         'cheeks': cheeks, 'muzzle': muzzle, 'smile': smile,
-         'armStretch': arm_stretch}
+EDITS = {
+    'mouthFill': mouth_fill,
+    'headWide': head_wide,
+    'legs': legs,
+    'shin': shin,
+    'head': head,
+    'paw': paw,
+    'eyes': eyes,
+    'armGirth': arm_girth,
+    'cheeks': cheeks,
+    'muzzle': muzzle,
+    'smile': smile,
+    'armStretch': arm_stretch,
+}
 
 
 def map_points(X, params, tail=None, part=None):

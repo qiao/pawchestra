@@ -6,6 +6,7 @@ point edits, the rings, the surface, the rig, and the exact weight rows of param
 Each step is a scripted point edit on chosen vertices. assets/models/rabbit/README.md gives each
 call and value.
 """
+
 import json
 import os
 import sys
@@ -60,8 +61,12 @@ def point_edits(body):
     part = np.where(count[roots] < 100, roots, -1)
     T = ce.map_points(S, P, tail, part)
     set_studio_points(me, T)
-    log('point edits', [e['kind'] for e in P.get('edits', [])], 'largest move',
-        round(float(np.linalg.norm(T - S, axis=1).max()), 4))
+    log(
+        'point edits',
+        [e['kind'] for e in P.get('edits', [])],
+        'largest move',
+        round(float(np.linalg.norm(T - S, axis=1).max()), 4),
+    )
 
 
 def limb_loops(bm, kind, sign):
@@ -98,17 +103,26 @@ def subdivide(body):
                     inside = (sign * S_[:, 0] > 0.06) & (S_[:, 1] > 0.45) & (S_[:, 1] < 0.60)
                     axis = (sign, 0, 0)
                 else:
-                    inside = (sign * S_[:, 0] > 0.0) & (S_[:, 1] < 0.30) & (S_[:, 1] > 0.03) & (S_[:, 2] > -0.06)
+                    inside = (
+                        (sign * S_[:, 0] > 0.0)
+                        & (S_[:, 1] < 0.30)
+                        & (S_[:, 1] > 0.03)
+                        & (S_[:, 2] > -0.06)
+                    )
                     axis = (0, 1, 0)
                 found = rings.edge_rings(bm, inside, axis)
                 best = min(found, key=lambda r: abs(r[0] - a) + abs(r[1] - b))
                 if abs(best[0] - a) > 0.004 or abs(best[1] - b) > 0.004:
-                    raise SystemExit(f'No clean ring at {a} to {b} of the {kind} ({sign}): {best[0]:.4f} to {best[1]:.4f}')
+                    raise SystemExit(
+                        f'No clean ring at {a} to {b} of the {kind} ({sign}): {best[0]:.4f} to {best[1]:.4f}'
+                    )
                 ring = best[2]
                 bmesh.ops.subdivide_edges(bm, edges=ring, cuts=cuts, use_grid_fill=True)
                 bm.to_mesh(me)
                 bm.free()
-                log(f'{kind} {"L" if sign > 0 else "R"}: band {a} to {b}, {len(ring)} edges, {cuts} cuts')
+                log(
+                    f'{kind} {"L" if sign > 0 else "R"}: band {a} to {b}, {len(ring)} edges, {cuts} cuts'
+                )
     me.update()
 
 
@@ -139,11 +153,18 @@ def turn_paws(body):
         B = []
         for i in A:
             v = bm.verts[i]
-            B.append(next(e.other_vert(v).index for e in v.link_edges if e.other_vert(v).index in sb))
+            B.append(
+                next(e.other_vert(v).index for e in v.link_edges if e.other_vert(v).index in sb)
+            )
         n = len(A)
         old = []
         for i in range(n):
-            quad = [bm.verts[A[i]], bm.verts[A[(i + 1) % n]], bm.verts[B[(i + 1) % n]], bm.verts[B[i]]]
+            quad = [
+                bm.verts[A[i]],
+                bm.verts[A[(i + 1) % n]],
+                bm.verts[B[(i + 1) % n]],
+                bm.verts[B[i]],
+            ]
             face = next(fc for fc in quad[0].link_faces if set(fc.verts) == set(quad))
             order = [v.index for v in face.verts]
             forward = order[(order.index(A[i]) + 1) % 4] == A[(i + 1) % n]
@@ -161,7 +182,10 @@ def turn_paws(body):
             bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
         # The new quads join A[i] to the turned vertex that now lies where B[i] lay before.
         Bold = np.array([R.T @ (S[b] - f) + f for b in B])
-        shift = min(range(n), key=lambda s_: sum(np.linalg.norm(S[B[(i + s_) % n]] - Bold[i]) for i in range(n)))
+        shift = min(
+            range(n),
+            key=lambda s_: sum(np.linalg.norm(S[B[(i + s_) % n]] - Bold[i]) for i in range(n)),
+        )
         fade = P.get('turnFit')
         if fade:
             # The turned ring B takes the form of the ring before the turn: each vertex B[i + shift]
@@ -171,10 +195,14 @@ def turn_paws(body):
             delta = np.array([Borig[i] - S[B[(i + shift) % n]] for i in range(n)])
             ring = np.array([S[B[(i + shift) % n]] for i in range(n)])
             t_b = float(np.mean((ring - f) @ axis))
+
             def angle_of(p):
                 v = (p - f) - np.outer((p - f) @ axis, axis)
-                e1 = np.cross(axis, [0.0, 1.0, 0.0]); e1 /= np.linalg.norm(e1); e2 = np.cross(axis, e1)
+                e1 = np.cross(axis, [0.0, 1.0, 0.0])
+                e1 /= np.linalg.norm(e1)
+                e2 = np.cross(axis, e1)
                 return np.arctan2(v @ e2, v @ e1)
+
             ring_ang = angle_of(ring)
             ids = np.nonzero(move)[0]
             ang = angle_of(S[ids])
@@ -187,7 +215,12 @@ def turn_paws(body):
         band = bm.faces.layers.int.get('band') or bm.faces.layers.int.new('band')
         for i in range(n):
             forward, uvs = old[i]
-            quad = [bm.verts[A[i]], bm.verts[A[(i + 1) % n]], bm.verts[B[(i + 1 + shift) % n]], bm.verts[B[(i + shift) % n]]]
+            quad = [
+                bm.verts[A[i]],
+                bm.verts[A[(i + 1) % n]],
+                bm.verts[B[(i + 1 + shift) % n]],
+                bm.verts[B[(i + shift) % n]],
+            ]
             vs, uv_list = (quad, uvs) if forward else (quad[::-1], uvs[::-1])
             face = bm.faces.new(vs)
             face[band] = 1 if side == 'L' else 2
@@ -198,8 +231,10 @@ def turn_paws(body):
         bm.normal_update()
         bm.to_mesh(me)
         bm.free()
-        log(f'paw {side}: turn {np.degrees(angle):.1f} deg ({k} steps), {int(move.sum())} vertices, '
-            f'ring offset {shift}, largest gap of a turned ring vertex from its old place {gap:.4f}')
+        log(
+            f'paw {side}: turn {np.degrees(angle):.1f} deg ({k} steps), {int(move.sum())} vertices, '
+            f'ring offset {shift}, largest gap of a turned ring vertex from its old place {gap:.4f}'
+        )
     me.update()
 
 
@@ -252,14 +287,20 @@ def build_rig(rm):
         seat['front'] = round(float(knee[2] - P['seatGap']), 4)
     share = (seat['front'] - hip[2]) / (knee[2] - hip[2])
     rig['seat'] = {'prop': config['chair'].get('prop', 'chair'), **seat}
-    log(f'seat: bind hip z {hip[2]:.4f}, knee z {knee[2]:.4f}, front {seat["front"]}, back '
+    log(
+        f'seat: bind hip z {hip[2]:.4f}, knee z {knee[2]:.4f}, front {seat["front"]}, back '
         f'{seat["back"]}: {100 * share:.0f} % of the thigh over the seat, front edge '
-        f'{knee[2] - seat["front"]:.4f} units behind the knee; tail root {np.round(posed["tail"], 3).tolist()}')
+        f'{knee[2] - seat["front"]:.4f} units behind the knee; tail root {np.round(posed["tail"], 3).tolist()}'
+    )
     hinges = rm['bind_hinges'](config, turns, heads, ends)
     for side, deg in P.get('hingeTurn', {}).items():
-        up = turns[f'upper_arm_{side}'] @ rm['unit'](heads[f'forearm_{side}'] - heads[f'upper_arm_{side}'])
+        up = turns[f'upper_arm_{side}'] @ rm['unit'](
+            heads[f'forearm_{side}'] - heads[f'upper_arm_{side}']
+        )
         hinges[side] = ce.rotation(up, np.radians(deg)) @ np.asarray(hinges[side], float)
-    rig['hinges'] = {side: [round(float(x), 6) for x in to_blender(axis)] for side, axis in hinges.items()}
+    rig['hinges'] = {
+        side: [round(float(x), 6) for x in to_blender(axis)] for side, axis in hinges.items()
+    }
     action = bpy.data.actions.new('bind')
     action.use_fake_user = True
     rig.animation_data_create().action = action
@@ -308,7 +349,7 @@ def own_eyes(body):
     flags = np.zeros(len(me.polygons), bool)
     flags[faces] = True
     attr.data.foreach_set('value', flags)
-    rgb = np.array([0x15, 0x11, 0x0e]) / 255
+    rgb = np.array([0x15, 0x11, 0x0E]) / 255
     lin = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
     for name in ('color', 'color_base'):
         data = me.attributes[name].data
@@ -366,7 +407,9 @@ def arm_row(x, R):
     ctl = np.array(R['control'])
     clav, elbow, wrist = (float(np.interp(x, ctl[:, 0], ctl[:, k])) for k in (1, 2, 3))
     rest = 1 - clav - elbow - wrist
-    row = {n: w * rest for n, w in segments(x, 'upper_arm' if x < R['elbow'] else 'forearm', R).items()}
+    row = {
+        n: w * rest for n, w in segments(x, 'upper_arm' if x < R['elbow'] else 'forearm', R).items()
+    }
     for name, w in (('clavicle', clav), ('elbow', elbow), ('wrist', wrist)):
         if w > 0:
             row[name] = w
@@ -413,10 +456,15 @@ def exact_rows(body, rig, head_ids):
         line = (hh - ua) / np.linalg.norm(hh - ua)
         elbow_x, wrist_x = sign * fh[0], sign * hh[0]
         knuckle_d = (gh - hh) @ axis
-        Rx = dict(R, shoulder=sign * ua[0], elbow=elbow_x, wrist=wrist_x,
-                  control=[[x, c, e, 0.0] for x, c, e in R['control']])
+        Rx = dict(
+            R,
+            shoulder=sign * ua[0],
+            elbow=elbow_x,
+            wrist=wrist_x,
+            control=[[x, c, e, 0.0] for x, c, e in R['control']],
+        )
         for i, p in enumerate(S):
-            if i in head_ids or sign * p[0] < R["start"] or p[1] > ua[1] + 0.07:
+            if i in head_ids or sign * p[0] < R['start'] or p[1] > ua[1] + 0.07:
                 continue
             v = p - ua
             if np.linalg.norm(v - (v @ line) * line) > R['reach']:
@@ -455,8 +503,10 @@ def tail_rows(body, rig):
     me = body.data
     S = studio_points(me)
     ids = tail_vertices(me)
-    bone = lambda n: (np.array(rig.data.bones[n].head_local) @ sa.TO_STUDIO.T,
-                      np.array(rig.data.bones[n].tail_local) @ sa.TO_STUDIO.T)
+    bone = lambda n: (
+        np.array(rig.data.bones[n].head_local) @ sa.TO_STUDIO.T,
+        np.array(rig.data.bones[n].tail_local) @ sa.TO_STUDIO.T,
+    )
     th, tt = bone('tail')
     kh, kt = bone('tail_tip')
     a1 = (tt - th) / np.linalg.norm(tt - th)
@@ -488,7 +538,9 @@ def auto_weights(body, rig, head_ids):
     loose = set(loose_vertices(me)) | set(tail_vertices(me))
     shared = {f for e in bm.edges if len(e.link_faces) > 2 for f in e.link_faces}
     bmesh.ops.delete(bm, geom=list(shared), context='FACES_ONLY')
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.index in loose or not v.link_faces], context='VERTS')
+    bmesh.ops.delete(
+        bm, geom=[v for v in bm.verts if v.index in loose or not v.link_faces], context='VERTS'
+    )
     bm.to_mesh(copy.data)
     bm.free()
     for g in list(copy.vertex_groups):
@@ -515,7 +567,9 @@ def auto_weights(body, rig, head_ids):
         a, b = e.vertices
         nbr[a].append(b)
         nbr[b].append(a)
-    todo = [i for i in range(len(me.vertices)) if i not in rows and i not in head_ids and i not in tail]
+    todo = [
+        i for i in range(len(me.vertices)) if i not in rows and i not in head_ids and i not in tail
+    ]
     filled = 0
     while todo:
         left = []
@@ -543,9 +597,19 @@ def auto_weights(body, rig, head_ids):
             sa.set_weight_row(body, i, {'head': 1.0})
             none += 1
     bpy.data.objects.remove(copy)
-    log('automatic weights on a copy:', len(shared), 'faces of shared edges and', len(loose),
-        'loose and tail vertices out,', empty, 'copy vertices with no weight,', filled,
-        'body vertices take the mean row of their neighbors,', none, 'take head 1')
+    log(
+        'automatic weights on a copy:',
+        len(shared),
+        'faces of shared edges and',
+        len(loose),
+        'loose and tail vertices out,',
+        empty,
+        'copy vertices with no weight,',
+        filled,
+        'body vertices take the mean row of their neighbors,',
+        none,
+        'take head 1',
+    )
 
 
 def weights_of(body, names):
@@ -577,7 +641,9 @@ def ear_rows(body):
     n = np.linalg.svd(Q - mid)[2][2]
     n = n if n[1] > 0 else -n
     rule = dict(rule, offset=float(n @ mid))
-    keep = set(loose_vertices(me)) | {i for p in me.polygons if p.material_index == 1 for i in p.vertices}
+    keep = set(loose_vertices(me)) | {
+        i for p in me.polygons if p.material_index == 1 for i in p.vertices
+    }
     floor = float(ce.map_points(np.array([[0, 0.7, 0.05]]), P)[0, 1])
     count = {'ear': 0, 'base': 0, 'head': 0}
     for v in me.vertices:
@@ -619,7 +685,7 @@ def thicken_trunk(body):
     t = np.minimum(weights_of(body, {'hips', 'spine', 'spine1', 'chest', 'neck'}), 1.0)
     y0 = CONFIG['joints']['hips']['head'][1]
     y1 = CONFIG['joints']['neck']['head'][1]
-    core = (t > rule.get("core", 0.95)) & (np.abs(S[:, 0]) < 0.15)
+    core = (t > rule.get('core', 0.95)) & (np.abs(S[:, 0]) < 0.15)
     bins = np.arange(y0 - 0.06, y1 + 0.02, 0.02)
     mids = [(b + 0.01, S[core & (S[:, 1] >= b) & (S[:, 1] < b + 0.02)][:, [0, 2]]) for b in bins]
     mids = [(y, (q.max(0) + q.min(0)) / 2) for y, q in mids if len(q) >= 6]
@@ -635,8 +701,14 @@ def thicken_trunk(body):
     move[:, 2] = (fd - 1) * (S[:, 2] - c_z)
     T = S + t[:, None] * move
     set_studio_points(me, T)
-    log('trunk: largest move', round(float(np.linalg.norm(T - S, axis=1).max()), 4), 'units,',
-        int((t * np.linalg.norm(move, axis=1) > 1e-4).sum()), 'vertices; middle z fit', np.round(cz, 4).tolist())
+    log(
+        'trunk: largest move',
+        round(float(np.linalg.norm(T - S, axis=1).max()), 4),
+        'units,',
+        int((t * np.linalg.norm(move, axis=1) > 1e-4).sum()),
+        'vertices; middle z fit',
+        np.round(cz, 4).tolist(),
+    )
 
 
 def region_colors(body):
@@ -647,6 +719,7 @@ def region_colors(body):
     tail tip), and the orange fur. Each region takes the color of its face at 0.6 of its luma
     range. The gloss nose and the faces of the loose parts keep their colors."""
     import colorsys
+
     me = body.data
     rgba = np.empty(len(me.polygons) * 4, np.float32)
     me.attributes['color'].data.foreach_get('color', rgba)
@@ -716,8 +789,10 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
         X[over] = S[over] + d[over] * (clip / n[over])[:, None]
     set_studio_points(me, X)
     n = np.linalg.norm(X - S, axis=1)
-    log(f'relax: {rounds} Taubin rounds ({lam}, {mu}), {int(free.sum())} free vertices, largest move '
-        f'{n.max():.4f}, mean {n[free].mean():.4f}, {int((n >= clip - 1e-9).sum())} clipped')
+    log(
+        f'relax: {rounds} Taubin rounds ({lam}, {mu}), {int(free.sum())} free vertices, largest move '
+        f'{n.max():.4f}, mean {n[free].mean():.4f}, {int((n >= clip - 1e-9).sum())} clipped'
+    )
 
 
 def belly_key(body, rig):
@@ -735,12 +810,18 @@ def belly_key(body, rig):
         return
     sys.path.insert(0, os.path.join(ROOT, 'tools', 'blender'))
     import bind_edit as be
+
     me = body.data
     rest = np.array([v.co[:] for v in me.vertices])
     lo, hi = rule['z']
     theta = np.degrees(np.arctan2(np.abs(rest[:, 0]), -rest[:, 1]))
-    S = np.nonzero((rest[:, 2] >= lo) & (rest[:, 2] <= hi) & (rest[:, 1] < 0) & (theta <= 60)
-                   & (np.hypot(rest[:, 0], rest[:, 1]) < 0.2))[0]
+    S = np.nonzero(
+        (rest[:, 2] >= lo)
+        & (rest[:, 2] <= hi)
+        & (rest[:, 1] < 0)
+        & (theta <= 60)
+        & (np.hypot(rest[:, 0], rest[:, 1]) < 0.2)
+    )[0]
     restore = be.pose_bind(body, rig)
     Pb = be.bind_points(body)
     ev = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
@@ -760,8 +841,12 @@ def belly_key(body, rig):
         """The raised thighs fold the faces of the crotch in the bind. A Laplacian smooth of the
         bind of the chosen vertices C unfolds them: each round moves each vertex of C by lam
         times the mean of its edge neighbors less its place, all at the same time."""
-        C = np.nonzero((rest[:, 2] >= zr[0]) & (rest[:, 2] <= zr[1])
-                       & (np.abs(rest[:, 0]) < crotch['x']) & (rest[:, 1] < crotch['y']))[0]
+        C = np.nonzero(
+            (rest[:, 2] >= zr[0])
+            & (rest[:, 2] <= zr[1])
+            & (np.abs(rest[:, 0]) < crotch['x'])
+            & (rest[:, 1] < crotch['y'])
+        )[0]
         around = {i: [] for i in C}
         for e in me.edges:
             a, b = e.vertices
@@ -807,7 +892,12 @@ def belly_key(body, rig):
         a, b, c, d = rule['lapBand']
         zb = Pb[moved, 2]
         th = np.degrees(np.arctan2(np.abs(rest[moved, 0]), -rest[moved, 1]))
-        w = ce.smoothstep(a, b, zb) * (1 - ce.smoothstep(c, d, zb)) * (1 + np.cos(np.pi * np.minimum(th, 60) / 60)) / 2
+        w = (
+            ce.smoothstep(a, b, zb)
+            * (1 - ce.smoothstep(c, d, zb))
+            * (1 + np.cos(np.pi * np.minimum(th, 60) / 60))
+            / 2
+        )
         X[moved, 1] -= rule['lap'] * w
     if crotch and 'after' in crotch:
         X, C2 = smooth_crotch(X, crotch['after'], crotch['afterRounds'])
@@ -816,7 +906,9 @@ def belly_key(body, rig):
     count = be.add_bind_move(body, rig, move, 'bind_belly')
     restore()
     n = np.linalg.norm(move, axis=1)
-    log(f'belly key: {count} vertices move, largest {n.max():.4f}, mean {n[S].mean():.4f}, bind z {Pb[S, 2].min():.3f} to {Pb[S, 2].max():.3f}')
+    log(
+        f'belly key: {count} vertices move, largest {n.max():.4f}, mean {n[S].mean():.4f}, bind z {Pb[S, 2].min():.3f} to {Pb[S, 2].max():.3f}'
+    )
 
 
 def color_map(body, eyes):
@@ -861,6 +953,7 @@ def nose_trim(body):
     old color (the test of region_colors(): h below 16 or above 340 degrees, S at least 0.38, and L
     above 0.35) goes back to the slot fur, so that it takes the color map."""
     import colorsys
+
     me = body.data
     srgb = face_srgb(me)
     back = []
@@ -883,8 +976,11 @@ def brow_strips(body):
     me = body.data
     S = studio_points(me)
     loose = set(loose_vertices(me))
-    faces = [p.index for p in me.polygons if all(v in loose for v in p.vertices)
-             and S[list(p.vertices), 1].min() > rule['above']]
+    faces = [
+        p.index
+        for p in me.polygons
+        if all(v in loose for v in p.vertices) and S[list(p.vertices), 1].min() > rule['above']
+    ]
     set_face_srgb(me, faces, rule['srgb'])
     log(f'brow strips: {len(faces)} faces take sRGB {rule["srgb"]}')
 
@@ -915,8 +1011,12 @@ def band_uvs(body):
                 continue
             q = S[list(p.vertices)]
             u = np.array([uv[l].uv[:] for l in p.loop_indices])
-            a3 = 0.5 * np.linalg.norm(sum(np.cross(q[i] - q[0], q[i + 1] - q[0]) for i in range(1, len(q) - 1)))
-            u2 = 0.5 * abs(sum(np.cross(u[i] - u[0], u[i + 1] - u[0]) for i in range(1, len(u) - 1)))
+            a3 = 0.5 * np.linalg.norm(
+                sum(np.cross(q[i] - q[0], q[i + 1] - q[0]) for i in range(1, len(q) - 1))
+            )
+            u2 = 0.5 * abs(
+                sum(np.cross(u[i] - u[0], u[i + 1] - u[0]) for i in range(1, len(u) - 1))
+            )
             if a3 > 1e-9:
                 dens.append(np.sqrt(u2 / a3))
             near_uv.append(u.mean(axis=0).tolist())
@@ -952,6 +1052,7 @@ def lid_frames(body):
     reaches), u (+Z made square to g), and the hinge h = u x g. Also the BVH of the head surface
     (no eye, no loose part) and the ball faces of each side."""
     from mathutils.bvhtree import BVHTree
+
     me = body.data
     eye = np.zeros(len(me.polygons), bool)
     me.attributes['eye'].data.foreach_get('value', eye)
@@ -964,7 +1065,7 @@ def lid_frames(body):
         faces = [p.index for p in me.polygons if eye[p.index] and sign * co[p.vertices[0], 0] > 0]
         ids = sorted({v for f in faces for v in me.polygons[f].vertices})
         q = co[ids]
-        fit = np.linalg.lstsq(np.c_[2 * q, np.ones(len(q))], (q ** 2).sum(1), rcond=None)[0]
+        fit = np.linalg.lstsq(np.c_[2 * q, np.ones(len(q))], (q**2).sum(1), rcond=None)[0]
         c = fit[:3]
         r = float(np.sqrt(fit[3] + c @ c))
         seen = []
@@ -981,8 +1082,18 @@ def lid_frames(body):
         seen = np.array(seen)
         psi = np.degrees(np.arctan2(seen @ u, seen @ g))
         lam = np.degrees(np.arcsin(np.clip(seen @ h, -1, 1)))
-        out[side] = dict(c=c, r=r, g=g, u=u, h=h, faces=faces, psi=(psi.min(), psi.max()),
-                         lam=(lam.min(), lam.max()), seen=len(seen), balls=len(q))
+        out[side] = dict(
+            c=c,
+            r=r,
+            g=g,
+            u=u,
+            h=h,
+            faces=faces,
+            psi=(psi.min(), psi.max()),
+            lam=(lam.min(), lam.max()),
+            seen=len(seen),
+            balls=len(q),
+        )
     return out, bvh
 
 
@@ -1036,6 +1147,7 @@ def open_lids(body):
                 par[i] = par[par[i]]
                 i = par[i]
             return i
+
         for e in me.edges:
             a, b = e.vertices
             if a in sub and b in sub:
@@ -1073,8 +1185,15 @@ def open_lids(body):
             w = w * (1 - ce.smoothstep(rule['outer'][0], rule['outer'][1], s))
             return w * (d @ g > -0.2 * r)
 
-        ids = np.array([i for i in range(len(co)) if i not in eye_v and sign * co[i, 0] > 0
-                        and np.linalg.norm(co[i] - c) < rule['reach'][1] * r])
+        ids = np.array(
+            [
+                i
+                for i in range(len(co))
+                if i not in eye_v
+                and sign * co[i, 0] > 0
+                and np.linalg.norm(co[i] - c) < rule['reach'][1] * r
+            ]
+        )
         loose_set = set(loose)
         body_ids = np.array([i for i in ids if i not in loose_set], int)
         w = weight(co[body_ids])
@@ -1092,9 +1211,14 @@ def open_lids(body):
                 moved_parts += 1
                 R = rot(h, -ang * wp)
                 out[ids_p] = (co[ids_p] - c) @ R.T + c
-        report[side] = dict(line=len(line), lam=[round(float(lam_l[0]), 1), round(float(lam_l[-1]), 1)],
-                            psi_max=round(float(psi_l.max()), 1), moved=int((w > 1e-3).sum()), parts=moved_parts,
-                            largest=round(float(np.linalg.norm(out - co, axis=1).max()), 4))
+        report[side] = dict(
+            line=len(line),
+            lam=[round(float(lam_l[0]), 1), round(float(lam_l[-1]), 1)],
+            psi_max=round(float(psi_l.max()), 1),
+            moved=int((w > 1e-3).sum()),
+            parts=moved_parts,
+            largest=round(float(np.linalg.norm(out - co, axis=1).max()), 4),
+        )
     for v, p in zip(me.vertices, out):
         v.co = p.tolist()
     me.update()
@@ -1136,7 +1260,11 @@ def mouth_corners(body):
             continue
         q = min(a, rule['corner'])
         e = np.hypot(p[1] - np.interp(q, lx, ly), p[2] - np.interp(q, lx, lz))
-        w = ce.smoothstep(x0, x1, a) * (1 - ce.smoothstep(x2, x3, a)) * (1 - ce.smoothstep(g0, g1, e))
+        w = (
+            ce.smoothstep(x0, x1, a)
+            * (1 - ce.smoothstep(x2, x3, a))
+            * (1 - ce.smoothstep(g0, g1, e))
+        )
         if w > 0:
             v.co.z += rule['lift'] * w
             moved += 1
@@ -1173,8 +1301,12 @@ def lower_lids(body):
         p0, p1, p2, p3 = rule['psi']
         r0, r1 = rule['reach']
         l0, l1 = rule['lam']
-        w = (ce.smoothstep(p0, p1, psi) * (1 - ce.smoothstep(p2, p3, psi))
-             * (1 - ce.smoothstep(r0, r1, n / r)) * (1 - ce.smoothstep(l0, l1, np.abs(lam))))
+        w = (
+            ce.smoothstep(p0, p1, psi)
+            * (1 - ce.smoothstep(p2, p3, psi))
+            * (1 - ce.smoothstep(r0, r1, n / r))
+            * (1 - ce.smoothstep(l0, l1, np.abs(lam)))
+        )
         w[[i for i in range(len(co)) if i in keep or sign * co[i, 0] <= 0]] = 0
         w[d @ g < 0] = 0
         moved = 0
@@ -1182,7 +1314,9 @@ def lower_lids(body):
             # A turn about h by +angle takes the lid down (lids(): +angle closes a lid).
             out[i] = c + rot(h, ang * w[i]) @ (co[i] - c)
             moved += 1
-        report[side] = dict(moved=moved, largest=round(float(np.linalg.norm(out - co, axis=1).max()), 4))
+        report[side] = dict(
+            moved=moved, largest=round(float(np.linalg.norm(out - co, axis=1).max()), 4)
+        )
     for v, p_ in zip(me.vertices, out):
         v.co = p_.tolist()
     me.update()
@@ -1195,7 +1329,9 @@ def lid_inside(bvh, c, points):
     out = []
     for p in points:
         d = (p - c) / np.linalg.norm(p - c)
-        out.append(bvh.ray_cast(Vector((p + 1e-5 * d).tolist()), Vector(d.tolist()), 0.3)[0] is not None)
+        out.append(
+            bvh.ray_cast(Vector((p + 1e-5 * d).tolist()), Vector(d.tolist()), 0.3)[0] is not None
+        )
     return np.array(out)
 
 
@@ -1246,16 +1382,26 @@ def lids(body):
         lam_range = rule['lam'] if side == 'L' else [-rule['lam'][1], -rule['lam'][0]]
         lams = np.radians(np.linspace(*lam_range, rule['steps'][1] + 1))
         rows = [(psis[0], rule['strip'])] + [(p, rule['radius']) for p in psis]
-        closed = np.array([[c + k * r * (np.cos(l) * (np.cos(p) * g + np.sin(p) * u) + np.sin(l) * h)
-                            for l in lams] for p, k in rows])
+        closed = np.array(
+            [
+                [
+                    c + k * r * (np.cos(l) * (np.cos(p) * g + np.sin(p) * u) + np.sin(l) * h)
+                    for l in lams
+                ]
+                for p, k in rows
+            ]
+        )
         R_open = rot(h, -ang)
         opened = (closed - c) @ R_open.T + c
-        grid = [[bm.verts.new(opened[i, j].tolist()) for j in range(len(lams))] for i in range(len(rows))]
+        grid = [
+            [bm.verts.new(opened[i, j].tolist()) for j in range(len(lams))]
+            for i in range(len(rows))
+        ]
         for i in range(len(rows) - 1):
             for j in range(len(lams) - 1):
                 quad = [grid[i][j], grid[i][j + 1], grid[i + 1][j + 1], grid[i + 1][j]]
                 face = bm.faces.new(quad)
-                mid = closed[i:i + 2, j:j + 2].reshape(-1, 3).mean(0)
+                mid = closed[i : i + 2, j : j + 2].reshape(-1, 3).mean(0)
                 face.normal_update()
                 fn = np.array(face.normal[:])
                 if fn @ (rot(h, -ang) @ (mid - c)) < 0:
@@ -1267,9 +1413,16 @@ def lids(body):
                     if layer is not None:
                         face[layer] = (*fur, 1.0)
                 for loop in face.loops:
-                    ii, jj = next((a, b) for a in range(len(rows)) for b in range(len(lams)) if grid[a][b] is loop.vert)
+                    ii, jj = next(
+                        (a, b)
+                        for a in range(len(rows))
+                        for b in range(len(lams))
+                        if grid[a][b] is loop.vert
+                    )
                     d = closed[ii, jj] - c
-                    loop[uv].uv = (np.array(rule['uv']) + rule['density'] * np.array([d @ h, d @ u])).tolist()
+                    loop[uv].uv = (
+                        np.array(rule['uv']) + rule['density'] * np.array([d @ h, d @ u])
+                    ).tolist()
         new_verts += [v for row in grid for v in row]
         # Ray casts in each step of the blink: the open lid, the side edges, and the back edge
         # must stay under the head; the lower strip of the closed lid too.
@@ -1287,18 +1440,28 @@ def lids(body):
             d = (p - c) / np.linalg.norm(p - c)
             hit = bvh.ray_cast(Vector(p.tolist()), Vector(d.tolist()), 0.3)
             depth.append(hit[3] if hit[0] is not None else -1)
-        report[side] = dict(r=round(r, 5), seen=f['seen'], psi=np.round(f['psi'], 1).tolist(),
-                            lam=np.round(f['lam'], 1).tolist(), out=counts, strip_out=strip,
-                            open_depth=round(float(min(depth)), 4), h=np.round(h, 6).tolist())
+        report[side] = dict(
+            r=round(r, 5),
+            seen=f['seen'],
+            psi=np.round(f['psi'], 1).tolist(),
+            lam=np.round(f['lam'], 1).tolist(),
+            out=counts,
+            strip_out=strip,
+            open_depth=round(float(min(depth)), 4),
+            h=np.round(h, 6).tolist(),
+        )
     bm.to_mesh(me)
     bm.free()
     me.update()
-    ids = [v.index for v in me.vertices][-len(new_verts):]
+    ids = [v.index for v in me.vertices][-len(new_verts) :]
     for i in ids:
         sa.set_weight_row(body, i, {'head': 1.0})
     rig = body.parent
-    rig['lids'] = {'angle': round(float(ang), 6), 'L': [round(float(x), 6) for x in frames['L']['h']],
-                   'R': [round(float(x), 6) for x in frames['R']['h']]}
+    rig['lids'] = {
+        'angle': round(float(ang), 6),
+        'L': [round(float(x), 6) for x in frames['L']['h']],
+        'R': [round(float(x), 6) for x in frames['R']['h']],
+    }
     log(f'lids: {len(gone)} back ball faces go, {len(new_verts)} lid vertices; {report}')
 
 
@@ -1322,8 +1485,10 @@ def smile(body):
     T = ce.smile(S, rule, dict(P, _part=part))
     set_studio_points(me, T)
     move = np.linalg.norm(T - S, axis=1)
-    log(f'smile: {int((move > 1e-6).sum())} vertices move, {int(((move > 1e-6) & (part >= 0)).sum())} of loose parts, '
-        f'largest {move.max():.4f}, lowest moved y {S[move > 1e-6, 1].min():.4f}')
+    log(
+        f'smile: {int((move > 1e-6).sum())} vertices move, {int(((move > 1e-6) & (part >= 0)).sum())} of loose parts, '
+        f'largest {move.max():.4f}, lowest moved y {S[move > 1e-6, 1].min():.4f}'
+    )
 
 
 def facts(rig):
@@ -1333,11 +1498,14 @@ def facts(rig):
     rig['height'] = round(shoulder * CONFIG['metersPerUnit'], 6)
     for name, value in P.get('rigFacts', {}).items():
         rig[name] = value
-    log('facts', {k: rig[k] for k in list(CONFIG['body']) + ['height'] + list(P.get('rigFacts', {}))})
+    log(
+        'facts',
+        {k: rig[k] for k in list(CONFIG['body']) + ['height'] + list(P.get('rigFacts', {}))},
+    )
 
 
 def main():
-    rest = sys.argv[sys.argv.index('--') + 1:]
+    rest = sys.argv[sys.argv.index('--') + 1 :]
     out = os.path.abspath(rest[rest.index('--out') + 1])
     bpy.ops.wm.read_factory_settings(use_empty=True)
     body = rimport.import_rabbit(os.path.join(ROOT, CONFIG['source']), CONFIG['weld'])
@@ -1383,5 +1551,5 @@ def main():
     log('wrote', out)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

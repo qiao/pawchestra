@@ -5,6 +5,7 @@ holds the joints of the edited mesh.
 
     uv run --no-project --with numpy python -I tools/blender/hand/penguin/make_config.py
 """
+
 import json
 import os
 import subprocess
@@ -47,9 +48,15 @@ if P.get('jaw'):
     SOURCE['jaw'] = tuple(P['jaw'])
 ROLLS = {
     'root': [0, 1, 0],
-    'upper_arm_L': 'palm', 'forearm_L': 'palm', 'forearm_twist_L': 'palm', 'hand_L': 'palm',
+    'upper_arm_L': 'palm',
+    'forearm_L': 'palm',
+    'forearm_twist_L': 'palm',
+    'hand_L': 'palm',
     'fingers_L': 'palm',
-    'foot_L': [0, 1, 0], 'toes_L': [0, 1, 0], 'tail': [0, 1, 0], 'tail_tip': [0, 1, 0],
+    'foot_L': [0, 1, 0],
+    'toes_L': [0, 1, 0],
+    'tail': [0, 1, 0],
+    'tail_tip': [0, 1, 0],
     'jaw': [0, 1, 0],
 }
 TAIL_JOINTS = {'tail', 'tail_tip'}
@@ -81,7 +88,9 @@ def mapped_joints():
             head, tail = turned(head, side), turned(tail, side)
         else:
             head, tail = SOURCE[name]
-        pts = [np.array(head, float)] + ([np.array(tail, float)] if not isinstance(tail, str) else [])
+        pts = [np.array(head, float)] + (
+            [np.array(tail, float)] if not isinstance(tail, str) else []
+        )
         pts = np.array(pts)
         tail_mask = np.full(len(pts), name in TAIL_JOINTS)
         pts = ce.map_points(pts, P, tail_mask)
@@ -117,10 +126,14 @@ def main():
     }
     st['tailBindNote'] = P['tailBindNote']
     cfg['chair'] = P['chair']
-    cfg['chairNote'] = ('The seat of the rig in units of this body, as the property seat of the '
-                        'armature of tripo-hand/penguin.blend holds it.')
+    cfg['chairNote'] = (
+        'The seat of the rig in units of this body, as the property seat of the '
+        'armature of tripo-hand/penguin.blend holds it.'
+    )
     c = cfg['colors']
-    box = lambda lo, hi: [[round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)]
+    box = lambda lo, hi: [
+        [round(float(x), 6) for x in p] for p in ce.map_points(np.array([lo, hi], float), P)
+    ]
     c['eyeBox'] = box(*P['eyeBox'])
     c['noseBox'] = box(*P['noseBox'])
     c['eyeBoxNote'] = P['eyeBoxNote']
