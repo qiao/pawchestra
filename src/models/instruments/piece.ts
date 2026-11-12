@@ -98,14 +98,18 @@ export class PieceBuilder implements PartSink {
   /** The corners that the footprint counts in place of the parts ({@link InstrumentPiece.footprint}). */
   readonly #footprint: number[] = [];
   readonly #size: number;
+  readonly #spaceSize: number;
 
   /**
    * Creates an empty piece.
    *
    * @param size A scale for all parts. It applies after the placement of each part.
+   * @param spaceSize The scale of the footprint ({@link footprint}): `size` by default. A smaller
+   *   instrument can keep the footprint of its full size, so that no seat of the layout moves.
    */
-  constructor(size = 1) {
+  constructor(size = 1, spaceSize = size) {
     this.#size = size;
+    this.#spaceSize = spaceSize;
   }
 
   /**
@@ -133,7 +137,7 @@ export class PieceBuilder implements PartSink {
    * @param at The placement in the piece axes, before the size scale.
    */
   footprint(corners: readonly number[], at: Transform = transform()): void {
-    this.#footprint.push(...this.#place(corners, at));
+    this.#footprint.push(...this.#place(corners, at, this.#spaceSize));
   }
 
   /**
@@ -218,10 +222,10 @@ export class PieceBuilder implements PartSink {
    *
    * @param corners The corner list of the part in its own axes.
    * @param at The placement of the part in the piece axes, before the size scale.
+   * @param s The size scale: the size of the parts by default.
    * @returns The new corner list.
    */
-  #place(corners: readonly number[], at: Transform): number[] {
-    const s = this.#size;
+  #place(corners: readonly number[], at: Transform, s = this.#size): number[] {
     const placed = placeCorners(corners, at);
     return s === 1 ? placed : placed.map((c) => c * s);
   }
