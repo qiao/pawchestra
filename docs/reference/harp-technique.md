@@ -354,8 +354,8 @@ function of the notes. Design 5.3 "Harp" gives the motion. The app follows these
 - **Rolled chords (7.4).** A chord of three or more strings of both hands rolls up, with the last
   pluck on the note start. An octave does not roll. The strings swing from the plucks of the roll,
   and the sound keeps one start.
-- **Damping (7.6).** After a hand rest of more than a second, the flat palm goes onto the strings
-  with the fingers open, then the hand places the next group.
+- **Damping (7.6).** After a hand rest of more than a second, the palm opens flat at the place of
+  its group with the fingers open, then the hand places the next group.
 - **The pedals (7.7).** Each note needs the pedal of its string in its notch, and the pedal changes
   as early as the music lets it, after the last pluck in the old notch (`planPedals()` of
   `src/pose/harp-pedals.ts`). The left foot moves D, C, and B, and the right foot E, F, G, and A.
@@ -368,6 +368,8 @@ function of the notes. Design 5.3 "Harp" gives the motion. The app follows these
 
 The app does not follow these facts:
 
+- **The damp (7.6).** The flat palm does not press on the strings. The treble strings of the
+  near harp lie near the chest of the deer, and a press put the right paw into the chest.
 - **The fingers (7.1).** The deer has a thumb bone and one bone for fingers 2 to 4, so fingers 2
   to 4 close together. A digit pose for a paw with a bone for each finger reads the finger, the
   pluck time, and the close time of each note (`HarpFingering`) and closes each finger from its
