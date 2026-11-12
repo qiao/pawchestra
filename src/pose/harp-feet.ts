@@ -39,6 +39,31 @@ const HEEL_PITCH = 45 * (Math.PI / 180);
  */
 const HEEL_LIFT = { pitch: 60 * (Math.PI / 180), back: 0.15 };
 
+/** The rest place of the hoof and the knee of one leg of a harpist ({@link LEG_RESTS}). */
+interface LegRest {
+  /** The move of the hoof from its place in the bind, in head heights, in the model axes. */
+  readonly hoof: Vec3;
+  /** The direction to which the knee points, in the model axes, or `null` for the bind knee. */
+  readonly knee: Vec3 | null;
+}
+
+/**
+ * The rest place of the hoof and the knee of each leg: the left leg, then the right leg. A
+ * harpist sits with the knees apart around the harp, and the feet stand at the sides of the base
+ * (`docs/reference/harp-technique.md`, sections 2 and 7.7). The near diagonal harp of the Tripo
+ * fawn puts the foot of its soundbox and its base over the bind place of the left hoof: there,
+ * the left hoof went 3.7 cm into the soundbox and 3.0 cm into the base, and the left shin 3.5 cm
+ * into the soundbox, in each sample of `boulanger-matin`. So the left hoof rests to the left of
+ * the base, behind the foot of the soundbox, and the harp stands between the knees. Its knee
+ * points out, forward, and a little up: with the knee of the bind, the knee went back over the
+ * front corner of the stool, and the left shin 2.0 cm into the stool. With this knee, the left
+ * shin goes 1.9 cm into the stool only in a pedal move (0.8 % of the samples).
+ */
+const LEG_RESTS: readonly [left: LegRest, right: LegRest] = [
+  { hoof: [-0.55, 0, 0.6], knee: [-0.5, 0.3, -1] },
+  { hoof: [0, 0, 0], knee: null },
+];
+
 /** One leg of a harpist and the harp pedals in front of it, in the model axes. */
 interface HarpFoot {
   /** The bind joints of the leg: the hip (`thigh`), the knee (`shin`), the ankle (`foot`). */
@@ -49,6 +74,8 @@ interface HarpFoot {
   readonly toe: Vec3;
   /** The back of the sole of the hoof in the bind: the heel, which stays on the floor. */
   readonly heel: Vec3;
+  /** The move of the hoof from its bind place to its rest place, in meters ({@link LEG_RESTS}). */
+  readonly rest: Vec3;
   /** The bones of the leg. */
   readonly bones: { readonly thigh: number; readonly shin: number; readonly foot: number };
 }
@@ -98,11 +125,13 @@ export function harpFeet(model: PlayerModel, scale: number): HarpFeet | null {
     const knee = new Vector3(...(p[bones.shin] ?? [0, 0, 0]));
     const ankle = new Vector3(...(p[bones.foot] ?? [0, 0, 0]));
     const pole = knee.clone().sub(hip.clone().add(ankle).multiplyScalar(0.5));
+    const rest = LEG_RESTS[side === 'L' ? 0 : 1];
     return {
       bind: { shoulder: toVec3(hip), elbow: toVec3(knee), wrist: toVec3(ankle) },
-      pole: toVec3(pole),
+      pole: rest.knee ?? toVec3(pole),
       toe: [x, low, front],
       heel: [x, low, back],
+      rest: toVec3(new Vector3(...rest.hoof).multiplyScalar(model.body.headHeight)),
       bones,
     };
   };
@@ -131,6 +160,7 @@ const footState = createFootState();
 const legPose = createArmPose();
 const hipAt = new Vector3();
 const toeAt = new Vector3();
+const restToe = new Vector3();
 const fromAt = new Vector3();
 const pedalAt = new Vector3();
 const ankleAt = new Vector3();
@@ -178,7 +208,7 @@ function pressPoint(feet: HarpFeet, pedal: number, notch: number, out: Vector3):
  * @param plan The pedal plan of the player.
  * @param notches The notch of each pedal at the time (`pedalNotchesAt()`).
  * @param time The song time of the note layer.
- * @param weight The eased weight of the playing pose: at rest, the feet stay in their bind places.
+ * @param weight The eased weight of the playing pose: at rest, the feet stay in their rest places.
  * @param rotations The rotations of the pose to write.
  */
 export function poseHarpFeet(
@@ -191,7 +221,8 @@ export function poseHarpFeet(
 ): void {
   for (const [side, foot] of [feet.left, feet.right].entries()) {
     footStateAt(plan, side, time, footState);
-    toeAt.fromArray(foot.toe);
+    restToe.fromArray(foot.toe).add(press.fromArray(foot.rest));
+    toeAt.copy(restToe);
     fromAt.copy(toeAt);
     if (footState.fromPedal >= 0) {
       const p = footState.fromPedal;
@@ -210,7 +241,7 @@ export function poseHarpFeet(
     sole.fromArray(foot.toe).sub(press.fromArray(foot.heel));
     const length = sole.length();
     const rise = Math.min(Math.max((toeAt.y - (foot.toe[1] ?? 0)) / length, 0), 1);
-    const back = Math.min(Math.max((toeAt.z - (foot.toe[2] ?? 0)) / HEEL_LIFT.back, 0), 1);
+    const back = Math.min(Math.max((toeAt.z - restToe.z) / HEEL_LIFT.back, 0), 1);
     pitch.setFromAxisAngle(
       PITCH_AXIS,
       Math.min(Math.asin(rise), HEEL_PITCH) - HEEL_LIFT.pitch * back,
