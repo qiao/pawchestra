@@ -24,7 +24,7 @@
     "hips": {
       "head": [
         0.0,
-        0.31,
+        0.29,
         0.0
       ],
       "tail": "spine"
@@ -32,7 +32,7 @@
     "spine": {
       "head": [
         0.0,
-        0.38,
+        0.36,
         0.01
       ],
       "tail": "spine1"
@@ -40,7 +40,7 @@
     "spine1": {
       "head": [
         0.0,
-        0.45,
+        0.43,
         0.02
       ],
       "tail": "chest"
@@ -48,120 +48,120 @@
     "chest": {
       "head": [
         0.0,
-        0.51,
-        0.012
+        0.495,
+        0.015
       ],
       "tail": "neck"
     },
     "neck": {
       "head": [
         0.0,
-        0.585,
-        -0.004
+        0.575,
+        0.0
       ],
       "tail": "head"
     },
     "head": {
       "head": [
         0.0,
-        0.615,
+        0.605,
         0.0
       ],
       "tail": [
         0.0,
-        0.8,
+        0.79,
         0.0
       ]
     },
     "ear_L": {
       "head": [
         0.045,
-        0.785,
-        -0.03
+        0.79,
+        -0.02
       ],
       "tail": [
-        0.1,
+        0.092,
         1.0,
-        -0.065
+        -0.045
       ]
     },
     "clavicle_L": {
       "head": [
         0.015,
-        0.55,
-        0.005
+        0.54,
+        0.01
       ],
       "tail": "upper_arm_L"
     },
     "upper_arm_L": {
       "head": [
         0.07,
-        0.5452,
-        0.001
+        0.535,
+        0.02
       ],
       "tail": "forearm_L",
       "roll": "palm"
     },
     "forearm_L": {
       "head": [
-        0.1475,
-        0.5452,
-        0.005
+        0.156,
+        0.524,
+        0.03
       ],
       "tail": "forearm_twist_L",
       "roll": "palm"
     },
     "forearm_twist_L": {
       "head": [
-        0.186,
-        0.5457,
-        0.009
+        0.2,
+        0.5255,
+        0.038
       ],
       "tail": "hand_L",
       "roll": "palm"
     },
     "hand_L": {
       "head": [
-        0.225,
-        0.5458,
-        0.013
+        0.245,
+        0.525,
+        0.048
       ],
       "tail": "fingers_L",
       "roll": "palm"
     },
     "fingers_L": {
       "head": [
-        0.268491,
-        0.54827,
-        0.014928
+        0.287488,
+        0.529949,
+        0.055088
       ],
       "tail": [
-        0.307935,
-        0.5509,
-        0.031335
+        0.327488,
+        0.534949,
+        0.086088
       ],
       "roll": "palm"
     },
     "thigh_L": {
       "head": [
-        0.0595,
-        0.287,
-        0.004
+        0.0605,
+        0.2635,
+        0.0085
       ],
       "tail": "shin_L"
     },
     "shin_L": {
       "head": [
-        0.0555,
-        0.178,
-        0.0
+        0.065,
+        0.153,
+        0.006
       ],
       "tail": "foot_L"
     },
     "foot_L": {
       "head": [
-        0.056,
-        0.055,
+        0.066,
+        0.058,
         -0.012
       ],
       "tail": "toes_L",
@@ -173,14 +173,14 @@
     },
     "toes_L": {
       "head": [
-        0.064,
+        0.075,
         0.02,
-        0.055
+        0.06
       ],
       "tail": [
-        0.064,
+        0.08,
         0.01,
-        0.095
+        0.13
       ],
       "roll": [
         0,
@@ -191,13 +191,13 @@
     "tail": {
       "head": [
         0.0,
-        0.33,
-        -0.08
+        0.28,
+        -0.1
       ],
       "tail": [
         0.0,
-        0.33,
-        -0.13
+        0.28,
+        -0.145
       ],
       "roll": [
         0,
@@ -207,22 +207,22 @@
     },
     "fingers_R": {
       "head": [
-        -0.267942,
-        0.547898,
-        0.020265
+        -0.286516,
+        0.522722,
+        0.060298
       ],
       "tail": [
-        -0.308923,
-        0.535829,
-        0.022897
+        -0.334275,
+        0.506383,
+        0.054121
       ],
       "roll": "palm"
     }
   },
   "palm": [
-    -0.035,
-    -0.997,
-    -0.063
+    0.0,
+    -0.994,
+    0.11
   ],
   "studio": {
     "trunk": {
@@ -260,16 +260,16 @@
     "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 15 degrees down and 8 degrees out, and the shin leans 12 degrees forward of vertical, so that most of the thigh lies on the seat (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 15 8 12).",
     "legTurns": {
       "thigh": [
-        0.617985,
-        -0.019299,
-        -0.092074,
-        0.780541
+        0.609863,
+        0.026612,
+        -0.07851,
+        0.788159
       ],
       "shin": [
-        0.152745,
-        0.000426,
-        0.002002,
-        0.988263
+        0.197041,
+        0.001097,
+        0.005159,
+        0.980381
       ],
       "foot": [
         0.0,
@@ -299,19 +299,19 @@
       [
         0.07,
         0.74,
-        0.09
+        0.105
       ]
     ],
     "noseBox": [
       [
         -0.02,
-        0.65,
-        0.11
+        0.64,
+        0.125
       ],
       [
         0.02,
-        0.69,
-        0.14
+        0.685,
+        0.165
       ]
     ],
     "nose": [
@@ -343,14 +343,14 @@
       "note": "No move: the cream fur of the texture is near the cream of the sheet in the light of the app."
     },
     "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
-    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.003 to 0.065, y 0.67 to 0.733, z 0.044 to 0.086 in the source, mapped by the point edits). The nose box holds the pink nose tip."
+    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.018 to 0.066, y 0.672 to 0.73, z 0.052 to 0.098 in the source). The nose box holds the pink nose tip."
   },
   "eyeShell": {
     "lift": 0.002,
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its bead eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
@@ -369,8 +369,8 @@
   },
   "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and a seat 1 cm deeper, so that the back keeps off the chair back.",
   "eyeSize": 0.2018,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no bead eye.",
-  "metersPerUnit": 1.4795,
+  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "metersPerUnit": 1.4867,
   "metersPerUnitNote": "The scale of the app: H (0.2018 units of the source form) is 0.2985 m, the H of the rabbit of main. The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/rabbit.blend holds it.",
   "texture": "assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg",
