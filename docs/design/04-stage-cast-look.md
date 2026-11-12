@@ -796,8 +796,11 @@ the crease angle 180°, and only a scale to H. Reason: the look target of this b
 FBX. Its source is the Tripo mesh with new front paws (`tools/blender/fox_paws.py`): each paw of
 three long digits goes past the wrist ring, and a palm with a pad and four short digits close
 together takes its place, in quad faces with the UVs of the dark paw fur. Reason: the three thick
-digits spread as a hand, and the paw was about two thirds of the shoulder distance long. A fox paw
-has four short digits of near equal length, with the middle two a little longer. It keeps the
+digits spread as a hand, and the paw was about two thirds of the shoulder distance long. The new
+paw is about 1.3 wrist diameters wide, as the paw of the wolf. Its middle two digits are the
+longest, the inner digit is shorter, and the outer digit is the shortest, as on a real fore paw.
+Reason: a paw 1.5 wrist diameters wide with four digits of near equal length read as a large hand.
+It keeps the
 eyeballs of its mesh, because the map paints a full eye on each, with a light in each pupil. So the
 eyes take the finish `varnish` and no eye light, and the irises keep the place of the source. Its
 eyeballs and sockets are a little smaller and deeper than in the source, and the upper lids turn
