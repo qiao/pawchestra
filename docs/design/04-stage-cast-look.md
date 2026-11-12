@@ -1262,7 +1262,8 @@ does the same with `tools/hippo-maps.py`, the Tripo pig (`assets/models/pig/trip
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
 the map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus
-the tan fox never shows the red map. The red map keeps the colors of the source. The tan map
+the tan fox never shows the red map. The red map keeps the colors of the source and adds fur
+strands (`STRANDS`, "Strand normals" below). The tan map
 moves only the orange fur of the source, by one step of the lightness and the hue (`TAN_STEP`), and
 the cream, the dark socks, the lines, and the eyes keep the colors of the source. Reason: the
 source FBX is the look target, and the tan fox needs the smallest change that reads as tan.
@@ -1289,6 +1290,11 @@ faces keep the shared shading.
   spread into black squares. A body with no normal map file keeps the normals of its mesh. A map
   of a palette takes the normal map of the map of its body, because both have the same UVs and
   strands.
+- **Added strands.** A source that paints its fur smooth, such as the Tripo fox, gets strands
+  from its maps tool (`STRANDS` of `tools/fox-maps.py`): seeded noise, smeared along the faint
+  strokes of the source, gives a small luma step in the color map and its slope in the normal
+  map. The strand contrast and the tilts then match the cat and the wolf. Reason: with no
+  strands in either map, the fox fur read as smooth plastic beside the other bodies.
 
 The fur of the candidate rabbit is near the shoulder of the tone curve, so the sheen adds little
 light at the outline. The color map already paints the strands, so the normal map adds little at
