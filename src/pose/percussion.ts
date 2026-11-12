@@ -1326,9 +1326,11 @@ function poseHand(
       share += (damped.share - share) * muffle;
     }
     acrossHand(side, head, share, shoulder.position, turnedPole, homeShift, held);
-    // At a muffle of the timpani, the lowest point of the paw goes to the head.
+    // At a muffle of the timpani, the lowest point of the paw goes to the head. On the way, a paw
+    // under the head goes up to it at once, so that it does not go into the kettle.
     if (damped?.kind === 'grip' && damped.touch !== null && muffle > 0) {
-      wrist.y += (damped.touch - lowestPoint(damped.paw, wrist, turn)) * muffle;
+      const rise = damped.touch - lowestPoint(damped.paw, wrist, turn);
+      wrist.y += rise > 0 ? rise : rise * muffle;
     }
   } else if (side.kind === 'mallet' && fingers) {
     fingerHand(rig, hand, state.small);

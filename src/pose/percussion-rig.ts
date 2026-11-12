@@ -199,8 +199,8 @@ export interface FingersDamp {
   readonly up: number;
   /**
    * The depth of the lowest point of the rigid paw under the head, in meters
-   * (`DampHand.touch`). The skin of the studio body lies about 1.2 cm over that point, so the end
-   * of the paw presses the head lightly.
+   * (`DampHand.touch`). The skin of the studio body lies up to about 2.5 cm under that point, so
+   * a negative depth lays the end of the paw lightly on the head.
    */
   readonly press: number;
   /** The share of the pitch of the mallet at the damp (`MalletAcross.pitch`). */
@@ -443,7 +443,7 @@ export const PERCUSSION_HOLDS = {
     // kettle stands nearer than the right one, so each side has its own reach. The spine leans 3°,
     // and the upper body does not turn: a turn of 17° twisted the chest 13° in 0.06 s at a muffle.
     // The stump paw of the Tripo elephant reaches 0.52 m and 0.51 m, and its rigid low point stays
-    // 1.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
+    // 2.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
     // out of the kettles). The grip stays level with the head, and the mallet keeps 0.5 rad of
     // the pitch (share), so that the mallet head stays out of the head. The paw moves about 25 cm
     // to the muffle, at most at 1.2 m/s (speed). In 0.06 s, it moved 6.7 m/s. With the lean of
@@ -457,7 +457,7 @@ export const PERCUSSION_HOLDS = {
       reach: [0.52, 0.51],
       rim: 0.05,
       up: 0,
-      press: -0.015,
+      press: -0.025,
       share: 1.67,
       lean: 0.05,
       turn: 0,
