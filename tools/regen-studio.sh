@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Usage: tools/regen-studio.sh [<animal>...]
+# Usage: tools/regen-studio.sh [<animal>...], or --heights
 #
 # Writes the studio module of each animal again with `node tools/studio-body.ts <animal>`, then the
 # heights module with `--heights`, in the git checkout of the current folder. With no animal, it
 # writes each module of src/models/studio/. It compares each written file with HEAD and prints one
-# line for each file: `same <name>`, `DIFF <name>`, `NEW <name>` (no file in HEAD), or `FAIL <name>` (the tool
-# failed, with the end of its log). The logs go into scratch/regen/. A DIFF is a result, and the
-# caller decides about it.
+# line for each file: `same <name>`, `DIFF <name>`, `NEW <name>` (no file in HEAD), or
+# `FAIL <name>` (the tool failed, with the end of its log). The logs go into scratch/regen/. A DIFF
+# is a result, and the caller decides about it. --heights writes only the heights module.
 #
 # Exit codes: 0 no FAIL, 1 one or more FAIL.
 set -uo pipefail
@@ -15,11 +15,13 @@ cd "$(git rev-parse --show-toplevel)"
 LOG_DIR=scratch/regen
 mkdir -p "$LOG_DIR"
 
-ANIMALS=("$@")
-if [ "${#ANIMALS[@]}" -eq 0 ]; then
+ANIMALS=()
+if [ $# -eq 0 ]; then
   for file in src/models/studio/*.ts; do
     ANIMALS+=("$(basename "$file" .ts)")
   done
+elif [ "$1" != --heights ]; then
+  ANIMALS=("$@")
 fi
 
 FAIL=0
@@ -50,7 +52,7 @@ regen() {
 }
 
 # studio-body also writes the heights module, so the runs go one after the other.
-for animal in "${ANIMALS[@]}"; do
+for animal in ${ANIMALS[@]+"${ANIMALS[@]}"}; do
   regen "$animal" "src/models/studio/$animal.ts" "$animal"
 done
 regen heights src/models/studio-heights.ts --heights
