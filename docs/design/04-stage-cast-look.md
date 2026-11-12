@@ -171,8 +171,9 @@ interface SpeciesParams {
 
 The head height `H` is the unit of the body. The head height and the seat height of a species
 come from its studio body (`StudioBody.headHeight`, `StudioBody.seatHeight`). The bear has no
-studio seat, so it uses a seat of 0.75 H. The holds of 4.6
-give their offsets in `H`, so one hold serves the species of different sizes.
+studio seat, so it uses a seat of 0.75 H. The holds of 4.6 and the pose holds of 5.3 give each
+value that follows the body in `H`, so one hold serves the species of different sizes, and a body
+size change needs no hold edit (5.3, "Units").
 
 ## 4.4 Models
 
@@ -915,12 +916,13 @@ eye opening was about 0.18 of the head width in the play view, above the limit o
 the other bodies. Its scale (`metersPerUnit` of its config) puts its seated crown, with no ears,
 at the seated crown of the Tripo wolf, and its ears rise above the ears of the wolf. Reason: with
 the standing shoulders of the old deer, the slim fawn was the smallest body of the orchestra. Its
-head is small, so a scale that keeps H of the old deer made it 1.6 times taller. The stool, the
-harp, and the meter offsets of the harp hold grow with the body (4.6, 5.3). Its upper arms and forearms are 1.3 times longer than in the source, as on the
-Tripo hippo, and the hooves keep their size. Reason: with shorter arms, the hooves reached fewer
-of their places on the harp strings, and the harp stood so near the chest that the soundbox went
-into it. The harp stands near the stool and to the right of the chest (`HARP_PLACE`, 4.6), and
-the spine stays erect, so that the muzzle stays off the neck of the harp. The left hoof turns
+head is small, so a scale that keeps H of the old deer made it 1.6 times taller. The stool and
+the harp grow with the body (4.6), and the palm offsets of the harp hold are in `H` (5.3). Its
+upper arms and forearms are 1.3 times longer than in the source, as on the Tripo hippo, and the
+hooves keep their size. Reason: with shorter arms, the hooves reached fewer of their places on
+the harp strings, and the harp stood so near the chest that the soundbox went into it.
+The harp stands near the stool and to the right of the chest (`HARP_PLACE`, 4.6), and the spine
+stays erect, so that the muzzle stays off the neck of the harp. The left hoof turns
 by one step of a closed wrist ring, and each elbow axis turns, so that each part of each arm
 takes at most 45° in the moments of the harpist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
