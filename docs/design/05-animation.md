@@ -254,7 +254,8 @@ The rest of each family:
   makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
   rests the bow upright beside the right thigh at the reach of its short arm. Its bow tip turns to
   the left below the snout in a move (`FOX_HOLD.restBow.via`), so that the bow does not cross the
-  snout.
+  snout. The grip also moves up toward the shoulder in the move. Reason: the rest grip is out of
+  the reach of the short arm, and a wrist that comes into the reach late bends the elbow in a jump.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
