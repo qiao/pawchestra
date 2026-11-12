@@ -156,7 +156,7 @@ worktree, which git ignores: `build.py`, `make_config.py`, `base-config.json`, `
 
 | Item | Value |
 |---|---|
-| Size | 376,609 bytes |
+| Size | 376,803 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the elephant faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `elephant`: 3,526 vertices and 3,853 faces (3,091 quads and 762 triangles, 6,944 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss. The 42 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/elephant/tripo-hand/elephant-color.webp`) |
 | Armature | `elephant_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the standing bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -203,9 +203,10 @@ The weights, in the rest pose:
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no tail.
 2. Arm rows: each vertex of a side with |x| from 0.13, within 0.075 units of the line of the rest
-   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.13 to 0 at x
-   0.17, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2325, 0.2475, 0.2625, and
-   0.2775, and the rest on the 4 roll segments.
+   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.8, 0.6, 0.4, 0.2, and
+   0.05 at x 0.13, 0.15, 0.17, 0.19, and 0.21, linear between them and 0 from x 0.22 (`rows.control`
+   of `params.json`), an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2325, 0.2475,
+   0.2625, and 0.2775, and the rest on the 4 roll segments ("Arm roots").
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0025 from
    0.015 units before the head of `fingers_<side>`.
@@ -306,9 +307,28 @@ sweep of one demo (`pnpm pose-depth timpanist --demo beethoven-5-4`) and the arm
 | Skin twist p95, left and right (main 27 and 26) | 18, 18 | 12, 11 |
 | Note targets within 5 mm | 100 % | 100 % |
 
-The folds that stay lie at the inner elbows and at the root of each upper arm (`pnpm fold-probe
-timpanist`). The upper arm root goes 4.7 cm into the trunk in each sample, also at rest: the inner
-side of the T-pose arm root lies in the side of the trunk in the standing bind.
+The folds that stayed lay at the inner elbows and at the root of each upper arm (`pnpm fold-probe
+timpanist`). "Arm roots" gives the fix of the roots.
+
+**Arm roots.** The shoulder joint lies 0.035 units inside the side of the trunk. With a clavicle
+share from 0.4 at x 0.13 to 0 at x 0.17, the rings under the arm, where the arm leaves the trunk
+(x 0.15 to 0.18), followed the upper arm by 0.89 to 1.0. The bind holds the upper arm 8 degrees
+below level, and the timpani hold lowers it 39 to 54 degrees more. These rings then turned about
+the joint into the trunk: 0.7 cm in the bind, and 3.9 cm to 4.2 cm in each sample of the sweep.
+The clavicle rows of step 2 now reach to x 0.22, so the rings of the root lag behind the upper
+arm. The sweep of beethoven-9 (`pnpm pose-depth timpanist --demo beethoven-9`) and the arm gate
+(`pnpm arm-check timpanist`), before and after:
+
+| Measure | Before | After |
+|---|---|---|
+| Upper arms in the body: play, lift, rest, lower | 4.2, 3.9, 3.9, 4.2 cm | 0.0, 0.0, 0.0, 0.1 cm |
+| Folds p95, left and right (limit 8) | 9, 4 | 6, 2 |
+| Twist p95, left and right (limit 55) | 8, 8 | 8, 8 |
+| Flat p5, left and right (limit 0.55) | 0.87, 0.90 | 0.86, 0.90 |
+
+The other pairs of the sweep, the note targets, the head height, and the seat height do not
+change. A clavicle share of 0.7 at x 0.13 and 0.5 at x 0.15 left 1.5 cm in the play, and 0.75 and
+0.55 split the body surface of the sweep into 5 open loops.
 
 **Color map** (`tools/elephant-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and
 writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the
@@ -331,7 +351,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/elephant.rig.glb` | 1,088,320 bytes | `50848c3387fa2225585c27ca936c6996f24269e1159142dce2cec60510a211ae` |
-| `tripo-hand/elephant.rig.json` | 15,348 bytes | `8c95d2a593eadaf447ba18722adfa37ddde9f143fdc27df8e472166a215e366e` |
+| `tripo-hand/elephant.rig.glb` | 1,088,320 bytes | `f7a20e453d3f22a0ccf38de3ae876c026a31e45fddffc4249c6fecc9ef7e63ce` |
+| `tripo-hand/elephant.rig.json` | 15,348 bytes | `7b5e4b73fa501a54b8e1bd6a7c87725c37795082c69506582c3e8a141b3c3805` |
 | `tripo-hand/elephant-color.webp` | 84,838 bytes, 2048 × 2048 | `f24ff816f2d47e08ec49aeb942005d56975e91a371b5bdd814076a322b5d4c68` |
 | `tripo-hand/elephant-normal.webp` | 67,098 bytes, 1024 × 1024 | `c3b6e219e1fd7d56bcbea4531e07b18d93469640152178810f9e3f876d68c564` |
