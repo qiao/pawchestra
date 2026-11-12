@@ -441,9 +441,14 @@ The rest of each family:
   12 recast bodies flipped through 180° (cast matrix, 4.4). The dog takes its place from its body
   too, with its own gap and a larger lean to the left (`DOG_HOLD.fit`), so that the scroll stands
   beside the left ear and not in front of the long muzzle, and the short bow arm reaches the
-  strings. The contrabass of the hippo takes its place from the body by the same rule, with its
-  own lean back, lean to the left, turn of the top plate, end pin place, and gap
-  (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
+  strings. Its fit also tests lines across the upper half of the back (`CelloFit.across`), and the
+  cello leans back less, so that the back of the upper bout touches the chest at the sternum. Its
+  trunk leans further forward and its right shoulder turns further, so that the bow paw reaches
+  the strings in front of the chest, and its bow paw turns on the stick (`stickTurnR`), so that it
+  does not flip. Reason: the chest of the beagle is round, and with the middle line alone, the
+  upper bout stood deep in the chest in each sample. The contrabass of the hippo takes its
+  place from the body by the same rule, with its own lean back, lean to the left, turn of the top
+  plate, end pin place, and gap (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
   small tilt back and a small turn to the right, as a standing bassist holds it. The lower bout
   rests against the left thigh, the upper bout stands below the left shoulder, and the scroll
   stands beside the head. The left elbow points out to the side, and the bow plays near level in
@@ -494,9 +499,9 @@ The rest of each family:
   wrist end goes into the upper bout. The play keeps its grip, because no move of the wrist and no
   turn of the elbow moves the thick wrist end out of the upper bout (`TODO.md`).
 - **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
-  near the nut (`restPlace`), and the dog keeps its own rest grip. Reason: at the place of the dog,
-  the paw holds the fingerboard at the top of the upper bout, and the left forearm or the paw of
-  most recast bodies goes into the upper bout at rest and in the moves.
+  near the nut (`restPlace`). The dog holds it at 0.3 of the fingerboard. Reason: at 0.6, the paw
+  holds the fingerboard at the top of the upper bout, and the left forearm or the paw of most
+  recast bodies, and the paw of the dog, goes into the upper bout at rest and in the moves.
 - **Violin left elbow of the rabbit.** In the play, the left elbow of the rabbit comes in under
   the violin, straight down and forward (`RABBIT_HOLD.poleL`), as a violinist swings the elbow
   under the instrument (strings 1.10). At rest, it points out (`RABBIT_HOLD.restPoleL`). Reason:
