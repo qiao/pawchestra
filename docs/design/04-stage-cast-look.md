@@ -834,7 +834,15 @@ arms and forearms are longer than in the source (the point edit `armStretch` of 
 `assets/models/hippo/README.md`), and the paws keep their size. Reason: with the arms of the
 source, no upright hold of the contrabass reached the strings and the neck over the round belly.
 Its paws and its elbow axes turn so that each part of each arm takes at most 45° in the moments of
-the bassist. The paws of the fox turn about the
+the bassist. The Tripo pig (`assets/models/pig/tripo-hand/`) is the body of the hornist, by the
+same rules. Its source paints each eye on faces of the head with no light, so the eye faces take
+the face attribute `eye`, the finish `eye` with the eye light, and a blink lid. Its arms keep the
+short length of the source, so the horn hold turns the coil further back and the left shoulder
+further forward (`PIG_HORN`, 5.3). Its arm loops stop at poles, so no ring takes a split: each
+hoof turns by whole steps of the one closed wrist ring, and a bridge of new quads joins the ring
+again (`turn_hooves()` of its build). Each elbow axis also turns. Each part of each arm then takes
+at most 45° in the moments of the hornist. Its face takes the head bone alone above the chin,
+because the bone heat of the hanging head gave the snout shares of the shoulders. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1153,7 +1161,8 @@ with no change of a color (`tools/wolf-maps.py`). Reason: the look target of thi
 source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
 `tools/dog-maps.py`, and the candidate monkey (`assets/models/monkey/tripo-hand/`) with
 `tools/monkey-maps.py`, for the same reason. The Tripo hippo (`assets/models/hippo/tripo-hand/`)
-does the same with `tools/hippo-maps.py`.
+does the same with `tools/hippo-maps.py`, and the Tripo pig (`assets/models/pig/tripo-hand/`) with
+`tools/pig-maps.py`.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
