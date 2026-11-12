@@ -205,12 +205,12 @@ with the eyeballs of the Tripo monkey (`../monkey/README.md`). `make_config.py` 
 
 | Item | Value |
 |---|---|
-| Size | 393,383 bytes |
-| SHA-256 | `2a5f72e6de46b2916b0d14c2671ac9b44e4ce337af8afe02b1feba4da9079dc0` |
+| Size | 393,380 bytes |
+| SHA-256 | `87b70b41c63deac26cce08dcda59165508d652e4c0b39014199f3322b015926f` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fawn faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `deer`: 3,746 vertices and 3,923 faces (3,425 quads and 498 triangles, 7,348 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 48 faces of the nose take the slot `fur` and the color map ("Nose"). The 225 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/deer/tripo-hand/deer-color.webp`) |
 | Armature | `deer_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.897127 (the shoulder joints at 1.386595 m for each unit, the standing shoulder height of the deer of `deer.rig.glb`), `crease` 180, and `seatWidth` 0.44 ("Seat") |
+| Facts | `height` 1.166265 (the shoulder joints at 1.802574 m for each unit: 1.3 times the scale of the standing shoulder height of the deer of `deer.rig.glb`, "Size"), `crease` 180, and `seatWidth` 0.57 ("Seat") |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The old deer has antlers, so its entry took `headCeiling` 0.87. The fawn has no antlers, and its
@@ -318,13 +318,32 @@ the angle 2.199115 and the hinge axes. The lid faces take the brown fur patch at
 point, side edge, or back edge leaves the head (ray casts), and the open lid lies at least 0.017
 units under it. With psi from -55 degrees, up to 14 points of the closing lid left the head.
 
+**Size.** The scale is 1.802574 m for each unit (`metersPerUnit` of the config): 1.3 times the
+scale 1.386595 at which the standing shoulder joints are at the height of the deer of
+`deer.rig.glb`. At 1.3, the seated crown with no ears is at the seated crown of the Tripo wolf
+(`scratch/deersize/measure.py` on each `.blend`, the bones of each studio module):
+
+| Measure (m) | Fawn at 1.0 | Fawn at 1.3 | Tripo wolf |
+|---|---|---|---|
+| Head height H | 0.221 | 0.287 | 0.369 |
+| Standing crown, no ears | 1.292 | 1.680 | 1.664 |
+| Standing ear tips | 1.387 | 1.803 | 1.774 |
+| Seated crown, no ears | 1.179 | 1.533 | 1.539 |
+| Seated shoulder joints | 0.784 | 1.019 | 0.996 |
+| Chest width | 0.231 | 0.300 | 0.381 |
+| Seat height | 0.271 | 0.352 | 0.276 |
+
+The trunk of the fawn is slim: a scale that matches the chest width of the wolf (1.65) puts the
+seated crown 0.4 m above the seated crown of the wolf.
+
 **Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, the shins lean 35
 degrees forward, and the hooves stand flat on the floor (`tools/rig/leg_turns.py <config> 25 15 35
 0`). The property `seat` is {`prop` `chair`, `front` -0.0031, `back` -0.12, `halfWidth` 0.13}: the
 front lies 0.05 units behind the knee joint of the bind, and 35 % of the thigh lies on the seat.
-The seat height is 0.271 m (0.243 m on the old deer), with the legs of the source. The stool keeps
-the width 0.44 m of the old deer (`seatWidth`), which holds the haunch (0.33 m). The layout of
-the demos against main (`boulanger-matin`, the only demo with the harp, 42 players):
+The seat height is 0.352 m, with the legs of the source. The stool is 0.57 m wide (`seatWidth`),
+1.3 times the stool of the old deer, and holds the haunch (0.43 m). At the scale of the shoulders
+of the old deer ("Size"), the seat height was 0.271 m (0.243 m on the old deer), and the layout of
+the demos against main (`boulanger-matin`, the only demo with the harp, 42 players) was:
 
 | Shins forward | Seat height | Players that move |
 |---|---|---|
@@ -333,7 +352,8 @@ the demos against main (`boulanger-matin`, the only demo with the harp, 42 playe
 | 30 degrees | 0.283 m | 0 |
 | 35 degrees | 0.271 m | 0 |
 
-The place of the harp moves no player. The
+The place of the harp moves no player. At the scale 1.3, the larger body and harp move one
+player of `boulanger-matin`: the pig hornist, 0.43 m (`scratch/deersize/layout.ts`). The
 short tail hangs behind the back edge of the seat: no tail corner lies in the stool in the play
 (`pnpm pose-depth harpist --where tail1`).
 
@@ -357,7 +377,9 @@ forward right rest elbow (`restR.pole`) rolls the right upper arm 58 to 59 degre
 the arms of 1.2 and of 1.3 times the source. The left forearm spreads 59 degrees from the chord
 to the rest, so no hoof step of 32.7 degrees centers it better.
 
-**Harp fit.** The harp is 0.75 of the concert harp of the app (`harpScale`, 0.98 m high). Its base
+**Harp fit.** The harp is 0.975 of the concert harp of the app (`harpScale`, 1.27 m high): 1.3
+times the harp 0.75 of the fit below, as the body is 1.3 times the body of the fit ("Size"). The
+meter offsets of the harp hold grow by 1.3 too, so each depth below grows by 1.3. Its base
 stands 0.15 m in front of the floor point at the scale 1 and 0.22 H to the right of it, turned 46
 degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim (`SOUNDBOX`,
 `NECK` of `src/models/instruments/harp.ts`). The left hand plays up to D4 (`reach.leftHighest` 62
@@ -410,7 +432,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `0d7b2623e817d60d359645a873fdf0ce1ec2986f8758e2d9d3073c3a7b2cd658` |
+| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `c497b1ccec832b908640df1802c1bf45e36d320290b597d84ffdb1702b9469f0` |
 | `tripo-hand/deer.rig.json` | 19,351 bytes | `9053ccd978036ffbd175020ea83950d092fc4334619cc3a507b9478db5eb6c11` |
 | `tripo-hand/deer-color.webp` | 133,838 bytes, 2048 × 2048 | `9f40f146e7a1f5ea11a8139d90682db82a8ace321451b96b30200236b9cb6876` |
 | `tripo-hand/deer-normal.webp` | 75,080 bytes, 1024 × 1024 | `3607beb00dcf3ec1e5d061d975efd4a221ef12dc63c378ab6e7058439928e538` |
