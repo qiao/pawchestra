@@ -744,10 +744,15 @@ to the middle of its eye opening in a view from above the head (`VIEW_DOWN`), tu
 (`SHIFT_SHARE`), because the full move read wall-eyed. White of the same eye fills the place
 that the iris leaves, and the clean outer rim of the iris fills its nose rim. Reason: the source
 paints each pupil at the nose side of its opening, so the rabbit looked cross-eyed from the side,
-and its two eyes are not mirror images, so a mirrored shift showed a white seam. The map paints a
-light in each pupil, so the eyes take the finish `varnish` and no eye light. A lid on each eye
-blinks over it
-("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
+and its two eyes are not mirror images, so a mirrored shift showed a white seam. The target turns
+no farther out (`GAZE_OUT`). Reason: with a turn out, the right eye looked a little out, past the
+viewer, from the front. The map also lightens the dark lash line on the rim of each upper lid
+over the iris, and keeps the outer corner of the line (`soft_lash()`). Reason: in the stage light
+the line read as a hard dark wedge, and the face read stern. The eyes take the finish `eye` and the
+eye light. Reason: the painted light of the source lies under the upper lid, so the eyes showed no
+clear light from the front, and the face read blank. The corners of its mouth lift a little up and
+back, as on the Tripo cat (`assets/models/rabbit/README.md`, "Smile"). Reason: the mouth read flat.
+A lid on each eye blinks over it ("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
 `violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It stands
