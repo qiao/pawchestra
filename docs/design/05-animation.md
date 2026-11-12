@@ -293,9 +293,11 @@ The rest of each family:
   belly with the paws beside the thighs, as the arms of a pianist hang before a performance. Paws
   on the front of the belly looked held at the chest, and paws nearer to the middle put the arms
   into the belly.
-  The deer sits up with the arms at its sides and the paws beside the knees, as a pianist rests
-  before a performance. Reason: with each hand near a string, the rest looked the same as
-  the play.
+  The deer sits up with the elbows bent and the hooves on the lap, on the front of the belly where
+  it meets the thighs, as a pianist rests the hands on the lap before a performance. Reason: with
+  each hand near a string, the rest looked the same as the play, and the thighs lie out of the
+  reach of the short arms. Paws beside the knees lie out of reach, so the arms lock straight and
+  the elbows snap where the lift leaves the reach limit.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
   rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). A hold
