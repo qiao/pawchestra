@@ -1,0 +1,277 @@
+{
+ "edits": [
+  {
+   "kind": "eyes",
+   "scale": 0.8,
+   "centers": {
+    "L": [
+     0.0376,
+     0.8657,
+     0.0628
+    ],
+    "R": [
+     -0.0376,
+     0.8655,
+     0.0629
+    ]
+   },
+   "rBall": 0.0217,
+   "rIn": 0.027,
+   "rOut": 0.045,
+   "mid": 0.012,
+   "zKeep": 0.15
+  },
+  {
+   "kind": "armStretch",
+   "k": 1.3,
+   "ramp": 0.01,
+   "reach": [
+    0.05,
+    0.07
+   ]
+  }
+ ],
+ "sourceTexture": "assets/models/deer/tripo-p2/deer.fbm/deer_basecolor.jpg",
+ "palm": [
+  0.159,
+  -0.987,
+  -0.034
+ ],
+ "ringEdges": 11,
+ "legTurns": [
+  25,
+  15,
+  35,
+  0
+ ],
+ "tailBind": null,
+ "tailBindNote": "The tail bones keep the directions of the source in the bind, so that the short tail stays behind the haunch.",
+ "chair": {
+  "halfWidth": 0.13,
+  "front": 0.05,
+  "back": -0.12,
+  "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The front edge lies seatGap units behind the knee joint of the bind (the property seat of the armature). The half width holds the haunch (x -0.119 to 0.119)."
+ },
+ "eyeBox": [
+  [
+   0.0,
+   0.83,
+   0.03
+  ],
+  [
+   0.075,
+   0.9,
+   0.1
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.035,
+   0.785,
+   0.15
+  ],
+  [
+   0.035,
+   0.845,
+   0.2
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (|x| 0.016 to 0.059, y 0.844 to 0.887, z 0.041 to 0.084; spheres of radius 0.0217 about (0.0376, 0.8657, 0.0628)). The nose box holds the dark nose at the tip of the muzzle.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and the seat width 0.57 m of the stool, 1.3 times the stool of the old deer, which holds the haunch (0.43 m wide at this scale).",
+ "metersPerUnit": 1.802574,
+ "metersPerUnitNote": "The scale of the app: 1.3 times the scale at which the standing shoulder joints (0.647 units) are 0.897127 m high, as on the deer of main (assets/models/deer/deer.rig.glb). At 1.3, the seated crown with no ears is at the height of the seated crown of the Tripo wolf, and the shoulder joints are 1.166265 m high. The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the hooves, and the legs keep the form of the source.",
+ "eyeSize": 0.159257,
+ "jointsNote": "The places are the places of the source, in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 11 vertices from x 0.113 to x 0.236, axis y 0.647 to 0.650, radius 0.037 to 0.020): the shoulder joint at x 0.095, at the trunk side, the elbow at x 0.175, in the middle from the shoulder to the wrist, the wrist at x 0.25, where the pastern widens, the knuckles at x 0.315, where the two toes of the hoof part, the tip at x 0.353. Leg (closed rings of 11 vertices from y 0.088 to y 0.281): the hip joint at (0.055, 0.33, -0.03) in the haunch, the knee at y 0.245, at the narrow ring between the thigh and the calf, the ankle at y 0.055, where the hoof starts, and the hoof tips at z 0.025. Trunk: the spine bones lie near the middle of the depth. The long neck is narrowest at y 0.72 to 0.76, and the chin is at y 0.775. Ears: the root at (0.06, 0.905, -0.02), the tips at (0.14, 0.995, -0.09). Tail: the short tail behind the rump, from its root at (0, 0.45, -0.10) back and down to (0, 0.36, -0.19). The palm is the true palm of the source: the mean normal of the hoof faces that face down (x from 0.30) is (0.159, -0.987, -0.034). The hoof turn of the build turns it with the hoof. The joints of the config are these places mapped by the point edits of the build: the arm stretch (armStretch, 1.3) moves the elbow to x 0.1984, the wrist to x 0.2954, and the knuckles to x 0.3617.",
+ "rings": {
+  "arm": [
+   [
+    0.113,
+    0.138,
+    1
+   ],
+   [
+    0.138,
+    0.162,
+    1
+   ],
+   [
+    0.162,
+    0.176,
+    1
+   ],
+   [
+    0.176,
+    0.187,
+    1
+   ],
+   [
+    0.187,
+    0.197,
+    1
+   ],
+   [
+    0.197,
+    0.216,
+    2
+   ],
+   [
+    0.216,
+    0.236,
+    2
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.095,
+  "reach": 0.05,
+  "handReach": 0.06,
+  "control": [
+   [
+    0.095,
+    0.4,
+    0
+   ],
+   [
+    0.105,
+    0.25,
+    0
+   ],
+   [
+    0.115,
+    0.12,
+    0
+   ],
+   [
+    0.125,
+    0.04,
+    0
+   ],
+   [
+    0.13,
+    0,
+    0
+   ],
+   [
+    0.14,
+    0,
+    0.25
+   ],
+   [
+    0.158,
+    0,
+    0.75
+   ],
+   [
+    0.192,
+    0,
+    0.75
+   ],
+   [
+    0.21,
+    0,
+    0.25
+   ],
+   [
+    0.22,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.0025,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.015,
+   "band": 0.002,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   0.0,
+   0.02
+  ],
+  "bend": 0.03,
+  "tip": false
+ },
+ "hipJoint": [
+  [
+   0.055,
+   0.33,
+   -0.03
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/deer/tripo-hand/deer-color.webp"
+ },
+ "smooth": false,
+ "dropSmall": 30,
+ "lids": {
+  "back": 135,
+  "psi": [
+   -45,
+   40
+  ],
+  "lam": [
+   -58,
+   70
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 126,
+  "srgb": [
+   186,
+   118,
+   63
+  ],
+  "uv": [
+   0.078,
+   0.352
+  ],
+  "density": 0.97
+ },
+ "noGloss": false,
+ "tailFlood": {
+  "z": -0.1,
+  "yMax": 0.5,
+  "startBack": true
+ },
+ "kneeRows": {
+  "reach": 0.05,
+  "radius": 0.06,
+  "band": 0.025
+ },
+ "noseFur": true,
+ "seatGap": 0.05,
+ "rigFacts": {
+  "seatWidth": 0.57
+ },
+ "faceRows": {
+  "y": 0.78
+ },
+ "pawTurn": {
+  "L": 1,
+  "R": 0
+ },
+ "hingeTurn": {
+  "L": 81,
+  "R": -63
+ },
+ "hoofTurn": {
+  "ring": 0.236,
+  "steps": {
+   "L": 1
+  }
+ }
+}
