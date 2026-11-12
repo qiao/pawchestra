@@ -437,8 +437,8 @@ the joints of the source, mapped by the paw turns and the eye edit.
 
 | Item | Value |
 |---|---|
-| Size | 379,933 bytes |
-| SHA-256 | `f8e26ac8a8ca696ea2050ea3bf7077e3fa382359ce4b9091398309f0f681c331` |
+| Size | 382,379 bytes |
+| SHA-256 | `8fb408f651418240fa15cf7b976dee666fa38ade9a7b91fcf421060a7c4d24da` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail behind the chair"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -673,6 +673,15 @@ step runs after them. With the knuckle rows of the source (12 steps of 0.003), t
 more faces in the crease of the curled digits at rest: 50 faces of the left paw folded (41 before
 the edit, `pnpm fold-probe violist`). With steps of 0.0035, 43 fold.
 
+With the smaller paws, the higher seat, and the tail behind the chair, the paws still close on
+the viola neck and on the bow. Against the body of 34d140d5c, the note targets do not change
+(`pnpm hold-fit violist`: the same worst sample of 76.1 mm, and 99.9 % within 5 mm). The arm gate
+(`pnpm arm-check violist --base`) has no FAIL: the twist p95 stays at 55° on the left arm (lift)
+and 7° on the right arm, and the rest folds of the left arm go from 41 to 42. In the sweep
+(`pnpm pose-depth violist --base`), each depth changes by 0.6 cm or less: the paws go 0.2 to 0.6
+cm less into the body and the viola, the rest forearms 0.2 cm more into the viola, and the viola
+0.3 cm more into the body in the lower.
+
 **Differences from the source.** The stage light is warm and the close views add a fill light, so
 the gray fur reads light tan in the close views, and gray in the play view and the hall view. The
 eyes are 0.90 of their size, a little deeper, and the upper lids a little lower ("Eyes"). The mouth
@@ -683,8 +692,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `280de55fefdea412005faf1ca80af300c4c14b4eeb8e8fa23ee67b80bb2334ac` |
-| `tripo-hand/cat.rig.json` | 18,466 bytes | `ca532c61d2ce1b5e1daa4e19c43c584ddf777885003f19d31d275e205d47be79` |
+| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `b2228d6c417362a9e98e9b8a68b0cd826b785442ecf2a2fece4abcb5a4d41e23` |
+| `tripo-hand/cat.rig.json` | 18,465 bytes | `5d1e807da2cea80c107496af2c71b3b29873068bbecb9c3062c196ea2840ba8e` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
