@@ -934,7 +934,10 @@ again. In a legato, it closes a part of the way (`dip`), so that each note shows
 little over each phrase and keeps still on each note, as a real choir singer opens the mouth and
 keeps the head still. Neighbor voices sway to opposite sides, so that the choir does not move as one
 block. The flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`), on a wide
-folder (`CHOIR_FOLDER`). Reason:
+folder (`CHOIR_FOLDER`). As a hand holds a book, the outer third of each flipper curls around the
+outer edge of the cover: the paw bends toward the palm at the wrist with the palm on its grip
+(`CHOIR_HOLD.flex`), and the fingers curl (`CHOIR_HOLD.curl`). A curl of the fingers alone bent
+only the last part of the flipper, and the flipper looked flat. Reason:
 the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
 went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
 
