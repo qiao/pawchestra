@@ -590,7 +590,7 @@ export function stopHandAt(
  * Places the left paw in its rest grip on the neck of a violin or a viola (design 5.2): the
  * playing grip of the middle finger in the first position, at the rest place
  * (`BowedHold.restPlace`), with the fingers closed around the neck by `BowedHold.restCurlL`, off
- * the neck by `BowedHold.restGapL`, and turned a little around the normal of the top plate through
+ * the neck by `BowedRig.restGapL`, and turned a little around the normal of the top plate through
  * the middle of the neck by `BowedHold.restYawL`. The paw that the viewer sees then turns at the
  * wrist in the plane of its palm by `BowedHold.restPawTurnL` in place of the turn of the retarget
  * (`carryLift()`, design 4.4), as the paw of the play turns toward a forearm along the neck. Thus
@@ -614,7 +614,7 @@ export function restHandAt(
   stopHandAt(rig, place, strings, at, hold.restCurlL, 0, MIDDLE_FINGER, out);
   // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
   palmNormal.set(1, 0, 0).applyQuaternion(out.rotation);
-  out.wrist.addScaledVector(palmNormal, -hold.restGapL);
+  out.wrist.addScaledVector(palmNormal, -rig.restGapL);
   if (hold.restYawL !== 0) {
     onInstrument(
       rig,
@@ -1721,7 +1721,7 @@ export function poseBowed(
   ).multiply(bowAlign.fromArray(rig.bowAlign));
   onInstrument(rig, bowPlace, pluckPalm.fromArray(rig.pluck))
     .addScaledVector(strings.top, h.pluckHeight)
-    .addScaledVector(strings.across, state.pluck * h.pluck * state.gesture - rig.hold.pluckSide);
+    .addScaledVector(strings.across, state.pluck * h.pluck * state.gesture - rig.pluckSide);
   pluckBow.grip.copy(pluckPalm);
 
   // The right shoulder turns forward while the player plays.
@@ -1816,10 +1816,10 @@ export function poseBowed(
   const handTilt = leftTilt(rig.hold, state.fingerboard) * weight;
   if (!carried) {
     stopHandAt(rig, place, strings, stop, h.curlL * weight, handTilt, finger, handL);
-    if (rig.hold.gapL !== 0) {
+    if (rig.gapL !== 0) {
       // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
       palmNormal.set(1, 0, 0).applyQuaternion(handL.rotation);
-      handL.wrist.addScaledVector(palmNormal, -rig.hold.gapL);
+      handL.wrist.addScaledVector(palmNormal, -rig.gapL);
     }
   }
   shoulderTurnL(rig, weight, turnL);

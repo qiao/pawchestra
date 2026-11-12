@@ -232,9 +232,10 @@ export interface BowedHold {
    */
   readonly pluckPlace: number;
   /**
-   * The move of the plucking palm from the strings toward the frog side, in meters: a real
-   * bassist brings the hand up from the side and rests the thumb on the edge of the fingerboard
-   * (`docs/reference/string-technique.md`, section 2.8). 0 keeps the palm above the strings.
+   * The move of the plucking palm from the strings toward the frog side, in head heights `H`: a
+   * real bassist brings the hand up from the side and rests the thumb on the edge of the
+   * fingerboard (`docs/reference/string-technique.md`, section 2.8). 0 keeps the palm above the
+   * strings.
    */
   readonly pluckSide: number;
   /**
@@ -291,24 +292,25 @@ export interface BowedHold {
    */
   readonly restYawL: number;
   /**
-   * The move of the paw of the rest grip from the neck, along the normal of its palm, in meters
-   * (`restHandAt()` of `pose/bowed.ts`), so that the palm lies on the neck and does not go into
-   * it. The playing grip puts the middle of the finger block on the strings, so the palm of a
-   * thick paw goes into the neck.
+   * The move of the paw of the rest grip from the neck, along the normal of its palm, in head
+   * heights `H` (`restHandAt()` of `pose/bowed.ts`), so that the palm lies on the neck and does
+   * not go into it. The playing grip puts the middle of the finger block on the strings, so the
+   * palm of a thick paw goes into the neck.
    */
   readonly restGapL: number;
   /**
    * The move of the left paw of a floor instrument from the neck, along the normal of its palm, in
-   * meters, in the play, the rest, and the moves between them (`poseBowed()` of `pose/bowed.ts`).
-   * The grip puts the middle of the finger block on the strings, so the thick wrist of a short
-   * paw goes into the back of the neck. 0 keeps the grip on the strings.
+   * head heights `H`, in the play, the rest, and the moves between them (`poseBowed()` of
+   * `pose/bowed.ts`). The grip puts the middle of the finger block on the strings, so the thick
+   * wrist of a short paw goes into the back of the neck. 0 keeps the grip on the strings.
    */
   readonly gapL: number;
   /**
    * The rule of the grip clearance from the girth (design 5.3): the girth of the left paw of the
-   * body that the hold fits (`pawGirth()`), in meters. A thicker paw lies further off the neck by
-   * the difference, which adds to {@link BowedHold.gapL}, so that it keeps the free gap of that
-   * body. `null` keeps the gap of the hold on each body, as an own hold does.
+   * body that the hold fits (`pawGirth()`), in meters, as the rule measures the girth of each body.
+   * A thicker paw lies further off the neck by the difference, which adds to the gap of
+   * {@link BowedHold.gapL} in meters (`BowedRig.gapL`), so that it keeps the free gap of that body.
+   * `null` keeps the gap of the hold on each body, as an own hold does.
    */
   readonly girthFit: number | null;
   /**
@@ -765,7 +767,7 @@ const SHOULDER_HOLD = {
   restCurlL: 60 * MathUtils.DEG2RAD,
   restPawTurnL: 20 * MathUtils.DEG2RAD,
   restYawL: -5 * MathUtils.DEG2RAD,
-  restGapL: 0.005,
+  restGapL: 0.01675,
   liftPoleL: [-1, -0.6, 0],
   restBow: {
     lap: { along: 1, offset: [0.25, 0.7, -0.2] },
@@ -895,7 +897,7 @@ const FOX_HOLD = {
   headTurn: 20 * MathUtils.DEG2RAD,
   frogHair: 0.16,
   pluckPlace: 1,
-  pluckSide: 0.15,
+  pluckSide: 0.39474,
   pizzicatoTip: [1, 0.4, 0.6],
   slant: -12 * MathUtils.DEG2RAD,
   stringTurn: 9 * MathUtils.DEG2RAD,
@@ -909,7 +911,7 @@ const FOX_HOLD = {
   liftReach: [-0.1, 0, -0.15],
   restPawTurnL: 25 * MathUtils.DEG2RAD,
   restYawL: -45 * MathUtils.DEG2RAD,
-  restGapL: -0.005,
+  restGapL: -0.013158,
   liftPoleL: null,
   restBow: {
     lap: { along: 0.5, offset: [0.2, 0, -0.3] },
@@ -1087,7 +1089,7 @@ const CELLO_HOLD = {
   poleR: [1, -1.2, -0.3],
   poleTipR: [1, -0.5, -0.5],
   pluckPlace: 0.2,
-  pluckSide: 0.15,
+  pluckSide: 0.360378,
   polePizzicato: [1, -1, -0.3],
   restPoleL: [-0.5, -1, 0],
   restPoleR: [0.6, -1, 0.75],
@@ -1313,7 +1315,7 @@ const CAT_HOLD = {
   poleR: [2, -0.3, -0.7],
   poleTipR: [1.5, -1, -1],
   polePizzicato: [1.2, -0.5, -1],
-  pluckSide: 0.1,
+  pluckSide: 0.294654,
   reach: 36 * MathUtils.DEG2RAD,
   restPoleR: [0.6, -1, 0.1],
   restPoleL: [0, -1, -0.3],
@@ -1419,7 +1421,7 @@ const DOG_HOLD = {
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
   polePizzicato: [2.5, -0.5, -0.3],
-  pluckSide: 0.25,
+  pluckSide: 0.600629,
   restPoleR: [0.8, -1, 0.4],
   slant: -5 * MathUtils.DEG2RAD,
   tiltL: 45 * MathUtils.DEG2RAD,
@@ -1507,7 +1509,7 @@ const HIPPO_HOLD = {
   soundingPoint: [0.3, 0.25],
   frogHair: 0.12,
   tiltL: 35 * MathUtils.DEG2RAD,
-  gapL: 0.015,
+  gapL: 0.029859,
   restPlace: 0.6,
   poleL: [-1, -0.3, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
@@ -1515,7 +1517,7 @@ const HIPPO_HOLD = {
   poleTipR: [1, -0.7, 0.2],
   polePizzicato: [1.5, 0.4, -0.75],
   pizzicatoTip: [0.2, -1, -1],
-  pluckSide: 0.24,
+  pluckSide: 0.477746,
   stopEnd: 0.9,
   farSideR: 30 * MathUtils.DEG2RAD,
   pawBendR: 24.94 * MathUtils.DEG2RAD,
@@ -1605,7 +1607,7 @@ const RABBIT_HOLD = {
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 90 * MathUtils.DEG2RAD,
-  restGapL: 0.015,
+  restGapL: 0.050251,
   liftReach: [0, 0.3, -0.15],
   liftPoleL: [-1, -1.2, 0],
   restBow: {
@@ -1731,6 +1733,15 @@ export interface BowedRig {
   readonly restRotation: Quat;
   /** The move of the instrument while the player plays, in meters (`BowedHold.playShift`). */
   readonly playShift: Vec3;
+  /** The move of the plucking palm toward the frog side, in meters (`BowedHold.pluckSide`). */
+  readonly pluckSide: number;
+  /** The move of the left paw of the rest grip off the neck, in meters (`BowedHold.restGapL`). */
+  readonly restGapL: number;
+  /**
+   * The move of the left paw of a floor instrument off the neck, in meters: the gap of
+   * {@link BowedHold.gapL} with the rule of the girth ({@link BowedHold.girthFit}).
+   */
+  readonly gapL: number;
   /** The place of the `instrument` bone in the rest pose, in the model axes. */
   readonly restPivot: Vec3;
   /**
@@ -1997,10 +2008,9 @@ export function bowedRig(
   given: BowedHold = BOWED_HOLDS[instrument],
 ): BowedRig {
   const floor = given.fit ? { ...given, ...fitCelloPlace(model, given.fit) } : given;
-  const placedHold = girthGaps(
-    model,
-    floor.chinFit ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) } : floor,
-  );
+  const placedHold = floor.chinFit
+    ? { ...floor, ...fitViolinPlace(model, floor.chinFit, floor.playTurn) }
+    : floor;
   const hold = wristRest(model, placedHold);
   const { positions, parents } = model.skeleton;
   const at = (bone: number): Vec3 => positions[bone] ?? [0, 0, 0];
@@ -2062,7 +2072,8 @@ export function bowedRig(
   };
   const via = restBow.via;
   const strings = new Vector3().crossVectors(top, axis);
-  const playShift = new Vector3(...hold.playShift).multiplyScalar(model.body.headHeight);
+  const h = model.body.headHeight;
+  const playShift = new Vector3(...hold.playShift).multiplyScalar(h);
   const pivot = at(BONES.instrument);
   const rig: RigPoints = {
     hold,
@@ -2096,6 +2107,9 @@ export function bowedRig(
     pawBindL: pawBindOf(model.studio.arms.L),
     restRotation: toQuat(restRotation),
     playShift: toVec3(playShift),
+    pluckSide: hold.pluckSide * h,
+    restGapL: hold.restGapL * h,
+    gapL: hold.gapL * h + girthGap(model, hold),
     restPivot: restPivotOf(model, hold, atSide, pivot, playShift),
     restCarryPlace: placedHold.restPlace,
     liftReach: toVec3(new Vector3(...hold.liftReach).multiplyScalar(model.body.headHeight)),
@@ -2137,21 +2151,21 @@ export function bowedRig(
 }
 
 /**
- * Moves the left paw of a thicker body further off the neck by the rule of the grip clearance
- * from the girth ({@link BowedHold.girthFit}, design 5.3): the gap of the hold grows by the girth
- * of the left paw of the body over the girth of the body that the hold fits. A paw with the same
- * girth or less keeps the gap of the hold.
+ * Gives the further gap of the left paw of a thicker body off the neck by the rule of the grip
+ * clearance from the girth ({@link BowedHold.girthFit}, design 5.3): the girth of the left paw of
+ * the body over the girth of the body that the hold fits. A paw with the same girth or less gets
+ * no further gap.
  *
  * @param model The player model.
  * @param hold The hold.
- * @returns The hold with the gap of the body, or `hold` for a hold with no rule.
+ * @returns The further gap, in meters: 0 for a hold with no rule.
  */
-function girthGaps(model: PlayerModel, hold: BowedHold): BowedHold {
+function girthGap(model: PlayerModel, hold: BowedHold): number {
   const fit = hold.girthFit;
   if (fit === null) {
-    return hold;
+    return 0;
   }
-  return { ...hold, gapL: hold.gapL + Math.max(0, pawGirth(model, 'L') - fit) };
+  return Math.max(0, pawGirth(model, 'L') - fit);
 }
 
 /**
