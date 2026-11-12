@@ -676,8 +676,8 @@ const SCROLL = {
    */
   fromDeg: -135,
   toDeg: 405,
-  /** The number of steps of the spiral. */
-  steps: 9,
+  /** The number of steps of the spiral, so that its turns read round in a close shot. */
+  steps: 18,
   /** The radius of the spiral at the first ring, and its part that remains at the eye. */
   radius: 0.015,
   eyeShare: 0.28,
@@ -761,19 +761,104 @@ function scrollSpiral(): number[] {
 }
 
 /**
- * Makes a ring of the pegbox.
+ * The hollow of the pegbox, in meters in the violin axes, as on a real pegbox: two side walls and a
+ * floor around a deep, open slot from the nut to the throat of the scroll. The pegs cross the
+ * slot. The inside is dark, and its floor lies far below the top of the walls, so no dark face
+ * lies close over a wood face that faces the same way.
+ */
+const PEGBOX = {
+  /** The thickness of each side wall. */
+  wall: 0.0022,
+  /** The height of the floor of the slot above the bottom of the pegbox. */
+  floor: 0.005,
+  /** The length of the slope of the floor at the nut end and at the throat end. */
+  ends: [0.0012, 0.002],
+  /** The depth of the slot at its two ends, so that each ring keeps eight distinct corners. */
+  endDepth: 0.0004,
+} as const;
+
+/**
+ * Makes a ring of the hollow pegbox ({@link PEGBOX}): the outer side, the top of the wall, the
+ * inner side, and the floor, around the U of the section.
  *
  * @param x The place along the violin.
- * @param ring The half width, the bottom, and the top.
- * @returns The corners, counterclockwise when seen from the scroll.
+ * @param ring The half width, the bottom, and the top of the outer box.
+ * @param floor The height of the floor of the slot.
+ * @returns Eight corners, counterclockwise when seen from the scroll.
  */
-function boxRing(x: number, [half, bottom, top]: readonly [number, number, number]): Vec3[] {
+function pegboxRing(
+  x: number,
+  [half, bottom, top]: readonly [number, number, number],
+  floor: number,
+): Vec3[] {
+  const inner = half - PEGBOX.wall;
   return [
     [x, bottom, -half],
     [x, top, -half],
+    [x, top, -inner],
+    [x, floor, -inner],
+    [x, floor, inner],
+    [x, top, inner],
     [x, top, half],
     [x, bottom, half],
   ];
+}
+
+/** The faces of the hollow pegbox ({@link pegbox}), by color. */
+interface PegboxFaces {
+  /** The outside, the tops of the walls, and the ends. */
+  readonly wood: number[];
+  /** The inside of the slot. */
+  readonly dark: number[];
+}
+
+/**
+ * Makes the hollow pegbox from the nut to the throat ({@link PEGBOX}), as one closed solid of a
+ * wood part and a dark part with shared corners.
+ *
+ * @param from The place of the nut end along the violin.
+ * @returns The faces by color.
+ */
+function pegbox(from: number): PegboxFaces {
+  const sc = SCROLL;
+  const to = sc.pegboxEnd;
+  const at = (x: number): [number, number, number] => {
+    const t = (x - from) / (to - from);
+    const mix = (k: 0 | 1 | 2): number => sc.nutRing[k] + t * (sc.throatRing[k] - sc.nutRing[k]);
+    return [mix(0), mix(1), mix(2)];
+  };
+  const [nutEnd, throatEnd] = PEGBOX.ends;
+  const rings = [
+    [from, true],
+    [from + nutEnd, false],
+    [to - throatEnd, false],
+    [to, true],
+  ].map(([x, closed]) => {
+    const ring = at(Number(x));
+    const floor = closed ? ring[2] - PEGBOX.endDepth : ring[1] + PEGBOX.floor;
+    return pegboxRing(Number(x), ring, floor);
+  });
+  const wood: number[] = [];
+  const dark: number[] = [];
+  const corner = (ring: number, i: number): Vec3 => rings[ring]?.[i % 8] ?? [0, 0, 0];
+  for (let j = 0; j + 1 < rings.length; j++) {
+    for (let i = 0; i < 8; i++) {
+      const out = i >= 2 && i <= 4 ? dark : wood;
+      out.push(...quad(corner(j, i), corner(j, i + 1), corner(j + 1, i + 1), corner(j + 1, i)));
+    }
+  }
+  // The two ends: the U of the section as three quads, the side walls and the floor.
+  const last = rings.length - 1;
+  const ends: readonly (readonly [number, number, number, number])[] = [
+    [0, 1, 2, 3],
+    [0, 3, 4, 7],
+    [7, 4, 5, 6],
+  ];
+  for (const [a, b, c, d] of ends) {
+    wood.push(...quad(corner(0, d), corner(0, c), corner(0, b), corner(0, a)));
+    wood.push(...quad(corner(last, a), corner(last, b), corner(last, c), corner(last, d)));
+  }
+  return { wood, dark };
 }
 
 /**
@@ -1423,27 +1508,11 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
     (nutTop + FINGERBOARD.nutUnder) / 2,
     0,
   ]);
-  // The pegbox with its dark opening at the top, the scroll, and the four pegs.
+  // The hollow pegbox with its dark slot, the scroll, and the four pegs across the slot.
   const sc = SCROLL;
-  const pegboxStart = v.nut + FINGERBOARD.nutLength;
-  part(
-    sweep([boxRing(pegboxStart, sc.nutRing), boxRing(sc.pegboxEnd, sc.throatRing)]),
-    wood,
-    [0, 0, 0],
-  );
-  const opening = (ring: readonly [number, number, number]): [number, number, number] => [
-    ring[0] - 0.0022,
-    ring[2] - 0.006,
-    ring[2] + 0.0004,
-  ];
-  part(
-    sweep([
-      boxRing(pegboxStart + 0.0025, opening(sc.nutRing)),
-      boxRing(sc.pegboxEnd - 0.004, opening(sc.throatRing)),
-    ]),
-    dark,
-    [0, 0, 0],
-  );
+  const hollow = pegbox(v.nut + FINGERBOARD.nutLength);
+  part(hollow.wood, wood, [0, 0, 0]);
+  part(hollow.dark, dark, [0, 0, 0]);
   part(scrollSpiral(), top, [0, 0, 0]);
   part(
     cylinder(sc.coreRadius, sc.coreRadius, 2 * sc.coreHalfWidth, 6),
