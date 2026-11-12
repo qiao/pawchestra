@@ -872,24 +872,23 @@ const BEAVER_SHOULDER_TURN = {
   /**
    * The right shoulder. The short arms of the Tripo beaver reach the boot joint only when the
    * shoulder slides forward: with 20°, the right paw misses its grip by 6.5 cm on a bassoon of
-   * 0.6, with 35° by 3.1 cm.
+   * 0.6, with 35° by 3.1 cm. On the bassoon of 0.7, with 40°, it misses its grip by 1.2 cm.
    */
-  right: 40,
+  right: 55,
 } as const;
 
 /**
- * The turn of the bassoon of the beaver, relative to the chest: the lower end 18° forward and 5°
- * to the right from the bind pose of `woodwindRotation()` of `models/instruments/woodwinds.ts`,
- * which leans the tube 35° to the left. The boot joint comes up toward the right shoulder, so the
- * short right arm reaches it: with the lower end 5° to the left, the right paw missed its grip by
- * 0.6 cm more.
+ * The turn of the bassoon of the beaver, relative to the chest: the lower end 18° forward from the
+ * bind pose of `woodwindRotation()` of `models/instruments/woodwinds.ts`, which leans the tube 35°
+ * to the left. The boot joint comes forward of the round belly: with the lower end 18° further
+ * back, the boot of a bassoon of 0.8 went 8 cm into the belly. With the lower end 5° to the
+ * right, the bell top stood 2.3 cm lower.
  */
-const BEAVER_PLAY = holdTurn(18, 5);
+const BEAVER_PLAY = holdTurn(18, 0);
 
 /**
  * The turn of the bassoon of the beaver at rest, relative to the chest: the bind pose of
- * `woodwindRotation()`, the lower end 18° back toward the body and 5° to the left of
- * {@link BEAVER_PLAY}.
+ * `woodwindRotation()`, the lower end 18° back toward the body of {@link BEAVER_PLAY}.
  */
 const BEAVER_REST = holdTurn(0, 0);
 
@@ -905,7 +904,9 @@ const BEAVER_REST = holdTurn(0, 0);
  * The Tripo beaver stands on short legs with no chair, and its arms are short: 0.20 m from the
  * shoulder joint to the wrist joint. So it plays a small bassoon (`SpeciesParams.bassoonScale`),
  * and each shoulder bone turns forward ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a
- * real player slides forward when the arm reaches forward. The arms are round tubes free of the
+ * real player slides forward when the arm reaches forward. The bell top stands 3.5 cm below the
+ * top of the head: a larger bassoon puts the boot joint out of the reach of the right arm or into
+ * the belly. The arms are round tubes free of the
  * trunk, as a real bassoonist keeps the elbows a little away from the body: the left elbow points
  * out, down, and a little back, and the right elbow out, down, and forward. At rest, the left elbow
  * points further out, and the right elbow out and a little down. With the left elbow less far out,
@@ -916,8 +917,9 @@ const BEAVER_REST = holdTurn(0, 0);
  * the right thigh and both paws keep their grips. With 0.2 H lower and 0.25 H forward, each paw
  * missed its rest grip by 6.5 cm. A real bassoonist carries the boot at the right thigh with the
  * boot joint in the right palm, and no source gives the rest (`docs/reference/wind-technique.md`
- * 3). The left paw holds the wing joint high, and the right grip moves 0.15 H up the boot joint
- * (`gripShiftR`). Each grip moves toward the axis and to the side of its own shoulder, the left
+ * 3). The left paw holds the wing joint high, and the right grip moves 0.25 H up the boot
+ * joint (`gripShiftR`): with 0.15 H, the right arm does not reach the boot of the bassoon of
+ * 0.7. Each grip moves toward the axis and to the side of its own shoulder, the left
  * grip 0.1 H toward the axis and 0.1 H across it toward the left shoulder, and the right grip
  * 0.15 H toward the axis and 0.08 H across it toward the right shoulder. Each palm then faces the
  * tube from its own side (`faceTube`), each paw aims a quarter toward the side across the tube
@@ -951,7 +953,7 @@ const BEAVER_BASSOON = {
   aimAcross: 1,
   aimSide: [0.25, 0.25],
   gripShiftL: [0, 0.1, -0.1],
-  gripShiftR: [0.15, 0.15, -0.08],
+  gripShiftR: [0.25, 0.15, -0.08],
   restAim: 1,
   gripCurl: curls(110, 120),
 } as const satisfies WindHold;

@@ -460,8 +460,10 @@ export const SPECIES = {
    * Beaver, the bassoons: a round, furry, orange-brown beaver with a light muzzle, two big front
    * teeth, whiskers, and a large flat scaly tail. It has the studio body of the hand rig of the
    * Tripo P2 beaver (`assets/models/beaver/tripo-hand/`, design 4.4), with the form and the colors
-   * of its source and short arms. It plays a small bassoon of 0.55, at which each paw reaches its
-   * grip with the forward turns of the shoulders of its hold. It has no chair: the round belly
+   * of its source and short arms. It plays a small bassoon of 0.7, at which each paw reaches its
+   * grip with the forward turns of the shoulders of its hold, and the boot joint stays in front of
+   * the round belly. With 0.8 and the boot further back, where the paws reach it, the boot went
+   * 8 cm into the belly. It has no chair: the round belly
    * hides the short thighs, so it stands on its short legs in the pose of the source, at the seat
    * height of its legs. Its flat tail goes back and lies on the floor behind it. A bassoon soloist
    * keeps its seat (`supportOf()` of `player.ts`). Its head height is the head of the studio
@@ -470,7 +472,7 @@ export const SPECIES = {
   beaver: {
     body: 'studio-beaver',
     colors: SPECIES_COLORS.beaver,
-    bassoonScale: 0.55,
+    bassoonScale: 0.7,
     noChair: true,
     headHeight: STUDIO_HEIGHTS['studio-beaver'].headHeight,
     seatHeight:
