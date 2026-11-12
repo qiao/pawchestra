@@ -126,10 +126,9 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 
 The app follows these facts:
 
-- **The size (section 1).** The deer plays a harp of 1.3 times the concert harp of the app
-  (`SpeciesParams.harpScale`), 1.69 m high, near the 1.8 m of a concert harp. Its base stands on
-  the floor, so the pedals lie at the hooves. A larger harp brings its neck to the muzzle of the
-  deer.
+- **The size (section 1).** The deer plays a harp of 0.75 of the concert harp of the app
+  (`SpeciesParams.harpScale`), 0.98 m high. Its base stands on the floor, so the pedals lie at the
+  hooves. A larger harp brings its neck to the chin of the deer.
 - **The place (section 2).** The base stands in front of the deer, and the top of the soundbox
   rests on the front of the right shoulder, near the neck. The harp is diagonal to the deer, with
   the column at the front left (`HARP_PLACE.turn`).
@@ -170,9 +169,9 @@ The app does not follow these facts:
   front view.
 - **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
   model leans toward the player, and a tilt back puts the forearms of the deer into its body.
-- **The reach (section 3).** The arms of the deer are short for its height, so the base stands
-  near the stool, and the left paw does not reach the lowest bass strings. A harpist reaches the
-  column with the stretched left arm.
+- **The reach (section 3).** The arms of the deer are short, so the base stands near the stool,
+  and the left hand plays only up to D4. A harpist reaches the column with the stretched left arm,
+  and the left hand plays up to about C5.
 - **The level forearms (section 4).** The forearms rise from the elbow to the wrist, because the
   elbows of the short arms hang below the strings.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
@@ -334,7 +333,8 @@ No source gives a cost model of harp fingering. These rules follow from the fact
 function of the notes. Design 5.3 "Harp" gives the motion. The app follows these facts:
 
 - **The split of the hands (7.1, 7.9).** The right hand plays down to G2, and the left hand up to
-  C5 (`HANDS_HOLDS.harp.reach`). One hand reaches a tenth and plays at most four strings
+  D4 (`HANDS_HOLDS.harp.reach`). The near harp of the short arms puts the higher strings near the
+  chest of the deer, so the right hand takes them. One hand reaches a tenth and plays at most four strings
   (`span`, `most`).
 - **The groups and the fingers (7.4, 7.9).** The notes of a hand go into groups of at most four
   strings within a tenth. The thumb plays the highest string of a group and finger 4 the lowest,
