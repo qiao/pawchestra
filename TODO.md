@@ -1187,6 +1187,38 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Tool: `pnpm fold-probe` prints a wrong "Source middle (u)" for some faces. For face 133 of the
       deer it gives (-0.1721, 0.3031, 0.0644), but entry 133 of the corners file of the rig gives
       (-0.1909, 0.2710, 0.0843), the point that fixed the face in `weights.rigidPainted`.
+- [ ] Lower the instrument in a long rest, and lift it one beat before the entry. Multiply a third
+      factor into `playerWeight()` (`src/pose/pose-at.ts`) from the long rests of the player, as a
+      function of the song time only. Start with the winds and the brass, with rests of 8 s or
+      more. In `boulanger-matin`, 41% of the seat time is in a rest of 10 s or more, and the tuba
+      holds its mouthpiece for 120 s with no note (5.2, 5.5).
+- [ ] Give `swayOf()` a seeded sign, phase lag, and pulse level for each player. The sway of the 14
+      string players of `beethoven-5-4` correlates at 0.991 or more, and the spine turns at most
+      2.2°, about 2 pixels in the default view. Show the user a lineup at 1.5, 2, and 3 times.
+      Then give each player a level and trend track, as the conductor has: a lean into a
+      crescendo, a chest turn with a long bow, a bell lift at a phrase peak (5.1).
+- [ ] Plan the looks from the music: a look at the conductor before an entry after a long rest, at
+      a cue of `findCues()`, and at the final chord. Keep the idle look as the fallback. Start a
+      blink with each look (fast close, slower open). Now each look starts at a seeded wall-clock
+      time, and the sections do not answer a cue (`src/pose/idle.ts`) (5.1).
+- [ ] Give the ears and the tails overlap: a drag from the head angle at t and t - 0.08 s, with a
+      limit, so that the pose stays stateless. Give the look a curve that passes its end by about
+      10% and settles. Now the ears and the tail have only a twitch and a sine (5.1).
+- [ ] Vary the players of a section: seeded head tilt (±3°), head turn (±4°), spine slouch (±2°),
+      and ear rest angle in `PlayerPlan`. Then show the user a lineup of a fur value step of ±5%.
+      Now four foxes of a section have one pose and one face (`PLAYER_OFFSETS`) (5.1).
+- [ ] Move the plate of the suspended cymbal to the `slide` bone, and tilt it with a decaying sine
+      of the time since the strike. Now a crash does not move it (5.3).
+- [ ] Add a softness to `solveTwoBone()` (`src/pose/ik.ts`), default 0, so that the elbow comes
+      near the full reach on a curve. Try 5% of the arm length on the pianist and the harpist.
+      The clamp at the full reach causes the snaps of the polar bear and the deer tasks above
+      (4.7).
+- [ ] Turn the clavicle by a share of the lift of the upper arm (try 0.25 above 30°) before the
+      IK, on the bow arm of the rabbit first. Now the clavicle takes one constant turn for each
+      hold: the violinist shoulder bone turns 0.02° in 20 s, the upper arm 58.6° (4.7).
+- [ ] Eye gaze pilot on one body in a trial folder: two optional eye bones, the eye faces at
+      weight 1, a turn of at most 10° that starts 0.1 s before a planned look. Check the lids in
+      2x crops. Now the eyes follow only `head`, and the gaze is paint (4.7).
 
 Done when: the pose tests pass, and the pose and frame targets pass.
 
