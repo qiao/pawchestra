@@ -374,8 +374,17 @@ passes.
       blocked and 21 hidden, and with the first desk of the violas also in row 1, 123 and 30.
       Horns on the right of row 3 gave 48 to 50 blocked and 19 or 20 hidden. Both together gave
       75 blocked and 23 hidden.
-- [ ] Elephant: a short light sliver stays at the inner root of the right arm, near the tusk, from
-      the front.
+- [ ] Tripo elephant timpanist: the arm gate folds p95 are 12 (left) and 11 (right), over the
+      limit of 8 (main 6 and 3). The faces fold at the inner elbows and at the root of each upper
+      arm (`pnpm fold-probe timpanist`). The arm has no clean quad band, so no ring takes a split.
+- [ ] Tripo elephant: the inner side of each upper arm root lies 4.7 cm in the trunk in each
+      sample of the sweep, also at rest (`pnpm pose-depth timpanist`).
+- [ ] Tripo elephant: the grip turn p50 of the arm gate is 28 (left) and 30 (right), against 6
+      and 5 on main, and the stretch p95 of the right arm is 0.15 (main 0.08). The mallet grips
+      are those of the old paws (`TIMPANI.malletSpotL`, `malletSpotR`). Fit the grips to the
+      stump paws.
+- [ ] Tripo elephant: its seat height is 0.489 m (0.288 m on the old elephant), the back of the
+      haunch of the standing bind. Check the recast seated roles of the cast matrix.
 - [ ] Elephant timpanist: between strikes, the heads stay 2 cm to 7 cm above the spots with the
       shafts down. A real timpanist holds them one inch above the head with a level shaft.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
