@@ -152,8 +152,8 @@ and the skin normals at the arm roots (`rootNormals` of `tools/mesh-rigs/dog.jso
 `tripo-hand/` holds a candidate body ("tripo-hand/dog.blend" below): a hand rig of the Tripo P2
 beagle `tripo-p2/dog.fbx`, made by one build script in a headless Blender 5.2, as the Tripo wolf
 (`../wolf/README.md`). The body keeps the colors and the eyes of the source, and the form of the
-source but for the front paws: one point edit makes them smaller ("Paw size"). No point edit
-changes the head, the ears, the muzzle, the trunk, the legs, the feet, or the tail. The arms
+source but for two edits: one point edit makes the front paws smaller ("Paw size"), and one scale
+makes the head smaller ("Head size"). No edit changes the trunk, the legs, the feet, or the tail. The arms
 keep the length of the source: no cut, no split from the trunk, and no stretch. On the branch of the
 candidate, the `ANIMALS` entry of the dog points to `tripo-hand/dog.rig.glb`. The files of the dog
 of main above do not change.
@@ -202,10 +202,10 @@ beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joi
 
 | Item | Value |
 |---|---|
-| Size | 393,105 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 393,883 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 115 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
-| Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, `lids`, and `headFactor` come from the steps below |
 | Facts | `height` 0.977184 (the shoulder joints at 1.508 m for each unit, so that H is 0.41623 m, 1.27 times the H of the dog of main: "Size" below), `crease` 180 |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
@@ -227,9 +227,9 @@ left side):
   on the right (1 step), 211 vertices on each side. New quads join the two rings with the step
   offset, and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units).
   The new quads keep the UVs of the old band. The paws keep their form ("Arm twist").
-- **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The head, the ears,
-  the eyes, the muzzle, the trunk, the arms, the legs, the feet, and the tail keep the form of the
-  source.
+- **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The trunk, the arms,
+  the legs, the feet, and the tail keep the form of the source. The head scale comes after the
+  weights ("Head size" below).
 - **Surface.** `sa.add_surface(dog, 'dog', <base color>, eye_fans=False,
   config=<dog-tripo.json>)`. The gloss nose is the dark nose in the nose box of the config.
 - **Eyes.** The 72 faces of the two eyeballs take the face attribute `eye`.
@@ -240,7 +240,8 @@ left side):
   (`open` 1) are those of the dog of main. The elbow axis of each side turns about its bind upper
   arm (`hingeTurn`): 8 degrees on the left and -20 degrees on the right ("Arm twist").
 
-The weights, in the rest pose:
+The weights, in the rest pose (the head and ear bones of the rig stand at their places before
+the head scale):
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no tail and
    no eyeball.
@@ -256,6 +257,8 @@ The weights, in the rest pose:
    lowest point reaches through vertices with z below -0.095 (148 vertices). It takes {`hips`
    1 - a, `tail` a (1 - c), `tail_tip` a c}, with a = smoothstep(-0.01, 0.03) along `tail` and c =
    smoothstep(-0.04, 0.04) along `tail_tip`.
+5. Head scale (`scale_head()` of `build.py`, `headScale` {`factor` 0.9} of `params.json`): the
+   head gets smaller, with the weights as they are ("Head size" below). The lids come after it.
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
@@ -295,6 +298,8 @@ the app, in meters, with the seated values from the bind of each player:
 
 The ears of the beagle hang, so the step compares the top of the head with no ear. A step to 1.1
 times the ear tips of the cat makes the head of the beagle about 1.3 times the head of the cat.
+The table gives the head before the head scale. With the head scale ("Head size"), the top of the
+head stands 1.455 m high standing and 1.354 m seated: 1.05 and 1.07 times the cat.
 
 **Paw size.** This is an exception to the wolf route, which keeps the form of the source. In the
 app, the front paws of the source read too large: the arms are short and the head is large. In
@@ -329,17 +334,77 @@ the forearm twist p95 from 44° to 37°. The bow paw touches the stick in each s
 to 0.7 cm, so the share of the play samples in which the paw holds the bow goes from 59 % to 44 %
 (the rule of `tools/wind-grip.ts` with a temporary row for the cellist).
 
+**Head size.** This is the second exception to the wolf route. In the app, the head of the source
+read too large: H was 1.38 times the distance of the shoulder joints (1.20 on the Tripo cat and
+1.14 on the dog of main). The build scales the head by 0.9 about the neck joint N (0, 0.65, 0.02),
+with the head weight as the share: each vertex goes to p + s (0.9 - 1) (p - N), with s the summed
+weight of the vertex on `head`, `ear_L`, and `ear_R`. The head, the ears, the eyeballs, the nose,
+and the muzzle (s = 1, 1,298 vertices) scale as one piece. The move fades with the head weight over
+the neck rings (139 vertices from y 0.645 to 0.884, most of them at the nape and the throat), so no
+step shows. The arms, the paws, and the trunk have no head weight, so they stay. The largest move is
+0.035 units (5.3 cm). The bones `head`, `ear_L`, and `ear_R` scale about N with the mesh: the head
+joint goes to (0, 0.704, 0.029), and each ear joint to (±0.099, 0.884, 0.002) with its tip at
+(±0.1485, 0.722, 0.038). `make_config.py` writes these joints into the config. The weight rows do
+not change. The lids are made after the scale, so they fit the scaled balls.
+
+This is the head growth of `pnpm rig-mesh` (`headFactor`) with the factor 0.9. Thus the armature
+has the property `headFactor` 0.9, the export writes it, and `pnpm studio-body` measures H and the
+head center before the factor (design 4.4). H stays 0.41623 m, the head center moves 0.05 mm, and
+each hold in units of H keeps its place. The measures, with `scratch/beagle/head_measure.py` (the
+fur vertices that follow the head most, in the rest, and the seated bind):
+
+| Measure | Beagle before | Beagle now | Tripo cat | Dog of main |
+|---|---|---|---|---|
+| Head height, chin to top | 0.416 m | 0.372 m | 0.339 m | 1.14 shoulder distances |
+| Head width, no ears | 0.312 m | 0.281 m | 0.482 m | 1.52 shoulder distances |
+| Ear length, root joint to tip | 0.311 m | 0.280 m | 0.180 m | 0.88 head heights |
+| Distance of the shoulder joints | 0.302 m | 0.302 m | 0.282 m | |
+| Head height / shoulder distance | 1.38 | 1.23 | 1.20 | 1.14 |
+| Seated, top of the head above the floor | 1.407 m | 1.354 m | 1.260 m | |
+| Seated, ear tips above the floor | 0.977 m | 0.967 m | 1.200 m | |
+| Standing, to the top of the head | 1.508 m | 1.455 m | 1.384 m | |
+
+The head height of the table counts the chin in the neck fade, so it is 0.893 of the value
+before, and not 0.9. The seated head top of the beagle is now 1.07 times the head top of the cat
+(1.12 before).
+
 **Ears.** The long ears hang to the top of each shoulder in the source. They follow the head and
 their ear bones, and in the moments of the cellist they lie on the shoulders with no visible cut
 into the arms or the cello. No weight fix was necessary.
 
+**Cello place.** The cello of the beagle stood in its chest: in each sample of the play, the rest,
+and the moves, the back of the upper bout went 11 to 12.4 cm into the chest at the sternum. The fit
+of the place tested only the middle line of the back, and that line lay left of the round chest.
+Now the fit also tests 4 lines across the upper half of the back (`DOG_HOLD.fit.across` 0.2 of the
+body length to each side), with the back 0.02 H in front of the body, and the cello leans back 20°
+in place of 25.7°. The trunk leans 9° forward in the play (3° before), the right shoulder turns
+28° forward (20° before), and the bow paw turns on the stick (`stickTurnR`, 26°), so that the short
+bow arm reaches the strings in front of the chest with no flip. At rest, the left paw holds the
+neck at 0.3 of the fingerboard (0.6 before). The full sweep (`pnpm pose-depth cellist`, 18 demos),
+deepest point in cm, before and now:
+
+| Pair | Play | Lift | Rest | Lower |
+|---|---|---|---|---|
+| Cello in the body | 12.4, 2.4 | 11.9, 1.5 | 11.0, 0.0 | 11.8, 1.4 |
+| Paws in the cello | 1.2, 0.8 | 4.4, 2.2 | 4.3, 1.8 | 4.4, 2.1 |
+| Claws in the cello | 2.3, 1.1 | 4.6, 0.9 | 4.6, 0.6 | 4.6, 0.9 |
+| Forearms in the cello | 1.9, 2.4 | 0.0, 0.0 | 0.0, 0.0 | 0.1, 0.0 |
+| Upper arms in the body | 3.0, 1.7 | 2.8, 1.3 | 1.0, 0.8 | 3.0, 1.4 |
+
+The cello in the play presses the chest by about 1.5 to 1.8 cm, and in 1 sample of 991 the scroll
+touches the head by 2.4 cm. The left forearm goes up to 2.4 cm into the back of the neck in 0.3 %
+of the play samples, in the middle positions, where the nearly straight arm passes behind the
+neck. The left paw holds the neck at rest with the palm 1.8 cm in it. The arm gate passes (`pnpm
+arm-check cellist --base 4472dc8aa`), the note targets are within 5 mm in each sample (`pnpm
+hold-fit cellist`, worst 1.3 mm), and the left upper arm of the play turns 31° (62° before).
+
 **Lids.** A lid on each eyeball: 14 × 13 points from psi -55 to 45 degrees and lam from -50 to 62
 degrees on the left (the mirror on the right), with the lower strip as the first row, at 1.17 ball
-radii. 156 quads on each side, held turned up 126 degrees into the head. The property `lids` holds
-the angle 2.199115 and the hinge axes. The lid faces take the orange fur patch at UV (0.625, 0.56)
-at 0.75 UV for each unit, and the row `head` 1. In the 21 steps of the blink no open lid point,
-side edge, or back edge leaves the head (ray casts), and the open lid lies at least 0.0167 units
-under it.
+radii. The lids fit the scaled balls (radius 0.0299 units). 156 quads on each side, held turned up
+126 degrees into the head. The property `lids` holds the angle 2.199115 and the hinge axes. The lid
+faces take the orange fur patch at UV (0.625, 0.56) at 0.75 UV for each unit, and the row `head` 1.
+In the 21 steps of the blink no open lid point, side edge, or back edge leaves the head (ray casts),
+and the open lid lies at least 0.015 units under it.
 
 **Arm twist.** The roll of each upper arm and the twist of each forearm, in degrees, in each moment
 of the cellist (`pnpm pose-preview cellist`):
@@ -357,8 +422,24 @@ With the paws of the source and no hinge turn, the left forearm twisted -154 deg
 and the right forearm 139.5 degrees at rest. The paw turn and the hinge turn add the same angle to
 each moment of a side, so they cannot make the spread of the right forearm smaller: from 4 degrees
 at the frog to 139.5 degrees at rest. The rest of the right forearm keeps 91.9 degrees, so that each
-moment of the play stays within 45 degrees. The `DOG_HOLD` of `src/pose/bowed-rig.ts` does not
-change.
+moment of the play stays within 45 degrees. The table gives the hold before the cello place of
+"Cello place" below. With that place, the left paw holds the strings further from the shoulder,
+and the same measure gives:
+
+| Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
+|---|---|---|---|---|
+| frog | 20.8 | -72.0 | -24.3 | -33.5 |
+| tip | 19.2 | -67.4 | -35.0 | -22.4 |
+| crossing | 18.4 | -65.2 | -26.2 | -29.8 |
+| rest | 30.7 | -24.1 | -23.5 | 59.6 |
+| lift50 | 28.0 | -43.0 | -14.8 | -12.9 |
+| lower50 | 26.7 | -49.6 | -15.6 | -25.0 |
+
+The left forearm of this measure is the turn of the paw from the upper arm, so it holds the tilt
+of the paw over the neck (`tiltL` 45°). The arm gate measures the twist of the skin: the forearm
+twist p95 stays 37° on the left and goes from 32° to 29° on the right (`pnpm arm-check cellist`).
+A larger tilt makes the left forearm of the table smaller (-41.5° to -43.6° in the play at 60°), but
+the paw then bends sideways on the wrist past the limit of the gate (107° p95 at 65°).
 
 **Maps** (`tools/dog-maps.py`). The tool scales the color map to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the fur, the ears, and the
@@ -375,7 +456,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,084,064 bytes | `fd29f9b23ab26ef7f85dc5a22e26472faaffd172aeacd8a7e72f6fd0253eb49a` |
-| `tripo-hand/dog.rig.json` | 16,185 bytes | `13aedff9af472ae7fb94153ae6c61ffece5088300ae127d39176ef028232bad2` |
+| `tripo-hand/dog.rig.glb` | 1,084,080 bytes | `048a6ec3db2484b3c8a83c12da2dd0bbdaf64a232abb5362582ae6e58a917338` |
+| `tripo-hand/dog.rig.json` | 16,214 bytes | `c9b51277c8c151df8c96f2dfc7021a827d014052cef88ebb492f377b30ffeb13` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |
