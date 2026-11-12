@@ -797,32 +797,31 @@ const SHOULDER_HOLD = {
  *
  * The rest pose is the upright rest of the rabbit: the violin stands on the left thigh at 0.6 of
  * the way to the knee, 0.14 H down and 0.2 H forward, near the hip, so that the short left arm
- * reaches the rest grip. At 0.8 of the way and 0.18 H down, the rest grip was 5 cm out of the
- * reach of the arm: the violin stood on the thigh with the paw on the pegbox, and in the first
- * frame of each move the violin jumped 5.2 cm up into the paw (`carryLift()` of `pose/bowed.ts`).
- * At 0.65 of the way, it moves 0.3 cm in that frame. The left paw holds the violin at 0.37 of the
- * fingerboard (`restPlace`), so that it closes around the neck: at 0.2, the paw lies over the
- * scroll. The long right arm of the fox reaches the right thigh only
- * nearly straight, and its line from the shoulder to a paw on the top of the thigh passes through
- * the side of the belly: with the grip 0.15 H out at 0.65 of the way, the right upper arm goes
- * 6.2 cm into the body. The stick passes through the paw, so the hand sits about 4 cm further out
- * on the bow. The grip rests 0.25 H out at 0.75 of the way, 0.5 H up, and 0.25 H to the front, at
- * the front of the lap and near the body, and the right elbow points down, out, and back,
- * (0.5, -1, -0.2), so that the upper arm hangs 22° from the vertical with a straight wrist. Thus
- * the bow paw rests near the belly and the lap. With the elbow (0.4, -1, 0), the right upper arm
- * goes 3.0 cm into the body at rest, and with (0.4, -1, -0.3) and the grip 0.2 H out, the skin of
- * the right arm flattens (flat 0.73 against 0.78). The left rest elbow points down and a little
- * out and back, (-0.6, -1, 0.3), as on the rabbit: out, (-1, -0.6, 0), the arm looks long and
- * bent. The left paw holds the neck at rest in the rest grip of the rabbit, 5 mm toward the neck
- * (`restGapL`), with a turn of -30° around the normal of the top plate (`restYawL`) and a turn of
- * 25° in the plane of its palm (`restPawTurnL`). With no turn around the normal, the grip in the
- * paw changes by 27° in a move, and the paw goes 0.5 cm into the violin. At 0.4 of the
- * fingerboard with a turn of 35°, the forearm goes 0.2 cm into the violin at rest. In the lift and
- * the lowering, the violin hangs from the left paw, as on the rabbit, and the wrist moves 0.1 H out
- * and 0.15 H to the front in the middle (`liftReach`), so that the violin near the jaw goes 1.9 cm
- * into the body: with 0.1 H to the front, it goes 2.1 cm in, and with 0.1 H up and 0.2 H to the
- * front, 2.6 cm. The bow takes the via of the rabbit: with the hair down, the right paw turns
- * 17,038°/s in a lowering.
+ * reaches the rest grip. At 0.8 of the way and 0.18 H down, the rest grip was 5 cm out of the reach
+ * of the arm: the violin stood on the thigh with the paw on the pegbox, and in the first frame of
+ * each move the violin jumped 5.2 cm up into the paw (`carryLift()` of `pose/bowed.ts`). At 0.65 of
+ * the way, it moves 0.3 cm in that frame. The left paw holds the violin at 0.37 of the fingerboard
+ * (`restPlace`), so that it closes around the neck: at 0.2, the paw lies over the scroll. The short
+ * right arm of the fox does not reach the top of the right thigh: with the grip 0.1 H out at 0.4 of
+ * the way, the frog end stays 7.7 cm above the thigh, and the right forearm goes into the belly.
+ * The grip rests 0.2 H out at 0.5 of the way, at the height of the top of the thigh, and 0.3 H to
+ * the front, and the bow tip points up and a little out and forward, (0.1, 1, -0.2), and the right
+ * elbow points down, out, and a little to the front, (0.5, -1, -0.2). Thus the right upper arm
+ * hangs 23° from the vertical, the bow leans 13° from the vertical beside the right thigh, and the
+ * frog end stays 16 cm above the thigh, at the reach of the arm. With the grip 0.25 H out, 0.5 H
+ * up, and the tip (0.3, 1, -0.2), the upper arm stood 38° from the vertical, the bow leaned 20°,
+ * and the frog was not over the thigh. With the grip 0.15 H out, the right forearm goes 1.7 cm into
+ * the belly at rest (1.1 cm at 0.2 H). The left rest elbow points down and a little out and back,
+ * (-0.6, -1, 0.3), as on the rabbit: out, (-1, -0.6, 0), the arm looks long and bent. The left paw
+ * holds the neck at rest in the rest grip of the rabbit, 5 mm toward the neck (`restGapL`), with a
+ * turn of -30° around the normal of the top plate (`restYawL`) and a turn of 25° in the plane of
+ * its palm (`restPawTurnL`). With no turn around the normal, the grip in the paw changes by 27° in
+ * a move, and the paw goes 0.5 cm into the violin. At 0.4 of the fingerboard with a turn of 35°,
+ * the forearm goes 0.2 cm into the violin at rest. In the lift and the lowering, the violin hangs
+ * from the left paw, as on the rabbit, and the wrist moves 0.1 H out and 0.15 H to the front in the
+ * middle (`liftReach`), so that the violin near the jaw goes 1.9 cm into the body: with 0.1 H to
+ * the front, it goes 2.1 cm in, and with 0.1 H up and 0.2 H to the front, 2.6 cm. The bow takes the
+ * via of the rabbit: with the hair down, the right paw turns 17,038°/s in a lowering.
  *
  * The left elbow turns toward the body by 2° for each lower string of the finger: with the 5° of
  * the chin hold, the left forearm goes 2.4 cm into the violin in the middle of the lift and of the
@@ -888,8 +887,8 @@ const FOX_HOLD = {
   restGapL: -0.005,
   liftPoleL: null,
   restBow: {
-    lap: { along: 0.75, offset: [0.25, 0.5, -0.25] },
-    tip: [0.3, 1, -0.2],
+    lap: { along: 0.5, offset: [0.2, 0, -0.3] },
+    tip: [0.1, 1, -0.2],
     hair: [0, 0, -1],
     via: { tip: [0.4, 0.3, -1], hair: [0, 0, -1], reach: [0.3, 0.1, -0.3] },
   },
