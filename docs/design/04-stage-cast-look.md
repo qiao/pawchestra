@@ -1842,7 +1842,9 @@ pedal harp (`docs/reference/harp-technique.md`):
 - **Column.** A fluted shaft between a gilded foot and a gilded crown (`COLUMN`).
 - **Neck.** An S curve (`HARP.neck`): it falls from the crown, rises in a hump over the middle
   strings, and falls onto the top of the soundbox. A brass plate covers the bottom of each side
-  over the strings (`NECK`), as the plates of the action.
+  over the strings (`NECK`), as the plates of the action. The crown and the neck near it stand
+  lower than on a concert harp (`HARP.column`). Reason: the long muzzle of the deer reaches over
+  the neck near the crown, and the head of a harpist does not rest on the harp.
 - **Soundbox.** A round back of five staves and a flat spruce soundboard, wide at the base and
   narrow at the top (`SOUNDBOX`). The strings start in a center strip of the soundboard, and the
   middle stave of the back has four holes.
