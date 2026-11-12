@@ -1,7 +1,8 @@
 # Writes the web color map and the web normal map of the Tripo rabbit from the maps of its FBX
 # (design 4.5, assets/models/rabbit/README.md, "Color map" and "Normal map"). The color map is the
-# source image at 2048 pixels, with no change of a color: the fur, the brows, and the eye paint
-# stay as the FBX shows them. Only the iris of each eye moves (`shift_eyes()`). The normal map
+# source image at 2048 pixels, with no change of a color out of the eyes: the fur, the brows, and
+# the eye paint stay as the FBX shows them. The iris of each eye moves (`shift_eyes()`), and the
+# lash line of each upper lid gets lighter (`soft_lash()`). The normal map
 # limits each tilt of the source, scales it to 1024 pixels, and stores the tilts times
 # NORMAL_MAP_GAIN of src/scene/fur.ts. The output depends only on the input files and on cwebp
 # 1.5.0.
@@ -75,13 +76,30 @@ NOSE_BAND = 4.0
 #: The smallest luma of a band cell on the nose side that takes the fill white: a lighter cell is
 #: the brown shade of the corner, a darker cell the lash line.
 LASH_LUMA = 70
+#: The lash line of the upper lid: the skin texels within LASH_REACH ball radii of the ball middle
+#: that a view of `LASH_VIEWS` shows. They lie on the rim of the socket, over the top of the iris.
+LASH_REACH = 1.08
+#: The views (degrees up, degrees to the left side) that find the skin faces around each eye.
+LASH_VIEWS = [(e, a) for e in (0, 10, 20, 30) for a in (-35, 0, 35)]
+#: The arc of the lash line that `soft_lash()` lightens: the angle in degrees about the moved iris
+#: middle, from straight up. The arc has the full share to LASH_ARC[0] and none from LASH_ARC[1],
+#: so the outer corner of the lash line keeps its paint.
+LASH_ARC = (40.0, 75.0)
+#: The largest share of the move of a lash texel toward the fur color above the eye.
+LASH_SHARE = 0.8
+#: The fur color above the eye: the median of the shown skin texels from FUR_BAND[0] to FUR_BAND[1]
+#: ball radii from the ball middle, within LASH_ARC[0] degrees of straight up.
+FUR_BAND = (1.2, 1.5)
 
 
 def color_map():
     """Writes the color map: the source scaled to SIZE (Lanczos), the irises moved
-    (`shift_eyes()`), WebP quality QUALITY, method 6."""
+    (`shift_eyes()`), the lash line of each upper lid lightened (`soft_lash()`), WebP quality
+    QUALITY, method 6."""
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
-    image = shift_eyes(gaze_shift.read_rig(RIG), image)
+    rig = gaze_shift.read_rig(RIG)
+    image, irises = shift_eyes(rig, image)
+    image = soft_lash(rig, image, irises)
     image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
     print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
 
@@ -303,7 +321,8 @@ def shift_eyes(rig, image):
     - Each other texel of O takes the white of its row (`white_rows()`). The rest of the band (the
       lash line and the shade of the lids on the white) keeps its paint.
     No texel takes a new color except the fill white, which is the median white of the same eye.
-    Only the eyeball texels of E and the padding next to them change. Gives the new image."""
+    Only the eyeball texels of E and the padding next to them change. Gives the new image, and for
+    each side the moved iris middle and the iris radius a."""
     eyes = rig[3]
     base = np.asarray(image)
     out = base.astype(np.float64)
@@ -311,6 +330,7 @@ def shift_eyes(rig, image):
     written = np.zeros(taken.shape, bool)
     src = gaze_shift.fill_around(out, taken)
     sides = {}
+    irises = {}
     for side, sign in (('L', 1.0), ('R', -1.0)):
         faces = np.array(eyes[side]['faces'])
         c, r, _ = gaze_shift.ball_frame(rig, faces)
@@ -326,6 +346,7 @@ def shift_eyes(rig, image):
         t = p * (1 - SHIFT_SHARE) + full * SHIFT_SHARE
         t = t / np.linalg.norm(t)
         turn = gaze_shift.turn_matrix(p, t)
+        irises[side] = (turn @ q, parts['a'])
         lam, psi = grid_axes()
         lam_g, psi_g = np.meshgrid(lam, psi)
         from_q = gaze_shift.angle_to(parts['dirs'].reshape(-1, 3), q).reshape(lam_g.shape)
@@ -391,7 +412,87 @@ def shift_eyes(rig, image):
     # color shows as a line on a seam. The other texels keep the source.
     near = morph(written, 2 * gaze_shift.EYE_FILL + 1, True)
     result = np.asarray(gaze_shift.ball_image(rig, out, taken))
-    return Image.fromarray(np.where(near[..., None], result, base))
+    return Image.fromarray(np.where(near[..., None], result, base)), irises
+
+
+def smoothstep(a, b, x):
+    """Gives 0 below a, 1 above b, and the smooth Hermite step between them."""
+    t = np.clip((x - a) / (b - a), 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
+def arc_angles(d, q):
+    """Gives the angle in degrees of each unit direction d about the unit axis q from straight up
+    (0 above q, 180 below it)."""
+    up = np.array([0.0, 1.0, 0.0]) - q[1] * q
+    up /= np.linalg.norm(up)
+    side = d - (d @ q)[:, None] * q
+    length = np.maximum(np.linalg.norm(side, axis=1), 1e-12)
+    return np.degrees(np.arccos(np.clip(side @ up / length, -1, 1)))
+
+
+def shown_faces(rig, c, r):
+    """Gives the triangles within 2.2 ball radii of the ball middle c that a view of LASH_VIEWS
+    shows (parallel rays, as `view_middle()`). The lids lie under the skin, so no lid face shows."""
+    triangles, positions = rig[0], rig[1]
+    corners = positions[triangles]
+    near = np.flatnonzero(np.linalg.norm(corners.mean(axis=1) - c, axis=1) < 2.2 * r)
+    steps = np.arange(-2.2 * r, 2.2 * r, gaze_shift.RAY_STEP)
+    gx, gy = np.meshgrid(steps, steps)
+    shown = set()
+    for up_deg, left_deg in LASH_VIEWS:
+        e, a = np.radians(up_deg), np.radians(left_deg)
+        v = np.array([np.sin(a) * np.cos(e), np.sin(e), np.cos(a) * np.cos(e)])
+        across = np.cross(-v, [0.0, 1.0, 0.0])
+        across /= np.linalg.norm(across)
+        tilt = np.cross(across, -v)
+        origins = c + gx.ravel()[:, None] * across + gy.ravel()[:, None] * tilt + v
+        _, hit, _ = gaze_shift.ray_hits(origins, np.tile(-v, (len(origins), 1)), corners[near])
+        shown |= set(near[hit[hit >= 0]].tolist())
+    return np.array(sorted(shown))
+
+
+def soft_lash(rig, image, irises):
+    """Lightens the painted lash line of each upper lid over the iris, so that the upper lid reads
+    soft and not stern. The source paints a dark line on the rim of the socket, and in the stage
+    light it reads as a thick dark wedge over the top of the iris. For each side, with the moved
+    iris middle q (`shift_eyes()`):
+    - The lash texels: the texels of the skin faces that a view shows (`shown_faces()`, no
+      eyeball face) within LASH_REACH ball radii of the ball middle.
+    - The fur color: the median color of the shown skin texels in FUR_BAND above the eye.
+    - A lash texel at the angle th about q from straight up (`arc_angles()`) moves toward the fur
+      color by the share LASH_SHARE * (1 - smoothstep(LASH_ARC[0], LASH_ARC[1], th)), and only when
+      the fur color is lighter. Thus a thin, lighter line stays, and the lower lid and the outer
+      corner of the lash line keep their paint.
+    Only these skin texels change. Gives the new image."""
+    out = np.asarray(image).astype(np.float64)
+    luma_of = np.array([0.2126, 0.7152, 0.0722])
+    for side in ('L', 'R'):
+        q = irises[side][0]
+        faces = np.array(rig[3][side]['faces'])
+        c, r, _ = gaze_shift.ball_frame(rig, faces)
+        skin = shown_faces(rig, c, r)
+        skin = skin[~np.isin(skin, faces)]
+        ys, xs, places = gaze_shift.eye_texels(rig, skin, out.shape[0])
+        d = places - c
+        dist = np.linalg.norm(d, axis=1) / r
+        d /= np.linalg.norm(d, axis=1)[:, None]
+        th = arc_angles(d, q)
+        fur = np.median(out[ys, xs][(dist >= FUR_BAND[0]) & (dist < FUR_BAND[1])
+                                    & (th < LASH_ARC[0])], axis=0)
+        lash = dist < LASH_REACH
+        share = LASH_SHARE * (1 - smoothstep(LASH_ARC[0], LASH_ARC[1], th)) * lash
+        old = out[ys, xs]
+        share[old @ luma_of >= fur @ luma_of] = 0
+        changed = share > 1e-3
+        # A texel at the edge of two triangles can come twice: each row writes the same color.
+        new = old + share[:, None] * (fur - old)
+        print(f'lash {side}: {len(skin)} shown skin faces, fur {np.round(fur).astype(int).tolist()}, '
+              f'{len(np.unique(ys[changed] * out.shape[1] + xs[changed]))} texels lighten, the mean '
+              f'luma goes from {(old[changed] @ luma_of).mean():.0f} to '
+              f'{(new[changed] @ luma_of).mean():.0f}')
+        out[ys[changed], xs[changed]] = new[changed]
+    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
 
 
 def normal_map():
