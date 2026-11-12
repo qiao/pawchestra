@@ -198,7 +198,7 @@ eye edit.
 
 | Item | Value |
 |---|---|
-| Size | 373,303 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 372,984 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 3,591 vertices and 3,943 faces (3,087 quads and 856 triangles, 7,030 triangles). Flat faces and the surface of `sa.add_surface()`. No face is gloss: the 42 faces of the dark nose take the slot `fur` and the color map, with the smooth normals of the fur. The 112 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -251,9 +251,10 @@ The weights, in the rest pose:
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
    part. The tail is a part of the body ("Tail" gives its rows).
 2. Arm rows: each vertex of a side with |x| from 0.085, within 0.05 units of the line of the rest
-   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.085 to 0 at x
-   0.125, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.163, 0.178, 0.194, and 0.209,
-   and the rest on the 4 roll segments.
+   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.55, 0.4, 0.27, 0.15, and
+   0.06 at x 0.085, 0.095, 0.105, 0.115, and 0.125, linear between them and 0 from x 0.135
+   (`rows.control` of `params.json`), an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x
+   0.163, 0.178, 0.194, and 0.209, and the rest on the 4 roll segments ("Arm roots").
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
    0.02 units before the head of `fingers_<side>`, so the four digits and the front of the palm
@@ -368,6 +369,29 @@ runs on it):
 The sweep of the fox before stops on its open loops, so the depths have no base. With the bow
 elbow of the fox before, the upper arms go as deep (one demo, `--set` of `pnpm pose-depth`).
 
+**Arm roots.** With a clavicle share from 0.4 at the shoulder joint (x 0.085, the root loop of the
+arm) to 0 at x 0.125, the front of the first root rings followed the upper arm by 0.63 to 0.87.
+The bow arm of the red fox turns 68 degrees forward from the bind, and the flute arms turn forward
+too. These rings then turned into the chest and the shoulder. The clavicle rows of step 2 now
+reach to x 0.135, with more than half of the root loop on the clavicle. The two roles share the
+body, so one change serves both. The sweep (`pnpm pose-depth violinist@fox-red --demo
+mozart-k525`, `pnpm pose-depth flutist --demo beethoven-1`) and the arm gate (`pnpm arm-check
+fox-violinist flutist`), before and after:
+
+| Measure | Before | After |
+|---|---|---|
+| Violinist, upper arms in the body in the play | 2.2 cm, 97 % of the samples over 1.5 cm | 0.4 cm, 0 % |
+| Flutist, upper arms in the body: play, lift, rest, lower | 2.0, 2.0, 1.2, 2.0 cm | 0.6, 1.1, 1.0, 1.2 cm |
+| Folds p95, violinist L and R, flutist L and R (limit 8) | 4, 11, 6, 6 | 4, 7, 4, 2 |
+| Twist p95, violinist L and R, flutist L and R (limit 55) | 15, 21, 28, 18 | 15, 21, 28, 18 |
+| Flat p5, violinist L and R, flutist L and R (limit 0.55) | 0.87, 0.89, 0.88, 0.78 | 0.83, 0.80, 0.74, 0.78 |
+
+The other pairs of the sweeps, the note targets, the flute grips (`pnpm wind-grip flutist`), the
+head height, and the seat height do not change. A clavicle share of 0.45 at x 0.085 left 2.1 cm
+at the front of the root loop in the violin (each 25th sample of the play). The rest, the lift,
+and the lowering of the violinist keep the left upper arm 3.4 cm in the belly (upperArmL 0.50,
+`TODO.md`).
+
 **Color map.** `tools/fox-maps.py` writes `fox-color.webp`, `fox-tan-color.webp`, and
 `fox-normal.webp` from the source maps and the rig file:
 
@@ -404,8 +428,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 | File | Size | SHA-256 |
 |---|---|---|
 | `tripo-p2/fox-paws.fbx` | 202,556 bytes (one run) | `2331d6371a1aacc742f2bda62a75afd4e93eee3eb87ddea24f796bd635ef1c12` |
-| `tripo-hand/fox.rig.glb` | 1,059,996 bytes | `2ae52bd93b22588f8431dddc252dc38179d0adffa888e83aeb60fb612e7b123d` |
-| `tripo-hand/fox.rig.json` | 16,979 bytes | `4abcc3d190df1374a1131b129a6f6127ec5654ac5626ecde9f41ebc25ebcafa0` |
+| `tripo-hand/fox.rig.glb` | 1,059,996 bytes | `3a66fad9dd96c9dabbf28fceabbe9f12dc0b9beaa365a94760a618a6b1a30632` |
+| `tripo-hand/fox.rig.json` | 16,978 bytes | `124cefc2111d5a56d8ea1afda2b2a2659da9def90dcfa4e9606327f0dbe950d0` |
 | `tripo-hand/fox-color.webp` | 108,956 bytes, 2048 × 2048 | `27b992ec80f30629163e2b001623ef8ec071099d6a46facfbc48603ce81267f5` |
 | `tripo-hand/fox-tan-color.webp` | 115,370 bytes, 2048 × 2048 | `fc14932af3aa0afa4a3077acedecf50c7ccc5ec5944f5baf62c3cdb7c686f06e` |
 | `tripo-hand/fox-normal.webp` | 21,804 bytes, 1024 × 1024 | `0bf03b7b4f6251d4c07346e8cb1af9c2c7f986d9b07a7af92285f5bd5f1fb559` |
