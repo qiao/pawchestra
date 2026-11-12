@@ -851,7 +851,8 @@ cannot bring the left elbow near the plane of the strings, so the left forearm p
 strings. With the palm square to the strings, the left wrist bent back past the paw swing limit of
 the arm gate in the rest, in the lift, and in the play. The turned paw comes nearer to the
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
-knuckles stay out of the neck of the harp.
+knuckles stay out of the neck of the harp. The offsets of the palms are in meters, so they fit
+one size of the deer and its harp. When both grow by a factor (4.4), the offsets grow by it too.
 The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
 the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
 The highest strings of the right hand lie near the right shoulder, so for them the right palm
