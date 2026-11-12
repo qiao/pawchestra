@@ -745,6 +745,14 @@ passes.
       layout rule that keeps the seats.
 - [ ] Tripo fox with four-digit paws: the four digits share one fingers bone, so they curl as one
       piece. Check the grip of each digit on the neck, the stick, and the flute in the app.
+- [ ] Tripo fox with the smaller paw: the left paw slides 1.3 mm on the violin in one step of
+      1/240 s at the start of the lift, and 2.3 mm at the end of the lowering (0.2 mm and 0.1 mm
+      with the larger paw), so the rest grip of the neck (`restHandAt()`) moved. Check it in the
+      app, and refit `FOX_HOLD` if the step shows.
+- [ ] Tripo fox fur strands: the strands follow the faint strokes of the source maps (`STRANDS`
+      of `tools/fox-maps.py`), so they curve in places on the back, and they cross the painted
+      mouth line. A flow field from the mesh (down the trunk, back on the head, out along the
+      limbs and the tail) would give straighter strands.
 - [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
       (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
       golden. A chroma step would read nearer the pale tan of the reference image.
