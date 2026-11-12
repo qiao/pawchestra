@@ -1214,6 +1214,52 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
+- [ ] Give the piece to the system with Media Session: the title, the composer, `share.jpg`, and
+      the actions `play`, `pause`, and `seekto`. Hold a screen Wake Lock during play, release it
+      at a pause and at the end, and request it again on `visibilitychange`. `src/` has neither,
+      and a phone locks its screen during `beethoven-5-4` (9:24) (2.4).
+- [ ] After the key C closes the drawer, give the focus to the drawer button only if the focus in
+      the drawer was a keyboard focus. Else remove the focus. Now the focus ring and the tooltip
+      "Open the drawer" stay on the film, the bar does not hide, and Space opens the drawer in
+      place of a pause (`src/ui/ui.ts:308`, `src/app/keys.ts:73`) (2.4, 2.8).
+- [ ] Make the seat rows read: keep the color dot at full size and color, and show the level only
+      by the glow ring. At rest the dot is 3.9 px wide at the opacity 0.3 (`src/ui/ui.css`). Add a
+      visible word to M and S in the wide drawer ("Mute", "Only this"), and a row "All seats"
+      above the list that clears each flag. This also answers the two seat row tasks above (2.8).
+- [ ] Give each demo row a cast line, such as "Penguin choir, full orchestra", from
+      `castBodies()` at build time (a `cast` field of `DemoInfo`). The design has the content in
+      "What it shows" of 8.2. Change the intro line to "An orchestra of animals plays classical
+      music. It also plays your MIDI file.", and name two sources of free MIDI files on `/about`
+      (2.8, 8.2).
+- [ ] Add a text button "Watch as a film" beside "Select music" on the first screen. It starts
+      the piece in Cinematic mode. Free stays the start mode. Now the film starts only from an
+      icon with no text or the key C, and a touch shows no tooltip (2.3, 2.8).
+- [ ] Put `film=1` in the hash, and remove the hash when a dropped file plays. Now a link copied
+      during an own file names the earlier demo. Then add "Copy link" to the drawer, with Web
+      Share on a phone (2.2).
+- [ ] Small control gaps: show the time at the pointer in the tooltip of the seek bar, give the
+      canvas `cursor: grab` in Free mode with one line "Drag to look around" until the first drag,
+      and give a dropped file a row "Your file: {title}" for the session, in memory only (2.3,
+      2.8).
+- [ ] Make a new share card with `pnpm share-image`. `public/share.jpg` shows the old faceted
+      bodies and the back of the bear. Also try a close shot under the wordmark, and compare both
+      at 300 px wide. Add a 180 px `apple-touch-icon.png` and a small web app manifest
+      (`index.html` links only `favicon.svg`) (7.4).
+- [ ] Ask the user for an end card: the title, "Play again", and "Next: {title}" with a 10 s ring
+      that a tap stops, then the next demo of `DEMO_IDS`. Its opacity follows the song time, as
+      `titleCardLevel()`. This changes the rule "the bar offers no next demo" of 2.8. An applause
+      sample needs the license check of 8.1 and loads with the samples.
+- [ ] Ask the user if a click on an animal toggles the solo of its seat, with a label for 2 s
+      ("Violins 1, 4 rabbits"), and a click on the floor clears each solo. Use `isClick()` of
+      `src/app/pick.ts` and the player boxes of `src/shots/clearance.ts`. This changes the rule
+      "A click on an animal does nothing" of 2.3.
+- [ ] Ask the user for a public cast page: a mode `?page=cast` of the gallery with the UI names of
+      the instruments, no test controls, and a link from the drawer and `/about`. The gallery and
+      `test.html` are development pages with `noindex` now (7.4).
+- [ ] Ask the user for Fraunces in the piece title. Measure a Latin subset first (target: at most
+      25 KB as WOFF2, loaded after the first frame) and run `pnpm lighthouse`. The first download
+      is 866,070 B of 1,000,000 B. The title now uses a system serif that differs on each
+      platform (2.8, 7.2).
 
 Done when: the UI matches the prototype at both sizes, and a keyboard alone can reach and use
 each control.
