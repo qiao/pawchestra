@@ -348,12 +348,12 @@ export const HANDS_HOLDS = {
     palmL: [-0.07, 0.22, 0.02],
     palmR: [0.055, 0.03, 0],
     // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.22 m
-    // above their pluck points stands at the height of the shoulder. From F3 to D4, the left palm
-    // moves up to 4 cm nearer to the strings, 6 cm down, and 4 cm toward the column: with no move,
-    // the left paw went 3.4 cm into the chest at D4, and with this move 1.0 cm. With the move from
-    // G3 and 4 cm down, it went 1.6 cm at B3 on the harp turned to 47°. The note targets do not
-    // change (`pnpm hold-fit harpist`).
-    highL: { from: 53, to: 62, offset: [0.04, -0.06, -0.04] },
+    // above their pluck points stands at the height of the shoulder. From C3 to D4, the left palm
+    // moves up to 4 cm nearer to the strings, 6 cm down, and 6 cm toward the column. With the
+    // harp place of 2026-11-13 and the move from F3 and 4 cm toward the column, the left paw went
+    // 3.3 cm into the chest, and with this move 0.8 cm. The note targets do not change (`pnpm
+    // hold-fit harpist`, `pnpm pose-depth harpist`).
+    highL: { from: 48, to: 62, offset: [0.04, -0.06, -0.06] },
     // The highest strings of the right hand lie near the right shoulder, at the neck of the harp.
     // From G5 to C7, the right palm moves up to 8 cm down the strings and 2 cm away from them, as
     // the right wrist of a harpist comes near the soundboard in the upper register (section 4).
