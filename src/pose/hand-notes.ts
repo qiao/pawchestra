@@ -790,10 +790,14 @@ function harpPlacing(
     const group = groups[i] ?? 0;
     const startsGroup = i === 0 || groups[i - 1] !== group;
     const end = note.start - (rolls[i] ?? 0) - (rests[i] ?? 0);
-    // A new group places at its place time, and after the damp before it. A note inside a group
-    // keeps the place of the palm, so its move only eases the pull back.
+    // A new group places at its place time, and after the damp before it, when the palm is off
+    // the strings. A note inside a group keeps the place of the palm, so its move only eases the
+    // pull back. A move that starts at the damp end skips the release of the damp: the forearm
+    // turned up to 40° and the fingers closed fully in 1/240 s.
     const before = i > 0 ? (notes[i - 1]?.start ?? 0) + (pluckTimes[i - 1] ?? 0) : -Infinity;
-    const damped = i > 0 ? (damps[2 * i - 1] ?? -Infinity) : -Infinity;
+    const dampFrom = i > 0 ? (damps[2 * i - 2] ?? 0) : 0;
+    const dampTo = i > 0 ? (damps[2 * i - 1] ?? 0) : 0;
+    const damped = dampTo > dampFrom ? dampTo + m.dampMoveSec : -Infinity;
     const place = startsGroup ? (places[group] ?? end) : before;
     const start = Math.min(end, Math.max(place, damped, lastStart));
     moveStarts[i] = start;
