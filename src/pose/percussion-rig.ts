@@ -108,7 +108,7 @@ export interface MalletAcross {
  * the play.
  */
 export interface MalletSet {
-  /** The move of each wrist up from its place on the hanging arm, in meters. */
+  /** The move of each wrist up from its place on the hanging arm, in head heights `H`. */
   readonly raise: number;
   /**
    * The turn of the left and of the right stick around the forearm, up from the level direction
@@ -138,7 +138,7 @@ export interface ChestDamp {
   readonly hold: number;
   /** The drop of the crash point at the damp, in head heights. */
   readonly drop: number;
-  /** The room between the near rim of the cymbals and the front of the trunk, in meters. */
+  /** The room between the near rim of the cymbals and the front of the trunk, in head heights. */
   readonly room: number;
 }
 
@@ -155,8 +155,8 @@ export interface EdgeDamp {
   /** The distance of the rim from the middle of the cymbal, in meters. */
   readonly rim: number;
   /**
-   * The grip of the mallet at the damp, from the rim point, in meters: out from the rim on the
-   * line from the middle of the cymbal to the shoulder joint, and up.
+   * The grip of the mallet at the damp, from the rim point, in head heights `H`: out from the rim
+   * on the line from the middle of the cymbal to the shoulder joint, and up.
    */
   readonly grip: readonly [out: number, up: number];
   /**
@@ -188,17 +188,17 @@ export interface FingersDamp {
   readonly hold: number;
   /**
    * The distance on the floor plane from the shoulder joint of the left and of the right hand to
-   * the grip of the mallet at the damp, in meters. The grip lies on the line from the playing spot
+   * the grip of the mallet at the damp, in head heights `H`. The grip lies on the line from the playing spot
    * of the hand to the player, as far toward the spot as this reach permits, so that the short arm
    * reaches the head.
    */
   readonly reach: readonly [left: number, right: number];
   /** The least distance of the grip in from the near rim of the head, in meters. */
   readonly rim: number;
-  /** The height of the grip over the head, in meters. */
+  /** The height of the grip over the head, in head heights `H`. */
   readonly up: number;
   /**
-   * The depth of the lowest point of the rigid paw under the head, in meters
+   * The depth of the lowest point of the rigid paw under the head, in head heights `H`
    * (`DampHand.touch`). The skin of the studio body lies up to about 2.5 cm under that point, so
    * a negative depth lays the end of the paw lightly on the head.
    */
@@ -226,8 +226,8 @@ export interface PalmDamp {
   /** The longest contact, in seconds. */
   readonly hold: number;
   /**
-   * The wrist at the damp, from the middle of the far head, in meters, in the axes of the head:
-   * out from the head along its normal, up, and along the head toward the player.
+   * The wrist at the damp, from the middle of the far head, in head heights `H`, in the axes of
+   * the head: out from the head along its normal, up, and along the head toward the player.
    */
   readonly wrist: Vec3;
   /**
@@ -322,7 +322,7 @@ interface PercussionHold {
   readonly pass: number;
   /**
    * The farthest distance on the floor plane from the shoulder joint of a hand to its target, in
-   * meters (`alternateHands()`). A farther target goes to the other hand when that hand is
+   * head heights `H` (`alternateHands()`). A farther target goes to the other hand when that hand is
    * nearer. `Infinity`: no limit.
    */
   readonly reach: number;
@@ -454,10 +454,10 @@ export const PERCUSSION_HOLDS = {
       kind: 'fingers',
       restSec: 0.5,
       hold: 0.3,
-      reach: [0.52, 0.51],
+      reach: [0.876789, 0.859928],
       rim: 0.05,
       up: 0,
-      press: -0.025,
+      press: -0.042153,
       share: 1.67,
       lean: 0.05,
       turn: 0,
@@ -522,7 +522,7 @@ export const PERCUSSION_HOLDS = {
       kind: 'palm',
       restSec: 0.5,
       hold: 0.5,
-      wrist: [0.07, 0, 0.25],
+      wrist: [0.287283, 0, 1.026011],
       fingers: 0.5,
       yaw: 0.65,
       turn: 0.35,
@@ -561,7 +561,7 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
     pitchR: 1,
     ready: false,
-    set: { raise: 0.01, rise: [0.1, 0.22] },
+    set: { raise: 0.04104, rise: [0.1, 0.22] },
     pair: false,
     gap: 0,
     pass: 0,
@@ -597,7 +597,7 @@ export const PERCUSSION_HOLDS = {
     lean: 0,
     side: null,
     fit: null,
-    damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.01 },
+    damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.04104 },
     curl: GRIP_CURL,
     strikeRoll: true,
   },
@@ -678,7 +678,7 @@ export const PERCUSSION_HOLDS = {
     // low heads, a pass of one bar put one shaft on the head of the other mallet for 2.8 s of
     // the test score, and a lift of the passing head over the other head did not clear it.
     pass: 0,
-    reach: 0.53,
+    reach: 2.175144,
     lean: 0.2,
     // The short legs tilt far with a small move of the hips, and the foot skin then sinks into
     // the floor, so the hips keep their place, and the spine takes the whole move. A lean of 12°
@@ -728,7 +728,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
   ready: false,
-  set: { raise: 0.06, rise: [0, 0.15] },
+  set: { raise: 0.246243, rise: [0, 0.15] },
   pair: false,
   gap: 0,
   pass: 0,
@@ -741,7 +741,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
     restSec: 0.5,
     hold: 0.5,
     rim: 0.2,
-    grip: [0.03, -0.05],
+    grip: [0.123121, -0.205202],
     around: -0.35,
     share: 7,
     lean: 0.16,
@@ -1311,7 +1311,7 @@ function pairOfPlates(
   const radius = Math.max(rimL.radius, rimR.radius);
   const y = crash.y - damp.drop * model.body.headHeight;
   const front = frontmostTrunk(model, (k) => y - radius + (2 * radius * k) / FRONT_POINTS);
-  const z = Number.isFinite(front) ? front - radius - damp.room : crash.z;
+  const z = Number.isFinite(front) ? front - radius - damp.room * model.body.headHeight : crash.z;
   return {
     sides: [plate(left, rimL, -1), plate(right, rimR, 1)],
     chest: [crash.x, y, Math.max(z, crash.z)],
@@ -1484,7 +1484,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         targets.set(0, top);
         sides = [mallet(left, 'malletL'), mallet(right, 'malletR')];
         if (hold.damp?.kind === 'edge') {
-          dampHands = pawsOnRim(top.point, hold.damp, [left, right]);
+          dampHands = pawsOnRim(top.point, hold.damp, [left, right], h);
         }
       } else {
         const plates = pairOfPlates(model, left, right, inH, targets);
@@ -1500,7 +1500,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       targets.set(0, head);
       sides = [{ kind: 'free', arm: left }, mallet(right, 'malletR')];
       if (hold.damp?.kind === 'palm') {
-        dampHands = [palmOnFarHead(head, hold.damp), null];
+        dampHands = [palmOnFarHead(head, hold.damp, h), null];
       }
       break;
     }
@@ -1599,12 +1599,12 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       const dx = x - sx;
       const dz = z - sz;
       const b = dx * ux + dz * uz;
-      const reach = damp.reach[arm.side === 'L' ? 0 : 1];
+      const reach = damp.reach[arm.side === 'L' ? 0 : 1] * h;
       const c = dx * dx + dz * dz - reach * reach;
       const ahead = -b - Math.sqrt(Math.max(0, b * b - c));
       const move = MathUtils.clamp(c > 0 ? ahead : 0, 0, hold.rim - damp.rim);
       const point = towardPlayer(target, move).point;
-      const grip = new Vector3(point[0], point[1] + damp.up, point[2]);
+      const grip = new Vector3(point[0], point[1] + damp.up * h, point[2]);
       // The grip at a strike lies the length of the mallet back from the target, on the line
       // from the home. The smooth step of the move is 1.5 times faster than its mean speed at its
       // middle.
@@ -1621,7 +1621,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         grip: toVec3(grip),
         share: damp.share,
         keep: true,
-        touch: target.point[1] - damp.press,
+        touch: target.point[1] - damp.press * h,
         paw: pawCorners(model, arm),
         moveSec: (1.5 * grip.distanceTo(struck)) / damp.speed,
       };
@@ -1773,15 +1773,16 @@ function headAxes(normal: Vec3): readonly [normal: Vector3, up: Vector3, toward:
  *
  * @param near The target on the near head, the head of the beater.
  * @param rule The rule of the damp.
+ * @param h The head height `H` of the body, in meters: the unit of `rule.wrist`.
  * @returns The wrist and the rotation of the hand from the bind pose.
  */
-function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): DampHand {
+function palmOnFarHead(near: StrikeTarget, rule: PalmDamp, h: number): DampHand {
   const [n, up, toward] = headAxes(near.normal);
   const middle = new Vector3(...near.point).addScaledVector(n, -BASS_DRUM.depth);
   const wrist = middle
-    .addScaledVector(n, -rule.wrist[0])
-    .addScaledVector(up, rule.wrist[1])
-    .addScaledVector(toward, rule.wrist[2]);
+    .addScaledVector(n, -rule.wrist[0] * h)
+    .addScaledVector(up, rule.wrist[1] * h)
+    .addScaledVector(toward, rule.wrist[2] * h);
   const fingers = toward
     .clone()
     .multiplyScalar(-Math.cos(rule.fingers))
@@ -1799,12 +1800,14 @@ function palmOnFarHead(near: StrikeTarget, rule: PalmDamp): DampHand {
  * @param middle The middle of the top of the cymbal.
  * @param rule The rule of the damp.
  * @param arms The left and the right arm.
+ * @param h The head height `H` of the body, in meters: the unit of `rule.grip`.
  * @returns The paw of the left and of the right hand.
  */
 function pawsOnRim(
   middle: Vec3,
   rule: EdgeDamp,
   arms: readonly [ArmRig, ArmRig],
+  h: number,
 ): readonly [DampHand, DampHand] {
   const paw = (arm: ArmRig): DampHand => {
     const center = new Vector3(...middle);
@@ -1814,8 +1817,8 @@ function pawsOnRim(
       .normalize()
       .applyAxisAngle(Y_AXIS, (arm.side === 'L' ? 1 : -1) * rule.around);
     const grip = center
-      .addScaledVector(out, rule.rim + rule.grip[0])
-      .add(new Vector3(0, rule.grip[1], 0));
+      .addScaledVector(out, rule.rim + rule.grip[0] * h)
+      .add(new Vector3(0, rule.grip[1] * h, 0));
     return {
       kind: 'grip',
       grip: toVec3(grip),

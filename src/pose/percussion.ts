@@ -446,7 +446,7 @@ function handTracks(
       gap: hold.gap,
       pass: hold.pass,
       places: waits ? [rig.restL.point[0], rig.restR.point[0]] : [-Infinity, Infinity],
-      reach: hold.reach,
+      reach: hold.reach * rig.headHeight,
       shoulders: [
         [rig.left.arm.bind.shoulder[0], rig.left.arm.bind.shoulder[2]],
         [rig.right.arm.bind.shoulder[0], rig.right.arm.bind.shoulder[2]],
@@ -1053,6 +1053,7 @@ function acrossHand(
  *
  * @param side The hand with a mallet.
  * @param set The set position.
+ * @param h The head height `H` of the body, in meters: the unit of `set.raise`.
  * @param pole The direction to which the elbow of the hanging arm points, in the axes of the
  *   chest.
  * @param joint The posed shoulder joint of the side.
@@ -1063,6 +1064,7 @@ function acrossHand(
 function setHand(
   side: Extract<PercussionSide, { kind: 'mallet' }>,
   set: MalletSet,
+  h: number,
   pole: Vec3,
   joint: Vector3,
   chest: Frame,
@@ -1070,7 +1072,7 @@ function setHand(
   handOut: Quaternion,
 ): void {
   const { arm } = side;
-  wristOut.y += set.raise;
+  wristOut.y += set.raise * h;
   shoulderBind.fromArray(arm.bind.shoulder);
   elbowBind.fromArray(arm.bind.elbow);
   const upper = elbowBind.distanceTo(shoulderBind);
@@ -1278,7 +1280,16 @@ function poseHand(
   hangingHand(hang, shoulder, restHand);
   // A hold with a set position holds the sticks across the body at rest.
   if (side.kind === 'mallet' && rig.hold.set) {
-    setHand(side, rig.hold.set, hang.pole, shoulder.position, chest, hanging, restHand);
+    setHand(
+      side,
+      rig.hold.set,
+      rig.headHeight,
+      hang.pole,
+      shoulder.position,
+      chest,
+      hanging,
+      restHand,
+    );
   }
   // A paw goes to its place at a damp of its hand (`PalmDamp`, `EdgeDamp`) while the player
   // plays. The free paw else hangs.
