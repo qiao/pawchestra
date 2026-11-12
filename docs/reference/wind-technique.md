@@ -610,11 +610,10 @@ The app does not follow these facts:
   points more than "slightly down" [19]. No source gives the range of the neck flexion of a
   trumpet player in degrees, so the bow stays small (`MAX_BOW`). The bell of the monkey points 20°
   to 22° below the level. A higher bell puts the valves out of the reach of its short arms.
-- **The trumpet size and rest (2.1).** The monkey plays a smaller trumpet of 0.85
-  (`SpeciesParams.trumpetScale`), the largest size at which its paws reach the valves with the head
-  upright. No source gives its size or the rest. At rest, the trumpet turns
-  down in front of the belly (`restShift`), and both paws keep the hold of the play (`restAim`,
-  `restGripShiftL`).
+- **The trumpet size and rest (2.1).** The monkey plays the standard trumpet of the app, as an
+  adult player does. Its body is large enough that its paws reach the valves with the head upright.
+  No source gives the rest. At rest, the trumpet turns down in front of the belly (`restShift`),
+  and both paws keep the hold of the play (`restAim`, `restGripShiftL`).
 - **The tuba (3).** The app draws no strap. The lead pipe is longer (`SpeciesParams.tubaPipe`),
   because the long muzzle puts the mouthpiece far in front of the shoulder joints. No source gives
   the length of a lead pipe or the rest. At rest, the tuba moves off the mouth, with both paws on
