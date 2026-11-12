@@ -330,6 +330,8 @@ export const HANDS_HOLDS = {
   // the side (section 4). The shoulder of a harpist holds the harp, so the right upper arm touches
   // the soundbox: with the elbow 45° down, it went 2.0 cm into the soundbox in the play, 37% of
   // the samples over 1.5 cm, and with this elbow 1.4 cm, none over 1.5 cm (`pnpm pose-depth
+  // harpist`). An elbow forward, at [0.5, -1, -1.5], kept the upper arm out of the soundbox, but
+  // the right paw twisted up to 74° on its forearm, against 35° with this elbow (`pnpm hold-fit
   // harpist`). On the larger harp on the floor, with the palm 3 cm right of the strings and the
   // elbow at [0.7, -1, 0], the right arm folds (folds p95 9 of `pnpm arm-check`, limit 8), and with
   // this hold, 6. The left fingers point up and back along the strings (`aimL`): with the fingers on
@@ -394,10 +396,14 @@ export const HANDS_HOLDS = {
     // shoulder (0.91 of the reach), and the elbows bend to 122°. With the old places, 0.35 H out
     // and 0.5 H above the knee, the wrists lay 0.32 m from the shoulder: the arms locked straight
     // (179.7°), and the elbows snapped where the lift left the reach limit. The palms face back
-    // and down onto the belly, and the fingers point down and a little forward. The elbows point
-    // down and back (`pole` z 0.6): with z 0.3, the right paw went 2.2 cm into the belly and the
-    // right forearm 2.5 cm (`pnpm pose-depth harpist`). The right palm turns a little to the right
-    // (x -0.4), so that the right forearm of the Tripo fawn twists at most 45° from the bind.
+    // and down onto the belly, and the fingers point down and a little forward. The left elbow
+    // points down and back (`pole` z 0.6): with z 0.3, the right paw went 2.2 cm into the belly
+    // and the right forearm 2.5 cm (`pnpm pose-depth harpist`). The right elbow points down and
+    // forward (z -0.6), so that the right arm lies in front of the soundbox: with z 0.6, the right
+    // upper arm went 1.6 cm into the harp at rest, and with z -0.6 0.8 cm (`pnpm hold-fit
+    // harpist`), and the right forearm no longer goes 2.2 cm into the soundbox. The right palm
+    // turns a little to the right (x -0.4), so that the right forearm of the Tripo fawn twists at
+    // most 45° from the bind.
     restL: {
       lap: { along: 0.4, offset: [-0.04, 0.48, -0.5] },
       palm: [0, -0.5, 1],
@@ -408,7 +414,7 @@ export const HANDS_HOLDS = {
       lap: { along: 0.4, offset: [0.04, 0.48, -0.5] },
       palm: [-0.4, -0.5, 1],
       fingers: [-0.2, -1, -0.5],
-      pole: [0.4, -1, 0.6],
+      pole: [0.4, -1, -0.6],
     },
   },
 } as const satisfies Readonly<Record<HandsInstrument, HandsHold>>;
