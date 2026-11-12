@@ -203,7 +203,8 @@ The app does not follow these facts:
 - **The rest (section 5).** In the rest pose, the hooves rest on the lap with the elbows bent
   about 122° (`restL`, `restR`), as a pianist rests the hands on the lap before a performance
   (`piano-technique.md`, section 8). The short arms of the deer do not reach the thighs, so the
-  hooves lie on the front of the belly where it meets the thighs. The sources give the rest of
+  hooves lie on the front of the belly where it meets the thighs. The right elbow points forward,
+  so the right arm lies in front of the soundbox (`restR.pole`). The sources give the rest of
   one hand on the edge of the soundboard only while the other hand plays. With each hand on a
   string, the rest pose looked the same as the play.
 - **The fingers (section 7.1).** The deer paw is a fist: a free thumb and three fingers joined into
