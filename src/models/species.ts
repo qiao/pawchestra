@@ -506,11 +506,11 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-monkey'].seatHeight / STUDIO_HEIGHTS['studio-monkey'].headHeight,
   },
   /**
-   * Pig, the horns: a pink pig with a paler belly, a pink snout disc, dark hooves, and a small
-   * curled tail. It has the studio body of the mesh `assets/models/pig/pig.glb`, which `pnpm
-   * rig-mesh pig` rigs (design 4.4), with longer arms. It sits on a chair that fits its short legs,
-   * and stands as a soloist. Its head height is the head of the studio body, and the seat height is
-   * the seat of the studio body, in H.
+   * Pig, the horns: a round pink pig with floppy ears, a pink snout disc, dark hooves, and a
+   * curly tail. It has the studio body of the hand rig of the Tripo P2 pig
+   * (`assets/models/pig/tripo-hand/pig.blend`, design 4.4), with the arms of its source. It sits
+   * on a chair that fits its short legs, and stands as a soloist. Its head height is the head of
+   * the studio body, and the seat height is the seat of the studio body, in H.
    */
   pig: {
     body: 'studio-pig',

@@ -461,20 +461,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/beaver/beaver.rig.glb',
     },
   ],
-  // The horn pig (design 4.4). It stands as a soloist.
+  // The horn pig (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/pig/tripo-hand/pig.blend`), by the route of the Tripo wolf, with no arm cut and
+  // no arm stretch. It stands as a soloist. Its `.blend` holds the facts of the body: the scale that
+  // keeps H of the pig of `pig.rig.glb`, and the crease angle 180°. The source paints no light in
+  // the eyes, so the eyes take the finish `eye` and the eye light.
   [
     'pig',
     {
       landmark: 'shoulders',
-      height: 0.671951,
       seated: true,
       soloist: true,
       constant: 'STUDIO_PIG',
-      crease: 35,
-      // The crease between the lips under the snout disc, on a cut of the head with the middle
-      // plane. The tip of the nose is the front of the disc, 3.5 cm in front of the lips.
-      mouthHeight: 0.755,
-      glb: 'assets/models/pig/pig.rig.glb',
+      glb: 'assets/models/pig/tripo-hand/pig.rig.glb',
     },
   ],
   // The clarinet wolf (design 4.4): the candidate hand rig of the Tripo P2 mesh
