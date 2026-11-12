@@ -911,12 +911,15 @@ swing. A paused song keeps the swing of its time, as a film camera sees a string
 - The swing takes the weight of the playing pose, so a resting or a muted harpist shows still
   strings (5.5).
 
-**Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it a part of
-the way between two notes, so that each note shows (`CHOIR_MOTION`). The jaw turns at most at
-`jawRate`, so a short time between two notes gives a small dip. The head lifts a little over each
-phrase and keeps still on each note, as a real choir singer opens the mouth and keeps the head
-still. Neighbor voices sway to opposite sides, so that the choir does not move as one block. The
-flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`), on a wide
+**Choir** (`pose/choir.ts`): the `jaw` bone opens the beak for each note and closes it after the
+note (`CHOIR_MOTION`). As a real singer opens the mouth for the vowel, the beak starts to open just
+before the voice, and the opening goes on a little after the note start (`openShare`). The jaw opens
+at most at `openRate` and closes at most at the faster `closeRate`, so no frame step snaps. In a
+rest, the beak closes fully when the rest gives the time, and else as far as it can before it opens
+again. In a legato, it closes a part of the way (`dip`), so that each note shows. The head lifts a
+little over each phrase and keeps still on each note, as a real choir singer opens the mouth and
+keeps the head still. Neighbor voices sway to opposite sides, so that the choir does not move as one
+block. The flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`), on a wide
 folder (`CHOIR_FOLDER`). Reason:
 the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
 went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
