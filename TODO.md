@@ -79,13 +79,16 @@ passes.
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
-- [ ] Trombonist panda (Tripo body): the right upper arm goes 1.6 cm to 1.7 cm into the round
-      belly at rest and in the lift and the lowering (limit 1.5 cm, `pnpm pose-depth
-      trombonist`). A right rest elbow further out clears it, and rolls the upper arm 47° (limit
-      45°).
-- [ ] Trombonist panda (Tripo body): the right arm reaches 5.5 cm of the slide travel (10.5 cm on
-      the old body), so the worst note target misses by 103 mm. The slide points 35° below the
-      level for that reach. A grip lower on the brace leaves the brace out of the paw.
+- [ ] Trombonist panda (Tripo body): ask the user to confirm the trombone of 0.75
+      (`tromboneScale`, 2026-11-12). It gives a slide travel of 10.0 cm at the 7th position (5.5 cm
+      at full size). A larger trombone puts the brace out of reach, and an arm stretch of 1.15
+      still needs the slide 35° to 40° down. The right paw is only 5.8 cm in front of the left
+      paw, and the slide still points 35° down.
+- [ ] Trombonist panda: the smaller trombone and its turn of 10° to the right bring the slide nearer
+      to the desk and the next player. Measure both gaps again (16.4 cm and 11.1 cm before).
+- [ ] Wind slide: the paused test `src/pose/winds.test.ts` (near line 234) expects a linear slide
+      map, but `reachedShare` of 2026-11-12 moves the near positions more. Update it when the
+      tests come back.
 - [ ] Trombonist panda (Tripo body): the arm gate folds p95 are 61 (left) and 73 (right), at the
       finger crease of the paws that curl 130° and 120° around the tubes (the curls of 90° and 110°
       gave 33 and 42, and the paws did not grasp). Check the paws in 2x crops.
@@ -924,7 +927,11 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Mouse oboist: the big head puts the reed high, so the paws hold the half-size oboe at the
       height of the shoulders with open elbows. Show the user, and offer a bowed head.
 - [ ] Mouse and beaver: find a source for the size of a small oboe and a small bassoon. The mouse
-      plays an oboe of 0.5, and the beaver a bassoon of 0.55 (wind-technique 4.2).
+      plays an oboe of 0.5, and the beaver a bassoon of 0.7 (wind-technique 4.2). At 0.7 the bell
+      top is 3.5 cm below the head top. At 0.8 the boot goes 8 cm into the belly.
+- [ ] Beaver bassoonist: the bassoon of 0.7 moves 20 players by 1 cm to 27 cm in mozart-k191 (the
+      pig horn 27.1 cm, red fox violins 21.3 cm and 15.4 cm), and each beaver stand 2 cm in 10
+      demos. The reed blade hides behind the teeth, so from the front only the bocal shows.
 - [ ] Mouse: the loop of the long tail lies on the floor behind the mouse, and the footprint is
       0.764 m deep. Check the tail between the rows of the stage with the user.
 - [ ] Mouse: with no chair, the haunch hangs 0.076 m above the floor, and it seems to float in the
