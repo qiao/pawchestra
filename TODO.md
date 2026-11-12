@@ -967,7 +967,7 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Mouse oboist: the big head puts the reed high, so the paws hold the half-size oboe at the
       height of the shoulders with open elbows. Show the user, and offer a bowed head.
 - [ ] Mouse and beaver: find a source for the size of a small oboe and a small bassoon. The mouse
-      plays an oboe of 0.5, and the beaver a bassoon of 0.82 (wind-technique 4.2).
+      plays an oboe of 0.5, and the beaver a bassoon of 0.55 (wind-technique 4.2).
 - [ ] Mouse: the loop of the long tail lies on the floor behind the mouse, and the footprint is
       0.764 m deep. Check the tail between the rows of the stage with the user.
 - [ ] Mouse: with no chair, the haunch hangs 0.076 m above the floor, and it seems to float in the
@@ -1000,11 +1000,14 @@ scene of each demo has its seats and stage size with no overlap.
       the trombonist, the oboist, the clarinetist, the wolf, the tubist, and the xylophone.
 - [ ] Horn: the right palm lies across the bell opening, 2.5 cm inside it (`HORN_PALM_DEPTH`). A
       real hand goes deeper, against the far wall at 2 o'clock. Turn the paw along the bell.
-- [ ] Beaver bassoonist: three faces of the inner left elbow fold in each play sample, and the
-      left paw swings 70° on its forearm in the play (limit 70). Try wider elbow rings
-      (`arm_rebuild.py --spec`) with new rigid crease points, or a left elbow `raise` shape.
-- [ ] Beaver: the fur keeps the orange-brown of its texture. Ask the user if the plain fur takes the
-      chroma of `SPECIES_COLORS.beaver`.
+- [ ] Tripo beaver bassoonist: the curled digits and the paws fold 23 (left) and 20 (right) faces
+      in the play (arm gate, limit 8), and the left grip turn p50 is 36° (17° on the old beaver).
+      Check the paws on the bassoon in a 2x crop.
+- [ ] Tripo beaver: the left upper arm lies 2.7 cm to 3.4 cm in the body at its root in each
+      sample (`pnpm pose-depth bassoonist`, limit 1.5). Check if the sweep counts the root of an
+      arm with no cut.
+- [ ] Tripo beaver: its footprint moves the beavers 0.21 m to 0.52 m in their rows in 4 demos, and
+      one cat 1.41 m in `boulanger-matin`. Check the wind rows in the hall view.
 - [ ] Twist steps above 25° between two arm bones: the left forearm of the rabbit, the cat, and the
       foxes, the panda, and the wolf right forearm. Add forearm segments.
 - [ ] Twist steps: measure the steps of the snare drum and the xylophone on the percussion test
