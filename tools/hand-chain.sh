@@ -20,7 +20,7 @@ species="${1:-}"
 chain="tools/blender/hand/$species"
 if [[ -z "$species" || ! -f "$root/$chain/build.py" ]]; then
   echo "hand-chain: give a species with a chain in tools/blender/hand/" >&2
-  ls "$root/tools/blender/hand" >&2
+  print -l "$root"/tools/blender/hand/*(/:t) >&2
   exit 2
 fi
 
