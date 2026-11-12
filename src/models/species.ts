@@ -446,20 +446,20 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-mouse'].seatHeight / STUDIO_HEIGHTS['studio-mouse'].headHeight,
   },
   /**
-   * Beaver, the bassoons: an orange-brown beaver with a cream belly and muzzle, two white front
-   * teeth, and a broad flat tail. It has the studio body of the mesh
-   * `assets/models/beaver/beaver.glb`, which `pnpm rig-mesh beaver` rigs (design 4.4), with longer
-   * arms. It plays a smaller bassoon, the largest at which each paw reaches its grip with 3 cm to
-   * spare. It has no chair: the round belly hides the short thighs, so it stands on its hind legs
-   * with bent knees, in the seated pose at the seat height of its legs. Its broad tail goes back
-   * and lies on the floor behind it. A bassoon soloist keeps its seat (`supportOf()` of
-   * `player.ts`). Its head height is the head of the studio body, and the seat height is the seat
-   * of the studio body, in H.
+   * Beaver, the bassoons: a round, furry, orange-brown beaver with a light muzzle, two big front
+   * teeth, whiskers, and a large flat scaly tail. It has the studio body of the hand rig of the
+   * Tripo P2 beaver (`assets/models/beaver/tripo-hand/`, design 4.4), with the form and the colors
+   * of its source and short arms. It plays a small bassoon of 0.55, at which each paw reaches its
+   * grip with the forward turns of the shoulders of its hold. It has no chair: the round belly
+   * hides the short thighs, so it stands on its short legs in the pose of the source, at the seat
+   * height of its legs. Its flat tail goes back and lies on the floor behind it. A bassoon soloist
+   * keeps its seat (`supportOf()` of `player.ts`). Its head height is the head of the studio
+   * body, and the seat height is the seat of the studio body, in H.
    */
   beaver: {
     body: 'studio-beaver',
     colors: SPECIES_COLORS.beaver,
-    bassoonScale: 0.82,
+    bassoonScale: 0.55,
     noChair: true,
     headHeight: STUDIO_HEIGHTS['studio-beaver'].headHeight,
     seatHeight:

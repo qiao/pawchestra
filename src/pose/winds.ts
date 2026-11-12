@@ -881,28 +881,30 @@ const MOUSE_OBOE = {
 /** The forward turns of the shoulder bones of the bassoon beaver while it plays, in degrees. */
 const BEAVER_SHOULDER_TURN = {
   /**
-   * The left shoulder. With 15°, the left upper arm turns 84° from its bind direction, and the
-   * faces at the front of the left shoulder fold in each play sample.
+   * The left shoulder. With 30°, the left paw misses its grip on the wing joint by 0.6 cm in the
+   * play.
    */
-  left: 20,
+  left: 35,
   /**
-   * The right shoulder. With 15°, the round free right upper arm goes 1.1 cm into the belly in
-   * the play, against 0.5 cm with 20°.
+   * The right shoulder. The short arms of the Tripo beaver reach the boot joint only when the
+   * shoulder slides forward: with 20°, the right paw misses its grip by 6.5 cm on a bassoon of
+   * 0.6, with 35° by 3.1 cm.
    */
-  right: 20,
+  right: 40,
 } as const;
 
 /**
  * The turn of the bassoon of the beaver, relative to the chest: the lower end 18° forward and 5°
- * to the left from the bind pose of `woodwindRotation()` of `models/instruments/woodwinds.ts`,
- * which leans the tube 35° to the left. The top goes back beside the head: with the lower end 10°
- * forward, the left forearm went 1.5 cm into the belly in the play.
+ * to the right from the bind pose of `woodwindRotation()` of `models/instruments/woodwinds.ts`,
+ * which leans the tube 35° to the left. The boot joint comes up toward the right shoulder, so the
+ * short right arm reaches it: with the lower end 5° to the left, the right paw missed its grip by
+ * 0.6 cm more.
  */
-const BEAVER_PLAY = holdTurn(18, -5);
+const BEAVER_PLAY = holdTurn(18, 5);
 
 /**
  * The turn of the bassoon of the beaver at rest, relative to the chest: the bind pose of
- * `woodwindRotation()`, the lower end 18° back toward the body and 5° to the right of
+ * `woodwindRotation()`, the lower end 18° back toward the body and 5° to the left of
  * {@link BEAVER_PLAY}.
  */
 const BEAVER_REST = holdTurn(0, 0);
@@ -911,68 +913,62 @@ const BEAVER_REST = holdTurn(0, 0);
  * The bassoon hold of the beaver (design 5.3), the hold of a real bassoonist
  * (`docs/reference/wind-technique.md` 3): the bassoon lies diagonal in front of the body, the left
  * paw above the right paw, and the bocal brings the reed to the mouth at a nearly level angle. The
- * bassoon crosses the body from the right hip up past the left shoulder, 30° from the vertical in
- * the front view, with the bell above the head ({@link BEAVER_PLAY}). With the play turn of
- * {@link WIND_HOLDS}, it lies 54° from the vertical, near level from the side, with its top at the
- * shoulder. The reed lies near the tube (`BASSOON_REED` of `models/instruments/woodwinds.ts`), so
- * that the long joint passes beside the head in place of in front of the eye. At rest, the bassoon
- * moves 0.25 H forward and 0.2 H lower, so that its top comes down below the mouth, and takes its
- * bind turn ({@link BEAVER_REST}), so that the boot joint comes back toward the right thigh and
- * both paws keep their grips. With 0.05 H lower, the top stayed at the mouth. A real bassoonist
- * carries the boot at the right thigh with the boot joint in the right palm, and no source gives
- * the rest (`docs/reference/wind-technique.md` 3). With the diagonal of the play 0.2 H forward, the
- * right grip is 5.2 cm out of the reach of the right arm, and the right paw stands about 10 cm from
- * the boot joint. The left paw holds the wing joint high, and the right grip moves 0.15 H up the
- * boot joint (`gripShiftR`): at its grip of the instrument, the right paw misses by 1.4 cm. Each
- * grip moves toward the axis and to the side of its own shoulder, the left grip 0.1 H toward the
- * axis and 0.1 H across it toward the left shoulder, and the right grip 0.2 H toward the axis and
- * 0.14 H across it toward the right shoulder. Each palm then faces the tube from its own side
- * (`faceTube`), each paw aims a quarter toward the side across the tube (`aimSide`), the fingers
- * curl 100° over its front (`gripCurl`), and the thumbs point up the bassoon, so that both paws
- * grasp it (`pnpm wind-grip bassoonist`). With the grips behind the tube and a side aim of half,
- * each paw lies behind the tube with its palm to the audience and its thumb down the bassoon.
+ * bassoon crosses the body from the right hip up past the left shoulder, with the bell above the
+ * head ({@link BEAVER_PLAY}). The reed lies near the tube (`BASSOON_REED` of
+ * `models/instruments/woodwinds.ts`), so that the long joint passes beside the head in place of in
+ * front of the eye.
  *
- * The long muzzle and the front teeth put the tip of the nose far in front of the mouth, so the
- * reed sits 0.3 H lower and 0.31 H further back than the mouth of the bind pose, behind the tips of
- * the front teeth, between the lips, as the reed of a real bassoonist goes straight into the mouth
- * (`docs/reference/wind-technique.md` 3). With 0.28 H back, the left paw swings 71° on its forearm
- * in the play, over the limit of the arm gate. The beaver keeps its arms, so it plays a smaller
- * bassoon (`SpeciesParams.bassoonScale`), and each shoulder bone turns forward
- * ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a real player slides forward when the
- * arm reaches forward: with square shoulders, the right paw reaches its grip with 3 cm to spare
- * only on a bassoon of 0.75. The arms are round tubes free of the trunk, as a real bassoonist keeps
- * the elbows a little away from the body. So each elbow points further out than the elbow of the
- * old arm that the mesh joined to the trunk: the left elbow out, down, and a little back, and the
- * right elbow out, down, and forward. At rest, the left elbow points further out, and the right
- * elbow out and a little down: with the elbows of the play, the left forearm went 1.7 cm into the
- * belly at rest, and the right paw twisted 50° on its forearm. With the old elbows, the left upper
- * arm went 2.8 cm and the right upper arm 2.5 cm into the belly. With the left elbow further out,
- * the left paw swings more than 70° on its forearm in the play, and with the left elbow less far
- * back (0.1 back for each 1 down), it swings 71° with the reed between the lips. With the right
- * elbow higher in the play, the right paw turns more than 25° from its accepted grip.
+ * The Tripo beaver stands on short legs with no chair, and its arms are short: 0.20 m from the
+ * shoulder joint to the wrist joint. So it plays a small bassoon (`SpeciesParams.bassoonScale`),
+ * and each shoulder bone turns forward ({@link BEAVER_SHOULDER_TURN}), as the shoulder blade of a
+ * real player slides forward when the arm reaches forward. The arms are round tubes free of the
+ * trunk, as a real bassoonist keeps the elbows a little away from the body: the left elbow points
+ * out, down, and a little back, and the right elbow out, down, and forward. At rest, the left elbow
+ * points further out, and the right elbow out and a little down. With the left elbow less far out,
+ * the left paw twists 23° on its forearm in the play, against 8° now.
  *
- * The right fingers curl 120° around the boot joint, against 100° on the left: with 100°, the right
- * claws go 1.8 cm into the bassoon, against 1.0 cm with 120°.
+ * At rest, the bassoon moves 0.1 H forward and 0.1 H lower, so that its top comes down below the
+ * mouth, and takes its bind turn ({@link BEAVER_REST}), so that the boot joint comes back toward
+ * the right thigh and both paws keep their grips. With 0.2 H lower and 0.25 H forward, each paw
+ * missed its rest grip by 6.5 cm. A real bassoonist carries the boot at the right thigh with the
+ * boot joint in the right palm, and no source gives the rest (`docs/reference/wind-technique.md`
+ * 3). The left paw holds the wing joint high, and the right grip moves 0.15 H up the boot joint
+ * (`gripShiftR`). Each grip moves toward the axis and to the side of its own shoulder, the left
+ * grip 0.1 H toward the axis and 0.1 H across it toward the left shoulder, and the right grip
+ * 0.15 H toward the axis and 0.08 H across it toward the right shoulder. Each palm then faces the
+ * tube from its own side (`faceTube`), each paw aims a quarter toward the side across the tube
+ * (`aimSide`), the fingers curl over its front (`gripCurl`), and the thumbs point up the bassoon,
+ * so that both paws grasp it in each sample (`pnpm wind-grip bassoonist`). With the right grip
+ * 0.2 H toward the axis and 0.14 H across it, the right paw grasped in 67 % of the play samples.
+ *
+ * The big front teeth hang in front of the lower lip, so the reed sits 0.25 H lower and 0.24 H
+ * further back than the mouth of the bind pose (`lipShift`): at the lower lip, just behind the
+ * teeth, as the reed of a real bassoonist goes straight into the mouth
+ * (`docs/reference/wind-technique.md` 3). With 0.3 H lower and 0.31 H back, the reed ended at the
+ * lower tips of the teeth.
+ *
+ * The right fingers curl 120° around the boot joint, and the left fingers 110° around the wing
+ * joint. With 100°, the left paw grasped in no rest sample.
  */
 const BEAVER_BASSOON = {
   ...WIND_HOLDS.bassoon,
   reach: BEAVER_SHOULDER_TURN.right * MathUtils.DEG2RAD,
   reachL: BEAVER_SHOULDER_TURN.left * MathUtils.DEG2RAD,
-  lipShift: [0, -0.3, 0.31],
+  lipShift: [0, -0.25, 0.24],
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
-  restShift: [0, -0.2, -0.25],
-  poleL: [-0.75, -1, 0.2],
+  restShift: [0, -0.1, -0.1],
+  poleL: [-1.2, -1, 0.2],
   poleR: [1, -1, -0.5],
-  restPoleL: [-1.3, -1, 0],
+  restPoleL: [-1.6, -1, 0],
   restPoleR: [1, -0.5, 0],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.25, 0.25],
   gripShiftL: [0, 0.1, -0.1],
-  gripShiftR: [0.15, 0.2, -0.14],
+  gripShiftR: [0.15, 0.15, -0.08],
   restAim: 1,
-  gripCurl: curls(100, 120),
+  gripCurl: curls(110, 120),
 } as const satisfies WindHold;
 
 /** The turns of the horn of the pig around the mouthpiece, relative to the chest (design 5.3). */

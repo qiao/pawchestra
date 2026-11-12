@@ -484,7 +484,7 @@ The app follows these facts:
 - **The bassoon (3, `BEAVER_BASSOON`).** The bassoon lies diagonal from the right hip up past the
   left shoulder, with the bell above the head (`BEAVER_PLAY`, `bassoonParts()`). The left paw is
   high on the wing joint, and the right paw low on the boot joint. The bocal is near the level at
-  the reed, and the reed goes between the lips behind the tips of the front teeth (`lipShift`).
+  the reed, and the reed goes to the lower lip just behind the big front teeth (`lipShift`).
   The reed lies near the long joint (`BASSOON_REED`), so that the long joint passes beside the
   head. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
   free arms stay out of the belly (design 5.3).
@@ -561,8 +561,10 @@ The app does not follow these facts:
 - **The clarinet rest (3).** The bell rests on nothing. The round belly reaches the seat front, so
   an upright clarinet has no room on the seat, and on the right knee the left forearm goes into
   the belly.
-- **The bassoon (3).** The app has no strap. The beaver plays a smaller bassoon
-  (`SpeciesParams.bassoonScale`), so that it keeps its arms. No source gives the angle of the
+- **The bassoon (3).** The app has no strap. The Tripo beaver has short arms, so it plays a
+  bassoon of 0.55 (`SpeciesParams.bassoonScale`), its shoulders turn forward (`reach`,
+  `reachL`), and the boot joint turns up toward the right shoulder (`BEAVER_PLAY`). No source
+  gives the size of a small bassoon. No source gives the angle of the
   elbows: each elbow points as far out as the paw keeps its grip. No source gives the rest: the
   bassoon moves down off the mouth, with its top below the mouth and both paws on their grips
   (`BEAVER_REST`, `restShift`).
