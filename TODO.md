@@ -1339,6 +1339,31 @@ navigation menu at the top of the mockup is out of scope.
       (`src/models/props.ts`), and the close shots show them (4.6).
 - [ ] The mouse is a faceted body beside fur bodies in one frame. Check that a Tripo hand body of
       the mouse is in the body plan (4.3).
+- [ ] Fit the key shadow map to each close shot from the shot plan: a sphere around the subject
+      and the players between it and the light. Pose and draw only the players in that sphere or
+      the view. Now one map covers the whole stage (texel 11.8 mm, blur disc 11.8 cm on the high
+      tier), so a paw or a bow casts no shadow, and the shadow pass draws 65% of the triangles of
+      a close shot. Show the user a lineup (4.5, 9.7).
+- [ ] Read the full-size depth (`uSceneDepth`) for the depth of field mix in `FINAL_FRAGMENT`, and
+      take the mean of the mix weight at 4 points. Now the half-size depth gives steps of 2 pixels
+      at the outline of the subject, and 4 device pixels on a phone (4.5).
+- [ ] Load the body maps at half size on the medium and low tiers (a second file from the
+      `*-maps.py` tools, or the resize of `createImageBitmap()`). Now 14 color maps and 13 normal
+      maps take 386 MB of GPU memory on each tier, and a phone can lose the WebGL context. Later
+      test KTX2 with the transcoder after the first frame (2.6).
+- [ ] Put two steps between the medium and the low tier: medium at the pixel ratio 1.25, then 1.0.
+      Now one slow window of 2 s drops a phone to the low tier, with no bloom and no depth of
+      field, for the session (`src/scene/quality.ts`, `src/app/settings.ts`) (2.6).
+- [ ] Give the thin ears a warm light from behind: in `RIM_VERTEX`, a factor from the skin weights
+      of the ear bones. Show the user a lineup (4.5).
+- [ ] Ask the user for instrument surface detail: a wood grain from a 3D noise in bind space on the
+      `varnish` faces (no image file) and a clear coat. Design 4.1 keeps the plain parts of the
+      instruments flat. Make a lineup of one violin and one cello first (4.1).
+- [ ] After the shadow fit, make a proxy of about 1,500 triangles for one species in its chain,
+      and draw it in the shadow and depth passes. Measure with `pnpm frame`. Now each pass draws
+      about 360,000 triangles for 42 players (7.2, 9.7).
+- [ ] Fade the piano strings to their mean color beyond a distance (`fwidth()`). They make a moiré
+      at the pixel ratio 1 (4.6).
 - [ ] Give the cello and the contrabass the deeper ribs of the real instruments (about 0.16 of the
       body length), and check the holds of the dog and the hippo.
 - [ ] Slope the strings of the bowed strings down about 5° from the bridge to the nut, as on a real
