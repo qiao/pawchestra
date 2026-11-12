@@ -1,0 +1,255 @@
+{
+ "edits": [
+  {
+   "kind": "armStretch",
+   "k": 1.2,
+   "ramp": 0.01,
+   "reach": [
+    0.1,
+    0.12
+   ]
+  },
+  {
+   "kind": "paw",
+   "length": 0.8,
+   "wide": 0.8,
+   "thick": 1.0,
+   "ramp": 0.02,
+   "width": [
+    0,
+    0,
+    1
+   ],
+   "after": "autoWeights"
+  }
+ ],
+ "sourceTexture": "assets/models/panda/tripo-p2/panda.fbm/panda_basecolor.jpg",
+ "palm": [
+  0.127,
+  -0.992,
+  -0.016
+ ],
+ "ringEdges": 16,
+ "legTurns": [
+  25.0,
+  5.0,
+  0.0
+ ],
+ "chair": {
+  "halfWidth": 0.2,
+  "front": 0.08,
+  "back": -0.2,
+  "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The front edge lies seatGap units behind the knee joint of the bind (the property seat of the armature)."
+ },
+ "eyeBox": [
+  [
+   0.02,
+   0.8,
+   0.09
+  ],
+  [
+   0.08,
+   0.88,
+   0.16
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.032,
+   0.755,
+   0.18
+  ],
+  [
+   0.032,
+   0.815,
+   0.225
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.036 to 0.063 on the left, y 0.826 to 0.858, z 0.112 to 0.134). The nose box holds the dark nose (x -0.028 to 0.025, y 0.76 to 0.812, the front at z 0.213).",
+ "body": {
+  "crease": 180,
+  "seatWidth": 0.66
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.807249,
+ "eyeSize": 0.276502,
+ "rings": {
+  "arm": [
+   [
+    0.199,
+    0.219,
+    1
+   ],
+   [
+    0.219,
+    0.238,
+    1
+   ]
+  ],
+  "leg": [
+   [
+    0.115,
+    0.138,
+    1
+   ],
+   [
+    0.138,
+    0.158,
+    1
+   ]
+  ]
+ },
+ "rows": {
+  "start": 0.13,
+  "reach": 0.085,
+  "control": [
+   [
+    0.13,
+    0.4,
+    0
+   ],
+   [
+    0.14,
+    0.25,
+    0
+   ],
+   [
+    0.15,
+    0.12,
+    0
+   ],
+   [
+    0.16,
+    0.04,
+    0
+   ],
+   [
+    0.17,
+    0,
+    0
+   ],
+   [
+    0.2,
+    0,
+    0
+   ],
+   [
+    0.2125,
+    0,
+    0.25
+   ],
+   [
+    0.2275,
+    0,
+    0.75
+   ],
+   [
+    0.2425,
+    0,
+    0.75
+   ],
+   [
+    0.2575,
+    0,
+    0.25
+   ],
+   [
+    0.27,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.024,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "pawTurn": {
+  "L": -6,
+  "R": 5
+ },
+ "turnRings": [
+  0.2285,
+  0.238
+ ],
+ "seatGap": 0.09,
+ "earPlane": {
+  "points": [
+   [
+    0.072,
+    0.967,
+    -0.035
+   ],
+   [
+    0.137,
+    0.881,
+    -0.028
+   ],
+   [
+    0.081,
+    0.941,
+    0.019
+   ],
+   [
+    0.111,
+    0.927,
+    -0.068
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "texture": {
+  "path": "assets/models/panda/tripo-hand/panda-color.webp",
+  "plainSmall": 30
+ },
+ "smooth": false,
+ "trunk": null,
+ "hingeTurn": {},
+ "lids": {
+  "back": 135,
+  "psi": [
+   -60,
+   60
+  ],
+  "lam": [
+   -60,
+   65
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.15,
+  "strip": 1.12,
+  "angle": 125,
+  "srgb": [
+   52,
+   37,
+   30
+  ],
+  "uv": [
+   0.8772,
+   0.6533
+  ],
+  "density": 0.3,
+  "midClear": 0.003,
+  "lidClear": 0.002,
+  "refit": true
+ },
+ "belly": null,
+ "turnFit": 0.02,
+ "noseFur": true,
+ "tailBind": null,
+ "tailBindNote": "The tail is a round bump of the body at the back of the haunch. Its bones keep the directions of the source in the bind.",
+ "metersPerUnitNote": "TBD",
+ "jointsNote": "TBD",
+ "tailToHips": true,
+ "turnReach": 0.15
+}
