@@ -64,7 +64,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
-  it.
+  it. A script chain makes the `.blend` of each Tripo body except the bear.
 
 A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
 `pnpm glb-point-edits <file>` writes it into the rig file of its base commit. Test a
@@ -95,6 +95,10 @@ Steps 1 to 4 are the steps of the mesh rig. Steps 5 and 6 hold for each route.
 
 Design 4.4 ("Hand rig") gives the layout of the `.blend` and the folder of a trial. Export a trial
 only by path (`--blend <file> --out <file>`), never to `assets/models/<s>/`.
+
+The chain of a Tripo body lives in `tools/blender/hand/<s>/` (`tools/blender/hand/README.md`).
+Change the chain, never its `.blend`, and run `pnpm hand-chain <s>`. A size change is
+`metersPerUnit` in `params.json`. A worktree has the chain in git, so copy no scratch folder.
 
 In a live Blender, call only the functions of `studio_preview.py` (`sp`), `studio_armature.py`
 (`sa`), and `studio_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only.
