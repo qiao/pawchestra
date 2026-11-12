@@ -89,6 +89,8 @@ const BODY_LOOPS = 2;
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
+ * - The panda: 6 open loops, the cuts to the two upper arms, the open rims of the 2 eyeballs of the
+ *   Tripo panda, and the edges of the 2 lids.
  * - The penguin: 22 open loops, the cuts to the two upper arms, 18 open loops of the Tripo penguin
  *   (the 2 eye sockets, the open backs of the 2 eyeballs, 12 small holes of the feet, and 2 of the
  *   tail), and the edges of the 2 lids.
@@ -109,6 +111,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
   ['assets/models/penguin/tripo-hand/penguin.rig.glb', 22],
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
+  ['assets/models/panda/tripo-hand/panda.rig.glb', 6],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
 ]);
 
@@ -454,14 +457,14 @@ function pigBodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of the T-pose panda mesh: {@link BODY_BONES} with a cap on each
- * open loop ({@link PANDA_BODY_LOOPS}).
+ * The closed surface of the body of the panda: {@link BODY_BONES} with a cap on each open loop
+ * ({@link PANDA_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function pandaBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, PANDA_BODY_LOOPS);
+  return closedPart(posed, BODY_BONES, bodyLoops(posed, PANDA_BODY_LOOPS));
 }
 
 /** The seat of each player model, found one time for each model. */
