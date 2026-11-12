@@ -150,7 +150,8 @@ interface SpeciesParams {
   /**
    * The scale of an instrument of `SCALED_INSTRUMENTS` for the species (4.6), 1 by default.
    * Also `violaScale`, `celloScale`, `bassScale`, `fluteScale`, `oboeScale`,
-   * `clarinetScale`, `bassoonScale`, `trumpetScale`, `cymbalScale`, and `harpScale`.
+   * `clarinetScale`, `bassoonScale`, `trumpetScale`, `tromboneScale`, `cymbalScale`, and
+   * `harpScale`.
    */
   violinScale?: number;
   /** `'suspended'` for a species whose arms cannot hold hand cymbals (4.6). */
@@ -889,15 +890,18 @@ small folds of the source surface (`fold_relax()` of its build). Reason: the FBX
 them with the custom normals of the file, but the app makes its normals from the form, and the
 folds showed as dark triangles on the back and the cheeks. Its paws and elbow axes turn so that
 each part of each arm takes at most 45° in the moments of the bassoonist. Its arms are short, so
-it plays a smaller bassoon, and its hold turns both shoulders forward and the boot joint up toward
-the right shoulder (`BEAVER_BASSOON`, 5.3). The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
+it plays a smaller bassoon, and its hold turns both shoulders forward (`BEAVER_BASSOON`, 5.3).
+The bassoon is the largest at which both paws reach their grips with the boot joint in front of the
+round belly. The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
 trombonist, by the same rules. Its eyeballs keep the paint and the size of the source, with the
 finish `varnish` and a blink lid. Its front paws are smaller than in the source (the point edit
 `paw`), as on the Tripo wolf. Reason: against its short arms, the paws of the source read too
 large. Its round tail is a bump of the haunch, and it moves with the hips. Reason: the bone heat
 gave the tail bones shares of the lower back, and the bump swayed into the chair back. Each paw
 turns by whole ring steps, so that each part of each arm takes at most 45° in the moments of the
-trombonist. The Tripo fawn (`assets/models/deer/tripo-hand/`) is the body of the harpist, by the same rules. Its source
+trombonist. Its mouth lies far in front of its short arms, so it plays a smaller trombone
+(`tromboneScale`): a smaller trombone brings the slide brace nearer to the right shoulder, and
+the right arm reaches a longer part of the slide travel. The Tripo fawn (`assets/models/deer/tripo-hand/`) is the body of the harpist, by the same rules. Its source
 paints a full eye with a light on each eyeball, so the eyeballs take the finish `varnish`, no eye
 light, and a blink lid. Its eyeballs and their sockets are smaller than in the source, because the
 eye opening was about 0.18 of the head width in the play view, above the limit of about 0.14 of
@@ -1754,7 +1758,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, and near the stool (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its short arms need to reach the strings. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
-| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
+| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
 | Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
@@ -1973,8 +1977,9 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   with pearl buttons, the saddle of the first valve slide, and the ring of the third valve slide.
 - **Trombone.** The inner slide and its stockings are nickel silver. The outer slide is one bent
   tube with a ferrule at each open end and a dark bumper on its bow. The bell section has a short
-  tuning slide that ends beside the cheek (`TROMBONE_BACK`), with a counterweight on its bow, so
-  that it stays out of the big head of the panda with the slide toward the audience.
+  tuning slide that ends beside the cheek (`TROMBONE_BACK`), so that it stays out of the big head
+  of the panda with the slide toward the audience. The counterweight touches the outer side of the
+  bow, at the middle between its legs.
 - **Horn.** A double horn: the outer hoop widens in one spiral turn into the bell tail. Four
   rotary valves with silver caps and the levers of the left fingers, the loops of the F side and
   the B♭ side, and the valve slides.

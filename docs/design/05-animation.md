@@ -265,7 +265,11 @@ The rest of each family:
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the round bellies of the mouse, the beaver, and the pig cover their thighs. So these
-  instruments stay in front of the belly. The wolf sets the clarinet bell on the front of its
+  instruments stay in front of the belly. The beaver lowers the bassoon across its belly, flatter
+  than in the play, with the reed to the left below the chin (`BEAVER_BASSOON`). Reason: its short
+  arms reach no lower rest with both paws on the bassoon, and with the right paw alone on the
+  bassoon upright at its side, the bassoon went through the head in the lift and into the right
+  thigh in the lowering. The wolf sets the clarinet bell on the front of its
   right knee, with the right paw on the upper joint (`restGripShiftR`), as a seated clarinetist
   rests the bell on the knee (winds 3). A shared hold with rest arms
   (`WindHold.restArms`, `armRest()` of `pose/winds.ts`) rests from the hanging arms of the body:
@@ -602,12 +606,15 @@ The rest of each family:
   keys, as the fingers of a professional do (winds 7.4).
 - The trombone slide takes the position of the chart, the lowest one, or an alternate of a fast
   note that saves two positions of travel (`planSlide()`, `SLIDE_ALTERNATE`). The positions map
-  into the travel that the arm reaches, with the ratios of the real distances (`slideTravel()`).
-  The arms do not grow for the slide. The panda points the slide a little to the right of straight
-  ahead and down, toward the audience (`PANDA_PLAY`), lower than a real trombonist. Reason: at 45°
-  to the right, the slide pointed at the next panda, and the short arms of the Tripo panda reach
-  none of the travel with the slide straight ahead or a little down. The slide keeps clear of the
-  music desk.
+  into the travel that the arm reaches, by the ratios of the real distances (`slideTravel()`) and
+  a curve that spreads the near positions (`reachedShare()`). Reason: with the ratios alone, the
+  second position moved the slide of the panda about 1 cm, and the slide did not show the notes.
+  The arms do not grow for the slide. The panda plays a smaller trombone (4.6) and points the
+  slide a little to the right of straight ahead and down, toward the audience (`PANDA_PLAY`),
+  lower than a real trombonist. Reason: at 45° to the right, the slide pointed at the next panda,
+  at 20° the bell stood at the right knee, and the short arms of the Tripo panda reach none of the
+  travel of the trombone of the app with the slide straight ahead or a little down. The slide
+  keeps clear of the music desk.
 
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 
