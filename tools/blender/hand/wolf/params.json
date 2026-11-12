@@ -1,0 +1,268 @@
+{
+ "edits": [
+  {
+   "kind": "paw",
+   "length": 0.8,
+   "wide": 0.8,
+   "thick": 1.0,
+   "ramp": 0.02,
+   "width": [
+    0,
+    0,
+    1
+   ]
+  }
+ ],
+ "sourceTexture": "assets/models/wolf/tripo-p2/wolf.fbm/wolf_basecolor.jpg",
+ "palm": [
+  0.107,
+  -0.994,
+  0.016
+ ],
+ "ringEdges": 11,
+ "legTurns": [
+  25,
+  15,
+  0
+ ],
+ "tailBind": {
+  "tail": [
+   0,
+   -0.6428,
+   -0.766
+  ],
+  "tail_tip": [
+   0,
+   -0.9701,
+   -0.2425
+  ]
+ },
+ "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py), as on the wolf of main: the root goes 40 degrees below the level back over the back edge of the seat, and the tip hangs down behind the seat. In the source, the tail hangs down behind the legs.",
+ "chair": {
+  "halfWidth": 0.15,
+  "front": 0.12,
+  "back": -0.08,
+  "note": "The seat is level, and its top is the lowest point of the seated body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py). The front edge lies seatGap units behind the knee joint of the bind (the property seat of the armature). The half width holds the haunch (x -0.139 to 0.139)."
+ },
+ "eyeBox": [
+  [
+   0.02,
+   0.82,
+   0.11
+  ],
+  [
+   0.07,
+   0.87,
+   0.16
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.032,
+   0.778,
+   0.185
+  ],
+  [
+   0.032,
+   0.818,
+   0.245
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the painted eye of each side (x 0.029 to 0.064, y 0.829 to 0.858, z 0.123 to 0.145 in the source). The eyes are faces of the head surface, with no eyeball. The nose box holds the dark nose (x -0.029 to 0.029, y 0.778 to 0.813, the front at z 0.241).",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.77428,
+ "metersPerUnitNote": "The scale of the app: H (0.208109 units) is 0.369244 m, the H of the wolf of main (assets/models/wolf/wolf.rig.glb). The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the arms, and the legs keep the form of the source. The front paws are smaller than in the source (the edit paw of the build: 0.8 times as long and 0.8 times as wide past the wrist joint).",
+ "eyeSize": 0.208109,
+ "jointsNote": "The places are the places of the source, in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 11 vertices from x 0.124 to x 0.290, axis y 0.638 to 0.627, radius 0.057 to 0.035): the shoulder joint at x 0.10, at the trunk side (x 0.099 at y 0.62), the elbow at x 0.20, at the middle from the shoulder to the wrist, the wrist at x 0.30, where the paw widens, the knuckles at x 0.355, where the digits part, the tip at x 0.409. Leg (closed rings of 11 vertices from y 0.061 to y 0.255): the hip joint at (0.067, 0.29, 0.055) in the haunch, the knee at y 0.165, between the rings at y 0.150 and 0.172, the ankle at y 0.06, the ball of the foot at z 0.09, and the toe tips at z 0.142. Trunk: the spine bones lie at about 0.35 of the depth from the back. The neck is narrowest at y 0.68 to 0.72, and the chin is at y 0.74. Ears: the root at y 0.90, the tips at (0.077, 1.0, 0.088). Tail: a loose part of the source, from its root at (0, 0.42, -0.04) back and down to its tip at (0, 0.11, -0.19). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.31) is (0.107, -0.994, 0.016). The paw turn of the build turns it with the paw. The edit paw of the build moves the knuckle joint and the tip of each fingers bone with the paw: the config holds the mapped places.",
+ "rings": {
+  "arm": [
+   [
+    0.124,
+    0.15,
+    1
+   ],
+   [
+    0.15,
+    0.178,
+    1
+   ],
+   [
+    0.178,
+    0.208,
+    2
+   ],
+   [
+    0.208,
+    0.238,
+    2
+   ],
+   [
+    0.238,
+    0.267,
+    1
+   ],
+   [
+    0.267,
+    0.29,
+    1
+   ]
+  ],
+  "leg": [
+   [
+    0.135,
+    0.15,
+    1
+   ],
+   [
+    0.15,
+    0.172,
+    1
+   ],
+   [
+    0.172,
+    0.1975,
+    1
+   ]
+  ]
+ },
+ "rows": {
+  "start": 0.1,
+  "reach": 0.07,
+  "control": [
+   [
+    0.1,
+    0.4,
+    0
+   ],
+   [
+    0.11,
+    0.25,
+    0
+   ],
+   [
+    0.12,
+    0.12,
+    0
+   ],
+   [
+    0.13,
+    0.04,
+    0
+   ],
+   [
+    0.14,
+    0,
+    0
+   ],
+   [
+    0.165,
+    0,
+    0
+   ],
+   [
+    0.178,
+    0,
+    0.25
+   ],
+   [
+    0.193,
+    0,
+    0.75
+   ],
+   [
+    0.208,
+    0,
+    0.75
+   ],
+   [
+    0.223,
+    0,
+    0.25
+   ],
+   [
+    0.236,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.04,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   -0.01,
+   0.03
+  ],
+  "bend": 0.04
+ },
+ "seatGap": 0.05,
+ "hipJoint": [
+  [
+   0.067,
+   0.29,
+   0.055
+  ],
+  "shin_L"
+ ],
+ "texture": {
+  "path": "assets/models/wolf/tripo-hand/wolf-color.webp"
+ },
+ "smooth": false,
+ "eyeFaces": "tools/blender/hand/wolf/eye-centers.json",
+ "dropSmall": 100,
+ "pawTurn": {
+  "L": -2,
+  "R": 2
+ },
+ "turnRings": [
+  0.2786,
+  0.29
+ ],
+ "turnFit": 0.02,
+ "lids": {
+  "back": 135,
+  "psi": [
+   -55,
+   45
+  ],
+  "lam": [
+   -50,
+   62
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.17,
+  "strip": 1.035,
+  "angle": 126,
+  "srgb": [
+   203,
+   181,
+   161
+  ],
+  "uv": [
+   0.4189,
+   0.2041
+  ],
+  "density": 0.84
+ },
+ "noGloss": false,
+ "noseFur": true,
+ "headShift": [
+  0.0,
+  0.0,
+  -0.006106139
+ ]
+}
