@@ -592,8 +592,10 @@ The rest of each family:
   note that saves two positions of travel (`planSlide()`, `SLIDE_ALTERNATE`). The positions map
   into the travel that the arm reaches, with the ratios of the real distances (`slideTravel()`).
   The arms do not grow for the slide. The panda points the slide a little to the right of straight
-  ahead and a little down, toward the audience (`PANDA_PLAY`). Reason: at 45° to the right, the
-  slide pointed at the next panda, and straight ahead the arm reaches almost none of the travel.
+  ahead and down, toward the audience (`PANDA_PLAY`), lower than a real trombonist. Reason: at 45°
+  to the right, the slide pointed at the next panda, and the short arms of the Tripo panda reach
+  none of the travel with the slide straight ahead or a little down. The slide keeps clear of the
+  music desk.
 
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 

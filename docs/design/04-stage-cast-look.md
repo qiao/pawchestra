@@ -890,7 +890,14 @@ them with the custom normals of the file, but the app makes its normals from the
 folds showed as dark triangles on the back and the cheeks. Its paws and elbow axes turn so that
 each part of each arm takes at most 45° in the moments of the bassoonist. Its arms are short, so
 it plays a smaller bassoon, and its hold turns both shoulders forward and the boot joint up toward
-the right shoulder (`BEAVER_BASSOON`, 5.3). The paws of the fox turn about the
+the right shoulder (`BEAVER_BASSOON`, 5.3). The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
+trombonist, by the same rules. Its eyeballs keep the paint and the size of the source, with the
+finish `varnish` and a blink lid. Its front paws are smaller than in the source (the point edit
+`paw`), as on the Tripo wolf. Reason: against its short arms, the paws of the source read too
+large. Its round tail is a bump of the haunch, and it moves with the hips. Reason: the bone heat
+gave the tail bones shares of the lower back, and the bump swayed into the chair back. Each paw
+turns by whole ring steps, so that each part of each arm takes at most 45° in the moments of the
+trombonist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -973,14 +980,15 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   so that more of each thigh lies on the seat. Reason: with flat feet, the seat was low, and only
   the haunch sat on it. A higher seat moved players in the sight pass of the layout (4.5), so the
   seat takes the largest height with no move.
-- The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
-  the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
-  thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
-  old panda. The vertical shin lifts the seat by its full length and the sloped thigh by less
-  than half, so the shin grows more than the thigh (`shinFactor`). Its head is smaller than the
-  head of the mesh (`headFactor`), so that the head has the width of the old head for its height.
-  The smaller head moves the mouth back, so the trombone hold of the panda puts the
-  right elbow further out and the rest place further forward (5.2, 5.3).
+- The Tripo panda keeps the short, thick legs of its mesh, and its bind keeps the leg turns of the
+  panda of the old mesh: the thighs slope down and the shins stand vertical, with flat feet. So
+  its chair is low, and the front edge of the seat lies about one shin radius behind the knees,
+  so that no shin lies over the seat. Its round haunch is wider than the chair of the app, so it
+  sits on a wider chair (`seatWidth`), and the chair is deep enough that its round tail lies in
+  front of the chair back. Reason: steeper thighs or raised heels add little height under the
+  round haunch, and the seat height and the chair size move no player of the layout (4.5). The
+  larger body of the Tripo panda at the same H moves the players of the four demos with
+  trombones.
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey stands erect, as a brass
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
