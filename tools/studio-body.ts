@@ -281,8 +281,9 @@ const FOX_TEXTURE_COLORS: SpeciesColors = {
 export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalEntry>([
   // The bear conductor: the candidate hand rig of the Tripo P2 mesh
   // (`assets/models/bear/tripo-hand/bear.blend`), with no arm cut and no limb stretch. Its `.blend`
-  // holds the facts of the body: the scale that keeps H of the bear of `bear-tpose.rig.glb`, and
-  // the crease angle 40° and the color blend 0.05 of that bear. It stands on the podium.
+  // holds the facts of the body: the scale that keeps H of the bear of `bear-tpose.rig.glb` at
+  // cbc8db5e4, and the crease angle 40° and the color blend 0.05 of that bear. It stands on the
+  // podium.
   [
     'bear',
     {
@@ -367,9 +368,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   ],
   // The cello dog (design 4.4): the candidate hand rig of the Tripo P2 beagle
   // (`assets/models/dog/tripo-hand/dog.blend`), with no arm cut and no arm stretch. Its `.blend`
-  // holds the facts of the body: the scale that keeps H of the dog of `dog.rig.glb`, and the
-  // crease angle 180°. The map paints the iris and a light on each eyeball of the source, so the
-  // eyes take the finish `varnish` and no eye light.
+  // holds the facts of the body: the scale that keeps H of the dog of `dog.rig.glb` at cbc8db5e4,
+  // and the crease angle 180°. The map paints the iris and a light on each eyeball of the source,
+  // so the eyes take the finish `varnish` and no eye light.
   [
     'dog',
     {
@@ -384,9 +385,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // The trombone panda (design 4.4): the hand rig of the Tripo P2 mesh
   // (`assets/models/panda/tripo-hand/panda.blend`), by the route of the Tripo wolf, with no arm cut
   // and no arm stretch. It stands as a soloist. Its `.blend` holds the facts of the body: the scale
-  // that keeps H of the panda of `panda.rig.glb`, and the crease angle 180°. The map paints the iris
-  // and a light on each eyeball of the source, so the eyes take the finish `varnish` and no eye
-  // light.
+  // that keeps H of the panda of `panda.rig.glb` at cbc8db5e4, and the crease angle 180°. The map
+  // paints the iris and a light on each eyeball of the source, so the eyes take the finish
+  // `varnish` and no eye light.
   [
     'panda',
     {
@@ -401,9 +402,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // The contrabass hippo (design 4.4): the candidate hand rig of the Tripo P2 mesh
   // (`assets/models/hippo/tripo-hand/hippo.blend`), with no arm cut and no arm stretch. It stands
   // at its contrabass in the pose of the source. Its `.blend` holds the facts of the body: the
-  // scale that keeps H of the hippo of `hippo.rig.glb`, and the crease angle 180°. The map paints
-  // the iris and a light on each eyeball of the source, so the eyes take the finish `varnish` and
-  // no eye light.
+  // scale that keeps H of the hippo of `hippo.rig.glb` at cbc8db5e4, and the crease angle 180°. The
+  // map paints the iris and a light on each eyeball of the source, so the eyes take the finish
+  // `varnish` and no eye light.
   [
     'hippo',
     {
@@ -432,9 +433,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/elephant/tripo-hand/elephant.blend`), by the route of the Tripo wolf, with no
   // arm cut and no arm stretch. It stands at its timpani in the stance of its bind, with the center
   // of mass over the middle of the soles. Its `.blend` holds the facts of the body: the scale that
-  // keeps H of the elephant of `elephant.rig.glb`, the crease angle 180°, and the lowest height of
-  // the head measures, so that the trunk stays out of them. The source paints no light in the
-  // eyes, so the eyes take the finish `eye` and the eye light.
+  // keeps H of the elephant of `elephant.rig.glb` at cbc8db5e4, the crease angle 180°, and the
+  // lowest height of the head measures, so that the trunk stays out of them. The source paints no
+  // light in the eyes, so the eyes take the finish `eye` and the eye light.
   [
     'elephant',
     {
@@ -449,8 +450,8 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // (`assets/models/beaver/tripo-hand/beaver.blend`), by the route of the Tripo wolf, with no arm
   // cut and no arm stretch. It has no chair, and it stands on its short legs in the pose of the
   // source. Its `.blend` holds the facts of the body: the scale that keeps H of the beaver of
-  // `beaver.rig.glb`, and the crease angle 180°. The map paints the iris and a light on each
-  // eyeball of the source, so the eyes take the finish `varnish` and no eye light.
+  // `beaver.rig.glb` at cbc8db5e4, and the crease angle 180°. The map paints the iris and a light
+  // on each eyeball of the source, so the eyes take the finish `varnish` and no eye light.
   [
     'beaver',
     {
@@ -464,9 +465,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   ],
   // The horn pig (design 4.4): the hand rig of the Tripo P2 mesh
   // (`assets/models/pig/tripo-hand/pig.blend`), by the route of the Tripo wolf, with no arm cut and
-  // no arm stretch. It stands as a soloist. Its `.blend` holds the facts of the body: the scale that
-  // keeps H of the pig of `pig.rig.glb`, and the crease angle 180°. The source paints no light in
-  // the eyes, so the eyes take the finish `eye` and the eye light.
+  // no arm stretch. It stands as a soloist. Its `.blend` holds the facts of the body: the scale
+  // that keeps H of the pig of `pig.rig.glb` at cbc8db5e4, and the crease angle 180°. The source
+  // paints no light in the eyes, so the eyes take the finish `eye` and the eye light.
   [
     'pig',
     {
@@ -479,9 +480,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   ],
   // The clarinet wolf (design 4.4): the candidate hand rig of the Tripo P2 mesh
   // (`assets/models/wolf/tripo-hand/wolf.blend`), with no arm cut and no arm stretch. Its `.blend`
-  // holds the facts of the body: the scale that keeps H of the wolf of `wolf.rig.glb`, and the
-  // crease angle 55°. The map paints each eye on faces of the head with a light, so the eyes take
-  // the finish `varnish` and no eye light.
+  // holds the facts of the body: the scale that keeps H of the wolf of `wolf.rig.glb` at cbc8db5e4,
+  // and the crease angle 55°. The map paints each eye on faces of the head with a light, so the
+  // eyes take the finish `varnish` and no eye light.
   [
     'wolf',
     {
@@ -524,13 +525,13 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The trumpet monkey (design 4.4): the candidate hand rig of the Tripo P2 macaque
-  // (`assets/models/monkey/tripo-hand/monkey.blend`), with no arm cut and no arm stretch. It
-  // stands as a soloist. Its `.blend` holds the facts of the body: the scale of 1.2 times the H of
-  // the monkey of `monkey.rig.glb`, and the crease angle 180°. The map paints a full eye with a
-  // light on each eyeball, so the eyes take the finish `varnish` and no eye light. It has no chair,
-  // and its bind stands with the center of mass over the middle of the soles. So the soloist keeps
-  // the bind stance. Reason: the straight legs of the sheet put the center of mass 2.8 cm behind
-  // the middle of the soles.
+  // (`assets/models/monkey/tripo-hand/monkey.blend`), with no arm cut and no arm stretch. It stands
+  // as a soloist. Its `.blend` holds the facts of the body: the scale of 1.2 times the H of the
+  // monkey of `monkey.rig.glb` at cbc8db5e4, and the crease angle 180°. The map paints a full eye
+  // with a light on each eyeball, so the eyes take the finish `varnish` and no eye light. It has no
+  // chair, and its bind stands with the center of mass over the middle of the soles. So the soloist
+  // keeps the bind stance. Reason: the straight legs of the sheet put the center of mass 2.8 cm
+  // behind the middle of the soles.
   [
     'monkey',
     {
@@ -571,9 +572,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // and no arm stretch. It sits on the stool of the harp, and the harp soloist keeps the stool, so
   // it does not stand. Its `.blend` holds the facts of the body: the scale at which the seated
   // crown meets the seated crown of the Tripo wolf (1.3 times the scale of the standing shoulders
-  // of the deer of `deer.rig.glb`), the crease angle 180°, and the width of the stool. The map
-  // paints a full eye with a light on each eyeball, so the eyes take the finish `varnish` and no
-  // eye light.
+  // of the deer of `deer.rig.glb` at cbc8db5e4), the crease angle 180°, and the width of the stool.
+  // The map paints a full eye with a light on each eyeball, so the eyes take the finish `varnish`
+  // and no eye light.
   [
     'deer',
     {
@@ -586,10 +587,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
     },
   ],
   // The choir penguin (design 4.4): the hand rig of the Tripo P2 penguin
-  // (`assets/models/penguin/tripo-hand/penguin.blend`), with no flipper cut and no flipper
-  // stretch. It stands on its riser, so the export keeps the standing pose of the rig. Its `.blend`
-  // holds the facts of the body: the scale that keeps H of the penguin of `penguin.rig.glb`, and
-  // the crease angle 180°. The map paints a full eye with a light on each eyeball, so the eyes
+  // (`assets/models/penguin/tripo-hand/penguin.blend`), with no flipper cut and no flipper stretch.
+  // It stands on its riser, so the export keeps the standing pose of the rig. Its `.blend` holds
+  // the facts of the body: the scale that keeps H of the penguin of `penguin.rig.glb` at cbc8db5e4,
+  // and the crease angle 180°. The map paints a full eye with a light on each eyeball, so the eyes
   // take the finish `varnish` and no eye light.
   [
     'penguin',
