@@ -823,8 +823,14 @@ const SHOULDER_HOLD = {
  * near the jaw goes 1.9 cm into the body: with 0.1 H to the front, it goes 2.1 cm in, and with
  * 0.1 H up and 0.2 H to the front, 2.6 cm. In the middle of the move, the bow tip points to the
  * left, down, and to the front, (-1, -0.6, -0.5), with the hair in and a little down,
- * (-1, -0.3, 0), and the grip moves 0.4 H out and 0.5 H to the front (`restBow.via`), so that the
- * tip passes below the snout, in front of the belly, and to the left of the violin. With the tip
+ * (-1, -0.3, 0), and the grip moves 0.2 H out, 0.5 H up, and 0.1 H to the front (`restBow.via`),
+ * so that the tip passes below the snout, in front of the belly, and to the left of the violin.
+ * The rest grip is out of the reach of the short arm, so the arm hangs straight at rest. The grip
+ * moves up toward the shoulder in the move, so that the wrist comes into the reach at 0.3 of the
+ * lift and the elbow bends over the rest of the move. With the grip 0.4 H out and 0.5 H to the
+ * front, the wrist was 1.55 arm lengths from the shoulder in the middle of the move: the arm stayed
+ * straight up to 0.7 of the lift, and then the elbow bent 22° in 1/60 s, so that the forearm
+ * turned 29° in one frame of 1/30 s. With the tip
  * forward and a little up, (0.4, 0.3, -1), the bow stood up across the snout and the mouth in the
  * middle of each move. With the tip (-1, -0.2, -0.8) and the grip 0.3 H to the front, the bow went
  * 1.6 cm into the violin in a lowering. With the hair of the via down, (0, -1, 0), and of the rest
@@ -909,7 +915,7 @@ const FOX_HOLD = {
     lap: { along: 0.5, offset: [0.2, 0, -0.3] },
     tip: [0.1, 1, -0.2],
     hair: [-1, 0, -1],
-    via: { tip: [-1, -0.6, -0.5], hair: [-1, -0.3, 0], reach: [0.4, 0, -0.5] },
+    via: { tip: [-1, -0.6, -0.5], hair: [-1, -0.3, 0], reach: [0.2, 0.5, -0.1] },
   },
 } as const satisfies BowedHold;
 
