@@ -407,23 +407,27 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The slide angle (1.1, 1.4).** The slide points toward the audience, 35° below the level and
+- **The slide angle (1.1, 1.4).** The slide points toward the audience, 40° below the level and
   10° to the right (`PANDA_PLAY`), lower than the small angle below the level of a real player.
   The mouth of the panda lies far in front of its short arms: with the slide straight ahead or at
   25° below the level, the right arm reaches a small part of the slide travel.
-- **The size (1.2).** The panda plays a trombone of 0.75 of the trombone of the app
-  (`tromboneScale`), so that the slide brace comes nearer to the right shoulder. No source gives
-  the size of a small trombone.
+- **The size (1.2).** The panda plays the trombone of the app, 0.83 m long, about 0.5 of the
+  seated panda. A real trombone is about 1.7 times a clarinet and nearer to 0.85 of a seated
+  player. The upper arms and the forearms of the panda are 1.2 times those of its source
+  (`assets/models/panda/README.md`), so that the right arm reaches a part of the travel.
 - **The tuning slide (1.1).** The bell section ends beside the cheek (`TROMBONE_BACK`), in place of
   over the left shoulder. The big head of the panda puts the cheeks beside the mouthpiece, and a
   real bell section went into the head.
 - **The slide reach (1.2).** The slide travel is a small part of the real travel, with the right
   arm straight at the seventh position (`slideReachOf()`). The paw at the far side of the brace
   keeps the palm off the audience, and costs a part of the reach. The right paw holds the brace
-  below its middle, and the right shoulder turns forward, so that the arm reaches a part of the
-  travel (`gripShiftR`, `reach`). A grip lower on the brace leaves the brace out of the paw. The
-  near positions take a larger share of the reached travel than of the real travel
-  (`reachedShare()`), so that a move to the second position shows.
+  below its middle, and the right shoulder turns forward, so that the arm reaches 13.5 cm of the
+  travel (`gripShiftR`, `reach`). A grip lower on the brace leaves the brace out of the paw. In the
+  first position, the right paw holds the brace below and in front of the left paw, with a gap
+  between them. The near positions take a larger share of the reached travel than of the real
+  travel (`reachedShare()`): the slide moves 4.1 cm in the second position, 10.1 cm in the fourth,
+  and 13.5 cm in the seventh. A real player leans the chest forward in the far positions. In the
+  app, the mouthpiece follows the chest, so a lean adds no reach, and the chest does not lean.
 - **The alternate positions (1.3).** The app has none.
 - **The arm (1.4).** The two-bone IK moves the elbow most, with no lead of the wrist (`armRig()`).
 - **The rest place (1.7).** No source gives where an orchestral trombonist holds the trombone in a
@@ -500,7 +504,8 @@ The app follows these facts:
   the reed, and the reed goes into the mouth between the lips, behind the big front teeth
   (`lipShift`).
   The reed lies near the long joint (`BASSOON_REED`), so that the long joint passes beside the
-  head. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
+  head, and the left side of the bassoon turns forward (`BEAVER_PLAY_TURN`), so that the bell
+  rises at the left of the line of sight, in front of the eye. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round
   free arms stay out of the belly (design 5.3).
 - **The horn (2.2, `PIG_HORN`).** The left paw presses the valves at the middle of the body. The
   horn lies across the body, with the bell at the right of the torso, open to the back and to the
@@ -578,7 +583,9 @@ The app does not follow these facts:
 - **The bassoon (3).** The app has no strap. The Tripo beaver has short arms, so it plays a
   bassoon of 0.7 (`SpeciesParams.bassoonScale`), its shoulders turn forward (`reach`,
   `reachL`), and the boot joint turns forward of the round belly (`BEAVER_PLAY`). The bell top
-  stays a little below the top of the head, in place of above it. No source gives the size of a
+  stays 7.9 cm below the top of the head, above the eyes, in place of above the head. The boot
+  joint holds both bores and is wide, so the right paw holds it high and from the side of the right
+  shoulder (`gripShiftR`), and the claws stay out of it. No source gives the size of a
   small bassoon. No source gives the angle of the elbows: each elbow points as far out as the paw
   keeps its grip. No source gives the rest: the bocal leaves the mouth, and the bassoon lies lower
   and flatter across the belly, with both paws on their grips (`BEAVER_REST`, `restShift`). The
