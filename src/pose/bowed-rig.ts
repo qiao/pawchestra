@@ -1373,9 +1373,14 @@ const CAT_HOLD = {
  *   strings (`gapL`) of 1.5 cm kept the claws further out of the neck, but the paw then bent
  *   sideways on the wrist up to 79° (p95) in the play.
  * - The bow paw turns in the plane of its palm around the grip on the stick, so that the forearm
- *   keeps 26° in that plane (`stickTurnR`), as on the hippo. With no turn, the bow paw flipped by
- *   about 180° on its forearm in 1.4% of the play samples in front of the chest, such as at
- *   119.75 s of `beethoven-1` (`pnpm arm-check cellist`, paw jumps).
+ *   stays on the line of the palm in that plane (`stickTurnR`), as on the hippo. With no turn, the
+ *   bow paw flipped by about 180° on its forearm in 1.4% of the play samples in front of the
+ *   chest, such as at 119.75 s of `beethoven-1` (`pnpm arm-check cellist`, paw jumps). With the
+ *   bow grip of the dog at the finger tips (`SpeciesParams.bowGrip`), a forearm angle of 26° bent
+ *   the bow elbow further, and the right arm folded 10 faces (p95, limit 8, 4 with 0°).
+ * - The right fingers curl 65° around the stick (`curlR`), so that the finger tips of the short
+ *   paw close over it, as the fingers of a cellist drape over the stick. With 75° or more, the
+ *   skin of the right knuckles folds over in each play sample.
  * - The left paw tilts 45° over the neck (`tiltL`): with the 55° of {@link CELLO_HOLD}, the left
  *   forearm of the Tripo beagle twists 46° in the play (43° with 45°).
  */
@@ -1393,7 +1398,8 @@ const DOG_HOLD = {
   poleL: [-1, -0.25, 0],
   highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
-  stickTurnR: { forearm: 26 * MathUtils.DEG2RAD, most: 90 * MathUtils.DEG2RAD },
+  stickTurnR: { forearm: 0, most: 90 * MathUtils.DEG2RAD },
+  curlR: 65 * MathUtils.DEG2RAD,
   roundArms: null,
   girthFit: null,
   restPlace: 0.3,
