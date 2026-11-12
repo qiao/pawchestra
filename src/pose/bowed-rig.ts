@@ -1486,47 +1486,50 @@ const HIPPO_HOLD = {
  * elbow of the Tripo P2 hand rig (design 4.4, 5.3). In the play, the left elbow comes in under
  * the violin, straight down and forward, (0, -1, -0.5), as a real violinist swings the left elbow
  * under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
- * elbow points out, down, and a little back, (-1, -0.9, -0.2), and the left paw turns 65° about
- * the forearm, in place of the 20° of the shoulder hold. The two elbows and the rest turn move a
- * part of the turn of the left paw from the forearm to the upper arm. With the small violin of
- * the second Tripo rabbit and the rest elbow (-1, -0.6, 0) of the first, the left upper arm
- * rolled 53° at rest. Each part of each arm now takes at most 42° of roll or twist in the moments
- * of the violinist (assets/models/rabbit/README.md, "Arm twist").
+ * elbow points out, down, and a little back, (-1, -0.9, -0.2). The two elbows and the rest turn
+ * move a part of the turn of the left paw from the forearm to the upper arm. Each part of each
+ * arm of the third Tripo rabbit takes at most 43° of roll or twist in the moments of the
+ * violinist (assets/models/rabbit/README.md, "Arm twist").
  *
  * The violin lies about level, as a real player holds it (`docs/reference/string-technique.md`,
  * section 1.10): the top plate turns 25° toward up (`violinTurn(-20, 5, 25)`), so that it tilts
  * only 25° down toward the right. With the 50° of the chin hold, the violin read as upright on the
  * chest, and the bow at the frog stood up beside the face. The violin sits 0.03 H higher than in
  * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
- * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.75
- * (`SpeciesParams.violinScale`) from 0.63 of its length (0.25 with the violin of 0.6).
+ * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.9
+ * (`SpeciesParams.violinScale`) from 0.67 of its length.
  *
- * At rest, the arms take the rest of the shared violin hold (`restArms` of {@link VIOLIN_HOLD}):
- * they hang out to the sides until they clear the body, and the elbows bend forward, so that the
- * paws hold the upright violin and the bow near the body. With the lap places of the shoulder hold
- * at the knees of the new body, both arms reached nearly straight forward. The left paw then turns
- * 65° in the plane of its palm (`restPawTurnL`), so that the left forearm twists 43° at rest (45°
- * with 55°, 47° with 40°).
+ * At rest, the right arm takes the rest of the shared violin hold (`restArms` of
+ * {@link VIOLIN_HOLD}): it hangs out to the side until it clears the body, and the elbow bends
+ * forward. The left upper arm hangs 49° forward and the left elbow bends 63°, so that the paw
+ * holds the upright violin of 0.9 over the lap: with the 20° and 80° of the shared hold, the
+ * lower end of the violin went 5.6 cm into the lap (`pnpm hold-fit violinist --scan`). The left
+ * paw then turns 95° in the plane of its palm (`restPawTurnL`), so that the left forearm twists
+ * 42° at rest (58° with 65°).
  *
  * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
  * front (`liftReach`), so that the violin passes over the belly: with the move of the shoulder
  * hold, 0.15 H in, 0.15 H up, and 0.15 H to the front, the violin went 5.2 cm into the belly in a
- * lowering of `bach-bwv1050`, and with this move, 2.7 cm, the depth of the rest. At rest, the bow
- * tip points up, out, and forward, (0.7, 0.8, -0.6), so that the bow lies beside the right knee:
- * with the upright tip of the shoulder hold, (0.2, 1, -0.1), the stick crossed the face in the
- * view from the front right. The right paw then twists 27° on its forearm at rest.
+ * lowering of `bach-bwv1050`. At rest, the bow tip points up, out, and forward, (0.7, 0.8, -0.6),
+ * so that the bow lies beside the right knee: with the upright tip of the shoulder hold, (0.2, 1,
+ * -0.1), the stick crossed the face in the view from the front right. The hair faces down and a
+ * little out, (0.3, -0.1, -1), so that the right paw twists 42° on its forearm at rest and bends
+ * 49° on it: with the hair of the shoulder hold, (0, 0, -1), the twist was 50°.
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
   playShift: [-0.054, -0.06, 0.185],
   playTurn: violinTurn(-20, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
-  restArms: VIOLIN_HOLD.restArms,
+  restArms: {
+    L: { forward: 49 * MathUtils.DEG2RAD, bend: 63 * MathUtils.DEG2RAD },
+    R: VIOLIN_HOLD.restArms.R,
+  },
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
-  restPawTurnL: 65 * MathUtils.DEG2RAD,
+  restPawTurnL: 95 * MathUtils.DEG2RAD,
   liftReach: [0, 0.3, -0.15],
-  restBow: { ...SHOULDER_HOLD.restBow, tip: [0.7, 0.8, -0.6] },
+  restBow: { ...SHOULDER_HOLD.restBow, tip: [0.7, 0.8, -0.6], hair: [0.3, -0.1, -1] },
 } as const satisfies BowedHold;
 
 /**
