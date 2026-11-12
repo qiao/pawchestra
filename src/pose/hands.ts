@@ -332,11 +332,12 @@ export const HANDS_HOLDS = {
     sideLeanMax: 0,
     shoulderDrop: 0,
     // The right hand reaches around the soundbox down to about G2, the lowest line of the bass
-    // staff, and the left hand plays up to about C5 (`docs/reference/harp-technique.md`, section
-    // 7.9). With no limit, the left hand played up to D6, where the left paw stands 0.22 m above
+    // staff, and the left hand plays up to D4 (`docs/reference/harp-technique.md`, section 7.9).
+    // The near harp of the short arms of the Tripo fawn puts the treble strings near its chest:
+    // with the limit G4, the left paw went 6.2 cm into the chest, and with D4 2.6 cm. With no limit, the left hand played up to D6, where the left paw stands 0.22 m above
     // the short treble strings, at the neck. One hand reaches a tenth (16 semitones) and plays at
     // most four strings (section 7.4).
-    reach: { leftHighest: 72, rightLowest: 43 },
+    reach: { leftHighest: 62, rightLowest: 43 },
     span: 16,
     most: HARP_FINGERING.fingers,
     apart: 0,
@@ -358,8 +359,8 @@ export const HANDS_HOLDS = {
     // thigh and 0.5 H above it: on the top of the thigh, the elbows went 4.2 cm into the belly at
     // rest, and 0.1 H above it the arms were straight (180°). A palm near the hip (`along` 0.7) put
     // the paws on the hips with the elbows out (`pnpm pose-depth harpist`). The right palm of the
-    // rest turns a little to the right (x -0.3), so that the right forearm of the Tripo fawn
-    // twists at most 45° from the bind: -40° at rest and 39° in a chord. With x 0, it twisted -47°
+    // rest turns a little to the right (x -0.4), so that the right forearm of the Tripo fawn
+    // twists at most 45° from the bind: -42° at rest and 45° in a chord. With x 0, it twisted -47°
     // at rest (`pnpm pose-preview harpist`).
     restL: {
       lap: { along: 1, offset: [-0.35, 0.5, -0.25] },
@@ -369,7 +370,7 @@ export const HANDS_HOLDS = {
     },
     restR: {
       lap: { along: 1, offset: [0.35, 0.5, -0.25] },
-      palm: [-0.3, -0.8, 1],
+      palm: [-0.4, -0.8, 1],
       fingers: [-0.2, -1, -0.8],
       pole: [0.4, -1, 0.3],
     },
