@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Usage: tools/round-checks.sh [--fast] [<log dir>]
 #
-# Runs the end checks of a round (AGENTS.md, "Checks") in the checkout of this script: the
-# typecheck, the lint, the format check, the build, the size, and the smoke test. Each check runs
-# alone and writes its output to <log dir>/<check>.log (default scratch/checks/). The script prints
-# one line `<check> exit <n>` for each check, and it continues after a failure. The size check reads
-# the output of the build, so it does not run after a failed build. --fast does not run the smoke
-# test. Use it for a change with no effect on the app or the UI.
+# Runs the end checks of a round (AGENTS.md, "Checks") in the git checkout of the current folder:
+# the typecheck, the lint, the format check, the build, the size, and the smoke test. Each check
+# runs alone and writes its output to <log dir>/<check>.log. The log folder is relative to the
+# root of the checkout (default scratch/checks/). The script prints one line `<check> exit <n>`
+# for each check, and it continues after a failure. The size check reads the output of the build,
+# so it does not run after a failed build. --fast does not run the smoke test. Use it for a change
+# with no effect on the app or the UI.
 #
 # Exit codes: 0 all checks passed, 1 one or more checks failed, 2 bad use.
 set -uo pipefail
@@ -22,7 +23,7 @@ if [ $# -gt 1 ] || [ "${1:-}" = -h ] || [ "${1:-}" = --help ]; then
 fi
 LOG_DIR=${1:-scratch/checks}
 
-cd "$(dirname "$0")/.."
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p "$LOG_DIR"
 
 FAILED=()
