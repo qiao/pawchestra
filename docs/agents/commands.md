@@ -34,7 +34,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 | `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html`, the test page of one role at `/test#<species>-<instrument>` (design 7.1), and a demo at `/#demo=<id>`. |
 | `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). A second pass (`vite build --mode test-page`) adds the test page (design 7.1). `PAWCHESTRA_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). |
 | `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). |
-| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `pawchestra` (design 9.2). Code: `tools/deploy-vercel.sh`. |
+| `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `pawchestra` (design 9.2). `--preview` also points `pawchestra-preview.vercel.app` to the deploy. Production only with the approval of the user. Code: `tools/deploy-vercel.sh`. |
 | `pnpm load-probe [--phone] [--base <ref>]` | Measures the load of the default demo after `pnpm build`: FCP, LCP, the first frame, the time until play is ready, and the bytes. |
 | `pnpm lighthouse [--quick]` | Audits the page with the pinned Lighthouse after `pnpm build`. |
 | `pnpm typecheck` | Runs `tsc` with no output files. |
@@ -115,6 +115,7 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | `pnpm mixamo-import <file> --out <dir>`, `pnpm mixamo-model <file> --out <dir>` | Converts a Mixamo file into a GLB file in meters with one animation for each take, or writes the inputs of `rig-mesh` from a Mixamo-rigged mesh (design 4.4). The folder must be one that git ignores (design 8.1). |
 | `pnpm glb-point-edits <edits.json> [--out <file.glb>]` | Writes the point edits of an edit file into the rig GLB file of its base commit (design 4.4). It stops at another SHA-256 of the base. `--out` writes a trial file for `--glb`. |
 | `pnpm studio-body <animal> [--inspect]`, or `--heights` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender, and then `src/models/studio-heights.ts`. `--heights` writes only the heights file. `--inspect` prints the joints and the clips. |
+| `pnpm regen-studio [<animal>...]`, or `--heights` | Runs `studio-body` for each animal (default: all) and `--heights`, and prints `same`, `DIFF`, `NEW`, or `FAIL` for each file against `HEAD`. Code: `tools/regen-studio.sh`. |
 | `pnpm view-point [<x>,<y>,<z>]...` | Projects each point into the default view with no render, and prints its pixel and its depth. |
 
 ## Tests and scripts
@@ -129,20 +130,20 @@ All tests are paused ([`workflow.md`](workflow.md), "Tests").
 | `pnpm test:e2e` | Runs the Playwright tests of `e2e/*.e2e.ts` on the built site, on the port `PAWCHESTRA_E2E_PORT` (4182 by default). |
 | `pnpm e2e-base <ref>` | Runs the Chromium e2e tests on the working tree and on `<ref>`, and prints the failures of the tree that pass on the base. |
 | `pnpm smoke` | Runs the smoke test on the Vite dev server: the bow arm of a violin and the camera modes. |
+| `pnpm round-checks [--fast] [<log dir>]` | Runs the end checks of a round (`AGENTS.md`, "Checks") one at a time, each into `<log dir>/<check>.log` (default `scratch/checks/`), and prints `<check> exit <n>`. `--fast` skips the smoke test. Exit code 1 when a check failed. Code: `tools/round-checks.sh`. |
 | `pnpm frame [--demo=<id>]` | Measures the frame target of design 9.7 in Google Chrome with a Metal System Trace (`tools/measure-frame.ts`). About 3 minutes. |
 | `pnpm frozen [--base <ref>]` | Renders the four frozen shots. `--base` also renders the commit, and exits with 1 when a pixel changed. |
 | `pnpm cpu-profile [--demo <id>]` | Profiles the main thread during play, and prints the top functions for each frame. |
 | `pnpm frame-compare <ref\|patch>...` | Measures `pnpm frame` in turns on each commit, or on `HEAD` with each `.patch` file, and compares the frozen shots. |
 | `tools/check-commits.sh <base>` | Checks each commit of `<base>..HEAD` ([`workflow.md`](workflow.md), "The check script"): the lint, the typecheck, the format, and the tests that a commit reaches. |
 | `tools/measure-lock.sh run --owner <name> -- <cmd>`, or `status` | The fair lock of the timed measures ([`workflow.md`](workflow.md), "Performance rounds"). |
-| `tools/merge-branch.sh <branch> [worktree]` | Rebases `<branch>` onto `main`, checks each commit, and runs `pnpm build` and `pnpm size`. `--arm-check` also runs the arm gate. Then it fast-forwards `main`, and removes the worktree and the branch. Run it from `main`. |
+| `tools/merge-worktree.sh [--into <path>] [--resume] <name> [<base>]` | Merges the round of `.claude/worktrees/<name>` into the main checkout with cherry-picks ([`workflow.md`](workflow.md), "Where to work"). Its head comment gives the steps and the exit codes. |
 | `tools/base-tree.sh <ref>` | Extracts a commit into a temporary folder with a link to `node_modules`, for a base run of a tool with no `--base`. |
 | `tools/break-test.sh '<perl expr>' <file> <test files>...` | Applies one temporary break to a tracked file, and prints each test that fails. |
 
 ## CI
 
-CI (`.github/workflows/ci.yml`) runs the checks of design 9.2 on each push: the typecheck, the
-lint, the format, `pnpm test`, the build, and the size, with no deploy.
+CI (`.github/workflows/ci.yml`) runs the checks of design 9.2 on each push, with no deploy.
 
 ## Checks for each kind of change
 
