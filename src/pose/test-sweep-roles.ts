@@ -85,8 +85,8 @@ const BODY_LOOPS = 2;
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
- * - The rabbit: 16 open loops, the cuts to the two upper arms and the open loops of the source mesh
- *   and of its lids.
+ * - The rabbit: 14 open loops, the cuts to the two upper arms and the open loops of the third Tripo
+ *   rabbit (the whisker strips, the eyeballs, and two of the body) and of its lids.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
@@ -96,7 +96,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/fox/tripo-hand/fox.rig.glb', 6],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
-  ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 16],
+  ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
 ]);
 
 /**
