@@ -1,0 +1,404 @@
+{
+  "source": "assets/models/beaver/tripo-p2/beaver.fbx",
+  "sourceNote": "The fourth Tripo P2 cat mesh with its quads (assets/models/beaver/README.md). The hand rig assets/models/beaver/tripo-hand/beaver.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "name": "Beaver",
+  "weld": 1e-05,
+  "joints": {
+    "root": {
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.1
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "hips": {
+      "head": [
+        0.0,
+        0.2,
+        0.06
+      ],
+      "tail": "spine"
+    },
+    "spine": {
+      "head": [
+        0.0,
+        0.32,
+        0.07
+      ],
+      "tail": "spine1"
+    },
+    "spine1": {
+      "head": [
+        0.0,
+        0.43,
+        0.08
+      ],
+      "tail": "chest"
+    },
+    "chest": {
+      "head": [
+        0.0,
+        0.54,
+        0.085
+      ],
+      "tail": "neck"
+    },
+    "neck": {
+      "head": [
+        0.0,
+        0.66,
+        0.09
+      ],
+      "tail": "head"
+    },
+    "head": {
+      "head": [
+        0.0,
+        0.7,
+        0.1
+      ],
+      "tail": [
+        0.0,
+        0.98,
+        0.12
+      ]
+    },
+    "ear_L": {
+      "head": [
+        0.115,
+        0.91,
+        0.09
+      ],
+      "tail": [
+        0.128,
+        0.99,
+        0.1
+      ]
+    },
+    "clavicle_L": {
+      "head": [
+        0.03,
+        0.62,
+        0.11
+      ],
+      "tail": "upper_arm_L"
+    },
+    "upper_arm_L": {
+      "head": [
+        0.17,
+        0.611,
+        0.121
+      ],
+      "tail": "forearm_L",
+      "roll": "palm"
+    },
+    "forearm_L": {
+      "head": [
+        0.27,
+        0.611,
+        0.126
+      ],
+      "tail": "forearm_twist_L",
+      "roll": "palm"
+    },
+    "forearm_twist_L": {
+      "head": [
+        0.3175,
+        0.6115,
+        0.133
+      ],
+      "tail": "hand_L",
+      "roll": "palm"
+    },
+    "hand_L": {
+      "head": [
+        0.365,
+        0.612,
+        0.14
+      ],
+      "tail": "fingers_L",
+      "roll": "palm"
+    },
+    "fingers_L": {
+      "head": [
+        0.405017,
+        0.617298,
+        0.148219
+      ],
+      "tail": [
+        0.464104,
+        0.615286,
+        0.168558
+      ],
+      "roll": "palm"
+    },
+    "thigh_L": {
+      "head": [
+        0.11,
+        0.2,
+        0.07
+      ],
+      "tail": "shin_L"
+    },
+    "shin_L": {
+      "head": [
+        0.13,
+        0.12,
+        0.1
+      ],
+      "tail": "foot_L"
+    },
+    "foot_L": {
+      "head": [
+        0.14,
+        0.055,
+        0.1
+      ],
+      "tail": "toes_L",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "toes_L": {
+      "head": [
+        0.15,
+        0.02,
+        0.21
+      ],
+      "tail": [
+        0.155,
+        0.01,
+        0.32
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail": {
+      "head": [
+        0.0,
+        0.2,
+        -0.12
+      ],
+      "tail": "tail_tip",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail_tip": {
+      "head": [
+        0.0,
+        0.09,
+        -0.25
+      ],
+      "tail": [
+        0.0,
+        0.03,
+        -0.4
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "fingers_R": {
+      "head": [
+        -0.404715,
+        0.610129,
+        0.150779
+      ],
+      "tail": [
+        -0.465958,
+        0.599262,
+        0.157124
+      ],
+      "roll": "palm"
+    }
+  },
+  "palm": [
+    0.049,
+    -0.999,
+    -0.016
+  ],
+  "studio": {
+    "trunk": {
+      "open": 0,
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
+    },
+    "trunkNote": "The trunk of the bind keeps the pose of the source (open 0: no recline, trunk_turn() of tools/blender/rig_mesh.py).",
+    "bindArms": {
+      "upper_arm": [
+        0.813873,
+        -0.143043,
+        0.563161
+      ],
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
+    },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 0,
+      "R": 0
+    },
+    "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: no turn. The beaver has no chair and stands on its short legs in the pose of the source, with the feet flat on the floor.",
+    "tailBind": {
+      "tail": [
+        0,
+        -0.11,
+        -0.13
+      ],
+      "tail_tip": [
+        0,
+        -0.06,
+        -0.15
+      ]
+    },
+    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the directions of the source, so that the flat tail lies on the floor behind the body as in the source.",
+    "legTurns": {
+      "thigh": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "shin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "foot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "toes": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.05,
+    "eyeShare": 0.34,
+    "eyeBox": [
+      [
+        0.04,
+        0.855,
+        0.23
+      ],
+      [
+        0.105,
+        0.92,
+        0.29
+      ]
+    ],
+    "noseBox": [
+      [
+        -0.07,
+        0.815,
+        0.35
+      ],
+      [
+        0.07,
+        0.89,
+        0.42
+      ]
+    ],
+    "nose": [
+      0.86,
+      0.5,
+      0.45
+    ],
+    "tone": {
+      "chroma": 0.2,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          0,
+          0,
+          0
+        ],
+        [
+          0.97,
+          0,
+          0,
+          0
+        ]
+      ],
+      "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
+    },
+    "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
+    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.055 to 0.094 on the left, y 0.864 to 0.912, z 0.240 to 0.283). The nose box holds the dark brown nose."
+  },
+  "eyeShell": {
+    "lift": 0.002,
+    "points": 12,
+    "reach": 1,
+    "darkReach": 2,
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+  },
+  "chair": {
+    "halfWidth": 0.24,
+    "front": 0.0,
+    "back": -0.1,
+    "note": "The beaver has no chair (noChair of the species): it stands in the pose of the source. The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the underside of the belly between the legs. The front edge lies behind the shins and the back edge in front of the root of the tail. The half width holds the haunch (x 0.25)."
+  },
+  "armSegments": {
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
+  },
+  "jointsNote": "TBD",
+  "body": {
+    "crease": 180
+  },
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "eyeSize": 0.30728,
+  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "metersPerUnit": 1.01029,
+  "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb).",
+  "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/beaver.blend holds it.",
+  "texture": "assets/models/beaver/tripo-p2/beaver.fbm/beaver_basecolor.jpg",
+  "rollSplit": true,
+  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/cat/README.md, \"tripo-hand/cat.blend\")."
+}
