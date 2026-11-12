@@ -610,12 +610,13 @@ The rest of each family:
   into the travel that the arm reaches, by the ratios of the real distances (`slideTravel()`) and
   a curve that spreads the near positions (`reachedShare()`). Reason: with the ratios alone, the
   second position moved the slide of the panda about 1 cm, and the slide did not show the notes.
-  The arms do not grow for the slide. The panda plays a smaller trombone (4.6) and points the
-  slide a little to the right of straight ahead and down, toward the audience (`PANDA_PLAY`),
-  lower than a real trombonist. Reason: at 45° to the right, the slide pointed at the next panda,
-  at 20° the bell stood at the right knee, and the short arms of the Tripo panda reach none of the
-  travel of the trombone of the app with the slide straight ahead or a little down. The slide
-  keeps clear of the music desk.
+  The arms do not grow in the pose. The panda plays the trombone of the app with the longer arms
+  of its mesh (4.4) and points the slide a little to the right of straight ahead and down,
+  toward the audience (`PANDA_PLAY`), lower than a real trombonist. Reason: at 45° to the right,
+  the slide pointed at the next panda, at 20° the bell stood at the right knee, and the short arms
+  of the Tripo panda reach little of the travel with the slide straight ahead or a little down.
+  A lean or a turn of the chest in the far positions adds no reach, because the mouthpiece follows
+  the chest. The slide keeps clear of the music desk.
 
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 
