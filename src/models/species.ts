@@ -261,12 +261,11 @@ export const SPECIES = {
   },
   /**
    * Red-orange fox with a white face, the second violins (reference image). It has the studio body
-   * of the mesh `assets/models/fox/fox.glb`, which `pnpm rig-mesh fox` rigs (design 4.4), seated
-   * with its long thighs on the seat and its tail back through the chair, and standing as a
-   * soloist. The rig moves the orange fur of the texture to the red-orange of the reference foxes
-   * (`colors.shift` of `tools/mesh-rigs/fox.json`, design 4.5). Its head height is the head of the
-   * studio body, and its chair fits its legs: the seat height is the seat of the studio body, in H.
-   * Its violin is almost the violin of the app.
+   * of the hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/fox.blend`, design 4.4),
+   * seated with its long thighs on the seat and its tail back through the chair, and standing as a
+   * soloist. Its color map keeps the hue of the source (`assets/models/fox/README.md`, "Color
+   * map"). Its head height is the head of the studio body, and its chair fits its legs: the seat
+   * height is the seat of the studio body, in H. Its violin is almost the violin of the app.
    *
    * The stick of the bow passes through the closed right paw, 50° from square toward the wrist,
    * along the line nearest to the middles of the turned paw. The skin of the long wrist of the fox
@@ -299,14 +298,14 @@ export const SPECIES = {
   },
   /**
    * Wolf, the clarinets: a gray wolf with a cream chest, belly, and muzzle, dark lower legs, and a
-   * bushy tail with a cream tip. It has the studio body of the mesh `assets/models/wolf/wolf.glb`,
-   * which `pnpm rig-mesh wolf` rigs (design 4.4), with the size of the reference images, then 0.9
-   * of the height and 1.2 of the width. It sits on a chair that fits its legs, with the tail back
-   * over the seat and down behind it, and stands as a soloist. Its head height is the head of the
-   * studio body, and the seat height is the seat of the studio body, in H. The violin size is for
-   * the recast role `violinist@wolf` of the role tools only: no wolf plays the violin in the app.
-   * It is the rule of a violin shop for the arm of the wolf with the violin on the shoulder (0.732),
-   * rounded up to 0.75 (`pnpm hold-reach wolf --instrument violin`).
+   * bushy tail with a cream tip. It has the studio body of the hand rig of the Tripo P2 wolf
+   * (`assets/models/wolf/tripo-hand/wolf.blend`, design 4.4), at the height of the older wolf. It
+   * sits on a chair that fits its legs, with the tail back over the seat and down behind it, and
+   * stands as a soloist. Its head height is the head of the studio body, and the seat height is the
+   * seat of the studio body, in H. The violin size is for the recast role `violinist@wolf` of the
+   * role tools only: no wolf plays the violin in the app. It is the rule of a violin shop for the
+   * arm of the wolf with the violin on the shoulder (0.732), rounded up to 0.75 (`pnpm hold-reach
+   * wolf --instrument violin`).
    */
   wolf: {
     body: 'studio-wolf',
@@ -317,8 +316,8 @@ export const SPECIES = {
   },
   /**
    * Elephant, the timpani: a gray elephant with large ears, a long trunk, and cream tusks. It has
-   * the studio body of the mesh `assets/models/elephant/elephant-apose.glb`, which `pnpm rig-mesh
-   * elephant` rigs (design 4.4), with the size of the reference images and the arms of the mesh. It
+   * the studio body of the hand rig of the Tripo P2 elephant
+   * (`assets/models/elephant/tripo-hand/elephant.blend`, design 4.4), with the arms of the mesh. It
    * stands at its timpani, as the elephant of `orchestra-latest.png`. The trunk, the tusks, and the
    * ears follow the head. Its head height is the head of the studio body without the trunk, and the
    * seat height is the seat of the studio body, in H.
@@ -331,10 +330,9 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-elephant'].seatHeight / STUDIO_HEIGHTS['studio-elephant'].headHeight,
   },
   /**
-   * Bear, the conductor (reference image). It has the studio body of the T-pose mesh
-   * `assets/models/bear/bear-tpose.glb`, which `pnpm rig-mesh bear` rigs with its own faces (design
-   * 4.4). Its head height is the head of the studio body. It binds standing, so its seat has a
-   * fixed height.
+   * Bear, the conductor (reference image). It has the studio body of the hand rig of the Tripo P2
+   * bear (`assets/models/bear/tripo-hand/bear.blend`, design 4.4). Its head height is the head of
+   * the studio body. It binds standing, so its seat has a fixed height.
    */
   bear: {
     body: 'studio-bear',
@@ -343,17 +341,17 @@ export const SPECIES = {
     seatHeight: 0.75,
   },
   /**
-   * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the mesh
-   * `assets/models/cat/cat.glb`, which `pnpm rig-mesh cat` rigs (design 4.4), with the size, the
-   * reach, and the leg factor of the red fox. It sits with its tail curled on the seat around the
-   * left side of the haunch, and stands as a soloist. Its head height is the head of the studio
-   * body, and its chair fits its legs: the seat height is the seat of the studio body, in H. It
-   * plays a viola of about 13 inches, with a body of 324 mm, 0.925 of the viola of the app
-   * (`violaScale`), so that the viola reads at its size beside the body. The arms do not grow, so
-   * the hold uses the reach of the arms: the left paw stops the strings from 0.51 of the
-   * fingerboard from the nut, as a player in a high position, and the scroll stands out past the
-   * paw. The bow paw reaches 0.285 m of the hair (`pnpm hold-reach cat --instrument viola`). With
-   * 0.74, the size that a violin shop gives for the arm, the viola read as a toy under the paws.
+   * Gray cat with a cream belly, the violas (`cat-views.png`). It has the studio body of the hand
+   * rig of the Tripo P2 cat (`assets/models/cat/tripo-hand/cat.blend`, design 4.4). It sits with
+   * its tail curled on the seat around the left side of the haunch, and stands as a soloist. Its
+   * head height is the head of the studio body, and its chair fits its legs: the seat height is the
+   * seat of the studio body, in H. It plays a viola of about 13 inches, with a body of 324 mm,
+   * 0.925 of the viola of the app (`violaScale`), so that the viola reads at its size beside the
+   * body. The arms do not grow, so the hold uses the reach of the arms: the left paw stops the
+   * strings from 0.51 of the fingerboard from the nut, as a player in a high position, and the
+   * scroll stands out past the paw. The bow paw reaches 0.285 m of the hair (`pnpm hold-reach cat
+   * --instrument viola`). With 0.74, the size that a violin shop gives for the arm, the viola read
+   * as a toy under the paws.
    *
    * The stick of the bow passes through the middle of the closed right paw. The paw of the studio
    * turns in the plane of its palm toward the forearm by 0° to 70° (`PAW_TURN` of `studio-rig.ts`),
@@ -482,16 +480,16 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-beaver'].seatHeight / STUDIO_HEIGHTS['studio-beaver'].headHeight,
   },
   /**
-   * Dog, the cellos: a beagle with brown ears and a brown back. It has the studio body of the mesh
-   * `assets/models/dog/dog.glb`, which `pnpm rig-mesh dog` rigs (design 4.4), with the head height
-   * of the red fox and longer legs. It sits with the knees apart around the lower bout of the
-   * cello, and its thin tail hangs down behind the seat between the back posts of the chair. Its
-   * ears hang, so they do not twitch. Its head height is the head of the studio body, and its chair
-   * fits its legs: the seat height is the seat of the studio body, in H. It plays a 1/2 cello
-   * (a back of 23 in to 26 in, 0.77 to 0.87 of a 4/4). The reach limit of the cello rule fails at
-   * each size for its short arms, so the rule gives the clamp of a 1/10 (`pnpm cello-size dog`).
-   * A 1/10 fits the body at the H of the dog of main, and the cello keeps that share of the body
-   * at the larger H of the Tripo beagle: 0.65 times 1.27, to two places.
+   * Dog, the cellos: a beagle with brown ears and a brown back. It has the studio body of the hand
+   * rig of the Tripo P2 beagle (`assets/models/dog/tripo-hand/dog.blend`, design 4.4). It sits with
+   * the knees apart around the lower bout of the cello, and its thin tail hangs down behind the
+   * seat between the back posts of the chair. Its ears hang, so they do not twitch. Its head height
+   * is the head of the studio body, and its chair fits its legs: the seat height is the seat of the
+   * studio body, in H. It plays a 1/2 cello (a back of 23 in to 26 in, 0.77 to 0.87 of a 4/4). The
+   * reach limit of the cello rule fails at each size for its short arms, so the rule gives the
+   * clamp of a 1/10 (`pnpm cello-size dog`). A 1/10 fits the body at the H of the dog of main, and
+   * the cello keeps that share of the body at the larger H of the Tripo beagle: 0.65 times 1.27, to
+   * two places.
    *
    * The bow grip (`bowGrip`) puts the stick across the fingers under the curled finger tips of
    * the right paw, at the frog end: 0.7 of the way from the middle of the closed paw to the mean
@@ -581,10 +579,10 @@ export const SPECIES = {
   },
   /**
    * Penguin, the choir: a penguin with a black back, head, and flippers, a white belly, a pale
-   * yellow throat, an orange beak, and orange feet. It has the studio body of the mesh
-   * `assets/models/penguin/penguin.glb`, which `pnpm rig-mesh penguin` rigs (design 4.4). It stands
-   * on its riser. Its head height is the head of the studio body, and the seat height is the seat
-   * of the studio body, in H.
+   * yellow throat, an orange beak, and orange feet. It has the studio body of the hand rig of the
+   * Tripo P2 penguin (`assets/models/penguin/tripo-hand/penguin.blend`, design 4.4). It stands on
+   * its riser. Its head height is the head of the studio body, and the seat height is the seat of
+   * the studio body, in H.
    */
   penguin: {
     body: 'studio-penguin',
@@ -594,11 +592,11 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-penguin'].seatHeight / STUDIO_HEIGHTS['studio-penguin'].headHeight,
   },
   /**
-   * Polar bear, the piano and the other keyboards. It has the studio body of the hand rig
-   * `assets/models/polar-bear/polar-bear.blend` (design 4.4, "Hand rig"), with the legs of its
-   * mesh. It sits on the bench of the rig with the thighs 25° down, and its soles touch
-   * the floor. Its head height is the head of the studio body, and the seat height is the seat of
-   * the studio body, in H.
+   * Polar bear, the piano and the other keyboards. It has the studio body of the hand rig of the
+   * Tripo P2 polar bear (`assets/models/polar-bear/tripo-hand/polar-bear.blend`, design 4.4, "Hand
+   * rig"), with the legs of its mesh. It sits on the bench of the rig with the thighs 25° down, and
+   * its soles touch the floor. Its head height is the head of the studio body, and the seat height
+   * is the seat of the studio body, in H.
    */
   'polar-bear': {
     body: 'studio-polar-bear',
