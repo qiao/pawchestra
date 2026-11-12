@@ -738,13 +738,21 @@ passes.
       violist` did not run on the fourth mesh.
 - [ ] Cat candidate: the smaller eyes and the lower upper lids have only ray checks of the lids (no
       lid point leaves the head in a blink step). Check a blink in the app.
-- [ ] Tripo fox candidate: `pnpm pose-depth` stops on the body ("12 open loops, and the caller
-      expects 4"), so the clearance of the arms and the head has only renders.
+- [ ] Tripo fox with four-digit paws: the right upper arm of the red fox goes 7.6 cm into the
+      right shoulder in the play and the lowering (`pnpm pose-depth violinist@fox-red`, 92.6 % of
+      the play samples), with the old and the new bow elbow. The right folds p95 of the arm gate
+      is 11 (limit 8).
+- [ ] Tripo fox with four-digit paws: the right paw of the tan flutist swings 103° at the wrist in
+      the play (limit 70°, 111° on the fox before), its wrist ring keeps 0.56 of its width (limit
+      0.55), and it grasps the flute in 31 % of the play samples, with the finger tips 0.7 cm off.
+- [ ] Tripo fox with four-digit paws: the seat is 0.249 m with flat feet. A heel turn for a taller
+      chair moves 318 to 421 of the 459 players of the demos (sight pass, 4.5), so it waits for a
+      layout rule that keeps the seats.
+- [ ] Tripo fox with four-digit paws: the four digits share one fingers bone, so they curl as one
+      piece. Check the grip of each digit on the neck, the stick, and the flute in the app.
 - [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
       (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
       golden. A chroma step would read nearer the pale tan of the reference image.
-- [ ] Tripo fox candidate: one gaze view (`VIEW_DOWN` 30° of the map tools) serves the play view
-      and the default camera. Check the gaze on a phone.
 - [ ] Third Tripo rabbit: the seat is 0.196 m high, with the shins 6° forward and the heels 15°
       up (0.167 m with flat feet). The higher eyes change the sight pass of the layout: 13
       players move in `bach-bwv1048` (up to 1.3 m) and `mozart-k417`, and 2 in `bach-bwv1047`
@@ -859,10 +867,10 @@ passes.
       the viola off its short arc. Lift elbows (`liftPoleL`, arm-check twist p95 / carry-check
       detour, base 55° / 36°): (0.6, 0.7, 0.5) 54° / 45°, (0.6, 0.4, 0.5) 48° / 58°,
       (0.6, 0.4, 0.3) 59° / 43°, (0.6, 0.2, 0.5) 38° / 63°, each with 0 opposed steps.
-- [ ] Tripo red fox violinist: with the lower, left violin of the head turn, the bow paw goes
-      2.4 cm into the violin body in 53 % of the lowering samples (17 % before). The rest bow via
-      (`restBow.via.reach`) takes it to 2.0 cm at most, and the violin path (`liftReach`) does
-      not help.
+- [ ] Tripo red fox violinist: with the lower, left violin of the head turn, a paw goes up to
+      1.6 cm into the violin in the lowering (1.3 % of the samples of the fox with four-digit
+      paws, limit 1.5 cm). The rest bow via (`restBow.via.reach`) and the violin path
+      (`liftReach`) are the knobs.
 - [ ] Tripo beagle cellist: the clearance sweep puts the cello 12.3 cm into the chest at the bass
       side of the upper back, behind the left upper arm. No view shows it; the fit measures only
       the middle line of the back.
