@@ -1308,6 +1308,11 @@ each control.
       `pnpm plan-time`. A shot round wrote a scratch script for each.
 - [ ] Tool: `pnpm close-views play` with `--pause` or `--url` still renders 1 to 2 s after `--time`.
       The label then says "on the bar".
+- [ ] Portrait phone: Cinematic mode at 390 × 844 shows a strip 19.8% of the screen height
+      (`CINEMA_ASPECT`). First show one line below the frame: "Turn the phone for a larger film."
+      Then ask the user for a portrait shot plan with the portrait constants of the skill
+      `pawchestra-film`. This changes the rule of 2.5 that a piece gives the same film on each
+      screen.
 
 Done when: the tests of 5.6 pass for each demo, the shot targets and the frame target of 9.7
 pass, and the smoke test checks the camera.
