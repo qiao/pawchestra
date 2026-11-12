@@ -87,8 +87,14 @@ passes.
       1.55 m. Ask the user if the wide haunch on the narrow chair is a fault.
 - [ ] Trombonist panda: the slide comes 3 cm to 5 cm from its music desk in boulanger-matin. A
       longer slide reach or a lower slide puts it into the desk.
-- [ ] Trumpeter monkey: `pnpm hold-fit trumpeter` stops, because the body bones of the Tripo monkey
-      have 6 open loops, and the sweep expects 5.
+- [ ] Trumpeter monkey: with the trumpet of 0.85 and the play stance (`MONKEY_TRUMPET`), the right
+      paw reaches its grip with 0.9 cm to spare (1.5 cm before), and a trumpet of 0.91 is out of
+      reach. A larger trumpet needs another reach gain, such as a small turn of the bell to the right.
+- [ ] Trumpeter monkey: with the trumpet of 0.85, more arm faces fold: 48 in the rest sample of
+      `hold-fit` (37 before), and the arm gate folds p95 are 20 (right) and 26 (left), against 17
+      and 25. Check the elbows in 2x crops.
+- [ ] Trumpeter monkey: the trumpet of 0.85 moves the music stand of the monkey from 0.69 m to
+      0.77 m in `beethoven-7-4`. Check the hall views of each demo with a monkey trumpeter.
 - [ ] Trumpeter monkey: at rest, with the trumpet in front of the belly (`restShift`), the upper
       arms roll 70.6° and -50.6° from the clavicles (`pose-preview`), more than 45°. The skin twist
       of the arm gate stays 29° and 25°. Check the arms at rest in a 2x crop.
@@ -824,9 +830,6 @@ passes.
 - [ ] Tripo monkey candidate: the source has small notches at the back of the knees and under the
       haunch, which show as dark marks in the back views. The look rule allows no point edit of
       the legs, so ask before any fix.
-- [ ] Tripo monkey candidate: the doc comment of `monkey` in `src/models/species.ts` still names the
-      mesh `monkey.glb` of the monkey of main and its longer arms. Update it when the candidate
-      merges.
 - [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
       valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
       technique (`docs/reference/wind-technique.md` 2.1).
