@@ -169,6 +169,15 @@ passes.
       The arms of 1.3 times the source can reach more: try E4 to G4 with `pnpm hold-fit harpist`.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
       0 cm now. Trim the entry when the tests come back.
+- [ ] Hold units: the instrument scales of the species (`harpScale`, `trumpetScale`,
+      `bassoonScale`) are set by hand. A size change of a body still needs a manual edit of its
+      instrument scale. Tie the scale to H, or give the rule in rigging.md.
+- [ ] Hold units: the shared `SHOULDER_HOLD.restGapL` (rabbit fit) and `CELLO_HOLD.pluckSide`
+      (dog fit) are now in H, so a recast body (for example `violinist@wolf`) gets the gap at its
+      own size. Check the recast violinist and cellist in the cast matrix.
+- [ ] Hold units: these body values are still in meters: `MIRROR_IN` of the conductor (0.12 m),
+      `HEEL_LIFT.back` of harp-feet.ts (0.15 m), and the `offset` of `UPRIGHT_HOLDS`. Move each one
+      to H when its body changes size.
 - [ ] Harp strings: ask the user to pick the strength and the density of the bands of the swinging
       strings (`STRING_SWING`, 4.6). In the Cinematic solo shot, the default bands are thin.
 - [ ] Harp strings: the bands write no depth, so the depth of field of a close shot blurs a band
