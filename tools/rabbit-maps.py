@@ -55,6 +55,10 @@ IRIS_EDGE = 2.0
 #: each target out from the middle of the painted eye in that view.
 VIEW_DOWN = 15.0
 GAZE_OUT = 4.0
+#: The part of the full turn of each iris toward its target that the map applies. The full turn
+#: (about 8 degrees) read wall-eyed from the front, so the iris moves only a small part of the way
+#: from the source paint.
+SHIFT_SHARE = 0.35
 #: The step in degrees of the turn about the iris middle that finds the paint of a hidden iris
 #: point on its ring.
 RING_STEP = 1.0
@@ -275,8 +279,9 @@ def shift_eyes(rig, image):
     """Moves the iris of each eyeball, with its pupil and its painted light, as one decal on its
     ball, so that the rabbit does not look cross-eyed. Each eye has its own target, because the
     two eyes of the source are not mirror images. For each side, with the parts of `eye_parts()`:
-    - The target t: the middle of the painted eye in the view of `view_middle()`, turned out by
-      GAZE_OUT degrees, at the mean psi of the two pupils, so that both eyes look at one height.
+    - The target t: SHIFT_SHARE of the way from the source pupil p to the middle of the painted eye
+      in the view of `view_middle()`, turned out by GAZE_OUT degrees, at the mean psi of the two
+      pupils.
     - The decal D: the iris cells of E off the band within a + IRIS_EDGE of q, grown by IRIS_EDGE
       degrees, so that the soft edge of the iris moves with it. The old place O: D and each part
       of the iris paint of E (the band included) that touches D.
@@ -316,7 +321,9 @@ def shift_eyes(rig, image):
     for side, parts in sides.items():
         sign, q, p = parts['sign'], parts['q'], parts['p']
         mid_lam, mid_psi = angles(parts['middle'], sign)
-        t = direction(mid_lam + GAZE_OUT, height, sign)
+        full = direction(mid_lam + GAZE_OUT, height, sign)
+        t = p * (1 - SHIFT_SHARE) + full * SHIFT_SHARE
+        t = t / np.linalg.norm(t)
         turn = gaze_shift.turn_matrix(p, t)
         lam, psi = grid_axes()
         lam_g, psi_g = np.meshgrid(lam, psi)
