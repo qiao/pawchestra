@@ -444,18 +444,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/elephant/tripo-hand/elephant.rig.glb',
     },
   ],
-  // The bassoon beaver (design 4.4). A bassoon soloist keeps its seat,
-  // but the standing views of the gallery stand it up.
+  // The bassoon beaver (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/beaver/tripo-hand/beaver.blend`), by the route of the Tripo wolf, with no arm
+  // cut and no arm stretch. It has no chair, and it stands on its short legs in the pose of the
+  // source. Its `.blend` holds the facts of the body: the scale that keeps H of the beaver of
+  // `beaver.rig.glb`, and the crease angle 180°. The map paints the iris and a light on each
+  // eyeball of the source, so the eyes take the finish `varnish` and no eye light.
   [
     'beaver',
     {
       landmark: 'shoulders',
-      height: 0.632835,
       seated: true,
       soloist: true,
       constant: 'STUDIO_BEAVER',
-      crease: 35,
-      glb: 'assets/models/beaver/beaver.rig.glb',
+      glb: 'assets/models/beaver/tripo-hand/beaver.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The horn pig (design 4.4): the hand rig of the Tripo P2 mesh
