@@ -475,10 +475,19 @@ export const SPECIES = {
    * each size for its short arms, so the rule gives the clamp of a 1/10 (`pnpm cello-size dog`).
    * A 1/10 fits the body at the H of the dog of main, and the cello keeps that share of the body
    * at the larger H of the Tripo beagle: 0.65 times 1.27, to two places.
+   *
+   * The bow grip (`bowGrip`) puts the stick across the fingers under the curled finger tips of
+   * the right paw, at the frog end: 0.7 of the way from the middle of the closed paw to the mean
+   * of the finger tips, in the axes of the hand. The tips touch the stick, and the paw holds the
+   * bow in each play sample, with a median tip gap of 0.1 cm (`pnpm wind-grip cellist`). With
+   * the grip of `BOW_GRIP`, the stick lay under the palm of the smaller paw, and the tips stayed
+   * 5.2 cm from it. A grip through the middle of the paw needs a curl of 105°, which folds the
+   * knuckles (`DOG_HOLD.curlR` of `pose/bowed-rig.ts`).
    */
   dog: {
     body: 'studio-dog',
     celloScale: 0.83,
+    bowGrip: { at: [-0.0858, -0.0999, -0.0953], turn: 0 },
     colors: SPECIES_COLORS.dog,
     hangingEars: true,
     headHeight: STUDIO_HEIGHTS['studio-dog'].headHeight,
