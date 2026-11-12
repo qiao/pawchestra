@@ -143,7 +143,10 @@ export function fitCelloPlace(model: PlayerModel, fit: CelloFit): CelloPlace {
     const y = pin + (k / BACK_POINTS) * VIOLIN.bodyLength * size;
     const lines = width > 0 && 2 * k >= BACK_POINTS ? ACROSS_LINES : [0];
     for (const share of lines) {
-      point.set(share * width, y, half).applyQuaternion(turn).add(tip);
+      point
+        .set(share * width, y, half)
+        .applyQuaternion(turn)
+        .add(tip);
       const front = trunkFront(model, point.x, point.y);
       if (front !== null) {
         deepest = Math.max(deepest, point.z - front);
