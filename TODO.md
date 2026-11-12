@@ -125,8 +125,12 @@ passes.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
 - [ ] Deer harpist: the high left palm (`highL`) and the damp with no press of 2026-11-12 keep each
       paw at most 1.4 cm in the body. Check the high left notes in 2x crops in the app.
-- [ ] Deer harpist: the right upper arm rests on the soundbox in 39 % of the play samples (at most
-      2.1 cm, 1.6 cm at rest). The left paw swing p95 is 69 (limit 70).
+- [ ] Deer harpist: with the higher right elbow of 2026-11-12, the right upper arm goes at most
+      1.4 cm into the soundbox in the play, but the cap of the soundbox still shows in front of the
+      arm from the right side (az 90). In the lift it goes 2.3 cm in (23 % of the samples), in the
+      lowering 2.3 cm (53 %), and at rest 1.6 cm. The left paw swing p95 is 69 (limit 70).
+- [ ] Deer harpist: 4 left-arm frames turn 15° to 17° in one 1/30 s step (127.5 s and 280.1 s of
+      boulanger-matin), where the music gives a move less than 0.2 s.
 - [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
       close snaps 31° to 45° in one step.
 - [ ] Deer harpist: the left hoof goes 2.8 cm into the harp base at rest and 3.7 cm in a pedal
