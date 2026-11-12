@@ -346,32 +346,10 @@ passes.
       2, margin 2), and six tries of a shape of the bent right elbow failed
       (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`). The open choice: a
       fifth shape (`STUDIO_RAISES`).
-- [ ] Cat: a run of `pnpm rig-mesh cat` today moves the tail root and 404 vertices near the haunch
-      and the tail by up to 4.8 cm against the base `cat.rig.glb` of fc52d38f
-      (`assets/models/cat/README.md`). Find the change of `rig_mesh.py`, and make the run give
-      the base file again. Then `pnpm glb-point-edits assets/models/cat/cat-edits.json` adds the
-      point edits.
-- [ ] Cat tail: the haunch fills the width of the seat (`seatWidth`), so the outer half of the
-      curled tail end lies over the left edge of the seat (README, "Point edits"). Choose a wider
-      chair or a shorter curl.
-- [ ] Cat tail root: under the haunch, 6 edges at the tail root fold by 109° to 174° (vertices
-      2224, 2254, 2255, 2256, 2258, 3721, 3730, and 4415 of `cat.rig.glb`). The seat hides them in
-      each view of `reports/2026-11-05-cat-edits/`. Move them with point edits if a crop shows them.
-- [ ] Cat violist: the front of the bow arm root keeps hard steps of the clavicle share: 886, 890,
-      and 892 (`clavicle_R` 0.77 to 0.87) beside the neck places 889, 894, and 908 (README "Bow
-      arm root"). Rows with more chest share there moved the folds to the neck. Try rows that
-      blend `clavicle_R` into the neck at the front.
 - [ ] Cat violist: a small dark pinch stays behind the bow arm root at the crossing from az120 and
       at the frog from the back (`reports/2026-11-05-cat-bow-arm/crops/pair-crossing-az120.png`,
       `pair-frog-az180.png`). At the tip, the small faces 817-850-848 and 817-818-850 fold, and the
       fourth `raise` shape is 0 there.
-- [ ] Cat violist: the left arm root has the same corner as the right one, where the side wall
-      meets the back (places 1744 to 1757 and 3259 to 3270 of `cat.rig.glb`). It shows as a notch
-      on the far edge of the back from az150. Mirror the moves of 839 and 840 if the left arm may
-      change.
-- [ ] Cat legs: ask the user for the leg girth step of
-      `reports/2026-11-05-cat-edits/leg-lineup.png` (1.15, 1.25, or 1.35). The body has 1.25, and
-      the README gives the rule for another step.
 - [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
       forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
@@ -562,9 +540,9 @@ passes.
       so an arm joined to the trunk down to the elbow (the fox and the deer) keeps
       its species script.
 - [ ] Mesh intake: `pnpm mesh-intake` puts the shoulder line of the dog at 0.50 of the upper arm,
-      at its limit, but the arm of `dog.glb` joins the trunk down to 0.80 (the `README.md` of the
-      dog). The rays from the bone do not see the seam faces outside the arm. Count the faces
-      that join the arm and the trunk.
+      at its limit, but the arm of the old `dog.glb` joins the trunk down to 0.80 (the `README.md`
+      of the dog at cbc8db5e4). The rays from the bone do not see the seam faces outside the arm.
+      Count the faces that join the arm and the trunk.
 - [ ] Mesh intake: the limits `GAP`, `SPACING`, `TILT`, and `COLOR_FACES` of
       `tools/blender/mesh_intake.py` come only from the mannequin and the rebuilt arms. Check them
       on the first clean quad mesh, with `arm_rebuild.py --keep-faces` and the arm gate.
@@ -666,12 +644,12 @@ passes.
       from the shoulder opens it (the place of the cello). Run the cast matrix with the new elbow
       on `CELLO_HOLD`, and move it into the shared hold if the recast cells do not get worse.
 - [ ] Dog cellist left elbow height (5.3): the left upper arm goes only about 11° down in the
-      play, and a cellist holds it about 45° down on the A string (strings 1.8). A lower elbow
-      folds the inner elbow faces 1711 and 1712 into a dark wedge (about 20° down: 1.2% of the
-      play), and an elbow further back folds the armpit faces 2580 and 2581. The two inner elbow
-      shapes of the dog (`raise` of `tools/mesh-rigs/dog.json`) come from the old level elbow
-      and are at full weight in nearly each play sample. Fit a shape to the low elbow
-      (`pnpm raise-fit`), or move the inner elbow rings, then lower `DOG_HOLD.poleL` again.
+      play, and a cellist holds it about 45° down on the A string (strings 1.8). A lower elbow folds
+      the inner elbow faces 1711 and 1712 into a dark wedge (about 20° down: 1.2% of the play), and
+      an elbow further back folds the armpit faces 2580 and 2581. The two inner elbow shapes of the
+      dog (`raise` of `tools/mesh-rigs/dog.json` at cbc8db5e4) come from the old level elbow and are
+      at full weight in nearly each play sample. Fit a shape to the low elbow (`pnpm raise-fit`), or
+      move the inner elbow rings, then lower `DOG_HOLD.poleL` again.
 - [ ] Dog cellist inner elbow (4.4): the faces 1713 and 1714 at the inner left elbow fold in 15 of
       18 rest samples and in 2% to 5% of the play samples, also before the elbow changes. Look at
       them in the 2x crops of the rest, and fix them in the rig.
@@ -877,8 +855,6 @@ passes.
       and the trunk slimmer (chest 0.30 m against 0.38 m). Also confirm the arms 1.3 times longer.
 - [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
       is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
-- [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
-      mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
 - [ ] Tripo beagle candidate: the right paw twists 66° on its forearm at rest (`pnpm arm-check
       cellist`, paw twist p95), 92° before the rest grip of `f5031198e`. No rest grip, rest
       elbow, or bow turn of the scan took it to 45° or less. In one lowering at the end of
@@ -887,13 +863,11 @@ passes.
 - [ ] Tripo beagle bow hand (4.4, 5.3): the stick lies under the curled finger tips, 5 cm from
       the middle of the closed paw (`pnpm wind-grip cellist`). A curl of 105° puts it through
       the middle of the paw, but 20 faces of the right knuckles fold. Weights or a ring at the
-      knuckles of `tools/mesh-rigs/dog.json` that bend without a fold allow that curl.
+      knuckles of the chain `tools/blender/hand/dog/` that bend without a fold allow that curl.
 - [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
       12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
 - [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
       no ring split. Check the inner elbow fold of the bow arm in the app.
-- [ ] Tripo beagle candidate: the doc comment of `dog` in `src/models/species.ts` still names the
-      mesh `dog.glb` of the dog of main and its longer legs. Update it when the candidate merges.
 - [ ] Tripo beagle seats (4.5): the larger beagle and its 1/2 cello make the footprint of the
       cellist larger, so the layout moves the seats. In 12 of the 18 demos the stage side grows by
       about 0.23 m. In `mozart-k191` each seat moves 12 cm to 28 cm, and in some demos the
