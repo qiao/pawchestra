@@ -101,8 +101,13 @@ export const HAND_MOTION = {
   dampSec: 0.5,
   /** The time in which the palm goes onto the strings, and off them, in seconds. */
   dampMoveSec: 0.12,
-  /** The distance that the flat palm of a damp moves onto the strings, in meters. */
-  dampPress: 0.02,
+  /**
+   * The distance that the flat palm of a damp moves onto the strings, in meters. The treble
+   * strings of the near harp of the Tripo fawn lie near its chest: with 0.02 m, the right paw went
+   * 2.8 cm into the chest in the damps, with 0.01 m 1.8 cm, and with 0 1.4 cm (`pnpm pose-depth
+   * harpist`). The flat palm with the open fingers stays at the place of its group.
+   */
+  dampPress: 0,
   /** One hand plays the notes of a chord within this span, in semitones. */
   span: 12,
   /** The keys of the left and the right hand before the first note: C3 and C5. */
