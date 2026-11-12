@@ -936,7 +936,11 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   the seat height of its legs, with its feet on the floor. The monkey stands erect, as a brass
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
   its hips. Its center of mass thus stays over the middle of its soles. As a soloist, it keeps
-  this stance, because the straight legs of its sheet put the center of mass behind the middle.
+  this stance, because the straight legs of its sheet put the center of mass off the middle.
+  It plays a trumpet of 0.85 (`trumpetScale`), and in the play its spine turns 7° back and its
+  head stays upright (5.3), so the head stays over the chest and the hips. Reason: the trumpet of
+  0.65 read small beside the big head and paws, and a larger trumpet puts the valves out of the
+  reach of the short arms (0.91 and up).
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
   pose of their meshes. The rhino stands as a real tubist on a strap does.
 - A seated body that also stands as a soloist (`soloist` of `ANIMALS`) keeps the leg shapes of
