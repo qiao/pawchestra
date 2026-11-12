@@ -46,6 +46,7 @@ const SCALED_INSTRUMENTS = [
   'clarinet',
   'bassoon',
   'trumpet',
+  'trombone',
   'cymbals',
   'harp',
 ] as const satisfies readonly InstrumentId[];

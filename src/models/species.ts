@@ -83,6 +83,13 @@ export interface SpeciesParams {
    */
   readonly trumpetScale?: number;
   /**
+   * The scale of the trombone for the species, as a factor of the trombone of the app (design
+   * 4.6). It is 1 when it is not given. A species with short arms plays a smaller trombone, as a
+   * child plays a fractional violin. The trombone shrinks toward the mouthpiece, so the mouthpiece
+   * stays at the mouth, and the slide brace comes nearer to the right shoulder.
+   */
+  readonly tromboneScale?: number;
+  /**
    * The scale of the pair of crash cymbals for the species, as a factor of the cymbals of the app
    * (design 4.6). It is 1 when it is not given. A species with short arms in front of a deep body
    * plays smaller hand cymbals. Each cymbal shrinks toward the palm, so the palm keeps its place
@@ -201,6 +208,7 @@ export const SCALE_PARAMS = {
   clarinet: 'clarinetScale',
   bassoon: 'bassoonScale',
   trumpet: 'trumpetScale',
+  trombone: 'tromboneScale',
   cymbals: 'cymbalScale',
   harp: 'harpScale',
 } as const satisfies Readonly<Record<ScaledInstrument, keyof SpeciesParams>>;

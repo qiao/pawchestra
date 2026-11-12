@@ -436,11 +436,18 @@ function trumpet(scale: number): BrassBuild {
  * The slide is a second piece on the `slide` bone. Its origin is the slide brace in the first
  * position, and it moves along +x by `travel` to the seventh position.
  *
+ * A species with short arms plays a smaller trombone (`SpeciesParams.tromboneScale`). The
+ * trombone, its grips, and its slide travel shrink toward the mouthpiece, so the mouthpiece stays
+ * at the mouth, and the slide brace comes nearer to the right shoulder.
+ *
+ * @param scale The scale of the trombone, as a factor of its size in {@link BRASS}.
  * @returns The parts and the play data.
  */
-function trombone(): BrassBuild {
+function trombone(scale: number): BrassBuild {
   const t = BRASS.trombone;
-  const main = new PieceBuilder();
+  // The footprint keeps the size of the trombone of the app, so that no seat moves.
+  const main = new PieceBuilder(scale, 1);
+  const scaled = (at: Vec3): Vec3 => [at[0] * scale, at[1] * scale, at[2] * scale];
   mouthpiece(main, [1, 0, 0], 0.0115, 0.085);
   const low = -0.07;
   const side = -0.11;
@@ -507,7 +514,7 @@ function trombone(): BrassBuild {
   // The outer slide: the two tubes and the bow at the end as one bent tube, a ferrule at the
   // open end of each tube, the brace, and the rubber bumper on the bow.
   const brace: Vec3 = [0.3, low / 2, 0];
-  const slide = new PieceBuilder();
+  const slide = new PieceBuilder(scale, 1);
   const local = (p: Vec3): Vec3 => [p[0] - brace[0], p[1] - brace[1], p[2] - brace[2]];
   tubeAlong(
     slide,
@@ -541,23 +548,27 @@ function trombone(): BrassBuild {
   return {
     pieces: [
       main.build('instrument', hold('mouth', [0, 0, 0], rotation)),
-      slide.build('slide', hold('instrument', [0, 0, 0], IDENTITY, brace)),
+      slide.build('slide', hold('instrument', [0, 0, 0], IDENTITY, scaled(brace))),
     ],
-    palmL: [0.08, low / 2, side / 2],
-    palmR: [0, 0, 0.02],
+    palmL: scaled([0.08, low / 2, side / 2]),
+    palmR: scaled([0, 0, 0.02]),
     // The left fingers wrap the inner slide tubes near the mouthpiece brace, and the right
     // fingertips hold the upright slide brace (`docs/reference/wind-technique.md` 1.1).
     tubes: {
-      tubeL: { bone: 'instrument', from: [0.04, low / 2, 0], to: [0.3, low / 2, 0] },
-      tubeR: { bone: 'slide', from: [0, -low / 2, 0], to: [0, low / 2, 0] },
+      tubeL: {
+        bone: 'instrument',
+        from: scaled([0.04, low / 2, 0]),
+        to: scaled([0.3, low / 2, 0]),
+      },
+      tubeR: { bone: 'slide', from: scaled([0, -low / 2, 0]), to: scaled([0, low / 2, 0]) },
     },
     targets: [
-      bellTarget,
+      { ...bellTarget, from: scaled(bellTarget.from), to: scaled(bellTarget.to) },
       {
         kind: 'slide',
         bone: 'slide',
-        from: [0, 0, 0.02],
-        to: [t.travel, 0, 0.02],
+        from: scaled([0, 0, 0.02]),
+        to: scaled([t.travel, 0, 0.02]),
         normal: [0, 0, 1],
         keys: null,
       },
@@ -871,8 +882,8 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
  * and the instrument bone hangs on the chest (4.7).
  *
  * @param id The brass instrument.
- * @param scale The scale of the trumpet (`SpeciesParams.trumpetScale`). The other brass
- *   instruments ignore it.
+ * @param scale The scale of the trumpet or the trombone (`SpeciesParams.trumpetScale`,
+ *   `SpeciesParams.tromboneScale`). The other brass instruments ignore it.
  * @param lead The lengths by which the lead pipe of the tuba reaches back and to the left from the
  *   mouthpiece, in meters (`SpeciesParams.tubaPipe`). The other brass instruments ignore it.
  * @returns The model.
@@ -888,7 +899,7 @@ export function buildBrass(
       : id === 'trumpet'
         ? trumpet(scale)
         : id === 'trombone'
-          ? trombone()
+          ? trombone(scale)
           : tuba(lead);
   const main = built.pieces[0];
   if (!main) {

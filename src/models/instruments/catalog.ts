@@ -85,7 +85,6 @@ export function buildInstrument(
     case 'choir-folder':
       return buildChoirFolder();
     case 'horn':
-    case 'trombone':
       return buildBrass(id);
     case 'tuba':
       return buildBrass(id, 1, tubaPipe);
@@ -140,6 +139,7 @@ function buildScaled(
     case 'bassoon':
       return buildWoodwind(id, scale);
     case 'trumpet':
+    case 'trombone':
       return buildBrass(id, scale);
     case 'cymbals':
       return cymbalForm === 'suspended' ? buildSuspendedCymbal(scale) : buildCymbals(scale);
