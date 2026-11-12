@@ -8,7 +8,7 @@ import type { StudioBody } from '../studio-format.ts';
  */
 export const STUDIO_PIG = {
   source: 'assets/models/pig/tripo-hand/pig.rig.glb',
-  sha256: 'a5a51cae7219102fb925ddf10d00a98397dea964bca2397e4bcf10e6e57f1ee7',
+  sha256: '57976132fef40d00fbebb06edb1151cd094c5a85121511682dd3935367ae60db',
   scale: 1.402226,
   heads: {
     root: [0, -0.059988, -0.129121],
@@ -146,7 +146,7 @@ export const STUDIO_PIG = {
   ],
   hinges: {
     L: [0.025071, -0.976966, 0.211917],
-    R: [-0.076113, 0.934626, -0.347393],
+    R: [-0.268539, 0.7669, -0.582882],
   },
   texture: {
     file: 'assets/models/pig/tripo-hand/pig-color.webp',
