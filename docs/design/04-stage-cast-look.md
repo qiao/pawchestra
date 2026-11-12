@@ -733,15 +733,18 @@ rig"). The first Tripo P2 rabbit was a trial of this route that the app does not
 of the third Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
 stretch (`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
 target of its look, as for the Tripo wolf. It shows the color map of its Tripo FBX
-(`rabbit-color.webp`, `tools/rabbit-maps.py`) with no color change, and it keeps the eyeballs of
-the source in their sockets, with no bead eyes. Reason: the map paints a full eye on each eyeball
-(a black pupil, a brown iris, a light, and white). Its eyeballs and sockets are 0.93 of the
-source, so that each eye opening is 0.140 of the head width (0.149 in the source), and the balls
-keep their bulge. The irises keep the place of the source paint, with no gaze shift: the rabbit
-does not look cross-eyed or down, and the iris shows below the upper lid from the default camera.
-Reason: the right pupil of the source lies lower than the left, and a shift showed white seams in
-the right eye. The map paints a light in each pupil, so the eyes take the finish `varnish` and no
-eye light. A lid on each eye blinks over it
+(`rabbit-color.webp`, `tools/rabbit-maps.py`) with no color change out of the eyes, and it keeps the
+eyeballs of the source in their sockets, with no bead eyes. Reason: the map paints a full eye on
+each eyeball (a black pupil, a brown iris, a light, and white). Its eyeballs and sockets are 0.93 of
+the source, so that each eye opening is 0.140 of the head width (0.149 in the source), and the balls
+keep their bulge. The map tool moves the iris of each eye on its own, with its pupil and its light,
+to the middle of its eye opening in a view from above the head (`VIEW_DOWN`), turned a little out
+(`GAZE_OUT`), with both pupils at one height (`shift_eyes()`). White of the same eye fills the place
+that the iris leaves, and the clean outer rim of the iris fills its nose rim. Reason: the source
+paints each pupil at the nose side of its opening, so the rabbit looked cross-eyed from the side,
+and its two eyes are not mirror images, so a mirrored shift showed a white seam. The map paints a
+light in each pupil, so the eyes take the finish `varnish` and no eye light. A lid on each eye
+blinks over it
 ("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
 `violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
