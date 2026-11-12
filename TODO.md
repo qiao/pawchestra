@@ -73,7 +73,7 @@ passes.
       Cut the thin faces, or count their pixels in a probe build.
 - [ ] Monkey trumpeter: from the front at the elevation 20, the right paw on the valve tops hides
       the mouth. A right curl of 69° (92° now) and a side aim of 0.5 or 1 (0.8 now) leave the
-      paw and the forearm in front of the mouth. The right arm has 1.5 cm of spare reach, so the
+      paw and the forearm in front of the mouth. The right arm has 1.4 cm of spare reach, so the
       grip cannot move further toward the bell.
 - [ ] Monkey trumpeter: the right thumb points back to the mouthpiece. A real player puts it under
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
@@ -97,14 +97,15 @@ passes.
       layout, by a median of 7 cm to 12 cm, and 17 players more than 0.2 m (the monkeys of
       beethoven-9 1.39 m and 1.28 m, a red fox of boulanger-matin 1.36 m). The seat height and the
       chair size move no player. Check the low chair and the moves with the user.
-- [ ] Trumpeter monkey: with the trumpet of 0.85 and the play stance (`MONKEY_TRUMPET`), the right
-      paw reaches its grip with 0.9 cm to spare (1.5 cm before), and a trumpet of 0.91 is out of
-      reach. A larger trumpet needs another reach gain, such as a small turn of the bell to the right.
-- [ ] Trumpeter monkey: with the trumpet of 0.85, more arm faces fold: 48 in the rest sample of
-      `hold-fit` (37 before), and the arm gate folds p95 are 20 (right) and 26 (left), against 17
-      and 25. Check the elbows in 2x crops.
-- [ ] Trumpeter monkey: the trumpet of 0.85 moves the music stand of the monkey from 0.69 m to
-      0.77 m in `beethoven-7-4`. Check the hall views of each demo with a monkey trumpeter.
+- [ ] Trumpeter monkey: the body of 1.2 times H with the trumpet of the app folds 47 arm faces in
+      the rest sample of `hold-fit`. The arm gate did not run at this scale (folds p95 20 right
+      and 26 left, skin twist 44 and 29 degrees at the scale before). Run it, and check the
+      elbows in 2x crops.
+- [ ] Trumpeter monkey: the body of 1.2 times H moves players in each of the 8 demos with a
+      monkey: the second monkey of `beethoven-7-4` and `beethoven-8-4` 1.31 m, a horn pig of
+      `beethoven-1` 1.37 m, the clarinet wolf and a horn pig there 0.96 m, and in
+      `bach-bwv1047` each player 6 cm back. No monkey comes within 10 cm of a neighbor or
+      14.8 cm of a stand. Check the hall views of each demo with a monkey trumpeter.
 - [ ] Trumpeter monkey: at rest, with the trumpet in front of the belly (`restShift`), the upper
       arms roll 70.6° and -50.6° from the clavicles (`pose-preview`), more than 45°. The skin twist
       of the arm gate stays 29° and 25°. Check the arms at rest in a 2x crop.
