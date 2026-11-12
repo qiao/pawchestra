@@ -151,8 +151,9 @@ and the skin normals at the arm roots (`rootNormals` of `tools/mesh-rigs/dog.jso
 
 `tripo-hand/` holds a candidate body ("tripo-hand/dog.blend" below): a hand rig of the Tripo P2
 beagle `tripo-p2/dog.fbx`, made by one build script in a headless Blender 5.2, as the Tripo wolf
-(`../wolf/README.md`). The body keeps the form, the colors, and the eyes of the source: no point
-edit changes the head, the ears, the muzzle, the trunk, the paws, the legs, or the tail. The arms
+(`../wolf/README.md`). The body keeps the colors and the eyes of the source, and the form of the
+source but for the front paws: one point edit makes them smaller ("Paw size"). No point edit
+changes the head, the ears, the muzzle, the trunk, the legs, the feet, or the tail. The arms
 keep the length of the source: no cut, no split from the trunk, and no stretch. On the branch of the
 candidate, the `ANIMALS` entry of the dog points to `tripo-hand/dog.rig.glb`. The files of the dog
 of main above do not change.
@@ -195,13 +196,13 @@ muzzle, a smile line, and on each eyeball a brown iris, a black pupil, and two w
 ### tripo-hand/dog.blend
 
 The candidate hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/beagle/` of
-the worktree, which git ignores: `build.py`, `rings.py`, `make_config.py`, `params.json`, and
-`chain-here.sh`) are not in the repo. They are the scripts of the Tripo wolf with the values of the
+the main checkout, which git ignores: `build.py`, `rings.py`, `redits.py`, `make_config.py`,
+`params.json`, and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo wolf with the values of the
 beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|
-| Size | 393,864 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 393,105 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 115 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
 | Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -226,14 +227,15 @@ left side):
   on the right (1 step), 211 vertices on each side. New quads join the two rings with the step
   offset, and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units).
   The new quads keep the UVs of the old band. The paws keep their form ("Arm twist").
-- **Point edits.** None. The head, the ears, the eyes, the muzzle, the trunk, the paws, the legs,
-  and the tail keep the form of the source.
+- **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The head, the ears,
+  the eyes, the muzzle, the trunk, the arms, the legs, the feet, and the tail keep the form of the
+  source.
 - **Surface.** `sa.add_surface(dog, 'dog', <base color>, eye_fans=False,
   config=<dog-tripo.json>)`. The gloss nose is the dark nose in the nose box of the config.
 - **Eyes.** The 72 faces of the two eyeballs take the face attribute `eye`.
 - **Armature.** The joints of the config: the shoulder at x 0.10, the elbow at x 0.205, the wrist
-  at x 0.31, the knuckles at x 0.375, the hip at (0.083, 0.28, 0.035), and the knee at (0.083,
-  0.16, 0). The palm is the true palm of the source, the mean normal of the paw faces that face
+  at x 0.31, the knuckles at x 0.364 (x 0.375 in the source, moved by the paw edit), the hip at
+  (0.083, 0.28, 0.035), and the knee at (0.083, 0.16, 0). The palm is the true palm of the source, the mean normal of the paw faces that face
   down, (0.155, -0.988, -0.012), turned by the paw turn. The bind arms (`bindArms`) and the trunk
   (`open` 1) are those of the dog of main. The elbow axis of each side turns about its bind upper
   arm (`hingeTurn`): 8 degrees on the left and -20 degrees on the right ("Arm twist").
@@ -294,6 +296,39 @@ the app, in meters, with the seated values from the bind of each player:
 The ears of the beagle hang, so the step compares the top of the head with no ear. A step to 1.1
 times the ear tips of the cat makes the head of the beagle about 1.3 times the head of the cat.
 
+**Paw size.** This is an exception to the wolf route, which keeps the form of the source. In the
+app, the front paws of the source read too large: the arms are short and the head is large. In
+shares of H, the source paw is about as long as the paw of the dog of main. But against the
+distance of the shoulder joints (the width of the trunk), it is 1.23 times as long and 1.55 times
+as wide. The point edit `paw` of `redits.py` (in `params.json`: `{"kind": "paw", "length": 0.82,
+"wide": 0.8, "thick": 1.0, "ramp": 0.02, "width": [0, 0, 1]}`) scales each front paw past the wrist
+joint of its side (x 0.31) about that joint, in the frame of the paw: the rest forearm axis, the
+width axis +z of the source turned with the paw turn, and the height axis square to the two. A
+point at the distance d past the wrist joint takes the share smoothstep(0, 0.02, d) of the scale,
+so the edit fades in over the wrist ring at x 0.318, and the wrist has no step. The paw height,
+the arm, the bones of the arm, and the feet do not change. `make_config.py` moves the knuckle joint
+and the tip of `fingers_<side>` with the same edit, and the weight rows keep their rules. The left
+paw in the rest of each export (`scratch/beagle/paw_measure.py`), in meters and in H:
+
+| Measure | Source beagle | Beagle now | Dog of main | Tripo cat |
+|---|---|---|---|---|
+| Length, wrist joint to tip | 0.180 (0.432) | 0.148 (0.355) | 0.139 (0.424) | 0.153 (0.450) |
+| Width | 0.183 (0.439) | 0.146 (0.352) | 0.112 (0.342) | 0.166 (0.488) |
+| Height | 0.113 (0.272) | 0.114 (0.273) | 0.091 (0.279) | 0.082 (0.243) |
+| Forearm girth at the wrist joint | 0.380 (0.913) | 0.376 (0.903) | 0.267 (0.816) | 0.317 (0.933) |
+| Length / shoulder distance | 0.597 | 0.489 | 0.485 | 0.541 |
+| Width / shoulder distance | 0.606 | 0.486 | 0.390 | 0.587 |
+| Length / arm (shoulder to wrist joint) | 0.567 | 0.465 | 0.347 | 0.472 |
+
+With the smaller paws, the hold does not change. Against the body of HEAD 12edbabec, the note
+targets stay within 5 mm (`pnpm hold-fit cellist`). The claws go at most 2.3 cm into the cello in
+the play (3.5 cm before) and 4.6 cm at rest (4.7 cm before). The arm gate (`pnpm arm-check
+cellist --base`) has no FAIL and no WORSE: the twist p95 of the left arm goes from 33° to 31°, and
+the forearm twist p95 from 44° to 37°. The bow paw touches the stick in each sample, with the stick
+0.2 cm in the closed paw (median). The median gap from the finger tips to the bow goes from 0.4 cm
+to 0.7 cm, so the share of the play samples in which the paw holds the bow goes from 59 % to 44 %
+(the rule of `tools/wind-grip.ts` with a temporary row for the cellist).
+
 **Ears.** The long ears hang to the top of each shoulder in the source. They follow the head and
 their ear bones, and in the moments of the cellist they lie on the shoulders with no visible cut
 into the arms or the cello. No weight fix was necessary.
@@ -340,7 +375,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,084,064 bytes | `6b5687f08957cf142ca53400d22bc0342c8960e5b9697fa708889782bb7a0066` |
-| `tripo-hand/dog.rig.json` | 16,184 bytes | `712be77001139e11263872c715c88a4fb2347cedad39c5557b11b831b61447bf` |
+| `tripo-hand/dog.rig.glb` | 1,084,064 bytes | `fd29f9b23ab26ef7f85dc5a22e26472faaffd172aeacd8a7e72f6fd0253eb49a` |
+| `tripo-hand/dog.rig.json` | 16,185 bytes | `13aedff9af472ae7fb94153ae6c61ffece5088300ae127d39176ef028232bad2` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |
