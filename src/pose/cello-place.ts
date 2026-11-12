@@ -33,10 +33,20 @@ export interface CelloFit {
   readonly turn?: number;
   /** The place of the end pin to the right of the middle, in head heights (`CELLO_PLACE.side`). */
   readonly side?: number;
+  /**
+   * The half width of the upper half of the back that the contact also tests, as a share of the
+   * length of the body: on a round chest, an edge of the upper bout can stand behind the front of
+   * the body while the middle line stands in front of it. With no value, only the middle line
+   * counts.
+   */
+  readonly across?: number;
 }
 
 /** The number of points on the middle line of the back that the contact tests. */
 const BACK_POINTS = 16;
+
+/** The lines across the upper half of the back that `CelloFit.across` adds, as shares of it. */
+const ACROSS_LINES = [-1, -0.5, 0, 0.5, 1] as const;
 
 /**
  * The bones of the trunk and the thighs, whose front the back of the cello rests on. The arms
@@ -92,8 +102,8 @@ export function trunkFront(model: PlayerModel, x: number, y: number): number | n
 /**
  * Finds the place of a cello at the body of a seated player (design 5.3), with the rule of
  * `CELLO_PLACE`: the end pin stands on the floor right of the middle, the cello leans back and to
- * the left, and it moves back until the middle line of its back stands `gap` in front of the
- * trunk or the thighs, as the cello of a real player leans back onto the chest
+ * the left, and it moves back until the middle line of its back (with `across`, also the lines
+ * across the upper half of its back) stands `gap` in front of the trunk or the thighs, as the cello of a real player leans back onto the chest
  * (`docs/reference/string-technique.md`, section 2.7). The end pin of the model fits the chest
  * (`celloPinOf()`), so the top of the back stands at the height of the chest. A contrabass takes
  * the same rule with its own lean, turn, and end pin place (`CelloFit`), as a real bassist leans
@@ -128,12 +138,16 @@ export function fitCelloPlace(model: PlayerModel, fit: CelloFit): CelloPlace {
   // The back moves only along z with the end pin, so one pass finds the place.
   let deepest = -Infinity;
   const point = new Vector3();
+  const width = (fit.across ?? 0) * VIOLIN.bodyLength * size;
   for (let k = 0; k <= BACK_POINTS; k++) {
     const y = pin + (k / BACK_POINTS) * VIOLIN.bodyLength * size;
-    point.set(0, y, half).applyQuaternion(turn).add(tip);
-    const front = trunkFront(model, point.x, point.y);
-    if (front !== null) {
-      deepest = Math.max(deepest, point.z - front);
+    const lines = width > 0 && 2 * k >= BACK_POINTS ? ACROSS_LINES : [0];
+    for (const share of lines) {
+      point.set(share * width, y, half).applyQuaternion(turn).add(tip);
+      const front = trunkFront(model, point.x, point.y);
+      if (front !== null) {
+        deepest = Math.max(deepest, point.z - front);
+      }
     }
   }
   if (Number.isFinite(deepest)) {
