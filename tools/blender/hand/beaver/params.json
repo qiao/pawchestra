@@ -1,0 +1,245 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/beaver/tripo-p2/beaver.fbm/beaver_basecolor.jpg",
+ "palm": [
+  0.049,
+  -0.999,
+  -0.016
+ ],
+ "ringEdges": 12,
+ "legTurnsIdentity": true,
+ "trunkOpen": 0,
+ "tailBind": {
+  "tail": [
+   0,
+   -0.11,
+   -0.13
+  ],
+  "tail_tip": [
+   0,
+   -0.06,
+   -0.15
+  ]
+ },
+ "chair": {
+  "halfWidth": 0.24,
+  "front": 0.0,
+  "back": -0.1,
+  "note": "The beaver has no chair (noChair of the species): it stands in the pose of the source. The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the underside of the belly between the legs. The front edge lies behind the shins and the back edge in front of the root of the tail. The half width holds the haunch (x 0.25)."
+ },
+ "eyeBox": [
+  [
+   0.04,
+   0.855,
+   0.23
+  ],
+  [
+   0.105,
+   0.92,
+   0.29
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.07,
+   0.815,
+   0.35
+  ],
+  [
+   0.07,
+   0.89,
+   0.42
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.055 to 0.094 on the left, y 0.864 to 0.912, z 0.240 to 0.283). The nose box holds the dark brown nose.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.01029,
+ "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb).",
+ "eyeSize": 0.30728,
+ "jointsNote": "TBD",
+ "rings": {
+  "arm": [
+   [
+    0.204,
+    0.234,
+    1
+   ],
+   [
+    0.299,
+    0.331,
+    1
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.17,
+  "reach": 0.08,
+  "control": [
+   [
+    0.17,
+    0.4,
+    0
+   ],
+   [
+    0.18,
+    0.25,
+    0
+   ],
+   [
+    0.19,
+    0.12,
+    0
+   ],
+   [
+    0.2,
+    0.04,
+    0
+   ],
+   [
+    0.21,
+    0,
+    0
+   ],
+   [
+    0.235,
+    0,
+    0
+   ],
+   [
+    0.248,
+    0,
+    0.25
+   ],
+   [
+    0.263,
+    0,
+    0.75
+   ],
+   [
+    0.278,
+    0,
+    0.75
+   ],
+   [
+    0.293,
+    0,
+    0.25
+   ],
+   [
+    0.306,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "pawTurn": {
+  "L": -4,
+  "R": 1
+ },
+ "turnRings": [
+  0.331,
+  0.352
+ ],
+ "turnFit": 0.02,
+ "earPlane": {
+  "points": [
+   [
+    0.09,
+    0.925,
+    0.09
+   ],
+   [
+    0.155,
+    0.885,
+    0.09
+   ],
+   [
+    0.122,
+    0.905,
+    0.05
+   ],
+   [
+    0.122,
+    0.905,
+    0.13
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "texture": {
+  "path": "assets/models/beaver/tripo-hand/beaver-color.webp",
+  "plainSmall": 30
+ },
+ "smooth": false,
+ "trunk": null,
+ "eyeVerts": [
+  60,
+  80
+ ],
+ "tailRule": {
+  "z": -0.13,
+  "yMax": 0.28,
+  "rowRoot": [
+   -0.01,
+   0.03
+  ],
+  "bend": 0.03
+ },
+ "lids": {
+  "back": 135,
+  "psi": [
+   -60,
+   60
+  ],
+  "lam": [
+   -60,
+   65
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.15,
+  "strip": 1.12,
+  "angle": 110,
+  "srgb": [
+   183,
+   118,
+   69
+  ],
+  "uv": [
+   0.7152,
+   0.1556
+  ],
+  "density": 0.64,
+  "refit": true
+ },
+ "noseFur": true,
+ "foldRelax": {
+  "angle": 75,
+  "pawX": 0.36,
+  "footY": 0.06,
+  "rounds": 40,
+  "lam": 0.5,
+  "clip": 0.02
+ },
+ "hingeTurn": {
+  "L": 30,
+  "R": -60
+ }
+}
