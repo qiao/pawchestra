@@ -111,7 +111,7 @@ cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the elephan
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/elephant.fbx`, `tripo-p2/elephant.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/elephant.blend` | Made from `tripo-p2/elephant.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/elephant.blend` | Made from `tripo-p2/elephant.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain elephant` |
 | `tripo-hand/elephant.rig.glb` | Export of `tripo-hand/elephant.blend`. License as the FBX file | `pnpm rig-export elephant --blend assets/models/elephant/tripo-hand/elephant.blend --out assets/models/elephant/tripo-hand/elephant.rig.glb` |
 | `tripo-hand/elephant.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/elephant-color.webp`, `tripo-hand/elephant-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/elephant-maps.py` |
@@ -148,11 +148,11 @@ outer side. It paints no light in the eyes.
 
 ### tripo-hand/elephant.blend
 
-The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/elephant/` of the
-worktree, which git ignores: `build.py`, `make_config.py`, `base-config.json`, `params.json`,
-`eye-centers.json`, and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo pig
-(`../pig/README.md`) with the changes below. `make_config.py` writes
-`tools/mesh-rigs/simple/elephant-tripo.json`: the joints of the source.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/elephant/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `eye-centers.json`, `redits.py`,
+`rimport.py`, `rings.py`), and `pnpm hand-chain elephant` runs it (`tools/blender/hand/README.md`).
+Its scripts are those of the Tripo pig (`../pig/README.md`) with the changes below. `make_config.py`
+writes `tools/mesh-rigs/simple/elephant-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|

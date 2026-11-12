@@ -182,7 +182,7 @@ above do not change.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/panda.fbx`, `tripo-p2/panda.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/panda.blend` | Made from `tripo-p2/panda.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/panda.blend` | Made from `tripo-p2/panda.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain panda` |
 | `tripo-hand/panda.rig.glb` | Export of `tripo-hand/panda.blend`. License as the FBX file | `pnpm rig-export panda --blend assets/models/panda/tripo-hand/panda.blend --out assets/models/panda/tripo-hand/panda.rig.glb` |
 | `tripo-hand/panda.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/panda-color.webp`, `tripo-hand/panda-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/panda-maps.py` |
@@ -231,12 +231,13 @@ on the wolf).
 | Facts | `height` 1.133145 (the shoulder joints at 1.807249 m for each unit, so that H is 0.499711 m, the H of the panda of `panda.rig.glb`), `crease` 180, `seatWidth` 0.66 |
 | Eyes | The eyeballs of the mesh at the size of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The scripts of the session (`scratch/panda/` of the worktree, which git ignores: `build.py`,
-`redits.py`, `rings.py`, `make_config.py`, `params.json`, and `chain-here.sh`) are not in the repo.
-They follow the scripts of the Tripo cat and of the Tripo wolf. `make_config.py` writes
-`tools/mesh-rigs/simple/panda-tripo.json`: the joints of the source, mapped by the paw turns, the
-arm stretch, and the paw edit. The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x
-is the x of the left side, y the height, in the source):
+The chain of the body is in `tools/blender/hand/panda/` (`build.py`, `make_config.py`,
+`params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`, `tail.py`), and `pnpm
+hand-chain panda` runs it (`tools/blender/hand/README.md`). Its scripts follow the scripts of the
+Tripo cat and of the Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/panda-tripo.json`:
+the joints of the source, mapped by the paw turns, the arm stretch, and the paw edit. The edits, in
+the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the left side, y
+the height, in the source):
 
 - **Import.** `sa.import_source('assets/models/panda/tripo-p2/panda.fbx', 1e-5)`. No vertex merges,
   and each face is flat.

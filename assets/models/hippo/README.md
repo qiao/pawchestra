@@ -114,7 +114,7 @@ below), and the paws keep their size. The `ANIMALS` entry of the hippo points to
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/hippo.fbx`, `tripo-p2/hippo.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/hippo.blend` | Made from `tripo-p2/hippo.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/hippo.blend` | Made from `tripo-p2/hippo.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain hippo` |
 | `tripo-hand/hippo.rig.glb` | Export of `tripo-hand/hippo.blend`. License as the FBX file | `pnpm rig-export hippo --blend assets/models/hippo/tripo-hand/hippo.blend --out assets/models/hippo/tripo-hand/hippo.rig.glb` |
 | `tripo-hand/hippo.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/hippo-color.webp`, `tripo-hand/hippo-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/hippo-maps.py` |
@@ -149,11 +149,12 @@ pupil, white at the corners, and a white light.
 
 ### tripo-hand/hippo.blend
 
-The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/hippo/` of the
-main checkout, which git ignores: `build.py`, `rings.py`, `redits.py`, `make_config.py`,
-`params.json`, and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo beagle
-with the values of the hippo. `make_config.py` writes `tools/mesh-rigs/simple/hippo-tripo.json`:
-the joints of the source, moved by the point edits of `redits.py`.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/hippo/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`), and `pnpm hand-chain hippo` runs it (`tools/blender/hand/README.md`). Its scripts are
+those of the Tripo beagle with the values of the hippo. `make_config.py` writes
+`tools/mesh-rigs/simple/hippo-tripo.json`: the joints of the source, moved by the point edits of
+`redits.py`.
 
 | Item | Value |
 |---|---|
@@ -180,7 +181,7 @@ left side):
   the right (3 steps), 248 vertices on each side. New quads join the two rings with the step offset, and the
   far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new quads
   keep the UVs of the old band. The paws keep their form ("Arm twist").
-- **Arm stretch.** The point edit `armStretch` (`scratch/hippo/redits.py`, params `{"kind":
+- **Arm stretch.** The point edit `armStretch` (`tools/blender/hand/hippo/redits.py`, params `{"kind":
   "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.095, 0.115]}`), after the paw turns. Each
   vertex of a side with |x| over the shoulder joint moves along the line u of the rest arm, from
   the shoulder joint to the wrist joint (0.2135 units), from its place t on the line to

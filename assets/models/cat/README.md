@@ -393,7 +393,7 @@ eyes, a slight smile, and smaller front paws need.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/cat.fbx`, `tripo-p2/cat.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/cat.blend` | Made from `tripo-p2/cat.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/cat.blend` | Made from `tripo-p2/cat.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain cat` |
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/cat-color.webp`, `tripo-hand/cat-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
@@ -429,11 +429,12 @@ muzzle, white paws, a pink nose, pink inner ears, and a thin mouth line.
 
 ### tripo-hand/cat.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/cat4/` of
-the worktree, which git ignores: `build.py`, `redits.py`, `rings.py`, `tail.py`, `make_config.py`,
-`params.json`, and `chain-here.sh`) are not in the repo. They follow the scripts of the third
-Tripo cat and of the Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/cat-tripo.json`:
-the joints of the source, mapped by the paw turns and the eye edit.
+The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
+`tools/blender/hand/cat/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
+`redits.py`, `rimport.py`, `rings.py`, `tail.py`), and `pnpm hand-chain cat` runs it
+(`tools/blender/hand/README.md`). Its scripts follow the scripts of the third Tripo cat and of the
+Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/cat-tripo.json`: the joints of the
+source, mapped by the paw turns and the eye edit.
 
 | Item | Value |
 |---|---|
@@ -468,7 +469,7 @@ left side, y the height, in the source):
   below y 0.79 fade out to y 0.75, so that the nose and the muzzle stay. Each ball then moves
   0.004 units back along its eye axis (0.30, 0, 0.954), x mirrored on the right. The largest skin
   move is 0.0038 units ("Eyes").
-- **Smile.** The map `smile` of `scratch/cat4/redits.py` (the values in `smile` of
+- **Smile.** The map `smile` of `tools/blender/hand/cat/redits.py` (the values in `smile` of
   `params.json`) lifts the corners of the mouth into a slight smile ("Smile"). The step runs after
   the weights (after the ear rows, step 5 below), so the automatic weights stay those of the mesh
   with no smile, and no arm skin changes. As a point edit before the weights, it changed the

@@ -93,7 +93,7 @@ fox points to `tripo-hand/fox.rig.glb`. The red fox and the tan fox share it.
 |---|---|---|
 | `tripo-p2/fox.fbx`, `tripo-p2/fox.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
 | `tripo-p2/fox-paws.fbx` | The source mesh with four-digit front paws ("Four-digit paws" below). License as the FBX file | `blender -b --factory-startup --python-exit-code 1 -P tools/blender/fox_paws.py -- assets/models/fox/tripo-p2/fox.fbx assets/models/fox/tripo-p2/fox-paws.fbx` |
-| `tripo-hand/fox.blend` | Made in headless Blender 5.2 from `tripo-p2/fox-paws.fbx` (below). License as the FBX file | The scripted edits below |
+| `tripo-hand/fox.blend` | Made in headless Blender 5.2 from `tripo-p2/fox-paws.fbx` (below). License as the FBX file | `pnpm hand-chain fox` |
 | `tripo-hand/fox.rig.glb` | Export of `tripo-hand/fox.blend`. License as the FBX file | `pnpm rig-export fox --blend assets/models/fox/tripo-hand/fox.blend --out assets/models/fox/tripo-hand/fox.rig.glb` |
 | `tripo-hand/fox.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/fox-color.webp` | Color map of the red fox, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/fox-maps.py` |
@@ -192,11 +192,11 @@ together: the middle two are the longest, and the outer two are shorter.
 
 ### tripo-hand/fox.blend
 
-The hand rig (design 4.4, "Hand rig"), made in headless Blender 5.2 (`blender -b
---factory-startup`) by one build script, as the Tripo wolf (`../wolf/README.md`) and the Tripo cat
-(`../cat/README.md`). The scripts of the session (`scratch/fox4/` of the main checkout, which git
-ignores: `build.py`, `redits.py`, `rings.py`, `tail.py`, `rimport.py`, `make_config.py`,
-`base-config.json`, `params.json`, and `chain.sh`) are not in the repo. `make_config.py` writes
+The hand rig (design 4.4, "Hand rig"), made in headless Blender 5.2 (`blender -b --factory-startup`)
+by one build script, as the Tripo wolf (`../wolf/README.md`) and the Tripo cat (`../cat/README.md`).
+The chain of the body is in `tools/blender/hand/fox/` (`build.py`, `make_config.py`, `params.json`,
+`base-config.json`, `redits.py`, `rimport.py`, `rings.py`, `tail.py`), and `pnpm hand-chain fox`
+runs it (`tools/blender/hand/README.md`). `make_config.py` writes
 `tools/mesh-rigs/simple/fox-tripo.json`: the joints of the source, mapped by the paw turns and the
 eye edit.
 

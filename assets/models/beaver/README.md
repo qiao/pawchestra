@@ -126,7 +126,7 @@ files of the old beaver above do not change.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/beaver.fbx`, `tripo-p2/beaver.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/beaver.blend` | Made from `tripo-p2/beaver.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/beaver.blend` | Made from `tripo-p2/beaver.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain beaver` |
 | `tripo-hand/beaver.rig.glb` | Export of `tripo-hand/beaver.blend`. License as the FBX file | `pnpm rig-export beaver --blend assets/models/beaver/tripo-hand/beaver.blend --out assets/models/beaver/tripo-hand/beaver.rig.glb` |
 | `tripo-hand/beaver.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/beaver-color.webp`, `tripo-hand/beaver-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/beaver-maps.py` |
@@ -161,11 +161,11 @@ of scales, and on each eyeball a dark brown iris, a black pupil, and a white lig
 
 ### tripo-hand/beaver.blend
 
-The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/beaver/` of the worktree,
-which git ignores: `build.py`, `redits.py`, `rings.py`, `rimport.py`, `make_config.py`,
-`params.json`, and `chain-here.sh`) are not in the repo. They follow the scripts of the Tripo cat
-(`../cat/README.md`). `make_config.py` writes `tools/mesh-rigs/simple/beaver-tripo.json`: the joints
-of the source.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/beaver/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`, `tail.py`), and `pnpm hand-chain beaver` runs it (`tools/blender/hand/README.md`). Its
+scripts follow the scripts of the Tripo cat (`../cat/README.md`). `make_config.py` writes
+`tools/mesh-rigs/simple/beaver-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|

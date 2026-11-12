@@ -331,7 +331,7 @@ above do not change.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/penguin.fbx`, `tripo-p2/penguin.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/penguin.blend` | Made from `tripo-p2/penguin.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/penguin.blend` | Made from `tripo-p2/penguin.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain penguin` |
 | `tripo-hand/penguin.rig.glb` | Export of `tripo-hand/penguin.blend`. License as the FBX file | `pnpm rig-export penguin --blend assets/models/penguin/tripo-hand/penguin.blend --out assets/models/penguin/tripo-hand/penguin.rig.glb` |
 | `tripo-hand/penguin.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/penguin-color.webp`, `tripo-hand/penguin-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/penguin-maps.py` |
@@ -368,10 +368,10 @@ light.
 
 ### tripo-hand/penguin.blend
 
-The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/penguin/` of the
-worktree, which git ignores: `build.py`, `make_config.py`, `base-config.json`, `params.json`,
-`chain-here.sh`, and the probe `balance.py`) are not in the repo. They are the scripts of the
-Tripo monkey with the changes below. `make_config.py` writes
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/penguin/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`), and `pnpm hand-chain penguin` runs it (`tools/blender/hand/README.md`). Its scripts are
+those of the Tripo monkey with the changes below. `make_config.py` writes
 `tools/mesh-rigs/simple/penguin-tripo.json`: the joints of the source.
 
 | Item | Value |

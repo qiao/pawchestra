@@ -110,7 +110,7 @@ trunk, and no stretch. On the branch of the candidate, the `ANIMALS` entry of th
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/monkey.fbx`, `tripo-p2/monkey.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/monkey.blend` | Made from `tripo-p2/monkey.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/monkey.blend` | Made from `tripo-p2/monkey.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain monkey` |
 | `tripo-hand/monkey.rig.glb` | Export of `tripo-hand/monkey.blend`. License as the FBX file | `pnpm rig-export monkey --blend assets/models/monkey/tripo-hand/monkey.blend --out assets/models/monkey/tripo-hand/monkey.rig.glb` |
 | `tripo-hand/monkey.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/monkey-color.webp`, `tripo-hand/monkey-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/monkey-maps.py` |
@@ -146,10 +146,11 @@ pupil, white, a dark rim, and a white light.
 
 ### tripo-hand/monkey.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/monkey/` of
-the worktree, which git ignores: `build.py`, `make_config.py`, `base-config.json`, `params.json`,
-and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo wolf with the changes
-below. `make_config.py` writes `tools/mesh-rigs/simple/monkey-tripo.json`: the joints of the source.
+The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
+`tools/blender/hand/monkey/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
+`redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain monkey` runs it
+(`tools/blender/hand/README.md`). Its scripts are those of the Tripo wolf with the changes below.
+`make_config.py` writes `tools/mesh-rigs/simple/monkey-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|

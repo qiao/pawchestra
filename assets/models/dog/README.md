@@ -161,7 +161,7 @@ of main above do not change.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/dog.fbx`, `tripo-p2/dog.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/dog.blend` | Made from `tripo-p2/dog.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/dog.blend` | Made from `tripo-p2/dog.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain dog` |
 | `tripo-hand/dog.rig.glb` | Export of `tripo-hand/dog.blend`. License as the FBX file | `pnpm rig-export dog --blend assets/models/dog/tripo-hand/dog.blend --out assets/models/dog/tripo-hand/dog.rig.glb` |
 | `tripo-hand/dog.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/dog-color.webp`, `tripo-hand/dog-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/dog-maps.py` |
@@ -195,9 +195,10 @@ muzzle, a smile line, and on each eyeball a brown iris, a black pupil, and two w
 
 ### tripo-hand/dog.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/beagle/` of
-the main checkout, which git ignores: `build.py`, `rings.py`, `redits.py`, `make_config.py`,
-`params.json`, and `chain-here.sh`) are not in the repo. They are the scripts of the Tripo wolf with the values of the
+The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
+`tools/blender/hand/dog/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
+`eye-centers.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain dog` runs it
+(`tools/blender/hand/README.md`). Its scripts are those of the Tripo wolf with the values of the
 beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joints of the source.
 
 | Item | Value |

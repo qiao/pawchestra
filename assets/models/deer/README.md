@@ -161,7 +161,7 @@ points to `tripo-hand/deer.rig.glb`. The files of the old deer above do not chan
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/deer.fbx`, `tripo-p2/deer.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/deer.blend` | Made from `tripo-p2/deer.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/deer.blend` | Made from `tripo-p2/deer.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain deer` |
 | `tripo-hand/deer.rig.glb` | Export of `tripo-hand/deer.blend`. License as the FBX file | `pnpm rig-export deer --blend assets/models/deer/tripo-hand/deer.blend --out assets/models/deer/tripo-hand/deer.rig.glb` |
 | `tripo-hand/deer.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/deer-color.webp`, `tripo-hand/deer-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/deer-maps.py` |
@@ -197,11 +197,12 @@ white light.
 
 ### tripo-hand/deer.blend
 
-The hand rig (design 4.4, "Hand rig"). The scripts of the session (`scratch/deer/` of the worktree,
-which git ignores: `build.py`, `make_config.py`, `base-config.json`, `params.json`, and
-`chain-here.sh`) are not in the repo. They are the scripts of the Tripo pig (`../pig/README.md`)
-with the eyeballs of the Tripo monkey (`../monkey/README.md`). `make_config.py` writes
-`tools/mesh-rigs/simple/deer-tripo.json`: the joints of the source.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/deer/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`), and `pnpm hand-chain deer` runs it (`tools/blender/hand/README.md`). Its scripts are
+those of the Tripo pig (`../pig/README.md`) with the eyeballs of the Tripo monkey
+(`../monkey/README.md`). `make_config.py` writes `tools/mesh-rigs/simple/deer-tripo.json`: the
+joints of the source.
 
 | Item | Value |
 |---|---|

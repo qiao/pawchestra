@@ -571,7 +571,7 @@ not change.
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/polar-bear.fbx`, `tripo-p2/polar-bear.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/polar-bear.blend` | Made from `tripo-p2/polar-bear.fbx` by the scripted edits below. License as the FBX file | The scripted edits below |
+| `tripo-hand/polar-bear.blend` | Made from `tripo-p2/polar-bear.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain polar-bear` |
 | `tripo-hand/polar-bear.rig.glb` | Export of `tripo-hand/polar-bear.blend`. License as the FBX file | `pnpm rig-export polar-bear --blend assets/models/polar-bear/tripo-hand/polar-bear.blend --out assets/models/polar-bear/tripo-hand/polar-bear.rig.glb` |
 | `tripo-hand/polar-bear.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/polar-bear-color.webp`, `tripo-hand/polar-bear-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/polar-bear-maps.py` after the export |
@@ -609,11 +609,12 @@ mouth line in a smile, and brown claws.
 ### tripo-hand/polar-bear.blend
 
 The candidate hand rig (design 4.4, "Hand rig"), made in headless Blender 5.2 (`blender -b
---factory-startup`) by one build script. The scripts of the session (`scratch/polar3/` of the
-worktree, which git ignores: `build.py`, `redits.py`, `make_config.py`, `params.json`, and
-`chain-here.sh`) are not in the repo. They follow the scripts of the Tripo fox
-(`assets/models/fox/README.md`). `make_config.py` writes `tools/mesh-rigs/simple/polar-bear-tripo.json`:
-the joints of the source, mapped by the point edits.
+--factory-startup`) by one build script. The chain of the body is in
+`tools/blender/hand/polar-bear/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
+`redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain polar-bear` runs it
+(`tools/blender/hand/README.md`). Its scripts follow the scripts of the Tripo fox
+(`assets/models/fox/README.md`). `make_config.py` writes
+`tools/mesh-rigs/simple/polar-bear-tripo.json`: the joints of the source, mapped by the point edits.
 
 | Item | Value |
 |---|---|

@@ -57,7 +57,7 @@ The candidate hand rig:
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/rabbit.fbx`, `tripo-p2/rabbit.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/rabbit.blend` | Made in headless Blender 5.2 from `tripo-p2/rabbit.fbx` (below). License as the FBX file | The scripted edits below |
+| `tripo-hand/rabbit.blend` | Made in headless Blender 5.2 from `tripo-p2/rabbit.fbx` (below). License as the FBX file | `pnpm hand-chain rabbit` |
 | `tripo-hand/rabbit.rig.glb` | Export of `tripo-hand/rabbit.blend`. License as the FBX file | `pnpm rig-export rabbit --blend assets/models/rabbit/tripo-hand/rabbit.blend --out assets/models/rabbit/tripo-hand/rabbit.rig.glb` |
 | `tripo-hand/rabbit.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/rabbit-color.webp` | Color map of the rabbit, from the color map of the Tripo FBX ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py` |
@@ -282,11 +282,12 @@ FBX file.
 | `tripo-hand/rabbit.rig.glb` | 1,218,828 bytes | `524098bc05131464a9d46f260e1d319efc74d90d680f0898d4918c313603bfd1` |
 | `tripo-hand/rabbit.rig.json` | 16,320 bytes | `e9606923f20d3f5d05a0b50a7c42501d2c20dc18aaec17b1037d023997778b35` |
 
-The scripts of the session (`scratch/rabbit3/` of the worktree, which git ignores: `build.py`,
-`redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
-not in the repo. They follow the scripts of the second Tripo rabbit and the fourth Tripo cat. The
-edits, in the order of the work (`sa` is `tools/blender/studio_armature.py`, x is the x of the left
-arm). Each edit is a need of the rig, the seat, or the instrument:
+The chain of the body is in `tools/blender/hand/rabbit/` (`build.py`, `make_config.py`,
+`params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain
+rabbit` runs it (`tools/blender/hand/README.md`). Its scripts follow the scripts of the second Tripo
+rabbit and the fourth Tripo cat. The edits, in the order of the work (`sa` is
+`tools/blender/studio_armature.py`, x is the x of the left arm). Each edit is a need of the rig, the
+seat, or the instrument:
 
 - **Import.** `sa.import_source('assets/models/rabbit/tripo-p2/rabbit.fbx', 1e-5)`. The FBX faces
   -y, so no turn follows. No vertex merges. Each face is flat.
