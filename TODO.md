@@ -797,8 +797,6 @@ passes.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
       mesh `wolf.glb` of the wolf of main. Update it when the candidate merges.
-- [ ] Tripo wolf candidate: the upper arm rolls 41.8° (left) and -35.7° (right) at rest, near the
-      limit of 45°. Check the shoulder skin at rest in the app.
 - [ ] Tripo beagle candidate: the right paw twists 65° on its forearm at rest (`pnpm arm-check
       cellist`, paw twist p95), 92° before the rest grip of `f5031198e`. No rest grip, rest
       elbow, or bow turn of the scan took it to 45° or less. In one lowering at the end of
@@ -952,11 +950,14 @@ scene of each demo has its seats and stage size with no overlap.
       0.764 m deep. Check the tail between the rows of the stage with the user.
 - [ ] Mouse: with no chair, the haunch hangs 0.076 m above the floor, and it seems to float in the
       low side view. Offer the user a lower haunch, or the heels further back.
-- [ ] Wolf clarinetist: renders from the camera of the reference images put the clarinet of the wolf
-      at about 30° to 35°. The app uses 30°. Show the user, and offer 35°.
-- [ ] Wolf clarinetist: the right paw reaches its grip with only 0.9 cm to spare. Try a larger arm
-      factor (up to 1.25) or a new mouthpiece place.
-- [ ] Wolf clarinetist: the mouthpiece goes 1.3 cm into the head under the long muzzle.
+- [ ] Wolf clarinetist: at 35° the right paw reaches its grip with only 0.2 cm to spare, also with
+      the right shoulder 45° forward (`pnpm hold-reach wolf --instrument clarinet`), and a palm
+      misses its grip by up to 13.9 mm (`pnpm hold-fit clarinetist`, note targets, 6.2 mm before
+      the smaller paws). Try a larger arm factor (up to 1.25) or a new mouthpiece place.
+- [ ] Wolf clarinetist: the smaller paws raise the folded arm faces (`pnpm arm-check clarinetist`,
+      folds p95) from 53 to 66 (left) and from 48 to 55 (right), over the limit of 8 before and
+      after. Find the folded faces (`pnpm fold-probe`), and check the paws in the app.
+- [ ] Wolf clarinetist: the mouthpiece goes 1.6 cm into the head under the long muzzle.
 - [ ] Wolf: the seated wolf is 1.01 times the dog cellist, below the range of the orchestra images.
       Ask the user to confirm the shape of the body.
 - [ ] Wolf: ask the user to confirm the face (level brows, level bead eyes, a thin smile line).
