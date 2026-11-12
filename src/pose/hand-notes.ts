@@ -997,9 +997,12 @@ export function handStateAt(track: HandTrack, time: number, out: HandState): voi
   }
   // Before the move, the hand is away from the strings after the pluck of the note before. In a
   // rolled chord, the fingers pluck from the first pluck on, and the hand pulls away only after
-  // the last pluck, at the note start.
-  const before = i > 0 ? (track.gestures[i - 1] ?? 1) * (1 - eased) : 0;
-  const pluck = time < start ? 0 : smoothstep((time - start) / (track.pluckTimes[i] ?? 1));
+  // the last pluck, at the note start. The move to the next group of a hand can start before
+  // that pull ends, so the pull before eases from its value at the time.
+  const pluckAt = (k: number): number =>
+    smoothstep((time - (track.starts[k] ?? 0)) / (track.pluckTimes[k] ?? 1));
+  const before = i > 0 ? (track.gestures[i - 1] ?? 1) * pluckAt(i - 1) * (1 - eased) : 0;
+  const pluck = time < start ? 0 : pluckAt(i);
   out.lift = 0;
   out.kick = 0;
   out.pull = HAND_MOTION.pull * (time < start ? before : gesture * pluck);
