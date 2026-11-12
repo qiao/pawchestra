@@ -1501,29 +1501,32 @@ const HIPPO_HOLD = {
  *
  * At rest, the rabbit sits as a seated orchestra violinist (`docs/reference/string-technique.md`,
  * section 2.9): the violin stands upright on the lap (`rest.axis` (0, 1, 0)), the left paw holds
- * its neck, and the bow hangs from the right paw with the tip down. The left upper arm hangs 35°
+ * its neck, and the right paw holds the bow up with a fist around the frog. The left upper arm hangs 35°
  * forward and the left elbow bends 80° (`restArms`), so that the elbow stays near the side: with
  * the 49° and 63° of the first hold of this body, the arm reached forward and held the violin up
  * in front of the chest. The left paw holds the neck at 0.5 of the fingerboard (`restPlace`), so
- * that the lower end of the violin stands 1.1 cm above the lap: at 0.4, the lower end went into
+ * that the lower end of the violin rests on the lap: at 0.4, the lower end went into
  * the lap, and at 0.6, it stood 3 cm above it (`pnpm hold-fit violinist --scan`). The paw lies
  * 1.5 cm off the neck (`restGapL`), so that the violin stands nearer to the lap (1.4 cm above it
  * with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the left
  * forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over the
  * 70° of the arm gate, and with 80°, the twist was 48°.
  *
- * The right upper arm hangs straight down at the side and the elbow bends 35° (`restArms`). The
- * bow tip points down, forward, and a little out, (0.3, -0.8, -1), so that the tip rests near the
- * right foot, 16 cm above the floor, and 37 cm from the music desk. The hair faces in and back,
- * (-1, 0, 1), so that the right forearm twists 5° at rest and the paw bends 47° on it. The bow
- * paw grips the stick across the palm, so a bow tip straight down twisted the right forearm by
- * about 175°, and a tip more down, (0.2, -1, -0.7), put the frog end 2.8 cm into the forearm. With
- * the first rest bow of this body, the tip pointed up, out, and forward, (0.7, 0.8, -0.6), and the
- * bow stood up toward the desk like a pointer. In the lift and the lowering, the bow tip turns
- * through the front and a little down, (0, -0.3, -1), with the hair down, and the grip moves 0.3 H
- * out and 0.1 H to the front (`restBow.via`), so that the bow keeps at least 5 cm from the desk:
- * with the via of the shoulder hold, the tip went into the desk. Each part of each arm then turns
- * at most 42° in the moments of the violinist (assets/models/rabbit/README.md, "Arm twist").
+ * The right upper arm swings 10° forward and the elbow bends 50° (`restArms`), so that the paw
+ * rests at the top of the right thigh near the hip, with the elbow near the side. The paw holds the
+ * bow at the frog with the tip up and a little out, (0.2, 1, 0.1), as a seated violinist rests the
+ * bow pointing up with a fist around the frog (`docs/reference/string-technique.md`, section 2.9).
+ * The bow paw grips the stick across the palm, so the stick rises from the thumb side of the
+ * closed paw: a tip down twists the right forearm, and a tip straight down twisted it by about
+ * 175°. The short arms do not reach the top of the thigh in front of the hip, so the frog end
+ * stands beside the thigh. The hair faces the front and in, (-1, 0, -1), so that the right forearm
+ * twists 38° at rest, and the bow turns 72° from the rest to the bow of the moves: with the hair
+ * to the back and out, (1, 0, 1), the forearm twisted 8° at rest, but the bow turned about 150°,
+ * and the paw flipped early in each lift (`pnpm arm-check violinist`). In the lift and the
+ * lowering, the bow tip turns up through the front, (0.3, 0.6, -1), with the hair to the front,
+ * and the grip moves 0.3 H out and 0.1 H to the front (`restBow.via`), so that the bow keeps at
+ * least 20 cm from the music desk. Each part of each arm then turns at most 43° in the moments of
+ * the violinist (assets/models/rabbit/README.md, "Arm twist").
  *
  * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
  * front (`liftReach`), and the left elbow points out and down, (-1, -1.2, 0) (`liftPoleL`), so
@@ -1541,7 +1544,7 @@ const RABBIT_HOLD = {
   restPlace: 0.5,
   restArms: {
     L: { forward: 35 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
-    R: { forward: 0, bend: 35 * MathUtils.DEG2RAD },
+    R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
   },
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
@@ -1551,9 +1554,9 @@ const RABBIT_HOLD = {
   liftPoleL: [-1, -1.2, 0],
   restBow: {
     ...SHOULDER_HOLD.restBow,
-    tip: [0.3, -0.8, -1],
-    hair: [-1, 0, 1],
-    via: { tip: [0, -0.3, -1], hair: [0, -1, 0], reach: [0.3, 0, -0.1] },
+    tip: [0.2, 1, 0.1],
+    hair: [-1, 0, -1],
+    via: { tip: [0.3, 0.6, -1], hair: [0, 0, -1], reach: [0.3, 0, -0.1] },
   },
 } as const satisfies BowedHold;
 
