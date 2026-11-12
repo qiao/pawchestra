@@ -534,7 +534,8 @@ source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  m
   ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
 ```
 
-The mesh of the `.blend` is the source of truth, and no tool makes it again from the source file.
+In a rig made by hand, the mesh of the `.blend` is the source of truth, and no tool makes it
+again from the source file.
 `add_surface()` runs one time on that mesh: each face takes the color of the base color texture
 of the source (the GLB file, or the image file of an FBX source) through the UVs of the mesh, by
 the color rules of "Mesh rig" (`face_colors()`, `palette()`). The faces of the old eyes take the
@@ -558,6 +559,13 @@ the role, the constant, and the GLB file. A tool reads each value from the expor
 (`<s>.rig.glb` or its summary `<s>.rig.json`), never from the rig config
 `tools/mesh-rigs/<s>.json`, which keeps the values of the old chain. `pnpm rig-mesh <s>` stops
 for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap.ts`).
+
+Each Tripo body of `tripo-hand/` except the bear comes from a script chain in
+`tools/blender/hand/<s>/`: `params.json` and `base-config.json` hold its values, `make_config.py`
+writes its rig config `tools/mesh-rigs/simple/<s>-tripo.json`, and `build.py` writes its `.blend` in
+headless Blender. `pnpm hand-chain <s>` runs the chain, `rig-export`, and `studio-body`. For such a
+body, the chain is the source of truth, and the `.blend` is an output. Reason: git keeps the
+chain, so each worktree and each later round can make the body again byte for byte.
 
 | GLB item | Hand rig |
 | --- | --- |
