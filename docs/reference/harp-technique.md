@@ -363,7 +363,8 @@ function of the notes. Design 5.3 "Harp" gives the motion. The app follows these
   presses it into its notch, and goes back to its rest (`poseHarpFeet()`).
 - **The heels (7.7).** The pedals stand on the floor, and the hoof presses a pedal with the heel
   on the floor: it turns up around its heel until the front of its sole is on the pedal, and
-  higher over the pedal in the move to it.
+  higher over the pedal in the move to it. The pedals of the near harp lie under the knees of the
+  deer, so for a pedal behind the rest place of the toe, the heel lifts (`HEEL_LIFT`).
 
 The app does not follow these facts:
 
