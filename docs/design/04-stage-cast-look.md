@@ -801,9 +801,12 @@ warm white (`far_tone()`), with the values of the dark iris of the earlier fox m
 each eye is a few pixels across, and the bright white read dim. Its source paints white only at the
 outer corner, so it takes no round iris. Its arm, leg, and trunk girths and
 its paws are those of the main polar bear, and its head keeps the round form of the sheet. The
-candidate Tripo wolf (`assets/models/wolf/tripo-hand/`) has no point edit of its form and no
-change of its map colors, and it scales only to H of the wolf of main. Reason: the look target of
-this body is its source FBX in an FBX viewer. Its source has no eyeball, so the head faces of each
+candidate Tripo wolf (`assets/models/wolf/tripo-hand/`) has no change of its map colors, and it
+scales only to H of the wolf of main. Reason: the look target of this body is its source FBX in an
+FBX viewer. Its one point edit makes the front paws smaller past the wrist (the edit `paw` of its
+build, `assets/models/wolf/README.md`, "Paw size"). Reason: against the distance of the shoulder
+joints, the source paws are larger than the paws of the beagle and the rabbit, and they read too
+large on the short arms. Its source has no eyeball, so the head faces of each
 painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
 steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
