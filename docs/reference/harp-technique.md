@@ -127,8 +127,10 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 The app follows these facts:
 
 - **The size (section 1).** The deer plays a harp of 0.75 of the concert harp of the app
-  (`SpeciesParams.harpScale`), 0.98 m high. Its base stands on the floor, so the pedals lie at the
-  hooves. A larger harp brings its neck to the chin of the deer.
+  (`SpeciesParams.harpScale`), 0.94 m high. Its base stands on the floor, so the pedals lie at the
+  hooves. A larger harp brings its neck to the chin of the deer. The crown and the neck near it
+  stand lower than on a concert harp (`HARP.column`), so the muzzle of the deer stays about 5 cm
+  above the neck, as the head does not rest on the harp (section 2).
 - **The place (section 2).** The base stands in front of the deer, and the top of the soundbox
   rests on the front of the right shoulder, near the neck. The harp is diagonal to the deer, with
   the column at the front left (`HARP_PLACE.turn`).
