@@ -34,8 +34,8 @@ QUALITY = 60
 NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
 #: The step of the orange fur in the tan map: the Oklab lightness step, the hue step in degrees,
-#: and the chroma factor. The orange fur of the source has the median Oklab L 0.638, C 0.17, and
-#: h 49.7.
+#: and the chroma factor. The orange fur of the source has the median Oklab L 0.629, C 0.165, and
+#: h 48.2.
 TAN_STEP = (0.06, 18.0, 1.0)
 #: The share of the step of a texel: a smoothstep of the Oklab chroma (C_RAMP), times 1 minus a
 #: smoothstep of the lightness (L_RAMP, the cream lies above), times 1 minus a smoothstep of the
@@ -49,10 +49,13 @@ H_RAMP = (15.0, 25.0)
 EYE_MARGIN = 4
 #: The gaze shift of the eyes (tools/gaze_shift.py): the view in degrees above the forward axis of
 #: the head of the seated bind in which each iris lies in the middle of its eye opening, and the
-#: turn of each target out and up from that middle, in degrees.
+#: turn of each target out and up from that middle, in degrees. GAZE_SHIFT turns the shift on. It
+#: is off: the source of the fox with four-digit paws paints each iris where the gaze reads at the
+#: viewer in the play view and from the default camera.
 VIEW_DOWN = 30.0
 GAZE_OUT = 4.0
 GAZE_UP = 0.0
+GAZE_SHIFT = False
 
 
 def linear(srgb):
@@ -154,7 +157,8 @@ def main():
     which = sys.argv[1:] or ['color', 'tan', 'normal']
     image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
     rig = gaze_shift.read_rig(RIG)
-    image = gaze_shift.shift_gaze(rig, image, VIEW_DOWN, GAZE_OUT, GAZE_UP)
+    if GAZE_SHIFT:
+        image = gaze_shift.shift_gaze(rig, image, VIEW_DOWN, GAZE_OUT, GAZE_UP)
     if 'color' in which:
         image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
         print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
