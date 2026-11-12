@@ -90,7 +90,7 @@ These probes need no build and change no source file. [`rigging.md`](rigging.md)
 | `pnpm camera-probe [--out <file>]`, `--compare <a> <b>`, or `--base <ref>` | Prints a hash of the camera of `cameraAt()` for each demo (design 5.6). `--compare` and `--base` print the changed samples. |
 | `pnpm sight-lines [--demo <id>]...` | Prints for each demo the players that do not see the head or the baton paw of the conductor (design 4.5), with the main blockers, and the players that the default view or the wide shots do not see. The count is a report with no goal. |
 | `pnpm beat-rates [--demo <id>]... [--limit <bpm>]` | Prints the rate of each beat or note motion over a song (design 5.1, 5.4), and fails above the limit. |
-| `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. |
+| `pnpm clip-probe [--demo <id>]... [--base <ref>]` | Finds the clips of all players over the whole song. Of the body, it tests the paws only: use `body-clip` for the trunk, the arms, and the legs. |
 | `pnpm shot-trace <demo> [--from <s>] [--to <s>]`, or `--rules` | Prints the choice of the shot planner at each cut (design 5.6). |
 | `pnpm plan-time [--base <ref>]...` | Times `prepareShots()` on each demo (design 5.6) on each tree, in turns. |
 | `pnpm light-probe [--look <JSON>]` | Prints the light on the players by row, and the lux for a goal. |
