@@ -125,17 +125,19 @@ passes.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
 - [ ] Deer harpist: the high left palm (`highL`) and the damp with no press of 2026-11-12 keep each
       paw at most 1.4 cm in the body. Check the high left notes in 2x crops in the app.
-- [ ] Deer harpist: the top of the soundbox lies at the outer side of the right shoulder, and the
-      end of the harp neck crosses the front of the right shoulder. Each vertex of the body in each
-      closed harp part, every 0.1 s of boulanger-matin: the right upper arm goes 1.9 cm into the
-      soundbox (82 % of the play samples over 1.0 cm) and 1.8 cm into the harp neck (56 %), the
-      right side of the chest 2.7 cm into the soundbox (100 %), and the deer neck 1.4 cm into the
-      harp neck (3.9 %). The cap of the soundbox shows in front of the arm from the right side.
-      A move of the harp in its +x (4.5 cm) with a tilt back of 4° clears the chest and the deer
-      neck, but puts the left paw 4.8 cm into the chest. A move away from the chest drops the
-      note targets under 95 %. The forward rest elbow of 2026-11-13 clears the rest and the lift.
-      Ask the user for a route: a smaller left hand range, longer deer arms, or another form of
-      the soundbox top and the neck end.
+- [ ] Deer harpist: the arm gate did not run on the arms of 1.3 times the source and the harp of
+      2026-11-13. Run `pnpm arm-check harpist --base a6bf63f28` and check the folds, the twist,
+      the paw swing, and the stretch of the longer arms in 2x crops.
+- [ ] Deer harpist: the right upper arm rolls 59° at rest and 47° in the lift from the bind
+      (`pnpm pose-preview harpist`, limit about 45°), with the forward right rest elbow
+      (`restR.pole`). Check the right shoulder at rest in 2x crops.
+- [ ] Deer harpist: in the fast run near 112 s of boulanger-matin, the right forearm turns 15° in
+      one 1/30 s step (`scratch/tripo-audit/motion.ts`). The turn speed is lower than before the
+      harp of 2026-11-13 (459 deg/s against 538), but the neighbor steps are slower now.
+- [ ] Deer harpist: the right paw goes 1.4 cm into the chest at 245.1 s of boulanger-matin
+      (`pnpm pose-depth harpist`, limit 1.5 cm). Check it in a 2x crop.
+- [ ] Harp: no source of `docs/reference/harp-technique.md` gives the width and the depth of the
+      soundbox of a concert harp at its top. Find one, and check `SOUNDBOX` against it.
 - [ ] Deer harpist: the left paw swing p95 is 69 (limit 70).
 - [ ] Deer harpist: the role sweep (`HARPIST_SWEEP`) and `pnpm clip-probe` do not measure the harp
       in the trunk or the legs in the harp, so they missed the clips above. Save
@@ -145,13 +147,14 @@ passes.
       boulanger-matin), where the music gives a move less than 0.2 s.
 - [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
       close snaps 31° to 45° in one step.
-- [ ] Deer harpist: in pedal moves, the left shin goes 1.9 cm into the stool edge (0.8 % of the
-      samples) and the right hoof 1.9 cm into the harp base (0.9 %).
+- [ ] Deer harpist: in pedal moves, the left shin goes 1.8 cm into the stool edge (0.7 % of the
+      samples) and the right hoof 1.9 cm into the harp base (0.8 %).
 - [ ] Deer: dark facet patches on the tail tip and the back of the left shoulder in the hall light.
       The color map has no dark texel there (`reports/2026-11-12-afix/deer/m4-patches/`), so the
       cause is the shading of flat faces that face away from the key. Four tail faces are flipped.
 - [ ] Deer harpist: the left hand plays only up to D4 (`reach.leftHighest`), because the near harp
       puts the higher strings near the chest. A harpist plays up to about C5 with the left hand.
+      The arms of 1.3 times the source can reach more: try E4 to G4 with `pnpm hold-fit harpist`.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
       0 cm now. Trim the entry when the tests come back.
 - [ ] Harp strings: ask the user to pick the strength and the density of the bands of the swinging
@@ -822,7 +825,7 @@ passes.
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
 - [ ] Tripo fawn: ask the user to confirm the size (the standing shoulders of the old deer, with a
-      smaller head than the old deer: H 0.22 m against 0.36 m) and the arms 1.2 times longer.
+      smaller head than the old deer: H 0.22 m against 0.36 m) and the arms 1.3 times longer.
 - [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
       is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
