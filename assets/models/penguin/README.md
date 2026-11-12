@@ -495,8 +495,12 @@ flippers).
 the flippers of the earlier penguin. With the folder at 1.1 H in front of the head center, the palms
 stayed up to 74 mm from their grips (`pnpm hold-fit singer`). The folder now hangs at 0.74 H
 (`CHOIR_FOLDER.forward`), and the elbow poles are (±1, -1, 0.1) (`CHOIR_HOLD`): the palms meet the
-grips within 1.0 mm, the flipper tips twist 27 degrees (40 with the earlier poles), and the folder
-goes 0.7 cm into the belly in the play (`pnpm pose-depth singer`, limit 2.0 cm). The roots of the upper flippers
+grips within 3.1 mm, the flipper tips twist 27 degrees (40 with the earlier poles), and the folder
+goes 0.7 cm into the belly in the play (`pnpm pose-depth singer`, limit 2.0 cm). The paw bones hold the
+outer third of each flipper (the wrist at two thirds of its length). The hand bends 30 degrees
+toward the palm at the wrist (`CHOIR_HOLD.flex`) and the fingers curl 15 degrees
+(`CHOIR_HOLD.curl`), so the outer third curls about 40 degrees around the outer edge of the cover,
+as a hand holds a book. The tips stay out of the folder (0.0 cm), and the paws go 0.2 cm into it. The roots of the upper flippers
 go 2.0 cm into the sides in each pose (1.3 cm on the earlier penguin, limit 1.5 cm).
 
 **Color map** (`tools/penguin-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and
