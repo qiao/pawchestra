@@ -379,7 +379,8 @@ The app follows these facts:
   `poleL`).
 - **The elbows (1.8).** The elbows stay away from the sides, so that the free round arms stay out
   of the trunk (design 5.3). Each elbow turns out about the line from the shoulder joint to the
-  grip (`poleL`, `poleR`), and the left shoulder turns forward (`reachL`). At rest, the elbows
+  grip (`poleL`, `poleR`): the right elbow points out to the side, so that the right upper arm
+  stays off the round belly. The left shoulder turns forward (`reachL`). At rest, the elbows
   point out and down, below the shoulders (`restPoleL`, `restPoleR`).
 - **The rest place (1.7).** The trombone stands upright in front of the body, with the slide down,
   16° forward of the vertical, as a seated player holds the slide vertical in front of the knee
@@ -404,16 +405,18 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The slide angle (1.1, 1.4).** The slide points toward the audience, a little below the level
-  and a little to the right (`PANDA_PLAY`). Straight ahead, the short arm of the panda reaches
-  almost none of the slide travel.
+- **The slide angle (1.1, 1.4).** The slide points toward the audience, 35° below the level and
+  20° to the right (`PANDA_PLAY`), lower than the small angle below the level of a real player.
+  Straight ahead or at 20° below the level, the short arm of the panda reaches none of the slide
+  travel.
 - **The tuning slide (1.1).** The bell section ends beside the cheek (`TROMBONE_BACK`), in place of
   over the left shoulder. The big head of the panda puts the cheeks beside the mouthpiece, and a
   real bell section went into the head.
 - **The slide reach (1.2).** The slide travel is a small part of the real travel, with the right
   arm straight at the seventh position (`slideReachOf()`). The paw at the far side of the brace
-  keeps the palm off the audience, and costs a part of the reach. The right grip lies high on the
-  brace, so that the right upper arm stays off the belly, and costs another part (`gripShiftR`).
+  keeps the palm off the audience, and costs a part of the reach. The right paw holds the brace
+  below its middle, and the right shoulder turns forward, so that the arm reaches a part of the
+  travel (`gripShiftR`, `reach`). A grip lower on the brace leaves the brace out of the paw.
 - **The alternate positions (1.3).** The app has none.
 - **The arm (1.4).** The two-bone IK moves the elbow most, with no lead of the wrist (`armRig()`).
 - **The rest place (1.7).** No source gives where an orchestral trombonist holds the trombone in a
