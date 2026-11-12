@@ -381,20 +381,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeFinish: 'varnish',
     },
   ],
-  // The trombone panda (design 4.4). It stands as a soloist. The standing shoulder joints are
-  // 1.026202 m high (0.9792 m with the legs of the mesh, and the rise of the longer legs), so that
-  // the body keeps 1.6052 m for each unit (`app` of the rig config). The panda sits on the chair of
-  // the panda of the A-pose mesh: the seat top is 0.277 m high, and the chair is 0.210 m deep.
+  // The trombone panda (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/panda/tripo-hand/panda.blend`), by the route of the Tripo wolf, with no arm cut
+  // and no arm stretch. It stands as a soloist. Its `.blend` holds the facts of the body: the scale
+  // that keeps H of the panda of `panda.rig.glb`, and the crease angle 180°. The map paints the iris
+  // and a light on each eyeball of the source, so the eyes take the finish `varnish` and no eye
+  // light.
   [
     'panda',
     {
       landmark: 'shoulders',
-      height: 1.026202,
       seated: true,
       soloist: true,
       constant: 'STUDIO_PANDA',
-      crease: 35,
-      glb: 'assets/models/panda/panda.rig.glb',
+      glb: 'assets/models/panda/tripo-hand/panda.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The contrabass hippo (design 4.4): the candidate hand rig of the Tripo P2 mesh
