@@ -5,10 +5,10 @@ import type { InstrumentId } from './types.ts';
  * Only tests read it.
  */
 export const INSTRUMENT_BUDGETS = {
-  violin: 1200,
-  viola: 1200,
-  cello: 1200,
-  contrabass: 1200,
+  violin: 2400,
+  viola: 2400,
+  cello: 3400,
+  contrabass: 3000,
   harp: 800,
   piano: 2000,
   'choir-folder': 800,
