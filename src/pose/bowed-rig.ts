@@ -127,6 +127,12 @@ export interface BowedHold {
    */
   readonly stickTurnR: { readonly forearm: number; readonly most: number } | null;
   /**
+   * The curl of the right fingers around the bow stick, in radians (`writeCurl()` of `pose/ik.ts`,
+   * design 4.6): `BOWED_HANDS.curlR` for a hold with no own value. A paw with short fingers curls
+   * them further, so that the finger tips close over the stick.
+   */
+  readonly curlR: number;
+  /**
    * The move of the instrument while the player plays, in head heights, in the axes of the parent
    * of the `instrument` bone. It makes room for the arms between the instrument and the body.
    */
@@ -457,6 +463,7 @@ const CHIN_HOLD = {
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,
+  curlR: BOWED_HANDS.curlR,
   playShift: [0, -0.05, -0.15],
   playTurn: IDENTITY,
   restPoleR: [1, -0.9, -0.5],
@@ -536,6 +543,7 @@ const FLOOR_HOLD = {
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,
+  curlR: BOWED_HANDS.curlR,
   playShift: [0, 0, -0.05],
   playTurn: IDENTITY,
   restPoleR: [1, -0.6, -0.5],

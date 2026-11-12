@@ -43,7 +43,10 @@ export const BOWED_HANDS = {
    * target is 165 mm long.
    */
   neckDepth: 0.18,
-  /** The curl of the right fingers around the bow stick (design 4.6). */
+  /**
+   * The curl of the right fingers around the bow stick (design 4.6), for a hold with no own curl
+   * (`BowedHold.curlR`).
+   */
   curlR: 45 * MathUtils.DEG2RAD,
 } as const;
 
@@ -1841,6 +1844,6 @@ export function poseBowed(
   const restCurl = restCurlOf(rig.hold);
   const playCurl = h.curlL + h.pressL * state.press * state.gesture;
   writeCurl(rig.armL, restCurl + (playCurl - restCurl) * weight, rotations);
-  writeCurl(rig.armR, h.curlR, rotations);
+  writeCurl(rig.armR, rig.hold.curlR, rotations);
   return pawTurnL;
 }
