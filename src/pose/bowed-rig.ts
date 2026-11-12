@@ -795,11 +795,14 @@ const SHOULDER_HOLD = {
  * and a little out, (0.3, 0.5, 1): with the tip of the chin hold, (0.3, 1, 0.4), the bent wrist of
  * the plucking paw moves the middle of the paw 2.1 cm from the stick, and with this tip 1.2 cm.
  *
- * The rest pose is the upright rest of the rabbit: the violin stands on the left thigh at 0.8 of
- * the way to the knee, 0.18 H down and 0.2 H forward. The thighs slope 25° down, so at 0.65 of the
- * way, 0.24 H down, and 0.3 H forward, the lower end stands 13.8 cm above the thigh. The left paw
- * holds the violin at 0.37 of the fingerboard (`restPlace`), so that it closes around the neck: at
- * 0.2, the paw lies over the scroll. The long right arm of the fox reaches the right thigh only
+ * The rest pose is the upright rest of the rabbit: the violin stands on the left thigh at 0.6 of
+ * the way to the knee, 0.14 H down and 0.2 H forward, near the hip, so that the short left arm
+ * reaches the rest grip. At 0.8 of the way and 0.18 H down, the rest grip was 5 cm out of the
+ * reach of the arm: the violin stood on the thigh with the paw on the pegbox, and in the first
+ * frame of each move the violin jumped 5.2 cm up into the paw (`carryLift()` of `pose/bowed.ts`).
+ * At 0.65 of the way, it moves 0.3 cm in that frame. The left paw holds the violin at 0.37 of the
+ * fingerboard (`restPlace`), so that it closes around the neck: at 0.2, the paw lies over the
+ * scroll. The long right arm of the fox reaches the right thigh only
  * nearly straight, and its line from the shoulder to a paw on the top of the thigh passes through
  * the side of the belly: with the grip 0.15 H out at 0.65 of the way, the right upper arm goes
  * 6.2 cm into the body. The stick passes through the paw, so the hand sits about 4 cm further out
@@ -878,7 +881,7 @@ const FOX_HOLD = {
   freeHair: 0.12,
   restPoleR: [0.5, -1, -0.2],
   restPlace: 0.37,
-  rest: { ...LAP_VIOLIN, lap: { along: 0.8, offset: [0, -0.18, -0.2] } },
+  rest: { ...LAP_VIOLIN, lap: { along: 0.6, offset: [0, -0.14, -0.2] } },
   liftReach: [-0.1, 0, -0.15],
   restPawTurnL: 25 * MathUtils.DEG2RAD,
   restYawL: -45 * MathUtils.DEG2RAD,
