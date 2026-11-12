@@ -739,7 +739,8 @@ each eyeball (a black pupil, a brown iris, a light, and white). Its eyeballs and
 the source, so that each eye opening is 0.140 of the head width (0.149 in the source), and the balls
 keep their bulge. The map tool moves the iris of each eye on its own, with its pupil and its light,
 to the middle of its eye opening in a view from above the head (`VIEW_DOWN`), turned a little out
-(`GAZE_OUT`), with both pupils at one height (`shift_eyes()`). White of the same eye fills the place
+(`GAZE_OUT`), with both pupils at one height (`shift_eyes()`), but only a small part of the way
+(`SHIFT_SHARE`), because the full move read wall-eyed. White of the same eye fills the place
 that the iris leaves, and the clean outer rim of the iris fills its nose rim. Reason: the source
 paints each pupil at the nose side of its opening, so the rabbit looked cross-eyed from the side,
 and its two eyes are not mirror images, so a mirrored shift showed a white seam. The map paints a

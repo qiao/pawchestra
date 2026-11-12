@@ -400,13 +400,13 @@ sat 0.31 of the half width of the opening toward the nose in the 3/4 view of the
 Close view of the test page, and 0.07 and 0.15 in its front view. `shift_eyes()` of
 `tools/rabbit-maps.py` moves the iris of each eye on its own, with its pupil and its painted light,
 as one decal on the ball. The target is the middle of the painted eye in a view 15 degrees above
-the forward axis of the head, turned 4 degrees out, at the mean height of the two pupils. The left
-iris turns 7.9 degrees (8.0 out, 1.3 down) and the right iris 7.6 degrees (7.6 out, 1.3 up). The
+the forward axis of the head, turned 4 degrees out, at the mean height of the two pupils. Each
+iris moves only 0.35 of the way to that target (`SHIFT_SHARE`), because the full turn read
+wall-eyed from the front: the left iris turns 2.8 degrees and the right iris 2.7 degrees. The
 white of the same eye, row by row, fills the place that the iris leaves, and the clean outer rim
 of each iris fills its nose rim, so no mirror of one eye goes into the other and no seam shows.
-After the move, the pupil sits 0.14 toward the nose in the 3/4 view, 0.11 in the Close view, and
-0.09 and 0.12 out in the front view, and the white shows on both sides of each iris from the side.
-The pupils are at one height, and from the default camera the iris shows below the upper lid. The
+So the eyes stay near the source paint, with a small move out. From the default camera the iris
+shows below the upper lid. The
 map paints a light in each pupil, so the eyes take the finish `varnish` and no eye light, which
 gives one light in each eye.
 
@@ -423,7 +423,7 @@ above), WebP quality 60, method 6 (Pillow 13.0.0). Before the WebP step, 10,347 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 252,772 bytes | `840e722ca69f5201919ed18b8473ac8e0ed7805226f9a260c7638a46cc6be92c` |
+| `tripo-hand/rabbit-color.webp` | 252,458 bytes | `778b41387ae64891340ec158e3206b0f874377a2aaf70794184ce0a889fb7075` |
 | `tripo-hand/rabbit-normal.webp` | 142,378 bytes | `c18a8ae6ddbee8ad2b0d188376150e0dcb0dd9ecc393ba3fd06b91d13c3811b9` |
 
 **Normal map.** Each x, y tilt of the normal map of the FBX limited to 0.2 (7.30 % of the
