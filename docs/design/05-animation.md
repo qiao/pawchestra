@@ -249,7 +249,12 @@ The rest of each family:
   the sides, as a seated violinist does. The cat rests the viola at the outer side
   of the left thigh. Reason: with the viola on the top of the thigh, the elbow had to point out to
   clear the round belly, and the left upper arm then turned far about its axis from the bind and
-  read as bent.
+  read as bent. The rest grip of a carried instrument lies in the reach of the left arm, because
+  the instrument hangs from the solved paw from the first frame of a move: a grip out of reach
+  makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
+  rests the bow upright beside the right thigh at the reach of its short arm. Its bow tip turns to
+  the left below the snout in a move (`FOX_HOLD.restBow.via`), so that the bow does not cross the
+  snout.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
