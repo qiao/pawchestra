@@ -33,19 +33,30 @@ export const CHOIR_MOTION = {
   inhaleSec: 0.4,
   exhaleSec: 1,
   /**
-   * The fastest turn of the jaw, in radians each second: 5.3° in a frame of 1/30 s. A note that
-   * the jaw cannot reach at this speed opens less, and a short time between two notes gives a
-   * smaller dip. A jaw that opened in 0.1 s moved up to 15° in one frame.
+   * The fastest turn of the jaw as it opens, in radians each second: 5.3° in a frame of 1/30 s.
+   * A jaw that opened in 0.1 s moved up to 15° in one frame.
    */
-  jawRate: 160 * MathUtils.DEG2RAD,
-  /** The jaw opens in this time before a note: at most half the time from the note before. */
-  openSec: 0.6,
+  openRate: 160 * MathUtils.DEG2RAD,
   /**
-   * The jaw closes in this time after the end of a note, or slower, so that it turns at most at
-   * {@link jawRate}.
+   * The fastest turn of the jaw as it closes, in radians each second: 9° in a frame of 1/30 s. The
+   * jaw closes faster than it opens, so that it closes in a short rest: at the open rate, a beak
+   * open 50° takes 0.47 s to close.
    */
-  closeSec: 0.12,
-  /** Between two notes, an open jaw closes to this part of its opening and opens again. */
+  closeRate: 270 * MathUtils.DEG2RAD,
+  /**
+   * The part of the opening that is done at the note start. The opening goes on after the start,
+   * so that the jaw opens just before the voice, as a real singer opens the mouth for the vowel.
+   * When the jaw opened fully before the start at the open rate, the beak was 15° open 0.4 s
+   * before the sound.
+   */
+  openShare: 0.65,
+  /** After a short rest, the jaw starts to open at least this time before the note. */
+  leadMinSec: 0.04,
+  /** A rest shorter than this is legato: the jaw closes only to {@link dip} and opens again. */
+  legatoSec: 0.1,
+  /** In a legato, the jaw starts to close at most this time before the next note. */
+  dipSec: 0.2,
+  /** In a legato, an open jaw closes to this part of its opening and opens again. */
   dip: 0.5,
   /**
    * The chest turns this far to each side in a phrase, at a gesture size of 1. Neighbor voices
@@ -63,17 +74,20 @@ export const CHOIR_MOTION = {
 export interface ChoirTrack {
   /** The time at which the jaw starts to open for each note, sorted. */
   readonly openStarts: Float64Array;
+  /** The time at which the jaw is fully open for each note. It can be after the note start. */
+  readonly openEnds: Float64Array;
+  /** The opening of the jaw when it starts to open for each note, from the note before. */
+  readonly bases: Float64Array;
+  /** The opening of the jaw for each note, in radians. */
+  readonly opens: Float64Array;
+  /** The start and the end of the close of the jaw after each note. */
+  readonly closeStarts: Float64Array;
+  readonly closeEnds: Float64Array;
+  /** The opening of the jaw at the end of the close after each note: 0 when it fully closes. */
+  readonly lows: Float64Array;
   /** The start and the end of each sung note. */
   readonly starts: Float64Array;
   readonly ends: Float64Array;
-  /** The opening of the jaw for each note, in radians. */
-  readonly opens: Float64Array;
-  /** The opening of the jaw when it starts to open for each note, from the note before. */
-  readonly bases: Float64Array;
-  /** The dip of the jaw before each note, in radians (`CHOIR_MOTION.dip`). */
-  readonly dips: Float64Array;
-  /** The time in which the jaw closes after the end of each note, in seconds. */
-  readonly closes: Float64Array;
   /** The start and the end of each phrase, and its gesture size. */
   readonly phraseStarts: Float64Array;
   readonly phraseEnds: Float64Array;
@@ -81,34 +95,42 @@ export interface ChoirTrack {
 }
 
 /**
- * Gives the opening of the jaw for a note, from its start on: open while the note sounds, then
- * closed in the close time of the note.
+ * Gives the time of a smooth step of the jaw over an angle at a rate. The smooth step turns 1.5
+ * times faster than its mean speed at its middle.
  *
- * @param open The opening of the note.
- * @param end The end of the note.
- * @param close The close time of the note, in seconds.
- * @param time The song time, at or after the start of the note.
- * @returns The opening, in radians.
+ * @param angle The angle, in radians.
+ * @param rate The fastest turn, in radians each second.
+ * @returns The time, in seconds.
  */
-function heldJaw(open: number, end: number, close: number, time: number): number {
-  return open * (1 - smoothstep((time - end) / close));
+function stepTime(angle: number, rate: number): number {
+  return (1.5 * Math.abs(angle)) / rate;
 }
 
 /**
- * Gives the time in which a jaw closes from an opening, at most at {@link CHOIR_MOTION.jawRate}.
- * The smooth step turns 1.5 times faster than its mean speed at its middle.
+ * Gives a smooth step from one value to another over a time span. It starts and ends with no
+ * speed, so that the jaw does not jump in speed between two steps.
  *
- * @param open The opening, in radians.
- * @returns The time, in seconds.
+ * @param from The value at the start.
+ * @param to The value at the end.
+ * @param start The start of the span.
+ * @param end The end of the span.
+ * @param time The time.
+ * @returns The value.
  */
-function closeTime(open: number): number {
-  return Math.max(CHOIR_MOTION.closeSec, (1.5 * open) / CHOIR_MOTION.jawRate);
+function easeOver(from: number, to: number, start: number, end: number, time: number): number {
+  return end > start ? from + (to - from) * smoothstep((time - start) / (end - start)) : to;
 }
 
 /**
  * Calculates the note data of a singer (design 5.3). A singer sings one note at a time: of the
  * notes that start within 50 ms of each other, it shows one note, from the first start to the
  * last end. Rests of at least 0.5 s end a phrase.
+ *
+ * For each note, the jaw opens at most at {@link CHOIR_MOTION.openRate}, and {@link
+ * CHOIR_MOTION.openShare} of the opening is done at the note start. After the note end, the jaw
+ * closes at most at {@link CHOIR_MOTION.closeRate}, fully when the rest gives the time, or else
+ * as far as it can before the jaw opens for the next note. In a legato, it closes to {@link
+ * CHOIR_MOTION.dip} of the opening.
  *
  * @param notes The notes of the singer, sorted by start.
  * @param loudness The loudness of each note, in the order of `notes`.
@@ -123,30 +145,35 @@ export function buildChoirTrack(
   const m = CHOIR_MOTION;
   const sung = groupChords(notes, loudness);
   const notesSung = sung.length;
+  const opens = Float64Array.from(sung, (g) => m.jaw * gestureSize(g.loudness, amplitude));
   const openStarts = new Float64Array(notesSung);
-  const opens = new Float64Array(notesSung);
+  const openEnds = new Float64Array(notesSung);
   const bases = new Float64Array(notesSung);
-  const dips = new Float64Array(notesSung);
-  const closes = new Float64Array(notesSung);
+  const closeStarts = new Float64Array(notesSung);
+  const closeEnds = new Float64Array(notesSung);
+  const lows = new Float64Array(notesSung);
   for (const [i, g] of sung.entries()) {
-    const before = sung[i - 1];
-    const time = before ? Math.min(m.openSec, (g.start - before.start) / 2) : m.openSec;
-    const at = g.start - time;
-    const base = before ? heldJaw(opens[i - 1] ?? 0, before.end, closes[i - 1] ?? 1, at) : 0;
-    // The smooth step from the base turns at most at the jaw rate, and the dip takes the rest of
-    // the speed: its sine turns π times faster than its depth over the time.
-    const reach = (m.jawRate * time) / 1.5;
-    const open = MathUtils.clamp(
-      m.jaw * gestureSize(g.loudness, amplitude),
-      base - reach,
-      base + reach,
-    );
-    const room = (m.jawRate * time - 1.5 * Math.abs(open - base)) / Math.PI;
-    openStarts[i] = at;
-    opens[i] = open;
+    const open = opens[i] ?? 0;
+    const base = lows[i - 1] ?? 0;
+    const opening = stepTime(open - base, m.openRate);
+    const openStart = Math.max(closeEnds[i - 1] ?? -Infinity, g.start - m.openShare * opening);
+    const openEnd = openStart + opening;
+    const next = sung[i + 1];
+    const legato = next !== undefined && next.start - g.end < m.legatoSec;
+    const closeStart = Math.max(openEnd, legato ? Math.min(g.end, next.start - m.dipSec) : g.end);
+    // A legato dip closes at the open rate, so that its turn from the close to the opening is
+    // not sudden.
+    const rate = legato ? m.openRate : m.closeRate;
+    // The close ends before the jaw opens for the next note. A short rest gives a part of it.
+    const room = next ? next.start - m.leadMinSec - closeStart : Infinity;
+    const floor = legato ? m.dip * Math.min(open, opens[i + 1] ?? 0) : 0;
+    const low = room > 0 ? Math.max(floor, open - room * (rate / 1.5)) : open;
+    openStarts[i] = openStart;
+    openEnds[i] = openEnd;
     bases[i] = base;
-    dips[i] = MathUtils.clamp(m.dip * Math.min(base, open), 0, Math.max(room, 0));
-    closes[i] = closeTime(open);
+    closeStarts[i] = closeStart;
+    closeEnds[i] = closeStart + stepTime(open - low, rate);
+    lows[i] = low;
   }
   const phrases = joinSpans(sung, PHRASE_GAP_SEC);
   const gestureOf = (first: number, count: number): number => {
@@ -155,12 +182,14 @@ export function buildChoirTrack(
   };
   return {
     openStarts,
+    openEnds,
+    bases,
+    opens,
+    closeStarts,
+    closeEnds,
+    lows,
     starts: Float64Array.from(sung, (g) => g.start),
     ends: Float64Array.from(sung, (g) => g.end),
-    opens,
-    bases,
-    dips,
-    closes,
     phraseStarts: Float64Array.from(phrases, (p) => p.start),
     phraseEnds: Float64Array.from(phrases, (p) => p.end),
     phraseGestures: Float64Array.from(phrases, (p) => gestureOf(p.first, p.count)),
@@ -226,9 +255,9 @@ function exhale(time: number, end: number, start: number): number {
 
 /**
  * Calculates the jaw, the sway, the breath, and the head lift of a singer at a song time (design
- * 5.3). The jaw opens before each note, and it is open at the note start. It stays open while the
- * note sounds, and closes after it. Between two notes, it closes a part of the way and opens
- * again, so that each note shows. The jaw turns at most at `CHOIR_MOTION.jawRate`. The sway and
+ * 5.3). The jaw starts to open just before each note, and it is fully open a little after the
+ * note start. It stays open while the note sounds, and closes after it: fully in a rest, and a
+ * part of the way in a legato, so that each note shows ({@link buildChoirTrack}). The sway and
  * the head lift rise before each phrase and fade after it. The breath in rises in the 0.4 s
  * before each phrase.
  *
@@ -239,18 +268,14 @@ function exhale(time: number, end: number, start: number): number {
 export function choirStateAt(track: ChoirTrack, time: number, out: ChoirState): void {
   const i = lastAtOrBefore(track.openStarts, time);
   const openStart = track.openStarts[i];
-  const start = track.starts[i];
   const open = track.opens[i] ?? 0;
-  const base = track.bases[i] ?? 0;
-  const dip = track.dips[i] ?? 0;
-  if (openStart === undefined || start === undefined) {
+  const closeStart = track.closeStarts[i] ?? 0;
+  if (openStart === undefined) {
     out.jaw = 0;
-  } else if (time < start) {
-    const p = (time - openStart) / (start - openStart);
-    // The dip ends with its full speed at the note start, as the voice starts.
-    out.jaw = base + (open - base) * smoothstep(p) - dip * Math.sin(Math.PI * p);
+  } else if (time < closeStart) {
+    out.jaw = easeOver(track.bases[i] ?? 0, open, openStart, track.openEnds[i] ?? 0, time);
   } else {
-    out.jaw = heldJaw(open, track.ends[i] ?? start, track.closes[i] ?? 1, time);
+    out.jaw = easeOver(open, track.lows[i] ?? 0, closeStart, track.closeEnds[i] ?? 0, time);
   }
   const phrase = spanEnvelope(
     track.phraseStarts,
