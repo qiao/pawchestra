@@ -99,6 +99,13 @@ export interface WindHold {
    */
   readonly headTurn: number;
   /**
+   * The forward lean of the spine while the player plays, in radians, on top of the breath. A
+   * negative lean turns the upper body back. The instrument and the arms move with the chest, so
+   * the head bow of the far mouth ({@link WindHold.farMouth}) keeps the paws in reach while the
+   * head stays upright. 0 keeps the spine of the body.
+   */
+  readonly lean: number;
+  /**
    * The move of the mouthpiece from the mouth of the bind pose, in head heights, in the bind axes
    * of the head. A long muzzle reaches past the mouth, so a flute can sit further back under it.
    * (0, 0, 0) keeps the mouthpiece at the mouth.
@@ -250,6 +257,7 @@ const WOODWIND = {
   restShift: [0, 0, 0],
   restArms: null,
   headTurn: 0,
+  lean: 0,
   lipShift: [0, 0, 0],
   restFreeL: null,
   faceTube: ['none', 'none'],
