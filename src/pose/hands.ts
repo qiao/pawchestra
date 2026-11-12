@@ -35,6 +35,7 @@ import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import { pedalFoot } from './pedal.ts';
+import { clamp01 } from './rest.ts';
 import type { PedalFoot } from './pedal.ts';
 import { buildDigitTrack } from './piano-digits.ts';
 import type { DigitTrack } from './piano-digits.ts';
@@ -62,6 +63,12 @@ interface HandsHold {
   /** The palm of each hand is this far from the point of its key, in the instrument axes. */
   readonly palmL: Vec3;
   readonly palmR: Vec3;
+  /**
+   * The move of the left palm for its highest keys, in the axes of the instrument piece, or `null`
+   * for none. The move grows from 0 at the key `from` to the full `offset` at the key `to`, by the
+   * middle of the keys of the note.
+   */
+  readonly highL: { readonly from: number; readonly to: number; readonly offset: Vec3 } | null;
   /**
    * The side of the palm of each hand: down to the keys of the piano, and to the strings of the
    * harp. In the axes of the instrument piece.
@@ -197,6 +204,7 @@ export const HANDS_HOLDS = {
     keyPoint: pianoKeyFront,
     palmL: [0, 0.0572, 0.039],
     palmR: [0, 0.0657, 0.039],
+    highL: null,
     faceL: [0, -1, 0],
     faceR: [0, -1, 0],
     aimL: null,
@@ -321,6 +329,12 @@ export const HANDS_HOLDS = {
     keyPoint: harpStringPosition,
     palmL: [-0.07, 0.22, 0.02],
     palmR: [0.05, 0.03, 0],
+    // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.22 m
+    // above their pluck points stands at the height of the shoulder. From G3 to D4, the left palm
+    // moves 4 cm nearer to the strings, 4 cm down, and 4 cm toward the column: with no move, the
+    // left paw went 3.4 cm into the chest at D4, and with this move 1.0 cm. The note targets and
+    // the arm gate do not change (`pnpm hold-fit harpist`, `pnpm arm-check harpist`).
+    highL: { from: 55, to: 62, offset: [0.04, -0.04, -0.04] },
     faceL: [1, -1, 0],
     faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
@@ -506,6 +520,11 @@ function palmPoint(
     at.z = depth;
   }
   at.add(new Vector3(...offset));
+  const { highL } = rig.hold;
+  if (side === 'L' && highL) {
+    const share = clamp01(((low + high) / 2 - highL.from) / (highL.to - highL.from));
+    at.addScaledVector(new Vector3(...highL.offset), share);
+  }
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
 }
 
