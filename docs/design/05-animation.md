@@ -900,7 +900,11 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   them, as a harpist moves 1 to 2 pedals each second (harp 7.7). The left foot moves D, C, and B,
   and the right foot E, F, G, and A (`PEDAL_FEET`). For each change, the foot goes from its rest
   to the pedal, lifted, presses the pedal into the notch, and goes back (`poseHarpFeet()` of
-  `pose/harp-feet.ts`). The pedals stand on the floor (4.6), so the hoof turns up around its
+  `pose/harp-feet.ts`). Each foot starts from its rest place (`LEG_RESTS`): the left hoof rests
+  to the left of the base, behind the foot of the soundbox, with the knee out and forward, so the
+  harp stands between the knees, as a harpist sits (harp 2). Reason: the near diagonal harp puts
+  the foot of its soundbox and its base over the bind place of the left hoof, so the left hoof
+  and shin went through them. The pedals stand on the floor (4.6), so the hoof turns up around its
   heel until the front of its sole is on the pedal, as a harpist keeps the heel on the floor and
   presses with the ball of the foot (harp 7.7). Above `HEEL_PITCH`, the whole hoof lifts. For a
   pedal behind the rest place of the toe, the heel lifts (`HEEL_LIFT`). Reason: the pedals of the
