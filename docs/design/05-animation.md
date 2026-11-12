@@ -610,7 +610,9 @@ The rest of each family:
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 
 - Each paw holds its mallet in the closed fingers, with the head out of the front of the fist,
-  and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`).
+  and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`). The palm of
+  each stump paw of the timpanist faces down, and the shaft crosses the lower side of the stump,
+  as in the German grip (`TIMPANI.malletTilt`).
 - A mallet lifts before a strike, comes down at full speed at the note start, and rebounds
   (`STRIKE_MOTION`). A strike within `legatoSec` of the strike before it of the same hand is a
   legato stroke: the mallet lifts at once after the strike before, to the top of the new strike,
@@ -636,8 +638,12 @@ The rest of each family:
   of the lean: with no lean, the arm stretched past the margin of the arm gate. The paw of the
   timpanist that struck the note moves toward the player with its mallet in the strike direction,
   as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to
-  the head, while the spine leans and the upper body turns the shoulder of the paw forward
-  (`FingersDamp`). The muffle does not follow the lift and the lowering. Reason: from an upright
+  the head, while the spine leans (`FingersDamp`). The paw keeps the roll of the mallet of its
+  place before the muffle, and on the way, a paw under the head goes up to it at once. The move
+  takes the time of `FingersDamp.speed` for its length (`DampWish.minInSec`), so a short rest has
+  no muffle. Reason: a move in 0.06 s jumped the paw 25 cm, the turn of the upper body twisted the
+  chest, and the roll of the posed forearm turned the paw over on the way. The muffle does not
+  follow the lift and the lowering. Reason: from an upright
   body, the paw stayed over the head, and higher, nearer kettles that the paw reached moved the
   left arm past the margins of the arm gate. A muffle that grew with a lift turned a paw too fast.
   The stump paws of the Tripo elephant reach farther, so its spine leans less at the muffle, and

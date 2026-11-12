@@ -232,15 +232,18 @@ and the instruments in `src/models/instruments/percussion.ts`. The strokes come 
 
 The app follows these facts:
 
-- **The grip (section 1).** The end of the stump paw of the Tripo elephant closes 20° onto the
-  shaft (`PercussionHold.curl`), the head leaves the front of the fist at the thumb side
-  (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`), and the butt end sticks out behind the
-  paw (`TIMPANI.malletButt`).
-- **The V (section 2).** Each mallet points forward and in, in the V of the American grip
-  (`PercussionHold.home`). The wider V of the German grip turns the paw further on its forearm.
+- **The grip (sections 1 and 2).** The palm of the stump paw of the Tripo elephant faces down,
+  as in the German grip, and the shaft crosses the lower side of the closed stump, as through a
+  fist (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`). The end of the stump closes 20° onto
+  the shaft (`PercussionHold.curl`), the head leaves the front of the fist, and the butt end
+  sticks out 2 cm to 3 cm behind the paw (`TIMPANI.malletButt`).
+- **The V (section 2).** Each mallet points forward and 27° to 34° in, a V of about 60°
+  (`PercussionHold.home`).
 - **The elbows (section 3).** Each upper arm hangs near the side, and the elbow points down and a
-  little out (`poleL`, `poleR`). The mallet slopes down along the forearm, so the wrist stays
-  nearly straight. Elbows farther out show a gap between the arm and the body from the back.
+  little out (`poleL`, `poleR`). Elbows farther out show a gap between the arm and the body from
+  the back.
+- **The set position (section 3).** Between strikes, the wrist lifts the head about one inch over
+  the drum head, and the shaft slopes 13° to 17° down (`MalletAcross.pitch`).
 - **The stroke (sections 3 and 4).** The head lifts before the note, comes down at its full speed
   at the note start, and rebounds (`STRIKE_MOTION`). The wrist turns the head up by 35° to 70°,
   and a louder note lifts higher (`MalletAcross.peak`), as louder notes fall from a greater
@@ -254,7 +257,9 @@ The app follows these facts:
   back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The spine
   leans only 3°, so that the trunk stays out of the kettles and the body stays over its feet.
   The mallet keeps its strike direction, and the wrist lifts its head off the drum, so the mallet
-  stays in the paw [55] [56]. A pause in a muffle keeps the paw on the head.
+  stays in the paw [55] [56]. A pause in a muffle keeps the paw on the head. The upper body does
+  not turn. The paw moves to the muffle and back at most at 1.2 m/s (`FingersDamp.speed`), so a
+  short rest after a note has no muffle, as a rest does not always need one [58 (secondary)].
 
 The app does not follow these facts:
 
@@ -265,15 +270,16 @@ The app does not follow these facts:
 - **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
 - **The place of the muffle (section 4).** The paw touches the head between the playing spot and
   the near rim, at least 5 cm in from the rim, as far toward the spot as the short arm reaches
-  (`FingersDamp.reach`). The spine leans 15° over the kettles, and the upper body turns 17° to
-  bring the shoulder of the paw forward. No source gives a lean or a turn. From an upright body,
+  (`FingersDamp.reach`). The spine leans 3° over the kettles. No source gives a lean. From an
+  upright body,
   the lowest point of the paw stayed 11 cm to 15 cm over the head. Kettles of 0.92 m, in the
   0.84 m to 0.94 m of an adjustable kettle, and 6 cm nearer, let the paw reach the head, but they
   moved the left arm past the margins of the arm gate (paw twist p95 170° against 136°). A lean
   of 17° put the forearms up to 1.8 cm into the belly.
-- **The set position (section 3).** Between strikes, the wrist lifts the head above its spot with
-  the shaft down (`MalletAcross.pitch`). A larger lift of the wrist moves the shaft out of the
-  closed paw. Each paw keeps the roll that has no side bend at the strike
+- **The set position (section 3).** Between strikes, the shaft slopes 13° to 17° down. A real
+  player holds it parallel to the floor, but the stump paws stand over the heads, and a lower grip
+  put them into the kettles. At a strike, the shaft slopes 24° to 26° down, a little more than the 10° to
+  25° of a real player. Each paw keeps the roll that has no side bend at the strike
   (`PercussionHold.strikeRoll`), so the shaft stays in the paw.
 - **The roll (section 4).** A roll on one kettle stays in one hand, because each hand plays only
   the front kettle on its side (`PercussionHold.pair`). The hand strikes on some notes of the roll,
