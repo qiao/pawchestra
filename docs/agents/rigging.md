@@ -8,16 +8,17 @@ round.
 Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4), except the
 cat, which keeps the bind of the viola hold. "Rebuilt arms" means quad arm tubes, Blender weights,
 and arm segments. Each body except the polar bear (a hand rig) has them. The `README.md` of each
-model folder gives the files of each step.
+model folder gives the files of each step. The candidate branch gives the bear, the rabbit, and
+the cat the hand rig of `tripo-hand/` (no arm cut, no stretch).
 
 | Species | Body | Role |
 | --- | --- | --- |
-| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `conductor` |
+| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
 | polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): loop cuts at the elbows, the wrists, and the knees, weights by hand (its `README.md`), a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). The candidate branch gives it the hand rig of a Tripo P2 mesh in `tripo-hand/`. | `pianist` |
-| rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `violinist` |
+| rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. | `violinist` |
 | fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. The candidate branch gives it the hand rig of `tripo-hand/` (no arm cut, no stretch). | `violist` |
+| cat | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. | `violist` |
 | dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor`), arm roots moved to the trunk (`dog-arms-clip.glb`, `weightMoves`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
 | panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor`), color edges cut (`panda_edge.py`), a right elbow `raise`, rigid root faces (`rigidPainted`), the old form of the rig config. | `trombonist` |
 | hippo | T-pose mesh, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller bead eyes, point edits that fill the furrow between the brows (`hippo-edits.json`). Stands at the contrabass. | `bassist` |
@@ -201,8 +202,8 @@ Design 4.4 gives the rule and the reason of each config key.
   palm of the source.
 - Short arms do not reach the instruments. Size the instrument by the rule of real players, then
   fit the arm factor to the reach.
-- A hold trades folds against clearance. Check each hold change with `hold-fit`, `pose-depth`, and
-  `arm-check`.
+- A hold trades folds against clearance. Check each hold change with `hold-fit`, `pose-depth`,
+  `arm-check`, and `body-clip` (the trunk, the arms, and the legs in the instrument and the seat).
 - The arm gate and the depths pass while a paw misses its instrument. Measure each grip with
   `pnpm wind-grip`, and look at the thumb. A paw that points at its tube cannot face it with the
   palm: put the grip beside the tube.
