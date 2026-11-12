@@ -148,28 +148,167 @@ const UPRIGHT_HOLDS = {
 >;
 
 /**
- * The outline of the violin body around its center, from the neck end (+x) along the -z side to the
- * tail end (-x): the upper bout, the upper corner, the C-bout, the lower corner, and the lower
- * bout. Each corner is a tip and a point on the line from the tip to the center, so that the
- * outline stays star-shaped around the center for the fan caps.
+ * The control points of the outline of a body around its center, from the neck end (+x) along the
+ * -z side to the tail end (-x), and the indices of its sharp points. A smooth curve goes through
+ * the points from one sharp point to the next ({@link smoothHalf}).
  */
-const VIOLIN_HALF: readonly OutlinePoint[] = [
-  [0.12, 0],
-  [0.116, -0.022],
-  [0.098, -0.045],
-  [0.068, -0.0566],
-  [0.045, -0.052],
-  [0.032, -0.0475],
-  [0.0278, -0.0413],
-  [0.01, -0.0378],
-  [-0.0135, -0.0434],
-  [-0.016, -0.0515],
-  [-0.035, -0.062],
-  [-0.062, -0.068],
-  [-0.092, -0.062],
-  [-0.112, -0.04],
-  [-0.12, 0],
-];
+interface BodyOutline {
+  readonly half: readonly OutlinePoint[];
+  /**
+   * The indices of the sharp points: the tip of each corner, and the point on the line from the
+   * tip to the center where the C-bout starts. The segment between them stays straight.
+   */
+  readonly sharp: readonly number[];
+}
+
+/**
+ * The outline of the violin body: the upper bout, the upper corner, the C-bout, the lower corner,
+ * and the lower bout. Each corner is a tip and a point on the line from the tip to the center, so
+ * that the outline stays star-shaped around the center for the fan caps. The waist is a little
+ * narrower than the lower corners, as the deep C-bout of a real cello, where the waist is about
+ * 0.53 of the lower bout. The points of the bouts lie a little inside the earlier outline of
+ * straight segments, so that the smooth curve stays inside it, except at most 0.9 mm in the
+ * segment at each end of the half. Thus no part of a player goes deeper into the body.
+ */
+const VIOLIN_OUTLINE: BodyOutline = {
+  half: [
+    [0.12, 0],
+    [0.1138, -0.0216],
+    [0.0958, -0.044],
+    [0.066, -0.055],
+    [0.0443, -0.0512],
+    [0.032, -0.0475],
+    [0.0278, -0.0413],
+    [0.01, -0.0364],
+    [-0.0135, -0.0434],
+    [-0.016, -0.0515],
+    [-0.0343, -0.0608],
+    [-0.0606, -0.0664],
+    [-0.0897, -0.0604],
+    [-0.1077, -0.0384],
+    [-0.12, 0],
+  ],
+  sharp: [5, 6, 8, 9],
+};
+
+/**
+ * The number of points of the whole smooth outline of each form ({@link smoothHalf}). The cello and
+ * the contrabass are large in the close shots, so their outline has more points.
+ */
+const OUTLINE_POINTS = { violin: 40, cello: 64, contrabass: 64 } as const satisfies Record<
+  StringForm,
+  number
+>;
+
+/**
+ * Gives a point of a centripetal Catmull-Rom curve between `b` and `c`.
+ *
+ * @param a The point before `b`.
+ * @param b The start of the segment.
+ * @param c The end of the segment.
+ * @param d The point after `c`.
+ * @param t The part of the segment, from 0 to 1.
+ * @returns The point.
+ */
+function catmullRom(
+  a: OutlinePoint,
+  b: OutlinePoint,
+  c: OutlinePoint,
+  d: OutlinePoint,
+  t: number,
+): OutlinePoint {
+  const knot = (p: OutlinePoint, q: OutlinePoint): number =>
+    Math.max(1e-9, Math.hypot(q[0] - p[0], q[1] - p[1]) ** 0.5);
+  const t1 = knot(a, b);
+  const t2 = t1 + knot(b, c);
+  const t3 = t2 + knot(c, d);
+  const u = t1 + t * (t2 - t1);
+  const mix = (p: OutlinePoint, q: OutlinePoint, from: number, to: number): OutlinePoint => {
+    const w = (u - from) / (to - from);
+    return [p[0] + w * (q[0] - p[0]), p[1] + w * (q[1] - p[1])];
+  };
+  const a1 = mix(a, b, 0, t1);
+  const a2 = mix(b, c, t1, t2);
+  const a3 = mix(c, d, t2, t3);
+  const b1 = mix(a1, a2, 0, t2);
+  const b2 = mix(a2, a3, t1, t3);
+  return mix(b1, b2, t1, t2);
+}
+
+/**
+ * Makes the smooth half of an outline: a Catmull-Rom curve through the control points from one
+ * sharp point to the next. At the neck end and the tail end, the curve crosses the axis at a
+ * right angle, so the two halves join smoothly. Each segment gets points by its length.
+ *
+ * @param outline The control points and the sharp points.
+ * @param count The number of points of the whole outline.
+ * @returns The half from +x to -x, with the two end points on the x axis.
+ */
+function smoothHalf(outline: BodyOutline, count: number): OutlinePoint[] {
+  const { half, sharp } = outline;
+  const last = half.length - 1;
+  const point = (i: number): OutlinePoint => half[i] ?? [0, 0];
+  const length = (i: number): number => {
+    const [x0, z0] = point(i);
+    const [x1, z1] = point(i + 1);
+    return Math.hypot(x1 - x0, z1 - z0);
+  };
+  const breaks = [0, ...sharp, last];
+  const straight = (i: number): boolean => sharp.includes(i) && sharp.includes(i + 1);
+  let total = 0;
+  for (let i = 0; i < last; i++) {
+    total += straight(i) ? 0 : length(i);
+  }
+  // The half has count / 2 + 1 points. Each straight corner segment takes one step, and the curved
+  // segments share the other steps by their lengths, rounded on the running sum.
+  const corners = sharp.length / 2;
+  const steps = count / 2 - corners;
+  let done = 0;
+  let share = 0;
+  const partsOf = (i: number): number => {
+    if (straight(i)) {
+      return 1;
+    }
+    share += length(i);
+    const parts = Math.max(1, Math.round((steps * share) / total) - done);
+    done += parts;
+    return parts;
+  };
+  const out: OutlinePoint[] = [point(0)];
+  for (let k = 0; k + 1 < breaks.length; k++) {
+    const from = breaks[k] ?? 0;
+    const to = breaks[k + 1] ?? 0;
+    // The point before and after the run: a mirror over the axis at an end of the outline, or
+    // a straight extension at a sharp point.
+    const before = (i: number): OutlinePoint => {
+      if (i > from) {
+        return point(i - 1);
+      }
+      const [x, z] = point(i + 1);
+      const [px, pz] = point(i);
+      return i === 0 ? [x, -z] : [2 * px - x, 2 * pz - z];
+    };
+    const after = (i: number): OutlinePoint => {
+      if (i < to) {
+        return point(i + 1);
+      }
+      const [x, z] = point(i - 1);
+      const [px, pz] = point(i);
+      return i === last ? [x, -z] : [2 * px - x, 2 * pz - z];
+    };
+    for (let i = from; i < to; i++) {
+      const parts = partsOf(i);
+      for (let s = 1; s <= parts; s++) {
+        out.push(
+          s === parts
+            ? point(i + 1)
+            : catmullRom(before(i), point(i), point(i + 1), after(i + 1), s / parts),
+        );
+      }
+    }
+  }
+  return out;
+}
 
 /**
  * One level of the body: the outline at a scale around the center, at a part of the body
@@ -188,55 +327,79 @@ interface BodyLevel {
 }
 
 /**
+ * The levels of the top of each body, from the top edge to the arch: the top edge that stands out
+ * over the ribs, its bevel, and the arch, which rises in a smooth curve to a flat middle under the
+ * bridge. The edges have the darker wood color, so that a dark band goes around the top and the
+ * back, as in `orchestra-latest.png`. The arch stays at or below the earlier arch of three levels,
+ * so that no part of a player goes deeper into it.
+ */
+const TOP_LEVELS: readonly BodyLevel[] = [
+  { scale: 1, y: 0.8, band: 'edge' },
+  { scale: 0.94, y: 0.843, band: 'edge' },
+  { scale: 0.84, y: 0.893, band: 'top' },
+  { scale: 0.72, y: 0.946, band: 'top' },
+  { scale: 0.58, y: 0.976, band: 'top' },
+  { scale: 0.42, y: 1, band: 'top' },
+];
+
+/**
  * The levels of the violin body from the back to the top: the arch of the back, the back edge
- * that stands out over the ribs, the ribs, the top edge that stands out over the ribs, and the
- * arch of the top. The edges have the darker wood color, so that a dark band goes around the top
- * and the back, as in `orchestra-latest.png`.
+ * that stands out over the ribs, the ribs, and the levels of the top ({@link TOP_LEVELS}). The
+ * arch of the back stays inside the earlier straight back from the scale 0.8 to the edge, so that
+ * no part of a player goes deeper into it.
  */
 const VIOLIN_LEVELS: readonly BodyLevel[] = [
-  { scale: 0.8, y: 0, band: 'top' },
+  { scale: 0.6, y: 0, band: 'top' },
+  { scale: 0.8, y: 0.03, band: 'top' },
+  { scale: 0.92, y: 0.08, band: 'top' },
   { scale: 1, y: 0.13, band: 'top' },
   { scale: 0.965, y: 0.17, band: 'edge' },
   { scale: 0.965, y: 0.76, band: 'top' },
-  { scale: 1, y: 0.8, band: 'edge' },
-  { scale: 0.93, y: 0.85, band: 'edge' },
-  { scale: 0.72, y: 0.95, band: 'top' },
-  { scale: 0.45, y: 1, band: 'top' },
+  ...TOP_LEVELS,
 ];
 
 /**
- * The outline of the contrabass body around its center, as {@link VIOLIN_HALF}: the shoulders
- * slope down from the neck to the widest point of the upper bout, as on a real double bass, and
- * the upper corners stand out less.
+ * The outline of the contrabass body, as {@link VIOLIN_OUTLINE}: the shoulders slope down from the
+ * neck to the widest point of the upper bout, as on a real double bass, and the upper corners
+ * stand out less. The smooth curve stays inside the earlier outline in the same way.
  */
-const BASS_HALF: readonly OutlinePoint[] = [
-  [0.12, 0],
-  [0.117, -0.012],
-  [0.1, -0.03],
-  [0.08, -0.046],
-  [0.058, -0.0555],
-  [0.026, -0.049],
-  [0.0227, -0.0428],
-  [0.006, -0.0405],
-  [-0.0138, -0.0443],
-  [-0.016, -0.0515],
-  [-0.035, -0.063],
-  [-0.062, -0.069],
-  [-0.092, -0.063],
-  [-0.112, -0.04],
-  [-0.12, 0],
-];
+const BASS_OUTLINE: BodyOutline = {
+  half: [
+    [0.12, 0],
+    [0.1157, -0.0119],
+    [0.0993, -0.0298],
+    [0.079, -0.0455],
+    [0.0558, -0.0534],
+    [0.026, -0.049],
+    [0.0227, -0.0428],
+    [0.006, -0.0392],
+    [-0.0138, -0.0443],
+    [-0.016, -0.0515],
+    [-0.0342, -0.0616],
+    [-0.0605, -0.0674],
+    [-0.0897, -0.0614],
+    [-0.1077, -0.0385],
+    [-0.12, 0],
+  ],
+  sharp: [5, 6, 8, 9],
+};
 
 /**
- * The levels of the contrabass body: the levels of the violin with a flat back. The back of a
- * double bass is flat, so the ribs start lower.
+ * The levels of the contrabass body: a flat back with a round edge, the ribs, and the levels of
+ * the top. The back of a double bass is flat, so the ribs start lower. The round edge stays inside
+ * the earlier straight edge.
  */
 const BASS_LEVELS: readonly BodyLevel[] = [
-  { scale: 0.95, y: 0, band: 'top' },
+  { scale: 0.93, y: 0, band: 'top' },
+  { scale: 0.968, y: 0.02, band: 'top' },
   { scale: 1, y: 0.05, band: 'top' },
   { scale: 0.965, y: 0.09, band: 'edge' },
-  ...VIOLIN_LEVELS.slice(3),
+  { scale: 0.965, y: 0.76, band: 'top' },
+  ...TOP_LEVELS,
 ];
+
+/** The height of the top of the ribs, as a part of the body thickness ({@link breakBack}). */
+const RIB_TOP = 0.76;
 
 /**
  * The break of the flat back of the contrabass: from this place along the body (from its
@@ -950,7 +1113,7 @@ function fHoles(arch: readonly number[]): number[] {
 
 /**
  * The outline of the body of the simple model that gives the space of a bowed string in the
- * layout ({@link addLayoutSpace}), as {@link VIOLIN_HALF}.
+ * layout ({@link addLayoutSpace}), as the half of {@link VIOLIN_OUTLINE}.
  */
 const SPACE_HALF: readonly OutlinePoint[] = [
   [0.12, 0],
@@ -1237,8 +1400,9 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
   // The contrabass has its own outline and a flat back with a break.
   const bass = form === 'contrabass';
   const levels = bass ? BASS_LEVELS : VIOLIN_LEVELS;
-  const bands = bodyBands(mirrorOutline(bass ? BASS_HALF : VIOLIN_HALF), levels, v.bodyThickness);
-  const ribTop = (levels[3]?.y ?? 0) * v.bodyThickness;
+  const outline = smoothHalf(bass ? BASS_OUTLINE : VIOLIN_OUTLINE, OUTLINE_POINTS[form]);
+  const bands = bodyBands(mirrorOutline(outline), levels, v.bodyThickness);
+  const ribTop = RIB_TOP * v.bodyThickness;
   const body = {
     top: breakBack(bands.top, form, ribTop),
     edge: breakBack(bands.edge, form, ribTop),
