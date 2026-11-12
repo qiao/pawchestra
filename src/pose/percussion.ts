@@ -778,6 +778,8 @@ const offset = new Vector3();
 const wristBind = new Vector3();
 const grip = new Vector3();
 const homeShift = new Vector3();
+/** The mallet head of a paw before its muffle. */
+const unmuffled = new Vector3();
 const tablePole = new Vector3();
 const playPole = new Vector3();
 const nowPole = new Vector3();
@@ -967,6 +969,9 @@ const GRIP_FADE = [30 * MathUtils.DEG2RAD, 10 * MathUtils.DEG2RAD] as const;
  * @param pole The direction to which the elbow points, in the model axes.
  * @param shift The move of the home of the mallet, in meters: the move of the paw at a damp that
  *   keeps the direction of the mallet (`DampHand.keep`).
+ * @param held The roll of the mallet in the paw ({@link gripRoll}), in radians, or `null` for the
+ *   roll of the posed forearm.
+ * @returns The roll of the mallet in the paw, in radians: 0 for a paw with no bend rule.
  */
 function acrossHand(
   side: Extract<PercussionSide, { kind: 'mallet' }>,
@@ -975,10 +980,12 @@ function acrossHand(
   joint: Vector3,
   pole: Vector3,
   shift: Vector3,
-): void {
+  held: number | null,
+): number {
   const { across, arm } = side;
+  let roll = 0;
   if (!across) {
-    return;
+    return roll;
   }
   strikeAlong.copy(point).sub(offset.fromArray(side.home).add(shift)).normalize();
   grip.copy(point).addScaledVector(strikeAlong, -side.length);
@@ -996,12 +1003,23 @@ function acrossHand(
     // keeps that roll of the mallet in the paw through the stroke.
     if (side.strikeRoll) {
       holdTurn(side, forearm, 0, strikeTurn, strikeDirection);
-      turn.multiply(gripRoll(side, strikeDirection, forearm, strikeTurn));
+      gripRoll(side, strikeDirection, forearm, rollTurn.copy(strikeTurn));
+      if (held !== null) {
+        rollTurn.setFromAxisAngle(shaftInHand, held);
+      }
+      roll =
+        2 *
+        Math.atan2(
+          rollTurn.x * shaftInHand.x + rollTurn.y * shaftInHand.y + rollTurn.z * shaftInHand.z,
+          rollTurn.w,
+        );
+      turn.multiply(rollTurn);
     }
     point.copy(grip).addScaledVector(along, side.length);
     offset.fromArray(side.head).sub(wristBind.fromArray(arm.bind.wrist)).applyQuaternion(turn);
     wrist.copy(point).sub(offset);
   }
+  return roll;
 }
 
 /**
@@ -1257,6 +1275,21 @@ function poseHand(
     let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
     // At a damp, the grip goes to its place, and the wrist lifts the head of the mallet.
     homeShift.set(0, 0, 0);
+    // At a muffle of the timpani, the paw keeps the roll of the mallet of its place before the
+    // muffle. The roll of the posed forearm fades out near the line of the shaft (`GRIP_FADE`),
+    // and on the way to the muffle it turned a paw 22° in 1/30 s.
+    let held: number | null = null;
+    if (damped?.kind === 'grip' && damped.keep && muffle > 0) {
+      held = acrossHand(
+        side,
+        unmuffled.copy(head),
+        share,
+        shoulder.position,
+        turnedPole,
+        homeShift,
+        null,
+      );
+    }
     if (damped?.kind === 'grip' && muffle > 0) {
       grip.fromArray(damped.grip);
       if (damped.keep) {
@@ -1270,7 +1303,7 @@ function poseHand(
       }
       share += (damped.share - share) * muffle;
     }
-    acrossHand(side, head, share, shoulder.position, turnedPole, homeShift);
+    acrossHand(side, head, share, shoulder.position, turnedPole, homeShift, held);
     // At a muffle of the timpani, the lowest point of the paw goes to the head.
     if (damped?.kind === 'grip' && damped.touch !== null && muffle > 0) {
       wrist.y += (damped.touch - lowestPoint(damped.paw, wrist, turn)) * muffle;

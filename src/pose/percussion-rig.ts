@@ -177,7 +177,8 @@ export interface EdgeDamp {
  * fingers and keeps the mallet between the thumb and the index finger
  * (`docs/reference/percussion-technique.md` 4). The spine leans over the kettles, and the upper
  * body turns the shoulder of the paw forward. The muffle and the lean do not follow the lift and
- * the lowering, so that a pause in a muffle keeps the paw on the head.
+ * the lowering, so that a pause in a muffle keeps the paw on the head. The paw keeps the roll of
+ * the mallet of its place before the muffle.
  */
 export interface FingersDamp {
   readonly kind: 'fingers';
