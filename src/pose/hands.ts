@@ -60,7 +60,10 @@ interface HandsHold {
    * of the instrument of the species (`SpeciesParams.harpScale`). The piano ignores the scale.
    */
   readonly keyPoint: (key: number, scale: number) => Vec3;
-  /** The palm of each hand is this far from the point of its key, in the instrument axes. */
+  /**
+   * The palm of each hand is this far from the point of its key, in head heights `H`, in the
+   * instrument axes. The offset follows the paw, so a larger body keeps its hold.
+   */
   readonly palmL: Vec3;
   readonly palmR: Vec3;
   /**
@@ -151,19 +154,22 @@ type RestingHand = LapHand & {
 
 /** The move of a palm for its highest keys ({@link HandsHold.highL}). */
 interface HighPalm {
+  /** The key at which the move starts. */
   readonly from: number;
+  /** The key at which the move is full. */
   readonly to: number;
+  /** The full move, in head heights `H`, in the axes of the instrument piece. */
   readonly offset: Vec3;
 }
 
 /** The holds of the piano and the harp. */
 export const HANDS_HOLDS = {
-  // The paw of the studio polar bear is longer than a white key, so the palm is 0.039 m in front of
-  // the front edge of the keys (`pianoKeyFront()`), and the curled claws lie on the key tops. The
-  // left palm is 0.0572 m above the keys and the right palm 0.0657 m, because the two paws of the
-  // mesh differ. The offsets grow with the paw: they are 1.3 times the offsets of the bear at a
-  // shoulder height of 1.15 m, and the claws go at most 1 mm into the case in the play
-  // (`pnpm pose-depth pianist`).
+  // The paw of the studio polar bear is longer than a white key, so the palm is 0.039 m (0.092 H)
+  // in front of the front edge of the keys (`pianoKeyFront()`), and the curled claws lie on the
+  // key tops. The left palm is 0.0572 m (0.135 H) above the keys and the right palm 0.0657 m
+  // (0.155 H), because the two paws of the mesh differ. The offsets are in H, so they grow with
+  // the paw. In meters, they are 1.3 times the offsets of the bear at a shoulder height of 1.15 m,
+  // and the claws go at most 1 mm into the case in the play (`pnpm pose-depth pianist`).
   // The pose follows a professional pianist (`docs/reference/piano-technique.md`): the trunk leans
   // a little from the hips, less than the 20° of a posture that is not neutral, the elbows stand
   // out from the trunk, and the shoulders stay low (`shoulderDrop`). The polar bear sits tall on a
@@ -210,8 +216,8 @@ export const HANDS_HOLDS = {
   piano: {
     action: 'strike',
     keyPoint: pianoKeyFront,
-    palmL: [0, 0.0572, 0.039],
-    palmR: [0, 0.0657, 0.039],
+    palmL: [0, 0.13529, 0.092244],
+    palmR: [0, 0.155395, 0.092244],
     highL: null,
     highR: null,
     faceL: [0, -1, 0],
@@ -306,13 +312,12 @@ export const HANDS_HOLDS = {
   // trunk sits erect, and the elbows rise out to the sides. The short arms of the deer set the
   // values. The measures below come from the deer of the old mesh, except where a sentence names
   // the Tripo fawn. The measures of the Tripo fawn come from the fit of the body and the harp at
-  // 1/1.3 of their size (design 4.4). Both grew by 1.3, so each offset in meters of this hold
-  // (`palmL`, `palmR`, `highL`, `highR`) is 1.3 times the value of the fit that the comments
-  // give, and each depth is 1.3 times the depth of the fit. The spine of the Tripo fawn stays
-  // erect (`lean` 0): with a lean of 3°, its muzzle touched the neck of the harp
-  // (`pnpm pose-depth harpist --gaps`), and erect, the gap is
-  // at least 2.3 cm. The pluck points lie at 0.37 of each string (`PLUCK.share`), so the bass strings
-  // are plucked low. The left palm lies 0.22 m above the pluck point, nearer to the shoulder, and
+  // 1/1.3 of their size (design 4.4). Both grew by 1.3. The palm offsets of this hold (`palmL`,
+  // `palmR`, `highL`, `highR`) are in H, so they grew with the body: each offset and each depth in
+  // meters is now 1.3 times the value of the fit that the comments give. The spine of the Tripo
+  // fawn stays erect (`lean` 0): with a lean of 3°, its muzzle touched the neck of the harp
+  // (`pnpm pose-depth harpist --gaps`), and erect, the gap is at least 2.3 cm. The pluck points
+  // lie at 0.37 of each string (`PLUCK.share`), so the bass strings are plucked low. The left palm lies 0.22 m above the pluck point, nearer to the shoulder, and
   // 2 cm toward the player: at 0.14 m and 2 cm toward the column, the left paw misses the bass
   // strings C2 to A2 by up to 4.5 cm, and at 0.14 m and 4 cm toward the player, the left paw bends
   // 75° from the straight paw of the source (paw swing p95 of `pnpm arm-check`, limit 70°).
@@ -351,22 +356,22 @@ export const HANDS_HOLDS = {
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.091, 0.286, 0.026],
-    palmR: [0.0715, 0.039, 0],
+    palmL: [-0.316993, 0.996262, 0.090569],
+    palmR: [0.249066, 0.135854, 0],
     // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.22 m
     // above their pluck points stands at the height of the shoulder. From C3 to D4, the left palm
     // moves up to 4 cm nearer to the strings, 6 cm down, and 6 cm toward the column. With the
     // harp place of 2026-11-13 and the move from F3 and 4 cm toward the column, the left paw went
     // 3.3 cm into the chest, and with this move 0.8 cm. The note targets do not change (`pnpm
     // hold-fit harpist`, `pnpm pose-depth harpist`).
-    highL: { from: 48, to: 62, offset: [0.052, -0.078, -0.078] },
+    highL: { from: 48, to: 62, offset: [0.181139, -0.271708, -0.271708] },
     // The highest strings of the right hand lie near the right shoulder, at the neck of the harp.
     // From G5 to C7, the right palm moves up to 8 cm down the strings and 2 cm away from them, as
     // the right wrist of a harpist comes near the soundboard in the upper register (section 4).
     // With no move, the right elbow folded to 147° on F6 and D7, and the right paw twisted up to
     // 57° on its forearm. With this move, the elbow bends 120° there, and the paw twists up to 37°
     // (`scratch/harp2/burst.ts`). The note targets do not change (`pnpm pose-depth harpist`).
-    highR: { from: 79, to: 96, offset: [0.026, -0.104, 0] },
+    highR: { from: 79, to: 96, offset: [0.090569, -0.362277, 0] },
     faceL: [1, -1, 0],
     faceR: [-1, -0.5, 0.4],
     aimL: [0, 1, 0.5],
@@ -462,6 +467,8 @@ interface HandSide {
 /** The points of a piano or harp player in the bind pose that the pose needs. */
 export interface HandsRig {
   readonly hold: HandsHold;
+  /** The head height `H` of the body, in meters: the unit of the palm offsets of the hold. */
+  readonly headHeight: number;
   /** The scale of the instrument of the species (`instrumentScale()` of `models/species.ts`). */
   readonly scale: number;
   readonly chestBind: Vec3;
@@ -507,6 +514,7 @@ export function handsRig(model: PlayerModel, instrument: HandsInstrument, scale 
 
   return {
     hold,
+    headHeight: model.body.headHeight,
     scale,
     chestBind: positions[boneIndex('chest')] ?? [0, 0, 0],
     pieces: model.pieces,
@@ -555,11 +563,11 @@ function palmPoint(
   if (depth !== null) {
     at.z = depth;
   }
-  at.add(new Vector3(...offset));
+  at.addScaledVector(new Vector3(...offset), rig.headHeight);
   const highPalm = side === 'L' ? rig.hold.highL : rig.hold.highR;
   if (highPalm) {
     const share = clamp01(((low + high) / 2 - highPalm.from) / (highPalm.to - highPalm.from));
-    at.addScaledVector(new Vector3(...highPalm.offset), share);
+    at.addScaledVector(new Vector3(...highPalm.offset), share * rig.headHeight);
   }
   return placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) });
 }

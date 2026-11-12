@@ -156,7 +156,10 @@ export function harpReach(species: SpeciesId, demos: readonly DemoFile[]): HandR
       joint(arm.bones.forearm).distanceTo(joint(arm.bones.hand)) +
       joint(arm.bones.hand).distanceTo(palm);
     const strings = stringKeys().map((key): StringSpare => {
-      const at = new Vector3(...hold.keyPoint(key, scale)).add(new Vector3(...offset));
+      const at = new Vector3(...hold.keyPoint(key, scale)).addScaledVector(
+        new Vector3(...offset),
+        rig.headHeight,
+      );
       const point = new Vector3(...placePoint(rig.pieces, { bone: 'instrument', at: toVec3(at) }));
       return { key, spare: length - point.distanceTo(shoulder) };
     });

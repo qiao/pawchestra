@@ -57,7 +57,7 @@ const FILE: TestFile = {
   ],
 };
 
-/** The place of the palm over a key (design 5.3), in the instrument axes. */
+/** The place of the palm over a key (design 5.3), in head heights, in the instrument axes. */
 const PALM_OFFSETS = {
   piano: { L: HANDS_HOLDS.piano.palmL, R: HANDS_HOLDS.piano.palmR },
   harp: { L: HANDS_HOLDS.harp.palmL, R: HANDS_HOLDS.harp.palmR },
@@ -87,7 +87,10 @@ function expectedPalm(
   const at = new Vector3(...keyPoint(low))
     .add(new Vector3(...keyPoint(high)))
     .multiplyScalar(0.5)
-    .add(new Vector3(...PALM_OFFSETS[player.instrument][side]));
+    .addScaledVector(
+      new Vector3(...PALM_OFFSETS[player.instrument][side]),
+      player.model.body.headHeight,
+    );
   return new Vector3(...placePoint(player.model.pieces, { bone: 'instrument', at: toVec3(at) }));
 }
 
