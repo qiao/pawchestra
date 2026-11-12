@@ -167,7 +167,11 @@ const COLUMN = {
   shaft: [0.031, 0.026],
   /** The number of flutes of the shaft. */
   flutes: 5,
-  /** The crown on the top of the column, around the end of the neck. */
+  /**
+   * The crown on the top of the column, around the end of the neck. It is lower than the crown of
+   * a concert harp: with its top at 1.395, the crown stood at the nose tip of the Tripo fawn in the
+   * side views, and the fawn seemed to bite it. With the top at 1.272, it stands below the muzzle.
+   */
   crown: [
     [0.031, 1.18],
     [0.045, 1.21],
