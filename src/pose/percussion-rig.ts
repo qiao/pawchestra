@@ -935,10 +935,10 @@ export const TAMBOURINE_HOLD = {
   poleR: [1.5, -0.5, 0.3],
   /**
    * The move of the right wrist forward in the middle of its move between the play place and the
-   * trap table, in meters: the beater passes in front of the belly. On a straight line, the beater
-   * went 4 cm into the belly.
+   * trap table, in head heights `H`: the beater passes in front of the belly. On a straight line,
+   * the beater went 4 cm into the belly.
    */
-  beaterArc: 0.05,
+  beaterArc: 0.205202,
 } as const;
 
 /**

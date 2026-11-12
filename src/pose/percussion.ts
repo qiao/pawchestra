@@ -1399,7 +1399,7 @@ function poseHand(
       to,
       swap.across,
       swap.table,
-      left ? 0 : TAMBOURINE_HOLD.beaterArc,
+      left ? 0 : TAMBOURINE_HOLD.beaterArc * rig.headHeight,
     );
     pawTurn = left ? palm : null;
   }
