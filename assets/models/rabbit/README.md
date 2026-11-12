@@ -257,18 +257,19 @@ The hand rig of the third Tripo P2 rabbit (design 4.4, "Hand rig"), made in head
 (`blender -b --factory-startup`) by one build script, by the route of the Tripo wolf
 (`../wolf/README.md`). The source FBX is the target of the look: the body keeps the form, the
 colors, and the eye paint of the source, with a crease angle of 180 and one scale of the whole
-body. The only form edit is the size of the eyeballs and their sockets ("Eyes" below). The arms
-and the legs keep the length of the source: no cut, no split from the trunk, and no stretch.
+body. Two form edits change the source: the size of the eyeballs and their sockets ("Eyes"
+below), and the size of the front paws ("Paw size" below). The arms and the legs keep the length
+of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 396,045 bytes |
-| SHA-256 | `7bc2d1fae16a0b1dbca786acbf00a9ab950cfb057309286ca0afc4e9fdba0e57` |
+| Size | 394,177 bytes |
+| SHA-256 | `f74f1fe669681a7895151e1cef7c0132310ed436f074eecbffb549d43dcf97d2` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,790 vertices and 4,012 faces (3,388 quads and 624 triangles, 7,400 triangles), flat faces, and the surface of `sa.add_surface()`. 27 faces are gloss (the pink nose). The 80 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the paw edit). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.795385 (the shoulder joints at 1.4867 m for each unit, so that H is 0.2985 m, the H of the rabbit of main), `crease` 180, `backRoom` 0.01 |
 | Eyes | The eyeballs of the mesh at 0.93 of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), the irises of the source map moved out ("Eyes" below), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
@@ -278,8 +279,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 1,218,836 bytes | `74a7b7c80d08aba25d3b812657a387815540bf84f52bbb36eb080a3881016df5` |
-| `tripo-hand/rabbit.rig.json` | 16,321 bytes | `17e9d67717c9d8a9b5ebf23820eb0977d44d3e56081fb8ca203fff4ce5e051ab` |
+| `tripo-hand/rabbit.rig.glb` | 1,218,832 bytes | `a6bdeba155a1fb5188c49d403aa3f6006e56addf4d5dae0708c1ff70c7a68d41` |
+| `tripo-hand/rabbit.rig.json` | 16,320 bytes | `d230b7cafa3cfcb0bcfbff339eb60d344935e03f11041271d4711e1d54697e11` |
 
 The scripts of the session (`scratch/rabbit3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
@@ -309,6 +310,9 @@ arm). Each edit is a need of the rig, the seat, or the instrument:
   smoothstep to 0 at 0.055 units, toward the middle plane from |x| 0.012, and below y 0.68 (0 at
   y 0.64). The whiskers and the nose (z above 0.115) stay. The largest move is 0.0025 units
   ("Eyes" below).
+- **Paw size.** The edit `paw` of `redits.py` (`{"kind": "paw", "length": 0.8, "wide": 0.8,
+  "thick": 1.0, "ramp": 0.02, "width": [0, 0, 1]}`) scales each front paw past the wrist joint
+  ("Paw size" below).
 - **Surface.** `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg',
   eye_fans=False, config=<rabbit-tripo.json>)`. The faces of the two eyeballs get the face
   attribute `eye`. 66 light faces over the nose of the nose box leave the gloss nose, so that they
@@ -350,6 +354,31 @@ The trunk, the neck, the head, the hips, the legs, and the tail keep the automat
 **Smooth surface.** No relax, no region colors, no trunk scale, and no belly key: the form stays
 the form of the source. In the seated bind the belly shows no dent and no dark fold from the front.
 
+**Paw size.** In the app, the front paws of the source read too large. In shares of H, the
+source paw is about as long as the paw of the Tripo cat. But against the distance of the shoulder
+joints, it is 1.19 times as long and 1.23 times as wide as the paw of the cat, and against the arm,
+1.07 and 1.12 times. The point edit `paw` (above) scales each front paw past the wrist joint of its
+side (x 0.245) about that joint, in the frame of the paw: the rest forearm axis, the width axis +z
+of the source turned with the paw turn, and the height axis square to the two. A point at the
+distance d past the wrist joint takes the share smoothstep(0, 0.02, d) of the scale, so the wrist
+has no step. The paw height, the arm, the bones of the arm, and the feet do not change.
+`make_config.py` moves the knuckle joint and the tip of `fingers_<side>` with the same edit, and
+the weight rows keep their rules. The left paw in the rest of each export
+(`scratch/beagle/paw_measure.py`), in meters and in H:
+
+| Measure | Source rabbit | Rabbit now | A-pose rabbit of main | Tripo cat |
+|---|---|---|---|---|
+| Length, wrist joint to tip | 0.134 (0.448) | 0.107 (0.359) | 0.083 (0.277) | 0.153 (0.450) |
+| Width | 0.151 (0.505) | 0.121 (0.404) | 0.089 (0.298) | 0.166 (0.488) |
+| Height | 0.069 (0.230) | 0.069 (0.230) | 0.070 (0.233) | 0.082 (0.243) |
+| Length / shoulder distance | 0.643 | 0.514 | 0.306 | 0.541 |
+| Width / shoulder distance | 0.724 | 0.579 | 0.330 | 0.587 |
+| Length / arm (shoulder to wrist joint) | 0.507 | 0.406 | 0.241 | 0.472 |
+
+The scale is a first step of 0.8. The paw stays larger than the mitten paw of the A-pose rabbit.
+With the smaller paws, the note targets stay within 5 mm (`pnpm hold-fit violinist`), the faces
+that fold at rest go from 39 to 13, and the depths of the play change by 0.5 cm or less.
+
 **Arm twist.** The roll of each upper arm (from the clavicle), the twist of each forearm (the paw
 from the upper arm), and the bend of each paw on its forearm (swing), in degrees, in each moment of
 the hold `RABBIT_HOLD` of `src/pose/bowed-rig.ts` (`pnpm pose-preview violinist`):
@@ -369,11 +398,11 @@ the rest hold of the second rabbit, it twisted 50 degrees at rest, and the left 
 The rest holds the bow tip down and forward (design 5.2). A bow tip straight down twisted the right
 forearm by about 175 degrees at rest, because the paw grips the stick across the palm.
 
-**Violin.** The arms reach 0.297 m from the shoulder joint to the middle of the palm (0.262 m on
+**Violin.** The arms reach 0.291 m from the shoulder joint to the middle of the palm (0.262 m on
 the second Tripo rabbit). The violin is 0.9 of the violin of the app (0.456 m, `violinScale` of
 `src/models/species.ts`, 0.75 before): the left paw reaches the fingerboard from 0.67 of its
-length from the nut, and the bow paw 0.14 m of the hair (`pnpm hold-reach rabbit --instrument
-violin`). The rule of a violin shop gives 0.554.
+length from the nut, and the bow paw 0.125 m of the hair (`pnpm hold-reach rabbit --instrument
+violin`). The rule of a violin shop gives 0.541.
 
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, and the shins lean 12
 degrees forward (`legTurns` of the config). The front of the seat lies 0.05 units behind the knee
@@ -435,7 +464,8 @@ normal of the source is (-0.002, -0.005, 0.986).
 
 **Differences from the source.** The app light is warm and comes from above, so the cream fur
 reads warmer than in the even gray light of an FBX viewer. The eyes are 0.93 of the source, and
-each iris sits about 8 degrees farther out on its ball. Each eye has a blink lid. The paw turns move the seam of each wrist band.
+each iris sits about 8 degrees farther out on its ball. Each eye has a blink lid. The front
+paws are 0.8 of the source in length and width. The paw turns move the seam of each wrist band.
 
 ### History
 
