@@ -1302,18 +1302,22 @@ function trombonistTargets(scene: TestScene, index: number, model: PlayerModel):
   }
   const { note: layer, timeOffset } = plan;
   return (['L', 'R'] as const).flatMap((side) => {
-    const grip = side === 'L' ? model.instrument.grips.palmL : model.instrument.grips.palmR;
+    const piece = side === 'L' ? model.instrument.grips.palmL : model.instrument.grips.palmR;
     const palm = side === 'L' ? model.body.palmL : model.body.palmR;
-    if (!grip) {
+    if (!piece) {
       return [];
     }
+    // The grip of the rig, with the move of the hold along and around the tube
+    // (`WindHold.gripShiftL`), on the bone of the grip of the instrument: the right grip moves
+    // with the slide.
+    const grip = side === 'L' ? layer.rig.left.grip : layer.rig.right.grip;
     const starts = side === 'L' ? layer.track.phraseStarts : layer.track.starts;
     return Array.from(starts, (start: number): NoteTarget => ({
       side,
       sample: playSample(scene, start + timeOffset + 0.05),
       error: (posed) =>
         new Vector3(...posedPoint(posed, `hand${side}`, palm)).distanceTo(
-          new Vector3(...posedPiecePoint(posed, grip)),
+          new Vector3(...posedPoint(posed, piece.bone, grip)),
         ),
     }));
   });
