@@ -427,24 +427,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/mouse/mouse.rig.glb',
     },
   ],
-  // The timpani elephant (design 4.4). It stands at its timpani, so the
-  // export keeps the standing pose of the rig. Its trunk follows the head below the chin. Its eyes
-  // are 0.6 of the bead eyes of its head, because the large head with its ears made them large.
-  // The old eyes of the mesh sit in deep sockets with lids, which showed as a gray groove around
-  // each bead eye, so the head fills them (`eyeFill`).
+  // The timpani elephant (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/elephant/tripo-hand/elephant.blend`), by the route of the Tripo wolf, with no
+  // arm cut and no arm stretch. It stands at its timpani in the stance of its bind, with the center
+  // of mass over the middle of the soles. Its `.blend` holds the facts of the body: the scale that
+  // keeps H of the elephant of `elephant.rig.glb`, the crease angle 180°, and the lowest height of
+  // the head measures, so that the trunk stays out of them. The source paints no light in the
+  // eyes, so the eyes take the finish `eye` and the eye light.
   [
     'elephant',
     {
       landmark: 'shoulders',
-      height: 1.1616,
       seated: true,
-      soloist: true,
+      soloist: false,
       constant: 'STUDIO_ELEPHANT',
-      crease: 35,
-      glb: 'assets/models/elephant/elephant.rig.glb',
-      headFloor: 0.69,
-      eyeSize: 0.6,
-      eyeFill: [0.2, 0.5],
+      glb: 'assets/models/elephant/tripo-hand/elephant.rig.glb',
     },
   ],
   // The bassoon beaver (design 4.4). A bassoon soloist keeps its seat,

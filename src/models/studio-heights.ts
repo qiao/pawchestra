@@ -13,7 +13,7 @@ export const STUDIO_HEIGHTS = {
   'studio-cat': { headHeight: 0.339381, seatHeight: 0.222242 },
   'studio-deer': { headHeight: 0.356551, seatHeight: 0.243208 },
   'studio-dog': { headHeight: 0.41623, seatHeight: 0.190577 },
-  'studio-elephant': { headHeight: 0.593073, seatHeight: 0.288117 },
+  'studio-elephant': { headHeight: 0.593073, seatHeight: 0.489256 },
   'studio-fox': { headHeight: 0.379997, seatHeight: 0.248978 },
   'studio-hippo': { headHeight: 0.502359, seatHeight: 0.235398 },
   'studio-mannequin': { headHeight: 0.453483, seatHeight: 0.239596 },
