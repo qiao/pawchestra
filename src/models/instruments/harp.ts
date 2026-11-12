@@ -22,10 +22,16 @@ type PlanePoint = readonly [y: number, z: number];
 export const HARP = {
   /** The base on the floor: a bar along z at the height y, with its width on x and its height. */
   base: { z: [-0.42, 0.08], y: 0.04, width: 0.26, height: 0.08 },
-  /** The bottom and the top of the column, as (y, z). */
+  /**
+   * The bottom and the top of the column, as (y, z). The muzzle of the Tripo fawn reaches over
+   * the neck near the crown. With the crown at 1.3, the neck lay 2.8 cm below the muzzle. The
+   * crown now stands at 1.25, and the neck falls by a share of the 0.05 that goes to 0 at the
+   * soundbox, so the gap is 4.8 cm with the turn of {@link HARP_PLACE} (`pnpm pose-depth harpist
+   * --gaps`).
+   */
   column: [
     [0.08, -0.38],
-    [1.3, -0.38],
+    [1.25, -0.38],
   ],
   /**
    * The bottom and the top of the soundbox axis, as (y, z). The bottom stands near the foot of the
@@ -42,15 +48,15 @@ export const HARP = {
    * soundbox, so the end of the neck sits on it.
    */
   neck: [
-    [1.3, -0.38],
-    [1.268, -0.3],
-    [1.236, -0.215],
-    [1.212, -0.125],
-    [1.19, -0.035],
-    [1.16, 0.05],
-    [1.115, 0.135],
-    [1.055, 0.215],
-    [0.995, 0.285],
+    [1.25, -0.38],
+    [1.224, -0.3],
+    [1.198, -0.215],
+    [1.18, -0.125],
+    [1.165, -0.035],
+    [1.141, 0.05],
+    [1.102, 0.135],
+    [1.048, 0.215],
+    [0.993, 0.285],
     [0.962, 0.315],
   ],
   /** The number of strings: C1 to G7, seven strings in each octave, as a concert harp. */
@@ -89,9 +95,12 @@ export const HARP_PLACE = {
    * front left: the harp is diagonal to the player. The left hand plays the bass strings at the
    * front left, and the right hand the treble strings near the right shoulder. A larger turn
    * brings the bass strings nearer to the left paw, and the strings nearer to the chest. At 40°,
-   * the right paw of the deer goes 3.8 cm into the right shoulder.
+   * the right paw of the deer goes 3.8 cm into the right shoulder. With the lower crown of
+   * {@link HARP}, 97.5% of the note targets lie within 5 mm at 47°, and 96.6% at 45°, because the
+   * bass strings are shorter (`pnpm pose-depth harpist --gaps`). At 48°, the right upper arm
+   * rests on the soundbox in 43% of the play, and at 47° in 38%.
    */
-  turn: 45 * MathUtils.DEG2RAD,
+  turn: 47 * MathUtils.DEG2RAD,
 };
 
 /**
