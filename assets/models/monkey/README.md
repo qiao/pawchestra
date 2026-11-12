@@ -153,12 +153,12 @@ below. `make_config.py` writes `tools/mesh-rigs/simple/monkey-tripo.json`: the j
 
 | Item | Value |
 |---|---|
-| Size | 398,678 bytes |
-| SHA-256 | `a6b8e7f3821939e235d6375412d6598fd9daf08c13946476686f3ad25391cf26` |
+| Size | 398,642 bytes |
+| SHA-256 | `22c4676a02c17138f5dbac43950c69c832a835131f18ef8611f75cd2098ad268` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the tuft, the soles at z = 0, the monkey faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `monkey`: 3,721 vertices and 3,983 faces (3,323 quads and 660 triangles, 7,306 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 20 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 96 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/monkey/tripo-hand/monkey-color.webp`) |
 | Armature | `monkey_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.714598 (the shoulder joints at 1.130693 m for each unit, so that H is 0.333629 m, the H of the monkey of main), `crease` 180 |
+| Facts | `height` 0.857518 (the shoulder joints at 1.356832 m for each unit: 1.2 times the scale 1.130693 that kept H of the monkey of main, so that H is 0.400355 m), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
@@ -229,7 +229,7 @@ the hall light it reads as the nose of the FBX file, so the map tool does not ch
 **Stance.** The monkey has no chair (`noChair` of `src/models/species.ts`). The property `seat` is
 {`prop` `chair`, `front` -0.04, `back` -0.11, `halfWidth` 0.15}: a seat under the back of the
 haunch, behind the heels, which only sets the seat height of the export. The seat height is
-0.335 m (0.292 m on the monkey of main), so the soles stay on the floor in the app. The legs keep
+0.401 m (0.292 m on the monkey of main), so the soles stay on the floor in the app. The legs keep
 the length of the source. The thighs hang straight down, the knees bend 22 degrees, and the
 shoulders stay over the hips, as a brass player stands erect (`docs/reference/wind-technique.md`,
 1.8). The soloist keeps this stance (`soloist` false in `ANIMALS` of `tools/studio-body.ts`).
@@ -306,7 +306,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `c2571ddd46f1c28432633fc765f14670bb5546981ad9b20f9b7e4897a341c1f6` |
-| `tripo-hand/monkey.rig.json` | 16,672 bytes | `de0aaf7331eddd31b603e0eb00438c4c32e8cfdd7c822390eea2b8527294f35e` |
+| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `cccff22e4b12bc8c7c1e4667a7dcebaea0f9df3273f31e63f3a4c43548d95375` |
+| `tripo-hand/monkey.rig.json` | 16,672 bytes | `c24dbd8ec6789d1e95fb9a2a7d23c67aa783afa4e1ca57925ac8743c5803d0cb` |
 | `tripo-hand/monkey-color.webp` | 178,300 bytes, 2048 × 2048 | `5b9920243e479862e07e602f19b82b5eebdfe1f1ddd6d019c524f619cb34d117` |
 | `tripo-hand/monkey-normal.webp` | 111,326 bytes, 1024 × 1024 | `e81b285a48619d696b4ae23557ee2d203934d8a2be29739b2a7cfd2c88f83dca` |

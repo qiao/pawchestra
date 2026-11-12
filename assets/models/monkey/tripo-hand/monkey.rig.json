@@ -1,5 +1,5 @@
 {
- "sha256": "c2571ddd46f1c28432633fc765f14670bb5546981ad9b20f9b7e4897a341c1f6",
+ "sha256": "cccff22e4b12bc8c7c1e4667a7dcebaea0f9df3273f31e63f3a4c43548d95375",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -1326,7 +1326,7 @@
    }
   },
   "body": {
-   "height": 0.714598,
+   "height": 0.857518,
    "crease": 180
   },
   "texture": "assets/models/monkey/tripo-hand/monkey-color.webp"

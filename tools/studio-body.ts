@@ -525,10 +525,10 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   ],
   // The trumpet monkey (design 4.4): the candidate hand rig of the Tripo P2 macaque
   // (`assets/models/monkey/tripo-hand/monkey.blend`), with no arm cut and no arm stretch. It
-  // stands as a soloist. Its `.blend` holds the facts of the body: the scale that keeps H of the
-  // monkey of `monkey.rig.glb`, and the crease angle 180°. The map paints a full eye with a light
-  // on each eyeball, so the eyes take the finish `varnish` and no eye light. It has no chair, and
-  // its bind stands with the center of mass over the middle of the soles. So the soloist keeps
+  // stands as a soloist. Its `.blend` holds the facts of the body: the scale of 1.2 times the H of
+  // the monkey of `monkey.rig.glb`, and the crease angle 180°. The map paints a full eye with a
+  // light on each eyeball, so the eyes take the finish `varnish` and no eye light. It has no chair,
+  // and its bind stands with the center of mass over the middle of the soles. So the soloist keeps
   // the bind stance. Reason: the straight legs of the sheet put the center of mass 2.8 cm behind
   // the middle of the soles.
   [
