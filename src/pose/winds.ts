@@ -674,12 +674,18 @@ const FOX_FLUTE = {
 
 /**
  * The turns of the trombone hold of the panda while it plays, in degrees (design 5.3). The slide
- * points 10° to the right of straight ahead and 35° below the level, toward the audience
+ * points 10° to the right of straight ahead and 40° below the level, toward the audience
  * (`docs/reference/wind-technique.md` 1.1). The arms of the Tripo panda are short for its big round
- * head and belly: the mouth is 0.21 m in front of the right shoulder joint and 0.25 m above it, and
- * the arm reaches 0.417 m. With the slide 25° below the level, the right arm reaches 0.085 m of the
- * slide travel, and at 35° below the level 0.1 m (`pnpm hold-reach panda --instrument trombone`).
- * With the slide 20° to the right, the bell stood at the right knee.
+ * head and belly: the mouth is 0.21 m in front of the right shoulder joint and 0.25 m above it. The
+ * upper arms and the forearms of the mesh are 1.2 times those of the source
+ * (`assets/models/panda/README.md`), so that the arm reaches 0.488 m in place of 0.417 m. On the
+ * trombone of the app, the right arm then reaches 0.11 m of the slide travel with the slide 35°
+ * below the level, and 0.135 m at 40° (`pnpm hold-reach panda --instrument trombone`). With the
+ * arms of the source, it reached 0.03 m at 35°. With the slide 20° to the right, the bell stood at
+ * the right knee.
+ *
+ * A chest that leans forward or turns in the far positions adds no reach: the head and the
+ * mouthpiece follow the chest, so the shoulder and the slide move together.
  */
 const PANDA_PLAY = {
   /** The turn of the slide to the right of the panda, around the mouthpiece. */
@@ -688,7 +694,7 @@ const PANDA_PLAY = {
    * The turn of the slide down around the mouthpiece, after the turn right, from the 15° below
    * the level of the bind pose.
    */
-  down: 20,
+  down: 25,
   /** The forward turn of the left shoulder. */
   shoulderL: 35,
   /**
@@ -715,11 +721,8 @@ const PANDA_PLAY_TURN = toQuat(
  * `models/instruments/brass.ts`) keeps the bell section out of the head. The right shoulder turns
  * 70° forward (`reach`), 25° more than in {@link WIND_HOLDS}. A turn of more than 70° adds no reach.
  *
- * The panda plays a smaller trombone (`SpeciesParams.tromboneScale`), so that the slide brace
- * comes nearer to the right shoulder: with the trombone of the app, the right arm reached only
- * 0.055 m of the slide travel, and the right paw held the slide 10 cm below the brace. With 0.75,
- * it reaches 0.1 m. A larger trombone puts the brace further from the shoulder: with 1.1, the right
- * arm reaches no part of the travel.
+ * The panda plays the trombone of the app, 0.83 m long, 0.49 of the height of the seated panda.
+ * With the smaller trombone of 0.75, it read as a toy beside the clarinets and the flutes around it.
  *
  * The left palm faces the inner slide tubes near the mouthpiece brace, and the right palm the
  * upright slide brace (`faceTube`, `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as
@@ -747,9 +750,10 @@ const PANDA_PLAY_TURN = toQuat(
  * the front of the chest.
  *
  * The middle of the right paw lies at the right side of the brace, so the right arm reaches a small
- * part of the slide travel of 0.41 m. A real seventh position is 0.57 m from the first position
+ * part of the slide travel of 0.55 m. A real seventh position is 0.57 m from the first position
  * (`docs/reference/wind-technique.md` 1.2), so the slide positions map into the reached travel
- * ({@link reachedShare}).
+ * ({@link reachedShare}): the slide moves 4.1 cm in the second position, 10.1 cm in the fourth,
+ * and 13.5 cm in the seventh.
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trombonist
  * (`docs/reference/wind-technique.md` 1.1): it moves 0.057 H down and 0.065 H back from the mouth
