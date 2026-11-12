@@ -909,7 +909,8 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   to the left of the base, behind the foot of the soundbox, with the knee out and forward, so the
   harp stands between the knees, as a harpist sits (harp 2). Reason: the near diagonal harp puts
   the foot of its soundbox and its base over the bind place of the left hoof, so the left hoof
-  and shin went through them. The pedals stand on the floor (4.6), so the hoof turns up around its
+  and shin went through them. The base stands to the right of the middle, so the right hoof rests
+  a little to the right of its bind place, and its pedal moves stay out of the base. The pedals stand on the floor (4.6), so the hoof turns up around its
   heel until the front of its sole is on the pedal, as a harpist keeps the heel on the floor and
   presses with the ball of the foot (harp 7.7). Above `HEEL_PITCH`, the whole hoof lifts. For a
   pedal behind the rest place of the toe, the heel lifts (`HEEL_LIFT`). Reason: the pedals of the
