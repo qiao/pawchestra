@@ -270,7 +270,7 @@
       "R": 0
     },
     "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 20 degrees down and 20 degrees out, and the shin leans 12 degrees forward of vertical, so that most of the thigh lies on the seat (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 20 20 12).",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 20 degrees down and 20 degrees out, and the shin leans 8 degrees forward of vertical, so that most of the thigh lies on the seat, and the foot turns 12 degrees with the heel up, the toes flat on the floor, so that the seat is higher (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 20 20 8 12).",
     "tailBind": {
       "tail": [
         0.25,
@@ -292,16 +292,16 @@
         0.816361
       ],
       "shin": [
-        0.104421,
-        0.00547,
-        0.025733,
-        0.994185
+        0.069685,
+        0.00365,
+        0.025972,
+        0.997224
       ],
       "foot": [
+        -0.104528,
         0.0,
         0.0,
-        0.0,
-        1.0
+        0.994522
       ],
       "toes": [
         0.0,
