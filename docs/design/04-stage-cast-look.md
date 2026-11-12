@@ -202,7 +202,7 @@ does not fix.
 
 An arm that the mesh joins to the trunk needs a free section. A species script frees it with a
 side wall on the trunk (`cat_arms.py`), or splits it from the trunk along its crease in a copy
-(`beaver_edit.py`, `badger_edit.py`, `penguin_edit.py`). An arm that joins the trunk only near the
+(`beaver_edit.py`, `badger_edit.py`). An arm that joins the trunk only near the
 shoulder also takes the split, because the long thin faces above a low shoulder line fold when the
 arm lifts. A flat flipper has rays of different lengths with no trunk in the section, so the free
 test takes a larger ratio for it (`--spec` key `free`).
@@ -223,7 +223,6 @@ traps of the rig.
   longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
   source file stays unchanged and a run gives the same bytes again. A point edit of a rig file
   goes into an edit file, and `pnpm glb-point-edits` writes it into the rig file of a base commit.
-  The cat has such edits, because a run of `pnpm rig-mesh cat` no longer gives its rig file.
 - **Replacing body.** A new body of a species keeps three things of its old body in the app view:
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
@@ -250,8 +249,8 @@ traps of the rig.
   penguin, gives each face one of the two colors, and its orange keeps its colors
   (`colors.twoTone`).
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
-  eye patch. A script cuts such faces along the edge in a copy (`tools/blender/penguin_edge.py`,
-  `panda_edge.py`), and each new vertex lies on an old face. The rig takes the weights of the mesh
+  eye patch. A script cuts such faces along the edge in a copy, and each new vertex lies on an old
+  face. The rig takes the weights of the mesh
   before the cut (`weightSource`). Where the weights change fast, such as at the clavicles, the
   skin moves a new vertex off the line of its old edge, and a small new face turns over in the
   play. There the cut adds few and large faces: it splits no face at the middles of its edges, and
@@ -513,17 +512,18 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
-The polar bear has the one hand rig of the app (`assets/models/polar-bear/polar-bear.blend`), from
-a Tripo retopology of its mesh. Each paw has one digit bone for each claw (`DIGIT_BONES`,
+Fifteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
+A chain of `tools/blender/hand/<s>/` makes each one, except the bear (`pnpm hand-chain <s>`). The
+mouse, the badger, the rhino, and the mannequin come from `rig-mesh`. Each paw of the polar bear
+has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
 share take half of each bone. The paw vertices follow the paw and the fingers, and the wrist
 helper only its own ring. Reason: with half of the wrist helper, the paw turned only about two
-thirds of the hand turn, and one claw could not press a key alone. Each other body comes from
-`rig-mesh`. The hand rigs of the cat and the rabbit are trials that the app does not use, because
-they gave a thin, faceted arm root. A trial keeps its files in `assets/models/<s>/hand-rig/`, so
-that no tool takes it for the body of the app (`pnpm rig-export <s> --blend <file> --out
-<file>`).
+thirds of the hand turn, and one claw could not press a key alone. A trial of a hand rig keeps
+its files outside `tripo-hand/`, such as in `scratch/trials/` of `pnpm rig-trial`, and exports only
+by path (`pnpm rig-export <s> --blend <file> --out <file>`), so that no tool takes it for the body
+of the app.
 
 ```text
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
@@ -993,13 +993,9 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   bench reaches back from the front edge of its fit to at least `PIANO_BENCH.studioDepth`, so the
   round haunch sits on the bench with a little room behind it. The deer sits on the stool of the
   harp.
-- The cat and the rabbit sit on the chairs of their A-pose bodies. The wider haunch of the cat
-  sits on a wider chair (`seatWidth`), and its tail lies curled on the seat around the left side
-  of the haunch (`studio.tailCurl` of the rig config). Point edits make the curled tail a round
-  tube and the legs thicker (`assets/models/cat/cat-edits.json`), because the rig left the tail a
-  flat, crumpled sheet and the long legs looked thin. They also flatten the belly of the left
-  forearm, which showed as a bump on the top of the arm in the play pose. The rabbit sits with more room behind the
-  back (`backRoom`), so that its back keeps off the chair back.
+- The wider haunch of the cat sits on a wider chair (`seatWidth`), and its tail lies curled on
+  the seat around the left side of the haunch (`studio.tailCurl` of the rig config). The rabbit
+  sits with more room behind the back (`backRoom`), so that its back keeps off the chair back.
 - The candidate rabbit of `tripo-hand/` keeps the legs of its mesh, so its chair is lower than
   the chair of the A-pose rabbit. It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where

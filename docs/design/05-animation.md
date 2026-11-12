@@ -345,10 +345,7 @@ The rest of each family:
   shoulder bones of a round body, and keeps a free paw bent in the moves ("Free round arms in a
   shared hold", "Bent arms in the moves"). A clip at the root of the upper arm of a bent arm comes
   from the arm root of the mesh, so the rig fixes it. A larger elbow turn or shoulder turn clears
-  only a small part of the depth, and it moves the grip line of the arm gate past its limit. The
-  root domes of the pig shrink
-  toward the shoulder joints (`pig_root.py`), because their depth swings with their distance from
-  the joint, and some of them come out of the shoulder in another pose.
+  only a small part of the depth, and it moves the grip line of the arm gate past its limit.
 - **Free round arms.** A rebuilt arm that the mesh joined to the trunk (the panda, the pig, the dog,
   the beaver, the badger) is a round tube with its full inner half width. With the
   bone pose of a thinner arm, the inner side of the upper arm goes into the trunk. So the hold of such a body keeps the elbows away from the sides, as a brass player
