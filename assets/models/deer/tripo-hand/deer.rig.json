@@ -1,5 +1,5 @@
 {
- "sha256": "0d7b2623e817d60d359645a873fdf0ce1ec2986f8758e2d9d3073c3a7b2cd658",
+ "sha256": "c497b1ccec832b908640df1802c1bf45e36d320290b597d84ffdb1702b9469f0",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -1572,9 +1572,9 @@
    }
   },
   "body": {
-   "height": 0.897127,
+   "height": 1.166265,
    "crease": 180,
-   "seatWidth": 0.44
+   "seatWidth": 0.57
   },
   "texture": "assets/models/deer/tripo-hand/deer-color.webp"
  }

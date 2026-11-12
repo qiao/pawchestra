@@ -379,11 +379,11 @@
   "body": {
     "crease": 180
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and the seat width 0.44 m of the stool of the old deer, which holds the haunch (0.33 m wide at this scale).",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and the seat width 0.57 m of the stool, 1.3 times the stool of the old deer, which holds the haunch (0.43 m wide at this scale).",
   "eyeSize": 0.159257,
   "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
-  "metersPerUnit": 1.386595,
-  "metersPerUnitNote": "The scale of the app: the standing shoulder joints (0.647 units) are 0.897127 m high, as on the deer of main (assets/models/deer/deer.rig.glb). The fawn has a small head and a long neck, so a scale that keeps H of the old deer made it 1.6 times taller. H is then 0.220825 m. The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the hooves, and the legs keep the form of the source.",
+  "metersPerUnit": 1.802574,
+  "metersPerUnitNote": "The scale of the app: 1.3 times the scale at which the standing shoulder joints (0.647 units) are 0.897127 m high, as on the deer of main (assets/models/deer/deer.rig.glb). At 1.3, the seated crown with no ears is at the height of the seated crown of the Tripo wolf, and the shoulder joints are 1.166265 m high. The fact height of the armature is the shoulder joints at this scale. The head, the trunk, the hooves, and the legs keep the form of the source.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/deer.blend holds it.",
   "texture": "assets/models/deer/tripo-p2/deer.fbm/deer_basecolor.jpg",
   "rollSplit": true,
