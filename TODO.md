@@ -120,15 +120,13 @@ passes.
 - [ ] Rhino tubist: with a tuba of about 10 kg, the center of mass lies at the front end of the
       stable range of the soles. A small lean of the trunk back is an option.
 - [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
-- [ ] Deer harpist: the short arms of the Tripo fawn do not reach all strings of the harp. Only
-      48 % of the palm targets lie within 5 mm (worst 31 cm on the low bass strings, 18 cm for the
-      right palm, `pnpm pose-depth harpist`). Ask the user to pick a route: longer arms, a smaller
-      harp on a stand, or fewer bass notes for the left hand.
-- [ ] Deer harpist: the left forearm goes 4.4 cm into the chest on a high note of the left hand,
-      and the right upper arm 4.9 cm into the body at the soundbox (`pnpm pose-depth harpist`,
-      limits 2.5 cm and 3.5 cm). Check both in 2x crops in the app.
-- [ ] Deer harpist: the left stretch p95 of the arm gate is 0.11 (base 0.04, limit 0.35), and the
-      right folds p95 8 (base 6, limit 8). Check the left elbow and the right inner elbow in 2x crops.
+- [ ] Deer harpist: the left paw goes 3.4 cm into the chest at a high note of the left hand, and
+      the forearms 2.5 cm into the body (old deer: 1.0 cm and 0.8 cm, `pnpm pose-depth harpist`).
+      Check both in 2x crops in the app.
+- [ ] Deer harpist: the right upper arm goes 2.2 cm to 3.0 cm into the root of the arm, also at
+      rest (old deer: 0.8 cm to 1.6 cm). Check the right shoulder in 2x crops.
+- [ ] Deer harpist: the left hand plays only up to D4 (`reach.leftHighest`), because the near harp
+      puts the higher strings near the chest. A harpist plays up to about C5 with the left hand.
 - [ ] Deer harpist: `HARPIST_SWEEP` accepts a forearm depth of 2.5 cm in the body, but the depth is
       0 cm now. Trim the entry when the tests come back.
 - [ ] Harp strings: ask the user to pick the strength and the density of the bands of the swinging
@@ -786,9 +784,8 @@ passes.
 - [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
-- [ ] Tripo fawn: the scale that keeps H of the old deer makes the fawn tall (the standing shoulder
-      joints at 1.45 m, 0.90 m on the old deer), so its stool is 0.51 m high, and the larger body and
-      harp move each player of `boulanger-matin` in the layout. Ask the user to confirm the size.
+- [ ] Tripo fawn: ask the user to confirm the size (the standing shoulders of the old deer, with a
+      smaller head than the old deer: H 0.22 m against 0.36 m) and the arms 1.2 times longer.
 - [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
       is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
 - [ ] Tripo wolf candidate: the doc comment of `wolf` in `src/models/species.ts` still names the
