@@ -177,7 +177,8 @@ The app does not follow these facts:
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
   (`palmL`, `palmR`). The short left arm reaches the low pluck points of the bass strings only
   with the palm far above them, so the fingers of the left paw do not touch the bass strings at
-  their pluck points.
+  their pluck points. For its highest strings, near the chest, the left palm moves nearer to the
+  strings, lower, and toward the column (`highL`).
 - **The size of the swing (section 5).** The band shows the real swing times
   `STRING_SWING.strength`, and a denser blur (`STRING_SWING.density`), because a swing of a few
   millimeters on the small harp of the deer does not show in a stage shot.
