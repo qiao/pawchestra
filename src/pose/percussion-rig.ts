@@ -450,9 +450,10 @@ export const PERCUSSION_HOLDS = {
       lean: 0.27,
       turn: 0.3,
     },
-    // The end of the round paw of the elephant closes on the shaft (TIMPANI.malletSpotL and
-    // malletSpotR).
-    curl: 100 * MathUtils.DEG2RAD,
+    // The end of the stump paw of the Tripo elephant closes a little on the shaft
+    // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
+    // old paw), the ring of its nails folded 44 and 43 faces at rest, and with 20° 10 and 9.
+    curl: 20 * MathUtils.DEG2RAD,
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
     // between strikes, so that the shaft stays in the closed paw. Each hand strikes one kettle in
     // one direction, so the roll stays near one value. With no roll, the shafts leave the paws

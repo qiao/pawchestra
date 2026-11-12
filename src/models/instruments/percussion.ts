@@ -92,10 +92,10 @@ export const TIMPANI = {
    */
   malletTilt: 45 * MathUtils.DEG2RAD,
   /**
-   * The grip of the mallet in the closed left paw of the elephant mesh (`MalletSpot`). The mesh
-   * is not symmetric: the middle of the right paw lies about 1 cm further toward the palm, so each
-   * paw has its own grip. With the end of the round paw curled 100°, the shaft goes about 1.5 cm
-   * deep through each paw, and the end of the paw touches it.
+   * The grip of the mallet in the closed left paw of the elephant (`MalletSpot`). The values come
+   * from the old elephant mesh, whose paws were not symmetric. The stump paws of the Tripo
+   * elephant keep them: the end of the stump closes 20° on the shaft, and the shaft leaves the
+   * front of the stump.
    */
   malletSpotL: [0.045, 0.05, 0.035],
   /** The grip of the mallet in the closed right paw of the elephant mesh. */
