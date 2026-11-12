@@ -155,8 +155,9 @@ passes.
       a 2x crop.
 - [ ] Deer harpist: at 1.3 times the size, the fit of the harp and the hold is the fit of the
       smaller deer, so each depth is 1.3 times larger. In the absolute limit of 1.0 cm
-      (`scratch/deerclip/depth.ts`), the right upper arm goes 1.4 cm into the neck of the harp in
-      24 % of the play and the soundbox in 3 %, and the right thigh 1.2 cm into the stool in 8 %.
+      (`pnpm body-clip harpist --limit 0.0348`), the right upper arm goes 1.4 cm into the neck of
+      the harp in 24 % of the play and the soundbox in 3 %, and the right thigh 1.2 cm into the
+      stool in 8 %.
       With the limit at 1.3 cm, each region is under 1 % of the samples. The turn, the side, the
       front, the scale, and the tilt of the harp, the right elbow, the right palm, the shoulder
       drop, and a higher neck hump did not bring the right arm under 1.0 cm in 1 % of the play
@@ -165,16 +166,16 @@ passes.
 - [ ] Harp: no source of `docs/reference/harp-technique.md` gives the width and the depth of the
       soundbox of a concert harp at its top. Find one, and check `SOUNDBOX` against it.
 - [ ] Deer harpist: the left paw swing p95 is 69 (limit 70).
-- [ ] Deer harpist: the role sweep (`HARPIST_SWEEP`) and `pnpm clip-probe` do not measure the harp
-      in the trunk or the legs in the harp, so they missed the clips above. Save
-      `scratch/deerclip/depth.ts` (each body region in each closed harp part) as a tool, or add
-      the pairs to the sweep.
 - [ ] Deer harpist: 4 left-arm frames turn 15° to 17° in one 1/30 s step (127.5 s and 280.1 s of
       boulanger-matin), where the music gives a move less than 0.2 s.
 - [ ] Deer harpist: in the fast run of 109 s to 120 s (about 14 notes/s, pluck 0.021 s) a finger
       close snaps 31° to 45° in one step.
 - [ ] Deer harpist: in pedal moves, the left shin goes 1.9 cm into the stool edge (0.6 % of the
       samples) and the right hoof 2.4 cm into the harp base (0.4 %).
+- [ ] Deer harpist: `pnpm body-clip harpist` (limit 0.045 H, 1.3 cm) gives 5 clips in
+      boulanger-matin: the right hoof 2.4 cm into the harp base and the left shin 1.9 cm into the
+      stool (0.2 % and 0.5 % of the play), and the right upper arm 1.4 cm into the neck and the
+      soundbox of the harp (0.3 % and 0.5 %) and 1.3 cm into the neck in the lowering (1.1 %).
 - [ ] Deer: dark facet patches on the tail tip and the back of the left shoulder in the hall light.
       The color map has no dark texel there (`reports/2026-11-12-afix/deer/m4-patches/`), so the
       cause is the shading of flat faces that face away from the key. Four tail faces are flipped.
@@ -405,6 +406,17 @@ passes.
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
+- [ ] Rabbit violinist: `pnpm body-clip violinist` (limit 0.045 H, 1.3 cm) in bach-bwv1047: the
+      left forearm goes 2.2 cm and the left paw 2.1 cm into the violin in 100 % of the play, and
+      67 % to 87 % of the lift and the lowering. The chest goes 2.1 cm (lift) and the head 1.9 cm
+      (lowering) into the violin, and the right paw 1.5 cm (6.5 % of the play). Similar values
+      show in `pachelbel-p37`. Check in 2x crops if the neck of the violin goes through the paw.
+- [ ] Red fox violinist: `pnpm body-clip violinist` (limit 0.045 H, 1.7 cm) in bach-bwv1047: the
+      left forearm goes 2.3 cm into the violin in 99.8 % of the play, 87 % of the lift, and 60 %
+      of the lowering. The left paw goes 1.9 cm (1.5 % of the play), and the right paw 2.3 cm in
+      the lift (6.5 %).
+- [ ] Dog cellist: `pnpm body-clip --demo pachelbel-p37` (limit 0.045 H, 1.9 cm): the left paw goes
+      2.1 cm into the cello in the lowering (16.7 %) and the lift (9.7 %).
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
 - [ ] Layout sight lines (4.5): with no row risers and the lane search, 49 of 453 players stay
