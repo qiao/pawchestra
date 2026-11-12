@@ -263,8 +263,8 @@ of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
-| Size | 394,177 bytes |
-| SHA-256 | `f74f1fe669681a7895151e1cef7c0132310ed436f074eecbffb549d43dcf97d2` |
+| Size | 394,249 bytes |
+| SHA-256 | `d883667d069a9f16c98eaea08375fa9284e3cab47a79d9a92e00334bd78c2999` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
@@ -279,8 +279,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 1,218,832 bytes | `a6bdeba155a1fb5188c49d403aa3f6006e56addf4d5dae0708c1ff70c7a68d41` |
-| `tripo-hand/rabbit.rig.json` | 16,320 bytes | `d230b7cafa3cfcb0bcfbff339eb60d344935e03f11041271d4711e1d54697e11` |
+| `tripo-hand/rabbit.rig.glb` | 1,218,828 bytes | `2843d794e408b73bbc9c7eac12425b1964f006a3abf4723b3011421552324af1` |
+| `tripo-hand/rabbit.rig.json` | 16,320 bytes | `c31833b26783d519def23dc81eb1ec29a3aba7c47540fbd0a64cfa69bca374c2` |
 
 The scripts of the session (`scratch/rabbit3/` of the worktree, which git ignores: `build.py`,
 `redits.py`, `rimport.py`, `rings.py`, `make_config.py`, `chain-here.sh`, and `params.json`) are
@@ -404,11 +404,14 @@ the second Tripo rabbit). The violin is 0.9 of the violin of the app (0.456 m, `
 length from the nut, and the bow paw 0.125 m of the hair (`pnpm hold-reach rabbit --instrument
 violin`). The rule of a violin shop gives 0.541.
 
-**Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, and the shins lean 12
-degrees forward (`legTurns` of the config). The front of the seat lies 0.05 units behind the knee
-joint of the bind, and 53 % of the thigh lies on the seat. The legs keep the length of the source,
-so the seat height of the app is 0.167 m (`seatHeight` of `src/models/studio/rabbit.ts`, 0.207 m
-on the second Tripo rabbit). The chair of the app fits it.
+**Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, the shins lean 6
+degrees forward, and each foot turns 15 degrees with the heel up, with the toes flat on the floor
+(`legTurns` of the config, `tools/rig/leg_turns.py <config> 15 8 6 15`). The front of the seat
+lies 0.05 units behind the knee joint of the bind, and 53 % of the thigh lies on the seat. The
+legs keep the length of the source, so the seat height of the app is 0.196 m (`seatHeight` of
+`src/models/studio/rabbit.ts`), near the 0.20 m of the Tripo cat. The chair of the app fits it.
+The ankle joint is 0.113 m above the floor (0.086 m with flat feet), and the lowest point of each
+foot is on the floor. With the shins 12 degrees forward and flat feet, the seat was 0.167 m.
 
 **Lids.** A lid on each eye: 13 × 13 points from psi -40 to 40 degrees and lam -45 to 55 degrees
 (45 degrees in and 55 out, the right lid mirrors the range) at 1.12 ball radii, and a lower strip
