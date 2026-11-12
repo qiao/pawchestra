@@ -840,6 +840,8 @@ strings. With the palm square to the strings, the left wrist bent back past the 
 the arm gate in the rest, in the lift, and in the play. The turned paw comes nearer to the
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
 knuckles stay out of the neck of the harp.
+The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
+the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
 
 Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 `pose/harp-fingering.ts`), a pure function of the notes of the hands:
