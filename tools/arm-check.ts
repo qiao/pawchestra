@@ -456,7 +456,9 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   // 12° and the right paw 13° further.
   ['timpanist', { L: 75, R: 61 }],
   ['bassoonist', { L: -41, R: -2 }],
-  ['hornist', { L: -92, R: -3 }],
+  // The right hoof of the pig lies across the mouth of the horn bell, with the right elbow out to
+  // the side, from 2x crops of the right side and the 3/4 views.
+  ['hornist', { L: -92, R: -84 }],
   // The wolf and the mouse close their paws around the tube, with the palms toward its axis and
   // the grips moved around it, so that each paw holds the instrument, from accepted 2x crops.
   ['clarinetist', { L: -14, R: 4 }],
