@@ -434,20 +434,24 @@ export const PERCUSSION_HOLDS = {
     fit: null,
     // After a note before a rest, the paw that struck it muffles its head (damp). The left front
     // kettle stands nearer than the right one, so each side has its own reach. The spine leans
-    // 15° and the upper body turns 17°: from an upright body, the lowest point of the paw stayed
-    // 11 cm to 15 cm over the head. A lean of 17° put the forearms up to 1.8 cm into the belly,
-    // and a lean of 20° twisted the other paw 5° more in a lowering, past the margin of 3° of the
-    // arm gate. A muffle of 0.5 s folded 9 faces of the left paw at p95 (main 5, margin 2).
+    // 3° and the upper body turns 17°. The stump paw of the Tripo elephant reaches 0.52 m and
+    // 0.51 m, and its rigid low point stays 1.5 cm over the head, so that its skin touches the head
+    // (sweep: paws, forearms, and the trunk out of the kettles). The grip stays level with the
+    // head, and the mallet keeps 5 of the pitch, so that the left forearm twists at most 43° at
+    // the damp and the mallet head stays out of the head. With the lean of 15°, the reach
+    // of 0.46 m, and a press of 1.7 cm of the old paw, the stump went 5.7 cm and the forearm
+    // 6.4 cm into the kettles, the trunk 2.2 cm into a head, and the center of mass moved 10 cm
+    // forward of the middle of the soles.
     damp: {
       kind: 'fingers',
       restSec: 0.5,
       hold: 0.3,
-      reach: [0.46, 0.45],
+      reach: [0.52, 0.51],
       rim: 0.05,
-      up: -0.02,
-      press: 0.017,
-      share: 9,
-      lean: 0.27,
+      up: 0,
+      press: -0.015,
+      share: 5,
+      lean: 0.05,
       turn: 0.3,
     },
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
