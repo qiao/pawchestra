@@ -730,16 +730,20 @@ the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rig
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
 rig"). The first Tripo P2 rabbit was a trial of this route that the app does not use. A hand rig
-of the second Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
-stretch (`assets/models/rabbit/tripo-hand/`) is a candidate body of the rabbit. It goes to `main`
-only after an approval of its look in the app. It shows the color map of its Tripo FBX
-(`rabbit-color.webp`, `tools/rabbit-maps.py`), and it keeps the eyeballs of the source in their
-round sockets, with no bead eyes. Reason: the map paints a full eye on each eyeball (a black pupil,
-an amber iris, and white), and the socket faces keep their source UVs, so the dark lining
-of the map shows around it. The map paints each iris toward the inner side of its ball, so the map
-tool moves each iris on its ball to the middle of the eye opening of a view from above the head
-(`tools/gaze_shift.py`). Else the rabbit looks cross-eyed. A lid on each eye blinks over it ("Hand rig"). Its arms are short, so its
-violin is smaller (4.6, `violinScale`). The map holds no baked key light: the luma of its cream fur stays
+of the third Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
+stretch (`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
+target of its look, as for the Tripo wolf. It shows the color map of its Tripo FBX
+(`rabbit-color.webp`, `tools/rabbit-maps.py`) with no color change, and it keeps the eyeballs of
+the source in their sockets, with no bead eyes. Reason: the map paints a full eye on each eyeball
+(a black pupil, a brown iris, a light, and white). Its eyeballs and sockets are 0.93 of the
+source, so that each eye opening is 0.140 of the head width (0.149 in the source), and the balls
+keep their bulge. The irises keep the place of the source paint, with no gaze shift: the rabbit
+does not look cross-eyed or down, and the iris shows below the upper lid from the default camera.
+Reason: the right pupil of the source lies lower than the left, and a shift showed white seams in
+the right eye. The map paints a light in each pupil, so the eyes take the finish `varnish` and no
+eye light. A lid on each eye blinks over it
+("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
+`violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It stands
 with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of the bear
@@ -776,15 +780,9 @@ app showed them as dark dents and bands on the cream belly. Its map tool moves e
 eye opening in a view from above the head, a little out (`tools/gaze_shift.py`). Each moved texel
 is a copy of a texel of the same ball. Reason: the source paints each iris at the inner side of
 its opening, and the foxes looked to the side and down in the play view and from the default
-camera. The candidate rabbit takes the same route: the eyeballs, the cheeks, the paws, the limbs,
-and the trunk keep the form of the source, its map keeps the colors and the brows of the source,
-and its legs keep the length of the source, so its chair is lower. Its map tool moves each iris in
-the same way (`tools/gaze_shift.py`). Reason: the source paints each iris at the inner corner, and
-the rabbit looked cross-eyed from the front and down in the play view. The view of the shift lies
-above the head, so that the iris shows below the upper lid from the default camera. Reason: the
-head of a seated player turns down and the default camera is high, and with the iris in the middle
-of the front view the rabbits read as sleepy from that camera. Neither source paints a light in
-the eyes, so the fox and the rabbit eyes take the `eye` finish, and the eye light gives one small
+camera. The candidate rabbit of the second Tripo mesh took the same route. Its successor keeps
+the iris place of its source ("Simple route"). Neither source paints a light in
+the eyes, so the fox eyes and the eyes of the second rabbit take the `eye` finish, and the eye light gives one small
 light in the upper part of each eye. Reason: with the finish `varnish` and no eye light, the fox
 eyes read as a dead stare. The candidate Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
