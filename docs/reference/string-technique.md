@@ -377,6 +377,9 @@ and at the highest rates the wrist and the elbow move in phase [56 (abstract)].
   the left hand [73]. Orchestra violinists sit with their violins upright on their laps [75]. A
   school orchestra holds the violin "out in front, straight up and down, with the fiddle resting
   on your knee" [74].
+- **The bow in the seated rest.** With the violin on the left leg and the neck in the left hand,
+  "the bow will also be pointing up with just a gentle fist around the frog" in the right hand
+  [86].
 - **The side of the top plate.** In the standing rest, the violin lies under the right arm with
   the scroll forward and the bridge facing out [73]. No source of this file gives the side of the
   top plate in the seated rest.
@@ -539,9 +542,9 @@ The app follows these facts:
   the shared violin hold and the hold of the rabbit, both arms hang out to the sides until they
   clear the body, and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The rabbit holds its violin upright on
-  the lap with the left elbow near the side, and hangs the bow from the right paw at its side, with
-  the tip down and forward to the right foot, away from the music desk and the face
-  (`RABBIT_HOLD`). The cat rests the viola nearer to the
+  the lap with the left elbow near the side. Its right paw rests at the top of the right thigh near
+  the hip and holds the bow at the frog in a closed paw, with the tip up and a little out, away
+  from the music desk and the face (`RABBIT_HOLD`, [86]). The cat rests the viola nearer to the
   hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
   side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
 
@@ -592,9 +595,9 @@ The app does not follow these facts:
   because with the top to the front the bow paw of the cat turns too fast in a lowering. The bow
   paw rests low at the front of the lap or the lower belly, with the elbow hanging and a straight
   wrist.
-- **The bow at rest (2.9).** No source of this file gives the bow of a seated violinist at rest.
-  The rabbit points the tip down and forward, and not straight down, because its paw grips the
-  stick across the palm: a tip straight down twists the forearm by about 180°.
+- **The bow at rest (2.9).** The source gives the bow up with a fist around the frog [86], and
+  no place of the right hand. The short arms of the rabbit do not reach the top of the thigh in
+  front of the hip, so its frog end stands beside the thigh and not on it.
 
 ### 3.3 The cello on the chair and at rest
 
@@ -909,3 +912,5 @@ Each source opened on 2026-10-17, except where its entry gives another date.
     https://pmtonline.co.uk/stentor-student-i-cello-back-length-19-5in-1-10
 85. A. McDonagh, "Cello Basics 14: Bow Arm". Opened on 2026-11-03.
     https://www.ailbhemcdonagh.com/cello-basics-14-bow-arm.html
+86. Violinspiration, "Proper Violin Posture in 5 Steps", the rest position when sitting. Opened on
+    2026-11-11. https://violinspiration.com/violin-posture/
