@@ -14,7 +14,8 @@
  * - `in instrument`: the depth of the paws, of the shafts of the held parts, and of the middle of
  *   each mallet head in the closed shells of the own instrument: the piano case off the keys
  *   (`pianoCase()`), or each closed shell of a percussion instrument. A head lies on its target at
- *   a strike, so only its middle counts.
+ *   a strike, so only its middle counts. Of the body, only the paws count: `pnpm body-clip`
+ *   measures the trunk, the arms, and the legs.
  * - `under floor`: the depth of the lowest corner of the instrument and of the held parts below the
  *   floor under the player.
  * - `between players`: the arms, the held parts, and the instrument of a player that cross the arms,
@@ -109,6 +110,13 @@ const FLOOR_LIMIT = 0.01;
  * for one sample in a fast move of a hand does not show.
  */
 const SHARE_LIMIT = 0.01;
+
+/**
+ * The scope line of the output: of the body, the measure `in instrument` tests only the paws.
+ * `pnpm body-clip` tests the other regions of the body.
+ */
+const SCOPE =
+  'Of the body, "in instrument" tests the paws only. Use pnpm body-clip for the trunk, the arms, and the legs.';
 
 /**
  * The distance of the footprints of two players below which the probe measures them against each
@@ -882,6 +890,7 @@ export function outputLines(
 ): string[] {
   const lines = [
     `Clip probe of ${tree.files.length} files at steps of ${tree.step} s${label ? `, with ${label} in parentheses` : ''}. A depth gives the share of the samples over ${(100 * CONTACT).toFixed(1)} cm (${(100 * FLOOR_LIMIT).toFixed(1)} cm under the floor). A measure clips when the share is over ${(100 * SHARE_LIMIT).toFixed(0)}%.`,
+    SCOPE,
     '',
     `| File | Players | Samples | ${MEASURES.join(' | ')} | Verdict |${base ? ' Base |' : ''}`,
     `|---|---|---|${MEASURES.map(() => '---|').join('')}---|${base ? '---|' : ''}`,
@@ -912,6 +921,7 @@ export function variantLines(
   const [first] = blocks;
   const lines = [
     `Clip probe of ${first?.output.files.length ?? 0} files in ${blocks.length} variants at steps of ${first?.output.step ?? 0} s${label ? `, with ${label} in parentheses` : ''}. A depth gives the share of the samples over ${(100 * CONTACT).toFixed(1)} cm (${(100 * FLOOR_LIMIT).toFixed(1)} cm under the floor). A measure clips when the share is over ${(100 * SHARE_LIMIT).toFixed(0)}%.`,
+    SCOPE,
     '',
     ...blocks.map(({ variant }) => `- ${variant.name}: ${variant.sets.join(';') || 'no change'}`),
     '',
