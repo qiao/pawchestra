@@ -912,10 +912,11 @@ light, and a blink lid. Its eyeballs and their sockets are smaller than in the s
 eye opening was about 0.18 of the head width in the play view, above the limit of about 0.14 of
 the other bodies. Its scale keeps the standing shoulder height of the old deer, not H, because
 its head is small: the scale of H made it 1.6 times taller, and its larger body moved the players
-of the layout. Its upper arms and forearms are 1.2 times longer than in the source, as on the
+of the layout. Its upper arms and forearms are 1.3 times longer than in the source, as on the
 Tripo hippo, and the hooves keep their size. Reason: with shorter arms, the hooves reached fewer
-than 95 % of their places on the harp strings. The harp stands near the stool (`HARP_PLACE`, 4.6),
-and the spine stays erect, so that the muzzle stays off the neck of the harp. The left hoof turns
+of their places on the harp strings, and the harp stood so near the chest that the soundbox went
+into it. The harp stands near the stool and to the right of the chest (`HARP_PLACE`, 4.6), and
+the spine stays erect, so that the muzzle stays off the neck of the harp. The left hoof turns
 by one step of a closed wrist ring, and each elbow axis turns, so that each part of each arm
 takes at most 45° in the moments of the harpist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
