@@ -345,7 +345,13 @@ export const HANDS_HOLDS = {
     // G3 and 4 cm down, it went 1.6 cm at B3 on the harp turned to 47°. The note targets do not
     // change (`pnpm hold-fit harpist`).
     highL: { from: 53, to: 62, offset: [0.04, -0.06, -0.04] },
-    highR: null,
+    // The highest strings of the right hand lie near the right shoulder, at the neck of the harp.
+    // From G5 to C7, the right palm moves up to 8 cm down the strings and 2 cm away from them, as
+    // the right wrist of a harpist comes near the soundboard in the upper register (section 4).
+    // With no move, the right elbow folded to 147° on F6 and D7, and the right paw twisted up to
+    // 57° on its forearm. With this move, the elbow bends 120° there, and the paw twists up to 37°
+    // (`scratch/harp2/burst.ts`). The note targets do not change (`pnpm pose-depth harpist`).
+    highR: { from: 79, to: 96, offset: [0.02, -0.08, 0] },
     faceL: [1, -1, 0],
     faceR: [-1, -0.15, 0],
     aimL: [0, 1, 0.5],
