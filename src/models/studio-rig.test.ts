@@ -363,7 +363,7 @@ describe('studioRig for a seated body that also stands (design 4.4)', () => {
       const knee = new Vector3(...standing.positions[`shin${side}`]);
       const ankle = new Vector3(...standing.positions[`foot${side}`]);
       // The thigh and the shin point down within 25° of the vertical, as the legs of the mesh: its
-      // shin slants 20° back from the knee to the ankle (tools/mesh-rigs/rabbit.json).
+      // shin slants 20° back from the knee to the ankle (tools/mesh-rigs/rabbit.json at cbc8db5e4).
       for (const [from, to] of [
         [hip, knee],
         [knee, ankle],

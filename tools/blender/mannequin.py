@@ -148,8 +148,8 @@ def animal_preset():
     """Gives the animal preset: the proportions of the animals of the app, 1.6 m high.
 
     Each place is the mean of the wolf and the rabbit, in parts of the height from the soles to the
-    skull top. The wolf joints are those of `tools/mesh-rigs/wolf.json`, with the skull top at
-    0.8684 u (`app.note`). The rabbit joints are those of the A-pose rabbit
+    skull top. The wolf joints are those of `tools/mesh-rigs/wolf.json` at cbc8db5e4, with the
+    skull top at 0.8684 u (`app.note`). The rabbit joints are those of the A-pose rabbit
     (`tools/mesh-rigs/rabbit.json` at 6af3369d) after the leg factor 1.75, which lifts the body
     0.09 u (the shoulders at 0.574 u, `app.note`), with the skull top at the tail of the head bone,
     0.85 u. The parts (wolf, rabbit, mean):
@@ -958,8 +958,8 @@ def add_clips(p, rig):
 
 
 #: The angle of each arm below the level in the A-pose, in degrees, near the 43 degrees of the
-#: upper arm of the wolf mesh (`tools/mesh-rigs/wolf.json`). An angle of 45 degrees gives the
-#: arm direction 0.707107 in the studio module, which the lint refuses as an approximate
+#: upper arm of the wolf mesh (`tools/mesh-rigs/wolf.json` at cbc8db5e4). An angle of 45 degrees
+#: gives the arm direction 0.707107 in the studio module, which the lint refuses as an approximate
 #: `Math.SQRT1_2`.
 A_POSE = 40.0
 

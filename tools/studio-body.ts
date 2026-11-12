@@ -267,9 +267,9 @@ export type AnimalEntry = AnimalSettings | Omit<AnimalSettings, BodyFact | EyeRu
 
 /**
  * The colors of the texture of the fox mesh, from which the tan palette maps (design 4.5): the
- * colors of the red fox before the color shift of its rig (`colors.shift` of
- * `tools/mesh-rigs/fox.json`). The tan palette maps the face colors before the shift
- * (`COLOR_1`), so the tan fox keeps its colors when the shift of the red fox changes.
+ * colors of the red fox before the color shift of its old rig (`colors.shift` of
+ * `tools/mesh-rigs/fox.json` at cbc8db5e4). The tan palette maps the face colors before the
+ * shift (`COLOR_1`), so the tan fox keeps its colors when the shift of the red fox changes.
  */
 const FOX_TEXTURE_COLORS: SpeciesColors = {
   fur: '#f0934c',

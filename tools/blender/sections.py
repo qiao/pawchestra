@@ -1,4 +1,5 @@
-# Output: the cuts of a mesh that give the joint places of `tools/mesh-rigs/panda.json`.
+# Output: the cuts of a mesh that give the joint places of `tools/mesh-rigs/panda.json`
+# at cbc8db5e4.
 """Prints horizontal sections of the rabbit mesh, in the units of the studio.
 
     blender -b --factory-startup --python tools/blender/sections.py -- <rabbit-4.glb> [axis] [step]

@@ -14,8 +14,8 @@ export interface SpeciesColors {
 
 /**
  * The colors of each species (design 4.5, species colors). The fur of the red fox is the fur of
- * its rig after the color shift (`colors.shift` of `tools/mesh-rigs/fox.json`). The models and the
- * seat dots of the UI read them through `SPECIES`.
+ * its old rig after the color shift (`colors.shift` of `tools/mesh-rigs/fox.json` at cbc8db5e4).
+ * The models and the seat dots of the UI read them through `SPECIES`.
  */
 export const SPECIES_COLORS = {
   rabbit: { fur: '#ece6dc', belly: '#f4f0ea', accent: '#e9a7a5' },
