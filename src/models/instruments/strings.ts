@@ -1754,7 +1754,7 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
     bridgeTurn,
   );
   // The four strings, from the end of the tailpiece over the bridge to the nut (design 4.5,
-  // instrument colors).
+  // instrument colors). The strings of the cello and the contrabass are light metal windings.
   const st = STRINGS;
   const section = STRING_SECTIONS[STRING_SECTION[form]];
   const strings: number[] = [];
@@ -1771,7 +1771,11 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
     const nut: Vec3 = [v.nut, middle - st.nutDrop[outer], share * st.nutSpan];
     strings.push(...strand(tail, bridge, section), ...strand(bridge, nut, section));
   }
-  piece.add(strings, INSTRUMENT_COLORS.strings, inFrame(frame, transform()));
+  if (upright) {
+    piece.add(strings, INSTRUMENT_COLORS.silver, inFrame(frame, transform()), 'metal');
+  } else {
+    piece.add(strings, INSTRUMENT_COLORS.strings, inFrame(frame, transform()));
+  }
 }
 
 /**
