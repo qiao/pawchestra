@@ -220,7 +220,7 @@ const ROLES = {
     places: {},
     placeAxes: 'chest',
     parts: { L: ['instrument'], R: ['bow'] },
-    shafts: [],
+    shafts: ['R'],
   },
 } as const satisfies Readonly<Record<string, RoleGrip>>;
 
