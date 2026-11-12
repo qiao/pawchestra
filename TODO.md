@@ -79,13 +79,13 @@ passes.
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
       each reader of the seat height of a body with no chair.
-- [ ] Trombonist panda (Tripo body): ask the user to confirm the trombone of 0.75
-      (`tromboneScale`, 2026-11-12). It gives a slide travel of 10.0 cm at the 7th position (5.5 cm
-      at full size). A larger trombone puts the brace out of reach, and an arm stretch of 1.15
-      still needs the slide 35° to 40° down. The right paw is only 5.8 cm in front of the left
-      paw, and the slide still points 35° down.
-- [ ] Trombonist panda: the smaller trombone and its turn of 10° to the right bring the slide nearer
-      to the desk and the next player. Measure both gaps again (16.4 cm and 11.1 cm before).
+- [ ] Trombonist panda (Tripo body): ask the user to confirm the arm stretch of 1.2 (as on the
+      hippo and the deer, 2026-11-12). It lets the panda play the full trombone of the app (0.83 m,
+      0.49 of the seated panda) with a slide travel of 13.5 cm at the 7th position, and the slide
+      40° below the level. The paws are only 1.0 cm apart in the play: a left grip nearer the
+      mouthpiece puts the left paw into the chin.
+- [ ] Trombonist panda: the arm gate folds p95 are 75 (left) and 82 (right) after the arm stretch
+      (63 and 78 before). Check the paws in 2x crops.
 - [ ] Wind slide: the paused test `src/pose/winds.test.ts` (near line 234) expects a linear slide
       map, but `reachedShare` of 2026-11-12 moves the near positions more. Update it when the
       tests come back.
@@ -941,6 +941,11 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Beaver bassoonist: the bassoon of 0.7 moves 20 players by 1 cm to 27 cm in mozart-k191 (the
       pig horn 27.1 cm, red fox violins 21.3 cm and 15.4 cm), and each beaver stand 2 cm in 10
       demos. The reed blade hides behind the teeth, so from the front only the bocal shows.
+- [ ] Beaver bassoonist: the forward turn of 2026-11-12 (`BEAVER_PLAY_TURN`) clears the eye in the
+      app view, but in the close front-left head view (az -45) the bell end touches the front of
+      the eye, and the tube covers the snout. A longer bocal (`BASSOON_REED`) could move it out, and
+      it also moves the grips. Ask the user. The right arm folds p95 are 37 (27 before), and the
+      bell top is 7.9 cm below the head top.
 - [ ] Mouse: the loop of the long tail lies on the floor behind the mouse, and the footprint is
       0.764 m deep. Check the tail between the rows of the stage with the user.
 - [ ] Mouse: with no chair, the haunch hangs 0.076 m above the floor, and it seems to float in the
