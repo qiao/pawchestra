@@ -188,6 +188,9 @@ Design 4.4 gives the rule and the reason of each config key.
 
 ### Holds and reach
 
+- Hold values that follow the body are in `H`, and values on the instrument are in instrument
+  units, so a body size change needs no hold edit (design 5.3, "Units"). The motion sizes and the
+  sweep limits stay in meters: check them after a size change.
 - The bind paw of a mesh is pronated, so a far supinated hold passes 180° of skin twist, where
   `twistAngle()` flips. Use `pnpm bind-supination` (design 4.4), or lower the twist of the hold.
 - The `palm` of a rig config sets the roll of the arm bones. Read it from the claw curl on the real
@@ -221,9 +224,6 @@ Design 4.4 gives the rule and the reason of each config key.
 - Before a root fix, split a recast fold count by bone with `pnpm fold-probe --faces`. Paws and
   inner elbows at rest can hold most of it.
 - `arm-check --views` takes no conductor. Aim `pnpm close-views conductor --aim` at a wrist.
-- The bow values (`src/pose/bowed-rig.ts`, `src/pose/strokes.ts`), `HAND_MOTION`, the percussion
-  `sizes`, `CONDUCTOR_MOTION.scale`, and the sweep limits are in meters. Compare a new body size in
-  `H` first.
 
 ### Weights, folds, and shapes
 
