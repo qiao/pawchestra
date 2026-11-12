@@ -330,7 +330,7 @@ export const HANDS_HOLDS = {
   // the side (section 4). The shoulder of a harpist holds the harp, so the right upper arm only
   // touches the top of the soundbox: on the Tripo fawn with the elbow 27° down, the right upper
   // arm went more than 1.0 cm into the soundbox in 16% of the play and 61% of the lift, and with
-  // this elbow in 0.2% of the play and none of the lift (`scratch/deerclip/depth.ts`). With
+  // this elbow in 0.7% of the play and none of the lift (`scratch/deerclip/depth.ts`). With
   // the old deer, the elbow 45° down put the upper arm 2.0 cm into the soundbox. An elbow
   // forward, at [0.5, -1, -1.5], kept the upper arm out of the soundbox, but
   // the right paw twisted up to 74° on its forearm, against 35° with this elbow (`pnpm hold-fit
