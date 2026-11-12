@@ -2367,7 +2367,9 @@ export function poseWind(
 ): void {
   const chest = frames.chest;
   placeWind(rig, chest, weight);
-  slide.fromArray(rig.slideAxis).multiplyScalar(reachedShare(state.slide) * rig.slideReach * weight);
+  slide
+    .fromArray(rig.slideAxis)
+    .multiplyScalar(reachedShare(state.slide) * rig.slideReach * weight);
   const { hold } = rig;
   const { freeL } = rig;
   const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
