@@ -1843,7 +1843,8 @@ it by a few centimeters.
 `harpFrame`, with gilded parts, as a natural Lyon & Healy Style 23. The parts follow a real
 pedal harp (`docs/reference/harp-technique.md`):
 
-- **Column.** A fluted shaft between a gilded foot and a gilded crown (`COLUMN`).
+- **Column.** A fluted shaft between a gilded foot and a gilded crown (`COLUMN`). The crown is
+  low, so that it stands below the muzzle of the deer in a side view.
 - **Neck.** An S curve (`HARP.neck`): it falls from the crown, rises in a hump over the middle
   strings, and falls onto the top of the soundbox. A brass plate covers the bottom of each side
   over the strings (`NECK`), as the plates of the action. The crown and the neck near it stand
