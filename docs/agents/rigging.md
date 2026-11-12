@@ -6,32 +6,33 @@ round.
 ## Bodies and roles
 
 Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4), except the
-cat, which keeps the bind of the viola hold. "Rebuilt arms" means quad arm tubes, Blender weights,
-and arm segments. Each body except the polar bear (a hand rig) has them. The `README.md` of each
-model folder gives the files of each step. The candidate branch gives the bear, the rabbit, and
-the cat the hand rig of `tripo-hand/` (no arm cut, no stretch).
+cat, which keeps the bind of the viola hold. "Hand rig" means the hand rig of a Tripo P2 mesh in
+`assets/models/<s>/tripo-hand/`, with no arm cut and no stretch. A chain in
+`tools/blender/hand/<s>/` makes each one, except the bear. "Rebuilt arms" means quad arm tubes,
+Blender weights, and arm segments of the mesh rig. The `README.md` of each model folder gives the
+files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
-| bear | T-pose mesh, rebuilt arms (`bear_arms.py`), elbow `raise` shapes, forearm skin normals (`rootNormals.wrist`), a larger crease angle, a color blend. Stands on the podium. | `conductor` |
-| polar-bear | The hand rig of the Tripo mesh (`polar-bear.blend`): loop cuts at the elbows, the wrists, and the knees, weights by hand (its `README.md`), a digit bone for each claw (`paw_digits.py`), no wrist helper on the paws (`paw_wrist_off.py`). Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). The candidate branch gives it the hand rig of a Tripo P2 mesh in `tripo-hand/`. | `pianist` |
-| rabbit | A-pose mesh, longer rebuilt arms (`violin_arms.py`), a `raise` shape of the left elbow, root and elbow skin normals, a smaller violin. The simple route trial in `tripo-p2/` is not in use. | `violinist` |
-| fox-red | Longer rebuilt arms (`fox_arms.py`), a `raise` shape that smooths the bow arm at rest, a tail of two bones. | `fox-violinist` |
+| bear | Hand rig, made by hand in Blender (no chain). Stands on the podium. | `conductor` |
+| polar-bear | Hand rig, a digit bone for each claw. Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
+| rabbit | Hand rig, a smaller violin. | `violinist` |
+| fox-red | Hand rig of a copy with four-digit front paws (`fox_paws.py`). | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
-| cat | A-pose mesh, rebuilt arms with a round side wall and a clean armpit line (`cat_arms.py`), the bind of the viola hold with a dual quaternion left lower arm (`bind.arm`), three `raise` shapes with `follow` at the left arm root, a tail curled on the seat, point edits of the tail and the legs (`cat-edits.json`), a viola of `violaScale`. | `violist` |
-| dog | A copy with round inner arms (`dog-patch.glb`), longer rebuilt arms (`arm_rebuild.py --factor`), arm roots moved to the trunk (`dog-arms-clip.glb`, `weightMoves`), a cut at each arm seam, elbow `raise` shapes, a round hanging tail. | `cellist` |
-| panda | T-pose mesh, longer rebuilt arms (`arm_rebuild.py --factor`), color edges cut (`panda_edge.py`), a right elbow `raise`, rigid root faces (`rigidPainted`), the old form of the rig config. | `trombonist` |
-| hippo | T-pose mesh, smoothed tubes (`armSmooth`), a socket segment (`rootSegment`), smaller bead eyes, point edits that fill the furrow between the brows (`hippo-edits.json`). Stands at the contrabass. | `bassist` |
+| cat | Hand rig, a tail curled on the seat, a viola of `violaScale`. | `violist` |
+| dog | Hand rig of the beagle. | `cellist` |
+| panda | Hand rig, arms 1.2 times longer. Stands as a soloist. | `trombonist` |
+| hippo | Hand rig, arms 1.2 times longer. Stands at the contrabass. | `bassist` |
 | mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
-| elephant | A-pose mesh, rebuilt arms with flatter inner upper arms (`elephant_arms.py`). Stands at the timpani, with the trunk on the head. | `timpanist` |
-| beaver | Arms freed in a copy (`beaver_edit.py`), longer rebuilt arms (`arm_rebuild.py --factor`), rigid crease faces (`rigidPainted`), root skin normals, a tail on the floor, a smaller bassoon, no chair. | `bassoonist` |
-| pig | A copy with round upper arms (`pig-upper.glb`), longer rebuilt arms (`arm_rebuild.py --factor`), arm roots at the trunk wall (`pig_root.py`), two left `raise` shapes, forearm skin normals. | `hornist` |
-| wolf | Longer rebuilt arms (`wind_arms.py`), lower and wider than the mesh (`proportions`). The clarinet bell rests against the right knee. | `clarinetist`, `violinist@wolf` (recast) |
+| elephant | Hand rig. Stands at the timpani. | `timpanist` |
+| beaver | Hand rig. No chair: it stands on its short legs. | `bassoonist` |
+| pig | Hand rig. Stands as a soloist. | `hornist` |
+| wolf | Hand rig. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | Arms freed in a copy (`badger_edit.py`), rebuilt arms, rigid shoulder faces (`rigidPainted`), triangle and recast `raise` shapes, a tail ball, a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
-| monkey | Longer rebuilt arms (`arm_rebuild.py --factor`), a long tail curled on the floor, no chair. The Tripo hand rig at 1.2 times H of this body, with the trumpet of the app. | `trumpeter` |
+| monkey | Hand rig at 1.2 times H of the older monkey, no chair, with the trumpet of the app. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
-| deer | Longer rebuilt arms (`deer_arms.py`), a right elbow `raise`, a thumb bone on each fist (`thumbs`). Sits on the harp stool, with a smaller harp (`harpScale`). | `harpist` |
-| penguin | Flippers freed in a copy (`penguin_edit.py`) and rebuilt, a split beak with a jaw bone, point edits of the flipper seams, two colors only (`colors.twoTone`), a color blend, left flipper `raise` shapes. Stands on its riser. | `singer` |
+| deer | Hand rig of the fawn, arms 1.3 times longer. Sits on the harp stool, with a smaller harp (`harpScale`). | `harpist` |
+| penguin | Hand rig. Stands on its riser. | `singer` |
 | mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 ## Rules of the mesh
@@ -61,7 +62,8 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 ("Models") gives the chain in a diagram.
 
 - **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
-  each body of the table except the polar bear. A mesh whose arms join the trunk takes this route.
+  the mouse, the badger, the rhino, and the mannequin. A mesh whose arms join the trunk takes this
+  route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
@@ -225,7 +227,7 @@ Design 4.4 gives the rule and the reason of each config key.
 - The pair "instrument in body" gives the deepest corner. Measure the visible top plate alone.
 - Measure a free pose, such as a clip, in the closed body (`closedDepth()`).
 - The sweep counts the hidden root of a free arm in the trunk as a clip. Move only its deep
-  vertices toward the wall, or toward the joint when they also come out (`pig_root.py`).
+  vertices toward the wall, or toward the joint when they also come out.
 - Before a root fix, split a recast fold count by bone with `pnpm fold-probe --faces`. Paws and
   inner elbows at rest can hold most of it.
 - `arm-check --views` takes no conductor. Aim `pnpm close-views conductor --aim` at a wrist.
@@ -271,8 +273,8 @@ Design 4.4 gives the rule and the reason of each config key.
 
 Design 4.4 gives the merges of each copy.
 
-- Remove a closed tetrahedron or a vertex of two surfaces in a crease before the split
-  (`penguin_edit.py`). A collapse at a cut loop can give a face of a stray color (`spread`).
+- Remove a closed tetrahedron or a vertex of two surfaces in a crease before the split. A
+  collapse at a cut loop can give a face of a stray color (`spread`).
 - Free an arm (`cut`) only as far as a raised arm of the played roles needs it, and stop where the
   root meets the trunk. End a cut above the shoulder joint, else a black triangle shows on the
   back. Give the caps the skin normals, and check the flat rig view (front, below, back).
