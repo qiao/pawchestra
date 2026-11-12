@@ -1306,16 +1306,23 @@ const CAT_HOLD = {
  * {@link CELLO_HOLD} with the place from the body (`fit`, `fitCelloPlace()`). The Tripo beagle
  * sits on a seat of 0.19 m, and its right arm reaches only 0.30 m from the shoulder joint. So it
  * plays a 1/2 cello, the 1/10 of the cello rule times the scale of its body
- * (`SpeciesParams.celloScale`), with the middle line of the back 0.1 H in front of the body, and
- * the cello leans 20° to the left, so that the neck passes over the left shoulder and the scroll
- * stands beside the left ear, as on a real cellist (`docs/reference/string-technique.md`, section
- * 2.7). With the fixed place of the dog of main, the end pin stood far in front of the seat, the
- * pegbox stood in front of the muzzle and the eye, the bow arm reached no part of the hair, and
- * the bow went behind the strings through the waist of the cello. With the 14° of `CELLO_PLACE`,
- * the nut stays 0.55 H in front of the head at the side of the muzzle. With the gap of 0.28 H,
- * the left paw reaches the fingerboard only to 0.74 of its length. The cello keeps the place in
- * the rest pose (`BowedHold.rest` null). In the high positions, the left paw tilts further over
- * the neck, as in {@link CELLO_HOLD}.
+ * (`SpeciesParams.celloScale`). The cello leans 20° to the left, so that the neck passes over the
+ * left shoulder and the scroll stands beside the left ear, and 20° back, as on a real cellist
+ * (`docs/reference/string-technique.md`, section 2.7). The fit tests the whole width of the upper
+ * half of the back (`across` 0.2), and the back stands 0.02 H in front of the body. Then the back
+ * of the upper bout touches the chest at the sternum, and the trunk, which leans 9° forward in the
+ * play (`lean`), presses it about 1.8 cm. With the middle line alone and 0.1 H, the upper bout
+ * stood 12.3 cm deep in the chest at the sternum in each sample, because the middle line of the
+ * back lay left of the round chest. In front of the chest, the short right arm reaches the bow
+ * targets only with this lean of the trunk and of the cello: with the lean of 25.7° of
+ * `CELLO_PLACE`, the right paw missed them by up to 2.0 cm, and with a lean of the trunk of 3°,
+ * by up to 3.2 cm (`mozart-k191`). With the fixed place of the dog of main, the end pin stood far
+ * in front of the seat, the pegbox stood in front of the muzzle and the eye, the bow arm reached
+ * no part of the hair, and the bow went behind the strings through the waist of the cello. With
+ * the 14° of `CELLO_PLACE`, the nut stays 0.55 H in front of the head at the side of the muzzle.
+ * With the middle line 0.28 H in front of the body, the left paw reaches the fingerboard only to
+ * 0.74 of its length. The cello keeps the place in the rest pose (`BowedHold.rest` null). In the
+ * high positions, the left paw tilts further over the neck, as in {@link CELLO_HOLD}.
  *
  * The rebuilt arms of the dog are round tubes with their full inner half width (design 5.3, "Free
  * round arms"), so the elbows keep away from the sides, as a cellist starts a stroke open at the
@@ -1324,9 +1331,8 @@ const CAT_HOLD = {
  * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
  *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
  *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
- *   its accepted grip. The right shoulder turns 20° forward (`reach`): with
- *   30°, the right upper arm goes 1.8 cm into the chest in a stroke of `bach-bwv1050`, and with
- *   25°, 1.7 cm in a stroke of `beethoven-8-4`.
+ *   its accepted grip. The right shoulder turns 28° forward (`reach`), so that the bow paw reaches
+ *   the strings of the cello in front of the chest: with 20°, it missed them by up to 1.2 cm.
  * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
  *   out and a little down, (2.5, -0.5, -0.3): with the pluck of {@link CELLO_HOLD}, the right upper
  *   arm goes 3.0 cm into the chest.
@@ -1354,14 +1360,21 @@ const CAT_HOLD = {
  * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
  *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
  *   into the cello.
- * - At rest, the left paw holds the cello at 0.6 of the fingerboard (`restPlace`), the place at
- *   which the dog was accepted.
+ * - At rest, the left paw holds the cello at 0.3 of the fingerboard (`restPlace`): at 0.6, the
+ *   paw went 4.4 cm into the upper bout at rest and in the moves. A gap of the left paw off the
+ *   strings (`gapL`) of 1.5 cm kept the claws further out of the neck, but the paw then bent
+ *   sideways on the wrist up to 79° (p95) in the play.
+ * - The bow paw turns in the plane of its palm around the grip on the stick, so that the forearm
+ *   keeps 26° in that plane (`stickTurnR`), as on the hippo. With no turn, the bow paw flipped by
+ *   about 180° on its forearm in 1.4% of the play samples in front of the chest, such as at
+ *   119.75 s of `beethoven-1` (`pnpm arm-check cellist`, paw jumps).
  * - The left paw tilts 45° over the neck (`tiltL`): with the 55° of {@link CELLO_HOLD}, the left
  *   forearm of the Tripo beagle twists 46° in the play (43° with 45°).
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
-  reach: 20 * MathUtils.DEG2RAD,
+  lean: 9 * MathUtils.DEG2RAD,
+  reach: 28 * MathUtils.DEG2RAD,
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
   polePizzicato: [2.5, -0.5, -0.3],
@@ -1372,15 +1385,16 @@ const DOG_HOLD = {
   poleL: [-1, -0.25, 0],
   highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
+  stickTurnR: { forearm: 26 * MathUtils.DEG2RAD, most: 90 * MathUtils.DEG2RAD },
   roundArms: null,
   girthFit: null,
-  restPlace: 0.6,
+  restPlace: 0.3,
   restBow: {
     ...LAP_CELLO_BOW,
     tip: [0.2, 1, -0.6],
     lap: { along: 0.9, offset: [0.35, 0.5, -0.1] },
   },
-  fit: { gap: 0.1, left: 20 * MathUtils.DEG2RAD },
+  fit: { gap: 0.02, left: 20 * MathUtils.DEG2RAD, back: 20 * MathUtils.DEG2RAD, across: 0.2 },
 } as const satisfies BowedHold;
 
 /**
