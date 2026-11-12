@@ -739,29 +739,35 @@ passes.
       golden. A chroma step would read nearer the pale tan of the reference image.
 - [ ] Tripo fox candidate: one gaze view (`VIEW_DOWN` 30° of the map tools) serves the play view
       and the default camera. Check the gaze on a phone.
-- [ ] Third Tripo rabbit: with the source legs the seat is 0.167 m high (0.207 m on the second
-      Tripo rabbit). Check the chair height in the row of the first violins.
+- [ ] Third Tripo rabbit: the seat is 0.196 m high, with the shins 6° forward and the heels 15°
+      up (0.167 m with flat feet). The higher eyes change the sight pass of the layout: 13
+      players move in `bach-bwv1048` (up to 1.3 m) and `mozart-k417`, and 2 in `bach-bwv1047`
+      (`pnpm sight-lines`: 4 players hidden from the audience in `bach-bwv1048`, 1 before, and 0
+      in `mozart-k417`, 1 before). Each seat height from 0.189 m gives the same moves. Check the
+      new seats in the app.
 - [ ] Third Tripo rabbit: the hip joint lies 1.5 mm from its measured place, because at that place
       the rest frames of the leg bones in Blender scale and `pnpm rig-export` stops. A tolerance or
       a fix of the frames in `tools/blender/export_rig.py` would allow the measured place.
-- [ ] Third Tripo rabbit: in the lift the violin of 0.9 goes up to 4.7 cm into the belly, and in
-      the lowering up to 5.7 cm into the head (`pnpm pose-depth violinist`, 6.2 cm with the first rest of
+- [ ] Third Tripo rabbit: in the lift the violin of 0.9 goes up to 4.2 cm into the belly, and in
+      the lowering up to 5.5 cm into the head (`pnpm pose-depth violinist`, 6.2 cm with the first rest of
       this body, 2.7 cm with the violin of 0.75 on the second rabbit). A `liftReach`
       further to the left took the head depth to 4.3 cm, but the violin left the short arc by up
       to 57° (`pnpm carry-check`). At rest the violin keeps out of the body.
-- [ ] Third Tripo rabbit: near the end of one lowering of `beethoven-6-1` (467.27 s) the bow goes
-      2.1 cm into the violin in 2 of 30 samples (limit 1.5, 0.3 cm with the upright rest bow).
-      Other `restBow.via` turns and grip moves gave 1.6 cm to 2.3 cm.
-- [ ] Third Tripo rabbit: the rest bow points down and forward, 38° below the level, in place of
-      straight down: the bow paw grips the stick across the palm, so a tip straight down twists
-      the right forearm by about 175°. A rest grip at the frog, with the stick along the fingers,
-      would let the bow hang straight down.
+- [ ] Third Tripo rabbit: near the end of one lowering the bow goes into the violin in 1 of 30
+      samples: 2.2 cm in `bach-bwv1048` (327.30 s) and 1.7 cm in `beethoven-6-1` (467.27 s),
+      limit 1.5 (`pnpm pose-depth violinist`).
+- [ ] Third Tripo rabbit: at rest the frog end of the upright bow stands beside the right thigh,
+      and not on it: the short arms do not reach the top of the thigh in front of the hip, and the
+      hanging arm keeps clear of the thigh (`hangingArm()`). The frog end stood 5 cm to 10 cm
+      above the thigh with the hair to the back, but then the paw flipped in each lift. The right
+      fingers keep the curl of the play (`curlR` of `pose/bowed.ts`) at rest.
 - [ ] Third Tripo rabbit: in the play the depths of the arms grow against the second rabbit
       (`pnpm pose-depth violinist --base 12edbabec`): the upper arms 3.8 cm into the body (2.4)
       and 2.1 cm into the violin (0.2), the forearms 2.9 cm into the body (2.3). No ear meets the
       violin or the bow.
 - [ ] Third Tripo rabbit: faces of the knuckle creases of the curled paws fold in each sample
-      (`pnpm arm-check violinist`, folds p95 29 left and 12 right at rest, limit 8). Wider knuckle
+      (`pnpm arm-check violinist`, folds p95 10 left in the play and 8 right in the lift, limit 8,
+      29 and 12 before the smaller paws). Wider knuckle
       rows took the count only from 38 to 37. Check the curled paws in the app.
 - [ ] Third Tripo rabbit: the right knee has no clean quad strip, so it takes no ring, and the
       left elbow has partial rings from x 0.144 to 0.192. Check the knees and the elbows in the
