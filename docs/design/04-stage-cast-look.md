@@ -324,8 +324,7 @@ the facts of its body in its `.blend` ("Hand rig").
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
 - A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
-  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the penguin, the
-  rhino), else with a point edit of its rig file (`<s>-edits.json`, the mouse and the elephant) or
+  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the rhino), else with a point edit of its rig file (`<s>-edits.json`, the mouse and the elephant) or
   of its `.blend` (the polar bear).
 - A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
@@ -866,7 +865,16 @@ further forward (`PIG_HORN`, 5.3). Its arm loops stop at poles, so no ring takes
 hoof turns by whole steps of the one closed wrist ring, and a bridge of new quads joins the ring
 again (`turn_hooves()` of its build). Each elbow axis also turns. Each part of each arm then takes
 at most 45° in the moments of the hornist. Its face takes the head bone alone above the chin,
-because the bone heat of the hanging head gave the snout shares of the shoulders. The paws of the fox turn about the
+because the bone heat of the hanging head gave the snout shares of the shoulders. The Tripo
+penguin (`assets/models/penguin/tripo-hand/`) is the body of the singer, by the same rules. Its
+eyeballs stay, with the finish `varnish` and a blink lid. The flat flippers are its arms: each
+flipper takes edge-ring rings at the shoulder, the elbow, and the wrist, and the paw bones take the
+flipper tip. Its beak opens: the build cuts the closed beak of the source along the mouth plane
+from one mouth corner around the tip to the other corner, a dark cap closes each part, and the
+lower beak follows the jaw bone (`jaw`). It stands in the pose of the source, with its legs and its
+upright trunk, and its center of mass lies over the back of the soles, as on a real penguin. Its
+flippers start at the back half of the sides, so the choir folder is nearer to the chest than for
+the earlier penguin (`CHOIR_FOLDER`, 5.3). The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -1012,7 +1020,7 @@ interface SeatExtras {
   paw its own turn (`pawTurnL`, `pawBendR`). Each shape takes its weight from the pose alone
   (`raiseWeight()`), so the rule of stateless poses holds.
 - **Render.** The fur gets smooth normals within the crease angle of the body (`crease` of
-  `ANIMALS`, `studioNormals()`). The bears and the penguin take a larger angle and a color blend
+  `ANIMALS`, `studioNormals()`). The bears take a larger angle and a color blend
   (`colorBlend`), so they look round with soft facets, and the edges of the muzzle and the claws
   stay sharp. The other bodies share one angle. The colors hold the baked occlusion of the rig.
 - **Bind mesh.** `buildStudioBody()` gives the mesh in the bind pose of the player, with two
@@ -1195,8 +1203,9 @@ with no change of a color (`tools/wolf-maps.py`). Reason: the look target of thi
 source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
 `tools/dog-maps.py`, and the candidate monkey (`assets/models/monkey/tripo-hand/`) with
 `tools/monkey-maps.py`, for the same reason. The Tripo hippo (`assets/models/hippo/tripo-hand/`)
-does the same with `tools/hippo-maps.py`, and the Tripo pig (`assets/models/pig/tripo-hand/`) with
-`tools/pig-maps.py`.
+does the same with `tools/hippo-maps.py`, the Tripo pig (`assets/models/pig/tripo-hand/`) with
+`tools/pig-maps.py`, and the Tripo penguin (`assets/models/penguin/tripo-hand/`) with
+`tools/penguin-maps.py`.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows

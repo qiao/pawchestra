@@ -55,8 +55,8 @@ choices win over the images:
   the monkey, and the deer have no image. The source mesh sets the form. The head top keeps the
   height of the earlier body of the species (`height` of `ANIMALS` in `tools/studio-body.ts`),
   and the monkey and the deer are a little larger.
-- **Penguin.** The source mesh sets the form, and the crown keeps the height of the earlier
-  penguin. The orchestra images set the white front, the black back, and the folder.
+- **Penguin.** The Tripo FBX sets the form and the colors, and the head height H keeps the H of
+  the earlier penguin. The orchestra images set the folder.
 - **Wolf.** The body is lower and wider than the orchestra images give, with a head of the size
   of the red fox. Thus the seated wolf is about as high as the dog cellists.
 - **Badger.** The bass drum stands in front of the badger, as for a real player. Thus from the
