@@ -332,7 +332,8 @@ cellist --base`) has no FAIL and no WORSE: the twist p95 of the left arm goes fr
 the forearm twist p95 from 44° to 37°. The bow paw touches the stick in each sample, with the stick
 0.2 cm in the closed paw (median). The median gap from the finger tips to the bow goes from 0.4 cm
 to 0.7 cm, so the share of the play samples in which the paw holds the bow goes from 59 % to 44 %
-(the rule of `tools/wind-grip.ts` with a temporary row for the cellist).
+(the rule of `tools/wind-grip.ts` with a temporary row for the cellist). "Bow grip" below fits
+the bow to the smaller paw.
 
 **Head size.** This is the second exception to the wolf route. In the app, the head of the source
 read too large: H was 1.38 times the distance of the shoulder joints (1.20 on the Tripo cat and
@@ -397,6 +398,40 @@ of the play samples, in the middle positions, where the nearly straight arm pass
 neck. The left paw holds the neck at rest with the palm 1.8 cm in it. The arm gate passes (`pnpm
 arm-check cellist --base 4472dc8aa`), the note targets are within 5 mm in each sample (`pnpm
 hold-fit cellist`, worst 1.3 mm), and the left upper arm of the play turns 31° (62° before).
+
+**Bow grip.** With the grip of `BOW_GRIP`, the bow stick lay under the palm of the smaller paw,
+and the finger tips stayed about 5 cm from it, so the paw held the bow in no play sample. Now the
+stick lies under the curled finger tips at the frog end, across the fingers, and the tips close
+over it, as a cellist drapes the fingers over the stick (`docs/reference/string-technique.md`,
+3.3). The fit has three values:
+
+- `SpeciesParams.bowGrip` of the dog puts the grip 0.7 of the way from the middle of the closed
+  paw to the mean of its finger tips (the corners of `tools/wind-grip.ts`), in the axes of the
+  hand. The paw is rigid in these axes, so one grip fits each sample.
+- The right fingers curl 65° (`DOG_HOLD.curlR`, 45° for the other holds). With 75° or more, the
+  skin of the knuckles folds over in each play sample. With 105°, the stick goes through the
+  middle of the closed paw, but 20 faces of the knuckles fold.
+- The bow paw turns on the stick with the forearm at 0° in the plane of the palm
+  (`DOG_HOLD.stickTurnR`). With 26°, the grip at the tips bends the bow elbow further, and the
+  folds p95 of the right arm go from 2 to 10 (limit 8).
+
+The measures of the right paw on the stick (`pnpm wind-grip cellist`, `bach-bwv1047`, the median
+of each set), before and now:
+
+| Set | Holds | Tip gap (cm) | Stick from the paw middle (cm) | Stick in the paw (cm) | Palm angle |
+|---|---|---|---|---|---|
+| Play | 0 %, 100 % | 5.2, 0.1 | 5.5, 5.3 | 0.3, 1.1 | 25°, 16° |
+| Lift | 0 %, 100 % | 5.6, 0.1 | 5.5, 5.3 | 0.3, 1.2 | 26°, 29° |
+| Rest | 0 %, 100 % | 4.1, 0.5 | 5.7, 5.5 | 0.2, 1.4 | 30°, 51° |
+| Lower | 0 %, 100 % | 4.1, 0.4 | 5.3, 5.3 | 0.3, 1.2 | 23°, 27° |
+
+The stick leaves the paw 23° from the thumb side in the play (9° before). The note targets stay
+within 5 mm (`pnpm hold-fit cellist`, worst 0.0 mm). The arm gate passes (`pnpm arm-check
+cellist --base`): the right arm folds p95 4 (2 before), twist p95 19° (20°), forearm twist p95 32°
+(29°), and paw twist p95 66° at rest (60°). The sweep of `bach-bwv1047` and `bach-bwv1048`
+(`pnpm pose-depth cellist --base`) puts no bow and no paw deeper into the cello, and the bow
+stays out of the cello and the body. The right upper arm goes 1.4 cm into the arm root at rest
+(0.8 cm before, limit 1.5 cm).
 
 **Lids.** A lid on each eyeball: 14 × 13 points from psi -55 to 45 degrees and lam from -50 to 62
 degrees on the left (the mirror on the right), with the lower strip as the first row, at 1.17 ball
