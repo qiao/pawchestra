@@ -1183,7 +1183,7 @@ const WOLF_CLARINET = {
  * The trumpet hold of the monkey (design 5.3), the hold of a real trumpet player
  * (`docs/reference/wind-technique.md` 2.1): the left paw wraps the valve casings and holds the
  * weight, the right fingers arch down onto the valves, and the trumpet points forward and down.
- * The monkey plays a trumpet of 0.85 (`SpeciesParams.trumpetScale`).
+ * The monkey plays the trumpet of the app, with no `SpeciesParams.trumpetScale`.
  *
  * The big head of the Tripo monkey puts the mouth 1.09 arm lengths from the shoulder joints
  * (`mouthShare()` of `pose/far-mouth.ts`), so the arms reach the valves only with four changes.
@@ -1193,16 +1193,15 @@ const WOLF_CLARINET = {
  * the face. The trumpet turns 13° further down (`play`), so that the valves come nearer to the
  * shoulders. The spine turns 7° back in the play (`lean`), as a real player stands erect, so the
  * head bows only 4° to 6° from the vertical, the bell points 20° to 22° below the level, and the
- * head center stays within 1.1 cm of the middle of the soles. The paws then reach their grips with
- * 1.3 cm (left) and 0.9 cm (right) to spare (`pnpm hold-reach`). With the spine of the body, the
+ * head center stays within 1.4 cm of the middle of the soles. The paws then reach their grips with
+ * 1.8 cm (left) and 1.4 cm (right) to spare (`pnpm hold-reach`). With the spine of the body, the
  * head bowed 14° to 16° from the vertical, and the head center stood 6 cm to 8 cm in front of the
- * soles, so the body read as if it fell forward. A trumpet of 0.91 puts the right valves out of
- * reach (0.0 cm to spare), and the trumpet of the app 1.4 cm out of reach.
+ * soles, so the body read as if it fell forward.
  *
  * The left palm faces the upright casings from the left, below the middle of their height
  * (`InstrumentGrips.tubeL` of `models/instruments/brass.ts`), the left paw points up along its
  * forearm with the thumb up and back toward the first valve slide, and its fingers curl 130°
- * around the thin casings of the smaller trumpet (`gripCurl`): with 109°, the finger tips stand
+ * around the thin casings of the trumpet (`gripCurl`): with 109°, the finger tips stand
  * 1.1 cm off. The right palm lies above the valves at their right and faces down, and the right
  * paw points to the left across the valve tops: 0.7 of its aim is the side direction across the
  * valves (`aimSide`), and its fingers curl 92° down onto the valves. With 0.8, the right wrist
@@ -1220,9 +1219,9 @@ const WOLF_CLARINET = {
  * player rests the trumpet in front of the body. With 0.25 H back, the bent elbows folded 57
  * faces of the arms in the rest sample (`pnpm hold-fit trumpeter --scan`), and the inner elbows
  * showed a soft crease. With 0.12 H back, 37 faces fold, and the left upper arm twists 39° in
- * place of 43°. With the trumpet of 0.85, 48 faces fold, and the left upper arm twists 44°. The
- * center of mass stays 0.5 cm in front of the middle of the soles. With 0.05 H back, the arms are
- * almost straight in front of the body at rest.
+ * place of 43°. With the trumpet of the app, 47 faces fold. The center of mass stays 0.7 cm in
+ * front of the middle of the soles. With 0.05 H back, the arms are almost straight in front of the
+ * body at rest.
  *
  * Both elbows point down and out, as a real player lets the elbows hang. The mouthpiece rim rests
  * on the lips, as the rim of a real trumpet player (`docs/reference/wind-technique.md` 2.1): it

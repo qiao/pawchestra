@@ -54,7 +54,7 @@ const REAL_WIND_SIZES = {
 /**
  * The largest distance from the shoulder joint to the grip of a palm in the playing pose, as a
  * share of the arm: the share of the monkey at its first accepted trumpet of 0.65. The monkey now
- * plays a trumpet of 0.85 at a share of 0.97, with its spine turned back and its head upright
+ * plays the trumpet of the app at a share of 0.96, with its spine turned back and its head upright
  * (`MONKEY_TRUMPET` of `src/pose/winds.ts`).
  */
 const WIND_REACH_SHARE = 0.95;

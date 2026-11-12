@@ -515,9 +515,9 @@ export const SPECIES = {
    * chest and belly, a small tuft of hair, and a long tail that curls up behind the back. It has
    * the studio body of the hand rig of the Tripo P2 monkey
    * (`assets/models/monkey/tripo-hand/monkey.blend`, design 4.4), with the arms of its source. It
-   * plays a smaller trumpet, 0.85 of the trumpet of the app: the largest size at which its short
-   * arms reach the valves with the head upright (`MONKEY_TRUMPET` of `pose/winds.ts`). It has no
-   * chair, so it stands on its hind legs, in the seated pose at the seat height of its legs. Its
+   * plays the trumpet of the app: its arms reach the valves with the head upright, with 1.8 cm
+   * (left) and 1.4 cm (right) to spare (`MONKEY_TRUMPET` of `pose/winds.ts`). It has no chair,
+   * so it stands on its hind legs, in the seated pose at the seat height of its legs. Its
    * hips stand over its feet, its knees bend a little, and its shoulders stay over its hips, so
    * that its center of mass is over the middle of its soles. It keeps this stance as a soloist.
    * Its head height is the head of the studio body, and the seat height is the seat of the studio
@@ -526,7 +526,6 @@ export const SPECIES = {
   monkey: {
     body: 'studio-monkey',
     colors: SPECIES_COLORS.monkey,
-    trumpetScale: 0.85,
     noChair: true,
     headHeight: STUDIO_HEIGHTS['studio-monkey'].headHeight,
     seatHeight:
