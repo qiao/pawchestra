@@ -1055,17 +1055,17 @@ const PIG_HORN = {
  * The turn of the lower end of the clarinet of the wolf forward while it plays, in degrees, from
  * the 25° of {@link WIND_HOLDS}. The value below 0 turns the lower end back toward the body.
  */
-const WOLF_CLARINET_FORWARD = 5;
+const WOLF_CLARINET_FORWARD = 10;
 
 /**
  * The clarinet hold of the wolf (design 5.3), the hold of a real clarinetist
  * (`docs/reference/wind-technique.md` 3): the clarinet at the middle of the body, from the mouth to
  * between the knees. The clarinet turns its lower end {@link WOLF_CLARINET_FORWARD}° forward from
- * {@link WIND_HOLDS}, to 30° from the vertical, the angle of the wolf in `orchestra-latest.png` and
- * `orchestra-side.png`: a render of the app from the camera of the images shows the clarinet at 30°
- * as 25° in the image, and the images show it at 24° and 28°. A real clarinetist holds it at about
- * 45°, and the long muzzle already puts the mouthpiece far in front of the chest: at 45°, the bell
- * is far in front of the knees.
+ * {@link WIND_HOLDS}, to 35° from the vertical, so that the bell comes forward over the knees. A
+ * real clarinetist holds it at about 45°, but the long muzzle already puts the mouthpiece far in
+ * front of the chest: at 45°, the bell is far in front of the knees, and the arms do not reach the
+ * grips. The wolf of `orchestra-latest.png` and `orchestra-side.png` holds it at 24° and 28° in the
+ * image, and a render of the app from the camera of the images shows 30° as 25°.
  *
  * Each paw closes around the body of the clarinet from the side of its own shoulder, as a
  * clarinetist curves the fingers over the tube with the thumb behind it. Each palm faces the tube
@@ -1084,9 +1084,10 @@ const WOLF_CLARINET_FORWARD = 5;
  * muzzle, and goes 0.6 cm into the mouth, as a real clarinetist takes the mouthpiece between the
  * lips (`docs/reference/wind-technique.md` 3). The body keeps the mouth of the rule of the nose
  * drop, because a mouth point at the lips (`mouthHeight`) moves the clarinet of the bind pose and
- * the seats of the stage. Each shoulder bone turns forward in the play, the right 35° and the left
- * 20°. At 45°, the grips move further forward, out of the reach of the arms. Both elbows point
- * down and a little out, as a seated clarinetist lets the arms hang near the body, in the play.
+ * the seats of the stage. Each shoulder bone turns forward in the play, the right 45° and the left
+ * 30° (`reach`, `reachL`), as the shoulder blades of a real player slide forward: with the 35° and
+ * 20° of {@link WIND_HOLDS}, the right paw missed its grip by 2.0 cm. Both elbows point down and a
+ * little out, as a seated clarinetist lets the arms hang near the body, in the play.
  *
  * At rest, the bell stands on the front of the right knee, as a seated clarinetist puts the bell
  * on the knee (`docs/reference/wind-technique.md` 3). The right paw holds the upper joint, 0.4 H
@@ -1107,6 +1108,8 @@ const WOLF_CLARINET_FORWARD = 5;
 const WOLF_CLARINET = {
   ...WIND_HOLDS.clarinet,
   roundArms: null,
+  reach: 45 * MathUtils.DEG2RAD,
+  reachL: 30 * MathUtils.DEG2RAD,
   rest: holdTurn(-30, -10),
   restArms: {
     L: { forward: 20 * MathUtils.DEG2RAD, bend: 30 * MathUtils.DEG2RAD },
