@@ -88,11 +88,12 @@ shasum -a 256 assets/models/wolf/*.glb assets/models/wolf/wolf-weights.json
 ## Candidate hand rig
 
 `tripo-hand/` holds a candidate body ("tripo-hand/wolf.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/wolf.fbx`, made by one build script in a headless Blender 5.2. The body keeps the form,
-the colors, and the eye paint of the source: no point edit changes the head, the trunk, the paws, the
-legs, or the tail. The arms keep the length of the source: no cut, no split from the trunk, and no
-stretch. On the branch of the candidate, the `ANIMALS` entry of the wolf points to
-`tripo-hand/wolf.rig.glb`. The files of the wolf of main above do not change.
+mesh `tripo-p2/wolf.fbx`, made by one build script in a headless Blender 5.2. The body keeps the
+form, the colors, and the eye paint of the source, but one point edit makes the front paws smaller
+("Paw size"). No point edit changes the head, the trunk, the legs, or the tail. The arms keep the
+length of the source: no cut, no split from the trunk, and no stretch. On the branch of the
+candidate, the `ANIMALS` entry of the wolf points to `tripo-hand/wolf.rig.glb`. The files of the
+wolf of main above do not change.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -140,8 +141,8 @@ of the source.
 
 | Item | Value |
 |---|---|
-| Size | 395,747 bytes |
-| SHA-256 | `96a93e5eb3b115cb84117a4e05f25bddec7903985e927759c4fa7ffcc3ef89f0` |
+| Size | 394,536 bytes |
+| SHA-256 | `a5a3ea9ea1e9ab171b6a857e9cb8baa37dfdf050aa9cc407a678102126a570af` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the wolf faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `wolf`: 3,656 vertices and 4,066 faces (3,124 quads and 942 triangles, 7,190 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 82 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 48 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/wolf/tripo-hand/wolf-color.webp`) |
 | Armature | `wolf_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -167,8 +168,8 @@ left side):
   on the right, 362 and 363 vertices. New quads join the two rings with the step offset, and the
   far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new quads
   keep the UVs of the old band. The paws keep their form ("Arm twist").
-- **Point edits.** None. The head, the eyes, the muzzle, the trunk, the paws, the legs, and the tail
-  keep the form of the source.
+- **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The head, the eyes, the
+  muzzle, the trunk, the arms, the legs, and the tail keep the form of the source.
 - **Surface.** `sa.add_surface(wolf, 'wolf', <base color>, eye_fans=False,
   config=<wolf-tripo.json>)`. The gloss nose is the dark nose in the nose box of the config.
 - **Eyes.** The 48 head faces with at least half of their pixels in the eye paint of the front
@@ -176,10 +177,10 @@ left side):
   filled) take the face attribute `eye`. Each eye is about 0.035 units wide, and a sphere fits its
   vertices within 0.0045 units (radius 0.026 on the left, 0.030 on the right).
 - **Armature.** The joints of the config: the shoulder at x 0.10, the elbow at x 0.20, the wrist at
-  x 0.30, the knuckles at x 0.355, the hip at (0.067, 0.29, 0.055), and the knee at (0.067, 0.165,
-  0.022). The palm is the true palm of the source, the mean normal of the paw faces that face down,
-  (0.107, -0.994, 0.016), turned by the paw turn. The bind arms (`bindArms`), the trunk (`open` 1),
-  and the tail bind are those of the wolf of main.
+  x 0.30, the knuckles at x 0.343 (x 0.355 in the source, moved by the paw edit), the hip at (0.067,
+  0.29, 0.055), and the knee at (0.067, 0.165, 0.022). The palm is the true palm of the source, the
+  mean normal of the paw faces that face down, (0.107, -0.994, 0.016), turned by the paw turn. The
+  bind arms (`bindArms`), the trunk (`open` 1), and the tail bind are those of the wolf of main.
 
 The weights, in the rest pose:
 
@@ -223,19 +224,76 @@ quads on each side, held turned up 126 degrees into the head. The property `lids
 for each unit, and the row `head` 1. In the 21 steps of the blink no open lid point, side edge, or
 back edge leaves the head (ray casts), and the open lid lies at least 0.0236 units under it.
 
+**Paw size.** This is an exception to the route of the wolf, which keeps the form of the source. In
+the app, the front paws of the source read too large: against the distance of the shoulder joints,
+the source paw is 1.45 times as long and 1.74 times as wide as the paw of the wolf of main, and 1.15
+and 1.19 times the paw of the Tripo beagle. The point edit `paw` of `redits.py` (in `params.json`:
+`{"kind": "paw", "length": 0.8, "wide": 0.8, "thick": 1.0, "ramp": 0.02, "width": [0, 0, 1]}`)
+scales each front paw past the wrist joint of its side (x 0.30) about that joint, in the frame of
+the paw: the rest forearm axis, the width axis +z of the source turned with the paw turn, and the
+height axis square to the two. A point at the distance d past the wrist joint takes the share
+smoothstep(0, 0.02, d) of the scale, so the wrist has no step. The paw height, the arm, the bones of
+the arm, and the feet do not change. `make_config.py` moves the knuckle joint and the tip of
+`fingers_<side>` with the same edit, and the weight rows keep their rules. The largest move is 0.023
+units (4.0 cm). The left paw in the rest of each export (`scratch/wolf/paw_measure.py`), in meters
+and in H, and the shares of the shoulder distance and of the arm (shoulder joint to wrist joint):
+
+| Measure | Source wolf | Wolf now | Wolf of main | Tripo beagle | Tripo rabbit |
+|---|---|---|---|---|---|
+| Length, wrist joint to tip | 0.200 (0.542) | 0.160 (0.433) | - | 0.148 (0.355) | 0.107 (0.359) |
+| Width | 0.205 (0.555) | 0.164 (0.444) | - | 0.146 (0.352) | 0.121 (0.404) |
+| Height | 0.124 (0.336) | 0.124 (0.336) | - | 0.114 (0.273) | 0.069 (0.230) |
+| Length / shoulder distance | 0.564 | 0.451 | 0.390 | 0.489 | 0.514 |
+| Width / shoulder distance | 0.577 | 0.462 | 0.332 | 0.486 | 0.579 |
+| Length / arm | 0.562 | 0.449 | 0.324 | 0.465 | 0.406 |
+| Width / arm | 0.575 | 0.460 | 0.275 | 0.461 | 0.457 |
+
+The paw stays larger than the paw of the wolf of main, and it is near the paw of the beagle. The
+clarinet hold changes with the smaller paws ("Clarinet hold" below).
+
 **Arm twist.** The roll of each upper arm and the twist of each forearm, in degrees, in each moment
 of `WOLF_CLARINET` of `src/pose/winds.ts` (`pnpm pose-preview clarinetist`):
 
 | Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
 |---|---|---|---|---|
-| note | -26.2 | 29.6 | 30.1 | -27.1 |
-| rest | 41.8 | -7.9 | -35.7 | 22.6 |
-| lift50 | 21.1 | 1.3 | -9.0 | 0.9 |
-| lower50 | 11.2 | 6.7 | -1.0 | -4.8 |
-| stand | -26.3 | 29.2 | 30.3 | -26.8 |
+| note | -24.7 | 17.1 | 28.2 | -14.6 |
+| rest | 8.0 | 11.1 | 9.8 | 1.5 |
+| lift50 | -14.0 | 14.7 | 9.0 | 6.7 |
+| lower50 | -17.9 | 17.4 | 12.2 | 4.7 |
+| stand | -24.7 | 16.7 | 28.1 | -14.1 |
 
 With the paws of the source, the forearms twisted -73 and 88 degrees at rest. Each paw closes on the
 clarinet, and the mouthpiece meets the lips under the muzzle.
+
+**Clarinet hold.** The hold of the clarinetist (`WOLF_CLARINET`, design 5.3) follows a seated
+clarinetist (`docs/reference/wind-technique.md` 3): the left paw on the upper joint (its middle 24
+cm from the tip of the mouthpiece), the right paw on the lower joint (38 cm, below the thumb rest at
+34.5 cm), each from the side of its own shoulder with the fingers curled over the front of the tube,
+and the head upright. The clarinet hangs 35 degrees from the vertical (30 degrees before), both
+shoulder bones turn further forward (45 and 30 degrees, 35 and 20 before), the elbows point further
+out, and the right fingers curl 105 degrees (115 before). Against the commit before the smaller paws
+(34d140d5c):
+
+| Measure | Before | Now |
+|---|---|---|
+| Right paw grasps the clarinet in the play (`pnpm wind-grip clarinetist`) | 100 % | 100 % |
+| Left paw grasps it in the play | 100 % | 100 % |
+| Palm angle in the play, left and right (median) | 0°, 10° | 5°, 16° |
+| Twist p95, left and right (`pnpm arm-check clarinetist`) | 11°, 11° | 7°, 7° |
+| Forearm twist p95, left and right | 20°, 10° | 14°, 6° |
+| Upper arms in the body in the play (`pnpm pose-depth clarinetist`) | 4.7 cm | 2.1 cm |
+| Forearms in the body in the lift | 1.1 cm | 0.1 cm |
+| Paws and claws in the body | 0 cm | 0 cm |
+| Mouthpiece in the head under the muzzle | 1.7 cm | 1.6 cm |
+| Bell in the right knee at rest | 1.6 cm | 1.9 cm |
+| Spare reach of the right arm in the play (`pnpm hold-fit clarinetist`) | 1.3 cm | 0.2 cm |
+| Largest error of a palm from its grip (note targets) | 6.2 mm | 13.9 mm |
+
+With the smaller paws and a curl of 115 degrees, the right finger tips stood 0.8 cm off the tube in
+the notes that open the right keys, and the right paw grasped in 79 % of the play samples. The bell
+does not reach between the knees: the clarinet is shorter than the line from the mouth to the knees.
+The folds of the arms (`pnpm arm-check`, folds p95) go from 53 to 66 (left) and from 48 to 55
+(right), over the limit of 8 before and after (`TODO.md`).
 
 **Color map** (`tools/wolf-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the fur, the brows, and the
@@ -254,7 +312,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/wolf.rig.glb` | 1,308,872 bytes | `4e4bcb50d667662db0e2090865878269aaa8e95fd23e6fbbe6c18e8c8ca4c278` |
-| `tripo-hand/wolf.rig.json` | 15,687 bytes | `8722bf07140b1e6590610882507ccd8f652ebd0e490d0c9981056a18cf91b97a` |
+| `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `6ecfa7db2db9f69d9c0b41dfcff853c769e9e70ac9564479118210f351cfe919` |
+| `tripo-hand/wolf.rig.json` | 15,687 bytes | `88ceab3e84fa4ee3650c6b3b99ec6f7b02ba498495fb2b4f6b3ed61516468508` |
 | `tripo-hand/wolf-color.webp` | 205,090 bytes, 2048 × 2048 | `eef1e480bcb8dd099b54c0793699999fa8ae82a835f7291e0284c6d538f67b83` |
 | `tripo-hand/wolf-normal.webp` | 121,396 bytes, 1024 × 1024 | `64f71fe8916ac5600d15d9c70caba053f3cfab412a892cc505796f5f14f6dc1d` |
