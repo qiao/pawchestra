@@ -359,13 +359,15 @@ the hold `RABBIT_HOLD` of `src/pose/bowed-rig.ts` (`pnpm pose-preview violinist`
 | frog | -42.3 | -32.8 | -13.5 | 1.7 | 21 | 7 |
 | tip | -42.3 | -32.7 | 3.7 | -23.5 | 21 | 5 |
 | crossing | -37.9 | -35.3 | -13.5 | 8.0 | 20 | 8 |
-| rest | 17.9 | 41.5 | 14.6 | 42.2 | 63 | 49 |
-| lift50 | 23.4 | 41.2 | 11.8 | 25.9 | 29 | 11 |
-| lower50 | 26.5 | 26.8 | 4.2 | 23.3 | 28 | 7 |
+| rest | 22.2 | 31.9 | -27.8 | 4.8 | 64 | 47 |
+| lift50 | 10.1 | 41.7 | -39.8 | 4.1 | 31 | 16 |
+| lower50 | 9.3 | 28.9 | -40.4 | 4.9 | 30 | 8 |
 | stand | -41.8 | -34.6 | -13.8 | 3.4 | 21 | 6 |
 
 With the right paw turned 2 steps, the right forearm twisted 59 degrees at the tip. With 1 step and
 the rest hold of the second rabbit, it twisted 50 degrees at rest, and the left forearm 56 degrees.
+The rest holds the bow tip down and forward (design 5.2). A bow tip straight down twisted the right
+forearm by about 175 degrees at rest, because the paw grips the stick across the palm.
 
 **Violin.** The arms reach 0.297 m from the shoulder joint to the middle of the palm (0.262 m on
 the second Tripo rabbit). The violin is 0.9 of the violin of the app (0.456 m, `violinScale` of
