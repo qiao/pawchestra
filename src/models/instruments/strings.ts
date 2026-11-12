@@ -883,17 +883,20 @@ function pegbox(from: number): PegboxFaces {
 /**
  * The rings of the tailpiece, from the end at the edge of the body to the end near the bridge:
  * the place along the violin, the width, the height of the underside, and the thickness. The
- * tailpiece is narrow at the edge, wide near its top end, and follows the arch of the top a
- * little above it.
+ * tailpiece is narrow at the edge, with sides that curve in a little, wide near its round top
+ * end, and follows the arch of the top a little above it.
  */
 const TAILPIECE: readonly (readonly [x: number, width: number, under: number, thick: number])[] = [
   [0.001, 0.011, 0.0345, 0.004],
+  [0.014, 0.014, 0.0366, 0.0042],
+  [0.03, 0.0192, 0.0392, 0.0046],
   [0.05, 0.026, 0.0425, 0.005],
+  [0.058, 0.0236, 0.0431, 0.0048],
   [0.063, 0.019, 0.0435, 0.0045],
 ];
 
 /**
- * Makes a ring of the tailpiece: a flat underside, and a top with beveled edges.
+ * Makes a ring of the tailpiece: a flat underside, and a round top.
  *
  * @param ring The ring of {@link TAILPIECE}.
  * @returns The corners, counterclockwise when seen from the bridge.
@@ -902,13 +905,48 @@ function tailRing([x, width, under, thick]: (typeof TAILPIECE)[number]): Vec3[] 
   const half = width / 2;
   return [
     [x, under, -half],
-    [x, under + 0.6 * thick, -half],
-    [x, under + thick, -0.5 * half],
-    [x, under + thick, 0.5 * half],
-    [x, under + 0.6 * thick, half],
+    [x, under + 0.55 * thick, -half],
+    [x, under + 0.85 * thick, -0.75 * half],
+    [x, under + thick, -0.35 * half],
+    [x, under + thick, 0.35 * half],
+    [x, under + 0.85 * thick, 0.75 * half],
+    [x, under + 0.55 * thick, half],
     [x, under, half],
   ];
 }
+
+/**
+ * The parts at the tail end, in meters in the violin axes: the ebony saddle on the edge of the top,
+ * and the tailgut of the cello and the contrabass from the end of the tailpiece over the saddle to
+ * the end pin holder. The violin and the viola have no tailgut outside the body, because the tail
+ * end lies at the neck of the player.
+ */
+const TAIL_END = {
+  /** The ends of the saddle along the violin, its height above the edge, and its width. */
+  saddle: [0.0005, 0.0035, 0.0016, 0.017],
+  /** The height of the top edge at the tail end, as a part of the body thickness. */
+  edge: 0.8,
+  /** The half distance between the two strands of the tailgut, and the half size of a strand. */
+  gut: [0.0028, 0.0007],
+} as const;
+
+/**
+ * The fine tuners of the cello on the tailpiece, in meters in the violin axes: one for each
+ * string, just behind the end of the string. Each is a barrel with a screw head on top.
+ */
+const FINE_TUNERS = {
+  /** The place along the violin. */
+  x: 0.0545,
+  /** The profile from inside the tailpiece to the top of the screw head. */
+  profile: [
+    [0.0011, -0.0008],
+    [0.0011, 0.0018],
+    [0.0016, 0.002],
+    [0.0016, 0.0031],
+    [0.0009, 0.0035],
+    [0, 0.0036],
+  ] satisfies readonly ProfilePoint[],
+} as const;
 
 /**
  * The outline of the bridge across the violin, as (across, height above the feet) from the left
@@ -1412,6 +1450,70 @@ function inFrame(frame: Transform, local: Transform): Transform {
 }
 
 /**
+ * Adds the saddle, the tailgut, and the fine tuners of the cello ({@link TAIL_END},
+ * {@link FINE_TUNERS}).
+ *
+ * @param piece The piece that gets the parts.
+ * @param frame The placement of the violin axes in the piece axes, before the piece scale.
+ * @param form The form of the body.
+ */
+function addTailEnd(piece: PieceBuilder, frame: Transform, form: StringForm): void {
+  const t = TAIL_END;
+  const dark = INSTRUMENT_COLORS.fingerboard;
+  const v = VIOLIN;
+  const place = (p: Vec3): Vec3 => applyTransform(frame, p);
+  const [from, to, height, width] = t.saddle;
+  const edge = t.edge * v.bodyThickness;
+  piece.add(
+    box(to - from, height + 0.001, width),
+    dark,
+    inFrame(frame, transform([(from + to) / 2, edge + (height - 0.001) / 2, 0])),
+    'varnish',
+  );
+  if (form === 'violin') {
+    return;
+  }
+  // The tailgut: two strands from the end of the tailpiece over the saddle and down the tail end
+  // to the middle of the ribs, where the end pin holder stands out.
+  const [first] = TAILPIECE;
+  const [tailX = 0, , tailUnder = 0, tailThick = 0] = first ?? [];
+  const middle = v.bodyThickness / 2;
+  const [apart, size] = t.gut;
+  for (const side of [-1, 1]) {
+    const z = side * apart;
+    const points: Vec3[] = [
+      [tailX + 0.003, tailUnder + tailThick / 2, z],
+      [from + 0.0005, edge + height + size, z],
+      [-0.0012, edge, z],
+      [-0.0012, middle, z],
+    ];
+    for (let i = 0; i + 1 < points.length; i++) {
+      piece.rod(
+        place(points[i] ?? [0, 0, 0]),
+        place(points[i + 1] ?? [0, 0, 0]),
+        size,
+        4,
+        dark,
+        'varnish',
+      );
+    }
+  }
+  if (form === 'cello') {
+    const st = STRINGS;
+    for (let i = 0; i < 4; i++) {
+      const z = (i / 3 - 0.5) * st.tailSpan;
+      const [, , under = 0, thick = 0] = TAILPIECE[4] ?? [];
+      piece.add(
+        lathe(FINE_TUNERS.profile, 6),
+        INSTRUMENT_COLORS.silver,
+        inFrame(frame, transform([FINE_TUNERS.x, under + thick, z])),
+        'metal',
+      );
+    }
+  }
+}
+
+/**
  * The end pin of the cello and the contrabass, in meters before the scale of the instrument, as a
  * real end pin: a thin steel rod that ends in a round rubber tip, and the ebony end pin holder with
  * a silver ring where the rod leaves the tail end. The tip touches the floor at the origin of the
@@ -1621,9 +1723,10 @@ function addViolinParts(piece: PieceBuilder, frame: Transform, form: StringForm)
       'varnish',
     );
   }
-  // The tailpiece, which tapers from its top end to the edge of the body, the chin rest, and the
-  // shoulder rest.
+  // The tailpiece, which tapers from its top end to the edge of the body, the saddle, the
+  // tailgut and the fine tuners of the upright forms, the chin rest, and the shoulder rest.
   part(sweep(TAILPIECE.map(tailRing)), dark, [0, 0, 0]);
+  addTailEnd(piece, frame, form);
   if (!upright) {
     part(plate(chinRestOutline(), CHIN_REST.levels), dark, [
       CHIN_REST.center[0],
