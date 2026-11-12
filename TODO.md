@@ -133,22 +133,22 @@ passes.
 - [ ] Deer: a small cream fold of the haunch lies on the seat under the puff tail.
 - [ ] Add the chair as an obstacle to the sweeps of the seated roles, with the legs and the haunch
       as parts (`SEATED_PARTS`, `seatSurface()` of `pose/test-sweep-roles.ts`).
-- [ ] Penguin singer: ask the user to confirm the size, the flippers, the place of the folder, the
-      wider folder (covers of 0.26 m) with the elbows further out, and the white throat. Option:
-      flippers 1.25 times as long.
-- [ ] Penguin: black wedges from the roots of the flippers show on the white belly under the folder
-      in the front views.
-- [ ] Penguin: the crease angle 35° has no facet probe against the penguins of the reference images
-      (`ANIMALS` of `tools/studio-body.ts`).
-- [ ] Penguin with rebuilt flippers: under the raised flipper, the black and white edge of the side
-      lies up to about 1 cm further back than on the old rig, and the right side shows more white
-      under the flipper (`reports/2026-11-03-penguin-arms/crop-left-c4.png`). The straight bind
-      narrows the bent elbow rings to about 3.5 and 3.4 cm (old bind 3.80 and 4.28 cm), and one face
-      of the left flipper root still turns over in the bind after the relax. In the cast matrix,
-      the round upper arms go 3.6 to 6.2 cm into the body (old flippers 1.3 to 3.4 cm).
-- [ ] Penguin: the round rebuilt flippers go 1.3 cm into the chest, and the forearms 0.3 cm into
-      the folder (0 cm on the old flippers). The edge of the orange beak and feet is not cut.
-      Check the roots of the flippers with a fill light.
+- [ ] Penguin singer: ask the user to confirm the Tripo penguin
+      (`reports/2026-11-12-penguin/panel.png`) and its hold. The body keeps the choir folder in
+      both flippers (design 4.6), with the folder at 0.74 H. Option: the flippers down at the sides
+      or a little out, with no folder.
+- [ ] Tripo penguin: the roots of the upper flippers go 2.0 cm into the sides in each pose (limit
+      1.5 cm, `pnpm pose-depth singer`). The clip is at the root, so the pose does not change it.
+- [ ] Tripo penguin: the center of mass lies 8 cm behind the middle of the soles, about 2 cm in
+      front of the heels, as in the source. Decide if the bind leans the trunk forward (about
+      12°) to put it over the middle.
+- [ ] Tripo penguin: in the second half of the blink, up to 18 points of the side edges and the
+      back edge of each lid leave the head. The lid and the head are both black. Check a close shot.
+- [ ] Tripo penguin: the beak split keeps a short arc of the mouth groove at the beak root (z 0.122
+      to 0.137) and a small loop at the hook of the tip joined. Check the open beak at the mouth
+      corners in a close shot.
+- [ ] Tripo penguin: no round measured the recast roles of the cast matrix on the new body. The
+      `raise` shapes of the earlier penguin ("Penguin recast folds") do not apply to it.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
       angles fold the right shoulder. Fix the right shoulder in a rig round (string-technique).
 - [ ] Panda: at rest, the app view (front left, 30° up) shows a white wedge of the chest between
