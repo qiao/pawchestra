@@ -169,11 +169,11 @@ const COLUMN = {
   flutes: 5,
   /** The crown on the top of the column, around the end of the neck. */
   crown: [
-    [0.031, 1.19],
-    [0.045, 1.235],
-    [0.064, 1.345],
-    [0.052, 1.385],
-    [0, 1.395],
+    [0.031, 1.18],
+    [0.045, 1.21],
+    [0.054, 1.245],
+    [0.042, 1.265],
+    [0, 1.272],
   ],
   /** The number of faces of the foot and the crown around the column. */
   segments: 8,
