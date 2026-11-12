@@ -867,6 +867,14 @@ const SHOULDER_HOLD = {
  * play samples of `boulanger-matin`, the right forearm 4.7 cm in 17.0%, and the violin 3.9 cm
  * into the jaw in each sample. With this hold, the paw and the violin stay out of the head, and
  * the right forearm goes at most 0.8 cm in. With the violin 0.05 H up, the paw went 1.8 cm in.
+ *
+ * In pizzicato, the short right arm of the fox plucks at the bow contact (`pluckPlace` 1), 0.15 m
+ * right of the strings (`pluckSide`), as the paw of the dog, and the bow tip points out, up, and
+ * back, (1, 0.4, 0.6) (`pizzicatoTip`). Over the end of the fingerboard and above the strings, the
+ * straight arm reached across the chest: the right upper arm went 7.6 cm into the body and the
+ * forearm 3.5 cm into the neck (`boulanger-matin`). With this pluck, they go 2.3 cm in (the arm
+ * root, as in the bow play) and 0 cm. With the tip of the hold of the rabbit, (0.3, 0.5, 1), the stick passed across the
+ * face at this paw.
  */
 const FOX_HOLD = {
   ...SHOULDER_HOLD,
@@ -880,6 +888,9 @@ const FOX_HOLD = {
   headDrop: -9 * MathUtils.DEG2RAD,
   headTurn: 20 * MathUtils.DEG2RAD,
   frogHair: 0.16,
+  pluckPlace: 1,
+  pluckSide: 0.15,
+  pizzicatoTip: [1, 0.4, 0.6],
   slant: -12 * MathUtils.DEG2RAD,
   stringTurn: 9 * MathUtils.DEG2RAD,
   bowTilt: 15 * MathUtils.DEG2RAD,
