@@ -718,13 +718,17 @@ passes.
       violist` did not run on the fourth mesh.
 - [ ] Cat candidate: the smaller eyes and the lower upper lids have only ray checks of the lids (no
       lid point leaves the head in a blink step). Check a blink in the app.
-- [ ] Tripo fox with four-digit paws: the right upper arm of the red fox goes 7.6 cm into the
-      right shoulder in the play and the lowering (`pnpm pose-depth violinist@fox-red`, 92.6 % of
-      the play samples), with the old and the new bow elbow. The right folds p95 of the arm gate
-      is 11 (limit 8).
-- [ ] Tripo fox with four-digit paws: the right paw of the tan flutist swings 103° at the wrist in
-      the play (limit 70°, 111° on the fox before), its wrist ring keeps 0.56 of its width (limit
-      0.55), and it grasps the flute in 31 % of the play samples, with the finger tips 0.7 cm off.
+- [ ] Tripo fox with four-digit paws: the pizzicato fix of `FOX_HOLD` (2026-11-12) brought the
+      right upper arm of the red fox from 7.6 cm to 2.3 cm in the shoulder. In mozart-k525 the
+      root of the arm still goes 2.2 cm in (96 % of the samples, limit 1.5 cm), and the right folds
+      p95 stay 11 (limit 8). Four elbow poles did not change it: it needs a weight row.
+- [ ] Tripo red fox violinist: the rest frog of the bow is 16 cm over the right thigh, because the
+      short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
+      At rest the left upper arm goes 3.4 cm into the belly.
+- [ ] Tripo tan fox flutist: the free left paw rests on the haunch beside the hip, because the
+      arm does not reach the top of the thigh or the flute at rest. The root of the left upper
+      arm goes 2.0 cm into the body in the play, the lift, and the lowering (limit 1.5 cm). In the
+      lowering the right rest grip grasps the flute in only 37 % of the samples.
 - [ ] Tripo fox with four-digit paws: the seat is 0.249 m with flat feet. A heel turn for a taller
       chair moves 318 to 421 of the 459 players of the demos (sight pass, 4.5), so it waits for a
       layout rule that keeps the seats.
