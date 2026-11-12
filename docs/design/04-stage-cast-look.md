@@ -932,6 +932,12 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   nearly vertical and the heels are a little up, with the toes on the floor, so that the seat is
   near the seat of the cat. Reason: with flat feet, the chair read too low. The higher eyes change
   the sight pass of the layout (4.5) in three demos.
+- The Tripo pig keeps the short legs of its mesh. Its bind turns each foot with the heel up, the
+  hoof tips flat on the floor, as a pig stands on its hoof tips, and its shins stay vertical. So
+  its seat is higher than with flat feet, and the front edge of the seat is nearer to the knees,
+  so that more of each thigh lies on the seat. Reason: with flat feet, the seat was low, and only
+  the haunch sat on it. A higher seat moved players in the sight pass of the layout (4.5), so the
+  seat takes the largest height with no move.
 - The panda sits on the chair of the panda of its old mesh, as a product choice: the seat top and
   the chair depth of that panda, with legs about as long. A front edge of the seat under the sloped
   thighs puts the seat top far below the hips joint, so the seat ends under the haunch, as on the
