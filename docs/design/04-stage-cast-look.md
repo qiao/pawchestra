@@ -764,7 +764,9 @@ hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candi
 violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
 changes its trunk, limbs, legs, or tail, its map keeps the colors of the source
 (`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
-chair fits its legs. The only form edits are those of the eyes, of the mouth corners, and of the
+chair fits its legs: the shins of its bind stand nearly vertical and the heels are a little up,
+with the toes on the floor. Reason: with flat feet, the chair read too low. The higher eyes
+change the sight pass of the layout (4.5) in five demos. The only form edits are those of the eyes, of the mouth corners, and of the
 front paws. The point edit `paw` makes each front paw shorter and narrower past the wrist joint,
 and the digits a little shorter again past the knuckles (the values are in its README). Reason:
 the paws and the digits of the source read too large in the app. Against the arm, the paw now has
