@@ -162,9 +162,12 @@ passes.
       12°) to put it over the middle.
 - [ ] Tripo penguin: in the second half of the blink, up to 18 points of the side edges and the
       back edge of each lid leave the head. The lid and the head are both black. Check a close shot.
-- [ ] Tripo penguin: the beak split keeps a short arc of the mouth groove at the beak root (z 0.122
-      to 0.137) and a small loop at the hook of the tip joined. Check the open beak at the mouth
-      corners in a close shot.
+- [ ] Tripo penguin: the lower beak turns at the back of the mouth slit, and the chin in front of
+      the slit follows it a little. Check the chin and the slit walls from below in a close shot.
+      Confirm the beak opening (`CHOIR_MOTION.jaw`) in the app.
+- [ ] Tripo penguin: the outer third of each flipper curls about 40° around the folder edge
+      (`CHOIR_HOLD.flex`, `CHOIR_HOLD.curl`). Confirm the amount in the app. The palms now meet
+      their grips within 3.1 mm (1.0 mm before).
 - [ ] Tripo penguin: no round measured the recast roles of the cast matrix on the new body. The
       `raise` shapes of the earlier penguin ("Penguin recast folds") do not apply to it.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
