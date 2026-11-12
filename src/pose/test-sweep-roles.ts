@@ -84,6 +84,9 @@ const BODY_LOOPS = 2;
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
+ * - The penguin: 22 open loops, the cuts to the two upper arms, 18 open loops of the Tripo penguin
+ *   (the 2 eye sockets, the open backs of the 2 eyeballs, 12 small holes of the feet, and 2 of the
+ *   tail), and the edges of the 2 lids.
  * - The pig: 7 open loops, the cuts to the two upper arms, 3 small open loops of the Tripo pig at
  *   the roots of the ears, and the edges of the 2 lids.
  * - The rabbit: 14 open loops, the cuts to the two upper arms and the open loops of the third Tripo
@@ -97,6 +100,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/fox/tripo-hand/fox.rig.glb', 8],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
+  ['assets/models/penguin/tripo-hand/penguin.rig.glb', 22],
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
 ]);
