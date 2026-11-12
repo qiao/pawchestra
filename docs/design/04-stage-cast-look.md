@@ -901,10 +901,14 @@ trombonist. The Tripo fawn (`assets/models/deer/tripo-hand/`) is the body of the
 paints a full eye with a light on each eyeball, so the eyeballs take the finish `varnish`, no eye
 light, and a blink lid. Its eyeballs and their sockets are smaller than in the source, because the
 eye opening was about 0.18 of the head width in the play view, above the limit of about 0.14 of
-the other bodies. Its arms keep the short length of the source, so the harp stands nearer to the
-stool than a concert harp (`HARP_PLACE`, 4.6), and the spine stays erect, so that the muzzle stays
-off the neck of the harp. The left hoof turns by one step of a closed wrist ring, and each elbow
-axis turns, so that each part of each arm takes at most 45° in the moments of the harpist. The paws of the fox turn about the
+the other bodies. Its scale keeps the standing shoulder height of the old deer, not H, because
+its head is small: the scale of H made it 1.6 times taller, and its larger body moved the players
+of the layout. Its upper arms and forearms are 1.2 times longer than in the source, as on the
+Tripo hippo, and the hooves keep their size. Reason: with shorter arms, the hooves reached fewer
+than 95 % of their places on the harp strings. The harp stands near the stool (`HARP_PLACE`, 4.6),
+and the spine stays erect, so that the muzzle stays off the neck of the harp. The left hoof turns
+by one step of a closed wrist ring, and each elbow axis turns, so that each part of each arm
+takes at most 45° in the moments of the harpist. The paws of the fox turn about the
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
@@ -996,10 +1000,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   round haunch, and the seat height and the chair size move no player of the layout (4.5). The
   larger body of the Tripo panda at the same H moves the players of the four demos with
   trombones.
-- The Tripo fawn keeps the long legs of its mesh, with flat hooves and vertical shins, on a high
-  and wide stool (`seatWidth`). Its short tail hangs behind the back edge of the seat. Reason: the
-  scale that keeps H of the old deer makes the fawn tall, and a lower seat moves no player of the
-  layout.
+- The Tripo fawn keeps the long legs of its mesh, with flat hooves, on the stool of the old deer
+  (`seatWidth`). Its shins lean 35° forward, so that the seat is lower. Its short tail hangs behind
+  the back edge of the seat. Reason: with vertical shins, the higher seat moved players of the
+  layout, and the hooves reached fewer strings.
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
   the seat height of its legs, with its feet on the floor. The monkey stands erect, as a brass
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
@@ -1747,7 +1751,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin of a thin steel rod and a round rubber tip (`celloPinOf()`, `endPinLength()`, `END_PIN`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
-| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a harp of its own size (`harpScale`), upright, diagonal, and near the stool (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its muzzle, with the base as near as the paws stay out of the chest. The short arms of the Tripo fawn do not reach all bass strings. |
+| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, and near the stool (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its short arms need to reach the strings. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. |
