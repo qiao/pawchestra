@@ -628,9 +628,9 @@ export const WIND_HOLDS = {
  * 90°. The rest elbows point back, (-0.3, -1, 0.7) and (0.8, -1, 0.3), so that each upper arm takes
  * about half of the turn at rest: with (-0.4, -1, 0.38) and (0.8, -1, 0.6), the left upper arm
  * rolled 45° and the right forearm twisted 55° on the first Tripo fox. The rest grip of the right
- * paw lies 0.209 H further toward and past the axis of the tube than on the first Tripo fox
- * (`restGripShiftR`): with the old grip, the right arm of the new fox took 92° on its two parts at
- * rest, more than two parts of 42°, and now 76°, 38° on each part.
+ * paw keeps the distance of the play grip from the axis of the tube (`restGripShiftR`). The right
+ * palm then faces the flute at rest (9°), and the right paw turns at most 401° each second in the
+ * lift. With the rest grip 0.1 H nearer to the axis, the paw turned 748° each second.
  *
  * The rest values in H (`restShift`, `restGripShiftR`, and the lap offset of `restFreeL`) keep the
  * rest of the arms in meters when the head of the body grows. They are the values of the head
@@ -664,7 +664,7 @@ const FOX_FLUTE = {
   aimSide: [0.5, -0.45],
   gripShiftL: [-0.04, 0, 0.12],
   gripShiftR: [0, 0, -0.14],
-  restGripShiftR: [-0.376, 0.1, -0.067],
+  restGripShiftR: [-0.376, 0, -0.067],
   gripCurl: curls(90, 85),
   gripAround: true,
 } as const satisfies WindHold;
