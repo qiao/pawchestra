@@ -238,24 +238,22 @@ soles. With the leg turns and the trunk lean of the monkey of main, the large he
 leaned far forward of the haunch.
 
 **Play stance.** In the play, the spine turns 7 degrees back (`lean` of `MONKEY_TRUMPET` of
-`src/pose/winds.ts`), so the head stays upright over the chest and the hips. The trumpet is 0.85
-of the trumpet of the app (`trumpetScale`). The table gives, from the middle of the soles (the
-corners within 1.2 cm of the floor, 22 cm long), the center of mass (the volume of the skin and a
-trumpet of 1 kg times the cube of its scale) and the head center, in cm in front of the middle
-(negative: behind it), with the bow of the head from the vertical. The hips stay 3.9 cm behind the
-middle. Before: the hold with the head bowed by the far mouth (`farMouth` 0.8) and the trumpet of
-0.65. Probe: `scratch/trumpet/probe.ts` of the session, which git ignores.
+`src/pose/winds.ts`), so the head stays upright over the chest and the hips. The monkey plays the
+trumpet of the app (no `trumpetScale`). The table gives, from the middle of the soles (the corners
+within 1.2 cm of the floor, 26 cm long), the center of mass (the volume of the skin and a trumpet
+of 1 kg times the cube of its scale) and the head center, in cm in front of the middle (negative:
+behind it), with the bow of the head from the vertical. The hips stay 4.6 cm behind the middle.
+The lowest point of the skin stays on the floor in each moment. Before: the body at the scale
+1.130693 with the trumpet of 0.85. Probe: `scratch/p/balance.ts` of the session, which git
+ignores (from `scratch/trumpet/probe.ts`, with the height of the lowest point).
 
 | Moment | Center of mass, before | After | Head center, before | After | Head bow, before | After |
 |---|---|---|---|---|---|---|
-| note, stand | 2.2 | -0.5 | 6.3 | -0.4 | 13.9° | 3.9° |
-| between | 2.9 | 0.2 | 7.7 | 1.1 | 15.7° | 5.7° |
-| rest | 0.3 | 0.5 | 0.2 | 0.2 | -12.7° | -12.7° |
-| lift50 | 1.1 | 0.2 | 2.7 | 0.0 | -2.4° | -6.3° |
-| lower50 | 1.4 | 0.1 | 3.5 | -0.1 | 1.2° | -4.0° |
-
-The balance probe of the round of the leg turns took +z as the front, so the sides of its values
-were swapped. Its values are not given here.
+| note, stand | -0.5 | -0.5 | -0.4 | -0.4 | 3.9° | 3.9° |
+| between | 0.2 | 0.3 | 1.1 | 1.4 | 5.7° | 5.7° |
+| rest | 0.5 | 0.7 | 0.2 | 0.3 | -12.7° | -12.7° |
+| lift50 | 0.2 | 0.3 | 0.0 | 0.1 | -6.3° | -6.3° |
+| lower50 | 0.1 | 0.1 | -0.1 | 0.0 | -4.0° | -4.0° |
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -55 to 45 degrees and lam from -50 to 62
 degrees on the left (the mirror on the right), with the lower strip as the first row, at 1.17 ball
@@ -279,9 +277,9 @@ of `MONKEY_TRUMPET` of `src/pose/winds.ts` (`pnpm pose-preview trumpeter`):
 The rest row comes from the rest place in front of the belly (`restShift` of `MONKEY_TRUMPET`).
 Its upper arm rolls are larger than 45 degrees (67.0 and -49.4 with the old stance). The skin
 twist of the arm gate (`pnpm arm-check trumpeter`, p95) was 39 (left) and 29 (right) degrees.
-The table comes from the hold before the play stance. With the play stance and the trumpet of
-0.85, the skin twist is 44 and 29 degrees, at most 45, and the right paw bends 68 degrees at the
-wrist (limit 70).
+The table comes from the hold before the play stance. With the play stance, the trumpet of 0.85,
+and the scale 1.130693, the skin twist is 44 and 29 degrees, at most 45, and the right paw bends
+68 degrees at the wrist (limit 70). The arm gate did not run again at the scale 1.356832.
 
 With the hands of the source, the forearms twisted -130 and 112 degrees at rest. The hold keeps the
 constants of the trumpet hold of the monkey of main. The right hand closes under the valves, the
