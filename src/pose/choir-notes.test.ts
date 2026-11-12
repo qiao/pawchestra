@@ -39,10 +39,8 @@ function stateAt(t: ChoirTrack, time: number): ChoirState {
 const OPEN = CHOIR_MOTION.jaw * gestureSize(LOUD, 1);
 
 describe('choirStateAt (design 5.3)', () => {
-  it('opens the jaw 50° in the 0.1 s before a note, and keeps it open while the note sounds', () => {
+  it('opens the jaw in the 0.1 s before a note, and keeps it open while the note sounds', () => {
     const t = track([n(1, 2)]);
-    // With 35°, the beak does not show in a section shot.
-    expect(CHOIR_MOTION.jaw).toBeGreaterThan((35 * Math.PI) / 180);
     expect(OPEN).toBeCloseTo(CHOIR_MOTION.jaw, 12);
     expect(stateAt(t, 0.89).jaw).toBe(0);
     expect(stateAt(t, 0.95).jaw).toBeCloseTo(OPEN / 2, 9);

@@ -8,13 +8,11 @@ import { smoothstep } from './rest.ts';
 /** The motion of a singer (design 5.3). */
 export const CHOIR_MOTION = {
   /**
-   * The jaw or the lower beak opens this far for a note, at a gesture size of 1. The beak of a
-   * singer in the front row of the default view is about 3 pixels long, so 18° does not show.
-   * With 35°, the beak does not show in a section shot at 1440 × 900. The singing penguins of
-   * `orchestra-side.png` open their beaks about 60° to 75°, so the penguin mesh keeps this
-   * angle.
+   * The jaw or the lower beak opens this far for a note, at a gesture size of 1. The lower beak
+   * of the Tripo penguin turns at the back of the mouth slit, so a small angle opens a long gape,
+   * as a singing bird does. At 50°, the long lower beak hung down as a wide hinge.
    */
-  jaw: 50 * MathUtils.DEG2RAD,
+  jaw: 20 * MathUtils.DEG2RAD,
   /**
    * The neck and the head lift this far in a phrase, as a real choir singer lifts the head a
    * little to sing and keeps it still on each note. The lift rises in {@link liftRiseSec} before
@@ -39,8 +37,7 @@ export const CHOIR_MOTION = {
   openRate: 160 * MathUtils.DEG2RAD,
   /**
    * The fastest turn of the jaw as it closes, in radians each second: 9° in a frame of 1/30 s. The
-   * jaw closes faster than it opens, so that it closes in a short rest: at the open rate, a beak
-   * open 50° takes 0.47 s to close.
+   * jaw closes faster than it opens, so that it closes in a short rest.
    */
   closeRate: 270 * MathUtils.DEG2RAD,
   /**
