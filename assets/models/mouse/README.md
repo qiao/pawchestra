@@ -84,7 +84,7 @@ The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blende
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the mouse faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `mouse`: 3,720 vertices and 3,819 faces (3,346 quads and 473 triangles, 7,165 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 45 faces of the nose take the slot `fur` and the color map. The 134 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 50 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/mouse/tripo-hand/mouse-color.webp`) |
 | Armature | `mouse_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.622076 (the shoulder joints at 1.031635 m for each unit, so that H is 0.271642 m, the H of the mouse of `aa8af0dd8`), `crease` 180 |
+| Facts | `height` 0.507275 (the shoulder joints at 0.841252 m for each unit, so that H is 0.221512 m and the lower eye of the standing mouse is 0.688 m high, as on the mouse of `7fa9d1e89`), `crease` 180 |
 | Eyes | The eyeballs of the source in their sockets, with the finish `eye` and the eye light of the app, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
@@ -149,9 +149,9 @@ recline (`studio.trunk.open` 0), and the tail bones keep the directions of the s
 (`studio.tailBind`). Thus it stands on its legs as in the source, with the feet flat on the floor
 and the tail on the floor behind it. The property `seat` is {`prop` `chair`, `front` 0.015, `back`
 -0.1, `halfWidth` 0.045}: the seat lies between the legs, behind the shins and the feet, and its
-top is the crotch, at 0.119 units. The seat height of the app is 0.122 m (0.076 m on the mouse of
-`aa8af0dd8`, which stood on bent knees). Standing, the top of the skull is 0.946 m above the floor
-and the ear tips 1.032 m, against 0.812 m and 0.856 m on the mouse of `aa8af0dd8`.
+top is the crotch, at 0.119 units. The seat height of the app is 0.100 m (0.076 m on the mouse of
+`7fa9d1e89`, which stood on bent knees). Standing, the top of the skull is 0.771 m above the floor
+and the ear tips 0.841 m, against 0.812 m and 0.856 m on the mouse of `7fa9d1e89`.
 
 **Lids.** A lid on each eye: 13 × 13 points from psi -70 to 65 degrees and lam from -72 to 72
 degrees (the mirror on the right), with the lower strip as the first row, at 1.15 ball radii (1.12
@@ -172,29 +172,37 @@ oboist (`pnpm arm-check oboist`), in degrees, with the paws of the source in par
 
 | Arm | Upper arm | Forearm | Paw |
 |---|---|---|---|
-| Left | 25 (24) | 30 (56) | 43 (130) |
-| Right | 35 (30) | 10 (45) | 19 (112) |
+| Left | 26 (24) | 29 (56) | 43 (130) |
+| Right | 37 (30) | 9 (45) | 23 (112) |
 
-**Oboe hold.** The arms of the Tripo mouse reach 0.22 m from the shoulder joint to the wrist,
+**Scale.** The scale of the chain (`metersPerUnit` 0.841252) puts the lower eye of the standing
+mouse 0.688 m above the floor, as on the mouse of `7fa9d1e89`. The seat search of each demo reads
+the eye height and the mesh of each body (design 4.2), so this scale gives the seats of that mouse
+in 12 of 18 demos. At the H of the old mouse (0.271642 m), the eyes stood 0.844 m high and the ear
+tips 1.032 m, and players of 14 of 18 demos moved by up to 1.5 m.
+
+**Oboe hold.** The arms of the Tripo mouse reach 0.18 m from the shoulder joint to the wrist,
 against 0.27 m on the rebuilt arms of the old mesh, so the hold of the old mouse did not reach:
 the left paw missed its grip by 2.7 cm and the right paw by 5.2 cm in the play, and no note target
 lay within 5 mm. `MOUSE_OBOE` of `src/pose/winds.ts` changes (design 5.3): the shoulders turn
-forward 60 degrees (right) and 45 degrees (left), the left grip stays at the grip of the shared
-hold and the right grip moves 0.1 H down the tube, and the left digits curl 130 degrees. The oboe
-keeps the scale 0.45. The measures, with the mouse of `aa8af0dd8` in parentheses where the tool
-gives it:
+forward 70 degrees (right) and 45 degrees (left), the left grip moves 0.03 H up the tube from the
+grip of the shared hold and the right grip 0.05 H down the tube, and the left digits curl 130
+degrees. The oboe keeps the scale 0.45, a factor of the oboe of the app, so it keeps its size in
+meters at each scale of the body. The measures, with the mouse of `aa8af0dd8` in parentheses where
+the tool gives it:
 
 | Measure | Left | Right |
 |---|---|---|
-| Spare reach to the grip, play / rest (`pnpm hold-fit oboist`) | 4.2 / 7.3 cm | 1.2 / 7.6 cm |
-| Note targets within 5 mm (`pnpm pose-depth oboist`) | 100 % | 100 % |
-| Grasps the oboe, play, lift, rest, lower (`pnpm wind-grip oboist`) | 100, 100, 100, 90 % (100 % each) | 100 % each (100 % each) |
-| Folds p95 (`pnpm arm-check oboist`) | 19 (6) | 18 (8) |
+| Spare reach to the grip, play / rest (`pnpm hold-fit oboist`) | 3.0 / 5.8 cm | 0.4 / 5.4 cm |
+| Note targets within 5 mm (`pnpm hold-fit oboist`), worst error 1.7 mm | 100 % | 100 % |
+| Grasps the oboe, play, lift, rest, lower (`pnpm wind-grip oboist`) | 100 % each (100 % each) | 100 % each (100 % each) |
+| Folds p95 (`pnpm arm-check oboist`) | 20 (6) | 18 (8) |
 
 The folds are the curled digits of the paws and a few thin faces at the arm root, which fold with
 a turn of the shoulder of 2 to 8 degrees (`pnpm fold-probe oboist --faces 20`). The paws and the
-claws stay within 0.5 cm of the oboe, and the reed goes 1.3 cm into the head at the lips (limit 2
-cm). The oboe has no closed part, so `pnpm body-clip oboist` finds no row (as on the old mouse).
+claws stay within 0.4 cm of the oboe, the paws keep a clear gap of at least 1.6 cm in the play,
+and the reed goes 1.1 cm into the head at the lips (limit 2 cm). The oboe has no closed part, so
+`pnpm body-clip oboist` finds no row (as on the old mouse).
 
 **Maps** (`tools/mouse-maps.py`). The tool scales the color map of the source to 2048 pixels
 (Lanczos), adds the fur strands of `tools/fox-maps.py` (`strands()`) to the fur, and writes WebP
@@ -212,7 +220,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/mouse.rig.glb` | 1,168,048 bytes | `53340713916b39ed53212dc55b561404d535fb2c3d9b6cdc3044c15d9adc4741` |
-| `tripo-hand/mouse.rig.json` | 17,320 bytes | `63561ca2b633603919522225b8d2a00818dcb6a52eb80053fc1c1c050fc67fb6` |
+| `tripo-hand/mouse.rig.glb` | 1,168,048 bytes | `05fe01765647a9669efda3f91eb08478f5230bb1dbb25a6f746a490a6638cfa5` |
+| `tripo-hand/mouse.rig.json` | 17,320 bytes | `01c2822da13fefb835080fec61e7424f3bcdcdf56c72256fa66e96229e33b5d2` |
 | `tripo-hand/mouse-color.webp` | 257,276 bytes, 2048 × 2048 | `c7865caf72b02338b984c617ad201f0cd2a3c3abf1da7794ee296dc03f18ed9a` |
 | `tripo-hand/mouse-normal.webp` | 214,706 bytes, 1024 × 1024 | `b45a2aaea51861a709b94434bde25e50ca12b73d5d1adc323e781ec45b4198b4` |
