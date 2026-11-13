@@ -105,8 +105,10 @@ const BODY_LOOPS = 2;
  *   tail), and the edges of the 2 lids.
  * - The pig: 7 open loops, the cuts to the two upper arms, 3 small open loops of the Tripo pig at
  *   the roots of the ears, and the edges of the 2 lids.
- * - The rabbit: 14 open loops, the cuts to the two upper arms and the open loops of the third Tripo
- *   rabbit (the whisker strips, the eyeballs, and two of the body) and of its lids.
+ * - The rabbit: 19 open loops, the cuts to the two upper arms, 15 open loops of the fourth Tripo
+ *   rabbit (the 8 whisker strips, the open backs of the 2 eyeballs, 2 slits at the nose and the
+ *   mouth, and 3 small holes of 4 edges at the right flank, the top of the head, and the root of
+ *   the left ear), and the edges of the 2 lids.
  * - The wolf: 5 open loops, the cuts to the two upper arms and 3 open loops of the Tripo wolf.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
@@ -125,7 +127,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/penguin/tripo-hand/penguin.rig.glb', 22],
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/panda/tripo-hand/panda.rig.glb', 6],
-  ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
+  ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 19],
   ['assets/models/wolf/tripo-hand/wolf.rig.glb', 5],
 ]);
 
