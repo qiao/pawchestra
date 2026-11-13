@@ -172,8 +172,8 @@ oboist (`pnpm arm-check oboist`), in degrees, with the paws of the source in par
 
 | Arm | Upper arm | Forearm | Paw |
 |---|---|---|---|
-| Left | 26 (24) | 29 (56) | 43 (130) |
-| Right | 37 (30) | 9 (45) | 23 (112) |
+| Left | 26 (24) | 25 (56) | 37 (130) |
+| Right | 36 (30) | 9 (45) | 22 (112) |
 
 **Scale.** The scale of the chain (`metersPerUnit` 0.841252) puts the lower eye of the standing
 mouse 0.688 m above the floor, as on the mouse of `7fa9d1e89`. The seat search of each demo reads
@@ -184,25 +184,27 @@ tips 1.032 m, and players of 14 of 18 demos moved by up to 1.5 m.
 **Oboe hold.** The arms of the Tripo mouse reach 0.18 m from the shoulder joint to the wrist,
 against 0.27 m on the rebuilt arms of the old mesh, so the hold of the old mouse did not reach:
 the left paw missed its grip by 2.7 cm and the right paw by 5.2 cm in the play, and no note target
-lay within 5 mm. `MOUSE_OBOE` of `src/pose/winds.ts` changes (design 5.3): the shoulders turn
-forward 70 degrees (right) and 45 degrees (left), the left grip moves 0.03 H up the tube from the
-grip of the shared hold and the right grip 0.05 H down the tube, and the left digits curl 130
-degrees. The oboe keeps the scale 0.45, a factor of the oboe of the app, so it keeps its size in
-meters at each scale of the body. The measures, with the mouse of `aa8af0dd8` in parentheses where
-the tool gives it:
+lay within 5 mm. `MOUSE_OBOE` of `src/pose/winds.ts` changes (design 5.3): the reed goes between
+the lips at the front of the muzzle (`lipShift`), the oboe hangs 30 degrees from the vertical,
+the shoulders turn forward 70 degrees (right) and 45 degrees (left), each grip moves 0.08 H up the
+tube from the grip of the shared hold, onto the tone holes of its joint, and the digits curl 120
+degrees (left) and 100 degrees (right). The oboe has the scale 0.5, a factor of the oboe of the
+app, so it keeps its size in meters at each scale of the body. The measures:
 
 | Measure | Left | Right |
 |---|---|---|
-| Spare reach to the grip, play / rest (`pnpm hold-fit oboist`) | 3.0 / 5.8 cm | 0.4 / 5.4 cm |
-| Note targets within 5 mm (`pnpm hold-fit oboist`), worst error 1.7 mm | 100 % | 100 % |
-| Grasps the oboe, play, lift, rest, lower (`pnpm wind-grip oboist`) | 100 % each (100 % each) | 100 % each (100 % each) |
-| Folds p95 (`pnpm arm-check oboist`) | 20 (6) | 18 (8) |
+| Spare reach to the grip, play / rest (`pnpm hold-fit oboist`) | 1.9 / 5.7 cm | 1.0 / 6.1 cm |
+| Note targets within 5 mm (`pnpm hold-fit oboist`), worst error 0.0 mm | 100 % | 100 % |
+| Grasps the oboe, play, lift, rest, lower (`pnpm wind-grip oboist`) | 100 % each | 100 % each |
+| Middle of the paw from the reed tip, play (`pnpm wind-grip oboist`) | 6.5 cm | 15.6 cm |
+| Folds p95 (`pnpm arm-check oboist`) | 18 | 15 |
 
 The folds are the curled digits of the paws and a few thin faces at the arm root, which fold with
-a turn of the shoulder of 2 to 8 degrees (`pnpm fold-probe oboist --faces 20`). The paws and the
-claws stay within 0.4 cm of the oboe, the paws keep a clear gap of at least 1.6 cm in the play,
-and the reed goes 1.1 cm into the head at the lips (limit 2 cm). The oboe has no closed part, so
-`pnpm body-clip oboist` finds no row (as on the old mouse).
+a turn of the shoulder (`pnpm fold-probe oboist --faces 20`). The paws and the claws stay within
+0.4 cm of the oboe, the paws keep a gap of at least 1.0 cm in the play, and the reed goes 0.6 cm
+into the head at the lips (limit 2 cm). The oboe has no closed part, so `pnpm body-clip oboist`
+finds no row. The pink of the paws is the pink of the source: the mean color of the paw texels is
+RGB (231, 155, 135) in the source map and (229, 156, 136) in `mouse-color.webp`.
 
 **Maps** (`tools/mouse-maps.py`). The tool scales the color map of the source to 2048 pixels
 (Lanczos), adds the fur strands of `tools/fox-maps.py` (`strands()`) to the fur, and writes WebP
