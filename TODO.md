@@ -767,45 +767,29 @@ passes.
 - [ ] Tripo fox: the tan map moves the orange fur only by a lightness and a hue step
       (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
       golden. A chroma step would read nearer the pale tan of the reference image.
-- [ ] Third Tripo rabbit: the seat is 0.196 m high, with the shins 6° forward and the heels 15°
-      up (0.167 m with flat feet). The higher eyes change the sight pass of the layout: 13
-      players move in `bach-bwv1048` (up to 1.3 m) and `mozart-k417`, and 2 in `bach-bwv1047`
-      (`pnpm sight-lines`: 4 players hidden from the audience in `bach-bwv1048`, 1 before, and 0
-      in `mozart-k417`, 1 before). Each seat height from 0.189 m gives the same moves. Check the
-      new seats in the app.
-- [ ] Third Tripo rabbit: the hip joint lies 1.5 mm from its measured place, because at that place
-      the rest frames of the leg bones in Blender scale and `pnpm rig-export` stops. A tolerance or
-      a fix of the frames in `tools/blender/export_rig.py` would allow the measured place.
-- [ ] Third Tripo rabbit: in the lift the violin of 0.9 goes up to 4.2 cm into the belly, and in
-      the lowering up to 5.5 cm into the head (`pnpm pose-depth violinist`, 6.2 cm with the first rest of
-      this body, 2.7 cm with the violin of 0.75 on the second rabbit). A `liftReach`
-      further to the left took the head depth to 4.3 cm, but the violin left the short arc by up
-      to 57° (`pnpm carry-check`). At rest the violin keeps out of the body.
-- [ ] Third Tripo rabbit: near the end of one lowering the bow goes into the violin in 1 of 30
-      samples: 2.2 cm in `bach-bwv1048` (327.30 s) and 1.7 cm in `beethoven-6-1` (467.27 s),
-      limit 1.5 (`pnpm pose-depth violinist`).
-- [ ] Third Tripo rabbit: at rest the frog end of the upright bow stands beside the right thigh,
-      and not on it: the short arms do not reach the top of the thigh in front of the hip, and the
-      hanging arm keeps clear of the thigh (`hangingArm()`). The frog end stood 5 cm to 10 cm
-      above the thigh with the hair to the back, but then the paw flipped in each lift. The right
-      fingers keep the curl of the play (`curlR` of `pose/bowed.ts`) at rest.
-- [ ] Third Tripo rabbit: in the play the depths of the arms grow against the second rabbit
-      (`pnpm pose-depth violinist --base 12edbabec`): the upper arms 3.8 cm into the body (2.4)
-      and 2.1 cm into the violin (0.2), the forearms 2.9 cm into the body (2.3). No ear meets the
-      violin or the bow.
-- [ ] Third Tripo rabbit: faces of the knuckle creases of the curled paws fold in each sample
-      (`pnpm arm-check violinist`, folds p95 10 left in the play and 8 right in the lift, limit 8,
-      29 and 12 before the smaller paws). Wider knuckle
-      rows took the count only from 38 to 37. Check the curled paws in the app.
-- [ ] Third Tripo rabbit: the right knee has no clean quad strip, so it takes no ring, and the
-      left elbow has partial rings from x 0.144 to 0.192. Check the knees and the elbows in the
-      seated bind.
-- [ ] Third Tripo rabbit: the stern look of the source eyes (painted lash lines over the upper
-      iris) stays. Check that the face reads happy enough in the hall.
-- [ ] Third Tripo rabbit eyes: one painted iris cannot sit in the middle from each view. After the
-      move of `shift_eyes()`, the pupils sit 0.09 to 0.12 of the half width of the opening out in
-      the front view of the test page, and 0.11 to 0.14 toward the nose in the 3/4 views. A small
-      dark lash corner stays at the inner bottom of each eye. Check the gaze in the app.
+- [ ] Fourth Tripo rabbit seats: against 931b150dd, 14 of 18 demos keep each seat, and 4 move:
+      `bach-bwv1050` (8 players, up to 1.5 m), `bach-bwv1047` (2 players, the mouse oboist and a
+      rabbit, 0.51 m), `bach-bwv1048` (3 players, 0.10 m), and `boulanger-matin` (3 players,
+      0.13 m). The seated eyes keep their height. Causes by hybrid probes: the whisker strips make
+      the head box 0.240 m wide on each side (0.207 m before, and 0.225 m or less keeps the seats
+      of `bach-bwv1050` and `boulanger-matin`), and the ears in the sight mesh move `bach-bwv1047`
+      and `bach-bwv1048`. Shorter whisker strips (about 10 %) would keep two demos. Check the new
+      seats in the app.
+- [ ] Fourth Tripo rabbit: at rest the lower end of the violin stands 2.1 cm above the lap (goal
+      2.0), and the violin goes 1.0 cm into the body. In the lowering it goes 4.0 cm into the body
+      (4.4 cm before). The upper arms go 3.9 cm into the body in the play (3.8 cm before), and
+      into the violin 0.8 cm in the lift (0.1 cm before) (`pnpm hold-fit violinist`).
+- [ ] Fourth Tripo rabbit: in `pnpm body-clip violinist` 7 of 11 rows clip (8 of 16 before): the
+      left forearm and the left paw 2.3 cm and 1.9 cm into the violin in about 80 % of the play,
+      the chest 2.0 cm, as on the third rabbit.
+- [ ] Fourth Tripo rabbit: only 2 faces keep the gloss nose (27 on the third rabbit), because the
+      face colors of the nose box fail the pink test of `nose_trim()`. Check the shine of the nose.
+- [ ] Fourth Tripo rabbit face: the mouth of the source reads only a little happy in the front
+      view of the hall. The map `smile` of the chain lifted the mouth corners of the third rabbit.
+      Check the face in the app.
+- [ ] Fourth Tripo rabbit fur: in the hall the lit fur has Oklab L 0.78 and C 0.07, and the
+      rabbits of `orchestra-latest.png` L 0.94 to 0.98 and C 0.01 to 0.02. The map fur has the
+      chroma of the sheet (`FUR_CHROMA`), and the warm hall light gives most of the rest.
 - [ ] Tripo pig: at rest and in the moves, the right upper arm goes 2.4 cm into the cap of the arm
       root (`pnpm pose-depth hornist`, limit 1.5 cm; 0.8 cm in the play). Check the right shoulder
       at rest in 2x crops, or accept the depth with its reason in the sweep of the hornist.
