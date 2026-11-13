@@ -1073,7 +1073,11 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   nod, and no lift of the baton.
 - **Baton.** The bear holds one baton, in the right paw, with the palm down and tilted a little
   in, as a conductor holds it between the thumb and the fingers (`CONDUCTOR_HOLD.batonRoll`). The
-  roll is right for a body whose `palm` is the true palm of its paw.
+  roll is right for a body whose `palm` is the true palm of its paw. The fingers curl around the
+  baton in each pose, also at rest and in the bow (`batonCurl`), because a conductor keeps the
+  baton in the closed hand. Reason: the open rest paw of the Tripo bear showed the baton under
+  the tips of its claws. The curl stays below the angle at which the knuckle crease of the Tripo
+  bear folds.
 - **Paws of the arm gate.** In the ready gesture the left palm faces in and down, as in the quiet
   place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
   pose the arms hang relaxed beside the round belly, a little forward, with a small bend of the
