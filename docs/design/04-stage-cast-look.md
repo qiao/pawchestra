@@ -503,8 +503,8 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
 ### Hand rig
 
 A body can also come from a rig that a person or an agent makes by hand in Blender, saved as
-`assets/models/<s>/<s>.blend`. `pnpm rig-export <s>` (`tools/blender/export_rig.py`, headless
-Blender) reads it and writes `<s>.rig.glb` in the format of "Mesh rig". Thus `pnpm studio-body`,
+`assets/models/<s>/tripo-hand/<s>.blend`. `pnpm rig-export <s>` (`tools/blender/export_rig.py`,
+headless Blender) reads it and writes `<s>.rig.glb` in the format of "Mesh rig". Thus `pnpm studio-body`,
 the app, and the gates (`arm-check`, `cast-matrix`, `pose-depth`, `close-views`) do not change.
 Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, so a rule for one
 fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows

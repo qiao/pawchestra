@@ -3,9 +3,9 @@
     blender -b --factory-startup --python tools/blender/export_rig.py -- <animal> \
         [--blend <file.blend>] [--out <file.glb>]
 
-`pnpm rig-export <animal>` runs it on `assets/models/<animal>/<animal>.blend`, and writes
-`<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it. `pnpm studio-body`
-reads the GLB file as it reads a file of `rig_mesh.py`. The script checks the layout of design 4.4
+`pnpm rig-export <animal>` runs it on `assets/models/<animal>/tripo-hand/<animal>.blend`, and
+writes `<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it.
+`pnpm studio-body` reads the GLB file as it reads a file of `rig_mesh.py`. The script checks the layout of design 4.4
 and stops at the first fault with its name. Then it bakes the bind: the rest of the file is the
 basis with the keys `bind*`, moved by the linear blend of the bones in the Action `bind`, and the
 move of each key `arm_raise_*` is its move in the bind. The bake must match the mesh that Blender
@@ -565,7 +565,7 @@ def main():
     """Checks, bakes, and writes the hand rig of the animal of the arguments."""
     rest = sys.argv[sys.argv.index('--') + 1 :]
     species = rest[0] if rest else fail('Usage: export_rig.py -- <animal> [--blend] [--out]')
-    folder = os.path.join(sa.ROOT, 'assets', 'models', species)
+    folder = os.path.join(sa.ROOT, 'assets', 'models', species, 'tripo-hand')
     blend = rest[rest.index('--blend') + 1] if '--blend' in rest else f'{folder}/{species}.blend'
     out = rest[rest.index('--out') + 1] if '--out' in rest else f'{folder}/{species}.rig.glb'
     need(os.path.isfile(blend), f'The file {blend} does not exist.')
