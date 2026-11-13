@@ -3,7 +3,9 @@ import { SCENE_COLORS } from './colors.ts';
 import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
 import { MeshBuilder, applyTransform, transform } from './mesh.ts';
-import type { MeshData, Rgb } from './mesh.ts';
+import type { MeshData, Rgb, Transform } from './mesh.ts';
+import { pianoSheetCorners } from './instruments/piano.ts';
+import type { ModelCache } from './model-cache.ts';
 import { box, cylinder, quad } from './primitives.ts';
 import type { SceneLayout } from './layout.ts';
 import { STAGE_COLORS, addDesk, deskSheetCorners, standSheetCorners } from './props.ts';
@@ -595,22 +597,50 @@ const SCORE_PAGE = {
 } as const;
 
 /**
- * Gives the sheets of music of a layout (design 4.5): the sheet of each music stand, and the two
- * pages of the score on the conductor stand. The scene draws staff lines and notes on them.
+ * Gives the place of an object that stands on the stage and turns around y.
+ *
+ * @param position The position on the stage.
+ * @param facing The turn around y, in radians.
+ * @returns The place.
+ */
+function stagePlace(position: Vec3, facing: number): Transform {
+  return transform(
+    position,
+    toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), facing)),
+  );
+}
+
+/**
+ * Gives the sheets of music of a layout (design 4.5): the sheet of each music stand, the sheet on
+ * the desk of each piano, and the two pages of the score on the conductor stand. The scene draws
+ * staff lines and notes on them. The piano does not move in a pose, so its sheet stays at its
+ * place in the bind pose of the player.
  *
  * @param layout The layout of a score.
+ * @param models The player models of the score, which give the place of each piano.
  * @returns 12 numbers for each sheet: x, y, z of its corners at the lower left, the lower right,
  *   the upper right, and the upper left, as its reader sees it ({@link deskSheetCorners}).
  */
-export function buildSheets(layout: SceneLayout): Float32Array {
+export function buildSheets(layout: SceneLayout, models: ModelCache): Float32Array {
   const corners: number[] = [];
   for (const at of layout.stands) {
-    const place = transform(
-      at.position,
-      toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), at.facing)),
-    );
+    const place = stagePlace(at.position, at.facing);
     for (const corner of standSheetCorners(at.deskHeight)) {
       corners.push(...applyTransform(place, corner));
+    }
+  }
+  for (const { cast, position, facing } of layout.players) {
+    if (cast.instrument !== 'piano') {
+      continue;
+    }
+    const model = models.get(cast.species, cast.instrument, cast.kettles, cast.support);
+    const piano = model.pieces.find((placed) => placed.piece.bone === 'instrument');
+    if (!piano) {
+      continue;
+    }
+    const place = stagePlace(position, facing);
+    for (const corner of pianoSheetCorners()) {
+      corners.push(...applyTransform(place, applyTransform(piano.at, corner)));
     }
   }
   if (layout.conductor) {

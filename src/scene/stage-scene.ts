@@ -573,7 +573,7 @@ export class StageScene {
     setRimLights(this.#rim, lights);
     yield;
     const props = createStaticMesh(buildSceneProps(layout), materials);
-    const sheets = createSheetMesh(buildSheets(layout), materials[0]);
+    const sheets = createSheetMesh(buildSheets(layout, models), materials[0]);
     if (sheets) {
       props.add(sheets);
     }
