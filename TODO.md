@@ -461,7 +461,7 @@ passes.
 - [ ] Badger xylophonist: the grip stays up to 7 cm over its bar (`gripRise`), and a real player
       keeps the hands at most one inch over them (percussion-technique 9). With 0.2 H, a target
       missed by 6.8 mm. The limit bends the paws more on the forearms: the arm gate counts 35 (L)
-      and 24 (R) folded faces at the wrists in place of 22 and 15, which the 2x paw crops of
+      and 22 (R) folded faces at the wrists in place of 22 and 15, which the 2x paw crops of
       `reports/2026-11-13-perc-holds/crops/` do not show. A home moved out to the end bars kept the
       folds low, but spread the arms out as wings.
 - [ ] Badger xylophonist: a fast run between the lowest and the highest bars keeps the body in the
