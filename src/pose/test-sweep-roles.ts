@@ -12,7 +12,6 @@ import { buildSupport } from '../models/props.ts';
 import type { PlayerModel } from '../models/player.ts';
 import type { BoneName } from '../models/rig.ts';
 import { SPECIES, instrumentScale } from '../models/species.ts';
-import { STUDIO_RABBIT } from '../models/studio/rabbit.ts';
 import type { SpeciesId, SpeciesParams } from '../models/species.ts';
 import { scoreOf } from '../score/test-score.ts';
 import { countInAt } from './count-in.ts';
@@ -100,6 +99,7 @@ const BODY_LOOPS = 2;
  *   the roots of the ears, and the edges of the 2 lids.
  * - The rabbit: 14 open loops, the cuts to the two upper arms and the open loops of the third Tripo
  *   rabbit (the whisker strips, the eyeballs, and two of the body) and of its lids.
+ * - The wolf: 5 open loops, the cuts to the two upper arms and 3 open loops of the Tripo wolf.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
@@ -116,50 +116,19 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/panda/tripo-hand/panda.rig.glb', 6],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 14],
+  ['assets/models/wolf/tripo-hand/wolf.rig.glb', 5],
 ]);
 
 /**
  * Gives the open loops of {@link BODY_BONES} of the body of a player.
  *
  * @param posed The posed skeleton.
- * @param loops The open loops of the body of the species when it is no Tripo hand rig.
+ * @param loops The open loops of the body when it is no Tripo hand rig.
  * @returns The loops of {@link TRIPO_BODY_LOOPS} for a Tripo hand rig, else `loops`.
  */
 function bodyLoops(posed: PosedSkeleton, loops: number): number {
   return TRIPO_BODY_LOOPS.get(posed.model.studio.body.source) ?? loops;
 }
-
-/**
- * The open loops of {@link BODY_BONES} of the foxes, the bodies of the meshes
- * (`pnpm rig-mesh <animal>`): the cuts to the two upper arms, and two open edges of each mesh. The
- * export drops the gloss fan over each eye of the rig, and the bead eyes of the app are not in the
- * skin of the studio (design 4.5).
- */
-const MESH_BODY_LOOPS = 4;
-
-/**
- * The open loops of {@link BODY_BONES} of the rabbit mesh in an A-pose: the roots of the two upper
- * arms, and six small open edges at the whiskers, which the source mesh has.
- */
-const RABBIT_BODY_LOOPS = 8;
-
-/**
- * The open loops of {@link BODY_BONES} of the cat mesh: the cuts to the two upper arms, and one
- * open edge pair of 1.4 cm at a whisker.
- */
-const CAT_BODY_LOOPS = 3;
-
-/**
- * The open loops of {@link BODY_BONES} of the dog mesh: the cuts to the two upper arms, two open
- * edge pairs of 3 cm at the muzzle, and two of 1.5 cm to 1.9 cm at the toes.
- */
-const DOG_BODY_LOOPS = 6;
-
-/**
- * The open loops of {@link BODY_BONES} of the hippo mesh: the cuts to the two upper arms, and one
- * open edge pair of 3.3 cm in the small tail.
- */
-const HIPPO_BODY_LOOPS = 3;
 
 /**
  * The open loops of {@link BODY_BONES} of the mouse mesh: the cuts to the two upper arms, 10 open
@@ -169,25 +138,6 @@ const HIPPO_BODY_LOOPS = 3;
 const MOUSE_BODY_LOOPS = 14;
 
 /**
- * The open loops of {@link BODY_BONES} of the elephant mesh in an A-pose: the roots of the two
- * upper arms, and one open edge pair of 2.7 cm at the left side of the head, which the source mesh
- * has.
- */
-const ELEPHANT_BODY_LOOPS = 3;
-
-/**
- * The open loops of {@link BODY_BONES} of the beaver mesh: the cuts to the two upper arms, and 7
- * open edge pairs and triples of 1.2 cm to 5.6 cm at the roots of the whiskers on the cheeks.
- */
-const BEAVER_BODY_LOOPS = 9;
-
-/**
- * The open loops of {@link BODY_BONES} of the wolf mesh: the cuts to the two upper arms, and three
- * open edge pairs of 4.2 cm to 11.6 cm, one on the head and two on the sides of the trunk.
- */
-const WOLF_BODY_LOOPS = 5;
-
-/**
  * The open loops of {@link BODY_BONES} of the badger mesh: the cuts to the two upper arms. The
  * rigid weights of the left shoulder join a loop of 4 edges at the left shoulder to the cut of the
  * left upper arm (29 edges in place of 25).
@@ -195,38 +145,11 @@ const WOLF_BODY_LOOPS = 5;
 const BADGER_BODY_LOOPS = 2;
 
 /**
- * The open loops of {@link BODY_BONES} of the monkey mesh: the cuts to the two upper arms, two open
- * edge pairs of 2.6 cm and 2.8 cm at the sides of the neck, and one open edge pair of 3.3 cm at the
- * left toes.
- */
-const MONKEY_BODY_LOOPS = 5;
-
-/**
  * The open loops of {@link BODY_BONES} of the rhino mesh in a T-pose: the roots of the two upper
  * arms, and one small loop of two edges (3.8 cm) at the head, where faces meet that follow other
  * bones most.
  */
 const RHINO_BODY_LOOPS = 3;
-
-/**
- * The open loops of {@link BODY_BONES} of the old deer mesh: the roots of the two rebuilt upper
- * arms (`deer-arms.glb` at cbc8db5e4), and one open edge pair of 1.5 cm at the left hoof.
- */
-const DEER_BODY_LOOPS = 3;
-
-/**
- * The open loops of {@link BODY_BONES} of the old pig mesh of `pig.rig.glb` at cbc8db5e4: none.
- * Each arm of that pig is a closed part of its own with no face that joins it to the trunk
- * (`pig-upper.glb` and `pig-arms.glb` at cbc8db5e4), and the trunk wall under each arm is closed.
- * The Tripo pig takes its loops from {@link TRIPO_BODY_LOOPS}.
- */
-const PIG_BODY_LOOPS = 0;
-
-/**
- * The open loops of {@link BODY_BONES} of the T-pose panda mesh: the roots of the two upper arms,
- * and one open edge pair of 0.8 cm at the left side of the nose, which the source mesh has.
- */
-const PANDA_BODY_LOOPS = 3;
 
 /** The parts of the two arms that move in the sweep of a role. */
 const ARM_PARTS: readonly SweepPart[] = [
@@ -309,56 +232,6 @@ function bodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of a mesh, the rabbit or a fox: {@link BODY_BONES}
- * with a cap on each open loop ({@link RABBIT_BODY_LOOPS} or {@link MESH_BODY_LOOPS}, or
- * {@link TRIPO_BODY_LOOPS} for a Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function meshBodySurface(posed: PosedSkeleton): ClosedSurface {
-  const rabbit = posed.model.studio.body.source === STUDIO_RABBIT.source;
-  return closedPart(
-    posed,
-    BODY_BONES,
-    bodyLoops(posed, rabbit ? RABBIT_BODY_LOOPS : MESH_BODY_LOOPS),
-  );
-}
-
-/**
- * The closed surface of the body of the cat: {@link BODY_BONES} with a cap on each open loop
- * ({@link CAT_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function catBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, CAT_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the dog mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link DOG_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function dogBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, DOG_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the hippo mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link HIPPO_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function hippoBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, HIPPO_BODY_LOOPS));
-}
-
-/**
  * The closed surface of the body of the mouse mesh: {@link BODY_BONES} with a cap on each open loop
  * ({@link MOUSE_BODY_LOOPS}).
  *
@@ -367,40 +240,6 @@ function hippoBodySurface(posed: PosedSkeleton): ClosedSurface {
  */
 function mouseBodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, MOUSE_BODY_LOOPS);
-}
-
-/**
- * The closed surface of the body of the beaver: {@link BODY_BONES} with a cap on each open loop
- * ({@link BEAVER_BODY_LOOPS} of the beaver mesh, or the loops of {@link TRIPO_BODY_LOOPS} of the
- * Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function beaverBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, BEAVER_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the elephant mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link ELEPHANT_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function elephantBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, ELEPHANT_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the wolf mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link WOLF_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function wolfBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, WOLF_BODY_LOOPS);
 }
 
 /**
@@ -415,17 +254,6 @@ function badgerBodySurface(posed: PosedSkeleton): ClosedSurface {
 }
 
 /**
- * The closed surface of the body of the monkey mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link MONKEY_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function monkeyBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, MONKEY_BODY_LOOPS));
-}
-
-/**
  * The closed surface of the body of the rhino mesh: {@link BODY_BONES} with a cap on each open
  * loop ({@link RHINO_BODY_LOOPS}).
  *
@@ -434,40 +262,6 @@ function monkeyBodySurface(posed: PosedSkeleton): ClosedSurface {
  */
 function rhinoBodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, RHINO_BODY_LOOPS);
-}
-
-/**
- * The closed surface of the body of the deer: {@link BODY_BONES} with a cap on each open loop of
- * the deer mesh ({@link DEER_BODY_LOOPS}) or of the Tripo fawn ({@link TRIPO_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function deerBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, DEER_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the pig: {@link BODY_BONES}, which need no cap on the pig mesh
- * ({@link PIG_BODY_LOOPS}), and a cap on each open loop of the Tripo pig
- * ({@link TRIPO_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function pigBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, PIG_BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the panda: {@link BODY_BONES} with a cap on each open loop
- * ({@link PANDA_BODY_LOOPS}, or {@link TRIPO_BODY_LOOPS} for the Tripo hand rig).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function pandaBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, PANDA_BODY_LOOPS));
 }
 
 /** The seat of each player model, found one time for each model. */
@@ -814,7 +608,7 @@ const HARPIST_SWEEP: RoleSweep = {
   role: 'harpist',
   parts: [...ARM_PARTS, ...SEATED_PARTS],
   obstacles: [
-    { name: 'body', surface: deerBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'harp', surface: harpFrame },
     { name: 'stool', surface: seatSurface },
   ],
@@ -1153,7 +947,7 @@ export const VIOLINIST_SWEEP: RoleSweep = {
   role: 'violinist',
   parts: [...ARM_PARTS, { name: 'bow', bones: ['bow'] }, INSTRUMENT_PART],
   obstacles: [
-    { name: 'body', surface: meshBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'violin', surface: instrumentSurface },
   ],
   contact: CONTACT,
@@ -1250,7 +1044,7 @@ export const FLUTIST_SWEEP: RoleSweep = {
   role: 'flutist',
   parts: [...ARM_PARTS, INSTRUMENT_PART],
   obstacles: [
-    { name: 'body', surface: meshBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'flute', surface: instrumentSurface },
   ],
   contact: CONTACT,
@@ -1352,16 +1146,14 @@ function sweptTrombonist(scene: TestScene, index: number): boolean {
  * The sweep of the trombonist (design 5.3): the arms against the body and the trombone, and the
  * trombone with its slide in the body ({@link INSTRUMENT_PART}), in a full play, in the lift at the
  * play start, in the rest pose before the first play, and in the lowering after the song end, with
- * the left palm on its grip and the right palm on the slide. The first
- * seated panda of each demo with trombones, and each standing panda soloist, play it. The body of
- * the panda mesh has one small open edge pair, so its closed surface has a cap on it and on the
- * roots of the two upper arms ({@link pandaBodySurface}).
+ * the left palm on its grip and the right palm on the slide. The first seated panda of each demo
+ * with trombones, and each standing panda soloist, play it.
  */
 const TROMBONIST_SWEEP: RoleSweep = {
   role: 'trombonist',
   parts: [...ARM_PARTS, INSTRUMENT_PART],
   obstacles: [
-    { name: 'body', surface: pandaBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'trombone', surface: instrumentSurface },
   ],
   contact: CONTACT,
@@ -1403,7 +1195,7 @@ const VIOLIST_SWEEP: RoleSweep = {
   ...VIOLINIST_SWEEP,
   role: 'violist',
   obstacles: [
-    { name: 'body', surface: catBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'viola', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'viola'),
@@ -1418,7 +1210,7 @@ const CELLIST_SWEEP: RoleSweep = {
   ...VIOLINIST_SWEEP,
   role: 'cellist',
   obstacles: [
-    { name: 'body', surface: dogBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'cello', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'cello'),
@@ -1433,7 +1225,7 @@ const BASSIST_SWEEP: RoleSweep = {
   ...VIOLINIST_SWEEP,
   role: 'bassist',
   obstacles: [
-    { name: 'body', surface: hippoBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'contrabass', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'contrabass'),
@@ -1498,7 +1290,7 @@ const TIMPANIST_SWEEP: RoleSweep = {
     { name: 'head', bones: ['head'] },
   ],
   obstacles: [
-    { name: 'body', surface: elephantBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'kettles', surface: instrumentSurface },
   ],
   contact: CONTACT,
@@ -1852,7 +1644,7 @@ const BASSOONIST_SWEEP: RoleSweep = {
   ...FLUTIST_SWEEP,
   role: 'bassoonist',
   obstacles: [
-    { name: 'body', surface: beaverBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'bassoon', surface: instrumentSurface },
   ],
   accepted: ['lift', 'lower'].map((samples) => ({
@@ -1917,14 +1709,13 @@ function sweptHornist(scene: TestScene, index: number): boolean {
  * The sweep of the hornist (design 5.3): the sweep of the trombonist with the horn and the pig.
  * The first seated pig of each demo with horns, and each standing pig soloist, play it. The left
  * palm is on its grip at the valves at the start of each phrase, and the right palm on its grip in
- * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide). The body
- * takes a cap on each open loop of the Tripo pig ({@link pigBodySurface}).
+ * the bell at the start of each note ({@link trombonistTargets}: the horn has no slide).
  */
 const HORNIST_SWEEP: RoleSweep = {
   ...TROMBONIST_SWEEP,
   role: 'hornist',
   obstacles: [
-    { name: 'body', surface: pigBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'horn', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'horn'),
@@ -1988,7 +1779,7 @@ const CLARINETIST_SWEEP: RoleSweep = {
   ...FLUTIST_SWEEP,
   role: 'clarinetist',
   obstacles: [
-    { name: 'body', surface: wolfBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'clarinet', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'clarinet'),
@@ -2053,7 +1844,7 @@ const TRUMPETER_SWEEP: RoleSweep = {
   ...TROMBONIST_SWEEP,
   role: 'trumpeter',
   obstacles: [
-    { name: 'body', surface: monkeyBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'trumpet', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'trumpet'),
@@ -2198,8 +1989,8 @@ function sweptSinger(scene: TestScene, index: number): boolean {
  * folder in the body ({@link INSTRUMENT_PART}), in a full play, in the lift at the play start, in
  * the rest pose before the first play, and in the lowering after the song end. The folder stays
  * in the flippers in each set. The first penguin of each demo with a choir sings it, with each palm
- * on its grip at the start of each note ({@link singerTargets}). The body of the penguin mesh has no
- * open edge, so its closed surface has the two cuts to the upper arms.
+ * on its grip at the start of each note ({@link singerTargets}). The body takes a cap on each open
+ * loop of the Tripo penguin ({@link TRIPO_BODY_LOOPS}).
  */
 const SINGER_SWEEP: RoleSweep = {
   role: 'singer',
