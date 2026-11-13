@@ -21,16 +21,34 @@ export const BATON_TIP = 0.49;
 const BATON_RADII = [0.008, 0.0045] as const;
 
 /**
+ * The turn of the stick of the baton from the line of the fingers toward the thumb, in the plane
+ * of the palm. The stick leaves the fist on the side of the thumb and the first fingers, which
+ * hold it (`conductor-technique.md`, section 7a).
+ */
+const STICK_TO_THUMB = 30 * MathUtils.DEG2RAD;
+
+/**
+ * The turn of the stick of the baton from the line of the fingers toward the palm. The butt lies
+ * in the heel of the palm, and the stick leaves the paw through the palm, under the curled
+ * claws, so that the closed paw grips it. With the stick in the plane of the palm, it ran through
+ * the middle of the thick paw of the Tripo bear and came out at the tips of the claws. The turn
+ * also brings the paw near the line of the forearm in the beat: the paw bent 41° to 59° toward
+ * the palm from the forearm with the stick in the plane of the palm, and 12° to 29° with it.
+ */
+const STICK_TO_PALM = 30 * MathUtils.DEG2RAD;
+
+/**
  * The direction of the stick of the baton in the bind pose, from the grip to the tip, in the
- * model axes: in the hanging right hand, along the fingers (down) and 15° toward the thumb (to
- * the front). A conductor holds the baton between the thumb and the first fingers, along the
- * line of the index finger, with its grip in the palm, so that the stick extends the hand
- * (design 4.6). A stick across the fist points 90° from the fingers.
+ * model axes: in the hanging right hand, along the fingers (down), turned toward the thumb (to
+ * the front, {@link STICK_TO_THUMB}) and toward the palm (in, {@link STICK_TO_PALM}). A conductor
+ * holds the baton with the thumb and the first fingers, with its butt against the palm, so that
+ * the stick extends the line of the forearm (design 4.6). A stick across the fist points 90°
+ * from the fingers.
  */
 export const BATON_ALONG: Vec3 = [
-  0,
-  -Math.cos(MathUtils.DEG2RAD * 15),
-  -Math.sin(MathUtils.DEG2RAD * 15),
+  -Math.sin(STICK_TO_PALM),
+  -Math.cos(STICK_TO_PALM) * Math.cos(STICK_TO_THUMB),
+  -Math.cos(STICK_TO_PALM) * Math.sin(STICK_TO_THUMB),
 ];
 
 /**
@@ -57,16 +75,19 @@ function topOf(along: Vec3, degrees: number): Vec3 {
 }
 
 /**
- * The grip of the baton from the middle of the palm, in head heights, in the model axes: a little
- * up toward the heel of the palm, in front toward the index finger, and in toward the palm. The
- * butt of the stick then sits in the palm, and the stick lies along the index finger.
+ * The grip of the baton from the middle of the palm, in head heights, in the model axes: up
+ * toward the heel of the palm, in toward the palm, and a little back from the line of the index
+ * finger. The butt of the stick then lies in the heel of the palm, inside the paw, and the stick
+ * leaves the paw through the palm. The grip of the stick in the middle of the paw (-0.03, 0.05,
+ * -0.04) put the butt in the middle of the thick paw of the Tripo bear.
  */
-const BATON_GRIP: Vec3 = [-0.03, 0.05, -0.04];
+const BATON_GRIP: Vec3 = [-0.08, 0.09, 0.02];
 
 /**
  * Builds the baton of the conductor (design 4.6): a straight white stick that tapers to the tip,
  * with a round handle. The grip is at the origin, and the stick runs along +x to the tip. In the
- * bind pose, it lies in the hanging right hand along the index finger ({@link BATON_ALONG}).
+ * bind pose, its butt lies in the heel of the palm of the hanging right hand, and the stick
+ * leaves the paw through the palm toward the thumb ({@link BATON_ALONG}).
  *
  * @returns The model.
  */

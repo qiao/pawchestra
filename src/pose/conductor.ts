@@ -24,9 +24,9 @@ import type { PlantedLegs } from './side-move.ts';
  * The hold of the baton and of the left hand of the conductor (design 5.4). The places are in
  * head heights `H` of the bear of the cast, the studio bear (0.313 m), in the model axes of the
  * bind pose: the bear faces -z, and its left is -x. The places of the left hand and the elbows
- * keep their values in `H`. The baton lies along the index finger, and its point and pivot keep
- * the direction of the hold of the mesh bear at 0.93 of its meters. `CUE_MOTION` of `cues.ts`
- * gives the directions of a cue.
+ * keep their values in `H`. The butt of the baton lies in the palm ({@link BATON_ALONG}), and
+ * its point and pivot keep the direction of the hold of the mesh bear at 0.93 of its meters.
+ * `CUE_MOTION` of `cues.ts` gives the directions of a cue.
  */
 export const CONDUCTOR_HOLD = {
   /**
@@ -268,8 +268,8 @@ const PALM_TWIST = { up: -MAX_TWIST_L, down: MAX_TWIST_L } as const;
 const CLOSE_CURL = 80 * MathUtils.DEG2RAD;
 
 /**
- * The rotation of the baton in the bind pose: its tip along the fingers of the hanging right hand,
- * and its top out of the back of the hand (design 4.6, {@link BATON_ALONG}).
+ * The rotation of the baton in the bind pose: its tip down the hanging right hand, toward the thumb
+ * and the palm, and its top out of the back of the hand (design 4.6, {@link BATON_ALONG}).
  */
 const BATON_BIND = setFromBasis(
   new Quaternion(),

@@ -51,13 +51,14 @@ describe('buildBaton', () => {
     expect(end.distanceTo(new Vector3(...tip))).toBeLessThan(0.005);
   });
 
-  it('points the baton along the fingers of the hanging right hand', () => {
+  it('points the baton down the hanging right hand, toward its thumb and its palm', () => {
     const hold = buildBaton().pieces[0]?.hold;
     expect(hold?.anchor).toBe('palmR');
     const forward = new Vector3(1, 0, 0).applyQuaternion(
       new Quaternion(...(hold?.rotation ?? [0, 0, 0, 1])),
     );
-    expect(forward.y).toBeLessThan(-0.9);
+    expect(forward.y).toBeLessThan(-0.7);
     expect(forward.z).toBeLessThan(0);
+    expect(forward.x).toBeLessThan(0);
   });
 });
