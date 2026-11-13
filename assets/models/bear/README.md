@@ -147,8 +147,8 @@ The weights, in the rest pose:
    part.
 2. Arm rows: each vertex of a side with |x| from 0.165, within 0.085 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.165 to 0 at x
-   0.22, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.245, 0.26, 0.275, and 0.29, and
-   the rest on the 4 roll segments.
+   0.22, an elbow helper share that grows from 0 at x 0.232 to 1 at the elbow joint (x 0.265) and
+   falls to 0 at x 0.303, and the rest on the 4 roll segments.
 3. Wrist rows and knuckle rows as on the badger: the bend share of the paw grows in 12 equal steps
    of 0.004 from 0.03 units before the head of `hand_<side>`, and the fingers share in 12 equal
    steps of 0.0035 from 0.02 units before the head of `fingers_<side>`.
@@ -200,8 +200,8 @@ License of both files: CC BY-NC 4.0, as the FBX file. Two runs of the chain give
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 1,093,528 bytes | `ba06d1dfee96b08a54702de0fadbe9fa42fc58ae52e54259e8c1766305ac4a6b` |
-| `tripo-hand/bear.rig.json` | 15,939 bytes | `02541d39618ae6519994bc91f1b6dd9373666c5e862fb0319cc092d652e46001` |
+| `tripo-hand/bear.rig.glb` | 1,093,528 bytes | `95cb3fae3b61776b2f0ab70ac93528729a809506414359ea3c512a82800c8936` |
+| `tripo-hand/bear.rig.json` | 15,939 bytes | `4b63d21d89ab7ceef681168a0e80530466a6c65e1ab01acce3a1851d422eaa81` |
 
 ### Conductor
 
@@ -222,7 +222,7 @@ the paw through the palm under the curled claws. The measures of `pnpm hold-fit 
 | Forearms in the body, lift, lowering, and rest | 1.9 cm | 0.0 cm |
 | Upper arms in the body, lift and lowering | 3.8 cm | 3.7 cm (limit 4 cm) |
 | Upper arms in the body, rest | 3.2 cm | 3.7 cm (limit 4 cm) |
-| Samples of the play with a folded face | 56.2 % | 25.3 % |
+| Samples of the play with a folded face | 56.2 % | 17.8 % |
 | Faces that fold at rest | 7 | 7 |
 | Paw twist on the forearm in the play, L / R | 20° / -3° | -10° / 21° |
 | Body in the baton (`pnpm body-clip conductor`) | PASS, no point | PASS, no point |
@@ -233,6 +233,7 @@ takes away the fold of the wrist face 1833. The paw stays closed around the bato
 the bow.
 
 The arm gate of the left arm (`pnpm arm-check conductor`) gives a stretch p95 of 0.29 (limit
-0.35) and 7 folded faces in the lift (limit 8). The left inner elbow (faces 443, 5222, 5223, and
-5226) folds from a bend of about 45°, so the ready gesture and the cue point keep the left arm
-nearly straight.
+0.35) and 5 folded faces (limit 8). With the continuous elbow rows, the left inner elbow (faces
+443, 5222, 5223, and 5226) no longer folds at a bend of about 45° (`pnpm fold-probe conductor
+--faces`: lift 94 % to 0 %). The faces 4254, 4258, 4259, and 4262 of the left elbow fold in at
+most 6 % of the play, only at bends of 89° to 142°.
