@@ -1,0 +1,404 @@
+{
+  "source": "assets/models/mouse/tripo-p2/mouse.fbx",
+  "sourceNote": "The Tripo P2 mouse mesh with its quads (assets/models/mouse/README.md). The hand rig assets/models/mouse/tripo-hand/mouse.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "name": "Mouse",
+  "weld": 1e-05,
+  "joints": {
+    "root": {
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.1
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "hips": {
+      "head": [
+        0.0,
+        0.2,
+        0.03
+      ],
+      "tail": "spine"
+    },
+    "spine": {
+      "head": [
+        0.0,
+        0.31,
+        0.05
+      ],
+      "tail": "spine1"
+    },
+    "spine1": {
+      "head": [
+        0.0,
+        0.42,
+        0.07
+      ],
+      "tail": "chest"
+    },
+    "chest": {
+      "head": [
+        0.0,
+        0.53,
+        0.08
+      ],
+      "tail": "neck"
+    },
+    "neck": {
+      "head": [
+        0.0,
+        0.645,
+        0.085
+      ],
+      "tail": "head"
+    },
+    "head": {
+      "head": [
+        0.0,
+        0.69,
+        0.09
+      ],
+      "tail": [
+        0.0,
+        0.92,
+        0.1
+      ]
+    },
+    "ear_L": {
+      "head": [
+        0.095,
+        0.885,
+        0.02
+      ],
+      "tail": [
+        0.19,
+        0.985,
+        -0.06
+      ]
+    },
+    "clavicle_L": {
+      "head": [
+        0.03,
+        0.615,
+        0.09
+      ],
+      "tail": "upper_arm_L"
+    },
+    "upper_arm_L": {
+      "head": [
+        0.115,
+        0.603,
+        0.092
+      ],
+      "tail": "forearm_L",
+      "roll": "palm"
+    },
+    "forearm_L": {
+      "head": [
+        0.225,
+        0.6,
+        0.094
+      ],
+      "tail": "forearm_twist_L",
+      "roll": "palm"
+    },
+    "forearm_twist_L": {
+      "head": [
+        0.2775,
+        0.598,
+        0.102
+      ],
+      "tail": "hand_L",
+      "roll": "palm"
+    },
+    "hand_L": {
+      "head": [
+        0.33,
+        0.595,
+        0.11
+      ],
+      "tail": "fingers_L",
+      "roll": "palm"
+    },
+    "fingers_L": {
+      "head": [
+        0.373294,
+        0.59922,
+        0.116388
+      ],
+      "tail": [
+        0.414458,
+        0.585549,
+        0.136354
+      ],
+      "roll": "palm"
+    },
+    "thigh_L": {
+      "head": [
+        0.075,
+        0.2,
+        0.05
+      ],
+      "tail": "shin_L"
+    },
+    "shin_L": {
+      "head": [
+        0.09,
+        0.115,
+        0.068
+      ],
+      "tail": "foot_L"
+    },
+    "foot_L": {
+      "head": [
+        0.092,
+        0.045,
+        0.055
+      ],
+      "tail": "toes_L",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "toes_L": {
+      "head": [
+        0.11,
+        0.015,
+        0.14
+      ],
+      "tail": [
+        0.12,
+        0.01,
+        0.205
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail": {
+      "head": [
+        0.0,
+        0.15,
+        -0.072
+      ],
+      "tail": "tail_tip",
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "tail_tip": {
+      "head": [
+        0.0,
+        0.025,
+        -0.185
+      ],
+      "tail": [
+        0.0,
+        0.008,
+        -0.336
+      ],
+      "roll": [
+        0,
+        1,
+        0
+      ]
+    },
+    "fingers_R": {
+      "head": [
+        -0.372783,
+        0.598484,
+        0.119511
+      ],
+      "tail": [
+        -0.414852,
+        0.579604,
+        0.131913
+      ],
+      "roll": "palm"
+    }
+  },
+  "palm": [
+    0.035,
+    -0.999,
+    0.041
+  ],
+  "studio": {
+    "trunk": {
+      "open": 0,
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
+    },
+    "trunkNote": "The trunk of the bind keeps the pose of the source (open 0: no recline, trunk_turn() of tools/blender/rig_mesh.py).",
+    "bindArms": {
+      "upper_arm": [
+        0.813873,
+        -0.143043,
+        0.563161
+      ],
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
+    },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 0,
+      "R": 0
+    },
+    "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: no turn. The mouse has no chair and stands on its legs in the pose of the source, with the feet flat on the floor.",
+    "tailBind": {
+      "tail": [
+        0,
+        -0.125,
+        -0.113
+      ],
+      "tail_tip": [
+        0,
+        -0.017,
+        -0.151
+      ]
+    },
+    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the directions of the source, so that the long tail goes down behind the body and lies on the floor as in the source.",
+    "legTurns": {
+      "thigh": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "shin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "foot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "toes": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.05,
+    "eyeShare": 0.34,
+    "eyeBox": [
+      [
+        0.03,
+        0.79,
+        0.185
+      ],
+      [
+        0.095,
+        0.85,
+        0.245
+      ]
+    ],
+    "noseBox": [
+      [
+        -0.03,
+        0.74,
+        0.3
+      ],
+      [
+        0.03,
+        0.8,
+        0.345
+      ]
+    ],
+    "nose": [
+      0.86,
+      0.5,
+      0.45
+    ],
+    "tone": {
+      "chroma": 0.2,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          0,
+          0,
+          0
+        ],
+        [
+          0.97,
+          0,
+          0,
+          0
+        ]
+      ],
+      "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
+    },
+    "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
+    "eyeBoxNote": "The eye box holds the two loose eyeballs of the source (x 0.039 to 0.084 on the left, y 0.796 to 0.841, z 0.193 to 0.234). The nose box holds the pink nose."
+  },
+  "eyeShell": {
+    "lift": 0.002,
+    "points": 12,
+    "reach": 1,
+    "darkReach": 2,
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+  },
+  "chair": {
+    "halfWidth": 0.045,
+    "front": 0.015,
+    "back": -0.1,
+    "note": "The mouse has no chair (noChair of the species): it stands in the pose of the source. The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the crotch between the legs. The half width lies inside the thighs, and the front and the back edges hold the crotch."
+  },
+  "armSegments": {
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
+  },
+  "jointsNote": "The places are the places of the source (assets/models/mouse/README.md), in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed loops of 12 vertices from x 0.18 to 0.32, the axis at y 0.60 and z 0.09 to 0.11): the shoulder joint at x 0.115, the elbow at x 0.225, the wrist at x 0.33, where the paw starts, the knuckles at x 0.372, and the tip at x 0.418. Leg (closed loops of 10 and 11 vertices at y 0.07 to 0.14, the axis at x 0.091 and z 0.06 to 0.07): the hip joint at (0.075, 0.20, 0.05) in the haunch, the knee at y 0.115, the ankle at y 0.045, and the toes forward to z 0.205. Trunk: the hips at y 0.20, the neck at y 0.645, and the head from y 0.69 to 0.92. Ears: the root at (0.095, 0.885, 0.02), the far edge at (0.19, 0.985, -0.06). Tail: from its root under the haunch at (0, 0.15, -0.072) down to the floor at z -0.185, then on the floor to its tip at z -0.336.",
+  "body": {
+    "crease": 180
+  },
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "eyeSize": 0.263312,
+  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "metersPerUnit": 1.031635,
+  "metersPerUnitNote": "The scale of the app: H (0.263312 units of the source form) is 0.271642 m, the H of the mouse of main (assets/models/mouse/mouse.rig.glb at aa8af0dd8). The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
+  "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/mouse.blend holds it.",
+  "texture": "assets/models/mouse/tripo-p2/mouse.fbm/mouse_basecolor.jpg",
+  "rollSplit": true,
+  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/cat/README.md, \"tripo-hand/cat.blend\")."
+}
